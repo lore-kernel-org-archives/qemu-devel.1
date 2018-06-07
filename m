@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUs-0008Ax-Ao
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUs-0008Ar-9J
 	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUo-00084s-Q3
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUo-00084I-PH
 	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:14:50 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  7 Jun 2018 20:14:33 +0300
-Message-Id: <20180607171441.64079-4-vsementsov@virtuozzo.com>
+Date: Thu,  7 Jun 2018 20:14:35 +0300
+Message-Id: <20180607171441.64079-6-vsementsov@virtuozzo.com>
 In-Reply-To: <20180607171441.64079-1-vsementsov@virtuozzo.com>
 References: <20180607171441.64079-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 03/11] block/nbd-client: split connection
- from initialization
+Subject: [Qemu-devel] [PATCH v2 05/11] block/nbd-client: don't check ioc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,63 +22,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Split connection code to reuse it for reconnect.
+We have several paranoiac checks for ioc != NULL. But ioc may become
+NULL only on close, which should not happen during requests handling.
+Also, we check ioc only sometimes, not after each yield, which is
+inconsistent. Let's drop these checks. However, for safety, lets leave
+asserts instead.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/nbd-client.c | 29 +++++++++++++++++++++--------
- 1 file changed, 21 insertions(+), 8 deletions(-)
+ block/nbd-client.c | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
 
 diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 6ff505c4b8..14b42f31df 100644
+index dd712c59b3..1589ceb475 100644
 --- a/block/nbd-client.c
 +++ b/block/nbd-client.c
-@@ -999,12 +999,12 @@ static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr,
-     return sioc;
- }
- 
--int nbd_client_init(BlockDriverState *bs,
--                    SocketAddress *saddr,
--                    const char *export,
--                    QCryptoTLSCreds *tlscreds,
--                    const char *hostname,
--                    Error **errp)
-+static int nbd_client_connect(BlockDriverState *bs,
-+                              SocketAddress *saddr,
-+                              const char *export,
-+                              QCryptoTLSCreds *tlscreds,
-+                              const char *hostname,
-+                              Error **errp)
+@@ -51,9 +51,7 @@ static void nbd_teardown_connection(BlockDriverState *bs)
  {
      NBDClientSession *client = nbd_get_client_session(bs);
-     int ret;
-@@ -1048,8 +1048,6 @@ int nbd_client_init(BlockDriverState *bs,
-         bs->supported_zero_flags |= BDRV_REQ_MAY_UNMAP;
+ 
+-    if (!client->ioc) { /* Already closed */
+-        return;
+-    }
++    assert(client->ioc);
+ 
+     /* finish any pending coroutines */
+     qio_channel_shutdown(client->ioc,
+@@ -150,10 +148,7 @@ static int nbd_co_send_request(BlockDriverState *bs,
+         rc = -EIO;
+         goto err;
      }
+-    if (!s->ioc) {
+-        rc = -EPIPE;
+-        goto err;
+-    }
++    assert(s->ioc);
  
--    qemu_co_mutex_init(&client->send_mutex);
--    qemu_co_queue_init(&client->free_sema);
-     client->sioc = sioc;
+     if (qiov) {
+         qio_channel_set_cork(s->ioc, true);
+@@ -426,10 +421,11 @@ static coroutine_fn int nbd_co_do_receive_one_chunk(
+     s->requests[i].receiving = true;
+     qemu_coroutine_yield();
+     s->requests[i].receiving = false;
+-    if (!s->ioc || s->quit) {
++    if (s->quit) {
+         error_setg(errp, "Connection closed");
+         return -EIO;
+     }
++    assert(s->ioc);
  
-     if (!client->ioc) {
-@@ -1066,3 +1064,18 @@ int nbd_client_init(BlockDriverState *bs,
-     logout("Established connection with NBD server\n");
-     return 0;
- }
-+
-+int nbd_client_init(BlockDriverState *bs,
-+                    SocketAddress *saddr,
-+                    const char *export,
-+                    QCryptoTLSCreds *tlscreds,
-+                    const char *hostname,
-+                    Error **errp)
-+{
-+    NBDClientSession *client = nbd_get_client_session(bs);
-+
-+    qemu_co_mutex_init(&client->send_mutex);
-+    qemu_co_queue_init(&client->free_sema);
-+
-+    return nbd_client_connect(bs, saddr, export, tlscreds, hostname, errp);
-+}
+     assert(s->reply.handle == handle);
+ 
+@@ -967,9 +963,7 @@ void nbd_client_close(BlockDriverState *bs)
+     NBDClientSession *client = nbd_get_client_session(bs);
+     NBDRequest request = { .type = NBD_CMD_DISC };
+ 
+-    if (client->ioc == NULL) {
+-        return;
+-    }
++    assert(client->ioc);
+ 
+     nbd_send_request(client->ioc, &request);
+ 
 -- 
 2.11.1
