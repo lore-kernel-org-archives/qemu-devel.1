@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fQzxs-0005Vw-HV
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:48:53 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fQzxt-0005WU-FU
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:48:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fQzxr-0001hk-8j
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:48:52 -0400
-Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:47016)
+	(envelope-from <richard.henderson@linaro.org>) id 1fQzxs-0001iD-Oz
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:48:53 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36931)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fQzxr-0001hP-3K
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:48:51 -0400
-Received: by mail-pg0-x232.google.com with SMTP id d2-v6so5164781pga.13
-	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 11:48:50 -0700 (PDT)
+	id 1fQzxs-0001hx-JB
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:48:52 -0400
+Received: by mail-pf0-x241.google.com with SMTP id y5-v6so4434182pfn.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 11:48:52 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Jun 2018 11:48:41 -0700
-Message-Id: <20180607184844.30126-2-richard.henderson@linaro.org>
+Date: Thu,  7 Jun 2018 11:48:42 -0700
+Message-Id: <20180607184844.30126-3-richard.henderson@linaro.org>
 In-Reply-To: <20180607184844.30126-1-richard.henderson@linaro.org>
 References: <20180607184844.30126-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/4] linux-user/alpha: Fix epoll syscalls
+Subject: [Qemu-devel] [PATCH 2/4] linux-user/hppa: Fix typo in mknodat
+ syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +30,23 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-These were named incorrectly, going so far as to invade strace.list.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/alpha/syscall_nr.h | 6 +++---
- linux-user/strace.list        | 9 ---------
- 2 files changed, 3 insertions(+), 12 deletions(-)
+ linux-user/hppa/syscall_nr.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/linux-user/alpha/syscall_nr.h b/linux-user/alpha/syscall_nr.h
-index 00e14bb6b3..6532376e3e 100644
---- a/linux-user/alpha/syscall_nr.h
-+++ b/linux-user/alpha/syscall_nr.h
-@@ -343,9 +343,9 @@
- #define TARGET_NR_io_cancel			402
- #define TARGET_NR_exit_group			405
- #define TARGET_NR_lookup_dcookie		406
--#define TARGET_NR_sys_epoll_create		407
--#define TARGET_NR_sys_epoll_ctl		408
--#define TARGET_NR_sys_epoll_wait		409
-+#define TARGET_NR_epoll_create		407
-+#define TARGET_NR_epoll_ctl		408
-+#define TARGET_NR_epoll_wait		409
- #define TARGET_NR_remap_file_pages		410
- #define TARGET_NR_set_tid_address		411
- #define TARGET_NR_restart_syscall		412
-diff --git a/linux-user/strace.list b/linux-user/strace.list
-index a91e33f7e5..2bc5ba04d4 100644
---- a/linux-user/strace.list
-+++ b/linux-user/strace.list
-@@ -1467,15 +1467,6 @@
- #ifdef TARGET_NR__sysctl
- { TARGET_NR__sysctl, "_sysctl" , NULL, NULL, NULL },
- #endif
--#ifdef TARGET_NR_sys_epoll_create
--{ TARGET_NR_sys_epoll_create, "sys_epoll_create" , NULL, NULL, NULL },
--#endif
--#ifdef TARGET_NR_sys_epoll_ctl
--{ TARGET_NR_sys_epoll_ctl, "sys_epoll_ctl" , NULL, NULL, NULL },
--#endif
--#ifdef TARGET_NR_sys_epoll_wait
--{ TARGET_NR_sys_epoll_wait, "sys_epoll_wait" , NULL, NULL, NULL },
--#endif
- #ifdef TARGET_NR_sysfs
- { TARGET_NR_sysfs, "sysfs" , NULL, NULL, NULL },
- #endif
+diff --git a/linux-user/hppa/syscall_nr.h b/linux-user/hppa/syscall_nr.h
+index 55bdf71d50..9c1d0a195d 100644
+--- a/linux-user/hppa/syscall_nr.h
++++ b/linux-user/hppa/syscall_nr.h
+@@ -279,7 +279,7 @@
+ #define TARGET_NR_ppoll             274
+ #define TARGET_NR_openat            275
+ #define TARGET_NR_mkdirat           276
+-#define TARGET_NR_mknotat           277
++#define TARGET_NR_mknodat           277
+ #define TARGET_NR_fchownat          278
+ #define TARGET_NR_futimesat         279
+ #define TARGET_NR_fstatat64         280
 -- 
 2.17.1
