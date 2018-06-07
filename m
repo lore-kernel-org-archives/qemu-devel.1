@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fQx02-0007wZ-6L
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:38:55 -0400
+	(envelope-from <ari@tuxera.com>) id 1fQx04-0007z6-9w
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:38:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fQx00-00045w-8W
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:38:54 -0400
+	(envelope-from <ari@tuxera.com>) id 1fQx02-00047u-To
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:38:56 -0400
 From: Ari Sundholm <ari@tuxera.com>
-Date: Thu, 7 Jun 2018 18:38:07 +0300
-Message-ID: <1528385894-19434-4-git-send-email-ari@tuxera.com>
+Date: Thu, 7 Jun 2018 18:38:12 +0300
+Message-ID: <1528385894-19434-9-git-send-email-ari@tuxera.com>
 In-Reply-To: <1528385894-19434-1-git-send-email-ari@tuxera.com>
 References: <1528385894-19434-1-git-send-email-ari@tuxera.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 03/10] block: Add a mechanism for passing a
- block driver a block configuration
+Subject: [Qemu-devel] [PATCH v3 08/10] hw/block/fdc: Always apply block
+ configuration to block driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,150 +23,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ari Sundholm <ari@tuxera.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, "open list:Block I/O path" <qemu-block@nongnu.org>
+Cc: Ari Sundholm <ari@tuxera.com>, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>
 
-A block driver may need to know about the block configuration, most
-critically the sector sizes, of a block backend for alignment purposes
-or for some other reason. It doesn't seem like qemu has an existing
-mechanism for a block backend to convey the required information to
-the relevant block driver when it is being realized.
-
-The need for this mechanism rises from the fact that a drive may not
-have a backend at the time it is created, as devices are created after
-drives during qemu startup. Therefore, a driver requiring information
-about the block configuration can get this information when a backend
-is created for it at the earliest. The most natural place for this to
-take place seems to be in the realization functions of the various
-block device drivers, such as scsi-hd. The interface proposed here
-allows the block driver to receive information about the block
-configuration and the associated backend through a new callback.
+This allows the block driver to use the block configuration of the new
+floppy device. One use for this information is to set request limits
+using this information.
 
 Signed-off-by: Ari Sundholm <ari@tuxera.com>
 ---
- block/io.c                | 22 ++++++++++++++++++++++
- hw/block/block.c          | 12 +++++++++++-
- include/block/block.h     | 10 ++++++++++
- include/block/block_int.h |  9 +++++++++
- include/hw/block/block.h  |  1 +
- 5 files changed, 53 insertions(+), 1 deletion(-)
+ hw/block/fdc.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block/io.c b/block/io.c
-index b7beaee..3a06843 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2932,3 +2932,25 @@ int coroutine_fn bdrv_co_copy_range(BdrvChild *src, uint64_t src_offset,
-     bdrv_dec_in_flight(dst_bs);
-     return ret;
- }
-+
-+void bdrv_apply_blkconf(BlockDriverState *bs, BlockConf *conf)
-+{
-+    BlockDriver *drv = bs->drv;
-+
-+    if (!drv) {
-+        return;
-+    }
-+
-+    if (drv->bdrv_apply_blkconf) {
-+        drv->bdrv_apply_blkconf(bs, conf);
-+        return;
-+    }
-+
-+    if (bs->file && bs->file->bs) {
-+        bdrv_apply_blkconf(bs->file->bs, conf);
-+    }
-+
-+    if (bs->drv->supports_backing && backing_bs(bs)) {
-+        bdrv_apply_blkconf(backing_bs(bs), conf);
-+    }
-+}
-diff --git a/hw/block/block.c b/hw/block/block.c
-index b91e2b6..8c87dbf 100644
---- a/hw/block/block.c
-+++ b/hw/block/block.c
-@@ -38,7 +38,7 @@ void blkconf_blocksizes(BlockConf *conf)
-     /* fill in detected values if they are not defined via qemu command line */
-     if (!conf->physical_block_size) {
-         if (!backend_ret) {
--           conf->physical_block_size = blocksizes.phys;
-+            conf->physical_block_size = blocksizes.phys;
-         } else {
-             conf->physical_block_size = BDRV_SECTOR_SIZE;
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index cd29e27..b11eeda 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -482,6 +482,8 @@ static void fd_change_cb(void *opaque, bool load, Error **errp)
+                                            errp)) {
+             return;
          }
-@@ -52,6 +52,16 @@ void blkconf_blocksizes(BlockConf *conf)
++
++        blkconf_apply_to_blkdrv(drive->conf);
      }
+ 
+     drive->media_changed = 1;
+@@ -594,6 +596,8 @@ static void floppy_drive_realize(DeviceState *qdev, Error **errp)
+     pick_drive_type(drive);
+     dev->type = drive->drive;
+ 
++    blkconf_apply_to_blkdrv(&dev->conf);
++
+     fd_revalidate(drive);
  }
- 
-+void blkconf_apply_to_blkdrv(BlockConf *conf)
-+{
-+    BlockBackend *blk = conf->blk;
-+    BlockDriverState *bs = blk_bs(blk);
-+
-+    if (bs) {
-+        bdrv_apply_blkconf(bs, conf);
-+    }
-+}
-+
- bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-                                    bool resizable, Error **errp)
- {
-diff --git a/include/block/block.h b/include/block/block.h
-index 312ae01..5d0a8ba 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -10,6 +10,7 @@
- #include "block/dirty-bitmap.h"
- #include "block/blockjob.h"
- #include "qemu/hbitmap.h"
-+#include "hw/block/block.h"
- 
- /* block.c */
- typedef struct BlockDriver BlockDriver;
-@@ -650,4 +651,13 @@ void bdrv_unregister_buf(BlockDriverState *bs, void *host);
- int coroutine_fn bdrv_co_copy_range(BdrvChild *src, uint64_t src_offset,
-                                     BdrvChild *dst, uint64_t dst_offset,
-                                     uint64_t bytes, BdrvRequestFlags flags);
-+
-+/*
-+ * bdrv_apply_blkconf:
-+ *
-+ * Recursively finds the highest-level block drivers among the files and
-+ * backing files that accept a block configuration and applies the given block
-+ * configuration to them.
-+ */
-+void bdrv_apply_blkconf(BlockDriverState *bs, BlockConf *conf);
- #endif
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 888b7f7..cb82745 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -464,6 +464,15 @@ struct BlockDriver {
-     void (*bdrv_abort_perm_update)(BlockDriverState *bs);
- 
-     /**
-+     * Called to inform the driver of the block configuration of the virtual
-+     * block device.
-+     *
-+     * This function is called by a block device realization function if the
-+     * device wants to inform the block driver of its block configuration.
-+     */
-+    void (*bdrv_apply_blkconf)(BlockDriverState *bs, BlockConf *conf);
-+
-+    /**
-      * Returns in @nperm and @nshared the permissions that the driver for @bs
-      * needs on its child @c, based on the cumulative permissions requested by
-      * the parents in @parent_perm and @parent_shared.
-diff --git a/include/hw/block/block.h b/include/hw/block/block.h
-index d4f4dff..2861995 100644
---- a/include/hw/block/block.h
-+++ b/include/hw/block/block.h
-@@ -77,6 +77,7 @@ bool blkconf_geometry(BlockConf *conf, int *trans,
-                       unsigned cyls_max, unsigned heads_max, unsigned secs_max,
-                       Error **errp);
- void blkconf_blocksizes(BlockConf *conf);
-+void blkconf_apply_to_blkdrv(BlockConf *conf);
- bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
-                                    bool resizable, Error **errp);
  
 -- 
 2.7.4
