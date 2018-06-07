@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49850)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fQsoH-0006DN-Bz
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:10:30 -0400
+	(envelope-from <thuth@redhat.com>) id 1fQsou-0006Y9-Kc
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:11:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fQsoD-0008Qi-8r
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:10:29 -0400
-Date: Thu, 7 Jun 2018 13:10:18 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180607131018.577a2219.cohuck@redhat.com>
-In-Reply-To: <3f81742d-4ce8-4c3f-643d-44745ed88374@redhat.com>
-References: <20180525113708.29856-1-david@redhat.com>
-	<20180525113708.29856-2-david@redhat.com>
-	<20180604133853.7c0f7933.cohuck@redhat.com>
-	<a26f4c5e-59b2-078d-19a3-e73dbece67c1@redhat.com>
-	<20180604141434.508e2f55.cohuck@redhat.com>
-	<3f81742d-4ce8-4c3f-643d-44745ed88374@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1fQsoq-0000KC-Ev
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:11:08 -0400
+References: <20180426161958.2872-1-rkagan@virtuozzo.com>
+	<20180426161958.2872-4-rkagan@virtuozzo.com>
+	<87tvqjf28u.fsf@dusky.pond.sub.org>
+	<3f5aaa32-5e43-542b-c657-3f1eec553e70@redhat.com>
+	<df356e6b-8559-1a79-17cf-47bdfeb8612d@redhat.com>
+	<b088605a-477f-4c80-34d8-c6677cfdb37e@redhat.com>
+	<87d0x33wyr.fsf@dusky.pond.sub.org>
+	<19326638-6980-5473-dea9-79c7aabdf710@redhat.com>
+	<bcf8d1bf-54b0-c2cd-431c-3db8e14d7676@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b010eb74-9ac5-014c-723d-82ba462f99b8@redhat.com>
+Date: Thu, 7 Jun 2018 13:10:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <bcf8d1bf-54b0-c2cd-431c-3db8e14d7676@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 1/7] s390x/tod: factor out
- TOD into separate device
+Subject: Re: [Qemu-devel] [PATCH 03/17] iotests: ask qemu for supported
+ formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, "Collin L . Walling" <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Thu, 7 Jun 2018 12:49:23 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 07.06.2018 13:07, Paolo Bonzini wrote:
+> On 07/06/2018 09:50, Thomas Huth wrote:
+>>
+>>> There's no real need to kill off '?', unless it gets in the way of
+>>> steering people towards 'help'.  We should steer them toward 'help',
+>>> because '?' is a trap for insufficiently sophisticated users of
+>>> shell[*].
+>> ... and I agree with your points here.
+>>
+>> => I think we need a second list of deprecated feature (maybe we should
+>> call them "legacy features" instead of "deprecated"?), i.e. a list of
+>> features which we don't recommend for new code / scripts anymore, but
+>> which we do not intend to remove via our official deprecation policy any
+>> time soon. Things like "--enable-kvm" / "-no-kvm" or maybe even "-net"
+>> go into the same category.
+> 
+> Yes, "-net" definitely goes there.
+> 
+>> If you agree, I can try to come up with a patch (should the list go into
+>> qemu-doc.texi or a separate document in the the documentation folder?).
+> 
+> I think it should go in docs/devel.
 
-> On 04.06.2018 14:14, Cornelia Huck wrote:
-> > On Mon, 4 Jun 2018 14:00:43 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 04.06.2018 13:38, Cornelia Huck wrote:  
-> >>> On Fri, 25 May 2018 13:37:02 +0200
-> >>> David Hildenbrand <david@redhat.com> wrote:
-> >>>     
-> >>>> Let's treat this like a separate device. TCG will have to store the
-> >>>> actual state/time later on.
-> >>>>
-> >>>> Include cpu-qom.h in kvm_s390x.h (due to S390CPU) to compile tod-kvm.c.    
-> >>>
-> >>> Can't you include it in tod-kvm.c instead? Why was it not needed before?    
-> >>
-> >> Guess I can, kvm_s390x.h looks to me like the right place, as S390CPU is
-> >> used in there.
-> >>
-> >> All other users include "cpu.h" already, so it isn't needed.  
-> > 
-> > Hm, and for kvm_s390_irq, this file is using a forward declaration,
-> > which would likely be more awkward for this structure.  
-> 
-> I remember that we wanted to use cpu-qom.h for this typedef fun, that's
-> why I decided to do it this way.
-> 
-> > 
-> > Header dependencies are always fun :)
-> >   
-> 
-> So what do you suggest? Thanks!
-> 
+I currently rather tend to put it into a new appendix in qemu-doc.texi,
+since this is useful information for the normal users, too. Or how shall
+we communicate this to the users that the old options that they are used
+to are still there, but should not be used for new scripts anymore?
 
-Let's go with cpu-qom.h for this, then.
+ Thomas
