@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fR0X1-000730-5O
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 15:25:13 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fR0ZX-0007qT-7z
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 15:27:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fR0Wz-0000EB-EZ
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 15:25:11 -0400
-References: <9e8b49fb-0162-bf35-21bb-acc0dc28555f@redhat.com>
-	<20180606120050.GB2661@work-vm>
-	<61a301dd-8e50-8799-8328-341d6ab744f5@redhat.com>
-	<20180606143134.GG2660@work-vm>
-	<39bcee27-329a-61d8-47fa-678b431b0a79@redhat.com>
-	<20180606150507.GJ2660@work-vm>
-	<66727986-1cf1-c12e-d78c-d56cc15eaf00@redhat.com>
-	<20180606163246.GL3064@redhat.com>
-	<f3914a591a46c9d489f2fa1ad2ac4fd0c5a9e5b6.camel@redhat.com>
-	<20180607103218.GC1455@redhat.com> <20180607103620.GJ28827@redhat.com>
-	<dd014be5c818e71d4f833e150fbae11e490e2325.camel@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <7410e002-ba2f-2dd2-b24f-c9841f456ac9@redhat.com>
-Date: Thu, 7 Jun 2018 21:24:53 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fR0ZS-0004xS-H4
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 15:27:47 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:45150)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fR0ZS-0004uM-CN
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 15:27:42 -0400
+Received: by mail-qt0-x244.google.com with SMTP id i18-v6so11051324qtp.12
+	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 12:27:42 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180607184844.30126-1-richard.henderson@linaro.org>
+	<20180607184844.30126-3-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2602ee2d-d930-53c7-c0f0-e88505322adc@amsat.org>
+Date: Thu, 7 Jun 2018 16:27:37 -0300
 MIME-Version: 1.0
-In-Reply-To: <dd014be5c818e71d4f833e150fbae11e490e2325.camel@redhat.com>
+In-Reply-To: <20180607184844.30126-3-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/4] linux-user/hppa: Fix typo in mknodat
+ syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +36,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrea Bolognani <abologna@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: laurent@vivier.eu
 
-On 06/07/18 12:54, Andrea Bolognani wrote:
-> On Thu, 2018-06-07 at 11:36 +0100, Daniel P. Berrang=C3=A9 wrote:
->> On Thu, Jun 07, 2018 at 11:32:18AM +0100, Richard W.M. Jones wrote:
->>> Another problem which Laszlo mentioned is the varstore isn't portable
->>> between UEFI implementations, or if the UEFI is compiled with
->>> different options.  You can even imagine shipping multiple
->>> varstores(!) which argues for a tar-like format.
->>
->> Could we perhaps imagine shipping the actual UEFI bios, rather
->> than only the varstore.  The bios blob runs in guest context,
->> so there shouldn't be able security concerns from hosting
->> vendors with running user provided bios. Mostly its a matter
->> of confidence that the interface between bios & qemu is stable
->> which feels easier than assuming varstore vs different bios is
->> portable.
->=20
-> That sounds sensible, and further reinforces the idea that we
-> need way more than a single string baked into the qcow2 file.
->=20
+On 06/07/2018 03:48 PM, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Sorry for arriving late (thanks Rich for the Fwd).
+mknodat is not at 8ee78dece0d.
 
-The contents of the non-volatile UEFI variables should be considered
-part of (permanent) guest state, such as disk contents. Therefore I'd
-argue for bundling the varstore file with the disk image(s).
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-In turn, the best way to ensure comaptibility between varstore and
-firmware binary is to just bundle the firmware binary as well. It's
-generally not large (x86) or if it is, it compresses extremely well
-(aarch64). For extra politeness, image providers can bundle a text file
-with their firmware build options (like a kernel config), possibly even
-a JSON document conforming to the new firmware schema (qemu commit
-3a0adfc9bfcf), but that's not a hard requirement I guess.
-
-If such a VM is to be migrated between hosts, I'd expect the host admin
-to take care of installing the fw binary on all eligible hosts.
-
-
-Regarding compat between QEMU and firmware binary, I see three cases:
-
-(1) Static requirements presented by the firmware for the QEMU
-configuration. (Such as -D SMM_REQUIRE.) With the domain configuration
-captured one way or another alongside the disk image anyway, this should
-not be a problem.
-
-(2) New firmware launched on old QEMU. The firmware generally detects or
-negotiates features with QEMU, so this should be safe.
-
-(Discounting firmware regressions, of course -- for example, search
-<https://www.mail-archive.com/qemu-devel@nongnu.org/msg471901.html> for
-the string "I messed up".)
-
-(3) Old firmware launched on new QEMU. This scenario has given us a lot
-more grief than (2), but I think for the appliance distribution use
-case, it can be folded into case (1) above -- specify the machine type
-too in the domain config, and that should be compatible with the old
-firmware.
-
-(The handling of (3) is not uniform between upstream QEMU and various
-downstreams. For example, consider
-<https://bugs.launchpad.net/qemu/+bug/1715700>. This was a latent bug in
-OVMF that got exposed by a new QEMU (due to a valid QEMU change), even
-when using old machine types. The upstream solution was to fix edk2 and
-stick with QEMU as-was (although the agreement around that hadn't been
-universal). Conversely, one downstream solution was to restrict the
-otherwise valid QEMU change to new machine types
-<https://bugzilla.redhat.com/show_bug.cgi?id=3D1489800#c5>.)
-
-
-All in all I agree with Daniel's proposal; it seems to be the most
-robust one.
-
-And, I too recall that, under AMD SEV, users will be supposed to, or
-allowed to, provide their own firmware binaries.
-
-Thanks!
-Laszlo
+> ---
+>  linux-user/hppa/syscall_nr.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/linux-user/hppa/syscall_nr.h b/linux-user/hppa/syscall_nr.h
+> index 55bdf71d50..9c1d0a195d 100644
+> --- a/linux-user/hppa/syscall_nr.h
+> +++ b/linux-user/hppa/syscall_nr.h
+> @@ -279,7 +279,7 @@
+>  #define TARGET_NR_ppoll             274
+>  #define TARGET_NR_openat            275
+>  #define TARGET_NR_mkdirat           276
+> -#define TARGET_NR_mknotat           277
+> +#define TARGET_NR_mknodat           277
+>  #define TARGET_NR_fchownat          278
+>  #define TARGET_NR_futimesat         279
+>  #define TARGET_NR_fstatat64         280
+> 
