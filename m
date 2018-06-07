@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQvAg-0000KF-Jp
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 09:41:47 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fQvE9-0001ti-Ow
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 09:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQvAf-0007Gf-Q0
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 09:41:46 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180529174821.19964-1-f4bug@amsat.org>
-	<20180529174821.19964-2-f4bug@amsat.org>
-	<fba4c1c5-a479-60c6-31e3-99affcacd5b7@redhat.com>
-	<5374cfa5-e314-0c4f-92e9-b3ec3bf3bd95@amsat.org>
-Date: Thu, 07 Jun 2018 15:41:35 +0200
-In-Reply-To: <5374cfa5-e314-0c4f-92e9-b3ec3bf3bd95@amsat.org> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed,
-	30 May 2018 18:30:58 -0300")
-Message-ID: <87po12vhm8.fsf@dusky.pond.sub.org>
+	(envelope-from <imammedo@redhat.com>) id 1fQvE6-0000DQ-LB
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 09:45:21 -0400
+Date: Thu, 7 Jun 2018 15:44:55 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180607154455.6eab4e24@redhat.com>
+In-Reply-To: <e451e0d6-a181-b027-cdb7-f44beb11b37c@redhat.com>
+References: <20180517081527.14410-1-david@redhat.com>
+	<20180517081527.14410-5-david@redhat.com>
+	<20180530150806.061c26b9@redhat.com>
+	<5dcb16e5-b9b9-d07d-dfe3-98724e911f83@redhat.com>
+	<20180531161310.52ea9507@redhat.com>
+	<e451e0d6-a181-b027-cdb7-f44beb11b37c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] hw/block/fdc: Replace
- error_setg(&error_abort) by error_report() + abort()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
+ hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +28,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+On Mon, 4 Jun 2018 13:27:01 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> On 05/30/2018 05:23 PM, John Snow wrote:
->> On 05/29/2018 01:48 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Use error_report() + abort() instead of error_setg(&error_abort),
->>> as suggested by the "qapi/error.h" documentation:
->>>
->>>     Please don't error_setg(&error_fatal, ...), use error_report() and
->>>     exit(), because that's more obvious.
->>>     Likewise, don't error_setg(&error_abort, ...), use assert().
->>>
->>=20
->> Didn't realize this was bad form (Why do we have it?)
+> On 31.05.2018 16:13, Igor Mammedov wrote:
+> > On Wed, 30 May 2018 16:13:32 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 30.05.2018 15:08, Igor Mammedov wrote:  
+> >>> On Thu, 17 May 2018 10:15:17 +0200
+> >>> David Hildenbrand <david@redhat.com> wrote:
+> >>>     
+> >>>> For multi stage hotplug handlers, we'll have to do some error handling
+> >>>> in some hotplug functions, so let's use a local error variable (except
+> >>>> for unplug requests).    
+> >>> I'd split out introducing local error into separate patch
+> >>> so patch would do a single thing.  
+> 
+> I can do that if it makes review easier.
+> 
+> >>>     
+> >>>> Also, add code to pass control to the final stage hotplug handler at the
+> >>>> parent bus.    
+> >>> But I don't agree with generic
+> >>>  "} else if ("dev->parent_bus && dev->parent_bus->hotplug_handler) {"
+> >>> forwarding, it's done by 3/14 for generic case and in case of
+> >>> special device that needs bus handler called from machine one,
+> >>> I'd suggest to do forwarding explicitly for that device only
+> >>> like we do with acpi_dev.    
+> >>
+> >> I decided to do it that way because it is generic and results in nicer
+> >> recovery handling (e.g. in case pc_dimm plug fails, we can simply
+> >> rollback all (for now MemoryDevice) previous plug operations).  
+> > rollback should be managed by the caller of pc_dimm plug
+> > directly, so it's not relevant here.
+> >   
+> >> IMHO, the resulting code is easier to read.
+> >>
+> >> From this handling it is clear that
+> >> "if we reach the hotplug handler, and it is not some special device
+> >> plugged by the machine (CPU, PC_DIMM), pass it on to the actual hotplug
+> >> handler if any exists"  
+> > I strongly disagree with that it's easier to deal with.
+> > You are basically duplicating already generalized code
+> > from qdev_get_hotplug_handler() back into boards.
+> > 
+> > If a device doesn't have to be handled by machine handler,
+> > than qdev_get_hotplug_handler() must return its bus handler
+> > if any directly. So branch in question that your are copying
+> > is a dead one, pls drop it.  
+> 
+> We forward selected (pc_get_hotpug_handler()) devices to the
+> right hotplug handler. Nothing wrong about that. I don't agree
+> with "basically duplicating already generalized code" wrong.
+> We have to forward at some place. Your idea simply places that
+> code at some other place.
+> 
+> 
+> But I think we have to get the general idea sorted out first.
+> 
+> What you have in mind (e.g. plug):
+> 
+> if (TYPE_MEMORY_DEVICE) {
+> 	memory_device_plug();
+> 	if (local_err) {
+> 		goto out;
+> 	}
+> 
+> 	if (TYPE_PC_DIMM) {
+> 		pc_dimm_plug(hotplug_dev, dev, &local_err);
+> 	} else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+> 		hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
+> 	}
+> 	if (local_err) {
+> 		memory_device_unplug()
+> 		goto out;
+> 	}
+> } else if (TYPE_CPU)
+> ...
+> 
+> 
+> What I have in mind (and implemented in this series):
+> 
+> 
+> if (TYPE_MEMORY_DEVICE) {
+> 	memory_device_plug();
+> }
+> /* possibly other interfaces */
+> if (local_err) {
+> 	error_handling();
+> 	return;
+> }
+> 
+> if (TYPE_PC_DIMM) {
+> 	pc_dimm_plug(hotplug_dev, dev, &local_err);
+> } ...
+> } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+> 	hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
+> }
+I don't like this implicit wiring, where reader of this part of code
+has no idea that TYPE_MEMORY_DEVICE might be also bus device that needs
+request forwarding.
+I'd prefer [pre/un]plug handlers be concrete and explicit spaghetti code,
+something like this:
 
-Because &error_abort has other uses, and I can't see how we can get rid
-of just error_setg(&error_abort, ...).  Open to ideas.
+if (TYPE_PC_DIMM) {
+    pc_dimm_plug()
+    /* do here additional concrete machine specific things */
+} else if (TYPE_VIRTIO_MEM) {
+    virtio_mem_plug() <- do forwarding in there
+    /* and do here additional concrete machine specific things */
+} else if (TYPE_CPU) {
+    cpu_plug()
+    /* do here additional concrete machine specific things */
+}
 
->>> Use abort() instead of the suggested assert() because the error message
->>> already got displayed.
->>>
->>=20
->> Update the suggestion?
->
-> Fair enough.
+> if (local_err) {
+> 	if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+> 		memory_device_unplug()
+> 	}
+> 	/* possibly other interfaces */
+> }
+> ...
+> 
+> 
+> I claim that my variant is more generic because:
+> - it easily supports multiple interfaces (like MemoryDevice)
+>   per Device that need a hotplug handler call
+> - there is only one call to hotplug_handler_plug() in case we
+>   add similar handling for another device
+As someone said "one more layer of indirection would solve problem".
+But then one would have a clue how it works after a while (including
+author of the feature).
+I don't think we have a problem here and need generalization.
 
-No.  I intentionally pointed to assert(), because ...
-
->>> Suggested-by: Eric Blake <eblake@redhat.com>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>=20
->> Reviewed-by: John Snow <jsnow@redhat.com>
->> Acked-by: John Snow <jsnow@redhat.com>
->
-> Thanks!
->
->>> ---
->>>  hw/block/fdc.c | 7 ++++---
->>>  1 file changed, 4 insertions(+), 3 deletions(-)
->>>=20
->>> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
->>> index cd29e27d8f..048467c00b 100644
->>> --- a/hw/block/fdc.c
->>> +++ b/hw/block/fdc.c
->>> @@ -401,9 +401,10 @@ static int pick_geometry(FDrive *drv)
->>>=20=20
->>>      /* No match of any kind found -- fd_format is misconfigured, abort=
-. */
->>>      if (match =3D=3D -1) {
->>> -        error_setg(&error_abort, "No candidate geometries present in t=
-able "
->>> -                   " for floppy drive type '%s'",
->>> -                   FloppyDriveType_str(drv->drive));
->>> +        error_report("No candidate geometries present in table "
->>> +                     " for floppy drive type '%s'",
->>> +                     FloppyDriveType_str(drv->drive));
->>> +        abort();
-
-... no matter how "nice" you make the message before an abort, it's
-still an abort.  It should not happen (or else aborting would be wrong),
-and when it does, somebody will have to stare at the code anyway.  I
-recommend not to bother with niceties there.
-
-Pig:
-
-    hw/block/fdc.c:403:pick_geometry: assertion failed: (match !=3D -1)
-    Aborted (core dumped)
-
-Pig with lipstick on:
-
-    No candidate geometries present in table for floppy drive type 'FOO'
-    Aborted (core dumped)
-
-Now, if you're really, really into lipstick: to each his own.  But
-please return the courtesy and keep it out of the stuff I maintain :)
-
->>>      }
->>>=20=20
->>>      parse =3D &(fd_formats[match]);
->>> --=20
->>> 2.17.0
+> 
+> Apart from that they do exactly the same thing.
+> 
