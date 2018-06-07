@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQkd4-0005gf-LL
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 22:26:23 -0400
+	(envelope-from <jcody@redhat.com>) id 1fQlO5-0003L7-MT
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 23:14:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQkd3-0001oX-Q5
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 22:26:22 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180606152128.449-1-f4bug@amsat.org>
-	<20180606152128.449-5-f4bug@amsat.org>
-	<20180607021658.GB3166@umbus.fritz.box>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6dd6bc7b-739d-0824-644c-36f3e7d6056b@amsat.org>
-Date: Wed, 6 Jun 2018 23:26:04 -0300
+	(envelope-from <jcody@redhat.com>) id 1fQlO4-0001WI-JC
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 23:14:57 -0400
+Date: Wed, 6 Jun 2018 23:14:45 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180607031445.GD6435@localhost.localdomain>
+References: <20180606193702.7113-1-mreitz@redhat.com>
+	<20180606193702.7113-2-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180607021658.GB3166@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="8au7FAvUjXr7iuYnGmfCaATqAYtjROO7R"
-Subject: Re: [Qemu-devel] [PATCH 04/11] ppc/pnv: Add trailing '\n' to
- qemu_log() calls
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180606193702.7113-2-mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] block: Make bdrv_is_writable()
+ public
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,99 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8au7FAvUjXr7iuYnGmfCaATqAYtjROO7R
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org, qemu-ppc@nongnu.org
-Message-ID: <6dd6bc7b-739d-0824-644c-36f3e7d6056b@amsat.org>
-Subject: Re: [PATCH 04/11] ppc/pnv: Add trailing '\n' to qemu_log() calls
-References: <20180606152128.449-1-f4bug@amsat.org>
- <20180606152128.449-5-f4bug@amsat.org>
- <20180607021658.GB3166@umbus.fritz.box>
-In-Reply-To: <20180607021658.GB3166@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-On 06/06/2018 11:16 PM, David Gibson wrote:
-> On Wed, Jun 06, 2018 at 12:21:21PM -0300, Philippe Mathieu-Daud=E9 wrot=
-e:
->> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->=20
-> I'm not really sure what series this was part of, but I've applied it
-> to ppc-for-3.0 anyway.
-
-I did an effort to split the series, then add all the recipients to the
-cover but I missed your mail indeed, sorry!
-
-here is the cover:
-http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg01266.html
+On Wed, Jun 06, 2018 at 09:37:00PM +0200, Max Reitz wrote:
+> This is a useful function for the whole block layer, so make it public.
+> At the same time, users outside of block.c probably do not need to make
+> use of the reopen functionality, so rename the current function to
+> bdrv_is_writable_after_reopen() create a new bdrv_is_writable() function
+> that just passes NULL to it for the reopen queue.
+> 
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
 Thanks!
 
->=20
-> Acked-by: David Gibson <david@gibson.dropbear.id.au>
->=20
->> ---
->>  hw/ppc/pnv_core.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
->> index cbb64ad9e7..13ad7d9e04 100644
->> --- a/hw/ppc/pnv_core.c
->> +++ b/hw/ppc/pnv_core.c
->> @@ -97,7 +97,7 @@ static uint64_t pnv_core_xscom_read(void *opaque, hw=
-addr addr,
->>          val =3D 0x24f000000000000ull;
->>          break;
->>      default:
->> -        qemu_log_mask(LOG_UNIMP, "Warning: reading reg=3D0x%" HWADDR_=
-PRIx,
->> +        qemu_log_mask(LOG_UNIMP, "Warning: reading reg=3D0x%" HWADDR_=
-PRIx "\n",
->>                    addr);
->>      }
->> =20
->> @@ -107,7 +107,7 @@ static uint64_t pnv_core_xscom_read(void *opaque, =
-hwaddr addr,
->>  static void pnv_core_xscom_write(void *opaque, hwaddr addr, uint64_t =
-val,
->>                                   unsigned int width)
->>  {
->> -    qemu_log_mask(LOG_UNIMP, "Warning: writing to reg=3D0x%" HWADDR_P=
-RIx,
->> +    qemu_log_mask(LOG_UNIMP, "Warning: writing to reg=3D0x%" HWADDR_P=
-RIx "\n",
->>                    addr);
->>  }
->> =20
->=20
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-
---8au7FAvUjXr7iuYnGmfCaATqAYtjROO7R
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlsYl78ACgkQ4+MsLN6t
-wN51SRAAwZLVBTOkFWqyol3YmxtzWVHBNrM9xmxaum1iDhk8vHBNZSzkPk/Znev2
-TmkIfyBhr2Xkh1sU4nXTv0ZxnHIirQL4vMreihjQ24gEkedwqjuNn6qUJbZBaJSZ
-cST9fNXlNqyrroZKrWQ1ZwlMDGCcjQg8/sSP1PLzq0kG1we8QXBX7ZNbZqXly8s3
-6tCmSZBcioT+jmFz7wyMLAmh6Y6iPyWC1A8zKPjpUOYSY/zBWcPcGxrsY1s53i5Z
-ajeo0TNWzlLdYmiaO2jBav7qNHFZRKT3NRc+KBHcurSM6Hh8BjocfUU4i7rgMe7w
-Ea8wiF/9fsT0xyIYIVEn28OXxpGgaxTSLPrM9qGmuvGPysrhj5s6W+Ki17Re2cYI
-aJz8R6xzpi4pb3o+M1BErbVH0Gf/ApgKVwkOXIZ+0dcRVUdOZqZdtiwMAXtIL7GE
-qIIReWd1GNI9kH4yvvldp/NsKlPRDbkvWuae/K4JhMClS/TrRpiP6rrthhI27XEJ
-/Ho0NOCsbsO8mB05LsQWzqI3hCCnYa9YTVS4EfBCdoS4z1PAwLU9I/8byht3Qk5X
-GVmVU46TfHmRarfHeVFDXkfED6QdwP7bS/yd0yp6chG3aNWr88jgOJ2vEiJqmmnW
-lDTF3Hcffel4XhsUu9JA3R37kpJtousARUGu1RDRLZcLzm1cHI4=
-=Pi7U
------END PGP SIGNATURE-----
-
---8au7FAvUjXr7iuYnGmfCaATqAYtjROO7R--
+> ---
+>  include/block/block.h |  1 +
+>  block.c               | 17 ++++++++++++++---
+>  2 files changed, 15 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 4dd4f1eab2..e677080c4e 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -408,6 +408,7 @@ bool bdrv_is_read_only(BlockDriverState *bs);
+>  int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
+>                             bool ignore_allow_rdw, Error **errp);
+>  int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
+> +bool bdrv_is_writable(BlockDriverState *bs);
+>  bool bdrv_is_sg(BlockDriverState *bs);
+>  bool bdrv_is_inserted(BlockDriverState *bs);
+>  void bdrv_lock_medium(BlockDriverState *bs, bool locked);
+> diff --git a/block.c b/block.c
+> index 9d577f65bb..50887087f3 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -1620,13 +1620,24 @@ static int bdrv_reopen_get_flags(BlockReopenQueue *q, BlockDriverState *bs)
+>  
+>  /* Returns whether the image file can be written to after the reopen queue @q
+>   * has been successfully applied, or right now if @q is NULL. */
+> -static bool bdrv_is_writable(BlockDriverState *bs, BlockReopenQueue *q)
+> +static bool bdrv_is_writable_after_reopen(BlockDriverState *bs,
+> +                                          BlockReopenQueue *q)
+>  {
+>      int flags = bdrv_reopen_get_flags(q, bs);
+>  
+>      return (flags & (BDRV_O_RDWR | BDRV_O_INACTIVE)) == BDRV_O_RDWR;
+>  }
+>  
+> +/*
+> + * Return whether the BDS can be written to.  This is not necessarily
+> + * the same as !bdrv_is_read_only(bs), as inactivated images may not
+> + * be written to but do not count as read-only images.
+> + */
+> +bool bdrv_is_writable(BlockDriverState *bs)
+> +{
+> +    return bdrv_is_writable_after_reopen(bs, NULL);
+> +}
+> +
+>  static void bdrv_child_perm(BlockDriverState *bs, BlockDriverState *child_bs,
+>                              BdrvChild *c, const BdrvChildRole *role,
+>                              BlockReopenQueue *reopen_queue,
+> @@ -1664,7 +1675,7 @@ static int bdrv_check_perm(BlockDriverState *bs, BlockReopenQueue *q,
+>  
+>      /* Write permissions never work with read-only images */
+>      if ((cumulative_perms & (BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED)) &&
+> -        !bdrv_is_writable(bs, q))
+> +        !bdrv_is_writable_after_reopen(bs, q))
+>      {
+>          error_setg(errp, "Block node is read-only");
+>          return -EPERM;
+> @@ -1956,7 +1967,7 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+>                                    &perm, &shared);
+>  
+>          /* Format drivers may touch metadata even if the guest doesn't write */
+> -        if (bdrv_is_writable(bs, reopen_queue)) {
+> +        if (bdrv_is_writable_after_reopen(bs, reopen_queue)) {
+>              perm |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
+>          }
+>  
+> -- 
+> 2.17.0
+> 
