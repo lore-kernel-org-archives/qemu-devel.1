@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fQqc1-0007pa-G2
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 04:49:42 -0400
+	(envelope-from <liujunjie23@huawei.com>) id 1fQqc5-0007tS-ID
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 04:49:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fQqby-0002gM-Di
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 04:49:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60774 helo=mx1.redhat.com)
+	(envelope-from <liujunjie23@huawei.com>) id 1fQqc2-0002ld-Gf
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 04:49:45 -0400
+Received: from [45.249.212.35] (port=59186 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fQqby-0002fT-7N
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 04:49:38 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6A7DF401EF06
-	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 08:49:37 +0000 (UTC)
-Date: Thu, 7 Jun 2018 16:49:33 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180607084933.GH750@xz-mi>
-References: <20180605122636.33654-1-dgilbert@redhat.com>
-	<20180605122636.33654-5-dgilbert@redhat.com>
+	(Exim 4.71) (envelope-from <liujunjie23@huawei.com>)
+	id 1fQqc2-0002dh-2J
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 04:49:42 -0400
+From: liujunjie <liujunjie23@huawei.com>
+Date: Thu, 7 Jun 2018 16:02:37 +0800
+Message-ID: <20180607080237.12360-1-liujunjie23@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180605122636.33654-5-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/6] hmp: Add info commands for preconfig
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] ps2: check PS2Queue wptr pointer in post_load
+ routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +25,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, imammedo@redhat.com
+To: kraxel@redhat.com, berrange@redhat.com
+Cc: arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, fangying1@huawei.com, qemu-devel@nongnu.org, liujunjie <liujunjie23@huawei.com>
 
-On Tue, Jun 05, 2018 at 01:26:34PM +0100, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Allow a bunch of the info commands to be used in preconfig.
-> Could probably add most of them.
+In commit 802cbcb7300, most issues have been fixed when qemu guest
+migration. But the queue size still need to check whether is equal to
+PS2_QUEUE_SIZE. If yes, the wptr should set as 0. Or, wptr would larger
+than PS2_QUEUE_SIZE and never come back when ps2_queue_noirq is called.
+This could lead to OOB access, add check to avoid it.
 
-I guess some of them may not work yet during preconfig.  E.g.:
+Signed-off-by: liujunjie <liujunjie23@huawei.com>
+---
+ hw/input/ps2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-$ ./x86_64-softmmu/qemu-system-x86_64 -preconfig -monitor stdio
-QEMU 2.12.50 monitor - type 'help' for more information
-(qemu) info mtree
-address-space: memory
-  0000000000000000-ffffffffffffffff (prio 0, i/o): system
-
-address-space: I/O
-  0000000000000000-000000000000ffff (prio 0, i/o): io
-
-But it's fine to enable that I guess.
-
-(Which "info" command would you want to use during preconfig?)
-
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index eeec618..fdfcadf 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -927,7 +927,7 @@ static void ps2_common_post_load(PS2State *s)
+ 
+     /* reset rptr/wptr/count */
+     q->rptr = 0;
+-    q->wptr = size;
++    q->wptr = (size == PS2_QUEUE_SIZE) ? 0 : size;
+     q->count = size;
+     s->update_irq(s->update_arg, q->count != 0);
+ }
 -- 
-Peter Xu
+1.8.3.1
