@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51706)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fQuMs-0005tM-48
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:50:20 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52519)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1fQuPg-0007Gj-Dg
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:53:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fQuMp-00028j-1Y
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:50:18 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35464)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fQuMo-000289-LS
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:50:14 -0400
-Received: by mail-wr0-x241.google.com with SMTP id l10-v6so9734447wrn.2
-	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 05:50:14 -0700 (PDT)
-Date: Thu, 7 Jun 2018 13:50:11 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180607125011.GL19032@stefanha-x1.localdomain>
-References: <1528291488-2586-1-git-send-email-xieyongji@baidu.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="m+jEI8cDoTn6Mu9E"
-Content-Disposition: inline
-In-Reply-To: <1528291488-2586-1-git-send-email-xieyongji@baidu.com>
-Subject: Re: [Qemu-devel] [PATCH v2] vhost-user-blk: start vhost when guest
- kicks
+	(envelope-from <pl@kamp.de>) id 1fQuPd-0003hZ-BC
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:53:12 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:54224 helo=mx01.kamp.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1fQuPd-0003gH-1c
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:53:09 -0400
+Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
+	for qemu-devel@nongnu.org; Thu, 7 Jun 2018 14:46:20 +0200
+From: Peter Lieven <pl@kamp.de>
+Date: Thu,  7 Jun 2018 14:46:21 +0200
+Message-Id: <1528375581-29538-1-git-send-email-pl@kamp.de>
+Subject: [Qemu-devel] [PATCH] qemu-img: align is_allocated_sectors to 4k
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +24,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongji Xie <elohimes@gmail.com>
-Cc: mst@redhat.com, stefanha@redhat.com, changpeng.liu@intel.com, nixun@baidu.com, qemu-devel@nongnu.org, chaiwen@baidu.com
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, Peter Lieven <pl@kamp.de>
 
+We currently don't enforce that the sparse segments we detect during convert are
+aligned. This leads to unnecessary and costly read-modify-write cycles either
+internally in Qemu or in the background on the storage device as nearly all
+modern filesystems or hardware has a 4k alignment internally.
 
---m+jEI8cDoTn6Mu9E
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+As we per default set the min_sparse size to 4k it makes perfectly sense to ensure
+that these sparse holes in the file are placed at 4k boundaries.
 
-On Wed, Jun 06, 2018 at 09:24:48PM +0800, Yongji Xie wrote:
-> Some old guests (before commit 7a11370e5: "virtio_blk: enable VQs early")
-> kick virtqueue before setting VIRTIO_CONFIG_S_DRIVER_OK. This violates
-> the virtio spec. But virtio 1.0 transitional devices support this behavio=
-ur.
-> So we should start vhost when guest kicks in this case.
->=20
-> Signed-off-by: Yongji Xie <xieyongji@baidu.com>
-> Signed-off-by: Chai Wen <chaiwen@baidu.com>
-> Signed-off-by: Ni Xun <nixun@baidu.com>
-> ---
->  hw/block/vhost-user-blk.c |   25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
+The number of RMW cycles when converting an example image [1] to a raw device that
+has 4k sector size is about 4600 4k read requests to perform a total of about 15000
+write requests. With this path the 4600 additional read requests are eliminated.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+[1] https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
 
---m+jEI8cDoTn6Mu9E
-Content-Type: application/pgp-signature; name="signature.asc"
+Signed-off-by: Peter Lieven <pl@kamp.de>
+---
+ qemu-img.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbGSoDAAoJEJykq7OBq3PIBBAIAK6nIUGUuFsa6H5nQ0wOlux+
-XK38rbwnGIZH8TwTixfot5rmFueFbEYMrpMTHkGbq8tt/RlG3cv3uk2rnIzBWf+C
-gg8Nu0/4vQH5GSsVxLZ1V9mVlNjMKX4IVrNZSL2WZskntZphkXH7aj+2bM2IfsIZ
-Zl38IY2wUXqfI5QLDy9Fp87Zyido1pYUoE0IrFNIhiA11mlJM+dvLEaR9jWcqxmS
-Q2yRBp0betmv029Z4PvUvOhW4Jqtal1YvgS/PLbRnVpbt/rMzxHnmzT4XdBRgeCo
-Ypcqct5oRcVRaDyfuKN8IelLzFwQSq2bbsqQTkpgZnSId/Bnp8fZkpRlddhmNcA=
-=3W7q
------END PGP SIGNATURE-----
-
---m+jEI8cDoTn6Mu9E--
+diff --git a/qemu-img.c b/qemu-img.c
+index 75f1610..68eefba 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1096,24 +1096,33 @@ static int64_t find_nonzero(const uint8_t *buf, int64_t n)
+  *
+  * 'pnum' is set to the number of sectors (including and immediately following
+  * the first one) that are known to be in the same allocated/unallocated state.
++ * The function will try to align 'pnum' to 8 sectors (4k) to avoid unnecassary
++ * RMW cycles on modern hardware.
+  */
+ static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
+ {
+     bool is_zero;
+-    int i;
++    int i, alignment = 1;
+ 
+     if (n <= 0) {
+         *pnum = 0;
+         return 0;
+     }
+-    is_zero = buffer_is_zero(buf, 512);
+-    for(i = 1; i < n; i++) {
+-        buf += 512;
+-        if (is_zero != buffer_is_zero(buf, 512)) {
++
++    if (!(n & 7)) {
++        /* the buffer size is dividable by 4k */
++        alignment = 8;
++        n /= 8;
++    }
++
++    is_zero = buffer_is_zero(buf, BDRV_SECTOR_SIZE * alignment);
++    for (i = 1; i < n; i++) {
++        buf += BDRV_SECTOR_SIZE * alignment;
++        if (is_zero != buffer_is_zero(buf, BDRV_SECTOR_SIZE * alignment)) {
+             break;
+         }
+     }
+-    *pnum = i;
++    *pnum = i * alignment;
+     return !is_zero;
+ }
+ 
+-- 
+2.7.4
