@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQyTa-00072k-PO
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:13:31 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUs-0008Az-BA
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQyTX-0006wV-Cc
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:13:30 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180607165955.10232-1-mark.cave-ayland@ilande.co.uk>
-	<20180607165955.10232-3-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6aac047c-d1d4-66ab-acba-3ff3d9bcc3bf@amsat.org>
-Date: Thu, 7 Jun 2018 14:13:20 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180607165955.10232-3-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] ppc: remove obsolete macio_init()
- definition from mac.h
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUo-00084L-NA
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:14:50 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu,  7 Jun 2018 20:14:34 +0300
+Message-Id: <20180607171441.64079-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20180607171441.64079-1-vsementsov@virtuozzo.com>
+References: <20180607171441.64079-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 04/11] block/nbd-client: fix
+ nbd_reply_chunk_iter_receive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +20,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-On 06/07/2018 01:59 PM, Mark Cave-Ayland wrote:
-> Commits b6712ea391 removed the macio_init() function but missed the header
-> prototype in mac.h. Remove it since it is no longer needed.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Use exported report, not the variable to be reused (should not really
+matter).
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/nbd-client.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> ---
->  hw/ppc/mac.h | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-> index dac96317af..89fa8bbed7 100644
-> --- a/hw/ppc/mac.h
-> +++ b/hw/ppc/mac.h
-> @@ -91,9 +91,6 @@ typedef struct MACIOIDEState {
->  void macio_ide_init_drives(MACIOIDEState *ide, DriveInfo **hd_table);
->  void macio_ide_register_dma(MACIOIDEState *ide);
->  
-> -void macio_init(PCIDevice *dev,
-> -                MemoryRegion *pic_mem);
-> -
->  /* Grackle PCI */
->  #define TYPE_GRACKLE_PCI_HOST_BRIDGE "grackle-pcihost"
->  
-> 
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 14b42f31df..dd712c59b3 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -599,7 +599,7 @@ static bool nbd_reply_chunk_iter_receive(NBDClientSession *s,
+     }
+ 
+     /* Do not execute the body of NBD_FOREACH_REPLY_CHUNK for simple reply. */
+-    if (nbd_reply_is_simple(&s->reply) || s->quit) {
++    if (nbd_reply_is_simple(reply) || s->quit) {
+         goto break_loop;
+     }
+ 
+-- 
+2.11.1
