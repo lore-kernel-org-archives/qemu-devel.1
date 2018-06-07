@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fR1H4-0007sD-9c
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:12:47 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fR1Ja-0001cF-0g
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:15:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fR1H1-0007fE-3Z
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:12:46 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:58481)
+	(envelope-from <laurent@vivier.eu>) id 1fR1JW-0008JB-Pq
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:15:21 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:45239)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fR1H0-0007V6-P7
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:12:42 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fR1JW-00086f-EW
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:15:18 -0400
 References: <20180607184844.30126-1-richard.henderson@linaro.org>
-	<20180607184844.30126-4-richard.henderson@linaro.org>
+	<20180607184844.30126-5-richard.henderson@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <6c6cd347-999a-286b-79f7-9243d5dd811f@vivier.eu>
-Date: Thu, 7 Jun 2018 22:12:40 +0200
+Message-ID: <cc6643c1-5d76-5054-8b9f-0f3c2fd428e4@vivier.eu>
+Date: Thu, 7 Jun 2018 22:15:15 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180607184844.30126-4-richard.henderson@linaro.org>
+In-Reply-To: <20180607184844.30126-5-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/4] linux-user/microblaze: Fix typo in
- accept4 syscall
+Subject: Re: [Qemu-devel] [PATCH 4/4] linux-user/sparc64: Add
+ inotify_rm_watch and tee syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,22 +34,31 @@ To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Le 07/06/2018 à 20:48, Richard Henderson a écrit :
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  linux-user/microblaze/syscall_nr.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  linux-user/sparc64/syscall_nr.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/linux-user/microblaze/syscall_nr.h b/linux-user/microblaze/syscall_nr.h
-> index 0704449bae..761208e9e6 100644
-> --- a/linux-user/microblaze/syscall_nr.h
-> +++ b/linux-user/microblaze/syscall_nr.h
-> @@ -363,7 +363,7 @@
->  #define TARGET_NR_shutdown		359 /* new */
->  #define TARGET_NR_sendmsg		360 /* new */
->  #define TARGET_NR_recvmsg		361 /* new */
-> -#define TARGET_NR_accept04		362 /* new */
-> +#define TARGET_NR_accept4		362 /* new */
->  #define TARGET_NR_preadv                363 /* new */
->  #define TARGET_NR_pwritev               364 /* new */
->  #define TARGET_NR_rt_tgsigqueueinfo     365 /* new */
+> diff --git a/linux-user/sparc64/syscall_nr.h b/linux-user/sparc64/syscall_nr.h
+> index 9391645598..0b91b896da 100644
+> --- a/linux-user/sparc64/syscall_nr.h
+> +++ b/linux-user/sparc64/syscall_nr.h
+> @@ -154,7 +154,7 @@
+>  #define TARGET_NR_poll               153 /* Common                                      */
+>  #define TARGET_NR_getdents64		154 /* Linux specific				   */
+>  #define TARGET_NR_fcntl64            155 /* Linux sparc32 Specific                      */
+> -/* #define TARGET_NR_getdirentries   156    SunOS Specific                              */
+> +#define TARGET_NR_inotify_rm_watch   156 /* Linux specific                              */
+>  #define TARGET_NR_statfs             157 /* Common                                      */
+>  #define TARGET_NR_fstatfs            158 /* Common                                      */
+>  #define TARGET_NR_umount             159 /* Common                                      */
+> @@ -278,7 +278,7 @@
+>  #define TARGET_NR_mq_notify		277
+>  #define TARGET_NR_mq_getsetattr	278
+>  #define TARGET_NR_waitid		279
+> -/*#define TARGET_NR_sys_setaltroot	280 available (was setaltroot) */
+> +#define TARGET_NR_tee                   280
+>  #define TARGET_NR_add_key		281
+>  #define TARGET_NR_request_key	282
+>  #define TARGET_NR_keyctl		283
 > 
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
