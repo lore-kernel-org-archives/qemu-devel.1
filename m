@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQoNC-0000oP-6w
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1fQoNG-0000s2-Oo
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQoNA-0002sl-CL
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:14 -0400
+	(envelope-from <armbru@redhat.com>) id 1fQoNA-0002tT-UD
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:18 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Jun 2018 08:25:55 +0200
-Message-Id: <20180607062559.16127-16-armbru@redhat.com>
+Date: Thu,  7 Jun 2018 08:25:58 +0200
+Message-Id: <20180607062559.16127-19-armbru@redhat.com>
 In-Reply-To: <20180607062559.16127-1-armbru@redhat.com>
 References: <20180607062559.16127-1-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 15/19] check-block-qdict: Rename
- qdict_flatten()'s variables for clarity
+Subject: [Qemu-devel] [RFC PATCH 18/19] rbd: New parameter
+ auth-client-required
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,91 +23,169 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
 
+Parameter auth-client-required lets you configure authentication
+methods.  We tried to provide that in v2.9.0, but backed out due to
+interface design doubts (commit 464444fcc16).
+
+This commit is similar to what we backed out, but simpler: we use a
+list of enumeration values instead of a list of objects with a member
+of enumeration type.
+
+Let's review our reasons for backing out the first try, as stated in
+the commit message:
+
+    * The implementation uses deprecated rados_conf_set() key
+      "auth_supported".  No biggie.
+
+Fixed: we use "auth-client-required".
+
+    * The implementation makes -drive silently ignore invalid parameters
+      "auth" and "auth-supported.*.X" where X isn't "auth".  Fixable (in
+      fact I'm going to fix similar bugs around parameter server), so
+      again no biggie.
+
+That fix is commit 2836284db60.  This commit doesn't bring the bugs
+back.
+
+    * BlockdevOptionsRbd member @password-secret applies only to
+      authentication method cephx.  Should it be a variant member of
+      RbdAuthMethod?
+
+We've had time to ponder, and we decided to stick to the way Ceph
+configuration works: the key configured separately, and silently
+ignored if the authentication method doesn't use it.
+
+    * BlockdevOptionsRbd member @user could apply to both methods cephx
+      and none, but I'm not sure it's actually used with none.  If it
+      isn't, should it be a variant member of RbdAuthMethod?
+
+Likewise.
+
+    * The client offers a *set* of authentication methods, not a list.
+      Should the methods be optional members of BlockdevOptionsRbd instead
+      of members of list @auth-supported?  The latter begs the question
+      what multiple entries for the same method mean.  Trivial question
+      now that RbdAuthMethod contains nothing but @type, but less so when
+      RbdAuthMethod acquires other members, such the ones discussed above.
+
+Again, we decided to stick to the way Ceph configuration works, except
+we make auth-client-required a list of enumeration values instead of a
+string containing keywords separated by delimiters.
+
+    * How BlockdevOptionsRbd member @auth-supported interacts with
+      settings from a configuration file specified with @conf is
+      undocumented.  I suspect it's untested, too.
+
+Not actually true, the documentation for @conf says "Values in the
+configuration file will be overridden by options specified via QAPI",
+and we've tested this.
+
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- tests/check-block-qdict.c | 57 ++++++++++++++++++++-------------------
- 1 file changed, 29 insertions(+), 28 deletions(-)
+ block/rbd.c          | 42 ++++++++++++++++++++++++++++++++----------
+ qapi/block-core.json | 11 +++++++++++
+ 2 files changed, 43 insertions(+), 10 deletions(-)
 
-diff --git a/tests/check-block-qdict.c b/tests/check-block-qdict.c
-index 5b9f4d506e..29f58a2d3d 100644
---- a/tests/check-block-qdict.c
-+++ b/tests/check-block-qdict.c
-@@ -37,11 +37,11 @@ static void qdict_defaults_test(void)
+diff --git a/block/rbd.c b/block/rbd.c
+index 82346a2a5e..ea0575d068 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -240,20 +240,42 @@ static void qemu_rbd_refresh_limits(BlockDriverState *bs, Error **errp)
  
- static void qdict_flatten_test(void)
+ 
+ static int qemu_rbd_set_auth(rados_t cluster, const char *secretid,
++                             BlockdevOptionsRbd *opts,
+                              Error **errp)
  {
--    QList *list1 = qlist_new();
--    QList *list2 = qlist_new();
--    QDict *dict1 = qdict_new();
--    QDict *dict2 = qdict_new();
--    QDict *dict3 = qdict_new();
-+    QList *e_1 = qlist_new();
-+    QList *e = qlist_new();
-+    QDict *e_1_2 = qdict_new();
-+    QDict *f = qdict_new();
-+    QDict *root = qdict_new();
- 
-     /*
-      * Test the flattening of
-@@ -79,35 +79,36 @@ static void qdict_flatten_test(void)
-      * }
-      */
- 
--    qdict_put_int(dict1, "a", 0);
--    qdict_put_int(dict1, "b", 1);
-+    qdict_put_int(e_1_2, "a", 0);
-+    qdict_put_int(e_1_2, "b", 1);
- 
--    qlist_append_int(list1, 23);
--    qlist_append_int(list1, 66);
--    qlist_append(list1, dict1);
--    qlist_append_int(list2, 42);
--    qlist_append(list2, list1);
-+    qlist_append_int(e_1, 23);
-+    qlist_append_int(e_1, 66);
-+    qlist_append(e_1, e_1_2);
-+    qlist_append_int(e, 42);
-+    qlist_append(e, e_1);
- 
--    qdict_put_int(dict2, "c", 2);
--    qdict_put_int(dict2, "d", 3);
--    qdict_put(dict3, "e", list2);
--    qdict_put(dict3, "f", dict2);
--    qdict_put_int(dict3, "g", 4);
-+    qdict_put_int(f, "c", 2);
-+    qdict_put_int(f, "d", 3);
- 
--    qdict_flatten(dict3);
-+    qdict_put(root, "e", e);
-+    qdict_put(root, "f", f);
-+    qdict_put_int(root, "g", 4);
- 
--    g_assert(qdict_get_int(dict3, "e.0") == 42);
--    g_assert(qdict_get_int(dict3, "e.1.0") == 23);
--    g_assert(qdict_get_int(dict3, "e.1.1") == 66);
--    g_assert(qdict_get_int(dict3, "e.1.2.a") == 0);
--    g_assert(qdict_get_int(dict3, "e.1.2.b") == 1);
--    g_assert(qdict_get_int(dict3, "f.c") == 2);
--    g_assert(qdict_get_int(dict3, "f.d") == 3);
--    g_assert(qdict_get_int(dict3, "g") == 4);
-+    qdict_flatten(root);
- 
--    g_assert(qdict_size(dict3) == 8);
-+    g_assert(qdict_get_int(root, "e.0") == 42);
-+    g_assert(qdict_get_int(root, "e.1.0") == 23);
-+    g_assert(qdict_get_int(root, "e.1.1") == 66);
-+    g_assert(qdict_get_int(root, "e.1.2.a") == 0);
-+    g_assert(qdict_get_int(root, "e.1.2.b") == 1);
-+    g_assert(qdict_get_int(root, "f.c") == 2);
-+    g_assert(qdict_get_int(root, "f.d") == 3);
-+    g_assert(qdict_get_int(root, "g") == 4);
- 
--    qobject_unref(dict3);
-+    g_assert(qdict_size(root) == 8);
+-    if (secretid == 0) {
+-        return 0;
+-    }
++    char *acr;
++    int r;
++    GString *accu;
++    RbdAuthModeList *auth;
 +
-+    qobject_unref(root);
- }
++    if (secretid) {
++        gchar *secret = qcrypto_secret_lookup_as_base64(secretid,
++                                                        errp);
++        if (!secret) {
++            return -1;
++        }
  
- static void qdict_array_split_test(void)
+-    gchar *secret = qcrypto_secret_lookup_as_base64(secretid,
+-                                                    errp);
+-    if (!secret) {
+-        return -1;
++        rados_conf_set(cluster, "key", secret);
++        g_free(secret);
+     }
+ 
+-    rados_conf_set(cluster, "key", secret);
+-    g_free(secret);
++    if (opts->has_auth_client_required) {
++        accu = g_string_new("");
++        for (auth = opts->auth_client_required; auth; auth = auth->next) {
++            if (accu->str[0]) {
++                g_string_append_c(accu, ';');
++            }
++            g_string_append(accu, RbdAuthMode_str(auth->value));
++        }
++        acr = g_string_free(accu, FALSE);
++        r = rados_conf_set(cluster, "auth_client_required", acr);
++        g_free(acr);
++        if (r < 0) {
++            error_setg_errno(errp, -r,
++                             "Could not set 'auth_client_required'");
++            return r;
++        }
++    }
+ 
+     return 0;
+ }
+@@ -585,7 +607,7 @@ static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
+         }
+     }
+ 
+-    if (qemu_rbd_set_auth(*cluster, secretid, errp) < 0) {
++    if (qemu_rbd_set_auth(*cluster, secretid, opts, errp) < 0) {
+         r = -EIO;
+         goto failed_shutdown;
+     }
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 4b1de474a9..6964fb707f 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3093,6 +3093,14 @@
+             '*timeout': 'int' } }
+ 
+ 
++##
++# @RbdAuthMode:
++#
++# Since: 3.0
++##
++{ 'enum': 'RbdAuthMode',
++  'data': [ 'cephx', 'none' ] }
++
+ ##
+ # @BlockdevOptionsRbd:
+ #
+@@ -3108,6 +3116,8 @@
+ #
+ # @user:               Ceph id name.
+ #
++# @auth-client-required: Acceptable authentication modes (since 3.0).
++#
+ # @server:             Monitor host address and port.  This maps
+ #                      to the "mon_host" Ceph option.
+ #
+@@ -3119,6 +3129,7 @@
+             '*conf': 'str',
+             '*snapshot': 'str',
+             '*user': 'str',
++            '*auth-client-required': ['RbdAuthMode'],
+             '*server': ['InetSocketAddressBase'] } }
+ 
+ ##
 -- 
 2.17.1
