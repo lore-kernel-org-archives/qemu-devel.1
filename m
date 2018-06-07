@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fQsQ8-0007lR-1A
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:45:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1fQsR2-0008No-In
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:46:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fQsQ7-0007he-34
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:45:31 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:38087)
+	(envelope-from <bounces@canonical.com>) id 1fQsQx-0008AF-Ia
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:46:28 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37806)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fQsQ6-0007gW-Oo
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:45:30 -0400
-Received: by mail-ot0-x244.google.com with SMTP id n3-v6so10953428ota.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 03:45:30 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fQsQx-00089k-C3
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:46:23 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fQsQw-000477-C1
+	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 10:46:22 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3BC522E88D2
+	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 10:46:22 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180530180120.13355-19-richard.henderson@linaro.org>
-References: <20180530180120.13355-1-richard.henderson@linaro.org>
-	<20180530180120.13355-19-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Jun 2018 11:45:09 +0100
-Message-ID: <CAFEAcA-ZOrn0dHX9qhrsMsBVPLTVJp_EMjQi4q4JfgTABPXkzg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3b 18/18] target/arm: Implement SVE
- Floating Point Arithmetic - Unpredicated Group
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 07 Jun 2018 10:26:24 -0000
+From: Thomas Huth <1101210@bugs.launchpad.net>
+Reply-To: Bug 1101210 <1101210@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130118141238.13697.51258.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152836718454.24946.7574429418222193777.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1101210] Re: qemu 1.4.2: usb keyboard not fully
+ working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 30 May 2018 at 19:01, Richard Henderson <richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper-sve.h    | 14 ++++++++
->  target/arm/helper.h        | 19 +++++++++++
->  target/arm/translate-sve.c | 42 +++++++++++++++++++++++
->  target/arm/vec_helper.c    | 69 ++++++++++++++++++++++++++++++++++++++
->  target/arm/sve.decode      | 10 ++++++
->  5 files changed, 154 insertions(+)
->
+Looks like people report different issues here... if you report a
+keyboard mapping problem, please try to either make sure that it matches
+the bug, or open a new ticket.
 
-> +DO_3OP(gvec_fadd_h, float16_add, float16)
-> +DO_3OP(gvec_fadd_s, float32_add, float32)
-> +DO_3OP(gvec_fadd_d, float64_add, float64)
-> +
-> +DO_3OP(gvec_fsub_h, float16_sub, float16)
-> +DO_3OP(gvec_fsub_s, float32_sub, float32)
-> +DO_3OP(gvec_fsub_d, float64_sub, float64)
-> +
-> +DO_3OP(gvec_fmul_h, float16_mul, float16)
-> +DO_3OP(gvec_fmul_s, float32_mul, float32)
-> +DO_3OP(gvec_fmul_d, float64_mul, float64)
-> +
-> +DO_3OP(gvec_ftsmul_h, float16_ftsmul, float16)
-> +DO_3OP(gvec_ftsmul_s, float32_ftsmul, float32)
-> +DO_3OP(gvec_ftsmul_d, float64_ftsmul, float64)
-> +
-> +#ifdef TARGET_AARCH64
-> +
-> +DO_3OP(gvec_recps_h, helper_recpsf_f16, float16)
-> +DO_3OP(gvec_recps_s, helper_recpsf_f32, float32)
-> +DO_3OP(gvec_recps_d, helper_recpsf_f64, float64)
-> +
-> +DO_3OP(gvec_rsqrts_h, helper_rsqrtsf_f16, float16)
-> +DO_3OP(gvec_rsqrts_s, helper_rsqrtsf_f32, float32)
-> +DO_3OP(gvec_rsqrts_d, helper_rsqrtsf_f64, float64)
-> +
-> +#endif
-> +#undef DO_3OP
+So the original problem (with the < > | not working at all) seems to be
+fixed nowadays, at least it works for me with a Linux guest running on a
+Linux host.
 
-Why do only these ones need to be guarded by the TARGET_AARCH64 ifdef?
+But I'll leave this ticket opened for the Windows problems that have
+been reported.
 
+Jos=C3=A9, could you please add the information about your guest? Are you
+running Linux or Windows in QEMU?
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+** Changed in: qemu
+       Status: Incomplete =3D> New
 
-thanks
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1101210
+
+Title:
+  qemu 1.4.2: usb keyboard not fully working
+
+Status in QEMU:
+  New
+
+Bug description:
+  When using the usb keyboard, I can't type the | character. I'm using
+  german keyboard layout (de) on the host and inside the guest. As a
+  guest OS, I use Linux (e.g. a recent KNOPPIX cd). To obtain the |
+  character on a german keyboard, I need to press AltGr + the < or >
+  key, i.e. the key right to the left shift.
+
+  The qemu command line is something like this:
+  ./qemu-system-i386 -device pci-ohci -device usb-kbd
+  I also tried
+  ./qemu-system-i386 -usb -usbdevice keyboard
+  with the same effect.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1101210/+subscriptions
