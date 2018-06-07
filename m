@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48312)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fQw5r-0003KE-Kj
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:40:52 -0400
+	(envelope-from <ari@tuxera.com>) id 1fQw5u-0003L9-Fs
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:40:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fQw5p-0005Ga-NR
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:40:51 -0400
-Received: from mx2.mpynet.fi ([82.197.21.85]:45780)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ari@tuxera.com>) id 1fQw5p-0005Ft-F0
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:40:49 -0400
+	(envelope-from <ari@tuxera.com>) id 1fQw5t-0005JT-Eq
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:40:54 -0400
 From: Ari Sundholm <ari@tuxera.com>
-Date: Thu, 7 Jun 2018 17:40:22 +0300
-Message-ID: <1528382429-13478-5-git-send-email-ari@tuxera.com>
+Date: Thu, 7 Jun 2018 17:40:21 +0300
+Message-ID: <1528382429-13478-4-git-send-email-ari@tuxera.com>
 In-Reply-To: <1528382429-13478-1-git-send-email-ari@tuxera.com>
 References: <1528382429-13478-1-git-send-email-ari@tuxera.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 04/10] hw/scsi/scsi-disk: Always apply block
- configuration to block driver
+Subject: [Qemu-devel] [PATCH v2 03/10] block: Add a mechanism for passing a
+ block driver a block configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +23,151 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ari Sundholm <ari@tuxera.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam
-	Zheng <famz@redhat.com>
+Cc: Ari Sundholm <ari@tuxera.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam
+	Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, "open list:Block I/O path" <qemu-block@nongnu.org>
 
-This allows the block driver to use the block configuration of the new
-SCSI device. One use for this information is to set request limits
-using this information.
+A block driver may need to know about the block configuration, most
+critically the sector sizes, of a block backend for alignment purposes
+or for some other reason. It doesn't seem like qemu has an existing
+mechanism for a block backend to convey the required information to
+the relevant block driver when it is being realized.
+
+The need for this mechanism rises from the fact that a drive may not
+have a backend at the time it is created, as devices are created after
+drives during qemu startup. Therefore, a driver requiring information
+about the block configuration can get this information when a backend
+is created for it at the earliest. The most natural place for this to
+take place seems to be in the realization functions of the various
+block device drivers, such as scsi-hd. The interface proposed here
+allows the block driver to receive information about the block
+configuration and the associated backend through a new callback.
 
 Signed-off-by: Ari Sundholm <ari@tuxera.com>
 ---
- hw/scsi/scsi-disk.c | 1 +
- 1 file changed, 1 insertion(+)
+ block/io.c                | 22 ++++++++++++++++++++++
+ hw/block/block.c          | 12 +++++++++++-
+ include/block/block.h     | 10 ++++++++++
+ include/block/block_int.h |  9 +++++++++
+ include/hw/block/block.h  |  1 +
+ 5 files changed, 53 insertions(+), 1 deletion(-)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index ded23d3..d50517e 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2413,6 +2413,7 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
-         blk_set_dev_ops(s->qdev.conf.blk, &scsi_disk_block_ops, s);
+diff --git a/block/io.c b/block/io.c
+index ca96b48..1f3211a 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2835,3 +2835,25 @@ void bdrv_unregister_buf(BlockDriverState *bs, void *host)
+         bdrv_unregister_buf(child->bs, host);
      }
-     blk_set_guest_block_size(s->qdev.conf.blk, s->qdev.blocksize);
-+    blkconf_apply_to_blkdrv(&s->qdev.conf);
- 
-     blk_iostatus_enable(s->qdev.conf.blk);
  }
++
++void bdrv_apply_blkconf(BlockDriverState *bs, BlockConf *conf)
++{
++    BlockDriver *drv = bs->drv;
++
++    if (!drv) {
++        return;
++    }
++
++    if (drv->bdrv_apply_blkconf) {
++        drv->bdrv_apply_blkconf(bs, conf);
++        return;
++    }
++
++    if (bs->file && bs->file->bs) {
++        bdrv_apply_blkconf(bs->file->bs, conf);
++    }
++
++    if (bs->drv->supports_backing && backing_bs(bs)) {
++        bdrv_apply_blkconf(backing_bs(bs), conf);
++    }
++}
+diff --git a/hw/block/block.c b/hw/block/block.c
+index b91e2b6..8c87dbf 100644
+--- a/hw/block/block.c
++++ b/hw/block/block.c
+@@ -38,7 +38,7 @@ void blkconf_blocksizes(BlockConf *conf)
+     /* fill in detected values if they are not defined via qemu command line */
+     if (!conf->physical_block_size) {
+         if (!backend_ret) {
+-           conf->physical_block_size = blocksizes.phys;
++            conf->physical_block_size = blocksizes.phys;
+         } else {
+             conf->physical_block_size = BDRV_SECTOR_SIZE;
+         }
+@@ -52,6 +52,16 @@ void blkconf_blocksizes(BlockConf *conf)
+     }
+ }
+ 
++void blkconf_apply_to_blkdrv(BlockConf *conf)
++{
++    BlockBackend *blk = conf->blk;
++    BlockDriverState *bs = blk_bs(blk);
++
++    if (bs) {
++        bdrv_apply_blkconf(bs, conf);
++    }
++}
++
+ bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
+                                    bool resizable, Error **errp)
+ {
+diff --git a/include/block/block.h b/include/block/block.h
+index fb7d379..57a8b65 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -10,6 +10,7 @@
+ #include "block/dirty-bitmap.h"
+ #include "block/blockjob.h"
+ #include "qemu/hbitmap.h"
++#include "hw/block/block.h"
+ 
+ /* block.c */
+ typedef struct BlockDriver BlockDriver;
+@@ -618,4 +619,13 @@ bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
+  */
+ void bdrv_register_buf(BlockDriverState *bs, void *host, size_t size);
+ void bdrv_unregister_buf(BlockDriverState *bs, void *host);
++
++/**
++ * bdrv_apply_blkconf:
++ *
++ * Recursively finds the highest-level block drivers among the files and
++ * backing files that accept a block configuration and applies the given block
++ * configuration to them.
++ */
++void bdrv_apply_blkconf(BlockDriverState *bs, BlockConf *conf);
+ #endif
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 6c0927b..1d99a0d 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -433,6 +433,15 @@ struct BlockDriver {
+     void (*bdrv_abort_perm_update)(BlockDriverState *bs);
+ 
+     /**
++     * Called to inform the driver of the block configuration of the virtual
++     * block device.
++     *
++     * This function is called by a block device realization function if the
++     * device wants to inform the block driver of its block configuration.
++     */
++    void (*bdrv_apply_blkconf)(BlockDriverState *bs, BlockConf *conf);
++
++    /**
+      * Returns in @nperm and @nshared the permissions that the driver for @bs
+      * needs on its child @c, based on the cumulative permissions requested by
+      * the parents in @parent_perm and @parent_shared.
+diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+index d4f4dff..2861995 100644
+--- a/include/hw/block/block.h
++++ b/include/hw/block/block.h
+@@ -77,6 +77,7 @@ bool blkconf_geometry(BlockConf *conf, int *trans,
+                       unsigned cyls_max, unsigned heads_max, unsigned secs_max,
+                       Error **errp);
+ void blkconf_blocksizes(BlockConf *conf);
++void blkconf_apply_to_blkdrv(BlockConf *conf);
+ bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
+                                    bool resizable, Error **errp);
+ 
 -- 
 2.7.4
