@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fR1Ja-0001cF-0g
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:15:23 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fR1Lc-0002Pp-5n
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:17:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fR1JW-0008JB-Pq
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:15:21 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:45239)
+	(envelope-from <laurent@vivier.eu>) id 1fR1LZ-0000IT-0S
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:17:28 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:42525)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fR1JW-00086f-EW
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:15:18 -0400
-References: <20180607184844.30126-1-richard.henderson@linaro.org>
-	<20180607184844.30126-5-richard.henderson@linaro.org>
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fR1LY-0000Bx-MF
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:17:24 -0400
+References: <152839776057.447.4308730223123096@d39dc562802a>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <cc6643c1-5d76-5054-8b9f-0f3c2fd428e4@vivier.eu>
-Date: Thu, 7 Jun 2018 22:15:15 +0200
+Message-ID: <b4fe23eb-70a3-3f71-7b53-daca08aba6b4@vivier.eu>
+Date: Thu, 7 Jun 2018 22:17:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180607184844.30126-5-richard.henderson@linaro.org>
+In-Reply-To: <152839776057.447.4308730223123096@d39dc562802a>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] linux-user/sparc64: Add
- inotify_rm_watch and tee syscalls
+Subject: Re: [Qemu-devel] [PATCH 0/4] linux-user: syscall number fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +27,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, richard.henderson@linaro.org
+Cc: famz@redhat.com
 
-Le 07/06/2018 à 20:48, Richard Henderson a écrit :
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  linux-user/sparc64/syscall_nr.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+Le 07/06/2018 à 20:56, no-reply@patchew.org a écrit :
+...
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/4: linux-user/alpha: Fix epoll syscalls...
+> ERROR: code indent should never use tabs
+> #22: FILE: linux-user/alpha/syscall_nr.h:346:
+> +#define TARGET_NR_epoll_create^I^I407$
 > 
-> diff --git a/linux-user/sparc64/syscall_nr.h b/linux-user/sparc64/syscall_nr.h
-> index 9391645598..0b91b896da 100644
-> --- a/linux-user/sparc64/syscall_nr.h
-> +++ b/linux-user/sparc64/syscall_nr.h
-> @@ -154,7 +154,7 @@
->  #define TARGET_NR_poll               153 /* Common                                      */
->  #define TARGET_NR_getdents64		154 /* Linux specific				   */
->  #define TARGET_NR_fcntl64            155 /* Linux sparc32 Specific                      */
-> -/* #define TARGET_NR_getdirentries   156    SunOS Specific                              */
-> +#define TARGET_NR_inotify_rm_watch   156 /* Linux specific                              */
->  #define TARGET_NR_statfs             157 /* Common                                      */
->  #define TARGET_NR_fstatfs            158 /* Common                                      */
->  #define TARGET_NR_umount             159 /* Common                                      */
-> @@ -278,7 +278,7 @@
->  #define TARGET_NR_mq_notify		277
->  #define TARGET_NR_mq_getsetattr	278
->  #define TARGET_NR_waitid		279
-> -/*#define TARGET_NR_sys_setaltroot	280 available (was setaltroot) */
-> +#define TARGET_NR_tee                   280
->  #define TARGET_NR_add_key		281
->  #define TARGET_NR_request_key	282
->  #define TARGET_NR_keyctl		283
+> ERROR: code indent should never use tabs
+> #23: FILE: linux-user/alpha/syscall_nr.h:347:
+> +#define TARGET_NR_epoll_ctl^I^I408$
+> 
+> ERROR: code indent should never use tabs
+> #24: FILE: linux-user/alpha/syscall_nr.h:348:
+> +#define TARGET_NR_epoll_wait^I^I409$
+> 
+> total: 3 errors, 0 warnings, 27 lines checked
+...
+> ERROR: code indent should never use tabs
+> #18: FILE: linux-user/microblaze/syscall_nr.h:366:
+> +#define TARGET_NR_accept4^I^I362 /* new */$
 > 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+If you agree, I will remove tabs when I'll commit the patches for the
+pull-request.
+
+Thanks,
+Laurent
