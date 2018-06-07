@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fQtwK-0008H8-Pb
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:22:53 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1fQtzH-0003BW-AZ
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:25:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fQtwE-0003uu-Rz
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:22:52 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu,  7 Jun 2018 14:22:34 +0200
-Message-Id: <1528374154-14680-5-git-send-email-thuth@redhat.com>
-In-Reply-To: <1528374154-14680-1-git-send-email-thuth@redhat.com>
-References: <1528374154-14680-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/4] pc-bios/s390-ccw/net: Try to load
- pxelinux.cfg file accoring to the UUID
+	(envelope-from <gengdongjiu@huawei.com>) id 1fQtzG-0005qO-5A
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:25:55 -0400
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Date: Fri, 8 Jun 2018 04:31:00 +0800
+Message-ID: <1528403460-30526-3-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1528403460-30526-1-git-send-email-gengdongjiu@huawei.com>
+References: <1528403460-30526-1-git-send-email-gengdongjiu@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 RFC 2/2] target: arm: Add support for VCPU
+ event states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,98 +22,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
+To: peter.maydell@linaro.org, james.morse@arm.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, gengdongjiu@huawei.com, linuxarm@huawei.com
 
-With the STSI instruction, we can get the UUID of the current VM instance,
-so we can support loading pxelinux config files via UUID in the file name,
-too.
+This patch extends the qemu-kvm state sync logic with support for
+KVM_GET/SET_VCPU_EVENTS, giving access to yet missing SError exception.
+And also it can support the exception state migration.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
 ---
- pc-bios/s390-ccw/netmain.c | 56 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 55 insertions(+), 1 deletion(-)
+ target/arm/cpu.h     |  5 ++++
+ target/arm/kvm64.c   | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ target/arm/machine.c |  3 +++
+ 3 files changed, 72 insertions(+)
 
-diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index c059546..0392131 100644
---- a/pc-bios/s390-ccw/netmain.c
-+++ b/pc-bios/s390-ccw/netmain.c
-@@ -44,6 +44,9 @@ extern char _start[];
- #define KERNEL_MAX_SIZE         ((long)_start)
- #define ARCH_COMMAND_LINE_SIZE  896              /* Taken from Linux kernel */
- 
-+/* STSI 3.2.2 offset of first vmdb + offset of uuid inside vmdb */
-+#define STSI322_VMDB_UUID_OFFSET ((8 + 12) * 4)
-+
- char stack[PAGE_SIZE * 8] __attribute__((aligned(PAGE_SIZE)));
- IplParameterBlock iplb __attribute__((aligned(PAGE_SIZE)));
- static char cfgbuf[2048];
-@@ -236,6 +239,56 @@ static void net_release(filename_ip_t *fn_ip)
- }
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 8488273..b3d6682 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -645,6 +645,11 @@ typedef struct CPUARMState {
+     const struct arm_boot_info *boot_info;
+     /* Store GICv3CPUState to access from this struct */
+     void *gicv3state;
++    struct {
++        uint32_t pending;
++        uint32_t has_esr;
++        uint64_t esr;
++    } serror;
+ } CPUARMState;
  
  /**
-+ * Retrieve the Universally Unique Identifier of the VM.
-+ * @return UUID string, or NULL in case of errors
-+ */
-+static const char *get_uuid(void)
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index e0b8246..45b6911 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -600,6 +600,59 @@ int kvm_arm_cpreg_level(uint64_t regidx)
+ #define AARCH64_SIMD_CTRL_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U32 | \
+                  KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+ 
++static bool kvm_can_set_vcpu_esr(ARMCPU *cpu)
 +{
-+    register int r0 asm("0");
-+    register int r1 asm("1");
-+    uint8_t *mem, *buf, uuid[16];
-+    int i, cc, chk = 0;
-+    static char uuid_str[37];
++    CPUState *cs = CPU(cpu);
 +
-+    mem = malloc(2 * PAGE_SIZE);
-+    if (!mem) {
-+        puts("Out of memory ... can not get UUID.");
-+        return NULL;
-+    }
-+    buf = (uint8_t *)(((uint64_t)mem + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1));
-+    memset(buf, 0, PAGE_SIZE);
-+
-+    /* Get SYSIB 3.2.2 */
-+    r0 = (3 << 28) | 2;
-+    r1 = 2;
-+    asm volatile(" stsi 0(%[addr])\n"
-+                 " ipm  %[cc]\n"
-+                 " srl  %[cc],28\n"
-+                 : [cc] "=d" (cc)
-+                 : "d" (r0), "d" (r1), [addr] "a" (buf)
-+                 : "cc", "memory");
-+    if (cc) {
-+        return NULL;
-+    }
-+
-+    for (i = 0; i < 16; i++) {
-+        uuid[i] = buf[STSI322_VMDB_UUID_OFFSET + i];
-+        chk |= uuid[i];
-+    }
-+    free(mem);
-+    if (!chk) {
-+        return NULL;
-+    }
-+
-+    sprintf(uuid_str, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-"
-+            "%02x%02x%02x%02x%02x%02x", uuid[0], uuid[1], uuid[2], uuid[3],
-+            uuid[4], uuid[5], uuid[6], uuid[7], uuid[8], uuid[9], uuid[10],
-+            uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]);
-+
-+    return uuid_str;
++    int ret = kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_INJECT_SERROR_ESR);
++    return (ret) ? true : false;
 +}
 +
-+/**
-  * Load a kernel with initrd (i.e. with the information that we've got from
-  * a pxelinux.cfg config file)
-  */
-@@ -285,7 +338,8 @@ static int net_try_pxelinux_cfg(filename_ip_t *fn_ip)
-     struct pl_cfg_entry entries[MAX_PXELINUX_ENTRIES];
-     int num_ent, def_ent = 0;
++
++static int kvm_put_vcpu_events(ARMCPU *cpu)
++{
++    CPUARMState *env = &cpu->env;
++    struct kvm_vcpu_events events = {};
++
++    if (!kvm_has_vcpu_events()) {
++        return 0;
++    }
++
++    memset(&events, 0, sizeof(events));
++    events.exception.serror_pending = env->serror.pending;
++
++    if (kvm_can_set_vcpu_esr(cpu)) {
++        events.exception.serror_has_esr = env->serror.has_esr;
++        events.exception.serror_esr = env->serror.esr;
++    }
++
++    return kvm_vcpu_ioctl(CPU(cpu), KVM_SET_VCPU_EVENTS, &events);
++}
++
++static int kvm_get_vcpu_events(ARMCPU *cpu)
++{
++    CPUARMState *env = &cpu->env;
++    struct kvm_vcpu_events events;
++    int ret;
++
++    if (!kvm_has_vcpu_events()) {
++        return 0;
++    }
++
++    memset(&events, 0, sizeof(events));
++    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_GET_VCPU_EVENTS, &events);
++
++    if (ret < 0) {
++        return ret;
++    }
++
++    env->serror.pending = events.exception.serror_pending;
++    env->serror.has_esr = events.exception.serror_has_esr;
++    env->serror.esr = events.exception.serror_esr;
++
++    return 0;
++}
++
+ int kvm_arch_put_registers(CPUState *cs, int level)
+ {
+     struct kvm_one_reg reg;
+@@ -727,6 +780,12 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+         return ret;
+     }
  
--    num_ent = pxelinux_load_parse_cfg(fn_ip, mac, NULL, DEFAULT_TFTP_RETRIES,
-+    num_ent = pxelinux_load_parse_cfg(fn_ip, mac, get_uuid(),
-+                                      DEFAULT_TFTP_RETRIES,
-                                       cfgbuf, sizeof(cfgbuf),
-                                       entries, MAX_PXELINUX_ENTRIES, &def_ent);
-     if (num_ent > 0) {
++    ret = kvm_put_vcpu_events(cpu);
++    if (ret) {
++        printf("return error kvm_put_vcpu_events: %d\n", ret);
++        return ret;
++    }
++
+     if (!write_list_to_kvmstate(cpu, level)) {
+         return EINVAL;
+     }
+@@ -863,6 +922,11 @@ int kvm_arch_get_registers(CPUState *cs)
+     }
+     vfp_set_fpcr(env, fpr);
+ 
++    ret = kvm_get_vcpu_events(cpu);
++    if (ret) {
++        return ret;
++    }
++
+     if (!write_kvmstate_to_list(cpu)) {
+         return EINVAL;
+     }
+diff --git a/target/arm/machine.c b/target/arm/machine.c
+index 2e28d08..5a359f4 100644
+--- a/target/arm/machine.c
++++ b/target/arm/machine.c
+@@ -695,6 +695,9 @@ const VMStateDescription vmstate_arm_cpu = {
+         VMSTATE_UINT32(env.exception.syndrome, ARMCPU),
+         VMSTATE_UINT32(env.exception.fsr, ARMCPU),
+         VMSTATE_UINT64(env.exception.vaddress, ARMCPU),
++        VMSTATE_UINT32(env.serror.pending, ARMCPU),
++        VMSTATE_UINT32(env.serror.has_esr, ARMCPU),
++        VMSTATE_UINT64(env.serror.esr, ARMCPU),
+         VMSTATE_TIMER_PTR(gt_timer[GTIMER_PHYS], ARMCPU),
+         VMSTATE_TIMER_PTR(gt_timer[GTIMER_VIRT], ARMCPU),
+         {
 -- 
 1.8.3.1
