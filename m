@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQsEK-0006l9-00
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:33:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fQsGa-0000aI-8S
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:35:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQsEI-0005oS-QS
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:33:19 -0400
-Date: Thu, 7 Jun 2018 11:33:07 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180607103307.GI28827@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180603203412.11033-1-contrib@steffen-goertz.de>
-	<20180604092008.GA13674@stefanha-x1.localdomain>
-	<CAFEAcA9kdvxa61HNxv-cDhcv07E_NUpwVcSJVYNw4weS3k7nUw@mail.gmail.com>
-	<20180604101221.nhvjum467ier3txx@sirius.home.kraxel.org>
-	<20180607102455.GD19032@stefanha-x1.localdomain>
+	(envelope-from <dgilbert@redhat.com>) id 1fQsGZ-0008IQ-3A
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:35:40 -0400
+Date: Thu, 7 Jun 2018 11:35:30 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180607103529.GG2522@work-vm>
+References: <9e8b49fb-0162-bf35-21bb-acc0dc28555f@redhat.com>
+	<20180606120050.GB2661@work-vm>
+	<61a301dd-8e50-8799-8328-341d6ab744f5@redhat.com>
+	<20180606143134.GG2660@work-vm>
+	<39bcee27-329a-61d8-47fa-678b431b0a79@redhat.com>
+	<20180606150507.GJ2660@work-vm>
+	<66727986-1cf1-c12e-d78c-d56cc15eaf00@redhat.com>
+	<20180606163246.GL3064@redhat.com>
+	<f3914a591a46c9d489f2fa1ad2ac4fd0c5a9e5b6.camel@redhat.com>
+	<20180607103218.GC1455@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180607102455.GD19032@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [RFC v3] qapi: command category to stimulate
- high-level machine devices
+In-Reply-To: <20180607103218.GC1455@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +32,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Jim Mussared <jim@groklearning.com>, Steffen =?utf-8?B?R8O2cnR6?= <contrib@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, "open list:ARM" <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Andrea Bolognani <abologna@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On Thu, Jun 07, 2018 at 11:24:55AM +0100, Stefan Hajnoczi wrote:
-> On Mon, Jun 04, 2018 at 12:12:21PM +0200, Gerd Hoffmann wrote:
-> > On Mon, Jun 04, 2018 at 10:29:40AM +0100, Peter Maydell wrote:
-> > > On 4 June 2018 at 10:20, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > > > Many of these inputs/outputs can be tied to an external UI.  A degree of
-> > > > timing precision is required so that the UI is responsive, although
-> > > > cycle-accurate timing is not what I'd expect from QMP.
-> > > 
-> > > Would we also be able to tie them to an internal UI, ie
-> > > something that appears as another view in the GTK/etc
-> > > UI frontends we have?
-> > 
-> > Should be doable too.  Basically a display device, which isn't a *real*
-> > display but the UI.  Could show a rendering of the board, simliar to how
-> > web emulation environments are doing it.  LED status could be rendered
-> > directly to the board.  A virtual mouse could map mouse clicks to button
-> > presses.
-> > 
-> > Doing more complex input that way (say a slider for the temperature
-> > sensor) isn't going to work very well though ...
-> > 
-> > Sensor input in general is pretty much unsupported in qemu.
-> 
-> For the micro:bit we've been thinking of a WebSocket monitor interface.
-> This way a web UI can work with both local and remote QEMU instances.
-> 
-> For security reasons, the WebSocket cannot be the regular QMP monitor.
+* Richard W.M. Jones (rjones@redhat.com) wrote:
+> On Thu, Jun 07, 2018 at 12:02:29PM +0200, Andrea Bolognani wrote:
+> > Something that I haven't seen mentioned in the thread - and this
+> > looks like as good a point as any to jump in - is that for q35
+> > guests using EFI as well as aarch64 guests the "one click import"
+> > experience requires not only hints about the machine (and firmware!)
+> > type, but also a copy of the EFI variable store:
+> >=20
+> >   $ virt-builder fedora-27 --arch aarch64 --notes
+> >   Fedora=C2=AE 27 Server (aarch64)
+> >=20
+> >   [...]
+> >=20
+> >   You will need to use the associated UEFI NVRAM variables file:
+> >     http://libguestfs.org/download/builder/fedora-27-aarch64-nvram.xz
+>=20
+> This is true, although only sometimes.  If the bootloader[*] has a
+> working fallback path then usually it is able to boot and reset the
+> UEFI varstore back to the correct values.  We have had bugs before
+> where the fallback path was not working, eg:
+>=20
+>   https://bugzilla.redhat.com/show_bug.cgi?id=3D1353689 (yours!)
+>   https://bugzilla.redhat.com/show_bug.cgi?id=3D1558793
+>=20
+> Another problem which Laszlo mentioned is the varstore isn't portable
+> between UEFI implementations, or if the UEFI is compiled with
+> different options.  You can even imagine shipping multiple
+> varstores(!) which argues for a tar-like format.
 
-FWIW, add ability to use websockets protocol over chardevs is fairly
-easy. We already have a QIOChannelWebsock for the VNC server, so it
-is just a little work to wire it into the chardev.
+Given that level of incompatibility with var stores (which I've seen
+myself) I don't see how you can distribute them with images.
 
-If the -monitor / -qmp arg took a filename containing a whitelist of
-allowed monitor commands, you could indeed use the regular QMP monitor
-instead of writing something new.
+Dave
 
-> A slimmed down monitor is required with a subset of QMP commands and
-> events.  For example, users must not be able to migrate to an exec:
-> destination so we need to ban that command on the UI monitor :-).
-
-FWIW, you could  use the "-sandbox spawn=off,elevateprivileges=off"
-arg to prevent ability of QEMU to fork/exec/setuid. Even if the
-monitor still allows it, it thus get blocked, albeit by immediately
-terminating the process.
-
-> Pros:
->  + Remote control is possible over sockets
->    (Important for hosting QEMU on a server.  Nowadays this is becoming a
->    popular way to deliver emulation to users.  They don't need to
->    install software locally.)
->  + UI is cleanly isolated from QEMU process
-> Cons:
->  - Binary or high-frequency I/O is a bad fit for a JSON WebSocket
->    interface
-> 
-> I prefer the WebSocket route over creating a fake display that will not
-> be able to implement complex widgets well.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> > While hints might be considered a reasonable fit for qcow2, I think
+> > it's pretty hard to argue for embedding the NVRAM file in there,
+> > which to me signals quite clearly that an archive containing the
+> > disk image(s) *and* the configuration hints *and* other ancillary
+> > files such as the NVRAM is the only way to build a solution that's
+> > not dead on arrival.
+>=20
+> The tar argument is quite strong.  Just not the wretched OVA/OVF :-)
+>=20
+> > It's pretty easy then to imagine using something like
+> >=20
+> >   $ virt-builder \
+> >     fedora-27 \
+> >     --arch aarch64 \
+> >     --format qva \
+> >     --output f27-aarch64.qva
+> >=20
+> > or download the equivalent from some website, followed by
+> >=20
+> >   $ virt-install \
+> >     --name f27-aarch64 \
+> >     --import \
+> >     --input f27-aarch.qva
+> >=20
+> > or the equivalent pointy-clicky import step and having things
+> > Just Work=E2=84=A2, provided sufficient hints are included in the arc=
+hive;
+> > the user, or the management application, would of course be able
+> > to override such hints at import time.
+>=20
+> RFEs for virt-builder & virt-install one day :-)
+>=20
+> Rich.
+>=20
+> [*] I'm not sure exactly which bit of the bootloader does this,
+> whether it's UEFI itself, or the grub-efi in the guest.
+>=20
+>=20
+> --=20
+> Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~=
+rjones
+> Read my programming and virtualization blog: http://rwmj.wordpress.com
+> virt-p2v converts physical machines to virtual machines.  Boot with a
+> live CD or over the network (PXE) and turn machines into KVM guests.
+> http://libguestfs.org/virt-v2v
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
