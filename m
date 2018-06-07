@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fQnLt-0007mN-A1
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 01:20:50 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1fQnQX-00017l-TN
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 01:25:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fQnLq-0000fp-35
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 01:20:49 -0400
-Received: from mga14.intel.com ([192.55.52.115]:58257)
+	(envelope-from <wei.w.wang@intel.com>) id 1fQnQU-0004Yw-Ot
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 01:25:37 -0400
+Received: from mga12.intel.com ([192.55.52.136]:33777)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1fQnLp-0000c5-M8
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 01:20:46 -0400
-Message-ID: <5B18C18D.3070007@intel.com>
-Date: Thu, 07 Jun 2018 13:24:29 +0800
+	id 1fQnQU-0004Y3-E0
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 01:25:34 -0400
+Message-ID: <5B18C2B2.30709@intel.com>
+Date: Thu, 07 Jun 2018 13:29:22 +0800
 From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
 References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
 	<1524550428-27173-5-git-send-email-wei.w.wang@intel.com>
-	<20180529181221-mutt-send-email-mst@kernel.org>
-	<5B0E6AE9.2030505@intel.com>
-	<20180530154325-mutt-send-email-mst@kernel.org>
-	<5B14F2A3.9010805@intel.com> <20180605065857.GC9216@xz-mi>
-	<5B168EAB.7090607@intel.com> <20180606054227.GA7815@xz-mi>
-	<5B17B1A7.8060307@intel.com> <20180606110217.GF7815@xz-mi>
-In-Reply-To: <20180606110217.GF7815@xz-mi>
+	<20180606064315.GB7815@xz-mi> <5B17B366.5030802@intel.com>
+	<20180607031732.GG7815@xz-mi>
+In-Reply-To: <20180607031732.GG7815@xz-mi>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v7 4/5] virtio-balloon:
@@ -36,134 +32,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Xu <peterx@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com, zhang.zhanghailiang@huawei.com
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, liliang.opensource@gmail.com, pbonzini@redhat.com, nilal@redhat.com
 
-On 06/06/2018 07:02 PM, Peter Xu wrote:
-> On Wed, Jun 06, 2018 at 06:04:23PM +0800, Wei Wang wrote:
->> On 06/06/2018 01:42 PM, Peter Xu wrote:
->>> IMHO migration states do not suite here.  IMHO bitmap syncing is too
->>> frequently an operation, especially at the end of a precopy migration.
->>> If you really want to introduce some notifiers, I would prefer
->>> something new rather than fiddling around with migration state.  E.g.,
->>> maybe a new migration event notifiers, then introduce two new events
->>> for both start/end of bitmap syncing.
->> Please see if below aligns to what you meant:
->>
->> MigrationState {
->> ...
->> + int ram_save_state;
->>
->> }
->>
->> typedef enum RamSaveState {
->>      RAM_SAVE_BEGIN = 0,
->>      RAM_SAVE_END = 1,
->>      RAM_SAVE_MAX = 2
->> }
->>
->> then at the step 1) and 3) you concluded somewhere below, we change the
->> state and invoke the callback.
-> I mean something like this:
+On 06/07/2018 11:17 AM, Peter Xu wrote:
+> On Wed, Jun 06, 2018 at 06:11:50PM +0800, Wei Wang wrote:
 >
-> 1693c64c27 ("postcopy: Add notifier chain", 2018-03-20)
+> I got similar comments from Michael, and it will be
+> while (1) {
+> lock;
+> func();
+> unlock();
+> }
 >
-> That was a postcopy-only notifier.  Maybe we can generalize it into a
-> more common notifier for the migration framework so that we can even
-> register with non-postcopy events like bitmap syncing?
-
-Precopy already has its own notifiers: git 99a0db9b
-If we want to reuse, that one would be more suitable. I think mixing 
-non-related events into one notifier list isn't nice.
-
->>
->> Btw, the migration_state_notifiers is already there, but seems not really
->> used (I only tracked spice-core.c called
->> add_migration_state_change_notifier). I thought adding new migration states
->> can reuse all that we have.
->> What's your real concern about that? (not sure how defining new events would
->> make a difference)
-> Migration state is exposed via control path (QMP).  Adding new states
-> mean that the QMP clients will see more.  IMO that's not really
-> anything that a QMP client will need to know, instead we can keep it
-> internally.  That's a reason from compatibility pov.
+> All the unlock inside the body will be gone.
+> Ok I think I have more question on this part...
 >
-> Meanwhile, it's not really a state-thing at all for me.  It looks
-> really more like hook or event (start/stop of sync).
+> Actually AFAICT this new feature uses iothread in a way very similar
+> to the block layer, so I digged a bit on how block layer used the
+> iothreads.  I see that the block code is using something like
+> virtio_queue_aio_set_host_notifier_handler() to hook up the
+> iothread/aiocontext and the ioeventfd, however here you are manually
+> creating one QEMUBH and bound that to the new context.  Should you
+> also use something like the block layer?  Then IMHO you can avoid
+> using a busy loop there (assuming the performance does not really
+> matter that much here for page hintings), and all the packet handling
+> can again be based on interrupts from the guest (ioeventfd).
+>
+> [1]
 
-Thanks for sharing your concerns in detail, which are quite helpful for 
-the discussion. To reuse 99a0db9b, we can also add sub-states (or say 
-events), instead of new migration states.
-For example, we can still define "enum RamSaveState" as above, which can 
-be an indication for the notifier queued on the 99a0db9b notider_list to 
-decide whether to call start or stop.
-Does this solve your concern?
+Also mentioned in another discussion thread that it's better to not let 
+guest send notifications. Otherwise, we would have used the virtqueue 
+door bell to notify host.
+So we need to use polling here, and Michael suggested to implemented in 
+BH, which sounds good to me.
 
 
 >
->>>> I would suggest to focus on the supplied interface and its usage in live
->>>> migration. That is, now we have two APIs, start() and stop(), to start and
->>>> stop the optimization.
->>>>
->>>> 1) where in the migration code should we use them (do you agree with the
->>>> step (1), (2), (3) you concluded below?)
->>>> 2) how should we use them, directly do global call or via notifiers?
->>> I don't know how Dave and Juan might think; here I tend to agree with
->>> Michael that some notifier framework should be nicer.
+>>> [...]
+>>>> +static const VMStateDescription vmstate_virtio_balloon_free_page_report = {
+>>>> +    .name = "virtio-balloon-device/free-page-report",
+>>>> +    .version_id = 1,
+>>>> +    .minimum_version_id = 1,
+>>>> +    .needed = virtio_balloon_free_page_support,
+>>>> +    .fields = (VMStateField[]) {
+>>>> +        VMSTATE_UINT32(free_page_report_cmd_id, VirtIOBalloon),
+>>>> +        VMSTATE_UINT32(poison_val, VirtIOBalloon),
+>>> (could we move all the poison-related lines into another patch or
+>>>    postpone?  after all we don't support it yet, do we?)
 >>>
->> What would be the advantages of using notifiers here?
-> Isolation of modules?  Then migration/ram.c at least won't need to
-> include something like "balloon.h".
+>>   We don't support migrating poison value, but guest maybe use it, so we are
+>> actually disabling this feature in that case. Probably good to leave the
+>> code together to handle that case.
+> Could we just avoid declaring that feature bit in emulation code
+> completely?  I mean, we support VIRTIO_BALLOON_F_FREE_PAGE_HINT first
+> as the first step (as you mentioned in commit message, the POISON is a
+> TODO).  Then when you really want to completely support the POISON
+> bit, you can put all that into a separate patch.  Would that work?
 >
-> And I think it's also possible too if some other modules would like to
-> hook at these places someday.
 
-OK, I can implement it with notifiers, but this (framework) is usually 
-added when someday there is a second user who needs a callback at the 
-same place.
-
+Not really. The F_PAGE_POISON isn't a feature configured via QEMU cmd 
+line like F_FREE_PAGE_HINT. We always set F_PAGE_POISON if 
+F_FREE_PAGE_HINT is enabled. It is used to detect if the guest is using 
+page poison.
 
 
 >>
->>
->>> This is not that obvious to me.  For now I think it's true, since when
->>> we call stop() we'll take the mutex, meanwhile the mutex is actually
->>> always held by the iothread (in the big loop in
->>> virtio_balloon_poll_free_page_hints) until either:
->>>
->>> - it sleeps in qemu_cond_wait() [1], or
->>> - it leaves the big loop [2]
->>>
->>> Since I don't see anyone who will set dev->block_iothread to true for
->>> the balloon device, then [1] cannot happen;
->> there is a case in virtio_balloon_set_status which sets dev->block_iothread
->> to true.
->>
->> Did you mean the free_page_lock mutex? it is released at the bottom of the
->> while() loop in virtio_balloon_poll_free_page_hint. It's actually released
->> for every hint. That is,
->>
->> while(1){
->>      take the lock;
->>      process 1 hint from the vq;
->>      release the lock;
->> }
-> Ah, so now I understand why you need the lock to be inside the loop,
-> since the loop is busy polling actually.  Is it possible to do this in
-> an async way?
+>>>> +    if (virtio_has_feature(s->host_features,
+>>>> +                           VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+>>>> +        s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE, NULL);
+>>>> +        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+>>>> +        s->free_page_report_cmd_id =
+>>>> +                           VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN - 1;
+>>> Why explicitly -1?  I thought ID_MIN would be fine too?
+>> Yes, that will also be fine. Since we states that the cmd id will be from
+>> [MIN, MAX], and we make s->free_page_report_cmd_id++ in start(), using
+>> VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN here will make it [MIN + 1, MAX].
+> Then I would prefer we just use the MIN value, otherwise IMO we'd
+> better have a comment mentioning about why that -1 is there.
 
-We need to use polling here because of some back story in the guest side 
-(due to some locks being held) that makes it a barrier to sending 
-notifications for each hints.
-
-> I'm a bit curious on how much time will it use to do
-> one round of the free page hints (e.g., an idle guest with 8G mem, or
-> any configuration you tested)?  I suppose during that time the
-> iothread will be held steady with 100% cpu usage, am I right?
-
-Compared to the time spent by the legacy migration to send free pages, 
-that small amount of CPU usage spent on filtering free pages could be 
-neglected.
-Grinding a chopper will not hold up the work of cutting firewood :)
+Sure, we can do that.
 
 Best,
 Wei
