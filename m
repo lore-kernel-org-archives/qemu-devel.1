@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fQxCN-0002TK-BH
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:51:40 -0400
+	(envelope-from <clg@kaod.org>) id 1fQxCT-0002YW-0n
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:51:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fQxCI-00041Y-Kx
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:51:39 -0400
-Received: from 14.mo3.mail-out.ovh.net ([188.165.43.98]:60262)
+	(envelope-from <clg@kaod.org>) id 1fQxCO-00044F-0j
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:51:45 -0400
+Received: from 18.mo5.mail-out.ovh.net ([178.33.45.10]:58811)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fQxCI-00040H-AZ
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:51:34 -0400
-Received: from player169.ha.ovh.net (unknown [10.109.108.58])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id B8BAC1BC4EA
-	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 17:51:32 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fQxCN-00043W-Pl
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:51:39 -0400
+Received: from player169.ha.ovh.net (unknown [10.109.120.69])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 2FCB21BD82E
+	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 17:51:38 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu,  7 Jun 2018 17:49:49 +0200
-Message-Id: <20180607155003.1580-15-clg@kaod.org>
+Date: Thu,  7 Jun 2018 17:49:50 +0200
+Message-Id: <20180607155003.1580-16-clg@kaod.org>
 In-Reply-To: <20180607155003.1580-1-clg@kaod.org>
 References: <20180607155003.1580-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 14/28] spapr/xive: use the VCPU id as a VP
- identifier in the OS CAM.
+Subject: [Qemu-devel] [PATCH v4 15/28] spapr: initialize VSMT before
+ initializing the IRQ backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,189 +33,45 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-For the IVPE to find a matching VP among the VPs dispatched on the
-physical processor threads, the model needs to update the OS CAM line
-of the XIVE thread interrupt context with the VP identifier.
-
-The model uses the VCPU id as the VP identifier for the sPAPR and
-provide a set of helpers to do the conversion between identifiers.
-EQ ids are also derived from the VCPU id.
-
-sPAPRXive does not provision storage for a VPD table but the
-XiveRouter handlers provide some extra checks to the routing
-algorithm.
+We will need to use xics_max_server_number() to create the sPAPRXive
+object modeling the interrupt controller of the machine which is
+created before the CPUs.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/spapr_xive.h | 15 +++++++++
- hw/intc/spapr_xive.c        | 80 +++++++++++++++++++++++++++++++++++++++=
-++++++
- hw/intc/xive.c              | 12 +++++++
- 3 files changed, 107 insertions(+)
+ hw/ppc/spapr.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-index 32733270f734..be1163a8f272 100644
---- a/include/hw/ppc/spapr_xive.h
-+++ b/include/hw/ppc/spapr_xive.h
-@@ -43,4 +43,19 @@ bool spapr_xive_irq_disable(sPAPRXive *xive, uint32_t =
-lisn);
- void spapr_xive_pic_print_info(sPAPRXive *xive, Monitor *mon);
- qemu_irq spapr_xive_qirq(sPAPRXive *xive, uint32_t lisn);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index c097a7093e62..ae915a3b4803 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2423,11 +2423,6 @@ static void spapr_init_cpus(sPAPRMachineState *spa=
+pr)
+         boot_cores_nr =3D possible_cpus->len;
+     }
 =20
-+/*
-+ * sPAPR VP and EQ indexing helpers
-+ */
-+static inline uint32_t spapr_xive_vp_to_target(sPAPRXive *xive, uint8_t =
-vp_blk,
-+                                               uint32_t vp_idx)
-+{
-+    return vp_idx;
-+}
-+int spapr_xive_target_to_vp(XiveRouter *xrtr, uint32_t target,
-+                            uint8_t *out_vp_blk, uint32_t *out_vp_idx);
-+int spapr_xive_target_to_eq(XiveRouter *xrtr, uint32_t target, uint8_t p=
-rio,
-+                            uint8_t *out_eq_blk, uint32_t *out_eq_idx);
-+int spapr_xive_cpu_to_eq(XiveRouter *xrtr, PowerPCCPU *cpu, uint8_t prio=
-,
-+                         uint8_t *out_eq_blk, uint32_t *out_eq_idx);
-+
- #endif /* PPC_SPAPR_XIVE_H */
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index e006c199ed11..222c1266a547 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -184,6 +184,84 @@ static int spapr_xive_set_eq(XiveRouter *xrtr,
-     return 0;
- }
+-    /* VSMT must be set in order to be able to compute VCPU ids, ie to
+-     * call xics_max_server_number() or spapr_vcpu_id().
+-     */
+-    spapr_set_vsmt_mode(spapr, &error_fatal);
+-
+     if (smc->pre_2_10_has_unused_icps) {
+         int i;
 =20
-+static int spapr_xive_get_vp(XiveRouter *xrtr,
-+                             uint8_t vp_blk, uint32_t vp_idx, XiveVP *vp=
-)
-+{
-+    sPAPRXive *xive =3D SPAPR_XIVE(xrtr);
-+    uint32_t vcpu_id =3D spapr_xive_vp_to_target(xive, vp_blk, vp_idx);
-+    PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
-+
-+    if (!cpu) {
-+        return -1;
-+    }
-+
-+    /*
-+     * sPAPR does not maintain a VPD table. Return that the VP is
-+     * valid if we have found a matching CPU
+@@ -2547,6 +2542,11 @@ static void spapr_machine_init(MachineState *machi=
+ne)
+     /* Setup a load limit for the ramdisk leaving room for SLOF and FDT =
+*/
+     load_limit =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FW_OVERHEAD;
+=20
++    /* VSMT must be set in order to be able to compute VCPU ids, ie to
++     * call xics_max_server_number() or spapr_vcpu_id().
 +     */
-+    vp->w0 =3D VP_W0_VALID;
-+    return 0;
-+}
++    spapr_set_vsmt_mode(spapr, &error_fatal);
 +
-+static int spapr_xive_set_vp(XiveRouter *xrtr,
-+                             uint8_t vp_blk, uint32_t vp_idx, XiveVP *vp=
-)
-+{
-+    /* no VPD table */
-+    return 0;
-+}
-+
-+/*
-+ * sPAPR VP indexing uses a simple mapping of the CPU vcpu_id
-+ */
-+int spapr_xive_target_to_vp(XiveRouter *xrtr, uint32_t target,
-+                            uint8_t *out_vp_blk, uint32_t *out_vp_idx)
-+{
-+    PowerPCCPU *cpu =3D spapr_find_cpu(target);
-+
-+    if (!cpu) {
-+        return -1;
-+    }
-+
-+    if (out_vp_blk) {
-+        *out_vp_blk =3D xrtr->chip_id;
-+    }
-+
-+    if (out_vp_blk) {
-+        *out_vp_idx =3D cpu->vcpu_id;
-+    }
-+    return 0;
-+}
-+
-+/*
-+ * sPAPR EQ indexing uses a simple mapping of the CPU vcpu_id, 8
-+ * priorities per CPU
-+ */
-+int spapr_xive_cpu_to_eq(XiveRouter *xrtr, PowerPCCPU *cpu, uint8_t prio=
-,
-+                         uint8_t *out_eq_blk, uint32_t *out_eq_idx)
-+{
-+    if (!cpu) {
-+        return -1;
-+    }
-+
-+    if (out_eq_blk) {
-+        *out_eq_blk =3D xrtr->chip_id;
-+    }
-+
-+    if (out_eq_idx) {
-+        *out_eq_idx =3D (cpu->vcpu_id << 3) + prio;
-+    }
-+    return 0;
-+}
-+
-+int spapr_xive_target_to_eq(XiveRouter *xrtr, uint32_t target, uint8_t p=
-rio,
-+                            uint8_t *out_eq_blk, uint32_t *out_eq_idx)
-+{
-+    PowerPCCPU *cpu =3D spapr_find_cpu(target);
-+
-+    return spapr_xive_cpu_to_eq(xrtr, cpu, prio, out_eq_blk, out_eq_idx)=
-;
-+}
-+
-+
- static const VMStateDescription vmstate_spapr_xive_eq =3D {
-     .name =3D TYPE_SPAPR_XIVE "/eq",
-     .version_id =3D 1,
-@@ -248,6 +326,8 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     xrc->set_ive =3D spapr_xive_set_ive;
-     xrc->get_eq  =3D spapr_xive_get_eq;
-     xrc->set_eq  =3D spapr_xive_set_eq;
-+    xrc->get_vp  =3D spapr_xive_get_vp;
-+    xrc->set_vp  =3D spapr_xive_set_vp;
- }
+     /* Set up Interrupt Controller before we create the VCPUs */
+     smc->irq->init(spapr, &error_fatal);
 =20
- static const TypeInfo spapr_xive_info =3D {
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index f249ffc8943e..671ea1c6c36b 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -486,6 +486,8 @@ static uint32_t xive_tctx_hw_cam(XiveTCTX *tctx, bool=
- block_group)
- static void xive_tctx_reset(void *dev)
- {
-     XiveTCTX *tctx =3D XIVE_TCTX(dev);
-+    PowerPCCPU *cpu =3D POWERPC_CPU(tctx->cs);
-+    CPUPPCState *env =3D &cpu->env;
-=20
-     memset(tctx->regs, 0, sizeof(tctx->regs));
-=20
-@@ -500,6 +502,16 @@ static void xive_tctx_reset(void *dev)
-      */
-     tctx->regs[TM_QW1_OS + TM_PIPR] =3D
-         ipb_to_pipr(tctx->regs[TM_QW1_OS + TM_IPB]);
-+
-+    /* The OS CAM is pushed by the hypervisor when the VP is scheduled
-+     * to run on a HW thread. On QEMU, when running a pseries machine,
-+     * hardwire the VCPU id as this is our VP identifier.
-+     */
-+    if (!msr_hv) {
-+        uint32_t os_cam =3D cpu_to_be32(
-+            TM_QW1W2_VO | tctx_cam_line(tctx->xrtr->chip_id, cpu->vcpu_i=
-d));
-+        memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &os_cam, 4);
-+    }
- }
-=20
- static void xive_tctx_realize(DeviceState *dev, Error **errp)
 --=20
 2.13.6
