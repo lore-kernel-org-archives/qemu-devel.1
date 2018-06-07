@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40066)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fR0n5-0006Zv-NN
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 15:41:49 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fR1Ec-0006xI-SG
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:10:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fR0n1-0000aS-Mg
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 15:41:47 -0400
-Resent-Message-Id: <E1fR0n1-0000aS-Mg@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21022)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fR0n1-0000V5-Fc
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 15:41:43 -0400
-In-Reply-To: <20180607184844.30126-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152839776057.447.4308730223123096@d39dc562802a>
+	(envelope-from <laurent@vivier.eu>) id 1fR1EZ-0007ec-Jz
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:10:14 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:50007)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fR1EZ-0007Gv-A2
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 16:10:11 -0400
+References: <20180607184844.30126-1-richard.henderson@linaro.org>
+	<20180607184844.30126-2-richard.henderson@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <943b1ac4-171c-dfb6-c0c4-c458d69184b4@vivier.eu>
+Date: Thu, 7 Jun 2018 22:10:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Jun 2018 11:56:01 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/4] linux-user: syscall number fixes
+In-Reply-To: <20180607184844.30126-2-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] linux-user/alpha: Fix epoll syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +28,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, laurent@vivier.eu
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjA3MTg0ODQ0LjMwMTI2LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAvNF0gbGludXgtdXNlcjogc3lzY2Fs
-bCBudW1iZXIgZml4ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
-U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
-aWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
-aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
-QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
-LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
-c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
-Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
-bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
-ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9n
-aXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAg
-IHBhdGNoZXcvMjAxODA2MDcxODQ4NDQuMzAxMjYtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
-b3JnIC0+IHBhdGNoZXcvMjAxODA2MDcxODQ4NDQuMzAxMjYtMS1yaWNoYXJkLmhlbmRlcnNvbkBs
-aW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNjA4MGZiYWVmZCBsaW51
-eC11c2VyL3NwYXJjNjQ6IEFkZCBpbm90aWZ5X3JtX3dhdGNoIGFuZCB0ZWUgc3lzY2FsbHMKYTMz
-MjA2MmE5YyBsaW51eC11c2VyL21pY3JvYmxhemU6IEZpeCB0eXBvIGluIGFjY2VwdDQgc3lzY2Fs
-bAowNGJmOTBhOTM3IGxpbnV4LXVzZXIvaHBwYTogRml4IHR5cG8gaW4gbWtub2RhdCBzeXNjYWxs
-CjYzODQ1ZGU0NzggbGludXgtdXNlci9hbHBoYTogRml4IGVwb2xsIHN5c2NhbGxzCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzQ6IGxpbnV4LXVzZXIvYWxwaGE6IEZpeCBl
-cG9sbCBzeXNjYWxscy4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJz
-CiMyMjogRklMRTogbGludXgtdXNlci9hbHBoYS9zeXNjYWxsX25yLmg6MzQ2OgorI2RlZmluZSBU
-QVJHRVRfTlJfZXBvbGxfY3JlYXRlXkleSTQwNyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
-bmV2ZXIgdXNlIHRhYnMKIzIzOiBGSUxFOiBsaW51eC11c2VyL2FscGhhL3N5c2NhbGxfbnIuaDoz
-NDc6CisjZGVmaW5lIFRBUkdFVF9OUl9lcG9sbF9jdGxeSV5JNDA4JAoKRVJST1I6IGNvZGUgaW5k
-ZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjQ6IEZJTEU6IGxpbnV4LXVzZXIvYWxwaGEvc3lz
-Y2FsbF9uci5oOjM0ODoKKyNkZWZpbmUgVEFSR0VUX05SX2Vwb2xsX3dhaXReSV5JNDA5JAoKdG90
-YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzQ6IGxpbnV4LXVzZXIv
-aHBwYTogRml4IHR5cG8gaW4gbWtub2RhdCBzeXNjYWxsLi4uCkNoZWNraW5nIFBBVENIIDMvNDog
-bGludXgtdXNlci9taWNyb2JsYXplOiBGaXggdHlwbyBpbiBhY2NlcHQ0IHN5c2NhbGwuLi4KRVJS
-T1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTg6IEZJTEU6IGxpbnV4LXVz
-ZXIvbWljcm9ibGF6ZS9zeXNjYWxsX25yLmg6MzY2OgorI2RlZmluZSBUQVJHRVRfTlJfYWNjZXB0
-NF5JXkkzNjIgLyogbmV3ICovJAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA4IGxpbmVz
-IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
-IFBBVENIIDQvNDogbGludXgtdXNlci9zcGFyYzY0OiBBZGQgaW5vdGlmeV9ybV93YXRjaCBhbmQg
-dGVlIHN5c2NhbGxzLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxODogRklM
-RTogbGludXgtdXNlci9zcGFyYzY0L3N5c2NhbGxfbnIuaDoxNTc6CisjZGVmaW5lIFRBUkdFVF9O
-Ul9pbm90aWZ5X3JtX3dhdGNoICAgMTU2IC8qIExpbnV4IHNwZWNpZmljICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgKi8KCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTYgbGluZXMg
-Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVU
-IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdl
-bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQ
-bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Le 07/06/2018 à 20:48, Richard Henderson a écrit :
+> These were named incorrectly, going so far as to invade strace.list.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  linux-user/alpha/syscall_nr.h | 6 +++---
+>  linux-user/strace.list        | 9 ---------
+>  2 files changed, 3 insertions(+), 12 deletions(-)
+
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
