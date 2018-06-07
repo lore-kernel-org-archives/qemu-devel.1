@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQoNA-0000nU-Ey
+	(envelope-from <armbru@redhat.com>) id 1fQoN9-0000mF-Ly
 	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQoN8-0002pm-AE
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:12 -0400
+	(envelope-from <armbru@redhat.com>) id 1fQoN7-0002ot-ND
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:11 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Jun 2018 08:25:47 +0200
-Message-Id: <20180607062559.16127-8-armbru@redhat.com>
+Date: Thu,  7 Jun 2018 08:25:54 +0200
+Message-Id: <20180607062559.16127-15-armbru@redhat.com>
 In-Reply-To: <20180607062559.16127-1-armbru@redhat.com>
 References: <20180607062559.16127-1-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 07/19] block: Fix -drive for certain
- non-string scalars
+Subject: [Qemu-devel] [RFC PATCH 14/19] block-qdict: Simplify
+ qdict_is_list() some
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,107 +23,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
 
-The previous commit fixed -blockdev breakage due to misuse of the
-qobject input visitor's keyval flavor in bdrv_file_open().  The commit
-message explain why using the plain flavor would be just as wrong; it
-would break -drive.  Turns out we break it in three places:
-nbd_open(), sd_open() and ssh_file_open().  They are even marked
-FIXME.  Example breakage:
-
-    $ qemu-system-x86 -drive node-name=n1,driver=nbd,server.type=inet,server.host=localhost,server.port=1234,server.numeric=off
-    qemu-system-x86: -drive node-name=n1,driver=nbd,server.type=inet,server.host=localhost,server.port=1234,server.numeric=off: Invalid parameter type for 'numeric', expected: boolean
-
-Fix it the same way: replace qdict_crumple() by
-qdict_crumple_for_keyval_qiv(), and switch from plain to the keyval
-flavor.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/nbd.c      | 12 ++----------
- block/sheepdog.c | 12 ++----------
- block/ssh.c      | 12 ++----------
- 3 files changed, 6 insertions(+), 30 deletions(-)
+ qobject/block-qdict.c | 27 +++++++++++----------------
+ 1 file changed, 11 insertions(+), 16 deletions(-)
 
-diff --git a/block/nbd.c b/block/nbd.c
-index d6c4c4ddbc..614dd9fec0 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -273,20 +273,12 @@ static SocketAddress *nbd_config(BDRVNBDState *s, QDict *options,
-         goto done;
+diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
+index 35e9052816..f24bea30e1 100644
+--- a/qobject/block-qdict.c
++++ b/qobject/block-qdict.c
+@@ -317,27 +317,22 @@ static int qdict_is_list(QDict *maybe_list, Error **errp)
+ 
+     for (ent = qdict_first(maybe_list); ent != NULL;
+          ent = qdict_next(maybe_list, ent)) {
++        int is_index = !qemu_strtoi64(ent->key, NULL, 10, &val);
+ 
+-        if (qemu_strtoi64(ent->key, NULL, 10, &val) == 0) {
+-            if (is_list == -1) {
+-                is_list = 1;
+-            } else if (!is_list) {
+-                error_setg(errp,
+-                           "Cannot mix list and non-list keys");
+-                return -1;
+-            }
++        if (is_list == -1) {
++            is_list = is_index;
++        }
++
++        if (is_index != is_list) {
++            error_setg(errp, "Cannot mix list and non-list keys");
++            return -1;
++        }
++
++        if (is_index) {
+             len++;
+             if (val > max) {
+                 max = val;
+             }
+-        } else {
+-            if (is_list == -1) {
+-                is_list = 0;
+-            } else if (is_list) {
+-                error_setg(errp,
+-                           "Cannot mix list and non-list keys");
+-                return -1;
+-            }
+         }
      }
  
--    crumpled_addr = qdict_crumple(addr, errp);
-+    crumpled_addr = qdict_crumple_for_keyval_qiv(addr, errp);
-     if (!crumpled_addr) {
-         goto done;
-     }
- 
--    /*
--     * FIXME .numeric, .to, .ipv4 or .ipv6 don't work with -drive
--     * server.type=inet.  .to doesn't matter, it's ignored anyway.
--     * That's because when @options come from -blockdev or
--     * blockdev_add, members are typed according to the QAPI schema,
--     * but when they come from -drive, they're all QString.  The
--     * visitor expects the former.
--     */
--    iv = qobject_input_visitor_new(crumpled_addr);
-+    iv = qobject_input_visitor_new_keyval(crumpled_addr);
-     visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index a93f93d360..29e3e1eaaa 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -546,20 +546,12 @@ static SocketAddress *sd_server_config(QDict *options, Error **errp)
- 
-     qdict_extract_subqdict(options, &server, "server.");
- 
--    crumpled_server = qdict_crumple(server, errp);
-+    crumpled_server = qdict_crumple_for_keyval_qiv(server, errp);
-     if (!crumpled_server) {
-         goto done;
-     }
- 
--    /*
--     * FIXME .numeric, .to, .ipv4 or .ipv6 don't work with -drive
--     * server.type=inet.  .to doesn't matter, it's ignored anyway.
--     * That's because when @options come from -blockdev or
--     * blockdev_add, members are typed according to the QAPI schema,
--     * but when they come from -drive, they're all QString.  The
--     * visitor expects the former.
--     */
--    iv = qobject_input_visitor_new(crumpled_server);
-+    iv = qobject_input_visitor_new_keyval(crumpled_server);
-     visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-diff --git a/block/ssh.c b/block/ssh.c
-index eec37dd27c..bd85d989d5 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -623,20 +623,12 @@ static BlockdevOptionsSsh *ssh_parse_options(QDict *options, Error **errp)
-     }
- 
-     /* Create the QAPI object */
--    crumpled = qdict_crumple(options, errp);
-+    crumpled = qdict_crumple_for_keyval_qiv(options, errp);
-     if (crumpled == NULL) {
-         goto fail;
-     }
- 
--    /*
--     * FIXME .numeric, .to, .ipv4 or .ipv6 don't work with -drive.
--     * .to doesn't matter, it's ignored anyway.
--     * That's because when @options come from -blockdev or
--     * blockdev_add, members are typed according to the QAPI schema,
--     * but when they come from -drive, they're all QString.  The
--     * visitor expects the former.
--     */
--    v = qobject_input_visitor_new(crumpled);
-+    v = qobject_input_visitor_new_keyval(crumpled);
-     visit_type_BlockdevOptionsSsh(v, NULL, &result, &local_err);
-     visit_free(v);
-     qobject_unref(crumpled);
 -- 
 2.17.1
