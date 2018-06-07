@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQvtA-0001tQ-7h
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:27:45 -0400
+	(envelope-from <armbru@redhat.com>) id 1fQvtU-00028q-7R
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:28:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQvt9-00070C-6X
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:27:44 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180529174821.19964-1-f4bug@amsat.org>
-	<20180529174821.19964-2-f4bug@amsat.org>
-	<fba4c1c5-a479-60c6-31e3-99affcacd5b7@redhat.com>
-	<5374cfa5-e314-0c4f-92e9-b3ec3bf3bd95@amsat.org>
-	<87po12vhm8.fsf@dusky.pond.sub.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e34c36ea-95ea-685c-ea7e-72554925e350@amsat.org>
-Date: Thu, 7 Jun 2018 11:27:32 -0300
+	(envelope-from <armbru@redhat.com>) id 1fQvtQ-00077g-9M
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:28:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60360)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fQvtQ-00077D-3v
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:28:00 -0400
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.phx2.redhat.com
+	[10.5.11.24])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3D2B087621
+	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 14:27:59 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180529055755.12404-1-peterx@redhat.com>
+	<20180529055755.12404-5-peterx@redhat.com>
+Date: Thu, 07 Jun 2018 16:27:49 +0200
+In-Reply-To: <20180529055755.12404-5-peterx@redhat.com> (Peter Xu's message of
+	"Tue, 29 May 2018 13:57:52 +0800")
+Message-ID: <87d0x2u0wq.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87po12vhm8.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] hw/block/fdc: Replace
- error_setg(&error_abort) by error_report() + abort()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v9 4/7] monitor: fix comment for
+ monitor_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,87 +34,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On 06/07/2018 10:41 AM, Markus Armbruster wrote:
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
->> On 05/30/2018 05:23 PM, John Snow wrote:
->>> On 05/29/2018 01:48 PM, Philippe Mathieu-Daudé wrote:
->>>> Use error_report() + abort() instead of error_setg(&error_abort),
->>>> as suggested by the "qapi/error.h" documentation:
->>>>
->>>>     Please don't error_setg(&error_fatal, ...), use error_report() and
->>>>     exit(), because that's more obvious.
->>>>     Likewise, don't error_setg(&error_abort, ...), use assert().
->>>>
->>>
->>> Didn't realize this was bad form (Why do we have it?)
-> 
-> Because &error_abort has other uses, and I can't see how we can get rid
-> of just error_setg(&error_abort, ...).  Open to ideas.
-> 
->>>> Use abort() instead of the suggested assert() because the error message
->>>> already got displayed.
->>>>
->>>
->>> Update the suggestion?
->>
->> Fair enough.
-> 
-> No.  I intentionally pointed to assert(), because ...
-> 
->>>> Suggested-by: Eric Blake <eblake@redhat.com>
->>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>
->>> Reviewed-by: John Snow <jsnow@redhat.com>
->>> Acked-by: John Snow <jsnow@redhat.com>
->>
->> Thanks!
->>
->>>> ---
->>>>  hw/block/fdc.c | 7 ++++---
->>>>  1 file changed, 4 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
->>>> index cd29e27d8f..048467c00b 100644
->>>> --- a/hw/block/fdc.c
->>>> +++ b/hw/block/fdc.c
->>>> @@ -401,9 +401,10 @@ static int pick_geometry(FDrive *drv)
->>>>  
->>>>      /* No match of any kind found -- fd_format is misconfigured, abort. */
->>>>      if (match == -1) {
->>>> -        error_setg(&error_abort, "No candidate geometries present in table "
->>>> -                   " for floppy drive type '%s'",
->>>> -                   FloppyDriveType_str(drv->drive));
->>>> +        error_report("No candidate geometries present in table "
->>>> +                     " for floppy drive type '%s'",
->>>> +                     FloppyDriveType_str(drv->drive));
->>>> +        abort();
-> 
-> ... no matter how "nice" you make the message before an abort, it's
-> still an abort.  It should not happen (or else aborting would be wrong),
-> and when it does, somebody will have to stare at the code anyway.  I
-> recommend not to bother with niceties there.
+Peter Xu <peterx@redhat.com> writes:
 
-OK I see, thanks for the clear explanation.
+> Fix typo in d622cb5879c.  Meanwhile move these variables close to each
+> other.  monitor_qapi_event_state can be declared static, add that.
+>
+> Reported-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-> 
-> Pig:
-> 
->     hw/block/fdc.c:403:pick_geometry: assertion failed: (match != -1)
->     Aborted (core dumped)
-> 
-> Pig with lipstick on:
-> 
->     No candidate geometries present in table for floppy drive type 'FOO'
->     Aborted (core dumped)
-> 
-> Now, if you're really, really into lipstick: to each his own.  But
-> please return the courtesy and keep it out of the stuff I maintain :)
-> 
->>>>      }
->>>>  
->>>>      parse = &(fd_formats[match]);
->>>> -- 
->>>> 2.17.0
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
