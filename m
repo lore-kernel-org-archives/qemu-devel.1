@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fQvJ7-00071X-PZ
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 09:50:30 -0400
+	(envelope-from <armbru@redhat.com>) id 1fQvLk-0000qX-Lc
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 09:53:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fQvJ6-00034d-JI
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 09:50:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58284 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fQvJ6-00031D-Aa
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 09:50:28 -0400
-Date: Thu, 7 Jun 2018 14:50:20 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180607135020.GQ19032@stefanha-x1.localdomain>
-References: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
-	<152784163262.348.14845375943329962378@d39dc562802a>
+	(envelope-from <armbru@redhat.com>) id 1fQvLj-00050b-W7
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 09:53:12 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180529174821.19964-1-f4bug@amsat.org>
+	<20180529174821.19964-4-f4bug@amsat.org>
+Date: Thu, 07 Jun 2018 15:53:05 +0200
+In-Reply-To: <20180529174821.19964-4-f4bug@amsat.org> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Tue,
+	29 May 2018 14:48:20 -0300")
+Message-ID: <87d0x2vh32.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="OxDG9cJJSSQMUzGF"
-Content-Disposition: inline
-In-Reply-To: <152784163262.348.14845375943329962378@d39dc562802a>
-Subject: Re: [Qemu-devel] [PATCH V6 0/7] nvdimm: guarantee persistence of
- QEMU writes to persistent memory
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/4] hw/arm/sysbus-fdt: Replace
+ error_setg(&error_fatal) by error_report() + exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +26,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: junyan.he@gmx.com, famz@redhat.com, haozhong.zhang@intel.com, xiaoguangrong.eric@gmail.com, crosthwaite.peter@gmail.com, mst@redhat.com, dgilbert@redhat.com, ehabkost@redhat.com, quintela@redhat.com, junyan.he@intel.com, pbonzini@redhat.com, imammedo@redhat.com, rth@twiddle.net
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
---OxDG9cJJSSQMUzGF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> Use error_report() + exit() instead of error_setg(&error_fatal),
+> as suggested by the "qapi/error.h" documentation:
+>
+>    Please don't error_setg(&error_fatal, ...), use error_report() and
+>    exit(), because that's more obvious.
+>
+> This fixes CID 1352173:
+>     "Passing null pointer dt_name to qemu_fdt_node_path, which dereferenc=
+es it."
+>
+> And this also fixes:
+>
+>     hw/arm/sysbus-fdt.c:322:9: warning: Array access (from variable 'node=
+_path') results in a null pointer dereference
+>         if (node_path[1]) {
+>             ^~~~~~~~~~~~
+>
+> Fixes: Coverity CID 1352173 (Dereference after null check)
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-On Fri, Jun 01, 2018 at 01:27:14AM -0700, no-reply@patchew.org wrote:
-> /tmp/qemu-test/src/stubs/pmem.c: In function 'pmem_persist':
-> /tmp/qemu-test/src/stubs/pmem.c:23:1: error: control reaches end of non-void function [-Werror=return-type]
->  }
->  ^
-> cc1: all warnings being treated as errors
+Same code smell as in PATCH 4/4.
 
-Looks like another revision of this series will be necessary.
-
-Stefan
-
---OxDG9cJJSSQMUzGF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbGTgcAAoJEJykq7OBq3PIIUIH+wWxuv3zA7wxG0IfHU7jsKKV
-5YBns0qUnZUcr3V+gKQ56EyZVlwIoXXxcs2k0pREYaNW+YQAVzwTQgg3plyojQ86
-/XkE7ClPbt+vvTGKsLi1RZpXzO79F3rMe29BqCdrJRgkpTGuPTRL6mcYFpQbcm8v
-xTm17JGnqZiTwQpWj0/DuygZpylVg6Pujx3NV8XlIdfiftrsTVa0OYE/guGovWc2
-D1AulzsI10CLnHxAVi1XF64laEUhv6Qi0cRjfgDGjKU53gaXehmi+blyDyrM2cHx
-/idjad+iAQ2W1gI9qEum5lB8xm01zqbW9axTMfqecvW3nB07oDTteBxGwzY0Mk4=
-=D1zD
------END PGP SIGNATURE-----
-
---OxDG9cJJSSQMUzGF--
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
