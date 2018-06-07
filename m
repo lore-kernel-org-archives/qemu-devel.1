@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43329)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fQsKL-0003AU-T6
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:39:34 -0400
+	(envelope-from <bounces@canonical.com>) id 1fQsLu-0004yT-Au
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:41:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fQsKL-0002xI-3m
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:39:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52360 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fQsKK-0002wa-W4
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:39:33 -0400
-References: <7CECC2DFC21538489F72729DF5EFB4D9C1486C@DGGEMM501-MBX.china.huawei.com>
-	<20180601122307.3e6ade66@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DB00F4E4@dggeml511-mbx.china.huawei.com>
-	<50481bea-bb5b-dd71-b712-6418c3bb29ac@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <bbb4f800-1d16-3dcc-9abb-8a3024777923@redhat.com>
-Date: Thu, 7 Jun 2018 12:39:30 +0200
+	(envelope-from <bounces@canonical.com>) id 1fQsLr-0004PF-8Y
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:41:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36108)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fQsLr-0004OR-1V
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:41:07 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fQsLp-00033R-Jh
+	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 10:41:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8724B2E88D2
+	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 10:41:05 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <50481bea-bb5b-dd71-b712-6418c3bb29ac@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] An emulation failure occurs,
- if I hotplug vcpus immediately after the VM start
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 07 Jun 2018 10:28:35 -0000
+From: Daniel Berrange <1775366@bugs.launchpad.net>
+Reply-To: Bug 1775366 <1775366@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152827602795.25960.11192717382861692470.malonedeb@wampee.canonical.com>
+Message-Id: <152836731508.24903.11927103162357903967.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1775366] Re: [Feature request] qemu-ga - Allow
+ unexpected parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +37,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Igor Mammedov <imammedo@redhat.com>, xuyandong <xuyandong2@huawei.com>
-Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, lidonglin <lidonglin@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>
+To: qemu-devel@nongnu.org
 
-On 06.06.2018 15:57, Paolo Bonzini wrote:
-> On 06/06/2018 15:28, Gonglei (Arei) wrote:
->> gonglei********: mem.slot: 3, mem.guest_phys_addr=0xc0000,
->> mem.userspace_addr=0x7fc343ec0000, mem.flags=0, memory_size=0x0 
->> gonglei********: mem.slot: 3, mem.guest_phys_addr=0xc0000,
->> mem.userspace_addr=0x7fc343ec0000, mem.flags=0, memory_size=0x9000
->>
->> When the memory region is cleared, the KVM will tell the slot to be 
->> invalid (which it is set to KVM_MEMSLOT_INVALID).
->>
->> If SeaBIOS accesses this memory and cause page fault, it will find an
->> invalid value according to gfn (by __gfn_to_pfn_memslot), and finally
->> it will return an invalid value, and finally it will return a
->> failure.
->>
->> So, My questions are:
->>
->> 1) Why don't we hold kvm->slots_lock during page fault processing?
-> 
-> Because it's protected by SRCU.  We don't need kvm->slots_lock on the
-> read side.
-> 
->> 2) How do we assure that vcpus will not access the corresponding 
->> region when deleting an memory slot?
-> 
-> We don't.  It's generally a guest bug if they do, but the problem here
-> is that QEMU is splitting a memory region in two parts and that is not
-> atomic.
+BTW, if you have any friendly contact with the your hosting provider,
+please encourage them to contribute any enhancements they have back to
+QEMU. It is highly desirable to *NOT* have hosting providers needing a
+fork of qemu-ga, as that ruins ability to run standard disk images, as
+you've found.
 
-BTW, one ugly (but QEMU-only) fix would be to temporarily pause all
-VCPUs, do the change and then unpause all VCPUs.
+-- =
 
-> 
-> One fix could be to add a KVM_SET_USER_MEMORY_REGIONS ioctl that
-> replaces the entire memory map atomically.
-> 
-> Paolo
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1775366
 
+Title:
+   [Feature request] qemu-ga - Allow unexpected parameter
 
--- 
+Status in QEMU:
+  Won't Fix
 
-Thanks,
+Bug description:
+  It whould be nice if the qemu-ga allowed received messages to contain
+  fields which is not part of the spec. In my example I have a host
+  which sends the following request:
 
-David / dhildenb
+  {"execute":"guest-exec","arguments":{"path":"prl_nettool","capture-
+  output":true,"execute-in-shell":false,"arg":[...]}}
+
+  Right now this request is rejected with the following error:
+
+  {"error": {"class": "GenericError", "desc": "Parameter 'execute-in-
+  shell' is unexpected"}}
+
+  My situation is the hosting provider I use does have some customized
+  solution which sends some extra arguments. I have manually patched my
+  qemu-ga so it accepts the "execute-in-shell" parameter but I don't
+  think this should be necessary.
+
+  Instead of "Error" it should just be a "warning" returned to the user
+  of qemu-ga but the call should still be executed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1775366/+subscriptions
