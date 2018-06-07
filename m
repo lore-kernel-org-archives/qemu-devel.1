@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQoN9-0000mZ-QW
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1fQoNC-0000oP-6w
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQoN7-0002p4-V8
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:11 -0400
+	(envelope-from <armbru@redhat.com>) id 1fQoNA-0002sl-CL
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:14 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Jun 2018 08:25:44 +0200
-Message-Id: <20180607062559.16127-5-armbru@redhat.com>
+Date: Thu,  7 Jun 2018 08:25:55 +0200
+Message-Id: <20180607062559.16127-16-armbru@redhat.com>
 In-Reply-To: <20180607062559.16127-1-armbru@redhat.com>
 References: <20180607062559.16127-1-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 04/19] fixup block: Add block-specific
- QDict header
+Subject: [Qemu-devel] [RFC PATCH 15/19] check-block-qdict: Rename
+ qdict_flatten()'s variables for clarity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +25,89 @@ Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- include/block/qdict.h | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ tests/check-block-qdict.c | 57 ++++++++++++++++++++-------------------
+ 1 file changed, 29 insertions(+), 28 deletions(-)
 
-diff --git a/include/block/qdict.h b/include/block/qdict.h
-index 825e096a72..71c037afba 100644
---- a/include/block/qdict.h
-+++ b/include/block/qdict.h
-@@ -1,7 +1,7 @@
- /*
-  * Special QDict functions used by the block layer
-  *
-- * Copyright (c) 2018 Red Hat, Inc.
-+ * Copyright (c) 2013-2018 Red Hat, Inc.
-  *
-  * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
-  * See the COPYING.LIB file in the top-level directory.
-@@ -11,9 +11,6 @@
- #define BLOCK_QDICT_H
+diff --git a/tests/check-block-qdict.c b/tests/check-block-qdict.c
+index 5b9f4d506e..29f58a2d3d 100644
+--- a/tests/check-block-qdict.c
++++ b/tests/check-block-qdict.c
+@@ -37,11 +37,11 @@ static void qdict_defaults_test(void)
  
- #include "qapi/qmp/qdict.h"
--#include "qapi/qmp/qobject.h"
--#include "qapi/error.h"
--
+ static void qdict_flatten_test(void)
+ {
+-    QList *list1 = qlist_new();
+-    QList *list2 = qlist_new();
+-    QDict *dict1 = qdict_new();
+-    QDict *dict2 = qdict_new();
+-    QDict *dict3 = qdict_new();
++    QList *e_1 = qlist_new();
++    QList *e = qlist_new();
++    QDict *e_1_2 = qdict_new();
++    QDict *f = qdict_new();
++    QDict *root = qdict_new();
  
- void qdict_copy_default(QDict *dst, QDict *src, const char *key);
- void qdict_set_default_str(QDict *dst, const char *key, const char *val);
+     /*
+      * Test the flattening of
+@@ -79,35 +79,36 @@ static void qdict_flatten_test(void)
+      * }
+      */
+ 
+-    qdict_put_int(dict1, "a", 0);
+-    qdict_put_int(dict1, "b", 1);
++    qdict_put_int(e_1_2, "a", 0);
++    qdict_put_int(e_1_2, "b", 1);
+ 
+-    qlist_append_int(list1, 23);
+-    qlist_append_int(list1, 66);
+-    qlist_append(list1, dict1);
+-    qlist_append_int(list2, 42);
+-    qlist_append(list2, list1);
++    qlist_append_int(e_1, 23);
++    qlist_append_int(e_1, 66);
++    qlist_append(e_1, e_1_2);
++    qlist_append_int(e, 42);
++    qlist_append(e, e_1);
+ 
+-    qdict_put_int(dict2, "c", 2);
+-    qdict_put_int(dict2, "d", 3);
+-    qdict_put(dict3, "e", list2);
+-    qdict_put(dict3, "f", dict2);
+-    qdict_put_int(dict3, "g", 4);
++    qdict_put_int(f, "c", 2);
++    qdict_put_int(f, "d", 3);
+ 
+-    qdict_flatten(dict3);
++    qdict_put(root, "e", e);
++    qdict_put(root, "f", f);
++    qdict_put_int(root, "g", 4);
+ 
+-    g_assert(qdict_get_int(dict3, "e.0") == 42);
+-    g_assert(qdict_get_int(dict3, "e.1.0") == 23);
+-    g_assert(qdict_get_int(dict3, "e.1.1") == 66);
+-    g_assert(qdict_get_int(dict3, "e.1.2.a") == 0);
+-    g_assert(qdict_get_int(dict3, "e.1.2.b") == 1);
+-    g_assert(qdict_get_int(dict3, "f.c") == 2);
+-    g_assert(qdict_get_int(dict3, "f.d") == 3);
+-    g_assert(qdict_get_int(dict3, "g") == 4);
++    qdict_flatten(root);
+ 
+-    g_assert(qdict_size(dict3) == 8);
++    g_assert(qdict_get_int(root, "e.0") == 42);
++    g_assert(qdict_get_int(root, "e.1.0") == 23);
++    g_assert(qdict_get_int(root, "e.1.1") == 66);
++    g_assert(qdict_get_int(root, "e.1.2.a") == 0);
++    g_assert(qdict_get_int(root, "e.1.2.b") == 1);
++    g_assert(qdict_get_int(root, "f.c") == 2);
++    g_assert(qdict_get_int(root, "f.d") == 3);
++    g_assert(qdict_get_int(root, "g") == 4);
+ 
+-    qobject_unref(dict3);
++    g_assert(qdict_size(root) == 8);
++
++    qobject_unref(root);
+ }
+ 
+ static void qdict_array_split_test(void)
 -- 
 2.17.1
