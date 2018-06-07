@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ross.zwisler@linux.intel.com>) id 1fR3RJ-00012Y-8T
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 18:31:30 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fR3U2-0002zN-BZ
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 18:34:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ross.zwisler@linux.intel.com>) id 1fR3RH-00052U-2O
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 18:31:29 -0400
-Received: from mga09.intel.com ([134.134.136.24]:60809)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ross.zwisler@linux.intel.com>)
-	id 1fR3RG-0004z8-Qf
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 18:31:27 -0400
-From: Ross Zwisler <ross.zwisler@linux.intel.com>
-Date: Thu,  7 Jun 2018 16:31:11 -0600
-Message-Id: <20180607223111.27792-5-ross.zwisler@linux.intel.com>
-In-Reply-To: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
-References: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
-Subject: [Qemu-devel] [qemu PATCH 5/5] nvdimm: make persistence option
- symbolic
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fR3U1-0007bZ-AM
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 18:34:18 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:44374)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fR3U1-0007aY-3b
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 18:34:17 -0400
+Received: by mail-wr0-x243.google.com with SMTP id x4-v6so3261539wro.11
+	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 15:34:16 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180604093653.GC19749@redhat.com>
+References: <20180601162749.27406-1-marcandre.lureau@redhat.com>
+	<20180601162749.27406-5-marcandre.lureau@redhat.com>
+	<20180604093653.GC19749@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 8 Jun 2018 00:34:15 +0200
+Message-ID: <CAJ+F1C+dSJOZUR6nGVxBmonaqB5gREXut61=r2bGMhioYMvEHw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v2 04/12] Add vhost-user-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,188 +31,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, Dan Williams <dan.j.williams@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-Replace the "nvdimm-cap" option which took numeric arguments such as "2"
-with a more user friendly "nvdimm-persistence" option which takes symbolic
-arguments "cpu" or "mem-ctrl".
+Hi
 
-Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Suggested-by: Dan Williams <dan.j.williams@intel.com>
----
- docs/nvdimm.txt          | 31 ++++++++++++-------------------
- hw/acpi/nvdimm.c         |  4 ++--
- hw/i386/pc.c             | 35 +++++++++++++++++------------------
- include/hw/i386/pc.h     |  2 +-
- include/hw/mem/nvdimm.h  |  3 ++-
- tests/bios-tables-test.c |  2 +-
- 6 files changed, 35 insertions(+), 42 deletions(-)
+On Mon, Jun 4, 2018 at 11:36 AM, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
+om> wrote:
+> On Fri, Jun 01, 2018 at 06:27:41PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+>> Create a vhost-user-backend object that holds a connection to a
+>> vhost-user backend and can be referenced from virtio devices that
+>> support it. See later patches for input & gpu usage.
+>>
+>> A chardev can be specified to communicate with the vhost-user backend,
+>> ex: -chardev socket,id=3Dchar0,path=3D/tmp/foo.sock -object
+>> vhost-user-backend,id=3Dvuid,chardev=3Dchar0.
+>>
+>> Alternatively, an executable with its arguments may be given as 'cmd'
+>> property, ex: -object
+>> vhost-user-backend,id=3Dvui,cmd=3D"./vhost-user-input /dev/input..". The
+>> executable is then spawn and, by convention, the vhost-user socket is
+>> passed as fd=3D3. It may be considered a security breach to allow
+>> creating processes that may execute arbitrary executables, so this may
+>> be restricted to some known executables (via signature etc) or
+>> directory.
+>
+> Passing a binary and args as a string blob.....
+>
+>> +static int
+>> +vhost_user_backend_spawn_cmd(VhostUserBackend *b, int vhostfd, Error **=
+errp)
+>> +{
+>> +    int devnull =3D open("/dev/null", O_RDWR);
+>> +    pid_t pid;
+>> +
+>> +    assert(!b->child);
+>> +
+>> +    if (!b->cmd) {
+>> +        error_setg_errno(errp, errno, "Missing cmd property");
+>> +        return -1;
+>> +    }
+>> +    if (devnull < 0) {
+>> +        error_setg_errno(errp, errno, "Unable to open /dev/null");
+>> +        return -1;
+>> +    }
+>> +
+>> +    pid =3D qemu_fork(errp);
+>> +    if (pid < 0) {
+>> +        close(devnull);
+>> +        return -1;
+>> +    }
+>> +
+>> +    if (pid =3D=3D 0) { /* child */
+>> +        int fd, maxfd =3D sysconf(_SC_OPEN_MAX);
+>> +
+>> +        dup2(devnull, STDIN_FILENO);
+>> +        dup2(devnull, STDOUT_FILENO);
+>> +        dup2(vhostfd, 3);
+>> +
+>> +        signal(SIGINT, SIG_IGN);
+>
+> Why ignore SIGINT ?  Surely we want this extra process to be killed
+> someone ctrl-c's the parent QEMU.
 
-diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-index 8b48fb4633..24b443b655 100644
---- a/docs/nvdimm.txt
-+++ b/docs/nvdimm.txt
-@@ -154,29 +154,22 @@ guest software that this vNVDIMM device contains a region that cannot
- accept persistent writes. In result, for example, the guest Linux
- NVDIMM driver, marks such vNVDIMM device as read-only.
- 
--Platform Capabilities
-----------------------
-+NVDIMM Persistence
-+------------------
- 
- ACPI 6.2 Errata A added support for a new Platform Capabilities Structure
- which allows the platform to communicate what features it supports related to
--NVDIMM data durability.  Users can provide a capabilities value to a guest via
--the optional "nvdimm-cap" machine command line option:
-+NVDIMM data persistence.  Users can provide a persistence value to a guest via
-+the optional "nvdimm-persistence" machine command line option:
- 
--    -machine pc,accel=kvm,nvdimm,nvdimm-cap=2
-+    -machine pc,accel=kvm,nvdimm,nvdimm-persistence=cpu
- 
--This "nvdimm-cap" field is an integer, and is the combined value of the
--various capability bits defined in table 5-137 of the ACPI 6.2 Errata A spec.
-+There are currently two valid values for this option:
- 
--Here is a quick summary of the three bits that are defined as of that spec:
-+"mem-ctrl" - The platform supports flushing dirty data from the memory
-+             controller to the NVDIMMs in the event of power loss.
- 
--Bit[0] - CPU Cache Flush to NVDIMM Durability on Power Loss Capable.
--Bit[1] - Memory Controller Flush to NVDIMM Durability on Power Loss Capable.
--         Note: If bit 0 is set to 1 then this bit shall be set to 1 as well.
--Bit[2] - Byte Addressable Persistent Memory Hardware Mirroring Capable.
--
--So, a "nvdimm-cap" value of 2 would mean that the platform supports Memory
--Controller Flush on Power Loss, a value of 3 would mean that the platform
--supports CPU Cache Flush and Memory Controller Flush on Power Loss, etc.
--
--For a complete list of the flags available and for more detailed descriptions,
--please consult the ACPI spec.
-+"cpu"      - The platform supports flushing dirty data from the CPU cache to
-+             the NVDIMMs in the event of power loss.  This implies that the
-+             platform also supports flushing dirty data through the memory
-+             controller on power loss.
-diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-index 87e4280c71..27eeb6609f 100644
---- a/hw/acpi/nvdimm.c
-+++ b/hw/acpi/nvdimm.c
-@@ -404,8 +404,8 @@ static GArray *nvdimm_build_device_structure(AcpiNVDIMMState *state)
-     }
-     g_slist_free(device_list);
- 
--    if (state->capabilities) {
--        nvdimm_build_structure_caps(structures, state->capabilities);
-+    if (state->persistence) {
-+        nvdimm_build_structure_caps(structures, state->persistence);
-     }
- 
-     return structures;
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index f3befe6721..5bba9dcf5a 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2181,31 +2181,30 @@ static void pc_machine_set_nvdimm(Object *obj, bool value, Error **errp)
-     pcms->acpi_nvdimm_state.is_enabled = value;
- }
- 
--static void pc_machine_get_nvdimm_capabilities(Object *obj, Visitor *v,
--                                               const char *name, void *opaque,
--                                               Error **errp)
-+static char *pc_machine_get_nvdimm_persistence(Object *obj, Error **errp)
- {
-     PCMachineState *pcms = PC_MACHINE(obj);
--    uint32_t value = pcms->acpi_nvdimm_state.capabilities;
- 
--    visit_type_uint32(v, name, &value, errp);
-+    return g_strdup(pcms->acpi_nvdimm_state.persistence_string);
- }
- 
--static void pc_machine_set_nvdimm_capabilities(Object *obj, Visitor *v,
--                                               const char *name, void *opaque,
-+static void pc_machine_set_nvdimm_persistence(Object *obj, const char *value,
-                                                Error **errp)
- {
-     PCMachineState *pcms = PC_MACHINE(obj);
--    Error *error = NULL;
--    uint32_t value;
--
--    visit_type_uint32(v, name, &value, &error);
--    if (error) {
--        error_propagate(errp, error);
--        return;
-+    AcpiNVDIMMState *nvdimm_state = &pcms->acpi_nvdimm_state;
-+
-+    if (strcmp(value, "cpu") == 0)
-+        nvdimm_state->persistence = 3;
-+    else if (strcmp(value, "mem-ctrl") == 0)
-+        nvdimm_state->persistence = 2;
-+    else {
-+        error_report("-machine nvdimm-persistence=%s: unsupported option", value);
-+        exit(EXIT_FAILURE);
-     }
- 
--    pcms->acpi_nvdimm_state.capabilities = value;
-+    g_free(nvdimm_state->persistence_string);
-+    nvdimm_state->persistence_string = g_strdup(value);
- }
- 
- static bool pc_machine_get_smbus(Object *obj, Error **errp)
-@@ -2421,9 +2420,9 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     object_class_property_add_bool(oc, PC_MACHINE_NVDIMM,
-         pc_machine_get_nvdimm, pc_machine_set_nvdimm, &error_abort);
- 
--    object_class_property_add(oc, PC_MACHINE_NVDIMM_CAP, "uint32",
--        pc_machine_get_nvdimm_capabilities,
--        pc_machine_set_nvdimm_capabilities, NULL, NULL, &error_abort);
-+    object_class_property_add_str(oc, PC_MACHINE_NVDIMM_PERSIST,
-+        pc_machine_get_nvdimm_persistence,
-+        pc_machine_set_nvdimm_persistence, &error_abort);
- 
-     object_class_property_add_bool(oc, PC_MACHINE_SMBUS,
-         pc_machine_get_smbus, pc_machine_set_smbus, &error_abort);
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 04d1f8c6c3..fc8dedca12 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -76,7 +76,7 @@ struct PCMachineState {
- #define PC_MACHINE_VMPORT           "vmport"
- #define PC_MACHINE_SMM              "smm"
- #define PC_MACHINE_NVDIMM           "nvdimm"
--#define PC_MACHINE_NVDIMM_CAP       "nvdimm-cap"
-+#define PC_MACHINE_NVDIMM_PERSIST   "nvdimm-persistence"
- #define PC_MACHINE_SMBUS            "smbus"
- #define PC_MACHINE_SATA             "sata"
- #define PC_MACHINE_PIT              "pit"
-diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-index 3c82751bab..9340631cfc 100644
---- a/include/hw/mem/nvdimm.h
-+++ b/include/hw/mem/nvdimm.h
-@@ -138,7 +138,8 @@ struct AcpiNVDIMMState {
-     /*
-      * Platform capabilities, section 5.2.25.9 of ACPI 6.2 Errata A
-      */
--    int32_t capabilities;
-+    int32_t persistence;
-+    char    *persistence_string;
- };
- typedef struct AcpiNVDIMMState AcpiNVDIMMState;
- 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 9b5db1ee8f..b95d56aa4e 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -831,7 +831,7 @@ static void test_acpi_tcg_dimm_pxm(const char *machine)
-     memset(&data, 0, sizeof(data));
-     data.machine = machine;
-     data.variant = ".dimmpxm";
--    test_acpi_one(" -machine nvdimm=on,nvdimm-cap=3"
-+    test_acpi_one(" -machine nvdimm=on,nvdimm-persistence=cpu"
-                   " -smp 4,sockets=4"
-                   " -m 128M,slots=3,maxmem=1G"
-                   " -numa node,mem=32M,nodeid=0"
--- 
-2.14.4
+leftover, removed
+
+>
+>> +
+>> +        for (fd =3D 4; fd < maxfd; fd++) {
+>> +            close(fd);
+>> +        }
+>> +
+>> +        execlp("/bin/sh", "sh", "-c", b->cmd, NULL);
+>
+> ...which is then interpreted by the shell is a recipe for security
+> flaws. There needs to be a way to pass the command + arguments
+> to QEMU as an argv[] we can directly exec without involving the
+> shell.
+>
+
+For now, I use g_shell_parse_argv(). Do you have a better idea?
+
+>> +        _exit(1);
+>> +    }
+>> +
+>> +    b->child =3D QIO_CHANNEL(qio_channel_command_new_pid(devnull, devnu=
+ll, pid));
+>
+> Overall this method overall duplicates much of the
+> qio_channel_command_new_argv(), though you do have a few differences.
+>
+> I'd prefer if we could make qio_channel_command_new_argv more flexible to
+> handle these extra needs though.
+>
+
+Ok I added a pre-exec callback for the extra dup2() & close().
+
+Thanks,
+
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
