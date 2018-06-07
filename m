@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQvsK-0001KL-9R
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:26:54 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQvtA-0001tQ-7h
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:27:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQvsG-0006WY-Bk
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:26:52 -0400
-Date: Thu, 7 Jun 2018 16:26:32 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180607162632.2c2258de@redhat.com>
-In-Reply-To: <fbd2d738-7356-e991-7c15-f9cc436a9378@redhat.com>
-References: <20180517081527.14410-1-david@redhat.com>
-	<20180517081527.14410-7-david@redhat.com>
-	<20180605010840.GF5140@umbus.fritz.box>
-	<fbd2d738-7356-e991-7c15-f9cc436a9378@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQvt9-00070C-6X
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:27:44 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180529174821.19964-1-f4bug@amsat.org>
+	<20180529174821.19964-2-f4bug@amsat.org>
+	<fba4c1c5-a479-60c6-31e3-99affcacd5b7@redhat.com>
+	<5374cfa5-e314-0c4f-92e9-b3ec3bf3bd95@amsat.org>
+	<87po12vhm8.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e34c36ea-95ea-685c-ea7e-72554925e350@amsat.org>
+Date: Thu, 7 Jun 2018 11:27:32 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 06/14] spapr: prepare for multi stage
- hotplug handlers
+In-Reply-To: <87po12vhm8.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] hw/block/fdc: Replace
+ error_setg(&error_abort) by error_report() + abort()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,100 +32,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Tue, 5 Jun 2018 09:51:26 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> On 05.06.2018 03:08, David Gibson wrote:
-> > On Thu, May 17, 2018 at 10:15:19AM +0200, David Hildenbrand wrote:  
-> >> For multi stage hotplug handlers, we'll have to do some error handling
-> >> in some hotplug functions, so let's use a local error variable (except
-> >> for unplug requests).
-> >>
-> >> Also, add code to pass control to the final stage hotplug handler at the
-> >> parent bus.
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  hw/ppc/spapr.c | 54 +++++++++++++++++++++++++++++++++++++++++++-----------
-> >>  1 file changed, 43 insertions(+), 11 deletions(-)
-> >>
-> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >> index ebf30dd60b..b7c5c95f7a 100644
-> >> --- a/hw/ppc/spapr.c
-> >> +++ b/hw/ppc/spapr.c
-> >> @@ -3571,27 +3571,48 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
-> >>  {
-> >>      MachineState *ms = MACHINE(hotplug_dev);
-> >>      sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
-> >> +    Error *local_err = NULL;
-> >>  
-> >> +    /* final stage hotplug handler */
-> >>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> >>          int node;
-> >>  
-> >>          if (!smc->dr_lmb_enabled) {
-> >> -            error_setg(errp, "Memory hotplug not supported for this machine");
-> >> -            return;
-> >> +            error_setg(&local_err,
-> >> +                       "Memory hotplug not supported for this machine");
-> >> +            goto out;
-> >>          }
-> >> -        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP, errp);
-> >> -        if (*errp) {
-> >> -            return;
-> >> +        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP,
-> >> +                                        &local_err);
-> >> +        if (local_err) {
-> >> +            goto out;
-> >>          }
-> >>          if (node < 0 || node >= MAX_NODES) {
-> >> -            error_setg(errp, "Invaild node %d", node);
-> >> -            return;
-> >> +            error_setg(&local_err, "Invaild node %d", node);
-> >> +            goto out;
-> >>          }
-> >>  
-> >> -        spapr_memory_plug(hotplug_dev, dev, node, errp);
-> >> +        spapr_memory_plug(hotplug_dev, dev, node, &local_err);
-> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
-> >> -        spapr_core_plug(hotplug_dev, dev, errp);
-> >> +        spapr_core_plug(hotplug_dev, dev, &local_err);
-> >> +    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-> >> +        hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
-> >> +    }
-> >> +out:
-> >> +    error_propagate(errp, local_err);
-> >> +}
-> >> +
-> >> +static void spapr_machine_device_unplug(HotplugHandler *hotplug_dev,
-> >> +                                        DeviceState *dev, Error **errp)
-> >> +{
-> >> +    Error *local_err = NULL;
-> >> +
-> >> +    /* final stage hotplug handler */
-> >> +    if (dev->parent_bus && dev->parent_bus->hotplug_handler) {  
-> > 
-> > As I think Igor said on the equivalent PC patch, I don't quite get
-> > this.  Isn't this already handled by the generic hotplug code picking
-> > up the bus's hotplug handler if the machine doesn't supply one?  
+On 06/07/2018 10:41 AM, Markus Armbruster wrote:
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+>> On 05/30/2018 05:23 PM, John Snow wrote:
+>>> On 05/29/2018 01:48 PM, Philippe Mathieu-Daudé wrote:
+>>>> Use error_report() + abort() instead of error_setg(&error_abort),
+>>>> as suggested by the "qapi/error.h" documentation:
+>>>>
+>>>>     Please don't error_setg(&error_fatal, ...), use error_report() and
+>>>>     exit(), because that's more obvious.
+>>>>     Likewise, don't error_setg(&error_abort, ...), use assert().
+>>>>
+>>>
+>>> Didn't realize this was bad form (Why do we have it?)
 > 
-> See my reply to patch nr 4.
+> Because &error_abort has other uses, and I can't see how we can get rid
+> of just error_setg(&error_abort, ...).  Open to ideas.
 > 
-> What we do is, we install the machine hotplug handler as an
-> "intermediate" hotplug handler.
+>>>> Use abort() instead of the suggested assert() because the error message
+>>>> already got displayed.
+>>>>
+>>>
+>>> Update the suggestion?
+>>
+>> Fair enough.
 > 
-> E.g. if we have a VIRTIO based MemoryDevice, we have to initialize the
-> MemoryDevice specific stuff in the machine hotplug handler, but then
-> pass the device onto the last stage hotplug handler (which will
-> eventually attach it to a bus and notify the guest).
-as said in v4, pls don't do this implicit routing as it's hard to
-read and maintain. Do explicit routing within concrete device helper
-(virtio_mem_[un|pre]plug()) keeping un/pre/plug handlers simple.
+> No.  I intentionally pointed to assert(), because ...
+> 
+>>>> Suggested-by: Eric Blake <eblake@redhat.com>
+>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>
+>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>> Acked-by: John Snow <jsnow@redhat.com>
+>>
+>> Thanks!
+>>
+>>>> ---
+>>>>  hw/block/fdc.c | 7 ++++---
+>>>>  1 file changed, 4 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+>>>> index cd29e27d8f..048467c00b 100644
+>>>> --- a/hw/block/fdc.c
+>>>> +++ b/hw/block/fdc.c
+>>>> @@ -401,9 +401,10 @@ static int pick_geometry(FDrive *drv)
+>>>>  
+>>>>      /* No match of any kind found -- fd_format is misconfigured, abort. */
+>>>>      if (match == -1) {
+>>>> -        error_setg(&error_abort, "No candidate geometries present in table "
+>>>> -                   " for floppy drive type '%s'",
+>>>> -                   FloppyDriveType_str(drv->drive));
+>>>> +        error_report("No candidate geometries present in table "
+>>>> +                     " for floppy drive type '%s'",
+>>>> +                     FloppyDriveType_str(drv->drive));
+>>>> +        abort();
+> 
+> ... no matter how "nice" you make the message before an abort, it's
+> still an abort.  It should not happen (or else aborting would be wrong),
+> and when it does, somebody will have to stare at the code anyway.  I
+> recommend not to bother with niceties there.
 
-And then you won't need if check as well, just call to bus handler
-directly.
+OK I see, thanks for the clear explanation.
 
-[...]
+> 
+> Pig:
+> 
+>     hw/block/fdc.c:403:pick_geometry: assertion failed: (match != -1)
+>     Aborted (core dumped)
+> 
+> Pig with lipstick on:
+> 
+>     No candidate geometries present in table for floppy drive type 'FOO'
+>     Aborted (core dumped)
+> 
+> Now, if you're really, really into lipstick: to each his own.  But
+> please return the courtesy and keep it out of the stuff I maintain :)
+> 
+>>>>      }
+>>>>  
+>>>>      parse = &(fd_formats[match]);
+>>>> -- 
+>>>> 2.17.0
