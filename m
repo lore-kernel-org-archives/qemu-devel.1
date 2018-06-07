@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ilg@livius.net>) id 1fQsR3-0008Ox-WE
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:46:30 -0400
+	(envelope-from <david@redhat.com>) id 1fQsS8-0000w4-13
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:47:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ilg@livius.net>) id 1fQsR2-0008D1-S9
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:46:30 -0400
-Received: from mail-yb0-x233.google.com ([2607:f8b0:4002:c09::233]:44353)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ilg@livius.net>) id 1fQsR2-0008Cl-Ll
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:46:28 -0400
-Received: by mail-yb0-x233.google.com with SMTP id w74-v6so3049361ybe.11
-	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 03:46:28 -0700 (PDT)
-From: Liviu Ionescu <ilg@livius.net>
-In-Reply-To: <20180607103628.GE19032@stefanha-x1.localdomain>
-References: <CAJSP0QURm0Y6FBByzY=kgf7JmDDyt5PLkkxk+ODi21uQKUGq5A@mail.gmail.com>
-	<CAJSP0QWELqGP56Dm5qyS7zGe_xdPwB5t6CZXkqhdmX16RKM9nw@mail.gmail.com>
-	<CAG7hfcJxiPYou5dNaWcL8p9uQxHUX1Qa7PDaku_z80Qx-S=yGg@mail.gmail.com>
-	<CAJSP0QW4dDpifDJgyuLKo3Ar53OGwUMP16e++HnDe69NA3-Mmw@mail.gmail.com>
-	<CAG7hfcLvhTgz2497-wDD0e02U7hX4eeRPuzqwaL+ugxemPSkzg@mail.gmail.com>
-	<20180607103628.GE19032@stefanha-x1.localdomain>
+	(envelope-from <david@redhat.com>) id 1fQsS3-0000Iu-4x
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:47:36 -0400
+References: <20180525113708.29856-1-david@redhat.com>
+	<20180525113708.29856-7-david@redhat.com>
+	<20180604140903.2629d329.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <cd4912c2-5169-4a46-3434-6767c24fc386@redhat.com>
+Date: Thu, 7 Jun 2018 12:47:28 +0200
 MIME-Version: 1.0
-Date: Thu, 7 Jun 2018 06:46:26 -0400
-Message-ID: <CAG7hfcLE7jJgsAmmOD0TQSN42kPg8ixJ_RQnpmZk-NNJ2MuZ_Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Cortex M0 emulation tasks
+In-Reply-To: <20180604140903.2629d329.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 6/7] s390x/tcg: rearm the
+ CKC timer during migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Julia Suvorova <jusual@mail.ru>, qemu-devel <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>, Jim Mussared <jim@groklearning.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, "Collin L . Walling" <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On 7 June 2018 at 13:36:30, Stefan Hajnoczi (stefanha@gmail.com) wrote:
+On 04.06.2018 14:09, Cornelia Huck wrote:
+> On Fri, 25 May 2018 13:37:07 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> If the CPU data is migrated after the TOD clock, the CKC timer of a CPU
+>> is not rearmed. Let's rearm it when loading the CPU state.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/machine.c | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/target/s390x/machine.c b/target/s390x/machine.c
+>> index 84b4928755..53d226ff48 100644
+>> --- a/target/s390x/machine.c
+>> +++ b/target/s390x/machine.c
+>> @@ -34,6 +34,13 @@ static int cpu_post_load(void *opaque, int version_id)
+>>          return kvm_s390_vcpu_interrupt_post_load(cpu);
+>>      }
+>>  
+>> +#ifdef CONFIG_TCG
+>> +    if (tcg_enabled()) {
+>> +        /* Rearm the CKC timer if necessary */
+>> +        tcg_s390_tod_updated(CPU(cpu), RUN_ON_CPU_NULL);
+> 
+> Stub this out so the explicit CONFIG_TCG is not required? But I don't
+> care too much.
 
-> If you do want to upstream the code you linked, please let us know
-> the
-> details of how you want to do it and how long it might take. Maybe
-> there is a way to work together on it...
 
-yes, I considered this, but I do not have a schedule yet, probably in Q4.
+Yes, can do!
 
-I first=C2=A0plan to upgrade from 2.8 and only later to re-evaluate the
-entire project, to bring it closer to the upstream version.
+-- 
 
+Thanks,
 
-the main change I envision is to untangle the Cortex-M code from the
-current ARM code. maybe now the status is better, but when I did my
-changes I had lots of problems.
-
-
-regards,
-
-Liviu
+David / dhildenb
