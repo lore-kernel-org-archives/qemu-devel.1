@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fQs6I-0002y7-4K
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:25:03 -0400
+	(envelope-from <rjones@redhat.com>) id 1fQsDZ-0006TZ-Bq
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:32:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fQs6E-0006On-W5
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:25:02 -0400
-Date: Thu, 7 Jun 2018 11:24:55 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180607102455.GD19032@stefanha-x1.localdomain>
-References: <20180603203412.11033-1-contrib@steffen-goertz.de>
-	<20180604092008.GA13674@stefanha-x1.localdomain>
-	<CAFEAcA9kdvxa61HNxv-cDhcv07E_NUpwVcSJVYNw4weS3k7nUw@mail.gmail.com>
-	<20180604101221.nhvjum467ier3txx@sirius.home.kraxel.org>
+	(envelope-from <rjones@redhat.com>) id 1fQsDY-00054D-9U
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:32:33 -0400
+Date: Thu, 7 Jun 2018 11:32:18 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20180607103218.GC1455@redhat.com>
+References: <20180606111406.GD2660@work-vm>
+	<9e8b49fb-0162-bf35-21bb-acc0dc28555f@redhat.com>
+	<20180606120050.GB2661@work-vm>
+	<61a301dd-8e50-8799-8328-341d6ab744f5@redhat.com>
+	<20180606143134.GG2660@work-vm>
+	<39bcee27-329a-61d8-47fa-678b431b0a79@redhat.com>
+	<20180606150507.GJ2660@work-vm>
+	<66727986-1cf1-c12e-d78c-d56cc15eaf00@redhat.com>
+	<20180606163246.GL3064@redhat.com>
+	<f3914a591a46c9d489f2fa1ad2ac4fd0c5a9e5b6.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wLAMOaPNJ0fu1fTG"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180604101221.nhvjum467ier3txx@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] [RFC v3] qapi: command category to stimulate
- high-level machine devices
+In-Reply-To: <f3914a591a46c9d489f2fa1ad2ac4fd0c5a9e5b6.camel@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
 
-
---wLAMOaPNJ0fu1fTG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jun 04, 2018 at 12:12:21PM +0200, Gerd Hoffmann wrote:
-> On Mon, Jun 04, 2018 at 10:29:40AM +0100, Peter Maydell wrote:
-> > On 4 June 2018 at 10:20, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > > Many of these inputs/outputs can be tied to an external UI.  A degree=
- of
-> > > timing precision is required so that the UI is responsive, although
-> > > cycle-accurate timing is not what I'd expect from QMP.
-> >=20
-> > Would we also be able to tie them to an internal UI, ie
-> > something that appears as another view in the GTK/etc
-> > UI frontends we have?
+On Thu, Jun 07, 2018 at 12:02:29PM +0200, Andrea Bolognani wrote:
+> Something that I haven't seen mentioned in the thread - and this
+> looks like as good a point as any to jump in - is that for q35
+> guests using EFI as well as aarch64 guests the "one click import"
+> experience requires not only hints about the machine (and firmware!)
+> type, but also a copy of the EFI variable store:
 >=20
-> Should be doable too.  Basically a display device, which isn't a *real*
-> display but the UI.  Could show a rendering of the board, simliar to how
-> web emulation environments are doing it.  LED status could be rendered
-> directly to the board.  A virtual mouse could map mouse clicks to button
-> presses.
+>   $ virt-builder fedora-27 --arch aarch64 --notes
+>   Fedora=C2=AE 27 Server (aarch64)
 >=20
-> Doing more complex input that way (say a slider for the temperature
-> sensor) isn't going to work very well though ...
+>   [...]
 >=20
-> Sensor input in general is pretty much unsupported in qemu.
+>   You will need to use the associated UEFI NVRAM variables file:
+>     http://libguestfs.org/download/builder/fedora-27-aarch64-nvram.xz
 
-For the micro:bit we've been thinking of a WebSocket monitor interface.
-This way a web UI can work with both local and remote QEMU instances.
+This is true, although only sometimes.  If the bootloader[*] has a
+working fallback path then usually it is able to boot and reset the
+UEFI varstore back to the correct values.  We have had bugs before
+where the fallback path was not working, eg:
 
-For security reasons, the WebSocket cannot be the regular QMP monitor.
-A slimmed down monitor is required with a subset of QMP commands and
-events.  For example, users must not be able to migrate to an exec:
-destination so we need to ban that command on the UI monitor :-).
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1353689 (yours!)
+  https://bugzilla.redhat.com/show_bug.cgi?id=3D1558793
 
-Pros:
- + Remote control is possible over sockets
-   (Important for hosting QEMU on a server.  Nowadays this is becoming a
-   popular way to deliver emulation to users.  They don't need to
-   install software locally.)
- + UI is cleanly isolated from QEMU process
-Cons:
- - Binary or high-frequency I/O is a bad fit for a JSON WebSocket
-   interface
+Another problem which Laszlo mentioned is the varstore isn't portable
+between UEFI implementations, or if the UEFI is compiled with
+different options.  You can even imagine shipping multiple
+varstores(!) which argues for a tar-like format.
 
-I prefer the WebSocket route over creating a fake display that will not
-be able to implement complex widgets well.
+> While hints might be considered a reasonable fit for qcow2, I think
+> it's pretty hard to argue for embedding the NVRAM file in there,
+> which to me signals quite clearly that an archive containing the
+> disk image(s) *and* the configuration hints *and* other ancillary
+> files such as the NVRAM is the only way to build a solution that's
+> not dead on arrival.
 
-Gerd: What is your preference?  Do you want board-specific fake displays
-inside the QEMU process as the long-term direction for UIs?
+The tar argument is quite strong.  Just not the wretched OVA/OVF :-)
 
-Stefan
+> It's pretty easy then to imagine using something like
+>=20
+>   $ virt-builder \
+>     fedora-27 \
+>     --arch aarch64 \
+>     --format qva \
+>     --output f27-aarch64.qva
+>=20
+> or download the equivalent from some website, followed by
+>=20
+>   $ virt-install \
+>     --name f27-aarch64 \
+>     --import \
+>     --input f27-aarch.qva
+>=20
+> or the equivalent pointy-clicky import step and having things
+> Just Work=E2=84=A2, provided sufficient hints are included in the archi=
+ve;
+> the user, or the management application, would of course be able
+> to override such hints at import time.
 
---wLAMOaPNJ0fu1fTG
-Content-Type: application/pgp-signature; name="signature.asc"
+RFEs for virt-builder & virt-install one day :-)
 
------BEGIN PGP SIGNATURE-----
+Rich.
 
-iQEcBAEBAgAGBQJbGQf3AAoJEJykq7OBq3PINoYH+wQeFaTA29kp934I6W3zeHof
-0J/eKiigJqbt4VMkKhCwjnH8YxmijxymHi0lK9PcOJZnRY8oVavXFKmr7fE8KDri
-f+a53pkcrF39ftqtmKnIsmTKfRmy7ikdnYQdmlb5eZcpVDrESpwZs+mNb2FKlFDB
-6B8YhLOvLWYdeyg3CqdUHbgeAY6II9m6rJUOAaWEsLue/WmamdqeJYoedvBKAZL1
-2CdJR+5rng8F3PASqhx1KQtIDUEdCxG3tV17OeD4UoediCdcImPrPQYJ0MDn4LI9
-ak6hDtBKPBfII1n5GUwzDsdNegAmTO1LeUc5nQDmsx0kPVtsGP47DA4P8721Jv8=
-=5lCM
------END PGP SIGNATURE-----
+[*] I'm not sure exactly which bit of the bootloader does this,
+whether it's UEFI itself, or the grub-efi in the guest.
 
---wLAMOaPNJ0fu1fTG--
+
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
+ones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+virt-p2v converts physical machines to virtual machines.  Boot with a
+live CD or over the network (PXE) and turn machines into KVM guests.
+http://libguestfs.org/virt-v2v
