@@ -1,13 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fQsGa-0000aI-8S
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:35:42 -0400
+	(envelope-from <berrange@redhat.com>) id 1fQsHV-00011P-NQ
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:36:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fQsGZ-0008IQ-3A
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:35:40 -0400
-Date: Thu, 7 Jun 2018 11:35:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180607103529.GG2522@work-vm>
+	(envelope-from <berrange@redhat.com>) id 1fQsHU-0000gM-HL
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:36:37 -0400
+Date: Thu, 7 Jun 2018 11:36:20 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180607103620.GJ28827@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <9e8b49fb-0162-bf35-21bb-acc0dc28555f@redhat.com>
 	<20180606120050.GB2661@work-vm>
 	<61a301dd-8e50-8799-8328-341d6ab744f5@redhat.com>
@@ -33,9 +34,9 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Andrea Bolognani <abologna@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
+Cc: Andrea Bolognani <abologna@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
 
-* Richard W.M. Jones (rjones@redhat.com) wrote:
+On Thu, Jun 07, 2018 at 11:32:18AM +0100, Richard W.M. Jones wrote:
 > On Thu, Jun 07, 2018 at 12:02:29PM +0200, Andrea Bolognani wrote:
 > > Something that I haven't seen mentioned in the thread - and this
 > > looks like as good a point as any to jump in - is that for q35
@@ -64,55 +65,21 @@ Cc: Andrea Bolognani <abologna@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E
 > different options.  You can even imagine shipping multiple
 > varstores(!) which argues for a tar-like format.
 
-Given that level of incompatibility with var stores (which I've seen
-myself) I don't see how you can distribute them with images.
+Could we perhaps imagine shipping the actual UEFI bios, rather
+than only the varstore.  The bios blob runs in guest context,
+so there shouldn't be able security concerns from hosting
+vendors with running user provided bios. Mostly its a matter
+of confidence that the interface between bios & qemu is stable
+which feels easier than assuming varstore vs different bios is
+portable. IIRC, shipping actual UEFI BIOS is something that was
+desirable for AMD SEV usage.
 
-Dave
-
-> > While hints might be considered a reasonable fit for qcow2, I think
-> > it's pretty hard to argue for embedding the NVRAM file in there,
-> > which to me signals quite clearly that an archive containing the
-> > disk image(s) *and* the configuration hints *and* other ancillary
-> > files such as the NVRAM is the only way to build a solution that's
-> > not dead on arrival.
->=20
-> The tar argument is quite strong.  Just not the wretched OVA/OVF :-)
->=20
-> > It's pretty easy then to imagine using something like
-> >=20
-> >   $ virt-builder \
-> >     fedora-27 \
-> >     --arch aarch64 \
-> >     --format qva \
-> >     --output f27-aarch64.qva
-> >=20
-> > or download the equivalent from some website, followed by
-> >=20
-> >   $ virt-install \
-> >     --name f27-aarch64 \
-> >     --import \
-> >     --input f27-aarch.qva
-> >=20
-> > or the equivalent pointy-clicky import step and having things
-> > Just Work=E2=84=A2, provided sufficient hints are included in the arc=
-hive;
-> > the user, or the management application, would of course be able
-> > to override such hints at import time.
->=20
-> RFEs for virt-builder & virt-install one day :-)
->=20
-> Rich.
->=20
-> [*] I'm not sure exactly which bit of the bootloader does this,
-> whether it's UEFI itself, or the grub-efi in the guest.
->=20
->=20
-> --=20
-> Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~=
-rjones
-> Read my programming and virtualization blog: http://rwmj.wordpress.com
-> virt-p2v converts physical machines to virtual machines.  Boot with a
-> live CD or over the network (PXE) and turn machines into KVM guests.
-> http://libguestfs.org/virt-v2v
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
