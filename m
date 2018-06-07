@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fQu4W-0007ea-DH
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:31:21 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fQu7L-0001Co-Py
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:34:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fQu4S-0000S4-Ce
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:31:20 -0400
-Resent-Message-Id: <E1fQu4S-0000S4-Ce@eggs.gnu.org>
-In-Reply-To: <1528374154-14680-1-git-send-email-thuth@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152837465974.447.3394605257699992372@d39dc562802a>
+	(envelope-from <stefanha@gmail.com>) id 1fQu7H-0001rh-NO
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:34:15 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:52774)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fQu7H-0001rH-FL
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:34:11 -0400
+Received: by mail-wm0-x231.google.com with SMTP id p126-v6so17810594wmb.2
+	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 05:34:11 -0700 (PDT)
+Date: Thu, 7 Jun 2018 13:34:08 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180607123408.GH19032@stefanha-x1.localdomain>
+References: <20180602031629.3925-1-contrib@steffen-goertz.de>
+	<317e07c2-b1d8-b782-9a0b-88ece8600164@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Jun 2018 05:31:00 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] pc-bios/s390-ccw: Allow network
- booting via pxelinux.cfg
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="l06SQqiZYCi8rTKz"
+Content-Disposition: inline
+In-Reply-To: <317e07c2-b1d8-b782-9a0b-88ece8600164@redhat.com>
+Subject: Re: [Qemu-devel] [RFC] qapi: command category to stimulate
+ high-level machine devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +31,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: thuth@redhat.com
-Cc: famz@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.vnet.ibm.com, alifm@linux.ibm.com, walling@linux.ibm.com, cohuck@redhat.com, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>, qemu-devel@nongnu.org, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Joel Stanley <joel@jms.id.au>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1MjgzNzQxNTQtMTQ2ODAtMS1naXQtc2VuZC1lbWFpbC10aHV0aEByZWRoYXQu
-Y29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMC80XSBwYy1iaW9zL3MzOTAtY2N3
-OiBBbGxvdyBuZXR3b3JrIGJvb3RpbmcgdmlhIHB4ZWxpbnV4LmNmZwoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1v
-bmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxv
-ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
-ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
-dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
-ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-ICAgNWQzMjhkN2QyZi4uOGUzNmQyN2M1YSAgbWFzdGVyICAgICAtPiBtYXN0ZXIKICogW25ldyB0
-YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTI4Mzc0MTU0LTE0NjgwLTEtZ2l0LXNlbmQtZW1h
-aWwtdGh1dGhAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE1MjgzNzQxNTQtMTQ2ODAtMS1naXQtc2Vu
-ZC1lbWFpbC10aHV0aEByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNo
-ZXcvMTUyODQwMzQ2MC0zMDUyNi0xLWdpdC1zZW5kLWVtYWlsLWdlbmdkb25naml1QGh1YXdlaS5j
-b20gLT4gcGF0Y2hldy8xNTI4NDAzNDYwLTMwNTI2LTEtZ2l0LXNlbmQtZW1haWwtZ2VuZ2Rvbmdq
-aXVAaHVhd2VpLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTMw
-MTgwMTIwLjEzMzU1LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIw
-MTgwNTMwMTgwMTIwLjEzMzU1LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjEzMmZmYTM1ODcgcGMtYmlvcy9zMzkwLWNjdy9uZXQ6
-IFRyeSB0byBsb2FkIHB4ZWxpbnV4LmNmZyBmaWxlIGFjY29yaW5nIHRvIHRoZSBVVUlECmIzYjcz
-NjEzYmEgcGMtYmlvcy9zMzkwLWNjdy9uZXQ6IEFkZCBzdXBwb3J0IGZvciBweGVsaW51eC1zdHls
-ZSBjb25maWcgZmlsZXMKNjk5MDIwNDAyYSBwYy1iaW9zL3MzOTAtY2N3L25ldDogVXBkYXRlIGNv
-ZGUgZm9yIHRoZSBsYXRlc3QgY2hhbmdlcyBpbiBTTE9GCjVkZDc2YTljODkgcm9tczogVXBkYXRl
-IFNMT0Ygc3VibW9kdWxlIHRvIGN1cnJlbnQgc3RhdHVzCgo9PT0gT1VUUFVUIEJFR0lOID09PQpD
-aGVja2luZyBQQVRDSCAxLzQ6IHJvbXM6IFVwZGF0ZSBTTE9GIHN1Ym1vZHVsZSB0byBjdXJyZW50
-IHN0YXR1cy4uLgpDaGVja2luZyBQQVRDSCAyLzQ6IHBjLWJpb3MvczM5MC1jY3cvbmV0OiBVcGRh
-dGUgY29kZSBmb3IgdGhlIGxhdGVzdCBjaGFuZ2VzIGluIFNMT0YuLi4KQ2hlY2tpbmcgUEFUQ0gg
-My80OiBwYy1iaW9zL3MzOTAtY2N3L25ldDogQWRkIHN1cHBvcnQgZm9yIHB4ZWxpbnV4LXN0eWxl
-IGNvbmZpZyBmaWxlcy4uLgpDaGVja2luZyBQQVRDSCA0LzQ6IHBjLWJpb3MvczM5MC1jY3cvbmV0
-OiBUcnkgdG8gbG9hZCBweGVsaW51eC5jZmcgZmlsZSBhY2NvcmluZyB0byB0aGUgVVVJRC4uLgpF
-UlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzU3
-OiBGSUxFOiBwYy1iaW9zL3MzOTAtY2N3L25ldG1haW4uYzoyNjc6CisgICAgICAgICAgICAgICAg
-IDogW2NjXSAiPWQiIChjYykKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNzQgbGluZXMg
-Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBV
-VCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4K
-UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+
+--l06SQqiZYCi8rTKz
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Jun 04, 2018 at 05:14:25PM -0500, Eric Blake wrote:
+> On 06/01/2018 10:16 PM, Steffen G=F6rtz wrote:
+> > From: Steffen Goertz <contrib@steffen-goertz.de>
+> >=20
+> > Add a new category "stimulate" to host commands that
+> > act upon high-level devices associated with machines/boards.
+> >=20
+> > This is patch is part of an effort to add support for BBC:microbit
+> > educational computer to QEMU.
+> >=20
+> > The microbit board, as many other microcontroller boards,
+> > contains typical trivial (digital) input and output options such as but=
+tons and LEDs,
+> > but also more sophiscated possibilities such as analog inputs and
+>=20
+> s/sophiscated/sophisticated/
+>=20
+> > complex dedicated sensor ICs that are connected to the microbit machine
+> > by means of inter-ic bus (i2c).
+> > These devices interact with peripheral devices of the microcontroller
+> > in use, for example with the GPIO peripheral of the used NRF51.
+> >=20
+> > One aim of our efforts is to create a user interface that models the
+> > look and feel of the physical microbit board and lets the user interact
+> > with its inputs and provide feedback on its outsputs.
+>=20
+> s/outsputs/outputs/
+>=20
+> >=20
+> > For this it is necessary to transmit user inputs such as the pressing o=
+f a
+> > button to the machine.
+> > In return, when the state of an output is changed on the machine, this
+> > change needs to be reflected in the user interface.
+> >=20
+> > At the moment, there are only a few QMP commands that provide user inpu=
+t to the
+> > machine, eg. send-keys, input-button. These commands require very
+> > high-level concepts, which are not really suitable for applications that
+> > microcontrollers are typically used in in.
+> >=20
+> > This RFC is meant to start a discussion on how to provide stimuli to
+> > low-complex inputs and outputs typically found in embedded
+> > microcontroller applications. To the best of my knowledge, there are
+> > currently no examples of how to provide such stimuli to either SoC
+> > device peripheral or machine level concepts like pushbuttons and LEDs.
+> >=20
+> > To my understanding, the following concepts/apis are needed:
+> > - QMP commands to send stimuli to machine level concepts like
+> > pushbuttons
+> > - Machine level devices that receive these stimuli and act as an adapter
+> > to manipulate the associated SoC peripheral devices
+> > - For outputs, machine level devices are needed that observe changes in
+> > SoC peripherals and emit QMP events that clients can receive
+> >=20
+> > This patch adds a new qmp command "buttons-set-state" to update the
+> > push-down state of arbitrarily identified buttons (string identifier).
+>=20
+> An arbitrary string has the most flexibility, but also the least
+> discoverability.  Is there any way to enumerate which strings are valid,
+> and/or make the button names an enum instead of an open-coded string?
+
+The button names could defined by an enum.
+
+Which button names are valid with a particular machine type can't be
+expressed in the schema AFAIK.
+
+--l06SQqiZYCi8rTKz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbGSZAAAoJEJykq7OBq3PIrfkH/0QsjjkFSj5flBKxA9CjGv2K
+EcPg8DnVQLZh6sIstRTT134OtZNuOM09o36e0d4tJKTEQSh/dbEYRv2+egRzrEGz
+Pd6q2iDWZDmeHDFb/OccT1j3a9nyMPR+dDwQgdowIc1EqXJfG2OyHPaolW3+ytAg
+a3B3//tmT726axcXiNDywNmtslUQxwLAcjE9VevtN2xd5JYxaEYxOPDRBqmkAruk
+41gg7/cNbSGDtbwpiDdW9y/m+vgUpyoRurbCzf79G1j+fSa2/mc6lFR0eXfQtyr9
+gDxI+WHPh9hOfh4mtGLB4QiaUpQG7kdnWycEPWcZYZtfLzB1iTDX1cU37hHD9xE=
+=v84v
+-----END PGP SIGNATURE-----
+
+--l06SQqiZYCi8rTKz--
