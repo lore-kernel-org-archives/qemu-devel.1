@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fQwTf-0006Xz-Ri
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:05:28 -0400
+	(envelope-from <jcody@redhat.com>) id 1fQwUS-0007g3-08
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:06:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fQwTe-00084P-L5
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:05:27 -0400
-References: <1528382429-13478-1-git-send-email-ari@tuxera.com>
-From: Ari Sundholm <ari@tuxera.com>
-Message-ID: <9015d8bb-6407-ca60-c2d9-622721144f29@tuxera.com>
-Date: Thu, 7 Jun 2018 18:05:15 +0300
+	(envelope-from <jcody@redhat.com>) id 1fQwUN-0008OI-2l
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:06:15 -0400
+Date: Thu, 7 Jun 2018 11:05:58 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180607150558.GI6435@localhost.localdomain>
+References: <1528382639-9202-1-git-send-email-baiyaowei@cmss.chinamobile.com>
 MIME-Version: 1.0
-In-Reply-To: <1528382429-13478-1-git-send-email-ari@tuxera.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2 00/10] New block driver: blklogwrites
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1528382639-9202-1-git-send-email-baiyaowei@cmss.chinamobile.com>
+Subject: Re: [Qemu-devel] [PATCH] gitignore: Ignore qapi/qapi-*-job.[ch]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,89 +22,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, eblake@redhat.com
 
-This patch series adds a new block driver, blklogwrites, to QEMU. The
-driver is given two block devices: a raw device backed by an image or a
-host block device, and a log device, typically backed by a file, on
-which writes to the raw device are logged.
+On Thu, Jun 07, 2018 at 10:43:59AM -0400, Yaowei Bai wrote:
+> They were introduced by commit bf42508f24ee(job: Introduce
+> qapi/job.json) but forgot to ignore them in .gitignore.
+> 
+> Signed-off-by: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
 
-The logging format used is the same as in the dm-log-writes target of
-the Linux kernel device mapper. The log reflects the writes that have
-been performed on the guest block device and flushed. To be strict, the
-log may contain writes that have not been flushed yet, but they are
-technically outside the bounds of the log until the next flush updates
-the metadata in the log superblock. We believe these semantics to be
-useful even though they may not be completely identical to those of
-dm-log-writes.
+Good patch, but Eric Blake already sent an identical one that has two r-b's
+on it already, so that is probably the one to pull in:
 
-This functionality can be used for crash consistency and fs consistency
-testing in filesystem drivers, including on non-Linux guests and older
-guests running Linux versions without support for dm-log-writes. This
-is simple and useful. Admittedly this and more advanced things could
-perhaps be done by extending the quorum driver, but this approach would
-require re-engineering the functionality and involve a more complicated
-setup, so we offer this simple solution which we have found useful
-internally.
 
-In the first patch of this series, two block permission constants are
-moved from block.c to include/block/block.h to make them available
-outside of block.c. The next patch uses these constants.
+[Qemu-block] [PATCH] block: Ignore generated job QAPI files
+essage-Id: <20180531212435.165261-1-eblake@redhat.com>
 
-The driver requires all requests to be aligned to the sector size. In
-the second patch of this series, which includes the bulk of the
-blklogwrites driver, this sector size is assumed to be equal to
-BDRV_SECTOR_SIZE for simplicity.
+Thanks,
+Jeff
 
-In patches 3-8, a mechanism to pass the block configuration of a block
-backend to a block driver is introduced, and this mechanism is
-integrated in various hw/block drivers.
-
-In patch 9, blklogwrites is changed to use the block configuration of
-the relevant block backend to set its block limits.
-
-Finally, in patch 10, blklogwrites is improved to use the logical
-sector size of the block backend for logging. This means that the
-sector size in the log metadata will be set to the logical sector size,
-and offsets and sizes of writes will be expressed as a multiple of that
-instead of BDRV_SECTOR_SIZE.
-
-Aapo Vienamo (1):
-   block: Add blklogwrites
-
-Ari Sundholm (9):
-   block: Move two block permission constants to the relevant enum
-   block: Add a mechanism for passing a block driver a block
-     configuration
-   hw/scsi/scsi-disk: Always apply block configuration to block driver
-   hw/ide/qdev: Always apply block configuration to block driver
-   hw/block/virtio-blk: Always apply block configuration to block driver
-   hw/block/nvme: Always apply block configuration to block driver
-   hw/block/fdc: Always apply block configuration to block driver
-   block/blklogwrites: Use block limits from the backend block
-     configuration
-   block/blklogwrites: Use the block device logical sector size when
-     logging writes
-
-  MAINTAINERS               |   6 +
-  block.c                   |   6 -
-  block/Makefile.objs       |   1 +
-  block/blklogwrites.c      | 420 
-++++++++++++++++++++++++++++++++++++++++++++++
-  block/io.c                |  22 +++
-  hw/block/block.c          |  12 +-
-  hw/block/fdc.c            |   4 +
-  hw/block/nvme.c           |   1 +
-  hw/block/virtio-blk.c     |   1 +
-  hw/ide/qdev.c             |   2 +
-  hw/scsi/scsi-disk.c       |   1 +
-  include/block/block.h     |  17 ++
-  include/block/block_int.h |   9 +
-  include/hw/block/block.h  |   1 +
-  qapi/block-core.json      |  29 +++-
-  15 files changed, 519 insertions(+), 13 deletions(-)
-  create mode 100644 block/blklogwrites.c
-
--- 
-2.7.4
+> ---
+>  .gitignore | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/.gitignore b/.gitignore
+> index a178e4c..e4bacc6 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -36,6 +36,7 @@
+>  /qapi/qapi-commands-common.[ch]
+>  /qapi/qapi-commands-crypto.[ch]
+>  /qapi/qapi-commands-introspect.[ch]
+> +/qapi/qapi-commands-job.[ch]
+>  /qapi/qapi-commands-migration.[ch]
+>  /qapi/qapi-commands-misc.[ch]
+>  /qapi/qapi-commands-net.[ch]
+> @@ -53,6 +54,7 @@
+>  /qapi/qapi-events-common.[ch]
+>  /qapi/qapi-events-crypto.[ch]
+>  /qapi/qapi-events-introspect.[ch]
+> +/qapi/qapi-events-job.[ch]
+>  /qapi/qapi-events-migration.[ch]
+>  /qapi/qapi-events-misc.[ch]
+>  /qapi/qapi-events-net.[ch]
+> @@ -71,6 +73,7 @@
+>  /qapi/qapi-types-common.[ch]
+>  /qapi/qapi-types-crypto.[ch]
+>  /qapi/qapi-types-introspect.[ch]
+> +/qapi/qapi-types-job.[ch]
+>  /qapi/qapi-types-migration.[ch]
+>  /qapi/qapi-types-misc.[ch]
+>  /qapi/qapi-types-net.[ch]
+> @@ -88,6 +91,7 @@
+>  /qapi/qapi-visit-common.[ch]
+>  /qapi/qapi-visit-crypto.[ch]
+>  /qapi/qapi-visit-introspect.[ch]
+> +/qapi/qapi-visit-job.[ch]
+>  /qapi/qapi-visit-migration.[ch]
+>  /qapi/qapi-visit-misc.[ch]
+>  /qapi/qapi-visit-net.[ch]
+> -- 
+> 1.8.3.1
+> 
+> 
+> 
