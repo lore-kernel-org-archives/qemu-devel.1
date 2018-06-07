@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fQzuL-0004FA-Iu
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:45:15 -0400
+	(envelope-from <ari@tuxera.com>) id 1fQzxd-0005Ot-Lg
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:48:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fQzuK-0000pR-Fq
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:45:13 -0400
-References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516366207-109842-9-git-send-email-anton.nefedov@virtuozzo.com>
-	<b0066a7f-0197-73c9-4012-67b5e48e178a@redhat.com>
-	<87tvuyf4it.fsf@dusky.pond.sub.org>
-	<959271ee-c39e-09ab-9f9a-90d97d34f4f5@virtuozzo.com>
-	<87wovar5tl.fsf@dusky.pond.sub.org>
-	<c807b13d-8176-46a5-72b9-dade0ad0712a@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <02f27bf7-e371-c396-eaec-1f9e3e24611e@redhat.com>
-Date: Thu, 7 Jun 2018 13:45:03 -0500
+	(envelope-from <ari@tuxera.com>) id 1fQzxc-0001be-Id
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:48:37 -0400
+References: <1528382429-13478-1-git-send-email-ari@tuxera.com>
+	<1528382429-13478-3-git-send-email-ari@tuxera.com>
+	<337a4d38-397e-a251-b387-27034140d94d@redhat.com>
+From: Ari Sundholm <ari@tuxera.com>
+Message-ID: <98fccefb-89ab-3d14-b838-4991ac302959@tuxera.com>
+Date: Thu, 7 Jun 2018 21:48:27 +0300
 MIME-Version: 1.0
-In-Reply-To: <c807b13d-8176-46a5-72b9-dade0ad0712a@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <337a4d38-397e-a251-b387-27034140d94d@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] qapi: query-blockstat: add driver
- specific file-posix stats
+Subject: Re: [Qemu-devel] [PATCH v2 02/10] block: Add blklogwrites
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,99 +25,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>
-Cc: kwolf@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Aapo Vienamo <aapo@tuxera.com>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>"open list:Block layer core" <qemu-block@nongnu.org>
 
-On 06/07/2018 10:23 AM, Anton Nefedov wrote:
->>> If we introduce BlockdevDriver as a discriminator as Markus suggests
->>> above, we need some way to define its value.
->>> I guess one would be to check blk->bs->drv->format_name but it won't
->>> always work; often it's even blk->bs =3D=3D NULL.
+On 06/07/2018 09:32 PM, Eric Blake wrote:
+> On 06/07/2018 09:40 AM, Ari Sundholm wrote:
+>> From: Aapo Vienamo <aapo@tuxera.com>
 >>
->> There is no blk->bs, at least not if blk is a BlockBackend *.
+>> Implements a block device write logging system, similar to Linux kerne=
+l
+>> device mapper dm-log-writes. The write operations that are performed
+>> on a block device are logged to a file or another block device. The
+>> write log format is identical to the dm-log-writes format. Currently,
+>> log markers are not supported.
 >>
->> I figure the problem you're trying to describe is query-blockstats
->> running into BlockBackends that aren't associated with a
->> BlockDriverState (blk->root is null), and thus aren't associated with =
-a
->> BlockDriver.=C2=A0 Correct?
+>> This functionality can be used for crash consistency and fs consistenc=
+y
+>> testing. By implementing it in qemu, tests utilizing write logs can be
+>> be used to test non-Linux drivers and older kernels.
 >>
+>> The implementation is based on the blkverify and blkdebug block driver=
+s.
+>>
+>> Signed-off-by: Aapo Vienamo <aapo@tuxera.com>
+>> Signed-off-by: Ari Sundholm <ari@tuxera.com>
+>> ---
 >=20
-> Sorry, yes, exactly
+>> +++ b/qapi/block-core.json
+>> @@ -2429,12 +2429,12 @@
+>> =C2=A0 # Since: 2.9
+>> =C2=A0 ##
+>> =C2=A0 { 'enum': 'BlockdevDriver',
+>=20
+> Missing a comment:
+>=20
+> # @blklogwrites: Since 3.0
+>=20
 
-Okay, that sounds like the driver stats have to be optional, present=20
-only when blk->bs is non-NULL.
+Thanks, will add in v4.
 
+>> -=C2=A0 'data': [ 'blkdebug', 'blkverify', 'bochs', 'cloop', 'copy-on-=
+read',
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'd=
+mg', 'file', 'ftp', 'ftps', 'gluster', 'host_cdrom',
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'h=
+ost_device', 'http', 'https', 'iscsi', 'luks', 'nbd',=20
+>> 'nfs',
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'n=
+ull-aio', 'null-co', 'nvme', 'parallels', 'qcow',=20
+>> 'qcow2', 'qed',
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'q=
+uorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 't=
+hrottle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs'=20
+>> ] }
+>> +=C2=A0 'data': [ 'blkdebug', 'blklogwrites', 'blkverify', 'bochs', 'c=
+loop',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'c=
+opy-on-read', 'dmg', 'file', 'ftp', 'ftps', 'gluster',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'h=
+ost_cdrom', 'host_device', 'http', 'https', 'iscsi',=20
+>> 'luks',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'n=
+bd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels',=20
+>> 'qcow',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'q=
+cow2', 'qed', 'quorum', 'raw', 'rbd', 'replication',=20
+>> 'sheepdog',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 's=
+sh', 'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat',=20
+>> 'vxhs' ] }
+>> =C2=A0 ##
+>> =C2=A0 # @BlockdevOptionsFile:
+>> @@ -2949,6 +2949,21 @@
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 '*set-state': ['BlkdebugSetStateOptions'] } }
+>> =C2=A0 ##
+>> +# @BlockdevOptionsBlklogwrites:
+>> +#
+>> +# Driver specific block device options for blklogwrites.
+>> +#
+>> +# @raw:=C2=A0=C2=A0=C2=A0=C2=A0 block device
+>> +#
+>> +# @log:=C2=A0=C2=A0=C2=A0=C2=A0 block device used to log writes on @r=
+aw
+>> +#
+>> +# Since: foo
 >=20
->>> I guess we could add a default ('unspecified'?) to BlockdevDriver enu=
-m?
+> s/foo/3.0/
+>=20
+
+Oops, this was a placeholder that I ended up forgetting about. Will be=20
+fixed in v4.
+
+Thanks,
+Ari Sundholm
+ari@tuxera.com
+
+>> +##
+>> +{ 'struct': 'BlockdevOptionsBlklogwrites',
+>> +=C2=A0 'data': { 'raw': 'BlockdevRef',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'l=
+og': 'BlockdevRef' } }
+>> +
+>> +##
+>> =C2=A0 # @BlockdevOptionsBlkverify:
+>> =C2=A0 #
+>> =C2=A0 # Driver specific block device options for blkverify.
+>> @@ -3443,6 +3458,7 @@
+>> =C2=A0=C2=A0=C2=A0 'discriminator': 'driver',
+>> =C2=A0=C2=A0=C2=A0 'data': {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'blkdebug':=C2=A0=C2=A0 'Bl=
+ockdevOptionsBlkdebug',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'blklogwrites': 'BlockdevOptionsBlklog=
+writes',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'blkverify':=C2=A0 'Blockde=
+vOptionsBlkverify',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'bochs':=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 'BlockdevOptionsGenericFormat',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'cloop':=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 'BlockdevOptionsGenericFormat',
+>> @@ -3971,6 +3987,7 @@
+>> =C2=A0=C2=A0=C2=A0 'discriminator': 'driver',
+>> =C2=A0=C2=A0=C2=A0 'data': {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'blkdebug':=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 'BlockdevCreateNotSupported',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'blklogwrites':=C2=A0=C2=A0 'BlockdevC=
+reateNotSupported',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'blkverify':=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 'BlockdevCreateNotSupported',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'bochs':=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BlockdevCreateNotSupported',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'cloop':=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'BlockdevCreateNotSupported',
 >>
->> This part I understand, but...
->>
->>> But I'd rather leave an optional BlockDriverStats union (but make it
->>> flat). Only the drivers that provide these stats will need to set
->>> BlockdevDriver field. What do you think?
->>
->> I'm not sure I got this part.=C2=A0 Care to sketch the QAPI schema sni=
-ppet?
->>
 >=20
-> You earlier proposed:
->=20
->  >>> You're adding a union of driver-specific stats to a struct of gene=
-ric
->  >>> stats.=C2=A0 That's unnecessarily complicated.=C2=A0 Instead, turn=
- the struct of
->  >>> generic stats into a flat union, like this:
->  >>>
->  >>> { 'union': 'BlockStats',
->  >>>=C2=A0=C2=A0=C2=A0=C2=A0 'base': { ... the generic stats, i.e. the =
-members of BlockStats
->  >>>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 before this patch ...
->  >>>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 'driver': 'BlockdevDriver' }
->  >>>=C2=A0=C2=A0=C2=A0=C2=A0 'discriminator': 'driver',
->  >>>=C2=A0=C2=A0=C2=A0=C2=A0 'data': {
->  >>>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'file': 'BlockDriv=
-erStatsFile',
->  >>>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ... } }
-
-That would require 'driver' to always resolve to something, even when=20
-there is no driver (unless we create a superset enum that adds 'none'=20
-beyond what 'BlockdevDriver' supports).
-
->=20
-> But I meant to leave it as:
->=20
-> + { 'union': 'BlockDriverStats':
-> +=C2=A0=C2=A0=C2=A0=C2=A0 'base': { 'driver': 'BlockdevDriver' },
-> +=C2=A0=C2=A0=C2=A0=C2=A0 'discriminator': 'driver',
-> +=C2=A0=C2=A0=C2=A0=C2=A0 'data': {
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'file': 'BlockDriverS=
-tatsFile' } }
->=20
->=20
->  =C2=A0 { 'struct': 'BlockStats',
->  =C2=A0=C2=A0=C2=A0 'data': {'*device': 'str', '*node-name': 'str',
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- 'stats': 'BlockDeviceStats',
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*d=
-river-stats': 'BlockDriverStats',
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- '*parent': 'BlockStats',
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- '*backing': 'BlockStats'} }
->=20
-> so those block backends which do not provide driver stats do not need t=
-o
-> set BlockdevDriver field.
-
-This makes the most sense to me - we're stuck with a layer of nesting,=20
-but that's because driver-stats truly is optional (we don't always have=20
-access to a driver).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
