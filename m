@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fQwDX-0001xI-50
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:48:48 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQwEw-0003Al-DZ
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:50:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fQwDU-0000QX-2F
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:48:47 -0400
-Date: Thu, 7 Jun 2018 16:48:33 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <CAFEAcA8NOAME70Sdv7rEV67rp0NEhMqdRqRm=iLQUKmo3oTvLQ@mail.gmail.com>
-Message-ID: <alpine.BSF.2.21.1806071641200.90120@zero.eik.bme.hu>
-References: <cover.1528291908.git.balaton@eik.bme.hu>
-	<fdb61fc16922f78190f0db04a11dd20519cd2fb5.1528291908.git.balaton@eik.bme.hu>
-	<CAFEAcA_GwgmiZPQ9NmY9a7_OwYFCBHFZiVQzk1nZEoxYaD+mwQ@mail.gmail.com>
-	<alpine.BSF.2.21.1806061619030.42561@zero.eik.bme.hu>
-	<CAFEAcA8NOAME70Sdv7rEV67rp0NEhMqdRqRm=iLQUKmo3oTvLQ@mail.gmail.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQwEv-00015v-AV
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:50:14 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180529174821.19964-1-f4bug@amsat.org>
+	<87lgbqvha8.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <4294f0f1-3b40-c886-dda8-a5638ddf1b94@amsat.org>
+Date: Thu, 7 Jun 2018 11:49:58 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v2 7/8] sm501: Do not clear read only bits
- when writing register
+In-Reply-To: <87lgbqvha8.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 0/4] qapi/error: converts
+ error_setg(&error_fatal) to error_report() + exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, 6 Jun 2018, Peter Maydell wrote:
-> On 6 June 2018 at 15:28, BALATON Zoltan <balaton@eik.bme.hu> wrote:
->> s->whatever &= ro_bits_mask;
->> s->whatever |= value & rw_bits_mask;
->
-> Yes, this works (and I have a feeling it's what we tend to use.)
-
-OK, I'll do this then in next respin.
-
->>>> @@ -853,7 +853,7 @@ static void sm501_system_config_write(void *opaque,
->>>> hwaddr addr,
->>>>          s->dram_control |=  value & 0x7FFFFFC3;
->
-> Hmm, does dram_control also need to behave the same way?
-
-It has one read only bit which we are not emulating so maybe not 
-significant but changed it as well for correctness and added some more 
-similar registers as well.
-
->>>>          break;
->>>>      case SM501_ARBTRTN_CONTROL:
->>>> -        s->arbitration_control =  value & 0x37777777;
->>>> +        s->arbitration_control = value & 0x37777777;
->>>
->>>
->>> Was this intended to be changed too?
+On 06/07/2018 10:48 AM, Markus Armbruster wrote:
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> 
+>> Hi,
 >>
->>
->> Yes, just a simple white space cleanup. Does that worth a separate patch or
->> enough to mention in commit message to make it clear it's intended change?
->
-> I would personally put it in its own patch, but if you put it
-> in this one do mention it in the commit message. Otherwise
-> given the patch is changing four 'foo_control' registers it
-> looks like this one was typoed. (It will look less so if
-> the change for the others isn't just "add a '|'", though.)
+>> This series converts error_setg(&error_fatal) to error_report() + exit() as
+>> suggested by the "qapi/error.h" documentation.
+> 
+> Appreciated!
+> 
+> The series actually converts two anti-patterns.
+> 
+> 1. From
+> 
+>     if (COND) {
+>         error_setg(&error_fatal, ...);
+>     }
+> 
+> to
+> 
+>     if (COND) {
+>         error_report(...);
+>         exit(1);
+>     }
+> 
+> This is exactly what error.h asks for.
+> 
+> 2. From
+> 
+>     if (COND) {
+>         error_setg(&error_abort, ...);
+>     }
+> to
+> 
+>     if (COND) {
+>         error_report(...);
+>         abort();
+>     }
+> 
+> error.h asks for
+> 
+>     assert(!COND);
+> 
+> instead.  See my reply to PATCH 1 for why.
 
-I've left it in one patch to avoid having two many patches in the series 
-but added it to commit message together with dram_control which also had 
-a whitespace removed in same patch.
+My bad, I misread your "error.h" explanation.
 
-Before sending v3 I'm waiting if there are any more comments for other 
-patches in this series 
-(http://patchew.org/QEMU/cover.1528291908.git.balaton@eik.bme.hu/) but 
-looks like David is busy and could not look at them yet. Not sure if 
-you've seen these patches but if you have a moment your comments are 
-welcome. If no other changes are suggested I'll submit v3 in the coming 
-days.
+These patterns are now cleaned from the codebase.
 
-Thank you,
-BALATON Zoltan
+Your examples are clearer and might be added in the header comments if
+we keep using the bad patterns.
+
+Regards,
+
+Phil.
