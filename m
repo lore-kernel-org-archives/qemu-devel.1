@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fQx04-0007z7-AW
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:38:59 -0400
+	(envelope-from <david@redhat.com>) id 1fQx8A-0007xA-Dh
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:47:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fQx02-00048B-UP
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:38:56 -0400
-From: Ari Sundholm <ari@tuxera.com>
-Date: Thu, 7 Jun 2018 18:38:13 +0300
-Message-ID: <1528385894-19434-10-git-send-email-ari@tuxera.com>
-In-Reply-To: <1528385894-19434-1-git-send-email-ari@tuxera.com>
-References: <1528385894-19434-1-git-send-email-ari@tuxera.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 09/10] block/blklogwrites: Use block limits
- from the backend block configuration
+	(envelope-from <david@redhat.com>) id 1fQx88-0001GR-8A
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:47:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49310 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fQx88-0001GG-3H
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:47:16 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Thu,  7 Jun 2018 17:47:05 +0200
+Message-Id: <20180607154705.6316-3-david@redhat.com>
+In-Reply-To: <20180607154705.6316-1-david@redhat.com>
+References: <20180607154705.6316-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 2/2] exec: check that alignment is a power
+ of two
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +25,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ari Sundholm <ari@tuxera.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:blklogwrites" <qemu-block@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, david@redhat.com
 
-This is to ensure that writes are aligned properly for logging writes
-to the virtual block device. This is important because the
-dm-log-writes log format has a granularity of one sector for both the
-offset and the size of each write. By using the logical sector size
-for alignment, the log records the writes more faithfully for those
-devices that have a non-512 logical sector size.
+Right now we can crash QEMU using e.g.
 
-Note that even with this patch, blklogwrites still uses
-BDRV_SECTOR_SIZE for logging. This will change in a subsequent patch
-which will introduce support for non-512 sector sizes.
+qemu-system-x86_64 -m 256M,maxmem=20G,slots=2 \
+ -object memory-backend-file,id=mem0,size=12288,mem-path=/dev/zero,align=12288 \
+ -device pc-dimm,id=dimm1,memdev=mem0
 
-Signed-off-by: Ari Sundholm <ari@tuxera.com>
+qemu-system-x86_64: util/mmap-alloc.c:115:
+ qemu_ram_mmap: Assertion `is_power_of_2(align)' failed
+
+Fix this by adding a proper check.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- block/blklogwrites.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ exec.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index 0e60449..8b09e12 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -168,6 +168,25 @@ static void blk_log_writes_refresh_limits(BlockDriverState *bs, Error **errp)
+diff --git a/exec.c b/exec.c
+index f6645ede0c..f54c83ac61 100644
+--- a/exec.c
++++ b/exec.c
+@@ -1681,6 +1681,10 @@ static void *file_ram_alloc(RAMBlock *block,
+                    " must be multiples of page size 0x%zx",
+                    block->mr->align, block->page_size);
+         return NULL;
++    } else if (block->mr->align && !is_power_of_2(block->mr->align)) {
++        error_setg(errp, "alignment 0x%" PRIx64
++                   " must be a power of two", block->mr->align);
++        return NULL;
      }
- }
- 
-+static void blk_log_writes_apply_blkconf(BlockDriverState *bs, BlockConf *conf)
-+{
-+    assert(bs && conf && conf->blk);
-+
-+    bs->bl.request_alignment = conf->logical_block_size;
-+    if (conf->discard_granularity != (uint32_t)-1) {
-+        bs->bl.pdiscard_alignment = conf->discard_granularity;
-+    }
-+
-+    if (bs->bl.pdiscard_alignment &&
-+            bs->bl.pdiscard_alignment < bs->bl.request_alignment) {
-+        bs->bl.pdiscard_alignment = bs->bl.request_alignment;
-+    }
-+    if (bs->bl.pwrite_zeroes_alignment &&
-+            bs->bl.pwrite_zeroes_alignment < bs->bl.request_alignment) {
-+        bs->bl.pwrite_zeroes_alignment = bs->bl.request_alignment;
-+    }
-+}
-+
- static int coroutine_fn
- blk_log_writes_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-                          QEMUIOVector *qiov, int flags)
-@@ -364,6 +383,7 @@ static BlockDriver bdrv_blk_log_writes = {
-     .bdrv_refresh_filename  = blk_log_writes_refresh_filename,
-     .bdrv_child_perm        = blk_log_writes_child_perm,
-     .bdrv_refresh_limits    = blk_log_writes_refresh_limits,
-+    .bdrv_apply_blkconf     = blk_log_writes_apply_blkconf,
- 
-     .bdrv_co_preadv         = blk_log_writes_co_preadv,
-     .bdrv_co_pwritev        = blk_log_writes_co_pwritev,
+     block->mr->align = MAX(block->page_size, block->mr->align);
+ #if defined(__s390x__)
 -- 
-2.7.4
+2.17.0
