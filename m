@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fQs1C-00077m-JO
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:19:47 -0400
+	(envelope-from <bounces@canonical.com>) id 1fQs2A-0007eQ-55
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:20:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fQs1B-0007VF-LP
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:19:46 -0400
-References: <1487347224-8667-1-git-send-email-pl@kamp.de>
-	<20170220145011.GJ21255@stefanha-x1.localdomain>
-	<73412b92-353d-7109-cfbe-9c61bf91e7eb@kamp.de>
-	<a9939647-5c4e-9336-1121-eb821fe8eecc@virtuozzo.com>
-	<20180607101046.GC19032@stefanha-x1.localdomain>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <2ddb8b13-650a-5bd7-8c77-3f2eca34efdf@virtuozzo.com>
-Date: Thu, 7 Jun 2018 13:19:29 +0300
+	(envelope-from <bounces@canonical.com>) id 1fQs27-0000bS-0L
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:20:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58580)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fQs26-0000YT-PE
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 06:20:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fQs24-0008Qn-GM
+	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 10:20:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7A77E2E88DA
+	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 10:20:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180607101046.GC19032@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH V4] qemu-img: make convert
- async
+Date: Thu, 07 Jun 2018 10:14:46 -0000
+From: Thomas Huth <1775366@bugs.launchpad.net>
+Reply-To: Bug 1775366 <1775366@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152827602795.25960.11192717382861692470.malonedeb@wampee.canonical.com>
+Message-Id: <152836648689.32066.12539262907090961748.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1775366] Re: [Feature request] qemu-ga - Allow
+ unexpected parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +37,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Peter Lieven <pl@kamp.de>, kwolf@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
 
-07.06.2018 13:10, Stefan Hajnoczi wrote:
-> On Fri, Jun 01, 2018 at 07:16:14PM +0300, Vladimir Sementsov-Ogievskiy wr=
-ote:
->> 20.02.2017 17:59, Peter Lieven wrote:
->>> Am 20.02.2017 um 15:50 schrieb Stefan Hajnoczi:
->>>> On Fri, Feb 17, 2017 at 05:00:24PM +0100, Peter Lieven wrote:
->>>>> this is something I have been thinking about for almost 2 years now.
->>>>> we heavily have the following two use cases when using qemu-img
->>>>> convert.
->>>>>
->>>>>
->> [...]
->>
->>>> Does this patch work with compressed images?=A0 Especially the
->>>> out-of-order write mode may be problematic with a compressed qcow2
->>>> image.
->>> It does, but you are right, out-of-order writes and compression should
->>> be mutually exclusive.
->>
->> Sorry for being late, but can you please explain to me, why?
-> There are image format-specific limitations on compressed writes.  For
-> some reason I thought they were append-only in qcow2, but I was wrong.
->
-> Stefan
+I agree with John, accepting commands that have not fully been
+understood is just too dangerous. So closing this as Won't-Fix.
 
-And what are limitations for compressed writes in qcow2? We can't write=20
-asynchronously? Why?
+** Changed in: qemu
+       Status: New =3D> Won't Fix
 
---=20
-Best regards,
-Vladimir
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1775366
+
+Title:
+   [Feature request] qemu-ga - Allow unexpected parameter
+
+Status in QEMU:
+  Won't Fix
+
+Bug description:
+  It whould be nice if the qemu-ga allowed received messages to contain
+  fields which is not part of the spec. In my example I have a host
+  which sends the following request:
+
+  {"execute":"guest-exec","arguments":{"path":"prl_nettool","capture-
+  output":true,"execute-in-shell":false,"arg":[...]}}
+
+  Right now this request is rejected with the following error:
+
+  {"error": {"class": "GenericError", "desc": "Parameter 'execute-in-
+  shell' is unexpected"}}
+
+  My situation is the hosting provider I use does have some customized
+  solution which sends some extra arguments. I have manually patched my
+  qemu-ga so it accepts the "execute-in-shell" parameter but I don't
+  think this should be necessary.
+
+  Instead of "Error" it should just be a "warning" returned to the user
+  of qemu-ga but the call should still be executed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1775366/+subscriptions
