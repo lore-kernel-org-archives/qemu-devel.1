@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQwaH-0003g5-Hd
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:12:18 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQwcX-0005kj-Tv
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:14:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQwaG-0003Ip-IX
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:12:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32768 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fQwaG-0003IV-EQ
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:12:16 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 179C540200A0
-	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 15:12:16 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180605122636.33654-1-dgilbert@redhat.com>
-	<20180605122636.33654-5-dgilbert@redhat.com>
-	<20180607084933.GH750@xz-mi> <87muw6wzud.fsf@dusky.pond.sub.org>
-	<20180607134529.GL2522@work-vm>
-Date: Thu, 07 Jun 2018 17:12:12 +0200
-In-Reply-To: <20180607134529.GL2522@work-vm> (David Alan Gilbert's message of
-	"Thu, 7 Jun 2018 14:45:30 +0100")
-Message-ID: <87sh5yr5pv.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQwcW-0004Mm-R0
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:14:37 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180603000827.30872-1-f4bug@amsat.org>
+	<20180603000827.30872-2-f4bug@amsat.org>
+	<CAFEAcA_EDXyOHpdamg05=p35jazqgZsLKP2O+G1tg6BoR4b28g@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b5db1ee8-68b1-a41a-be34-eba99ef5565d@amsat.org>
+Date: Thu, 7 Jun 2018 12:14:25 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 4/6] hmp: Add info commands for preconfig
+In-Reply-To: <CAFEAcA_EDXyOHpdamg05=p35jazqgZsLKP2O+G1tg6BoR4b28g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/8] sdcard: Update the Configuration
+ Register (SCR) to Spec Version 1.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: imammedo@redhat.com, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+Hi Peter,
 
-> * Markus Armbruster (armbru@redhat.com) wrote:
->> Peter Xu <peterx@redhat.com> writes:
->> 
->> > On Tue, Jun 05, 2018 at 01:26:34PM +0100, Dr. David Alan Gilbert (git) wrote:
->> >> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->> >> 
->> >> Allow a bunch of the info commands to be used in preconfig.
->> >> Could probably add most of them.
->> >
->> > I guess some of them may not work yet during preconfig.  E.g.:
->> >
->> > $ ./x86_64-softmmu/qemu-system-x86_64 -preconfig -monitor stdio
->> > QEMU 2.12.50 monitor - type 'help' for more information
->> > (qemu) info mtree
->> > address-space: memory
->> >   0000000000000000-ffffffffffffffff (prio 0, i/o): system
->> >
->> > address-space: I/O
->> >   0000000000000000-000000000000ffff (prio 0, i/o): io
->> >
->> > But it's fine to enable that I guess.
->> >
->> > (Which "info" command would you want to use during preconfig?)
->> >
->> >> 
->> >> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> >
->> > Reviewed-by: Peter Xu <peterx@redhat.com>
->> 
->> The reason for having -preconfig is us despairing of making -S do the
->> right thing.  We'd have to *understand* the tangled mess that is our
->> startup, and rearrange it so QMP becomes available early enough for
->> configuring NUMA (and other things), yet late enough for everything to
->> work.
->> 
->> -preconfig is a cheap hack to avoid this headache, by bypassing almost
->> all of "everything".
->> 
->> Now you bring back some of "everything".  Dangerous.  You better show it
->> actually works.  Until you do:
->> 
->> NAK
->
-> Well I did test each command in here to make sure it didn't
-> crash/produce complete junk; but here's the output with the v2 of this
-> patch that Igor R-b:
-[...]
+On 06/07/2018 08:00 AM, Peter Maydell wrote:
+> On 3 June 2018 at 01:08, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> This register now matches the description of the header:
+>>
+>>  * SD Memory Card emulation as defined in the "SD Memory Card Physical
+>>  * layer specification, Version 1.10."
+> 
+> Can you provide a brief justification in the commit message
+> of why it makes more sense for us to advertise as 1.10, please?
+> 
+> (eg a summary of the 1.01 to 1.10 differences and a note
+> that we already implement them)
 
-For the sake of the argument, let's assume these commands all work in
-preconfig state.  Are their QMP equivalents all available in preconfig
-state?
+The only differences I found are:
+
+    4.3.11 High-Speed mode (25MB/sec interface speed)
+           (This chapter is newly added in version 1.10)
+
+    Though the Rev 1.01 SD memory card supports up to 12.5MB/sec
+    interface speed, the speed of 25MB/sec is necessary to support
+    increasing performance needs of the host and because of memory
+    size which continues to grow.
+    To achieve 25MB/sec interface speed, clock rate is increased to
+    50MHz and CLK/CMD/DAT signal timing and circuit conditions are
+    reconsidered and changed from Physical Layer Specification
+    Version 1.01.
+
+    4.3.12 Command system
+           (This chapter is newly added in version 1.10)
+
+    SD commands CMD34-37, CMD50, CMD57 are reserved for SD command
+    system expansion via the switch command.
+    [These commands] will be considered as illegal commands (as
+    defined in revision 1.01 of the SD physical layer specification).
+
+The current codebase is a mix of v1 registers and v2 commands (which
+were added slowly without updating all registers).
+As of now v1 is broken (See the lm3s6965evb machine can not use the
+card) and all users are using v2.
+My goal with these series is to also support v3.
+
+It might be more obvious to first enforce the current implementation is
+v2, then restore v1 support and go for v3. I think this is doable by an
+easy rebase of this series (keep v2 and restore v1).
+
+Do you think this is better?
+
+Regards,
+
+Phil.
