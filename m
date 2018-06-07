@@ -1,14 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1fQw9s-0007h9-EV
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:45:01 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fQwAU-0008It-10
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1fQw9r-0006yk-LR
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:45:00 -0400
-From: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
-Date: Thu,  7 Jun 2018 10:43:59 -0400
-Message-Id: <1528382639-9202-1-git-send-email-baiyaowei@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH] gitignore: Ignore qapi/qapi-*-job.[ch]
+	(envelope-from <dgilbert@redhat.com>) id 1fQwAT-0007Ij-BG
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:45:38 -0400
+Date: Thu, 7 Jun 2018 15:45:28 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180607144527.GO2522@work-vm>
+References: <39bcee27-329a-61d8-47fa-678b431b0a79@redhat.com>
+	<20180606150507.GJ2660@work-vm>
+	<66727986-1cf1-c12e-d78c-d56cc15eaf00@redhat.com>
+	<20180606163246.GL3064@redhat.com>
+	<f3914a591a46c9d489f2fa1ad2ac4fd0c5a9e5b6.camel@redhat.com>
+	<20180607102257.GH28827@redhat.com>
+	<2afb9305deb37c8ca4f930235eaf52486ab0153e.camel@redhat.com>
+	<20180607123847.GL28827@redhat.com> <20180607134953.GN2522@work-vm>
+	<63fece55c4708744d9289fedf42d67ebb1bccbdd.camel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <63fece55c4708744d9289fedf42d67ebb1bccbdd.camel@redhat.com>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,52 +30,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com, jcody@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, "Richard W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
 
-They were introduced by commit bf42508f24ee(job: Introduce
-qapi/job.json) but forgot to ignore them in .gitignore.
+* Andrea Bolognani (abologna@redhat.com) wrote:
+> On Thu, 2018-06-07 at 14:49 +0100, Dr. David Alan Gilbert wrote:
+> > Including the nvram and efi makes me nervous; but I can see why together
+> > they might work.  However, there's no guarantee that EFI has been tested
+> > with the QEMU it's used on and ... that could be trouble.
+> 
+> If the QEMU binary doesn't support EFI, then a guest expecting
+> EFI won't be able to start regardless of where the EFI ROM came
+> from.
 
-Signed-off-by: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
----
- .gitignore | 4 ++++
- 1 file changed, 4 insertions(+)
+No, I mean if the QEMU doesn't support that *particular* EFI.
 
-diff --git a/.gitignore b/.gitignore
-index a178e4c..e4bacc6 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -36,6 +36,7 @@
- /qapi/qapi-commands-common.[ch]
- /qapi/qapi-commands-crypto.[ch]
- /qapi/qapi-commands-introspect.[ch]
-+/qapi/qapi-commands-job.[ch]
- /qapi/qapi-commands-migration.[ch]
- /qapi/qapi-commands-misc.[ch]
- /qapi/qapi-commands-net.[ch]
-@@ -53,6 +54,7 @@
- /qapi/qapi-events-common.[ch]
- /qapi/qapi-events-crypto.[ch]
- /qapi/qapi-events-introspect.[ch]
-+/qapi/qapi-events-job.[ch]
- /qapi/qapi-events-migration.[ch]
- /qapi/qapi-events-misc.[ch]
- /qapi/qapi-events-net.[ch]
-@@ -71,6 +73,7 @@
- /qapi/qapi-types-common.[ch]
- /qapi/qapi-types-crypto.[ch]
- /qapi/qapi-types-introspect.[ch]
-+/qapi/qapi-types-job.[ch]
- /qapi/qapi-types-migration.[ch]
- /qapi/qapi-types-misc.[ch]
- /qapi/qapi-types-net.[ch]
-@@ -88,6 +91,7 @@
- /qapi/qapi-visit-common.[ch]
- /qapi/qapi-visit-crypto.[ch]
- /qapi/qapi-visit-introspect.[ch]
-+/qapi/qapi-visit-job.[ch]
- /qapi/qapi-visit-migration.[ch]
- /qapi/qapi-visit-misc.[ch]
- /qapi/qapi-visit-net.[ch]
--- 
-1.8.3.1
+> > Also, if we're going to start including the EFI rom then that would have
+> > to be migrated with the VM so that after a restart on a different host
+> > it's still using the right ROM that's compatible with it's varfile.
+> 
+> That's a problem that needs to be addressed anyway, because even
+> as it is now you could easily find yourself trying and failing
+> to migrate a guest between two hosts that have different and
+> incompatible EFI ROMs installed.
+
+True; although I was working on the basis that vendors who cared about
+migration compatibility would couple the EFI versions with machine types
+to ensure that the variable data didn't become incompatible.
+
+Dave
+
+> -- 
+> Andrea Bolognani / Red Hat / Virtualization
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
