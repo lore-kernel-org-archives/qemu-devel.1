@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUs-0008Az-BA
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUs-0008Ax-Ao
 	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:14:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUo-00084L-NA
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUo-00084s-Q3
 	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:14:50 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  7 Jun 2018 20:14:34 +0300
-Message-Id: <20180607171441.64079-5-vsementsov@virtuozzo.com>
+Date: Thu,  7 Jun 2018 20:14:33 +0300
+Message-Id: <20180607171441.64079-4-vsementsov@virtuozzo.com>
 In-Reply-To: <20180607171441.64079-1-vsementsov@virtuozzo.com>
 References: <20180607171441.64079-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 04/11] block/nbd-client: fix
- nbd_reply_chunk_iter_receive
+Subject: [Qemu-devel] [PATCH v2 03/11] block/nbd-client: split connection
+ from initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,26 +23,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Use exported report, not the variable to be reused (should not really
-matter).
+Split connection code to reuse it for reconnect.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/nbd-client.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/nbd-client.c | 29 +++++++++++++++++++++--------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
 
 diff --git a/block/nbd-client.c b/block/nbd-client.c
-index 14b42f31df..dd712c59b3 100644
+index 6ff505c4b8..14b42f31df 100644
 --- a/block/nbd-client.c
 +++ b/block/nbd-client.c
-@@ -599,7 +599,7 @@ static bool nbd_reply_chunk_iter_receive(NBDClientSession *s,
+@@ -999,12 +999,12 @@ static QIOChannelSocket *nbd_establish_connection(SocketAddress *saddr,
+     return sioc;
+ }
+ 
+-int nbd_client_init(BlockDriverState *bs,
+-                    SocketAddress *saddr,
+-                    const char *export,
+-                    QCryptoTLSCreds *tlscreds,
+-                    const char *hostname,
+-                    Error **errp)
++static int nbd_client_connect(BlockDriverState *bs,
++                              SocketAddress *saddr,
++                              const char *export,
++                              QCryptoTLSCreds *tlscreds,
++                              const char *hostname,
++                              Error **errp)
+ {
+     NBDClientSession *client = nbd_get_client_session(bs);
+     int ret;
+@@ -1048,8 +1048,6 @@ int nbd_client_init(BlockDriverState *bs,
+         bs->supported_zero_flags |= BDRV_REQ_MAY_UNMAP;
      }
  
-     /* Do not execute the body of NBD_FOREACH_REPLY_CHUNK for simple reply. */
--    if (nbd_reply_is_simple(&s->reply) || s->quit) {
-+    if (nbd_reply_is_simple(reply) || s->quit) {
-         goto break_loop;
-     }
+-    qemu_co_mutex_init(&client->send_mutex);
+-    qemu_co_queue_init(&client->free_sema);
+     client->sioc = sioc;
  
+     if (!client->ioc) {
+@@ -1066,3 +1064,18 @@ int nbd_client_init(BlockDriverState *bs,
+     logout("Established connection with NBD server\n");
+     return 0;
+ }
++
++int nbd_client_init(BlockDriverState *bs,
++                    SocketAddress *saddr,
++                    const char *export,
++                    QCryptoTLSCreds *tlscreds,
++                    const char *hostname,
++                    Error **errp)
++{
++    NBDClientSession *client = nbd_get_client_session(bs);
++
++    qemu_co_mutex_init(&client->send_mutex);
++    qemu_co_queue_init(&client->free_sema);
++
++    return nbd_client_connect(bs, saddr, export, tlscreds, hostname, errp);
++}
 -- 
 2.11.1
