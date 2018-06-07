@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fQlUm-0007VX-NL
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 23:21:53 -0400
+	(envelope-from <peterx@redhat.com>) id 1fQm42-0000f7-LL
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 23:58:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fQlUl-00016m-HB
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 23:21:52 -0400
-Date: Wed, 6 Jun 2018 23:21:37 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180607032137.GO11303@localhost.localdomain>
-References: <20180606182449.1607-1-jsnow@redhat.com>
-	<20180606182449.1607-3-jsnow@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1fQm3x-0002IF-Qj
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 23:58:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53386 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fQm3x-0002Hs-LK
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 23:58:13 -0400
+Date: Thu, 7 Jun 2018 11:58:05 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180607035805.GH7815@xz-mi>
+References: <20180606173233.28080-1-berrange@redhat.com>
+	<20180606173233.28080-4-berrange@redhat.com>
+	<CAFEAcA-_e7mMB07fOCN6qmm-9YTPG2HSMJ3-z=0wRHaa+uTteA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180606182449.1607-3-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/5] qapi: add
- x-block-dirty-bitmap-enable/disable
+In-Reply-To: <CAFEAcA-_e7mMB07fOCN6qmm-9YTPG2HSMJ3-z=0wRHaa+uTteA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] util: remove redundant include of
+ glib.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,133 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Olaf Hering <olaf@aepfle.de>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On Wed, Jun 06, 2018 at 02:24:46PM -0400, John Snow wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
-> Expose the ability to turn bitmaps "on" or "off". This is experimental
-> and principally for the sake of the Libvirt Checkpoints API, and it may
-> or may not be committed for 3.0.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: John Snow <jsnow@redhat.com>
+On Wed, Jun 06, 2018 at 07:31:53PM +0100, Peter Maydell wrote:
+> On 6 June 2018 at 18:32, Daniel P. Berrang=C3=A9 <berrange@redhat.com> =
+wrote:
+> > Code must only ever include glib.h indirectly via the glib-compat.h
+> > header file, because we will need some macros set before glib.h is
+> > pulled in. Adding extra includes of glib.h will (soon) cause compile
+> > failures such as:
+> >
+> > In file included from /home/berrange/src/virt/qemu/include/qemu/osdep=
+.h:107,
+> >                  from /home/berrange/src/virt/qemu/include/qemu/iova-=
+tree.h:26,
+> >                  from util/iova-tree.c:13:
+> > /home/berrange/src/virt/qemu/include/glib-compat.h:22: error: "GLIB_V=
+ERSION_MIN_REQUIRED" redefined [-Werror]
+> >  #define GLIB_VERSION_MIN_REQUIRED GLIB_VERSION_2_40
+> >
+> > In file included from /usr/include/glib-2.0/glib/gtypes.h:34,
+> >                  from /usr/include/glib-2.0/glib/galloca.h:32,
+> >                  from /usr/include/glib-2.0/glib.h:30,
+> >                  from util/iova-tree.c:12:
+> > /usr/include/glib-2.0/glib/gversionmacros.h:237: note: this is the lo=
+cation of the previous definition
+> >  # define GLIB_VERSION_MIN_REQUIRED      (GLIB_VERSION_CUR_STABLE)
+> >
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+> >  util/iova-tree.c | 1 -
+> >  1 file changed, 1 deletion(-)
+> >
+> > diff --git a/util/iova-tree.c b/util/iova-tree.c
+> > index 2d9cebfc89..d39cd8bb29 100644
+> > --- a/util/iova-tree.c
+> > +++ b/util/iova-tree.c
+> > @@ -9,7 +9,6 @@
+> >   * This work is licensed under the terms of the GNU GPL, version 2 o=
+r later.
+> >   */
+> >
+> > -#include <glib.h>
+> >  #include "qemu/iova-tree.h"
+>=20
+> While we're fixing up the headers in this file:
+> it should start with an include of qemu/osdep.h,
+> and qemu/iova-tree.h should not include osdep.h...
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+Sorry to messed this up.  It was used for hwaddr definition.
 
-> ---
->  blockdev.c           | 42 ++++++++++++++++++++++++++++++++++++++++++
->  qapi/block-core.json | 42 ++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 84 insertions(+)
-> 
-> diff --git a/blockdev.c b/blockdev.c
-> index 8de95be8f4..fb402edc94 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -2923,6 +2923,48 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
->      bdrv_clear_dirty_bitmap(bitmap, NULL);
->  }
->  
-> +void qmp_x_block_dirty_bitmap_enable(const char *node, const char *name,
-> +                                   Error **errp)
-> +{
-> +    BlockDriverState *bs;
-> +    BdrvDirtyBitmap *bitmap;
-> +
-> +    bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
-> +    if (!bitmap) {
-> +        return;
-> +    }
-> +
-> +    if (bdrv_dirty_bitmap_frozen(bitmap)) {
-> +        error_setg(errp,
-> +                   "Bitmap '%s' is currently frozen and cannot be enabled",
-> +                   name);
-> +        return;
-> +    }
-> +
-> +    bdrv_enable_dirty_bitmap(bitmap);
-> +}
-> +
-> +void qmp_x_block_dirty_bitmap_disable(const char *node, const char *name,
-> +                                    Error **errp)
-> +{
-> +    BlockDriverState *bs;
-> +    BdrvDirtyBitmap *bitmap;
-> +
-> +    bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
-> +    if (!bitmap) {
-> +        return;
-> +    }
-> +
-> +    if (bdrv_dirty_bitmap_frozen(bitmap)) {
-> +        error_setg(errp,
-> +                   "Bitmap '%s' is currently frozen and cannot be disabled",
-> +                   name);
-> +        return;
-> +    }
-> +
-> +    bdrv_disable_dirty_bitmap(bitmap);
-> +}
-> +
->  BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
->                                                                const char *name,
->                                                                Error **errp)
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 4b1de474a9..02de674f5f 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -1808,6 +1808,48 @@
->  { 'command': 'block-dirty-bitmap-clear',
->    'data': 'BlockDirtyBitmap' }
->  
-> +##
-> +# @x-block-dirty-bitmap-enable:
-> +#
-> +# Enables a dirty bitmap so that it will begin tracking disk changes.
-> +#
-> +# Returns: nothing on success
-> +#          If @node is not a valid block device, DeviceNotFound
-> +#          If @name is not found, GenericError with an explanation
-> +#
-> +# Since: 3.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "x-block-dirty-bitmap-enable",
-> +#      "arguments": { "node": "drive0", "name": "bitmap0" } }
-> +# <- { "return": {} }
-> +#
-> +##
-> +  { 'command': 'x-block-dirty-bitmap-enable',
-> +    'data': 'BlockDirtyBitmap' }
-> +
-> +##
-> +# @x-block-dirty-bitmap-disable:
-> +#
-> +# Disables a dirty bitmap so that it will stop tracking disk changes.
-> +#
-> +# Returns: nothing on success
-> +#          If @node is not a valid block device, DeviceNotFound
-> +#          If @name is not found, GenericError with an explanation
-> +#
-> +# Since: 3.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "x-block-dirty-bitmap-disable",
-> +#      "arguments": { "node": "drive0", "name": "bitmap0" } }
-> +# <- { "return": {} }
-> +#
-> +##
-> +    { 'command': 'x-block-dirty-bitmap-disable',
-> +      'data': 'BlockDirtyBitmap' }
-> +
->  ##
->  # @BlockDirtyBitmapSha256:
->  #
-> -- 
-> 2.14.3
-> 
-> 
+Maybe we can just replace hwaddr usage in iova-tree.[ch] with
+something like uint64_t?  Then I think we can drop the osdep.h.
+
+Regards,
+
+--=20
+Peter Xu
