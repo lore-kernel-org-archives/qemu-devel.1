@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQtiB-0001Dw-0X
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:08:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1fQtoI-0003tz-Di
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:14:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQti7-0003J5-PT
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:08:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35814 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fQtoE-0006t5-Hy
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:14:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58838 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQti7-0003Ii-KU
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:08:11 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fQtoE-0006sr-Cc
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:14:30 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1DDB7818BAF3
-	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 12:08:11 +0000 (UTC)
-Date: Thu, 7 Jun 2018 14:08:09 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180607140809.4159614b@redhat.com>
-In-Reply-To: <20180607102121.9849-1-dgilbert@redhat.com>
-References: <20180607102121.9849-1-dgilbert@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id 037F1859B5
+	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 12:14:30 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180605122636.33654-1-dgilbert@redhat.com>
+	<20180605122636.33654-2-dgilbert@redhat.com>
+Date: Thu, 07 Jun 2018 14:14:28 +0200
+In-Reply-To: <20180605122636.33654-2-dgilbert@redhat.com> (David Alan
+	Gilbert's message of "Tue, 5 Jun 2018 13:26:31 +0100")
+Message-ID: <87sh5yx07v.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] hmp: Add info commands for preconfig
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 1/6] hmp: Add flag for preconfig commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,133 +34,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com
 
-On Thu,  7 Jun 2018 11:21:21 +0100
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
 
 > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Allow a bunch of the info commands to be used in preconfig.
-> Could probably add most of them.
-> 
+>
+> Add a flag to command definitions to allow them to be used in preconfig
+> and check it.
+>
 > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
 > ---
->  hmp-commands-info.hx | 12 ++++++++++++
->  hmp-commands.hx      |  1 +
->  2 files changed, 13 insertions(+)
-> 
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index ddfcd5adcc..f4d0d7d2d0 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -19,6 +19,7 @@ ETEXI
->          .params     = "",
->          .help       = "show the version of QEMU",
->          .cmd        = hmp_info_version,
-> +        .flags      = "p",
->      },
+>  monitor.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+>
+> diff --git a/monitor.c b/monitor.c
+> index 6d0cec552e..50b95f41db 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -128,6 +128,7 @@ typedef struct mon_cmd_t {
+>      const char *args_type;
+>      const char *params;
+>      const char *help;
+> +    const char *flags; /* p=preconfig */
+>      void (*cmd)(Monitor *mon, const QDict *qdict);
+>      /* @sub_table is a list of 2nd level of commands. If it does not exist,
+>       * cmd should be used. If it exists, sub_table[?].cmd should be
+> @@ -936,6 +937,19 @@ static int parse_cmdline(const char *cmdline,
+>      return -1;
+>  }
 >  
->  STEXI
-> @@ -47,6 +48,7 @@ ETEXI
->          .params     = "",
->          .help       = "show the character devices",
->          .cmd        = hmp_info_chardev,
-> +        .flags      = "p",
->      },
+> +/*
+> + * Returns true if the command can be executed in preconfig mode
+> + * i.e. it has the 'p' flag.
+> + */
+> +static bool cmd_can_preconfig(const mon_cmd_t *cmd)
+> +{
+> +    if (!cmd->flags) {
+> +        return false;
+> +    }
+> +
+> +    return strchr(cmd->flags, 'p');
+> +}
+> +
+>  static void help_cmd_dump_one(Monitor *mon,
+>                                const mon_cmd_t *cmd,
+>                                char **prefix_args,
+> @@ -2976,6 +2990,11 @@ static const mon_cmd_t *monitor_parse_command(Monitor *mon,
+>                         (int)(p - cmdp_start), cmdp_start);
+>          return NULL;
+>      }
+> +    if (runstate_check(RUN_STATE_PRECONFIG) && !cmd_can_preconfig(cmd)) {
+> +        monitor_printf(mon, "Command '%.*s' not available in preconfig\n",
+> +                       (int)(p - cmdp_start), cmdp_start);
+> +        return NULL;
+> +    }
 >  
->  STEXI
-> @@ -165,6 +167,7 @@ ETEXI
->          .params     = "",
->          .help       = "show the command line history",
->          .cmd        = hmp_info_history,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -315,6 +318,7 @@ ETEXI
->          .params     = "",
->          .help       = "show NUMA information",
->          .cmd        = hmp_info_numa,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -343,6 +347,7 @@ ETEXI
->          .params     = "",
->          .help       = "show host USB devices",
->          .cmd        = hmp_info_usbhost,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -399,6 +404,7 @@ ETEXI
->          .params     = "",
->          .help       = "show the current VM status (running|paused)",
->          .cmd        = hmp_info_status,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -457,6 +463,7 @@ ETEXI
->          .params     = "",
->          .help       = "show the current VM name",
->          .cmd        = hmp_info_name,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -471,6 +478,7 @@ ETEXI
->          .params     = "",
->          .help       = "show the current VM UUID",
->          .cmd        = hmp_info_uuid,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -613,6 +621,7 @@ ETEXI
->          .params     = "[path]",
->          .help       = "show QOM composition tree",
->          .cmd        = hmp_info_qom_tree,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -671,6 +680,7 @@ ETEXI
->          .params     = "",
->          .help       = "show memory backends",
->          .cmd        = hmp_info_memdev,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -699,6 +709,7 @@ ETEXI
->          .params     = "",
->          .help       = "show iothreads",
->          .cmd        = hmp_info_iothreads,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -829,6 +840,7 @@ ETEXI
->          .params     = "",
->          .help       = "Show information about hotpluggable CPUs",
->          .cmd        = hmp_hotpluggable_cpus,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 8bf590ae4b..dc82ed526f 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1856,6 +1856,7 @@ ETEXI
->          .help       = "show various information about the system state",
->          .cmd        = hmp_info_help,
->          .sub_table  = info_cmds,
-> +        .flags      = "p",
->      },
->  
->  STEXI
+>      /* filter out following useless space */
+>      while (qemu_isspace(*p)) {
+
+This
+
+    (qemu) c
+    Command 'c' not available in preconfig
+
+is not a nice user experience.  We can do better (paraphrasing myself):
+
+    Command 'c' not available with -preconfig until you complete
+    configuration with QMP
+
+Note that this talks to the user in the user's terms (-preconfig)
+instead of internal terms ("in preconfig", whatever that is), and is
+more specific on how to ready the monitor.
+
+Obviously, "with QMP" needs an update once HMP acquires a command to
+exit preconfig state.
