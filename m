@@ -1,15 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fR2Ia-0000dl-Qq
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:18:26 -0400
+	(envelope-from <mst@redhat.com>) id 1fR2Jw-0001mv-Sf
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:19:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fR2IZ-0001Uj-Bt
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:18:24 -0400
-Date: Fri, 8 Jun 2018 00:18:15 +0300
+	(envelope-from <mst@redhat.com>) id 1fR2Jv-00005H-Rl
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:19:48 -0400
+Date: Fri, 8 Jun 2018 00:19:40 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180608000835-mutt-send-email-mst@kernel.org>
-References: <20180606120050.GB2661@work-vm>
-	<61a301dd-8e50-8799-8328-341d6ab744f5@redhat.com>
+Message-ID: <20180608001843-mutt-send-email-mst@kernel.org>
+References: <61a301dd-8e50-8799-8328-341d6ab744f5@redhat.com>
 	<20180606143134.GG2660@work-vm>
 	<39bcee27-329a-61d8-47fa-678b431b0a79@redhat.com>
 	<20180606150507.GJ2660@work-vm>
@@ -18,10 +17,11 @@ References: <20180606120050.GB2661@work-vm>
 	<f3914a591a46c9d489f2fa1ad2ac4fd0c5a9e5b6.camel@redhat.com>
 	<20180607103218.GC1455@redhat.com>
 	<20180607103620.GJ28827@redhat.com>
+	<dd014be5c818e71d4f833e150fbae11e490e2325.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180607103620.GJ28827@redhat.com>
+In-Reply-To: <dd014be5c818e71d4f833e150fbae11e490e2325.camel@redhat.com>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
@@ -32,77 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: "Richard W.M. Jones" <rjones@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
+To: Andrea Bolognani <abologna@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On Thu, Jun 07, 2018 at 11:36:20AM +0100, Daniel P. Berrang=E9 wrote:
-> On Thu, Jun 07, 2018 at 11:32:18AM +0100, Richard W.M. Jones wrote:
-> > On Thu, Jun 07, 2018 at 12:02:29PM +0200, Andrea Bolognani wrote:
-> > > Something that I haven't seen mentioned in the thread - and this
-> > > looks like as good a point as any to jump in - is that for q35
-> > > guests using EFI as well as aarch64 guests the "one click import"
-> > > experience requires not only hints about the machine (and firmware!=
-)
-> > > type, but also a copy of the EFI variable store:
-> > >=20
-> > >   $ virt-builder fedora-27 --arch aarch64 --notes
-> > >   Fedora=AE 27 Server (aarch64)
-> > >=20
-> > >   [...]
-> > >=20
-> > >   You will need to use the associated UEFI NVRAM variables file:
-> > >     http://libguestfs.org/download/builder/fedora-27-aarch64-nvram.=
-xz
+On Thu, Jun 07, 2018 at 12:54:33PM +0200, Andrea Bolognani wrote:
+> On Thu, 2018-06-07 at 11:36 +0100, Daniel P. Berrang=E9 wrote:
+> > On Thu, Jun 07, 2018 at 11:32:18AM +0100, Richard W.M. Jones wrote:
+> > > Another problem which Laszlo mentioned is the varstore isn't portab=
+le
+> > > between UEFI implementations, or if the UEFI is compiled with
+> > > different options.  You can even imagine shipping multiple
+> > > varstores(!) which argues for a tar-like format.
 > >=20
-> > This is true, although only sometimes.  If the bootloader[*] has a
-> > working fallback path then usually it is able to boot and reset the
-> > UEFI varstore back to the correct values.  We have had bugs before
-> > where the fallback path was not working, eg:
-> >=20
-> >   https://bugzilla.redhat.com/show_bug.cgi?id=3D1353689 (yours!)
-> >   https://bugzilla.redhat.com/show_bug.cgi?id=3D1558793
-> >=20
-> > Another problem which Laszlo mentioned is the varstore isn't portable
-> > between UEFI implementations, or if the UEFI is compiled with
-> > different options.  You can even imagine shipping multiple
-> > varstores(!) which argues for a tar-like format.
+> > Could we perhaps imagine shipping the actual UEFI bios, rather
+> > than only the varstore.  The bios blob runs in guest context,
+> > so there shouldn't be able security concerns from hosting
+> > vendors with running user provided bios. Mostly its a matter
+> > of confidence that the interface between bios & qemu is stable
+> > which feels easier than assuming varstore vs different bios is
+> > portable.
 >=20
-> Could we perhaps imagine shipping the actual UEFI bios, rather
-> than only the varstore.
+> That sounds sensible, and further reinforces the idea that we
+> need way more than a single string baked into the qcow2 file.
 
-That's pretty unusual, UEFI is designed to abstract away the
-hardware. It normally ships with the hardware.
+I don't think anyone said we want a single string.
+What was proposed is a set of key value pairs with
+values being binary blobs.
 
-I don't think it's a good idea to stick firmware itself in the image:
-updating guest images is already a problem, at least we can easily fix
-firmware bugs by dnf update on the host.
-
-> The bios blob runs in guest context,
-> so there shouldn't be able security concerns from hosting
-> vendors with running user provided bios.
-
-It seems possible that users that do supply their own firmware
-will want to save it with the image. I don't think
-we should do it for the standard firmware.
-
-
-> Mostly its a matter
-> of confidence that the interface between bios & qemu is stable
-> which feels easier than assuming varstore vs different bios is
-> portable. IIRC, shipping actual UEFI BIOS is something that was
-> desirable for AMD SEV usage.
-
-For SEV storing the un-encrypted binary, having QEMU read it out and writ=
-e
-it into guest memory isn't any better than shipping it with QEMU.
-
->=20
-> Regards,
-> Daniel
 > --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
+> Andrea Bolognani / Red Hat / Virtualization
