@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56053)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fQy9X-00033a-B4
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 12:52:48 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fQyGu-0003Oe-FF
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:00:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fQy9T-00024q-AD
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 12:52:47 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Thu,  7 Jun 2018 18:52:18 +0200
-Message-Id: <20180607165218.9558-9-david@redhat.com>
-In-Reply-To: <20180607165218.9558-1-david@redhat.com>
-References: <20180607165218.9558-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 8/8] s390x: local error handling in hotplug
- handler functions
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fQyGq-0005ua-VJ
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:00:24 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Thu,  7 Jun 2018 17:59:55 +0100
+Message-Id: <20180607165955.10232-4-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180607165955.10232-1-mark.cave-ayland@ilande.co.uk>
+References: <20180607165955.10232-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 3/3] ppc: add missing FW_CFG_PPC_NVRAM_FLAT
+ definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,47 +20,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, david@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-Let's introduce and use local error variables in the hotplug handler
-functions.
+This is used in OpenBIOS to define the memory layout of the NVRAM device. Whilst
+currently left at its default value, add the missing definition to ensure it is
+reserved.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/s390x/s390-virtio-ccw.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ include/hw/ppc/ppc.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 7ae5fb38dd..29ea50a177 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -434,18 +434,23 @@ static void s390_machine_reset(void)
- static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
-                                      DeviceState *dev, Error **errp)
- {
-+    Error *local_err = NULL;
-+
-     if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
--        s390_cpu_plug(hotplug_dev, dev, errp);
-+        s390_cpu_plug(hotplug_dev, dev, &local_err);
-     }
-+    error_propagate(errp, local_err);
- }
+diff --git a/include/hw/ppc/ppc.h b/include/hw/ppc/ppc.h
+index ff0ac306be..b18ef3eefb 100644
+--- a/include/hw/ppc/ppc.h
++++ b/include/hw/ppc/ppc.h
+@@ -100,6 +100,7 @@ enum {
+ #define FW_CFG_PPC_KVM_PID      (FW_CFG_ARCH_LOCAL + 0x07)
+ #define FW_CFG_PPC_NVRAM_ADDR   (FW_CFG_ARCH_LOCAL + 0x08)
+ #define FW_CFG_PPC_BUSFREQ      (FW_CFG_ARCH_LOCAL + 0x09)
++#define FW_CFG_PPC_NVRAM_FLAT   (FW_CFG_ARCH_LOCAL + 0x0a)
  
- static void s390_machine_device_unplug_request(HotplugHandler *hotplug_dev,
-                                                DeviceState *dev, Error **errp)
- {
-+    Error *local_err = NULL;
-+
-     if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
--        error_setg(errp, "CPU hot unplug not supported on this machine");
--        return;
-+        error_setg(&local_err, "CPU hot unplug not supported on this machine");
-     }
-+    error_propagate(errp, local_err);
- }
+ #define PPC_SERIAL_MM_BAUDBASE 399193
  
- static CpuInstanceProperties s390_cpu_index_to_props(MachineState *ms,
 -- 
-2.17.0
+2.11.0
