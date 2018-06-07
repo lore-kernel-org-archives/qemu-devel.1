@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fR2BE-0007TV-PH
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:10:49 -0400
+	(envelope-from <mst@redhat.com>) id 1fR2Ia-0000dl-Qq
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:18:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fR2BD-0006Ab-SV
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:10:48 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180607171751.11510-1-mark.cave-ayland@ilande.co.uk>
-	<8484d1a4-b9e4-3d69-090c-22c230878566@amsat.org>
-	<CAFEAcA_qc-x0rnDRyJaoiZyL=G2BU6HoiiKbzV=_phRMwHo4zA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4905eb15-ee9e-c2b0-419b-4e60babd4061@amsat.org>
-Date: Thu, 7 Jun 2018 18:10:39 -0300
+	(envelope-from <mst@redhat.com>) id 1fR2IZ-0001Uj-Bt
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:18:24 -0400
+Date: Fri, 8 Jun 2018 00:18:15 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180608000835-mutt-send-email-mst@kernel.org>
+References: <20180606120050.GB2661@work-vm>
+	<61a301dd-8e50-8799-8328-341d6ab744f5@redhat.com>
+	<20180606143134.GG2660@work-vm>
+	<39bcee27-329a-61d8-47fa-678b431b0a79@redhat.com>
+	<20180606150507.GJ2660@work-vm>
+	<66727986-1cf1-c12e-d78c-d56cc15eaf00@redhat.com>
+	<20180606163246.GL3064@redhat.com>
+	<f3914a591a46c9d489f2fa1ad2ac4fd0c5a9e5b6.camel@redhat.com>
+	<20180607103218.GC1455@redhat.com>
+	<20180607103620.GJ28827@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_qc-x0rnDRyJaoiZyL=G2BU6HoiiKbzV=_phRMwHo4zA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 0/4] cuda/mos6522 migration fixes
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180607103620.GJ28827@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,17 +32,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>, Andrea Bolognani <abologna@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On 06/07/2018 05:17 PM, Peter Maydell wrote:
-> On 7 June 2018 at 20:18, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> You forgot patch 5 "vmstate: Remove VMSTATE_TIMER_PTR_TEST" :)
-> 
-> It's a generic macro that might have utility in future,
-> and it fits into a slot in the matrix of possible VMSTATE
-> macros, so I wouldn't bother. (It's kind of irritating that we
-> have an almost but not quite orthogonal set of VMSTATE
-> macros.)
+On Thu, Jun 07, 2018 at 11:36:20AM +0100, Daniel P. Berrang=E9 wrote:
+> On Thu, Jun 07, 2018 at 11:32:18AM +0100, Richard W.M. Jones wrote:
+> > On Thu, Jun 07, 2018 at 12:02:29PM +0200, Andrea Bolognani wrote:
+> > > Something that I haven't seen mentioned in the thread - and this
+> > > looks like as good a point as any to jump in - is that for q35
+> > > guests using EFI as well as aarch64 guests the "one click import"
+> > > experience requires not only hints about the machine (and firmware!=
+)
+> > > type, but also a copy of the EFI variable store:
+> > >=20
+> > >   $ virt-builder fedora-27 --arch aarch64 --notes
+> > >   Fedora=AE 27 Server (aarch64)
+> > >=20
+> > >   [...]
+> > >=20
+> > >   You will need to use the associated UEFI NVRAM variables file:
+> > >     http://libguestfs.org/download/builder/fedora-27-aarch64-nvram.=
+xz
+> >=20
+> > This is true, although only sometimes.  If the bootloader[*] has a
+> > working fallback path then usually it is able to boot and reset the
+> > UEFI varstore back to the correct values.  We have had bugs before
+> > where the fallback path was not working, eg:
+> >=20
+> >   https://bugzilla.redhat.com/show_bug.cgi?id=3D1353689 (yours!)
+> >   https://bugzilla.redhat.com/show_bug.cgi?id=3D1558793
+> >=20
+> > Another problem which Laszlo mentioned is the varstore isn't portable
+> > between UEFI implementations, or if the UEFI is compiled with
+> > different options.  You can even imagine shipping multiple
+> > varstores(!) which argues for a tar-like format.
+>=20
+> Could we perhaps imagine shipping the actual UEFI bios, rather
+> than only the varstore.
 
-OK!
+That's pretty unusual, UEFI is designed to abstract away the
+hardware. It normally ships with the hardware.
+
+I don't think it's a good idea to stick firmware itself in the image:
+updating guest images is already a problem, at least we can easily fix
+firmware bugs by dnf update on the host.
+
+> The bios blob runs in guest context,
+> so there shouldn't be able security concerns from hosting
+> vendors with running user provided bios.
+
+It seems possible that users that do supply their own firmware
+will want to save it with the image. I don't think
+we should do it for the standard firmware.
+
+
+> Mostly its a matter
+> of confidence that the interface between bios & qemu is stable
+> which feels easier than assuming varstore vs different bios is
+> portable. IIRC, shipping actual UEFI BIOS is something that was
+> desirable for AMD SEV usage.
+
+For SEV storing the un-encrypted binary, having QEMU read it out and writ=
+e
+it into guest memory isn't any better than shipping it with QEMU.
+
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
