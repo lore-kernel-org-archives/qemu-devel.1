@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQoNC-0000oN-1M
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1fQoN9-0000mZ-QW
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQoNA-0002s6-2u
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:14 -0400
+	(envelope-from <armbru@redhat.com>) id 1fQoN7-0002p4-V8
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 02:26:11 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu,  7 Jun 2018 08:25:53 +0200
-Message-Id: <20180607062559.16127-14-armbru@redhat.com>
+Date: Thu,  7 Jun 2018 08:25:44 +0200
+Message-Id: <20180607062559.16127-5-armbru@redhat.com>
 In-Reply-To: <20180607062559.16127-1-armbru@redhat.com>
 References: <20180607062559.16127-1-armbru@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH 13/19] block-qdict: Clean up
- qdict_crumple() a bit
+Subject: [Qemu-devel] [RFC PATCH 04/19] fixup block: Add block-specific
+ QDict header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +23,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
 
-When you mix scalar and non-scalar keys, whether you get an "already
-set as scalar" or an "already set as dict" error depends on qdict
-iteration order.  Neither message makes much sense.  Replace by
-""Cannot mix scalar and non-scalar keys".  This is similar to the
-message we get for mixing list and non-list keys.
-
-I find qdict_crumple()'s first loop hard to understand.  Rearrange it
-and add a comment.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qobject/block-qdict.c | 42 +++++++++++++++++++++---------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+ include/block/qdict.h | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
-index a4e1c8d08f..35e9052816 100644
---- a/qobject/block-qdict.c
-+++ b/qobject/block-qdict.c
-@@ -403,7 +403,7 @@ static int qdict_is_list(QDict *maybe_list, Error **errp)
- QObject *qdict_crumple(const QDict *src, Error **errp)
- {
-     const QDictEntry *ent;
--    QDict *two_level, *multi_level = NULL;
-+    QDict *two_level, *multi_level = NULL, *child_dict;
-     QObject *dst = NULL, *child;
-     size_t i;
-     char *prefix = NULL;
-@@ -422,29 +422,29 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
-         }
+diff --git a/include/block/qdict.h b/include/block/qdict.h
+index 825e096a72..71c037afba 100644
+--- a/include/block/qdict.h
++++ b/include/block/qdict.h
+@@ -1,7 +1,7 @@
+ /*
+  * Special QDict functions used by the block layer
+  *
+- * Copyright (c) 2018 Red Hat, Inc.
++ * Copyright (c) 2013-2018 Red Hat, Inc.
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
+  * See the COPYING.LIB file in the top-level directory.
+@@ -11,9 +11,6 @@
+ #define BLOCK_QDICT_H
  
-         qdict_split_flat_key(ent->key, &prefix, &suffix);
+ #include "qapi/qmp/qdict.h"
+-#include "qapi/qmp/qobject.h"
+-#include "qapi/error.h"
 -
-         child = qdict_get(two_level, prefix);
-+        child_dict = qobject_to(QDict, child);
-+
-+        if (child) {
-+            /*
-+             * An existing child must be a dict and @ent must be a
-+             * dict member (i.e. suffix not null), or else @ent
-+             * clashes.
-+             */
-+            if (!child_dict || !suffix) {
-+                error_setg(errp,
-+                           "Cannot mix scalar and non-scalar keys");
-+                goto error;
-+            }
-+        } else if (suffix) {
-+            child_dict = qdict_new();
-+            qdict_put(two_level, prefix, child_dict);
-+        } else {
-+            qdict_put_obj(two_level, prefix, qobject_ref(ent->value));
-+        }
-+
-         if (suffix) {
--            QDict *child_dict = qobject_to(QDict, child);
--            if (!child_dict) {
--                if (child) {
--                    error_setg(errp, "Key %s prefix is already set as a scalar",
--                               prefix);
--                    goto error;
--                }
--
--                child_dict = qdict_new();
--                qdict_put_obj(two_level, prefix, QOBJECT(child_dict));
--            }
--
-             qdict_put_obj(child_dict, suffix, qobject_ref(ent->value));
--        } else {
--            if (child) {
--                error_setg(errp, "Key %s prefix is already set as a dict",
--                           prefix);
--                goto error;
--            }
--            qdict_put_obj(two_level, prefix, qobject_ref(ent->value));
-         }
  
-         g_free(prefix);
+ void qdict_copy_default(QDict *dst, QDict *src, const char *key);
+ void qdict_set_default_str(QDict *dst, const char *key, const char *val);
 -- 
 2.17.1
