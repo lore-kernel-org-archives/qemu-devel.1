@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQtcu-0006M9-Py
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:02:52 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fQtiB-0001Dw-0X
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:08:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQtcr-00085P-M4
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:02:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58406 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fQti7-0003J5-PT
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:08:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35814 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fQtcr-00085D-H9
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:02:45 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180604162140.20688-1-peter.maydell@linaro.org>
-	<20180604191756.1ae61871@w520.home>
-	<52a5446f-4624-fd45-ce7d-492269aa5c3f@redhat.com>
-	<20180605094613.52bcf85d.cohuck@redhat.com>
-	<CAFEAcA80XzxdxLfwMUYLpHprX8L=AZyNDw1DiJKshhGvbFJLRA@mail.gmail.com>
-Date: Thu, 07 Jun 2018 14:02:43 +0200
-In-Reply-To: <CAFEAcA80XzxdxLfwMUYLpHprX8L=AZyNDw1DiJKshhGvbFJLRA@mail.gmail.com>
-	(Peter Maydell's message of "Tue, 5 Jun 2018 10:19:15 +0100")
-Message-ID: <87k1rayfbw.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQti7-0003Ii-KU
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:08:11 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1DDB7818BAF3
+	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 12:08:11 +0000 (UTC)
+Date: Thu, 7 Jun 2018 14:08:09 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180607140809.4159614b@redhat.com>
+In-Reply-To: <20180607102121.9849-1-dgilbert@redhat.com>
+References: <20180607102121.9849-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] CODING_STYLE: Define our preferred form
- for multiline comments
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/6] hmp: Add info commands for preconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +32,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, berrange@redhat.com
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+On Thu,  7 Jun 2018 11:21:21 +0100
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 
-> On 5 June 2018 at 08:46, Cornelia Huck <cohuck@redhat.com> wrote:
->> On Tue, 5 Jun 2018 06:33:22 +0200
->> Thomas Huth <thuth@redhat.com> wrote:
->>> On 05.06.2018 03:17, Alex Williamson wrote:
->>> > On Mon,  4 Jun 2018 17:21:40 +0100
->>> > Peter Maydell <peter.maydell@linaro.org> wrote:
->>> >> +Multiline comments blocks should have a row of stars on the left
->>> >> +and the terminating */ on its own line:
->>> >> +    /* like
->>> >> +     * this
->>> >> +     */
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Allow a bunch of the info commands to be used in preconfig.
+> Could probably add most of them.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Uh, winging just one end of the comment offends my eyes.
-
->>> >> +Putting the initial /* on its own line is accepted, but not required.
->>> >
->>> > Could we say "at maintainer discretion", or is that always implied?  The
->>> > asymmetry of the proposed standard is not my favorite and a mostly
->>> > blank line before and after further supports standing out from
->>> > surrounding code.
->>> I also don't like the asymmetry. I'd prefer more dense comments, though:
->>>
->>>   /* like
->>>    * this */
->
-> Wow, I think that looks terrible :-)
-
-Even more terrible, you wanted to say ;)
-
->>> Anyway, could we either use that dense format or the kernel-style
->>> multi-lines-comment format, please? Mixing it asymmetrically is just ugly.
->>
->> I'd vote for the kernel style, then.
->
-> I don't particularly object to the kernel style (though it's not
-> how I personally default to writing comments). I just didn't want
-> to rule a huge chunk of our existing comments as out-of-standard
-> for what I see as a relatively minor divergence in form --
-> we do have a lot of no-leading-separate-/* comments. I can live
-> with mandating kernel-style if it means we can rule out GNU-form
-> and other weirdnesses though :-)
-
-Let's mandate kernel-style for new code.  I could live with giving
-maintainers license to tolerate certain other styles.  The fewer, the
-better, though.
+> ---
+>  hmp-commands-info.hx | 12 ++++++++++++
+>  hmp-commands.hx      |  1 +
+>  2 files changed, 13 insertions(+)
+> 
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index ddfcd5adcc..f4d0d7d2d0 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -19,6 +19,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show the version of QEMU",
+>          .cmd        = hmp_info_version,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -47,6 +48,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show the character devices",
+>          .cmd        = hmp_info_chardev,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -165,6 +167,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show the command line history",
+>          .cmd        = hmp_info_history,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -315,6 +318,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show NUMA information",
+>          .cmd        = hmp_info_numa,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -343,6 +347,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show host USB devices",
+>          .cmd        = hmp_info_usbhost,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -399,6 +404,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show the current VM status (running|paused)",
+>          .cmd        = hmp_info_status,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -457,6 +463,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show the current VM name",
+>          .cmd        = hmp_info_name,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -471,6 +478,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show the current VM UUID",
+>          .cmd        = hmp_info_uuid,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -613,6 +621,7 @@ ETEXI
+>          .params     = "[path]",
+>          .help       = "show QOM composition tree",
+>          .cmd        = hmp_info_qom_tree,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -671,6 +680,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show memory backends",
+>          .cmd        = hmp_info_memdev,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -699,6 +709,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show iothreads",
+>          .cmd        = hmp_info_iothreads,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -829,6 +840,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "Show information about hotpluggable CPUs",
+>          .cmd        = hmp_hotpluggable_cpus,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 8bf590ae4b..dc82ed526f 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1856,6 +1856,7 @@ ETEXI
+>          .help       = "show various information about the system state",
+>          .cmd        = hmp_info_help,
+>          .sub_table  = info_cmds,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
