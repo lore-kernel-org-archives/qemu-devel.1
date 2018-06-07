@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQw3j-0001GK-1P
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:38:39 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fQw3q-0001Je-BB
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:38:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQw3f-0003cj-UW
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:38:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37060 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fQw3n-0003hU-81
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:38:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41478)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fQw3f-0003cU-QN
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:38:35 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 39317859BA
-	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 14:38:35 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180529055755.12404-1-peterx@redhat.com>
-	<20180529055755.12404-8-peterx@redhat.com>
-Date: Thu, 07 Jun 2018 16:38:33 +0200
-In-Reply-To: <20180529055755.12404-8-peterx@redhat.com> (Peter Xu's message of
-	"Tue, 29 May 2018 13:57:55 +0800")
-Message-ID: <87zi06slue.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fQw3m-0003fi-V9
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 10:38:43 -0400
+Date: Thu, 7 Jun 2018 11:38:35 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180607143835.GF7451@localhost.localdomain>
+References: <1528295806-90593-1-git-send-email-babu.moger@amd.com>
+	<1528295806-90593-3-git-send-email-babu.moger@amd.com>
+	<20180606220531.GC7451@localhost.localdomain>
+	<DM5PR12MB2471DF38865A11BD0D08F8CE95640@DM5PR12MB2471.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v9 7/7] monitor: add lock to protect
- mon_fdsets
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM5PR12MB2471DF38865A11BD0D08F8CE95640@DM5PR12MB2471.namprd12.prod.outlook.com>
+Subject: Re: [Qemu-devel] [PATCH v12 2/4] i386: Verify if topoext feature
+ can be supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,19 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: "Moger, Babu" <Babu.Moger@amd.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Markus Armbruster <armbru@redhat.com>
 
-Peter Xu <peterx@redhat.com> writes:
+On Thu, Jun 07, 2018 at 02:24:18PM +0000, Moger, Babu wrote:
+[...]
+> > > +    /* On AMD systems, check if we can support topoext feature */
+> > > +    if (IS_AMD_CPU(env) &&
+> > > +        (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT)) {
+> > > +        if (!topology_supports_topoext(cs->nr_cores, cs->nr_threads)) {
+> > > +                /* Cannot support topoext */
+> > > +                error_setg(errp, "CPU model does not support topoext feature "
+> > > +                                 "with number of cores(%d) and threads(%d). "
+> > > +                                 "Please configure -smp options properly.",
+> > > +                                 cs->nr_cores, cs->nr_threads);
+> > 
+> > See error.h documentation:
+> > 
+> >  * Error reporting system loosely patterned after Glib's GError.
+> >  *
+> >  * Create an error:
+> >  *     error_setg(&err, "situation normal, all fouled up");
+> >  *
+> >  * Create an error and add additional explanation:
+> >  *     error_setg(&err, "invalid quark");
+> >  *     error_append_hint(&err, "Valid quarks are up, down, strange, "
+> >  *                       "charm, top, bottom.\n");
+> >  *
+> >  * Do *not* contract this to
+> >  *     error_setg(&err, "invalid quark\n"
+> >  *                "Valid quarks are up, down, strange, charm, top, bottom.");
+> >  *
+> > 
+> > I suggest something like this:
+> 
+> Sure. I will make these changes. Thanks
 
-> Introduce a new global big lock for mon_fdsets.  Take it where needed.
->
-> The monitor_fdset_get_fd() handling is a bit tricky: now we need to call
-> qemu_mutex_unlock() which might pollute errno, so we need to make sure
-> the correct errno be passed up to the callers.  To make things simpler,
-> we let monitor_fdset_get_fd() return the -errno directly when error
-> happens, then in qemu_open() we move it back into errno.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+Thanks.  Note that I have made a mistake below, by not including
+a newline in error_append_hint().
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Also, I'm not sure if it's better to mention the current value of
+nr_cores in error_setg() or just in the error hint.  Markus, do
+you have any suggestion?
+
+> 
+> > 
+> > static bool topology_supports_topoext(int nr_cores, int nr_threads, Error
+> > **errp)
+> > {
+> >     if (nr_cores > (MAX_CORES_IN_NODE * MAX_NODES_PER_SOCKET))) {
+> >         error_setg(errp, "TOPOEXT unsupported with %d cores per socket",
+> > nr_cores);
+> >         error_append_hint(errp, "TOPOEXT supports only up to %d cores per
+> > socket",
+> >                           (MAX_CORES_IN_NODE * MAX_NODES_PER_SOCKET));
+> >         return false;
+> >     }
+> >     if (nr_threads > 2) {
+> >         error_setg(errp, "TOPOEXT unsupported with %d threads per core",
+> > nr_threads);
+> >         error_append_hint(errp, "TOPOEXT supports only up to 2 threads per
+> > core");
+> >                           (MAX_CORES_IN_NODE * MAX_NODES_PER_SOCKET));
+> >         return false;
+> >     }
+> >     return true;
+> > }
+> > 
+> > static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+> > {
+> >     /* ... */
+> >     if (IS_AMD_CPU(env) &&
+> >         (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
+> >         !topology_supports_topoext(cs->nr_cores, cs->nr_threads, errp)) {
+> >             return;
+> >     }
+> >     /* ... */
+> > }
+> > 
+> > --
+> > Eduardo
+
+-- 
+Eduardo
