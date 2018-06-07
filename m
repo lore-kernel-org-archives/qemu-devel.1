@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42631)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fR29D-0005iB-Qz
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:08:45 -0400
+	id 1fR2BE-0007TV-PH
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:10:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fR29A-0007vN-Gx
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:08:43 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:37315)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fR29A-0007s5-Aw
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:08:40 -0400
-Received: by mail-qt0-x241.google.com with SMTP id q13-v6so11405709qtp.4
-	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 14:08:40 -0700 (PDT)
+	id 1fR2BD-0006Ab-SV
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 17:10:48 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu,  7 Jun 2018 18:08:18 -0300
-Message-Id: <20180607210818.12727-1-f4bug@amsat.org>
+References: <20180607171751.11510-1-mark.cave-ayland@ilande.co.uk>
+	<8484d1a4-b9e4-3d69-090c-22c230878566@amsat.org>
+	<CAFEAcA_qc-x0rnDRyJaoiZyL=G2BU6HoiiKbzV=_phRMwHo4zA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <4905eb15-ee9e-c2b0-419b-4e60babd4061@amsat.org>
+Date: Thu, 7 Jun 2018 18:10:39 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAFEAcA_qc-x0rnDRyJaoiZyL=G2BU6HoiiKbzV=_phRMwHo4zA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] chardev: Restore CR,LF on stdio
+Subject: Re: [Qemu-devel] [PATCH 0/4] cuda/mos6522 migration fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +29,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Patryk Olszewski <patryk@fala.ehost.pl>, BALATON Zoltan <balaton@eik.bme.hu>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Desnogues <laurent.desnogues@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
 
-Remove the 'stair-step output' on stdio.
+On 06/07/2018 05:17 PM, Peter Maydell wrote:
+> On 7 June 2018 at 20:18, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> You forgot patch 5 "vmstate: Remove VMSTATE_TIMER_PTR_TEST" :)
+> 
+> It's a generic macro that might have utility in future,
+> and it fits into a slot in the matrix of possible VMSTATE
+> macros, so I wouldn't bother. (It's kind of irritating that we
+> have an almost but not quite orthogonal set of VMSTATE
+> macros.)
 
-This partially reverts commit 12fb0ac05, which was correct
-on the mailing list but got corrupted by the maintainer :p
-
-Introduced-by: 3b876140-c035-dd39-75d0-d54c48128fac@redhat.com
-Reported-by: BALATON Zoltan <balaton@eik.bme.hu>
-Suggested-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-See:
-http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg06202.html (bug)
-http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg01309.html (report)
-
-Peter, Can this enters directly as bug-fix?
-
- chardev/char-stdio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/chardev/char-stdio.c b/chardev/char-stdio.c
-index d83e60e787..96375f2ab8 100644
---- a/chardev/char-stdio.c
-+++ b/chardev/char-stdio.c
-@@ -59,7 +59,7 @@ static void qemu_chr_set_echo_stdio(Chardev *chr, bool echo)
-     if (!echo) {
-         tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
-                          | INLCR | IGNCR | ICRNL | IXON);
--        tty.c_oflag &= ~OPOST;
-+        tty.c_oflag |= OPOST;
-         tty.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN);
-         tty.c_cflag &= ~(CSIZE | PARENB);
-         tty.c_cflag |= CS8;
--- 
-2.17.1
+OK!
