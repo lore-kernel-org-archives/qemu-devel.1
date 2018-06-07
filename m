@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fQyY2-0002T8-FT
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fQyY2-0002T7-FA
 	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:18:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fQyY0-0001kq-J0
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fQyXz-0001jr-4v
 	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:18:06 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Thu,  7 Jun 2018 18:17:48 +0100
-Message-Id: <20180607171751.11510-2-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180607171751.11510-1-mark.cave-ayland@ilande.co.uk>
-References: <20180607171751.11510-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 1/4] mos6522: fix vmstate_mos6522_timer version
- in vmstate_mos6522
+Date: Thu,  7 Jun 2018 18:17:47 +0100
+Message-Id: <20180607171751.11510-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 0/4] cuda/mos6522 migration fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,26 +19,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-This was accidentally introduced when extracting the 6522 VIA functionality
-from the CUDA device, and prevents loadvm from completing successfully.
+Whilst performing a random migration test for the Mac machines I noticed
+a regression (patch 1) which prevented the loadvm from completing
+successfully. A big thank you to Peter and David on IRC who pointed me
+in the right direction in order to fix the bug.
+
+Once that was working I spent a bit more time analysing the migration
+stream and realised that the mos6522 device state wasn't being embedded
+within the CUDA device, but instead being maintained separately which is
+solved by patch 2.
+
+Patch 3 is something I noticed whilst rearranging the existing code based
+upon my better understanding of QOM/qdev and ensures that the timer frequency
+is always set correctly post-migration for the device and its parent class.
+This leaves no remaining functionality in the mos6522 realize function and so
+allows it to be removed.
+
+Finally patch 4 was suggested by Peter on IRC whilst helping me investigate
+the original migration issue, and removes the last remaining user of
+VMSTATE_TIMER_PTR_TEST from the codebase.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/misc/mos6522.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
-index 6163cea6ab..dd56c796e4 100644
---- a/hw/misc/mos6522.c
-+++ b/hw/misc/mos6522.c
-@@ -405,7 +405,7 @@ static const VMStateDescription vmstate_mos6522 = {
-         VMSTATE_UINT8(ifr, MOS6522State),
-         VMSTATE_UINT8(ier, MOS6522State),
-         VMSTATE_UINT8(anh, MOS6522State),
--        VMSTATE_STRUCT_ARRAY(timers, MOS6522State, 2, 1,
-+        VMSTATE_STRUCT_ARRAY(timers, MOS6522State, 2, 0,
-                              vmstate_mos6522_timer, MOS6522Timer),
-         VMSTATE_END_OF_LIST()
-     }
+
+Mark Cave-Ayland (4):
+  mos6522: fix vmstate_mos6522_timer version in vmstate_mos6522
+  cuda: embed mos6522_cuda device directly rather than using QOM object
+    link
+  mos6522: move timer frequency initialisation to mos6522_reset
+  mos6522: convert VMSTATE_TIMER_PTR_TEST to VMSTATE_TIMER_PTR
+
+ hw/misc/macio/cuda.c         | 50 +++++++++++++++++++-------------------------
+ hw/misc/mos6522.c            | 26 ++++++-----------------
+ include/hw/misc/macio/cuda.h | 27 +++++++++++-------------
+ include/hw/misc/mos6522.h    |  4 +++-
+ 4 files changed, 42 insertions(+), 65 deletions(-)
+
 -- 
 2.11.0
