@@ -1,17 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fQyY7-0002ZE-MM
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:18:12 -0400
+	(envelope-from <bounces@canonical.com>) id 1fQyp0-0004dR-RW
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:35:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fQyY6-0001pM-KC
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:18:11 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Thu,  7 Jun 2018 18:17:51 +0100
-Message-Id: <20180607171751.11510-5-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180607171751.11510-1-mark.cave-ayland@ilande.co.uk>
-References: <20180607171751.11510-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 4/4] mos6522: convert VMSTATE_TIMER_PTR_TEST to
- VMSTATE_TIMER_PTR
+	(envelope-from <bounces@canonical.com>) id 1fQyov-0005Zd-MS
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:35:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57780)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fQyov-0005YC-3Y
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:35:33 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fQyot-0003l3-Gw
+	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 17:35:31 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 65F162E88D4
+	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 17:35:31 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 07 Jun 2018 17:29:20 -0000
+From: Roman Kagan <1636217@bugs.launchpad.net>
+Reply-To: Bug 1636217 <1636217@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161024141318.21041.87583.malonedeb@gac.canonical.com>
+Message-Id: <152839256087.25960.16797478040778771712.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1636217] Re: qemu-kvm 2.7 does not boot kvm VMs
+ with virtio on top of VMware ESX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,47 +37,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-The timers are configured in the mos6522 init function and therefore will
-always exist, so the function can never return false.
+This is a KVM bug.  It has been fixed in mainstream Linux in
 
-Peter also pointed out that this is the only remaining user of
-VMSTATE_TIMER_PTR_TEST in the codebase, so we might as well just convert it
-over to VMSTATE_TIMER_PTR and remove mos6522_timer_exist() as it is no
-longer required.
+commit d391f1207067268261add0485f0f34503539c5b0
+Author: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date:   Thu Jan 25 16:37:07 2018 +0100
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/misc/mos6522.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+    x86/kvm/vmx: do not use vm-exit instruction length for fast MMIO when r=
+unning nested
+    =
 
-diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
-index d0a0c9e5d9..e9b686ac92 100644
---- a/hw/misc/mos6522.c
-+++ b/hw/misc/mos6522.c
-@@ -369,13 +369,6 @@ static const MemoryRegionOps mos6522_ops = {
-     },
- };
- 
--static bool mos6522_timer_exist(void *opaque, int version_id)
--{
--    MOS6522Timer *s = opaque;
--
--    return s->timer != NULL;
--}
--
- static const VMStateDescription vmstate_mos6522_timer = {
-     .name = "mos6522_timer",
-     .version_id = 0,
-@@ -385,7 +378,7 @@ static const VMStateDescription vmstate_mos6522_timer = {
-         VMSTATE_UINT16(counter_value, MOS6522Timer),
-         VMSTATE_INT64(load_time, MOS6522Timer),
-         VMSTATE_INT64(next_irq_time, MOS6522Timer),
--        VMSTATE_TIMER_PTR_TEST(timer, MOS6522Timer, mos6522_timer_exist),
-+        VMSTATE_TIMER_PTR(timer, MOS6522Timer),
-         VMSTATE_END_OF_LIST()
-     }
- };
--- 
-2.11.0
+    I was investigating an issue with seabios >=3D 1.10 which stopped worki=
+ng
+    for nested KVM on Hyper-V. The problem appears to be in
+    handle_ept_violation() function: when we do fast mmio we need to skip
+    the instruction so we do kvm_skip_emulated_instruction(). This, however,
+    depends on VM_EXIT_INSTRUCTION_LEN field being set correctly in VMCS.
+    However, this is not the case.
+    =
+
+    Intel's manual doesn't mandate VM_EXIT_INSTRUCTION_LEN to be set when
+    EPT MISCONFIG occurs. While on real hardware it was observed to be set,
+    some hypervisors follow the spec and don't set it; we end up advancing
+    IP with some random value.
+    =
+
+    I checked with Microsoft and they confirmed they don't fill
+    VM_EXIT_INSTRUCTION_LEN on EPT MISCONFIG.
+    =
+
+    Fix the issue by doing instruction skip through emulator when running
+    nested.
+    =
+
+    Fixes: 68c3b4d1676d870f0453c31d5a52e7e65c7448ae
+    Suggested-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+    Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+    Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+    Acked-by: Michael S. Tsirkin <mst@redhat.com>
+    Signed-off-by: Radim Kr=C4=8Dm=C3=A1=C5=99 <rkrcmar@redhat.com>
+
+
+Although the commit mentions Hyper-V as L0 hypervisor, the same problem
+pertains to ESXi.
+
+The commit is included in v4.16.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1636217
+
+Title:
+  qemu-kvm 2.7 does not boot kvm VMs with virtio on top of VMware ESX
+
+Status in QEMU:
+  New
+
+Bug description:
+  After todays Proxmox update all my Linux VMs stopped booting.
+
+  # How to reproduce
+  - Have KVM on top of VMware ESX (I use VMware ESX 6)
+  - Boot Linux VM with virtio Disk drive.
+
+  =
+
+  # Result
+  virtio based VMs do not boot anymore:
+
+  root@demotuxdc:/etc/pve/nodes/demotuxdc/qemu-server# grep virtio0 100.con=
+f =
+
+  bootdisk: virtio0
+  virtio0: pvestorage:100/vm-100-disk-1.raw,discard=3Don,size=3D20G
+
+  (initially with cache=3Dwritethrough, but that doesn=C2=B4t matter)
+
+  What happens instead is:
+
+  - BIOS displays "Booting from harddisk..."
+  - kvm process of VM loops at about 140% of Intel(R) Core(TM) i5-6260U CPU=
+ @ 1.80GHz Skylake dual core CPU
+
+  Disk of course has valid bootsector:
+
+  root@demotuxdc:/srv/pvestorage/images/100# file -sk vm-100-disk-1.raw =
+
+  vm-100-disk-1.raw: DOS/MBR boot sector DOS/MBR boot sector DOS executable=
+ (COM), boot code
+  root@demotuxdc:/srv/pvestorage/images/100# head -c 2048 vm-100-disk-1.raw=
+ | hd | grep GRUB
+  00000170  be 94 7d e8 2e 00 cd 18  eb fe 47 52 55 42 20 00  |..}.......GR=
+UB .|
+
+  =
+
+  # Workaround 1
+  - Change disk from virtio0 to scsi0
+  - Debian boots out of the box after this change
+  - SLES 12 needs a rebuilt initrd
+  - CentOS 7 too, but it seems that is not even enough and it still fails (=
+even in hostonly=3D"no" mode for dracut)
+
+  =
+
+  # Workaround 2
+  Downgrade pve-qemu-kvm 2.7.0-3 to 2.6.2-2.
+
+  =
+
+  # Expected results
+  Disk boots just fine via virtio like it did before.
+
+  =
+
+  # Downstream bug report
+  Downstream suggests an issue with upstream qemu-kvm:
+
+  https://bugzilla.proxmox.com/show_bug.cgi?id=3D1181
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1636217/+subscriptions
