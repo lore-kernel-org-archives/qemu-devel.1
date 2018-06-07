@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fQy0Q-0004G4-A2
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 12:43:23 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQy4Q-0008Vf-Nq
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 12:47:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fQy0P-0006AP-8N
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 12:43:22 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:38387)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fQy0P-0006A7-2G
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 12:43:21 -0400
-Received: by mail-pl0-x242.google.com with SMTP id b14-v6so6489980pls.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 09:43:20 -0700 (PDT)
-References: <20180531224911.23725-1-richard.henderson@linaro.org>
-	<20180531224911.23725-7-richard.henderson@linaro.org>
-	<788ee514-a026-d415-73ce-67cc996e6259@vivier.eu>
-	<149da730-950c-a527-2373-9cb0433543b1@linaro.org>
-	<d9298b1e-d600-879b-b19d-0e38e15dbbd6@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5d817a6f-a963-148f-bb8d-f62b8f7c0207@linaro.org>
-Date: Thu, 7 Jun 2018 09:43:17 -0700
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQy4P-00081p-Ra
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 12:47:30 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20180603000827.30872-1-f4bug@amsat.org>
+	<20180603000827.30872-2-f4bug@amsat.org>
+	<CAFEAcA_EDXyOHpdamg05=p35jazqgZsLKP2O+G1tg6BoR4b28g@mail.gmail.com>
+	<b5db1ee8-68b1-a41a-be34-eba99ef5565d@amsat.org>
+Message-ID: <f52778c1-f556-22f2-635f-7b85e0eab39b@amsat.org>
+Date: Thu, 7 Jun 2018 13:47:16 -0300
 MIME-Version: 1.0
-In-Reply-To: <d9298b1e-d600-879b-b19d-0e38e15dbbd6@vivier.eu>
+In-Reply-To: <b5db1ee8-68b1-a41a-be34-eba99ef5565d@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] linux-user: Use *at functions to
- implement interp_prefix
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/8] sdcard: Update the Configuration
+ Register (SCR) to Spec Version 1.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,19 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, evgreen@chromium.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 06/07/2018 01:01 AM, Laurent Vivier wrote:
->> Your script doesn't work outside debian, lacking debootstrap.
->> At the moment, I can't build on debian *at all*.  Some bit of the build
->> infrastructure is off and QEMU_FULL_VERSION gets incorrectly defined.  I have
->> no idea how or why it is different than Fedora.
+On 06/07/2018 12:14 PM, Philippe Mathieu-Daudé wrote:
+> On 06/07/2018 08:00 AM, Peter Maydell wrote:
+>> On 3 June 2018 at 01:08, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>> This register now matches the description of the header:
+>>>
+>>>  * SD Memory Card emulation as defined in the "SD Memory Card Physical
+>>>  * layer specification, Version 1.10."
+>>
+>> Can you provide a brief justification in the commit message
+>> of why it makes more sense for us to advertise as 1.10, please?
+>>
+>> (eg a summary of the 1.01 to 1.10 differences and a note
+>> that we already implement them)
 > 
-> I had this problem on Fedora building in a separate directory, "make
-> distclean" at the top source directory fixed the problem for me.
+> The only differences I found are:
 
-Thanks.  I had never seen this failure mode before.
+And I shamefully missed:
 
+    4.3.10 Switch function command
+           (This chapter is newly added in version 1.10)
 
-r~
+    Switch function command (CMD6) 1 is used to switch or expand
+    memory card functions. [...]
+
+    This is a new feature, introduced in SD physical Layer
+    Specification Version 1.10. Therefore, cards that are
+    compatible with earlier versions of the spec do not support
+    it. The host shall check the "SD_SPEC" field in the SCR
+    register to recognize what version of the spec the card
+    complies with before using CMD6. It is mandatory for SD
+    memory card of Ver1.10 to support CMD6.
+
+> 
+>     4.3.11 High-Speed mode (25MB/sec interface speed)
+>            (This chapter is newly added in version 1.10)
+> 
+>     Though the Rev 1.01 SD memory card supports up to 12.5MB/sec
+>     interface speed, the speed of 25MB/sec is necessary to support
+>     increasing performance needs of the host and because of memory
+>     size which continues to grow.
+>     To achieve 25MB/sec interface speed, clock rate is increased to
+>     50MHz and CLK/CMD/DAT signal timing and circuit conditions are
+>     reconsidered and changed from Physical Layer Specification
+>     Version 1.01.
+> 
+>     4.3.12 Command system
+>            (This chapter is newly added in version 1.10)
+> 
+>     SD commands CMD34-37, CMD50, CMD57 are reserved for SD command
+>     system expansion via the switch command.
+>     [These commands] will be considered as illegal commands (as
+>     defined in revision 1.01 of the SD physical layer specification).
