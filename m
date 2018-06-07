@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fQsh1-0002DD-Lu
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:03:04 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fQslN-0003oI-UV
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:07:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fQsgx-0003zX-Oj
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:02:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36082 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fQsgx-0003zK-Jw
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:02:55 -0400
-References: <7CECC2DFC21538489F72729DF5EFB4D9C1486C@DGGEMM501-MBX.china.huawei.com>
-	<20180601122307.3e6ade66@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DB00F4E4@dggeml511-mbx.china.huawei.com>
-	<50481bea-bb5b-dd71-b712-6418c3bb29ac@redhat.com>
-	<77604174-3c15-a8d3-3ea3-53a1759cd885@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fQslN-0006Rx-7p
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:07:29 -0400
+References: <20180426161958.2872-1-rkagan@virtuozzo.com>
+	<20180426161958.2872-4-rkagan@virtuozzo.com>
+	<87tvqjf28u.fsf@dusky.pond.sub.org>
+	<3f5aaa32-5e43-542b-c657-3f1eec553e70@redhat.com>
+	<df356e6b-8559-1a79-17cf-47bdfeb8612d@redhat.com>
+	<b088605a-477f-4c80-34d8-c6677cfdb37e@redhat.com>
+	<87d0x33wyr.fsf@dusky.pond.sub.org>
+	<19326638-6980-5473-dea9-79c7aabdf710@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e2e0ff2b-139e-0582-c8f9-9a716780ff1f@redhat.com>
-Date: Thu, 7 Jun 2018 13:02:51 +0200
+Message-ID: <bcf8d1bf-54b0-c2cd-431c-3db8e14d7676@redhat.com>
+Date: Thu, 7 Jun 2018 13:07:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <77604174-3c15-a8d3-3ea3-53a1759cd885@redhat.com>
+In-Reply-To: <19326638-6980-5473-dea9-79c7aabdf710@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] An emulation failure occurs,
- if I hotplug vcpus immediately after the VM start
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 03/17] iotests: ask qemu for supported
+ formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Igor Mammedov <imammedo@redhat.com>, xuyandong <xuyandong2@huawei.com>
-Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, lidonglin <lidonglin@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>
+To: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 07/06/2018 12:37, David Hildenbrand wrote:
->=20
-> I have a related requirement, which would be to atomically grow a
-> memory regions. So instead of region_del(old)+region_add(new), I would
-> have to do it in one shot (atomically).
->=20
-> AFAICS an atomic replace of the memory map would work for this, too.
-> However I am not sure how we want to handle all kinds of tracking data
-> that is connected to e.g. x86 memory slots (e.g. rmap, dirty bitmap ...=
-).
+On 07/06/2018 09:50, Thomas Huth wrote:
+> 
+>> There's no real need to kill off '?', unless it gets in the way of
+>> steering people towards 'help'.  We should steer them toward 'help',
+>> because '?' is a trap for insufficiently sophisticated users of
+>> shell[*].
+> ... and I agree with your points here.
+> 
+> => I think we need a second list of deprecated feature (maybe we should
+> call them "legacy features" instead of "deprecated"?), i.e. a list of
+> features which we don't recommend for new code / scripts anymore, but
+> which we do not intend to remove via our official deprecation policy any
+> time soon. Things like "--enable-kvm" / "-no-kvm" or maybe even "-net"
+> go into the same category.
 
-The dirty bitmap would be synced in kvm_region_del (so it's not true
-that kvm_region_del would disappear, but almost :)).
+Yes, "-net" definitely goes there.
 
-The rmap is more interesting.  Perhaps it can be just rebuilt on every
-KVM_SET_USER_MEMORY_REGIONS call.
+> If you agree, I can try to come up with a patch (should the list go into
+> qemu-doc.texi or a separate document in the the documentation folder?).
+
+I think it should go in docs/devel.
 
 Paolo
