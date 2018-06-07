@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQuW6-0003fq-HG
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:59:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fQuZ2-0005VK-0I
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 09:02:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQuW3-00070r-Dm
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:59:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60808 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fQuW3-00070X-8a
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:59:47 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180603050546.6827-1-zhangckid@gmail.com>
-	<20180603050546.6827-12-zhangckid@gmail.com>
-Date: Thu, 07 Jun 2018 14:59:45 +0200
-In-Reply-To: <20180603050546.6827-12-zhangckid@gmail.com> (Zhang Chen's
-	message of "Sun, 3 Jun 2018 13:05:40 +0800")
-Message-ID: <87efhiwy4e.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fQuZ1-0000eZ-2w
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 09:02:52 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:39121)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fQuZ0-0000e4-Sd
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 09:02:51 -0400
+Received: by mail-ot0-x243.google.com with SMTP id l15-v6so10382593oth.6
+	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 06:02:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH V8 11/17] qapi: Add new command to query
- colo status
+In-Reply-To: <20180606191801.6331-1-f4bug@amsat.org>
+References: <20180606191801.6331-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Jun 2018 14:02:29 +0100
+Message-ID: <CAFEAcA9mDByYZixijY8OwbgJQpsh5TztGcJhAyaNFxE_X6o7mA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] hw/i2c: Add trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,123 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Corey Minyard <cminyard@mvista.com>, Stefan Hajnoczi <stefanha@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Linus Walleij <linus.walleij@linaro.org>
 
-Zhang Chen <zhangckid@gmail.com> writes:
-
-> Libvirt or other high level software can use this command query colo status.
-> You can test this command like that:
-> {'execute':'query-colo-status'}
->
-> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+On 6 June 2018 at 20:18, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrot=
+e:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  migration/colo.c    | 39 +++++++++++++++++++++++++++++++++++++++
->  qapi/migration.json | 34 ++++++++++++++++++++++++++++++++++
->  2 files changed, 73 insertions(+)
+> $ qemu-system ... -d trace:i2c_recv,trace:i2c_send
 >
-> diff --git a/migration/colo.c b/migration/colo.c
-> index bedb677788..8c6b8e9a4e 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -29,6 +29,7 @@
->  #include "net/colo.h"
->  #include "block/block.h"
->  #include "qapi/qapi-events-migration.h"
-> +#include "qapi/qmp/qerror.h"
->  
->  static bool vmstate_loading;
->  static Notifier packets_compare_notifier;
-> @@ -237,6 +238,44 @@ void qmp_xen_colo_do_checkpoint(Error **errp)
->  #endif
->  }
->  
-> +COLOStatus *qmp_query_colo_status(Error **errp)
-> +{
-> +    int state;
-> +    COLOStatus *s = g_new0(COLOStatus, 1);
-> +
-> +    s->mode = get_colo_mode();
-> +
-> +    switch (s->mode) {
-> +    case COLO_MODE_UNKNOWN:
-> +        error_setg(errp, "COLO is disabled");
-> +        state = MIGRATION_STATUS_NONE;
-> +        break;
-> +    case COLO_MODE_PRIMARY:
-> +        state = migrate_get_current()->state;
-> +        break;
-> +    case COLO_MODE_SECONDARY:
-> +        state = migration_incoming_get_current()->state;
-> +        break;
-> +    default:
-> +        abort();
-> +    }
-> +
-> +    s->colo_running = state == MIGRATION_STATUS_COLO;
-> +
-> +    switch (failover_get_state()) {
-> +    case FAILOVER_STATUS_NONE:
-> +        s->reason = COLO_EXIT_REASON_NONE;
-> +        break;
-> +    case FAILOVER_STATUS_REQUIRE:
-> +        s->reason = COLO_EXIT_REASON_REQUEST;
-> +        break;
-> +    default:
-> +        s->reason = COLO_EXIT_REASON_ERROR;
-> +    }
-> +
-> +    return s;
-> +}
-> +
->  static void colo_send_message(QEMUFile *f, COLOMessage msg,
->                                Error **errp)
->  {
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index 93136ce5a0..356a370949 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -1231,6 +1231,40 @@
->  ##
->  { 'command': 'xen-colo-do-checkpoint' }
->  
-> +##
-> +# @COLOStatus:
-> +#
-> +# The result format for 'query-colo-status'.
-> +#
-> +# @mode: COLO running mode. If COLO is running, this field will return
-> +#        'primary' or 'secodary'.
-> +#
-> +# @colo-running: true if COLO is running.
-> +#
-> +# @reason: describes the reason for the COLO exit.
+> 4486@1528311614.709959:i2c_recv recv(addr:0x50) data:0x00
+> 4486@1528311614.709994:i2c_send send(addr:0x50) data:0x05
+> 4486@1528311614.710060:i2c_recv recv(addr:0x50) data:0x02
+> 4486@1528311614.710161:i2c_recv recv(addr:0x50) data:0x40
+> 4486@1528311614.710185:i2c_send send(addr:0x50) data:0x02
+> 4486@1528311614.710233:i2c_recv recv(addr:0x50) data:0x08
+> 4486@1528311614.710380:i2c_recv recv(addr:0x50) data:0x0d
+> 4486@1528311614.710396:i2c_send send(addr:0x50) data:0x1f
+> 4486@1528311614.710437:i2c_recv recv(addr:0x50) data:0x40
+>
+> or
+>
+> $ qemu-system ... -d trace:i2c\*
+>
+> 4486@1528311614.698315:i2c_event start(addr:0x50)
+> 4486@1528311614.698338:i2c_recv recv(addr:0x50) data:0x82
+> 4486@1528311614.698349:i2c_event finish(addr:0x50)
+> 4486@1528311614.698354:i2c_event start(addr:0x50)
+> 4486@1528311614.698357:i2c_send send(addr:0x50) data:0x11
+> 4486@1528311614.698377:i2c_event finish(addr:0x50)
+> 4486@1528311614.698380:i2c_event start(addr:0x50)
+> 4486@1528311614.698402:i2c_recv recv(addr:0x50) data:0x04
+> 4486@1528311614.698485:i2c_event finish(addr:0x50)
+>
+>  Makefile.objs       |  1 +
+>  hw/i2c/core.c       | 25 ++++++++++++++++++-------
+>  hw/i2c/trace-events |  7 +++++++
+>  3 files changed, 26 insertions(+), 7 deletions(-)
+>  create mode 100644 hw/i2c/trace-events
 
-What's the value of @reason before a "COLO exit"?
 
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'struct': 'COLOStatus',
-> +  'data': { 'mode': 'COLOMode', 'colo-running': 'bool', 'reason': 'COLOExitReason' } }
-> +
-> +##
-> +# @query-colo-status:
-> +#
-> +# Query COLO status while the vm is running.
-> +#
-> +# Returns: A @COLOStatus object showing the status.
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-colo-status" }
-> +# <- { "return": { "mode": "primary", "colo-running": true, "reason": "request" } }
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'command': 'query-colo-status',
-> +  'returns': 'COLOStatus' }
-> +
->  ##
->  # @migrate-recover:
->  #
+
+Applied to target-arm.next, thanks.
+
+-- PMM
