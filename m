@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fQzxw-0005Y6-Cx
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:48:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1fR058-0003ys-MA
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:56:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fQzxv-0001j6-Pc
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:48:56 -0400
-Received: from mail-pf0-x22d.google.com ([2607:f8b0:400e:c00::22d]:41821)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fQzxv-0001il-Jq
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:48:55 -0400
-Received: by mail-pf0-x22d.google.com with SMTP id a11-v6so5338095pff.8
-	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 11:48:55 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Jun 2018 11:48:44 -0700
-Message-Id: <20180607184844.30126-5-richard.henderson@linaro.org>
-In-Reply-To: <20180607184844.30126-1-richard.henderson@linaro.org>
-References: <20180607184844.30126-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 4/4] linux-user/sparc64: Add inotify_rm_watch
- and tee syscalls
+	(envelope-from <eblake@redhat.com>) id 1fR057-0005Qg-T1
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 14:56:22 -0400
+References: <1528385894-19434-1-git-send-email-ari@tuxera.com>
+	<1528385894-19434-3-git-send-email-ari@tuxera.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f8473628-6510-d4cd-c679-fb8354a8b831@redhat.com>
+Date: Thu, 7 Jun 2018 13:56:14 -0500
+MIME-Version: 1.0
+In-Reply-To: <1528385894-19434-3-git-send-email-ari@tuxera.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 02/10] block: Add blklogwrites
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: laurent@vivier.eu
+To: Ari Sundholm <ari@tuxera.com>, qemu-devel@nongnu.org
+Cc: Aapo Vienamo <aapo@tuxera.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- linux-user/sparc64/syscall_nr.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On 06/07/2018 10:38 AM, Ari Sundholm wrote:
+> From: Aapo Vienamo <aapo@tuxera.com>
+> 
+> Implements a block device write logging system, similar to Linux kernel
+> device mapper dm-log-writes. The write operations that are performed
+> on a block device are logged to a file or another block device. The
+> write log format is identical to the dm-log-writes format. Currently,
+> log markers are not supported.
+> 
+> This functionality can be used for crash consistency and fs consistency
+> testing. By implementing it in qemu, tests utilizing write logs can be
+> be used to test non-Linux drivers and older kernels.
+> 
+> The implementation is based on the blkverify and blkdebug block drivers.
+> 
+> Signed-off-by: Aapo Vienamo <aapo@tuxera.com>
+> Signed-off-by: Ari Sundholm <ari@tuxera.com>
+> ---
+>   MAINTAINERS          |   6 +
+>   block/Makefile.objs  |   1 +
+>   block/blklogwrites.c | 383 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>   qapi/block-core.json |  29 +++-
 
-diff --git a/linux-user/sparc64/syscall_nr.h b/linux-user/sparc64/syscall_nr.h
-index 9391645598..0b91b896da 100644
---- a/linux-user/sparc64/syscall_nr.h
-+++ b/linux-user/sparc64/syscall_nr.h
-@@ -154,7 +154,7 @@
- #define TARGET_NR_poll               153 /* Common                                      */
- #define TARGET_NR_getdents64		154 /* Linux specific				   */
- #define TARGET_NR_fcntl64            155 /* Linux sparc32 Specific                      */
--/* #define TARGET_NR_getdirentries   156    SunOS Specific                              */
-+#define TARGET_NR_inotify_rm_watch   156 /* Linux specific                              */
- #define TARGET_NR_statfs             157 /* Common                                      */
- #define TARGET_NR_fstatfs            158 /* Common                                      */
- #define TARGET_NR_umount             159 /* Common                                      */
-@@ -278,7 +278,7 @@
- #define TARGET_NR_mq_notify		277
- #define TARGET_NR_mq_getsetattr	278
- #define TARGET_NR_waitid		279
--/*#define TARGET_NR_sys_setaltroot	280 available (was setaltroot) */
-+#define TARGET_NR_tee                   280
- #define TARGET_NR_add_key		281
- #define TARGET_NR_request_key	282
- #define TARGET_NR_keyctl		283
+I commented on v2 before seeing v3; but the same issues are still 
+present in block-core.json (since our mails crossed).
+
 -- 
-2.17.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
