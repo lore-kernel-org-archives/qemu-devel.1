@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fQqi0-0005Aa-A7
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 04:55:53 -0400
+	(envelope-from <peterx@redhat.com>) id 1fQqig-0005em-FA
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 04:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fQqhz-0006nn-Jz
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 04:55:52 -0400
-Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:36421)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fQqhz-0006nY-F9
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 04:55:51 -0400
-Received: by mail-ot0-x229.google.com with SMTP id c15-v6so781942otl.3
-	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 01:55:51 -0700 (PDT)
+	(envelope-from <peterx@redhat.com>) id 1fQqif-0007DG-Qy
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 04:56:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33338 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fQqif-0007Cj-MB
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 04:56:33 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2C94DBB42D
+	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 08:56:33 +0000 (UTC)
+Date: Thu, 7 Jun 2018 16:56:28 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180607085628.GN750@xz-mi>
+References: <20180605122636.33654-1-dgilbert@redhat.com>
+	<20180605122636.33654-7-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180605200425.24323.56023.stgit@gimli.home>
-References: <20180605200425.24323.56023.stgit@gimli.home>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Jun 2018 09:55:30 +0100
-Message-ID: <CAFEAcA-T9FcK3HWoCrchUKk_hmtAsPiKWsso=4ptn9VBu42ysQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/6] VFIO updates 2018-06-05
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180605122636.33654-7-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 6/6] hmp: Allow HMP in preconfig state again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +33,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, imammedo@redhat.com
 
-On 5 June 2018 at 21:06, Alex Williamson <alex.williamson@redhat.com> wrote:
-> The following changes since commit 41feb5b955f0d7c9d071b2c5adbc404ae2895c7a:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.0-pull-request' into staging (2018-06-05 10:38:33 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/awilliam/qemu-vfio.git tags/vfio-update-20180605.0
->
-> for you to fetch changes up to 8151a9c56d31eeeea872b8103c8b86d03c411667:
->
->   vfio/pci: Default display option to "off" (2018-06-05 08:28:09 -0600)
->
-> ----------------------------------------------------------------
-> VFIO updates 2018-06-05
->
->  - Removed unused DPRINTF (Tiwei Bie)
->  - KVM & VFIO ioeventfd support for NVIDIA MSI ACK (Alex Williamson)
->  - Default vfio-pci display support to "off" (Alex Williamson)
->
+On Tue, Jun 05, 2018 at 01:26:36PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Now we can cope with preconfig in HMP, reenable by reverting
+> commit 71dc578e116599ea73c8a2a4e693134702ec0e83.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Applied, thanks.
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
--- PMM
+-- 
+Peter Xu
