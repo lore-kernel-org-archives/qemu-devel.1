@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fRCBU-0006vr-31
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:51:45 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fRCD3-0007tY-3b
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:53:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fRCBR-000516-0C
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:51:44 -0400
-Date: Fri, 8 Jun 2018 08:51:37 +0100
+	(envelope-from <stefanha@gmail.com>) id 1fRCD0-00068H-Nt
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:53:21 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35029)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fRCD0-00067g-F2
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:53:18 -0400
+Received: by mail-wr0-x244.google.com with SMTP id l10-v6so12362887wrn.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 00:53:18 -0700 (PDT)
+Date: Fri, 8 Jun 2018 08:53:15 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180608075137.GD29183@stefanha-x1.localdomain>
-References: <1487347224-8667-1-git-send-email-pl@kamp.de>
-	<20170220145011.GJ21255@stefanha-x1.localdomain>
-	<73412b92-353d-7109-cfbe-9c61bf91e7eb@kamp.de>
-	<a9939647-5c4e-9336-1121-eb821fe8eecc@virtuozzo.com>
-	<20180607101046.GC19032@stefanha-x1.localdomain>
-	<2ddb8b13-650a-5bd7-8c77-3f2eca34efdf@virtuozzo.com>
+Message-ID: <20180608075315.GE29183@stefanha-x1.localdomain>
+References: <CAJSP0QURm0Y6FBByzY=kgf7JmDDyt5PLkkxk+ODi21uQKUGq5A@mail.gmail.com>
+	<CAJSP0QWELqGP56Dm5qyS7zGe_xdPwB5t6CZXkqhdmX16RKM9nw@mail.gmail.com>
+	<CAG7hfcJxiPYou5dNaWcL8p9uQxHUX1Qa7PDaku_z80Qx-S=yGg@mail.gmail.com>
+	<CAJSP0QW4dDpifDJgyuLKo3Ar53OGwUMP16e++HnDe69NA3-Mmw@mail.gmail.com>
+	<CAG7hfcLvhTgz2497-wDD0e02U7hX4eeRPuzqwaL+ugxemPSkzg@mail.gmail.com>
+	<20180607103628.GE19032@stefanha-x1.localdomain>
+	<CAG7hfcLE7jJgsAmmOD0TQSN42kPg8ixJ_RQnpmZk-NNJ2MuZ_Q@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="PHCdUe6m4AxPMzOu"
+	protocol="application/pgp-signature"; boundary="+SfteS7bOf3dGlBC"
 Content-Disposition: inline
-In-Reply-To: <2ddb8b13-650a-5bd7-8c77-3f2eca34efdf@virtuozzo.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH V4] qemu-img: make convert
- async
+In-Reply-To: <CAG7hfcLE7jJgsAmmOD0TQSN42kPg8ixJ_RQnpmZk-NNJ2MuZ_Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] Cortex M0 emulation tasks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +35,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: Peter Lieven <pl@kamp.de>, kwolf@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Liviu Ionescu <ilg@livius.net>
+Cc: Julia Suvorova <jusual@mail.ru>, qemu-devel <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>, Jim Mussared <jim@groklearning.com>
 
 
---PHCdUe6m4AxPMzOu
+--+SfteS7bOf3dGlBC
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 07, 2018 at 01:19:29PM +0300, Vladimir Sementsov-Ogievskiy wrot=
-e:
-> 07.06.2018 13:10, Stefan Hajnoczi wrote:
-> > On Fri, Jun 01, 2018 at 07:16:14PM +0300, Vladimir Sementsov-Ogievskiy =
-wrote:
-> > > 20.02.2017 17:59, Peter Lieven wrote:
-> > > > Am 20.02.2017 um 15:50 schrieb Stefan Hajnoczi:
-> > > > > On Fri, Feb 17, 2017 at 05:00:24PM +0100, Peter Lieven wrote:
-> > > > > > this is something I have been thinking about for almost 2 years=
- now.
-> > > > > > we heavily have the following two use cases when using qemu-img
-> > > > > > convert.
-> > > > > >=20
-> > > > > >=20
-> > > [...]
-> > >=20
-> > > > > Does this patch work with compressed images?=A0 Especially the
-> > > > > out-of-order write mode may be problematic with a compressed qcow2
-> > > > > image.
-> > > > It does, but you are right, out-of-order writes and compression sho=
-uld
-> > > > be mutually exclusive.
-> > >=20
-> > > Sorry for being late, but can you please explain to me, why?
-> > There are image format-specific limitations on compressed writes.  For
-> > some reason I thought they were append-only in qcow2, but I was wrong.
-> >=20
-> > Stefan
+On Thu, Jun 07, 2018 at 06:46:26AM -0400, Liviu Ionescu wrote:
+> On 7 June 2018 at 13:36:30, Stefan Hajnoczi (stefanha@gmail.com) wrote:
 >=20
-> And what are limitations for compressed writes in qcow2?
+> > If you do want to upstream the code you linked, please let us know
+> > the
+> > details of how you want to do it and how long it might take. Maybe
+> > there is a way to work together on it...
+>=20
+> yes, I considered this, but I do not have a schedule yet, probably in Q4.
+>=20
+> I first=A0plan to upgrade from 2.8 and only later to re-evaluate the
+> entire project, to bring it closer to the upstream version.
+>=20
+>=20
+> the main change I envision is to untangle the Cortex-M code from the
+> current ARM code. maybe now the status is better, but when I did my
+> changes I had lots of problems.
 
-Writes must be cluster-aligned and the size must be 1 cluster (except
-for the last cluster in an image).
-
-qemu-img convert honors this, so it's not a problem.
-
-> We can't write asynchronously? Why?
-
-Async compressed writes are supported nowadays.
-
-I think my original comment was wrong.  It should be fine to use
-out-of-order compressed writes.
+Thanks for the info.  We'll CC you on Cortex M0 patches.
 
 Stefan
 
---PHCdUe6m4AxPMzOu
+--+SfteS7bOf3dGlBC
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJbGjWJAAoJEJykq7OBq3PIWZgIALncLtu+SvGG+seICTN9v0Id
-PAZvatH2bn0dIuLiOsZ75iXbPiiOT617icuL0jz5oYi8pNTB5k/KqGghmlQNYpQh
-tA5fvwGMyUBPn2yjY9bHniVi+ZB0xFLNg38oNi+XNifizl+g4h1WOR/qTcwGIkb1
-f+CtYU4P8sXfrzIARd/DsdaFYa13qgbqmtV6qiGTFaIhd9I+5fshAtFG4pQOMgm5
-L0akQEDA1uCQqMBIpgbUSblCNU9EsNWRh483+SH959YLe3gFQAF/rqYhfypbTQWS
-1b4bxJWSqHoVxwB9SrCT3sZXZPLXuLkvPuf/pMNeyoTjPV9nLf+hWxZ2ZX9lx6A=
-=pMHj
+iQEcBAEBAgAGBQJbGjXrAAoJEJykq7OBq3PIl7sH/3YdVDkkDuUYlOQdI1e+Pbn/
+gX8RxTB+9NmBgzFyaC0X56J0s1zXFpFBrnrM786CwKs9eTaQyl/+FHzEPjpZu5+3
+zMcm8ead1JILX1Y4ggzjicqki7YfzbWwYSEo8CMzQuH/bInJokUdrRP6w2woQviT
+eREA/dBzC3RIjhF6CwBK1BEqrif6rnvwzFrAeAcVrxaYZe3xxC5o3ZlfHTV57SLP
+uEVE9tJx/AJmdC9Xn6kPS0EjYLYFUHyjsNfXrNwzlKNiJ+aQk0ByyPeNv/zY0qf0
+TV5WJr23ojbpUd9ENC/bHXOZYTcpQakYnQN3Haqw21SyQ6sxqFdo6TccKInrX9Y=
+=2n/K
 -----END PGP SIGNATURE-----
 
---PHCdUe6m4AxPMzOu--
+--+SfteS7bOf3dGlBC--
