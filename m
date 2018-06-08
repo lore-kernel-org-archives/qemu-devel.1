@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44713)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRJOx-0005IP-5J
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:34:08 -0400
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1fRJOx-0005J2-Pu
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:34:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRJOw-0002Xx-3V
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1fRJOu-0002XS-Ml
 	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:34:07 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20180608123208.54033-1-vsementsov@virtuozzo.com>
-Message-ID: <de1884cb-00e0-8042-3eef-d81ac32d9c0e@virtuozzo.com>
-Date: Fri, 8 Jun 2018 18:33:54 +0300
+Received: from mga05.intel.com ([192.55.52.43]:24566)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ross.zwisler@linux.intel.com>)
+	id 1fRJOu-0002Wu-E5
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:34:04 -0400
+Date: Fri, 8 Jun 2018 09:34:02 -0600
+From: Ross Zwisler <ross.zwisler@linux.intel.com>
+Message-ID: <20180608153402.GA27156@linux.intel.com>
+References: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
+	<20180607223111.27792-2-ross.zwisler@linux.intel.com>
+	<20180608020724-mutt-send-email-mst@kernel.org>
+	<5352d2fb-9244-78b0-4f4b-2818359a4425@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180608123208.54033-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] block/qcow2: save dirty_bitmaps_loaded
- during reopen
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5352d2fb-9244-78b0-4f4b-2818359a4425@redhat.com>
+Subject: Re: [Qemu-devel] [qemu PATCH 2/5] acpi: "make check" should fail on
+ asl mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Ross Zwisler <ross.zwisler@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
-08.06.2018 15:32, Vladimir Sementsov-Ogievskiy wrote:
-> This variable was introduced to handle reopens. We need it on the
-> following qcow2_do_open, to don't try load bitmaps again.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   block/qcow2.c | 2 ++
->   1 file changed, 2 insertions(+)
->
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 549fee9b69..29f7eab576 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -2178,6 +2178,7 @@ static void coroutine_fn qcow2_co_invalidate_cache(=
-BlockDriverState *bs,
->       QDict *options;
->       Error *local_err =3D NULL;
->       int ret;
-> +    bool dirty_bitmaps_loaded =3D s->dirty_bitmaps_loaded;
->  =20
->       /*
->        * Backing files are read-only which makes all of their metadata im=
-mutable,
-> @@ -2190,6 +2191,7 @@ static void coroutine_fn qcow2_co_invalidate_cache(=
-BlockDriverState *bs,
->       qcow2_close(bs);
->  =20
->       memset(s, 0, sizeof(BDRVQcow2State));
-> +    s->dirty_bitmaps_loaded =3D dirty_bitmaps_loaded;
->       options =3D qdict_clone_shallow(bs->options);
->  =20
->       flags &=3D ~BDRV_O_INACTIVE;
+On Fri, Jun 08, 2018 at 07:17:51AM +0200, Thomas Huth wrote:
+> On 08.06.2018 01:09, Michael S. Tsirkin wrote:
+> > On Thu, Jun 07, 2018 at 04:31:08PM -0600, Ross Zwisler wrote:
+> >> Currently if "make check" detects a mismatch in the ASL generated during
+> >> testing, we print an error such as:
+> >>
+> >>   acpi-test: Warning! SSDT mismatch. Actual [asl:/tmp/asl-QZDWJZ.dsl,
+> >>   aml:/tmp/aml-T8JYJZ], Expected [asl:/tmp/asl-DTWVJZ.dsl,
+> >>   aml:tests/acpi-test-data/q35/SSDT.dimmpxm].
+> >>
+> >> but the testing still exits with good shell status.  This is wrong, and
+> >> makes bisecting such a failure difficult.
+> >>
+> >> Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+> > 
+> > Failing would also mean that any change must update the expected files
+> > at the same time.  And that in turn is problematic because expected
+> > files are binary and can't be merged.
+> > 
+> > In other words the way we devel ACPI right now means that bisect will
+> > periodically produce a diff, it's not an error.
+> 
+> But apparently the current way also allows that real bug go unnoticed
+> for a while, until somebody accidentially spots the warning in the
+> output of "make check". Wouldn't it be better to fail at CI time
+> already? If a merge of the file is required, you can still resolve that
+> manually (i.e. by rebasing one of the pull requests).
 
-Haha, this breaks 169 test.. Because, logic around dirty_bitmaps_loaded,=20
-which is fixed here, actually breaks it.
-
-context:
-
-static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- int flags, Error **errp)
-{
-
-[...]
-
- =C2=A0=C2=A0=C2=A0 if (s->dirty_bitmaps_loaded) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* It's some kind of reopen. Th=
-ere are no known cases where we=20
-need to
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * reload bitmaps in such =
-a situation, so it's safer to skip them.
-*
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Moreover, if we have so=
-me readonly bitmaps and we are=20
-reopening for
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * rw we should reopen bit=
-maps correspondingly.
-*/
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bdrv_has_readonly_bitmaps(b=
-s) &&
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !bdrv_i=
-s_read_only(bs) && !(bdrv_get_flags(bs) &=20
-BDRV_O_INACTIVE))
-{
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qcow2_r=
-eopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
-}
- =C2=A0=C2=A0=C2=A0 } else {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 header_updated =3D qcow2_load_d=
-irty_bitmaps(bs, &local_err);
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->dirty_bitmaps_loaded =3D tru=
-e;
- =C2=A0=C2=A0=C2=A0 }
-
-[...]
-
-- First time, we go into "else" block, but there no bitmaps yet, as=20
-target is opened before source closed. On second time, we go into "if"=20
-block, but there is nothing to reopen.
-
-I'll resend the patch, with additional fixing.
-
---=20
-Best regards,
-Vladimir
+I share this point of view.  The unit tests only add value if we keep them up
+to date and passing as we modify the source.  The ACPI tables in this case
+were broken in an innocuous way and just needed to be updated to match again,
+but it means that the tests for them are now basically turned off.  Someone
+else could come along and break the ACPI table in a real and harmful way, and
+nobody would notice because the and result would still just be an ACPI table
+mismatch that is non-fatal and ignored.
