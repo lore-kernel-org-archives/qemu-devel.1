@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60252)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRIkW-00063v-NH
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:52:21 -0400
+	id 1fRIlg-0006vG-Tc
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRIkR-00042G-Gk
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:52:20 -0400
-Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:42676)
+	id 1fRIlc-0004ob-3H
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:53:32 -0400
+Received: from mail-qk0-x234.google.com ([2607:f8b0:400d:c09::234]:33221)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRIkR-000426-Bd
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:52:15 -0400
-Received: by mail-qt0-x22c.google.com with SMTP id y31-v6so13662043qty.9
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 07:52:15 -0700 (PDT)
+	id 1fRIlb-0004oN-Ub
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:53:28 -0400
+Received: by mail-qk0-x234.google.com with SMTP id c131-v6so331839qkb.0
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 07:53:27 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180601162749.27406-1-marcandre.lureau@redhat.com>
-	<20180601162749.27406-2-marcandre.lureau@redhat.com>
+	<20180601162749.27406-4-marcandre.lureau@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <496cef6a-35a1-5ad7-fa43-771f877c5c13@amsat.org>
-Date: Fri, 8 Jun 2018 11:52:11 -0300
+Message-ID: <3df8dfad-94b0-d57a-89c1-acc698c1d48b@amsat.org>
+Date: Fri, 8 Jun 2018 11:53:23 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180601162749.27406-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20180601162749.27406-4-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC v2 01/12] chardev: avoid crash if no
- associated address
+Subject: Re: [Qemu-devel] [RFC v2 03/12] vhost-user: wrap some read/write
+ with retry handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,54 +40,52 @@ To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 On 06/01/2018 01:27 PM, Marc-André Lureau wrote:
-> A socket chardev may not have associated address (when adding client
-> fd manually for example). But on disconnect, updating socket filename
-> expects an address and may lead to this crash:
-> 
->   Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
->   0x0000555555d8c70c in SocketAddress_to_str (prefix=0x555556043062 "disconnected:", addr=0x0, is_listen=false, is_telnet=false) at /home/elmarco/src/qq/chardev/char-socket.c:388
->   388	    switch (addr->type) {
->   (gdb) bt
->   #0  0x0000555555d8c70c in SocketAddress_to_str (prefix=0x555556043062 "disconnected:", addr=0x0, is_listen=false, is_telnet=false) at /home/elmarco/src/qq/chardev/char-socket.c:388
->   #1  0x0000555555d8c8aa in update_disconnected_filename (s=0x555556b1ed00) at /home/elmarco/src/qq/chardev/char-socket.c:419
->   #2  0x0000555555d8c959 in tcp_chr_disconnect (chr=0x555556b1ed00) at /home/elmarco/src/qq/chardev/char-socket.c:438
->   #3  0x0000555555d8cba1 in tcp_chr_hup (channel=0x555556b75690, cond=G_IO_HUP, opaque=0x555556b1ed00) at /home/elmarco/src/qq/chardev/char-socket.c:482
->   #4  0x0000555555da596e in qio_channel_fd_source_dispatch (source=0x555556bb68b0, callback=0x555555d8cb58 <tcp_chr_hup>, user_data=0x555556b1ed00) at /home/elmarco/src/qq/io/channel-watch.c:84
-> 
 > Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  chardev/char-socket.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>  hw/virtio/vhost-user.c | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
 > 
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 159e69c3b1..f1b7907798 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -416,8 +416,11 @@ static void update_disconnected_filename(SocketChardev *s)
->      Chardev *chr = CHARDEV(s);
+> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> index ca554d4ff1..cc9298792d 100644
+> --- a/hw/virtio/vhost-user.c
+> +++ b/hw/virtio/vhost-user.c
+> @@ -869,7 +869,10 @@ static void slave_read(void *opaque)
+>      iov.iov_base = &hdr;
+>      iov.iov_len = VHOST_USER_HDR_SIZE;
 >  
->      g_free(chr->filename);
-> -    chr->filename = SocketAddress_to_str("disconnected:", s->addr,
-> -                                         s->is_listen, s->is_telnet);
-> +    chr->filename = NULL;
-> +    if (s->addr) {
-
-Isn't it more robust to add this check in SocketAddress_to_str()?
-
-    static char *SocketAddress_to_str(const char *prefix, SocketAddress
-*addr,
-                                      bool is_listen, bool is_telnet)
-    {
-        if (!addr) {
-            return NULL;
-        }
-        switch (addr->type) {
-            ...
-
-> +        chr->filename = SocketAddress_to_str("disconnected:", s->addr,
-> +                                             s->is_listen, s->is_telnet);
-> +    }
->  }
+> -    size = recvmsg(u->slave_fd, &msgh, 0);
+> +    do {
+> +        size = recvmsg(u->slave_fd, &msgh, 0);
+> +    } while (size < 0 && (errno == EINTR || errno == EAGAIN));
+> +
+>      if (size != VHOST_USER_HDR_SIZE) {
+>          error_report("Failed to read from slave.");
+>          goto err;
+> @@ -898,7 +901,10 @@ static void slave_read(void *opaque)
+>      }
 >  
->  /* NB may be called even if tcp_chr_connect has not been
+>      /* Read payload */
+> -    size = read(u->slave_fd, &payload, hdr.size);
+> +    do {
+> +        size = read(u->slave_fd, &payload, hdr.size);
+> +    } while (size < 0 && (errno == EINTR || errno == EAGAIN));
+> +
+>      if (size != hdr.size) {
+>          error_report("Failed to read payload from slave.");
+>          goto err;
+> @@ -941,7 +947,10 @@ static void slave_read(void *opaque)
+>          iovec[1].iov_base = &payload;
+>          iovec[1].iov_len = hdr.size;
+>  
+> -        size = writev(u->slave_fd, iovec, ARRAY_SIZE(iovec));
+> +        do {
+> +            size = writev(u->slave_fd, iovec, ARRAY_SIZE(iovec));
+> +        } while (size < 0 && (errno == EINTR || errno == EAGAIN));
+> +
+>          if (size != VHOST_USER_HDR_SIZE + hdr.size) {
+>              error_report("Failed to send msg reply to slave.");
+>              goto err;
 > 
