@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fRI1s-0002A7-He
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:06:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1fRIK1-0002bf-6r
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fRI1p-0003rh-T2
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:06:12 -0400
-Resent-Message-Id: <E1fRI1p-0003rh-T2@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21127)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fRI1p-0003rC-JB
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:06:09 -0400
-In-Reply-To: <20180608061316.4909-1-samuel.thibault@ens-lyon.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152843880340.450.18016408634074194980@d39dc562802a>
+	(envelope-from <eblake@redhat.com>) id 1fRIJx-0008Cp-2r
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:24:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41054 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fRIJw-0008C5-UO
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:24:53 -0400
+References: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
+	<20180607223111.27792-3-ross.zwisler@linux.intel.com>
+	<20180608021134-mutt-send-email-mst@kernel.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5b2dafa6-1206-bef3-10d7-eac9910baa85@redhat.com>
+Date: Fri, 8 Jun 2018 09:24:49 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 7 Jun 2018 23:20:04 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/5] slirp updates
+In-Reply-To: <20180608021134-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu PATCH 3/5] hw/i386: Update SSDT table used
+ by "make check"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: samuel.thibault@ens-lyon.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com, jan.kiszka@siemens.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, Ross Zwisler <ross.zwisler@linux.intel.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Cornelia Huck <cohuck@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjA4MDYxMzE2LjQ5MDktMS1zYW11ZWwudGhpYmF1bHRAZW5zLWx5b24u
-b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzVdIHNsaXJwIHVwZGF0ZXMKCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
-aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRz
-PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
-bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
-IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
-bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
-aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
-bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
-NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
-amVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA2MDgwNjEz
-MTYuNDkwOS0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcgLT4gcGF0Y2hldy8yMDE4MDYw
-ODA2MTMxNi40OTA5LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZwpTd2l0Y2hlZCB0byBh
-IG5ldyBicmFuY2ggJ3Rlc3QnCjAwYTA0MmRhYTYgc2xpcnA6IHJlZm9ybWF0IG1faW5jIHJvdXRp
-bmUKYjJiZDVlZTY1ZSBzbGlycDogY29ycmVjdCBzaXplIGNvbXB1dGF0aW9uIHdoaWxlIGNvbmNh
-dGVuYXRpbmcgbWJ1ZgpjOTc4NmQ2NWExIHNsaXJwOiBmaXggZG9tYWlubmFtZSB2ZXJzaW9uIGF2
-YWlsYWJpbGl0eQo0ZjM0ZWUwNjA5IHNsaXJwOiBBZGQgU2FtdWVsIFRoaWJhdWx0J3Mgc3RhZ2lu
-ZyB0cmVlIGZvciBzbGlycAo5MTU5NzYyNzAzIHNsaXJwOiBGaXggc3B1cmlvdXMgZXJyb3IgcmVw
-b3J0IHdoZW4gc2VuZGluZyBkaXJlY3RseQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcg
-UEFUQ0ggMS81OiBzbGlycDogRml4IHNwdXJpb3VzIGVycm9yIHJlcG9ydCB3aGVuIHNlbmRpbmcg
-ZGlyZWN0bHkuLi4KRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjU6
-IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM0MzoKK15JaW50IG47JAoKRVJST1I6IGNvZGUgaW5kZW50
-IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzQ6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM2MjoKK15J
-XklpbnQgbGVuID0gKHNiLT5zYl9kYXRhICsgc2ItPnNiX2RhdGFsZW4pIC0gc2ItPnNiX3JwdHI7
-JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDM6IEZJTEU6IHNs
-aXJwL3NvY2tldC5jOjM3ODoKK15JXklpZiAobiAhPSBsZW4pIHskCgpXQVJOSU5HOiBsaW5lIG92
-ZXIgODAgY2hhcmFjdGVycwojNDQ6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM3OToKKwkJCURFQlVH
-X0VSUk9SKChkZmQsICJEaWRuJ3Qgc2VuZCBhbGwgZGF0YSB1cmdlbnRseSBYWFhYWFxuIikpOwoK
-RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDQ6IEZJTEU6IHNsaXJw
-L3NvY2tldC5jOjM3OToKK15JXkleSURFQlVHX0VSUk9SKChkZmQsICJEaWRuJ3Qgc2VuZCBhbGwg
-ZGF0YSB1cmdlbnRseSBYWFhYWFxuIikpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
-ZXIgdXNlIHRhYnMKIzQ1OiBGSUxFOiBzbGlycC9zb2NrZXQuYzozODA6CiteSV5JfSQKCnRvdGFs
-OiA1IGVycm9ycywgMSB3YXJuaW5ncywgMzQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi81OiBzbGlycDogQWRkIFNh
-bXVlbCBUaGliYXVsdCdzIHN0YWdpbmcgdHJlZSBmb3Igc2xpcnAuLi4KQ2hlY2tpbmcgUEFUQ0gg
-My81OiBzbGlycDogZml4IGRvbWFpbm5hbWUgdmVyc2lvbiBhdmFpbGFiaWxpdHkuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNC81OiBzbGlycDogY29ycmVjdCBzaXplIGNvbXB1dGF0aW9uIHdoaWxlIGNvbmNh
-dGVuYXRpbmcgbWJ1Zi4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJz
-CiMyNTogRklMRTogc2xpcnAvbWJ1Zi5jOjE0MToKK15JXkltX2luYyhtLCBtLT5tX2xlbiArIG4t
-Pm1fbGVuKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0Mzog
-RklMRTogc2xpcnAvbWJ1Zi5jOjE2MToKK15JICBtLT5tX2V4dCA9IGdfcmVhbGxvYyhtLT5tX2V4
-dCwgc2l6ZSArIGRhdGFzaXplKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiM0OTogRklMRTogc2xpcnAvbWJ1Zi5jOjE2NjoKK15JICBkYXQgPSBnX21hbGxvYyhz
-aXplICsgZGF0YXNpemUpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
-YnMKIzgxOiBGSUxFOiBzbGlycC9tYnVmLmg6NzM6CiteSWludF5JbV9zaXplO15JXkleSS8qIFNp
-emUgb2YgbWJ1ZiwgZnJvbSBtX2RhdCBvciBtX2V4dCAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBz
-aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzg2OiBGSUxFOiBzbGlycC9tYnVmLmg6NzY6CiteSWNhZGRy
-X3ReSW1fZGF0YTteSV5JXkkvKiBDdXJyZW50IGxvY2F0aW9uIG9mIGRhdGEgKi8kCgpXQVJOSU5H
-OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODc6IEZJTEU6IHNsaXJwL21idWYuaDo3NzoKKwlp
-bnQJbV9sZW47CQkJLyogQW1vdW50IG9mIGRhdGEgaW4gdGhpcyBtYnVmLCBmcm9tIG1fZGF0YSAq
-LwoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojODc6IEZJTEU6IHNs
-aXJwL21idWYuaDo3NzoKK15JaW50XkltX2xlbjteSV5JXkkvKiBBbW91bnQgb2YgZGF0YSBpbiB0
-aGlzIG1idWYsIGZyb20gbV9kYXRhICovJAoKdG90YWw6IDYgZXJyb3JzLCAxIHdhcm5pbmdzLCA2
-MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpD
-aGVja2luZyBQQVRDSCA1LzU6IHNsaXJwOiByZWZvcm1hdCBtX2luYyByb3V0aW5lLi4uCj09PSBP
-VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 06/07/2018 06:14 PM, Michael S. Tsirkin wrote:
+> On Thu, Jun 07, 2018 at 04:31:09PM -0600, Ross Zwisler wrote:
+>> This commit:
+>>
+>> commit aa78a16d8645 ("hw/i386: Rename 2.13 machine types to 3.0")
+>>
+>> updated the name used to create the q35 machine, which in turn changed the
+>> SSDT table which is generated when we run "make check":
+>>
+>>    acpi-test: Warning! SSDT mismatch. Actual [asl:/tmp/asl-QZDWJZ.dsl,
+>>    aml:/tmp/aml-T8JYJZ], Expected [asl:/tmp/asl-DTWVJZ.dsl,
+>>    aml:tests/acpi-test-data/q35/SSDT.dimmpxm].
+>>
+>> Here's the only difference, aside from the checksum:
+>>
+>>    <     Name (MEMA, 0x07FFF000)
+>>    ---
+>>    >     Name (MEMA, 0x07FFE000)
+> 
+> Weird. How come the phys address changes just because of machine name?
+
+"2.13" is a different length than "3.0"; depending on whatever other 
+alignment coincidences or sharing of similar substrings are in place, 
+this obviously shuffled enough data that the one byte change then 
+reflects into an entire page boundary difference.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
