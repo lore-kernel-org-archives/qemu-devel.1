@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fRCD3-0007tY-3b
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:53:21 -0400
+	(envelope-from <david@redhat.com>) id 1fRCHm-0001TD-QC
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:58:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fRCD0-00068H-Nt
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:53:21 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35029)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fRCD0-00067g-F2
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:53:18 -0400
-Received: by mail-wr0-x244.google.com with SMTP id l10-v6so12362887wrn.2
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 00:53:18 -0700 (PDT)
-Date: Fri, 8 Jun 2018 08:53:15 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180608075315.GE29183@stefanha-x1.localdomain>
-References: <CAJSP0QURm0Y6FBByzY=kgf7JmDDyt5PLkkxk+ODi21uQKUGq5A@mail.gmail.com>
-	<CAJSP0QWELqGP56Dm5qyS7zGe_xdPwB5t6CZXkqhdmX16RKM9nw@mail.gmail.com>
-	<CAG7hfcJxiPYou5dNaWcL8p9uQxHUX1Qa7PDaku_z80Qx-S=yGg@mail.gmail.com>
-	<CAJSP0QW4dDpifDJgyuLKo3Ar53OGwUMP16e++HnDe69NA3-Mmw@mail.gmail.com>
-	<CAG7hfcLvhTgz2497-wDD0e02U7hX4eeRPuzqwaL+ugxemPSkzg@mail.gmail.com>
-	<20180607103628.GE19032@stefanha-x1.localdomain>
-	<CAG7hfcLE7jJgsAmmOD0TQSN42kPg8ixJ_RQnpmZk-NNJ2MuZ_Q@mail.gmail.com>
+	(envelope-from <david@redhat.com>) id 1fRCHj-0001QI-Nq
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:58:14 -0400
+References: <20180607165218.9558-1-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <df3c285e-8f7d-6e24-7d8e-2a2738556b1d@redhat.com>
+Date: Fri, 8 Jun 2018 09:58:07 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="+SfteS7bOf3dGlBC"
-Content-Disposition: inline
-In-Reply-To: <CAG7hfcLE7jJgsAmmOD0TQSN42kPg8ixJ_RQnpmZk-NNJ2MuZ_Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] Cortex M0 emulation tasks
+In-Reply-To: <20180607165218.9558-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 0/8] pc/spapr/s390x: machine hotplug
+ handler cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,49 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liviu Ionescu <ilg@livius.net>
-Cc: Julia Suvorova <jusual@mail.ru>, qemu-devel <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>, Jim Mussared <jim@groklearning.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Greg Kurz <groug@kaod.org>
 
+On 07.06.2018 18:52, David Hildenbrand wrote:
+> I'll be messing with machine hotplug handlers of pc/spapr/s390x in the
+> context of
+>     [PATCH v4 00/14] MemoryDevice: use multi stage hotplug handlers
+> 
+> So this is a spin-off of the cleanup patches produced so far.
+> 
+> David Hildenbrand (8):
+>   pc: local error handling in hotplug handler functions
+>   spapr: no need to verify the node
+>   spapr: move all DIMM checks into spapr_memory_plug
+>   spapr: local error handling in hotplug handler functions
+>   spapr: introduce machine unplug handler
+>   spapr: handle pc-dimm unplug via hotplug handler chain
+>   spapr: handle cpu core unplug via hotplug handler chain
+>   s390x: local error handling in hotplug handler functions
+> 
+>  hw/i386/pc.c               | 32 +++++++++-----
+>  hw/ppc/spapr.c             | 89 +++++++++++++++++++++++++-------------
+>  hw/s390x/s390-virtio-ccw.c | 11 +++--
+>  3 files changed, 89 insertions(+), 43 deletions(-)
+> 
 
---+SfteS7bOf3dGlBC
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I might be dropping the "local error handling" patches (as Conny and
+Christian properly asked for the reason). Although they are not wrong,
+they are only useful if performing checks on error pointers (*errp) or
+when relying on the error to indicate the "return value" of a function.
 
-On Thu, Jun 07, 2018 at 06:46:26AM -0400, Liviu Ionescu wrote:
-> On 7 June 2018 at 13:36:30, Stefan Hajnoczi (stefanha@gmail.com) wrote:
->=20
-> > If you do want to upstream the code you linked, please let us know
-> > the
-> > details of how you want to do it and how long it might take. Maybe
-> > there is a way to work together on it...
->=20
-> yes, I considered this, but I do not have a schedule yet, probably in Q4.
->=20
-> I first=A0plan to upgrade from 2.8 and only later to re-evaluate the
-> entire project, to bring it closer to the upstream version.
->=20
->=20
-> the main change I envision is to untangle the Cortex-M code from the
-> current ARM code. maybe now the status is better, but when I did my
-> changes I had lots of problems.
+And as I might be handling plugging of memory devices in subfunctions
+(to keep the handler short as requested by Igor), this might not be
+needed on this level.
 
-Thanks for the info.  We'll CC you on Cortex M0 patches.
+-- 
 
-Stefan
+Thanks,
 
---+SfteS7bOf3dGlBC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbGjXrAAoJEJykq7OBq3PIl7sH/3YdVDkkDuUYlOQdI1e+Pbn/
-gX8RxTB+9NmBgzFyaC0X56J0s1zXFpFBrnrM786CwKs9eTaQyl/+FHzEPjpZu5+3
-zMcm8ead1JILX1Y4ggzjicqki7YfzbWwYSEo8CMzQuH/bInJokUdrRP6w2woQviT
-eREA/dBzC3RIjhF6CwBK1BEqrif6rnvwzFrAeAcVrxaYZe3xxC5o3ZlfHTV57SLP
-uEVE9tJx/AJmdC9Xn6kPS0EjYLYFUHyjsNfXrNwzlKNiJ+aQk0ByyPeNv/zY0qf0
-TV5WJr23ojbpUd9ENC/bHXOZYTcpQakYnQN3Haqw21SyQ6sxqFdo6TccKInrX9Y=
-=2n/K
------END PGP SIGNATURE-----
-
---+SfteS7bOf3dGlBC--
+David / dhildenb
