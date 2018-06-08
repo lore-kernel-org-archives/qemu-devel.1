@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRMwA-0006fN-43
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fRMwA-0006fP-57
 	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:20:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRMw5-0004mD-6W
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fRMw5-0004mU-BI
 	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:20:38 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  8 Jun 2018 22:20:24 +0300
-Message-Id: <20180608192027.284601-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 0/3] qcow2 compress threads
+Date: Fri,  8 Jun 2018 22:20:27 +0300
+Message-Id: <20180608192027.284601-4-vsementsov@virtuozzo.com>
+In-Reply-To: <20180608192027.284601-1-vsementsov@virtuozzo.com>
+References: <20180608192027.284601-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH 3/3] qcow2: add compress threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,109 +22,123 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: mreitz@redhat.com, kwolf@redhat.com, stefanha@gmail.com, pl@kamp.de, vsementsov@virtuozzo.com, den@openvz.org
 
-Hi all!
+Do data compression in separate threads. This significantly improve
+performance for qemu-img convert with -W (allow async writes) and -c
+(compressed) options.
 
-Here are compress threads for qcow2, to increase performance of
-compressed writes.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/qcow2.h |  3 +++
+ block/qcow2.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 64 insertions(+), 1 deletion(-)
 
-I've created the following test:
-
-[]# cat ../gen.sh 
-#!/bin/bash
-
-echo 'create pattern-file t_pat'
-
-./qemu-img create -f raw t_pat 1000m
-./qemu-io -c 'write -P 0xab 0 1000m' t_pat
-
-echo 'create randod t_rand'
-
-dd if=/dev/urandom of=t_rand bs=1M count=1000
-
-[]# cat ../test.sh 
-#!/bin/bash
-
-rm -f t_out
-
-echo 'test pattern-file compression'
-
-time ./qemu-img convert -W -f raw -O qcow2 -c t_pat t_out
-
-rm -f t_out
-
-echo 'test random-file compression'
-
-time ./qemu-img convert -W -f raw -O qcow2 -c t_rand t_out
-
-rm -f t_out
-
-
-and results before the series (and without -W flag):
-
-test pattern-file compression
-
-real    0m16.658s
-user    0m16.450s
-sys     0m0.628s
-test random-file compression
-
-real    0m24.194s
-user    0m24.361s
-sys     0m0.395s
-
-results with -W flag, after first patch:
-
-test pattern-file compression
-
-real    0m16.242s
-user    0m16.895s
-sys     0m0.080s
-test random-file compression
-
-real    0m23.450s
-user    0m23.767s
-sys     0m1.085s
-
-results with -W flag, after third patch:
-
-test pattern-file compression
-
-real    0m5.747s
-user    0m22.637s
-sys     0m0.393s
-test random-file compression
-
-real    0m8.402s
-user    0m33.315s
-sys     0m0.926s
-
-So, we see significant performance gain. But this of course don't work
-without -W flag.
-
-results without -W flag, after third patch:
-
-test pattern-file compression
-
-real    0m16.908s
-user    0m16.775s
-sys     0m0.589s
-test random-file compression
-
-real    0m24.913s
-user    0m24.586s
-sys     0m0.898s
-
-Note: my cpu is 4-cores 8-threads i7-4790
-
-Vladimir Sementsov-Ogievskiy (3):
-  qemu-img: allow compressed not-in-order writes
-  qcow2: refactor data compression
-  qcow2: add compress threads
-
- block/qcow2.h |   3 ++
- block/qcow2.c | 134 ++++++++++++++++++++++++++++++++++++++++++++++------------
- qemu-img.c    |   5 ---
- 3 files changed, 110 insertions(+), 32 deletions(-)
-
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 01b5250415..0bd21623c2 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -326,6 +326,9 @@ typedef struct BDRVQcow2State {
+      * override) */
+     char *image_backing_file;
+     char *image_backing_format;
++
++    CoQueue compress_wait_queue;
++    int nb_compress_threads;
+ } BDRVQcow2State;
+ 
+ typedef struct Qcow2COWRegion {
+diff --git a/block/qcow2.c b/block/qcow2.c
+index d4dbe329ab..91465893e2 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -42,6 +42,7 @@
+ #include "qapi/qobject-input-visitor.h"
+ #include "qapi/qapi-visit-block-core.h"
+ #include "crypto.h"
++#include "block/thread-pool.h"
+ 
+ /*
+   Differences with QCOW:
+@@ -1544,6 +1545,9 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+         qcow2_check_refcounts(bs, &result, 0);
+     }
+ #endif
++
++    qemu_co_queue_init(&s->compress_wait_queue);
++
+     return ret;
+ 
+  fail:
+@@ -3715,6 +3719,62 @@ static ssize_t qcow2_compress(void *dest, const void *src, size_t size)
+     return ret;
+ }
+ 
++#define MAX_COMPRESS_THREADS 4
++
++typedef struct Qcow2CompressData {
++    void *dest;
++    const void *src;
++    size_t size;
++    ssize_t ret;
++} Qcow2CompressData;
++
++static int qcow2_compress_pool_func(void *opaque)
++{
++    Qcow2CompressData *data = opaque;
++
++    data->ret = qcow2_compress(data->dest, data->src, data->size);
++
++    return 0;
++}
++
++static void qcow2_compress_complete(void *opaque, int ret)
++{
++    qemu_coroutine_enter(opaque);
++}
++
++/* See qcow2_compress definition for parameters description */
++static ssize_t qcow2_co_compress(BlockDriverState *bs,
++                                 void *dest, const void *src, size_t size)
++{
++    BDRVQcow2State *s = bs->opaque;
++    BlockAIOCB *acb;
++    ThreadPool *pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
++    Qcow2CompressData arg = {
++        .dest = dest,
++        .src = src,
++        .size = size,
++    };
++
++    while (s->nb_compress_threads >= MAX_COMPRESS_THREADS) {
++        qemu_co_queue_wait(&s->compress_wait_queue, NULL);
++    }
++
++    s->nb_compress_threads++;
++    acb = thread_pool_submit_aio(pool, qcow2_compress_pool_func, &arg,
++                                 qcow2_compress_complete,
++                                 qemu_coroutine_self());
++
++    if (!acb) {
++        s->nb_compress_threads--;
++        return -EINVAL;
++    }
++    qemu_coroutine_yield();
++    s->nb_compress_threads--;
++    qemu_co_queue_next(&s->compress_wait_queue);
++
++    return arg.ret;
++}
++
+ /* XXX: put compressed sectors first, then all the cluster aligned
+    tables to avoid losing bytes in alignment */
+ static coroutine_fn int
+@@ -3758,7 +3818,7 @@ qcow2_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
+ 
+     out_buf = g_malloc(s->cluster_size);
+ 
+-    out_len = qcow2_compress(out_buf, buf, s->cluster_size);
++    out_len = qcow2_co_compress(bs, out_buf, buf, s->cluster_size);
+     if (out_len == -2) {
+         ret = -EINVAL;
+         goto fail;
 -- 
 2.11.1
