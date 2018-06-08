@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39622)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fRMy7-0008HF-VE
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:22:41 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fRMyc-0000Gc-Hl
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:23:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fRMy3-0005ZY-0L
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:22:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51950 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fRMyY-0005nv-Ow
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:23:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56276)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1fRMy2-0005Yy-RJ
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:22:34 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 76226402509A
-	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 19:22:34 +0000 (UTC)
-References: <20180608170231.27912-1-armbru@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <acdb161e-fb99-e92c-6651-3f7850eaf64a@redhat.com>
-Date: Fri, 8 Jun 2018 15:22:33 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fRMyY-0005nd-Gc
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:23:06 -0400
+Date: Fri, 8 Jun 2018 16:23:00 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180608192300.GN7451@localhost.localdomain>
+References: <1528295806-90593-1-git-send-email-babu.moger@amd.com>
+	<1528295806-90593-4-git-send-email-babu.moger@amd.com>
+	<20180606223956.GD7451@localhost.localdomain>
+	<DM5PR12MB24717A9DD61F79F58D3E70F7957B0@DM5PR12MB2471.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20180608170231.27912-1-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Purge uses of banned g_assert_FOO()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM5PR12MB24717A9DD61F79F58D3E70F7957B0@DM5PR12MB2471.namprd12.prod.outlook.com>
+Subject: Re: [Qemu-devel] [PATCH v12 3/4] i386: Enable TOPOEXT feature on
+ AMD EPYC CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,186 +30,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: "Moger, Babu" <Babu.Moger@amd.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Juan Quintela <quintela@redhat.com>, xiaoguangrong@tencent.com
+
+On Fri, Jun 08, 2018 at 06:40:16PM +0000, Moger, Babu wrote:
+> Hi Eduardo, 
+> Sorry for the late response. Got pulled into something else.
+> 
+> > -----Original Message-----
+> > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> > Sent: Wednesday, June 6, 2018 5:40 PM
+> > To: Moger, Babu <Babu.Moger@amd.com>
+> > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
+> > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> > kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com
+> > Subject: Re: [PATCH v12 3/4] i386: Enable TOPOEXT feature on AMD EPYC
+> > CPU
+> > 
+> > On Wed, Jun 06, 2018 at 10:36:45AM -0400, Babu Moger wrote:
+> > > Enable TOPOEXT feature on EPYC CPU. This is required to support
+> > > hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
+> > >
+> > > Disable TOPOEXT feature for legacy machines.
+> > >
+> > > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > 
+> > Now, I just noticed we have a problem here:
+> > 
+> > "-machine pc -cpu EPYC -smp 64" works today
+> > 
+> > This patch makes it stop working, but it shouldn't.
+> 
+> No. It works fine. I have tested it.
+
+This doesn't sound right.  The code in this series will error out
+of TOPOEXT is enabled and you have more than 64 VCPUs.
+
+But I just noticed we have a bug introduced by:
+
+commit f548222c24342ca74689de7794f9006b43f86a54
+Author: Xiao Guangrong <xiaoguangrong@tencent.com>
+Date:   Thu May 3 16:06:11 2018 +0800
+
+    migration: introduce decompress-error-check
+
+    QEMU 3.0 enables strict check for compression & decompression to
+    make the migration more robust, that depends on the source to fix
+    the internal design which triggers the unexpected error conditions
+
+    To make it work for migrating old version QEMU to 2.13 QEMU, we
+    introduce this parameter to disable the error check on the
+    destination which is the default behavior of the machine type
+    which is older than 2.13, alternately, the strict check can be
+    enabled explicitly as followings:
+          -M pc-q35-2.11 -global migration.decompress-error-check=true
+
+    Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+    Reviewed-by: Juan Quintela <quintela@redhat.com>
+    Signed-off-by: Juan Quintela <quintela@redhat.com>
+
+This commits added PC_COMPAT_2_12 to the 3.0 machine-types.
+Because of this bug, TOPOEXT is being unconditionally disabled on
+all machine-types, unless I apply the fix below:
 
 
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 3d81136065..b4c5b03274 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -430,7 +430,6 @@ static void pc_i440fx_3_0_machine_options(MachineClass *m)
+     pc_i440fx_machine_options(m);
+     m->alias = "pc";
+     m->is_default = 1;
+-    SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
+ }
+ 
+ DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index b60cbb9266..83d6d75efa 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -312,7 +312,6 @@ static void pc_q35_3_0_machine_options(MachineClass *m)
+ {
+     pc_q35_machine_options(m);
+     m->alias = "q35";
+-    SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
+ }
+ 
+ DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
 
-On 06/08/2018 01:02 PM, Markus Armbruster wrote:
-> We banned use of certain g_assert_FOO() functions outside tests, and
-> made checkpatch.pl flag them (commit 6e9389563e5).  We neglected to
-> purge existing uses.  Do that now.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> 
+> > 
+> > On the other hand, I believe you expect:
+> > * "-machine pc -cpu EPYC -smp 8" to automatically enable topoext.
+> Yes. Only on new machines-types
+> > * "-machine pc -cpu Opteron_G1 -smp 8" to not enable topoext.
+> Yes.
+> > * What about "-machine -cpu Opteron_G1 -smp 8,threads=2"?
+> No. This should not enable topoext.  Topoext is not supported by Opteron_G1.
+> This should warn about hyperthreading and continue.
 
-I've apparently got a real knack for using APIs that I ought not to.
+OK, makes sense to me.
 
-The commit message for 6e93... makes sense, though, so this does too.
+> > 
+> > 
+> > We also have other requirements, I will try to enumerate all of
+> > them below:
+> > 
+> > 0) "-topoext" explicitly configured (any machine-type):
+> > * Must never enable topoext.
+> Yes.
+> > 
+> > 1) "+topoext" explicitly configured (any machine-type):
+> > * Must validate topology and refuse to start if unsupported.
+> 
+> Yes.
+> 
+> > 
+> > 2) Older machine-types:
+> > * Must never enable topoext automatically, even if using "EPYC"
+> >   or "threads=2"
+> > 
+> Yes.
+> 
+> > 3) "EPYC" CPU model (on new machine-types):
+> > * Should enable topoext automatically, but only if topology is
+> >   supported.
+> > * Must not error out if topology is not supported.
+> In new machine types we will enable topoext for "EPYC" CPU model.
+> Right now(old machine type) we can disable for all the CPU models. 
+> So, we don't need two bits(topoext and auto-topoext)
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Right, so you agree that in this case we must _not_ error out if
+topology is unsupported, correct?  Otherwise we will break this
+existing use case:
+  "-machine pc -cpu EPYC -smp 64".
 
+> 
+> I thought we should error out if topology cannot be supported. But we can warn(disable topoext) and continue that is another option.
+> 
+> > * Should this enable topoext automatically even if threads=1?
+> 
+> Yes. We should enable even with threads=1.
+> 
+> > 
+> > 4) Other AMD CPU models with "threads=2" (on new machine-types):
+> > * We might want to make this enable topoext automatically, too.
+> >   What do you think?
+> 
+>   No. We should not enable topoext here. We should depend on CPU model table here.
+> 
+> > 
+> > Is the above description accurate?  Do you agree with these
+> > requirements?
+> 
+> With these requirements in mind, I will send that patches. We can start our discussion.
+> We don't need one more bits. That is my opinion. 
 
-> ---
->  hw/ide/ahci.c                 |  2 +-
->  hw/ppc/spapr_ovec.c           | 12 ++++++------
->  hw/usb/dev-smartcard-reader.c |  2 +-
->  qom/object.c                  | 10 +++++-----
->  util/qht.c                    |  2 +-
->  5 files changed, 14 insertions(+), 14 deletions(-)
->=20
-> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-> index 24dbad5125..75cccbea47 100644
-> --- a/hw/ide/ahci.c
-> +++ b/hw/ide/ahci.c
-> @@ -387,7 +387,7 @@ static uint64_t ahci_mem_read(void *opaque, hwaddr =
-addr, unsigned size)
->      if (ofst + size <=3D 4) {
->          val =3D lo >> (ofst * 8);
->      } else {
-> -        g_assert_cmpint(size, >, 1);
-> +        g_assert(size > 1);
-> =20
->          /* If the 64bit read is unaligned, we will produce undefined
->           * results. AHCI does not support unaligned 64bit reads. */
-> diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
-> index 41df4c35ba..318bf33de4 100644
-> --- a/hw/ppc/spapr_ovec.c
-> +++ b/hw/ppc/spapr_ovec.c
-> @@ -113,7 +113,7 @@ void spapr_ovec_cleanup(sPAPROptionVector *ov)
->  void spapr_ovec_set(sPAPROptionVector *ov, long bitnr)
->  {
->      g_assert(ov);
-> -    g_assert_cmpint(bitnr, <, OV_MAXBITS);
-> +    g_assert(bitnr < OV_MAXBITS);
-> =20
->      set_bit(bitnr, ov->bitmap);
->  }
-> @@ -121,7 +121,7 @@ void spapr_ovec_set(sPAPROptionVector *ov, long bit=
-nr)
->  void spapr_ovec_clear(sPAPROptionVector *ov, long bitnr)
->  {
->      g_assert(ov);
-> -    g_assert_cmpint(bitnr, <, OV_MAXBITS);
-> +    g_assert(bitnr < OV_MAXBITS);
-> =20
->      clear_bit(bitnr, ov->bitmap);
->  }
-> @@ -129,7 +129,7 @@ void spapr_ovec_clear(sPAPROptionVector *ov, long b=
-itnr)
->  bool spapr_ovec_test(sPAPROptionVector *ov, long bitnr)
->  {
->      g_assert(ov);
-> -    g_assert_cmpint(bitnr, <, OV_MAXBITS);
-> +    g_assert(bitnr < OV_MAXBITS);
-> =20
->      return test_bit(bitnr, ov->bitmap) ? true : false;
->  }
-> @@ -186,7 +186,7 @@ sPAPROptionVector *spapr_ovec_parse_vector(target_u=
-long table_addr, int vector)
->      int i;
-> =20
->      g_assert(table_addr);
-> -    g_assert_cmpint(vector, >=3D, 1); /* vector numbering starts at 1 =
-*/
-> +    g_assert(vector >=3D 1);      /* vector numbering starts at 1 */
-> =20
->      addr =3D vector_addr(table_addr, vector);
->      if (!addr) {
-> @@ -195,7 +195,7 @@ sPAPROptionVector *spapr_ovec_parse_vector(target_u=
-long table_addr, int vector)
->      }
-> =20
->      vector_len =3D ldub_phys(&address_space_memory, addr++) + 1;
-> -    g_assert_cmpint(vector_len, <=3D, OV_MAXBYTES);
-> +    g_assert(vector_len <=3D OV_MAXBYTES);
->      ov =3D spapr_ovec_new();
-> =20
->      for (i =3D 0; i < vector_len; i++) {
-> @@ -225,7 +225,7 @@ int spapr_ovec_populate_dt(void *fdt, int fdt_offse=
-t,
->       * encoding/sizing expected in ibm,client-architecture-support
->       */
->      vec_len =3D (lastbit =3D=3D OV_MAXBITS) ? 1 : lastbit / BITS_PER_B=
-YTE + 1;
-> -    g_assert_cmpint(vec_len, <=3D, OV_MAXBYTES);
-> +    g_assert(vec_len <=3D OV_MAXBYTES);
->      /* guest expects vector len encoded as vec_len - 1, since the leng=
-th byte
->       * is assumed and not included, and the first byte of the vector
->       * is assumed as well
-> diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reade=
-r.c
-> index 2131e33d27..13d0befd9c 100644
-> --- a/hw/usb/dev-smartcard-reader.c
-> +++ b/hw/usb/dev-smartcard-reader.c
-> @@ -786,7 +786,7 @@ static void ccid_write_data_block(USBCCIDState *s, =
-uint8_t slot, uint8_t seq,
->          DPRINTF(s, D_VERBOSE, "error %d\n", p->b.bError);
->      }
->      if (len) {
-> -        g_assert_nonnull(data);
-> +        assert(data);
->          memcpy(p->abData, data, len);
->      }
->      ccid_reset_error_status(s);
-> diff --git a/qom/object.c b/qom/object.c
-> index cb7a8cd589..794bd9a3f5 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -295,7 +295,7 @@ static void type_initialize(TypeImpl *ti)
->          GSList *e;
->          int i;
-> =20
-> -        g_assert_cmpint(parent->class_size, <=3D, ti->class_size);
-> +        g_assert(parent->class_size <=3D ti->class_size);
->          memcpy(ti->class, parent->class, parent->class_size);
->          ti->class->interfaces =3D NULL;
->          ti->class->properties =3D g_hash_table_new_full(
-> @@ -372,9 +372,9 @@ static void object_initialize_with_type(void *data,=
- size_t size, TypeImpl *type)
->      g_assert(type !=3D NULL);
->      type_initialize(type);
-> =20
-> -    g_assert_cmpint(type->instance_size, >=3D, sizeof(Object));
-> +    g_assert(type->instance_size >=3D sizeof(Object));
->      g_assert(type->abstract =3D=3D false);
-> -    g_assert_cmpint(size, >=3D, type->instance_size);
-> +    g_assert(size >=3D type->instance_size);
-> =20
->      memset(obj, 0, type->instance_size);
->      obj->class =3D type->class;
-> @@ -475,7 +475,7 @@ static void object_finalize(void *data)
->      object_property_del_all(obj);
->      object_deinit(obj, ti);
-> =20
-> -    g_assert_cmpint(obj->ref, =3D=3D, 0);
-> +    g_assert(obj->ref =3D=3D 0);
->      if (obj->free) {
->          obj->free(obj);
->      }
-> @@ -917,7 +917,7 @@ void object_unref(Object *obj)
->      if (!obj) {
->          return;
->      }
-> -    g_assert_cmpint(obj->ref, >, 0);
-> +    g_assert(obj->ref > 0);
-> =20
->      /* parent always holds a reference to its children */
->      if (atomic_fetch_dec(&obj->ref) =3D=3D 1) {
-> diff --git a/util/qht.c b/util/qht.c
-> index ff4d2e6974..55b0738cd1 100644
-> --- a/util/qht.c
-> +++ b/util/qht.c
-> @@ -759,7 +759,7 @@ static void qht_do_resize_reset(struct qht *ht, str=
-uct qht_map *new, bool reset)
->          return;
->      }
-> =20
-> -    g_assert_cmpuint(new->n_buckets, !=3D, old->n_buckets);
-> +    g_assert(new->n_buckets !=3D old->n_buckets);
->      qht_map_iter__all_locked(ht, old, qht_map_copy, new);
->      qht_map_debug__all_locked(new);
-> =20
->=20
+Thanks for confirming the requirements above.
 
---=20
-=E2=80=94js
+But it doesn't seem to be possible represent these requirements
+with just one bit.  Otherwise you can't differentiate explicit
+"+topoext" (1 above) from topoext being implicitly enabled by
+"-cpu EPYC" (3 above).
+
+Another problem is query-cpu-model-expansion QMP command: this
+patch makes "topoext" appear on the output of
+"query-cpu-model-expansion model=EPYC", meaning that management
+software will assume everybody using the "EPYC" CPU model will
+require +topoext.  A separate "auto-topoext" property would avoid
+this issue.
+
+(Yeah, this is tricky.  I want to eventually encode these subtle
+rules in automated test cases, so these issues could be detected
+by software instead of code inspection.)
+
+-- 
+Eduardo
