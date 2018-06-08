@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRIzI-0006kd-Rw
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:07:37 -0400
+	(envelope-from <berrange@redhat.com>) id 1fRIzc-00071r-5z
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:07:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRIzH-0005DZ-Fu
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:07:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52518 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fRIzY-0005Q6-AM
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:07:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42792 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fRIzH-0005DG-BJ
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:07:35 -0400
-Date: Fri, 8 Jun 2018 16:07:29 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fRIzY-0005Px-4j
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:07:52 -0400
+Date: Fri, 8 Jun 2018 16:07:46 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180608150729.GW18233@redhat.com>
+Message-ID: <20180608150746.GX18233@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20180608143026.20167-1-ehabkost@redhat.com>
+	<20180608143747.GR18233@redhat.com>
+	<20180608145559.GI7451@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180608143026.20167-1-ehabkost@redhat.com>
+In-Reply-To: <20180608145559.GI7451@localhost.localdomain>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] configure: Require Python 2.7 or newer
 List-Id: <qemu-devel.nongnu.org>
@@ -31,26 +33,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>
 
-On Fri, Jun 08, 2018 at 11:30:26AM -0300, Eduardo Habkost wrote:
-> All of the supported build platforms documented in qemu-doc.texi
-> should already support Python 2.7.
+On Fri, Jun 08, 2018 at 11:55:59AM -0300, Eduardo Habkost wrote:
+> On Fri, Jun 08, 2018 at 03:37:47PM +0100, Daniel P. Berrang=C3=A9 wrote=
+:
+> > On Fri, Jun 08, 2018 at 11:30:26AM -0300, Eduardo Habkost wrote:
+> > > All of the supported build platforms documented in qemu-doc.texi
+> > > should already support Python 2.7.
+> > >=20
+> > > Removing support for Python 2.6 will allow us to remove some
+> > > compatibility modules we carry in the QEMU tree:
+> > >=20
+> > > * scripts/argparse.py
+> > > * scripts/ordereddict.py
+> >=20
+> > Lets delete those in this patch then....
 >=20
-> Removing support for Python 2.6 will allow us to remove some
-> compatibility modules we carry in the QEMU tree:
->=20
-> * scripts/argparse.py
-> * scripts/ordereddict.py
->=20
-> Python 2.6 is also not receiving bug fixes upstream and is not
-> supported by pylint, which makes it harder to keep the code
-> compatible with both Python 2 and Python 3.
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  configure | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> I will do it, but I prefer to do this in a separate patch.
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Ok that's fine
 
 
 Regards,
