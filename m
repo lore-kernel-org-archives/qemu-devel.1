@@ -1,51 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fROBr-0001Eo-4Y
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 16:40:56 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fROCD-0001QH-Ht
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 16:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fROBm-0002ae-8u
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 16:40:55 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33792)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fROBl-0002Zz-UF
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 16:40:50 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w58KXuCp091524
-	for <qemu-devel@nongnu.org>; Fri, 8 Jun 2018 16:40:48 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jfvyahcd9-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 16:40:47 -0400
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Fri, 8 Jun 2018 21:40:45 +0100
-References: <20180509154822.23510-1-cohuck@redhat.com>
-	<20180509154822.23510-3-cohuck@redhat.com>
-	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
-	<20180515181006.0cb1dfc2.cohuck@redhat.com>
-	<a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
-	<20180522145208.310143ea.cohuck@redhat.com>
-	<4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
-	<20180605151449.22aafbfc.cohuck@redhat.com>
-	<e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
-	<20180606142131.74ea2eb7.cohuck@redhat.com>
-	<5b77ec9c-41b8-2e32-ce79-d9005b93fdd0@linux.ibm.com>
-	<20180607115442.6a779ed9.cohuck@redhat.com>
-	<10c8a0ac-fe61-d7c7-c7bb-0fffc6909cb3@linux.ibm.com>
-	<20180607183407.1ea5ab89.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.ibm.com>
-Date: Fri, 8 Jun 2018 22:40:39 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fROC7-0002gc-S9
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 16:41:17 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <1515506513-31961-1-git-send-email-peter.maydell@linaro.org>
+	<1515506513-31961-5-git-send-email-peter.maydell@linaro.org>
+	<92c12802-3cd5-48ef-ac9e-555946cb1d5c@amsat.org>
+Message-ID: <594da42f-4108-76f1-2c85-242a0e021829@amsat.org>
+Date: Fri, 8 Jun 2018 17:41:06 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180607183407.1ea5ab89.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <92c12802-3cd5-48ef-ac9e-555946cb1d5c@amsat.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <0c1e1b26-0c6a-fdc2-0c1a-2e2d58c2cb73@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH RFC 2/2] vfio-ccw: support for
- halt/clear subchannel
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] hw/sd/omap_mmc: Reset SD card on
+ controller reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -54,109 +30,399 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Dong Jia Shi <bjsdjshi@linux.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-
-
-On 06/07/2018 06:34 PM, Cornelia Huck wrote:
-> On Thu, 7 Jun 2018 18:17:57 +0200
-> Halil Pasic <pasic@linux.ibm.com> wrote:
-> 
->> On 06/07/2018 11:54 AM, Cornelia Huck wrote:
->>> Hm, I think we need to be more precise as to what scsw we're talking
->>> about. Bad ascii art time:
->>>
->>> --------------
->>> |   scsw(g)  |  ssch
->>> --------------   |
->>>                    |                                       guest
-[..]
-
->> (5) AFAIK this is how the current implementation works. We don't wait
->> for the I/O interrupt on the host to present a cc to the guest for it's
->> ssch.
-> 
-> But the vfio code does wait, no? We just signal the interrupt via
-> eventfd as well.
-> 
-
-We have sorted this out in the other thread.
-
+On 06/08/2018 12:44 AM, Philippe Mathieu-Daudé wrote:
+> On 01/09/2018 11:01 AM, Peter Maydell wrote:
+>> Since omap_mmc is still using the legacy SD card API, the SD
+>> card created by sd_init() is not plugged into any bus. This
+>> means that the controller has to reset it manually.
 >>
->>>
->>> If the guest now does a hsch, it would trap in the same way as the ssch
->>> before. When qemu gets control, it adds the halt bit in scsw(q) (which
->>> is in accordance with the architecture).
+>> Failing to do this mostly didn't affect the guest since the
+>> guest typically does a programmed SD card reset as part of
+>> its SD controller driver initialization, but would mean that
+>> migration fails because it's only in sd_reset() that we
+>> set up the wpgrps_size field.
 >>
->> (7) Again it's when is fctl set according to the architecture...
-> 
-> Same comment as above. If we do a hsch for a subchannel with the start
-> function set, we'll set cc 0.
-> 
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> This one isn't cc-stable because the OMAP boards don't
+>> support migration at all anyway, being un-QOMified.
+>> ---
+>>  hw/sd/omap_mmc.c | 14 ++++++++++----
+>>  1 file changed, 10 insertions(+), 4 deletions(-)
 >>
->>> My proposal is to do the same
->>> copying to scsw(r) again, which would mean we get a request with both
->>> the halt and the start bit set.
->>
->> (8) IMHO when receiving the 'request' we are and should be in instruction
->> context -- opposed to basic io function context. So we should not set fctl
->> before we know what will our guest cc be. But since scsw(r) is not a real
->> scsw it is just strange.
+>> diff --git a/hw/sd/omap_mmc.c b/hw/sd/omap_mmc.c
+>> index e934cd3..5b47cad 100644
+>> --- a/hw/sd/omap_mmc.c
+>> +++ b/hw/sd/omap_mmc.c
+>> @@ -305,6 +305,12 @@ void omap_mmc_reset(struct omap_mmc_s *host)
+>>      host->cdet_enable = 0;
+>>      qemu_set_irq(host->coverswitch, host->cdet_state);
+>>      host->clkdiv = 0;
+>> +
+>> +    /* Since we're still using the legacy SD API the card is not plugged
+>> +     * into any bus, and we must reset it manually. When omap_mmc is
+>> +     * QOMified this must move into the QOM reset function.
+>> +     */
+>> +    device_reset(DEVICE(host->card));
+>>  }
+>>  
+>>  static uint64_t omap_mmc_read(void *opaque, hwaddr offset,
+>> @@ -587,8 +593,6 @@ struct omap_mmc_s *omap_mmc_init(hwaddr base,
+>>      s->lines = 1;	/* TODO: needs to be settable per-board */
+>>      s->rev = 1;
+>>  
+>> -    omap_mmc_reset(s);
+>> -
+>>      memory_region_init_io(&s->iomem, NULL, &omap_mmc_ops, s, "omap.mmc", 0x800);
+>>      memory_region_add_subregion(sysmem, base, &s->iomem);
+>>  
+>> @@ -598,6 +602,8 @@ struct omap_mmc_s *omap_mmc_init(hwaddr base,
+>>          exit(1);
+>>      }
+>>  
+>> +    omap_mmc_reset(s);
+>> +
+>>      return s;
+>>  }
+>>  
+>> @@ -613,8 +619,6 @@ struct omap_mmc_s *omap2_mmc_init(struct omap_target_agent_s *ta,
+>>      s->lines = 4;
+>>      s->rev = 2;
+>>  
+>> -    omap_mmc_reset(s);
+>> -
+>>      memory_region_init_io(&s->iomem, NULL, &omap_mmc_ops, s, "omap.mmc",
+>>                            omap_l4_region_size(ta, 0));
+>>      omap_l4_attach(ta, 0, &s->iomem);
+>> @@ -628,6 +632,8 @@ struct omap_mmc_s *omap2_mmc_init(struct omap_target_agent_s *ta,
+>>      s->cdet = qemu_allocate_irq(omap_mmc_cover_cb, s, 0);
+>>      sd_set_cb(s->card, NULL, s->cdet);
+>>  
+>> +    omap_mmc_reset(s);
+>> +
+>>      return s;
+>>  }
 > 
-> I think what we are doing is really 'performing the start function' -
-> it's just not asynchronous in the current implementation. 
+> This patch broke something in the Nokia N810 tablet.
 
-The code is written as if, especially in QEMU. But this was in my current
-understanding a bad decision. The why is the following. It makes reasoning
-both about architectural correctness and the code a lot trickier compared
-to the interpretation of the guest instruction finishes after the host
-instruction finishes (unless we can prove we don't need any) approach.
+Correction, this patch is correct :)
 
+It triggered a latent bug in omap_mmc_write(MMC_CON).
 
-> So we already know that ssch will return with cc 0.
-> 
-
-I will use your example, and another example to explain what I mean
-by tricky.
-
-One can probably argue that setting cc 0 even if the host device
-responds to the host ssch with cc 3 because the device is not any more
-on the given subchannel or simply just disabled. It is probably true
-that the guest would not have any means to prove that we were 'lying'
-to it.
-
-But AFAIR this is not how the current implementation works. The pwrite
-in qemu basically depends on the cc of the host ssch. So if the host
-ssch completes with cc 3 the vfio-ccw kernel module map ist to pwrite
-reporting -ENODEV and vfio_ccw_handle_request makes sure that the
-guest instruction completes with cc 3 by mapping it to return code
-IOINST_CC_NOT_OPERATIONAL.
-
-I mentioned xsch in the other thread. I don't think we can tell if
-cc 0 or cc 2. In my reading xsch in simple words xsch completes with
-cc 2 and does nothing else if the channel subsystem already started talking
-to the cu/device. If in time it makes sure we don't start talking to the
-device, and clear away stuff. So if we don't consider cc of the xsch
-to be issued by the host the only safe bet seems to be cc 2. But that's
-effectively getting around implementing the desired functionality of
-xsch and still staying architecturally correct. Which however might
-be good enough for vfio-ccw. But I think I demonstrated it's kinda
-tricky business.
-
-I prefer to avoid tricky if there is no good reason not to.
-
-[..]
+I'll submit a fix.
 
 > 
-> Thanks for reading!
+> I used your image:
 > 
-
-Your welcome. The discussion is kind of taking place all over the
-place. I'm actively trying to find the best place to answer, and avoid
-overtalking topics -- but it does not seem to work. Please bear with me.
-
-Regards,
-Halil
-  
-[..]
+> http://people.linaro.org/~peter.maydell/n8x0-images.tgz
+> 
+>     ecd219f7abbc17b9d9170206410355bba287831f is the first bad commit
+>     commit ecd219f7abbc17b9d9170206410355bba287831f
+>     Author: Peter Maydell <peter.maydell@linaro.org>
+>     Date:   Tue Jan 16 13:28:13 2018 +0000
+> 
+>         hw/sd/omap_mmc: Reset SD card on controller reset
+> 
+>         Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>         Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>         Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> Using: -append "console=ttyS1"
+> 
+> Before:
+> 
+> [    1.239471] mmci-omap mmci-omap.0: command timeout (CMD52)
+> [    1.240356] mmci-omap mmci-omap.0: command timeout (CMD52)
+> [    1.253967] mmci-omap mmci-omap.0: command timeout (CMD5)
+> [    1.254364] mmci-omap mmci-omap.0: command timeout (CMD5)
+> [    1.254730] mmci-omap mmci-omap.0: command timeout (CMD5)
+> [    1.255096] mmci-omap mmci-omap.0: command timeout (CMD5)
+> omap_dma4_write: Read-only register 0x000034
+> omap_dma4_write: Read-only register 0x000038
+> omap_dma4_write: Read-only register 0x00003c
+> omap_dma4_write: Read-only register 0x000040
+> omap_dma4_write: Read-only register 0x000038
+> [    1.263275] mmc0: host does not support reading read-only switch.
+> assuming write-enable.
+> [    1.264038] mmc0: new SDHC card at address 4567
+> omap_uart_read: Bad register 0x000034
+> omap_uart_write: Bad register 0x000034
+> omap_uart_read: Bad register 0x000034
+> omap_uart_write: Bad register 0x000034
+> [    1.327514] Waiting for root device /dev/mmcblk0p1...
+> [    1.329925] mmcblk0: mmc0:4567 QEMU! 1.81 GiB
+> [    1.333831]  mmcblk0:omap_dma4_write: Read-only register 0x000038
+>  p1 p2
+> [    1.425537] mmci-omap mmci-omap.0: command timeout (CMD52)
+> [    1.426727] mmci-omap mmci-omap.0: command timeout (CMD52)
+> omap_dma4_write: Read-only register 0x000038
+> [    1.478668] mmci-omap mmci-omap.0: command timeout (CMD8)
+> omap_dma4_write: Read-only register 0x000038
+> omap_dma4_write: Read-only register 0x000038
+> [    1.484436] mmci-omap mmci-omap.0: command timeout (CMD5)
+> [    1.485015] mmci-omap mmci-omap.0: command timeout (CMD5)
+> [    1.485595] mmci-omap mmci-omap.0: command timeout (CMD5)
+> [    1.486022] mmci-omap mmci-omap.0: command timeout (CMD5)
+> [    1.486480] mmci-omap mmci-omap.0: command timeout (CMD55)
+> [    1.487030] mmci-omap mmci-omap.0: command timeout (CMD55)
+> omap_dma4_write: Read-only register 0x000038
+> [    1.490600] EXT3-fs (mmcblk0p1): recovery required on readonly filesystem
+> [    1.491149] EXT3-fs (mmcblk0p1): write access will be enabled during
+> recovery
+> omap_dma4_write: Read-only register 0x000038
+> [    1.498779] mmci-omap mmci-omap.0: command timeout (CMD55)
+> [    1.499359] mmci-omap mmci-omap.0: command timeout (CMD55)
+> [    1.499908] mmci-omap mmci-omap.0: command timeout (CMD1)
+> [    1.502319] EXT3-fs: barriers not enabled
+> omap_dma4_write: Read-only register 0x000038
+> [    1.633636] EXT3-fs (mmcblk0p1): recovery complete
+> omap_dma4_write: Read-only register 0x000034
+> omap_dma4_write: Read-only register 0x000038
+> omap_dma4_write: Read-only register 0x00003c
+> omap_dma4_write: Read-only register 0x000040
+> omap_dma4_write: Read-only register 0x000034
+> omap_dma4_write: Read-only register 0x000038
+> omap_dma4_write: Read-only register 0x00003c
+> omap_dma4_write: Read-only register 0x000040
+> omap_dma4_write: Read-only register 0x000038
+> [    1.639495] kjournald starting.  Commit interval 5 seconds
+> [    1.641113] EXT3-fs (mmcblk0p1): mounted filesystem with writeback
+> data mode
+> [    1.645233] VFS: Mounted root (ext3 filesystem) readonly on device 179:1.
+> 
+> After:
+> 
+> omap_dma4_write: Read-only register 0x000034
+> omap_dma4_write: Read-only register 0x000038
+> omap_dma4_write: Read-only register 0x00003c
+> omap_dma4_write: Read-only register 0x000040
+> omap_dma4_write: Read-only register 0x000038
+> [    1.733459] mmc0: host does not support reading read-only switch.
+> assuming write-enable.
+> [    1.736083] mmc0: new SDHC card at address 4567
+> [    1.738494] Power Management for OMAP2 initializing
+> [    1.740753] PRCM revision 1.0
+> omap_prcm_write: Read-only register 0x0002c8
+> omap_prcm_write: Read-only register 0x0002c8
+> omap_prcm_write: Read-only register 0x0002c8
+> omap_prcm_read: Bad register 0x000048
+> omap_prcm_write: Bad register 0x000048
+> omap_prcm_read: Bad register 0x000048
+> omap_prcm_write: Bad register 0x000048
+> omap_prcm_read: Bad register 0x0004c8
+> omap_prcm_write: Bad register 0x0004c8
+> omap_prcm_write: Read-only register 0x0002c8
+> omap_prcm_read: Bad register 0x0004c8
+> omap_prcm_write: Bad register 0x0004c8
+> omap_prcm_write: Bad register 0x000030
+> [    1.744873] VFP support v0.3: implementor 41 architecture 1 part 20
+> variant b rev 4
+> [    1.795288] mmcblk0: mmc0:4567 QEMU! 1.81 GiB
+> [    1.802581]  mmcblk0:omap_dma4_write: Read-only register 0x000038
+>  p1 p2
+> omap_uart_read: Bad register 0x000034
+> omap_uart_write: Bad register 0x000034
+> omap_uart_read: Bad register 0x000034
+> omap_uart_write: Bad register 0x000034
+> [    1.867645] VFS: Cannot open root device "(null)" or unknown-block(0,0)
+> [    1.870056] Please append a correct "root=" boot option; here are the
+> available partitions:
+> [    1.874938] 1f00             128 mtdblock0 (driver?)
+> [    1.877746] 1f01             384 mtdblock1 (driver?)
+> [    1.880340] 1f02            2048 mtdblock2 (driver?)
+> [    1.882629] 1f03            4096 mtdblock3 (driver?)
+> [    1.884887] 1f04          255488 mtdblock4 (driver?)
+> [    1.887207] b300         1900544 mmcblk0 driver: mmcblk
+> [    1.889526]   b301         1562480 mmcblk0p1
+> [    1.891723]   b302          249984 mmcblk0p2
+> [    1.894165] Kernel panic - not syncing: VFS: Unable to mount root fs
+> on unknown-block(0,0)
+> [    1.897583] [<c002fa1c>] (unwind_backtrace+0x0/0xf0) from
+> [<c02b7938>] (panic+0x5c/0xe0)
+> [    1.900177] [<c02b7938>] (panic+0x5c/0xe0) from [<c0009054>]
+> (mount_block_root+0x258/0x2a8)
+> [    1.903137] [<c0009054>] (mount_block_root+0x258/0x2a8) from
+> [<c0009268>] (prepare_namespace+0x160/0x1c4)
+> [    1.909240] [<c0009268>] (prepare_namespace+0x160/0x1c4) from
+> [<c0008600>] (kernel_init+0x120/0x168)
+> [    1.914886] [<c0008600>] (kernel_init+0x120/0x168) from [<c002af04>]
+> (kernel_thread_exit+0x0/0x8)
+> omap_dma4_write: Read-only register 0x000034
+> omap_dma4_write: Read-only register 0x000038
+> omap_dma4_write: Read-only register 0x00003c
+> omap_dma4_write: Read-only register 0x000040
+> 
+> Diff using -append "console=ttyS1 printk.time=0":
+> 
+>  mmci-omap mmci-omap.0: command timeout (CMD5)
+>  mmc0: host does not support reading read-only switch. assuming
+> write-enable.
+>  mmc0: new SDHC card at address 4567
+> -Waiting for root device /dev/mmcblk0p1...
+>  mmcblk0: mmc0:4567 QEMU! 1.81 GiB
+>   mmcblk0: p1 p2
+> -EXT3-fs: barriers not enabled
+> -EXT3-fs (mmcblk0p1): mounted filesystem with writeback data mode
+> -VFS: Mounted root (ext3 filesystem) readonly on device 179:1.
+> -kjournald starting.  Commit interval 5 seconds
+> -devtmpfs: mounted
+> -Freeing init memory: 132K
+> -mmci-omap mmci-omap.0: command timeout (CMD52)
+> -mmci-omap mmci-omap.0: command timeout (CMD52)
+> -mmci-omap mmci-omap.0: command timeout (CMD8)
+> -mmci-omap mmci-omap.0: command timeout (CMD5)
+> -mmci-omap mmci-omap.0: command timeout (CMD5)
+> -mmci-omap mmci-omap.0: command timeout (CMD5)
+> -mmci-omap mmci-omap.0: command timeout (CMD5)
+> -mmci-omap mmci-omap.0: command timeout (CMD55)
+> -mmci-omap mmci-omap.0: command timeout (CMD55)
+> -mmci-omap mmci-omap.0: command timeout (CMD55)
+> -mmci-omap mmci-omap.0: command timeout (CMD55)
+> -mmci-omap mmci-omap.0: command timeout (CMD1)
+> -lcd_mipid spi1.1: performing LCD ESD recovery
+> -lcd_mipid spi1.1: performing LCD ESD recovery
+> +mmci-omap mmci-omap.0: command timeout (CMD18)
+> +mmcblk0: retrying using single block read
+> +mmci-omap mmci-omap.0: command timeout (CMD17)
+> +Unable to handle kernel NULL pointer dereference at virtual address
+> 00000018
+> +pgd = c0004000
+> +[00000018] *pgd=00000000
+> +Internal error: Oops: 5 [#1] PREEMPT
+> +last sysfs file:
+> +Modules linked in:
+> +CPU: 0    Tainted: G        W    (2.6.35~rc4-129.1-n8x0 #1)
+> +PC is at mmc_omap_dma_cb+0xb8/0x174
+> +LR is at omap2_dma_irq_handler+0x240/0x294
+> +pc : [<c0219504>]    lr : [<c003c3ac>]    psr: 20000193
+> +sp : c7d49db8  ip : c7c4c800  fp : 00000001
+> +r10: 00000060  r9 : c7c4c950  r8 : 00000001
+> +r7 : 0000032c  r6 : 00000007  r5 : 00000150  r4 : c7d4ba00
+> +r3 : 00000000  r2 : 00000007  r1 : 00000060  r0 : 00000007
+> +Flags: nzCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment kernel
+> +Control: 00c5387d  Table: 80004008  DAC: 00000017
+> +Process mmcqd (pid: 462, stack limit = 0xc7d48268)
+> +Stack: (0xc7d49db8 to 0xc7d4a000)
+> +9da0:                                                       c03baed4
+> 00000150
+> +9dc0: 00000007 0000032c 00000001 c003c3ac 0000000c 00000000 c7d49e18
+> c0399a20
+> +9de0: 00000000 00000000 0000000c 00000000 c7d48000 00000001 00000001
+> c0081318
+> +9e00: c039ccc8 0000000c c0399a20 00000001 00000000 c00834c8 0000000c
+> 00000000
+> +9e20: 00000001 c002906c ffffffff fa0fe000 00000001 c0029ac8 c7d5ed24
+> c7d5ed24
+> +9e40: c7d49e68 00000001 c7d57320 c7d64400 00000001 c7d5ed24 c7d49e90
+> c7d48000
+> +9e60: 00000001 00000001 00000ffe c7d49e80 c0215fa8 c0215ffc 60000013
+> ffffffff
+> +9e80: 00000001 29e8d608 c7d57320 c7d49ea4 c7d49ea4 c7d49efc 00000000
+> c7d49e64
+> +9ea0: c0210128 00000011 00000022 00000000 00000000 00000000 00000000
+> 000000b5
+> +9ec0: 00000000 ffffff92 c7d49efc c7d49e90 0000000c 00000000 00000000
+> 00000000
+> +9ee0: 00000000 00000000 0000049d 00000000 00000000 00000000 00000000
+> 05f5e100
+> +9f00: 00000000 00000200 00000001 00000000 00000200 00000000 00000000
+> c7d49e90
+> +9f20: 00000001 c7d64800 c7eca800 c7d60980 c7d57320 c0171dc4 c7eca800
+> c7d60980
+> +9f40: c7d57320 00000000 000001b1 c01729a0 c7ec4e40 00000000 00000000
+> c7d48000
+> +9f60: c7ec4e40 00000000 c7d48000 c7ec4e40 00000000 c7d49f84 c7d57320
+> c0167680
+> +9f80: c7ec4e40 c7d48000 c7d5ed24 c7d5ed2c c7ec4e40 00000000 c7ec4fb0
+> 00000001
+> +9fa0: c7d57320 c02169b8 00000000 c7c6be28 c7d49fd4 c02168c0 c7d5ed24
+> 00000000
+> +9fc0: 00000000 00000000 00000000 c00692dc 00000000 00000000 c7d49fd8
+> c7d49fd8
+> +9fe0: 00000000 00000000 00000000 00000000 00000000 c002af04 00000000
+> 00000000
+> +[<c0219504>] (mmc_omap_dma_cb+0xb8/0x174) from [<c003c3ac>]
+> (omap2_dma_irq_handler+0x240/0x294)
+> +[<c003c3ac>] (omap2_dma_irq_handler+0x240/0x294) from [<c0081318>]
+> (handle_IRQ_event+0x24/0xe4)
+> +[<c0081318>] (handle_IRQ_event+0x24/0xe4) from [<c00834c8>]
+> (handle_level_irq+0xd4/0x16c)
+> +[<c00834c8>] (handle_level_irq+0xd4/0x16c) from [<c002906c>]
+> (asm_do_IRQ+0x6c/0x8c)
+> +[<c002906c>] (asm_do_IRQ+0x6c/0x8c) from [<c0029ac8>] (__irq_svc+0x48/0xac)
+> +Exception stack(0xc7d49e38 to 0xc7d49e80)
+> +9e20:                                                       c7d5ed24
+> c7d5ed24
+> +9e40: c7d49e68 00000001 c7d57320 c7d64400 00000001 c7d5ed24 c7d49e90
+> c7d48000
+> +9e60: 00000001 00000001 00000ffe c7d49e80 c0215fa8 c0215ffc 60000013
+> ffffffff
+> +[<c0029ac8>] (__irq_svc+0x48/0xac) from [<c0215ffc>]
+> (mmc_blk_issue_rq+0x240/0x590)
+> +[<c0215ffc>] (mmc_blk_issue_rq+0x240/0x590) from [<c02169b8>]
+> (mmc_queue_thread+0xf8/0xfc)
+> +[<c02169b8>] (mmc_queue_thread+0xf8/0xfc) from [<c00692dc>]
+> (kthread+0x78/0x80)
+> +[<c00692dc>] (kthread+0x78/0x80) from [<c002af04>]
+> (kernel_thread_exit+0x0/0x8)
+> +Code: e59f00c0 eafffff0 e3110020 08bd81f0 (e5931018)
+> +---[ end trace 1b75b31a2719ed20 ]---
+> +Kernel panic - not syncing: Fatal exception in interrupt
+> 
+> Trace diff:
+> 
+> @@ -245,6 +247,7 @@
+>   16-bit register 0x000004
+>   16-bit register 0x000003
+>   16-bit register 0x000004
+> +sdcard_reset
+>   Read-only register 0x0002c8
+>   Read-only register 0x0002c8
+>   Read-only register 0x0002c8
+> @@ -308,10 +311,6 @@
+>  sdcard_response RESP#1 (normal cmd) (sz:4)
+>  sdcard_app_command SD           SET_BUS_WIDTH/ACMD06 arg 0x00000002
+> (state transfer)
+>  sdcard_response RESP#1 (normal cmd) (sz:4)
+> - Bad register 0x000034
+> - Bad register 0x000034
+> - Bad register 0x000034
+> - Bad register 0x000034
+>  sdcard_normal_command SD  READ_MULTIPLE_BLOCK/ CMD18 arg 0x00000000
+> (state transfer)
+>  sdcard_response RESP#1 (normal cmd) (sz:4)
+>  sdcard_read_block addr 0x0 size 0x200
+> @@ -325,532 +324,17 @@
+>  sdcard_read_block addr 0xe00 size 0x200
+>  sdcard_normal_command SD    STOP_TRANSMISSION/ CMD12 arg 0x00000000
+> (state sendingdata)
+>  sdcard_response RESP#1 (normal cmd) (sz:4)
+> + Bad register 0x000034
+> + Bad register 0x000034
+> + Bad register 0x000034
+> + Bad register 0x000034
+>  sdcard_normal_command SD          SEND_STATUS/ CMD13 arg 0x45670000
+> (state transfer)
+>  sdcard_response RESP#1 (normal cmd) (sz:4)
+> -sdcard_normal_command SD  READ_MULTIPLE_BLOCK/ CMD18 arg 0x00000022
+> (state transfer)
+> -sdcard_response RESP#1 (normal cmd) (sz:4)
+> -sdcard_read_block addr 0x4400 size 0x200
+> - Read-only register 0x000038
+> -sdcard_read_block addr 0x4600 size 0x200
+> -sdcard_normal_command SD    STOP_TRANSMISSION/ CMD12 arg 0x00000000
+> (state sendingdata)
+> -sdcard_response RESP#1 (normal cmd) (sz:4)
+> -sdcard_normal_command SD  READ_MULTIPLE_BLOCK/ CMD18 arg 0x00000020
+> (state transfer)
+> -sdcard_response RESP#1 (normal cmd) (sz:4)
+> -sdcard_read_block addr 0x4000 size 0x200
+> ...
+> 
+> Regards,
+> 
+> Phil.
+> 
