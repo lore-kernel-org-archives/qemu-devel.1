@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRJFF-0007Gn-Ez
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:24:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fRJGc-0000AQ-1N
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:25:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRJFD-0005PS-VQ
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:24:05 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Fri,  8 Jun 2018 18:23:50 +0300
-Message-Id: <20180608152353.98712-4-vsementsov@virtuozzo.com>
-In-Reply-To: <20180608152353.98712-1-vsementsov@virtuozzo.com>
-References: <20180608152353.98712-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v4 3/6] nbd/server: add
- nbd_meta_empty_or_pattern helper
+	(envelope-from <peter.maydell@linaro.org>) id 1fRJGb-0006Bx-1T
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:25:30 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:46280)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fRJGa-0006Bc-Rb
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:25:28 -0400
+Received: by mail-ot0-x243.google.com with SMTP id q1-v6so16104509oth.13
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 08:25:28 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <9abdaa17-d6d1-0c34-2a20-43078b487bef@redhat.com>
+References: <20180607210818.12727-1-f4bug@amsat.org>
+	<9abdaa17-d6d1-0c34-2a20-43078b487bef@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 Jun 2018 16:25:07 +0100
+Message-ID: <CAFEAcA-QYnWOo2Hqdr-3tKDDxWDnR+tF4snd15Y1P6md04CogA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] chardev: Restore CR,LF on stdio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,140 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Patryk Olszewski <patryk@fala.ehost.pl>, BALATON Zoltan <balaton@eik.bme.hu>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Desnogues <laurent.desnogues@gmail.com>, QEMU Trivial <qemu-trivial@nongnu.org>
 
-Add nbd_meta_pattern() and nbd_meta_empty_or_pattern() helpers for
-metadata query parsing. nbd_meta_pattern() will be reused for "qemu"
-namespace in following patches.
+On 8 June 2018 at 06:47, Thomas Huth <thuth@redhat.com> wrote:
+> On 07.06.2018 23:08, Philippe Mathieu-Daud=C3=A9 wrote:
+>> Remove the 'stair-step output' on stdio.
+>>
+>> This partially reverts commit 12fb0ac05, which was correct
+>> on the mailing list but got corrupted by the maintainer :p
+>>
+>> Introduced-by: 3b876140-c035-dd39-75d0-d54c48128fac@redhat.com
+>> Reported-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> Suggested-by: Thomas Huth <thuth@redhat.com>
+>> Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>> See:
+>> http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg06202.html (b=
+ug)
+>> http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg01309.html (r=
+eport)
+>>
+>> Peter, Can this enters directly as bug-fix?
+>>
+>>  chardev/char-stdio.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/chardev/char-stdio.c b/chardev/char-stdio.c
+>> index d83e60e787..96375f2ab8 100644
+>> --- a/chardev/char-stdio.c
+>> +++ b/chardev/char-stdio.c
+>> @@ -59,7 +59,7 @@ static void qemu_chr_set_echo_stdio(Chardev *chr, bool=
+ echo)
+>>      if (!echo) {
+>>          tty.c_iflag &=3D ~(IGNBRK | BRKINT | PARMRK | ISTRIP
+>>                           | INLCR | IGNCR | ICRNL | IXON);
+>> -        tty.c_oflag &=3D ~OPOST;
+>> +        tty.c_oflag |=3D OPOST;
+>>          tty.c_lflag &=3D ~(ECHO | ECHONL | ICANON | IEXTEN);
+>>          tty.c_cflag &=3D ~(CSIZE | PARENB);
+>>          tty.c_cflag |=3D CS8;
+>>
+>
+> I think this is the right way to go.
+>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- nbd/server.c | 86 +++++++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 59 insertions(+), 27 deletions(-)
+Applied to master, thanks.
 
-diff --git a/nbd/server.c b/nbd/server.c
-index 8593a6874b..d39a42cb7f 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -733,52 +733,83 @@ static int nbd_negotiate_send_meta_context(NBDClient *client,
-     return qio_channel_writev_all(client->ioc, iov, 2, errp) < 0 ? -EIO : 0;
- }
- 
--/* nbd_meta_base_query
-- *
-- * Handle query to 'base' namespace. For now, only base:allocation context is
-- * available in it.  'len' is the amount of text remaining to be read from
-- * the current name, after the 'base:' portion has been stripped.
-+/* Read strlen(@pattern) bytes, and set @match to true if they match @pattern.
-+ * @match is never set to false.
-  *
-  * Return -errno on I/O error, 0 if option was completely handled by
-  * sending a reply about inconsistent lengths, or 1 on success.
-  *
-- * Note: return code = 1 doesn't mean that we've parsed "base:allocation"
-- * namespace. It only means that there are no errors.*/
--static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
--                               uint32_t len, Error **errp)
-+ * Note: return code = 1 doesn't mean that we've read exactly @pattern
-+ * It only means that there are no errors. */
-+static int nbd_meta_pattern(NBDClient *client, const char *pattern, bool *match,
-+                            Error **errp)
- {
-     int ret;
--    char query[sizeof("allocation") - 1];
--    size_t alen = strlen("allocation");
-+    char *query;
-+    int len = strlen(pattern);
- 
--    if (len == 0) {
--        if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
--            meta->base_allocation = true;
--        }
--        trace_nbd_negotiate_meta_query_parse("base:");
--        return 1;
--    }
--
--    if (len != alen) {
--        trace_nbd_negotiate_meta_query_skip("not base:allocation");
--        return nbd_opt_skip(client, len, errp);
--    }
-+    assert(len);
- 
-+    query = g_malloc(len);
-     ret = nbd_opt_read(client, query, len, errp);
-     if (ret <= 0) {
-+        g_free(query);
-         return ret;
-     }
- 
--    if (strncmp(query, "allocation", alen) == 0) {
--        trace_nbd_negotiate_meta_query_parse("base:allocation");
--        meta->base_allocation = true;
-+    if (strncmp(query, pattern, len) == 0) {
-+        trace_nbd_negotiate_meta_query_parse(pattern);
-+        *match = true;
-     } else {
--        trace_nbd_negotiate_meta_query_skip("not base:allocation");
-+        trace_nbd_negotiate_meta_query_skip(pattern);
-     }
-+    g_free(query);
- 
-     return 1;
- }
- 
-+/* Read @len bytes, and set @match to true if they match @pattern, or if @len
-+ * is 0 and the client is performing _LIST_. @match is never set to false.
-+ *
-+ * Return -errno on I/O error, 0 if option was completely handled by
-+ * sending a reply about inconsistent lengths, or 1 on success.
-+ *
-+ * Note: return code = 1 doesn't mean that we've read exactly @pattern
-+ * It only means that there are no errors. */
-+static int nbd_meta_empty_or_pattern(NBDClient *client, const char *pattern,
-+                                     uint32_t len, bool *match, Error **errp)
-+{
-+    if (len == 0) {
-+        if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
-+            *match = true;
-+        }
-+        trace_nbd_negotiate_meta_query_parse("empty");
-+        return 1;
-+    }
-+
-+    if (len != strlen(pattern)) {
-+        trace_nbd_negotiate_meta_query_skip("different lengths");
-+        return nbd_opt_skip(client, len, errp);
-+    }
-+
-+    return nbd_meta_pattern(client, pattern, match, errp);
-+}
-+
-+/* nbd_meta_base_query
-+ *
-+ * Handle query to 'base' namespace. For now, only base:allocation context is
-+ * available in it.  'len' is the amount of text remaining to be read from
-+ * the current name, after the 'base:' portion has been stripped.
-+ *
-+ * Return -errno on I/O error, 0 if option was completely handled by
-+ * sending a reply about inconsistent lengths, or 1 on success. */
-+static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
-+                               uint32_t len, Error **errp)
-+{
-+    return nbd_meta_empty_or_pattern(client, "allocation", len,
-+                                     &meta->base_allocation, errp);
-+}
-+
- /* nbd_negotiate_meta_query
-  *
-  * Parse namespace name and call corresponding function to parse body of the
-@@ -822,6 +853,7 @@ static int nbd_negotiate_meta_query(NBDClient *client,
-         return nbd_opt_skip(client, len, errp);
-     }
- 
-+    trace_nbd_negotiate_meta_query_parse("base:");
-     return nbd_meta_base_query(client, meta, len, errp);
- }
- 
--- 
-2.11.1
+-- PMM
