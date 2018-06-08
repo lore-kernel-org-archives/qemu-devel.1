@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fRAXD-00010G-HP
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:06:04 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fRAeJ-0007d7-Jd
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:13:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fRAXC-0000Vs-He
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:06:03 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180607144645.10187-1-f4bug@amsat.org>
-	<20180607144645.10187-2-f4bug@amsat.org>
-	<30e6332f-7f4f-5fe3-9517-d057d3bff4a7@redhat.com>
-Date: Fri, 08 Jun 2018 08:05:55 +0200
-In-Reply-To: <30e6332f-7f4f-5fe3-9517-d057d3bff4a7@redhat.com> (John Snow's
-	message of "Thu, 7 Jun 2018 13:18:02 -0400")
-Message-ID: <87k1r9dd8c.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] hw/block/fdc: Replace
- error_setg(&error_abort) by assert()
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fRAeI-0004IV-MM
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:13:23 -0400
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:48614)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1fRAeI-0004Hp-FN
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:13:22 -0400
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Fri,  8 Jun 2018 09:13:13 +0300
+Message-Id: <20180608061316.4909-3-samuel.thibault@ens-lyon.org>
+In-Reply-To: <20180608061316.4909-1-samuel.thibault@ens-lyon.org>
+References: <20180608061316.4909-1-samuel.thibault@ens-lyon.org>
+Subject: [Qemu-devel] [PULL 2/5] slirp: Add Samuel Thibault's staging tree
+ for slirp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +25,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com
 
-John Snow <jsnow@redhat.com> writes:
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Acked-by: Thomas Huth <thuth@redhat.com>
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-> On 06/07/2018 10:46 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Use assert() instead of error_setg(&error_abort),
->> as suggested by the "qapi/error.h" documentation:
->>=20
->>     Please don't error_setg(&error_fatal, ...), use error_report() and
->>     exit(), because that's more obvious.
->>     Likewise, don't error_setg(&error_abort, ...), use assert().
->>=20
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->>  hw/block/fdc.c | 9 +--------
->>  1 file changed, 1 insertion(+), 8 deletions(-)
->>=20
->> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
->> index cd29e27d8f..7c1c57f57f 100644
->> --- a/hw/block/fdc.c
->> +++ b/hw/block/fdc.c
->> @@ -396,16 +396,9 @@ static int pick_geometry(FDrive *drv)
->>                             nb_sectors,
->>                             FloppyDriveType_str(parse->drive));
->>          }
->> +        assert(type_match !=3D -1 && "misconfigured fd_format");
->>          match =3D type_match;
->>      }
->> -
->> -    /* No match of any kind found -- fd_format is misconfigured, abort.=
- */
->> -    if (match =3D=3D -1) {
->> -        error_setg(&error_abort, "No candidate geometries present in ta=
-ble "
->> -                   " for floppy drive type '%s'",
->> -                   FloppyDriveType_str(drv->drive));
->> -    }
->> -
->>      parse =3D &(fd_formats[match]);
->>=20=20
->>   out:
->>=20
->
-> Truthfully sad to see the lipstick go, because this is my pig.
-> Oh well, it doesn't matter. Not really, anyway.
->
-> ACK
-
-There's still a bit of lipstick in assert()'s argument.
-
-v1 has the error_report() lipstick.  Would you like me to merge that one
-instead?  Your pig, your choice :)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 41cd3736a9..4c73c16fee 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1675,6 +1675,7 @@ S: Maintained
+ F: slirp/
+ F: net/slirp.c
+ F: include/net/slirp.h
++T: git https://people.debian.org/~sthibault/qemu.git slirp
+ T: git git://git.kiszka.org/qemu.git queues/slirp
+ 
+ Stubs
+-- 
+2.17.1
