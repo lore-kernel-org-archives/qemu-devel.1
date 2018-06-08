@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRGpU-0005x2-4N
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:49:23 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fRGpY-00061e-15
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:49:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRGpT-0006kt-2o
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:49:20 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:45017)
+	(envelope-from <alex.bennee@linaro.org>) id 1fRGpV-0006na-QN
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:49:24 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:52650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fRGpS-0006kO-SP
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:49:19 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id x4-v6so5138568wro.11
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 05:49:18 -0700 (PDT)
+	id 1fRGpV-0006mh-Hz
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:49:21 -0400
+Received: by mail-wm0-x235.google.com with SMTP id p126-v6so3165901wmb.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 05:49:21 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  8 Jun 2018 13:32:36 +0100
-Message-Id: <20180608123307.24773-19-alex.bennee@linaro.org>
+Date: Fri,  8 Jun 2018 13:32:49 +0100
+Message-Id: <20180608123307.24773-32-alex.bennee@linaro.org>
 In-Reply-To: <20180608123307.24773-1-alex.bennee@linaro.org>
 References: <20180608123307.24773-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 18/49] tests/tcg/x86_64: add Makefile.target
+Subject: [Qemu-devel] [PATCH v6 31/49] tests/tcg: enable building for Alpha
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +30,130 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-The sources for x86_64 are shared in the i386 directory which will be
-included thanks to TARGET_BASE_ARCH. However not all sources build so
-we need to filter out the ones we can't build in the 64 bit world and
-those that can't be built for 32 bit.
+We can't use our normal Debian based compilers as Alpha isn't an
+officially supported architecture. However it is available as a port
+and fortunately cross compilers for all these targets are included in
+Debian Sid, the perpetual rolling/unstable/testing version of Debian.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
 ---
-v4
-  - update MAINTAINERS
 v5
-  - merge with disable i386 version of test-i386-ssse
+  - drop the unused debian-cross-build docker image
+  - add note to debian-sid docker image
+  - echo reference to notes on build failure
+  - include EXTRA_RUNS for mmap tests
+v6
+  - use NOCACHE=1 for docker-image-debian-sid to force re-builds
+  - this seems a little hacky
 ---
- MAINTAINERS                      |  1 +
- tests/tcg/i386/Makefile.target   |  4 ++--
- tests/tcg/x86_64/Makefile.target | 15 +++++++++++++++
- 3 files changed, 18 insertions(+), 2 deletions(-)
- create mode 100644 tests/tcg/x86_64/Makefile.target
+ tests/docker/Makefile.include                 |  7 ++++
+ .../dockerfiles/debian-alpha-cross.docker     | 12 +++++++
+ tests/docker/dockerfiles/debian-sid.docker    | 32 +++++++++++++++++++
+ tests/tcg/alpha/Makefile.include              |  2 ++
+ tests/tcg/alpha/Makefile.target               |  6 ++++
+ 5 files changed, 59 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/debian-alpha-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-sid.docker
+ create mode 100644 tests/tcg/alpha/Makefile.include
+ create mode 100644 tests/tcg/alpha/Makefile.target
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e795b8186e..1063c4d60f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -284,6 +284,7 @@ M: Eduardo Habkost <ehabkost@redhat.com>
- S: Maintained
- F: target/i386/
- F: tests/tcg/i386/
-+F: tests/tcg/x86_64/
- F: hw/i386/
- F: disas/i386.c
- T: git git://github.com/ehabkost/qemu.git x86-next
-diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
-index 64d241cfdf..cd173363ee 100644
---- a/tests/tcg/i386/Makefile.target
-+++ b/tests/tcg/i386/Makefile.target
-@@ -7,9 +7,9 @@ VPATH 		+= $(I386_SRC)
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 8afb383478..1a4664c04e 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -63,6 +63,13 @@ docker-image-debian-ppc64el-cross: docker-image-debian9
+ docker-image-debian-s390x-cross: docker-image-debian9
+ docker-image-debian-win32-cross: docker-image-debian8-mxe
+ docker-image-debian-win64-cross: docker-image-debian8-mxe
++
++# Debian SID images - we are tracking a rolling distro so we want to
++# force a re-build of the base image if we ever need to build one of
++# its children.
++docker-image-debian-sid: NOCACHE=1
++
++docker-image-debian-alpha-cross: docker-image-debian-sid
+ docker-image-travis: NOUSER=1
  
- I386_SRCS=$(notdir $(wildcard $(I386_SRC)/*.c))
- I386_TESTS=$(I386_SRCS:.c=)
--
-+I386_ONLY_TESTS=$(filter-out test-i386-ssse3, $(I386_TESTS))
- # Update TESTS
--TESTS+=$(I386_TESTS)
-+TESTS+=$(I386_ONLY_TESTS)
- 
- ifneq ($(TARGET_NAME),x86_64)
- CFLAGS+=-m32
-diff --git a/tests/tcg/x86_64/Makefile.target b/tests/tcg/x86_64/Makefile.target
+ # Specialist build images, sometimes very limited tools
+diff --git a/tests/docker/dockerfiles/debian-alpha-cross.docker b/tests/docker/dockerfiles/debian-alpha-cross.docker
 new file mode 100644
-index 0000000000..74f170b9ed
+index 0000000000..29a25d0dfd
 --- /dev/null
-+++ b/tests/tcg/x86_64/Makefile.target
-@@ -0,0 +1,15 @@
++++ b/tests/docker/dockerfiles/debian-alpha-cross.docker
+@@ -0,0 +1,12 @@
++#
++# Docker cross-compiler target
++#
++# This docker target builds on the debian sid base image which
++# contains cross compilers for Debian "ports" targets.
++#
++FROM qemu:debian-sid
++
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        gcc-alpha-linux-gnu \
++        libc6.1-dev-alpha-cross || { echo "Failed to build - see debian-sid.docker notes"; exit 1; }
+diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
+new file mode 100644
+index 0000000000..9a3d168705
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-sid.docker
+@@ -0,0 +1,32 @@
++#
++# Debian Sid Base
++#
++# A number of our guests exist as ports only. We can either use the
++# ports repo or get everything from Sid. However Sid is a rolling
++# distro which may be broken at any particular time. If you are
++# unlucky and try and build your images while gcc is in the process of
++# being uploaded this can fail. Your only recourse is to try again in
++# a few hours when the repos have re-synced. Once built however you
++# won't be affected by repo changes unless the docker recipies are
++# updated and trigger a re-build.
++#
++
++FROM debian:sid-slim
++
++# Duplicate deb line as deb-src
++RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
++
++# Install common build utilities
++RUN apt update
++RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt install -y --no-install-recommends \
++        bison \
++        build-essential \
++        ca-certificates \
++        flex \
++        git \
++        pkg-config \
++        psmisc \
++        python \
++        texinfo || { echo "Failed to build - see debian-sid.docker notes"; exit 1; }
+diff --git a/tests/tcg/alpha/Makefile.include b/tests/tcg/alpha/Makefile.include
+new file mode 100644
+index 0000000000..c7dc48eadb
+--- /dev/null
++++ b/tests/tcg/alpha/Makefile.include
+@@ -0,0 +1,2 @@
++DOCKER_IMAGE=debian-alpha-cross
++DOCKER_CROSS_COMPILER=alpha-linux-gnu-gcc
+diff --git a/tests/tcg/alpha/Makefile.target b/tests/tcg/alpha/Makefile.target
+new file mode 100644
+index 0000000000..bedf1b6444
+--- /dev/null
++++ b/tests/tcg/alpha/Makefile.target
+@@ -0,0 +1,6 @@
 +# -*- Mode: makefile -*-
 +#
-+# x86_64 tests - included from tests/tcg/Makefile.target
-+#
-+# Currently we only build test-x86_64 and test-i386-ssse3 from
-+# $(SRC)/tests/tcg/i386/
-+#
++# Alpha specific tweaks
 +
-+X86_64_TESTS=$(filter-out $(I386_ONLY_TESTS), $(TESTS))
-+X86_64_TESTS+=test-x86_64
-+TESTS:=$(X86_64_TESTS)
-+
-+test-x86_64: LDFLAGS+=-lm -lc
-+test-x86_64: test-i386.c test-i386.h test-i386-shift.h test-i386-muldiv.h
-+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
++# On Alpha Linux only supports 8k pages
++EXTRA_RUNS+=run-test-mmap-8192
 -- 
 2.17.1
