@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRKtf-0007Ch-62
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:09:57 -0400
+	(envelope-from <berrange@redhat.com>) id 1fRKth-0007FS-IT
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:09:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRKtd-0008Rq-1O
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:09:55 -0400
+	(envelope-from <berrange@redhat.com>) id 1fRKtf-0008TX-Fq
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:09:57 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri,  8 Jun 2018 18:09:31 +0100
-Message-Id: <20180608170933.9137-7-berrange@redhat.com>
+Date: Fri,  8 Jun 2018 18:09:32 +0100
+Message-Id: <20180608170933.9137-8-berrange@redhat.com>
 In-Reply-To: <20180608170933.9137-1-berrange@redhat.com>
 References: <20180608170933.9137-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 6/8] authz: add QAuthZListFile object type for
- a file access control list
+Subject: [Qemu-devel] [PATCH 7/8] authz: add QAuthZPAM object type for
+ authorizing using PAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,83 +23,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-trivial@nongnu.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>
 
-Add a QAuthZListFile object type that implements the QAuthZ interface. Th=
-is
-built-in implementation is a proxy around the QAtuhZList object type,
-initializing it from an external file, and optionally, automatically
-reloading it whenever it changes.
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-To create an instance of this object via the QMP monitor, the syntax
-used would be:
+Add an authorization backend that talks to PAM to check whether the user
+identity is allowed. This only uses the PAM account validation facility,
+which is essentially just a check to see if the provided username is permitted
+access. It doesn't use the authentication or session parts of PAM, since
+that's dealt with by the relevant part of QEMU (eg VNC server).
 
-      {
-        "execute": "object-add",
-        "arguments": {
-          "qom-type": "authz-list",
-          "id": "auth0",
-          "parameters": {
-            "filename": "/etc/qemu/vnc.acl",
-	    "refresh": "yes"
-          }
-        }
-      }
+Consider starting QEMU with a VNC server and telling it to use TLS with
+x509 client certificates and configuring it to use an PAM to validate
+the x509 distinguished name. In this example we're telling it to use PAM
+for the QAuthZ impl with a service name of "qemu-vnc"
 
-If "refresh" is "yes", inotify is used to monitor the file,
-automatically reloading changes. If an error occurs during reloading,
-all authorizations will fail until the file is next successfully
-loaded.
+ $ qemu-system-x86_64 \
+     -object tls-creds-x509,id=tls0,dir=/home/berrange/security/qemutls,\
+             endpoint=server,verify-peer=yes \
+     -object authz-pam,id=authz0,service=qemu-vnc \
+     -vnc :1,tls-creds=tls0,tls-authz=authz0
 
-The /etc/qemu/vnc.acl file would contain a JSON representation of a
-QAuthZList object
+This requires an /etc/pam/qemu-vnc file to be created with the auth
+rules. A very simple file based whitelist can be setup using
 
-    {
-      "rules": [
-         { "match": "fred", "policy": "allow", "format": "exact" },
-         { "match": "bob", "policy": "allow", "format": "exact" },
-         { "match": "danb", "policy": "deny", "format": "glob" },
-         { "match": "dan*", "policy": "allow", "format": "exact" },
-      ],
-      "policy": "deny"
-    }
+  $ cat > /etc/pam/qemu-vnc <<EOF
+  account         requisite       pam_listfile.so item=user sense=allow file=/etc/qemu/vnc.allow
+  EOF
 
-This sets up an authorization rule that allows 'fred', 'bob' and anyone
-whose name starts with 'dan', except for 'danb'. Everyone unmatched is
-denied.
+The /etc/qemu/vnc.allow file simply contains one username per line. Any
+username not in the file is denied. The usernames in this example are
+the x509 distinguished name from the client's x509 cert.
 
-The object can be loaded on the comand line using
+  $ cat > /etc/qemu/vnc.allow <<EOF
+  CN=laptop.berrange.com,O=Berrange Home,L=London,ST=London,C=GB
+  EOF
 
-   -object authz-list-file,id=3Dauthz0,filename=3D/etc/qemu/vnc.acl,refre=
-sh=3Dyes
+More interesting would be to configure PAM to use an LDAP backend, so
+that the QEMU authorization check data can be centralized instead of
+requiring each compute host to have file maintained.
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+The main limitation with this PAM module is that the rules apply to all
+QEMU instances on the host. Setting up different rules per VM, would
+require creating a separate PAM service name & config file for every
+guest. An alternative approach for the future might be to not pass in
+the plain username to PAM, but instead combine the VM name or UUID with
+the username. This requires further consideration though.
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- authz/Makefile.objs      |   1 +
- authz/listfile.c         | 252 +++++++++++++++++++++++++++++++++++++++
- authz/trace-events       |   4 +
- include/authz/listfile.h | 104 ++++++++++++++++
- qom/object.c             |  12 +-
- qom/object_interfaces.c  |  16 ++-
- 6 files changed, 379 insertions(+), 10 deletions(-)
- create mode 100644 authz/listfile.c
- create mode 100644 include/authz/listfile.h
+ authz/Makefile.objs |   3 +
+ authz/pam.c         | 149 ++++++++++++++++++++++++++++++++++++++++++++
+ authz/trace-events  |   3 +
+ configure           |  36 +++++++++++
+ include/authz/pam.h |  84 +++++++++++++++++++++++++
+ 5 files changed, 275 insertions(+)
+ create mode 100644 authz/pam.c
+ create mode 100644 include/authz/pam.h
 
 diff --git a/authz/Makefile.objs b/authz/Makefile.objs
-index 921fa624d7..8351bf181d 100644
+index 8351bf181d..1276421c22 100644
 --- a/authz/Makefile.objs
 +++ b/authz/Makefile.objs
-@@ -1,3 +1,4 @@
- authz-obj-y +=3D base.o
- authz-obj-y +=3D simple.o
- authz-obj-y +=3D list.o
-+authz-obj-y +=3D listfile.o
-diff --git a/authz/listfile.c b/authz/listfile.c
+@@ -2,3 +2,6 @@ authz-obj-y += base.o
+ authz-obj-y += simple.o
+ authz-obj-y += list.o
+ authz-obj-y += listfile.o
++authz-obj-$(CONFIG_AUTH_PAM) += pam.o
++
++pam.o-libs = -lpam
+diff --git a/authz/pam.c b/authz/pam.c
 new file mode 100644
-index 0000000000..c04050fd0a
+index 0000000000..d3dd49b343
 --- /dev/null
-+++ b/authz/listfile.c
-@@ -0,0 +1,252 @@
++++ b/authz/pam.c
+@@ -0,0 +1,149 @@
 +/*
-+ * QEMU access control list file authorization driver
++ * QEMU pam authorization driver
 + *
 + * Copyright (c) 2018 Red Hat, Inc.
 + *
@@ -117,230 +112,125 @@ index 0000000000..c04050fd0a
 + * Lesser General Public License for more details.
 + *
 + * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + *
 + */
 +
 +#include "qemu/osdep.h"
-+#include "authz/listfile.h"
++#include "authz/pam.h"
 +#include "authz/trace.h"
-+#include "qemu/error-report.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/sockets.h"
 +#include "qom/object_interfaces.h"
-+#include "qapi/qapi-visit-authz.h"
-+#include "qapi/qmp/qjson.h"
-+#include "qapi/qmp/qobject.h"
-+#include "qapi/qmp/qerror.h"
-+#include "qapi/qobject-input-visitor.h"
++
++#include <security/pam_appl.h>
 +
 +
-+static bool
-+qauthz_list_file_is_allowed(QAuthZ *authz,
-+                            const char *identity,
-+                            Error **errp)
++static bool qauthz_pam_is_allowed(QAuthZ *authz,
++                                  const char *identity,
++                                  Error **errp)
 +{
-+    QAuthZListFile *fauthz =3D QAUTHZ_LIST_FILE(authz);
-+    if (fauthz->list) {
-+        return qauthz_is_allowed(fauthz->list, identity, errp);
++    QAuthZPam *pauthz = QAUTHZ_PAM(authz);
++    const struct pam_conv pam_conversation = { 0 };
++    pam_handle_t *pamh = NULL;
++    int ret;
++
++    trace_qauthz_pam_check(authz, identity, pauthz->service);
++    ret = pam_start(pauthz->service,
++                    identity,
++                    &pam_conversation,
++                    &pamh);
++    if (ret != PAM_SUCCESS) {
++        error_setg(errp, "Unable to start PAM transaction: %s",
++                   pam_strerror(NULL, ret));
++        return false;
 +    }
 +
-+    return false;
-+}
-+
-+
-+static QAuthZ *
-+qauthz_list_file_load(QAuthZListFile *fauthz, Error **errp)
-+{
-+    GError *err =3D NULL;
-+    gchar *content =3D NULL;
-+    gsize len;
-+    QObject *obj =3D NULL;
-+    QDict *pdict;
-+    Visitor *v =3D NULL;
-+    QAuthZ *ret =3D NULL;
-+
-+    trace_qauthz_list_file_load(fauthz, fauthz->filename);
-+    if (!g_file_get_contents(fauthz->filename, &content, &len, &err)) {
-+        error_setg(errp, "Unable to read '%s': %s",
-+                   fauthz->filename, err->message);
++    ret = pam_acct_mgmt(pamh, PAM_SILENT);
++    if (ret != PAM_SUCCESS) {
++        error_setg(errp, "Unable to authorize user '%s': %s",
++                   identity, pam_strerror(pamh, ret));
 +        goto cleanup;
 +    }
-+
-+    obj =3D qobject_from_json(content, errp);
-+    if (!obj) {
-+        goto cleanup;
-+    }
-+
-+    pdict =3D qobject_to(QDict, obj);
-+    if (!pdict) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_TYPE, "obj", "dict");
-+        goto cleanup;
-+    }
-+
-+    v =3D qobject_input_visitor_new(obj);
-+
-+    ret =3D (QAuthZ *)user_creatable_add_type(TYPE_QAUTHZ_LIST,
-+                                            NULL, pdict, v, errp);
 +
 + cleanup:
-+    visit_free(v);
-+    qobject_unref(obj);
-+    if (err) {
-+        g_error_free(err);
-+    }
-+    g_free(content);
-+    return ret;
++    pam_end(pamh, ret);
++    return ret == PAM_SUCCESS;
 +}
 +
 +
 +static void
-+qauthz_list_file_inotify(int wd G_GNUC_UNUSED,
-+                         uint32_t mask,
-+                         const char *name G_GNUC_UNUSED,
-+                         void *opaque)
++qauthz_pam_prop_set_service(Object *obj,
++                            const char *service,
++                            Error **errp G_GNUC_UNUSED)
 +{
-+    QAuthZListFile *fauthz =3D opaque;
-+    Error *err =3D NULL;
++    QAuthZPam *pauthz = QAUTHZ_PAM(obj);
 +
-+    if (!(mask & IN_CLOSE_WRITE)) {
-+        return;
-+    }
-+
-+    object_unref(OBJECT(fauthz->list));
-+    fauthz->list =3D qauthz_list_file_load(fauthz, &err);
-+    trace_qauthz_list_file_refresh(fauthz,
-+                                   fauthz->filename, fauthz->list ? 1 : =
-0);
-+    if (!fauthz->list) {
-+        error_report_err(err);
-+    }
-+}
-+
-+static void
-+qauthz_list_file_complete(UserCreatable *uc, Error **errp)
-+{
-+    QAuthZListFile *fauthz =3D QAUTHZ_LIST_FILE(uc);
-+
-+    fauthz->list =3D qauthz_list_file_load(fauthz, errp);
-+
-+    if (fauthz->refresh) {
-+        fauthz->inotify =3D qemu_inotify_new(qauthz_list_file_inotify,
-+                                           fauthz,
-+                                           NULL,
-+                                           errp);
-+        if (!fauthz->inotify) {
-+            return;
-+        }
-+
-+#ifdef CONFIG_INOTIFY1
-+        if (qemu_inotify_add_watch(fauthz->inotify,
-+                                   fauthz->filename,
-+                                   IN_CLOSE_WRITE,
-+                                   errp) < 0) {
-+            return;
-+        }
-+#endif
-+    }
-+}
-+
-+
-+static void
-+qauthz_list_file_prop_set_filename(Object *obj,
-+                                   const char *value,
-+                                   Error **errp G_GNUC_UNUSED)
-+{
-+    QAuthZListFile *authz =3D QAUTHZ_LIST_FILE(obj);
-+
-+    authz->filename =3D g_strdup(value);
++    g_free(pauthz->service);
++    pauthz->service = g_strdup(service);
 +}
 +
 +
 +static char *
-+qauthz_list_file_prop_get_filename(Object *obj,
-+                                   Error **errp G_GNUC_UNUSED)
++qauthz_pam_prop_get_service(Object *obj,
++                            Error **errp G_GNUC_UNUSED)
 +{
-+    QAuthZListFile *authz =3D QAUTHZ_LIST_FILE(obj);
++    QAuthZPam *pauthz = QAUTHZ_PAM(obj);
 +
-+    return g_strdup(authz->filename);
++    return g_strdup(pauthz->service);
 +}
 +
 +
 +static void
-+qauthz_list_file_prop_set_refresh(Object *obj,
-+                                  bool value,
-+                                  Error **errp G_GNUC_UNUSED)
++qauthz_pam_complete(UserCreatable *uc, Error **errp)
 +{
-+    QAuthZListFile *authz =3D QAUTHZ_LIST_FILE(obj);
-+
-+    authz->refresh =3D value;
-+}
-+
-+
-+static bool
-+qauthz_list_file_prop_get_refresh(Object *obj,
-+                                  Error **errp G_GNUC_UNUSED)
-+{
-+    QAuthZListFile *authz =3D QAUTHZ_LIST_FILE(obj);
-+
-+    return authz->refresh;
 +}
 +
 +
 +static void
-+qauthz_list_file_finalize(Object *obj)
++qauthz_pam_finalize(Object *obj)
 +{
-+    QAuthZListFile *authz =3D QAUTHZ_LIST_FILE(obj);
++    QAuthZPam *pauthz = QAUTHZ_PAM(obj);
 +
-+    qemu_inotify_free(authz->inotify);
-+    object_unref(OBJECT(authz->list));
-+    g_free(authz->filename);
++    g_free(pauthz->service);
 +}
 +
 +
 +static void
-+qauthz_list_file_class_init(ObjectClass *oc, void *data)
++qauthz_pam_class_init(ObjectClass *oc, void *data)
 +{
-+    UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
-+    QAuthZClass *authz =3D QAUTHZ_CLASS(oc);
++    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
++    QAuthZClass *authz = QAUTHZ_CLASS(oc);
 +
-+    ucc->complete =3D qauthz_list_file_complete;
++    ucc->complete = qauthz_pam_complete;
++    authz->is_allowed = qauthz_pam_is_allowed;
 +
-+    object_class_property_add_str(oc, "filename",
-+                                  qauthz_list_file_prop_get_filename,
-+                                  qauthz_list_file_prop_set_filename,
++    object_class_property_add_str(oc, "service",
++                                  qauthz_pam_prop_get_service,
++                                  qauthz_pam_prop_set_service,
 +                                  NULL);
-+    object_class_property_add_bool(oc, "refresh",
-+                                   qauthz_list_file_prop_get_refresh,
-+                                   qauthz_list_file_prop_set_refresh,
-+                                   NULL);
-+
-+    authz->is_allowed =3D qauthz_list_file_is_allowed;
 +}
 +
 +
-+QAuthZListFile *qauthz_list_file_new(const char *id,
-+                                     const char *filename,
-+                                     Error **errp)
++QAuthZPam *qauthz_pam_new(const char *id,
++                          const char *service,
++                          Error **errp)
 +{
-+    return QAUTHZ_LIST_FILE(
-+        object_new_with_props(TYPE_QAUTHZ_LIST_FILE,
++    return QAUTHZ_PAM(
++        object_new_with_props(TYPE_QAUTHZ_PAM,
 +                              object_get_objects_root(),
 +                              id, errp,
-+                              "filename", filename,
++                              "service", service,
 +                              NULL));
 +}
 +
 +
-+static const TypeInfo qauthz_list_file_info =3D {
-+    .parent =3D TYPE_QAUTHZ_LIST,
-+    .name =3D TYPE_QAUTHZ_LIST_FILE,
-+    .instance_size =3D sizeof(QAuthZListFile),
-+    .instance_finalize =3D qauthz_list_file_finalize,
-+    .class_size =3D sizeof(QAuthZListFileClass),
-+    .class_init =3D qauthz_list_file_class_init,
-+    .interfaces =3D (InterfaceInfo[]) {
++static const TypeInfo qauthz_pam_info = {
++    .parent = TYPE_QAUTHZ,
++    .name = TYPE_QAUTHZ_PAM,
++    .instance_size = sizeof(QAuthZPam),
++    .instance_finalize = qauthz_pam_finalize,
++    .class_size = sizeof(QAuthZPamClass),
++    .class_init = qauthz_pam_class_init,
++    .interfaces = (InterfaceInfo[]) {
 +        { TYPE_USER_CREATABLE },
 +        { }
 +    }
@@ -348,39 +238,114 @@ nses/>.
 +
 +
 +static void
-+qauthz_list_file_register_types(void)
++qauthz_pam_register_types(void)
 +{
-+    type_register_static(&qauthz_list_file_info);
++    type_register_static(&qauthz_pam_info);
 +}
 +
 +
-+type_init(qauthz_list_file_register_types);
++type_init(qauthz_pam_register_types);
 diff --git a/authz/trace-events b/authz/trace-events
-index a896d876e8..fb65349a90 100644
+index fb65349a90..72c411927d 100644
 --- a/authz/trace-events
 +++ b/authz/trace-events
-@@ -9,3 +9,7 @@ qauthz_simple_is_allowed(void *authz, const char *wantide=
-ntity, const char *goti
- # auth/list.c
- qauthz_list_check_rule(void *authz, const char *identity, const char *ru=
-le, int format, int policy) "AuthZ list %p check rule=3D%s identity=3D%s =
-format=3D%d policy=3D%d"
- qauthz_list_default_policy(void *authz, const char *identity, int policy=
-) "AuthZ list %p default identity=3D%s policy=3D%d"
+@@ -13,3 +13,6 @@ qauthz_list_default_policy(void *authz, const char *identity, int policy) "AuthZ
+ # auth/listfile.c
+ qauthz_list_file_load(void *authz, const char *filename) "AuthZ file %p load filename=%s"
+ qauthz_list_file_refresh(void *authz, const char *filename, int success) "AuthZ file %p load filename=%s success=%d"
 +
-+# auth/listfile.c
-+qauthz_list_file_load(void *authz, const char *filename) "AuthZ file %p =
-load filename=3D%s"
-+qauthz_list_file_refresh(void *authz, const char *filename, int success)=
- "AuthZ file %p load filename=3D%s success=3D%d"
-diff --git a/include/authz/listfile.h b/include/authz/listfile.h
++# auth/pam.c
++qauthz_pam_check(void *authz, const char *identity, const char *service) "AuthZ PAM %p identity=%s service=%s"
+diff --git a/configure b/configure
+index 14b11130a7..85d2ac4b78 100755
+--- a/configure
++++ b/configure
+@@ -445,6 +445,7 @@ nettle_kdf="no"
+ gcrypt=""
+ gcrypt_hmac="no"
+ gcrypt_kdf="no"
++auth_pam=""
+ vte=""
+ virglrenderer=""
+ tpm="yes"
+@@ -1310,6 +1311,10 @@ for opt do
+   ;;
+   --enable-gcrypt) gcrypt="yes"
+   ;;
++  --disable-auth-pam) auth_pam="no"
++  ;;
++  --enable-auth-pam) auth_pam="yes"
++  ;;
+   --enable-rdma) rdma="yes"
+   ;;
+   --disable-rdma) rdma="no"
+@@ -1575,6 +1580,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   gnutls          GNUTLS cryptography support
+   nettle          nettle cryptography support
+   gcrypt          libgcrypt cryptography support
++  auth-pam        PAM access control
+   sdl             SDL UI
+   --with-sdlabi     select preferred SDL ABI 1.2 or 2.0
+   gtk             gtk UI
+@@ -2814,6 +2820,32 @@ else
+ fi
+ 
+ 
++##########################################
++# PAM probe
++
++if test "x$auth_pam" != "no"; then
++    cat > $TMPC <<EOF
++#include <security/pam_appl.h>
++#include <stdio.h>
++int main(void) {
++   const char *service_name = "qemu";
++   const char *user = "frank";
++   const struct pam_conv *pam_conv = NULL;
++   pam_handle_t *pamh = NULL;
++   pam_start(service_name, user, pam_conv, &pamh);
++}
++EOF
++    if compile_prog "" "-lpam" ; then
++	auth_pam=yes
++    else
++	if test "$auth_pam" = "yes"; then
++	    feature_not_found "PAM" "Install pam-devel"
++	else
++	    auth_pam=no
++	fi
++    fi
++fi
++
+ ##########################################
+ # getifaddrs (for tests/test-io-channel-socket )
+ 
+@@ -5826,6 +5858,7 @@ echo "libgcrypt kdf     $gcrypt_kdf"
+ echo "nettle            $nettle $(echo_version $nettle $nettle_version)"
+ echo "nettle kdf        $nettle_kdf"
+ echo "libtasn1          $tasn1"
++echo "PAM               $auth_pam"
+ echo "curses support    $curses"
+ echo "virgl support     $virglrenderer"
+ echo "curl support      $curl"
+@@ -6286,6 +6319,9 @@ fi
+ if test "$tasn1" = "yes" ; then
+   echo "CONFIG_TASN1=y" >> $config_host_mak
+ fi
++if test "$auth_pam" = "yes" ; then
++    echo "CONFIG_AUTH_PAM=y" >> $config_host_mak
++fi
+ if test "$have_ifaddrs_h" = "yes" ; then
+     echo "HAVE_IFADDRS_H=y" >> $config_host_mak
+ fi
+diff --git a/include/authz/pam.h b/include/authz/pam.h
 new file mode 100644
-index 0000000000..7b01bcfbd7
+index 0000000000..461313c15b
 --- /dev/null
-+++ b/include/authz/listfile.h
-@@ -0,0 +1,104 @@
++++ b/include/authz/pam.h
+@@ -0,0 +1,84 @@
 +/*
-+ * QEMU list file authorization driver
++ * QEMU pam authorization driver
 + *
 + * Copyright (c) 2018 Red Hat, Inc.
 + *
@@ -395,40 +360,38 @@ index 0000000000..7b01bcfbd7
 + * Lesser General Public License for more details.
 + *
 + * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + *
 + */
 +
-+#ifndef QAUTHZ_LIST_FILE_H__
-+#define QAUTHZ_LIST_FILE_H__
++#ifndef QAUTHZ_PAM_H__
++#define QAUTHZ_PAM_H__
 +
-+#include "authz/list.h"
-+#include "qapi/qapi-types-authz.h"
-+#include "qemu/inotify.h"
++#include "authz/base.h"
 +
-+#define TYPE_QAUTHZ_LIST_FILE "authz-list-file"
 +
-+#define QAUTHZ_LIST_FILE_CLASS(klass)                        \
-+    OBJECT_CLASS_CHECK(QAuthZListFileClass, (klass),        \
-+                       TYPE_QAUTHZ_LIST_FILE)
-+#define QAUTHZ_LIST_FILE_GET_CLASS(obj)              \
-+    OBJECT_GET_CLASS(QAuthZListFileClass, (obj),    \
-+                      TYPE_QAUTHZ_LIST_FILE)
-+#define QAUTHZ_LIST_FILE(obj) \
-+    INTERFACE_CHECK(QAuthZListFile, (obj),          \
-+                    TYPE_QAUTHZ_LIST_FILE)
++#define TYPE_QAUTHZ_PAM "authz-pam"
 +
-+typedef struct QAuthZListFile QAuthZListFile;
-+typedef struct QAuthZListFileClass QAuthZListFileClass;
++#define QAUTHZ_PAM_CLASS(klass) \
++     OBJECT_CLASS_CHECK(QAuthZPamClass, (klass), \
++                        TYPE_QAUTHZ_PAM)
++#define QAUTHZ_PAM_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(QAuthZPamClass, (obj), \
++                      TYPE_QAUTHZ_PAM)
++#define QAUTHZ_PAM(obj) \
++     INTERFACE_CHECK(QAuthZPam, (obj), \
++                     TYPE_QAUTHZ_PAM)
++
++typedef struct QAuthZPam QAuthZPam;
++typedef struct QAuthZPamClass QAuthZPamClass;
 +
 +
 +/**
-+ * QAuthZListFile:
++ * QAuthZPam:
 + *
-+ * This authorization driver provides a file mechanism
++ * This authorization driver provides a pam mechanism
 + * for granting access by matching user names against a
-+ * file of globs. Each match rule has an associated policy
++ * list of globs. Each match rule has an associated policy
 + * and a catch all policy applies if no rule matches
 + *
 + * To create an instance of this class via QMP:
@@ -436,113 +399,34 @@ nses/>.
 + *  {
 + *    "execute": "object-add",
 + *    "arguments": {
-+ *      "qom-type": "authz-list-file",
-+ *      "id": "authz0",
++ *      "qom-type": "authz-pam",
++ *      "id": "auth0",
 + *      "parameters": {
-+ *        "filename": "/etc/qemu/myvm-vnc.acl",
-+ *        "refresh": "yes"
++ *        "service": "qemu-vnc-tls"
 + *      }
 + *    }
 + *  }
 + *
-+ * If 'refresh' is 'yes', inotify is used to monitor for changes
-+ * to the file and auto-reload the rules.
-+ *
-+ * The myvm-vnc.acl file should contain the parameters for
-+ * the QAuthZList object in JSON format:
-+ *
-+ *      {
-+ *        "rules": [
-+ *           { "match": "fred", "policy": "allow", "format": "exact" },
-+ *           { "match": "bob", "policy": "allow", "format": "exact" },
-+ *           { "match": "danb", "policy": "deny", "format": "exact" },
-+ *           { "match": "dan*", "policy": "allow", "format": "glob" }
-+ *        ],
-+ *        "policy": "deny"
-+ *      }
 + *
 + */
-+struct QAuthZListFile {
++struct QAuthZPam {
 +    QAuthZ parent_obj;
 +
-+    QAuthZ *list;
-+    char *filename;
-+    bool refresh;
-+    QInotify *inotify;
++    char *service;
 +};
 +
 +
-+struct QAuthZListFileClass {
++struct QAuthZPamClass {
 +    QAuthZClass parent_class;
 +};
 +
 +
-+QAuthZListFile *qauthz_list_file_new(const char *id,
-+                                     const char *filename,
-+                                     Error **errp);
++QAuthZPam *qauthz_pam_new(const char *id,
++                          const char *service,
++                          Error **errp);
 +
 +
-+#endif /* QAUTHZ_LIST_FILE_H__ */
++#endif /* QAUTHZ_PAM_H__ */
 +
-diff --git a/qom/object.c b/qom/object.c
-index cb7a8cd589..6ffe7d0362 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -546,15 +546,19 @@ Object *object_new_with_propv(const char *typename,
-         goto error;
-     }
-=20
--    object_property_add_child(parent, id, obj, &local_err);
--    if (local_err) {
--        goto error;
-+    if (id !=3D NULL) {
-+        object_property_add_child(parent, id, obj, &local_err);
-+        if (local_err) {
-+            goto error;
-+        }
-     }
-=20
-     if (object_dynamic_cast(obj, TYPE_USER_CREATABLE)) {
-         user_creatable_complete(obj, &local_err);
-         if (local_err) {
--            object_unparent(obj);
-+            if (id !=3D NULL) {
-+                object_unparent(obj);
-+            }
-             goto error;
-         }
-     }
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index 72b97a8bed..e0f12c0a9b 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -83,16 +83,20 @@ Object *user_creatable_add_type(const char *type, con=
-st char *id,
-         goto out;
-     }
-=20
--    object_property_add_child(object_get_objects_root(),
--                              id, obj, &local_err);
--    if (local_err) {
--        goto out;
-+    if (id !=3D NULL) {
-+        object_property_add_child(object_get_objects_root(),
-+                                  id, obj, &local_err);
-+        if (local_err) {
-+            goto out;
-+        }
-     }
-=20
-     user_creatable_complete(obj, &local_err);
-     if (local_err) {
--        object_property_del(object_get_objects_root(),
--                            id, &error_abort);
-+        if (id !=3D NULL) {
-+            object_property_del(object_get_objects_root(),
-+                                id, &error_abort);
-+        }
-         goto out;
-     }
- out:
---=20
+-- 
 2.17.0
