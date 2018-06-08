@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fR474-0002LA-16
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 19:14:39 -0400
+	(envelope-from <mst@redhat.com>) id 1fR4v9-0000em-5H
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 20:06:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fR470-0000jz-2e
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 19:14:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58800 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fR4v5-0006fk-Vj
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 20:06:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50724 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fR46z-0000iw-Tq
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 19:14:33 -0400
-Date: Fri, 8 Jun 2018 02:14:31 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fR4v5-0006f1-PQ
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 20:06:19 -0400
+Date: Fri, 8 Jun 2018 03:06:12 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180608021134-mutt-send-email-mst@kernel.org>
-References: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
-	<20180607223111.27792-3-ross.zwisler@linux.intel.com>
+Message-ID: <20180608000540.276617-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180607223111.27792-3-ross.zwisler@linux.intel.com>
-Subject: Re: [Qemu-devel] [qemu PATCH 3/5] hw/i386: Update SSDT table used
- by "make check"
+Subject: [Qemu-devel] [PATCH] kvm: support -realtime cpu-pm=on|off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +24,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Zwisler <ross.zwisler@linux.intel.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org
 
-On Thu, Jun 07, 2018 at 04:31:09PM -0600, Ross Zwisler wrote:
-> This commit:
-> 
-> commit aa78a16d8645 ("hw/i386: Rename 2.13 machine types to 3.0")
-> 
-> updated the name used to create the q35 machine, which in turn changed the
-> SSDT table which is generated when we run "make check":
-> 
->   acpi-test: Warning! SSDT mismatch. Actual [asl:/tmp/asl-QZDWJZ.dsl,
->   aml:/tmp/aml-T8JYJZ], Expected [asl:/tmp/asl-DTWVJZ.dsl,
->   aml:tests/acpi-test-data/q35/SSDT.dimmpxm].
-> 
-> Here's the only difference, aside from the checksum:
-> 
->   <     Name (MEMA, 0x07FFF000)
->   ---
->   >     Name (MEMA, 0x07FFE000)
+With this flag, kvm allows guest to control host CPU power state.  This
+increases latency for other processes using same host CPU in an
+unpredictable way, but if decreases idle entry/exit times for the
+running VCPU.
 
-Weird. How come the phys address changes just because of machine name?
+Follow-up patches will expose this capability to guest
+(using mwait leaf).
 
-> 
-> Update the binary table that we compare against so it reflects this name
-> change.
-> 
-> Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Fixes: commit aa78a16d8645 ("hw/i386: Rename 2.13 machine types to 3.0")
-> ---
->  tests/acpi-test-data/q35/SSDT.dimmpxm | Bin 685 -> 685 bytes
->  1 file changed, 0 insertions(+), 0 deletions(-)
-> 
-> diff --git a/tests/acpi-test-data/q35/SSDT.dimmpxm b/tests/acpi-test-data/q35/SSDT.dimmpxm
-> index 8ba0e67cb72daa81a65da4906d37a5e0f4af1fd4..2d5b721bcf9c398feb6d005761f898015042e8a4 100644
-> GIT binary patch
-> delta 23
-> fcmZ3>x|WqIIM^j*EfWI+qr*n71x(Bz{<8xBPCEwk
-> 
-> delta 23
-> fcmZ3>x|WqIIM^j*EfWI+W57nP1x(Bj{<8xBPMZev
-> 
-> -- 
-> 2.14.4
+Based on a patch by Wanpeng Li <kernellwp@gmail.com> .
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ include/sysemu/sysemu.h |  1 +
+ target/i386/kvm.c       | 26 ++++++++++++++++++++++++++
+ vl.c                    |  6 ++++++
+ qemu-options.hx         |  9 +++++++--
+ 4 files changed, 40 insertions(+), 2 deletions(-)
+
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index e893f72f3b..b921c6f3b7 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -128,6 +128,7 @@ extern bool boot_strict;
+ extern uint8_t *boot_splash_filedata;
+ extern size_t boot_splash_filedata_size;
+ extern bool enable_mlock;
++extern bool enable_cpu_pm;
+ extern uint8_t qemu_extra_params_fw[2];
+ extern QEMUClockType rtc_clock;
+ extern const char *mem_path;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 44f70733e7..e4c3e65e00 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1041,6 +1041,32 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         }
+     }
+ 
++    if (enable_cpu_pm) {
++        int disable_exits = kvm_check_extension(cs->kvm_state, KVM_CAP_X86_DISABLE_EXITS);
++        int ret;
++
++/* Work around for kernel header with a typo. TODO: fix header and drop. */
++#if defined(KVM_X86_DISABLE_EXITS_HTL) && !defined(KVM_X86_DISABLE_EXITS_HLT)
++#define KVM_X86_DISABLE_EXITS_HLT KVM_X86_DISABLE_EXITS_HTL
++#endif
++        if (disable_exits) {
++            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
++                              KVM_X86_DISABLE_EXITS_HLT |
++                              KVM_X86_DISABLE_EXITS_PAUSE);
++            /* PV unhalt relies on HALT to cause an exit */
++            if (env->user_features[FEAT_KVM] & (1U << KVM_FEATURE_PV_UNHALT)) {
++                disable_exits &= ~KVM_X86_DISABLE_EXITS_HLT;
++            }
++        }
++
++        ret = kvm_vm_enable_cap(cs->kvm_state, KVM_CAP_X86_DISABLE_EXITS, 0,
++                                disable_exits);
++        if (ret < 0) {
++            error_report("kvm: guest stopping CPU not supported: %s", strerror(-ret));
++        }
++    }
++
++
+     qemu_add_vm_change_state_handler(cpu_update_state, env);
+ 
+     c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
+diff --git a/vl.c b/vl.c
+index 06031715ac..7bea9c2177 100644
+--- a/vl.c
++++ b/vl.c
+@@ -142,6 +142,7 @@ ram_addr_t ram_size;
+ const char *mem_path = NULL;
+ int mem_prealloc = 0; /* force preallocation of physical target memory */
+ bool enable_mlock = false;
++bool enable_cpu_pm = false;
+ int nb_nics;
+ NICInfo nd_table[MAX_NICS];
+ int autostart;
+@@ -386,6 +387,10 @@ static QemuOptsList qemu_realtime_opts = {
+             .name = "mlock",
+             .type = QEMU_OPT_BOOL,
+         },
++        {
++            .name = "cpu-pm",
++            .type = QEMU_OPT_BOOL,
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -3904,6 +3909,7 @@ int main(int argc, char **argv, char **envp)
+                     exit(1);
+                 }
+                 enable_mlock = qemu_opt_get_bool(opts, "mlock", true);
++                enable_cpu_pm = qemu_opt_get_bool(opts, "cpu-pm", false);
+                 break;
+             case QEMU_OPTION_msg:
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("msg"), optarg,
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c0d3951e9f..e6f31071ce 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3325,16 +3325,21 @@ Do not start CPU at startup (you must type 'c' in the monitor).
+ ETEXI
+ 
+ DEF("realtime", HAS_ARG, QEMU_OPTION_realtime,
+-    "-realtime [mlock=on|off]\n"
++    "-realtime [mlock=on|off][cpu-halt=on|off[\n"
+     "                run qemu with realtime features\n"
+-    "                mlock=on|off controls mlock support (default: on)\n",
++    "                mlock=on|off controls mlock support (default: on)\n"
++    "                cpu-pm=on|off controls cpu power management (default: off)\n",
+     QEMU_ARCH_ALL)
+ STEXI
+ @item -realtime mlock=on|off
++@item -realtime cpu-pm=on|off
+ @findex -realtime
+ Run qemu with realtime features.
+ mlocking qemu and guest memory can be enabled via @option{mlock=on}
+ (enabled by default).
++guest ability to manage power state of host cpus (increasing latency for other
++processes on the same host cpu, but decreasing latency for guest)
++can be enabled via @option{cpu-pm=on} (disabled by default).
+ ETEXI
+ 
+ DEF("gdb", HAS_ARG, QEMU_OPTION_gdb, \
+-- 
+MST
