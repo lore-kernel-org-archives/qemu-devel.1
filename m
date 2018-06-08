@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRLGj-0003rc-14
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:33:46 -0400
+	(envelope-from <thuth@redhat.com>) id 1fRLH7-00047l-1G
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:34:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRLGf-0003a6-Ti
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:33:45 -0400
-References: <20180608152353.98712-1-vsementsov@virtuozzo.com>
-	<20180608152353.98712-5-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <6a6e8081-7e3b-31da-ead8-8e6a3165f8f3@virtuozzo.com>
-Date: Fri, 8 Jun 2018 20:33:33 +0300
+	(envelope-from <thuth@redhat.com>) id 1fRLH0-0003ny-PJ
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:34:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49048 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fRLH0-0003nL-Kk
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:34:02 -0400
+References: <20180608131604.16826-1-berrange@redhat.com>
+	<20180608131604.16826-4-berrange@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5e547f16-5756-984f-35f8-f7d06849c116@redhat.com>
+Date: Fri, 8 Jun 2018 19:33:52 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180608152353.98712-5-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180608131604.16826-4-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v4 4/6] nbd/server: implement dirty bitmap
- export
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] glib: enforce the minimum required
+ version and warn about old APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Xu <peterx@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Olaf Hering <olaf@aepfle.de>
 
-08.06.2018 18:23, Vladimir Sementsov-Ogievskiy wrote:
-> Handle new NBD meta namespace: "qemu", and corresponding queries:
-> "qemu:dirty-bitmap:<export bitmap name>".
->
-> With new metadata context negotiated, BLOCK_STATUS query will reply
-> with dirty-bitmap data, converted to extents. New public function
-> nbd_export_bitmap selects bitmap to export. For now, only one bitmap
-> may be exported.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 08.06.2018 15:16, Daniel P. Berrang=C3=A9 wrote:
+> There are two useful macros that can be defined before including
+> glib.h that are related to the min required glib version
+>=20
+>  - GLIB_VERSION_MIN_REQUIRED
+>=20
+>    When this is defined, if code uses an API that was deprecated
+>    in this version, or older, a compiler warning will be emitted.
+>    This alerts maintainers to update their code to whatever new
+>    replacement API is now recommended best practice.
+>=20
+>  - GLIB_VERSION_MAX_ALLOWED
+>=20
+>    When this is defined, if code uses an API that was introduced
+>    in a version that is newer than the declared version, a compiler
+>    warning will be emitted. This alerts maintainers if new code
+>    accidentally uses functionality that won't be available on some
+>    supported platforms.
+>=20
+> The GLIB_VERSION_MAX_ALLOWED constant makes it a bit harder to opt
+> in to using specific new APIs with a GLIB_CHECK_VERSION conditional.
+> To workaround this Pragmas can be used to temporarily turn off the
+> -Wdeprecated-declarations compiler warning, while a static inline
+> compat function is implemented. This workaround is illustrated with the
+> implementation of the g_strv_contains method to satisfy the test suite.
+>=20
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 > ---
+>  include/glib-compat.h | 68 +++++++++++++++++++++++++++++++++++++++++++
+>  tests/test-qga.c      |  2 --
+>  2 files changed, 68 insertions(+), 2 deletions(-)
 
-[...]
-
-> +static unsigned bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
-> +                                  uint64_t length, NBDExtent *extents,
-> +                                  unsigned nb_extents)
-> +{
-> +    uint64_t begin = offset, end;
-> +    uint64_t overall_end = offset + length;
-> +    unsigned i = 0;
-> +    BdrvDirtyBitmapIter *it;
-> +    bool dirty;
-> +
-> +    bdrv_dirty_bitmap_lock(bitmap);
-> +
-> +    it = bdrv_dirty_iter_new(bitmap);
-> +    dirty = bdrv_get_dirty_locked(NULL, bitmap, offset);
-> +
-> +    while (begin < overall_end && i < nb_extents) {
-> +        if (dirty) {
-> +            end = bdrv_dirty_bitmap_next_zero(bitmap, begin);
-> +        } else {
-> +            bdrv_set_dirty_iter(it, begin);
-> +            end = bdrv_dirty_iter_next(it);
-> +        }
-> +        if (end == -1) {
-> +            end = overall_end;
-
-here better is bdrv_dirty_bitmap_size()
-
-> +        }
-
-and here we should crop it to overall_end in case of REQ_ONE
-
-> +
-> +        i += add_extents(extents + i, nb_extents - i, end - begin,
-> +                         dirty ? NBD_STATE_DIRTY : 0);
-> +        begin = end;
-> +        dirty = !dirty;
-> +    }
-> +
-> +    bdrv_dirty_iter_free(it);
-> +
-> +    bdrv_dirty_bitmap_unlock(bitmap);
-> +
-> +    return i;
-> +}
-
--- 
-Best regards,
-Vladimir
+Reviewed-by: Thomas Huth <thuth@redhat.com>
