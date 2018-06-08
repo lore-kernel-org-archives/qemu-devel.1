@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fRIyX-00069N-FK
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:06:50 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fRIzH-0006jz-3F
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:07:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fRIyW-0004o7-Q2
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:06:49 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:51361)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fRIyW-0004nH-JE
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:06:48 -0400
-Received: by mail-wm0-x230.google.com with SMTP id r15-v6so3915391wmc.1
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 08:06:48 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1fRIzG-0005CC-3P
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:07:35 -0400
+References: <20180606152128.449-1-f4bug@amsat.org>
+	<b4903491-f450-1a54-2a70-a084c30cd8c6@redhat.com>
+	<CAFEAcA_xP37u4KMdvPe8MyU3y_6re88pAx3KTLY_DOP0qWQzqA@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e67c1e7c-a720-beb9-4858-2459f7001091@redhat.com>
+Date: Fri, 8 Jun 2018 11:07:27 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAJSP0QURm0Y6FBByzY=kgf7JmDDyt5PLkkxk+ODi21uQKUGq5A@mail.gmail.com>
-References: <CAJSP0QURm0Y6FBByzY=kgf7JmDDyt5PLkkxk+ODi21uQKUGq5A@mail.gmail.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 8 Jun 2018 16:06:46 +0100
-Message-ID: <CAJSP0QWe+yBNoXUuKcNw=zAOGC-fGZqzC5CcubFWsVhraYsiKA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Cortex M0 emulation tasks
+In-Reply-To: <CAFEAcA_xP37u4KMdvPe8MyU3y_6re88pAx3KTLY_DOP0qWQzqA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 00/11] misc: Add trailing '\n' to
+ qemu_log() calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,18 +26,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>, Joel Stanley <joel@jms.id.au>
-Cc: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>, Jim Mussared <jim@groklearning.com>, qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Michael Walle <michael@walle.cc>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <paul.burton@mips.com>, Yongbok Kim <yongbok.kim@mips.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Antony Pavlov <antonynpavlov@gmail.com>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, May 28, 2018 at 3:26 PM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> Tasks:
->
-> D3.3 Instruction Support
-> D3.5.1 Alignment support
 
-Julia and I have discussed these two tasks and she will work on them.
 
-I will implement an undefined instruction test case that verifies that
-all undefined instructions do indeed raise the expected exception.
+On 06/08/2018 06:54 AM, Peter Maydell wrote:
+> On 6 June 2018 at 20:43, John Snow <jsnow@redhat.com> wrote:
+>> so error_setg must be used WITHOUT \n and logging must happen with \n?
+>>
+>> If we're sure that's the way we want to have things laid out, we really
+>> ought to augment checkpatch to catch this -- because there's 0% chance
+>> that we'll keep it straight on our own otherwise.
+> 
+> It's a historical side effect of them being basically separately
+> designed APIs. error_setg() takes the "give it the entire error
+> message" approach. logging is printf-style and gives the caller
+> flexibility to compose more complicated lines of logging with
+> multiple calls. Consistency between the two might be nice but
+> there are an awful lot of qemu_log calls in the codebase to check
+> and change to the other convention...
+> 
 
-Stefan
+Well, there's a pragmatic reason against having it be uniform.
+
+If logging lets you build more complicated statements, perhaps a
+checkpatch /warning/ that you've omitted the newline might be nice.
+
+--js
