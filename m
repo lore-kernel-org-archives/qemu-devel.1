@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRGfm-0005pS-GT
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:20 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fRGfo-0005pX-Iz
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRGfl-0000xg-8I
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:18 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34573)
+	(envelope-from <alex.bennee@linaro.org>) id 1fRGfn-0000yv-4Z
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:20 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35847)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fRGfl-0000wr-0Q
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:17 -0400
-Received: by mail-wr0-x243.google.com with SMTP id a12-v6so13261990wro.1
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 05:39:16 -0700 (PDT)
+	id 1fRGfm-0000yR-UG
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:19 -0400
+Received: by mail-wr0-x244.google.com with SMTP id f16-v6so13263094wrm.3
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 05:39:18 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  8 Jun 2018 13:32:58 +0100
-Message-Id: <20180608123307.24773-41-alex.bennee@linaro.org>
+Date: Fri,  8 Jun 2018 13:33:06 +0100
+Message-Id: <20180608123307.24773-49-alex.bennee@linaro.org>
 In-Reply-To: <20180608123307.24773-1-alex.bennee@linaro.org>
 References: <20180608123307.24773-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 40/49] tests/tcg: enable building for PowerPC
+Subject: [Qemu-devel] [PATCH v6 48/49] tests/docker: prevent sub-makes
+ re-building debian-sid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +33,46 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Now we have restored debian-image-powerpc-cross using Debian SID
-compilers we can build for 32 bit powerpc. Although PPC32 supports a
-range of pages sizes currently only 4k works so the others are
-commented out for now.
-
-We can also merge the ppc64 support under the base architecture
-directory to avoid too much proliferation of directories.
+This is a bit of a hack but having ensured Debian SID is built at
+least once in the top-level we don't need to do it over and over
+again. Perhaps a better solution would be to have docker.py spit out
+the dependency if a base image is too old?
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
 ---
-v5
-  - new for v5
----
- tests/tcg/ppc/Makefile.include     |  7 +++++++
- tests/tcg/ppc/Makefile.target      | 12 ++++++++++++
- tests/tcg/ppc64le/Makefile.include |  2 --
- 3 files changed, 19 insertions(+), 2 deletions(-)
- create mode 100644 tests/tcg/ppc/Makefile.include
- create mode 100644 tests/tcg/ppc/Makefile.target
- delete mode 100644 tests/tcg/ppc64le/Makefile.include
+ tests/docker/Makefile.include | 6 +++++-
+ tests/tcg/Makefile.include    | 1 +
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/tests/tcg/ppc/Makefile.include b/tests/tcg/ppc/Makefile.include
-new file mode 100644
-index 0000000000..b062c30dd3
---- /dev/null
-+++ b/tests/tcg/ppc/Makefile.include
-@@ -0,0 +1,7 @@
-+ifeq ($(TARGET_NAME),ppc)
-+DOCKER_IMAGE=debian-powerpc-cross
-+DOCKER_CROSS_COMPILER=powerpc-linux-gnu-gcc
-+else ifeq ($(TARGET_NAME),ppc64le)
-+DOCKER_IMAGE=debian-ppc64el-cross
-+DOCKER_CROSS_COMPILER=powerpc64le-linux-gnu-gcc
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 78568d7c61..3393e9f97d 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -63,8 +63,12 @@ docker-image-debian-win64-cross: docker-image-debian8-mxe
+ 
+ # Debian SID images - we are tracking a rolling distro so we want to
+ # force a re-build of the base image if we ever need to build one of
+-# its children.
++# its children. However when doing check-tcg we ensure everything is
++# built at top-level make so we can dispense with NOCACHE here to
++# avoid excessive re-builds.
++ifneq ($(SUBMAKE_NOCACHE_HACK),y)
+ docker-image-debian-sid: NOCACHE=1
 +endif
-diff --git a/tests/tcg/ppc/Makefile.target b/tests/tcg/ppc/Makefile.target
-new file mode 100644
-index 0000000000..f5e08c7376
---- /dev/null
-+++ b/tests/tcg/ppc/Makefile.target
-@@ -0,0 +1,12 @@
-+# -*- Mode: makefile -*-
-+#
-+# PPC - included from tests/tcg/Makefile
-+#
-+
-+ifneq (,$(findstring 64,$(TARGET_NAME)))
-+# On PPC64 Linux can be configured with 4k (default) or 64k pages (currently broken)
-+EXTRA_RUNS+=run-test-mmap-4096 #run-test-mmap-65536
-+else
-+# On PPC32 Linux supports 4K/16K/64K/256K (but currently only 4k works)
-+EXTRA_RUNS+=run-test-mmap-4096 #run-test-mmap-16384 run-test-mmap-65536 run-test-mmap-262144
-+endif
-diff --git a/tests/tcg/ppc64le/Makefile.include b/tests/tcg/ppc64le/Makefile.include
-deleted file mode 100644
-index d71cfc9aa7..0000000000
---- a/tests/tcg/ppc64le/Makefile.include
-+++ /dev/null
-@@ -1,2 +0,0 @@
--DOCKER_IMAGE=debian-ppc64el-cross
--DOCKER_CROSS_COMPILER=powerpc64le-linux-gnu-gcc
+ 
+ docker-image-debian-alpha-cross: docker-image-debian-sid
+ docker-image-debian-hppa-cross: docker-image-debian-sid
+diff --git a/tests/tcg/Makefile.include b/tests/tcg/Makefile.include
+index 4851df0951..951f40c28d 100644
+--- a/tests/tcg/Makefile.include
++++ b/tests/tcg/Makefile.include
+@@ -39,6 +39,7 @@ ifeq ($(HAVE_USER_DOCKER)$(GUEST_BUILD),y)
+ ifneq ($(DOCKER_IMAGE),)
+ 
+ # We also need the Docker make rules to depend on
++SUBMAKE_NOCACHE_HACK=y
+ include $(SRC_PATH)/tests/docker/Makefile.include
+ 
+ DOCKER_COMPILE_CMD="$(DOCKER_SCRIPT) cc --user $(shell id -u) \
 -- 
 2.17.1
