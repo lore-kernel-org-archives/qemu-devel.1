@@ -1,16 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fRGZP-0000ht-HK
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:32:46 -0400
+	(envelope-from <ari@tuxera.com>) id 1fRGZV-0000m4-Ti
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:32:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fRGZO-0005x3-Ah
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:32:43 -0400
+	(envelope-from <ari@tuxera.com>) id 1fRGZS-0005zj-R1
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:32:49 -0400
 From: Ari Sundholm <ari@tuxera.com>
-Date: Fri, 8 Jun 2018 15:32:18 +0300
-Message-ID: <1528461148-17925-1-git-send-email-ari@tuxera.com>
+Date: Fri, 8 Jun 2018 15:32:23 +0300
+Message-ID: <1528461148-17925-6-git-send-email-ari@tuxera.com>
+In-Reply-To: <1528461148-17925-1-git-send-email-ari@tuxera.com>
+References: <1528461148-17925-1-git-send-email-ari@tuxera.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 00/10] New block driver: blklogwrites
+Subject: [Qemu-devel] [PATCH v4 05/10] hw/ide/qdev: Always apply block
+ configuration to block driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,102 +23,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ari Sundholm <ari@tuxera.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Ari Sundholm <ari@tuxera.com>, John Snow <jsnow@redhat.com>, "open
+	list:IDE" <qemu-block@nongnu.org>
 
-This patch series adds a new block driver, blklogwrites, to QEMU. The
-driver is given two block devices: a raw device backed by an image or a
-host block device, and a log device, typically backed by a file, on
-which writes to the raw device are logged.
+This allows the block driver to use the block configuration of the new
+IDE device. One use for this information is to set request limits
+using this information.
 
-The logging format used is the same as in the dm-log-writes target of
-the Linux kernel device mapper. The log reflects the writes that have
-been performed on the guest block device and flushed. To be strict, the
-log may contain writes that have not been flushed yet, but they are
-technically outside the bounds of the log until the next flush updates
-the metadata in the log superblock. We believe these semantics to be
-useful even though they may not be completely identical to those of
-dm-log-writes.
+Signed-off-by: Ari Sundholm <ari@tuxera.com>
+---
+ hw/ide/qdev.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-This functionality can be used for crash consistency and fs consistency
-testing in filesystem drivers, including on non-Linux guests and older
-guests running Linux versions without support for dm-log-writes. This
-is simple and useful. Admittedly this and more advanced things could
-perhaps be done by extending the quorum driver, but this approach would
-require re-engineering the functionality and involve a more complicated
-setup, so we offer this simple solution which we have found useful
-internally.
-
-In the first patch of this series, two block permission constants are
-moved from block.c to include/block/block.h to make them available
-outside of block.c. The next patch uses these constants.
-
-The driver requires all requests to be aligned to the sector size. In
-the second patch of this series, which includes the bulk of the
-blklogwrites driver, this sector size is assumed to be equal to
-BDRV_SECTOR_SIZE for simplicity.
-
-In patches 3-8, a mechanism to pass the block configuration of a block
-backend to a block driver is introduced, and this mechanism is
-integrated in various hw/block drivers.
-
-In patch 9, blklogwrites is changed to use the block configuration of
-the relevant block backend to set its block limits.
-
-Finally, in patch 10, blklogwrites is improved to use the logical
-sector size of the block backend for logging. This means that the
-sector size in the log metadata will be set to the logical sector size,
-and offsets and sizes of writes will be expressed as a multiple of that
-instead of BDRV_SECTOR_SIZE.
-
-v4:
-  - Check return value of snprintf() (flagged by patchew)
-  - Don't use C99 for loop initial declaration (flagged by patchew, but
-    wasn't QEMU supposed to be C99? Oh well.)
-  - Add proper "Since" fields for blklogwrites in block-core.json
-  - Rebase on current upstream master
-
-v3:
-  - Rebase on current upstream master
-
-v2:
-  - Incorporate review feedback
-  - Add patches to apply block configurations in more block device
-    drivers
-
-Aapo Vienamo (1):
-  block: Add blklogwrites
-
-Ari Sundholm (9):
-  block: Move two block permission constants to the relevant enum
-  block: Add a mechanism for passing a block driver a block
-    configuration
-  hw/scsi/scsi-disk: Always apply block configuration to block driver
-  hw/ide/qdev: Always apply block configuration to block driver
-  hw/block/virtio-blk: Always apply block configuration to block driver
-  hw/block/nvme: Always apply block configuration to block driver
-  hw/block/fdc: Always apply block configuration to block driver
-  block/blklogwrites: Use block limits from the backend block
-    configuration
-  block/blklogwrites: Use the block device logical sector size when
-    logging writes
-
- MAINTAINERS               |   6 +
- block.c                   |   6 -
- block/Makefile.objs       |   1 +
- block/blklogwrites.c      | 426 ++++++++++++++++++++++++++++++++++++++++++++++
- block/io.c                |  22 +++
- hw/block/block.c          |  12 +-
- hw/block/fdc.c            |   4 +
- hw/block/nvme.c           |   1 +
- hw/block/virtio-blk.c     |   1 +
- hw/ide/qdev.c             |   2 +
- hw/scsi/scsi-disk.c       |   1 +
- include/block/block.h     |  17 ++
- include/block/block_int.h |   9 +
- include/hw/block/block.h  |   1 +
- qapi/block-core.json      |  30 +++-
- 15 files changed, 526 insertions(+), 13 deletions(-)
- create mode 100644 block/blklogwrites.c
-
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index f395d24..7da1d28 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -214,6 +214,8 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+         dev->serial = g_strdup(s->drive_serial_str);
+     }
+ 
++    blkconf_apply_to_blkdrv(&dev->conf);
++
+     add_boot_device_path(dev->conf.bootindex, &dev->qdev,
+                          dev->unit ? "/disk@1" : "/disk@0");
+ }
 -- 
 2.7.4
