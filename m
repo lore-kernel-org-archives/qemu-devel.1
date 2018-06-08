@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35331)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRMPm-0006m1-9E
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:47:11 -0400
+	id 1fRMau-0000dp-Pi
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:58:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRMPj-0000uV-6F
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:47:10 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:44481)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRMPj-0000uN-1L
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:47:07 -0400
-Received: by mail-qt0-x242.google.com with SMTP id l33-v6so14423370qta.11
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 11:47:06 -0700 (PDT)
+	id 1fRMap-0005rS-U7
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:58:40 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20180601162620.32362-1-mst@redhat.com>
-	<CAFEAcA_weoW3XS2dppdc=jwpCSSAaiTxaQDxsBBKdjjA4aY_Rg@mail.gmail.com>
-	<fe4cdf31-4e5c-c3c8-936b-91a45eaa77ad@amsat.org>
-Message-ID: <68fe6a1f-e2fd-679c-d705-82173c832c3f@amsat.org>
-Date: Fri, 8 Jun 2018 15:47:02 -0300
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Fri,  8 Jun 2018 15:58:26 -0300
+Message-Id: <20180608185826.10708-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <fe4cdf31-4e5c-c3c8-936b-91a45eaa77ad@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 00/31] acpi, vhost, misc: fixes, features
+Subject: [Qemu-devel] [PATCH] Makefile: Remove qemu-version.h and
+ qemu-options.def during 'make distclean'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,100 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org
 
-On 06/08/2018 02:52 PM, Philippe Mathieu-Daudé wrote:
-> On 06/04/2018 07:28 AM, Peter Maydell wrote:
->> On 1 June 2018 at 17:26, Michael S. Tsirkin <mst@redhat.com> wrote:
->>> The following changes since commit 63b88968f139b6a77f2f81e6f1eedf70c0170a85:
->>>
->>>   intel-iommu: rework the page walk logic (2018-05-23 17:34:05 +0300)
->>>
->>> are available in the Git repository at:
->>>
->>>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->>>
->>> for you to fetch changes up to 25b1d45a1975fd8624c37b5bf42e8502ccf53460:
->>>
->>>   vhost-blk: turn on pre-defined RO feature bit (2018-06-01 19:20:38 +0300)
->>>
->>> ----------------------------------------------------------------
->>> acpi, vhost, misc: fixes, features
->>>
->>> vDPA support, fix to vhost blk RO bit handling, some include path
->>> cleanups, NFIT ACPI table.
->>>
->>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>>
->>> ----------------------------------------------------------------
->>
->> Applied, thanks.
-> 
-> Not sure this is a problem, but something experienced after rebasing:
-> 
-> 
-> #1
-> 
-> /source/qemu/qemu-nbd.c: In function ‘version’:
-> /source/qemu/qemu-nbd.c:133:6: error: expected ‘)’ before
-> ‘QEMU_FULL_VERSION’
->  "%s " QEMU_FULL_VERSION "\n"
->       ^~~~~~~~~~~~~~~~~~
->       )
-> /source/qemu/qemu-nbd.c:133:3: error: format ‘%s’ expects a matching
-> ‘char *’ argument [-Werror=format=]
->  "%s " QEMU_FULL_VERSION "\n"
->   ~^
-> cc1: all warnings being treated as errors
-> 
-> It took me a while to figure this out, probably because today is Friday.
-> 
-> $ git status --ignored show me I had a "qemu-version.h" generated long
-> time ago in the source directory.
-> 
-> - I only do out-of-tree builds.
-> 
-> - sometimes I run "make help/docker/vm-test" and friends in the source
-> directory, and my 'make' is aliased as 'make -jN'.
-> I doubt those make calls generate this file, as ./configure generates
-> it, so I probably messed with a ./configure in source dir.
-> 
-> Now, building out-of-tree dirs was finding the old /qemu-version.h
-> before the generated one in current dir.
-> 
-> I was not noticing it due to the /qemu-version.h entry in /.gitignore .
-> 
-> 
-> #2
-> 
->   CC      vl.o
-> /source/qemu/vl.c: In function ‘main’:
-> /source/qemu/vl.c:3052:18: error: ‘QEMU_OPTION_blockdev’ undeclared
-> (first use in this function); did you mean ‘QEMU_OPTION_clock’?
->              case QEMU_OPTION_blockdev:
->                   ^~~~~~~~~~~~~~~~~~~~
->                   QEMU_OPTION_clock
-> /source/qemu/vl.c:3052:18: note: each undeclared identifier is reported
-> only once for each function it appears in
-> /source/qemu/vl.c:3171:18: error: ‘QEMU_OPTION_nic’ undeclared (first
-> use in this function); did you mean ‘QEMU_OPTION_rtc’?
->              case QEMU_OPTION_nic:
->                   ^~~~~~~~~~~~~~~
->                   QEMU_OPTION_rtc
-> /source/qemu/vl.c:3574:18: error: ‘QEMU_OPTION_preconfig’ undeclared
-> (first use in this function); did you mean ‘QEMU_OPTION_writeconfig’?
->              case QEMU_OPTION_preconfig:
->                   ^~~~~~~~~~~~~~~~~~~~~
->                   QEMU_OPTION_writeconfig
-> 
-> This is the same story, but with /qemu-options.def (also in .gitignore).
-> 
-> 
-> So 'rm ${srcdir}/qemu-version.h ${srcdir}/qemu-options.def' fixed my
-> problems.
-> 
-> Should we add a check for this kind of mistakes when running out-of-tree
-> builds? I'll try something.
+qemu-version.h and qemu-options.def are generated files
+that should be deleted during 'make distclean'.
 
-Oops, doesn't seem related to this merge...
+This solves building issues with out-of-tree builds from
+a source tree that has been built in (see d1bd2423a90).
+
+This solves:
+
+- /qemu-version.h existing in source tree:
+
+    /source/qemu/qemu-nbd.c: In function ‘version’:
+    /source/qemu/qemu-nbd.c:133:6: error: expected ‘)’ before
+    ‘QEMU_FULL_VERSION’
+     "%s " QEMU_FULL_VERSION "\n"
+          ^~~~~~~~~~~~~~~~~~
+          )
+    /source/qemu/qemu-nbd.c:133:3: error: format ‘%s’ expects a matching
+    ‘char *’ argument [-Werror=format=]
+     "%s " QEMU_FULL_VERSION "\n"
+      ~^
+    cc1: all warnings being treated as errors
+
+- /qemu-options.def existing in source tree:
+
+    /source/qemu/vl.c: In function ‘main’:
+    /source/qemu/vl.c:3052:18: error: ‘QEMU_OPTION_blockdev’ undeclared
+    (first use in this function); did you mean ‘QEMU_OPTION_clock’?
+                 case QEMU_OPTION_blockdev:
+                      ^~~~~~~~~~~~~~~~~~~~
+                      QEMU_OPTION_clock
+    /source/qemu/vl.c:3052:18: note: each undeclared identifier is reported
+    only once for each function it appears in
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile b/Makefile
+index 023b3437ec..7ae453ffa2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -757,6 +757,7 @@ qemu-%.tar.bz2:
+ distclean: clean
+ 	rm -f config-host.mak config-host.h* config-host.ld $(DOCS) qemu-options.texi qemu-img-cmds.texi qemu-monitor.texi qemu-monitor-info.texi
+ 	rm -f config-all-devices.mak config-all-disas.mak config.status
++	rm -f qemu-version.h qemu-options.def
+ 	rm -f po/*.mo tests/qemu-iotests/common.env
+ 	rm -f roms/seabios/config.mak roms/vgabios/config.mak
+ 	rm -f qemu-doc.info qemu-doc.aux qemu-doc.cp qemu-doc.cps
+-- 
+2.17.1
