@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58903)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fR6tu-0006UQ-B2
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:13:15 -0400
+	(envelope-from <peterx@redhat.com>) id 1fR6ym-0000bX-E7
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:18:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fR6tt-00009W-92
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:13:14 -0400
-Date: Fri, 8 Jun 2018 12:11:39 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180608021139.GC3344@umbus.fritz.box>
-References: <20180607171751.11510-1-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <peterx@redhat.com>) id 1fR6yj-00056O-6I
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:18:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35452 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fR6yi-000553-UJ
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:18:13 -0400
+Date: Fri, 8 Jun 2018 10:17:58 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180608021758.GS750@xz-mi>
+References: <20180530154325-mutt-send-email-mst@kernel.org>
+	<5B14F2A3.9010805@intel.com> <20180605065857.GC9216@xz-mi>
+	<5B168EAB.7090607@intel.com> <20180606054227.GA7815@xz-mi>
+	<5B17B1A7.8060307@intel.com> <20180606110217.GF7815@xz-mi>
+	<5B18C18D.3070007@intel.com> <20180607063241.GA750@xz-mi>
+	<5B191E1A.1000605@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="6zdv2QT/q3FMhpsV"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180607171751.11510-1-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 0/4] cuda/mos6522 migration fixes
+In-Reply-To: <5B191E1A.1000605@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v7 4/5] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,85 +32,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com, zhang.zhanghailiang@huawei.com
 
+On Thu, Jun 07, 2018 at 07:59:22PM +0800, Wei Wang wrote:
+> On 06/07/2018 02:32 PM, Peter Xu wrote:
+> > On Thu, Jun 07, 2018 at 01:24:29PM +0800, Wei Wang wrote:
+> > > On 06/06/2018 07:02 PM, Peter Xu wrote:
+> > > > On Wed, Jun 06, 2018 at 06:04:23PM +0800, Wei Wang wrote:
+> > > > > On 06/06/2018 01:42 PM, Peter Xu wrote:
+> > > > > > IMHO migration states do not suite here.  IMHO bitmap syncing is too
+> > > > > > frequently an operation, especially at the end of a precopy migration.
+> > > > > > If you really want to introduce some notifiers, I would prefer
+> > > > > > something new rather than fiddling around with migration state.  E.g.,
+> > > > > > maybe a new migration event notifiers, then introduce two new events
+> > > > > > for both start/end of bitmap syncing.
+> > > > > Please see if below aligns to what you meant:
+> > > > > 
+> > > > > MigrationState {
+> > > > > ...
+> > > > > + int ram_save_state;
+> > > > > 
+> > > > > }
+> > > > > 
+> > > > > typedef enum RamSaveState {
+> > > > >       RAM_SAVE_BEGIN = 0,
+> > > > >       RAM_SAVE_END = 1,
+> > > > >       RAM_SAVE_MAX = 2
+> > > > > }
+> > > > > 
+> > > > > then at the step 1) and 3) you concluded somewhere below, we change the
+> > > > > state and invoke the callback.
+> > > > I mean something like this:
+> > > > 
+> > > > 1693c64c27 ("postcopy: Add notifier chain", 2018-03-20)
+> > > > 
+> > > > That was a postcopy-only notifier.  Maybe we can generalize it into a
+> > > > more common notifier for the migration framework so that we can even
+> > > > register with non-postcopy events like bitmap syncing?
+> > > Precopy already has its own notifiers: git 99a0db9b
+> > > If we want to reuse, that one would be more suitable. I think mixing
+> > > non-related events into one notifier list isn't nice.
+> > I think that's only for migration state changes?
+> > 
+> > > > > Btw, the migration_state_notifiers is already there, but seems not really
+> > > > > used (I only tracked spice-core.c called
+> > > > > add_migration_state_change_notifier). I thought adding new migration states
+> > > > > can reuse all that we have.
+> > > > > What's your real concern about that? (not sure how defining new events would
+> > > > > make a difference)
+> > > > Migration state is exposed via control path (QMP).  Adding new states
+> > > > mean that the QMP clients will see more.  IMO that's not really
+> > > > anything that a QMP client will need to know, instead we can keep it
+> > > > internally.  That's a reason from compatibility pov.
+> > > > 
+> > > > Meanwhile, it's not really a state-thing at all for me.  It looks
+> > > > really more like hook or event (start/stop of sync).
+> > > Thanks for sharing your concerns in detail, which are quite helpful for the
+> > > discussion. To reuse 99a0db9b, we can also add sub-states (or say events),
+> > > instead of new migration states.
+> > > For example, we can still define "enum RamSaveState" as above, which can be
+> > > an indication for the notifier queued on the 99a0db9b notider_list to decide
+> > > whether to call start or stop.
+> > > Does this solve your concern?
+> > Frankly speaking I don't fully understand how you would add that
+> > sub-state.  If you are confident with the idea, maybe you can post
+> > your new version with the change, then I can read the code.
+> 
+> Sure. Code is more straightforward for this one. Let's check it in the new
+> version.
+> 
+> > > > > > This is not that obvious to me.  For now I think it's true, since when
+> > > > > > we call stop() we'll take the mutex, meanwhile the mutex is actually
+> > > > > > always held by the iothread (in the big loop in
+> > > > > > virtio_balloon_poll_free_page_hints) until either:
+> > > > > > 
+> > > > > > - it sleeps in qemu_cond_wait() [1], or
+> > > > > > - it leaves the big loop [2]
+> > > > > > 
+> > > > > > Since I don't see anyone who will set dev->block_iothread to true for
+> > > > > > the balloon device, then [1] cannot happen;
+> > > > > there is a case in virtio_balloon_set_status which sets dev->block_iothread
+> > > > > to true.
+> > > > > 
+> > > > > Did you mean the free_page_lock mutex? it is released at the bottom of the
+> > > > > while() loop in virtio_balloon_poll_free_page_hint. It's actually released
+> > > > > for every hint. That is,
+> > > > > 
+> > > > > while(1){
+> > > > >       take the lock;
+> > > > >       process 1 hint from the vq;
+> > > > >       release the lock;
+> > > > > }
+> > > > Ah, so now I understand why you need the lock to be inside the loop,
+> > > > since the loop is busy polling actually.  Is it possible to do this in
+> > > > an async way?
+> > > We need to use polling here because of some back story in the guest side
+> > > (due to some locks being held) that makes it a barrier to sending
+> > > notifications for each hints.
+> > Any link to the "back story" that I can learn about? :) If it's too
+> > complicated a problem and you think I don't need to understand at all,
+> > please feel free to do so.
+> 
+> I searched a little bit, and forgot where we discussed this one. But the
+> conclusion is that we don't want kick happens when the mm lock is held.
+> Also, polling is a good idea here to me.
+> There are 32 versions of kernel patch discussions scattered, interesting to
+> watch, but might take too much time. Also people usually have different
+> thoughts (sometimes with partial understanding) when they watch something
+> (we even have many different versions of implementations ourselves if you
+> check the whole 32 versions). It's not easy to get here with many consensus.
+> That's why I hope our discussion could be more focused on the migration
+> part, which is the last part that has not be fully finalized.
 
---6zdv2QT/q3FMhpsV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It's ok.
 
-On Thu, Jun 07, 2018 at 06:17:47PM +0100, Mark Cave-Ayland wrote:
-> Whilst performing a random migration test for the Mac machines I noticed
-> a regression (patch 1) which prevented the loadvm from completing
-> successfully. A big thank you to Peter and David on IRC who pointed me
-> in the right direction in order to fix the bug.
->=20
-> Once that was working I spent a bit more time analysing the migration
-> stream and realised that the mos6522 device state wasn't being embedded
-> within the CUDA device, but instead being maintained separately which is
-> solved by patch 2.
->=20
-> Patch 3 is something I noticed whilst rearranging the existing code based
-> upon my better understanding of QOM/qdev and ensures that the timer frequ=
-ency
-> is always set correctly post-migration for the device and its parent clas=
-s.
-> This leaves no remaining functionality in the mos6522 realize function an=
-d so
-> allows it to be removed.
->=20
-> Finally patch 4 was suggested by Peter on IRC whilst helping me investiga=
-te
-> the original migration issue, and removes the last remaining user of
-> VMSTATE_TIMER_PTR_TEST from the codebase.
->=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+I'd be focused on migration part if you have a very clear interface
+declared. :) You know, it was not even clear to me before I read the
+series on whether the free_page_stop() operation is synchronous. And
+IMHO that's really important even if I focus on migration review.
 
-Applied to ppc-for-3.0.
+I'd say I'll treat reviewers somehow differently from you.  But I
+don't think that worth a debate.
 
->=20
->=20
-> Mark Cave-Ayland (4):
->   mos6522: fix vmstate_mos6522_timer version in vmstate_mos6522
->   cuda: embed mos6522_cuda device directly rather than using QOM object
->     link
->   mos6522: move timer frequency initialisation to mos6522_reset
->   mos6522: convert VMSTATE_TIMER_PTR_TEST to VMSTATE_TIMER_PTR
->=20
->  hw/misc/macio/cuda.c         | 50 +++++++++++++++++++-------------------=
-------
->  hw/misc/mos6522.c            | 26 ++++++-----------------
->  include/hw/misc/macio/cuda.h | 27 +++++++++++-------------
->  include/hw/misc/mos6522.h    |  4 +++-
->  4 files changed, 42 insertions(+), 65 deletions(-)
->=20
+> 
+> 
+> 
+> > Then I would assume at least Michael has
+> > fully acknowledged that idea, and I can just stop putting more time on
+> > this part.
+> 
+> Yes, he's been on the loop since the beginning.
+> 
+> 
+> > 
+> > Besides, if you are going to use a busy loop, then I would be not
+> > quite sure about whether you really want to share that iothread with
+> > others, since AFAIU that's not how iothread is designed (which is
+> > mostly event-based and should not welcome out-of-control blocking in
+> > the handler of events).  Though I am not 100% confident about my
+> > understaning on that, I only raise this question up.  Anyway you'll
+> > just take over the thread for a while without sharing, and after the
+> > burst IOs it's mostly never used (until the next bitmap sync).  Then
+> > it seems a bit confusing to me on why you need to share that after
+> > all.
+> 
+> Not necessarily _need_ to share it, I meant it can be shared using qemu
+> command line.
+> Live migration doesn't happen all the time, and that optimization doesn't
+> run that long, if users want to have other BHs run in this iothread context,
+> they can only create one iothread via the qemu cmd line.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+IMO iothreads and aiocontexts are for event-driven model.  Busy loop
+is not an event-driven model.  Here if we want a busy loop I'll create
+a thread when start page hinting, then join the thread when done.
 
---6zdv2QT/q3FMhpsV
-Content-Type: application/pgp-signature; name="signature.asc"
+But I'll stop commenting on this.  Please prepare a more clear
+interface for migration in your next post.  I'll read that.
 
------BEGIN PGP SIGNATURE-----
+> 
+> 
+> > 
+> > > > I'm a bit curious on how much time will it use to do
+> > > > one round of the free page hints (e.g., an idle guest with 8G mem, or
+> > > > any configuration you tested)?  I suppose during that time the
+> > > > iothread will be held steady with 100% cpu usage, am I right?
+> > > Compared to the time spent by the legacy migration to send free pages, that
+> > > small amount of CPU usage spent on filtering free pages could be neglected.
+> > > Grinding a chopper will not hold up the work of cutting firewood :)
+> > Sorry I didn't express myself clearly.
+> > 
+> > My question was that, have you measured how long time it will take
+> > from starting of the free page hints (when balloon state is set to
+> > FREE_PAGE_REPORT_S_REQUESTED), until it completes (when QEMU receives
+> > the VIRTIO_BALLOON_FREE_PAGE_REPORT_STOP_ID, then set the status to
+> > FREE_PAGE_REPORT_S_STOP)?
+> > 
+> 
+> I vaguely remember it's several ms (for around 7.5G free pages) long time
+> ago. What would be the concern behind that number you want to know?
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsZ5dkACgkQbDjKyiDZ
-s5JZ7g/+OwJ8UKu4DWrnHttJdfeGJnZSnfXl3ateyQiU6SIuv9yl/V923ikDPXbs
-3iqcgt25cBlyn3bdr2npgXbTVzbhjoM+nAhW5B+/cXJxRH1AMRhTvCGfPL7AN4wS
-Awl8smMJFIkvk3rq7DCT/eJfpVjnxc29GhM7plcULv3yxQSF4MmX51Do/9KrIetI
-asbKuQJY1+5RNy6CqlzNat4k5feHxPeVvtFY/HAEqN3KbUAjlRPGAY09AAyK07Vb
-kzJBiTyyDgYZUhDXBvt0awGZ5a4V3cTc7T2WXmVN6wOmnCoyAS0ztQnVyFkvmKUc
-8pQOQLzwlqZj1r2oz6VQGYC8dJF3DLu19byZ5xQZ3EZv+doMBmwKD0SZpndmpscf
-K3V2Jwo68Nin87IjyfGMQrHf7pCy5Fha5W5V0ncAbH6UfL68lQc6hm2BDDg90H7G
-0YWglZAtLiZCu8Lvtg5VTjA6GFfbnBC6b5a9YHUYMJxwiUwlUQT2PAiEZ9ckNDaR
-zJpAN1jTzAZzr5CCY/LoIg7hM6xtK3+kNNz73vL8L6IXthjjPxbdEFS0FbHHxBvh
-vA9bhrA4mY5UQTZta4qYyO587SfjcLqNPwBzKfzUcUCeaFRfLadSAiL0peWnHNO3
-1Qzqz91qHQfntH7uJ7ELIZP0PlKyNtLCEMo4YAFTfVvzxysHTWU=
-=Wpfg
------END PGP SIGNATURE-----
+Because roughly I know the time between two bitmap syncs.  Then I will
+know how possible a free page hinting process won't stop until the
+next bitmap sync happens.
 
---6zdv2QT/q3FMhpsV--
+Thanks,
+
+-- 
+Peter Xu
