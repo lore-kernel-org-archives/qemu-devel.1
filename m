@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fRN55-0005db-0Y
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:29:51 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fRN6l-0006R2-6z
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:31:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fRN50-0000hG-EH
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:29:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32685)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fRN50-0000gx-8O
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:29:46 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri,  8 Jun 2018 16:29:40 -0300
-Message-Id: <20180608192940.19548-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH] pc: Remove PC_COMPAT_2_12 from 3.0
- machine-types
+	(envelope-from <jsnow@redhat.com>) id 1fRN6k-0001c6-7I
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:31:35 -0400
+References: <20180606182449.1607-1-jsnow@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <3c3c51a2-52c3-a621-7567-b42c94999051@redhat.com>
+Date: Fri, 8 Jun 2018 15:31:23 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180606182449.1607-1-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] block dirty bitmaps: support
+ libvirt API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,45 +24,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Babu Moger <babu.moger@amd.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Juan Quintela <quintela@redhat.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-commit f548222c added PC_COMPAT_2_12 to the 3.0 PC machine-types.
-I believe this happened during manual conflict resolution when
-applying the patch.
 
-Cc: Xiao Guangrong <xiaoguangrong@tencent.com>
-Cc: Juan Quintela <quintela@redhat.com>
-Fixes: f548222c24342ca74689de7794f9006b43f86a54
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- hw/i386/pc_piix.c | 1 -
- hw/i386/pc_q35.c  | 1 -
- 2 files changed, 2 deletions(-)
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 3d81136065..b4c5b03274 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -430,7 +430,6 @@ static void pc_i440fx_3_0_machine_options(MachineClass *m)
-     pc_i440fx_machine_options(m);
-     m->alias = "pc";
-     m->is_default = 1;
--    SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
- 
- DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index b60cbb9266..83d6d75efa 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -312,7 +312,6 @@ static void pc_q35_3_0_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias = "q35";
--    SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
- 
- DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
--- 
-2.18.0.rc1.1.g3f1ff2140
+On 06/06/2018 02:24 PM, John Snow wrote:
+> This is largely the same series that Vladimir sent in January, but at
+> the time I was unsure of if we'd want these commands or not in QEMU.
+> 
+> After discussing with Virtuozzo their plans for a checkpoint-like API
+> implemented primarily in libvirt, I agree that these commands are at
+> least tentatively useful.
+> 
+> Eric Blake is currently writing a counter-proposal and demo API to show
+> to Virtuozzo on libvirt's development list. Check in these QMP commands
+> with the experimental prefix 'x-' for now so that it can be used for
+> prototyping.
+> 
+> Once the design for the libvirt API looks reasonably final I will
+> remove the 'x-' prefixes, or, if we wind up not using these particular
+> commands I will delete them entirely.
+> 
+> v4:
+>  - Reinstated Vladimir's authorship credit on all patches
+>  - Switched 2.12 to 3.0
+>  - Edited doc to clarify failure mode for merge (Jeff)
+>  - Removed !bs check where applicable (Jeff)
+> 
+> v3:
+>  - Drop patch one (already merged)
+>  - Minor phrasing adjustments to documentation
+>  - Removed &state->bs argument to bitmap lookup for enable/disable
+>  - Added x- prefix to all three commands and to add's new argument.
+> 
+> Vladimir's original cover letter is below:
+> 
+> There are three qmp commands, needed to implement external backup API.
+> 
+> Using these three commands, client may do all needed bitmap management by
+> hand:
+> 
+> on backup start we need to do a transaction:
+>  {disable old bitmap, create new bitmap}
+> 
+> on backup success:
+>  drop old bitmap
+> 
+> on backup fail:
+>  enable old bitmap
+>  merge new bitmap to old bitmap
+>  drop new bitmap
+> 
+> Vladimir Sementsov-Ogievskiy (5):
+>   block/dirty-bitmap: add lock to bdrv_enable/disable_dirty_bitmap
+>   qapi: add x-block-dirty-bitmap-enable/disable
+>   qmp: transaction support for x-block-dirty-bitmap-enable/disable
+>   qapi: add x-block-dirty-bitmap-merge
+>   qapi: add disabled parameter to block-dirty-bitmap-add
+> 
+>  block/dirty-bitmap.c         |  24 ++++++-
+>  blockdev.c                   | 163 ++++++++++++++++++++++++++++++++++++++++++-
+>  include/block/dirty-bitmap.h |   3 +-
+>  qapi/block-core.json         |  86 ++++++++++++++++++++++-
+>  qapi/transaction.json        |   4 ++
+>  5 files changed, 275 insertions(+), 5 deletions(-)
+> 
+
+Hmm, I sorta-maybe have jurisdiction on this, but it touches more
+blockdev.c and qapi/block-core.json than it does block/dirty-bitmap.c.
+
+I'm gonna send a PR for this and if I was wrong about that, Kevin, just
+veto the PR thread.
+
+--js
