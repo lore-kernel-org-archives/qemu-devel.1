@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51452)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fRGlx-0003Dl-39
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:45:42 -0400
+	(envelope-from <david@redhat.com>) id 1fRGoa-0005GN-U3
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:48:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fRGlv-0004Qw-Ur
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:45:41 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42604)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fRGlv-0004MB-NJ
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:45:39 -0400
-Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fRGlu-0003nA-O7
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:45:38 +0100
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  8 Jun 2018 13:45:14 +0100
-Message-Id: <20180608124517.29475-29-peter.maydell@linaro.org>
-In-Reply-To: <20180608124517.29475-1-peter.maydell@linaro.org>
-References: <20180608124517.29475-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 28/31] sdcard: Add a 'spec_version' property,
- default to Spec v2.00
+	(envelope-from <david@redhat.com>) id 1fRGoZ-0006FK-5P
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:48:24 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Fri,  8 Jun 2018 14:48:12 +0200
+Message-Id: <20180608124816.22140-3-david@redhat.com>
+In-Reply-To: <20180608124816.22140-1-david@redhat.com>
+References: <20180608124816.22140-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/6] spapr: move lookup of the node into
+ spapr_memory_plug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,100 +21,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, david@redhat.com, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Let's clean the hotplug handler up by moving lookup of the node into
+the function where it is actually being used.
 
-As of this commit, the Spec v1 is not working, and all controllers
-expect the cards to be conformant to Spec v2.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20180607180641.874-4-f4bug@amsat.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- include/hw/sd/sd.h |  5 +++++
- hw/sd/sd.c         | 23 ++++++++++++++++++++---
- 2 files changed, 25 insertions(+), 3 deletions(-)
+ hw/ppc/spapr.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-index 9bdb3c9285a..7c6ad3c8f14 100644
---- a/include/hw/sd/sd.h
-+++ b/include/hw/sd/sd.h
-@@ -54,6 +54,11 @@
- #define APP_CMD			(1 << 5)
- #define AKE_SEQ_ERROR		(1 << 3)
- 
-+enum SDPhySpecificationVersion {
-+    SD_PHY_SPECv1_10_VERS     = 1,
-+    SD_PHY_SPECv2_00_VERS     = 2,
-+};
-+
- typedef enum {
-     SD_VOLTAGE_0_4V     = 400,  /* currently not supported */
-     SD_VOLTAGE_1_8V     = 1800,
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 80e70dd93e2..1ae085de69a 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -1,9 +1,10 @@
- /*
-  * SD Memory Card emulation as defined in the "SD Memory Card Physical
-- * layer specification, Version 1.10."
-+ * layer specification, Version 2.00."
-  *
-  * Copyright (c) 2006 Andrzej Zaborowski  <balrog@zabor.org>
-  * Copyright (c) 2007 CodeSourcery
-+ * Copyright (c) 2018 Philippe Mathieu-Daudé <f4bug@amsat.org>
-  *
-  * Redistribution and use in source and binary forms, with or without
-  * modification, are permitted provided that the following conditions
-@@ -91,6 +92,7 @@ struct SDState {
-     uint8_t sd_status[64];
- 
-     /* Configurable properties */
-+    uint8_t spec_version;
-     BlockBackend *blk;
-     bool spi;
- 
-@@ -310,8 +312,12 @@ static void sd_ocr_powerup(void *opaque)
- 
- static void sd_set_scr(SDState *sd)
- {
--    sd->scr[0] = (0 << 4)       /* SCR structure version 1.0 */
--                 | 1;           /* Spec Version 1.10 */
-+    sd->scr[0] = 0 << 4;        /* SCR structure version 1.0 */
-+    if (sd->spec_version == SD_PHY_SPECv1_10_VERS) {
-+        sd->scr[0] |= 1;        /* Spec Version 1.10 */
-+    } else {
-+        sd->scr[0] |= 2;        /* Spec Version 2.00 */
-+    }
-     sd->scr[1] = (2 << 4)       /* SDSC Card (Security Version 1.01) */
-                  | 0b0101;      /* 1-bit or 4-bit width bus modes */
-     sd->scr[2] = 0x00;          /* Extended Security is not supported. */
-@@ -2058,6 +2064,15 @@ static void sd_realize(DeviceState *dev, Error **errp)
- 
-     sd->proto_name = sd->spi ? "SPI" : "SD";
- 
-+    switch (sd->spec_version) {
-+    case SD_PHY_SPECv1_10_VERS
-+     ... SD_PHY_SPECv2_00_VERS:
-+        break;
-+    default:
-+        error_setg(errp, "Invalid SD card Spec version: %u", sd->spec_version);
-+        return;
-+    }
-+
-     if (sd->blk && blk_is_read_only(sd->blk)) {
-         error_setg(errp, "Cannot use read-only drive as SD card");
-         return;
-@@ -2074,6 +2089,8 @@ static void sd_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f16a0b2870..1f577b274b 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3136,7 +3136,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
  }
  
- static Property sd_properties[] = {
-+    DEFINE_PROP_UINT8("spec_version", SDState,
-+                      spec_version, SD_PHY_SPECv2_00_VERS),
-     DEFINE_PROP_DRIVE("drive", SDState, blk),
-     /* We do not model the chip select pin, so allow the board to select
-      * whether card should be in SSI or MMC/SD mode.  It is also up to the
+ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+-                              uint32_t node, Error **errp)
++                              Error **errp)
+ {
+     Error *local_err = NULL;
+     sPAPRMachineState *ms = SPAPR_MACHINE(hotplug_dev);
+@@ -3144,6 +3144,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+     MemoryRegion *mr;
+     uint64_t align, size, addr;
++    uint32_t node;
+ 
+     mr = ddc->get_memory_region(dimm, &local_err);
+     if (local_err) {
+@@ -3163,6 +3164,8 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         goto out_unplug;
+     }
+ 
++    node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP,
++                                    &error_abort);
+     spapr_add_lmbs(dev, addr, size, node,
+                    spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
+                    &local_err);
+@@ -3572,16 +3575,11 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+     sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
+ 
+     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+-        int node;
+-
+         if (!smc->dr_lmb_enabled) {
+             error_setg(errp, "Memory hotplug not supported for this machine");
+             return;
+         }
+-        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP,
+-                                        &error_abort);
+-
+-        spapr_memory_plug(hotplug_dev, dev, node, errp);
++        spapr_memory_plug(hotplug_dev, dev, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+         spapr_core_plug(hotplug_dev, dev, errp);
+     }
 -- 
-2.17.1
+2.17.0
