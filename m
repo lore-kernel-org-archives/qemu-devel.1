@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38142)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fRDzD-0004kz-8m
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:47:12 -0400
+	(envelope-from <david@redhat.com>) id 1fRE8z-0007TQ-6u
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:57:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fRDzA-0004YT-KV
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:47:11 -0400
-Received: from 11.mo5.mail-out.ovh.net ([46.105.47.167]:45386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fRDzA-0004Xr-Cq
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:47:08 -0400
-Received: from player168.ha.ovh.net (unknown [10.109.108.82])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 7D78D1B9A9B
-	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 11:47:06 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 08 Jun 2018 11:46:55 +0200
-Message-ID: <152845121577.13960.4480474870896921301.stgit@bahia.lan>
+	(envelope-from <david@redhat.com>) id 1fRE8v-0002xA-4o
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:57:17 -0400
+References: <20180517081527.14410-1-david@redhat.com>
+	<451cd080-12ab-42bd-0150-e1dbf0abd859@redhat.com>
+	<20180601141341.2d0f7ee0@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <2072bd49-adc5-77e2-ef02-d2580911a50f@redhat.com>
+Date: Fri, 8 Jun 2018 11:57:00 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v4] target/ppc: Allow PIR read in privileged
- mode
+In-Reply-To: <20180601141341.2d0f7ee0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 00/14] MemoryDevice: use
+ multi stage hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +26,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, leandro.lupori@gmail.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: luporl <leandro.lupori@gmail.com>
+On 01.06.2018 14:13, Igor Mammedov wrote:
+> On Fri, 25 May 2018 14:43:39 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> On 17.05.2018 10:15, David Hildenbrand wrote:
+>>> We can have devices that need certain other resources that are e.g.
+>>> system resources managed by the machine. We need a clean way to assig=
+n
+>>> these resources (without violating layers as brought up by Igor).
+>>>
+>>> One example is virtio-mem/virtio-pmem. Both device types need to be
+>>> assigned some region in guest physical address space. This device mem=
+ory
+>>> belongs to the machine and is managed by it. However, virito devices =
+are
+>>> hotplugged using the hotplug handler their proxy device implements. S=
+o we
+>>> could trigger e.g. a PCI hotplug handler for virtio-pci or a CSS/CCW
+>>> hotplug handler for virtio-ccw. But definetly not the machine.
+>>>
+>>> Now, we can route other devices through the machine hotplug handler, =
+to
+>>> properly assign/unassign resources - like a portion in guest physical
+>>> address space.
+>=20
+> To sum up review:
+> Some comments apply to several patches even though I commented only onc=
+e.
+>=20
+> I'd suggest to restructure and split series into several:
+>   * unplug cleanups 08/14 & co
+>   * generic _preplug refactoring so we won't have to go back to that qu=
+estion again
 
-According to PowerISA, the PIR register should be readable in privileged
-mode also, not only in hypervisor privileged mode.
+Looking into the details, I don't think this is possible and should be
+done for address asignment. It can be done for the node. Here is the
+reason why:
 
-PowerISA 3.0 - 4.3.3 Processor Identification Register
+In pre_plug(), we acccess a device before it has been realized. This is
+okay, as long as we are using "direct properties" like the "node", that
+won't be touched during realize.
 
-"Read access to the PIR is privileged; write access is not provided."
+However, for address detection we need access to the memory region. This
+is a "derived property", as it is based on the "memdev" property.
 
-Figure 18 in section 4.4.4 explicitly confirms that mfspr PIR is privileged
-and doesn't require hypervisor state.
+While we can easily verify the validity of "memdev" in the pc_dimm
+pre_plug handler (instead of doing that in pc_dimm_realize()), we cannot
+access the memory region itself before the device has been realized
+using get_memory_region() in all cases.
 
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: qemu-ppc@nongnu.org
-Signed-off-by: Leandro Lupori <leandro.lupori@gmail.com>
-Reviewed-by: Jose Ricardo Ziviani <joserz@linux.ibm.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-Changes in v2:
-- added my Signed-off-by, maintainers CC and Jose's Reviewed-by tags
+While this works for PC_DIMM (pc_dimm_get_memory_region() is only based
+on dimm->hostmem, which we can verify as stated), we cannot do the same
+thing for NVDIMM, because nvdimm_get_memory_region() relies on "realize"
+already being called and setting up "nvdimm->nvdimm_mr".
 
-Changes in v3:
-- added subsystem name, version tag and summary of changes
-- added the section of PowerISA that describes PIR access privileges
+In short: we should call device functions only after realize(),
+therefore address assignment is not possible during pre_plug.
 
-Changes in v4 (Greg):
-- rebased against ppc-for-3.0 (ie, file is now target/ppc/translate_init.inc.c)
-- added some more context from PowerISA
----
- target/ppc/translate_init.inc.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+--=20
 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 1a89017ddea8..bb9296f5a3da 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -7819,7 +7819,7 @@ static void gen_spr_book3s_ids(CPUPPCState *env)
-     /* Processor identification */
-     spr_register_hv(env, SPR_PIR, "PIR",
-                  SPR_NOACCESS, SPR_NOACCESS,
--                 SPR_NOACCESS, SPR_NOACCESS,
-+                 &spr_read_generic, SPR_NOACCESS,
-                  &spr_read_generic, NULL,
-                  0x00000000);
-     spr_register_hv(env, SPR_HID0, "HID0",
+Thanks,
+
+David / dhildenb
