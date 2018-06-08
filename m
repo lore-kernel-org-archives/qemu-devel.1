@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fRLUJ-0002VR-Oi
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:47:51 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fRLUK-0002Vk-0u
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:47:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fRLUG-0001cr-57
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:47:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49500 helo=mx1.redhat.com)
+	(envelope-from <jsnow@redhat.com>) id 1fRLUH-0001dv-3K
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:47:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58046 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1fRLUF-0001bq-NP
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:47:43 -0400
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1fRLUG-0001dM-Qx
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:47:44 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Fri,  8 Jun 2018 13:47:24 -0400
-Message-Id: <20180608174733.4936-22-jsnow@redhat.com>
+Date: Fri,  8 Jun 2018 13:47:28 -0400
+Message-Id: <20180608174733.4936-26-jsnow@redhat.com>
 In-Reply-To: <20180608174733.4936-1-jsnow@redhat.com>
 References: <20180608174733.4936-1-jsnow@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 21/30] tests/cdrom-test: Test booting from
- CD-ROM ISO image file
+Subject: [Qemu-devel] [PULL 25/30] ahci: move PIO Setup FIS before transfer,
+ fix it for ATAPI commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,237 +28,196 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>
+Cc: jsnow@redhat.com, peter.maydell@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Thomas Huth <thuth@redhat.com>
+The PIO Setup FIS is written in the PIO:Entry state, which comes before
+the ATA and ATAPI data transfer states.  As a result, the PIO Setup FIS
+interrupt is now raised before DMA ends for ATAPI commands, and tests hav=
+e
+to be adjusted.
 
-We already have the code for a boot file in tests/boot-sector.c,
-so if the genisoimage program is available, we can easily create
-a bootable CD ISO image that we can use for testing whether our
-CD-ROM emulation and the BIOS CD-ROM boot works correctly.
+This is also hinted by the description of the command header in the AHCI
+specification, where the "A" bit is described as
 
+    When =E2=80=981=E2=80=99, indicates that a PIO setup FIS shall be sen=
+t by the device
+    indicating a transfer for the ATAPI command.
+
+and also by the description of the ACMD (ATAPI command region):
+
+    The ATAPI command must be either 12 or 16 bytes in length. The length
+    transmitted by the HBA is determined by the PIO setup FIS that is sen=
+t
+    by the device requesting the ATAPI command.
+
+QEMU, which conflates the "generator" and the "receiver" of the FIS into
+one device, always uses ATAPI_PACKET_SIZE, aka 12, for the length.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-Acked-By: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-id: 20180606190955.20845-3-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- tests/Makefile.include |   2 +
- tests/cdrom-test.c     | 164 +++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 2 files changed, 166 insertions(+)
- create mode 100644 tests/cdrom-test.c
+ hw/ide/ahci.c       | 18 ++++++------------
+ tests/libqos/ahci.c | 35 +++++++++++++++++++++--------------
+ tests/libqos/ahci.h |  3 +--
+ 3 files changed, 28 insertions(+), 28 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 400d8890e7..d098a104bb 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -179,6 +179,7 @@ check-qtest-generic-y =3D tests/qmp-test$(EXESUF)
- gcov-files-generic-y =3D monitor.c qapi/qmp-dispatch.c
- check-qtest-generic-y +=3D tests/device-introspect-test$(EXESUF)
- gcov-files-generic-y =3D qdev-monitor.c qmp.c
-+check-qtest-generic-y +=3D tests/cdrom-test$(EXESUF)
+diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+index 571e32dd66..f25bef501d 100644
+--- a/hw/ide/ahci.c
++++ b/hw/ide/ahci.c
+@@ -1259,7 +1259,6 @@ static void handle_reg_h2d_fis(AHCIState *s, int po=
+rt,
+             g_free(pretty_fis);
+         }
+         s->dev[port].done_atapi_packet =3D false;
+-        /* XXX send PIO setup FIS */
+     }
 =20
- gcov-files-ipack-y +=3D hw/ipack/ipack.c
- check-qtest-ipack-y +=3D tests/ipoctal232-test$(EXESUF)
-@@ -844,6 +845,7 @@ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o=
- $(test-util-obj-y)
- tests/numa-test$(EXESUF): tests/numa-test.o
- tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o te=
-sts/acpi-utils.o
- tests/sdhci-test$(EXESUF): tests/sdhci-test.o $(libqos-pc-obj-y)
-+tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libq=
-os-obj-y)
+     ide_state->error =3D 0;
+@@ -1353,10 +1352,12 @@ static void ahci_start_transfer(IDEDMA *dma)
+     int is_atapi =3D opts & AHCI_CMD_ATAPI;
+     int has_sglist =3D 0;
 =20
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,=
-"LINK","$(TARGET_DIR)$@")
-diff --git a/tests/cdrom-test.c b/tests/cdrom-test.c
-new file mode 100644
-index 0000000000..5bbf322789
---- /dev/null
-+++ b/tests/cdrom-test.c
-@@ -0,0 +1,164 @@
-+/*
-+ * Various tests for emulated CD-ROM drives.
-+ *
-+ * Copyright (c) 2018 Red Hat Inc.
-+ *
-+ * Author:
-+ *    Thomas Huth <thuth@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2
-+ * or later. See the COPYING file in the top-level directory.
-+ */
++    /* PIO FIS gets written prior to transfer */
++    ahci_write_fis_pio(ad, size);
 +
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "boot-sector.h"
-+
-+static char isoimage[] =3D "cdrom-boot-iso-XXXXXX";
-+
-+static int exec_genisoimg(const char **args)
-+{
-+    gchar *out_err =3D NULL;
-+    gint exit_status =3D -1;
-+    bool success;
-+
-+    success =3D g_spawn_sync(NULL, (gchar **)args, NULL,
-+                           G_SPAWN_SEARCH_PATH | G_SPAWN_STDOUT_TO_DEV_N=
-ULL,
-+                           NULL, NULL, NULL, &out_err, &exit_status, NUL=
-L);
-+    if (!success) {
-+        return -ENOENT;
-+    }
-+    if (out_err) {
-+        fputs(out_err, stderr);
-+        g_free(out_err);
-+    }
-+
-+    return exit_status;
-+}
-+
-+static int prepare_image(const char *arch, char *isoimage)
-+{
-+    char srcdir[] =3D "cdrom-test-dir-XXXXXX";
-+    char *codefile =3D NULL;
-+    int ifh, ret =3D -1;
-+    const char *args[] =3D {
-+        "genisoimage", "-quiet", "-l", "-no-emul-boot",
-+        "-b", NULL, "-o", isoimage, srcdir, NULL
-+    };
-+
-+    ifh =3D mkstemp(isoimage);
-+    if (ifh < 0) {
-+        perror("Error creating temporary iso image file");
-+        return -1;
-+    }
-+    if (!mkdtemp(srcdir)) {
-+        perror("Error creating temporary directory");
-+        goto cleanup;
-+    }
-+
-+    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64") ||
-+        g_str_equal(arch, "s390x")) {
-+        codefile =3D g_strdup_printf("%s/bootcode-XXXXXX", srcdir);
-+        ret =3D boot_sector_init(codefile);
-+        if (ret) {
-+            goto cleanup;
-+        }
-+    } else {
-+        /* Just create a dummy file */
-+        char txt[] =3D "empty disc";
-+        codefile =3D g_strdup_printf("%s/readme.txt", srcdir);
-+        if (!g_file_set_contents(codefile, txt, sizeof(txt) - 1, NULL)) =
+     if (is_atapi && !ad->done_atapi_packet) {
+         /* already prepopulated iobuffer */
+         ad->done_atapi_packet =3D true;
+-        size =3D 0;
+         goto out;
+     }
+=20
+@@ -1376,19 +1377,12 @@ static void ahci_start_transfer(IDEDMA *dma)
+         }
+     }
+=20
+-out:
+-    /* declare that we processed everything */
+-    s->data_ptr =3D s->data_end;
+-
+     /* Update number of transferred bytes, destroy sglist */
+     dma_buf_commit(s, size);
+-
++out:
++    /* declare that we processed everything */
++    s->data_ptr =3D s->data_end;
+     s->end_transfer_func(s);
+-
+-    if (!(s->status & DRQ_STAT)) {
+-        /* done with PIO send/receive */
+-        ahci_write_fis_pio(ad, le32_to_cpu(ad->cur_cmd->status));
+-    }
+ }
+=20
+ static void ahci_start_dma(IDEDMA *dma, IDEState *s,
+diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
+index 63e1f9b92d..7264e085d0 100644
+--- a/tests/libqos/ahci.c
++++ b/tests/libqos/ahci.c
+@@ -478,10 +478,10 @@ void ahci_port_check_d2h_sanity(AHCIQState *ahci, u=
+int8_t port, uint8_t slot)
+     g_free(d2h);
+ }
+=20
+-void ahci_port_check_pio_sanity(AHCIQState *ahci, uint8_t port,
+-                                uint8_t slot, size_t buffsize)
++void ahci_port_check_pio_sanity(AHCIQState *ahci, AHCICommand *cmd)
+ {
+     PIOSetupFIS *pio =3D g_malloc0(0x20);
++    uint8_t port =3D cmd->port;
+=20
+     /* We cannot check the Status or E_Status registers, because
+      * the status may have again changed between the PIO Setup FIS
+@@ -489,15 +489,22 @@ void ahci_port_check_pio_sanity(AHCIQState *ahci, u=
+int8_t port,
+     qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x20, pio, 0x=
+20);
+     g_assert_cmphex(pio->fis_type, =3D=3D, 0x5f);
+=20
+-    /* BUG: PIO Setup FIS as utilized by QEMU tries to fit the entire
+-     * transfer size in a uint16_t field. The maximum transfer size can
+-     * eclipse this; the field is meant to convey the size of data per
+-     * each Data FIS, not the entire operation as a whole. For now,
+-     * we will sanity check the broken case where applicable. */
+-    if (buffsize <=3D UINT16_MAX) {
+-        g_assert_cmphex(le16_to_cpu(pio->tx_count), =3D=3D, buffsize);
++    /* Data transferred by PIO will either be:
++     * (1) 12 or 16 bytes for an ATAPI command packet (QEMU always uses =
+12), or
++     * (2) Actual data from the drive.
++     * If we do both, (2) winds up erasing any evidence of (1).
++     */
++    if (cmd->props->atapi && (cmd->xbytes =3D=3D 0 || cmd->props->dma)) =
 {
-+            fprintf(stderr, "Failed to create '%s'\n", codefile);
-+            goto cleanup;
-+        }
-+    }
-+
-+    args[5] =3D strchr(codefile, '/') + 1;
-+    ret =3D exec_genisoimg(args);
-+    if (ret) {
-+        fprintf(stderr, "genisoimage failed: %i\n", ret);
-+    }
-+
-+    unlink(codefile);
-+
-+cleanup:
-+    g_free(codefile);
-+    rmdir(srcdir);
-+    close(ifh);
-+
-+    return ret;
-+}
-+
-+static void test_cdboot(gconstpointer data)
-+{
-+    QTestState *qts;
-+
-+    qts =3D qtest_startf("-accel kvm:tcg -no-shutdown %s%s", (const char=
- *)data,
-+                       isoimage);
-+    boot_sector_test(qts);
-+    qtest_quit(qts);
-+}
-+
-+static void add_x86_tests(void)
-+{
-+    qtest_add_data_func("cdrom/boot/default", "-cdrom ", test_cdboot);
-+    qtest_add_data_func("cdrom/boot/virtio-scsi",
-+                        "-device virtio-scsi -device scsi-cd,drive=3Dcdr=
- "
-+                        "-blockdev file,node-name=3Dcdr,filename=3D", te=
-st_cdboot);
-+    qtest_add_data_func("cdrom/boot/isapc", "-M isapc "
-+                        "-drive if=3Dide,media=3Dcdrom,file=3D", test_cd=
-boot);
-+    qtest_add_data_func("cdrom/boot/am53c974",
-+                        "-device am53c974 -device scsi-cd,drive=3Dcd1 "
-+                        "-drive if=3Dnone,id=3Dcd1,format=3Draw,file=3D"=
-, test_cdboot);
-+    qtest_add_data_func("cdrom/boot/dc390",
-+                        "-device dc390 -device scsi-cd,drive=3Dcd1 "
-+                        "-blockdev file,node-name=3Dcd1,filename=3D", te=
-st_cdboot);
-+    qtest_add_data_func("cdrom/boot/lsi53c895a",
-+                        "-device lsi53c895a -device scsi-cd,drive=3Dcd1 =
-"
-+                        "-blockdev file,node-name=3Dcd1,filename=3D", te=
-st_cdboot);
-+    qtest_add_data_func("cdrom/boot/megasas", "-M q35 "
-+                        "-device megasas -device scsi-cd,drive=3Dcd1 "
-+                        "-blockdev file,node-name=3Dcd1,filename=3D", te=
-st_cdboot);
-+    qtest_add_data_func("cdrom/boot/megasas-gen2", "-M q35 "
-+                        "-device megasas-gen2 -device scsi-cd,drive=3Dcd=
-1 "
-+                        "-blockdev file,node-name=3Dcd1,filename=3D", te=
-st_cdboot);
-+}
-+
-+static void add_s390x_tests(void)
-+{
-+    qtest_add_data_func("cdrom/boot/default", "-cdrom ", test_cdboot);
-+    qtest_add_data_func("cdrom/boot/virtio-scsi",
-+                        "-device virtio-scsi -device scsi-cd,drive=3Dcdr=
- "
-+                        "-blockdev file,node-name=3Dcdr,filename=3D", te=
-st_cdboot);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+    const char *arch =3D qtest_get_arch();
-+    const char *genisocheck[] =3D { "genisoimage", "-version", NULL };
-+
-+    g_test_init(&argc, &argv, NULL);
-+
-+    if (exec_genisoimg(genisocheck)) {
-+        /* genisoimage not available - so can't run tests */
-+        return 0;
-+    }
-+
-+    ret =3D prepare_image(arch, isoimage);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    if (g_str_equal(arch, "i386") || g_str_equal(arch, "x86_64")) {
-+        add_x86_tests();
-+    } else if (g_str_equal(arch, "s390x")) {
-+        add_s390x_tests();
-+    }
-+
-+    ret =3D g_test_run();
-+
-+    unlink(isoimage);
-+
-+    return ret;
-+}
++        g_assert(le16_to_cpu(pio->tx_count) =3D=3D 12 ||
++                 le16_to_cpu(pio->tx_count) =3D=3D 16);
++    } else {
++        /* The AHCI test suite here does not test any PIO command that s=
+pecifies
++         * a DRQ block larger than one sector (like 0xC4), so this shoul=
+d always
++         * be one sector or less. */
++        size_t pio_len =3D ((cmd->xbytes % cmd->sector_size) ?
++                          (cmd->xbytes % cmd->sector_size) : cmd->sector=
+_size);
++        g_assert_cmphex(le16_to_cpu(pio->tx_count), =3D=3D, pio_len);
+     }
+-
+     g_free(pio);
+ }
+=20
+@@ -832,9 +839,9 @@ void ahci_command_enable_atapi_dma(AHCICommand *cmd)
+     RegH2DFIS *fis =3D &(cmd->fis);
+     g_assert(cmd->props->atapi);
+     fis->feature_low |=3D 0x01;
+-    cmd->interrupts &=3D ~AHCI_PX_IS_PSS;
++    /* PIO is still used to transfer the ATAPI command */
++    g_assert(cmd->props->pio);
+     cmd->props->dma =3D true;
+-    cmd->props->pio =3D false;
+     /* BUG: We expect the DMA Setup interrupt for DMA commands */
+     /* cmd->interrupts |=3D AHCI_PX_IS_DSS; */
+ }
+@@ -846,7 +853,7 @@ AHCICommand *ahci_command_create(uint8_t command_name=
+)
+=20
+     g_assert(props);
+     cmd =3D g_new0(AHCICommand, 1);
+-    g_assert(!(props->dma && props->pio));
++    g_assert(!(props->dma && props->pio) || props->atapi);
+     g_assert(!(props->lba28 && props->lba48));
+     g_assert(!(props->read && props->write));
+     g_assert(!props->size || props->data);
+@@ -1218,7 +1225,7 @@ void ahci_command_verify(AHCIQState *ahci, AHCIComm=
+and *cmd)
+         ahci_port_check_d2h_sanity(ahci, port, slot);
+     }
+     if (cmd->props->pio) {
+-        ahci_port_check_pio_sanity(ahci, port, slot, cmd->xbytes);
++        ahci_port_check_pio_sanity(ahci, cmd);
+     }
+ }
+=20
+diff --git a/tests/libqos/ahci.h b/tests/libqos/ahci.h
+index 715ca1e226..13f6d87b75 100644
+--- a/tests/libqos/ahci.h
++++ b/tests/libqos/ahci.h
+@@ -596,8 +596,7 @@ void ahci_port_check_interrupts(AHCIQState *ahci, uin=
+t8_t port,
+                                 uint32_t intr_mask);
+ void ahci_port_check_nonbusy(AHCIQState *ahci, uint8_t port, uint8_t slo=
+t);
+ void ahci_port_check_d2h_sanity(AHCIQState *ahci, uint8_t port, uint8_t =
+slot);
+-void ahci_port_check_pio_sanity(AHCIQState *ahci, uint8_t port,
+-                                uint8_t slot, size_t buffsize);
++void ahci_port_check_pio_sanity(AHCIQState *ahci, AHCICommand *cmd);
+ void ahci_port_check_cmd_sanity(AHCIQState *ahci, AHCICommand *cmd);
+=20
+ /* Misc */
 --=20
 2.14.3
