@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fRGid-00006V-DU
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:42:16 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fRGlj-0002zH-HE
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:45:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fRGiY-0002WL-FX
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:42:15 -0400
-Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:57989)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fRGiY-0002V0-5C
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:42:10 -0400
-Received: from player729.ha.ovh.net (unknown [10.109.105.30])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 83865B60AA
-	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 14:42:08 +0200 (CEST)
-References: <cover.1528291908.git.balaton@eik.bme.hu>
-	<8c404c8c4ee1bfd2e4d079877d481094f797df8f.1528291908.git.balaton@eik.bme.hu>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e66bfc59-ee49-ebfd-ea6b-eb5abb6b22d7@kaod.org>
-Date: Fri, 8 Jun 2018 14:42:02 +0200
+	(envelope-from <pm215@archaic.org.uk>) id 1fRGli-0004CS-Bc
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:45:27 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42588)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fRGlh-00046X-RM
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:45:26 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1fRGla-0003aW-5j
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:45:18 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  8 Jun 2018 13:44:46 +0100
+Message-Id: <20180608124517.29475-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <8c404c8c4ee1bfd2e4d079877d481094f797df8f.1528291908.git.balaton@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 5/8] hw/timer: Add basic
- M41T80 emulation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/31] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,191 +28,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-On 06/06/2018 03:31 PM, BALATON Zoltan wrote:
-> Basic emulation of the M41T80 serial (I2C) RTC chip. Only getting time
-> of day is implemented. Setting time and RTC alarm are not supported.
-> 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->  MAINTAINERS                     |   1 +
->  default-configs/ppc-softmmu.mak |   1 +
->  hw/timer/Makefile.objs          |   1 +
->  hw/timer/m41t80.c               | 117 ++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 120 insertions(+)
->  create mode 100644 hw/timer/m41t80.c
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 41cd373..9e13bc1 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -826,6 +826,7 @@ M: BALATON Zoltan <balaton@eik.bme.hu>
->  L: qemu-ppc@nongnu.org
->  S: Maintained
->  F: hw/ide/sii3112.c
-> +F: hw/timer/m41t80.c
->  
->  SH4 Machines
->  ------------
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-> index 7d0dc2f..9fbaadc 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -27,6 +27,7 @@ CONFIG_SM501=y
->  CONFIG_IDE_SII3112=y
->  CONFIG_I2C=y
->  CONFIG_BITBANG_I2C=y
-> +CONFIG_M41T80=y
->  
->  # For Macs
->  CONFIG_MAC=y
-> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-> index 8b27a4b..e16b2b9 100644
-> --- a/hw/timer/Makefile.objs
-> +++ b/hw/timer/Makefile.objs
-> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_CADENCE) += cadence_ttc.o
->  common-obj-$(CONFIG_DS1338) += ds1338.o
->  common-obj-$(CONFIG_HPET) += hpet.o
->  common-obj-$(CONFIG_I8254) += i8254_common.o i8254.o
-> +common-obj-$(CONFIG_M41T80) += m41t80.o
->  common-obj-$(CONFIG_M48T59) += m48t59.o
->  ifeq ($(CONFIG_ISA_BUS),y)
->  common-obj-$(CONFIG_M48T59) += m48t59-isa.o
-> diff --git a/hw/timer/m41t80.c b/hw/timer/m41t80.c
-> new file mode 100644
-> index 0000000..9dbdb1b
-> --- /dev/null
-> +++ b/hw/timer/m41t80.c
-> @@ -0,0 +1,117 @@
-> +/*
-> + * M41T80 serial rtc emulation
-> + *
-> + * Copyright (c) 2018 BALATON Zoltan
-> + *
-> + * This work is licensed under the GNU GPL license version 2 or later.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/log.h"
-> +#include "qemu/timer.h"
-> +#include "qemu/bcd.h"
-> +#include "hw/i2c/i2c.h"
-> +
-> +#define TYPE_M41T80 "m41t80"
-> +#define M41T80(obj) OBJECT_CHECK(M41t80State, (obj), TYPE_M41T80)
-> +
-> +typedef struct M41t80State {
-> +    I2CSlave parent_obj;
-> +    int8_t addr;
-> +} M41t80State;
-> +
-> +static void m41t80_realize(DeviceState *dev, Error **errp)
-> +{
-> +    M41t80State *s = M41T80(dev);
-> +
-> +    s->addr = -1;
-> +}
-> +
-> +static int m41t80_send(I2CSlave *i2c, uint8_t data)
-> +{
-> +    M41t80State *s = M41T80(i2c);
-> +
-> +    if (s->addr < 0) {
-> +        s->addr = data;
-> +    } else {
-> +        s->addr++;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static int m41t80_recv(I2CSlave *i2c)
-> +{
-> +    M41t80State *s = M41T80(i2c);
-> +    struct tm now;
-> +    qemu_timeval tv;
-> +
-> +    if (s->addr < 0) {
-> +        s->addr = 0;
-> +    }
-> +    if (s->addr >= 1 && s->addr <= 7) {
-> +        qemu_get_timedate(&now, -1);
-> +    }
-> +    switch (s->addr++) {
+target-arm queue: aspeed patches from Cédric, and
+cleanup and sd card patches from Philippe.
 
-you could use some define to name the registers :
+thanks
+-- PMM 
 
-> +    case 0:
-> +        qemu_gettimeofday(&tv);
-> +        return to_bcd(tv.tv_usec / 10000);> +    case 1:
-> +        return to_bcd(now.tm_sec);
-> +    case 2:
-> +        return to_bcd(now.tm_min);
-> +    case 3:
-> +        return to_bcd(now.tm_hour);
+The following changes since commit bac5ba3dc5da706f52c149fa6c0bd1dc96899bec:
 
-There is an interesting century bit in specs.
+  Merge remote-tracking branch 'remotes/thibault/tags/samuel-thibault' into staging (2018-06-08 10:26:16 +0100)
 
-> +    case 4:
-> +        return to_bcd(now.tm_wday);
-> +    case 5:
-> +        return to_bcd(now.tm_mday);
-> +    case 6:
-> +        return to_bcd(now.tm_mon + 1);
-> +    case 7:
-> +        return to_bcd(now.tm_year % 100);
-> +    case 8 ... 19:
-> +        qemu_log_mask(LOG_UNIMP, "\n%s: unimplemented register: %d\n",
+are available in the Git repository at:
 
-is the beginning \n needed ?
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180608
 
-Thanks,
+for you to fetch changes up to 113f31c06c6bf16451892b2459d83c9b9c5e9844:
 
-C.
- 
-> +                      __func__, s->addr - 1);
-> +        return 0;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR, "\n%s: invalid register: %d",
-> +                      __func__, s->addr - 1);
-> +        return 0;
-> +    }
-> +}
-> +
-> +static int m41t80_event(I2CSlave *i2c, enum i2c_event event)
-> +{
-> +    M41t80State *s = M41T80(i2c);
-> +
-> +    if (event == I2C_START_SEND) {
-> +        s->addr = -1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void m41t80_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +    I2CSlaveClass *sc = I2C_SLAVE_CLASS(klass);
-> +
-> +    dc->realize = m41t80_realize;
-> +    sc->send = m41t80_send;
-> +    sc->recv = m41t80_recv;
-> +    sc->event = m41t80_event;
-> +}
-> +
-> +static const TypeInfo m41t80_info = {
-> +    .name          = TYPE_M41T80,
-> +    .parent        = TYPE_I2C_SLAVE,
-> +    .instance_size = sizeof(M41t80State),
-> +    .class_init    = m41t80_class_init,
-> +};
-> +
-> +static void m41t80_register_types(void)
-> +{
-> +    type_register_static(&m41t80_info);
-> +}
-> +
-> +type_init(m41t80_register_types)
-> 
+  sdcard: Disable CMD19/CMD23 for Spec v2 (2018-06-08 13:15:34 +0100)
+
+----------------------------------------------------------------
+target-arm queue:
+ * arm_gicv3_kvm: fix migration of registers corresponding to
+   IRQs 992 to 1020 in the KVM GIC
+ * aspeed: remove ignore_memory_transaction_failures on all boards
+ * aspeed: add support for the witherspoon-bmc board
+ * aspeed: add an I2C RTC device and EEPROM I2C devices
+ * aspeed: add the pc9552 chips to the witherspoon machine
+ * ftgmac100: fix various bugs
+ * hw/arm: Remove the deprecated xlnx-ep108 machine
+ * hw/i2c: Add trace events
+ * add missing '\n' on various qemu_log() logging strings
+ * sdcard: clean up spec version support so we report the
+   right spec version to the guest and only implement the
+   commands that are supposed to be present in that version
+
+----------------------------------------------------------------
+Cédric Le Goater (11):
+      aspeed: remove ignore_memory_transaction_failures on all boards
+      aspeed: add support for the witherspoon-bmc board
+      aspeed: add an I2C RTC device to all machines
+      smbus: add a smbus_eeprom_init_one() routine
+      aspeed: Add EEPROM I2C devices
+      misc: add pca9552 LED blinker model
+      aspeed: add the pc9552 chips to the witherspoon machine
+      ftgmac100: compute maximum frame size depending on the protocol
+      ftgmac100: add IEEE 802.1Q VLAN support
+      ftgmac100: fix multicast hash routine
+      ftgmac100: remove check on runt messages
+
+Philippe Mathieu-Daudé (18):
+      hw/i2c: Add trace events
+      hw/sd/milkymist-memcard: Add trailing '\n' to qemu_log() call
+      hw/digic: Add trailing '\n' to qemu_log() calls
+      xilinx-dp: Add trailing '\n' to qemu_log() call
+      ppc/pnv: Add trailing '\n' to qemu_log() calls
+      hw/core/register: Add trailing '\n' to qemu_log() call
+      hw/mips/boston: Add trailing '\n' to qemu_log() calls
+      stellaris: Add trailing '\n' to qemu_log() calls
+      target/arm: Add trailing '\n' to qemu_log() calls
+      target/m68k: Add trailing '\n' to qemu_log() call
+      RISC-V: Add trailing '\n' to qemu_log() calls
+      target/xtensa: Add trailing '\n' to qemu_log() calls
+      sdcard: Update the Configuration Register (SCR) to Spec Version 1.10
+      sdcard: Allow commands valid in SPI mode
+      sdcard: Add a 'spec_version' property, default to Spec v2.00
+      sdcard: Disable SEND_IF_COND (CMD8) for Spec v1
+      sdcard: Reflect when the Spec v3 is supported in the Config Register (SCR)
+      sdcard: Disable CMD19/CMD23 for Spec v2
+
+Shannon Zhao (1):
+      arm_gicv3_kvm: kvm_dist_get/put: skip the registers banked by GICR
+
+Thomas Huth (1):
+      hw/arm: Remove the deprecated xlnx-ep108 machine
+
+ Makefile.objs                      |   1 +
+ hw/misc/Makefile.objs              |   1 +
+ tests/Makefile.include             |   2 +
+ include/hw/i2c/smbus.h             |   1 +
+ include/hw/intc/arm_gicv3_common.h |   1 +
+ include/hw/misc/pca9552.h          |  32 +++++
+ include/hw/misc/pca9552_regs.h     |  32 +++++
+ include/hw/net/ftgmac100.h         |   7 +-
+ include/hw/sd/sd.h                 |   6 +
+ tests/libqos/i2c.h                 |   2 +
+ hw/arm/aspeed.c                    |  88 +++++++++++++-
+ hw/arm/stellaris.c                 |  11 +-
+ hw/arm/xlnx-zcu102.c               |  62 +---------
+ hw/char/digic-uart.c               |   4 +-
+ hw/core/register.c                 |   2 +-
+ hw/display/xlnx_dp.c               |   4 +-
+ hw/i2c/core.c                      |  25 ++--
+ hw/i2c/smbus_eeprom.c              |  16 ++-
+ hw/intc/arm_gicv3_common.c         |  79 ++++++++++++
+ hw/intc/arm_gicv3_kvm.c            |  38 ++++++
+ hw/mips/boston.c                   |   8 +-
+ hw/misc/pca9552.c                  | 240 +++++++++++++++++++++++++++++++++++++
+ hw/net/ftgmac100.c                 |  64 ++++++----
+ hw/ppc/pnv_core.c                  |   4 +-
+ hw/sd/milkymist-memcard.c          |   2 +-
+ hw/sd/sd.c                         |  50 +++++---
+ hw/timer/digic-timer.c             |   4 +-
+ target/arm/helper.c                |   4 +-
+ target/m68k/translate.c            |   2 +-
+ target/riscv/op_helper.c           |   6 +-
+ target/xtensa/translate.c          |   6 +-
+ tests/pca9552-test.c               | 116 ++++++++++++++++++
+ tests/tmp105-test.c                |   2 -
+ default-configs/arm-softmmu.mak    |   1 +
+ hw/i2c/trace-events                |   7 ++
+ qemu-doc.texi                      |   5 -
+ 36 files changed, 788 insertions(+), 147 deletions(-)
+ create mode 100644 include/hw/misc/pca9552.h
+ create mode 100644 include/hw/misc/pca9552_regs.h
+ create mode 100644 hw/misc/pca9552.c
+ create mode 100644 tests/pca9552-test.c
+ create mode 100644 hw/i2c/trace-events
