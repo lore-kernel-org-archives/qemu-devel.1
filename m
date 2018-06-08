@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRGfj-0005n2-R5
+	(envelope-from <alex.bennee@linaro.org>) id 1fRGfj-0005n1-Qo
 	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRGfg-0000uU-Cc
+	(envelope-from <alex.bennee@linaro.org>) id 1fRGff-0000uC-LN
 	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:15 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:56221)
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38079)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fRGfg-0000u3-34
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:12 -0400
-Received: by mail-wm0-x232.google.com with SMTP id v16-v6so3098682wmh.5
+	id 1fRGff-0000td-BD
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:11 -0400
+Received: by mail-wm0-x229.google.com with SMTP id 69-v6so3451627wmf.3
 	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 05:39:11 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  8 Jun 2018 13:33:02 +0100
-Message-Id: <20180608123307.24773-45-alex.bennee@linaro.org>
+Date: Fri,  8 Jun 2018 13:33:04 +0100
+Message-Id: <20180608123307.24773-47-alex.bennee@linaro.org>
 In-Reply-To: <20180608123307.24773-1-alex.bennee@linaro.org>
 References: <20180608123307.24773-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 44/49] tests/tcg: add run, diff,
- and skip helper macros
+Subject: [Qemu-devel] [PATCH v6 46/49] target/sh4: Fix translator.c
+ assertion failure for gUSA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,136 +28,178 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:ARM" <qemu-arm@nongnu.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth7680@gmail.com>
 
-As we aren't using the default runners for all the test cases it is
-easy to miss out things like timeouts. To help with this we add some
-helpers and use them so we only need to make core changes in one
-place.
+From: Richard Henderson <rth7680@gmail.com>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+The translator loop does not allow the tb_start hook to set
+dc->base.is_jmp; the only hook allowed to do that is translate_insn.
 
+Split the work between init_disas_context where we validate
+the gUSA parameters, and translate_insn where we emit code.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v5
-  - new for v5
-v5.1
-  - diff-test->diff-out
----
- tests/tcg/Makefile                  | 13 ++++++++++---
- tests/tcg/aarch64/Makefile.target   |  6 ++----
- tests/tcg/arm/Makefile.target       |  6 ++----
- tests/tcg/i386/Makefile.target      | 10 ++++------
- tests/tcg/multiarch/Makefile.target |  4 ++--
- 5 files changed, 20 insertions(+), 19 deletions(-)
+ target/sh4/translate.c | 81 +++++++++++++++++++++++-------------------
+ 1 file changed, 44 insertions(+), 37 deletions(-)
 
-diff --git a/tests/tcg/Makefile b/tests/tcg/Makefile
-index e7dbcdb5bf..d4c5140210 100644
---- a/tests/tcg/Makefile
-+++ b/tests/tcg/Makefile
-@@ -34,6 +34,15 @@
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index c716b74a0f..1b9a201d6d 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -1895,35 +1895,18 @@ static void decode_opc(DisasContext * ctx)
+    any sequence via cpu_exec_step_atomic, we can recognize the "normal"
+    sequences and transform them into atomic operations as seen by the host.
+ */
+-static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
++static void decode_gusa(DisasContext *ctx, CPUSH4State *env)
+ {
+     uint16_t insns[5];
+     int ld_adr, ld_dst, ld_mop;
+     int op_dst, op_src, op_opc;
+     int mv_src, mt_dst, st_src, st_mop;
+     TCGv op_arg;
+-
+     uint32_t pc = ctx->base.pc_next;
+     uint32_t pc_end = ctx->base.tb->cs_base;
+-    int backup = sextract32(ctx->tbflags, GUSA_SHIFT, 8);
+     int max_insns = (pc_end - pc) / 2;
+     int i;
  
- quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
+-    if (pc != pc_end + backup || max_insns < 2) {
+-        /* This is a malformed gUSA region.  Don't do anything special,
+-           since the interpreter is likely to get confused.  */
+-        ctx->envflags &= ~GUSA_MASK;
+-        return 0;
+-    }
+-
+-    if (ctx->tbflags & GUSA_EXCLUSIVE) {
+-        /* Regardless of single-stepping or the end of the page,
+-           we must complete execution of the gUSA region while
+-           holding the exclusive lock.  */
+-        *pmax_insns = max_insns;
+-        return 0;
+-    }
+-
+     /* The state machine below will consume only a few insns.
+        If there are more than that in a region, fail now.  */
+     if (max_insns > ARRAY_SIZE(insns)) {
+@@ -2140,7 +2123,6 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
+     /*
+      * Emit the operation.
+      */
+-    tcg_gen_insn_start(pc, ctx->envflags);
+     switch (op_opc) {
+     case -1:
+         /* No operation found.  Look for exchange pattern.  */
+@@ -2235,7 +2217,8 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
+     /* The entire region has been translated.  */
+     ctx->envflags &= ~GUSA_MASK;
+     ctx->base.pc_next = pc_end;
+-    return max_insns;
++    ctx->base.num_insns += max_insns - 1;
++    return;
  
-+# $1 = test name, $2 = cmd, $3 = desc
-+run-test = $(call quiet-command, timeout $(TIMEOUT) $2 > $1.out,"TEST",$3)
+  fail:
+     qemu_log_mask(LOG_UNIMP, "Unrecognized gUSA sequence %08x-%08x\n",
+@@ -2243,7 +2226,6 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
+ 
+     /* Restart with the EXCLUSIVE bit set, within a TB run via
+        cpu_exec_step_atomic holding the exclusive lock.  */
+-    tcg_gen_insn_start(pc, ctx->envflags);
+     ctx->envflags |= GUSA_EXCLUSIVE;
+     gen_save_cpu_state(ctx, false);
+     gen_helper_exclusive(cpu_env);
+@@ -2254,7 +2236,7 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
+        entire region consumed via ctx->base.pc_next so that it's immediately
+        available in the disassembly dump.  */
+     ctx->base.pc_next = pc_end;
+-    return 1;
++    ctx->base.num_insns += max_insns - 1;
+ }
+ #endif
+ 
+@@ -2262,19 +2244,39 @@ static void sh4_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+ {
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPUSH4State *env = cs->env_ptr;
++    uint32_t tbflags;
+     int bound;
+ 
+-    ctx->tbflags = (uint32_t)ctx->base.tb->flags;
+-    ctx->envflags = ctx->base.tb->flags & TB_FLAG_ENVFLAGS_MASK;
+-    ctx->memidx = (ctx->tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
++    ctx->tbflags = tbflags = ctx->base.tb->flags;
++    ctx->envflags = tbflags & TB_FLAG_ENVFLAGS_MASK;
++    ctx->memidx = (tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
+     /* We don't know if the delayed pc came from a dynamic or static branch,
+        so assume it is a dynamic branch.  */
+     ctx->delayed_pc = -1; /* use delayed pc from env pointer */
+     ctx->features = env->features;
+-    ctx->has_movcal = (ctx->tbflags & TB_FLAG_PENDING_MOVCA);
+-    ctx->gbank = ((ctx->tbflags & (1 << SR_MD)) &&
+-                  (ctx->tbflags & (1 << SR_RB))) * 0x10;
+-    ctx->fbank = ctx->tbflags & FPSCR_FR ? 0x10 : 0;
++    ctx->has_movcal = (tbflags & TB_FLAG_PENDING_MOVCA);
++    ctx->gbank = ((tbflags & (1 << SR_MD)) &&
++                  (tbflags & (1 << SR_RB))) * 0x10;
++    ctx->fbank = tbflags & FPSCR_FR ? 0x10 : 0;
 +
-+# $1 = test name, $2 = reference
-+diff-out = $(call quiet-command, diff -u $1.out $2 | head -n 10,"DIFF","$1.out with $2")
++    if (tbflags & GUSA_MASK) {
++        uint32_t pc = ctx->base.pc_next;
++        uint32_t pc_end = ctx->base.tb->cs_base;
++        int backup = sextract32(ctx->tbflags, GUSA_SHIFT, 8);
++        int max_insns = (pc_end - pc) / 2;
 +
-+# $1 = test name, $2 = reason
-+skip-test = @printf "  SKIPPED %s because %s\n" $1 $2
++        if (pc != pc_end + backup || max_insns < 2) {
++            /* This is a malformed gUSA region.  Don't do anything special,
++               since the interpreter is likely to get confused.  */
++            ctx->envflags &= ~GUSA_MASK;
++        } else if (tbflags & GUSA_EXCLUSIVE) {
++            /* Regardless of single-stepping or the end of the page,
++               we must complete execution of the gUSA region while
++               holding the exclusive lock.  */
++            ctx->base.max_insns = max_insns;
++            return;
++        }
++    }
+ 
+     /* Since the ISA is fixed-width, we can bound by the number
+        of instructions remaining on the page.  */
+@@ -2284,14 +2286,6 @@ static void sh4_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+ 
+ static void sh4_tr_tb_start(DisasContextBase *dcbase, CPUState *cs)
+ {
+-#ifdef CONFIG_USER_ONLY
+-    DisasContext *ctx = container_of(dcbase, DisasContext, base);
+-    CPUSH4State *env = cs->env_ptr;
+-
+-    if (ctx->tbflags & GUSA_MASK) {
+-        ctx->base.num_insns = decode_gusa(ctx, env, &ctx->base.max_insns);
+-    }
+-#endif
+ }
+ 
+ static void sh4_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
+@@ -2323,6 +2317,19 @@ static void sh4_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+     CPUSH4State *env = cs->env_ptr;
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+ 
++#ifdef CONFIG_USER_ONLY
++    if (unlikely(ctx->envflags & GUSA_MASK)
++        && !(ctx->envflags & GUSA_EXCLUSIVE)) {
++        /* We're in an gUSA region, and we have not already fallen
++           back on using an exclusive region.  Attempt to parse the
++           region into a single supported atomic operation.  Failure
++           is handled within the parser by raising an exception to
++           retry using an exclusive region.  */
++        decode_gusa(ctx, env);
++        return;
++    }
++#endif
 +
- # Tests we are building
- TESTS=
- 
-@@ -84,9 +93,7 @@ RUN_TESTS=$(patsubst %,run-%, $(TESTS))
- RUN_TESTS+=$(EXTRA_RUNS)
- 
- run-%: %
--	$(call quiet-command, \
--		timeout $(TIMEOUT) $(QEMU) $< > $<.out, \
--		"TEST", "$< on $(TARGET_NAME)")
-+	$(call run-test, $<, $(QEMU) $<, "$< on $(TARGET_NAME)")
- 
- .PHONY: run
- run: $(RUN_TESTS)
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index 7dba32138d..08c45b8470 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -13,7 +13,5 @@ TESTS:=$(AARCH64_TESTS)
- fcvt: LDFLAGS+=-lm
- 
- run-fcvt: fcvt
--	$(call quiet-command, \
--		$(QEMU) $< > fcvt.out && \
--		diff -u $(AARCH64_SRC)/fcvt.ref fcvt.out, \
--		"TEST", "$< (default) on $(TARGET_NAME)")
-+	$(call run-test,$<,$(QEMU) $<, "$< on $(TARGET_NAME)")
-+	$(call diff-out,$<,$(AARCH64_SRC)/fcvt.ref)
-diff --git a/tests/tcg/arm/Makefile.target b/tests/tcg/arm/Makefile.target
-index 14b5435fc6..aa4e4e3782 100644
---- a/tests/tcg/arm/Makefile.target
-+++ b/tests/tcg/arm/Makefile.target
-@@ -24,10 +24,8 @@ fcvt: LDFLAGS+=-lm
- # fcvt: CFLAGS+=-march=armv8.2-a+fp16 -mfpu=neon-fp-armv8
- 
- run-fcvt: fcvt
--	$(call quiet-command, \
--		$(QEMU) $< > fcvt.out && \
--		diff -u $(ARM_SRC)/fcvt.ref fcvt.out, \
--		"TEST", "$< (default) on $(TARGET_NAME)")
-+	$(call run-test,fcvt,$(QEMU) $<,"$< on $(TARGET_NAME)")
-+	$(call diff-out,fcvt,$(ARM_SRC)/fcvt.ref)
- endif
- 
- # On ARM Linux only supports 4k pages
-diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
-index cd173363ee..97b7c23cf1 100644
---- a/tests/tcg/i386/Makefile.target
-+++ b/tests/tcg/i386/Makefile.target
-@@ -31,7 +31,7 @@ test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S test-i386.h test-i386
- 
- # Specialist test runners
- run-runcom: runcom pi_10.com
--	$(call quiet-command, $(QEMU) ./runcom $(I386_SRC)/pi_10.com > runcom.out, "TEST", "$< on $(TARGET_NAME)")
-+	$(call run-test,$<,$(QEMU) ./runcom $(I386_SRC)/pi_10.com,"$< on $(TARGET_NAME)")
- 
- ifeq ($(SPEED), slow)
- 
-@@ -40,13 +40,11 @@ test-i386-fprem.ref: test-i386-fprem
- 
- run-test-i386-fprem: TIMEOUT=60
- run-test-i386-fprem: test-i386-fprem
--	$(call quiet-command, \
--		$(QEMU) $< > $<.out && \
--		diff -u $(I386_SRC)/$<.ref $<.out, \
--		"TEST", "$< (default) on $(TARGET_NAME)")
-+	$(call run-test,test-i386-fprem, $(QEMU) $<,"$< on $(TARGET_NAME)")
-+	$(call diff-out,test-i386-fprem, $(I386_SRC)/$<.ref)
- else
- run-test-i386-fprem: test-i386-fprem
--	$(call quiet-command, /bin/true, "SLOW TEST", "$< SKIPPED on $(TARGET_NAME)")
-+	$(call skip-test, $<, "SLOW")
- endif
- 
- # On i386 and x86_64 Linux only supports 4k pages (large pages are a different hack)
-diff --git a/tests/tcg/multiarch/Makefile.target b/tests/tcg/multiarch/Makefile.target
-index 90e45a881e..b77084c146 100644
---- a/tests/tcg/multiarch/Makefile.target
-+++ b/tests/tcg/multiarch/Makefile.target
-@@ -27,10 +27,10 @@ testthread: LDFLAGS+=-lpthread
- 
- # default case (host page size)
- run-test-mmap: test-mmap
--	$(call quiet-command, $(QEMU) $< > test-mmap.out, "TEST", \
-+	$(call run-test, test-mmap, $(QEMU) $<, \
- 		"$< (default) on $(TARGET_NAME)")
- 
- # additional page sizes (defined by each architecture adding to EXTRA_RUNS)
- run-test-mmap-%: test-mmap
--	$(call quiet-command, $(QEMU) -p $* $< > test-mmap-$*.out, "TEST", \
-+	$(call run-test, test-mmap-$*, $(QEMU) -p $* $<,\
- 		"$< ($* byte pages) on $(TARGET_NAME)")
+     ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
+     decode_opc(ctx);
+     ctx->base.pc_next += 2;
 -- 
 2.17.1
