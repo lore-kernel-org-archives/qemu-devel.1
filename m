@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRJsV-0008FM-3O
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:04:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fRK23-0008Ig-EL
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:14:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRJsR-0002su-SB
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:04:39 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36996)
+	(envelope-from <peter.maydell@linaro.org>) id 1fRK22-0007pa-J9
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:14:31 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:40937)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fRJsR-0002s4-Lz
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:04:35 -0400
-Received: by mail-wm0-x241.google.com with SMTP id r125-v6so4679547wmg.2
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 09:04:35 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  8 Jun 2018 17:04:29 +0100
-Message-Id: <20180608160432.8734-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fRK22-0007pJ-EK
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:14:30 -0400
+Received: by mail-ot0-x243.google.com with SMTP id w9-v6so10806163otj.7
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 09:14:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 0/3] Better docker dependency checking
+In-Reply-To: <20180608185714-mutt-send-email-mst@kernel.org>
+References: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
+	<20180607223111.27792-2-ross.zwisler@linux.intel.com>
+	<20180608020724-mutt-send-email-mst@kernel.org>
+	<5352d2fb-9244-78b0-4f4b-2818359a4425@redhat.com>
+	<20180608153402.GA27156@linux.intel.com>
+	<20180608185714-mutt-send-email-mst@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 Jun 2018 17:14:09 +0100
+Message-ID: <CAFEAcA943cBfMbjBJcheTWAL+mWa4vu5uL62LvKXS4agd+ZRMA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [qemu PATCH 2/5] acpi: "make check" should fail on
+ asl mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +34,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
-Hi,
+On 8 June 2018 at 16:59, Michael S. Tsirkin <mst@redhat.com> wrote:
+> The expected value tests are a debugging aid. They do not catch bugs and
+> aren't designed to. In particular the comparisons do not even run if
+> IASL isn't installed.
 
-These patches apply on top of my tcg/testing patch series and attempt
-to make the dependancy checking a bit smarter within the confines of
-what Make can achieve. The basic idea is although the debian-sid-image
-will always rebuild by making it a conditional dependancy we can only
-trigger this when we need to rebuild the target image. Together with
-the top-level initial build this mean you can now run make check-tcg
-with high -j's without issue.
+If they're not actually tests to catch bugs, maybe we shouldn't
+be running them in "make check" ?
 
-The first patch in the series fixes the checksum code as it was broken
-anyway. Currently we don't properly handle extra_files and executables
-but this should be fairly easy to add. I've not done it at the moment
-because we don't use these exotic builds in any of the default
-targets.
-
-Alex Bennée (3):
-  docker: docker.py don't conflate checksums for extra_files
-  dcoker: docker.py add check sub-command
-  docker: remove SUBMAKE_NOCACHE_HACK for debian-sid based images
-
- tests/docker/Makefile.include | 25 ++++++++++++++-----------
- tests/docker/docker.py        | 30 +++++++++++++++++++++++++++---
- tests/tcg/Makefile.include    |  1 -
- 3 files changed, 41 insertions(+), 15 deletions(-)
-
--- 
-2.17.1
+thanks
+-- PMM
