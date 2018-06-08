@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRMhC-0002OD-T5
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:05:11 -0400
+	(envelope-from <alifm@linux.ibm.com>) id 1fRMks-0003Ag-9C
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:08:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRMh9-000830-No
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:05:10 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:34435)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRMh9-00082u-Im
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:05:07 -0400
-Received: by mail-qk0-x241.google.com with SMTP id q70-v6so9415710qke.1
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 12:05:07 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180608175252.25110-1-ehabkost@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <514811ad-5c26-5744-3ef2-444112ec2f4a@amsat.org>
-Date: Fri, 8 Jun 2018 16:05:03 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180608175252.25110-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] python: Remove unused compatibility
- modules
+	(envelope-from <alifm@linux.ibm.com>) id 1fRMkp-0000lf-3N
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:08:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33188
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1fRMko-0000lU-Uk
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:08:55 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w58J5AvA049388
+	for <qemu-devel@nongnu.org>; Fri, 8 Jun 2018 15:08:52 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2jfw7mwq17-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 15:08:52 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Fri, 8 Jun 2018 15:08:52 -0400
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Fri,  8 Jun 2018 15:08:45 -0400
+Message-Id: <cover.1528462918.git.alifm@linux.ibm.com>
+Subject: [Qemu-devel] [RFC v1 0/2] Detect & register virtio-crypto algos
+ only if it can be supported by backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,43 +36,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Cleber Rosa <crosa@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: mst@redhat.com, qemu-devel@nongnu.org, arei.gonglei@huawei.com, longpeng2@huawei.com, pasic@linux.ibm.com, frankja@linux.ibm.com, borntraeger@de.ibm.com, alifm@linux.ibm.com
 
-On 06/08/2018 02:52 PM, Eduardo Habkost wrote:
-> Changes v1 -> v2:
-> * Remove references to ordereddict.py from Makefiles
->   (oops)
-> 
-> Now that we require Python >= 2.7, we don't need
-> scripts/argparse.py and scripts/ordereddict.py anymore.
-> 
-> Eduardo Habkost (2):
->   python: Remove scripts/argparse.py
->   python: Remove scripts/ordereddict.py
-> 
->  Makefile               |    1 -
->  scripts/argparse.py    | 2406 ----------------------------------------
->  scripts/ordereddict.py |  128 ---
->  scripts/qapi/common.py |    5 +-
->  tests/Makefile.include |    1 -
->  5 files changed, 1 insertion(+), 2540 deletions(-)
->  delete mode 100644 scripts/argparse.py
->  delete mode 100644 scripts/ordereddict.py
-> 
-> 
-> base-commit: 0d2fa03dae4fbe185a082f361342b1e30aed4582
-> prerequisite-patch-id: 85850a32e1cc81a0da74ab17f5529422dad95b84
-> prerequisite-patch-id: 7170cef9d18c1a7685e2fee388f91dc41f4904b6
-> prerequisite-patch-id: 7c129d8fffe290a3212658590b2d992b0cec41c7
-> prerequisite-patch-id: d7a2da6245ab7e7d3425d095ea910ff36564d852
-> prerequisite-patch-id: 0873603d721465a489159d648f31d1a067b056fa
-> prerequisite-patch-id: 076695a7cdd63726e02855227ce5488c76c11aa9
-> prerequisite-patch-id: 7df7c61e87116dd3ac9ad8a74735715e09030c62
-> prerequisite-patch-id: 4f454e504a80785079216d79289e737ba092a75c
-> prerequisite-patch-id: 5a6b8b611de8324d8a5083e855d5512a66c3680f
-> prerequisite-patch-id: 3e5e0849ce3a5149c75e088fd01974d1d5c9c6d5
-> prerequisite-patch-id: 6aa4739baafd181e2ae0027903b77a5267e983f7
+Hi,
 
-Series:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Currently the Linux virtio-crypto driver registers the crypto
+algorithm without verifying if the backend actually supports the
+algorithm.
+
+This kernel patch series adds support for registering algorithm
+with Linux crypto layer, only if the algorithm is supported by
+the backend device. This also makes the driver more compliant with
+the virtio-crypto spec [1].
+
+I would appreciate any feedback or comments on this.
+
+Thank you
+Farhan
+
+Reference
+---------
+[1] Virtio crypto spec proposal https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg00816.html
+
+Farhan Ali (2):
+  crypto/virtio-crypto: Read crypto services and algorithm masks
+  crypto/virtio-crypto: Register an algo only if it's supported
+
+ drivers/crypto/virtio/virtio_crypto_algs.c   | 110 ++++++++++++++++++---------
+ drivers/crypto/virtio/virtio_crypto_common.h |  25 +++++-
+ drivers/crypto/virtio/virtio_crypto_core.c   |  29 +++++++
+ drivers/crypto/virtio/virtio_crypto_mgr.c    |  81 ++++++++++++++++++--
+ 4 files changed, 201 insertions(+), 44 deletions(-)
+
+-- 
+2.7.4
