@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fRD9b-0000dW-0I
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:53:52 -0400
+	(envelope-from <groug@kaod.org>) id 1fRDCc-0001b4-1x
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:56:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fRD9Z-0007cg-PW
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:53:51 -0400
-Date: Fri, 8 Jun 2018 09:53:33 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180608085333.GD2671@work-vm>
-References: <20180606150507.GJ2660@work-vm>
-	<66727986-1cf1-c12e-d78c-d56cc15eaf00@redhat.com>
-	<20180606163246.GL3064@redhat.com>
-	<f3914a591a46c9d489f2fa1ad2ac4fd0c5a9e5b6.camel@redhat.com>
-	<20180607103218.GC1455@redhat.com>
-	<20180607103620.GJ28827@redhat.com>
-	<dd014be5c818e71d4f833e150fbae11e490e2325.camel@redhat.com>
-	<7410e002-ba2f-2dd2-b24f-c9841f456ac9@redhat.com>
-	<20180608082129.GC2671@work-vm> <20180608084112.GD18233@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1fRDCX-0002rz-5Q
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:56:58 -0400
+Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:42467)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fRDCW-0002qW-VN
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:56:53 -0400
+Received: from player726.ha.ovh.net (unknown [10.109.120.110])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 2666918C2A
+	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 10:56:50 +0200 (CEST)
+Date: Fri, 8 Jun 2018 10:56:32 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180608105632.20d5c723@bahia.lan>
+In-Reply-To: <20180607165218.9558-6-david@redhat.com>
+References: <20180607165218.9558-1-david@redhat.com>
+	<20180607165218.9558-6-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180608084112.GD18233@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 5/8] spapr: introduce machine unplug
+ handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,84 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Andrea Bolognani <abologna@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Fri, Jun 08, 2018 at 09:21:30AM +0100, Dr. David Alan Gilbert wrote:
-> > * Laszlo Ersek (lersek@redhat.com) wrote:
-> > > On 06/07/18 12:54, Andrea Bolognani wrote:
-> > > > On Thu, 2018-06-07 at 11:36 +0100, Daniel P. Berrang=E9 wrote:
-> > > >> On Thu, Jun 07, 2018 at 11:32:18AM +0100, Richard W.M. Jones wro=
-te:
-> > > >>> Another problem which Laszlo mentioned is the varstore isn't po=
-rtable
-> > > >>> between UEFI implementations, or if the UEFI is compiled with
-> > > >>> different options.  You can even imagine shipping multiple
-> > > >>> varstores(!) which argues for a tar-like format.
-> > > >>
-> > > >> Could we perhaps imagine shipping the actual UEFI bios, rather
-> > > >> than only the varstore.  The bios blob runs in guest context,
-> > > >> so there shouldn't be able security concerns from hosting
-> > > >> vendors with running user provided bios. Mostly its a matter
-> > > >> of confidence that the interface between bios & qemu is stable
-> > > >> which feels easier than assuming varstore vs different bios is
-> > > >> portable.
-> > > >=20
-> > > > That sounds sensible, and further reinforces the idea that we
-> > > > need way more than a single string baked into the qcow2 file.
-> > > >=20
-> > >=20
-> > > Sorry for arriving late (thanks Rich for the Fwd).
-> > >=20
-> > > The contents of the non-volatile UEFI variables should be considere=
-d
-> > > part of (permanent) guest state, such as disk contents. Therefore I=
-'d
-> > > argue for bundling the varstore file with the disk image(s).
-> > >=20
-> > > In turn, the best way to ensure comaptibility between varstore and
-> > > firmware binary is to just bundle the firmware binary as well. It's
-> > > generally not large (x86) or if it is, it compresses extremely well
-> > > (aarch64). For extra politeness, image providers can bundle a text =
-file
-> > > with their firmware build options (like a kernel config), possibly =
-even
-> > > a JSON document conforming to the new firmware schema (qemu commit
-> > > 3a0adfc9bfcf), but that's not a hard requirement I guess.
-> > >=20
-> > > If such a VM is to be migrated between hosts, I'd expect the host a=
-dmin
-> > > to take care of installing the fw binary on all eligible hosts.
-> >=20
-> > There's no way they can do that if they're just importing VMs from
-> > templates that include the image; who is going to keep track of which
-> > BIOSs are needed where?
->=20
-> It isn't that unusual a requirement. When Openstack deploys a VM, it
-> has the user provided image as a base file, and then creates  qcow2
-> overlay.  If the VM is cold migrated (ie not running) to another
-> host, OpenStack has to make sure the same base file gets copied across
-> to the new host so that the overlay still works. Copying the BIOS file
-> and vars state across at the same time is no more difficult than what
-> its already doing.
+On Thu,  7 Jun 2018 18:52:15 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-I'm kind of OK with management layers doing it; but Laszlo was
-suggesting it was an admins problem;  if we can make it something
-manageable by higher levels that's OK.
-(Although I'm still concerned that making images with a UEFI image in
-that's portable is still not going to work).
+> We'll be handling unplug of e.g. CPUs and PCDIMMs  via the general
+> hotplug handler soon, so let's add that handler function.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
 
-Dave
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  hw/ppc/spapr.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 4447cb197f..bcb72d9fa7 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3586,6 +3586,11 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+>      error_propagate(errp, local_err);
+>  }
+>  
+> +static void spapr_machine_device_unplug(HotplugHandler *hotplug_dev,
+> +                                        DeviceState *dev, Error **errp)
+> +{
+> +}
+> +
+>  static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_dev,
+>                                                  DeviceState *dev, Error **errp)
+>  {
+> @@ -3988,6 +3993,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>      mc->get_default_cpu_node_id = spapr_get_default_cpu_node_id;
+>      mc->possible_cpu_arch_ids = spapr_possible_cpu_arch_ids;
+>      hc->unplug_request = spapr_machine_device_unplug_request;
+> +    hc->unplug = spapr_machine_device_unplug;
+>  
+>      smc->dr_lmb_enabled = true;
+>      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
