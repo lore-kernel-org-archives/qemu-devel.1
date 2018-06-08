@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRGfu-0005wM-3s
+	(envelope-from <alex.bennee@linaro.org>) id 1fRGfu-0005wN-3y
 	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRGfr-000117-7I
+	(envelope-from <alex.bennee@linaro.org>) id 1fRGfs-00011Z-20
 	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:26 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:53456)
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:46627)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fRGfq-00010N-V5
+	id 1fRGfr-00011F-RF
 	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:23 -0400
-Received: by mail-wm0-x243.google.com with SMTP id x6-v6so3089481wmc.3
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 05:39:22 -0700 (PDT)
+Received: by mail-wr0-x241.google.com with SMTP id v13-v6so13245158wrp.13
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 05:39:23 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  8 Jun 2018 13:32:42 +0100
-Message-Id: <20180608123307.24773-25-alex.bennee@linaro.org>
+Date: Fri,  8 Jun 2018 13:33:03 +0100
+Message-Id: <20180608123307.24773-46-alex.bennee@linaro.org>
 In-Reply-To: <20180608123307.24773-1-alex.bennee@linaro.org>
 References: <20180608123307.24773-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 24/49] tests/tcg: enable building for AArch64
+Subject: [Qemu-devel] [PATCH v6 45/49] tests/tcg: override runners for
+ broken tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,48 +31,56 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Yongbok Kim <yongbok.kim@mips.com>
 
-We only have compilers for the (default) little endian variants.
+To get a clean run of check-tcg these tests are currently skipped:
+
+  - hello-mips for mips
+  - linux-test for sparc
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 ---
 v4
-  - update MAINTAINERS
+  - document broken tests in commit
+  - temporarily demote fcvt while fixes percolate upstream
+v5
+  - reinstate fcvt
+  - remove test-mmap overrides (done with EXTRA_RUNS now)
+v6
+  - move to after the skip-test helper
 ---
- MAINTAINERS                        | 1 +
- tests/tcg/aarch64/Makefile.include | 8 ++++++++
- 2 files changed, 9 insertions(+)
- create mode 100644 tests/tcg/aarch64/Makefile.include
+ tests/tcg/mips/Makefile.target    | 3 +++
+ tests/tcg/sparc64/Makefile.target | 7 ++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c9b440344e..b8fbef495b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -136,6 +136,7 @@ L: qemu-arm@nongnu.org
- S: Maintained
- F: target/arm/
- F: tests/tcg/arm/
-+F: tests/tcg/aarch64/
- F: hw/arm/
- F: hw/cpu/a*mpcore.c
- F: include/hw/cpu/a*mpcore.h
-diff --git a/tests/tcg/aarch64/Makefile.include b/tests/tcg/aarch64/Makefile.include
-new file mode 100644
-index 0000000000..de32c91235
---- /dev/null
-+++ b/tests/tcg/aarch64/Makefile.include
-@@ -0,0 +1,8 @@
-+# Makefile.include for AArch64 targets
-+#
-+# We don't have any bigendian build tools so we only use this for AArch64
+diff --git a/tests/tcg/mips/Makefile.target b/tests/tcg/mips/Makefile.target
+index 71f0c2dd53..086625f533 100644
+--- a/tests/tcg/mips/Makefile.target
++++ b/tests/tcg/mips/Makefile.target
+@@ -17,3 +17,6 @@ hello-mips: LDFLAGS+=-nostdlib
+ 
+ # For MIPS32 and 64 we have a bunch of extra tests in sub-directories
+ # however they are intended for system tests.
 +
-+ifeq ($(TARGET_NAME),aarch64)
-+DOCKER_IMAGE=debian-arm64-cross
-+DOCKER_CROSS_COMPILER=aarch64-linux-gnu-gcc
-+endif
++run-hello-mips: hello-mips
++	$(call skip-test, $<, "BROKEN")
+diff --git a/tests/tcg/sparc64/Makefile.target b/tests/tcg/sparc64/Makefile.target
+index 408dace783..064c7a598b 100644
+--- a/tests/tcg/sparc64/Makefile.target
++++ b/tests/tcg/sparc64/Makefile.target
+@@ -1,6 +1,11 @@
+ # -*- Mode: makefile -*-
+ #
+-# sparc specific tweaks
++# sparc specific tweaks and masking out broken tests
++
++# different from the other hangs
++# /home/alex/lsrc/qemu/qemu.git/tests/tcg/multiarch/linux-test.c:264: Value too large for defined data type (ret=-1, errno=92/Value too large for defined data type)
++run-linux-test: linux-test
++	$(call skip-test, $<, "BROKEN")
+ 
+ # On Sparc64 Linux support 8k pages
+ EXTRA_RUNS+=run-test-mmap-8192
 -- 
 2.17.1
