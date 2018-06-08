@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fRLH7-00047l-1G
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:34:11 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fRLJA-0005bk-Sr
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fRLH0-0003ny-PJ
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:34:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49048 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fRLJ6-0004eH-72
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:36:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46918)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fRLH0-0003nL-Kk
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:34:02 -0400
-References: <20180608131604.16826-1-berrange@redhat.com>
-	<20180608131604.16826-4-berrange@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <5e547f16-5756-984f-35f8-f7d06849c116@redhat.com>
-Date: Fri, 8 Jun 2018 19:33:52 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180608131604.16826-4-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] glib: enforce the minimum required
- version and warn about old APIs
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fRLJ6-0004dn-0W
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:36:12 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri,  8 Jun 2018 14:35:56 -0300
+Message-Id: <20180608173558.8122-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] python: Remove unused compatibility modules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +21,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Xu <peterx@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Olaf Hering <olaf@aepfle.de>
+To: qemu-devel@nongnu.org
+Cc: Cleber Rosa <crosa@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 08.06.2018 15:16, Daniel P. Berrang=C3=A9 wrote:
-> There are two useful macros that can be defined before including
-> glib.h that are related to the min required glib version
->=20
->  - GLIB_VERSION_MIN_REQUIRED
->=20
->    When this is defined, if code uses an API that was deprecated
->    in this version, or older, a compiler warning will be emitted.
->    This alerts maintainers to update their code to whatever new
->    replacement API is now recommended best practice.
->=20
->  - GLIB_VERSION_MAX_ALLOWED
->=20
->    When this is defined, if code uses an API that was introduced
->    in a version that is newer than the declared version, a compiler
->    warning will be emitted. This alerts maintainers if new code
->    accidentally uses functionality that won't be available on some
->    supported platforms.
->=20
-> The GLIB_VERSION_MAX_ALLOWED constant makes it a bit harder to opt
-> in to using specific new APIs with a GLIB_CHECK_VERSION conditional.
-> To workaround this Pragmas can be used to temporarily turn off the
-> -Wdeprecated-declarations compiler warning, while a static inline
-> compat function is implemented. This workaround is illustrated with the
-> implementation of the g_strv_contains method to satisfy the test suite.
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
->  include/glib-compat.h | 68 +++++++++++++++++++++++++++++++++++++++++++
->  tests/test-qga.c      |  2 --
->  2 files changed, 68 insertions(+), 2 deletions(-)
+Now that we require Python >= 2.7, we don't need
+scripts/argparse.py and scripts/ordereddict.py anymore.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Eduardo Habkost (2):
+  python: Remove scripts/argparse.py
+  python: Remove scripts/ordereddict.py
+
+ scripts/argparse.py    | 2406 ----------------------------------------
+ scripts/ordereddict.py |  128 ---
+ scripts/qapi/common.py |    5 +-
+ 3 files changed, 1 insertion(+), 2538 deletions(-)
+ delete mode 100644 scripts/argparse.py
+ delete mode 100644 scripts/ordereddict.py
+
+
+base-commit: bac5ba3dc5da706f52c149fa6c0bd1dc96899bec
+prerequisite-patch-id: 85850a32e1cc81a0da74ab17f5529422dad95b84
+prerequisite-patch-id: 7170cef9d18c1a7685e2fee388f91dc41f4904b6
+prerequisite-patch-id: 7c129d8fffe290a3212658590b2d992b0cec41c7
+prerequisite-patch-id: d7a2da6245ab7e7d3425d095ea910ff36564d852
+prerequisite-patch-id: 0873603d721465a489159d648f31d1a067b056fa
+prerequisite-patch-id: 076695a7cdd63726e02855227ce5488c76c11aa9
+prerequisite-patch-id: 7df7c61e87116dd3ac9ad8a74735715e09030c62
+prerequisite-patch-id: 4f454e504a80785079216d79289e737ba092a75c
+prerequisite-patch-id: 5a6b8b611de8324d8a5083e855d5512a66c3680f
+prerequisite-patch-id: 3e5e0849ce3a5149c75e088fd01974d1d5c9c6d5
+prerequisite-patch-id: 6aa4739baafd181e2ae0027903b77a5267e983f7
+-- 
+2.18.0.rc1.1.g3f1ff2140
