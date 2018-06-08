@@ -1,26 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fRFqh-00014R-Ua
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:46:33 -0400
+	(envelope-from <groug@kaod.org>) id 1fRFyB-00044n-8N
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:54:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fRFqe-00035f-On
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:46:31 -0400
-Resent-Message-Id: <E1fRFqe-00035f-On@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21081)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fRFqe-00035B-Ee
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:46:28 -0400
-In-Reply-To: <20180608112001.14729-1-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152845744972.456.1789810180257987315@d39dc562802a>
+	(envelope-from <groug@kaod.org>) id 1fRFy8-00084h-6T
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:54:15 -0400
+Received: from 17.mo6.mail-out.ovh.net ([46.105.36.150]:52486)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fRFy7-00083q-Uu
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:54:12 -0400
+Received: from player794.ha.ovh.net (unknown [10.109.108.88])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 3944C1630FA
+	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 13:54:10 +0200 (CEST)
+Date: Fri, 8 Jun 2018 13:53:49 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180608135349.61bf51fe@bahia.lan>
+In-Reply-To: <c9aba2a1-2232-457b-db6d-c2935711231d@redhat.com>
+References: <20180607165218.9558-1-david@redhat.com>
+	<20180607165218.9558-3-david@redhat.com>
+	<20180608093406.30c878ec@bahia.lan>
+	<4f518685-fcdb-7c3a-35d3-5a26374e0604@redhat.com>
+	<20180608094657.4043502f@bahia.lan>
+	<431d4fe5-5bfe-1ab3-00b5-610038a7a9ea@redhat.com>
+	<2b431d32-9172-0517-4717-7ce50355b8db@redhat.com>
+	<20180608103943.1d7e72ee@redhat.com>
+	<673ffa52-1e24-5d6c-5d6a-927d3df79273@redhat.com>
+	<20180608110612.18ac915c@redhat.com>
+	<9eaefde2-b8aa-9072-610b-4236ce5c3913@redhat.com>
+	<20180608125233.46fc187a@bahia.lan>
+	<c9aba2a1-2232-457b-db6d-c2935711231d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 8 Jun 2018 04:30:50 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] ramfb: simple boot framebuffer,
- no legacy vga
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 2/8] spapr: no need to
+ verify the node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +42,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com, lersek@redhat.com, rth@twiddle.net
+To: David Hildenbrand <david@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjA4MTEyMDAxLjE0NzI5LTEta3JheGVsQHJlZGhhdC5jb20KU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwLzZdIHJhbWZiOiBzaW1wbGUgYm9vdCBmcmFtZWJ1
-ZmZlciwgbm8gbGVnYWN5IHZnYQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
-bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
-Z29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
-c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
-Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
-IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
-YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
-bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
-ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRw
-czovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICAgYTY3NGRhMGFiNy4uYmFjNWJh
-M2RjNSAgbWFzdGVyICAgICAtPiBtYXN0ZXIKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0
-Y2hldy8yMDE4MDYwODExMjAwMS4xNDcyOS0xLWtyYXhlbEByZWRoYXQuY29tIC0+IHBhdGNoZXcv
-MjAxODA2MDgxMTIwMDEuMTQ3MjktMS1rcmF4ZWxAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCmIzYjc2OGJkY2YgYm9jaHMtZGlzcGxheTogZW5hYmxlIHZnYWJpb3MK
-YmUwOGVkMTRiZSByYW1mYjogZW5hYmxlIHZnYWJpb3MKZjJmMjA2OTYyNSBody92ZmlvL2Rpc3Bs
-YXk6IGFkZCByYW1mYiBzdXBwb3J0CjcxN2VkYjJmNGQgaHcvZGlzcGxheTogYWRkIHZpcnRpby1y
-YW1mYiBkZXZpY2UKY2ZiODdjOWIzYiBody9kaXNwbGF5OiBhZGQgc3RhbmRhbG9uZSByYW1mYiBk
-ZXZpY2UKYWRkMzljZTUxOCBody9kaXNwbGF5OiBhZGQgcmFtZmIsIGEgc2ltcGxlIGJvb3QgZnJh
-bWVidWZmZXIgbGl2aW5nIGluIGd1ZXN0IHJhbQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
-bmcgUEFUQ0ggMS82OiBody9kaXNwbGF5OiBhZGQgcmFtZmIsIGEgc2ltcGxlIGJvb3QgZnJhbWVi
-dWZmZXIgbGl2aW5nIGluIGd1ZXN0IHJhbS4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MTogCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEwOSBsaW5lcyBj
-aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBB
-VENIIDIvNjogaHcvZGlzcGxheTogYWRkIHN0YW5kYWxvbmUgcmFtZmIgZGV2aWNlLi4uCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzcxOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgMTQxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy82OiBody9kaXNwbGF5OiBhZGQgdmlydGlvLXJh
-bWZiIGRldmljZS4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
-Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE1NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvNjogaHcvdmZp
-by9kaXNwbGF5OiBhZGQgcmFtZmIgc3VwcG9ydC4uLgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNl
-c3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMzMTogRklMRTogaHcvdmZpby9k
-aXNwbGF5LmM6MTg3OgorICAgIGlmIChzdHJjbXAob2JqZWN0X2dldF90eXBlbmFtZShPQkpFQ1Qo
-dmRldikpLCAidmZpby1wY2ktcmFtZmIiKSA9PSAwKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBh
-cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNTA6IEZJTEU6IGh3
-L3ZmaW8vZGlzcGxheS5jOjMxMToKKyAgICBpZiAoc3RyY21wKG9iamVjdF9nZXRfdHlwZW5hbWUo
-T0JKRUNUKHZkZXYpKSwgInZmaW8tcGNpLXJhbWZiIikgPT0gMCkKWy4uLl0KCnRvdGFsOiAyIGVy
-cm9ycywgMCB3YXJuaW5ncywgNzIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS82OiByYW1mYjogZW5hYmxlIHZnYWJp
-b3MuLi4KQ2hlY2tpbmcgUEFUQ0ggNi82OiBib2Nocy1kaXNwbGF5OiBlbmFibGUgdmdhYmlvcy4u
-Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
-LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
-aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
-aGF0LmNvbQ==
+On Fri, 8 Jun 2018 13:28:01 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 08.06.2018 12:52, Greg Kurz wrote:
+> > On Fri, 8 Jun 2018 11:24:51 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >>>>>> +1 for error_abort, even if it takes another line.      
+> >>>>> +1 for error_abort
+> >>>>> call shouldn't fail, but if does it won't be silently ignored
+> >>>>> and introduce undefined behavior.      
+> >>>>
+> >>>> Maybe we should fix the others that pass in NULL.
+> >>>>
+> >>>> (no, not me :D - I'm already busy with your requested pre_plug handling)    
+> >>> Add it to wiki page for bite sized tasks?    
+> >>
+> >> Done.
+> >>
+> >>  
+> > 
+> > FWIW, I've also added a line to check and possibly fix places where we do
+> > 'if (*errp)', which would cause QEMU to crash if the caller passes NULL.
+> > 
+> > $ git grep 'if (\*errp)'
+> > hmp.c:    if (*errp) {
+> > hw/ipmi/isa_ipmi_bt.c:    if (*errp)
+> > hw/ipmi/isa_ipmi_kcs.c:    if (*errp)
+> > hw/mem/memory-device.c:    if (*errp) {
+> > hw/mem/memory-device.c:        if (*errp) {
+> > hw/ppc/spapr.c:        if (*errp) {
+> > hw/s390x/event-facility.c:        if (*errp) {
+> > include/qapi/error.h: *     if (*errp) { // WRONG!
+> > qga/commands-posix.c:            if (*errp) {
+> > target/s390x/cpu_models.c:    if (*errp) {
+> > target/s390x/cpu_models.c:        if (*errp) {
+> > target/s390x/cpu_models.c:            if (*errp) {
+> > target/s390x/cpu_models.c:        if (*errp) {
+> > target/s390x/cpu_models.c:    if (*errp) {
+> > target/s390x/cpu_models.c:    if (*errp) {
+> > target/s390x/cpu_models.c:    if (*errp) {
+> > target/s390x/cpu_models.c:    if (*errp) {
+> > target/s390x/cpu_models.c:    if (*errp) {
+> > target/s390x/cpu_models.c:    if (*errp) {
+> > target/s390x/cpu_models.c:    if (*errp) {
+> > target/s390x/cpu_models.c:    if (*errp) {
+> > target/s390x/cpu_models.c:    if (*errp) {
+> > tests/test-crypto-tlscredsx509.c:    if (*errp) {
+> > tests/test-io-channel-tls.c:    if (*errp) {
+> >   
+> 
+> I think the more important part is actually looking out for people that
+> use NULL instead of error_abort. This way we won't silently ignore errors.
+> 
+
+I agree that we should probably pass &error_abort in many places,
+but passing NULL isn't bad per se. It means any failure in the
+callee is unimportant enough that we can simply ignore it.
+
+The error framework provides this possibility and so we should
+never dereference errp.
