@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fRNen-0007Wm-Qb
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 16:06:51 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fRNet-0007a1-OA
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 16:06:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fRNel-0006gf-J7
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 16:06:45 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fRNeq-0006kM-H9
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 16:06:51 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri,  8 Jun 2018 22:05:50 +0200
-Message-Id: <20180608200558.386-6-laurent@vivier.eu>
+Date: Fri,  8 Jun 2018 22:05:53 +0200
+Message-Id: <20180608200558.386-9-laurent@vivier.eu>
 In-Reply-To: <20180608200558.386-1-laurent@vivier.eu>
 References: <20180608200558.386-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [RFC 05/13] hw/m68k: Apple Sound Chip (ASC) emulation
+Subject: [Qemu-devel] [RFC 08/13] hw/m68k: add a dummy SWIM floppy controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,554 +20,357 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Laurent Vivier <Laurent@Vivier.EU>
+Cc: Aurelien Jarno <aurelien@aurel32.net>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, Laurent Vivier <laurent@vivier.eu>
 
-From: Laurent Vivier <Laurent@Vivier.EU>
-
-This is broken as the linux driver seems broken too...
-
-Signed-off-by: Laurent Vivier <Laurent@Vivier.EU>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/audio/Makefile.objs |   1 +
- hw/audio/asc.c         | 492 +++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/audio/asc.h |  21 +++
- 3 files changed, 514 insertions(+)
- create mode 100644 hw/audio/asc.c
- create mode 100644 include/hw/audio/asc.h
+ hw/block/Makefile.objs |   1 +
+ hw/block/swim.c        | 325 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 326 insertions(+)
+ create mode 100644 hw/block/swim.c
 
-diff --git a/hw/audio/Makefile.objs b/hw/audio/Makefile.objs
-index 63db383709..44d1ada7b0 100644
---- a/hw/audio/Makefile.objs
-+++ b/hw/audio/Makefile.objs
-@@ -16,3 +16,4 @@ common-obj-$(CONFIG_MARVELL_88W8618) += marvell_88w8618.o
- common-obj-$(CONFIG_MILKYMIST) += milkymist-ac97.o
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index 53ce5751ae..068de3f0c9 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -8,6 +8,7 @@ common-obj-$(CONFIG_XEN) += xen_disk.o
+ common-obj-$(CONFIG_ECC) += ecc.o
+ common-obj-$(CONFIG_ONENAND) += onenand.o
+ common-obj-$(CONFIG_NVME_PCI) += nvme.o
++common-obj-$(CONFIG_SWIM) += swim.o
  
- common-obj-y += soundhw.o
-+common-obj-$(CONFIG_ASC) += asc.o
-diff --git a/hw/audio/asc.c b/hw/audio/asc.c
+ obj-$(CONFIG_SH4) += tc58128.o
+ 
+diff --git a/hw/block/swim.c b/hw/block/swim.c
 new file mode 100644
-index 0000000000..3c07d4fa91
+index 0000000000..33424ca76f
 --- /dev/null
-+++ b/hw/audio/asc.c
-@@ -0,0 +1,492 @@
++++ b/hw/block/swim.c
+@@ -0,0 +1,325 @@
 +/*
-+ *  QEMU Apple Sound Chip emulation
++ * QEMU Macintosh floppy disk controller emulator (SWIM)
 + *
-+ *  Apple Sound Chip (ASC) 344S0063
-+ *  Enhanced Apple Sound Chip (EASC) 343S1063
++ * Copyright (c) 2014-2018 Laurent Vivier <laurent@vivier.eu>
 + *
-+ *  Copyright (c) 2012-2018 Laurent Vivier <laurent@vivier.eu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
 + *
 + */
 +
 +#include "qemu/osdep.h"
 +#include "hw/sysbus.h"
-+#include "audio/audio.h"
-+#include "hw/audio/asc.h"
 +
-+/*
-+ * Linux doesn't provide information about ASC, see arch/m68k/mac/macboing.c
-+ * and arch/m68k/include/asm/mac_asc.h
-+ *
-+ * best information is coming from MAME:
-+ *   http://mamedev.org/source/src/emu/sound/asc.h.html
-+ *   http://mamedev.org/source/src/emu/sound/asc.c.html
-+ *   Emulation by R. Belmont
-+ *
-+ *     0x800: VERSION
-+ *     0x801: MODE
-+ *            1=FIFO mode,
-+ *            2=wavetable mode
-+ *     0x802: CONTROL
-+ *            bit 0=analog or PWM output,
-+ *                1=stereo/mono,
-+ *                7=processing time exceeded
-+ *     0x803: FIFO MODE
-+ *            bit 7=clear FIFO,
-+ *            bit 1="non-ROM companding",
-+ *            bit 0="ROM companding")
-+ *     0x804: FIFO IRQ STATUS
-+ *            bit 0=ch A 1/2 full,
-+ *                1=ch A full,
-+ *                2=ch B 1/2 full,
-+ *                3=ch B full)
-+ *     0x805: WAVETABLE CONTROL
-+ *            bits 0-3 wavetables 0-3 start
-+ *     0x806: VOLUME
-+ *            bits 2-4 = 3 bit internal ASC volume,
-+ *            bits 5-7 = volume control sent to Sony sound chip
-+ *     0x807: CLOCK RATE
-+ *            0 = Mac 22257 Hz,
-+ *            1 = undefined,
-+ *            2 = 22050 Hz,
-+ *            3 = 44100 Hz
-+ *     0x80a: PLAY REC A
-+ *     0x80f: TEST
-+ *            bits 6-7 = digital test,
-+ *            bits 4-5 = analog test
-+ *     0x810: WAVETABLE 0 PHASE
-+ *            big-endian 9.15 fixed-point, only 24 bits valid
-+ *     0x814: WAVETABLE 0 INCREMENT
-+ *            big-endian 9.15 fixed-point, only 24 bits valid
-+ *     0x818: WAVETABLE 1 PHASE
-+ *     0x81C: WAVETABLE 1 INCREMENT
-+ *     0x820: WAVETABLE 2 PHASE
-+ *     0x824: WAVETABLE 2 INCREMENT
-+ *     0x828: WAVETABLE 3 PHASE
-+ *     0x82C: WAVETABLE 3 INCREMENT
-+ */
++/* IWM registers */
 +
-+#define ASC_LENGTH   0x2000
-+#define ASC_BUF_SIZE 0x0800
++#define IWM_PH0L                0
++#define IWM_PH0H                1
++#define IWM_PH1L                2
++#define IWM_PH1H                3
++#define IWM_PH2L                4
++#define IWM_PH2H                5
++#define IWM_PH3L                6
++#define IWM_PH3H                7
++#define IWM_MTROFF              8
++#define IWM_MTRON               9
++#define IWM_INTDRIVE            10
++#define IWM_EXTDRIVE            11
++#define IWM_Q6L                 12
++#define IWM_Q6H                 13
++#define IWM_Q7L                 14
++#define IWM_Q7H                 15
 +
-+#define ASC_REG_BASE 0x0800
-+enum {
-+    ASC_VERSION     = 0x00,
-+    ASC_MODE        = 0x01,
-+    ASC_CONTROL     = 0x02,
-+    ASC_FIFOMODE    = 0x03,
-+    ASC_FIFOIRQ     = 0x04,
-+    ASC_WAVECTRL    = 0x05,
-+    ASC_VOLUME      = 0x06,
-+    ASC_CLOCK       = 0x07,
-+    ASC_PLAYRECA    = 0x0a,
-+    ASC_TEST        = 0x0f,
-+    ASC_WAVETABLE   = 0x10
++/* SWIM registers */
++
++#define SWIM_WRITE_DATA         0
++#define SWIM_WRITE_MARK         1
++#define SWIM_WRITE_CRC          2
++#define SWIM_WRITE_PARAMETER    3
++#define SWIM_WRITE_PHASE        4
++#define SWIM_WRITE_SETUP        5
++#define SWIM_WRITE_MODE0        6
++#define SWIM_WRITE_MODE1        7
++
++#define SWIM_READ_DATA          8
++#define SWIM_READ_MARK          9
++#define SWIM_READ_ERROR         10
++#define SWIM_READ_PARAMETER     11
++#define SWIM_READ_PHASE         12
++#define SWIM_READ_SETUP         13
++#define SWIM_READ_STATUS        14
++#define SWIM_READ_HANDSHAKE     15
++
++#define REG_SHIFT               9
++
++#define MAX_FD                  2
++
++typedef struct SWIMCtrl SWIMCtrl;
++
++typedef struct FDrive {
++    SWIMCtrl *swimctrl;
++    BlockBackend *blk;
++} FDrive;
++
++#define SWIM_MODE_IWM  0
++#define SWIM_MODE_SWIM 1
++
++/* bits in phase register */
++
++#define SWIM_SEEK_NEGATIVE   0x074
++#define SWIM_STEP            0x071
++#define SWIM_MOTOR_ON        0x072
++#define SWIM_MOTOR_OFF       0x076
++#define SWIM_INDEX           0x073
++#define SWIM_EJECT           0x077
++#define SWIM_SETMFM          0x171
++#define SWIM_SETGCR          0x175
++#define SWIM_RELAX           0x033
++#define SWIM_LSTRB           0x008
++#define SWIM_CA_MASK         0x077
++
++/* Select values for swim_select and swim_readbit */
++
++#define SWIM_READ_DATA_0     0x074
++#define SWIM_TWOMEG_DRIVE    0x075
++#define SWIM_SINGLE_SIDED    0x076
++#define SWIM_DRIVE_PRESENT   0x077
++#define SWIM_DISK_IN         0x170
++#define SWIM_WRITE_PROT      0x171
++#define SWIM_TRACK_ZERO      0x172
++#define SWIM_TACHO           0x173
++#define SWIM_READ_DATA_1     0x174
++#define SWIM_MFM_MODE        0x175
++#define SWIM_SEEK_COMPLETE   0x176
++#define SWIM_ONEMEG_MEDIA    0x177
++
++/* Bits in handshake register */
++
++#define SWIM_MARK_BYTE       0x01
++#define SWIM_CRC_ZERO        0x02
++#define SWIM_RDDATA          0x04
++#define SWIM_SENSE           0x08
++#define SWIM_MOTEN           0x10
++#define SWIM_ERROR           0x20
++#define SWIM_DAT2BYTE        0x40
++#define SWIM_DAT1BYTE        0x80
++
++/* bits in setup register */
++
++#define SWIM_S_INV_WDATA     0x01
++#define SWIM_S_3_5_SELECT    0x02
++#define SWIM_S_GCR           0x04
++#define SWIM_S_FCLK_DIV2     0x08
++#define SWIM_S_ERROR_CORR    0x10
++#define SWIM_S_IBM_DRIVE     0x20
++#define SWIM_S_GCR_WRITE     0x40
++#define SWIM_S_TIMEOUT       0x80
++
++/* bits in mode register */
++
++#define SWIM_CLFIFO          0x01
++#define SWIM_ENBL1           0x02
++#define SWIM_ENBL2           0x04
++#define SWIM_ACTION          0x08
++#define SWIM_WRITE_MODE      0x10
++#define SWIM_HEDSEL          0x20
++#define SWIM_MOTON           0x80
++
++struct SWIMCtrl {
++    MemoryRegion iomem;
++    FDrive drives[MAX_FD];
++    int mode;
++    /* IWM mode */
++    int iwm_switch;
++    int regs[8];
++#define IWM_PH0   0
++#define IWM_PH1   1
++#define IWM_PH2   2
++#define IWM_PH3   3
++#define IWM_MTR   4
++#define IWM_DRIVE 5
++#define IWM_Q6    6
++#define IWM_Q7    7
++    uint8_t iwm_data;
++    uint8_t iwm_mode;
++    /* SWIM mode */
++    uint8_t swim_phase;
++    uint8_t swim_mode;
 +};
 +
-+struct ASCState {
-+    SysBusDevice busdev;
-+    MemoryRegion mem_regs;
++#define TYPE_SYSBUS_SWIM "sysbus-swim"
++#define SYSBUS_SWIM(obj) OBJECT_CHECK(SWIMCtrlSysBus, (obj), TYPE_SYSBUS_SWIM)
 +
-+    QEMUSoundCard card;
-+    SWVoiceOut *channel;
++typedef struct SWIMCtrlSysBus {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
 +
-+    qemu_irq irq;
++    struct SWIMCtrl state;
++} SWIMCtrlSysBus;
 +
-+    uint8_t type;
-+    int a_wptr, a_rptr, a_cnt;
-+    int b_wptr, b_rptr, b_cnt;
-+
-+    uint8_t *fifo;
-+
-+    uint8_t regs[48];
-+};
-+typedef struct ASCState ASCState;
-+
-+#define TYPE_ASC  "apple-sound-chip"
-+#define ASC(obj) OBJECT_CHECK(ASCSysBusState, (obj), TYPE_ASC)
-+
-+static inline uint32_t get_phase(ASCState *s, int channel)
++static void iwmctrl_write(void *opaque, hwaddr reg, uint64_t value,
++                          unsigned size)
 +{
-+    return be32_to_cpu(*(uint32_t *)(s->regs + ASC_WAVETABLE + channel * 8));
-+}
++    SWIMCtrl *swimctrl = opaque;
 +
-+static inline void set_phase(ASCState *s, int channel, uint32_t phase)
-+{
-+    *(uint32_t *)(s->regs + ASC_WAVETABLE + channel * 8) = cpu_to_be32(phase);
-+}
++    reg >>= REG_SHIFT;
 +
-+static inline uint32_t get_incr(ASCState *s, int channel)
-+{
-+    return be32_to_cpu(*(uint32_t *)(s->regs + ASC_WAVETABLE + 4 +
-+                                     channel * 8));
-+}
++    swimctrl->regs[reg >> 1] = reg & 1;
 +
-+static inline uint32_t incr_phase(ASCState *s, int channel)
-+{
-+    uint32_t incr = get_incr(s, channel);
-+    uint32_t phase = get_phase(s, channel);
-+
-+    set_phase(s, channel, phase + incr);
-+
-+    return get_phase(s, channel);
-+}
-+
-+static void generate_fifo(ASCState *s, int free_b)
-+{
-+    int8_t buf[2048];
-+    int i;
-+    int to_copy;
-+
-+    do {
-+        to_copy = audio_MIN(sizeof(buf), free_b);
-+        for (i = 0; i < (to_copy >> 1); to_copy++) {
-+            int8_t left, right;
-+
-+            left = s->fifo[s->a_rptr] ^ 0x80;
-+            right = s->fifo[s->b_rptr + 0x400] ^ 0x80;
-+
-+            if (s->a_cnt) {
-+                s->a_rptr++;
-+                s->a_rptr &= 0x3ff;
-+                s->a_cnt--;
-+            }
-+
-+            if (s->b_cnt) {
-+                s->b_rptr++;
-+                s->b_rptr &= 0x3ff;
-+                s->b_cnt--;
-+            }
-+
-+            if (s->type == ASC_TYPE_SONORA) {
-+                if (s->a_cnt < 0x200) {
-+                    s->regs[ASC_FIFOIRQ] |= 4; /* FIFO A less than half full */
-+                    qemu_irq_raise(s->irq);
-+                }
-+                if (s->b_cnt < 0x200) {
-+                    s->regs[ASC_FIFOIRQ] |= 8; /* FIFO B less than half full */
-+                    qemu_irq_raise(s->irq);
-+                }
-+            } else {
-+                if (s->a_cnt == 0x1ff) {
-+                    s->regs[ASC_FIFOIRQ] |= 1; /* FIFO A half empty */
-+                    qemu_irq_raise(s->irq);
-+                } else if (s->a_cnt == 0x001) {
-+                    s->regs[ASC_FIFOIRQ] |= 2; /* FIFO A half empty */
-+                    qemu_irq_raise(s->irq);
-+                }
-+                if (s->b_cnt == 0x1ff) {
-+                    s->regs[ASC_FIFOIRQ] |= 4; /* FIFO A half empty */
-+                    qemu_irq_raise(s->irq);
-+                } else if (s->b_cnt == 0x001) {
-+                    s->regs[ASC_FIFOIRQ] |= 8; /* FIFO A half empty */
-+                    qemu_irq_raise(s->irq);
-+                }
-+            }
-+            buf[i * 2] = left;
-+            buf[i * 2 + 1] = right;
-+        }
-+        AUD_write(s->channel, buf, to_copy);
-+        free_b -= to_copy;
-+    } while (free_b);
-+}
-+
-+static void generate_wavetable(ASCState *s, int free_b)
-+{
-+    int8_t buf[2048];
-+    int i;
-+    int channel;
-+    int to_copy;
-+    int control = s->regs[ASC_WAVECTRL];
-+
-+    do {
-+        to_copy = audio_MIN(sizeof(buf), free_b);
-+        for (i = 0; i < (to_copy >> 1); i++) {
-+                int32_t left, right;
-+                int8_t sample;
-+
-+                left = 0;
-+                right = 0;
-+
-+                if (control) { /* FIXME: how to use it ? */
-+                    for (channel = 0; channel < 4; channel++) {
-+                        uint32_t phase = incr_phase(s, channel);
-+
-+                        phase = (phase >> 15) & 0x1ff;
-+                        sample = s->fifo[0x200 * channel + phase] ^ 0x80;
-+
-+                        left += sample;
-+                        right += sample;
-+                    }
-+                    buf[i * 2] = left >> 2;
-+                    buf[i * 2 + 1] = right >> 2;
-+                } else {
-+                    /* FIXME: only works with linux macboing.c */
-+                    uint32_t phase = incr_phase(s, 0);
-+                    phase = (phase >> 15) & 0x7ff;
-+                    sample = s->fifo[phase];
-+                    buf[i * 2] = sample;
-+                    buf[i * 2 + 1] = sample;
-+                }
-+        }
-+        AUD_write(s->channel, buf, to_copy);
-+        free_b -= to_copy;
-+    } while (free_b);
-+}
-+
-+static void asc_out_cb(void *opaque, int free_b)
-+{
-+    ASCState *s = opaque;
-+
-+    switch (s->regs[ASC_MODE] & 3) {
-+    case 0: /* Off */
-+        break;
-+    case 1: /* FIFO mode */
-+        generate_fifo(s, free_b);
-+        break;
-+    case 2: /* Wave table mode */
-+        generate_wavetable(s, free_b);
-+        break;
-+    }
-+}
-+
-+static uint64_t asc_read(void *opaque, hwaddr addr,
-+                              unsigned size)
-+{
-+    ASCState *s = opaque;
-+    uint64_t prev;
-+
-+    if (addr < 0x800) {
-+        return s->fifo[addr];
-+    }
-+
-+    addr -= 0x800;
-+
-+    if (addr >= 0x030) {
-+        return 0;
-+    }
-+
-+    switch (addr) {
-+    case ASC_VERSION:
-+        switch (s->type) {
-+        case ASC_TYPE_ASC:
-+            return 0;
-+        case ASC_TYPE_V8:
-+        case ASC_TYPE_EAGLE:
-+        case ASC_TYPE_SPICE:
-+        case ASC_TYPE_VASP:
-+            return 0xe8;
-+        case ASC_TYPE_SONORA:
-+            return 0xbc;
-+        default:
-+            break;
-+        }
-+        break;
-+    case ASC_MODE:
-+        switch (s->type) {
-+        case ASC_TYPE_V8:
-+        case ASC_TYPE_EAGLE:
-+        case ASC_TYPE_SPICE:
-+        case ASC_TYPE_VASP:
-+            return 1;
-+        default:
-+            break;
-+        }
-+        break;
-+    case ASC_CONTROL:
-+        switch (s->type) {
-+        case ASC_TYPE_V8:
-+        case ASC_TYPE_EAGLE:
-+        case ASC_TYPE_SPICE:
-+        case ASC_TYPE_VASP:
-+            return 1;
-+        default:
-+            break;
-+        }
-+        break;
-+    case ASC_FIFOIRQ:
-+        if (s->type == ASC_TYPE_V8) {
-+            prev = 3;
++    if (swimctrl->regs[IWM_Q6] &&
++        swimctrl->regs[IWM_Q7]) {
++        if (swimctrl->regs[IWM_MTR]) {
++            /* data register */
++            swimctrl->iwm_data = value;
 +        } else {
-+            prev = s->regs[ASC_FIFOIRQ];
++            /* mode register */
++            swimctrl->iwm_mode = value;
++            /* detect sequence to switch from IWM mode to SWIM mode */
++            switch (swimctrl->iwm_switch) {
++            case 0:
++                if (value == 0x57) {
++                    swimctrl->iwm_switch++;
++                }
++                break;
++            case 1:
++                if (value == 0x17) {
++                    swimctrl->iwm_switch++;
++                }
++                break;
++            case 2:
++                if (value == 0x57) {
++                    swimctrl->iwm_switch++;
++                }
++                break;
++            case 3:
++                if (value == 0x57) {
++                    swimctrl->mode = SWIM_MODE_SWIM;
++                    swimctrl->iwm_switch = 0;
++                }
++                break;
++            }
 +        }
-+        s->regs[ASC_FIFOIRQ] = 0;
-+        qemu_irq_lower(s->irq);
-+        return prev;
-+    default:
-+        break;
 +    }
-+
-+    return s->regs[addr];
 +}
 +
-+static void asc_write(void *opaque, hwaddr addr, uint64_t value,
++static uint64_t iwmctrl_read(void *opaque, hwaddr reg, unsigned size)
++{
++    SWIMCtrl *swimctrl = opaque;
++
++    reg >>= REG_SHIFT;
++
++    swimctrl->regs[reg >> 1] = reg & 1;
++
++    return 0;
++}
++
++static void swimctrl_write(void *opaque, hwaddr reg, uint64_t value,
 +                           unsigned size)
 +{
-+    ASCState *s = opaque;
++    SWIMCtrl *swimctrl = opaque;
 +
-+    if (addr < 0x800) {
-+        if (s->regs[ASC_MODE] == 1) {
-+            if (addr < 0x400) {
-+                /* FIFO A */
-+                s->fifo[s->a_wptr++] = value;
-+                s->a_cnt++;
-+                if (s->a_cnt == 0x3ff) {
-+                    s->regs[ASC_FIFOIRQ] |= 2; /* FIFO A Full */
-+                }
-+                s->a_wptr &= 0x3ff;
-+            } else {
-+                /* FIFO B */
-+                s->fifo[s->b_wptr++ + 0x400] = value;
-+                s->b_cnt++;
-+                if (s->b_cnt == 0x3ff) {
-+                    s->regs[ASC_FIFOIRQ] |= 8; /* FIFO B Full */
-+                }
-+                s->b_wptr &= 0x3ff;
-+            }
-+        } else {
-+            s->fifo[addr] = value;
-+        }
++    if (swimctrl->mode == SWIM_MODE_IWM) {
++        iwmctrl_write(opaque, reg, value, size);
 +        return;
 +    }
 +
-+    addr -= 0x800;
-+    if (addr >= 0x30) {
-+        return;
++    reg >>= REG_SHIFT;
++
++    switch (reg) {
++    case SWIM_WRITE_PHASE:
++        swimctrl->swim_phase = value;
++        break;
++    case SWIM_WRITE_MODE0:
++        swimctrl->swim_mode &= ~value;
++        break;
++    case SWIM_WRITE_MODE1:
++        swimctrl->swim_mode |= value;
++        break;
++    case SWIM_WRITE_DATA:
++    case SWIM_WRITE_MARK:
++    case SWIM_WRITE_CRC:
++    case SWIM_WRITE_PARAMETER:
++    case SWIM_WRITE_SETUP:
++        break;
 +    }
-+    switch (addr) {
-+    case ASC_MODE:
-+        value &= 3;
-+        if (value != s->regs[ASC_MODE]) {
-+            s->a_rptr = 0;
-+            s->a_wptr = 0;
-+            s->a_cnt = 0;
-+            s->b_rptr = 0;
-+            s->b_wptr = 0;
-+            s->b_cnt = 0;
-+            if (value != 0) {
-+                AUD_set_active_out(s->channel, 1);
-+            } else {
-+                AUD_set_active_out(s->channel, 0);
-+            }
++}
++
++static uint64_t swimctrl_read(void *opaque, hwaddr reg, unsigned size)
++{
++    SWIMCtrl *swimctrl = opaque;
++    uint32_t value = 0;
++
++    if (swimctrl->mode == SWIM_MODE_IWM) {
++        return iwmctrl_read(opaque, reg, size);
++    }
++
++    reg >>= REG_SHIFT;
++
++    switch (reg) {
++    case SWIM_READ_PHASE:
++        value = swimctrl->swim_phase;
++        break;
++    case SWIM_READ_HANDSHAKE:
++        if (swimctrl->swim_phase == SWIM_DRIVE_PRESENT) {
++            /* always answer "no drive present" */
++            value = SWIM_SENSE;
 +        }
 +        break;
-+    case ASC_FIFOMODE:
-+        if (value & 0x80) {
-+            s->a_rptr = 0;
-+            s->a_wptr = 0;
-+            s->a_cnt = 0;
-+            s->b_rptr = 0;
-+            s->b_wptr = 0;
-+            s->b_cnt = 0;
-+        }
-+        break;
-+    case ASC_WAVECTRL:
++    case SWIM_READ_DATA:
++    case SWIM_READ_MARK:
++    case SWIM_READ_ERROR:
++    case SWIM_READ_PARAMETER:
++    case SWIM_READ_SETUP:
++    case SWIM_READ_STATUS:
 +        break;
 +    }
-+    s->regs[addr] = value;
++
++    return value;
 +}
 +
-+static const MemoryRegionOps asc_mmio_ops = {
-+    .read = asc_read,
-+    .write = asc_write,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 1,
-+    },
-+    .endianness = DEVICE_BIG_ENDIAN,
++static const MemoryRegionOps swimctrl_mem_ops = {
++    .write = swimctrl_write,
++    .read = swimctrl_read,
++    .endianness = DEVICE_NATIVE_ENDIAN,
 +};
 +
-+static int asc_post_load(void *opaque, int version_id)
++static void sysbus_swim_initfn(Object *obj)
 +{
-+    return 0;
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    SWIMCtrlSysBus *sys = SYSBUS_SWIM(obj);
++    SWIMCtrl *swimctrl = &sys->state;
++
++    memory_region_init_io(&swimctrl->iomem, obj, &swimctrl_mem_ops, swimctrl,
++                          "swim", 0x2000);
++    sysbus_init_mmio(sbd, &swimctrl->iomem);
 +}
 +
-+static const VMStateDescription vmstate_asc = {
-+    .name = "apple-sound-chip",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .minimum_version_id_old = 1,
-+    .post_load = asc_post_load,
-+    .fields      = (VMStateField[]) {
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+typedef struct {
-+    SysBusDevice busdev;
-+    ASCState asc;
-+} ASCSysBusState;
-+
-+static int asc_sysbus_init(SysBusDevice *dev)
-+{
-+    ASCState *s = &ASC(dev)->asc;
-+    struct audsettings as;
-+
-+    s->fifo = g_malloc0(ASC_BUF_SIZE);
-+
-+    sysbus_init_irq(dev, &s->irq);
-+
-+    AUD_register_card("Apple Sound Chip", &s->card);
-+
-+    as.freq = 22257;
-+    as.nchannels = 2;
-+    as.fmt = AUD_FMT_S8;
-+    as.endianness = 0;
-+
-+    s->channel = AUD_open_out(&s->card, s->channel, "asc.out",
-+                              s, asc_out_cb, &as);
-+
-+    memory_region_init_io(&s->mem_regs, NULL, &asc_mmio_ops, s, "asc",
-+                          ASC_LENGTH);
-+    sysbus_init_mmio(dev, &s->mem_regs);
-+
-+    return 0;
-+}
-+
-+static void asc_sysbus_reset(DeviceState *d)
-+{
-+    ASCSysBusState *s = ASC(d);
-+
-+    AUD_set_active_out(s->asc.channel, 0);
-+
-+    memset(s->asc.regs, 0, sizeof(s->asc.regs));
-+    s->asc.a_wptr = 0;
-+    s->asc.a_rptr = 0;
-+    s->asc.a_cnt = 0;
-+    s->asc.b_wptr = 0;
-+    s->asc.b_rptr = 0;
-+    s->asc.b_cnt = 0;
-+}
-+
-+static Property asc_sysbus_properties[] = {
-+    DEFINE_PROP_UINT8("asctype", ASCSysBusState, asc.type, ASC_TYPE_ASC),
++static Property sysbus_swim_properties[] = {
++    DEFINE_PROP_DRIVE("driveA", SWIMCtrlSysBus, state.drives[0].blk),
++    DEFINE_PROP_DRIVE("driveB", SWIMCtrlSysBus, state.drives[1].blk),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void asc_class_init(ObjectClass *klass, void *data)
++static void sysbus_swim_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
-+    SysBusDeviceClass *k = SYS_BUS_DEVICE_CLASS(klass);
 +
-+    k->init = asc_sysbus_init;
-+    dc->reset = asc_sysbus_reset;
-+    dc->vmsd = &vmstate_asc;
-+    dc->props = asc_sysbus_properties;
++    dc->props = sysbus_swim_properties;
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
 +}
 +
-+static TypeInfo asc_sysbus_info = {
-+    .name = TYPE_ASC,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(ASCSysBusState),
-+    .class_init = asc_class_init,
++static const TypeInfo sysbus_swim_info = {
++    .name          = TYPE_SYSBUS_SWIM,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++     .instance_size = sizeof(SWIMCtrlSysBus),
++    .instance_init = sysbus_swim_initfn,
++    .class_init    = sysbus_swim_class_init,
 +};
 +
-+static void asc_register_types(void)
++static void swim_register_types(void)
 +{
-+    type_register_static(&asc_sysbus_info);
++    type_register_static(&sysbus_swim_info);
 +}
 +
-+type_init(asc_register_types)
-diff --git a/include/hw/audio/asc.h b/include/hw/audio/asc.h
-new file mode 100644
-index 0000000000..f2a292bbb0
---- /dev/null
-+++ b/include/hw/audio/asc.h
-@@ -0,0 +1,21 @@
-+/*
-+ *  Copyright (c) 2012-2018 Laurent Vivier <laurent@vivier.eu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef HW_AUDIO_ASC_H
-+#define HW_AUDIO_ASC_H
-+enum {
-+    ASC_TYPE_ASC    = 0,  /* original discrete Apple Sound Chip */
-+    ASC_TYPE_EASC   = 1,  /* discrete Enhanced Apple Sound Chip */
-+    ASC_TYPE_V8     = 2,  /* ASC included in the V8 ASIC (LC/LCII) */
-+    ASC_TYPE_EAGLE  = 3,  /* ASC included in the Eagle ASIC (Classic II) */
-+    ASC_TYPE_SPICE  = 4,  /* ASC included in the Spice ASIC (Color Classic) */
-+    ASC_TYPE_SONORA = 5,  /* ASC included in the Sonora ASIC (LCIII) */
-+    ASC_TYPE_VASP   = 6,  /* ASC included in the VASP ASIC  (IIvx/IIvi) */
-+    ASC_TYPE_ARDBEG = 7   /* ASC included in the Ardbeg ASIC (LC520) */
-+};
-+#endif
++type_init(swim_register_types)
 -- 
 2.14.4
