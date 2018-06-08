@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRGpU-0005xb-Of
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:49:23 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fRGpY-00061Z-0D
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:49:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRGpT-0006lj-SP
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:49:20 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:46051)
+	(envelope-from <alex.bennee@linaro.org>) id 1fRGpU-0006mY-NY
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:49:24 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:54307)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fRGpT-0006kx-Lw
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:49:19 -0400
-Received: by mail-wr0-x242.google.com with SMTP id o12-v6so13263030wrm.12
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 05:49:19 -0700 (PDT)
+	id 1fRGpU-0006lq-Gt
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:49:20 -0400
+Received: by mail-wm0-x231.google.com with SMTP id o13-v6so3130821wmf.4
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 05:49:20 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  8 Jun 2018 13:32:39 +0100
-Message-Id: <20180608123307.24773-22-alex.bennee@linaro.org>
+Date: Fri,  8 Jun 2018 13:33:07 +0100
+Message-Id: <20180608123307.24773-50-alex.bennee@linaro.org>
 In-Reply-To: <20180608123307.24773-1-alex.bennee@linaro.org>
 References: <20180608123307.24773-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 21/49] tests/tcg: move ARM specific tests
- into subdir
+Subject: [Qemu-devel] [PATCH v6 49/49] .travis.yml: add check-tcg test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,110 +30,26 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
-
-These only need to be built for ARM guests.
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
 ---
-v2
-  - do VPATH manipulation in tests/tcg/arm/Makefile.target
-  - merge with fix hello-arm test
-v4
-  - update MAINTAINERS
----
- MAINTAINERS                           |  1 +
- tests/tcg/README                      |  9 ---------
- tests/tcg/arm/Makefile.target         | 13 +++++++++++++
- tests/tcg/arm/README                  | 11 +++++++++++
- tests/tcg/{ => arm}/hello-arm.c       |  0
- tests/tcg/{ => arm}/test-arm-iwmmxt.s |  0
- 6 files changed, 25 insertions(+), 9 deletions(-)
- create mode 100644 tests/tcg/arm/Makefile.target
- create mode 100644 tests/tcg/arm/README
- rename tests/tcg/{ => arm}/hello-arm.c (100%)
- rename tests/tcg/{ => arm}/test-arm-iwmmxt.s (100%)
+ .travis.yml | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1063c4d60f..c9b440344e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -135,6 +135,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
- L: qemu-arm@nongnu.org
- S: Maintained
- F: target/arm/
-+F: tests/tcg/arm/
- F: hw/arm/
- F: hw/cpu/a*mpcore.c
- F: include/hw/cpu/a*mpcore.h
-diff --git a/tests/tcg/README b/tests/tcg/README
-index 469504c4cb..625f2326e6 100644
---- a/tests/tcg/README
-+++ b/tests/tcg/README
-@@ -5,15 +5,6 @@ or they are architecture specific.
- 
- 
- 
--ARM
--===
--
--hello-arm
-----------
--
--test-arm-iwmmxt
-----------------
--
- MIPS
- ====
- 
-diff --git a/tests/tcg/arm/Makefile.target b/tests/tcg/arm/Makefile.target
-new file mode 100644
-index 0000000000..bc6962ecc6
---- /dev/null
-+++ b/tests/tcg/arm/Makefile.target
-@@ -0,0 +1,13 @@
-+# -*- Mode: makefile -*-
-+#
-+# ARM - included from tests/tcg/Makefile.target
-+#
-+
-+ARM_SRC=$(SRC_PATH)/tests/tcg/arm
-+
-+# Set search path for all sources
-+VPATH 		+= $(ARM_SRC)
-+
-+
-+hello-arm: CFLAGS+=-marm -ffreestanding
-+hello-arm: LDFLAGS+=-nostdlib
-diff --git a/tests/tcg/arm/README b/tests/tcg/arm/README
-new file mode 100644
-index 0000000000..e6307116e2
---- /dev/null
-+++ b/tests/tcg/arm/README
-@@ -0,0 +1,11 @@
-+These are ARM specific guest programs
-+
-+hello-arm
-+---------
-+
-+A very simple inline assembly, write syscall based hello world
-+
-+test-arm-iwmmxt
-+---------------
-+
-+A simple test case for older iwmmxt extended ARMs
-diff --git a/tests/tcg/hello-arm.c b/tests/tcg/arm/hello-arm.c
-similarity index 100%
-rename from tests/tcg/hello-arm.c
-rename to tests/tcg/arm/hello-arm.c
-diff --git a/tests/tcg/test-arm-iwmmxt.s b/tests/tcg/arm/test-arm-iwmmxt.s
-similarity index 100%
-rename from tests/tcg/test-arm-iwmmxt.s
-rename to tests/tcg/arm/test-arm-iwmmxt.s
+diff --git a/.travis.yml b/.travis.yml
+index 814be151f4..f1d2d9edec 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -152,3 +152,9 @@ matrix:
+         - TEST_CMD=""
+       before_script:
+         - ./configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread -fuse-ld=gold" || cat config.log
++    - env:
++        - CONFIG="--disable-system --disable-docs"
++        - TEST_CMD="make check-tcg"
++      sudo: required
++      dist: trusty
++      compiler: gcc
 -- 
 2.17.1
