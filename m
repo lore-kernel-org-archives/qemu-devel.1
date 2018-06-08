@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fRFRO-000874-Ks
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:20:23 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fRFRP-00087i-G7
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:20:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fRFRL-0001nw-NH
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:20:20 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fRFRK-0001ng-1m
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:20:23 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  8 Jun 2018 13:19:56 +0200
-Message-Id: <20180608112001.14729-2-kraxel@redhat.com>
-In-Reply-To: <20180608112001.14729-1-kraxel@redhat.com>
-References: <20180608112001.14729-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/6] hw/display: add ramfb,
- a simple boot framebuffer living in guest ram
+Date: Fri,  8 Jun 2018 13:19:55 +0200
+Message-Id: <20180608112001.14729-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/6] ramfb: simple boot framebuffer,
+ no legacy vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,6 +20,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?L=C3=A1szl=C3=B3=20=C3=89rsek?= <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+
+  Hi,
+
+Ok folks, here is a experimental patch series for a legacy free boot
+framebuffer.  If you want play with it I recommend getting the bits from
+
+	https://www.kraxel.org/cgit/qemu/log/?h=sirius/ramfb
+
+because they come with an updated seabios and a new vgabios rom and an
+experimental OVMF build.
+
+Functional overview
+-------------------
 
 The boot framebuffer is expected to be configured by the firmware, so it
 uses fw_cfg as interface.  Initialization goes as follows:
@@ -36,147 +47,114 @@ automagically on the screen.
 Note that this isn't very efficient because it does a full display
 update on each refresh.  No dirty tracking.  Dirty tracking would have
 to be active for the whole ram slot, so that wouldn't be very efficient
-either.  For a boot display which is active for a short time only this
-isn't a big deal.  As permanent guest display something better should be
-used (if possible).
+either.
 
-This is the ramfb core code.  Some windup is needed for display devices
-which want have a ramfb boot display.
+Firmware support -- seabios
+---------------------------
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/hw/display/ramfb.h |  9 +++++
- hw/display/ramfb.c         | 95 ++++++++++++++++++++++++++++++++++++++++++++++
- hw/display/Makefile.objs   |  2 +
- 3 files changed, 106 insertions(+)
+seavgabios is able to emulate vga text mode on top of a framebuffer, for
+coreboot native graphics initialialization.  Which works fine for
+everything which writes text using the vgabios interface (basically
+everyhing which works with sgabios).
+
+So I hacked that up to work with ramfb (and, while being at it,
+bochs-display too).  Right now it's proof-of-concept code with fwcfg
+support being cut+paste, so it'll need cleanups before merging.
+Look here:
+
+	https://www.kraxe.org/cgit/seabios/log/?h=bochs
+
+Firmware support -- edk2
+------------------------
+
+There is a EFI driver too.  Code is here:
+
+	https://github.com/kraxel/edk2/commits/ramfb
+
+Firmware blob is in pc-bios/OVMF-ramfb.fd, to be used with -bios.
+
+So, how to play?
+----------------
+
+There is ramfb.  Standalone device.
+
+There is virtio-ramfb.  Simliar to virtio-vga, but using ramfb instead of
+adding vga compatibility.  Shows how you can wire up ramfb support to
+some display device.  Unlike virtio-vga it should work fine on arm.  Use
+"qemu -vga none -device virtio-ramfb" for this one.  Not clear whenever
+this will be actually be merged, given that edk2 has a native virtio-gpu
+driver.
+
+There is virtio-pci-ramfb, which provides boot display support to vgpu
+devices.
+
+What works?
+-----------
+
+Both windows (x86 tested) and linux (x86 + arm tested) UEFI guests
+handle the ramfb GOP just fine.
+
+BIOS boot loaders for linux all use vgabios calls for text mode, so they
+show up just fine.  Also ipxe, seabios itself of course.  So you can
+boot up your linux guest.  vesafb works too.
+
+Windows in BIOS mode doesn't use text mode and works fine too.
+
+What doesn't work?
+------------------
+
+vgacon (direct vga hardware access).  Linux boots just fine
+nevertheless, the only effect is that you don't see any boot messages
+until the drm driver loads.
+
+Known issues
+------------
+
+Handover from ramfb-backed efifb to the native linux driver is tricky.
+Usually efifb gets kicked out when the native driver loads because of
+overlapping ressources.  With efifb being in RAM instead of using a GPU
+PCI bar this doesn't happen though, so you'll end up with two
+framebuffer devices.
+
+In case vgaarb classifies the GPU as primary display device fbcon will
+switch all VTs over to the framebuffer device of the real GPU, so there
+isn't a noticable difference.  Otherwise you'll end up with a
+non-visible fbcon, because it continues to run on ramfb whereas qemu
+switched over to the GPU because the native linux driver initialized the
+display.
+
+xorg/wayland will show up on the GPU in any case because they prefer drm
+over fbdev, so they wouldn't run on efifb.
+
+enjoy,
+  Gerd
+
+Gerd Hoffmann (6):
+  hw/display: add ramfb, a simple boot framebuffer living in guest ram
+  hw/display: add standalone ramfb device
+  hw/display: add virtio-ramfb device
+  hw/vfio/display: add ramfb support
+  ramfb: enable vgabios
+  bochs-display: enable vgabios
+
+ include/hw/display/ramfb.h    |  12 ++++
+ include/hw/vfio/vfio-common.h |   2 +
+ hw/arm/sysbus-fdt.c           |   7 ++
+ hw/arm/virt.c                 |   2 +
+ hw/display/bochs-display.c    |   1 +
+ hw/display/ramfb-standalone.c |  62 ++++++++++++++++++
+ hw/display/ramfb.c            |  96 +++++++++++++++++++++++++++
+ hw/display/virtio-ramfb.c     | 149 ++++++++++++++++++++++++++++++++++++++++++
+ hw/i386/pc_piix.c             |   2 +
+ hw/i386/pc_q35.c              |   2 +
+ hw/vfio/display.c             |  10 +++
+ hw/vfio/pci.c                 |  15 +++++
+ hw/display/Makefile.objs      |   5 +-
+ 13 files changed, 364 insertions(+), 1 deletion(-)
  create mode 100644 include/hw/display/ramfb.h
+ create mode 100644 hw/display/ramfb-standalone.c
  create mode 100644 hw/display/ramfb.c
+ create mode 100644 hw/display/virtio-ramfb.c
 
-diff --git a/include/hw/display/ramfb.h b/include/hw/display/ramfb.h
-new file mode 100644
-index 0000000000..a3d4c79942
---- /dev/null
-+++ b/include/hw/display/ramfb.h
-@@ -0,0 +1,9 @@
-+#ifndef RAMFB_H
-+#define RAMFB_H
-+
-+/* ramfb.c */
-+typedef struct RAMFBState RAMFBState;
-+void ramfb_display_update(QemuConsole *con, RAMFBState *s);
-+RAMFBState *ramfb_setup(Error **errp);
-+
-+#endif /* RAMFB_H */
-diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
-new file mode 100644
-index 0000000000..258783fe3b
---- /dev/null
-+++ b/hw/display/ramfb.c
-@@ -0,0 +1,95 @@
-+/*
-+ * early boot framebuffer in guest ram
-+ * configured using fw_cfg
-+ *
-+ * Copyright Red Hat, Inc. 2017
-+ *
-+ * Author:
-+ *     Gerd Hoffmann <kraxel@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/loader.h"
-+#include "hw/display/ramfb.h"
-+#include "ui/console.h"
-+#include "sysemu/sysemu.h"
-+
-+struct RAMFBCfg {
-+    uint64_t addr;
-+    uint32_t fourcc;
-+    uint32_t flags;
-+    uint32_t width;
-+    uint32_t height;
-+    uint32_t stride;
-+};
-+
-+struct RAMFBState {
-+    DisplaySurface *ds;
-+    uint32_t width, height;
-+    struct RAMFBCfg cfg;
-+};
-+
-+static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
-+{
-+    RAMFBState *s = dev;
-+    void *framebuffer;
-+    uint32_t stride, fourcc, format;
-+    hwaddr addr, length;
-+
-+    s->width  = be32_to_cpu(s->cfg.width);
-+    s->height = be32_to_cpu(s->cfg.height);
-+    stride    = be32_to_cpu(s->cfg.stride);
-+    fourcc    = be32_to_cpu(s->cfg.fourcc);
-+    addr      = be64_to_cpu(s->cfg.addr);
-+    length    = stride * s->height;
-+    format    = qemu_drm_format_to_pixman(fourcc);
-+
-+    fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
-+            s->width, s->height, addr);
-+    framebuffer = address_space_map(&address_space_memory,
-+                                    addr, &length, false,
-+                                    MEMTXATTRS_UNSPECIFIED);
-+    if (!framebuffer || length < stride * s->height) {
-+        s->width = 0;
-+        s->height = 0;
-+        return;
-+    }
-+    s->ds = qemu_create_displaysurface_from(s->width, s->height,
-+                                            format, stride, framebuffer);
-+}
-+
-+void ramfb_display_update(QemuConsole *con, RAMFBState *s)
-+{
-+    if (!s->width || !s->height) {
-+        return;
-+    }
-+
-+    if (s->ds) {
-+        dpy_gfx_replace_surface(con, s->ds);
-+        s->ds = NULL;
-+    }
-+
-+    /* simple full screen update */
-+    dpy_gfx_update_full(con);
-+}
-+
-+RAMFBState *ramfb_setup(Error **errp)
-+{
-+    FWCfgState *fw_cfg = fw_cfg_find();
-+    RAMFBState *s;
-+
-+    if (!fw_cfg || !fw_cfg->dma_enabled) {
-+        error_setg(errp, "ramfb device requires fw_cfg with DMA");
-+        return NULL;
-+    }
-+
-+    s = g_new0(RAMFBState, 1);
-+
-+    fw_cfg_add_file_callback(fw_cfg, "etc/ramfb",
-+                             NULL, ramfb_fw_cfg_write, s,
-+                             &s->cfg, sizeof(s->cfg), false);
-+    return s;
-+}
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index b5d97ab26d..0af04985d2 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -1,3 +1,5 @@
-+common-obj-y += ramfb.o
-+
- common-obj-$(CONFIG_ADS7846) += ads7846.o
- common-obj-$(CONFIG_VGA_CIRRUS) += cirrus_vga.o
- common-obj-$(CONFIG_G364FB) += g364fb.o
 -- 
 2.9.3
