@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRHZt-0003n2-At
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:37:18 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fRHae-0004PX-Hk
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:38:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRHZp-0004Xq-9N
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:37:17 -0400
-References: <20180523102419.28665-1-vsementsov@virtuozzo.com>
-	<20180523102419.28665-4-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <758d1370-b973-ff14-c6e8-c56a50cd8534@virtuozzo.com>
-Date: Fri, 8 Jun 2018 16:37:05 +0300
+	(envelope-from <ehabkost@redhat.com>) id 1fRHad-0004qn-H8
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:38:04 -0400
+Date: Fri, 8 Jun 2018 10:37:45 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180608133745.GH7451@localhost.localdomain>
+References: <20180608122952.2009-1-ehabkost@redhat.com>
+	<20180608122952.2009-2-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180523102419.28665-4-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] nbd/server: implement dirty bitmap
- export
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180608122952.2009-2-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH] fixup! python: futurize -f
+ libfuturize.fixes.fix_print_with_import
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,83 +24,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-23.05.2018 13:24, Vladimir Sementsov-Ogievskiy wrote:
-> Handle new NBD meta namespace: "qemu", and corresponding queries:
-> "qemu:dirty-bitmap:<export bitmap name>".
->
-> With new metadata context negotiated, BLOCK_STATUS query will reply
-> with dirty-bitmap data, converted to extents. New public function
-> nbd_export_bitmap selects bitmap to export. For now, only one bitmap
-> may be exported.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Fri, Jun 08, 2018 at 09:29:43AM -0300, Eduardo Habkost wrote:
+> Change all Python code to use print as a function.
+> 
+> This is necessary for Python 3 compatibility.
+> 
+> Done using:
+> 
+>   $ py=$( (g grep -l -E '^#!.*python';find -name '*.py' -printf '%P\n';) | \
+>     sort -u | grep -v README.sh4)
+>   $ futurize -w -f libfuturize.fixes.fix_print_with_import $py
+> 
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Acked-by: Fam Zheng <famz@redhat.com>
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
-
+[...]
+>  tests/docker/docker.py                   | 11 +--
 [...]
 
->   
-> +/* nbd_meta_bitmap_query
-> + *
-> + * Handle query to 'qemu:' namespace.
-> + * @len is the amount of text remaining to be read from the current name, after
-> + * the 'qemu:' portion has been stripped.
-> + *
-> + * Return -errno on I/O error, 0 if option was completely handled by
-> + * sending a reply about inconsistent lengths, or 1 on success. */
-> +static int nbd_meta_qemu_query(NBDClient *client, NBDExportMetaContexts *meta,
-> +                               uint32_t len, Error **errp)
-> +{
-> +    bool dirty_bitmap = false;
-> +    int dirty_bitmap_len = strlen("dirty-bitmap:");
-> +    int ret;
-> +
-> +    if (!client->exp->export_bitmap) {
+This patch needs an update:
 
-client->exp is not yet set here. meta->exp should be used instead (and 
-patch should be added, to move from meta->export_name to meta->exp, I'll 
-add it in v4)
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ tests/docker/docker.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> +        return nbd_opt_skip(client, len, errp);
-> +    }
-> +
-> +    if (len == 0) {
-> +        if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
-> +            meta->dirty_bitmap = true;
-> +        }
-> +        trace_nbd_negotiate_meta_query_parse("empty");
-> +        return 1;
-> +    }
-> +
-> +    if (len < dirty_bitmap_len) {
-> +        trace_nbd_negotiate_meta_query_skip("not dirty-bitmap:");
-> +        return nbd_opt_skip(client, len, errp);
-> +    }
-> +
-> +    len -= dirty_bitmap_len;
-> +    ret = nbd_meta_pattern(client, "dirty-bitmap:", &dirty_bitmap, errp);
-> +    if (ret <= 0) {
-> +        return ret;
-> +    }
-> +    if (!dirty_bitmap) {
-> +        trace_nbd_negotiate_meta_query_skip("not dirty-bitmap:");
-> +        return nbd_opt_skip(client, len, errp);
-> +    }
-> +
-> +    trace_nbd_negotiate_meta_query_parse("dirty-bitmap:");
-> +
-> +    return nbd_meta_empty_or_pattern(
-> +            client, client->exp->export_bitmap_context +
-
-meta->exp
-
-> +            strlen("qemu:dirty_bitmap:"), len, &meta->dirty_bitmap, errp);
-> +}
-> +
->   
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index a18cfcbe94..306e14cf69 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -400,11 +400,11 @@ class ProbeCommand(SubCommand):
+         try:
+             docker = Docker()
+             if docker._command[0] == "docker":
+-                print "yes"
++                print("yes")
+             elif docker._command[0] == "sudo":
+-                print "sudo"
++                print("sudo")
+         except Exception:
+-            print "no"
++            print("no")
+ 
+         return
+ 
+-- 
+2.18.0.rc1.1.g3f1ff2140
 
 -- 
-Best regards,
-Vladimir
+Eduardo
