@@ -1,39 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fRFyB-00044n-8N
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:54:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fRFyu-0004lH-0x
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:55:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fRFy8-00084h-6T
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:54:15 -0400
-Received: from 17.mo6.mail-out.ovh.net ([46.105.36.150]:52486)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fRFy7-00083q-Uu
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:54:12 -0400
-Received: from player794.ha.ovh.net (unknown [10.109.108.88])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 3944C1630FA
-	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 13:54:10 +0200 (CEST)
-Date: Fri, 8 Jun 2018 13:53:49 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180608135349.61bf51fe@bahia.lan>
-In-Reply-To: <c9aba2a1-2232-457b-db6d-c2935711231d@redhat.com>
-References: <20180607165218.9558-1-david@redhat.com>
-	<20180607165218.9558-3-david@redhat.com>
-	<20180608093406.30c878ec@bahia.lan>
-	<4f518685-fcdb-7c3a-35d3-5a26374e0604@redhat.com>
-	<20180608094657.4043502f@bahia.lan>
-	<431d4fe5-5bfe-1ab3-00b5-610038a7a9ea@redhat.com>
-	<2b431d32-9172-0517-4717-7ce50355b8db@redhat.com>
-	<20180608103943.1d7e72ee@redhat.com>
-	<673ffa52-1e24-5d6c-5d6a-927d3df79273@redhat.com>
-	<20180608110612.18ac915c@redhat.com>
-	<9eaefde2-b8aa-9072-610b-4236ce5c3913@redhat.com>
-	<20180608125233.46fc187a@bahia.lan>
-	<c9aba2a1-2232-457b-db6d-c2935711231d@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fRFyt-0000AE-49
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:55:00 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:39297)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fRFys-00009a-N3
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:54:59 -0400
+Received: by mail-ot0-x244.google.com with SMTP id l15-v6so14321277oth.6
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 04:54:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 2/8] spapr: no need to
- verify the node
+In-Reply-To: <20180606152128.449-1-f4bug@amsat.org>
+References: <20180606152128.449-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 Jun 2018 12:54:37 +0100
+Message-ID: <CAFEAcA-9=j8_VmMmAuUbk37uvWKkFEs77NFT3jv4TbWDk4=ZYg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/11] misc: Add trailing '\n' to
+ qemu_log() calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,67 +30,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Michael Walle <michael@walle.cc>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <paul.burton@mips.com>, Yongbok Kim <yongbok.kim@mips.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Antony Pavlov <antonynpavlov@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
 
-On Fri, 8 Jun 2018 13:28:01 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 6 June 2018 at 16:21, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrot=
+e:
+> Nothing very exciting here.
+> I sometimes miss to notice some trace events, running with -d unimp,trace=
+...
+> then using 'grep ^...'. This is only due to a missing '\n' :)
+>
+> Philippe Mathieu-Daud=C3=A9 (11):
+>   hw/sd/milkymist-memcard: Add trailing '\n' to qemu_log() call
+>   hw/digic: Add trailing '\n' to qemu_log() calls
+>   xilinx-dp: Add trailing '\n' to qemu_log() call
+>   ppc/pnv: Add trailing '\n' to qemu_log() calls
+>   hw/core/register: Add trailing '\n' to qemu_log() call
+>   hw/mips/boston: Add trailing '\n' to qemu_log() calls
+>   stellaris: Add trailing '\n' to qemu_log() calls
+>   target/arm: Add trailing '\n' to qemu_log() calls
+>   target/m68k: Add trailing '\n' to qemu_log() call
+>   RISC-V: Add trailing '\n' to qemu_log() calls
+>   RFC target/xtensa: Add trailing '\n' to qemu_log() calls
+>
+>  hw/arm/stellaris.c        | 11 ++++++-----
+>  hw/char/digic-uart.c      |  4 ++--
+>  hw/core/register.c        |  2 +-
+>  hw/display/xlnx_dp.c      |  4 +++-
+>  hw/mips/boston.c          |  8 ++++----
+>  hw/ppc/pnv_core.c         |  4 ++--
+>  hw/sd/milkymist-memcard.c |  2 +-
+>  hw/timer/digic-timer.c    |  4 ++--
+>  target/arm/helper.c       |  4 ++--
+>  target/m68k/translate.c   |  2 +-
+>  target/riscv/op_helper.c  |  6 ++++--
+>  target/xtensa/translate.c |  6 +++---
+>  12 files changed, 31 insertions(+), 26 deletions(-)
 
-> On 08.06.2018 12:52, Greg Kurz wrote:
-> > On Fri, 8 Jun 2018 11:24:51 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >>>>>> +1 for error_abort, even if it takes another line.      
-> >>>>> +1 for error_abort
-> >>>>> call shouldn't fail, but if does it won't be silently ignored
-> >>>>> and introduce undefined behavior.      
-> >>>>
-> >>>> Maybe we should fix the others that pass in NULL.
-> >>>>
-> >>>> (no, not me :D - I'm already busy with your requested pre_plug handling)    
-> >>> Add it to wiki page for bite sized tasks?    
-> >>
-> >> Done.
-> >>
-> >>  
-> > 
-> > FWIW, I've also added a line to check and possibly fix places where we do
-> > 'if (*errp)', which would cause QEMU to crash if the caller passes NULL.
-> > 
-> > $ git grep 'if (\*errp)'
-> > hmp.c:    if (*errp) {
-> > hw/ipmi/isa_ipmi_bt.c:    if (*errp)
-> > hw/ipmi/isa_ipmi_kcs.c:    if (*errp)
-> > hw/mem/memory-device.c:    if (*errp) {
-> > hw/mem/memory-device.c:        if (*errp) {
-> > hw/ppc/spapr.c:        if (*errp) {
-> > hw/s390x/event-facility.c:        if (*errp) {
-> > include/qapi/error.h: *     if (*errp) { // WRONG!
-> > qga/commands-posix.c:            if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:        if (*errp) {
-> > target/s390x/cpu_models.c:            if (*errp) {
-> > target/s390x/cpu_models.c:        if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > tests/test-crypto-tlscredsx509.c:    if (*errp) {
-> > tests/test-io-channel-tls.c:    if (*errp) {
-> >   
-> 
-> I think the more important part is actually looking out for people that
-> use NULL instead of error_abort. This way we won't silently ignore errors.
-> 
 
-I agree that we should probably pass &error_abort in many places,
-but passing NULL isn't bad per se. It means any failure in the
-callee is unimportant enough that we can simply ignore it.
+Applied to target-arm.next, since about half of these are arm
+and the rest are trivial and have got ack/review by the relevant
+maintainers.
 
-The error framework provides this possibility and so we should
-never dereference errp.
+thanks
+-- PMM
