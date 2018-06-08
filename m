@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRIWZ-0004V7-5y
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:37:57 -0400
+	(envelope-from <yuval.shaia@oracle.com>) id 1fRIWs-0004ls-Ae
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:38:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRIWW-00012u-3P
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:37:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51484 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fRIWV-00012Y-U8
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:37:52 -0400
-Date: Fri, 8 Jun 2018 15:37:47 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180608143747.GR18233@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180608143026.20167-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180608143026.20167-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] configure: Require Python 2.7 or newer
+	(envelope-from <yuval.shaia@oracle.com>) id 1fRIWp-0001Lk-76
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:38:14 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:45246)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
+	id 1fRIWo-0001Kx-Tw
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:38:11 -0400
+From: Yuval Shaia <yuval.shaia@oracle.com>
+Date: Fri,  8 Jun 2018 17:37:52 +0300
+Message-Id: <20180608143752.22718-1-yuval.shaia@oracle.com>
+Subject: [Qemu-devel] [PATCH] hw/pvrdma: Bugfix - provide the correct
+ attr_mask to query_qp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +23,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>
+To: yuval.shaia@oracle.com, marcel.apfelbaum@gmail.com, qemu-devel@nongnu.org
 
-On Fri, Jun 08, 2018 at 11:30:26AM -0300, Eduardo Habkost wrote:
-> All of the supported build platforms documented in qemu-doc.texi
-> should already support Python 2.7.
-> 
-> Removing support for Python 2.6 will allow us to remove some
-> compatibility modules we carry in the QEMU tree:
-> 
-> * scripts/argparse.py
-> * scripts/ordereddict.py
+Calling rdma_rm_query_qp with attr_mask equals to -1 leads to error
+where backend query_qp fails to retrieve the needed QP attributes.
+Fix it by providing the attr_mask we got from driver.
 
-Lets delete those in this patch then....
+Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+---
+ hw/rdma/vmw/pvrdma_cmd.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-> 
-> Python 2.6 is also not receiving bug fixes upstream and is not
-> supported by pylint, which makes it harder to keep the code
-> compatible with both Python 2 and Python 3.
-
-Agreed, there's no compelling reason for 2.6 to stay around
-
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  configure | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 14b11130a7..a8c4094c87 100755
-> --- a/configure
-> +++ b/configure
-> @@ -1651,8 +1651,8 @@ fi
->  
->  # Note that if the Python conditional here evaluates True we will exit
->  # with status 1 which is a shell 'false' value.
-> -if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6))'; then
-> -  error_exit "Cannot use '$python', Python 2 >= 2.6 or Python 3 is required." \
-> +if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
-> +  error_exit "Cannot use '$python', Python 2 >= 2.7 or Python 3 is required." \
->        "Use --python=/path/to/python to specify a supported Python."
->  fi
->  
-> -- 
-> 2.18.0.rc1.1.g3f1ff2140
-> 
-
-Regards,
-Daniel
+diff --git a/hw/rdma/vmw/pvrdma_cmd.c b/hw/rdma/vmw/pvrdma_cmd.c
+index 9d9dfc6b81..76df60a540 100644
+--- a/hw/rdma/vmw/pvrdma_cmd.c
++++ b/hw/rdma/vmw/pvrdma_cmd.c
+@@ -524,6 +524,7 @@ static int query_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
+     struct ibv_qp_init_attr init_attr;
+ 
+     pr_dbg("qp_handle=%d\n", cmd->qp_handle);
++    pr_dbg("attr_mask=0x%x\n", cmd->attr_mask);
+ 
+     memset(rsp, 0, sizeof(*rsp));
+     rsp->hdr.response = cmd->hdr.response;
+@@ -531,8 +532,8 @@ static int query_qp(PVRDMADev *dev, union pvrdma_cmd_req *req,
+ 
+     rsp->hdr.err = rdma_rm_query_qp(&dev->rdma_dev_res, &dev->backend_dev,
+                                     cmd->qp_handle,
+-                                    (struct ibv_qp_attr *)&resp->attrs, -1,
+-                                    &init_attr);
++                                    (struct ibv_qp_attr *)&resp->attrs,
++                                    cmd->attr_mask, &init_attr);
+ 
+     pr_dbg("ret=%d\n", rsp->hdr.err);
+     return rsp->hdr.err;
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.17.0
