@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fR7Ef-0008VY-60
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:34:42 -0400
+	(envelope-from <junyan.he@gmx.com>) id 1fR7Lm-00033y-BL
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:42:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fR7Ea-00007a-AK
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:34:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32958 helo=mx1.redhat.com)
+	(envelope-from <junyan.he@gmx.com>) id 1fR7Lh-0000Lu-Hq
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:42:02 -0400
+Received: from mga11.intel.com ([192.55.52.93]:41319)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fR7Ea-00006o-5B
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:34:36 -0400
-Date: Fri, 8 Jun 2018 10:34:25 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180608023425.GT750@xz-mi>
-References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
-	<1524550428-27173-5-git-send-email-wei.w.wang@intel.com>
-	<20180606064315.GB7815@xz-mi> <5B17B366.5030802@intel.com>
-	<20180607031732.GG7815@xz-mi> <5B18C2B2.30709@intel.com>
-	<20180607065808.GB750@xz-mi> <5B191EA6.3020004@intel.com>
-	<20180608013723.GQ750@xz-mi>
-	<20180608045316-mutt-send-email-mst@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180608045316-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v7 4/5] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1fR7Lh-0000Js-8J
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:41:57 -0400
+From: junyan.he@gmx.com
+Date: Fri,  8 Jun 2018 10:41:49 +0800
+Message-Id: <1528425709-24635-1-git-send-email-junyan.he@gmx.com>
+Subject: [Qemu-devel] [PATCH V6 RESEND 7/7] migration/ram: ensure write
+ persistence on loading all data to PMEM.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +22,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, liliang.opensource@gmail.com, pbonzini@redhat.com, nilal@redhat.com
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, xiaoguangrong.eric@gmail.com, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, Junyan He <junyan.he@intel.com>
 
-On Fri, Jun 08, 2018 at 04:58:21AM +0300, Michael S. Tsirkin wrote:
-> On Fri, Jun 08, 2018 at 09:37:23AM +0800, Peter Xu wrote:
-> > > > Asked since I see this in virtio spec (v1.0, though I guess it won't
-> > > > change) in chapter "2.2.1 Driver Requirements: Feature Bits":
-> > > > 
-> > > > "The driver MUST NOT accept a feature which the device did not offer"
-> > > > 
-> > > > Then I'm curious what would happen if:
-> > > > 
-> > > > - a emulator (not QEMU) only offered F_FREE_PAGE_HINT, not F_POISON
-> > > > - a guest that enabled PAGE_POISON
-> > > > 
-> > > > Then how the driver could tell the host that PAGE_POISON is enabled
-> > > > considering that guest should never set that feature bit if the
-> > > > emulation code didn't provide it?
-> 
-> It wouldn't. It just has to deal with the fact that host can discard
-> writes to hinted pages. Right now driver deals with it simply by
-> disabling F_FREE_PAGE_HINT.
+From: Junyan He <junyan.he@intel.com>
 
-Ah I see.  Thanks Michael.
+Because we need to make sure the pmem kind memory data is synced
+after migration, we choose to call pmem_persist() when the migration
+finish. This will make sure the data of pmem is safe and will not
+lose if power is off.
 
-Then it seems to me that it's more important to implement the F_POISON
-along with where it is declared since otherwise it'll be a real broken
-(device declares F_POISON, guest assumes it can handle the POISON so
-guest will enable FREE_PAGE_HINT, however the device can't really
-handle that).
+Signed-off-by: Junyan He <junyan.he@intel.com>
+---
+ include/qemu/pmem.h | 1 +
+ migration/ram.c     | 8 ++++++++
+ stubs/pmem.c        | 4 ++++
+ 3 files changed, 13 insertions(+)
 
-Or, if the guest driver is capable to drop F_FREE_PAGE_HINT when
-F_POISON is not declared, we can safely split the two features into
-two patches in QEMU too.
-
-Regards,
-
+diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
+index 00d6680..8f52b08 100644
+--- a/include/qemu/pmem.h
++++ b/include/qemu/pmem.h
+@@ -17,6 +17,7 @@
+ #else  /* !CONFIG_LIBPMEM */
+ 
+ void *pmem_memcpy_persist(void *pmemdest, const void *src, size_t len);
++void pmem_persist(const void *addr, size_t len);
+ 
+ #endif /* CONFIG_LIBPMEM */
+ 
+diff --git a/migration/ram.c b/migration/ram.c
+index aa0c6f0..15418c2 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -33,6 +33,7 @@
+ #include "qemu/bitops.h"
+ #include "qemu/bitmap.h"
+ #include "qemu/main-loop.h"
++#include "qemu/pmem.h"
+ #include "xbzrle.h"
+ #include "ram.h"
+ #include "migration.h"
+@@ -3046,6 +3047,13 @@ static int ram_load_setup(QEMUFile *f, void *opaque)
+ static int ram_load_cleanup(void *opaque)
+ {
+     RAMBlock *rb;
++
++    RAMBLOCK_FOREACH(rb) {
++        if (ramblock_is_pmem(rb)) {
++            pmem_persist(rb->host, rb->used_length);
++        }
++    }
++
+     xbzrle_load_cleanup();
+     compress_threads_load_cleanup();
+ 
+diff --git a/stubs/pmem.c b/stubs/pmem.c
+index b4ec72d..f794262 100644
+--- a/stubs/pmem.c
++++ b/stubs/pmem.c
+@@ -17,3 +17,7 @@ void *pmem_memcpy_persist(void *pmemdest, const void *src, size_t len)
+ {
+     return memcpy(pmemdest, src, len);
+ }
++
++void pmem_persist(const void *addr, size_t len)
++{
++}
 -- 
-Peter Xu
+2.7.4
