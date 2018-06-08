@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fRIh8-0003k0-0N
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:48:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1fRIjG-0005EU-Ig
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:51:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fRIh3-0001i5-OZ
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:48:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35144 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fRIh3-0001hb-KH
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:48:45 -0400
-References: <20180608131604.16826-1-berrange@redhat.com>
-	<20180608131604.16826-2-berrange@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8c705c77-ca6a-7cbe-07b3-537f6ae20ee0@redhat.com>
-Date: Fri, 8 Jun 2018 09:48:42 -0500
+	(envelope-from <bounces@canonical.com>) id 1fRIjB-0003Mf-K0
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:51:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33232)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fRIjB-0003Ln-D8
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:50:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fRIj8-0001k7-Os
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 14:50:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id CA7652E88E8
+	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 14:50:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180608131604.16826-2-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/3] util: remove redundant include of
- glib.h and add osdep.h
+Date: Fri, 08 Jun 2018 14:37:30 -0000
+From: Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: Bug 1708462 <1708462@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150176961654.13001.1653024142886908093.malonedeb@soybean.canonical.com>
+Message-Id: <152846865008.19483.14418099684745492025.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1708462] Re: Support Python 3 to build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +36,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Xu <peterx@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Olaf Hering <olaf@aepfle.de>
+To: qemu-devel@nongnu.org
 
-On 06/08/2018 08:16 AM, Daniel P. Berrang=C3=A9 wrote:
-> Code must only ever include glib.h indirectly via the glib-compat.h
-> header file, because we will need some macros set before glib.h is
-> pulled in. Adding extra includes of glib.h will (soon) cause compile
-> failures such as:
->=20
-> In file included from /home/berrange/src/virt/qemu/include/qemu/osdep.h=
-:107,
->                   from /home/berrange/src/virt/qemu/include/qemu/iova-t=
-ree.h:26,
->                   from util/iova-tree.c:13:
-> /home/berrange/src/virt/qemu/include/glib-compat.h:22: error: "GLIB_VER=
-SION_MIN_REQUIRED" redefined [-Werror]
->   #define GLIB_VERSION_MIN_REQUIRED GLIB_VERSION_2_40
->=20
-> In file included from /usr/include/glib-2.0/glib/gtypes.h:34,
->                   from /usr/include/glib-2.0/glib/galloca.h:32,
->                   from /usr/include/glib-2.0/glib.h:30,
->                   from util/iova-tree.c:12:
-> /usr/include/glib-2.0/glib/gversionmacros.h:237: note: this is the loca=
-tion of the previous definition
->   # define GLIB_VERSION_MIN_REQUIRED      (GLIB_VERSION_CUR_STABLE)
->=20
-> Furthermore, the osdep.h include should always be done directly from th=
-e
-> .c file rather than indirectly via any .h file.
->=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> ---
+The series mentioned in comment #3 was merged in v2.12.0, see commit
+c21965a0c8b979c306e927f158257e5b0fa3a1f9.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1708462
+
+Title:
+  Support Python 3 to build
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  Currently qemu's configure requires Python 2 to build.  As Python 2 is
+  rapidly approaching its EOL, it should be possible to build qemu with
+  Python 3.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1708462/+subscriptions
