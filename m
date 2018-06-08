@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60365)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fRFcU-00069A-OV
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:31:51 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fRFiV-0007uQ-00
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:38:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fRFcQ-0006T7-QG
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:31:50 -0400
-Date: Fri, 8 Jun 2018 13:31:41 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180608133141.15abb227.cohuck@redhat.com>
-In-Reply-To: <c9aba2a1-2232-457b-db6d-c2935711231d@redhat.com>
-References: <20180607165218.9558-1-david@redhat.com>
-	<20180607165218.9558-3-david@redhat.com>
-	<20180608093406.30c878ec@bahia.lan>
-	<4f518685-fcdb-7c3a-35d3-5a26374e0604@redhat.com>
-	<20180608094657.4043502f@bahia.lan>
-	<431d4fe5-5bfe-1ab3-00b5-610038a7a9ea@redhat.com>
-	<2b431d32-9172-0517-4717-7ce50355b8db@redhat.com>
-	<20180608103943.1d7e72ee@redhat.com>
-	<673ffa52-1e24-5d6c-5d6a-927d3df79273@redhat.com>
-	<20180608110612.18ac915c@redhat.com>
-	<9eaefde2-b8aa-9072-610b-4236ce5c3913@redhat.com>
-	<20180608125233.46fc187a@bahia.lan>
-	<c9aba2a1-2232-457b-db6d-c2935711231d@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1fRFiR-0008Oc-Qz
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:38:03 -0400
+Date: Fri, 8 Jun 2018 21:24:33 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180608112433.GV3344@umbus.fritz.box>
+References: <152845121577.13960.4480474870896921301.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 2/8] spapr: no need to
- verify the node
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="TPGKQYD3WP7vMswh"
+Content-Disposition: inline
+In-Reply-To: <152845121577.13960.4480474870896921301.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v4] target/ppc: Allow PIR read in
+ privileged mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,63 +24,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, leandro.lupori@gmail.com
 
-On Fri, 8 Jun 2018 13:28:01 +0200
-David Hildenbrand <david@redhat.com> wrote:
 
-> On 08.06.2018 12:52, Greg Kurz wrote:
-> > On Fri, 8 Jun 2018 11:24:51 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >>>>>> +1 for error_abort, even if it takes another line.      
-> >>>>> +1 for error_abort
-> >>>>> call shouldn't fail, but if does it won't be silently ignored
-> >>>>> and introduce undefined behavior.      
-> >>>>
-> >>>> Maybe we should fix the others that pass in NULL.
-> >>>>
-> >>>> (no, not me :D - I'm already busy with your requested pre_plug handling)    
-> >>> Add it to wiki page for bite sized tasks?    
-> >>
-> >> Done.
-> >>
-> >>  
-> > 
-> > FWIW, I've also added a line to check and possibly fix places where we do
-> > 'if (*errp)', which would cause QEMU to crash if the caller passes NULL.
-> > 
-> > $ git grep 'if (\*errp)'
-> > hmp.c:    if (*errp) {
-> > hw/ipmi/isa_ipmi_bt.c:    if (*errp)
-> > hw/ipmi/isa_ipmi_kcs.c:    if (*errp)
-> > hw/mem/memory-device.c:    if (*errp) {
-> > hw/mem/memory-device.c:        if (*errp) {
-> > hw/ppc/spapr.c:        if (*errp) {
-> > hw/s390x/event-facility.c:        if (*errp) {
-> > include/qapi/error.h: *     if (*errp) { // WRONG!
-> > qga/commands-posix.c:            if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:        if (*errp) {
-> > target/s390x/cpu_models.c:            if (*errp) {
-> > target/s390x/cpu_models.c:        if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > target/s390x/cpu_models.c:    if (*errp) {
-> > tests/test-crypto-tlscredsx509.c:    if (*errp) {
-> > tests/test-io-channel-tls.c:    if (*errp) {
-> >   
-> 
-> I think the more important part is actually looking out for people that
-> use NULL instead of error_abort. This way we won't silently ignore errors.
+--TPGKQYD3WP7vMswh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I think we can assume that the callers here all pass in !NULL. Would
-probably make sense to change these anyway because (a) better safe than
-sorry, and (b) make sure new code does not copy it.
+On Fri, Jun 08, 2018 at 11:46:55AM +0200, Greg Kurz wrote:
+> From: luporl <leandro.lupori@gmail.com>
+>=20
+> According to PowerISA, the PIR register should be readable in privileged
+> mode also, not only in hypervisor privileged mode.
+>=20
+> PowerISA 3.0 - 4.3.3 Processor Identification Register
+>=20
+> "Read access to the PIR is privileged; write access is not provided."
+>=20
+> Figure 18 in section 4.4.4 explicitly confirms that mfspr PIR is privileg=
+ed
+> and doesn't require hypervisor state.
+
+Applied, thanks.
+
+>=20
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Cc: Alexander Graf <agraf@suse.de>
+> Cc: qemu-ppc@nongnu.org
+> Signed-off-by: Leandro Lupori <leandro.lupori@gmail.com>
+> Reviewed-by: Jose Ricardo Ziviani <joserz@linux.ibm.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+> Changes in v2:
+> - added my Signed-off-by, maintainers CC and Jose's Reviewed-by tags
+>=20
+> Changes in v3:
+> - added subsystem name, version tag and summary of changes
+> - added the section of PowerISA that describes PIR access privileges
+>=20
+> Changes in v4 (Greg):
+> - rebased against ppc-for-3.0 (ie, file is now target/ppc/translate_init.=
+inc.c)
+> - added some more context from PowerISA
+> ---
+>  target/ppc/translate_init.inc.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index 1a89017ddea8..bb9296f5a3da 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -7819,7 +7819,7 @@ static void gen_spr_book3s_ids(CPUPPCState *env)
+>      /* Processor identification */
+>      spr_register_hv(env, SPR_PIR, "PIR",
+>                   SPR_NOACCESS, SPR_NOACCESS,
+> -                 SPR_NOACCESS, SPR_NOACCESS,
+> +                 &spr_read_generic, SPR_NOACCESS,
+>                   &spr_read_generic, NULL,
+>                   0x00000000);
+>      spr_register_hv(env, SPR_HID0, "HID0",
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--TPGKQYD3WP7vMswh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsaZ28ACgkQbDjKyiDZ
+s5L2OhAArItP0Z0Kv8KhHcGTq4cgArDPlzTr+KXkpGsRLUR0toaRiafhskWArFpG
+RvGwXN44wXcdwmR4L2KQbKGS/ZubES3ThCk+NGGIS0n7F6Jc+TKlDVLIMRHHH0Lu
+YpNoq6vPbZW4a48ex9yktE3Wtot/zjW00FnnDQMvvUQg+nhcNsjiXJbXfqdlPVkz
+EEXeCfBSt/HLnQ+UVS+7vFCcv4pqoTREeKqWl4rFPgSh3tobzEMbI8PhrbLu4QoL
+7RKNusodPYybVcO0FHD8h2qi93HLbXWy8MISltPs6pSC9Y8Y7oWPY9PpCUeUT1x/
+ie28x1La1m6OqFPIt4rdYVSsJBX/z8ba61PjA03dpfr2kzHy8quKXv9IDQRj8gfO
+po8Rl439JBpw0hm8gt+v+HmbrSb77pSql2/PKumIajWMfF+E2aDhxgAK9Kh5LmKt
+yn7ZBCAcwH0tKV4tgAAXTdr11/NJRm7fNAdHPTMkyqsJd5cL5Y59vHMRoN4JqeHm
+IuaX3+qgaHmuQ164mZlnoe9w85kqygd5qwNL80ETv3WgkdthgBjSMaJAtAFJJfQ+
+dhHHAmQKh35DvxZxCzmko9lDoGk9EQrj9aA5cE7YR4IXCX9PN6V/UyiSQwvhiwhu
+D7Q+Tqf5+A1tmpm01hvzvZwJ7NmX0NnRIPM4E87lHtv3MxsuZ/I=
+=eZfZ
+-----END PGP SIGNATURE-----
+
+--TPGKQYD3WP7vMswh--
