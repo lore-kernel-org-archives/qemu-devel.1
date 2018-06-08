@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fR4v9-0000em-5H
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 20:06:24 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fR4z6-0001wD-19
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 20:10:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fR4v5-0006fk-Vj
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 20:06:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50724 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fR4v5-0006f1-PQ
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 20:06:19 -0400
-Date: Fri, 8 Jun 2018 03:06:12 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180608000540.276617-1-mst@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1fR4z2-00043V-Rp
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 20:10:27 -0400
+Resent-Message-Id: <E1fR4z2-00043V-Rp@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21099)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fR4z2-00040r-HY
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 20:10:24 -0400
+In-Reply-To: <20180608000540.276617-1-mst@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152841660997.447.17594475293234388622@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] kvm: support -realtime cpu-pm=on|off
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 7 Jun 2018 17:10:10 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] kvm: support -realtime cpu-pm=on|off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,134 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org
+To: mst@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com, ehabkost@redhat.com, kvm@vger.kernel.org, rth@twiddle.net
 
-With this flag, kvm allows guest to control host CPU power state.  This
-increases latency for other processes using same host CPU in an
-unpredictable way, but if decreases idle entry/exit times for the
-running VCPU.
-
-Follow-up patches will expose this capability to guest
-(using mwait leaf).
-
-Based on a patch by Wanpeng Li <kernellwp@gmail.com> .
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- include/sysemu/sysemu.h |  1 +
- target/i386/kvm.c       | 26 ++++++++++++++++++++++++++
- vl.c                    |  6 ++++++
- qemu-options.hx         |  9 +++++++--
- 4 files changed, 40 insertions(+), 2 deletions(-)
-
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index e893f72f3b..b921c6f3b7 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -128,6 +128,7 @@ extern bool boot_strict;
- extern uint8_t *boot_splash_filedata;
- extern size_t boot_splash_filedata_size;
- extern bool enable_mlock;
-+extern bool enable_cpu_pm;
- extern uint8_t qemu_extra_params_fw[2];
- extern QEMUClockType rtc_clock;
- extern const char *mem_path;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 44f70733e7..e4c3e65e00 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1041,6 +1041,32 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         }
-     }
- 
-+    if (enable_cpu_pm) {
-+        int disable_exits = kvm_check_extension(cs->kvm_state, KVM_CAP_X86_DISABLE_EXITS);
-+        int ret;
-+
-+/* Work around for kernel header with a typo. TODO: fix header and drop. */
-+#if defined(KVM_X86_DISABLE_EXITS_HTL) && !defined(KVM_X86_DISABLE_EXITS_HLT)
-+#define KVM_X86_DISABLE_EXITS_HLT KVM_X86_DISABLE_EXITS_HTL
-+#endif
-+        if (disable_exits) {
-+            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
-+                              KVM_X86_DISABLE_EXITS_HLT |
-+                              KVM_X86_DISABLE_EXITS_PAUSE);
-+            /* PV unhalt relies on HALT to cause an exit */
-+            if (env->user_features[FEAT_KVM] & (1U << KVM_FEATURE_PV_UNHALT)) {
-+                disable_exits &= ~KVM_X86_DISABLE_EXITS_HLT;
-+            }
-+        }
-+
-+        ret = kvm_vm_enable_cap(cs->kvm_state, KVM_CAP_X86_DISABLE_EXITS, 0,
-+                                disable_exits);
-+        if (ret < 0) {
-+            error_report("kvm: guest stopping CPU not supported: %s", strerror(-ret));
-+        }
-+    }
-+
-+
-     qemu_add_vm_change_state_handler(cpu_update_state, env);
- 
-     c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
-diff --git a/vl.c b/vl.c
-index 06031715ac..7bea9c2177 100644
---- a/vl.c
-+++ b/vl.c
-@@ -142,6 +142,7 @@ ram_addr_t ram_size;
- const char *mem_path = NULL;
- int mem_prealloc = 0; /* force preallocation of physical target memory */
- bool enable_mlock = false;
-+bool enable_cpu_pm = false;
- int nb_nics;
- NICInfo nd_table[MAX_NICS];
- int autostart;
-@@ -386,6 +387,10 @@ static QemuOptsList qemu_realtime_opts = {
-             .name = "mlock",
-             .type = QEMU_OPT_BOOL,
-         },
-+        {
-+            .name = "cpu-pm",
-+            .type = QEMU_OPT_BOOL,
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -3904,6 +3909,7 @@ int main(int argc, char **argv, char **envp)
-                     exit(1);
-                 }
-                 enable_mlock = qemu_opt_get_bool(opts, "mlock", true);
-+                enable_cpu_pm = qemu_opt_get_bool(opts, "cpu-pm", false);
-                 break;
-             case QEMU_OPTION_msg:
-                 opts = qemu_opts_parse_noisily(qemu_find_opts("msg"), optarg,
-diff --git a/qemu-options.hx b/qemu-options.hx
-index c0d3951e9f..e6f31071ce 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3325,16 +3325,21 @@ Do not start CPU at startup (you must type 'c' in the monitor).
- ETEXI
- 
- DEF("realtime", HAS_ARG, QEMU_OPTION_realtime,
--    "-realtime [mlock=on|off]\n"
-+    "-realtime [mlock=on|off][cpu-halt=on|off[\n"
-     "                run qemu with realtime features\n"
--    "                mlock=on|off controls mlock support (default: on)\n",
-+    "                mlock=on|off controls mlock support (default: on)\n"
-+    "                cpu-pm=on|off controls cpu power management (default: off)\n",
-     QEMU_ARCH_ALL)
- STEXI
- @item -realtime mlock=on|off
-+@item -realtime cpu-pm=on|off
- @findex -realtime
- Run qemu with realtime features.
- mlocking qemu and guest memory can be enabled via @option{mlock=on}
- (enabled by default).
-+guest ability to manage power state of host cpus (increasing latency for other
-+processes on the same host cpu, but decreasing latency for guest)
-+can be enabled via @option{cpu-pm=on} (disabled by default).
- ETEXI
- 
- DEF("gdb", HAS_ARG, QEMU_OPTION_gdb, \
--- 
-MST
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjA4MDAwNTQwLjI3NjYxNy0xLW1zdEByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0hdIGt2bTogc3VwcG9ydCAtcmVhbHRpbWUgY3B1LXBtPW9ufG9m
+ZgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
+b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
+CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
+IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
+dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
+bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
+ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
+eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
+ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
+Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE4
+MDYwNzE1NDcwNS42MzE2LTEtZGF2aWRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNjA3MTU0
+NzA1LjYzMTYtMS1kYXZpZEByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBh
+dGNoZXcvMjAxODA2MDgwMDA1NDAuMjc2NjE3LTEtbXN0QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8y
+MDE4MDYwODAwMDU0MC4yNzY2MTctMS1tc3RAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBi
+cmFuY2ggJ3Rlc3QnCmUzODhkNTY4NjEga3ZtOiBzdXBwb3J0IC1yZWFsdGltZSBjcHUtcG09b258
+b2ZmCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGt2bTogc3VwcG9y
+dCAtcmVhbHRpbWUgY3B1LXBtPW9ufG9mZi4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojNjg6IEZJTEU6IHRhcmdldC9pMzg2L2t2bS5jOjEwNDU6CisgICAgICAgIGludCBkaXNh
+YmxlX2V4aXRzID0ga3ZtX2NoZWNrX2V4dGVuc2lvbihjcy0+a3ZtX3N0YXRlLCBLVk1fQ0FQX1g4
+Nl9ESVNBQkxFX0VYSVRTKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4ODog
+RklMRTogdGFyZ2V0L2kzODYva3ZtLmM6MTA2NToKKyAgICAgICAgICAgIGVycm9yX3JlcG9ydCgi
+a3ZtOiBndWVzdCBzdG9wcGluZyBDUFUgbm90IHN1cHBvcnRlZDogJXMiLCBzdHJlcnJvcigtcmV0
+KSk7CgpFUlJPUjogZG8gbm90IGluaXRpYWxpc2UgZ2xvYmFscyB0byAwIG9yIE5VTEwKIzEwNDog
+RklMRTogdmwuYzoxNDU6Citib29sIGVuYWJsZV9jcHVfcG0gPSBmYWxzZTsKCnRvdGFsOiAxIGVy
+cm9ycywgMiB3YXJuaW5ncywgODYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
