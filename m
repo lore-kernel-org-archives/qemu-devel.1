@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fRAwv-0001lK-Mp
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:32:38 -0400
+	(envelope-from <davidsondfgl@gmail.com>) id 1fRBCX-0007tw-C6
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:48:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fRAws-000821-KT
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:32:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57824 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fRAws-00081d-Fo
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:32:34 -0400
-Date: Fri, 8 Jun 2018 14:32:26 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180608063226.GC7736@xz-mi>
-References: <20180531051641.8473-1-peterx@redhat.com>
-	<20180531051641.8473-4-peterx@redhat.com>
-	<87efhizuxl.fsf@dusky.pond.sub.org>
+	(envelope-from <davidsondfgl@gmail.com>) id 1fRBCW-0004Hz-Ok
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:48:45 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35300)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <davidsondfgl@gmail.com>)
+	id 1fRBCW-0004Hn-J9
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:48:44 -0400
+Received: by mail-qt0-x243.google.com with SMTP id s9-v6so12474746qtg.2
+	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 23:48:44 -0700 (PDT)
+References: <CALAE4RoMmLDrSkvBUPhp-pCddbb-j1unXee3vPcUzbT1_q_G-A@mail.gmail.com>
+	<5185f351-8f1d-bc81-9806-a5e412cfebb0@twiddle.net>
+From: Davidson Francis <davidsondfgl@gmail.com>
+Message-ID: <7c9a8e94-2f45-aeba-a12b-0c83c70c6f99@gmail.com>
+Date: Fri, 8 Jun 2018 03:48:40 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87efhizuxl.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [RFC v2 3/4] monitor: remove "x-oob",
- turn oob on by default
+In-Reply-To: <5185f351-8f1d-bc81-9806-a5e412cfebb0@twiddle.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [OpenRISC] OpenRISC: SMP support for more than 2
+ cores
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Richard Henderson <rth@twiddle.net>, QEMU Development <qemu-devel@nongnu.org>, Openrisc <openrisc@lists.librecores.org>
 
-On Thu, Jun 07, 2018 at 01:40:22PM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
+On 07-06-2018 12:56, Richard Henderson wrote:
+> On 06/07/2018 06:27 AM, Davidson Francis wrote:
+>> Dear all,
+>>
+>> Currently Qemu supports only 2 cores when SMP enabled for or1k architecure, so
+>> I would like to know if there is a quick way to increase the number of cores by
+>> changing a few lines of code or to accomplish this, will requires significant
+>> changes in the source code?
 > 
-> > There was a regression reported by Eric Auger before with OOB:
-> >
-> >   http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06231.html
-> >
-> > The fix is 951702f39c ("monitor: bind dispatch bh to iohandler context",
-> > 2018-04-10), which is in master already.
-> >
-> > For the bug, we turned Out-Of-Band feature of monitors off for 2.12
-> > release.  Now we turn that on again after the 2.12 release.
-> >
-> > This patch partly reverts be933ffc23 (monitor: new parameter "x-oob"),
-> > meanwhile turn it on again by default for non-MUX QMPs.
+> Probably not significant changes.
+> The limit of 2 seems to be the way the interrupts are wired up.
+> That can probably be extended relatively easily.
 > 
-> Please add a brief explanation why OOB isn't turned on for MUX.  Pointer
-> to existing explanation would be fine.
+> 
+> r~
+> 
 
-Sure.
+Thank you Richard, I will investigate how the interrupts are wired.
 
--- 
-Peter Xu
+Kind regards,
+Davidson Francis.
