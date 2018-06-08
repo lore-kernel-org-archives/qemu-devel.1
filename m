@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fRDCi-0001gq-Er
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:57:05 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fRDDQ-0002Cj-Dy
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:57:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fRDCd-0002vO-HW
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:57:04 -0400
-Date: Fri, 8 Jun 2018 10:56:55 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180608105655.01fa8fb0@redhat.com>
-In-Reply-To: <20180607165218.9558-7-david@redhat.com>
-References: <20180607165218.9558-1-david@redhat.com>
-	<20180607165218.9558-7-david@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1fRDDP-0003Oy-IF
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:57:48 -0400
+Date: Fri, 8 Jun 2018 18:50:54 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180608085054.GS3344@umbus.fritz.box>
+References: <cover.1528291908.git.balaton@eik.bme.hu>
+	<53f9d0b04374a3f4449af65ce01bd68dbe757ab5.1528291908.git.balaton@eik.bme.hu>
+	<428ea537-a8d7-1c7c-7052-ea959797022d@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 6/8] spapr: handle pc-dimm unplug via
- hotplug handler chain
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="e9fMjeYs+GPci+mg"
+Content-Disposition: inline
+In-Reply-To: <428ea537-a8d7-1c7c-7052-ea959797022d@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH v2 1/8] ppc4xx_i2c: Clean up and improve
+ error logging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +26,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Greg Kurz <groug@kaod.org>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
-
-On Thu,  7 Jun 2018 18:52:16 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> Let's handle it via hotplug_handler_unplug(). E.g. necessary to hotplug/
-> unplug memory devices (which a pc-dimm is) later.
-Perhaps something like following would be better:
-
-Factor out memory unplug into separate function from spapr_lmb_release().
-Then use generic hotplug_handler_unplug() to trigger memory unplug,
-which would call spapr_machine_device_unplug() -> spapr_memory_unplug()
-in the end .
-This way unplug operation is not buried in lmb internals and located
-in the same place like in other targets, following similar
-logic/call chain across targets.
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/ppc/spapr.c | 18 +++++++++++++++---
->  1 file changed, 15 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index bcb72d9fa7..0a8a3455d6 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3298,7 +3298,8 @@ static sPAPRDIMMState *spapr_recover_pending_dimm_state(sPAPRMachineState *ms,
->  /* Callback to be called during DRC release. */
->  void spapr_lmb_release(DeviceState *dev)
->  {
-> -    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_hotplug_handler(dev));
-> +    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(dev);
-> +    sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_ctrl);
->      sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr, PC_DIMM(dev));
->  
->      /* This information will get lost if a migration occurs
-> @@ -3316,9 +3317,17 @@ void spapr_lmb_release(DeviceState *dev)
->  
->      /*
->       * Now that all the LMBs have been removed by the guest, call the
-> -     * pc-dimm unplug handler to cleanup up the pc-dimm device.
-> +     * unplug handler chain. This can never fail.
->       */
-> -    pc_dimm_memory_unplug(dev, MACHINE(spapr));
-> +    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
-> +}
-> +
-> +static void spapr_memory_unplug(HotplugHandler *hotplug_dev, DeviceState *dev)
-> +{
-> +    sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
-> +    sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr, PC_DIMM(dev));
-> +
-> +    pc_dimm_memory_unplug(dev, MACHINE(hotplug_dev));
->      object_unparent(OBJECT(dev));
->      spapr_pending_dimm_unplugs_remove(spapr, ds);
->  }
-> @@ -3589,6 +3598,9 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
->  static void spapr_machine_device_unplug(HotplugHandler *hotplug_dev,
->                                          DeviceState *dev, Error **errp)
->  {
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> +        spapr_memory_unplug(hotplug_dev, dev);
-> +    }
->  }
->  
->  static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_dev,
+--e9fMjeYs+GPci+mg
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jun 06, 2018 at 12:56:32PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> On 06/06/2018 10:31 AM, BALATON Zoltan wrote:
+> > Make it more readable by converting register indexes to decimal
+> > (avoids lot of superfluous 0x0) and distinguish errors caused by
+> > accessing non-existent vs. unimplemented registers.
+> > No functional change.
+> >=20
+> > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> > ---
+> >  hw/i2c/ppc4xx_i2c.c | 94 +++++++++++++++++++++++++++++----------------=
+--------
+> >  1 file changed, 51 insertions(+), 43 deletions(-)
+> >=20
+> > diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+> > index ab64d19..d1936db 100644
+> > --- a/hw/i2c/ppc4xx_i2c.c
+> > +++ b/hw/i2c/ppc4xx_i2c.c
+> > @@ -31,7 +31,7 @@
+> >  #include "hw/hw.h"
+> >  #include "hw/i2c/ppc4xx_i2c.h"
+> > =20
+> > -#define PPC4xx_I2C_MEM_SIZE 0x12
+> > +#define PPC4xx_I2C_MEM_SIZE 18
+>=20
+> This looks weird, it seems all memory range sizes are in hex in other
+> QEMU devices.
+
+[snip]
+> > @@ -263,32 +267,31 @@ static void ppc4xx_i2c_writeb(void *opaque, hwadd=
+r addr, uint64_t value,
+> >              }
+> >          }
+> >          break;
+> > -    case 0x07:
+> > -        i2c->mdcntl =3D value & 0xDF;
+> > +    case 7:
+> > +        i2c->mdcntl =3D value & 0xdf;
+> >          break;
+> > -    case 0x08:
+> > -        i2c->sts &=3D ~(value & 0x0A);
+> > +    case 8:
+> > +        i2c->sts &=3D ~(value & 0xa);
+>=20
+> 'value & 0x0a' implicitly denotes than 'value' is a 8-bit register.
+> Matter of taste...
+
+I tend to prefer the forms you suggest, Philippe, but not by enough to
+delay this otherwise good cleanup.  Especially since Balaton is taking
+on this long neglected area of the code.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--e9fMjeYs+GPci+mg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsaQ2sACgkQbDjKyiDZ
+s5K4GhAAtgSbvkYV87H9qyqqKrm5MZxNJmDqtDHt+SN1XAQq586fc1upxL66lrLk
+M+TVe3G9dKGCHFm7c+I1V/R8nJTyglyHOdiYkqGhZITj4e6w0+TLOA1kd22Y9gpL
+7T2cV3dd46cN4IIG7xbNd8xkwXr7QGRNoANdz5th0lBnjhijaqUzPLowmy48OZ+m
+fKSF1QCRJA8ybsx0KHMv9fveRFBpr9Bv7OG2OU6EFkZXLkdrN9l4mgGvbttOcO4u
+9/WJLCd0RuKAdg7WjpBHlIraaC04brleltSCGSqMyT5loQPWivdbgkKR/gIKvb51
+1MRAfwKcLrw3vyXObJh9h9EHScyDOnYqh1Z3oizcqK868/yI07IYR4Wakcfx0Wdi
+E//gfUQvE5QKyGkW7o6ujgWTSSJVDod9XPlLewfP+tDAY5Od0uwh1VW1Uthg8QKK
+KwZj2JjiOL3oUvUuxtrVx88MTboqI65EePRqHTJdnQMmTY1bbmLvVOFMcFp7pFdB
+iqIqFycRopjyDdRy4Y8hbJycqU5tT8ft4v4Kvn6u6cVf5kQjEH+BcUrF46RE62Bl
+gZ9VqeXmpMRrj07mhyDM9aeJWUIpsq86FgBtjIhfh4HAbKCERUVu57XKpvzRNooK
+ji8Z6f0ONPsO83l5KacGk5L0Up5zlnVbNKrNVrw3TbEp87wyIFw=
+=/m5p
+-----END PGP SIGNATURE-----
+
+--e9fMjeYs+GPci+mg--
