@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fRIdm-0001j9-3K
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:45:23 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fRIhA-0003ka-Iy
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:48:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fRIdj-0007M2-01
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:45:22 -0400
-Date: Fri, 8 Jun 2018 16:45:14 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180608164514.2e8248f4.cohuck@redhat.com>
-In-Reply-To: <d68340a2-bb1b-cef9-e394-f0d55983c0bb@linux.ibm.com>
-References: <20180509154822.23510-1-cohuck@redhat.com>
-	<20180509154822.23510-3-cohuck@redhat.com>
-	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
-	<20180515181006.0cb1dfc2.cohuck@redhat.com>
-	<a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
-	<20180522145208.310143ea.cohuck@redhat.com>
-	<4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
-	<20180605151449.22aafbfc.cohuck@redhat.com>
-	<e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
-	<20180606142131.74ea2eb7.cohuck@redhat.com>
-	<5b77ec9c-41b8-2e32-ce79-d9005b93fdd0@linux.ibm.com>
-	<20180607115442.6a779ed9.cohuck@redhat.com>
-	<86d57698-3ea7-a390-2217-07c6d41ca9ed@linux.ibm.com>
-	<20180608142022.7dd6a658.cohuck@redhat.com>
-	<d68340a2-bb1b-cef9-e394-f0d55983c0bb@linux.ibm.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fRIh1-0001gc-Lr
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:48:52 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:32945)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fRIh1-0001gE-Gi
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:48:43 -0400
+Received: by mail-qk0-x244.google.com with SMTP id c131-v6so321638qkb.0
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 07:48:43 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180601162749.27406-1-marcandre.lureau@redhat.com>
+	<20180601162749.27406-3-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <684de99e-c9d6-7286-0c8d-80137e22e77e@amsat.org>
+Date: Fri, 8 Jun 2018 11:48:39 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
- subchannel
+In-Reply-To: <20180601162749.27406-3-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC v2 02/12] libvhost-user: exit by default on
+ VHOST_USER_NONE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,45 +36,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Pierre Morel <pmorel@linux.ibm.com>, Dong Jia Shi <bjsdjshi@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Fri, 8 Jun 2018 15:13:28 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
-
-> On 06/08/2018 02:20 PM, Cornelia Huck wrote:
-> >>> My proposal is to do the same
-> >>> copying to scsw(r) again, which would mean we get a request with both
-> >>> the halt and the start bit set. The vfio code now needs to do a hsch
-> >>> (instead of a ssch). The real channel subsystem should figure this out,
-> >>> as we can't reliably check whether the start function has concluded
-> >>> already (there's always a race window).  
-> >> This I do not agree scsw(r) is part of the driver.
-> >> The interface here is not a device interface anymore but a driver
-> >> interface.
-> >> SCSW is a status, it is at its place in QEMU device interface with the
-> >> guest
-> >> but here pwrite() sends a command.  
-> > Hm, I rather consider that "we write a status, and the backend figures
-> > out what to do based on that status".
-> >   
+On 06/01/2018 01:27 PM, Marc-André Lureau wrote:
+> Since commit 2566378d6d13bf4d28c7770bdbda5f7682594bbe, libvhost-user
+> no longer panics on disconnect (rc == 0), and instead silently ignores
+> an invalid VHOST_USER_NONE message.
 > 
-> The status of what? Kind of a target status?
+> Without extra work from the API user, this will simply busy-loop on
+> HUP events. The obvious thing to do is to exit(0) instead, while
+> additional or different work can be done by overriding
+> iface->process_msg().
 > 
-> I think this approach is the source of lots of complications. For instance
-> take xsch. How are we supposed to react to a guest xsch (in QEMU and
-> in the kernel module)? My guess is that the right thing to do is to issue
-> an xsch in the vfio-ccw kernel module on the passed through subchannel.
-> But there is no bit in fctl for cancel.
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> ---
+>  contrib/libvhost-user/libvhost-user.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> Bottom line is: I'm not happy with the current design but I'm not sure
-> if it's practical to do something about it (i.e. change it radically).
+> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+> index 54e643d871..ebe30c7dab 100644
+> --- a/contrib/libvhost-user/libvhost-user.c
+> +++ b/contrib/libvhost-user/libvhost-user.c
+> @@ -1220,6 +1220,8 @@ vu_process_message(VuDev *dev, VhostUserMsg *vmsg)
+>      case VHOST_USER_SET_CONFIG:
+>          return vu_set_config(dev, vmsg);
+>      case VHOST_USER_NONE:
+> +        /* if you need processing before exit, override iface->process_msg */
+> +        exit(0);
+>          break;
 
-It might make sense to keep this for ssch, maybe reuse it for hsch/csch,
-and think about something else for other things we want to handle
-(xsch, channel monitoring, the path handling stuff for which we already
-had a prototype etc.) It's probably not practical to do radical surgery
-on the existing code.
+Remove the 'break'?
 
-[Speaking of which: Is there any current effort on the path handling
-things?]
+>      case VHOST_USER_POSTCOPY_ADVISE:
+>          return vu_set_postcopy_advise(dev, vmsg);
+> 
