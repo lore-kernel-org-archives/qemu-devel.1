@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fRHUf-0008J4-HV
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:31:54 -0400
+	(envelope-from <groug@kaod.org>) id 1fRHZ0-00039O-K8
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:36:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fRHUa-0002Gr-Il
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:31:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40582 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1fRHYw-00049J-Il
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:36:22 -0400
+Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:50817)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fRHUa-0002Gi-Cp
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:31:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0A05E400ADC3
-	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 13:31:48 +0000 (UTC)
-Date: Fri, 8 Jun 2018 14:31:46 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180608133146.GD31164@stefanha-x1.localdomain>
-References: <20180608035511.7439-1-peterx@redhat.com>
-	<20180608035511.7439-6-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fRHYw-00048n-An
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:36:18 -0400
+Received: from player773.ha.ovh.net (unknown [10.109.108.4])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 78609C2F89
+	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 15:36:16 +0200 (CEST)
+Date: Fri, 8 Jun 2018 15:36:06 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180608153606.6c108c67@bahia.lan>
+In-Reply-To: <20180608124816.22140-4-david@redhat.com>
+References: <20180608124816.22140-1-david@redhat.com>
+	<20180608124816.22140-4-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="76DTJ5CE0DCVQemd"
-Content-Disposition: inline
-In-Reply-To: <20180608035511.7439-6-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v10 5/7] monitor: remove event_clock_type
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] spapr: move memory hotplug support
+ check into spapr_memory_pre_plug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,46 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
+On Fri,  8 Jun 2018 14:48:13 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
---76DTJ5CE0DCVQemd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jun 08, 2018 at 11:55:09AM +0800, Peter Xu wrote:
-> Instead, use a dynamic function to detect which clock we'll use.  The
-> problem is that the old code will let monitor initialization depend on
-> configure_accelerator() (that's where qtest_enabled() start to take
-> effect).  After this change, we don't have such a dependency any more.
-> We just need to make sure configure_accelerator() is called when we
-> start to use it.  Now it's only used in monitor_qapi_event_queue() and
-> monitor_qapi_event_handler(), so we're good.
->=20
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> Let's finish cleaning up the hotplug handler. This check can be
+> performed in the pre_plug code as the very first thing.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  monitor.c | 25 ++++++++++++++++---------
->  1 file changed, 16 insertions(+), 9 deletions(-)
+>  hw/ppc/spapr.c | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 1f577b274b..9b8b4068b1 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3184,12 +3184,18 @@ out:
+>  static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                                    Error **errp)
+>  {
+> +    const sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(hotplug_dev);
 
-With Markus' suggestion:
+Even if const is valid here, it doesn't seem to be widely used in similar
+situations:
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+$ git grep 'Class.* = .*GET_CLASS' | grep const | wc -l
+14
+$ git grep 'Class.* = .*GET_CLASS' | grep -v const | wc -l
+642
 
---76DTJ5CE0DCVQemd
-Content-Type: application/pgp-signature; name="signature.asc"
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
 
------BEGIN PGP SIGNATURE-----
+... like here for example. This inconsistency is a bit weird.
 
-iQEcBAEBAgAGBQJbGoVCAAoJEJykq7OBq3PIxQIIAILMiWXEmFLNRNRu1oIFAT7L
-Key6MOu+XwPWnUffshVWu4dDMNPdyfWPMS0/gZUva03pejEOC2iUmDaRz9a1Vxv7
-AH28W8lmnY09K0Nu7FMnugFXsN5DIiRHdKUMYDQcsW9FxJOoig+Fp99jxyviY0En
-OfOX/5+Wvk5PzYddmGzEgCQdVUlUtTQ+zYoMZzeM1f0mpXEUdQM3DWhm8FjVLKsy
-DwcG+AS4/uYGj9WI5dMI4emIccgzxH0BfYnHLp/1qZd/L9Txq+xApUY94xU08LkM
-gcSsuhGPF/N+5LRA0VXX1cLEVWGNAjvEpO364G/NUWai/wAdUog1m3MexUdglEU=
-=yppG
------END PGP SIGNATURE-----
+The patch is good anyway so:
 
---76DTJ5CE0DCVQemd--
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>      MemoryRegion *mr;
+>      uint64_t size;
+>      char *mem_dev;
+>  
+> +    if (!smc->dr_lmb_enabled) {
+> +        error_setg(errp, "Memory hotplug not supported for this machine");
+> +        return;
+> +    }
+> +
+>      mr = ddc->get_memory_region(dimm, errp);
+>      if (!mr) {
+>          return;
+> @@ -3571,14 +3577,7 @@ out:
+>  static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+>                                        DeviceState *dev, Error **errp)
+>  {
+> -    MachineState *ms = MACHINE(hotplug_dev);
+> -    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
+> -
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> -        if (!smc->dr_lmb_enabled) {
+> -            error_setg(errp, "Memory hotplug not supported for this machine");
+> -            return;
+> -        }
+>          spapr_memory_plug(hotplug_dev, dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+>          spapr_core_plug(hotplug_dev, dev, errp);
