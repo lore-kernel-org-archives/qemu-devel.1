@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fRGNb-00054k-Ds
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:20:32 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fRGRn-000648-9J
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:24:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fRGNX-0006rb-Jp
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:20:30 -0400
-Date: Fri, 8 Jun 2018 14:20:22 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180608142022.7dd6a658.cohuck@redhat.com>
-In-Reply-To: <86d57698-3ea7-a390-2217-07c6d41ca9ed@linux.ibm.com>
-References: <20180509154822.23510-1-cohuck@redhat.com>
-	<20180509154822.23510-3-cohuck@redhat.com>
-	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
-	<20180515181006.0cb1dfc2.cohuck@redhat.com>
-	<a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
-	<20180522145208.310143ea.cohuck@redhat.com>
-	<4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
-	<20180605151449.22aafbfc.cohuck@redhat.com>
-	<e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
-	<20180606142131.74ea2eb7.cohuck@redhat.com>
-	<5b77ec9c-41b8-2e32-ce79-d9005b93fdd0@linux.ibm.com>
-	<20180607115442.6a779ed9.cohuck@redhat.com>
-	<86d57698-3ea7-a390-2217-07c6d41ca9ed@linux.ibm.com>
+	(envelope-from <imammedo@redhat.com>) id 1fRGRk-0001DC-4Z
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:24:51 -0400
+Date: Fri, 8 Jun 2018 14:24:42 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180608142442.0d97b7c6@redhat.com>
+In-Reply-To: <5dda6237-88d8-f0f8-58d2-af996368cea4@redhat.com>
+References: <20180517081527.14410-1-david@redhat.com>
+	<20180517081527.14410-5-david@redhat.com>
+	<20180530150806.061c26b9@redhat.com>
+	<5dcb16e5-b9b9-d07d-dfe3-98724e911f83@redhat.com>
+	<20180531161310.52ea9507@redhat.com>
+	<e451e0d6-a181-b027-cdb7-f44beb11b37c@redhat.com>
+	<20180607154455.6eab4e24@redhat.com>
+	<5dda6237-88d8-f0f8-58d2-af996368cea4@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
- subchannel
+Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
+ hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,116 +30,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-On Thu, 7 Jun 2018 18:37:16 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+On Thu, 7 Jun 2018 16:00:54 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> On 07/06/2018 11:54, Cornelia Huck wrote:
+> On 07.06.2018 15:44, Igor Mammedov wrote:
+> > On Mon, 4 Jun 2018 13:27:01 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 31.05.2018 16:13, Igor Mammedov wrote:  
+> >>> On Wed, 30 May 2018 16:13:32 +0200
+> >>> David Hildenbrand <david@redhat.com> wrote:
+> >>>     
+> >>>> On 30.05.2018 15:08, Igor Mammedov wrote:    
+> >>>>> On Thu, 17 May 2018 10:15:17 +0200
+> >>>>> David Hildenbrand <david@redhat.com> wrote:
+> >>>>>       
+> >>>>>> For multi stage hotplug handlers, we'll have to do some error handling
+> >>>>>> in some hotplug functions, so let's use a local error variable (except
+> >>>>>> for unplug requests).      
+> >>>>> I'd split out introducing local error into separate patch
+> >>>>> so patch would do a single thing.    
+> >>
+> >> I can do that if it makes review easier.
+> >>  
+> >>>>>       
+> >>>>>> Also, add code to pass control to the final stage hotplug handler at the
+> >>>>>> parent bus.      
+> >>>>> But I don't agree with generic
+> >>>>>  "} else if ("dev->parent_bus && dev->parent_bus->hotplug_handler) {"
+> >>>>> forwarding, it's done by 3/14 for generic case and in case of
+> >>>>> special device that needs bus handler called from machine one,
+> >>>>> I'd suggest to do forwarding explicitly for that device only
+> >>>>> like we do with acpi_dev.      
+> >>>>
+> >>>> I decided to do it that way because it is generic and results in nicer
+> >>>> recovery handling (e.g. in case pc_dimm plug fails, we can simply
+> >>>> rollback all (for now MemoryDevice) previous plug operations).    
+> >>> rollback should be managed by the caller of pc_dimm plug
+> >>> directly, so it's not relevant here.
+> >>>     
+> >>>> IMHO, the resulting code is easier to read.
+> >>>>
+> >>>> From this handling it is clear that
+> >>>> "if we reach the hotplug handler, and it is not some special device
+> >>>> plugged by the machine (CPU, PC_DIMM), pass it on to the actual hotplug
+> >>>> handler if any exists"    
+> >>> I strongly disagree with that it's easier to deal with.
+> >>> You are basically duplicating already generalized code
+> >>> from qdev_get_hotplug_handler() back into boards.
+> >>>
+> >>> If a device doesn't have to be handled by machine handler,
+> >>> than qdev_get_hotplug_handler() must return its bus handler
+> >>> if any directly. So branch in question that your are copying
+> >>> is a dead one, pls drop it.    
+> >>
+> >> We forward selected (pc_get_hotpug_handler()) devices to the
+> >> right hotplug handler. Nothing wrong about that. I don't agree
+> >> with "basically duplicating already generalized code" wrong.
+> >> We have to forward at some place. Your idea simply places that
+> >> code at some other place.
+> >>
+> >>
+> >> But I think we have to get the general idea sorted out first.
+> >>
+> >> What you have in mind (e.g. plug):
+> >>
+> >> if (TYPE_MEMORY_DEVICE) {
+> >> 	memory_device_plug();
+> >> 	if (local_err) {
+> >> 		goto out;
+> >> 	}
+> >>
+> >> 	if (TYPE_PC_DIMM) {
+> >> 		pc_dimm_plug(hotplug_dev, dev, &local_err);
+> >> 	} else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+> >> 		hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
+> >> 	}
+> >> 	if (local_err) {
+> >> 		memory_device_unplug()
+> >> 		goto out;
+> >> 	}
+> >> } else if (TYPE_CPU)
+> >> ...
+> >>
+> >>
+> >> What I have in mind (and implemented in this series):
+> >>
+> >>
+> >> if (TYPE_MEMORY_DEVICE) {
+> >> 	memory_device_plug();
+> >> }
+> >> /* possibly other interfaces */
+> >> if (local_err) {
+> >> 	error_handling();
+> >> 	return;
+> >> }
+> >>
+> >> if (TYPE_PC_DIMM) {
+> >> 	pc_dimm_plug(hotplug_dev, dev, &local_err);
+> >> } ...
+> >> } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+> >> 	hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
+> >> }  
+> > I don't like this implicit wiring, where reader of this part of code
+> > has no idea that TYPE_MEMORY_DEVICE might be also bus device that needs
+> > request forwarding.
+> > I'd prefer [pre/un]plug handlers be concrete and explicit spaghetti code,
+> > something like this:
+> > 
+> > if (TYPE_PC_DIMM) {
+> >     pc_dimm_plug()
+> >     /* do here additional concrete machine specific things */
+> > } else if (TYPE_VIRTIO_MEM) {
+> >     virtio_mem_plug() <- do forwarding in there
+> >     /* and do here additional concrete machine specific things */
+> > } else if (TYPE_CPU) {
+> >     cpu_plug()
+> >     /* do here additional concrete machine specific things */
+> > }  
+> 
+> That will result in a lot of duplicate code - for every machine we
+> support (dimm/virtio-mem/virtio-pmem/*add more memory devices here*) -
+> virtio-mem and virtio-pmem could most probably share the code.
+maybe or maybe not, depending on if pmem endups as memory device or
+separate controller. And even with duplication, machine code would
+be easy to follow just down one explicit call chain.
 
-> > --------------
-> > |   scsw(g)  |  ssch
-> > --------------   |
-> >                   |                                       guest
-> > --------------------------------------------------------------
-> >                   |                                        qemu
-> > --------------   v
-> > |   scsw(q)  | emulate
-> > --------------   |
-> >                   |
-> > --------------   v
-> > |   scsw(r)  | pwrite()
-> > --------------   |
-> >                   |
-> > --------------------------------------------------------------
-> >                   |                                        vfio
-> >                   v
-> >                  ssch
-> >                   |
-> > --------------------------------------------------------------
-> >                   |                                    hardware
-> > --------------   v
-> > |   scsw(h)  | actually do something
-> > --------------
-> >
-> > The guest issues a ssch (which gets intercepted; it won't get control
-> > back until ssch finishes with a cc set.) scsw(g) won't change, unless
-> > the guest does a stsch for the subchannel on another vcpu, in which
-> > case it will get whatever information qemu holds in scsw(q) at that
-> > point in time.
-> >
-> > When qemu starts to emulate the guest's ssch, it will set the start
-> > function bit in the fctl field of scsw(q). It then copies scsw(q) to
-> > scsw(r) in the vfio region.
-> >
-> > The vfio code will then proceed to call ssch on the real subchannel.
-> > This is the first time we get really asynchronous, as the ssch will
-> > return with cc set and the start function will be performed at some
-> > point in time. If we would do a stsch on the real subchannel, we would
-> > see that scsw(h) now has the start function bit set.
-> >
-> > Currently, we won't return back up the chain until we get an interrupt
-> > from the hardware, at which time we update the scsw(r) from the irb.  
 > 
-> I do not find where the thread waits for interrupt inside the
-> write->fsm_io_request->fsm_io_helper->ssch chain.
-> 
-> I must have miss it ten times. Can you point it to me?
-
-I'm not surprised you did not find it, because it isn't there :)
-
-I've let myself be confused by the /* Start channel program and wait
-for I/O interrupt. */ comment -- it is wrong and should be removed (but
-we did have that waiting initially). So we already have the async
-situation :)
-
-> 
-> > This will propagate into the scsw(q). At the time we finish handling
-> > the guest's ssch and return control to it, we're all done and if the
-> > guest does a stsch to update its scsw(g), it will get the current
-> > scsw(q) which will already contain the scsw from the interrupt's irb
-> > (indicating that the start function is already finished).
-> >
-> > Now let's imagine we have a future implementation that handles actually
-> > performing the start on the hardware asynchronously, i.e. it returns
-> > control to the guest without the interrupt having been posted (let's
-> > say that it is a longer-running I/O request). If the guest now did a
-> > stsch to update scsw(g), it would get the current state of scsw(q),
-> > which would be "start function set, but not done yet".
-> >
-> > If the guest now does a hsch, it would trap in the same way as the ssch
-> > before. When qemu gets control, it adds the halt bit in scsw(q) (which
-> > is in accordance with the architecture).  
-> 
-> This I agree.
-> The scsw(q) is part of the QEMU device.
-> 
-> >   My proposal is to do the same
-> > copying to scsw(r) again, which would mean we get a request with both
-> > the halt and the start bit set. The vfio code now needs to do a hsch
-> > (instead of a ssch). The real channel subsystem should figure this out,
-> > as we can't reliably check whether the start function has concluded
-> > already (there's always a race window).  
-> 
-> This I do not agree scsw(r) is part of the driver.
-> The interface here is not a device interface anymore but a driver 
-> interface.
-> SCSW is a status, it is at its place in QEMU device interface with the 
-> guest
-> but here pwrite() sends a command.
-
-Hm, I rather consider that "we write a status, and the backend figures
-out what to do based on that status".
-
+> >   
+> >> if (local_err) {
+> >> 	if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+> >> 		memory_device_unplug()
+> >> 	}
+> >> 	/* possibly other interfaces */
+> >> }
+> >> ...
+> >>
+> >>
+> >> I claim that my variant is more generic because:
+> >> - it easily supports multiple interfaces (like MemoryDevice)
+> >>   per Device that need a hotplug handler call
+> >> - there is only one call to hotplug_handler_plug() in case we
+> >>   add similar handling for another device  
+> > As someone said "one more layer of indirection would solve problem".
+> > But then one would have a clue how it works after a while (including
+> > author of the feature).
+> > I don't think we have a problem here and need generalization.
+> >   
+> >>
+> >> Apart from that they do exactly the same thing.
+> >>  
+> >   
 > 
 > 
-> Since we do not do a STSCH on each command, scsw(q), should be
-> updated by QEMU depending on syscall return value.
-> This is not done currently, only the success path is right
-> because it is set before the call.
-> 
-> If I read right and the IRQ is asynchronous, the scsw(q) is not right,
-> because not updated, after the interrupt is received from the guest.
-
-Yes, we're probably missing some updates.
