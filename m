@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34739)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fRFpn-0000ib-EY
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:45:36 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fRFqh-00014R-Ua
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:46:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fRFpk-0002i3-9q
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:45:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48478)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fRFpk-0002hp-1L
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:45:32 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fRFpj-0006l5-1h
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 11:45:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 00B8B2E80C9
-	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 11:45:31 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1fRFqe-00035f-On
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:46:31 -0400
+Resent-Message-Id: <E1fRFqe-00035f-On@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21081)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fRFqe-00035B-Ee
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:46:28 -0400
+In-Reply-To: <20180608112001.14729-1-kraxel@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152845744972.456.1789810180257987315@d39dc562802a>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 08 Jun 2018 11:31:41 -0000
-From: Thomas Huth <1467240@bugs.launchpad.net>
-Reply-To: Bug 1467240 <1467240@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150621112608.24532.97250.malonedeb@gac.canonical.com>
-Message-Id: <152845750167.20327.10198078513155275296.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1467240] Re: Regression - bridged networking
- broken for Mac OS X guest
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 8 Jun 2018 04:30:50 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] ramfb: simple boot framebuffer,
+ no legacy vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: kraxel@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com, lersek@redhat.com, rth@twiddle.net
 
-Patch had been included here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D5df6a1855b62dc6535
-
-** Changed in: qemu
-       Status: New =3D> Fix Released
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1467240
-
-Title:
-  Regression - bridged networking broken for Mac OS X guest
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Using the instructions at
-  http://www.contrib.andrew.cmu.edu/~somlo/OSXKVM/ for running Mac OS X
-  Snow Leopard under QEMU, bridged networking is broken when using QEMU
-  git. The result is that Mac OS X is unable to obtain an IP address
-  using DHCP. It works in the latest stable release - QEMU 2.3.0.
-
-  Replace "-netdev user,id=3Dhub0port0" with "-netdev
-  bridge,br=3Dbr0,id=3Dhub0port0" when testing bridged networking.
-
-  Bisecting the git repository shows the following bad commit:
-  commit a90a7425cf592a3afeff3eaf32f543b83050ee5c
-  Author: Fam Zheng <famz@redhat.com>
-  Date:   Thu Jun 4 14:45:17 2015 +0800
-
-      tap: Drop tap_can_send
-
-      This callback is called by main loop before polling s->fd, if it retu=
-rns
-      false, the fd will not be polled in this iteration.
-
-      This is redundant with checks inside read callback. After this patch,
-      the data will be sent to peer when it arrives. If the device can't
-      receive, it will be queued to incoming_queue, and when the device sta=
-tus
-      changes, this queue will be flushed.
-
-      Signed-off-by: Fam Zheng <famz@redhat.com>
-      Message-id: 1433400324-7358-7-git-send-email-famz@redhat.com
-      Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1467240/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjA4MTEyMDAxLjE0NzI5LTEta3JheGVsQHJlZGhhdC5jb20KU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwLzZdIHJhbWZiOiBzaW1wbGUgYm9vdCBmcmFtZWJ1
+ZmZlciwgbm8gbGVnYWN5IHZnYQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
+aAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAt
+bCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
+Z29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVy
+c2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFU
+Q0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAh
+IGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAg
+bj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVw
+ZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRw
+czovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICAgYTY3NGRhMGFiNy4uYmFjNWJh
+M2RjNSAgbWFzdGVyICAgICAtPiBtYXN0ZXIKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0
+Y2hldy8yMDE4MDYwODExMjAwMS4xNDcyOS0xLWtyYXhlbEByZWRoYXQuY29tIC0+IHBhdGNoZXcv
+MjAxODA2MDgxMTIwMDEuMTQ3MjktMS1rcmF4ZWxAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5l
+dyBicmFuY2ggJ3Rlc3QnCmIzYjc2OGJkY2YgYm9jaHMtZGlzcGxheTogZW5hYmxlIHZnYWJpb3MK
+YmUwOGVkMTRiZSByYW1mYjogZW5hYmxlIHZnYWJpb3MKZjJmMjA2OTYyNSBody92ZmlvL2Rpc3Bs
+YXk6IGFkZCByYW1mYiBzdXBwb3J0CjcxN2VkYjJmNGQgaHcvZGlzcGxheTogYWRkIHZpcnRpby1y
+YW1mYiBkZXZpY2UKY2ZiODdjOWIzYiBody9kaXNwbGF5OiBhZGQgc3RhbmRhbG9uZSByYW1mYiBk
+ZXZpY2UKYWRkMzljZTUxOCBody9kaXNwbGF5OiBhZGQgcmFtZmIsIGEgc2ltcGxlIGJvb3QgZnJh
+bWVidWZmZXIgbGl2aW5nIGluIGd1ZXN0IHJhbQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tp
+bmcgUEFUQ0ggMS82OiBody9kaXNwbGF5OiBhZGQgcmFtZmIsIGEgc2ltcGxlIGJvb3QgZnJhbWVi
+dWZmZXIgbGl2aW5nIGluIGd1ZXN0IHJhbS4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
+ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0MTogCm5ldyBm
+aWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEwOSBsaW5lcyBj
+aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBB
+VENIIDIvNjogaHcvZGlzcGxheTogYWRkIHN0YW5kYWxvbmUgcmFtZmIgZGV2aWNlLi4uCldBUk5J
+Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
+ZCB1cGRhdGluZz8KIzcxOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
+MSB3YXJuaW5ncywgMTQxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy82OiBody9kaXNwbGF5OiBhZGQgdmlydGlvLXJh
+bWZiIGRldmljZS4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
+b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzMjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
+Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE1NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
+dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvNjogaHcvdmZp
+by9kaXNwbGF5OiBhZGQgcmFtZmIgc3VwcG9ydC4uLgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNl
+c3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiMzMTogRklMRTogaHcvdmZpby9k
+aXNwbGF5LmM6MTg3OgorICAgIGlmIChzdHJjbXAob2JqZWN0X2dldF90eXBlbmFtZShPQkpFQ1Qo
+dmRldikpLCAidmZpby1wY2ktcmFtZmIiKSA9PSAwKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7fSBh
+cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNTA6IEZJTEU6IGh3
+L3ZmaW8vZGlzcGxheS5jOjMxMToKKyAgICBpZiAoc3RyY21wKG9iamVjdF9nZXRfdHlwZW5hbWUo
+T0JKRUNUKHZkZXYpKSwgInZmaW8tcGNpLXJhbWZiIikgPT0gMCkKWy4uLl0KCnRvdGFsOiAyIGVy
+cm9ycywgMCB3YXJuaW5ncywgNzIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS82OiByYW1mYjogZW5hYmxlIHZnYWJp
+b3MuLi4KQ2hlY2tpbmcgUEFUQ0ggNi82OiBib2Nocy1kaXNwbGF5OiBlbmFibGUgdmdhYmlvcy4u
+Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+LS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRj
+aGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVk
+aGF0LmNvbQ==
