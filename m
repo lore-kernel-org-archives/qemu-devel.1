@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fRJoG-00056A-Tz
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:00:18 -0400
+	(envelope-from <mst@redhat.com>) id 1fRJrD-0007Ej-IJ
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:03:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fRJoB-0007rQ-8W
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:00:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45962 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fRJr8-0001ga-PT
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:03:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46264 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fRJoB-0007rA-3w
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:00:11 -0400
-Date: Fri, 8 Jun 2018 19:00:09 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fRJr8-0001g6-Jx
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:03:14 -0400
+Date: Fri, 8 Jun 2018 19:03:10 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180608185945-mutt-send-email-mst@kernel.org>
+Message-ID: <20180608190040-mutt-send-email-mst@kernel.org>
 References: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
-	<20180607223111.27792-3-ross.zwisler@linux.intel.com>
-	<20180608021134-mutt-send-email-mst@kernel.org>
-	<5b2dafa6-1206-bef3-10d7-eac9910baa85@redhat.com>
+	<20180607223111.27792-2-ross.zwisler@linux.intel.com>
+	<20180608020724-mutt-send-email-mst@kernel.org>
+	<5352d2fb-9244-78b0-4f4b-2818359a4425@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5b2dafa6-1206-bef3-10d7-eac9910baa85@redhat.com>
-Subject: Re: [Qemu-devel] [qemu PATCH 3/5] hw/i386: Update SSDT table used
- by "make check"
+In-Reply-To: <5352d2fb-9244-78b0-4f4b-2818359a4425@redhat.com>
+Subject: Re: [Qemu-devel] [qemu PATCH 2/5] acpi: "make check" should fail on
+ asl mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Cornelia Huck <cohuck@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
-On Fri, Jun 08, 2018 at 09:24:49AM -0500, Eric Blake wrote:
-> On 06/07/2018 06:14 PM, Michael S. Tsirkin wrote:
-> > On Thu, Jun 07, 2018 at 04:31:09PM -0600, Ross Zwisler wrote:
-> > > This commit:
-> > > 
-> > > commit aa78a16d8645 ("hw/i386: Rename 2.13 machine types to 3.0")
-> > > 
-> > > updated the name used to create the q35 machine, which in turn changed the
-> > > SSDT table which is generated when we run "make check":
-> > > 
-> > >    acpi-test: Warning! SSDT mismatch. Actual [asl:/tmp/asl-QZDWJZ.dsl,
-> > >    aml:/tmp/aml-T8JYJZ], Expected [asl:/tmp/asl-DTWVJZ.dsl,
-> > >    aml:tests/acpi-test-data/q35/SSDT.dimmpxm].
-> > > 
-> > > Here's the only difference, aside from the checksum:
-> > > 
-> > >    <     Name (MEMA, 0x07FFF000)
-> > >    ---
-> > >    >     Name (MEMA, 0x07FFE000)
+On Fri, Jun 08, 2018 at 07:17:51AM +0200, Thomas Huth wrote:
+> On 08.06.2018 01:09, Michael S. Tsirkin wrote:
+> > On Thu, Jun 07, 2018 at 04:31:08PM -0600, Ross Zwisler wrote:
+> >> Currently if "make check" detects a mismatch in the ASL generated during
+> >> testing, we print an error such as:
+> >>
+> >>   acpi-test: Warning! SSDT mismatch. Actual [asl:/tmp/asl-QZDWJZ.dsl,
+> >>   aml:/tmp/aml-T8JYJZ], Expected [asl:/tmp/asl-DTWVJZ.dsl,
+> >>   aml:tests/acpi-test-data/q35/SSDT.dimmpxm].
+> >>
+> >> but the testing still exits with good shell status.  This is wrong, and
+> >> makes bisecting such a failure difficult.
+> >>
+> >> Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
 > > 
-> > Weird. How come the phys address changes just because of machine name?
+> > Failing would also mean that any change must update the expected files
+> > at the same time.  And that in turn is problematic because expected
+> > files are binary and can't be merged.
+> > 
+> > In other words the way we devel ACPI right now means that bisect will
+> > periodically produce a diff, it's not an error.
 > 
-> "2.13" is a different length than "3.0"; depending on whatever other
-> alignment coincidences or sharing of similar substrings are in place, this
-> obviously shuffled enough data that the one byte change then reflects into
-> an entire page boundary difference.
+> But apparently the current way also allows that real bug go unnoticed
+> for a while, until somebody accidentially spots the warning in the
+> output of "make check". Wouldn't it be better to fail at CI time
+> already? If a merge of the file is required, you can still resolve that
+> manually (i.e. by rebasing one of the pull requests).
+> 
+>  Thomas
 
-I don't think we expose the version number to guests though - do we?
+Pull requests are somewhat different, they are usually tested for lack
+of warnings. This change didn't arrive as a result of a pull request
+maybe that's why it slipped through the cracks. Peter?
 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+Maybe we need a "pedantic" flag to fail on any warnings, or just catch
+output to stderr.
+
+-- 
+MST
