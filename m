@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fRLhq-0005PN-5M
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:01:47 -0400
+	(envelope-from <patryk@fala.ehost.pl>) id 1fRLoj-0002RK-7s
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:08:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fRLhm-00070u-9H
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:01:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48452)
+	(envelope-from <patryk@fala.ehost.pl>) id 1fRLog-0001fu-0y
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:08:53 -0400
+Received: from s16.ehost.pl ([193.143.77.16]:37622)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fRLhm-00070i-2q
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:01:42 -0400
-Date: Fri, 8 Jun 2018 15:01:39 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180608180139.GM7451@localhost.localdomain>
-References: <20180606192731.6910-1-f4bug@amsat.org>
-	<20180606200513.GY7451@localhost.localdomain>
-	<6a527693-33e6-813b-9fc5-b114aacc7668@amsat.org>
-	<ff4501f9-f45e-dc96-9f02-861458fee39b@redhat.com>
+	(Exim 4.71) (envelope-from <patryk@fala.ehost.pl>)
+	id 1fRLof-0001fR-LP
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:08:49 -0400
+References: <20180531171253.21012-1-pbonzini@redhat.com>
+	<20180531171606.21604-1-pbonzini@redhat.com>
+	<20180531171606.21604-14-pbonzini@redhat.com>
+	<20180608193905.0841f4d5@bahia.lan>
+From: Patryk Olszewski <patryk@fala.ehost.pl>
+Message-ID: <372f6a74-61c9-c234-2751-e16012312dc5@fala.ehost.pl>
+Date: Fri, 8 Jun 2018 20:08:46 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180608193905.0841f4d5@bahia.lan>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ff4501f9-f45e-dc96-9f02-861458fee39b@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2] qmp.py: Fix exception parsing
- partial JSON
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PULL 52/53] char: Remove unwanted crlf conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +31,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+To: Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Fri, Jun 08, 2018 at 07:57:55PM +0200, Luk=C3=A1=C5=A1 Doktor wrote:
-> Hello guys,
->=20
-> Dne 7.6.2018 v 01:06 Philippe Mathieu-Daud=C3=A9 napsal(a):
-> > On 06/06/2018 05:05 PM, Eduardo Habkost wrote:
-> >> On Wed, Jun 06, 2018 at 04:27:31PM -0300, Philippe Mathieu-Daud=C3=A9=
- wrote:
-> >>> The readline() call returns partial data.
-> >>
-> >> How can this be reproduced?  Despite not being forbidden by the
-> >> QMP specification, QEMU normally doesn't break QMP replies in
-> >> multiple lines, and readline() is not supposed to return a
-> >> partial line unless it encounters EOF.
-> >=20
-> > $ git rev-parse HEAD
-> > c1c2a435905ae76b159c573b0c0d6f095b45ebc6
-> >=20
-> > config copy/pasted from:
-> > https://wiki.qemu.org/index.php/Documentation/QMP#Trying_it
-> > (now looking at it, it seems I'm mixing configs...)
-> >=20
-> > $ cat qmp.conf
-> > [chardev "qmp"]
-> >   backend =3D "socket"
-> >   path =3D "/tmp/qmp.sock"
-> >   server =3D "on"
-> >   wait =3D "off"
-> > [mon "qmp"]
-> >   mode =3D "control"
-> >   chardev =3D "qmp"
-> >   pretty =3D "on"
-> >=20
->=20
-> nice, pretty printing..., didn't expected that.
+W dniu 08.06.2018 o 19:39, Greg Kurz pisze:
+> On Thu, 31 May 2018 19:16:05 +0200
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>> From: Patryk Olszewski <patryk@fala.ehost.pl>
+>>
+>> This patch fixes a bug in serial that made it almost impossible for guest
+>> to communicate with devices through host's serial.
+>>
+>> OPOST flag in c_oflag enables output processing letting other flags in
+>> c_oflag take effect. Usually in c_oflag ONLCR flag is also set, which
+>> causes crlf to be sent in place of lf. This breaks binary transmissions.
+>> Unsetting OPOST flag turns off any output processing which fixes the bug.
+>>
+> But it damages error reporting...
+>
+> Without this patch:
+>
+> $ qemu-system-ppc64 -serial stdio -kernel foo
+> foo: No such file or directory
+> qemu-system-ppc64: error loading foo: Failed to load ELF
+> $
+>
+> With this patch:
+>
+> $ .mbuild-ppc-for-3.0/obj/ppc64-softmmu/qemu-system-ppc64 -serial stdio -kernel foo
+> foo: No such file or directory
+>                               qemu-system-ppc64: error loading foo: Failed to load ELF
+>                                                                                       $
+>
+> It is possible to patch vreport() to append an explicit CR:
+>
+>      error_vprintf(fmt, ap);
+> -    error_printf("\n");
+> +    error_printf("\n\r");
+>  }
+>
+> but it only fixes the trailing newline of error_report(). Any other newline,
+> eg when using error_append_hint(), will lack the CR... Not sure how to fix
+> this :-\
+>
+>> Bug reports related:
+>> https://bugs.launchpad.net/qemu/+bug/1772086
+>> https://bugs.launchpad.net/qemu/+bug/1407813
+>> https://bugs.launchpad.net/qemu/+bug/1715296
+>> also
+>> https://lists.nongnu.org/archive/html/qemu-devel/2006-06/msg00196.html
+>>
+>> Signed-off-by: Patryk Olszewski <patryk@fala.ehost.pl>
+>> Message-Id: <1527105041-21013-1-git-send-email-patryk@fala.ehost.pl>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  chardev/char-serial.c | 2 +-
+>>  chardev/char-stdio.c  | 2 +-
+>>  2 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/chardev/char-serial.c b/chardev/char-serial.c
+>> index feb52e559d..ae548d28da 100644
+>> --- a/chardev/char-serial.c
+>> +++ b/chardev/char-serial.c
+>> @@ -139,7 +139,7 @@ static void tty_serial_init(int fd, int speed,
+>>  
+>>      tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
+>>                       | INLCR | IGNCR | ICRNL | IXON);
+>> -    tty.c_oflag |= OPOST;
+>> +    tty.c_oflag &= ~OPOST;
+>>      tty.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+>>      tty.c_cflag &= ~(CSIZE | PARENB | PARODD | CRTSCTS | CSTOPB);
+>>      switch (data_bits) {
+>> diff --git a/chardev/char-stdio.c b/chardev/char-stdio.c
+>> index 96375f2ab8..d83e60e787 100644
+>> --- a/chardev/char-stdio.c
+>> +++ b/chardev/char-stdio.c
+>> @@ -59,7 +59,7 @@ static void qemu_chr_set_echo_stdio(Chardev *chr, bool echo)
+>>      if (!echo) {
+>>          tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
+>>                           | INLCR | IGNCR | ICRNL | IXON);
+>> -        tty.c_oflag |= OPOST;
+>> +        tty.c_oflag &= ~OPOST;
+>>          tty.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN);
+>>          tty.c_cflag &= ~(CSIZE | PARENB);
+>>          tty.c_cflag |= CS8;
 
-Oh, so *that*'s the root cause.  Thanks, I stared at this
-configuration for a while and I couldn't see what could cause
-extra newlines to appear in the output.  :)
-
-[...]
-> >>> I'm sure there is a nicer/more pythonic way to do this, but this wo=
-rks for me,
-> >>> sorry :)
-> >>
-> >> It looks like there's no elegant solution for this:
-> >> https://stackoverflow.com/a/21709058
-> >>
->=20
-> Yep, that looks nicer, but even the original solution should
-> not be that bad as it should be rarely used. What troubles me
-> more is the possible infinite loop. Would you mind adding a
-> timeout?
-
-We already have a socket timeout, so I assume this is alrady
-covered?
-
---=20
-Eduardo
+The change to char-stdio.c wasn't actually introduced by me.
+(https://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg05416.html).
+Anyway, I haven't yet investigated it thoroughly but right now I think the problem is with that error reporting system. After all serial device shouldn't alter data coming from the guest. You never know when somebody will come up with crazy idea of pushing binary data through stdout.
