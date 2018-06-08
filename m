@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fRGXw-00085e-4F
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:31:12 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fRGXv-00085Q-SZ
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:31:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fRGXt-00056y-09
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:31:12 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fRGXp-00050j-JV
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:31:11 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri,  8 Jun 2018 09:29:47 -0300
-Message-Id: <20180608122952.2009-6-ehabkost@redhat.com>
+Date: Fri,  8 Jun 2018 09:29:44 -0300
+Message-Id: <20180608122952.2009-3-ehabkost@redhat.com>
 In-Reply-To: <20180608122952.2009-1-ehabkost@redhat.com>
 References: <20180608122952.2009-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 05/10] python: futurize -f
- lib2to3.fixes.fix_standarderror
+Subject: [Qemu-devel] [PATCH v2 02/10] python: futurize -f
+ libfuturize.fixes.fix_absolute_import
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,7 +23,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Rename StandardError to Exception.
+Make implicit relative imports explicit and add "from __future__ import
+absolute_import" at the top of each relevant module.
 
 This is necessary for Python 3 compatibility.
 
@@ -31,44 +32,176 @@ Done using:
 
   $ py=$( (g grep -l -E '^#!.*python';find -name '*.py' -printf '%P\n';) | \
     sort -u | grep -v README.sh4)
-  $ futurize -w -f lib2to3.fixes.fix_standarderror $py
+  $ futurize -w -f libfuturize.fixes.fix_absolute_import $py
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/qmp/qemu-ga-client | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Changes v1 -> v2:
+* Moved "from __future__ import" line after copyright header
+---
+ scripts/qmp/qemu-ga-client           | 3 ++-
+ scripts/qmp/qmp                      | 3 ++-
+ scripts/qmp/qmp-shell                | 3 ++-
+ scripts/qmp/qom-fuse                 | 3 ++-
+ scripts/qmp/qom-get                  | 3 ++-
+ scripts/qmp/qom-list                 | 3 ++-
+ scripts/qmp/qom-set                  | 3 ++-
+ scripts/qmp/qom-tree                 | 3 ++-
+ tests/image-fuzzer/qcow2/__init__.py | 3 ++-
+ tests/image-fuzzer/qcow2/layout.py   | 3 ++-
+ 10 files changed, 20 insertions(+), 10 deletions(-)
 
 diff --git a/scripts/qmp/qemu-ga-client b/scripts/qmp/qemu-ga-client
-index 6045fcd3f2..976e69e05f 100755
+index 8510814683..6045fcd3f2 100755
 --- a/scripts/qmp/qemu-ga-client
 +++ b/scripts/qmp/qemu-ga-client
-@@ -137,7 +137,7 @@ class QemuGuestAgentClient:
+@@ -37,10 +37,11 @@
+ #
  
-     def fsfreeze(self, cmd):
-         if cmd not in ['status', 'freeze', 'thaw']:
--            raise StandardError('Invalid command: ' + cmd)
-+            raise Exception('Invalid command: ' + cmd)
+ from __future__ import print_function
++from __future__ import absolute_import
+ import base64
+ import random
  
-         return getattr(self.qga, 'fsfreeze' + '_' + cmd)()
+-import qmp
++from . import qmp
  
-@@ -146,7 +146,7 @@ class QemuGuestAgentClient:
  
-     def suspend(self, mode):
-         if mode not in ['disk', 'ram', 'hybrid']:
--            raise StandardError('Invalid mode: ' + mode)
-+            raise Exception('Invalid mode: ' + mode)
+ class QemuGuestAgent(qmp.QEMUMonitorProtocol):
+diff --git a/scripts/qmp/qmp b/scripts/qmp/qmp
+index 16d3bdb6fe..4d2be4e98a 100755
+--- a/scripts/qmp/qmp
++++ b/scripts/qmp/qmp
+@@ -11,8 +11,9 @@
+ # See the COPYING file in the top-level directory.
  
-         try:
-             getattr(self.qga, 'suspend' + '_' + mode)()
-@@ -157,7 +157,7 @@ class QemuGuestAgentClient:
+ from __future__ import print_function
++from __future__ import absolute_import
+ import sys, os
+-from qmp import QEMUMonitorProtocol
++from .qmp import QEMUMonitorProtocol
  
-     def shutdown(self, mode='powerdown'):
-         if mode not in ['powerdown', 'halt', 'reboot']:
--            raise StandardError('Invalid mode: ' + mode)
-+            raise Exception('Invalid mode: ' + mode)
+ def print_response(rsp, prefix=[]):
+     if type(rsp) == list:
+diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
+index b1cc7e2271..38c99d8f72 100755
+--- a/scripts/qmp/qmp-shell
++++ b/scripts/qmp/qmp-shell
+@@ -66,7 +66,8 @@
+ # sent to QEMU, which is useful for debugging and documentation generation.
  
-         try:
-             self.qga.shutdown(mode=mode)
+ from __future__ import print_function
+-import qmp
++from __future__ import absolute_import
++from . import qmp
+ import json
+ import ast
+ import readline
+diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
+index 5c6754aa63..b75aa72767 100755
+--- a/scripts/qmp/qom-fuse
++++ b/scripts/qmp/qom-fuse
+@@ -11,11 +11,12 @@
+ # the COPYING file in the top-level directory.
+ ##
+ 
++from __future__ import absolute_import
+ import fuse, stat
+ from fuse import Fuse
+ import os, posix
+ from errno import *
+-from qmp import QEMUMonitorProtocol
++from .qmp import QEMUMonitorProtocol
+ 
+ fuse.fuse_python_api = (0, 2)
+ 
+diff --git a/scripts/qmp/qom-get b/scripts/qmp/qom-get
+index 291c8bfbc2..6313f27e8e 100755
+--- a/scripts/qmp/qom-get
++++ b/scripts/qmp/qom-get
+@@ -12,9 +12,10 @@
+ ##
+ 
+ from __future__ import print_function
++from __future__ import absolute_import
+ import sys
+ import os
+-from qmp import QEMUMonitorProtocol
++from .qmp import QEMUMonitorProtocol
+ 
+ cmd, args = sys.argv[0], sys.argv[1:]
+ socket_path = None
+diff --git a/scripts/qmp/qom-list b/scripts/qmp/qom-list
+index cd907bb81f..80b0a3d1be 100755
+--- a/scripts/qmp/qom-list
++++ b/scripts/qmp/qom-list
+@@ -12,9 +12,10 @@
+ ##
+ 
+ from __future__ import print_function
++from __future__ import absolute_import
+ import sys
+ import os
+-from qmp import QEMUMonitorProtocol
++from .qmp import QEMUMonitorProtocol
+ 
+ cmd, args = sys.argv[0], sys.argv[1:]
+ socket_path = None
+diff --git a/scripts/qmp/qom-set b/scripts/qmp/qom-set
+index fbe4b3e471..cbffb65880 100755
+--- a/scripts/qmp/qom-set
++++ b/scripts/qmp/qom-set
+@@ -12,9 +12,10 @@
+ ##
+ 
+ from __future__ import print_function
++from __future__ import absolute_import
+ import sys
+ import os
+-from qmp import QEMUMonitorProtocol
++from .qmp import QEMUMonitorProtocol
+ 
+ cmd, args = sys.argv[0], sys.argv[1:]
+ socket_path = None
+diff --git a/scripts/qmp/qom-tree b/scripts/qmp/qom-tree
+index 0ffd1ff1de..ad4be233e6 100755
+--- a/scripts/qmp/qom-tree
++++ b/scripts/qmp/qom-tree
+@@ -14,9 +14,10 @@
+ ##
+ 
+ from __future__ import print_function
++from __future__ import absolute_import
+ import sys
+ import os
+-from qmp import QEMUMonitorProtocol
++from .qmp import QEMUMonitorProtocol
+ 
+ cmd, args = sys.argv[0], sys.argv[1:]
+ socket_path = None
+diff --git a/tests/image-fuzzer/qcow2/__init__.py b/tests/image-fuzzer/qcow2/__init__.py
+index e2ebe19311..09ef59821b 100644
+--- a/tests/image-fuzzer/qcow2/__init__.py
++++ b/tests/image-fuzzer/qcow2/__init__.py
+@@ -1 +1,2 @@
+-from layout import create_image
++from __future__ import absolute_import
++from .layout import create_image
+diff --git a/tests/image-fuzzer/qcow2/layout.py b/tests/image-fuzzer/qcow2/layout.py
+index 63e801f4e8..675877da96 100644
+--- a/tests/image-fuzzer/qcow2/layout.py
++++ b/tests/image-fuzzer/qcow2/layout.py
+@@ -16,9 +16,10 @@
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ #
+ 
++from __future__ import absolute_import
+ import random
+ import struct
+-import fuzz
++from . import fuzz
+ from math import ceil
+ from os import urandom
+ from itertools import chain
 -- 
 2.18.0.rc1.1.g3f1ff2140
