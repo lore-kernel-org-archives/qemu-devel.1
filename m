@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58110)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fRFRL-00086M-7s
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:20:22 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fRFRO-000874-Ks
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:20:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fRFRK-0001na-1B
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:20:19 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fRFRL-0001nw-NH
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:20:20 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri,  8 Jun 2018 13:19:58 +0200
-Message-Id: <20180608112001.14729-4-kraxel@redhat.com>
+Date: Fri,  8 Jun 2018 13:19:56 +0200
+Message-Id: <20180608112001.14729-2-kraxel@redhat.com>
 In-Reply-To: <20180608112001.14729-1-kraxel@redhat.com>
 References: <20180608112001.14729-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/6] hw/display: add virtio-ramfb device
+Subject: [Qemu-devel] [PATCH v3 1/6] hw/display: add ramfb,
+ a simple boot framebuffer living in guest ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,189 +23,160 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?L=C3=A1szl=C3=B3=20=C3=89rsek?= <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-Like virtio-vga, but using ramfb instead of legacy vga.
+The boot framebuffer is expected to be configured by the firmware, so it
+uses fw_cfg as interface.  Initialization goes as follows:
 
-Note: Not clear yet whenever this will be ever merged upstream.
-      No clear benefit, given that edk2 has a virtio-gpu driver
-      which doesn't depend on the vga compatibility mode.
+  (1) Check whenever etc/ramfb is present.
+  (2) Allocate framebuffer from RAM.
+  (3) Fill struct RAMFBCfg, write it to etc/ramfb.
 
-      Will keeping it in the devel branch for now, for testing
-      purposes and as playground.
+Done.  You can write stuff to the framebuffer now, and it should appear
+automagically on the screen.
+
+Note that this isn't very efficient because it does a full display
+update on each refresh.  No dirty tracking.  Dirty tracking would have
+to be active for the whole ram slot, so that wouldn't be very efficient
+either.  For a boot display which is active for a short time only this
+isn't a big deal.  As permanent guest display something better should be
+used (if possible).
+
+This is the ramfb core code.  Some windup is needed for display devices
+which want have a ramfb boot display.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/display/virtio-ramfb.c | 149 ++++++++++++++++++++++++++++++++++++++++++++++
- hw/display/Makefile.objs  |   2 +-
- 2 files changed, 150 insertions(+), 1 deletion(-)
- create mode 100644 hw/display/virtio-ramfb.c
+ include/hw/display/ramfb.h |  9 +++++
+ hw/display/ramfb.c         | 95 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/display/Makefile.objs   |  2 +
+ 3 files changed, 106 insertions(+)
+ create mode 100644 include/hw/display/ramfb.h
+ create mode 100644 hw/display/ramfb.c
 
-diff --git a/hw/display/virtio-ramfb.c b/hw/display/virtio-ramfb.c
+diff --git a/include/hw/display/ramfb.h b/include/hw/display/ramfb.h
 new file mode 100644
-index 0000000000..e8ffe66047
+index 0000000000..a3d4c79942
 --- /dev/null
-+++ b/hw/display/virtio-ramfb.c
-@@ -0,0 +1,149 @@
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "hw/pci/pci.h"
-+#include "ui/console.h"
-+#include "hw/virtio/virtio-pci.h"
-+#include "hw/display/ramfb.h"
-+#include "qapi/error.h"
++++ b/include/hw/display/ramfb.h
+@@ -0,0 +1,9 @@
++#ifndef RAMFB_H
++#define RAMFB_H
 +
++/* ramfb.c */
++typedef struct RAMFBState RAMFBState;
++void ramfb_display_update(QemuConsole *con, RAMFBState *s);
++RAMFBState *ramfb_setup(Error **errp);
++
++#endif /* RAMFB_H */
+diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
+new file mode 100644
+index 0000000000..258783fe3b
+--- /dev/null
++++ b/hw/display/ramfb.c
+@@ -0,0 +1,95 @@
 +/*
-+ * virtio-ramfb: This extends VirtioPCIProxy.
++ * early boot framebuffer in guest ram
++ * configured using fw_cfg
++ *
++ * Copyright Red Hat, Inc. 2017
++ *
++ * Author:
++ *     Gerd Hoffmann <kraxel@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + */
-+#define TYPE_VIRTIO_RAMFB "virtio-ramfb"
-+#define VIRTIO_RAMFB(obj) \
-+        OBJECT_CHECK(VirtIORAMFB, (obj), TYPE_VIRTIO_RAMFB)
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/loader.h"
++#include "hw/display/ramfb.h"
++#include "ui/console.h"
++#include "sysemu/sysemu.h"
 +
-+typedef struct VirtIORAMFB {
-+    VirtIOPCIProxy parent_obj;
-+    VirtIOGPU      vdev;
-+    RAMFBState     *ramfb;
-+} VirtIORAMFB;
-+
-+static void virtio_ramfb_invalidate_display(void *opaque)
-+{
-+    VirtIORAMFB *vramfb = opaque;
-+
-+    if (vramfb->vdev.enable) {
-+        virtio_gpu_ops.invalidate(&vramfb->vdev);
-+    }
-+}
-+
-+static void virtio_ramfb_update_display(void *opaque)
-+{
-+    VirtIORAMFB *vramfb = opaque;
-+    VirtIOGPU *g = &vramfb->vdev;
-+
-+    if (vramfb->vdev.enable) {
-+        virtio_gpu_ops.gfx_update(&vramfb->vdev);
-+    } else {
-+        ramfb_display_update(g->scanout[0].con, vramfb->ramfb);
-+    }
-+}
-+
-+static int virtio_ramfb_ui_info(void *opaque, uint32_t idx, QemuUIInfo *info)
-+{
-+    VirtIORAMFB *vramfb = opaque;
-+
-+    if (virtio_gpu_ops.ui_info) {
-+        return virtio_gpu_ops.ui_info(&vramfb->vdev, idx, info);
-+    }
-+    return -1;
-+}
-+
-+static void virtio_ramfb_gl_block(void *opaque, bool block)
-+{
-+    VirtIORAMFB *vramfb = opaque;
-+
-+    if (virtio_gpu_ops.gl_block) {
-+        virtio_gpu_ops.gl_block(&vramfb->vdev, block);
-+    }
-+}
-+
-+static const GraphicHwOps virtio_ramfb_ops = {
-+    .invalidate = virtio_ramfb_invalidate_display,
-+    .gfx_update = virtio_ramfb_update_display,
-+    .ui_info = virtio_ramfb_ui_info,
-+    .gl_block = virtio_ramfb_gl_block,
++struct RAMFBCfg {
++    uint64_t addr;
++    uint32_t fourcc;
++    uint32_t flags;
++    uint32_t width;
++    uint32_t height;
++    uint32_t stride;
 +};
 +
-+static const VMStateDescription vmstate_virtio_ramfb = {
-+    .name = "virtio-ramfb",
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-+    .fields = (VMStateField[]) {
-+        /* no pci stuff here, saving the virtio device will handle that */
-+        /* FIXME */
-+        VMSTATE_END_OF_LIST()
-+    }
++struct RAMFBState {
++    DisplaySurface *ds;
++    uint32_t width, height;
++    struct RAMFBCfg cfg;
 +};
 +
-+/* RAMFB device wrapper around PCI device around virtio GPU */
-+static void virtio_ramfb_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
++static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
 +{
-+    VirtIORAMFB *vramfb = VIRTIO_RAMFB(vpci_dev);
-+    VirtIOGPU *g = &vramfb->vdev;
-+    Error *err = NULL;
-+    int i;
++    RAMFBState *s = dev;
++    void *framebuffer;
++    uint32_t stride, fourcc, format;
++    hwaddr addr, length;
 +
-+    /* init virtio bits */
-+    qdev_set_parent_bus(DEVICE(g), BUS(&vpci_dev->bus));
-+    virtio_pci_force_virtio_1(vpci_dev);
-+    object_property_set_bool(OBJECT(g), true, "realized", &err);
-+    if (err) {
-+        error_propagate(errp, err);
++    s->width  = be32_to_cpu(s->cfg.width);
++    s->height = be32_to_cpu(s->cfg.height);
++    stride    = be32_to_cpu(s->cfg.stride);
++    fourcc    = be32_to_cpu(s->cfg.fourcc);
++    addr      = be64_to_cpu(s->cfg.addr);
++    length    = stride * s->height;
++    format    = qemu_drm_format_to_pixman(fourcc);
++
++    fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
++            s->width, s->height, addr);
++    framebuffer = address_space_map(&address_space_memory,
++                                    addr, &length, false,
++                                    MEMTXATTRS_UNSPECIFIED);
++    if (!framebuffer || length < stride * s->height) {
++        s->width = 0;
++        s->height = 0;
++        return;
++    }
++    s->ds = qemu_create_displaysurface_from(s->width, s->height,
++                                            format, stride, framebuffer);
++}
++
++void ramfb_display_update(QemuConsole *con, RAMFBState *s)
++{
++    if (!s->width || !s->height) {
 +        return;
 +    }
 +
-+    /* init ramfb */
-+    vramfb->ramfb = ramfb_setup(errp);
-+    graphic_console_set_hwops(g->scanout[0].con, &virtio_ramfb_ops, vramfb);
-+
-+    for (i = 0; i < g->conf.max_outputs; i++) {
-+        object_property_set_link(OBJECT(g->scanout[i].con),
-+                                 OBJECT(vpci_dev),
-+                                 "device", errp);
++    if (s->ds) {
++        dpy_gfx_replace_surface(con, s->ds);
++        s->ds = NULL;
 +    }
++
++    /* simple full screen update */
++    dpy_gfx_update_full(con);
 +}
 +
-+static Property virtio_ramfb_properties[] = {
-+    DEFINE_VIRTIO_GPU_PCI_PROPERTIES(VirtIOPCIProxy),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void virtio_ramfb_class_init(ObjectClass *klass, void *data)
++RAMFBState *ramfb_setup(Error **errp)
 +{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VirtioPCIClass *k = VIRTIO_PCI_CLASS(klass);
-+    PCIDeviceClass *pcidev_k = PCI_DEVICE_CLASS(klass);
++    FWCfgState *fw_cfg = fw_cfg_find();
++    RAMFBState *s;
 +
-+    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-+    dc->props = virtio_ramfb_properties;
-+    dc->vmsd = &vmstate_virtio_ramfb;
-+    dc->hotpluggable = false;
++    if (!fw_cfg || !fw_cfg->dma_enabled) {
++        error_setg(errp, "ramfb device requires fw_cfg with DMA");
++        return NULL;
++    }
 +
-+    k->realize = virtio_ramfb_realize;
-+    pcidev_k->class_id = PCI_CLASS_DISPLAY_OTHER;
++    s = g_new0(RAMFBState, 1);
++
++    fw_cfg_add_file_callback(fw_cfg, "etc/ramfb",
++                             NULL, ramfb_fw_cfg_write, s,
++                             &s->cfg, sizeof(s->cfg), false);
++    return s;
 +}
-+
-+static void virtio_ramfb_inst_initfn(Object *obj)
-+{
-+    VirtIORAMFB *dev = VIRTIO_RAMFB(obj);
-+
-+    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
-+                                TYPE_VIRTIO_GPU);
-+}
-+
-+static TypeInfo virtio_ramfb_info = {
-+    .name          = TYPE_VIRTIO_RAMFB,
-+    .parent        = TYPE_VIRTIO_PCI,
-+    .instance_size = sizeof(struct VirtIORAMFB),
-+    .instance_init = virtio_ramfb_inst_initfn,
-+    .class_init    = virtio_ramfb_class_init,
-+};
-+
-+static void virtio_ramfb_register_types(void)
-+{
-+    type_register_static(&virtio_ramfb_info);
-+}
-+
-+type_init(virtio_ramfb_register_types)
 diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index fb8408c6d0..e70e71ac5c 100644
+index b5d97ab26d..0af04985d2 100644
 --- a/hw/display/Makefile.objs
 +++ b/hw/display/Makefile.objs
-@@ -40,7 +40,7 @@ obj-$(CONFIG_VGA) += vga.o
- common-obj-$(CONFIG_QXL) += qxl.o qxl-logger.o qxl-render.o
- 
- obj-$(CONFIG_VIRTIO_GPU) += virtio-gpu.o virtio-gpu-3d.o
--obj-$(call land,$(CONFIG_VIRTIO_GPU),$(CONFIG_VIRTIO_PCI)) += virtio-gpu-pci.o
-+obj-$(call land,$(CONFIG_VIRTIO_GPU),$(CONFIG_VIRTIO_PCI)) += virtio-gpu-pci.o virtio-ramfb.o
- obj-$(CONFIG_VIRTIO_VGA) += virtio-vga.o
- virtio-gpu.o-cflags := $(VIRGL_CFLAGS)
- virtio-gpu.o-libs += $(VIRGL_LIBS)
+@@ -1,3 +1,5 @@
++common-obj-y += ramfb.o
++
+ common-obj-$(CONFIG_ADS7846) += ads7846.o
+ common-obj-$(CONFIG_VGA_CIRRUS) += cirrus_vga.o
+ common-obj-$(CONFIG_G364FB) += g364fb.o
 -- 
 2.9.3
