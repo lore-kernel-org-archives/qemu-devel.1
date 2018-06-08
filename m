@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fRGoa-0005GN-U3
+	(envelope-from <david@redhat.com>) id 1fRGob-0005Gv-Jn
 	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:48:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fRGoZ-0006FK-5P
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:48:24 -0400
+	(envelope-from <david@redhat.com>) id 1fRGoa-0006G1-OY
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:48:25 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Fri,  8 Jun 2018 14:48:12 +0200
-Message-Id: <20180608124816.22140-3-david@redhat.com>
+Date: Fri,  8 Jun 2018 14:48:13 +0200
+Message-Id: <20180608124816.22140-4-david@redhat.com>
 In-Reply-To: <20180608124816.22140-1-david@redhat.com>
 References: <20180608124816.22140-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/6] spapr: move lookup of the node into
- spapr_memory_plug()
+Subject: [Qemu-devel] [PATCH v2 3/6] spapr: move memory hotplug support
+ check into spapr_memory_pre_plug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,61 +23,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, david@redhat.com, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
 
-Let's clean the hotplug handler up by moving lookup of the node into
-the function where it is actually being used.
+Let's finish cleaning up the hotplug handler. This check can be
+performed in the pre_plug code as the very first thing.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/ppc/spapr.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ hw/ppc/spapr.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f16a0b2870..1f577b274b 100644
+index 1f577b274b..9b8b4068b1 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -3136,7 +3136,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
- }
- 
- static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
--                              uint32_t node, Error **errp)
-+                              Error **errp)
+@@ -3184,12 +3184,18 @@ out:
+ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                                   Error **errp)
  {
-     Error *local_err = NULL;
-     sPAPRMachineState *ms = SPAPR_MACHINE(hotplug_dev);
-@@ -3144,6 +3144,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
++    const sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(hotplug_dev);
+     PCDIMMDevice *dimm = PC_DIMM(dev);
      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
      MemoryRegion *mr;
-     uint64_t align, size, addr;
-+    uint32_t node;
+     uint64_t size;
+     char *mem_dev;
  
-     mr = ddc->get_memory_region(dimm, &local_err);
-     if (local_err) {
-@@ -3163,6 +3164,8 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         goto out_unplug;
-     }
- 
-+    node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP,
-+                                    &error_abort);
-     spapr_add_lmbs(dev, addr, size, node,
-                    spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
-                    &local_err);
-@@ -3572,16 +3575,11 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
-     sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
- 
++    if (!smc->dr_lmb_enabled) {
++        error_setg(errp, "Memory hotplug not supported for this machine");
++        return;
++    }
++
+     mr = ddc->get_memory_region(dimm, errp);
+     if (!mr) {
+         return;
+@@ -3571,14 +3577,7 @@ out:
+ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+                                       DeviceState *dev, Error **errp)
+ {
+-    MachineState *ms = MACHINE(hotplug_dev);
+-    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
+-
      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
--        int node;
--
-         if (!smc->dr_lmb_enabled) {
-             error_setg(errp, "Memory hotplug not supported for this machine");
-             return;
-         }
--        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP,
--                                        &error_abort);
--
--        spapr_memory_plug(hotplug_dev, dev, node, errp);
-+        spapr_memory_plug(hotplug_dev, dev, errp);
+-        if (!smc->dr_lmb_enabled) {
+-            error_setg(errp, "Memory hotplug not supported for this machine");
+-            return;
+-        }
+         spapr_memory_plug(hotplug_dev, dev, errp);
      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
          spapr_core_plug(hotplug_dev, dev, errp);
-     }
 -- 
 2.17.0
