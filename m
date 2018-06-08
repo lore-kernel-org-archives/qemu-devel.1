@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRCzg-0003GO-4n
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:43:37 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fRD0W-00040s-Tw
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:44:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRCzc-0003bl-WD
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:43:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32970 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fRCzc-0003aU-RL
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:43:32 -0400
-Date: Fri, 8 Jun 2018 09:43:25 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180608084325.GE18233@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180601162749.27406-1-marcandre.lureau@redhat.com>
-	<20180601162749.27406-5-marcandre.lureau@redhat.com>
-	<20180604093653.GC19749@redhat.com>
-	<CAJ+F1C+dSJOZUR6nGVxBmonaqB5gREXut61=r2bGMhioYMvEHw@mail.gmail.com>
+	(envelope-from <imammedo@redhat.com>) id 1fRD0T-00045Q-Qp
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:44:28 -0400
+Date: Fri, 8 Jun 2018 10:44:16 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180608104416.6704577d@redhat.com>
+In-Reply-To: <20180607165218.9558-6-david@redhat.com>
+References: <20180607165218.9558-1-david@redhat.com>
+	<20180607165218.9558-6-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1C+dSJOZUR6nGVxBmonaqB5gREXut61=r2bGMhioYMvEHw@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 04/12] Add vhost-user-backend
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 5/8] spapr: introduce machine unplug
+ handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,108 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, Greg Kurz <groug@kaod.org>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On Fri, Jun 08, 2018 at 12:34:15AM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Mon, Jun 4, 2018 at 11:36 AM, Daniel P. Berrang=C3=A9 <berrange@redh=
-at.com> wrote:
-> > On Fri, Jun 01, 2018 at 06:27:41PM +0200, Marc-Andr=C3=A9 Lureau wrot=
-e:
-> >> Create a vhost-user-backend object that holds a connection to a
-> >> vhost-user backend and can be referenced from virtio devices that
-> >> support it. See later patches for input & gpu usage.
-> >>
-> >> A chardev can be specified to communicate with the vhost-user backen=
-d,
-> >> ex: -chardev socket,id=3Dchar0,path=3D/tmp/foo.sock -object
-> >> vhost-user-backend,id=3Dvuid,chardev=3Dchar0.
-> >>
-> >> Alternatively, an executable with its arguments may be given as 'cmd=
-'
-> >> property, ex: -object
-> >> vhost-user-backend,id=3Dvui,cmd=3D"./vhost-user-input /dev/input..".=
- The
-> >> executable is then spawn and, by convention, the vhost-user socket i=
-s
-> >> passed as fd=3D3. It may be considered a security breach to allow
-> >> creating processes that may execute arbitrary executables, so this m=
-ay
-> >> be restricted to some known executables (via signature etc) or
-> >> directory.
-> >
-> > Passing a binary and args as a string blob.....
-> >
-> >> +static int
-> >> +vhost_user_backend_spawn_cmd(VhostUserBackend *b, int vhostfd, Erro=
-r **errp)
-> >> +{
-> >> +    int devnull =3D open("/dev/null", O_RDWR);
-> >> +    pid_t pid;
-> >> +
-> >> +    assert(!b->child);
-> >> +
-> >> +    if (!b->cmd) {
-> >> +        error_setg_errno(errp, errno, "Missing cmd property");
-> >> +        return -1;
-> >> +    }
-> >> +    if (devnull < 0) {
-> >> +        error_setg_errno(errp, errno, "Unable to open /dev/null");
-> >> +        return -1;
-> >> +    }
-> >> +
-> >> +    pid =3D qemu_fork(errp);
-> >> +    if (pid < 0) {
-> >> +        close(devnull);
-> >> +        return -1;
-> >> +    }
-> >> +
-> >> +    if (pid =3D=3D 0) { /* child */
-> >> +        int fd, maxfd =3D sysconf(_SC_OPEN_MAX);
-> >> +
-> >> +        dup2(devnull, STDIN_FILENO);
-> >> +        dup2(devnull, STDOUT_FILENO);
-> >> +        dup2(vhostfd, 3);
-> >> +
-> >> +        signal(SIGINT, SIG_IGN);
-> >
-> > Why ignore SIGINT ?  Surely we want this extra process to be killed
-> > someone ctrl-c's the parent QEMU.
->=20
-> leftover, removed
->=20
-> >
-> >> +
-> >> +        for (fd =3D 4; fd < maxfd; fd++) {
-> >> +            close(fd);
-> >> +        }
-> >> +
-> >> +        execlp("/bin/sh", "sh", "-c", b->cmd, NULL);
-> >
-> > ...which is then interpreted by the shell is a recipe for security
-> > flaws. There needs to be a way to pass the command + arguments
-> > to QEMU as an argv[] we can directly exec without involving the
-> > shell.
-> >
->=20
-> For now, I use g_shell_parse_argv(). Do you have a better idea?
+On Thu,  7 Jun 2018 18:52:15 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Accept individual args at the cli level is far preferrable - we don't
-want anything to be parsing shell strings:
+> We'll be handling unplug of e.g. CPUs and PCDIMMs  via the general
+> hotplug handler soon, so let's add that handler function.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
- vhost-user-backend,id=3Dvui,binary=3D/sbin/vhost-user-input,arg=3D/dev/i=
-nput,arg=3Dfoo,arg=3Dbar
-
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> ---
+>  hw/ppc/spapr.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 4447cb197f..bcb72d9fa7 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3586,6 +3586,11 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+>      error_propagate(errp, local_err);
+>  }
+>  
+> +static void spapr_machine_device_unplug(HotplugHandler *hotplug_dev,
+> +                                        DeviceState *dev, Error **errp)
+> +{
+> +}
+> +
+>  static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_dev,
+>                                                  DeviceState *dev, Error **errp)
+>  {
+> @@ -3988,6 +3993,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+>      mc->get_default_cpu_node_id = spapr_get_default_cpu_node_id;
+>      mc->possible_cpu_arch_ids = spapr_possible_cpu_arch_ids;
+>      hc->unplug_request = spapr_machine_device_unplug_request;
+> +    hc->unplug = spapr_machine_device_unplug;
+>  
+>      smc->dr_lmb_enabled = true;
+>      mc->default_cpu_type = POWERPC_CPU_TYPE_NAME("power8_v2.0");
