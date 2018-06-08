@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fRCsW-00062B-07
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:36:13 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1fRCsY-00064E-P6
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:36:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fRCsT-0000Nc-Ca
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:36:12 -0400
-Received: from mga09.intel.com ([134.134.136.24]:58061)
+	(envelope-from <wei.w.wang@intel.com>) id 1fRCsX-0000Q4-OZ
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:36:14 -0400
+Received: from mga09.intel.com ([134.134.136.24]:58067)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1fRCsT-0000MG-13
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:36:09 -0400
+	id 1fRCsX-0000OZ-EP
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:36:13 -0400
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Fri,  8 Jun 2018 16:10:38 +0800
-Message-Id: <1528445443-43406-2-git-send-email-wei.w.wang@intel.com>
+Date: Fri,  8 Jun 2018 16:10:40 +0800
+Message-Id: <1528445443-43406-4-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1528445443-43406-1-git-send-email-wei.w.wang@intel.com>
 References: <1528445443-43406-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v8 1/6] bitmap: bitmap_count_one_with_offset
+Subject: [Qemu-devel] [PATCH v8 3/6] migration: API to clear bits of guest
+ free pages from the dirty bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +28,123 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com
 Cc: peterx@redhat.com, pbonzini@redhat.com, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-Count the number of 1s in a bitmap starting from an offset.
+This patch adds an API to clear bits corresponding to guest free pages
+from the dirty bitmap. Spilt the free page block if it crosses the QEMU
+RAMBlock boundary.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
 CC: Juan Quintela <quintela@redhat.com>
 CC: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+CC: Peter Xu <peterx@redhat.com>
 ---
- include/qemu/bitmap.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ include/migration/misc.h |  2 ++
+ migration/migration.c    |  2 +-
+ migration/migration.h    |  1 +
+ migration/ram.c          | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 52 insertions(+), 1 deletion(-)
 
-diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
-index 509eedd..e3f31f1 100644
---- a/include/qemu/bitmap.h
-+++ b/include/qemu/bitmap.h
-@@ -228,6 +228,19 @@ static inline long bitmap_count_one(const unsigned long *bitmap, long nbits)
-     }
+diff --git a/include/migration/misc.h b/include/migration/misc.h
+index 4ebf24c..113320e 100644
+--- a/include/migration/misc.h
++++ b/include/migration/misc.h
+@@ -14,11 +14,13 @@
+ #ifndef MIGRATION_MISC_H
+ #define MIGRATION_MISC_H
+ 
++#include "exec/cpu-common.h"
+ #include "qemu/notify.h"
+ 
+ /* migration/ram.c */
+ 
+ void ram_mig_init(void);
++void qemu_guest_free_page_hint(void *addr, size_t len);
+ 
+ /* migration/block.c */
+ 
+diff --git a/migration/migration.c b/migration/migration.c
+index 05aec2c..220ff48 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -647,7 +647,7 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+  * Return true if we're already in the middle of a migration
+  * (i.e. any of the active or setup states)
+  */
+-static bool migration_is_setup_or_active(int state)
++bool migration_is_setup_or_active(int state)
+ {
+     switch (state) {
+     case MIGRATION_STATUS_ACTIVE:
+diff --git a/migration/migration.h b/migration/migration.h
+index 8f0c821..5a74740 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -230,6 +230,7 @@ void migrate_fd_error(MigrationState *s, const Error *error);
+ void migrate_fd_connect(MigrationState *s, Error *error_in);
+ 
+ void migrate_init(MigrationState *s);
++bool migration_is_setup_or_active(int state);
+ bool migration_is_blocked(Error **errp);
+ /* True if outgoing migration has entered postcopy phase */
+ bool migration_in_postcopy(void);
+diff --git a/migration/ram.c b/migration/ram.c
+index 2eabbe9..237f11e 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -2530,6 +2530,54 @@ static void ram_state_resume_prepare(RAMState *rs, QEMUFile *out)
  }
  
-+static inline long bitmap_count_one_with_offset(const unsigned long *bitmap,
-+                                                long offset, long nbits)
+ /*
++ * This function clears bits of the free pages reported by the caller from the
++ * migration dirty bitmap. @addr is the host address corresponding to the
++ * start of the continuous guest free pages, and @len is the total bytes of
++ * those pages.
++ */
++void qemu_guest_free_page_hint(void *addr, size_t len)
 +{
-+    long aligned_offset = QEMU_ALIGN_DOWN(offset, BITS_PER_LONG);
-+    long redundant_bits = offset - aligned_offset;
-+    long bits_to_count = nbits + redundant_bits;
-+    const unsigned long *bitmap_start = bitmap +
-+                                        aligned_offset / BITS_PER_LONG;
++    RAMBlock *block;
++    ram_addr_t offset;
++    size_t used_len, start, npages;
++    MigrationState *s = migrate_get_current();
 +
-+    return bitmap_count_one(bitmap_start, bits_to_count) -
-+           bitmap_count_one(bitmap_start, redundant_bits);
++    /* This function is currently expected to be used during live migration */
++    if (!migration_is_setup_or_active(s->state)) {
++        return;
++    }
++
++    for (; len > 0; len -= used_len) {
++        block = qemu_ram_block_from_host(addr, false, &offset);
++        assert(block);
++
++        /*
++         * This handles the case that the RAMBlock is resized after the free
++         * page hint is reported.
++         */
++        if (unlikely(offset > block->used_length)) {
++            return;
++        }
++
++        if (len <= block->used_length - offset) {
++            used_len = len;
++        } else {
++            used_len = block->used_length - offset;
++            addr += used_len;
++        }
++
++        start = offset >> TARGET_PAGE_BITS;
++        npages = used_len >> TARGET_PAGE_BITS;
++
++        qemu_mutex_lock(&ram_state->bitmap_mutex);
++        ram_state->migration_dirty_pages -=
++                      bitmap_count_one_with_offset(block->bmap, start, npages);
++        bitmap_clear(block->bmap, start, npages);
++        qemu_mutex_unlock(&ram_state->bitmap_mutex);
++    }
 +}
 +
- void bitmap_set(unsigned long *map, long i, long len);
- void bitmap_set_atomic(unsigned long *map, long i, long len);
- void bitmap_clear(unsigned long *map, long start, long nr);
++/*
+  * Each of ram_save_setup, ram_save_iterate and ram_save_complete has
+  * long-running RCU critical section.  When rcu-reclaims in the code
+  * start to become numerous it will be necessary to reduce the
 -- 
 1.8.3.1
