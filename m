@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fRMyc-0000Gc-Hl
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:23:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1fRN12-0002QA-4P
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:25:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fRMyY-0005nv-Ow
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:23:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56276)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fRMyY-0005nd-Gc
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:23:06 -0400
-Date: Fri, 8 Jun 2018 16:23:00 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180608192300.GN7451@localhost.localdomain>
-References: <1528295806-90593-1-git-send-email-babu.moger@amd.com>
-	<1528295806-90593-4-git-send-email-babu.moger@amd.com>
-	<20180606223956.GD7451@localhost.localdomain>
-	<DM5PR12MB24717A9DD61F79F58D3E70F7957B0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	(envelope-from <eblake@redhat.com>) id 1fRN0y-0007Zc-0h
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:25:40 -0400
+References: <20180608190145.10872-1-f4bug@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ef6bb32d-b5e0-f94b-327c-fbe6125b220a@redhat.com>
+Date: Fri, 8 Jun 2018 14:25:33 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM5PR12MB24717A9DD61F79F58D3E70F7957B0@DM5PR12MB2471.namprd12.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH v12 3/4] i386: Enable TOPOEXT feature on
- AMD EPYC CPU
+In-Reply-To: <20180608190145.10872-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RESEND] Makefile: Remove qemu-version.h and
+ qemu-options.def during 'make distclean'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,180 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Moger, Babu" <Babu.Moger@amd.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Juan Quintela <quintela@redhat.com>, xiaoguangrong@tencent.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org
 
-On Fri, Jun 08, 2018 at 06:40:16PM +0000, Moger, Babu wrote:
-> Hi Eduardo, 
-> Sorry for the late response. Got pulled into something else.
-> 
-> > -----Original Message-----
-> > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> > Sent: Wednesday, June 6, 2018 5:40 PM
-> > To: Moger, Babu <Babu.Moger@amd.com>
-> > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
-> > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> > kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com
-> > Subject: Re: [PATCH v12 3/4] i386: Enable TOPOEXT feature on AMD EPYC
-> > CPU
-> > 
-> > On Wed, Jun 06, 2018 at 10:36:45AM -0400, Babu Moger wrote:
-> > > Enable TOPOEXT feature on EPYC CPU. This is required to support
-> > > hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
-> > >
-> > > Disable TOPOEXT feature for legacy machines.
-> > >
-> > > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > 
-> > Now, I just noticed we have a problem here:
-> > 
-> > "-machine pc -cpu EPYC -smp 64" works today
-> > 
-> > This patch makes it stop working, but it shouldn't.
-> 
-> No. It works fine. I have tested it.
+On 06/08/2018 02:01 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> qemu-version.h and qemu-options.def are generated files
+> that should be deleted during 'make distclean'.
+>=20
+> This solves building issues with out-of-tree builds from
+> a source tree that has been built in (see d1bd2423a90):
 
-This doesn't sound right.  The code in this series will error out
-of TOPOEXT is enabled and you have more than 64 VCPUs.
-
-But I just noticed we have a bug introduced by:
-
-commit f548222c24342ca74689de7794f9006b43f86a54
-Author: Xiao Guangrong <xiaoguangrong@tencent.com>
-Date:   Thu May 3 16:06:11 2018 +0800
-
-    migration: introduce decompress-error-check
-
-    QEMU 3.0 enables strict check for compression & decompression to
-    make the migration more robust, that depends on the source to fix
-    the internal design which triggers the unexpected error conditions
-
-    To make it work for migrating old version QEMU to 2.13 QEMU, we
-    introduce this parameter to disable the error check on the
-    destination which is the default behavior of the machine type
-    which is older than 2.13, alternately, the strict check can be
-    enabled explicitly as followings:
-          -M pc-q35-2.11 -global migration.decompress-error-check=true
-
-    Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-    Reviewed-by: Juan Quintela <quintela@redhat.com>
-    Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-This commits added PC_COMPAT_2_12 to the 3.0 machine-types.
-Because of this bug, TOPOEXT is being unconditionally disabled on
-all machine-types, unless I apply the fix below:
+Well, it prevents future repeats of the problem. It does not "fix"=20
+existing incremental builds that already have the problem.  But I'm=20
+still in favor of this change.
 
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 3d81136065..b4c5b03274 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -430,7 +430,6 @@ static void pc_i440fx_3_0_machine_options(MachineClass *m)
-     pc_i440fx_machine_options(m);
-     m->alias = "pc";
-     m->is_default = 1;
--    SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
- 
- DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index b60cbb9266..83d6d75efa 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -312,7 +312,6 @@ static void pc_q35_3_0_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias = "q35";
--    SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
- 
- DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> resend: Cc Peter, removed dup line in comment
+>=20
+>   Makefile | 1 +
+>   1 file changed, 1 insertion(+)
+>=20
 
-> 
-> > 
-> > On the other hand, I believe you expect:
-> > * "-machine pc -cpu EPYC -smp 8" to automatically enable topoext.
-> Yes. Only on new machines-types
-> > * "-machine pc -cpu Opteron_G1 -smp 8" to not enable topoext.
-> Yes.
-> > * What about "-machine -cpu Opteron_G1 -smp 8,threads=2"?
-> No. This should not enable topoext.  Topoext is not supported by Opteron_G1.
-> This should warn about hyperthreading and continue.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-OK, makes sense to me.
+> diff --git a/Makefile b/Makefile
+> index 023b3437ec..7ae453ffa2 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -757,6 +757,7 @@ qemu-%.tar.bz2:
+>   distclean: clean
+>   	rm -f config-host.mak config-host.h* config-host.ld $(DOCS) qemu-opt=
+ions.texi qemu-img-cmds.texi qemu-monitor.texi qemu-monitor-info.texi
+>   	rm -f config-all-devices.mak config-all-disas.mak config.status
+> +	rm -f qemu-version.h qemu-options.def
+>   	rm -f po/*.mo tests/qemu-iotests/common.env
+>   	rm -f roms/seabios/config.mak roms/vgabios/config.mak
+>   	rm -f qemu-doc.info qemu-doc.aux qemu-doc.cp qemu-doc.cps
+>=20
 
-> > 
-> > 
-> > We also have other requirements, I will try to enumerate all of
-> > them below:
-> > 
-> > 0) "-topoext" explicitly configured (any machine-type):
-> > * Must never enable topoext.
-> Yes.
-> > 
-> > 1) "+topoext" explicitly configured (any machine-type):
-> > * Must validate topology and refuse to start if unsupported.
-> 
-> Yes.
-> 
-> > 
-> > 2) Older machine-types:
-> > * Must never enable topoext automatically, even if using "EPYC"
-> >   or "threads=2"
-> > 
-> Yes.
-> 
-> > 3) "EPYC" CPU model (on new machine-types):
-> > * Should enable topoext automatically, but only if topology is
-> >   supported.
-> > * Must not error out if topology is not supported.
-> In new machine types we will enable topoext for "EPYC" CPU model.
-> Right now(old machine type) we can disable for all the CPU models. 
-> So, we don't need two bits(topoext and auto-topoext)
-
-Right, so you agree that in this case we must _not_ error out if
-topology is unsupported, correct?  Otherwise we will break this
-existing use case:
-  "-machine pc -cpu EPYC -smp 64".
-
-> 
-> I thought we should error out if topology cannot be supported. But we can warn(disable topoext) and continue that is another option.
-> 
-> > * Should this enable topoext automatically even if threads=1?
-> 
-> Yes. We should enable even with threads=1.
-> 
-> > 
-> > 4) Other AMD CPU models with "threads=2" (on new machine-types):
-> > * We might want to make this enable topoext automatically, too.
-> >   What do you think?
-> 
->   No. We should not enable topoext here. We should depend on CPU model table here.
-> 
-> > 
-> > Is the above description accurate?  Do you agree with these
-> > requirements?
-> 
-> With these requirements in mind, I will send that patches. We can start our discussion.
-> We don't need one more bits. That is my opinion. 
-
-Thanks for confirming the requirements above.
-
-But it doesn't seem to be possible represent these requirements
-with just one bit.  Otherwise you can't differentiate explicit
-"+topoext" (1 above) from topoext being implicitly enabled by
-"-cpu EPYC" (3 above).
-
-Another problem is query-cpu-model-expansion QMP command: this
-patch makes "topoext" appear on the output of
-"query-cpu-model-expansion model=EPYC", meaning that management
-software will assume everybody using the "EPYC" CPU model will
-require +topoext.  A separate "auto-topoext" property would avoid
-this issue.
-
-(Yeah, this is tricky.  I want to eventually encode these subtle
-rules in automated test cases, so these issues could be detected
-by software instead of code inspection.)
-
--- 
-Eduardo
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
