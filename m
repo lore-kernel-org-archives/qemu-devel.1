@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRGfj-0005n1-Qo
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:17 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fRGfm-0005pS-GT
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fRGff-0000uC-LN
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:15 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:38079)
+	(envelope-from <alex.bennee@linaro.org>) id 1fRGfl-0000xg-8I
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:18 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34573)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fRGff-0000td-BD
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:11 -0400
-Received: by mail-wm0-x229.google.com with SMTP id 69-v6so3451627wmf.3
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 05:39:11 -0700 (PDT)
+	id 1fRGfl-0000wr-0Q
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:39:17 -0400
+Received: by mail-wr0-x243.google.com with SMTP id a12-v6so13261990wro.1
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 05:39:16 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri,  8 Jun 2018 13:33:04 +0100
-Message-Id: <20180608123307.24773-47-alex.bennee@linaro.org>
+Date: Fri,  8 Jun 2018 13:32:58 +0100
+Message-Id: <20180608123307.24773-41-alex.bennee@linaro.org>
 In-Reply-To: <20180608123307.24773-1-alex.bennee@linaro.org>
 References: <20180608123307.24773-1-alex.bennee@linaro.org>
-Subject: [Qemu-devel] [PATCH v6 46/49] target/sh4: Fix translator.c
- assertion failure for gUSA
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v6 40/49] tests/tcg: enable building for PowerPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,178 +30,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth7680@gmail.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Richard Henderson <rth7680@gmail.com>
+Now we have restored debian-image-powerpc-cross using Debian SID
+compilers we can build for 32 bit powerpc. Although PPC32 supports a
+range of pages sizes currently only 4k works so the others are
+commented out for now.
 
-The translator loop does not allow the tb_start hook to set
-dc->base.is_jmp; the only hook allowed to do that is translate_insn.
+We can also merge the ppc64 support under the base architecture
+directory to avoid too much proliferation of directories.
 
-Split the work between init_disas_context where we validate
-the gUSA parameters, and translate_insn where we emit code.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/sh4/translate.c | 81 +++++++++++++++++++++++-------------------
- 1 file changed, 44 insertions(+), 37 deletions(-)
+v5
+  - new for v5
+---
+ tests/tcg/ppc/Makefile.include     |  7 +++++++
+ tests/tcg/ppc/Makefile.target      | 12 ++++++++++++
+ tests/tcg/ppc64le/Makefile.include |  2 --
+ 3 files changed, 19 insertions(+), 2 deletions(-)
+ create mode 100644 tests/tcg/ppc/Makefile.include
+ create mode 100644 tests/tcg/ppc/Makefile.target
+ delete mode 100644 tests/tcg/ppc64le/Makefile.include
 
-diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index c716b74a0f..1b9a201d6d 100644
---- a/target/sh4/translate.c
-+++ b/target/sh4/translate.c
-@@ -1895,35 +1895,18 @@ static void decode_opc(DisasContext * ctx)
-    any sequence via cpu_exec_step_atomic, we can recognize the "normal"
-    sequences and transform them into atomic operations as seen by the host.
- */
--static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
-+static void decode_gusa(DisasContext *ctx, CPUSH4State *env)
- {
-     uint16_t insns[5];
-     int ld_adr, ld_dst, ld_mop;
-     int op_dst, op_src, op_opc;
-     int mv_src, mt_dst, st_src, st_mop;
-     TCGv op_arg;
--
-     uint32_t pc = ctx->base.pc_next;
-     uint32_t pc_end = ctx->base.tb->cs_base;
--    int backup = sextract32(ctx->tbflags, GUSA_SHIFT, 8);
-     int max_insns = (pc_end - pc) / 2;
-     int i;
- 
--    if (pc != pc_end + backup || max_insns < 2) {
--        /* This is a malformed gUSA region.  Don't do anything special,
--           since the interpreter is likely to get confused.  */
--        ctx->envflags &= ~GUSA_MASK;
--        return 0;
--    }
--
--    if (ctx->tbflags & GUSA_EXCLUSIVE) {
--        /* Regardless of single-stepping or the end of the page,
--           we must complete execution of the gUSA region while
--           holding the exclusive lock.  */
--        *pmax_insns = max_insns;
--        return 0;
--    }
--
-     /* The state machine below will consume only a few insns.
-        If there are more than that in a region, fail now.  */
-     if (max_insns > ARRAY_SIZE(insns)) {
-@@ -2140,7 +2123,6 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
-     /*
-      * Emit the operation.
-      */
--    tcg_gen_insn_start(pc, ctx->envflags);
-     switch (op_opc) {
-     case -1:
-         /* No operation found.  Look for exchange pattern.  */
-@@ -2235,7 +2217,8 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
-     /* The entire region has been translated.  */
-     ctx->envflags &= ~GUSA_MASK;
-     ctx->base.pc_next = pc_end;
--    return max_insns;
-+    ctx->base.num_insns += max_insns - 1;
-+    return;
- 
-  fail:
-     qemu_log_mask(LOG_UNIMP, "Unrecognized gUSA sequence %08x-%08x\n",
-@@ -2243,7 +2226,6 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
- 
-     /* Restart with the EXCLUSIVE bit set, within a TB run via
-        cpu_exec_step_atomic holding the exclusive lock.  */
--    tcg_gen_insn_start(pc, ctx->envflags);
-     ctx->envflags |= GUSA_EXCLUSIVE;
-     gen_save_cpu_state(ctx, false);
-     gen_helper_exclusive(cpu_env);
-@@ -2254,7 +2236,7 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
-        entire region consumed via ctx->base.pc_next so that it's immediately
-        available in the disassembly dump.  */
-     ctx->base.pc_next = pc_end;
--    return 1;
-+    ctx->base.num_insns += max_insns - 1;
- }
- #endif
- 
-@@ -2262,19 +2244,39 @@ static void sh4_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
- {
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
-     CPUSH4State *env = cs->env_ptr;
-+    uint32_t tbflags;
-     int bound;
- 
--    ctx->tbflags = (uint32_t)ctx->base.tb->flags;
--    ctx->envflags = ctx->base.tb->flags & TB_FLAG_ENVFLAGS_MASK;
--    ctx->memidx = (ctx->tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
-+    ctx->tbflags = tbflags = ctx->base.tb->flags;
-+    ctx->envflags = tbflags & TB_FLAG_ENVFLAGS_MASK;
-+    ctx->memidx = (tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
-     /* We don't know if the delayed pc came from a dynamic or static branch,
-        so assume it is a dynamic branch.  */
-     ctx->delayed_pc = -1; /* use delayed pc from env pointer */
-     ctx->features = env->features;
--    ctx->has_movcal = (ctx->tbflags & TB_FLAG_PENDING_MOVCA);
--    ctx->gbank = ((ctx->tbflags & (1 << SR_MD)) &&
--                  (ctx->tbflags & (1 << SR_RB))) * 0x10;
--    ctx->fbank = ctx->tbflags & FPSCR_FR ? 0x10 : 0;
-+    ctx->has_movcal = (tbflags & TB_FLAG_PENDING_MOVCA);
-+    ctx->gbank = ((tbflags & (1 << SR_MD)) &&
-+                  (tbflags & (1 << SR_RB))) * 0x10;
-+    ctx->fbank = tbflags & FPSCR_FR ? 0x10 : 0;
+diff --git a/tests/tcg/ppc/Makefile.include b/tests/tcg/ppc/Makefile.include
+new file mode 100644
+index 0000000000..b062c30dd3
+--- /dev/null
++++ b/tests/tcg/ppc/Makefile.include
+@@ -0,0 +1,7 @@
++ifeq ($(TARGET_NAME),ppc)
++DOCKER_IMAGE=debian-powerpc-cross
++DOCKER_CROSS_COMPILER=powerpc-linux-gnu-gcc
++else ifeq ($(TARGET_NAME),ppc64le)
++DOCKER_IMAGE=debian-ppc64el-cross
++DOCKER_CROSS_COMPILER=powerpc64le-linux-gnu-gcc
++endif
+diff --git a/tests/tcg/ppc/Makefile.target b/tests/tcg/ppc/Makefile.target
+new file mode 100644
+index 0000000000..f5e08c7376
+--- /dev/null
++++ b/tests/tcg/ppc/Makefile.target
+@@ -0,0 +1,12 @@
++# -*- Mode: makefile -*-
++#
++# PPC - included from tests/tcg/Makefile
++#
 +
-+    if (tbflags & GUSA_MASK) {
-+        uint32_t pc = ctx->base.pc_next;
-+        uint32_t pc_end = ctx->base.tb->cs_base;
-+        int backup = sextract32(ctx->tbflags, GUSA_SHIFT, 8);
-+        int max_insns = (pc_end - pc) / 2;
-+
-+        if (pc != pc_end + backup || max_insns < 2) {
-+            /* This is a malformed gUSA region.  Don't do anything special,
-+               since the interpreter is likely to get confused.  */
-+            ctx->envflags &= ~GUSA_MASK;
-+        } else if (tbflags & GUSA_EXCLUSIVE) {
-+            /* Regardless of single-stepping or the end of the page,
-+               we must complete execution of the gUSA region while
-+               holding the exclusive lock.  */
-+            ctx->base.max_insns = max_insns;
-+            return;
-+        }
-+    }
- 
-     /* Since the ISA is fixed-width, we can bound by the number
-        of instructions remaining on the page.  */
-@@ -2284,14 +2286,6 @@ static void sh4_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
- 
- static void sh4_tr_tb_start(DisasContextBase *dcbase, CPUState *cs)
- {
--#ifdef CONFIG_USER_ONLY
--    DisasContext *ctx = container_of(dcbase, DisasContext, base);
--    CPUSH4State *env = cs->env_ptr;
--
--    if (ctx->tbflags & GUSA_MASK) {
--        ctx->base.num_insns = decode_gusa(ctx, env, &ctx->base.max_insns);
--    }
--#endif
- }
- 
- static void sh4_tr_insn_start(DisasContextBase *dcbase, CPUState *cs)
-@@ -2323,6 +2317,19 @@ static void sh4_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-     CPUSH4State *env = cs->env_ptr;
-     DisasContext *ctx = container_of(dcbase, DisasContext, base);
- 
-+#ifdef CONFIG_USER_ONLY
-+    if (unlikely(ctx->envflags & GUSA_MASK)
-+        && !(ctx->envflags & GUSA_EXCLUSIVE)) {
-+        /* We're in an gUSA region, and we have not already fallen
-+           back on using an exclusive region.  Attempt to parse the
-+           region into a single supported atomic operation.  Failure
-+           is handled within the parser by raising an exception to
-+           retry using an exclusive region.  */
-+        decode_gusa(ctx, env);
-+        return;
-+    }
-+#endif
-+
-     ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
-     decode_opc(ctx);
-     ctx->base.pc_next += 2;
++ifneq (,$(findstring 64,$(TARGET_NAME)))
++# On PPC64 Linux can be configured with 4k (default) or 64k pages (currently broken)
++EXTRA_RUNS+=run-test-mmap-4096 #run-test-mmap-65536
++else
++# On PPC32 Linux supports 4K/16K/64K/256K (but currently only 4k works)
++EXTRA_RUNS+=run-test-mmap-4096 #run-test-mmap-16384 run-test-mmap-65536 run-test-mmap-262144
++endif
+diff --git a/tests/tcg/ppc64le/Makefile.include b/tests/tcg/ppc64le/Makefile.include
+deleted file mode 100644
+index d71cfc9aa7..0000000000
+--- a/tests/tcg/ppc64le/Makefile.include
++++ /dev/null
+@@ -1,2 +0,0 @@
+-DOCKER_IMAGE=debian-ppc64el-cross
+-DOCKER_CROSS_COMPILER=powerpc64le-linux-gnu-gcc
 -- 
 2.17.1
