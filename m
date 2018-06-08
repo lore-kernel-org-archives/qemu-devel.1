@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fR7hS-00024i-VQ
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:04:28 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fR83R-0002c4-RT
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:27:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fR7hR-0006pi-N1
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:04:26 -0400
-Date: Fri, 8 Jun 2018 13:03:19 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fR83Q-0006vi-PE
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:27:09 -0400
+Date: Fri, 8 Jun 2018 13:06:19 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180608030319.GE3344@umbus.fritz.box>
-References: <20180607144645.10187-1-f4bug@amsat.org>
-	<20180607144645.10187-3-f4bug@amsat.org>
+Message-ID: <20180608030619.GG3344@umbus.fritz.box>
+References: <20180606073353.18465-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="JBi0ZxuS5uaEhkUZ"
+	protocol="application/pgp-signature"; boundary="MiFvc8Vo6wRSORdP"
 Content-Disposition: inline
-In-Reply-To: <20180607144645.10187-3-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] hw/ppc/spapr_drc: Replace
- error_setg(&error_abort) by abort()
+In-Reply-To: <20180606073353.18465-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: extend eieio for POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +23,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Ellerman <mpe@ellerman.id.au>
 
 
---JBi0ZxuS5uaEhkUZ
+--MiFvc8Vo6wRSORdP
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 07, 2018 at 11:46:43AM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Use abort() instead of error_setg(&error_abort),
-> as suggested by the "qapi/error.h" documentation:
+On Wed, Jun 06, 2018 at 09:33:53AM +0200, C=E9dric Le Goater wrote:
+> POWER9 introduced a new variant of the eieio instruction using bit 6
+> as a hint to tell the CPU it is a store-forwarding barrier.
 >=20
->     Please don't error_setg(&error_fatal, ...), use error_report() and
->     exit(), because that's more obvious.
->     Likewise, don't error_setg(&error_abort, ...), use assert().
+> The usage of this eieio extension was recently added in Linux 4.17
+> which activated the "support for a store forwarding barrier at kernel
+> entry/exit".
 >=20
-> Use abort() instead of the suggested assert() because the assertion is
-> already verified by the switch case.
+> Unfortunately, it is not possible to insert this new eieio instruction
+> without considerable change in ppc_tr_translate_insn(). So instead we
+> loosen the QEMU eieio instruction mask and modify the gen_eieio()
+> helper to test for bit6. On non-POWER9 CPUs, the bit6 is just ignored
+> but a warning is emitted as this is not an instruction software should
+> be using.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-I think g_assert_not_reached() would be the right thing here.
+Applied to ppc-for-3.0.
 
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 > ---
->  hw/ppc/spapr_drc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> index 8a045d6b93..b934b9c9ed 100644
-> --- a/hw/ppc/spapr_drc.c
-> +++ b/hw/ppc/spapr_drc.c
-> @@ -366,7 +366,7 @@ static void prop_get_fdt(Object *obj, Visitor *v, con=
-st char *name,
->              break;
->          }
->          default:
-> -            error_setg(&error_abort, "device FDT in unexpected state: %d=
-", tag);
-> +            abort(); /* device FDT in unexpected state */
->          }
->          fdt_offset =3D fdt_offset_next;
->      } while (fdt_depth !=3D 0);
+>  Changes since v1:
+>=20
+>  - removed specific PPC2_MEM_EIEIO2 flag
+>  - ignore bit6 on non-POWER9 CPU
+>=20
+>  target/ppc/translate.c | 25 +++++++++++++++++++++++--
+>  1 file changed, 23 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+> index 8ba8f67dc513..5fe1ba655599 100644
+> --- a/target/ppc/translate.c
+> +++ b/target/ppc/translate.c
+> @@ -2967,7 +2967,28 @@ static void gen_stswx(DisasContext *ctx)
+>  /* eieio */
+>  static void gen_eieio(DisasContext *ctx)
+>  {
+> -    tcg_gen_mb(TCG_MO_LD_ST | TCG_BAR_SC);
+> +    TCGBar bar =3D TCG_MO_LD_ST;
+> +
+> +    /*
+> +     * POWER9 has a eieio instruction variant using bit 6 as a hint to
+> +     * tell the CPU it is a store-forwarding barrier.
+> +     */
+> +    if (ctx->opcode & 0x2000000) {
+> +        /*
+> +         * ISA says that "Reserved fields in instructions are ignored
+> +         * by the processor". So ignore the bit 6 on non-POWER9 CPU but
+> +         * as this is not an instruction software should be using,
+> +         * complain to the user.
+> +         */
+> +        if (!(ctx->insns_flags2 & PPC2_ISA300)) {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "invalid eieio using bit 6 at=
+ @"
+> +                          TARGET_FMT_lx "\n", ctx->base.pc_next - 4);
+> +        } else {
+> +            bar =3D TCG_MO_ST_LD;
+> +        }
+> +    }
+> +
+> +    tcg_gen_mb(bar | TCG_BAR_SC);
+>  }
+> =20
+>  #if !defined(CONFIG_USER_ONLY)
+> @@ -6483,7 +6504,7 @@ GEN_HANDLER(lswi, 0x1F, 0x15, 0x12, 0x00000001, PPC=
+_STRING),
+>  GEN_HANDLER(lswx, 0x1F, 0x15, 0x10, 0x00000001, PPC_STRING),
+>  GEN_HANDLER(stswi, 0x1F, 0x15, 0x16, 0x00000001, PPC_STRING),
+>  GEN_HANDLER(stswx, 0x1F, 0x15, 0x14, 0x00000001, PPC_STRING),
+> -GEN_HANDLER(eieio, 0x1F, 0x16, 0x1A, 0x03FFF801, PPC_MEM_EIEIO),
+> +GEN_HANDLER(eieio, 0x1F, 0x16, 0x1A, 0x01FFF801, PPC_MEM_EIEIO),
+>  GEN_HANDLER(isync, 0x13, 0x16, 0x04, 0x03FFF801, PPC_MEM),
+>  GEN_HANDLER_E(lbarx, 0x1F, 0x14, 0x01, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
+>  GEN_HANDLER_E(lharx, 0x1F, 0x14, 0x03, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -75,24 +113,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---JBi0ZxuS5uaEhkUZ
+--MiFvc8Vo6wRSORdP
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsZ8fUACgkQbDjKyiDZ
-s5IyURAAz0c4WX9kJMhH4r7VZ39QKxJDERT9r+maqEe83rbcOO0AANCMOlsgL80C
-jeUlto5tQnUpdcylsUgrkjdiELZ4vitpTdSmNDU4qODWTsFcW/UpGRkoBcIEE3SZ
-nmJkt/zyoGY6nQHn1uEBHF/z5RyBQdlZIXnnQy7E0JL4KDn/xQbg/dOtseXmm2k3
-LBaVjV0XxpqkLaBpirVdQZqcvhOSJNDtbGU+F2moroFIUCYdiTCViu2E3BpIvlhJ
-LBXVsBM1G7FvSKHt5ZrPEmLUQQ7HjKjwVD3HqM7qSMQvEMeaZa8sA4Nr4N8GS5gc
-aIiecpmVa0fy3zcWPMJjCnyQME4mm49Dq5DS8NSdxp9HuXH69neb6GXtV7YIF3aJ
-4p7lBmnhbUw3GbQT+rBPcu9f/7YT1Kv75Dc4SWXoaMm45q7euGXhXxcyNV7Em4XO
-fKALJuNQlQmi22eCvYGQWAGBXNW/qsdCULlRjzWXsXbHIGrvnAPfmPRuqGsDxGlW
-CQwh0/Nsawzp+DCGMh4VnEifDbZKucDxFIuWseF0KB7dLjq1msZR4lba74CYwBBR
-V2/y58JtTi2vGP0b4E5hpWw4XgyaLqc1EdyY+ftWIolxLn1Dpx6ehh8QWuh65qvx
-Y3rRLzZ7yTOMAVthL0wpbgRS80jT5gxlN3l6fo4LVUxu6BgVUD4=
-=aWnp
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsZ8qoACgkQbDjKyiDZ
+s5LX7hAAvBkp/OdMMG7rD817E+vRj4RP13sxn/3CkMzd9VM7lKQSA0Ma42EUt6ms
+3XK72xCZrkHTc+0sKgM6h0Pe4iEtHyn3d+9hzWsqCLkBV/d3i5qiAvpzoWrkgpzx
+81DbHckwXGLEzgnrT0n6tX2yKoJjejjwf4etNxDARtKmrkOKBJhxJJ74/j0z5fN6
+Vio9XgjqRCxRhcmXxTt5bA8vCitriM7C/hnqx0CLtzBupd9yRS+zr/CnwrdTv5f8
+ZtZsf1Lu59rkuF+Bp7rtjM379KkkErkYh1r24HYLrG39IERzeyUW/RX1DBrTTzRF
+knM0NZSV4f/n+fys7+Gnqm1hlDpD9MOJfop0iXARjchaLnC017h3NlxLo+DzU7Dd
+w8ymW6+F1qwaa/HYMBHvNmjkjtoYRo5aRPgtkWwxgLaObrnPZyY3rHUcCuL69Sog
+bwaSK7vPMJe6CxLw6aRXe20seLQ2DUg/vpYz/ypQkfPsifvzO51IWVSwsx6y0p9H
+XpHeoNiyA8TCztIJw/igf3E9TOxPRgDKQwhfPJAFFaM+/ehOC/yzvTxLOBm7g7GV
+umWi5EocEFj503dAw/yRcgntLRoDc6+2F3LRUxOJHTZwdzng1O6TSTKZjZtMk3tI
+uka96icsrarIOKqIq0LEVnRkk6knLF3RglbjPmTf67DW4pyqvb8=
+=wncC
 -----END PGP SIGNATURE-----
 
---JBi0ZxuS5uaEhkUZ--
+--MiFvc8Vo6wRSORdP--
