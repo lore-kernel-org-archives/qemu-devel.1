@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fRM3j-0006Iw-2c
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:24:24 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fRMJC-0004gA-B0
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:40:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lvivier@redhat.com>) id 1fRM3f-0007UI-U6
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:24:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59544 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1fRM3f-0007Tp-Oo
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:24:19 -0400
-From: Laurent Vivier <lvivier@redhat.com>
-References: <20180425071040.25542-1-bala24@linux.vnet.ibm.com>
-	<20180425071040.25542-2-bala24@linux.vnet.ibm.com>
-	<20180501143737.GA25113@9.122.211.20>
-	<d4e1788d-64c9-4b43-5fd6-4008b616362e@redhat.com>
-Message-ID: <2a437c51-2153-7fca-6f50-51590105b554@redhat.com>
-Date: Fri, 8 Jun 2018 20:24:15 +0200
-MIME-Version: 1.0
-In-Reply-To: <d4e1788d-64c9-4b43-5fd6-4008b616362e@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <Babu.Moger@amd.com>) id 1fRMJ9-0006Us-6H
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:40:22 -0400
+Received: from mail-sn1nam01on0045.outbound.protection.outlook.com
+	([104.47.32.45]:4096
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fRMJ8-0006UR-LU
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:40:19 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Fri, 8 Jun 2018 18:40:16 +0000
+Message-ID: <DM5PR12MB24717A9DD61F79F58D3E70F7957B0@DM5PR12MB2471.namprd12.prod.outlook.com>
+References: <1528295806-90593-1-git-send-email-babu.moger@amd.com>
+	<1528295806-90593-4-git-send-email-babu.moger@amd.com>
+	<20180606223956.GD7451@localhost.localdomain>
+In-Reply-To: <20180606223956.GD7451@localhost.localdomain>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] migration: calculate
- expected_downtime with ram_bytes_remaining()
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v12 3/4] i386: Enable TOPOEXT feature on
+ AMD EPYC CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,155 +32,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Balamuruhan S <bala24@linux.vnet.ibm.com>, dgilbert@redhat.com, quintela@redhat.com, david@gibson.dropbear.id.au
-Cc: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>
 
-Hi,
+Hi Eduardo,=20
+Sorry for the late response. Got pulled into something else.
 
-I had time to investigate more on this problem.
+> -----Original Message-----
+> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> Sent: Wednesday, June 6, 2018 5:40 PM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
+> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com
+> Subject: Re: [PATCH v12 3/4] i386: Enable TOPOEXT feature on AMD EPYC
+> CPU
+>=20
+> On Wed, Jun 06, 2018 at 10:36:45AM -0400, Babu Moger wrote:
+> > Enable TOPOEXT feature on EPYC CPU. This is required to support
+> > hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
+> >
+> > Disable TOPOEXT feature for legacy machines.
+> >
+> > Signed-off-by: Babu Moger <babu.moger@amd.com>
+>=20
+> Now, I just noticed we have a problem here:
+>=20
+> "-machine pc -cpu EPYC -smp 64" works today
+>=20
+> This patch makes it stop working, but it shouldn't.
 
-On 16/05/2018 15:43, Laurent Vivier wrote:
-> Hi Bala,
-> 
-> I've tested you patch migrating a pseries between a P9 host and a P8
-> host with 1G huge page size on the P9 side and 16MB on P8 side and the
-> information are strange now.
-> 
-> "remaining ram" doesn't change, and after a while it can be set to "0"
-> and estimated downtime is 0 too, but the migration is not completed and
-> "transferred ram" continues to increase.
-> 
-> so think there is a problem somewhere...
-> 
-> thanks,
-> Laurent
-> 
-> On 01/05/2018 16:37, Balamuruhan S wrote:
->> Hi,
->>
->> Dave, David and Juan if you guys are okay with the patch, please
->> help to merge it.
->>
->> Thanks,
->> Bala
->>
->> On Wed, Apr 25, 2018 at 12:40:40PM +0530, Balamuruhan S wrote:
->>> expected_downtime value is not accurate with dirty_pages_rate * page_size,
->>> using ram_bytes_remaining would yeild it correct. It will initially be a
->>> gross over-estimate, but for for non-converging migrations it should
->>> approach a reasonable estimate later on.
->>>
->>> currently bandwidth and expected_downtime value are calculated in
->>> migration_update_counters() during each iteration from
->>> migration_thread(), where as remaining ram is calculated in
->>> qmp_query_migrate() when we actually call "info migrate". Due to this
->>> there is some difference in expected_downtime value being calculated.
->>>
->>> with this patch bandwidth, expected_downtime and remaining ram are
->>> calculated in migration_update_counters(), retrieve the same value during
->>> "info migrate". By this approach we get almost close enough value.
->>>
->>> Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
->>> Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
->>> ---
->>>  migration/migration.c | 11 ++++++++---
->>>  migration/migration.h |  1 +
->>>  2 files changed, 9 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/migration/migration.c b/migration/migration.c
->>> index 52a5092add..5d721ee481 100644
->>> --- a/migration/migration.c
->>> +++ b/migration/migration.c
->>> @@ -614,7 +614,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
->>>      }
->>>
->>>      if (s->state != MIGRATION_STATUS_COMPLETED) {
->>> -        info->ram->remaining = ram_bytes_remaining();
->>> +        info->ram->remaining = s->ram_bytes_remaining;
+No. It works fine. I have tested it.
 
-Don't remove the ram_byte_remaining(), it is updated more often, and
-give a better information about the state of memory.
-(this why in my test case I have a "remaining" ram" freezed)
+>=20
+> On the other hand, I believe you expect:
+> * "-machine pc -cpu EPYC -smp 8" to automatically enable topoext.
+Yes. Only on new machines-types
+> * "-machine pc -cpu Opteron_G1 -smp 8" to not enable topoext.
+Yes.
+> * What about "-machine -cpu Opteron_G1 -smp 8,threads=3D2"?
+No. This should not enable topoext.  Topoext is not supported by Opteron_G1=
+.
+This should warn about hyperthreading and continue.
+>=20
+>=20
+> We also have other requirements, I will try to enumerate all of
+> them below:
+>=20
+> 0) "-topoext" explicitly configured (any machine-type):
+> * Must never enable topoext.
+Yes.
+>=20
+> 1) "+topoext" explicitly configured (any machine-type):
+> * Must validate topology and refuse to start if unsupported.
 
->>>          info->ram->dirty_pages_rate = ram_counters.dirty_pages_rate;
->>>      }
->>>  }
->>> @@ -2227,6 +2227,7 @@ static void migration_update_counters(MigrationState *s,
->>>      transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
->>>      time_spent = current_time - s->iteration_start_time;
->>>      bandwidth = (double)transferred / time_spent;
->>> +    s->ram_bytes_remaining = ram_bytes_remaining();
->>>      s->threshold_size = bandwidth * s->parameters.downtime_limit;
+Yes.
 
-To have an accurate value, we must read the remaining ram just after
-having updated the dirty pages count, so I think after
-migration_bitmap_sync_range() in migration_bitmap_sync()
+>=20
+> 2) Older machine-types:
+> * Must never enable topoext automatically, even if using "EPYC"
+>   or "threads=3D2"
+>=20
+Yes.
 
->>>
->>>      s->mbps = (((double) transferred * 8.0) /
->>> @@ -2237,8 +2238,12 @@ static void migration_update_counters(MigrationState *s,
->>>       * recalculate. 10000 is a small enough number for our purposes
->>>       */
->>>      if (ram_counters.dirty_pages_rate && transferred > 10000) {
->>> -        s->expected_downtime = ram_counters.dirty_pages_rate *
->>> -            qemu_target_page_size() / bandwidth;
->>> +        /*
->>> +         * It will initially be a gross over-estimate, but for for
->>> +         * non-converging migrations it should approach a reasonable estimate
->>> +         * later on
->>> +         */
->>> +        s->expected_downtime = s->ram_bytes_remaining / bandwidth;
->>>      }
->>>
->>>      qemu_file_reset_rate_limit(s->to_dst_file);
->>> diff --git a/migration/migration.h b/migration/migration.h
->>> index 8d2f320c48..8584f8e22e 100644
->>> --- a/migration/migration.h
->>> +++ b/migration/migration.h
->>> @@ -128,6 +128,7 @@ struct MigrationState
->>>      int64_t downtime_start;
->>>      int64_t downtime;
->>>      int64_t expected_downtime;
->>> +    int64_t ram_bytes_remaining;
->>>      bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
->>>      int64_t setup_time;
->>>      /*
->>> -- 
-I think you don't need to add ram_byte_remaining, there is in
-ram_counters a "remaining" field that seems unused.
+> 3) "EPYC" CPU model (on new machine-types):
+> * Should enable topoext automatically, but only if topology is
+>   supported.
+> * Must not error out if topology is not supported.
+In new machine types we will enable topoext for "EPYC" CPU model.
+Right now(old machine type) we can disable for all the CPU models.=20
+So, we don't need two bits(topoext and auto-topoext)
 
-I think this fix can be as simple as:
+I thought we should error out if topology cannot be supported. But we can w=
+arn(disable topoext) and continue that is another option.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 1e99ec9..25b26f3 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2712,14 +2712,7 @@ static void
-migration_update_counters(MigrationState *s,
-     s->mbps = (((double) transferred * 8.0) /
-                ((double) time_spent / 1000.0)) / 1000.0 / 1000.0;
+> * Should this enable topoext automatically even if threads=3D1?
 
--    /*
--     * if we haven't sent anything, we don't want to
--     * recalculate. 10000 is a small enough number for our purposes
--     */
--    if (ram_counters.dirty_pages_rate && transferred > 10000) {
--        s->expected_downtime = ram_counters.dirty_pages_rate *
--            qemu_target_page_size() / bandwidth;
--    }
-+    s->expected_downtime = ram_counters.remaining / bandwidth;
+Yes. We should enable even with threads=3D1.
 
-     qemu_file_reset_rate_limit(s->to_dst_file);
+>=20
+> 4) Other AMD CPU models with "threads=3D2" (on new machine-types):
+> * We might want to make this enable topoext automatically, too.
+>   What do you think?
 
-diff --git a/migration/ram.c b/migration/ram.c
-index a500015..5f7b9f1 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1164,6 +1164,7 @@ static void migration_bitmap_sync(RAMState *rs)
+  No. We should not enable topoext here. We should depend on CPU model tabl=
+e here.
 
-     trace_migration_bitmap_sync_end(rs->num_dirty_pages_period);
+>=20
+> Is the above description accurate?  Do you agree with these
+> requirements?
 
-+    ram_counters.remaining = ram_bytes_remaining();
-     end_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+With these requirements in mind, I will send that patches. We can start our=
+ discussion.
+We don't need one more bits. That is my opinion.=20
 
-     /* more than 1 second = 1000 millisecons */
+
+>=20
+> We're trying to use the "topoext" property to cover all cases
+> above, but it looks like we need at least 2 bits to represent all
+> possible cases.
+>=20
+>=20
+> Maybe we can represent the cases above with two properties:
+> "topoext" and "auto-topoext".  Then each case would be
+> represented by:
+>=20
+> 0) "-topoext" explicitly configured (any machine-type):
+> * Will clear TOPOEXT on env->features and set TOPOEXT on
+>   env->user_features
+>   (already done today)
+>=20
+> 1) "+topoext" explicitly configured (any machine-type):
+> * Will set TOPOEXT on both env->user_features and env->features
+>   (already done today)
+>=20
+> 2) Older machine-types:
+> * Will set auto-topoext=3Doff (can be done on compat_props)
+> * Will set topoext=3Doff on EPYC CPU model (so TOPOEXT won't be set
+>   by default on env->features) (can be done on compat_props)
+>=20
+> 3) "EPYC" CPU model (on new machine-types):
+> * Will set auto-topoext=3Don (can be the default for all CPU
+>   models)
+> * Will set TOPOEXT on env->features) (can be done on CPU model table)
+>=20
+> 4) Other AMD CPU models with "threads=3D2" (on new machine-types):
+> * Will set auto-topoext=3Don (can be the default on all CPU models)
+> * Will keep TOPOEXT disabled on env->features (done on the CPU
+>   model table)
+>=20
+>=20
+> Then the rules would be:
+>=20
+>   if {auto_topoext && TOPOEXT not in env->user_features) {
+>       if (supported_topology) {
+>           if (threads > 1)
+>               set TOPOEXT in env->features
+>       } else
+>           unset TOPOEXT in env->features
+>   }
+>=20
+>   if (TOPOEXT in env->features && !supported_topology)
+>       error;
+>   }
+>=20
+> I think this would fulfill all the requirements above.  Please
+> help me confirm that.
+>=20
+> --
+> Eduardo
