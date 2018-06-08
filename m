@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fRGYy-0000Mt-2D
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:32:18 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fRGYy-0000N8-AT
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:32:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fRGYu-0005fF-Vt
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fRGYv-0005fS-8O
 	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:32:16 -0400
-References: <20180517081527.14410-1-david@redhat.com>
-	<20180517081527.14410-5-david@redhat.com>
-	<20180530150806.061c26b9@redhat.com>
-	<5dcb16e5-b9b9-d07d-dfe3-98724e911f83@redhat.com>
-	<20180531161310.52ea9507@redhat.com>
-	<e451e0d6-a181-b027-cdb7-f44beb11b37c@redhat.com>
-	<20180607154455.6eab4e24@redhat.com>
-	<5dda6237-88d8-f0f8-58d2-af996368cea4@redhat.com>
-	<20180608142442.0d97b7c6@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <397d37ee-b3a8-dae0-37d1-fd3c942448c2@redhat.com>
-Date: Fri, 8 Jun 2018 14:32:09 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180608142442.0d97b7c6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
- hotplug handlers
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Fri,  8 Jun 2018 15:32:08 +0300
+Message-Id: <20180608123208.54033-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] block/qcow2: save dirty_bitmaps_loaded during
+ reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,32 +18,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com
 
+This variable was introduced to handle reopens. We need it on the
+following qcow2_do_open, to don't try load bitmaps again.
 
->>> if (TYPE_PC_DIMM) {
->>>     pc_dimm_plug()
->>>     /* do here additional concrete machine specific things */
->>> } else if (TYPE_VIRTIO_MEM) {
->>>     virtio_mem_plug() <- do forwarding in there
->>>     /* and do here additional concrete machine specific things */
->>> } else if (TYPE_CPU) {
->>>     cpu_plug()
->>>     /* do here additional concrete machine specific things */
->>> }  
->>
->> That will result in a lot of duplicate code - for every machine we
->> support (dimm/virtio-mem/virtio-pmem/*add more memory devices here*) -
->> virtio-mem and virtio-pmem could most probably share the code.
-> maybe or maybe not, depending on if pmem endups as memory device or
-> separate controller. And even with duplication, machine code would
-> be easy to follow just down one explicit call chain.
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/qcow2.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Not 100% convinced but I am now going into that direction.
-
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 549fee9b69..29f7eab576 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2178,6 +2178,7 @@ static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
+     QDict *options;
+     Error *local_err = NULL;
+     int ret;
++    bool dirty_bitmaps_loaded = s->dirty_bitmaps_loaded;
+ 
+     /*
+      * Backing files are read-only which makes all of their metadata immutable,
+@@ -2190,6 +2191,7 @@ static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
+     qcow2_close(bs);
+ 
+     memset(s, 0, sizeof(BDRVQcow2State));
++    s->dirty_bitmaps_loaded = dirty_bitmaps_loaded;
+     options = qdict_clone_shallow(bs->options);
+ 
+     flags &= ~BDRV_O_INACTIVE;
 -- 
-
-Thanks,
-
-David / dhildenb
+2.11.1
