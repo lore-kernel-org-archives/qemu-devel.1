@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRLci-00011S-9u
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:56:29 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRLcx-0001E5-Lo
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:56:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRLce-0004vI-CU
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:56:28 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:40937)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRLct-00051J-R0
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:56:43 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:35314)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRLce-0004v9-64
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:56:24 -0400
-Received: by mail-qk0-x242.google.com with SMTP id r66-v6so9266067qkr.7
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 10:56:24 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180531171253.21012-1-pbonzini@redhat.com>
-	<20180531171606.21604-1-pbonzini@redhat.com>
-	<20180531171606.21604-14-pbonzini@redhat.com>
-	<20180608193905.0841f4d5@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <93a5ade5-2550-8b8a-60f3-9ee72bd75d45@amsat.org>
-Date: Fri, 8 Jun 2018 14:56:20 -0300
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fRLct-000519-Jf
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:56:39 -0400
+Received: by mail-pl0-x242.google.com with SMTP id k1-v6so310967plt.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 10:56:39 -0700 (PDT)
+References: <152839776057.447.4308730223123096@d39dc562802a>
+	<b4fe23eb-70a3-3f71-7b53-daca08aba6b4@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <386b549c-76ca-8b14-d9a3-e3d08b55c717@linaro.org>
+Date: Fri, 8 Jun 2018 07:56:34 -1000
 MIME-Version: 1.0
-In-Reply-To: <20180608193905.0841f4d5@bahia.lan>
+In-Reply-To: <b4fe23eb-70a3-3f71-7b53-daca08aba6b4@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 52/53] char: Remove unwanted crlf conversion
+Subject: Re: [Qemu-devel] [PATCH 0/4] linux-user: syscall number fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,97 +31,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Patryk Olszewski <patryk@fala.ehost.pl>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-On 06/08/2018 02:39 PM, Greg Kurz wrote:
-> On Thu, 31 May 2018 19:16:05 +0200
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
->> From: Patryk Olszewski <patryk@fala.ehost.pl>
->>
->> This patch fixes a bug in serial that made it almost impossible for guest
->> to communicate with devices through host's serial.
->>
->> OPOST flag in c_oflag enables output processing letting other flags in
->> c_oflag take effect. Usually in c_oflag ONLCR flag is also set, which
->> causes crlf to be sent in place of lf. This breaks binary transmissions.
->> Unsetting OPOST flag turns off any output processing which fixes the bug.
->>
-> 
-> But it damages error reporting...
-> 
-> Without this patch:
-> 
-> $ qemu-system-ppc64 -serial stdio -kernel foo
-> foo: No such file or directory
-> qemu-system-ppc64: error loading foo: Failed to load ELF
-> $
-> 
-> With this patch:
-> 
-> $ .mbuild-ppc-for-3.0/obj/ppc64-softmmu/qemu-system-ppc64 -serial stdio -kernel foo
-> foo: No such file or directory
->                               qemu-system-ppc64: error loading foo: Failed to load ELF
->                                                                                       $
-> 
-> It is possible to patch vreport() to append an explicit CR:
-> 
->      error_vprintf(fmt, ap);
-> -    error_printf("\n");
-> +    error_printf("\n\r");
->  }
-> 
-> but it only fixes the trailing newline of error_report(). Any other newline,
-> eg when using error_append_hint(), will lack the CR... Not sure how to fix
-> this :-\
+On 06/07/2018 10:17 AM, Laurent Vivier wrote:
+> If you agree, I will remove tabs when I'll commit the patches for the
+> pull-request.
 
-Peter just pushed the fix (ed6b018ef7):
+Yes please.  I should have noticed them there when making my change.
 
-http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg02152.html
 
-> 
->> Bug reports related:
->> https://bugs.launchpad.net/qemu/+bug/1772086
->> https://bugs.launchpad.net/qemu/+bug/1407813
->> https://bugs.launchpad.net/qemu/+bug/1715296
->> also
->> https://lists.nongnu.org/archive/html/qemu-devel/2006-06/msg00196.html
->>
->> Signed-off-by: Patryk Olszewski <patryk@fala.ehost.pl>
->> Message-Id: <1527105041-21013-1-git-send-email-patryk@fala.ehost.pl>
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  chardev/char-serial.c | 2 +-
->>  chardev/char-stdio.c  | 2 +-
->>  2 files changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/chardev/char-serial.c b/chardev/char-serial.c
->> index feb52e559d..ae548d28da 100644
->> --- a/chardev/char-serial.c
->> +++ b/chardev/char-serial.c
->> @@ -139,7 +139,7 @@ static void tty_serial_init(int fd, int speed,
->>  
->>      tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
->>                       | INLCR | IGNCR | ICRNL | IXON);
->> -    tty.c_oflag |= OPOST;
->> +    tty.c_oflag &= ~OPOST;
->>      tty.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
->>      tty.c_cflag &= ~(CSIZE | PARENB | PARODD | CRTSCTS | CSTOPB);
->>      switch (data_bits) {
->> diff --git a/chardev/char-stdio.c b/chardev/char-stdio.c
->> index 96375f2ab8..d83e60e787 100644
->> --- a/chardev/char-stdio.c
->> +++ b/chardev/char-stdio.c
->> @@ -59,7 +59,7 @@ static void qemu_chr_set_echo_stdio(Chardev *chr, bool echo)
->>      if (!echo) {
->>          tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
->>                           | INLCR | IGNCR | ICRNL | IXON);
->> -        tty.c_oflag |= OPOST;
->> +        tty.c_oflag &= ~OPOST;
->>          tty.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN);
->>          tty.c_cflag &= ~(CSIZE | PARENB);
->>          tty.c_cflag |= CS8;
-> 
+r~
