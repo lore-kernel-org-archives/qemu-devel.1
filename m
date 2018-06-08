@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fRJGc-0000AQ-1N
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:25:31 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fRJOx-0005IP-5J
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:34:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fRJGb-0006Bx-1T
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:25:30 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:46280)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fRJGa-0006Bc-Rb
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:25:28 -0400
-Received: by mail-ot0-x243.google.com with SMTP id q1-v6so16104509oth.13
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 08:25:28 -0700 (PDT)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fRJOw-0002Xx-3V
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:34:07 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+References: <20180608123208.54033-1-vsementsov@virtuozzo.com>
+Message-ID: <de1884cb-00e0-8042-3eef-d81ac32d9c0e@virtuozzo.com>
+Date: Fri, 8 Jun 2018 18:33:54 +0300
 MIME-Version: 1.0
-In-Reply-To: <9abdaa17-d6d1-0c34-2a20-43078b487bef@redhat.com>
-References: <20180607210818.12727-1-f4bug@amsat.org>
-	<9abdaa17-d6d1-0c34-2a20-43078b487bef@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Jun 2018 16:25:07 +0100
-Message-ID: <CAFEAcA-QYnWOo2Hqdr-3tKDDxWDnR+tF4snd15Y1P6md04CogA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20180608123208.54033-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] chardev: Restore CR,LF on stdio
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] block/qcow2: save dirty_bitmaps_loaded
+ during reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +24,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Patryk Olszewski <patryk@fala.ehost.pl>, BALATON Zoltan <balaton@eik.bme.hu>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Desnogues <laurent.desnogues@gmail.com>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com
 
-On 8 June 2018 at 06:47, Thomas Huth <thuth@redhat.com> wrote:
-> On 07.06.2018 23:08, Philippe Mathieu-Daud=C3=A9 wrote:
->> Remove the 'stair-step output' on stdio.
->>
->> This partially reverts commit 12fb0ac05, which was correct
->> on the mailing list but got corrupted by the maintainer :p
->>
->> Introduced-by: 3b876140-c035-dd39-75d0-d54c48128fac@redhat.com
->> Reported-by: BALATON Zoltan <balaton@eik.bme.hu>
->> Suggested-by: Thomas Huth <thuth@redhat.com>
->> Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> ---
->> See:
->> http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg06202.html (b=
-ug)
->> http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg01309.html (r=
-eport)
->>
->> Peter, Can this enters directly as bug-fix?
->>
->>  chardev/char-stdio.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/chardev/char-stdio.c b/chardev/char-stdio.c
->> index d83e60e787..96375f2ab8 100644
->> --- a/chardev/char-stdio.c
->> +++ b/chardev/char-stdio.c
->> @@ -59,7 +59,7 @@ static void qemu_chr_set_echo_stdio(Chardev *chr, bool=
- echo)
->>      if (!echo) {
->>          tty.c_iflag &=3D ~(IGNBRK | BRKINT | PARMRK | ISTRIP
->>                           | INLCR | IGNCR | ICRNL | IXON);
->> -        tty.c_oflag &=3D ~OPOST;
->> +        tty.c_oflag |=3D OPOST;
->>          tty.c_lflag &=3D ~(ECHO | ECHONL | ICANON | IEXTEN);
->>          tty.c_cflag &=3D ~(CSIZE | PARENB);
->>          tty.c_cflag |=3D CS8;
->>
+08.06.2018 15:32, Vladimir Sementsov-Ogievskiy wrote:
+> This variable was introduced to handle reopens. We need it on the
+> following qcow2_do_open, to don't try load bitmaps again.
 >
-> I think this is the right way to go.
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   block/qcow2.c | 2 ++
+>   1 file changed, 2 insertions(+)
 >
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 549fee9b69..29f7eab576 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -2178,6 +2178,7 @@ static void coroutine_fn qcow2_co_invalidate_cache(=
+BlockDriverState *bs,
+>       QDict *options;
+>       Error *local_err =3D NULL;
+>       int ret;
+> +    bool dirty_bitmaps_loaded =3D s->dirty_bitmaps_loaded;
+>  =20
+>       /*
+>        * Backing files are read-only which makes all of their metadata im=
+mutable,
+> @@ -2190,6 +2191,7 @@ static void coroutine_fn qcow2_co_invalidate_cache(=
+BlockDriverState *bs,
+>       qcow2_close(bs);
+>  =20
+>       memset(s, 0, sizeof(BDRVQcow2State));
+> +    s->dirty_bitmaps_loaded =3D dirty_bitmaps_loaded;
+>       options =3D qdict_clone_shallow(bs->options);
+>  =20
+>       flags &=3D ~BDRV_O_INACTIVE;
 
-Applied to master, thanks.
+Haha, this breaks 169 test.. Because, logic around dirty_bitmaps_loaded,=20
+which is fixed here, actually breaks it.
 
--- PMM
+context:
+
+static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ int flags, Error **errp)
+{
+
+[...]
+
+ =C2=A0=C2=A0=C2=A0 if (s->dirty_bitmaps_loaded) {
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* It's some kind of reopen. Th=
+ere are no known cases where we=20
+need to
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * reload bitmaps in such =
+a situation, so it's safer to skip them.
+*
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Moreover, if we have so=
+me readonly bitmaps and we are=20
+reopening for
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * rw we should reopen bit=
+maps correspondingly.
+*/
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bdrv_has_readonly_bitmaps(b=
+s) &&
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !bdrv_i=
+s_read_only(bs) && !(bdrv_get_flags(bs) &=20
+BDRV_O_INACTIVE))
+{
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qcow2_r=
+eopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
+}
+ =C2=A0=C2=A0=C2=A0 } else {
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 header_updated =3D qcow2_load_d=
+irty_bitmaps(bs, &local_err);
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->dirty_bitmaps_loaded =3D tru=
+e;
+ =C2=A0=C2=A0=C2=A0 }
+
+[...]
+
+- First time, we go into "else" block, but there no bitmaps yet, as=20
+target is opened before source closed. On second time, we go into "if"=20
+block, but there is nothing to reopen.
+
+I'll resend the patch, with additional fixing.
+
+--=20
+Best regards,
+Vladimir
