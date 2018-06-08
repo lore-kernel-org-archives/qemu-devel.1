@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRIZ5-0006U4-9C
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:40:32 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fRIbn-0000Na-5Q
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:43:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRIZ2-0002tp-5v
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:40:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43262 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fRIZ2-0002tR-0S
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:40:28 -0400
-Date: Fri, 8 Jun 2018 15:40:23 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180608144023.GS18233@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180608143026.20167-1-ehabkost@redhat.com>
-	<24e7a171-33b6-e9ca-9d9c-d61a7a2c5047@amsat.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fRIbm-0005Nk-D0
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:43:19 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180607180641.874-1-f4bug@amsat.org>
+	<CAFEAcA9N9XyQrU9Y1XmgLDU9viUB1+U8iQH5QguAkxzqop4piw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <4d519668-0f79-80c9-ceef-9fe531c76c1f@amsat.org>
+Date: Fri, 8 Jun 2018 11:43:09 -0300
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9N9XyQrU9Y1XmgLDU9viUB1+U8iQH5QguAkxzqop4piw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <24e7a171-33b6-e9ca-9d9c-d61a7a2c5047@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Require Python 2.7 or newer
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 0/7] sdcard: cleanup the
+ SD_SPEC version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,43 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paul Brook <paul@codesourcery.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Fri, Jun 08, 2018 at 11:37:36AM -0300, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> Cc'ing Eric
->=20
-> On 06/08/2018 11:30 AM, Eduardo Habkost wrote:
-> > All of the supported build platforms documented in qemu-doc.texi
-> > should already support Python 2.7.
->=20
-> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg05173.html
->=20
->   On 08/25/2017 11:40 AM, Peter Maydell wrote:
->   > Our choices about our dependencies are generally driven by "what
->   > are the versions available on the oldest distros which we wish
->   > to support building QEMU on", which typically is whatever the
->   > long-term-support versions of Ubuntu, SUSE, Redhat, etc are.
->   >
->   > Has somebody checked what that means for our Python version
->   > requirements?
->=20
->   At least this one:
->=20
->   RHEL/CentOS 6: Python-2.6.6
+On 06/08/2018 09:14 AM, Peter Maydell wrote:
+> On 7 June 2018 at 19:06, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> Since v2:
+>> - heavy documentation improvements
+>> - squashed previous 3+4 "add spec_version property default to v2" for atomicity
+>> - SSI/SD patch downgraded to RFC
+>> - added Alistair R-b tags
+> 
+>> Philippe Mathieu-Daudé (7):
+>>   sdcard: Update the Configuration Register (SCR) to Spec Version 1.10
+>>   sdcard: Allow commands valid in SPI mode
+>>   sdcard: Add a 'spec_version' property, default to Spec v2.00
+>>   sdcard: Disable SEND_IF_COND (CMD8) for Spec v1
+>>   sdcard: Reflect when the Spec v3 is supported in the Config Register (SCR)
+>>   sdcard: Disable CMD19/CMD23 for Spec v2
+>>   hw/sd/ssi-sd: Force cards connected in SPI mode to use Spec v1.10
+> 
+> Hi; I've applied patches 1-6 to target-arm.next. 7 I had a
+> question about.
 
-RHEL6 is no longer a target we care about and is being explicitly
-broken as a result of the min glib bump:
-
-  https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg02104.html
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Thanks!
