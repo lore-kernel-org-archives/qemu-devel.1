@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fR8u3-0007ad-Rs
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:21:33 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fR8u1-0007aH-RI
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:21:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fR8u0-0007dF-Oi
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:21:31 -0400
-Date: Fri, 8 Jun 2018 13:29:49 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fR8u0-0007d8-OY
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:21:29 -0400
+Date: Fri, 8 Jun 2018 13:28:08 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180608032949.GK3344@umbus.fritz.box>
+Message-ID: <20180608032808.GH3344@umbus.fritz.box>
 References: <20180607165218.9558-1-david@redhat.com>
-	<20180607165218.9558-6-david@redhat.com>
+	<20180607165218.9558-3-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="DozTQjXnjm3C9Xhk"
+	protocol="application/pgp-signature"; boundary="OgApRN/oydYDdnYz"
 Content-Disposition: inline
-In-Reply-To: <20180607165218.9558-6-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 5/8] spapr: introduce machine unplug
- handler
+In-Reply-To: <20180607165218.9558-3-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 2/8] spapr: no need to verify the node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +28,47 @@ To: David Hildenbrand <david@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Greg Kurz <groug@kaod.org>
 
 
---DozTQjXnjm3C9Xhk
+--OgApRN/oydYDdnYz
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 07, 2018 at 06:52:15PM +0200, David Hildenbrand wrote:
-> We'll be handling unplug of e.g. CPUs and PCDIMMs  via the general
-> hotplug handler soon, so let's add that handler function.
+On Thu, Jun 07, 2018 at 06:52:12PM +0200, David Hildenbrand wrote:
+> The node property can always be queried and the value has already been
+> verified in pc_dimm_realize().
 >=20
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/ppc/spapr.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  hw/ppc/spapr.c | 9 +--------
+>  1 file changed, 1 insertion(+), 8 deletions(-)
 >=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 4447cb197f..bcb72d9fa7 100644
+> index 2375cbee12..d038f3243e 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -3586,6 +3586,11 @@ static void spapr_machine_device_plug(HotplugHandl=
+> @@ -3578,14 +3578,7 @@ static void spapr_machine_device_plug(HotplugHandl=
 er *hotplug_dev,
->      error_propagate(errp, local_err);
->  }
+>              error_setg(errp, "Memory hotplug not supported for this mach=
+ine");
+>              return;
+>          }
+> -        node =3D object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP=
+, errp);
+> -        if (*errp) {
+> -            return;
+> -        }
+> -        if (node < 0 || node >=3D MAX_NODES) {
+> -            error_setg(errp, "Invaild node %d", node);
+> -            return;
+> -        }
+> +        node =3D object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP=
+, NULL);
 > =20
-> +static void spapr_machine_device_unplug(HotplugHandler *hotplug_dev,
-> +                                        DeviceState *dev, Error **errp)
-> +{
-> +}
-> +
->  static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_=
-dev,
->                                                  DeviceState *dev, Error =
-**errp)
->  {
-> @@ -3988,6 +3993,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
->      mc->get_default_cpu_node_id =3D spapr_get_default_cpu_node_id;
->      mc->possible_cpu_arch_ids =3D spapr_possible_cpu_arch_ids;
->      hc->unplug_request =3D spapr_machine_device_unplug_request;
-> +    hc->unplug =3D spapr_machine_device_unplug;
-> =20
->      smc->dr_lmb_enabled =3D true;
->      mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power8_v2.0");
+>          spapr_memory_plug(hotplug_dev, dev, node, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -81,24 +76,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---DozTQjXnjm3C9Xhk
+--OgApRN/oydYDdnYz
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsZ+C0ACgkQbDjKyiDZ
-s5IiuhAA2FewRuxTom6C+hLUCDwEexPd+Ep5zqWWN0K3JgpyqvXYXIr/INWgjDKI
-ncP0tKk2qFMEd+MFKxrhyOw/vU5v2p8v4w6HDks2Z83UDy5ekKyWH1EGDE6OcEmc
-puCtUFnbnkCMK/UYRmBN64o/5oDoyv88YKfn99XUw6q55aMWJofGizv7CZdpgdwr
-M6M1RfjASNUVyQPK/f+5i5pgvmHntoZbUpHZKnQaouar7cUZ/BJwcXAfzCRpdy0z
-BNgbYRpfjJKEP/pe+Fjv2KtmqZv3UILs8BmrC846ciUzS+95h5Uxzg37qmIwW4bf
-aag6BE1mG8Bg9JWqhHQFbp81VtkJYBUHtkXZgEESb52gv/uRjB9bJ7dXg6UCdn7A
-SdU2A6A2m3HwGb+cdg0bp47GFSravz8hPEWDXn7VwafR7QNV99YsSzTtwZaBKjhv
-xi2ZLDoFKESJ3/z9J1mcbCub/ZLROFaHfBk0LFWvJbgeSjkOhqd9MHGbWNzgON/u
-KzzBVWVx28YWxx/J0xxTcGVGVx656UAZ/KCRFLwFtCgo2fonYPld/MVrrow2qME9
-tTyG+q2Ktefi5HKTyCQn5f5QIQRLRNpuG/cXVeM/4jBQ1jFdCHz9MyQu+uXU6jN3
-3G4+8jHCgG1GFi4kESMlsiS8eu7kGmq7zwRvPUzgcVDbudbGrZo=
-=wkCg
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsZ98UACgkQbDjKyiDZ
+s5KbdRAA13Cgb7cm1OsguJK4/Vgc+zNThMGlVlHsQ8JYreR5/BDi8rFuSItT/RkL
+K0j/e2nsOcDl1+tvVi5iNsQlxidul1mxzHn3juv6ElpVPEipX362X6NV5gznToZo
+3uCe/fXDDDyKoQ26pH5CvWgtVQkewmhAPqe0PhYSb4+Uoz8oXKaesKBY9Y6slx7x
+A6mJqcWL7W1Ro/4pf0D2yg6pz4CXCUWB1suslsyK2D3EvW0HFF9dNziwrmb4gg0k
+8YYaDHYRQgtedJAMsgs67lCnhsMMepeun7h9DQYb+oJIsuWpc8VeCUruo+I0bDd9
+XyqD9SU6NR200hB8KpwMyY0vcvZhFviQVSp9xHZHpCFPZhAi3jLmlff+sc/wde18
+Q9KIrNFk5vsS+uT/SUZAuvi7lB/bpOU1oHtfF6Qsruw4DZivMzTts5zpZ7m1EnHr
++dsptf/utbHtOoa1OGS9vbTW9sNOyL9oYZhpEtrsDf5zNPsVNEfTvt7dMpMA9YNu
+cy3xvQ4fcnBVNTdtGdXRmxmley/SyMbZZgWDLAfb/+k7v/7KJdRpyN54uFQoBfhR
+XaAGLgbJACR9aqbNGglxpcTjn9pt6NL/WOKuKcnHNubrLG6bEa25bKtoxFwSG2r6
+ViyD4mt+ljvI0n/I0M+t3lovg8f8lpfSq14YiISz371oz8B+gtE=
+=rkO2
 -----END PGP SIGNATURE-----
 
---DozTQjXnjm3C9Xhk--
+--OgApRN/oydYDdnYz--
