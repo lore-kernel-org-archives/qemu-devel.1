@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRHFU-0003Zq-4g
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:16:13 -0400
+	(envelope-from <berrange@redhat.com>) id 1fRHFV-0003Zs-CE
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:16:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRHFT-0002CE-7M
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:16:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51604 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fRHFQ-0002B9-49
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:16:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51562 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fRHFT-0002C7-2l
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:16:11 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fRHFP-0002As-VO
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:16:08 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri,  8 Jun 2018 14:16:02 +0100
-Message-Id: <20180608131604.16826-2-berrange@redhat.com>
-In-Reply-To: <20180608131604.16826-1-berrange@redhat.com>
-References: <20180608131604.16826-1-berrange@redhat.com>
+Date: Fri,  8 Jun 2018 14:16:01 +0100
+Message-Id: <20180608131604.16826-1-berrange@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 1/3] util: remove redundant include of
- glib.h and add osdep.h
+Subject: [Qemu-devel] [PATCH v3 0/3] glib: update the min required version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +27,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Thomas Huth <thuth@redhat.com>, Peter Xu <peterx@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Olaf Hering <olaf@aepfle.de>
 
-Code must only ever include glib.h indirectly via the glib-compat.h
-header file, because we will need some macros set before glib.h is
-pulled in. Adding extra includes of glib.h will (soon) cause compile
-failures such as:
+The previous patch to bump glib to 2.42 hit problems with Peter's build
+environment for testing merge:
 
-In file included from /home/berrange/src/virt/qemu/include/qemu/osdep.h:1=
-07,
-                 from /home/berrange/src/virt/qemu/include/qemu/iova-tree=
-.h:26,
-                 from util/iova-tree.c:13:
-/home/berrange/src/virt/qemu/include/glib-compat.h:22: error: "GLIB_VERSI=
-ON_MIN_REQUIRED" redefined [-Werror]
- #define GLIB_VERSION_MIN_REQUIRED GLIB_VERSION_2_40
+  https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02557.html
 
-In file included from /usr/include/glib-2.0/glib/gtypes.h:34,
-                 from /usr/include/glib-2.0/glib/galloca.h:32,
-                 from /usr/include/glib-2.0/glib.h:30,
-                 from util/iova-tree.c:12:
-/usr/include/glib-2.0/glib/gversionmacros.h:237: note: this is the locati=
-on of the previous definition
- # define GLIB_VERSION_MIN_REQUIRED      (GLIB_VERSION_CUR_STABLE)
+This posting drops back to 2.40, which allows Ubuntu 14.04 from GLibC
+compile farm to be supported.
 
-Furthermore, the osdep.h include should always be done directly from the
-.c file rather than indirectly via any .h file.
+It does NOT try to go back to 2.34, because it is hoped that the mxe.cc
+Debian packages will be suitable for Peter to test Windows
+cross-compile. Alternatively the docker environments provided in tree
+can be used for mingw build testing on any host able to run docker.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- include/qemu/iova-tree.h | 1 -
- util/iova-tree.c         | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+I also dropped some more GLIB_CHECK_VERSION checks that are redundant
+given the new min version.
 
-diff --git a/include/qemu/iova-tree.h b/include/qemu/iova-tree.h
-index b061932097..b66cf93c4b 100644
---- a/include/qemu/iova-tree.h
-+++ b/include/qemu/iova-tree.h
-@@ -23,7 +23,6 @@
-  * for the thread safety issue.
-  */
-=20
--#include "qemu/osdep.h"
- #include "exec/memory.h"
- #include "exec/hwaddr.h"
-=20
-diff --git a/util/iova-tree.c b/util/iova-tree.c
-index 2d9cebfc89..7990692cbd 100644
---- a/util/iova-tree.c
-+++ b/util/iova-tree.c
-@@ -9,7 +9,7 @@
-  * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-  */
-=20
--#include <glib.h>
-+#include "qemu/osdep.h"
- #include "qemu/iova-tree.h"
-=20
- struct IOVATree {
+Changed in v3:
+
+ - Use #pragma instead of _Pragma
+ - Move dockerfile deletion to earlier patch
+ - Add missing osdep.h include
+ - Reorder patches to preserve bisectability
+
+Daniel P. Berrang=C3=A9 (3):
+  util: remove redundant include of glib.h and add osdep.h
+  glib: bump min required glib library version to 2.40
+  glib: enforce the minimum required version and warn about old APIs
+
+ configure                                |   6 +-
+ crypto/hash-glib.c                       |   4 -
+ crypto/hmac-glib.c                       |  36 ---
+ include/glib-compat.h                    | 373 ++++-------------------
+ include/qemu/iova-tree.h                 |   1 -
+ qga/commands.c                           |  11 +-
+ tests/docker/dockerfiles/centos6.docker  |  30 --
+ tests/docker/dockerfiles/min-glib.docker |   8 -
+ tests/ivshmem-test.c                     |   6 -
+ tests/test-qga.c                         |   2 -
+ tests/test-qmp-event.c                   |   8 +-
+ tests/tpm-emu.h                          |   4 +-
+ tests/vhost-user-test.c                  |  26 +-
+ trace/simple.c                           |   6 +-
+ util/iova-tree.c                         |   2 +-
+ util/osdep.c                             |  14 -
+ 16 files changed, 73 insertions(+), 464 deletions(-)
+ delete mode 100644 tests/docker/dockerfiles/centos6.docker
+ delete mode 100644 tests/docker/dockerfiles/min-glib.docker
+
 --=20
 2.17.0
