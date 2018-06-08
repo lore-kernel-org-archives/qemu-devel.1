@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fR9Ec-00019D-MZ
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:42:47 -0400
+	(envelope-from <junyan.he@intel.com>) id 1fR9YM-0000Bl-8B
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 01:03:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fR9EZ-0000Ew-Jv
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:42:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49016 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fR9EZ-0000ER-EM
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:42:43 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7F90BBB43A
-	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 04:42:42 +0000 (UTC)
-Date: Fri, 8 Jun 2018 12:42:35 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180608044235.GA7736@xz-mi>
-References: <20180604080630.10946-1-peterx@redhat.com>
-	<87tvqeyfs2.fsf@dusky.pond.sub.org>
+	(envelope-from <junyan.he@intel.com>) id 1fR9YI-00087B-9P
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 01:03:10 -0400
+From: "He, Junyan" <junyan.he@intel.com>
+Date: Fri, 8 Jun 2018 05:02:58 +0000
+Message-ID: <EC8A4E314CF1574AB62C80421BD983393409C805@SHSMSX104.ccr.corp.intel.com>
+References: <1514187226.13662.28.camel@intel.com>
+	<6e792b9f-2281-e8db-0410-c4c3468ffc90@redhat.com>
+	<20180508150309.GC4065@localhost.localdomain>
+	<20180509101618.GC19645@stefanha-x1.localdomain>
+	<d8a06161-d611-4f27-f4c8-f14370f191d4@redhat.com>
+	<20180510082659.GC1296@stefanha-x1.localdomain>
+	<20180511172531.GB5016@localhost.localdomain>
+	<20180514134846.GD5182@stefanha-x1.localdomain>
+	<20180530144450.GB5973@stefanha-x1.localdomain>
+	<20180530160719.GD4311@localhost.localdomain>
+	<20180531104838.GC27838@stefanha-x1.localdomain>
+In-Reply-To: <20180531104838.GC27838@stefanha-x1.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87tvqeyfs2.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] monitor: postpone
- monitor_qmp_cleanup_queues
+Subject: Re: [Qemu-devel] [Qemu-block] Some question about savem/qcow2
+ incremental snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,111 +34,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Pankaj Gupta <pagupta@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
 
-On Thu, Jun 07, 2018 at 01:53:01PM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
-> 
-> > Previously we cleanup the queues when we got CLOSED event.  It was used
-> 
-> we clean up
-> 
-> > to make sure we won't leftover replies/events of a old client to a new
-> 
-> we won't send leftover replies/events of an old client
-> 
-> > client.  Now this patch postpones that until OPENED.
-> 
-> What if OPENED never comes?
+Dear all:
 
-Then we clean that up until destruction of the monitor.  IMHO it's
-fine, but I'm not sure whether that's an overall acceptable approach.
+I just switched from graphic/media field to virtualization at the end of th=
+e last year,
+so I am sorry that though I have already try my best but I still feel a lit=
+tle dizzy
+about your previous discussion about NVDimm via block layer:)
+In today's qemu, we use the SaveVMHandlers functions to handle both snapsho=
+t and migration.
+So for nvdimm kind memory, its migration and snapshot use the same way as t=
+he=20
+ram(savevm_ram_handlers). But the difference is the size of nvdimm may be h=
+uge, and the load
+and store speed is slower. According to my usage, when I use 256G nvdimm as=
+ memory backend,
+it may take more than 5 minutes to complete one snapshot saving, and after =
+saving the qcow2
+image is bigger than 50G. For migration, this may not be a problem because =
+we do not need
+extra disk space and the guest is not paused when in migration process. But=
+ for snapshot,
+we need to pause the VM and the user experience is bad, and we got concerns=
+ about that.
+I posted this question in Jan this year but failed to get enough reply. The=
+n I sent a RFC patch
+set in Mar, basic idea is using the dependency snapshot and dirty log trace=
+ in kernel to
+optimize this.
 
-> 
-> > In most cases, it does not really matter much since either way will make
-> > sure that the new client won't receive unexpected old events/responses.
-> > However there can be a very rare race condition with the old way when we
-> > use QMP with stdio and pipelines (which is quite common in iotests).
-> > The problem is that, we can easily have something like this in scripts:
-> >
-> >   cat $QMP_COMMANDS | qemu -qmp stdio ... | filter_commands
-> >
-> > In most cases, a QMP session will be based on a bidirectional
-> > channel (read/write to a TCP port, for example), so IN and OUT are
-> > sharing some fundamentally same thing.  However that's untrue for pipes
-> 
-> Suggest "are fundamentally the same thing".
-> 
-> > above - the IN is the "cat" program, while the "OUT" is directed to the
-> > "filter_commands" which is actually another process.
-> 
-> Regarding 'IN is the "cat" program': a pipe is not a program.  Suggest
-> 'IN is connected to "cat", while OUT is connected to "filter_commands",
-> which are separate processes.
-> 
-> > Now when we received the CLOSED event, we cleanup the queues (including
-> 
-> we clean up
-> 
-> > the QMP response queue).  That means, if we kill/stop the "cat" process
-> > faster than the filter_commands process, the filter_commands process is
-> > possible to miss some responses/events that should belong to it.
-> 
-> I'm not sure I understand the error scenario.  Can you explain it in
-> more concrete terms?  Like "cat terminates, QEMU reads EOF, QEMU does
-> this, QEMU does that, oops, it shouldn't have done that".
+https://lists.gnu.org/archive/html/qemu-devel/2018-03/msg04530.html
 
-One condition could be this (after "quit" command is executed and QEMU
-quits the main loop):
+I use the simple way to handle this,
+1. Separate the nvdimm region from ram when do snapshot.
+2. If the first time, we dump all the nvdimm data the same as ram, and enab=
+le dirty log trace
+for nvdimm kind region.
+3. If not the first time, we find the previous snapshot point and add refer=
+ence to its clusters
+which is used to store nvdimm data. And this time, we just save dirty page =
+bitmap and dirty pages.
+Because the previous nvdimm data clusters is ref added, we do not need to w=
+orry about its deleting.
 
-1. [main thread] QEMU queues one SHUTDOWN event into response queue
+I encounter a lot of problems:
+1. Migration and snapshot logic is mixed and need to separate them for nvdi=
+mm.
+2. Cluster has its alignment. When do snapshot, we just save data to disk c=
+ontinuous. Because we
+need to add ref to cluster, we really need to consider the alignment. I jus=
+t use a little trick way=20
+to padding some data to alignment now, and I think it is not a good way.
+3. Dirty log trace may have some performance problem.
 
-2. "cat" terminates (to distinguish it from the animal, I quote it).
-   Logically it can terminate even earlier, but let's just assume it's
-   here.
+In theory, this manner can be used to handle all kind of huge memory snapsh=
+ot, we need to find the=20
+balance between guest performance(Because of dirty log trace) and snapshot =
+saving time.
 
-3. [monitor iothread] QEMU reads EOF from stdin, which connects to the
-   "cat" process
+Thanks
+Junyan
 
-4. [monitor iothread] QEMU calls the CLOSED event hook for the monitor,
-   which will clean up the response queue of the monitor, then the
-   SHUTDOWN event is dropped
 
-5. [main thread] clean up the monitors in monitor_cleanup(), when
-   trying to flush pending responses, it sees nothing.  SHUTDOWN is
-   lost forever
+-----Original Message-----
+From: Stefan Hajnoczi [mailto:stefanha@redhat.com]=20
+Sent: Thursday, May 31, 2018 6:49 PM
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>; He, Junyan <junyan.he@intel.com>; Pankaj=
+ Gupta <pagupta@redhat.com>; qemu-devel@nongnu.org; qemu block <qemu-block@=
+nongnu.org>
+Subject: Re: [Qemu-block] [Qemu-devel] Some question about savem/qcow2 incr=
+emental snapshot
 
-Note that before the monitor iothread was introduced, step [4]/[5]
-could never happen since the main loop was the only place to detect
-the EOF event of stdin and run the CLOSED event hooks.  Now things can
-happen in parallel in the iothread.
+On Wed, May 30, 2018 at 06:07:19PM +0200, Kevin Wolf wrote:
+> Am 30.05.2018 um 16:44 hat Stefan Hajnoczi geschrieben:
+> > On Mon, May 14, 2018 at 02:48:47PM +0100, Stefan Hajnoczi wrote:
+> > > On Fri, May 11, 2018 at 07:25:31PM +0200, Kevin Wolf wrote:
+> > > > Am 10.05.2018 um 10:26 hat Stefan Hajnoczi geschrieben:
+> > > > > On Wed, May 09, 2018 at 07:54:31PM +0200, Max Reitz wrote:
+> > > > > > On 2018-05-09 12:16, Stefan Hajnoczi wrote:
+> > > > > > > On Tue, May 08, 2018 at 05:03:09PM +0200, Kevin Wolf wrote:
+> > > > > > >> Am 08.05.2018 um 16:41 hat Eric Blake geschrieben:
+> > > > > > >>> On 12/25/2017 01:33 AM, He Junyan wrote:
+> > > > > > >> I think it makes sense to invest some effort into such=20
+> > > > > > >> interfaces, but be prepared for a long journey.
+> > > > > > >=20
+> > > > > > > I like the suggestion but it needs to be followed up with=20
+> > > > > > > a concrete design that is feasible and fair for Junyan and ot=
+hers to implement.
+> > > > > > > Otherwise the "long journey" is really just a way of=20
+> > > > > > > rejecting this feature.
+> >=20
+> > The discussion on NVDIMM via the block layer has runs its course. =20
+> > It would be a big project and I don't think it's fair to ask Junyan=20
+> > to implement it.
+> >=20
+> > My understanding is this patch series doesn't modify the qcow2=20
+> > on-disk file format.  Rather, it just uses existing qcow2 mechanisms=20
+> > and extends live migration to identify the NVDIMM state state region=20
+> > to share the clusters.
+> >=20
+> > Since this feature does not involve qcow2 format changes and is just=20
+> > an optimization (dirty blocks still need to be allocated), it can be=20
+> > removed from QEMU in the future if a better alternative becomes=20
+> > available.
+> >=20
+> > Junyan: Can you rebase the series and send a new revision?
+> >=20
+> > Kevin and Max: Does this sound alright?
+>=20
+> Do patches exist? I've never seen any, so I thought this was just the=20
+> early design stage.
 
-I can add these into commit message.
+Sorry for the confusion, the earlier patch series was here:
 
-> 
-> > In practise, I encountered a very strange SHUTDOWN event missing when
-> 
-> practice
-> 
-> May I suggest use of a spell checker?  ;)
+  https://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg04530.html
 
-Sorry for that.  TODO added: "Find a spell checker for Emacs".
+> I suspect that while it wouldn't change the qcow2 on-disk format in a=20
+> way that the qcow2 spec would have to be change, it does need to=20
+> change the VMState format that is stored as a blob within the qcow2 file.
+> At least, you need to store which other snapshot it is based upon so=20
+> that you can actually resume a VM from the incremental state.
+>=20
+> Once you modify the VMState format/the migration stream, removing it=20
+> from QEMU again later means that you can't load your old snapshots any=20
+> more. Doing that, even with the two-release deprecation period, would=20
+> be quite nasty.
+>=20
+> But you're right, depending on how the feature is implemented, it=20
+> might not be a thing that affects qcow2 much, but one that the=20
+> migration maintainers need to have a look at. I kind of suspect that=20
+> it would actually touch both parts to a degree that it would need=20
+> approval from both sides.
 
-> 
-> > running test with iotest 087.  Without this patch, iotest 078 will have
-> 
-> 087 or 078?
+VMState wire format changes are minimal.  The only issue is that the previo=
+us snapshot's nvdimm vmstate can start at an arbitrary offset in the qcow2 =
+cluster.  We can find a solution to the misalignment problem (I think Junya=
+n's patch series adds padding).
 
-087.  Err.  Even a spell checker won't help me here!
+The approach references existing clusters in the previous snapshot's vmstat=
+e area and only allocates new clusters for dirty NVDIMM regions.
+In the non-qcow2 case we fall back to writing the entire NVDIMM contents.
 
-> 
-> > ~10% chance to miss the SHUTDOWN event and fail when with Out-Of-Band
-> > enabled:
-> >
-> > 087 8s ... - output mismatch (see 087.out.bad)
+So instead of:
 
-I'll take all the rest comments.  Thanks for reviewing.
+  write(qcow2_bs, all_vmstate_data); /* duplicates nvdimm contents :( */
 
--- 
-Peter Xu
+do:
+
+  write(bs, vmstate_data_upto_nvdimm);
+  if (is_qcow2(bs)) {
+      snapshot_clone_vmstate_range(bs, previous_snapshot,
+                                   offset_to_nvdimm_vmstate);
+      overwrite_nvdimm_dirty_blocks(bs, nvdimm);
+  } else {
+      write(bs, nvdimm_vmstate_data);
+  }
+  write(bs, vmstate_data_after_nvdimm);
+
+Stefan
