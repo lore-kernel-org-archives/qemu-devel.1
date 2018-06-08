@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRIzc-00071r-5z
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:07:57 -0400
+	(envelope-from <mst@redhat.com>) id 1fRJ4W-0002em-Eg
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:13:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fRIzY-0005Q6-AM
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:07:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42792 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fRIzY-0005Px-4j
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:07:52 -0400
-Date: Fri, 8 Jun 2018 16:07:46 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180608150746.GX18233@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180608143026.20167-1-ehabkost@redhat.com>
-	<20180608143747.GR18233@redhat.com>
-	<20180608145559.GI7451@localhost.localdomain>
+	(envelope-from <mst@redhat.com>) id 1fRJ4S-0008Uw-Ed
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:13:00 -0400
+Date: Fri, 8 Jun 2018 18:12:46 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180608181004-mutt-send-email-mst@kernel.org>
+References: <20180530150806.061c26b9@redhat.com>
+	<5dcb16e5-b9b9-d07d-dfe3-98724e911f83@redhat.com>
+	<20180531161310.52ea9507@redhat.com>
+	<e451e0d6-a181-b027-cdb7-f44beb11b37c@redhat.com>
+	<20180607154455.6eab4e24@redhat.com>
+	<5dda6237-88d8-f0f8-58d2-af996368cea4@redhat.com>
+	<20180608142442.0d97b7c6@redhat.com>
+	<397d37ee-b3a8-dae0-37d1-fd3c942448c2@redhat.com>
+	<20180608155432-mutt-send-email-mst@kernel.org>
+	<d6966aa8-54e5-8036-3603-069fbbb88c2a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180608145559.GI7451@localhost.localdomain>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] configure: Require Python 2.7 or newer
+In-Reply-To: <d6966aa8-54e5-8036-3603-069fbbb88c2a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
+ hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-On Fri, Jun 08, 2018 at 11:55:59AM -0300, Eduardo Habkost wrote:
-> On Fri, Jun 08, 2018 at 03:37:47PM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Fri, Jun 08, 2018 at 11:30:26AM -0300, Eduardo Habkost wrote:
-> > > All of the supported build platforms documented in qemu-doc.texi
-> > > should already support Python 2.7.
-> > >=20
-> > > Removing support for Python 2.6 will allow us to remove some
-> > > compatibility modules we carry in the QEMU tree:
-> > >=20
-> > > * scripts/argparse.py
-> > > * scripts/ordereddict.py
-> >=20
-> > Lets delete those in this patch then....
->=20
-> I will do it, but I prefer to do this in a separate patch.
+On Fri, Jun 08, 2018 at 03:07:53PM +0200, David Hildenbrand wrote:
+> On 08.06.2018 14:55, Michael S. Tsirkin wrote:
+> > On Fri, Jun 08, 2018 at 02:32:09PM +0200, David Hildenbrand wrote:
+> >>
+> >>>>> if (TYPE_PC_DIMM) {
+> >>>>>     pc_dimm_plug()
+> >>>>>     /* do here additional concrete machine specific things */
+> >>>>> } else if (TYPE_VIRTIO_MEM) {
+> >>>>>     virtio_mem_plug() <- do forwarding in there
+> >>>>>     /* and do here additional concrete machine specific things */
+> >>>>> } else if (TYPE_CPU) {
+> >>>>>     cpu_plug()
+> >>>>>     /* do here additional concrete machine specific things */
+> >>>>> }  
+> >>>>
+> >>>> That will result in a lot of duplicate code - for every machine we
+> >>>> support (dimm/virtio-mem/virtio-pmem/*add more memory devices here*) -
+> >>>> virtio-mem and virtio-pmem could most probably share the code.
+> >>> maybe or maybe not, depending on if pmem endups as memory device or
+> >>> separate controller. And even with duplication, machine code would
+> >>> be easy to follow just down one explicit call chain.
+> >>
+> >> Not 100% convinced but I am now going into that direction.
+> > 
+> > Can this go into DeviceClass? Failover has the same need to
+> > allocate/free resources for vfio without a full realize/unrealize.
+> > 
+> 
+> Conceptually, I would have called here something like
+> 
+> virtio_mem_plug() ...
+> 
+> Which would end up calling memory_device_plug() and triggering the
+> target hotplug handler.
+> 
+> I assume this can also be done from a device class callback.
+> 
+> So we would need a total of 3 callbacks for
+> 
+> a) pre_plug
+> b) plug
+> c) unplug
+> 
+> In addition, unplug requests might be necessary, so
+> 
+> d) unplug_request
 
-Ok that's fine
 
+Right - basically HotplugHandlerClass.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> >> -- 
+> >>
+> >> Thanks,
+> >>
+> >> David / dhildenb
+> 
+> 
+> -- 
+> 
+> Thanks,
+> 
+> David / dhildenb
