@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fR8VW-0004zO-Io
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:56:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fR8u2-0007aJ-3I
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:21:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fR8VR-0007Cx-ME
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:56:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47364 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fR8VR-0007Cp-Fu
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:56:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 04931BB42D
-	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 03:56:05 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Fri,  8 Jun 2018 11:55:11 +0800
-Message-Id: <20180608035511.7439-8-peterx@redhat.com>
-In-Reply-To: <20180608035511.7439-1-peterx@redhat.com>
-References: <20180608035511.7439-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v10 7/7] monitor: add lock to protect mon_fdsets
+	(envelope-from <dgibson@ozlabs.org>) id 1fR8u0-0007dE-P0
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:21:30 -0400
+Date: Fri, 8 Jun 2018 13:29:28 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180608032928.GJ3344@umbus.fritz.box>
+References: <20180607165218.9558-1-david@redhat.com>
+	<20180607165218.9558-5-david@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Tu8ztk+XgTAiG9Id"
+Content-Disposition: inline
+In-Reply-To: <20180607165218.9558-5-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 4/8] spapr: local error handling in
+ hotplug handler functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,249 +25,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Greg Kurz <groug@kaod.org>
 
-Introduce a new global big lock for mon_fdsets.  Take it where needed.
 
-The monitor_fdset_get_fd() handling is a bit tricky: now we need to call
-qemu_mutex_unlock() which might pollute errno, so we need to make sure
-the correct errno be passed up to the callers.  To make things simpler,
-we let monitor_fdset_get_fd() return the -errno directly when error
-happens, then in qemu_open() we move it back into errno.
+--Tu8ztk+XgTAiG9Id
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- monitor.c     | 52 +++++++++++++++++++++++++++++++++++++++++----------
- stubs/fdset.c |  2 +-
- util/osdep.c  |  3 ++-
- 3 files changed, 45 insertions(+), 12 deletions(-)
+On Thu, Jun 07, 2018 at 06:52:14PM +0200, David Hildenbrand wrote:
+> Let's introduce and use local error variables in the hotplug handler
+> functions.
+>=20
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-diff --git a/monitor.c b/monitor.c
-index 2bda0dfa12..ede4aed8b6 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -271,7 +271,10 @@ static QemuMutex monitor_lock;
- static GHashTable *monitor_qapi_event_state;
- static QTAILQ_HEAD(mon_list, Monitor) mon_list;
- 
-+/* Protects mon_fdsets */
-+static QemuMutex mon_fdsets_lock;
- static QLIST_HEAD(mon_fdsets, MonFdset) mon_fdsets;
-+
- static int mon_refcount;
- 
- static mon_cmd_t mon_cmds[];
-@@ -2319,9 +2322,11 @@ static void monitor_fdsets_cleanup(void)
-     MonFdset *mon_fdset;
-     MonFdset *mon_fdset_next;
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     QLIST_FOREACH_SAFE(mon_fdset, &mon_fdsets, next, mon_fdset_next) {
-         monitor_fdset_cleanup(mon_fdset);
-     }
-+    qemu_mutex_unlock(&mon_fdsets_lock);
- }
- 
- AddfdInfo *qmp_add_fd(bool has_fdset_id, int64_t fdset_id, bool has_opaque,
-@@ -2356,6 +2361,7 @@ void qmp_remove_fd(int64_t fdset_id, bool has_fd, int64_t fd, Error **errp)
-     MonFdsetFd *mon_fdset_fd;
-     char fd_str[60];
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
-         if (mon_fdset->id != fdset_id) {
-             continue;
-@@ -2375,10 +2381,12 @@ void qmp_remove_fd(int64_t fdset_id, bool has_fd, int64_t fd, Error **errp)
-             goto error;
-         }
-         monitor_fdset_cleanup(mon_fdset);
-+        qemu_mutex_unlock(&mon_fdsets_lock);
-         return;
-     }
- 
- error:
-+    qemu_mutex_unlock(&mon_fdsets_lock);
-     if (has_fd) {
-         snprintf(fd_str, sizeof(fd_str), "fdset-id:%" PRId64 ", fd:%" PRId64,
-                  fdset_id, fd);
-@@ -2394,6 +2402,7 @@ FdsetInfoList *qmp_query_fdsets(Error **errp)
-     MonFdsetFd *mon_fdset_fd;
-     FdsetInfoList *fdset_list = NULL;
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
-         FdsetInfoList *fdset_info = g_malloc0(sizeof(*fdset_info));
-         FdsetFdInfoList *fdsetfd_list = NULL;
-@@ -2423,6 +2432,7 @@ FdsetInfoList *qmp_query_fdsets(Error **errp)
-         fdset_info->next = fdset_list;
-         fdset_list = fdset_info;
-     }
-+    qemu_mutex_unlock(&mon_fdsets_lock);
- 
-     return fdset_list;
- }
-@@ -2435,6 +2445,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
-     MonFdsetFd *mon_fdset_fd;
-     AddfdInfo *fdinfo;
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     if (has_fdset_id) {
-         QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
-             /* Break if match found or match impossible due to ordering by ID */
-@@ -2455,6 +2466,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
-             if (fdset_id < 0) {
-                 error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "fdset-id",
-                            "a non-negative value");
-+                qemu_mutex_unlock(&mon_fdsets_lock);
-                 return NULL;
-             }
-             /* Use specified fdset ID */
-@@ -2505,16 +2517,21 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
-     fdinfo->fdset_id = mon_fdset->id;
-     fdinfo->fd = mon_fdset_fd->fd;
- 
-+    qemu_mutex_unlock(&mon_fdsets_lock);
-     return fdinfo;
- }
- 
- int monitor_fdset_get_fd(int64_t fdset_id, int flags)
- {
--#ifndef _WIN32
-+#ifdef _WIN32
-+    return -ENOENT;
-+#else
-     MonFdset *mon_fdset;
-     MonFdsetFd *mon_fdset_fd;
-     int mon_fd_flags;
-+    int ret;
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
-         if (mon_fdset->id != fdset_id) {
-             continue;
-@@ -2522,20 +2539,24 @@ int monitor_fdset_get_fd(int64_t fdset_id, int flags)
-         QLIST_FOREACH(mon_fdset_fd, &mon_fdset->fds, next) {
-             mon_fd_flags = fcntl(mon_fdset_fd->fd, F_GETFL);
-             if (mon_fd_flags == -1) {
--                return -1;
-+                ret = -errno;
-+                goto out;
-             }
- 
-             if ((flags & O_ACCMODE) == (mon_fd_flags & O_ACCMODE)) {
--                return mon_fdset_fd->fd;
-+                ret = mon_fdset_fd->fd;
-+                goto out;
-             }
-         }
--        errno = EACCES;
--        return -1;
-+        ret = -EACCES;
-+        goto out;
-     }
--#endif
-+    ret = -ENOENT;
- 
--    errno = ENOENT;
--    return -1;
-+out:
-+    qemu_mutex_unlock(&mon_fdsets_lock);
-+    return ret;
-+#endif
- }
- 
- int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
-@@ -2543,20 +2564,25 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
-     MonFdset *mon_fdset;
-     MonFdsetFd *mon_fdset_fd_dup;
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
-         if (mon_fdset->id != fdset_id) {
-             continue;
-         }
-         QLIST_FOREACH(mon_fdset_fd_dup, &mon_fdset->dup_fds, next) {
-             if (mon_fdset_fd_dup->fd == dup_fd) {
--                return -1;
-+                goto err;
-             }
-         }
-         mon_fdset_fd_dup = g_malloc0(sizeof(*mon_fdset_fd_dup));
-         mon_fdset_fd_dup->fd = dup_fd;
-         QLIST_INSERT_HEAD(&mon_fdset->dup_fds, mon_fdset_fd_dup, next);
-+        qemu_mutex_unlock(&mon_fdsets_lock);
-         return 0;
-     }
-+
-+err:
-+    qemu_mutex_unlock(&mon_fdsets_lock);
-     return -1;
- }
- 
-@@ -2565,6 +2591,7 @@ static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
-     MonFdset *mon_fdset;
-     MonFdsetFd *mon_fdset_fd_dup;
- 
-+    qemu_mutex_lock(&mon_fdsets_lock);
-     QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
-         QLIST_FOREACH(mon_fdset_fd_dup, &mon_fdset->dup_fds, next) {
-             if (mon_fdset_fd_dup->fd == dup_fd) {
-@@ -2573,13 +2600,17 @@ static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
-                     if (QLIST_EMPTY(&mon_fdset->dup_fds)) {
-                         monitor_fdset_cleanup(mon_fdset);
-                     }
--                    return -1;
-+                    goto err;
-                 } else {
-+                    qemu_mutex_unlock(&mon_fdsets_lock);
-                     return mon_fdset->id;
-                 }
-             }
-         }
-     }
-+
-+err:
-+    qemu_mutex_unlock(&mon_fdsets_lock);
-     return -1;
- }
- 
-@@ -4519,6 +4550,7 @@ void monitor_init_globals(void)
-     monitor_qapi_event_init();
-     sortcmdlist();
-     qemu_mutex_init(&monitor_lock);
-+    qemu_mutex_init(&mon_fdsets_lock);
-     monitor_iothread_init();
- }
- 
-diff --git a/stubs/fdset.c b/stubs/fdset.c
-index 6020cf28c8..4f3edf2ea4 100644
---- a/stubs/fdset.c
-+++ b/stubs/fdset.c
-@@ -14,7 +14,7 @@ int monitor_fdset_dup_fd_find(int dup_fd)
- 
- int monitor_fdset_get_fd(int64_t fdset_id, int flags)
- {
--    return -1;
-+    return -ENOENT;
- }
- 
- void monitor_fdset_dup_fd_remove(int dupfd)
-diff --git a/util/osdep.c b/util/osdep.c
-index a73de0e1ba..ea51d500b6 100644
---- a/util/osdep.c
-+++ b/util/osdep.c
-@@ -302,7 +302,8 @@ int qemu_open(const char *name, int flags, ...)
-         }
- 
-         fd = monitor_fdset_get_fd(fdset_id, flags);
--        if (fd == -1) {
-+        if (fd < 0) {
-+            errno = -fd;
-             return -1;
-         }
- 
--- 
-2.17.1
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
+> ---
+>  hw/ppc/spapr.c | 29 ++++++++++++++++++++---------
+>  1 file changed, 20 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index a12be24ca9..4447cb197f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3576,11 +3576,14 @@ out:
+>  static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+>                                        DeviceState *dev, Error **errp)
+>  {
+> +    Error *local_err =3D NULL;
+> +
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> -        spapr_memory_plug(hotplug_dev, dev, errp);
+> +        spapr_memory_plug(hotplug_dev, dev, &local_err);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+> -        spapr_core_plug(hotplug_dev, dev, errp);
+> +        spapr_core_plug(hotplug_dev, dev, &local_err);
+>      }
+> +    error_propagate(errp, local_err);
+>  }
+> =20
+>  static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_=
+dev,
+> @@ -3588,10 +3591,11 @@ static void spapr_machine_device_unplug_request(H=
+otplugHandler *hotplug_dev,
+>  {
+>      sPAPRMachineState *sms =3D SPAPR_MACHINE(OBJECT(hotplug_dev));
+>      MachineClass *mc =3D MACHINE_GET_CLASS(sms);
+> +    Error *local_err =3D NULL;
+> =20
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>          if (spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT)) {
+> -            spapr_memory_unplug_request(hotplug_dev, dev, errp);
+> +            spapr_memory_unplug_request(hotplug_dev, dev, &local_err);
+>          } else {
+>              /* NOTE: this means there is a window after guest reset, pri=
+or to
+>               * CAS negotiation, where unplug requests will fail due to t=
+he
+> @@ -3599,25 +3603,32 @@ static void spapr_machine_device_unplug_request(H=
+otplugHandler *hotplug_dev,
+>               * the case with PCI unplug, where the events will be queued=
+ and
+>               * eventually handled by the guest after boot
+>               */
+> -            error_setg(errp, "Memory hot unplug not supported for this g=
+uest");
+> +            error_setg(&local_err,
+> +                       "Memory hot unplug not supported for this guest");
+>          }
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+>          if (!mc->has_hotpluggable_cpus) {
+> -            error_setg(errp, "CPU hot unplug not supported on this machi=
+ne");
+> -            return;
+> +            error_setg(&local_err,
+> +                       "CPU hot unplug not supported on this machine");
+> +            goto out;
+>          }
+> -        spapr_core_unplug_request(hotplug_dev, dev, errp);
+> +        spapr_core_unplug_request(hotplug_dev, dev, &local_err);
+>      }
+> +out:
+> +    error_propagate(errp, local_err);
+>  }
+> =20
+>  static void spapr_machine_device_pre_plug(HotplugHandler *hotplug_dev,
+>                                            DeviceState *dev, Error **errp)
+>  {
+> +    Error *local_err =3D NULL;
+> +
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> -        spapr_memory_pre_plug(hotplug_dev, dev, errp);
+> +        spapr_memory_pre_plug(hotplug_dev, dev, &local_err);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
+> -        spapr_core_pre_plug(hotplug_dev, dev, errp);
+> +        spapr_core_pre_plug(hotplug_dev, dev, &local_err);
+>      }
+> +    error_propagate(errp, local_err);
+>  }
+> =20
+>  static HotplugHandler *spapr_get_hotplug_handler(MachineState *machine,
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Tu8ztk+XgTAiG9Id
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsZ+BgACgkQbDjKyiDZ
+s5KryhAA4+0bmAwY57vUjy6peZwZMYgRc76cdSJQTbpXCs6U0YJLWsJl4m+Y75qo
+OopEMQE1r+3MTNtkIiA/ukmZqwpLhj4wIWKDsQ9Ikxv8cwLw3xgiFUv9++m68nzG
+uUzTgBC9S8+0kXJo/gjRaSoZsT6xaQ/BRjotDSou+FxjALMUAYv9TmizPXDvWuLU
+fcjFul7SOCVzbFgoAgkz4sWtvr+mkVQ4zzuOoqmBcO8VbwN1TpYuFRt4BGHheAGn
+XNbuxqpsmG+1ZNkUCsh9GL7NbbAdjWO/jf8G5OBG4X0o2WWwXIqlBgQoTQv4EGbx
++YL9/feVaFW5t8FLRFGnLvfcEGKANXutJc2nC90YPYUfLQ0r9igMlzJWV0zYzxcX
+UHJmnWyb9DE+B3K5qSLPyKH+CAham/gyA+kWdC2tR2wdP4XgVxe3iWujB2ni9i/K
+jHys0nfTTAzPrAPWDUA0LSzmIqkIGwJLNnrk5bLbZnolZAYGiqQjsHgRjeBSnEQF
+C/KamNGU2V9vLPcTVfiCOvNlhKjNyxYTLfXuE8xkQbnOkfFL76l33sNU8WaJnoBn
+4/ILwjSJ0YYsEbO2WdWAQccYqNatu2fKFNhH65jpfWvmQimLMsjmXPpSu37o+Z7N
+HRraDXZz2a9SQ1rwRA3nEY8tEnfCY6Br73yBasIqRazI6mqdG4Y=
+=J3FT
+-----END PGP SIGNATURE-----
+
+--Tu8ztk+XgTAiG9Id--
