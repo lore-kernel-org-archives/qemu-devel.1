@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fRGRn-000648-9J
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:24:52 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fRGWw-0007UI-UH
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:30:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fRGRk-0001DC-4Z
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:24:51 -0400
-Date: Fri, 8 Jun 2018 14:24:42 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180608142442.0d97b7c6@redhat.com>
-In-Reply-To: <5dda6237-88d8-f0f8-58d2-af996368cea4@redhat.com>
-References: <20180517081527.14410-1-david@redhat.com>
-	<20180517081527.14410-5-david@redhat.com>
-	<20180530150806.061c26b9@redhat.com>
-	<5dcb16e5-b9b9-d07d-dfe3-98724e911f83@redhat.com>
-	<20180531161310.52ea9507@redhat.com>
-	<e451e0d6-a181-b027-cdb7-f44beb11b37c@redhat.com>
-	<20180607154455.6eab4e24@redhat.com>
-	<5dda6237-88d8-f0f8-58d2-af996368cea4@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1fRGWv-0004Wc-P6
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:30:10 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri,  8 Jun 2018 09:29:42 -0300
+Message-Id: <20180608122952.2009-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
- hotplug handlers
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 00/10] python: futurize --stage1 (Python 3
+ compatibility)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,159 +21,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Thu, 7 Jun 2018 16:00:54 +0200
-David Hildenbrand <david@redhat.com> wrote:
+v2 note (v1 was RFC):
 
-> On 07.06.2018 15:44, Igor Mammedov wrote:
-> > On Mon, 4 Jun 2018 13:27:01 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 31.05.2018 16:13, Igor Mammedov wrote:  
-> >>> On Wed, 30 May 2018 16:13:32 +0200
-> >>> David Hildenbrand <david@redhat.com> wrote:
-> >>>     
-> >>>> On 30.05.2018 15:08, Igor Mammedov wrote:    
-> >>>>> On Thu, 17 May 2018 10:15:17 +0200
-> >>>>> David Hildenbrand <david@redhat.com> wrote:
-> >>>>>       
-> >>>>>> For multi stage hotplug handlers, we'll have to do some error handling
-> >>>>>> in some hotplug functions, so let's use a local error variable (except
-> >>>>>> for unplug requests).      
-> >>>>> I'd split out introducing local error into separate patch
-> >>>>> so patch would do a single thing.    
-> >>
-> >> I can do that if it makes review easier.
-> >>  
-> >>>>>       
-> >>>>>> Also, add code to pass control to the final stage hotplug handler at the
-> >>>>>> parent bus.      
-> >>>>> But I don't agree with generic
-> >>>>>  "} else if ("dev->parent_bus && dev->parent_bus->hotplug_handler) {"
-> >>>>> forwarding, it's done by 3/14 for generic case and in case of
-> >>>>> special device that needs bus handler called from machine one,
-> >>>>> I'd suggest to do forwarding explicitly for that device only
-> >>>>> like we do with acpi_dev.      
-> >>>>
-> >>>> I decided to do it that way because it is generic and results in nicer
-> >>>> recovery handling (e.g. in case pc_dimm plug fails, we can simply
-> >>>> rollback all (for now MemoryDevice) previous plug operations).    
-> >>> rollback should be managed by the caller of pc_dimm plug
-> >>> directly, so it's not relevant here.
-> >>>     
-> >>>> IMHO, the resulting code is easier to read.
-> >>>>
-> >>>> From this handling it is clear that
-> >>>> "if we reach the hotplug handler, and it is not some special device
-> >>>> plugged by the machine (CPU, PC_DIMM), pass it on to the actual hotplug
-> >>>> handler if any exists"    
-> >>> I strongly disagree with that it's easier to deal with.
-> >>> You are basically duplicating already generalized code
-> >>> from qdev_get_hotplug_handler() back into boards.
-> >>>
-> >>> If a device doesn't have to be handled by machine handler,
-> >>> than qdev_get_hotplug_handler() must return its bus handler
-> >>> if any directly. So branch in question that your are copying
-> >>> is a dead one, pls drop it.    
-> >>
-> >> We forward selected (pc_get_hotpug_handler()) devices to the
-> >> right hotplug handler. Nothing wrong about that. I don't agree
-> >> with "basically duplicating already generalized code" wrong.
-> >> We have to forward at some place. Your idea simply places that
-> >> code at some other place.
-> >>
-> >>
-> >> But I think we have to get the general idea sorted out first.
-> >>
-> >> What you have in mind (e.g. plug):
-> >>
-> >> if (TYPE_MEMORY_DEVICE) {
-> >> 	memory_device_plug();
-> >> 	if (local_err) {
-> >> 		goto out;
-> >> 	}
-> >>
-> >> 	if (TYPE_PC_DIMM) {
-> >> 		pc_dimm_plug(hotplug_dev, dev, &local_err);
-> >> 	} else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-> >> 		hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
-> >> 	}
-> >> 	if (local_err) {
-> >> 		memory_device_unplug()
-> >> 		goto out;
-> >> 	}
-> >> } else if (TYPE_CPU)
-> >> ...
-> >>
-> >>
-> >> What I have in mind (and implemented in this series):
-> >>
-> >>
-> >> if (TYPE_MEMORY_DEVICE) {
-> >> 	memory_device_plug();
-> >> }
-> >> /* possibly other interfaces */
-> >> if (local_err) {
-> >> 	error_handling();
-> >> 	return;
-> >> }
-> >>
-> >> if (TYPE_PC_DIMM) {
-> >> 	pc_dimm_plug(hotplug_dev, dev, &local_err);
-> >> } ...
-> >> } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-> >> 	hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
-> >> }  
-> > I don't like this implicit wiring, where reader of this part of code
-> > has no idea that TYPE_MEMORY_DEVICE might be also bus device that needs
-> > request forwarding.
-> > I'd prefer [pre/un]plug handlers be concrete and explicit spaghetti code,
-> > something like this:
-> > 
-> > if (TYPE_PC_DIMM) {
-> >     pc_dimm_plug()
-> >     /* do here additional concrete machine specific things */
-> > } else if (TYPE_VIRTIO_MEM) {
-> >     virtio_mem_plug() <- do forwarding in there
-> >     /* and do here additional concrete machine specific things */
-> > } else if (TYPE_CPU) {
-> >     cpu_plug()
-> >     /* do here additional concrete machine specific things */
-> > }  
-> 
-> That will result in a lot of duplicate code - for every machine we
-> support (dimm/virtio-mem/virtio-pmem/*add more memory devices here*) -
-> virtio-mem and virtio-pmem could most probably share the code.
-maybe or maybe not, depending on if pmem endups as memory device or
-separate controller. And even with duplication, machine code would
-be easy to follow just down one explicit call chain.
+  Except for a trivial change in patch 02/10, this series is the
+  same as the RFC I sent previously.  I plan to merge it and
+  include it in a pull request soon.
 
-> 
-> >   
-> >> if (local_err) {
-> >> 	if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-> >> 		memory_device_unplug()
-> >> 	}
-> >> 	/* possibly other interfaces */
-> >> }
-> >> ...
-> >>
-> >>
-> >> I claim that my variant is more generic because:
-> >> - it easily supports multiple interfaces (like MemoryDevice)
-> >>   per Device that need a hotplug handler call
-> >> - there is only one call to hotplug_handler_plug() in case we
-> >>   add similar handling for another device  
-> > As someone said "one more layer of indirection would solve problem".
-> > But then one would have a clue how it works after a while (including
-> > author of the feature).
-> > I don't think we have a problem here and need generalization.
-> >   
-> >>
-> >> Apart from that they do exactly the same thing.
-> >>  
-> >   
-> 
-> 
+>From the futurize[1] documentation:
+
+> This applies fixes that modernize Python 2 code without
+> changing the effect of the code.  With luck, this will not
+> introduce any bugs into the code, or will at least be trivial
+> to fix. The changes are those that bring the Python code
+> up-to-date without breaking Py2 compatibility.  The resulting
+> code will be modern Python 2.6-compatible code plus __future__
+> imports from the following set:
+>
+>     from __future__ import absolute_import
+>     from __future__ import division
+>     from __future__ import print_function
+>
+[...]
+> The goal for this stage is to create most of the diff for the
+> entire porting process, but without introducing any bugs.  It
+> should be uncontroversial and safe to apply to every Python 2
+> package.  The subsequent patches introducing Python 3
+> compatibility should then be shorter and easier to review.
+
+This series run all the fixers from futurize --stage1 on all
+Python code in the tree.  To make review and testing easier, I
+have run the fixers separately instead of doing all changes in a
+single patch.
+
+[1] http://python-future.org/automatic_conversion.html
+
+Eduardo Habkost (10):
+  python: futurize -f libfuturize.fixes.fix_print_with_import
+  python: futurize -f libfuturize.fixes.fix_absolute_import
+  python: futurize -f libfuturize.fixes.fix_next_call
+  python: futurize -f lib2to3.fixes.fix_has_key
+  python: futurize -f lib2to3.fixes.fix_standarderror
+  python: futurize -f lib2to3.fixes.fix_reduce
+  python: futurize -f lib2to3.fixes.fix_tuple_params
+  python: futurize -f lib2to3.fixes.fix_renames
+  python: futurize -f lib2to3.fixes.fix_except
+  python: futurize -f lib2to3.fixes.fix_numliterals
+
+ scripts/analyse-9p-simpletrace.py        | 89 ++++++++++++------------
+ scripts/analyse-locks-simpletrace.py     |  3 +-
+ scripts/analyze-migration.py             | 11 +--
+ scripts/dump-guest-memory.py             |  1 +
+ scripts/ordereddict.py                   |  4 +-
+ scripts/replay-dump.py                   | 21 +++---
+ scripts/signrom.py                       |  1 +
+ scripts/simpletrace.py                   |  5 +-
+ scripts/vmstate-static-checker.py        | 89 ++++++++++++------------
+ scripts/device-crash-test                |  3 +-
+ scripts/kvm/kvm_flightrecorder           | 21 +++---
+ scripts/kvm/vmxcap                       |  1 +
+ scripts/qmp/qemu-ga-client               | 10 +--
+ scripts/qmp/qmp                          | 24 ++++---
+ scripts/qmp/qmp-shell                    | 40 ++++++-----
+ scripts/qmp/qom-fuse                     | 11 +--
+ scripts/qmp/qom-get                      | 12 ++--
+ scripts/qmp/qom-list                     | 16 +++--
+ scripts/qmp/qom-set                      | 10 +--
+ scripts/qmp/qom-tree                     | 16 +++--
+ tests/docker/docker.py                   | 11 +--
+ tests/docker/travis.py                   | 15 ++--
+ tests/guest-debug/test-gdbstub.py        |  1 +
+ tests/image-fuzzer/qcow2/__init__.py     |  3 +-
+ tests/image-fuzzer/qcow2/fuzz.py         |  1 +
+ tests/image-fuzzer/qcow2/layout.py       |  3 +-
+ tests/image-fuzzer/runner.py             | 42 +++++------
+ tests/migration/guestperf/engine.py      | 29 ++++----
+ tests/migration/guestperf/plot.py        | 17 ++---
+ tests/migration/guestperf/shell.py       | 19 ++---
+ tests/qemu-iotests/093                   |  2 +-
+ tests/qemu-iotests/096                   |  4 +-
+ tests/qemu-iotests/118                   | 24 +++----
+ tests/qemu-iotests/136                   |  2 +-
+ tests/qemu-iotests/149                   |  3 +-
+ tests/qemu-iotests/165                   |  3 +-
+ tests/qemu-iotests/iotests.py            |  5 +-
+ tests/qemu-iotests/nbd-fault-injector.py |  7 +-
+ tests/qemu-iotests/qcow2.py              | 39 ++++++-----
+ tests/qemu-iotests/qed.py                | 17 ++---
+ tests/vm/basevm.py                       |  3 +-
+ 41 files changed, 337 insertions(+), 301 deletions(-)
+
+--=20
+2.18.0.rc1.1.g3f1ff2140
