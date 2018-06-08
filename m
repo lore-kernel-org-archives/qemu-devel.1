@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49039)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fRArr-00087W-NT
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:27:24 -0400
+	(envelope-from <peterx@redhat.com>) id 1fRAwv-0001lK-Mp
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:32:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fRArq-0004nL-Nx
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:27:23 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180607144645.10187-1-f4bug@amsat.org>
-	<20180607144645.10187-4-f4bug@amsat.org>
-Date: Fri, 08 Jun 2018 08:27:15 +0200
-In-Reply-To: <20180607144645.10187-4-f4bug@amsat.org> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu, 7 Jun 2018 11:46:44
-	-0300")
-Message-ID: <877en9bxoc.fsf@dusky.pond.sub.org>
+	(envelope-from <peterx@redhat.com>) id 1fRAws-000821-KT
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:32:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57824 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fRAws-00081d-Fo
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:32:34 -0400
+Date: Fri, 8 Jun 2018 14:32:26 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180608063226.GC7736@xz-mi>
+References: <20180531051641.8473-1-peterx@redhat.com>
+	<20180531051641.8473-4-peterx@redhat.com>
+	<87efhizuxl.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] hw/arm/sysbus-fdt: Replace
- error_setg(&error_fatal) by error_report() + exit()
+Content-Disposition: inline
+In-Reply-To: <87efhizuxl.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [RFC v2 3/4] monitor: remove "x-oob",
+ turn oob on by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+On Thu, Jun 07, 2018 at 01:40:22PM +0200, Markus Armbruster wrote:
+> Peter Xu <peterx@redhat.com> writes:
+> 
+> > There was a regression reported by Eric Auger before with OOB:
+> >
+> >   http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06231.html
+> >
+> > The fix is 951702f39c ("monitor: bind dispatch bh to iohandler context",
+> > 2018-04-10), which is in master already.
+> >
+> > For the bug, we turned Out-Of-Band feature of monitors off for 2.12
+> > release.  Now we turn that on again after the 2.12 release.
+> >
+> > This patch partly reverts be933ffc23 (monitor: new parameter "x-oob"),
+> > meanwhile turn it on again by default for non-MUX QMPs.
+> 
+> Please add a brief explanation why OOB isn't turned on for MUX.  Pointer
+> to existing explanation would be fine.
 
-> Use error_report() + exit() instead of error_setg(&error_fatal),
-> as suggested by the "qapi/error.h" documentation:
->
->    Please don't error_setg(&error_fatal, ...), use error_report() and
->    exit(), because that's more obvious.
->
-> This fixes CID 1352173:
->     "Passing null pointer dt_name to qemu_fdt_node_path, which dereferenc=
-es it."
->
-> And this also fixes:
->
->     hw/arm/sysbus-fdt.c:322:9: warning: Array access (from variable 'node=
-_path') results in a null pointer dereference
->         if (node_path[1]) {
->             ^~~~~~~~~~~~
->
-> Fixes: Coverity CID 1352173 (Dereference after null check)
+Sure.
 
-You lost
-
-  Suggested-by: Eric Blake <eblake@redhat.com>
-
-Intentional?
-
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/arm/sysbus-fdt.c | 42 +++++++++++++++++++++++-------------------
->  1 file changed, 23 insertions(+), 19 deletions(-)
->
-> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-> index e4c492ea44..8e2784fa11 100644
-> --- a/hw/arm/sysbus-fdt.c
-> +++ b/hw/arm/sysbus-fdt.c
-> @@ -91,7 +91,7 @@ static void copy_properties_from_host(HostProperty *pro=
-ps, int nb_props,
->          r =3D qemu_fdt_getprop(host_fdt, node_path,
->                               props[i].name,
->                               &prop_len,
-> -                             props[i].optional ? &err : &error_fatal);
-> +                             &err);
->          if (r) {
->              qemu_fdt_setprop(guest_fdt, nodename,
->                               props[i].name, r, prop_len);
-> @@ -102,6 +102,7 @@ static void copy_properties_from_host(HostProperty *p=
-rops, int nb_props,
->              } else {
->                  error_free(err);
->              }
-> +            assert(props[i].optional); /* mandatory property not found */
->          }
->      }
->  }
-
-This is not the conversion the commit message promised: it replaces
-exit(1) by abort().  Why?
-
-[Remainder of the patch is unchanged]
+-- 
+Peter Xu
