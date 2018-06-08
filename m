@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fR7T5-0005zm-6N
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:49:36 -0400
+	(envelope-from <liujunjie23@huawei.com>) id 1fR7g6-00018P-2p
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:03:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fR7T1-0003OV-9u
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:49:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54368 helo=mx1.redhat.com)
+	(envelope-from <liujunjie23@huawei.com>) id 1fR7g2-0005Q1-VN
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:03:02 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2544 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fR7T1-0003Ng-4f
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 22:49:31 -0400
-Date: Fri, 8 Jun 2018 05:49:26 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180608054637-mutt-send-email-mst@kernel.org>
-References: <1524550428-27173-5-git-send-email-wei.w.wang@intel.com>
-	<20180606064315.GB7815@xz-mi> <5B17B366.5030802@intel.com>
-	<20180607031732.GG7815@xz-mi> <5B18C2B2.30709@intel.com>
-	<20180607065808.GB750@xz-mi> <5B191EA6.3020004@intel.com>
-	<20180608013723.GQ750@xz-mi>
-	<20180608045316-mutt-send-email-mst@kernel.org>
-	<20180608023425.GT750@xz-mi>
+	(Exim 4.71) (envelope-from <liujunjie23@huawei.com>)
+	id 1fR7g2-0005Kq-AD
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:02:58 -0400
+From: liujunjie <liujunjie23@huawei.com>
+Date: Fri, 8 Jun 2018 11:02:15 +0800
+Message-ID: <20180608030215.23040-1-liujunjie23@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180608023425.GT750@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v7 4/5] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] cpu hot-del: leak fix by free the relevant
+ members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,45 +25,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, liliang.opensource@gmail.com, pbonzini@redhat.com, nilal@redhat.com
+To: pbonzini@redhat.com, rth@twiddle.net, crosthwaite.peter@gmail.com
+Cc: linzhecheng@huawei.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, qemu-devel@nongnu.org, liujunjie <liujunjie23@huawei.com>
 
-On Fri, Jun 08, 2018 at 10:34:25AM +0800, Peter Xu wrote:
-> On Fri, Jun 08, 2018 at 04:58:21AM +0300, Michael S. Tsirkin wrote:
-> > On Fri, Jun 08, 2018 at 09:37:23AM +0800, Peter Xu wrote:
-> > > > > Asked since I see this in virtio spec (v1.0, though I guess it won't
-> > > > > change) in chapter "2.2.1 Driver Requirements: Feature Bits":
-> > > > > 
-> > > > > "The driver MUST NOT accept a feature which the device did not offer"
-> > > > > 
-> > > > > Then I'm curious what would happen if:
-> > > > > 
-> > > > > - a emulator (not QEMU) only offered F_FREE_PAGE_HINT, not F_POISON
-> > > > > - a guest that enabled PAGE_POISON
-> > > > > 
-> > > > > Then how the driver could tell the host that PAGE_POISON is enabled
-> > > > > considering that guest should never set that feature bit if the
-> > > > > emulation code didn't provide it?
-> > 
-> > It wouldn't. It just has to deal with the fact that host can discard
-> > writes to hinted pages. Right now driver deals with it simply by
-> > disabling F_FREE_PAGE_HINT.
-> 
-> Ah I see.  Thanks Michael.
-> 
-> Then it seems to me that it's more important to implement the F_POISON
-> along with where it is declared since otherwise it'll be a real broken
-> (device declares F_POISON, guest assumes it can handle the POISON so
-> guest will enable FREE_PAGE_HINT, however the device can't really
-> handle that).
+THese leaks are found by ASAN with CPU hot-add and hot-del actions,
+such as:
+==14127==ERROR: LeakSanitizer: detected memory leaks
 
-It seems to handle it fine, it just ignores the hints.
+Direct leak of 4096 byte(s) in 1 object(s) allocated from:
+    #0 0x7fc321cb6ec0 in posix_memalign (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7ec0)
+    #1 0xf756b9 in qemu_try_memalign util/oslib-posix.c:110
+    #2 0xf7575b in qemu_memalign util/oslib-posix.c:126
+    #3 0x7769cb in kvm_arch_init_vcpu /root/qemu/target/i386/kvm.c:1103
+    #4 0x4cc4e6 in qemu_kvm_cpu_thread_fn /root/qemu/cpus.c:1201
+    #5 0x7fc31cb28dc4 in start_thread (/usr/lib64/libpthread.so.0+0x7dc4)
 
-> Or, if the guest driver is capable to drop F_FREE_PAGE_HINT when
-> F_POISON is not declared, we can safely split the two features into
-> two patches in QEMU too.
-> 
-> Regards,
-> 
-> -- 
-> Peter Xu
+Direct leak of 4096 byte(s) in 1 object(s) allocated from:
+    #0 0x7fc321cb6560 in calloc (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)
+    #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
+    #2 0x4cc4e6 in qemu_kvm_cpu_thread_fn /root/qemu/cpus.c:1201
+    #3 0x7fc31cb28dc4 in start_thread (/usr/lib64/libpthread.so.0+0x7dc4)
+
+Direct leak of 184 byte(s) in 1 object(s) allocated from:
+    #0 0x7fc321cb6560 in calloc (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)
+    #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
+    #2 0x4cda83 in qemu_init_vcpu /root/qemu/cpus.c:1993
+    #3 0x6aedbd in x86_cpu_realizefn /root/qemu/target/i386/cpu.c:4739
+    #4 0x8edfc8 in device_set_realized hw/core/qdev.c:826
+    #5 0xcff60c in property_set_bool qom/object.c:1928
+    #6 0xd09bd2 in object_property_set_qobject qom/qom-qobject.c:27
+    #7 0xd048e3 in object_property_set_bool qom/object.c:1188
+    #8 0x79ad83 in qdev_device_add /root/qemu/qdev-monitor.c:627
+    #9 0x79b50c in qmp_device_add /root/qemu/qdev-monitor.c:807
+    #10 0xf4ca5d in do_qmp_dispatch qapi/qmp-dispatch.c:119
+    #11 0xf4ce3c in qmp_dispatch qapi/qmp-dispatch.c:168
+    #12 0x4e2a5a in monitor_qmp_dispatch_one /root/qemu/monitor.c:4088
+    #13 0x4e2baf in monitor_qmp_bh_dispatcher /root/qemu/monitor.c:4146
+    #14 0xf67ad1 in aio_bh_poll util/async.c:118
+    #15 0xf724a3 in aio_dispatch util/aio-posix.c:436
+    #16 0xf67270 in aio_ctx_dispatch util/async.c:261
+    #17 0x7fc31cf8e999 in g_main_context_dispatch (/usr/lib64/libglib-2.0.so.0+0x49999)
+
+Direct leak of 64 byte(s) in 2 object(s) allocated from:
+    #0 0x7fc321cb6560 in calloc (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)
+    #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
+    #2 0x4cda1f in qemu_init_vcpu /root/qemu/cpus.c:1997
+    #3 0x6aedbd in x86_cpu_realizefn /root/qemu/target/i386/cpu.c:4739
+    #4 0x8edfc8 in device_set_realized hw/core/qdev.c:826
+    #5 0xcff60c in property_set_bool qom/object.c:1928
+    #6 0xd09bd2 in object_property_set_qobject qom/qom-qobject.c:27
+    #7 0xd048e3 in object_property_set_bool qom/object.c:1188
+    #8 0x79ad83 in qdev_device_add /root/qemu/qdev-monitor.c:627
+    #9 0x79b50c in qmp_device_add /root/qemu/qdev-monitor.c:807
+    #10 0xf4ca5d in do_qmp_dispatch qapi/qmp-dispatch.c:119
+    #11 0xf4ce3c in qmp_dispatch qapi/qmp-dispatch.c:168
+    #12 0x4e2a5a in monitor_qmp_dispatch_one /root/qemu/monitor.c:4088
+    #13 0x4e2baf in monitor_qmp_bh_dispatcher /root/qemu/monitor.c:4146
+    #14 0xf67ad1 in aio_bh_poll util/async.c:118
+    #15 0xf724a3 in aio_dispatch util/aio-posix.c:436
+    #16 0xf67270 in aio_ctx_dispatch util/async.c:261
+    #17 0x7fc31cf8e999 in g_main_context_dispatch (/usr/lib64/libglib-2.0.so.0+0x49999)
+
+SUMMARY: AddressSanitizer: 8440 byte(s) leaked in 5 allocation(s).
+
+The relevant members in CPU Structure are freed to fix leak. Meanwhile, although the
+VMChangeStateEntry added in kvm_arch_init_vcpu does not be reportd by ASAN since it still
+in vm_change_state_head, it's not longer used after hot-del, so free it, too.
+
+Signed-off-by: liujunjie <liujunjie23@huawei.com>
+Signed-off-by: linzhecheng <linzhecheng@huawei.com>
+---
+ accel/kvm/kvm-all.c  |  1 +
+ cpus.c               |  6 ++++++
+ include/sysemu/kvm.h |  2 ++
+ target/arm/kvm.c     |  4 ++++
+ target/i386/cpu.h    |  2 ++
+ target/i386/kvm.c    | 19 ++++++++++++++++++-
+ 6 files changed, 33 insertions(+), 1 deletion(-)
+
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index ffee68e..ff5e738 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -305,6 +305,7 @@ int kvm_destroy_vcpu(CPUState *cpu)
+     vcpu->vcpu_id = kvm_arch_vcpu_id(cpu);
+     vcpu->kvm_fd = cpu->kvm_fd;
+     QLIST_INSERT_HEAD(&kvm_state->kvm_parked_vcpus, vcpu, node);
++    kvm_arch_destroy_vcpu(cpu);
+ err:
+     return ret;
+ }
+diff --git a/cpus.c b/cpus.c
+index d1f1629..cbe28d6 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1842,6 +1842,12 @@ void cpu_remove_sync(CPUState *cpu)
+     qemu_mutex_unlock_iothread();
+     qemu_thread_join(cpu->thread);
+     qemu_mutex_lock_iothread();
++    g_free(cpu->thread);
++    cpu->thread = NULL;
++    g_free(cpu->halt_cond);
++    cpu->halt_cond = NULL;
++    g_free(cpu->cpu_ases);
++    cpu->cpu_ases = NULL;
+ }
+ 
+ /* For temporary buffers for forming a name */
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 0b64b8e..f7db7db 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -372,6 +372,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s);
+ 
+ int kvm_arch_init_vcpu(CPUState *cpu);
+ 
++void kvm_arch_destroy_vcpu(CPUState *cs);
++
+ bool kvm_vcpu_id_is_valid(int vcpu_id);
+ 
+ /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 98f5006..603089a 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -172,6 +172,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     return 0;
+ }
+ 
++void kvm_arch_destroy_vcpu(CPUState *cs)
++{
++}
++
+ unsigned long kvm_arch_vcpu_id(CPUState *cpu)
+ {
+     return cpu->cpu_index;
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 6645046..d6b8137 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -32,6 +32,7 @@
+ #endif
+ 
+ #include "exec/cpu-defs.h"
++typedef struct vm_change_state_entry VMChangeStateEntry;
+ 
+ /* The x86 has a strong memory model with some store-after-load re-ordering */
+ #define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
+@@ -1330,6 +1331,7 @@ typedef struct CPUX86State {
+     uint64_t xss;
+ 
+     TPRAccess tpr_access_type;
++    VMChangeStateEntry *vmstate;
+ } CPUX86State;
+ 
+ struct kvm_msrs;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 44f7073..1ae5330 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1041,7 +1041,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         }
+     }
+ 
+-    qemu_add_vm_change_state_handler(cpu_update_state, env);
++    env->vmstate = qemu_add_vm_change_state_handler(cpu_update_state, env);
+ 
+     c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
+     if (c) {
+@@ -1115,6 +1115,23 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     return r;
+ }
+ 
++void kvm_arch_destroy_vcpu(CPUState *cs)
++{
++    X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
++
++    if (has_xsave && env->kvm_xsave_buf) {
++        qemu_vfree(env->kvm_xsave_buf);
++        env->kvm_xsave_buf = NULL;
++    }
++    g_free(cpu->kvm_msr_buf);
++    cpu->kvm_msr_buf = NULL;
++    if (env->vmstate) {
++        qemu_del_vm_change_state_handler(env->vmstate);
++        env->vmstate = NULL;
++    }
++}
++
+ void kvm_arch_reset_vcpu(X86CPU *cpu)
+ {
+     CPUX86State *env = &cpu->env;
+-- 
+1.8.3.1
