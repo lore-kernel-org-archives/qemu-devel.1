@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60085)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fR7hT-000255-2a
+	(envelope-from <dgibson@ozlabs.org>) id 1fR7hS-00024i-VQ
 	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fR7hR-0006py-SF
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:04:27 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:57075)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fR7hR-0006kt-4y
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:04:25 -0400
-Date: Fri, 8 Jun 2018 13:04:05 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fR7hR-0006pi-N1
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:04:26 -0400
+Date: Fri, 8 Jun 2018 13:03:19 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180608030405.GF3344@umbus.fritz.box>
+Message-ID: <20180608030319.GE3344@umbus.fritz.box>
 References: <20180607144645.10187-1-f4bug@amsat.org>
-	<20180607144645.10187-5-f4bug@amsat.org>
+	<20180607144645.10187-3-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="MZf7D3rAEoQgPanC"
+	protocol="application/pgp-signature"; boundary="JBi0ZxuS5uaEhkUZ"
 Content-Disposition: inline
-In-Reply-To: <20180607144645.10187-5-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] device_tree: Replace
- error_setg(&error_fatal) by error_report() + exit()
+In-Reply-To: <20180607144645.10187-3-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] hw/ppc/spapr_drc: Replace
+ error_setg(&error_abort) by abort()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +26,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
 
---MZf7D3rAEoQgPanC
+--JBi0ZxuS5uaEhkUZ
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 07, 2018 at 11:46:45AM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Use error_report() + exit() instead of error_setg(&error_fatal),
+On Thu, Jun 07, 2018 at 11:46:43AM -0300, Philippe Mathieu-Daud=E9 wrote:
+> Use abort() instead of error_setg(&error_abort),
 > as suggested by the "qapi/error.h" documentation:
 >=20
->    Please don't error_setg(&error_fatal, ...), use error_report() and
->    exit(), because that's more obvious.
+>     Please don't error_setg(&error_fatal, ...), use error_report() and
+>     exit(), because that's more obvious.
+>     Likewise, don't error_setg(&error_abort, ...), use assert().
+>=20
+> Use abort() instead of the suggested assert() because the assertion is
+> already verified by the switch case.
+
+I think g_assert_not_reached() would be the right thing here.
+
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
 > ---
->  device_tree.c | 23 +++++++++++++----------
->  1 file changed, 13 insertions(+), 10 deletions(-)
+>  hw/ppc/spapr_drc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/device_tree.c b/device_tree.c
-> index 52c3358a55..3553819257 100644
-> --- a/device_tree.c
-> +++ b/device_tree.c
-> @@ -140,15 +140,16 @@ static void read_fstree(void *fdt, const char *dirn=
-ame)
->      const char *parent_node;
-> =20
->      if (strstr(dirname, root_dir) !=3D dirname) {
-> -        error_setg(&error_fatal, "%s: %s must be searched within %s",
-> -                   __func__, dirname, root_dir);
-> +        error_report("%s: %s must be searched within %s",
-> +                     __func__, dirname, root_dir);
-> +        exit(1);
->      }
->      parent_node =3D &dirname[strlen(SYSFS_DT_BASEDIR)];
-> =20
->      d =3D opendir(dirname);
->      if (!d) {
-> -        error_setg(&error_fatal, "%s cannot open %s", __func__, dirname);
-> -        return;
-> +        error_report("%s cannot open %s", __func__, dirname);
-> +        exit(1);
->      }
-> =20
->      while ((de =3D readdir(d)) !=3D NULL) {
-> @@ -162,7 +163,8 @@ static void read_fstree(void *fdt, const char *dirnam=
-e)
->          tmpnam =3D g_strdup_printf("%s/%s", dirname, de->d_name);
-> =20
->          if (lstat(tmpnam, &st) < 0) {
-> -            error_setg(&error_fatal, "%s cannot lstat %s", __func__, tmp=
-nam);
-> +            error_report("%s cannot lstat %s", __func__, tmpnam);
-> +            exit(1);
+> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> index 8a045d6b93..b934b9c9ed 100644
+> --- a/hw/ppc/spapr_drc.c
+> +++ b/hw/ppc/spapr_drc.c
+> @@ -366,7 +366,7 @@ static void prop_get_fdt(Object *obj, Visitor *v, con=
+st char *name,
+>              break;
 >          }
-> =20
->          if (S_ISREG(st.st_mode)) {
-> @@ -170,8 +172,9 @@ static void read_fstree(void *fdt, const char *dirnam=
-e)
->              gsize len;
-> =20
->              if (!g_file_get_contents(tmpnam, &val, &len, NULL)) {
-> -                error_setg(&error_fatal, "%s not able to extract info fr=
-om %s",
-> -                           __func__, tmpnam);
-> +                error_report("%s not able to extract info from %s",
-> +                             __func__, tmpnam);
-> +                exit(1);
->              }
-> =20
->              if (strlen(parent_node) > 0) {
-> @@ -206,9 +209,9 @@ void *load_device_tree_from_sysfs(void)
->      host_fdt =3D create_device_tree(&host_fdt_size);
->      read_fstree(host_fdt, SYSFS_DT_BASEDIR);
->      if (fdt_check_header(host_fdt)) {
-> -        error_setg(&error_fatal,
-> -                   "%s host device tree extracted into memory is invalid=
-",
-> -                   __func__);
-> +        error_report("%s host device tree extracted into memory is inval=
-id",
-> +                     __func__);
-> +        exit(1);
->      }
->      return host_fdt;
->  }
+>          default:
+> -            error_setg(&error_abort, "device FDT in unexpected state: %d=
+", tag);
+> +            abort(); /* device FDT in unexpected state */
+>          }
+>          fdt_offset =3D fdt_offset_next;
+>      } while (fdt_depth !=3D 0);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -129,24 +75,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---MZf7D3rAEoQgPanC
+--JBi0ZxuS5uaEhkUZ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsZ8iUACgkQbDjKyiDZ
-s5LFXg//WYWG0OLEZ2Rtq/UWcXwi0X83jXTGjteW1tf3UwqiWIzD9heleVKVwMSz
-+maAuH0O1jjsVOTZqzuG9mlAurkAG44FWswTpW8euf1sr0Qo6DeyaC3RDgGo3yLZ
-IXmvxrv7KrE1nazZsFLEI2UHuFGLV+CpWEN0353Ce6CojAZI/ljAO2MD5VlPkqX1
-Buhdn9qQINMva0aE4CmCVTP+Ki9nqYhUtyysjVrygPct4hCUbdYavBzFHZiZ21Ti
-IVmJY4lNX3vej1YNPqfT/5f93MdnBo6OBcuPSgbZYAwd7tJVf7GQORYkebPV4wtL
-BcZmMdNdlIgkh5Z3wwMfBYsycM5hhZuKSHAuAGs/AIvTmpzvYrFa//mvU/hAhsTV
-+usu+5YwoWrKYdHrayJAU75CsYHzkGJiUPXoPQ6e6lIrJg5N63ydALSfZN1IeaYn
-WiCUlclppIJ3yhKZ8gKlBL10Wtffn9CjfvNn4/j97ly6MVSN3+2HzE4Y8hsE2jsN
-UCznR8tpsrLGsNyCbhd1tYatIKq1yeWkBPMnr459pS3AtK7efqlgFak2PPcYnhdZ
-2Ygs1iKY51dKoAio/Ds+shWePCaI2/qDy3yMPGwoYDFjKZANEFV3P0ylBCj5GAfB
-wiKUzAjJ3fpgktnK7nGVxQz+8m6/GlA7rnfAmH8iVBXaF3tOgSs=
-=CQXT
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsZ8fUACgkQbDjKyiDZ
+s5IyURAAz0c4WX9kJMhH4r7VZ39QKxJDERT9r+maqEe83rbcOO0AANCMOlsgL80C
+jeUlto5tQnUpdcylsUgrkjdiELZ4vitpTdSmNDU4qODWTsFcW/UpGRkoBcIEE3SZ
+nmJkt/zyoGY6nQHn1uEBHF/z5RyBQdlZIXnnQy7E0JL4KDn/xQbg/dOtseXmm2k3
+LBaVjV0XxpqkLaBpirVdQZqcvhOSJNDtbGU+F2moroFIUCYdiTCViu2E3BpIvlhJ
+LBXVsBM1G7FvSKHt5ZrPEmLUQQ7HjKjwVD3HqM7qSMQvEMeaZa8sA4Nr4N8GS5gc
+aIiecpmVa0fy3zcWPMJjCnyQME4mm49Dq5DS8NSdxp9HuXH69neb6GXtV7YIF3aJ
+4p7lBmnhbUw3GbQT+rBPcu9f/7YT1Kv75Dc4SWXoaMm45q7euGXhXxcyNV7Em4XO
+fKALJuNQlQmi22eCvYGQWAGBXNW/qsdCULlRjzWXsXbHIGrvnAPfmPRuqGsDxGlW
+CQwh0/Nsawzp+DCGMh4VnEifDbZKucDxFIuWseF0KB7dLjq1msZR4lba74CYwBBR
+V2/y58JtTi2vGP0b4E5hpWw4XgyaLqc1EdyY+ftWIolxLn1Dpx6ehh8QWuh65qvx
+Y3rRLzZ7yTOMAVthL0wpbgRS80jT5gxlN3l6fo4LVUxu6BgVUD4=
+=aWnp
 -----END PGP SIGNATURE-----
 
---MZf7D3rAEoQgPanC--
+--JBi0ZxuS5uaEhkUZ--
