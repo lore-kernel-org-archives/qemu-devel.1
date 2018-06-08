@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fRGv8-0002iq-Nl
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:55:11 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fRH1w-0000Hy-8H
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:02:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fRGv4-0001js-S3
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:55:10 -0400
-Date: Fri, 8 Jun 2018 15:55:04 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180608155432-mutt-send-email-mst@kernel.org>
-References: <20180517081527.14410-1-david@redhat.com>
-	<20180517081527.14410-5-david@redhat.com>
-	<20180530150806.061c26b9@redhat.com>
-	<5dcb16e5-b9b9-d07d-dfe3-98724e911f83@redhat.com>
-	<20180531161310.52ea9507@redhat.com>
-	<e451e0d6-a181-b027-cdb7-f44beb11b37c@redhat.com>
-	<20180607154455.6eab4e24@redhat.com>
-	<5dda6237-88d8-f0f8-58d2-af996368cea4@redhat.com>
-	<20180608142442.0d97b7c6@redhat.com>
-	<397d37ee-b3a8-dae0-37d1-fd3c942448c2@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1fRH1s-0004kF-7b
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:02:12 -0400
+Resent-Message-Id: <E1fRH1s-0004kF-7b@eggs.gnu.org>
+In-Reply-To: <20180608122952.2009-1-ehabkost@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152846290792.459.5963258763500377504@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <397d37ee-b3a8-dae0-37d1-fd3c942448c2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
- hotplug handlers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 8 Jun 2018 06:01:48 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 00/10] python: futurize --stage1 (Python
+ 3 compatibility)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,36 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
+To: ehabkost@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kwolf@redhat.comfamz@redhat.com, qemu-block@nongnu.org, quintela@redhat.com, armbru@redhat.com, dgilbert@redhat.com, f4bug@amsat.org, stefanha@redhat.com, crosa@redhat.com, marcandre.lureau@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org
 
-On Fri, Jun 08, 2018 at 02:32:09PM +0200, David Hildenbrand wrote:
-> 
-> >>> if (TYPE_PC_DIMM) {
-> >>>     pc_dimm_plug()
-> >>>     /* do here additional concrete machine specific things */
-> >>> } else if (TYPE_VIRTIO_MEM) {
-> >>>     virtio_mem_plug() <- do forwarding in there
-> >>>     /* and do here additional concrete machine specific things */
-> >>> } else if (TYPE_CPU) {
-> >>>     cpu_plug()
-> >>>     /* do here additional concrete machine specific things */
-> >>> }  
-> >>
-> >> That will result in a lot of duplicate code - for every machine we
-> >> support (dimm/virtio-mem/virtio-pmem/*add more memory devices here*) -
-> >> virtio-mem and virtio-pmem could most probably share the code.
-> > maybe or maybe not, depending on if pmem endups as memory device or
-> > separate controller. And even with duplication, machine code would
-> > be easy to follow just down one explicit call chain.
-> 
-> Not 100% convinced but I am now going into that direction.
-
-Can this go into DeviceClass? Failover has the same need to
-allocate/free resources for vfio without a full realize/unrealize.
-
-> -- 
-> 
-> Thanks,
-> 
-> David / dhildenb
+SGksCgpUaGlzIHNlcmllcyBmYWlsZWQgZG9ja2VyLW1pbmd3QGZlZG9yYSBidWlsZCB0ZXN0LiBQ
+bGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJ
+ZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBp
+dApsb2NhbGx5LgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTgwNjA4MTIyOTUyLjIwMDkt
+MS1laGFia29zdEByZWRoYXQuY29tClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAv
+MTBdIHB5dGhvbjogZnV0dXJpemUgLS1zdGFnZTEgKFB5dGhvbiAzIGNvbXBhdGliaWxpdHkpCgo9
+PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCnNldCAtZQpnaXQgc3VibW9kdWxl
+IHVwZGF0ZSAtLWluaXQgZHRjCiMgTGV0IGRvY2tlciB0ZXN0cyBkdW1wIGVudmlyb25tZW50IGlu
+Zm8KZXhwb3J0IFNIT1dfRU5WPTEKZXhwb3J0IEo9OAp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWlu
+Z3dAZmVkb3JhCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
+dCcKMDM0YTE3YjczMiBweXRob246IGZ1dHVyaXplIC1mIGxpYjJ0bzMuZml4ZXMuZml4X251bWxp
+dGVyYWxzCjI0ODE1YzYzMzcgcHl0aG9uOiBmdXR1cml6ZSAtZiBsaWIydG8zLmZpeGVzLmZpeF9l
+eGNlcHQKODRjMmViNGE0YSBweXRob246IGZ1dHVyaXplIC1mIGxpYjJ0bzMuZml4ZXMuZml4X3Jl
+bmFtZXMKOGUyMWM1YjRmZCBweXRob246IGZ1dHVyaXplIC1mIGxpYjJ0bzMuZml4ZXMuZml4X3R1
+cGxlX3BhcmFtcwo4MzE0MzgyYzhjIHB5dGhvbjogZnV0dXJpemUgLWYgbGliMnRvMy5maXhlcy5m
+aXhfcmVkdWNlCmRiNmJkNTQwMTYgcHl0aG9uOiBmdXR1cml6ZSAtZiBsaWIydG8zLmZpeGVzLmZp
+eF9zdGFuZGFyZGVycm9yCjI2NTE4Y2NlNTYgcHl0aG9uOiBmdXR1cml6ZSAtZiBsaWIydG8zLmZp
+eGVzLmZpeF9oYXNfa2V5CjcxMGZmOTA5ZjAgcHl0aG9uOiBmdXR1cml6ZSAtZiBsaWJmdXR1cml6
+ZS5maXhlcy5maXhfbmV4dF9jYWxsCjMzMmNhNDQ2MTIgcHl0aG9uOiBmdXR1cml6ZSAtZiBsaWJm
+dXR1cml6ZS5maXhlcy5maXhfYWJzb2x1dGVfaW1wb3J0CmViZGY5YTNmZTYgcHl0aG9uOiBmdXR1
+cml6ZSAtZiBsaWJmdXR1cml6ZS5maXhlcy5maXhfcHJpbnRfd2l0aF9pbXBvcnQKCj09PSBPVVRQ
+VVQgQkVHSU4gPT09ClN1Ym1vZHVsZSAnZHRjJyAoZ2l0Oi8vZ2l0LnFlbXUtcHJvamVjdC5vcmcv
+ZHRjLmdpdCkgcmVnaXN0ZXJlZCBmb3IgcGF0aCAnZHRjJwpDbG9uaW5nIGludG8gJy92YXIvdG1w
+L3BhdGNoZXctdGVzdGVyLXRtcC1kaWZpODJpaC9zcmMvZHRjJy4uLgpTdWJtb2R1bGUgcGF0aCAn
+ZHRjJzogY2hlY2tlZCBvdXQgJ2U1NDM4ODAxNWFmMWZiNGJmMDRkMGJjYTk5Y2FiYTEwNzRkOWNj
+NDInCiAgQlVJTEQgICBmZWRvcmEKICBGaWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBs
+aW5lIDQwMwogICAgcHJpbnQgInllcyIKICAgICAgICAgICAgICBeClN5bnRheEVycm9yOiBpbnZh
+bGlkIHN5bnRheAptYWtlOiAqKiogW3Rlc3RzL2RvY2tlci9NYWtlZmlsZS5pbmNsdWRlOjM4OiBk
+b2NrZXItaW1hZ2UtZmVkb3JhXSBFcnJvciAxCgpyZWFsCTBtMC41NjBzCnVzZXIJMG0wLjE1OXMK
+c3lzCTBtMC4xNzVzCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
+IGNvZGU6IDIKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
+aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEByZWRoYXQuY29t
