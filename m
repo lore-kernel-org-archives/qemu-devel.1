@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fRDZo-0007Dc-Gz
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:20:57 -0400
+	(envelope-from <david@redhat.com>) id 1fRDdi-0001uG-S4
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:24:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fRDZl-0006LA-87
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:20:56 -0400
-Date: Fri, 8 Jun 2018 11:20:50 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180608085618.GT3344@umbus.fritz.box>
-Message-ID: <alpine.BSF.2.21.1806081112180.22949@zero.eik.bme.hu>
-References: <cover.1528291908.git.balaton@eik.bme.hu>
-	<7017cb3e0ed918bc3a9df823175d91a24692e2ef.1528291908.git.balaton@eik.bme.hu>
-	<20180608085618.GT3344@umbus.fritz.box>
+	(envelope-from <david@redhat.com>) id 1fRDdi-00085x-3E
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:24:58 -0400
+References: <20180607165218.9558-1-david@redhat.com>
+	<20180607165218.9558-3-david@redhat.com>
+	<20180608093406.30c878ec@bahia.lan>
+	<4f518685-fcdb-7c3a-35d3-5a26374e0604@redhat.com>
+	<20180608094657.4043502f@bahia.lan>
+	<431d4fe5-5bfe-1ab3-00b5-610038a7a9ea@redhat.com>
+	<2b431d32-9172-0517-4717-7ce50355b8db@redhat.com>
+	<20180608103943.1d7e72ee@redhat.com>
+	<673ffa52-1e24-5d6c-5d6a-927d3df79273@redhat.com>
+	<20180608110612.18ac915c@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <9eaefde2-b8aa-9072-610b-4236ce5c3913@redhat.com>
+Date: Fri, 8 Jun 2018 11:24:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] ppc4xx_i2c: Move register state to
- private struct and remove unimplemented sdata and intr registers
+In-Reply-To: <20180608110612.18ac915c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 2/8] spapr: no need to
+ verify the node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +33,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On Fri, 8 Jun 2018, David Gibson wrote:
-> On Wed, Jun 06, 2018 at 03:31:48PM +0200, BALATON Zoltan wrote:
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->
-> It's not clear to me why this is preferable to having the registers
-> embedded in the state structure.  The latter is pretty standard
-> practice for qemu.
 
-Maybe it will be clearer after the next patch in the series. I needed a 
-place to store the bitbang_i2c_interface for the directcntl way of 
-accessing the i2c bus but I can't include bitbang_i2c.h from the public 
-header because it's a local header. So I needed a local extension to the 
-state struct. Once I have that then it's a good place to also store 
-private registers which are now defined in the same file so I don't have 
-to look up them in a different place. This seemed clearer to me and easier 
-to work with. Maybe the spliting of the rewrite did not make this clear.
-
-One thing I'm not sure about though:
-
->> ---
->>  hw/i2c/ppc4xx_i2c.c         | 75 +++++++++++++++++++++++++--------------------
->>  include/hw/i2c/ppc4xx_i2c.h | 19 ++----------
->>  2 files changed, 43 insertions(+), 51 deletions(-)
+>>>> +1 for error_abort, even if it takes another line.  
+>>> +1 for error_abort
+>>> call shouldn't fail, but if does it won't be silently ignored
+>>> and introduce undefined behavior.  
 >>
->> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
->> index d1936db..a68b5f7 100644
->> --- a/hw/i2c/ppc4xx_i2c.c
->> +++ b/hw/i2c/ppc4xx_i2c.c
-[...]
->> @@ -330,7 +335,9 @@ static const MemoryRegionOps ppc4xx_i2c_ops = {
->>  static void ppc4xx_i2c_init(Object *o)
->>  {
->>      PPC4xxI2CState *s = PPC4xx_I2C(o);
->> +    PPC4xxI2CRegs *r = g_malloc0(sizeof(PPC4xxI2CRegs));
+>> Maybe we should fix the others that pass in NULL.
 >>
->> +    s->regs = r;
->>      memory_region_init_io(&s->iomem, OBJECT(s), &ppc4xx_i2c_ops, s,
->>                            TYPE_PPC4xx_I2C, PPC4xx_I2C_MEM_SIZE);
->>      sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
+>> (no, not me :D - I'm already busy with your requested pre_plug handling)
+> Add it to wiki page for bite sized tasks?
 
-I allocate memory here but I'm not sure if it should be g_free'd somewhere 
-and if so where? I was not able to detangle QOM object hierarchies and 
-there seems to be no good docs available or I haven't found them. (PCI 
-devices seem to have unrealize methods but this did not work for I2C 
-objects.)
+Done.
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
