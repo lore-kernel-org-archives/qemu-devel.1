@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRIbn-0000Na-5Q
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:43:20 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fRIdm-0001j9-3K
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRIbm-0005Nk-D0
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:43:19 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180607180641.874-1-f4bug@amsat.org>
-	<CAFEAcA9N9XyQrU9Y1XmgLDU9viUB1+U8iQH5QguAkxzqop4piw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4d519668-0f79-80c9-ceef-9fe531c76c1f@amsat.org>
-Date: Fri, 8 Jun 2018 11:43:09 -0300
+	(envelope-from <cohuck@redhat.com>) id 1fRIdj-0007M2-01
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:45:22 -0400
+Date: Fri, 8 Jun 2018 16:45:14 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180608164514.2e8248f4.cohuck@redhat.com>
+In-Reply-To: <d68340a2-bb1b-cef9-e394-f0d55983c0bb@linux.ibm.com>
+References: <20180509154822.23510-1-cohuck@redhat.com>
+	<20180509154822.23510-3-cohuck@redhat.com>
+	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
+	<20180515181006.0cb1dfc2.cohuck@redhat.com>
+	<a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
+	<20180522145208.310143ea.cohuck@redhat.com>
+	<4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
+	<20180605151449.22aafbfc.cohuck@redhat.com>
+	<e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
+	<20180606142131.74ea2eb7.cohuck@redhat.com>
+	<5b77ec9c-41b8-2e32-ce79-d9005b93fdd0@linux.ibm.com>
+	<20180607115442.6a779ed9.cohuck@redhat.com>
+	<86d57698-3ea7-a390-2217-07c6d41ca9ed@linux.ibm.com>
+	<20180608142022.7dd6a658.cohuck@redhat.com>
+	<d68340a2-bb1b-cef9-e394-f0d55983c0bb@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9N9XyQrU9Y1XmgLDU9viUB1+U8iQH5QguAkxzqop4piw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 0/7] sdcard: cleanup the
- SD_SPEC version
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
+ subchannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +37,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paul Brook <paul@codesourcery.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Pierre Morel <pmorel@linux.ibm.com>, Dong Jia Shi <bjsdjshi@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 06/08/2018 09:14 AM, Peter Maydell wrote:
-> On 7 June 2018 at 19:06, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Since v2:
->> - heavy documentation improvements
->> - squashed previous 3+4 "add spec_version property default to v2" for atomicity
->> - SSI/SD patch downgraded to RFC
->> - added Alistair R-b tags
-> 
->> Philippe Mathieu-Daudé (7):
->>   sdcard: Update the Configuration Register (SCR) to Spec Version 1.10
->>   sdcard: Allow commands valid in SPI mode
->>   sdcard: Add a 'spec_version' property, default to Spec v2.00
->>   sdcard: Disable SEND_IF_COND (CMD8) for Spec v1
->>   sdcard: Reflect when the Spec v3 is supported in the Config Register (SCR)
->>   sdcard: Disable CMD19/CMD23 for Spec v2
->>   hw/sd/ssi-sd: Force cards connected in SPI mode to use Spec v1.10
-> 
-> Hi; I've applied patches 1-6 to target-arm.next. 7 I had a
-> question about.
+On Fri, 8 Jun 2018 15:13:28 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-Thanks!
+> On 06/08/2018 02:20 PM, Cornelia Huck wrote:
+> >>> My proposal is to do the same
+> >>> copying to scsw(r) again, which would mean we get a request with both
+> >>> the halt and the start bit set. The vfio code now needs to do a hsch
+> >>> (instead of a ssch). The real channel subsystem should figure this out,
+> >>> as we can't reliably check whether the start function has concluded
+> >>> already (there's always a race window).  
+> >> This I do not agree scsw(r) is part of the driver.
+> >> The interface here is not a device interface anymore but a driver
+> >> interface.
+> >> SCSW is a status, it is at its place in QEMU device interface with the
+> >> guest
+> >> but here pwrite() sends a command.  
+> > Hm, I rather consider that "we write a status, and the backend figures
+> > out what to do based on that status".
+> >   
+> 
+> The status of what? Kind of a target status?
+> 
+> I think this approach is the source of lots of complications. For instance
+> take xsch. How are we supposed to react to a guest xsch (in QEMU and
+> in the kernel module)? My guess is that the right thing to do is to issue
+> an xsch in the vfio-ccw kernel module on the passed through subchannel.
+> But there is no bit in fctl for cancel.
+> 
+> Bottom line is: I'm not happy with the current design but I'm not sure
+> if it's practical to do something about it (i.e. change it radically).
+
+It might make sense to keep this for ssch, maybe reuse it for hsch/csch,
+and think about something else for other things we want to handle
+(xsch, channel monitoring, the path handling stuff for which we already
+had a prototype etc.) It's probably not practical to do radical surgery
+on the existing code.
+
+[Speaking of which: Is there any current effort on the path handling
+things?]
