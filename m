@@ -1,29 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fRJ4W-0002em-Eg
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:13:01 -0400
+	(envelope-from <berto@igalia.com>) id 1fRJ81-0004PY-HD
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fRJ4S-0008Uw-Ed
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:13:00 -0400
-Date: Fri, 8 Jun 2018 18:12:46 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180608181004-mutt-send-email-mst@kernel.org>
-References: <20180530150806.061c26b9@redhat.com>
-	<5dcb16e5-b9b9-d07d-dfe3-98724e911f83@redhat.com>
-	<20180531161310.52ea9507@redhat.com>
-	<e451e0d6-a181-b027-cdb7-f44beb11b37c@redhat.com>
-	<20180607154455.6eab4e24@redhat.com>
-	<5dda6237-88d8-f0f8-58d2-af996368cea4@redhat.com>
-	<20180608142442.0d97b7c6@redhat.com>
-	<397d37ee-b3a8-dae0-37d1-fd3c942448c2@redhat.com>
-	<20180608155432-mutt-send-email-mst@kernel.org>
-	<d6966aa8-54e5-8036-3603-069fbbb88c2a@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d6966aa8-54e5-8036-3603-069fbbb88c2a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
- hotplug handlers
+	(envelope-from <berto@igalia.com>) id 1fRJ7x-00023Q-Hd
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:16:37 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Fri,  8 Jun 2018 18:15:36 +0300
+Message-Id: <20180608151536.7378-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] throttle: Fix crash on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,68 +17,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-stable@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-On Fri, Jun 08, 2018 at 03:07:53PM +0200, David Hildenbrand wrote:
-> On 08.06.2018 14:55, Michael S. Tsirkin wrote:
-> > On Fri, Jun 08, 2018 at 02:32:09PM +0200, David Hildenbrand wrote:
-> >>
-> >>>>> if (TYPE_PC_DIMM) {
-> >>>>>     pc_dimm_plug()
-> >>>>>     /* do here additional concrete machine specific things */
-> >>>>> } else if (TYPE_VIRTIO_MEM) {
-> >>>>>     virtio_mem_plug() <- do forwarding in there
-> >>>>>     /* and do here additional concrete machine specific things */
-> >>>>> } else if (TYPE_CPU) {
-> >>>>>     cpu_plug()
-> >>>>>     /* do here additional concrete machine specific things */
-> >>>>> }  
-> >>>>
-> >>>> That will result in a lot of duplicate code - for every machine we
-> >>>> support (dimm/virtio-mem/virtio-pmem/*add more memory devices here*) -
-> >>>> virtio-mem and virtio-pmem could most probably share the code.
-> >>> maybe or maybe not, depending on if pmem endups as memory device or
-> >>> separate controller. And even with duplication, machine code would
-> >>> be easy to follow just down one explicit call chain.
-> >>
-> >> Not 100% convinced but I am now going into that direction.
-> > 
-> > Can this go into DeviceClass? Failover has the same need to
-> > allocate/free resources for vfio without a full realize/unrealize.
-> > 
-> 
-> Conceptually, I would have called here something like
-> 
-> virtio_mem_plug() ...
-> 
-> Which would end up calling memory_device_plug() and triggering the
-> target hotplug handler.
-> 
-> I assume this can also be done from a device class callback.
-> 
-> So we would need a total of 3 callbacks for
-> 
-> a) pre_plug
-> b) plug
-> c) unplug
-> 
-> In addition, unplug requests might be necessary, so
-> 
-> d) unplug_request
+The throttle block filter can be reopened, and with this it is
+possible to change the throttle group that the filter belongs to.
 
+The way the code does that is the following:
 
-Right - basically HotplugHandlerClass.
+  - On throttle_reopen_prepare(): create a new ThrottleGroupMember
+    and attach it to the new throttle group.
 
-> >> -- 
-> >>
-> >> Thanks,
-> >>
-> >> David / dhildenb
-> 
-> 
-> -- 
-> 
-> Thanks,
-> 
-> David / dhildenb
+  - On throttle_reopen_commit(): detach the old ThrottleGroupMember,
+    delete it and replace it with the new one.
+
+The problem with this is that by replacing the ThrottleGroupMember the
+previous value of io_limits_disabled is lost, causing an assertion
+failure in throttle_co_drain_end().
+
+This problem can be reproduced by reopening a throttle node:
+
+   $QEMU -monitor stdio
+   -object throttle-group,id=tg0,x-iops-total=1000 \
+   -blockdev node-name=hd0,driver=qcow2,file.driver=file,file.filename=hd.qcow2 \
+   -blockdev node-name=root,driver=throttle,throttle-group=tg0,file=hd0,read-only=on
+
+   (qemu) block_stream root
+   block/throttle.c:214: throttle_co_drain_end: Assertion `tgm->io_limits_disabled' failed.
+
+Since we only want to change the throttle group on reopen there's no
+need to create a ThrottleGroupMember and discard the old one. It's
+easier if we simply detach it from its current group and attach it to
+the new one.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/throttle.c | 54 +++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 33 insertions(+), 21 deletions(-)
+
+diff --git a/block/throttle.c b/block/throttle.c
+index 95ed06acd8..026f408aa6 100644
+--- a/block/throttle.c
++++ b/block/throttle.c
+@@ -36,9 +36,12 @@ static QemuOptsList throttle_opts = {
+     },
+ };
+ 
+-static int throttle_configure_tgm(BlockDriverState *bs,
+-                                  ThrottleGroupMember *tgm,
+-                                  QDict *options, Error **errp)
++/*
++ * If this function succeeds then the throttle group name is stored in
++ * @group and must be freed by the caller.
++ * If there's an error then @group remains unmodified.
++ */
++static int throttle_parse_options(QDict *options, char **group, Error **errp)
+ {
+     int ret;
+     const char *group_name;
+@@ -63,8 +66,7 @@ static int throttle_configure_tgm(BlockDriverState *bs,
+         goto fin;
+     }
+ 
+-    /* Register membership to group with name group_name */
+-    throttle_group_register_tgm(tgm, group_name, bdrv_get_aio_context(bs));
++    *group = g_strdup(group_name);
+     ret = 0;
+ fin:
+     qemu_opts_del(opts);
+@@ -75,6 +77,8 @@ static int throttle_open(BlockDriverState *bs, QDict *options,
+                          int flags, Error **errp)
+ {
+     ThrottleGroupMember *tgm = bs->opaque;
++    char *group;
++    int ret;
+ 
+     bs->file = bdrv_open_child(NULL, options, "file", bs,
+                                &child_file, false, errp);
+@@ -84,7 +88,14 @@ static int throttle_open(BlockDriverState *bs, QDict *options,
+     bs->supported_write_flags = bs->file->bs->supported_write_flags;
+     bs->supported_zero_flags = bs->file->bs->supported_zero_flags;
+ 
+-    return throttle_configure_tgm(bs, tgm, options, errp);
++    ret = throttle_parse_options(options, &group, errp);
++    if (ret == 0) {
++        /* Register membership to group with name group_name */
++        throttle_group_register_tgm(tgm, group, bdrv_get_aio_context(bs));
++        g_free(group);
++    }
++
++    return ret;
+ }
+ 
+ static void throttle_close(BlockDriverState *bs)
+@@ -160,35 +171,36 @@ static void throttle_attach_aio_context(BlockDriverState *bs,
+ static int throttle_reopen_prepare(BDRVReopenState *reopen_state,
+                                    BlockReopenQueue *queue, Error **errp)
+ {
+-    ThrottleGroupMember *tgm;
++    int ret;
++    char *group = NULL;
+ 
+     assert(reopen_state != NULL);
+     assert(reopen_state->bs != NULL);
+ 
+-    reopen_state->opaque = g_new0(ThrottleGroupMember, 1);
+-    tgm = reopen_state->opaque;
+-
+-    return throttle_configure_tgm(reopen_state->bs, tgm, reopen_state->options,
+-            errp);
++    ret = throttle_parse_options(reopen_state->options, &group, errp);
++    reopen_state->opaque = group;
++    return ret;
+ }
+ 
+ static void throttle_reopen_commit(BDRVReopenState *reopen_state)
+ {
+-    ThrottleGroupMember *old_tgm = reopen_state->bs->opaque;
+-    ThrottleGroupMember *new_tgm = reopen_state->opaque;
++    BlockDriverState *bs = reopen_state->bs;
++    ThrottleGroupMember *tgm = bs->opaque;
++    char *group = reopen_state->opaque;
+ 
+-    throttle_group_unregister_tgm(old_tgm);
+-    g_free(old_tgm);
+-    reopen_state->bs->opaque = new_tgm;
++    assert(group);
++
++    if (strcmp(group, throttle_group_get_name(tgm))) {
++        throttle_group_unregister_tgm(tgm);
++        throttle_group_register_tgm(tgm, group, bdrv_get_aio_context(bs));
++    }
++    g_free(reopen_state->opaque);
+     reopen_state->opaque = NULL;
+ }
+ 
+ static void throttle_reopen_abort(BDRVReopenState *reopen_state)
+ {
+-    ThrottleGroupMember *tgm = reopen_state->opaque;
+-
+-    throttle_group_unregister_tgm(tgm);
+-    g_free(tgm);
++    g_free(reopen_state->opaque);
+     reopen_state->opaque = NULL;
+ }
+ 
+-- 
+2.11.0
