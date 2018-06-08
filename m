@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fR8UG-0003Oa-3Y
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:54:53 -0400
+	(envelope-from <peterx@redhat.com>) id 1fR8Ur-0003tY-Gw
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:55:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fR8UF-0006g9-7q
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:54:52 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180607144645.10187-1-f4bug@amsat.org>
-	<20180607144645.10187-3-f4bug@amsat.org>
-	<20180608030319.GE3344@umbus.fritz.box>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <83125664-91ec-3274-e6d3-6c5ccfd95297@amsat.org>
-Date: Fri, 8 Jun 2018 00:54:36 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180608030319.GE3344@umbus.fritz.box>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="FWtUHwIfmEAwSQMsGLBYwpdEOGcwldsAz"
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] hw/ppc/spapr_drc: Replace
- error_setg(&error_abort) by abort()
+	(envelope-from <peterx@redhat.com>) id 1fR8Um-0006v1-HB
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:55:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34740 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fR8Um-0006uk-C3
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:55:24 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E288481663C4
+	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 03:55:23 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Fri,  8 Jun 2018 11:55:04 +0800
+Message-Id: <20180608035511.7439-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v10 0/7] monitor: let Monitor be thread safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,97 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FWtUHwIfmEAwSQMsGLBYwpdEOGcwldsAz
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: David Gibson <david@gibson.dropbear.id.au>,
- Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
-Message-ID: <83125664-91ec-3274-e6d3-6c5ccfd95297@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] hw/ppc/spapr_drc: Replace
- error_setg(&error_abort) by abort()
-References: <20180607144645.10187-1-f4bug@amsat.org>
- <20180607144645.10187-3-f4bug@amsat.org>
- <20180608030319.GE3344@umbus.fritz.box>
-In-Reply-To: <20180608030319.GE3344@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+v10:
+- collect r-bs
+- comment/renice the function monitor_get_clock(), add some commit
+  message [Stefan, Markus]
 
-Hi David,
+v9:
+- two more patches to implement Markus's idea to init monitor earlier
+  (which are patch 5 & 6)
+- touch up patch 7 to init the fdset lock in monitor_init_globals()
 
-On 06/08/2018 12:03 AM, David Gibson wrote:
-> On Thu, Jun 07, 2018 at 11:46:43AM -0300, Philippe Mathieu-Daud=E9 wrot=
-e:
->> Use abort() instead of error_setg(&error_abort),
->> as suggested by the "qapi/error.h" documentation:
->>
->>     Please don't error_setg(&error_fatal, ...), use error_report() and=
+v8:
+- some wording changes according to previous comments [Markus]
+- return -ENOENT too in stubs/fdset.c:monitor_fdset_get_fd() [Stefan]
+- refactor the fdset functions a bit, drop "ret" where proper [Markus]
+- one more patch to fix monitor_lock comment [Markus]
+- regular rebase and torturing
 
->>     exit(), because that's more obvious.
->>     Likewise, don't error_setg(&error_abort, ...), use assert().
->>
->> Use abort() instead of the suggested assert() because the assertion is=
+Stefan reported this problem that in the future we might start to have
+more threads operating on the same Monitor object.  This seris try to
+add fundamental support for it.
 
->> already verified by the switch case.
->=20
-> I think g_assert_not_reached() would be the right thing here.
+Please review.  Thanks,
 
-I try to follow Eric advice (who recalled Markus).
-As I understand:
-http://lists.gnu.org/archive/html/qemu-devel/2017-08/msg03605.html
+Peter Xu (7):
+  monitor: rename out_lock to mon_lock
+  monitor: protect mon->fds with mon_lock
+  monitor: more comments on lock-free elements
+  monitor: fix comment for monitor_lock
+  monitor: remove event_clock_type
+  monitor: move init global earlier
+  monitor: add lock to protect mon_fdsets
 
-"glib-Testing [...] should not be used outside of tests/."
+ monitor.c     | 168 +++++++++++++++++++++++++++++++++++---------------
+ stubs/fdset.c |   2 +-
+ util/osdep.c  |   3 +-
+ vl.c          |   7 +--
+ 4 files changed, 121 insertions(+), 59 deletions(-)
 
-I can respin if you prefer.
-
->>
->> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->> ---
->>  hw/ppc/spapr_drc.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
->> index 8a045d6b93..b934b9c9ed 100644
->> --- a/hw/ppc/spapr_drc.c
->> +++ b/hw/ppc/spapr_drc.c
->> @@ -366,7 +366,7 @@ static void prop_get_fdt(Object *obj, Visitor *v, =
-const char *name,
->>              break;
->>          }
->>          default:
->> -            error_setg(&error_abort, "device FDT in unexpected state:=
- %d", tag);
->> +            abort(); /* device FDT in unexpected state */
->>          }
->>          fdt_offset =3D fdt_offset_next;
->>      } while (fdt_depth !=3D 0);
->=20
-
-
---FWtUHwIfmEAwSQMsGLBYwpdEOGcwldsAz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlsZ/fwACgkQ4+MsLN6t
-wN5GJQ/9EnvxK702eu9ba/JqGHUM4U9FGSYmh5JA1S58xNEgzxqzzzaSvmhxxNGo
-BWpuHdOVZ2OfNLhZzXfAGEPki0uixfFOi7224VshK7MezF+JGq8xYRB4L7ET/s+p
-TthxRpzkxXU2g26caleSfjzV7ay46CLQ58OeReFhcHrTblmQ8Ftrts/Njcr8pwoQ
-JQivZt+jaVuM7vaJbRCTWml+oif/51U2LucXLkjlrt+9GN4SAYR7ChKv+yQMcznm
-9BqHc1fxnD+WorDXrMlaOr6kxTUjM32yQaw9gP9vgVv+YXSdRwxCbuocP+n03zgt
-CWnTNfKY3zbh0C55dzV2mCcvBqsbtYRb85XsSAyfBZho/Ekp6oxTAeAUKYqEZRGO
-KK2qzcV6AR+/tydp2V7eWaUrGveMR8blu5aT2QoKaQHC8A0NaVPWnbucosdG6a6w
-2YURQg31f7LT3MGGd/YiygkMRvkLFqqkhotFjavxvkR5FHM0aEPK6W97z8+d+x/9
-sQwaFWQATvLDpSLWZXJaUgM172Qf2WsVAZ2H+PXM/p9Cth1dm6a+iQFOVHYnFRgz
-7keRknsbrrhBRUcY0X4skFdmfhvCgVZyy1VVVZwTV7+cnnSeTza2Kamqx8vQyNup
-VP11OtaJOKWfUnAqKnFUrH1yOvFc6rlbwbilZ01ygwdPjJUE73o=
-=kjTa
------END PGP SIGNATURE-----
-
---FWtUHwIfmEAwSQMsGLBYwpdEOGcwldsAz--
+-- 
+2.17.1
