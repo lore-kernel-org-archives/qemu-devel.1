@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fRCeT-0006i7-Vw
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:21:43 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fRCgg-0008A3-KE
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:23:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fRCeS-0007Uq-QV
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:21:41 -0400
-Date: Fri, 8 Jun 2018 09:21:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180608082129.GC2671@work-vm>
-References: <20180606143134.GG2660@work-vm>
-	<39bcee27-329a-61d8-47fa-678b431b0a79@redhat.com>
-	<20180606150507.GJ2660@work-vm>
-	<66727986-1cf1-c12e-d78c-d56cc15eaf00@redhat.com>
-	<20180606163246.GL3064@redhat.com>
-	<f3914a591a46c9d489f2fa1ad2ac4fd0c5a9e5b6.camel@redhat.com>
-	<20180607103218.GC1455@redhat.com>
-	<20180607103620.GJ28827@redhat.com>
-	<dd014be5c818e71d4f833e150fbae11e490e2325.camel@redhat.com>
-	<7410e002-ba2f-2dd2-b24f-c9841f456ac9@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1fRCgc-0008Np-LT
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:23:58 -0400
+Date: Fri, 8 Jun 2018 18:20:58 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180608082058.GQ3344@umbus.fritz.box>
+References: <20180607165218.9558-1-david@redhat.com>
+	<20180607165218.9558-3-david@redhat.com>
+	<20180608093406.30c878ec@bahia.lan>
+	<4f518685-fcdb-7c3a-35d3-5a26374e0604@redhat.com>
+	<20180608094657.4043502f@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Y9o+fgG4MNl0mnzl"
 Content-Disposition: inline
-In-Reply-To: <7410e002-ba2f-2dd2-b24f-c9841f456ac9@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+In-Reply-To: <20180608094657.4043502f@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v1 2/8] spapr: no need to verify the node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,95 +27,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Andrea Bolognani <abologna@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-* Laszlo Ersek (lersek@redhat.com) wrote:
-> On 06/07/18 12:54, Andrea Bolognani wrote:
-> > On Thu, 2018-06-07 at 11:36 +0100, Daniel P. Berrang=E9 wrote:
-> >> On Thu, Jun 07, 2018 at 11:32:18AM +0100, Richard W.M. Jones wrote:
-> >>> Another problem which Laszlo mentioned is the varstore isn't portab=
-le
-> >>> between UEFI implementations, or if the UEFI is compiled with
-> >>> different options.  You can even imagine shipping multiple
-> >>> varstores(!) which argues for a tar-like format.
-> >>
-> >> Could we perhaps imagine shipping the actual UEFI bios, rather
-> >> than only the varstore.  The bios blob runs in guest context,
-> >> so there shouldn't be able security concerns from hosting
-> >> vendors with running user provided bios. Mostly its a matter
-> >> of confidence that the interface between bios & qemu is stable
-> >> which feels easier than assuming varstore vs different bios is
-> >> portable.
+
+--Y9o+fgG4MNl0mnzl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jun 08, 2018 at 09:46:57AM +0200, Greg Kurz wrote:
+> On Fri, 8 Jun 2018 09:42:48 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+> > On 08.06.2018 09:34, Greg Kurz wrote:
+> > > On Thu,  7 Jun 2018 18:52:12 +0200
+> > > David Hildenbrand <david@redhat.com> wrote:
+> > >  =20
+> > >> The node property can always be queried and the value has already be=
+en
+> > >> verified in pc_dimm_realize().
+> > >>
+> > >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> > >> ---
+> > >>  hw/ppc/spapr.c | 9 +--------
+> > >>  1 file changed, 1 insertion(+), 8 deletions(-)
+> > >>
+> > >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > >> index 2375cbee12..d038f3243e 100644
+> > >> --- a/hw/ppc/spapr.c
+> > >> +++ b/hw/ppc/spapr.c
+> > >> @@ -3578,14 +3578,7 @@ static void spapr_machine_device_plug(Hotplug=
+Handler *hotplug_dev,
+> > >>              error_setg(errp, "Memory hotplug not supported for this=
+ machine");
+> > >>              return;
+> > >>          }
+> > >> -        node =3D object_property_get_uint(OBJECT(dev), PC_DIMM_NODE=
+_PROP, errp);
+> > >> -        if (*errp) { =20
+> > >=20
+> > > Good riddance :)
+> > >  =20
+> > >> -            return;
+> > >> -        }
+> > >> -        if (node < 0 || node >=3D MAX_NODES) {
+> > >> -            error_setg(errp, "Invaild node %d", node);
+> > >> -            return;
+> > >> -        }
+> > >> +        node =3D object_property_get_uint(OBJECT(dev), PC_DIMM_NODE=
+_PROP, NULL); =20
+> > >=20
+> > > Maybe pass &error_abort ? =20
 > >=20
-> > That sounds sensible, and further reinforces the idea that we
-> > need way more than a single string baked into the qcow2 file.
+> > I'm using the same access scheme as in hw/acpi/memory_hotplug.c
+> >=20
+> > ("error ignored" vs. "error leads to an abort") - but this will actually
+> > never fail. But I can use error_abort here, does not matter.
 > >=20
 >=20
-> Sorry for arriving late (thanks Rich for the Fwd).
->=20
-> The contents of the non-volatile UEFI variables should be considered
-> part of (permanent) guest state, such as disk contents. Therefore I'd
-> argue for bundling the varstore file with the disk image(s).
->=20
-> In turn, the best way to ensure comaptibility between varstore and
-> firmware binary is to just bundle the firmware binary as well. It's
-> generally not large (x86) or if it is, it compresses extremely well
-> (aarch64). For extra politeness, image providers can bundle a text file
-> with their firmware build options (like a kernel config), possibly even
-> a JSON document conforming to the new firmware schema (qemu commit
-> 3a0adfc9bfcf), but that's not a hard requirement I guess.
->=20
-> If such a VM is to be migrated between hosts, I'd expect the host admin
-> to take care of installing the fw binary on all eligible hosts.
+> Heh, /me paranoid but this is David's call and he acked that already
+> so I guess it's okay.
 
-There's no way they can do that if they're just importing VMs from
-templates that include the image; who is going to keep track of which
-BIOSs are needed where?
+Actually, I missed this - error_abort is preferable.  That's general
+the right choice for things that shouldn't ever fail.  This way if
+they *do* fail we get a clear error immediately.
 
-Dave
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 
-> Regarding compat between QEMU and firmware binary, I see three cases:
->=20
-> (1) Static requirements presented by the firmware for the QEMU
-> configuration. (Such as -D SMM_REQUIRE.) With the domain configuration
-> captured one way or another alongside the disk image anyway, this shoul=
-d
-> not be a problem.
->=20
-> (2) New firmware launched on old QEMU. The firmware generally detects o=
-r
-> negotiates features with QEMU, so this should be safe.
->=20
-> (Discounting firmware regressions, of course -- for example, search
-> <https://www.mail-archive.com/qemu-devel@nongnu.org/msg471901.html> for
-> the string "I messed up".)
->=20
-> (3) Old firmware launched on new QEMU. This scenario has given us a lot
-> more grief than (2), but I think for the appliance distribution use
-> case, it can be folded into case (1) above -- specify the machine type
-> too in the domain config, and that should be compatible with the old
-> firmware.
->=20
-> (The handling of (3) is not uniform between upstream QEMU and various
-> downstreams. For example, consider
-> <https://bugs.launchpad.net/qemu/+bug/1715700>. This was a latent bug i=
-n
-> OVMF that got exposed by a new QEMU (due to a valid QEMU change), even
-> when using old machine types. The upstream solution was to fix edk2 and
-> stick with QEMU as-was (although the agreement around that hadn't been
-> universal). Conversely, one downstream solution was to restrict the
-> otherwise valid QEMU change to new machine types
-> <https://bugzilla.redhat.com/show_bug.cgi?id=3D1489800#c5>.)
->=20
->=20
-> All in all I agree with Daniel's proposal; it seems to be the most
-> robust one.
->=20
-> And, I too recall that, under AMD SEV, users will be supposed to, or
-> allowed to, provide their own firmware binaries.
->=20
-> Thanks!
-> Laszlo
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Y9o+fgG4MNl0mnzl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsaPGcACgkQbDjKyiDZ
+s5K42hAAk6oIV4PFzVaIH3UsR4yU1gPxsb5yG/4B9pirDlB0ZMXMm1xUngn/0N/P
+jLf6JhQILpBkT66hh4vRWukrbZYATV9VabySsUuFWi2Orw6V/PJeIK86xiWsXAmv
+tuNP80GVDvbaufcPYqgJREQk54pY+o2APSMCFwqR0ZU4+7pq74R1I1SduvQepRek
+2+yFp5Fi/uerzq0U6xX5+LifqcmJZWYDC1fy5+32AYFlAGtKVXqQmeUddbbiQnvM
+te3Riz6urmXlVVwHuBfLAkDB9lv+HnVIVdLtqwktmeDrih7ni2Flv30iYE3icqlV
+yTGQjC1TDp30WcU8P3r5M20ZYAPV1wgEn5B5M9m/tqEFYiMBSspPVtq8lJFqjMn3
+Nr5ubAwmoDSsD2Ae9esXXmjWEEw3EJCkgXnf8qRdp5nKzRidp75J7BxRtjYk1Jat
+ToqOKOTTSzr3ygarLkvCKcyOIlOyweM8Q8HJb0KDjH1iJ9kbV+GYe39xT3FOCGv+
+Dn2fVQdl0zPdqLpAiRUh5WG0kBxoBocOXPrPDEcHl0kCtzOCS3mrvEpPmQIVwkol
+c0RXwHeLxE2GQo2kErQe/mFE8WEKNMWEK3h68725ct9XQJqgtpoIRkPsc8Q0Sfdg
+CsQVgrWP49P8MErs5PM3Pupo5IuHE1o3dk6pkgxAWaf9MnE1FsA=
+=UZzR
+-----END PGP SIGNATURE-----
+
+--Y9o+fgG4MNl0mnzl--
