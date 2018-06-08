@@ -1,14 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fRBLE-00047h-JU
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:57:46 -0400
+	(envelope-from <armbru@redhat.com>) id 1fRBSy-0006Mn-Kx
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:05:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fRBLD-0002mz-7g
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:57:44 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Fri,  8 Jun 2018 08:57:11 +0200
-Message-Id: <1528441031-6518-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH] hw/arm/smmuv3: Fix translate error handling
+	(envelope-from <armbru@redhat.com>) id 1fRBSv-0006Wq-Ez
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:05:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45708 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fRBSv-0006WF-8v
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:05:41 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6CAD28884A
+	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 07:05:40 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180604080630.10946-1-peterx@redhat.com>
+	<87tvqeyfs2.fsf@dusky.pond.sub.org> <20180608044235.GA7736@xz-mi>
+Date: Fri, 08 Jun 2018 09:05:27 +0200
+In-Reply-To: <20180608044235.GA7736@xz-mi> (Peter Xu's message of "Fri, 8 Jun
+	2018 12:42:35 +0800")
+Message-ID: <87602t69mw.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] monitor: postpone
+ monitor_qmp_cleanup_queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,269 +34,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, jia.he@hxt-semitech.com, hejianet@gmail.com
+To: Peter Xu <peterx@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?utf-8?Q?M?= =?utf-8?Q?arc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, John Snow <jsnow@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-From: Jia He <hejianet@gmail.com>
+Peter Xu <peterx@redhat.com> writes:
 
-In case the STE's config is "Bypass" we currently don't set the
-IOMMUTLBEntry perm flags and the access does not succeed. Also
-if the config is 0b0xx (Aborted/Reserved), decode_ste and
-smmuv3_decode_config currently returns -EINVAL and we don't enter
-the expected code path: we record an event whereas we should not.
+> On Thu, Jun 07, 2018 at 01:53:01PM +0200, Markus Armbruster wrote:
+>> Peter Xu <peterx@redhat.com> writes:
+>> 
+>> > Previously we cleanup the queues when we got CLOSED event.  It was used
+>> 
+>> we clean up
+>> 
+>> > to make sure we won't leftover replies/events of a old client to a new
+>> 
+>> we won't send leftover replies/events of an old client
+>> 
+>> > client.  Now this patch postpones that until OPENED.
+>> 
+>> What if OPENED never comes?
+>
+> Then we clean that up until destruction of the monitor.  IMHO it's
+> fine, but I'm not sure whether that's an overall acceptable approach.
 
-This patch fixes those bugs and simplifies the error handling.
-decode_ste and smmuv3_decode_config now return 0 if aborted or
-bypassed config was found. Only bad config info produces negative
-error values. In smmuv3_translate we more clearly differentiate
-errors, bypass/smmu disabled, aborted and success cases. Also
-trace points are differentiated.
+See below.
 
-Fixes: 9bde7f0674fe ("hw/arm/smmuv3: Implement translate callback")
-Reported-by: jia.he@hxt-semitech.com
-Signed-off-by: jia.he@hxt-semitech.com
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/smmuv3-internal.h | 12 +++++--
- hw/arm/smmuv3.c          | 93 ++++++++++++++++++++++++++++++++----------------
- hw/arm/trace-events      |  7 ++--
- 3 files changed, 77 insertions(+), 35 deletions(-)
+>> > In most cases, it does not really matter much since either way will make
+>> > sure that the new client won't receive unexpected old events/responses.
+>> > However there can be a very rare race condition with the old way when we
+>> > use QMP with stdio and pipelines (which is quite common in iotests).
+>> > The problem is that, we can easily have something like this in scripts:
+>> >
+>> >   cat $QMP_COMMANDS | qemu -qmp stdio ... | filter_commands
+>> >
+>> > In most cases, a QMP session will be based on a bidirectional
+>> > channel (read/write to a TCP port, for example), so IN and OUT are
+>> > sharing some fundamentally same thing.  However that's untrue for pipes
+>> 
+>> Suggest "are fundamentally the same thing".
+>> 
+>> > above - the IN is the "cat" program, while the "OUT" is directed to the
+>> > "filter_commands" which is actually another process.
+>> 
+>> Regarding 'IN is the "cat" program': a pipe is not a program.  Suggest
+>> 'IN is connected to "cat", while OUT is connected to "filter_commands",
+>> which are separate processes.
+>> 
+>> > Now when we received the CLOSED event, we cleanup the queues (including
+>> 
+>> we clean up
+>> 
+>> > the QMP response queue).  That means, if we kill/stop the "cat" process
+>> > faster than the filter_commands process, the filter_commands process is
+>> > possible to miss some responses/events that should belong to it.
+>> 
+>> I'm not sure I understand the error scenario.  Can you explain it in
+>> more concrete terms?  Like "cat terminates, QEMU reads EOF, QEMU does
+>> this, QEMU does that, oops, it shouldn't have done that".
+>
+> One condition could be this (after "quit" command is executed and QEMU
+> quits the main loop):
+>
+> 1. [main thread] QEMU queues one SHUTDOWN event into response queue
+>
+> 2. "cat" terminates (to distinguish it from the animal, I quote it).
+>    Logically it can terminate even earlier, but let's just assume it's
+>    here.
+>
+> 3. [monitor iothread] QEMU reads EOF from stdin, which connects to the
+>    "cat" process
+>
+> 4. [monitor iothread] QEMU calls the CLOSED event hook for the monitor,
+>    which will clean up the response queue of the monitor, then the
+>    SHUTDOWN event is dropped
+>
+> 5. [main thread] clean up the monitors in monitor_cleanup(), when
+>    trying to flush pending responses, it sees nothing.  SHUTDOWN is
+>    lost forever
 
-diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-index a9d714b..bab25d6 100644
---- a/hw/arm/smmuv3-internal.h
-+++ b/hw/arm/smmuv3-internal.h
-@@ -23,6 +23,14 @@
- 
- #include "hw/arm/smmu-common.h"
- 
-+typedef enum SMMUTranslationStatus {
-+    SMMU_TRANS_DISABLE,
-+    SMMU_TRANS_ABORT,
-+    SMMU_TRANS_BYPASS,
-+    SMMU_TRANS_ERROR,
-+    SMMU_TRANS_SUCCESS,
-+} SMMUTranslationStatus;
-+
- /* MMIO Registers */
- 
- REG32(IDR0,                0x0)
-@@ -315,7 +323,7 @@ enum { /* Command completion notification */
- /* Events */
- 
- typedef enum SMMUEventType {
--    SMMU_EVT_OK                 = 0x00,
-+    SMMU_EVT_NONE               = 0x00,
-     SMMU_EVT_F_UUT                    ,
-     SMMU_EVT_C_BAD_STREAMID           ,
-     SMMU_EVT_F_STE_FETCH              ,
-@@ -337,7 +345,7 @@ typedef enum SMMUEventType {
- } SMMUEventType;
- 
- static const char *event_stringify[] = {
--    [SMMU_EVT_OK]                       = "SMMU_EVT_OK",
-+    [SMMU_EVT_NONE]                     = "no recorded event",
-     [SMMU_EVT_F_UUT]                    = "SMMU_EVT_F_UUT",
-     [SMMU_EVT_C_BAD_STREAMID]           = "SMMU_EVT_C_BAD_STREAMID",
-     [SMMU_EVT_F_STE_FETCH]              = "SMMU_EVT_F_STE_FETCH",
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index b3026de..c5e7a7c 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -154,7 +154,7 @@ void smmuv3_record_event(SMMUv3State *s, SMMUEventInfo *info)
-     EVT_SET_SID(&evt, info->sid);
- 
-     switch (info->type) {
--    case SMMU_EVT_OK:
-+    case SMMU_EVT_NONE:
-         return;
-     case SMMU_EVT_F_UUT:
-         EVT_SET_SSID(&evt, info->u.f_uut.ssid);
-@@ -312,12 +312,11 @@ static int smmu_get_cd(SMMUv3State *s, STE *ste, uint32_t ssid,
-     return 0;
- }
- 
--/* Returns <0 if the caller has no need to continue the translation */
-+/* Returns < 0 in case of invalid STE, 0 otherwise */
- static int decode_ste(SMMUv3State *s, SMMUTransCfg *cfg,
-                       STE *ste, SMMUEventInfo *event)
- {
-     uint32_t config;
--    int ret = -EINVAL;
- 
-     if (!STE_VALID(ste)) {
-         goto bad_ste;
-@@ -326,13 +325,13 @@ static int decode_ste(SMMUv3State *s, SMMUTransCfg *cfg,
-     config = STE_CONFIG(ste);
- 
-     if (STE_CFG_ABORT(config)) {
--        cfg->aborted = true; /* abort but don't record any event */
--        return ret;
-+        cfg->aborted = true;
-+        return 0;
-     }
- 
-     if (STE_CFG_BYPASS(config)) {
-         cfg->bypassed = true;
--        return ret;
-+        return 0;
-     }
- 
-     if (STE_CFG_S2_ENABLED(config)) {
-@@ -509,7 +508,7 @@ bad_cd:
-  *       the different configuration decoding steps
-  * @event: must be zero'ed by the caller
-  *
-- * return < 0 if the translation needs to be aborted (@event is filled
-+ * return < 0 in case of config decoding error (@event is filled
-  * accordingly). Return 0 otherwise.
-  */
- static int smmuv3_decode_config(IOMMUMemoryRegion *mr, SMMUTransCfg *cfg,
-@@ -518,19 +517,26 @@ static int smmuv3_decode_config(IOMMUMemoryRegion *mr, SMMUTransCfg *cfg,
-     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
-     uint32_t sid = smmu_get_sid(sdev);
-     SMMUv3State *s = sdev->smmu;
--    int ret = -EINVAL;
-+    int ret;
-     STE ste;
-     CD cd;
- 
--    if (smmu_find_ste(s, sid, &ste, event)) {
-+    ret = smmu_find_ste(s, sid, &ste, event);
-+    if (ret) {
-         return ret;
-     }
- 
--    if (decode_ste(s, cfg, &ste, event)) {
-+    ret = decode_ste(s, cfg, &ste, event);
-+    if (ret) {
-         return ret;
-     }
- 
--    if (smmu_get_cd(s, &ste, 0 /* ssid */, &cd, event)) {
-+    if (cfg->aborted || cfg->bypassed) {
-+        return 0;
-+    }
-+
-+    ret = smmu_get_cd(s, &ste, 0 /* ssid */, &cd, event);
-+    if (ret) {
-         return ret;
-     }
- 
-@@ -543,8 +549,9 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
-     SMMUv3State *s = sdev->smmu;
-     uint32_t sid = smmu_get_sid(sdev);
--    SMMUEventInfo event = {.type = SMMU_EVT_OK, .sid = sid};
-+    SMMUEventInfo event = {.type = SMMU_EVT_NONE, .sid = sid};
-     SMMUPTWEventInfo ptw_info = {};
-+    SMMUTranslationStatus status;
-     SMMUTransCfg cfg = {};
-     IOMMUTLBEntry entry = {
-         .target_as = &address_space_memory,
-@@ -553,23 +560,28 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-         .addr_mask = ~(hwaddr)0,
-         .perm = IOMMU_NONE,
-     };
--    int ret = 0;
- 
-     if (!smmu_enabled(s)) {
--        goto out;
-+        status = SMMU_TRANS_DISABLE;
-+        goto epilogue;
-     }
- 
--    ret = smmuv3_decode_config(mr, &cfg, &event);
--    if (ret) {
--        goto out;
-+    if (smmuv3_decode_config(mr, &cfg, &event)) {
-+        status = SMMU_TRANS_ERROR;
-+        goto epilogue;
-     }
- 
-     if (cfg.aborted) {
--        goto out;
-+        status = SMMU_TRANS_ABORT;
-+        goto epilogue;
-     }
- 
--    ret = smmu_ptw(&cfg, addr, flag, &entry, &ptw_info);
--    if (ret) {
-+    if (cfg.bypassed) {
-+        status = SMMU_TRANS_BYPASS;
-+        goto epilogue;
-+    }
-+
-+    if (smmu_ptw(&cfg, addr, flag, &entry, &ptw_info)) {
-         switch (ptw_info.type) {
-         case SMMU_PTW_ERR_WALK_EABT:
-             event.type = SMMU_EVT_F_WALK_EABT;
-@@ -609,18 +621,39 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-         default:
-             g_assert_not_reached();
-         }
-+        status = SMMU_TRANS_ERROR;
-+    } else {
-+        status = SMMU_TRANS_SUCCESS;
-     }
--out:
--    if (ret) {
--        qemu_log_mask(LOG_GUEST_ERROR,
--                      "%s translation failed for iova=0x%"PRIx64"(%d)\n",
--                      mr->parent_obj.name, addr, ret);
--        entry.perm = IOMMU_NONE;
--        smmuv3_record_event(s, &event);
--    } else if (!cfg.aborted) {
-+
-+epilogue:
-+    switch (status) {
-+    case SMMU_TRANS_SUCCESS:
-         entry.perm = flag;
--        trace_smmuv3_translate(mr->parent_obj.name, sid, addr,
--                               entry.translated_addr, entry.perm);
-+        trace_smmuv3_translate_success(mr->parent_obj.name, sid, addr,
-+                                       entry.translated_addr, entry.perm);
-+        break;
-+    case SMMU_TRANS_DISABLE:
-+        entry.perm = flag;
-+        trace_smmuv3_translate_disable(mr->parent_obj.name, sid, addr,
-+                                      entry.perm);
-+        break;
-+    case SMMU_TRANS_BYPASS:
-+        entry.perm = flag;
-+        trace_smmuv3_translate_bypass(mr->parent_obj.name, sid, addr,
-+                                      entry.perm);
-+        break;
-+    case SMMU_TRANS_ABORT:
-+        /* no event is recorded on abort */
-+        trace_smmuv3_translate_abort(mr->parent_obj.name, sid, addr,
-+                                     entry.perm);
-+        break;
-+    case SMMU_TRANS_ERROR:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s translation failed for iova=0x%"PRIx64"(%s)\n",
-+                      mr->parent_obj.name, addr, smmu_event_string(event.type));
-+        smmuv3_record_event(s, &event);
-+        break;
-     }
- 
-     return entry;
-diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index 2d92727..0ab66bb 100644
---- a/hw/arm/trace-events
-+++ b/hw/arm/trace-events
-@@ -33,9 +33,10 @@ smmuv3_record_event(const char *type, uint32_t sid) "%s sid=%d"
- smmuv3_find_ste(uint16_t sid, uint32_t features, uint16_t sid_split) "SID:0x%x features:0x%x, sid_split:0x%x"
- smmuv3_find_ste_2lvl(uint64_t strtab_base, uint64_t l1ptr, int l1_ste_offset, uint64_t l2ptr, int l2_ste_offset, int max_l2_ste) "strtab_base:0x%"PRIx64" l1ptr:0x%"PRIx64" l1_off:0x%x, l2ptr:0x%"PRIx64" l2_off:0x%x max_l2_ste:%d"
- smmuv3_get_ste(uint64_t addr) "STE addr: 0x%"PRIx64
--smmuv3_translate_bypass(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d bypass iova:0x%"PRIx64" is_write=%d"
--smmuv3_translate_in(uint16_t sid, int pci_bus_num, uint64_t strtab_base) "SID:0x%x bus:%d strtab_base:0x%"PRIx64
-+smmuv3_translate_disable(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d bypass (smmu disabled) iova:0x%"PRIx64" is_write=%d"
-+smmuv3_translate_bypass(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d STE bypass iova:0x%"PRIx64" is_write=%d"
-+smmuv3_translate_abort(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d abort on iova:0x%"PRIx64" is_write=%d"
-+smmuv3_translate_success(const char *n, uint16_t sid, uint64_t iova, uint64_t translated, int perm) "%s sid=%d iova=0x%"PRIx64" translated=0x%"PRIx64" perm=0x%x"
- smmuv3_get_cd(uint64_t addr) "CD addr: 0x%"PRIx64
--smmuv3_translate(const char *n, uint16_t sid, uint64_t iova, uint64_t translated, int perm) "%s sid=%d iova=0x%"PRIx64" translated=0x%"PRIx64" perm=0x%x"
- smmuv3_decode_cd(uint32_t oas) "oas=%d"
- smmuv3_decode_cd_tt(int i, uint32_t tsz, uint64_t ttb, uint32_t granule_sz) "TT[%d]:tsz:%d ttb:0x%"PRIx64" granule_sz:%d"
--- 
-2.5.5
+Got it, thanks!
+
+The actual problem is that we drop the output queue when we see EOF on
+input.
+
+Here's what I think we should do on such EOF:
+
+1. Shut down input
+
+   Stop reading input.  If input has its own file descriptor (as opposed
+   to a read/write fd shared with output), close it.
+
+2. Flush output
+
+   Continue to write output until the queue becomes empty or we run into
+   an error (such as EPIPE, telling us the output's consumer went away).
+   Works exactly as before, except we proceed to step 3 when the queue
+   becomes empty.
+
+3. Shut down output
+
+   Close the output file descriptor.
+
+> Note that before the monitor iothread was introduced, step [4]/[5]
+> could never happen since the main loop was the only place to detect
+> the EOF event of stdin and run the CLOSED event hooks.
+
+I can't quite see what ensured response queue is empty before main loop
+runs the CLOSED event hook.
+
+>                                                         Now things can
+> happen in parallel in the iothread.
+
+Perhaps that just made the bug more likely to bite.
+
+> I can add these into commit message.
+>
+>> 
+>> > In practise, I encountered a very strange SHUTDOWN event missing when
+>> 
+>> practice
+>> 
+>> May I suggest use of a spell checker?  ;)
+>
+> Sorry for that.  TODO added: "Find a spell checker for Emacs".
+
+C-h i
+M emacs RET
+M spelling RET
+
+>> > running test with iotest 087.  Without this patch, iotest 078 will have
+>> 
+>> 087 or 078?
+>
+> 087.  Err.  Even a spell checker won't help me here!
+
+Need to leave something for reviewers to do ;)
+
+>> > ~10% chance to miss the SHUTDOWN event and fail when with Out-Of-Band
+>> > enabled:
+>> >
+>> > 087 8s ... - output mismatch (see 087.out.bad)
+>
+> I'll take all the rest comments.  Thanks for reviewing.
+
+I'm not sure this patch is the proper solution.  Can we explore the one
+I sketched?
