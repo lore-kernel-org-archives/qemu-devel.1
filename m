@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fR92J-0005wP-4e
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:30:04 -0400
+	(envelope-from <peterx@redhat.com>) id 1fR9Ec-00019D-MZ
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:42:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fR92G-0001pz-11
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:30:03 -0400
-Date: Fri, 8 Jun 2018 14:23:16 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180608042316.GP3344@umbus.fritz.box>
-References: <20180607144645.10187-1-f4bug@amsat.org>
-	<20180607144645.10187-3-f4bug@amsat.org>
-	<20180608030319.GE3344@umbus.fritz.box>
-	<83125664-91ec-3274-e6d3-6c5ccfd95297@amsat.org>
+	(envelope-from <peterx@redhat.com>) id 1fR9EZ-0000Ew-Jv
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:42:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49016 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fR9EZ-0000ER-EM
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 00:42:43 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7F90BBB43A
+	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 04:42:42 +0000 (UTC)
+Date: Fri, 8 Jun 2018 12:42:35 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180608044235.GA7736@xz-mi>
+References: <20180604080630.10946-1-peterx@redhat.com>
+	<87tvqeyfs2.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9zecZT88ylESpiZX"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <83125664-91ec-3274-e6d3-6c5ccfd95297@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] hw/ppc/spapr_drc: Replace
- error_setg(&error_abort) by abort()
+In-Reply-To: <87tvqeyfs2.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH] monitor: postpone
+ monitor_qmp_cleanup_queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +34,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
+On Thu, Jun 07, 2018 at 01:53:01PM +0200, Markus Armbruster wrote:
+> Peter Xu <peterx@redhat.com> writes:
+> 
+> > Previously we cleanup the queues when we got CLOSED event.  It was used
+> 
+> we clean up
+> 
+> > to make sure we won't leftover replies/events of a old client to a new
+> 
+> we won't send leftover replies/events of an old client
+> 
+> > client.  Now this patch postpones that until OPENED.
+> 
+> What if OPENED never comes?
 
---9zecZT88ylESpiZX
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Then we clean that up until destruction of the monitor.  IMHO it's
+fine, but I'm not sure whether that's an overall acceptable approach.
 
-On Fri, Jun 08, 2018 at 12:54:36AM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Hi David,
->=20
-> On 06/08/2018 12:03 AM, David Gibson wrote:
-> > On Thu, Jun 07, 2018 at 11:46:43AM -0300, Philippe Mathieu-Daud=E9 wrot=
-e:
-> >> Use abort() instead of error_setg(&error_abort),
-> >> as suggested by the "qapi/error.h" documentation:
-> >>
-> >>     Please don't error_setg(&error_fatal, ...), use error_report() and
-> >>     exit(), because that's more obvious.
-> >>     Likewise, don't error_setg(&error_abort, ...), use assert().
-> >>
-> >> Use abort() instead of the suggested assert() because the assertion is
-> >> already verified by the switch case.
-> >=20
-> > I think g_assert_not_reached() would be the right thing here.
->=20
-> I try to follow Eric advice (who recalled Markus).
-> As I understand:
-> http://lists.gnu.org/archive/html/qemu-devel/2017-08/msg03605.html
->=20
-> "glib-Testing [...] should not be used outside of tests/."
+> 
+> > In most cases, it does not really matter much since either way will make
+> > sure that the new client won't receive unexpected old events/responses.
+> > However there can be a very rare race condition with the old way when we
+> > use QMP with stdio and pipelines (which is quite common in iotests).
+> > The problem is that, we can easily have something like this in scripts:
+> >
+> >   cat $QMP_COMMANDS | qemu -qmp stdio ... | filter_commands
+> >
+> > In most cases, a QMP session will be based on a bidirectional
+> > channel (read/write to a TCP port, for example), so IN and OUT are
+> > sharing some fundamentally same thing.  However that's untrue for pipes
+> 
+> Suggest "are fundamentally the same thing".
+> 
+> > above - the IN is the "cat" program, while the "OUT" is directed to the
+> > "filter_commands" which is actually another process.
+> 
+> Regarding 'IN is the "cat" program': a pipe is not a program.  Suggest
+> 'IN is connected to "cat", while OUT is connected to "filter_commands",
+> which are separate processes.
+> 
+> > Now when we received the CLOSED event, we cleanup the queues (including
+> 
+> we clean up
+> 
+> > the QMP response queue).  That means, if we kill/stop the "cat" process
+> > faster than the filter_commands process, the filter_commands process is
+> > possible to miss some responses/events that should belong to it.
+> 
+> I'm not sure I understand the error scenario.  Can you explain it in
+> more concrete terms?  Like "cat terminates, QEMU reads EOF, QEMU does
+> this, QEMU does that, oops, it shouldn't have done that".
 
-Oh, ok, go with that then.
+One condition could be this (after "quit" command is executed and QEMU
+quits the main loop):
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+1. [main thread] QEMU queues one SHUTDOWN event into response queue
 
-> I can respin if you prefer.
+2. "cat" terminates (to distinguish it from the animal, I quote it).
+   Logically it can terminate even earlier, but let's just assume it's
+   here.
 
+3. [monitor iothread] QEMU reads EOF from stdin, which connects to the
+   "cat" process
 
+4. [monitor iothread] QEMU calls the CLOSED event hook for the monitor,
+   which will clean up the response queue of the monitor, then the
+   SHUTDOWN event is dropped
 
->=20
-> >>
-> >> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> >> ---
-> >>  hw/ppc/spapr_drc.c | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> >> index 8a045d6b93..b934b9c9ed 100644
-> >> --- a/hw/ppc/spapr_drc.c
-> >> +++ b/hw/ppc/spapr_drc.c
-> >> @@ -366,7 +366,7 @@ static void prop_get_fdt(Object *obj, Visitor *v, =
-const char *name,
-> >>              break;
-> >>          }
-> >>          default:
-> >> -            error_setg(&error_abort, "device FDT in unexpected state:=
- %d", tag);
-> >> +            abort(); /* device FDT in unexpected state */
-> >>          }
-> >>          fdt_offset =3D fdt_offset_next;
-> >>      } while (fdt_depth !=3D 0);
-> >=20
->=20
+5. [main thread] clean up the monitors in monitor_cleanup(), when
+   trying to flush pending responses, it sees nothing.  SHUTDOWN is
+   lost forever
 
+Note that before the monitor iothread was introduced, step [4]/[5]
+could never happen since the main loop was the only place to detect
+the EOF event of stdin and run the CLOSED event hooks.  Now things can
+happen in parallel in the iothread.
 
+I can add these into commit message.
 
+> 
+> > In practise, I encountered a very strange SHUTDOWN event missing when
+> 
+> practice
+> 
+> May I suggest use of a spell checker?  ;)
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Sorry for that.  TODO added: "Find a spell checker for Emacs".
 
---9zecZT88ylESpiZX
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> > running test with iotest 087.  Without this patch, iotest 078 will have
+> 
+> 087 or 078?
 
------BEGIN PGP SIGNATURE-----
+087.  Err.  Even a spell checker won't help me here!
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsaBLIACgkQbDjKyiDZ
-s5JjuQ/8CNrKeHZ8Sv9Awc9wH+Aal1eHLQal2u47RDAYc2RemIFZTEB6EDEbzwiN
-RMkXZkicgzjrhM184LGUUIBeEQXZ/RZmHKsyxWv+VqiLWt4T6iFp5BlfNKGbtA4O
-QFJxo6GM53gsutxW2IMhjj7eEMZg5OmCV74zgBK+qvoHsicKbUn0p0x3EAPfDoP3
-KzEoPGKbL9/POWf1Uq6bIHx3KHYlsZsIokG3quL+H1ZWxMFy/9T2scqqEp59xqUs
-y7fEdzdJn6Xw8atmcfINomePDl4FeXK+aUgftg7Hz8VRILq7R34rrQeHQQB7RgwI
-WR8c9TzF/mFr+NBPZzvZF7Oj+LRZAjxH0IJHJQcuQFHnHqUtrVH9QdHNglWAhqrS
-1h7JD9KjqF4i1S1UsF7ctISdio7Oldct0msQQOHK7S//rMpBwIAmlOFboKhI0jXd
-cR0XVMwxV0yPR3ln2IWGRnPRvZ7/UD443Shh73zHCNs3rqrMHETV5BNB7L2xLREh
-YyJ4jkgmaqMgVIAAAjMfGlyQIPRTlZKrzzJJhNdjlsjOVVoQjT1f0loZlmkL/A93
-kpxpmtnLhmyWLqnfjmCxf3WOIHCtsX27V4ovM3w2OLQ0EPsVpl0i/25iVfFFK3At
-0SDhEq3RL57T0s8k8K2OkX4+OIuEGHNtkBhWc0yQuA5/Nsg7Igs=
-=6Jn/
------END PGP SIGNATURE-----
+> 
+> > ~10% chance to miss the SHUTDOWN event and fail when with Out-Of-Band
+> > enabled:
+> >
+> > 087 8s ... - output mismatch (see 087.out.bad)
 
---9zecZT88ylESpiZX--
+I'll take all the rest comments.  Thanks for reviewing.
+
+-- 
+Peter Xu
