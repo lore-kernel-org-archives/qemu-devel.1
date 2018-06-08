@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fRN9w-0007aW-I3
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:34:54 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fRNBF-0000Az-0O
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:36:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fRN9s-0002mM-IA
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:34:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53206 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fRN9s-0002lK-Bt
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:34:48 -0400
-Date: Fri, 8 Jun 2018 22:34:47 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180608223441-mutt-send-email-mst@kernel.org>
-References: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
-	<20180607223111.27792-5-ross.zwisler@linux.intel.com>
+	(envelope-from <Babu.Moger@amd.com>) id 1fRNBB-0003Oq-0c
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:36:13 -0400
+Received: from mail-co1nam05on0616.outbound.protection.outlook.com
+	([2a01:111:f400:fe50::616]:23325
+	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fRNBA-0003Oc-J2
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:36:08 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Fri, 8 Jun 2018 19:36:05 +0000
+Message-ID: <DM5PR12MB2471636A157F2530E972AFB6957B0@DM5PR12MB2471.namprd12.prod.outlook.com>
+References: <1528295806-90593-1-git-send-email-babu.moger@amd.com>
+	<1528295806-90593-4-git-send-email-babu.moger@amd.com>
+	<20180606223956.GD7451@localhost.localdomain>
+	<DM5PR12MB24717A9DD61F79F58D3E70F7957B0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180608192300.GN7451@localhost.localdomain>
+In-Reply-To: <20180608192300.GN7451@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180607223111.27792-5-ross.zwisler@linux.intel.com>
-Subject: Re: [Qemu-devel] [qemu PATCH 5/5] nvdimm: make persistence option
- symbolic
+Subject: Re: [Qemu-devel] [PATCH v12 3/4] i386: Enable TOPOEXT feature on
+ AMD EPYC CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,192 +34,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Zwisler <ross.zwisler@linux.intel.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Juan Quintela <quintela@redhat.com>, "xiaoguangrong@tencent.com" <xiaoguangrong@tencent.com>
 
-On Thu, Jun 07, 2018 at 04:31:11PM -0600, Ross Zwisler wrote:
-> Replace the "nvdimm-cap" option which took numeric arguments such as "2"
-> with a more user friendly "nvdimm-persistence" option which takes symbolic
-> arguments "cpu" or "mem-ctrl".
-> 
-> Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
-> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> Suggested-by: Dan Williams <dan.j.williams@intel.com>
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> -----Original Message-----
+> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> Sent: Friday, June 8, 2018 2:23 PM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
+> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Juan
+> Quintela <quintela@redhat.com>; xiaoguangrong@tencent.com
+> Subject: Re: [PATCH v12 3/4] i386: Enable TOPOEXT feature on AMD EPYC
+> CPU
+>=20
+> On Fri, Jun 08, 2018 at 06:40:16PM +0000, Moger, Babu wrote:
+> > Hi Eduardo,
+> > Sorry for the late response. Got pulled into something else.
+> >
+> > > -----Original Message-----
+> > > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> > > Sent: Wednesday, June 6, 2018 5:40 PM
+> > > To: Moger, Babu <Babu.Moger@amd.com>
+> > > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com;
+> pbonzini@redhat.com;
+> > > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> > > kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com
+> > > Subject: Re: [PATCH v12 3/4] i386: Enable TOPOEXT feature on AMD EPYC
+> > > CPU
+> > >
+> > > On Wed, Jun 06, 2018 at 10:36:45AM -0400, Babu Moger wrote:
+> > > > Enable TOPOEXT feature on EPYC CPU. This is required to support
+> > > > hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
+> > > >
+> > > > Disable TOPOEXT feature for legacy machines.
+> > > >
+> > > > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > >
+> > > Now, I just noticed we have a problem here:
+> > >
+> > > "-machine pc -cpu EPYC -smp 64" works today
+> > >
+> > > This patch makes it stop working, but it shouldn't.
+> >
+> > No. It works fine. I have tested it.
+>=20
+> This doesn't sound right.  The code in this series will error out
+> of TOPOEXT is enabled and you have more than 64 VCPUs.
+>=20
+> But I just noticed we have a bug introduced by:
 
-> ---
->  docs/nvdimm.txt          | 31 ++++++++++++-------------------
->  hw/acpi/nvdimm.c         |  4 ++--
->  hw/i386/pc.c             | 35 +++++++++++++++++------------------
->  include/hw/i386/pc.h     |  2 +-
->  include/hw/mem/nvdimm.h  |  3 ++-
->  tests/bios-tables-test.c |  2 +-
->  6 files changed, 35 insertions(+), 42 deletions(-)
-> 
-> diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-> index 8b48fb4633..24b443b655 100644
-> --- a/docs/nvdimm.txt
-> +++ b/docs/nvdimm.txt
-> @@ -154,29 +154,22 @@ guest software that this vNVDIMM device contains a region that cannot
->  accept persistent writes. In result, for example, the guest Linux
->  NVDIMM driver, marks such vNVDIMM device as read-only.
->  
-> -Platform Capabilities
-> ----------------------
-> +NVDIMM Persistence
-> +------------------
->  
->  ACPI 6.2 Errata A added support for a new Platform Capabilities Structure
->  which allows the platform to communicate what features it supports related to
-> -NVDIMM data durability.  Users can provide a capabilities value to a guest via
-> -the optional "nvdimm-cap" machine command line option:
-> +NVDIMM data persistence.  Users can provide a persistence value to a guest via
-> +the optional "nvdimm-persistence" machine command line option:
->  
-> -    -machine pc,accel=kvm,nvdimm,nvdimm-cap=2
-> +    -machine pc,accel=kvm,nvdimm,nvdimm-persistence=cpu
->  
-> -This "nvdimm-cap" field is an integer, and is the combined value of the
-> -various capability bits defined in table 5-137 of the ACPI 6.2 Errata A spec.
-> +There are currently two valid values for this option:
->  
-> -Here is a quick summary of the three bits that are defined as of that spec:
-> +"mem-ctrl" - The platform supports flushing dirty data from the memory
-> +             controller to the NVDIMMs in the event of power loss.
->  
-> -Bit[0] - CPU Cache Flush to NVDIMM Durability on Power Loss Capable.
-> -Bit[1] - Memory Controller Flush to NVDIMM Durability on Power Loss Capable.
-> -         Note: If bit 0 is set to 1 then this bit shall be set to 1 as well.
-> -Bit[2] - Byte Addressable Persistent Memory Hardware Mirroring Capable.
-> -
-> -So, a "nvdimm-cap" value of 2 would mean that the platform supports Memory
-> -Controller Flush on Power Loss, a value of 3 would mean that the platform
-> -supports CPU Cache Flush and Memory Controller Flush on Power Loss, etc.
-> -
-> -For a complete list of the flags available and for more detailed descriptions,
-> -please consult the ACPI spec.
-> +"cpu"      - The platform supports flushing dirty data from the CPU cache to
-> +             the NVDIMMs in the event of power loss.  This implies that the
-> +             platform also supports flushing dirty data through the memory
-> +             controller on power loss.
-> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> index 87e4280c71..27eeb6609f 100644
-> --- a/hw/acpi/nvdimm.c
-> +++ b/hw/acpi/nvdimm.c
-> @@ -404,8 +404,8 @@ static GArray *nvdimm_build_device_structure(AcpiNVDIMMState *state)
->      }
->      g_slist_free(device_list);
->  
-> -    if (state->capabilities) {
-> -        nvdimm_build_structure_caps(structures, state->capabilities);
-> +    if (state->persistence) {
-> +        nvdimm_build_structure_caps(structures, state->persistence);
->      }
->  
->      return structures;
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index f3befe6721..5bba9dcf5a 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -2181,31 +2181,30 @@ static void pc_machine_set_nvdimm(Object *obj, bool value, Error **errp)
->      pcms->acpi_nvdimm_state.is_enabled = value;
+Oh.. Ok..  Let me retry again with the new patch.
+
+>=20
+> commit f548222c24342ca74689de7794f9006b43f86a54
+> Author: Xiao Guangrong <xiaoguangrong@tencent.com>
+> Date:   Thu May 3 16:06:11 2018 +0800
+>=20
+>     migration: introduce decompress-error-check
+>=20
+>     QEMU 3.0 enables strict check for compression & decompression to
+>     make the migration more robust, that depends on the source to fix
+>     the internal design which triggers the unexpected error conditions
+>=20
+>     To make it work for migrating old version QEMU to 2.13 QEMU, we
+>     introduce this parameter to disable the error check on the
+>     destination which is the default behavior of the machine type
+>     which is older than 2.13, alternately, the strict check can be
+>     enabled explicitly as followings:
+>           -M pc-q35-2.11 -global migration.decompress-error-check=3Dtrue
+>=20
+>     Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+>     Reviewed-by: Juan Quintela <quintela@redhat.com>
+>     Signed-off-by: Juan Quintela <quintela@redhat.com>
+>=20
+> This commits added PC_COMPAT_2_12 to the 3.0 machine-types.
+> Because of this bug, TOPOEXT is being unconditionally disabled on
+> all machine-types, unless I apply the fix below:
+>=20
+>=20
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 3d81136065..b4c5b03274 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -430,7 +430,6 @@ static void
+> pc_i440fx_3_0_machine_options(MachineClass *m)
+>      pc_i440fx_machine_options(m);
+>      m->alias =3D "pc";
+>      m->is_default =3D 1;
+> -    SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
 >  }
->  
-> -static void pc_machine_get_nvdimm_capabilities(Object *obj, Visitor *v,
-> -                                               const char *name, void *opaque,
-> -                                               Error **errp)
-> +static char *pc_machine_get_nvdimm_persistence(Object *obj, Error **errp)
+>=20
+>  DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index b60cbb9266..83d6d75efa 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -312,7 +312,6 @@ static void
+> pc_q35_3_0_machine_options(MachineClass *m)
 >  {
->      PCMachineState *pcms = PC_MACHINE(obj);
-> -    uint32_t value = pcms->acpi_nvdimm_state.capabilities;
->  
-> -    visit_type_uint32(v, name, &value, errp);
-> +    return g_strdup(pcms->acpi_nvdimm_state.persistence_string);
+>      pc_q35_machine_options(m);
+>      m->alias =3D "q35";
+> -    SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
 >  }
->  
-> -static void pc_machine_set_nvdimm_capabilities(Object *obj, Visitor *v,
-> -                                               const char *name, void *opaque,
-> +static void pc_machine_set_nvdimm_persistence(Object *obj, const char *value,
->                                                 Error **errp)
->  {
->      PCMachineState *pcms = PC_MACHINE(obj);
-> -    Error *error = NULL;
-> -    uint32_t value;
-> -
-> -    visit_type_uint32(v, name, &value, &error);
-> -    if (error) {
-> -        error_propagate(errp, error);
-> -        return;
-> +    AcpiNVDIMMState *nvdimm_state = &pcms->acpi_nvdimm_state;
-> +
-> +    if (strcmp(value, "cpu") == 0)
-> +        nvdimm_state->persistence = 3;
-> +    else if (strcmp(value, "mem-ctrl") == 0)
-> +        nvdimm_state->persistence = 2;
-> +    else {
-> +        error_report("-machine nvdimm-persistence=%s: unsupported option", value);
-> +        exit(EXIT_FAILURE);
->      }
->  
-> -    pcms->acpi_nvdimm_state.capabilities = value;
-> +    g_free(nvdimm_state->persistence_string);
-> +    nvdimm_state->persistence_string = g_strdup(value);
->  }
->  
->  static bool pc_machine_get_smbus(Object *obj, Error **errp)
-> @@ -2421,9 +2420,9 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
->      object_class_property_add_bool(oc, PC_MACHINE_NVDIMM,
->          pc_machine_get_nvdimm, pc_machine_set_nvdimm, &error_abort);
->  
-> -    object_class_property_add(oc, PC_MACHINE_NVDIMM_CAP, "uint32",
-> -        pc_machine_get_nvdimm_capabilities,
-> -        pc_machine_set_nvdimm_capabilities, NULL, NULL, &error_abort);
-> +    object_class_property_add_str(oc, PC_MACHINE_NVDIMM_PERSIST,
-> +        pc_machine_get_nvdimm_persistence,
-> +        pc_machine_set_nvdimm_persistence, &error_abort);
->  
->      object_class_property_add_bool(oc, PC_MACHINE_SMBUS,
->          pc_machine_get_smbus, pc_machine_set_smbus, &error_abort);
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 04d1f8c6c3..fc8dedca12 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -76,7 +76,7 @@ struct PCMachineState {
->  #define PC_MACHINE_VMPORT           "vmport"
->  #define PC_MACHINE_SMM              "smm"
->  #define PC_MACHINE_NVDIMM           "nvdimm"
-> -#define PC_MACHINE_NVDIMM_CAP       "nvdimm-cap"
-> +#define PC_MACHINE_NVDIMM_PERSIST   "nvdimm-persistence"
->  #define PC_MACHINE_SMBUS            "smbus"
->  #define PC_MACHINE_SATA             "sata"
->  #define PC_MACHINE_PIT              "pit"
-> diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-> index 3c82751bab..9340631cfc 100644
-> --- a/include/hw/mem/nvdimm.h
-> +++ b/include/hw/mem/nvdimm.h
-> @@ -138,7 +138,8 @@ struct AcpiNVDIMMState {
->      /*
->       * Platform capabilities, section 5.2.25.9 of ACPI 6.2 Errata A
->       */
-> -    int32_t capabilities;
-> +    int32_t persistence;
-> +    char    *persistence_string;
->  };
->  typedef struct AcpiNVDIMMState AcpiNVDIMMState;
->  
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index 9b5db1ee8f..b95d56aa4e 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -831,7 +831,7 @@ static void test_acpi_tcg_dimm_pxm(const char *machine)
->      memset(&data, 0, sizeof(data));
->      data.machine = machine;
->      data.variant = ".dimmpxm";
-> -    test_acpi_one(" -machine nvdimm=on,nvdimm-cap=3"
-> +    test_acpi_one(" -machine nvdimm=on,nvdimm-persistence=cpu"
->                    " -smp 4,sockets=4"
->                    " -m 128M,slots=3,maxmem=1G"
->                    " -numa node,mem=32M,nodeid=0"
-> -- 
-> 2.14.4
+>=20
+>  DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
+>=20
+> >
+> > >
+> > > On the other hand, I believe you expect:
+> > > * "-machine pc -cpu EPYC -smp 8" to automatically enable topoext.
+> > Yes. Only on new machines-types
+> > > * "-machine pc -cpu Opteron_G1 -smp 8" to not enable topoext.
+> > Yes.
+> > > * What about "-machine -cpu Opteron_G1 -smp 8,threads=3D2"?
+> > No. This should not enable topoext.  Topoext is not supported by
+> Opteron_G1.
+> > This should warn about hyperthreading and continue.
+>=20
+> OK, makes sense to me.
+>=20
+> > >
+> > >
+> > > We also have other requirements, I will try to enumerate all of
+> > > them below:
+> > >
+> > > 0) "-topoext" explicitly configured (any machine-type):
+> > > * Must never enable topoext.
+> > Yes.
+> > >
+> > > 1) "+topoext" explicitly configured (any machine-type):
+> > > * Must validate topology and refuse to start if unsupported.
+> >
+> > Yes.
+> >
+> > >
+> > > 2) Older machine-types:
+> > > * Must never enable topoext automatically, even if using "EPYC"
+> > >   or "threads=3D2"
+> > >
+> > Yes.
+> >
+> > > 3) "EPYC" CPU model (on new machine-types):
+> > > * Should enable topoext automatically, but only if topology is
+> > >   supported.
+> > > * Must not error out if topology is not supported.
+> > In new machine types we will enable topoext for "EPYC" CPU model.
+> > Right now(old machine type) we can disable for all the CPU models.
+> > So, we don't need two bits(topoext and auto-topoext)
+>=20
+> Right, so you agree that in this case we must _not_ error out if
+> topology is unsupported, correct?  Otherwise we will break this
+> existing use case:
+>   "-machine pc -cpu EPYC -smp 64".
+
+Ok. I will test this with new fix patch. =20
+>=20
+> >
+> > I thought we should error out if topology cannot be supported. But we c=
+an
+> warn(disable topoext) and continue that is another option.
+> >
+> > > * Should this enable topoext automatically even if threads=3D1?
+> >
+> > Yes. We should enable even with threads=3D1.
+> >
+> > >
+> > > 4) Other AMD CPU models with "threads=3D2" (on new machine-types):
+> > > * We might want to make this enable topoext automatically, too.
+> > >   What do you think?
+> >
+> >   No. We should not enable topoext here. We should depend on CPU
+> model table here.
+> >
+> > >
+> > > Is the above description accurate?  Do you agree with these
+> > > requirements?
+> >
+> > With these requirements in mind, I will send that patches. We can start=
+ our
+> discussion.
+> > We don't need one more bits. That is my opinion.
+>=20
+> Thanks for confirming the requirements above.
+>=20
+> But it doesn't seem to be possible represent these requirements
+> with just one bit.  Otherwise you can't differentiate explicit
+> "+topoext" (1 above) from topoext being implicitly enabled by
+> "-cpu EPYC" (3 above).
+>=20
+> Another problem is query-cpu-model-expansion QMP command: this
+> patch makes "topoext" appear on the output of
+> "query-cpu-model-expansion model=3DEPYC", meaning that management
+> software will assume everybody using the "EPYC" CPU model will
+> require +topoext.  A separate "auto-topoext" property would avoid
+> this issue.
+
+Sure.  Will work on it.  Yes, I know all these combinations make it very tr=
+icky.=20
+>=20
+> (Yeah, this is tricky.  I want to eventually encode these subtle
+> rules in automated test cases, so these issues could be detected
+> by software instead of code inspection.)
+>=20
+> --
+> Eduardo
