@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fRCvb-0008JB-FP
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:39:24 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fRCw9-0000Rh-3S
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:39:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fRCvY-0001fO-A8
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:39:23 -0400
-Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:51830)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fRCvY-0001ev-2n
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:39:20 -0400
-Received: from player799.ha.ovh.net (unknown [10.109.122.15])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 41886CF2C5
-	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 10:39:18 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 08 Jun 2018 10:39:09 +0200
-Message-ID: <152844714981.11789.3657734445739553287.stgit@bahia.lan>
+	(envelope-from <imammedo@redhat.com>) id 1fRCw5-0001vM-Ui
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:39:57 -0400
+Date: Fri, 8 Jun 2018 10:39:43 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180608103943.1d7e72ee@redhat.com>
+In-Reply-To: <2b431d32-9172-0517-4717-7ce50355b8db@redhat.com>
+References: <20180607165218.9558-1-david@redhat.com>
+	<20180607165218.9558-3-david@redhat.com>
+	<20180608093406.30c878ec@bahia.lan>
+	<4f518685-fcdb-7c3a-35d3-5a26374e0604@redhat.com>
+	<20180608094657.4043502f@bahia.lan>
+	<431d4fe5-5bfe-1ab3-00b5-610038a7a9ea@redhat.com>
+	<2b431d32-9172-0517-4717-7ce50355b8db@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] typedefs: add QJSON
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 2/8] spapr: no need to
+ verify the node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, Greg Kurz <groug@kaod.org>, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-Since commit 83ee768d6247b, we now have two places that define the
-QJSON type:
+On Fri, 8 Jun 2018 10:07:31 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-$ git grep 'typedef struct QJSON QJSON'
-include/migration/vmstate.h:typedef struct QJSON QJSON;
-migration/qjson.h:typedef struct QJSON QJSON;
+> On 08.06.2018 09:48, David Hildenbrand wrote:
+> > On 08.06.2018 09:46, Greg Kurz wrote:  
+> >> On Fri, 8 Jun 2018 09:42:48 +0200
+> >> David Hildenbrand <david@redhat.com> wrote:
+> >>  
+> >>> On 08.06.2018 09:34, Greg Kurz wrote:  
+> >>>> On Thu,  7 Jun 2018 18:52:12 +0200
+> >>>> David Hildenbrand <david@redhat.com> wrote:
+> >>>>     
+> >>>>> The node property can always be queried and the value has already been
+> >>>>> verified in pc_dimm_realize().
+> >>>>>
+> >>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >>>>> ---
+> >>>>>  hw/ppc/spapr.c | 9 +--------
+> >>>>>  1 file changed, 1 insertion(+), 8 deletions(-)
+> >>>>>
+> >>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> >>>>> index 2375cbee12..d038f3243e 100644
+> >>>>> --- a/hw/ppc/spapr.c
+> >>>>> +++ b/hw/ppc/spapr.c
+> >>>>> @@ -3578,14 +3578,7 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+> >>>>>              error_setg(errp, "Memory hotplug not supported for this machine");
+> >>>>>              return;
+> >>>>>          }
+> >>>>> -        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP, errp);
+> >>>>> -        if (*errp) {    
+> >>>>
+> >>>> Good riddance :)
+> >>>>     
+> >>>>> -            return;
+> >>>>> -        }
+> >>>>> -        if (node < 0 || node >= MAX_NODES) {
+> >>>>> -            error_setg(errp, "Invaild node %d", node);
+> >>>>> -            return;
+> >>>>> -        }  
+> 
+> Maybe turn that into an assert() instead? ... just for the paranoids ;-)
+> 
+> >>>>> +        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP, NULL);    
+> >>>>
+> >>>> Maybe pass &error_abort ?    
+> >>>
+> >>> I'm using the same access scheme as in hw/acpi/memory_hotplug.c
+> >>>
+> >>> ("error ignored" vs. "error leads to an abort") - but this will actually
+> >>> never fail. But I can use error_abort here, does not matter.
+> >>>  
+> >>
+> >> Heh, /me paranoid but this is David's call and he acked that already
+> >> so I guess it's okay.  
+> > 
+> > NULL makes it fit into a single line :)  
+> 
+> +1 for error_abort, even if it takes another line.
++1 for error_abort
+call shouldn't fail, but if does it won't be silently ignored
+and introduce undefined behavior.
 
-This breaks docker-test-build@centos6:
-
-In file included from /tmp/qemu-test/src/migration/savevm.c:59:
-/tmp/qemu-test/src/migration/qjson.h:16: error: redefinition of typedef
- 'QJSON'
-/tmp/qemu-test/src/include/migration/vmstate.h:30: note: previous
- declaration of 'QJSON' was here
-make: *** [migration/savevm.o] Error 1
-
-This happens because CentOS 6 has an old GCC 4.4.7. Even if redefining
-a typedef with the same type is permitted since GCC 4.6, unless -pedantic
-is passed, we don't really need to do that on purpose. Let's have a
-single definition in <qemu/typedefs.h> instead.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- include/migration/vmstate.h |    2 --
- include/qemu/typedefs.h     |    1 +
- migration/qjson.h           |    2 --
- 3 files changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index 3747110f951a..42b946ce902c 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -27,8 +27,6 @@
- #ifndef QEMU_VMSTATE_H
- #define QEMU_VMSTATE_H
- 
--typedef struct QJSON QJSON;
--
- typedef struct VMStateInfo VMStateInfo;
- typedef struct VMStateDescription VMStateDescription;
- typedef struct VMStateField VMStateField;
-diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-index 325c72de3313..3ec0e13a967f 100644
---- a/include/qemu/typedefs.h
-+++ b/include/qemu/typedefs.h
-@@ -97,6 +97,7 @@ typedef struct QEMUTimer QEMUTimer;
- typedef struct QEMUTimerListGroup QEMUTimerListGroup;
- typedef struct QBool QBool;
- typedef struct QDict QDict;
-+typedef struct QJSON QJSON;
- typedef struct QList QList;
- typedef struct QNull QNull;
- typedef struct QNum QNum;
-diff --git a/migration/qjson.h b/migration/qjson.h
-index 2978b5f37121..41664f2d71b5 100644
---- a/migration/qjson.h
-+++ b/migration/qjson.h
-@@ -13,8 +13,6 @@
- #ifndef QEMU_QJSON_H
- #define QEMU_QJSON_H
- 
--typedef struct QJSON QJSON;
--
- QJSON *qjson_new(void);
- void qjson_destroy(QJSON *json);
- void json_prop_str(QJSON *json, const char *name, const char *str);
+> 
+>  Thomas
