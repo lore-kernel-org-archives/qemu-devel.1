@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fRIK1-0002bf-6r
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:24:58 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fRIPV-0007gs-6i
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:30:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fRIJx-0008Cp-2r
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:24:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41054 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fRIPQ-0004W5-Na
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:30:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:6559)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fRIJw-0008C5-UO
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:24:53 -0400
-References: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
-	<20180607223111.27792-3-ross.zwisler@linux.intel.com>
-	<20180608021134-mutt-send-email-mst@kernel.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5b2dafa6-1206-bef3-10d7-eac9910baa85@redhat.com>
-Date: Fri, 8 Jun 2018 09:24:49 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180608021134-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu PATCH 3/5] hw/i386: Update SSDT table used
- by "make check"
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fRIPQ-0004VE-DX
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:30:32 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri,  8 Jun 2018 11:30:26 -0300
+Message-Id: <20180608143026.20167-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH] configure: Require Python 2.7 or newer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +21,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Ross Zwisler <ross.zwisler@linux.intel.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Cornelia Huck <cohuck@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On 06/07/2018 06:14 PM, Michael S. Tsirkin wrote:
-> On Thu, Jun 07, 2018 at 04:31:09PM -0600, Ross Zwisler wrote:
->> This commit:
->>
->> commit aa78a16d8645 ("hw/i386: Rename 2.13 machine types to 3.0")
->>
->> updated the name used to create the q35 machine, which in turn changed the
->> SSDT table which is generated when we run "make check":
->>
->>    acpi-test: Warning! SSDT mismatch. Actual [asl:/tmp/asl-QZDWJZ.dsl,
->>    aml:/tmp/aml-T8JYJZ], Expected [asl:/tmp/asl-DTWVJZ.dsl,
->>    aml:tests/acpi-test-data/q35/SSDT.dimmpxm].
->>
->> Here's the only difference, aside from the checksum:
->>
->>    <     Name (MEMA, 0x07FFF000)
->>    ---
->>    >     Name (MEMA, 0x07FFE000)
-> 
-> Weird. How come the phys address changes just because of machine name?
+All of the supported build platforms documented in qemu-doc.texi
+should already support Python 2.7.
 
-"2.13" is a different length than "3.0"; depending on whatever other 
-alignment coincidences or sharing of similar substrings are in place, 
-this obviously shuffled enough data that the one byte change then 
-reflects into an entire page boundary difference.
+Removing support for Python 2.6 will allow us to remove some
+compatibility modules we carry in the QEMU tree:
 
+* scripts/argparse.py
+* scripts/ordereddict.py
+
+Python 2.6 is also not receiving bug fixes upstream and is not
+supported by pylint, which makes it harder to keep the code
+compatible with both Python 2 and Python 3.
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ configure | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index 14b11130a7..a8c4094c87 100755
+--- a/configure
++++ b/configure
+@@ -1651,8 +1651,8 @@ fi
+ 
+ # Note that if the Python conditional here evaluates True we will exit
+ # with status 1 which is a shell 'false' value.
+-if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6))'; then
+-  error_exit "Cannot use '$python', Python 2 >= 2.6 or Python 3 is required." \
++if ! $python -c 'import sys; sys.exit(sys.version_info < (2,7))'; then
++  error_exit "Cannot use '$python', Python 2 >= 2.7 or Python 3 is required." \
+       "Use --python=/path/to/python to specify a supported Python."
+ fi
+ 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.18.0.rc1.1.g3f1ff2140
