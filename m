@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fRCsX-00063O-My
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:36:14 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fRCsW-0000PR-Tf
+	(envelope-from <wei.w.wang@intel.com>) id 1fRCsW-00062B-07
 	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:36:13 -0400
-Received: from mga09.intel.com ([134.134.136.24]:58067)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <wei.w.wang@intel.com>) id 1fRCsT-0000Nc-Ca
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:36:12 -0400
+Received: from mga09.intel.com ([134.134.136.24]:58061)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1fRCsW-0000OZ-Kj
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:36:12 -0400
+	id 1fRCsT-0000MG-13
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 04:36:09 -0400
 From: Wei Wang <wei.w.wang@intel.com>
-Date: Fri,  8 Jun 2018 16:10:39 +0800
-Message-Id: <1528445443-43406-3-git-send-email-wei.w.wang@intel.com>
+Date: Fri,  8 Jun 2018 16:10:38 +0800
+Message-Id: <1528445443-43406-2-git-send-email-wei.w.wang@intel.com>
 In-Reply-To: <1528445443-43406-1-git-send-email-wei.w.wang@intel.com>
 References: <1528445443-43406-1-git-send-email-wei.w.wang@intel.com>
-Subject: [Qemu-devel] [PATCH v8 2/6] migration: use bitmap_mutex in
- migration_bitmap_clear_dirty
+Subject: [Qemu-devel] [PATCH v8 1/6] bitmap: bitmap_count_one_with_offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +27,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com
 Cc: peterx@redhat.com, pbonzini@redhat.com, wei.w.wang@intel.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-The bitmap mutex is used to synchronize threads to update the dirty
-bitmap and the migration_dirty_pages counter. For example, the free
-page optimization clears bits of free pages from the bitmap in an
-iothread context. This patch makes migration_bitmap_clear_dirty update
-the bitmap and counter under the mutex.
+Count the number of 1s in a bitmap starting from an offset.
 
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
 CC: Juan Quintela <quintela@redhat.com>
 CC: Michael S. Tsirkin <mst@redhat.com>
-CC: Peter Xu <peterx@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/ram.c | 3 +++
- 1 file changed, 3 insertions(+)
+ include/qemu/bitmap.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index c53e836..2eabbe9 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1093,11 +1093,14 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
- {
-     bool ret;
- 
-+    qemu_mutex_lock(&rs->bitmap_mutex);
-     ret = test_and_clear_bit(page, rb->bmap);
- 
-     if (ret) {
-         rs->migration_dirty_pages--;
+diff --git a/include/qemu/bitmap.h b/include/qemu/bitmap.h
+index 509eedd..e3f31f1 100644
+--- a/include/qemu/bitmap.h
++++ b/include/qemu/bitmap.h
+@@ -228,6 +228,19 @@ static inline long bitmap_count_one(const unsigned long *bitmap, long nbits)
      }
-+    qemu_mutex_unlock(&rs->bitmap_mutex);
-+
-     return ret;
  }
  
++static inline long bitmap_count_one_with_offset(const unsigned long *bitmap,
++                                                long offset, long nbits)
++{
++    long aligned_offset = QEMU_ALIGN_DOWN(offset, BITS_PER_LONG);
++    long redundant_bits = offset - aligned_offset;
++    long bits_to_count = nbits + redundant_bits;
++    const unsigned long *bitmap_start = bitmap +
++                                        aligned_offset / BITS_PER_LONG;
++
++    return bitmap_count_one(bitmap_start, bits_to_count) -
++           bitmap_count_one(bitmap_start, redundant_bits);
++}
++
+ void bitmap_set(unsigned long *map, long i, long len);
+ void bitmap_set_atomic(unsigned long *map, long i, long len);
+ void bitmap_clear(unsigned long *map, long start, long nr);
 -- 
 1.8.3.1
