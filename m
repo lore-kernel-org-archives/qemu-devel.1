@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fRC7H-0004kQ-OA
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:47:24 -0400
+	(envelope-from <david@redhat.com>) id 1fRC8N-0005K5-7w
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:48:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fRC7E-0002nD-LO
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:47:23 -0400
-Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:45855)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fRC7E-0002mY-En
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:47:20 -0400
-Received: from player778.ha.ovh.net (unknown [10.109.105.15])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 079291717B
-	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 09:47:17 +0200 (CEST)
-Date: Fri, 8 Jun 2018 09:46:57 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180608094657.4043502f@bahia.lan>
-In-Reply-To: <4f518685-fcdb-7c3a-35d3-5a26374e0604@redhat.com>
+	(envelope-from <david@redhat.com>) id 1fRC8K-0003JC-4D
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 03:48:31 -0400
 References: <20180607165218.9558-1-david@redhat.com>
 	<20180607165218.9558-3-david@redhat.com>
 	<20180608093406.30c878ec@bahia.lan>
 	<4f518685-fcdb-7c3a-35d3-5a26374e0604@redhat.com>
+	<20180608094657.4043502f@bahia.lan>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <431d4fe5-5bfe-1ab3-00b5-610038a7a9ea@redhat.com>
+Date: Fri, 8 Jun 2018 09:48:24 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180608094657.4043502f@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Subject: Re: [Qemu-devel] [PATCH v1 2/8] spapr: no need to verify the node
 List-Id: <qemu-devel.nongnu.org>
@@ -32,64 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
+To: Greg Kurz <groug@kaod.org>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On Fri, 8 Jun 2018 09:42:48 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 08.06.2018 09:46, Greg Kurz wrote:
+> On Fri, 8 Jun 2018 09:42:48 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> On 08.06.2018 09:34, Greg Kurz wrote:
+>>> On Thu,  7 Jun 2018 18:52:12 +0200
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>   
+>>>> The node property can always be queried and the value has already been
+>>>> verified in pc_dimm_realize().
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>  hw/ppc/spapr.c | 9 +--------
+>>>>  1 file changed, 1 insertion(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>>> index 2375cbee12..d038f3243e 100644
+>>>> --- a/hw/ppc/spapr.c
+>>>> +++ b/hw/ppc/spapr.c
+>>>> @@ -3578,14 +3578,7 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+>>>>              error_setg(errp, "Memory hotplug not supported for this machine");
+>>>>              return;
+>>>>          }
+>>>> -        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP, errp);
+>>>> -        if (*errp) {  
+>>>
+>>> Good riddance :)
+>>>   
+>>>> -            return;
+>>>> -        }
+>>>> -        if (node < 0 || node >= MAX_NODES) {
+>>>> -            error_setg(errp, "Invaild node %d", node);
+>>>> -            return;
+>>>> -        }
+>>>> +        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP, NULL);  
+>>>
+>>> Maybe pass &error_abort ?  
+>>
+>> I'm using the same access scheme as in hw/acpi/memory_hotplug.c
+>>
+>> ("error ignored" vs. "error leads to an abort") - but this will actually
+>> never fail. But I can use error_abort here, does not matter.
+>>
+> 
+> Heh, /me paranoid but this is David's call and he acked that already
+> so I guess it's okay.
 
-> On 08.06.2018 09:34, Greg Kurz wrote:
-> > On Thu,  7 Jun 2018 18:52:12 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> The node property can always be queried and the value has already been
-> >> verified in pc_dimm_realize().
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  hw/ppc/spapr.c | 9 +--------
-> >>  1 file changed, 1 insertion(+), 8 deletions(-)
-> >>
-> >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >> index 2375cbee12..d038f3243e 100644
-> >> --- a/hw/ppc/spapr.c
-> >> +++ b/hw/ppc/spapr.c
-> >> @@ -3578,14 +3578,7 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
-> >>              error_setg(errp, "Memory hotplug not supported for this machine");
-> >>              return;
-> >>          }
-> >> -        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP, errp);
-> >> -        if (*errp) {  
-> > 
-> > Good riddance :)
-> >   
-> >> -            return;
-> >> -        }
-> >> -        if (node < 0 || node >= MAX_NODES) {
-> >> -            error_setg(errp, "Invaild node %d", node);
-> >> -            return;
-> >> -        }
-> >> +        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP, NULL);  
-> > 
-> > Maybe pass &error_abort ?  
+NULL makes it fit into a single line :)
+
+Thanks!
+
 > 
-> I'm using the same access scheme as in hw/acpi/memory_hotplug.c
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 > 
-> ("error ignored" vs. "error leads to an abort") - but this will actually
-> never fail. But I can use error_abort here, does not matter.
+>> Thanks!
+>>
+>>>   
+>>>>  
+>>>>          spapr_memory_plug(hotplug_dev, dev, node, errp);
+>>>>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {  
+>>>   
+>>
+>>
 > 
 
-Heh, /me paranoid but this is David's call and he acked that already
-so I guess it's okay.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+-- 
 
-> Thanks!
-> 
-> >   
-> >>  
-> >>          spapr_memory_plug(hotplug_dev, dev, node, errp);
-> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {  
-> >   
-> 
-> 
+Thanks,
+
+David / dhildenb
