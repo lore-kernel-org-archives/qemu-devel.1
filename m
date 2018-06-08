@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRL4m-0007E4-4R
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:21:25 -0400
+	(envelope-from <thuth@redhat.com>) id 1fRL6b-0008RX-Hy
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:23:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRL4j-0006Td-07
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:21:24 -0400
-References: <20180608152353.98712-1-vsementsov@virtuozzo.com>
-	<20180608152353.98712-3-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <020dcbab-d0fe-922f-0fd8-d242e8374377@virtuozzo.com>
-Date: Fri, 8 Jun 2018 20:21:12 +0300
+	(envelope-from <thuth@redhat.com>) id 1fRL6a-00077P-QI
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:23:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59536 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fRL6a-00076x-Kr
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 13:23:16 -0400
+References: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
+	<20180607223111.27792-2-ross.zwisler@linux.intel.com>
+	<20180608020724-mutt-send-email-mst@kernel.org>
+	<5352d2fb-9244-78b0-4f4b-2818359a4425@redhat.com>
+	<20180608190040-mutt-send-email-mst@kernel.org>
+	<CAFEAcA-h3xxeRFO32pnqrwR_wZ1=us-t0FunS2aJRpQV==3-GQ@mail.gmail.com>
+	<20180608192148-mutt-send-email-mst@kernel.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <74b8eaa6-841f-1e35-654f-ba0243970958@redhat.com>
+Date: Fri, 8 Jun 2018 19:23:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180608152353.98712-3-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180608192148-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v4 2/6] nbd/server: refactor
- NBDExportMetaContexts
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu PATCH 2/5] acpi: "make check" should fail on
+ asl mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,106 +34,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Ross Zwisler <ross.zwisler@linux.intel.com>, Dan Williams <dan.j.williams@intel.com>
 
-08.06.2018 18:23, Vladimir Sementsov-Ogievskiy wrote:
-> Use NBDExport pointer instead of just export name: there no needs to
-> store duplicated name in the struct, moreover, NBDExport will be used
-> further.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   nbd/server.c | 23 +++++++++++------------
->   1 file changed, 11 insertions(+), 12 deletions(-)
->
-> diff --git a/nbd/server.c b/nbd/server.c
-> index 8e02e077ec..8593a6874b 100644
-> --- a/nbd/server.c
-> +++ b/nbd/server.c
-> @@ -88,7 +88,7 @@ static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
->    * as selected by NBD_OPT_SET_META_CONTEXT. Also used for
->    * NBD_OPT_LIST_META_CONTEXT. */
->   typedef struct NBDExportMetaContexts {
-> -    char export_name[NBD_MAX_NAME_SIZE + 1];
-> +    NBDExport *exp;
->       bool valid; /* means that negotiation of the option finished without
->                      errors */
->       bool base_allocation; /* export base:allocation context (block status) */
-> @@ -399,10 +399,9 @@ static int nbd_negotiate_handle_list(NBDClient *client, Error **errp)
->       return nbd_negotiate_send_rep(client, NBD_REP_ACK, errp);
->   }
->   
-> -static void nbd_check_meta_export_name(NBDClient *client)
-> +static void nbd_check_meta_export(NBDClient *client)
->   {
-> -    client->export_meta.valid &= !strcmp(client->exp->name,
-> -                                         client->export_meta.export_name);
-> +    client->export_meta.valid &= client->exp == client->exp;
+On 08.06.2018 18:24, Michael S. Tsirkin wrote:
+> On Fri, Jun 08, 2018 at 05:16:30PM +0100, Peter Maydell wrote:
+>> On 8 June 2018 at 17:03, Michael S. Tsirkin <mst@redhat.com> wrote:
+>>> Pull requests are somewhat different, they are usually tested for lack
+>>> of warnings. This change didn't arrive as a result of a pull request
+>>> maybe that's why it slipped through the cracks. Peter?
+>>>
+>>> Maybe we need a "pedantic" flag to fail on any warnings, or just catch
+>>> output to stderr.
+>>
+>> If there's a situation that shouldn't exist in the tree (ie
+>> a bug), then make check should catch it, and result in a
+>> failure, not just printing random stuff to stderr. Otherwise
+>> I'm not going to notice it, whether I'm applying a pull request
+>> or an individual patch.
+>>
+>> thanks
+>> -- PMM
+> 
+> It's ok if it happens, but it just makes debugging and reviewing
+> ACPI patches a little bit harder until it's fixed.
 
-client->exp == meta->exp
+It's maybe ok for *you*, but this certainly confuses everybody else. If
+I want to check my patches and suddenly some strange warnings are
+popping up, I first assume that there is something wrong in my patches
+(since I assume that the git repository is clean by default). So I've
+got to waste my time debugging issues that are not my own. Thanks for
+that :-/
 
->   }
->   
->   /* Send a reply to NBD_OPT_EXPORT_NAME.
-> @@ -456,7 +455,7 @@ static int nbd_negotiate_handle_export_name(NBDClient *client,
->   
->       QTAILQ_INSERT_TAIL(&client->exp->clients, client, next);
->       nbd_export_get(client->exp);
-> -    nbd_check_meta_export_name(client);
-> +    nbd_check_meta_export(client);
->   
->       return 0;
->   }
-> @@ -650,7 +649,7 @@ static int nbd_negotiate_handle_info(NBDClient *client, uint16_t myflags,
->           client->exp = exp;
->           QTAILQ_INSERT_TAIL(&client->exp->clients, client, next);
->           nbd_export_get(client->exp);
-> -        nbd_check_meta_export_name(client);
-> +        nbd_check_meta_export(client);
->           rc = 1;
->       }
->       return rc;
-> @@ -834,7 +833,7 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
->                                         NBDExportMetaContexts *meta, Error **errp)
->   {
->       int ret;
-> -    NBDExport *exp;
-> +    char export_name[NBD_MAX_NAME_SIZE + 1];
->       NBDExportMetaContexts local_meta;
->       uint32_t nb_queries;
->       int i;
-> @@ -853,15 +852,15 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
->   
->       memset(meta, 0, sizeof(*meta));
->   
-> -    ret = nbd_opt_read_name(client, meta->export_name, NULL, errp);
-> +    ret = nbd_opt_read_name(client, export_name, NULL, errp);
->       if (ret <= 0) {
->           return ret;
->       }
->   
-> -    exp = nbd_export_find(meta->export_name);
-> -    if (exp == NULL) {
-> +    meta->exp = nbd_export_find(export_name);
-> +    if (meta->exp == NULL) {
->           return nbd_opt_drop(client, NBD_REP_ERR_UNKNOWN, errp,
-> -                            "export '%s' not present", meta->export_name);
-> +                            "export '%s' not present", export_name);
->       }
->   
->       ret = nbd_opt_read(client, &nb_queries, sizeof(nb_queries), errp);
-> @@ -870,7 +869,7 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
->       }
->       cpu_to_be32s(&nb_queries);
->       trace_nbd_negotiate_meta_context(nbd_opt_lookup(client->opt),
-> -                                     meta->export_name, nb_queries);
-> +                                     export_name, nb_queries);
->   
->       if (client->opt == NBD_OPT_LIST_META_CONTEXT && !nb_queries) {
->           /* enable all known contexts */
-
-
--- 
-Best regards,
-Vladimir
+ Thomas
