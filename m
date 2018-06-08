@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fRF31-0003yt-Co
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 06:55:12 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fRFRC-0007ws-EJ
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:20:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fRF30-0000Rn-Lk
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 06:55:11 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33326)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fRF30-0000QO-GM
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 06:55:10 -0400
-Received: by mail-oi0-x244.google.com with SMTP id c6-v6so10329194oiy.0
-	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 03:55:10 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <b4903491-f450-1a54-2a70-a084c30cd8c6@redhat.com>
-References: <20180606152128.449-1-f4bug@amsat.org>
-	<b4903491-f450-1a54-2a70-a084c30cd8c6@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Jun 2018 11:54:49 +0100
-Message-ID: <CAFEAcA_xP37u4KMdvPe8MyU3y_6re88pAx3KTLY_DOP0qWQzqA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 00/11] misc: Add trailing '\n' to
- qemu_log() calls
+	(envelope-from <kraxel@redhat.com>) id 1fRFRB-0001iB-JZ
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 07:20:10 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Fri,  8 Jun 2018 13:20:01 +0200
+Message-Id: <20180608112001.14729-7-kraxel@redhat.com>
+In-Reply-To: <20180608112001.14729-1-kraxel@redhat.com>
+References: <20180608112001.14729-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 6/6] bochs-display: enable vgabios
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +19,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Michael Walle <michael@walle.cc>, Max Filippov <jcmvbkbc@gmail.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Laurent Vivier <laurent@vivier.eu>, Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <paul.burton@mips.com>, Yongbok Kim <yongbok.kim@mips.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Antony Pavlov <antonynpavlov@gmail.com>, QEMU Trivial <qemu-trivial@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?L=C3=A1szl=C3=B3=20=C3=89rsek?= <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 6 June 2018 at 20:43, John Snow <jsnow@redhat.com> wrote:
-> so error_setg must be used WITHOUT \n and logging must happen with \n?
->
-> If we're sure that's the way we want to have things laid out, we really
-> ought to augment checkpatch to catch this -- because there's 0% chance
-> that we'll keep it straight on our own otherwise.
+---
+ hw/display/bochs-display.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-It's a historical side effect of them being basically separately
-designed APIs. error_setg() takes the "give it the entire error
-message" approach. logging is printf-style and gives the caller
-flexibility to compose more complicated lines of logging with
-multiple calls. Consistency between the two might be nice but
-there are an awful lot of qemu_log calls in the codebase to check
-and change to the other convention...
-
-thanks
--- PMM
+diff --git a/hw/display/bochs-display.c b/hw/display/bochs-display.c
+index 1187d77576..12d8a66c6c 100644
+--- a/hw/display/bochs-display.c
++++ b/hw/display/bochs-display.c
+@@ -337,6 +337,7 @@ static void bochs_display_class_init(ObjectClass *klass, void *data)
+     k->device_id = PCI_DEVICE_ID_QEMU_VGA;
+ 
+     k->realize   = bochs_display_realize;
++    k->romfile   = "vgabios-bochs-display.bin";
+     k->exit      = bochs_display_exit;
+     dc->vmsd     = &vmstate_bochs_display;
+     dc->props    = bochs_display_properties;
+-- 
+2.9.3
