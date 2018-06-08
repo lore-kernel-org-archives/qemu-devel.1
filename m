@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35331)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35846)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRMau-0000dp-Pi
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:58:42 -0400
+	id 1fRMe7-0001Yv-8d
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:02:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRMap-0005rS-U7
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 14:58:40 -0400
+	id 1fRMe2-0006tC-2R
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 15:01:59 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  8 Jun 2018 15:58:26 -0300
-Message-Id: <20180608185826.10708-1-f4bug@amsat.org>
+Date: Fri,  8 Jun 2018 16:01:45 -0300
+Message-Id: <20180608190145.10872-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] Makefile: Remove qemu-version.h and
+Subject: [Qemu-devel] [PATCH RESEND] Makefile: Remove qemu-version.h and
  qemu-options.def during 'make distclean'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,16 +25,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org
 
 qemu-version.h and qemu-options.def are generated files
 that should be deleted during 'make distclean'.
 
 This solves building issues with out-of-tree builds from
-a source tree that has been built in (see d1bd2423a90).
-
-This solves:
+a source tree that has been built in (see d1bd2423a90):
 
 - /qemu-version.h existing in source tree:
 
@@ -63,6 +61,8 @@ This solves:
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
+resend: Cc Peter, removed dup line in comment
+
  Makefile | 1 +
  1 file changed, 1 insertion(+)
 
