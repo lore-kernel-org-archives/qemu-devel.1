@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fRDJR-0006bV-6b
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:04:02 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fRDKB-0007J4-74
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:04:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fRDJQ-0006Fs-3A
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:04:01 -0400
-Date: Fri, 8 Jun 2018 11:03:50 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180608110350.13fbcd77@redhat.com>
-In-Reply-To: <e553a053-b1e1-997b-27de-33f4e1c959b3@redhat.com>
-References: <20180607165218.9558-1-david@redhat.com>
-	<20180607165218.9558-9-david@redhat.com>
-	<20180608092545.52133d91.cohuck@redhat.com>
-	<6a2bf8b2-5b15-d2ec-39e4-7afaf981fa3f@de.ibm.com>
-	<e553a053-b1e1-997b-27de-33f4e1c959b3@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1fRDK7-0006hO-5N
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:04:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49796 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fRDK6-0006hD-Vd
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 05:04:43 -0400
+Date: Fri, 8 Jun 2018 10:04:39 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180608090438.GE2671@work-vm>
+References: <152844714981.11789.3657734445739553287.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 8/8] s390x: local error handling in
- hotplug handler functions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <152844714981.11789.3657734445739553287.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] typedefs: add QJSON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,86 +26,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-On Fri, 8 Jun 2018 09:40:04 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> On 08.06.2018 09:27, Christian Borntraeger wrote:
-> > 
-> > 
-> > On 06/08/2018 09:25 AM, Cornelia Huck wrote:  
-> >> On Thu,  7 Jun 2018 18:52:18 +0200
-> >> David Hildenbrand <david@redhat.com> wrote:
-> >>  
-> >>> Let's introduce and use local error variables in the hotplug handler
-> >>> functions.
-> >>>
-> >>> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >>> ---
-> >>>  hw/s390x/s390-virtio-ccw.c | 11 ++++++++---
-> >>>  1 file changed, 8 insertions(+), 3 deletions(-)
-> >>>
-> >>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> >>> index 7ae5fb38dd..29ea50a177 100644
-> >>> --- a/hw/s390x/s390-virtio-ccw.c
-> >>> +++ b/hw/s390x/s390-virtio-ccw.c
-> >>> @@ -434,18 +434,23 @@ static void s390_machine_reset(void)
-> >>>  static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
-> >>>                                       DeviceState *dev, Error **errp)
-> >>>  {
-> >>> +    Error *local_err = NULL;
-> >>> +
-> >>>      if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-> >>> -        s390_cpu_plug(hotplug_dev, dev, errp);
-> >>> +        s390_cpu_plug(hotplug_dev, dev, &local_err);
-> >>>      }
-> >>> +    error_propagate(errp, local_err);
-> >>>  }
-> >>>  
-> >>>  static void s390_machine_device_unplug_request(HotplugHandler *hotplug_dev,
-> >>>                                                 DeviceState *dev, Error **errp)
-> >>>  {
-> >>> +    Error *local_err = NULL;
-> >>> +
-> >>>      if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-> >>> -        error_setg(errp, "CPU hot unplug not supported on this machine");
-> >>> -        return;
-> >>> +        error_setg(&local_err, "CPU hot unplug not supported on this machine");
-> >>>      }
-> >>> +    error_propagate(errp, local_err);
-> >>>  }
-> >>>  
-> >>>  static CpuInstanceProperties s390_cpu_index_to_props(MachineState *ms,  
-> >>
-> >> Just seeing this patch by itself, it does not really make much sense.
-> >> Even if this is a split out clean-up series, I'd prefer this to go
-> >> together with a patch that actually adds something more to the
-> >> plug/unplug functions.  
-> > 
-> > +1. It is hard to see the "why". Maybe a better patch description could help here?
-> >   
+* Greg Kurz (groug@kaod.org) wrote:
+> Since commit 83ee768d6247b, we now have two places that define the
+> QJSON type:
 > 
-> When checking for an error (*errp) we should make sure that we don't
-> dereference the NULL pointer. I will be doing that in the future (memory
-> devices), but as you both don't seem to like this patch, I'll drop it
-> for now.
-hotplug handlers aren't called with NULL errp, so it not really necessary.
-To be on the safe side we can ensure that errp is not NULL doing something
-like:
+> $ git grep 'typedef struct QJSON QJSON'
+> include/migration/vmstate.h:typedef struct QJSON QJSON;
+> migration/qjson.h:typedef struct QJSON QJSON;
+> 
+> This breaks docker-test-build@centos6:
+> 
+> In file included from /tmp/qemu-test/src/migration/savevm.c:59:
+> /tmp/qemu-test/src/migration/qjson.h:16: error: redefinition of typedef
+>  'QJSON'
+> /tmp/qemu-test/src/include/migration/vmstate.h:30: note: previous
+>  declaration of 'QJSON' was here
+> make: *** [migration/savevm.o] Error 1
+> 
+> This happens because CentOS 6 has an old GCC 4.4.7. Even if redefining
+> a typedef with the same type is permitted since GCC 4.6, unless -pedantic
+> is passed, we don't really need to do that on purpose. Let's have a
+> single definition in <qemu/typedefs.h> instead.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-diff --git a/hw/core/hotplug.c b/hw/core/hotplug.c
-index 17ac986..dc9e4bf 100644
---- a/hw/core/hotplug.c
-+++ b/hw/core/hotplug.c
-@@ -52,6 +52,7 @@ void hotplug_handler_unplug(HotplugHandler *plug_handler,
- {
-     HotplugHandlerClass *hdc = HOTPLUG_HANDLER_GET_CLASS(plug_handler);
- 
-+    g_assert(errp);
-     if (hdc->unplug) {
-         hdc->unplug(plug_handler, plugged_dev, errp);
-     }
+Yeh that looks right to me;
 
-and do it for all similar wrappers in this file
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> ---
+>  include/migration/vmstate.h |    2 --
+>  include/qemu/typedefs.h     |    1 +
+>  migration/qjson.h           |    2 --
+>  3 files changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 3747110f951a..42b946ce902c 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -27,8 +27,6 @@
+>  #ifndef QEMU_VMSTATE_H
+>  #define QEMU_VMSTATE_H
+>  
+> -typedef struct QJSON QJSON;
+> -
+>  typedef struct VMStateInfo VMStateInfo;
+>  typedef struct VMStateDescription VMStateDescription;
+>  typedef struct VMStateField VMStateField;
+> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> index 325c72de3313..3ec0e13a967f 100644
+> --- a/include/qemu/typedefs.h
+> +++ b/include/qemu/typedefs.h
+> @@ -97,6 +97,7 @@ typedef struct QEMUTimer QEMUTimer;
+>  typedef struct QEMUTimerListGroup QEMUTimerListGroup;
+>  typedef struct QBool QBool;
+>  typedef struct QDict QDict;
+> +typedef struct QJSON QJSON;
+>  typedef struct QList QList;
+>  typedef struct QNull QNull;
+>  typedef struct QNum QNum;
+> diff --git a/migration/qjson.h b/migration/qjson.h
+> index 2978b5f37121..41664f2d71b5 100644
+> --- a/migration/qjson.h
+> +++ b/migration/qjson.h
+> @@ -13,8 +13,6 @@
+>  #ifndef QEMU_QJSON_H
+>  #define QEMU_QJSON_H
+>  
+> -typedef struct QJSON QJSON;
+> -
+>  QJSON *qjson_new(void);
+>  void qjson_destroy(QJSON *json);
+>  void json_prop_str(QJSON *json, const char *name, const char *str);
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
