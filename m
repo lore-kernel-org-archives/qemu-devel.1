@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41940)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fRAW8-0008WV-SD
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:04:58 -0400
+	(envelope-from <famz@redhat.com>) id 1fRAWN-0000Ix-Lh
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:05:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fRAW7-0008IS-N3
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:04:56 -0400
+	(envelope-from <famz@redhat.com>) id 1fRAWM-0008Ru-Q6
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:05:11 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  8 Jun 2018 14:04:13 +0800
-Message-Id: <20180608060417.10170-3-famz@redhat.com>
+Date: Fri,  8 Jun 2018 14:04:15 +0800
+Message-Id: <20180608060417.10170-5-famz@redhat.com>
 In-Reply-To: <20180608060417.10170-1-famz@redhat.com>
 References: <20180608060417.10170-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/6] block: Check if block drivers can do copy
- offloading
+Subject: [Qemu-devel] [PATCH 4/6] block-backend: Add blk_aio_copy_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,194 +22,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This avoids the wasteful cluster allocation in qcow2 before actually
-trying an unsupported copy range call, for example.
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- block.c                   | 12 ++++++++++++
- block/file-posix.c        |  9 +++++++++
- block/io.c                |  3 +++
- block/iscsi.c             |  8 ++++++++
- block/qcow2.c             | 11 +++++++++++
- block/raw-format.c        |  6 ++++++
- include/block/block_int.h |  4 ++++
- 7 files changed, 53 insertions(+)
+ block/block-backend.c          | 36 ++++++++++++++++++++++++++++++++++
+ include/sysemu/block-backend.h |  4 ++++
+ 2 files changed, 40 insertions(+)
 
-diff --git a/block.c b/block.c
-index 501b64c819..28aa8d8a65 100644
---- a/block.c
-+++ b/block.c
-@@ -5320,3 +5320,15 @@ bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
+diff --git a/block/block-backend.c b/block/block-backend.c
+index e20a204bee..36d928e13d 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1213,6 +1213,14 @@ typedef struct BlkRwCo {
+             unsigned long int req;
+             void *buf;
+         } ioctl;
++
++        struct {
++            BlockBackend *dst_blk;
++            int64_t src_off;
++            int64_t dst_off;
++            int bytes;
++            BdrvRequestFlags flags;
++        } copy_range;
+     };
  
-     return drv->bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp);
- }
-+
-+bool bdrv_can_copy_range(BdrvChild *src, BdrvChild *dst)
-+{
-+    BlockDriverState *bs;
-+
-+    if (!src || !src->bs) {
-+        return false;
-+    }
-+    bs = src->bs;
-+    return bs && bs->drv && bs->drv->bdrv_can_copy_range &&
-+           bs->drv->bdrv_can_copy_range(bs, dst);
-+}
-diff --git a/block/file-posix.c b/block/file-posix.c
-index c6dae38f94..41c491c65b 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -2539,6 +2539,13 @@ static int coroutine_fn raw_co_copy_range_to(BlockDriverState *bs,
-                                NULL, bytes, QEMU_AIO_COPY_RANGE);
+ } BlkRwCo;
+@@ -1505,6 +1513,34 @@ BlockAIOCB *blk_aio_pwritev(BlockBackend *blk, int64_t offset,
+     return blk_aio_prwv(blk, &rwco, blk_aio_write_entry, cb, opaque);
  }
  
-+static bool raw_can_copy_range(BlockDriverState *bs,
-+                               BdrvChild *dst)
++static void blk_aio_copy_range_entry(void *opaque)
 +{
-+    return dst->bs && dst->bs->drv &&
-+           dst->bs->drv->bdrv_can_copy_range == raw_can_copy_range;
++    BlkAioEmAIOCB *acb = opaque;
++    BlkRwCo *rwco = &acb->rwco;
++
++    rwco->ret = blk_co_copy_range(rwco->blk, rwco->copy_range.src_off,
++                                  rwco->copy_range.dst_blk,
++                                  rwco->copy_range.dst_off,
++                                  rwco->copy_range.bytes,
++                                  rwco->copy_range.flags);
++    blk_aio_complete(acb);
 +}
 +
- BlockDriver bdrv_file = {
-     .format_name = "file",
-     .protocol_name = "file",
-@@ -2564,6 +2571,7 @@ BlockDriver bdrv_file = {
-     .bdrv_aio_pdiscard = raw_aio_pdiscard,
-     .bdrv_co_copy_range_from = raw_co_copy_range_from,
-     .bdrv_co_copy_range_to  = raw_co_copy_range_to,
-+    .bdrv_can_copy_range = raw_can_copy_range,
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-@@ -3044,6 +3052,7 @@ static BlockDriver bdrv_host_device = {
-     .bdrv_aio_pdiscard   = hdev_aio_pdiscard,
-     .bdrv_co_copy_range_from = raw_co_copy_range_from,
-     .bdrv_co_copy_range_to  = raw_co_copy_range_to,
-+    .bdrv_can_copy_range = raw_can_copy_range,
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-diff --git a/block/io.c b/block/io.c
-index b7beaeeb9f..d8039793c2 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2913,6 +2913,9 @@ int coroutine_fn bdrv_co_copy_range(BdrvChild *src, uint64_t src_offset,
-     BlockDriverState *dst_bs = dst->bs;
-     int ret;
- 
-+    if (!bdrv_can_copy_range(src, dst)) {
-+        return -ENOTSUP;
-+    }
-     bdrv_inc_in_flight(src_bs);
-     bdrv_inc_in_flight(dst_bs);
-     tracked_request_begin(&src_req, src_bs, src_offset,
-diff --git a/block/iscsi.c b/block/iscsi.c
-index c2fbd8a8aa..6c465ebd46 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -2420,6 +2420,12 @@ out_unlock:
-     return r;
- }
- 
-+static bool iscsi_can_copy_range(BlockDriverState *bs, BdrvChild *dst)
++BlockAIOCB *blk_aio_copy_range(BlockBackend *src, int64_t src_offset,
++                               BlockBackend *dst, int64_t dst_offset,
++                               uint64_t bytes, BdrvRequestFlags flags,
++                               BlockCompletionFunc *cb, void *opaque)
 +{
-+    return dst->bs && dst->bs->drv &&
-+           dst->bs->drv->bdrv_can_copy_range == iscsi_can_copy_range;
++    BlkRwCo rwco = (BlkRwCo) {
++        .copy_range.src_off = src_offset,
++        .copy_range.dst_blk = dst,
++        .copy_range.dst_off = dst_offset,
++        .copy_range.bytes = bytes,
++        .copy_range.flags = flags,
++    };
++    return blk_aio_prwv(src, &rwco, blk_aio_copy_range_entry, cb, opaque);
 +}
 +
- static QemuOptsList iscsi_create_opts = {
-     .name = "iscsi-create-opts",
-     .head = QTAILQ_HEAD_INITIALIZER(iscsi_create_opts.head),
-@@ -2456,6 +2462,7 @@ static BlockDriver bdrv_iscsi = {
-     .bdrv_co_pdiscard      = iscsi_co_pdiscard,
-     .bdrv_co_copy_range_from = iscsi_co_copy_range_from,
-     .bdrv_co_copy_range_to  = iscsi_co_copy_range_to,
-+    .bdrv_can_copy_range   = iscsi_can_copy_range,
-     .bdrv_co_pwrite_zeroes = iscsi_co_pwrite_zeroes,
-     .bdrv_co_readv         = iscsi_co_readv,
-     .bdrv_co_writev        = iscsi_co_writev,
-@@ -2493,6 +2500,7 @@ static BlockDriver bdrv_iser = {
-     .bdrv_co_pdiscard      = iscsi_co_pdiscard,
-     .bdrv_co_copy_range_from = iscsi_co_copy_range_from,
-     .bdrv_co_copy_range_to  = iscsi_co_copy_range_to,
-+    .bdrv_can_copy_range   = iscsi_can_copy_range,
-     .bdrv_co_pwrite_zeroes = iscsi_co_pwrite_zeroes,
-     .bdrv_co_readv         = iscsi_co_readv,
-     .bdrv_co_writev        = iscsi_co_writev,
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 549fee9b69..1326410d1c 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3440,6 +3440,16 @@ fail:
-     return ret;
- }
- 
-+static bool qcow2_can_copy_range(BlockDriverState *bs, BdrvChild *dst)
-+{
-+    bool r = bdrv_can_copy_range(bs->file, dst);
-+
-+    if (bs->backing) {
-+        r = r && bdrv_can_copy_range(bs->backing, dst);
-+    }
-+    return r;
-+}
-+
- static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-                           PreallocMode prealloc, Error **errp)
+ static void blk_aio_flush_entry(void *opaque)
  {
-@@ -4690,6 +4700,7 @@ BlockDriver bdrv_qcow2 = {
-     .bdrv_co_pdiscard       = qcow2_co_pdiscard,
-     .bdrv_co_copy_range_from = qcow2_co_copy_range_from,
-     .bdrv_co_copy_range_to  = qcow2_co_copy_range_to,
-+    .bdrv_can_copy_range    = qcow2_can_copy_range,
-     .bdrv_truncate          = qcow2_truncate,
-     .bdrv_co_pwritev_compressed = qcow2_co_pwritev_compressed,
-     .bdrv_make_empty        = qcow2_make_empty,
-diff --git a/block/raw-format.c b/block/raw-format.c
-index f2e468df6f..707b25fc77 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -527,6 +527,11 @@ static int coroutine_fn raw_co_copy_range_to(BlockDriverState *bs,
-                                  flags);
- }
- 
-+static bool raw_can_copy_range(BlockDriverState *bs, BdrvChild *dst)
-+{
-+    return bdrv_can_copy_range(bs->file, dst);
-+}
-+
- BlockDriver bdrv_raw = {
-     .format_name          = "raw",
-     .instance_size        = sizeof(BDRVRawState),
-@@ -545,6 +550,7 @@ BlockDriver bdrv_raw = {
-     .bdrv_co_block_status = &raw_co_block_status,
-     .bdrv_co_copy_range_from = &raw_co_copy_range_from,
-     .bdrv_co_copy_range_to  = &raw_co_copy_range_to,
-+    .bdrv_can_copy_range  = &raw_can_copy_range,
-     .bdrv_truncate        = &raw_truncate,
-     .bdrv_getlength       = &raw_getlength,
-     .has_variable_length  = true,
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 888b7f7bff..2c51cd420f 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -235,6 +235,9 @@ struct BlockDriver {
-                                               uint64_t bytes,
-                                               BdrvRequestFlags flags);
- 
-+    bool (*bdrv_can_copy_range)(BlockDriverState *bs,
-+                                BdrvChild *dst);
-+
-     /*
-      * Building block for bdrv_block_status[_above] and
-      * bdrv_is_allocated[_above].  The driver should answer only
-@@ -1139,5 +1142,6 @@ int coroutine_fn bdrv_co_copy_range_from(BdrvChild *src, uint64_t src_offset,
- int coroutine_fn bdrv_co_copy_range_to(BdrvChild *src, uint64_t src_offset,
-                                        BdrvChild *dst, uint64_t dst_offset,
-                                        uint64_t bytes, BdrvRequestFlags flags);
-+bool bdrv_can_copy_range(BdrvChild *src, BdrvChild *dst);
- 
- #endif /* BLOCK_INT_H */
+     BlkAioEmAIOCB *acb = opaque;
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 8d03d493c2..ea121eac3f 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -147,6 +147,10 @@ BlockAIOCB *blk_aio_flush(BlockBackend *blk,
+                           BlockCompletionFunc *cb, void *opaque);
+ BlockAIOCB *blk_aio_pdiscard(BlockBackend *blk, int64_t offset, int bytes,
+                              BlockCompletionFunc *cb, void *opaque);
++BlockAIOCB *blk_aio_copy_range(BlockBackend *src, int64_t src_offset,
++                               BlockBackend *dst, int64_t dst_offset,
++                               uint64_t bytes, BdrvRequestFlags flags,
++                               BlockCompletionFunc *cb, void *opaque);
+ void blk_aio_cancel(BlockAIOCB *acb);
+ void blk_aio_cancel_async(BlockAIOCB *acb);
+ int blk_co_ioctl(BlockBackend *blk, unsigned long int req, void *buf);
 -- 
 2.17.0
