@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fRIrA-0001Aa-5e
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:59:13 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fRIrW-0001NO-3B
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:59:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fRIr6-0007q4-7A
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:59:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42360 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fRIr6-0007pm-3N
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:59:08 -0400
-References: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <edcae62f-e3b6-6e25-60a5-843eeae89396@redhat.com>
-Date: Fri, 8 Jun 2018 09:59:00 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fRIrR-00080E-9Q
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:59:34 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:43590)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fRIrR-000802-5c
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:59:29 -0400
+Received: by mail-qk0-x243.google.com with SMTP id g126-v6so8907260qke.10
+	for <qemu-devel@nongnu.org>; Fri, 08 Jun 2018 07:59:28 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180608143026.20167-1-ehabkost@redhat.com>
+	<24e7a171-33b6-e9ca-9d9c-d61a7a2c5047@amsat.org>
+	<20180608144023.GS18233@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9e9f1c3b-f055-eb71-673b-8696a63403d7@amsat.org>
+Date: Fri, 8 Jun 2018 11:59:24 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180608144023.GS18233@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu PATCH 1/5] gitignore: ignore generated qapi
- job files
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] configure: Require Python 2.7 or newer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +36,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Zwisler <ross.zwisler@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-On 06/07/2018 05:31 PM, Ross Zwisler wrote:
-> With a fully built QEMU I currently see the following with "git status":
+On 06/08/2018 11:40 AM, Daniel P. Berrangé wrote:
+> On Fri, Jun 08, 2018 at 11:37:36AM -0300, Philippe Mathieu-Daudé wrote:
+>> Cc'ing Eric
+>>
+>> On 06/08/2018 11:30 AM, Eduardo Habkost wrote:
+>>> All of the supported build platforms documented in qemu-doc.texi
+>>> should already support Python 2.7.
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg05173.html
+>>
+>>   On 08/25/2017 11:40 AM, Peter Maydell wrote:
+>>   > Our choices about our dependencies are generally driven by "what
+>>   > are the versions available on the oldest distros which we wish
+>>   > to support building QEMU on", which typically is whatever the
+>>   > long-term-support versions of Ubuntu, SUSE, Redhat, etc are.
+>>   >
+>>   > Has somebody checked what that means for our Python version
+>>   > requirements?
+>>
+>>   At least this one:
+>>
+>>   RHEL/CentOS 6: Python-2.6.6
 > 
->    Untracked files:
->      (use "git add <file>..." to include in what will be committed)
+> RHEL6 is no longer a target we care about and is being explicitly
+> broken as a result of the min glib bump:
 > 
->    	qapi/qapi-commands-job.c
->    	qapi/qapi-commands-job.h
->    	qapi/qapi-events-job.c
->    	qapi/qapi-events-job.h
->    	qapi/qapi-types-job.c
->    	qapi/qapi-types-job.h
->    	qapi/qapi-visit-job.c
->    	qapi/qapi-visit-job.h
-> 
-> These are all generated files.  Ignore them.
-> 
-> Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Fixes: commit bf42508f24ee ("job: Introduce qapi/job.json")
+>   https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg02104.html
 
-You're the third to post this:
-
-https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg07280.html
-https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg01624.html
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+\o/
