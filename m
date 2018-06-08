@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fRAeL-0007dM-SN
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:13:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1fRAni-0005Zg-BV
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:23:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fRAeJ-0004J1-Pu
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:13:25 -0400
-Received: from hera.aquilenet.fr ([185.233.100.1]:53422)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1fRAeJ-0004Ia-JO
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:13:23 -0400
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Fri,  8 Jun 2018 09:13:12 +0300
-Message-Id: <20180608061316.4909-2-samuel.thibault@ens-lyon.org>
-In-Reply-To: <20180608061316.4909-1-samuel.thibault@ens-lyon.org>
-References: <20180608061316.4909-1-samuel.thibault@ens-lyon.org>
+	(envelope-from <armbru@redhat.com>) id 1fRAnf-0001U2-7a
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:23:06 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180607144645.10187-1-f4bug@amsat.org>
+	<20180607144645.10187-3-f4bug@amsat.org>
+	<20180608030319.GE3344@umbus.fritz.box>
+	<83125664-91ec-3274-e6d3-6c5ccfd95297@amsat.org>
+	<20180608042316.GP3344@umbus.fritz.box>
+Date: Fri, 08 Jun 2018 08:22:59 +0200
+In-Reply-To: <20180608042316.GP3344@umbus.fritz.box> (David Gibson's message
+	of "Fri, 8 Jun 2018 14:23:16 +1000")
+Message-ID: <87d0x1bxvg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/5] slirp: Fix spurious error report when
- sending directly
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] hw/ppc/spapr_drc: Replace
+ error_setg(&error_abort) by abort()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-Move check to where it actually is useful, and reduce scope of 'len'
-variable along the way.
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
- slirp/socket.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+> On Fri, Jun 08, 2018 at 12:54:36AM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+>> Hi David,
+>>=20
+>> On 06/08/2018 12:03 AM, David Gibson wrote:
+>> > On Thu, Jun 07, 2018 at 11:46:43AM -0300, Philippe Mathieu-Daud=C3=A9 =
+wrote:
+>> >> Use abort() instead of error_setg(&error_abort),
+>> >> as suggested by the "qapi/error.h" documentation:
+>> >>
+>> >>     Please don't error_setg(&error_fatal, ...), use error_report() and
+>> >>     exit(), because that's more obvious.
+>> >>     Likewise, don't error_setg(&error_abort, ...), use assert().
+>> >>
+>> >> Use abort() instead of the suggested assert() because the assertion is
+>> >> already verified by the switch case.
+>> >=20
+>> > I think g_assert_not_reached() would be the right thing here.
+>>=20
+>> I try to follow Eric advice (who recalled Markus).
+>> As I understand:
+>> http://lists.gnu.org/archive/html/qemu-devel/2017-08/msg03605.html
+>>=20
+>> "glib-Testing [...] should not be used outside of tests/."
+>
+> Oh, ok, go with that then.
 
-diff --git a/slirp/socket.c b/slirp/socket.c
-index e2a71c9b04..08fe98907d 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -340,7 +340,7 @@ sosendoob(struct socket *so)
- 	struct sbuf *sb =3D &so->so_rcv;
- 	char buff[2048]; /* XXX Shouldn't be sending more oob data than this */
-=20
--	int n, len;
-+	int n;
-=20
- 	DEBUG_CALL("sosendoob");
- 	DEBUG_ARG("so =3D %p", so);
-@@ -359,7 +359,7 @@ sosendoob(struct socket *so)
- 		 * send it all
- 		 */
- 		uint32_t urgc =3D so->so_urgc;
--		len =3D (sb->sb_data + sb->sb_datalen) - sb->sb_rptr;
-+		int len =3D (sb->sb_data + sb->sb_datalen) - sb->sb_rptr;
- 		if (len > urgc) {
- 			len =3D urgc;
- 		}
-@@ -374,13 +374,13 @@ sosendoob(struct socket *so)
- 			len +=3D n;
- 		}
- 		n =3D slirp_send(so, buff, len, (MSG_OOB)); /* |MSG_DONTWAIT)); */
--	}
--
- #ifdef DEBUG
--	if (n !=3D len) {
--		DEBUG_ERROR((dfd, "Didn't send all data urgently XXXXX\n"));
--	}
-+		if (n !=3D len) {
-+			DEBUG_ERROR((dfd, "Didn't send all data urgently XXXXX\n"));
-+		}
- #endif
-+	}
-+
- 	if (n < 0) {
- 		return n;
- 	}
---=20
-2.17.1
+Most g_assert_FOO() are indeed tests-only, but g_assert_not_reached() is
+actually acceptable elsewhere, see commit 6e9389563e5, and its review
+thread
+https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05499.html
+Message-Id: <20170427165526.19836-1-dgilbert@redhat.com>
+
+That said, I fail to see the value of this kind of lipstick, too.
+
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+>
+>> I can respin if you prefer.
+
+I can replace by g_assert_not_reached() on commit if you prefer.
