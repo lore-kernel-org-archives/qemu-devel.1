@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fRGYR-0008R8-Cl
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:31:44 -0400
+	(envelope-from <david@redhat.com>) id 1fRGYy-0000Mt-2D
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:32:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fRGYQ-0005Sh-9W
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:31:43 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri,  8 Jun 2018 09:29:52 -0300
-Message-Id: <20180608122952.2009-11-ehabkost@redhat.com>
-In-Reply-To: <20180608122952.2009-1-ehabkost@redhat.com>
-References: <20180608122952.2009-1-ehabkost@redhat.com>
+	(envelope-from <david@redhat.com>) id 1fRGYu-0005fF-Vt
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 08:32:16 -0400
+References: <20180517081527.14410-1-david@redhat.com>
+	<20180517081527.14410-5-david@redhat.com>
+	<20180530150806.061c26b9@redhat.com>
+	<5dcb16e5-b9b9-d07d-dfe3-98724e911f83@redhat.com>
+	<20180531161310.52ea9507@redhat.com>
+	<e451e0d6-a181-b027-cdb7-f44beb11b37c@redhat.com>
+	<20180607154455.6eab4e24@redhat.com>
+	<5dda6237-88d8-f0f8-58d2-af996368cea4@redhat.com>
+	<20180608142442.0d97b7c6@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <397d37ee-b3a8-dae0-37d1-fd3c942448c2@redhat.com>
+Date: Fri, 8 Jun 2018 14:32:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 10/10] python: futurize -f
- lib2to3.fixes.fix_numliterals
+In-Reply-To: <20180608142442.0d97b7c6@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
+ hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,174 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-Convert octal literals into the new syntax.
 
-This is necessary for Python 3 compatibility.
+>>> if (TYPE_PC_DIMM) {
+>>>     pc_dimm_plug()
+>>>     /* do here additional concrete machine specific things */
+>>> } else if (TYPE_VIRTIO_MEM) {
+>>>     virtio_mem_plug() <- do forwarding in there
+>>>     /* and do here additional concrete machine specific things */
+>>> } else if (TYPE_CPU) {
+>>>     cpu_plug()
+>>>     /* do here additional concrete machine specific things */
+>>> }  
+>>
+>> That will result in a lot of duplicate code - for every machine we
+>> support (dimm/virtio-mem/virtio-pmem/*add more memory devices here*) -
+>> virtio-mem and virtio-pmem could most probably share the code.
+> maybe or maybe not, depending on if pmem endups as memory device or
+> separate controller. And even with duplication, machine code would
+> be easy to follow just down one explicit call chain.
 
-Done using:
+Not 100% convinced but I am now going into that direction.
 
-  $ py=3D$( (g grep -l -E '^#!.*python';find -name '*.py' -printf '%P\n';=
-) | \
-    sort -u | grep -v README.sh4)
-  $ futurize -w -f lib2to3.fixes.fix_numliterals $py
+-- 
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- scripts/qmp/qom-fuse   |  6 +++---
- tests/qemu-iotests/118 | 24 ++++++++++++------------
- 2 files changed, 15 insertions(+), 15 deletions(-)
+Thanks,
 
-diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
-index b00cb0a0af..e524e798fc 100755
---- a/scripts/qmp/qom-fuse
-+++ b/scripts/qmp/qom-fuse
-@@ -90,7 +90,7 @@ class QOMFS(Fuse):
-=20
-     def getattr(self, path):
-         if self.is_link(path):
--            value =3D posix.stat_result((0755 | stat.S_IFLNK,
-+            value =3D posix.stat_result((0o755 | stat.S_IFLNK,
-                                        self.get_ino(path),
-                                        0,
-                                        2,
-@@ -101,7 +101,7 @@ class QOMFS(Fuse):
-                                        0,
-                                        0))
-         elif self.is_object(path):
--            value =3D posix.stat_result((0755 | stat.S_IFDIR,
-+            value =3D posix.stat_result((0o755 | stat.S_IFDIR,
-                                        self.get_ino(path),
-                                        0,
-                                        2,
-@@ -112,7 +112,7 @@ class QOMFS(Fuse):
-                                        0,
-                                        0))
-         elif self.is_property(path):
--            value =3D posix.stat_result((0644 | stat.S_IFREG,
-+            value =3D posix.stat_result((0o644 | stat.S_IFREG,
-                                        self.get_ino(path),
-                                        0,
-                                        1,
-diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
-index a0469b570e..ff3b2ae3e7 100755
---- a/tests/qemu-iotests/118
-+++ b/tests/qemu-iotests/118
-@@ -390,14 +390,14 @@ class TestChangeReadOnly(ChangeBaseClass):
-=20
-     def tearDown(self):
-         self.vm.shutdown()
--        os.chmod(old_img, 0666)
--        os.chmod(new_img, 0666)
-+        os.chmod(old_img, 0o666)
-+        os.chmod(new_img, 0o666)
-         os.remove(old_img)
-         os.remove(new_img)
-=20
-     def test_ro_ro_retain(self):
--        os.chmod(old_img, 0444)
--        os.chmod(new_img, 0444)
-+        os.chmod(old_img, 0o444)
-+        os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk,read-only=3Don', 'none'=
-)
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -417,7 +417,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-     def test_ro_rw_retain(self):
--        os.chmod(old_img, 0444)
-+        os.chmod(old_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk,read-only=3Don', 'none'=
-)
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -437,7 +437,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-     def test_rw_ro_retain(self):
--        os.chmod(new_img, 0444)
-+        os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -459,7 +459,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', old=
-_img)
-=20
-     def test_ro_rw(self):
--        os.chmod(old_img, 0444)
-+        os.chmod(old_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk,read-only=3Don', 'none'=
-)
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -480,7 +480,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-     def test_rw_ro(self):
--        os.chmod(new_img, 0444)
-+        os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -521,7 +521,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-     def test_make_ro_rw(self):
--        os.chmod(new_img, 0444)
-+        os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -542,7 +542,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', old=
-_img)
-=20
-     def test_make_rw_ro_by_retain(self):
--        os.chmod(old_img, 0444)
-+        os.chmod(old_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk,read-only=3Don', 'none'=
-)
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -562,7 +562,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-     def test_make_ro_rw_by_retain(self):
--        os.chmod(new_img, 0444)
-+        os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -582,7 +582,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', old=
-_img)
-=20
-     def test_rw_ro_cycle(self):
--        os.chmod(new_img, 0444)
-+        os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
---=20
-2.18.0.rc1.1.g3f1ff2140
+David / dhildenb
