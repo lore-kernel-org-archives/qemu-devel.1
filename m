@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47390)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fRAni-0005Zg-BV
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:23:07 -0400
+	(envelope-from <peterx@redhat.com>) id 1fRApM-0006HP-JA
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:24:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fRAnf-0001U2-7a
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:23:06 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180607144645.10187-1-f4bug@amsat.org>
-	<20180607144645.10187-3-f4bug@amsat.org>
-	<20180608030319.GE3344@umbus.fritz.box>
-	<83125664-91ec-3274-e6d3-6c5ccfd95297@amsat.org>
-	<20180608042316.GP3344@umbus.fritz.box>
-Date: Fri, 08 Jun 2018 08:22:59 +0200
-In-Reply-To: <20180608042316.GP3344@umbus.fritz.box> (David Gibson's message
-	of "Fri, 8 Jun 2018 14:23:16 +1000")
-Message-ID: <87d0x1bxvg.fsf@dusky.pond.sub.org>
+	(envelope-from <peterx@redhat.com>) id 1fRApJ-00030K-Gk
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:24:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57552 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fRApJ-0002zW-Cv
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 02:24:45 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C51FA40200A4
+	for <qemu-devel@nongnu.org>; Fri,  8 Jun 2018 06:24:44 +0000 (UTC)
+Date: Fri, 8 Jun 2018 14:24:39 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180608062439.GB7736@xz-mi>
+References: <20180608035511.7439-1-peterx@redhat.com>
+	<20180608035511.7439-6-peterx@redhat.com>
+	<8736xxq1mk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] hw/ppc/spapr_drc: Replace
- error_setg(&error_abort) by abort()
+Content-Disposition: inline
+In-Reply-To: <8736xxq1mk.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v10 5/7] monitor: remove event_clock_type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +34,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+On Fri, Jun 08, 2018 at 07:38:11AM +0200, Markus Armbruster wrote:
 
-> On Fri, Jun 08, 2018 at 12:54:36AM -0300, Philippe Mathieu-Daud=C3=A9 wro=
-te:
->> Hi David,
->>=20
->> On 06/08/2018 12:03 AM, David Gibson wrote:
->> > On Thu, Jun 07, 2018 at 11:46:43AM -0300, Philippe Mathieu-Daud=C3=A9 =
-wrote:
->> >> Use abort() instead of error_setg(&error_abort),
->> >> as suggested by the "qapi/error.h" documentation:
->> >>
->> >>     Please don't error_setg(&error_fatal, ...), use error_report() and
->> >>     exit(), because that's more obvious.
->> >>     Likewise, don't error_setg(&error_abort, ...), use assert().
->> >>
->> >> Use abort() instead of the suggested assert() because the assertion is
->> >> already verified by the switch case.
->> >=20
->> > I think g_assert_not_reached() would be the right thing here.
->>=20
->> I try to follow Eric advice (who recalled Markus).
->> As I understand:
->> http://lists.gnu.org/archive/html/qemu-devel/2017-08/msg03605.html
->>=20
->> "glib-Testing [...] should not be used outside of tests/."
->
-> Oh, ok, go with that then.
+[...]
 
-Most g_assert_FOO() are indeed tests-only, but g_assert_not_reached() is
-actually acceptable elsewhere, see commit 6e9389563e5, and its review
-thread
-https://lists.gnu.org/archive/html/qemu-devel/2017-04/msg05499.html
-Message-Id: <20170427165526.19836-1-dgilbert@redhat.com>
+> > +/*
+> > + * This should never be called before configure_accelerator() since
+> > + * only until then could we know whether qtest was enabled or not.
+> 
+> Uh, we know it after then, not until then.  What about
+> 
+>    /*
+>     * Return the clock to use for recording an event's time.
+>     * Beware: result is invalid before configure_accelerator().
 
-That said, I fail to see the value of this kind of lipstick, too.
+Oh, another Chinglish from me. :(
 
-> Acked-by: David Gibson <david@gibson.dropbear.id.au>
->
->> I can respin if you prefer.
+> 
+> > + */
+> > +static inline QEMUClockType monitor_get_clock(void)
+> 
+> Suggest to rename to monitor_get_event_clock(), or just
+> get_event_clock().
+> 
+> Happy to apply touch-ups on commit.
 
-I can replace by g_assert_not_reached() on commit if you prefer.
+That'll be appreciated.  Both changes work for me.
+
+[...]
+
+> With at least a suitable fix for the comment:
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
+Thanks!
+
+-- 
+Peter Xu
