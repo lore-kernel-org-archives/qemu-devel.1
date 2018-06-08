@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <patryk@fala.ehost.pl>) id 1fRJne-0004f4-0i
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:59:39 -0400
+	(envelope-from <mst@redhat.com>) id 1fRJoG-00056A-Tz
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:00:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <patryk@fala.ehost.pl>) id 1fRJnb-0007Ou-L9
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 11:59:38 -0400
-References: <20180607210818.12727-1-f4bug@amsat.org>
-	<9abdaa17-d6d1-0c34-2a20-43078b487bef@redhat.com>
-	<CAFEAcA-QYnWOo2Hqdr-3tKDDxWDnR+tF4snd15Y1P6md04CogA@mail.gmail.com>
-From: Patryk Olszewski <patryk@fala.ehost.pl>
-Message-ID: <2b3eb485-701e-21cd-f66c-897df470a4e4@fala.ehost.pl>
-Date: Fri, 8 Jun 2018 17:58:38 +0200
+	(envelope-from <mst@redhat.com>) id 1fRJoB-0007rQ-8W
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:00:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45962 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fRJoB-0007rA-3w
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 12:00:11 -0400
+Date: Fri, 8 Jun 2018 19:00:09 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180608185945-mutt-send-email-mst@kernel.org>
+References: <20180607223111.27792-1-ross.zwisler@linux.intel.com>
+	<20180607223111.27792-3-ross.zwisler@linux.intel.com>
+	<20180608021134-mutt-send-email-mst@kernel.org>
+	<5b2dafa6-1206-bef3-10d7-eac9910baa85@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-QYnWOo2Hqdr-3tKDDxWDnR+tF4snd15Y1P6md04CogA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] chardev: Restore CR,LF on stdio
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b2dafa6-1206-bef3-10d7-eac9910baa85@redhat.com>
+Subject: Re: [Qemu-devel] [qemu PATCH 3/5] hw/i386: Update SSDT table used
+ by "make check"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, BALATON Zoltan <balaton@eik.bme.hu>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Laurent Desnogues <laurent.desnogues@gmail.com>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Cornelia Huck <cohuck@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
-W dniu 08.06.2018 o 17:25, Peter Maydell pisze:
-> On 8 June 2018 at 06:47, Thomas Huth <thuth@redhat.com> wrote:
->> On 07.06.2018 23:08, Philippe Mathieu-Daudé wrote:
->>> Remove the 'stair-step output' on stdio.
->>>
->>> This partially reverts commit 12fb0ac05, which was correct
->>> on the mailing list but got corrupted by the maintainer :p
->>>
->>> Introduced-by: 3b876140-c035-dd39-75d0-d54c48128fac@redhat.com
->>> Reported-by: BALATON Zoltan <balaton@eik.bme.hu>
->>> Suggested-by: Thomas Huth <thuth@redhat.com>
->>> Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>> ---
->>> See:
->>> http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg06202.html (bug)
->>> http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg01309.html (report)
->>>
->>> Peter, Can this enters directly as bug-fix?
->>>
->>>  chardev/char-stdio.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/chardev/char-stdio.c b/chardev/char-stdio.c
->>> index d83e60e787..96375f2ab8 100644
->>> --- a/chardev/char-stdio.c
->>> +++ b/chardev/char-stdio.c
->>> @@ -59,7 +59,7 @@ static void qemu_chr_set_echo_stdio(Chardev *chr, bool echo)
->>>      if (!echo) {
->>>          tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
->>>                           | INLCR | IGNCR | ICRNL | IXON);
->>> -        tty.c_oflag &= ~OPOST;
->>> +        tty.c_oflag |= OPOST;
->>>          tty.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN);
->>>          tty.c_cflag &= ~(CSIZE | PARENB);
->>>          tty.c_cflag |= CS8;
->>>
->> I think this is the right way to go.
->>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Applied to master, thanks.
->
-> -- PMM
->
-I actually think it would be better to set c_oflag to (OPOST | ONLCR) to
-avoid any problems in the future. At this point it is assumed that ONLCR
-is set.
+On Fri, Jun 08, 2018 at 09:24:49AM -0500, Eric Blake wrote:
+> On 06/07/2018 06:14 PM, Michael S. Tsirkin wrote:
+> > On Thu, Jun 07, 2018 at 04:31:09PM -0600, Ross Zwisler wrote:
+> > > This commit:
+> > > 
+> > > commit aa78a16d8645 ("hw/i386: Rename 2.13 machine types to 3.0")
+> > > 
+> > > updated the name used to create the q35 machine, which in turn changed the
+> > > SSDT table which is generated when we run "make check":
+> > > 
+> > >    acpi-test: Warning! SSDT mismatch. Actual [asl:/tmp/asl-QZDWJZ.dsl,
+> > >    aml:/tmp/aml-T8JYJZ], Expected [asl:/tmp/asl-DTWVJZ.dsl,
+> > >    aml:tests/acpi-test-data/q35/SSDT.dimmpxm].
+> > > 
+> > > Here's the only difference, aside from the checksum:
+> > > 
+> > >    <     Name (MEMA, 0x07FFF000)
+> > >    ---
+> > >    >     Name (MEMA, 0x07FFE000)
+> > 
+> > Weird. How come the phys address changes just because of machine name?
+> 
+> "2.13" is a different length than "3.0"; depending on whatever other
+> alignment coincidences or sharing of similar substrings are in place, this
+> obviously shuffled enough data that the one byte change then reflects into
+> an entire page boundary difference.
+
+I don't think we expose the version number to guests though - do we?
+
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
