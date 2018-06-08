@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fRHhy-0002Mb-10
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:45:39 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fRI1s-0002A7-He
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:06:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fRHhx-0008Mq-1l
-	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 09:45:38 -0400
-Date: Fri, 8 Jun 2018 14:45:27 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180608134527.GA980@stefanha-x1.localdomain>
-References: <20180608122952.2009-1-ehabkost@redhat.com>
-	<20180608122952.2009-3-ehabkost@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1fRI1p-0003rh-T2
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:06:12 -0400
+Resent-Message-Id: <E1fRI1p-0003rh-T2@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21127)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fRI1p-0003rC-JB
+	for qemu-devel@nongnu.org; Fri, 08 Jun 2018 10:06:09 -0400
+In-Reply-To: <20180608061316.4909-1-samuel.thibault@ens-lyon.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152843880340.450.18016408634074194980@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2fHTh5uZTiUOsy+g"
-Content-Disposition: inline
-In-Reply-To: <20180608122952.2009-3-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 02/10] python: futurize -f
- libfuturize.fixes.fix_absolute_import
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 7 Jun 2018 23:20:04 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/5] slirp updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: samuel.thibault@ens-lyon.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanha@redhat.com, jan.kiszka@siemens.com
 
-
---2fHTh5uZTiUOsy+g
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jun 08, 2018 at 09:29:44AM -0300, Eduardo Habkost wrote:
-> Make implicit relative imports explicit and add "from __future__ import
-> absolute_import" at the top of each relevant module.
->=20
-> This is necessary for Python 3 compatibility.
->=20
-> Done using:
->=20
->   $ py=3D$( (g grep -l -E '^#!.*python';find -name '*.py' -printf '%P\n';=
-) | \
->     sort -u | grep -v README.sh4)
->   $ futurize -w -f libfuturize.fixes.fix_absolute_import $py
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Changes v1 -> v2:
-> * Moved "from __future__ import" line after copyright header
-> ---
->  scripts/qmp/qemu-ga-client           | 3 ++-
->  scripts/qmp/qmp                      | 3 ++-
->  scripts/qmp/qmp-shell                | 3 ++-
->  scripts/qmp/qom-fuse                 | 3 ++-
->  scripts/qmp/qom-get                  | 3 ++-
->  scripts/qmp/qom-list                 | 3 ++-
->  scripts/qmp/qom-set                  | 3 ++-
->  scripts/qmp/qom-tree                 | 3 ++-
->  tests/image-fuzzer/qcow2/__init__.py | 3 ++-
->  tests/image-fuzzer/qcow2/layout.py   | 3 ++-
->  10 files changed, 20 insertions(+), 10 deletions(-)
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---2fHTh5uZTiUOsy+g
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbGoh3AAoJEJykq7OBq3PI3qcH/R2g3noJgbAp8jWWjR/NU4Da
-GRBnd+eWTJopZ5Vm4tJHCoJaDxnHP2KvAuBr4pXDKDsHCpPE8J8MhbdFExwt/nMJ
-+Kpx4wAIKfW00nP+Nwdfoo+LdtHyCrC+pQi/6dEvrCAygPbBz2qhyjR3PIXug0Lg
-wPXc2TiGpxTskzYfxzawu9LdKa0iFttbfCb8P35ZU8xFzHLeWzAK47dcQUkBuVfA
-LKe3yxG4FaX0syWGul6qVPDKNj76VR4xDzbmQZPc6NG8lugvzrTJWSqrrm1CKMda
-kq6QL4WsArL9/Y9KSHVPeqEgpKeZ9i7D592Tb2ISxVOoUf7zQhOanM6UVS8jPkc=
-=4+ag
------END PGP SIGNATURE-----
-
---2fHTh5uZTiUOsy+g--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjA4MDYxMzE2LjQ5MDktMS1zYW11ZWwudGhpYmF1bHRAZW5zLWx5b24u
+b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzVdIHNsaXJwIHVwZGF0ZXMKCj09PSBU
+RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
+aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
+VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRz
+PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
+bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
+IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
+bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
+aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
+bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
+NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
+amVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA2MDgwNjEz
+MTYuNDkwOS0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcgLT4gcGF0Y2hldy8yMDE4MDYw
+ODA2MTMxNi40OTA5LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZwpTd2l0Y2hlZCB0byBh
+IG5ldyBicmFuY2ggJ3Rlc3QnCjAwYTA0MmRhYTYgc2xpcnA6IHJlZm9ybWF0IG1faW5jIHJvdXRp
+bmUKYjJiZDVlZTY1ZSBzbGlycDogY29ycmVjdCBzaXplIGNvbXB1dGF0aW9uIHdoaWxlIGNvbmNh
+dGVuYXRpbmcgbWJ1ZgpjOTc4NmQ2NWExIHNsaXJwOiBmaXggZG9tYWlubmFtZSB2ZXJzaW9uIGF2
+YWlsYWJpbGl0eQo0ZjM0ZWUwNjA5IHNsaXJwOiBBZGQgU2FtdWVsIFRoaWJhdWx0J3Mgc3RhZ2lu
+ZyB0cmVlIGZvciBzbGlycAo5MTU5NzYyNzAzIHNsaXJwOiBGaXggc3B1cmlvdXMgZXJyb3IgcmVw
+b3J0IHdoZW4gc2VuZGluZyBkaXJlY3RseQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcg
+UEFUQ0ggMS81OiBzbGlycDogRml4IHNwdXJpb3VzIGVycm9yIHJlcG9ydCB3aGVuIHNlbmRpbmcg
+ZGlyZWN0bHkuLi4KRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjU6
+IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM0MzoKK15JaW50IG47JAoKRVJST1I6IGNvZGUgaW5kZW50
+IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzQ6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM2MjoKK15J
+XklpbnQgbGVuID0gKHNiLT5zYl9kYXRhICsgc2ItPnNiX2RhdGFsZW4pIC0gc2ItPnNiX3JwdHI7
+JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDM6IEZJTEU6IHNs
+aXJwL3NvY2tldC5jOjM3ODoKK15JXklpZiAobiAhPSBsZW4pIHskCgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojNDQ6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM3OToKKwkJCURFQlVH
+X0VSUk9SKChkZmQsICJEaWRuJ3Qgc2VuZCBhbGwgZGF0YSB1cmdlbnRseSBYWFhYWFxuIikpOwoK
+RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDQ6IEZJTEU6IHNsaXJw
+L3NvY2tldC5jOjM3OToKK15JXkleSURFQlVHX0VSUk9SKChkZmQsICJEaWRuJ3Qgc2VuZCBhbGwg
+ZGF0YSB1cmdlbnRseSBYWFhYWFxuIikpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2
+ZXIgdXNlIHRhYnMKIzQ1OiBGSUxFOiBzbGlycC9zb2NrZXQuYzozODA6CiteSV5JfSQKCnRvdGFs
+OiA1IGVycm9ycywgMSB3YXJuaW5ncywgMzQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi81OiBzbGlycDogQWRkIFNh
+bXVlbCBUaGliYXVsdCdzIHN0YWdpbmcgdHJlZSBmb3Igc2xpcnAuLi4KQ2hlY2tpbmcgUEFUQ0gg
+My81OiBzbGlycDogZml4IGRvbWFpbm5hbWUgdmVyc2lvbiBhdmFpbGFiaWxpdHkuLi4KQ2hlY2tp
+bmcgUEFUQ0ggNC81OiBzbGlycDogY29ycmVjdCBzaXplIGNvbXB1dGF0aW9uIHdoaWxlIGNvbmNh
+dGVuYXRpbmcgbWJ1Zi4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJz
+CiMyNTogRklMRTogc2xpcnAvbWJ1Zi5jOjE0MToKK15JXkltX2luYyhtLCBtLT5tX2xlbiArIG4t
+Pm1fbGVuKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0Mzog
+RklMRTogc2xpcnAvbWJ1Zi5jOjE2MToKK15JICBtLT5tX2V4dCA9IGdfcmVhbGxvYyhtLT5tX2V4
+dCwgc2l6ZSArIGRhdGFzaXplKTskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
+ZSB0YWJzCiM0OTogRklMRTogc2xpcnAvbWJ1Zi5jOjE2NjoKK15JICBkYXQgPSBnX21hbGxvYyhz
+aXplICsgZGF0YXNpemUpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
+YnMKIzgxOiBGSUxFOiBzbGlycC9tYnVmLmg6NzM6CiteSWludF5JbV9zaXplO15JXkleSS8qIFNp
+emUgb2YgbWJ1ZiwgZnJvbSBtX2RhdCBvciBtX2V4dCAqLyQKCkVSUk9SOiBjb2RlIGluZGVudCBz
+aG91bGQgbmV2ZXIgdXNlIHRhYnMKIzg2OiBGSUxFOiBzbGlycC9tYnVmLmg6NzY6CiteSWNhZGRy
+X3ReSW1fZGF0YTteSV5JXkkvKiBDdXJyZW50IGxvY2F0aW9uIG9mIGRhdGEgKi8kCgpXQVJOSU5H
+OiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODc6IEZJTEU6IHNsaXJwL21idWYuaDo3NzoKKwlp
+bnQJbV9sZW47CQkJLyogQW1vdW50IG9mIGRhdGEgaW4gdGhpcyBtYnVmLCBmcm9tIG1fZGF0YSAq
+LwoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojODc6IEZJTEU6IHNs
+aXJwL21idWYuaDo3NzoKK15JaW50XkltX2xlbjteSV5JXkkvKiBBbW91bnQgb2YgZGF0YSBpbiB0
+aGlzIG1idWYsIGZyb20gbV9kYXRhICovJAoKdG90YWw6IDYgZXJyb3JzLCAxIHdhcm5pbmdzLCA2
+MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpD
+aGVja2luZyBQQVRDSCA1LzU6IHNsaXJwOiByZWZvcm1hdCBtX2luYyByb3V0aW5lLi4uCj09PSBP
+VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
+aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
+L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
