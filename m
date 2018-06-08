@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <liujunjie23@huawei.com>) id 1fR7g6-00018P-2p
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:03:03 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fR7hT-000255-2a
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <liujunjie23@huawei.com>) id 1fR7g2-0005Q1-VN
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:03:02 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2544 helo=huawei.com)
+	(envelope-from <dgibson@ozlabs.org>) id 1fR7hR-0006py-SF
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:04:27 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:57075)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <liujunjie23@huawei.com>)
-	id 1fR7g2-0005Kq-AD
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:02:58 -0400
-From: liujunjie <liujunjie23@huawei.com>
-Date: Fri, 8 Jun 2018 11:02:15 +0800
-Message-ID: <20180608030215.23040-1-liujunjie23@huawei.com>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fR7hR-0006kt-4y
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 23:04:25 -0400
+Date: Fri, 8 Jun 2018 13:04:05 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180608030405.GF3344@umbus.fritz.box>
+References: <20180607144645.10187-1-f4bug@amsat.org>
+	<20180607144645.10187-5-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] cpu hot-del: leak fix by free the relevant
- members
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="MZf7D3rAEoQgPanC"
+Content-Disposition: inline
+In-Reply-To: <20180607144645.10187-5-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] device_tree: Replace
+ error_setg(&error_fatal) by error_report() + exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,197 +29,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, rth@twiddle.net, crosthwaite.peter@gmail.com
-Cc: linzhecheng@huawei.com, arei.gonglei@huawei.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, qemu-devel@nongnu.org, liujunjie <liujunjie23@huawei.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org
 
-THese leaks are found by ASAN with CPU hot-add and hot-del actions,
-such as:
-==14127==ERROR: LeakSanitizer: detected memory leaks
 
-Direct leak of 4096 byte(s) in 1 object(s) allocated from:
-    #0 0x7fc321cb6ec0 in posix_memalign (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7ec0)
-    #1 0xf756b9 in qemu_try_memalign util/oslib-posix.c:110
-    #2 0xf7575b in qemu_memalign util/oslib-posix.c:126
-    #3 0x7769cb in kvm_arch_init_vcpu /root/qemu/target/i386/kvm.c:1103
-    #4 0x4cc4e6 in qemu_kvm_cpu_thread_fn /root/qemu/cpus.c:1201
-    #5 0x7fc31cb28dc4 in start_thread (/usr/lib64/libpthread.so.0+0x7dc4)
+--MZf7D3rAEoQgPanC
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Direct leak of 4096 byte(s) in 1 object(s) allocated from:
-    #0 0x7fc321cb6560 in calloc (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)
-    #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
-    #2 0x4cc4e6 in qemu_kvm_cpu_thread_fn /root/qemu/cpus.c:1201
-    #3 0x7fc31cb28dc4 in start_thread (/usr/lib64/libpthread.so.0+0x7dc4)
+On Thu, Jun 07, 2018 at 11:46:45AM -0300, Philippe Mathieu-Daud=E9 wrote:
+> Use error_report() + exit() instead of error_setg(&error_fatal),
+> as suggested by the "qapi/error.h" documentation:
+>=20
+>    Please don't error_setg(&error_fatal, ...), use error_report() and
+>    exit(), because that's more obvious.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-Direct leak of 184 byte(s) in 1 object(s) allocated from:
-    #0 0x7fc321cb6560 in calloc (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)
-    #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
-    #2 0x4cda83 in qemu_init_vcpu /root/qemu/cpus.c:1993
-    #3 0x6aedbd in x86_cpu_realizefn /root/qemu/target/i386/cpu.c:4739
-    #4 0x8edfc8 in device_set_realized hw/core/qdev.c:826
-    #5 0xcff60c in property_set_bool qom/object.c:1928
-    #6 0xd09bd2 in object_property_set_qobject qom/qom-qobject.c:27
-    #7 0xd048e3 in object_property_set_bool qom/object.c:1188
-    #8 0x79ad83 in qdev_device_add /root/qemu/qdev-monitor.c:627
-    #9 0x79b50c in qmp_device_add /root/qemu/qdev-monitor.c:807
-    #10 0xf4ca5d in do_qmp_dispatch qapi/qmp-dispatch.c:119
-    #11 0xf4ce3c in qmp_dispatch qapi/qmp-dispatch.c:168
-    #12 0x4e2a5a in monitor_qmp_dispatch_one /root/qemu/monitor.c:4088
-    #13 0x4e2baf in monitor_qmp_bh_dispatcher /root/qemu/monitor.c:4146
-    #14 0xf67ad1 in aio_bh_poll util/async.c:118
-    #15 0xf724a3 in aio_dispatch util/aio-posix.c:436
-    #16 0xf67270 in aio_ctx_dispatch util/async.c:261
-    #17 0x7fc31cf8e999 in g_main_context_dispatch (/usr/lib64/libglib-2.0.so.0+0x49999)
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-Direct leak of 64 byte(s) in 2 object(s) allocated from:
-    #0 0x7fc321cb6560 in calloc (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)
-    #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
-    #2 0x4cda1f in qemu_init_vcpu /root/qemu/cpus.c:1997
-    #3 0x6aedbd in x86_cpu_realizefn /root/qemu/target/i386/cpu.c:4739
-    #4 0x8edfc8 in device_set_realized hw/core/qdev.c:826
-    #5 0xcff60c in property_set_bool qom/object.c:1928
-    #6 0xd09bd2 in object_property_set_qobject qom/qom-qobject.c:27
-    #7 0xd048e3 in object_property_set_bool qom/object.c:1188
-    #8 0x79ad83 in qdev_device_add /root/qemu/qdev-monitor.c:627
-    #9 0x79b50c in qmp_device_add /root/qemu/qdev-monitor.c:807
-    #10 0xf4ca5d in do_qmp_dispatch qapi/qmp-dispatch.c:119
-    #11 0xf4ce3c in qmp_dispatch qapi/qmp-dispatch.c:168
-    #12 0x4e2a5a in monitor_qmp_dispatch_one /root/qemu/monitor.c:4088
-    #13 0x4e2baf in monitor_qmp_bh_dispatcher /root/qemu/monitor.c:4146
-    #14 0xf67ad1 in aio_bh_poll util/async.c:118
-    #15 0xf724a3 in aio_dispatch util/aio-posix.c:436
-    #16 0xf67270 in aio_ctx_dispatch util/async.c:261
-    #17 0x7fc31cf8e999 in g_main_context_dispatch (/usr/lib64/libglib-2.0.so.0+0x49999)
+> ---
+>  device_tree.c | 23 +++++++++++++----------
+>  1 file changed, 13 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/device_tree.c b/device_tree.c
+> index 52c3358a55..3553819257 100644
+> --- a/device_tree.c
+> +++ b/device_tree.c
+> @@ -140,15 +140,16 @@ static void read_fstree(void *fdt, const char *dirn=
+ame)
+>      const char *parent_node;
+> =20
+>      if (strstr(dirname, root_dir) !=3D dirname) {
+> -        error_setg(&error_fatal, "%s: %s must be searched within %s",
+> -                   __func__, dirname, root_dir);
+> +        error_report("%s: %s must be searched within %s",
+> +                     __func__, dirname, root_dir);
+> +        exit(1);
+>      }
+>      parent_node =3D &dirname[strlen(SYSFS_DT_BASEDIR)];
+> =20
+>      d =3D opendir(dirname);
+>      if (!d) {
+> -        error_setg(&error_fatal, "%s cannot open %s", __func__, dirname);
+> -        return;
+> +        error_report("%s cannot open %s", __func__, dirname);
+> +        exit(1);
+>      }
+> =20
+>      while ((de =3D readdir(d)) !=3D NULL) {
+> @@ -162,7 +163,8 @@ static void read_fstree(void *fdt, const char *dirnam=
+e)
+>          tmpnam =3D g_strdup_printf("%s/%s", dirname, de->d_name);
+> =20
+>          if (lstat(tmpnam, &st) < 0) {
+> -            error_setg(&error_fatal, "%s cannot lstat %s", __func__, tmp=
+nam);
+> +            error_report("%s cannot lstat %s", __func__, tmpnam);
+> +            exit(1);
+>          }
+> =20
+>          if (S_ISREG(st.st_mode)) {
+> @@ -170,8 +172,9 @@ static void read_fstree(void *fdt, const char *dirnam=
+e)
+>              gsize len;
+> =20
+>              if (!g_file_get_contents(tmpnam, &val, &len, NULL)) {
+> -                error_setg(&error_fatal, "%s not able to extract info fr=
+om %s",
+> -                           __func__, tmpnam);
+> +                error_report("%s not able to extract info from %s",
+> +                             __func__, tmpnam);
+> +                exit(1);
+>              }
+> =20
+>              if (strlen(parent_node) > 0) {
+> @@ -206,9 +209,9 @@ void *load_device_tree_from_sysfs(void)
+>      host_fdt =3D create_device_tree(&host_fdt_size);
+>      read_fstree(host_fdt, SYSFS_DT_BASEDIR);
+>      if (fdt_check_header(host_fdt)) {
+> -        error_setg(&error_fatal,
+> -                   "%s host device tree extracted into memory is invalid=
+",
+> -                   __func__);
+> +        error_report("%s host device tree extracted into memory is inval=
+id",
+> +                     __func__);
+> +        exit(1);
+>      }
+>      return host_fdt;
+>  }
 
-SUMMARY: AddressSanitizer: 8440 byte(s) leaked in 5 allocation(s).
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-The relevant members in CPU Structure are freed to fix leak. Meanwhile, although the
-VMChangeStateEntry added in kvm_arch_init_vcpu does not be reportd by ASAN since it still
-in vm_change_state_head, it's not longer used after hot-del, so free it, too.
+--MZf7D3rAEoQgPanC
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Signed-off-by: liujunjie <liujunjie23@huawei.com>
-Signed-off-by: linzhecheng <linzhecheng@huawei.com>
----
- accel/kvm/kvm-all.c  |  1 +
- cpus.c               |  6 ++++++
- include/sysemu/kvm.h |  2 ++
- target/arm/kvm.c     |  4 ++++
- target/i386/cpu.h    |  2 ++
- target/i386/kvm.c    | 19 ++++++++++++++++++-
- 6 files changed, 33 insertions(+), 1 deletion(-)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index ffee68e..ff5e738 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -305,6 +305,7 @@ int kvm_destroy_vcpu(CPUState *cpu)
-     vcpu->vcpu_id = kvm_arch_vcpu_id(cpu);
-     vcpu->kvm_fd = cpu->kvm_fd;
-     QLIST_INSERT_HEAD(&kvm_state->kvm_parked_vcpus, vcpu, node);
-+    kvm_arch_destroy_vcpu(cpu);
- err:
-     return ret;
- }
-diff --git a/cpus.c b/cpus.c
-index d1f1629..cbe28d6 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1842,6 +1842,12 @@ void cpu_remove_sync(CPUState *cpu)
-     qemu_mutex_unlock_iothread();
-     qemu_thread_join(cpu->thread);
-     qemu_mutex_lock_iothread();
-+    g_free(cpu->thread);
-+    cpu->thread = NULL;
-+    g_free(cpu->halt_cond);
-+    cpu->halt_cond = NULL;
-+    g_free(cpu->cpu_ases);
-+    cpu->cpu_ases = NULL;
- }
- 
- /* For temporary buffers for forming a name */
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 0b64b8e..f7db7db 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -372,6 +372,8 @@ int kvm_arch_init(MachineState *ms, KVMState *s);
- 
- int kvm_arch_init_vcpu(CPUState *cpu);
- 
-+void kvm_arch_destroy_vcpu(CPUState *cs);
-+
- bool kvm_vcpu_id_is_valid(int vcpu_id);
- 
- /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 98f5006..603089a 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -172,6 +172,10 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     return 0;
- }
- 
-+void kvm_arch_destroy_vcpu(CPUState *cs)
-+{
-+}
-+
- unsigned long kvm_arch_vcpu_id(CPUState *cpu)
- {
-     return cpu->cpu_index;
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 6645046..d6b8137 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -32,6 +32,7 @@
- #endif
- 
- #include "exec/cpu-defs.h"
-+typedef struct vm_change_state_entry VMChangeStateEntry;
- 
- /* The x86 has a strong memory model with some store-after-load re-ordering */
- #define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
-@@ -1330,6 +1331,7 @@ typedef struct CPUX86State {
-     uint64_t xss;
- 
-     TPRAccess tpr_access_type;
-+    VMChangeStateEntry *vmstate;
- } CPUX86State;
- 
- struct kvm_msrs;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 44f7073..1ae5330 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1041,7 +1041,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         }
-     }
- 
--    qemu_add_vm_change_state_handler(cpu_update_state, env);
-+    env->vmstate = qemu_add_vm_change_state_handler(cpu_update_state, env);
- 
-     c = cpuid_find_entry(&cpuid_data.cpuid, 1, 0);
-     if (c) {
-@@ -1115,6 +1115,23 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     return r;
- }
- 
-+void kvm_arch_destroy_vcpu(CPUState *cs)
-+{
-+    X86CPU *cpu = X86_CPU(cs);
-+    CPUX86State *env = &cpu->env;
-+
-+    if (has_xsave && env->kvm_xsave_buf) {
-+        qemu_vfree(env->kvm_xsave_buf);
-+        env->kvm_xsave_buf = NULL;
-+    }
-+    g_free(cpu->kvm_msr_buf);
-+    cpu->kvm_msr_buf = NULL;
-+    if (env->vmstate) {
-+        qemu_del_vm_change_state_handler(env->vmstate);
-+        env->vmstate = NULL;
-+    }
-+}
-+
- void kvm_arch_reset_vcpu(X86CPU *cpu)
- {
-     CPUX86State *env = &cpu->env;
--- 
-1.8.3.1
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsZ8iUACgkQbDjKyiDZ
+s5LFXg//WYWG0OLEZ2Rtq/UWcXwi0X83jXTGjteW1tf3UwqiWIzD9heleVKVwMSz
++maAuH0O1jjsVOTZqzuG9mlAurkAG44FWswTpW8euf1sr0Qo6DeyaC3RDgGo3yLZ
+IXmvxrv7KrE1nazZsFLEI2UHuFGLV+CpWEN0353Ce6CojAZI/ljAO2MD5VlPkqX1
+Buhdn9qQINMva0aE4CmCVTP+Ki9nqYhUtyysjVrygPct4hCUbdYavBzFHZiZ21Ti
+IVmJY4lNX3vej1YNPqfT/5f93MdnBo6OBcuPSgbZYAwd7tJVf7GQORYkebPV4wtL
+BcZmMdNdlIgkh5Z3wwMfBYsycM5hhZuKSHAuAGs/AIvTmpzvYrFa//mvU/hAhsTV
++usu+5YwoWrKYdHrayJAU75CsYHzkGJiUPXoPQ6e6lIrJg5N63ydALSfZN1IeaYn
+WiCUlclppIJ3yhKZ8gKlBL10Wtffn9CjfvNn4/j97ly6MVSN3+2HzE4Y8hsE2jsN
+UCznR8tpsrLGsNyCbhd1tYatIKq1yeWkBPMnr459pS3AtK7efqlgFak2PPcYnhdZ
+2Ygs1iKY51dKoAio/Ds+shWePCaI2/qDy3yMPGwoYDFjKZANEFV3P0ylBCj5GAfB
+wiKUzAjJ3fpgktnK7nGVxQz+8m6/GlA7rnfAmH8iVBXaF3tOgSs=
+=CQXT
+-----END PGP SIGNATURE-----
+
+--MZf7D3rAEoQgPanC--
