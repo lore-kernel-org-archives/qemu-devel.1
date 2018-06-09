@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRfqs-0002pi-SF
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 11:32:28 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fRfqq-0002oR-Va
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 11:32:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fRfqo-0002YE-5n
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 11:32:26 -0400
-Received: from relay.sw.ru ([195.214.232.25]:52444)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fRfqo-0002Y1-0G
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 11:32:24 -0400
+Received: from relay.sw.ru ([195.214.232.25]:52434)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1fRfqn-0002Wv-RJ
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 11:32:22 -0400
+	id 1fRfqn-0002WX-Gj
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 11:32:21 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Sat,  9 Jun 2018 18:32:17 +0300
-Message-Id: <20180609153217.19683-12-vsementsov@virtuozzo.com>
+Date: Sat,  9 Jun 2018 18:32:14 +0300
+Message-Id: <20180609153217.19683-9-vsementsov@virtuozzo.com>
 In-Reply-To: <20180609153217.19683-1-vsementsov@virtuozzo.com>
 References: <20180609153217.19683-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 11/11] iotests: test nbd reconnect
+Subject: [Qemu-devel] [PATCH v3 08/11] block/nbd-client: move connecting to
+ connection_co
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,129 +28,149 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Add test, which starts backup to nbd target and restarts nbd server
-during backup.
+As a first step to nbd reconnect, move connection to connection_co
+coroutine.
+
+The key point in this patch is nbd_client_attach_aio_context() change:
+We schedule to connection_co only if it is waiting for read from the
+channel. We should not schedule it if it is some other yield, and if
+it is currently executing (we call nbd_client_attach_aio_context from
+connection code).
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/220        | 68 +++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/220.out    |  7 +++++
- tests/qemu-iotests/group      |  1 +
- tests/qemu-iotests/iotests.py |  4 +++
- 4 files changed, 80 insertions(+)
- create mode 100755 tests/qemu-iotests/220
- create mode 100644 tests/qemu-iotests/220.out
+ block/nbd-client.h |  3 +++
+ block/nbd-client.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 57 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/220 b/tests/qemu-iotests/220
-new file mode 100755
-index 0000000000..f1c26a2796
---- /dev/null
-+++ b/tests/qemu-iotests/220
-@@ -0,0 +1,68 @@
-+#!/usr/bin/env python
-+#
-+# Test nbd reconnect
-+#
-+# Copyright (c) 2018 Virtuozzo International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import time
-+
-+import iotests
-+from iotests import qemu_img_create, file_path, qemu_nbd_popen
-+
-+disk_a, disk_b, nbd_sock = file_path('disk_a', 'disk_b', 'nbd-sock')
-+nbd_uri = 'nbd+unix:///exp?socket=' + nbd_sock
-+
-+qemu_img_create('-f', iotests.imgfmt, disk_a, '5M')
-+qemu_img_create('-f', iotests.imgfmt, disk_b, '5M')
-+srv = qemu_nbd_popen('-k', nbd_sock, '-x', 'exp', '-f', iotests.imgfmt, disk_b)
-+time.sleep(1)
-+
-+vm = iotests.VM().add_drive(disk_a)
-+vm.launch()
-+vm.hmp_qemu_io('drive0', 'write 0 5M')
-+
-+print 'blockdev-add:', vm.qmp('blockdev-add', node_name='backup0', driver='raw',
-+                              file={'driver':'nbd',
-+                                    'reconnect-attempts':10,
-+                                    'export': 'exp',
-+                                    'server': {'type': 'unix',
-+                                               'path': nbd_sock}})
-+print 'blockdev-backup:', vm.qmp('blockdev-backup', device='drive0',
-+                                 sync='full', target='backup0')
-+
-+time.sleep(1)
-+print 'Kill NBD server'
-+srv.kill()
-+
-+jobs = vm.qmp('query-block-jobs')['return']
-+if jobs and jobs[0]['offset'] < jobs[0]['len']:
-+    print 'Backup job is still in progress'
-+
-+time.sleep(1)
-+
-+print 'Start NBD server'
-+srv = qemu_nbd_popen('-k', nbd_sock, '-x', 'exp', '-f', iotests.imgfmt, disk_b)
-+
-+try:
-+    e = vm.event_wait('BLOCK_JOB_COMPLETED')
-+    print e['event'], ':', e['data']
-+except:
-+    pass
-+
-+print 'blockdev-del:', vm.qmp('blockdev-del', node_name='backup0')
-+srv.kill()
-+vm.shutdown()
-diff --git a/tests/qemu-iotests/220.out b/tests/qemu-iotests/220.out
-new file mode 100644
-index 0000000000..dae1a49d9f
---- /dev/null
-+++ b/tests/qemu-iotests/220.out
-@@ -0,0 +1,7 @@
-+blockdev-add: {u'return': {}}
-+blockdev-backup: {u'return': {}}
-+Kill NBD server
-+Backup job is still in progress
-+Start NBD server
-+BLOCK_JOB_COMPLETED : {u'device': u'drive0', u'type': u'backup', u'speed': 0, u'len': 5242880, u'offset': 5242880}
-+blockdev-del: {u'return': {}}
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 93f93d71ba..cc5a1cf2a4 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -217,3 +217,4 @@
- 216 rw auto quick
- 218 rw auto quick
- 219 rw auto
-+220 rw auto quick
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index fdbdd8b300..7071318c9e 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -175,6 +175,10 @@ def qemu_nbd(*args):
-     '''Run qemu-nbd in daemon mode and return the parent's exit code'''
-     return subprocess.call(qemu_nbd_args + ['--fork'] + list(args))
+diff --git a/block/nbd-client.h b/block/nbd-client.h
+index 7cb31e72e6..f6c8052573 100644
+--- a/block/nbd-client.h
++++ b/block/nbd-client.h
+@@ -41,6 +41,9 @@ typedef struct NBDClientSession {
+     Coroutine *connection_co;
+     int in_flight;
+     NBDClientState state;
++    bool receiving;
++    int connect_status;
++    Error *connect_err;
  
-+def qemu_nbd_popen(*args):
-+    '''Run qemu-nbd in daemon mode and return the parent's exit code'''
-+    return subprocess.Popen(qemu_nbd_args + ['--persistent'] + list(args))
+     NBDClientRequest requests[MAX_NBD_REQUESTS];
+     NBDReply reply;
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 32c6f531de..44ac4ebc31 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -34,6 +34,13 @@
+ #define HANDLE_TO_INDEX(bs, handle) ((handle) ^ (uint64_t)(intptr_t)(bs))
+ #define INDEX_TO_HANDLE(bs, index)  ((index)  ^ (uint64_t)(intptr_t)(bs))
+ 
++static int nbd_client_connect(BlockDriverState *bs,
++                              SocketAddress *saddr,
++                              const char *export,
++                              QCryptoTLSCreds *tlscreds,
++                              const char *hostname,
++                              Error **errp);
 +
- def compare_images(img1, img2, fmt1=imgfmt, fmt2=imgfmt):
-     '''Return True if two image files are identical'''
-     return qemu_img('compare', '-f', fmt1,
+ /* @ret would be used for reconnect in future */
+ static void nbd_channel_error(NBDClientSession *s, int ret)
+ {
+@@ -63,6 +70,7 @@ static void nbd_teardown_connection(BlockDriverState *bs)
+     qio_channel_shutdown(client->ioc,
+                          QIO_CHANNEL_SHUTDOWN_BOTH,
+                          NULL);
++    client->state = NBD_CLIENT_QUIT;
+     BDRV_POLL_WHILE(bs, client->connection_co);
+ 
+     nbd_client_detach_aio_context(bs);
+@@ -72,16 +80,38 @@ static void nbd_teardown_connection(BlockDriverState *bs)
+     client->ioc = NULL;
+ }
+ 
++typedef struct NBDConnection {
++    BlockDriverState *bs;
++    SocketAddress *saddr;
++    const char *export;
++    QCryptoTLSCreds *tlscreds;
++    const char *hostname;
++} NBDConnection;
++
+ static coroutine_fn void nbd_connection_entry(void *opaque)
+ {
+-    NBDClientSession *s = opaque;
++    NBDConnection *con = opaque;
++    NBDClientSession *s = nbd_get_client_session(con->bs);
+     uint64_t i;
+     int ret = 0;
+     Error *local_err = NULL;
+ 
++    s->connect_status = nbd_client_connect(con->bs, con->saddr,
++                                           con->export, con->tlscreds,
++                                           con->hostname, &s->connect_err);
++    if (s->connect_status < 0) {
++        nbd_channel_error(s, s->connect_status);
++        return;
++    }
++
++    /* successfully connected */
++    s->state = NBD_CLIENT_CONNECTED;
++
+     while (s->state != NBD_CLIENT_QUIT) {
+         assert(s->reply.handle == 0);
++        s->receiving = true;
+         ret = nbd_receive_reply(s->ioc, &s->reply, &local_err);
++        s->receiving = false;
+         if (local_err) {
+             error_report_err(local_err);
+         }
+@@ -966,7 +996,9 @@ void nbd_client_attach_aio_context(BlockDriverState *bs,
+ {
+     NBDClientSession *client = nbd_get_client_session(bs);
+     qio_channel_attach_aio_context(QIO_CHANNEL(client->ioc), new_context);
+-    aio_co_schedule(new_context, client->connection_co);
++    if (client->receiving) {
++        aio_co_schedule(new_context, client->connection_co);
++    }
+ }
+ 
+ void nbd_client_close(BlockDriverState *bs)
+@@ -1063,7 +1095,6 @@ static int nbd_client_connect(BlockDriverState *bs,
+     /* Now that we're connected, set the socket to be non-blocking and
+      * kick the reply mechanism.  */
+     qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
+-    client->connection_co = qemu_coroutine_create(nbd_connection_entry, client);
+     nbd_client_attach_aio_context(bs, bdrv_get_aio_context(bs));
+ 
+     logout("Established connection with NBD server\n");
+@@ -1078,9 +1109,28 @@ int nbd_client_init(BlockDriverState *bs,
+                     Error **errp)
+ {
+     NBDClientSession *client = nbd_get_client_session(bs);
++    NBDConnection *con = g_new(NBDConnection, 1);
++
++    con->bs = bs;
++    con->saddr = saddr;
++    con->export = export;
++    con->tlscreds = tlscreds;
++    con->hostname = hostname;
+ 
+     qemu_co_mutex_init(&client->send_mutex);
+     qemu_co_queue_init(&client->free_sema);
++    client->state = NBD_CLIENT_CONNECTING_INIT;
+ 
+-    return nbd_client_connect(bs, saddr, export, tlscreds, hostname, errp);
++    client->connection_co = qemu_coroutine_create(nbd_connection_entry, con);
++    aio_co_schedule(bdrv_get_aio_context(bs), client->connection_co);
++    BDRV_POLL_WHILE(bs, client->state == NBD_CLIENT_CONNECTING_INIT);
++
++    if (client->state != NBD_CLIENT_CONNECTED) {
++        assert(client->connect_status < 0 && client->connect_err);
++        error_propagate(errp, client->connect_err);
++        client->connect_err = NULL;
++        return client->connect_status;
++    }
++
++    return 0;
+ }
 -- 
 2.11.1
