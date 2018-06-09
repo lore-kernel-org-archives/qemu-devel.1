@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59957)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fReoE-0000lP-JG
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 10:25:39 -0400
+	id 1fRezY-0002y5-56
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 10:37:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fReoD-0005DL-9M
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 10:25:38 -0400
+	id 1fRezX-00026c-2D
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 10:37:20 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180608200558.386-1-laurent@vivier.eu>
+References: <1528554193-27270-1-git-send-email-eric.auger@redhat.com>
+	<1528554193-27270-3-git-send-email-eric.auger@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7b30f13d-cd17-7375-47b4-317ed350a052@amsat.org>
-Date: Sat, 9 Jun 2018 11:25:25 -0300
+Message-ID: <0bdf92a5-7500-028c-5043-3d082b7051e8@amsat.org>
+Date: Sat, 9 Jun 2018 11:37:09 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180608200558.386-1-laurent@vivier.eu>
+In-Reply-To: <1528554193-27270-3-git-send-email-eric.auger@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC 00/13] hw/m68k: add Apple Machintosh Quadra
- 800 machine
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/2] hw/arm/virt: Silence dtc
+ /memory warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,118 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
 
-Hi Laurent,
+Hi Eric,
 
-On 06/08/2018 05:05 PM, Laurent Vivier wrote:
-> if you want to test the machine, I'm sorry, it doesn't boot
-> a MacROM, but you can boot a linux kernel from the command line.
+On 06/09/2018 11:23 AM, Eric Auger wrote:
+> When running dtc on the guest /proc/device-tree we get the
+> following warning: Warning (unit_address_vs_reg): Node /memory
+> has a reg or ranges property, but no unit name".
 > 
-> You can install your own disk using debian-installer, with:
+> Let's fix that by adding the unit address to the node name. We also
+> don't create the /memory node anymore in create_fdt(). We directly
+> create it in load_dtb. /chosen still needs to be created in create_fdt
+> as the uart needs it. In case the user provided his own dtb, either
+> the bank is added to the existing /memory node or if this latter is
+> not found we create a new separate memory node.
 > 
->     ...
->     -M q800 \
->     -serial none -serial mon:stdio \
->     -m 1000M -drive file=m68k.qcow2,format=qcow2 \
->     -net nic,model=dp83932,addr=09:00:07:12:34:57 \
->     -append "console=ttyS0 vga=off" \
->     -kernel vmlinux-4.15.0-2-m68k \
->     -initrd initrd.gz \
->     -drive file=debian-9.0-m68k-NETINST-1.iso \
->     -drive file=m68k.qcow2,format=qcow2 \
->     -nographic
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  hw/arm/boot.c | 20 ++++++++++++++------
+>  hw/arm/virt.c |  6 ------
+>  2 files changed, 14 insertions(+), 12 deletions(-)
 > 
-> If you use a graphic adapter instead of "-nographic", you can use "-g" to set the
-> size of the display (I use "-g 1600x800x24").
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index 1e2be20..2054670 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
+> @@ -593,24 +593,32 @@ static int load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>              g_free(nodename);
+>          }
+>      } else {
+> +        char *nodename = g_strdup("/memory");
+>          Error *err = NULL;
+>  
+> -        rc = fdt_path_offset(fdt, "/memory");
+> +        /* If there is an existing /memory node (user provided dtb), we add the
+> +         * new bank into it, otherwise we create a /memory@addr node
+> +         */
+> +        rc = fdt_path_offset(fdt, nodename);
+>          if (rc < 0) {
+> -            qemu_fdt_add_subnode(fdt, "/memory");
+> +            g_free(nodename);
+> +            nodename = g_strdup_printf("/memory@%" PRIx64, binfo->loader_start);
+> +
+> +            qemu_fdt_add_subnode(fdt, nodename);
+>          }
+>  
+> -        if (!qemu_fdt_getprop(fdt, "/memory", "device_type", NULL, &err)) {
+> -            qemu_fdt_setprop_string(fdt, "/memory", "device_type", "memory");
+> +        if (!qemu_fdt_getprop(fdt, nodename, "device_type", NULL, &err)) {
+> +            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+>          }
+>  
+> -        rc = qemu_fdt_setprop_sized_cells(fdt, "/memory", "reg",
+> +        rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+>                                            acells, binfo->loader_start,
+>                                            scells, binfo->ram_size);
+>          if (rc < 0) {
+> -            fprintf(stderr, "couldn't set /memory/reg\n");
+> +            fprintf(stderr, "couldn't set %s reg\n", nodename);
+>              goto fail;
+>          }
+> +        g_free(nodename);
+>      }
+
+This part looks good.
+
+>  
+>      rc = fdt_path_offset(fdt, "/chosen");
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index b1e9a6b..46c5c3f 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -203,13 +203,7 @@ static void create_fdt(VirtMachineState *vms)
+>      qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
+>      qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
+>  
+> -    /*
+> -     * /chosen and /memory nodes must exist for load_dtb
+> -     * to fill in necessary properties later
+> -     */
+>      qemu_fdt_add_subnode(fdt, "/chosen");
+
+Here I think you should keep the comment, but update it (info from your
+commit message).
+
+> -    qemu_fdt_add_subnode(fdt, "/memory");
+> -    qemu_fdt_setprop_string(fdt, "/memory", "device_type", "memory");
+>  
+>      /* Clock node, for the benefit of the UART. The kernel device tree
+>       * binding documentation claims the PL011 node clock properties are
 > 
-> You can get the ISO from:
-> 
-> https://cdimage.debian.org/mirror/cdimage/ports/9.0/m68k/iso-cd/debian-9.0-m68k-NETINST-1.iso
-> 
-> and extract the kernel and initrd.gz:
-> 
-> guestfish --add debian-9.0-m68k-NETINST-1.iso --ro \
->           --mount /dev/sda:/ <<_EOF_
-> copy-out /install/cdrom/initrd.gz .
-> copy-out /install/kernels/vmlinux-4.15.0-2-m68k .
-> _EOF_
-
-Running with -d in_asm,int I get:
-
-----------------
-IN: nf_get_id
-0x0000d432:  movel %a3,%d0
-0x0000d434:  addil #0,%d0
-0x0000d43a:  movel %d0,%sp@-
-0x0000d43c:  jsr 0xd404
-
-----------------
-IN:
-0x0000d404:  071400
-
-INT      1: Unassigned(0xf4) pc=0000d404 sp=00393e60 sr=2700
-INT      2: Access Fault(0x8) pc=00000000 sp=00393e58 sr=2700
-            ssw:  00000506 ea:   00000000 sfc:  5    dfc: 5
-
-----------------
-IN:
-0x0000280c:  clrl %sp@-
-0x0000280e:  pea 0xffffffffffffffff
-0x00002812:  movel %d0,%sp@-
-0x00002814:  moveml %d1-%d5/%a0-%a2,%sp@-
-0x00002818:  movel %sp,%d0
-0x0000281a:  andil #-8192,%d0
-0x00002820:  moveal %d0,%a2
-0x00002822:  moveal %a2@,%a2
-0x00002824:  movel %sp,%sp@-
-0x00002826:  bsrl 0x557c
-
-----------------
-IN: buserr_c
-0x0000557c:  subql #4,%sp
-0x0000557e:  moveml %d2-%d7/%a3-%fp,%sp@-
-0x00005582:  moveal %sp@(48),%a3
-0x00005586:  btst #5,%a3@(44)
-0x0000558c:  bnes 0x5592
-
-...
-
-----------------
-IN: panic
-0x0002c956:  moveal 0x39503c,%a0
-0x0002c95c:  moveq #101,%d1
-0x0002c95e:  subql #1,%d1
-0x0002c960:  bnes 0x2c9c6
-
-objdump -S gives:
-
-0000d404 <nf_get_id_phys>:
-    d404:       7300            mvsb %d0,%d1
-    d406:       4e75            rts
-
-Instruction which exists in the disas code, but doesn't seem
-tcg-implemented:
-
-disas/m68k.c:3654:{"mvsb", 2,   one(0070400),   one(0170700), "*bDd",
-mcfisa_b },
-
-> 
-> The mirror to use is: http://ftp.ports.debian.org/debian-ports/
-> when it fails, continue without boot loader.
-> 
-> In the same way, you can extract the kernel and the initramfs from the qcow2
-> image to use it with "-kernel" and "-initrd":
-> 
-> guestfish --add m68k.qcow2 --mount /dev/sda2:/ <<_EOF_
-> copy-out /boot/vmlinux-4.15.0-2-m68k .
-> copy-out /boot/initrd.img-4.15.0-2-m68k .
-> _EOF_
-> 
-> and boot with:
-> 
->    ...
->    -append "root=/dev/sda2 rw console=ttyS0 console=tty \
->    -kernel vmlinux-4.15.0-2-m68k \
->    -initrd initrd.img-4.15.0-2-m68k
