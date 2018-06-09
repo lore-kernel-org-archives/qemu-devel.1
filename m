@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45056)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fRZLE-0002PC-7Q
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 04:35:21 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1fRZXZ-0004Ya-SN
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 04:48:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fRZLD-0000EC-4u
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 04:35:20 -0400
+	(envelope-from <hpoussin@reactos.org>) id 1fRZXY-0003q8-Tv
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 04:48:05 -0400
 References: <20180608200558.386-1-laurent@vivier.eu>
-	<c7bcc8cd-458f-6501-df30-a9ea0a0299bb@amsat.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <34070e9a-96b7-1c08-7232-b71368df3966@vivier.eu>
-Date: Sat, 9 Jun 2018 10:34:44 +0200
+	<20180608200558.386-11-laurent@vivier.eu>
+From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Message-ID: <3d55a7ff-93b1-06d6-252a-0df31aa8d084@reactos.org>
+Date: Sat, 9 Jun 2018 10:47:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <c7bcc8cd-458f-6501-df30-a9ea0a0299bb@amsat.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180608200558.386-11-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC 00/13] hw/m68k: add Apple Machintosh Quadra
- 800 machine
+Subject: Re: [Qemu-devel] [RFC 10/13] dp8393x: fix dp8393x_receive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,44 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "open list:Block layer core" <qemu-block@nongnu.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, qemu-block@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
-Le 09/06/2018 à 05:26, Philippe Mathieu-Daudé a écrit :
-> On 06/08/2018 05:05 PM, Laurent Vivier wrote:
->> I'm rebasing some of these patches for seven years now,
->> too many years...
->>
->> It's an RFC because things have changed in QEMU in seven years,
->> for instance the VIA has a new implementation (mos6522) introduced
->> by Mark Cave-Ayland and I didn't rework my implementation to
->> fit into this new one (any volunteers?), display has some glitches,
->> ADB devices are not identified correctly.
->>
->> if you want to test the machine, I'm sorry, it doesn't boot
->> a MacROM, but you can boot a linux kernel from the command line.
->>
->> You can install your own disk using debian-installer, with:
->>
->>     ...
->>     -M q800 \
->>     -serial none -serial mon:stdio \
->>     -m 1000M -drive file=m68k.qcow2,format=qcow2 \
->>     -net nic,model=dp83932,addr=09:00:07:12:34:57 \
->>     -append "console=ttyS0 vga=off" \
->>     -kernel vmlinux-4.15.0-2-m68k \
->>     -initrd initrd.gz \
->>     -drive file=debian-9.0-m68k-NETINST-1.iso \
->>     -drive file=m68k.qcow2,format=qcow2 \
->>     -nographic
+Le 08/06/2018 à 22:05, Laurent Vivier a écrit :
+> address_space_rw() access size must be multiplied by width.
+> dp8393x_receive() must return the number of bytes read, not the length
+> of the last memory access.
 > 
-> qemu-system-m68k: -drive file=m68k.qcow2,format=qcow2: Failed to get
-> "write" lock
-> Is another process using the image?
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>   hw/net/dp8393x.c | 8 +++++---
+>   1 file changed, 5 insertions(+), 3 deletions(-)
 > 
-> (two times same file provided in cmdline arguments)
+> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+> index f2d2ce344c..ef5f1eb94f 100644
+> --- a/hw/net/dp8393x.c
+> +++ b/hw/net/dp8393x.c
+> @@ -808,9 +808,11 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+>           /* EOL detected */
+>           s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
+>       } else {
+> +        size = sizeof(uint16_t) * width;
+>           data[0 * width] = 0; /* in_use */
+> -        address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 6 * width,
+> -            MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1);
+> +        address_space_rw(&s->as,
+> +            dp8393x_crda(s) + sizeof(uint16_t) * 6 * width,
+> +            MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
+>           s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
+>           s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
+>           s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) | (((s->regs[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
+> @@ -824,7 +826,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+>       /* Done */
+>       dp8393x_update_irq(s);
+>   
+> -    return size;
+> +    return rx_len;
+>   }
+>   
+>   static void dp8393x_reset(DeviceState *dev)
+> 
 
-Yes, you're right. A bad cut'n'paste.
+NACK. This breaks NetBSD 5.1/arc networking.
 
-Thanks,
-Laurent
+This seems to revert the following commit and change the function return value.
+
+commit 409b52bfe199d8106dadf7c5ff3d88d2228e89b5
+Author: Hervé Poussineau <hpoussin@reactos.org>
+Date:   Wed Jun 3 22:45:48 2015 +0200
+
+     net/dp8393x: correctly reset in_use field
+
+     Don't write more than the field width, which is always 16 bit.
+     Fixes network in NetBSD 5.1/arc
+
+     Signed-off-by: Hervé Poussineau <hpoussin@reactos.org>
+     Reviewed-by: Aurelien Jarno <aurelien@aurel32.net>
+     Signed-off-by: Leon Alrae <leon.alrae@imgtec.com>
+
+diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+index 4184045145..ff633f76a0 100644
+--- a/hw/net/dp8393x.c
++++ b/hw/net/dp8393x.c
+@@ -764,7 +764,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+          data[0 * width] = 0; /* in_use */
+          address_space_rw(&s->as,
+              ((s->regs[SONIC_URDA] << 16) | s->regs[SONIC_CRDA]) + sizeof(uint16_t) * 6 * width,
+-            MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
++            MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1);
+          s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
+          s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
+          s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) | (((s->regs[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
