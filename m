@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fRem7-0007eM-I0
+	(envelope-from <eric.auger@redhat.com>) id 1fRem7-0007eL-Ac
 	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 10:23:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fRem6-0004OD-CC
+	(envelope-from <eric.auger@redhat.com>) id 1fRem6-0004O2-6u
 	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 10:23:27 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Sat,  9 Jun 2018 16:23:12 +0200
-Message-Id: <1528554193-27270-2-git-send-email-eric.auger@redhat.com>
+Date: Sat,  9 Jun 2018 16:23:13 +0200
+Message-Id: <1528554193-27270-3-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1528554193-27270-1-git-send-email-eric.auger@redhat.com>
 References: <1528554193-27270-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] hw/arm/virt: Silence dtc /intc warnings
+Subject: [Qemu-devel] [PATCH 2/2] hw/arm/virt: Silence dtc /memory warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,128 +22,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
 
 When running dtc on the guest /proc/device-tree we get the
-following warnings: "Warning (unit_address_vs_reg): Node <name>
-has a reg or ranges property, but no unit name", with name:
-/intc, /intc/its, /intc/v2m.
+following warning: Warning (unit_address_vs_reg): Node /memory
+has a reg or ranges property, but no unit name".
 
-Nodes should have a name in the form <name>[@<unit-address>] where
-unit-address is the primary address used to access the device, listed
-in the node's reg property. This fix seems to make dtc happy.
+Let's fix that by adding the unit address to the node name. We also
+don't create the /memory node anymore in create_fdt(). We directly
+create it in load_dtb. /chosen still needs to be created in create_fdt
+as the uart needs it. In case the user provided his own dtb, either
+the bank is added to the existing /memory node or if this latter is
+not found we create a new separate memory node.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
----
- hw/arm/virt.c | 59 +++++++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 37 insertions(+), 22 deletions(-)
+ hw/arm/boot.c | 20 ++++++++++++++------
+ hw/arm/virt.c |  6 ------
+ 2 files changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 11b9f59..b1e9a6b 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -368,66 +368,81 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
- 
- static void fdt_add_its_gic_node(VirtMachineState *vms)
- {
-+    char *nodename;
-+
-     vms->msi_phandle = qemu_fdt_alloc_phandle(vms->fdt);
--    qemu_fdt_add_subnode(vms->fdt, "/intc/its");
--    qemu_fdt_setprop_string(vms->fdt, "/intc/its", "compatible",
-+    nodename = g_strdup_printf("/intc/its@%" PRIx64,
-+                               vms->memmap[VIRT_GIC_ITS].base);
-+    qemu_fdt_add_subnode(vms->fdt, nodename);
-+    qemu_fdt_setprop_string(vms->fdt, nodename, "compatible",
-                             "arm,gic-v3-its");
--    qemu_fdt_setprop(vms->fdt, "/intc/its", "msi-controller", NULL, 0);
--    qemu_fdt_setprop_sized_cells(vms->fdt, "/intc/its", "reg",
-+    qemu_fdt_setprop(vms->fdt, nodename, "msi-controller", NULL, 0);
-+    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-                                  2, vms->memmap[VIRT_GIC_ITS].base,
-                                  2, vms->memmap[VIRT_GIC_ITS].size);
--    qemu_fdt_setprop_cell(vms->fdt, "/intc/its", "phandle", vms->msi_phandle);
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "phandle", vms->msi_phandle);
-+    g_free(nodename);
- }
- 
- static void fdt_add_v2m_gic_node(VirtMachineState *vms)
- {
-+    char *nodename;
-+
-+    nodename = g_strdup_printf("/intc/v2m@%" PRIx64,
-+                               vms->memmap[VIRT_GIC_V2M].base);
-     vms->msi_phandle = qemu_fdt_alloc_phandle(vms->fdt);
--    qemu_fdt_add_subnode(vms->fdt, "/intc/v2m");
--    qemu_fdt_setprop_string(vms->fdt, "/intc/v2m", "compatible",
-+    qemu_fdt_add_subnode(vms->fdt, nodename);
-+    qemu_fdt_setprop_string(vms->fdt, nodename, "compatible",
-                             "arm,gic-v2m-frame");
--    qemu_fdt_setprop(vms->fdt, "/intc/v2m", "msi-controller", NULL, 0);
--    qemu_fdt_setprop_sized_cells(vms->fdt, "/intc/v2m", "reg",
-+    qemu_fdt_setprop(vms->fdt, nodename, "msi-controller", NULL, 0);
-+    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-                                  2, vms->memmap[VIRT_GIC_V2M].base,
-                                  2, vms->memmap[VIRT_GIC_V2M].size);
--    qemu_fdt_setprop_cell(vms->fdt, "/intc/v2m", "phandle", vms->msi_phandle);
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "phandle", vms->msi_phandle);
-+    g_free(nodename);
- }
- 
- static void fdt_add_gic_node(VirtMachineState *vms)
- {
-+    char *nodename;
-+
-     vms->gic_phandle = qemu_fdt_alloc_phandle(vms->fdt);
-     qemu_fdt_setprop_cell(vms->fdt, "/", "interrupt-parent", vms->gic_phandle);
- 
--    qemu_fdt_add_subnode(vms->fdt, "/intc");
--    qemu_fdt_setprop_cell(vms->fdt, "/intc", "#interrupt-cells", 3);
--    qemu_fdt_setprop(vms->fdt, "/intc", "interrupt-controller", NULL, 0);
--    qemu_fdt_setprop_cell(vms->fdt, "/intc", "#address-cells", 0x2);
--    qemu_fdt_setprop_cell(vms->fdt, "/intc", "#size-cells", 0x2);
--    qemu_fdt_setprop(vms->fdt, "/intc", "ranges", NULL, 0);
-+    nodename = g_strdup_printf("/intc@%" PRIx64,
-+                               vms->memmap[VIRT_GIC_DIST].base);
-+    qemu_fdt_add_subnode(vms->fdt, nodename);
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "#interrupt-cells", 3);
-+    qemu_fdt_setprop(vms->fdt, nodename, "interrupt-controller", NULL, 0);
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "#address-cells", 0x2);
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "#size-cells", 0x2);
-+    qemu_fdt_setprop(vms->fdt, nodename, "ranges", NULL, 0);
-     if (vms->gic_version == 3) {
--        qemu_fdt_setprop_string(vms->fdt, "/intc", "compatible",
-+        qemu_fdt_setprop_string(vms->fdt, nodename, "compatible",
-                                 "arm,gic-v3");
--        qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
-+        qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-                                      2, vms->memmap[VIRT_GIC_DIST].base,
-                                      2, vms->memmap[VIRT_GIC_DIST].size,
-                                      2, vms->memmap[VIRT_GIC_REDIST].base,
-                                      2, vms->memmap[VIRT_GIC_REDIST].size);
-         if (vms->virt) {
--            qemu_fdt_setprop_cells(vms->fdt, "/intc", "interrupts",
-+            qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
-                                    GIC_FDT_IRQ_TYPE_PPI, ARCH_GICV3_MAINT_IRQ,
-                                    GIC_FDT_IRQ_FLAGS_LEVEL_HI);
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 1e2be20..2054670 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -593,24 +593,32 @@ static int load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+             g_free(nodename);
          }
      } else {
-         /* 'cortex-a15-gic' means 'GIC v2' */
--        qemu_fdt_setprop_string(vms->fdt, "/intc", "compatible",
-+        qemu_fdt_setprop_string(vms->fdt, nodename, "compatible",
-                                 "arm,cortex-a15-gic");
--        qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
-+        qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-                                       2, vms->memmap[VIRT_GIC_DIST].base,
-                                       2, vms->memmap[VIRT_GIC_DIST].size,
-                                       2, vms->memmap[VIRT_GIC_CPU].base,
-                                       2, vms->memmap[VIRT_GIC_CPU].size);
++        char *nodename = g_strdup("/memory");
+         Error *err = NULL;
+ 
+-        rc = fdt_path_offset(fdt, "/memory");
++        /* If there is an existing /memory node (user provided dtb), we add the
++         * new bank into it, otherwise we create a /memory@addr node
++         */
++        rc = fdt_path_offset(fdt, nodename);
+         if (rc < 0) {
+-            qemu_fdt_add_subnode(fdt, "/memory");
++            g_free(nodename);
++            nodename = g_strdup_printf("/memory@%" PRIx64, binfo->loader_start);
++
++            qemu_fdt_add_subnode(fdt, nodename);
+         }
+ 
+-        if (!qemu_fdt_getprop(fdt, "/memory", "device_type", NULL, &err)) {
+-            qemu_fdt_setprop_string(fdt, "/memory", "device_type", "memory");
++        if (!qemu_fdt_getprop(fdt, nodename, "device_type", NULL, &err)) {
++            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+         }
+ 
+-        rc = qemu_fdt_setprop_sized_cells(fdt, "/memory", "reg",
++        rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+                                           acells, binfo->loader_start,
+                                           scells, binfo->ram_size);
+         if (rc < 0) {
+-            fprintf(stderr, "couldn't set /memory/reg\n");
++            fprintf(stderr, "couldn't set %s reg\n", nodename);
+             goto fail;
+         }
++        g_free(nodename);
      }
  
--    qemu_fdt_setprop_cell(vms->fdt, "/intc", "phandle", vms->gic_phandle);
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "phandle", vms->gic_phandle);
-+    g_free(nodename);
- }
+     rc = fdt_path_offset(fdt, "/chosen");
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index b1e9a6b..46c5c3f 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -203,13 +203,7 @@ static void create_fdt(VirtMachineState *vms)
+     qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
+     qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
  
- static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+-    /*
+-     * /chosen and /memory nodes must exist for load_dtb
+-     * to fill in necessary properties later
+-     */
+     qemu_fdt_add_subnode(fdt, "/chosen");
+-    qemu_fdt_add_subnode(fdt, "/memory");
+-    qemu_fdt_setprop_string(fdt, "/memory", "device_type", "memory");
+ 
+     /* Clock node, for the benefit of the UART. The kernel device tree
+      * binding documentation claims the PL011 node clock properties are
 -- 
 2.5.5
