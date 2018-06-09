@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58253)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fRiNW-00022e-Rx
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 14:14:20 -0400
+	(envelope-from <th.huth@gmail.com>) id 1fRiYJ-0004rJ-P6
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 14:25:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fRiNS-0004WJ-Sb
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 14:14:18 -0400
+	(envelope-from <th.huth@gmail.com>) id 1fRiYI-00050k-PT
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 14:25:27 -0400
 References: <20180608200558.386-1-laurent@vivier.eu>
-	<7b30f13d-cd17-7375-47b4-317ed350a052@amsat.org>
+	<20180608200558.386-12-laurent@vivier.eu>
 From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <5f5dcc1a-3eb2-45ff-3e0d-6dd1694bc2e3@tuxfamily.org>
-Date: Sat, 9 Jun 2018 20:14:11 +0200
+Message-ID: <66dab148-ed2f-dbf8-3b6f-02938f9c5ae7@tuxfamily.org>
+Date: Sat, 9 Jun 2018 20:25:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <7b30f13d-cd17-7375-47b4-317ed350a052@amsat.org>
+In-Reply-To: <20180608200558.386-12-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC 00/13] hw/m68k: add Apple Machintosh Quadra
- 800 machine
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 11/13] dp8393x: manage big endian bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,118 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Laurent Vivier <laurent@vivier.eu>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Richard Henderson <rth@twiddle.net>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 09.06.2018 16:25, Philippe Mathieu-Daudé wrote:
-> Hi Laurent,
+On 08.06.2018 22:05, Laurent Vivier wrote:
+> This is needed by Quadra 800, this card can run on little-endian
+> or big-endian bus.
 > 
-> On 06/08/2018 05:05 PM, Laurent Vivier wrote:
->> if you want to test the machine, I'm sorry, it doesn't boot
->> a MacROM, but you can boot a linux kernel from the command line.
->>
->> You can install your own disk using debian-installer, with:
->>
->>     ...
->>     -M q800 \
->>     -serial none -serial mon:stdio \
->>     -m 1000M -drive file=m68k.qcow2,format=qcow2 \
->>     -net nic,model=dp83932,addr=09:00:07:12:34:57 \
->>     -append "console=ttyS0 vga=off" \
->>     -kernel vmlinux-4.15.0-2-m68k \
->>     -initrd initrd.gz \
->>     -drive file=debian-9.0-m68k-NETINST-1.iso \
->>     -drive file=m68k.qcow2,format=qcow2 \
->>     -nographic
->>
->> If you use a graphic adapter instead of "-nographic", you can use "-g" to set the
->> size of the display (I use "-g 1600x800x24").
->>
->> You can get the ISO from:
->>
->> https://cdimage.debian.org/mirror/cdimage/ports/9.0/m68k/iso-cd/debian-9.0-m68k-NETINST-1.iso
->>
->> and extract the kernel and initrd.gz:
->>
->> guestfish --add debian-9.0-m68k-NETINST-1.iso --ro \
->>           --mount /dev/sda:/ <<_EOF_
->> copy-out /install/cdrom/initrd.gz .
->> copy-out /install/kernels/vmlinux-4.15.0-2-m68k .
->> _EOF_
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  hw/net/dp8393x.c | 101 ++++++++++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 70 insertions(+), 31 deletions(-)
 > 
-> Running with -d in_asm,int I get:
-> 
-> ----------------
-> IN: nf_get_id
-> 0x0000d432:  movel %a3,%d0
-> 0x0000d434:  addil #0,%d0
-> 0x0000d43a:  movel %d0,%sp@-
-> 0x0000d43c:  jsr 0xd404
-> 
-> ----------------
-> IN:
-> 0x0000d404:  071400
-> 
-> INT      1: Unassigned(0xf4) pc=0000d404 sp=00393e60 sr=2700
-> INT      2: Access Fault(0x8) pc=00000000 sp=00393e58 sr=2700
->             ssw:  00000506 ea:   00000000 sfc:  5    dfc: 5
-> 
-> ----------------
-> IN:
-> 0x0000280c:  clrl %sp@-
-> 0x0000280e:  pea 0xffffffffffffffff
-> 0x00002812:  movel %d0,%sp@-
-> 0x00002814:  moveml %d1-%d5/%a0-%a2,%sp@-
-> 0x00002818:  movel %sp,%d0
-> 0x0000281a:  andil #-8192,%d0
-> 0x00002820:  moveal %d0,%a2
-> 0x00002822:  moveal %a2@,%a2
-> 0x00002824:  movel %sp,%sp@-
-> 0x00002826:  bsrl 0x557c
-> 
-> ----------------
-> IN: buserr_c
-> 0x0000557c:  subql #4,%sp
-> 0x0000557e:  moveml %d2-%d7/%a3-%fp,%sp@-
-> 0x00005582:  moveal %sp@(48),%a3
-> 0x00005586:  btst #5,%a3@(44)
-> 0x0000558c:  bnes 0x5592
-> 
-> ...
-> 
-> ----------------
-> IN: panic
-> 0x0002c956:  moveal 0x39503c,%a0
-> 0x0002c95c:  moveq #101,%d1
-> 0x0002c95e:  subql #1,%d1
-> 0x0002c960:  bnes 0x2c9c6
-> 
-> objdump -S gives:
-> 
-> 0000d404 <nf_get_id_phys>:
->     d404:       7300            mvsb %d0,%d1
->     d406:       4e75            rts
-> 
-> Instruction which exists in the disas code, but doesn't seem
-> tcg-implemented:
-> 
-> disas/m68k.c:3654:{"mvsb", 2,   one(0070400),   one(0170700), "*bDd",
-> mcfisa_b },
+> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+> index ef5f1eb94f..5061474e6b 100644
+> --- a/hw/net/dp8393x.c
+> +++ b/hw/net/dp8393x.c
+> @@ -150,6 +150,7 @@ typedef struct dp8393xState {
+>  
+>      /* Hardware */
+>      uint8_t it_shift;
+> +    bool big_endian;
+>      qemu_irq irq;
+>  #ifdef DEBUG_SONIC
+>      int irq_level;
+> @@ -174,6 +175,12 @@ typedef struct dp8393xState {
+>      AddressSpace as;
+>  } dp8393xState;
+>  
+> +#ifdef HOST_WORDS_BIGENDIAN
+> +static const bool host_big_endian = true;
+> +#else
+> +static const bool host_big_endian = false;
+> +#endif
+> +
+>  /* Accessor functions for values which are formed by
+>   * concatenating two 16 bit device registers. By putting these
+>   * in their own functions with a uint32_t return type we avoid the
+> @@ -220,6 +227,36 @@ static uint32_t dp8393x_wt(dp8393xState *s)
+>      return s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
+>  }
+>  
+> +static uint16_t dp8393x_get(dp8393xState *s, int width, uint16_t *base,
+> +                            int offset)
+> +{
+> +    uint16_t val;
+> +
+> +    if (s->big_endian) {
+> +        val = base[offset * width + width - 1];
+> +    } else {
+> +        val = base[offset * width];
+> +    }
+> +    if (s->big_endian != host_big_endian) {
+> +        val = bswap16(val);
+> +    }
+> +    return val;
+> +}
 
-0x7300 is the illegal opcode that is used by the Aranym emulator for its
-"Native Feature" (some kind of Hypercall) interface:
+Could you maybe write that like this instead:
 
-https://github.com/aranym/aranym/wiki/natfeats-proposal#special-opcodes
+{
+    uint16_t val;
 
-It's also a valid opcode in the ColdFire ISA (that's why the
-disassembler detects this as valid instruction), but the name of the
-function (nf_get_id_phys) clearly indicates that Linux is trying to use
-the Natfeats opcode here.
+    if (s->big_endian) {
+        val = base[offset * width + width - 1];
+        val = be16_to_cpu(val);
+    } else {
+        val = base[offset * width];
+        val = le16_to_cpu(val);
+    }
+    return val;
+}
 
-So it's normal that this opcode is not implemented in QEMU 680x0 mode.
-If Linux correctly catches the illegal opcode exception afterwards,
-everything is fine and you don't need to worry about this anymore.
-However, if Linux fails to catch it correctly, there is certainly
-something wrong here...
+?
+... then you don't need that ugly host_big_endian variable anymore.
 
  Thomas
