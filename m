@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRfWe-00014L-Ui
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 11:11:34 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fRfd0-0002y1-Hx
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 11:18:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fRfWb-0002EU-PP
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 11:11:32 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sat,  9 Jun 2018 12:10:48 -0300
-Message-Id: <20180609151048.9628-1-f4bug@amsat.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] Makefile: Check for more dangling scratch
- files in out-of-tree builds
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fRfcx-00052E-G5
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 11:18:06 -0400
+Received: from relay.sw.ru ([195.214.232.25]:51908)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1fRfcx-00050Y-5r
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 11:18:03 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Sat,  9 Jun 2018 18:17:58 +0300
+Message-Id: <20180609151758.17343-7-vsementsov@virtuozzo.com>
+In-Reply-To: <20180609151758.17343-1-vsementsov@virtuozzo.com>
+References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v5 6/6] docs/interop: add nbd.txt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,67 +24,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-It is easy to catch the generated 'config-host.mak' in the source
-tree, however qemu-version.h and qemu-options.def are also generated
-files and are hidden by .gitignore rules.
+Describe new metadata namespace: "qemu".
 
-Improve the out-of-tree safety net rule added in d1bd2423a90,
-by also checking for these two files.
-
-This solves building issues with out-of-tree builds from a
-source tree that has been built in:
-
-- /qemu-version.h existing in source tree:
-
-    /source/qemu/qemu-nbd.c: In function ‘version’:
-    /source/qemu/qemu-nbd.c:133:6: error: expected ‘)’ before
-    ‘QEMU_FULL_VERSION’
-     "%s " QEMU_FULL_VERSION "\n"
-          ^~~~~~~~~~~~~~~~~~
-          )
-    /source/qemu/qemu-nbd.c:133:3: error: format ‘%s’ expects a matching
-    ‘char *’ argument [-Werror=format=]
-     "%s " QEMU_FULL_VERSION "\n"
-      ~^
-    cc1: all warnings being treated as errors
-
-- /qemu-options.def existing in source tree:
-
-    /source/qemu/vl.c: In function ‘main’:
-    /source/qemu/vl.c:3052:18: error: ‘QEMU_OPTION_blockdev’ undeclared
-    (first use in this function); did you mean ‘QEMU_OPTION_clock’?
-                 case QEMU_OPTION_blockdev:
-                      ^~~~~~~~~~~~~~~~~~~~
-                      QEMU_OPTION_clock
-    /source/qemu/vl.c:3052:18: note: each undeclared identifier is reported
-    only once for each function it appears in
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
-Since v1 http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg02254.html:
-Peter noticed [1] those files already are in GENERATED_FILES
+ docs/interop/nbd.txt | 37 +++++++++++++++++++++++++++++++++++++
+ MAINTAINERS          |  1 +
+ 2 files changed, 38 insertions(+)
+ create mode 100644 docs/interop/nbd.txt
 
-[1] http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg02338.html
-
- Makefile | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index 023b3437ec..521009964c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -55,7 +55,8 @@ endif
- # Check that we're not trying to do an out-of-tree build from
- # a tree that's been used for an in-tree build.
- ifneq ($(realpath $(SRC_PATH)),$(realpath .))
--ifneq ($(wildcard $(SRC_PATH)/config-host.mak),)
-+scratch_files = config-host.mak qemu-version.h qemu-options.def
-+ifneq ($(wildcard $(addprefix $(SRC_PATH)/,$(scratch_files))),)
- $(error This is an out of tree build but your source tree ($(SRC_PATH)) \
- seems to have been used for an in-tree build. You can fix this by running \
- "$(MAKE) distclean && rm -rf *-linux-user *-softmmu" in your source tree)
+diff --git a/docs/interop/nbd.txt b/docs/interop/nbd.txt
+new file mode 100644
+index 0000000000..7366269fc0
+--- /dev/null
++++ b/docs/interop/nbd.txt
+@@ -0,0 +1,37 @@
++Qemu supports NBD protocol, and has internal NBD client (look at
++block/nbd.c), internal NBD server (look at blockdev-nbd.c) as well as
++external NBD server tool - qemu-nbd.c. The common code is placed in
++nbd/*.
++
++NBD protocol is specified here:
++https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md
++
++This following paragraphs describe some specific properties of NBD
++protocol realization in Qemu.
++
++
++= Metadata namespaces =
++
++Qemu supports "base:allocation" metadata context as defined in the NBD
++protocol specification and defines own metadata namespace: "qemu".
++
++
++== "qemu" namespace ==
++
++For now, the only type of metadata context in the namespace is dirty
++bitmap. All available metadata contexts have the following form:
++
++   qemu:dirty-bitmap:<dirty-bitmap-export-name>
++
++Each dirty-bitmap metadata context defines the only one flag for
++extents in reply for NBD_CMD_BLOCK_STATUS:
++
++    bit 0: NBD_STATE_DIRTY, means that the extent is "dirty"
++
++For NBD_OPT_LIST_META_CONTEXT the following queries are supported
++additionally to "qemu:dirty-bitmap:<dirty-bitmap-export-name>":
++
++* "qemu:" : returns list of all available metadata contexts in the
++            namespace.
++* "qemu:dirty-bitmap:" : returns list of all available dirty-bitmap
++                         metadata contexts.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e187b1f18f..887b479440 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1923,6 +1923,7 @@ F: nbd/
+ F: include/block/nbd*
+ F: qemu-nbd.*
+ F: blockdev-nbd.c
++F: docs/interop/nbd.txt
+ T: git git://repo.or.cz/qemu/ericb.git nbd
+ 
+ NFS
 -- 
-2.17.1
+2.11.1
