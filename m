@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fS4fl-0003oY-2T
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 14:02:38 -0400
+	(envelope-from <bounces@canonical.com>) id 1fS4xJ-00079T-7T
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 14:20:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fS4fh-0004Gw-W3
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 14:02:37 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:38241)
+	(envelope-from <bounces@canonical.com>) id 1fS4xE-00009x-8V
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 14:20:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50192)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fS4fh-0004G0-QY
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 14:02:33 -0400
-Received: by mail-qt0-x242.google.com with SMTP id x34-v6so18295005qtk.5
-	for <qemu-devel@nongnu.org>; Sun, 10 Jun 2018 11:02:33 -0700 (PDT)
-From: Keno Fischer <keno@juliacomputing.com>
-Date: Sun, 10 Jun 2018 14:02:11 -0400
-Message-Id: <1528653731-4920-1-git-send-email-keno@juliacomputing.com>
-Subject: [Qemu-devel] [PATCH v4] cutils: Provide strchrnul
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fS4xE-00009L-1N
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 14:20:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fS4xD-0003pw-7t
+	for <qemu-devel@nongnu.org>; Sun, 10 Jun 2018 18:20:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 382762E80C7
+	for <qemu-devel@nongnu.org>; Sun, 10 Jun 2018 18:20:39 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 10 Jun 2018 18:12:59 -0000
+From: Cameron Kaiser <1776096@bugs.launchpad.net>
+Reply-To: Bug 1776096 <1776096@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152865417474.22286.1843162139663853612.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152865437957.21187.6786340157445829673.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1776096] Re: qemu 2.12.0 qemu-system-ppc illegal
+ instruction on ppc64le, crashes emulator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,217 +38,100 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Keno Fischer <keno@juliacomputing.com>, groug@kaod.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
 
-strchrnul is a GNU extension and thus unavailable on a number of targets.
-In the review for a commit removing strchrnul from 9p, I was asked to
-create a qemu_strchrnul helper to factor out this functionality.
-Do so, and use it in a number of other places in the code base that inlined
-the replacement pattern in a place where strchrnul could be used.
+Sorry, more complete disassembly of the apparent actual fault:
 
-Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-Acked-by: Greg Kurz <groug@kaod.org>
----
+   0x00007fffd4ed8b64 <code_gen_buffer+284002984>:	mtctr   r3
+   0x00007fffd4ed8b68 <code_gen_buffer+284002988>:	mr      r31,r3
+   0x00007fffd4ed8b6c <code_gen_buffer+284002992>:	li      r3,0
+   0x00007fffd4ed8b70 <code_gen_buffer+284002996>:	bctr
 
-Changes since v3:
- - Fix bug in configure check
+-- =
 
- configure             | 15 +++++++++++++++
- hmp.c                 |  8 ++++----
- hw/9pfs/9p-local.c    |  2 +-
- include/qemu/cutils.h |  8 ++++++++
- monitor.c             |  8 ++------
- util/cutils.c         | 15 +++++++++++++++
- util/qemu-option.c    |  6 +-----
- util/uri.c            |  6 ++----
- 8 files changed, 48 insertions(+), 20 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1776096
 
-diff --git a/configure b/configure
-index 14b1113..f5ca850 100755
---- a/configure
-+++ b/configure
-@@ -4747,6 +4747,18 @@ if compile_prog "" "" ; then
- fi
- 
- ##########################################
-+# check if we have strchrnul
-+
-+strchrnul=no
-+cat > $TMPC << EOF
-+#include <string.h>
-+int main(void) { (void)strchrnul("Hello World", 'W'); return 0; }
-+EOF
-+if compile_prog "" "" ; then
-+    strchrnul=yes
-+fi
-+
-+##########################################
- # check if trace backend exists
- 
- $python "$source_path/scripts/tracetool.py" "--backends=$trace_backends" --check-backends  > /dev/null 2> /dev/null
-@@ -6229,6 +6241,9 @@ fi
- if test "$sem_timedwait" = "yes" ; then
-   echo "CONFIG_SEM_TIMEDWAIT=y" >> $config_host_mak
- fi
-+if test "$strchrnul" = "yes" ; then
-+  echo "CONFIG_STRCHRNUL=y" >> $config_host_mak
-+fi
- if test "$byteswap_h" = "yes" ; then
-   echo "CONFIG_BYTESWAP_H=y" >> $config_host_mak
- fi
-diff --git a/hmp.c b/hmp.c
-index ef93f48..416d4c9 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2123,12 +2123,12 @@ void hmp_sendkey(Monitor *mon, const QDict *qdict)
-     int has_hold_time = qdict_haskey(qdict, "hold-time");
-     int hold_time = qdict_get_try_int(qdict, "hold-time", -1);
-     Error *err = NULL;
--    char *separator;
-+    const char *separator;
-     int keyname_len;
- 
-     while (1) {
--        separator = strchr(keys, '-');
--        keyname_len = separator ? separator - keys : strlen(keys);
-+        separator = qemu_strchrnul(keys, '-');
-+        keyname_len = separator - keys;
- 
-         /* Be compatible with old interface, convert user inputted "<" */
-         if (keys[0] == '<' && keyname_len == 1) {
-@@ -2165,7 +2165,7 @@ void hmp_sendkey(Monitor *mon, const QDict *qdict)
-             keylist->value->u.qcode.data = idx;
-         }
- 
--        if (!separator) {
-+        if (!*separator) {
-             break;
-         }
-         keys = separator + 1;
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 5721eff..828e8d6 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -65,7 +65,7 @@ int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
-         assert(*path != '/');
- 
-         head = g_strdup(path);
--        c = strchrnul(path, '/');
-+        c = qemu_strchrnul(path, '/');
-         if (*c) {
-             /* Intermediate path element */
-             head[c - path] = 0;
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index a663340..809090c 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -122,6 +122,14 @@ int qemu_strnlen(const char *s, int max_len);
-  * Returns: the pointer originally in @input.
-  */
- char *qemu_strsep(char **input, const char *delim);
-+#ifdef CONFIG_STRCHRNUL
-+static inline const char *qemu_strchrnul(const char *s, int c)
-+{
-+    return strchrnul(s, c);
-+}
-+#else
-+const char *qemu_strchrnul(const char *s, int c);
-+#endif
- time_t mktimegm(struct tm *tm);
- int qemu_fdatasync(int fd);
- int fcntl_setfl(int fd, int flag);
-diff --git a/monitor.c b/monitor.c
-index 6d0cec5..4484d74 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -797,9 +797,7 @@ static int compare_cmd(const char *name, const char *list)
-     p = list;
-     for(;;) {
-         pstart = p;
--        p = strchr(p, '|');
--        if (!p)
--            p = pstart + strlen(pstart);
-+        p = qemu_strchrnul(p, '|');
-         if ((p - pstart) == len && !memcmp(pstart, name, len))
-             return 1;
-         if (*p == '\0')
-@@ -3400,9 +3398,7 @@ static void cmd_completion(Monitor *mon, const char *name, const char *list)
-     p = list;
-     for(;;) {
-         pstart = p;
--        p = strchr(p, '|');
--        if (!p)
--            p = pstart + strlen(pstart);
-+        p = qemu_strchrnul(p, '|');
-         len = p - pstart;
-         if (len > sizeof(cmd) - 2)
-             len = sizeof(cmd) - 2;
-diff --git a/util/cutils.c b/util/cutils.c
-index 0de69e6..c365ddb 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -545,6 +545,21 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
- }
- 
- /**
-+ * Searches for the first occurrence of 'c' in 's', and returns a pointer
-+ * to the trailing null byte if none was found.
-+ */
-+#ifndef CONFIG_STRCHRNUL
-+const char *qemu_strchrnul(const char *s, int c)
-+{
-+    const char *e = strchr(s, c);
-+    if (!e) {
-+        e = s + strlen(s);
-+    }
-+    return e;
-+}
-+#endif
-+
-+/**
-  * parse_uint:
-  *
-  * @s: String to parse
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 58d1c23..54eca12 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -77,11 +77,7 @@ const char *get_opt_value(const char *p, char **value)
- 
-     *value = NULL;
-     while (1) {
--        offset = strchr(p, ',');
--        if (!offset) {
--            offset = p + strlen(p);
--        }
--
-+        offset = qemu_strchrnul(p, ',');
-         length = offset - p;
-         if (*offset != '\0' && *(offset + 1) == ',') {
-             length++;
-diff --git a/util/uri.c b/util/uri.c
-index 8624a7a..8bdef84 100644
---- a/util/uri.c
-+++ b/util/uri.c
-@@ -52,6 +52,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- 
- #include "qemu/uri.h"
- 
-@@ -2266,10 +2267,7 @@ struct QueryParams *query_params_parse(const char *query)
-         /* Find the next separator, or end of the string. */
-         end = strchr(query, '&');
-         if (!end) {
--            end = strchr(query, ';');
--        }
--        if (!end) {
--            end = query + strlen(query);
-+            end = qemu_strchrnul(query, ';');
-         }
- 
-         /* Find the first '=' character between here and end. */
--- 
-2.8.1
+Title:
+  qemu 2.12.0 qemu-system-ppc illegal instruction on ppc64le, crashes
+  emulator
+
+Status in QEMU:
+  New
+
+Bug description:
+  % uname -a
+  Linux tim.floodgap.com 4.16.14-300.fc28.ppc64le #1 SMP Tue Jun 5 15:59:48=
+ UTC 2018 ppc64le ppc64le ppc64le GNU/Linux
+
+  STR:
+  Start QEMU and boot Mac OS X 10.4.11.
+  Download the current version of TenFourFox (I used G3 so that AltiVec was=
+ not a confounder).
+  Try to start TenFourFox in safe mode (hold down Option as you double-clic=
+k while the icon bounces in the Dock).
+
+  Expected:
+  TenFourFox starts.
+
+  Actual:
+  The entire emulator exits with an illegal instruction error.
+
+  Trace of session (including some disassembly so you can see where TCG
+  went wrong):
+
+  tim:/home/spectre/src/qemu-2.12.0/ppc-softmmu/% gdb --args ./qemu-
+  system-ppc -M mac99,accel=3Dtcg -m 2048 -prom-env boot-args=3D-v -boot c
+  -drive file=3Dtigerhd.img,format=3Draw,cache=3Dnone -netdev user,id=3Dmyn=
+et0
+  -device usb-net,netdev=3Dmynet0 -usb -device usb-tablet
+
+  GNU gdb (GDB) Fedora 8.1-15.fc28
+  [...]
+  Reading symbols from ./qemu-system-ppc...done.
+  (gdb) run
+  [...]
+
+  Thread 6 "qemu-system-ppc" received signal SIGSEGV, Segmentation fault.
+  [Switching to Thread 0x7ffff242ea30 (LWP 7017)]
+  0xfffffffffffffffc in ?? ()
+  #0  0xfffffffffffffffc in  ()
+  #1  0x00007fffd4edec00 in code_gen_buffer ()
+  #2  0x00000000100c9e20 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D<opti=
+mized out>) at /home/spectre/src/qemu-2.12.0/accel/tcg/cpu-exec.c:169
+  #3  0x00000000100c9e20 in cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>=
+, last_tb=3D<synthetic pointer>, tb=3D<optimized out>, cpu=3D<optimized out=
+>)
+      at /home/spectre/src/qemu-2.12.0/accel/tcg/cpu-exec.c:626
+  #4  0x00000000100c9e20 in cpu_exec (cpu=3D<optimized out>)
+      at /home/spectre/src/qemu-2.12.0/accel/tcg/cpu-exec.c:734
+  #5  0x000000001007decc in tcg_cpu_exec (cpu=3D0x11774e10)
+      at /home/spectre/src/qemu-2.12.0/cpus.c:1362
+  (gdb) disas 0x00007fffd4edebf0, 0x00007fffd4edec10
+  Dump of assembler code from 0x7fffd4edebf0 to 0x7fffd4edec10:
+     0x00007fffd4edebf0 <code_gen_buffer+284027700>:	addi    r0,r4,3
+     0x00007fffd4edebf4 <code_gen_buffer+284027704>:	rlwinm  r0,r0,0,0,19
+     0x00007fffd4edebf8 <code_gen_buffer+284027708>:	cmplw   cr7,r0,r12
+     0x00007fffd4edebfc <code_gen_buffer+284027712>:	bnel    cr7,0x7fffd4ed=
+8b64 <code_gen_buffer+284002984>
+     0x00007fffd4edec00 <code_gen_buffer+284027716>:	lwbrx   r14,r3,r4
+     0x00007fffd4edec04 <code_gen_buffer+284027720>:	stw     r14,40(r27)
+     0x00007fffd4edec08 <code_gen_buffer+284027724>:	clrldi  r4,r14,32
+     0x00007fffd4edec0c <code_gen_buffer+284027728>:	rlwinm  r3,r4,25,19,26
+  End of assembler dump.
+  (gdb) disas 0x7fffd4ed8b60, 0x7fffd4ed8b70
+  Dump of assembler code from 0x7fffd4ed8b60 to 0x7fffd4ed8b70:
+     0x00007fffd4ed8b60 <code_gen_buffer+284002980>:	bctrl
+     0x00007fffd4ed8b64 <code_gen_buffer+284002984>:	mtctr   r3
+     0x00007fffd4ed8b68 <code_gen_buffer+284002988>:	mr      r31,r3
+     0x00007fffd4ed8b6c <code_gen_buffer+284002992>:	li      r3,0
+  End of assembler dump.
+  (gdb) i reg ctr
+  ctr            0xffffffffffffffff	18446744073709551615
+
+  It appears that the branch at 0x00007fffd4edebfc caused a jump back (a
+  return?) through CTR, but CTR has -1 in it, hence setting PC to
+  0xfffffffffffffffc. I am not sure how to debug this further.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1776096/+subscriptions
