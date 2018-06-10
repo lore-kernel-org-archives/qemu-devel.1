@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40518)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqdm-0002Tl-Fx
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:03:39 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqdo-0002Vj-CA
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:03:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqdl-0003Wy-Al
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:03:38 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:40843)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqdn-0003XV-Et
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:03:40 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:35908)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqdl-0003Wg-2d
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:03:37 -0400
-Received: by mail-pg0-x243.google.com with SMTP id l2-v6so8127521pgc.7
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:03:36 -0700 (PDT)
+	id 1fRqdn-0003XN-72
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:03:39 -0400
+Received: by mail-pl0-x244.google.com with SMTP id a7-v6so7899198plp.3
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:03:39 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:04 -1000
-Message-Id: <20180610030220.3777-33-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:05 -1000
+Message-Id: <20180610030220.3777-34-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 032/108] linux-user: Split out
- rt_sigqueueinfo, rt_sigtimedwait, rt_tgsigqueueinfo
+Subject: [Qemu-devel] [PATCH v2 033/108] linux-user: Split out rt_sigreturn,
+ sethostname, setrlimit, sigreturn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,170 +32,151 @@ Cc: laurent@vivier.eu
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 129 ++++++++++++++++++++++---------------------
- 1 file changed, 67 insertions(+), 62 deletions(-)
+ linux-user/syscall.c | 85 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 52 insertions(+), 33 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 6869a0db47..94dc773b4c 100644
+index 94dc773b4c..ac3592d776 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -8768,6 +8768,20 @@ IMPL(rt_sigprocmask)
-     return ret;
+@@ -8782,6 +8782,14 @@ IMPL(rt_sigqueueinfo)
+     return get_errno(sys_rt_sigqueueinfo(arg1, arg2, &uinfo));
  }
  
-+IMPL(rt_sigqueueinfo)
++IMPL(rt_sigreturn)
 +{
-+    siginfo_t uinfo;
-+    target_siginfo_t *p;
-+
-+    p = lock_user(VERIFY_READ, arg3, sizeof(target_siginfo_t), 1);
-+    if (!p) {
-+        return -TARGET_EFAULT;
++    if (block_signals()) {
++        return -TARGET_ERESTARTSYS;
 +    }
-+    target_to_host_siginfo(&uinfo, p);
-+    unlock_user(p, arg3, 0);
-+    return get_errno(sys_rt_sigqueueinfo(arg1, arg2, &uinfo));
++    return do_rt_sigreturn(cpu_env);
 +}
 +
  IMPL(rt_sigsuspend)
  {
      CPUState *cpu = ENV_GET_CPU(cpu_env);
-@@ -8791,6 +8805,56 @@ IMPL(rt_sigsuspend)
-     return ret;
+@@ -8869,11 +8877,39 @@ IMPL(sgetmask)
  }
+ #endif
  
-+IMPL(rt_sigtimedwait)
++IMPL(sethostname)
 +{
-+    sigset_t set;
-+    struct timespec uts, *puts = NULL;
-+    void *p;
-+    siginfo_t uinfo;
++    char *p = lock_user_string(arg1);
 +    abi_long ret;
 +
-+    if (arg4 != sizeof(target_sigset_t)) {
-+        return -TARGET_EINVAL;
-+    }
-+    p = lock_user(VERIFY_READ, arg1, sizeof(target_sigset_t), 1);
 +    if (!p) {
 +        return -TARGET_EFAULT;
 +    }
-+    target_to_host_sigset(&set, p);
++    ret = get_errno(sethostname(p, arg2));
 +    unlock_user(p, arg1, 0);
-+    if (arg3) {
-+        puts = &uts;
-+        target_to_host_timespec(puts, arg3);
-+    }
-+    ret = get_errno(safe_rt_sigtimedwait(&set, &uinfo, puts, SIGSET_T_SIZE));
-+    if (!is_error(ret)) {
-+        if (arg2) {
-+            p = lock_user(VERIFY_WRITE, arg2, sizeof(target_siginfo_t), 0);
-+            if (!p) {
-+                return -TARGET_EFAULT;
-+            }
-+            host_to_target_siginfo(p, &uinfo);
-+            unlock_user(p, arg2, sizeof(target_siginfo_t));
-+        }
-+        ret = host_to_target_signal(ret);
-+    }
 +    return ret;
 +}
 +
-+IMPL(rt_tgsigqueueinfo)
+ IMPL(setpgid)
+ {
+     return get_errno(setpgid(arg1, arg2));
+ }
+ 
++IMPL(setrlimit)
 +{
-+    siginfo_t uinfo;
-+    target_siginfo_t *p;
++    int resource = target_to_host_resource(arg1);
++    struct target_rlimit *target_rlim;
++    struct rlimit rlim;
 +
-+    p = lock_user(VERIFY_READ, arg4, sizeof(target_siginfo_t), 1);
-+    if (!p) {
++    if (!lock_user_struct(VERIFY_READ, target_rlim, arg2, 1)) {
 +        return -TARGET_EFAULT;
 +    }
-+    target_to_host_siginfo(&uinfo, p);
-+    unlock_user(p, arg4, 0);
-+    return get_errno(sys_rt_tgsigqueueinfo(arg1, arg2, arg3, &uinfo));
++    rlim.rlim_cur = target_to_host_rlim(target_rlim->rlim_cur);
++    rlim.rlim_max = target_to_host_rlim(target_rlim->rlim_max);
++    unlock_user_struct(target_rlim, arg2, 0);
++    return get_errno(setrlimit(resource, &rlim));
 +}
 +
- #ifdef TARGET_NR_sgetmask
- IMPL(sgetmask)
+ IMPL(setsid)
  {
-@@ -9275,68 +9339,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+     return get_errno(setsid());
+@@ -9055,6 +9091,16 @@ IMPL(sigprocmask)
+ }
+ #endif
+ 
++#ifdef TARGET_NR_sigreturn
++IMPL(sigreturn)
++{
++    if (block_signals()) {
++        return -TARGET_ERESTARTSYS;
++    }
++    return do_sigreturn(cpu_env);
++}
++#endif
++
+ #ifdef TARGET_NR_sigsuspend
+ IMPL(sigsuspend)
+ {
+@@ -9339,39 +9385,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--    case TARGET_NR_rt_sigtimedwait:
--        {
--            sigset_t set;
--            struct timespec uts, *puts;
--            siginfo_t uinfo;
--
--            if (arg4 != sizeof(target_sigset_t)) {
--                return -TARGET_EINVAL;
--            }
--
--            if (!(p = lock_user(VERIFY_READ, arg1, sizeof(target_sigset_t), 1)))
--                return -TARGET_EFAULT;
--            target_to_host_sigset(&set, p);
--            unlock_user(p, arg1, 0);
--            if (arg3) {
--                puts = &uts;
--                target_to_host_timespec(puts, arg3);
--            } else {
--                puts = NULL;
--            }
--            ret = get_errno(safe_rt_sigtimedwait(&set, &uinfo, puts,
--                                                 SIGSET_T_SIZE));
--            if (!is_error(ret)) {
--                if (arg2) {
--                    p = lock_user(VERIFY_WRITE, arg2, sizeof(target_siginfo_t),
--                                  0);
--                    if (!p) {
--                        return -TARGET_EFAULT;
--                    }
--                    host_to_target_siginfo(p, &uinfo);
--                    unlock_user(p, arg2, sizeof(target_siginfo_t));
--                }
--                ret = host_to_target_signal(ret);
--            }
+-#ifdef TARGET_NR_sigreturn
+-    case TARGET_NR_sigreturn:
+-        if (block_signals()) {
+-            ret = -TARGET_ERESTARTSYS;
+-        } else {
+-            ret = do_sigreturn(cpu_env);
 -        }
 -        return ret;
--    case TARGET_NR_rt_sigqueueinfo:
--        {
--            siginfo_t uinfo;
--
--            p = lock_user(VERIFY_READ, arg3, sizeof(target_siginfo_t), 1);
--            if (!p) {
--                return -TARGET_EFAULT;
--            }
--            target_to_host_siginfo(&uinfo, p);
--            unlock_user(p, arg3, 0);
--            ret = get_errno(sys_rt_sigqueueinfo(arg1, arg2, &uinfo));
+-#endif
+-    case TARGET_NR_rt_sigreturn:
+-        if (block_signals()) {
+-            return -TARGET_ERESTARTSYS;
+-        } else {
+-            return do_rt_sigreturn(cpu_env);
 -        }
+-    case TARGET_NR_sethostname:
+-        if (!(p = lock_user_string(arg1)))
+-            return -TARGET_EFAULT;
+-        ret = get_errno(sethostname(p, arg2));
+-        unlock_user(p, arg1, 0);
 -        return ret;
--    case TARGET_NR_rt_tgsigqueueinfo:
+-    case TARGET_NR_setrlimit:
 -        {
--            siginfo_t uinfo;
--
--            p = lock_user(VERIFY_READ, arg4, sizeof(target_siginfo_t), 1);
--            if (!p) {
+-            int resource = target_to_host_resource(arg1);
+-            struct target_rlimit *target_rlim;
+-            struct rlimit rlim;
+-            if (!lock_user_struct(VERIFY_READ, target_rlim, arg2, 1))
 -                return -TARGET_EFAULT;
--            }
--            target_to_host_siginfo(&uinfo, p);
--            unlock_user(p, arg4, 0);
--            ret = get_errno(sys_rt_tgsigqueueinfo(arg1, arg2, arg3, &uinfo));
+-            rlim.rlim_cur = target_to_host_rlim(target_rlim->rlim_cur);
+-            rlim.rlim_max = target_to_host_rlim(target_rlim->rlim_max);
+-            unlock_user_struct(target_rlim, arg2, 0);
+-            return get_errno(setrlimit(resource, &rlim));
 -        }
--        return ret;
- #ifdef TARGET_NR_sigreturn
-     case TARGET_NR_sigreturn:
-         if (block_signals()) {
-@@ -12775,7 +12777,10 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(rt_sigaction);
+     case TARGET_NR_getrlimit:
+         {
+             int resource = target_to_host_resource(arg1);
+@@ -12778,13 +12791,16 @@ static impl_fn *syscall_table(unsigned num)
          SYSCALL(rt_sigpending);
          SYSCALL(rt_sigprocmask);
-+        SYSCALL(rt_sigqueueinfo);
+         SYSCALL(rt_sigqueueinfo);
++        SYSCALL(rt_sigreturn);
          SYSCALL(rt_sigsuspend);
-+        SYSCALL(rt_sigtimedwait);
-+        SYSCALL(rt_tgsigqueueinfo);
+         SYSCALL(rt_sigtimedwait);
+         SYSCALL(rt_tgsigqueueinfo);
  #ifdef TARGET_NR_sgetmask
          SYSCALL(sgetmask);
+ #endif
++        SYSCALL(sethostname);
+         SYSCALL(setpgid);
++        SYSCALL(setrlimit);
+         SYSCALL(setsid);
+ #ifdef TARGET_NR_sigaction
+         SYSCALL(sigaction);
+@@ -12795,6 +12811,9 @@ static impl_fn *syscall_table(unsigned num)
+ #ifdef TARGET_NR_sigprocmask
+         SYSCALL(sigprocmask);
+ #endif
++#ifdef TARGET_NR_sigreturn
++        SYSCALL(sigreturn);
++#endif
+ #ifdef TARGET_NR_sigsuspend
+         SYSCALL(sigsuspend);
  #endif
 -- 
 2.17.1
