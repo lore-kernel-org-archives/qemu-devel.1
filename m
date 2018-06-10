@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqel-0003QH-LY
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:41 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqen-0003Rc-0D
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqej-0003rY-Sm
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:39 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:37249)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqel-0003sw-Os
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:41 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:34415)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqej-0003rN-KT
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:37 -0400
-Received: by mail-pf0-x244.google.com with SMTP id y5-v6so7584032pfn.4
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:37 -0700 (PDT)
+	id 1fRqel-0003sS-Gw
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:39 -0400
+Received: by mail-pf0-x242.google.com with SMTP id a63-v6so8499503pfl.1
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:39 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:32 -1000
-Message-Id: <20180610030220.3777-61-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:33 -1000
+Message-Id: <20180610030220.3777-62-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 060/108] linux-user: Split out getdents,
- getdents64
+Subject: [Qemu-devel] [PATCH v2 061/108] linux-user: Split out poll, ppoll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,364 +29,269 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
+All targets define ppoll; remove the ifdef.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 329 ++++++++++++++++++++++---------------------
- 1 file changed, 170 insertions(+), 159 deletions(-)
+ linux-user/syscall.c | 232 +++++++++++++++++++++++--------------------
+ 1 file changed, 124 insertions(+), 108 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f5f21658a8..600702ea3e 100644
+index 600702ea3e..362d315ce8 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -8121,6 +8121,170 @@ IMPL(futimesat)
+@@ -9101,6 +9101,126 @@ IMPL(pipe2)
+                    target_to_host_bitmask(arg2, fcntl_flags_tbl), 1);
  }
- #endif
  
-+#ifdef TARGET_NR_getdents
-+IMPL(getdents)
++static struct pollfd *get_pollfd(abi_ulong nfds, abi_ulong target_addr,
++                                 struct target_pollfd **ptfd, abi_long *err)
 +{
-+    abi_long ret;
-+# ifdef EMULATE_GETDENTS_WITH_GETDENTS
-+#  if TARGET_ABI_BITS == 32 && HOST_LONG_BITS == 64
-+    struct target_dirent *target_dirp;
-+    struct linux_dirent *dirp;
-+    abi_long count = arg3;
++    struct target_pollfd *target_pfd;
++    struct pollfd *pfd;
++    abi_ulong i;
 +
-+    dirp = g_try_malloc(count);
-+    if (!dirp) {
-+        return -TARGET_ENOMEM;
++    if (nfds > (INT_MAX / sizeof(struct target_pollfd))) {
++        *err = -TARGET_EINVAL;
++        return NULL;
++    }
++    pfd = g_try_new(struct pollfd, nfds);
++    if (pfd == NULL) {
++        *err = -TARGET_ENOMEM;
++        return NULL;
 +    }
 +
-+    ret = get_errno(sys_getdents(arg1, dirp, count));
++    *ptfd = target_pfd = lock_user(VERIFY_WRITE, target_addr,
++                                   sizeof(struct target_pollfd) * nfds, 1);
++    if (!target_pfd) {
++        *err = -TARGET_EFAULT;
++        g_free(pfd);
++        return NULL;
++    }
++
++    for (i = 0; i < nfds; i++) {
++        pfd[i].fd = tswap32(target_pfd[i].fd);
++        pfd[i].events = tswap16(target_pfd[i].events);
++    }
++
++    *err = 0;
++    return pfd;
++}
++
++static abi_long put_pollfd(abi_ulong nfds, abi_ulong target_addr,
++                           struct pollfd *pfd,
++                           struct target_pollfd *target_pfd, abi_long ret)
++{
 +    if (!is_error(ret)) {
-+        struct linux_dirent *de;
-+        struct target_dirent *tde;
-+        int len = ret;
-+        int reclen, treclen;
-+        int count1, tnamelen;
-+
-+        count1 = 0;
-+        de = dirp;
-+        target_dirp = lock_user(VERIFY_WRITE, arg2, count, 0);
-+        if (!target_dirp) {
-+            return -TARGET_EFAULT;
-+        }
-+        tde = target_dirp;
-+        while (len > 0) {
-+            reclen = de->d_reclen;
-+            tnamelen = reclen - offsetof(struct linux_dirent, d_name);
-+            assert(tnamelen >= 0);
-+            treclen = tnamelen + offsetof(struct target_dirent, d_name);
-+            assert(count1 + treclen <= count);
-+            tde->d_reclen = tswap16(treclen);
-+            tde->d_ino = tswapal(de->d_ino);
-+            tde->d_off = tswapal(de->d_off);
-+            memcpy(tde->d_name, de->d_name, tnamelen);
-+            de = (struct linux_dirent *)((char *)de + reclen);
-+            len -= reclen;
-+            tde = (struct target_dirent *)((char *)tde + treclen);
-+            count1 += treclen;
-+        }
-+        ret = count1;
-+        unlock_user(target_dirp, arg2, ret);
-+    }
-+    g_free(dirp);
-+#  else
-+    struct linux_dirent *dirp;
-+    abi_long count = arg3;
-+
-+    dirp = lock_user(VERIFY_WRITE, arg2, count, 0);
-+    if (!dirp) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(sys_getdents(arg1, dirp, count));
-+    if (!is_error(ret)) {
-+        struct linux_dirent *de = dirp;
-+        int len = ret;
-+        int reclen;
-+
-+        while (len > 0) {
-+            reclen = de->d_reclen;
-+            if (reclen > len) {
-+                break;
-+            }
-+            de->d_reclen = tswap16(reclen);
-+            tswapls(&de->d_ino);
-+            tswapls(&de->d_off);
-+            de = (struct linux_dirent *)((char *)de + reclen);
-+            len -= reclen;
++        abi_ulong i;
++        for (i = 0; i < nfds; i++) {
++            target_pfd[i].revents = tswap16(pfd[i].revents);
 +        }
 +    }
-+    unlock_user(dirp, arg2, ret);
-+#  endif
-+# else
-+    /* Implement getdents in terms of getdents64 */
-+    struct linux_dirent64 *dirp;
-+    abi_long count = arg3;
-+
-+    dirp = lock_user(VERIFY_WRITE, arg2, count, 0);
-+    if (!dirp) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(sys_getdents64(arg1, dirp, count));
-+    if (!is_error(ret)) {
-+        /* Convert the dirent64 structs to target dirent.  We do this
-+         * in-place, since we can guarantee that a target_dirent is no
-+         * larger than a dirent64; however this means we have to be
-+         * careful to read everything before writing in the new format.
-+         */
-+        struct linux_dirent64 *de = dirp;
-+        struct target_dirent *tde = (struct target_dirent *)dirp;
-+        int len = ret;
-+        int tlen = 0;
-+
-+        while (len > 0) {
-+            int namelen, treclen;
-+            int reclen = de->d_reclen;
-+            uint64_t ino = de->d_ino;
-+            int64_t off = de->d_off;
-+            uint8_t type = de->d_type;
-+
-+            namelen = strlen(de->d_name);
-+            treclen = offsetof(struct target_dirent, d_name) + namelen + 2;
-+            treclen = QEMU_ALIGN_UP(treclen, sizeof(abi_long));
-+
-+            memmove(tde->d_name, de->d_name, namelen + 1);
-+            tde->d_ino = tswapal(ino);
-+            tde->d_off = tswapal(off);
-+            tde->d_reclen = tswap16(treclen);
-+            /* The target_dirent type is in what was formerly a padding
-+             * byte at the end of the structure:
-+             */
-+            *(((char *)tde) + treclen - 1) = type;
-+
-+            de = (struct linux_dirent64 *)((char *)de + reclen);
-+            tde = (struct target_dirent *)((char *)tde + treclen);
-+            len -= reclen;
-+            tlen += treclen;
-+        }
-+        ret = tlen;
-+    }
-+    unlock_user(dirp, arg2, ret);
-+# endif
++    unlock_user(target_pfd, target_addr, sizeof(struct target_pollfd) * nfds);
++    g_free(pfd);
 +    return ret;
++}
++
++#ifdef TARGET_NR_poll
++IMPL(poll)
++{
++    struct timespec ts, *pts;
++    struct target_pollfd *target_pfd;
++    struct pollfd *pfd;
++    abi_long ret;
++
++    if (arg3 >= 0) {
++        /* Convert ms to secs, ns */
++        ts.tv_sec = arg3 / 1000;
++        ts.tv_nsec = (arg3 % 1000) * 1000000LL;
++        pts = &ts;
++    } else {
++        /* -ve poll() timeout means "infinite" */
++        pts = NULL;
++    }
++
++    pfd = get_pollfd(arg2, arg1, &target_pfd, &ret);
++    if (pfd == NULL) {
++        return ret;
++    }
++    ret = safe_ppoll(pfd, arg2, pts, NULL, 0);
++    return put_pollfd(arg2, arg1, pfd, target_pfd, get_errno(ret));
 +}
 +#endif
 +
-+#if defined(TARGET_NR_getdents64) && defined(__NR_getdents64)
-+IMPL(getdents64)
++IMPL(ppoll)
 +{
-+    struct linux_dirent64 *dirp;
-+    abi_long count = arg3;
++    struct timespec ts;
++    sigset_t set;
++    struct target_pollfd *target_pfd;
++    struct pollfd *pfd;
 +    abi_long ret;
 +
-+    dirp = lock_user(VERIFY_WRITE, arg2, count, 0);
-+    if (!dirp) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(sys_getdents64(arg1, dirp, count));
-+    if (!is_error(ret)) {
-+        struct linux_dirent64 *de = dirp;
-+        int len = ret;
-+
-+        while (len > 0) {
-+            int reclen = de->d_reclen;
-+            if (reclen > len) {
-+                break;
-+            }
-+            de->d_reclen = tswap16(reclen);
-+            tswap64s((uint64_t *)&de->d_ino);
-+            tswap64s((uint64_t *)&de->d_off);
-+            de = (struct linux_dirent64 *)((char *)de + reclen);
-+            len -= reclen;
++    if (arg3) {
++        if (target_to_host_timespec(&ts, arg3)) {
++            return -TARGET_EFAULT;
 +        }
 +    }
-+    unlock_user(dirp, arg2, ret);
++
++    if (arg4) {
++        target_sigset_t *target_set;
++        if (arg5 != sizeof(target_sigset_t)) {
++            return -TARGET_EINVAL;
++        }
++        target_set = lock_user(VERIFY_READ, arg4, sizeof(target_sigset_t), 1);
++        if (!target_set) {
++            return -TARGET_EFAULT;
++        }
++        target_to_host_sigset(&set, target_set);
++        unlock_user(target_set, arg4, 0);
++    }
++
++    pfd = get_pollfd(arg2, arg1, &target_pfd, &ret);
++    if (pfd == NULL) {
++        return ret;
++    }
++    ret = safe_ppoll(pfd, arg2, arg3 ? &ts : NULL,
++                     arg4 ? &set : NULL, SIGSET_T_SIZE);
++    ret = put_pollfd(arg2, arg1, pfd, target_pfd, get_errno(ret));
++
++    if (!is_error(ret) && arg3) {
++        abi_long err = host_to_target_timespec(arg3, &ts);
++        if (err) {
++            return err;
++        }
++    }
 +    return ret;
 +}
-+#endif /* TARGET_NR_getdents64 */
 +
- IMPL(getitimer)
+ IMPL(pselect6)
  {
-     struct itimerval value;
-@@ -10485,165 +10649,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+     abi_long rfd_addr, wfd_addr, efd_addr, n, ts_addr;
+@@ -10649,114 +10769,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_getdents
--    case TARGET_NR_getdents:
--#ifdef EMULATE_GETDENTS_WITH_GETDENTS
--#if TARGET_ABI_BITS == 32 && HOST_LONG_BITS == 64
+-#if defined(TARGET_NR_poll) || defined(TARGET_NR_ppoll)
+-# ifdef TARGET_NR_poll
+-    case TARGET_NR_poll:
+-# endif
+-# ifdef TARGET_NR_ppoll
+-    case TARGET_NR_ppoll:
+-# endif
 -        {
--            struct target_dirent *target_dirp;
--            struct linux_dirent *dirp;
--            abi_long count = arg3;
+-            struct target_pollfd *target_pfd;
+-            unsigned int nfds = arg2;
+-            struct pollfd *pfd;
+-            unsigned int i;
 -
--            dirp = g_try_malloc(count);
--            if (!dirp) {
--                return -TARGET_ENOMEM;
--            }
+-            pfd = NULL;
+-            target_pfd = NULL;
+-            if (nfds) {
+-                if (nfds > (INT_MAX / sizeof(struct target_pollfd))) {
+-                    return -TARGET_EINVAL;
+-                }
 -
--            ret = get_errno(sys_getdents(arg1, dirp, count));
--            if (!is_error(ret)) {
--                struct linux_dirent *de;
--		struct target_dirent *tde;
--                int len = ret;
--                int reclen, treclen;
--		int count1, tnamelen;
--
--		count1 = 0;
--                de = dirp;
--                if (!(target_dirp = lock_user(VERIFY_WRITE, arg2, count, 0)))
+-                target_pfd = lock_user(VERIFY_WRITE, arg1,
+-                                       sizeof(struct target_pollfd) * nfds, 1);
+-                if (!target_pfd) {
 -                    return -TARGET_EFAULT;
--		tde = target_dirp;
--                while (len > 0) {
--                    reclen = de->d_reclen;
--                    tnamelen = reclen - offsetof(struct linux_dirent, d_name);
--                    assert(tnamelen >= 0);
--                    treclen = tnamelen + offsetof(struct target_dirent, d_name);
--                    assert(count1 + treclen <= count);
--                    tde->d_reclen = tswap16(treclen);
--                    tde->d_ino = tswapal(de->d_ino);
--                    tde->d_off = tswapal(de->d_off);
--                    memcpy(tde->d_name, de->d_name, tnamelen);
--                    de = (struct linux_dirent *)((char *)de + reclen);
--                    len -= reclen;
--                    tde = (struct target_dirent *)((char *)tde + treclen);
--		    count1 += treclen;
 -                }
--		ret = count1;
--                unlock_user(target_dirp, arg2, ret);
--            }
--            g_free(dirp);
--        }
--#else
--        {
--            struct linux_dirent *dirp;
--            abi_long count = arg3;
 -
--            if (!(dirp = lock_user(VERIFY_WRITE, arg2, count, 0)))
--                return -TARGET_EFAULT;
--            ret = get_errno(sys_getdents(arg1, dirp, count));
+-                pfd = alloca(sizeof(struct pollfd) * nfds);
+-                for (i = 0; i < nfds; i++) {
+-                    pfd[i].fd = tswap32(target_pfd[i].fd);
+-                    pfd[i].events = tswap16(target_pfd[i].events);
+-                }
+-            }
+-
+-            switch (num) {
+-# ifdef TARGET_NR_ppoll
+-            case TARGET_NR_ppoll:
+-            {
+-                struct timespec _timeout_ts, *timeout_ts = &_timeout_ts;
+-                target_sigset_t *target_set;
+-                sigset_t _set, *set = &_set;
+-
+-                if (arg3) {
+-                    if (target_to_host_timespec(timeout_ts, arg3)) {
+-                        unlock_user(target_pfd, arg1, 0);
+-                        return -TARGET_EFAULT;
+-                    }
+-                } else {
+-                    timeout_ts = NULL;
+-                }
+-
+-                if (arg4) {
+-                    if (arg5 != sizeof(target_sigset_t)) {
+-                        unlock_user(target_pfd, arg1, 0);
+-                        return -TARGET_EINVAL;
+-                    }
+-
+-                    target_set = lock_user(VERIFY_READ, arg4, sizeof(target_sigset_t), 1);
+-                    if (!target_set) {
+-                        unlock_user(target_pfd, arg1, 0);
+-                        return -TARGET_EFAULT;
+-                    }
+-                    target_to_host_sigset(set, target_set);
+-                } else {
+-                    set = NULL;
+-                }
+-
+-                ret = get_errno(safe_ppoll(pfd, nfds, timeout_ts,
+-                                           set, SIGSET_T_SIZE));
+-
+-                if (!is_error(ret) && arg3) {
+-                    host_to_target_timespec(arg3, timeout_ts);
+-                }
+-                if (arg4) {
+-                    unlock_user(target_set, arg4, 0);
+-                }
+-                return ret;
+-            }
+-# endif
+-# ifdef TARGET_NR_poll
+-            case TARGET_NR_poll:
+-            {
+-                struct timespec ts, *pts;
+-
+-                if (arg3 >= 0) {
+-                    /* Convert ms to secs, ns */
+-                    ts.tv_sec = arg3 / 1000;
+-                    ts.tv_nsec = (arg3 % 1000) * 1000000LL;
+-                    pts = &ts;
+-                } else {
+-                    /* -ve poll() timeout means "infinite" */
+-                    pts = NULL;
+-                }
+-                return get_errno(safe_ppoll(pfd, nfds, pts, NULL, 0));
+-            }
+-# endif
+-            default:
+-                g_assert_not_reached();
+-            }
+-
 -            if (!is_error(ret)) {
--                struct linux_dirent *de;
--                int len = ret;
--                int reclen;
--                de = dirp;
--                while (len > 0) {
--                    reclen = de->d_reclen;
--                    if (reclen > len)
--                        break;
--                    de->d_reclen = tswap16(reclen);
--                    tswapls(&de->d_ino);
--                    tswapls(&de->d_off);
--                    de = (struct linux_dirent *)((char *)de + reclen);
--                    len -= reclen;
+-                for(i = 0; i < nfds; i++) {
+-                    target_pfd[i].revents = tswap16(pfd[i].revents);
 -                }
 -            }
--            unlock_user(dirp, arg2, ret);
--        }
--#endif
--#else
--        /* Implement getdents in terms of getdents64 */
--        {
--            struct linux_dirent64 *dirp;
--            abi_long count = arg3;
--
--            dirp = lock_user(VERIFY_WRITE, arg2, count, 0);
--            if (!dirp) {
--                return -TARGET_EFAULT;
--            }
--            ret = get_errno(sys_getdents64(arg1, dirp, count));
--            if (!is_error(ret)) {
--                /* Convert the dirent64 structs to target dirent.  We do this
--                 * in-place, since we can guarantee that a target_dirent is no
--                 * larger than a dirent64; however this means we have to be
--                 * careful to read everything before writing in the new format.
--                 */
--                struct linux_dirent64 *de;
--                struct target_dirent *tde;
--                int len = ret;
--                int tlen = 0;
--
--                de = dirp;
--                tde = (struct target_dirent *)dirp;
--                while (len > 0) {
--                    int namelen, treclen;
--                    int reclen = de->d_reclen;
--                    uint64_t ino = de->d_ino;
--                    int64_t off = de->d_off;
--                    uint8_t type = de->d_type;
--
--                    namelen = strlen(de->d_name);
--                    treclen = offsetof(struct target_dirent, d_name)
--                        + namelen + 2;
--                    treclen = QEMU_ALIGN_UP(treclen, sizeof(abi_long));
--
--                    memmove(tde->d_name, de->d_name, namelen + 1);
--                    tde->d_ino = tswapal(ino);
--                    tde->d_off = tswapal(off);
--                    tde->d_reclen = tswap16(treclen);
--                    /* The target_dirent type is in what was formerly a padding
--                     * byte at the end of the structure:
--                     */
--                    *(((char *)tde) + treclen - 1) = type;
--
--                    de = (struct linux_dirent64 *)((char *)de + reclen);
--                    tde = (struct target_dirent *)((char *)tde + treclen);
--                    len -= reclen;
--                    tlen += treclen;
--                }
--                ret = tlen;
--            }
--            unlock_user(dirp, arg2, ret);
--        }
--#endif
--        return ret;
--#endif /* TARGET_NR_getdents */
--#if defined(TARGET_NR_getdents64) && defined(__NR_getdents64)
--    case TARGET_NR_getdents64:
--        {
--            struct linux_dirent64 *dirp;
--            abi_long count = arg3;
--            if (!(dirp = lock_user(VERIFY_WRITE, arg2, count, 0)))
--                return -TARGET_EFAULT;
--            ret = get_errno(sys_getdents64(arg1, dirp, count));
--            if (!is_error(ret)) {
--                struct linux_dirent64 *de;
--                int len = ret;
--                int reclen;
--                de = dirp;
--                while (len > 0) {
--                    reclen = de->d_reclen;
--                    if (reclen > len)
--                        break;
--                    de->d_reclen = tswap16(reclen);
--                    tswap64s((uint64_t *)&de->d_ino);
--                    tswap64s((uint64_t *)&de->d_off);
--                    de = (struct linux_dirent64 *)((char *)de + reclen);
--                    len -= reclen;
--                }
--            }
--            unlock_user(dirp, arg2, ret);
+-            unlock_user(target_pfd, arg1, sizeof(struct target_pollfd) * nfds);
 -        }
 -        return ret;
--#endif /* TARGET_NR_getdents64 */
- #if defined(TARGET_NR_poll) || defined(TARGET_NR_ppoll)
- # ifdef TARGET_NR_poll
-     case TARGET_NR_poll:
-@@ -12939,6 +12944,12 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(ftruncate);
- #ifdef TARGET_NR_futimesat
-         SYSCALL(futimesat);
-+#endif
-+#ifdef TARGET_NR_getdents
-+        SYSCALL(getdents);
-+#endif
-+#if defined(TARGET_NR_getdents64) && defined(__NR_getdents64)
-+        SYSCALL(getdents64);
+-#endif
+     case TARGET_NR_flock:
+         /* NOTE: the flock constant seems to be the same for every
+            Linux platform */
+@@ -13060,6 +13072,10 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(pipe);
  #endif
-         SYSCALL(getitimer);
- #ifdef TARGET_NR_getpeername
+         SYSCALL(pipe2);
++#ifdef TARGET_NR_poll
++        SYSCALL(poll);
++#endif
++        SYSCALL(ppoll);
+         SYSCALL(pselect6);
+         SYSCALL(read);
+ #ifdef TARGET_NR_readlink
 -- 
 2.17.1
