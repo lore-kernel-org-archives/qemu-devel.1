@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41164)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqf8-0003nU-S8
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:06 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfC-0003ov-Lh
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqf7-0004H0-Jv
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:02 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:41587)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfB-0004Jp-IF
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:06 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:42385)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqf7-0004FX-CC
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:01 -0400
-Received: by mail-pl0-x241.google.com with SMTP id az12-v6so10380824plb.8
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:01 -0700 (PDT)
+	id 1fRqfB-0004Jf-CC
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:05 -0400
+Received: by mail-pf0-x241.google.com with SMTP id w7-v6so8479182pfn.9
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:05 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:45 -1000
-Message-Id: <20180610030220.3777-74-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:47 -1000
+Message-Id: <20180610030220.3777-76-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 073/108] linux-user: Split out getgroups,
- setgroups, setregid, setreuid
+Subject: [Qemu-devel] [PATCH v2 075/108] linux-user: Split out chown,
+ getresgid, getresuid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,165 +32,144 @@ Cc: laurent@vivier.eu
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 107 +++++++++++++++++++++++++------------------
- 1 file changed, 63 insertions(+), 44 deletions(-)
+ linux-user/syscall.c | 94 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 57 insertions(+), 37 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f8e34d28b1..915e1f1a91 100644
+index 75b869fb33..c55c414239 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -8462,6 +8462,32 @@ IMPL(getgid)
+@@ -7787,6 +7787,21 @@ IMPL(chmod)
  }
  #endif
  
-+IMPL(getgroups)
++#ifdef TARGET_NR_chown
++IMPL(chown)
 +{
-+    int gidsetsize = arg1;
-+    gid_t *grouplist;
++    char *p = lock_user_string(arg1);
 +    abi_long ret;
 +
-+    grouplist = alloca(gidsetsize * sizeof(gid_t));
-+    ret = get_errno(getgroups(gidsetsize, grouplist));
-+
-+    if (!is_error(ret) && gidsetsize != 0) {
-+        target_id *target_gl;
-+        int i;
-+
-+        target_gl = lock_user(VERIFY_WRITE, arg2,
-+                              gidsetsize * sizeof(target_id), 0);
-+        if (!target_gl) {
-+            return -TARGET_EFAULT;
-+        }
-+        for (i = 0; i < ret; i++) {
-+            target_gl[i] = tswapid(high2lowgid(grouplist[i]));
-+        }
-+        unlock_user(target_gl, arg2, gidsetsize * sizeof(target_id));
++    if (!p) {
++        return -TARGET_EFAULT;
 +    }
++    ret = get_errno(chown(p, low2highuid(arg2), low2highgid(arg3)));
++    unlock_user(p, arg1, 0);
 +    return ret;
 +}
++#endif
 +
- IMPL(getitimer)
+ IMPL(chroot)
  {
-     struct itimerval value;
-@@ -10441,6 +10467,29 @@ IMPL(setdomainname)
+     char *p = lock_user_string(arg1);
+@@ -8588,6 +8603,38 @@ IMPL(getrandom)
      return ret;
  }
  
-+IMPL(setgroups)
++#ifdef TARGET_NR_getresgid
++IMPL(getresgid)
 +{
-+    int gidsetsize = arg1;
-+    gid_t *grouplist = NULL;
++    gid_t rgid, egid, sgid;
++    abi_long ret = get_errno(getresgid(&rgid, &egid, &sgid));
 +
-+    if (gidsetsize) {
-+        target_id *target_gl;
-+        int i;
-+
-+        grouplist = alloca(gidsetsize * sizeof(gid_t));
-+        target_gl = lock_user(VERIFY_READ, arg2,
-+                              gidsetsize * sizeof(target_id), 1);
-+        if (!target_gl) {
-+            return -TARGET_EFAULT;
-+        }
-+        for (i = 0; i < gidsetsize; i++) {
-+            grouplist[i] = low2highgid(tswapid(target_gl[i]));
-+        }
-+        unlock_user(target_gl, arg2, 0);
++    if (!is_error(ret) &&
++        (put_user_id(high2lowgid(rgid), arg1) ||
++         put_user_id(high2lowgid(egid), arg2) ||
++         put_user_id(high2lowgid(sgid), arg3))) {
++        return -TARGET_EFAULT;
 +    }
-+    return get_errno(setgroups(gidsetsize, grouplist));
++    return ret;
 +}
++#endif
 +
- IMPL(sethostname)
- {
-     char *p = lock_user_string(arg1);
-@@ -10486,6 +10535,16 @@ IMPL(setpriority)
-     return get_errno(setpriority(arg1, arg2, arg3));
- }
- 
-+IMPL(setregid)
++#ifdef TARGET_NR_getresuid
++IMPL(getresuid)
 +{
-+    return get_errno(setregid(low2highgid(arg1), low2highgid(arg2)));
-+}
++    uid_t ruid, euid, suid;
++    abi_long ret = get_errno(getresuid(&ruid, &euid, &suid));
 +
-+IMPL(setreuid)
-+{
-+    return get_errno(setreuid(low2highuid(arg1), low2highuid(arg2)));
++    if (!is_error(ret) &&
++        (put_user_id(high2lowuid(ruid), arg1) ||
++         put_user_id(high2lowuid(euid), arg2) ||
++         put_user_id(high2lowuid(suid), arg3))) {
++        return -TARGET_EFAULT;
++    }
++    return ret;
 +}
++#endif
 +
- IMPL(setrlimit)
+ IMPL(getrlimit)
  {
      int resource = target_to_host_resource(arg1);
-@@ -11453,50 +11512,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+@@ -11547,42 +11594,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--    case TARGET_NR_setreuid:
--        return get_errno(setreuid(low2highuid(arg1), low2highuid(arg2)));
--    case TARGET_NR_setregid:
--        return get_errno(setregid(low2highgid(arg1), low2highgid(arg2)));
--    case TARGET_NR_getgroups:
+-#ifdef TARGET_NR_getresuid
+-    case TARGET_NR_getresuid:
 -        {
--            int gidsetsize = arg1;
--            target_id *target_grouplist;
--            gid_t *grouplist;
--            int i;
--
--            grouplist = alloca(gidsetsize * sizeof(gid_t));
--            ret = get_errno(getgroups(gidsetsize, grouplist));
--            if (gidsetsize == 0)
--                return ret;
+-            uid_t ruid, euid, suid;
+-            ret = get_errno(getresuid(&ruid, &euid, &suid));
 -            if (!is_error(ret)) {
--                target_grouplist = lock_user(VERIFY_WRITE, arg2, gidsetsize * sizeof(target_id), 0);
--                if (!target_grouplist)
+-                if (put_user_id(high2lowuid(ruid), arg1)
+-                    || put_user_id(high2lowuid(euid), arg2)
+-                    || put_user_id(high2lowuid(suid), arg3))
 -                    return -TARGET_EFAULT;
--                for(i = 0;i < ret; i++)
--                    target_grouplist[i] = tswapid(high2lowgid(grouplist[i]));
--                unlock_user(target_grouplist, arg2, gidsetsize * sizeof(target_id));
 -            }
 -        }
 -        return ret;
--    case TARGET_NR_setgroups:
+-#endif
+-#ifdef TARGET_NR_getresgid
+-    case TARGET_NR_getresgid:
 -        {
--            int gidsetsize = arg1;
--            target_id *target_grouplist;
--            gid_t *grouplist = NULL;
--            int i;
--            if (gidsetsize) {
--                grouplist = alloca(gidsetsize * sizeof(gid_t));
--                target_grouplist = lock_user(VERIFY_READ, arg2, gidsetsize * sizeof(target_id), 1);
--                if (!target_grouplist) {
+-            gid_t rgid, egid, sgid;
+-            ret = get_errno(getresgid(&rgid, &egid, &sgid));
+-            if (!is_error(ret)) {
+-                if (put_user_id(high2lowgid(rgid), arg1)
+-                    || put_user_id(high2lowgid(egid), arg2)
+-                    || put_user_id(high2lowgid(sgid), arg3))
 -                    return -TARGET_EFAULT;
--                }
--                for (i = 0; i < gidsetsize; i++) {
--                    grouplist[i] = low2highgid(tswapid(target_grouplist[i]));
--                }
--                unlock_user(target_grouplist, arg2, 0);
 -            }
--            return get_errno(setgroups(gidsetsize, grouplist));
 -        }
-     case TARGET_NR_fchown:
-         return get_errno(fchown(arg1, low2highuid(arg2), low2highgid(arg3)));
- #if defined(TARGET_NR_fchownat)
-@@ -13123,6 +13138,7 @@ static impl_fn *syscall_table(unsigned num)
- #ifdef TARGET_NR_getgid
-         SYSCALL(getgid);
+-        return ret;
+-#endif
+-#ifdef TARGET_NR_chown
+-    case TARGET_NR_chown:
+-        if (!(p = lock_user_string(arg1)))
+-            return -TARGET_EFAULT;
+-        ret = get_errno(chown(p, low2highuid(arg2), low2highgid(arg3)));
+-        unlock_user(p, arg1, 0);
+-        return ret;
+-#endif
+     case TARGET_NR_setuid:
+         return get_errno(sys_setuid(low2highuid(arg1)));
+     case TARGET_NR_setgid:
+@@ -13080,10 +13091,13 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(clone);
+         SYSCALL(close);
+         SYSCALL(chdir);
+-        SYSCALL(chroot);
+ #ifdef TARGET_NR_chmod
+         SYSCALL(chmod);
  #endif
-+        SYSCALL(getgroups);
-         SYSCALL(getitimer);
- #ifdef TARGET_NR_getpeername
-         SYSCALL(getpeername);
-@@ -13356,10 +13372,13 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(sendto);
++#ifdef TARGET_NR_chown
++        SYSCALL(chown);
++#endif
++        SYSCALL(chroot);
+ #ifdef TARGET_NR_connect
+         SYSCALL(connect);
  #endif
-         SYSCALL(setdomainname);
-+        SYSCALL(setgroups);
-         SYSCALL(sethostname);
-         SYSCALL(setitimer);
-         SYSCALL(setpgid);
-         SYSCALL(setpriority);
-+        SYSCALL(setregid);
-+        SYSCALL(setreuid);
-         SYSCALL(setrlimit);
- #ifdef TARGET_NR_setsockopt
-         SYSCALL(setsockopt);
+@@ -13169,6 +13183,12 @@ static impl_fn *syscall_table(unsigned num)
+ #endif
+         SYSCALL(getpriority);
+         SYSCALL(getrandom);
++#ifdef TARGET_NR_getresgid
++        SYSCALL(getresgid);
++#endif
++#ifdef TARGET_NR_getresuid
++        SYSCALL(getresuid);
++#endif
+         SYSCALL(getrlimit);
+         SYSCALL(getrusage);
+         SYSCALL(getsid);
 -- 
 2.17.1
