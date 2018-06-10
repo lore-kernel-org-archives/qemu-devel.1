@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqfQ-00043c-Ry
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:24 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfU-000489-8o
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqfP-0004NX-Fu
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:20 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:41364)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfR-0004Pj-2g
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:24 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:44846)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqfP-0004NL-98
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:19 -0400
-Received: by mail-pf0-x244.google.com with SMTP id a11-v6so8486595pff.8
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:19 -0700 (PDT)
+	id 1fRqfQ-0004OE-R0
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:20 -0400
+Received: by mail-pg0-x242.google.com with SMTP id p21-v6so8128641pgd.11
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:20 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:54 -1000
-Message-Id: <20180610030220.3777-83-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:55 -1000
+Message-Id: <20180610030220.3777-84-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 082/108] linux-user: Split out chown32,
- setfsgid32, setfsuid32, setgid32, setuid32
+Subject: [Qemu-devel] [PATCH v2 083/108] linux-user: Split out mincore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,157 +29,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
+All targets define mincore; remove the ifdef.
+
+At the same time, fix two bugs in the implementation:
+(1) The pages to check need not be readable, only valid.
+(2) The third argument is an output vector, which
+(2a) needs to be writable, and
+(2b) sized properly.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 82 +++++++++++++++++++++++++++++++-------------
- 1 file changed, 58 insertions(+), 24 deletions(-)
+ linux-user/syscall.c | 44 ++++++++++++++++++++++++++------------------
+ 1 file changed, 26 insertions(+), 18 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index af96cc95d3..fc7f301519 100644
+index fc7f301519..afe6df5efa 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -7802,6 +7802,21 @@ IMPL(chown)
+@@ -9144,6 +9144,31 @@ IMPL(lstat64)
  }
  #endif
  
-+#ifdef TARGET_NR_chown32
-+IMPL(chown32)
++IMPL(mincore)
 +{
-+    char *p = lock_user_string(arg1);
++    void *a, *p;
++    size_t veclen;
 +    abi_long ret;
 +
++    /* Note that this is not the same as VERIFY_WRITE or VERIFY_READ.
++     * Moreover, we want to test the exact pages of guest memory.
++     */
++    if (page_check_range(arg1, arg2, PAGE_VALID)) {
++        return -TARGET_ENOMEM;
++    }
++    a = g2h(arg1);
++
++    veclen = DIV_ROUND_UP(arg2, TARGET_PAGE_SIZE);
++    p = lock_user(VERIFY_WRITE, arg3, veclen, 0);
 +    if (!p) {
 +        return -TARGET_EFAULT;
 +    }
-+    ret = get_errno(chown(p, arg2, arg3));
-+    unlock_user(p, arg1, 0);
++
++    ret = get_errno(mincore(a, arg2, p));
++    unlock_user(p, arg3, veclen);
 +    return ret;
 +}
-+#endif
 +
- IMPL(chroot)
+ #ifdef TARGET_NR_mkdir
+ IMPL(mkdir)
  {
-     char *p = lock_user_string(arg1);
-@@ -10815,16 +10830,37 @@ IMPL(setfsgid)
-     return get_errno(setfsgid(arg1));
- }
- 
-+#ifdef TARGET_NR_setfsgid32
-+IMPL(setfsgid32)
-+{
-+    return get_errno(setfsgid(arg1));
-+}
-+#endif
-+
- IMPL(setfsuid)
- {
-     return get_errno(setfsuid(arg1));
- }
- 
-+#ifdef TARGET_NR_setfsuid32
-+IMPL(setfsuid32)
-+{
-+    return get_errno(setfsuid(arg1));
-+}
-+#endif
-+
- IMPL(setgid)
- {
-     return get_errno(sys_setgid(low2highgid(arg1)));
- }
- 
-+#ifdef TARGET_NR_setgid32
-+IMPL(setgid32)
-+{
-+    return get_errno(sys_setgid(arg1));
-+}
-+#endif
-+
- IMPL(setgroups)
- {
-     int gidsetsize = arg1;
-@@ -11017,6 +11053,13 @@ IMPL(setuid)
-     return get_errno(sys_setuid(low2highuid(arg1)));
- }
- 
-+#ifdef TARGET_NR_setuid32
-+IMPL(setuid32)
-+{
-+    return get_errno(sys_setuid(arg1));
-+}
-+#endif
-+
- #ifdef TARGET_NR_sigaction
- IMPL(sigaction)
- {
-@@ -11943,30 +11986,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+@@ -11986,24 +12011,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_chown32
--    case TARGET_NR_chown32:
--        if (!(p = lock_user_string(arg1)))
--            return -TARGET_EFAULT;
--        ret = get_errno(chown(p, arg2, arg3));
--        unlock_user(p, arg1, 0);
+-#ifdef TARGET_NR_mincore
+-    case TARGET_NR_mincore:
+-        {
+-            void *a = lock_user(VERIFY_READ, arg1, arg2, 0);
+-            if (!a) {
+-                return -TARGET_ENOMEM;
+-            }
+-            p = lock_user_string(arg3);
+-            if (!p) {
+-                ret = -TARGET_EFAULT;
+-            } else {
+-                ret = get_errno(mincore(a, arg2, p));
+-                unlock_user(p, arg3, ret);
+-            }
+-            unlock_user(a, arg1, 0);
+-        }
 -        return ret;
 -#endif
--#ifdef TARGET_NR_setuid32
--    case TARGET_NR_setuid32:
--        return get_errno(sys_setuid(arg1));
--#endif
--#ifdef TARGET_NR_setgid32
--    case TARGET_NR_setgid32:
--        return get_errno(sys_setgid(arg1));
--#endif
--#ifdef TARGET_NR_setfsuid32
--    case TARGET_NR_setfsuid32:
--        return get_errno(setfsuid(arg1));
--#endif
--#ifdef TARGET_NR_setfsgid32
--    case TARGET_NR_setfsgid32:
--        return get_errno(setfsgid(arg1));
--#endif
- #ifdef TARGET_NR_mincore
-     case TARGET_NR_mincore:
-         {
-@@ -13139,6 +13158,9 @@ static impl_fn *syscall_table(unsigned num)
+ #ifdef TARGET_NR_arm_fadvise64_64
+     case TARGET_NR_arm_fadvise64_64:
+         /* arm_fadvise64_64 looks like fadvise64_64 but
+@@ -13328,6 +13335,7 @@ static impl_fn *syscall_table(unsigned num)
+ #ifdef TARGET_NR_lstat64
+         SYSCALL(lstat64);
  #endif
- #ifdef TARGET_NR_chown
-         SYSCALL(chown);
-+#endif
-+#ifdef TARGET_NR_chown32
-+        SYSCALL(chown32);
- #endif
-         SYSCALL(chroot);
- #ifdef TARGET_NR_connect
-@@ -13492,8 +13514,17 @@ static impl_fn *syscall_table(unsigned num)
- #endif
-         SYSCALL(setdomainname);
-         SYSCALL(setfsgid);
-+#ifdef TARGET_NR_setfsgid32
-+        SYSCALL(setfsgid32);
-+#endif
-         SYSCALL(setfsuid);
-+#ifdef TARGET_NR_setfsuid32
-+        SYSCALL(setfsuid32);
-+#endif
-         SYSCALL(setgid);
-+#ifdef TARGET_NR_setgid32
-+        SYSCALL(setgid32);
-+#endif
-         SYSCALL(setgroups);
- #ifdef TARGET_NR_setgroups32
-         SYSCALL(setgroups32);
-@@ -13529,6 +13560,9 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(settimeofday);
-         SYSCALL(setsid);
-         SYSCALL(setuid);
-+#ifdef TARGET_NR_setuid32
-+        SYSCALL(setuid32);
-+#endif
- #ifdef TARGET_NR_sigaction
-         SYSCALL(sigaction);
++        SYSCALL(mincore);
+ #ifdef TARGET_NR_mkdir
+         SYSCALL(mkdir);
  #endif
 -- 
 2.17.1
