@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqfC-0003oH-3i
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:07 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfE-0003qY-9a
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqf9-0004JO-EX
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:06 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:41588)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfD-0004Kc-De
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:08 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:43801)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqf9-0004J0-7g
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:03 -0400
-Received: by mail-pl0-x242.google.com with SMTP id az12-v6so10380849plb.8
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:03 -0700 (PDT)
+	id 1fRqfD-0004KK-7u
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:07 -0400
+Received: by mail-pf0-x241.google.com with SMTP id j20-v6so8482171pff.10
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:07 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:46 -1000
-Message-Id: <20180610030220.3777-75-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:48 -1000
+Message-Id: <20180610030220.3777-77-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 074/108] linux-user: Split out fchown,
- fchownat, setresgid, setresuid
+Subject: [Qemu-devel] [PATCH v2 076/108] linux-user: Split out setfsgid,
+ setfsuid, setgid, setuid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,124 +30,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-All targets define fchownat; remove the ifdef.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 66 +++++++++++++++++++++++++++++---------------
- 1 file changed, 43 insertions(+), 23 deletions(-)
+ linux-user/syscall.c | 33 ++++++++++++++++++++++++---------
+ 1 file changed, 24 insertions(+), 9 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 915e1f1a91..75b869fb33 100644
+index c55c414239..76a66b56fe 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -8103,6 +8103,25 @@ IMPL(fchmodat)
+@@ -10533,6 +10533,21 @@ IMPL(setdomainname)
      return ret;
  }
  
-+IMPL(fchown)
++IMPL(setfsgid)
 +{
-+    return get_errno(fchown(arg1, low2highuid(arg2), low2highgid(arg3)));
++    return get_errno(setfsgid(arg1));
 +}
 +
-+IMPL(fchownat)
++IMPL(setfsuid)
 +{
-+    char *p = lock_user_string(arg2);
-+    abi_long ret;
-+
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(fchownat(arg1, p, low2highuid(arg3),
-+                             low2highgid(arg4), arg5));
-+    unlock_user(p, arg2, 0);
-+    return ret;
++    return get_errno(setfsuid(arg1));
 +}
 +
- #ifdef TARGET_NR_fcntl
- IMPL(fcntl)
++IMPL(setgid)
++{
++    return get_errno(sys_setgid(low2highgid(arg1)));
++}
++
+ IMPL(setgroups)
  {
-@@ -10540,6 +10559,22 @@ IMPL(setregid)
-     return get_errno(setregid(low2highgid(arg1), low2highgid(arg2)));
+     int gidsetsize = arg1;
+@@ -10668,6 +10683,11 @@ IMPL(setsid)
+     return get_errno(setsid());
  }
  
-+#ifdef TARGET_NR_setresgid
-+IMPL(setresgid)
++IMPL(setuid)
 +{
-+    return get_errno(sys_setresgid(low2highgid(arg1), low2highgid(arg2),
-+                                   low2highgid(arg3)));
++    return get_errno(sys_setuid(low2highuid(arg1)));
 +}
-+#endif
 +
-+#ifdef TARGET_NR_setresuid
-+IMPL(setresuid)
-+{
-+    return get_errno(sys_setresuid(low2highuid(arg1), low2highuid(arg2),
-+                                   low2highuid(arg3)));
-+}
-+#endif
-+
- IMPL(setreuid)
+ #ifdef TARGET_NR_sigaction
+ IMPL(sigaction)
  {
-     return get_errno(setreuid(low2highuid(arg1), low2highuid(arg2)));
-@@ -11512,23 +11547,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+@@ -11594,15 +11614,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--    case TARGET_NR_fchown:
--        return get_errno(fchown(arg1, low2highuid(arg2), low2highgid(arg3)));
--#if defined(TARGET_NR_fchownat)
--    case TARGET_NR_fchownat:
--        if (!(p = lock_user_string(arg2))) 
--            return -TARGET_EFAULT;
--        ret = get_errno(fchownat(arg1, p, low2highuid(arg3),
--                                 low2highgid(arg4), arg5));
--        unlock_user(p, arg2, 0);
--        return ret;
--#endif
--#ifdef TARGET_NR_setresuid
--    case TARGET_NR_setresuid:
--        return get_errno(sys_setresuid(low2highuid(arg1),
--                                       low2highuid(arg2),
--                                       low2highuid(arg3)));
--#endif
- #ifdef TARGET_NR_getresuid
-     case TARGET_NR_getresuid:
-         {
-@@ -11543,12 +11561,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
-         }
-         return ret;
+-    case TARGET_NR_setuid:
+-        return get_errno(sys_setuid(low2highuid(arg1)));
+-    case TARGET_NR_setgid:
+-        return get_errno(sys_setgid(low2highgid(arg1)));
+-    case TARGET_NR_setfsuid:
+-        return get_errno(setfsuid(arg1));
+-    case TARGET_NR_setfsgid:
+-        return get_errno(setfsgid(arg1));
+-
+ #ifdef TARGET_NR_lchown32
+     case TARGET_NR_lchown32:
+         if (!(p = lock_user_string(arg1)))
+@@ -13406,6 +13417,9 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(sendto);
  #endif
--#ifdef TARGET_NR_getresgid
--    case TARGET_NR_setresgid:
--        return get_errno(sys_setresgid(low2highgid(arg1),
--                                       low2highgid(arg2),
--                                       low2highgid(arg3)));
--#endif
- #ifdef TARGET_NR_getresgid
-     case TARGET_NR_getresgid:
-         {
-@@ -13094,6 +13106,8 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(fchdir);
-         SYSCALL(fchmod);
-         SYSCALL(fchmodat);
-+        SYSCALL(fchown);
-+        SYSCALL(fchownat);
- #ifdef TARGET_NR_fcntl
-         SYSCALL(fcntl);
+         SYSCALL(setdomainname);
++        SYSCALL(setfsgid);
++        SYSCALL(setfsuid);
++        SYSCALL(setgid);
+         SYSCALL(setgroups);
+         SYSCALL(sethostname);
+         SYSCALL(setitimer);
+@@ -13425,6 +13439,7 @@ static impl_fn *syscall_table(unsigned num)
  #endif
-@@ -13378,6 +13392,12 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(setpgid);
-         SYSCALL(setpriority);
-         SYSCALL(setregid);
-+#ifdef TARGET_NR_setresgid
-+        SYSCALL(setresgid);
-+#endif
-+#ifdef TARGET_NR_setresuid
-+        SYSCALL(setresuid);
-+#endif
-         SYSCALL(setreuid);
-         SYSCALL(setrlimit);
- #ifdef TARGET_NR_setsockopt
+         SYSCALL(settimeofday);
+         SYSCALL(setsid);
++        SYSCALL(setuid);
+ #ifdef TARGET_NR_sigaction
+         SYSCALL(sigaction);
+ #endif
 -- 
 2.17.1
