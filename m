@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fS125-0006C5-0e
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 10:09:26 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fS12N-0006OD-2A
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 10:09:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fS123-00079M-EE
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 10:09:24 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:42097)
+	(envelope-from <zhangckid@gmail.com>) id 1fS12L-0007Ud-Ek
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 10:09:43 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:45399)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fS123-00078d-3S
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 10:09:23 -0400
-Received: by mail-wr0-x232.google.com with SMTP id w10-v6so17693352wrk.9
-	for <qemu-devel@nongnu.org>; Sun, 10 Jun 2018 07:09:23 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fS12L-0007TE-3s
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 10:09:41 -0400
+Received: by mail-wr0-x231.google.com with SMTP id o12-v6so17685403wrm.12
+	for <qemu-devel@nongnu.org>; Sun, 10 Jun 2018 07:09:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <6ad93c95-8c14-6155-6f0f-6c2dcc46faa8@redhat.com>
+In-Reply-To: <96b6dd17-bbb6-48e9-54c8-6495c8a56c98@redhat.com>
 References: <20180603050546.6827-1-zhangckid@gmail.com>
-	<20180603050546.6827-4-zhangckid@gmail.com>
-	<6ad93c95-8c14-6155-6f0f-6c2dcc46faa8@redhat.com>
+	<20180603050546.6827-15-zhangckid@gmail.com>
+	<96b6dd17-bbb6-48e9-54c8-6495c8a56c98@redhat.com>
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Sun, 10 Jun 2018 22:09:21 +0800
-Message-ID: <CAK3tnv+y97x5bmaComkwSKNNnuF9KcghBcJs+EymMEnPpwkJcw@mail.gmail.com>
+Date: Sun, 10 Jun 2018 22:09:39 +0800
+Message-ID: <CAK3tnv+GkZGVEGeswayaO0esSCWonwwgm30FL3QriOSDscsuvA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V8 03/17] colo-compare: use notifier to
- notify packets comparing result
+Subject: Re: [Qemu-devel] [PATCH V8 14/17] filter: Add handle_event method
+ for NetFilterClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,121 +34,157 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Jason Wang <jasowang@redhat.com>
 Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On Mon, Jun 4, 2018 at 2:36 PM, Jason Wang <jasowang@redhat.com> wrote:
+On Mon, Jun 4, 2018 at 2:57 PM, Jason Wang <jasowang@redhat.com> wrote:
 
 >
 >
 > On 2018=E5=B9=B406=E6=9C=8803=E6=97=A5 13:05, Zhang Chen wrote:
 >
->> It's a good idea to use notifier to notify COLO frame of
->> inconsistent packets comparing.
+>> Filter needs to process the event of checkpoint/failover or
+>> other event passed by COLO frame.
 >>
->> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 >> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 >> ---
->>   net/colo-compare.c | 32 +++++++++++++++++++++++++-------
->>   net/colo-compare.h |  2 ++
->>   2 files changed, 27 insertions(+), 7 deletions(-)
+>>   include/net/filter.h |  5 +++++
+>>   net/filter.c         | 17 +++++++++++++++++
+>>   net/net.c            | 28 ++++++++++++++++++++++++++++
+>>   3 files changed, 50 insertions(+)
 >>
->> diff --git a/net/colo-compare.c b/net/colo-compare.c
->> index 7ff3ae8904..05061cd1c4 100644
->> --- a/net/colo-compare.c
->> +++ b/net/colo-compare.c
->> @@ -29,6 +29,7 @@
->>   #include "sysemu/iothread.h"
->>   #include "net/colo-compare.h"
->>   #include "migration/colo.h"
->> +#include "migration/migration.h"
->>     #define TYPE_COLO_COMPARE "colo-compare"
->>   #define COLO_COMPARE(obj) \
->> @@ -37,6 +38,9 @@
->>   static QTAILQ_HEAD(, CompareState) net_compares =3D
->>          QTAILQ_HEAD_INITIALIZER(net_compares);
->>   +static NotifierList colo_compare_notifiers =3D
->> +    NOTIFIER_LIST_INITIALIZER(colo_compare_notifiers);
+>> diff --git a/include/net/filter.h b/include/net/filter.h
+>> index 435acd6f82..49da666ac0 100644
+>> --- a/include/net/filter.h
+>> +++ b/include/net/filter.h
+>> @@ -38,6 +38,8 @@ typedef ssize_t (FilterReceiveIOV)(NetFilterState *nc,
+>>     typedef void (FilterStatusChanged) (NetFilterState *nf, Error **errp=
+);
+>>   +typedef void (FilterHandleEvent) (NetFilterState *nf, int event, Erro=
+r
+>> **errp);
 >> +
->>   #define COMPARE_READ_LEN_MAX NET_BUFSIZE
->>   #define MAX_QUEUE_SIZE 1024
->>   @@ -561,8 +565,24 @@ static int colo_old_packet_check_one(Packet *pkt,
->> int64_t *check_time)
+>>   typedef struct NetFilterClass {
+>>       ObjectClass parent_class;
+>>   @@ -45,6 +47,7 @@ typedef struct NetFilterClass {
+>>       FilterSetup *setup;
+>>       FilterCleanup *cleanup;
+>>       FilterStatusChanged *status_changed;
+>> +    FilterHandleEvent *handle_event;
+>>       /* mandatory */
+>>       FilterReceiveIOV *receive_iov;
+>>   } NetFilterClass;
+>> @@ -77,4 +80,6 @@ ssize_t qemu_netfilter_pass_to_next(NetClientState
+>> *sender,
+>>                                       int iovcnt,
+>>                                       void *opaque);
+>>   +void colo_notify_filters_event(int event, Error **errp);
+>> +
+>>   #endif /* QEMU_NET_FILTER_H */
+>> diff --git a/net/filter.c b/net/filter.c
+>> index 2fd7d7d663..0f17eba143 100644
+>> --- a/net/filter.c
+>> +++ b/net/filter.c
+>> @@ -17,6 +17,8 @@
+>>   #include "net/vhost_net.h"
+>>   #include "qom/object_interfaces.h"
+>>   #include "qemu/iov.h"
+>> +#include "net/colo.h"
+>> +#include "migration/colo.h"
+>>     static inline bool qemu_can_skip_netfilter(NetFilterState *nf)
+>>   {
+>> @@ -245,11 +247,26 @@ static void netfilter_finalize(Object *obj)
+>>       g_free(nf->netdev_id);
+>>   }
+>>   +static void dummy_handle_event(NetFilterState *nf, int event, Error
+>> **errp)
+>> +{
+>> +    switch (event) {
+>> +    case COLO_EVENT_CHECKPOINT:
+>> +        break;
+>> +    case COLO_EVENT_FAILOVER:
+>> +        object_property_set_str(OBJECT(nf), "off", "status", errp);
+>> +        break;
+>> +    default:
+>> +        break;
+>> +    }
+>> +}
+>> +
+>>   static void netfilter_class_init(ObjectClass *oc, void *data)
+>>   {
+>>       UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
+>> +    NetFilterClass *nfc =3D NETFILTER_CLASS(oc);
+>>         ucc->complete =3D netfilter_complete;
+>> +    nfc->handle_event =3D dummy_handle_event;
+>>   }
+>>     static const TypeInfo netfilter_info =3D {
+>> diff --git a/net/net.c b/net/net.c
+>> index efb9eaf779..378cd2f9ec 100644
+>> --- a/net/net.c
+>> +++ b/net/net.c
+>> @@ -1329,6 +1329,34 @@ void hmp_info_network(Monitor *mon, const QDict
+>> *qdict)
 >>       }
 >>   }
->>   +static void colo_compare_inconsistent_notify(void)
+>>   +void colo_notify_filters_event(int event, Error **errp)
 >> +{
+>> +    NetClientState *nc, *peer;
+>> +    NetClientDriver type;
+>> +    NetFilterState *nf;
+>> +    NetFilterClass *nfc =3D NULL;
+>> +    Error *local_err =3D NULL;
+>> +
+>> +    QTAILQ_FOREACH(nc, &net_clients, next) {
+>> +        peer =3D nc->peer;
+>> +        type =3D nc->info->type;
+>> +        if (!peer || type !=3D NET_CLIENT_DRIVER_TAP) {
+>> +            continue;
 >>
 >
-> Not good at English but inconsistency sounds better here.
+> I think when COLO is enabled, qemu should reject all other types of
+> backends.
+
+
+Yes, you are right.
+May be we should add a assert here? Because we can not get backend info whe=
+n
+colo-compare start up.
+Have any idea?
+
+
 >
 >
-Sorry, I'm not good at English too...
-I will change to "inconsistency" in next version.
+> +        }
+>> +        QTAILQ_FOREACH(nf, &nc->filters, next) {
+>> +            nfc =3D  NETFILTER_GET_CLASS(OBJECT(nf));
+>> +            if (!nfc->handle_event) {
+>> +                continue;
+>> +            }
+>>
+>
+> Is this still necessary?
+>
+>
+Yes, may be user will use other filter(like filter-buffer) with COLO at
+same time.
 
 Thanks
 Zhang Chen
 
 
+
 > Thanks
 >
 >
-> +    notifier_list_notify(&colo_compare_notifiers,
->> +                migrate_get_current());
+> +            nfc->handle_event(nf, event, &local_err);
+>> +            if (local_err) {
+>> +                error_propagate(errp, local_err);
+>> +                return;
+>> +            }
+>> +        }
+>> +    }
 >> +}
 >> +
->> +void colo_compare_register_notifier(Notifier *notify)
->> +{
->> +    notifier_list_add(&colo_compare_notifiers, notify);
->> +}
->> +
->> +void colo_compare_unregister_notifier(Notifier *notify)
->> +{
->> +    notifier_remove(notify);
->> +}
->> +
->>   static int colo_old_packet_check_one_conn(Connection *conn,
->> -                                          void *user_data)
->> +                                           void *user_data)
+>>   void qmp_set_link(const char *name, bool up, Error **errp)
 >>   {
->>       GList *result =3D NULL;
->>       int64_t check_time =3D REGULAR_PACKET_CHECK_MS;
->> @@ -573,10 +593,7 @@ static int colo_old_packet_check_one_conn(Connectio=
-n
->> *conn,
->>         if (result) {
->>           /* Do checkpoint will flush old packet */
->> -        /*
->> -         * TODO: Notify colo frame to do checkpoint.
->> -         * colo_compare_inconsistent_notify();
->> -         */
->> +        colo_compare_inconsistent_notify();
->>           return 0;
->>       }
->>   @@ -620,11 +637,12 @@ static void colo_compare_packet(CompareState *s,
->> Connection *conn,
->>               /*
->>                * If one packet arrive late, the secondary_list or
->>                * primary_list will be empty, so we can't compare it
->> -             * until next comparison.
->> +             * until next comparison. If the packets in the list are
->> +             * timeout, it will trigger a checkpoint request.
->>                */
->>               trace_colo_compare_main("packet different");
->>               g_queue_push_head(&conn->primary_list, pkt);
->> -            /* TODO: colo_notify_checkpoint();*/
->> +            colo_compare_inconsistent_notify();
->>               break;
->>           }
->>       }
->> diff --git a/net/colo-compare.h b/net/colo-compare.h
->> index 1b1ce76aea..22ddd512e2 100644
->> --- a/net/colo-compare.h
->> +++ b/net/colo-compare.h
->> @@ -18,5 +18,7 @@
->>   #define QEMU_COLO_COMPARE_H
->>     void colo_notify_compares_event(void *opaque, int event, Error
->> **errp);
->> +void colo_compare_register_notifier(Notifier *notify);
->> +void colo_compare_unregister_notifier(Notifier *notify);
->>     #endif /* QEMU_COLO_COMPARE_H */
+>>       NetClientState *ncs[MAX_QUEUE_NUM];
 >>
 >
 >
