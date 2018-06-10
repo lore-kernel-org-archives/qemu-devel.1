@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqfr-0004Vf-F7
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:48 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfv-0004ZS-27
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqfq-0004iR-Cy
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:47 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:45645)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqft-0004js-Kd
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:51 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:46990)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqfq-0004i9-6A
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:46 -0400
-Received: by mail-pf0-x243.google.com with SMTP id a22-v6so8480880pfo.12
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:46 -0700 (PDT)
+	id 1fRqft-0004jh-E8
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:49 -0400
+Received: by mail-pf0-x244.google.com with SMTP id q1-v6so8483697pff.13
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:49 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:02:09 -1000
-Message-Id: <20180610030220.3777-98-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:02:11 -1000
+Message-Id: <20180610030220.3777-100-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 097/108] linux-user: Split out eventfd,
- eventfd2
+Subject: [Qemu-devel] [PATCH v2 099/108] linux-user: Split out signalfd,
+ signalfd4
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,101 +30,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-All targets define eventfd2; remove the ifdefs.
+All targets define signalfd4; remove the ifdefs.
+In do_signalfd4, unlock the target sigmask earlier and use is_error.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 64 +++++++++++++++++++++++++-------------------
- 1 file changed, 37 insertions(+), 27 deletions(-)
+ linux-user/syscall.c | 34 ++++++++++++++++++----------------
+ 1 file changed, 18 insertions(+), 16 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 8548f113d1..1158afde27 100644
+index 5edcb39b73..e630a43f97 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -7903,6 +7903,37 @@ IMPL(dup3)
+@@ -6975,8 +6975,6 @@ static abi_long host_to_target_statfs64(abi_ulong target_addr,
+ }
+ #endif
+ 
+-#if defined(TARGET_NR_signalfd) || defined(TARGET_NR_signalfd4)
+-
+ /* signalfd siginfo conversion */
+ 
+ static void
+@@ -7045,21 +7043,17 @@ static abi_long do_signalfd4(int fd, abi_long mask, int flags)
+     if (!lock_user_struct(VERIFY_READ, target_mask, mask, 1)) {
+         return -TARGET_EFAULT;
+     }
+-
+     target_to_host_sigset(&host_mask, target_mask);
++    unlock_user_struct(target_mask, mask, 0);
+ 
+     host_flags = target_to_host_bitmask(flags, fcntl_flags_tbl);
+ 
+     ret = get_errno(signalfd(fd, &host_mask, host_flags));
+-    if (ret >= 0) {
++    if (!is_error(ret)) {
+         fd_trans_register(ret, &target_signalfd_trans);
+     }
+-
+-    unlock_user_struct(target_mask, mask, 0);
+-
      return ret;
  }
+-#endif
  
-+#ifdef CONFIG_EVENTFD
-+# ifdef TARGET_NR_eventfd
-+IMPL(eventfd)
+ /* Map host to target signal numbers for the wait family of syscalls.
+    Assume all other status bits are the same.  */
+@@ -11884,6 +11878,18 @@ IMPL(sigaltstack)
+     return do_sigaltstack(arg1, arg2, get_sp_from_cpustate(cpu_env));
+ }
+ 
++#ifdef TARGET_NR_signalfd
++IMPL(signalfd)
 +{
-+    abi_long ret = get_errno(eventfd(arg1, 0));
-+    if (ret >= 0) {
-+        fd_trans_register(ret, &target_eventfd_trans);
-+    }
-+    return ret;
++    return do_signalfd4(arg1, arg2, 0);
 +}
-+# endif
++#endif
 +
-+IMPL(eventfd2)
++IMPL(signalfd4)
 +{
-+    int host_flags = arg2 & (~(TARGET_O_NONBLOCK | TARGET_O_CLOEXEC));
-+    abi_long ret;
-+
-+    if (arg2 & TARGET_O_NONBLOCK) {
-+        host_flags |= O_NONBLOCK;
-+    }
-+    if (arg2 & TARGET_O_CLOEXEC) {
-+        host_flags |= O_CLOEXEC;
-+    }
-+    ret = get_errno(eventfd(arg1, host_flags));
-+    if (ret >= 0) {
-+        fd_trans_register(ret, &target_eventfd_trans);
-+    }
-+    return ret;
++    return do_signalfd4(arg1, arg2, arg4);
 +}
-+#endif /* CONFIG_EVENTFD */
 +
- IMPL(execve)
+ #ifdef TARGET_NR_sigpending
+ IMPL(sigpending)
  {
-     abi_ulong *guest_ptrs;
-@@ -12767,33 +12798,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+@@ -12850,14 +12856,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      abi_long ret;
  
      switch(num) {
--#ifdef CONFIG_EVENTFD
--#if defined(TARGET_NR_eventfd)
--    case TARGET_NR_eventfd:
--        ret = get_errno(eventfd(arg1, 0));
--        if (ret >= 0) {
--            fd_trans_register(ret, &target_eventfd_trans);
--        }
--        return ret;
+-#if defined(TARGET_NR_signalfd4)
+-    case TARGET_NR_signalfd4:
+-        return do_signalfd4(arg1, arg2, arg4);
 -#endif
--#if defined(TARGET_NR_eventfd2)
--    case TARGET_NR_eventfd2:
--    {
--        int host_flags = arg2 & (~(TARGET_O_NONBLOCK | TARGET_O_CLOEXEC));
--        if (arg2 & TARGET_O_NONBLOCK) {
--            host_flags |= O_NONBLOCK;
--        }
--        if (arg2 & TARGET_O_CLOEXEC) {
--            host_flags |= O_CLOEXEC;
--        }
--        ret = get_errno(eventfd(arg1, host_flags));
--        if (ret >= 0) {
--            fd_trans_register(ret, &target_eventfd_trans);
--        }
--        return ret;
--    }
+-#if defined(TARGET_NR_signalfd)
+-    case TARGET_NR_signalfd:
+-        return do_signalfd4(arg1, arg2, 0);
 -#endif
--#endif /* CONFIG_EVENTFD  */
- #if defined(CONFIG_FALLOCATE) && defined(TARGET_NR_fallocate)
-     case TARGET_NR_fallocate:
- #if TARGET_ABI_BITS == 32
-@@ -13314,6 +13318,12 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(dup2);
+ #if defined(CONFIG_EPOLL)
+ #if defined(TARGET_NR_epoll_create)
+     case TARGET_NR_epoll_create:
+@@ -13808,6 +13806,10 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(sigaction);
  #endif
-         SYSCALL(dup3);
-+#ifdef CONFIG_EVENTFD
-+# ifdef TARGET_NR_eventfd
-+        SYSCALL(eventfd);
-+# endif
-+        SYSCALL(eventfd2);
+         SYSCALL(sigaltstack);
++#ifdef TARGET_NR_signalfd
++        SYSCALL(signalfd);
 +#endif
-         SYSCALL(execve);
-         SYSCALL(exit);
- #ifdef __NR_exit_group
++        SYSCALL(signalfd4);
+ #ifdef TARGET_NR_sigpending
+         SYSCALL(sigpending);
+ #endif
 -- 
 2.17.1
