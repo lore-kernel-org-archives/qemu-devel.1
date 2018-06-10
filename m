@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqel-0003Q2-DF
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:40 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqel-0003QH-LY
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqei-0003rE-7C
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqej-0003rY-Sm
 	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:39 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:46988)
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:37249)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqeh-0003r9-Vy
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:36 -0400
-Received: by mail-pf0-x244.google.com with SMTP id q1-v6so8483019pff.13
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:35 -0700 (PDT)
+	id 1fRqej-0003rN-KT
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:37 -0400
+Received: by mail-pf0-x244.google.com with SMTP id y5-v6so7584032pfn.4
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:37 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:31 -1000
-Message-Id: <20180610030220.3777-60-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:32 -1000
+Message-Id: <20180610030220.3777-61-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 059/108] linux-user: Split out fchdir,
- getpgid, llseek, personality
+Subject: [Qemu-devel] [PATCH v2 060/108] linux-user: Split out getdents,
+ getdents64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,176 +30,364 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-Given that we use _LARGEFILE_SOURCE and _FILEOFFSET_BITS == 64, there
-is no need to special-case llseek on the host side; always use lseek.
-Define _llseek in terms of llseek, rather than the other way around.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 81 +++++++++++++++++++++++---------------------
- 1 file changed, 42 insertions(+), 39 deletions(-)
+ linux-user/syscall.c | 329 ++++++++++++++++++++++---------------------
+ 1 file changed, 170 insertions(+), 159 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 7ff05dd33c..f5f21658a8 100644
+index f5f21658a8..600702ea3e 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -240,15 +240,6 @@ static type name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,	\
- #define __NR_sys_inotify_add_watch __NR_inotify_add_watch
- #define __NR_sys_inotify_rm_watch __NR_inotify_rm_watch
- 
--#if defined(__alpha__) || defined(__x86_64__) || defined(__s390x__)
--#define __NR__llseek __NR_lseek
--#endif
--
--/* Newer kernel ports have llseek() instead of _llseek() */
--#if defined(TARGET_NR_llseek) && !defined(TARGET_NR__llseek)
--#define TARGET_NR__llseek TARGET_NR_llseek
--#endif
--
- /* These definitions produce an ENOSYS from the host kernel.
-  * Performing a bogus syscall is lazier than boilerplating
-  * the replacement functions here in C.
-@@ -280,10 +271,6 @@ _syscall3(int, sys_getdents, uint, fd, struct linux_dirent *, dirp, uint, count)
-     (defined(TARGET_NR_getdents64) && defined(__NR_getdents64))
- _syscall3(int, sys_getdents64, uint, fd, struct linux_dirent64 *, dirp, uint, count);
- #endif
--#if defined(TARGET_NR__llseek) && defined(__NR_llseek)
--_syscall5(int, _llseek,  uint,  fd, ulong, hi, ulong, lo,
--          loff_t *, res, uint, wh);
--#endif
- _syscall3(int, sys_rt_sigqueueinfo, pid_t, pid, int, sig, siginfo_t *, uinfo)
- _syscall4(int, sys_rt_tgsigqueueinfo, pid_t, pid, pid_t, tid, int, sig,
-           siginfo_t *, uinfo)
-@@ -8026,6 +8013,11 @@ IMPL(faccessat)
-     return ret;
- }
- 
-+IMPL(fchdir)
-+{
-+    return get_errno(fchdir(arg1));
-+}
-+
- IMPL(fchmod)
- {
-     return get_errno(fchmod(arg1, arg2));
-@@ -8150,6 +8142,11 @@ IMPL(getpeername)
+@@ -8121,6 +8121,170 @@ IMPL(futimesat)
  }
  #endif
  
-+IMPL(getpgid)
++#ifdef TARGET_NR_getdents
++IMPL(getdents)
 +{
-+    return get_errno(getpgid(arg1));
-+}
++    abi_long ret;
++# ifdef EMULATE_GETDENTS_WITH_GETDENTS
++#  if TARGET_ABI_BITS == 32 && HOST_LONG_BITS == 64
++    struct target_dirent *target_dirp;
++    struct linux_dirent *dirp;
++    abi_long count = arg3;
 +
- #ifdef TARGET_NR_getpgrp
- IMPL(getpgrp)
- {
-@@ -8484,6 +8481,27 @@ IMPL(listen)
- }
- #endif
- 
-+/* Older kernel ports have _llseek() instead of llseek() */
-+#if defined(TARGET_NR__llseek) && !defined(TARGET_NR_llseek)
-+#define TARGET_NR_llseek TARGET_NR__llseek
-+#endif
-+
-+#ifdef TARGET_NR_llseek
-+IMPL(llseek)
-+{
-+    off_t res;
-+
-+    res = lseek(arg1, ((uint64_t)arg2 << 32) | (abi_ulong)arg3, arg5);
-+    if (res == -1) {
-+        return -host_to_target_errno(errno);
++    dirp = g_try_malloc(count);
++    if (!dirp) {
++        return -TARGET_ENOMEM;
 +    }
-+    if (put_user_s64(res, arg4)) {
++
++    ret = get_errno(sys_getdents(arg1, dirp, count));
++    if (!is_error(ret)) {
++        struct linux_dirent *de;
++        struct target_dirent *tde;
++        int len = ret;
++        int reclen, treclen;
++        int count1, tnamelen;
++
++        count1 = 0;
++        de = dirp;
++        target_dirp = lock_user(VERIFY_WRITE, arg2, count, 0);
++        if (!target_dirp) {
++            return -TARGET_EFAULT;
++        }
++        tde = target_dirp;
++        while (len > 0) {
++            reclen = de->d_reclen;
++            tnamelen = reclen - offsetof(struct linux_dirent, d_name);
++            assert(tnamelen >= 0);
++            treclen = tnamelen + offsetof(struct target_dirent, d_name);
++            assert(count1 + treclen <= count);
++            tde->d_reclen = tswap16(treclen);
++            tde->d_ino = tswapal(de->d_ino);
++            tde->d_off = tswapal(de->d_off);
++            memcpy(tde->d_name, de->d_name, tnamelen);
++            de = (struct linux_dirent *)((char *)de + reclen);
++            len -= reclen;
++            tde = (struct target_dirent *)((char *)tde + treclen);
++            count1 += treclen;
++        }
++        ret = count1;
++        unlock_user(target_dirp, arg2, ret);
++    }
++    g_free(dirp);
++#  else
++    struct linux_dirent *dirp;
++    abi_long count = arg3;
++
++    dirp = lock_user(VERIFY_WRITE, arg2, count, 0);
++    if (!dirp) {
 +        return -TARGET_EFAULT;
 +    }
-+    return 0;
++    ret = get_errno(sys_getdents(arg1, dirp, count));
++    if (!is_error(ret)) {
++        struct linux_dirent *de = dirp;
++        int len = ret;
++        int reclen;
++
++        while (len > 0) {
++            reclen = de->d_reclen;
++            if (reclen > len) {
++                break;
++            }
++            de->d_reclen = tswap16(reclen);
++            tswapls(&de->d_ino);
++            tswapls(&de->d_off);
++            de = (struct linux_dirent *)((char *)de + reclen);
++            len -= reclen;
++        }
++    }
++    unlock_user(dirp, arg2, ret);
++#  endif
++# else
++    /* Implement getdents in terms of getdents64 */
++    struct linux_dirent64 *dirp;
++    abi_long count = arg3;
++
++    dirp = lock_user(VERIFY_WRITE, arg2, count, 0);
++    if (!dirp) {
++        return -TARGET_EFAULT;
++    }
++    ret = get_errno(sys_getdents64(arg1, dirp, count));
++    if (!is_error(ret)) {
++        /* Convert the dirent64 structs to target dirent.  We do this
++         * in-place, since we can guarantee that a target_dirent is no
++         * larger than a dirent64; however this means we have to be
++         * careful to read everything before writing in the new format.
++         */
++        struct linux_dirent64 *de = dirp;
++        struct target_dirent *tde = (struct target_dirent *)dirp;
++        int len = ret;
++        int tlen = 0;
++
++        while (len > 0) {
++            int namelen, treclen;
++            int reclen = de->d_reclen;
++            uint64_t ino = de->d_ino;
++            int64_t off = de->d_off;
++            uint8_t type = de->d_type;
++
++            namelen = strlen(de->d_name);
++            treclen = offsetof(struct target_dirent, d_name) + namelen + 2;
++            treclen = QEMU_ALIGN_UP(treclen, sizeof(abi_long));
++
++            memmove(tde->d_name, de->d_name, namelen + 1);
++            tde->d_ino = tswapal(ino);
++            tde->d_off = tswapal(off);
++            tde->d_reclen = tswap16(treclen);
++            /* The target_dirent type is in what was formerly a padding
++             * byte at the end of the structure:
++             */
++            *(((char *)tde) + treclen - 1) = type;
++
++            de = (struct linux_dirent64 *)((char *)de + reclen);
++            tde = (struct target_dirent *)((char *)tde + treclen);
++            len -= reclen;
++            tlen += treclen;
++        }
++        ret = tlen;
++    }
++    unlock_user(dirp, arg2, ret);
++# endif
++    return ret;
 +}
 +#endif
 +
- IMPL(lseek)
- {
-     return get_errno(lseek(arg1, arg2, arg3));
-@@ -8901,6 +8919,11 @@ IMPL(pause)
- }
- #endif
- 
-+IMPL(personality)
++#if defined(TARGET_NR_getdents64) && defined(__NR_getdents64)
++IMPL(getdents64)
 +{
-+    return get_errno(personality(arg1));
-+}
++    struct linux_dirent64 *dirp;
++    abi_long count = arg3;
++    abi_long ret;
 +
- #ifdef TARGET_NR_pipe
- IMPL(pipe)
++    dirp = lock_user(VERIFY_WRITE, arg2, count, 0);
++    if (!dirp) {
++        return -TARGET_EFAULT;
++    }
++    ret = get_errno(sys_getdents64(arg1, dirp, count));
++    if (!is_error(ret)) {
++        struct linux_dirent64 *de = dirp;
++        int len = ret;
++
++        while (len > 0) {
++            int reclen = de->d_reclen;
++            if (reclen > len) {
++                break;
++            }
++            de->d_reclen = tswap16(reclen);
++            tswap64s((uint64_t *)&de->d_ino);
++            tswap64s((uint64_t *)&de->d_off);
++            de = (struct linux_dirent64 *)((char *)de + reclen);
++            len -= reclen;
++        }
++    }
++    unlock_user(dirp, arg2, ret);
++    return ret;
++}
++#endif /* TARGET_NR_getdents64 */
++
+ IMPL(getitimer)
  {
-@@ -10462,32 +10485,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+     struct itimerval value;
+@@ -10485,165 +10649,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--    case TARGET_NR_getpgid:
--        return get_errno(getpgid(arg1));
--    case TARGET_NR_fchdir:
--        return get_errno(fchdir(arg1));
--    case TARGET_NR_personality:
--        return get_errno(personality(arg1));
--#ifdef TARGET_NR__llseek /* Not on alpha */
--    case TARGET_NR__llseek:
+-#ifdef TARGET_NR_getdents
+-    case TARGET_NR_getdents:
+-#ifdef EMULATE_GETDENTS_WITH_GETDENTS
+-#if TARGET_ABI_BITS == 32 && HOST_LONG_BITS == 64
 -        {
--            int64_t res;
--#if !defined(__NR_llseek)
--            res = lseek(arg1, ((uint64_t)arg2 << 32) | (abi_ulong)arg3, arg5);
--            if (res == -1) {
--                ret = get_errno(res);
--            } else {
--                ret = 0;
+-            struct target_dirent *target_dirp;
+-            struct linux_dirent *dirp;
+-            abi_long count = arg3;
+-
+-            dirp = g_try_malloc(count);
+-            if (!dirp) {
+-                return -TARGET_ENOMEM;
 -            }
+-
+-            ret = get_errno(sys_getdents(arg1, dirp, count));
+-            if (!is_error(ret)) {
+-                struct linux_dirent *de;
+-		struct target_dirent *tde;
+-                int len = ret;
+-                int reclen, treclen;
+-		int count1, tnamelen;
+-
+-		count1 = 0;
+-                de = dirp;
+-                if (!(target_dirp = lock_user(VERIFY_WRITE, arg2, count, 0)))
+-                    return -TARGET_EFAULT;
+-		tde = target_dirp;
+-                while (len > 0) {
+-                    reclen = de->d_reclen;
+-                    tnamelen = reclen - offsetof(struct linux_dirent, d_name);
+-                    assert(tnamelen >= 0);
+-                    treclen = tnamelen + offsetof(struct target_dirent, d_name);
+-                    assert(count1 + treclen <= count);
+-                    tde->d_reclen = tswap16(treclen);
+-                    tde->d_ino = tswapal(de->d_ino);
+-                    tde->d_off = tswapal(de->d_off);
+-                    memcpy(tde->d_name, de->d_name, tnamelen);
+-                    de = (struct linux_dirent *)((char *)de + reclen);
+-                    len -= reclen;
+-                    tde = (struct target_dirent *)((char *)tde + treclen);
+-		    count1 += treclen;
+-                }
+-		ret = count1;
+-                unlock_user(target_dirp, arg2, ret);
+-            }
+-            g_free(dirp);
+-        }
 -#else
--            ret = get_errno(_llseek(arg1, arg2, arg3, &res, arg5));
+-        {
+-            struct linux_dirent *dirp;
+-            abi_long count = arg3;
+-
+-            if (!(dirp = lock_user(VERIFY_WRITE, arg2, count, 0)))
+-                return -TARGET_EFAULT;
+-            ret = get_errno(sys_getdents(arg1, dirp, count));
+-            if (!is_error(ret)) {
+-                struct linux_dirent *de;
+-                int len = ret;
+-                int reclen;
+-                de = dirp;
+-                while (len > 0) {
+-                    reclen = de->d_reclen;
+-                    if (reclen > len)
+-                        break;
+-                    de->d_reclen = tswap16(reclen);
+-                    tswapls(&de->d_ino);
+-                    tswapls(&de->d_off);
+-                    de = (struct linux_dirent *)((char *)de + reclen);
+-                    len -= reclen;
+-                }
+-            }
+-            unlock_user(dirp, arg2, ret);
+-        }
 -#endif
--            if ((ret == 0) && put_user_s64(res, arg4)) {
+-#else
+-        /* Implement getdents in terms of getdents64 */
+-        {
+-            struct linux_dirent64 *dirp;
+-            abi_long count = arg3;
+-
+-            dirp = lock_user(VERIFY_WRITE, arg2, count, 0);
+-            if (!dirp) {
 -                return -TARGET_EFAULT;
 -            }
+-            ret = get_errno(sys_getdents64(arg1, dirp, count));
+-            if (!is_error(ret)) {
+-                /* Convert the dirent64 structs to target dirent.  We do this
+-                 * in-place, since we can guarantee that a target_dirent is no
+-                 * larger than a dirent64; however this means we have to be
+-                 * careful to read everything before writing in the new format.
+-                 */
+-                struct linux_dirent64 *de;
+-                struct target_dirent *tde;
+-                int len = ret;
+-                int tlen = 0;
+-
+-                de = dirp;
+-                tde = (struct target_dirent *)dirp;
+-                while (len > 0) {
+-                    int namelen, treclen;
+-                    int reclen = de->d_reclen;
+-                    uint64_t ino = de->d_ino;
+-                    int64_t off = de->d_off;
+-                    uint8_t type = de->d_type;
+-
+-                    namelen = strlen(de->d_name);
+-                    treclen = offsetof(struct target_dirent, d_name)
+-                        + namelen + 2;
+-                    treclen = QEMU_ALIGN_UP(treclen, sizeof(abi_long));
+-
+-                    memmove(tde->d_name, de->d_name, namelen + 1);
+-                    tde->d_ino = tswapal(ino);
+-                    tde->d_off = tswapal(off);
+-                    tde->d_reclen = tswap16(treclen);
+-                    /* The target_dirent type is in what was formerly a padding
+-                     * byte at the end of the structure:
+-                     */
+-                    *(((char *)tde) + treclen - 1) = type;
+-
+-                    de = (struct linux_dirent64 *)((char *)de + reclen);
+-                    tde = (struct target_dirent *)((char *)tde + treclen);
+-                    len -= reclen;
+-                    tlen += treclen;
+-                }
+-                ret = tlen;
+-            }
+-            unlock_user(dirp, arg2, ret);
+-        }
+-#endif
+-        return ret;
+-#endif /* TARGET_NR_getdents */
+-#if defined(TARGET_NR_getdents64) && defined(__NR_getdents64)
+-    case TARGET_NR_getdents64:
+-        {
+-            struct linux_dirent64 *dirp;
+-            abi_long count = arg3;
+-            if (!(dirp = lock_user(VERIFY_WRITE, arg2, count, 0)))
+-                return -TARGET_EFAULT;
+-            ret = get_errno(sys_getdents64(arg1, dirp, count));
+-            if (!is_error(ret)) {
+-                struct linux_dirent64 *de;
+-                int len = ret;
+-                int reclen;
+-                de = dirp;
+-                while (len > 0) {
+-                    reclen = de->d_reclen;
+-                    if (reclen > len)
+-                        break;
+-                    de->d_reclen = tswap16(reclen);
+-                    tswap64s((uint64_t *)&de->d_ino);
+-                    tswap64s((uint64_t *)&de->d_off);
+-                    de = (struct linux_dirent64 *)((char *)de + reclen);
+-                    len -= reclen;
+-                }
+-            }
+-            unlock_user(dirp, arg2, ret);
 -        }
 -        return ret;
--#endif
- #ifdef TARGET_NR_getdents
-     case TARGET_NR_getdents:
- #ifdef EMULATE_GETDENTS_WITH_GETDENTS
-@@ -12924,6 +12921,7 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL_WITH(exit_group, enosys);
- #endif
-         SYSCALL(faccessat);
-+        SYSCALL(fchdir);
-         SYSCALL(fchmod);
-         SYSCALL(fchmodat);
- #ifdef TARGET_NR_fcntl
-@@ -12946,6 +12944,7 @@ static impl_fn *syscall_table(unsigned num)
- #ifdef TARGET_NR_getpeername
-         SYSCALL(getpeername);
- #endif
-+        SYSCALL(getpgid);
- #ifdef TARGET_NR_getpgrp
-         SYSCALL(getpgrp);
- #endif
-@@ -12980,6 +12979,9 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(linkat);
- #ifdef TARGET_NR_listen
-         SYSCALL(listen);
+-#endif /* TARGET_NR_getdents64 */
+ #if defined(TARGET_NR_poll) || defined(TARGET_NR_ppoll)
+ # ifdef TARGET_NR_poll
+     case TARGET_NR_poll:
+@@ -12939,6 +12944,12 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(ftruncate);
+ #ifdef TARGET_NR_futimesat
+         SYSCALL(futimesat);
 +#endif
-+#ifdef TARGET_NR_llseek
-+        SYSCALL(llseek);
++#ifdef TARGET_NR_getdents
++        SYSCALL(getdents);
++#endif
++#if defined(TARGET_NR_getdents64) && defined(__NR_getdents64)
++        SYSCALL(getdents64);
  #endif
-         SYSCALL(lseek);
- #ifdef TARGET_NR_lstat
-@@ -13042,6 +13044,7 @@ static impl_fn *syscall_table(unsigned num)
- #ifdef TARGET_NR_pause
-         SYSCALL(pause);
- #endif
-+        SYSCALL(personality);
- #ifdef TARGET_NR_pipe
-         SYSCALL(pipe);
- #endif
+         SYSCALL(getitimer);
+ #ifdef TARGET_NR_getpeername
 -- 
 2.17.1
