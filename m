@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqdM-00025a-IB
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:03:15 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqdR-00027h-66
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:03:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqdL-0003LC-CC
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:03:12 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:40841)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqdO-0003M5-2i
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:03:17 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:44108)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqdL-0003Ku-40
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:03:11 -0400
-Received: by mail-pg0-x242.google.com with SMTP id l2-v6so8127289pgc.7
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:03:10 -0700 (PDT)
+	id 1fRqdN-0003Lk-QL
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:03:13 -0400
+Received: by mail-pl0-x241.google.com with SMTP id z9-v6so10386379plk.11
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:03:13 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:00:53 -1000
-Message-Id: <20180610030220.3777-22-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:00:54 -1000
+Message-Id: <20180610030220.3777-23-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 021/108] linux-user: Split out alarm, pause,
- stime, utime, utimes
+Subject: [Qemu-devel] [PATCH v2 022/108] linux-user: Split out access,
+ faccessat, futimesat, kill, nice, sync, syncfs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,227 +30,246 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
+All targets define faccessat and syncfs; remove the ifdefs.
+Fix the missing flags parameter to faccessat.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 155 ++++++++++++++++++++++++++-----------------
- 1 file changed, 93 insertions(+), 62 deletions(-)
+ linux-user/syscall.c | 143 +++++++++++++++++++++++++++----------------
+ 1 file changed, 91 insertions(+), 52 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 844e771488..d5f7519e62 100644
+index d5f7519e62..6729a960ea 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -7871,6 +7871,13 @@ static abi_long impl_##NAME(void *cpu_env, unsigned num, abi_long arg1,   \
+@@ -7871,6 +7871,21 @@ static abi_long impl_##NAME(void *cpu_env, unsigned num, abi_long arg1,   \
                              abi_long arg5, abi_long arg6, abi_long arg7,  \
                              abi_long arg8)
  
-+#ifdef TARGET_NR_alarm
-+IMPL(alarm)
++#ifdef TARGET_NR_access
++IMPL(access)
 +{
-+    return alarm(arg1);
++    char *p = lock_user_string(arg1);
++    abi_long ret;
++
++    if (!p) {
++        return -TARGET_EFAULT;
++    }
++    ret = get_errno(access(path(p), arg2));
++    unlock_user(p, arg1, 0);
++    return ret;
 +}
 +#endif
 +
- IMPL(brk)
+ #ifdef TARGET_NR_alarm
+ IMPL(alarm)
  {
-     return do_brk(arg1);
-@@ -8319,6 +8326,17 @@ IMPL(open_by_handle_at)
+@@ -8080,6 +8095,19 @@ IMPL(exit)
+     g_assert_not_reached();
+ }
+ 
++IMPL(faccessat)
++{
++    char *p = lock_user_string(arg2);
++    abi_long ret;
++
++    if (!p) {
++        return -TARGET_EFAULT;
++    }
++    ret = get_errno(faccessat(arg1, p, arg3, arg4));
++    unlock_user(p, arg2, 0);
++    return ret;
++}
++
+ #ifdef TARGET_NR_fork
+ IMPL(fork)
+ {
+@@ -8087,6 +8115,29 @@ IMPL(fork)
  }
  #endif
  
-+#ifdef TARGET_NR_pause
-+IMPL(pause)
++#ifdef TARGET_NR_futimesat
++IMPL(futimesat)
 +{
-+    if (!block_signals()) {
-+        CPUState *cpu = ENV_GET_CPU(cpu_env);
-+        sigsuspend(&((TaskState *)cpu->opaque)->signal_mask);
++    struct timeval tv[2];
++    char *p;
++    abi_long ret;
++
++    if (arg3 &&
++        (copy_from_user_timeval(&tv[0], arg3) ||
++         copy_from_user_timeval(&tv[1],
++                                arg3 + sizeof(struct target_timeval)))) {
++        return -TARGET_EFAULT;
 +    }
-+    return -TARGET_EINTR;
++    p = lock_user_string(arg2);
++    if (!p) {
++        return -TARGET_EFAULT;
++    }
++    ret = get_errno(futimesat(arg1, path(p), arg3 ? tv : NULL));
++    unlock_user(p, arg2, 0);
++    return ret;
 +}
 +#endif
 +
- IMPL(read)
+ #ifdef TARGET_NR_getpid
+ IMPL(getpid)
  {
-     abi_long ret;
-@@ -8339,6 +8357,17 @@ IMPL(read)
-     return ret;
+@@ -8102,6 +8153,11 @@ IMPL(getxpid)
  }
+ #endif
  
-+#ifdef TARGET_NR_stime
-+IMPL(stime)
++IMPL(kill)
 +{
-+    time_t host_time;
-+    if (get_user_sal(host_time, arg1)) {
-+        return -TARGET_EFAULT;
-+    }
-+    return get_errno(stime(&host_time));
++    return get_errno(safe_kill(arg1, target_to_host_signal(arg2)));
++}
++
+ #ifdef TARGET_NR_link
+ IMPL(link)
+ {
+@@ -8256,6 +8312,13 @@ IMPL(name_to_handle_at)
+ }
+ #endif
+ 
++#ifdef TARGET_NR_nice
++IMPL(nice)
++{
++    return get_errno(nice(arg1));
++}
++#endif
++
+ #ifdef TARGET_NR_open
+ IMPL(open)
+ {
+@@ -8368,6 +8431,19 @@ IMPL(stime)
+ }
+ #endif
+ 
++IMPL(sync)
++{
++    sync();
++    return 0;
++}
++
++#ifdef CONFIG_SYNCFS
++IMPL(syncfs)
++{
++    return get_errno(syncfs(arg1));
 +}
 +#endif
 +
  #ifdef TARGET_NR_time
  IMPL(time)
  {
-@@ -8394,6 +8423,55 @@ IMPL(unlinkat)
-     return ret;
- }
- 
-+#ifdef TARGET_NR_utime
-+IMPL(utime)
-+{
-+    struct utimbuf tbuf;
-+    char *p;
-+    abi_long ret;
-+
-+    if (arg2) {
-+        struct target_utimbuf *target_tbuf;
-+        if (!lock_user_struct(VERIFY_READ, target_tbuf, arg2, 1)) {
-+            return -TARGET_EFAULT;
-+        }
-+        tbuf.actime = tswapal(target_tbuf->actime);
-+        tbuf.modtime = tswapal(target_tbuf->modtime);
-+        unlock_user_struct(target_tbuf, arg2, 0);
-+    }
-+    p = lock_user_string(arg1);
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(utime(p, arg2 ? &tbuf : NULL));
-+    unlock_user(p, arg1, 0);
-+    return ret;
-+}
-+#endif
-+
-+#ifdef TARGET_NR_utimes
-+IMPL(utimes)
-+{
-+    struct timeval tv[2];
-+    char *p;
-+    abi_long ret;
-+
-+    if (arg2 &&
-+        (copy_from_user_timeval(&tv[0], arg2) ||
-+         copy_from_user_timeval(&tv[1],
-+                                arg2 + sizeof(struct target_timeval)))) {
-+        return -TARGET_EFAULT;
-+    }
-+    p = lock_user_string(arg1);
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(utimes(p, arg2 ? tv : NULL));
-+    unlock_user(p, arg1, 0);
-+    return ret;
-+}
-+#endif
-+
- IMPL(waitid)
- {
-     siginfo_t info;
-@@ -8467,68 +8545,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+@@ -8545,58 +8621,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_stime /* not on alpha */
--    case TARGET_NR_stime:
--        {
--            time_t host_time;
--            if (get_user_sal(host_time, arg1))
--                return -TARGET_EFAULT;
--            return get_errno(stime(&host_time));
--        }
--#endif
--#ifdef TARGET_NR_alarm /* not on alpha */
--    case TARGET_NR_alarm:
--        return alarm(arg1);
--#endif
--#ifdef TARGET_NR_pause /* not on alpha */
--    case TARGET_NR_pause:
--        if (!block_signals()) {
--            sigsuspend(&((TaskState *)cpu->opaque)->signal_mask);
--        }
--        return -TARGET_EINTR;
--#endif
--#ifdef TARGET_NR_utime
--    case TARGET_NR_utime:
--        {
--            struct utimbuf tbuf, *host_tbuf;
--            struct target_utimbuf *target_tbuf;
--            if (arg2) {
--                if (!lock_user_struct(VERIFY_READ, target_tbuf, arg2, 1))
--                    return -TARGET_EFAULT;
--                tbuf.actime = tswapal(target_tbuf->actime);
--                tbuf.modtime = tswapal(target_tbuf->modtime);
--                unlock_user_struct(target_tbuf, arg2, 0);
--                host_tbuf = &tbuf;
--            } else {
--                host_tbuf = NULL;
--            }
--            if (!(p = lock_user_string(arg1)))
--                return -TARGET_EFAULT;
--            ret = get_errno(utime(p, host_tbuf));
--            unlock_user(p, arg1, 0);
--        }
--        return ret;
--#endif
--#ifdef TARGET_NR_utimes
--    case TARGET_NR_utimes:
+-#if defined(TARGET_NR_futimesat)
+-    case TARGET_NR_futimesat:
 -        {
 -            struct timeval *tvp, tv[2];
--            if (arg2) {
--                if (copy_from_user_timeval(&tv[0], arg2)
+-            if (arg3) {
+-                if (copy_from_user_timeval(&tv[0], arg3)
 -                    || copy_from_user_timeval(&tv[1],
--                                              arg2 + sizeof(struct target_timeval)))
+-                                              arg3 + sizeof(struct target_timeval)))
 -                    return -TARGET_EFAULT;
 -                tvp = tv;
 -            } else {
 -                tvp = NULL;
 -            }
--            if (!(p = lock_user_string(arg1)))
+-            if (!(p = lock_user_string(arg2))) {
 -                return -TARGET_EFAULT;
--            ret = get_errno(utimes(p, tvp));
--            unlock_user(p, arg1, 0);
+-            }
+-            ret = get_errno(futimesat(arg1, path(p), tvp));
+-            unlock_user(p, arg2, 0);
 -        }
 -        return ret;
 -#endif
- #if defined(TARGET_NR_futimesat)
-     case TARGET_NR_futimesat:
+-#ifdef TARGET_NR_access
+-    case TARGET_NR_access:
+-        if (!(p = lock_user_string(arg1))) {
+-            return -TARGET_EFAULT;
+-        }
+-        ret = get_errno(access(path(p), arg2));
+-        unlock_user(p, arg1, 0);
+-        return ret;
+-#endif
+-#if defined(TARGET_NR_faccessat) && defined(__NR_faccessat)
+-    case TARGET_NR_faccessat:
+-        if (!(p = lock_user_string(arg2))) {
+-            return -TARGET_EFAULT;
+-        }
+-        ret = get_errno(faccessat(arg1, p, arg3, 0));
+-        unlock_user(p, arg2, 0);
+-        return ret;
+-#endif
+-#ifdef TARGET_NR_nice /* not on alpha */
+-    case TARGET_NR_nice:
+-        return get_errno(nice(arg1));
+-#endif
+-    case TARGET_NR_sync:
+-        sync();
+-        return 0;
+-#if defined(TARGET_NR_syncfs) && defined(CONFIG_SYNCFS)
+-    case TARGET_NR_syncfs:
+-        return get_errno(syncfs(arg1));
+-#endif
+-    case TARGET_NR_kill:
+-        return get_errno(safe_kill(arg1, target_to_host_signal(arg2)));
+ #ifdef TARGET_NR_rename
+     case TARGET_NR_rename:
          {
-@@ -12528,6 +12544,9 @@ static impl_fn *syscall_table(unsigned num)
+@@ -12544,6 +12568,9 @@ static impl_fn *syscall_table(unsigned num)
          /*
           * Other syscalls listed in collation order, with '_' ignored.
           */
-+#ifdef TARGET_NR_alarm
-+        SYSCALL(alarm);
++#ifdef TARGET_NR_access
++        SYSCALL(access);
 +#endif
-         SYSCALL(brk);
-         SYSCALL(close);
-         SYSCALL(chdir);
-@@ -12567,8 +12586,14 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(openat);
- #ifdef CONFIG_OPEN_BY_HANDLE
-         SYSCALL(open_by_handle_at);
-+#endif
-+#ifdef TARGET_NR_pause
-+        SYSCALL(pause);
+ #ifdef TARGET_NR_alarm
+         SYSCALL(alarm);
  #endif
-         SYSCALL(read);
-+#ifdef TARGET_NR_stime
-+        SYSCALL(stime);
+@@ -12558,15 +12585,20 @@ static impl_fn *syscall_table(unsigned num)
+ #endif
+         SYSCALL(execve);
+         SYSCALL(exit);
++        SYSCALL(faccessat);
+ #ifdef TARGET_NR_fork
+         SYSCALL(fork);
+ #endif
++#ifdef TARGET_NR_futimesat
++        SYSCALL(futimesat);
 +#endif
+ #ifdef TARGET_NR_getpid
+         SYSCALL(getpid);
+ #endif
+ #if defined(TARGET_NR_getxpid) && defined(TARGET_ALPHA)
+         SYSCALL(getxpid);
+ #endif
++        SYSCALL(kill);
+ #ifdef TARGET_NR_link
+         SYSCALL(link);
+ #endif
+@@ -12580,6 +12612,9 @@ static impl_fn *syscall_table(unsigned num)
+ #ifdef CONFIG_OPEN_BY_HANDLE
+         SYSCALL(name_to_handle_at);
+ #endif
++#ifdef TARGET_NR_nice
++        SYSCALL(nice);
++#endif
+ #ifdef TARGET_NR_open
+         SYSCALL(open);
+ #endif
+@@ -12593,6 +12628,10 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(read);
+ #ifdef TARGET_NR_stime
+         SYSCALL(stime);
++#endif
++        SYSCALL(sync);
++#ifdef CONFIG_SYNCFS
++        SYSCALL(syncfs);
+ #endif
  #ifdef TARGET_NR_time
          SYSCALL(time);
- #endif
-@@ -12579,6 +12604,12 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(unlink);
- #endif
-         SYSCALL(unlinkat);
-+#ifdef TARGET_NR_utime
-+        SYSCALL(utime);
-+#endif
-+#ifdef TARGET_NR_utimes
-+        SYSCALL(utimes);
-+#endif
-         SYSCALL(waitid);
- #ifdef TARGET_NR_waitpid
-         SYSCALL(waitpid);
 -- 
 2.17.1
