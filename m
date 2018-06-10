@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqfM-0003zf-UR
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:18 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqfL-0004Mg-R5
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfL-0003xn-3f
 	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:16 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:33746)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfH-0004Lm-St
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:15 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:37284)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqfL-0004MN-Ir
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:15 -0400
-Received: by mail-pl0-x242.google.com with SMTP id n10-v6so10391995plp.0
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:15 -0700 (PDT)
+	id 1fRqfH-0004La-JN
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:11 -0400
+Received: by mail-pl0-x243.google.com with SMTP id 31-v6so10386558plc.4
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:11 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:52 -1000
-Message-Id: <20180610030220.3777-81-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:50 -1000
+Message-Id: <20180610030220.3777-79-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 080/108] linux-user: Split out fchown32,
- getgroups32, setgroups32
+Subject: [Qemu-devel] [PATCH v2 078/108] linux-user: Split out
+ osf_getsysinfo, osf_setsysinfo, osf_sigprocmask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,175 +32,356 @@ Cc: laurent@vivier.eu
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 114 +++++++++++++++++++++++++------------------
- 1 file changed, 67 insertions(+), 47 deletions(-)
+ linux-user/syscall.c | 323 ++++++++++++++++++++++---------------------
+ 1 file changed, 162 insertions(+), 161 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index c8bd13092e..031033c0ea 100644
+index 17560ebd41..ae591a6523 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -8123,6 +8123,13 @@ IMPL(fchown)
-     return get_errno(fchown(arg1, low2highuid(arg2), low2highgid(arg3)));
+@@ -9444,6 +9444,159 @@ IMPL(open_by_handle_at)
  }
+ #endif
  
-+#ifdef TARGET_NR_fchown32
-+IMPL(fchown32)
++#if defined(TARGET_NR_osf_getsysinfo) && defined(TARGET_ALPHA)
++IMPL(osf_getsysinfo)
 +{
-+    return get_errno(fchown(arg1, arg2, arg3));
++    uint64_t swcr, fpcr;
++
++    switch (arg1) {
++    case TARGET_GSI_IEEE_FP_CONTROL:
++        fpcr = cpu_alpha_load_fpcr(cpu_env);
++
++        /* Copied from linux ieee_fpcr_to_swcr.  */
++        swcr = (fpcr >> 35) & SWCR_STATUS_MASK;
++        swcr |= (fpcr >> 36) & SWCR_MAP_DMZ;
++        swcr |= (~fpcr >> 48) & (SWCR_TRAP_ENABLE_INV
++                                | SWCR_TRAP_ENABLE_DZE
++                                | SWCR_TRAP_ENABLE_OVF);
++        swcr |= (~fpcr >> 57) & (SWCR_TRAP_ENABLE_UNF
++                                | SWCR_TRAP_ENABLE_INE);
++        swcr |= (fpcr >> 47) & SWCR_MAP_UMZ;
++        swcr |= (~fpcr >> 41) & SWCR_TRAP_ENABLE_DNO;
++
++        if (put_user_u64(swcr, arg2)) {
++            return -TARGET_EFAULT;
++        }
++        return 0;
++
++    default:
++        /* case GSI_IEEE_STATE_AT_SIGNAL:
++         * -- Not implemented in linux kernel.
++         * case GSI_UACPROC:
++         * -- Retrieves current unaligned access state; not much used.
++         * case GSI_PROC_TYPE:
++         * -- Retrieves implver information; surely not used.
++         * case GSI_GET_HWRPB:
++         * -- Grabs a copy of the HWRPB; surely not used.
++         */
++        return -TARGET_EOPNOTSUPP;
++    }
 +}
 +#endif
 +
- IMPL(fchownat)
- {
-     char *p = lock_user_string(arg2);
-@@ -8543,6 +8550,33 @@ IMPL(getgroups)
-     return ret;
- }
- 
-+#ifdef TARGET_NR_getgroups32
-+IMPL(getgroups32)
++#if defined(TARGET_NR_osf_setsysinfo) && defined(TARGET_ALPHA)
++IMPL(osf_setsysinfo)
 +{
-+    int gidsetsize = arg1;
-+    gid_t *grouplist;
-+    abi_long ret;
++    uint64_t swcr, fpcr, exc, orig_fpcr;
++    int si_code;
 +
-+    grouplist = alloca(gidsetsize * sizeof(gid_t));
-+    ret = get_errno(getgroups(gidsetsize, grouplist));
-+
-+    if (!is_error(ret) && gidsetsize != 0) {
-+        uint32_t *target_gl;
-+        int i;
-+
-+        target_gl = lock_user(VERIFY_WRITE, arg2, gidsetsize * 4, 0);
-+        if (!target_gl) {
++    switch (arg1) {
++    case TARGET_SSI_IEEE_FP_CONTROL:
++        if (get_user_u64(swcr, arg2)) {
 +            return -TARGET_EFAULT;
 +        }
-+        for (i = 0; i < ret; i++) {
-+            target_gl[i] = tswap32(grouplist[i]);
++        orig_fpcr = cpu_alpha_load_fpcr(cpu_env);
++        fpcr = orig_fpcr & FPCR_DYN_MASK;
++
++        /* Copied from linux ieee_swcr_to_fpcr.  */
++        fpcr |= (swcr & SWCR_STATUS_MASK) << 35;
++        fpcr |= (swcr & SWCR_MAP_DMZ) << 36;
++        fpcr |= (~swcr & (SWCR_TRAP_ENABLE_INV
++                          | SWCR_TRAP_ENABLE_DZE
++                          | SWCR_TRAP_ENABLE_OVF)) << 48;
++        fpcr |= (~swcr & (SWCR_TRAP_ENABLE_UNF
++                          | SWCR_TRAP_ENABLE_INE)) << 57;
++        fpcr |= (swcr & SWCR_MAP_UMZ ? FPCR_UNDZ | FPCR_UNFD : 0);
++        fpcr |= (~swcr & SWCR_TRAP_ENABLE_DNO) << 41;
++
++        cpu_alpha_store_fpcr(cpu_env, fpcr);
++        return 0;
++
++    case TARGET_SSI_IEEE_RAISE_EXCEPTION:
++        if (get_user_u64(exc, arg2)) {
++            return -TARGET_EFAULT;
 +        }
-+        unlock_user(target_gl, arg2, gidsetsize * 4);
++        orig_fpcr = cpu_alpha_load_fpcr(cpu_env);
++
++        /* We only add to the exception status here.  */
++        fpcr = orig_fpcr | ((exc & SWCR_STATUS_MASK) << 35);
++        cpu_alpha_store_fpcr(cpu_env, fpcr);
++
++        /* Old exceptions are not signaled.  */
++        fpcr &= ~(orig_fpcr & FPCR_STATUS_MASK);
++
++        /* If any exceptions set by this call,
++           and are unmasked, send a signal.  */
++        si_code = 0;
++        if ((fpcr & (FPCR_INE | FPCR_INED)) == FPCR_INE) {
++            si_code = TARGET_FPE_FLTRES;
++        }
++        if ((fpcr & (FPCR_UNF | FPCR_UNFD)) == FPCR_UNF) {
++            si_code = TARGET_FPE_FLTUND;
++        }
++        if ((fpcr & (FPCR_OVF | FPCR_OVFD)) == FPCR_OVF) {
++            si_code = TARGET_FPE_FLTOVF;
++        }
++        if ((fpcr & (FPCR_DZE | FPCR_DZED)) == FPCR_DZE) {
++            si_code = TARGET_FPE_FLTDIV;
++        }
++        if ((fpcr & (FPCR_INV | FPCR_INVD)) == FPCR_INV) {
++            si_code = TARGET_FPE_FLTINV;
++        }
++        if (si_code != 0) {
++            CPUAlphaState *env = cpu_env;
++            target_siginfo_t info;
++
++            info.si_signo = SIGFPE;
++            info.si_errno = 0;
++            info.si_code = si_code;
++            info._sifields._sigfault._addr = env->pc;
++            queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
++        }
++        return 0;
++
++    default:
++        /* case SSI_NVPAIRS:
++         * -- Used with SSIN_UACPROC to enable unaligned accesses.
++         * case SSI_IEEE_STATE_AT_SIGNAL:
++         * case SSI_IEEE_IGNORE_STATE_AT_SIGNAL:
++         * -- Not implemented in linux kernel
++         */
++        return -TARGET_EOPNOTSUPP;
++    }
++}
++#endif
++
++#if defined(TARGET_NR_osf_sigprocmask) && defined(TARGET_ALPHA)
++IMPL(osf_sigprocmask)
++{
++    abi_ulong mask = arg2;
++    int how;
++    sigset_t set, oldset;
++
++    switch (arg1) {
++    case TARGET_SIG_BLOCK:
++        how = SIG_BLOCK;
++        break;
++    case TARGET_SIG_UNBLOCK:
++        how = SIG_UNBLOCK;
++        break;
++    case TARGET_SIG_SETMASK:
++        how = SIG_SETMASK;
++        break;
++    default:
++        return -TARGET_EINVAL;
++    }
++    target_to_host_old_sigset(&set, &mask);
++    ret = do_sigprocmask(how, &set, &oldset);
++    if (!ret) {
++        host_to_target_old_sigset(&mask, &oldset);
++        ret = mask;
 +    }
 +    return ret;
 +}
 +#endif
 +
- IMPL(getitimer)
+ #ifdef TARGET_NR_pause
+ IMPL(pause)
  {
-     struct itimerval value;
-@@ -10783,6 +10817,30 @@ IMPL(setgroups)
-     return get_errno(setgroups(gidsetsize, grouplist));
- }
- 
-+#ifdef TARGET_NR_setgroups32
-+IMPL(setgroups32)
-+{
-+    int gidsetsize = arg1;
-+    gid_t *grouplist = NULL;
-+
-+    if (gidsetsize) {
-+        uint32_t *target_gl;
-+        int i;
-+
-+        grouplist = alloca(gidsetsize * sizeof(gid_t));
-+        target_gl = lock_user(VERIFY_READ, arg2, gidsetsize * 4, 1);
-+        if (!target_gl) {
-+            return -TARGET_EFAULT;
-+        }
-+        for (i = 0; i < gidsetsize; i++) {
-+            grouplist[i] = tswap32(target_gl[i]);
-+        }
-+        unlock_user(target_gl, arg2, 0);
-+    }
-+    return get_errno(setgroups(gidsetsize, grouplist));
-+}
-+#endif
-+
- IMPL(sethostname)
- {
-     char *p = lock_user_string(arg1);
-@@ -11840,53 +11898,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+@@ -11652,167 +11805,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_getgroups32
--    case TARGET_NR_getgroups32:
--        {
--            int gidsetsize = arg1;
--            uint32_t *target_grouplist;
--            gid_t *grouplist;
--            int i;
+-#if defined(TARGET_NR_osf_getsysinfo) && defined(TARGET_ALPHA)
+-    /* Alpha specific */
+-    case TARGET_NR_osf_getsysinfo:
+-        ret = -TARGET_EOPNOTSUPP;
+-        switch (arg1) {
+-          case TARGET_GSI_IEEE_FP_CONTROL:
+-            {
+-                uint64_t swcr, fpcr = cpu_alpha_load_fpcr (cpu_env);
 -
--            grouplist = alloca(gidsetsize * sizeof(gid_t));
--            ret = get_errno(getgroups(gidsetsize, grouplist));
--            if (gidsetsize == 0)
--                return ret;
--            if (!is_error(ret)) {
--                target_grouplist = lock_user(VERIFY_WRITE, arg2, gidsetsize * 4, 0);
--                if (!target_grouplist) {
+-                /* Copied from linux ieee_fpcr_to_swcr.  */
+-                swcr = (fpcr >> 35) & SWCR_STATUS_MASK;
+-                swcr |= (fpcr >> 36) & SWCR_MAP_DMZ;
+-                swcr |= (~fpcr >> 48) & (SWCR_TRAP_ENABLE_INV
+-                                        | SWCR_TRAP_ENABLE_DZE
+-                                        | SWCR_TRAP_ENABLE_OVF);
+-                swcr |= (~fpcr >> 57) & (SWCR_TRAP_ENABLE_UNF
+-                                        | SWCR_TRAP_ENABLE_INE);
+-                swcr |= (fpcr >> 47) & SWCR_MAP_UMZ;
+-                swcr |= (~fpcr >> 41) & SWCR_TRAP_ENABLE_DNO;
+-
+-                if (put_user_u64 (swcr, arg2))
+-                        return -TARGET_EFAULT;
+-                ret = 0;
+-            }
+-            break;
+-
+-          /* case GSI_IEEE_STATE_AT_SIGNAL:
+-             -- Not implemented in linux kernel.
+-             case GSI_UACPROC:
+-             -- Retrieves current unaligned access state; not much used.
+-             case GSI_PROC_TYPE:
+-             -- Retrieves implver information; surely not used.
+-             case GSI_GET_HWRPB:
+-             -- Grabs a copy of the HWRPB; surely not used.
+-          */
+-        }
+-        return ret;
+-#endif
+-#if defined(TARGET_NR_osf_setsysinfo) && defined(TARGET_ALPHA)
+-    /* Alpha specific */
+-    case TARGET_NR_osf_setsysinfo:
+-        ret = -TARGET_EOPNOTSUPP;
+-        switch (arg1) {
+-          case TARGET_SSI_IEEE_FP_CONTROL:
+-            {
+-                uint64_t swcr, fpcr, orig_fpcr;
+-
+-                if (get_user_u64 (swcr, arg2)) {
 -                    return -TARGET_EFAULT;
 -                }
--                for(i = 0;i < ret; i++)
--                    target_grouplist[i] = tswap32(grouplist[i]);
--                unlock_user(target_grouplist, arg2, gidsetsize * 4);
+-                orig_fpcr = cpu_alpha_load_fpcr(cpu_env);
+-                fpcr = orig_fpcr & FPCR_DYN_MASK;
+-
+-                /* Copied from linux ieee_swcr_to_fpcr.  */
+-                fpcr |= (swcr & SWCR_STATUS_MASK) << 35;
+-                fpcr |= (swcr & SWCR_MAP_DMZ) << 36;
+-                fpcr |= (~swcr & (SWCR_TRAP_ENABLE_INV
+-                                  | SWCR_TRAP_ENABLE_DZE
+-                                  | SWCR_TRAP_ENABLE_OVF)) << 48;
+-                fpcr |= (~swcr & (SWCR_TRAP_ENABLE_UNF
+-                                  | SWCR_TRAP_ENABLE_INE)) << 57;
+-                fpcr |= (swcr & SWCR_MAP_UMZ ? FPCR_UNDZ | FPCR_UNFD : 0);
+-                fpcr |= (~swcr & SWCR_TRAP_ENABLE_DNO) << 41;
+-
+-                cpu_alpha_store_fpcr(cpu_env, fpcr);
+-                ret = 0;
+-            }
+-            break;
+-
+-          case TARGET_SSI_IEEE_RAISE_EXCEPTION:
+-            {
+-                uint64_t exc, fpcr, orig_fpcr;
+-                int si_code;
+-
+-                if (get_user_u64(exc, arg2)) {
+-                    return -TARGET_EFAULT;
+-                }
+-
+-                orig_fpcr = cpu_alpha_load_fpcr(cpu_env);
+-
+-                /* We only add to the exception status here.  */
+-                fpcr = orig_fpcr | ((exc & SWCR_STATUS_MASK) << 35);
+-
+-                cpu_alpha_store_fpcr(cpu_env, fpcr);
+-                ret = 0;
+-
+-                /* Old exceptions are not signaled.  */
+-                fpcr &= ~(orig_fpcr & FPCR_STATUS_MASK);
+-
+-                /* If any exceptions set by this call,
+-                   and are unmasked, send a signal.  */
+-                si_code = 0;
+-                if ((fpcr & (FPCR_INE | FPCR_INED)) == FPCR_INE) {
+-                    si_code = TARGET_FPE_FLTRES;
+-                }
+-                if ((fpcr & (FPCR_UNF | FPCR_UNFD)) == FPCR_UNF) {
+-                    si_code = TARGET_FPE_FLTUND;
+-                }
+-                if ((fpcr & (FPCR_OVF | FPCR_OVFD)) == FPCR_OVF) {
+-                    si_code = TARGET_FPE_FLTOVF;
+-                }
+-                if ((fpcr & (FPCR_DZE | FPCR_DZED)) == FPCR_DZE) {
+-                    si_code = TARGET_FPE_FLTDIV;
+-                }
+-                if ((fpcr & (FPCR_INV | FPCR_INVD)) == FPCR_INV) {
+-                    si_code = TARGET_FPE_FLTINV;
+-                }
+-                if (si_code != 0) {
+-                    target_siginfo_t info;
+-                    info.si_signo = SIGFPE;
+-                    info.si_errno = 0;
+-                    info.si_code = si_code;
+-                    info._sifields._sigfault._addr
+-                        = ((CPUArchState *)cpu_env)->pc;
+-                    queue_signal((CPUArchState *)cpu_env, info.si_signo,
+-                                 QEMU_SI_FAULT, &info);
+-                }
+-            }
+-            break;
+-
+-          /* case SSI_NVPAIRS:
+-             -- Used with SSIN_UACPROC to enable unaligned accesses.
+-             case SSI_IEEE_STATE_AT_SIGNAL:
+-             case SSI_IEEE_IGNORE_STATE_AT_SIGNAL:
+-             -- Not implemented in linux kernel
+-          */
+-        }
+-        return ret;
+-#endif
+-#ifdef TARGET_NR_osf_sigprocmask
+-    /* Alpha specific.  */
+-    case TARGET_NR_osf_sigprocmask:
+-        {
+-            abi_ulong mask;
+-            int how;
+-            sigset_t set, oldset;
+-
+-            switch(arg1) {
+-            case TARGET_SIG_BLOCK:
+-                how = SIG_BLOCK;
+-                break;
+-            case TARGET_SIG_UNBLOCK:
+-                how = SIG_UNBLOCK;
+-                break;
+-            case TARGET_SIG_SETMASK:
+-                how = SIG_SETMASK;
+-                break;
+-            default:
+-                return -TARGET_EINVAL;
+-            }
+-            mask = arg2;
+-            target_to_host_old_sigset(&set, &mask);
+-            ret = do_sigprocmask(how, &set, &oldset);
+-            if (!ret) {
+-                host_to_target_old_sigset(&mask, &oldset);
+-                ret = mask;
 -            }
 -        }
 -        return ret;
 -#endif
--#ifdef TARGET_NR_setgroups32
--    case TARGET_NR_setgroups32:
--        {
--            int gidsetsize = arg1;
--            uint32_t *target_grouplist;
--            gid_t *grouplist;
--            int i;
 -
--            grouplist = alloca(gidsetsize * sizeof(gid_t));
--            target_grouplist = lock_user(VERIFY_READ, arg2, gidsetsize * 4, 1);
--            if (!target_grouplist) {
--                return -TARGET_EFAULT;
--            }
--            for(i = 0;i < gidsetsize; i++)
--                grouplist[i] = tswap32(target_grouplist[i]);
--            unlock_user(target_grouplist, arg2, 0);
--            return get_errno(setgroups(gidsetsize, grouplist));
--        }
--#endif
--#ifdef TARGET_NR_fchown32
--    case TARGET_NR_fchown32:
--        return get_errno(fchown(arg1, arg2, arg3));
--#endif
- #ifdef TARGET_NR_setresuid32
-     case TARGET_NR_setresuid32:
-         return get_errno(sys_setresuid(arg1, arg2, arg3));
-@@ -13144,6 +13155,9 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(fchmod);
-         SYSCALL(fchmodat);
-         SYSCALL(fchown);
-+#ifdef TARGET_NR_fchown32
-+        SYSCALL(fchown32);
-+#endif
-         SYSCALL(fchownat);
- #ifdef TARGET_NR_fcntl
-         SYSCALL(fcntl);
-@@ -13199,6 +13213,9 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(getgid32);
+ #ifdef TARGET_NR_getgid32
+     case TARGET_NR_getgid32:
+         return get_errno(getgid());
+@@ -13316,6 +13308,15 @@ static impl_fn *syscall_table(unsigned num)
+ #ifdef CONFIG_OPEN_BY_HANDLE
+         SYSCALL(open_by_handle_at);
  #endif
-         SYSCALL(getgroups);
-+#ifdef TARGET_NR_getgroups32
-+        SYSCALL(getgroups32);
++#if defined(TARGET_NR_osf_getsysinfo) && defined(TARGET_ALPHA)
++        SYSCALL(osf_getsysinfo);
 +#endif
-         SYSCALL(getitimer);
- #ifdef TARGET_NR_getpeername
-         SYSCALL(getpeername);
-@@ -13463,6 +13480,9 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(setfsuid);
-         SYSCALL(setgid);
-         SYSCALL(setgroups);
-+#ifdef TARGET_NR_setgroups32
-+        SYSCALL(setgroups32);
++#if defined(TARGET_NR_osf_setsysinfo) && defined(TARGET_ALPHA)
++        SYSCALL(osf_setsysinfo);
 +#endif
-         SYSCALL(sethostname);
-         SYSCALL(setitimer);
-         SYSCALL(setpgid);
++#if defined(TARGET_NR_osf_sigprocmask) && defined(TARGET_ALPHA)
++        SYSCALL(osf_sigprocmask);
++#endif
+ #ifdef TARGET_NR_pause
+         SYSCALL(pause);
+ #endif
 -- 
 2.17.1
