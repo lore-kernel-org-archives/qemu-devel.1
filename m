@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqf5-0003ic-84
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:01 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqf7-0003jk-3h
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqf3-0004Bp-S8
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:59 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:38122)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqf5-0004EJ-Ua
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:01 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:44111)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqf3-0004As-Kc
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:57 -0400
-Received: by mail-pf0-x243.google.com with SMTP id b74-v6so8494347pfl.5
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:57 -0700 (PDT)
+	id 1fRqf5-0004DM-Mq
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:59 -0400
+Received: by mail-pl0-x242.google.com with SMTP id z9-v6so10387518plk.11
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:59 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:43 -1000
-Message-Id: <20180610030220.3777-72-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:44 -1000
+Message-Id: <20180610030220.3777-73-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 071/108] linux-user: Split out fstat64,
- fstatat64, newfstatat, lstat64, stat64
+Subject: [Qemu-devel] [PATCH v2 072/108] linux-user: Split out getegid,
+ geteuid, getgid, getuid, lchown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,211 +30,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-Comment on the odd overlap of fstatat64 and newfstatat,
-especially with respect to nios2.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 135 ++++++++++++++++++++++++++++---------------
- 1 file changed, 89 insertions(+), 46 deletions(-)
+ linux-user/syscall.c | 82 +++++++++++++++++++++++++++++++-------------
+ 1 file changed, 58 insertions(+), 24 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index c2dc7131bb..8d6b949b8a 100644
+index 8d6b949b8a..f8e34d28b1 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -8140,6 +8140,42 @@ IMPL(fstat)
+@@ -8441,6 +8441,27 @@ IMPL(getdents64)
+ }
+ #endif /* TARGET_NR_getdents64 */
+ 
++#ifdef TARGET_NR_getegid
++IMPL(getegid)
++{
++    return get_errno(high2lowgid(getegid()));
++}
++#endif
++
++#ifdef TARGET_NR_geteuid
++IMPL(geteuid)
++{
++    return get_errno(high2lowuid(geteuid()));
++}
++#endif
++
++#ifdef TARGET_NR_getgid
++IMPL(getgid)
++{
++    return get_errno(high2lowgid(getgid()));
++}
++#endif
++
+ IMPL(getitimer)
+ {
+     struct itimerval value;
+@@ -8584,6 +8605,13 @@ IMPL(gettimeofday)
      return ret;
  }
  
-+#ifdef TARGET_NR_fstat64
-+IMPL(fstat64)
++#ifdef TARGET_NR_getuid
++IMPL(getuid)
 +{
-+    struct stat st;
-+    abi_long ret;
-+
-+    ret = get_errno(fstat(arg1, &st));
-+    if (!is_error(ret) && host_to_target_stat64(cpu_env, arg2, &st)) {
-+        return -TARGET_EFAULT;
-+    }
-+    return ret;
++    return get_errno(high2lowuid(getuid()));
 +}
 +#endif
 +
-+/* Some targets name this syscall newfstatat, with the same arguments.  */
-+/* ??? Our nios2/syscall_nr.h defines both names; the kernel does not.
-+ * Preserve previous behavior and map both syscalls to this function.
-+ */
-+IMPL(fstatat64)
-+{
-+    char *p;
-+    abi_long ret;
-+    struct stat st;
-+
-+    p = lock_user_string(arg2);
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(fstatat(arg1, path(p), &st, arg4));
-+    unlock_user(p, arg2, 0);
-+    if (!is_error(ret) && host_to_target_stat64(cpu_env, arg3, &st)) {
-+        return -TARGET_EFAULT;
-+    }
-+    return ret;
-+}
-+
- IMPL(fstatfs)
+ #if defined(TARGET_NR_getxpid) && defined(TARGET_ALPHA)
+ IMPL(getxpid)
  {
-     struct statfs stfs;
-@@ -8815,6 +8851,25 @@ IMPL(lstat)
+@@ -8769,6 +8797,21 @@ IMPL(kill)
+     return get_errno(safe_kill(arg1, target_to_host_signal(arg2)));
  }
- #endif
  
-+#ifdef TARGET_NR_lstat64
-+IMPL(lstat64)
++#ifdef TARGET_NR_lchown
++IMPL(lchown)
 +{
 +    char *p = lock_user_string(arg1);
-+    struct stat st;
 +    abi_long ret;
 +
 +    if (!p) {
 +        return -TARGET_EFAULT;
 +    }
-+    ret = get_errno(lstat(path(p), &st));
++    ret = get_errno(lchown(p, low2highuid(arg2), low2highgid(arg3)));
 +    unlock_user(p, arg1, 0);
-+    if (!is_error(ret) && host_to_target_stat64(cpu_env, arg2, &st)) {
-+        return -TARGET_EFAULT;
-+    }
 +    return ret;
 +}
 +#endif
 +
- #ifdef TARGET_NR_mkdir
- IMPL(mkdir)
+ #ifdef TARGET_NR_link
+ IMPL(link)
  {
-@@ -10790,6 +10845,25 @@ IMPL(stat)
- }
- #endif
- 
-+#ifdef TARGET_NR_stat64
-+IMPL(stat64)
-+{
-+    char *p = lock_user_string(arg1);
-+    struct stat st;
-+    abi_long ret;
-+
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(stat(path(p), &st));
-+    unlock_user(p, arg1, 0);
-+    if (!is_error(ret) && host_to_target_stat64(cpu_env, arg2, &st)) {
-+        return -TARGET_EFAULT;
-+    }
-+    return ret;
-+}
-+#endif
-+
- IMPL(statfs)
- {
-     char *p = lock_user_string(arg1);
-@@ -11333,55 +11407,9 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
- {
-     CPUState *cpu __attribute__((unused)) = ENV_GET_CPU(cpu_env);
-     abi_long ret;
--    struct stat st;
+@@ -11410,30 +11453,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_stat64
--    case TARGET_NR_stat64:
--        if (!(p = lock_user_string(arg1))) {
+-#ifdef TARGET_NR_lchown
+-    case TARGET_NR_lchown:
+-        if (!(p = lock_user_string(arg1)))
 -            return -TARGET_EFAULT;
--        }
--        ret = get_errno(stat(path(p), &st));
+-        ret = get_errno(lchown(p, low2highuid(arg2), low2highgid(arg3)));
 -        unlock_user(p, arg1, 0);
--        if (!is_error(ret))
--            ret = host_to_target_stat64(cpu_env, arg2, &st);
 -        return ret;
 -#endif
--#ifdef TARGET_NR_lstat64
--    case TARGET_NR_lstat64:
--        if (!(p = lock_user_string(arg1))) {
--            return -TARGET_EFAULT;
--        }
--        ret = get_errno(lstat(path(p), &st));
--        unlock_user(p, arg1, 0);
--        if (!is_error(ret))
--            ret = host_to_target_stat64(cpu_env, arg2, &st);
--        return ret;
+-#ifdef TARGET_NR_getuid
+-    case TARGET_NR_getuid:
+-        return get_errno(high2lowuid(getuid()));
 -#endif
--#ifdef TARGET_NR_fstat64
--    case TARGET_NR_fstat64:
--        ret = get_errno(fstat(arg1, &st));
--        if (!is_error(ret))
--            ret = host_to_target_stat64(cpu_env, arg2, &st);
--        return ret;
+-#ifdef TARGET_NR_getgid
+-    case TARGET_NR_getgid:
+-        return get_errno(high2lowgid(getgid()));
 -#endif
--#if (defined(TARGET_NR_fstatat64) || defined(TARGET_NR_newfstatat))
--#ifdef TARGET_NR_fstatat64
--    case TARGET_NR_fstatat64:
+-#ifdef TARGET_NR_geteuid
+-    case TARGET_NR_geteuid:
+-        return get_errno(high2lowuid(geteuid()));
 -#endif
--#ifdef TARGET_NR_newfstatat
--    case TARGET_NR_newfstatat:
+-#ifdef TARGET_NR_getegid
+-    case TARGET_NR_getegid:
+-        return get_errno(high2lowgid(getegid()));
 -#endif
--        if (!(p = lock_user_string(arg2))) {
--            return -TARGET_EFAULT;
--        }
--        ret = get_errno(fstatat(arg1, path(p), &st, arg4));
--        unlock_user(p, arg2, 0);
--        if (!is_error(ret))
--            ret = host_to_target_stat64(cpu_env, arg3, &st);
--        return ret;
--#endif
- #ifdef TARGET_NR_lchown
-     case TARGET_NR_lchown:
-         if (!(p = lock_user_string(arg1)))
-@@ -13041,6 +13069,12 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(fork);
+     case TARGET_NR_setreuid:
+         return get_errno(setreuid(low2highuid(arg1), low2highuid(arg2)));
+     case TARGET_NR_setregid:
+@@ -13094,6 +13113,15 @@ static impl_fn *syscall_table(unsigned num)
  #endif
-         SYSCALL(fstat);
-+#ifdef TARGET_NR_fstat64
-+        SYSCALL(fstat64);
+ #if defined(TARGET_NR_getdents64) && defined(__NR_getdents64)
+         SYSCALL(getdents64);
 +#endif
-+#ifdef TARGET_NR_fstatat64
-+        SYSCALL(fstatat64);
++#ifdef TARGET_NR_getegid
++        SYSCALL(getegid);
 +#endif
-         SYSCALL(fstatfs);
- #ifdef TARGET_NR_fstatfs64
-         SYSCALL(fstatfs64);
-@@ -13109,6 +13143,9 @@ static impl_fn *syscall_table(unsigned num)
- #ifdef TARGET_NR_lstat
-         SYSCALL(lstat);
- #endif
-+#ifdef TARGET_NR_lstat64
-+        SYSCALL(lstat64);
++#ifdef TARGET_NR_geteuid
++        SYSCALL(geteuid);
 +#endif
- #ifdef TARGET_NR_mkdir
-         SYSCALL(mkdir);
++#ifdef TARGET_NR_getgid
++        SYSCALL(getgid);
  #endif
-@@ -13151,6 +13188,9 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(name_to_handle_at);
+         SYSCALL(getitimer);
+ #ifdef TARGET_NR_getpeername
+@@ -13121,6 +13149,9 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(getsockopt);
  #endif
-         SYSCALL(nanosleep);
-+#ifdef TARGET_NR_newfstatat
-+        SYSCALL_WITH(newfstatat, fstatat64);
+         SYSCALL(gettimeofday);
++#ifdef TARGET_NR_getuid
++        SYSCALL(getuid);
 +#endif
- #ifdef TARGET_NR__newselect
-         SYSCALL(_newselect);
+ #if defined(TARGET_NR_getxpid) && defined(TARGET_ALPHA)
+         SYSCALL(getxpid);
  #endif
-@@ -13322,6 +13362,9 @@ static impl_fn *syscall_table(unsigned num)
+@@ -13129,6 +13160,9 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(ipc);
  #endif
- #ifdef TARGET_NR_stat
-         SYSCALL(stat);
+         SYSCALL(kill);
++#ifdef TARGET_NR_lchown
++        SYSCALL(lchown);
 +#endif
-+#ifdef TARGET_NR_stat64
-+        SYSCALL(stat64);
+ #ifdef TARGET_NR_link
+         SYSCALL(link);
  #endif
-         SYSCALL(statfs);
- #ifdef TARGET_NR_statfs64
 -- 
 2.17.1
