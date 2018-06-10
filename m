@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqex-0003cy-PF
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:53 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqez-0003ed-ND
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqew-00044M-OR
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:51 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:35884)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqey-00046p-D9
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:53 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:39883)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqew-00043V-Hz
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:50 -0400
-Received: by mail-pf0-x241.google.com with SMTP id a12-v6so8499528pfi.3
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:50 -0700 (PDT)
+	id 1fRqey-000465-4u
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:52 -0400
+Received: by mail-pl0-x241.google.com with SMTP id f1-v6so10400347plt.6
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:52 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:39 -1000
-Message-Id: <20180610030220.3777-68-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:40 -1000
+Message-Id: <20180610030220.3777-69-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 067/108] linux-user: Split out getcwd,
- pread64, pwrite64, sigaltstack
+Subject: [Qemu-devel] [PATCH v2 068/108] linux-user: Split out capget, capset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,169 +29,191 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-All targets define pread64 and pwrite64; remove the ifdefs.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 88 ++++++++++++++++++++++++++++----------------
- 1 file changed, 56 insertions(+), 32 deletions(-)
+ linux-user/syscall.c | 156 ++++++++++++++++++++++++-------------------
+ 1 file changed, 86 insertions(+), 70 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index e3765069ab..1e1ac8defd 100644
+index 1e1ac8defd..c906719152 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -8161,6 +8161,19 @@ IMPL(getcpu)
-     return ret;
+@@ -7703,6 +7703,90 @@ IMPL(brk)
+     return do_brk(arg1);
  }
  
-+IMPL(getcwd)
++IMPL(capget)
 +{
-+    char *p = lock_user(VERIFY_WRITE, arg1, arg2, 0);
++    struct target_user_cap_header *target_header;
++    struct __user_cap_header_struct header;
++    struct __user_cap_data_struct data[2];
++    int data_items;
 +    abi_long ret;
 +
-+    if (!p) {
++    if (!lock_user_struct(VERIFY_WRITE, target_header, arg1, 1)) {
 +        return -TARGET_EFAULT;
 +    }
-+    ret = get_errno(sys_getcwd1(p, arg2));
-+    unlock_user(p, arg1, ret);
++    header.version = tswap32(target_header->version);
++    header.pid = tswap32(target_header->pid);
++
++    /* Version 2 and up takes pointer to two user_data structs */
++    data_items = (header.version == _LINUX_CAPABILITY_VERSION ? 1 : 2);
++
++    ret = get_errno(capget(&header, arg2 ? data : NULL));
++
++    /* The kernel always updates version for both capget and capset */
++    target_header->version = tswap32(header.version);
++    unlock_user_struct(target_header, arg1, 1);
++
++    if (arg2) {
++        struct target_user_cap_data *target_data;
++        int target_datalen = sizeof(*target_data) * data_items;
++        int i;
++
++        target_data = lock_user(VERIFY_WRITE, arg2, target_datalen, 0);
++        if (!target_data) {
++            return -TARGET_EFAULT;
++        }
++        for (i = 0; i < data_items; i++) {
++            target_data[i].effective = tswap32(data[i].effective);
++            target_data[i].permitted = tswap32(data[i].permitted);
++            target_data[i].inheritable = tswap32(data[i].inheritable);
++        }
++        unlock_user(target_data, arg2, target_datalen);
++    }
 +    return ret;
 +}
 +
- #ifdef TARGET_NR_getdents
- IMPL(getdents)
- {
-@@ -9359,6 +9372,23 @@ IMPL(prctl)
-     }
- }
- 
-+IMPL(pread64)
++IMPL(capset)
 +{
-+    void *p = lock_user(VERIFY_WRITE, arg2, arg3, 0);
++    struct target_user_cap_header *target_header;
++    struct __user_cap_header_struct header;
++    struct __user_cap_data_struct data[2];
 +    abi_long ret;
 +
-+    if (!p) {
++    if (!lock_user_struct(VERIFY_WRITE, target_header, arg1, 1)) {
 +        return -TARGET_EFAULT;
 +    }
-+    if (regpairs_aligned(cpu_env, TARGET_NR_pread64)) {
-+        arg4 = arg5;
-+        arg5 = arg6;
++    header.version = tswap32(target_header->version);
++    header.pid = tswap32(target_header->pid);
++
++    if (arg2) {
++        /* Version 2 and up takes pointer to two user_data structs */
++        int data_items = (header.version == _LINUX_CAPABILITY_VERSION ? 1 : 2);
++        struct target_user_cap_data *target_data;
++        int target_datalen = sizeof(*target_data) * data_items;
++        int i;
++
++        target_data = lock_user(VERIFY_READ, arg2, target_datalen, 1);
++        if (!target_data) {
++            unlock_user_struct(target_header, arg1, 0);
++            return -TARGET_EFAULT;
++        }
++
++        for (i = 0; i < data_items; i++) {
++            data[i].effective = tswap32(target_data[i].effective);
++            data[i].permitted = tswap32(target_data[i].permitted);
++            data[i].inheritable = tswap32(target_data[i].inheritable);
++        }
++        unlock_user(target_data, arg2, 0);
 +    }
-+    ret = get_errno(pread64(arg1, p, arg3, target_offset64(arg4, arg5)));
-+    unlock_user(p, arg2, ret);
++
++    ret = get_errno(capset(&header, arg2 ? data : NULL));
++
++    /* The kernel always updates version for both capget and capset */
++    target_header->version = tswap32(header.version);
++    unlock_user_struct(target_header, arg1, 1);
 +    return ret;
 +}
 +
- IMPL(preadv)
+ IMPL(chdir)
  {
-     struct iovec *vec;
-@@ -9478,6 +9508,23 @@ IMPL(pselect6)
-     return ret;
- }
- 
-+IMPL(pwrite64)
-+{
-+    void *p = lock_user(VERIFY_READ, arg2, arg3, 1);
-+    abi_long ret;
-+
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    if (regpairs_aligned(cpu_env, TARGET_NR_pwrite64)) {
-+        arg4 = arg5;
-+        arg5 = arg6;
-+    }
-+    ret = get_errno(pwrite64(arg1, p, arg3, target_offset64(arg4, arg5)));
-+    unlock_user(p, arg2, 0);
-+    return ret;
-+}
-+
- IMPL(pwritev)
- {
-     struct iovec *vec;
-@@ -10359,6 +10406,11 @@ IMPL(sigaction)
- }
- #endif
- 
-+IMPL(sigaltstack)
-+{
-+    return do_sigaltstack(arg1, arg2, get_sp_from_cpustate(cpu_env));
-+}
-+
- #ifdef TARGET_NR_sigpending
- IMPL(sigpending)
- {
-@@ -11129,34 +11181,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+     char *p = lock_user_string(arg1);
+@@ -11181,76 +11265,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_pread64
--    case TARGET_NR_pread64:
--        if (regpairs_aligned(cpu_env, num)) {
--            arg4 = arg5;
--            arg5 = arg6;
--        }
--        if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
--            return -TARGET_EFAULT;
--        ret = get_errno(pread64(arg1, p, arg3, target_offset64(arg4, arg5)));
--        unlock_user(p, arg2, ret);
--        return ret;
--    case TARGET_NR_pwrite64:
--        if (regpairs_aligned(cpu_env, num)) {
--            arg4 = arg5;
--            arg5 = arg6;
--        }
--        if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
--            return -TARGET_EFAULT;
--        ret = get_errno(pwrite64(arg1, p, arg3, target_offset64(arg4, arg5)));
--        unlock_user(p, arg2, 0);
--        return ret;
--#endif
--    case TARGET_NR_getcwd:
--        if (!(p = lock_user(VERIFY_WRITE, arg1, arg2, 0)))
--            return -TARGET_EFAULT;
--        ret = get_errno(sys_getcwd1(p, arg2));
--        unlock_user(p, arg1, ret);
--        return ret;
-     case TARGET_NR_capget:
-     case TARGET_NR_capset:
-     {
-@@ -11227,10 +11251,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
-         }
-         return ret;
-     }
--    case TARGET_NR_sigaltstack:
--        return do_sigaltstack(arg1, arg2,
--                              get_sp_from_cpustate((CPUArchState *)cpu_env));
+-    case TARGET_NR_capget:
+-    case TARGET_NR_capset:
+-    {
+-        struct target_user_cap_header *target_header;
+-        struct target_user_cap_data *target_data = NULL;
+-        struct __user_cap_header_struct header;
+-        struct __user_cap_data_struct data[2];
+-        struct __user_cap_data_struct *dataptr = NULL;
+-        int i, target_datalen;
+-        int data_items = 1;
 -
+-        if (!lock_user_struct(VERIFY_WRITE, target_header, arg1, 1)) {
+-            return -TARGET_EFAULT;
+-        }
+-        header.version = tswap32(target_header->version);
+-        header.pid = tswap32(target_header->pid);
+-
+-        if (header.version != _LINUX_CAPABILITY_VERSION) {
+-            /* Version 2 and up takes pointer to two user_data structs */
+-            data_items = 2;
+-        }
+-
+-        target_datalen = sizeof(*target_data) * data_items;
+-
+-        if (arg2) {
+-            if (num == TARGET_NR_capget) {
+-                target_data = lock_user(VERIFY_WRITE, arg2, target_datalen, 0);
+-            } else {
+-                target_data = lock_user(VERIFY_READ, arg2, target_datalen, 1);
+-            }
+-            if (!target_data) {
+-                unlock_user_struct(target_header, arg1, 0);
+-                return -TARGET_EFAULT;
+-            }
+-
+-            if (num == TARGET_NR_capset) {
+-                for (i = 0; i < data_items; i++) {
+-                    data[i].effective = tswap32(target_data[i].effective);
+-                    data[i].permitted = tswap32(target_data[i].permitted);
+-                    data[i].inheritable = tswap32(target_data[i].inheritable);
+-                }
+-            }
+-
+-            dataptr = data;
+-        }
+-
+-        if (num == TARGET_NR_capget) {
+-            ret = get_errno(capget(&header, dataptr));
+-        } else {
+-            ret = get_errno(capset(&header, dataptr));
+-        }
+-
+-        /* The kernel always updates version for both capget and capset */
+-        target_header->version = tswap32(header.version);
+-        unlock_user_struct(target_header, arg1, 1);
+-
+-        if (arg2) {
+-            if (num == TARGET_NR_capget) {
+-                for (i = 0; i < data_items; i++) {
+-                    target_data[i].effective = tswap32(data[i].effective);
+-                    target_data[i].permitted = tswap32(data[i].permitted);
+-                    target_data[i].inheritable = tswap32(data[i].inheritable);
+-                }
+-                unlock_user(target_data, arg2, target_datalen);
+-            } else {
+-                unlock_user(target_data, arg2, 0);
+-            }
+-        }
+-        return ret;
+-    }
  #ifdef CONFIG_SENDFILE
      case TARGET_NR_sendfile:
      {
-@@ -13022,6 +13042,7 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(futimesat);
+@@ -12991,6 +13005,8 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(bind);
  #endif
-         SYSCALL(getcpu);
-+        SYSCALL(getcwd);
- #ifdef TARGET_NR_getdents
-         SYSCALL(getdents);
- #endif
-@@ -13144,8 +13165,10 @@ static impl_fn *syscall_table(unsigned num)
- #endif
-         SYSCALL(ppoll);
-         SYSCALL(prctl);
-+        SYSCALL(pread64);
-         SYSCALL(preadv);
-         SYSCALL(pselect6);
-+        SYSCALL(pwrite64);
-         SYSCALL(pwritev);
-         SYSCALL(read);
- #ifdef TARGET_NR_readlink
-@@ -13254,6 +13277,7 @@ static impl_fn *syscall_table(unsigned num)
- #ifdef TARGET_NR_sigaction
-         SYSCALL(sigaction);
- #endif
-+        SYSCALL(sigaltstack);
- #ifdef TARGET_NR_sigpending
-         SYSCALL(sigpending);
+         SYSCALL(brk);
++        SYSCALL(capget);
++        SYSCALL(capset);
+ #ifdef CONFIG_CLOCK_ADJTIME
+         SYSCALL(clock_adjtime);
  #endif
 -- 
 2.17.1
