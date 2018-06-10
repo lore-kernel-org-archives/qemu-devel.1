@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqd0-0001jk-Mv
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqd0-0001jj-My
 	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:02:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqcx-0003C9-Jh
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqcz-0003Ck-Fu
 	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:02:50 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:44838)
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:34412)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqcx-0003Bm-Bp
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:02:47 -0400
-Received: by mail-pg0-x242.google.com with SMTP id p21-v6so8127188pgd.11
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:02:47 -0700 (PDT)
+	id 1fRqcz-0003CU-8M
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:02:49 -0400
+Received: by mail-pf0-x242.google.com with SMTP id a63-v6so8498419pfl.1
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:02:49 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:00:41 -1000
-Message-Id: <20180610030220.3777-10-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:00:42 -1000
+Message-Id: <20180610030220.3777-11-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 009/108] linux-user: Set up infrastructure
- for table-izing syscalls
+Subject: [Qemu-devel] [PATCH v2 010/108] linux-user: Split out brk, close,
+ exit, read, write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,144 +30,223 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-At the same time, split out set_robust_list and get_robust_list.
-Put them together, along with their block comment, at the top
-of syscall_table.
+These are relatively simple unconditionally defined syscalls.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 87 +++++++++++++++++++++++++++++++++-----------
- 1 file changed, 66 insertions(+), 21 deletions(-)
+ linux-user/syscall.c | 179 ++++++++++++++++++++++++-------------------
+ 1 file changed, 102 insertions(+), 77 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 46f123ee13..8678e749ee 100644
+index 8678e749ee..6d2f9915ec 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -7947,6 +7947,17 @@ static int host_to_target_cpu_mask(const unsigned long *host_mask,
-     return 0;
- }
+@@ -7958,6 +7958,103 @@ static abi_long impl_##NAME(void *cpu_env, unsigned num, abi_long arg1,   \
+                             abi_long arg5, abi_long arg6, abi_long arg7,  \
+                             abi_long arg8)
  
-+typedef abi_long impl_fn(void *cpu_env, unsigned num, abi_long arg1,
-+                         abi_long arg2, abi_long arg3, abi_long arg4,
-+                         abi_long arg5, abi_long arg6, abi_long arg7,
-+                         abi_long arg8);
++IMPL(brk)
++{
++    return do_brk(arg1);
++}
 +
-+#define IMPL(NAME) \
-+static abi_long impl_##NAME(void *cpu_env, unsigned num, abi_long arg1,   \
-+                            abi_long arg2, abi_long arg3, abi_long arg4,  \
-+                            abi_long arg5, abi_long arg6, abi_long arg7,  \
-+                            abi_long arg8)
++IMPL(close)
++{
++    fd_trans_unregister(arg1);
++    return get_errno(close(arg1));
++}
++
++IMPL(exit)
++{
++    CPUState *cpu = ENV_GET_CPU(cpu_env);
++
++    /* In old applications this may be used to implement _exit(2).
++       However in threaded applictions it is used for thread termination,
++       and _exit_group is used for application termination.
++       Do thread termination if we have more then one thread.  */
++    if (block_signals()) {
++        return -TARGET_ERESTARTSYS;
++    }
++
++    cpu_list_lock();
++
++    if (CPU_NEXT(first_cpu)) {
++        /* Remove the CPU from the list.  */
++        QTAILQ_REMOVE(&cpus, cpu, node);
++        cpu_list_unlock();
++
++        TaskState *ts = cpu->opaque;
++        if (ts->child_tidptr) {
++            put_user_u32(0, ts->child_tidptr);
++            sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
++                      NULL, NULL, 0);
++        }
++        thread_cpu = NULL;
++        object_unref(OBJECT(cpu));
++        g_free(ts);
++        rcu_unregister_thread();
++        pthread_exit(NULL);
++    } else {
++        cpu_list_unlock();
++
++#ifdef TARGET_GPROF
++        _mcleanup();
++#endif
++        gdb_exit(cpu_env, arg1);
++        _exit(arg1);
++    }
++    g_assert_not_reached();
++}
++
++IMPL(read)
++{
++    abi_long ret;
++    char *p;
++
++    if (arg3 == 0) {
++        return 0;
++    }
++    p = lock_user(VERIFY_WRITE, arg2, arg3, 0);
++    if (!p) {
++        return -TARGET_EFAULT;
++    }
++    ret = get_errno(safe_read(arg1, p, arg3));
++    if (ret >= 0 && fd_trans_host_to_target_data(arg1)) {
++        ret = fd_trans_host_to_target_data(arg1)(p, ret);
++    }
++    unlock_user(p, arg2, ret);
++    return ret;
++}
++
++IMPL(write)
++{
++    abi_long ret;
++    char *p;
++
++    p = lock_user(VERIFY_READ, arg2, arg3, 1);
++    if (!p) {
++        return -TARGET_EFAULT;
++    }
++    if (fd_trans_target_to_host_data(arg1)) {
++        void *copy = g_malloc(arg3);
++        memcpy(copy, p, arg3);
++        ret = fd_trans_target_to_host_data(arg1)(copy, arg3);
++        if (ret >= 0) {
++            ret = get_errno(safe_write(arg1, copy, ret));
++        }
++        g_free(copy);
++    } else {
++        ret = get_errno(safe_write(arg1, p, arg3));
++    }
++    unlock_user(p, arg2, ret);
++    return ret;
++}
 +
  /* This is an internal helper for do_syscall so that it is easier
   * to have a single return point, so that actions, such as logging
   * of syscall results, can be performed.
-@@ -11740,23 +11751,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
-         return get_errno(safe_tgkill((int)arg1, (int)arg2,
-                          target_to_host_signal(arg3)));
+@@ -7975,77 +8072,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+     void *p;
  
--#ifdef TARGET_NR_set_robust_list
--    case TARGET_NR_set_robust_list:
--    case TARGET_NR_get_robust_list:
--        /* The ABI for supporting robust futexes has userspace pass
--         * the kernel a pointer to a linked list which is updated by
--         * userspace after the syscall; the list is walked by the kernel
--         * when the thread exits. Since the linked list in QEMU guest
--         * memory isn't a valid linked list for the host and we have
--         * no way to reliably intercept the thread-death event, we can't
--         * support these. Silently return ENOSYS so that guest userspace
--         * falls back to a non-robust futex implementation (which should
--         * be OK except in the corner case of the guest crashing while
--         * holding a mutex that is shared with another process via
--         * shared memory).
--         */
--        return -TARGET_ENOSYS;
+     switch(num) {
+-    case TARGET_NR_exit:
+-        /* In old applications this may be used to implement _exit(2).
+-           However in threaded applictions it is used for thread termination,
+-           and _exit_group is used for application termination.
+-           Do thread termination if we have more then one thread.  */
+-
+-        if (block_signals()) {
+-            return -TARGET_ERESTARTSYS;
+-        }
+-
+-        cpu_list_lock();
+-
+-        if (CPU_NEXT(first_cpu)) {
+-            TaskState *ts;
+-
+-            /* Remove the CPU from the list.  */
+-            QTAILQ_REMOVE(&cpus, cpu, node);
+-
+-            cpu_list_unlock();
+-
+-            ts = cpu->opaque;
+-            if (ts->child_tidptr) {
+-                put_user_u32(0, ts->child_tidptr);
+-                sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
+-                          NULL, NULL, 0);
+-            }
+-            thread_cpu = NULL;
+-            object_unref(OBJECT(cpu));
+-            g_free(ts);
+-            rcu_unregister_thread();
+-            pthread_exit(NULL);
+-        }
+-
+-        cpu_list_unlock();
+-#ifdef TARGET_GPROF
+-        _mcleanup();
 -#endif
- 
- #if defined(TARGET_NR_utimensat)
-     case TARGET_NR_utimensat:
-@@ -12412,6 +12406,54 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
-     return ret;
- }
- 
-+/* The default action for a syscall not listed in syscall_table is to
-+ * log the missing syscall.  If a syscall is intentionally emulated as
-+ * not present, then list it with impl_enosys as the implementation,
-+ * which will avoid the logging.
-+ */
-+IMPL(enosys)
-+{
-+    return -TARGET_ENOSYS;
-+}
-+
-+/* For a given syscall number, return a function implementing it.
-+ * Do this via switch statement instead of table because some targets
-+ * do not begin at 0 and others have a large split in the middle of
-+ * the numbers.  The compiler should be able to produce a dense table.
-+ */
-+static impl_fn *syscall_table(unsigned num)
-+{
-+#define SYSCALL_WITH(X, Y)    case TARGET_NR_##X: return impl_##Y
-+#define SYSCALL(X)            SYSCALL_WITH(X, X)
-+
-+    switch (num) {
-+        /* The ABI for supporting robust futexes has userspace pass
-+         * the kernel a pointer to a linked list which is updated by
-+         * userspace after the syscall; the list is walked by the kernel
-+         * when the thread exits. Since the linked list in QEMU guest
-+         * memory isn't a valid linked list for the host and we have
-+         * no way to reliably intercept the thread-death event, we can't
-+         * support these. Silently return ENOSYS so that guest userspace
-+         * falls back to a non-robust futex implementation (which should
-+         * be OK except in the corner case of the guest crashing while
-+         * holding a mutex that is shared with another process via
-+         * shared memory).
-+         */
-+        SYSCALL_WITH(get_robust_list, enosys);
-+        SYSCALL_WITH(set_robust_list, enosys);
-+
-+        /*
-+         * Other syscalls listed in collation order, with '_' ignored.
-+         */
-+    }
-+
-+#undef SYSCALL
-+#undef SYSCALL_WITH
-+
-+    /* After do_syscall1 is fully split, this will be impl_enosys.  */
-+    return do_syscall1;
-+}
-+
- abi_long do_syscall(void *cpu_env, unsigned num, abi_long arg1,
-                     abi_long arg2, abi_long arg3, abi_long arg4,
-                     abi_long arg5, abi_long arg6, abi_long arg7,
-@@ -12419,6 +12461,7 @@ abi_long do_syscall(void *cpu_env, unsigned num, abi_long arg1,
- {
-     CPUState *cpu = ENV_GET_CPU(cpu_env);
-     abi_long ret;
-+    impl_fn *fn;
- 
- #ifdef DEBUG_ERESTARTSYS
-     /* Debug-only code for exercising the syscall-restart code paths
-@@ -12437,14 +12480,16 @@ abi_long do_syscall(void *cpu_env, unsigned num, abi_long arg1,
-     trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4,
-                              arg5, arg6, arg7, arg8);
- 
-+    fn = syscall_table(num);
-+
-     if (unlikely(do_strace)) {
-         print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
--        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
--                          arg5, arg6, arg7, arg8);
-+        ret = fn(cpu_env, num, arg1, arg2, arg3, arg4,
-+                 arg5, arg6, arg7, arg8);
-         print_syscall_ret(num, ret);
-     } else {
--        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
--                          arg5, arg6, arg7, arg8);
-+        ret = fn(cpu_env, num, arg1, arg2, arg3, arg4,
-+                 arg5, arg6, arg7, arg8);
+-        gdb_exit(cpu_env, arg1);
+-        _exit(arg1);
+-        return 0; /* avoid warning */
+-    case TARGET_NR_read:
+-        if (arg3 == 0) {
+-            return 0;
+-        } else {
+-            if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
+-                return -TARGET_EFAULT;
+-            ret = get_errno(safe_read(arg1, p, arg3));
+-            if (ret >= 0 &&
+-                fd_trans_host_to_target_data(arg1)) {
+-                ret = fd_trans_host_to_target_data(arg1)(p, ret);
+-            }
+-            unlock_user(p, arg2, ret);
+-        }
+-        return ret;
+-    case TARGET_NR_write:
+-        if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
+-            return -TARGET_EFAULT;
+-        if (fd_trans_target_to_host_data(arg1)) {
+-            void *copy = g_malloc(arg3);
+-            memcpy(copy, p, arg3);
+-            ret = fd_trans_target_to_host_data(arg1)(copy, arg3);
+-            if (ret >= 0) {
+-                ret = get_errno(safe_write(arg1, copy, ret));
+-            }
+-            g_free(copy);
+-        } else {
+-            ret = get_errno(safe_write(arg1, p, arg3));
+-        }
+-        unlock_user(p, arg2, 0);
+-        return ret;
+-
+ #ifdef TARGET_NR_open
+     case TARGET_NR_open:
+         if (!(p = lock_user_string(arg1)))
+@@ -8077,12 +8103,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+         fd_trans_unregister(ret);
+         return ret;
+ #endif
+-    case TARGET_NR_close:
+-        fd_trans_unregister(arg1);
+-        return get_errno(close(arg1));
+-
+-    case TARGET_NR_brk:
+-        return do_brk(arg1);
+ #ifdef TARGET_NR_fork
+     case TARGET_NR_fork:
+         return get_errno(do_fork(cpu_env, TARGET_SIGCHLD, 0, 0, 0, 0));
+@@ -12445,6 +12465,11 @@ static impl_fn *syscall_table(unsigned num)
+         /*
+          * Other syscalls listed in collation order, with '_' ignored.
+          */
++        SYSCALL(brk);
++        SYSCALL(close);
++        SYSCALL(exit);
++        SYSCALL(read);
++        SYSCALL(write);
      }
  
-     trace_guest_user_syscall_ret(cpu, num, ret);
+ #undef SYSCALL
 -- 
 2.17.1
