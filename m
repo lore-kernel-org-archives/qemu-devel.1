@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqcw-0001f5-F3
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:02:47 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqd0-0001jk-Mv
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:02:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqcv-0003BR-HD
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:02:46 -0400
-Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:35257)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqcx-0003C9-Jh
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:02:50 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:44838)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqcv-0003BB-C6
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:02:45 -0400
-Received: by mail-pg0-x231.google.com with SMTP id 15-v6so8138103pge.2
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:02:45 -0700 (PDT)
+	id 1fRqcx-0003Bm-Bp
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:02:47 -0400
+Received: by mail-pg0-x242.google.com with SMTP id p21-v6so8127188pgd.11
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:02:47 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:00:40 -1000
-Message-Id: <20180610030220.3777-9-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:00:41 -1000
+Message-Id: <20180610030220.3777-10-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 008/108] linux-user: Make syscall number
- unsigned
+Subject: [Qemu-devel] [PATCH v2 009/108] linux-user: Set up infrastructure
+ for table-izing syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +30,144 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+At the same time, split out set_robust_list and get_robust_list.
+Put them together, along with their block comment, at the top
+of syscall_table.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/qemu.h    |  2 +-
- linux-user/syscall.c | 16 ++++++++--------
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ linux-user/syscall.c | 87 +++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 66 insertions(+), 21 deletions(-)
 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 6fa1e968db..c628a5a05c 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -201,7 +201,7 @@ abi_long memcpy_to_target(abi_ulong dest, const void *src,
- void target_set_brk(abi_ulong new_brk);
- abi_long do_brk(abi_ulong new_brk);
- void syscall_init(void);
--abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-+abi_long do_syscall(void *cpu_env, unsigned num, abi_long arg1,
-                     abi_long arg2, abi_long arg3, abi_long arg4,
-                     abi_long arg5, abi_long arg6, abi_long arg7,
-                     abi_long arg8);
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index fd8d48b0da..46f123ee13 100644
+index 46f123ee13..8678e749ee 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -719,20 +719,20 @@ static inline int next_free_host_timer(void)
- 
- /* ARM EABI and MIPS expect 64bit types aligned even on pairs or registers */
- #ifdef TARGET_ARM
--static inline int regpairs_aligned(void *cpu_env, int num)
-+static inline int regpairs_aligned(void *cpu_env, unsigned num)
- {
-     return ((((CPUARMState *)cpu_env)->eabi) == 1) ;
+@@ -7947,6 +7947,17 @@ static int host_to_target_cpu_mask(const unsigned long *host_mask,
+     return 0;
  }
- #elif defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
--static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
-+static inline int regpairs_aligned(void *cpu_env, unsigned num) { return 1; }
- #elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
- /* SysV AVI for PPC32 expects 64bit parameters to be passed on odd/even pairs
-  * of registers which translates to the same as ARM/MIPS, because we start with
-  * r3 as arg1 */
--static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
-+static inline int regpairs_aligned(void *cpu_env, unsigned num) { return 1; }
- #elif defined(TARGET_SH4)
- /* SH4 doesn't align register pairs, except for p{read,write}64 */
--static inline int regpairs_aligned(void *cpu_env, int num)
-+static inline int regpairs_aligned(void *cpu_env, unsigned num)
- {
-     switch (num) {
-     case TARGET_NR_pread64:
-@@ -744,9 +744,9 @@ static inline int regpairs_aligned(void *cpu_env, int num)
-     }
- }
- #elif defined(TARGET_XTENSA)
--static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
-+static inline int regpairs_aligned(void *cpu_env, unsigned num) { return 1; }
- #else
--static inline int regpairs_aligned(void *cpu_env, int num) { return 0; }
-+static inline int regpairs_aligned(void *cpu_env, unsigned num) { return 0; }
- #endif
  
- #define ERRNO_TABLE_SIZE 1200
-@@ -7952,7 +7952,7 @@ static int host_to_target_cpu_mask(const unsigned long *host_mask,
++typedef abi_long impl_fn(void *cpu_env, unsigned num, abi_long arg1,
++                         abi_long arg2, abi_long arg3, abi_long arg4,
++                         abi_long arg5, abi_long arg6, abi_long arg7,
++                         abi_long arg8);
++
++#define IMPL(NAME) \
++static abi_long impl_##NAME(void *cpu_env, unsigned num, abi_long arg1,   \
++                            abi_long arg2, abi_long arg3, abi_long arg4,  \
++                            abi_long arg5, abi_long arg6, abi_long arg7,  \
++                            abi_long arg8)
++
+ /* This is an internal helper for do_syscall so that it is easier
+  * to have a single return point, so that actions, such as logging
   * of syscall results, can be performed.
-  * All errnos that do_syscall() returns must be -TARGET_<errcode>.
-  */
--static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-+static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
-                             abi_long arg2, abi_long arg3, abi_long arg4,
-                             abi_long arg5, abi_long arg6, abi_long arg7,
-                             abi_long arg8)
-@@ -12412,7 +12412,7 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+@@ -11740,23 +11751,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+         return get_errno(safe_tgkill((int)arg1, (int)arg2,
+                          target_to_host_signal(arg3)));
+ 
+-#ifdef TARGET_NR_set_robust_list
+-    case TARGET_NR_set_robust_list:
+-    case TARGET_NR_get_robust_list:
+-        /* The ABI for supporting robust futexes has userspace pass
+-         * the kernel a pointer to a linked list which is updated by
+-         * userspace after the syscall; the list is walked by the kernel
+-         * when the thread exits. Since the linked list in QEMU guest
+-         * memory isn't a valid linked list for the host and we have
+-         * no way to reliably intercept the thread-death event, we can't
+-         * support these. Silently return ENOSYS so that guest userspace
+-         * falls back to a non-robust futex implementation (which should
+-         * be OK except in the corner case of the guest crashing while
+-         * holding a mutex that is shared with another process via
+-         * shared memory).
+-         */
+-        return -TARGET_ENOSYS;
+-#endif
+ 
+ #if defined(TARGET_NR_utimensat)
+     case TARGET_NR_utimensat:
+@@ -12412,6 +12406,54 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      return ret;
  }
  
--abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-+abi_long do_syscall(void *cpu_env, unsigned num, abi_long arg1,
++/* The default action for a syscall not listed in syscall_table is to
++ * log the missing syscall.  If a syscall is intentionally emulated as
++ * not present, then list it with impl_enosys as the implementation,
++ * which will avoid the logging.
++ */
++IMPL(enosys)
++{
++    return -TARGET_ENOSYS;
++}
++
++/* For a given syscall number, return a function implementing it.
++ * Do this via switch statement instead of table because some targets
++ * do not begin at 0 and others have a large split in the middle of
++ * the numbers.  The compiler should be able to produce a dense table.
++ */
++static impl_fn *syscall_table(unsigned num)
++{
++#define SYSCALL_WITH(X, Y)    case TARGET_NR_##X: return impl_##Y
++#define SYSCALL(X)            SYSCALL_WITH(X, X)
++
++    switch (num) {
++        /* The ABI for supporting robust futexes has userspace pass
++         * the kernel a pointer to a linked list which is updated by
++         * userspace after the syscall; the list is walked by the kernel
++         * when the thread exits. Since the linked list in QEMU guest
++         * memory isn't a valid linked list for the host and we have
++         * no way to reliably intercept the thread-death event, we can't
++         * support these. Silently return ENOSYS so that guest userspace
++         * falls back to a non-robust futex implementation (which should
++         * be OK except in the corner case of the guest crashing while
++         * holding a mutex that is shared with another process via
++         * shared memory).
++         */
++        SYSCALL_WITH(get_robust_list, enosys);
++        SYSCALL_WITH(set_robust_list, enosys);
++
++        /*
++         * Other syscalls listed in collation order, with '_' ignored.
++         */
++    }
++
++#undef SYSCALL
++#undef SYSCALL_WITH
++
++    /* After do_syscall1 is fully split, this will be impl_enosys.  */
++    return do_syscall1;
++}
++
+ abi_long do_syscall(void *cpu_env, unsigned num, abi_long arg1,
                      abi_long arg2, abi_long arg3, abi_long arg4,
                      abi_long arg5, abi_long arg6, abi_long arg7,
-                     abi_long arg8)
+@@ -12419,6 +12461,7 @@ abi_long do_syscall(void *cpu_env, unsigned num, abi_long arg1,
+ {
+     CPUState *cpu = ENV_GET_CPU(cpu_env);
+     abi_long ret;
++    impl_fn *fn;
+ 
+ #ifdef DEBUG_ERESTARTSYS
+     /* Debug-only code for exercising the syscall-restart code paths
+@@ -12437,14 +12480,16 @@ abi_long do_syscall(void *cpu_env, unsigned num, abi_long arg1,
+     trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4,
+                              arg5, arg6, arg7, arg8);
+ 
++    fn = syscall_table(num);
++
+     if (unlikely(do_strace)) {
+         print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+-        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
+-                          arg5, arg6, arg7, arg8);
++        ret = fn(cpu_env, num, arg1, arg2, arg3, arg4,
++                 arg5, arg6, arg7, arg8);
+         print_syscall_ret(num, ret);
+     } else {
+-        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
+-                          arg5, arg6, arg7, arg8);
++        ret = fn(cpu_env, num, arg1, arg2, arg3, arg4,
++                 arg5, arg6, arg7, arg8);
+     }
+ 
+     trace_guest_user_syscall_ret(cpu, num, ret);
 -- 
 2.17.1
