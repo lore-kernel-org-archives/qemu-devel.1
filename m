@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqen-0003Rc-0D
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:42 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqeo-0003TQ-L8
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqel-0003sw-Os
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:41 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:34415)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqen-0003tU-Eg
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:42 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:40579)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqel-0003sS-Gw
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:39 -0400
-Received: by mail-pf0-x242.google.com with SMTP id a63-v6so8499503pfl.1
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:39 -0700 (PDT)
+	id 1fRqen-0003t7-69
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:41 -0400
+Received: by mail-pf0-x243.google.com with SMTP id z24-v6so8491109pfe.7
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:41 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:33 -1000
-Message-Id: <20180610030220.3777-62-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:34 -1000
+Message-Id: <20180610030220.3777-63-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 061/108] linux-user: Split out poll, ppoll
+Subject: [Qemu-devel] [PATCH v2 062/108] linux-user: Split out flock, preadv,
+ pwritev, readv, writev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,137 +30,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-All targets define ppoll; remove the ifdef.
+All targets define preadv and pwritev; remove the ifdefs.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 232 +++++++++++++++++++++++--------------------
- 1 file changed, 124 insertions(+), 108 deletions(-)
+ linux-user/syscall.c | 135 ++++++++++++++++++++++++-------------------
+ 1 file changed, 77 insertions(+), 58 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 600702ea3e..362d315ce8 100644
+index 362d315ce8..07fa043965 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -9101,6 +9101,126 @@ IMPL(pipe2)
-                    target_to_host_bitmask(arg2, fcntl_flags_tbl), 1);
+@@ -8043,6 +8043,12 @@ IMPL(fcntl)
+ }
+ #endif
+ 
++IMPL(flock)
++{
++    /* The flock constant seems to be the same for every Linux platform. */
++    return get_errno(safe_flock(arg1, arg2));
++}
++
+ #ifdef TARGET_NR_fork
+ IMPL(fork)
+ {
+@@ -9221,6 +9227,24 @@ IMPL(ppoll)
+     return ret;
  }
  
-+static struct pollfd *get_pollfd(abi_ulong nfds, abi_ulong target_addr,
-+                                 struct target_pollfd **ptfd, abi_long *err)
++IMPL(preadv)
 +{
-+    struct target_pollfd *target_pfd;
-+    struct pollfd *pfd;
-+    abi_ulong i;
-+
-+    if (nfds > (INT_MAX / sizeof(struct target_pollfd))) {
-+        *err = -TARGET_EINVAL;
-+        return NULL;
-+    }
-+    pfd = g_try_new(struct pollfd, nfds);
-+    if (pfd == NULL) {
-+        *err = -TARGET_ENOMEM;
-+        return NULL;
-+    }
-+
-+    *ptfd = target_pfd = lock_user(VERIFY_WRITE, target_addr,
-+                                   sizeof(struct target_pollfd) * nfds, 1);
-+    if (!target_pfd) {
-+        *err = -TARGET_EFAULT;
-+        g_free(pfd);
-+        return NULL;
-+    }
-+
-+    for (i = 0; i < nfds; i++) {
-+        pfd[i].fd = tswap32(target_pfd[i].fd);
-+        pfd[i].events = tswap16(target_pfd[i].events);
-+    }
-+
-+    *err = 0;
-+    return pfd;
-+}
-+
-+static abi_long put_pollfd(abi_ulong nfds, abi_ulong target_addr,
-+                           struct pollfd *pfd,
-+                           struct target_pollfd *target_pfd, abi_long ret)
-+{
-+    if (!is_error(ret)) {
-+        abi_ulong i;
-+        for (i = 0; i < nfds; i++) {
-+            target_pfd[i].revents = tswap16(pfd[i].revents);
-+        }
-+    }
-+    unlock_user(target_pfd, target_addr, sizeof(struct target_pollfd) * nfds);
-+    g_free(pfd);
-+    return ret;
-+}
-+
-+#ifdef TARGET_NR_poll
-+IMPL(poll)
-+{
-+    struct timespec ts, *pts;
-+    struct target_pollfd *target_pfd;
-+    struct pollfd *pfd;
++    struct iovec *vec;
 +    abi_long ret;
 +
-+    if (arg3 >= 0) {
-+        /* Convert ms to secs, ns */
-+        ts.tv_sec = arg3 / 1000;
-+        ts.tv_nsec = (arg3 % 1000) * 1000000LL;
-+        pts = &ts;
++    vec = lock_iovec(VERIFY_WRITE, arg2, arg3, 0);
++    if (vec != NULL) {
++        unsigned long low, high;
++
++        target_to_host_low_high(arg4, arg5, &low, &high);
++        ret = get_errno(safe_preadv(arg1, vec, arg3, low, high));
++        unlock_iovec(vec, arg2, arg3, 1);
 +    } else {
-+        /* -ve poll() timeout means "infinite" */
-+        pts = NULL;
-+    }
-+
-+    pfd = get_pollfd(arg2, arg1, &target_pfd, &ret);
-+    if (pfd == NULL) {
-+        return ret;
-+    }
-+    ret = safe_ppoll(pfd, arg2, pts, NULL, 0);
-+    return put_pollfd(arg2, arg1, pfd, target_pfd, get_errno(ret));
-+}
-+#endif
-+
-+IMPL(ppoll)
-+{
-+    struct timespec ts;
-+    sigset_t set;
-+    struct target_pollfd *target_pfd;
-+    struct pollfd *pfd;
-+    abi_long ret;
-+
-+    if (arg3) {
-+        if (target_to_host_timespec(&ts, arg3)) {
-+            return -TARGET_EFAULT;
-+        }
-+    }
-+
-+    if (arg4) {
-+        target_sigset_t *target_set;
-+        if (arg5 != sizeof(target_sigset_t)) {
-+            return -TARGET_EINVAL;
-+        }
-+        target_set = lock_user(VERIFY_READ, arg4, sizeof(target_sigset_t), 1);
-+        if (!target_set) {
-+            return -TARGET_EFAULT;
-+        }
-+        target_to_host_sigset(&set, target_set);
-+        unlock_user(target_set, arg4, 0);
-+    }
-+
-+    pfd = get_pollfd(arg2, arg1, &target_pfd, &ret);
-+    if (pfd == NULL) {
-+        return ret;
-+    }
-+    ret = safe_ppoll(pfd, arg2, arg3 ? &ts : NULL,
-+                     arg4 ? &set : NULL, SIGSET_T_SIZE);
-+    ret = put_pollfd(arg2, arg1, pfd, target_pfd, get_errno(ret));
-+
-+    if (!is_error(ret) && arg3) {
-+        abi_long err = host_to_target_timespec(arg3, &ts);
-+        if (err) {
-+            return err;
-+        }
++        ret = -host_to_target_errno(errno);
 +    }
 +    return ret;
 +}
@@ -167,131 +79,171 @@ index 600702ea3e..362d315ce8 100644
  IMPL(pselect6)
  {
      abi_long rfd_addr, wfd_addr, efd_addr, n, ts_addr;
-@@ -10649,114 +10769,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+@@ -9322,6 +9346,24 @@ IMPL(pselect6)
+     return ret;
+ }
+ 
++IMPL(pwritev)
++{
++    struct iovec *vec;
++    abi_long ret;
++
++    vec = lock_iovec(VERIFY_READ, arg2, arg3, 1);
++    if (vec != NULL) {
++        unsigned long low, high;
++
++        target_to_host_low_high(arg4, arg5, &low, &high);
++        ret = get_errno(safe_pwritev(arg1, vec, arg3, low, high));
++        unlock_iovec(vec, arg2, arg3, 0);
++    } else {
++        ret = -host_to_target_errno(errno);
++    }
++    return ret;
++}
++
+ IMPL(read)
+ {
+     abi_long ret;
+@@ -9381,6 +9423,21 @@ IMPL(readlinkat)
+     return do_readlinkat(arg1, arg2, arg3, arg4);
+ }
+ 
++IMPL(readv)
++{
++    struct iovec *vec;
++    abi_long ret;
++
++    vec = lock_iovec(VERIFY_WRITE, arg2, arg3, 0);
++    if (vec != NULL) {
++        ret = get_errno(safe_readv(arg1, vec, arg3));
++        unlock_iovec(vec, arg2, arg3, 1);
++    } else {
++        ret = -host_to_target_errno(errno);
++    }
++    return ret;
++}
++
+ IMPL(reboot)
+ {
+     abi_long ret;
+@@ -10753,6 +10810,21 @@ IMPL(write)
+     return ret;
+ }
+ 
++IMPL(writev)
++{
++    struct iovec *vec;
++    abi_long ret;
++
++    vec = lock_iovec(VERIFY_READ, arg2, arg3, 1);
++    if (vec != NULL) {
++        ret = get_errno(safe_writev(arg1, vec, arg3));
++        unlock_iovec(vec, arg2, arg3, 0);
++    } else {
++        ret = -host_to_target_errno(errno);
++    }
++    return ret;
++}
++
+ /* This is an internal helper for do_syscall so that it is easier
+  * to have a single return point, so that actions, such as logging
+  * of syscall results, can be performed.
+@@ -10769,64 +10841,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--#if defined(TARGET_NR_poll) || defined(TARGET_NR_ppoll)
--# ifdef TARGET_NR_poll
--    case TARGET_NR_poll:
--# endif
--# ifdef TARGET_NR_ppoll
--    case TARGET_NR_ppoll:
--# endif
+-    case TARGET_NR_flock:
+-        /* NOTE: the flock constant seems to be the same for every
+-           Linux platform */
+-        return get_errno(safe_flock(arg1, arg2));
+-    case TARGET_NR_readv:
 -        {
--            struct target_pollfd *target_pfd;
--            unsigned int nfds = arg2;
--            struct pollfd *pfd;
--            unsigned int i;
--
--            pfd = NULL;
--            target_pfd = NULL;
--            if (nfds) {
--                if (nfds > (INT_MAX / sizeof(struct target_pollfd))) {
--                    return -TARGET_EINVAL;
--                }
--
--                target_pfd = lock_user(VERIFY_WRITE, arg1,
--                                       sizeof(struct target_pollfd) * nfds, 1);
--                if (!target_pfd) {
--                    return -TARGET_EFAULT;
--                }
--
--                pfd = alloca(sizeof(struct pollfd) * nfds);
--                for (i = 0; i < nfds; i++) {
--                    pfd[i].fd = tswap32(target_pfd[i].fd);
--                    pfd[i].events = tswap16(target_pfd[i].events);
--                }
+-            struct iovec *vec = lock_iovec(VERIFY_WRITE, arg2, arg3, 0);
+-            if (vec != NULL) {
+-                ret = get_errno(safe_readv(arg1, vec, arg3));
+-                unlock_iovec(vec, arg2, arg3, 1);
+-            } else {
+-                ret = -host_to_target_errno(errno);
 -            }
--
--            switch (num) {
--# ifdef TARGET_NR_ppoll
--            case TARGET_NR_ppoll:
--            {
--                struct timespec _timeout_ts, *timeout_ts = &_timeout_ts;
--                target_sigset_t *target_set;
--                sigset_t _set, *set = &_set;
--
--                if (arg3) {
--                    if (target_to_host_timespec(timeout_ts, arg3)) {
--                        unlock_user(target_pfd, arg1, 0);
--                        return -TARGET_EFAULT;
--                    }
--                } else {
--                    timeout_ts = NULL;
--                }
--
--                if (arg4) {
--                    if (arg5 != sizeof(target_sigset_t)) {
--                        unlock_user(target_pfd, arg1, 0);
--                        return -TARGET_EINVAL;
--                    }
--
--                    target_set = lock_user(VERIFY_READ, arg4, sizeof(target_sigset_t), 1);
--                    if (!target_set) {
--                        unlock_user(target_pfd, arg1, 0);
--                        return -TARGET_EFAULT;
--                    }
--                    target_to_host_sigset(set, target_set);
--                } else {
--                    set = NULL;
--                }
--
--                ret = get_errno(safe_ppoll(pfd, nfds, timeout_ts,
--                                           set, SIGSET_T_SIZE));
--
--                if (!is_error(ret) && arg3) {
--                    host_to_target_timespec(arg3, timeout_ts);
--                }
--                if (arg4) {
--                    unlock_user(target_set, arg4, 0);
--                }
--                return ret;
+-        }
+-        return ret;
+-    case TARGET_NR_writev:
+-        {
+-            struct iovec *vec = lock_iovec(VERIFY_READ, arg2, arg3, 1);
+-            if (vec != NULL) {
+-                ret = get_errno(safe_writev(arg1, vec, arg3));
+-                unlock_iovec(vec, arg2, arg3, 0);
+-            } else {
+-                ret = -host_to_target_errno(errno);
 -            }
--# endif
--# ifdef TARGET_NR_poll
--            case TARGET_NR_poll:
--            {
--                struct timespec ts, *pts;
+-        }
+-        return ret;
+-#if defined(TARGET_NR_preadv)
+-    case TARGET_NR_preadv:
+-        {
+-            struct iovec *vec = lock_iovec(VERIFY_WRITE, arg2, arg3, 0);
+-            if (vec != NULL) {
+-                unsigned long low, high;
 -
--                if (arg3 >= 0) {
--                    /* Convert ms to secs, ns */
--                    ts.tv_sec = arg3 / 1000;
--                    ts.tv_nsec = (arg3 % 1000) * 1000000LL;
--                    pts = &ts;
--                } else {
--                    /* -ve poll() timeout means "infinite" */
--                    pts = NULL;
--                }
--                return get_errno(safe_ppoll(pfd, nfds, pts, NULL, 0));
--            }
--# endif
--            default:
--                g_assert_not_reached();
--            }
--
--            if (!is_error(ret)) {
--                for(i = 0; i < nfds; i++) {
--                    target_pfd[i].revents = tswap16(pfd[i].revents);
--                }
--            }
--            unlock_user(target_pfd, arg1, sizeof(struct target_pollfd) * nfds);
+-                target_to_host_low_high(arg4, arg5, &low, &high);
+-                ret = get_errno(safe_preadv(arg1, vec, arg3, low, high));
+-                unlock_iovec(vec, arg2, arg3, 1);
+-            } else {
+-                ret = -host_to_target_errno(errno);
+-           }
 -        }
 -        return ret;
 -#endif
-     case TARGET_NR_flock:
-         /* NOTE: the flock constant seems to be the same for every
-            Linux platform */
-@@ -13060,6 +13072,10 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(pipe);
+-#if defined(TARGET_NR_pwritev)
+-    case TARGET_NR_pwritev:
+-        {
+-            struct iovec *vec = lock_iovec(VERIFY_READ, arg2, arg3, 1);
+-            if (vec != NULL) {
+-                unsigned long low, high;
+-
+-                target_to_host_low_high(arg4, arg5, &low, &high);
+-                ret = get_errno(safe_pwritev(arg1, vec, arg3, low, high));
+-                unlock_iovec(vec, arg2, arg3, 0);
+-            } else {
+-                ret = -host_to_target_errno(errno);
+-           }
+-        }
+-        return ret;
+-#endif
+     case TARGET_NR_getsid:
+         return get_errno(getsid(arg1));
+ #if defined(TARGET_NR_fdatasync) /* Not on alpha (osf_datasync ?) */
+@@ -12944,6 +12958,7 @@ static impl_fn *syscall_table(unsigned num)
+ #ifdef TARGET_NR_fcntl
+         SYSCALL(fcntl);
  #endif
-         SYSCALL(pipe2);
-+#ifdef TARGET_NR_poll
-+        SYSCALL(poll);
-+#endif
-+        SYSCALL(ppoll);
++        SYSCALL(flock);
+ #ifdef TARGET_NR_fork
+         SYSCALL(fork);
+ #endif
+@@ -13076,12 +13091,15 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(poll);
+ #endif
+         SYSCALL(ppoll);
++        SYSCALL(preadv);
          SYSCALL(pselect6);
++        SYSCALL(pwritev);
          SYSCALL(read);
  #ifdef TARGET_NR_readlink
+         SYSCALL(readlink);
+ #endif
+         SYSCALL(readlinkat);
++        SYSCALL(readv);
+         SYSCALL(reboot);
+ #ifdef TARGET_NR_recv
+         SYSCALL(recv);
+@@ -13250,6 +13268,7 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(waitpid);
+ #endif
+         SYSCALL(write);
++        SYSCALL(writev);
+     }
+ 
+ #undef SYSCALL
 -- 
 2.17.1
