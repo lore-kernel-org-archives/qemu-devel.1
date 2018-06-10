@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqez-0003ed-ND
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqf3-0003he-Ey
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqey-00046p-D9
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:53 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:39883)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqf1-00049Y-V7
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:57 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:38930)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqey-000465-4u
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:52 -0400
-Received: by mail-pl0-x241.google.com with SMTP id f1-v6so10400347plt.6
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:52 -0700 (PDT)
+	id 1fRqf1-00049C-NH
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:55 -0400
+Received: by mail-pg0-x244.google.com with SMTP id w12-v6so8139553pgc.6
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:55 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:40 -1000
-Message-Id: <20180610030220.3777-69-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:42 -1000
+Message-Id: <20180610030220.3777-71-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 068/108] linux-user: Split out capget, capset
+Subject: [Qemu-devel] [PATCH v2 070/108] linux-user: Split out ftruncate64,
+ truncate64, ugetrlimit, vfork
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,189 +32,201 @@ Cc: laurent@vivier.eu
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 156 ++++++++++++++++++++++++-------------------
- 1 file changed, 86 insertions(+), 70 deletions(-)
+ linux-user/syscall.c | 133 +++++++++++++++++++++++--------------------
+ 1 file changed, 70 insertions(+), 63 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 1e1ac8defd..c906719152 100644
+index 39e416db0b..c2dc7131bb 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -7703,6 +7703,90 @@ IMPL(brk)
-     return do_brk(arg1);
+@@ -6718,34 +6718,6 @@ static inline uint64_t target_offset64(uint64_t word0, uint64_t word1)
+ }
+ #endif /* TARGET_ABI_BITS != 32 */
+ 
+-#ifdef TARGET_NR_truncate64
+-static inline abi_long target_truncate64(void *cpu_env, const char *arg1,
+-                                         abi_long arg2,
+-                                         abi_long arg3,
+-                                         abi_long arg4)
+-{
+-    if (regpairs_aligned(cpu_env, TARGET_NR_truncate64)) {
+-        arg2 = arg3;
+-        arg3 = arg4;
+-    }
+-    return get_errno(truncate64(arg1, target_offset64(arg2, arg3)));
+-}
+-#endif
+-
+-#ifdef TARGET_NR_ftruncate64
+-static inline abi_long target_ftruncate64(void *cpu_env, abi_long arg1,
+-                                          abi_long arg2,
+-                                          abi_long arg3,
+-                                          abi_long arg4)
+-{
+-    if (regpairs_aligned(cpu_env, TARGET_NR_ftruncate64)) {
+-        arg2 = arg3;
+-        arg3 = arg4;
+-    }
+-    return get_errno(ftruncate64(arg1, target_offset64(arg2, arg3)));
+-}
+-#endif
+-
+ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
+                                                abi_ulong target_addr)
+ {
+@@ -8204,6 +8176,17 @@ IMPL(ftruncate)
+     return get_errno(ftruncate(arg1, arg2));
  }
  
-+IMPL(capget)
++#ifdef TARGET_NR_ftruncate64
++IMPL(ftruncate64)
 +{
-+    struct target_user_cap_header *target_header;
-+    struct __user_cap_header_struct header;
-+    struct __user_cap_data_struct data[2];
-+    int data_items;
-+    abi_long ret;
-+
-+    if (!lock_user_struct(VERIFY_WRITE, target_header, arg1, 1)) {
-+        return -TARGET_EFAULT;
++    if (regpairs_aligned(cpu_env, TARGET_NR_ftruncate64)) {
++        arg2 = arg3;
++        arg3 = arg4;
 +    }
-+    header.version = tswap32(target_header->version);
-+    header.pid = tswap32(target_header->pid);
-+
-+    /* Version 2 and up takes pointer to two user_data structs */
-+    data_items = (header.version == _LINUX_CAPABILITY_VERSION ? 1 : 2);
-+
-+    ret = get_errno(capget(&header, arg2 ? data : NULL));
-+
-+    /* The kernel always updates version for both capget and capset */
-+    target_header->version = tswap32(header.version);
-+    unlock_user_struct(target_header, arg1, 1);
-+
-+    if (arg2) {
-+        struct target_user_cap_data *target_data;
-+        int target_datalen = sizeof(*target_data) * data_items;
-+        int i;
-+
-+        target_data = lock_user(VERIFY_WRITE, arg2, target_datalen, 0);
-+        if (!target_data) {
-+            return -TARGET_EFAULT;
-+        }
-+        for (i = 0; i < data_items; i++) {
-+            target_data[i].effective = tswap32(data[i].effective);
-+            target_data[i].permitted = tswap32(data[i].permitted);
-+            target_data[i].inheritable = tswap32(data[i].inheritable);
-+        }
-+        unlock_user(target_data, arg2, target_datalen);
-+    }
-+    return ret;
++    return get_errno(ftruncate64(arg1, target_offset64(arg2, arg3)));
 +}
++#endif
 +
-+IMPL(capset)
-+{
-+    struct target_user_cap_header *target_header;
-+    struct __user_cap_header_struct header;
-+    struct __user_cap_data_struct data[2];
-+    abi_long ret;
-+
-+    if (!lock_user_struct(VERIFY_WRITE, target_header, arg1, 1)) {
-+        return -TARGET_EFAULT;
-+    }
-+    header.version = tswap32(target_header->version);
-+    header.pid = tswap32(target_header->pid);
-+
-+    if (arg2) {
-+        /* Version 2 and up takes pointer to two user_data structs */
-+        int data_items = (header.version == _LINUX_CAPABILITY_VERSION ? 1 : 2);
-+        struct target_user_cap_data *target_data;
-+        int target_datalen = sizeof(*target_data) * data_items;
-+        int i;
-+
-+        target_data = lock_user(VERIFY_READ, arg2, target_datalen, 1);
-+        if (!target_data) {
-+            unlock_user_struct(target_header, arg1, 0);
-+            return -TARGET_EFAULT;
-+        }
-+
-+        for (i = 0; i < data_items; i++) {
-+            data[i].effective = tswap32(target_data[i].effective);
-+            data[i].permitted = tswap32(target_data[i].permitted);
-+            data[i].inheritable = tswap32(target_data[i].inheritable);
-+        }
-+        unlock_user(target_data, arg2, 0);
-+    }
-+
-+    ret = get_errno(capset(&header, arg2 ? data : NULL));
-+
-+    /* The kernel always updates version for both capget and capset */
-+    target_header->version = tswap32(header.version);
-+    unlock_user_struct(target_header, arg1, 1);
-+    return ret;
-+}
-+
- IMPL(chdir)
+ #ifdef TARGET_NR_futimesat
+ IMPL(futimesat)
  {
-     char *p = lock_user_string(arg1);
-@@ -11181,76 +11265,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+@@ -11048,6 +11031,45 @@ IMPL(truncate)
+     return ret;
+ }
+ 
++#ifdef TARGET_NR_truncate64
++IMPL(truncate64)
++{
++    char *p = lock_user_string(arg1);
++    abi_long ret;
++
++    if (!p) {
++        return -TARGET_EFAULT;
++    }
++    if (regpairs_aligned(cpu_env, TARGET_NR_truncate64)) {
++        arg2 = arg3;
++        arg3 = arg4;
++    }
++    ret = get_errno(truncate64(p, target_offset64(arg2, arg3)));
++    unlock_user(p, arg1, 0);
++    return ret;
++}
++#endif
++
++#ifdef TARGET_NR_ugetrlimit
++IMPL(ugetrlimit)
++{
++    struct rlimit rlim;
++    int resource = target_to_host_resource(arg1);
++    abi_long ret = get_errno(getrlimit(resource, &rlim));
++
++    if (!is_error(ret)) {
++        struct target_rlimit *target_rlim;
++        if (!lock_user_struct(VERIFY_WRITE, target_rlim, arg2, 0)) {
++            return -TARGET_EFAULT;
++        }
++        target_rlim->rlim_cur = host_to_target_rlim(rlim.rlim_cur);
++        target_rlim->rlim_max = host_to_target_rlim(rlim.rlim_max);
++        unlock_user_struct(target_rlim, arg2, 1);
++    }
++    return ret;
++}
++#endif
++
+ IMPL(umask)
+ {
+     return get_errno(umask(arg1));
+@@ -11183,6 +11205,14 @@ IMPL(utimes)
+ }
+ #endif
+ 
++#ifdef TARGET_NR_vfork
++IMPL(vfork)
++{
++    return get_errno(do_fork(cpu_env, CLONE_VFORK | CLONE_VM | TARGET_SIGCHLD,
++                             0, 0, 0, 0));
++}
++#endif
++
+ IMPL(vhangup)
+ {
+     return get_errno(vhangup());
+@@ -11307,41 +11337,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--    case TARGET_NR_capget:
--    case TARGET_NR_capset:
+-#ifdef TARGET_NR_vfork
+-    case TARGET_NR_vfork:
+-        return get_errno(do_fork(cpu_env,
+-                         CLONE_VFORK | CLONE_VM | TARGET_SIGCHLD,
+-                         0, 0, 0, 0));
+-#endif
+-#ifdef TARGET_NR_ugetrlimit
+-    case TARGET_NR_ugetrlimit:
 -    {
--        struct target_user_cap_header *target_header;
--        struct target_user_cap_data *target_data = NULL;
--        struct __user_cap_header_struct header;
--        struct __user_cap_data_struct data[2];
--        struct __user_cap_data_struct *dataptr = NULL;
--        int i, target_datalen;
--        int data_items = 1;
--
--        if (!lock_user_struct(VERIFY_WRITE, target_header, arg1, 1)) {
--            return -TARGET_EFAULT;
--        }
--        header.version = tswap32(target_header->version);
--        header.pid = tswap32(target_header->pid);
--
--        if (header.version != _LINUX_CAPABILITY_VERSION) {
--            /* Version 2 and up takes pointer to two user_data structs */
--            data_items = 2;
--        }
--
--        target_datalen = sizeof(*target_data) * data_items;
--
--        if (arg2) {
--            if (num == TARGET_NR_capget) {
--                target_data = lock_user(VERIFY_WRITE, arg2, target_datalen, 0);
--            } else {
--                target_data = lock_user(VERIFY_READ, arg2, target_datalen, 1);
--            }
--            if (!target_data) {
--                unlock_user_struct(target_header, arg1, 0);
+-	struct rlimit rlim;
+-	int resource = target_to_host_resource(arg1);
+-	ret = get_errno(getrlimit(resource, &rlim));
+-	if (!is_error(ret)) {
+-	    struct target_rlimit *target_rlim;
+-            if (!lock_user_struct(VERIFY_WRITE, target_rlim, arg2, 0))
 -                return -TARGET_EFAULT;
--            }
--
--            if (num == TARGET_NR_capset) {
--                for (i = 0; i < data_items; i++) {
--                    data[i].effective = tswap32(target_data[i].effective);
--                    data[i].permitted = tswap32(target_data[i].permitted);
--                    data[i].inheritable = tswap32(target_data[i].inheritable);
--                }
--            }
--
--            dataptr = data;
--        }
--
--        if (num == TARGET_NR_capget) {
--            ret = get_errno(capget(&header, dataptr));
--        } else {
--            ret = get_errno(capset(&header, dataptr));
--        }
--
--        /* The kernel always updates version for both capget and capset */
--        target_header->version = tswap32(header.version);
--        unlock_user_struct(target_header, arg1, 1);
--
--        if (arg2) {
--            if (num == TARGET_NR_capget) {
--                for (i = 0; i < data_items; i++) {
--                    target_data[i].effective = tswap32(data[i].effective);
--                    target_data[i].permitted = tswap32(data[i].permitted);
--                    target_data[i].inheritable = tswap32(data[i].inheritable);
--                }
--                unlock_user(target_data, arg2, target_datalen);
--            } else {
--                unlock_user(target_data, arg2, 0);
--            }
--        }
+-	    target_rlim->rlim_cur = host_to_target_rlim(rlim.rlim_cur);
+-	    target_rlim->rlim_max = host_to_target_rlim(rlim.rlim_max);
+-            unlock_user_struct(target_rlim, arg2, 1);
+-	}
 -        return ret;
 -    }
- #ifdef CONFIG_SENDFILE
-     case TARGET_NR_sendfile:
-     {
-@@ -12991,6 +13005,8 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(bind);
+-#endif
+-#ifdef TARGET_NR_truncate64
+-    case TARGET_NR_truncate64:
+-        if (!(p = lock_user_string(arg1)))
+-            return -TARGET_EFAULT;
+-	ret = target_truncate64(cpu_env, p, arg2, arg3, arg4);
+-        unlock_user(p, arg1, 0);
+-        return ret;
+-#endif
+-#ifdef TARGET_NR_ftruncate64
+-    case TARGET_NR_ftruncate64:
+-        return target_ftruncate64(cpu_env, arg1, arg2, arg3, arg4);
+-#endif
+ #ifdef TARGET_NR_stat64
+     case TARGET_NR_stat64:
+         if (!(p = lock_user_string(arg1))) {
+@@ -13052,6 +13047,9 @@ static impl_fn *syscall_table(unsigned num)
  #endif
-         SYSCALL(brk);
-+        SYSCALL(capget);
-+        SYSCALL(capset);
- #ifdef CONFIG_CLOCK_ADJTIME
-         SYSCALL(clock_adjtime);
+         SYSCALL(fsync);
+         SYSCALL(ftruncate);
++#ifdef TARGET_NR_ftruncate64
++        SYSCALL(ftruncate64);
++#endif
+ #ifdef TARGET_NR_futimesat
+         SYSCALL(futimesat);
  #endif
+@@ -13352,6 +13350,12 @@ static impl_fn *syscall_table(unsigned num)
+ #endif
+         SYSCALL(times);
+         SYSCALL(truncate);
++#ifdef TARGET_NR_truncate64
++        SYSCALL(truncate64);
++#endif
++#ifdef TARGET_NR_ugetrlimit
++        SYSCALL(ugetrlimit);
++#endif
+         SYSCALL(umask);
+ #ifdef TARGET_NR_umount
+         SYSCALL(umount);
+@@ -13367,6 +13371,9 @@ static impl_fn *syscall_table(unsigned num)
+ #endif
+ #ifdef TARGET_NR_utimes
+         SYSCALL(utimes);
++#endif
++#ifdef TARGET_NR_vfork
++        SYSCALL(vfork);
+ #endif
+         SYSCALL(vhangup);
+ #if defined(TARGET_I386) && !defined(TARGET_X86_64)
 -- 
 2.17.1
