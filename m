@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqfv-0004ZS-27
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:51 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfv-0004ZV-2L
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqft-0004js-Kd
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfs-0004jK-21
 	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:51 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:46990)
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:43603)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqft-0004jh-E8
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:49 -0400
-Received: by mail-pf0-x244.google.com with SMTP id q1-v6so8483697pff.13
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:49 -0700 (PDT)
+	id 1fRqfr-0004it-ST
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:47 -0400
+Received: by mail-pl0-x241.google.com with SMTP id c41-v6so10386204plj.10
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:47 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:02:11 -1000
-Message-Id: <20180610030220.3777-100-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:02:10 -1000
+Message-Id: <20180610030220.3777-99-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 099/108] linux-user: Split out signalfd,
- signalfd4
+Subject: [Qemu-devel] [PATCH v2 098/108] linux-user: Split out fallocate,
+ sync_file_range/2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,95 +30,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-All targets define signalfd4; remove the ifdefs.
-In do_signalfd4, unlock the target sigmask earlier and use is_error.
+All targets define fallocate; remove the ifdefs.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 34 ++++++++++++++++++----------------
- 1 file changed, 18 insertions(+), 16 deletions(-)
+ linux-user/syscall.c | 101 +++++++++++++++++++++++++++----------------
+ 1 file changed, 63 insertions(+), 38 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 5edcb39b73..e630a43f97 100644
+index 1158afde27..5edcb39b73 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -6975,8 +6975,6 @@ static abi_long host_to_target_statfs64(abi_ulong target_addr,
- }
- #endif
+@@ -8208,6 +8208,18 @@ IMPL(fadvise64)
+ # endif
+ #endif /* end fadvise64 handling */
  
--#if defined(TARGET_NR_signalfd) || defined(TARGET_NR_signalfd4)
--
- /* signalfd siginfo conversion */
- 
- static void
-@@ -7045,21 +7043,17 @@ static abi_long do_signalfd4(int fd, abi_long mask, int flags)
-     if (!lock_user_struct(VERIFY_READ, target_mask, mask, 1)) {
-         return -TARGET_EFAULT;
-     }
--
-     target_to_host_sigset(&host_mask, target_mask);
-+    unlock_user_struct(target_mask, mask, 0);
- 
-     host_flags = target_to_host_bitmask(flags, fcntl_flags_tbl);
- 
-     ret = get_errno(signalfd(fd, &host_mask, host_flags));
--    if (ret >= 0) {
-+    if (!is_error(ret)) {
-         fd_trans_register(ret, &target_signalfd_trans);
-     }
--
--    unlock_user_struct(target_mask, mask, 0);
--
-     return ret;
- }
--#endif
- 
- /* Map host to target signal numbers for the wait family of syscalls.
-    Assume all other status bits are the same.  */
-@@ -11884,6 +11878,18 @@ IMPL(sigaltstack)
-     return do_sigaltstack(arg1, arg2, get_sp_from_cpustate(cpu_env));
- }
- 
-+#ifdef TARGET_NR_signalfd
-+IMPL(signalfd)
++#ifdef CONFIG_FALLOCATE
++IMPL(fallocate)
 +{
-+    return do_signalfd4(arg1, arg2, 0);
++# if TARGET_ABI_BITS == 32
++    return get_errno(fallocate(arg1, arg2, target_offset64(arg3, arg4),
++                               target_offset64(arg5, arg6)));
++# else
++    return get_errno(fallocate(arg1, arg2, arg3, arg4));
++# endif
 +}
 +#endif
 +
-+IMPL(signalfd4)
-+{
-+    return do_signalfd4(arg1, arg2, arg4);
-+}
-+
- #ifdef TARGET_NR_sigpending
- IMPL(sigpending)
+ IMPL(fchdir)
  {
-@@ -12850,14 +12856,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+     return get_errno(fchdir(arg1));
+@@ -12310,6 +12322,46 @@ IMPL(syncfs)
+ }
+ #endif
+ 
++#ifdef CONFIG_SYNC_FILE_RANGE
++# ifdef TARGET_NR_sync_file_range
++IMPL(sync_file_range)
++{
++    uint64_t off, len;
++    unsigned flags;
++
++#  if TARGET_ABI_BITS == 32
++    if (regpairs_aligned(cpu_env, TARGET_NR_sync_file_range)) {
++        off = target_offset64(arg3, arg4);
++        len = target_offset64(arg5, arg6);
++        flags = arg7;
++    } else {
++        off = target_offset64(arg2, arg3);
++        len = target_offset64(arg4, arg5);
++        flags = arg6;
++    }
++#  else
++    off = arg2;
++    len = arg3;
++    flags = arg4;
++#  endif
++    return get_errno(sync_file_range(arg1, off, len, flags));
++}
++# endif
++
++# ifdef TARGET_NR_sync_file_range2
++IMPL(sync_file_range2)
++{
++    /* This is like sync_file_range but the arguments are reordered */
++#  if TARGET_ABI_BITS == 32
++    return get_errno(sync_file_range(arg1, target_offset64(arg3, arg4),
++                                     target_offset64(arg5, arg6), arg2));
++#  else
++    return get_errno(sync_file_range(arg1, arg3, arg4, arg2));
++#  endif
++}
++# endif
++#endif /* CONFIG_SYNC_FILE_RANGE */
++
+ #ifdef TARGET_NR__sysctl
+ IMPL(_sysctl)
+ {
+@@ -12798,44 +12850,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      abi_long ret;
  
      switch(num) {
--#if defined(TARGET_NR_signalfd4)
--    case TARGET_NR_signalfd4:
--        return do_signalfd4(arg1, arg2, arg4);
+-#if defined(CONFIG_FALLOCATE) && defined(TARGET_NR_fallocate)
+-    case TARGET_NR_fallocate:
+-#if TARGET_ABI_BITS == 32
+-        ret = get_errno(fallocate(arg1, arg2, target_offset64(arg3, arg4),
+-                                  target_offset64(arg5, arg6)));
+-#else
+-        ret = get_errno(fallocate(arg1, arg2, arg3, arg4));
 -#endif
--#if defined(TARGET_NR_signalfd)
--    case TARGET_NR_signalfd:
--        return do_signalfd4(arg1, arg2, 0);
+-        return ret;
 -#endif
- #if defined(CONFIG_EPOLL)
- #if defined(TARGET_NR_epoll_create)
-     case TARGET_NR_epoll_create:
-@@ -13808,6 +13806,10 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(sigaction);
- #endif
-         SYSCALL(sigaltstack);
-+#ifdef TARGET_NR_signalfd
-+        SYSCALL(signalfd);
+-#if defined(CONFIG_SYNC_FILE_RANGE)
+-#if defined(TARGET_NR_sync_file_range)
+-    case TARGET_NR_sync_file_range:
+-#if TARGET_ABI_BITS == 32
+-#if defined(TARGET_MIPS)
+-        ret = get_errno(sync_file_range(arg1, target_offset64(arg3, arg4),
+-                                        target_offset64(arg5, arg6), arg7));
+-#else
+-        ret = get_errno(sync_file_range(arg1, target_offset64(arg2, arg3),
+-                                        target_offset64(arg4, arg5), arg6));
+-#endif /* !TARGET_MIPS */
+-#else
+-        ret = get_errno(sync_file_range(arg1, arg2, arg3, arg4));
+-#endif
+-        return ret;
+-#endif
+-#if defined(TARGET_NR_sync_file_range2)
+-    case TARGET_NR_sync_file_range2:
+-        /* This is like sync_file_range but the arguments are reordered */
+-#if TARGET_ABI_BITS == 32
+-        ret = get_errno(sync_file_range(arg1, target_offset64(arg3, arg4),
+-                                        target_offset64(arg5, arg6), arg2));
+-#else
+-        ret = get_errno(sync_file_range(arg1, arg3, arg4, arg2));
+-#endif
+-        return ret;
+-#endif
+-#endif
+ #if defined(TARGET_NR_signalfd4)
+     case TARGET_NR_signalfd4:
+         return do_signalfd4(arg1, arg2, arg4);
+@@ -13341,6 +13355,9 @@ static impl_fn *syscall_table(unsigned num)
+ # else
+         SYSCALL_WITH(fadvise64_64, fadvise64);
+ # endif
 +#endif
-+        SYSCALL(signalfd4);
- #ifdef TARGET_NR_sigpending
-         SYSCALL(sigpending);
++#ifdef CONFIG_FALLOCATE
++        SYSCALL(fallocate);
+ #endif
+         SYSCALL(fchdir);
+         SYSCALL(fchmod);
+@@ -13841,6 +13858,14 @@ static impl_fn *syscall_table(unsigned num)
+ #ifdef CONFIG_SYNCFS
+         SYSCALL(syncfs);
+ #endif
++#ifdef CONFIG_SYNC_FILE_RANGE
++# ifdef TARGET_NR_sync_file_range
++        SYSCALL(sync_file_range);
++# endif
++# ifdef TARGET_NR_sync_file_range2
++        SYSCALL(sync_file_range2);
++# endif
++#endif
+ #ifdef TARGET_NR__sysctl
+         SYSCALL(_sysctl);
  #endif
 -- 
 2.17.1
