@@ -1,33 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fS4xJ-00079U-7X
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 14:20:46 -0400
+	(envelope-from <vkuznets@redhat.com>) id 1fS5PE-0003C9-9j
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 14:49:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fS4xE-00009p-41
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 14:20:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50166)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fS4xD-00009A-Qo
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 14:20:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fS4xC-0003ko-Mf
-	for <qemu-devel@nongnu.org>; Sun, 10 Jun 2018 18:20:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A7D0F2E8031
-	for <qemu-devel@nongnu.org>; Sun, 10 Jun 2018 18:20:38 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 10 Jun 2018 18:09:34 -0000
-From: Cameron Kaiser <1776096@bugs.launchpad.net>
-Reply-To: Bug 1776096 <1776096@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152865417474.22286.1843162139663853612.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1776096] [NEW] qemu 2.12.0 qemu-system-ppc
- illegal instruction on ppc64le, crashes emulator
+	(envelope-from <vkuznets@redhat.com>) id 1fS5PB-0007VW-4j
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 14:49:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35616 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vkuznets@redhat.com>) id 1fS5PA-0007UT-Vd
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 14:49:33 -0400
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+Date: Sun, 10 Jun 2018 20:49:27 +0200
+Message-Id: <20180610184927.19309-1-vkuznets@redhat.com>
+Subject: [Qemu-devel] [PATCH] i386/kvm: add support for Hyper-V TLB flush
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,170 +22,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>
 
-Public bug reported:
+Add support for Hyper-V TLB flush which recently got added to KVM.
 
-% uname -a
-Linux tim.floodgap.com 4.16.14-300.fc28.ppc64le #1 SMP Tue Jun 5 15:59:48 U=
-TC 2018 ppc64le ppc64le ppc64le GNU/Linux
+Just like regular Hyper-V we announce HV_EX_PROCESSOR_MASKS_RECOMMENDED
+regardless of how many vCPUs we have. Windows is 'smart' and uses less
+expensive non-EX Hypercall whenever possible (when it wants to flush TLB
+for all vCPUs or the maximum vCPU index in the vCPU set requires flushing
+is less than 64).
 
-STR:
-Start QEMU and boot Mac OS X 10.4.11.
-Download the current version of TenFourFox (I used G3 so that AltiVec was n=
-ot a confounder).
-Try to start TenFourFox in safe mode (hold down Option as you double-click =
-while the icon bounces in the Dock).
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ linux-headers/linux/kvm.h  |  1 +
+ target/i386/cpu.c          |  1 +
+ target/i386/cpu.h          |  1 +
+ target/i386/hyperv-proto.h |  1 +
+ target/i386/kvm.c          | 15 ++++++++++++++-
+ 5 files changed, 18 insertions(+), 1 deletion(-)
 
-Expected:
-TenFourFox starts.
-
-Actual:
-The entire emulator exits with an illegal instruction error.
-
-Trace of session (including some disassembly so you can see where TCG
-went wrong):
-
-tim:/home/spectre/src/qemu-2.12.0/ppc-softmmu/% gdb --args ./qemu-
-system-ppc -M mac99,accel=3Dtcg -m 2048 -prom-env boot-args=3D-v -boot c
--drive file=3Dtigerhd.img,format=3Draw,cache=3Dnone -netdev user,id=3Dmynet0
--device usb-net,netdev=3Dmynet0 -usb -device usb-tablet
-
-GNU gdb (GDB) Fedora 8.1-15.fc28
-[...]
-Reading symbols from ./qemu-system-ppc...done.
-(gdb) run
-[...]
-
-Thread 6 "qemu-system-ppc" received signal SIGSEGV, Segmentation fault.
-[Switching to Thread 0x7ffff242ea30 (LWP 7017)]
-0xfffffffffffffffc in ?? ()
-#0  0xfffffffffffffffc in  ()
-#1  0x00007fffd4edec00 in code_gen_buffer ()
-#2  0x00000000100c9e20 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D<optimi=
-zed out>) at /home/spectre/src/qemu-2.12.0/accel/tcg/cpu-exec.c:169
-#3  0x00000000100c9e20 in cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>, =
-last_tb=3D<synthetic pointer>, tb=3D<optimized out>, cpu=3D<optimized out>)
-    at /home/spectre/src/qemu-2.12.0/accel/tcg/cpu-exec.c:626
-#4  0x00000000100c9e20 in cpu_exec (cpu=3D<optimized out>)
-    at /home/spectre/src/qemu-2.12.0/accel/tcg/cpu-exec.c:734
-#5  0x000000001007decc in tcg_cpu_exec (cpu=3D0x11774e10)
-    at /home/spectre/src/qemu-2.12.0/cpus.c:1362
-(gdb) disas 0x00007fffd4edebf0, 0x00007fffd4edec10
-Dump of assembler code from 0x7fffd4edebf0 to 0x7fffd4edec10:
-   0x00007fffd4edebf0 <code_gen_buffer+284027700>:	addi    r0,r4,3
-   0x00007fffd4edebf4 <code_gen_buffer+284027704>:	rlwinm  r0,r0,0,0,19
-   0x00007fffd4edebf8 <code_gen_buffer+284027708>:	cmplw   cr7,r0,r12
-   0x00007fffd4edebfc <code_gen_buffer+284027712>:	bnel    cr7,0x7fffd4ed8b=
-64 <code_gen_buffer+284002984>
-   0x00007fffd4edec00 <code_gen_buffer+284027716>:	lwbrx   r14,r3,r4
-   0x00007fffd4edec04 <code_gen_buffer+284027720>:	stw     r14,40(r27)
-   0x00007fffd4edec08 <code_gen_buffer+284027724>:	clrldi  r4,r14,32
-   0x00007fffd4edec0c <code_gen_buffer+284027728>:	rlwinm  r3,r4,25,19,26
-End of assembler dump.
-(gdb) disas 0x7fffd4ed8b60, 0x7fffd4ed8b70
-Dump of assembler code from 0x7fffd4ed8b60 to 0x7fffd4ed8b70:
-   0x00007fffd4ed8b60 <code_gen_buffer+284002980>:	bctrl
-   0x00007fffd4ed8b64 <code_gen_buffer+284002984>:	mtctr   r3
-   0x00007fffd4ed8b68 <code_gen_buffer+284002988>:	mr      r31,r3
-   0x00007fffd4ed8b6c <code_gen_buffer+284002992>:	li      r3,0
-End of assembler dump.
-(gdb) i reg ctr
-ctr            0xffffffffffffffff	18446744073709551615
-
-It appears that the branch at 0x00007fffd4edebfc caused a jump back (a
-return?) through CTR, but CTR has -1 in it, hence setting PC to
-0xfffffffffffffffc. I am not sure how to debug this further.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1776096
-
-Title:
-  qemu 2.12.0 qemu-system-ppc illegal instruction on ppc64le, crashes
-  emulator
-
-Status in QEMU:
-  New
-
-Bug description:
-  % uname -a
-  Linux tim.floodgap.com 4.16.14-300.fc28.ppc64le #1 SMP Tue Jun 5 15:59:48=
- UTC 2018 ppc64le ppc64le ppc64le GNU/Linux
-
-  STR:
-  Start QEMU and boot Mac OS X 10.4.11.
-  Download the current version of TenFourFox (I used G3 so that AltiVec was=
- not a confounder).
-  Try to start TenFourFox in safe mode (hold down Option as you double-clic=
-k while the icon bounces in the Dock).
-
-  Expected:
-  TenFourFox starts.
-
-  Actual:
-  The entire emulator exits with an illegal instruction error.
-
-  Trace of session (including some disassembly so you can see where TCG
-  went wrong):
-
-  tim:/home/spectre/src/qemu-2.12.0/ppc-softmmu/% gdb --args ./qemu-
-  system-ppc -M mac99,accel=3Dtcg -m 2048 -prom-env boot-args=3D-v -boot c
-  -drive file=3Dtigerhd.img,format=3Draw,cache=3Dnone -netdev user,id=3Dmyn=
-et0
-  -device usb-net,netdev=3Dmynet0 -usb -device usb-tablet
-
-  GNU gdb (GDB) Fedora 8.1-15.fc28
-  [...]
-  Reading symbols from ./qemu-system-ppc...done.
-  (gdb) run
-  [...]
-
-  Thread 6 "qemu-system-ppc" received signal SIGSEGV, Segmentation fault.
-  [Switching to Thread 0x7ffff242ea30 (LWP 7017)]
-  0xfffffffffffffffc in ?? ()
-  #0  0xfffffffffffffffc in  ()
-  #1  0x00007fffd4edec00 in code_gen_buffer ()
-  #2  0x00000000100c9e20 in cpu_tb_exec (itb=3D<optimized out>, cpu=3D<opti=
-mized out>) at /home/spectre/src/qemu-2.12.0/accel/tcg/cpu-exec.c:169
-  #3  0x00000000100c9e20 in cpu_loop_exec_tb (tb_exit=3D<synthetic pointer>=
-, last_tb=3D<synthetic pointer>, tb=3D<optimized out>, cpu=3D<optimized out=
->)
-      at /home/spectre/src/qemu-2.12.0/accel/tcg/cpu-exec.c:626
-  #4  0x00000000100c9e20 in cpu_exec (cpu=3D<optimized out>)
-      at /home/spectre/src/qemu-2.12.0/accel/tcg/cpu-exec.c:734
-  #5  0x000000001007decc in tcg_cpu_exec (cpu=3D0x11774e10)
-      at /home/spectre/src/qemu-2.12.0/cpus.c:1362
-  (gdb) disas 0x00007fffd4edebf0, 0x00007fffd4edec10
-  Dump of assembler code from 0x7fffd4edebf0 to 0x7fffd4edec10:
-     0x00007fffd4edebf0 <code_gen_buffer+284027700>:	addi    r0,r4,3
-     0x00007fffd4edebf4 <code_gen_buffer+284027704>:	rlwinm  r0,r0,0,0,19
-     0x00007fffd4edebf8 <code_gen_buffer+284027708>:	cmplw   cr7,r0,r12
-     0x00007fffd4edebfc <code_gen_buffer+284027712>:	bnel    cr7,0x7fffd4ed=
-8b64 <code_gen_buffer+284002984>
-     0x00007fffd4edec00 <code_gen_buffer+284027716>:	lwbrx   r14,r3,r4
-     0x00007fffd4edec04 <code_gen_buffer+284027720>:	stw     r14,40(r27)
-     0x00007fffd4edec08 <code_gen_buffer+284027724>:	clrldi  r4,r14,32
-     0x00007fffd4edec0c <code_gen_buffer+284027728>:	rlwinm  r3,r4,25,19,26
-  End of assembler dump.
-  (gdb) disas 0x7fffd4ed8b60, 0x7fffd4ed8b70
-  Dump of assembler code from 0x7fffd4ed8b60 to 0x7fffd4ed8b70:
-     0x00007fffd4ed8b60 <code_gen_buffer+284002980>:	bctrl
-     0x00007fffd4ed8b64 <code_gen_buffer+284002984>:	mtctr   r3
-     0x00007fffd4ed8b68 <code_gen_buffer+284002988>:	mr      r31,r3
-     0x00007fffd4ed8b6c <code_gen_buffer+284002992>:	li      r3,0
-  End of assembler dump.
-  (gdb) i reg ctr
-  ctr            0xffffffffffffffff	18446744073709551615
-
-  It appears that the branch at 0x00007fffd4edebfc caused a jump back (a
-  return?) through CTR, but CTR has -1 in it, hence setting PC to
-  0xfffffffffffffffc. I am not sure how to debug this further.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1776096/+subscriptions
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index cdb148e959..a52a685690 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -948,6 +948,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_BPB 152
+ #define KVM_CAP_GET_MSR_FEATURES 153
+ #define KVM_CAP_HYPERV_EVENTFD 154
++#define KVM_CAP_HYPERV_TLBFLUSH 155
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 94260412e2..756cc78808 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5151,6 +5151,7 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_BOOL("hv-stimer", X86CPU, hyperv_stimer, false),
+     DEFINE_PROP_BOOL("hv-frequencies", X86CPU, hyperv_frequencies, false),
+     DEFINE_PROP_BOOL("hv-reenlightenment", X86CPU, hyperv_reenlightenment, false),
++    DEFINE_PROP_BOOL("hv-tlbflush", X86CPU, hyperv_tlbflush, false),
+     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+     DEFINE_PROP_BOOL("enforce", X86CPU, enforce_cpuid, false),
+     DEFINE_PROP_BOOL("kvm", X86CPU, expose_kvm, true),
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 664504610e..738d695331 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1363,6 +1363,7 @@ struct X86CPU {
+     bool hyperv_stimer;
+     bool hyperv_frequencies;
+     bool hyperv_reenlightenment;
++    bool hyperv_tlbflush;
+     bool check_cpuid;
+     bool enforce_cpuid;
+     bool expose_kvm;
+diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
+index 93352ebd2a..d6d5a79293 100644
+--- a/target/i386/hyperv-proto.h
++++ b/target/i386/hyperv-proto.h
+@@ -58,6 +58,7 @@
+ #define HV_APIC_ACCESS_RECOMMENDED          (1u << 3)
+ #define HV_SYSTEM_RESET_RECOMMENDED         (1u << 4)
+ #define HV_RELAXED_TIMING_RECOMMENDED       (1u << 5)
++#define HV_EX_PROCESSOR_MASKS_RECOMMENDED   (1u << 11)
+ 
+ /*
+  * Basic virtualized MSRs
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 44f70733e7..91c8e952c8 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -585,7 +585,8 @@ static bool hyperv_enabled(X86CPU *cpu)
+             cpu->hyperv_runtime ||
+             cpu->hyperv_synic ||
+             cpu->hyperv_stimer ||
+-            cpu->hyperv_reenlightenment);
++            cpu->hyperv_reenlightenment ||
++            cpu->hyperv_tlbflush);
+ }
+ 
+ static int kvm_arch_set_tsc_khz(CPUState *cs)
+@@ -823,6 +824,18 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         if (cpu->hyperv_vapic) {
+             c->eax |= HV_APIC_ACCESS_RECOMMENDED;
+         }
++        if (cpu->hyperv_tlbflush) {
++            if (kvm_check_extension(cs->kvm_state,
++                                    KVM_CAP_HYPERV_TLBFLUSH) <= 0) {
++                fprintf(stderr, "Hyper-V TLB flush support "
++                        "(requested by 'hv-tlbflush' cpu flag) "
++                        " is not supported by kernel\n");
++                return -ENOSYS;
++            }
++            c->eax |= HV_REMOTE_TLB_FLUSH_RECOMMENDED;
++            c->eax |= HV_EX_PROCESSOR_MASKS_RECOMMENDED;
++        }
++
+         c->ebx = cpu->hyperv_spinlock_attempts;
+ 
+         c = &cpuid_data.entries[cpuid_i++];
+-- 
+2.14.4
