@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqec-0003Gr-Dm
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:31 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqec-0003H5-Lc
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqeZ-0003nS-89
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqeb-0003nx-C8
 	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:30 -0400
-Received: from mail-pl0-x230.google.com ([2607:f8b0:400e:c01::230]:36985)
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:38928)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqeY-0003n7-W9
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:27 -0400
-Received: by mail-pl0-x230.google.com with SMTP id 31-v6so10386055plc.4
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:26 -0700 (PDT)
+	id 1fRqeb-0003nr-6F
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:29 -0400
+Received: by mail-pg0-x242.google.com with SMTP id w12-v6so8139290pgc.6
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:29 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:27 -1000
-Message-Id: <20180610030220.3777-56-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:28 -1000
+Message-Id: <20180610030220.3777-57-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 055/108] linux-user: Split out ipc syscalls
+Subject: [Qemu-devel] [PATCH v2 056/108] linux-user: Split out clone,
+ exit_group, fsync
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,220 +30,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-This is msgctl, msgget, msgrcv, msgsnd, shmat, shmctl,
-shmdt, shmget, semctl, semget, semop.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 154 ++++++++++++++++++++++++++++++-------------
- 1 file changed, 110 insertions(+), 44 deletions(-)
+ linux-user/syscall.c | 70 ++++++++++++++++++++++++++------------------
+ 1 file changed, 42 insertions(+), 28 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 6ac7532ea6..1c3a4590fb 100644
+index 1c3a4590fb..41facf4b44 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -8636,6 +8636,34 @@ IMPL(mremap)
-     return get_errno(target_mremap(arg1, arg2, arg3, arg4, arg5));
+@@ -7753,6 +7753,25 @@ IMPL(chroot)
+     return ret;
  }
  
-+#ifdef TARGET_NR_msgctl
-+IMPL(msgctl)
++IMPL(clone)
 +{
-+    return do_msgctl(arg1, arg2, arg3);
-+}
++    /* Linux manages to have three different orderings for its
++     * arguments to clone(); the BACKWARDS and BACKWARDS2 defines
++     * match the kernel's CONFIG_CLONE_* settings.
++     * Microblaze is further special in that it uses a sixth
++     * implicit argument to clone for the TLS pointer.
++     */
++#if defined(TARGET_MICROBLAZE)
++    return get_errno(do_fork(cpu_env, arg1, arg2, arg4, arg6, arg5));
++#elif defined(TARGET_CLONE_BACKWARDS)
++    return get_errno(do_fork(cpu_env, arg1, arg2, arg3, arg4, arg5));
++#elif defined(TARGET_CLONE_BACKWARDS2)
++    return get_errno(do_fork(cpu_env, arg2, arg1, arg3, arg5, arg4));
++#else
++    return get_errno(do_fork(cpu_env, arg1, arg2, arg3, arg5, arg4));
 +#endif
-+
-+#ifdef TARGET_NR_msgget
-+IMPL(msgget)
-+{
-+    return get_errno(msgget(arg1, arg2));
 +}
-+#endif
 +
-+#ifdef TARGET_NR_msgrcv
-+IMPL(msgrcv)
-+{
-+    return do_msgrcv(arg1, arg2, arg3, arg4, arg5);
-+}
-+#endif
-+
-+#ifdef TARGET_NR_msgsnd
-+IMPL(msgsnd)
-+{
-+    return do_msgsnd(arg1, arg2, arg3, arg4);
-+}
-+#endif
-+
- IMPL(msync)
+ IMPL(close)
  {
-     return get_errno(msync(g2h(arg1), arg2, arg3));
-@@ -9340,6 +9368,34 @@ IMPL(sgetmask)
+     fd_trans_unregister(arg1);
+@@ -7973,6 +7992,17 @@ IMPL(exit)
+     g_assert_not_reached();
  }
- #endif
  
-+#ifdef TARGET_NR_shmat
-+IMPL(shmat)
++#ifdef __NR_exit_group
++IMPL(exit_group)
 +{
-+    return do_shmat(cpu_env, arg1, arg2, arg3);
++# ifdef TARGET_GPROF
++    _mcleanup();
++# endif
++    gdb_exit(cpu_env, arg1);
++    return get_errno(exit_group(arg1));
 +}
 +#endif
 +
-+#ifdef TARGET_NR_shmctl
-+IMPL(shmctl)
-+{
-+    return do_shmctl(arg1, arg2, arg3);
-+}
-+#endif
-+
-+#ifdef TARGET_NR_shmdt
-+IMPL(shmdt)
-+{
-+    return do_shmdt(arg1);
-+}
-+#endif
-+
-+#ifdef TARGET_NR_shmget
-+IMPL(shmget)
-+{
-+    return get_errno(shmget(arg1, arg2, arg3));
-+}
-+#endif
-+
- #ifdef TARGET_NR_shutdown
- IMPL(shutdown)
+ IMPL(faccessat)
  {
-@@ -9358,6 +9414,27 @@ IMPL(select)
+     char *p = lock_user_string(arg2);
+@@ -8056,6 +8086,11 @@ IMPL(fstatfs64)
  }
  #endif
  
-+#ifdef TARGET_NR_semctl
-+IMPL(semctl)
++IMPL(fsync)
 +{
-+    return do_semctl(arg1, arg2, arg3, arg4);
++    return get_errno(fsync(arg1));
 +}
-+#endif
 +
-+#ifdef TARGET_NR_semget
-+IMPL(semget)
-+{
-+    return get_errno(semget(arg1, arg2, arg3));
-+}
-+#endif
-+
-+#ifdef TARGET_NR_semop
-+IMPL(semop)
-+{
-+    return do_semop(arg1, arg2, arg3);
-+}
-+#endif
-+
- #ifdef TARGET_NR_send
- IMPL(send)
+ IMPL(ftruncate)
  {
-@@ -10272,50 +10349,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+     return get_errno(ftruncate(arg1, arg2));
+@@ -10349,34 +10384,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_semget
--    case TARGET_NR_semget:
--        return get_errno(semget(arg1, arg2, arg3));
+-    case TARGET_NR_fsync:
+-        return get_errno(fsync(arg1));
+-    case TARGET_NR_clone:
+-        /* Linux manages to have three different orderings for its
+-         * arguments to clone(); the BACKWARDS and BACKWARDS2 defines
+-         * match the kernel's CONFIG_CLONE_* settings.
+-         * Microblaze is further special in that it uses a sixth
+-         * implicit argument to clone for the TLS pointer.
+-         */
+-#if defined(TARGET_MICROBLAZE)
+-        ret = get_errno(do_fork(cpu_env, arg1, arg2, arg4, arg6, arg5));
+-#elif defined(TARGET_CLONE_BACKWARDS)
+-        ret = get_errno(do_fork(cpu_env, arg1, arg2, arg3, arg4, arg5));
+-#elif defined(TARGET_CLONE_BACKWARDS2)
+-        ret = get_errno(do_fork(cpu_env, arg2, arg1, arg3, arg5, arg4));
+-#else
+-        ret = get_errno(do_fork(cpu_env, arg1, arg2, arg3, arg5, arg4));
 -#endif
--#ifdef TARGET_NR_semop
--    case TARGET_NR_semop:
--        return do_semop(arg1, arg2, arg3);
+-        return ret;
+-#ifdef __NR_exit_group
+-        /* new thread calls */
+-    case TARGET_NR_exit_group:
+-#ifdef TARGET_GPROF
+-        _mcleanup();
 -#endif
--#ifdef TARGET_NR_semctl
--    case TARGET_NR_semctl:
--        return do_semctl(arg1, arg2, arg3, arg4);
+-        gdb_exit(cpu_env, arg1);
+-        return get_errno(exit_group(arg1));
 -#endif
--#ifdef TARGET_NR_msgctl
--    case TARGET_NR_msgctl:
--        return do_msgctl(arg1, arg2, arg3);
--#endif
--#ifdef TARGET_NR_msgget
--    case TARGET_NR_msgget:
--        return get_errno(msgget(arg1, arg2));
--#endif
--#ifdef TARGET_NR_msgrcv
--    case TARGET_NR_msgrcv:
--        return do_msgrcv(arg1, arg2, arg3, arg4, arg5);
--#endif
--#ifdef TARGET_NR_msgsnd
--    case TARGET_NR_msgsnd:
--        return do_msgsnd(arg1, arg2, arg3, arg4);
--#endif
--#ifdef TARGET_NR_shmget
--    case TARGET_NR_shmget:
--        return get_errno(shmget(arg1, arg2, arg3));
--#endif
--#ifdef TARGET_NR_shmctl
--    case TARGET_NR_shmctl:
--        return do_shmctl(arg1, arg2, arg3);
--#endif
--#ifdef TARGET_NR_shmat
--    case TARGET_NR_shmat:
--        return do_shmat(cpu_env, arg1, arg2, arg3);
--#endif
--#ifdef TARGET_NR_shmdt
--    case TARGET_NR_shmdt:
--        return do_shmdt(arg1);
--#endif
-     case TARGET_NR_fsync:
-         return get_errno(fsync(arg1));
-     case TARGET_NR_clone:
-@@ -12943,6 +12976,18 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(mount);
-         SYSCALL(mprotect);
-         SYSCALL(mremap);
-+#ifdef TARGET_NR_msgctl
-+        SYSCALL(msgctl);
-+#endif
-+#ifdef TARGET_NR_msgget
-+        SYSCALL(msgget);
-+#endif
-+#ifdef TARGET_NR_msgrcv
-+        SYSCALL(msgrcv);
-+#endif
-+#ifdef TARGET_NR_msgsnd
-+        SYSCALL(msgsnd);
-+#endif
-         SYSCALL(msync);
-         SYSCALL(munlock);
-         SYSCALL(munlockall);
-@@ -13010,6 +13055,18 @@ static impl_fn *syscall_table(unsigned num)
- #ifdef TARGET_NR_sgetmask
-         SYSCALL(sgetmask);
+     case TARGET_NR_setdomainname:
+         if (!(p = lock_user_string(arg1)))
+             return -TARGET_EFAULT;
+@@ -12877,6 +12884,7 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(bind);
  #endif
-+#ifdef TARGET_NR_shmat
-+        SYSCALL(shmat);
+         SYSCALL(brk);
++        SYSCALL(clone);
+         SYSCALL(close);
+         SYSCALL(chdir);
+         SYSCALL(chroot);
+@@ -12896,6 +12904,11 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(dup3);
+         SYSCALL(execve);
+         SYSCALL(exit);
++#ifdef __NR_exit_group
++        SYSCALL(exit_group);
++#else
++        SYSCALL_WITH(exit_group, enosys);
 +#endif
-+#ifdef TARGET_NR_shmctl
-+        SYSCALL(shmctl);
-+#endif
-+#ifdef TARGET_NR_shmdt
-+        SYSCALL(shmdt);
-+#endif
-+#ifdef TARGET_NR_shmget
-+        SYSCALL(shmget);
-+#endif
- #ifdef TARGET_NR_shutdown
-         SYSCALL(shutdown);
+         SYSCALL(faccessat);
+         SYSCALL(fchmod);
+         SYSCALL(fchmodat);
+@@ -12910,6 +12923,7 @@ static impl_fn *syscall_table(unsigned num)
+ #ifdef TARGET_NR_fstatfs64
+         SYSCALL(fstatfs64);
  #endif
-@@ -13020,6 +13077,15 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(select);
- # endif
- #endif
-+#ifdef TARGET_NR_semctl
-+        SYSCALL(semctl);
-+#endif
-+#ifdef TARGET_NR_semget
-+        SYSCALL(semget);
-+#endif
-+#ifdef TARGET_NR_semop
-+        SYSCALL(semop);
-+#endif
- #ifdef TARGET_NR_send
-         SYSCALL(send);
- #endif
++        SYSCALL(fsync);
+         SYSCALL(ftruncate);
+ #ifdef TARGET_NR_futimesat
+         SYSCALL(futimesat);
 -- 
 2.17.1
