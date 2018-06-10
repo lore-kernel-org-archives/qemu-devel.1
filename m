@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqfO-00041E-Fx
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:19 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfQ-00043c-Ry
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqfN-0004N7-Ej
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:18 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:35912)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqfP-0004NX-Fu
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:20 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:41364)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqfN-0004Ms-8V
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:17 -0400
-Received: by mail-pl0-x244.google.com with SMTP id a7-v6so7900314plp.3
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:17 -0700 (PDT)
+	id 1fRqfP-0004NL-98
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:05:19 -0400
+Received: by mail-pf0-x244.google.com with SMTP id a11-v6so8486595pff.8
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:05:19 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:53 -1000
-Message-Id: <20180610030220.3777-82-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:54 -1000
+Message-Id: <20180610030220.3777-83-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 081/108] linux-user: Split out getresgid32,
- getresuid32, setresgid32, setresuid32
+Subject: [Qemu-devel] [PATCH v2 082/108] linux-user: Split out chown32,
+ setfsgid32, setfsuid32, setgid32, setuid32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,161 +32,155 @@ Cc: laurent@vivier.eu
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 93 +++++++++++++++++++++++++++-----------------
- 1 file changed, 57 insertions(+), 36 deletions(-)
+ linux-user/syscall.c | 82 +++++++++++++++++++++++++++++++-------------
+ 1 file changed, 58 insertions(+), 24 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 031033c0ea..af96cc95d3 100644
+index af96cc95d3..fc7f301519 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -8674,6 +8674,22 @@ IMPL(getresgid)
+@@ -7802,6 +7802,21 @@ IMPL(chown)
  }
  #endif
  
-+#ifdef TARGET_NR_getresgid32
-+IMPL(getresgid32)
++#ifdef TARGET_NR_chown32
++IMPL(chown32)
 +{
-+    gid_t rgid, egid, sgid;
-+    abi_long ret = get_errno(getresgid(&rgid, &egid, &sgid));
++    char *p = lock_user_string(arg1);
++    abi_long ret;
 +
-+    if (!is_error(ret) &&
-+        (put_user_u32(rgid, arg1) ||
-+         put_user_u32(egid, arg2) ||
-+         put_user_u32(sgid, arg3))) {
++    if (!p) {
 +        return -TARGET_EFAULT;
 +    }
++    ret = get_errno(chown(p, arg2, arg3));
++    unlock_user(p, arg1, 0);
 +    return ret;
 +}
 +#endif
 +
- #ifdef TARGET_NR_getresuid
- IMPL(getresuid)
+ IMPL(chroot)
  {
-@@ -8690,6 +8706,21 @@ IMPL(getresuid)
+     char *p = lock_user_string(arg1);
+@@ -10815,16 +10830,37 @@ IMPL(setfsgid)
+     return get_errno(setfsgid(arg1));
  }
- #endif
  
-+#ifdef TARGET_NR_getresuid32
-+IMPL(getresuid32)
++#ifdef TARGET_NR_setfsgid32
++IMPL(setfsgid32)
 +{
-+    uid_t ruid, euid, suid;
-+    abi_long ret = get_errno(getresuid(&ruid, &euid, &suid));
-+
-+    if (!is_error(ret) &&
-+        (put_user_u32(ruid, arg1) ||
-+         put_user_u32(euid, arg2) ||
-+         put_user_u32(suid, arg3))) {
-+        return -TARGET_EFAULT;
-+    }
-+    return ret;
-+}
-+#endif
- IMPL(getrlimit)
- {
-     int resource = target_to_host_resource(arg1);
-@@ -10906,6 +10937,13 @@ IMPL(setresgid)
- }
- #endif
- 
-+#ifdef TARGET_NR_setresgid32
-+IMPL(setresgid32)
-+{
-+    return get_errno(sys_setresgid(arg1, arg2, arg3));
++    return get_errno(setfsgid(arg1));
 +}
 +#endif
 +
- #ifdef TARGET_NR_setresuid
- IMPL(setresuid)
+ IMPL(setfsuid)
  {
-@@ -10914,6 +10952,13 @@ IMPL(setresuid)
+     return get_errno(setfsuid(arg1));
  }
- #endif
  
-+#ifdef TARGET_NR_setresuid32
-+IMPL(setresuid32)
++#ifdef TARGET_NR_setfsuid32
++IMPL(setfsuid32)
 +{
-+    return get_errno(sys_setresuid(arg1, arg2, arg3));
++    return get_errno(setfsuid(arg1));
 +}
 +#endif
 +
- IMPL(setreuid)
+ IMPL(setgid)
  {
-     return get_errno(setreuid(low2highuid(arg1), low2highuid(arg2)));
-@@ -11898,42 +11943,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+     return get_errno(sys_setgid(low2highgid(arg1)));
+ }
+ 
++#ifdef TARGET_NR_setgid32
++IMPL(setgid32)
++{
++    return get_errno(sys_setgid(arg1));
++}
++#endif
++
+ IMPL(setgroups)
+ {
+     int gidsetsize = arg1;
+@@ -11017,6 +11053,13 @@ IMPL(setuid)
+     return get_errno(sys_setuid(low2highuid(arg1)));
+ }
+ 
++#ifdef TARGET_NR_setuid32
++IMPL(setuid32)
++{
++    return get_errno(sys_setuid(arg1));
++}
++#endif
++
+ #ifdef TARGET_NR_sigaction
+ IMPL(sigaction)
+ {
+@@ -11943,30 +11986,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--#ifdef TARGET_NR_setresuid32
--    case TARGET_NR_setresuid32:
--        return get_errno(sys_setresuid(arg1, arg2, arg3));
--#endif
--#ifdef TARGET_NR_getresuid32
--    case TARGET_NR_getresuid32:
--        {
--            uid_t ruid, euid, suid;
--            ret = get_errno(getresuid(&ruid, &euid, &suid));
--            if (!is_error(ret)) {
--                if (put_user_u32(ruid, arg1)
--                    || put_user_u32(euid, arg2)
--                    || put_user_u32(suid, arg3))
--                    return -TARGET_EFAULT;
--            }
--        }
+-#ifdef TARGET_NR_chown32
+-    case TARGET_NR_chown32:
+-        if (!(p = lock_user_string(arg1)))
+-            return -TARGET_EFAULT;
+-        ret = get_errno(chown(p, arg2, arg3));
+-        unlock_user(p, arg1, 0);
 -        return ret;
 -#endif
--#ifdef TARGET_NR_setresgid32
--    case TARGET_NR_setresgid32:
--        return get_errno(sys_setresgid(arg1, arg2, arg3));
+-#ifdef TARGET_NR_setuid32
+-    case TARGET_NR_setuid32:
+-        return get_errno(sys_setuid(arg1));
 -#endif
--#ifdef TARGET_NR_getresgid32
--    case TARGET_NR_getresgid32:
--        {
--            gid_t rgid, egid, sgid;
--            ret = get_errno(getresgid(&rgid, &egid, &sgid));
--            if (!is_error(ret)) {
--                if (put_user_u32(rgid, arg1)
--                    || put_user_u32(egid, arg2)
--                    || put_user_u32(sgid, arg3))
--                    return -TARGET_EFAULT;
--            }
--        }
--        return ret;
+-#ifdef TARGET_NR_setgid32
+-    case TARGET_NR_setgid32:
+-        return get_errno(sys_setgid(arg1));
 -#endif
- #ifdef TARGET_NR_chown32
-     case TARGET_NR_chown32:
-         if (!(p = lock_user_string(arg1)))
-@@ -13235,8 +13244,14 @@ static impl_fn *syscall_table(unsigned num)
- #ifdef TARGET_NR_getresgid
-         SYSCALL(getresgid);
+-#ifdef TARGET_NR_setfsuid32
+-    case TARGET_NR_setfsuid32:
+-        return get_errno(setfsuid(arg1));
+-#endif
+-#ifdef TARGET_NR_setfsgid32
+-    case TARGET_NR_setfsgid32:
+-        return get_errno(setfsgid(arg1));
+-#endif
+ #ifdef TARGET_NR_mincore
+     case TARGET_NR_mincore:
+         {
+@@ -13139,6 +13158,9 @@ static impl_fn *syscall_table(unsigned num)
  #endif
-+#ifdef TARGET_NR_getresgid32
-+        SYSCALL(getresgid32);
+ #ifdef TARGET_NR_chown
+         SYSCALL(chown);
 +#endif
- #ifdef TARGET_NR_getresuid
-         SYSCALL(getresuid);
++#ifdef TARGET_NR_chown32
++        SYSCALL(chown32);
+ #endif
+         SYSCALL(chroot);
+ #ifdef TARGET_NR_connect
+@@ -13492,8 +13514,17 @@ static impl_fn *syscall_table(unsigned num)
+ #endif
+         SYSCALL(setdomainname);
+         SYSCALL(setfsgid);
++#ifdef TARGET_NR_setfsgid32
++        SYSCALL(setfsgid32);
 +#endif
-+#ifdef TARGET_NR_getresuid32
-+        SYSCALL(getresuid32);
- #endif
-         SYSCALL(getrlimit);
-         SYSCALL(getrusage);
-@@ -13491,11 +13506,17 @@ static impl_fn *syscall_table(unsigned num)
- #ifdef TARGET_NR_setresgid
-         SYSCALL(setresgid);
- #endif
-+#ifdef TARGET_NR_setresgid32
-+        SYSCALL(setresgid32);
+         SYSCALL(setfsuid);
++#ifdef TARGET_NR_setfsuid32
++        SYSCALL(setfsuid32);
 +#endif
- #ifdef TARGET_NR_setregid32
-         SYSCALL(setregid32);
- #endif
- #ifdef TARGET_NR_setresuid
-         SYSCALL(setresuid);
+         SYSCALL(setgid);
++#ifdef TARGET_NR_setgid32
++        SYSCALL(setgid32);
 +#endif
-+#ifdef TARGET_NR_setresuid32
-+        SYSCALL(setresuid32);
+         SYSCALL(setgroups);
+ #ifdef TARGET_NR_setgroups32
+         SYSCALL(setgroups32);
+@@ -13529,6 +13560,9 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(settimeofday);
+         SYSCALL(setsid);
+         SYSCALL(setuid);
++#ifdef TARGET_NR_setuid32
++        SYSCALL(setuid32);
++#endif
+ #ifdef TARGET_NR_sigaction
+         SYSCALL(sigaction);
  #endif
-         SYSCALL(setreuid);
- #ifdef TARGET_NR_setreuid32
 -- 
 2.17.1
