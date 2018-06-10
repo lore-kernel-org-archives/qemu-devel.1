@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40799)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqeP-00037D-DS
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqeT-0003Av-DW
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fRqeO-0003jF-68
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:17 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:35910)
+	(envelope-from <richard.henderson@linaro.org>) id 1fRqeQ-0003kI-4u
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:21 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:41585)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fRqeN-0003j3-Tm
-	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:16 -0400
-Received: by mail-pl0-x244.google.com with SMTP id a7-v6so7899611plp.3
-	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:15 -0700 (PDT)
+	id 1fRqeP-0003jz-Sw
+	for qemu-devel@nongnu.org; Sat, 09 Jun 2018 23:04:18 -0400
+Received: by mail-pl0-x243.google.com with SMTP id az12-v6so10380339plb.8
+	for <qemu-devel@nongnu.org>; Sat, 09 Jun 2018 20:04:17 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sat,  9 Jun 2018 17:01:22 -1000
-Message-Id: <20180610030220.3777-51-richard.henderson@linaro.org>
+Date: Sat,  9 Jun 2018 17:01:23 -1000
+Message-Id: <20180610030220.3777-52-richard.henderson@linaro.org>
 In-Reply-To: <20180610030220.3777-1-richard.henderson@linaro.org>
 References: <20180610030220.3777-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 050/108] linux-user: Split out getitimer,
- setitimer, syslog
+Subject: [Qemu-devel] [PATCH v2 051/108] linux-user: Split out fstat, lstat,
+ stat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,220 +30,199 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-All targets define syslog; remove the ifdef.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 155 ++++++++++++++++++++++---------------------
- 1 file changed, 79 insertions(+), 76 deletions(-)
+ linux-user/syscall.c | 129 +++++++++++++++++++++++++++----------------
+ 1 file changed, 82 insertions(+), 47 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 46c7c485fd..c8fc7fc908 100644
+index c8fc7fc908..4f6c01092b 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -8154,6 +8154,20 @@ IMPL(futimesat)
+@@ -7052,6 +7052,31 @@ static inline abi_long target_to_host_sigevent(struct sigevent *host_sevp,
+     return 0;
+ }
+ 
++static abi_long host_to_target_stat(abi_ulong target_addr, struct stat *st)
++{
++    struct target_stat *target_st;
++
++    if (!lock_user_struct(VERIFY_WRITE, target_st, target_addr, 0)) {
++        return -TARGET_EFAULT;
++    }
++    memset(target_st, 0, sizeof(*target_st));
++    __put_user(st->st_dev, &target_st->st_dev);
++    __put_user(st->st_ino, &target_st->st_ino);
++    __put_user(st->st_mode, &target_st->st_mode);
++    __put_user(st->st_uid, &target_st->st_uid);
++    __put_user(st->st_gid, &target_st->st_gid);
++    __put_user(st->st_nlink, &target_st->st_nlink);
++    __put_user(st->st_rdev, &target_st->st_rdev);
++    __put_user(st->st_size, &target_st->st_size);
++    __put_user(st->st_blksize, &target_st->st_blksize);
++    __put_user(st->st_blocks, &target_st->st_blocks);
++    __put_user(st->st_atime, &target_st->target_st_atime);
++    __put_user(st->st_mtime, &target_st->target_st_mtime);
++    __put_user(st->st_ctime, &target_st->target_st_ctime);
++    unlock_user_struct(target_st, target_addr, 1);
++    return 0;
++}
++
+ static inline abi_long host_to_target_stat64(void *cpu_env,
+                                              abi_ulong target_addr,
+                                              struct stat *host_st)
+@@ -8100,6 +8125,18 @@ IMPL(fork)
  }
  #endif
  
-+IMPL(getitimer)
++IMPL(fstat)
 +{
-+    struct itimerval value;
-+    abi_long ret = get_errno(getitimer(arg1, &value));
++    struct stat st;
++    abi_long ret;
 +
-+    if (!is_error(ret) && arg2 &&
-+        (copy_to_user_timeval(arg2, &value.it_interval) ||
-+         copy_to_user_timeval(arg2 + sizeof(struct target_timeval),
-+                              &value.it_value))) {
++    ret = get_errno(fstat(arg1, &st));
++    if (!is_error(ret) && host_to_target_stat(arg2, &st)) {
 +        return -TARGET_EFAULT;
 +    }
 +    return ret;
 +}
 +
- #ifdef TARGET_NR_getpeername
- IMPL(getpeername)
+ IMPL(fstatfs)
  {
-@@ -9357,6 +9371,28 @@ IMPL(sethostname)
-     return ret;
+     struct statfs stfs;
+@@ -8435,6 +8472,25 @@ IMPL(lseek)
+     return get_errno(lseek(arg1, arg2, arg3));
  }
  
-+IMPL(setitimer)
++#ifdef TARGET_NR_lstat
++IMPL(lstat)
 +{
-+    struct itimerval ivalue, ovalue;
++    char *p = lock_user_string(arg1);
++    struct stat st;
 +    abi_long ret;
 +
-+    if (arg2 &&
-+        (copy_from_user_timeval(&ivalue.it_interval, arg2) ||
-+         copy_from_user_timeval(&ivalue.it_value,
-+                                arg2 + sizeof(struct target_timeval)))) {
++    if (!p) {
 +        return -TARGET_EFAULT;
 +    }
-+    ret = get_errno(setitimer(arg1, arg2 ? &ivalue : NULL,
-+                              arg3 ? &ovalue : NULL));
-+    if (!is_error(ret) && arg3 &&
-+        (copy_to_user_timeval(arg3, &ovalue.it_interval) ||
-+         copy_to_user_timeval(arg3 + sizeof(struct target_timeval),
-+                              &ovalue.it_value))) {
++    ret = get_errno(lstat(path(p), &st));
++    unlock_user(p, arg1, 0);
++    if (!is_error(ret) && host_to_target_stat(arg2, &st)) {
 +        return -TARGET_EFAULT;
 +    }
 +    return ret;
 +}
++#endif
 +
- IMPL(setpgid)
+ #ifdef TARGET_NR_mkdir
+ IMPL(mkdir)
  {
-     return get_errno(setpgid(arg1, arg2));
-@@ -9848,6 +9884,46 @@ IMPL(syncfs)
+@@ -9781,6 +9837,25 @@ IMPL(ssetmask)
  }
  #endif
  
-+IMPL(syslog)
++#ifdef TARGET_NR_stat
++IMPL(stat)
 +{
++    char *p = lock_user_string(arg1);
++    struct stat st;
 +    abi_long ret;
-+    char *p;
-+    int len;
 +
-+    switch (arg1) {
-+    case TARGET_SYSLOG_ACTION_CLOSE:         /* Close log */
-+    case TARGET_SYSLOG_ACTION_OPEN:          /* Open log */
-+    case TARGET_SYSLOG_ACTION_CLEAR:         /* Clear ring buffer */
-+    case TARGET_SYSLOG_ACTION_CONSOLE_OFF:   /* Disable logging */
-+    case TARGET_SYSLOG_ACTION_CONSOLE_ON:    /* Enable logging */
-+    case TARGET_SYSLOG_ACTION_CONSOLE_LEVEL: /* Set messages level */
-+    case TARGET_SYSLOG_ACTION_SIZE_UNREAD:   /* Number of chars */
-+    case TARGET_SYSLOG_ACTION_SIZE_BUFFER:   /* Size of the buffer */
-+        return get_errno(sys_syslog((int)arg1, NULL, (int)arg3));
-+
-+    case TARGET_SYSLOG_ACTION_READ:          /* Read from log */
-+    case TARGET_SYSLOG_ACTION_READ_CLEAR:    /* Read/clear msgs */
-+    case TARGET_SYSLOG_ACTION_READ_ALL:      /* Read last messages */
-+        len = arg2;
-+        if (len < 0) {
-+            return -TARGET_EINVAL;
-+        }
-+        if (len == 0) {
-+            return 0;
-+        }
-+        p = lock_user(VERIFY_WRITE, arg2, arg3, 0);
-+        if (!p) {
-+            return -TARGET_EFAULT;
-+        }
-+        ret = get_errno(sys_syslog((int)arg1, p, (int)arg3));
-+        unlock_user(p, arg2, arg3);
-+        return ret;
-+
-+    default:
-+        return -TARGET_EINVAL;
++    if (!p) {
++        return -TARGET_EFAULT;
 +    }
++    ret = get_errno(stat(path(p), &st));
++    unlock_user(p, arg1, 0);
++    if (!is_error(ret) && host_to_target_stat(arg2, &st)) {
++        return -TARGET_EFAULT;
++    }
++    return ret;
 +}
++#endif
 +
- #ifdef TARGET_NR_time
- IMPL(time)
+ IMPL(statfs)
  {
-@@ -10077,82 +10153,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+     char *p = lock_user_string(arg1);
+@@ -10153,53 +10228,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
      void *p;
  
      switch(num) {
--#if defined(TARGET_NR_syslog)
--    case TARGET_NR_syslog:
--        {
--            int len = arg2;
--
--            switch (arg1) {
--            case TARGET_SYSLOG_ACTION_CLOSE:         /* Close log */
--            case TARGET_SYSLOG_ACTION_OPEN:          /* Open log */
--            case TARGET_SYSLOG_ACTION_CLEAR:         /* Clear ring buffer */
--            case TARGET_SYSLOG_ACTION_CONSOLE_OFF:   /* Disable logging */
--            case TARGET_SYSLOG_ACTION_CONSOLE_ON:    /* Enable logging */
--            case TARGET_SYSLOG_ACTION_CONSOLE_LEVEL: /* Set messages level */
--            case TARGET_SYSLOG_ACTION_SIZE_UNREAD:   /* Number of chars */
--            case TARGET_SYSLOG_ACTION_SIZE_BUFFER:   /* Size of the buffer */
--                return get_errno(sys_syslog((int)arg1, NULL, (int)arg3));
--            case TARGET_SYSLOG_ACTION_READ:          /* Read from log */
--            case TARGET_SYSLOG_ACTION_READ_CLEAR:    /* Read/clear msgs */
--            case TARGET_SYSLOG_ACTION_READ_ALL:      /* Read last messages */
--                {
--                    if (len < 0) {
--                        return -TARGET_EINVAL;
--                    }
--                    if (len == 0) {
--                        return 0;
--                    }
--                    p = lock_user(VERIFY_WRITE, arg2, arg3, 0);
--                    if (!p) {
--                        return -TARGET_EFAULT;
--                    }
--                    ret = get_errno(sys_syslog((int)arg1, p, (int)arg3));
--                    unlock_user(p, arg2, arg3);
--                }
--                return ret;
--            default:
--                return -TARGET_EINVAL;
--            }
+-#ifdef TARGET_NR_stat
+-    case TARGET_NR_stat:
+-        if (!(p = lock_user_string(arg1))) {
+-            return -TARGET_EFAULT;
 -        }
--        break;
+-        ret = get_errno(stat(path(p), &st));
+-        unlock_user(p, arg1, 0);
+-        goto do_stat;
 -#endif
--    case TARGET_NR_setitimer:
+-#ifdef TARGET_NR_lstat
+-    case TARGET_NR_lstat:
+-        if (!(p = lock_user_string(arg1))) {
+-            return -TARGET_EFAULT;
+-        }
+-        ret = get_errno(lstat(path(p), &st));
+-        unlock_user(p, arg1, 0);
+-        goto do_stat;
+-#endif
+-    case TARGET_NR_fstat:
 -        {
--            struct itimerval value, ovalue, *pvalue;
+-            ret = get_errno(fstat(arg1, &st));
+-#if defined(TARGET_NR_stat) || defined(TARGET_NR_lstat)
+-        do_stat:
+-#endif
+-            if (!is_error(ret)) {
+-                struct target_stat *target_st;
 -
--            if (arg2) {
--                pvalue = &value;
--                if (copy_from_user_timeval(&pvalue->it_interval, arg2)
--                    || copy_from_user_timeval(&pvalue->it_value,
--                                              arg2 + sizeof(struct target_timeval)))
+-                if (!lock_user_struct(VERIFY_WRITE, target_st, arg2, 0))
 -                    return -TARGET_EFAULT;
--            } else {
--                pvalue = NULL;
--            }
--            ret = get_errno(setitimer(arg1, pvalue, &ovalue));
--            if (!is_error(ret) && arg3) {
--                if (copy_to_user_timeval(arg3,
--                                         &ovalue.it_interval)
--                    || copy_to_user_timeval(arg3 + sizeof(struct target_timeval),
--                                            &ovalue.it_value))
--                    return -TARGET_EFAULT;
+-                memset(target_st, 0, sizeof(*target_st));
+-                __put_user(st.st_dev, &target_st->st_dev);
+-                __put_user(st.st_ino, &target_st->st_ino);
+-                __put_user(st.st_mode, &target_st->st_mode);
+-                __put_user(st.st_uid, &target_st->st_uid);
+-                __put_user(st.st_gid, &target_st->st_gid);
+-                __put_user(st.st_nlink, &target_st->st_nlink);
+-                __put_user(st.st_rdev, &target_st->st_rdev);
+-                __put_user(st.st_size, &target_st->st_size);
+-                __put_user(st.st_blksize, &target_st->st_blksize);
+-                __put_user(st.st_blocks, &target_st->st_blocks);
+-                __put_user(st.st_atime, &target_st->target_st_atime);
+-                __put_user(st.st_mtime, &target_st->target_st_mtime);
+-                __put_user(st.st_ctime, &target_st->target_st_ctime);
+-                unlock_user_struct(target_st, arg2, 1);
 -            }
 -        }
 -        return ret;
--    case TARGET_NR_getitimer:
--        {
--            struct itimerval value;
--
--            ret = get_errno(getitimer(arg1, &value));
--            if (!is_error(ret) && arg2) {
--                if (copy_to_user_timeval(arg2,
--                                         &value.it_interval)
--                    || copy_to_user_timeval(arg2 + sizeof(struct target_timeval),
--                                            &value.it_value))
--                    return -TARGET_EFAULT;
--            }
--        }
--        return ret;
- #ifdef TARGET_NR_stat
-     case TARGET_NR_stat:
-         if (!(p = lock_user_string(arg1))) {
-@@ -12881,6 +12881,7 @@ static impl_fn *syscall_table(unsigned num)
- #ifdef TARGET_NR_futimesat
-         SYSCALL(futimesat);
+     case TARGET_NR_vhangup:
+         return get_errno(vhangup());
+ #ifdef TARGET_NR_syscall
+@@ -12873,6 +12901,7 @@ static impl_fn *syscall_table(unsigned num)
+ #ifdef TARGET_NR_fork
+         SYSCALL(fork);
  #endif
-+        SYSCALL(getitimer);
- #ifdef TARGET_NR_getpeername
-         SYSCALL(getpeername);
++        SYSCALL(fstat);
+         SYSCALL(fstatfs);
+ #ifdef TARGET_NR_fstatfs64
+         SYSCALL(fstatfs64);
+@@ -12918,6 +12947,9 @@ static impl_fn *syscall_table(unsigned num)
+         SYSCALL(listen);
  #endif
-@@ -13026,6 +13027,7 @@ static impl_fn *syscall_table(unsigned num)
-         SYSCALL(sendto);
+         SYSCALL(lseek);
++#ifdef TARGET_NR_lstat
++        SYSCALL(lstat);
++#endif
+ #ifdef TARGET_NR_mkdir
+         SYSCALL(mkdir);
  #endif
-         SYSCALL(sethostname);
-+        SYSCALL(setitimer);
-         SYSCALL(setpgid);
-         SYSCALL(setpriority);
-         SYSCALL(setrlimit);
-@@ -13077,6 +13079,7 @@ static impl_fn *syscall_table(unsigned num)
- #ifdef CONFIG_SYNCFS
-         SYSCALL(syncfs);
+@@ -13062,6 +13094,9 @@ static impl_fn *syscall_table(unsigned num)
  #endif
-+        SYSCALL(syslog);
- #ifdef TARGET_NR_time
-         SYSCALL(time);
+ #ifdef TARGET_NR_ssetmask
+         SYSCALL(ssetmask);
++#endif
++#ifdef TARGET_NR_stat
++        SYSCALL(stat);
  #endif
+         SYSCALL(statfs);
+ #ifdef TARGET_NR_statfs64
 -- 
 2.17.1
