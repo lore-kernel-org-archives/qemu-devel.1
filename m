@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fRzRP-0001q6-FU
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 08:27:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fRzWd-0002kz-6k
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 08:32:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fRzRM-00080w-Ch
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 08:27:27 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:38235)
+	(envelope-from <peter.maydell@linaro.org>) id 1fRzWb-0001dQ-Tf
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 08:32:51 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:44608)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fRzRM-00080m-4d
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 08:27:24 -0400
-Received: by mail-wr0-x244.google.com with SMTP id e18-v6so9312139wrs.5
-	for <qemu-devel@nongnu.org>; Sun, 10 Jun 2018 05:27:24 -0700 (PDT)
-References: <20180608192940.19548-1-ehabkost@redhat.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <7b88043b-1eae-48b4-49e7-55491b200811@gmail.com>
-Date: Sun, 10 Jun 2018 15:27:20 +0300
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fRzWb-0001d0-N5
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 08:32:49 -0400
+Received: by mail-ot0-x241.google.com with SMTP id w13-v6so20733794ote.11
+	for <qemu-devel@nongnu.org>; Sun, 10 Jun 2018 05:32:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180608192940.19548-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] pc: Remove PC_COMPAT_2_12 from 3.0
- machine-types
+In-Reply-To: <20180610030220.3777-10-richard.henderson@linaro.org>
+References: <20180610030220.3777-1-richard.henderson@linaro.org>
+	<20180610030220.3777-10-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 10 Jun 2018 13:32:28 +0100
+Message-ID: <CAFEAcA8+NuuT_TDkQuh=C9Mo3xod=745fSTjSP7umSUrt8PFBg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 009/108] linux-user: Set up
+ infrastructure for table-izing syscalls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +30,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Babu Moger <babu.moger@amd.com>, Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Juan Quintela <quintela@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 
-
-
-On 06/08/2018 10:29 PM, Eduardo Habkost wrote:
-> commit f548222c added PC_COMPAT_2_12 to the 3.0 PC machine-types.
-> I believe this happened during manual conflict resolution when
-> applying the patch.
+On 10 June 2018 at 04:00, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> At the same time, split out set_robust_list and get_robust_list.
+> Put them together, along with their block comment, at the top
+> of syscall_table.
 >
-> Cc: Xiao Guangrong <xiaoguangrong@tencent.com>
-> Cc: Juan Quintela <quintela@redhat.com>
-> Fixes: f548222c24342ca74689de7794f9006b43f86a54
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->   hw/i386/pc_piix.c | 1 -
->   hw/i386/pc_q35.c  | 1 -
->   2 files changed, 2 deletions(-)
+>  linux-user/syscall.c | 87 +++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 66 insertions(+), 21 deletions(-)
 >
-> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> index 3d81136065..b4c5b03274 100644
-> --- a/hw/i386/pc_piix.c
-> +++ b/hw/i386/pc_piix.c
-> @@ -430,7 +430,6 @@ static void pc_i440fx_3_0_machine_options(MachineClass *m)
->       pc_i440fx_machine_options(m);
->       m->alias = "pc";
->       m->is_default = 1;
-> -    SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
->   }
->   
->   DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
-> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> index b60cbb9266..83d6d75efa 100644
-> --- a/hw/i386/pc_q35.c
-> +++ b/hw/i386/pc_q35.c
-> @@ -312,7 +312,6 @@ static void pc_q35_3_0_machine_options(MachineClass *m)
->   {
->       pc_q35_machine_options(m);
->       m->alias = "q35";
-> -    SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
->   }
->   
->   DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 46f123ee13..8678e749ee 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -7947,6 +7947,17 @@ static int host_to_target_cpu_mask(const unsigned long *host_mask,
+>      return 0;
+>  }
+>
+> +typedef abi_long impl_fn(void *cpu_env, unsigned num, abi_long arg1,
+> +                         abi_long arg2, abi_long arg3, abi_long arg4,
+> +                         abi_long arg5, abi_long arg6, abi_long arg7,
+> +                         abi_long arg8);
+> +
+> +#define IMPL(NAME) \
+> +static abi_long impl_##NAME(void *cpu_env, unsigned num, abi_long arg1,   \
+> +                            abi_long arg2, abi_long arg3, abi_long arg4,  \
+> +                            abi_long arg5, abi_long arg6, abi_long arg7,  \
+> +                            abi_long arg8)
+> +
+>  /* This is an internal helper for do_syscall so that it is easier
+>   * to have a single return point, so that actions, such as logging
+>   * of syscall results, can be performed.
+> @@ -11740,23 +11751,6 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+>          return get_errno(safe_tgkill((int)arg1, (int)arg2,
+>                           target_to_host_signal(arg3)));
+>
+> -#ifdef TARGET_NR_set_robust_list
+> -    case TARGET_NR_set_robust_list:
+> -    case TARGET_NR_get_robust_list:
+> -        /* The ABI for supporting robust futexes has userspace pass
+> -         * the kernel a pointer to a linked list which is updated by
+> -         * userspace after the syscall; the list is walked by the kernel
+> -         * when the thread exits. Since the linked list in QEMU guest
+> -         * memory isn't a valid linked list for the host and we have
+> -         * no way to reliably intercept the thread-death event, we can't
+> -         * support these. Silently return ENOSYS so that guest userspace
+> -         * falls back to a non-robust futex implementation (which should
+> -         * be OK except in the corner case of the guest crashing while
+> -         * holding a mutex that is shared with another process via
+> -         * shared memory).
+> -         */
+> -        return -TARGET_ENOSYS;
+> -#endif
+>
+>  #if defined(TARGET_NR_utimensat)
+>      case TARGET_NR_utimensat:
+> @@ -12412,6 +12406,54 @@ static abi_long do_syscall1(void *cpu_env, unsigned num, abi_long arg1,
+>      return ret;
+>  }
+>
+> +/* The default action for a syscall not listed in syscall_table is to
+> + * log the missing syscall.  If a syscall is intentionally emulated as
+> + * not present, then list it with impl_enosys as the implementation,
+> + * which will avoid the logging.
+> + */
+> +IMPL(enosys)
+> +{
+> +    return -TARGET_ENOSYS;
+> +}
+> +
+> +/* For a given syscall number, return a function implementing it.
+> + * Do this via switch statement instead of table because some targets
+> + * do not begin at 0 and others have a large split in the middle of
+> + * the numbers.  The compiler should be able to produce a dense table.
+> + */
+> +static impl_fn *syscall_table(unsigned num)
+> +{
+> +#define SYSCALL_WITH(X, Y)    case TARGET_NR_##X: return impl_##Y
+> +#define SYSCALL(X)            SYSCALL_WITH(X, X)
+> +
+> +    switch (num) {
+> +        /* The ABI for supporting robust futexes has userspace pass
+> +         * the kernel a pointer to a linked list which is updated by
+> +         * userspace after the syscall; the list is walked by the kernel
+> +         * when the thread exits. Since the linked list in QEMU guest
+> +         * memory isn't a valid linked list for the host and we have
+> +         * no way to reliably intercept the thread-death event, we can't
+> +         * support these. Silently return ENOSYS so that guest userspace
+> +         * falls back to a non-robust futex implementation (which should
+> +         * be OK except in the corner case of the guest crashing while
+> +         * holding a mutex that is shared with another process via
+> +         * shared memory).
+> +         */
+> +        SYSCALL_WITH(get_robust_list, enosys);
+> +        SYSCALL_WITH(set_robust_list, enosys);
+> +
+> +        /*
+> +         * Other syscalls listed in collation order, with '_' ignored.
+> +         */
+> +    }
 
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
+I was expecting this to be a table lookup, something like
+   return syscalls[num].impl;
 
-Thanks,
-Marcel
+where the other entries in the syscalls[num] structs would be
+for instance the strace data we currently have in strace.list.
+
+thanks
+-- PMM
