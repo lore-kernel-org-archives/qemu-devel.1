@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52600)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSOTg-0002DN-Jp
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 11:11:30 -0400
+	(envelope-from <vskytta@gmail.com>) id 1fSNlN-00044f-7m
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:25:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSOTb-0006tg-S9
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 11:11:28 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180515171446.10834-1-peter.maydell@linaro.org>
-	<CAFEAcA9TGnyeH8=f0xJ3sD9TtXQs_NbiJWBp9h6zsAz-UEOLrw@mail.gmail.com>
-	<CAFEAcA8vS_uk7Yz+JgoHvHnwFjY-T7ShnOCiwO+QzikycQ_5yA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <723bbc56-558f-6c4d-327f-d6984aadd6c9@amsat.org>
-Date: Mon, 11 Jun 2018 12:11:18 -0300
+	(envelope-from <vskytta@gmail.com>) id 1fSNlG-0001DG-73
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:25:41 -0400
+Received: from mail-lf0-x22e.google.com ([2a00:1450:4010:c07::22e]:44102)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <vskytta@gmail.com>) id 1fSNlF-0001Ct-Q5
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:25:34 -0400
+Received: by mail-lf0-x22e.google.com with SMTP id 36-v6so30826567lfr.11
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 07:25:33 -0700 (PDT)
+Received: from uncleman.com (dtcv1zycgh96w9vchdr3t-3.rev.dnainternet.fi.
+	[2001:14ba:80a3:5a00:4537:752e:c446:1baf])
+	by smtp.gmail.com with ESMTPSA id
+	c67-v6sm6201074lfe.4.2018.06.11.07.25.29 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Mon, 11 Jun 2018 07:25:30 -0700 (PDT)
+Sender: =?UTF-8?Q?Ville_Skytt=C3=A4?= <vskytta@gmail.com>
+From: =?UTF-8?q?Ville=20Skytt=C3=A4?= <ville.skytta@iki.fi>
+Date: Mon, 11 Jun 2018 17:25:28 +0300
+Message-Id: <20180611142528.11730-1-ville.skytta@iki.fi>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8vS_uk7Yz+JgoHvHnwFjY-T7ShnOCiwO+QzikycQ_5yA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/mps2-tz: Put ethernet
- controller behind PPC
+Subject: [Qemu-devel] [PATCH] docs: Grammar and spelling fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,134 +33,278 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
 
-On 06/11/2018 11:02 AM, Peter Maydell wrote:
-> I guess nobody else is interested -- applying to target-arm.next.
+Signed-off-by: Ville Skyttä <ville.skytta@iki.fi>
+---
+ docs/colo-proxy.txt                  | 2 +-
+ docs/config/mach-virt-graphical.cfg  | 2 +-
+ docs/config/mach-virt-serial.cfg     | 2 +-
+ docs/config/q35-emulated.cfg         | 2 +-
+ docs/config/q35-virtio-graphical.cfg | 2 +-
+ docs/config/q35-virtio-serial.cfg    | 2 +-
+ docs/devel/migration.rst             | 2 +-
+ docs/devel/multi-thread-tcg.txt      | 2 +-
+ docs/interop/qcow2.txt               | 4 ++--
+ docs/interop/vhost-user.txt          | 4 ++--
+ docs/memory-hotplug.txt              | 2 +-
+ docs/multiseat.txt                   | 2 +-
+ docs/qemu-block-drivers.texi         | 2 +-
+ docs/qemupciserial.inf               | 2 +-
+ docs/specs/acpi_nvdimm.txt           | 2 +-
+ docs/specs/ppc-spapr-hcalls.txt      | 2 +-
+ docs/specs/tpm.txt                   | 2 +-
+ docs/usb2.txt                        | 2 +-
+ 18 files changed, 20 insertions(+), 20 deletions(-)
 
-Sorry I missed this. I'm not specially interested in this particular
-board, but in hw/arm/mps2-tz.c which is the most up-to-date board
-example we have in the codebase.
-
-> 
-> thanks
-> -- PMM
-> 
-> On 29 May 2018 at 16:27, Peter Maydell <peter.maydell@linaro.org> wrote:
->> Ping for review?
->>
->> thanks
->> -- PMM
->>
->>
->> On 15 May 2018 at 18:14, Peter Maydell <peter.maydell@linaro.org> wrote:
->>> The ethernet controller in the AN505 MPC FPGA image is behind
->>> the same AHB Peripheral Protection Controller that handles
->>> the graphics and GPIOs. (In the documentation this is clear
->>> in the block diagram but the ethernet controller was omitted
->>> from the table listing devices connected to the PPC.)
->>> The ethernet sits behind AHB PPCEXP0 interface 5. We had
->>> incorrectly claimed that this was a "gpio4", but there are
->>> only 4 GPIOs in this image.
->>>
->>> Correct the QEMU model to match the hardware.
->>>
->>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->>> ---
->>> A minor nit that I didn't notice when I was modelling this.
->>>
->>> NB: I think the PSRAM is also supposed to be behind this
->>> interface of the PPC, but we definitely can't model that
->>> because our PPC implementation won't work for executing
->>> code from RAM that sits behind it.
->>>
->>>  hw/arm/mps2-tz.c | 32 +++++++++++++++++++++++---------
->>>  1 file changed, 23 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
->>> index 8dc8bfd4ab..c5ef95e4cc 100644
->>> --- a/hw/arm/mps2-tz.c
->>> +++ b/hw/arm/mps2-tz.c
->>> @@ -74,12 +74,13 @@ typedef struct {
->>>      UnimplementedDeviceState spi[5];
->>>      UnimplementedDeviceState i2c[4];
->>>      UnimplementedDeviceState i2s_audio;
->>> -    UnimplementedDeviceState gpio[5];
->>> +    UnimplementedDeviceState gpio[4];
->>>      UnimplementedDeviceState dma[4];
->>>      UnimplementedDeviceState gfx;
->>>      CMSDKAPBUART uart[5];
->>>      SplitIRQ sec_resp_splitter;
->>>      qemu_or_irq uart_irq_orgate;
->>> +    DeviceState *lan9118;
->>>  } MPS2TZMachineState;
->>>
->>>  #define TYPE_MPS2TZ_MACHINE "mps2tz"
->>> @@ -224,6 +225,26 @@ static MemoryRegion *make_fpgaio(MPS2TZMachineState *mms, void *opaque,
->>>      return sysbus_mmio_get_region(SYS_BUS_DEVICE(fpgaio), 0);
->>>  }
->>>
->>> +static MemoryRegion *make_eth_dev(MPS2TZMachineState *mms, void *opaque,
->>> +                                  const char *name, hwaddr size)
->>> +{
->>> +    SysBusDevice *s;
->>> +    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
->>> +    NICInfo *nd = &nd_table[0];
->>> +
->>> +    /* In hardware this is a LAN9220; the LAN9118 is software compatible
->>> +     * except that it doesn't support the checksum-offload feature.
->>> +     */
->>> +    qemu_check_nic_model(nd, "lan9118");
->>> +    mms->lan9118 = qdev_create(NULL, "lan9118");
->>> +    qdev_set_nic_properties(mms->lan9118, nd);
->>> +    qdev_init_nofail(mms->lan9118);
->>> +
->>> +    s = SYS_BUS_DEVICE(mms->lan9118);
->>> +    sysbus_connect_irq(s, 0, qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
-
-EXP_IRQ: "GPIOs to the NVIC's lines 32 and up."
-
-So this is IRQ[48], Ethernet, correct.
-
->>> +    return sysbus_mmio_get_region(s, 0);
->>> +}
->>> +
->>>  static void mps2tz_common_init(MachineState *machine)
->>>  {
->>>      MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
->>> @@ -363,7 +384,7 @@ static void mps2tz_common_init(MachineState *machine)
->>>                  { "gpio1", make_unimp_dev, &mms->gpio[1], 0x40101000, 0x1000 },
->>>                  { "gpio2", make_unimp_dev, &mms->gpio[2], 0x40102000, 0x1000 },
->>>                  { "gpio3", make_unimp_dev, &mms->gpio[3], 0x40103000, 0x1000 },
->>> -                { "gpio4", make_unimp_dev, &mms->gpio[4], 0x40104000, 0x1000 },
-
-4 GPIOs, correct.
-
->>> +                { "eth", make_eth_dev, NULL, 0x42000000, 0x100000 },
-
-Correct.
-
->>>              },
->>>          }, {
->>>              .name = "ahb_ppcexp1",
->>> @@ -447,13 +468,6 @@ static void mps2tz_common_init(MachineState *machine)
->>>                                                       "cfg_sec_resp", 0));
->>>      }
->>>
->>> -    /* In hardware this is a LAN9220; the LAN9118 is software compatible
->>> -     * except that it doesn't support the checksum-offload feature.
->>> -     * The ethernet controller is not behind a PPC.
->>> -     */
->>> -    lan9118_init(&nd_table[0], 0x42000000,
->>> -                 qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
->>> -
->>>      create_unimplemented_device("FPGA NS PC", 0x48007000, 0x1000);
->>>
->>>      armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x400000);
->>> --
->>> 2.17.0
-> 
-
-FWIW:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+diff --git a/docs/colo-proxy.txt b/docs/colo-proxy.txt
+index 8b726ea094..1f8e4b4e77 100644
+--- a/docs/colo-proxy.txt
++++ b/docs/colo-proxy.txt
+@@ -145,7 +145,7 @@ and redirect indev's packet to filter.
+ COLO-compare, we do packet comparing job.
+ Packets coming from the primary char indev will be sent to outdev.
+ Packets coming from the secondary char dev will be dropped after comparing.
+-COLO-comapre need two input chardev and one output chardev:
++COLO-compare needs two input chardevs and one output chardev:
+ primary_in=chardev1-id (source: primary send packet)
+ secondary_in=chardev2-id (source: secondary send packet)
+ outdev=chardev3-id
+diff --git a/docs/config/mach-virt-graphical.cfg b/docs/config/mach-virt-graphical.cfg
+index 0fdf6846dd..d6d31b17f5 100644
+--- a/docs/config/mach-virt-graphical.cfg
++++ b/docs/config/mach-virt-graphical.cfg
+@@ -185,7 +185,7 @@
+ # attached to it.
+ #
+ # We also create an optical disk, mostly for installation
+-# purposes: once the guest OS has been succesfully
++# purposes: once the guest OS has been successfully
+ # installed, the guest will no longer boot from optical
+ # media. If you don't want, or no longer want, to have an
+ # optical disk in the guest you can safely comment out
+diff --git a/docs/config/mach-virt-serial.cfg b/docs/config/mach-virt-serial.cfg
+index aee9f1c5a1..18a7c83731 100644
+--- a/docs/config/mach-virt-serial.cfg
++++ b/docs/config/mach-virt-serial.cfg
+@@ -191,7 +191,7 @@
+ # attached to it.
+ #
+ # We also create an optical disk, mostly for installation
+-# purposes: once the guest OS has been succesfully
++# purposes: once the guest OS has been successfully
+ # installed, the guest will no longer boot from optical
+ # media. If you don't want, or no longer want, to have an
+ # optical disk in the guest you can safely comment out
+diff --git a/docs/config/q35-emulated.cfg b/docs/config/q35-emulated.cfg
+index c6416d6545..99ac918e78 100644
+--- a/docs/config/q35-emulated.cfg
++++ b/docs/config/q35-emulated.cfg
+@@ -130,7 +130,7 @@
+ # it to that controller so that the guest can use it.
+ #
+ # We also create an optical disk, mostly for installation
+-# purposes: once the guest OS has been succesfully
++# purposes: once the guest OS has been successfully
+ # installed, the guest will no longer boot from optical
+ # media. If you don't want, or no longer want, to have an
+ # optical disk in the guest you can safely comment out
+diff --git a/docs/config/q35-virtio-graphical.cfg b/docs/config/q35-virtio-graphical.cfg
+index 28bde2fc57..4207f11e4f 100644
+--- a/docs/config/q35-virtio-graphical.cfg
++++ b/docs/config/q35-virtio-graphical.cfg
+@@ -136,7 +136,7 @@
+ # attached to it.
+ #
+ # We also create an optical disk, mostly for installation
+-# purposes: once the guest OS has been succesfully
++# purposes: once the guest OS has been successfully
+ # installed, the guest will no longer boot from optical
+ # media. If you don't want, or no longer want, to have an
+ # optical disk in the guest you can safely comment out
+diff --git a/docs/config/q35-virtio-serial.cfg b/docs/config/q35-virtio-serial.cfg
+index c33c9cc07a..d2830aec5e 100644
+--- a/docs/config/q35-virtio-serial.cfg
++++ b/docs/config/q35-virtio-serial.cfg
+@@ -141,7 +141,7 @@
+ # attached to it.
+ #
+ # We also create an optical disk, mostly for installation
+-# purposes: once the guest OS has been succesfully
++# purposes: once the guest OS has been successfully
+ # installed, the guest will no longer boot from optical
+ # media. If you don't want, or no longer want, to have an
+ # optical disk in the guest you can safely comment out
+diff --git a/docs/devel/migration.rst b/docs/devel/migration.rst
+index 40f136f6be..6ed3fce061 100644
+--- a/docs/devel/migration.rst
++++ b/docs/devel/migration.rst
+@@ -37,7 +37,7 @@ over any transport.
+ - tcp migration: do the migration using tcp sockets
+ - unix migration: do the migration using unix sockets
+ - exec migration: do the migration using the stdin/stdout through a process.
+-- fd migration: do the migration using an file descriptor that is
++- fd migration: do the migration using a file descriptor that is
+   passed to QEMU.  QEMU doesn't care how this file descriptor is opened.
+ 
+ In addition, support is included for migration using RDMA, which
+diff --git a/docs/devel/multi-thread-tcg.txt b/docs/devel/multi-thread-tcg.txt
+index a99b4564c6..ac485c8e62 100644
+--- a/docs/devel/multi-thread-tcg.txt
++++ b/docs/devel/multi-thread-tcg.txt
+@@ -308,7 +308,7 @@ other cores sharing access to the memory. The classic example is the
+ x86 cmpxchg instruction.
+ 
+ The second type offer a pair of load/store instructions which offer a
+-guarantee that an region of memory has not been touched between the
++guarantee that a region of memory has not been touched between the
+ load and store instructions. An example of this is ARM's ldrex/strex
+ pair where the strex instruction will return a flag indicating a
+ successful store only if no other CPU has accessed the memory region
+diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+index 8e1547ded2..27732aa413 100644
+--- a/docs/interop/qcow2.txt
++++ b/docs/interop/qcow2.txt
+@@ -326,7 +326,7 @@ in the image file.
+ It contains pointers to the second level structures which are called refcount
+ blocks and are exactly one cluster in size.
+ 
+-Given a offset into the image file, the refcount of its cluster can be obtained
++Given an offset into the image file, the refcount of its cluster can be obtained
+ as follows:
+ 
+     refcount_block_entries = (cluster_size * 8 / refcount_bits)
+@@ -365,7 +365,7 @@ The L1 table has a variable size (stored in the header) and may use multiple
+ clusters, however it must be contiguous in the image file. L2 tables are
+ exactly one cluster in size.
+ 
+-Given a offset into the virtual disk, the offset into the image file can be
++Given an offset into the virtual disk, the offset into the image file can be
+ obtained as follows:
+ 
+     l2_entries = (cluster_size / sizeof(uint64_t))
+diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+index d51fd58242..f59667f498 100644
+--- a/docs/interop/vhost-user.txt
++++ b/docs/interop/vhost-user.txt
+@@ -108,12 +108,12 @@ Depending on the request type, payload can be:
+    IOVA: a 64-bit I/O virtual address programmed by the guest
+    Size: a 64-bit size
+    User address: a 64-bit user address
+-   Permissions: a 8-bit value:
++   Permissions: an 8-bit value:
+     - 0: No access
+     - 1: Read access
+     - 2: Write access
+     - 3: Read/Write access
+-   Type: a 8-bit IOTLB message type:
++   Type: an 8-bit IOTLB message type:
+     - 1: IOTLB miss
+     - 2: IOTLB update
+     - 3: IOTLB invalidate
+diff --git a/docs/memory-hotplug.txt b/docs/memory-hotplug.txt
+index d96397c1af..6aa5e17e26 100644
+--- a/docs/memory-hotplug.txt
++++ b/docs/memory-hotplug.txt
+@@ -62,7 +62,7 @@ It's also possible to start a guest with memory cold-plugged into the
+ hotpluggable memory slots. This might seem counterintuitive at first,
+ but this allows for a lot of flexibility when using the file backend.
+ 
+-In the following command-line example, a 8GB guest is created where 6GB
++In the following command-line example, an 8GB guest is created where 6GB
+ comes from regular RAM, 1GB is a 1GB hugepage page and 256MB is from
+ 2MB pages. Also, the guest has additional memory slots to hotplug more
+ 2GB if needed:
+diff --git a/docs/multiseat.txt b/docs/multiseat.txt
+index 807518c8af..fb7e790b22 100644
+--- a/docs/multiseat.txt
++++ b/docs/multiseat.txt
+@@ -62,7 +62,7 @@ to its own window so you can see both display devices side-by-side.
+ 
+ For vnc some additional configuration on the command line is needed.
+ We'll create two vnc server instances, and bind the second one to the
+-second seat, simliar to input devices:
++second seat, similar to input devices:
+ 
+ 	-display vnc=:1,id=primary \
+ 	-display vnc=:2,id=secondary,display=video.2
+diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
+index f1793692bb..38e9f34cc9 100644
+--- a/docs/qemu-block-drivers.texi
++++ b/docs/qemu-block-drivers.texi
+@@ -524,7 +524,7 @@ You can create a cloned image from the existing snapshot.
+ @example
+ qemu-img create -b sheepdog:///@var{base}#@var{tag} sheepdog:///@var{image}
+ @end example
+-where @var{base} is a image name of the source snapshot and @var{tag}
++where @var{base} is an image name of the source snapshot and @var{tag}
+ is its tag name.
+ 
+ You can use an unix socket instead of an inet socket:
+diff --git a/docs/qemupciserial.inf b/docs/qemupciserial.inf
+index 6f7eef49cc..7ca766745d 100644
+--- a/docs/qemupciserial.inf
++++ b/docs/qemupciserial.inf
+@@ -1,7 +1,7 @@
+ ; qemupciserial.inf for QEMU, based on MSPORTS.INF
+ 
+ ; The driver itself is shipped with Windows (serial.sys).  This is
+-; just a inf file to tell windows which pci id the serial pci card
++; just an inf file to tell windows which pci id the serial pci card
+ ; emulated by qemu has, and to apply a name tag to it which windows
+ ; will show in the device manager.
+ 
+diff --git a/docs/specs/acpi_nvdimm.txt b/docs/specs/acpi_nvdimm.txt
+index 3f322e6f55..4da2d44534 100644
+--- a/docs/specs/acpi_nvdimm.txt
++++ b/docs/specs/acpi_nvdimm.txt
+@@ -72,7 +72,7 @@ for NVDIMM ACPI.
+ 
+ Memory:
+    QEMU uses BIOS Linker/loader feature to ask BIOS to allocate a memory
+-   page and dynamically patch its into a int32 object named "MEMA" in ACPI.
++   page and dynamically patch its into an int32 object named "MEMA" in ACPI.
+ 
+    This page is RAM-based and it is used to transfer data between _DSM
+    method and QEMU. If ACPI has control, this pages is owned by ACPI which
+diff --git a/docs/specs/ppc-spapr-hcalls.txt b/docs/specs/ppc-spapr-hcalls.txt
+index 5bd8eab78f..93fe3da91b 100644
+--- a/docs/specs/ppc-spapr-hcalls.txt
++++ b/docs/specs/ppc-spapr-hcalls.txt
+@@ -10,7 +10,7 @@ calls which are mostly used as a private interface between the firmware
+ running in the guest and QEMU.
+ 
+ All those hypercalls start at hcall number 0xf000 which correspond
+-to a implementation specific range in PAPR.
++to an implementation specific range in PAPR.
+ 
+ - H_RTAS (0xf000)
+ 
+diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+index c230c4c93e..575a267611 100644
+--- a/docs/specs/tpm.txt
++++ b/docs/specs/tpm.txt
+@@ -252,7 +252,7 @@ swtpm socket --tpmstate dir=/tmp/mytpm1 \
+   --ctrl type=unixio,path=/tmp/mytpm1/swtpm-sock \
+   --log level=20 --tpm2
+ 
+-In the 2nd terminal restore the state of the VM using the additonal
++In the 2nd terminal restore the state of the VM using the additional
+ '-incoming' option.
+ 
+ qemu-system-x86_64 -display sdl -enable-kvm \
+diff --git a/docs/usb2.txt b/docs/usb2.txt
+index 09df45b5b1..9e47169f45 100644
+--- a/docs/usb2.txt
++++ b/docs/usb2.txt
+@@ -15,7 +15,7 @@ the PIIX3 chipset.  The USB 1.1 bus will carry the name "usb-bus.0".
+ 
+ You can use the standard -device switch to add a EHCI controller to
+ your virtual machine.  It is strongly recommended to specify an ID for
+-the controller so the USB 2.0 bus gets a individual name, for example
++the controller so the USB 2.0 bus gets an individual name, for example
+ '-device usb-ehci,id=ehci".  This will give you a USB 2.0 bus named
+ "ehci.0".
+ 
+-- 
+2.14.1
