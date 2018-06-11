@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fSQm4-0007KX-Qp
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:38:37 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fSQo8-0000WZ-KS
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:40:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fSQm2-0006he-9C
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:38:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60326 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fSQm2-0006hS-3n
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:38:34 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A04884022905
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 17:38:33 +0000 (UTC)
-Date: Mon, 11 Jun 2018 18:38:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180611173830.GN2661@work-vm>
-References: <20180608130846.22234-1-dgilbert@redhat.com>
-	<20180608130846.22234-4-dgilbert@redhat.com>
-	<87bmchlmq1.fsf@dusky.pond.sub.org>
+	(envelope-from <no-reply@patchew.org>) id 1fSQo4-0007jN-BB
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:40:44 -0400
+Resent-Message-Id: <E1fSQo4-0007jN-BB@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21134)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fSQo3-0007i3-OB
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:40:40 -0400
+In-Reply-To: <20180611171007.4165-1-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152873880691.675.7083058694168904457@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87bmchlmq1.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] hmp: Restrict auto-complete in
- preconfig
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 11 Jun 2018 10:40:07 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add ldn_*_p() and stn_*_p() and use
+ them in exec.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,59 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com
+To: peter.maydell@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, patches@linaro.org
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
-> 
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > Don't show the commands that aren't available.
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> >  monitor.c | 9 +++++++--
-> >  1 file changed, 7 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/monitor.c b/monitor.c
-> > index 31c8f5dc88..c369b392db 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -3951,12 +3951,17 @@ static void monitor_find_completion_by_table(Monitor *mon,
-> >              cmdname = args[0];
-> >          readline_set_completion_index(mon->rs, strlen(cmdname));
-> >          for (cmd = cmd_table; cmd->name != NULL; cmd++) {
-> > -            cmd_completion(mon, cmdname, cmd->name);
-> > +            if (!runstate_check(RUN_STATE_PRECONFIG) ||
-> > +                 cmd_can_preconfig(cmd)) {
-> > +                cmd_completion(mon, cmdname, cmd->name);
-> > +            }
-> >          }
-> >      } else {
-> >          /* find the command */
-> >          for (cmd = cmd_table; cmd->name != NULL; cmd++) {
-> > -            if (compare_cmd(args[0], cmd->name)) {
-> > +            if (compare_cmd(args[0], cmd->name) &&
-> > +                (!runstate_check(RUN_STATE_PRECONFIG) ||
-> > +                 cmd_can_preconfig(cmd))) {
-> >                  break;
-> >              }
-> >          }
-> 
-> Hmm, I keep seeing
-> 
->     !runstate_check(RUN_STATE_PRECONFIG) || cmd_can_preconfig(cmd)
-> 
-> Would a helper be worthwhile?  cmd_available(cmd)?
-
-Yes, but I want to leave that change until I add the next flag (for OOB
-some time) so I know how to generalise it;  I'm not sure what it'll need
-yet.
-
-Dave
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjExMTcxMDA3LjQxNjUtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcK
+U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzNdIEFkZCBsZG5fKl9wKCkgYW5kIHN0bl8q
+X3AoKSBhbmQgdXNlIHRoZW0gaW4gZXhlYy5jCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
+LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
+IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
+a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
+ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
+IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
+cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10g
+ICAgICAgICAgICAgICBwYXRjaGV3LzE1Mjg3MzgwMDctMjkxMjItMS1naXQtc2VuZC1lbWFpbC10
+aHV0aEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTUyODczODAwNy0yOTEyMi0xLWdpdC1zZW5kLWVt
+YWlsLXRodXRoQHJlZGhhdC5jb20KIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8y
+MDE4MDYxMDE4NDkyNy4xOTMwOS0xLXZrdXpuZXRzQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4
+MDYxMDE4NDkyNy4xOTMwOS0xLXZrdXpuZXRzQHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAg
+ICAgICAgICAgcGF0Y2hldy8yMDE4MDYxMTE3MTAwNy40MTY1LTEtcGV0ZXIubWF5ZGVsbEBsaW5h
+cm8ub3JnIC0+IHBhdGNoZXcvMjAxODA2MTExNzEwMDcuNDE2NS0xLXBldGVyLm1heWRlbGxAbGlu
+YXJvLm9yZwogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNjExMTcyMzU1
+LjEyMDY3LTEtZWhhYmtvc3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNjExMTcyMzU1LjEy
+MDY3LTEtZWhhYmtvc3RAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
+CjQ0MDNiNGZkYjggZXhlYy5jOiBVc2Ugc3RuX3AoKSBhbmQgbGRuX3AoKSBpbnN0ZWFkIG9mIGV4
+cGxpY2l0IHN3aXRjaGVzCjg0ZWM5YWYxOTMgZXhlYy5jOiBEb24ndCBhY2NpZGVudGFsbHkgc2ln
+bi1leHRlbmQgNC1ieXRlIGxvYWRzIGluIHN1YnBhZ2VfcmVhZCgpCmYwMWU1ZGQ3YjQgYnN3YXA6
+IEFkZCBuZXcgc3RuXypfcCgpIGFuZCBsZG5fKl9wKCkgbWVtb3J5IGFjY2VzcyBmdW5jdGlvbnMK
+Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMzogYnN3YXA6IEFkZCBuZXcg
+c3RuXypfcCgpIGFuZCBsZG5fKl9wKCkgbWVtb3J5IGFjY2VzcyBmdW5jdGlvbnMuLi4KRVJST1I6
+IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRo
+ZXNpcwojNTU6IEZJTEU6IGluY2x1ZGUvZXhlYy9jcHUtYWxsLmg6MTM2OgorI2RlZmluZSBsZG5f
+cChwLCBzeiBsZG5fYmVfcChwLCBzeikKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTA0
+IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
+ZWNraW5nIFBBVENIIDIvMzogZXhlYy5jOiBEb24ndCBhY2NpZGVudGFsbHkgc2lnbi1leHRlbmQg
+NC1ieXRlIGxvYWRzIGluIHN1YnBhZ2VfcmVhZCgpLi4uCkNoZWNraW5nIFBBVENIIDMvMzogZXhl
+Yy5jOiBVc2Ugc3RuX3AoKSBhbmQgbGRuX3AoKSBpbnN0ZWFkIG9mIGV4cGxpY2l0IHN3aXRjaGVz
+Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
+ZWRoYXQuY29t
