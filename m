@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43316)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSBS6-0005kS-Vx
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:16:59 -0400
+	id 1fSBS8-0005mG-KU
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:17:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSBS4-0003K8-OO
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:16:58 -0400
+	id 1fSBS7-0003L8-IX
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:17:00 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 10 Jun 2018 22:14:47 -0300
-Message-Id: <20180611011501.10235-27-f4bug@amsat.org>
+Date: Sun, 10 Jun 2018 22:14:48 -0300
+Message-Id: <20180611011501.10235-28-f4bug@amsat.org>
 In-Reply-To: <20180611011501.10235-1-f4bug@amsat.org>
 References: <20180611011501.10235-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 26/40] hw/cris: Use the IEC binary prefix
+Subject: [Qemu-devel] [PATCH v4 27/40] hw/lm32: Use the IEC binary prefix
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Michael Walle <michael@walle.cc>
 
 It eases code review, unit is explicit.
 
@@ -39,30 +39,90 @@ Patch generated using:
 and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Acked-by: Michael Walle <michael@walle.cc>
 ---
- hw/cris/axis_dev88.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/lm32/lm32_boards.c | 13 +++++++------
+ hw/lm32/milkymist.c   | 10 +++++-----
+ 2 files changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/hw/cris/axis_dev88.c b/hw/cris/axis_dev88.c
-index 56ee398ee5..191292eebf 100644
---- a/hw/cris/axis_dev88.c
-+++ b/hw/cris/axis_dev88.c
-@@ -23,6 +23,7 @@
+diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
+index 167058348e..fd8eccca14 100644
+--- a/hw/lm32/lm32_boards.c
++++ b/hw/lm32/lm32_boards.c
+@@ -18,6 +18,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
- #include "qapi/error.h"
+ #include "qemu/error-report.h"
  #include "qemu-common.h"
  #include "cpu.h"
-@@ -242,7 +243,7 @@ static const MemoryRegionOps gpio_ops = {
-     },
- };
+@@ -87,10 +88,10 @@ static void lm32_evr_init(MachineState *machine)
  
--#define INTMEM_SIZE (128 * 1024)
-+#define INTMEM_SIZE (128 * KiB)
+     /* memory map */
+     hwaddr flash_base  = 0x04000000;
+-    size_t flash_sector_size       = 256 * 1024;
+-    size_t flash_size              = 32 * 1024 * 1024;
++    size_t flash_sector_size       = 256 * KiB;
++    size_t flash_size              = 32 * MiB;
+     hwaddr ram_base    = 0x08000000;
+-    size_t ram_size                = 64 * 1024 * 1024;
++    size_t ram_size                = 64 * MiB;
+     hwaddr timer0_base = 0x80002000;
+     hwaddr uart0_base  = 0x80006000;
+     hwaddr timer1_base = 0x8000a000;
+@@ -173,10 +174,10 @@ static void lm32_uclinux_init(MachineState *machine)
  
- static struct cris_load_info li;
+     /* memory map */
+     hwaddr flash_base   = 0x04000000;
+-    size_t flash_sector_size        = 256 * 1024;
+-    size_t flash_size               = 32 * 1024 * 1024;
++    size_t flash_sector_size        = 256 * KiB;
++    size_t flash_size               = 32 * MiB;
+     hwaddr ram_base     = 0x08000000;
+-    size_t ram_size                 = 64 * 1024 * 1024;
++    size_t ram_size                 = 64 * MiB;
+     hwaddr uart0_base   = 0x80000000;
+     hwaddr timer0_base  = 0x80002000;
+     hwaddr timer1_base  = 0x80010000;
+diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+index c36bbc4ae2..321f184595 100644
+--- a/hw/lm32/milkymist.c
++++ b/hw/lm32/milkymist.c
+@@ -18,6 +18,7 @@
+  */
  
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qemu/error-report.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -33,11 +34,10 @@
+ #include "milkymist-hw.h"
+ #include "lm32.h"
+ #include "exec/address-spaces.h"
+-#include "qemu/cutils.h"
+ 
+ #define BIOS_FILENAME    "mmone-bios.bin"
+ #define BIOS_OFFSET      0x00860000
+-#define BIOS_SIZE        (512*1024)
++#define BIOS_SIZE        (512 * KiB)
+ #define KERNEL_LOAD_ADDR 0x40000000
+ 
+ typedef struct {
+@@ -96,10 +96,10 @@ milkymist_init(MachineState *machine)
+ 
+     /* memory map */
+     hwaddr flash_base   = 0x00000000;
+-    size_t flash_sector_size        = 128 * 1024;
+-    size_t flash_size               = 32 * 1024 * 1024;
++    size_t flash_sector_size        = 128 * KiB;
++    size_t flash_size               = 32 * MiB;
+     hwaddr sdram_base   = 0x40000000;
+-    size_t sdram_size               = 128 * 1024 * 1024;
++    size_t sdram_size               = 128 * MiB;
+ 
+     hwaddr initrd_base  = sdram_base + 0x1002000;
+     hwaddr cmdline_base = sdram_base + 0x1000000;
 -- 
 2.17.1
