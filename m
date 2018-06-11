@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fSOfP-000112-FX
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 11:23:36 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSOgQ-0001mk-3O
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 11:24:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fSOfO-0003py-MM
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 11:23:35 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:37701)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fSOfO-0003pk-H5
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 11:23:34 -0400
-Received: by mail-oi0-x241.google.com with SMTP id l22-v6so18235223oib.4
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 08:23:34 -0700 (PDT)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSOgO-0004Gq-S5
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 11:24:38 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180601141223.26630-1-peter.maydell@linaro.org>
+	<20180601141223.26630-7-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1cfbab0b-3197-f93e-92ca-21c4d6b19881@amsat.org>
+Date: Mon, 11 Jun 2018 12:24:25 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180611142528.11730-1-ville.skytta@iki.fi>
-References: <20180611142528.11730-1-ville.skytta@iki.fi>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 11 Jun 2018 16:23:13 +0100
-Message-ID: <CAFEAcA-wru_Sb8nd6+10yZUdOS-g5Mz+mEDTbWS44zFa0NS5dw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] docs: Grammar and spelling fixes
+In-Reply-To: <20180601141223.26630-7-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 6/6] hw/char/parallel: Convert away from
+ old_mmio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +29,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Ville_Skytt=C3=A4?= <ville.skytta@iki.fi>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Thomas Huth <huth@tuxfamily.org>, patches@linaro.org, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 11 June 2018 at 15:25, Ville Skytt=C3=A4 <ville.skytta@iki.fi> wrote:
-> Signed-off-by: Ville Skytt=C3=A4 <ville.skytta@iki.fi>
+On 06/01/2018 11:12 AM, Peter Maydell wrote:
+> Convert the parallel device away from using the old_mmio field
+> of MemoryRegionOps. This change only affects the memory-mapped
+> variant, which is used by the MIPS Jazz boards 'magnum' and 'pica61'.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-> diff --git a/docs/specs/acpi_nvdimm.txt b/docs/specs/acpi_nvdimm.txt
-> index 3f322e6f55..4da2d44534 100644
-> --- a/docs/specs/acpi_nvdimm.txt
-> +++ b/docs/specs/acpi_nvdimm.txt
-> @@ -72,7 +72,7 @@ for NVDIMM ACPI.
->
->  Memory:
->     QEMU uses BIOS Linker/loader feature to ask BIOS to allocate a memory
-> -   page and dynamically patch its into a int32 object named "MEMA" in AC=
-PI.
-> +   page and dynamically patch its into an int32 object named "MEMA" in A=
-CPI.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Should this read "its address" ?
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+> ---
+>  hw/char/parallel.c | 50 ++++++++++------------------------------------
+>  1 file changed, 11 insertions(+), 39 deletions(-)
+> 
+> diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+> index 1542d62201..35748e6c1b 100644
+> --- a/hw/char/parallel.c
+> +++ b/hw/char/parallel.c
+> @@ -554,56 +554,28 @@ static void parallel_isa_realizefn(DeviceState *dev, Error **errp)
+>  }
+>  
+>  /* Memory mapped interface */
+> -static uint32_t parallel_mm_readb (void *opaque, hwaddr addr)
+> +static uint64_t parallel_mm_readfn(void *opaque, hwaddr addr, unsigned size)
+>  {
+>      ParallelState *s = opaque;
+>  
+> -    return parallel_ioport_read_sw(s, addr >> s->it_shift) & 0xFF;
+> +    return parallel_ioport_read_sw(s, addr >> s->it_shift) &
+> +        MAKE_64BIT_MASK(0, size * 8);
+>  }
+>  
+> -static void parallel_mm_writeb (void *opaque,
+> -                                hwaddr addr, uint32_t value)
+> +static void parallel_mm_writefn(void *opaque, hwaddr addr,
+> +                                uint64_t value, unsigned size)
+>  {
+>      ParallelState *s = opaque;
+>  
+> -    parallel_ioport_write_sw(s, addr >> s->it_shift, value & 0xFF);
+> -}
+> -
+> -static uint32_t parallel_mm_readw (void *opaque, hwaddr addr)
+> -{
+> -    ParallelState *s = opaque;
+> -
+> -    return parallel_ioport_read_sw(s, addr >> s->it_shift) & 0xFFFF;
+> -}
+> -
+> -static void parallel_mm_writew (void *opaque,
+> -                                hwaddr addr, uint32_t value)
+> -{
+> -    ParallelState *s = opaque;
+> -
+> -    parallel_ioport_write_sw(s, addr >> s->it_shift, value & 0xFFFF);
+> -}
+> -
+> -static uint32_t parallel_mm_readl (void *opaque, hwaddr addr)
+> -{
+> -    ParallelState *s = opaque;
+> -
+> -    return parallel_ioport_read_sw(s, addr >> s->it_shift);
+> -}
+> -
+> -static void parallel_mm_writel (void *opaque,
+> -                                hwaddr addr, uint32_t value)
+> -{
+> -    ParallelState *s = opaque;
+> -
+> -    parallel_ioport_write_sw(s, addr >> s->it_shift, value);
+> +    parallel_ioport_write_sw(s, addr >> s->it_shift,
+> +                             value & MAKE_64BIT_MASK(0, size * 8));
+>  }
+>  
+>  static const MemoryRegionOps parallel_mm_ops = {
+> -    .old_mmio = {
+> -        .read = { parallel_mm_readb, parallel_mm_readw, parallel_mm_readl },
+> -        .write = { parallel_mm_writeb, parallel_mm_writew, parallel_mm_writel },
+> -    },
+> +    .read = parallel_mm_readfn,
+> +    .write = parallel_mm_writefn,
+> +    .valid.min_access_size = 1,
+> +    .valid.max_access_size = 4,
+>      .endianness = DEVICE_NATIVE_ENDIAN,
+>  };
+>  
+> 
