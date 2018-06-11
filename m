@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45014)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fSGqU-0008Ps-1A
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 03:02:30 -0400
+	(envelope-from <morecache@gmail.com>) id 1fSGwr-0001Fn-2x
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 03:09:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fSGqP-00083G-5q
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 03:02:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44066 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fSGqP-00082n-0p
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 03:02:25 -0400
-References: <20180603050546.6827-1-zhangckid@gmail.com>
-	<20180603050546.6827-15-zhangckid@gmail.com>
-	<96b6dd17-bbb6-48e9-54c8-6495c8a56c98@redhat.com>
-	<CAK3tnv+GkZGVEGeswayaO0esSCWonwwgm30FL3QriOSDscsuvA@mail.gmail.com>
-	<6d894c72-0ddf-d915-98bb-b23803fb566f@redhat.com>
-	<CAK3tnvKX-QkNRv=pbZenDnBaEdnXvVZfPa3oYVQf6rMd3pKKhQ@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <563037c8-9749-db84-04b2-f443b9712702@redhat.com>
-Date: Mon, 11 Jun 2018 15:02:17 +0800
-MIME-Version: 1.0
-In-Reply-To: <CAK3tnvKX-QkNRv=pbZenDnBaEdnXvVZfPa3oYVQf6rMd3pKKhQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V8 14/17] filter: Add handle_event method
- for NetFilterClass
+	(envelope-from <morecache@gmail.com>) id 1fSGwl-0003RE-It
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 03:09:05 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:46315)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <morecache@gmail.com>) id 1fSGwl-0003QW-Bu
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 03:08:59 -0400
+Received: by mail-pf0-x244.google.com with SMTP id q1-v6so9720095pff.13
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 00:08:59 -0700 (PDT)
+Sender: Lin Ma <morecache@gmail.com>
+From: Lin Ma <lma@suse.com>
+Date: Mon, 11 Jun 2018 15:06:09 +0800
+Message-Id: <20180611070609.9482-1-lma@suse.com>
+Subject: [Qemu-devel]  [PATCH v2] net: Fix a potential segfault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +24,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, jasowang@redhat.com, Lin Ma <lma@suse.com>
 
+If user forgets to provide any backend types for '-netdev' in qemu CLI,
+It triggers seg fault.
 
+e.g.
 
-On 2018=E5=B9=B406=E6=9C=8811=E6=97=A5 14:46, Zhang Chen wrote:
-> On Mon, Jun 11, 2018 at 9:56 AM, Jason Wang <jasowang@redhat.com> wrote=
-:
->
->>
->> On 2018=E5=B9=B406=E6=9C=8810=E6=97=A5 22:09, Zhang Chen wrote:
->>
->>> I think when COLO is enabled, qemu should reject all other types of
->>>> backends.
->>>>
->>> Yes, you are right.
->>> May be we should add a assert here? Because we can not get backend in=
-fo
->>> when
->>> colo-compare start up.
->>> Have any idea?
->>>
->>>
->>>
->> Is there a global variable or function to detect the COLO existence? I=
-f
->> yes, maybe we could use that.
->>
-> May be we can reuse the "qmp_query_colo_status" in 11/17 patch.
-> I will add this check in next version.
+Expected:
+$ qemu -netdev id=net0
+qemu-system-x86_64: Parameter 'type' is missing
 
-I think it's better to have an internal helper. Calling qmp function=20
-from net is odd.
+Actual:
+$ qemu -netdev id=net0
+Segmentation fault (core dumped)
 
-Thanks
+Signed-off-by: Lin Ma <lma@suse.com>
+---
+ net/net.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
->
-> Thanks
-> Zhang Chen
->
->
->> Thanks
->>
->>
+diff --git a/net/net.c b/net/net.c
+index efb9eaf779..f89790be4a 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1093,9 +1093,12 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+     int ret = -1;
+     Visitor *v = opts_visitor_new(opts);
+ 
+-    if (is_netdev && is_help_option(qemu_opt_get(opts, "type"))) {
+-        show_netdevs();
+-        exit(0);
++    if (is_netdev) {
++        const char *type = qemu_opt_get(opts, "type");
++        if (type && is_help_option(type)) {
++            show_netdevs();
++            exit(0);
++        }
+     } else {
+         /* Parse convenience option format ip6-net=fec0::0[/64] */
+         const char *ip6_net = qemu_opt_get(opts, "ipv6-net");
+-- 
+2.16.2
