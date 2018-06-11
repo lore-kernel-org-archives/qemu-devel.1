@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42996)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSBRc-0005MW-LU
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:16:31 -0400
+	id 1fSBRf-0005Oy-C1
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:16:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSBRb-000317-Op
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:16:28 -0400
+	id 1fSBRe-00032A-Dt
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:16:31 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 10 Jun 2018 22:14:37 -0300
-Message-Id: <20180611011501.10235-17-f4bug@amsat.org>
+Date: Sun, 10 Jun 2018 22:14:38 -0300
+Message-Id: <20180611011501.10235-18-f4bug@amsat.org>
 In-Reply-To: <20180611011501.10235-1-f4bug@amsat.org>
 References: <20180611011501.10235-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 16/40] hw/riscv: Use the IEC binary prefix
+Subject: [Qemu-devel] [PATCH v4 17/40] hw/m68k: Use the IEC binary prefix
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Thomas Huth <huth@tuxfamily.org>
 
 It eases code review, unit is explicit.
 
@@ -39,30 +39,31 @@ Patch generated using:
 and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@tuxfamily.org>
 ---
- hw/riscv/virt.c | 3 ++-
+ hw/m68k/mcf5208.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index ad03113e0f..34d48993a2 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -19,6 +19,7 @@
+diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
+index ae3dcc98c3..0f2245dd81 100644
+--- a/hw/m68k/mcf5208.c
++++ b/hw/m68k/mcf5208.c
+@@ -6,6 +6,7 @@
+  * This code is licensed under the GPL
   */
- 
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
- #include "qemu/log.h"
  #include "qemu/error-report.h"
  #include "qapi/error.h"
-@@ -84,7 +85,7 @@ static hwaddr load_initrd(const char *filename, uint64_t mem_size,
-      * halfway into RAM, and for boards with 256MB of RAM or more we put
-      * the initrd at 128MB.
-      */
--    *start = kernel_entry + MIN(mem_size / 2, 128 * 1024 * 1024);
-+    *start = kernel_entry + MIN(mem_size / 2, 128 * MiB);
+ #include "qemu-common.h"
+@@ -241,7 +242,7 @@ static void mcf5208evb_init(MachineState *machine)
+     memory_region_add_subregion(address_space_mem, 0x40000000, ram);
  
-     size = load_ramdisk(filename, *start, mem_size - *start);
-     if (size == -1) {
+     /* Internal SRAM.  */
+-    memory_region_init_ram(sram, NULL, "mcf5208.sram", 16384, &error_fatal);
++    memory_region_init_ram(sram, NULL, "mcf5208.sram", 16 * KiB, &error_fatal);
+     memory_region_add_subregion(address_space_mem, 0x80000000, sram);
+ 
+     /* Internal peripherals.  */
 -- 
 2.17.1
