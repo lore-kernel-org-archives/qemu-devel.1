@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fS5uW-00006G-Ty
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 15:21:58 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSAGr-0000AA-T4
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 20:01:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fS5uS-000139-Vd
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 15:21:56 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:35805)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSAGo-0001CL-6A
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 20:01:17 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:42519)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fS5uS-00012F-Oh
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 15:21:52 -0400
-Received: by mail-pg0-x243.google.com with SMTP id 15-v6so8710515pge.2
-	for <qemu-devel@nongnu.org>; Sun, 10 Jun 2018 12:21:52 -0700 (PDT)
-References: <20180605194725.8585-1-laurent@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d74dd6bb-dbb7-d532-88c7-f137fa7f15ea@linaro.org>
-Date: Sun, 10 Jun 2018 09:21:43 -1000
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSAGo-0001CE-0J
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 20:01:14 -0400
+Received: by mail-qk0-x241.google.com with SMTP id j80-v6so11994654qke.9
+	for <qemu-devel@nongnu.org>; Sun, 10 Jun 2018 17:01:13 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180608123307.24773-1-alex.bennee@linaro.org>
+	<20180608123307.24773-48-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <fb391fdf-b08c-fbcc-b2f2-bab27a79623b@amsat.org>
+Date: Sun, 10 Jun 2018 21:00:58 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180605194725.8585-1-laurent@vivier.eu>
+In-Reply-To: <20180608123307.24773-48-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu-binfmt-conf.sh: ignore the OS/ABI
- field
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 47/49] tests: add top-level make
+ dependency for docker builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +36,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+Cc: qemu-devel@nongnu.org
 
-On 06/05/2018 09:47 AM, Laurent Vivier wrote:
-> Most of the binaries have a value of "UNIX - System V" for the OS/ABI.
+Hi Alex,
+
+On 06/08/2018 09:33 AM, Alex Bennée wrote:
+> One problem with satisfying your docker dependencies in a sub-make it
+> you might end up trying to satisfy the dependency multiple times. This
+> is especially a problem with debian-sid based cross compilers and CI
+> setups. We solve this by doing a docker build pass at the top level
+> before any sub-makes are called.
 > 
-> But cc1 has a value of "UNIX - GNU", and if we don't update the binfmt
-> mask to ignore the OS/ABI field, gcc fails to execute it:
+> We still need to satisfy dependencies in the Makefile.target call so
+> people can run tests from individual target directories. We introduce
+> a new Makefile.probe which gets called for each PROBE_TARGET and
+> allows us to build up the list. It does require multiply including
+> config-target.mak which shouldn't cause any issues as it shouldn't
+> define anything that clashes with config-host.mak. However we undefine
+> a few key variables each time around.
 > 
-> gcc: error trying to exec '/usr/lib/gcc/m68k-linux-gnu/7/cc1': execv: Exec format error
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  scripts/qemu-binfmt-conf.sh | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
+>  tests/Makefile.include   | 14 +++++++++++++-
+>  tests/tcg/Makefile.probe | 31 +++++++++++++++++++++++++++++++
+>  2 files changed, 44 insertions(+), 1 deletion(-)
+>  create mode 100644 tests/tcg/Makefile.probe
+> 
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index ca00247e36..049a387436 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -931,7 +931,19 @@ BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(LINUX_USER_TARGETS))
+>  CLEAN_TCG_TARGET_RULES=$(patsubst %,clean-tcg-tests-%, $(LINUX_USER_TARGETS))
+>  RUN_TCG_TARGET_RULES=$(patsubst %,run-tcg-tests-%, $(LINUX_USER_TARGETS))
+>  
+> -build-tcg-tests-%:
+> +# Probe for the Docker Builds we need for later
+> +DOCKER_BUILD_TARGETS:=
+> +$(foreach PROBE_TARGET,$(TARGET_LIST), 				\
+> +	$(eval -include $(SRC_PATH)/tests/tcg/Makefile.probe) 	\
+> +	$(if $(DOCKER_PREREQ), 					\
+> +		$(eval DOCKER_BUILD_TARGETS+=$(DOCKER_PREREQ))))
+> +
+> +$(info DOCKER_BUILD_TARGETS=$(sort $(DOCKER_BUILD_TARGETS)))
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Is this verbose info on purpose?
 
+Else this could be surrounded by something equiv to:
 
-r~
+ifneq ($(V)$(DEBUG),)
+...
+endif
+
+> +
+> +.PHONY: build-docker-prereqs
+> +build-docker-prereqs: $(sort $(DOCKER_BUILD_TARGETS))
+> +
+> +build-tcg-tests-%: build-docker-prereqs
+>  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" guest-tests,)
+>  
+>  run-tcg-tests-%: build-tcg-tests-%
+> diff --git a/tests/tcg/Makefile.probe b/tests/tcg/Makefile.probe
+> new file mode 100644
+> index 0000000000..7529e203ad
+> --- /dev/null
+> +++ b/tests/tcg/Makefile.probe
+> @@ -0,0 +1,31 @@
+> +# -*- Mode: makefile -*-
+> +#
+> +# TCG Compiler Probe
+> +#
+> +# This Makefile fragement is included multiple times in the main make
+> +# script to probe for available compilers. This is used to build up a
+> +# selection of required docker targets before we invoke a sub-make for
+> +# each target.
+> +
+> +# First we need the target makefile which tells us the target architecture
+> +-include $(BUILD_DIR)/$(PROBE_TARGET)/config-target.mak
+> +
+> +# Then we load up the target architecture makefiles which tell us
+> +# about the compilers
+> +undefine CROSS_CC_GUEST
+> +undefine DOCKER_IMAGE
+> +DOCKER_PREREQ:=
+> +
+> +-include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.include
+> +-include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
+> +
+> +ifndef CROSS_CC_GUEST
+> +ifneq ($(DOCKER_IMAGE),)
+> +DOCKER_PREREQ:=docker-image-$(DOCKER_IMAGE)
+> +endif
+> +endif
+> +
+> +# Clean-up
+> +undefine TARGET_NAME
+> +undefine TARGET_BASE_ARCH
+> +undefine TARGET_ABI_DIR
+> 
