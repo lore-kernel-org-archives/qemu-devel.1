@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58015)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSNrK-0000UT-RC
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:31:52 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fSO3l-0002Vz-A5
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:44:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSNrH-0004YX-M2
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:31:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55888 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fSNrH-0004YQ-HV
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:31:47 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180501132031.13270-1-viktor.prutyanov@virtuozzo.com>
-Date: Mon, 11 Jun 2018 16:31:42 +0200
-In-Reply-To: <20180501132031.13270-1-viktor.prutyanov@virtuozzo.com> (Viktor
-	Prutyanov's message of "Tue, 1 May 2018 16:20:31 +0300")
-Message-ID: <87h8m94coh.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1fSO3j-0001Ih-KE
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:44:41 -0400
+References: <20180607062559.16127-1-armbru@redhat.com>
+	<20180607062559.16127-7-armbru@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <45abd156-104c-de20-25ef-01831faffb34@redhat.com>
+Date: Mon, 11 Jun 2018 16:44:30 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4] dump: add Windows dump format to
- dump-guest-memory
+In-Reply-To: <20180607062559.16127-7-armbru@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="GGtjE8mrkMu8pjTlLWAqsdALEBHvZHfc1"
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC PATCH 06/19] block: Fix
+ -blockdev for certain non-string scalars
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,241 +25,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, rkagan@virtuozzo.com, armbru@redhat.com, dgilbert@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
-Looks stuck.  Paolo, would you be willing to take this through your
-tree?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--GGtjE8mrkMu8pjTlLWAqsdALEBHvZHfc1
+From: Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
+Message-ID: <45abd156-104c-de20-25ef-01831faffb34@redhat.com>
+Subject: Re: [Qemu-block] [RFC PATCH 06/19] block: Fix -blockdev for certain
+ non-string scalars
+References: <20180607062559.16127-1-armbru@redhat.com>
+ <20180607062559.16127-7-armbru@redhat.com>
+In-Reply-To: <20180607062559.16127-7-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Viktor Prutyanov <viktor.prutyanov@virtuozzo.com> writes:
+On 2018-06-07 08:25, Markus Armbruster wrote:
+> Configuration flows through the block subsystem in a rather peculiar
+> way.  Configuration made with -drive enters it as QemuOpts.
+> Configuration made with -blockdev / blockdev-add enters it as QAPI
+> type BlockdevOptions.  The block subsystem uses QDict, QemuOpts and
+> QAPI types internally.  The precise flow is next to impossible to
+> explain (I tried for this commit message, but gave up after wasting
+> several hours).  What I can explain is a flaw in the BlockDriver
+> interface that leads to this bug:
+>=20
+>     $ qemu-system-x86 -blockdev node-name=3Dn1,driver=3Dnfs,server.type=
+=3Dinet,server.host=3Dlocalhost,path=3D/foo/bar,user=3D1234: Internal err=
+or: parameter user invalid
+>     qemu-system-x86: -blockdev node-name=3Dn1,driver=3Dnfs,server.type=3D=
+inet,server.host=3Dlocalhost,path=3D/foo/bar,user=3D1234: Internal error:=
+ parameter user invalid
+>=20
+> QMP blockdev-add is broken the same way.
+>=20
+> Here's what happens.  The block layer passes configuration represented
+> as flat QDict (with dotted keys) to BlockDriver methods
+> .bdrv_file_open().  The QDict's members are typed according to the
+> QAPI schema.
+>=20
+> nfs_file_open() converts it to QAPI type BlockdevOptionsNfs, with
+> qdict_crumple() and a qobject input visitor.
+>=20
+> This visitor comes in two flavors.  The plain flavor requires scalars
+> to be typed according to the QAPI schema.  That's the case here.  The
+> keyval flavor requires string scalars.  That's not the case here.
+> nfs_file_open() uses the latter, and promptly falls apart for members
+> @user, @group, @tcp-syn-count, @readahead-size, @page-cache-size,
+> @debug.
+>=20
+> Switching to the plain flavor would fix -blockdev, but break -drive,
+> because there the scalars arrive in nfs_file_open() as strings.
 
-> This patch adds Windows crashdumping feature. Now QEMU can produce ELF-du=
-mp
-> containing Windows crashdump header, which can help to convert to a valid
-> WinDbg-understandable crashdump file, or immediately create such file.
-> The crashdump will be obtained by joining physical memory dump and 8K hea=
-der
-> exposed through vmcoreinfo/fw_cfg device by guest driver at BSOD time. Op=
-tion
-> '-w' was added to dump-guest-memory command. At the moment, only x64
-> configuration is supported.
-> Suitable driver can be found at
-> https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/fwcfg=
-64
->
-> Signed-off-by: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
-> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+(I'll just chime in because why not.)
+
+> The proper fix would be to replace the QDict by QAPI type
+> BlockdevOptions in the BlockDriver interface.  Sadly, that's beyond my
+> reach right now.
+
+Agreed.  The way there probably is to (as always) unify how the block
+drivers convert their QDict to their own BlockdevOptions, and then pull
+that out into block.c, but let's see how far off that still is.
+
+> Next best would be to fix the block layer to always pass correctly
+> typed QDicts to the BlockDriver methods.  Also beyond my reach.
+
+I tried and failed.
+
+(http://lists.nongnu.org/archive/html/qemu-block/2018-05/msg00061.html)
+
+But that will probably be an intermediate step before we get to
+BlockdevOptions.
+
+> What I can do is throw another hack onto the pile: have
+> nfs_file_open() convert all members to string, so use of the keyval
+> flavor actually works, by replacing qdict_crumple() by new function
+> qdict_crumple_for_keyval_qiv().
+
+I'm calling qdict_stringify_for_keyval() only from a single function,
+and it's immediately followed by a qdict_crumple(), so I suppose
+replacing those invocations in my series would be trivial.
+
+OTOH, just using qdict_stringify_for_keyval() in your
+qdict_crumple_for_keyval_qiv() function would be trivial as well. :-)
+But then again, it probably makes more sense to combine the two
+functions because I too assumed the QDict to be flattened before the
+function call for simplification.  This assumption makes more sense if
+the function proceeds to call qdict_crumple().
+
+> The pattern "pass result of qdict_crumple() to
+> qobject_input_visitor_new_keyval()" occurs several times more:
+>=20
+> * qemu_rbd_open()
+>=20
+>   Same issue as nfs_file_open(), but since BlockdevOptionsRbd has only
+>   string members, its only a latent bug.  Fix it anyway.
+>=20
+> * parallels_co_create_opts(), qcow_co_create_opts(),
+>   qcow2_co_create_opts(), bdrv_qed_co_create_opts(),
+>   sd_co_create_opts(), vhdx_co_create_opts(), vpc_co_create_opts()
+>=20
+>   These work, because they create the QDict with
+>   qemu_opts_to_qdict_filtered(), which creates only string scalars.
+>   The function sports a TODO comment asking for better typing; that's
+>   going to be fun.  Use qdict_crumple_for_keyval_qiv() to be safe.
+
+Sounds good!
+
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->
->  v1: documentation updated
->  v2: qapi/misc.json updated with version info
->  v3: qapi/misc.json codestyle fixed
->  v4: make error processing more quality
->
->  Makefile.target |   1 +
->  dump.c          |  24 ++++++-
->  hmp-commands.hx |  13 ++--
->  hmp.c           |   9 ++-
->  qapi/misc.json  |   5 +-
->  win_dump.c      | 209 ++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  win_dump.h      |  87 +++++++++++++++++++++++
->  7 files changed, 339 insertions(+), 9 deletions(-)
->  create mode 100644 win_dump.c
->  create mode 100644 win_dump.h
->
-> diff --git a/Makefile.target b/Makefile.target
-> index d0ec77a307..6ae2609597 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -138,6 +138,7 @@ obj-y +=3D hw/
->  obj-y +=3D memory.o
->  obj-y +=3D memory_mapping.o
->  obj-y +=3D dump.o
-> +obj-y +=3D win_dump.o
->  obj-y +=3D migration/ram.o
->  LIBS :=3D $(libs_softmmu) $(LIBS)
->=20=20
-> diff --git a/dump.c b/dump.c
-> index b54cd42b21..04467b353e 100644
-> --- a/dump.c
-> +++ b/dump.c
-> @@ -29,6 +29,10 @@
->  #include "qemu/error-report.h"
->  #include "hw/misc/vmcoreinfo.h"
->=20=20
-> +#ifdef TARGET_X86_64
-> +#include "win_dump.h"
-> +#endif
-> +
->  #include <zlib.h>
->  #ifdef CONFIG_LZO
->  #include <lzo/lzo1x.h>
-> @@ -1866,7 +1870,11 @@ static void dump_process(DumpState *s, Error **err=
-p)
->      Error *local_err =3D NULL;
->      DumpQueryResult *result =3D NULL;
->=20=20
-> -    if (s->has_format && s->format !=3D DUMP_GUEST_MEMORY_FORMAT_ELF) {
-> +    if (s->has_format && s->format =3D=3D DUMP_GUEST_MEMORY_FORMAT_WIN_D=
-MP) {
-> +#ifdef TARGET_X86_64
-> +        create_win_dump(s, &local_err);
-> +#endif
-> +    } else if (s->has_format && s->format !=3D DUMP_GUEST_MEMORY_FORMAT_=
-ELF) {
->          create_kdump_vmcore(s, &local_err);
->      } else {
->          create_vmcore(s, &local_err);
-> @@ -1970,6 +1978,13 @@ void qmp_dump_guest_memory(bool paging, const char=
- *file,
->      }
->  #endif
->=20=20
-> +#ifndef TARGET_X86_64
-> +    if (has_format && format =3D=3D DUMP_GUEST_MEMORY_FORMAT_WIN_DMP) {
-> +        error_setg(errp, "Windows dump is only available for x86-64");
-> +        return;
-> +    }
-> +#endif
-> +
->  #if !defined(WIN32)
->      if (strstart(file, "fd:", &p)) {
->          fd =3D monitor_get_fd(cur_mon, p, errp);
-> @@ -2044,5 +2059,12 @@ DumpGuestMemoryCapability *qmp_query_dump_guest_me=
-mory_capability(Error **errp)
->      item->value =3D DUMP_GUEST_MEMORY_FORMAT_KDUMP_SNAPPY;
->  #endif
->=20=20
-> +    /* Windows dump is available only if target is x86_64 */
-> +#ifdef TARGET_X86_64
-> +    item->next =3D g_malloc0(sizeof(DumpGuestMemoryFormatList));
-> +    item =3D item->next;
-> +    item->value =3D DUMP_GUEST_MEMORY_FORMAT_WIN_DMP;
-> +#endif
-> +
->      return cap;
->  }
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 35d862a5d2..6f35e4f5d0 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1088,30 +1088,33 @@ ETEXI
->=20=20
->      {
->          .name       =3D "dump-guest-memory",
-> -        .args_type  =3D "paging:-p,detach:-d,zlib:-z,lzo:-l,snappy:-s,fi=
-lename:F,begin:i?,length:i?",
-> -        .params     =3D "[-p] [-d] [-z|-l|-s] filename [begin length]",
-> +        .args_type  =3D "paging:-p,detach:-d,windmp:-w,zlib:-z,lzo:-l,sn=
-appy:-s,filename:F,begin:i?,length:i?",
-> +        .params     =3D "[-p] [-d] [-z|-l|-s|-w] filename [begin length]=
-",
->          .help       =3D "dump guest memory into file 'filename'.\n\t\t\t"
->                        "-p: do paging to get guest's memory mapping.\n\t\=
-t\t"
->                        "-d: return immediately (do not wait for completio=
-n).\n\t\t\t"
->                        "-z: dump in kdump-compressed format, with zlib co=
-mpression.\n\t\t\t"
->                        "-l: dump in kdump-compressed format, with lzo com=
-pression.\n\t\t\t"
->                        "-s: dump in kdump-compressed format, with snappy =
-compression.\n\t\t\t"
-> +                      "-w: dump in Windows crashdump format (can be used=
- instead of ELF-dump converting),\n\t\t\t"
-> +                      "    for Windows x64 guests with vmcoreinfo driver=
- only.\n\t\t\t"
+>  block/nfs.c           |  2 +-
+>  block/parallels.c     |  2 +-
+>  block/qcow.c          |  2 +-
+>  block/qcow2.c         |  2 +-
+>  block/qed.c           |  2 +-
+>  block/rbd.c           |  2 +-
+>  block/sheepdog.c      |  2 +-
+>  block/vhdx.c          |  2 +-
+>  block/vpc.c           |  2 +-
+>  include/block/qdict.h |  1 +
+>  qobject/block-qdict.c | 57 +++++++++++++++++++++++++++++++++++++++++++=
 
-Whatever "ELF-dump converting" is.  Do we need that part of the help text?
+>  11 files changed, 67 insertions(+), 9 deletions(-)
 
->                        "begin: the starting physical address.\n\t\t\t"
->                        "length: the memory size, in bytes.",
->          .cmd        =3D hmp_dump_guest_memory,
->      },
->=20=20
-> -
->  STEXI
->  @item dump-guest-memory [-p] @var{filename} @var{begin} @var{length}
-> -@item dump-guest-memory [-z|-l|-s] @var{filename}
-> +@item dump-guest-memory [-z|-l|-s|-w] @var{filename}
->  @findex dump-guest-memory
->  Dump guest memory to @var{protocol}. The file can be processed with cras=
-h or
-> -gdb. Without -z|-l|-s, the dump format is ELF.
-> +gdb. Without -z|-l|-s|-w, the dump format is ELF.
->          -p: do paging to get guest's memory mapping.
->          -z: dump in kdump-compressed format, with zlib compression.
->          -l: dump in kdump-compressed format, with lzo compression.
->          -s: dump in kdump-compressed format, with snappy compression.
-> +        -w: dump in Windows crashdump format (can be used instead of ELF=
--dump converting),
-
-Likewise.
-
-> +            for Windows x64 guests with vmcoreinfo driver only
->    filename: dump file name.
->       begin: the starting physical address. It's optional, and should be
->              specified together with length.
-> diff --git a/hmp.c b/hmp.c
-> index a25c7bd9a8..bb6a6eaf00 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1951,6 +1951,7 @@ void hmp_device_del(Monitor *mon, const QDict *qdic=
-t)
->  void hmp_dump_guest_memory(Monitor *mon, const QDict *qdict)
->  {
->      Error *err =3D NULL;
-> +    bool win_dmp =3D qdict_get_try_bool(qdict, "windmp", false);
->      bool paging =3D qdict_get_try_bool(qdict, "paging", false);
->      bool zlib =3D qdict_get_try_bool(qdict, "zlib", false);
->      bool lzo =3D qdict_get_try_bool(qdict, "lzo", false);
-> @@ -1965,12 +1966,16 @@ void hmp_dump_guest_memory(Monitor *mon, const QD=
-ict *qdict)
->      enum DumpGuestMemoryFormat dump_format =3D DUMP_GUEST_MEMORY_FORMAT_=
-ELF;
->      char *prot;
->=20=20
-> -    if (zlib + lzo + snappy > 1) {
-> -        error_setg(&err, "only one of '-z|-l|-s' can be set");
-> +    if (zlib + lzo + snappy + win_dmp > 1) {
-> +        error_setg(&err, "only one of '-z|-l|-s|-w' can be set");
->          hmp_handle_error(mon, &err);
->          return;
->      }
->=20=20
-> +    if (win_dmp) {
-> +        dump_format =3D DUMP_GUEST_MEMORY_FORMAT_WIN_DMP;
-> +    }
-> +
->      if (zlib) {
->          dump_format =3D DUMP_GUEST_MEMORY_FORMAT_KDUMP_ZLIB;
->      }
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index 5636f4a149..83f2df6b41 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -1645,10 +1645,13 @@
->  #
->  # @kdump-snappy: kdump-compressed format with snappy-compressed
->  #
-> +# @win-dmp: Windows full crashdump format,
-> +#           can be used instead of ELF converting (since 2.13)
-
-Whatever "ELF converting" is.  Do we need that part of the comment?
-
-The 2.13 needs to be fixed up to 3.0 now.
-
-> +#
->  # Since: 2.0
->  ##
->  { 'enum': 'DumpGuestMemoryFormat',
-> -  'data': [ 'elf', 'kdump-zlib', 'kdump-lzo', 'kdump-snappy' ] }
-> +  'data': [ 'elf', 'kdump-zlib', 'kdump-lzo', 'kdump-snappy', 'win-dmp' =
-] }
->=20=20
->  ##
->  # @dump-guest-memory:
 [...]
 
-Acked-by: Markus Armbruster <armbru@redhat.com>
+> @@ -513,6 +516,60 @@ QObject *qdict_crumple(const QDict *src, Error **e=
+rrp)
+>      return NULL;
+>  }
+> =20
+> +/**
+> + * qdict_crumple_for_keyval_qiv:
+> + * @src: the flat dictionary (only scalar values) to crumple
+> + * @errp: location to store error
+> + *
+> + * Like qdict_crumple(), but additionally transforms scalar values so
+> + * the result can be passed to qobject_input_visitor_new_keyval().
+> + *
+> + * The block subsystem uses this function to prepare its flat QDict
+> + * with possibly confused scalar types for a visit.  It should not be
+> + * used for anything else, and it should go away once the block
+> + * subsystem has been cleaned up.
+> + */
+> +QObject *qdict_crumple_for_keyval_qiv(QDict *src, Error **errp)
+> +{
+> +    QDict *tmp =3D NULL;
+> +    char *buf;
+> +    const char *s;
+> +    const QDictEntry *ent;
+> +    QObject *dst;
+> +
+> +    for (ent =3D qdict_first(src); ent; ent =3D qdict_next(src, ent)) =
+{
+> +        buf =3D NULL;
+> +        switch (qobject_type(ent->value)) {
+> +        case QTYPE_QNULL:
+> +        case QTYPE_QSTRING:
+> +            continue;
+> +        case QTYPE_QNUM:
+> +            s =3D buf =3D qnum_to_string(qobject_to(QNum, ent->value))=
+;
+> +            break;
+> +        case QTYPE_QDICT:
+> +        case QTYPE_QLIST:
+> +            /* @src isn't flat; qdict_crumple() will fail */
+> +            continue;
+> +        case QTYPE_QBOOL:
+> +            s =3D qbool_get_bool(qobject_to(QBool, ent->value))
+> +                ? "on" : "off";
+> +            break;
+> +        default:
+> +            abort();
+> +        }
+> +
+> +        if (!tmp) {
+> +            tmp =3D qdict_clone_shallow(src);
+> +        }
+> +        qdict_put(tmp, ent->key, qstring_from_str(s));
+> +        g_free(buf);
+> +    }
+> +
+> +    dst =3D qdict_crumple(tmp ?: src, errp);
+> +    qobject_unref(tmp);
+> +    return dst;
+> +}
+> +
+>  /**
+>   * qdict_array_entries(): Returns the number of direct array entries i=
+f the
+>   * sub-QDict of src specified by the prefix in subqdict (or src itself=
+ for
+>=20
+
+Looks functionally very much equivalent to my version, so no complaints
+from me.
+
+Max
+
+
+--GGtjE8mrkMu8pjTlLWAqsdALEBHvZHfc1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlseis4ACgkQ9AfbAGHV
+z0D42wgAw89mmJjBkgv278ykLl2lb5j+XwNEO1a7L0fwrsnOy80SRdhRUG6mIh/U
+aeYoo72RPyZxtqpYoI6Q7xoJ8yCmpcVe1umRR4C9BHdX4Oq/IIZR0aGxKPEpl2Cc
+CLhUbLMM2qA7Coum3gcuGV/56r74s9Eo2P19k38n7+wlpgQQsW6sqwqn800SYPiy
+tSTzrnELAiwZ4PQ0um+X34g9SKR2095qUaHcUYz/JD4FEVvyXeEtabW9y9IDVUvv
+JyX9OjCx1X0cdPF8HrSqrKPeRwskn7mn+FN3f2Pj0Cscf/TYK7025xsJE5qHlH0Z
+dFjIxs8f/w3Nwx10nRo1z/0sKug6og==
+=BhJp
+-----END PGP SIGNATURE-----
+
+--GGtjE8mrkMu8pjTlLWAqsdALEBHvZHfc1--
