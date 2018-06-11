@@ -1,18 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fSPRE-0005A7-9A
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:13:01 -0400
+	(envelope-from <thuth@redhat.com>) id 1fSPRv-0005kF-9m
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:13:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fSPRA-0000Yx-8R
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:13:00 -0400
+	(envelope-from <thuth@redhat.com>) id 1fSPRr-0000sg-9j
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:13:43 -0400
 References: <20180611135223.81865-1-borntraeger@de.ibm.com>
-	<fdb7be3e-dc13-e4a6-e2f0-9bb9ba4d43da@redhat.com>
-	<e6a140ef-bb19-9b7d-f555-2280de5a6cce@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <51d3fde9-2418-43b9-eb39-f1c1dcc169c6@redhat.com>
-Date: Mon, 11 Jun 2018 18:12:53 +0200
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c2fab3fa-b149-f090-5b2b-5310af451ea3@redhat.com>
+Date: Mon, 11 Jun 2018 18:13:32 +0200
 MIME-Version: 1.0
-In-Reply-To: <e6a140ef-bb19-9b7d-f555-2280de5a6cce@redhat.com>
+In-Reply-To: <20180611135223.81865-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -26,84 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On 11.06.2018 18:11, Thomas Huth wrote:
-> On 11.06.2018 15:56, David Hildenbrand wrote:
->> On 11.06.2018 15:52, Christian Borntraeger wrote:
->>> Right now the IPL device always starts from address 0x10000 (the usual
->>> Linux entry point). To run other guests (e.g. test programs) it is
->>> useful to use the IPL PSW from address 0. We can use the Linux magic
->>> at 0x10008 to decide.
->>>
->>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> ---
->>> v1->v2:
->>> 	- use LINUX_MAGIC_ADDR define
->>> 	- use assert for valid iplpsw pointer
->>> 	- add endianess conversion
->>>  hw/s390x/ipl.c | 15 ++++++++++++++-
->>>  1 file changed, 14 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
->>> index 04245b5258..3790153fa9 100644
->>> --- a/hw/s390x/ipl.c
->>> +++ b/hw/s390x/ipl.c
->>> @@ -29,6 +29,7 @@
->>>  #include "exec/exec-all.h"
->>>  
->>>  #define KERN_IMAGE_START                0x010000UL
->>> +#define LINUX_MAGIC_ADDR                0x010008UL
->>>  #define KERN_PARM_AREA                  0x010480UL
->>>  #define INITRD_START                    0x800000UL
->>>  #define INITRD_PARM_START               0x010408UL
->>> @@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
->>>  static void s390_ipl_realize(DeviceState *dev, Error **errp)
->>>  {
->>>      S390IPLState *ipl = S390_IPL(dev);
->>> -    uint64_t pentry = KERN_IMAGE_START;
->>> +    uint64_t *iplpsw;
->>> +    uint64_t pentry;
->>> +    char *magic;
->>>      int kernel_size;
->>>      Error *err = NULL;
->>>  
->>> @@ -157,6 +160,16 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->>>                                 NULL, 1, EM_S390, 0, 0);
->>>          if (kernel_size < 0) {
->>>              kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
->>> +            /* if this is Linux use KERN_IMAGE_START */
->>> +            magic = rom_ptr(LINUX_MAGIC_ADDR);
->>> +            if (magic && !memcmp(magic, "S390EP", 6)) {
->>> +                pentry = KERN_IMAGE_START;
->>> +            } else {
->>> +                /* if not Linux use the IPL PSW */
->>> +                iplpsw = rom_ptr(0);
->>> +                assert(iplpsw);
->>> +                pentry = be64_to_cpu(*iplpsw) & 0x7fffffffUL;
->>> +            }
->>>          }
->>>          if (kernel_size < 0) {
->>>              error_setg(&err, "could not load kernel '%s'", ipl->kernel);
->>>
->>
->> Have you tried this with kvm-unit-tests? (no magic but we rely on 0x10000)
+On 11.06.2018 15:52, Christian Borntraeger wrote:
+> Right now the IPL device always starts from address 0x10000 (the usual
+> Linux entry point). To run other guests (e.g. test programs) it is
+> useful to use the IPL PSW from address 0. We can use the Linux magic
+> at 0x10008 to decide.
 > 
-> kvm-unit-tests are elf files which should be handled by the load_elf()
-> some lines earlier already, so I think we should be fine there,
-> shouldn't we?
-
-Indeed, this should work.
-
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+> v1->v2:
+> 	- use LINUX_MAGIC_ADDR define
+> 	- use assert for valid iplpsw pointer
+> 	- add endianess conversion
+>  hw/s390x/ipl.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
 > 
->  Thomas
-> 
-> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 04245b5258..3790153fa9 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -29,6 +29,7 @@
+>  #include "exec/exec-all.h"
+>  
+>  #define KERN_IMAGE_START                0x010000UL
+> +#define LINUX_MAGIC_ADDR                0x010008UL
+>  #define KERN_PARM_AREA                  0x010480UL
+>  #define INITRD_START                    0x800000UL
+>  #define INITRD_PARM_START               0x010408UL
+> @@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
+>  static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>  {
+>      S390IPLState *ipl = S390_IPL(dev);
+> -    uint64_t pentry = KERN_IMAGE_START;
+> +    uint64_t *iplpsw;
+> +    uint64_t pentry;
+> +    char *magic;
+>      int kernel_size;
+>      Error *err = NULL;
+>  
+> @@ -157,6 +160,16 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>                                 NULL, 1, EM_S390, 0, 0);
+>          if (kernel_size < 0) {
+>              kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
+> +            /* if this is Linux use KERN_IMAGE_START */
+> +            magic = rom_ptr(LINUX_MAGIC_ADDR);
+> +            if (magic && !memcmp(magic, "S390EP", 6)) {
+> +                pentry = KERN_IMAGE_START;
+> +            } else {
+> +                /* if not Linux use the IPL PSW */
+> +                iplpsw = rom_ptr(0);
+> +                assert(iplpsw);
+> +                pentry = be64_to_cpu(*iplpsw) & 0x7fffffffUL;
+> +            }
+>          }
+>          if (kernel_size < 0) {
+>              error_setg(&err, "could not load kernel '%s'", ipl->kernel);
 
-
--- 
-
-Thanks,
-
-David / dhildenb
+Reviewed-by: Thomas Huth <thuth@redhat.com>
