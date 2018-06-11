@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fSTne-0001qg-1u
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 16:52:27 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fSTnh-0001sx-CS
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 16:52:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fSTnd-0008FZ-8T
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 16:52:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fSTng-0008Jy-Aa
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 16:52:29 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 11 Jun 2018 22:51:58 +0200
-Message-Id: <20180611205203.2624-6-mreitz@redhat.com>
+Date: Mon, 11 Jun 2018 22:51:59 +0200
+Message-Id: <20180611205203.2624-7-mreitz@redhat.com>
 In-Reply-To: <20180611205203.2624-1-mreitz@redhat.com>
 References: <20180611205203.2624-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 05/10] qapi: Formalize qcow encryption
- probing
+Subject: [Qemu-devel] [PATCH v2 06/10] qdict: Make qdict_flatten()
+ shallow-clone-friendly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,28 +23,62 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Kevin Wolf <kwolf@redhat.com>
 
-qcow only supports a single encryption (and there is no reason why that
-would change in the future), so we can make it the default.
+In its current form, qdict_flatten() removes all entries from nested
+QDicts that are moved to the root QDict.  It is completely sufficient to
+remove all old entries from the root QDict, however.  If the nested
+dicts have a refcount of 1, this will automatically delete them, too.
+And if they have a greater refcount, we probably do not want to modify
+them in the first place.
+
+The latter observation means that it was currently (in general)
+impossible to qdict_flatten() a shallowly cloned dict because that would
+empty nested QDicts in the original dict as well.  This patch changes
+this, so you can now use qdict_flatten(qdict_shallow_clone(dict)) to get
+a flattened copy without disturbing the original.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ qobject/block-qdict.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 295ace42ae..98295ac30e 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2647,8 +2647,9 @@
- # Since: 2.10
- ##
- { 'union': 'BlockdevQcowEncryption',
--  'base': { 'format': 'BlockdevQcowEncryptionFormat' },
-+  'base': { '*format': 'BlockdevQcowEncryptionFormat' },
-   'discriminator': 'format',
-+  'default-variant': 'aes',
-   'data': { 'aes': 'QCryptoBlockOptionsQCow' } }
+diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
+index 0b2ae02627..7e0deb74c5 100644
+--- a/qobject/block-qdict.c
++++ b/qobject/block-qdict.c
+@@ -114,19 +114,30 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
  
- ##
+         /*
+          * Flatten non-empty QDict and QList recursively into @target,
+-         * copy other objects to @target
++         * copy other objects to @target.
++         * On the root level (if @qdict == @target), remove flattened
++         * nested QDicts and QLists from @qdict.
++         *
++         * (Note that we do not need to remove entries from nested
++         * dicts or lists.  Their reference count is decremented on
++         * the root level, so there are no leaks.  In fact, if they
++         * have a reference count greater than one, we are probably
++         * well advised not to modify them altogether.)
+          */
+         if (dict_val && qdict_size(dict_val)) {
+             qdict_flatten_qdict(dict_val, target,
+                                 new_key ? new_key : entry->key);
+-            qdict_del(qdict, entry->key);
++            if (target == qdict) {
++                qdict_del(qdict, entry->key);
++            }
+         } else if (list_val && !qlist_empty(list_val)) {
+             qdict_flatten_qlist(list_val, target,
+                                 new_key ? new_key : entry->key);
+-            qdict_del(qdict, entry->key);
++            if (target == qdict) {
++                qdict_del(qdict, entry->key);
++            }
+         } else if (target != qdict) {
+             qdict_put_obj(target, new_key, qobject_ref(value));
+-            qdict_del(qdict, entry->key);
+         }
+ 
+         g_free(new_key);
 -- 
 2.17.1
