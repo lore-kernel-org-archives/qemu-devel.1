@@ -1,41 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fSQRy-0003ja-Bp
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:17:51 -0400
+	(envelope-from <clg@kaod.org>) id 1fSQSQ-0003w8-KJ
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:18:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fSQRv-0004iN-2M
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:17:50 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42394
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fSQRu-0004hj-Sr
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:17:46 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5BHDrBA100960
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 13:17:46 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2jhug4dbq6-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 13:17:45 -0400
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 11 Jun 2018 18:17:44 +0100
-References: <20180611135223.81865-1-borntraeger@de.ibm.com>
-	<c5ec6c27-42cb-e354-b861-8485e72cf1e3@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 11 Jun 2018 19:17:37 +0200
+	(envelope-from <clg@kaod.org>) id 1fSQSN-00050W-Be
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:18:18 -0400
+Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:49282)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fSQSN-0004ya-5k
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:18:15 -0400
+Received: from player795.ha.ovh.net (unknown [10.109.120.10])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 9869213B7B5
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 19:18:13 +0200 (CEST)
+References: <20180611171518.3390-1-clg@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <bfdc313f-f8b0-77a5-e87b-cc9c75f8e110@kaod.org>
+Date: Mon, 11 Jun 2018 19:18:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <c5ec6c27-42cb-e354-b861-8485e72cf1e3@redhat.com>
-Content-Language: en-US
-Message-Id: <4ba094ae-31dd-08c8-3795-8f708f6cf823@de.ibm.com>
+In-Reply-To: <20180611171518.3390-1-clg@kaod.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] s390x/ipl: Try to detect Linux vs
- non Linux for initial IPL PSW
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] m25p80: add support for two bytes WRSR for
+ Macronix chips
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,78 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
+On 06/11/2018 07:15 PM, C=C3=A9dric Le Goater wrote:
+> On Macronix chips, two bytes can written to the WRSR. First byte will
+> configure the status register and the second the configuration
+> register. It is important to save the configuration value as it
+> contains the dummy cycle setting when using dual or quad IO mode.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/block/m25p80.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+> index b49c8e9caa04..29775e055a24 100644
+> --- a/hw/block/m25p80.c
+> +++ b/hw/block/m25p80.c
+> @@ -699,6 +699,7 @@ static void complete_collecting_data(Flash *s)
+>          case MAN_MACRONIX:
+>              s->quad_enable =3D extract32(s->data[0], 6, 1);
+>              if (s->len > 1) {
+> +                s->volatile_cfg =3D s->data[1];
+>                  s->four_bytes_address_mode =3D extract32(s->data[1], 5=
+, 1);
+>              }
+>              break;
+>=20
 
+I sent this patch to qemu-ppc instead of qemu-devel ...
 
-On 06/11/2018 06:16 PM, Thomas Huth wrote:
-> On 11.06.2018 15:52, Christian Borntraeger wrote:
->> Right now the IPL device always starts from address 0x10000 (the usual
->> Linux entry point). To run other guests (e.g. test programs) it is
->> useful to use the IPL PSW from address 0. We can use the Linux magic
->> at 0x10008 to decide.
->>
->> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
->> ---
->> v1->v2:
->> 	- use LINUX_MAGIC_ADDR define
->> 	- use assert for valid iplpsw pointer
->> 	- add endianess conversion
->>  hw/s390x/ipl.c | 15 ++++++++++++++-
->>  1 file changed, 14 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
->> index 04245b5258..3790153fa9 100644
->> --- a/hw/s390x/ipl.c
->> +++ b/hw/s390x/ipl.c
->> @@ -29,6 +29,7 @@
->>  #include "exec/exec-all.h"
->>  
->>  #define KERN_IMAGE_START                0x010000UL
->> +#define LINUX_MAGIC_ADDR                0x010008UL
->>  #define KERN_PARM_AREA                  0x010480UL
->>  #define INITRD_START                    0x800000UL
->>  #define INITRD_PARM_START               0x010408UL
->> @@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
->>  static void s390_ipl_realize(DeviceState *dev, Error **errp)
->>  {
->>      S390IPLState *ipl = S390_IPL(dev);
->> -    uint64_t pentry = KERN_IMAGE_START;
->> +    uint64_t *iplpsw;
->> +    uint64_t pentry;
->> +    char *magic;
->>      int kernel_size;
->>      Error *err = NULL;
->>  
->> @@ -157,6 +160,16 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->>                                 NULL, 1, EM_S390, 0, 0);
->>          if (kernel_size < 0) {
->>              kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
->> +            /* if this is Linux use KERN_IMAGE_START */
->> +            magic = rom_ptr(LINUX_MAGIC_ADDR);
->> +            if (magic && !memcmp(magic, "S390EP", 6)) {
->> +                pentry = KERN_IMAGE_START;
->> +            } else {
->> +                /* if not Linux use the IPL PSW */
->> +                iplpsw = rom_ptr(0);
->> +                assert(iplpsw);
-> 
-> Hmm, wait, what if load_image_targphys() failed and returned a
-> kernel_size < 0 ... won't we hit that assert() in that case? I think you
-> might want to check for kernel_size > 0 (or even > 8) here first.
+Sorry for the noise.
 
-Yes you are right.  
-> 
->> +                pentry = be64_to_cpu(*iplpsw) & 0x7fffffffUL;
-
-This is also not proper. the IPL PSW is more or less an ESA (31bit) PSW. So I rather need to get
-the 4 byte address part from location 4 (and only do a byteswap there).
->> +            }
->>          }
->>          if (kernel_size < 0) {
->>              error_setg(&err, "could not load kernel '%s'", ipl->kernel);
->>
-> 
->  Thomas
-> 
+C.=20
