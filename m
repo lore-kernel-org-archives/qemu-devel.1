@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fSH5B-0002tG-Ci
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 03:17:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fSH60-0003Ht-Ha
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 03:18:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fSH57-0000Xm-DE
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 03:17:41 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:45492)
+	(envelope-from <alex.bennee@linaro.org>) id 1fSH5w-0000q4-CW
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 03:18:32 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:41512)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fSH57-0000Wy-5H
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 03:17:37 -0400
-Received: by mail-wr0-x241.google.com with SMTP id o12-v6so19137104wrm.12
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 00:17:36 -0700 (PDT)
+	id 1fSH5w-0000pY-68
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 03:18:28 -0400
+Received: by mail-wr0-x243.google.com with SMTP id h10-v6so19144567wrq.8
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 00:18:28 -0700 (PDT)
 References: <20180608123307.24773-1-alex.bennee@linaro.org>
 	<20180608123307.24773-48-alex.bennee@linaro.org>
-	<fb391fdf-b08c-fbcc-b2f2-bab27a79623b@amsat.org>
+	<b1ceee53-fbb2-5e46-75db-255ad5c5c351@amsat.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <fb391fdf-b08c-fbcc-b2f2-bab27a79623b@amsat.org>
-Date: Mon, 11 Jun 2018 08:17:34 +0100
-Message-ID: <87d0wx94hd.fsf@linaro.org>
+In-reply-to: <b1ceee53-fbb2-5e46-75db-255ad5c5c351@amsat.org>
+Date: Mon, 11 Jun 2018 08:18:26 +0100
+Message-ID: <87bmch94fx.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
@@ -38,8 +38,6 @@ Cc: cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@lina
 
 Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-> Hi Alex,
->
 > On 06/08/2018 09:33 AM, Alex Benn=C3=A9e wrote:
 >> One problem with satisfying your docker dependencies in a sub-make it
 >> you might end up trying to satisfy the dependency multiple times. This
@@ -82,21 +80,18 @@ TS))
 >> +		$(eval DOCKER_BUILD_TARGETS+=3D$(DOCKER_PREREQ))))
 >> +
 >> +$(info DOCKER_BUILD_TARGETS=3D$(sort $(DOCKER_BUILD_TARGETS)))
->
-> Is this verbose info on purpose?
-
-Ahh that slipped through, removed now.
-
->
-> Else this could be surrounded by something equiv to:
->
-> ifneq ($(V)$(DEBUG),)
-> ...
-> endif
->
 >> +
 >> +.PHONY: build-docker-prereqs
 >> +build-docker-prereqs: $(sort $(DOCKER_BUILD_TARGETS))
+>
+> It seems now all docker images are built, even if you want to test a
+> single arch... Using ~7GB of storage at once.
+
+I've moved build-docker-prereqs to build-tcg and made check-tcg depend
+on that. The single arch test case now relies on the sub-make building
+things.
+
+>
 >> +
 >> +build-tcg-tests-%: build-docker-prereqs
 >>  	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V=3D"$(V)" TARG=
