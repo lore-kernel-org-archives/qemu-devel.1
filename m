@@ -1,28 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50737)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fSLrr-0007vV-BX
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:24:16 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1fSLtL-0000xM-G9
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fSLrn-00043R-66
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:24:15 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180611122006.GE15038@localhost.localdomain>
-References: <w51bmegjzp4.fsf@maestria.local.igalia.com>
-	<216e7398-0bc3-4822-d4b0-e0267c714abb@redhat.com>
-	<w5136zjsar5.fsf@maestria.local.igalia.com>
-	<bc26c382-458f-5a86-de59-3945397fbcac@redhat.com>
-	<w51wowvqu65.fsf@maestria.local.igalia.com>
-	<b3ec832d-202b-db93-a163-3d63a4d36326@redhat.com>
-	<w51h8nqcijb.fsf@maestria.local.igalia.com>
-	<aab201a7-ef3f-8152-cc37-85ae7e106a5e@redhat.com>
-	<20180503122241.GA6140@localhost.localdomain>
-	<w51zi0e6apc.fsf@maestria.local.igalia.com>
-	<20180611122006.GE15038@localhost.localdomain>
-Date: Mon, 11 Jun 2018 14:23:31 +0200
-Message-ID: <w51tvq9zf3w.fsf@maestria.local.igalia.com>
+	(envelope-from <arei.gonglei@huawei.com>) id 1fSLtI-0005Jj-Dc
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:25:47 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2276 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1fSLtH-0005HH-Ve
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:25:44 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Mon, 11 Jun 2018 12:25:18 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DB015FC4@dggeml511-mbx.china.huawei.com>
+References: <7CECC2DFC21538489F72729DF5EFB4D9C1486C@DGGEMM501-MBX.china.huawei.com>
+	<20180601122307.3e6ade66@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DB00F4E4@dggeml511-mbx.china.huawei.com>
+	<50481bea-bb5b-dd71-b712-6418c3bb29ac@redhat.com>
+	<77604174-3c15-a8d3-3ea3-53a1759cd885@redhat.com>
+	<e2e0ff2b-139e-0582-c8f9-9a716780ff1f@redhat.com>
+	<56943de0-74f6-0746-c2c2-eeb9fdeabd74@redhat.com>
+	<4409ea2d-971d-8898-bd1a-9e9b9e9172dc@redhat.com>
+	<ced449d6-1778-6641-d055-4fedda442a47@redhat.com>
+	<AE460DFB-87F8-45A3-A007-E59C3B23BB67@zju.edu.cn>
+	<679ab02f-b110-c80a-c99e-1301b7fa1725@redhat.com>
+In-Reply-To: <679ab02f-b110-c80a-c99e-1301b7fa1725@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC] Intermediate block mirroring
+Subject: Re: [Qemu-devel] An emulation failure occurs,
+ if I hotplug vcpus immediately after the VM start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +39,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: David Hildenbrand <david@redhat.com>, =?utf-8?B?5rWZ5aSn6YKu566x?= <linzc@zju.edu.cn>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, xuyandong <xuyandong2@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, lidonglin <lidonglin@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-On Mon 11 Jun 2018 02:20:06 PM CEST, Kevin Wolf wrote:
-> Am 01.06.2018 um 12:51 hat Alberto Garcia geschrieben:
->> On Thu 03 May 2018 02:22:41 PM CEST, Kevin Wolf wrote:
->> >> > Were the (more or less) exact requirements of QMP blockdev-reopen
->> >> > discussed? How is it different from qemu-io's "reopen" command?
->> >> > What are the options that you can and can not change?
->> >> 
->> >> I can't quite remember, I'm afraid.  I think it was supposed to be
->> >> pretty much qemu-io's reopen (so just bdrv_reopen()).  I suppose you
->> >> cannot change the driver (obviously) or probably the node name, because
->> >> either would result in the node being replaced by a completely new one.
->> >> 
->> >> Other than that, it probably depends on what the block driver supports,
->> >> but ideally you should be able to change everything.
->> >
->> > Honestly the design of bdrv_reopen() is quite broken because of the
->> > way it tries to maintain old options if they aren't specified, and
->> > guesses what you might mean when you add flags to the mix. The exact
->> > semantics are quite complicated and I'd rather avoid them in a stable
->> > API.
->> >
->> > A clean QMP command would probably apply the same defaults as
->> > blockdev-add, so you just get to specify the full options again.
->> 
->> I have a prototype of this working and almost ready to be published, but
->> there's a tricky thing with this part:
->> 
->> If we want blockdev-reopen to apply the defaults for all options except
->> from the ones expliclity specified by the user, then it means that we
->> need to check not just the options that are present, but also the ones
->> that are omitted.
->> 
->> For example:
->> 
->>    { "execute": "blockdev-add",
->>      "arguments": { "driver": "null-aio",
->>                     "node-name": "root",
->>                     "size": 1024 }
->> 
->> This adds a null-aio block device with the "size" option set to 1024
->> (the default is 1 << 30).
->> 
->> null_reopen_prepare() allows reopening that block device, but it does
->> not allow changing any of its options. Attempting to change the value of
->> "size" is detected by the loop that checks unhandled options at the end
->> of bdrv_reopen_prepare() and returns "Cannot change the option 'size'".
->> 
->> So far, so good. We have this generic check for all options that works
->> with all drivers, so as long as we only specify options that we know
->> that can be changed, everything is fine.
->> 
->> However if we want blockdev-reopen to apply the default values for all
->> omitted options, then omitting "size" would be equivalent to setting it
->> to its default value (1 << 30). And if "size" cannot be changed then
->> QEMU should complain unless we explicitly set "size" to 1024 again on
->> reopen.
->> 
->> This complicates things a bit, because we would go from "the options
->> that can't be changed are the ones that are not handled by each driver's
->> _prepare() function" to "options that are absent can also produce an
->> error".
->
-> To be honest, I think this is fine. If the user can specify the size
-> once (in blockdev-add), they can do it again (in blockdev-reopen).
->
-> We just need to make sure that we don't break existing bdrv_reopen*()
-> calls that come from places other than the monitor.
-
-Good. I have the first revision of the series almost ready, expect it
-this week.
-
-Berto
+DQpIaSBEYXZpZCBhbmQgUGFvbG8sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4g
+RnJvbTogRGF2aWQgSGlsZGVuYnJhbmQgW21haWx0bzpkYXZpZEByZWRoYXQuY29tXQ0KPiBTZW50
+OiBNb25kYXksIEp1bmUgMTEsIDIwMTggNjo0NCBQTQ0KPiBUbzog5rWZ5aSn6YKu566xIDxsaW56
+Y0B6anUuZWR1LmNuPg0KPiBDYzogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT47
+IEdvbmdsZWkgKEFyZWkpDQo+IDxhcmVpLmdvbmdsZWlAaHVhd2VpLmNvbT47IElnb3IgTWFtbWVk
+b3YgPGltYW1tZWRvQHJlZGhhdC5jb20+Ow0KPiB4dXlhbmRvbmcgPHh1eWFuZG9uZzJAaHVhd2Vp
+LmNvbT47IFpoYW5naGFpbGlhbmcNCj4gPHpoYW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbT47
+IHdhbmd4aW4gKFUpDQo+IDx3YW5neGlueGluLndhbmdAaHVhd2VpLmNvbT47IGxpZG9uZ2xpbiA8
+bGlkb25nbGluQGh1YXdlaS5jb20+Ow0KPiBrdm1Admdlci5rZXJuZWwub3JnOyBxZW11LWRldmVs
+QG5vbmdudS5vcmc7IEh1YW5nd2VpZG9uZyAoQykNCj4gPHdlaWRvbmcuaHVhbmdAaHVhd2VpLmNv
+bT4NCj4gU3ViamVjdDogUmU6IEFuIGVtdWxhdGlvbiBmYWlsdXJlIG9jY3VycyxpZiBJIGhvdHBs
+dWcgdmNwdXMgaW1tZWRpYXRlbHkgYWZ0ZXIgdGhlDQo+IFZNIHN0YXJ0DQo+IA0KPiBPbiAwNy4w
+Ni4yMDE4IDE4OjAzLCDmtZnlpKfpgq7nrrEgd3JvdGU6DQo+ID4gSGnvvIxhbGwNCj4gPiBJIHN0
+aWxsIGhhdmUgYSBxdWVzdGlvbiBhZnRlciByZWFkaW5nIHlvdXIgZGlzY3Vzc2lvbjogV2lsbCBz
+ZWFiaW9zIGRldGVjdCB0aGUNCj4gY2hhbmdlIG9mIGFkZHJlc3Mgc3BhY2UgZXZlbiBpZiB3ZSBh
+ZGRfcmVnaW9uIGFuZCBkZWxfcmVnaW9uIGF1dG9tYXRpY2FsbHk/IEkNCj4gZ3Vlc3MgdGhhdCBz
+ZWFiaW9zIG1heSBub3QgdGFrZSB0aGlzIGNoYW5nZSBpbnRvIGNvbnNpZGVyYXRpb24uDQo+IA0K
+PiBIaSwNCj4gDQo+IFdlIHdvdWxkIGp1c3QgY2hhbmdlIHRoZSB3YXkgaG93IEtWTSBtZW1vcnkg
+c2xvdHMgYXJlIHVwZGF0ZWQuIFRoaXMgaXMNCj4gcmlnaHQgbm93IG5vdCBhdG9taWMsIGJ1dCB3
+b3VsZCBiZSBsYXRlciBvbi4gSXQgc2hvdWxkIG5vdCBoYXZlIGFueQ0KPiBvdGhlciBlZmZlY3Qu
+DQo+IA0KWWVzLiBEbyB5b3UgaGF2ZSBhbnkgcGxhbnMgdG8gZG8gdGhhdD8gDQoNClRoYW5rcywN
+Ci1Hb25nbGVpDQo=
