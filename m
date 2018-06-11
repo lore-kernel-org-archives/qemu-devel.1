@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fSNmW-0004h9-Jr
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:26:54 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fSNmY-0004iu-Bh
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:26:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fSNmU-0001or-RN
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:26:51 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fSNmW-0001qH-TN
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:26:54 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 11 Jun 2018 16:25:58 +0200
-Message-Id: <20180611142611.6609-17-mreitz@redhat.com>
+Date: Mon, 11 Jun 2018 16:26:00 +0200
+Message-Id: <20180611142611.6609-19-mreitz@redhat.com>
 In-Reply-To: <20180611142611.6609-1-mreitz@redhat.com>
 References: <20180611142611.6609-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 16/29] iotests.py: Add qemu_io_silent
+Subject: [Qemu-devel] [PULL 18/29] qemu-img: Resolve relative backing paths
+ in rebase
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +23,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-With qemu-io now returning a useful exit code, some tests may find it
-sufficient to just query that instead of logging (and filtering) the
-whole output.
+Currently, rebase interprets a relative path for the new backing image
+as follows:
+(1) Open the new backing image with the given relative path (thus relative to
+    qemu-img's working directory).
+(2) Write it directly into the overlay's backing path field (thus
+    relative to the overlay).
 
+If the overlay is not in qemu-img's working directory, both will be
+different interpretations, which may either lead to an error somewhere
+(either rebase fails because it cannot open the new backing image, or
+your overlay becomes unusable because its backing path does not point to
+a file), or, even worse, it may result in your rebase being performed
+for a different backing file than what your overlay will point to after
+the rebase.
+
+Fix this by interpreting the target backing path as relative to the
+overlay, like qemu-img does everywhere else.
+
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1569835
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20180509182002.8044-2-mreitz@redhat.com
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20180509194302.21585-5-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ qemu-img.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index fdbdd8b300..0b204dc220 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -133,6 +133,15 @@ def qemu_io(*args):
-         sys.stderr.write('qemu-io received signal %i: %s\n' % (-exitcode, ' '.join(args)))
-     return subp.communicate()[0]
+diff --git a/qemu-img.c b/qemu-img.c
+index b1c1e484d2..ebe1b866da 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -3251,6 +3251,9 @@ static int img_rebase(int argc, char **argv)
+         }
  
-+def qemu_io_silent(*args):
-+    '''Run qemu-io and return the exit code, suppressing stdout'''
-+    args = qemu_io_args + list(args)
-+    exitcode = subprocess.call(args, stdout=open('/dev/null', 'w'))
-+    if exitcode < 0:
-+        sys.stderr.write('qemu-io received signal %i: %s\n' %
-+                         (-exitcode, ' '.join(args)))
-+    return exitcode
+         if (out_baseimg[0]) {
++            const char *overlay_filename;
++            char *out_real_path;
 +
+             options = qdict_new();
+             if (out_basefmt) {
+                 qdict_put_str(options, "driver", out_basefmt);
+@@ -3259,8 +3262,26 @@ static int img_rebase(int argc, char **argv)
+                 qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
+             }
  
- class QemuIoInteractive:
-     def __init__(self, *args):
+-            blk_new_backing = blk_new_open(out_baseimg, NULL,
++            overlay_filename = bs->exact_filename[0] ? bs->exact_filename
++                                                     : bs->filename;
++            out_real_path = g_malloc(PATH_MAX);
++
++            bdrv_get_full_backing_filename_from_filename(overlay_filename,
++                                                         out_baseimg,
++                                                         out_real_path,
++                                                         PATH_MAX,
++                                                         &local_err);
++            if (local_err) {
++                error_reportf_err(local_err,
++                                  "Could not resolve backing filename: ");
++                ret = -1;
++                g_free(out_real_path);
++                goto out;
++            }
++
++            blk_new_backing = blk_new_open(out_real_path, NULL,
+                                            options, src_flags, &local_err);
++            g_free(out_real_path);
+             if (!blk_new_backing) {
+                 error_reportf_err(local_err,
+                                   "Could not open new backing file '%s': ",
 -- 
 2.17.1
