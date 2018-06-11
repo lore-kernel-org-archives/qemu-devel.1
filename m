@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fSPjJ-0000uU-GM
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:31:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fSPsH-0003Sx-6G
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:40:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fSPjG-0003VV-AL
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:31:41 -0400
-References: <20180611141716.3813-1-peter.maydell@linaro.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <67eed517-2f84-eaf9-25db-cdacee70c2aa@redhat.com>
-Date: Mon, 11 Jun 2018 12:31:29 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fSPsG-00089W-KQ
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:40:57 -0400
+Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:39949)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fSPsG-00088n-FO
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:40:56 -0400
+Received: by mail-oi0-x232.google.com with SMTP id f79-v6so18467703oib.7
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 09:40:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180611141716.3813-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20180611101551.2f656715@w520.home>
+References: <20180611141716.3813-1-peter.maydell@linaro.org>
+	<20180611101551.2f656715@w520.home>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Jun 2018 17:40:35 +0100
+Message-ID: <CAFEAcA_Y5zkoiSyHfuvnhSUPOc44fpGj7j373Rz2+Gf0yGF6sQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
  for multiline comments
 List-Id: <qemu-devel.nongnu.org>
@@ -24,64 +30,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, patches@linaro.org, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Richard Henderson <rth@twiddle.net>, John Snow <jsnow@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
+On 11 June 2018 at 17:15, Alex Williamson <alex.williamson@redhat.com> wrote:
+> Much preferred, thanks  (tabs next? ;)
 
+CODING_STYLE already mandates spaces-only, no-tabs...
 
-On 06/11/2018 10:17 AM, Peter Maydell wrote:
-> The codebase has a bit of a mix of different multiline
-> comment styles. State a preference for the Linux kernel
-> style:
->     /*
->      * Star on the left for each line.
->      * Leading slash-star and trailing star-slash
->      * each go on a line of their own.
->      */
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
-> This is not my personal favourite, but seemed to be the
-> closest we had to consensus in the mail thread for v1;
-> I can live with it in order to avoid getting patches which
-> use the styles I like even less :-)
-
-"Same."
-
-Well, at least it's not asymmetric.
-
-Reviewed-by: John Snow <jsnow@redhat.com>
-
-> ---
->  CODING_STYLE | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
-> 
-> diff --git a/CODING_STYLE b/CODING_STYLE
-> index 12ba58ee293..2d84f5f26d1 100644
-> --- a/CODING_STYLE
-> +++ b/CODING_STYLE
-> @@ -124,6 +124,23 @@ We use traditional C-style /* */ comments and avoid // comments.
->  Rationale: The // form is valid in C99, so this is purely a matter of
->  consistency of style. The checkpatch script will warn you about this.
->  
-> +Multiline comments blocks should have a row of stars on the left,
-> +and the initial /* and terminating */ both on their own lines:
-> +    /*
-> +     * like
-> +     * this
-> +     */
-> +This is the same format required by the Linux kernel coding style.
-> +
-> +(Some of the existing comments in the codebase use the GNU Coding
-> +Standards form which does not have stars on the left, or other
-> +variations; avoid these when writing new comments, but don't worry
-> +about converting to the preferred form unless you're editing that
-> +comment anyway.)
-> +
-> +Rationale: Consistency, and ease of visually picking out a multiline
-> +comment from the surrounding code.
-> +
->  8. trace-events style
->  
->  8.1 0x prefix
-> 
+thanks
+-- PMM
