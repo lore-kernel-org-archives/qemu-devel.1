@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSIWR-0002IB-PU
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:49:56 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fSIZi-0003hy-2M
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:53:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSIWO-0002t7-Nz
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:49:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55454 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fSIWO-0002rc-Hh
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:49:52 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 948EA401EF00
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 08:49:51 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180608130846.22234-1-dgilbert@redhat.com>
-	<20180608130846.22234-2-dgilbert@redhat.com>
-Date: Mon, 11 Jun 2018 10:49:50 +0200
-In-Reply-To: <20180608130846.22234-2-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Fri, 8 Jun 2018 14:08:40 +0100")
-Message-ID: <87k1r5lnbl.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fSIZh-0004Tu-DE
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:53:18 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:33259)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fSIZh-0004Tg-7Y
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:53:17 -0400
+Received: by mail-oi0-x243.google.com with SMTP id c6-v6so16074660oiy.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 01:53:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] hmp: Add flag for preconfig commands
+In-Reply-To: <87tvq9lps3.fsf@dusky.pond.sub.org>
+References: <1528653731-4920-1-git-send-email-keno@juliacomputing.com>
+	<87tvq9lps3.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Jun 2018 09:52:55 +0100
+Message-ID: <CAFEAcA9XiuToz7pCEOysL-Hz1HvVyaMyeXV-yJi1xpHgdycLiw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4] cutils: Provide strchrnul
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, imammedo@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Keno Fischer <keno@juliacomputing.com>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
+On 11 June 2018 at 08:56, Markus Armbruster <armbru@redhat.com> wrote:
+> You're not printing $strchrnul like we print other configuration
+> results.  Hmm, we're not printing several of them.  Question for
+> maintainers (MAINTAINERS doesn't have any, so I'm cc'ing the top three
+> coughed up by get_maintainer.pl): bug or feature?  If feature, how do we
+> decide what to print?
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
-> Add a flag to command definitions to allow them to be used in preconfig
-> and check it.
-> If users try to use commands that aren't available, tell them to use
-> the exit_preconfig comand we're adding in a few patches.
->
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  monitor.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
->
-> diff --git a/monitor.c b/monitor.c
-> index 6d0cec552e..f4a16e6a03 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -128,6 +128,7 @@ typedef struct mon_cmd_t {
->      const char *args_type;
->      const char *params;
->      const char *help;
-> +    const char *flags; /* p=preconfig */
+If we printed everything that we tested for then the output would
+be unhelpfully enormous. My view is that we should print the
+"interesting" things for the user, ie the higher-level things
+that the user could potentially turn on by installing more
+libraries or has turned off explicitly or whatever. Reporting
+whether the host OS has strchrnul or whether we've had to
+provide our own implementation is doubly uninteresting:
+ * there's nothing the user could do to change this
+ * there is no visible effect (missing features, worse performance)
 
-I'd add a bool for each flag instead of encoding them in a string.  No
-need for a comment then (yours is cryptic).  But your artistic license
-applies.
+There's an argument that we should also log every config check
+result somehow (I think autoconf configures do this), but I
+don't think that our 'print stuff to stdout' is the right place
+for that.
 
->      void (*cmd)(Monitor *mon, const QDict *qdict);
->      /* @sub_table is a list of 2nd level of commands. If it does not exist,
->       * cmd should be used. If it exists, sub_table[?].cmd should be
-> @@ -936,6 +937,19 @@ static int parse_cmdline(const char *cmdline,
->      return -1;
->  }
->  
-> +/*
-> + * Returns true if the command can be executed in preconfig mode
-> + * i.e. it has the 'p' flag.
-> + */
-> +static bool cmd_can_preconfig(const mon_cmd_t *cmd)
-> +{
-> +    if (!cmd->flags) {
-> +        return false;
-> +    }
-> +
-> +    return strchr(cmd->flags, 'p');
-> +}
-> +
->  static void help_cmd_dump_one(Monitor *mon,
->                                const mon_cmd_t *cmd,
->                                char **prefix_args,
-> @@ -2976,6 +2990,12 @@ static const mon_cmd_t *monitor_parse_command(Monitor *mon,
->                         (int)(p - cmdp_start), cmdp_start);
->          return NULL;
->      }
-> +    if (runstate_check(RUN_STATE_PRECONFIG) && !cmd_can_preconfig(cmd)) {
-> +        monitor_printf(mon, "Command '%.*s' not available with -preconfig; "
-> +                            "use exit_preconfig after configuration.\n",
-> +                       (int)(p - cmdp_start), cmdp_start);
-> +        return NULL;
-> +    }
->  
->      /* filter out following useless space */
->      while (qemu_isspace(*p)) {
-
-Suggest "not available with -preconfig until after exit_preconfig".
-
-Regardless,
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+thanks
+-- PMM
