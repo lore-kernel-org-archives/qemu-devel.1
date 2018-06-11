@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36895)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fSMgS-0007wJ-SP
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:16:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSMiK-0000I6-Ap
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:18:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fSMgP-0001U4-Ch
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:16:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58454 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fSMiH-0002WB-2B
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:18:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53260 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fSMgP-0001TE-6r
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:16:29 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fSMiG-0002Vk-ST
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:18:25 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BF1B67D839
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 13:16:27 +0000 (UTC)
-Date: Mon, 11 Jun 2018 15:16:25 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180611151625.4b2420b8@redhat.com>
-In-Reply-To: <20180608132105.GA24764@localhost.localdomain>
-References: <20180606135051.GR7451@localhost.localdomain>
-	<1528372809-175770-1-git-send-email-imammedo@redhat.com>
-	<20180608132105.GA24764@localhost.localdomain>
+	by mx1.redhat.com (Postfix) with ESMTPS id 40DDF4002248
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 13:18:24 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180608130846.22234-1-dgilbert@redhat.com>
+	<20180608130846.22234-3-dgilbert@redhat.com>
+	<87fu1tlmu8.fsf@dusky.pond.sub.org> <20180611102716.GB2661@work-vm>
+Date: Mon, 11 Jun 2018 15:18:22 +0200
+In-Reply-To: <20180611102716.GB2661@work-vm> (David Alan Gilbert's message of
+	"Mon, 11 Jun 2018 11:27:16 +0100")
+Message-ID: <874li9h36p.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] vl: fix use of --daemonize with
- --preconfig
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 2/7] hmp: Allow help on preconfig
+ commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,133 +35,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, ldoktor@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, imammedo@redhat.com, qemu-devel@nongnu.org
 
-On Fri, 8 Jun 2018 10:21:05 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-> On Thu, Jun 07, 2018 at 02:00:09PM +0200, Igor Mammedov wrote:
-> > When using --daemonize, the initial lead process will fork a child and
-> > then wait to be notified that setup is complete via a pipe, before it
-> > exits.  When using --preconfig there is an extra call to main_loop()
-> > before the notification is done from os_setup_post(). Thus the parent
-> > process won't exit until the mgmt application connects to the monitor
-> > and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
-> > won't connect to the monitor until daemonizing has completed though.
-> >=20
-> > This is a chicken and egg problem, leading to deadlock at startup.
-> >=20
-> > The only viable way to fix this is to call os_setup_post() before
-> > the early main_loop() call when --preconfig is used. This has the
-> > downside that any errors from this point onwards won't be handled
-> > well by the mgmt application, because it will think QEMU has started
-> > successfully, so not be expecting an abrupt exit. Moving as much user
-> > input validation as possible to before the main_loop() call might help,
-> > but mgmt application should stop assuming that QEMU has started
-> > successfuly and use other means to collect errors from QEMU (logfile).
-> >=20
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > v5:
-> >   * use original Daniel's patch [1], but addapt it to apply on top of
-> >     "[PATCH v3 1/2] cli: Don't run early event loop if no  --preconfig =
-was specified"
-> >     with extra comment and massage commit message a little bit.
-> > v6:
-> >   * hide os_setup_post_done flag inside of os_setup_post() as it was in=
- v4
-> >=20
-> > CC: berrange@redhat.com
-> > CC: mreitz@redhat.com
-> > CC: pbonzini@redhat.com
-> > CC: ehabkost@redhat.com
-> > CC: ldoktor@redhat.com
-> > CC: eblake@redhat.com
-> > ---
-> >  os-posix.c | 6 ++++++
-> >  vl.c       | 6 ++++++
-> >  2 files changed, 12 insertions(+)
-> >=20
-> > diff --git a/os-posix.c b/os-posix.c
-> > index 9ce6f74..0246195 100644
-> > --- a/os-posix.c
-> > +++ b/os-posix.c
-> > @@ -309,8 +309,14 @@ void os_daemonize(void)
-> > =20
-> >  void os_setup_post(void)
-> >  {
-> > +    static bool os_setup_post_done;
-> >      int fd =3D 0;
-> > =20
-> > +    if (os_setup_post_done) {
-> > +        return;
-> > +    }
-> > +    os_setup_post_done =3D true;
-> > +
-> >      if (daemonize) {
-> >          if (chdir("/")) {
-> >              error_report("not able to chdir to /: %s", strerror(errno)=
-);
-> > diff --git a/vl.c b/vl.c
-> > index fa44138..457ff2a 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -4578,6 +4578,12 @@ int main(int argc, char **argv, char **envp)
-> >      parse_numa_opts(current_machine);
-> > =20
-> >      /* do monitor/qmp handling at preconfig state if requested */
-> > +    if (!preconfig_exit_requested && is_daemonized()) {
-> > +        /* signal parent QEMU to exit, libvirt treats it as a sign
-> > +         * that monitor socket is ready to accept connections
-> > +         */
-> > +        os_setup_post();
-> > +    } =20
->=20
-> I was looking at the daemonize logic, and noticed it we have a
-> huge amount of code between this line and the next
-> os_setup_post() call that could either:
->=20
-> * call exit() and/or error_report(); or
-logging would work to the extent mentioned in commit message,
-i.e. it' would work fine when log file is used otherwise it
-errors will go to /dev/null
+> * Markus Armbruster (armbru@redhat.com) wrote:
+>> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
+>> 
+>> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> >
+>> > Allow the 'help' command in preconfig state but
+>> > make it only list the preconfig commands.
+>> >
+>> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> > Reviewed-by: Peter Xu <peterx@redhat.com>
+>> > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>> > ---
+>> >  hmp-commands.hx | 1 +
+>> >  monitor.c       | 8 +++++++-
+>> >  2 files changed, 8 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/hmp-commands.hx b/hmp-commands.hx
+>> > index 0734fea931..8bf590ae4b 100644
+>> > --- a/hmp-commands.hx
+>> > +++ b/hmp-commands.hx
+>> > @@ -15,6 +15,7 @@ ETEXI
+>> >          .params     = "[cmd]",
+>> >          .help       = "show the help",
+>> >          .cmd        = do_help_cmd,
+>> > +        .flags      = "p",
+>> >      },
+>> >  
+>> >  STEXI
+>> > diff --git a/monitor.c b/monitor.c
+>> > index f4a16e6a03..31c8f5dc88 100644
+>> > --- a/monitor.c
+>> > +++ b/monitor.c
+>> > @@ -957,6 +957,10 @@ static void help_cmd_dump_one(Monitor *mon,
+>> >  {
+>> >      int i;
+>> >  
+>> > +    if (runstate_check(RUN_STATE_PRECONFIG) && !cmd_can_preconfig(cmd)) {
+>> > +        return;
+>> > +    }
+>> > +
+>> >      for (i = 0; i < prefix_args_nb; i++) {
+>> >          monitor_printf(mon, "%s ", prefix_args[i]);
+>> >      }
+>> > @@ -979,7 +983,9 @@ static void help_cmd_dump(Monitor *mon, const mon_cmd_t *cmds,
+>> >  
+>> >      /* Find one entry to dump */
+>> >      for (cmd = cmds; cmd->name != NULL; cmd++) {
+>> > -        if (compare_cmd(args[arg_index], cmd->name)) {
+>> > +        if (compare_cmd(args[arg_index], cmd->name) &&
+>> > +            ((!runstate_check(RUN_STATE_PRECONFIG) ||
+>> > +                cmd_can_preconfig(cmd)))) {
+>> 
+>> Why do we need this check in addition to the one in help_cmd_dump_one()?
+>
+> To gate entire subtables (we've only currently got 'info' and that's enabled,
+> anyway, so it never actually triggers).
 
-so it should be more or less fine on this point
+Something's bothering me around here, but I can't put a finger on it...
+let me think aloud.
 
-> * be unable to finish machine initialization because of
->   chdir("/"), change_root(), or change_process_uid().
-this one really no go.
-I see 2 options here,
+There's an asymmetry between command execution and help.  The former has
+just one check, in monitor_parse_command().  If the command has a
+sub-table, and there are arguments, monitor_parse_command() recurses
+into the sub-table.  Thus, if the command is unavailable, the
+sub-commands are unavailable as well, regardless of their "p" flags.
 
- * move init code that opens files to early stage (before preconfig monitor)
-   or split it to open files early.
-   (I've spotted several obvious places fwcfg/vnc/replay_start/migration)
-   but there might be code somewhere in callbacks that would do it too,
-   so it rather risky to go this route.
-   (I'd do this anyways one place at the time using sanitizing
-    initialization sequence pretext.)
+Help's recursion is different.  It's limited to two levels, unlike
+execution.  help_cmd_dump_one()'s check applies to the last level.
+help_cmd_dump()'s check applies to the first level.  If there's just one
+level, we check twice.  Perhaps less than elegant, but harmless and
+simple.
 
- * split out signaling part that tells parent process to exit into
-   separate helper that's called once before/from main_loop().
-   This option seems low risk and additionally error output to
-   stderr will work as it does currently (until os_setup_post())
+You can't make a sub-command available without also making the command
+available.  Makes sense, I guess.  If you try, your "p" flags on the
+sub-commands are silently ignored.  That's a bit ugly, but if it doesn't
+bother you, I can pretend I didn't see it ;)
 
-> Doesn't this make -preconfig and -daemonize fundamentally
-> incompatible?
-Don't see anything that prevents both to work together fundamentally.
-essentially -preconfig is extra configuration after CLI,
-we potentially would be able execute commands that open files there,
-so we should leave chroot & co where it is now.
-
->=20
->=20
-> >      main_loop();
-> > =20
-> >      /* from here on runstate is RUN_STATE_PRELAUNCH */
-> > --=20
-> > 2.7.4
-> >=20
-> >  =20
->=20
+> Dave
+>
+>> >              if (cmd->sub_table) {
+>> >                  /* continue with next arg */
+>> >                  help_cmd_dump(mon, cmd->sub_table,
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
