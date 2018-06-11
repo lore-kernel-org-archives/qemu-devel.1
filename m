@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fSI2G-0001tg-NG
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:18:45 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fSI2o-0002Bi-6m
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:19:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fSI2C-0006fl-OE
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:18:44 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33827)
+	(envelope-from <alex.bennee@linaro.org>) id 1fSI2k-0006pN-3o
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:19:18 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:43938)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fSI2C-0006fS-89
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:18:40 -0400
-Received: by mail-wm0-x244.google.com with SMTP id l15-v6so10001895wmc.1
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 01:18:40 -0700 (PDT)
+	id 1fSI2j-0006ox-PY
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:19:14 -0400
+Received: by mail-wr0-x241.google.com with SMTP id d2-v6so19333022wrm.10
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 01:19:13 -0700 (PDT)
 References: <20180608123307.24773-1-alex.bennee@linaro.org>
-	<20180608123307.24773-41-alex.bennee@linaro.org>
-	<abdbe000-3b80-d116-1183-10dae22fbd9e@amsat.org>
+	<a8e3ddaa-816d-d590-580f-94d32b5d56be@amsat.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <abdbe000-3b80-d116-1183-10dae22fbd9e@amsat.org>
-Date: Mon, 11 Jun 2018 09:18:37 +0100
-Message-ID: <878t7l20te.fsf@linaro.org>
+In-reply-to: <a8e3ddaa-816d-d590-580f-94d32b5d56be@amsat.org>
+Date: Mon, 11 Jun 2018 09:19:11 +0100
+Message-ID: <877en520sg.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 40/49] tests/tcg: enable building for
- PowerPC
+Subject: Re: [Qemu-devel] [PATCH v6 00/49] fix building of tests/tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,105 +37,265 @@ Cc: cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@lina
 Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
 > On 06/08/2018 09:32 AM, Alex Benn=C3=A9e wrote:
->> Now we have restored debian-image-powerpc-cross using Debian SID
->> compilers we can build for 32 bit powerpc. Although PPC32 supports a
->> range of pages sizes currently only 4k works so the others are
->> commented out for now.
+>> Hi,
 >>
->> We can also merge the ppc64 support under the base architecture
->> directory to avoid too much proliferation of directories.
->
-> ppc64el doesn't seem to work:
->
-> $ make subdir-ppc64le-linux-user build-tcg-tests-ppc64el-linux-user -j1
-> make[1]: *** ppc64el-linux-user: No such file or directory.  Stop.
-> make: *** [tests/Makefile.include:947:
-> build-tcg-tests-ppc64el-linux-user] Error 2
-
-09:17:30 [alex@zen:~/l/q/qemu.git] testing/tcg-testing-revival-v7 + make ru=
-n-tcg-tests-ppc64le-linux-user
-  BUILD   debian9
-  BUILD   debian-ppc64el-cross
-  CROSS-BUILD ppc64le guest-tests with docker qemu:debian-ppc64el-cross
-  BUILD   debian9
-  BUILD   debian-ppc64el-cross
-  CROSS-BUILD ppc64le guest-tests with docker qemu:debian-ppc64el-cross
-  CC      ppc64le-linux-user/linux-user/main.o
-  LINK    ppc64le-linux-user/qemu-ppc64le
-  RUN-TESTS for ppc64le
-  TEST    test-mmap (default) on ppc64le
-  TEST    sha1 on ppc64le
-  TEST    linux-test on ppc64le
-  TEST    testthread on ppc64le
-  TEST    test-mmap (4096 byte pages) on ppc64le
-
-The Debian and QEMU naming conventions switch....
-
->
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> ppc32:
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
+>> Not a super amount has changed since the last version but review
+>> comments and review tags have been added. The new patches at the end
+>> enable a .travis.yml run and try and make the image building part of
+>> check-tcg -j safe. Essentially the problem is trying to avoid
+>> re-building the images multiple times. The additional issue is wanting
+>> an upto date Debian SID image whenever we actually build an image but
+>> not forcing a rebuild every time.
 >>
->> ---
->> v5
->>   - new for v5
->> ---
->>  tests/tcg/ppc/Makefile.include     |  7 +++++++
->>  tests/tcg/ppc/Makefile.target      | 12 ++++++++++++
->>  tests/tcg/ppc64le/Makefile.include |  2 --
->>  3 files changed, 19 insertions(+), 2 deletions(-)
+>> Essentially I'd like to encode a conditional dependency when:
+>>   - the target image doesn't exist
+>>   - or the target image is out of date w.r.t. the dockerfike
+>>
+>> I'm thinking this is going to involve some sort of extension to the
+>> docker.py script to feed the Makefile.
+>>
+>> A number of the prerequisite patches have already been pulled in the
+>> docker fixes series however I think this series is ready to go in now.
+>> Unless there are any objections I'll send a pull on Monday.
+>>
+>> Current unreviewed patches:
+>>
+>>   patch 0017/tests tcg i386 add runner for test i386 fprem.patch needs r=
+eview
+>>   patch 0039/docker move debian powerpc cross to sid based bui.patch nee=
+ds review
+>>   patch 0040/tests tcg enable building for PowerPC.patch needs review
+>>   patch 0042/Makefile.target add clean build guest tests targe.patch nee=
+ds review
+>>   patch 0044/tests tcg add run diff and skip helper macros.patch needs r=
+eview
+>>   patch 0045/tests tcg override runners for broken tests.patch needs rev=
+iew
+>>   patch 0046/target sh4 Fix translator.c assertion failure for.patch nee=
+ds review
+>
+> Is this patch related/required to this series?
+> It looks it should enter via another tree.
+>
+> The SH4 tests pass without it:
+>
+> $ make run-tcg-tests-sh4-linux-user -j1
+>   ...
+>   RUN-TESTS for sh4
+>   TEST    test-mmap (default) on sh4
+>   TEST    sha1 on sh4
+>   TEST    linux-test on sh4
+>   TEST    testthread on sh4
+>   TEST    test-mmap (4096 byte pages) on sh4
+
+Not with --enable-debug, but yeah I'll drop as it should come via Rich's
+TCG tree.
+
+>
+>>   patch 0047/tests add top level make dependency for docker bu.patch nee=
+ds review
+>>   patch 0048/tests docker prevent sub makes re building debian.patch nee=
+ds review
+>>   patch 0049/.travis.yml add check tcg test.patch needs review
+>>
+>>
+>> Alex Benn=C3=A9e (46):
+>>   configure: add support for --cross-cc-FOO
+>>   configure: move i386_cc to cross_cc_i386
+>>   configure: allow user to specify --cross-cc-cflags-foo=3D
+>>   configure: set cross_cc_FOO for host compiler
+>>   docker: Add "cc" subcommand
+>>   docker: extend "cc" command to accept compiler
+>>   docker: allow "cc" command to run in user context
+>>   docker: Makefile.include introduce DOCKER_SCRIPT
+>>   tests/tcg: move architecture independent tests into subdir
+>>   tests/tcg/multiarch: enable additional linux-test tests
+>>   tests/tcg/multiarch: move most output to stdout
+>>   tests/tcg: move i386 specific tests into subdir
+>>   tests/tcg: enable building for i386
+>>   tests/tcg/i386: fix test-i386
+>>   tests/tcg/i386: add runner for test-i386-fprem
+>>   tests/tcg/x86_64: add Makefile.target
+>>   tests/tcg/i386/test-i386: use modern vector_size attributes
+>>   tests/tcg/i386/test-i386: fix printf format
+>>   tests/tcg: move ARM specific tests into subdir
+>>   tests/tcg: enable building for ARM
+>>   tests/tcg/arm: fix up test-arm-iwmmxt test
+>>   tests/tcg: enable building for AArch64
+>>   tests/tcg/arm: add fcvt test cases for AArch32/64
+>>   tests/tcg: move MIPS specific tests into subdir
+>>   tests/tcg: enable building for MIPS
+>>   tests/tcg/mips: include common mips hello-mips
+>>   tests/tcg: enable building for s390x
+>>   tests/tcg: enable building for ppc64
+>>   tests/tcg: enable building for Alpha
+>>   tests/tcg/alpha: add Alpha specific tests
+>>   tests/tcg: enable building for HPPA
+>>   tests/tcg: enable building for m68k
+>>   tests/tcg: enable building for sh4
+>>   tests/tcg: enable building for sparc64
+>>   tests/tcg: enable building for mips64
+>>   tests/tcg: enable building for RISCV64
+>>   docker: move debian-powerpc-cross to sid based build
+>>   tests/tcg: enable building for PowerPC
+>>   tests/tcg/Makefile: update to be called from Makefile.target
+>>   Makefile.target: add (clean-/build-)guest-tests targets
+>>   tests/Makefile.include: add [build|clean|check]-tcg targets
+>>   tests/tcg: add run, diff, and skip helper macros
+>>   tests/tcg: override runners for broken tests
+>>   tests: add top-level make dependency for docker builds
+>>   tests/docker: prevent sub-makes re-building debian-sid
+>>   .travis.yml: add check-tcg test
+>>
+>> Fam Zheng (2):
+>>   tests/tcg/multiarch: Build fix for linux-test
+>>   tests/tcg/i386: Build fix for hello-i386
+>>
+>> Richard Henderson (1):
+>>   target/sh4: Fix translator.c assertion failure for gUSA
+>>
+>>  .travis.yml                                   |    6 +
+>>  MAINTAINERS                                   |   14 +
+>>  Makefile.target                               |    5 +
+>>  configure                                     |  134 +-
+>>  target/sh4/translate.c                        |   81 +-
+>>  tests/Makefile.include                        |   38 +-
+>>  tests/docker/Makefile.include                 |   31 +-
+>>  tests/docker/docker.py                        |   31 +
+>>  .../dockerfiles/debian-alpha-cross.docker     |   12 +
+>>  tests/docker/dockerfiles/debian-apt-fake.sh   |   46 -
+>>  .../dockerfiles/debian-hppa-cross.docker      |   12 +
+>>  .../dockerfiles/debian-m68k-cross.docker      |   12 +
+>>  .../dockerfiles/debian-mips64-cross.docker    |   12 +
+>>  .../dockerfiles/debian-powerpc-cross.docker   |   39 +-
+>>  .../dockerfiles/debian-riscv64-cross.docker   |   12 +
+>>  .../dockerfiles/debian-sh4-cross.docker       |   12 +
+>>  tests/docker/dockerfiles/debian-sid.docker    |   32 +
+>>  .../dockerfiles/debian-sparc64-cross.docker   |   12 +
+>>  tests/docker/dockerfiles/debian8.docker       |    3 -
+>>  tests/tcg/Makefile                            |  219 +-
+>>  tests/tcg/Makefile.include                    |   89 +
+>>  tests/tcg/Makefile.probe                      |   31 +
+>>  tests/tcg/README                              |   69 +-
+>>  tests/tcg/aarch64/Makefile.include            |    8 +
+>>  tests/tcg/aarch64/Makefile.target             |   17 +
+>>  tests/tcg/aarch64/fcvt.ref                    | 3268 +++++++++++++++++
+>>  tests/tcg/alpha/Makefile                      |   35 -
+>>  tests/tcg/alpha/Makefile.include              |    2 +
+>>  tests/tcg/alpha/Makefile.target               |   18 +
+>>  tests/tcg/alpha/crt.s                         |   26 -
+>>  tests/tcg/alpha/hello-alpha.c                 |    2 +
+>>  tests/tcg/alpha/test-cond.c                   |    1 +
+>>  tests/tcg/alpha/test-ovf.c                    |    2 +
+>>  tests/tcg/arm/Makefile.include                |    8 +
+>>  tests/tcg/arm/Makefile.target                 |   32 +
+>>  tests/tcg/arm/README                          |   11 +
+>>  tests/tcg/arm/fcvt.c                          |  458 +++
+>>  tests/tcg/arm/fcvt.ref                        | 3268 +++++++++++++++++
+>>  tests/tcg/{ =3D> arm}/hello-arm.c               |    0
+>>  .../test-arm-iwmmxt.S}                        |    0
+>>  tests/tcg/hppa/Makefile.include               |    2 +
+>>  tests/tcg/hppa/Makefile.target                |    6 +
+>>  tests/tcg/i386/Makefile.include               |    9 +
+>>  tests/tcg/i386/Makefile.target                |   51 +
+>>  tests/tcg/i386/README                         |   38 +
+>>  tests/tcg/{ =3D> i386}/hello-i386.c             |    1 +
+>>  tests/tcg/{ =3D> i386}/pi_10.com                |  Bin
+>>  tests/tcg/{ =3D> i386}/runcom.c                 |    0
+>>  tests/tcg/{ =3D> i386}/test-i386-code16.S       |    0
+>>  tests/tcg/{ =3D> i386}/test-i386-fprem.c        |   12 +-
+>>  tests/tcg/{ =3D> i386}/test-i386-muldiv.h       |    0
+>>  tests/tcg/{ =3D> i386}/test-i386-shift.h        |    0
+>>  tests/tcg/{ =3D> i386}/test-i386-ssse3.c        |    0
+>>  tests/tcg/{ =3D> i386}/test-i386-vm86.S         |    0
+>>  tests/tcg/{ =3D> i386}/test-i386.c              |    7 +-
+>>  tests/tcg/{ =3D> i386}/test-i386.h              |    0
+>>  tests/tcg/m68k/Makefile.include               |    2 +
+>>  tests/tcg/m68k/Makefile.target                |    7 +
+>>  tests/tcg/mips/Makefile.include               |   20 +
+>>  tests/tcg/mips/Makefile.target                |   22 +
+>>  tests/tcg/mips/README                         |    7 +
+>>  tests/tcg/{ =3D> mips}/hello-mips.c             |    0
+>>  tests/tcg/multiarch/Makefile.target           |   36 +
+>>  tests/tcg/multiarch/README                    |    1 +
+>>  tests/tcg/{ =3D> multiarch}/linux-test.c        |  113 +-
+>>  tests/tcg/{ =3D> multiarch}/sha1.c              |    0
+>>  tests/tcg/{ =3D> multiarch}/test-mmap.c         |   40 +-
+>>  tests/tcg/{ =3D> multiarch}/testthread.c        |    0
+>>  tests/tcg/ppc/Makefile.include                |    7 +
+>>  tests/tcg/ppc/Makefile.target                 |   12 +
+>>  tests/tcg/riscv/Makefile.include              |   10 +
+>>  tests/tcg/s390x/Makefile.include              |    2 +
+>>  tests/tcg/sh4/Makefile.include                |    4 +
+>>  tests/tcg/sh4/Makefile.target                 |    7 +
+>>  tests/tcg/sparc64/Makefile.include            |    2 +
+>>  tests/tcg/sparc64/Makefile.target             |   11 +
+>>  tests/tcg/test_path.c                         |  157 -
+>>  tests/tcg/x86_64/Makefile.target              |   15 +
+>>  78 files changed, 8068 insertions(+), 641 deletions(-)
+>>  create mode 100644 tests/docker/dockerfiles/debian-alpha-cross.docker
+>>  delete mode 100755 tests/docker/dockerfiles/debian-apt-fake.sh
+>>  create mode 100644 tests/docker/dockerfiles/debian-hppa-cross.docker
+>>  create mode 100644 tests/docker/dockerfiles/debian-m68k-cross.docker
+>>  create mode 100644 tests/docker/dockerfiles/debian-mips64-cross.docker
+>>  create mode 100644 tests/docker/dockerfiles/debian-riscv64-cross.docker
+>>  create mode 100644 tests/docker/dockerfiles/debian-sh4-cross.docker
+>>  create mode 100644 tests/docker/dockerfiles/debian-sid.docker
+>>  create mode 100644 tests/docker/dockerfiles/debian-sparc64-cross.docker
+>>  create mode 100644 tests/tcg/Makefile.include
+>>  create mode 100644 tests/tcg/Makefile.probe
+>>  create mode 100644 tests/tcg/aarch64/Makefile.include
+>>  create mode 100644 tests/tcg/aarch64/Makefile.target
+>>  create mode 100644 tests/tcg/aarch64/fcvt.ref
+>>  delete mode 100644 tests/tcg/alpha/Makefile
+>>  create mode 100644 tests/tcg/alpha/Makefile.include
+>>  create mode 100644 tests/tcg/alpha/Makefile.target
+>>  delete mode 100644 tests/tcg/alpha/crt.s
+>>  create mode 100644 tests/tcg/arm/Makefile.include
+>>  create mode 100644 tests/tcg/arm/Makefile.target
+>>  create mode 100644 tests/tcg/arm/README
+>>  create mode 100644 tests/tcg/arm/fcvt.c
+>>  create mode 100644 tests/tcg/arm/fcvt.ref
+>>  rename tests/tcg/{ =3D> arm}/hello-arm.c (100%)
+>>  rename tests/tcg/{test-arm-iwmmxt.s =3D> arm/test-arm-iwmmxt.S} (100%)
+>>  create mode 100644 tests/tcg/hppa/Makefile.include
+>>  create mode 100644 tests/tcg/hppa/Makefile.target
+>>  create mode 100644 tests/tcg/i386/Makefile.include
+>>  create mode 100644 tests/tcg/i386/Makefile.target
+>>  create mode 100644 tests/tcg/i386/README
+>>  rename tests/tcg/{ =3D> i386}/hello-i386.c (96%)
+>>  rename tests/tcg/{ =3D> i386}/pi_10.com (100%)
+>>  rename tests/tcg/{ =3D> i386}/runcom.c (100%)
+>>  rename tests/tcg/{ =3D> i386}/test-i386-code16.S (100%)
+>>  rename tests/tcg/{ =3D> i386}/test-i386-fprem.c (97%)
+>>  rename tests/tcg/{ =3D> i386}/test-i386-muldiv.h (100%)
+>>  rename tests/tcg/{ =3D> i386}/test-i386-shift.h (100%)
+>>  rename tests/tcg/{ =3D> i386}/test-i386-ssse3.c (100%)
+>>  rename tests/tcg/{ =3D> i386}/test-i386-vm86.S (100%)
+>>  rename tests/tcg/{ =3D> i386}/test-i386.c (99%)
+>>  rename tests/tcg/{ =3D> i386}/test-i386.h (100%)
+>>  create mode 100644 tests/tcg/m68k/Makefile.include
+>>  create mode 100644 tests/tcg/m68k/Makefile.target
+>>  create mode 100644 tests/tcg/mips/Makefile.include
+>>  create mode 100644 tests/tcg/mips/Makefile.target
+>>  create mode 100644 tests/tcg/mips/README
+>>  rename tests/tcg/{ =3D> mips}/hello-mips.c (100%)
+>>  create mode 100644 tests/tcg/multiarch/Makefile.target
+>>  create mode 100644 tests/tcg/multiarch/README
+>>  rename tests/tcg/{ =3D> multiarch}/linux-test.c (86%)
+>>  rename tests/tcg/{ =3D> multiarch}/sha1.c (100%)
+>>  rename tests/tcg/{ =3D> multiarch}/test-mmap.c (93%)
+>>  rename tests/tcg/{ =3D> multiarch}/testthread.c (100%)
 >>  create mode 100644 tests/tcg/ppc/Makefile.include
 >>  create mode 100644 tests/tcg/ppc/Makefile.target
->>  delete mode 100644 tests/tcg/ppc64le/Makefile.include
->>
->> diff --git a/tests/tcg/ppc/Makefile.include b/tests/tcg/ppc/Makefile.inc=
-lude
->> new file mode 100644
->> index 0000000000..b062c30dd3
->> --- /dev/null
->> +++ b/tests/tcg/ppc/Makefile.include
->> @@ -0,0 +1,7 @@
->> +ifeq ($(TARGET_NAME),ppc)
->> +DOCKER_IMAGE=3Ddebian-powerpc-cross
->> +DOCKER_CROSS_COMPILER=3Dpowerpc-linux-gnu-gcc
->> +else ifeq ($(TARGET_NAME),ppc64le)
->> +DOCKER_IMAGE=3Ddebian-ppc64el-cross
->> +DOCKER_CROSS_COMPILER=3Dpowerpc64le-linux-gnu-gcc
->> +endif
->> diff --git a/tests/tcg/ppc/Makefile.target b/tests/tcg/ppc/Makefile.targ=
-et
->> new file mode 100644
->> index 0000000000..f5e08c7376
->> --- /dev/null
->> +++ b/tests/tcg/ppc/Makefile.target
->> @@ -0,0 +1,12 @@
->> +# -*- Mode: makefile -*-
->> +#
->> +# PPC - included from tests/tcg/Makefile
->> +#
->> +
->> +ifneq (,$(findstring 64,$(TARGET_NAME)))
->> +# On PPC64 Linux can be configured with 4k (default) or 64k pages (curr=
-ently broken)
->> +EXTRA_RUNS+=3Drun-test-mmap-4096 #run-test-mmap-65536
->> +else
->> +# On PPC32 Linux supports 4K/16K/64K/256K (but currently only 4k works)
->> +EXTRA_RUNS+=3Drun-test-mmap-4096 #run-test-mmap-16384 run-test-mmap-655=
-36 run-test-mmap-262144
->> +endif
->> diff --git a/tests/tcg/ppc64le/Makefile.include b/tests/tcg/ppc64le/Make=
-file.include
->> deleted file mode 100644
->> index d71cfc9aa7..0000000000
->> --- a/tests/tcg/ppc64le/Makefile.include
->> +++ /dev/null
->> @@ -1,2 +0,0 @@
->> -DOCKER_IMAGE=3Ddebian-ppc64el-cross
->> -DOCKER_CROSS_COMPILER=3Dpowerpc64le-linux-gnu-gcc
+>>  create mode 100644 tests/tcg/riscv/Makefile.include
+>>  create mode 100644 tests/tcg/s390x/Makefile.include
+>>  create mode 100644 tests/tcg/sh4/Makefile.include
+>>  create mode 100644 tests/tcg/sh4/Makefile.target
+>>  create mode 100644 tests/tcg/sparc64/Makefile.include
+>>  create mode 100644 tests/tcg/sparc64/Makefile.target
+>>  delete mode 100644 tests/tcg/test_path.c
+>>  create mode 100644 tests/tcg/x86_64/Makefile.target
 >>
 
 
