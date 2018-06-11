@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fSSPw-0005uu-9u
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:23:54 -0400
+	(envelope-from <sw@weilnetz.de>) id 1fSSTB-0007yo-U0
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:27:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fSSPt-0005QG-2n
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:23:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43864 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fSSPs-0005PI-SV
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:23:48 -0400
-Date: Mon, 11 Jun 2018 22:23:47 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180611192206.339122-3-mst@redhat.com>
-References: <20180611192206.339122-1-mst@redhat.com>
+	(envelope-from <sw@weilnetz.de>) id 1fSSTA-000794-V2
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:27:13 -0400
+References: <20180611011501.10235-1-f4bug@amsat.org>
+	<20180611011501.10235-3-f4bug@amsat.org>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <59507b40-1c5e-8782-1b3b-3690e73563ec@weilnetz.de>
+Date: Mon, 11 Jun 2018 21:27:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180611192206.339122-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 2/2] nvdimm: make persistence option symbolic
+In-Reply-To: <20180611011501.10235-3-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 02/40] vdi: Use definitions from
+ "qemu/units.h"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,191 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Ross Zwisler <ross.zwisler@linux.intel.com>, Dan Williams <dan.j.williams@intel.com>, Igor Mammedov <imammedo@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:VDI" <qemu-block@nongnu.org>
 
-From: Ross Zwisler <ross.zwisler@linux.intel.com>
+Am 11.06.2018 um 03:14 schrieb Philippe Mathieu-Daud=C3=A9:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  block/vdi.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/block/vdi.c b/block/vdi.c
+> index 668af0a828..35b51dc5c5 100644
+> --- a/block/vdi.c
+> +++ b/block/vdi.c
+> @@ -50,6 +50,7 @@
+>   */
+> =20
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qobject-input-visitor.h"
+> @@ -83,9 +84,6 @@
+>  /* Command line option for static images. */
+>  #define BLOCK_OPT_STATIC "static"
+> =20
+> -#define KiB     1024
+> -#define MiB     (KiB * KiB)
+> -
+>  #define SECTOR_SIZE 512
+>  #define DEFAULT_CLUSTER_SIZE (1 * MiB)
+> =20
+> @@ -250,7 +248,7 @@ static void vdi_header_print(VdiHeader *header)
+>      logout("heads       0x%04x\n", header->heads);
+>      logout("sectors     0x%04x\n", header->sectors);
+>      logout("sector size 0x%04x\n", header->sector_size);
+> -    logout("image size  0x%" PRIx64 " B (%" PRIu64 " MiB)\n",
+> +    logout("image size  0x%" PRIx64 " B (%llu MiB)\n",
+>             header->disk_size, header->disk_size / MiB);
+>      logout("block size  0x%04x\n", header->block_size);
+>      logout("block extra 0x%04x\n", header->block_extra);
+> @@ -434,7 +432,7 @@ static int vdi_open(BlockDriverState *bs, QDict *op=
+tions, int flags,
+>          goto fail;
+>      } else if (header.block_size !=3D DEFAULT_CLUSTER_SIZE) {
+>          error_setg(errp, "unsupported VDI image (block size %" PRIu32
+> -                   " is not %u)", header.block_size, DEFAULT_CLUSTER_S=
+IZE);
+> +                   " is not %llu)", header.block_size, DEFAULT_CLUSTER=
+_SIZE);
+>          ret =3D -ENOTSUP;
+>          goto fail;
+>      } else if (header.disk_size >
+>=20
 
-Replace the "nvdimm-cap" option which took numeric arguments such as "2"
-with a more user friendly "nvdimm-persistence" option which takes symbolic
-arguments "cpu" or "mem-ctrl".
-
-Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
-Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-Suggested-by: Dan Williams <dan.j.williams@intel.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- docs/nvdimm.txt          | 31 ++++++++++++-------------------
- include/hw/i386/pc.h     |  2 +-
- include/hw/mem/nvdimm.h  |  3 ++-
- hw/acpi/nvdimm.c         |  4 ++--
- hw/i386/pc.c             | 33 ++++++++++++++++-----------------
- tests/bios-tables-test.c |  2 +-
- 6 files changed, 34 insertions(+), 41 deletions(-)
-
-diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-index 8b48fb4633..24b443b655 100644
---- a/docs/nvdimm.txt
-+++ b/docs/nvdimm.txt
-@@ -154,29 +154,22 @@ guest software that this vNVDIMM device contains a region that cannot
- accept persistent writes. In result, for example, the guest Linux
- NVDIMM driver, marks such vNVDIMM device as read-only.
- 
--Platform Capabilities
-----------------------
-+NVDIMM Persistence
-+------------------
- 
- ACPI 6.2 Errata A added support for a new Platform Capabilities Structure
- which allows the platform to communicate what features it supports related to
--NVDIMM data durability.  Users can provide a capabilities value to a guest via
--the optional "nvdimm-cap" machine command line option:
-+NVDIMM data persistence.  Users can provide a persistence value to a guest via
-+the optional "nvdimm-persistence" machine command line option:
- 
--    -machine pc,accel=kvm,nvdimm,nvdimm-cap=2
-+    -machine pc,accel=kvm,nvdimm,nvdimm-persistence=cpu
- 
--This "nvdimm-cap" field is an integer, and is the combined value of the
--various capability bits defined in table 5-137 of the ACPI 6.2 Errata A spec.
-+There are currently two valid values for this option:
- 
--Here is a quick summary of the three bits that are defined as of that spec:
-+"mem-ctrl" - The platform supports flushing dirty data from the memory
-+             controller to the NVDIMMs in the event of power loss.
- 
--Bit[0] - CPU Cache Flush to NVDIMM Durability on Power Loss Capable.
--Bit[1] - Memory Controller Flush to NVDIMM Durability on Power Loss Capable.
--         Note: If bit 0 is set to 1 then this bit shall be set to 1 as well.
--Bit[2] - Byte Addressable Persistent Memory Hardware Mirroring Capable.
--
--So, a "nvdimm-cap" value of 2 would mean that the platform supports Memory
--Controller Flush on Power Loss, a value of 3 would mean that the platform
--supports CPU Cache Flush and Memory Controller Flush on Power Loss, etc.
--
--For a complete list of the flags available and for more detailed descriptions,
--please consult the ACPI spec.
-+"cpu"      - The platform supports flushing dirty data from the CPU cache to
-+             the NVDIMMs in the event of power loss.  This implies that the
-+             platform also supports flushing dirty data through the memory
-+             controller on power loss.
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 04d1f8c6c3..fc8dedca12 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -76,7 +76,7 @@ struct PCMachineState {
- #define PC_MACHINE_VMPORT           "vmport"
- #define PC_MACHINE_SMM              "smm"
- #define PC_MACHINE_NVDIMM           "nvdimm"
--#define PC_MACHINE_NVDIMM_CAP       "nvdimm-cap"
-+#define PC_MACHINE_NVDIMM_PERSIST   "nvdimm-persistence"
- #define PC_MACHINE_SMBUS            "smbus"
- #define PC_MACHINE_SATA             "sata"
- #define PC_MACHINE_PIT              "pit"
-diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-index 3c82751bab..9340631cfc 100644
---- a/include/hw/mem/nvdimm.h
-+++ b/include/hw/mem/nvdimm.h
-@@ -138,7 +138,8 @@ struct AcpiNVDIMMState {
-     /*
-      * Platform capabilities, section 5.2.25.9 of ACPI 6.2 Errata A
-      */
--    int32_t capabilities;
-+    int32_t persistence;
-+    char    *persistence_string;
- };
- typedef struct AcpiNVDIMMState AcpiNVDIMMState;
- 
-diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-index 87e4280c71..27eeb6609f 100644
---- a/hw/acpi/nvdimm.c
-+++ b/hw/acpi/nvdimm.c
-@@ -404,8 +404,8 @@ static GArray *nvdimm_build_device_structure(AcpiNVDIMMState *state)
-     }
-     g_slist_free(device_list);
- 
--    if (state->capabilities) {
--        nvdimm_build_structure_caps(structures, state->capabilities);
-+    if (state->persistence) {
-+        nvdimm_build_structure_caps(structures, state->persistence);
-     }
- 
-     return structures;
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index f3befe6721..5bba9dcf5a 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2181,31 +2181,30 @@ static void pc_machine_set_nvdimm(Object *obj, bool value, Error **errp)
-     pcms->acpi_nvdimm_state.is_enabled = value;
- }
- 
--static void pc_machine_get_nvdimm_capabilities(Object *obj, Visitor *v,
--                                               const char *name, void *opaque,
--                                               Error **errp)
-+static char *pc_machine_get_nvdimm_persistence(Object *obj, Error **errp)
- {
-     PCMachineState *pcms = PC_MACHINE(obj);
--    uint32_t value = pcms->acpi_nvdimm_state.capabilities;
- 
--    visit_type_uint32(v, name, &value, errp);
-+    return g_strdup(pcms->acpi_nvdimm_state.persistence_string);
- }
- 
--static void pc_machine_set_nvdimm_capabilities(Object *obj, Visitor *v,
--                                               const char *name, void *opaque,
-+static void pc_machine_set_nvdimm_persistence(Object *obj, const char *value,
-                                                Error **errp)
- {
-     PCMachineState *pcms = PC_MACHINE(obj);
--    Error *error = NULL;
--    uint32_t value;
-+    AcpiNVDIMMState *nvdimm_state = &pcms->acpi_nvdimm_state;
- 
--    visit_type_uint32(v, name, &value, &error);
--    if (error) {
--        error_propagate(errp, error);
--        return;
-+    if (strcmp(value, "cpu") == 0)
-+        nvdimm_state->persistence = 3;
-+    else if (strcmp(value, "mem-ctrl") == 0)
-+        nvdimm_state->persistence = 2;
-+    else {
-+        error_report("-machine nvdimm-persistence=%s: unsupported option", value);
-+        exit(EXIT_FAILURE);
-     }
- 
--    pcms->acpi_nvdimm_state.capabilities = value;
-+    g_free(nvdimm_state->persistence_string);
-+    nvdimm_state->persistence_string = g_strdup(value);
- }
- 
- static bool pc_machine_get_smbus(Object *obj, Error **errp)
-@@ -2421,9 +2420,9 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     object_class_property_add_bool(oc, PC_MACHINE_NVDIMM,
-         pc_machine_get_nvdimm, pc_machine_set_nvdimm, &error_abort);
- 
--    object_class_property_add(oc, PC_MACHINE_NVDIMM_CAP, "uint32",
--        pc_machine_get_nvdimm_capabilities,
--        pc_machine_set_nvdimm_capabilities, NULL, NULL, &error_abort);
-+    object_class_property_add_str(oc, PC_MACHINE_NVDIMM_PERSIST,
-+        pc_machine_get_nvdimm_persistence,
-+        pc_machine_set_nvdimm_persistence, &error_abort);
- 
-     object_class_property_add_bool(oc, PC_MACHINE_SMBUS,
-         pc_machine_get_smbus, pc_machine_set_smbus, &error_abort);
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 256d463cb8..4e24930c4b 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -830,7 +830,7 @@ static void test_acpi_tcg_dimm_pxm(const char *machine)
-     memset(&data, 0, sizeof(data));
-     data.machine = machine;
-     data.variant = ".dimmpxm";
--    test_acpi_one(" -machine nvdimm=on,nvdimm-cap=3"
-+    test_acpi_one(" -machine nvdimm=on,nvdimm-persistence=cpu"
-                   " -smp 4,sockets=4"
-                   " -m 128M,slots=3,maxmem=1G"
-                   " -numa node,mem=32M,nodeid=0"
--- 
-MST
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
