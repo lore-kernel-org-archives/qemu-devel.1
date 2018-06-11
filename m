@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43671)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSBSj-0006HN-Eb
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:17:38 -0400
+	id 1fSBSm-0006Kt-D5
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:17:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSBSi-0003jx-Ic
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:17:37 -0400
+	id 1fSBSl-0003lK-Hq
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:17:40 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 10 Jun 2018 22:14:59 -0300
-Message-Id: <20180611011501.10235-39-f4bug@amsat.org>
+Date: Sun, 10 Jun 2018 22:15:00 -0300
+Message-Id: <20180611011501.10235-40-f4bug@amsat.org>
 In-Reply-To: <20180611011501.10235-1-f4bug@amsat.org>
 References: <20180611011501.10235-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 38/40] hw/virtio: Use the IEC binary prefix
+Subject: [Qemu-devel] [PATCH v4 39/40] hw/rdma: Use the IEC binary prefix
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Yuval Shaia <yuval.shaia@oracle.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
 It eases code review, unit is explicit.
 
@@ -39,30 +39,32 @@ Patch generated using:
 and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
 ---
- include/hw/virtio/virtio-net.h | 3 ++-
+ hw/rdma/vmw/pvrdma.h | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/virtio/virtio-net.h b/include/hw/virtio/virtio-net.h
-index 02484dc94c..4d7f3c82ca 100644
---- a/include/hw/virtio/virtio-net.h
-+++ b/include/hw/virtio/virtio-net.h
-@@ -14,6 +14,7 @@
- #ifndef QEMU_VIRTIO_NET_H
- #define QEMU_VIRTIO_NET_H
+diff --git a/hw/rdma/vmw/pvrdma.h b/hw/rdma/vmw/pvrdma.h
+index 0b46dc5a9b..81e0e0e99c 100644
+--- a/hw/rdma/vmw/pvrdma.h
++++ b/hw/rdma/vmw/pvrdma.h
+@@ -16,6 +16,7 @@
+ #ifndef PVRDMA_PVRDMA_H
+ #define PVRDMA_PVRDMA_H
  
 +#include "qemu/units.h"
- #include "standard-headers/linux/virtio_net.h"
- #include "hw/virtio/virtio.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci/msix.h"
  
-@@ -44,7 +45,7 @@ typedef struct virtio_net_conf
- } virtio_net_conf;
+@@ -30,7 +31,7 @@
+ #define RDMA_MSIX_BAR_IDX    0
+ #define RDMA_REG_BAR_IDX     1
+ #define RDMA_UAR_BAR_IDX     2
+-#define RDMA_BAR0_MSIX_SIZE  (16 * 1024)
++#define RDMA_BAR0_MSIX_SIZE  (16 * KiB)
+ #define RDMA_BAR1_REGS_SIZE  64
+ #define RDMA_BAR2_UAR_SIZE   (0x1000 * MAX_UCS) /* each uc gets page */
  
- /* Maximum packet size we can receive from tap device: header + 64k */
--#define VIRTIO_NET_MAX_BUFSIZE (sizeof(struct virtio_net_hdr) + (64 << 10))
-+#define VIRTIO_NET_MAX_BUFSIZE (sizeof(struct virtio_net_hdr) + (64 * KiB))
- 
- typedef struct VirtIONetQueue {
-     VirtQueue *rx_vq;
 -- 
 2.17.1
