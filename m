@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fSQo8-0000WZ-KS
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:40:48 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fSQq9-0001iY-Ue
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:42:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fSQo4-0007jN-BB
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:40:44 -0400
-Resent-Message-Id: <E1fSQo4-0007jN-BB@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21134)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fSQo3-0007i3-OB
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:40:40 -0400
-In-Reply-To: <20180611171007.4165-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152873880691.675.7083058694168904457@d39dc562802a>
+	(envelope-from <ehabkost@redhat.com>) id 1fSQq6-0000C8-ET
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:42:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52742)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fSQq6-0000Bu-6W
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:42:46 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon, 11 Jun 2018 14:42:30 -0300
+Message-Id: <20180611174243.31070-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 11 Jun 2018 10:40:07 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add ldn_*_p() and stn_*_p() and use
- them in exec.c
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/13] Python queue, 2018-06-11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +24,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, patches@linaro.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjExMTcxMDA3LjQxNjUtMS1wZXRlci5tYXlkZWxsQGxpbmFyby5vcmcK
-U3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzNdIEFkZCBsZG5fKl9wKCkgYW5kIHN0bl8q
-X3AoKSBhbmQgdXNlIHRoZW0gaW4gZXhlYy5jCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
-LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
-IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
-a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
-ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
-IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
-cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10g
-ICAgICAgICAgICAgICBwYXRjaGV3LzE1Mjg3MzgwMDctMjkxMjItMS1naXQtc2VuZC1lbWFpbC10
-aHV0aEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMTUyODczODAwNy0yOTEyMi0xLWdpdC1zZW5kLWVt
-YWlsLXRodXRoQHJlZGhhdC5jb20KIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8y
-MDE4MDYxMDE4NDkyNy4xOTMwOS0xLXZrdXpuZXRzQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4
-MDYxMDE4NDkyNy4xOTMwOS0xLXZrdXpuZXRzQHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAg
-ICAgICAgICAgcGF0Y2hldy8yMDE4MDYxMTE3MTAwNy40MTY1LTEtcGV0ZXIubWF5ZGVsbEBsaW5h
-cm8ub3JnIC0+IHBhdGNoZXcvMjAxODA2MTExNzEwMDcuNDE2NS0xLXBldGVyLm1heWRlbGxAbGlu
-YXJvLm9yZwogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNjExMTcyMzU1
-LjEyMDY3LTEtZWhhYmtvc3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNjExMTcyMzU1LjEy
-MDY3LTEtZWhhYmtvc3RAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-CjQ0MDNiNGZkYjggZXhlYy5jOiBVc2Ugc3RuX3AoKSBhbmQgbGRuX3AoKSBpbnN0ZWFkIG9mIGV4
-cGxpY2l0IHN3aXRjaGVzCjg0ZWM5YWYxOTMgZXhlYy5jOiBEb24ndCBhY2NpZGVudGFsbHkgc2ln
-bi1leHRlbmQgNC1ieXRlIGxvYWRzIGluIHN1YnBhZ2VfcmVhZCgpCmYwMWU1ZGQ3YjQgYnN3YXA6
-IEFkZCBuZXcgc3RuXypfcCgpIGFuZCBsZG5fKl9wKCkgbWVtb3J5IGFjY2VzcyBmdW5jdGlvbnMK
-Cj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMzogYnN3YXA6IEFkZCBuZXcg
-c3RuXypfcCgpIGFuZCBsZG5fKl9wKCkgbWVtb3J5IGFjY2VzcyBmdW5jdGlvbnMuLi4KRVJST1I6
-IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBwYXJlbnRo
-ZXNpcwojNTU6IEZJTEU6IGluY2x1ZGUvZXhlYy9jcHUtYWxsLmg6MTM2OgorI2RlZmluZSBsZG5f
-cChwLCBzeiBsZG5fYmVfcChwLCBzeikKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTA0
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNo
-ZWNraW5nIFBBVENIIDIvMzogZXhlYy5jOiBEb24ndCBhY2NpZGVudGFsbHkgc2lnbi1leHRlbmQg
-NC1ieXRlIGxvYWRzIGluIHN1YnBhZ2VfcmVhZCgpLi4uCkNoZWNraW5nIFBBVENIIDMvMzogZXhl
-Yy5jOiBVc2Ugc3RuX3AoKSBhbmQgbGRuX3AoKSBpbnN0ZWFkIG9mIGV4cGxpY2l0IHN3aXRjaGVz
-Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
-CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
-dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
-ZWRoYXQuY29t
+The following changes since commit 0d2fa03dae4fbe185a082f361342b1e30aed45=
+82:
+
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+80608' into staging (2018-06-08 16:26:51 +0100)
+
+are available in the Git repository at:
+
+  git://github.com/ehabkost/qemu.git tags/python-next-pull-request
+
+for you to fetch changes up to c7883412440905b41dde7e70f4af782932e80e90:
+
+  python: Remove scripts/ordereddict.py (2018-06-08 16:40:54 -0300)
+
+----------------------------------------------------------------
+Python queue, 2018-06-11
+
+* Make code compatible with Python 3 using 'futurize --stage1'
+* Require Python >=3D 2.7 and remove Python 2.6 compatibility
+  modules
+
+----------------------------------------------------------------
+
+Eduardo Habkost (13):
+  python: futurize -f libfuturize.fixes.fix_print_with_import
+  python: futurize -f libfuturize.fixes.fix_absolute_import
+  python: futurize -f libfuturize.fixes.fix_next_call
+  python: futurize -f lib2to3.fixes.fix_has_key
+  python: futurize -f lib2to3.fixes.fix_standarderror
+  python: futurize -f lib2to3.fixes.fix_reduce
+  python: futurize -f lib2to3.fixes.fix_tuple_params
+  python: futurize -f lib2to3.fixes.fix_renames
+  python: futurize -f lib2to3.fixes.fix_except
+  python: futurize -f lib2to3.fixes.fix_numliterals
+  configure: Require Python 2.7 or newer
+  python: Remove scripts/argparse.py
+  python: Remove scripts/ordereddict.py
+
+ configure                                |    4 +-
+ Makefile                                 |    1 -
+ scripts/analyse-9p-simpletrace.py        |   89 +-
+ scripts/analyse-locks-simpletrace.py     |    3 +-
+ scripts/analyze-migration.py             |   11 +-
+ scripts/argparse.py                      | 2406 ----------------------
+ scripts/dump-guest-memory.py             |    1 +
+ scripts/ordereddict.py                   |  128 --
+ scripts/qapi/common.py                   |    5 +-
+ scripts/replay-dump.py                   |   21 +-
+ scripts/signrom.py                       |    1 +
+ scripts/simpletrace.py                   |    5 +-
+ scripts/vmstate-static-checker.py        |   89 +-
+ scripts/device-crash-test                |    3 +-
+ scripts/kvm/kvm_flightrecorder           |   21 +-
+ scripts/kvm/vmxcap                       |    1 +
+ scripts/qmp/qemu-ga-client               |   10 +-
+ scripts/qmp/qmp                          |   24 +-
+ scripts/qmp/qmp-shell                    |   40 +-
+ scripts/qmp/qom-fuse                     |   11 +-
+ scripts/qmp/qom-get                      |   12 +-
+ scripts/qmp/qom-list                     |   16 +-
+ scripts/qmp/qom-set                      |   10 +-
+ scripts/qmp/qom-tree                     |   16 +-
+ tests/Makefile.include                   |    1 -
+ tests/docker/docker.py                   |   17 +-
+ tests/docker/travis.py                   |   15 +-
+ tests/guest-debug/test-gdbstub.py        |    1 +
+ tests/image-fuzzer/qcow2/__init__.py     |    3 +-
+ tests/image-fuzzer/qcow2/fuzz.py         |    1 +
+ tests/image-fuzzer/qcow2/layout.py       |    3 +-
+ tests/image-fuzzer/runner.py             |   42 +-
+ tests/migration/guestperf/engine.py      |   29 +-
+ tests/migration/guestperf/plot.py        |   17 +-
+ tests/migration/guestperf/shell.py       |   19 +-
+ tests/qemu-iotests/093                   |    2 +-
+ tests/qemu-iotests/096                   |    4 +-
+ tests/qemu-iotests/118                   |   24 +-
+ tests/qemu-iotests/136                   |    2 +-
+ tests/qemu-iotests/149                   |    3 +-
+ tests/qemu-iotests/165                   |    3 +-
+ tests/qemu-iotests/iotests.py            |    5 +-
+ tests/qemu-iotests/nbd-fault-injector.py |    7 +-
+ tests/qemu-iotests/qcow2.py              |   39 +-
+ tests/qemu-iotests/qed.py                |   17 +-
+ tests/vm/basevm.py                       |    3 +-
+ 46 files changed, 341 insertions(+), 2844 deletions(-)
+ delete mode 100644 scripts/argparse.py
+ delete mode 100644 scripts/ordereddict.py
+
+--=20
+2.18.0.rc1.1.g3f1ff2140
