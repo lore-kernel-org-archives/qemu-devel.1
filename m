@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fSNmm-00050Y-QL
+	(envelope-from <mreitz@redhat.com>) id 1fSNmm-00050S-NM
 	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:27:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fSNml-00020k-LD
+	(envelope-from <mreitz@redhat.com>) id 1fSNml-00020T-5w
 	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:27:08 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 11 Jun 2018 16:26:08 +0200
-Message-Id: <20180611142611.6609-27-mreitz@redhat.com>
+Date: Mon, 11 Jun 2018 16:26:05 +0200
+Message-Id: <20180611142611.6609-24-mreitz@redhat.com>
 In-Reply-To: <20180611142611.6609-1-mreitz@redhat.com>
 References: <20180611142611.6609-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 26/29] throttle: Fix crash on reopen
+Subject: [Qemu-devel] [PULL 23/29] iotests: Fix 219's timing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,151 +22,132 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Alberto Garcia <berto@igalia.com>
+219 has two issues that may lead to sporadic failure, both of which are
+the result of issuing query-jobs too early after a job has been
+modified.  This can then lead to different results based on whether the
+modification has taken effect already or not.
 
-The throttle block filter can be reopened, and with this it is
-possible to change the throttle group that the filter belongs to.
+First, query-jobs is issued right after the job has been created.
+Besides its current progress possibly being in any random state (which
+has already been taken care of), its total progress too is basically
+arbitrary, because the job may not yet have been able to determine it.
+This patch addresses this by just filtering the total progress, like
+what has been done for the current progress already.  However, for more
+clarity, the filtering is changed to replace the values by a string
+'FILTERED' instead of deleting them.
 
-The way the code does that is the following:
+Secondly, query-jobs is issued right after a job has been resumed.  The
+job may or may not yet have had the time to actually perform any I/O,
+and thus its current progress may or may not have advanced.  To make
+sure it has indeed advanced (which is what the reference output already
+assumes), keep querying it until it has.
 
-  - On throttle_reopen_prepare(): create a new ThrottleGroupMember
-    and attach it to the new throttle group.
-
-  - On throttle_reopen_commit(): detach the old ThrottleGroupMember,
-    delete it and replace it with the new one.
-
-The problem with this is that by replacing the ThrottleGroupMember the
-previous value of io_limits_disabled is lost, causing an assertion
-failure in throttle_co_drain_end().
-
-This problem can be reproduced by reopening a throttle node:
-
-   $QEMU -monitor stdio
-   -object throttle-group,id=tg0,x-iops-total=1000 \
-   -blockdev node-name=hd0,driver=qcow2,file.driver=file,file.filename=hd.qcow2 \
-   -blockdev node-name=root,driver=throttle,throttle-group=tg0,file=hd0,read-only=on
-
-   (qemu) block_stream root
-   block/throttle.c:214: throttle_co_drain_end: Assertion `tgm->io_limits_disabled' failed.
-
-Since we only want to change the throttle group on reopen there's no
-need to create a ThrottleGroupMember and discard the old one. It's
-easier if we simply detach it from its current group and attach it to
-the new one.
-
-Signed-off-by: Alberto Garcia <berto@igalia.com>
-Message-id: 20180608151536.7378-1-berto@igalia.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20180606190628.8170-1-mreitz@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/throttle.c | 54 +++++++++++++++++++++++++++++-------------------
- 1 file changed, 33 insertions(+), 21 deletions(-)
+ tests/qemu-iotests/219     | 26 ++++++++++++++++++++------
+ tests/qemu-iotests/219.out | 10 +++++-----
+ 2 files changed, 25 insertions(+), 11 deletions(-)
 
-diff --git a/block/throttle.c b/block/throttle.c
-index e298827f95..f617f23a12 100644
---- a/block/throttle.c
-+++ b/block/throttle.c
-@@ -36,9 +36,12 @@ static QemuOptsList throttle_opts = {
-     },
- };
- 
--static int throttle_configure_tgm(BlockDriverState *bs,
--                                  ThrottleGroupMember *tgm,
--                                  QDict *options, Error **errp)
-+/*
-+ * If this function succeeds then the throttle group name is stored in
-+ * @group and must be freed by the caller.
-+ * If there's an error then @group remains unmodified.
-+ */
-+static int throttle_parse_options(QDict *options, char **group, Error **errp)
- {
-     int ret;
-     const char *group_name;
-@@ -63,8 +66,7 @@ static int throttle_configure_tgm(BlockDriverState *bs,
-         goto fin;
-     }
- 
--    /* Register membership to group with name group_name */
--    throttle_group_register_tgm(tgm, group_name, bdrv_get_aio_context(bs));
-+    *group = g_strdup(group_name);
-     ret = 0;
- fin:
-     qemu_opts_del(opts);
-@@ -75,6 +77,8 @@ static int throttle_open(BlockDriverState *bs, QDict *options,
-                          int flags, Error **errp)
- {
-     ThrottleGroupMember *tgm = bs->opaque;
-+    char *group;
-+    int ret;
- 
-     bs->file = bdrv_open_child(NULL, options, "file", bs,
-                                &child_file, false, errp);
-@@ -86,7 +90,14 @@ static int throttle_open(BlockDriverState *bs, QDict *options,
-     bs->supported_zero_flags = bs->file->bs->supported_zero_flags |
-                                BDRV_REQ_WRITE_UNCHANGED;
- 
--    return throttle_configure_tgm(bs, tgm, options, errp);
-+    ret = throttle_parse_options(options, &group, errp);
-+    if (ret == 0) {
-+        /* Register membership to group with name group_name */
-+        throttle_group_register_tgm(tgm, group, bdrv_get_aio_context(bs));
-+        g_free(group);
-+    }
+diff --git a/tests/qemu-iotests/219 b/tests/qemu-iotests/219
+index 898a26eef0..c03bbdb294 100755
+--- a/tests/qemu-iotests/219
++++ b/tests/qemu-iotests/219
+@@ -42,11 +42,24 @@ def test_pause_resume(vm):
+             iotests.log(vm.qmp(pause_cmd, **{pause_arg: 'job0'}))
+             pause_wait(vm, 'job0')
+             iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
+-            iotests.log(vm.qmp('query-jobs'))
++            result = vm.qmp('query-jobs')
++            iotests.log(result)
 +
-+    return ret;
- }
++            old_progress = result['return'][0]['current-progress']
++            total_progress = result['return'][0]['total-progress']
  
- static void throttle_close(BlockDriverState *bs)
-@@ -162,35 +173,36 @@ static void throttle_attach_aio_context(BlockDriverState *bs,
- static int throttle_reopen_prepare(BDRVReopenState *reopen_state,
-                                    BlockReopenQueue *queue, Error **errp)
- {
--    ThrottleGroupMember *tgm;
-+    int ret;
-+    char *group = NULL;
+             iotests.log(vm.qmp(resume_cmd, **{resume_arg: 'job0'}))
+             iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
+-            iotests.log(vm.qmp('query-jobs'))
++            if old_progress < total_progress:
++                # Wait for the job to advance
++                while result['return'][0]['current-progress'] == old_progress:
++                    result = vm.qmp('query-jobs')
++                iotests.log(result)
++            else:
++                # Already reached the end, so the job cannot advance
++                # any further; therefore, the query-jobs result can be
++                # logged immediately
++                iotests.log(vm.qmp('query-jobs'))
  
-     assert(reopen_state != NULL);
-     assert(reopen_state->bs != NULL);
+ def test_job_lifecycle(vm, job, job_args, has_ready=False):
+     iotests.log('')
+@@ -58,12 +71,13 @@ def test_job_lifecycle(vm, job, job_args, has_ready=False):
+     iotests.log(vm.qmp(job, job_id='job0', **job_args))
  
--    reopen_state->opaque = g_new0(ThrottleGroupMember, 1);
--    tgm = reopen_state->opaque;
--
--    return throttle_configure_tgm(reopen_state->bs, tgm, reopen_state->options,
--            errp);
-+    ret = throttle_parse_options(reopen_state->options, &group, errp);
-+    reopen_state->opaque = group;
-+    return ret;
- }
+     # Depending on the storage, the first request may or may not have completed
+-    # yet, so filter out the progress. Later query-job calls don't need the
+-    # filtering because the progress is made deterministic by the block job
+-    # speed
++    # yet (and the total progress may not have been fully determined yet), so
++    # filter out the progress. Later query-job calls don't need the filtering
++    # because the progress is made deterministic by the block job speed
+     result = vm.qmp('query-jobs')
+     for j in result['return']:
+-        del j['current-progress']
++        j['current-progress'] = 'FILTERED'
++        j['total-progress'] = 'FILTERED'
+     iotests.log(result)
  
- static void throttle_reopen_commit(BDRVReopenState *reopen_state)
- {
--    ThrottleGroupMember *old_tgm = reopen_state->bs->opaque;
--    ThrottleGroupMember *new_tgm = reopen_state->opaque;
-+    BlockDriverState *bs = reopen_state->bs;
-+    ThrottleGroupMember *tgm = bs->opaque;
-+    char *group = reopen_state->opaque;
-+
-+    assert(group);
+     # undefined -> created -> running
+diff --git a/tests/qemu-iotests/219.out b/tests/qemu-iotests/219.out
+index 346801b655..6dc07bc41e 100644
+--- a/tests/qemu-iotests/219.out
++++ b/tests/qemu-iotests/219.out
+@@ -3,7 +3,7 @@ Launching VM...
  
--    throttle_group_unregister_tgm(old_tgm);
--    g_free(old_tgm);
--    reopen_state->bs->opaque = new_tgm;
-+    if (strcmp(group, throttle_group_get_name(tgm))) {
-+        throttle_group_unregister_tgm(tgm);
-+        throttle_group_register_tgm(tgm, group, bdrv_get_aio_context(bs));
-+    }
-+    g_free(reopen_state->opaque);
-     reopen_state->opaque = NULL;
- }
+ Starting block job: drive-mirror (auto-finalize: True; auto-dismiss: True)
+ {u'return': {}}
+-{u'return': [{u'status': u'running', u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++{u'return': [{u'status': u'running', u'current-progress': 'FILTERED', u'total-progress': 'FILTERED', u'id': u'job0', u'type': u'mirror'}]}
+ {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'created', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+ {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
  
- static void throttle_reopen_abort(BDRVReopenState *reopen_state)
- {
--    ThrottleGroupMember *tgm = reopen_state->opaque;
--
--    throttle_group_unregister_tgm(tgm);
--    g_free(tgm);
-+    g_free(reopen_state->opaque);
-     reopen_state->opaque = NULL;
- }
+@@ -93,7 +93,7 @@ Waiting for PENDING state...
+ 
+ Starting block job: drive-backup (auto-finalize: True; auto-dismiss: True)
+ {u'return': {}}
+-{u'return': [{u'status': u'running', u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': [{u'status': u'running', u'current-progress': 'FILTERED', u'total-progress': 'FILTERED', u'id': u'job0', u'type': u'backup'}]}
+ {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'created', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+ {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+ 
+@@ -144,7 +144,7 @@ Waiting for PENDING state...
+ 
+ Starting block job: drive-backup (auto-finalize: True; auto-dismiss: False)
+ {u'return': {}}
+-{u'return': [{u'status': u'running', u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': [{u'status': u'running', u'current-progress': 'FILTERED', u'total-progress': 'FILTERED', u'id': u'job0', u'type': u'backup'}]}
+ {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'created', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+ {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+ 
+@@ -203,7 +203,7 @@ Waiting for PENDING state...
+ 
+ Starting block job: drive-backup (auto-finalize: False; auto-dismiss: True)
+ {u'return': {}}
+-{u'return': [{u'status': u'running', u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': [{u'status': u'running', u'current-progress': 'FILTERED', u'total-progress': 'FILTERED', u'id': u'job0', u'type': u'backup'}]}
+ {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'created', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+ {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+ 
+@@ -262,7 +262,7 @@ Waiting for PENDING state...
+ 
+ Starting block job: drive-backup (auto-finalize: False; auto-dismiss: False)
+ {u'return': {}}
+-{u'return': [{u'status': u'running', u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': [{u'status': u'running', u'current-progress': 'FILTERED', u'total-progress': 'FILTERED', u'id': u'job0', u'type': u'backup'}]}
+ {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'created', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+ {u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
  
 -- 
 2.17.1
