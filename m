@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fSLdJ-00083T-Tp
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:09:14 -0400
+	(envelope-from <david@redhat.com>) id 1fSLks-0001tq-UD
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:17:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fSLdG-0003LV-NC
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:09:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51178 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fSLdG-0003L8-Ir
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:09:10 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 387EF400225D
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 12:09:10 +0000 (UTC)
-Date: Mon, 11 Jun 2018 13:09:07 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180611120906.GE2661@work-vm>
-References: <20180608130846.22234-1-dgilbert@redhat.com>
-	<87a7s1il25.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a7s1il25.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3 0/7] Reenable hmp for preconfig mode
+	(envelope-from <david@redhat.com>) id 1fSLkr-0008NJ-8f
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:17:02 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Mon, 11 Jun 2018 14:16:45 +0200
+Message-Id: <20180611121655.19616-2-david@redhat.com>
+In-Reply-To: <20180611121655.19616-1-david@redhat.com>
+References: <20180611121655.19616-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 01/11] pc-dimm: remove leftover "struct
+ pc_dimms_capacity"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,16 +20,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> Let's also provide "quit", both in HMP and QMP.
+Not needed anymore, let's drop it.
 
-I tried enabling quit, but it fails with an incorrect
-state transition.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/mem/pc-dimm.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-Dave
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 12da89d562..62b34a992e 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -27,11 +27,6 @@
+ #include "sysemu/numa.h"
+ #include "trace.h"
+ 
+-typedef struct pc_dimms_capacity {
+-     uint64_t size;
+-     Error    **errp;
+-} pc_dimms_capacity;
+-
+ void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+                          uint64_t align, Error **errp)
+ {
+-- 
+2.17.1
