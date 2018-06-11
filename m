@@ -1,31 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fSQNb-0001gt-Ql
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:13:20 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fSQRy-0003ja-Bp
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:17:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fSQNY-00024Q-Hh
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:13:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59646 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fSQNY-000241-DL
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:13:16 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CF5B84023131
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 17:13:15 +0000 (UTC)
-Date: Mon, 11 Jun 2018 18:13:12 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180611171311.GK2661@work-vm>
-References: <20180523111817.1463-1-quintela@redhat.com>
-	<20180523111817.1463-6-quintela@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1fSQRv-0004iN-2M
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:17:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42394
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fSQRu-0004hj-Sr
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:17:46 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5BHDrBA100960
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 13:17:46 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2jhug4dbq6-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 13:17:45 -0400
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 11 Jun 2018 18:17:44 +0100
+References: <20180611135223.81865-1-borntraeger@de.ibm.com>
+	<c5ec6c27-42cb-e354-b861-8485e72cf1e3@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 11 Jun 2018 19:17:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180523111817.1463-6-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v13 05/12] migration: Multifd channels
- always wait on the sem
+In-Reply-To: <c5ec6c27-42cb-e354-b861-8485e72cf1e3@redhat.com>
+Content-Language: en-US
+Message-Id: <4ba094ae-31dd-08c8-3795-8f708f6cf823@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] s390x/ipl: Try to detect Linux vs
+ non Linux for initial IPL PSW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,74 +44,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> Either for quit, sync or packet, we first wake them.
+
+
+On 06/11/2018 06:16 PM, Thomas Huth wrote:
+> On 11.06.2018 15:52, Christian Borntraeger wrote:
+>> Right now the IPL device always starts from address 0x10000 (the usual
+>> Linux entry point). To run other guests (e.g. test programs) it is
+>> useful to use the IPL PSW from address 0. We can use the Linux magic
+>> at 0x10008 to decide.
+>>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>> v1->v2:
+>> 	- use LINUX_MAGIC_ADDR define
+>> 	- use assert for valid iplpsw pointer
+>> 	- add endianess conversion
+>>  hw/s390x/ipl.c | 15 ++++++++++++++-
+>>  1 file changed, 14 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+>> index 04245b5258..3790153fa9 100644
+>> --- a/hw/s390x/ipl.c
+>> +++ b/hw/s390x/ipl.c
+>> @@ -29,6 +29,7 @@
+>>  #include "exec/exec-all.h"
+>>  
+>>  #define KERN_IMAGE_START                0x010000UL
+>> +#define LINUX_MAGIC_ADDR                0x010008UL
+>>  #define KERN_PARM_AREA                  0x010480UL
+>>  #define INITRD_START                    0x800000UL
+>>  #define INITRD_PARM_START               0x010408UL
+>> @@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
+>>  static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      S390IPLState *ipl = S390_IPL(dev);
+>> -    uint64_t pentry = KERN_IMAGE_START;
+>> +    uint64_t *iplpsw;
+>> +    uint64_t pentry;
+>> +    char *magic;
+>>      int kernel_size;
+>>      Error *err = NULL;
+>>  
+>> @@ -157,6 +160,16 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>>                                 NULL, 1, EM_S390, 0, 0);
+>>          if (kernel_size < 0) {
+>>              kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
+>> +            /* if this is Linux use KERN_IMAGE_START */
+>> +            magic = rom_ptr(LINUX_MAGIC_ADDR);
+>> +            if (magic && !memcmp(magic, "S390EP", 6)) {
+>> +                pentry = KERN_IMAGE_START;
+>> +            } else {
+>> +                /* if not Linux use the IPL PSW */
+>> +                iplpsw = rom_ptr(0);
+>> +                assert(iplpsw);
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Hmm, wait, what if load_image_targphys() failed and returned a
+> kernel_size < 0 ... won't we hit that assert() in that case? I think you
+> might want to check for kernel_size > 0 (or even > 8) here first.
 
-Again, I'd prefer if this was merged in with later stuff that
-changes it heavily; but I realise it's difficult to split, and those
-do clean it up, so:
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  migration/ram.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
+Yes you are right.  
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index ab715cc148..90f62144e2 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -868,6 +868,7 @@ static void *multifd_send_thread(void *opaque)
->      p->num_packets = 1;
->  
->      while (true) {
-> +        qemu_sem_wait(&p->sem);
->          qemu_mutex_lock(&p->mutex);
->          multifd_send_fill_packet(p);
->          if (p->quit) {
-> @@ -875,7 +876,9 @@ static void *multifd_send_thread(void *opaque)
->              break;
->          }
->          qemu_mutex_unlock(&p->mutex);
-> -        qemu_sem_wait(&p->sem);
-> +        /* this is impossible */
-> +        error_setg(&local_err, "multifd_send_thread: Unknown command");
-> +        break;
->      }
->  
->  out:
-> @@ -1019,6 +1022,7 @@ static void *multifd_recv_thread(void *opaque)
->      trace_multifd_recv_thread_start(p->id);
->  
->      while (true) {
-> +        qemu_sem_wait(&p->sem);
->          qemu_mutex_lock(&p->mutex);
->          if (false)  {
->              /* ToDo: Packet reception goes here */
-> @@ -1033,9 +1037,14 @@ static void *multifd_recv_thread(void *opaque)
->              break;
->          }
->          qemu_mutex_unlock(&p->mutex);
-> -        qemu_sem_wait(&p->sem);
-> +        /* this is impossible */
-> +        error_setg(&local_err, "multifd_recv_thread: Unknown command");
-> +        break;
->      }
->  
-> +    if (local_err) {
-> +        multifd_recv_terminate_threads(local_err);
-> +    }
->      qemu_mutex_lock(&p->mutex);
->      p->running = false;
->      qemu_mutex_unlock(&p->mutex);
-> -- 
-> 2.17.0
+>> +                pentry = be64_to_cpu(*iplpsw) & 0x7fffffffUL;
+
+This is also not proper. the IPL PSW is more or less an ESA (31bit) PSW. So I rather need to get
+the 4 byte address part from location 4 (and only do a byteswap there).
+>> +            }
+>>          }
+>>          if (kernel_size < 0) {
+>>              error_setg(&err, "could not load kernel '%s'", ipl->kernel);
+>>
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  Thomas
+> 
