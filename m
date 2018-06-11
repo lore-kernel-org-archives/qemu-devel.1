@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fSNm0-0004AC-8u
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:26:24 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fSNm2-0004CN-Nw
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:26:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fSNlz-0001XM-3v
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:26:20 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fSNm1-0001YS-Kq
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:26:22 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 11 Jun 2018 16:25:43 +0200
-Message-Id: <20180611142611.6609-2-mreitz@redhat.com>
-In-Reply-To: <20180611142611.6609-1-mreitz@redhat.com>
-References: <20180611142611.6609-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 01/29] block/file-posix: Pass FD to locking
- helpers
+Date: Mon, 11 Jun 2018 16:25:42 +0200
+Message-Id: <20180611142611.6609-1-mreitz@redhat.com>
+Subject: [Qemu-devel] [PULL 00/29] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,126 +20,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-raw_apply_lock_bytes() and raw_check_lock_bytes() currently take a
-BDRVRawState *, but they only use the lock_fd field.  During image
-creation, we do not have a BDRVRawState, but we do have an FD; so if we
-want to reuse the functions there, we should modify them to receive only
-the FD.
+The following changes since commit 9f55925b8f50a962d1d08d815044db7767ae3838:
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Message-id: 20180509215336.31304-2-mreitz@redhat.com
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- block/file-posix.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+  Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-3.0-pull-request' into staging (2018-06-11 12:46:16 +0100)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 513d371bb1..7583bbfbb3 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -643,7 +643,7 @@ typedef enum {
-  * file; if @unlock == true, also unlock the unneeded bytes.
-  * @shared_perm_lock_bits is the mask of all permissions that are NOT shared.
-  */
--static int raw_apply_lock_bytes(BDRVRawState *s,
-+static int raw_apply_lock_bytes(int fd,
-                                 uint64_t perm_lock_bits,
-                                 uint64_t shared_perm_lock_bits,
-                                 bool unlock, Error **errp)
-@@ -654,13 +654,13 @@ static int raw_apply_lock_bytes(BDRVRawState *s,
-     PERM_FOREACH(i) {
-         int off = RAW_LOCK_PERM_BASE + i;
-         if (perm_lock_bits & (1ULL << i)) {
--            ret = qemu_lock_fd(s->lock_fd, off, 1, false);
-+            ret = qemu_lock_fd(fd, off, 1, false);
-             if (ret) {
-                 error_setg(errp, "Failed to lock byte %d", off);
-                 return ret;
-             }
-         } else if (unlock) {
--            ret = qemu_unlock_fd(s->lock_fd, off, 1);
-+            ret = qemu_unlock_fd(fd, off, 1);
-             if (ret) {
-                 error_setg(errp, "Failed to unlock byte %d", off);
-                 return ret;
-@@ -670,13 +670,13 @@ static int raw_apply_lock_bytes(BDRVRawState *s,
-     PERM_FOREACH(i) {
-         int off = RAW_LOCK_SHARED_BASE + i;
-         if (shared_perm_lock_bits & (1ULL << i)) {
--            ret = qemu_lock_fd(s->lock_fd, off, 1, false);
-+            ret = qemu_lock_fd(fd, off, 1, false);
-             if (ret) {
-                 error_setg(errp, "Failed to lock byte %d", off);
-                 return ret;
-             }
-         } else if (unlock) {
--            ret = qemu_unlock_fd(s->lock_fd, off, 1);
-+            ret = qemu_unlock_fd(fd, off, 1);
-             if (ret) {
-                 error_setg(errp, "Failed to unlock byte %d", off);
-                 return ret;
-@@ -687,8 +687,7 @@ static int raw_apply_lock_bytes(BDRVRawState *s,
- }
- 
- /* Check "unshared" bytes implied by @perm and ~@shared_perm in the file. */
--static int raw_check_lock_bytes(BDRVRawState *s,
--                                uint64_t perm, uint64_t shared_perm,
-+static int raw_check_lock_bytes(int fd, uint64_t perm, uint64_t shared_perm,
-                                 Error **errp)
- {
-     int ret;
-@@ -698,7 +697,7 @@ static int raw_check_lock_bytes(BDRVRawState *s,
-         int off = RAW_LOCK_SHARED_BASE + i;
-         uint64_t p = 1ULL << i;
-         if (perm & p) {
--            ret = qemu_lock_fd_test(s->lock_fd, off, 1, true);
-+            ret = qemu_lock_fd_test(fd, off, 1, true);
-             if (ret) {
-                 char *perm_name = bdrv_perm_names(p);
-                 error_setg(errp,
-@@ -715,7 +714,7 @@ static int raw_check_lock_bytes(BDRVRawState *s,
-         int off = RAW_LOCK_PERM_BASE + i;
-         uint64_t p = 1ULL << i;
-         if (!(shared_perm & p)) {
--            ret = qemu_lock_fd_test(s->lock_fd, off, 1, true);
-+            ret = qemu_lock_fd_test(fd, off, 1, true);
-             if (ret) {
-                 char *perm_name = bdrv_perm_names(p);
-                 error_setg(errp,
-@@ -752,11 +751,11 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
- 
-     switch (op) {
-     case RAW_PL_PREPARE:
--        ret = raw_apply_lock_bytes(s, s->perm | new_perm,
-+        ret = raw_apply_lock_bytes(s->lock_fd, s->perm | new_perm,
-                                    ~s->shared_perm | ~new_shared,
-                                    false, errp);
-         if (!ret) {
--            ret = raw_check_lock_bytes(s, new_perm, new_shared, errp);
-+            ret = raw_check_lock_bytes(s->lock_fd, new_perm, new_shared, errp);
-             if (!ret) {
-                 return 0;
-             }
-@@ -764,7 +763,8 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-         op = RAW_PL_ABORT;
-         /* fall through to unlock bytes. */
-     case RAW_PL_ABORT:
--        raw_apply_lock_bytes(s, s->perm, ~s->shared_perm, true, &local_err);
-+        raw_apply_lock_bytes(s->lock_fd, s->perm, ~s->shared_perm,
-+                             true, &local_err);
-         if (local_err) {
-             /* Theoretically the above call only unlocks bytes and it cannot
-              * fail. Something weird happened, report it.
-@@ -773,7 +773,8 @@ static int raw_handle_perm_lock(BlockDriverState *bs,
-         }
-         break;
-     case RAW_PL_COMMIT:
--        raw_apply_lock_bytes(s, new_perm, ~new_shared, true, &local_err);
-+        raw_apply_lock_bytes(s->lock_fd, new_perm, ~new_shared,
-+                             true, &local_err);
-         if (local_err) {
-             /* Theoretically the above call only unlocks bytes and it cannot
-              * fail. Something weird happened, report it.
+are available in the Git repository at:
+
+  git://github.com/XanClic/qemu.git tags/pull-block-2018-06-11
+
+for you to fetch changes up to c50abd175a88cd41c2c08339de91f6f6e4a7b162:
+
+  iotests: Add case for a corrupted inactive image (2018-06-11 16:18:45 +0200)
+
+----------------------------------------------------------------
+Block patches:
+- Various bug fixes
+- Removal of qemu-img convert's deprecated -s option
+- qemu-io now exits with an error when a command failed
+
+----------------------------------------------------------------
+Alberto Garcia (1):
+  throttle: Fix crash on reopen
+
+Max Reitz (25):
+  block/file-posix: Pass FD to locking helpers
+  block/file-posix: File locking during creation
+  iotests: Add creation test to 153
+  qemu-img: Amendment support implies create_opts
+  block: Add Error parameter to bdrv_amend_options
+  qemu-option: Pull out "Supported options" print
+  qemu-img: Add print_amend_option_help()
+  qemu-img: Recognize no creation support in -o help
+  iotests: Test help option for unsupporting formats
+  iotests: Rework 113
+  qcow2: Repair OFLAG_COPIED when fixing leaks
+  iotests: Repairing error during snapshot deletion
+  qemu-io: Drop command functions' return values
+  qemu-io: Let command functions return error code
+  qemu-io: Exit with error when a command failed
+  iotests.py: Add qemu_io_silent
+  iotests: Let 216 make use of qemu-io's exit code
+  qemu-img: Resolve relative backing paths in rebase
+  iotests: Add test for rebasing with relative paths
+  qemu-img: Special post-backing convert handling
+  iotests: Test post-backing convert target behavior
+  iotests: Fix 219's timing
+  block: Make bdrv_is_writable() public
+  qcow2: Do not mark inactive images corrupt
+  iotests: Add case for a corrupted inactive image
+
+Thomas Huth (1):
+  qemu-img: Remove deprecated -s snapshot_id_or_name option
+
+Vladimir Sementsov-Ogievskiy (2):
+  iotests: improve pause_job
+  block/qcow2-bitmap: fix free_bitmap_clusters
+
+ include/block/block.h         |   4 +-
+ include/block/block_int.h     |   3 +-
+ include/qemu-io.h             |   9 +-
+ block.c                       |  25 ++-
+ block/file-posix.c            |  64 ++++++--
+ block/qcow2-bitmap.c          |   1 -
+ block/qcow2-refcount.c        |  25 ++-
+ block/qcow2.c                 |  74 +++++----
+ block/throttle.c              |  54 ++++---
+ qemu-img.c                    | 108 +++++++++++--
+ qemu-io-cmds.c                | 276 +++++++++++++++++++---------------
+ qemu-io.c                     |  62 +++++---
+ util/qemu-option.c            |   1 -
+ qemu-doc.texi                 |   7 -
+ qemu-img-cmds.hx              |   4 +-
+ qemu-img.texi                 |   7 +-
+ tests/qemu-iotests/024        |  82 +++++++++-
+ tests/qemu-iotests/024.out    |  30 ++++
+ tests/qemu-iotests/029        |   2 +-
+ tests/qemu-iotests/060        |  30 ++++
+ tests/qemu-iotests/060.out    |  18 ++-
+ tests/qemu-iotests/061.out    |   7 -
+ tests/qemu-iotests/080        |   4 +-
+ tests/qemu-iotests/080.out    |   4 +-
+ tests/qemu-iotests/082        |   9 ++
+ tests/qemu-iotests/082.out    |  53 ++++---
+ tests/qemu-iotests/112.out    |   5 +-
+ tests/qemu-iotests/113        |  19 ++-
+ tests/qemu-iotests/113.out    |   7 +-
+ tests/qemu-iotests/122        |  42 ++++++
+ tests/qemu-iotests/122.out    |  18 +++
+ tests/qemu-iotests/153        |  18 +++
+ tests/qemu-iotests/153.out    |  13 ++
+ tests/qemu-iotests/216        |  23 +--
+ tests/qemu-iotests/216.out    |  17 +--
+ tests/qemu-iotests/217        |  90 +++++++++++
+ tests/qemu-iotests/217.out    |  42 ++++++
+ tests/qemu-iotests/219        |  26 +++-
+ tests/qemu-iotests/219.out    |  10 +-
+ tests/qemu-iotests/group      |   1 +
+ tests/qemu-iotests/iotests.py |  18 ++-
+ 41 files changed, 970 insertions(+), 342 deletions(-)
+ create mode 100755 tests/qemu-iotests/217
+ create mode 100644 tests/qemu-iotests/217.out
+
 -- 
 2.17.1
