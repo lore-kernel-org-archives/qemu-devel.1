@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fSKJJ-0000gx-Su
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 06:44:30 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSKMW-0001hs-1Q
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 06:47:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fSKJF-0006ds-0l
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 06:44:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58414 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fSKJE-0006dW-Rx
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 06:44:24 -0400
-References: <7CECC2DFC21538489F72729DF5EFB4D9C1486C@DGGEMM501-MBX.china.huawei.com>
-	<20180601122307.3e6ade66@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DB00F4E4@dggeml511-mbx.china.huawei.com>
-	<50481bea-bb5b-dd71-b712-6418c3bb29ac@redhat.com>
-	<77604174-3c15-a8d3-3ea3-53a1759cd885@redhat.com>
-	<e2e0ff2b-139e-0582-c8f9-9a716780ff1f@redhat.com>
-	<56943de0-74f6-0746-c2c2-eeb9fdeabd74@redhat.com>
-	<4409ea2d-971d-8898-bd1a-9e9b9e9172dc@redhat.com>
-	<ced449d6-1778-6641-d055-4fedda442a47@redhat.com>
-	<AE460DFB-87F8-45A3-A007-E59C3B23BB67@zju.edu.cn>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <679ab02f-b110-c80a-c99e-1301b7fa1725@redhat.com>
-Date: Mon, 11 Jun 2018 12:44:20 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSKMR-00082o-Bp
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 06:47:48 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:41574)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSKMR-00082M-5H
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 06:47:43 -0400
+Received: by mail-qk0-x241.google.com with SMTP id w23-v6so12596527qkb.8
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 03:47:43 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180608123307.24773-1-alex.bennee@linaro.org>
+	<a8e3ddaa-816d-d590-580f-94d32b5d56be@amsat.org>
+	<877en520sg.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9144e516-2161-73dc-06a9-8982332c58a4@amsat.org>
+Date: Mon, 11 Jun 2018 07:47:34 -0300
 MIME-Version: 1.0
-In-Reply-To: <AE460DFB-87F8-45A3-A007-E59C3B23BB67@zju.edu.cn>
+In-Reply-To: <877en520sg.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] An emulation failure occurs,
- if I hotplug vcpus immediately after the VM start
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 00/49] fix building of tests/tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,90 +36,286 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?5rWZ5aSn6YKu566x?= <linzc@zju.edu.cn>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, Igor Mammedov <imammedo@redhat.com>, xuyandong <xuyandong2@huawei.com>, Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, lidonglin <lidonglin@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Huangweidong (C)" <weidong.huang@huawei.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, richard.henderson@linaro.org
+Cc: stefanb@linux.vnet.ibm.com, agraf@suse.de, qemu-devel@nongnu.org, marcandre.lureau@redhat.com, cota@braap.org, stefanha@redhat.com, pbonzini@redhat.com, famz@redhat.com, aurelien@aurel32.net
 
-On 07.06.2018 18:03, =E6=B5=99=E5=A4=A7=E9=82=AE=E7=AE=B1 wrote:
-> Hi=EF=BC=8Call
-> I still have a question after reading your discussion: Will seabios det=
-ect the change of address space even if we add_region and del_region auto=
-matically? I guess that seabios may not take this change into considerati=
-on.
-
-Hi,
-
-We would just change the way how KVM memory slots are updated. This is
-right now not atomic, but would be later on. It should not have any
-other effect.
-
-Thanks
-
->=20
-> Looking forward to your replies,
-> Thanks
->=20
->>> On Jun 7, 2018, at 20:55, David Hildenbrand <david@redhat.com> wrote:
+On 06/11/2018 05:19 AM, Alex Bennée wrote:
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+>> On 06/08/2018 09:32 AM, Alex Bennée wrote:
+>>> Hi,
 >>>
->>> On 07.06.2018 14:36, Paolo Bonzini wrote:
->>> On 07/06/2018 13:36, David Hildenbrand wrote:
->>>>> The dirty bitmap would be synced in kvm_region_del (so it's not tru=
-e
->>>>> that kvm_region_del would disappear, but almost :)).
->>>> I was rather concerned when doing a KVM_SET_USER_MEMORY_REGIONS whil=
-e
->>>> some (already present) memory region is performing dirty tracking an=
-d
->>>> therefore has a dirty_bitmap pointer assigned.
->>>>
->>>> As we have to expect that all different kinds of parameters can chan=
-ge
->>>> (e.g. the size of a slot as I pointed out), the old bitmap cannot be
->>>> reused. At least not atomically -  we could create a new one and the
->>>> simply or the old content.
->>>>
->>>> Well, we could make that dirty tracking a special case ("all dirty
->>>> tracking data will be lost in case doing a KVM_SET_USER_MEMORY_REGIO=
-NS"
->>>> - but this again could lead to races (if the bitmap sync happens bef=
-ore
->>>> KVM_SET_USER_MEMORY_REGIONS)). It's tricky to get it right :)
+>>> Not a super amount has changed since the last version but review
+>>> comments and review tags have been added. The new patches at the end
+>>> enable a .travis.yml run and try and make the image building part of
+>>> check-tcg -j safe. Essentially the problem is trying to avoid
+>>> re-building the images multiple times. The additional issue is wanting
+>>> an upto date Debian SID image whenever we actually build an image but
+>>> not forcing a rebuild every time.
 >>>
->>> At the point where QEMU calls region_del, the guest is not supposed t=
-o
->>> access the region anymore, so it's okay to do the final sync there.  =
-The
->>> same race exists now already.
->>
->> The point is that KVM_SET_USER_MEMORY_REGIONS is the big hammer, not t=
-he
->> fine grained region_add/region_del. All regions are suddenly involved.
->> So we have to handle dirty_bitmaps somehow.
->>
->> But I agree that those that would actually change
->> (split/resized/whatever) should not be currently dirty tracked (or at =
-if
->> they are, they should be able to live with the possible race).
->>
->> Devil is in the detail :)
->>
+>>> Essentially I'd like to encode a conditional dependency when:
+>>>   - the target image doesn't exist
+>>>   - or the target image is out of date w.r.t. the dockerfike
 >>>
->>> Paolo
+>>> I'm thinking this is going to involve some sort of extension to the
+>>> docker.py script to feed the Makefile.
 >>>
->>>>> The rmap is more interesting.  Perhaps it can be just rebuilt on ev=
-ery
->>>>> KVM_SET_USER_MEMORY_REGIONS call.
+>>> A number of the prerequisite patches have already been pulled in the
+>>> docker fixes series however I think this series is ready to go in now.
+>>> Unless there are any objections I'll send a pull on Monday.
+>>>
+>>> Current unreviewed patches:
+>>>
+>>>   patch 0017/tests tcg i386 add runner for test i386 fprem.patch needs review
+>>>   patch 0039/docker move debian powerpc cross to sid based bui.patch needs review
+>>>   patch 0040/tests tcg enable building for PowerPC.patch needs review
+>>>   patch 0042/Makefile.target add clean build guest tests targe.patch needs review
+>>>   patch 0044/tests tcg add run diff and skip helper macros.patch needs review
+>>>   patch 0045/tests tcg override runners for broken tests.patch needs review
+>>>   patch 0046/target sh4 Fix translator.c assertion failure for.patch needs review
 >>
+>> Is this patch related/required to this series?
+>> It looks it should enter via another tree.
 >>
->> --=20
+>> The SH4 tests pass without it:
 >>
->> Thanks,
+>> $ make run-tcg-tests-sh4-linux-user -j1
+>>   ...
+>>   RUN-TESTS for sh4
+>>   TEST    test-mmap (default) on sh4
+>>   TEST    sha1 on sh4
+>>   TEST    linux-test on sh4
+>>   TEST    testthread on sh4
+>>   TEST    test-mmap (4096 byte pages) on sh4
+> 
+> Not with --enable-debug, but yeah I'll drop as it should come via Rich's
+> TCG tree.
+
+Oh I just tested the basic options, didn't go with all the matrix :/
+
+Indeed,
+
+  RUN-TESTS for sh4
+  TEST    test-mmap (default) on sh4
+  TEST    sha1 on sh4
+  TEST    linux-test on sh4
+  TEST    testthread on sh4
+qemu-sh4: accel/tcg/translator.c:66: translator_loop: Assertion
+`db->is_jmp == DISAS_NEXT' failed.
+qemu: uncaught target signal 11 (Segmentation fault) - core dumped
+Segmentation fault
+make: *** [tests/Makefile.include:950: run-tcg-tests-sh4-linux-user] Error 2
+
+I'd still prefer this enter via Richard tree, and keep this PR
+testing-only (in case if bisection in translate.c, this might goes very
+slow due to your changes in ./configure triggering full rebuild).
+
+> 
 >>
->> David / dhildenb
->=20
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+>>>   patch 0047/tests add top level make dependency for docker bu.patch needs review
+>>>   patch 0048/tests docker prevent sub makes re building debian.patch needs review
+>>>   patch 0049/.travis.yml add check tcg test.patch needs review
+>>>
+>>>
+>>> Alex Bennée (46):
+>>>   configure: add support for --cross-cc-FOO
+>>>   configure: move i386_cc to cross_cc_i386
+>>>   configure: allow user to specify --cross-cc-cflags-foo=
+>>>   configure: set cross_cc_FOO for host compiler
+>>>   docker: Add "cc" subcommand
+>>>   docker: extend "cc" command to accept compiler
+>>>   docker: allow "cc" command to run in user context
+>>>   docker: Makefile.include introduce DOCKER_SCRIPT
+>>>   tests/tcg: move architecture independent tests into subdir
+>>>   tests/tcg/multiarch: enable additional linux-test tests
+>>>   tests/tcg/multiarch: move most output to stdout
+>>>   tests/tcg: move i386 specific tests into subdir
+>>>   tests/tcg: enable building for i386
+>>>   tests/tcg/i386: fix test-i386
+>>>   tests/tcg/i386: add runner for test-i386-fprem
+>>>   tests/tcg/x86_64: add Makefile.target
+>>>   tests/tcg/i386/test-i386: use modern vector_size attributes
+>>>   tests/tcg/i386/test-i386: fix printf format
+>>>   tests/tcg: move ARM specific tests into subdir
+>>>   tests/tcg: enable building for ARM
+>>>   tests/tcg/arm: fix up test-arm-iwmmxt test
+>>>   tests/tcg: enable building for AArch64
+>>>   tests/tcg/arm: add fcvt test cases for AArch32/64
+>>>   tests/tcg: move MIPS specific tests into subdir
+>>>   tests/tcg: enable building for MIPS
+>>>   tests/tcg/mips: include common mips hello-mips
+>>>   tests/tcg: enable building for s390x
+>>>   tests/tcg: enable building for ppc64
+>>>   tests/tcg: enable building for Alpha
+>>>   tests/tcg/alpha: add Alpha specific tests
+>>>   tests/tcg: enable building for HPPA
+>>>   tests/tcg: enable building for m68k
+>>>   tests/tcg: enable building for sh4
+>>>   tests/tcg: enable building for sparc64
+>>>   tests/tcg: enable building for mips64
+>>>   tests/tcg: enable building for RISCV64
+>>>   docker: move debian-powerpc-cross to sid based build
+>>>   tests/tcg: enable building for PowerPC
+>>>   tests/tcg/Makefile: update to be called from Makefile.target
+>>>   Makefile.target: add (clean-/build-)guest-tests targets
+>>>   tests/Makefile.include: add [build|clean|check]-tcg targets
+>>>   tests/tcg: add run, diff, and skip helper macros
+>>>   tests/tcg: override runners for broken tests
+>>>   tests: add top-level make dependency for docker builds
+>>>   tests/docker: prevent sub-makes re-building debian-sid
+>>>   .travis.yml: add check-tcg test
+>>>
+>>> Fam Zheng (2):
+>>>   tests/tcg/multiarch: Build fix for linux-test
+>>>   tests/tcg/i386: Build fix for hello-i386
+>>>
+>>> Richard Henderson (1):
+>>>   target/sh4: Fix translator.c assertion failure for gUSA
+>>>
+>>>  .travis.yml                                   |    6 +
+>>>  MAINTAINERS                                   |   14 +
+>>>  Makefile.target                               |    5 +
+>>>  configure                                     |  134 +-
+>>>  target/sh4/translate.c                        |   81 +-
+>>>  tests/Makefile.include                        |   38 +-
+>>>  tests/docker/Makefile.include                 |   31 +-
+>>>  tests/docker/docker.py                        |   31 +
+>>>  .../dockerfiles/debian-alpha-cross.docker     |   12 +
+>>>  tests/docker/dockerfiles/debian-apt-fake.sh   |   46 -
+>>>  .../dockerfiles/debian-hppa-cross.docker      |   12 +
+>>>  .../dockerfiles/debian-m68k-cross.docker      |   12 +
+>>>  .../dockerfiles/debian-mips64-cross.docker    |   12 +
+>>>  .../dockerfiles/debian-powerpc-cross.docker   |   39 +-
+>>>  .../dockerfiles/debian-riscv64-cross.docker   |   12 +
+>>>  .../dockerfiles/debian-sh4-cross.docker       |   12 +
+>>>  tests/docker/dockerfiles/debian-sid.docker    |   32 +
+>>>  .../dockerfiles/debian-sparc64-cross.docker   |   12 +
+>>>  tests/docker/dockerfiles/debian8.docker       |    3 -
+>>>  tests/tcg/Makefile                            |  219 +-
+>>>  tests/tcg/Makefile.include                    |   89 +
+>>>  tests/tcg/Makefile.probe                      |   31 +
+>>>  tests/tcg/README                              |   69 +-
+>>>  tests/tcg/aarch64/Makefile.include            |    8 +
+>>>  tests/tcg/aarch64/Makefile.target             |   17 +
+>>>  tests/tcg/aarch64/fcvt.ref                    | 3268 +++++++++++++++++
+>>>  tests/tcg/alpha/Makefile                      |   35 -
+>>>  tests/tcg/alpha/Makefile.include              |    2 +
+>>>  tests/tcg/alpha/Makefile.target               |   18 +
+>>>  tests/tcg/alpha/crt.s                         |   26 -
+>>>  tests/tcg/alpha/hello-alpha.c                 |    2 +
+>>>  tests/tcg/alpha/test-cond.c                   |    1 +
+>>>  tests/tcg/alpha/test-ovf.c                    |    2 +
+>>>  tests/tcg/arm/Makefile.include                |    8 +
+>>>  tests/tcg/arm/Makefile.target                 |   32 +
+>>>  tests/tcg/arm/README                          |   11 +
+>>>  tests/tcg/arm/fcvt.c                          |  458 +++
+>>>  tests/tcg/arm/fcvt.ref                        | 3268 +++++++++++++++++
+>>>  tests/tcg/{ => arm}/hello-arm.c               |    0
+>>>  .../test-arm-iwmmxt.S}                        |    0
+>>>  tests/tcg/hppa/Makefile.include               |    2 +
+>>>  tests/tcg/hppa/Makefile.target                |    6 +
+>>>  tests/tcg/i386/Makefile.include               |    9 +
+>>>  tests/tcg/i386/Makefile.target                |   51 +
+>>>  tests/tcg/i386/README                         |   38 +
+>>>  tests/tcg/{ => i386}/hello-i386.c             |    1 +
+>>>  tests/tcg/{ => i386}/pi_10.com                |  Bin
+>>>  tests/tcg/{ => i386}/runcom.c                 |    0
+>>>  tests/tcg/{ => i386}/test-i386-code16.S       |    0
+>>>  tests/tcg/{ => i386}/test-i386-fprem.c        |   12 +-
+>>>  tests/tcg/{ => i386}/test-i386-muldiv.h       |    0
+>>>  tests/tcg/{ => i386}/test-i386-shift.h        |    0
+>>>  tests/tcg/{ => i386}/test-i386-ssse3.c        |    0
+>>>  tests/tcg/{ => i386}/test-i386-vm86.S         |    0
+>>>  tests/tcg/{ => i386}/test-i386.c              |    7 +-
+>>>  tests/tcg/{ => i386}/test-i386.h              |    0
+>>>  tests/tcg/m68k/Makefile.include               |    2 +
+>>>  tests/tcg/m68k/Makefile.target                |    7 +
+>>>  tests/tcg/mips/Makefile.include               |   20 +
+>>>  tests/tcg/mips/Makefile.target                |   22 +
+>>>  tests/tcg/mips/README                         |    7 +
+>>>  tests/tcg/{ => mips}/hello-mips.c             |    0
+>>>  tests/tcg/multiarch/Makefile.target           |   36 +
+>>>  tests/tcg/multiarch/README                    |    1 +
+>>>  tests/tcg/{ => multiarch}/linux-test.c        |  113 +-
+>>>  tests/tcg/{ => multiarch}/sha1.c              |    0
+>>>  tests/tcg/{ => multiarch}/test-mmap.c         |   40 +-
+>>>  tests/tcg/{ => multiarch}/testthread.c        |    0
+>>>  tests/tcg/ppc/Makefile.include                |    7 +
+>>>  tests/tcg/ppc/Makefile.target                 |   12 +
+>>>  tests/tcg/riscv/Makefile.include              |   10 +
+>>>  tests/tcg/s390x/Makefile.include              |    2 +
+>>>  tests/tcg/sh4/Makefile.include                |    4 +
+>>>  tests/tcg/sh4/Makefile.target                 |    7 +
+>>>  tests/tcg/sparc64/Makefile.include            |    2 +
+>>>  tests/tcg/sparc64/Makefile.target             |   11 +
+>>>  tests/tcg/test_path.c                         |  157 -
+>>>  tests/tcg/x86_64/Makefile.target              |   15 +
+>>>  78 files changed, 8068 insertions(+), 641 deletions(-)
+>>>  create mode 100644 tests/docker/dockerfiles/debian-alpha-cross.docker
+>>>  delete mode 100755 tests/docker/dockerfiles/debian-apt-fake.sh
+>>>  create mode 100644 tests/docker/dockerfiles/debian-hppa-cross.docker
+>>>  create mode 100644 tests/docker/dockerfiles/debian-m68k-cross.docker
+>>>  create mode 100644 tests/docker/dockerfiles/debian-mips64-cross.docker
+>>>  create mode 100644 tests/docker/dockerfiles/debian-riscv64-cross.docker
+>>>  create mode 100644 tests/docker/dockerfiles/debian-sh4-cross.docker
+>>>  create mode 100644 tests/docker/dockerfiles/debian-sid.docker
+>>>  create mode 100644 tests/docker/dockerfiles/debian-sparc64-cross.docker
+>>>  create mode 100644 tests/tcg/Makefile.include
+>>>  create mode 100644 tests/tcg/Makefile.probe
+>>>  create mode 100644 tests/tcg/aarch64/Makefile.include
+>>>  create mode 100644 tests/tcg/aarch64/Makefile.target
+>>>  create mode 100644 tests/tcg/aarch64/fcvt.ref
+>>>  delete mode 100644 tests/tcg/alpha/Makefile
+>>>  create mode 100644 tests/tcg/alpha/Makefile.include
+>>>  create mode 100644 tests/tcg/alpha/Makefile.target
+>>>  delete mode 100644 tests/tcg/alpha/crt.s
+>>>  create mode 100644 tests/tcg/arm/Makefile.include
+>>>  create mode 100644 tests/tcg/arm/Makefile.target
+>>>  create mode 100644 tests/tcg/arm/README
+>>>  create mode 100644 tests/tcg/arm/fcvt.c
+>>>  create mode 100644 tests/tcg/arm/fcvt.ref
+>>>  rename tests/tcg/{ => arm}/hello-arm.c (100%)
+>>>  rename tests/tcg/{test-arm-iwmmxt.s => arm/test-arm-iwmmxt.S} (100%)
+>>>  create mode 100644 tests/tcg/hppa/Makefile.include
+>>>  create mode 100644 tests/tcg/hppa/Makefile.target
+>>>  create mode 100644 tests/tcg/i386/Makefile.include
+>>>  create mode 100644 tests/tcg/i386/Makefile.target
+>>>  create mode 100644 tests/tcg/i386/README
+>>>  rename tests/tcg/{ => i386}/hello-i386.c (96%)
+>>>  rename tests/tcg/{ => i386}/pi_10.com (100%)
+>>>  rename tests/tcg/{ => i386}/runcom.c (100%)
+>>>  rename tests/tcg/{ => i386}/test-i386-code16.S (100%)
+>>>  rename tests/tcg/{ => i386}/test-i386-fprem.c (97%)
+>>>  rename tests/tcg/{ => i386}/test-i386-muldiv.h (100%)
+>>>  rename tests/tcg/{ => i386}/test-i386-shift.h (100%)
+>>>  rename tests/tcg/{ => i386}/test-i386-ssse3.c (100%)
+>>>  rename tests/tcg/{ => i386}/test-i386-vm86.S (100%)
+>>>  rename tests/tcg/{ => i386}/test-i386.c (99%)
+>>>  rename tests/tcg/{ => i386}/test-i386.h (100%)
+>>>  create mode 100644 tests/tcg/m68k/Makefile.include
+>>>  create mode 100644 tests/tcg/m68k/Makefile.target
+>>>  create mode 100644 tests/tcg/mips/Makefile.include
+>>>  create mode 100644 tests/tcg/mips/Makefile.target
+>>>  create mode 100644 tests/tcg/mips/README
+>>>  rename tests/tcg/{ => mips}/hello-mips.c (100%)
+>>>  create mode 100644 tests/tcg/multiarch/Makefile.target
+>>>  create mode 100644 tests/tcg/multiarch/README
+>>>  rename tests/tcg/{ => multiarch}/linux-test.c (86%)
+>>>  rename tests/tcg/{ => multiarch}/sha1.c (100%)
+>>>  rename tests/tcg/{ => multiarch}/test-mmap.c (93%)
+>>>  rename tests/tcg/{ => multiarch}/testthread.c (100%)
+>>>  create mode 100644 tests/tcg/ppc/Makefile.include
+>>>  create mode 100644 tests/tcg/ppc/Makefile.target
+>>>  create mode 100644 tests/tcg/riscv/Makefile.include
+>>>  create mode 100644 tests/tcg/s390x/Makefile.include
+>>>  create mode 100644 tests/tcg/sh4/Makefile.include
+>>>  create mode 100644 tests/tcg/sh4/Makefile.target
+>>>  create mode 100644 tests/tcg/sparc64/Makefile.include
+>>>  create mode 100644 tests/tcg/sparc64/Makefile.target
+>>>  delete mode 100644 tests/tcg/test_path.c
+>>>  create mode 100644 tests/tcg/x86_64/Makefile.target
+>>>
+> 
+> 
+> --
+> Alex Bennée
+> 
