@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fSS8s-0000bo-50
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:06:15 -0400
+	(envelope-from <sw@weilnetz.de>) id 1fSSNW-0004uC-1B
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:21:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fSS8p-0004lt-0C
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:06:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54536)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fSS8o-0004lJ-Nj
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:06:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DF1CF804F5
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 19:06:09 +0000 (UTC)
-Date: Mon, 11 Jun 2018 16:06:07 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180611190607.GU7451@localhost.localdomain>
-References: <20180606135051.GR7451@localhost.localdomain>
-	<1528372809-175770-1-git-send-email-imammedo@redhat.com>
-	<20180608132105.GA24764@localhost.localdomain>
-	<20180611151625.4b2420b8@redhat.com>
+	(envelope-from <sw@weilnetz.de>) id 1fSSNU-0003yW-S2
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:21:22 -0400
+References: <20180611011501.10235-1-f4bug@amsat.org>
+	<20180611011501.10235-35-f4bug@amsat.org>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <0e83902b-01dc-42ba-d708-8baa0fc16b9c@weilnetz.de>
+Date: Mon, 11 Jun 2018 21:20:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180611151625.4b2420b8@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] vl: fix use of --daemonize with
- --preconfig
+In-Reply-To: <20180611011501.10235-35-f4bug@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kj7AYo4YczuQ8bsfCrBfJUyhkjyMLb4UX"
+Subject: Re: [Qemu-devel] [PATCH v4 34/40] hw/net: Use the IEC binary prefix
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,149 +25,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, ldoktor@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Beniamino Galvani <b.galvani@gmail.com>, "open list:Allwinner-a10" <qemu-arm@nongnu.org>
 
-On Mon, Jun 11, 2018 at 03:16:25PM +0200, Igor Mammedov wrote:
-> On Fri, 8 Jun 2018 10:21:05 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kj7AYo4YczuQ8bsfCrBfJUyhkjyMLb4UX
+From: Stefan Weil <sw@weilnetz.de>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Thomas Huth <thuth@redhat.com>
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-trivial@nongnu.org,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ Beniamino Galvani <b.galvani@gmail.com>,
+ "open list:Allwinner-a10" <qemu-arm@nongnu.org>
+Message-ID: <0e83902b-01dc-42ba-d708-8baa0fc16b9c@weilnetz.de>
+Subject: Re: [Qemu-devel] [PATCH v4 34/40] hw/net: Use the IEC binary prefix
+ definitions
+References: <20180611011501.10235-1-f4bug@amsat.org>
+ <20180611011501.10235-35-f4bug@amsat.org>
+In-Reply-To: <20180611011501.10235-35-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Am 11.06.2018 um 03:14 schrieb Philippe Mathieu-Daud=C3=A9:
+> It eases code review, unit is explicit.
 >=20
-> > On Thu, Jun 07, 2018 at 02:00:09PM +0200, Igor Mammedov wrote:
-> > > When using --daemonize, the initial lead process will fork a child =
-and
-> > > then wait to be notified that setup is complete via a pipe, before =
-it
-> > > exits.  When using --preconfig there is an extra call to main_loop(=
+> Patch generated using:
+>=20
+>   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include=
+/hw/
+>=20
+> and modified manually.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Reviewed-by: Stefan Weil <sw@weilnetz.de>
+> ---
+>  hw/net/ne2000.h                 | 5 +++--
+>  include/hw/net/allwinner_emac.h | 5 +++--
+>  hw/net/e1000e.c                 | 7 ++++---
+>  hw/net/e1000x_common.c          | 3 ++-
+>  hw/net/eepro100.c               | 3 +--
+>  5 files changed, 13 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/hw/net/ne2000.h b/hw/net/ne2000.h
+> index adb8021bd1..2cd193e4c6 100644
+> --- a/hw/net/ne2000.h
+> +++ b/hw/net/ne2000.h
+> @@ -1,11 +1,12 @@
+>  #ifndef HW_NE2000_H
+>  #define HW_NE2000_H
+> =20
+> +#include "qemu/units.h"
+>  #include "hw/hw.h"
+>  #include "net/net.h"
+> =20
+> -#define NE2000_PMEM_SIZE    (32*1024)
+> -#define NE2000_PMEM_START   (16*1024)
+> +#define NE2000_PMEM_SIZE    (32 * KiB)
+> +#define NE2000_PMEM_START   (16 * KiB)
+>  #define NE2000_PMEM_END     (NE2000_PMEM_SIZE+NE2000_PMEM_START)
+>  #define NE2000_MEM_SIZE     NE2000_PMEM_END
+> =20
+> diff --git a/include/hw/net/allwinner_emac.h b/include/hw/net/allwinner=
+_emac.h
+> index 4cc8aab7ec..905a43deb4 100644
+> --- a/include/hw/net/allwinner_emac.h
+> +++ b/include/hw/net/allwinner_emac.h
+> @@ -23,6 +23,7 @@
+>  #ifndef ALLWINNER_EMAC_H
+>  #define ALLWINNER_EMAC_H
+> =20
+> +#include "qemu/units.h"
+>  #include "net/net.h"
+>  #include "qemu/fifo8.h"
+>  #include "hw/net/mii.h"
+> @@ -125,8 +126,8 @@
+>  #define EMAC_INT_RX         (1 << 8)
+> =20
+>  /* Due to lack of specifications, size of fifos is chosen arbitrarily =
+*/
+> -#define TX_FIFO_SIZE        (4 * 1024)
+> -#define RX_FIFO_SIZE        (32 * 1024)
+> +#define TX_FIFO_SIZE        (4 * KiB)
+> +#define RX_FIFO_SIZE        (32 * KiB)
+> =20
+>  #define NUM_TX_FIFOS        2
+>  #define RX_HDR_SIZE         8
+> diff --git a/hw/net/e1000e.c b/hw/net/e1000e.c
+> index cda8d48333..510ddb3897 100644
+> --- a/hw/net/e1000e.c
+> +++ b/hw/net/e1000e.c
+> @@ -34,6 +34,7 @@
+>  */
+> =20
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
+>  #include "net/net.h"
+>  #include "net/tap.h"
+>  #include "qemu/range.h"
+> @@ -81,10 +82,10 @@ typedef struct E1000EState {
+>  #define E1000E_IO_IDX       2
+>  #define E1000E_MSIX_IDX     3
+> =20
+> -#define E1000E_MMIO_SIZE    (128 * 1024)
+> -#define E1000E_FLASH_SIZE   (128 * 1024)
+> +#define E1000E_MMIO_SIZE    (128 * KiB)
+> +#define E1000E_FLASH_SIZE   (128 * KiB)
+>  #define E1000E_IO_SIZE      (32)
+> -#define E1000E_MSIX_SIZE    (16 * 1024)
+> +#define E1000E_MSIX_SIZE    (16 * KiB)
+> =20
+>  #define E1000E_MSIX_TABLE   (0x0000)
+>  #define E1000E_MSIX_PBA     (0x2000)
+> diff --git a/hw/net/e1000x_common.c b/hw/net/e1000x_common.c
+> index eb0e097137..09047806f2 100644
+> --- a/hw/net/e1000x_common.c
+> +++ b/hw/net/e1000x_common.c
+> @@ -23,6 +23,7 @@
+>  */
+> =20
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
+>  #include "hw/hw.h"
+>  #include "hw/pci/pci.h"
+>  #include "net/net.h"
+> @@ -111,7 +112,7 @@ bool e1000x_is_oversized(uint32_t *mac, size_t size=
 )
-> > > before the notification is done from os_setup_post(). Thus the pare=
-nt
-> > > process won't exit until the mgmt application connects to the monit=
-or
-> > > and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt applicati=
-on
-> > > won't connect to the monitor until daemonizing has completed though=
-.
-> > >=20
-> > > This is a chicken and egg problem, leading to deadlock at startup.
-> > >=20
-> > > The only viable way to fix this is to call os_setup_post() before
-> > > the early main_loop() call when --preconfig is used. This has the
-> > > downside that any errors from this point onwards won't be handled
-> > > well by the mgmt application, because it will think QEMU has starte=
-d
-> > > successfully, so not be expecting an abrupt exit. Moving as much us=
-er
-> > > input validation as possible to before the main_loop() call might h=
-elp,
-> > > but mgmt application should stop assuming that QEMU has started
-> > > successfuly and use other means to collect errors from QEMU (logfil=
-e).
-> > >=20
-> > > Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > > v5:
-> > >   * use original Daniel's patch [1], but addapt it to apply on top =
-of
-> > >     "[PATCH v3 1/2] cli: Don't run early event loop if no  --precon=
-fig was specified"
-> > >     with extra comment and massage commit message a little bit.
-> > > v6:
-> > >   * hide os_setup_post_done flag inside of os_setup_post() as it wa=
-s in v4
-> > >=20
-> > > CC: berrange@redhat.com
-> > > CC: mreitz@redhat.com
-> > > CC: pbonzini@redhat.com
-> > > CC: ehabkost@redhat.com
-> > > CC: ldoktor@redhat.com
-> > > CC: eblake@redhat.com
-> > > ---
-> > >  os-posix.c | 6 ++++++
-> > >  vl.c       | 6 ++++++
-> > >  2 files changed, 12 insertions(+)
-> > >=20
-> > > diff --git a/os-posix.c b/os-posix.c
-> > > index 9ce6f74..0246195 100644
-> > > --- a/os-posix.c
-> > > +++ b/os-posix.c
-> > > @@ -309,8 +309,14 @@ void os_daemonize(void)
-> > > =20
-> > >  void os_setup_post(void)
-> > >  {
-> > > +    static bool os_setup_post_done;
-> > >      int fd =3D 0;
-> > > =20
-> > > +    if (os_setup_post_done) {
-> > > +        return;
-> > > +    }
-> > > +    os_setup_post_done =3D true;
-> > > +
-> > >      if (daemonize) {
-> > >          if (chdir("/")) {
-> > >              error_report("not able to chdir to /: %s", strerror(er=
-rno));
-> > > diff --git a/vl.c b/vl.c
-> > > index fa44138..457ff2a 100644
-> > > --- a/vl.c
-> > > +++ b/vl.c
-> > > @@ -4578,6 +4578,12 @@ int main(int argc, char **argv, char **envp)
-> > >      parse_numa_opts(current_machine);
-> > > =20
-> > >      /* do monitor/qmp handling at preconfig state if requested */
-> > > +    if (!preconfig_exit_requested && is_daemonized()) {
-> > > +        /* signal parent QEMU to exit, libvirt treats it as a sign
-> > > +         * that monitor socket is ready to accept connections
-> > > +         */
-> > > +        os_setup_post();
-> > > +    } =20
-> >=20
-> > I was looking at the daemonize logic, and noticed it we have a
-> > huge amount of code between this line and the next
-> > os_setup_post() call that could either:
-> >=20
-> > * call exit() and/or error_report(); or
-> logging would work to the extent mentioned in commit message,
-> i.e. it' would work fine when log file is used otherwise it
-> errors will go to /dev/null
+>      static const int maximum_ethernet_vlan_size =3D 1522;
+>      /* this is the size past which hardware will
+>         drop packets when setting LPE=3D1 */
+> -    static const int maximum_ethernet_lpe_size =3D 16384;
+> +    static const int maximum_ethernet_lpe_size =3D 16 * KiB;
+> =20
+>      if ((size > maximum_ethernet_lpe_size ||
+>          (size > maximum_ethernet_vlan_size
+> diff --git a/hw/net/eepro100.c b/hw/net/eepro100.c
+> index a07a63247e..e761daf551 100644
+> --- a/hw/net/eepro100.c
+> +++ b/hw/net/eepro100.c
+> @@ -41,6 +41,7 @@
+>   */
+> =20
+>  #include "qemu/osdep.h"
+> +#include "qemu/units.h"
+>  #include "hw/hw.h"
+>  #include "hw/pci/pci.h"
+>  #include "net/net.h"
+> @@ -60,8 +61,6 @@
+>   * changed to pad short packets itself. */
+>  #define CONFIG_PAD_RECEIVED_FRAMES
+> =20
+> -#define KiB 1024
+> -
+>  /* Debug EEPRO100 card. */
+>  #if 0
+>  # define DEBUG_EEPRO100
 >=20
-> so it should be more or less fine on this point
 
-My worry is that most users of error_report() involve an exit()
-call too.
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
 
-Once we have an active monitor, we must never call exit()
-directly.  Even qmp_quit() doesn't call exit() directly.
-
->=20
-> > * be unable to finish machine initialization because of
-> >   chdir("/"), change_root(), or change_process_uid().
-> this one really no go.
-> I see 2 options here,
->=20
->  * move init code that opens files to early stage (before preconfig mon=
-itor)
->    or split it to open files early.
->    (I've spotted several obvious places fwcfg/vnc/replay_start/migratio=
-n)
->    but there might be code somewhere in callbacks that would do it too,
->    so it rather risky to go this route.
->    (I'd do this anyways one place at the time using sanitizing
->     initialization sequence pretext.)
-
-We might have QMP commands that take file paths as input, so is
-this really an option?
+Thank you!
 
 
->=20
->  * split out signaling part that tells parent process to exit into
->    separate helper that's called once before/from main_loop().
->    This option seems low risk and additionally error output to
->    stderr will work as it does currently (until os_setup_post())
 
-My assumption is that separating the chdir()/stdout/stderr logic
-from the fork/daemonize/exit steps wouldn't be possible without
-breaking expectations about -daemonize.
+--kj7AYo4YczuQ8bsfCrBfJUyhkjyMLb4UX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
---=20
-Eduardo
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEESSNv6nXJXWmOwreK4Iwh1Wd0UK0FAlsey6IACgkQ4Iwh1Wd0
+UK0H/g/9GCuOKU0kNMlzSz2P5k+R/1MzzSmYo0T8SHp+gV9PdXehvuYuIB8QRCOa
+5/hkO/w/AcPiUS02J3F3eIb9OwCwaQriJub9n9y3OxSM2FD09UHWtp9nKeo+nTDm
+PtNWCPyvYTZ0p8gXOkQ+nNeQy90JcAGKlZTcjDtb7bcbfgPsxd+KuvXVHpCQUal2
+W+rrR4qkNBUEN8bTKNp1qwBdhTvuq8a6DReUD6C0pd+P8Qqu89FFh8ArGW7z/TZK
+5vfVBwPtrbO6oVCtBbB3As3ZttG5vrKP398P4vB5moH/jrlVU47iHZb1pd5L8q41
+4oUDLKGo6XqIcHXdj/zL4sCa9sRQdx2rCjK4KNi2w0hexxvgYbJVWi/FlSr/XS2W
+1BlQGOs5P/EIJG1rhhbwi/mcH7R4Z7d/nx7SjK9JqvUJ+SAxGYzIMvKnXB7reSvY
+/3aSUWK3hg3OfL5dY0Qux54hCYBqXKHtj8fstk1Ag6RzrN/57+S5kNmoLCmN+zgd
+UCBtWzVt2avY1vtmCe6//B/qdcPrBG32x6DEoDlz5xKPqJE4A7U4Ti65nFn7fPBH
+/mHuD30hAQzhmM7Mxae2eh7yX7FdpKy8OEZoKTIjHywfmQ9e6rYF1CUovM4YMrBn
+5U18oN0I+RM9uAKU8nkPxYqPd1xw72Dgv+0masCi4YULdkC6hD4=
+=gLba
+-----END PGP SIGNATURE-----
+
+--kj7AYo4YczuQ8bsfCrBfJUyhkjyMLb4UX--
