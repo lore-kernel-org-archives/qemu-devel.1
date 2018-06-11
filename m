@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fSHtB-0007m1-2q
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:09:22 -0400
+	(envelope-from <msuchanek@suse.de>) id 1fSI0E-0000zI-D2
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:16:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fSHt7-000332-2t
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:09:21 -0400
-Date: Mon, 11 Jun 2018 10:09:06 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180611011501.10235-33-f4bug@amsat.org>
-Message-ID: <alpine.BSF.2.21.1806110959440.5957@zero.eik.bme.hu>
-References: <20180611011501.10235-1-f4bug@amsat.org>
-	<20180611011501.10235-33-f4bug@amsat.org>
+	(envelope-from <msuchanek@suse.de>) id 1fSI0D-0005rD-EW
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:16:38 -0400
+Date: Mon, 11 Jun 2018 10:16:28 +0200
+From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
+Message-ID: <20180611101628.7997f256@naga.suse.cz>
+In-Reply-To: <20180611044053-mutt-send-email-mst@kernel.org>
+References: <20180606111406.GD2660@work-vm>
+	<9e8b49fb-0162-bf35-21bb-acc0dc28555f@redhat.com>
+	<20180606120050.GB2661@work-vm>
+	<61a301dd-8e50-8799-8328-341d6ab744f5@redhat.com>
+	<20180606143134.GG2660@work-vm>
+	<39bcee27-329a-61d8-47fa-678b431b0a79@redhat.com>
+	<20180606175551-mutt-send-email-mst@kernel.org>
+	<8fc775cd-f98c-c795-3935-855e56f01b68@redhat.com>
+	<20180608002005-mutt-send-email-mst@kernel.org>
+	<5dc0b886-a7c3-50a6-e4db-bde26919af3a@redhat.com>
+	<20180611044053-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-ID: <alpine.BSF.2.21.1806111002580.5957@zero.eik.bme.hu>
-Content-Type: text/plain; CHARSET=ISO-8859-15; FORMAT=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v4 32/40] hw/ppc: Use the IEC
- binary prefix definitions
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,95 +32,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>, "open list:sPAPR" <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, =?ISO-8859-15?Q?Herv=E9_Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, "Richard
+	W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com, "Dr. David Alan
+	Gilbert" <dgilbert@redhat.com>
 
-On Sun, 10 Jun 2018, Philippe Mathieu-Daud=E9 wrote:
-> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-> index 2a98c10664..b35e3fff1c 100644
-> --- a/hw/ppc/sam460ex.c
-> +++ b/hw/ppc/sam460ex.c
-> @@ -12,8 +12,9 @@
->  */
->
-> #include "qemu/osdep.h"
-> +#include "qemu/units.h"
-> #include "qemu-common.h"
-> -#include "qemu/cutils.h"
-> +#include "qemu/units.h"
+On Mon, 11 Jun 2018 05:06:53 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-I think one of these includes of qemu/units.h is enough.
+> On Sat, Jun 09, 2018 at 11:34:03PM +0200, Max Reitz wrote:
+....
+> > Dave was saying that the worst thing about the whole q35 thing is
+> > that users download an image and have no idea why it isn't
+> > working.  Figuring that out may take a long time, because nothing
+> > is even throwing an error message.
+> > 
+> > If we had a new format, users couldn't even run it in qemu, so they
+> > would quickly figure out that in order to run this VM, they need to
+> > update their stack.  
+> 
+> Since then users of old software can't use your
+> image at all, then most people simply will not create
+> the new fangled image format.
 
-> #include "qemu/error-report.h"
-> #include "qapi/error.h"
-> #include "hw/hw.h"
-> @@ -46,7 +47,7 @@
-> /* from Sam460 U-Boot include/configs/Sam460ex.h */
-> #define FLASH_BASE             0xfff00000
-> #define FLASH_BASE_H           0x4
-> -#define FLASH_SIZE             (1 << 20)
-> +#define FLASH_SIZE             (1 * MiB)
-> #define UBOOT_LOAD_BASE        0xfff80000
-> #define UBOOT_SIZE             0x00080000
-> #define UBOOT_ENTRY            0xfffffffc
-> @@ -71,7 +72,8 @@
->
-> /* FIXME: See u-boot.git 8ac41e, also fix in ppc440_uc.c */
-> static const unsigned int ppc460ex_sdram_bank_sizes[] =3D {
-> -    1024 << 20, 512 << 20, 256 << 20, 128 << 20, 64 << 20, 32 << 20, 0
-> +    1 * GiB, 512 * MiB, 256 * MiB, 128 * MiB,
-> +    64 * MiB, 32 * MiB, 0
-> };
+They will have to because without the new fangles the images just don't
+work.
 
-You said elsewhere:
+> 
+> > If we just add this information to qcow2, those users with outdated
+> > qemu versions would again have to figure out why the image isn't
+> > working.  
+> 
+> By that metric compatibility is never worth it unless you have
+> ability to add new functionality retroactively to existing
+> software.
 
-On Sun, 10 Jun 2018, Philippe Mathieu-Daud=E9 wrote:
-> Each use this saves 3 char of the 80 columns limit!
+Compatibility is worth it when you add a new extension that is useful
+but not critical. When the image does not work without interpreting the
+extended metadata, the failure is hard to diagnose, and old versions of
+qemu just ignore the extended metadata the extension failed the primary
+purpose: making images work out of the box.
 
-Except when not but at least should not be longer than before and maybe=20
-more readable. But why are you splitting this line into two? I prefer one=
-=20
-line for readability if it's not over the line limit.
+Thanks
 
-> struct boot_info {
-> @@ -225,7 +227,7 @@ static int sam460ex_load_uboot(void)
->     fl_sectors =3D (bios_size + 65535) >> 16;
->
->     if (!pflash_cfi01_register(base, NULL, "sam460ex.flash", bios_size,
-> -                               blk, (64 * 1024), fl_sectors,
-> +                               blk, 64 * KiB, fl_sectors,
->                                1, 0x89, 0x18, 0x0000, 0x0, 1)) {
->         error_report("qemu: Error registering flash memory.");
->         /* XXX: return an error instead? */
-> @@ -359,14 +361,14 @@ static void main_cpu_reset(void *opaque)
->
->     /* either we have a kernel to boot or we jump to U-Boot */
->     if (bi->entry !=3D UBOOT_ENTRY) {
-> -        env->gpr[1] =3D (16 << 20) - 8;
-> +        env->gpr[1] =3D (16 * MiB) - 8;
->         env->gpr[3] =3D FDT_ADDR;
->         env->nip =3D bi->entry;
->
->         /* Create a mapping for the kernel.  */
->         mmubooke_create_initial_mapping(env, 0, 0);
->         env->gpr[6] =3D tswap32(EPAPR_MAGIC);
-> -        env->gpr[7] =3D (16 << 20) - 8; /*bi->ima_size;*/
-> +        env->gpr[7] =3D (16 * MiB) - 8; /* bi->ima_size; */
->
->     } else {
->         env->nip =3D UBOOT_ENTRY;
-> @@ -479,8 +481,8 @@ static void sam460ex_init(MachineState *machine)
->     /* 256K of L2 cache as memory */
->     ppc4xx_l2sram_init(env);
->     /* FIXME: remove this after fixing l2sram mapping in ppc440_uc.c? *=
-/
-> -    memory_region_init_ram(l2cache_ram, NULL, "ppc440.l2cache_ram", 25=
-6 << 10,
-> -                           &error_abort);
-> +    memory_region_init_ram(l2cache_ram, NULL, "ppc440.l2cache_ram",
-> +                           256 * KiB, &error_abort);
-
-Line is split differently here too for no apparent reason.
-
-Regards,
-BALATON Zoltan
+Michal
