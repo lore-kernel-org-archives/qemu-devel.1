@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fSQYG-0006uH-WD
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:24:21 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fSQYa-00079F-Oi
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:24:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fSQYD-0000Zk-Mt
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:24:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41775)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fSQYD-0000Zc-Gr
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:24:17 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 11 Jun 2018 14:23:55 -0300
-Message-Id: <20180611172355.12067-4-ehabkost@redhat.com>
-In-Reply-To: <20180611172355.12067-1-ehabkost@redhat.com>
-References: <20180611172355.12067-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 3/3] pc: Remove PC_COMPAT_2_12 from 3.0
- machine-types
+	(envelope-from <pm215@archaic.org.uk>) id 1fSQYa-0000m9-09
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:24:40 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42702)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fSQYZ-0000kf-PF
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:24:39 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Jun 2018 18:10:06 +0100
+Message-Id: <20180611171007.4165-3-peter.maydell@linaro.org>
+In-Reply-To: <20180611171007.4165-1-peter.maydell@linaro.org>
+References: <20180611171007.4165-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 2/3] exec.c: Don't accidentally sign-extend
+ 4-byte loads in subpage_read()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, Xiao Guangrong <xiaoguangrong@tencent.com>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
 
-commit f548222c added PC_COMPAT_2_12 to the 3.0 PC machine-types.
-I believe this happened during manual conflict resolution when
-applying the patch.
+In subpage_read() we perform a load of the data into a local buffer
+which we then access using ldub_p(), lduw_p(), ldl_p() or ldq_p()
+depending on its size, storing the result into the uint64_t *data.
+Since ldl_p() returns an 'int', this means that for the 4-byte
+case we will sign-extend the data, whereas for 1 and 2 byte
+reads we zero-extend it.
 
-Cc: Xiao Guangrong <xiaoguangrong@tencent.com>
-Cc: Juan Quintela <quintela@redhat.com>
-Fixes: f548222c24342ca74689de7794f9006b43f86a54
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20180608192940.19548-1-ehabkost@redhat.com>
-Reviewed-by: Marcel Apfelbaum<marcel.apfelbaum@gmail.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+This ought not to matter since the caller will likely ignore values in
+the high bytes of the data, but add a cast so that we're consistent.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/i386/pc_piix.c | 1 -
- hw/i386/pc_q35.c  | 1 -
- 2 files changed, 2 deletions(-)
+ exec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 3d81136065..b4c5b03274 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -430,7 +430,6 @@ static void pc_i440fx_3_0_machine_options(MachineClass *m)
-     pc_i440fx_machine_options(m);
-     m->alias = "pc";
-     m->is_default = 1;
--    SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
- 
- DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index b60cbb9266..83d6d75efa 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -312,7 +312,6 @@ static void pc_q35_3_0_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias = "q35";
--    SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
- 
- DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
+diff --git a/exec.c b/exec.c
+index 9cbba6adcd3..90b47cde7b1 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2747,7 +2747,7 @@ static MemTxResult subpage_read(void *opaque, hwaddr addr, uint64_t *data,
+         *data = lduw_p(buf);
+         return MEMTX_OK;
+     case 4:
+-        *data = ldl_p(buf);
++        *data = (uint32_t)ldl_p(buf);
+         return MEMTX_OK;
+     case 8:
+         *data = ldq_p(buf);
 -- 
-2.18.0.rc1.1.g3f1ff2140
+2.17.1
