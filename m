@@ -1,33 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fSIkW-0007yC-Qr
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:04:33 -0400
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1fSIoD-0000WG-0I
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:08:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fSIkV-0001EM-Il
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:04:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51550 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fSIkV-0001Dq-Bl
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:04:27 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B5B7A7B4A7
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 09:04:26 +0000 (UTC)
-Date: Mon, 11 Jun 2018 10:04:18 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180611090418.GB11636@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180601162749.27406-1-marcandre.lureau@redhat.com>
-	<20180601162749.27406-2-marcandre.lureau@redhat.com>
+	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1fSIo8-0002mo-0s
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:08:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46272)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
+	id 1fSIo7-0002mV-NU
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:08:11 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5B9518M038060
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 05:08:10 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jhm6ux6kn-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 05:08:10 -0400
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
+	Mon, 11 Jun 2018 10:08:07 +0100
+References: <1528374154-14680-1-git-send-email-thuth@redhat.com>
+From: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Date: Mon, 11 Jun 2018 11:08:02 +0200
 MIME-Version: 1.0
+In-Reply-To: <1528374154-14680-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180601162749.27406-2-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 01/12] chardev: avoid crash if no
- associated address
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Message-Id: <6e3c0582-86e0-383b-d6d3-7ba127198fd6@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] pc-bios/s390-ccw: Allow network
+ booting via pxelinux.cfg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,72 +42,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
 
-On Fri, Jun 01, 2018 at 06:27:38PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> A socket chardev may not have associated address (when adding client
-> fd manually for example). But on disconnect, updating socket filename
-> expects an address and may lead to this crash:
->=20
->   Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation faul=
-t.
->   0x0000555555d8c70c in SocketAddress_to_str (prefix=3D0x555556043062 "=
-disconnected:", addr=3D0x0, is_listen=3Dfalse, is_telnet=3Dfalse) at /hom=
-e/elmarco/src/qq/chardev/char-socket.c:388
->   388	    switch (addr->type) {
->   (gdb) bt
->   #0  0x0000555555d8c70c in SocketAddress_to_str (prefix=3D0x5555560430=
-62 "disconnected:", addr=3D0x0, is_listen=3Dfalse, is_telnet=3Dfalse) at =
-/home/elmarco/src/qq/chardev/char-socket.c:388
->   #1  0x0000555555d8c8aa in update_disconnected_filename (s=3D0x555556b=
-1ed00) at /home/elmarco/src/qq/chardev/char-socket.c:419
->   #2  0x0000555555d8c959 in tcp_chr_disconnect (chr=3D0x555556b1ed00) a=
-t /home/elmarco/src/qq/chardev/char-socket.c:438
->   #3  0x0000555555d8cba1 in tcp_chr_hup (channel=3D0x555556b75690, cond=
-=3DG_IO_HUP, opaque=3D0x555556b1ed00) at /home/elmarco/src/qq/chardev/cha=
-r-socket.c:482
->   #4  0x0000555555da596e in qio_channel_fd_source_dispatch (source=3D0x=
-555556bb68b0, callback=3D0x555555d8cb58 <tcp_chr_hup>, user_data=3D0x5555=
-56b1ed00) at /home/elmarco/src/qq/io/channel-watch.c:84
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  chardev/char-socket.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->=20
-> diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-> index 159e69c3b1..f1b7907798 100644
-> --- a/chardev/char-socket.c
-> +++ b/chardev/char-socket.c
-> @@ -416,8 +416,11 @@ static void update_disconnected_filename(SocketCha=
-rdev *s)
->      Chardev *chr =3D CHARDEV(s);
-> =20
->      g_free(chr->filename);
-> -    chr->filename =3D SocketAddress_to_str("disconnected:", s->addr,
-> -                                         s->is_listen, s->is_telnet);
-> +    chr->filename =3D NULL;
-> +    if (s->addr) {
-> +        chr->filename =3D SocketAddress_to_str("disconnected:", s->add=
-r,
-> +                                             s->is_listen, s->is_telne=
-t);
-> +    }
->  }
+On 07.06.2018 14:22, Thomas Huth wrote:
+> This patch series adds pxelinux.cfg-style network booting to the s390-ccw
+> firmware. The core pxelinux.cfg loading and parsing logic has recently
+> been merged to SLOF, so these patches now just have to make sure to call
+> the right functions to get the config file loaded and parsed. Once this is
+> done, the kernel and initrd are loaded separately, and are then glued
+> together in RAM.
+> 
+> v2:
+>  - Update SLOF submodule now that the git mirror is in sync again
+>  - Last parameter to tftp_get_error_info() must not be NULL
+>  - Check CC when calling STSI, and use a #define for the UUID offset
+>  - Only support files with the magic "# pxelinux" string comment when
+>    trying to guess the contents of a file that has been downloaded via
+>    the "bootfile" DHCP parameter. This is just for developers' convenience,
+>    the official way to specify pxelinux.cfg files is to use the DHCP
+>    options 209 and 210 instead.
+> 
+> Thomas Huth (4):
+>   roms: Update SLOF submodule to current status
+>   pc-bios/s390-ccw/net: Update code for the latest changes in SLOF
+>   pc-bios/s390-ccw/net: Add support for pxelinux-style config files
+>   pc-bios/s390-ccw/net: Try to load pxelinux.cfg file accoring to the
+>     UUID
+> 
+>  pc-bios/s390-ccw/netboot.mak |   9 +-
+>  pc-bios/s390-ccw/netmain.c   | 226 +++++++++++++++++++++++++++++--------------
+>  roms/SLOF                    |   2 +-
+>  3 files changed, 162 insertions(+), 75 deletions(-)
+> 
+I tested the series both with a self-created pxelinux.0 blob (to verify
+backward compatibility) and without an existing pxelinux.0 file (to
+force the standard pxelinux pattern). Both worked as expected, although
+the built-in search took significantly longer (timeout?).
 
-This will mean 'chr->filename' as NULL, which means other code using this
-field may get NULL - especially the monitor looks like it will printf()
-passing a NULL, which is a crash on some platforms. So I think you need
-an else clause that will set it to some dummy value.
+Tested-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 
-
+-- 
 Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+  Viktor Mihajlovski
