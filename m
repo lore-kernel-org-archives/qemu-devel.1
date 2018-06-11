@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <msuchanek@suse.de>) id 1fSI0E-0000zI-D2
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:16:39 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fSI2G-0001tg-NG
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:18:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <msuchanek@suse.de>) id 1fSI0D-0005rD-EW
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:16:38 -0400
-Date: Mon, 11 Jun 2018 10:16:28 +0200
-From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
-Message-ID: <20180611101628.7997f256@naga.suse.cz>
-In-Reply-To: <20180611044053-mutt-send-email-mst@kernel.org>
-References: <20180606111406.GD2660@work-vm>
-	<9e8b49fb-0162-bf35-21bb-acc0dc28555f@redhat.com>
-	<20180606120050.GB2661@work-vm>
-	<61a301dd-8e50-8799-8328-341d6ab744f5@redhat.com>
-	<20180606143134.GG2660@work-vm>
-	<39bcee27-329a-61d8-47fa-678b431b0a79@redhat.com>
-	<20180606175551-mutt-send-email-mst@kernel.org>
-	<8fc775cd-f98c-c795-3935-855e56f01b68@redhat.com>
-	<20180608002005-mutt-send-email-mst@kernel.org>
-	<5dc0b886-a7c3-50a6-e4db-bde26919af3a@redhat.com>
-	<20180611044053-mutt-send-email-mst@kernel.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1fSI2C-0006fl-OE
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:18:44 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:33827)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fSI2C-0006fS-89
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:18:40 -0400
+Received: by mail-wm0-x244.google.com with SMTP id l15-v6so10001895wmc.1
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 01:18:40 -0700 (PDT)
+References: <20180608123307.24773-1-alex.bennee@linaro.org>
+	<20180608123307.24773-41-alex.bennee@linaro.org>
+	<abdbe000-3b80-d116-1183-10dae22fbd9e@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <abdbe000-3b80-d116-1183-10dae22fbd9e@amsat.org>
+Date: Mon, 11 Jun 2018 09:18:37 +0100
+Message-ID: <878t7l20te.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 40/49] tests/tcg: enable building for
+ PowerPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,47 +32,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, armbru@redhat.com, qemu-devel@nongnu.org, "Richard
-	W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com, "Dr. David Alan
-	Gilbert" <dgilbert@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com, qemu-devel@nongnu.org
 
-On Mon, 11 Jun 2018 05:06:53 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> On Sat, Jun 09, 2018 at 11:34:03PM +0200, Max Reitz wrote:
-....
-> > Dave was saying that the worst thing about the whole q35 thing is
-> > that users download an image and have no idea why it isn't
-> > working.  Figuring that out may take a long time, because nothing
-> > is even throwing an error message.
-> > 
-> > If we had a new format, users couldn't even run it in qemu, so they
-> > would quickly figure out that in order to run this VM, they need to
-> > update their stack.  
-> 
-> Since then users of old software can't use your
-> image at all, then most people simply will not create
-> the new fangled image format.
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-They will have to because without the new fangles the images just don't
-work.
+> On 06/08/2018 09:32 AM, Alex Benn=C3=A9e wrote:
+>> Now we have restored debian-image-powerpc-cross using Debian SID
+>> compilers we can build for 32 bit powerpc. Although PPC32 supports a
+>> range of pages sizes currently only 4k works so the others are
+>> commented out for now.
+>>
+>> We can also merge the ppc64 support under the base architecture
+>> directory to avoid too much proliferation of directories.
+>
+> ppc64el doesn't seem to work:
+>
+> $ make subdir-ppc64le-linux-user build-tcg-tests-ppc64el-linux-user -j1
+> make[1]: *** ppc64el-linux-user: No such file or directory.  Stop.
+> make: *** [tests/Makefile.include:947:
+> build-tcg-tests-ppc64el-linux-user] Error 2
 
-> 
-> > If we just add this information to qcow2, those users with outdated
-> > qemu versions would again have to figure out why the image isn't
-> > working.  
-> 
-> By that metric compatibility is never worth it unless you have
-> ability to add new functionality retroactively to existing
-> software.
+09:17:30 [alex@zen:~/l/q/qemu.git] testing/tcg-testing-revival-v7 + make ru=
+n-tcg-tests-ppc64le-linux-user
+  BUILD   debian9
+  BUILD   debian-ppc64el-cross
+  CROSS-BUILD ppc64le guest-tests with docker qemu:debian-ppc64el-cross
+  BUILD   debian9
+  BUILD   debian-ppc64el-cross
+  CROSS-BUILD ppc64le guest-tests with docker qemu:debian-ppc64el-cross
+  CC      ppc64le-linux-user/linux-user/main.o
+  LINK    ppc64le-linux-user/qemu-ppc64le
+  RUN-TESTS for ppc64le
+  TEST    test-mmap (default) on ppc64le
+  TEST    sha1 on ppc64le
+  TEST    linux-test on ppc64le
+  TEST    testthread on ppc64le
+  TEST    test-mmap (4096 byte pages) on ppc64le
 
-Compatibility is worth it when you add a new extension that is useful
-but not critical. When the image does not work without interpreting the
-extended metadata, the failure is hard to diagnose, and old versions of
-qemu just ignore the extended metadata the extension failed the primary
-purpose: making images work out of the box.
+The Debian and QEMU naming conventions switch....
 
-Thanks
+>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> ppc32:
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+>>
+>> ---
+>> v5
+>>   - new for v5
+>> ---
+>>  tests/tcg/ppc/Makefile.include     |  7 +++++++
+>>  tests/tcg/ppc/Makefile.target      | 12 ++++++++++++
+>>  tests/tcg/ppc64le/Makefile.include |  2 --
+>>  3 files changed, 19 insertions(+), 2 deletions(-)
+>>  create mode 100644 tests/tcg/ppc/Makefile.include
+>>  create mode 100644 tests/tcg/ppc/Makefile.target
+>>  delete mode 100644 tests/tcg/ppc64le/Makefile.include
+>>
+>> diff --git a/tests/tcg/ppc/Makefile.include b/tests/tcg/ppc/Makefile.inc=
+lude
+>> new file mode 100644
+>> index 0000000000..b062c30dd3
+>> --- /dev/null
+>> +++ b/tests/tcg/ppc/Makefile.include
+>> @@ -0,0 +1,7 @@
+>> +ifeq ($(TARGET_NAME),ppc)
+>> +DOCKER_IMAGE=3Ddebian-powerpc-cross
+>> +DOCKER_CROSS_COMPILER=3Dpowerpc-linux-gnu-gcc
+>> +else ifeq ($(TARGET_NAME),ppc64le)
+>> +DOCKER_IMAGE=3Ddebian-ppc64el-cross
+>> +DOCKER_CROSS_COMPILER=3Dpowerpc64le-linux-gnu-gcc
+>> +endif
+>> diff --git a/tests/tcg/ppc/Makefile.target b/tests/tcg/ppc/Makefile.targ=
+et
+>> new file mode 100644
+>> index 0000000000..f5e08c7376
+>> --- /dev/null
+>> +++ b/tests/tcg/ppc/Makefile.target
+>> @@ -0,0 +1,12 @@
+>> +# -*- Mode: makefile -*-
+>> +#
+>> +# PPC - included from tests/tcg/Makefile
+>> +#
+>> +
+>> +ifneq (,$(findstring 64,$(TARGET_NAME)))
+>> +# On PPC64 Linux can be configured with 4k (default) or 64k pages (curr=
+ently broken)
+>> +EXTRA_RUNS+=3Drun-test-mmap-4096 #run-test-mmap-65536
+>> +else
+>> +# On PPC32 Linux supports 4K/16K/64K/256K (but currently only 4k works)
+>> +EXTRA_RUNS+=3Drun-test-mmap-4096 #run-test-mmap-16384 run-test-mmap-655=
+36 run-test-mmap-262144
+>> +endif
+>> diff --git a/tests/tcg/ppc64le/Makefile.include b/tests/tcg/ppc64le/Make=
+file.include
+>> deleted file mode 100644
+>> index d71cfc9aa7..0000000000
+>> --- a/tests/tcg/ppc64le/Makefile.include
+>> +++ /dev/null
+>> @@ -1,2 +0,0 @@
+>> -DOCKER_IMAGE=3Ddebian-ppc64el-cross
+>> -DOCKER_CROSS_COMPILER=3Dpowerpc64le-linux-gnu-gcc
+>>
 
-Michal
+
+--
+Alex Benn=C3=A9e
