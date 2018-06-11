@@ -1,37 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1fSIoD-0000WG-0I
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:08:18 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fSItr-0002Bh-RK
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:14:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1fSIo8-0002mo-0s
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:08:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46272)
+	(envelope-from <borntraeger@de.ibm.com>) id 1fSItn-0004fO-R0
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:14:07 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40280
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1fSIo7-0002mV-NU
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:08:11 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fSItn-0004f7-LA
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:14:03 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5B9518M038060
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 05:08:10 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jhm6ux6kn-1
+	w5B9A7OV118993
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 05:14:02 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jhk49rv2m-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 05:08:10 -0400
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 05:14:02 -0400
 Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Mon, 11 Jun 2018 10:08:07 +0100
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 11 Jun 2018 10:14:00 +0100
 References: <1528374154-14680-1-git-send-email-thuth@redhat.com>
-From: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Mon, 11 Jun 2018 11:08:02 +0200
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 11 Jun 2018 11:13:56 +0200
 MIME-Version: 1.0
 In-Reply-To: <1528374154-14680-1-git-send-email-thuth@redhat.com>
+Content-Language: en-US
+Message-Id: <8e3ae6c8-c5d6-76b6-3350-490cf8f4f21f@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Message-Id: <6e3c0582-86e0-383b-d6d3-7ba127198fd6@linux.vnet.ibm.com>
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PATCH v2 0/4] pc-bios/s390-ccw: Allow network
  booting via pxelinux.cfg
 List-Id: <qemu-devel.nongnu.org>
@@ -42,10 +43,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
 
-On 07.06.2018 14:22, Thomas Huth wrote:
+
+
+On 06/07/2018 02:22 PM, Thomas Huth wrote:
 > This patch series adds pxelinux.cfg-style network booting to the s390-ccw
 > firmware. The core pxelinux.cfg loading and parsing logic has recently
 > been merged to SLOF, so these patches now just have to make sure to call
@@ -75,13 +78,6 @@ On 07.06.2018 14:22, Thomas Huth wrote:
 >  roms/SLOF                    |   2 +-
 >  3 files changed, 162 insertions(+), 75 deletions(-)
 > 
-I tested the series both with a self-created pxelinux.0 blob (to verify
-backward compatibility) and without an existing pxelinux.0 file (to
-force the standard pxelinux pattern). Both worked as expected, although
-the built-in search took significantly longer (timeout?).
 
-Tested-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-
--- 
-Regards,
-  Viktor Mihajlovski
+Series
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
