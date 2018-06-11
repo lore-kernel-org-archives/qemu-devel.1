@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fSNmr-00054D-Vu
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:27:19 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fSNmt-00056J-Ag
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:27:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fSNmr-00028C-0D
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:27:13 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fSNms-00028z-6I
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:27:15 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Mon, 11 Jun 2018 16:26:10 +0200
-Message-Id: <20180611142611.6609-29-mreitz@redhat.com>
+Date: Mon, 11 Jun 2018 16:26:11 +0200
+Message-Id: <20180611142611.6609-30-mreitz@redhat.com>
 In-Reply-To: <20180611142611.6609-1-mreitz@redhat.com>
 References: <20180611142611.6609-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PULL 28/29] qcow2: Do not mark inactive images corrupt
+Subject: [Qemu-devel] [PULL 29/29] iotests: Add case for a corrupted
+ inactive image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,42 +23,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-When signaling a corruption on a read-only image, qcow2 already makes
-fatal events non-fatal (i.e., they will not result in the image being
-closed, and the image header's corrupt flag will not be set).  This is
-necessary because we cannot set the corrupt flag on read-only images,
-and it is possible because further corruption of read-only images is
-impossible.
-
-Inactive images are effectively read-only, too, so we should do the same
-for them.  bdrv_is_writable() can tell us whether an image can actually
-be written to, so use its result instead of !bs->read_only.
-
-(Otherwise, the assert(!(bs->open_flags & BDRV_O_INACTIVE)) in
-bdrv_co_pwritev() will fail, crashing qemu.)
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20180606193702.7113-3-mreitz@redhat.com
 Reviewed-by: John Snow <jsnow@redhat.com>
+Tested-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Jeff Cody <jcody@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20180606193702.7113-4-mreitz@redhat.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/060     | 30 ++++++++++++++++++++++++++++++
+ tests/qemu-iotests/060.out | 14 ++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 6b2d88759d..6fa5e1d71a 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4569,7 +4569,7 @@ void qcow2_signal_corruption(BlockDriverState *bs, bool fatal, int64_t offset,
-     char *message;
-     va_list ap;
+diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
+index 6c7407f499..7bdf609f3f 100755
+--- a/tests/qemu-iotests/060
++++ b/tests/qemu-iotests/060
+@@ -440,6 +440,36 @@ echo "{'execute': 'qmp_capabilities'}
+             -drive if=none,node-name=drive,file="$TEST_IMG",driver=qcow2 \
+     | _filter_qmp | _filter_qemu_io
  
--    fatal = fatal && !bs->read_only;
-+    fatal = fatal && bdrv_is_writable(bs);
- 
-     if (s->signaled_corruption &&
-         (!fatal || (s->incompatible_features & QCOW2_INCOMPAT_CORRUPT)))
++echo
++echo "=== Testing incoming inactive corrupted image ==="
++echo
++
++_make_test_img 64M
++# Create an unaligned L1 entry, so qemu will signal a corruption when
++# reading from the covered area
++poke_file "$TEST_IMG" "$l1_offset" "\x00\x00\x00\x00\x2a\x2a\x2a\x2a"
++
++# Inactive images are effectively read-only images, so this should be a
++# non-fatal corruption (which does not modify the image)
++echo "{'execute': 'qmp_capabilities'}
++      {'execute': 'human-monitor-command',
++       'arguments': {'command-line': 'qemu-io drive \"read 0 512\"'}}
++      {'execute': 'quit'}" \
++    | $QEMU -qmp stdio -nographic -nodefaults \
++            -blockdev "{'node-name': 'drive',
++                        'driver': 'qcow2',
++                        'file': {
++                            'driver': 'file',
++                            'filename': '$TEST_IMG'
++                        }}" \
++            -incoming exec:'cat /dev/null' \
++            2>&1 \
++    | _filter_qmp | _filter_qemu_io
++
++echo
++# Image should not have been marked corrupt
++_img_info --format-specific | grep 'corrupt:'
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
+index 5f4264cff6..bff023d889 100644
+--- a/tests/qemu-iotests/060.out
++++ b/tests/qemu-iotests/060.out
+@@ -420,4 +420,18 @@ write failed: Input/output error
+ {"return": ""}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++=== Testing incoming inactive corrupted image ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++QMP_VERSION
++{"return": {}}
++qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1 index: 0); further non-fatal corruption events will be suppressed
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a00 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
++read failed: Input/output error
++{"return": ""}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++    corrupt: false
+ *** done
 -- 
 2.17.1
