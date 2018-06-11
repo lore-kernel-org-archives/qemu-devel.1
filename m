@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fSKOd-0002TI-33
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 06:50:00 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fSKOe-0002TN-UD
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 06:50:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fSKOY-0000hS-6C
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 06:49:59 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:41103)
+	(envelope-from <laurent@vivier.eu>) id 1fSKOa-0000in-N6
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 06:50:00 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:39581)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fSKOX-0000gU-Px
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 06:49:54 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fSKOa-0000hz-96
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 06:49:56 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 11 Jun 2018 12:49:26 +0200
-Message-Id: <20180611104935.20499-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 0/9] M68k for 3.0 patches
+Date: Mon, 11 Jun 2018 12:49:27 +0200
+Message-Id: <20180611104935.20499-2-laurent@vivier.eu>
+In-Reply-To: <20180611104935.20499-1-laurent@vivier.eu>
+References: <20180611104935.20499-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL 1/9] target/m68k: Use DISAS_NORETURN for
+ exceptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +27,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <richard.henderson@linaro.org>
 
-The following changes since commit 0d2fa03dae4fbe185a082f361342b1e30aed4582:
+From: Richard Henderson <richard.henderson@linaro.org>
 
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180608' into staging (2018-06-08 16:26:51 +0100)
+The raise_exception helper does not return.  Do not generate
+any code following that.
 
-are available in the Git repository at:
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20180512050250.12774-2-richard.henderson@linaro.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/m68k/translate.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-  git://github.com/vivier/qemu-m68k.git tags/m68k-for-3.0-pull-request
-
-for you to fetch changes up to a56f36c1d2bccbc50a53fa8093b93d205607f1b8:
-
-  target/m68k: Merge disas_m68k_insn into m68k_tr_translate_insn (2018-06-11 12:43:42 +0200)
-
-----------------------------------------------------------------
-Convert to TranslatorOps
-
-I've updated the series to fix conflicts with:
-
-21528149eb target/m68k: Add trailing '\n' to qemu_log() call
-07ea28b418 tcg: Pass tb and index to tcg_gen_exit_tb separately
-
-----------------------------------------------------------------
-
-Richard Henderson (9):
-  target/m68k: Use DISAS_NORETURN for exceptions
-  target/m68k: Replace DISAS_TB_JUMP with DISAS_NORETURN
-  target/m68k: Remove DISAS_JUMP_NEXT as unused
-  target/m68k: Use lookup_and_goto_tb for DISAS_JUMP
-  target/m68k: Rename DISAS_UPDATE and gen_lookup_tb
-  target/m68k: Convert to DisasContextBase
-  target/m68k: Convert to TranslatorOps
-  target/m68k: Improve ending TB at page boundaries
-  target/m68k: Merge disas_m68k_insn into m68k_tr_translate_insn
-
- target/m68k/translate.c | 356 ++++++++++++++++++++++++------------------------
- 1 file changed, 180 insertions(+), 176 deletions(-)
-
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 4b5dbdb51c..de1be58f65 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -291,18 +291,18 @@ static void gen_jmp(DisasContext *s, TCGv dest)
+     s->is_jmp = DISAS_JUMP;
+ }
+ 
+-static void gen_raise_exception(int nr)
++static void gen_exception(DisasContext *s, uint32_t dest, int nr)
+ {
+-    TCGv_i32 tmp = tcg_const_i32(nr);
++    TCGv_i32 tmp;
+ 
++    update_cc_op(s);
++    tcg_gen_movi_i32(QREG_PC, dest);
++
++    tmp = tcg_const_i32(nr);
+     gen_helper_raise_exception(cpu_env, tmp);
+     tcg_temp_free_i32(tmp);
+-}
+ 
+-static void gen_exception(DisasContext *s, uint32_t where, int nr)
+-{
+-    gen_jmp_im(s, where);
+-    gen_raise_exception(nr);
++    s->is_jmp = DISAS_NORETURN;
+ }
+ 
+ static inline void gen_addr_fault(DisasContext *s)
+@@ -6106,7 +6106,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ 
+         if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
+             gen_exception(dc, dc->pc, EXCP_DEBUG);
+-            dc->is_jmp = DISAS_JUMP;
+             /* The address covered by the breakpoint must be included in
+                [tb->pc, tb->pc + tb->size) in order to for it to be
+                properly cleared -- thus we increment the PC here so that
+@@ -6150,6 +6149,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+             tcg_gen_exit_tb(NULL, 0);
+             break;
+         case DISAS_TB_JUMP:
++        case DISAS_NORETURN:
+             /* nothing more to generate */
+             break;
+         }
 -- 
 2.14.4
