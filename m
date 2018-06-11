@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fSJ1w-00057F-8U
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:22:29 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fSJ3l-0005pZ-Tj
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:24:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fSJ1s-0007V4-GD
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:22:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54438 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fSJ1s-0007Ur-AG
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:22:24 -0400
-Date: Mon, 11 Jun 2018 10:22:21 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180611092221.GE11636@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180608170231.27912-1-armbru@redhat.com>
-	<20180608171209.GE18233@redhat.com>
-	<b0870ff7-fb75-09a9-40cc-4d73f188a95c@amsat.org>
-	<87po0xn9fq.fsf@dusky.pond.sub.org>
+	(envelope-from <cohuck@redhat.com>) id 1fSJ3g-0007x8-1Q
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:24:21 -0400
+Date: Mon, 11 Jun 2018 11:24:10 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180611112410.4e2eb406.cohuck@redhat.com>
+In-Reply-To: <3a7d6318-c827-3aa3-2799-7e383132beb3@de.ibm.com>
+References: <1528636325-4237-1-git-send-email-thuth@redhat.com>
+	<3a7d6318-c827-3aa3-2799-7e383132beb3@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87po0xn9fq.fsf@dusky.pond.sub.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Purge uses of banned g_assert_FOO()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/s390x/ipl: Fix crash that occurs when
+ -kernel is used with small images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Mon, Jun 11, 2018 at 08:06:49AM +0200, Markus Armbruster wrote:
-> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->=20
-> > On 06/08/2018 02:12 PM, Daniel P. Berrang=C3=A9 wrote:
-> >> On Fri, Jun 08, 2018 at 07:02:31PM +0200, Markus Armbruster wrote:
-> >>> We banned use of certain g_assert_FOO() functions outside tests, an=
-d
-> >>> made checkpatch.pl flag them (commit 6e9389563e5).  We neglected to
-> >>> purge existing uses.  Do that now.
-> >>>
-> >>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> >>> ---
-> >>>  hw/ide/ahci.c                 |  2 +-
-> >>>  hw/ppc/spapr_ovec.c           | 12 ++++++------
-> >>>  hw/usb/dev-smartcard-reader.c |  2 +-
-> >>>  qom/object.c                  | 10 +++++-----
-> >>>  util/qht.c                    |  2 +-
-> >>>  5 files changed, 14 insertions(+), 14 deletions(-)
-> >>>
-> >>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-> >>=20
-> >>> diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-r=
-eader.c
-> >>> index 2131e33d27..13d0befd9c 100644
-> >>> --- a/hw/usb/dev-smartcard-reader.c
-> >>> +++ b/hw/usb/dev-smartcard-reader.c
-> >>> @@ -786,7 +786,7 @@ static void ccid_write_data_block(USBCCIDState =
-*s, uint8_t slot, uint8_t seq,
-> >>>          DPRINTF(s, D_VERBOSE, "error %d\n", p->b.bError);
-> >>>      }
-> >>>      if (len) {
-> >>> -        g_assert_nonnull(data);
-> >>> +        assert(data);
-> >>=20
-> >> nitpick - all the other conversions used  g_assert()
->=20
-> The other conversions are in files that predominantly or exclusively us=
-e
-> g_assert().  This one is in a file that exclusively uses assert().
+On Mon, 11 Jun 2018 09:49:39 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Ah ok, makes sense then.
+> On 06/10/2018 03:12 PM, Thomas Huth wrote:
+> > Add a sanity check to fix the following crash:
+> > 
+> > $ echo "Insane in the mainframe" > /tmp/test.txt
+> > $ s390x-softmmu/qemu-system-s390x -nographic -kernel /tmp/test.txt
+> > Segmentation fault (core dumped)
+> > 
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>  
+> 
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> 
+> I think a similar problem exists for INITRD_PARM_START and INITRD_PARM_SIZE. No?
 
+I think so as well.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> 
+> 
+> > ---
+> >  hw/s390x/ipl.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> > index 04245b5..9bb9b50 100644
+> > --- a/hw/s390x/ipl.c
+> > +++ b/hw/s390x/ipl.c
+> > @@ -168,7 +168,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+> >           * we can not rely on the ELF entry point - it was 0x800 (the SALIPL
+> >           * loader) and it won't work. For this case we force it to 0x10000, too.
+> >           */
+> > -        if (pentry == KERN_IMAGE_START || pentry == 0x800) {
+> > +        if ((pentry == KERN_IMAGE_START || pentry == 0x800) &&
+> > +            kernel_size > KERN_PARM_AREA + strlen(ipl->cmdline)) {
+> >              ipl->start_addr = KERN_IMAGE_START;
+> >              /* Overwrite parameters in the kernel image, which are "rom" */
+> >              strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
+> >   
+> 
+
+The outcome of this is that we don't write into areas we must not write
+into, but we still have a broken "kernel" and will simply fail if the
+thing we're pointing to isn't a valid PSW. I guess that's what we want
+("crap in, crap out"), i.e. no fallback to the bios or something like
+that?
