@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fSNNy-000833-RS
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:01:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fSNPe-0000iZ-Fk
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:03:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fSNNu-0007es-OB
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:01:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60568 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fSNNu-0007ed-JD
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:01:26 -0400
-References: <20180611125633.32755-1-peter.maydell@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9ec9adb7-d325-faaa-3339-315e28280dbf@redhat.com>
-Date: Mon, 11 Jun 2018 16:01:22 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fSNPc-0008Da-H9
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:03:14 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:40992)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fSNPc-0008Cg-Ah
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:03:12 -0400
+Received: by mail-ot0-x242.google.com with SMTP id d19-v6so18332702oti.8
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 07:03:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180611125633.32755-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] cputlb: document iotlb.addr,
- fix txfail physaddr
+In-Reply-To: <CAFEAcA9TGnyeH8=f0xJ3sD9TtXQs_NbiJWBp9h6zsAz-UEOLrw@mail.gmail.com>
+References: <20180515171446.10834-1-peter.maydell@linaro.org>
+	<CAFEAcA9TGnyeH8=f0xJ3sD9TtXQs_NbiJWBp9h6zsAz-UEOLrw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Jun 2018 15:02:51 +0100
+Message-ID: <CAFEAcA8vS_uk7Yz+JgoHvHnwFjY-T7ShnOCiwO+QzikycQ_5yA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/mps2-tz: Put ethernet
+ controller behind PPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +30,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "patches@linaro.org" <patches@linaro.org>
 
-On 11/06/2018 14:56, Peter Maydell wrote:
-> This patchset is two vaguely related patches that I wrote
-> while I was trying to understand the cputlb code enough to
-> add support for small-MPU-regions for v7M/v8M.
-> 
-> Patch 1 is just a docs comment patch, describing what the
-> CPUIOTLBEntry 'addr' field actually contains.
-> 
-> Patch 2 fixes a bug that doesn't yet have any visible effects
-> (we were passing cpu_transaction_failed() the wrong value for
-> the physaddr) roughly as suggested by Paolo back in
-> https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg02419.html
-> 
+I guess nobody else is interested -- applying to target-arm.next.
+
+thanks
+-- PMM
+
+On 29 May 2018 at 16:27, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Ping for review?
+>
 > thanks
 > -- PMM
-
-Both patches
-
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+>
+>
+> On 15 May 2018 at 18:14, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> The ethernet controller in the AN505 MPC FPGA image is behind
+>> the same AHB Peripheral Protection Controller that handles
+>> the graphics and GPIOs. (In the documentation this is clear
+>> in the block diagram but the ethernet controller was omitted
+>> from the table listing devices connected to the PPC.)
+>> The ethernet sits behind AHB PPCEXP0 interface 5. We had
+>> incorrectly claimed that this was a "gpio4", but there are
+>> only 4 GPIOs in this image.
+>>
+>> Correct the QEMU model to match the hardware.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> A minor nit that I didn't notice when I was modelling this.
+>>
+>> NB: I think the PSRAM is also supposed to be behind this
+>> interface of the PPC, but we definitely can't model that
+>> because our PPC implementation won't work for executing
+>> code from RAM that sits behind it.
+>>
+>>  hw/arm/mps2-tz.c | 32 +++++++++++++++++++++++---------
+>>  1 file changed, 23 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+>> index 8dc8bfd4ab..c5ef95e4cc 100644
+>> --- a/hw/arm/mps2-tz.c
+>> +++ b/hw/arm/mps2-tz.c
+>> @@ -74,12 +74,13 @@ typedef struct {
+>>      UnimplementedDeviceState spi[5];
+>>      UnimplementedDeviceState i2c[4];
+>>      UnimplementedDeviceState i2s_audio;
+>> -    UnimplementedDeviceState gpio[5];
+>> +    UnimplementedDeviceState gpio[4];
+>>      UnimplementedDeviceState dma[4];
+>>      UnimplementedDeviceState gfx;
+>>      CMSDKAPBUART uart[5];
+>>      SplitIRQ sec_resp_splitter;
+>>      qemu_or_irq uart_irq_orgate;
+>> +    DeviceState *lan9118;
+>>  } MPS2TZMachineState;
+>>
+>>  #define TYPE_MPS2TZ_MACHINE "mps2tz"
+>> @@ -224,6 +225,26 @@ static MemoryRegion *make_fpgaio(MPS2TZMachineState *mms, void *opaque,
+>>      return sysbus_mmio_get_region(SYS_BUS_DEVICE(fpgaio), 0);
+>>  }
+>>
+>> +static MemoryRegion *make_eth_dev(MPS2TZMachineState *mms, void *opaque,
+>> +                                  const char *name, hwaddr size)
+>> +{
+>> +    SysBusDevice *s;
+>> +    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
+>> +    NICInfo *nd = &nd_table[0];
+>> +
+>> +    /* In hardware this is a LAN9220; the LAN9118 is software compatible
+>> +     * except that it doesn't support the checksum-offload feature.
+>> +     */
+>> +    qemu_check_nic_model(nd, "lan9118");
+>> +    mms->lan9118 = qdev_create(NULL, "lan9118");
+>> +    qdev_set_nic_properties(mms->lan9118, nd);
+>> +    qdev_init_nofail(mms->lan9118);
+>> +
+>> +    s = SYS_BUS_DEVICE(mms->lan9118);
+>> +    sysbus_connect_irq(s, 0, qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
+>> +    return sysbus_mmio_get_region(s, 0);
+>> +}
+>> +
+>>  static void mps2tz_common_init(MachineState *machine)
+>>  {
+>>      MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
+>> @@ -363,7 +384,7 @@ static void mps2tz_common_init(MachineState *machine)
+>>                  { "gpio1", make_unimp_dev, &mms->gpio[1], 0x40101000, 0x1000 },
+>>                  { "gpio2", make_unimp_dev, &mms->gpio[2], 0x40102000, 0x1000 },
+>>                  { "gpio3", make_unimp_dev, &mms->gpio[3], 0x40103000, 0x1000 },
+>> -                { "gpio4", make_unimp_dev, &mms->gpio[4], 0x40104000, 0x1000 },
+>> +                { "eth", make_eth_dev, NULL, 0x42000000, 0x100000 },
+>>              },
+>>          }, {
+>>              .name = "ahb_ppcexp1",
+>> @@ -447,13 +468,6 @@ static void mps2tz_common_init(MachineState *machine)
+>>                                                       "cfg_sec_resp", 0));
+>>      }
+>>
+>> -    /* In hardware this is a LAN9220; the LAN9118 is software compatible
+>> -     * except that it doesn't support the checksum-offload feature.
+>> -     * The ethernet controller is not behind a PPC.
+>> -     */
+>> -    lan9118_init(&nd_table[0], 0x42000000,
+>> -                 qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
+>> -
+>>      create_unimplemented_device("FPGA NS PC", 0x48007000, 0x1000);
+>>
+>>      armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x400000);
+>> --
+>> 2.17.0
