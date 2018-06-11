@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1fSSTB-0007yo-U0
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:27:15 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fSSaO-0001ua-K3
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:34:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1fSSTA-000794-V2
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:27:13 -0400
-References: <20180611011501.10235-1-f4bug@amsat.org>
-	<20180611011501.10235-3-f4bug@amsat.org>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <59507b40-1c5e-8782-1b3b-3690e73563ec@weilnetz.de>
-Date: Mon, 11 Jun 2018 21:27:03 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180611011501.10235-3-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 02/40] vdi: Use definitions from
- "qemu/units.h"
+	(envelope-from <jsnow@redhat.com>) id 1fSSaK-0003Ut-OE
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:34:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36616 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1fSSaK-0003UN-KR
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 15:34:36 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Mon, 11 Jun 2018 15:34:28 -0400
+Message-Id: <20180611193434.19004-2-jsnow@redhat.com>
+In-Reply-To: <20180611193434.19004-1-jsnow@redhat.com>
+References: <20180611193434.19004-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PULL 1/7] block: remove bdrv_dirty_bitmap_make_anon
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,58 +23,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:VDI" <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, jsnow@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-Am 11.06.2018 um 03:14 schrieb Philippe Mathieu-Daud=C3=A9:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  block/vdi.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
->=20
-> diff --git a/block/vdi.c b/block/vdi.c
-> index 668af0a828..35b51dc5c5 100644
-> --- a/block/vdi.c
-> +++ b/block/vdi.c
-> @@ -50,6 +50,7 @@
->   */
-> =20
->  #include "qemu/osdep.h"
-> +#include "qemu/units.h"
->  #include "qapi/error.h"
->  #include "qapi/qmp/qdict.h"
->  #include "qapi/qobject-input-visitor.h"
-> @@ -83,9 +84,6 @@
->  /* Command line option for static images. */
->  #define BLOCK_OPT_STATIC "static"
-> =20
-> -#define KiB     1024
-> -#define MiB     (KiB * KiB)
-> -
->  #define SECTOR_SIZE 512
->  #define DEFAULT_CLUSTER_SIZE (1 * MiB)
-> =20
-> @@ -250,7 +248,7 @@ static void vdi_header_print(VdiHeader *header)
->      logout("heads       0x%04x\n", header->heads);
->      logout("sectors     0x%04x\n", header->sectors);
->      logout("sector size 0x%04x\n", header->sector_size);
-> -    logout("image size  0x%" PRIx64 " B (%" PRIu64 " MiB)\n",
-> +    logout("image size  0x%" PRIx64 " B (%llu MiB)\n",
->             header->disk_size, header->disk_size / MiB);
->      logout("block size  0x%04x\n", header->block_size);
->      logout("block extra 0x%04x\n", header->block_extra);
-> @@ -434,7 +432,7 @@ static int vdi_open(BlockDriverState *bs, QDict *op=
-tions, int flags,
->          goto fail;
->      } else if (header.block_size !=3D DEFAULT_CLUSTER_SIZE) {
->          error_setg(errp, "unsupported VDI image (block size %" PRIu32
-> -                   " is not %u)", header.block_size, DEFAULT_CLUSTER_S=
-IZE);
-> +                   " is not %llu)", header.block_size, DEFAULT_CLUSTER=
-_SIZE);
->          ret =3D -ENOTSUP;
->          goto fail;
->      } else if (header.disk_size >
->=20
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
+All this function is doing will be repeated by
+bdrv_do_release_matching_dirty_bitmap_locked, except
+resetting bm->persistent.  But even that does not matter
+because the bitmap will be freed.
+
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20180323164254.26487-1-pbonzini@redhat.com
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block/dirty-bitmap.c         | 9 ---------
+ blockdev.c                   | 1 -
+ include/block/dirty-bitmap.h | 1 -
+ 3 files changed, 11 deletions(-)
+
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 967159479d..ea82c06f07 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -97,15 +97,6 @@ BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs, const char *name)
+     return NULL;
+ }
+ 
+-/* Called with BQL taken.  */
+-void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap)
+-{
+-    assert(!bdrv_dirty_bitmap_frozen(bitmap));
+-    g_free(bitmap->name);
+-    bitmap->name = NULL;
+-    bitmap->persistent = false;
+-}
+-
+ /* Called with BQL taken.  */
+ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
+                                           uint32_t granularity,
+diff --git a/blockdev.c b/blockdev.c
+index 8de95be8f4..266ecc06cc 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2881,7 +2881,6 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+         }
+     }
+ 
+-    bdrv_dirty_bitmap_make_anon(bitmap);
+     bdrv_release_dirty_bitmap(bs, bitmap);
+ }
+ 
+diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+index 1ff8949b1b..5a51a78b63 100644
+--- a/include/block/dirty-bitmap.h
++++ b/include/block/dirty-bitmap.h
+@@ -24,7 +24,6 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
+ void bdrv_dirty_bitmap_enable_successor(BdrvDirtyBitmap *bitmap);
+ BdrvDirtyBitmap *bdrv_find_dirty_bitmap(BlockDriverState *bs,
+                                         const char *name);
+-void bdrv_dirty_bitmap_make_anon(BdrvDirtyBitmap *bitmap);
+ void bdrv_release_dirty_bitmap(BlockDriverState *bs, BdrvDirtyBitmap *bitmap);
+ void bdrv_release_named_dirty_bitmaps(BlockDriverState *bs);
+ void bdrv_release_persistent_dirty_bitmaps(BlockDriverState *bs);
+-- 
+2.14.3
