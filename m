@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fSLlA-00028F-71
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:17:21 -0400
+	(envelope-from <david@redhat.com>) id 1fSLlE-0002Am-Ax
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:17:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fSLl8-00005a-K7
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:17:20 -0400
+	(envelope-from <david@redhat.com>) id 1fSLlC-00008H-Jf
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:17:23 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 11 Jun 2018 14:16:53 +0200
-Message-Id: <20180611121655.19616-10-david@redhat.com>
+Date: Mon, 11 Jun 2018 14:16:55 +0200
+Message-Id: <20180611121655.19616-12-david@redhat.com>
 In-Reply-To: <20180611121655.19616-1-david@redhat.com>
 References: <20180611121655.19616-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 09/11] pc-dimm: remove
- pc_dimm_get_vmstate_memory_region()
+Subject: [Qemu-devel] [PATCH v1 11/11] pc-dimm: assign and verify the "slot"
+ property during pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +23,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-We can reuse pc_dimm_get_memory_region() now, as both functions are
-(besides the assert which is also correct), equal.
+We can assign and verify the slot before realizing and trying to plug.
+reading/writing the slot property should never change, so let's reduce
+error handling a bit by using &error_abort.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/mem/pc-dimm.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ hw/mem/pc-dimm.c | 31 ++++++++++++++-----------------
+ 1 file changed, 14 insertions(+), 17 deletions(-)
 
 diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 9a0da5d441..bc79dd04d8 100644
+index 995ce22d8d..88423f95a3 100644
 --- a/hw/mem/pc-dimm.c
 +++ b/hw/mem/pc-dimm.c
-@@ -219,11 +219,6 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm)
-     return host_memory_backend_get_memory(dimm->hostmem);
+@@ -30,12 +30,25 @@
+ void pc_dimm_memory_pre_plug(DeviceState *dev, MachineState *machine,
+                              Error **errp)
+ {
++    Error *local_err = NULL;
++    int slot;
++
++    slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP,
++                                   &error_abort);
++    slot = pc_dimm_get_free_slot(slot == PC_DIMM_UNASSIGNED_SLOT ? NULL : &slot,
++                                 machine->ram_slots, &local_err);
++    if (local_err) {
++        goto out;
++    }
++    object_property_set_int(OBJECT(dev), slot, PC_DIMM_SLOT_PROP, &error_abort);
++    trace_mhp_pc_dimm_assigned_slot(slot);
++out:
++    error_propagate(errp, local_err);
  }
  
--static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
--{
--    return host_memory_backend_get_memory(dimm->hostmem);
--}
--
- static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+ void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+                          uint64_t align, Error **errp)
  {
-     const PCDIMMDevice *dimm = PC_DIMM(md);
-@@ -282,7 +277,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
-     dc->desc = "DIMM memory module";
+-    int slot;
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
+@@ -61,22 +74,6 @@ void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+     }
+     trace_mhp_pc_dimm_assigned_address(addr);
  
-     ddc->get_memory_region = pc_dimm_get_memory_region;
--    ddc->get_vmstate_memory_region = pc_dimm_get_vmstate_memory_region;
-+    ddc->get_vmstate_memory_region = pc_dimm_get_memory_region;
+-    slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+-
+-    slot = pc_dimm_get_free_slot(slot == PC_DIMM_UNASSIGNED_SLOT ? NULL : &slot,
+-                                 machine->ram_slots, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+-    object_property_set_int(OBJECT(dev), slot, PC_DIMM_SLOT_PROP, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+-    trace_mhp_pc_dimm_assigned_slot(slot);
+-
+     memory_device_plug_region(machine, mr, addr);
+     vmstate_register_ram(vmstate_mr, dev);
  
-     mdc->get_addr = pc_dimm_md_get_addr;
-     /* for a dimm plugged_size == region_size */
 -- 
 2.17.1
