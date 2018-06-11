@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fSQqU-00021n-KQ
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:43:11 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fSQqY-00025N-EF
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:43:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fSQqQ-0000K2-GZ
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:43:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47900)
+	(envelope-from <ehabkost@redhat.com>) id 1fSQqX-0000M6-6H
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:43:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59290)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fSQqQ-0000Jl-8O
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:43:06 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fSQqW-0000Lv-TY
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:43:13 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 11 Jun 2018 14:42:40 -0300
-Message-Id: <20180611174243.31070-11-ehabkost@redhat.com>
+Date: Mon, 11 Jun 2018 14:42:43 -0300
+Message-Id: <20180611174243.31070-14-ehabkost@redhat.com>
 In-Reply-To: <20180611174243.31070-1-ehabkost@redhat.com>
 References: <20180611174243.31070-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/13] python: futurize -f
- lib2to3.fixes.fix_numliterals
+Subject: [Qemu-devel] [PULL 13/13] python: Remove scripts/ordereddict.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,173 +26,194 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-Convert octal literals into the new syntax.
+Python 2.7 (the minimum Python version we require) provides
+collections.OrderedDict on the standard library, so we don't need
+to carry our own implementation.
 
-This is necessary for Python 3 compatibility.
-
-Done using:
-
-  $ py=3D$( (g grep -l -E '^#!.*python';find -name '*.py' -printf '%P\n';=
-) | \
-    sort -u | grep -v README.sh4)
-  $ futurize -w -f lib2to3.fixes.fix_numliterals $py
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20180608122952.2009-11-ehabkost@redhat.com>
+Message-Id: <20180608175252.25110-3-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/qmp/qom-fuse   |  6 +++---
- tests/qemu-iotests/118 | 24 ++++++++++++------------
- 2 files changed, 15 insertions(+), 15 deletions(-)
+ Makefile               |   1 -
+ scripts/ordereddict.py | 128 -----------------------------------------
+ scripts/qapi/common.py |   5 +-
+ tests/Makefile.include |   1 -
+ 4 files changed, 1 insertion(+), 134 deletions(-)
+ delete mode 100644 scripts/ordereddict.py
 
-diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
-index b00cb0a0af..e524e798fc 100755
---- a/scripts/qmp/qom-fuse
-+++ b/scripts/qmp/qom-fuse
-@@ -90,7 +90,7 @@ class QOMFS(Fuse):
-=20
-     def getattr(self, path):
-         if self.is_link(path):
--            value =3D posix.stat_result((0755 | stat.S_IFLNK,
-+            value =3D posix.stat_result((0o755 | stat.S_IFLNK,
-                                        self.get_ino(path),
-                                        0,
-                                        2,
-@@ -101,7 +101,7 @@ class QOMFS(Fuse):
-                                        0,
-                                        0))
-         elif self.is_object(path):
--            value =3D posix.stat_result((0755 | stat.S_IFDIR,
-+            value =3D posix.stat_result((0o755 | stat.S_IFDIR,
-                                        self.get_ino(path),
-                                        0,
-                                        2,
-@@ -112,7 +112,7 @@ class QOMFS(Fuse):
-                                        0,
-                                        0))
-         elif self.is_property(path):
--            value =3D posix.stat_result((0644 | stat.S_IFREG,
-+            value =3D posix.stat_result((0o644 | stat.S_IFREG,
-                                        self.get_ino(path),
-                                        0,
-                                        1,
-diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
-index a0469b570e..ff3b2ae3e7 100755
---- a/tests/qemu-iotests/118
-+++ b/tests/qemu-iotests/118
-@@ -390,14 +390,14 @@ class TestChangeReadOnly(ChangeBaseClass):
-=20
-     def tearDown(self):
-         self.vm.shutdown()
--        os.chmod(old_img, 0666)
--        os.chmod(new_img, 0666)
-+        os.chmod(old_img, 0o666)
-+        os.chmod(new_img, 0o666)
-         os.remove(old_img)
-         os.remove(new_img)
-=20
-     def test_ro_ro_retain(self):
--        os.chmod(old_img, 0444)
--        os.chmod(new_img, 0444)
-+        os.chmod(old_img, 0o444)
-+        os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk,read-only=3Don', 'none'=
-)
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -417,7 +417,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-     def test_ro_rw_retain(self):
--        os.chmod(old_img, 0444)
-+        os.chmod(old_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk,read-only=3Don', 'none'=
-)
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -437,7 +437,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-     def test_rw_ro_retain(self):
--        os.chmod(new_img, 0444)
-+        os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -459,7 +459,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', old=
-_img)
-=20
-     def test_ro_rw(self):
--        os.chmod(old_img, 0444)
-+        os.chmod(old_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk,read-only=3Don', 'none'=
-)
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -480,7 +480,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-     def test_rw_ro(self):
--        os.chmod(new_img, 0444)
-+        os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -521,7 +521,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-     def test_make_ro_rw(self):
--        os.chmod(new_img, 0444)
-+        os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -542,7 +542,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', old=
-_img)
-=20
-     def test_make_rw_ro_by_retain(self):
--        os.chmod(old_img, 0444)
-+        os.chmod(old_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk,read-only=3Don', 'none'=
-)
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -562,7 +562,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', new=
-_img)
-=20
-     def test_make_ro_rw_by_retain(self):
--        os.chmod(new_img, 0444)
-+        os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
-@@ -582,7 +582,7 @@ class TestChangeReadOnly(ChangeBaseClass):
-         self.assert_qmp(result, 'return[0]/inserted/image/filename', old=
-_img)
-=20
-     def test_rw_ro_cycle(self):
--        os.chmod(new_img, 0444)
-+        os.chmod(new_img, 0o444)
-         self.vm.add_drive(old_img, 'media=3Ddisk', 'none')
-         self.vm.add_device('floppy,drive=3Ddrive0,id=3D%s' % self.device=
-_name)
-         self.vm.launch()
---=20
+diff --git a/Makefile b/Makefile
+index 023b3437ec..6c6664d9a3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -567,7 +567,6 @@ $(SRC_PATH)/scripts/qapi/types.py \
+ $(SRC_PATH)/scripts/qapi/visit.py \
+ $(SRC_PATH)/scripts/qapi/common.py \
+ $(SRC_PATH)/scripts/qapi/doc.py \
+-$(SRC_PATH)/scripts/ordereddict.py \
+ $(SRC_PATH)/scripts/qapi-gen.py
+ 
+ qga/qapi-generated/qga-qapi-types.c qga/qapi-generated/qga-qapi-types.h \
+diff --git a/scripts/ordereddict.py b/scripts/ordereddict.py
+deleted file mode 100644
+index 68ed340b33..0000000000
+--- a/scripts/ordereddict.py
++++ /dev/null
+@@ -1,128 +0,0 @@
+-# Copyright (c) 2009 Raymond Hettinger
+-#
+-# Permission is hereby granted, free of charge, to any person
+-# obtaining a copy of this software and associated documentation files
+-# (the "Software"), to deal in the Software without restriction,
+-# including without limitation the rights to use, copy, modify, merge,
+-# publish, distribute, sublicense, and/or sell copies of the Software,
+-# and to permit persons to whom the Software is furnished to do so,
+-# subject to the following conditions:
+-#
+-#     The above copyright notice and this permission notice shall be
+-#     included in all copies or substantial portions of the Software.
+-#
+-#     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+-#     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+-#     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+-#     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+-#     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+-#     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+-#     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+-#     OTHER DEALINGS IN THE SOFTWARE.
+-
+-from UserDict import DictMixin
+-
+-
+-class OrderedDict(dict, DictMixin):
+-
+-    def __init__(self, *args, **kwds):
+-        if len(args) > 1:
+-            raise TypeError('expected at most 1 arguments, got %d' % len(args))
+-        try:
+-            self.__end
+-        except AttributeError:
+-            self.clear()
+-        self.update(*args, **kwds)
+-
+-    def clear(self):
+-        self.__end = end = []
+-        end += [None, end, end]         # sentinel node for doubly linked list
+-        self.__map = {}                 # key --> [key, prev, next]
+-        dict.clear(self)
+-
+-    def __setitem__(self, key, value):
+-        if key not in self:
+-            end = self.__end
+-            curr = end[1]
+-            curr[2] = end[1] = self.__map[key] = [key, curr, end]
+-        dict.__setitem__(self, key, value)
+-
+-    def __delitem__(self, key):
+-        dict.__delitem__(self, key)
+-        key, prev, next = self.__map.pop(key)
+-        prev[2] = next
+-        next[1] = prev
+-
+-    def __iter__(self):
+-        end = self.__end
+-        curr = end[2]
+-        while curr is not end:
+-            yield curr[0]
+-            curr = curr[2]
+-
+-    def __reversed__(self):
+-        end = self.__end
+-        curr = end[1]
+-        while curr is not end:
+-            yield curr[0]
+-            curr = curr[1]
+-
+-    def popitem(self, last=True):
+-        if not self:
+-            raise KeyError('dictionary is empty')
+-        if last:
+-            key = next(reversed(self))
+-        else:
+-            key = next(iter(self))
+-        value = self.pop(key)
+-        return key, value
+-
+-    def __reduce__(self):
+-        items = [[k, self[k]] for k in self]
+-        tmp = self.__map, self.__end
+-        del self.__map, self.__end
+-        inst_dict = vars(self).copy()
+-        self.__map, self.__end = tmp
+-        if inst_dict:
+-            return (self.__class__, (items,), inst_dict)
+-        return self.__class__, (items,)
+-
+-    def keys(self):
+-        return list(self)
+-
+-    setdefault = DictMixin.setdefault
+-    update = DictMixin.update
+-    pop = DictMixin.pop
+-    values = DictMixin.values
+-    items = DictMixin.items
+-    iterkeys = DictMixin.iterkeys
+-    itervalues = DictMixin.itervalues
+-    iteritems = DictMixin.iteritems
+-
+-    def __repr__(self):
+-        if not self:
+-            return '%s()' % (self.__class__.__name__,)
+-        return '%s(%r)' % (self.__class__.__name__, self.items())
+-
+-    def copy(self):
+-        return self.__class__(self)
+-
+-    @classmethod
+-    def fromkeys(cls, iterable, value=None):
+-        d = cls()
+-        for key in iterable:
+-            d[key] = value
+-        return d
+-
+-    def __eq__(self, other):
+-        if isinstance(other, OrderedDict):
+-            if len(self) != len(other):
+-                return False
+-            for p, q in zip(self.items(), other.items()):
+-                if p != q:
+-                    return False
+-            return True
+-        return dict.__eq__(self, other)
+-
+-    def __ne__(self, other):
+-        return not self == other
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index e82990f0f2..2462fc0291 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -16,10 +16,7 @@ import errno
+ import os
+ import re
+ import string
+-try:
+-    from collections import OrderedDict
+-except:
+-    from ordereddict import OrderedDict
++from collections import OrderedDict
+ 
+ builtin_types = {
+     'null':     'QTYPE_QNULL',
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 400d8890e7..ccedacebd5 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -31,7 +31,6 @@ $(SRC_PATH)/scripts/qapi/types.py \
+ $(SRC_PATH)/scripts/qapi/visit.py \
+ $(SRC_PATH)/scripts/qapi/common.py \
+ $(SRC_PATH)/scripts/qapi/doc.py \
+-$(SRC_PATH)/scripts/ordereddict.py \
+ $(SRC_PATH)/scripts/qapi-gen.py
+ 
+ # Get the list of all supported sysemu targets
+-- 
 2.18.0.rc1.1.g3f1ff2140
