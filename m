@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fSQKb-0007TI-1B
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:10:13 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fSQKd-0007Ti-Mv
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:10:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fSQKa-0000Tz-3s
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:10:12 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42678)
+	(envelope-from <pm215@archaic.org.uk>) id 1fSQKc-0000Vo-Gk
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:10:15 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42686)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fSQKZ-0000TG-SN
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:10:12 -0400
+	id 1fSQKc-0000Up-8N
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 13:10:14 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 11 Jun 2018 18:10:04 +0100
-Message-Id: <20180611171007.4165-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/3] Add ldn_*_p() and stn_*_p() and use them
- in exec.c
+Date: Mon, 11 Jun 2018 18:10:05 +0100
+Message-Id: <20180611171007.4165-2-peter.maydell@linaro.org>
+In-Reply-To: <20180611171007.4165-1-peter.maydell@linaro.org>
+References: <20180611171007.4165-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/3] bswap: Add new stn_*_p() and ldn_*_p()
+ memory access functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +32,137 @@ There's a common pattern in QEMU where a function needs to perform
 a data load or store of an N byte integer in a particular endianness.
 At the moment this is handled by doing a switch() on the size and
 calling the appropriate ld*_p or st*_p function for each size.
-    
-This patchset provides a new family of functions ldn_*_p() and stn_*_p()
-which take the size as an argument and do the switch() themselves,
-and uses them in 5 callsites in exec.c.
 
-If people like the idea, naming convention, etc, we can look for
-and convert other callsites, extend this to eg an address_space_ldn()
-and address_space_stn() (sample use cases in watch_mem_read(),
-watch_mem_write(), dino_chip_write_with_attrs(), tx_ppc_read(),
-tx_ppc_write()...)
+Provide a new family of functions ldn_*_p() and stn_*_p() which
+take the size as an argument and do the switch() themselves.
 
-Patch 2 here fixes an apparently unintentional sign-extension in
-subpage_read(), so that patch 3 is a no-behaviour-change patch.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/exec/cpu-all.h      |  4 +++
+ include/qemu/bswap.h        | 52 +++++++++++++++++++++++++++++++++++++
+ docs/devel/loads-stores.rst | 15 +++++++++++
+ 3 files changed, 71 insertions(+)
 
-thanks
--- PMM
-
-Peter Maydell (3):
-  bswap: Add new stn_*_p() and ldn_*_p() memory access functions
-  exec.c: Don't accidentally sign-extend 4-byte loads in subpage_read()
-  exec.c: Use stn_p() and ldn_p() instead of explicit switches
-
- include/exec/cpu-all.h      |   4 ++
- include/qemu/bswap.h        |  52 +++++++++++++++++
- exec.c                      | 112 +++---------------------------------
- docs/devel/loads-stores.rst |  15 +++++
- 4 files changed, 79 insertions(+), 104 deletions(-)
-
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index a635f532f97..07ec3808342 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -133,6 +133,8 @@ static inline void tswap64s(uint64_t *s)
+ #define stq_p(p, v) stq_be_p(p, v)
+ #define stfl_p(p, v) stfl_be_p(p, v)
+ #define stfq_p(p, v) stfq_be_p(p, v)
++#define ldn_p(p, sz ldn_be_p(p, sz)
++#define stn_p(p, sz, v) stn_be_p(p, sz, v)
+ #else
+ #define lduw_p(p) lduw_le_p(p)
+ #define ldsw_p(p) ldsw_le_p(p)
+@@ -145,6 +147,8 @@ static inline void tswap64s(uint64_t *s)
+ #define stq_p(p, v) stq_le_p(p, v)
+ #define stfl_p(p, v) stfl_le_p(p, v)
+ #define stfq_p(p, v) stfq_le_p(p, v)
++#define ldn_p(p, sz) ldn_le_p(p, sz)
++#define stn_p(p, sz, v) stn_le_p(p, sz, v)
+ #endif
+ 
+ /* MMU memory access macros */
+diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+index 3f28f661b15..a684c1a7a29 100644
+--- a/include/qemu/bswap.h
++++ b/include/qemu/bswap.h
+@@ -290,6 +290,15 @@ typedef union {
+  * For accessors that take a guest address rather than a
+  * host address, see the cpu_{ld,st}_* accessors defined in
+  * cpu_ldst.h.
++ *
++ * For cases where the size to be used is not fixed at compile time,
++ * there are
++ *  stn{endian}_p(ptr, sz, val)
++ * which stores @val to @ptr as an @endian-order number @sz bytes in size
++ * and
++ *  ldn{endian}_p(ptr, sz)
++ * which loads @sz bytes from @ptr as an unsigned @endian-order number
++ * and returns it in a uint64_t.
+  */
+ 
+ static inline int ldub_p(const void *ptr)
+@@ -495,6 +504,49 @@ static inline unsigned long leul_to_cpu(unsigned long v)
+ #endif
+ }
+ 
++/* Store v to p as a sz byte value in host order */
++#define DO_STN_LDN_P(END) \
++    static inline void stn_## END ## _p(void *ptr, int sz, uint64_t v)  \
++    {                                                                   \
++        switch (sz) {                                                   \
++        case 1:                                                         \
++            stb_p(ptr, v);                                              \
++            break;                                                      \
++        case 2:                                                         \
++            stw_ ## END ## _p(ptr, v);                                  \
++            break;                                                      \
++        case 4:                                                         \
++            stl_ ## END ## _p(ptr, v);                                  \
++            break;                                                      \
++        case 8:                                                         \
++            stq_ ## END ## _p(ptr, v);                                  \
++            break;                                                      \
++        default:                                                        \
++            g_assert_not_reached();                                     \
++        }                                                               \
++    }                                                                   \
++    static inline uint64_t ldn_## END ## _p(const void *ptr, int sz)    \
++    {                                                                   \
++        switch (sz) {                                                   \
++        case 1:                                                         \
++            return ldub_p(ptr);                                         \
++        case 2:                                                         \
++            return lduw_ ## END ## _p(ptr);                             \
++        case 4:                                                         \
++            return (uint32_t)ldl_ ## END ## _p(ptr);                    \
++        case 8:                                                         \
++            return ldq_ ## END ## _p(ptr);                              \
++        default:                                                        \
++            g_assert_not_reached();                                     \
++        }                                                               \
++    }
++
++DO_STN_LDN_P(he)
++DO_STN_LDN_P(le)
++DO_STN_LDN_P(be)
++
++#undef DO_STN_LDN_P
++
+ #undef le_bswap
+ #undef be_bswap
+ #undef le_bswaps
+diff --git a/docs/devel/loads-stores.rst b/docs/devel/loads-stores.rst
+index 6a990cc2438..57d8c524bfe 100644
+--- a/docs/devel/loads-stores.rst
++++ b/docs/devel/loads-stores.rst
+@@ -53,9 +53,24 @@ The ``_{endian}`` infix is omitted for target-endian accesses.
+ The target endian accessors are only available to source
+ files which are built per-target.
+ 
++There are also functions which take the size as an argument:
++
++load: ``ldn{endian}_p(ptr, sz)``
++
++which performs an unsigned load of ``sz`` bytes from ``ptr``
++as an ``{endian}`` order value and returns it in a uint64_t.
++
++store: ``stn{endian}_p(ptr, sz, val)``
++
++which stores ``val`` to ``ptr`` as an ``{endian}`` order value
++of size ``sz`` bytes.
++
++
+ Regexes for git grep
+  - ``\<ldf\?[us]\?[bwlq]\(_[hbl]e\)\?_p\>``
+  - ``\<stf\?[bwlq]\(_[hbl]e\)\?_p\>``
++ - ``\<ldn_\([hbl]e\)?_p\>``
++ - ``\<stn_\([hbl]e\)?_p\>``
+ 
+ ``cpu_{ld,st}_*``
+ ~~~~~~~~~~~~~~~~~
 -- 
 2.17.1
