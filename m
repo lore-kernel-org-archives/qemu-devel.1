@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fSIGf-0006ok-9Y
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:33:38 -0400
+	(envelope-from <rjones@redhat.com>) id 1fSIRK-0000Yf-TM
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:44:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fSIGe-0004Le-Hx
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:33:37 -0400
-Message-ID: <5B1E33A4.7070509@huawei.com>
-Date: Mon, 11 Jun 2018 16:32:36 +0800
-From: Shannon Zhao <zhaoshenglong@huawei.com>
+	(envelope-from <rjones@redhat.com>) id 1fSIRJ-0000eR-SA
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 04:44:38 -0400
+Date: Mon, 11 Jun 2018 09:44:23 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20180611084423.GL1455@redhat.com>
+References: <20180528183058.GG2209@redhat.com>
+	<20180528183833.GJ4580@localhost.localdomain>
+	<20180528212054.GH2209@redhat.com>
+	<20180528212510.GC4660@redhat.com>
+	<20180529064415.GA4756@localhost.localdomain>
+	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+	<20180606123237.2235ae4a@kitsune.suse.cz>
+	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+	<20180606131929.44d0fd6b@kitsune.suse.cz>
+	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
 MIME-Version: 1.0
-References: <1527736557-11084-1-git-send-email-zhaoshenglong@huawei.com>
-	<1527736557-11084-2-git-send-email-zhaoshenglong@huawei.com>
-	<e7bb1cbd-7fad-5bd2-641c-885f0f473680@redhat.com>
-In-Reply-To: <e7bb1cbd-7fad-5bd2-641c-885f0f473680@redhat.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] arm_gicv3_kvm:
- kvm_dist_get/put_priority: skip the registers banked by GICR_IPRIORITYR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,31 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, qemu-stable@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com, ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
+On Wed, Jun 06, 2018 at 01:32:47PM +0200, Max Reitz wrote:
+> ext2?
 
+I wrote an nbdkit plugin for ext2/ext3/ext4 last week.
 
-On 2018/5/31 19:01, Auger Eric wrote:
-> Hi,
-> 
-> On 05/31/2018 05:15 AM, Shannon Zhao wrote:
->> While for_each_dist_irq_reg loop starts from GIC_INTERNAL, it forgot to
->> offset the date array and index. This will overlap the GICR registers
->> value and leave the last GIC_INTERNAL irq's registers out of update.
->>
->> Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
->> Cc: qemu-stable@nongnu.org
->> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> 
-Hi Peter,
+  https://github.com/libguestfs/nbdkit/tree/master/plugins/ext2
 
-Looks like we missed picking up this patch. I didn't include this in v6
-since you and Eric both reviewed it.
+It uses libext2fs from e2fsprogs and I think there are some lessons
+for anyone who wants to use ext2 to store disk images.
 
-Could you please pick it up?
+(1) You cannot have more than one host process accessing a single
+filesystem image, even read-only.  This is because opening an ext2+
+filesystem even read-only causes writes, replaying the journal (for
+ext3+) or writing to the superblock.
 
-Thanks,
+I'm sure there are some common use-cases such as overlays sharing a
+common backing store which are excluded by this restriction.
+
+(2) Within a single process you cannot have more than one libext2fs
+handle open on the filesystem image.  This could make qemu block
+drivers a bit awkward (although not impossible) because if two
+instances of an ext2 qemu block driver both opened different disks in
+the same filesystem they'd need to share a handle.
+
+(3) You can resize files in the filesystem, although because we're
+waiting for the NBD resize extension to be finalized my plugin does
+not do that.
+
+(4) Trim/discard appears to be possible (and it should be possible to
+punch holes in the filesystem image) but I couldn't actually
+understand how to make it work.  Also fast zeroing.
+
+Rich.
+
 -- 
-Shannon
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+libguestfs lets you edit virtual machines.  Supports shell scripting,
+bindings from many languages.  http://libguestfs.org
