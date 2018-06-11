@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39521)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fSVXN-0004RG-Hs
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 18:43:46 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fSVpC-0000L9-0P
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 19:02:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fSVXM-0001TM-Is
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 18:43:45 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Mon, 11 Jun 2018 18:43:38 -0400
-Message-Id: <20180611224338.9743-2-jsnow@redhat.com>
-In-Reply-To: <20180611224338.9743-1-jsnow@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1fSVpB-0002oF-82
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 19:02:10 -0400
 References: <20180611224338.9743-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/1] blockdev: n-ary bitmap merge
+From: John Snow <jsnow@redhat.com>
+Message-ID: <5b955356-810f-b3e3-27c5-d999c90306d7@redhat.com>
+Date: Mon, 11 Jun 2018 19:02:02 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180611224338.9743-1-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/1] blockdev: implement n-ary bitmap merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,121 +24,21 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, vsementov@virtuozzo.com, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-It might be nice to have an all-or-nothing merge command that either
-succeeds in merging all bitmaps or fails for all of them. This way,
-when assembling bitmaps that represent arbitrary points in time from
-component bitmaps, we always know the state of the target bitmap even
-in cases of failure.
+I mis-typed Vladimir's email, I have corrected it here.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- blockdev.c           | 40 ++++++++++++++++++++++++++++++----------
- qapi/block-core.json | 10 +++++-----
- 2 files changed, 35 insertions(+), 15 deletions(-)
-
-diff --git a/blockdev.c b/blockdev.c
-index 041f5d594f..4d60d0a03c 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3054,34 +3054,54 @@ void qmp_x_block_dirty_bitmap_disable(const char *node, const char *name,
-     bdrv_disable_dirty_bitmap(bitmap);
- }
- 
--void qmp_x_block_dirty_bitmap_merge(const char *node, const char *dst_name,
--                                    const char *src_name, Error **errp)
-+void qmp_x_block_dirty_bitmap_merge(const char *node, const char *target,
-+                                    strList *bitmaps, Error **errp)
- {
-     BlockDriverState *bs;
--    BdrvDirtyBitmap *dst, *src;
-+    BdrvDirtyBitmap *dst, *src, *anon;
-+    strList *lst;
-+    Error *local_err = NULL;
- 
--    dst = block_dirty_bitmap_lookup(node, dst_name, &bs, errp);
-+    dst = block_dirty_bitmap_lookup(node, target, &bs, errp);
-     if (!dst) {
-         return;
-     }
- 
-     if (bdrv_dirty_bitmap_frozen(dst)) {
-         error_setg(errp, "Bitmap '%s' is frozen and cannot be modified",
--                   dst_name);
-+                   target);
-         return;
-     } else if (bdrv_dirty_bitmap_readonly(dst)) {
-         error_setg(errp, "Bitmap '%s' is readonly and cannot be modified",
--                   dst_name);
-+                   target);
-         return;
-     }
- 
--    src = bdrv_find_dirty_bitmap(bs, src_name);
--    if (!src) {
--        error_setg(errp, "Dirty bitmap '%s' not found", src_name);
-+    anon = bdrv_create_dirty_bitmap(bs, bdrv_dirty_bitmap_granularity(dst),
-+                                    NULL, errp);
-+    if (!anon) {
-         return;
-     }
- 
--    bdrv_merge_dirty_bitmap(dst, src, errp);
-+    /* Aggregate bitmaps to anonymous temp bitmap */
-+    for (lst = bitmaps; lst; lst = lst->next) {
-+      src = bdrv_find_dirty_bitmap(bs, lst->value);
-+      if (!src) {
-+          error_setg(errp, "Dirty bitmap '%s' not found", lst->value);
-+          goto out;
-+      }
-+      bdrv_merge_dirty_bitmap(anon, src, &local_err);
-+      if (local_err) {
-+          error_propagate(errp, local_err);
-+          goto out;
-+      }
-+    }
-+
-+    /* Merge into dst; dst is unchanged on failure */
-+    bdrv_merge_dirty_bitmap(dst, anon, errp);
-+
-+out:
-+    bdrv_release_dirty_bitmap(bs, anon);
- }
- 
- BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index fff23fc82b..83402da7e7 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1749,14 +1749,14 @@
- #
- # @node: name of device/node which the bitmap is tracking
- #
--# @dst_name: name of the destination dirty bitmap
-+# @target: name of the destination dirty bitmap
- #
--# @src_name: name of the source dirty bitmap
-+# @bitmaps: name(s) of the source dirty bitmap(s)
- #
- # Since: 3.0
- ##
- { 'struct': 'BlockDirtyBitmapMerge',
--  'data': { 'node': 'str', 'dst_name': 'str', 'src_name': 'str' } }
-+  'data': { 'node': 'str', 'target': 'str', 'bitmaps': ['str'] } }
- 
- ##
- # @block-dirty-bitmap-add:
-@@ -1884,8 +1884,8 @@
- # Example:
- #
- # -> { "execute": "x-block-dirty-bitmap-merge",
--#      "arguments": { "node": "drive0", "dst_name": "bitmap0",
--#                     "src_name": "bitmap1" } }
-+#      "arguments": { "node": "drive0", "target": "bitmap0",
-+#                     "bitmaps": ["bitmap1"] } }
- # <- { "return": {} }
- #
- ##
--- 
-2.14.3
+On 06/11/2018 06:43 PM, John Snow wrote:
+> requires: 20180606182449.1607-1-jsnow@redhat.com
+> 
+> See patch for details; this is somewhat an RFC that I suspect
+> will be useful for libvirt in some situations, but maybe it's
+> actually overkill.
+> 
+> John Snow (1):
+>   blockdev: n-ary bitmap merge
+> 
+>  blockdev.c           | 40 ++++++++++++++++++++++++++++++----------
+>  qapi/block-core.json | 10 +++++-----
+>  2 files changed, 35 insertions(+), 15 deletions(-)
+> 
