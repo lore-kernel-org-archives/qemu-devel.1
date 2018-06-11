@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fSP9m-0001Rr-R5
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 11:55:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1fSPAN-0001xN-Uh
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 11:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fSP9l-0000Mp-Vz
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 11:54:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40358 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fSP9l-0000Md-QY
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 11:54:57 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 53B18401EF26
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 15:54:57 +0000 (UTC)
-Date: Mon, 11 Jun 2018 16:54:51 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180611155450.GH2661@work-vm>
-References: <20180523111817.1463-1-quintela@redhat.com>
-	<20180523111817.1463-11-quintela@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fSPAN-0000e2-1Z
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 11:55:36 -0400
+References: <20180611011501.10235-1-f4bug@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <54eb6ae9-d7e0-8a4d-6bd4-f8f1d0f00b92@redhat.com>
+Date: Mon, 11 Jun 2018 10:55:17 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180523111817.1463-11-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v13 10/12] migration: Wait for blocking IO
+In-Reply-To: <20180611011501.10235-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 00/40] Use the IEC binary prefix
+ definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,157 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>, Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-arm@nongnu.org, qemu-block@nongnu.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org, qemu-trivial@nongnu.org, Fabien Chouteau <chouteau@adacore.com>, Alistair Francis <alistair@alistair23.me>, Aurelien Jarno <aurelien@aurel32.net>, Anthony Perard <anthony.perard@citrix.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Marek Vasut <marex@denx.de>, Sagar Karandikar <sagark@eecs.berkeley.edu>, David Gibson <david@gibson.dropbear.id.au>, Antony Pavlov <antonynpavlov@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Andrzej Zaborowski <balrogg@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Chris Wulff <crwulff@gmail.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Max Filippov <jcmvbkbc@gmail.com>, Magnus Damm <magnus.damm@gmail.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alberto Garcia <berto@igalia.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Keith Busch <keith.busch@intel.com>, Stefano Stabellini <sstabellini@kernel.org>, Peter Maydell <peter.maydell@linaro.org>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Paul Burton <paul.burton@mips.com>, Yongbok Kim <yongbok.kim@mips.com>, Peter Chubb <peter.chubb@nicta.com.au>, Yuval Shaia <yuval.shaia@oracle.com>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>, Alex Williamson <alex.williamson@redhat.com>, Markus Armbruster <armbru@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Fam Zheng <famz@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Jiri Slaby <jslaby@suse.cz>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Michael Walle <michael@walle.cc>, Jan Kiszka <jan.kiszka@web.de>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We have three conditions here:
-> - channel fails -> error
-> - we have to quit: we close the channel and reads fails
-> - normal read that success, we are in bussiness
-> 
-> So forget the complications of waiting in a semaphore.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On 06/10/2018 08:14 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi,
+>=20
+> This series:
+>=20
+> - split the byte-based definitions from "qemu/cutils.h" to "qemu/units.=
+h"
+>    (this now triggers WARNING: 1 added file, does MAINTAINERS need upda=
+ting?)
+> - clean hw/ includes;
+> - replace different constants used for byte size with their correspondi=
+ng
+>    IEC binary prefix definitions.
+>=20
+> Since v3:
+> - use IEC binary prefix definitions (Stefan Weil)
+> - rebased
+> - added R-b tags
+>=20
 
-I'd still prefer this to be squashed into the earlier ones somehow, but
-the result looks OK afterwards I think.
+>   hw/net/ne2000.h                          |  5 ++--
+...
+>   tests/test-qemu-opts.c                   |  7 +++---
+>   scripts/checkpatch.pl                    |  1 +
+>   135 files changed, 533 insertions(+), 431 deletions(-)
+>   create mode 100644 include/qemu/units.h
+>=20
 
-Dave
+At least monitor.c and vl.c are missing from this list; a more general=20
+grep shows that the following are all potential candidates for this clean=
+up:
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+$ git grep -n '[<>][<>]=3D [1-5]0'
+disas/m68k.c:787:      val >>=3D 10;
+hw/mips/mips_malta.c:194:    ram_size >>=3D 20;
+hw/ppc/sam460ex.c:129:    ram_size >>=3D 20;
+hw/timer/sh_timer.c:112:        case 4: freq >>=3D 10; break;
+linux-user/mips/cpu_loop.c:641:                                code >>=3D=
+ 10;
+linux-user/mips/cpu_loop.c:664:                        code >>=3D 10;
+monitor.c:3198:                    val <<=3D 20;
+target/m68k/helper.c:386:    size >>=3D 10;
+target/m68k/helper.c:390:        size >>=3D 10;
+target/m68k/helper.c:394:            size >>=3D 10;
+target/xtensa/helper.c:729:            sz >>=3D 20;
+target/xtensa/helper.c:732:            sz >>=3D 10;
+vl.c:2793:            sz <<=3D 20;
 
-> ---
->  migration/ram.c | 81 ++++++++++++++++++-------------------------------
->  1 file changed, 29 insertions(+), 52 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 2584130c85..a707d3ae80 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -595,8 +595,6 @@ typedef struct {
->      bool running;
->      /* should this thread finish */
->      bool quit;
-> -    /* thread has work to do */
-> -    bool pending_job;
->      /* array of pages to receive */
->      MultiFDPages_t *pages;
->      /* packet allocated len */
-> @@ -1170,14 +1168,6 @@ static void multifd_recv_sync_main(void)
->      for (i = 0; i < migrate_multifd_channels(); i++) {
->          MultiFDRecvParams *p = &multifd_recv_state->params[i];
->  
-> -        trace_multifd_recv_sync_main_signal(p->id);
-> -        qemu_mutex_lock(&p->mutex);
-> -        p->pending_job = true;
-> -        qemu_mutex_unlock(&p->mutex);
-> -    }
-> -    for (i = 0; i < migrate_multifd_channels(); i++) {
-> -        MultiFDRecvParams *p = &multifd_recv_state->params[i];
-> -
->          trace_multifd_recv_sync_main_wait(p->id);
->          qemu_sem_wait(&multifd_recv_state->sem_sync);
->          qemu_mutex_lock(&p->mutex);
-> @@ -1190,7 +1180,6 @@ static void multifd_recv_sync_main(void)
->          MultiFDRecvParams *p = &multifd_recv_state->params[i];
->  
->          trace_multifd_recv_sync_main_signal(p->id);
-> -
->          qemu_sem_post(&p->sem_sync);
->      }
->      trace_multifd_recv_sync_main(multifd_recv_state->seq);
-> @@ -1205,51 +1194,40 @@ static void *multifd_recv_thread(void *opaque)
->      trace_multifd_recv_thread_start(p->id);
->  
->      while (true) {
-> +        uint32_t used;
-> +        uint32_t flags;
-> +
-> +        ret = qio_channel_read_all_eof(p->c, (void *)p->packet,
-> +                                       p->packet_len, &local_err);
-> +        if (ret == 0) {   /* EOF */
-> +            break;
-> +        }
-> +        if (ret == -1) {   /* Error */
-> +            break;
-> +        }
-> +
->          qemu_mutex_lock(&p->mutex);
-> -        if (true || p->pending_job) {
-> -            uint32_t used;
-> -            uint32_t flags;
-> -            qemu_mutex_unlock(&p->mutex);
-> -
-> -            ret = qio_channel_read_all_eof(p->c, (void *)p->packet,
-> -                                           p->packet_len, &local_err);
-> -            if (ret == 0) {   /* EOF */
-> -                break;
-> -            }
-> -            if (ret == -1) {   /* Error */
-> -                break;
-> -            }
-> -
-> -            qemu_mutex_lock(&p->mutex);
-> -            ret = multifd_recv_unfill_packet(p, &local_err);
-> -            if (ret) {
-> -                qemu_mutex_unlock(&p->mutex);
-> -                break;
-> -            }
-> -
-> -            used = p->pages->used;
-> -            flags = p->flags;
-> -            trace_multifd_recv(p->id, p->seq, used, flags);
-> -            p->pending_job = false;
-> -            p->num_packets++;
-> -            p->num_pages += used;
-> +        ret = multifd_recv_unfill_packet(p, &local_err);
-> +        if (ret) {
->              qemu_mutex_unlock(&p->mutex);
-> +            break;
-> +        }
->  
-> -            ret = qio_channel_readv_all(p->c, p->pages->iov, used, &local_err);
-> -            if (ret != 0) {
-> -                break;
-> -            }
-> +        used = p->pages->used;
-> +        flags = p->flags;
-> +        trace_multifd_recv(p->id, p->seq, used, flags);
-> +        p->num_packets++;
-> +        p->num_pages += used;
-> +        qemu_mutex_unlock(&p->mutex);
->  
-> -            if (flags & MULTIFD_FLAG_SYNC) {
-> -                qemu_sem_post(&multifd_recv_state->sem_sync);
-> -                qemu_sem_wait(&p->sem_sync);
-> -            }
-> -        } else if (p->quit) {
-> -            qemu_mutex_unlock(&p->mutex);
-> +        ret = qio_channel_readv_all(p->c, p->pages->iov, used, &local_err);
-> +        if (ret != 0) {
->              break;
-> -        } else {
-> -            qemu_mutex_unlock(&p->mutex);
-> -            /* sometimes there are spurious wakeups */
-> +        }
-> +
-> +        if (flags & MULTIFD_FLAG_SYNC) {
-> +            qemu_sem_post(&multifd_recv_state->sem_sync);
-> +            qemu_sem_wait(&p->sem_sync);
->          }
->      }
->  
-> @@ -1287,7 +1265,6 @@ int multifd_load_setup(void)
->          qemu_sem_init(&p->sem, 0);
->          qemu_sem_init(&p->sem_sync, 0);
->          p->quit = false;
-> -        p->pending_job = false;
->          p->id = i;
->          p->pages = multifd_pages_init(page_count);
->          p->packet_len = sizeof(MultiFDPacket_t)
-> -- 
-> 2.17.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
