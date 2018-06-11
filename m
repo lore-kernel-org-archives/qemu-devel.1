@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42858)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSBRN-0005Cx-Qg
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:16:14 -0400
+	id 1fSBRR-0005FU-HP
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:16:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSBRK-0002q3-Vv
-	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:16:13 -0400
+	id 1fSBRQ-0002ua-FV
+	for qemu-devel@nongnu.org; Sun, 10 Jun 2018 21:16:17 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 10 Jun 2018 22:14:33 -0300
-Message-Id: <20180611011501.10235-13-f4bug@amsat.org>
+Date: Sun, 10 Jun 2018 22:14:34 -0300
+Message-Id: <20180611011501.10235-14-f4bug@amsat.org>
 In-Reply-To: <20180611011501.10235-1-f4bug@amsat.org>
 References: <20180611011501.10235-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 12/40] hw/tpm: Use the IEC binary prefix
+Subject: [Qemu-devel] [PATCH v4 13/40] hw/block: Use the IEC binary prefix
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Stefan Berger <stefanb@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Keith Busch <keith.busch@intel.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
 It eases code review, unit is explicit.
 
@@ -39,31 +39,78 @@ Patch generated using:
 and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- include/hw/acpi/tpm.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/block/m25p80.c  | 5 +++--
+ hw/block/nvme.c    | 3 ++-
+ hw/block/tc58128.c | 3 ++-
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-index 46ac4dc581..3580ffd50c 100644
---- a/include/hw/acpi/tpm.h
-+++ b/include/hw/acpi/tpm.h
-@@ -16,6 +16,7 @@
- #ifndef HW_ACPI_TPM_H
- #define HW_ACPI_TPM_H
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index a5ccffb4aa..38c69c81a9 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -22,6 +22,7 @@
+  */
  
+ #include "qemu/osdep.h"
 +#include "qemu/units.h"
- #include "hw/registerfields.h"
+ #include "hw/hw.h"
+ #include "sysemu/block-backend.h"
+ #include "hw/ssi/ssi.h"
+@@ -541,12 +542,12 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
+     switch (cmd) {
+     case ERASE_4K:
+     case ERASE4_4K:
+-        len = 4 << 10;
++        len = 4 * KiB;
+         capa_to_assert = ER_4K;
+         break;
+     case ERASE_32K:
+     case ERASE4_32K:
+-        len = 32 << 10;
++        len = 32 * KiB;
+         capa_to_assert = ER_32K;
+         break;
+     case ERASE_SECTOR:
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 811084b6a7..ae2188c761 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -25,6 +25,7 @@
+  */
  
- #define TPM_TIS_ADDR_BASE           0xFED40000
-@@ -176,7 +177,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
- #define TPM_CRB_ADDR_CTRL           (TPM_CRB_ADDR_BASE + A_CRB_CTRL_REQ)
- #define TPM_CRB_R_MAX               R_CRB_DATA_BUFFER
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "hw/block/block.h"
+ #include "hw/hw.h"
+ #include "hw/pci/msix.h"
+@@ -648,7 +649,7 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeIdentify *c)
  
--#define TPM_LOG_AREA_MINIMUM_SIZE   (64 * 1024)
-+#define TPM_LOG_AREA_MINIMUM_SIZE   (64 * KiB)
+ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
+ {
+-    static const int data_len = 4096;
++    static const int data_len = 4 * KiB;
+     uint32_t min_nsid = le32_to_cpu(c->nsid);
+     uint64_t prp1 = le64_to_cpu(c->prp1);
+     uint64_t prp2 = le64_to_cpu(c->prp2);
+diff --git a/hw/block/tc58128.c b/hw/block/tc58128.c
+index 1d9f7ee000..808ad76ba6 100644
+--- a/hw/block/tc58128.c
++++ b/hw/block/tc58128.c
+@@ -1,4 +1,5 @@
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "hw/hw.h"
+ #include "hw/sh4/sh.h"
+ #include "hw/loader.h"
+@@ -26,7 +27,7 @@ typedef struct {
  
- #define TPM_TCPA_ACPI_CLASS_CLIENT  0
- #define TPM_TCPA_ACPI_CLASS_SERVER  1
+ static tc58128_dev tc58128_devs[2];
+ 
+-#define FLASH_SIZE (16*1024*1024)
++#define FLASH_SIZE (16 * MiB)
+ 
+ static void init_dev(tc58128_dev * dev, const char *filename)
+ {
 -- 
 2.17.1
