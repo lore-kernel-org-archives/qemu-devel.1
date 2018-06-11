@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fSJ3l-0005pZ-Tj
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:24:22 -0400
+	(envelope-from <morecache@gmail.com>) id 1fSJ4x-0006eP-MO
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:25:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fSJ3g-0007x8-1Q
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:24:21 -0400
-Date: Mon, 11 Jun 2018 11:24:10 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180611112410.4e2eb406.cohuck@redhat.com>
-In-Reply-To: <3a7d6318-c827-3aa3-2799-7e383132beb3@de.ibm.com>
-References: <1528636325-4237-1-git-send-email-thuth@redhat.com>
-	<3a7d6318-c827-3aa3-2799-7e383132beb3@de.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/s390x/ipl: Fix crash that occurs when
- -kernel is used with small images
+	(envelope-from <morecache@gmail.com>) id 1fSJ4u-0008K2-FT
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:25:35 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:39318)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <morecache@gmail.com>) id 1fSJ4u-0008Jk-Ai
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:25:32 -0400
+Received: by mail-pf0-x242.google.com with SMTP id r11-v6so9918593pfl.6
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 02:25:32 -0700 (PDT)
+Sender: Lin Ma <morecache@gmail.com>
+From: Lin Ma <lma@suse.com>
+Date: Mon, 11 Jun 2018 17:23:05 +0800
+Message-Id: <20180611092305.2542-1-lma@suse.com>
+Subject: [Qemu-devel]  [PATCH v3] net: Fix a potential segfault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +24,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, jasowang@redhat.com, Lin Ma <lma@suse.com>
 
-On Mon, 11 Jun 2018 09:49:39 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+If user forgets to provide any backend types for '-netdev' in qemu CLI,
+It triggers seg fault.
 
-> On 06/10/2018 03:12 PM, Thomas Huth wrote:
-> > Add a sanity check to fix the following crash:
-> > 
-> > $ echo "Insane in the mainframe" > /tmp/test.txt
-> > $ s390x-softmmu/qemu-system-s390x -nographic -kernel /tmp/test.txt
-> > Segmentation fault (core dumped)
-> > 
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>  
-> 
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> 
-> I think a similar problem exists for INITRD_PARM_START and INITRD_PARM_SIZE. No?
+e.g.
 
-I think so as well.
+Expected:
+$ qemu -netdev id=net0
+qemu-system-x86_64: Parameter 'type' is missing
 
-> 
-> 
-> > ---
-> >  hw/s390x/ipl.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> > index 04245b5..9bb9b50 100644
-> > --- a/hw/s390x/ipl.c
-> > +++ b/hw/s390x/ipl.c
-> > @@ -168,7 +168,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
-> >           * we can not rely on the ELF entry point - it was 0x800 (the SALIPL
-> >           * loader) and it won't work. For this case we force it to 0x10000, too.
-> >           */
-> > -        if (pentry == KERN_IMAGE_START || pentry == 0x800) {
-> > +        if ((pentry == KERN_IMAGE_START || pentry == 0x800) &&
-> > +            kernel_size > KERN_PARM_AREA + strlen(ipl->cmdline)) {
-> >              ipl->start_addr = KERN_IMAGE_START;
-> >              /* Overwrite parameters in the kernel image, which are "rom" */
-> >              strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
-> >   
-> 
+Actual:
+$ qemu -netdev id=net0
+Segmentation fault (core dumped)
 
-The outcome of this is that we don't write into areas we must not write
-into, but we still have a broken "kernel" and will simply fail if the
-thing we're pointing to isn't a valid PSW. I guess that's what we want
-("crap in, crap out"), i.e. no fallback to the bios or something like
-that?
+Signed-off-by: Lin Ma <lma@suse.com>
+---
+ net/net.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/net.c b/net/net.c
+index efb9eaf779..2a3133990c 100644
+--- a/net/net.c
++++ b/net/net.c
+@@ -1093,7 +1093,9 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
+     int ret = -1;
+     Visitor *v = opts_visitor_new(opts);
+ 
+-    if (is_netdev && is_help_option(qemu_opt_get(opts, "type"))) {
++    const char *type = qemu_opt_get(opts, "type");
++
++    if (is_netdev && type && is_help_option(type)) {
+         show_netdevs();
+         exit(0);
+     } else {
+-- 
+2.16.2
