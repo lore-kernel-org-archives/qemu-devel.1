@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fSPwc-0004p9-1X
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:45:26 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fSPx7-00053O-Ig
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:45:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fSPwX-0002Ry-1F
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:45:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41084 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fSPx2-0002fz-IQ
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:45:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58774 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fSPwW-0002Rd-PW
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:45:20 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E5776BB428
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 16:45:19 +0000 (UTC)
-Date: Mon, 11 Jun 2018 17:45:16 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180611164516.GI2661@work-vm>
-References: <20180523111817.1463-1-quintela@redhat.com>
-	<20180523111817.1463-12-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fSPx2-0002fg-Cf
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 12:45:52 -0400
+Date: Mon, 11 Jun 2018 17:45:49 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180611164549.GI17756@stefanha-x1.localdomain>
+References: <20180604080630.10946-1-peterx@redhat.com>
+	<87tvqeyfs2.fsf@dusky.pond.sub.org> <20180608044235.GA7736@xz-mi>
+	<20180608080446.GH29183@stefanha-x1.localdomain>
+	<87a7s5snce.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="8/UBlNHSEJa6utmr"
 Content-Disposition: inline
-In-Reply-To: <20180523111817.1463-12-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v13 11/12] migration: Remove not needed
- semaphore and quit
+In-Reply-To: <87a7s5snce.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH] monitor: postpone
+ monitor_qmp_cleanup_queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Peter Xu <peterx@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We know quit closing the QIO.
 
-This patch does two different things; one of which I think I understand.
+--8/UBlNHSEJa6utmr
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The 'quit' has been removed - I think that makes sense because the
-multifd threads terminate when either they come to the end of a stream
-or hit an error; there's no case of asking them to quit explicitly.
-The 'sem' was basically for kicking the recv-thread to quit; which again
-isn't needed.
+On Fri, Jun 08, 2018 at 10:18:25AM +0200, Markus Armbruster wrote:
+> Stefan Hajnoczi <stefanha@gmail.com> writes:
+> > On Fri, Jun 08, 2018 at 12:42:35PM +0800, Peter Xu wrote:
+> >> On Thu, Jun 07, 2018 at 01:53:01PM +0200, Markus Armbruster wrote:
+> >> > Peter Xu <peterx@redhat.com> writes:
+> >> >=20
+> >> > > Previously we cleanup the queues when we got CLOSED event.  It was=
+ used
+> >> >=20
+> >> > we clean up
+> >> >=20
+> >> > > to make sure we won't leftover replies/events of a old client to a=
+ new
+> >> >=20
+> >> > we won't send leftover replies/events of an old client
+> >> >=20
+> >> > > client.  Now this patch postpones that until OPENED.
+> >> >=20
+> >> > What if OPENED never comes?
+> >>=20
+> >> Then we clean that up until destruction of the monitor.  IMHO it's
+> >> fine, but I'm not sure whether that's an overall acceptable approach.
+> >
+> > I think this patch fixes the problem at the wrong level.  Marc-Andr=E9's
+> > fix seemed like a cleaner solution.
+>=20
+> Is it the right solution?
+>=20
+> I proposed another one:
 
-Now, what about the object_unref on p->c ?
-If I've got this right multifd_recv_terminate_threads is only called in
-the error case; but doesn't multifd_load_cleanup also get called in that
-case - it does the unref and p->c = NULL as well.
+Sorry, I won't be able to participate in this because I'm behind on
+other patches and tasks.  Therefore, feel free to disregard but I'll
+give my 2 cents:
 
-Dave
+This seems like a chardev bug.  The solution should probably be in the
+chardev layer (Marc-Andr=E9's patch or something else), not in the monitor
+(this patch).
 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/ram.c | 11 ++---------
->  1 file changed, 2 insertions(+), 9 deletions(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index a707d3ae80..62eea9e02f 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -587,14 +587,10 @@ typedef struct {
->      QemuThread thread;
->      /* communication channel */
->      QIOChannel *c;
-> -    /* sem where to wait for more work */
-> -    QemuSemaphore sem;
->      /* this mutex protects the following parameters */
->      QemuMutex mutex;
->      /* is this channel thread running */
->      bool running;
-> -    /* should this thread finish */
-> -    bool quit;
->      /* array of pages to receive */
->      MultiFDPages_t *pages;
->      /* packet allocated len */
-> @@ -1115,8 +1111,8 @@ static void multifd_recv_terminate_threads(Error *err)
->          MultiFDRecvParams *p = &multifd_recv_state->params[i];
->  
->          qemu_mutex_lock(&p->mutex);
-> -        p->quit = true;
-> -        qemu_sem_post(&p->sem);
-> +        object_unref(OBJECT(p->c));
-> +        p->c = NULL;
->          qemu_mutex_unlock(&p->mutex);
->      }
->  }
-> @@ -1139,7 +1135,6 @@ int multifd_load_cleanup(Error **errp)
->          object_unref(OBJECT(p->c));
->          p->c = NULL;
->          qemu_mutex_destroy(&p->mutex);
-> -        qemu_sem_destroy(&p->sem);
->          qemu_sem_destroy(&p->sem_sync);
->          g_free(p->name);
->          p->name = NULL;
-> @@ -1262,9 +1257,7 @@ int multifd_load_setup(void)
->          MultiFDRecvParams *p = &multifd_recv_state->params[i];
->  
->          qemu_mutex_init(&p->mutex);
-> -        qemu_sem_init(&p->sem, 0);
->          qemu_sem_init(&p->sem_sync, 0);
-> -        p->quit = false;
->          p->id = i;
->          p->pages = multifd_pages_init(page_count);
->          p->packet_len = sizeof(MultiFDPacket_t)
-> -- 
-> 2.17.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Even if there is a monitor change, it's probably necessary to at least
+clarify the meaning of the CLOSE event to reduce the chance of similar
+bugs in future chardev users.
+
+Stefan
+
+--8/UBlNHSEJa6utmr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbHqc9AAoJEJykq7OBq3PItn4H/3O6esr9NPeoj5jYb/1FNhQg
+TNIfRqNLXpo3OgOBjVWi8PV0xuFxRdw0GH7uqvZ25kKSgr549mzP1Nj5UM2XxmAv
+2s1CzTag4ISi/lK4G6wiKik1hCb3nX6xp+4/m7Th2mXL+na4WGuji0vbaQu7H20Z
+Hmax2DsuRa7uBKkAbk+ltSHvMHUTOmuaQhKcuG+Zu9pZqy5ZCRiSCg+AcgyKBtFQ
+RQ4fqfyTncoGc01htJNa6b2UCU/oK15RbKEviqPz8N2kbnicyoRB4CxUSn+PgjZn
+24LOPyU6TkihmQBP83kwNHc3u8UDpSyG5K90fkAyCUXQM/4zCqNVGHRAt8lAl7c=
+=5Rn5
+-----END PGP SIGNATURE-----
+
+--8/UBlNHSEJa6utmr--
