@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fSM7x-0002gj-FC
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:40:56 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSMBk-0005fS-66
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:44:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fSM7s-0006NG-I4
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:40:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55720)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fSM7s-0006Mc-Bt
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:40:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fSM7q-0000LQ-Ui
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 12:40:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D3EF62E88D7
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 12:40:46 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1fSMBf-0000ix-A2
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:44:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50956 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fSMBf-0000ij-3t
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 08:44:43 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 616624023141
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 12:44:42 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180608130846.22234-1-dgilbert@redhat.com>
+	<87a7s1il25.fsf@dusky.pond.sub.org> <20180611120906.GE2661@work-vm>
+Date: Mon, 11 Jun 2018 14:44:41 +0200
+In-Reply-To: <20180611120906.GE2661@work-vm> (David Alan Gilbert's message of
+	"Mon, 11 Jun 2018 13:09:07 +0100")
+Message-ID: <87efhdh4qu.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Jun 2018 12:31:08 -0000
-From: Bastien Orivel <1776224@bugs.launchpad.net>
-Reply-To: Bug 1776224 <1776224@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152872026835.25608.863999795714640483.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1776224] [NEW] QEMU's SPICE server not getting
- leds callback when sending capslock
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] Reenable hmp for preconfig mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,115 +33,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, imammedo@redhat.com, qemu-devel@nongnu.org
 
-Public bug reported:
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-I'm having troubles using the QEMU's SPICE server for remote views. When
-trying to sync leds from my SPICE client to QEMU, I can see that the
-caps lock keycodes are sent but the server state never gets updated
-(which leads in funny behaviours like caps lock "blinking" in the guest
-if the clients resyncs its state often).
-
-That behaviour doesn't happen at all with the numlock led which does the
-same thing but with different keycodes.
-
-Here is an example of what's happening when the client tries to resync
-with a capslock difference:
-
-> Spice received: 58
-> ps2_put_keycode: 88
+> * Markus Armbruster (armbru@redhat.com) wrote:
+>> Let's also provide "quit", both in HMP and QMP.
 >
-> Spice received: 186
-> ps2_put_keycode: 240
-> ps2_put_keycode: 88
-> ps2_queue: 186
+> I tried enabling quit, but it fails with an incorrect
+> state transition.
 
-And with numlock:
-
-> Spice received: 69
-> ps2_put_keycode: 119
->
-> Spice received: 197
-> ps2_put_keycode: 240
-> ps2_put_keycode: 119
-> ps2_queue: 197
-> ps2_set_ledstate: 0
-> Spice new ledstate: 0
-
-
-This behaviour is consistent across SPICE clients and only appears in a lin=
-ux TTY (it works fine if I start an X server and on windows). It still happ=
-ens on QEMU latest commit at the time (0d2fa03dae4fbe185a082f361342b1e30aed=
-4582)
-
-Spice registers a callback for leds via qemu_add_led_event_handler but
-it's never called for capslock. Is that a normal behaviour ? Is there
-any reasons for the capslock led not to be updated ?
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "Trace of a capslock press on both linux and windows"
-   https://bugs.launchpad.net/bugs/1776224/+attachment/5151280/+files/trace=
-_kbd
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1776224
-
-Title:
-  QEMU's SPICE server not getting leds callback when sending capslock
-
-Status in QEMU:
-  New
-
-Bug description:
-  I'm having troubles using the QEMU's SPICE server for remote views. When
-  trying to sync leds from my SPICE client to QEMU, I can see that the
-  caps lock keycodes are sent but the server state never gets updated
-  (which leads in funny behaviours like caps lock "blinking" in the guest
-  if the clients resyncs its state often).
-
-  That behaviour doesn't happen at all with the numlock led which does the
-  same thing but with different keycodes.
-
-  Here is an example of what's happening when the client tries to resync
-  with a capslock difference:
-
-  > Spice received: 58
-  > ps2_put_keycode: 88
-  >
-  > Spice received: 186
-  > ps2_put_keycode: 240
-  > ps2_put_keycode: 88
-  > ps2_queue: 186
-
-  And with numlock:
-
-  > Spice received: 69
-  > ps2_put_keycode: 119
-  >
-  > Spice received: 197
-  > ps2_put_keycode: 240
-  > ps2_put_keycode: 119
-  > ps2_queue: 197
-  > ps2_set_ledstate: 0
-  > Spice new ledstate: 0
-
-  =
-
-  This behaviour is consistent across SPICE clients and only appears in a l=
-inux TTY (it works fine if I start an X server and on windows). It still ha=
-ppens on QEMU latest commit at the time (0d2fa03dae4fbe185a082f361342b1e30a=
-ed4582)
-
-  Spice registers a callback for leds via qemu_add_led_event_handler but
-  it's never called for capslock. Is that a normal behaviour ? Is there
-  any reasons for the capslock led not to be updated ?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1776224/+subscriptions
+Igor, this one's for you.
