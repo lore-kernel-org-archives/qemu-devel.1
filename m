@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fSNIu-0005Sh-JT
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:56:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fSNJL-0005g6-C8
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:56:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fSNIq-0005RS-NZ
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:56:16 -0400
-References: <20180611135223.81865-1-borntraeger@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <fdb7be3e-dc13-e4a6-e2f0-9bb9ba4d43da@redhat.com>
-Date: Mon, 11 Jun 2018 15:56:09 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fSNJK-0005j9-Hu
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:56:43 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:43551)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fSNJK-0005ik-9O
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:56:42 -0400
+Received: by mail-oi0-x242.google.com with SMTP id t133-v6so17917093oif.10
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 06:56:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180611135223.81865-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] s390x/ipl: Try to detect Linux vs
- non Linux for initial IPL PSW
+In-Reply-To: <CAFEAcA86RRfz-YQivsPDRqAbZqOtdNpRnnBeKC24B5yYzY1=zg@mail.gmail.com>
+References: <20180426140253.3918-1-peter.maydell@linaro.org>
+	<4f0eec20-64a6-fb8f-58ae-1fab9ef34f53@redhat.com>
+	<CAFEAcA86RRfz-YQivsPDRqAbZqOtdNpRnnBeKC24B5yYzY1=zg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Jun 2018 14:56:21 +0100
+Message-ID: <CAFEAcA-xe-zX8_y3p_XKb2pHharJwwfL3ebtUU71E_EY+xvU3w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] vl.c: Don't zero-initialize statics for
+ serial_hds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On 11.06.2018 15:52, Christian Borntraeger wrote:
-> Right now the IPL device always starts from address 0x10000 (the usual
-> Linux entry point). To run other guests (e.g. test programs) it is
-> useful to use the IPL PSW from address 0. We can use the Linux magic
-> at 0x10008 to decide.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
-> v1->v2:
-> 	- use LINUX_MAGIC_ADDR define
-> 	- use assert for valid iplpsw pointer
-> 	- add endianess conversion
->  hw/s390x/ipl.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 04245b5258..3790153fa9 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -29,6 +29,7 @@
->  #include "exec/exec-all.h"
->  
->  #define KERN_IMAGE_START                0x010000UL
-> +#define LINUX_MAGIC_ADDR                0x010008UL
->  #define KERN_PARM_AREA                  0x010480UL
->  #define INITRD_START                    0x800000UL
->  #define INITRD_PARM_START               0x010408UL
-> @@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
->  static void s390_ipl_realize(DeviceState *dev, Error **errp)
->  {
->      S390IPLState *ipl = S390_IPL(dev);
-> -    uint64_t pentry = KERN_IMAGE_START;
-> +    uint64_t *iplpsw;
-> +    uint64_t pentry;
-> +    char *magic;
->      int kernel_size;
->      Error *err = NULL;
->  
-> @@ -157,6 +160,16 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->                                 NULL, 1, EM_S390, 0, 0);
->          if (kernel_size < 0) {
->              kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
-> +            /* if this is Linux use KERN_IMAGE_START */
-> +            magic = rom_ptr(LINUX_MAGIC_ADDR);
-> +            if (magic && !memcmp(magic, "S390EP", 6)) {
-> +                pentry = KERN_IMAGE_START;
-> +            } else {
-> +                /* if not Linux use the IPL PSW */
-> +                iplpsw = rom_ptr(0);
-> +                assert(iplpsw);
-> +                pentry = be64_to_cpu(*iplpsw) & 0x7fffffffUL;
-> +            }
->          }
->          if (kernel_size < 0) {
->              error_setg(&err, "could not load kernel '%s'", ipl->kernel);
-> 
+Ping^2 for qemu-trivial?
 
-Have you tried this with kvm-unit-tests? (no magic but we rely on 0x10000)
+thanks
+-- PMM
 
--- 
-
-Thanks,
-
-David / dhildenb
+On 29 May 2018 at 16:25, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Ping for application via qemu-trivial?
+>
+> thanks
+> -- PMM
+>
+> On 26 April 2018 at 15:19, Thomas Huth <thuth@redhat.com> wrote:
+>> On 26.04.2018 16:02, Peter Maydell wrote:
+>>> checkpatch reminds us that statics shouldn't be zero-initialized:
+>>>
+>>> ERROR: do not initialise statics to 0 or NULL
+>>> #35: FILE: vl.c:157:
+>>> +static int num_serial_hds = 0;
+>>>
+>>> ERROR: do not initialise statics to 0 or NULL
+>>> #36: FILE: vl.c:158:
+>>> +static Chardev **serial_hds = NULL;
+>>>
+>>> I forgot to fix this in 6af2692e86f9fdfb3d; do so now.
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
+>>> I wouldn't bother with this except that I forgot to fold
+>>> it in when applying the serial-limits patchset.
+>>>
+>>>  vl.c | 4 ++--
+>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/vl.c b/vl.c
+>>> index 616956adf1..6d8b869dad 100644
+>>> --- a/vl.c
+>>> +++ b/vl.c
+>>> @@ -154,8 +154,8 @@ QEMUClockType rtc_clock;
+>>>  int vga_interface_type = VGA_NONE;
+>>>  static DisplayOptions dpy;
+>>>  int no_frame;
+>>> -static int num_serial_hds = 0;
+>>> -static Chardev **serial_hds = NULL;
+>>> +static int num_serial_hds;
+>>> +static Chardev **serial_hds;
+>>>  Chardev *parallel_hds[MAX_PARALLEL_PORTS];
+>>>  Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
+>>>  Chardev *sclp_hds[MAX_SCLP_CONSOLES];
+>>>
+>>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
