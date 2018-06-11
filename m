@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34772)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSIgY-0006CN-Vh
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:00:23 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSIiz-0007E6-Hl
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:02:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSIgT-0007sb-DH
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:00:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51396 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fSIiu-0000lL-L5
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:02:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48660 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fSIgT-0007rt-7u
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:00:17 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fSIiu-0000l5-Fo
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 05:02:48 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B97D1BB42D
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 09:00:16 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5B0EC7D84D
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 09:02:47 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
 References: <20180608130846.22234-1-dgilbert@redhat.com>
-	<20180608130846.22234-3-dgilbert@redhat.com>
-Date: Mon, 11 Jun 2018 11:00:15 +0200
-In-Reply-To: <20180608130846.22234-3-dgilbert@redhat.com> (David Alan
-	Gilbert's message of "Fri, 8 Jun 2018 14:08:41 +0100")
-Message-ID: <87fu1tlmu8.fsf@dusky.pond.sub.org>
+	<20180608130846.22234-4-dgilbert@redhat.com>
+Date: Mon, 11 Jun 2018 11:02:46 +0200
+In-Reply-To: <20180608130846.22234-4-dgilbert@redhat.com> (David Alan
+	Gilbert's message of "Fri, 8 Jun 2018 14:08:42 +0100")
+Message-ID: <87bmchlmq1.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 2/7] hmp: Allow help on preconfig
- commands
+Subject: Re: [Qemu-devel] [PATCH v3 3/7] hmp: Restrict auto-complete in
+ preconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,55 +41,42 @@ Cc: qemu-devel@nongnu.org, armbru@redhat.com, imammedo@redhat.com
 
 > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 >
-> Allow the 'help' command in preconfig state but
-> make it only list the preconfig commands.
+> Don't show the commands that aren't available.
 >
 > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > Reviewed-by: Peter Xu <peterx@redhat.com>
 > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->  hmp-commands.hx | 1 +
->  monitor.c       | 8 +++++++-
->  2 files changed, 8 insertions(+), 1 deletion(-)
+>  monitor.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 >
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 0734fea931..8bf590ae4b 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -15,6 +15,7 @@ ETEXI
->          .params     = "[cmd]",
->          .help       = "show the help",
->          .cmd        = do_help_cmd,
-> +        .flags      = "p",
->      },
->  
->  STEXI
 > diff --git a/monitor.c b/monitor.c
-> index f4a16e6a03..31c8f5dc88 100644
+> index 31c8f5dc88..c369b392db 100644
 > --- a/monitor.c
 > +++ b/monitor.c
-> @@ -957,6 +957,10 @@ static void help_cmd_dump_one(Monitor *mon,
->  {
->      int i;
->  
-> +    if (runstate_check(RUN_STATE_PRECONFIG) && !cmd_can_preconfig(cmd)) {
-> +        return;
-> +    }
-> +
->      for (i = 0; i < prefix_args_nb; i++) {
->          monitor_printf(mon, "%s ", prefix_args[i]);
->      }
-> @@ -979,7 +983,9 @@ static void help_cmd_dump(Monitor *mon, const mon_cmd_t *cmds,
->  
->      /* Find one entry to dump */
->      for (cmd = cmds; cmd->name != NULL; cmd++) {
-> -        if (compare_cmd(args[arg_index], cmd->name)) {
-> +        if (compare_cmd(args[arg_index], cmd->name) &&
-> +            ((!runstate_check(RUN_STATE_PRECONFIG) ||
-> +                cmd_can_preconfig(cmd)))) {
+> @@ -3951,12 +3951,17 @@ static void monitor_find_completion_by_table(Monitor *mon,
+>              cmdname = args[0];
+>          readline_set_completion_index(mon->rs, strlen(cmdname));
+>          for (cmd = cmd_table; cmd->name != NULL; cmd++) {
+> -            cmd_completion(mon, cmdname, cmd->name);
+> +            if (!runstate_check(RUN_STATE_PRECONFIG) ||
+> +                 cmd_can_preconfig(cmd)) {
+> +                cmd_completion(mon, cmdname, cmd->name);
+> +            }
+>          }
+>      } else {
+>          /* find the command */
+>          for (cmd = cmd_table; cmd->name != NULL; cmd++) {
+> -            if (compare_cmd(args[0], cmd->name)) {
+> +            if (compare_cmd(args[0], cmd->name) &&
+> +                (!runstate_check(RUN_STATE_PRECONFIG) ||
+> +                 cmd_can_preconfig(cmd))) {
+>                  break;
+>              }
+>          }
 
-Why do we need this check in addition to the one in help_cmd_dump_one()?
+Hmm, I keep seeing
 
->              if (cmd->sub_table) {
->                  /* continue with next arg */
->                  help_cmd_dump(mon, cmd->sub_table,
+    !runstate_check(RUN_STATE_PRECONFIG) || cmd_can_preconfig(cmd)
+
+Would a helper be worthwhile?  cmd_available(cmd)?
