@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fSNFp-0003cr-Gn
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:53:06 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fSNHz-0004ww-7Q
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:55:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fSNFk-0003iI-LI
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:53:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36418 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fSNHt-0004hK-1A
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:55:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36476 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fSNFk-0003i3-Fo
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:53:00 -0400
-Date: Mon, 11 Jun 2018 14:52:57 +0100
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fSNHs-0004gt-Sj
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 09:55:12 -0400
+Date: Mon, 11 Jun 2018 14:55:07 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180611135257.GE17756@stefanha-x1.localdomain>
-References: <20180608143026.20167-1-ehabkost@redhat.com>
+Message-ID: <20180611135507.GF17756@stefanha-x1.localdomain>
+References: <20180609163252.27506-1-stefanha@redhat.com>
+	<6d70ea23.116b3.163e77016fb.Coremail.suhang16@mails.ucas.ac.cn>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="MIdTMoZhcV1D07fI"
+	protocol="application/pgp-signature"; boundary="Pgaa2uWPnPrfixyx"
 Content-Disposition: inline
-In-Reply-To: <20180608143026.20167-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] configure: Require Python 2.7 or newer
+In-Reply-To: <6d70ea23.116b3.163e77016fb.Coremail.suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [PATCH] loader: implement START_SEG_ADDR_RECORD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Su Hang <suhang16@mails.ucas.ac.cn>
+Cc: qemu-devel@nongnu.org, jusual@mail.ru, jim@groklearning.com, joel@jms.id.au, qemu.ml@steffen-goertz.de
 
 
---MIdTMoZhcV1D07fI
+--Pgaa2uWPnPrfixyx
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 08, 2018 at 11:30:26AM -0300, Eduardo Habkost wrote:
-> All of the supported build platforms documented in qemu-doc.texi
-> should already support Python 2.7.
->=20
-> Removing support for Python 2.6 will allow us to remove some
-> compatibility modules we carry in the QEMU tree:
->=20
-> * scripts/argparse.py
-> * scripts/ordereddict.py
->=20
-> Python 2.6 is also not receiving bug fixes upstream and is not
-> supported by pylint, which makes it harder to keep the code
-> compatible with both Python 2 and Python 3.
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  configure | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+On Sun, Jun 10, 2018 at 10:04:32AM +0800, Su Hang wrote:
+> Sure, Thanks for remind me of this.
+> One thing I must point out, in current code logic, if "START_SEG_ADDR_RECORD"
+> occured multiple times, only the last one works. I don't know whether GNU
+> binutils would emit 'The Record' many times.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+It does not.  The behavior you described seems fine.
 
---MIdTMoZhcV1D07fI
+Do you have time to send a new revision of your patch series addressing
+the comments from last time?
+
+Thanks,
+Stefan
+
+--Pgaa2uWPnPrfixyx
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJbHn65AAoJEJykq7OBq3PIu+sH/31yEtVeRkCPshhc4G9eeRX8
-+x+sVq56jljoaUr0z7dEs6nHX/5yuf4VwVh50kUNr6wY2rAr980KXOLQRF2JCvyw
-xdhfzilGeKIfSEcN+uyRhUrWBS4SbkEx70zueb77PDdjbnnNugDFgp1urZ8klfb/
-LwCBkVZTQUUfC5c4BsUailTSMTWp9ZiVEPkH5iovXKtSOja3FI308W/H5N0YRnOM
-T1ljoqikkieQjXXApeWSQQmaN+a73RgSPbfxy+OXdC6ekAIrmtVkIWgR9F7cypcU
-69mnq+M2TOlP7ThVcVzx+nO/S5CsBsK+yD20jjbm3Z1jFnnhcWIUlJGUPJMjseU=
-=WW+w
+iQEcBAEBAgAGBQJbHn87AAoJEJykq7OBq3PI/HMH/2f21bL3NFg9BfZAgUDNLGeU
+H+Ddh4v5Se90BtwgiVWIHElNIrcvnEGzLHqq+mlcsXdDQR66M32dJL0JFLB5KKGZ
+w5BnVUAqSKGPe9k9JmG4XFQvWElrJ3Q8PuU0Zzw7pOScj23WoOR8rvaEZh2VzsCk
+Ehp9Eg8nUpagOsGdjVDVsJMs7gSsnOkyBBpQcdAPxZ7+P5c6ZM/cGh/OaQUSAFFa
+Spjm4OtlGtj6ct9GgA8dl+jEwdyky3lljPOvYXVa2z311PitXEgzW4NT6HUUlium
+r4QeUULYcd6oJBi/0wEn8ISi35vyDyUb/wBN6KpmtdyDuBh2phqsTP09oQ1ZJww=
+=R6dJ
 -----END PGP SIGNATURE-----
 
---MIdTMoZhcV1D07fI--
+--Pgaa2uWPnPrfixyx--
