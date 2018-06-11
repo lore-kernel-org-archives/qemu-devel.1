@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47856)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1fSNTt-0003jD-Ag
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:07:38 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48881)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <kwolf@redhat.com>) id 1fSNX7-0006eN-TA
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:10:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1fSNTp-00024g-2L
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:07:37 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:49877 helo=mx01.kamp.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1fSNTo-00022j-K0
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:07:33 -0400
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 16:07:23 +0200
-References: <1528375581-29538-1-git-send-email-pl@kamp.de>
-	<db7a78de-7962-63ee-e550-f954f12a3586@redhat.com>
-	<6a1e0e02-0c43-7ca5-322a-565232802f75@kamp.de>
-	<87f37459-a276-035f-6ef3-5892061b689c@redhat.com>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <95c12f3c-6efb-df8f-1d3b-bda04e3acff3@kamp.de>
-Date: Mon, 11 Jun 2018 16:07:24 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fSNX6-00042G-PE
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 10:10:57 -0400
+Date: Mon, 11 Jun 2018 16:10:43 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180611141043.GG15038@localhost.localdomain>
+References: <20180529064415.GA4756@localhost.localdomain>
+	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+	<20180606123237.2235ae4a@kitsune.suse.cz>
+	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+	<20180606131929.44d0fd6b@kitsune.suse.cz>
+	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
+	<20180606113720.GA2661@work-vm>
+	<2c833e2c-f0bb-ea98-a703-54fb9447bd2f@redhat.com>
+	<20180606134233.GQ7451@localhost.localdomain>
+	<20180606174635-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87f37459-a276-035f-6ef3-5892061b689c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] qemu-img: align is_allocated_sectors to 4k
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180606174635-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,73 +31,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>, qemu-block@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
 
-Am 11.06.2018 um 16:04 schrieb Max Reitz:
-> On 2018-06-11 15:59, Peter Lieven wrote:
->> Am 11.06.2018 um 15:30 schrieb Max Reitz:
->>> On 2018-06-07 14:46, Peter Lieven wrote:
->>>> We currently don't enforce that the sparse segments we detect during
->>>> convert are
->>>> aligned. This leads to unnecessary and costly read-modify-write
->>>> cycles either
->>>> internally in Qemu or in the background on the storage device as
->>>> nearly all
->>>> modern filesystems or hardware has a 4k alignment internally.
->>>>
->>>> As we per default set the min_sparse size to 4k it makes perfectly
->>>> sense to ensure
->>>> that these sparse holes in the file are placed at 4k boundaries.
->>>>
->>>> The number of RMW cycles when converting an example image [1] to a
->>>> raw device that
->>>> has 4k sector size is about 4600 4k read requests to perform a total
->>>> of about 15000
->>>> write requests. With this path the 4600 additional read requests are
->>>> eliminated.
->>>>
->>>> [1]
->>>> https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
->>>>
->>>>
->>>> Signed-off-by: Peter Lieven <pl@kamp.de>
->>>> ---
->>>>    qemu-img.c | 21 +++++++++++++++------
->>>>    1 file changed, 15 insertions(+), 6 deletions(-)
->>> I like the idea, but it doesn't seem guaranteed that
->>> is_allocated_sectors() is called on aligned offsets, so this alignment
->>> work may still leave things unaligned.
->> I can't image why this should happen. As long as the alignment devides
->> the buffer size we either
->> write or skip aligned bytes. Maybe get_block_status returns an unaligned
->> number of sectors?
-> Yes, because the source medium does not need to be the same as the
-> destination (so the source may have e.g. 512-byte clusters).
+Am 06.06.2018 um 16:55 hat Michael S. Tsirkin geschrieben:
+> On Wed, Jun 06, 2018 at 10:42:33AM -0300, Eduardo Habkost wrote:
+> > > If we want a grand vision where a single file stores the whole VM, why
+> > > not invest the work and make it right from the start?
+> > 
+> > We don't want a grand vision where a single file stores the whole
+> > VM.  This is exactly what I would like to avoid, by not inventing
+> > a whole different appliance file format.
+> 
+> Besides, trying to get a grand vision from the start is a sure
+> way to never have the design leave the drawing board.
+> 
+> What we are asking for at this point is a way to stick a named blob in
+> an image that people can use with qemu without jumping through hoops.
+> 
+> It seems like a generic enough addition that it seems highly likely
+> to be useful down the road and harmless enough that maintaining
+> it won't become a burden.
+> 
+> Can we agree on that as a first step, so we can build that foundation
+> and move on to actually building ways to use it?
 
-Okay, I will try to figure out how to cope with it. So the function needs
-to get the offset and the alignment to make the right "decision".
+As you don't seem to believe Max, here's my opinion: No.
 
->
->>> Furthermore, we should probably not blindly assume 4k but instead use
->>> some block limit of the target, like pwrite_zeroes_alignment, or
->>> pdiscard_alignment, depending on the case.  (Or probably still
->>> min_sparse, if that's less.)
->>>
->>> Since is_allocated_sectors_min() (the only caller of
->>> is_allocated_sectors()) is called from just a single place, taking those
->>> factors into account should be possible.
->> I also thought of this, but for instance for raw-posix I always get a
->> request_alignment of 1.
-> Yes, because request_alignment is a hard requirement.  With caching, you
-> can send requests with any alignment, so it's 1.
->
-> pwrite_zeroes_alignment and pdiscard_alignment are described as "Optimal
-> alignment", so those should contain the values we/you want.  If they are
-> 0, then you should probably fall back to opt_transfer instead of
-> request_alignment.
+I'm okay with adding some well-specified information to qcow2 (I'm
+thinking of a JSON document that is validated against a schema) where
+the meaning is clear from the qcow2 spec, for all users.
 
-I will check that for the targets that I can test and send a V2.
+Allowing undefined blobs would add data to qcow2 images whose meaning is
+only understood by whatever highlevel tool that wrote it, and thereby
+fragment the one qcow2 format that we have today into many subformats
+whose specs are scattered all over the net (if they even exist). This is
+not where I want to go.
 
-Thanks for your feedback,
-Peter
+So before I'll even think of adding some extra information, we're back
+to what I already said two weeks ago: Show me what you want to store
+there. If we go with my proposal to use JSON, show me the JSON schema
+(with doc comments, obviously) and we'll talk.
+
+Kevin
