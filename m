@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fSjPM-0004lP-Iv
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:32:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSjS7-0005pb-IO
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:35:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fSjPL-0000v9-Jz
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:32:24 -0400
-Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:39851)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fSjPL-0000tv-3u
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:32:23 -0400
-Received: by mail-ot0-x235.google.com with SMTP id l15-v6so27018335oth.6
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 06:32:21 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fSjRx-0002Pr-TE
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:35:15 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180611205203.2624-1-mreitz@redhat.com>
+	<20180611205203.2624-7-mreitz@redhat.com>
+Date: Tue, 12 Jun 2018 15:34:55 +0200
+In-Reply-To: <20180611205203.2624-7-mreitz@redhat.com> (Max Reitz's message of
+	"Mon, 11 Jun 2018 22:51:59 +0200")
+Message-ID: <87wov4t9fk.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180611193434.19004-1-jsnow@redhat.com>
-References: <20180611193434.19004-1-jsnow@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Jun 2018 14:32:00 +0100
-Message-ID: <CAFEAcA84rOV5g4JXfWzu-hKs_=KzkihmBK45+wfAtRbycD8Mdg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/7] Bitmaps patches
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 06/10] qdict: Make qdict_flatten()
+ shallow-clone-friendly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +24,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Markus Armbruster <armbru@redhat.com>
 
-On 11 June 2018 at 20:34, John Snow <jsnow@redhat.com> wrote:
-> The following changes since commit 2afc4e3df80d947dd1bd42ce80278f591b35c74a:
->
->   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2018-06-11' into staging (2018-06-11 15:31:20 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/jnsnow/qemu.git tags/bitmaps-pull-request
->
-> for you to fetch changes up to a6e2ca5f6521553681ae136578ec1cb67e1a7973:
->
->   qapi: add disabled parameter to block-dirty-bitmap-add (2018-06-11 14:53:32 -0400)
->
-> ----------------------------------------------------------------
->
-> bitmaps pull request
->
+Max Reitz <mreitz@redhat.com> writes:
 
-Applied, thanks.
+> In its current form, qdict_flatten() removes all entries from nested
+> QDicts that are moved to the root QDict.  It is completely sufficient to
+> remove all old entries from the root QDict, however.  If the nested
+> dicts have a refcount of 1, this will automatically delete them, too.
+> And if they have a greater refcount, we probably do not want to modify
+> them in the first place.
+>
+> The latter observation means that it was currently (in general)
+> impossible to qdict_flatten() a shallowly cloned dict because that would
+> empty nested QDicts in the original dict as well.  This patch changes
+> this, so you can now use qdict_flatten(qdict_shallow_clone(dict)) to get
+> a flattened copy without disturbing the original.
+>
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  qobject/block-qdict.c | 19 +++++++++++++++----
+>  1 file changed, 15 insertions(+), 4 deletions(-)
+>
+> diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
+> index 0b2ae02627..7e0deb74c5 100644
+> --- a/qobject/block-qdict.c
+> +++ b/qobject/block-qdict.c
+> @@ -114,19 +114,30 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
+>  
+>          /*
+>           * Flatten non-empty QDict and QList recursively into @target,
+> -         * copy other objects to @target
+> +         * copy other objects to @target.
+> +         * On the root level (if @qdict == @target), remove flattened
+> +         * nested QDicts and QLists from @qdict.
+> +         *
+> +         * (Note that we do not need to remove entries from nested
+> +         * dicts or lists.  Their reference count is decremented on
+> +         * the root level, so there are no leaks.  In fact, if they
+> +         * have a reference count greater than one, we are probably
+> +         * well advised not to modify them altogether.)
+>           */
+>          if (dict_val && qdict_size(dict_val)) {
+>              qdict_flatten_qdict(dict_val, target,
+>                                  new_key ? new_key : entry->key);
+> -            qdict_del(qdict, entry->key);
+> +            if (target == qdict) {
+> +                qdict_del(qdict, entry->key);
+> +            }
+>          } else if (list_val && !qlist_empty(list_val)) {
+>              qdict_flatten_qlist(list_val, target,
+>                                  new_key ? new_key : entry->key);
+> -            qdict_del(qdict, entry->key);
+> +            if (target == qdict) {
+> +                qdict_del(qdict, entry->key);
+> +            }
+>          } else if (target != qdict) {
+>              qdict_put_obj(target, new_key, qobject_ref(value));
+> -            qdict_del(qdict, entry->key);
+>          }
+>  
+>          g_free(new_key);
 
--- PMM
+This simply makes sense, even without the later patch(es) that rely on
+it.
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
