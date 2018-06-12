@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSisZ-0007G7-8H
+	(envelope-from <armbru@redhat.com>) id 1fSisY-0007FN-S7
 	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSisW-0003AT-QP
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSisW-0003AK-NW
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:30 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 12 Jun 2018 14:58:13 +0200
-Message-Id: <20180612125821.4229-11-armbru@redhat.com>
+Date: Tue, 12 Jun 2018 14:58:04 +0200
+Message-Id: <20180612125821.4229-2-armbru@redhat.com>
 In-Reply-To: <20180612125821.4229-1-armbru@redhat.com>
 References: <20180612125821.4229-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 10/18] block-qdict: Simplify
- qdict_flatten_qdict()
+Subject: [Qemu-devel] [PATCH 01/18] rbd: Drop deprecated -drive parameter
+ "filename"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +23,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
 
-There's no need to restart the loop.  We don't elsewhere, e.g. in
-qdict_extract_subqdict(), qdict_join() and qemu_opts_absorb_qdict().
-Simplify accordingly.
+Parameter "filename" is deprecated since commit 91589d9e5ca, v2.10.0.
+Time to get rid of it.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qobject/block-qdict.c | 18 +++---------------
- 1 file changed, 3 insertions(+), 15 deletions(-)
+ block/rbd.c | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
-diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
-index 41f39abc4a..f32df343e8 100644
---- a/qobject/block-qdict.c
-+++ b/qobject/block-qdict.c
-@@ -89,16 +89,13 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
-     QObject *value;
-     const QDictEntry *entry, *next;
-     char *new_key;
--    bool delete;
+diff --git a/block/rbd.c b/block/rbd.c
+index a16431e267..40c6e4185f 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -632,25 +632,9 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+     QObject *crumpled = NULL;
+     const QDictEntry *e;
+     Error *local_err = NULL;
+-    const char *filename;
+     char *keypairs, *secretid;
+     int r;
  
-     entry = qdict_first(qdict);
- 
-     while (entry != NULL) {
--
-         next = qdict_next(qdict, entry);
-         value = qdict_entry_value(entry);
-         new_key = NULL;
--        delete = false;
- 
-         if (prefix) {
-             new_key = g_strdup_printf("%s.%s", prefix, entry->key);
-@@ -109,27 +106,18 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
-              * itself disappears. */
-             qdict_flatten_qdict(qobject_to(QDict, value), target,
-                                 new_key ? new_key : entry->key);
--            delete = true;
-+            qdict_del(qdict, entry->key);
-         } else if (qobject_type(value) == QTYPE_QLIST) {
-             qdict_flatten_qlist(qobject_to(QList, value), target,
-                                 new_key ? new_key : entry->key);
--            delete = true;
-+            qdict_del(qdict, entry->key);
-         } else if (prefix) {
-             /* All other objects are moved to the target unchanged. */
-             qdict_put_obj(target, new_key, qobject_ref(value));
--            delete = true;
+-    /* If we are given a filename, parse the filename, with precedence given to
+-     * filename encoded options */
+-    filename = qdict_get_try_str(options, "filename");
+-    if (filename) {
+-        warn_report("'filename' option specified. "
+-                    "This is an unsupported option, and may be deprecated "
+-                    "in the future");
+-        qemu_rbd_parse_filename(filename, options, &local_err);
+-        qdict_del(options, "filename");
+-        if (local_err) {
+-            error_propagate(errp, local_err);
+-            return -EINVAL;
 -        }
+-    }
 -
--        g_free(new_key);
--
--        if (delete) {
-             qdict_del(qdict, entry->key);
--
--            /* Restart loop after modifying the iterated QDict */
--            entry = qdict_first(qdict);
--            continue;
-         }
- 
-+        g_free(new_key);
-         entry = next;
-     }
- }
+     keypairs = g_strdup(qdict_get_try_str(options, "=keyvalue-pairs"));
+     if (keypairs) {
+         qdict_del(options, "=keyvalue-pairs");
 -- 
 2.17.1
