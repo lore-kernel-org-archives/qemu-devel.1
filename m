@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSisd-0007Kr-7F
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:36 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSisY-0003Cn-Ug
+	(envelope-from <armbru@redhat.com>) id 1fSisY-0007FV-V2
 	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:35 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1fSisW-00039p-D6
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:30 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 12 Jun 2018 14:58:15 +0200
-Message-Id: <20180612125821.4229-13-armbru@redhat.com>
+Date: Tue, 12 Jun 2018 14:58:05 +0200
+Message-Id: <20180612125821.4229-3-armbru@redhat.com>
 In-Reply-To: <20180612125821.4229-1-armbru@redhat.com>
 References: <20180612125821.4229-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/18] block-qdict: Clean up qdict_crumple() a
- bit
+Subject: [Qemu-devel] [PATCH 02/18] iscsi: Drop deprecated -drive parameter
+ "filename"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +23,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
 
-When you mix scalar and non-scalar keys, whether you get an "already
-set as scalar" or an "already set as dict" error depends on qdict
-iteration order.  Neither message makes much sense.  Replace by
-""Cannot mix scalar and non-scalar keys".  This is similar to the
-message we get for mixing list and non-list keys.
-
-I find qdict_crumple()'s first loop hard to understand.  Rearrange it
-and add a comment.
+Parameter "filename" is deprecated since commit 5c3ad1a6a8f, v2.10.0.
+Time to get rid of it.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qobject/block-qdict.c | 42 +++++++++++++++++++++---------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+ block/iscsi.c | 23 ++---------------------
+ 1 file changed, 2 insertions(+), 21 deletions(-)
 
-diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
-index a4e1c8d08f..35e9052816 100644
---- a/qobject/block-qdict.c
-+++ b/qobject/block-qdict.c
-@@ -403,7 +403,7 @@ static int qdict_is_list(QDict *maybe_list, Error **errp)
- QObject *qdict_crumple(const QDict *src, Error **errp)
- {
-     const QDictEntry *ent;
--    QDict *two_level, *multi_level = NULL;
-+    QDict *two_level, *multi_level = NULL, *child_dict;
-     QObject *dst = NULL, *child;
-     size_t i;
-     char *prefix = NULL;
-@@ -422,29 +422,29 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
-         }
+diff --git a/block/iscsi.c b/block/iscsi.c
+index c2fbd8a8aa..7e3ea72bd2 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -1713,10 +1713,6 @@ static QemuOptsList runtime_opts = {
+             .name = "timeout",
+             .type = QEMU_OPT_NUMBER,
+         },
+-        {
+-            .name = "filename",
+-            .type = QEMU_OPT_STRING,
+-        },
+         { /* end of list */ }
+     },
+ };
+@@ -1756,27 +1752,12 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+     char *initiator_name = NULL;
+     QemuOpts *opts;
+     Error *local_err = NULL;
+-    const char *transport_name, *portal, *target, *filename;
++    const char *transport_name, *portal, *target;
+ #if LIBISCSI_API_VERSION >= (20160603)
+     enum iscsi_transport_type transport;
+ #endif
+     int i, ret = 0, timeout = 0, lun;
  
-         qdict_split_flat_key(ent->key, &prefix, &suffix);
+-    /* If we are given a filename, parse the filename, with precedence given to
+-     * filename encoded options */
+-    filename = qdict_get_try_str(options, "filename");
+-    if (filename) {
+-        warn_report("'filename' option specified. "
+-                    "This is an unsupported option, and may be deprecated "
+-                    "in the future");
+-        iscsi_parse_filename(filename, options, &local_err);
+-        if (local_err) {
+-            ret = -EINVAL;
+-            error_propagate(errp, local_err);
+-            goto exit;
+-        }
+-    }
 -
-         child = qdict_get(two_level, prefix);
-+        child_dict = qobject_to(QDict, child);
-+
-+        if (child) {
-+            /*
-+             * An existing child must be a dict and @ent must be a
-+             * dict member (i.e. suffix not null), or else @ent
-+             * clashes.
-+             */
-+            if (!child_dict || !suffix) {
-+                error_setg(errp,
-+                           "Cannot mix scalar and non-scalar keys");
-+                goto error;
-+            }
-+        } else if (suffix) {
-+            child_dict = qdict_new();
-+            qdict_put(two_level, prefix, child_dict);
-+        } else {
-+            qdict_put_obj(two_level, prefix, qobject_ref(ent->value));
-+        }
-+
-         if (suffix) {
--            QDict *child_dict = qobject_to(QDict, child);
--            if (!child_dict) {
--                if (child) {
--                    error_setg(errp, "Key %s prefix is already set as a scalar",
--                               prefix);
--                    goto error;
--                }
--
--                child_dict = qdict_new();
--                qdict_put_obj(two_level, prefix, QOBJECT(child_dict));
--            }
--
-             qdict_put_obj(child_dict, suffix, qobject_ref(ent->value));
--        } else {
--            if (child) {
--                error_setg(errp, "Key %s prefix is already set as a dict",
--                           prefix);
--                goto error;
--            }
--            qdict_put_obj(two_level, prefix, qobject_ref(ent->value));
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &local_err);
+     if (local_err) {
+@@ -2006,7 +1987,7 @@ out:
          }
+         memset(iscsilun, 0, sizeof(IscsiLun));
+     }
+-exit:
++
+     return ret;
+ }
  
-         g_free(prefix);
 -- 
 2.17.1
