@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fSiUM-00061m-Qd
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:33:31 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSiVS-0006XM-CQ
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:34:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fSiUM-0004gF-3p
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:33:30 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:36478)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSiVM-0005Do-Mz
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:34:38 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:38170)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fSiUL-0004fj-N1
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:33:30 -0400
-Received: by mail-ot0-x242.google.com with SMTP id c15-v6so17972818otl.3
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 05:33:29 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSiVM-0005DQ-HU
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:34:32 -0400
+Received: by mail-qt0-x244.google.com with SMTP id x34-v6so23446381qtk.5
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 05:34:32 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180612082823.25507-1-berrange@redhat.com>
+	<c076cfe0-47ac-1c54-a157-f3797bab807d@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <09663059-601d-8859-4454-e05db816ac29@amsat.org>
+Date: Tue, 12 Jun 2018 09:34:27 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180611192206.339122-1-mst@redhat.com>
-References: <20180611192206.339122-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Jun 2018 13:33:08 +0100
-Message-ID: <CAFEAcA-04zXF2jKNwHVLEfp-+Bi7gf3iz-z5v_DsUrMgfsJFGA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] pc: fixes
+In-Reply-To: <c076cfe0-47ac-1c54-a157-f3797bab807d@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] travis: display config.log when configure
+ fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +36,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 11 June 2018 at 20:23, Michael S. Tsirkin <mst@redhat.com> wrote:
-> The following changes since commit 2afc4e3df80d947dd1bd42ce80278f591b35c74a:
->
->   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2018-06-11' into staging (2018-06-11 15:31:20 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to 11c39b5cd966ddc067a1ca0c5392ec9b666c45b7:
->
->   nvdimm: make persistence option symbolic (2018-06-11 22:19:57 +0300)
->
-> ----------------------------------------------------------------
-> pc: fixes
->
-> A couple of fixes to acpi and nvdimm.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
-> ----------------------------------------------------------------
-> Ross Zwisler (2):
->       hw/i386: Update SSDT table used by "make check"
->       nvdimm: make persistence option symbolic
->
+On 06/12/2018 09:15 AM, Eric Blake wrote:
+> On 06/12/2018 03:28 AM, Daniel P. Berrangé wrote:
+>> When configure fails in CI systems we must be able to see the contents
+>> of the config.log file to diagnose the root cause.
+>>
+>> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+>> ---
+>>   .travis.yml | 4 ++--
+>>   1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/.travis.yml b/.travis.yml
+>> index 814be151f4..fc9a1fe8a8 100644
+>> --- a/.travis.yml
+>> +++ b/.travis.yml
+>> @@ -69,7 +69,7 @@ before_install:
+>>     - wget -O -
+>> http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz |
+>> tar -xvJ
+>>     - git submodule update --init --recursive
+>>   before_script:
+>> -  - ./configure ${CONFIG}
+>> +  - ./configure ${CONFIG} || (cat config.log && exit 1)
+> 
+> If you want one less fork, you can spell this as:
+> 
+> - ./configure ${CONFIG} || { cat config.log && exit 1; }
 
-Applied, thanks.
+I was just digging for your previous mail explaining that to use as
+reference ;)
 
--- PMM
+> 
+> Either way, the patch makes sense, so:
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+
+preferably using {:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
