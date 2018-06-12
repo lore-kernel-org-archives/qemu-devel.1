@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fSh0l-0003Rt-PS
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:58:52 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fSh0n-0003S8-61
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:58:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fSh0i-0007Az-QG
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:58:51 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:36967)
+	(envelope-from <laurent@vivier.eu>) id 1fSh0l-0007Cy-UO
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:58:53 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:53633)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fSh0i-0007A6-FB
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:58:48 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fSh0l-0007CH-K8
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:58:51 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 12 Jun 2018 12:58:26 +0200
-Message-Id: <20180612105831.25703-4-laurent@vivier.eu>
+Date: Tue, 12 Jun 2018 12:58:27 +0200
+Message-Id: <20180612105831.25703-5-laurent@vivier.eu>
 In-Reply-To: <20180612105831.25703-1-laurent@vivier.eu>
 References: <20180612105831.25703-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 3/8] linux-user: disable qemu-bridge-helper and
- socket_scm_helper build
+Subject: [Qemu-devel] [PULL 4/8] qemu-binfmt-conf.sh: ignore the OS/ABI field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,42 +26,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
 
-linux-user targets don't need them, and if we ask to build statically
-linked binaries, some static libraries they need are not available.
+Most of the binaries have a value of "UNIX - System V" for the OS/ABI.
+
+But cc1 has a value of "UNIX - GNU", and if we don't update the binfmt
+mask to ignore the OS/ABI field, gcc fails to execute it:
+
+gcc: error trying to exec '/usr/lib/gcc/m68k-linux-gnu/7/cc1': execv: Exec format error
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20180605160958.5434-1-laurent@vivier.eu>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20180605194725.8585-1-laurent@vivier.eu>
 ---
- Makefile               | 2 +-
- tests/Makefile.include | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ scripts/qemu-binfmt-conf.sh | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 023b3437ec..e4bc34a1cb 100644
---- a/Makefile
-+++ b/Makefile
-@@ -351,7 +351,7 @@ $(call set-vpath, $(SRC_PATH))
+diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
+index 7ab7435fbd..d7eefda0b8 100755
+--- a/scripts/qemu-binfmt-conf.sh
++++ b/scripts/qemu-binfmt-conf.sh
+@@ -7,15 +7,15 @@ mips mipsel mipsn32 mipsn32el mips64 mips64el \
+ sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb microblaze microblazeel"
  
- LIBS+=-lz $(LIBS_TOOLS)
+ i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
+-i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
++i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+ i386_family=i386
  
--HELPERS-$(CONFIG_LINUX) = qemu-bridge-helper$(EXESUF)
-+HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) = qemu-bridge-helper$(EXESUF)
+ i486_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x06\x00'
+-i486_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
++i486_mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+ i486_family=i386
  
- ifdef BUILD_DOCS
- DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 qemu-ga.8
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index d098a104bb..10397ed159 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -930,7 +930,7 @@ check-report.html: check-report.xml
+ alpha_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x26\x90'
+-alpha_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
++alpha_mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+ alpha_family=alpha
  
- # Other tests
+ arm_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00'
+@@ -27,11 +27,11 @@ armeb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff
+ armeb_family=armeb
  
--QEMU_IOTESTS_HELPERS-$(CONFIG_LINUX) = tests/qemu-iotests/socket_scm_helper$(EXESUF)
-+QEMU_IOTESTS_HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) = tests/qemu-iotests/socket_scm_helper$(EXESUF)
+ sparc_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x02'
+-sparc_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
++sparc_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+ sparc_family=sparc
  
- .PHONY: check-tests/qemu-iotests-quick.sh
- check-tests/qemu-iotests-quick.sh: tests/qemu-iotests-quick.sh qemu-img$(EXESUF) qemu-io$(EXESUF) $(QEMU_IOTESTS_HELPERS-y)
+ sparc32plus_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x12'
+-sparc32plus_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
++sparc32plus_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+ sparc32plus_family=sparc
+ 
+ ppc_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x14'
+@@ -47,7 +47,7 @@ ppc64le_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\x
+ ppc64le_family=ppcle
+ 
+ m68k_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x04'
+-m68k_mask='\xff\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
++m68k_mask='\xff\xff\xff\xff\xff\xff\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+ m68k_family=m68k
+ 
+ # FIXME: We could use the other endianness on a MIPS host.
+@@ -77,15 +77,15 @@ mips64el_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\
+ mips64el_family=mips
+ 
+ sh4_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2a\x00'
+-sh4_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
++sh4_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
+ sh4_family=sh4
+ 
+ sh4eb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2a'
+-sh4eb_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
++sh4eb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+ sh4eb_family=sh4
+ 
+ s390x_magic='\x7fELF\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x16'
+-s390x_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
++s390x_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
+ s390x_family=s390x
+ 
+ aarch64_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7\x00'
 -- 
 2.14.4
