@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55800)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fSmAm-0002Si-Dx
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:29:34 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSmED-0004VS-3c
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:33:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fSmAi-0004Tk-0y
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:29:32 -0400
-Received: from mail-co1nam05on0609.outbound.protection.outlook.com
-	([2a01:111:f400:fe50::609]:23296
-	helo=NAM05-CO1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fSmAh-0004T8-Je
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:29:27 -0400
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Tue, 12 Jun 2018 16:29:25 +0000
-Message-ID: <DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
-	<1528498581-131037-4-git-send-email-babu.moger@amd.com>
-	<20180611205030.GW7451@localhost.localdomain>
-	<20180611211026.GA7451@localhost.localdomain>
-In-Reply-To: <20180611211026.GA7451@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <armbru@redhat.com>) id 1fSmEB-0007Mm-PM
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:33:05 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180607062559.16127-1-armbru@redhat.com>
+	<20180607062559.16127-11-armbru@redhat.com>
+	<20180612144308.GD4355@localhost.localdomain>
+Date: Tue, 12 Jun 2018 18:32:56 +0200
+In-Reply-To: <20180612144308.GD4355@localhost.localdomain> (Kevin Wolf's
+	message of "Tue, 12 Jun 2018 16:43:08 +0200")
+Message-ID: <874li8othj.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
- AMD EPYC CPU
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH 10/19] block: Make remaining uses of
+ qobject input visitor more robust
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,90 +25,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, jcody@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
+Kevin Wolf <kwolf@redhat.com> writes:
 
+> Am 07.06.2018 um 08:25 hat Markus Armbruster geschrieben:
+>> Remaining uses of qobject_input_visitor_new_keyval() in the block
+>> subsystem:
+>> 
+>> * block_crypto_create_opts_init()
+>>   Currently doesn't visit any non-string scalars, thus safe.  It's
+>>   called from
+>>   - block_crypto_open_luks()
+>>     Creates the QDict with qemu_opts_to_qdict_filtered(), which
+>>     creates only string scalars, but has a TODO asking for other types.
+>>   - qcow_open()
+>>   - qcow2_open(), qcow2_co_invalidate_cache(), qcow2_reopen_prepare()
+>
+> Do you mean block_crypto_open_opts_init()?
 
-> -----Original Message-----
-> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org]
-> On Behalf Of Eduardo Habkost
-> Sent: Monday, June 11, 2018 4:10 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
-> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Jiri
-> Denemark <jdenemar@redhat.com>
-> Subject: Re: [PATCH v13 3/5] i386: Enable TOPOEXT feature on AMD EPYC
-> CPU
->=20
-> On Mon, Jun 11, 2018 at 05:50:30PM -0300, Eduardo Habkost wrote:
-> [...]
-> > > +        /* TOPOEXT feature requires 0x8000001E */
-> > > +        if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT)
-> {
-> > > +            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel,
-> 0x8000001E);
-> > > +        }
-> >
-> > I suggest moving this hunk to a separate patch.  I'm not 100%
-> > sure yet if this will require compat_props code to disable
-> > auto-xlevel-increase on older machine-types.
->=20
-> The problem here is that:
->   $QEMU -machine pc-i440fx-1.3 -cpu Opteron_G4,+topoext
-> currently results in xlevel=3D0x8000001A, since QEMU 1.3.
->=20
-> (The same applies to all machine-types between 1.3 and 2.12)
->=20
-> I was hoping that we could declare topoext as non-migration-safe,
-> but I believe libvirt will already include "topoext" when using
-> "host-model" if the host CPU supports TOPOEXT.  Jiri, can you
-> confirm that?
->=20
-> We can address that with a "x-topoext-auto-xlevel" property, set
-> to true on all CPU models by default, and disabled by
-> PC_COMPAT_2_12.
->=20
-> The code would become:
->=20
->     if (cpu->topoext_auto_xlevel && env->features[FEAT_8000_0001_ECX] &
-> CPUID_EXT3_TOPOEXT) {
->         x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E);
->     }
->=20
-> Or, we could simply declare that "-cpu Opteron_G4,+topoext" will
-> never increase xlevel automatically (on any machine-type), and
-> change the code above to:
->=20
->     if (cpu->auto_topoext && env->features[FEAT_8000_0001_ECX] &
-> CPUID_EXT3_TOPOEXT) {
->         x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E);
->     }
+Yes.  Fixing...
 
-I was going to do this.  But there is one problem.  We don't set the CPUID_=
-EXT3_TOPOEXT in CPU model table. So this won't work.
-One more thing I noticed that feature setting should happen much before x86=
-_cpu_realizefn.
+>> * block_crypto_create_opts_init(), called from
+>>   - block_crypto_co_create_opts_luks()
+>>     Also creates the QDict with qemu_opts_to_qdict_filtered().
+>> 
+>> * vdi_co_create_opts()
+>>   Also creates the QDict with qemu_opts_to_qdict_filtered().
+>> 
+>> Replace these uses by qobject_input_visitor_new_flat_confused() for
+>> robustness.  This adds crumpling.  Right now, that's a no-op, but if
+>> we ever extend these things in non-flat ways, crumpling will be
+>> needed.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  block/crypto.c | 6 +++---
+>>  block/vdi.c    | 4 ++--
+>>  2 files changed, 5 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/block/crypto.c b/block/crypto.c
+>> index bc322b50f5..25d12e9d47 100644
+>> --- a/block/crypto.c
+>> +++ b/block/crypto.c
+>> @@ -21,11 +21,11 @@
+>>  #include "qemu/osdep.h"
+>>  
+>>  #include "block/block_int.h"
+>> +#include "block/qdict.h"
+>>  #include "sysemu/block-backend.h"
+>>  #include "crypto/block.h"
+>>  #include "qapi/opts-visitor.h"
+>>  #include "qapi/qapi-visit-crypto.h"
+>> -#include "qapi/qmp/qdict.h"
+>>  #include "qapi/qobject-input-visitor.h"
+>>  #include "qapi/error.h"
+>>  #include "qemu/option.h"
+>> @@ -159,7 +159,7 @@ block_crypto_open_opts_init(QCryptoBlockFormat format,
+>>      ret = g_new0(QCryptoBlockOpenOptions, 1);
+>>      ret->format = format;
+>>  
+>> -    v = qobject_input_visitor_new_keyval(QOBJECT(opts));
+>> +    v = qobject_input_visitor_new_flat_confused(opts, &error_abort);
+>
+> At least this &error_abort is not correct:
+>
+> $ ./qemu-img create -f qcow2 --object secret,id=sec0,data=foo -oencrypt.format=luks,encrypt.key-secret=sec0 /tmp/test.qcow2 64M
+> Formatting '/tmp/test.qcow2', fmt=qcow2 size=67108864 encrypt.format=luks encrypt.key-secret=sec0 cluster_size=65536 lazy_refcounts=off refcount_bits=16
+> $ x86_64-softmmu/qemu-system-x86_64 -drive driver=qcow2,encrypt.foo=1,encrypt.foo.bar=2,file.filename=/tmp/test.qcow2
+> Unexpected error in qdict_crumple() at qobject/block-qdict.c:452:
+> qemu-system-x86_64: -drive driver=qcow2,encrypt.foo=1,encrypt.foo.bar=2,file.filename=/tmp/test.qcow2: Key foo prefix is already set as a dict
+> Abgebrochen (Speicherabzug geschrieben)
+>
+>>      visit_start_struct(v, NULL, NULL, 0, &local_err);
+>>      if (local_err) {
+>> @@ -210,7 +210,7 @@ block_crypto_create_opts_init(QCryptoBlockFormat format,
+>>      ret = g_new0(QCryptoBlockCreateOptions, 1);
+>>      ret->format = format;
+>>  
+>> -    v = qobject_input_visitor_new_keyval(QOBJECT(opts));
+>> +    v = qobject_input_visitor_new_flat_confused(opts, &error_abort);
+>>  
+>>      visit_start_struct(v, NULL, NULL, 0, &local_err);
+>>      if (local_err) {
+>> diff --git a/block/vdi.c b/block/vdi.c
+>> index 668af0a828..6b6eed126d 100644
+>> --- a/block/vdi.c
+>> +++ b/block/vdi.c
+>> @@ -51,10 +51,10 @@
+>>  
+>>  #include "qemu/osdep.h"
+>>  #include "qapi/error.h"
+>> -#include "qapi/qmp/qdict.h"
+>>  #include "qapi/qobject-input-visitor.h"
+>>  #include "qapi/qapi-visit-block-core.h"
+>>  #include "block/block_int.h"
+>> +#include "block/qdict.h"
+>>  #include "sysemu/block-backend.h"
+>>  #include "qemu/module.h"
+>>  #include "qemu/option.h"
+>> @@ -934,7 +934,7 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+>>      }
+>>  
+>>      /* Get the QAPI object */
+>> -    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
+>> +    v = qobject_input_visitor_new_flat_confused(qdict, &error_abort);
+>>      visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
+>>      visit_free(v);
+>
+> The other two &error_aborts _might_ be correct today because I couldn't
+> see callers where the keys weren't already checked by QemuOpts, but I'm
+> not sure if I looked at everything nor whether review would catch a
+> future patch that added a new such call.
 
-Couple of options.=20
-First option.
-1. Set both feature and xlevel here(in x86_cpu_expand_features).
- if (cpu->x_auto_topoext {
-        env->features[FEAT_8000_0001_ECX]  |=3D CPUID_EXT3_TOPOEXT;
-        x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E);
- }
-2. And remove feature setting in x86_cpu_realizefn.
+Okay, I'm getting rid of all three.
 
-Or=20
-
-Second option
-1.Set the feature bit in CPU model table.
-2. Set xlevel in x86_cpu_expand_features using cpu->x_auto_topoext
-3. And remove feature setting in x86_cpu_realizefn.
-=20
-I  prefer the second option.=20
-
->=20
-> --
-> Eduardo
+Thanks!
