@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60072)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fSfSz-00080K-QG
+	(envelope-from <dgilbert@redhat.com>) id 1fSfSz-00080J-FH
 	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 05:19:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fSfSy-000148-Ub
+	(envelope-from <dgilbert@redhat.com>) id 1fSfSw-00011i-7b
 	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 05:19:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43772 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56702 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fSfSy-00013y-PI
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 05:19:52 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fSfSw-00011K-2D
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 05:19:50 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6B9727D84D
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 09:19:52 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A7F694000C57
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 09:19:49 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 12 Jun 2018 10:19:44 +0100
-Message-Id: <20180612091948.14367-4-dgilbert@redhat.com>
-In-Reply-To: <20180612091948.14367-1-dgilbert@redhat.com>
-References: <20180612091948.14367-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 3/7] hmp: Restrict auto-complete in preconfig
+Date: Tue, 12 Jun 2018 10:19:41 +0100
+Message-Id: <20180612091948.14367-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/7] Reenable hmp for preconfig mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +31,36 @@ To: qemu-devel@nongnu.org, armbru@redhat.com, imammedo@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Don't show the commands that aren't available.
+Reenable HMP in preconfig mode; it's pretty
+easy and anyway I want to do a similar thing for OOB eventually.
+We'll want to enable more commands in preconfig mode to make it
+useful at some point.
+ 
+Dave
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
----
- monitor.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+v4
+  Fixes from Markus' review.
+    Including enabling some more qom-* commands in qmp
 
-diff --git a/monitor.c b/monitor.c
-index 8ff0e2fcc7..9ea23828ef 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -3951,12 +3951,17 @@ static void monitor_find_completion_by_table(Monitor *mon,
-             cmdname = args[0];
-         readline_set_completion_index(mon->rs, strlen(cmdname));
-         for (cmd = cmd_table; cmd->name != NULL; cmd++) {
--            cmd_completion(mon, cmdname, cmd->name);
-+            if (!runstate_check(RUN_STATE_PRECONFIG) ||
-+                 cmd_can_preconfig(cmd)) {
-+                cmd_completion(mon, cmdname, cmd->name);
-+            }
-         }
-     } else {
-         /* find the command */
-         for (cmd = cmd_table; cmd->name != NULL; cmd++) {
--            if (compare_cmd(args[0], cmd->name)) {
-+            if (compare_cmd(args[0], cmd->name) &&
-+                (!runstate_check(RUN_STATE_PRECONFIG) ||
-+                 cmd_can_preconfig(cmd))) {
-                 break;
-             }
-         }
+Dr. David Alan Gilbert (6):
+  hmp: Add flag for preconfig commands
+  hmp: Allow help on preconfig commands
+  hmp: Restrict auto-complete in preconfig
+  hmp: Add commands for preconfig
+  hmp: add exit_preconfig
+  hmp: Allow HMP in preconfig state again
+
+Igor Mammedov (1):
+  qmp: Enable a few commands in preconfig state
+
+ hmp-commands-info.hx | 12 ++++++++++++
+ hmp-commands.hx      | 23 +++++++++++++++++++++++
+ hmp.c                |  8 ++++++++
+ hmp.h                |  1 +
+ monitor.c            | 43 ++++++++++++++++++++++++++++++++++---------
+ qapi/char.json       |  3 ++-
+ qapi/misc.json       | 27 +++++++++++++++++----------
+ 7 files changed, 97 insertions(+), 20 deletions(-)
+
 -- 
 2.17.1
