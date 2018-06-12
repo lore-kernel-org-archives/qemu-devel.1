@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fSdSY-00088b-VJ
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:11:20 -0400
+	(envelope-from <bounces@canonical.com>) id 1fSdSZ-00089N-R4
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:11:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fSdSV-0001T4-Q9
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:11:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52158)
+	(envelope-from <bounces@canonical.com>) id 1fSdSY-0001UW-Ob
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:11:19 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52328)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fSdSV-0001Sa-Jm
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:11:15 -0400
+	id 1fSdSY-0001U2-HY
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:11:18 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fSdSU-0002CV-5E
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 07:11:14 +0000
+	id 1fSdSX-0002HG-IL
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 07:11:17 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 268BC2E8030
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 07:11:14 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 872912E80C8
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 07:11:17 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Jun 2018 07:02:39 -0000
-From: Launchpad Bug Tracker <1769053@bugs.launchpad.net>
+Date: Tue, 12 Jun 2018 07:04:48 -0000
+From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
+	<1769053@bugs.launchpad.net>
 Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
-Message-Id: <152878696101.8742.13558106242426642749.launchpad@ackee.canonical.com>
+Message-Id: <152878708879.2108.7583082625442794515.launchpad@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1769053] Re: Ability to control phys-bits through
  libvirt
@@ -39,7 +40,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Merge proposal linked:
+** Merge proposal unlinked:
    https://code.launchpad.net/~paelzer/ubuntu/+source/qemu/+git/qemu/+merge=
 /347796
 
