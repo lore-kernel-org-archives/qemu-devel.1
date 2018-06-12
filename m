@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fShso-0001jy-1Z
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:54:43 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fShtj-0002Jl-Dx
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fShsj-0003KB-Oy
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:54:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59226 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fShti-0004VY-3D
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:55:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51652 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fShsj-0003Ja-IR
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:54:37 -0400
-Date: Tue, 12 Jun 2018 14:54:36 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180612144743-mutt-send-email-mst@kernel.org>
-References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
-	<fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
-	<20180605152344-mutt-send-email-mst@kernel.org>
-	<a45625c9-d2cd-f8f7-ce31-37c558e70b88@redhat.com>
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fShth-0004Uw-ST
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:55:38 -0400
+Date: Tue, 12 Jun 2018 13:55:34 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180612135534.000c0fad@redhat.com>
+In-Reply-To: <20180606220501-mutt-send-email-mst@kernel.org>
+References: <20180521163203.26590-4-ross.zwisler@linux.intel.com>
+	<20180605182243-mutt-send-email-mst@kernel.org>
+	<20180605164205.GA21034@linux.intel.com>
+	<CAPcyv4jSoFifTc05WGgxkEX6i7b12zYyB+VchJVW_+QPQzO7Fg@mail.gmail.com>
+	<20180605213547-mutt-send-email-mst@kernel.org>
+	<20180605220700.GB16066@linux.intel.com>
+	<CAPcyv4irudGth3+WZtgF4TjGL53s8mN70aVXpGWjj_Lc=7AMVg@mail.gmail.com>
+	<20180606165051.GC30568@linux.intel.com>
+	<20180606170033.GA29035@linux.intel.com>
+	<20180606170849.GA31789@linux.intel.com>
+	<20180606220501-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a45625c9-d2cd-f8f7-ce31-37c558e70b88@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qemu: Introduce VIRTIO_NET_F_STANDBY
- feature bit to virtio_net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu PATCH v4 3/4] nvdimm,
+ acpi: support NFIT platform capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,151 +37,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, jesse.brandeburg@intel.com, alexander.h.duyck@intel.com, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
 
-On Wed, Jun 06, 2018 at 10:29:03AM +0800, Jason Wang wrote:
->=20
->=20
-> On 2018=E5=B9=B406=E6=9C=8805=E6=97=A5 20:33, Michael S. Tsirkin wrote:
-> > I don't think this is sufficient.
-> >=20
-> > If both primary and standby devices are present, a legacy guest witho=
-ut
-> > support for the feature might see two devices with same mac and get
-> > confused.
-> >=20
-> > I think that we should only make primary visible after guest acked th=
-e
-> > backup feature bit.
->=20
-> I think we want exactly the reverse? E.g fail the negotiation when gues=
-t
-> does not ack backup feature.
->=20
-> Otherwise legacy guest won't even have the chance to see primary device=
- in
-> the guest.
+On Wed, 6 Jun 2018 22:06:17 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-That's by design.
-
-> >=20
-> > And on reset or when backup is cleared in some other way, unplug the
-> > primary.
->=20
-> What if guest does not support hotplug?
-
-It shouldn't ack the backup feature then and it's a good point.
-We should both document this and check kernel config has
-hotplug support. Sridhar could you take a look pls?
-
-> >=20
-> > Something like the below will do the job:
-> >=20
-> > Primary device is added with a special "primary-failover" flag.
-> > A virtual machine is then initialized with just a standby virtio
-> > device. Primary is not yet added.
->=20
-> A question is how to do the matching? Qemu knows nothing about e.g mac
-> address of a pass-through device I believe?
-
-Supply a flag to the VFIO when it's added, this way QEMU will know.
-
-> >=20
-> > Later QEMU detects that guest driver device set DRIVER_OK.
-> > It then exposes the primary device to the guest, and triggers
-> > a device addition event (hot-plug event) for it.
->=20
-> Do you mean we won't have primary device in the initial qemu cli?
-
-No, that's not what I mean.
-
-I mean management will supply a flag to VFIO and then
-
-
-- VFIO defers exposing
-primary to guest until guest acks the feature bit.
-- When we see guest ack, initiate hotplug.
-- On reboot, hide it again.
-- On reset without reboot, request hot-unplug and on eject hide it again.
-
-
-> >=20
-> > If QEMU detects guest driver removal, it initiates a hot-unplug seque=
-nce
-> > to remove the primary driver.  In particular, if QEMU detects guest
-> > re-initialization (e.g. by detecting guest reset) it immediately remo=
-ves
-> > the primary device.
->=20
-> I believe guest failover module should handle this gracefully?
-
-It can't control enumeration order, if primary is enumerated before
-standby then guest will load its driver and it's too late
-when failover driver is loaded.
-
-> Thanks
->=20
-> >=20
-> > We can move some of this code to management as well, architecturally =
-it
-> > does not make too much sense but it might be easier implementation-wi=
-se.
-> >=20
-> > HTH
-> >=20
-> > On Mon, Jun 04, 2018 at 06:41:48PM -0700, Samudrala, Sridhar wrote:
-> > > Ping on this patch now that the kernel patches are accepted into da=
-vem's net-next tree.
-> > > https://patchwork.ozlabs.org/cover/920005/
-> > >=20
-> > >=20
-> > > On 5/7/2018 4:09 PM, Sridhar Samudrala wrote:
-> > > > This feature bit can be used by hypervisor to indicate virtio_net=
- device to
-> > > > act as a standby for another device with the same MAC address.
-> > > >=20
-> > > > I tested this with a small change to the patch to mark the STANDB=
-Y feature 'true'
-> > > > by default as i am using libvirt to start the VMs.
-> > > > Is there a way to pass the newly added feature bit 'standby' to q=
-emu via libvirt
-> > > > XML file?
-> > > >=20
-> > > > Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> > > > ---
-> > > >    hw/net/virtio-net.c                         | 2 ++
-> > > >    include/standard-headers/linux/virtio_net.h | 3 +++
-> > > >    2 files changed, 5 insertions(+)
-> > > >=20
-> > > > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > > > index 90502fca7c..38b3140670 100644
-> > > > --- a/hw/net/virtio-net.c
-> > > > +++ b/hw/net/virtio-net.c
-> > > > @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] =3D=
- {
-> > > >                         true),
-> > > >        DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEE=
-D_UNKNOWN),
-> > > >        DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_st=
-r),
-> > > > +    DEFINE_PROP_BIT64("standby", VirtIONet, host_features, VIRTI=
-O_NET_F_STANDBY,
-> > > > +                      false),
-> > > >        DEFINE_PROP_END_OF_LIST(),
-> > > >    };
-> > > > diff --git a/include/standard-headers/linux/virtio_net.h b/includ=
-e/standard-headers/linux/virtio_net.h
-> > > > index e9f255ea3f..01ec09684c 100644
-> > > > --- a/include/standard-headers/linux/virtio_net.h
-> > > > +++ b/include/standard-headers/linux/virtio_net.h
-> > > > @@ -57,6 +57,9 @@
-> > > >    					 * Steering */
-> > > >    #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
-> > > > +#define VIRTIO_NET_F_STANDBY      62    /* Act as standby for an=
-other device
-> > > > +                                         * with the same MAC.
-> > > > +                                         */
-> > > >    #define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Device set linkspeed a=
-nd duplex */
-> > > >    #ifndef VIRTIO_NET_NO_LEGACY
+> On Wed, Jun 06, 2018 at 11:08:49AM -0600, Ross Zwisler wrote:
+> > On Wed, Jun 06, 2018 at 11:00:33AM -0600, Ross Zwisler wrote:  
+> > > On Wed, Jun 06, 2018 at 10:50:51AM -0600, Ross Zwisler wrote:  
+> > > > On Tue, Jun 05, 2018 at 03:21:30PM -0700, Dan Williams wrote:  
+> > > > > On Tue, Jun 5, 2018 at 3:07 PM, Ross Zwisler
+> > > > > <ross.zwisler@linux.intel.com> wrote:  
+> > > > > > On Tue, Jun 05, 2018 at 09:37:25PM +0300, Michael S. Tsirkin wrote:  
+> > > > > >> On Tue, Jun 05, 2018 at 11:15:00AM -0700, Dan Williams wrote:  
+> > > > > >> > On Tue, Jun 5, 2018 at 9:42 AM, Ross Zwisler
+> > > > > >> > <ross.zwisler@linux.intel.com> wrote:  
+> > > > > >> > > On Tue, Jun 05, 2018 at 06:25:27PM +0300, Michael S. Tsirkin wrote:  
+> > > > > >> > >> On Mon, May 21, 2018 at 10:32:02AM -0600, Ross Zwisler wrote:  
+> > > > > >> > >> > Add a machine command line option to allow the user to control the Platform
+> > > > > >> > >> > Capabilities Structure in the virtualized NFIT.  This Platform Capabilities
+> > > > > >> > >> > Structure was added in ACPI 6.2 Errata A.
+> > > > > >> > >> >
+> > > > > >> > >> > Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>  
+> > > > > >> > >>
+> > > > > >> > >> I tried playing with it and encoding the capabilities is
+> > > > > >> > >> quite awkward.
+> > > > > >> > >>
+> > > > > >> > >> Can we add bits for specific capabilities instead of nvdimm-cap?
+> > > > > >> > >>
+> > > > > >> > >> How about:
+> > > > > >> > >>
+> > > > > >> > >> "cpu-flush-on-power-loss-cap"
+> > > > > >> > >> "memory-flush-on-power-loss-cap"
+> > > > > >> > >> "byte-addressable-mirroring-cap"  
+> > > > > >> > >
+> > > > > >> > > Hmmm...I don't like that as much because:
+> > > > > >> > >
+> > > > > >> > > a) It's very verbose.  Looking at my current qemu command line few other
+> > > > > >> > >    options require that many characters, and you'd commonly be defining more
+> > > > > >> > >    than one of these for a given VM.
+> > > > > >> > >
+> > > > > >> > > b) It means that the QEMU will need to be updated if/when new flags are added,
+> > > > > >> > >    because we'll have to have new options for each flag.  The current
+> > > > > >> > >    implementation is more future-proof because you can specify any flags
+> > > > > >> > >    value you want.
+> > > > > >> > >
+> > > > > >> > > However, if you feel strongly about this, I'll make the change.  
+> > > > > >> >
+> > > > > >> > Straw-man: Could we do something similar with what we are doing in ndctl?
+> > > > > >> >
+> > > > > >> > enum ndctl_persistence_domain {
+> > > > > >> >         PERSISTENCE_NONE = 0,
+> > > > > >> >         PERSISTENCE_MEM_CTRL = 10,
+> > > > > >> >         PERSISTENCE_CPU_CACHE = 20,
+> > > > > >> >         PERSISTENCE_UNKNOWN = INT_MAX,
+> > > > > >> > };
+> > > > > >> >
+> > > > > >> > ...and have the command line take a number where "10" and "20" are
+> > > > > >> > supported today, but allows us to adapt to new persistence domains in
+> > > > > >> > the future.  
+> > > > > >>
+> > > > > >> I'm fine with that except can we have symbolic names instead of numbers
+> > > > > >> on command line?
+> > > > > >>
+> > > > > >> --
+> > > > > >> MST  
+> > > > > >
+> > > > > > Okay, we can move to the symbolic names.  Do you want them to be that long, or
+> > > > > > would:
+> > > > > >
+> > > > > > nvdimm-cap-cpu
+> > > > > > nvdimm-cap-mem-ctrl
+> > > > > > nvdimm-cap-mirroring  
+> > > > > 
+> > > > > Wait, why is mirroring part of this?
+> > > > > 
+> > > > > I was thinking this option would be:
+> > > > > 
+> > > > >     --persistence-domain={cpu,mem-ctrl}
+> > > > > 
+> > > > > ...and try not to let ACPI specifics leak into the qemu command line
+> > > > > interface. For example PowerPC qemu could have a persistence domain
+> > > > > communicated via Open Firmware or some other mechanism.  
+> > > > 
+> > > > Sure, this seems fine, though we may want to throw an "nvdimm" in the name
+> > > > somewhere so it's clear what the option affects.
+> > > > 
+> > > > nvdimm-persistence={cpu,mem-ctrl} maybe?
+> > > > 
+> > > > Michael, does this work for you?  
+> > > 
+> > > Hmm...also, the version of these patches that used numeric values did go
+> > > upstream in QEMU.  So, do we need to leave that interface intact, and just add
+> > > a new one that uses symbolic names?  Or did you still just want to replace the
+> > > numeric one since it hasn't appeared in a QEMU release yet?  
+> > 
+> > I guess another alternative would be to just add symbolic name options to the
+> > existing command line option, i.e. allow all of these:
+> > 
+> > nvdimm-cap=3		# CPU cache
+> > nvdimm-cap=cpu		# CPU cache
+> > nvdimm-cap=2		# memory controller
+> > nvdimm-cap=mem-ctrl	# memory controller
+> > 
+> > And just have them as aliases.  This retains backwards compatibility with
+> > what is already there, allows for other numeric values without QEMU updates if
+> > other bits are defined (though we are still tightly tied to ACPI in this
+> > case), and provides a symbolic name which is easier to use.
+> > 
+> > Thoughts?  
+> 
+> I'm inclined to say let's just keep the symbolic names.
+> Less of a chance users configure something incorrectly,
+> it somehow kind of works and then we get stuck with working
+> around these bugs.
+We used numeric values before (OSPM status) in QMP which is ACPI spec defined,
+so we probably should do so in this case as well, as far as there is clear
+explanation for user where values come from. We can have symbolic aliases,
+but it would be just extra burden to maintain (so I'd prefer not to have it).
