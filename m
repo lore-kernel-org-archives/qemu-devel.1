@@ -1,40 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fSrfz-000144-UM
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 18:22:09 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fSsx7-00066w-P8
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 19:43:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fSrft-000125-MI
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 18:22:07 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48576)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1fSrft-000112-ED
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 18:22:01 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5CMJ6ch136523
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:22:00 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jjpc6h218-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:22:00 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 12 Jun 2018 16:21:59 -0600
-Content-Type: text/plain; charset="utf-8"
+	(envelope-from <dgibson@ozlabs.org>) id 1fSsx6-0001zi-UI
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 19:43:53 -0400
+Date: Wed, 13 Jun 2018 09:38:36 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180612233836.GI30690@umbus.fritz.box>
+References: <152882087494.112322.15549780953419438229.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20180515100949.248bc43b.cohuck@redhat.com>
-References: <20180515063128.7040-1-olaf@aepfle.de>
-	<d17ae62a-03a5-61fa-934a-4cb917d14222@redhat.com>
-	<20180515100949.248bc43b.cohuck@redhat.com>
-Date: Tue, 12 Jun 2018 17:21:43 -0500
-Message-Id: <152884210382.21982.6157008274157617034@sif>
-Subject: Re: [Qemu-devel] [Qemu-stable] [PATCH v2] replace functions which
- are only available in glib-2.24
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="CD/aTaZybdUisKIc"
+Content-Disposition: inline
+In-Reply-To: <152882087494.112322.15549780953419438229.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] target/ppc: drop empty #if/#endif block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,95 +23,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: Olaf Hering <olaf@aepfle.de>, qemu-trivial@nongnu.org, "open list:All patches   CC here" <qemu-devel@nongnu.org>, qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-
-Quoting Cornelia Huck (2018-05-15 03:09:49)
-> On Tue, 15 May 2018 09:18:52 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> =
-
-> > On 15.05.2018 08:31, Olaf Hering wrote:
-> > > Currently the minimal supported version of glib is 2.22.
-> > > Since testing is done with a glib that claims to be 2.22, but in fact
-> > > has APIs from newer version of glib, this bug was not caught during
-> > > submit of the patch referenced below.
-> > > =
-
-> > > Replace g_realloc_n, which is available only since 2.24, with g_renew.
-> > > =
-
-> > > Fixes commit 418026ca43 ("util: Introduce vfio helpers")
-> > > =
-
-> > > Signed-off-by: Olaf Hering <olaf@aepfle.de>
-> > > ---
-> > >  This must go into stable-2.12.  =
-
-> > =
-
-> > In that case please CC: qemu-stable@nongnu.org (done now).
-> > =
-
-> > Reviewed-by: Thomas Huth <thuth@redhat.com>
-> > =
-
-> > >  util/vfio-helpers.c | 6 ++----
-> > >  1 file changed, 2 insertions(+), 4 deletions(-)
-> > > =
-
-> > > diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-> > > index 006674c916..1d9272efa4 100644
-> > > --- a/util/vfio-helpers.c
-> > > +++ b/util/vfio-helpers.c
-> > > @@ -522,8 +522,7 @@ static IOVAMapping *qemu_vfio_add_mapping(QEMUVFI=
-OState *s,
-> > >  =
-
-> > >      assert(index >=3D 0);
-> > >      s->nr_mappings++;
-> > > -    s->mappings =3D g_realloc_n(s->mappings, sizeof(s->mappings[0]),
-> > > -                              s->nr_mappings);
-> > > +    s->mappings =3D g_renew(IOVAMapping, s->mappings, s->nr_mappings=
-);
-> > >      insert =3D &s->mappings[index];
-> > >      shift =3D s->nr_mappings - index - 1;
-> > >      if (shift) {
-> > > @@ -577,8 +576,7 @@ static void qemu_vfio_undo_mapping(QEMUVFIOState =
-*s, IOVAMapping *mapping,
-> > >      memmove(mapping, &s->mappings[index + 1],
-> > >              sizeof(s->mappings[0]) * (s->nr_mappings - index - 1));
-> > >      s->nr_mappings--;
-> > > -    s->mappings =3D g_realloc_n(s->mappings, sizeof(s->mappings[0]),
-> > > -                              s->nr_mappings);
-> > > +    s->mappings =3D g_renew(IOVAMapping, s->mappings, s->nr_mappings=
-);
-> > >  }
-> > >  =
-
-> > >  /* Check if the mapping list is (ascending) ordered. */
-> > >   =
-
-> =
-
-> This looks fine to me, so
-> =
-
-> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-> =
-
-> But this leads to another question: What do we do if we want a fix only
-> in stable? Hypothetical scenario: Same parameters as for this patch
-> (glib version bump, newer function sneaked in), but the older function
-> that could be used in stable is clearly worse (IOW, we don't want it in
-> the new version). Do we have a process to get a change only into stable?
-> =
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
-I've answered in the form of a patch :)
+--CD/aTaZybdUisKIc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  "docs: add details regarding submitting stable-specific patches"
+On Tue, Jun 12, 2018 at 06:27:54PM +0200, Greg Kurz wrote:
+> Commit 9d6f106552fa moved the last line in this block to somewhere else,
+> but it forgot to remove the now useless #if/#endif.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-but here's a recent example:
+Applied to ppc-for-3.0, thanks.
 
-  https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04999.html
+> ---
+>  target/ppc/cpu.h |    2 --
+>  1 file changed, 2 deletions(-)
+>=20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 0247c1f04c37..a91f1a8777eb 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1300,8 +1300,6 @@ void ppc_store_ptcr(CPUPPCState *env, target_ulong =
+value);
+>  void ppc_store_msr (CPUPPCState *env, target_ulong value);
+> =20
+>  void ppc_cpu_list (FILE *f, fprintf_function cpu_fprintf);
+> -#if defined(TARGET_PPC64)
+> -#endif
+> =20
+>  /* Time-base and decrementer management */
+>  #ifndef NO_CPU_IO_DEFS
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--CD/aTaZybdUisKIc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsgWXwACgkQbDjKyiDZ
+s5KhWRAA1p9OTVMF2MBDNA+pIL0TIa9S9WOQL59jqRwn+1GwFZfnxn7TglRK4sqo
+ps9ih7ItWPnAa6y5ah9Eyw027o4SzJllk3++pteIb8Ami6SdvkVcCxkDCe5zpVwF
+pknUqQziyECoE4uKYfiah7VtMkdXNDgnRANnXq8HGhCxwcEsNSmjnnrxb+r912IZ
+wLzdSs5Nz5eDtMD8gxJjquQzHCtcY5BoncZNhnwkK0zQU2uPUAJJdZO9xH7chBKc
+DlukmddtPAvyWkYRE9Gt8NVikpJbkSyqO539qmU5UNAFr4ZkafSUCtcLPVjSFUTn
+N0zOHRJ2tnscalla+UBOMuVBl8l0fu/PfWoVhbuTH4/cJ7c/otyatkhlQ+kCt40E
+b/szJ9mxrS3n4qsP2ok33+24tU0nTNnA1q4k0RKOvI1CCzNkwalThUzVQxUu82Ow
+jicEbkdzP+gS7O+9TSKM4FmdVNE8sRA9SnHiVWU/JQiZUo56L4tASlVOf7Aqe5TJ
+invkLNyRFm0rWMukLIbOlYgTMwnQ1Qt/ZvMPT1xEvlvr7FO8zSzA+ucpSK4FSHjb
+pGfAc8SIe4PAigFY8ZcdnDTswYX8TOhahdH4IyKl8JB954NBb3BTOa/B5iJAB+za
++S1dj4jh1Ahqw+/S80UFFHoojPmmDogzmVpru0ZjFAiznSjEays=
+=n0Sd
+-----END PGP SIGNATURE-----
+
+--CD/aTaZybdUisKIc--
