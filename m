@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSisZ-0007GU-HB
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSisd-0007Kh-56
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSisX-0003Aw-5J
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:31 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSisZ-0003EI-Vs
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:35 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 12 Jun 2018 14:58:12 +0200
-Message-Id: <20180612125821.4229-10-armbru@redhat.com>
+Date: Tue, 12 Jun 2018 14:58:20 +0200
+Message-Id: <20180612125821.4229-18-armbru@redhat.com>
 In-Reply-To: <20180612125821.4229-1-armbru@redhat.com>
 References: <20180612125821.4229-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 09/18] block: Make remaining uses of qobject
- input visitor more robust
+Subject: [Qemu-devel] [PATCH 17/18] rbd: New parameter auth-client-required
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +22,171 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
 
-Remaining uses of qobject_input_visitor_new_keyval() in the block
-subsystem:
+Parameter auth-client-required lets you configure authentication
+methods.  We tried to provide that in v2.9.0, but backed out due to
+interface design doubts (commit 464444fcc16).
 
-* block_crypto_create_opts_init()
-  Currently doesn't visit any non-string scalars, thus safe.  It's
-  called from
-  - block_crypto_open_luks()
-    Creates the QDict with qemu_opts_to_qdict_filtered(), which
-    creates only string scalars, but has a TODO asking for other types.
-  - qcow_open()
-  - qcow2_open(), qcow2_co_invalidate_cache(), qcow2_reopen_prepare()
+This commit is similar to what we backed out, but simpler: we use a
+list of enumeration values instead of a list of objects with a member
+of enumeration type.
 
-* block_crypto_create_opts_init(), called from
-  - block_crypto_co_create_opts_luks()
-    Also creates the QDict with qemu_opts_to_qdict_filtered().
+Let's review our reasons for backing out the first try, as stated in
+the commit message:
 
-* vdi_co_create_opts()
-  Also creates the QDict with qemu_opts_to_qdict_filtered().
+    * The implementation uses deprecated rados_conf_set() key
+      "auth_supported".  No biggie.
 
-Replace these uses by qobject_input_visitor_new_flat_confused() for
-robustness.  This adds crumpling.  Right now, that's a no-op, but if
-we ever extend these things in non-flat ways, crumpling will be
-needed.
+Fixed: we use "auth-client-required".
+
+    * The implementation makes -drive silently ignore invalid parameters
+      "auth" and "auth-supported.*.X" where X isn't "auth".  Fixable (in
+      fact I'm going to fix similar bugs around parameter server), so
+      again no biggie.
+
+That fix is commit 2836284db60.  This commit doesn't bring the bugs
+back.
+
+    * BlockdevOptionsRbd member @password-secret applies only to
+      authentication method cephx.  Should it be a variant member of
+      RbdAuthMethod?
+
+We've had time to ponder, and we decided to stick to the way Ceph
+configuration works: the key configured separately, and silently
+ignored if the authentication method doesn't use it.
+
+    * BlockdevOptionsRbd member @user could apply to both methods cephx
+      and none, but I'm not sure it's actually used with none.  If it
+      isn't, should it be a variant member of RbdAuthMethod?
+
+Likewise.
+
+    * The client offers a *set* of authentication methods, not a list.
+      Should the methods be optional members of BlockdevOptionsRbd instead
+      of members of list @auth-supported?  The latter begs the question
+      what multiple entries for the same method mean.  Trivial question
+      now that RbdAuthMethod contains nothing but @type, but less so when
+      RbdAuthMethod acquires other members, such the ones discussed above.
+
+Again, we decided to stick to the way Ceph configuration works, except
+we make auth-client-required a list of enumeration values instead of a
+string containing keywords separated by delimiters.
+
+    * How BlockdevOptionsRbd member @auth-supported interacts with
+      settings from a configuration file specified with @conf is
+      undocumented.  I suspect it's untested, too.
+
+Not actually true, the documentation for @conf says "Values in the
+configuration file will be overridden by options specified via QAPI",
+and we've tested this.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/crypto.c | 6 +++---
- block/vdi.c    | 4 ++--
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ block/rbd.c          | 42 ++++++++++++++++++++++++++++++++----------
+ qapi/block-core.json | 13 +++++++++++++
+ 2 files changed, 45 insertions(+), 10 deletions(-)
 
-diff --git a/block/crypto.c b/block/crypto.c
-index bc322b50f5..25d12e9d47 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -21,11 +21,11 @@
- #include "qemu/osdep.h"
+diff --git a/block/rbd.c b/block/rbd.c
+index 82346a2a5e..ea0575d068 100644
+--- a/block/rbd.c
++++ b/block/rbd.c
+@@ -240,20 +240,42 @@ static void qemu_rbd_refresh_limits(BlockDriverState *bs, Error **errp)
  
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "sysemu/block-backend.h"
- #include "crypto/block.h"
- #include "qapi/opts-visitor.h"
- #include "qapi/qapi-visit-crypto.h"
--#include "qapi/qmp/qdict.h"
- #include "qapi/qobject-input-visitor.h"
- #include "qapi/error.h"
- #include "qemu/option.h"
-@@ -159,7 +159,7 @@ block_crypto_open_opts_init(QCryptoBlockFormat format,
-     ret = g_new0(QCryptoBlockOpenOptions, 1);
-     ret->format = format;
  
--    v = qobject_input_visitor_new_keyval(QOBJECT(opts));
-+    v = qobject_input_visitor_new_flat_confused(opts, &error_abort);
+ static int qemu_rbd_set_auth(rados_t cluster, const char *secretid,
++                             BlockdevOptionsRbd *opts,
+                              Error **errp)
+ {
+-    if (secretid == 0) {
+-        return 0;
+-    }
++    char *acr;
++    int r;
++    GString *accu;
++    RbdAuthModeList *auth;
++
++    if (secretid) {
++        gchar *secret = qcrypto_secret_lookup_as_base64(secretid,
++                                                        errp);
++        if (!secret) {
++            return -1;
++        }
  
-     visit_start_struct(v, NULL, NULL, 0, &local_err);
-     if (local_err) {
-@@ -210,7 +210,7 @@ block_crypto_create_opts_init(QCryptoBlockFormat format,
-     ret = g_new0(QCryptoBlockCreateOptions, 1);
-     ret->format = format;
- 
--    v = qobject_input_visitor_new_keyval(QOBJECT(opts));
-+    v = qobject_input_visitor_new_flat_confused(opts, &error_abort);
- 
-     visit_start_struct(v, NULL, NULL, 0, &local_err);
-     if (local_err) {
-diff --git a/block/vdi.c b/block/vdi.c
-index 668af0a828..6b6eed126d 100644
---- a/block/vdi.c
-+++ b/block/vdi.c
-@@ -51,10 +51,10 @@
- 
- #include "qemu/osdep.h"
- #include "qapi/error.h"
--#include "qapi/qmp/qdict.h"
- #include "qapi/qobject-input-visitor.h"
- #include "qapi/qapi-visit-block-core.h"
- #include "block/block_int.h"
-+#include "block/qdict.h"
- #include "sysemu/block-backend.h"
- #include "qemu/module.h"
- #include "qemu/option.h"
-@@ -934,7 +934,7 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
+-    gchar *secret = qcrypto_secret_lookup_as_base64(secretid,
+-                                                    errp);
+-    if (!secret) {
+-        return -1;
++        rados_conf_set(cluster, "key", secret);
++        g_free(secret);
      }
  
-     /* Get the QAPI object */
--    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    v = qobject_input_visitor_new_flat_confused(qdict, &error_abort);
-     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-     visit_free(v);
+-    rados_conf_set(cluster, "key", secret);
+-    g_free(secret);
++    if (opts->has_auth_client_required) {
++        accu = g_string_new("");
++        for (auth = opts->auth_client_required; auth; auth = auth->next) {
++            if (accu->str[0]) {
++                g_string_append_c(accu, ';');
++            }
++            g_string_append(accu, RbdAuthMode_str(auth->value));
++        }
++        acr = g_string_free(accu, FALSE);
++        r = rados_conf_set(cluster, "auth_client_required", acr);
++        g_free(acr);
++        if (r < 0) {
++            error_setg_errno(errp, -r,
++                             "Could not set 'auth_client_required'");
++            return r;
++        }
++    }
  
+     return 0;
+ }
+@@ -585,7 +607,7 @@ static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
+         }
+     }
+ 
+-    if (qemu_rbd_set_auth(*cluster, secretid, errp) < 0) {
++    if (qemu_rbd_set_auth(*cluster, secretid, opts, errp) < 0) {
+         r = -EIO;
+         goto failed_shutdown;
+     }
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 4b1de474a9..841d196a21 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -3093,6 +3093,14 @@
+             '*timeout': 'int' } }
+ 
+ 
++##
++# @RbdAuthMode:
++#
++# Since: 3.0
++##
++{ 'enum': 'RbdAuthMode',
++  'data': [ 'cephx', 'none' ] }
++
+ ##
+ # @BlockdevOptionsRbd:
+ #
+@@ -3108,6 +3116,10 @@
+ #
+ # @user:               Ceph id name.
+ #
++# @auth-client-required: Acceptable authentication modes.
++#                      This maps to Ceph configuration option
++#                      "auth_client_required".  (Since 3.0)
++#
+ # @server:             Monitor host address and port.  This maps
+ #                      to the "mon_host" Ceph option.
+ #
+@@ -3119,6 +3131,7 @@
+             '*conf': 'str',
+             '*snapshot': 'str',
+             '*user': 'str',
++            '*auth-client-required': ['RbdAuthMode'],
+             '*server': ['InetSocketAddressBase'] } }
+ 
+ ##
 -- 
 2.17.1
