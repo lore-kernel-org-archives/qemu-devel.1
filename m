@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fSgyX-0002MH-4x
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:56:33 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fSh0l-0003Ru-Q0
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:58:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fSgyW-0006AA-G6
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:56:33 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:41664)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fSgyW-00069u-AK
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:56:32 -0400
-Received: by mail-ot0-x243.google.com with SMTP id d19-v6so21954751oti.8
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 03:56:32 -0700 (PDT)
+	(envelope-from <laurent@vivier.eu>) id 1fSh0i-0007B9-VJ
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:58:51 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:45725)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fSh0i-0007AC-MC
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:58:48 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Tue, 12 Jun 2018 12:58:24 +0200
+Message-Id: <20180612105831.25703-2-laurent@vivier.eu>
+In-Reply-To: <20180612105831.25703-1-laurent@vivier.eu>
+References: <20180612105831.25703-1-laurent@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <20180611173452.28087-1-ehabkost@redhat.com>
-References: <20180611173452.28087-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Jun 2018 11:56:11 +0100
-Message-ID: <CAFEAcA83ZYsZB-yaaUFzddmG7ZKqV5oAq-6rnBobcMp9C-ddkQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] Machine queue, 2018-06-11
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 1/8] linux-user: Export use is_error(),
+ use it to avoid warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 11 June 2018 at 18:34, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> The following changes since commit 9f55925b8f50a962d1d08d815044db7767ae3838:
->
->   Merge remote-tracking branch 'remotes/vivier/tags/m68k-for-3.0-pull-request' into staging (2018-06-11 12:46:16 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
->
-> for you to fetch changes up to 0f5319ea25fb0a05827d512859b7c7d23371ac5d:
->
->   cli: Don't run early event loop if no --preconfig was specified (2018-06-11 14:25:49 -0300)
->
-> ----------------------------------------------------------------
-> Machine queue, 2018-06-11
->
-> * Fix -daemonize hang caused by --preconfig code
->
-> ----------------------------------------------------------------
->
-> Queue for Machine Core patches
->
->
-> Igor Mammedov (1):
->   cli: Don't run early event loop if no --preconfig was specified
->
->  vl.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> --
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Applied, thanks.
+This fixes:
 
--- PMM
+  linux-user/flatload.c:740:9: warning: Loss of sign in implicit conversion
+      if (res > (unsigned long)-4096)
+          ^~~
+
+Reported-by: Clang Static Analyzer
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20180604153722.24956-2-f4bug@amsat.org>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/qemu.h    | 5 +++++
+ linux-user/syscall.c | 5 -----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index 6fa1e968db..793cd4df04 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -618,6 +618,11 @@ static inline void *lock_user_string(abi_ulong guest_addr)
+ 
+ #include <pthread.h>
+ 
++static inline int is_error(abi_long ret)
++{
++    return (abi_ulong)ret >= (abi_ulong)(-4096);
++}
++
+ /* Include target-specific struct and function definitions;
+  * they may need access to the target-independent structures
+  * above, so include them last.
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 7b9ac3b408..2117fb13b4 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -906,11 +906,6 @@ static inline abi_long get_errno(abi_long ret)
+         return ret;
+ }
+ 
+-static inline int is_error(abi_long ret)
+-{
+-    return (abi_ulong)ret >= (abi_ulong)(-4096);
+-}
+-
+ const char *target_strerror(int err)
+ {
+     if (err == TARGET_ERESTARTSYS) {
+-- 
+2.14.4
