@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSisY-0007FP-Te
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSisd-0007Kr-7F
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSisW-0003A2-Fd
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:30 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSisY-0003Cn-Ug
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:35 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 12 Jun 2018 14:58:14 +0200
-Message-Id: <20180612125821.4229-12-armbru@redhat.com>
+Date: Tue, 12 Jun 2018 14:58:15 +0200
+Message-Id: <20180612125821.4229-13-armbru@redhat.com>
 In-Reply-To: <20180612125821.4229-1-armbru@redhat.com>
 References: <20180612125821.4229-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 11/18] block-qdict: Tweak qdict_flatten_qdict(),
- qdict_flatten_qlist()
+Subject: [Qemu-devel] [PATCH 12/18] block-qdict: Clean up qdict_crumple() a
+ bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +23,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
 
-qdict_flatten_qdict() skips copying scalars from @qdict to @target
-when the two are the same.  Fair enough, but it uses a non-obvious
-test for "same".  Replace it by the obvious one.  While there, improve
-comments.
+When you mix scalar and non-scalar keys, whether you get an "already
+set as scalar" or an "already set as dict" error depends on qdict
+iteration order.  Neither message makes much sense.  Replace by
+""Cannot mix scalar and non-scalar keys".  This is similar to the
+message we get for mixing list and non-list keys.
+
+I find qdict_crumple()'s first loop hard to understand.  Rearrange it
+and add a comment.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- qobject/block-qdict.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ qobject/block-qdict.c | 42 +++++++++++++++++++++---------------------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
 
 diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
-index f32df343e8..a4e1c8d08f 100644
+index a4e1c8d08f..35e9052816 100644
 --- a/qobject/block-qdict.c
 +++ b/qobject/block-qdict.c
-@@ -71,12 +71,15 @@ static void qdict_flatten_qlist(QList *qlist, QDict *target, const char *prefix)
-         value = qlist_entry_obj(entry);
-         new_key = g_strdup_printf("%s.%i", prefix, i);
- 
-+        /*
-+         * Flatten non-empty QDict and QList recursively into @target,
-+         * copy other objects to @target
-+         */
-         if (qobject_type(value) == QTYPE_QDICT) {
-             qdict_flatten_qdict(qobject_to(QDict, value), target, new_key);
-         } else if (qobject_type(value) == QTYPE_QLIST) {
-             qdict_flatten_qlist(qobject_to(QList, value), target, new_key);
-         } else {
--            /* All other types are moved to the target unchanged. */
-             qdict_put_obj(target, new_key, qobject_ref(value));
+@@ -403,7 +403,7 @@ static int qdict_is_list(QDict *maybe_list, Error **errp)
+ QObject *qdict_crumple(const QDict *src, Error **errp)
+ {
+     const QDictEntry *ent;
+-    QDict *two_level, *multi_level = NULL;
++    QDict *two_level, *multi_level = NULL, *child_dict;
+     QObject *dst = NULL, *child;
+     size_t i;
+     char *prefix = NULL;
+@@ -422,29 +422,29 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
          }
  
-@@ -101,9 +104,11 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
-             new_key = g_strdup_printf("%s.%s", prefix, entry->key);
+         qdict_split_flat_key(ent->key, &prefix, &suffix);
+-
+         child = qdict_get(two_level, prefix);
++        child_dict = qobject_to(QDict, child);
++
++        if (child) {
++            /*
++             * An existing child must be a dict and @ent must be a
++             * dict member (i.e. suffix not null), or else @ent
++             * clashes.
++             */
++            if (!child_dict || !suffix) {
++                error_setg(errp,
++                           "Cannot mix scalar and non-scalar keys");
++                goto error;
++            }
++        } else if (suffix) {
++            child_dict = qdict_new();
++            qdict_put(two_level, prefix, child_dict);
++        } else {
++            qdict_put_obj(two_level, prefix, qobject_ref(ent->value));
++        }
++
+         if (suffix) {
+-            QDict *child_dict = qobject_to(QDict, child);
+-            if (!child_dict) {
+-                if (child) {
+-                    error_setg(errp, "Key %s prefix is already set as a scalar",
+-                               prefix);
+-                    goto error;
+-                }
+-
+-                child_dict = qdict_new();
+-                qdict_put_obj(two_level, prefix, QOBJECT(child_dict));
+-            }
+-
+             qdict_put_obj(child_dict, suffix, qobject_ref(ent->value));
+-        } else {
+-            if (child) {
+-                error_setg(errp, "Key %s prefix is already set as a dict",
+-                           prefix);
+-                goto error;
+-            }
+-            qdict_put_obj(two_level, prefix, qobject_ref(ent->value));
          }
  
-+        /*
-+         * Flatten non-empty QDict and QList recursively into @target,
-+         * copy other objects to @target
-+         */
-         if (qobject_type(value) == QTYPE_QDICT) {
--            /* Entries of QDicts are processed recursively, the QDict object
--             * itself disappears. */
-             qdict_flatten_qdict(qobject_to(QDict, value), target,
-                                 new_key ? new_key : entry->key);
-             qdict_del(qdict, entry->key);
-@@ -111,8 +116,7 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
-             qdict_flatten_qlist(qobject_to(QList, value), target,
-                                 new_key ? new_key : entry->key);
-             qdict_del(qdict, entry->key);
--        } else if (prefix) {
--            /* All other objects are moved to the target unchanged. */
-+        } else if (target != qdict) {
-             qdict_put_obj(target, new_key, qobject_ref(value));
-             qdict_del(qdict, entry->key);
-         }
+         g_free(prefix);
 -- 
 2.17.1
