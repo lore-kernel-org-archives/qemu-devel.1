@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fSnHT-0004Pf-2T
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:40:32 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSnIm-00057K-71
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:41:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fSnHP-0005i0-EY
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:40:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58658)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fSnHP-0005hK-5R
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:40:27 -0400
-Date: Tue, 12 Jun 2018 14:40:21 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180612174021.GL7451@localhost.localdomain>
-References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
-	<1528498581-131037-4-git-send-email-babu.moger@amd.com>
-	<20180611205030.GW7451@localhost.localdomain>
-	<20180611211026.GA7451@localhost.localdomain>
-	<DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSnIl-0006Jv-Ao
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:41:52 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180611141716.3813-1-peter.maydell@linaro.org>
+	<650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ba3865c5-dd60-8da2-9f99-33723ae26c2b@amsat.org>
+Date: Tue, 12 Jun 2018 14:41:40 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
- AMD EPYC CPU
+In-Reply-To: <650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
+ for multiline comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,114 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Moger, Babu" <Babu.Moger@amd.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, patches@linaro.org, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Jun 12, 2018 at 04:29:25PM +0000, Moger, Babu wrote:
-> > [...]
-> > > > +        /* TOPOEXT feature requires 0x8000001E */
-> > > > +        if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT)
-> > {
-> > > > +            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel,
-> > 0x8000001E);
-> > > > +        }
-> > >
-> > > I suggest moving this hunk to a separate patch.  I'm not 100%
-> > > sure yet if this will require compat_props code to disable
-> > > auto-xlevel-increase on older machine-types.
-> > 
-> > The problem here is that:
-> >   $QEMU -machine pc-i440fx-1.3 -cpu Opteron_G4,+topoext
-> > currently results in xlevel=0x8000001A, since QEMU 1.3.
-> > 
-> > (The same applies to all machine-types between 1.3 and 2.12)
-> > 
-> > I was hoping that we could declare topoext as non-migration-safe,
-> > but I believe libvirt will already include "topoext" when using
-> > "host-model" if the host CPU supports TOPOEXT.  Jiri, can you
-> > confirm that?
-> > 
-> > We can address that with a "x-topoext-auto-xlevel" property, set
-> > to true on all CPU models by default, and disabled by
-> > PC_COMPAT_2_12.
-> > 
-> > The code would become:
-> > 
-> >     if (cpu->topoext_auto_xlevel && env->features[FEAT_8000_0001_ECX] &
-> > CPUID_EXT3_TOPOEXT) {
-> >         x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E);
-> >     }
-> > 
-> > Or, we could simply declare that "-cpu Opteron_G4,+topoext" will
-> > never increase xlevel automatically (on any machine-type), and
-> > change the code above to:
-> > 
-> >     if (cpu->auto_topoext && env->features[FEAT_8000_0001_ECX] &
-> > CPUID_EXT3_TOPOEXT) {
-> >         x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E);
-> >     }
+On 06/12/2018 02:30 PM, Richard Henderson wrote:
+> On 06/11/2018 04:17 AM, Peter Maydell wrote:
+>> The codebase has a bit of a mix of different multiline
+>> comment styles. State a preference for the Linux kernel
+>> style:
+>>     /*
+>>      * Star on the left for each line.
+>>      * Leading slash-star and trailing star-slash
+>>      * each go on a line of their own.
+>>      */
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> This is not my personal favourite, but seemed to be the
+>> closest we had to consensus in the mail thread for v1;
+>> I can live with it in order to avoid getting patches which
+>> use the styles I like even less :-)
 > 
-> I was going to do this.  But there is one problem.  We don't
-> set the CPUID_EXT3_TOPOEXT in CPU model table. So this won't
-> work.
-
-Won't this work if the auto_topoext handling is done before
-x86_cpu_expand_features() is called?
-
-
-> One more thing I noticed that feature setting should happen
-> much before x86_cpu_realizefn.
-
-Why?
-
+> Honestly, I don't like this except for "important" comments.
 > 
-> Couple of options. 
-> First option.
-> 1. Set both feature and xlevel here(in x86_cpu_expand_features).
->  if (cpu->x_auto_topoext {
->         env->features[FEAT_8000_0001_ECX]  |= CPUID_EXT3_TOPOEXT;
->         x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E);
->  }
-> 2. And remove feature setting in x86_cpu_realizefn.
-
-This would make TOPOEXT be included in 'query-cpu-model-expansion
-model=EPYC', which would be incorrect because TOPOEXT won't
-always be enabled when using EPYC.
-
-
+> A "small" comment, e.g. one that doesn't quite fit on a single line, now takes
+> 4 lines instead of 2.  Which is really annoying and IMO tends to break flow.
 > 
-> Or 
+> If you don't like
 > 
-> Second option
-> 1.Set the feature bit in CPU model table.
-> 2. Set xlevel in x86_cpu_expand_features using cpu->x_auto_topoext
-> 3. And remove feature setting in x86_cpu_realizefn.
->  
-> I  prefer the second option. 
+>   /* gnu
+>      style */
+> 
+> or
+> 
+>   /* whatever
+>    * this is */
+> 
+> could you live with
+> 
+>   // c99/c++
+>   // comments
+> 
+> (I know we currently deny those in checkpatch, but that's easy enough to remove
+> if we're changing policy.  I have no idea why we don't like them in the first
+> place.  Or other c99 features like mid-block or control declarations, for that
+> matter.)
 
-Same here: TOPOEXT would be included in
-'query-cpu-model-expansion model=EPYC', and this would be
-incorrect.
++1 for control declarations :) Code is easier to read and keep focus on.
 
-
-I'm starting to think that enabling TOPOEXT automatically is
-adding too much complexity and compatibility problems, and it's
-better to leave this task to management software.
-
-The main problem here is:
-
-This works today with QEMU 2.12 + Linux <= 4.15:
-  $ $QEMU -machine pc -cpu EPYC,enforce -smp 8,sockets=2,cores=2,threads=2"
-and must keep working with QEMU 3.0 and Linux <= 4.15.
-
-In addition to that, the results for:
-  $ $QEMU -machine pc-q35-3.0 -cpu EPYC,enforce [...]
-must be deterministic and expose exactly the same CPUID data even
-if host hardware or software changes, as long as the QEMU
-command-line is the same.
-
-Do you see a way to fulfill those two constraints while making
-"-machine pc-q35-3.0 -cpu EPYC" enable TOPOEXT automatically?
-
--- 
-Eduardo
+3.0 release is a good opportunity to establish such disruptive changes.
