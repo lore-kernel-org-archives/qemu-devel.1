@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSisZ-0007FZ-0M
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSisd-0007Kj-50
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSisW-00039k-9u
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:30 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSisY-0003Ce-Nz
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:35 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 12 Jun 2018 14:58:09 +0200
-Message-Id: <20180612125821.4229-7-armbru@redhat.com>
+Date: Tue, 12 Jun 2018 14:58:17 +0200
+Message-Id: <20180612125821.4229-15-armbru@redhat.com>
 In-Reply-To: <20180612125821.4229-1-armbru@redhat.com>
 References: <20180612125821.4229-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/18] block: Fix -drive for certain non-string
- scalars
+Subject: [Qemu-devel] [PATCH 14/18] check-block-qdict: Rename
+ qdict_flatten()'s variables for clarity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,107 +23,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
 
-The previous commit fixed -blockdev breakage due to misuse of the
-qobject input visitor's keyval flavor in bdrv_file_open().  The commit
-message explain why using the plain flavor would be just as wrong; it
-would break -drive.  Turns out we break it in three places:
-nbd_open(), sd_open() and ssh_file_open().  They are even marked
-FIXME.  Example breakage:
-
-    $ qemu-system-x86 -drive node-name=n1,driver=nbd,server.type=inet,server.host=localhost,server.port=1234,server.numeric=off
-    qemu-system-x86: -drive node-name=n1,driver=nbd,server.type=inet,server.host=localhost,server.port=1234,server.numeric=off: Invalid parameter type for 'numeric', expected: boolean
-
-Fix it the same way: replace qdict_crumple() by
-qdict_crumple_for_keyval_qiv(), and switch from plain to the keyval
-flavor.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/nbd.c      | 12 ++----------
- block/sheepdog.c | 12 ++----------
- block/ssh.c      | 12 ++----------
- 3 files changed, 6 insertions(+), 30 deletions(-)
+ tests/check-block-qdict.c | 57 ++++++++++++++++++++-------------------
+ 1 file changed, 29 insertions(+), 28 deletions(-)
 
-diff --git a/block/nbd.c b/block/nbd.c
-index d6c4c4ddbc..614dd9fec0 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -273,20 +273,12 @@ static SocketAddress *nbd_config(BDRVNBDState *s, QDict *options,
-         goto done;
-     }
+diff --git a/tests/check-block-qdict.c b/tests/check-block-qdict.c
+index 5b9f4d506e..29f58a2d3d 100644
+--- a/tests/check-block-qdict.c
++++ b/tests/check-block-qdict.c
+@@ -37,11 +37,11 @@ static void qdict_defaults_test(void)
  
--    crumpled_addr = qdict_crumple(addr, errp);
-+    crumpled_addr = qdict_crumple_for_keyval_qiv(addr, errp);
-     if (!crumpled_addr) {
-         goto done;
-     }
+ static void qdict_flatten_test(void)
+ {
+-    QList *list1 = qlist_new();
+-    QList *list2 = qlist_new();
+-    QDict *dict1 = qdict_new();
+-    QDict *dict2 = qdict_new();
+-    QDict *dict3 = qdict_new();
++    QList *e_1 = qlist_new();
++    QList *e = qlist_new();
++    QDict *e_1_2 = qdict_new();
++    QDict *f = qdict_new();
++    QDict *root = qdict_new();
  
--    /*
--     * FIXME .numeric, .to, .ipv4 or .ipv6 don't work with -drive
--     * server.type=inet.  .to doesn't matter, it's ignored anyway.
--     * That's because when @options come from -blockdev or
--     * blockdev_add, members are typed according to the QAPI schema,
--     * but when they come from -drive, they're all QString.  The
--     * visitor expects the former.
--     */
--    iv = qobject_input_visitor_new(crumpled_addr);
-+    iv = qobject_input_visitor_new_keyval(crumpled_addr);
-     visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index a93f93d360..29e3e1eaaa 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -546,20 +546,12 @@ static SocketAddress *sd_server_config(QDict *options, Error **errp)
+     /*
+      * Test the flattening of
+@@ -79,35 +79,36 @@ static void qdict_flatten_test(void)
+      * }
+      */
  
-     qdict_extract_subqdict(options, &server, "server.");
+-    qdict_put_int(dict1, "a", 0);
+-    qdict_put_int(dict1, "b", 1);
++    qdict_put_int(e_1_2, "a", 0);
++    qdict_put_int(e_1_2, "b", 1);
  
--    crumpled_server = qdict_crumple(server, errp);
-+    crumpled_server = qdict_crumple_for_keyval_qiv(server, errp);
-     if (!crumpled_server) {
-         goto done;
-     }
+-    qlist_append_int(list1, 23);
+-    qlist_append_int(list1, 66);
+-    qlist_append(list1, dict1);
+-    qlist_append_int(list2, 42);
+-    qlist_append(list2, list1);
++    qlist_append_int(e_1, 23);
++    qlist_append_int(e_1, 66);
++    qlist_append(e_1, e_1_2);
++    qlist_append_int(e, 42);
++    qlist_append(e, e_1);
  
--    /*
--     * FIXME .numeric, .to, .ipv4 or .ipv6 don't work with -drive
--     * server.type=inet.  .to doesn't matter, it's ignored anyway.
--     * That's because when @options come from -blockdev or
--     * blockdev_add, members are typed according to the QAPI schema,
--     * but when they come from -drive, they're all QString.  The
--     * visitor expects the former.
--     */
--    iv = qobject_input_visitor_new(crumpled_server);
-+    iv = qobject_input_visitor_new_keyval(crumpled_server);
-     visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-diff --git a/block/ssh.c b/block/ssh.c
-index eec37dd27c..bd85d989d5 100644
---- a/block/ssh.c
-+++ b/block/ssh.c
-@@ -623,20 +623,12 @@ static BlockdevOptionsSsh *ssh_parse_options(QDict *options, Error **errp)
-     }
+-    qdict_put_int(dict2, "c", 2);
+-    qdict_put_int(dict2, "d", 3);
+-    qdict_put(dict3, "e", list2);
+-    qdict_put(dict3, "f", dict2);
+-    qdict_put_int(dict3, "g", 4);
++    qdict_put_int(f, "c", 2);
++    qdict_put_int(f, "d", 3);
  
-     /* Create the QAPI object */
--    crumpled = qdict_crumple(options, errp);
-+    crumpled = qdict_crumple_for_keyval_qiv(options, errp);
-     if (crumpled == NULL) {
-         goto fail;
-     }
+-    qdict_flatten(dict3);
++    qdict_put(root, "e", e);
++    qdict_put(root, "f", f);
++    qdict_put_int(root, "g", 4);
  
--    /*
--     * FIXME .numeric, .to, .ipv4 or .ipv6 don't work with -drive.
--     * .to doesn't matter, it's ignored anyway.
--     * That's because when @options come from -blockdev or
--     * blockdev_add, members are typed according to the QAPI schema,
--     * but when they come from -drive, they're all QString.  The
--     * visitor expects the former.
--     */
--    v = qobject_input_visitor_new(crumpled);
-+    v = qobject_input_visitor_new_keyval(crumpled);
-     visit_type_BlockdevOptionsSsh(v, NULL, &result, &local_err);
-     visit_free(v);
-     qobject_unref(crumpled);
+-    g_assert(qdict_get_int(dict3, "e.0") == 42);
+-    g_assert(qdict_get_int(dict3, "e.1.0") == 23);
+-    g_assert(qdict_get_int(dict3, "e.1.1") == 66);
+-    g_assert(qdict_get_int(dict3, "e.1.2.a") == 0);
+-    g_assert(qdict_get_int(dict3, "e.1.2.b") == 1);
+-    g_assert(qdict_get_int(dict3, "f.c") == 2);
+-    g_assert(qdict_get_int(dict3, "f.d") == 3);
+-    g_assert(qdict_get_int(dict3, "g") == 4);
++    qdict_flatten(root);
+ 
+-    g_assert(qdict_size(dict3) == 8);
++    g_assert(qdict_get_int(root, "e.0") == 42);
++    g_assert(qdict_get_int(root, "e.1.0") == 23);
++    g_assert(qdict_get_int(root, "e.1.1") == 66);
++    g_assert(qdict_get_int(root, "e.1.2.a") == 0);
++    g_assert(qdict_get_int(root, "e.1.2.b") == 1);
++    g_assert(qdict_get_int(root, "f.c") == 2);
++    g_assert(qdict_get_int(root, "f.d") == 3);
++    g_assert(qdict_get_int(root, "g") == 4);
+ 
+-    qobject_unref(dict3);
++    g_assert(qdict_size(root) == 8);
++
++    qobject_unref(root);
+ }
+ 
+ static void qdict_array_split_test(void)
 -- 
 2.17.1
