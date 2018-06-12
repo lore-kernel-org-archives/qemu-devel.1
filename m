@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fSnm7-0003EU-Qg
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:12:12 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fSnzJ-0007ff-Lu
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:25:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fSnm4-0005Og-Lr
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:12:11 -0400
-References: <20180611141716.3813-1-peter.maydell@linaro.org>
-	<650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <85642e2a-f00a-3d85-8525-0ae89e4d71c9@redhat.com>
-Date: Tue, 12 Jun 2018 20:12:02 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1fSnzE-0002Ml-Ow
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:25:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33862)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fSnzE-0002MP-I0
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:25:44 -0400
+Date: Tue, 12 Jun 2018 15:25:41 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180612182541.GN7451@localhost.localdomain>
+References: <20180611203712.12086-1-ehabkost@redhat.com>
+	<a8426bf6-7531-6306-d1c6-bb4c6c2099cd@redhat.com>
+	<20180612150153.GK7451@localhost.localdomain>
+	<6c9b3744-7323-cd1f-7b07-2b77df7ae80d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
- for multiline comments
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6c9b3744-7323-cd1f-7b07-2b77df7ae80d@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH] i386: Remove ospke CPUID flag name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, patches@linaro.org, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 12.06.2018 19:30, Richard Henderson wrote:
-> On 06/11/2018 04:17 AM, Peter Maydell wrote:
->> The codebase has a bit of a mix of different multiline
->> comment styles. State a preference for the Linux kernel
->> style:
->>     /*
->>      * Star on the left for each line.
->>      * Leading slash-star and trailing star-slash
->>      * each go on a line of their own.
->>      */
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> This is not my personal favourite, but seemed to be the
->> closest we had to consensus in the mail thread for v1;
->> I can live with it in order to avoid getting patches which
->> use the styles I like even less :-)
+On Tue, Jun 12, 2018 at 05:12:58PM +0200, Paolo Bonzini wrote:
+> On 12/06/2018 17:01, Eduardo Habkost wrote:
+> >>>
+> >>> Remove OSPKE from the feature name array so users don't try to
+> >>> configure it manually.
+> >>>
+> >>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> >> Yes, it's the same as OSXSAVE.  Thanks!
+> > CR4_OSXSAVE_MASK is automatically enabled on user-mode QEMU,
+> > though.
+> > 
+> > My question is if it would make any sense to enable CR4_PKE_MASK
+> > too.
 > 
-> Honestly, I don't like this except for "important" comments.
-> 
-> A "small" comment, e.g. one that doesn't quite fit on a single line, now takes
-> 4 lines instead of 2.  Which is really annoying and IMO tends to break flow.
-> 
-> If you don't like
-> 
->   /* gnu
->      style */
-> 
-> or
-> 
->   /* whatever
->    * this is */
-> 
-> could you live with
-> 
->   // c99/c++
->   // comments
+> If you mean OSPKE, then yes---if PKU is available.  Likewise, OSXSAVE
+> should only be enabled if XSAVE is available.
 
-FWIW:
+Yeah, I mean enabling it only if PKU is available, like we
+already do with OSXAVE/XSAVE.
 
-+1 for one or two of those compact styles for two- or three-line comments.
+But we don't do it today, so enabling it automatically in
+CONFIG_USER_ONLY would be a new feature.  Would it be useful for
+anything, though?
 
- Thomas
+I'm asking that to find out if somebody could be already using
+"-cpu ...,+ospke" with user-mode QEMU today (which this patch
+would break).  If RDPKRU/WRPKRU is useless under user-mode QEMU,
+than we don't need to worry about that.
+
+-- 
+Eduardo
