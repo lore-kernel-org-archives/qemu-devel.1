@@ -1,34 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42796)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fSpFw-0008LN-Me
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 15:47:05 -0400
+	(envelope-from <alifm@linux.ibm.com>) id 1fSpHa-0000gO-A7
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 15:48:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fSpFr-0003tX-Qk
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 15:47:04 -0400
-Received: from mail-sn1nam02on0066.outbound.protection.outlook.com
-	([104.47.36.66]:2386
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	(envelope-from <alifm@linux.ibm.com>) id 1fSpHV-0004c0-DF
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 15:48:46 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43272
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fSpFr-0003t2-AP
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 15:46:59 -0400
-References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
-	<1528498581-131037-4-git-send-email-babu.moger@amd.com>
-	<20180611205030.GW7451@localhost.localdomain>
-	<20180611211026.GA7451@localhost.localdomain>
-	<DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612174021.GL7451@localhost.localdomain>
-	<DM5PR12MB2471F6EA1525A824A9A94545957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612190554.GO7451@localhost.localdomain>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <39f328af-a9c1-15bb-653e-9456b045768d@amd.com>
-Date: Tue, 12 Jun 2018 14:46:51 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180612190554.GO7451@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
- AMD EPYC CPU
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1fSpHV-0004bb-64
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 15:48:41 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5CJhdGx083958
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 15:48:40 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jjh8as71v-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 15:48:40 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Tue, 12 Jun 2018 15:48:39 -0400
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Tue, 12 Jun 2018 15:48:34 -0400
+In-Reply-To: <cover.1528832686.git.alifm@linux.ibm.com>
+References: <cover.1528832686.git.alifm@linux.ibm.com>
+Message-Id: <dd7e90c5b3de6f98218908c7f57d9d0286089ad5.1528832686.git.alifm@linux.ibm.com>
+Subject: [Qemu-devel] [RFC v1 1/1] virtio-crypto: Allow disabling of cipher
+ algorithms for virtio-crypto device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +38,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, arei.gonglei@huawei.com, longpeng2@huawei.com, pasic@linux.ibm.com, borntraeger@de.ibm.com, frankja@linux.ibm.com, alifm@linux.ibm.com
+
+The virtio-crypto driver currently propagates to the guest
+all the cipher algorithms that the backend cryptodev can
+support. But in certain cases where the guest has more
+performant mechanism to handle some algorithms, it would be
+useful to propagate only a subset of the algorithms.
+
+This patch adds support for disabling the cipher
+algorithms of the backend cryptodev.
+
+eg:
+ -object cryptodev-backend-builtin,id=cryptodev0
+ -device virtio-crypto-ccw,id=crypto0,cryptodev=cryptodev0,cipher-aes-cbc=off
+
+Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+---
+
+Please note this patch is not complete, and there are TODOs to handle
+for other types of algorithms such Hash, AEAD and MAC algorithms.
+
+This is mainly intended to get some feedback on the design approach
+from the community.
 
 
+ hw/virtio/virtio-crypto.c         | 46 ++++++++++++++++++++++++++++++++++++---
+ include/hw/virtio/virtio-crypto.h |  3 +++
+ 2 files changed, 46 insertions(+), 3 deletions(-)
 
-On 06/12/2018 02:05 PM, Eduardo Habkost wrote:
-> On Tue, Jun 12, 2018 at 06:38:08PM +0000, Moger, Babu wrote:
-> [...]
->>> I'm starting to think that enabling TOPOEXT automatically is
->>> adding too much complexity and compatibility problems, and it's
->>> better to leave this task to management software.
->>>
->>> The main problem here is:
->>>
->>> This works today with QEMU 2.12 + Linux <=3D 4.15:
->>>    $ $QEMU -machine pc -cpu EPYC,enforce -smp
->>> 8,sockets=3D2,cores=3D2,threads=3D2"
->>> and must keep working with QEMU 3.0 and Linux <=3D 4.15.
->>>
->>> In addition to that, the results for:
->>>    $ $QEMU -machine pc-q35-3.0 -cpu EPYC,enforce [...]
->>> must be deterministic and expose exactly the same CPUID data even
->>> if host hardware or software changes, as long as the QEMU
->>> command-line is the same.
->>>
->>> Do you see a way to fulfill those two constraints while making
->>> "-machine pc-q35-3.0 -cpu EPYC" enable TOPOEXT automatically?
->>>
->> Now(setting feature before x86_cpu_expand_features), enabling
->> TOPOEXT appears to work fine.
-> What about the above constraints?  Are you really fulfilling
-> them?
->
-> This one is tricky:
->
-> ] This works today with QEMU 2.12 + Linux <=3D 4.15:
-> ]   $ $QEMU -machine pc -cpu EPYC,enforce -smp 8,sockets=3D2,cores=3D2,th=
-reads=3D2"
-> ] and must keep working with QEMU 3.0 and Linux <=3D 4.15.
- =C2=A0This works fine on kernel <=3D 4.15 with some warnings(-smp=20
-8,sockets=3D2,cores=3D2,threads=3D2 -cpu EPYC).
-
-qemu-system-x86_64: warning: host doesn't support requested feature:=20
-CPUID.80000001H:EDX.rdtscp [bit 27]
-qemu-system-x86_64: warning: host doesn't support requested feature:=20
-CPUID.80000001H:ECX.topoext [bit 22]
-qemu-system-x86_64: This family of AMD CPU doesn't support=20
-hyperthreading(2). Please configure -smp options properly or try=20
-enabling topoext feature.
-continues..
->
-> If we enable TOPOEXT unconditionally, the command-line won't work
-> with Linux <=3D 4.15.
->
-> If we enable TOPOEXT only if the kernel returns TOPOEXT on
-> GET_SUPPORTED_CPUID, we break the second constraint:
->
-> ] The results for:
-> ]   $ $QEMU -machine pc-q35-3.0 -cpu EPYC,enforce [...]
-> ] must be deterministic and expose exactly the same CPUID data even
-> ] if host hardware or software changes, as long as the QEMU
-> ] command-line is the same.
->
-This fails on kernel=C2=A0 <=3D 4.15 with following messages((-smp=20
-8,sockets=3D2,cores=3D2,threads=3D2 -cpu EPYC,enforce).
-qemu-system-x86_64: warning: host doesn't support requested feature:=20
-CPUID.80000001H:EDX.rdtscp [bit 27]
-qemu-system-x86_64: warning: host doesn't support requested feature:=20
-CPUID.80000001H:ECX.topoext [bit 22]
-qemu-system-x86_64: Host doesn't support requested features
-exits..
-
-What do you think our options are here?
+diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
+index 9a9fa49..4aed9ca 100644
+--- a/hw/virtio/virtio-crypto.c
++++ b/hw/virtio/virtio-crypto.c
+@@ -754,12 +754,22 @@ static void virtio_crypto_reset(VirtIODevice *vdev)
+ static void virtio_crypto_init_config(VirtIODevice *vdev)
+ {
+     VirtIOCrypto *vcrypto = VIRTIO_CRYPTO(vdev);
++    uint32_t user_crypto_services = (1u << VIRTIO_CRYPTO_SERVICE_CIPHER) |
++                                    (1u << VIRTIO_CRYPTO_SERVICE_HASH) |
++                                    (1u << VIRTIO_CRYPTO_SERVICE_AEAD) |
++                                    (1u << VIRTIO_CRYPTO_SERVICE_MAC);
++
++    if (vcrypto->user_cipher_algo_l & (1u << VIRTIO_CRYPTO_NO_CIPHER)) {
++        vcrypto->user_cipher_algo_l = 1u << VIRTIO_CRYPTO_NO_CIPHER;
++        vcrypto->user_cipher_algo_h = 0;
++        user_crypto_services &= ~(1u << VIRTIO_CRYPTO_SERVICE_CIPHER);
++    }
+ 
+-    vcrypto->conf.crypto_services =
++    vcrypto->conf.crypto_services = user_crypto_services &
+                      vcrypto->conf.cryptodev->conf.crypto_services;
+-    vcrypto->conf.cipher_algo_l =
++    vcrypto->conf.cipher_algo_l = vcrypto->user_cipher_algo_l &
+                      vcrypto->conf.cryptodev->conf.cipher_algo_l;
+-    vcrypto->conf.cipher_algo_h =
++    vcrypto->conf.cipher_algo_h = vcrypto->user_cipher_algo_h &
+                      vcrypto->conf.cryptodev->conf.cipher_algo_h;
+     vcrypto->conf.hash_algo = vcrypto->conf.cryptodev->conf.hash_algo;
+     vcrypto->conf.mac_algo_l = vcrypto->conf.cryptodev->conf.mac_algo_l;
+@@ -853,6 +863,34 @@ static const VMStateDescription vmstate_virtio_crypto = {
+ static Property virtio_crypto_properties[] = {
+     DEFINE_PROP_LINK("cryptodev", VirtIOCrypto, conf.cryptodev,
+                      TYPE_CRYPTODEV_BACKEND, CryptoDevBackend *),
++    DEFINE_PROP_BIT("no-cipher", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_ARC4, false),
++    DEFINE_PROP_BIT("cipher-arc4", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_ARC4, false),
++    DEFINE_PROP_BIT("cipher-aes-ecb", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_AES_ECB, false),
++    DEFINE_PROP_BIT("cipher-aes-cbc", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_AES_CBC, false),
++    DEFINE_PROP_BIT("cipher-aes-ctr", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_AES_CTR, false),
++    DEFINE_PROP_BIT("cipher-des-ecb", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_DES_ECB, false),
++    DEFINE_PROP_BIT("cipher-3des-ecb", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_3DES_ECB, false),
++    DEFINE_PROP_BIT("cipher-3des-cbc", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_3DES_CBC, false),
++    DEFINE_PROP_BIT("cipher-3des-ctr", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_3DES_CTR, false),
++    DEFINE_PROP_BIT("cipher-kasumi-f8", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_KASUMI_F8, false),
++    DEFINE_PROP_BIT("cipher-snow3g-uea2", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_SNOW3G_UEA2, false),
++    DEFINE_PROP_BIT("cipher-aes-f8", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_AES_F8, false),
++    DEFINE_PROP_BIT("cipher-aes-xts", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_AES_XTS, false),
++    DEFINE_PROP_BIT("cipher-zuc-eea3", VirtIOCrypto, user_cipher_algo_l,
++                    VIRTIO_CRYPTO_CIPHER_ZUC_EEA3, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -974,6 +1012,8 @@ static void virtio_crypto_instance_init(Object *obj)
+      * Can be overriden with virtio_crypto_set_config_size.
+      */
+     vcrypto->config_size = sizeof(struct virtio_crypto_config);
++    vcrypto->user_cipher_algo_l = ~VIRTIO_CRYPTO_NO_CIPHER - 1;
++    vcrypto->user_cipher_algo_h = ~VIRTIO_CRYPTO_NO_CIPHER;
+ }
+ 
+ static const TypeInfo virtio_crypto_info = {
+diff --git a/include/hw/virtio/virtio-crypto.h b/include/hw/virtio/virtio-crypto.h
+index ca3a049..c5bb684 100644
+--- a/include/hw/virtio/virtio-crypto.h
++++ b/include/hw/virtio/virtio-crypto.h
+@@ -97,6 +97,9 @@ typedef struct VirtIOCrypto {
+     uint32_t curr_queues;
+     size_t config_size;
+     uint8_t vhost_started;
++
++    uint32_t user_cipher_algo_l;
++    uint32_t user_cipher_algo_h;
+ } VirtIOCrypto;
+ 
+ #endif /* _QEMU_VIRTIO_CRYPTO_H */
+-- 
+2.7.4
