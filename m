@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fSoK3-00077p-LO
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:47:16 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fSoKO-0007MK-4z
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:47:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fSoK1-0005KO-Lv
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:47:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57250 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fSoK1-0005K7-Fp
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:47:13 -0400
-Date: Tue, 12 Jun 2018 21:47:11 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180612184616.90838-2-mst@redhat.com>
-References: <20180612184616.90838-1-mst@redhat.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1fSoKL-0005RR-0g
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:47:36 -0400
+Date: Tue, 12 Jun 2018 12:47:29 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180612124729.0e630825@w520.home>
+In-Reply-To: <85642e2a-f00a-3d85-8525-0ae89e4d71c9@redhat.com>
+References: <20180611141716.3813-1-peter.maydell@linaro.org>
+	<650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
+	<85642e2a-f00a-3d85-8525-0ae89e4d71c9@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180612184616.90838-1-mst@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] kvm: support -realtime cpu-pm=on|off
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
+ for multiline comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,130 +25,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, patches@linaro.org, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-With this flag, kvm allows guest to control host CPU power state.  This
-increases latency for other processes using same host CPU in an
-unpredictable way, but if decreases idle entry/exit times for the
-running VCPU.
+On Tue, 12 Jun 2018 20:12:02 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Follow-up patches will expose this capability to guest
-(using mwait leaf).
+> On 12.06.2018 19:30, Richard Henderson wrote:
+> > On 06/11/2018 04:17 AM, Peter Maydell wrote:  
+> >> The codebase has a bit of a mix of different multiline
+> >> comment styles. State a preference for the Linux kernel
+> >> style:
+> >>     /*
+> >>      * Star on the left for each line.
+> >>      * Leading slash-star and trailing star-slash
+> >>      * each go on a line of their own.
+> >>      */
+> >>
+> >> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> >> ---
+> >> This is not my personal favourite, but seemed to be the
+> >> closest we had to consensus in the mail thread for v1;
+> >> I can live with it in order to avoid getting patches which
+> >> use the styles I like even less :-)  
+> > 
+> > Honestly, I don't like this except for "important" comments.
+> > 
+> > A "small" comment, e.g. one that doesn't quite fit on a single line, now takes
+> > 4 lines instead of 2.  Which is really annoying and IMO tends to break flow.
+> > 
+> > If you don't like
+> > 
+> >   /* gnu
+> >      style */
+> > 
+> > or
+> > 
+> >   /* whatever
+> >    * this is */
+> > 
+> > could you live with
+> > 
+> >   // c99/c++
+> >   // comments  
+> 
+> FWIW:
+> 
+> +1 for one or two of those compact styles for two- or three-line comments.
 
-Based on a patch by Wanpeng Li <kernellwp@gmail.com> .
+or four-line or single paragraphs or comments that rhyme with
+"orange"...  If the comment is too large for a single line, then take
+some time to say it more concisely, or maybe it does deserve enough
+thought to frame a nice paragraph for it.  We're well into personal
+style here, so either this is important enough to make some people
+unhappy or we should leave it to maintainer preference and consistency
+within a file/area.  Thanks,
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- include/sysemu/sysemu.h |  1 +
- target/i386/kvm.c       | 22 ++++++++++++++++++++++
- vl.c                    |  6 ++++++
- qemu-options.hx         |  9 +++++++--
- 4 files changed, 36 insertions(+), 2 deletions(-)
-
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index e893f72f3b..b921c6f3b7 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -128,6 +128,7 @@ extern bool boot_strict;
- extern uint8_t *boot_splash_filedata;
- extern size_t boot_splash_filedata_size;
- extern bool enable_mlock;
-+extern bool enable_cpu_pm;
- extern uint8_t qemu_extra_params_fw[2];
- extern QEMUClockType rtc_clock;
- extern const char *mem_path;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 44f70733e7..f093d55209 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1357,6 +1357,28 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-         smram_machine_done.notify = register_smram_listener;
-         qemu_add_machine_init_done_notifier(&smram_machine_done);
-     }
-+
-+    if (enable_cpu_pm) {
-+        int disable_exits = kvm_check_extension(s, KVM_CAP_X86_DISABLE_EXITS);
-+        int ret;
-+
-+/* Work around for kernel header with a typo. TODO: fix header and drop. */
-+#if defined(KVM_X86_DISABLE_EXITS_HTL) && !defined(KVM_X86_DISABLE_EXITS_HLT)
-+#define KVM_X86_DISABLE_EXITS_HLT KVM_X86_DISABLE_EXITS_HTL
-+#endif
-+        if (disable_exits) {
-+            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
-+                              KVM_X86_DISABLE_EXITS_HLT |
-+                              KVM_X86_DISABLE_EXITS_PAUSE);
-+        }
-+
-+        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0,
-+                                disable_exits);
-+        if (ret < 0) {
-+            error_report("kvm: guest stopping CPU not supported: %s", strerror(-ret));
-+        }
-+    }
-+
-     return 0;
- }
- 
-diff --git a/vl.c b/vl.c
-index 06031715ac..7bea9c2177 100644
---- a/vl.c
-+++ b/vl.c
-@@ -142,6 +142,7 @@ ram_addr_t ram_size;
- const char *mem_path = NULL;
- int mem_prealloc = 0; /* force preallocation of physical target memory */
- bool enable_mlock = false;
-+bool enable_cpu_pm = false;
- int nb_nics;
- NICInfo nd_table[MAX_NICS];
- int autostart;
-@@ -386,6 +387,10 @@ static QemuOptsList qemu_realtime_opts = {
-             .name = "mlock",
-             .type = QEMU_OPT_BOOL,
-         },
-+        {
-+            .name = "cpu-pm",
-+            .type = QEMU_OPT_BOOL,
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -3904,6 +3909,7 @@ int main(int argc, char **argv, char **envp)
-                     exit(1);
-                 }
-                 enable_mlock = qemu_opt_get_bool(opts, "mlock", true);
-+                enable_cpu_pm = qemu_opt_get_bool(opts, "cpu-pm", false);
-                 break;
-             case QEMU_OPTION_msg:
-                 opts = qemu_opts_parse_noisily(qemu_find_opts("msg"), optarg,
-diff --git a/qemu-options.hx b/qemu-options.hx
-index c0d3951e9f..e6f31071ce 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -3325,16 +3325,21 @@ Do not start CPU at startup (you must type 'c' in the monitor).
- ETEXI
- 
- DEF("realtime", HAS_ARG, QEMU_OPTION_realtime,
--    "-realtime [mlock=on|off]\n"
-+    "-realtime [mlock=on|off][cpu-halt=on|off[\n"
-     "                run qemu with realtime features\n"
--    "                mlock=on|off controls mlock support (default: on)\n",
-+    "                mlock=on|off controls mlock support (default: on)\n"
-+    "                cpu-pm=on|off controls cpu power management (default: off)\n",
-     QEMU_ARCH_ALL)
- STEXI
- @item -realtime mlock=on|off
-+@item -realtime cpu-pm=on|off
- @findex -realtime
- Run qemu with realtime features.
- mlocking qemu and guest memory can be enabled via @option{mlock=on}
- (enabled by default).
-+guest ability to manage power state of host cpus (increasing latency for other
-+processes on the same host cpu, but decreasing latency for guest)
-+can be enabled via @option{cpu-pm=on} (disabled by default).
- ETEXI
- 
- DEF("gdb", HAS_ARG, QEMU_OPTION_gdb, \
--- 
-MST
+Alex
