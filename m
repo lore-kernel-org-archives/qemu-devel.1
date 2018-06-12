@@ -1,40 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33908)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSoXJ-0004FB-8p
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 15:00:58 -0400
+	id 1fSoYU-0004vG-Nf
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 15:02:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSoXG-0007u6-5x
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 15:00:57 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:43450)
+	id 1fSoYT-0008PW-Ud
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 15:02:10 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33467)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSoXG-0007tw-0G
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 15:00:54 -0400
-Received: by mail-qt0-x243.google.com with SMTP id y89-v6so23482qtd.10
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 12:00:53 -0700 (PDT)
+	id 1fSoYT-0008PN-Q7
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 15:02:09 -0400
+Received: by mail-qk0-x243.google.com with SMTP id c131-v6so35909qkb.0
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 12:02:09 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <267f42a5-b7ce-379e-ffd1-f2611393d2ff@web.de>
-	<ad56487b-5afe-1420-9903-d5d849f97231@siemens.com>
-	<CAFEAcA9V9nFMVixeYjfBj54OT3zhRCVHM495AZHDzxVryh4JFA@mail.gmail.com>
-	<6730e270-9906-a43c-68b0-7a09a0743fa5@siemens.com>
-	<d64ace8c-30ca-e16c-fd73-746476bf3a6b@siemens.com>
-	<7bb24572-0fc1-00de-3552-aca1111059ed@amsat.org>
-	<63ee188e-0c66-ce7e-03b2-fd58e4da9116@siemens.com>
-	<3a128f8d-46a3-591f-ee09-8c9a3f2401ea@amsat.org>
-	<aebcbcd5-f0ab-5f9b-4a9d-3ff9dd94ee4f@siemens.com>
+References: <20180612005145.3375-1-richard.henderson@linaro.org>
+	<20180612005145.3375-16-richard.henderson@linaro.org>
+	<769b367a-c384-b551-b60a-2e891bd430bd@amsat.org>
+	<09a5e057-84d7-11e3-3f62-1145e0a2973c@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <e4b86268-ee3a-0f41-d382-5b6c806f9e25@amsat.org>
-Date: Tue, 12 Jun 2018 16:00:48 -0300
+Message-ID: <89e29fec-f817-09d3-2455-88c164724df6@amsat.org>
+Date: Tue, 12 Jun 2018 16:02:06 -0300
 MIME-Version: 1.0
-In-Reply-To: <aebcbcd5-f0ab-5f9b-4a9d-3ff9dd94ee4f@siemens.com>
+In-Reply-To: <09a5e057-84d7-11e3-3f62-1145e0a2973c@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] e1000e: Do not auto-clear ICR bits which
- aren't set in EIAC
+Subject: Re: [Qemu-devel] [PATCH v3 15/19] linux-user: Split out pread64,
+ pwrite64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,127 +38,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@siemens.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>, Jason Wang <jasowang@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, laurent@vivier.eu
 
-Cc'ing Jason who is also listed as co-maintainer:
-
-  ./scripts/get_maintainer.pl -f hw/net/e1000e_core.c
-  Dmitry Fleytman <dmitry.fleytman@gmail.com> (maintainer:e1000e)
-  Jason Wang <jasowang@redhat.com> (odd fixer:Network devices)
-
-On 06/12/2018 03:43 PM, Jan Kiszka wrote:
-> On 2018-06-12 20:38, Philippe Mathieu-Daudé wrote:
->> On 06/12/2018 03:30 PM, Jan Kiszka wrote:
->>> On 2018-06-12 20:11, Philippe Mathieu-Daudé wrote:
->>>> Hi Jan,
->>>>
->>>> On 06/12/2018 02:22 PM, Jan Kiszka wrote:
->>>>> On 2018-05-22 09:00, Jan Kiszka wrote:
->>>>>> On 2018-04-16 17:29, Peter Maydell wrote:
->>>>>>> On 16 April 2018 at 16:25, Jan Kiszka <jan.kiszka@siemens.com> wrote:
->>>>>>>> On 2018-04-01 23:17, Jan Kiszka wrote:
->>>>>>>>> From: Jan Kiszka <jan.kiszka@siemens.com>
->>>>>>>>>
->>>>>>>>> The spec does not justify clearing of any E1000_ICR_OTHER_CAUSES when
->>>>>>>>> E1000_ICR_OTHER is set in EIAC. In fact, removing this code fixes the
->>>>>>>>> issue the Linux driver runs into since 4aea7a5c5e94 ("e1000e: Avoid
->>>>>>>>> receiver overrun interrupt bursts") and was worked around by
->>>>>>>>> 745d0bd3af99 ("e1000e: Remove Other from EIAC").
->>>>>>>>>
->>>>>>>>> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
->>>>>>>>> ---
->>>>>>>>>
->>>>>>>>> This resolves the issue I reported on February 18 ("e1000e: MSI-X
->>>>>>>>> problem with recent Linux drivers").
->>>>>>>>>
->>>>>>>>>  hw/net/e1000e_core.c | 4 ----
->>>>>>>>>  1 file changed, 4 deletions(-)
->>>>>>>>>
->>>>>>>>> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
->>>>>>>>> index ecf9b15555..d38f025c0f 100644
->>>>>>>>> --- a/hw/net/e1000e_core.c
->>>>>>>>> +++ b/hw/net/e1000e_core.c
->>>>>>>>> @@ -2022,10 +2022,6 @@ e1000e_msix_notify_one(E1000ECore *core, uint32_t cause, uint32_t int_cfg)
->>>>>>>>>
->>>>>>>>>      effective_eiac = core->mac[EIAC] & cause;
->>>>>>>>>
->>>>>>>>> -    if (effective_eiac == E1000_ICR_OTHER) {
->>>>>>>>> -        effective_eiac |= E1000_ICR_OTHER_CAUSES;
->>>>>>>>> -    }
->>>>>>>>> -
->>>>>>>>>      core->mac[ICR] &= ~effective_eiac;
->>>>>>>>>
->>>>>>>>>      if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
->>>>>>>>>
->>>>>>>>
->>>>>>>> Ping for this - as well as https://patchwork.ozlabs.org/patch/895476.
->>>>>>>>
->>>>>>>> Given that q35 uses e1000e by default and many Linux kernel versions no
->>>>>>>> longer work, this should likely go into upcoming and stable versions
->>>>>>>
->>>>>>> I'd rather not put it into 2.12 at this point in the release
->>>>>>> cycle unless it's a regression from 2.11, I think.
->>>>>>
->>>>>> Second ping - nothing hit the repo so far, nor did I receive feedback.
->>>>>>
->>>>>
->>>>> And another ping. For both.
->>>>>
->>>>> These days I had to help someone with a broken QEMU setup that failed
->>>>> installing from network. It turned out that "modprobe e1000e IntMode=0"
->>>>> was needed to workaround the issues my patches address.
->>>>
->>>> What about the IMS register? It is set just after.
->>>>
->>>> Looking at b38636b8372, can you test this patch?
->>>>
->>>> -- >8 --
->>>> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
->>>> index c93c4661ed..a484b68a5a 100644
->>>> --- a/hw/net/e1000e_core.c
->>>> +++ b/hw/net/e1000e_core.c
->>>> @@ -2022,13 +2022,13 @@ e1000e_msix_notify_one(E1000ECore *core,
->>>> uint32_t cause, uint32_t int_cfg)
->>>>
->>>>      effective_eiac = core->mac[EIAC] & cause;
->>>>
->>>> -    if (effective_eiac == E1000_ICR_OTHER) {
->>>> -        effective_eiac |= E1000_ICR_OTHER_CAUSES;
->>>> -    }
->>>> -
->>>>      core->mac[ICR] &= ~effective_eiac;
->>>>
->>>>      if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
->>>> +        if (effective_eiac == E1000_ICR_OTHER) {
->>>> +            effective_eiac |= E1000_ICR_OTHER_CAUSES;
->>>> +        }
->>>> +
->>>>          core->mac[IMS] &= ~effective_eiac;
->>>>      }
->>>>  }
->>>>
->>>
->>> Before testing this: What would be the reasoning for this change?
+On 06/12/2018 02:44 PM, Richard Henderson wrote:
+> On 06/12/2018 06:37 AM, Philippe Mathieu-Daudé wrote:
+>>>  /* Both preadv and pwritev merge args 4/5 into a 64-bit offset.
+>>>   * Moreover, the parts are *always* in little-endian order.
+>>>   */
+>>>  #if TARGET_ABI_BITS == 32
+>>>  SYSCALL_ARGS(preadv_pwritev)
+>>>  {
+>>> -    /* We have already assigned out[0-3].  */
+>>> -    abi_ulong lo = in[4], hi = in[5];
+>>> -    out[4] = ((hi << (TARGET_ABI_BITS - 1)) << 1) | lo;
+>>> +    /* We have already assigned out[0-2].  */
+>>> +    abi_ulong lo = in[3], hi = in[4];
+>>> +    out[3] = ((hi << (TARGET_ABI_BITS - 1)) << 1) | lo;
+>> Why this change? If correct, can you update the comment?
+>> Also this seems related to your previous patch #14: "Split out preadv,
+>> pwritev, readv, writev", not this one.
 >>
->> Not breaking the purpose of b38636b8372 :)
 > 
-> I disagree on this expansion of bit 31 ("other causes"). I see no
-> indication in the spec that setting this bit for autoclear has more
-> impact than on the very same bit itself. Therefore I'm asking for a
-> reasoning - based on the spec.
+> You're right, this hunk should be folded back into the previous patch.
 
-  Interrupt Cause Registers
-
-    Other bits in this register are the legacy indication of
-    interrupts as the MDIC complete, management and link status
-    change. There is a specific Other Cause bit that is set if
-    one of these bits are set, this bit can be mapped to a
-    specific MSI-X interrupt message.
-
-I spent half an hour reading the relevant parts of the spec and can't
-figure out, so I'll let the authors of b38636b8372 to review your patch.
-
-Regards,
-
-Phil.
+So for this patch without this hunk:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
