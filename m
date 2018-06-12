@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fSf36-0008Ia-BH
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 04:53:09 -0400
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fSfMU-0004JG-Hn
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 05:13:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fSf35-0005fH-G2
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 04:53:08 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:43025)
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fSfMQ-0006Ks-Gx
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 05:13:10 -0400
+Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:37512)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fSf35-0005el-A8
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 04:53:07 -0400
-Received: by mail-oi0-x241.google.com with SMTP id t133-v6so20374632oif.10
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 01:53:07 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180612062430.GA15344@xz-mi>
-References: <20180612062430.GA15344@xz-mi>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Jun 2018 09:52:45 +0100
-Message-ID: <CAFEAcA_Bh4U1X_FDbakcc7YDBHFrkCjCKGrtuTWegn7rAGZUeQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Is there a way to package QEMU binaries?
+	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
+	id 1fSfMQ-0006KI-9r
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 05:13:06 -0400
+Received: by mail-pf0-x229.google.com with SMTP id y5-v6so10861739pfn.4
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 02:13:06 -0700 (PDT)
+From: Zihan Yang <whois.zihan.yang@gmail.com>
+Date: Tue, 12 Jun 2018 17:12:35 +0800
+Message-Id: <1528794755-6229-1-git-send-email-whois.zihan.yang@gmail.com>
+Subject: [Qemu-devel] [RFC v2 0/3] pci_expander_brdige: Put pxb-pcie host
+ bridge into separate pci domain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,22 +25,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: marcel.apfelbaum@gmail.com, Zihan Yang <whois.zihan.yang@gmail.com>
 
-On 12 June 2018 at 07:24, Peter Xu <peterx@redhat.com> wrote:
-> For example, I wanted to compile QEMU once and install it on multiple
-> systems.  What would be the suggested way to do so?
+Hi all, after some delay, here is the v2 version of putting pxb host bridge
+into separate pci domain.
 
-For this, I would recommend using whatever the packaging
-format for those systems is. Eg for Debian use the existing
-Debian QEMU packages, for Redhat systems use RPMs, etc.
-If you want a newer version of QEMU than is in the distro's
-packages, you can probably forward port the packaging parts
-to a newer QEMU without too much pain.
+Currently only q35 host bridge is allocated an item in MCFG table, all pxb
+host bridges stay within pci domain 0. This series of patches put each pxb
+host bridge in separate pci domain, allocating a new MCFG table item for it.
 
-Or you can use a distro-agnostic packaging tool of some sort;
-there are a few out there but I have no particular recommendations.
+Users can configure whether to put pxb host bridge into separate domain
+or just leave it in pci domain 0 by passing parameter sep_domain(bool) and
+domain_nr(uint32_t), they can also specify the maximum desired bus numbers
+to reduce MCFG space cost, for example,
 
-thanks
--- PMM
+    -device pxb-pcie,id=bridge3,bus="pcie.0",sep_domain=on,domain_nr=1,max_bus=130
+
+Then this pxb-pcie host bridge is placed at pci domain 1, and only reserve
+(130+1)=131 buses, which is much smaller than the default 256 buses.
+
+The pxb host does not have an mch in it, as q35 host already has one. All
+pxb host bridges just serve as expander bridges in QEMU, which makes them
+a little simpler than q35 host bridge.
+
+There are some things remaining TODO. For example, deal with the pci data
+write to pxb host bridges, but that will need some work in SeaBIOS, which
+I am starting soon. Also, we might need to limit the number of pci domains
+in case it exceeds the bit limit of physical address when EPT is enabled.
+
+v2 <- v1:
+- Allow user to configure whether to put pxb-pcie into seperate domain
+- Add AML description part of each host bridge
+- Modify the location of MCFG space to between RAM hotplug and pci hole64
+
+
+Zihan Yang (3):
+  pci_expander_bridge: add type TYPE_PXB_PCIE_HOST
+  acpi-build: allocate mcfg for pxb-pcie host bridges
+  acpi-build: describe new pci domain in AML
+
+ hw/i386/acpi-build.c                        | 162 ++++++++++++++++++++--------
+ hw/i386/pc.c                                |  14 ++-
+ hw/pci-bridge/pci_expander_bridge.c         | 142 +++++++++++++++++++++++-
+ hw/pci-host/q35.c                           |   2 +
+ hw/pci/pci.c                                |   9 +-
+ include/hw/i386/pc.h                        |   1 +
+ include/hw/pci-bridge/pci_expander_bridge.h |   6 ++
+ include/hw/pci-host/q35.h                   |   1 +
+ include/hw/pci/pci_host.h                   |   2 +-
+ 9 files changed, 285 insertions(+), 54 deletions(-)
+ create mode 100644 include/hw/pci-bridge/pci_expander_bridge.h
+
+-- 
+2.7.4
