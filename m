@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fSd3i-0002eD-8s
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 02:45:39 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fSd3j-0002fI-83
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 02:45:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fSd3h-0001mw-1N
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 02:45:38 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fSd3i-0001o9-6L
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 02:45:39 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 12 Jun 2018 16:44:37 +1000
-Message-Id: <20180612064503.14282-8-david@gibson.dropbear.id.au>
+Date: Tue, 12 Jun 2018 16:44:36 +1000
+Message-Id: <20180612064503.14282-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20180612064503.14282-1-david@gibson.dropbear.id.au>
 References: <20180612064503.14282-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 07/33] prep: fix keyboard for the 40p machine
+Subject: [Qemu-devel] [PULL 06/33] 40p: remove pci_allow_0_address = true
+ from 40p machine class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +25,36 @@ Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.o
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Commit 72d3d8f052 "hw/isa/superio: Add a keyboard/mouse controller (8042)=
-"
-added an 8042 keyboard device to the PC87312 superio device to replace th=
-at
-being used by the prep machine.
+The Linux sandalfoot zImage has an initialisation process which resets the
+VGA controller by setting all the BAR addresses to zero to access the VGA
+ioports at their legacy addresses.
 
-Unfortunately this commit didn't do the same for the 40p machine which br=
-oke
-the keyboard by registering two 8042 keyboard devices at the same address=
-.
+Unfortunately setting the framebuffer BAR to address 0 makes the framebuffer
+memory overlap the internal VGA memory causing accesses to fail, and so
+prevents the kernel from switching successfully to text mode.
 
-Resolve this by similarly removing the 8042 keyboard from the 40p machine=
- as
-done for the prep machine in commit 72d3d8f052.
+Since OpenHackWare configures the framebuffer BAR address outside of the legacy
+VGA internal memory space, remove pci_allow_0_address from the 40p machine class
+which causes the BAR reprogramming to zero to fail and so the VGA internal
+memory can be accessed correctly again.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
  hw/ppc/prep.c | 1 -
  1 file changed, 1 deletion(-)
 
 diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index dbbe749bde..5ed0bcd862 100644
+index a1e7219db6..dbbe749bde 100644
 --- a/hw/ppc/prep.c
 +++ b/hw/ppc/prep.c
-@@ -770,7 +770,6 @@ static void ibm_40p_init(MachineState *machine)
-=20
-     /* add some more devices */
-     if (defaults_enabled()) {
--        isa_create_simple(isa_bus, TYPE_I8042);
-         m48t59 =3D NVRAM(isa_create_simple(isa_bus, "isa-m48t59"));
-=20
-         dev =3D DEVICE(isa_create(isa_bus, "cs4231a"));
---=20
+@@ -885,7 +885,6 @@ static void ibm_40p_machine_init(MachineClass *mc)
+     mc->desc = "IBM RS/6000 7020 (40p)",
+     mc->init = ibm_40p_init;
+     mc->max_cpus = 1;
+-    mc->pci_allow_0_address = true;
+     mc->default_ram_size = 128 * M_BYTE;
+     mc->block_default_type = IF_SCSI;
+     mc->default_boot_order = "c";
+-- 
 2.17.1
