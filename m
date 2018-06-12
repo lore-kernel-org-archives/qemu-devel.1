@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55871)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fSZqD-0004bE-CY
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 23:19:30 -0400
+	(envelope-from <jcody@redhat.com>) id 1fSa2m-0006oJ-Mt
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 23:32:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fSZq8-0006gm-D9
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 23:19:29 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:41672)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fSZq8-0006g2-3A
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 23:19:24 -0400
-Received: by mail-pf0-x244.google.com with SMTP id a11-v6so11313266pff.8
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 20:19:23 -0700 (PDT)
-References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
-	<20180611080042.GK7736@xz-mi>
-From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <9127095c-dff2-a963-d9d1-3d1fe22b7937@gmail.com>
-Date: Tue, 12 Jun 2018 11:19:14 +0800
+	(envelope-from <jcody@redhat.com>) id 1fSa2l-0004Ja-LZ
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 23:32:28 -0400
+Date: Mon, 11 Jun 2018 23:32:13 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180612033213.GA21017@localhost.localdomain>
+References: <1528759585-51780-1-git-send-email-wangjie88@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20180611080042.GK7736@xz-mi>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 00/12] migration: improve multithreads for
- compression and decompression
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1528759585-51780-1-git-send-email-wangjie88@huawei.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] util/async: avoid NULL
+ pointer dereference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,112 +23,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: Jie Wang <wangjie88@huawei.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, famz@redhat.com, eric.fangyi@huawei.com, stefanha@redhat.com, wu.wubin@huawei.com
 
-
-
-On 06/11/2018 04:00 PM, Peter Xu wrote:
-> On Mon, Jun 04, 2018 at 05:55:08PM +0800, guangrong.xiao@gmail.com wrote:
->> From: Xiao Guangrong <xiaoguangrong@tencent.com>
->>
->> Background
->> ----------
->> Current implementation of compression and decompression are very
->> hard to be enabled on productions. We noticed that too many wait-wakes
->> go to kernel space and CPU usages are very low even if the system
->> is really free
->>
->> The reasons are:
->> 1) there are two many locks used to do synchronous，there
->> 　　is a global lock and each single thread has its own lock,
->> 　　migration thread and work threads need to go to sleep if
->> 　　these locks are busy
->>
->> 2) migration thread separately submits request to the thread
->>     however, only one request can be pended, that means, the
->>     thread has to go to sleep after finishing the request
->>
->> Our Ideas
->> ---------
->> To make it work better, we introduce a new multithread model,
->> the user, currently it is the migration thread, submits request
->> to each thread with round-robin manner, the thread has its own
->> ring whose capacity is 4 and puts the result to a global ring
->> which is lockless for multiple producers, the user fetches result
->> out from the global ring and do remaining operations for the
->> request, e.g, posting the compressed data out for migration on
->> the source QEMU
->>
->> Other works in this patchset is offering some statistics to see
->> if compression works as we expected and making the migration thread
->> work fast so it can feed more requests to the threads
+On Tue, Jun 12, 2018 at 07:26:25AM +0800, Jie Wang wrote:
+> if laio_init create linux_aio failed and return NULL, NULL pointer
+> dereference will occur when laio_attach_aio_context dereference
+> linux_aio in aio_get_linux_aio. Let's avoid it and report error.
 > 
-> Hi, Guangrong,
+> Signed-off-by: Jie Wang <wangjie88@huawei.com>
+
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+
+> ---
+>  block/file-posix.c | 19 +++++++++++++++++--
+>  util/async.c       |  5 ++++-
+>  2 files changed, 21 insertions(+), 3 deletions(-)
 > 
-> I'm not sure whether my understanding is correct, but AFAIU the old
-> code has a major defect that it depends too much on the big lock.  The
-> critial section of the small lock seems to be very short always, and
-> also that's per-thread.  However we use the big lock in lots of
-> places: flush compress data, queue every page, or send the notifies in
-> the compression thread.
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 513d371bb1..653017d7a5 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -1665,6 +1665,11 @@ static int coroutine_fn raw_co_prw(BlockDriverState *bs, uint64_t offset,
+>  #ifdef CONFIG_LINUX_AIO
+>          } else if (s->use_linux_aio) {
+>              LinuxAioState *aio = aio_get_linux_aio(bdrv_get_aio_context(bs));
+> +            if (!aio) {
+> +                s->use_linux_aio = false;
+> +                error_report("Failed to get linux aio");
+> +                return -EIO;
+> +            }
+>              assert(qiov->size == bytes);
+>              return laio_co_submit(bs, aio, s->fd, offset, qiov, type);
+>  #endif
+> @@ -1695,7 +1700,12 @@ static void raw_aio_plug(BlockDriverState *bs)
+>      BDRVRawState *s = bs->opaque;
+>      if (s->use_linux_aio) {
+>          LinuxAioState *aio = aio_get_linux_aio(bdrv_get_aio_context(bs));
+> -        laio_io_plug(bs, aio);
+> +        if (aio) {
+> +            laio_io_plug(bs, aio);
+> +        } else {
+> +            s->use_linux_aio = false;
+> +            error_report("Failed to get linux aio");
+> +        }
+>      }
+>  #endif
+>  }
+> @@ -1706,7 +1716,12 @@ static void raw_aio_unplug(BlockDriverState *bs)
+>      BDRVRawState *s = bs->opaque;
+>      if (s->use_linux_aio) {
+>          LinuxAioState *aio = aio_get_linux_aio(bdrv_get_aio_context(bs));
+> -        laio_io_unplug(bs, aio);
+> +        if (aio) {
+> +            laio_io_unplug(bs, aio);
+> +        } else {
+> +            s->use_linux_aio = false;
+> +            error_report("Failed to get linux aio");
+> +        }
+>      }
+>  #endif
+>  }
+> diff --git a/util/async.c b/util/async.c
+> index 03f62787f2..08d71340f8 100644
+> --- a/util/async.c
+> +++ b/util/async.c
+> @@ -327,8 +327,11 @@ LinuxAioState *aio_get_linux_aio(AioContext *ctx)
+>  {
+>      if (!ctx->linux_aio) {
+>          ctx->linux_aio = laio_init();
+> -        laio_attach_aio_context(ctx->linux_aio, ctx);
+> +        if (ctx->linux_aio) {
+> +            laio_attach_aio_context(ctx->linux_aio, ctx);
+> +        }
+>      }
+> +
+>      return ctx->linux_aio;
+>  }
+>  #endif
+> -- 
+> 2.15.0.windows.1
 > 
-
-The lock is one issue, however, another issue is that, the thread has
-to go to sleep after finishing one request and the main thread (live
-migration thread) needs to go to kernel space and wake the thread up
-for every single request.
-
-And we also observed that linearly scan the threads one by one to
-see which is free is not cache-friendly...
-
-> I haven't yet read the whole work, this work seems to be quite nice
-> according to your test results.  However have you thought about
-> firstly remove the big lock without touching much of other part of the
-> code, then continue to improve it?  Or have you ever tried to do so?
-> I don't think you need to do extra work for this, but I would
-> appreciate if you have existing test results to share.
 > 
-
-If you really want the performance result, i will try it...
-
-Actually, the first version we used on our production is that we
-use a lockless multi-thread model (only one atomic operation is needed
-for both producer and consumer) but only one request can be fed to the
-thread. It's comparable to your suggestion (and should far more faster
-than your suggestion).
-
-We observed the shortcoming of this solutions is that too many waits and
-wakeups trapped to kernel, so CPU is idle and bandwidth is low.
-
-> In other words, would it be nicer to separate the work into two
-> pieces?
-> 
-> - one to refactor the existing locks, to see what we can gain by
->    simplify the locks to minimum.  AFAIU now the locking used is still
->    not ideal, my thinking is that _maybe_ we can start by removing the
->    big lock, and use a semaphore or something to replace the "done"
->    notification while still keep the small lock?  Even some busy
->    looping?
-> 
-
-Note: no lock is used after this patchset...
-
-> - one to introduce the lockless ring buffer, to demostrate how the
->    lockless data structure helps comparing to the locking ways
-> 
-> Then we can know which item contributed how much to the performance
-> numbers.  After all the new ring and thread model seems to be a big
-> chunk of work (sorry I haven't read them yet, but I will).
-
-It is really a huge burden that refactor old code and later completely
-remove old code.
-
-We redesigned the data struct and algorithm completely and abstract the
-model to clean up the code used for compression and decompression, it's
-not easy to modify the old code part by part... :(
-
-But... if you really it is really needed, i will try to figure out a way
-to address your suggestion. :)
-
-Thanks!
