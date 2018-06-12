@@ -1,21 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fSj1D-0006WZ-AU
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:07:37 -0400
+	(envelope-from <pkrempa@redhat.com>) id 1fSj4m-0001Vm-4H
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:11:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fSj1A-0000cY-5E
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:07:27 -0400
-References: <20180612125933.262679-1-borntraeger@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <64f03456-0108-4deb-9e30-962a6b715530@redhat.com>
-Date: Tue, 12 Jun 2018 15:07:19 +0200
+	(envelope-from <pkrempa@redhat.com>) id 1fSj4l-0002iR-90
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:11:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46794 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1fSj4l-0002i0-2a
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:11:07 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 50908401EF24
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 13:11:06 +0000 (UTC)
+Date: Tue, 12 Jun 2018 15:10:46 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20180612131046.GB16514@angien.pipo.sk>
+References: <20180606135051.GR7451@localhost.localdomain>
+	<1528372809-175770-1-git-send-email-imammedo@redhat.com>
+	<20180608132105.GA24764@localhost.localdomain>
+	<20180611151625.4b2420b8@redhat.com>
+	<20180611190607.GU7451@localhost.localdomain>
+	<20180611232924.6e04b6f8@igors-macbook-pro.local>
+	<20180611223633.GG7451@localhost.localdomain>
+	<5cef972d-250b-5464-7482-90fa24d36c80@redhat.com>
+	<20180612144205.2169e7a2@redhat.com>
+	<1282921e-0d38-7bd2-de8b-64d327dd2549@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180612125933.262679-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 1/1] s390x/ipl: Try to detect Linux vs
- non Linux for initial IPL PSW
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="v9Ux+11Zm5mwPlX6"
+Content-Disposition: inline
+In-Reply-To: <1282921e-0d38-7bd2-de8b-64d327dd2549@redhat.com>
+Subject: Re: [Qemu-devel] [libvirt] [PATCH v6 2/2] vl: fix use of
+ --daemonize with --preconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,92 +43,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
-
-On 12.06.2018 14:59, Christian Borntraeger wrote:
-> Right now the IPL device always starts from address 0x10000 (the usual
-> Linux entry point). To run other guests (e.g. test programs) it is
-> useful to use the IPL PSW from address 0. We can use the Linux magic
-> at 0x10008 to decide.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
-> v3->v4:
-> 	- iplpsw-> ipl_psw
-> 	- move check for load failures into the non-elf case
-> 	- change comment about ipl psw
-> v2->v3:
-> 	- check for iplpsw to avoid assert on file errors
-> 	- use 4 bytes at 4 instead of 8 bytes at 0
-> v1->v2:
-> 	- use LINUX_MAGIC_ADDR define
-> 	- use assert for valid iplpsw pointer
-> 	- add endianess conversion
->  hw/s390x/ipl.c | 27 ++++++++++++++++++++++-----
->  1 file changed, 22 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 04245b5258..0d67349004 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -29,6 +29,7 @@
->  #include "exec/exec-all.h"
->  
->  #define KERN_IMAGE_START                0x010000UL
-> +#define LINUX_MAGIC_ADDR                0x010008UL
->  #define KERN_PARM_AREA                  0x010480UL
->  #define INITRD_START                    0x800000UL
->  #define INITRD_PARM_START               0x010408UL
-> @@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
->  static void s390_ipl_realize(DeviceState *dev, Error **errp)
->  {
->      S390IPLState *ipl = S390_IPL(dev);
-> -    uint64_t pentry = KERN_IMAGE_START;
-> +    uint32_t *ipl_psw;
-> +    uint64_t pentry;
-> +    char *magic;
->      int kernel_size;
->      Error *err = NULL;
->  
-> @@ -157,10 +160,24 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->                                 NULL, 1, EM_S390, 0, 0);
->          if (kernel_size < 0) {
->              kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
-> -        }
-> -        if (kernel_size < 0) {
-> -            error_setg(&err, "could not load kernel '%s'", ipl->kernel);
-> -            goto error;
-> +            if (kernel_size < 0) {
-> +                error_setg(&err, "could not load kernel '%s'", ipl->kernel);
-> +                goto error;
-> +            }
-> +            /* if this is Linux use KERN_IMAGE_START */
-> +            magic = rom_ptr(LINUX_MAGIC_ADDR);
-> +            if (magic && !memcmp(magic, "S390EP", 6)) {
-> +                pentry = KERN_IMAGE_START;
-> +            } else {
-> +                /* if not Linux load the address of the (short) IPL PSW */
-> +                ipl_psw = rom_ptr(4);
-> +                if (ipl_psw) {
-> +                    pentry = be32_to_cpu(*ipl_psw) & 0x7fffffffUL;
-> +                } else {
-> +                    error_setg(&err, "Could not get IPL PSW");
-> +                    goto error;
-> +                }
-> +            }
+To: Michal Privoznik <mprivozn@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, ldoktor@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com
 
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+--v9Ux+11Zm5mwPlX6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->          }
->          /*
->           * Is it a Linux kernel (starting at 0x10000)? If yes, we fill in the
-> 
+On Tue, Jun 12, 2018 at 15:04:42 +0200, Michal Privoznik wrote:
+> On 06/12/2018 02:42 PM, Igor Mammedov wrote:
+>=20
+> >>>
+> >>> Do we really need to make -daemonize and -preconfig work
+> >>> together?  libvirt uses -daemonize only for its initial
+> >>> capability probing, which shouldn't require -preconfig at all.
+> >>>
+> >>> Even on that case, I wonder why libvirt doesn't simply create a
+> >>> server socket and waits for QEMU to connect instead of using
+> >>> -daemonize as a sync point.
+> >>>  =20
+> >>
+> >> because libvirt views qemu as well behaved daemon. Should anything go
+> >> wrong libvirt reads qemu's stderr and reports error to upper layers.
+> > We can keep daemonizing flow in QEMU as it's now.
+> > But Eduardo's idea about libvirt created socked + letting QEMU connect =
+to it
+> > has a merit. It should fix current deadlock issue with as monitor
+> > won't be depending on lead exit event.
+>=20
+> Not sure about the benefits. Currently, libvirt spawns qemu, waits for
+> monitor to show up (currently, the timeout dynamic depending on some
+> black magic involving guest RAM size) and if it does not show up in time
+> it kills qemu. The same algorithm must be kept in place even for case
+> when libvirt would pass pre-opened socket to qemu in case qemu deadlocks
+> before being able to communicate over qmp. The only advantage I see is
+> libvirt would not need to label the socket (set uid:gid, selinux, ...).
+> On the other hand, since it would be libvirt creating the socket what
+> would happen on libvirtd restart?
 
+Well, if qemu deadlocks just after spewing out the monitor greeting you
+end up in the same situation as the timeout code is not applied later
+for regular monitor communication.
 
--- 
+Depending on how early the preconfig state happens, keeping in the
+timeout may be pointless.
 
-Thanks,
+--v9Ux+11Zm5mwPlX6
+Content-Type: application/pgp-signature; name="signature.asc"
 
-David / dhildenb
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlsfxlQACgkQHGwCByjY
+1Gr/QQ//b8FPXFocpdhyjagn/E9SUxINhKdY0Zyy2sO6PcBvVb74FwcTyMTRBorN
+MbHgGPZHUu/dAbiG33954exBCj1wlMnXnWMI1kEyj4YJoLh0dEogixmBkWX5tCCA
+niqLqep1+OtJb6DLYMy7p7+NWAKwD6OFr4A0eV4kXxe4nZa1w0JBG7jbqLL+Hdkw
+o4ikkBQy6lUs1CbQkfyvRBOiglMYAqW4op0Nn806sNTEoY84hOhNKXMNVIBtvQq0
+hKMdmZQi7eGb4tsrXMu8VzX9RO2uBZDwP5DYhbzj03A5r+49TPckFXPwNi17H06K
+8FsEejTdtXiIAKP6+QIkrBmBzdsacN7VFk3STpL1qxWeMwmT9bSLCSjcLhASuUoo
+EAWkFEsidgUcb7x4ZQN/NpM5Qv+Lhh301ynMUcBaWhcGO9pJ02N3c0gHe13cev+V
+u/ytcx+hncgQlHm+ObIBixeUhtdImiluL/sZetYjX9s0jZzQc7941cETrG+656I2
+t2dhCm2vlphzWY4r0NPaseaslV0ca+l0A+hc9KUUHHvKZfUxPL3IXAlVDBEoo0Wg
+juC+ljvspmQIuikwyxGYo5umanLn5mLkn6/zQaaHfFlSk5s6ZRPyvlGbqC2RzaTK
+aOC2Y//8hudaD7aVHKCPi3m7w8n2luBbHkRLnHqKLnlbFb0uqX4=
+=talJ
+-----END PGP SIGNATURE-----
+
+--v9Ux+11Zm5mwPlX6--
