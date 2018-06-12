@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSqYg-0006i6-CS
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 17:10:31 -0400
+	(envelope-from <bounces@canonical.com>) id 1fSqsG-00042c-T9
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 17:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSqYc-0007fy-DD
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 17:10:30 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:41605)
+	(envelope-from <bounces@canonical.com>) id 1fSqsC-0007gb-EL
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 17:30:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41368)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fSqYb-0007f1-UT
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 17:10:26 -0400
-Received: by mail-pl0-x244.google.com with SMTP id az12-v6so188014plb.8
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 14:10:25 -0700 (PDT)
-References: <20180611011501.10235-1-f4bug@amsat.org>
-	<20180611011501.10235-12-f4bug@amsat.org>
-	<15d222dd-d2e9-4855-62c6-f89f2ee59c52@linaro.org>
-	<76aa5170-1d18-8799-6ff1-a7c0dba0b489@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8537ca07-2645-6c2c-5945-a91da035b474@linaro.org>
-Date: Tue, 12 Jun 2018 11:10:19 -1000
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fSqsC-0007fM-71
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 17:30:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fSqsB-0007qh-3l
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 21:30:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D191C2E8041
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 21:30:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <76aa5170-1d18-8799-6ff1-a7c0dba0b489@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 11/40] hw/xen: Use the IEC binary prefix
- definitions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 12 Jun 2018 21:25:37 -0000
+From: guysoft <guysoft@gmail.com>
+Reply-To: Bug 1776478 <1776478@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152880770129.26761.1762643804065210181.malonedeb@gac.canonical.com>
+Message-Id: <152883873756.25566.17467978451340576051.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1776478] Re: Getting qemu: uncaught target signal
+ 6 when running lv2 plugin cross-compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,43 +37,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On 06/12/2018 11:04 AM, Eric Blake wrote:
-> On 06/12/2018 03:51 PM, Richard Henderson wrote:
->> On 06/10/2018 03:14 PM, Philippe Mathieu-Daudé wrote:
->>>       xen_pv_printf(xendev, 1, "type \"%s\", fileproto \"%s\", filename
->>> \"%s\","
->>> -                  " size %" PRId64 " (%" PRId64 " MB)\n",
->>> +                  " size %" PRId64 " (%llu MB)\n",
->>>                     blkdev->type, blkdev->fileproto, blkdev->filename,
->>> -                  blkdev->file_size, blkdev->file_size >> 20);
->>> +                  blkdev->file_size, blkdev->file_size / MiB);
->>
->> Having to change printf markup is exactly why you shouldn't use ULL in MiB.
-> 
-> Conversely, M_BYTE was already ULL, so if you don't use it in MiB, you'll have
-> to change other printf markup where you were changing those uses.
-> 
-> One benefit of using the widest possible type: we avoid risk of silent
-> truncation.  Potential downsides: wasted processing time (when 32 bits was
-> sufficient), and compilers might start warning when we narrow a 64-bit value
-> into a 32-bit variable (but I think we already ignore that).
-> 
-> One benefit of using the natural type that holds the value: use of 64-bit math
-> is explicit based on the type of what else is being multiplied by the macro. 
-> Potential downside: 32*32 assigned to a 64-bit result may be botched (but
-> hopefully Coverity will flag it).
-> 
-> So there's tradeoffs either way, and you at least need to document in your
-> commit messages what auditing you have done that any type changes introduced by
-> your changes are safe.
+Hey,
+Not sure how to boil it down (yet). But this would reproduce it for you:
 
-I'm more concerned about unnecessary or unintended signed vs unsigned changes
-than I am about width.  But if we're going to force a 64-bit type, use
-(int64_t)1 not 1LL.  That way the type will match the existing PRId64 printf
-markup.
+cd /tmp
+wget https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2=
+018-04-19/2018-04-18-raspbian-stretch-lite.zip
+unzip 2018-04-18-raspbian-stretch-lite.zip
+wget https://raw.githubusercontent.com/guysoft/CustomPiOS/devel/src/common.=
+sh
+source ./common
+mkdir ./mount
+
+mount_image ./2018-04-18-raspbian-stretch-lite.img 2 ./mount
+cd mount
+sudo bash -c "$(declare -f fixLd); fixLd"
+sudo cp $(which qemu-arm-static) ./usr/bin/
+sudo chroot .
+apt-get update
+
+apt-get install -y git premake libfreetype6-dev libgl1-mesa-dev libx11-dev =
+libasound2-dev
+git clone https://github.com/DISTRHO/DISTRHO-Ports.git --depth=3D1
+
+cd DISTRHO-Ports/
+
+export RASPPI=3Dtrue
+export LINUX_EMBED=3Dtrue
+
+./scripts/premake-update.sh linux
+
+make lv2 -j4
 
 
-r~
+once you have it all running you can just run again
+
+./libs/lv2_ttl_generator ./bin/lv2/TAL-Filter-2.lv2/TAL-Filter-2.so
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1776478
+
+Title:
+  Getting qemu: uncaught target signal 6 when running  lv2 plugin cross-
+  compilation
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hey,
+  I am part of the Zynthian team and we use qemu-arm-static to cross compil=
+e lv2 audio plugins.
+
+  When running a compilation of DISTRHO-Ports we get:
+
+  lv2_ttl_generator: pthread_mutex_lock.c:81: __pthread_mutex_lock: Asserti=
+on `mutex->__data.__owner =3D=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  ./scripts/generate-ttl.sh: line 27: 16524 Aborted                 $GEN ./=
+$FILE
+  Makefile:62: recipe for target 'gen_lv2' failed
+  make[1]: *** [gen_lv2] Error 134
+  make[1]: Leaving directory '/home/pi/zynthian-sw/plugins/DISTRHO-Ports'
+  Makefile:104: recipe for target 'lv2' failed
+  make: *** [lv2] Error 2
+
+  =
+
+  lv2_ttl_generator source is here:
+  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/libs/lv2-ttl-generat=
+or
+
+  The command that is ruining is
+  lv2_ttl_generator ./TAL-Filter-2.so =
+
+
+  And ./TAL-Filter-2.so source is here:
+  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/ports/tal-filter-2/s=
+ource
+
+
+  Is there a way to debug what is going on?
+  This runs fine on a Raspberrypi which is armv7
+
+  A workaround would also help.
+
+  =
+
+  Bug in Zynthian:
+  https://github.com/zynthian/zynthian-sys/issues/59
+  Bug in DISTRHO-Ports:
+  https://github.com/DISTRHO/DISTRHO-Ports/issues/29
+
+  Using qemu-arm-static version from master from two days ago:
+  qemu-arm version 2.12.50 (v2.12.0-1182-ga7a7309ca5-dirty), commit: a7a730=
+9ca52c327c6603d60db90ae4feeae719f7
+
+  Also saw this in qemu-arm version 2.12.0 (Debian 1:2.12+dfsg-3)
+
+  Thanks,
+  Guy
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1776478/+subscriptions
