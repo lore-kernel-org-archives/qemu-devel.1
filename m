@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36343)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37067)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fSmib-0005H1-Ju
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:04:30 -0400
+	(envelope-from <alifm@linux.ibm.com>) id 1fSmkr-0006zq-AX
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:06:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fSmiY-0000X2-B7
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:04:29 -0400
-Received: from 13.mo1.mail-out.ovh.net ([178.33.253.128]:43460)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fSmiY-0000WN-44
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:04:26 -0400
-Received: from player731.ha.ovh.net (unknown [10.109.120.91])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 73B481075D3
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 19:04:24 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Tue, 12 Jun 2018 19:04:15 +0200
-Message-ID: <152882305541.114463.3137854902721347235.stgit@bahia.lan>
-In-Reply-To: <152882087494.112322.15549780953419438229.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-References: <152882087494.112322.15549780953419438229.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
+	(envelope-from <alifm@linux.ibm.com>) id 1fSmkn-000294-0z
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:06:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38754)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1fSmkm-000287-O9
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:06:44 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5CH4ZPG035783
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 13:06:42 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jjgw3c2tv-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 13:06:41 -0400
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Tue, 12 Jun 2018 13:06:40 -0400
+References: <cover.1528462918.git.alifm@linux.ibm.com>
+	<e0fe84d1df4e0c2c88d7d29f94d621c988c22194.1528462918.git.alifm@linux.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DB015842@dggeml511-mbx.china.huawei.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Tue, 12 Jun 2018 13:06:35 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DB015842@dggeml511-mbx.china.huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 3/3] target/ppc: filter out non-zero PCR values
- when using TCG
+Message-Id: <226dad9f-8931-3886-eb00-352a190c5b5b@linux.ibm.com>
+Subject: Re: [Qemu-devel] [RFC v1 1/2] crypto/virtio-crypto: Read crypto
+ services and algorithm masks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,128 +43,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, longpeng <longpeng2@huawei.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>, "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>
 
-Bits set in the PCR disable features of the processor. TCG currently
-doesn't implement that, ie, we always act like if PCR is all zeros.
+Hi Arei
 
-But it is still possible for the PCR to have a non-null value. This may
-confuse the guest.
+On 06/11/2018 02:43 AM, Gonglei (Arei) wrote:
+> 
+>> -----Original Message-----
+>> From: Farhan Ali [mailto:alifm@linux.ibm.com]
+>> Sent: Saturday, June 09, 2018 3:09 AM
+>> To: linux-kernel@vger.kernel.org; kvm@vger.kernel.org
+>> Cc: mst@redhat.com; qemu-devel@nongnu.org; Gonglei (Arei)
+>> <arei.gonglei@huawei.com>; longpeng <longpeng2@huawei.com>;
+>> pasic@linux.ibm.com; frankja@linux.ibm.com; borntraeger@de.ibm.com;
+>> alifm@linux.ibm.com
+>> Subject: [RFC v1 1/2] crypto/virtio-crypto: Read crypto services and algorithm
+>> masks
+>>
+>> Read the crypto services and algorithm masks which provides
+>> information about the services and algorithms supported by
+>> virtio-crypto backend.
+>>
+>> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+>> ---
+>>   drivers/crypto/virtio/virtio_crypto_common.h | 14 ++++++++++++++
+>>   drivers/crypto/virtio/virtio_crypto_core.c   | 29
+>> ++++++++++++++++++++++++++++
+>>   2 files changed, 43 insertions(+)
+>>
+>> diff --git a/drivers/crypto/virtio/virtio_crypto_common.h
+>> b/drivers/crypto/virtio/virtio_crypto_common.h
+>> index 66501a5..05eca12e 100644
+>> --- a/drivers/crypto/virtio/virtio_crypto_common.h
+>> +++ b/drivers/crypto/virtio/virtio_crypto_common.h
+>> @@ -55,6 +55,20 @@ struct virtio_crypto {
+>>   	/* Number of queue currently used by the driver */
+>>   	u32 curr_queue;
+>>
+>> +	/*
+>> +	 * Specifies the services mask which the device support,
+>> +	 * see VIRTIO_CRYPTO_SERVICE_* above
+>> +	 */
+> 
+> Pls update the above comments. Except that:
+> 
+> Acked-by: Gonglei <arei.gonglei@huawei.com>
+> 
 
-There are three distinct cases:
+Sure will update the comment. How about " Specifies the services mask 
+which the device support, * see VIRTIO_CRYPTO_SERVICE_*" ?
 
-1) a powernv guest doing mtspr SPR_PCR
+or should I specify the file where the VIRTIO_CRYPTO_SERVICE_* are defined?
 
-2) reset of a pseries guest if the max-cpu-compat machine property is set
+Thanks
+Farhan
 
-3) CAS of a pseries guest
-
-This patch adds a ppc_store_pcr() helper that ensures we cannot put
-a non-null value in the PCR when using TCG. This helper also has
-error propagation support, so that each case listed above can be
-handled appropriately:
-
-1) since the powernv machine is mostly used for OpenPOWER FW devel,
-   we just print an error and let QEMU continue execution
-
-2) an error is printed and QEMU exits, ie, same behaviour as when
-   KVM doesn't support the requested compat mode
-
-3) an error is printed and QEMU reports H_HARDWARE to the guest
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- target/ppc/compat.c      |   26 ++++++++++++++++++++++++--
- target/ppc/cpu.h         |    3 +++
- target/ppc/misc_helper.c |    9 ++++++---
- 3 files changed, 33 insertions(+), 5 deletions(-)
-
-diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-index 807c906f6848..08aa99e6ad47 100644
---- a/target/ppc/compat.c
-+++ b/target/ppc/compat.c
-@@ -138,8 +138,8 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
- {
-     const CompatInfo *compat = compat_by_pvr(compat_pvr);
-     CPUPPCState *env = &cpu->env;
--    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-     uint64_t pcr;
-+    Error *local_err = NULL;
- 
-     if (!compat_pvr) {
-         pcr = 0;
-@@ -165,8 +165,30 @@ void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
-         }
-     }
- 
-+    ppc_store_pcr(env, pcr, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-     cpu->compat_pvr = compat_pvr;
--    env->spr[SPR_PCR] = pcr & pcc->pcr_mask;
-+}
-+
-+void ppc_store_pcr(CPUPPCState *env, target_ulong value, Error **errp)
-+{
-+    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-+
-+    /* TODO: this check should go away once we actually put the proper PCR
-+     * checks in the various bits of TCG that should have them.
-+     */
-+    if (!kvm_enabled() && value != 0) {
-+        error_setg(errp, "TCG doesn't support PCR value 0x"TARGET_FMT_lx,
-+                   value);
-+        return;
-+    }
-+
-+    env->spr[SPR_PCR] = value & pcc->pcr_mask;
- }
- 
- typedef struct {
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index a91f1a8777eb..fdaae34feffb 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1296,6 +1296,9 @@ int ppc_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size, int rw,
- #if !defined(CONFIG_USER_ONLY)
- void ppc_store_sdr1 (CPUPPCState *env, target_ulong value);
- void ppc_store_ptcr(CPUPPCState *env, target_ulong value);
-+#if defined(TARGET_PPC64)
-+void ppc_store_pcr(CPUPPCState *env, target_ulong value, Error **errp);
-+#endif
- #endif /* !defined(CONFIG_USER_ONLY) */
- void ppc_store_msr (CPUPPCState *env, target_ulong value);
- 
-diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-index b88493009609..7a9b45a01453 100644
---- a/target/ppc/misc_helper.c
-+++ b/target/ppc/misc_helper.c
-@@ -21,6 +21,7 @@
- #include "exec/exec-all.h"
- #include "exec/helper-proto.h"
- #include "qemu/error-report.h"
-+#include "qapi/error.h"
- 
- #include "helper_regs.h"
- 
-@@ -102,10 +103,12 @@ void helper_store_ptcr(CPUPPCState *env, target_ulong val)
- 
- void helper_store_pcr(CPUPPCState *env, target_ulong value)
- {
--    PowerPCCPU *cpu = ppc_env_get_cpu(env);
--    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-+    Error *local_err = NULL;
- 
--    env->spr[SPR_PCR] = value & pcc->pcr_mask;
-+    ppc_store_pcr(env, value, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
- }
- #endif /* defined(TARGET_PPC64) */
- 
+>> +	u32 crypto_services;
+>> +
+>> +	/* Detailed algorithms mask */
+>> +	u32 cipher_algo_l;
+>> +	u32 cipher_algo_h;
+>> +	u32 hash_algo;
+>> +	u32 mac_algo_l;
+>> +	u32 mac_algo_h;
+>> +	u32 aead_algo;
+>> +
+>>   	/* Maximum length of cipher key */
+>>   	u32 max_cipher_key_len;
+>>   	/* Maximum length of authenticated key */
+>> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c
+>> b/drivers/crypto/virtio/virtio_crypto_core.c
+>> index 8332698..8f745f2 100644
+>> --- a/drivers/crypto/virtio/virtio_crypto_core.c
+>> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
+>> @@ -303,6 +303,13 @@ static int virtcrypto_probe(struct virtio_device *vdev)
+>>   	u32 max_data_queues = 0, max_cipher_key_len = 0;
+>>   	u32 max_auth_key_len = 0;
+>>   	u64 max_size = 0;
+>> +	u32 cipher_algo_l = 0;
+>> +	u32 cipher_algo_h = 0;
+>> +	u32 hash_algo = 0;
+>> +	u32 mac_algo_l = 0;
+>> +	u32 mac_algo_h = 0;
+>> +	u32 aead_algo = 0;
+>> +	u32 crypto_services = 0;
+>>
+>>   	if (!virtio_has_feature(vdev, VIRTIO_F_VERSION_1))
+>>   		return -ENODEV;
+>> @@ -339,6 +346,20 @@ static int virtcrypto_probe(struct virtio_device *vdev)
+>>   		max_auth_key_len, &max_auth_key_len);
+>>   	virtio_cread(vdev, struct virtio_crypto_config,
+>>   		max_size, &max_size);
+>> +	virtio_cread(vdev, struct virtio_crypto_config,
+>> +		crypto_services, &crypto_services);
+>> +	virtio_cread(vdev, struct virtio_crypto_config,
+>> +		cipher_algo_l, &cipher_algo_l);
+>> +	virtio_cread(vdev, struct virtio_crypto_config,
+>> +		cipher_algo_h, &cipher_algo_h);
+>> +	virtio_cread(vdev, struct virtio_crypto_config,
+>> +		hash_algo, &hash_algo);
+>> +	virtio_cread(vdev, struct virtio_crypto_config,
+>> +		mac_algo_l, &mac_algo_l);
+>> +	virtio_cread(vdev, struct virtio_crypto_config,
+>> +		mac_algo_h, &mac_algo_h);
+>> +	virtio_cread(vdev, struct virtio_crypto_config,
+>> +		aead_algo, &aead_algo);
+>>
+>>   	/* Add virtio crypto device to global table */
+>>   	err = virtcrypto_devmgr_add_dev(vcrypto);
+>> @@ -358,6 +379,14 @@ static int virtcrypto_probe(struct virtio_device *vdev)
+>>   	vcrypto->max_cipher_key_len = max_cipher_key_len;
+>>   	vcrypto->max_auth_key_len = max_auth_key_len;
+>>   	vcrypto->max_size = max_size;
+>> +	vcrypto->crypto_services = crypto_services;
+>> +	vcrypto->cipher_algo_l = cipher_algo_l;
+>> +	vcrypto->cipher_algo_h = cipher_algo_h;
+>> +	vcrypto->mac_algo_l = mac_algo_l;
+>> +	vcrypto->mac_algo_h = mac_algo_h;
+>> +	vcrypto->hash_algo = hash_algo;
+>> +	vcrypto->aead_algo = aead_algo;
+>> +
+>>
+>>   	dev_info(&vdev->dev,
+>>   		"max_queues: %u, max_cipher_key_len: %u, max_auth_key_len: %u,
+>> max_size 0x%llx\n",
+>> --
+>> 2.7.4
+> 
+> 
