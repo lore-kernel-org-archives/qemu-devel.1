@@ -1,20 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fShtz-0002SZ-LK
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:55:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1fShyC-0004Qb-5P
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:00:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fShtu-0004lq-OW
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:55:55 -0400
-Date: Tue, 12 Jun 2018 13:55:45 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180612135545.1b7c2346.cohuck@redhat.com>
-In-Reply-To: <20180612100448.202315-1-borntraeger@de.ibm.com>
-References: <20180612100448.202315-1-borntraeger@de.ibm.com>
+	(envelope-from <armbru@redhat.com>) id 1fShy5-0008Da-Se
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:00:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49598 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fShy5-0008D6-OW
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:00:09 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F197FFD325
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 12:00:08 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180608130846.22234-1-dgilbert@redhat.com>
+	<20180608130846.22234-6-dgilbert@redhat.com>
+	<87y3flilan.fsf@dusky.pond.sub.org> <20180611174958.GP2661@work-vm>
+	<20180612053720.pp2xvb7r34o6ort7@sirius.home.kraxel.org>
+Date: Tue, 12 Jun 2018 14:00:05 +0200
+In-Reply-To: <20180612053720.pp2xvb7r34o6ort7@sirius.home.kraxel.org> (Gerd
+	Hoffmann's message of "Tue, 12 Jun 2018 07:37:20 +0200")
+Message-ID: <87k1r4use2.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] s390x/ipl: Try to detect Linux vs
- non Linux for initial IPL PSW
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 5/7] hmp: Add info commands for preconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +35,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, imammedo@redhat.com, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 
-On Tue, 12 Jun 2018 12:04:48 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+Gerd Hoffmann <kraxel@redhat.com> writes:
 
-> Right now the IPL device always starts from address 0x10000 (the usual
-> Linux entry point). To run other guests (e.g. test programs) it is
-> useful to use the IPL PSW from address 0. We can use the Linux magic
-> at 0x10008 to decide.
-> 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
-> v2->v3:
-> 	- check for iplpsw to avoid assert on file errors
-> 	- use 4 bytes at 4 instead of 8 bytes at 0
-> v1->v2:
-> 	- use LINUX_MAGIC_ADDR define
-> 	- use assert for valid iplpsw pointer
-> 	- add endianess conversion
->  hw/s390x/ipl.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 04245b5258..1a42630962 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -29,6 +29,7 @@
->  #include "exec/exec-all.h"
->  
->  #define KERN_IMAGE_START                0x010000UL
-> +#define LINUX_MAGIC_ADDR                0x010008UL
->  #define KERN_PARM_AREA                  0x010480UL
->  #define INITRD_START                    0x800000UL
->  #define INITRD_PARM_START               0x010408UL
-> @@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
->  static void s390_ipl_realize(DeviceState *dev, Error **errp)
->  {
->      S390IPLState *ipl = S390_IPL(dev);
-> -    uint64_t pentry = KERN_IMAGE_START;
-> +    uint32_t *iplpsw;
+>   Hi,
+>
+>> > Now let's review the three commands:
+>> > 
+>> > * Gerd, why does "info usbhost" have no QMP equivalent?
+>
+> Works only when running qemu directly, in the libvirt sandbox qemu
+> hasn't the permissions needed to scan the host usb bus so that would be
+> rather pointless ...
 
-In case you respin: Can this be ipl_psw, please?
+I don't think this meets either of the two criteria:
 
-> +    uint64_t pentry;
-> +    char *magic;
->      int kernel_size;
->      Error *err = NULL;
->  
-> @@ -157,6 +160,20 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->                                 NULL, 1, EM_S390, 0, 0);
->          if (kernel_size < 0) {
->              kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
-> +            /* if this is Linux use KERN_IMAGE_START */
-> +            magic = rom_ptr(LINUX_MAGIC_ADDR);
-> +            if (magic && !memcmp(magic, "S390EP", 6)) {
-> +                pentry = KERN_IMAGE_START;
-> +            } else {
-> +                /* if not Linux use the IPL PSW */
+* I meets "makes no sense in QMP" only if QMP implies "can't scan host
+  USB bus".  Libvirt implies it, but QMP doesn't imply libvirt; it's its
+  most important, not its sole user.
 
-"use the address of the IPL PSW"?
+* It meets "of use only for human users" only if we're convinced it's of
+  no use to programs.
 
-> +                iplpsw = rom_ptr(4);
-> +                if (iplpsw) {
-> +                    pentry = be32_to_cpu(*iplpsw) & 0x7fffffffUL;
-> +                } else {
-> +                    error_setg(&err, "Could not get IPL PSW");
-> +                    goto error;
-> +                }
-> +            }
->          }
->          if (kernel_size < 0) {
->              error_setg(&err, "could not load kernel '%s'", ipl->kernel);
+  To avoid speculation and endless arguments about what could or could
+  not be of use, we've always stuck to "when in doubt, assume it could
+  be of use".
 
-Is this ever reached now? In any case, it might make sense to move this
-up, as the "could not load kernel 'plahh'" message seems more useful
-than "Could not get IPL PSW"...
+  "Libvirt can't use it" falls short.
 
-Also, further below we copy ipl->cmdline if we think we're dealing with
-a Linux image. Would it make sense to explicitly check for the Linux
-magic there as well? (Separate patch, of course.)
+  "Any management application worth anything would deny QEMU the
+  capability to scan the USB host bus, and thus wouldn't be able to use
+  it" is exactly the argument we intended to avoid.
 
-Can/should netboot do a similar check? It uses KERN_IMAGE_START
-unconditionally if it wasn't an ELF file.
+QMP falling short of completeness in relatively unimportant ways like
+this one isn't exactly terrible.  The most serious effect is probably
+serving as a bad example that leads to further arguments like this one.
+These are well worth avoiding, though.
