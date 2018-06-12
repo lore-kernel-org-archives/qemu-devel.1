@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fSgHL-0002dx-PT
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:11:56 -0400
+	(envelope-from <david@redhat.com>) id 1fSgNy-0005oG-5L
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:18:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fSgHG-0001xb-S0
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:11:55 -0400
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:51034)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fSgHG-0001x7-Ka
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:11:50 -0400
-Received: from player735.ha.ovh.net (unknown [10.109.120.10])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 6C01813BE66
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 12:11:49 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue, 12 Jun 2018 12:11:35 +0200
-Message-Id: <20180612101135.23852-1-clg@kaod.org>
+	(envelope-from <david@redhat.com>) id 1fSgNv-0004oy-20
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:18:46 -0400
+References: <20180612100448.202315-1-borntraeger@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <b4321a75-b58f-54cf-9f35-314c49afbd99@redhat.com>
+Date: Tue, 12 Jun 2018 12:18:39 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] xics_kvm: fix a build break
+In-Reply-To: <20180612100448.202315-1-borntraeger@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] s390x/ipl: Try to detect Linux vs
+ non Linux for initial IPL PSW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On CentOS 7.5, gcc-4.8.5-28.el7_5.1.ppc64le fails to build QEMU due to :
+On 12.06.2018 12:04, Christian Borntraeger wrote:
+> Right now the IPL device always starts from address 0x10000 (the usual
+> Linux entry point). To run other guests (e.g. test programs) it is
+> useful to use the IPL PSW from address 0. We can use the Linux magic
+> at 0x10008 to decide.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+> v2->v3:
+> 	- check for iplpsw to avoid assert on file errors
+> 	- use 4 bytes at 4 instead of 8 bytes at 0
 
-  hw/intc/xics_kvm.c: In function =E2=80=98ics_set_kvm_state=E2=80=99:
-  hw/intc/xics_kvm.c:281:13: error: =E2=80=98ret=E2=80=99 may be used uni=
-nitialized in this
-    function [-Werror=3Dmaybe-uninitialized]
-             return ret;
+I trust you that this is the right thing to do :)
 
-Fix the breakage and also remove the extra error reporting as
-kvm_device_access() already provides a substantial error message.
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
+> v1->v2:
+> 	- use LINUX_MAGIC_ADDR define
+> 	- use assert for valid iplpsw pointer
+> 	- add endianess conversion
+>  hw/s390x/ipl.c | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 04245b5258..1a42630962 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -29,6 +29,7 @@
+>  #include "exec/exec-all.h"
+>  
+>  #define KERN_IMAGE_START                0x010000UL
+> +#define LINUX_MAGIC_ADDR                0x010008UL
+>  #define KERN_PARM_AREA                  0x010480UL
+>  #define INITRD_START                    0x800000UL
+>  #define INITRD_PARM_START               0x010408UL
+> @@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
+>  static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>  {
+>      S390IPLState *ipl = S390_IPL(dev);
+> -    uint64_t pentry = KERN_IMAGE_START;
+> +    uint32_t *iplpsw;
+> +    uint64_t pentry;
+> +    char *magic;
+>      int kernel_size;
+>      Error *err = NULL;
+>  
+> @@ -157,6 +160,20 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>                                 NULL, 1, EM_S390, 0, 0);
+>          if (kernel_size < 0) {
+>              kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
+> +            /* if this is Linux use KERN_IMAGE_START */
+> +            magic = rom_ptr(LINUX_MAGIC_ADDR);
+> +            if (magic && !memcmp(magic, "S390EP", 6)) {
+> +                pentry = KERN_IMAGE_START;
+> +            } else {
+> +                /* if not Linux use the IPL PSW */
+> +                iplpsw = rom_ptr(4);
+> +                if (iplpsw) {
+> +                    pentry = be32_to_cpu(*iplpsw) & 0x7fffffffUL;
+> +                } else {
+> +                    error_setg(&err, "Could not get IPL PSW");
+> +                    goto error;
+> +                }
+> +            }
+>          }
+>          if (kernel_size < 0) {
+>              error_setg(&err, "could not load kernel '%s'", ipl->kernel);
+> 
 
- Greg, can you please test ? RHEL7.5 does not catch the issue with the
- same compiler level :/ I don't understand why.
 
- hw/intc/xics_kvm.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+-- 
 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 8bdf6afe82a0..8dba2f84e71e 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -186,8 +186,7 @@ static void ics_get_kvm_state(ICSState *ics)
-         kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
-                           i + ics->offset, &state, false, &local_err);
-         if (local_err) {
--            error_report("Unable to retrieve KVM interrupt controller st=
-ate"
--                    " for IRQ %d: %s", i + ics->offset, strerror(errno))=
-;
-+            error_report_err(local_err);
-             exit(1);
-         }
-=20
-@@ -273,11 +272,10 @@ static int ics_set_kvm_state(ICSState *ics, int ver=
-sion_id)
-                 state |=3D KVM_XICS_QUEUED;
-         }
-=20
--        kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
--                          i + ics->offset, &state, true, &local_err);
-+        ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURC=
-ES,
-+                                i + ics->offset, &state, true, &local_er=
-r);
-         if (local_err) {
--            error_report("Unable to restore KVM interrupt controller sta=
-te"
--                    " for IRQs %d: %s", i + ics->offset, strerror(errno)=
-);
-+            error_report_err(local_err);
-             return ret;
-         }
-     }
---=20
-2.13.6
+Thanks,
+
+David / dhildenb
