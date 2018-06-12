@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fSoK3-00077r-Li
+	(envelope-from <mst@redhat.com>) id 1fSoK3-00077p-LO
 	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:47:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fSoK2-0005L5-AR
+	(envelope-from <mst@redhat.com>) id 1fSoK1-0005KO-Lv
 	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:47:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45536 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57250 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fSoK2-0005Kr-4x
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:47:14 -0400
-Date: Tue, 12 Jun 2018 21:47:13 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fSoK1-0005K7-Fp
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:47:13 -0400
+Date: Tue, 12 Jun 2018 21:47:11 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180612184616.90838-3-mst@redhat.com>
+Message-ID: <20180612184616.90838-2-mst@redhat.com>
 References: <20180612184616.90838-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20180612184616.90838-1-mst@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] i386/cpu: make -cpu host support
- monitor/mwait
+Subject: [Qemu-devel] [PATCH v2 1/2] kvm: support -realtime cpu-pm=on|off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,96 +27,129 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org
 
-When guest CPU PM is enabled, and with -cpu host, expose the host CPU
-MWAIT leaf in the CPUID so guest can make good PM decisions.
+With this flag, kvm allows guest to control host CPU power state.  This
+increases latency for other processes using same host CPU in an
+unpredictable way, but if decreases idle entry/exit times for the
+running VCPU.
 
-Note: the result is 100% CPU utilization reported by host as host
-no longer knows that the CPU is halted.
+Follow-up patches will expose this capability to guest
+(using mwait leaf).
+
+Based on a patch by Wanpeng Li <kernellwp@gmail.com> .
 
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- target/i386/cpu.h |  9 +++++++++
- target/i386/cpu.c | 19 ++++++++++++++-----
- target/i386/kvm.c |  8 ++++++++
- 3 files changed, 31 insertions(+), 5 deletions(-)
+ include/sysemu/sysemu.h |  1 +
+ target/i386/kvm.c       | 22 ++++++++++++++++++++++
+ vl.c                    |  6 ++++++
+ qemu-options.hx         |  9 +++++++--
+ 4 files changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 664504610e..309f804573 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1378,6 +1378,15 @@ struct X86CPU {
-     /* if true the CPUID code directly forward host cache leaves to the guest */
-     bool cache_info_passthrough;
- 
-+    /* if true the CPUID code directly forwards
-+     * host monitor/mwait leaves to the guest */
-+    struct {
-+        uint32_t eax;
-+        uint32_t ebx;
-+        uint32_t ecx;
-+        uint32_t edx;
-+    } mwait;
-+
-     /* Features that were filtered out because of missing host capabilities */
-     uint32_t filtered_features[FEATURE_WORDS];
- 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 94260412e2..a4fb856d58 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3760,11 +3760,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         }
-         break;
-     case 5:
--        /* mwait info: needed for Core compatibility */
--        *eax = 0; /* Smallest monitor-line size in bytes */
--        *ebx = 0; /* Largest monitor-line size in bytes */
--        *ecx = CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
--        *edx = 0;
-+        /* MONITOR/MWAIT Leaf */
-+        *eax = cpu->mwait.eax; /* Smallest monitor-line size in bytes */
-+        *ebx = cpu->mwait.ebx; /* Largest monitor-line size in bytes */
-+        *ecx = cpu->mwait.ecx; /* flags */
-+        *edx = cpu->mwait.edx; /* mwait substates */
-         break;
-     case 6:
-         /* Thermal and Power Leaf */
-@@ -4595,6 +4595,15 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-         goto out;
-     }
- 
-+    if (xcc->host_cpuid_required && enable_cpu_pm) {
-+        host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx,
-+                   &cpu->mwait.ecx, &cpu->mwait.edx);
-+        env->features[FEAT_1_ECX] |= CPUID_EXT_MONITOR;
-+    }
-+    /* mwait extended info: needed for Core compatibility */
-+    /* We always wake on interrupt even if host does not have the capability */
-+    cpu->mwait.ecx |= CPUID_MWAIT_EMX | CPUID_MWAIT_IBE;
-+
-     if (cpu->apic_id == UNASSIGNED_APIC_ID) {
-         error_setg(errp, "apic-id property was not initialized properly");
-         return;
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index e893f72f3b..b921c6f3b7 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -128,6 +128,7 @@ extern bool boot_strict;
+ extern uint8_t *boot_splash_filedata;
+ extern size_t boot_splash_filedata_size;
+ extern bool enable_mlock;
++extern bool enable_cpu_pm;
+ extern uint8_t qemu_extra_params_fw[2];
+ extern QEMUClockType rtc_clock;
+ extern const char *mem_path;
 diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index f093d55209..7cf9661159 100644
+index 44f70733e7..f093d55209 100644
 --- a/target/i386/kvm.c
 +++ b/target/i386/kvm.c
-@@ -366,6 +366,14 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
-         if (!kvm_irqchip_in_kernel()) {
-             ret &= ~CPUID_EXT_X2APIC;
-         }
+@@ -1357,6 +1357,28 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         smram_machine_done.notify = register_smram_listener;
+         qemu_add_machine_init_done_notifier(&smram_machine_done);
+     }
 +
-+        if (enable_cpu_pm) {
-+            int disable_exits = kvm_check_extension(s, KVM_CAP_X86_DISABLE_EXITS);
++    if (enable_cpu_pm) {
++        int disable_exits = kvm_check_extension(s, KVM_CAP_X86_DISABLE_EXITS);
++        int ret;
 +
-+            if (disable_exits & KVM_X86_DISABLE_EXITS_MWAIT) {
-+                ret |= CPUID_EXT_MONITOR;
-+            }
++/* Work around for kernel header with a typo. TODO: fix header and drop. */
++#if defined(KVM_X86_DISABLE_EXITS_HTL) && !defined(KVM_X86_DISABLE_EXITS_HLT)
++#define KVM_X86_DISABLE_EXITS_HLT KVM_X86_DISABLE_EXITS_HTL
++#endif
++        if (disable_exits) {
++            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
++                              KVM_X86_DISABLE_EXITS_HLT |
++                              KVM_X86_DISABLE_EXITS_PAUSE);
 +        }
-     } else if (function == 6 && reg == R_EAX) {
-         ret |= CPUID_6_EAX_ARAT; /* safe to allow because of emulated APIC */
-     } else if (function == 7 && index == 0 && reg == R_EBX) {
++
++        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0,
++                                disable_exits);
++        if (ret < 0) {
++            error_report("kvm: guest stopping CPU not supported: %s", strerror(-ret));
++        }
++    }
++
+     return 0;
+ }
+ 
+diff --git a/vl.c b/vl.c
+index 06031715ac..7bea9c2177 100644
+--- a/vl.c
++++ b/vl.c
+@@ -142,6 +142,7 @@ ram_addr_t ram_size;
+ const char *mem_path = NULL;
+ int mem_prealloc = 0; /* force preallocation of physical target memory */
+ bool enable_mlock = false;
++bool enable_cpu_pm = false;
+ int nb_nics;
+ NICInfo nd_table[MAX_NICS];
+ int autostart;
+@@ -386,6 +387,10 @@ static QemuOptsList qemu_realtime_opts = {
+             .name = "mlock",
+             .type = QEMU_OPT_BOOL,
+         },
++        {
++            .name = "cpu-pm",
++            .type = QEMU_OPT_BOOL,
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -3904,6 +3909,7 @@ int main(int argc, char **argv, char **envp)
+                     exit(1);
+                 }
+                 enable_mlock = qemu_opt_get_bool(opts, "mlock", true);
++                enable_cpu_pm = qemu_opt_get_bool(opts, "cpu-pm", false);
+                 break;
+             case QEMU_OPTION_msg:
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("msg"), optarg,
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c0d3951e9f..e6f31071ce 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3325,16 +3325,21 @@ Do not start CPU at startup (you must type 'c' in the monitor).
+ ETEXI
+ 
+ DEF("realtime", HAS_ARG, QEMU_OPTION_realtime,
+-    "-realtime [mlock=on|off]\n"
++    "-realtime [mlock=on|off][cpu-halt=on|off[\n"
+     "                run qemu with realtime features\n"
+-    "                mlock=on|off controls mlock support (default: on)\n",
++    "                mlock=on|off controls mlock support (default: on)\n"
++    "                cpu-pm=on|off controls cpu power management (default: off)\n",
+     QEMU_ARCH_ALL)
+ STEXI
+ @item -realtime mlock=on|off
++@item -realtime cpu-pm=on|off
+ @findex -realtime
+ Run qemu with realtime features.
+ mlocking qemu and guest memory can be enabled via @option{mlock=on}
+ (enabled by default).
++guest ability to manage power state of host cpus (increasing latency for other
++processes on the same host cpu, but decreasing latency for guest)
++can be enabled via @option{cpu-pm=on} (disabled by default).
+ ETEXI
+ 
+ DEF("gdb", HAS_ARG, QEMU_OPTION_gdb, \
 -- 
 MST
