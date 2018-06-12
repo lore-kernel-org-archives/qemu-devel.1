@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1fSbg7-0000t5-Q7
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 01:17:12 -0400
+	(envelope-from <peterx@redhat.com>) id 1fSbz5-0005d9-Pt
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 01:36:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1fSbg6-0005vy-VF
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 01:17:11 -0400
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Tue, 12 Jun 2018 15:16:30 +1000
-Message-Id: <20180612051630.17854-2-sjitindarsingh@gmail.com>
-In-Reply-To: <20180612051630.17854-1-sjitindarsingh@gmail.com>
-References: <20180612051630.17854-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V2 2/2] ppc/spapr_caps: Don't
- disable cap_cfpc on POWER8 by default
+	(envelope-from <peterx@redhat.com>) id 1fSbz1-0007Eq-6G
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 01:36:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50132 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fSbz0-0007EC-Lr
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 01:36:42 -0400
+Date: Tue, 12 Jun 2018 13:36:35 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180612053635.GM7736@xz-mi>
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180611080042.GK7736@xz-mi>
+	<9127095c-dff2-a963-d9d1-3d1fe22b7937@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9127095c-dff2-a963-d9d1-3d1fe22b7937@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 00/12] migration: improve multithreads for
+ compression and decompression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,47 +30,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, groug@kaod.org, muriloo@linux.ibm.com, sjitindarsingh@gmail.com
+To: Xiao Guangrong <guangrong.xiao@gmail.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-In default_caps_with_cpu() we set spapr_cap_cfpc to broken for POWER8
-processors and before.
+On Tue, Jun 12, 2018 at 11:19:14AM +0800, Xiao Guangrong wrote:
+>=20
+>=20
+> On 06/11/2018 04:00 PM, Peter Xu wrote:
+> > On Mon, Jun 04, 2018 at 05:55:08PM +0800, guangrong.xiao@gmail.com wr=
+ote:
+> > > From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> > >=20
+> > > Background
+> > > ----------
+> > > Current implementation of compression and decompression are very
+> > > hard to be enabled on productions. We noticed that too many wait-wa=
+kes
+> > > go to kernel space and CPU usages are very low even if the system
+> > > is really free
+> > >=20
+> > > The reasons are:
+> > > 1) there are two many locks used to do synchronous=EF=BC=8Cthere
+> > > =E3=80=80=E3=80=80is a global lock and each single thread has its o=
+wn lock,
+> > > =E3=80=80=E3=80=80migration thread and work threads need to go to s=
+leep if
+> > > =E3=80=80=E3=80=80these locks are busy
+> > >=20
+> > > 2) migration thread separately submits request to the thread
+> > >     however, only one request can be pended, that means, the
+> > >     thread has to go to sleep after finishing the request
+> > >=20
+> > > Our Ideas
+> > > ---------
+> > > To make it work better, we introduce a new multithread model,
+> > > the user, currently it is the migration thread, submits request
+> > > to each thread with round-robin manner, the thread has its own
+> > > ring whose capacity is 4 and puts the result to a global ring
+> > > which is lockless for multiple producers, the user fetches result
+> > > out from the global ring and do remaining operations for the
+> > > request, e.g, posting the compressed data out for migration on
+> > > the source QEMU
+> > >=20
+> > > Other works in this patchset is offering some statistics to see
+> > > if compression works as we expected and making the migration thread
+> > > work fast so it can feed more requests to the threads
+> >=20
+> > Hi, Guangrong,
+> >=20
+> > I'm not sure whether my understanding is correct, but AFAIU the old
+> > code has a major defect that it depends too much on the big lock.  Th=
+e
+> > critial section of the small lock seems to be very short always, and
+> > also that's per-thread.  However we use the big lock in lots of
+> > places: flush compress data, queue every page, or send the notifies i=
+n
+> > the compression thread.
+> >=20
+>=20
+> The lock is one issue, however, another issue is that, the thread has
+> to go to sleep after finishing one request and the main thread (live
+> migration thread) needs to go to kernel space and wake the thread up
+> for every single request.
+>=20
+> And we also observed that linearly scan the threads one by one to
+> see which is free is not cache-friendly...
 
-Since we no longer require private l1d cache on POWER8 for this cap to
-be set to workaround change this to default to broken for POWER7
-processors and before.
+I don't quite understand how this can be fixed on cache POV, but I'll
+read the series first before further asking.
 
-Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+> > I haven't yet read the whole work, this work seems to be quite nice
+> > according to your test results.  However have you thought about
+> > firstly remove the big lock without touching much of other part of th=
+e
+> > code, then continue to improve it?  Or have you ever tried to do so?
+> > I don't think you need to do extra work for this, but I would
+> > appreciate if you have existing test results to share.
+> >=20
+>=20
+> If you really want the performance result, i will try it...
 
----
+Then that'll be enough for me.  Please only provide the performance
+numbers if there are more people asking for that.  Otherwise please
+feel free to put that aside.
 
-V1 -> V2:
-- No Change
+>=20
+> Actually, the first version we used on our production is that we
+> use a lockless multi-thread model (only one atomic operation is needed
+> for both producer and consumer) but only one request can be fed to the
+> thread. It's comparable to your suggestion (and should far more faster
+> than your suggestion).
+>=20
+> We observed the shortcoming of this solutions is that too many waits an=
+d
+> wakeups trapped to kernel, so CPU is idle and bandwidth is low.
 
----
- hw/ppc/spapr_caps.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+Okay.
 
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 531e145114..00e43a9ba7 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -335,14 +335,10 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
- 
-     caps = smc->default_caps;
- 
--    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00,
--                          0, spapr->max_compat_pvr)) {
--        caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
--    }
--
-     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
-                           0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
-+        caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-     }
- 
-     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06_PLUS,
--- 
-2.13.6
+>=20
+> > In other words, would it be nicer to separate the work into two
+> > pieces?
+> >=20
+> > - one to refactor the existing locks, to see what we can gain by
+> >    simplify the locks to minimum.  AFAIU now the locking used is stil=
+l
+> >    not ideal, my thinking is that _maybe_ we can start by removing th=
+e
+> >    big lock, and use a semaphore or something to replace the "done"
+> >    notification while still keep the small lock?  Even some busy
+> >    looping?
+> >=20
+>=20
+> Note: no lock is used after this patchset...
+>=20
+> > - one to introduce the lockless ring buffer, to demostrate how the
+> >    lockless data structure helps comparing to the locking ways
+> >=20
+> > Then we can know which item contributed how much to the performance
+> > numbers.  After all the new ring and thread model seems to be a big
+> > chunk of work (sorry I haven't read them yet, but I will).
+>=20
+> It is really a huge burden that refactor old code and later completely
+> remove old code.
+>=20
+> We redesigned the data struct and algorithm completely and abstract the
+> model to clean up the code used for compression and decompression, it's
+> not easy to modify the old code part by part... :(
+
+Yeah; my suggestion above is based on the possibility that removing
+the big lock won't be that hard (I _feel_ like it can be <100 LOC, but
+I can't tell).  If it's proven to be very hard itself already, then
+I'm totally fine without it.
+
+>=20
+> But... if you really it is really needed, i will try to figure out a wa=
+y
+> to address your suggestion. :)
+
+Not necessary.  I won't spend your time for my solo question.  :)
+
+My point is not strong, it's just how I think about it - generally I
+would prefer incremental changes along the way especially the first
+step seems obvious (for this, again I would try operating on the big
+lock first).  But this is of course not a reason to refuse your
+work.
+
+I'll study your whole series soon; meanwhile let's see how other
+people think.
+
+Thanks,
+
+--=20
+Peter Xu
