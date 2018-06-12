@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52500)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fSkgI-0005ob-At
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 10:53:59 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fSkiB-0006ic-Dr
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 10:55:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fSkgH-0006zO-BR
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 10:53:58 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:40521)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fSkgH-0006vo-4Z
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 10:53:57 -0400
-Received: by mail-wr0-x242.google.com with SMTP id l41-v6so24415584wre.7
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 07:53:56 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1fSki7-00036V-0C
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 10:55:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57840 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fSki6-00034n-Or
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 10:55:50 -0400
+Date: Tue, 12 Jun 2018 16:55:46 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180612165546.0474564f@redhat.com>
+In-Reply-To: <HK2PR06MB0531F10A69CBFC1D41402F19EB7F0@HK2PR06MB0531.apcprd06.prod.outlook.com>
+References: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
+	<20180612140643.6f6ed34d@redhat.com>
+	<HK2PR06MB0531F10A69CBFC1D41402F19EB7F0@HK2PR06MB0531.apcprd06.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <20180608084325.GE18233@redhat.com>
-References: <20180601162749.27406-1-marcandre.lureau@redhat.com>
-	<20180601162749.27406-5-marcandre.lureau@redhat.com>
-	<20180604093653.GC19749@redhat.com>
-	<CAJ+F1C+dSJOZUR6nGVxBmonaqB5gREXut61=r2bGMhioYMvEHw@mail.gmail.com>
-	<20180608084325.GE18233@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 12 Jun 2018 16:53:54 +0200
-Message-ID: <CAJ+F1CLFJGhWVzPWGjQX78qSOQK8BZ7W0rkO6s-SsGpLqc-ObA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 04/12] Add vhost-user-backend
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V6 0/7] nvdimm: guarantee persistence of
+ QEMU writes to persistent memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +29,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Junyan He <junyan.he@gmx.com>
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>, "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, Junyan He <junyan.he@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
 
-Hi
+On Tue, 12 Jun 2018 13:38:08 +0000
+Junyan He <junyan.he@gmx.com> wrote:
 
-On Fri, Jun 8, 2018 at 10:43 AM, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om> wrote:
-> On Fri, Jun 08, 2018 at 12:34:15AM +0200, Marc-Andr=C3=A9 Lureau wrote:
->> Hi
->>
->> On Mon, Jun 4, 2018 at 11:36 AM, Daniel P. Berrang=C3=A9 <berrange@redha=
-t.com> wrote:
->> > On Fri, Jun 01, 2018 at 06:27:41PM +0200, Marc-Andr=C3=A9 Lureau wrote=
-:
->> >> Create a vhost-user-backend object that holds a connection to a
->> >> vhost-user backend and can be referenced from virtio devices that
->> >> support it. See later patches for input & gpu usage.
->> >>
->> >> A chardev can be specified to communicate with the vhost-user backend=
-,
->> >> ex: -chardev socket,id=3Dchar0,path=3D/tmp/foo.sock -object
->> >> vhost-user-backend,id=3Dvuid,chardev=3Dchar0.
->> >>
->> >> Alternatively, an executable with its arguments may be given as 'cmd'
->> >> property, ex: -object
->> >> vhost-user-backend,id=3Dvui,cmd=3D"./vhost-user-input /dev/input..". =
-The
->> >> executable is then spawn and, by convention, the vhost-user socket is
->> >> passed as fd=3D3. It may be considered a security breach to allow
->> >> creating processes that may execute arbitrary executables, so this ma=
-y
->> >> be restricted to some known executables (via signature etc) or
->> >> directory.
->> >
->> > Passing a binary and args as a string blob.....
->> >
->> >> +static int
->> >> +vhost_user_backend_spawn_cmd(VhostUserBackend *b, int vhostfd, Error=
- **errp)
->> >> +{
->> >> +    int devnull =3D open("/dev/null", O_RDWR);
->> >> +    pid_t pid;
->> >> +
->> >> +    assert(!b->child);
->> >> +
->> >> +    if (!b->cmd) {
->> >> +        error_setg_errno(errp, errno, "Missing cmd property");
->> >> +        return -1;
->> >> +    }
->> >> +    if (devnull < 0) {
->> >> +        error_setg_errno(errp, errno, "Unable to open /dev/null");
->> >> +        return -1;
->> >> +    }
->> >> +
->> >> +    pid =3D qemu_fork(errp);
->> >> +    if (pid < 0) {
->> >> +        close(devnull);
->> >> +        return -1;
->> >> +    }
->> >> +
->> >> +    if (pid =3D=3D 0) { /* child */
->> >> +        int fd, maxfd =3D sysconf(_SC_OPEN_MAX);
->> >> +
->> >> +        dup2(devnull, STDIN_FILENO);
->> >> +        dup2(devnull, STDOUT_FILENO);
->> >> +        dup2(vhostfd, 3);
->> >> +
->> >> +        signal(SIGINT, SIG_IGN);
->> >
->> > Why ignore SIGINT ?  Surely we want this extra process to be killed
->> > someone ctrl-c's the parent QEMU.
->>
->> leftover, removed
->>
->> >
->> >> +
->> >> +        for (fd =3D 4; fd < maxfd; fd++) {
->> >> +            close(fd);
->> >> +        }
->> >> +
->> >> +        execlp("/bin/sh", "sh", "-c", b->cmd, NULL);
->> >
->> > ...which is then interpreted by the shell is a recipe for security
->> > flaws. There needs to be a way to pass the command + arguments
->> > to QEMU as an argv[] we can directly exec without involving the
->> > shell.
->> >
->>
->> For now, I use g_shell_parse_argv(). Do you have a better idea?
->
-> Accept individual args at the cli level is far preferrable - we don't
-> want anything to be parsing shell strings:
->
->  vhost-user-backend,id=3Dvui,binary=3D/sbin/vhost-user-input,arg=3D/dev/i=
-nput,arg=3Dfoo,arg=3Dbar
+> He have pmem_persist and pmem_memcpy_persist stub functions.
+> 
+> If no libpmem and user really specify pmem=on, we just do nothing or just memcpy.
+> 
+> Real persistent memory always require libpmem support its load/save.
+> 
+> If pmem=on and without libpmem, we can think that user want to imitate
+> 
+> pmem=on while the HW environment is without real persistent memory existing.
+> 
+> It may help debug on some machine without real pmem.
 
-Object arguments are populated in a dictionary. Only the last value
-specified is used.
+For unaware user it would be easy to misconfigure and think that feature
+works while it isn't, which cloud lead to data loss.
 
-g_shell_parse_argv() isn't that scary imho. But if there is a
-blacklist of functions, it would be worth to have them listed
-somewhere.
+(1) Maybe we should error out if pmem=on but compiled without libpmem
+and add 3rd state pmem=force for testing purposes.
+
+Also can we detect that backing file is located on pmem storage and do [1] if it's not?
+
+> 
+> ________________________________
+> From: Qemu-devel <qemu-devel-bounces+junyan.he=gmx.com@nongnu.org> on behalf of Igor Mammedov <imammedo@redhat.com>
+> Sent: Tuesday, June 12, 2018 12:06:43 PM
+> To: junyan.he@gmx.com
+> Cc: Haozhong Zhang; xiaoguangrong.eric@gmail.com; crosthwaite.peter@gmail.com; mst@redhat.com; qemu-devel@nongnu.org; dgilbert@redhat.com; quintela@redhat.com; Junyan He; stefanha@redhat.com; pbonzini@redhat.com; rth@twiddle.net; ehabkost@redhat.com
+> Subject: Re: [Qemu-devel] [PATCH V6 0/7] nvdimm: guarantee persistence of QEMU writes to persistent memory
+> 
+> On Fri,  1 Jun 2018 16:10:22 +0800
+> junyan.he@gmx.com wrote:
+> 
+> > From: Junyan He <junyan.he@intel.com>
+> >
+> > QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and
+> > live migration. If the backend is on the persistent memory, QEMU needs
+> > to take proper operations to ensure its writes persistent on the
+> > persistent memory. Otherwise, a host power failure may result in the
+> > loss the guest data on the persistent memory.  
+> 
+> extra question, what are expected behavior when QEMU is built without
+> libpmem and user specifies pmem=on for backend?
+> 
+> >
+> > This v3 patch series is based on Marcel's patch "mem: add share
+> > parameter to memory-backend-ram" [1] because of the changes in patch 1.
+> >
+> > [1] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03858.html
+> >
+> > Previous versions can be found at
+> > v5: https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02258.html
+> > V4: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06993.html
+> > v3: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04365.html
+> > v2: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01579.html
+> > v1: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg05040.html
+> >
+> > Changes in v6:
+> > * (Patch 1) Expose all ram block flags rather than redefine the flags.
+> > * (Patch 4) Use pkg-config rather the hard check when configure.
+> > * (Patch 7) Sync and flush all the pmem data when migration completes,
+> > rather than sync pages one by one in previous version.
+> >
+> > Changes in v5:
+> > * (Patch 9) Add post copy check and output some messages for nvdimm.
+> >
+> > Changes in v4:
+> > * (Patch 2) Fix compilation errors found by patchew.
+> >
+> > Changes in v3:
+> > * (Patch 5) Add a is_pmem flag to ram_handle_compressed() and handle
+> > PMEM writes in it, so we don't need the _common function.
+> > * (Patch 6) Expose qemu_get_buffer_common so we can remove the
+> > unnecessary qemu_get_buffer_to_pmem wrapper.
+> > * (Patch 8) Add a is_pmem flag to xbzrle_decode_buffer() and handle
+> > PMEM writes in it, so we can remove the unnecessary
+> > xbzrle_decode_buffer_{common, to_pmem}.
+> > * Move libpmem stubs to stubs/pmem.c and fix the compilation failures
+> > of test-{xbzrle,vmstate}.c.
+> >
+> > Changes in v2:
+> > * (Patch 1) Use a flags parameter in file ram allocation functions.
+> > * (Patch 2) Add a new option 'pmem' to hostmem-file.
+> > * (Patch 3) Use libpmem to operate on the persistent memory, rather
+> > than re-implementing those operations in QEMU.
+> > * (Patch 5-8) Consider the write persistence in the migration path.
+> >
+> >
+> > Junyan:
+> > [1/7] memory, exec: Expose all memory block related flags.
+> > [6/7] migration/ram: Add check and info message to nvdimm post copy.
+> > [7/7] migration/ram: ensure write persistence on loading all date to PMEM.
+> >
+> > Haozhong:
+> > [5/7] mem/nvdimm: ensure write persistence to PMEM in label emulation
+> >
+> > Haozhong & Junyan:
+> > [2/7] memory, exec: switch file ram allocation functions to 'flags' parameters
+> > [3/7] hostmem-file: add the 'pmem' option
+> > [4/7] configure: add libpmem support
+> >
+> >
+> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> > Signed-off-by: Junyan He <junyan.he@intel.com>
+> >
+> > ---
+> > backends/hostmem-file.c | 28 +++++++++++++++++++++++++++-
+> > configure               | 29 +++++++++++++++++++++++++++++
+> > docs/nvdimm.txt         | 14 ++++++++++++++
+> > exec.c                  | 36 ++++++++++++++----------------------
+> > hw/mem/nvdimm.c         |  9 ++++++++-
+> > include/exec/memory.h   | 31 +++++++++++++++++++++++++++++--
+> > include/exec/ram_addr.h | 28 ++++++++++++++++++++++++++--
+> > include/qemu/pmem.h     | 24 ++++++++++++++++++++++++
+> > memory.c                |  8 +++++---
+> > migration/ram.c         | 18 ++++++++++++++++++
+> > numa.c                  |  2 +-
+> > qemu-options.hx         |  7 +++++++
+> > stubs/Makefile.objs     |  1 +
+> > stubs/pmem.c            | 23 +++++++++++++++++++++++
+> > 14 files changed, 226 insertions(+), 32 deletions(-)  
+> 
+> 
