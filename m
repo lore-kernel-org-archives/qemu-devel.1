@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fShNW-0006Nw-85
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:22:23 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fShPF-00079A-3C
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:24:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fShNT-0003ff-1r
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:22:22 -0400
-Resent-Message-Id: <E1fShNT-0003ff-1r@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21073)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fShNS-0003f4-P1
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:22:18 -0400
-In-Reply-To: <20180612105831.25703-1-laurent@vivier.eu>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152880248270.681.9297727489638090665@d39dc562802a>
+	(envelope-from <kwolf@redhat.com>) id 1fShPE-0004Zf-7d
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:24:09 -0400
+Date: Tue, 12 Jun 2018 13:23:59 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180612112359.GB4355@localhost.localdomain>
+References: <20180611213927.141894-1-eblake@redhat.com>
+	<20180611213927.141894-3-eblake@redhat.com>
+	<ff47b198-c6a7-a2f5-86d0-93e3b431806e@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 12 Jun 2018 04:21:23 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/8] Linux user for 3.0 patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ff47b198-c6a7-a2f5-86d0-93e3b431806e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] iotests: Add test 221 to catch
+ qemu-img map regression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjEyMTA1ODMxLjI1NzAzLTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAvOF0gTGludXggdXNlciBmb3IgMy4wIHBhdGNoZXMKCj09
-PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
-JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21t
-aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
-Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
-IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
-bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
-IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
-ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
-MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
-cHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA2MTIx
-MDU4MzEuMjU3MDMtMS1sYXVyZW50QHZpdmllci5ldSAtPiBwYXRjaGV3LzIwMTgwNjEyMTA1ODMx
-LjI1NzAzLTEtbGF1cmVudEB2aXZpZXIuZXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
-Jwo0MWMwMDA4YmRjIGxpbnV4LXVzZXIvc3BhcmM2NDogQWRkIGlub3RpZnlfcm1fd2F0Y2ggYW5k
-IHRlZSBzeXNjYWxscwpjNTEwM2ZhOTNhIGxpbnV4LXVzZXIvbWljcm9ibGF6ZTogRml4IHR5cG8g
-aW4gYWNjZXB0NCBzeXNjYWxsCjMxZmJlYzU3MWEgbGludXgtdXNlci9ocHBhOiBGaXggdHlwbyBp
-biBta25vZGF0IHN5c2NhbGwKZmRiYThmYmY0MCBsaW51eC11c2VyL2FscGhhOiBGaXggZXBvbGwg
-c3lzY2FsbHMKNmY4MDEzZjlkYiBxZW11LWJpbmZtdC1jb25mLnNoOiBpZ25vcmUgdGhlIE9TL0FC
-SSBmaWVsZAo5NzRiMGU3OThhIGxpbnV4LXVzZXI6IGRpc2FibGUgcWVtdS1icmlkZ2UtaGVscGVy
-IGFuZCBzb2NrZXRfc2NtX2hlbHBlciBidWlsZAo2MjE2MjUwYTQzIGxpbnV4LXVzZXI6IFVzZSBp
-c19lcnJvcigpIHRvIGF2b2lkIHdhcm5pbmdzIGFuZCBtYWtlIHRoZSBjb2RlIGNsZWFyZXIKYTM1
-MjQzYjVjNyBsaW51eC11c2VyOiBFeHBvcnQgdXNlIGlzX2Vycm9yKCksIHVzZSBpdCB0byBhdm9p
-ZCB3YXJuaW5ncwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS84OiBsaW51
-eC11c2VyOiBFeHBvcnQgdXNlIGlzX2Vycm9yKCksIHVzZSBpdCB0byBhdm9pZCB3YXJuaW5ncy4u
-LgpDaGVja2luZyBQQVRDSCAyLzg6IGxpbnV4LXVzZXI6IFVzZSBpc19lcnJvcigpIHRvIGF2b2lk
-IHdhcm5pbmdzIGFuZCBtYWtlIHRoZSBjb2RlIGNsZWFyZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMy84
-OiBsaW51eC11c2VyOiBkaXNhYmxlIHFlbXUtYnJpZGdlLWhlbHBlciBhbmQgc29ja2V0X3NjbV9o
-ZWxwZXIgYnVpbGQuLi4KQ2hlY2tpbmcgUEFUQ0ggNC84OiBxZW11LWJpbmZtdC1jb25mLnNoOiBp
-Z25vcmUgdGhlIE9TL0FCSSBmaWVsZC4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
-IzI3OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MTA6CitpMzg2X21hc2s9J1x4
-ZmZceGZmXHhmZlx4ZmZceGZmXHhmZVx4ZmVceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhm
-Zlx4ZmZceGZlXHhmZlx4ZmZceGZmJwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMz
-MjogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjE0OgoraTQ4Nl9tYXNrPSdceGZm
-XHhmZlx4ZmZceGZmXHhmZlx4ZmVceGZlXHgwMFx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZc
-eGZmXHhmZVx4ZmZceGZmXHhmZicKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzc6
-IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxODoKK2FscGhhX21hc2s9J1x4ZmZc
-eGZmXHhmZlx4ZmZceGZmXHhmZVx4ZmVceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4
-ZmZceGZlXHhmZlx4ZmZceGZmJwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0Njog
-RklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjMwOgorc3BhcmNfbWFzaz0nXHhmZlx4
-ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhm
-Zlx4ZmZceGZlXHhmZlx4ZmYnCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzUxOiBG
-SUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MzQ6CitzcGFyYzMycGx1c19tYXNrPSdc
-eGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHgwMFx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4
-ZmZceGZmXHhmZlx4ZmVceGZmXHhmZicKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
-NjA6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDo1MDoKK202OGtfbWFzaz0nXHhm
-Zlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZVx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZm
-XHhmZlx4ZmZceGZlXHhmZlx4ZmYnCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzY5
-OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6ODA6CitzaDRfbWFzaz0nXHhmZlx4
-ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhm
-Zlx4ZmVceGZmXHhmZlx4ZmYnCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzc0OiBG
-SUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6ODQ6CitzaDRlYl9tYXNrPSdceGZmXHhm
-Zlx4ZmZceGZmXHhmZlx4ZmZceGZmXHgwMFx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZm
-XHhmZlx4ZmVceGZmXHhmZicKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNzk6IEZJ
-TEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDo4ODoKK3MzOTB4X21hc2s9J1x4ZmZceGZm
-XHhmZlx4ZmZceGZmXHhmZlx4ZmZceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZc
-eGZmXHhmZVx4ZmZceGZmJwoKdG90YWw6IDkgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NyBsaW5lcyBj
-aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
-QVRDSCA1Lzg6IGxpbnV4LXVzZXIvYWxwaGE6IEZpeCBlcG9sbCBzeXNjYWxscy4uLgpDaGVja2lu
-ZyBQQVRDSCA2Lzg6IGxpbnV4LXVzZXIvaHBwYTogRml4IHR5cG8gaW4gbWtub2RhdCBzeXNjYWxs
-Li4uCkNoZWNraW5nIFBBVENIIDcvODogbGludXgtdXNlci9taWNyb2JsYXplOiBGaXggdHlwbyBp
-biBhY2NlcHQ0IHN5c2NhbGwuLi4KQ2hlY2tpbmcgUEFUQ0ggOC84OiBsaW51eC11c2VyL3NwYXJj
-NjQ6IEFkZCBpbm90aWZ5X3JtX3dhdGNoIGFuZCB0ZWUgc3lzY2FsbHMuLi4KV0FSTklORzogbGlu
-ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIwOiBGSUxFOiBsaW51eC11c2VyL3NwYXJjNjQvc3lzY2Fs
-bF9uci5oOjE1NzoKKyNkZWZpbmUgVEFSR0VUX05SX2lub3RpZnlfcm1fd2F0Y2ggICAxNTYgLyog
-TGludXggc3BlY2lmaWMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAqLwoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Am 12.06.2018 um 00:03 hat Eric Blake geschrieben:
+> On 06/11/2018 04:39 PM, Eric Blake wrote:
+> > Although qemu-img creates aligned files (by rounding up), it
+> > must also gracefully handle files that are not sector-aligned.
+> > Test that the bug fixed in the previous patch does not recur.
+> > 
+> > It's a bit annoying that we can see the (implicit) hole past
+> > the end of the file on to the next sector boundary, so if we
+> > ever reach the point where we report a byte-accurate size rather
+> > than our current behavior of always rounding up, this test will
+> > probably need a slight modification.
+> > 
+> > Signed-off-by: Eric Blake <eblake@redhat.com>
+> > ---
+> 
+> > +
+> > +$QEMU_IO -c 'w 43008 1' "$TEST_IMG" # writing also rounds up
+> 
+> Shoot - missing a filter...
+> 
+> > +++ b/tests/qemu-iotests/221.out
+> > @@ -0,0 +1,16 @@
+> > +QA output created by 221
+> > +
+> > +=== Check mapping of unaligned raw image ===
+> > +
+> > +Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=43009
+> > +[{ "start": 0, "length": 43520, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
+> > +[{ "start": 0, "length": 43520, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
+> > +wrote 1/1 bytes at offset 43008
+> > +1 bytes, 1 ops; 0.0001 sec (7.512 KiB/sec and 7692.3077 ops/sec)
+> 
+> ...which leaks volatile output.  Squash this in:
+
+Thanks, applied to the block branch. (After fixing the patch corruption
+caused by your mailer helpfully adding line breaks.)
+
+Kevin
