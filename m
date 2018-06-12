@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fSd3r-0002rE-NV
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 02:45:51 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fSd3r-0002qs-7t
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 02:45:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fSd3q-0001yl-9I
+	(envelope-from <dgibson@ozlabs.org>) id 1fSd3q-0001yT-1N
 	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 02:45:47 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 12 Jun 2018 16:44:54 +1000
-Message-Id: <20180612064503.14282-25-david@gibson.dropbear.id.au>
+Date: Tue, 12 Jun 2018 16:44:55 +1000
+Message-Id: <20180612064503.14282-26-david@gibson.dropbear.id.au>
 In-Reply-To: <20180612064503.14282-1-david@gibson.dropbear.id.au>
 References: <20180612064503.14282-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 24/33] target/ppc: Allow PIR read in privileged
- mode
+Subject: [Qemu-devel] [PULL 25/33] spapr: no need to verify the node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,44 +20,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, clg@kaod.org, luporl <leandro.lupori@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, clg@kaod.org, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-From: luporl <leandro.lupori@gmail.com>
+From: David Hildenbrand <david@redhat.com>
 
-According to PowerISA, the PIR register should be readable in privileged
-mode also, not only in hypervisor privileged mode.
+The node property can always be queried and the value has already been
+verified in pc_dimm_realize().
 
-PowerISA 3.0 - 4.3.3 Processor Identification Register
-
-"Read access to the PIR is privileged; write access is not provided."
-
-Figure 18 in section 4.4.4 explicitly confirms that mfspr PIR is privileged
-and doesn't require hypervisor state.
-
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: qemu-ppc@nongnu.org
-Signed-off-by: Leandro Lupori <leandro.lupori@gmail.com>
-Reviewed-by: Jose Ricardo Ziviani <joserz@linux.ibm.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/translate_init.inc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/ppc/spapr.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index 1a89017dde..bb9296f5a3 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -7819,7 +7819,7 @@ static void gen_spr_book3s_ids(CPUPPCState *env)
-     /* Processor identification */
-     spr_register_hv(env, SPR_PIR, "PIR",
-                  SPR_NOACCESS, SPR_NOACCESS,
--                 SPR_NOACCESS, SPR_NOACCESS,
-+                 &spr_read_generic, SPR_NOACCESS,
-                  &spr_read_generic, NULL,
-                  0x00000000);
-     spr_register_hv(env, SPR_HID0, "HID0",
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 2375cbee12..f16a0b2870 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3578,14 +3578,8 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
+             error_setg(errp, "Memory hotplug not supported for this machine");
+             return;
+         }
+-        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP, errp);
+-        if (*errp) {
+-            return;
+-        }
+-        if (node < 0 || node >= MAX_NODES) {
+-            error_setg(errp, "Invaild node %d", node);
+-            return;
+-        }
++        node = object_property_get_uint(OBJECT(dev), PC_DIMM_NODE_PROP,
++                                        &error_abort);
+ 
+         spapr_memory_plug(hotplug_dev, dev, node, errp);
+     } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
 -- 
 2.17.1
