@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55338)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fShM6-0005gB-N7
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:20:55 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fShNW-0006Nw-85
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:22:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fShM3-0002zi-JF
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:20:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56676)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fShM3-0002z0-Cz
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:20:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fShM1-0003qo-74
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 11:20:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2E92E2E80CC
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 11:20:49 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1fShNT-0003ff-1r
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:22:22 -0400
+Resent-Message-Id: <E1fShNT-0003ff-1r@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21073)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fShNS-0003f4-P1
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:22:18 -0400
+In-Reply-To: <20180612105831.25703-1-laurent@vivier.eu>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152880248270.681.9297727489638090665@d39dc562802a>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Jun 2018 11:14:50 -0000
-From: Launchpad Bug Tracker <1769053@bugs.launchpad.net>
-Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
-Message-Id: <152880209107.8741.3155008616330113616.launchpad@ackee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1769053] Re: Ability to control phys-bits through
- libvirt
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 12 Jun 2018 04:21:23 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/8] Linux user for 3.0 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,66 +28,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi
 
-** Merge proposal linked:
-   https://code.launchpad.net/~paelzer/ubuntu/+source/qemu/+git/qemu/+merge=
-/347801
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1769053
-
-Title:
-  Ability to control phys-bits through libvirt
-
-Status in libvirt:
-  Unknown
-Status in QEMU:
-  Invalid
-Status in libvirt package in Ubuntu:
-  Triaged
-Status in qemu package in Ubuntu:
-  Invalid
-
-Bug description:
-  Attempting to start a KVM guest with more than 1TB of RAM fails.
-
-  It looks like we might need some extra patches:
-  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
-  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
-  Uname: Linux 4.15.0-20-generic x86_64
-  ApportVersion: 2.20.9-0ubuntu7
-  Architecture: amd64
-  CurrentDesktop: Unity:Unity7:ubuntu
-  Date: Fri May  4 16:21:14 2018
-  InstallationDate: Installed on 2017-04-05 (393 days ago)
-  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
-  MachineType: Dell Inc. XPS 13 9360
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
-pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
-off=3D1
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
-  dmi.bios.date: 02/26/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: 2.6.2
-  dmi.board.name: 0PF86Y
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A00
-  dmi.chassis.type: 9
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
-60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
-  dmi.product.family: XPS
-  dmi.product.name: XPS 13 9360
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/libvirt/+bug/1769053/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjEyMTA1ODMxLjI1NzAzLTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAvOF0gTGludXggdXNlciBmb3IgMy4wIHBhdGNoZXMKCj09
+PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9
+JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21t
+aXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAk
+Y29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9n
+IC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1l
+bWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAg
+IGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAk
+ZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4
+MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXct
+cHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA2MTIx
+MDU4MzEuMjU3MDMtMS1sYXVyZW50QHZpdmllci5ldSAtPiBwYXRjaGV3LzIwMTgwNjEyMTA1ODMx
+LjI1NzAzLTEtbGF1cmVudEB2aXZpZXIuZXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0
+Jwo0MWMwMDA4YmRjIGxpbnV4LXVzZXIvc3BhcmM2NDogQWRkIGlub3RpZnlfcm1fd2F0Y2ggYW5k
+IHRlZSBzeXNjYWxscwpjNTEwM2ZhOTNhIGxpbnV4LXVzZXIvbWljcm9ibGF6ZTogRml4IHR5cG8g
+aW4gYWNjZXB0NCBzeXNjYWxsCjMxZmJlYzU3MWEgbGludXgtdXNlci9ocHBhOiBGaXggdHlwbyBp
+biBta25vZGF0IHN5c2NhbGwKZmRiYThmYmY0MCBsaW51eC11c2VyL2FscGhhOiBGaXggZXBvbGwg
+c3lzY2FsbHMKNmY4MDEzZjlkYiBxZW11LWJpbmZtdC1jb25mLnNoOiBpZ25vcmUgdGhlIE9TL0FC
+SSBmaWVsZAo5NzRiMGU3OThhIGxpbnV4LXVzZXI6IGRpc2FibGUgcWVtdS1icmlkZ2UtaGVscGVy
+IGFuZCBzb2NrZXRfc2NtX2hlbHBlciBidWlsZAo2MjE2MjUwYTQzIGxpbnV4LXVzZXI6IFVzZSBp
+c19lcnJvcigpIHRvIGF2b2lkIHdhcm5pbmdzIGFuZCBtYWtlIHRoZSBjb2RlIGNsZWFyZXIKYTM1
+MjQzYjVjNyBsaW51eC11c2VyOiBFeHBvcnQgdXNlIGlzX2Vycm9yKCksIHVzZSBpdCB0byBhdm9p
+ZCB3YXJuaW5ncwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS84OiBsaW51
+eC11c2VyOiBFeHBvcnQgdXNlIGlzX2Vycm9yKCksIHVzZSBpdCB0byBhdm9pZCB3YXJuaW5ncy4u
+LgpDaGVja2luZyBQQVRDSCAyLzg6IGxpbnV4LXVzZXI6IFVzZSBpc19lcnJvcigpIHRvIGF2b2lk
+IHdhcm5pbmdzIGFuZCBtYWtlIHRoZSBjb2RlIGNsZWFyZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggMy84
+OiBsaW51eC11c2VyOiBkaXNhYmxlIHFlbXUtYnJpZGdlLWhlbHBlciBhbmQgc29ja2V0X3NjbV9o
+ZWxwZXIgYnVpbGQuLi4KQ2hlY2tpbmcgUEFUQ0ggNC84OiBxZW11LWJpbmZtdC1jb25mLnNoOiBp
+Z25vcmUgdGhlIE9TL0FCSSBmaWVsZC4uLgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMK
+IzI3OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MTA6CitpMzg2X21hc2s9J1x4
+ZmZceGZmXHhmZlx4ZmZceGZmXHhmZVx4ZmVceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhm
+Zlx4ZmZceGZlXHhmZlx4ZmZceGZmJwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMz
+MjogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjE0OgoraTQ4Nl9tYXNrPSdceGZm
+XHhmZlx4ZmZceGZmXHhmZlx4ZmVceGZlXHgwMFx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZc
+eGZmXHhmZVx4ZmZceGZmXHhmZicKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMzc6
+IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxODoKK2FscGhhX21hc2s9J1x4ZmZc
+eGZmXHhmZlx4ZmZceGZmXHhmZVx4ZmVceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4
+ZmZceGZlXHhmZlx4ZmZceGZmJwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0Njog
+RklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjMwOgorc3BhcmNfbWFzaz0nXHhmZlx4
+ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhm
+Zlx4ZmZceGZlXHhmZlx4ZmYnCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzUxOiBG
+SUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6MzQ6CitzcGFyYzMycGx1c19tYXNrPSdc
+eGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHgwMFx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4
+ZmZceGZmXHhmZlx4ZmVceGZmXHhmZicKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+NjA6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDo1MDoKK202OGtfbWFzaz0nXHhm
+Zlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZVx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZm
+XHhmZlx4ZmZceGZlXHhmZlx4ZmYnCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzY5
+OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6ODA6CitzaDRfbWFzaz0nXHhmZlx4
+ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhm
+Zlx4ZmVceGZmXHhmZlx4ZmYnCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzc0OiBG
+SUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6ODQ6CitzaDRlYl9tYXNrPSdceGZmXHhm
+Zlx4ZmZceGZmXHhmZlx4ZmZceGZmXHgwMFx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZm
+XHhmZlx4ZmVceGZmXHhmZicKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNzk6IEZJ
+TEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDo4ODoKK3MzOTB4X21hc2s9J1x4ZmZceGZm
+XHhmZlx4ZmZceGZmXHhmZlx4ZmZceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZc
+eGZmXHhmZVx4ZmZceGZmJwoKdG90YWw6IDkgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NyBsaW5lcyBj
+aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
+QVRDSCA1Lzg6IGxpbnV4LXVzZXIvYWxwaGE6IEZpeCBlcG9sbCBzeXNjYWxscy4uLgpDaGVja2lu
+ZyBQQVRDSCA2Lzg6IGxpbnV4LXVzZXIvaHBwYTogRml4IHR5cG8gaW4gbWtub2RhdCBzeXNjYWxs
+Li4uCkNoZWNraW5nIFBBVENIIDcvODogbGludXgtdXNlci9taWNyb2JsYXplOiBGaXggdHlwbyBp
+biBhY2NlcHQ0IHN5c2NhbGwuLi4KQ2hlY2tpbmcgUEFUQ0ggOC84OiBsaW51eC11c2VyL3NwYXJj
+NjQ6IEFkZCBpbm90aWZ5X3JtX3dhdGNoIGFuZCB0ZWUgc3lzY2FsbHMuLi4KV0FSTklORzogbGlu
+ZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIwOiBGSUxFOiBsaW51eC11c2VyL3NwYXJjNjQvc3lzY2Fs
+bF9uci5oOjE1NzoKKyNkZWZpbmUgVEFSR0VUX05SX2lub3RpZnlfcm1fd2F0Y2ggICAxNTYgLyog
+TGludXggc3BlY2lmaWMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAqLwoKdG90YWw6IDAg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
