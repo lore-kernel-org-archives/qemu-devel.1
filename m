@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1fSoGU-0005gy-7f
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:43:35 -0400
+	(envelope-from <groug@kaod.org>) id 1fSoJ7-0006eU-Qi
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:46:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1fSoGQ-0003Ya-AN
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:43:34 -0400
-Received: from goliath.siemens.de ([192.35.17.28]:51223)
+	(envelope-from <groug@kaod.org>) id 1fSoJ4-0004rQ-LL
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:46:17 -0400
+Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:40650)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
-	id 1fSoGP-0003XB-Ub
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:43:30 -0400
-References: <267f42a5-b7ce-379e-ffd1-f2611393d2ff@web.de>
-	<ad56487b-5afe-1420-9903-d5d849f97231@siemens.com>
-	<CAFEAcA9V9nFMVixeYjfBj54OT3zhRCVHM495AZHDzxVryh4JFA@mail.gmail.com>
-	<6730e270-9906-a43c-68b0-7a09a0743fa5@siemens.com>
-	<d64ace8c-30ca-e16c-fd73-746476bf3a6b@siemens.com>
-	<7bb24572-0fc1-00de-3552-aca1111059ed@amsat.org>
-	<63ee188e-0c66-ce7e-03b2-fd58e4da9116@siemens.com>
-	<3a128f8d-46a3-591f-ee09-8c9a3f2401ea@amsat.org>
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <aebcbcd5-f0ab-5f9b-4a9d-3ff9dd94ee4f@siemens.com>
-Date: Tue, 12 Jun 2018 20:43:22 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fSoJ4-0004qr-Dr
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:46:14 -0400
+Received: from player692.ha.ovh.net (unknown [10.109.105.35])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id D1B1016CD1
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 20:46:12 +0200 (CEST)
+Date: Tue, 12 Jun 2018 20:46:03 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180612204603.7bf254cb@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <CAFEAcA8yKyHX-xVx5VPxBOy7-hiKDo+DgztVZ_sD5FxK77Z-9w@mail.gmail.com>
+References: <20180612064503.14282-1-david@gibson.dropbear.id.au>
+	<CAFEAcA85qHjDLBYxWW9i4T91m1uTS6TAY_y2A6_840n-_tDZKw@mail.gmail.com>
+	<20180612175241.7340be80@bahia.lab.toulouse-stg.fr.ibm.com>
+	<CAFEAcA8yKyHX-xVx5VPxBOy7-hiKDo+DgztVZ_sD5FxK77Z-9w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <3a128f8d-46a3-591f-ee09-8c9a3f2401ea@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] e1000e: Do not auto-clear ICR bits which
- aren't set in EIAC
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 00/33] ppc-for-3.0 queue 20180612
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,123 +32,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
 
-On 2018-06-12 20:38, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 06/12/2018 03:30 PM, Jan Kiszka wrote:
->> On 2018-06-12 20:11, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Hi Jan,
->>>
->>> On 06/12/2018 02:22 PM, Jan Kiszka wrote:
->>>> On 2018-05-22 09:00, Jan Kiszka wrote:
->>>>> On 2018-04-16 17:29, Peter Maydell wrote:
->>>>>> On 16 April 2018 at 16:25, Jan Kiszka <jan.kiszka@siemens.com> wro=
-te:
->>>>>>> On 2018-04-01 23:17, Jan Kiszka wrote:
->>>>>>>> From: Jan Kiszka <jan.kiszka@siemens.com>
->>>>>>>>
->>>>>>>> The spec does not justify clearing of any E1000_ICR_OTHER_CAUSES=
- when
->>>>>>>> E1000_ICR_OTHER is set in EIAC. In fact, removing this code fixe=
-s the
->>>>>>>> issue the Linux driver runs into since 4aea7a5c5e94 ("e1000e: Av=
-oid
->>>>>>>> receiver overrun interrupt bursts") and was worked around by
->>>>>>>> 745d0bd3af99 ("e1000e: Remove Other from EIAC").
->>>>>>>>
->>>>>>>> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
->>>>>>>> ---
->>>>>>>>
->>>>>>>> This resolves the issue I reported on February 18 ("e1000e: MSI-=
-X
->>>>>>>> problem with recent Linux drivers").
->>>>>>>>
->>>>>>>>  hw/net/e1000e_core.c | 4 ----
->>>>>>>>  1 file changed, 4 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
->>>>>>>> index ecf9b15555..d38f025c0f 100644
->>>>>>>> --- a/hw/net/e1000e_core.c
->>>>>>>> +++ b/hw/net/e1000e_core.c
->>>>>>>> @@ -2022,10 +2022,6 @@ e1000e_msix_notify_one(E1000ECore *core, =
-uint32_t cause, uint32_t int_cfg)
->>>>>>>>
->>>>>>>>      effective_eiac =3D core->mac[EIAC] & cause;
->>>>>>>>
->>>>>>>> -    if (effective_eiac =3D=3D E1000_ICR_OTHER) {
->>>>>>>> -        effective_eiac |=3D E1000_ICR_OTHER_CAUSES;
->>>>>>>> -    }
->>>>>>>> -
->>>>>>>>      core->mac[ICR] &=3D ~effective_eiac;
->>>>>>>>
->>>>>>>>      if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
->>>>>>>>
->>>>>>>
->>>>>>> Ping for this - as well as https://patchwork.ozlabs.org/patch/895=
-476.
->>>>>>>
->>>>>>> Given that q35 uses e1000e by default and many Linux kernel versi=
-ons no
->>>>>>> longer work, this should likely go into upcoming and stable versi=
-ons
->>>>>>
->>>>>> I'd rather not put it into 2.12 at this point in the release
->>>>>> cycle unless it's a regression from 2.11, I think.
->>>>>
->>>>> Second ping - nothing hit the repo so far, nor did I receive feedba=
-ck.
->>>>>
->>>>
->>>> And another ping. For both.
->>>>
->>>> These days I had to help someone with a broken QEMU setup that faile=
-d
->>>> installing from network. It turned out that "modprobe e1000e IntMode=
-=3D0"
->>>> was needed to workaround the issues my patches address.
->>>
->>> What about the IMS register? It is set just after.
->>>
->>> Looking at b38636b8372, can you test this patch?
->>>
->>> -- >8 --
->>> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
->>> index c93c4661ed..a484b68a5a 100644
->>> --- a/hw/net/e1000e_core.c
->>> +++ b/hw/net/e1000e_core.c
->>> @@ -2022,13 +2022,13 @@ e1000e_msix_notify_one(E1000ECore *core,
->>> uint32_t cause, uint32_t int_cfg)
->>>
->>>      effective_eiac =3D core->mac[EIAC] & cause;
->>>
->>> -    if (effective_eiac =3D=3D E1000_ICR_OTHER) {
->>> -        effective_eiac |=3D E1000_ICR_OTHER_CAUSES;
->>> -    }
->>> -
->>>      core->mac[ICR] &=3D ~effective_eiac;
->>>
->>>      if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
->>> +        if (effective_eiac =3D=3D E1000_ICR_OTHER) {
->>> +            effective_eiac |=3D E1000_ICR_OTHER_CAUSES;
->>> +        }
->>> +
->>>          core->mac[IMS] &=3D ~effective_eiac;
->>>      }
->>>  }
->>>
->>
->> Before testing this: What would be the reasoning for this change?
->=20
-> Not breaking the purpose of b38636b8372 :)
+On Tue, 12 Jun 2018 16:55:08 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-I disagree on this expansion of bit 31 ("other causes"). I see no
-indication in the spec that setting this bit for autoclear has more
-impact than on the very same bit itself. Therefore I'm asking for a
-reasoning - based on the spec.
+> On 12 June 2018 at 16:52, Greg Kurz <groug@kaod.org> wrote:
+> > On Tue, 12 Jun 2018 15:34:22 +0100
+> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> >  
+> >> On 12 June 2018 at 07:44, David Gibson <david@gibson.dropbear.id.au> wrote:  
+> >> > ----------------------------------------------------------------
+> >> > ppc patch queue 2018-06-12
+> >> >
+> >> > Here's another batch of ppc patches towards the 3.0 release.  There's
+> >> > a fair bit here, because I've been working through my mail backlog
+> >> > after a holiday.  There's not much of a central theme, amongst other
+> >> > things we have:
+> >> >     * ppc440 / sam460ex improvements
+> >> >     * logging and error cleanups
+> >> >     * 40p (PReP) bugfixes
+> >> >     * Macintosh fixes and cleanups
+> >> >     * Add emulation of the new POWER9 store-forwarding barrier
+> >> >       instruction variant
+> >> >     * Hotplug cleanups
+> >> >  
+> >>
+> >> Applied, thanks.  
+> 
+> > Oh... so we've broken bisect until Cedric's fix is merged.  
+> 
+> If you want me not to merge a pullreq you need to follow up to
+> the cover letter saying "please don't merge this" or something
+> similar. Otherwise I will not notice.
+> 
 
-Jan
+Yeah I've only answered to the offending patch, sorry...
 
---=20
-Siemens AG, Corporate Technology, CT RDA IOT SES-DE
-Corporate Competence Center Embedded Linux
+Cheers,
+
+--
+Greg
+
+> thanks
+> -- PMM
