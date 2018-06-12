@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSXXr-0005IG-Oo
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:27 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fSXXu-0005KU-77
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSXXo-0007cc-GL
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:23 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:34757)
+	(envelope-from <richard.henderson@linaro.org>) id 1fSXXq-0007eT-Ss
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:26 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:39987)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fSXXo-0007by-4z
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:20 -0400
-Received: by mail-pg0-x241.google.com with SMTP id q4-v6so9531493pgr.1
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 17:52:19 -0700 (PDT)
+	id 1fSXXq-0007dm-Gv
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:22 -0400
+Received: by mail-pg0-x244.google.com with SMTP id l2-v6so10582471pgc.7
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 17:52:22 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Jun 2018 14:51:38 -1000
-Message-Id: <20180612005145.3375-13-richard.henderson@linaro.org>
+Date: Mon, 11 Jun 2018 14:51:39 -1000
+Message-Id: <20180612005145.3375-14-richard.henderson@linaro.org>
 In-Reply-To: <20180612005145.3375-1-richard.henderson@linaro.org>
 References: <20180612005145.3375-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 12/19] linux-user: Setup split syscall
- infrastructure
+Subject: [Qemu-devel] [PATCH v3 13/19] linux-user: Split out close, open,
+ openat, read, write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +30,591 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, peter.maydell@linaro.org
 
-Defines a unified structure for implementation and strace.
-Supplies a generator script to build the declarations and
-the lookup function.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.h           | 178 +++++++++++++++
- linux-user/strace.c            | 386 ++++++++++++++++++++++++---------
- linux-user/syscall.c           | 113 ++++------
- linux-user/Makefile.objs       |  10 +
- linux-user/gen_syscall_list.py |  82 +++++++
- 5 files changed, 595 insertions(+), 174 deletions(-)
- create mode 100644 linux-user/syscall.h
- create mode 100644 linux-user/gen_syscall_list.py
+ linux-user/syscall.h           |  51 ++++
+ linux-user/strace.c            |  35 ---
+ linux-user/syscall.c           | 402 +------------------------------
+ linux-user/syscall_file.c      | 423 +++++++++++++++++++++++++++++++++
+ linux-user/Makefile.objs       |   3 +-
+ linux-user/gen_syscall_list.py |   5 +
+ linux-user/strace.list         |  15 --
+ 7 files changed, 484 insertions(+), 450 deletions(-)
+ create mode 100644 linux-user/syscall_file.c
 
 diff --git a/linux-user/syscall.h b/linux-user/syscall.h
-new file mode 100644
-index 0000000000..7eb078c3e5
---- /dev/null
+index 7eb078c3e5..e35b0a60f5 100644
+--- a/linux-user/syscall.h
 +++ b/linux-user/syscall.h
-@@ -0,0 +1,178 @@
+@@ -125,6 +125,57 @@ static inline int is_error(abi_ulong ret)
+     return ret >= -4096;
+ }
+ 
++typedef abi_long (*TargetFdDataFunc)(void *, size_t);
++typedef abi_long (*TargetFdAddrFunc)(void *, abi_ulong, socklen_t);
++typedef struct TargetFdTrans {
++    TargetFdDataFunc host_to_target_data;
++    TargetFdDataFunc target_to_host_data;
++    TargetFdAddrFunc target_to_host_addr;
++} TargetFdTrans;
++
++extern TargetFdTrans **target_fd_trans;
++extern unsigned int target_fd_max;
++
++static inline TargetFdDataFunc fd_trans_target_to_host_data(int fd)
++{
++    if (fd >= 0 && fd < target_fd_max && target_fd_trans[fd]) {
++        return target_fd_trans[fd]->target_to_host_data;
++    }
++    return NULL;
++}
++
++static inline TargetFdDataFunc fd_trans_host_to_target_data(int fd)
++{
++    if (fd >= 0 && fd < target_fd_max && target_fd_trans[fd]) {
++        return target_fd_trans[fd]->host_to_target_data;
++    }
++    return NULL;
++}
++
++static inline TargetFdAddrFunc fd_trans_target_to_host_addr(int fd)
++{
++    if (fd >= 0 && fd < target_fd_max && target_fd_trans[fd]) {
++        return target_fd_trans[fd]->target_to_host_addr;
++    }
++    return NULL;
++}
++
++void fd_trans_register(int fd, TargetFdTrans *trans);
++
++static inline void fd_trans_unregister(int fd)
++{
++    if (fd >= 0 && fd < target_fd_max) {
++        target_fd_trans[fd] = NULL;
++    }
++}
++
++/* Temporary declarations from syscall_foo.c back to main syscall.c.
++ * These indicate incomplete conversion.
++ */
++
++int is_proc_myself(const char *filename, const char *entry);
++extern bitmask_transtbl const fcntl_flags_tbl[];
++
+ /* Declarators for interruptable system calls.  */
+ 
+ #define safe_syscall0(type, name) \
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 6375feb747..1ae0057365 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -2213,41 +2213,6 @@ print_mq_open(const struct syscallname *name,
+ }
+ #endif
+ 
+-#ifdef TARGET_NR_open
+-static void
+-print_open(const struct syscallname *name,
+-    abi_long arg0, abi_long arg1, abi_long arg2,
+-    abi_long arg3, abi_long arg4, abi_long arg5)
+-{
+-    int is_creat = (arg1 & TARGET_O_CREAT);
+-
+-    print_syscall_prologue(name);
+-    print_string(arg0, 0);
+-    print_open_flags(arg1, (is_creat == 0));
+-    if (is_creat)
+-        print_file_mode(arg2, 1);
+-    print_syscall_epilogue(name);
+-}
+-#endif
+-
+-#ifdef TARGET_NR_openat
+-static void
+-print_openat(const struct syscallname *name,
+-    abi_long arg0, abi_long arg1, abi_long arg2,
+-    abi_long arg3, abi_long arg4, abi_long arg5)
+-{
+-    int is_creat = (arg2 & TARGET_O_CREAT);
+-
+-    print_syscall_prologue(name);
+-    print_at_dirfd(arg0, 0);
+-    print_string(arg1, 0);
+-    print_open_flags(arg2, (is_creat == 0));
+-    if (is_creat)
+-        print_file_mode(arg3, 1);
+-    print_syscall_epilogue(name);
+-}
+-#endif
+-
+ #ifdef TARGET_NR_mq_unlink
+ static void
+ print_mq_unlink(const struct syscallname *name,
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index a96bbf9093..c47e73de5f 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -325,42 +325,6 @@ _syscall5(int, kcmp, pid_t, pid1, pid_t, pid2, int, type,
+           unsigned long, idx1, unsigned long, idx2)
+ #endif
+ 
+-static bitmask_transtbl fcntl_flags_tbl[] = {
+-  { TARGET_O_ACCMODE,   TARGET_O_WRONLY,    O_ACCMODE,   O_WRONLY,    },
+-  { TARGET_O_ACCMODE,   TARGET_O_RDWR,      O_ACCMODE,   O_RDWR,      },
+-  { TARGET_O_CREAT,     TARGET_O_CREAT,     O_CREAT,     O_CREAT,     },
+-  { TARGET_O_EXCL,      TARGET_O_EXCL,      O_EXCL,      O_EXCL,      },
+-  { TARGET_O_NOCTTY,    TARGET_O_NOCTTY,    O_NOCTTY,    O_NOCTTY,    },
+-  { TARGET_O_TRUNC,     TARGET_O_TRUNC,     O_TRUNC,     O_TRUNC,     },
+-  { TARGET_O_APPEND,    TARGET_O_APPEND,    O_APPEND,    O_APPEND,    },
+-  { TARGET_O_NONBLOCK,  TARGET_O_NONBLOCK,  O_NONBLOCK,  O_NONBLOCK,  },
+-  { TARGET_O_SYNC,      TARGET_O_DSYNC,     O_SYNC,      O_DSYNC,     },
+-  { TARGET_O_SYNC,      TARGET_O_SYNC,      O_SYNC,      O_SYNC,      },
+-  { TARGET_FASYNC,      TARGET_FASYNC,      FASYNC,      FASYNC,      },
+-  { TARGET_O_DIRECTORY, TARGET_O_DIRECTORY, O_DIRECTORY, O_DIRECTORY, },
+-  { TARGET_O_NOFOLLOW,  TARGET_O_NOFOLLOW,  O_NOFOLLOW,  O_NOFOLLOW,  },
+-#if defined(O_DIRECT)
+-  { TARGET_O_DIRECT,    TARGET_O_DIRECT,    O_DIRECT,    O_DIRECT,    },
+-#endif
+-#if defined(O_NOATIME)
+-  { TARGET_O_NOATIME,   TARGET_O_NOATIME,   O_NOATIME,   O_NOATIME    },
+-#endif
+-#if defined(O_CLOEXEC)
+-  { TARGET_O_CLOEXEC,   TARGET_O_CLOEXEC,   O_CLOEXEC,   O_CLOEXEC    },
+-#endif
+-#if defined(O_PATH)
+-  { TARGET_O_PATH,      TARGET_O_PATH,      O_PATH,      O_PATH       },
+-#endif
+-#if defined(O_TMPFILE)
+-  { TARGET_O_TMPFILE,   TARGET_O_TMPFILE,   O_TMPFILE,   O_TMPFILE    },
+-#endif
+-  /* Don't terminate the list prematurely on 64-bit host+guest.  */
+-#if TARGET_O_LARGEFILE != 0 || O_LARGEFILE != 0
+-  { TARGET_O_LARGEFILE, TARGET_O_LARGEFILE, O_LARGEFILE, O_LARGEFILE, },
+-#endif
+-  { 0, 0, 0, 0 }
+-};
+-
+ enum {
+     QEMU_IFLA_BR_UNSPEC,
+     QEMU_IFLA_BR_FORWARD_DELAY,
+@@ -539,43 +503,10 @@ enum {
+     QEMU___IFLA_XDP_MAX,
+ };
+ 
+-typedef abi_long (*TargetFdDataFunc)(void *, size_t);
+-typedef abi_long (*TargetFdAddrFunc)(void *, abi_ulong, socklen_t);
+-typedef struct TargetFdTrans {
+-    TargetFdDataFunc host_to_target_data;
+-    TargetFdDataFunc target_to_host_data;
+-    TargetFdAddrFunc target_to_host_addr;
+-} TargetFdTrans;
++TargetFdTrans **target_fd_trans;
++unsigned int target_fd_max;
+ 
+-static TargetFdTrans **target_fd_trans;
+-
+-static unsigned int target_fd_max;
+-
+-static TargetFdDataFunc fd_trans_target_to_host_data(int fd)
+-{
+-    if (fd >= 0 && fd < target_fd_max && target_fd_trans[fd]) {
+-        return target_fd_trans[fd]->target_to_host_data;
+-    }
+-    return NULL;
+-}
+-
+-static TargetFdDataFunc fd_trans_host_to_target_data(int fd)
+-{
+-    if (fd >= 0 && fd < target_fd_max && target_fd_trans[fd]) {
+-        return target_fd_trans[fd]->host_to_target_data;
+-    }
+-    return NULL;
+-}
+-
+-static TargetFdAddrFunc fd_trans_target_to_host_addr(int fd)
+-{
+-    if (fd >= 0 && fd < target_fd_max && target_fd_trans[fd]) {
+-        return target_fd_trans[fd]->target_to_host_addr;
+-    }
+-    return NULL;
+-}
+-
+-static void fd_trans_register(int fd, TargetFdTrans *trans)
++void fd_trans_register(int fd, TargetFdTrans *trans)
+ {
+     unsigned int oldmax;
+ 
+@@ -590,13 +521,6 @@ static void fd_trans_register(int fd, TargetFdTrans *trans)
+     target_fd_trans[fd] = trans;
+ }
+ 
+-static void fd_trans_unregister(int fd)
+-{
+-    if (fd >= 0 && fd < target_fd_max) {
+-        target_fd_trans[fd] = NULL;
+-    }
+-}
+-
+ static void fd_trans_dup(int oldfd, int newfd)
+ {
+     fd_trans_unregister(newfd);
+@@ -913,10 +837,6 @@ const char *target_strerror(int err)
+     return strerror(target_to_host_errno(err));
+ }
+ 
+-safe_syscall3(ssize_t, read, int, fd, void *, buff, size_t, count)
+-safe_syscall3(ssize_t, write, int, fd, const void *, buff, size_t, count)
+-safe_syscall4(int, openat, int, dirfd, const char *, pathname, \
+-              int, flags, mode_t, mode)
+ safe_syscall4(pid_t, wait4, pid_t, pid, int *, status, int, options, \
+               struct rusage *, rusage)
+ safe_syscall5(int, waitid, idtype_t, idtype, id_t, id, siginfo_t *, infop, \
+@@ -7490,267 +7410,6 @@ int host_to_target_waitstatus(int status)
+     return status;
+ }
+ 
+-static int open_self_cmdline(void *cpu_env, int fd)
+-{
+-    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
+-    struct linux_binprm *bprm = ((TaskState *)cpu->opaque)->bprm;
+-    int i;
+-
+-    for (i = 0; i < bprm->argc; i++) {
+-        size_t len = strlen(bprm->argv[i]) + 1;
+-
+-        if (write(fd, bprm->argv[i], len) != len) {
+-            return -1;
+-        }
+-    }
+-
+-    return 0;
+-}
+-
+-static int open_self_maps(void *cpu_env, int fd)
+-{
+-    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
+-    TaskState *ts = cpu->opaque;
+-    FILE *fp;
+-    char *line = NULL;
+-    size_t len = 0;
+-    ssize_t read;
+-
+-    fp = fopen("/proc/self/maps", "r");
+-    if (fp == NULL) {
+-        return -1;
+-    }
+-
+-    while ((read = getline(&line, &len, fp)) != -1) {
+-        int fields, dev_maj, dev_min, inode;
+-        uint64_t min, max, offset;
+-        char flag_r, flag_w, flag_x, flag_p;
+-        char path[512] = "";
+-        fields = sscanf(line, "%"PRIx64"-%"PRIx64" %c%c%c%c %"PRIx64" %x:%x %d"
+-                        " %512s", &min, &max, &flag_r, &flag_w, &flag_x,
+-                        &flag_p, &offset, &dev_maj, &dev_min, &inode, path);
+-
+-        if ((fields < 10) || (fields > 11)) {
+-            continue;
+-        }
+-        if (h2g_valid(min)) {
+-            int flags = page_get_flags(h2g(min));
+-            max = h2g_valid(max - 1) ? max : (uintptr_t)g2h(GUEST_ADDR_MAX) + 1;
+-            if (page_check_range(h2g(min), max - min, flags) == -1) {
+-                continue;
+-            }
+-            if (h2g(min) == ts->info->stack_limit) {
+-                pstrcpy(path, sizeof(path), "      [stack]");
+-            }
+-            dprintf(fd, TARGET_ABI_FMT_lx "-" TARGET_ABI_FMT_lx
+-                    " %c%c%c%c %08" PRIx64 " %02x:%02x %d %s%s\n",
+-                    h2g(min), h2g(max - 1) + 1, flag_r, flag_w,
+-                    flag_x, flag_p, offset, dev_maj, dev_min, inode,
+-                    path[0] ? "         " : "", path);
+-        }
+-    }
+-
+-    free(line);
+-    fclose(fp);
+-
+-    return 0;
+-}
+-
+-static int open_self_stat(void *cpu_env, int fd)
+-{
+-    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
+-    TaskState *ts = cpu->opaque;
+-    abi_ulong start_stack = ts->info->start_stack;
+-    int i;
+-
+-    for (i = 0; i < 44; i++) {
+-      char buf[128];
+-      int len;
+-      uint64_t val = 0;
+-
+-      if (i == 0) {
+-        /* pid */
+-        val = getpid();
+-        snprintf(buf, sizeof(buf), "%"PRId64 " ", val);
+-      } else if (i == 1) {
+-        /* app name */
+-        snprintf(buf, sizeof(buf), "(%s) ", ts->bprm->argv[0]);
+-      } else if (i == 27) {
+-        /* stack bottom */
+-        val = start_stack;
+-        snprintf(buf, sizeof(buf), "%"PRId64 " ", val);
+-      } else {
+-        /* for the rest, there is MasterCard */
+-        snprintf(buf, sizeof(buf), "0%c", i == 43 ? '\n' : ' ');
+-      }
+-
+-      len = strlen(buf);
+-      if (write(fd, buf, len) != len) {
+-          return -1;
+-      }
+-    }
+-
+-    return 0;
+-}
+-
+-static int open_self_auxv(void *cpu_env, int fd)
+-{
+-    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
+-    TaskState *ts = cpu->opaque;
+-    abi_ulong auxv = ts->info->saved_auxv;
+-    abi_ulong len = ts->info->auxv_len;
+-    char *ptr;
+-
+-    /*
+-     * Auxiliary vector is stored in target process stack.
+-     * read in whole auxv vector and copy it to file
+-     */
+-    ptr = lock_user(VERIFY_READ, auxv, len, 0);
+-    if (ptr != NULL) {
+-        while (len > 0) {
+-            ssize_t r;
+-            r = write(fd, ptr, len);
+-            if (r <= 0) {
+-                break;
+-            }
+-            len -= r;
+-            ptr += r;
+-        }
+-        lseek(fd, 0, SEEK_SET);
+-        unlock_user(ptr, auxv, len);
+-    }
+-
+-    return 0;
+-}
+-
+-static int is_proc_myself(const char *filename, const char *entry)
+-{
+-    if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
+-        filename += strlen("/proc/");
+-        if (!strncmp(filename, "self/", strlen("self/"))) {
+-            filename += strlen("self/");
+-        } else if (*filename >= '1' && *filename <= '9') {
+-            char myself[80];
+-            snprintf(myself, sizeof(myself), "%d/", getpid());
+-            if (!strncmp(filename, myself, strlen(myself))) {
+-                filename += strlen(myself);
+-            } else {
+-                return 0;
+-            }
+-        } else {
+-            return 0;
+-        }
+-        if (!strcmp(filename, entry)) {
+-            return 1;
+-        }
+-    }
+-    return 0;
+-}
+-
+-#if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+-static int is_proc(const char *filename, const char *entry)
+-{
+-    return strcmp(filename, entry) == 0;
+-}
+-
+-static int open_net_route(void *cpu_env, int fd)
+-{
+-    FILE *fp;
+-    char *line = NULL;
+-    size_t len = 0;
+-    ssize_t read;
+-
+-    fp = fopen("/proc/net/route", "r");
+-    if (fp == NULL) {
+-        return -1;
+-    }
+-
+-    /* read header */
+-
+-    read = getline(&line, &len, fp);
+-    dprintf(fd, "%s", line);
+-
+-    /* read routes */
+-
+-    while ((read = getline(&line, &len, fp)) != -1) {
+-        char iface[16];
+-        uint32_t dest, gw, mask;
+-        unsigned int flags, refcnt, use, metric, mtu, window, irtt;
+-        sscanf(line, "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
+-                     iface, &dest, &gw, &flags, &refcnt, &use, &metric,
+-                     &mask, &mtu, &window, &irtt);
+-        dprintf(fd, "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
+-                iface, tswap32(dest), tswap32(gw), flags, refcnt, use,
+-                metric, tswap32(mask), mtu, window, irtt);
+-    }
+-
+-    free(line);
+-    fclose(fp);
+-
+-    return 0;
+-}
+-#endif
+-
+-static int do_openat(void *cpu_env, int dirfd, const char *pathname, int flags, mode_t mode)
+-{
+-    struct fake_open {
+-        const char *filename;
+-        int (*fill)(void *cpu_env, int fd);
+-        int (*cmp)(const char *s1, const char *s2);
+-    };
+-    const struct fake_open *fake_open;
+-    static const struct fake_open fakes[] = {
+-        { "maps", open_self_maps, is_proc_myself },
+-        { "stat", open_self_stat, is_proc_myself },
+-        { "auxv", open_self_auxv, is_proc_myself },
+-        { "cmdline", open_self_cmdline, is_proc_myself },
+-#if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+-        { "/proc/net/route", open_net_route, is_proc },
+-#endif
+-        { NULL, NULL, NULL }
+-    };
+-
+-    if (is_proc_myself(pathname, "exe")) {
+-        int execfd = qemu_getauxval(AT_EXECFD);
+-        return execfd ? execfd : safe_openat(dirfd, exec_path, flags, mode);
+-    }
+-
+-    for (fake_open = fakes; fake_open->filename; fake_open++) {
+-        if (fake_open->cmp(pathname, fake_open->filename)) {
+-            break;
+-        }
+-    }
+-
+-    if (fake_open->filename) {
+-        const char *tmpdir;
+-        char filename[PATH_MAX];
+-        int fd, r;
+-
+-        /* create temporary file to map stat to */
+-        tmpdir = getenv("TMPDIR");
+-        if (!tmpdir)
+-            tmpdir = "/tmp";
+-        snprintf(filename, sizeof(filename), "%s/qemu-open.XXXXXX", tmpdir);
+-        fd = mkstemp(filename);
+-        if (fd < 0) {
+-            return fd;
+-        }
+-        unlink(filename);
+-
+-        if ((r = fake_open->fill(cpu_env, fd))) {
+-            int e = errno;
+-            close(fd);
+-            errno = e;
+-            return r;
+-        }
+-        lseek(fd, 0, SEEK_SET);
+-
+-        return fd;
+-    }
+-
+-    return safe_openat(dirfd, path(pathname), flags, mode);
+-}
+-
+ #define TIMER_MAGIC 0x0caf0000
+ #define TIMER_MAGIC_MASK 0xffff0000
+ 
+@@ -7945,57 +7604,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         gdb_exit(cpu_env, arg1);
+         _exit(arg1);
+         return 0; /* avoid warning */
+-    case TARGET_NR_read:
+-        if (arg3 == 0) {
+-            return 0;
+-        } else {
+-            if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
+-                return -TARGET_EFAULT;
+-            ret = get_errno(safe_read(arg1, p, arg3));
+-            if (ret >= 0 &&
+-                fd_trans_host_to_target_data(arg1)) {
+-                ret = fd_trans_host_to_target_data(arg1)(p, ret);
+-            }
+-            unlock_user(p, arg2, ret);
+-        }
+-        return ret;
+-    case TARGET_NR_write:
+-        if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
+-            return -TARGET_EFAULT;
+-        if (fd_trans_target_to_host_data(arg1)) {
+-            void *copy = g_malloc(arg3);
+-            memcpy(copy, p, arg3);
+-            ret = fd_trans_target_to_host_data(arg1)(copy, arg3);
+-            if (ret >= 0) {
+-                ret = get_errno(safe_write(arg1, copy, ret));
+-            }
+-            g_free(copy);
+-        } else {
+-            ret = get_errno(safe_write(arg1, p, arg3));
+-        }
+-        unlock_user(p, arg2, 0);
+-        return ret;
+-
+-#ifdef TARGET_NR_open
+-    case TARGET_NR_open:
+-        if (!(p = lock_user_string(arg1)))
+-            return -TARGET_EFAULT;
+-        ret = get_errno(do_openat(cpu_env, AT_FDCWD, p,
+-                                  target_to_host_bitmask(arg2, fcntl_flags_tbl),
+-                                  arg3));
+-        fd_trans_unregister(ret);
+-        unlock_user(p, arg1, 0);
+-        return ret;
+-#endif
+-    case TARGET_NR_openat:
+-        if (!(p = lock_user_string(arg2)))
+-            return -TARGET_EFAULT;
+-        ret = get_errno(do_openat(cpu_env, arg1, p,
+-                                  target_to_host_bitmask(arg3, fcntl_flags_tbl),
+-                                  arg4));
+-        fd_trans_unregister(ret);
+-        unlock_user(p, arg2, 0);
+-        return ret;
+ #if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
+     case TARGET_NR_name_to_handle_at:
+         ret = do_name_to_handle_at(arg1, arg2, arg3, arg4, arg5);
+@@ -8007,10 +7615,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         fd_trans_unregister(ret);
+         return ret;
+ #endif
+-    case TARGET_NR_close:
+-        fd_trans_unregister(arg1);
+-        return get_errno(close(arg1));
+-
+     case TARGET_NR_brk:
+         return do_brk(arg1);
+ #ifdef TARGET_NR_fork
+diff --git a/linux-user/syscall_file.c b/linux-user/syscall_file.c
+new file mode 100644
+index 0000000000..d11128787f
+--- /dev/null
++++ b/linux-user/syscall_file.c
+@@ -0,0 +1,423 @@
 +/*
-+ *  Linux syscalls internals
-+ *  Copyright (c) 2018 Linaro, Limited.
++ *  Linux file-related syscalls
++ *  Copyright (c) 2003 Fabrice Bellard
 + *
 + *  This program is free software; you can redistribute it and/or modify
 + *  it under the terms of the GNU General Public License as published by
@@ -68,932 +629,494 @@ index 0000000000..7eb078c3e5
 + *  You should have received a copy of the GNU General Public License
 + *  along with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
++#include "qemu/osdep.h"
++#include "qemu/cutils.h"
++#include "qemu/path.h"
++#include "qemu.h"
++#include "syscall.h"
++#include <elf.h>
++#include <linux/unistd.h>
 +
-+typedef struct SyscallDef SyscallDef;
 +
-+/* This hook extracts max 6 arguments from max 8 input registers.
-+ * In the process, register pairs that store 64-bit arguments are merged.
-+ * Finally, syscalls are demultipliexed; e.g. the hook for socketcall will
-+ * return the SyscallDef for bind, listen, etc.  In the process the hook
-+ * may need to read from guest memory, or otherwise validate operands.
-+ * On failure, set errno (to a host value) and return NULL;
-+ * the (target adjusted) errno will be returned to the guest.
-+ */
-+typedef const SyscallDef *SyscallArgsFn(const SyscallDef *, int64_t out[6],
-+                                        abi_long in[8]);
++safe_syscall4(int, openat, int, dirfd, const char *, pathname, \
++              int, flags, mode_t, mode)
++safe_syscall3(ssize_t, read, int, fd, void *, buff, size_t, count)
++safe_syscall3(ssize_t, write, int, fd, const void *, buff, size_t, count)
 +
-+/* This hook implements the syscall.  */
-+typedef abi_long SyscallImplFn(CPUArchState *, int64_t, int64_t, int64_t,
-+                               int64_t, int64_t, int64_t);
-+
-+/* This hook prints the arguments to the syscall for strace.  */
-+typedef void SyscallPrintFn(const SyscallDef *, int64_t arg[6]);
-+
-+/* This hook print the return value from the syscall for strace.  */
-+typedef void SyscallPrintRetFn(const SyscallDef *, abi_long);
-+
-+/* These flags describe the arguments for the generic fallback to
-+ * SyscallPrintFn.  ARG_NONE indicates that the argument is not present.
-+ */
-+typedef enum {
-+    ARG_NONE = 0,
-+
-+    /* These print as numbers of abi_long.  */
-+    ARG_DEC,
-+    ARG_HEX,
-+    ARG_OCT,
-+
-+    /* These print as sets of flags.  */
-+    ARG_ATDIRFD,
-+    ARG_MODEFLAG,
-+    ARG_OPENFLAG,
-+
-+    /* These are interpreted as pointers.  */
-+    ARG_PTR,
-+    ARG_STR,
-+    ARG_BUF,
-+
-+    /* For a 32-bit host, force printing as a 64-bit operand.  */
-+#if TARGET_ABI_BITS == 32
-+    ARG_DEC64,
-+#else
-+    ARG_DEC64 = ARG_DEC,
++bitmask_transtbl const fcntl_flags_tbl[] = {
++  { TARGET_O_ACCMODE,   TARGET_O_WRONLY,    O_ACCMODE,   O_WRONLY,    },
++  { TARGET_O_ACCMODE,   TARGET_O_RDWR,      O_ACCMODE,   O_RDWR,      },
++  { TARGET_O_CREAT,     TARGET_O_CREAT,     O_CREAT,     O_CREAT,     },
++  { TARGET_O_EXCL,      TARGET_O_EXCL,      O_EXCL,      O_EXCL,      },
++  { TARGET_O_NOCTTY,    TARGET_O_NOCTTY,    O_NOCTTY,    O_NOCTTY,    },
++  { TARGET_O_TRUNC,     TARGET_O_TRUNC,     O_TRUNC,     O_TRUNC,     },
++  { TARGET_O_APPEND,    TARGET_O_APPEND,    O_APPEND,    O_APPEND,    },
++  { TARGET_O_NONBLOCK,  TARGET_O_NONBLOCK,  O_NONBLOCK,  O_NONBLOCK,  },
++  { TARGET_O_SYNC,      TARGET_O_DSYNC,     O_SYNC,      O_DSYNC,     },
++  { TARGET_O_SYNC,      TARGET_O_SYNC,      O_SYNC,      O_SYNC,      },
++  { TARGET_FASYNC,      TARGET_FASYNC,      FASYNC,      FASYNC,      },
++  { TARGET_O_DIRECTORY, TARGET_O_DIRECTORY, O_DIRECTORY, O_DIRECTORY, },
++  { TARGET_O_NOFOLLOW,  TARGET_O_NOFOLLOW,  O_NOFOLLOW,  O_NOFOLLOW,  },
++#if defined(O_DIRECT)
++  { TARGET_O_DIRECT,    TARGET_O_DIRECT,    O_DIRECT,    O_DIRECT,    },
 +#endif
-+} SyscallArgType;
-+
-+struct SyscallDef {
-+    const char *name;
-+    SyscallArgsFn *args;
-+    SyscallImplFn *impl;
-+    SyscallPrintFn *print;
-+    SyscallPrintRetFn *print_ret;
-+    SyscallArgType arg_type[6];
++#if defined(O_NOATIME)
++  { TARGET_O_NOATIME,   TARGET_O_NOATIME,   O_NOATIME,   O_NOATIME    },
++#endif
++#if defined(O_CLOEXEC)
++  { TARGET_O_CLOEXEC,   TARGET_O_CLOEXEC,   O_CLOEXEC,   O_CLOEXEC    },
++#endif
++#if defined(O_PATH)
++  { TARGET_O_PATH,      TARGET_O_PATH,      O_PATH,      O_PATH       },
++#endif
++#if defined(O_TMPFILE)
++  { TARGET_O_TMPFILE,   TARGET_O_TMPFILE,   O_TMPFILE,   O_TMPFILE    },
++#endif
++  /* Don't terminate the list prematurely on 64-bit host+guest.  */
++#if TARGET_O_LARGEFILE != 0 || O_LARGEFILE != 0
++  { TARGET_O_LARGEFILE, TARGET_O_LARGEFILE, O_LARGEFILE, O_LARGEFILE, },
++#endif
++  { 0, 0, 0, 0 }
 +};
 +
-+void print_syscall_def(const SyscallDef *def, int64_t args[6]);
-+void print_syscall_def_ret(const SyscallDef *def, abi_long ret);
-+void print_syscall_ptr_ret(const SyscallDef *def, abi_long ret);
 +
-+/* Emit the signature for a SyscallArgsFn.  */
-+#define SYSCALL_ARGS(NAME) \
-+    static const SyscallDef *args_##NAME(const SyscallDef *def, \
-+                                         int64_t out[6], abi_long in[8])
-+
-+/* Emit the signature for a SyscallImplFn.  */
-+#define SYSCALL_IMPL(NAME) \
-+    static abi_long impl_##NAME(CPUArchState *cpu_env, int64_t arg1, \
-+                                int64_t arg2, int64_t arg3, int64_t arg4, \
-+                                int64_t arg5, int64_t arg6)
-+
-+/* Emit the definition for a "simple" syscall.  Such does not use
-+ * SyscallArgsFn and only uses arg_type for strace.
-+ */
-+#define SYSCALL_DEF(NAME, ...) \
-+    const SyscallDef def_##NAME = { \
-+        .name = #NAME, .impl = impl_##NAME, .arg_type = { __VA_ARGS__ } \
-+    }
-+
-+/* Emit the definition for a syscall that also has an args hook,
-+ * and uses arg_type for strace.
-+ */
-+#define SYSCALL_DEF_ARGS(NAME, ...) \
-+    const SyscallDef def_##NAME = { \
-+        .name = #NAME, .args = args_##NAME, .impl = impl_##NAME, \
-+        .arg_type = { __VA_ARGS__ } \
-+    }
-+
-+/* Declarations from the main syscall.c for use in syscall_foo.c,
-+ * or for the moment, vice versa.
++/*
++ * Helpers for do_openat, manipulating /proc/self/foo.
 + */
 +
-+int host_to_target_errno(int err);
-+
-+static inline abi_long get_errno(abi_long ret)
++static int open_self_cmdline(void *cpu_env, int fd)
 +{
-+    return unlikely(ret == -1) ? -host_to_target_errno(errno) : ret;
-+}
++    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
++    struct linux_binprm *bprm = ((TaskState *)cpu->opaque)->bprm;
++    int i;
 +
-+static inline int is_error(abi_ulong ret)
-+{
-+    return ret >= -4096;
-+}
++    for (i = 0; i < bprm->argc; i++) {
++        size_t len = strlen(bprm->argv[i]) + 1;
 +
-+/* Declarators for interruptable system calls.  */
-+
-+#define safe_syscall0(type, name) \
-+static type safe_##name(void) \
-+{ \
-+    return safe_syscall(__NR_##name); \
-+}
-+
-+#define safe_syscall1(type, name, type1, arg1) \
-+static type safe_##name(type1 arg1) \
-+{ \
-+    return safe_syscall(__NR_##name, arg1); \
-+}
-+
-+#define safe_syscall2(type, name, type1, arg1, type2, arg2) \
-+static type safe_##name(type1 arg1, type2 arg2) \
-+{ \
-+    return safe_syscall(__NR_##name, arg1, arg2); \
-+}
-+
-+#define safe_syscall3(type, name, type1, arg1, type2, arg2, type3, arg3) \
-+static type safe_##name(type1 arg1, type2 arg2, type3 arg3) \
-+{ \
-+    return safe_syscall(__NR_##name, arg1, arg2, arg3); \
-+}
-+
-+#define safe_syscall4(type, name, type1, arg1, type2, arg2, type3, arg3, \
-+    type4, arg4) \
-+static type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4) \
-+{ \
-+    return safe_syscall(__NR_##name, arg1, arg2, arg3, arg4); \
-+}
-+
-+#define safe_syscall5(type, name, type1, arg1, type2, arg2, type3, arg3, \
-+    type4, arg4, type5, arg5) \
-+static type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, \
-+    type5 arg5) \
-+{ \
-+    return safe_syscall(__NR_##name, arg1, arg2, arg3, arg4, arg5); \
-+}
-+
-+#define safe_syscall6(type, name, type1, arg1, type2, arg2, type3, arg3, \
-+    type4, arg4, type5, arg5, type6, arg6) \
-+static type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, \
-+    type5 arg5, type6 arg6) \
-+{ \
-+    return safe_syscall(__NR_##name, arg1, arg2, arg3, arg4, arg5, arg6); \
-+}
-+
-+/* Include declarations of syscall definitions.  */
-+#include "syscall_list.h"
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index bd897a3f20..6375feb747 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -10,6 +10,7 @@
- #include <linux/if_packet.h>
- #include <sched.h>
- #include "qemu.h"
-+#include "syscall.h"
- 
- int do_strace=0;
- 
-@@ -796,7 +797,7 @@ UNUSED static struct flags unlinkat_flags[] = {
-     FLAG_END,
- };
- 
--UNUSED static struct flags mode_flags[] = {
-+static struct flags const mode_flags[] = {
-     FLAG_GENERIC(S_IFSOCK),
-     FLAG_GENERIC(S_IFLNK),
-     FLAG_GENERIC(S_IFREG),
-@@ -807,14 +808,14 @@ UNUSED static struct flags mode_flags[] = {
-     FLAG_END,
- };
- 
--UNUSED static struct flags open_access_flags[] = {
-+static struct flags const open_access_flags[] = {
-     FLAG_TARGET(O_RDONLY),
-     FLAG_TARGET(O_WRONLY),
-     FLAG_TARGET(O_RDWR),
-     FLAG_END,
- };
- 
--UNUSED static struct flags open_flags[] = {
-+static struct flags const open_flags[] = {
-     FLAG_TARGET(O_APPEND),
-     FLAG_TARGET(O_CREAT),
-     FLAG_TARGET(O_DIRECTORY),
-@@ -989,84 +990,86 @@ get_comma(int last)
-     return ((last) ? "" : ",");
- }
- 
-+static int add_flags(char *buf, int size, const struct flags *f,
-+                     int flags, bool octal)
-+{
-+    const char *sep = "";
-+    int off = 0;
-+
-+    if (flags == 0 && f->f_value == 0) {
-+        return snprintf(buf, size, "%s", f->f_string);
-+    }
-+
-+    for (; f->f_string != NULL; f++) {
-+        if (f->f_value != 0 && (flags & f->f_value) == f->f_value) {
-+            off += snprintf(buf + off, size - off, "%s%s", sep, f->f_string);
-+            flags &= ~f->f_value;
-+            sep = "|";
++        if (write(fd, bprm->argv[i], len) != len) {
++            return -1;
 +        }
 +    }
 +
-+    /* Print rest of the flags as numeric.  */
-+    if (flags) {
-+        if (octal) {
-+            off += snprintf(buf + off, size - off, "%s%#o", sep, flags);
-+        } else {
-+            off += snprintf(buf + off, size - off, "%s%#x", sep, flags);
-+        }
-+    }
-+    return off;
++    return 0;
 +}
 +
- static void
- print_flags(const struct flags *f, abi_long flags, int last)
- {
--    const char *sep = "";
--    int n;
-+    char buf[256];
-+    add_flags(buf, sizeof(buf), f, flags, false);
-+    gemu_log("%s%s", buf, get_comma(last));
-+}
- 
--    if ((flags == 0) && (f->f_value == 0)) {
--        gemu_log("%s%s", f->f_string, get_comma(last));
--        return;
--    }
--    for (n = 0; f->f_string != NULL; f++) {
--        if ((f->f_value != 0) && ((flags & f->f_value) == f->f_value)) {
--            gemu_log("%s%s", sep, f->f_string);
--            flags &= ~f->f_value;
--            sep = "|";
--            n++;
--        }
--    }
--
--    if (n > 0) {
--        /* print rest of the flags as numeric */
--        if (flags != 0) {
--            gemu_log("%s%#x%s", sep, (unsigned int)flags, get_comma(last));
--        } else {
--            gemu_log("%s", get_comma(last));
--        }
-+static int add_atdirfd(char *buf, int size, int fd)
++static int open_self_maps(void *cpu_env, int fd)
 +{
-+    if (fd == AT_FDCWD) {
-+        return snprintf(buf, size, "AT_FDCWD");
-     } else {
--        /* no string version of flags found, print them in hex then */
--        gemu_log("%#x%s", (unsigned int)flags, get_comma(last));
-+        return snprintf(buf, size, "%d", fd);
-     }
- }
- 
- static void
- print_at_dirfd(abi_long dirfd, int last)
- {
--#ifdef AT_FDCWD
--    if (dirfd == AT_FDCWD) {
--        gemu_log("AT_FDCWD%s", get_comma(last));
--        return;
--    }
--#endif
--    gemu_log("%d%s", (int)dirfd, get_comma(last));
-+    char buf[16];
-+    add_atdirfd(buf, sizeof(buf), dirfd);
-+    gemu_log("%s%s", buf, get_comma(last));
- }
- 
- static void
- print_file_mode(abi_long mode, int last)
- {
--    const char *sep = "";
--    const struct flags *m;
-+    char buf[256];
-+    add_flags(buf, sizeof(buf), mode_flags, mode, true);
-+    gemu_log("%s%s", buf, get_comma(last));
-+}
- 
--    for (m = &mode_flags[0]; m->f_string != NULL; m++) {
--        if ((m->f_value & mode) == m->f_value) {
--            gemu_log("%s%s", m->f_string, sep);
--            sep = "|";
--            mode &= ~m->f_value;
--            break;
--        }
-+static int add_open_flags(char *buf, int size, int flags)
-+{
-+    int off = add_flags(buf, size, open_access_flags,
-+                        flags & TARGET_O_ACCMODE, false);
-+    flags &= ~TARGET_O_ACCMODE;
-+    if (flags == 0 || off + 2 >= size) {
-+        return off;
-     }
--
--    mode &= ~S_IFMT;
--    /* print rest of the mode as octal */
--    if (mode != 0)
--        gemu_log("%s%#o", sep, (unsigned int)mode);
--
--    gemu_log("%s", get_comma(last));
-+    buf[off++] = '|';
-+    return off + add_flags(buf + off, size - off, open_flags, flags, true);
- }
- 
- static void
- print_open_flags(abi_long flags, int last)
- {
--    print_flags(open_access_flags, flags & TARGET_O_ACCMODE, 1);
--    flags &= ~TARGET_O_ACCMODE;
--    if (flags == 0) {
--        gemu_log("%s", get_comma(last));
--        return;
--    }
--    gemu_log("|");
--    print_flags(open_flags, flags, last);
-+    char buf[256];
-+    add_open_flags(buf, sizeof(buf), flags);
-+    gemu_log("%s%s", buf, get_comma(last));
- }
- 
- static void
-@@ -1083,48 +1086,86 @@ print_syscall_epilogue(const struct syscallname *sc)
-     gemu_log(")");
- }
- 
--static void
--print_string(abi_long addr, int last)
-+static int add_pointer(char *buf, int size, abi_ulong addr)
- {
--    char *s;
--
--    if ((s = lock_user_string(addr)) != NULL) {
--        gemu_log("\"%s\"%s", s, get_comma(last));
--        unlock_user(s, addr, 0);
-+    if (addr) {
-+        return snprintf(buf, size, "0x" TARGET_ABI_FMT_lx, addr);
-     } else {
--        /* can't get string out of it, so print it as pointer */
--        print_pointer(addr, last);
-+        return snprintf(buf, size, "NULL");
-     }
- }
- 
-+static int add_string(char *buf, int size, abi_ulong addr)
-+{
-+    char *s = lock_user_string(addr);
-+    if (s) {
-+        /* TODO: Escape special characters within the string.  */
-+        /* TODO: Limit the string length for logging.  */
-+        int len = snprintf(buf, size, "\"%s\"", s);
-+        unlock_user(s, addr, 0);
-+        return len;
-+    }
-+    return add_pointer(buf, size, addr);
-+}
++    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
++    TaskState *ts = cpu->opaque;
++    FILE *fp;
++    char *line = NULL;
++    size_t len = 0;
++    ssize_t read;
 +
-+static void
-+print_string(abi_long addr, int last)
-+{
-+    char buf[256];
-+    add_string(buf, sizeof(buf), addr);
-+    gemu_log("%s%s", buf, get_comma(last));
-+}
-+
- #define MAX_PRINT_BUF 40
-+
-+static int add_buffer(char *buf, int size, abi_long addr, abi_ulong len)
-+{
-+    unsigned char *p;
-+    int off = 0;
-+    abi_ulong i;
-+
-+    p = lock_user(VERIFY_READ, addr, MIN(len, MAX_PRINT_BUF), 1);
-+    if (!p) {
-+        return add_pointer(buf, size, addr);
++    fp = fopen("/proc/self/maps", "r");
++    if (fp == NULL) {
++        return -1;
 +    }
 +
-+    buf[0] = '"';
-+    off = 1;
++    while ((read = getline(&line, &len, fp)) != -1) {
++        int fields, dev_maj, dev_min, inode;
++        uint64_t min, max, offset;
++        char flag_r, flag_w, flag_x, flag_p;
++        char path[512] = "";
 +
-+    for (i = 0; i < MAX_PRINT_BUF; ++i) {
-+        int len;
++        fields = sscanf(line, "%"PRIx64"-%"PRIx64" %c%c%c%c %"
++                        PRIx64" %x:%x %d %512s",
++                        &min, &max, &flag_r, &flag_w, &flag_x,
++                        &flag_p, &offset, &dev_maj, &dev_min, &inode, path);
 +
-+        if (isprint(p[i])) {
-+            buf[off] = p[i];
-+            len = 1;
-+        } else {
-+            len = snprintf(buf + off, size - off, "\\%o", p[i]);
++        if ((fields < 10) || (fields > 11)) {
++            continue;
 +        }
-+        off += len;
-+        if (off + 2 >= size) {
-+            goto overflow;
-+        }
-+    }
-+    unlock_user(p, addr, 0);
++        if (h2g_valid(min)) {
++            int flags = page_get_flags(h2g(min));
 +
-+    if (i == len && off + 2 < size) {
-+        buf[off] = '"';
-+        buf[off + 1] = 0;
-+        return off + 1;
-+    }
-+
-+ overflow:
-+    off = MIN(off, size - 5);
-+    strcpy(buf + off, "...\"");
-+    return off + 4;
-+}
-+
- static void
- print_buf(abi_long addr, abi_long len, int last)
- {
--    uint8_t *s;
--    int i;
--
--    s = lock_user(VERIFY_READ, addr, len, 1);
--    if (s) {
--        gemu_log("\"");
--        for (i = 0; i < MAX_PRINT_BUF && i < len; i++) {
--            if (isprint(s[i])) {
--                gemu_log("%c", s[i]);
--            } else {
--                gemu_log("\\%o", s[i]);
--            }
--        }
--        gemu_log("\"");
--        if (i != len) {
--            gemu_log("...");
--        }
--        if (!last) {
--            gemu_log(",");
--        }
--        unlock_user(s, addr, 0);
--    } else {
--        print_pointer(addr, last);
--    }
-+    char buf[256];
-+    add_buffer(buf, sizeof(buf), addr, len);
-+    gemu_log("%s%s", buf, get_comma(last));
- }
- 
- /*
-@@ -1143,10 +1184,9 @@ print_raw_param(const char *fmt, abi_long param, int last)
- static void
- print_pointer(abi_long p, int last)
- {
--    if (p == 0)
--        gemu_log("NULL%s", get_comma(last));
--    else
--        gemu_log("0x" TARGET_ABI_FMT_lx "%s", p, get_comma(last));
-+    char buf[24];
-+    add_pointer(buf, sizeof(buf), p);
-+    gemu_log("%s%s", buf, get_comma(last));
- }
- 
- /*
-@@ -2623,32 +2663,168 @@ print_syscall(int num,
-     gemu_log("Unknown syscall %d\n", num);
- }
- 
-+static void print_syscall_def1(const SyscallDef *def, int64_t args[6])
-+{
-+    char buf[1024], *b = buf;
-+    int i, rest = sizeof(buf);
-+
-+    /* Render the argument list into BUF.  This allows us to log the
-+     * entire syscall in one write statement at the end.
-+     * While this is still not quite as good as separate files, a-la
-+     * strace -ff, it can minimize confusion with a multithreaded guest.
-+     */
-+    buf[0] = 0;
-+    for (i = 0; i < 6; ++i) {
-+        SyscallArgType type = def->arg_type[i];
-+        int64_t arg = args[i];
-+        int len;
-+
-+        if (type == ARG_NONE) {
-+            break;
-+        }
-+
-+        /* Validate remaining space.  */
-+        if (rest < 4) {
-+            goto overflow;
-+        }
-+
-+        /* Add separator.  */
-+        if (i > 0) {
-+            b[0] = ',';
-+            b[1] = ' ';
-+            b += 2;
-+            rest -= 2;
-+        }
-+
-+        switch (type) {
-+#if TARGET_ABI_BITS == 32
-+        /* ??? We don't have TARGET_ABI_FMT_* macros for exactly
-+         * what we want here.  For this case it probably makes
-+         * most sense to just special case.
-+         */
-+        case ARG_DEC:
-+            len = snprintf(b, rest, "%d", (int32_t)arg);
-+            break;
-+        case ARG_HEX:
-+            len = snprintf(b, rest, "%#x", (uint32_t)arg);
-+            break;
-+        case ARG_OCT:
-+            len = snprintf(b, rest, "%#o", (uint32_t)arg);
-+            break;
-+        case ARG_DEC64:
-+            len = snprintf(b, rest, "%" PRId64, arg);
-+            break;
-+#else
-+        case ARG_DEC:
-+            len = snprintf(b, rest, "%" PRId64, arg);
-+            break;
-+        case ARG_OCT:
-+            len = snprintf(b, rest, "%" PRIo64, arg);
-+            break;
-+        case ARG_HEX:
-+            len = snprintf(b, rest, "%" PRIx64, arg);
-+            break;
-+#endif
-+        case ARG_ATDIRFD:
-+            len = add_atdirfd(b, rest, arg);
-+            break;
-+        case ARG_MODEFLAG:
-+            len = add_flags(b, rest, mode_flags, arg, true);
-+            break;
-+        case ARG_OPENFLAG:
-+            len = add_open_flags(b, rest, arg);
-+            break;
-+        case ARG_PTR:
-+            len = add_pointer(b, rest, arg);
-+            break;
-+        case ARG_STR:
-+            len = add_string(b, rest, arg);
-+            break;
-+        case ARG_BUF:
-+            len = add_buffer(b, rest, arg, MAX_PRINT_BUF);
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-+
-+        b += len;
-+        rest -= len;
-+        if (rest == 0) {
-+            goto overflow;
-+        }
-+    }
-+    goto done;
-+
-+ overflow:
-+    strcpy(buf + sizeof(buf) - 4, "...");
-+ done:
-+    gemu_log("%d %s(%s)", getpid(), def->name, buf);
-+}
-+
-+void print_syscall_def(const SyscallDef *def, int64_t args[6])
-+{
-+    SyscallPrintFn *print = def->print;
-+    if (!print) {
-+        print = print_syscall_def1;
-+    }
-+    print(def, args);
-+}
-+
-+static void print_syscall_def_ret1(const SyscallDef *def, abi_long ret)
-+{
-+    if (is_error(ret)) {
-+        const char *errstr = target_strerror(-ret);
-+        if (errstr) {
-+            gemu_log(" = -1 errno=" TARGET_ABI_FMT_ld " (%s)\n",
-+                     -ret, errstr);
-+        } else {
-+            gemu_log(" = -1 errno=" TARGET_ABI_FMT_ld "\n", -ret);
-+        }
-+    } else {
-+        gemu_log(" = " TARGET_ABI_FMT_ld "\n", ret);
-+    }
-+}
- 
- void
- print_syscall_ret(int num, abi_long ret)
- {
-     int i;
--    const char *errstr = NULL;
- 
-     for(i=0;i<nsyscalls;i++)
-         if( scnames[i].nr == num ) {
-             if( scnames[i].result != NULL ) {
-                 scnames[i].result(&scnames[i],ret);
-             } else {
--                if (ret < 0) {
--                    errstr = target_strerror(-ret);
--                }
--                if (errstr) {
--                    gemu_log(" = -1 errno=" TARGET_ABI_FMT_ld " (%s)\n",
--                             -ret, errstr);
--                } else {
--                    gemu_log(" = " TARGET_ABI_FMT_ld "\n", ret);
--                }
-+                print_syscall_def_ret1(NULL, ret);
-             }
-             break;
-         }
- }
- 
-+void print_syscall_ptr_ret(const SyscallDef *def, abi_long ret)
-+{
-+    if (is_error(ret)) {
-+        const char *errstr = target_strerror(-ret);
-+        if (errstr) {
-+            gemu_log(" = -1 errno=" TARGET_ABI_FMT_ld " (%s)\n",
-+                     -ret, errstr);
-+        } else {
-+            gemu_log(" = -1 errno=" TARGET_ABI_FMT_ld "\n", -ret);
-+        }
-+    } else {
-+        gemu_log(" = 0x" TARGET_ABI_FMT_lx "\n", ret);
-+    }
-+}
-+
-+void print_syscall_def_ret(const SyscallDef *def, abi_long ret)
-+{
-+    SyscallPrintRetFn *print = def->print_ret;
-+    if (!print) {
-+        print = print_syscall_def_ret1;
-+    }
-+    print(def, ret);
-+}
-+
- void print_taken_signal(int target_signum, const target_siginfo_t *tinfo)
- {
-     /* Print the strace output for a signal being taken:
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index fd8d48b0da..a96bbf9093 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -111,6 +111,7 @@
- #include "uname.h"
- 
- #include "qemu.h"
-+#include "syscall.h"
- 
- #ifndef CLONE_IO
- #define CLONE_IO                0x80000000      /* Clone io context */
-@@ -879,7 +880,7 @@ static uint16_t host_to_target_errno_table[ERRNO_TABLE_SIZE] = {
- #endif
- };
- 
--static inline int host_to_target_errno(int err)
-+int host_to_target_errno(int err)
- {
-     if (err >= 0 && err < ERRNO_TABLE_SIZE &&
-         host_to_target_errno_table[err]) {
-@@ -897,19 +898,6 @@ static inline int target_to_host_errno(int err)
-     return err;
- }
- 
--static inline abi_long get_errno(abi_long ret)
--{
--    if (ret == -1)
--        return -host_to_target_errno(errno);
--    else
--        return ret;
--}
--
--static inline int is_error(abi_long ret)
--{
--    return (abi_ulong)ret >= (abi_ulong)(-4096);
--}
--
- const char *target_strerror(int err)
- {
-     if (err == TARGET_ERESTARTSYS) {
-@@ -925,53 +913,6 @@ const char *target_strerror(int err)
-     return strerror(target_to_host_errno(err));
- }
- 
--#define safe_syscall0(type, name) \
--static type safe_##name(void) \
--{ \
--    return safe_syscall(__NR_##name); \
--}
--
--#define safe_syscall1(type, name, type1, arg1) \
--static type safe_##name(type1 arg1) \
--{ \
--    return safe_syscall(__NR_##name, arg1); \
--}
--
--#define safe_syscall2(type, name, type1, arg1, type2, arg2) \
--static type safe_##name(type1 arg1, type2 arg2) \
--{ \
--    return safe_syscall(__NR_##name, arg1, arg2); \
--}
--
--#define safe_syscall3(type, name, type1, arg1, type2, arg2, type3, arg3) \
--static type safe_##name(type1 arg1, type2 arg2, type3 arg3) \
--{ \
--    return safe_syscall(__NR_##name, arg1, arg2, arg3); \
--}
--
--#define safe_syscall4(type, name, type1, arg1, type2, arg2, type3, arg3, \
--    type4, arg4) \
--static type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4) \
--{ \
--    return safe_syscall(__NR_##name, arg1, arg2, arg3, arg4); \
--}
--
--#define safe_syscall5(type, name, type1, arg1, type2, arg2, type3, arg3, \
--    type4, arg4, type5, arg5) \
--static type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, \
--    type5 arg5) \
--{ \
--    return safe_syscall(__NR_##name, arg1, arg2, arg3, arg4, arg5); \
--}
--
--#define safe_syscall6(type, name, type1, arg1, type2, arg2, type3, arg3, \
--    type4, arg4, type5, arg5, type6, arg6) \
--static type safe_##name(type1 arg1, type2 arg2, type3 arg3, type4 arg4, \
--    type5 arg5, type6 arg6) \
--{ \
--    return safe_syscall(__NR_##name, arg1, arg2, arg3, arg4, arg5, arg6); \
--}
--
- safe_syscall3(ssize_t, read, int, fd, void *, buff, size_t, count)
- safe_syscall3(ssize_t, write, int, fd, const void *, buff, size_t, count)
- safe_syscall4(int, openat, int, dirfd, const char *, pathname, \
-@@ -12412,12 +12353,18 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-     return ret;
- }
- 
-+/* Include the generated syscall lookup function.  */
-+#include "syscall_list.inc.c"
-+
- abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-                     abi_long arg2, abi_long arg3, abi_long arg4,
-                     abi_long arg5, abi_long arg6, abi_long arg7,
-                     abi_long arg8)
- {
-     CPUState *cpu = ENV_GET_CPU(cpu_env);
-+    const SyscallDef *def, *orig_def;
-+    abi_long raw_args[8] = { arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 };
-+    int64_t  out_args[6] = { arg1, arg2, arg3, arg4, arg5, arg6 };
-     abi_long ret;
- 
- #ifdef DEBUG_ERESTARTSYS
-@@ -12437,16 +12384,44 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-     trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4,
-                              arg5, arg6, arg7, arg8);
- 
--    if (unlikely(do_strace)) {
--        print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
--        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
--                          arg5, arg6, arg7, arg8);
--        print_syscall_ret(num, ret);
--    } else {
--        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
--                          arg5, arg6, arg7, arg8);
-+    orig_def = def = syscall_table(num);
-+    if (def == NULL) {
-+        /* Unconverted.  */
-+        if (unlikely(do_strace)) {
-+            print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
-+            ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
-+                              arg5, arg6, arg7, arg8);
-+            print_syscall_ret(num, ret);
-+        } else {
-+            ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
-+                              arg5, arg6, arg7, arg8);
-+        }
-+        goto fini;
-     }
- 
-+    if (def->args) {
-+        def = def->args(def, out_args, raw_args);
-+        if (unlikely(def == NULL)) {
-+            ret = -host_to_target_errno(errno);
-+            if (unlikely(do_strace)) {
-+                print_syscall_def(orig_def, out_args);
-+                print_syscall_def_ret(orig_def, ret);
++            if (!h2g_valid(max - 1)) {
++                max = (uintptr_t)g2h(GUEST_ADDR_MAX) + 1;
 +            }
-+            goto fini;
++            if (page_check_range(h2g(min), max - min, flags) == -1) {
++                continue;
++            }
++            if (h2g(min) == ts->info->stack_limit) {
++                pstrcpy(path, sizeof(path), "      [stack]");
++            }
++            dprintf(fd, TARGET_ABI_FMT_lx "-" TARGET_ABI_FMT_lx
++                    " %c%c%c%c %08" PRIx64 " %02x:%02x %d %s%s\n",
++                    h2g(min), h2g(max - 1) + 1, flag_r, flag_w,
++                    flag_x, flag_p, offset, dev_maj, dev_min, inode,
++                    path[0] ? "         " : "", path);
 +        }
 +    }
 +
-+    if (unlikely(do_strace)) {
-+        print_syscall_def(def, out_args);
-+        ret = def->impl(cpu_env, out_args[0], out_args[1], out_args[2],
-+                        out_args[3], out_args[4], out_args[5]);
-+        print_syscall_def_ret(def, ret);
-+    } else {
-+        ret = def->impl(cpu_env, out_args[0], out_args[1], out_args[2],
-+                        out_args[3], out_args[4], out_args[5]);
++    free(line);
++    fclose(fp);
++
++    return 0;
++}
++
++static int open_self_stat(void *cpu_env, int fd)
++{
++    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
++    TaskState *ts = cpu->opaque;
++    abi_ulong start_stack = ts->info->start_stack;
++    int i;
++
++    for (i = 0; i < 44; i++) {
++        char buf[128];
++        int len;
++        uint64_t val = 0;
++
++        if (i == 0) {
++            /* pid */
++            val = getpid();
++            snprintf(buf, sizeof(buf), "%"PRId64 " ", val);
++        } else if (i == 1) {
++            /* app name */
++            snprintf(buf, sizeof(buf), "(%s) ", ts->bprm->argv[0]);
++        } else if (i == 27) {
++            /* stack bottom */
++            val = start_stack;
++            snprintf(buf, sizeof(buf), "%"PRId64 " ", val);
++        } else {
++            /* for the rest, there is MasterCard */
++            snprintf(buf, sizeof(buf), "0%c", i == 43 ? '\n' : ' ');
++        }
++
++        len = strlen(buf);
++        if (write(fd, buf, len) != len) {
++            return -1;
++        }
 +    }
 +
-+ fini:
-     trace_guest_user_syscall_ret(cpu, num, ret);
-     return ret;
- }
++    return 0;
++}
++
++static int open_self_auxv(void *cpu_env, int fd)
++{
++    CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
++    TaskState *ts = cpu->opaque;
++    abi_ulong auxv = ts->info->saved_auxv;
++    abi_ulong len = ts->info->auxv_len;
++    char *ptr;
++
++    /*
++     * Auxiliary vector is stored in target process stack.
++     * read in whole auxv vector and copy it to file
++     */
++    ptr = lock_user(VERIFY_READ, auxv, len, 0);
++    if (ptr != NULL) {
++        while (len > 0) {
++            ssize_t r;
++            r = write(fd, ptr, len);
++            if (r <= 0) {
++                break;
++            }
++            len -= r;
++            ptr += r;
++        }
++        lseek(fd, 0, SEEK_SET);
++        unlock_user(ptr, auxv, len);
++    }
++
++    return 0;
++}
++
++int is_proc_myself(const char *filename, const char *entry)
++{
++    if (!strncmp(filename, "/proc/", strlen("/proc/"))) {
++        filename += strlen("/proc/");
++        if (!strncmp(filename, "self/", strlen("self/"))) {
++            filename += strlen("self/");
++        } else if (*filename >= '1' && *filename <= '9') {
++            char myself[80];
++            snprintf(myself, sizeof(myself), "%d/", getpid());
++            if (!strncmp(filename, myself, strlen(myself))) {
++                filename += strlen(myself);
++            } else {
++                return 0;
++            }
++        } else {
++            return 0;
++        }
++        if (!strcmp(filename, entry)) {
++            return 1;
++        }
++    }
++    return 0;
++}
++
++#if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
++static int is_proc(const char *filename, const char *entry)
++{
++    return strcmp(filename, entry) == 0;
++}
++
++static int open_net_route(void *cpu_env, int fd)
++{
++    FILE *fp;
++    char *line = NULL;
++    size_t len = 0;
++    ssize_t read;
++
++    fp = fopen("/proc/net/route", "r");
++    if (fp == NULL) {
++        return -1;
++    }
++
++    /* read header */
++
++    read = getline(&line, &len, fp);
++    dprintf(fd, "%s", line);
++
++    /* read routes */
++
++    while ((read = getline(&line, &len, fp)) != -1) {
++        char iface[16];
++        uint32_t dest, gw, mask;
++        unsigned int flags, refcnt, use, metric, mtu, window, irtt;
++        sscanf(line, "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
++               iface, &dest, &gw, &flags, &refcnt, &use, &metric,
++               &mask, &mtu, &window, &irtt);
++        dprintf(fd, "%s\t%08x\t%08x\t%04x\t%d\t%d\t%d\t%08x\t%d\t%u\t%u\n",
++                iface, tswap32(dest), tswap32(gw), flags, refcnt, use,
++                metric, tswap32(mask), mtu, window, irtt);
++    }
++
++    free(line);
++    fclose(fp);
++
++    return 0;
++}
++#endif
++
++static abi_long do_openat(void *cpu_env, int dirfd, abi_ulong target_path,
++                          int target_flags, int mode)
++{
++    struct fake_open {
++        const char *filename;
++        int (*fill)(void *cpu_env, int fd);
++        int (*cmp)(const char *s1, const char *s2);
++    };
++    static const struct fake_open fakes[] = {
++        { "maps", open_self_maps, is_proc_myself },
++        { "stat", open_self_stat, is_proc_myself },
++        { "auxv", open_self_auxv, is_proc_myself },
++        { "cmdline", open_self_cmdline, is_proc_myself },
++#if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
++        { "/proc/net/route", open_net_route, is_proc },
++#endif
++    };
++
++    char *pathname = lock_user_string(target_path);
++    int flags = target_to_host_bitmask(target_flags, fcntl_flags_tbl);
++    int i, ret;
++
++    if (!pathname) {
++        return -TARGET_EFAULT;
++    }
++
++    if (is_proc_myself(pathname, "exe")) {
++        ret = qemu_getauxval(AT_EXECFD);
++        if (ret == 0) {
++            ret = get_errno(safe_openat(dirfd, exec_path, flags, mode));
++        }
++        goto done;
++    }
++
++    for (i = 0; i < ARRAY_SIZE(fakes); ++i) {
++        if (fakes[i].cmp(pathname, fakes[i].filename)) {
++            const char *tmpdir;
++            char filename[PATH_MAX];
++            int r;
++
++            /* Create temporary file.  */
++            tmpdir = getenv("TMPDIR");
++            if (!tmpdir) {
++                tmpdir = "/tmp";
++            }
++            snprintf(filename, sizeof(filename),
++                     "%s/qemu-open.XXXXXX", tmpdir);
++            ret = mkstemp(filename);
++            if (ret < 0) {
++                ret = -TARGET_ENOENT;
++                goto done;
++            }
++            unlink(filename);
++
++            /* Add contents to the temporary file.  */
++            r = fakes[i].fill(cpu_env, ret);
++            if (r) {
++                close(ret);
++                ret = -TARGET_ENOENT;
++                goto done;
++            }
++
++            /* Reset pointer to the beginning.  */
++            lseek(ret, 0, SEEK_SET);
++            goto done;
++        }
++    }
++    ret = get_errno(safe_openat(dirfd, path(pathname), flags, mode));
++
++ done:
++    fd_trans_unregister(ret);
++    unlock_user(pathname, target_path, 0);
++    return ret;
++}
++
++SYSCALL_IMPL(close)
++{
++    fd_trans_unregister(arg1);
++    return get_errno(close(arg1));
++}
++SYSCALL_DEF(close, ARG_DEC);
++
++#ifdef TARGET_NR_open
++SYSCALL_IMPL(open)
++{
++    return do_openat(cpu_env, AT_FDCWD, arg1, arg2, arg3);
++}
++SYSCALL_DEF(open, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
++#endif
++
++SYSCALL_IMPL(openat)
++{
++    return do_openat(cpu_env, arg1, arg2, arg3, arg4);
++}
++SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
++
++SYSCALL_IMPL(read)
++{
++    abi_long ret;
++    void *p;
++
++    if (arg3 == 0) {
++        return 0;
++    }
++    p = lock_user(VERIFY_WRITE, arg2, arg3, 0);
++    if (!p) {
++        return -TARGET_EFAULT;
++    }
++    ret = get_errno(safe_read(arg1, p, arg3));
++
++    if (!is_error(ret)) {
++        TargetFdDataFunc trans = fd_trans_host_to_target_data(arg1);
++        if (trans) {
++            ret = trans(p, ret);
++        }
++    }
++    unlock_user(p, arg2, ret);
++    return ret;
++}
++SYSCALL_DEF(read, ARG_DEC, ARG_PTR, ARG_DEC);
++
++SYSCALL_IMPL(write)
++{
++    TargetFdDataFunc trans = fd_trans_target_to_host_data(arg1);
++    void *p = lock_user(VERIFY_READ, arg2, arg3, 1);
++    abi_long ret;
++
++    if (!p) {
++        return -TARGET_EFAULT;
++    }
++    if (trans) {
++        void *copy = g_malloc(arg3);
++        memcpy(copy, p, arg3);
++        ret = trans(copy, arg3);
++        if (ret >= 0) {
++            ret = get_errno(safe_write(arg1, copy, ret));
++        }
++        g_free(copy);
++    } else {
++        ret = get_errno(safe_write(arg1, p, arg3));
++    }
++    unlock_user(p, arg2, 0);
++    return ret;
++}
++SYSCALL_DEF(write, ARG_DEC, ARG_PTR, ARG_DEC);
 diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
-index 59a5c17354..afa69ed6d2 100644
+index afa69ed6d2..63b81f50e8 100644
 --- a/linux-user/Makefile.objs
 +++ b/linux-user/Makefile.objs
-@@ -7,3 +7,13 @@ obj-$(TARGET_HAS_BFLT) += flatload.o
- obj-$(TARGET_I386) += vm86.o
- obj-$(TARGET_ARM) += arm/nwfpe/
- obj-$(TARGET_M68K) += m68k-sim.o
-+
-+GEN_SYSCALL_LIST = $(SRC_PATH)/linux-user/gen_syscall_list.py
-+SYSCALL_LIST = linux-user/syscall_list.h linux-user/syscall_list.inc.c
-+
-+$(SYSCALL_LIST): $(GEN_SYSCALL_LIST)
-+	$(call quiet-command,\
-+	  $(PYTHON) $(GEN_SYSCALL_LIST) $@, "GEN", $(TARGET_DIR)$@)
-+
-+linux-user/syscall.o \
-+linux-user/strace.o: $(SYSCALL_LIST)
+@@ -1,4 +1,4 @@
+-obj-y = main.o syscall.o strace.o mmap.o signal.o \
++obj-y = main.o syscall.o syscall_file.o strace.o mmap.o signal.o \
+ 	elfload.o linuxload.o uaccess.o uname.o \
+ 	safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
+         $(TARGET_ABI_DIR)/cpu_loop.o
+@@ -16,4 +16,5 @@ $(SYSCALL_LIST): $(GEN_SYSCALL_LIST)
+ 	  $(PYTHON) $(GEN_SYSCALL_LIST) $@, "GEN", $(TARGET_DIR)$@)
+ 
+ linux-user/syscall.o \
++linux-user/syscall_file.o \
+ linux-user/strace.o: $(SYSCALL_LIST)
 diff --git a/linux-user/gen_syscall_list.py b/linux-user/gen_syscall_list.py
-new file mode 100644
-index 0000000000..2e0fc39100
---- /dev/null
+index 2e0fc39100..3d223e3468 100644
+--- a/linux-user/gen_syscall_list.py
 +++ b/linux-user/gen_syscall_list.py
-@@ -0,0 +1,82 @@
-+#
-+# Linux syscall table generator
-+# Copyright (c) 2018 Linaro, Limited.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program; if not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+from __future__ import print_function
-+import sys
-+
-+# These are sets of all syscalls that have been converted.
-+# The lists are in collation order with '_' ignored.
-+
-+# These syscalls are supported by all targets.
-+# Avoiding ifdefs for these can diagnose typos in $cpu/syscall_nr.h
-+unconditional_syscalls = [
-+]
-+
-+# These syscalls are only supported by some target or abis.
-+conditional_syscalls = [
-+]
-+
-+
-+def header(f):
-+    # Do not ifdef the declarations -- their use may be complicated.
-+    all = unconditional_syscalls + conditional_syscalls
-+    all.sort()
-+    for s in all:
-+        print("extern const SyscallDef def_", s, ";", sep = '', file = f)
-+
-+
-+def def_syscall(s, f):
-+    print("    case TARGET_NR_", s, ": return &def_", s, ";",
-+          sep = '', file = f);
-+
-+
-+def source(f):
-+    print("static const SyscallDef *syscall_table(int num)",
-+          "{",
-+          "    switch (num) {",
-+          sep = '\n', file = f)
-+
-+    for s in unconditional_syscalls:
-+        def_syscall(s, f)
-+    for s in conditional_syscalls:
-+        print("#ifdef TARGET_NR_", s, sep = '', file = f)
-+        def_syscall(s, f)
-+        print("#endif", file = f)
-+
-+    print("    }",
-+          "    return NULL;",
-+          "}",
-+          sep = '\n', file = f);
-+
-+
-+def main():
-+    p = sys.argv[1]
-+    f = open(p, "w")
-+
-+    print("/* This file is autogenerated by gensyscall.py.  */\n\n",
-+          file = f)
-+
-+    if p[len(p) - 1] == 'h':
-+        header(f)
-+    else:
-+        source(f)
-+
-+    f.close();
-+
-+
-+main()
+@@ -25,10 +25,15 @@ import sys
+ # These syscalls are supported by all targets.
+ # Avoiding ifdefs for these can diagnose typos in $cpu/syscall_nr.h
+ unconditional_syscalls = [
++    "close",
++    "openat",
++    "read",
++    "write",
+ ]
+ 
+ # These syscalls are only supported by some target or abis.
+ conditional_syscalls = [
++    "open",
+ ]
+ 
+ 
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index 2bc5ba04d4..baafa28370 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -97,9 +97,6 @@
+ #ifdef TARGET_NR_clone
+ { TARGET_NR_clone, "clone" , NULL, print_clone, NULL },
+ #endif
+-#ifdef TARGET_NR_close
+-{ TARGET_NR_close, "close" , "%s(%d)", NULL, NULL },
+-#endif
+ #ifdef TARGET_NR_connect
+ { TARGET_NR_connect, "connect" , "%s(%d,%#x,%d)", NULL, NULL },
+ #endif
+@@ -677,12 +674,6 @@
+ #ifdef TARGET_NR_olduname
+ { TARGET_NR_olduname, "olduname" , NULL, NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_open
+-{ TARGET_NR_open, "open" , NULL, print_open, NULL },
+-#endif
+-#ifdef TARGET_NR_openat
+-{ TARGET_NR_openat, "openat" , NULL, print_openat, NULL },
+-#endif
+ #ifdef TARGET_NR_osf_adjtime
+ { TARGET_NR_osf_adjtime, "osf_adjtime" , NULL, NULL, NULL },
+ #endif
+@@ -1076,9 +1067,6 @@
+ #ifdef TARGET_NR_quotactl
+ { TARGET_NR_quotactl, "quotactl" , NULL, NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_read
+-{ TARGET_NR_read, "read" , "%s(%d,%#x,%d)", NULL, NULL },
+-#endif
+ #ifdef TARGET_NR_readahead
+ { TARGET_NR_readahead, "readahead" , NULL, NULL, NULL },
+ #endif
+@@ -1626,9 +1614,6 @@
+ #ifdef TARGET_NR_waitpid
+ { TARGET_NR_waitpid, "waitpid" , "%s(%d,%p,%#x)", NULL, NULL },
+ #endif
+-#ifdef TARGET_NR_write
+-{ TARGET_NR_write, "write" , "%s(%d,%#x,%d)", NULL, NULL },
+-#endif
+ #ifdef TARGET_NR_writev
+ { TARGET_NR_writev, "writev" , "%s(%d,%p,%#x)", NULL, NULL },
+ #endif
 -- 
 2.17.1
