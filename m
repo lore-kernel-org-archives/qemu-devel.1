@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSXXV-0004z0-W0
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:05 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fSXXZ-00051u-79
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSXXV-0007Ih-04
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:02 -0400
-Received: from mail-pl0-x22c.google.com ([2607:f8b0:400e:c01::22c]:41915)
+	(envelope-from <richard.henderson@linaro.org>) id 1fSXXW-0007KG-Tt
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:05 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:42170)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fSXXU-0007I0-Qa
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:00 -0400
-Received: by mail-pl0-x22c.google.com with SMTP id az12-v6so13312176plb.8
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 17:52:00 -0700 (PDT)
+	id 1fSXXW-0007Ji-O3
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:02 -0400
+Received: by mail-pf0-x244.google.com with SMTP id w7-v6so11133547pfn.9
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 17:52:02 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Jun 2018 14:51:30 -1000
-Message-Id: <20180612005145.3375-5-richard.henderson@linaro.org>
+Date: Mon, 11 Jun 2018 14:51:31 -1000
+Message-Id: <20180612005145.3375-6-richard.henderson@linaro.org>
 In-Reply-To: <20180612005145.3375-1-richard.henderson@linaro.org>
 References: <20180612005145.3375-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 04/19] linux-user/sparc64: Add
- inotify_rm_watch and tee syscalls
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 05/19] linux-user: Remove DEBUG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +32,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu, peter.maydell@linaro.org
 
+This is redundant with both -strace and actual tracing.
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/sparc64/syscall_nr.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ linux-user/syscall.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-diff --git a/linux-user/sparc64/syscall_nr.h b/linux-user/sparc64/syscall_nr.h
-index 9391645598..0b91b896da 100644
---- a/linux-user/sparc64/syscall_nr.h
-+++ b/linux-user/sparc64/syscall_nr.h
-@@ -154,7 +154,7 @@
- #define TARGET_NR_poll               153 /* Common                                      */
- #define TARGET_NR_getdents64		154 /* Linux specific				   */
- #define TARGET_NR_fcntl64            155 /* Linux sparc32 Specific                      */
--/* #define TARGET_NR_getdirentries   156    SunOS Specific                              */
-+#define TARGET_NR_inotify_rm_watch   156 /* Linux specific                              */
- #define TARGET_NR_statfs             157 /* Common                                      */
- #define TARGET_NR_fstatfs            158 /* Common                                      */
- #define TARGET_NR_umount             159 /* Common                                      */
-@@ -278,7 +278,7 @@
- #define TARGET_NR_mq_notify		277
- #define TARGET_NR_mq_getsetattr	278
- #define TARGET_NR_waitid		279
--/*#define TARGET_NR_sys_setaltroot	280 available (was setaltroot) */
-+#define TARGET_NR_tee                   280
- #define TARGET_NR_add_key		281
- #define TARGET_NR_request_key	282
- #define TARGET_NR_keyctl		283
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 7b9ac3b408..c212149245 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -163,7 +163,6 @@
+  * (The one remaining unallocated bit is 0x1000 which used to be CLONE_PID.)
+  */
+ 
+-//#define DEBUG
+ /* Define DEBUG_ERESTARTSYS to force every syscall to be restarted
+  * once. This exercises the codepaths for restart.
+  */
+@@ -5777,9 +5776,6 @@ static abi_long do_ioctl(int fd, int cmd, abi_long arg)
+         ie++;
+     }
+     arg_type = ie->arg_type;
+-#if defined(DEBUG)
+-    gemu_log("ioctl: cmd=0x%04lx (%s)\n", (long)cmd, ie->name);
+-#endif
+     if (ie->do_ioctl) {
+         return ie->do_ioctl(ie, buf_temp, fd, cmd, arg);
+     } else if (!ie->host_cmd) {
+@@ -7980,9 +7976,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+     }
+ #endif
+ 
+-#ifdef DEBUG
+-    gemu_log("syscall %d", num);
+-#endif
+     trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+     if(do_strace)
+         print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+@@ -12772,9 +12765,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         break;
+     }
+ fail:
+-#ifdef DEBUG
+-    gemu_log(" = " TARGET_ABI_FMT_ld "\n", ret);
+-#endif
+     if(do_strace)
+         print_syscall_ret(num, ret);
+     trace_guest_user_syscall_ret(cpu, num, ret);
 -- 
 2.17.1
