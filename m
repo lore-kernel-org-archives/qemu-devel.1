@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fSd3r-0002qg-3S
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 02:45:48 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fSd3u-0002rl-Qp
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 02:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fSd3p-0001yG-UT
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 02:45:47 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fSd3t-000238-NP
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 02:45:50 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 12 Jun 2018 16:44:57 +1000
-Message-Id: <20180612064503.14282-28-david@gibson.dropbear.id.au>
+Date: Tue, 12 Jun 2018 16:45:02 +1000
+Message-Id: <20180612064503.14282-33-david@gibson.dropbear.id.au>
 In-Reply-To: <20180612064503.14282-1-david@gibson.dropbear.id.au>
 References: <20180612064503.14282-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 27/33] spapr: move memory hotplug support check
- into spapr_memory_pre_plug()
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 32/33] xics_kvm: use KVM helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,57 +23,173 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, clg@kaod.org, David Hildenbrand <david@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com, groug@kaod.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: David Hildenbrand <david@redhat.com>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Let's finish cleaning up the hotplug handler. This check can be
-performed in the pre_plug code as the very first thing.
+The KVM helpers hide the low level interface used to communicate to
+the XICS KVM device and provide a good cleanup to the XICS KVM models.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ hw/intc/xics_kvm.c | 52 +++++++++++++---------------------------------
+ 1 file changed, 14 insertions(+), 38 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 1f577b274b..9b8b4068b1 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3184,12 +3184,18 @@ out:
- static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                   Error **errp)
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 89fb20e2c5..8bdf6afe82 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -56,10 +56,6 @@ static QLIST_HEAD(, KVMEnabledICP)
+ static void icp_get_kvm_state(ICPState *icp)
  {
-+    const sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(hotplug_dev);
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *mr;
-     uint64_t size;
-     char *mem_dev;
- 
-+    if (!smc->dr_lmb_enabled) {
-+        error_setg(errp, "Memory hotplug not supported for this machine");
-+        return;
-+    }
-+
-     mr = ddc->get_memory_region(dimm, errp);
-     if (!mr) {
+     uint64_t state;
+-    struct kvm_one_reg reg =3D {
+-        .id =3D KVM_REG_PPC_ICP_STATE,
+-        .addr =3D (uintptr_t)&state,
+-    };
+     int ret;
+=20
+     /* ICP for this CPU thread is not in use, exiting */
+@@ -67,7 +63,7 @@ static void icp_get_kvm_state(ICPState *icp)
          return;
-@@ -3571,14 +3577,7 @@ out:
- static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
-                                       DeviceState *dev, Error **errp)
+     }
+=20
+-    ret =3D kvm_vcpu_ioctl(icp->cs, KVM_GET_ONE_REG, &reg);
++    ret =3D kvm_get_one_reg(icp->cs, KVM_REG_PPC_ICP_STATE, &state);
+     if (ret !=3D 0) {
+         error_report("Unable to retrieve KVM interrupt controller state"
+                 " for CPU %ld: %s", kvm_arch_vcpu_id(icp->cs), strerror(=
+errno));
+@@ -96,10 +92,6 @@ static void icp_synchronize_state(ICPState *icp)
+ static int icp_set_kvm_state(ICPState *icp, int version_id)
  {
--    MachineState *ms = MACHINE(hotplug_dev);
--    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
+     uint64_t state;
+-    struct kvm_one_reg reg =3D {
+-        .id =3D KVM_REG_PPC_ICP_STATE,
+-        .addr =3D (uintptr_t)&state,
+-    };
+     int ret;
+=20
+     /* ICP for this CPU thread is not in use, exiting */
+@@ -111,7 +103,7 @@ static int icp_set_kvm_state(ICPState *icp, int versi=
+on_id)
+         | ((uint64_t)icp->mfrr << KVM_REG_PPC_ICP_MFRR_SHIFT)
+         | ((uint64_t)icp->pending_priority << KVM_REG_PPC_ICP_PPRI_SHIFT=
+);
+=20
+-    ret =3D kvm_vcpu_ioctl(icp->cs, KVM_SET_ONE_REG, &reg);
++    ret =3D kvm_set_one_reg(icp->cs, KVM_REG_PPC_ICP_STATE, &state);
+     if (ret !=3D 0) {
+         error_report("Unable to restore KVM interrupt controller state (=
+0x%"
+                 PRIx64 ") for CPU %ld: %s", state, kvm_arch_vcpu_id(icp-=
+>cs),
+@@ -185,21 +177,15 @@ static const TypeInfo icp_kvm_info =3D {
+ static void ics_get_kvm_state(ICSState *ics)
+ {
+     uint64_t state;
+-    struct kvm_device_attr attr =3D {
+-        .flags =3D 0,
+-        .group =3D KVM_DEV_XICS_GRP_SOURCES,
+-        .addr =3D (uint64_t)(uintptr_t)&state,
+-    };
+     int i;
++    Error *local_err =3D NULL;
+=20
+     for (i =3D 0; i < ics->nr_irqs; i++) {
+         ICSIRQState *irq =3D &ics->irqs[i];
+-        int ret;
 -
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
--        if (!smc->dr_lmb_enabled) {
--            error_setg(errp, "Memory hotplug not supported for this machine");
--            return;
--        }
-         spapr_memory_plug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_SPAPR_CPU_CORE)) {
-         spapr_core_plug(hotplug_dev, dev, errp);
--- 
+-        attr.attr =3D i + ics->offset;
+=20
+-        ret =3D ioctl(kernel_xics_fd, KVM_GET_DEVICE_ATTR, &attr);
+-        if (ret !=3D 0) {
++        kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
++                          i + ics->offset, &state, false, &local_err);
++        if (local_err) {
+             error_report("Unable to retrieve KVM interrupt controller st=
+ate"
+                     " for IRQ %d: %s", i + ics->offset, strerror(errno))=
+;
+             exit(1);
+@@ -255,19 +241,13 @@ static void ics_synchronize_state(ICSState *ics)
+ static int ics_set_kvm_state(ICSState *ics, int version_id)
+ {
+     uint64_t state;
+-    struct kvm_device_attr attr =3D {
+-        .flags =3D 0,
+-        .group =3D KVM_DEV_XICS_GRP_SOURCES,
+-        .addr =3D (uint64_t)(uintptr_t)&state,
+-    };
+     int i;
++    Error *local_err =3D NULL;
+=20
+     for (i =3D 0; i < ics->nr_irqs; i++) {
+         ICSIRQState *irq =3D &ics->irqs[i];
+         int ret;
+=20
+-        attr.attr =3D i + ics->offset;
+-
+         state =3D irq->server;
+         state |=3D (uint64_t)(irq->saved_priority & KVM_XICS_PRIORITY_MA=
+SK)
+             << KVM_XICS_PRIORITY_SHIFT;
+@@ -293,8 +273,9 @@ static int ics_set_kvm_state(ICSState *ics, int versi=
+on_id)
+                 state |=3D KVM_XICS_QUEUED;
+         }
+=20
+-        ret =3D ioctl(kernel_xics_fd, KVM_SET_DEVICE_ATTR, &attr);
+-        if (ret !=3D 0) {
++        kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
++                          i + ics->offset, &state, true, &local_err);
++        if (local_err) {
+             error_report("Unable to restore KVM interrupt controller sta=
+te"
+                     " for IRQs %d: %s", i + ics->offset, strerror(errno)=
+);
+             return ret;
+@@ -391,10 +372,6 @@ static void rtas_dummy(PowerPCCPU *cpu, sPAPRMachine=
+State *spapr,
+ int xics_kvm_init(sPAPRMachineState *spapr, Error **errp)
+ {
+     int rc;
+-    struct kvm_create_device xics_create_device =3D {
+-        .type =3D KVM_DEV_TYPE_XICS,
+-        .flags =3D 0,
+-    };
+=20
+     if (!kvm_enabled() || !kvm_check_extension(kvm_state, KVM_CAP_IRQ_XI=
+CS)) {
+         error_setg(errp,
+@@ -431,20 +408,19 @@ int xics_kvm_init(sPAPRMachineState *spapr, Error *=
+*errp)
+         goto fail;
+     }
+=20
+-    /* Create the kernel ICP */
+-    rc =3D kvm_vm_ioctl(kvm_state, KVM_CREATE_DEVICE, &xics_create_devic=
+e);
++    /* Create the KVM XICS device */
++    rc =3D kvm_create_device(kvm_state, KVM_DEV_TYPE_XICS, false);
+     if (rc < 0) {
+         error_setg_errno(errp, -rc, "Error on KVM_CREATE_DEVICE for XICS=
+");
+         goto fail;
+     }
+=20
+-    kernel_xics_fd =3D xics_create_device.fd;
+-
++    kernel_xics_fd =3D rc;
+     kvm_kernel_irqchip =3D true;
+     kvm_msi_via_irqfd_allowed =3D true;
+     kvm_gsi_direct_mapping =3D true;
+=20
+-    return rc;
++    return 0;
+=20
+ fail:
+     kvmppc_define_rtas_kernel_token(0, "ibm,set-xive");
+--=20
 2.17.1
