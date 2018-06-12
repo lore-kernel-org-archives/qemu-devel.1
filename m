@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fSmu4-00025M-Ae
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:16:21 -0400
+	(envelope-from <jan.kiszka@siemens.com>) id 1fSn0a-0005l9-09
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:23:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fSmtz-0007GJ-DD
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:16:20 -0400
-References: <20180612125933.262679-1-borntraeger@de.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <904a0d85-57ab-b42e-48a0-53d4da9cbb66@redhat.com>
-Date: Tue, 12 Jun 2018 19:16:10 +0200
+	(envelope-from <jan.kiszka@siemens.com>) id 1fSn0V-0002tO-2P
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:23:04 -0400
+Received: from goliath.siemens.de ([192.35.17.28]:40566)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+	id 1fSn0U-0002fD-Nc
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 13:22:59 -0400
+From: Jan Kiszka <jan.kiszka@siemens.com>
+References: <267f42a5-b7ce-379e-ffd1-f2611393d2ff@web.de>
+	<ad56487b-5afe-1420-9903-d5d849f97231@siemens.com>
+	<CAFEAcA9V9nFMVixeYjfBj54OT3zhRCVHM495AZHDzxVryh4JFA@mail.gmail.com>
+	<6730e270-9906-a43c-68b0-7a09a0743fa5@siemens.com>
+Message-ID: <d64ace8c-30ca-e16c-fd73-746476bf3a6b@siemens.com>
+Date: Tue, 12 Jun 2018 19:22:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180612125933.262679-1-borntraeger@de.ibm.com>
+In-Reply-To: <6730e270-9906-a43c-68b0-7a09a0743fa5@siemens.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 1/1] s390x/ipl: Try to
- detect Linux vs non Linux for initial IPL PSW
+Subject: Re: [Qemu-devel] [PATCH] e1000e: Do not auto-clear ICR bits which
+ aren't set in EIAC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,83 +32,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Janosch Frank <frankja@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
 
-On 12.06.2018 14:59, Christian Borntraeger wrote:
-> Right now the IPL device always starts from address 0x10000 (the usual
-> Linux entry point). To run other guests (e.g. test programs) it is
-> useful to use the IPL PSW from address 0. We can use the Linux magic
-> at 0x10008 to decide.
+On 2018-05-22 09:00, Jan Kiszka wrote:
+> On 2018-04-16 17:29, Peter Maydell wrote:
+>> On 16 April 2018 at 16:25, Jan Kiszka <jan.kiszka@siemens.com> wrote:
+>>> On 2018-04-01 23:17, Jan Kiszka wrote:
+>>>> From: Jan Kiszka <jan.kiszka@siemens.com>
+>>>>
+>>>> The spec does not justify clearing of any E1000_ICR_OTHER_CAUSES when
+>>>> E1000_ICR_OTHER is set in EIAC. In fact, removing this code fixes the
+>>>> issue the Linux driver runs into since 4aea7a5c5e94 ("e1000e: Avoid
+>>>> receiver overrun interrupt bursts") and was worked around by
+>>>> 745d0bd3af99 ("e1000e: Remove Other from EIAC").
+>>>>
+>>>> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+>>>> ---
+>>>>
+>>>> This resolves the issue I reported on February 18 ("e1000e: MSI-X
+>>>> problem with recent Linux drivers").
+>>>>
+>>>>  hw/net/e1000e_core.c | 4 ----
+>>>>  1 file changed, 4 deletions(-)
+>>>>
+>>>> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+>>>> index ecf9b15555..d38f025c0f 100644
+>>>> --- a/hw/net/e1000e_core.c
+>>>> +++ b/hw/net/e1000e_core.c
+>>>> @@ -2022,10 +2022,6 @@ e1000e_msix_notify_one(E1000ECore *core, uint32_t cause, uint32_t int_cfg)
+>>>>
+>>>>      effective_eiac = core->mac[EIAC] & cause;
+>>>>
+>>>> -    if (effective_eiac == E1000_ICR_OTHER) {
+>>>> -        effective_eiac |= E1000_ICR_OTHER_CAUSES;
+>>>> -    }
+>>>> -
+>>>>      core->mac[ICR] &= ~effective_eiac;
+>>>>
+>>>>      if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
+>>>>
+>>>
+>>> Ping for this - as well as https://patchwork.ozlabs.org/patch/895476.
+>>>
+>>> Given that q35 uses e1000e by default and many Linux kernel versions no
+>>> longer work, this should likely go into upcoming and stable versions
+>>
+>> I'd rather not put it into 2.12 at this point in the release
+>> cycle unless it's a regression from 2.11, I think.
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
-> v3->v4:
-> 	- iplpsw-> ipl_psw
-> 	- move check for load failures into the non-elf case
-> 	- change comment about ipl psw
-> v2->v3:
-> 	- check for iplpsw to avoid assert on file errors
-> 	- use 4 bytes at 4 instead of 8 bytes at 0
-> v1->v2:
-> 	- use LINUX_MAGIC_ADDR define
-> 	- use assert for valid iplpsw pointer
-> 	- add endianess conversion
->  hw/s390x/ipl.c | 27 ++++++++++++++++++++++-----
->  1 file changed, 22 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 04245b5258..0d67349004 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -29,6 +29,7 @@
->  #include "exec/exec-all.h"
->  
->  #define KERN_IMAGE_START                0x010000UL
-> +#define LINUX_MAGIC_ADDR                0x010008UL
->  #define KERN_PARM_AREA                  0x010480UL
->  #define INITRD_START                    0x800000UL
->  #define INITRD_PARM_START               0x010408UL
-> @@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
->  static void s390_ipl_realize(DeviceState *dev, Error **errp)
->  {
->      S390IPLState *ipl = S390_IPL(dev);
-> -    uint64_t pentry = KERN_IMAGE_START;
-> +    uint32_t *ipl_psw;
-> +    uint64_t pentry;
-> +    char *magic;
->      int kernel_size;
->      Error *err = NULL;
->  
-> @@ -157,10 +160,24 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->                                 NULL, 1, EM_S390, 0, 0);
->          if (kernel_size < 0) {
->              kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
-> -        }
-> -        if (kernel_size < 0) {
-> -            error_setg(&err, "could not load kernel '%s'", ipl->kernel);
-> -            goto error;
-> +            if (kernel_size < 0) {
-> +                error_setg(&err, "could not load kernel '%s'", ipl->kernel);
-> +                goto error;
-> +            }
-> +            /* if this is Linux use KERN_IMAGE_START */
-> +            magic = rom_ptr(LINUX_MAGIC_ADDR);
-> +            if (magic && !memcmp(magic, "S390EP", 6)) {
-> +                pentry = KERN_IMAGE_START;
-> +            } else {
-> +                /* if not Linux load the address of the (short) IPL PSW */
-> +                ipl_psw = rom_ptr(4);
-> +                if (ipl_psw) {
-> +                    pentry = be32_to_cpu(*ipl_psw) & 0x7fffffffUL;
-> +                } else {
-> +                    error_setg(&err, "Could not get IPL PSW");
-> +                    goto error;
-> +                }
-> +            }
->          }
->          /*
->           * Is it a Linux kernel (starting at 0x10000)? If yes, we fill in the
+> Second ping - nothing hit the repo so far, nor did I receive feedback.
 > 
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+And another ping. For both.
+
+These days I had to help someone with a broken QEMU setup that failed
+installing from network. It turned out that "modprobe e1000e IntMode=0"
+was needed to workaround the issues my patches address.
+
+Jan
+
+-- 
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
