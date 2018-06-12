@@ -1,40 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fSjAk-0006w2-9I
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:17:22 -0400
+	(envelope-from <berrange@redhat.com>) id 1fSjEJ-0000w2-Eg
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:21:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fSjAg-0006Gw-T2
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:17:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46942 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fSjAg-0006G0-NG
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:17:14 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4A620401EF2F
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 13:17:14 +0000 (UTC)
-Date: Tue, 12 Jun 2018 14:17:08 +0100
+	(envelope-from <berrange@redhat.com>) id 1fSjEH-0000XA-Tk
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:20:59 -0400
+Date: Tue, 12 Jun 2018 14:20:41 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180612131708.GG24690@redhat.com>
+Message-ID: <20180612132041.GH24690@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180606135051.GR7451@localhost.localdomain>
-	<1528372809-175770-1-git-send-email-imammedo@redhat.com>
-	<20180608132105.GA24764@localhost.localdomain>
-	<20180611151625.4b2420b8@redhat.com>
-	<20180611190607.GU7451@localhost.localdomain>
-	<20180611232924.6e04b6f8@igors-macbook-pro.local>
-	<20180611223633.GG7451@localhost.localdomain>
-	<5cef972d-250b-5464-7482-90fa24d36c80@redhat.com>
-	<20180612144205.2169e7a2@redhat.com>
-	<1282921e-0d38-7bd2-de8b-64d327dd2549@redhat.com>
+References: <20180612125821.4229-1-armbru@redhat.com>
+	<20180612125821.4229-19-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1282921e-0d38-7bd2-de8b-64d327dd2549@redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] [PATCH v6 2/2] vl: fix use of
- --daemonize with --preconfig
+In-Reply-To: <20180612125821.4229-19-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 18/18] rbd: New parameter key-secret
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,54 +24,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Privoznik <mprivozn@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, ldoktor@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, pkrempa@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jcody@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Tue, Jun 12, 2018 at 03:04:42PM +0200, Michal Privoznik wrote:
-> On 06/12/2018 02:42 PM, Igor Mammedov wrote:
+On Tue, Jun 12, 2018 at 02:58:21PM +0200, Markus Armbruster wrote:
+> Legacy -drive supports "password-secret" parameter that isn't
+> available with -blockdev / blockdev-add.  That's because we backed out
+> our first try to provide it there due to interface design doubts, in
+> commit 577d8c9a811, v2.9.0.
 > 
-> >>>
-> >>> Do we really need to make -daemonize and -preconfig work
-> >>> together?  libvirt uses -daemonize only for its initial
-> >>> capability probing, which shouldn't require -preconfig at all.
-> >>>
-> >>> Even on that case, I wonder why libvirt doesn't simply create a
-> >>> server socket and waits for QEMU to connect instead of using
-> >>> -daemonize as a sync point.
-> >>>   
-> >>
-> >> because libvirt views qemu as well behaved daemon. Should anything go
-> >> wrong libvirt reads qemu's stderr and reports error to upper layers.
-> > We can keep daemonizing flow in QEMU as it's now.
-> > But Eduardo's idea about libvirt created socked + letting QEMU connect to it
-> > has a merit. It should fix current deadlock issue with as monitor
-> > won't be depending on lead exit event.
+> This is the second try.  It brings back the parameter, except it's
+> named "key-secret" now.
 > 
-> Not sure about the benefits. Currently, libvirt spawns qemu, waits for
-> monitor to show up (currently, the timeout dynamic depending on some
-> black magic involving guest RAM size) and if it does not show up in time
-> it kills qemu. The same algorithm must be kept in place even for case
-> when libvirt would pass pre-opened socket to qemu in case qemu deadlocks
-> before being able to communicate over qmp. The only advantage I see is
-> libvirt would not need to label the socket (set uid:gid, selinux, ...).
+> Let's review our reasons for backing out the first try, as stated in
+> the commit message:
+> 
+>     * BlockdevOptionsRbd member @password-secret isn't actually a
+>       password, it's a key generated by Ceph.
 
-As mentioned in my other reply, we already do FD passing, and that code
-has intentionally got rid of the timeout, because timeouts cause false
-failures to launch QEMU. This is a particular problem when using many
-disks that are encrypted, since LUKS encryption has a minimum 1 second
-delay on opening each disk, so with many disks we're at risk of hitting
-the timeout even when QEMU is still starting normally.
+I thought about that when I first added password-secret, but felt
+that it is still effectively acting as a password to authenticate
+to the server, and calling it password-secret made it clearer that
+it was related to the authentication phase, and not for example,
+disk encryption.
 
-I don't see a reason to special case startup with timeouts to deal
-with hangs, while ignoring the possibility of hangs after initial
-startup.
-
-> On the other hand, since it would be libvirt creating the socket what
-> would happen on libvirtd restart?
-
-We're creating a *listener* socket, not a client connection, so on
-restart we simply connect again as normal.
-
+> 
+> Addressed by the rename.
+> 
+>     * We're not sure where member @password-secret belongs (see the
+>       previous commit).
+> 
+> See previous commit.
+> 
+>     * How @password-secret interacts with settings from a configuration
+>       file specified with @conf is undocumented.
+> 
+> Not actually true, the documentation for @conf says "Values in the
+> configuration file will be overridden by options specified via QAPI",
+> and we've tested this.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  block/rbd.c          | 41 +++++++++++++++++++++++++----------------
+>  qapi/block-core.json |  6 ++++++
+>  2 files changed, 31 insertions(+), 16 deletions(-)
+> 
+> diff --git a/block/rbd.c b/block/rbd.c
+> index ea0575d068..f2c6965418 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -239,24 +239,25 @@ static void qemu_rbd_refresh_limits(BlockDriverState *bs, Error **errp)
+>  }
+>  
+>  
+> -static int qemu_rbd_set_auth(rados_t cluster, const char *secretid,
+> -                             BlockdevOptionsRbd *opts,
+> +static int qemu_rbd_set_auth(rados_t cluster, BlockdevOptionsRbd *opts,
+>                               Error **errp)
+>  {
+> -    char *acr;
+> +    char *key, *acr;
+>      int r;
+>      GString *accu;
+>      RbdAuthModeList *auth;
+>  
+> -    if (secretid) {
+> -        gchar *secret = qcrypto_secret_lookup_as_base64(secretid,
+> -                                                        errp);
+> -        if (!secret) {
+> -            return -1;
+> +    if (opts->key_secret) {
+> +        key = qcrypto_secret_lookup_as_base64(opts->key_secret, errp);
+> +        if (!key) {
+> +            return -EIO;
+> +        }
+> +        r = rados_conf_set(cluster, "key", key);
+> +        g_free(key);
+> +        if (r < 0) {
+> +            error_setg_errno(errp, -r, "Could not set 'key'");
+> +            return r;
+>          }
+> -
+> -        rados_conf_set(cluster, "key", secret);
+> -        g_free(secret);
+>      }
+>  
+>      if (opts->has_auth_client_required) {
+> @@ -367,9 +368,7 @@ static QemuOptsList runtime_opts = {
+>      },
+>  };
+>  
+> -/* FIXME Deprecate and remove keypairs or make it available in QMP.
+> - * password_secret should eventually be configurable in opts->location. Support
+> - * for it in .bdrv_open will make it work here as well. */
+> +/* FIXME Deprecate and remove keypairs or make it available in QMP. */
+>  static int qemu_rbd_do_create(BlockdevCreateOptions *options,
+>                                const char *keypairs, const char *password_secret,
+>                                Error **errp)
+> @@ -575,6 +574,16 @@ static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
+>      Error *local_err = NULL;
+>      int r;
+>  
+> +    if (secretid) {
+> +        if (opts->key_secret) {
+> +            error_setg(errp,
+> +                       "Legacy 'password-secret' clashes with 'key-secret'");
+> +            return -EINVAL;
+> +        }
+> +        opts->key_secret = g_strdup(secretid);
+> +        opts->has_key_secret = true;
+> +    }
+> +
+>      mon_host = qemu_rbd_mon_host(opts, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+> @@ -607,8 +616,8 @@ static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
+>          }
+>      }
+>  
+> -    if (qemu_rbd_set_auth(*cluster, secretid, opts, errp) < 0) {
+> -        r = -EIO;
+> +    r = qemu_rbd_set_auth(*cluster, opts, errp);
+> +    if (r < 0) {
+>          goto failed_shutdown;
+>      }
+>  
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 841d196a21..3eb536de5b 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -3120,6 +3120,11 @@
+>  #                      This maps to Ceph configuration option
+>  #                      "auth_client_required".  (Since 3.0)
+>  #
+> +# @key-secret:         ID of a QCryptoSecret object providing a key
+> +#                      for cephx authentication.
+> +#                      This maps to Ceph configuration option
+> +#                      "key".  (Since 3.0)
+> +#
+>  # @server:             Monitor host address and port.  This maps
+>  #                      to the "mon_host" Ceph option.
+>  #
+> @@ -3132,6 +3137,7 @@
+>              '*snapshot': 'str',
+>              '*user': 'str',
+>              '*auth-client-required': ['RbdAuthMode'],
+> +            '*key-secret': 'str',
+>              '*server': ['InetSocketAddressBase'] } }
+>  
+>  ##
+> -- 
+> 2.17.1
+> 
+> 
 
 Regards,
 Daniel
