@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fSqsG-00042c-T9
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 17:30:46 -0400
+	(envelope-from <bounces@canonical.com>) id 1fSr2B-0007KU-Qy
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 17:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fSqsC-0007gb-EL
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 17:30:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41368)
+	(envelope-from <bounces@canonical.com>) id 1fSr27-000465-4Y
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 17:40:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44566)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fSqsC-0007fM-71
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 17:30:40 -0400
+	id 1fSr26-00045C-Uo
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 17:40:55 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fSqsB-0007qh-3l
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 21:30:39 +0000
+	id 1fSr25-00012e-EF
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 21:40:53 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id D191C2E8041
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 21:30:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 604F72E802E
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 21:40:53 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Jun 2018 21:25:37 -0000
+Date: Tue, 12 Jun 2018 21:30:53 -0000
 From: guysoft <guysoft@gmail.com>
 Reply-To: Bug 1776478 <1776478@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152880770129.26761.1762643804065210181.malonedeb@gac.canonical.com>
-Message-Id: <152883873756.25566.17467978451340576051.malone@soybean.canonical.com>
+Message-Id: <152883905352.2146.5618932922136394901.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1776478] Re: Getting qemu: uncaught target signal
  6 when running lv2 plugin cross-compilation
@@ -39,42 +39,10 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Hey,
-Not sure how to boil it down (yet). But this would reproduce it for you:
+my bad, the line should be :
+source ./common.sh
 
-cd /tmp
-wget https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2=
-018-04-19/2018-04-18-raspbian-stretch-lite.zip
-unzip 2018-04-18-raspbian-stretch-lite.zip
-wget https://raw.githubusercontent.com/guysoft/CustomPiOS/devel/src/common.=
-sh
-source ./common
-mkdir ./mount
-
-mount_image ./2018-04-18-raspbian-stretch-lite.img 2 ./mount
-cd mount
-sudo bash -c "$(declare -f fixLd); fixLd"
-sudo cp $(which qemu-arm-static) ./usr/bin/
-sudo chroot .
-apt-get update
-
-apt-get install -y git premake libfreetype6-dev libgl1-mesa-dev libx11-dev =
-libasound2-dev
-git clone https://github.com/DISTRHO/DISTRHO-Ports.git --depth=3D1
-
-cd DISTRHO-Ports/
-
-export RASPPI=3Dtrue
-export LINUX_EMBED=3Dtrue
-
-./scripts/premake-update.sh linux
-
-make lv2 -j4
-
-
-once you have it all running you can just run again
-
-./libs/lv2_ttl_generator ./bin/lv2/TAL-Filter-2.lv2/TAL-Filter-2.so
+not "source ./common"
 
 -- =
 
