@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fSgNy-0005oG-5L
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:18:47 -0400
+	(envelope-from <thuth@redhat.com>) id 1fSgRB-0006sn-O2
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:22:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fSgNv-0004oy-20
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:18:46 -0400
+	(envelope-from <thuth@redhat.com>) id 1fSgR7-00061v-QF
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:22:05 -0400
 References: <20180612100448.202315-1-borntraeger@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <b4321a75-b58f-54cf-9f35-314c49afbd99@redhat.com>
-Date: Tue, 12 Jun 2018 12:18:39 +0200
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f32c6fa1-6a15-b9fe-8aa7-6ef0fc3afdf7@redhat.com>
+Date: Tue, 12 Jun 2018 12:21:55 +0200
 MIME-Version: 1.0
 In-Reply-To: <20180612100448.202315-1-borntraeger@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
@@ -25,7 +25,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
 On 12.06.2018 12:04, Christian Borntraeger wrote:
 > Right now the IPL device always starts from address 0x10000 (the usual
@@ -38,11 +38,6 @@ On 12.06.2018 12:04, Christian Borntraeger wrote:
 > v2->v3:
 > 	- check for iplpsw to avoid assert on file errors
 > 	- use 4 bytes at 4 instead of 8 bytes at 0
-
-I trust you that this is the right thing to do :)
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
 > v1->v2:
 > 	- use LINUX_MAGIC_ADDR define
 > 	- use assert for valid iplpsw pointer
@@ -96,9 +91,4 @@ Reviewed-by: David Hildenbrand <david@redhat.com>
 >              error_setg(&err, "could not load kernel '%s'", ipl->kernel);
 > 
 
-
--- 
-
-Thanks,
-
-David / dhildenb
+Reviewed-by: Thomas Huth <thuth@redhat.com>
