@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fShAc-0002Wn-Ld
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:09:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1fShM6-0005gB-N7
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:20:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fShAX-0004Ii-PN
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:09:02 -0400
-Received: from mga05.intel.com ([192.55.52.43]:27137)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1fShAX-0004Hi-BI
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:08:57 -0400
-Message-ID: <5B1FAAAF.4030705@intel.com>
-Date: Tue, 12 Jun 2018 19:12:47 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <bounces@canonical.com>) id 1fShM3-0002zi-JF
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:20:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56676)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fShM3-0002z0-Cz
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:20:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fShM1-0003qo-74
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 11:20:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2E92E2E80CC
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 11:20:49 +0000 (UTC)
 MIME-Version: 1.0
-References: <1528445443-43406-1-git-send-email-wei.w.wang@intel.com>
-	<1528445443-43406-5-git-send-email-wei.w.wang@intel.com>
-	<20180612075016.GD15344@xz-mi>
-In-Reply-To: <20180612075016.GD15344@xz-mi>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v8 4/6] migration/ram.c: add ram save state
- notifiers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 12 Jun 2018 11:14:50 -0000
+From: Launchpad Bug Tracker <1769053@bugs.launchpad.net>
+Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
+Message-Id: <152880209107.8741.3155008616330113616.launchpad@ackee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1769053] Re: Ability to control phys-bits through
+ libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,218 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
+To: qemu-devel@nongnu.org
 
-On 06/12/2018 03:50 PM, Peter Xu wrote:
-> On Fri, Jun 08, 2018 at 04:10:41PM +0800, Wei Wang wrote:
->> This patch adds a ram save state notifier list, and expose RAMState for
->> the notifer callbacks to use.
->>
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> CC: Juan Quintela <quintela@redhat.com>
->> CC: Michael S. Tsirkin <mst@redhat.com>
->> CC: Peter Xu <peterx@redhat.com>
->> ---
->>   include/migration/misc.h | 52 +++++++++++++++++++++++++++++++++++++++
->>   migration/ram.c          | 64 +++++++++++++++++-------------------------------
->>   2 files changed, 75 insertions(+), 41 deletions(-)
->>
->> diff --git a/include/migration/misc.h b/include/migration/misc.h
->> index 113320e..b970d7d 100644
->> --- a/include/migration/misc.h
->> +++ b/include/migration/misc.h
->> @@ -16,9 +16,61 @@
->>   
->>   #include "exec/cpu-common.h"
->>   #include "qemu/notify.h"
->> +#include "qemu/thread.h"
->>   
->>   /* migration/ram.c */
->>   
->> +typedef enum RamSaveState {
->> +    RAM_SAVE_ERR = 0,
->> +    RAM_SAVE_RESET = 1,
->> +    RAM_SAVE_BEFORE_SYNC_BITMAP = 2,
->> +    RAM_SAVE_AFTER_SYNC_BITMAP = 3,
->> +    RAM_SAVE_MAX = 4,
->> +} RamSaveState;
->> +
->> +/* State of RAM for migration */
->> +typedef struct RAMState {
->> +    /* QEMUFile used for this migration */
->> +    QEMUFile *f;
->> +    /* Last block that we have visited searching for dirty pages */
->> +    RAMBlock *last_seen_block;
->> +    /* Last block from where we have sent data */
->> +    RAMBlock *last_sent_block;
->> +    /* Last dirty target page we have sent */
->> +    ram_addr_t last_page;
->> +    /* last ram version we have seen */
->> +    uint32_t last_version;
->> +    /* We are in the first round */
->> +    bool ram_bulk_stage;
->> +    /* How many times we have dirty too many pages */
->> +    int dirty_rate_high_cnt;
->> +    /* ram save states used for notifiers */
->> +    int ram_save_state;
->> +    /* these variables are used for bitmap sync */
->> +    /* last time we did a full bitmap_sync */
->> +    int64_t time_last_bitmap_sync;
->> +    /* bytes transferred at start_time */
->> +    uint64_t bytes_xfer_prev;
->> +    /* number of dirty pages since start_time */
->> +    uint64_t num_dirty_pages_period;
->> +    /* xbzrle misses since the beginning of the period */
->> +    uint64_t xbzrle_cache_miss_prev;
->> +    /* number of iterations at the beginning of period */
->> +    uint64_t iterations_prev;
->> +    /* Iterations since start */
->> +    uint64_t iterations;
->> +    /* number of dirty bits in the bitmap */
->> +    uint64_t migration_dirty_pages;
->> +    /* protects modification of the bitmap */
->> +    QemuMutex bitmap_mutex;
->> +    /* The RAMBlock used in the last src_page_requests */
->> +    RAMBlock *last_req_rb;
->> +    /* Queue of outstanding page requests from the destination */
->> +    QemuMutex src_page_req_mutex;
->> +    QSIMPLEQ_HEAD(src_page_requests, RAMSrcPageRequest) src_page_requests;
->> +} RAMState;
-> Why move these chunk?  Can it be avoided?
->
->> +
->> +void add_ram_save_state_change_notifier(Notifier *notify);
->>   void ram_mig_init(void);
->>   void qemu_guest_free_page_hint(void *addr, size_t len);
->>   
->> diff --git a/migration/ram.c b/migration/ram.c
->> index 237f11e..d45b5a4 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -56,6 +56,9 @@
->>   #include "qemu/uuid.h"
->>   #include "savevm.h"
->>   
->> +static NotifierList ram_save_state_notifiers =
->> +    NOTIFIER_LIST_INITIALIZER(ram_save_state_notifiers);
->> +
->>   /***********************************************************/
->>   /* ram save/restore */
->>   
->> @@ -267,49 +270,18 @@ struct RAMSrcPageRequest {
->>       QSIMPLEQ_ENTRY(RAMSrcPageRequest) next_req;
->>   };
->>   
->> -/* State of RAM for migration */
->> -struct RAMState {
->> -    /* QEMUFile used for this migration */
->> -    QEMUFile *f;
->> -    /* Last block that we have visited searching for dirty pages */
->> -    RAMBlock *last_seen_block;
->> -    /* Last block from where we have sent data */
->> -    RAMBlock *last_sent_block;
->> -    /* Last dirty target page we have sent */
->> -    ram_addr_t last_page;
->> -    /* last ram version we have seen */
->> -    uint32_t last_version;
->> -    /* We are in the first round */
->> -    bool ram_bulk_stage;
->> -    /* How many times we have dirty too many pages */
->> -    int dirty_rate_high_cnt;
->> -    /* these variables are used for bitmap sync */
->> -    /* last time we did a full bitmap_sync */
->> -    int64_t time_last_bitmap_sync;
->> -    /* bytes transferred at start_time */
->> -    uint64_t bytes_xfer_prev;
->> -    /* number of dirty pages since start_time */
->> -    uint64_t num_dirty_pages_period;
->> -    /* xbzrle misses since the beginning of the period */
->> -    uint64_t xbzrle_cache_miss_prev;
->> -    /* number of iterations at the beginning of period */
->> -    uint64_t iterations_prev;
->> -    /* Iterations since start */
->> -    uint64_t iterations;
->> -    /* number of dirty bits in the bitmap */
->> -    uint64_t migration_dirty_pages;
->> -    /* protects modification of the bitmap */
->> -    QemuMutex bitmap_mutex;
->> -    /* The RAMBlock used in the last src_page_requests */
->> -    RAMBlock *last_req_rb;
->> -    /* Queue of outstanding page requests from the destination */
->> -    QemuMutex src_page_req_mutex;
->> -    QSIMPLEQ_HEAD(src_page_requests, RAMSrcPageRequest) src_page_requests;
->> -};
->> -typedef struct RAMState RAMState;
->> -
->>   static RAMState *ram_state;
->>   
->> +void add_ram_save_state_change_notifier(Notifier *notify)
->> +{
->> +    notifier_list_add(&ram_save_state_notifiers, notify);
->> +}
->> +
->> +static void notify_ram_save_state_change_notifier(void)
->> +{
->> +    notifier_list_notify(&ram_save_state_notifiers, ram_state);
->> +}
->> +
->>   uint64_t ram_bytes_remaining(void)
->>   {
->>       return ram_state ? (ram_state->migration_dirty_pages * TARGET_PAGE_SIZE) :
->> @@ -1139,6 +1111,9 @@ static void migration_bitmap_sync(RAMState *rs)
->>       int64_t end_time;
->>       uint64_t bytes_xfer_now;
->>   
->> +    rs->ram_save_state = RAM_SAVE_BEFORE_SYNC_BITMAP;
-> What's the point to keep this state after all?...
->
->> +    notify_ram_save_state_change_notifier();
->> +
->>       ram_counters.dirty_sync_count++;
->>   
->>       if (!rs->time_last_bitmap_sync) {
->> @@ -1205,6 +1180,9 @@ static void migration_bitmap_sync(RAMState *rs)
->>       if (migrate_use_events()) {
->>           qapi_event_send_migration_pass(ram_counters.dirty_sync_count, NULL);
->>       }
->> +
->> +    rs->ram_save_state = RAM_SAVE_AFTER_SYNC_BITMAP;
->> +    notify_ram_save_state_change_notifier();
->>   }
->>   
->>   /**
->> @@ -1961,6 +1939,8 @@ static void ram_state_reset(RAMState *rs)
->>       rs->last_page = 0;
->>       rs->last_version = ram_list.version;
->>       rs->ram_bulk_stage = true;
->> +    rs->ram_save_state = RAM_SAVE_RESET;
-> ... and this state is much more meaningless afaict ...
->
->> +    notify_ram_save_state_change_notifier();
->>   }
->>   
->>   #define MAX_WAIT 50 /* ms, half buffered_file limit */
->> @@ -2709,6 +2689,8 @@ out:
->>   
->>       ret = qemu_file_get_error(f);
->>       if (ret < 0) {
->> +        rs->ram_save_state = RAM_SAVE_ERR;
->> +        notify_ram_save_state_change_notifier();
->>           return ret;
->>       }
-> Also, I would prefer to add a general event framework for migration
-> rather than "ram save" specific.  Then we add SYNC_START/SYNC_END
-> events.  These notifiers aren't a lot, it'll be a bit awkward to
-> introduce the framework multiple times for similar purpuse (after we
-> have a common notifier we can merge the postcopy notifiers AFAIU).
+** Merge proposal linked:
+   https://code.launchpad.net/~paelzer/ubuntu/+source/qemu/+git/qemu/+merge=
+/347801
 
-Hi Peter,
+-- =
 
-Thanks for the review. We just got a little accident in the kernel part, 
-which may cause some modifications to the QEMU side interfaces. So I 
-will implement a new version and let you review in v9 patches.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1769053
 
-Best,
-Wei
+Title:
+  Ability to control phys-bits through libvirt
+
+Status in libvirt:
+  Unknown
+Status in QEMU:
+  Invalid
+Status in libvirt package in Ubuntu:
+  Triaged
+Status in qemu package in Ubuntu:
+  Invalid
+
+Bug description:
+  Attempting to start a KVM guest with more than 1TB of RAM fails.
+
+  It looks like we might need some extra patches:
+  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
+  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
+  Uname: Linux 4.15.0-20-generic x86_64
+  ApportVersion: 2.20.9-0ubuntu7
+  Architecture: amd64
+  CurrentDesktop: Unity:Unity7:ubuntu
+  Date: Fri May  4 16:21:14 2018
+  InstallationDate: Installed on 2017-04-05 (393 days ago)
+  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
+  MachineType: Dell Inc. XPS 13 9360
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
+pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
+off=3D1
+  SourcePackage: qemu
+  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
+  dmi.bios.date: 02/26/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: 2.6.2
+  dmi.board.name: 0PF86Y
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A00
+  dmi.chassis.type: 9
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
+60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
+  dmi.product.family: XPS
+  dmi.product.name: XPS 13 9360
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/libvirt/+bug/1769053/+subscriptions
