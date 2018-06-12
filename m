@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fShZo-0002BO-7P
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:35:05 -0400
+	(envelope-from <groug@kaod.org>) id 1fShfx-0004Nx-PK
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:41:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fShZk-0001vj-In
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:35:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38996 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1fShfu-0006hC-LM
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:41:25 -0400
+Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:52358)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fShZk-0001vQ-Bi
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:35:00 -0400
-Date: Tue, 12 Jun 2018 14:34:56 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180612142557-mutt-send-email-mst@kernel.org>
-References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
-	<20180611202207-mutt-send-email-mst@kernel.org>
-	<dc8b1669-b8b6-fb59-94e2-6e4de6b96572@redhat.com>
-	<20180612051432-mutt-send-email-mst@kernel.org>
-	<23fc4aa4-ec41-d6e2-3354-10cbfc13b7ec@intel.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fShfu-0006fq-EY
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:41:22 -0400
+Received: from player795.ha.ovh.net (unknown [10.109.108.4])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id A177EC4C72
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 13:41:18 +0200 (CEST)
+Date: Tue, 12 Jun 2018 13:41:04 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180612134104.11bd1b62@bahia.lan>
+In-Reply-To: <20180612101135.23852-1-clg@kaod.org>
+References: <20180612101135.23852-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <23fc4aa4-ec41-d6e2-3354-10cbfc13b7ec@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qemu: Introduce VIRTIO_NET_F_STANDBY
- feature bit to virtio_net
+Subject: Re: [Qemu-devel] [PATCH v2] xics_kvm: fix a build break
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,124 +29,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
-Cc: Jason Wang <jasowang@redhat.com>, alexander.h.duyck@intel.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, jiri@resnulli.us, kubakici@wp.pl, netdev@vger.kernel.org, jesse.brandeburg@intel.com, virtualization@lists.linux-foundation.org, loseweigh@gmail.com, aaron.f.brown@intel.com
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>
 
-On Mon, Jun 11, 2018 at 10:02:45PM -0700, Samudrala, Sridhar wrote:
-> On 6/11/2018 7:17 PM, Michael S. Tsirkin wrote:
-> > On Tue, Jun 12, 2018 at 09:54:44AM +0800, Jason Wang wrote:
-> > >=20
-> > > On 2018=E5=B9=B406=E6=9C=8812=E6=97=A5 01:26, Michael S. Tsirkin wr=
-ote:
-> > > > On Mon, May 07, 2018 at 04:09:54PM -0700, Sridhar Samudrala wrote=
-:
-> > > > > This feature bit can be used by hypervisor to indicate virtio_n=
-et device to
-> > > > > act as a standby for another device with the same MAC address.
-> > > > >=20
-> > > > > I tested this with a small change to the patch to mark the STAN=
-DBY feature 'true'
-> > > > > by default as i am using libvirt to start the VMs.
-> > > > > Is there a way to pass the newly added feature bit 'standby' to=
- qemu via libvirt
-> > > > > XML file?
-> > > > >=20
-> > > > > Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> > > > So I do not think we can commit to this interface: we
-> > > > really need to control visibility of the primary device.
-> > > The problem is legacy guest won't use primary device at all if we d=
-o this.
-> > And that's by design - I think it's the only way to ensure the
-> > legacy guest isn't confused.
+On Tue, 12 Jun 2018 12:11:35 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+
+> On CentOS 7.5, gcc-4.8.5-28.el7_5.1.ppc64le fails to build QEMU due to :
 >=20
-> Yes. I think so. But i am not sure if Qemu is the right place to contro=
-l the visibility
-> of the primary device. The primary device may not be specified as an ar=
-gument to Qemu. It
-> may be plugged in later.
-> The cloud service provider is providing a feature that enables low late=
-ncy datapath and live
-> migration capability.
-> A tenant can use this feature only if he is running a VM that has virti=
-o-net with failover support.
-
-Well live migration is there already. The new feature is low latency
-data path.
-
-And it's the guest that needs failover support not the VM.
-
-
-> I think Qemu should check if guest virtio-net supports this feature and=
- provide a mechanism for
-> an upper layer indicating if the STANDBY feature is successfully negoti=
-ated or not.
-> The upper layer can then decide if it should hot plug a VF with the sam=
-e MAC and manage the 2 links.
-> If VF is successfully hot plugged, virtio-net link should be disabled.
-
-Did you even talk to upper layer management about it?
-Just list the steps they need to do and you will see
-that's a lot of machinery to manage by the upper layer.
-
-What do we gain in flexibility? As far as I can see the
-only gain is some resources saved for legacy VMs.
-
-That's not a lot as tenant of the upper layer probably already has
-at least a hunch that it's a new guest otherwise
-why bother specifying the feature at all - you
-save even more resources without it.
-
-
-
-
+>   hw/intc/xics_kvm.c: In function =E2=80=98ics_set_kvm_state=E2=80=99:
+>   hw/intc/xics_kvm.c:281:13: error: =E2=80=98ret=E2=80=99 may be used uni=
+nitialized in this
+>     function [-Werror=3Dmaybe-uninitialized]
+>              return ret;
 >=20
-> >=20
-> > > How about control the visibility of standby device?
-> > >=20
-> > > Thanks
-> > standy the always there to guarantee no downtime.
-> >=20
-> > > > However just for testing purposes, we could add a non-stable
-> > > > interface "x-standby" with the understanding that as any
-> > > > x- prefix it's unstable and will be changed down the road,
-> > > > likely in the next release.
-> > > >=20
-> > > >=20
-> > > > > ---
-> > > > >    hw/net/virtio-net.c                         | 2 ++
-> > > > >    include/standard-headers/linux/virtio_net.h | 3 +++
-> > > > >    2 files changed, 5 insertions(+)
-> > > > >=20
-> > > > > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > > > > index 90502fca7c..38b3140670 100644
-> > > > > --- a/hw/net/virtio-net.c
-> > > > > +++ b/hw/net/virtio-net.c
-> > > > > @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] =3D=
- {
-> > > > >                         true),
-> > > > >        DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SP=
-EED_UNKNOWN),
-> > > > >        DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_=
-str),
-> > > > > +    DEFINE_PROP_BIT64("standby", VirtIONet, host_features, VIR=
-TIO_NET_F_STANDBY,
-> > > > > +                      false),
-> > > > >        DEFINE_PROP_END_OF_LIST(),
-> > > > >    };
-> > > > > diff --git a/include/standard-headers/linux/virtio_net.h b/incl=
-ude/standard-headers/linux/virtio_net.h
-> > > > > index e9f255ea3f..01ec09684c 100644
-> > > > > --- a/include/standard-headers/linux/virtio_net.h
-> > > > > +++ b/include/standard-headers/linux/virtio_net.h
-> > > > > @@ -57,6 +57,9 @@
-> > > > >    					 * Steering */
-> > > > >    #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
-> > > > > +#define VIRTIO_NET_F_STANDBY      62    /* Act as standby for =
-another device
-> > > > > +                                         * with the same MAC.
-> > > > > +                                         */
-> > > > >    #define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Device set linkspeed=
- and duplex */
-> > > > >    #ifndef VIRTIO_NET_NO_LEGACY
-> > > > > --=20
-> > > > > 2.14.3
+> Fix the breakage and also remove the extra error reporting as
+> kvm_device_access() already provides a substantial error message.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>=20
+>  Greg, can you please test ? RHEL7.5 does not catch the issue with the
+>  same compiler level :/ I don't understand why.
+>=20
+
+This fixes the build breakage for me. Now this should really be squashed
+into your original patch to preserve bisect on master.
+
+Just one remark:
+
+>  hw/intc/xics_kvm.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 8bdf6afe82a0..8dba2f84e71e 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -186,8 +186,7 @@ static void ics_get_kvm_state(ICSState *ics)
+>          kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+>                            i + ics->offset, &state, false, &local_err);
+>          if (local_err) {
+> -            error_report("Unable to retrieve KVM interrupt controller st=
+ate"
+> -                    " for IRQ %d: %s", i + ics->offset, strerror(errno));
+> +            error_report_err(local_err);
+
+This would change the error message from:
+
+Unable to retrieve KVM interrupt controller state for IRQ 4096: Invalid arg=
+ument
+
+to
+
+KVM_GET_DEVICE_ATTR failed: Group 1 attr 0x0000000000001000: Invalid argume=
+nt
+
+I find it a bit cryptic, and we loose both the IRQ number and direct indica=
+tion
+that it is related to XICS on KVM. That's why I had suggested to print both=
+ with
+error_reportf_err().
+
+Since this would result in a very long line, alternatively, you can
+keep the current error message, using -ret instead of errno, and call
+error_free(local_err).
+
+>              exit(1);
+>          }
+> =20
+> @@ -273,11 +272,10 @@ static int ics_set_kvm_state(ICSState *ics, int ver=
+sion_id)
+>                  state |=3D KVM_XICS_QUEUED;
+>          }
+> =20
+> -        kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+> -                          i + ics->offset, &state, true, &local_err);
+> +        ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURC=
+ES,
+> +                                i + ics->offset, &state, true, &local_er=
+r);
+>          if (local_err) {
+> -            error_report("Unable to restore KVM interrupt controller sta=
+te"
+> -                    " for IRQs %d: %s", i + ics->offset, strerror(errno)=
+);
+> +            error_report_err(local_err);
+
+
+
+>              return ret;
+>          }
+>      }
