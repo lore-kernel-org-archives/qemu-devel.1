@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fSjVU-0008Ar-NZ
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:38:45 -0400
+	(envelope-from <junyan.he@gmx.com>) id 1fSjVZ-0008Fv-Hp
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fSjVT-0004oY-FT
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:38:44 -0400
-Date: Tue, 12 Jun 2018 15:38:34 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180612133834.GC4355@localhost.localdomain>
-References: <20180607062559.16127-1-armbru@redhat.com>
-	<20180607062559.16127-7-armbru@redhat.com>
+	(envelope-from <junyan.he@gmx.com>) id 1fSjVV-0004qO-FD
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:38:49 -0400
+Received: from mout.gmx.net ([212.227.15.18]:34529)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1fSjVV-0004p5-1U
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:38:45 -0400
+From: Junyan He <junyan.he@gmx.com>
+Sender: Junyan He <junyan.he@hotmail.com>
+Date: Tue, 12 Jun 2018 13:38:08 +0000
+Message-ID: <HK2PR06MB0531F10A69CBFC1D41402F19EB7F0@HK2PR06MB0531.apcprd06.prod.outlook.com>
+References: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>,
+	<20180612140643.6f6ed34d@redhat.com>
+In-Reply-To: <20180612140643.6f6ed34d@redhat.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180607062559.16127-7-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 06/19] block: Fix -blockdev for certain
- non-string scalars
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH V6 0/7] nvdimm: guarantee persistence of
+ QEMU writes to persistent memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,118 +30,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>, "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, Junyan He <junyan.he@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
 
-Am 07.06.2018 um 08:25 hat Markus Armbruster geschrieben:
-> Configuration flows through the block subsystem in a rather peculiar
-> way.  Configuration made with -drive enters it as QemuOpts.
-> Configuration made with -blockdev / blockdev-add enters it as QAPI
-> type BlockdevOptions.  The block subsystem uses QDict, QemuOpts and
-> QAPI types internally.  The precise flow is next to impossible to
-> explain (I tried for this commit message, but gave up after wasting
-> several hours).  What I can explain is a flaw in the BlockDriver
-> interface that leads to this bug:
-> 
->     $ qemu-system-x86 -blockdev node-name=n1,driver=nfs,server.type=inet,server.host=localhost,path=/foo/bar,user=1234: Internal error: parameter user invalid
->     qemu-system-x86: -blockdev node-name=n1,driver=nfs,server.type=inet,server.host=localhost,path=/foo/bar,user=1234: Internal error: parameter user invalid
+He have pmem_persist and pmem_memcpy_persist stub functions.
 
-I don't think the error message was intended to be part of your command
-line, and I also don't have a binary called qemu-system-x86. :-)
+If no libpmem and user really specify pmem=3Don, we just do nothing or just=
+ memcpy.
 
-> QMP blockdev-add is broken the same way.
-> 
-> Here's what happens.  The block layer passes configuration represented
-> as flat QDict (with dotted keys) to BlockDriver methods
-> .bdrv_file_open().  The QDict's members are typed according to the
-> QAPI schema.
-> 
-> nfs_file_open() converts it to QAPI type BlockdevOptionsNfs, with
-> qdict_crumple() and a qobject input visitor.
-> 
-> This visitor comes in two flavors.  The plain flavor requires scalars
-> to be typed according to the QAPI schema.  That's the case here.  The
-> keyval flavor requires string scalars.  That's not the case here.
-> nfs_file_open() uses the latter, and promptly falls apart for members
-> @user, @group, @tcp-syn-count, @readahead-size, @page-cache-size,
-> @debug.
-> 
-> Switching to the plain flavor would fix -blockdev, but break -drive,
-> because there the scalars arrive in nfs_file_open() as strings.
-> 
-> The proper fix would be to replace the QDict by QAPI type
-> BlockdevOptions in the BlockDriver interface.  Sadly, that's beyond my
-> reach right now.
-> 
-> Next best would be to fix the block layer to always pass correctly
-> typed QDicts to the BlockDriver methods.  Also beyond my reach.
-> 
-> What I can do is throw another hack onto the pile: have
-> nfs_file_open() convert all members to string, so use of the keyval
-> flavor actually works, by replacing qdict_crumple() by new function
-> qdict_crumple_for_keyval_qiv().
-> 
-> The pattern "pass result of qdict_crumple() to
-> qobject_input_visitor_new_keyval()" occurs several times more:
-> 
-> * qemu_rbd_open()
-> 
->   Same issue as nfs_file_open(), but since BlockdevOptionsRbd has only
->   string members, its only a latent bug.  Fix it anyway.
-> 
-> * parallels_co_create_opts(), qcow_co_create_opts(),
->   qcow2_co_create_opts(), bdrv_qed_co_create_opts(),
->   sd_co_create_opts(), vhdx_co_create_opts(), vpc_co_create_opts()
-> 
->   These work, because they create the QDict with
->   qemu_opts_to_qdict_filtered(), which creates only string scalars.
->   The function sports a TODO comment asking for better typing; that's
->   going to be fun.  Use qdict_crumple_for_keyval_qiv() to be safe.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Real persistent memory always require libpmem support its load/save.
 
-> +QObject *qdict_crumple_for_keyval_qiv(QDict *src, Error **errp)
-> +{
-> +    QDict *tmp = NULL;
-> +    char *buf;
-> +    const char *s;
-> +    const QDictEntry *ent;
-> +    QObject *dst;
-> +
-> +    for (ent = qdict_first(src); ent; ent = qdict_next(src, ent)) {
-> +        buf = NULL;
-> +        switch (qobject_type(ent->value)) {
-> +        case QTYPE_QNULL:
-> +        case QTYPE_QSTRING:
-> +            continue;
-> +        case QTYPE_QNUM:
-> +            s = buf = qnum_to_string(qobject_to(QNum, ent->value));
-> +            break;
-> +        case QTYPE_QDICT:
-> +        case QTYPE_QLIST:
-> +            /* @src isn't flat; qdict_crumple() will fail */
-> +            continue;
-> +        case QTYPE_QBOOL:
-> +            s = qbool_get_bool(qobject_to(QBool, ent->value))
-> +                ? "on" : "off";
+If pmem=3Don and without libpmem, we can think that user want to imitate
 
-This fits in a single line.
+pmem=3Don while the HW environment is without real persistent memory existi=
+ng.
 
-> +            break;
-> +        default:
-> +            abort();
-> +        }
-> +
-> +        if (!tmp) {
-> +            tmp = qdict_clone_shallow(src);
-> +        }
-> +        qdict_put(tmp, ent->key, qstring_from_str(s));
-> +        g_free(buf);
-> +    }
-> +
-> +    dst = qdict_crumple(tmp ?: src, errp);
-> +    qobject_unref(tmp);
-> +    return dst;
-> +}
+It may help debug on some machine without real pmem.
 
-Kevin
+________________________________
+From: Qemu-devel <qemu-devel-bounces+junyan.he=3Dgmx.com@nongnu.org> on beh=
+alf of Igor Mammedov <imammedo@redhat.com>
+Sent: Tuesday, June 12, 2018 12:06:43 PM
+To: junyan.he@gmx.com
+Cc: Haozhong Zhang; xiaoguangrong.eric@gmail.com; crosthwaite.peter@gmail.c=
+om; mst@redhat.com; qemu-devel@nongnu.org; dgilbert@redhat.com; quintela@re=
+dhat.com; Junyan He; stefanha@redhat.com; pbonzini@redhat.com; rth@twiddle.=
+net; ehabkost@redhat.com
+Subject: Re: [Qemu-devel] [PATCH V6 0/7] nvdimm: guarantee persistence of Q=
+EMU writes to persistent memory
+
+On Fri,  1 Jun 2018 16:10:22 +0800
+junyan.he@gmx.com wrote:
+
+> From: Junyan He <junyan.he@intel.com>
+>
+> QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and
+> live migration. If the backend is on the persistent memory, QEMU needs
+> to take proper operations to ensure its writes persistent on the
+> persistent memory. Otherwise, a host power failure may result in the
+> loss the guest data on the persistent memory.
+
+extra question, what are expected behavior when QEMU is built without
+libpmem and user specifies pmem=3Don for backend?
+
+>
+> This v3 patch series is based on Marcel's patch "mem: add share
+> parameter to memory-backend-ram" [1] because of the changes in patch 1.
+>
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03858.html
+>
+> Previous versions can be found at
+> v5: https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02258.html
+> V4: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06993.html
+> v3: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04365.html
+> v2: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01579.html
+> v1: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg05040.html
+>
+> Changes in v6:
+> * (Patch 1) Expose all ram block flags rather than redefine the flags.
+> * (Patch 4) Use pkg-config rather the hard check when configure.
+> * (Patch 7) Sync and flush all the pmem data when migration completes,
+> rather than sync pages one by one in previous version.
+>
+> Changes in v5:
+> * (Patch 9) Add post copy check and output some messages for nvdimm.
+>
+> Changes in v4:
+> * (Patch 2) Fix compilation errors found by patchew.
+>
+> Changes in v3:
+> * (Patch 5) Add a is_pmem flag to ram_handle_compressed() and handle
+> PMEM writes in it, so we don't need the _common function.
+> * (Patch 6) Expose qemu_get_buffer_common so we can remove the
+> unnecessary qemu_get_buffer_to_pmem wrapper.
+> * (Patch 8) Add a is_pmem flag to xbzrle_decode_buffer() and handle
+> PMEM writes in it, so we can remove the unnecessary
+> xbzrle_decode_buffer_{common, to_pmem}.
+> * Move libpmem stubs to stubs/pmem.c and fix the compilation failures
+> of test-{xbzrle,vmstate}.c.
+>
+> Changes in v2:
+> * (Patch 1) Use a flags parameter in file ram allocation functions.
+> * (Patch 2) Add a new option 'pmem' to hostmem-file.
+> * (Patch 3) Use libpmem to operate on the persistent memory, rather
+> than re-implementing those operations in QEMU.
+> * (Patch 5-8) Consider the write persistence in the migration path.
+>
+>
+> Junyan:
+> [1/7] memory, exec: Expose all memory block related flags.
+> [6/7] migration/ram: Add check and info message to nvdimm post copy.
+> [7/7] migration/ram: ensure write persistence on loading all date to PMEM=
+.
+>
+> Haozhong:
+> [5/7] mem/nvdimm: ensure write persistence to PMEM in label emulation
+>
+> Haozhong & Junyan:
+> [2/7] memory, exec: switch file ram allocation functions to 'flags' param=
+eters
+> [3/7] hostmem-file: add the 'pmem' option
+> [4/7] configure: add libpmem support
+>
+>
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> Signed-off-by: Junyan He <junyan.he@intel.com>
+>
+> ---
+> backends/hostmem-file.c | 28 +++++++++++++++++++++++++++-
+> configure               | 29 +++++++++++++++++++++++++++++
+> docs/nvdimm.txt         | 14 ++++++++++++++
+> exec.c                  | 36 ++++++++++++++----------------------
+> hw/mem/nvdimm.c         |  9 ++++++++-
+> include/exec/memory.h   | 31 +++++++++++++++++++++++++++++--
+> include/exec/ram_addr.h | 28 ++++++++++++++++++++++++++--
+> include/qemu/pmem.h     | 24 ++++++++++++++++++++++++
+> memory.c                |  8 +++++---
+> migration/ram.c         | 18 ++++++++++++++++++
+> numa.c                  |  2 +-
+> qemu-options.hx         |  7 +++++++
+> stubs/Makefile.objs     |  1 +
+> stubs/pmem.c            | 23 +++++++++++++++++++++++
+> 14 files changed, 226 insertions(+), 32 deletions(-)
