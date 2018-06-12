@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fSeJv-0005Z6-Vg
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 04:06:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1fSeKS-0005vV-Jp
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 04:07:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fSeJu-0002z9-Pr
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 04:06:27 -0400
-Date: Tue, 12 Jun 2018 09:06:11 +0100
+	(envelope-from <berrange@redhat.com>) id 1fSeKR-0003AV-Nu
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 04:07:00 -0400
+Date: Tue, 12 Jun 2018 09:06:48 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180612080611.GD23739@redhat.com>
+Message-ID: <20180612080648.GE23739@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20180611205203.2624-1-mreitz@redhat.com>
-	<20180611205203.2624-5-mreitz@redhat.com>
+	<20180611205203.2624-6-mreitz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180611205203.2624-5-mreitz@redhat.com>
+In-Reply-To: <20180611205203.2624-6-mreitz@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 04/10] qapi: Formalize qcow2 encryption
+Subject: Re: [Qemu-devel] [PATCH v2 05/10] qapi: Formalize qcow encryption
  probing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,16 +29,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Max Reitz <mreitz@redhat.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Mon, Jun 11, 2018 at 10:51:57PM +0200, Max Reitz wrote:
-> Currently, you can give no encryption format for a qcow2 file while
-> still passing a key-secret.  That does not conform to the schema, so
-> this patch changes the schema to allow it.
+On Mon, Jun 11, 2018 at 10:51:58PM +0200, Max Reitz wrote:
+> qcow only supports a single encryption (and there is no reason why that
+> would change in the future), so we can make it the default.
 >=20
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
->  qapi/block-core.json | 44 ++++++++++++++++++++++++++++++++++++++++----
->  block/qcow2.c        |  3 +++
->  2 files changed, 43 insertions(+), 4 deletions(-)
+>  qapi/block-core.json | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
