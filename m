@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fSoKO-0007MK-4z
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:47:37 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fSoTy-0002x4-9s
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fSoKL-0005RR-0g
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:47:36 -0400
-Date: Tue, 12 Jun 2018 12:47:29 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180612124729.0e630825@w520.home>
-In-Reply-To: <85642e2a-f00a-3d85-8525-0ae89e4d71c9@redhat.com>
-References: <20180611141716.3813-1-peter.maydell@linaro.org>
-	<650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
-	<85642e2a-f00a-3d85-8525-0ae89e4d71c9@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fSoTv-0003JL-6U
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:57:30 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <f9a9b5bb-4941-a6b3-ff6b-02ab2cb046df@virtuozzo.com>
+Date: Tue, 12 Jun 2018 21:57:18 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
- for multiline comments
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: [Qemu-devel] bug in reopen arch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +21,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, patches@linaro.org, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: "Denis V. Lunev" <den@openvz.org>
 
-On Tue, 12 Jun 2018 20:12:02 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+Hi all!
 
-> On 12.06.2018 19:30, Richard Henderson wrote:
-> > On 06/11/2018 04:17 AM, Peter Maydell wrote:  
-> >> The codebase has a bit of a mix of different multiline
-> >> comment styles. State a preference for the Linux kernel
-> >> style:
-> >>     /*
-> >>      * Star on the left for each line.
-> >>      * Leading slash-star and trailing star-slash
-> >>      * each go on a line of their own.
-> >>      */
-> >>
-> >> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> >> ---
-> >> This is not my personal favourite, but seemed to be the
-> >> closest we had to consensus in the mail thread for v1;
-> >> I can live with it in order to avoid getting patches which
-> >> use the styles I like even less :-)  
-> > 
-> > Honestly, I don't like this except for "important" comments.
-> > 
-> > A "small" comment, e.g. one that doesn't quite fit on a single line, now takes
-> > 4 lines instead of 2.  Which is really annoying and IMO tends to break flow.
-> > 
-> > If you don't like
-> > 
-> >   /* gnu
-> >      style */
-> > 
-> > or
-> > 
-> >   /* whatever
-> >    * this is */
-> > 
-> > could you live with
-> > 
-> >   // c99/c++
-> >   // comments  
-> 
-> FWIW:
-> 
-> +1 for one or two of those compact styles for two- or three-line comments.
+I've faced the following problem:
 
-or four-line or single paragraphs or comments that rhyme with
-"orange"...  If the comment is too large for a single line, then take
-some time to say it more concisely, or maybe it does deserve enough
-thought to frame a nice paragraph for it.  We're well into personal
-style here, so either this is important enough to make some people
-unhappy or we should leave it to maintainer preference and consistency
-within a file/area.  Thanks,
+ =C2=A0=C2=A0=C2=A0 1. create image with dirty bitmap, a.qcow2 (start qemu =
+and run qmp
+ =C2=A0=C2=A0=C2=A0 command block-dirty-bitmap-add)
 
-Alex
+ =C2=A0=C2=A0=C2=A0 2. run the following commands:
+
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu-img create -f qcow2 -b a.q=
+cow2 b.qcow2 10M
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu-io -c 'write 0 512' b.qcow=
+2
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu-img commit b.qcow2
+
+ =C2=A0=C2=A0=C2=A0 3. last command fails with the following output:
+
+Formatting 'b.qcow2', fmt=3Dqcow2 size=3D68719476736 backing_file=3Da.qcow2=
+=20
+cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+wrote 512/512 bytes at offset 0
+512 bytes, 1 ops; 0.0953 sec (5.243 KiB/sec and 10.4867 ops/sec)
+qemu-img: #block397: Failed to make dirty bitmaps writable: Can't update=20
+bitmap directory: Operation not permitted
+qemu-img: Block job failed: Operation not permitted
+
+
+And problem is that children are reopened _after_ parent. But qcow2=20
+reopen needs write access to its file, to write IN_USE flag to=20
+dirty-bitmaps extension.
+
+I've tried to fix it as simple as:
+
+
+diff --git a/block.c b/block.c
+index cfe5e6080d..392b2941ac 100644
+--- a/block.c
++++ b/block.c
+@@ -2793,7 +2793,7 @@ static BlockReopenQueue=20
+*bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
+
+ =C2=A0=C2=A0=C2=A0=C2=A0 if (!bs_entry) {
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs_entry =3D g_new0(Block=
+ReopenQueueEntry, 1);
+-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QSIMPLEQ_INSERT_TAIL(bs_queue, =
+bs_entry, entry);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QSIMPLEQ_INSERT_HEAD(bs_queue, =
+bs_entry, entry);
+ =C2=A0=C2=A0=C2=A0=C2=A0 } else {
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QDECREF(bs_entry->state.o=
+ptions);
+ =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QDECREF(bs_entry->state.e=
+xplicit_options);
+
+
+But this breaks a lot of iotests. And looks like it is wrong idea,=20
+because permissions should be updated for parent first. We've faced and=20
+fixed similar problems with invalidation sequence. Reopen architecture=20
+differs with it's bs_queue.. Any ideas how to fix this?
+
+Similar story with invalidation includes
+
+commit 16e977d506bcc2d9f7daa4a9f7cc2b48536d9da6
+Author: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date:=C2=A0=C2=A0 Tue Jan 31 14:23:08 2017 +0300
+
+ =C2=A0=C2=A0=C2=A0 block: bdrv_invalidate_cache: invalidate children first
+
+and
+
+commit dafe096057373d95847e1c99c2fece34be9fc5bb
+Author: Kevin Wolf <kwolf@redhat.com>
+Date:=C2=A0=C2=A0 Thu Nov 16 13:00:01 2017 +0100
+
+ =C2=A0=C2=A0=C2=A0 block: Fix permissions in image activation
+
+--=20
+Best regards,
+Vladimir
