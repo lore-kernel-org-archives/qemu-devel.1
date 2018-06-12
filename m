@@ -1,32 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fSoBa-0003Qi-Fc
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:38:31 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSoBk-0003UF-Gc
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:38:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fSoBW-0000vS-FW
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:38:30 -0400
-Received: from mail-cys01nam02on0071.outbound.protection.outlook.com
-	([104.47.37.71]:45184
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fSoBW-0000uz-4T
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:38:26 -0400
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Tue, 12 Jun 2018 18:38:08 +0000
-Message-ID: <DM5PR12MB2471F6EA1525A824A9A94545957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
-	<1528498581-131037-4-git-send-email-babu.moger@amd.com>
-	<20180611205030.GW7451@localhost.localdomain>
-	<20180611211026.GA7451@localhost.localdomain>
-	<DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612174021.GL7451@localhost.localdomain>
-In-Reply-To: <20180612174021.GL7451@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSoBg-000109-IH
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:38:40 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:45115)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSoBg-0000yf-DW
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:38:36 -0400
+Received: by mail-qt0-x243.google.com with SMTP id i18-v6so24679837qtp.12
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 11:38:36 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <267f42a5-b7ce-379e-ffd1-f2611393d2ff@web.de>
+	<ad56487b-5afe-1420-9903-d5d849f97231@siemens.com>
+	<CAFEAcA9V9nFMVixeYjfBj54OT3zhRCVHM495AZHDzxVryh4JFA@mail.gmail.com>
+	<6730e270-9906-a43c-68b0-7a09a0743fa5@siemens.com>
+	<d64ace8c-30ca-e16c-fd73-746476bf3a6b@siemens.com>
+	<7bb24572-0fc1-00de-3552-aca1111059ed@amsat.org>
+	<63ee188e-0c66-ce7e-03b2-fd58e4da9116@siemens.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3a128f8d-46a3-591f-ee09-8c9a3f2401ea@amsat.org>
+Date: Tue, 12 Jun 2018 15:38:30 -0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
- AMD EPYC CPU
+In-Reply-To: <63ee188e-0c66-ce7e-03b2-fd58e4da9116@siemens.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] e1000e: Do not auto-clear ICR bits which
+ aren't set in EIAC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,142 +41,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
+To: Jan Kiszka <jan.kiszka@siemens.com>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
 
+On 06/12/2018 03:30 PM, Jan Kiszka wrote:
+> On 2018-06-12 20:11, Philippe Mathieu-Daudé wrote:
+>> Hi Jan,
+>>
+>> On 06/12/2018 02:22 PM, Jan Kiszka wrote:
+>>> On 2018-05-22 09:00, Jan Kiszka wrote:
+>>>> On 2018-04-16 17:29, Peter Maydell wrote:
+>>>>> On 16 April 2018 at 16:25, Jan Kiszka <jan.kiszka@siemens.com> wrote:
+>>>>>> On 2018-04-01 23:17, Jan Kiszka wrote:
+>>>>>>> From: Jan Kiszka <jan.kiszka@siemens.com>
+>>>>>>>
+>>>>>>> The spec does not justify clearing of any E1000_ICR_OTHER_CAUSES when
+>>>>>>> E1000_ICR_OTHER is set in EIAC. In fact, removing this code fixes the
+>>>>>>> issue the Linux driver runs into since 4aea7a5c5e94 ("e1000e: Avoid
+>>>>>>> receiver overrun interrupt bursts") and was worked around by
+>>>>>>> 745d0bd3af99 ("e1000e: Remove Other from EIAC").
+>>>>>>>
+>>>>>>> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+>>>>>>> ---
+>>>>>>>
+>>>>>>> This resolves the issue I reported on February 18 ("e1000e: MSI-X
+>>>>>>> problem with recent Linux drivers").
+>>>>>>>
+>>>>>>>  hw/net/e1000e_core.c | 4 ----
+>>>>>>>  1 file changed, 4 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+>>>>>>> index ecf9b15555..d38f025c0f 100644
+>>>>>>> --- a/hw/net/e1000e_core.c
+>>>>>>> +++ b/hw/net/e1000e_core.c
+>>>>>>> @@ -2022,10 +2022,6 @@ e1000e_msix_notify_one(E1000ECore *core, uint32_t cause, uint32_t int_cfg)
+>>>>>>>
+>>>>>>>      effective_eiac = core->mac[EIAC] & cause;
+>>>>>>>
+>>>>>>> -    if (effective_eiac == E1000_ICR_OTHER) {
+>>>>>>> -        effective_eiac |= E1000_ICR_OTHER_CAUSES;
+>>>>>>> -    }
+>>>>>>> -
+>>>>>>>      core->mac[ICR] &= ~effective_eiac;
+>>>>>>>
+>>>>>>>      if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
+>>>>>>>
+>>>>>>
+>>>>>> Ping for this - as well as https://patchwork.ozlabs.org/patch/895476.
+>>>>>>
+>>>>>> Given that q35 uses e1000e by default and many Linux kernel versions no
+>>>>>> longer work, this should likely go into upcoming and stable versions
+>>>>>
+>>>>> I'd rather not put it into 2.12 at this point in the release
+>>>>> cycle unless it's a regression from 2.11, I think.
+>>>>
+>>>> Second ping - nothing hit the repo so far, nor did I receive feedback.
+>>>>
+>>>
+>>> And another ping. For both.
+>>>
+>>> These days I had to help someone with a broken QEMU setup that failed
+>>> installing from network. It turned out that "modprobe e1000e IntMode=0"
+>>> was needed to workaround the issues my patches address.
+>>
+>> What about the IMS register? It is set just after.
+>>
+>> Looking at b38636b8372, can you test this patch?
+>>
+>> -- >8 --
+>> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+>> index c93c4661ed..a484b68a5a 100644
+>> --- a/hw/net/e1000e_core.c
+>> +++ b/hw/net/e1000e_core.c
+>> @@ -2022,13 +2022,13 @@ e1000e_msix_notify_one(E1000ECore *core,
+>> uint32_t cause, uint32_t int_cfg)
+>>
+>>      effective_eiac = core->mac[EIAC] & cause;
+>>
+>> -    if (effective_eiac == E1000_ICR_OTHER) {
+>> -        effective_eiac |= E1000_ICR_OTHER_CAUSES;
+>> -    }
+>> -
+>>      core->mac[ICR] &= ~effective_eiac;
+>>
+>>      if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
+>> +        if (effective_eiac == E1000_ICR_OTHER) {
+>> +            effective_eiac |= E1000_ICR_OTHER_CAUSES;
+>> +        }
+>> +
+>>          core->mac[IMS] &= ~effective_eiac;
+>>      }
+>>  }
+>>
+> 
+> Before testing this: What would be the reasoning for this change?
 
+Not breaking the purpose of b38636b8372 :)
 
-> -----Original Message-----
-> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Tuesday, June 12, 2018 12:40 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
-> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Jiri
-> Denemark <jdenemar@redhat.com>
-> Subject: Re: [PATCH v13 3/5] i386: Enable TOPOEXT feature on AMD EPYC
-> CPU
->=20
-> On Tue, Jun 12, 2018 at 04:29:25PM +0000, Moger, Babu wrote:
-> > > [...]
-> > > > > +        /* TOPOEXT feature requires 0x8000001E */
-> > > > > +        if (env->features[FEAT_8000_0001_ECX] &
-> CPUID_EXT3_TOPOEXT)
-> > > {
-> > > > > +            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel,
-> > > 0x8000001E);
-> > > > > +        }
-> > > >
-> > > > I suggest moving this hunk to a separate patch.  I'm not 100%
-> > > > sure yet if this will require compat_props code to disable
-> > > > auto-xlevel-increase on older machine-types.
-> > >
-> > > The problem here is that:
-> > >   $QEMU -machine pc-i440fx-1.3 -cpu Opteron_G4,+topoext
-> > > currently results in xlevel=3D0x8000001A, since QEMU 1.3.
-> > >
-> > > (The same applies to all machine-types between 1.3 and 2.12)
-> > >
-> > > I was hoping that we could declare topoext as non-migration-safe,
-> > > but I believe libvirt will already include "topoext" when using
-> > > "host-model" if the host CPU supports TOPOEXT.  Jiri, can you
-> > > confirm that?
-> > >
-> > > We can address that with a "x-topoext-auto-xlevel" property, set
-> > > to true on all CPU models by default, and disabled by
-> > > PC_COMPAT_2_12.
-> > >
-> > > The code would become:
-> > >
-> > >     if (cpu->topoext_auto_xlevel && env-
-> >features[FEAT_8000_0001_ECX] &
-> > > CPUID_EXT3_TOPOEXT) {
-> > >         x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E)=
-;
-> > >     }
-> > >
-> > > Or, we could simply declare that "-cpu Opteron_G4,+topoext" will
-> > > never increase xlevel automatically (on any machine-type), and
-> > > change the code above to:
-> > >
-> > >     if (cpu->auto_topoext && env->features[FEAT_8000_0001_ECX] &
-> > > CPUID_EXT3_TOPOEXT) {
-> > >         x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E)=
-;
-> > >     }
-> >
-> > I was going to do this.  But there is one problem.  We don't
-> > set the CPUID_EXT3_TOPOEXT in CPU model table. So this won't
-> > work.
->=20
-> Won't this work if the auto_topoext handling is done before
-> x86_cpu_expand_features() is called?
-
-Yes. That works. We can go with this approach.
-
->=20
->=20
-> > One more thing I noticed that feature setting should happen
-> > much before x86_cpu_realizefn.
->=20
-> Why?
-
-I was wrong here.  It should be done before x86_cpu_expand_features.
-
->=20
-> >
-> > Couple of options.
-> > First option.
-> > 1. Set both feature and xlevel here(in x86_cpu_expand_features).
-> >  if (cpu->x_auto_topoext {
-> >         env->features[FEAT_8000_0001_ECX]  |=3D CPUID_EXT3_TOPOEXT;
-> >         x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E);
-> >  }
-> > 2. And remove feature setting in x86_cpu_realizefn.
->=20
-> This would make TOPOEXT be included in 'query-cpu-model-expansion
-> model=3DEPYC', which would be incorrect because TOPOEXT won't
-> always be enabled when using EPYC.
->=20
->=20
-> >
-> > Or
-> >
-> > Second option
-> > 1.Set the feature bit in CPU model table.
-> > 2. Set xlevel in x86_cpu_expand_features using cpu->x_auto_topoext
-> > 3. And remove feature setting in x86_cpu_realizefn.
-> >
-> > I  prefer the second option.
->=20
-> Same here: TOPOEXT would be included in
-> 'query-cpu-model-expansion model=3DEPYC', and this would be
-> incorrect.
->=20
->=20
-> I'm starting to think that enabling TOPOEXT automatically is
-> adding too much complexity and compatibility problems, and it's
-> better to leave this task to management software.
->=20
-> The main problem here is:
->=20
-> This works today with QEMU 2.12 + Linux <=3D 4.15:
->   $ $QEMU -machine pc -cpu EPYC,enforce -smp
-> 8,sockets=3D2,cores=3D2,threads=3D2"
-> and must keep working with QEMU 3.0 and Linux <=3D 4.15.
->=20
-> In addition to that, the results for:
->   $ $QEMU -machine pc-q35-3.0 -cpu EPYC,enforce [...]
-> must be deterministic and expose exactly the same CPUID data even
-> if host hardware or software changes, as long as the QEMU
-> command-line is the same.
->=20
-> Do you see a way to fulfill those two constraints while making
-> "-machine pc-q35-3.0 -cpu EPYC" enable TOPOEXT automatically?
->=20
-
-Now(setting feature before x86_cpu_expand_features), enabling TOPOEXT appea=
-rs to work fine.
-
-> --
-> Eduardo
+> 
+> I need to refresh my caches, the debugging session is now too long ago
+> again.
+> 
+> Jan
+> 
