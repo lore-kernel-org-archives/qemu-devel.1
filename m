@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSisd-0007Kl-6A
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSisf-0007Oi-NS
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSisa-0003Ej-A9
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:35 -0400
+	(envelope-from <armbru@redhat.com>) id 1fSisd-0003HH-FI
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:58:37 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Tue, 12 Jun 2018 14:58:10 +0200
-Message-Id: <20180612125821.4229-8-armbru@redhat.com>
+Date: Tue, 12 Jun 2018 14:58:19 +0200
+Message-Id: <20180612125821.4229-17-armbru@redhat.com>
 In-Reply-To: <20180612125821.4229-1-armbru@redhat.com>
 References: <20180612125821.4229-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH 07/18] block: Clean up a misuse of qobject_to()
- in .bdrv_co_create_opts()
+Subject: [Qemu-devel] [PATCH 16/18] block: Fix -blockdev / blockdev-add for
+ empty objects and arrays
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,224 +23,261 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
 
-The following pattern occurs in the .bdrv_co_create_opts() methods of
-parallels, qcow, qcow2, qed, vhdx and vpc:
+-blockdev and blockdev-add silently ignore empty objects and arrays in
+their argument.  That's because qmp_blockdev_add() converts the
+argument to a flat QDict, and qdict_flatten() eats empty QDict and
+QList members.  For instance, we ignore an empty BlockdevOptions
+member @cache.  No real harm, as absent means the same as empty there.
 
-    qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
-    qobject_unref(qdict);
-    qdict = qobject_to(QDict, qobj);
-    if (qdict == NULL) {
-         ret = -EINVAL;
-         goto done;
-    }
+Thus, the flaw puts an artificial restriction on the QAPI schema: we
+can't have potentially empty objects and arrays within
+BlockdevOptions, except when they're optional and "empty" has the same
+meaning as "absent".
 
-    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-    [...]
-    ret = 0;
-done:
-    qobject_unref(qdict);
-    [...]
-    return ret;
+Our QAPI schema satisfies this restriction (I checked), but it's a
+trap for the unwary, and a temptation to employ awkward workarounds
+for the wary.  Let's get rid of it.
 
-If qobject_to() fails, we return failure without setting errp.  That's
-wrong.  As far as I can tell, it cannot fail here.  Clean it up
-anyway, by removing the useless conversion.
+Change qdict_flatten() and qdict_crumple() to treat empty dictionaries
+and lists exactly like scalars.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/parallels.c | 9 ++++-----
- block/qcow.c      | 9 ++++-----
- block/qcow2.c     | 9 ++++-----
- block/qed.c       | 9 ++++-----
- block/vhdx.c      | 9 ++++-----
- block/vpc.c       | 9 ++++-----
- 6 files changed, 24 insertions(+), 30 deletions(-)
+ qobject/block-qdict.c     | 54 ++++++++++++++++++++++++---------------
+ tests/check-block-qdict.c | 38 +++++++++++++++++++++------
+ 2 files changed, 63 insertions(+), 29 deletions(-)
 
-diff --git a/block/parallels.c b/block/parallels.c
-index 695899fc4b..ceb7a15d62 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -616,7 +616,7 @@ static int coroutine_fn parallels_co_create_opts(const char *filename,
-     BlockdevCreateOptions *create_options = NULL;
-     Error *local_err = NULL;
-     BlockDriverState *bs = NULL;
--    QDict *qdict = NULL;
-+    QDict *qdict;
-     QObject *qobj;
-     Visitor *v;
-     int ret;
-@@ -654,14 +654,13 @@ static int coroutine_fn parallels_co_create_opts(const char *filename,
-     qdict_put_str(qdict, "file", bs->node_name);
- 
-     qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
--    qobject_unref(qdict);
--    qdict = qobject_to(QDict, qobj);
--    if (qdict == NULL) {
-+    if (!qobj) {
-         ret = -EINVAL;
-         goto done;
-     }
- 
--    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    v = qobject_input_visitor_new_keyval(qobj);
-+    qobject_unref(qobj);
-     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-     visit_free(v);
- 
-diff --git a/block/qcow.c b/block/qcow.c
-index 860b058240..2f81f081fd 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -946,7 +946,7 @@ static int coroutine_fn qcow_co_create_opts(const char *filename,
+diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
+index f24bea30e1..0b2ae02627 100644
+--- a/qobject/block-qdict.c
++++ b/qobject/block-qdict.c
+@@ -56,6 +56,8 @@ static void qdict_flatten_qlist(QList *qlist, QDict *target, const char *prefix)
  {
-     BlockdevCreateOptions *create_options = NULL;
-     BlockDriverState *bs = NULL;
--    QDict *qdict = NULL;
-+    QDict *qdict;
-     QObject *qobj;
-     Visitor *v;
-     const char *val;
-@@ -998,14 +998,13 @@ static int coroutine_fn qcow_co_create_opts(const char *filename,
-     qdict_put_str(qdict, "file", bs->node_name);
+     QObject *value;
+     const QListEntry *entry;
++    QDict *dict_val;
++    QList *list_val;
+     char *new_key;
+     int i;
  
-     qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
--    qobject_unref(qdict);
--    qdict = qobject_to(QDict, qobj);
--    if (qdict == NULL) {
-+    if (!qobj) {
-         ret = -EINVAL;
-         goto fail;
-     }
+@@ -69,16 +71,18 @@ static void qdict_flatten_qlist(QList *qlist, QDict *target, const char *prefix)
  
--    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    v = qobject_input_visitor_new_keyval(qobj);
-+    qobject_unref(qobj);
-     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-     visit_free(v);
+     for (i = 0; entry; entry = qlist_next(entry), i++) {
+         value = qlist_entry_obj(entry);
++        dict_val = qobject_to(QDict, value);
++        list_val = qobject_to(QList, value);
+         new_key = g_strdup_printf("%s.%i", prefix, i);
  
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 0a27afa2ef..8c338661db 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3080,7 +3080,7 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
-                                              Error **errp)
+         /*
+          * Flatten non-empty QDict and QList recursively into @target,
+          * copy other objects to @target
+          */
+-        if (qobject_type(value) == QTYPE_QDICT) {
+-            qdict_flatten_qdict(qobject_to(QDict, value), target, new_key);
+-        } else if (qobject_type(value) == QTYPE_QLIST) {
+-            qdict_flatten_qlist(qobject_to(QList, value), target, new_key);
++        if (dict_val && qdict_size(dict_val)) {
++            qdict_flatten_qdict(dict_val, target, new_key);
++        } else if (list_val && !qlist_empty(list_val)) {
++            qdict_flatten_qlist(list_val, target, new_key);
+         } else {
+             qdict_put_obj(target, new_key, qobject_ref(value));
+         }
+@@ -91,6 +95,8 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
  {
-     BlockdevCreateOptions *create_options = NULL;
--    QDict *qdict = NULL;
-+    QDict *qdict;
-     QObject *qobj;
-     Visitor *v;
-     BlockDriverState *bs = NULL;
-@@ -3153,14 +3153,13 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
+     QObject *value;
+     const QDictEntry *entry, *next;
++    QDict *dict_val;
++    QList *list_val;
+     char *new_key;
  
-     /* Now get the QAPI type BlockdevCreateOptions */
-     qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
--    qobject_unref(qdict);
--    qdict = qobject_to(QDict, qobj);
--    if (qdict == NULL) {
-+    if (!qobj) {
-         ret = -EINVAL;
-         goto finish;
-     }
+     entry = qdict_first(qdict);
+@@ -98,6 +104,8 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
+     while (entry != NULL) {
+         next = qdict_next(qdict, entry);
+         value = qdict_entry_value(entry);
++        dict_val = qobject_to(QDict, value);
++        list_val = qobject_to(QList, value);
+         new_key = NULL;
  
--    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    v = qobject_input_visitor_new_keyval(qobj);
-+    qobject_unref(qobj);
-     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-     visit_free(v);
+         if (prefix) {
+@@ -108,12 +116,12 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
+          * Flatten non-empty QDict and QList recursively into @target,
+          * copy other objects to @target
+          */
+-        if (qobject_type(value) == QTYPE_QDICT) {
+-            qdict_flatten_qdict(qobject_to(QDict, value), target,
++        if (dict_val && qdict_size(dict_val)) {
++            qdict_flatten_qdict(dict_val, target,
+                                 new_key ? new_key : entry->key);
+             qdict_del(qdict, entry->key);
+-        } else if (qobject_type(value) == QTYPE_QLIST) {
+-            qdict_flatten_qlist(qobject_to(QList, value), target,
++        } else if (list_val && !qlist_empty(list_val)) {
++            qdict_flatten_qlist(list_val, target,
+                                 new_key ? new_key : entry->key);
+             qdict_del(qdict, entry->key);
+         } else if (target != qdict) {
+@@ -127,10 +135,11 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
+ }
  
-diff --git a/block/qed.c b/block/qed.c
-index 88fa36d409..fcec760b26 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -722,7 +722,7 @@ static int coroutine_fn bdrv_qed_co_create_opts(const char *filename,
-                                                 Error **errp)
+ /**
+- * qdict_flatten(): For each nested QDict with key x, all fields with key y
+- * are moved to this QDict and their key is renamed to "x.y". For each nested
+- * QList with key x, the field at index y is moved to this QDict with the key
+- * "x.y" (i.e., the reverse of what qdict_array_split() does).
++ * qdict_flatten(): For each nested non-empty QDict with key x, all
++ * fields with key y are moved to this QDict and their key is renamed
++ * to "x.y". For each nested non-empty QList with key x, the field at
++ * index y is moved to this QDict with the key "x.y" (i.e., the
++ * reverse of what qdict_array_split() does).
+  * This operation is applied recursively for nested QDicts and QLists.
+  */
+ void qdict_flatten(QDict *qdict)
+@@ -361,8 +370,8 @@ static int qdict_is_list(QDict *maybe_list, Error **errp)
+  * @src: the original flat dictionary (only scalar values) to crumple
+  *
+  * Takes a flat dictionary whose keys use '.' separator to indicate
+- * nesting, and values are scalars, and crumples it into a nested
+- * structure.
++ * nesting, and values are scalars, empty dictionaries or empty lists,
++ * and crumples it into a nested structure.
+  *
+  * To include a literal '.' in a key name, it must be escaped as '..'
+  *
+@@ -399,6 +408,8 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
  {
-     BlockdevCreateOptions *create_options = NULL;
--    QDict *qdict = NULL;
-+    QDict *qdict;
-     QObject *qobj;
-     Visitor *v;
-     BlockDriverState *bs = NULL;
-@@ -764,14 +764,13 @@ static int coroutine_fn bdrv_qed_co_create_opts(const char *filename,
-     qdict_put_str(qdict, "file", bs->node_name);
+     const QDictEntry *ent;
+     QDict *two_level, *multi_level = NULL, *child_dict;
++    QDict *dict_val;
++    QList *list_val;
+     QObject *dst = NULL, *child;
+     size_t i;
+     char *prefix = NULL;
+@@ -409,10 +420,11 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
  
-     qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
--    qobject_unref(qdict);
--    qdict = qobject_to(QDict, qobj);
--    if (qdict == NULL) {
-+    if (!qobj) {
-         ret = -EINVAL;
-         goto fail;
-     }
+     /* Step 1: split our totally flat dict into a two level dict */
+     for (ent = qdict_first(src); ent != NULL; ent = qdict_next(src, ent)) {
+-        if (qobject_type(ent->value) == QTYPE_QDICT ||
+-            qobject_type(ent->value) == QTYPE_QLIST) {
+-            error_setg(errp, "Value %s is not a scalar",
+-                       ent->key);
++        dict_val = qobject_to(QDict, ent->value);
++        list_val = qobject_to(QList, ent->value);
++        if ((dict_val && qdict_size(dict_val))
++            || (list_val && !qlist_empty(list_val))) {
++            error_setg(errp, "Value %s is not flat", ent->key);
+             goto error;
+         }
  
--    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    v = qobject_input_visitor_new_keyval(qobj);
-+    qobject_unref(qobj);
-     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-     visit_free(v);
+@@ -451,9 +463,9 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
+     multi_level = qdict_new();
+     for (ent = qdict_first(two_level); ent != NULL;
+          ent = qdict_next(two_level, ent)) {
+-        QDict *dict = qobject_to(QDict, ent->value);
+-        if (dict) {
+-            child = qdict_crumple(dict, errp);
++        dict_val = qobject_to(QDict, ent->value);
++        if (dict_val && qdict_size(dict_val)) {
++            child = qdict_crumple(dict_val, errp);
+             if (!child) {
+                 goto error;
+             }
+diff --git a/tests/check-block-qdict.c b/tests/check-block-qdict.c
+index 2da16f01a6..1d20fccbd4 100644
+--- a/tests/check-block-qdict.c
++++ b/tests/check-block-qdict.c
+@@ -79,10 +79,10 @@ static void qdict_flatten_test(void)
+      *     "e.1.2.b": 1,
+      *     "f.c": 2,
+      *     "f.d": 3,
+-     *     "g": 4
++     *     "g": 4,
++     *     "y.0": {},
++     *     "z.a": []
+      * }
+-     *
+-     * Note that "y" and "z" get eaten.
+      */
  
-diff --git a/block/vhdx.c b/block/vhdx.c
-index 78b29d9fc7..f2aec3d2cd 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -1965,7 +1965,7 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename,
-                                             Error **errp)
+     qdict_put_int(e_1_2, "a", 0);
+@@ -117,8 +117,10 @@ static void qdict_flatten_test(void)
+     g_assert(qdict_get_int(root, "f.c") == 2);
+     g_assert(qdict_get_int(root, "f.d") == 3);
+     g_assert(qdict_get_int(root, "g") == 4);
++    g_assert(!qdict_size(qdict_get_qdict(root, "y.0")));
++    g_assert(qlist_empty(qdict_get_qlist(root, "z.a")));
+ 
+-    g_assert(qdict_size(root) == 8);
++    g_assert(qdict_size(root) == 10);
+ 
+     qobject_unref(root);
+ }
+@@ -387,7 +389,8 @@ static void qdict_join_test(void)
+ static void qdict_crumple_test_recursive(void)
  {
-     BlockdevCreateOptions *create_options = NULL;
--    QDict *qdict = NULL;
-+    QDict *qdict;
-     QObject *qobj;
-     Visitor *v;
-     BlockDriverState *bs = NULL;
-@@ -2006,14 +2006,13 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename,
-     qdict_put_str(qdict, "file", bs->node_name);
+     QDict *src, *dst, *rule, *vnc, *acl, *listen;
+-    QList *rules;
++    QDict *empty, *empty_dict, *empty_list_0;
++    QList *rules, *empty_list, *empty_dict_a;
  
-     qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
--    qobject_unref(qdict);
--    qdict = qobject_to(QDict, qobj);
--    if (qdict == NULL) {
-+    if (!qobj) {
-         ret = -EINVAL;
-         goto fail;
-     }
+     src = qdict_new();
+     qdict_put_str(src, "vnc.listen.addr", "127.0.0.1");
+@@ -399,10 +402,12 @@ static void qdict_crumple_test_recursive(void)
+     qdict_put_str(src, "vnc.acl.default", "deny");
+     qdict_put_str(src, "vnc.acl..name", "acl0");
+     qdict_put_str(src, "vnc.acl.rule..name", "acl0");
++    qdict_put(src, "empty.dict.a", qlist_new());
++    qdict_put(src, "empty.list.0", qdict_new());
  
--    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    v = qobject_input_visitor_new_keyval(qobj);
-+    qobject_unref(qobj);
-     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-     visit_free(v);
+     dst = qobject_to(QDict, qdict_crumple(src, &error_abort));
+     g_assert(dst);
+-    g_assert_cmpint(qdict_size(dst), ==, 1);
++    g_assert_cmpint(qdict_size(dst), ==, 2);
  
-diff --git a/block/vpc.c b/block/vpc.c
-index 16178e5a90..a9bb04149d 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -1081,7 +1081,7 @@ static int coroutine_fn vpc_co_create_opts(const char *filename,
-                                            QemuOpts *opts, Error **errp)
+     vnc = qdict_get_qdict(dst, "vnc");
+     g_assert(vnc);
+@@ -440,6 +445,21 @@ static void qdict_crumple_test_recursive(void)
+     g_assert_cmpstr("acl0", ==, qdict_get_str(vnc, "acl.name"));
+     g_assert_cmpstr("acl0", ==, qdict_get_str(acl, "rule.name"));
+ 
++    empty = qdict_get_qdict(dst, "empty");
++    g_assert(empty);
++    g_assert_cmpint(qdict_size(empty), ==, 2);
++    empty_dict = qdict_get_qdict(empty, "dict");
++    g_assert(empty_dict);
++    g_assert_cmpint(qdict_size(empty_dict), ==, 1);
++    empty_dict_a = qdict_get_qlist(empty_dict, "a");
++    g_assert(empty_dict_a && qlist_empty(empty_dict_a));
++    empty_list = qdict_get_qlist(empty, "list");
++    g_assert(empty_list);
++    g_assert_cmpint(qlist_size(empty_list), ==, 1);
++    empty_list_0 = qobject_to(QDict, qlist_pop(empty_list));
++    g_assert(empty_list_0);
++    g_assert_cmpint(qdict_size(empty_list_0), ==, 0);
++
+     qobject_unref(src);
+     qobject_unref(dst);
+ }
+@@ -587,7 +607,7 @@ static void qdict_rename_keys_test(void)
+ 
+ static void qdict_crumple_test_bad_inputs(void)
  {
-     BlockdevCreateOptions *create_options = NULL;
--    QDict *qdict = NULL;
-+    QDict *qdict;
-     QObject *qobj;
-     Visitor *v;
-     BlockDriverState *bs = NULL;
-@@ -1120,14 +1120,13 @@ static int coroutine_fn vpc_co_create_opts(const char *filename,
-     qdict_put_str(qdict, "file", bs->node_name);
+-    QDict *src;
++    QDict *src, *nested;
+     Error *error = NULL;
  
-     qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
--    qobject_unref(qdict);
--    qdict = qobject_to(QDict, qobj);
--    if (qdict == NULL) {
-+    if (!qobj) {
-         ret = -EINVAL;
-         goto fail;
-     }
+     src = qdict_new();
+@@ -614,7 +634,9 @@ static void qdict_crumple_test_bad_inputs(void)
  
--    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    v = qobject_input_visitor_new_keyval(qobj);
-+    qobject_unref(qobj);
-     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
-     visit_free(v);
+     src = qdict_new();
+     /* The input should be flat, ie no dicts or lists */
+-    qdict_put(src, "rule.a", qdict_new());
++    nested = qdict_new();
++    qdict_put(nested, "x", qdict_new());
++    qdict_put(src, "rule.a", nested);
+     qdict_put_str(src, "rule.b", "allow");
  
+     g_assert(qdict_crumple(src, &error) == NULL);
 -- 
 2.17.1
