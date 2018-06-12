@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fSjXH-0001BI-H1
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:40:37 -0400
+	(envelope-from <mst@redhat.com>) id 1fSjZi-0002JH-MS
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:43:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fSjXD-0006De-4d
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:40:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36038 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fSjZe-0007nB-LS
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:43:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56700 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fSjXC-0006Bk-Tz
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:40:31 -0400
-Date: Tue, 12 Jun 2018 15:40:26 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180612154026.59a0f1fd@redhat.com>
-In-Reply-To: <20180608094324.23288-1-liujunjie23@huawei.com>
-References: <20180608094324.23288-1-liujunjie23@huawei.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fSjZe-0007mz-F0
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:43:02 -0400
+Date: Tue, 12 Jun 2018 16:43:01 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180612163301-mutt-send-email-mst@kernel.org>
+References: <1528794804-6289-1-git-send-email-whois.zihan.yang@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] cpu hot-del: leak fix by free the
- relevant members
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1528794804-6289-1-git-send-email-whois.zihan.yang@gmail.com>
+Subject: Re: [Qemu-devel] [RFC v2 1/3] pci_expander_bridge: add type
+ TYPE_PXB_PCIE_HOST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,124 +27,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: liujunjie <liujunjie23@huawei.com>
-Cc: pbonzini@redhat.com, rth@twiddle.net, crosthwaite.peter@gmail.com, linzhecheng@huawei.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org, arei.gonglei@huawei.com
+To: Zihan Yang <whois.zihan.yang@gmail.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-On Fri, 8 Jun 2018 17:43:24 +0800
-liujunjie <liujunjie23@huawei.com> wrote:
+On Tue, Jun 12, 2018 at 05:13:22PM +0800, Zihan Yang wrote:
+> The inner host bridge created by pxb-pcie is TYPE_PXB_PCI_HOST by default,
+> add a new type TYPE_PXB_PCIE_HOST to better utilize the ECAM of PCIe
+> 
+> Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
 
-> THese leaks are found by ASAN with CPU hot-add and hot-del actions,
-> such as:
-it would be better to split patch into several, 1 leak per patch
+I have a concern that there are lots of new properties
+added here, I'm not sure how are upper layers supposed to
+manage them all.
 
-> ==14127==ERROR: LeakSanitizer: detected memory leaks
-> 
-> Direct leak of 4096 byte(s) in 1 object(s) allocated from:
->     #0 0x7fc321cb6ec0 in posix_memalign (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7ec0)
->     #1 0xf756b9 in qemu_try_memalign util/oslib-posix.c:110
->     #2 0xf7575b in qemu_memalign util/oslib-posix.c:126
->     #3 0x7769cb in kvm_arch_init_vcpu /root/qemu/target/i386/kvm.c:1103
->     #4 0x4cc4e6 in qemu_kvm_cpu_thread_fn /root/qemu/cpus.c:1201
->     #5 0x7fc31cb28dc4 in start_thread (/usr/lib64/libpthread.so.0+0x7dc4)
-> 
-> Direct leak of 4096 byte(s) in 1 object(s) allocated from:
->     #0 0x7fc321cb6560 in calloc (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)
->     #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
->     #2 0x4cc4e6 in qemu_kvm_cpu_thread_fn /root/qemu/cpus.c:1201
->     #3 0x7fc31cb28dc4 in start_thread (/usr/lib64/libpthread.so.0+0x7dc4)
-> 
-> Direct leak of 184 byte(s) in 1 object(s) allocated from:
->     #0 0x7fc321cb6560 in calloc (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)
->     #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
->     #2 0x4cda83 in qemu_init_vcpu /root/qemu/cpus.c:1993
->     #3 0x6aedbd in x86_cpu_realizefn /root/qemu/target/i386/cpu.c:4739
->     #4 0x8edfc8 in device_set_realized hw/core/qdev.c:826
->     #5 0xcff60c in property_set_bool qom/object.c:1928
->     #6 0xd09bd2 in object_property_set_qobject qom/qom-qobject.c:27
->     #7 0xd048e3 in object_property_set_bool qom/object.c:1188
->     #8 0x79ad83 in qdev_device_add /root/qemu/qdev-monitor.c:627
->     #9 0x79b50c in qmp_device_add /root/qemu/qdev-monitor.c:807
->     #10 0xf4ca5d in do_qmp_dispatch qapi/qmp-dispatch.c:119
->     #11 0xf4ce3c in qmp_dispatch qapi/qmp-dispatch.c:168
->     #12 0x4e2a5a in monitor_qmp_dispatch_one /root/qemu/monitor.c:4088
->     #13 0x4e2baf in monitor_qmp_bh_dispatcher /root/qemu/monitor.c:4146
->     #14 0xf67ad1 in aio_bh_poll util/async.c:118
->     #15 0xf724a3 in aio_dispatch util/aio-posix.c:436
->     #16 0xf67270 in aio_ctx_dispatch util/async.c:261
->     #17 0x7fc31cf8e999 in g_main_context_dispatch (/usr/lib64/libglib-2.0.so.0+0x49999)
-> 
-> Direct leak of 64 byte(s) in 2 object(s) allocated from:
->     #0 0x7fc321cb6560 in calloc (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)
->     #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
->     #2 0x4cda1f in qemu_init_vcpu /root/qemu/cpus.c:1997
->     #3 0x6aedbd in x86_cpu_realizefn /root/qemu/target/i386/cpu.c:4739
->     #4 0x8edfc8 in device_set_realized hw/core/qdev.c:826
->     #5 0xcff60c in property_set_bool qom/object.c:1928
->     #6 0xd09bd2 in object_property_set_qobject qom/qom-qobject.c:27
->     #7 0xd048e3 in object_property_set_bool qom/object.c:1188
->     #8 0x79ad83 in qdev_device_add /root/qemu/qdev-monitor.c:627
->     #9 0x79b50c in qmp_device_add /root/qemu/qdev-monitor.c:807
->     #10 0xf4ca5d in do_qmp_dispatch qapi/qmp-dispatch.c:119
->     #11 0xf4ce3c in qmp_dispatch qapi/qmp-dispatch.c:168
->     #12 0x4e2a5a in monitor_qmp_dispatch_one /root/qemu/monitor.c:4088
->     #13 0x4e2baf in monitor_qmp_bh_dispatcher /root/qemu/monitor.c:4146
->     #14 0xf67ad1 in aio_bh_poll util/async.c:118
->     #15 0xf724a3 in aio_dispatch util/aio-posix.c:436
->     #16 0xf67270 in aio_ctx_dispatch util/async.c:261
->     #17 0x7fc31cf8e999 in g_main_context_dispatch (/usr/lib64/libglib-2.0.so.0+0x49999)
-back trace (including line numbers) is a moving target so it's only useful for concrete copy.
-I'd drop it and cite offending hunk in commit message instead.
+E.g. bus_nr supplied in several places, domain_nr for which
+it's not clear how it is supposed to be allocated, etc.
 
+Can the management interface be simplified?
+Ideally we wouldn't have to teach libvirt new tricks,
+just generalize pxb support slightly.
 
-> SUMMARY: AddressSanitizer: 8440 byte(s) leaked in 5 allocation(s).
-> 
-> The relevant members in CPU Structure are freed to fix leak. Meanwhile, although the
-> VMChangeStateEntry added in kvm_arch_init_vcpu does not be reportd by ASAN since it still
-> in vm_change_state_head, it's not longer used after hot-del, so free it, too.
-> 
-> Signed-off-by: liujunjie <liujunjie23@huawei.com>
-> Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 > ---
->  accel/kvm/kvm-all.c  |  3 +++
->  cpus.c               |  6 ++++++
->  include/sysemu/kvm.h |  1 +
->  target/i386/cpu.h    |  2 ++
->  target/i386/kvm.c    | 19 ++++++++++++++++++-
->  5 files changed, 30 insertions(+), 1 deletion(-)
+>  hw/pci-bridge/pci_expander_bridge.c | 118 ++++++++++++++++++++++++++++++++++--
+>  1 file changed, 114 insertions(+), 4 deletions(-)
 > 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index ffee68e..a0491dc 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -305,6 +305,9 @@ int kvm_destroy_vcpu(CPUState *cpu)
->      vcpu->vcpu_id = kvm_arch_vcpu_id(cpu);
->      vcpu->kvm_fd = cpu->kvm_fd;
->      QLIST_INSERT_HEAD(&kvm_state->kvm_parked_vcpus, vcpu, node);
-> +#ifdef TARGET_I386
-> +    kvm_arch_destroy_vcpu(cpu);
-> +#endif
->  err:
->      return ret;
->  }
-> diff --git a/cpus.c b/cpus.c
-> index d1f1629..cbe28d6 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -1842,6 +1842,12 @@ void cpu_remove_sync(CPUState *cpu)
->      qemu_mutex_unlock_iothread();
->      qemu_thread_join(cpu->thread);
->      qemu_mutex_lock_iothread();
-> +    g_free(cpu->thread);
-> +    cpu->thread = NULL;
-> +    g_free(cpu->halt_cond);
-> +    cpu->halt_cond = NULL;
-could you check if it's save to free thread/halt_cond when running in plain TCG mode
-
-> +    g_free(cpu->cpu_ases);
-> +    cpu->cpu_ases = NULL;
-consider TCG usecase, cpu_ases is registered with tcg_as_listener,
-is it really safe to free?
-
+> diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
+> index e62de42..448b9fb 100644
+> --- a/hw/pci-bridge/pci_expander_bridge.c
+> +++ b/hw/pci-bridge/pci_expander_bridge.c
+> @@ -15,10 +15,12 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/pci/pci_bus.h"
+>  #include "hw/pci/pci_host.h"
+> +#include "hw/pci/pcie_host.h"
+>  #include "hw/pci/pci_bridge.h"
+>  #include "qemu/range.h"
+>  #include "qemu/error-report.h"
+>  #include "sysemu/numa.h"
+> +#include "qapi/visitor.h"
+>  
+>  #define TYPE_PXB_BUS "pxb-bus"
+>  #define PXB_BUS(obj) OBJECT_CHECK(PXBBus, (obj), TYPE_PXB_BUS)
+> @@ -45,7 +47,10 @@ typedef struct PXBDev {
+>      PCIDevice parent_obj;
+>      /*< public >*/
+>  
+> -    uint8_t bus_nr;
+> +    bool sep_domain;    /* whether it resides in separate PCI segment */
+> +    uint32_t domain_nr; /* PCI domain(segment) number, should be 0 if sep_domain is false */
+> +    uint8_t max_bus;    /* max number of buses to use */
+> +    uint8_t bus_nr;     /* should be 0 when in separate domain */
+>      uint16_t numa_node;
+>  } PXBDev;
+>  
+> @@ -58,6 +63,18 @@ static PXBDev *convert_to_pxb(PCIDevice *dev)
+>  static GList *pxb_dev_list;
+>  
+>  #define TYPE_PXB_HOST "pxb-host"
+> +#define TYPE_PXB_PCIE_HOST "pxb-pcie-host"
+> +#define PXB_PCIE_HOST_DEVICE(obj) \
+> +     OBJECT_CHECK(PXBPCIEHost, (obj), TYPE_PXB_PCIE_HOST)
+> +
+> +typedef struct PXBPCIEHost {
+> +    PCIExpressHost parent_obj;
+> +
+> +    /* should only inherit from PXBDev */
+> +    uint32_t domain_nr;
+> +    uint8_t bus_nr;
+> +    uint8_t max_bus;
+> +} PXBPCIEHost;
+>  
+>  static int pxb_bus_num(PCIBus *bus)
+>  {
+> @@ -111,6 +128,31 @@ static const char *pxb_host_root_bus_path(PCIHostState *host_bridge,
+>      return bus->bus_path;
 >  }
 >  
-[...]
+> +/* Use a dedicated function for PCIe since pxb-host does
+> + * not have a domain_nr field */
+> +static const char *pxb_pcie_host_root_bus_path(PCIHostState *host_bridge,
+> +                                          PCIBus *rootbus)
+> +{
+> +    if (!pci_bus_is_express(rootbus)) {
+> +        /* pxb-pcie-host cannot reside on a PCI bus */
+> +        return NULL;
+> +    }
+> +    PXBBus *bus = PXB_PCIE_BUS(rootbus);
+> +
+> +    snprintf(bus->bus_path, 8, "%04lx:%02x",
+> +             object_property_get_uint((Object *)host_bridge, "domain_nr", NULL),
+> +             pxb_bus_num(rootbus));
+> +    return bus->bus_path;
+> +}
+> +
+> +static void pxb_pcie_host_get_mmcfg_size(Object *obj, Visitor *v, const char *name,
+> +                                    void *opaque, Error **errp)
+> +{
+> +    PCIExpressHost *e = PCIE_HOST_BRIDGE(obj);
+> +
+> +    visit_type_uint64(v, name, &e->size, errp);
+> +}
+> +
+>  static char *pxb_host_ofw_unit_address(const SysBusDevice *dev)
+>  {
+>      const PCIHostState *pxb_host;
+> @@ -142,6 +184,30 @@ static char *pxb_host_ofw_unit_address(const SysBusDevice *dev)
+>      return NULL;
+>  }
+>  
+> +static void pxb_pcie_host_initfn(Object *obj)
+> +{
+> +    PCIHostState *phb = PCI_HOST_BRIDGE(obj);
+> +
+> +    memory_region_init_io(&phb->conf_mem, obj, &pci_host_conf_le_ops, phb,
+> +                          "pci-conf-idx", 4);
+> +    memory_region_init_io(&phb->data_mem, obj, &pci_host_data_le_ops, phb,
+> +                          "pci-conf-data", 4);
+> +
+> +    object_property_add(obj, PCIE_HOST_MCFG_SIZE, "uint64",
+> +                         pxb_pcie_host_get_mmcfg_size,
+> +                         NULL, NULL, NULL, NULL);
+> +
+> +}
+> +
+> +static Property pxb_pcie_host_props[] = {
+> +    DEFINE_PROP_UINT64(PCIE_HOST_MCFG_BASE, PXBPCIEHost, parent_obj.base_addr,
+> +                        PCIE_BASE_ADDR_UNMAPPED),
+> +    DEFINE_PROP_UINT32("domain_nr", PXBPCIEHost, domain_nr, 0),
+> +    DEFINE_PROP_UINT8("bus_nr", PXBPCIEHost, bus_nr, 0),
+> +    DEFINE_PROP_UINT8("max_bus", PXBPCIEHost, max_bus, 255),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+>  static void pxb_host_class_init(ObjectClass *class, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(class);
+> @@ -155,12 +221,34 @@ static void pxb_host_class_init(ObjectClass *class, void *data)
+>      hc->root_bus_path = pxb_host_root_bus_path;
+>  }
+>  
+> +static void pxb_pcie_host_class_init(ObjectClass *class, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(class);
+> +    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(class);
+> +    PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_CLASS(class);
+> +
+> +    dc->fw_name = "pci";
+> +    dc->props = pxb_pcie_host_props;
+> +    /* Reason: Internal part of the pxb/pxb-pcie device, not usable by itself */
+> +    dc->user_creatable = false;
+> +    sbc->explicit_ofw_unit_address = pxb_host_ofw_unit_address;
+> +    hc->root_bus_path = pxb_pcie_host_root_bus_path;
+> +}
+> +
+>  static const TypeInfo pxb_host_info = {
+>      .name          = TYPE_PXB_HOST,
+>      .parent        = TYPE_PCI_HOST_BRIDGE,
+>      .class_init    = pxb_host_class_init,
+>  };
+>  
+> +static const TypeInfo pxb_pcie_host_info = {
+> +    .name          = TYPE_PXB_PCIE_HOST,
+> +    .parent        = TYPE_PCIE_HOST_BRIDGE,
+> +    .instance_size = sizeof(PXBPCIEHost),
+> +    .instance_init = pxb_pcie_host_initfn,
+> +    .class_init    = pxb_pcie_host_class_init,
+> +};
+> +
+>  /*
+>   * Registers the PXB bus as a child of pci host root bus.
+>   */
+> @@ -205,7 +293,10 @@ static gint pxb_compare(gconstpointer a, gconstpointer b)
+>  {
+>      const PXBDev *pxb_a = a, *pxb_b = b;
+>  
+> -    return pxb_a->bus_nr < pxb_b->bus_nr ? -1 :
+> +    /* check domain_nr, then bus_nr */
+> +    return pxb_a->domain_nr < pxb_b->domain_nr ? -1 :
+> +           pxb_a->domain_nr > pxb_b->domain_nr ?  1 :
+> +           pxb_a->bus_nr < pxb_b->bus_nr ? -1 :
+>             pxb_a->bus_nr > pxb_b->bus_nr ?  1 :
+>             0;
+>  }
+> @@ -228,10 +319,17 @@ static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
+>          dev_name = dev->qdev.id;
+>      }
+>  
+> -    ds = qdev_create(NULL, TYPE_PXB_HOST);
+>      if (pcie) {
+> +        /* either in sep_domain or stay in domain 0 */
+> +        g_assert (pxb->sep_domain || pxb->domain_nr == 0);
+> +        g_assert (pxb->max_bus >= pxb->bus_nr);
+> +        ds = qdev_create(NULL, TYPE_PXB_PCIE_HOST);
+> +        qdev_prop_set_uint8(ds, "bus_nr", pxb->bus_nr); //TODO.
+> +        qdev_prop_set_uint8(ds, "max_bus", pxb->max_bus);
+> +        qdev_prop_set_uint8(ds, "domain_nr", pxb->domain_nr);
+>          bus = pci_root_bus_new(ds, dev_name, NULL, NULL, 0, TYPE_PXB_PCIE_BUS);
+>      } else {
+> +        ds = qdev_create(NULL, TYPE_PXB_HOST);
+>          bus = pci_root_bus_new(ds, "pxb-internal", NULL, NULL, 0, TYPE_PXB_BUS);
+>          bds = qdev_create(BUS(bus), "pci-bridge");
+>          bds->id = dev_name;
+> @@ -294,6 +392,17 @@ static Property pxb_dev_properties[] = {
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>  
+> +static Property pxb_pcie_dev_properties[] = {
+> +    /* Note: 0 is not a legal PXB bus number. */
+> +    DEFINE_PROP_UINT8("bus_nr", PXBDev, bus_nr, 0),
+> +    DEFINE_PROP_UINT16("numa_node", PXBDev, numa_node, NUMA_NODE_UNASSIGNED),
+> +    DEFINE_PROP_BOOL("sep_domain", PXBDev, sep_domain, false),
+> +    DEFINE_PROP_UINT32("domain_nr", PXBDev, domain_nr, 0),
+> +    DEFINE_PROP_UINT8("max_bus", PXBDev, max_bus, 255),
+> +
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+>  static void pxb_dev_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+> @@ -344,7 +453,7 @@ static void pxb_pcie_dev_class_init(ObjectClass *klass, void *data)
+>      k->class_id = PCI_CLASS_BRIDGE_HOST;
+>  
+>      dc->desc = "PCI Express Expander Bridge";
+> -    dc->props = pxb_dev_properties;
+> +    dc->props = pxb_pcie_dev_properties;
+>      dc->hotpluggable = false;
+>      set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+>  }
+> @@ -365,6 +474,7 @@ static void pxb_register_types(void)
+>      type_register_static(&pxb_bus_info);
+>      type_register_static(&pxb_pcie_bus_info);
+>      type_register_static(&pxb_host_info);
+> +    type_register_static(&pxb_pcie_host_info);
+>      type_register_static(&pxb_dev_info);
+>      type_register_static(&pxb_pcie_dev_info);
+>  }
+> -- 
+> 2.7.4
