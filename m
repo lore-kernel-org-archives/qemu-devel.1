@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fSeCv-00035H-CM
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:59:14 -0400
+	(envelope-from <bounces@canonical.com>) id 1fSeFJ-0004Jg-VG
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 04:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fSeCr-00089j-IC
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:59:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42880 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fSeCr-00089Z-Bv
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:59:09 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CC1B668817
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 07:59:08 +0000 (UTC)
-Date: Tue, 12 Jun 2018 08:59:04 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180612075904.GC23739@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180611180152.2681-1-ehabkost@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fSeFE-0000lf-4R
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 04:01:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42040)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fSeFD-0000kH-Vs
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 04:01:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fSeFB-0002qh-Mw
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 08:01:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8DF9C2E80D1
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 08:01:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180611180152.2681-1-ehabkost@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] Remove COPYING.PYTHON
+Date: Tue, 12 Jun 2018 07:46:12 -0000
+From: Launchpad Bug Tracker <1769053@bugs.launchpad.net>
+Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
+Message-Id: <152878957306.8742.8651243940782124970.launchpad@ackee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1769053] Re: Ability to control phys-bits through
+ libvirt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,33 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Jun 11, 2018 at 03:01:52PM -0300, Eduardo Habkost wrote:
-> The COPYING.PYTHON file was added when we added the compatibility
-> argparse.py module, which was licensed under the Python Software
-> Foundation License Version 2.
->=20
-> Now the compatibility argparse.py module was removed, and we are
-> not carrying any code under that license anymore.  Remove
-> COPYING.PYTHON.
->=20
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  COPYING.PYTHON | 270 -------------------------------------------------
->  1 file changed, 270 deletions(-)
->  delete mode 100644 COPYING.PYTHON
+** Merge proposal linked:
+   https://code.launchpad.net/~paelzer/ubuntu/+source/qemu/+git/qemu/+merge=
+/347801
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1769053
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Title:
+  Ability to control phys-bits through libvirt
+
+Status in libvirt:
+  Unknown
+Status in QEMU:
+  Invalid
+Status in libvirt package in Ubuntu:
+  Triaged
+Status in qemu package in Ubuntu:
+  Invalid
+
+Bug description:
+  Attempting to start a KVM guest with more than 1TB of RAM fails.
+
+  It looks like we might need some extra patches:
+  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 18.04
+  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
+  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
+  Uname: Linux 4.15.0-20-generic x86_64
+  ApportVersion: 2.20.9-0ubuntu7
+  Architecture: amd64
+  CurrentDesktop: Unity:Unity7:ubuntu
+  Date: Fri May  4 16:21:14 2018
+  InstallationDate: Installed on 2017-04-05 (393 days ago)
+  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
+  MachineType: Dell Inc. XPS 13 9360
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
+pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
+off=3D1
+  SourcePackage: qemu
+  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
+  dmi.bios.date: 02/26/2018
+  dmi.bios.vendor: Dell Inc.
+  dmi.bios.version: 2.6.2
+  dmi.board.name: 0PF86Y
+  dmi.board.vendor: Dell Inc.
+  dmi.board.version: A00
+  dmi.chassis.type: 9
+  dmi.chassis.vendor: Dell Inc.
+  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
+60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
+  dmi.product.family: XPS
+  dmi.product.name: XPS 13 9360
+  dmi.sys.vendor: Dell Inc.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/libvirt/+bug/1769053/+subscriptions
