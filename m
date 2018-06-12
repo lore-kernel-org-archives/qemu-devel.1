@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fSrcU-0007lZ-Qs
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 18:18:31 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fSrdn-000070-KO
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 18:19:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fSrcT-0006oM-RE
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 18:18:30 -0400
-From: John Snow <jsnow@redhat.com>
-References: <20180612172614.60107-1-vsementsov@virtuozzo.com>
-	<bba5e735-2c16-e6a6-7742-7bc2ddcd0380@redhat.com>
-Message-ID: <bf81ec94-7e29-d902-9f8d-34c7a5b50557@redhat.com>
-Date: Tue, 12 Jun 2018 18:18:23 -0400
-MIME-Version: 1.0
-In-Reply-To: <bba5e735-2c16-e6a6-7742-7bc2ddcd0380@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block/qcow2: fix logic around
- dirty_bitmaps_loaded
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fSrdk-0007TE-WC
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 18:19:51 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44252)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1fSrdk-0007R2-N7
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 18:19:48 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5CMIx6d044322
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:19:46 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jjpc5rys3-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:19:45 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 12 Jun 2018 16:19:45 -0600
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+Date: Tue, 12 Jun 2018 17:19:23 -0500
+Message-Id: <20180612221923.24469-1-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH] docs: add details regarding submitting
+ stable-specific patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +36,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>
 
+Also add a few more details regarding normal master->stable patch
+flow.
 
+Cc: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ docs/devel/stable-process.rst | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-On 06/12/2018 06:11 PM, John Snow wrote:
-> 
-> 
-> On 06/12/2018 01:26 PM, Vladimir Sementsov-Ogievskiy wrote:
->> First: this variable was introduced to handle reopens. We need it on
->> following qcow2_do_open, to don't try loading bitmaps again. So, we are
->> fixing qcow2_invalidate_cache().
->>
->> However, if we fix only qcow2_invalidate_cache, iotest 169 fails on
->> case test__persistent__not_migbitmap__online_shared, because on first
->> target open, source is not yet closed, and is not yet stored bitmaps,
->> so, we are load nothing. And on second open, dirty_bitmaps_loaded is
->> already true, but we have no bitmaps to reopen with
->> qcow2_reopen_bitmaps_rw_hint(). So, we are fixing qcow2_do_open() too.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>  block/qcow2.c | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/block/qcow2.c b/block/qcow2.c
->> index 6fa5e1d71a..b4216a5830 100644
->> --- a/block/qcow2.c
->> +++ b/block/qcow2.c
->> @@ -1499,7 +1499,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
->>          {
->>              qcow2_reopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
->>          }
->> -    } else {
->> +    } else if (s->nb_bitmaps > 0) {
->>          header_updated = qcow2_load_dirty_bitmaps(bs, &local_err);
->>          s->dirty_bitmaps_loaded = true;
->>      }
->> @@ -2178,6 +2178,7 @@ static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
->>      QDict *options;
->>      Error *local_err = NULL;
->>      int ret;
->> +    bool dirty_bitmaps_loaded = s->dirty_bitmaps_loaded;
->>  
->>      /*
->>       * Backing files are read-only which makes all of their metadata immutable,
->> @@ -2190,6 +2191,7 @@ static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
->>      qcow2_close(bs);
->>  
->>      memset(s, 0, sizeof(BDRVQcow2State));
->> +    s->dirty_bitmaps_loaded = dirty_bitmaps_loaded;
->>      options = qdict_clone_shallow(bs->options);
->>  
->>      flags &= ~BDRV_O_INACTIVE;
->>
-> 
-> Ah, tch... I didn't realize that invalidate completely wipes the qcow2
-> metadata.
-> 
-> I guess the other three fields, nb_bitmaps, bitmap_directory_size and
-> bitmap_directory_offset get initialized again on re-open.
-> 
-> (I suppose this means I need to rethink caching bm_list more carefully,
-> too...)
-> 
-> I think this looks correct mechanically.
-> 
-
-Oh, I meant:
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+diff --git a/docs/devel/stable-process.rst b/docs/devel/stable-process.rst
+index 98736a9ea4..008fb4f9b4 100644
+--- a/docs/devel/stable-process.rst
++++ b/docs/devel/stable-process.rst
+@@ -56,6 +56,21 @@ There are various ways to get a patch into stable:
+   appropriate other people (like the patch author or the relevant maintainer)
+   on copy.
+ 
++Generally patches for a stable release/branch must first be included in the
++master QEMU branch, and from there the stable branch's maintainer will
++cherry-pick/backport the patch. However, occasionally there is a need to
++apply a stable-specific patch, such as a fix from master that isn't easily
++cherry-picked and has been reworked/backported specifically for a stable
++branch, or a fix that's only necessary in the context of a particular stable
++release. In such cases, the patch can be submitted to qemu-devel@nongnu.org
++using Cc: qemu-stable@nongnu.org just like a normal stable patch, but tagged
++with a "for-stable" or a "for-<stable-version>" in the subject line to
++indicate that's it's specifically for a stable branch and not master. For
++instance:
++
++  [PATCH for-2.11.2] spapr: make pseries-2.11 the default machine type
++
++
+ Stable release process
+ ----------------------
+ 
+-- 
+2.11.0
