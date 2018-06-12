@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSmLe-0007NJ-11
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:40:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fSmMt-00085c-SE
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:42:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSmLd-0002uJ-8X
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:40:46 -0400
-From: Markus Armbruster <armbru@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1fSmMt-00042G-2b
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:42:03 -0400
+Date: Tue, 12 Jun 2018 18:41:55 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180612164155.GH4355@localhost.localdomain>
 References: <20180612125821.4229-1-armbru@redhat.com>
-	<20180612125821.4229-4-armbru@redhat.com>
-	<20180612150233.GE4355@localhost.localdomain>
-Date: Tue, 12 Jun 2018 18:40:38 +0200
-In-Reply-To: <20180612150233.GE4355@localhost.localdomain> (Kevin Wolf's
-	message of "Tue, 12 Jun 2018 17:02:33 +0200")
-Message-ID: <87k1r4nek9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 03/18] block: Add block-specific QDict
- header
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180612125821.4229-1-armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 00/18] block: Configuration fixes and rbd
+ authentication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +23,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, jcody@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
 
-Kevin Wolf <kwolf@redhat.com> writes:
+Am 12.06.2018 um 14:58 hat Markus Armbruster geschrieben:
+> PATCH 01-17 are configuration fixes and cleanup, in particular
+> -blockdev driver=nfs,... and -drive driver=(nbd|sheepdog|ssh),... with
+> non-string scalars.
+> 
+> PATCH 18-19 provide support for configuring rbd authentication.
+> 
+> I'm happy to split the series if that helps.
+> 
+> Since the RFC post, I amended the documentation of the rbd
+> authentication parameters, and squashed PATCH 04 into 03.
+> 
+> Jeff Cody tested the RFC on his Ceph rig.  All results match
+> expectations.
+> 
+> The series clashes with Max's "[PATCH 00/13] block: Try to create well
+> typed json:{} filenames", but Max has rebased his work on mine.
 
-> Am 12.06.2018 um 14:58 hat Markus Armbruster geschrieben:
->> From: Max Reitz <mreitz@redhat.com>
->> 
->> There are numerous QDict functions that have been introduced for and are
->> used only by the block layer.  Move their declarations into an own
->> header file to reflect that.
->> 
->> While qdict_extract_subqdict() is in fact used outside of the block
->> layer (in util/qemu-config.c), it is still a function related very
->> closely to how the block layer works with nested QDicts, namely by
->> sometimes flattening them.  Therefore, its declaration is put into this
->> header as well and util/qemu-config.c includes it with a comment stating
->> exactly which function it needs.
->> 
->> Suggested-by: Markus Armbruster <armbru@redhat.com>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> Message-Id: <20180509165530.29561-7-mreitz@redhat.com>
->> [Copright note tweaked, superfluous includes dropped]
->
-> s/Copright/Copyright/
+I had minor, but still non-trivial comments for patches 9 and 12. The
+rest is:
 
-Fixing, thanks!
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
