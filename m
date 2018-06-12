@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fSYQm-000464-OO
+	(envelope-from <dgibson@ozlabs.org>) id 1fSYQn-00047e-Ty
 	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 21:49:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fSYQi-0003Mm-GF
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 21:49:08 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:60827)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fSYQi-0003Ls-9u
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 21:49:04 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon, 11 Jun 2018 21:48:59 -0400
-Message-Id: <1528768140-17894-14-git-send-email-cota@braap.org>
-In-Reply-To: <1528768140-17894-1-git-send-email-cota@braap.org>
-References: <1528768140-17894-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v4 13/14] hardfloat: support float32/64 square
- root
+	(envelope-from <dgibson@ozlabs.org>) id 1fSYQm-0003QZ-C2
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 21:49:09 -0400
+Date: Tue, 12 Jun 2018 11:48:59 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180612014859.GS2737@umbus.fritz.box>
+References: <20180611121655.19616-1-david@redhat.com>
+	<20180611121655.19616-11-david@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="3sseE1tnmEs+TkKq"
+Content-Disposition: inline
+In-Reply-To: <20180611121655.19616-11-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v1 10/11] pc-dimm: introduce and use
+ pc_dimm_memory_pre_plug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,140 +25,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>
 
-Performance results for fp-bench:
 
-1. Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-- before:
-sqrt-single: 43.27 MFlops
-sqrt-double: 24.81 MFlops
-- after:
-sqrt-single: 297.94 MFlops
-sqrt-double: 210.46 MFlops
+--3sseE1tnmEs+TkKq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-2. ARM Aarch64 A57 @ 2.4GHz
-- before:
-sqrt-single: 12.41 MFlops
-sqrt-double: 6.22 MFlops
-- after:
-sqrt-single: 55.58 MFlops
-sqrt-double: 40.63 MFlops
+On Mon, Jun 11, 2018 at 02:16:54PM +0200, David Hildenbrand wrote:
+> We'll be factoring out some pc-dimm specific and some memory-device
+> checks next.
+>=20
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-3. IBM POWER8E @ 2.1 GHz
-- before:
-sqrt-single: 17.01 MFlops
-sqrt-double: 9.61 MFlops
-- after:
-sqrt-single: 104.17 MFlops
-sqrt-double: 133.32 MFlops
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-Here none of the machines got faster from enabling USE_FP. For
-instance, on x86_64 sqrt is 23% slower for single precision,
-with it enabled, and 17% slower for double precision.
+ppc parts
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- fpu/softfloat.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 71 insertions(+), 2 deletions(-)
+> ---
+>  hw/i386/pc.c             | 2 ++
+>  hw/mem/pc-dimm.c         | 5 +++++
+>  hw/ppc/spapr.c           | 1 +
+>  include/hw/mem/pc-dimm.h | 2 ++
+>  4 files changed, 10 insertions(+)
+>=20
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 017396fe84..dc8e7b033b 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1695,6 +1695,8 @@ static void pc_dimm_pre_plug(HotplugHandler *hotplu=
+g_dev, DeviceState *dev,
+>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M=
+'");
+>          return;
+>      }
+> +
+> +    pc_dimm_memory_pre_plug(dev, MACHINE(hotplug_dev), errp);
+>  }
+> =20
+>  static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index bc79dd04d8..995ce22d8d 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -27,6 +27,11 @@
+>  #include "sysemu/numa.h"
+>  #include "trace.h"
+> =20
+> +void pc_dimm_memory_pre_plug(DeviceState *dev, MachineState *machine,
+> +                             Error **errp)
+> +{
+> +}
+> +
+>  void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+>                           uint64_t align, Error **errp)
+>  {
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 214286fd2f..54eddc0069 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3202,6 +3202,7 @@ static void spapr_memory_pre_plug(HotplugHandler *h=
+otplug_dev, DeviceState *dev,
+>          goto out;
+>      }
+> =20
+> +    pc_dimm_memory_pre_plug(dev, MACHINE(hotplug_dev), errp);
+>  out:
+>      g_free(mem_dev);
+>  }
+> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+> index f0e6867803..7d46a0a0cb 100644
+> --- a/include/hw/mem/pc-dimm.h
+> +++ b/include/hw/mem/pc-dimm.h
+> @@ -80,6 +80,8 @@ typedef struct PCDIMMDeviceClass {
+> =20
+>  int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
+> =20
+> +void pc_dimm_memory_pre_plug(DeviceState *dev, MachineState *machine,
+> +                             Error **errp);
+>  void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+>                           uint64_t align, Error **errp);
+>  void pc_dimm_memory_unplug(DeviceState *dev, MachineState *machine);
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 63cf60c..f89e872 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -2812,14 +2812,16 @@ float16 __attribute__((flatten)) float16_sqrt(float16 a, float_status *status)
-     return float16_round_pack_canonical(pr, status);
- }
- 
--float32 __attribute__((flatten)) float32_sqrt(float32 a, float_status *status)
-+static float32 QEMU_SOFTFLOAT_ATTR
-+soft_float32_sqrt(float32 a, float_status *status)
- {
-     FloatParts pa = float32_unpack_canonical(a, status);
-     FloatParts pr = sqrt_float(pa, status, &float32_params);
-     return float32_round_pack_canonical(pr, status);
- }
- 
--float64 __attribute__((flatten)) float64_sqrt(float64 a, float_status *status)
-+static float64 QEMU_SOFTFLOAT_ATTR
-+soft_float64_sqrt(float64 a, float_status *status)
- {
-     FloatParts pa = float64_unpack_canonical(a, status);
-     FloatParts pr = sqrt_float(pa, status, &float64_params);
-@@ -2899,6 +2901,73 @@ float64 float64_silence_nan(float64 a, float_status *status)
-     return float64_pack_raw(p);
- }
- 
-+#define GEN_SQRT_SF(name, soft_t, host_t, host_sqrt_func)               \
-+    static soft_t name(soft_t a, float_status *s)                       \
-+    {                                                                   \
-+        if (QEMU_NO_HARDFLOAT) {                                        \
-+            goto soft;                                                  \
-+        }                                                               \
-+        soft_t ## _input_flush1(&a, s);                                 \
-+        if (likely(soft_t ## _is_zero_or_normal(a) &&                   \
-+                   !soft_t ## _is_neg(a) &&                             \
-+                   can_use_fpu(s))) {                                   \
-+            host_t ha = soft_t ## _to_ ## host_t(a);                    \
-+            host_t hr = host_sqrt_func(ha);                             \
-+                                                                        \
-+            return host_t ## _to_ ## soft_t(hr);                        \
-+        }                                                               \
-+    soft:                                                               \
-+        return soft_ ## soft_t ## _sqrt(a, s);                          \
-+    }
-+
-+#define GEN_SQRT_FP(name, soft_t, host_t, host_sqrt_func)               \
-+    static soft_t name(soft_t a, float_status *s)                       \
-+    {                                                                   \
-+        host_t ha;                                                      \
-+                                                                        \
-+        if (QEMU_NO_HARDFLOAT) {                                        \
-+            goto soft;                                                  \
-+        }                                                               \
-+        soft_t ## _input_flush1(&a, s);                                 \
-+        ha = soft_t ## _to_ ## host_t(a);                               \
-+        if (likely((fpclassify(ha) == FP_NORMAL ||                      \
-+                    fpclassify(ha) == FP_ZERO) &&                       \
-+                   !signbit(ha) &&                                      \
-+                   can_use_fpu(s))) {                                   \
-+            host_t hr = host_sqrt_func(ha);                             \
-+                                                                        \
-+            return host_t ## _to_ ## soft_t(hr);                        \
-+        }                                                               \
-+    soft:                                                               \
-+        return soft_ ## soft_t ## _sqrt(a, s);                          \
-+    }
-+
-+GEN_SQRT_SF(f32_sqrt, float32, float, sqrtf)
-+GEN_SQRT_SF(f64_sqrt, float64, double, sqrt)
-+#undef GEN_SQRT_SF
-+
-+GEN_SQRT_FP(float_sqrt, float32, float, sqrtf)
-+GEN_SQRT_FP(double_sqrt, float64, double, sqrt)
-+#undef GEN_SQRT_FP
-+
-+float32 __attribute__((flatten)) float32_sqrt(float32 a, float_status *s)
-+{
-+    if (QEMU_HARDFLOAT_1F32_USE_FP) {
-+        return float_sqrt(a, s);
-+    } else {
-+        return f32_sqrt(a, s);
-+    }
-+}
-+
-+float64 __attribute__((flatten)) float64_sqrt(float64 a, float_status *s)
-+{
-+    if (QEMU_HARDFLOAT_1F64_USE_FP) {
-+        return double_sqrt(a, s);
-+    } else {
-+        return f64_sqrt(a, s);
-+    }
-+}
-+
- /*----------------------------------------------------------------------------
- | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
- | and 7, and returns the properly rounded 32-bit integer corresponding to the
--- 
-2.7.4
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--3sseE1tnmEs+TkKq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsfJosACgkQbDjKyiDZ
+s5Jx6RAAxZcm/3a4YaplLgfg08EluCcEyDgneTXHc4bi+U8izPC7vVVtDHYWZsMs
+Sh/xGxCFJXrCIz+bazcKC4KeccPEzZHKmxtjH1kT88RknxRvDDzTu2N5rnPHoy/X
+VGBI0sE5/skk26vVd5FO4Xd+BMUIuqqamB0SASEXoc85loTtIYSFDangmOMBmT4L
+RVDXfhVq+PMx3vKx8qx/JSGwUxkKJSFYerpcq0YudxTD1dqiLQu7C6mG7Md1Lptu
+85BRwTOy695mJ38vod9CCfnAU58MH3wf0aJZg3WV+NYVrDygPOgLjeULbLbelmgs
+UxF6XnNbK0DqyQW7dMWk4k98mA0hVWH0m9WnSiJKYDd7coP82/sT4oaXGvDg9HjA
+JBOHh2o1TxIiF/LkPL+M/qBEauARA0/MWsVaVtmSGjpZU16WIu+jEXgjHX8p3JGS
+huLrT53zZvO8Gg0yrxp4w3GfguNLTYmVe0mbmqrx4xPPpkTblEz1p8bxSZvDNeUl
+9bT6Xyt9Ywl5EFfp8FKvJEFPHsk33XI0tBOBPq8IfCfH4bhK/jsgGORmr4vy81WV
+VF/2PU7GVCnKHyvDUtsS4WNQ1WGWi8xq6OsmXFBNTdbSgf4hnTdH4ynzJzdrce08
+49a6T3l3rh3vVioBVN6JBADEa7W+qJyUFggIPwHo2jjBqzb3dV0=
+=+ED0
+-----END PGP SIGNATURE-----
+
+--3sseE1tnmEs+TkKq--
