@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fSnzJ-0007ff-Lu
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:25:50 -0400
+	(envelope-from <jan.kiszka@siemens.com>) id 1fSo4G-0001Ti-GS
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:30:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fSnzE-0002Ml-Ow
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:25:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33862)
+	(envelope-from <jan.kiszka@siemens.com>) id 1fSo4C-0005Rd-Gg
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:30:56 -0400
+Received: from thoth.sbs.de ([192.35.17.2]:59900)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fSnzE-0002MP-I0
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:25:44 -0400
-Date: Tue, 12 Jun 2018 15:25:41 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180612182541.GN7451@localhost.localdomain>
-References: <20180611203712.12086-1-ehabkost@redhat.com>
-	<a8426bf6-7531-6306-d1c6-bb4c6c2099cd@redhat.com>
-	<20180612150153.GK7451@localhost.localdomain>
-	<6c9b3744-7323-cd1f-7b07-2b77df7ae80d@redhat.com>
+	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+	id 1fSo4C-0005P7-49
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 14:30:52 -0400
+References: <267f42a5-b7ce-379e-ffd1-f2611393d2ff@web.de>
+	<ad56487b-5afe-1420-9903-d5d849f97231@siemens.com>
+	<CAFEAcA9V9nFMVixeYjfBj54OT3zhRCVHM495AZHDzxVryh4JFA@mail.gmail.com>
+	<6730e270-9906-a43c-68b0-7a09a0743fa5@siemens.com>
+	<d64ace8c-30ca-e16c-fd73-746476bf3a6b@siemens.com>
+	<7bb24572-0fc1-00de-3552-aca1111059ed@amsat.org>
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <63ee188e-0c66-ce7e-03b2-fd58e4da9116@siemens.com>
+Date: Tue, 12 Jun 2018 20:30:44 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6c9b3744-7323-cd1f-7b07-2b77df7ae80d@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH] i386: Remove ospke CPUID flag name
+In-Reply-To: <7bb24572-0fc1-00de-3552-aca1111059ed@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] e1000e: Do not auto-clear ICR bits which
+ aren't set in EIAC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +34,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Dmitry Fleytman <dmitry.fleytman@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
 
-On Tue, Jun 12, 2018 at 05:12:58PM +0200, Paolo Bonzini wrote:
-> On 12/06/2018 17:01, Eduardo Habkost wrote:
-> >>>
-> >>> Remove OSPKE from the feature name array so users don't try to
-> >>> configure it manually.
-> >>>
-> >>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> >> Yes, it's the same as OSXSAVE.  Thanks!
-> > CR4_OSXSAVE_MASK is automatically enabled on user-mode QEMU,
-> > though.
-> > 
-> > My question is if it would make any sense to enable CR4_PKE_MASK
-> > too.
-> 
-> If you mean OSPKE, then yes---if PKU is available.  Likewise, OSXSAVE
-> should only be enabled if XSAVE is available.
+On 2018-06-12 20:11, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Jan,
+>=20
+> On 06/12/2018 02:22 PM, Jan Kiszka wrote:
+>> On 2018-05-22 09:00, Jan Kiszka wrote:
+>>> On 2018-04-16 17:29, Peter Maydell wrote:
+>>>> On 16 April 2018 at 16:25, Jan Kiszka <jan.kiszka@siemens.com> wrote=
+:
+>>>>> On 2018-04-01 23:17, Jan Kiszka wrote:
+>>>>>> From: Jan Kiszka <jan.kiszka@siemens.com>
+>>>>>>
+>>>>>> The spec does not justify clearing of any E1000_ICR_OTHER_CAUSES w=
+hen
+>>>>>> E1000_ICR_OTHER is set in EIAC. In fact, removing this code fixes =
+the
+>>>>>> issue the Linux driver runs into since 4aea7a5c5e94 ("e1000e: Avoi=
+d
+>>>>>> receiver overrun interrupt bursts") and was worked around by
+>>>>>> 745d0bd3af99 ("e1000e: Remove Other from EIAC").
+>>>>>>
+>>>>>> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+>>>>>> ---
+>>>>>>
+>>>>>> This resolves the issue I reported on February 18 ("e1000e: MSI-X
+>>>>>> problem with recent Linux drivers").
+>>>>>>
+>>>>>>  hw/net/e1000e_core.c | 4 ----
+>>>>>>  1 file changed, 4 deletions(-)
+>>>>>>
+>>>>>> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+>>>>>> index ecf9b15555..d38f025c0f 100644
+>>>>>> --- a/hw/net/e1000e_core.c
+>>>>>> +++ b/hw/net/e1000e_core.c
+>>>>>> @@ -2022,10 +2022,6 @@ e1000e_msix_notify_one(E1000ECore *core, ui=
+nt32_t cause, uint32_t int_cfg)
+>>>>>>
+>>>>>>      effective_eiac =3D core->mac[EIAC] & cause;
+>>>>>>
+>>>>>> -    if (effective_eiac =3D=3D E1000_ICR_OTHER) {
+>>>>>> -        effective_eiac |=3D E1000_ICR_OTHER_CAUSES;
+>>>>>> -    }
+>>>>>> -
+>>>>>>      core->mac[ICR] &=3D ~effective_eiac;
+>>>>>>
+>>>>>>      if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
+>>>>>>
+>>>>>
+>>>>> Ping for this - as well as https://patchwork.ozlabs.org/patch/89547=
+6.
+>>>>>
+>>>>> Given that q35 uses e1000e by default and many Linux kernel version=
+s no
+>>>>> longer work, this should likely go into upcoming and stable version=
+s
+>>>>
+>>>> I'd rather not put it into 2.12 at this point in the release
+>>>> cycle unless it's a regression from 2.11, I think.
+>>>
+>>> Second ping - nothing hit the repo so far, nor did I receive feedback.
+>>>
+>>
+>> And another ping. For both.
+>>
+>> These days I had to help someone with a broken QEMU setup that failed
+>> installing from network. It turned out that "modprobe e1000e IntMode=3D=
+0"
+>> was needed to workaround the issues my patches address.
+>=20
+> What about the IMS register? It is set just after.
+>=20
+> Looking at b38636b8372, can you test this patch?
+>=20
+> -- >8 --
+> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+> index c93c4661ed..a484b68a5a 100644
+> --- a/hw/net/e1000e_core.c
+> +++ b/hw/net/e1000e_core.c
+> @@ -2022,13 +2022,13 @@ e1000e_msix_notify_one(E1000ECore *core,
+> uint32_t cause, uint32_t int_cfg)
+>=20
+>      effective_eiac =3D core->mac[EIAC] & cause;
+>=20
+> -    if (effective_eiac =3D=3D E1000_ICR_OTHER) {
+> -        effective_eiac |=3D E1000_ICR_OTHER_CAUSES;
+> -    }
+> -
+>      core->mac[ICR] &=3D ~effective_eiac;
+>=20
+>      if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
+> +        if (effective_eiac =3D=3D E1000_ICR_OTHER) {
+> +            effective_eiac |=3D E1000_ICR_OTHER_CAUSES;
+> +        }
+> +
+>          core->mac[IMS] &=3D ~effective_eiac;
+>      }
+>  }
+>=20
 
-Yeah, I mean enabling it only if PKU is available, like we
-already do with OSXAVE/XSAVE.
+Before testing this: What would be the reasoning for this change?
 
-But we don't do it today, so enabling it automatically in
-CONFIG_USER_ONLY would be a new feature.  Would it be useful for
-anything, though?
+I need to refresh my caches, the debugging session is now too long ago
+again.
 
-I'm asking that to find out if somebody could be already using
-"-cpu ...,+ospke" with user-mode QEMU today (which this patch
-would break).  If RDPKRU/WRPKRU is useless under user-mode QEMU,
-than we don't need to worry about that.
+Jan
 
--- 
-Eduardo
+--=20
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
