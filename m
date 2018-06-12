@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSmED-0004VS-3c
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:33:06 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSmIU-0005z7-2l
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSmEB-0007Mm-PM
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:33:05 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180607062559.16127-1-armbru@redhat.com>
-	<20180607062559.16127-11-armbru@redhat.com>
-	<20180612144308.GD4355@localhost.localdomain>
-Date: Tue, 12 Jun 2018 18:32:56 +0200
-In-Reply-To: <20180612144308.GD4355@localhost.localdomain> (Kevin Wolf's
-	message of "Tue, 12 Jun 2018 16:43:08 +0200")
-Message-ID: <874li8othj.fsf@dusky.pond.sub.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSmIQ-00019o-UO
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:37:30 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35485)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fSmIQ-00019b-OL
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:37:26 -0400
+Received: by mail-qt0-x244.google.com with SMTP id s9-v6so24302530qtg.2
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 09:37:26 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180612005145.3375-1-richard.henderson@linaro.org>
+	<20180612005145.3375-16-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <769b367a-c384-b551-b60a-2e891bd430bd@amsat.org>
+Date: Tue, 12 Jun 2018 13:37:22 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH 10/19] block: Make remaining uses of
- qobject input visitor more robust
+In-Reply-To: <20180612005145.3375-16-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 15/19] linux-user: Split out pread64,
+ pwrite64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,120 +36,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, jcody@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, laurent@vivier.eu
 
-Kevin Wolf <kwolf@redhat.com> writes:
+Hi Richard,
 
-> Am 07.06.2018 um 08:25 hat Markus Armbruster geschrieben:
->> Remaining uses of qobject_input_visitor_new_keyval() in the block
->> subsystem:
->> 
->> * block_crypto_create_opts_init()
->>   Currently doesn't visit any non-string scalars, thus safe.  It's
->>   called from
->>   - block_crypto_open_luks()
->>     Creates the QDict with qemu_opts_to_qdict_filtered(), which
->>     creates only string scalars, but has a TODO asking for other types.
->>   - qcow_open()
->>   - qcow2_open(), qcow2_co_invalidate_cache(), qcow2_reopen_prepare()
->
-> Do you mean block_crypto_open_opts_init()?
+On 06/11/2018 09:51 PM, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  linux-user/syscall.h           | 44 +++++++++++++++++++++
+>  linux-user/syscall.c           | 70 ----------------------------------
+>  linux-user/syscall_file.c      | 61 +++++++++++++++++++++++++++--
+>  linux-user/gen_syscall_list.py |  2 +
+>  linux-user/strace.list         |  6 ---
+>  5 files changed, 104 insertions(+), 79 deletions(-)
+> 
+> diff --git a/linux-user/syscall.h b/linux-user/syscall.h
+> index 3fc49d5b65..a157e25bba 100644
+> --- a/linux-user/syscall.h
+> +++ b/linux-user/syscall.h
+> @@ -174,6 +174,50 @@ struct iovec *lock_iovec(int type, abi_ulong target_addr,
+>  void unlock_iovec(struct iovec *vec, abi_ulong target_addr,
+>                    abi_ulong count, int copy);
+>  
+> +/* Returns true if syscall NUM expects 64bit types aligned even
+> + * on pairs of registers.
+> + */
+> +static inline bool regpairs_aligned(void *cpu_env, int num)
+> +{
+> +#ifdef TARGET_ARM
+> +    return ((CPUARMState *)cpu_env)->eabi;
+> +#elif defined(TARGET_MIPS) && TARGET_ABI_BITS == 32
+> +    return true;
+> +#elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
+> +    /* SysV AVI for PPC32 expects 64bit parameters to be passed on
+> +     * odd/even pairs of registers which translates to the same as
+> +     * we start with r3 as arg1
+> +     */
+> +    return true;
+> +#elif defined(TARGET_SH4)
+> +    /* SH4 doesn't align register pairs, except for p{read,write}64 */
+> +    switch (num) {
+> +    case TARGET_NR_pread64:
+> +    case TARGET_NR_pwrite64:
+> +        return true;
+> +    default:
+> +        return false;
+> +    }
+> +#elif defined(TARGET_XTENSA)
+> +    return true;
+> +#else
+> +    return false;
+> +#endif
+> +}
+> +
+> +static inline uint64_t target_offset64(abi_ulong word0, abi_ulong word1)
+> +{
+> +#if TARGET_ABI_BITS == 32
+> +# ifdef TARGET_WORDS_BIGENDIAN
+> +    return ((uint64_t)word0 << 32) | word1;
+> +# else
+> +    return ((uint64_t)word1 << 32) | word0;
+> +# endif
+> +#else
+> +    return word0;
+> +#endif
+> +}
+> +
+>  /* Temporary declarations from syscall_foo.c back to main syscall.c.
+>   * These indicate incomplete conversion.
+>   */
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 381ee9c3a2..cdc9787240 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -642,38 +642,6 @@ static inline int next_free_host_timer(void)
+>  }
+>  #endif
+>  
+> -/* ARM EABI and MIPS expect 64bit types aligned even on pairs or registers */
+> -#ifdef TARGET_ARM
+> -static inline int regpairs_aligned(void *cpu_env, int num)
+> -{
+> -    return ((((CPUARMState *)cpu_env)->eabi) == 1) ;
+> -}
+> -#elif defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
+> -static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
+> -#elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
+> -/* SysV AVI for PPC32 expects 64bit parameters to be passed on odd/even pairs
+> - * of registers which translates to the same as ARM/MIPS, because we start with
+> - * r3 as arg1 */
+> -static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
+> -#elif defined(TARGET_SH4)
+> -/* SH4 doesn't align register pairs, except for p{read,write}64 */
+> -static inline int regpairs_aligned(void *cpu_env, int num)
+> -{
+> -    switch (num) {
+> -    case TARGET_NR_pread64:
+> -    case TARGET_NR_pwrite64:
+> -        return 1;
+> -
+> -    default:
+> -        return 0;
+> -    }
+> -}
+> -#elif defined(TARGET_XTENSA)
+> -static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
+> -#else
+> -static inline int regpairs_aligned(void *cpu_env, int num) { return 0; }
+> -#endif
+> -
+>  #define ERRNO_TABLE_SIZE 1200
+>  
+>  /* target_to_host_errno_table[] is initialized from
+> @@ -6864,22 +6832,6 @@ void syscall_init(void)
+>      }
+>  }
+>  
+> -#if TARGET_ABI_BITS == 32
+> -static inline uint64_t target_offset64(uint32_t word0, uint32_t word1)
+> -{
+> -#ifdef TARGET_WORDS_BIGENDIAN
+> -    return ((uint64_t)word0 << 32) | word1;
+> -#else
+> -    return ((uint64_t)word1 << 32) | word0;
+> -#endif
+> -}
+> -#else /* TARGET_ABI_BITS == 32 */
+> -static inline uint64_t target_offset64(uint64_t word0, uint64_t word1)
+> -{
+> -    return word0;
+> -}
+> -#endif /* TARGET_ABI_BITS != 32 */
+> -
+>  #ifdef TARGET_NR_truncate64
+>  static inline abi_long target_truncate64(void *cpu_env, const char *arg1,
+>                                           abi_long arg2,
+> @@ -10078,28 +10030,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+>  #else
+>  #error unreachable
+>  #endif
+> -#endif
+> -#ifdef TARGET_NR_pread64
+> -    case TARGET_NR_pread64:
+> -        if (regpairs_aligned(cpu_env, num)) {
+> -            arg4 = arg5;
+> -            arg5 = arg6;
+> -        }
+> -        if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
+> -            return -TARGET_EFAULT;
+> -        ret = get_errno(pread64(arg1, p, arg3, target_offset64(arg4, arg5)));
+> -        unlock_user(p, arg2, ret);
+> -        return ret;
+> -    case TARGET_NR_pwrite64:
+> -        if (regpairs_aligned(cpu_env, num)) {
+> -            arg4 = arg5;
+> -            arg5 = arg6;
+> -        }
+> -        if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
+> -            return -TARGET_EFAULT;
+> -        ret = get_errno(pwrite64(arg1, p, arg3, target_offset64(arg4, arg5)));
+> -        unlock_user(p, arg2, 0);
+> -        return ret;
+>  #endif
+>      case TARGET_NR_getcwd:
+>          if (!(p = lock_user(VERIFY_WRITE, arg1, arg2, 0)))
+> diff --git a/linux-user/syscall_file.c b/linux-user/syscall_file.c
+> index 4cc7051847..aae9c49599 100644
+> --- a/linux-user/syscall_file.c
+> +++ b/linux-user/syscall_file.c
+> @@ -378,15 +378,70 @@ SYSCALL_IMPL(openat)
+>  }
+>  SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
+>  
+> +/* Both pread64 and pwrite64 merge args into a 64-bit offset,
+> + * but the input registers and ordering are target specific.
+> + */
+> +#if TARGET_ABI_BITS == 32
+> +SYSCALL_ARGS(pread64_pwrite64)
+> +{
+> +    /* We have already assigned out[0-2].  */
+> +    int off = regpairs_aligned(cpu_env, TARGET_NR_pread64);
+> +    out[3] = target_offset64(in[3 + off], in[4 + off]);
+> +    return def;
+> +}
+> +#else
+> +#define args_pread64_pwrite64 NULL
+> +#endif
+> +
+> +SYSCALL_IMPL(pread64)
+> +{
+> +    void *p = lock_user(VERIFY_WRITE, arg2, arg3, 0);
+> +    abi_long ret;
+> +
+> +    if (!p) {
+> +        return -TARGET_EFAULT;
+> +    }
+> +    ret = get_errno(pread64(arg1, p, arg3, arg4));
+> +    unlock_user(p, arg2, ret);
+> +    return ret;
+> +}
+> +
+> +const SyscallDef def_pread64 = {
+> +    .name = "pread64",
+> +    .args = args_pread64_pwrite64,
+> +    .impl = impl_pread64,
+> +    .arg_type = { ARG_DEC, ARG_PTR, ARG_DEC, ARG_DEC64 }
+> +};
+> +
+> +SYSCALL_IMPL(pwrite64)
+> +{
+> +    void *p = lock_user(VERIFY_READ, arg2, arg3, 0);
+> +    abi_long ret;
+> +
+> +    if (!p) {
+> +        return -TARGET_EFAULT;
+> +    }
+> +    ret = get_errno(pwrite64(arg1, p, arg3, arg4));
+> +    unlock_user(p, arg2, 0);
+> +    return ret;
+> +}
+> +
+> +const SyscallDef def_pwrite64 = {
+> +    .name = "pwrite64",
+> +    .args = args_pread64_pwrite64,
+> +    .impl = impl_pwrite64,
+> +    .arg_type = { ARG_DEC, ARG_PTR, ARG_DEC, ARG_DEC64 }
+> +};
+> +
+>  /* Both preadv and pwritev merge args 4/5 into a 64-bit offset.
+>   * Moreover, the parts are *always* in little-endian order.
+>   */
+>  #if TARGET_ABI_BITS == 32
+>  SYSCALL_ARGS(preadv_pwritev)
+>  {
+> -    /* We have already assigned out[0-3].  */
+> -    abi_ulong lo = in[4], hi = in[5];
+> -    out[4] = ((hi << (TARGET_ABI_BITS - 1)) << 1) | lo;
+> +    /* We have already assigned out[0-2].  */
+> +    abi_ulong lo = in[3], hi = in[4];
+> +    out[3] = ((hi << (TARGET_ABI_BITS - 1)) << 1) | lo;
 
-Yes.  Fixing...
+Why this change? If correct, can you update the comment?
+Also this seems related to your previous patch #14: "Split out preadv,
+pwritev, readv, writev", not this one.
 
->> * block_crypto_create_opts_init(), called from
->>   - block_crypto_co_create_opts_luks()
->>     Also creates the QDict with qemu_opts_to_qdict_filtered().
->> 
->> * vdi_co_create_opts()
->>   Also creates the QDict with qemu_opts_to_qdict_filtered().
->> 
->> Replace these uses by qobject_input_visitor_new_flat_confused() for
->> robustness.  This adds crumpling.  Right now, that's a no-op, but if
->> we ever extend these things in non-flat ways, crumpling will be
->> needed.
->> 
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->>  block/crypto.c | 6 +++---
->>  block/vdi.c    | 4 ++--
->>  2 files changed, 5 insertions(+), 5 deletions(-)
->> 
->> diff --git a/block/crypto.c b/block/crypto.c
->> index bc322b50f5..25d12e9d47 100644
->> --- a/block/crypto.c
->> +++ b/block/crypto.c
->> @@ -21,11 +21,11 @@
->>  #include "qemu/osdep.h"
->>  
->>  #include "block/block_int.h"
->> +#include "block/qdict.h"
->>  #include "sysemu/block-backend.h"
->>  #include "crypto/block.h"
->>  #include "qapi/opts-visitor.h"
->>  #include "qapi/qapi-visit-crypto.h"
->> -#include "qapi/qmp/qdict.h"
->>  #include "qapi/qobject-input-visitor.h"
->>  #include "qapi/error.h"
->>  #include "qemu/option.h"
->> @@ -159,7 +159,7 @@ block_crypto_open_opts_init(QCryptoBlockFormat format,
->>      ret = g_new0(QCryptoBlockOpenOptions, 1);
->>      ret->format = format;
->>  
->> -    v = qobject_input_visitor_new_keyval(QOBJECT(opts));
->> +    v = qobject_input_visitor_new_flat_confused(opts, &error_abort);
->
-> At least this &error_abort is not correct:
->
-> $ ./qemu-img create -f qcow2 --object secret,id=sec0,data=foo -oencrypt.format=luks,encrypt.key-secret=sec0 /tmp/test.qcow2 64M
-> Formatting '/tmp/test.qcow2', fmt=qcow2 size=67108864 encrypt.format=luks encrypt.key-secret=sec0 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-> $ x86_64-softmmu/qemu-system-x86_64 -drive driver=qcow2,encrypt.foo=1,encrypt.foo.bar=2,file.filename=/tmp/test.qcow2
-> Unexpected error in qdict_crumple() at qobject/block-qdict.c:452:
-> qemu-system-x86_64: -drive driver=qcow2,encrypt.foo=1,encrypt.foo.bar=2,file.filename=/tmp/test.qcow2: Key foo prefix is already set as a dict
-> Abgebrochen (Speicherabzug geschrieben)
->
->>      visit_start_struct(v, NULL, NULL, 0, &local_err);
->>      if (local_err) {
->> @@ -210,7 +210,7 @@ block_crypto_create_opts_init(QCryptoBlockFormat format,
->>      ret = g_new0(QCryptoBlockCreateOptions, 1);
->>      ret->format = format;
->>  
->> -    v = qobject_input_visitor_new_keyval(QOBJECT(opts));
->> +    v = qobject_input_visitor_new_flat_confused(opts, &error_abort);
->>  
->>      visit_start_struct(v, NULL, NULL, 0, &local_err);
->>      if (local_err) {
->> diff --git a/block/vdi.c b/block/vdi.c
->> index 668af0a828..6b6eed126d 100644
->> --- a/block/vdi.c
->> +++ b/block/vdi.c
->> @@ -51,10 +51,10 @@
->>  
->>  #include "qemu/osdep.h"
->>  #include "qapi/error.h"
->> -#include "qapi/qmp/qdict.h"
->>  #include "qapi/qobject-input-visitor.h"
->>  #include "qapi/qapi-visit-block-core.h"
->>  #include "block/block_int.h"
->> +#include "block/qdict.h"
->>  #include "sysemu/block-backend.h"
->>  #include "qemu/module.h"
->>  #include "qemu/option.h"
->> @@ -934,7 +934,7 @@ static int coroutine_fn vdi_co_create_opts(const char *filename, QemuOpts *opts,
->>      }
->>  
->>      /* Get the QAPI object */
->> -    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
->> +    v = qobject_input_visitor_new_flat_confused(qdict, &error_abort);
->>      visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
->>      visit_free(v);
->
-> The other two &error_aborts _might_ be correct today because I couldn't
-> see callers where the keys weren't already checked by QemuOpts, but I'm
-> not sure if I looked at everything nor whether review would catch a
-> future patch that added a new such call.
-
-Okay, I'm getting rid of all three.
-
-Thanks!
+>      return def;
+>  }
+>  #else
+> diff --git a/linux-user/gen_syscall_list.py b/linux-user/gen_syscall_list.py
+> index ce6dca742c..7481d030ee 100644
+> --- a/linux-user/gen_syscall_list.py
+> +++ b/linux-user/gen_syscall_list.py
+> @@ -27,7 +27,9 @@ import sys
+>  unconditional_syscalls = [
+>      "close",
+>      "openat",
+> +    "pread64",
+>      "preadv",
+> +    "pwrite64",
+>      "pwritev",
+>      "read",
+>      "readv",
+> diff --git a/linux-user/strace.list b/linux-user/strace.list
+> index d5ee55ac82..d978cefa31 100644
+> --- a/linux-user/strace.list
+> +++ b/linux-user/strace.list
+> @@ -1025,9 +1025,6 @@
+>  #ifdef TARGET_NR_prctl
+>  { TARGET_NR_prctl, "prctl" , NULL, NULL, NULL },
+>  #endif
+> -#ifdef TARGET_NR_pread64
+> -{ TARGET_NR_pread64, "pread64" , NULL, NULL, NULL },
+> -#endif
+>  #ifdef TARGET_NR_prlimit64
+>  { TARGET_NR_prlimit64, "prlimit64" , NULL, NULL, NULL },
+>  #endif
+> @@ -1052,9 +1049,6 @@
+>  #ifdef TARGET_NR_putpmsg
+>  { TARGET_NR_putpmsg, "putpmsg" , NULL, NULL, NULL },
+>  #endif
+> -#ifdef TARGET_NR_pwrite64
+> -{ TARGET_NR_pwrite64, "pwrite64" , NULL, NULL, NULL },
+> -#endif
+>  #ifdef TARGET_NR_query_module
+>  { TARGET_NR_query_module, "query_module" , NULL, NULL, NULL },
+>  #endif
+> 
