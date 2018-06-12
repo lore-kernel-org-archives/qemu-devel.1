@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fSlOB-00021r-Bi
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:39:20 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fSlRq-0003G9-Me
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:43:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fSlOA-0001At-37
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:39:19 -0400
-Date: Tue, 12 Jun 2018 17:39:09 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180612153909.GG4355@localhost.localdomain>
-References: <20180612125821.4229-1-armbru@redhat.com>
-	<20180612125821.4229-13-armbru@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fSlRp-0003LP-Sb
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:43:06 -0400
+Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:44621)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fSlRp-0003L3-Oj
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:43:05 -0400
+Received: by mail-ot0-x22d.google.com with SMTP id w13-v6so28579817ote.11
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 08:43:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180612125821.4229-13-armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 12/18] block-qdict: Clean up
- qdict_crumple() a bit
+In-Reply-To: <20180612104430.25745-1-kraxel@redhat.com>
+References: <20180612104430.25745-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Jun 2018 16:42:39 +0100
+Message-ID: <CAFEAcA9SWjaB-CxwJTH=jtkw6dYdWNhhW40v+fnz+9vZXzKF8A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/8] Usb 20180612 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, Richard Henderson <rth@twiddle.net>, qemu-arm <qemu-arm@nongnu.org>, Li Zhijian <lizhijian@cn.fujitsu.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Zhang Chen <zhangckid@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Corey Minyard <minyard@acm.org>
 
-Am 12.06.2018 um 14:58 hat Markus Armbruster geschrieben:
-> When you mix scalar and non-scalar keys, whether you get an "already
-> set as scalar" or an "already set as dict" error depends on qdict
-> iteration order.  Neither message makes much sense.  Replace by
-> ""Cannot mix scalar and non-scalar keys".  This is similar to the
-> message we get for mixing list and non-list keys.
-> 
-> I find qdict_crumple()'s first loop hard to understand.  Rearrange it
-> and add a comment.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+On 12 June 2018 at 11:44, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit 2afc4e3df80d947dd1bd42ce80278f591b35c74a:
+>
+>   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2018-06-11' into staging (2018-06-11 15:31:20 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/usb-20180612-pull-request
+>
+> for you to fetch changes up to 3c969a6022438cf59de10d2dc3c58f4807788f98:
+>
+>   usb-mtp: Return error on suspicious TYPE_DATA packet from initiator (2018-06-12 12:08:12 +0200)
+>
+> ----------------------------------------------------------------
+> usb: bug fix collection, doc update.
+>
+> ----------------------------------------------------------------
 
-To be honest, I found the old version of the loop more obvious.
+Applied, thanks.
 
->  qobject/block-qdict.c | 42 +++++++++++++++++++++---------------------
->  1 file changed, 21 insertions(+), 21 deletions(-)
-> 
-> diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
-> index a4e1c8d08f..35e9052816 100644
-> --- a/qobject/block-qdict.c
-> +++ b/qobject/block-qdict.c
-> @@ -403,7 +403,7 @@ static int qdict_is_list(QDict *maybe_list, Error **errp)
->  QObject *qdict_crumple(const QDict *src, Error **errp)
->  {
->      const QDictEntry *ent;
-> -    QDict *two_level, *multi_level = NULL;
-> +    QDict *two_level, *multi_level = NULL, *child_dict;
->      QObject *dst = NULL, *child;
->      size_t i;
->      char *prefix = NULL;
-> @@ -422,29 +422,29 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
->          }
->  
->          qdict_split_flat_key(ent->key, &prefix, &suffix);
-> -
->          child = qdict_get(two_level, prefix);
-> +        child_dict = qobject_to(QDict, child);
-> +
-> +        if (child) {
-> +            /*
-> +             * An existing child must be a dict and @ent must be a
-> +             * dict member (i.e. suffix not null), or else @ent
-> +             * clashes.
-> +             */
-> +            if (!child_dict || !suffix) {
-> +                error_setg(errp,
-> +                           "Cannot mix scalar and non-scalar keys");
-> +                goto error;
-> +            }
-> +        } else if (suffix) {
-> +            child_dict = qdict_new();
-> +            qdict_put(two_level, prefix, child_dict);
-> +        } else {
-> +            qdict_put_obj(two_level, prefix, qobject_ref(ent->value));
-> +        }
-
-At least, can you please move the else branch to the if below so that
-the addition of the new entry is symmetrical for both scalars and dicts?
-As the code is, it mixes the conflict check, creation of the child dict
-and addition of scalars (but not to the child dict) in a weird way in a
-single if block.
-
-Or maybe organise it like this:
-
-if (child && !(child_dict && suffix)) {
-    error
-}
-
-if (suffix) {
-    if (!child_dict) {
-        create it
-        add it to two_level
-    }
-    add entry to child_dict
-} else {
-    add entry to two_level
-}
-
-Kevin
+-- PMM
