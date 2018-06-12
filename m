@@ -1,36 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40769)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fSgBx-0006sb-Eu
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:06:22 -0400
+	(envelope-from <clg@kaod.org>) id 1fSgEm-0000aa-CC
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:09:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fSgBs-0007xy-FZ
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:06:21 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39262)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fSgBs-0007xW-7C
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:06:16 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5CA5Pmm129591
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 06:06:14 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jjarm3pdb-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 06:05:51 -0400
-Received: from localhost
-	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 12 Jun 2018 11:04:52 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 12 Jun 2018 12:04:48 +0200
-Message-Id: <20180612100448.202315-1-borntraeger@de.ibm.com>
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
+	(envelope-from <clg@kaod.org>) id 1fSgEh-0000cq-Ij
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:09:16 -0400
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:35977)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fSgEh-0000cU-CT
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 06:09:11 -0400
+Received: from player750.ha.ovh.net (unknown [10.109.120.18])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id E68F6E749F
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 12:09:09 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Tue, 12 Jun 2018 12:08:57 +0200
+Message-Id: <20180612100857.23093-1-clg@kaod.org>
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v3 1/1] s390x/ipl: Try to detect Linux vs non
- Linux for initial IPL PSW
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH] xics_kvm: fix a build break
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,69 +27,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Right now the IPL device always starts from address 0x10000 (the usual
-Linux entry point). To run other guests (e.g. test programs) it is
-useful to use the IPL PSW from address 0. We can use the Linux magic
-at 0x10008 to decide.
+On CentOS 7.5, gcc-4.8.5-28.el7_5.1.ppc64le fails to build QEMU due to :
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+  hw/intc/xics_kvm.c: In function =E2=80=98ics_set_kvm_state=E2=80=99:
+  hw/intc/xics_kvm.c:281:13: error: =E2=80=98ret=E2=80=99 may be used uni=
+nitialized in this
+    function [-Werror=3Dmaybe-uninitialized]
+             return ret;
+
+Fix the breakage and also remove the extra error reporting as
+kvm_device_access() already provides a substantial error message.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
-v2->v3:
-	- check for iplpsw to avoid assert on file errors
-	- use 4 bytes at 4 instead of 8 bytes at 0
-v1->v2:
-	- use LINUX_MAGIC_ADDR define
-	- use assert for valid iplpsw pointer
-	- add endianess conversion
- hw/s390x/ipl.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 04245b5258..1a42630962 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -29,6 +29,7 @@
- #include "exec/exec-all.h"
- 
- #define KERN_IMAGE_START                0x010000UL
-+#define LINUX_MAGIC_ADDR                0x010008UL
- #define KERN_PARM_AREA                  0x010480UL
- #define INITRD_START                    0x800000UL
- #define INITRD_PARM_START               0x010408UL
-@@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
- static void s390_ipl_realize(DeviceState *dev, Error **errp)
- {
-     S390IPLState *ipl = S390_IPL(dev);
--    uint64_t pentry = KERN_IMAGE_START;
-+    uint32_t *iplpsw;
-+    uint64_t pentry;
-+    char *magic;
-     int kernel_size;
-     Error *err = NULL;
- 
-@@ -157,6 +160,20 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
-                                NULL, 1, EM_S390, 0, 0);
-         if (kernel_size < 0) {
-             kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
-+            /* if this is Linux use KERN_IMAGE_START */
-+            magic = rom_ptr(LINUX_MAGIC_ADDR);
-+            if (magic && !memcmp(magic, "S390EP", 6)) {
-+                pentry = KERN_IMAGE_START;
-+            } else {
-+                /* if not Linux use the IPL PSW */
-+                iplpsw = rom_ptr(4);
-+                if (iplpsw) {
-+                    pentry = be32_to_cpu(*iplpsw) & 0x7fffffffUL;
-+                } else {
-+                    error_setg(&err, "Could not get IPL PSW");
-+                    goto error;
-+                }
-+            }
+ Greg, can you please test ? RHEL7.5 does not catch the issue with the
+ same compiler level :/ I don't understand why.=20
+=20
+ hw/intc/xics_kvm.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+index 8bdf6afe82a0..2113b6987a45 100644
+--- a/hw/intc/xics_kvm.c
++++ b/hw/intc/xics_kvm.c
+@@ -186,8 +186,7 @@ static void ics_get_kvm_state(ICSState *ics)
+         kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+                           i + ics->offset, &state, false, &local_err);
+         if (local_err) {
+-            error_report("Unable to retrieve KVM interrupt controller st=
+ate"
+-                    " for IRQ %d: %s", i + ics->offset, strerror(errno))=
+;
++            error_report_err(local_err);
+             exit(1);
          }
-         if (kernel_size < 0) {
-             error_setg(&err, "could not load kernel '%s'", ipl->kernel);
--- 
-2.17.0
+=20
+@@ -273,11 +272,10 @@ static int ics_set_kvm_state(ICSState *ics, int ver=
+sion_id)
+                 state |=3D KVM_XICS_QUEUED;
+         }
+=20
+-        kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+-                          i + ics->offset, &state, true, &local_err);
++        ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURC=
+ES,
++                                i + ics->offset, &state, true, &local_er=
+r);
+         if (local_err) {
+-            error_report("Unable to restore KVM interrupt controller sta=
+te"
+-                    " for IRQs %d: %s", i + ics->offset, strerror(errno)=
+);
++            error_report_err(err);
+             return ret;
+         }
+     }
+--=20
+2.13.6
