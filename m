@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1fSbg7-0000sq-0E
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 01:17:11 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1fSbg7-0000t5-Q7
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 01:17:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1fSbg6-0005tv-1c
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 01:17:10 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1fSbg6-0005vy-VF
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 01:17:11 -0400
 From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Tue, 12 Jun 2018 15:16:29 +1000
-Message-Id: <20180612051630.17854-1-sjitindarsingh@gmail.com>
-Subject: [Qemu-devel] [QEMU-PPC] [PATCH V2 1/2] target/ppc: Don't require
- private l1d cache on POWER8 for cap_ppc_safe_cache
+Date: Tue, 12 Jun 2018 15:16:30 +1000
+Message-Id: <20180612051630.17854-2-sjitindarsingh@gmail.com>
+In-Reply-To: <20180612051630.17854-1-sjitindarsingh@gmail.com>
+References: <20180612051630.17854-1-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [QEMU-PPC] [PATCH V2 2/2] ppc/spapr_caps: Don't
+ disable cap_cfpc on POWER8 by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,56 +23,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, david@gibson.dropbear.id.au, groug@kaod.org, muriloo@linux.ibm.com, sjitindarsingh@gmail.com
 
-For cap_ppc_safe_cache to be set to workaround, we require both a l1d
-cache flush instruction and private l1d cache.
+In default_caps_with_cpu() we set spapr_cap_cfpc to broken for POWER8
+processors and before.
 
-On POWER8 don't require private l1d cache. This means a guest on a
-POWER8 machine can make use of the cache flush workarounds.
+Since we no longer require private l1d cache on POWER8 for this cap to
+be set to workaround change this to default to broken for POWER7
+processors and before.
 
 Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 ---
 
 V1 -> V2:
-- Use mfpvr() to detect host type
+- No Change
 
 ---
- target/ppc/kvm.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ hw/ppc/spapr_caps.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 2c0c34e125..7fe9d0126b 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2412,11 +2412,28 @@ bool kvmppc_has_cap_mmu_hash_v3(void)
-     return cap_mmu_hash_v3;
- }
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 531e145114..00e43a9ba7 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -335,14 +335,10 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
  
-+static bool kvmppc_power8_host(void)
-+{
-+    bool ret = false;
-+#ifdef TARGET_PPC64
-+    {
-+        uint32_t base_pvr = CPU_POWERPC_POWER_SERVER_MASK & mfpvr();
-+        ret = (base_pvr == CPU_POWERPC_POWER8E_BASE) ||
-+              (base_pvr == CPU_POWERPC_POWER8NVL_BASE) ||
-+              (base_pvr == CPU_POWERPC_POWER8_BASE);
-+    }
-+#endif /* TARGET_PPC64 */
-+    return ret;
-+}
-+
- static int parse_cap_ppc_safe_cache(struct kvm_ppc_cpu_char c)
- {
-+    bool l1d_thread_priv_req = !kvmppc_power8_host();
-+
-     if (~c.behaviour & c.behaviour_mask & H_CPU_BEHAV_L1D_FLUSH_PR) {
-         return 2;
--    } else if ((c.character & c.character_mask & H_CPU_CHAR_L1D_THREAD_PRIV) &&
-+    } else if ((!l1d_thread_priv_req ||
-+                c.character & c.character_mask & H_CPU_CHAR_L1D_THREAD_PRIV) &&
-                (c.character & c.character_mask
-                 & (H_CPU_CHAR_L1D_FLUSH_ORI30 | H_CPU_CHAR_L1D_FLUSH_TRIG2))) {
-         return 1;
+     caps = smc->default_caps;
+ 
+-    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_3_00,
+-                          0, spapr->max_compat_pvr)) {
+-        caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
+-    }
+-
+     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
+                           0, spapr->max_compat_pvr)) {
+         caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
++        caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
+     }
+ 
+     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06_PLUS,
 -- 
 2.13.6
