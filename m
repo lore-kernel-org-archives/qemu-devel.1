@@ -1,35 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fSdgh-0003dy-NW
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:25:56 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fSdlZ-0007hC-Ox
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:30:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fSdgg-00068I-6F
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:25:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58630)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fSdgf-00064l-UG
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:25:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fSdgd-0005FN-KR
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 07:25:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 9473D2E80CF
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 07:25:51 +0000 (UTC)
+	(envelope-from <borntraeger@de.ibm.com>) id 1fSdlU-0000nr-4k
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:30:56 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34126)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fSdlT-0000nH-Ql
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 03:30:52 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5C7Sw6O031432
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 03:30:50 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jj8f2ksek-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 03:30:50 -0400
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 12 Jun 2018 08:30:48 +0100
+References: <20180611135223.81865-1-borntraeger@de.ibm.com>
+	<c5ec6c27-42cb-e354-b861-8485e72cf1e3@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 12 Jun 2018 09:30:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Jun 2018 07:18:19 -0000
-From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
-	<1769053@bugs.launchpad.net>
-Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
-Message-Id: <152878790000.2457.14500012423349658635.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1769053] Re: Ability to control phys-bits through
- libvirt
+In-Reply-To: <c5ec6c27-42cb-e354-b861-8485e72cf1e3@redhat.com>
+Content-Language: en-US
+Message-Id: <fc99f06a-3f54-343c-4362-3fb9df2d4768@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] s390x/ipl: Try to detect Linux vs
+ non Linux for initial IPL PSW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,66 +43,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-** Merge proposal unlinked:
-   https://code.launchpad.net/~paelzer/ubuntu/+source/qemu/+git/qemu/+merge=
-/347801
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1769053
+On 06/11/2018 06:16 PM, Thomas Huth wrote:
+> On 11.06.2018 15:52, Christian Borntraeger wrote:
+>> Right now the IPL device always starts from address 0x10000 (the usual
+>> Linux entry point). To run other guests (e.g. test programs) it is
+>> useful to use the IPL PSW from address 0. We can use the Linux magic
+>> at 0x10008 to decide.
+>>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>> v1->v2:
+>> 	- use LINUX_MAGIC_ADDR define
+>> 	- use assert for valid iplpsw pointer
+>> 	- add endianess conversion
+>>  hw/s390x/ipl.c | 15 ++++++++++++++-
+>>  1 file changed, 14 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+>> index 04245b5258..3790153fa9 100644
+>> --- a/hw/s390x/ipl.c
+>> +++ b/hw/s390x/ipl.c
+>> @@ -29,6 +29,7 @@
+>>  #include "exec/exec-all.h"
+>>  
+>>  #define KERN_IMAGE_START                0x010000UL
+>> +#define LINUX_MAGIC_ADDR                0x010008UL
+>>  #define KERN_PARM_AREA                  0x010480UL
+>>  #define INITRD_START                    0x800000UL
+>>  #define INITRD_PARM_START               0x010408UL
+>> @@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
+>>  static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      S390IPLState *ipl = S390_IPL(dev);
+>> -    uint64_t pentry = KERN_IMAGE_START;
+>> +    uint64_t *iplpsw;
+>> +    uint64_t pentry;
+>> +    char *magic;
+>>      int kernel_size;
+>>      Error *err = NULL;
+>>  
+>> @@ -157,6 +160,16 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>>                                 NULL, 1, EM_S390, 0, 0);
+>>          if (kernel_size < 0) {
+>>              kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
+>> +            /* if this is Linux use KERN_IMAGE_START */
+>> +            magic = rom_ptr(LINUX_MAGIC_ADDR);
+>> +            if (magic && !memcmp(magic, "S390EP", 6)) {
+>> +                pentry = KERN_IMAGE_START;
+>> +            } else {
+>> +                /* if not Linux use the IPL PSW */
+>> +                iplpsw = rom_ptr(0);
+>> +                assert(iplpsw);
+> 
+> Hmm, wait, what if load_image_targphys() failed and returned a
+> kernel_size < 0 ... won't we hit that assert() in that case? I think you
+> might want to check for kernel_size > 0 (or even > 8) here first.
 
-Title:
-  Ability to control phys-bits through libvirt
-
-Status in libvirt:
-  Unknown
-Status in QEMU:
-  Invalid
-Status in libvirt package in Ubuntu:
-  Triaged
-Status in qemu package in Ubuntu:
-  Invalid
-
-Bug description:
-  Attempting to start a KVM guest with more than 1TB of RAM fails.
-
-  It looks like we might need some extra patches:
-  https://lists.gnu.org/archive/html/qemu-discuss/2017-12/msg00005.html
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 18.04
-  Package: qemu-system-x86 1:2.11+dfsg-1ubuntu7
-  ProcVersionSignature: Ubuntu 4.15.0-20.21-generic 4.15.17
-  Uname: Linux 4.15.0-20-generic x86_64
-  ApportVersion: 2.20.9-0ubuntu7
-  Architecture: amd64
-  CurrentDesktop: Unity:Unity7:ubuntu
-  Date: Fri May  4 16:21:14 2018
-  InstallationDate: Installed on 2017-04-05 (393 days ago)
-  InstallationMedia: Ubuntu 16.10 "Yakkety Yak" - Release amd64 (20161012.2)
-  MachineType: Dell Inc. XPS 13 9360
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.15.0-20-generic root=3D/dev/ma=
-pper/ubuntu--vg-root ro quiet splash transparent_hugepage=3Dmadvise vt.hand=
-off=3D1
-  SourcePackage: qemu
-  UpgradeStatus: Upgraded to bionic on 2018-04-30 (3 days ago)
-  dmi.bios.date: 02/26/2018
-  dmi.bios.vendor: Dell Inc.
-  dmi.bios.version: 2.6.2
-  dmi.board.name: 0PF86Y
-  dmi.board.vendor: Dell Inc.
-  dmi.board.version: A00
-  dmi.chassis.type: 9
-  dmi.chassis.vendor: Dell Inc.
-  dmi.modalias: dmi:bvnDellInc.:bvr2.6.2:bd02/26/2018:svnDellInc.:pnXPS1393=
-60:pvr:rvnDellInc.:rn0PF86Y:rvrA00:cvnDellInc.:ct9:cvr:
-  dmi.product.family: XPS
-  dmi.product.name: XPS 13 9360
-  dmi.sys.vendor: Dell Inc.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/libvirt/+bug/1769053/+subscriptions
+I think I can just check for iplpsw being != NULL. That will only be the case
+if the load has succeeded. 
