@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fSkyk-00008R-BU
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:13:03 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fSl67-0003Jd-TL
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fSkyj-00016K-FO
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:13:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60682 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fSkyj-00015v-9O
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:13:01 -0400
-References: <20180611203712.12086-1-ehabkost@redhat.com>
-	<a8426bf6-7531-6306-d1c6-bb4c6c2099cd@redhat.com>
-	<20180612150153.GK7451@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6c9b3744-7323-cd1f-7b07-2b77df7ae80d@redhat.com>
-Date: Tue, 12 Jun 2018 17:12:58 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1fSl63-0006nl-0y
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:20:39 -0400
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:35749)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fSl62-0006nM-Pl
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:20:34 -0400
+Received: by mail-it0-x241.google.com with SMTP id a3-v6so15922911itd.0
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 08:20:34 -0700 (PDT)
+References: <20180606181352.61144-1-lfy@google.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6155757f-6dad-9299-80c3-d6ae4cc86e75@linaro.org>
+Date: Tue, 12 Jun 2018 05:20:28 -1000
 MIME-Version: 1.0
-In-Reply-To: <20180612150153.GK7451@localhost.localdomain>
+In-Reply-To: <20180606181352.61144-1-lfy@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] i386: Remove ospke CPUID flag name
+Subject: Re: [Qemu-devel] [PATCH] Improve file-backed RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,23 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Lingfeng Yang <lfy@google.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 12/06/2018 17:01, Eduardo Habkost wrote:
->>>
->>> Remove OSPKE from the feature name array so users don't try to
->>> configure it manually.
->>>
->>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->> Yes, it's the same as OSXSAVE.  Thanks!
-> CR4_OSXSAVE_MASK is automatically enabled on user-mode QEMU,
-> though.
-> 
-> My question is if it would make any sense to enable CR4_PKE_MASK
-> too.
+On 06/06/2018 08:13 AM, Lingfeng Yang via Qemu-devel wrote:
+>  size_t qemu_mempath_getpagesize(const char *mem_path)
+>  {
+> +#ifndef _WIN32
+>  #ifdef CONFIG_LINUX
+>      struct statfs fs;
+>      int ret;
+> @@ -73,10 +82,14 @@ size_t qemu_mempath_getpagesize(const char *mem_path)
+>  #endif
+>  
+>      return getpagesize();
+> +#else
+> +    return WIN_FILE_PAGE_SIZE;
+> +#endif
+>  }
 
-If you mean OSPKE, then yes---if PKU is available.  Likewise, OSXSAVE
-should only be enabled if XSAVE is available.
+As a rule, positive tests are easier to read than negative ones.  And when it
+comes to nesting ifdefs, doubly so.
 
-Paolo
+
+r~
