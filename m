@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fShUY-0000PD-Ar
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:29:39 -0400
+	(envelope-from <lersek@redhat.com>) id 1fShZ1-0001is-7A
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:34:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fShUV-0007LY-56
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:29:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50720 helo=mx1.redhat.com)
+	(envelope-from <lersek@redhat.com>) id 1fShYy-0001Ry-4T
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:34:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38978 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fShUU-0007LE-Vc
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:29:35 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fShYx-0001Rf-Vd
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:34:12 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DFF6F8314C
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 11:29:33 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 64A7880401A8
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 11:34:11 +0000 (UTC)
 References: <20180612062430.GA15344@xz-mi>
 	<20180612064119.GC29380@lemon.usersys.redhat.com>
+	<20180612065229.GB15344@xz-mi>
+	<20180612070152.GD29380@lemon.usersys.redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <818e1eff-6c10-5a00-c21c-217c2f02f02c@redhat.com>
-Date: Tue, 12 Jun 2018 13:29:32 +0200
+Message-ID: <a8a0c642-ab81-d693-3326-4db87c6a9240@redhat.com>
+Date: Tue, 12 Jun 2018 13:34:05 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180612064119.GC29380@lemon.usersys.redhat.com>
+In-Reply-To: <20180612070152.GD29380@lemon.usersys.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -37,89 +39,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Fam Zheng <famz@redhat.com>, Peter Xu <peterx@redhat.com>
 Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>
 
-Hi Fam,
+On 06/12/18 09:01, Fam Zheng wrote:
 
-On 06/12/18 08:41, Fam Zheng wrote:
-> On Tue, 06/12 14:24, Peter Xu wrote:
->> Hi,
->>
->> For example, I wanted to compile QEMU once and install it on multiple
->> systems.  What would be the suggested way to do so?
->>
->> Is there something similar to "make bin-rpmpkg" for Linux?
->>
->> Thanks in advance,
-> 
-> No. The big question is the libraries. Even if you create the rpm, the libraries
-> that you have linked against are not necessarily available on the systems you
-> install. This means you either list all possible libraries as required in the
-> rpm spec, which is a waste, or the list is generated dynamically, which is not
-> trivial. For example, you can easily build QEMU against a custom glib, but it's
-> very tricky to generate an rpm from it that works on other systems.
-> 
-> For development, maybe it's easier to combine git and Ansible.
+>     scp -r /tmp/qemu-install $remote
 
-libvirt supports RPM builds out of the upstream git tree:
+"tar -c | ssh $remote tar -x" is generally much more performant than scp
+(because of asynchronity), plus "tar" can transfer a bunch of extended
+file attributes too, if parametrized correctly (my preference is "--acls
+--selinux --xattrs" when it matters).
 
-  ./autogen.sh ...
-  make rpm
+For progress updates, pass "-v" to the remote tar, or else insert "pv"
+("pipe viewer") between the local tar and ssh.
 
-However, while QEMU doesn't support that, Peter's idea can be solved
-quite simply:
-
-* run QEMU's configure with "--prefix=...". For example,
---prefix=/opt/qemu-<version>.
-
-* If you make sure that the prefix configured above is writeable to a
-non-root user, then "make install" can be executed without becoming root
-first.
-
-* You can then tar up the installed file tree under prefix, and extract
-it on other hosts (at the same absolute prefix). If the installation is
-no longer needed, you can simply remove the file tree under the prefix.
-
-* The above procedure works basically for all open source packages
-nowadays; however in order to actually use packages installed like this,
-a number of environment variables may have to be extended so they refer
-to various subdirectories under "prefix":
-
-- CPLUS_INCLUDE_PATH
-  (so g++ can find include files)
-- C_INCLUDE_PATH
-  (so gcc can find include files)
-- INFOPATH
-  (so "info" can find docs)
-- LD_LIBRARY_PATH
-  (so ld.so can load shared objects at executable startup)
-- LIBRARY_PATH
-  (so gcc/g++/ld can resolve "-l" options at link editing time)
-- MANPATH
-  (so "man" can find docs)
-- PATH
-  (so the shell finds the binary)
-- PKG_CONFIG_PATH
-  (modern replacement for CPLUS_INCLUDE_PATH, C_INCLUDE_PATH,
-  and LIBRARY_PATH)
-- PYTHONPATH
-  (so python can find python modules)
-- ...
-
-On my laptop, I have a bunch of packages installed like this, and I have
-a script that traverses /opt and generates another script that assigns
-all of the above variables. This latter script is then sourced by my
-~/.bashrc.
-
-Considering QEMU specifically, only two of the above variables need to
-be extended in practice:
-
-- MANPATH: append <prefix>/share/man
-- PATH: append <prefix>/bin
-
-Summary: (1) configure QEMU with option "--prefix", (2) give rwx on
-"prefix" to the user that builds and installs QEMU, (3) build and
-install QEMU as that user, (3) transfer the tree under prefix to another
-host, (4) expand to the same prefix on the target, (5) update MANPATH
-and PATH on the target.
-
-Thanks
+Thanks,
 Laszlo
