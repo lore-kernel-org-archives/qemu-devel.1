@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <junyan.he@gmx.com>) id 1fSjVZ-0008Fv-Hp
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:38:51 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fSjXH-0001BI-H1
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:40:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <junyan.he@gmx.com>) id 1fSjVV-0004qO-FD
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:38:49 -0400
-Received: from mout.gmx.net ([212.227.15.18]:34529)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1fSjVV-0004p5-1U
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:38:45 -0400
-From: Junyan He <junyan.he@gmx.com>
-Sender: Junyan He <junyan.he@hotmail.com>
-Date: Tue, 12 Jun 2018 13:38:08 +0000
-Message-ID: <HK2PR06MB0531F10A69CBFC1D41402F19EB7F0@HK2PR06MB0531.apcprd06.prod.outlook.com>
-References: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>,
-	<20180612140643.6f6ed34d@redhat.com>
-In-Reply-To: <20180612140643.6f6ed34d@redhat.com>
-Content-Language: en-US
+	(envelope-from <imammedo@redhat.com>) id 1fSjXD-0006De-4d
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:40:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36038 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fSjXC-0006Bk-Tz
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:40:31 -0400
+Date: Tue, 12 Jun 2018 15:40:26 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180612154026.59a0f1fd@redhat.com>
+In-Reply-To: <20180608094324.23288-1-liujunjie23@huawei.com>
+References: <20180608094324.23288-1-liujunjie23@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V6 0/7] nvdimm: guarantee persistence of
- QEMU writes to persistent memory
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] cpu hot-del: leak fix by free the
+ relevant members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,125 +27,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>, "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, Junyan He <junyan.he@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
+To: liujunjie <liujunjie23@huawei.com>
+Cc: pbonzini@redhat.com, rth@twiddle.net, crosthwaite.peter@gmail.com, linzhecheng@huawei.com, weidong.huang@huawei.com, wangxinxin.wang@huawei.com, qemu-devel@nongnu.org, arei.gonglei@huawei.com
 
-He have pmem_persist and pmem_memcpy_persist stub functions.
+On Fri, 8 Jun 2018 17:43:24 +0800
+liujunjie <liujunjie23@huawei.com> wrote:
 
-If no libpmem and user really specify pmem=3Don, we just do nothing or just=
- memcpy.
+> THese leaks are found by ASAN with CPU hot-add and hot-del actions,
+> such as:
+it would be better to split patch into several, 1 leak per patch
 
-Real persistent memory always require libpmem support its load/save.
+> ==14127==ERROR: LeakSanitizer: detected memory leaks
+> 
+> Direct leak of 4096 byte(s) in 1 object(s) allocated from:
+>     #0 0x7fc321cb6ec0 in posix_memalign (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7ec0)
+>     #1 0xf756b9 in qemu_try_memalign util/oslib-posix.c:110
+>     #2 0xf7575b in qemu_memalign util/oslib-posix.c:126
+>     #3 0x7769cb in kvm_arch_init_vcpu /root/qemu/target/i386/kvm.c:1103
+>     #4 0x4cc4e6 in qemu_kvm_cpu_thread_fn /root/qemu/cpus.c:1201
+>     #5 0x7fc31cb28dc4 in start_thread (/usr/lib64/libpthread.so.0+0x7dc4)
+> 
+> Direct leak of 4096 byte(s) in 1 object(s) allocated from:
+>     #0 0x7fc321cb6560 in calloc (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)
+>     #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
+>     #2 0x4cc4e6 in qemu_kvm_cpu_thread_fn /root/qemu/cpus.c:1201
+>     #3 0x7fc31cb28dc4 in start_thread (/usr/lib64/libpthread.so.0+0x7dc4)
+> 
+> Direct leak of 184 byte(s) in 1 object(s) allocated from:
+>     #0 0x7fc321cb6560 in calloc (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)
+>     #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
+>     #2 0x4cda83 in qemu_init_vcpu /root/qemu/cpus.c:1993
+>     #3 0x6aedbd in x86_cpu_realizefn /root/qemu/target/i386/cpu.c:4739
+>     #4 0x8edfc8 in device_set_realized hw/core/qdev.c:826
+>     #5 0xcff60c in property_set_bool qom/object.c:1928
+>     #6 0xd09bd2 in object_property_set_qobject qom/qom-qobject.c:27
+>     #7 0xd048e3 in object_property_set_bool qom/object.c:1188
+>     #8 0x79ad83 in qdev_device_add /root/qemu/qdev-monitor.c:627
+>     #9 0x79b50c in qmp_device_add /root/qemu/qdev-monitor.c:807
+>     #10 0xf4ca5d in do_qmp_dispatch qapi/qmp-dispatch.c:119
+>     #11 0xf4ce3c in qmp_dispatch qapi/qmp-dispatch.c:168
+>     #12 0x4e2a5a in monitor_qmp_dispatch_one /root/qemu/monitor.c:4088
+>     #13 0x4e2baf in monitor_qmp_bh_dispatcher /root/qemu/monitor.c:4146
+>     #14 0xf67ad1 in aio_bh_poll util/async.c:118
+>     #15 0xf724a3 in aio_dispatch util/aio-posix.c:436
+>     #16 0xf67270 in aio_ctx_dispatch util/async.c:261
+>     #17 0x7fc31cf8e999 in g_main_context_dispatch (/usr/lib64/libglib-2.0.so.0+0x49999)
+> 
+> Direct leak of 64 byte(s) in 2 object(s) allocated from:
+>     #0 0x7fc321cb6560 in calloc (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)
+>     #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
+>     #2 0x4cda1f in qemu_init_vcpu /root/qemu/cpus.c:1997
+>     #3 0x6aedbd in x86_cpu_realizefn /root/qemu/target/i386/cpu.c:4739
+>     #4 0x8edfc8 in device_set_realized hw/core/qdev.c:826
+>     #5 0xcff60c in property_set_bool qom/object.c:1928
+>     #6 0xd09bd2 in object_property_set_qobject qom/qom-qobject.c:27
+>     #7 0xd048e3 in object_property_set_bool qom/object.c:1188
+>     #8 0x79ad83 in qdev_device_add /root/qemu/qdev-monitor.c:627
+>     #9 0x79b50c in qmp_device_add /root/qemu/qdev-monitor.c:807
+>     #10 0xf4ca5d in do_qmp_dispatch qapi/qmp-dispatch.c:119
+>     #11 0xf4ce3c in qmp_dispatch qapi/qmp-dispatch.c:168
+>     #12 0x4e2a5a in monitor_qmp_dispatch_one /root/qemu/monitor.c:4088
+>     #13 0x4e2baf in monitor_qmp_bh_dispatcher /root/qemu/monitor.c:4146
+>     #14 0xf67ad1 in aio_bh_poll util/async.c:118
+>     #15 0xf724a3 in aio_dispatch util/aio-posix.c:436
+>     #16 0xf67270 in aio_ctx_dispatch util/async.c:261
+>     #17 0x7fc31cf8e999 in g_main_context_dispatch (/usr/lib64/libglib-2.0.so.0+0x49999)
+back trace (including line numbers) is a moving target so it's only useful for concrete copy.
+I'd drop it and cite offending hunk in commit message instead.
 
-If pmem=3Don and without libpmem, we can think that user want to imitate
 
-pmem=3Don while the HW environment is without real persistent memory existi=
-ng.
-
-It may help debug on some machine without real pmem.
-
-________________________________
-From: Qemu-devel <qemu-devel-bounces+junyan.he=3Dgmx.com@nongnu.org> on beh=
-alf of Igor Mammedov <imammedo@redhat.com>
-Sent: Tuesday, June 12, 2018 12:06:43 PM
-To: junyan.he@gmx.com
-Cc: Haozhong Zhang; xiaoguangrong.eric@gmail.com; crosthwaite.peter@gmail.c=
-om; mst@redhat.com; qemu-devel@nongnu.org; dgilbert@redhat.com; quintela@re=
-dhat.com; Junyan He; stefanha@redhat.com; pbonzini@redhat.com; rth@twiddle.=
-net; ehabkost@redhat.com
-Subject: Re: [Qemu-devel] [PATCH V6 0/7] nvdimm: guarantee persistence of Q=
-EMU writes to persistent memory
-
-On Fri,  1 Jun 2018 16:10:22 +0800
-junyan.he@gmx.com wrote:
-
-> From: Junyan He <junyan.he@intel.com>
->
-> QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and
-> live migration. If the backend is on the persistent memory, QEMU needs
-> to take proper operations to ensure its writes persistent on the
-> persistent memory. Otherwise, a host power failure may result in the
-> loss the guest data on the persistent memory.
-
-extra question, what are expected behavior when QEMU is built without
-libpmem and user specifies pmem=3Don for backend?
-
->
-> This v3 patch series is based on Marcel's patch "mem: add share
-> parameter to memory-backend-ram" [1] because of the changes in patch 1.
->
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03858.html
->
-> Previous versions can be found at
-> v5: https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02258.html
-> V4: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06993.html
-> v3: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04365.html
-> v2: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01579.html
-> v1: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg05040.html
->
-> Changes in v6:
-> * (Patch 1) Expose all ram block flags rather than redefine the flags.
-> * (Patch 4) Use pkg-config rather the hard check when configure.
-> * (Patch 7) Sync and flush all the pmem data when migration completes,
-> rather than sync pages one by one in previous version.
->
-> Changes in v5:
-> * (Patch 9) Add post copy check and output some messages for nvdimm.
->
-> Changes in v4:
-> * (Patch 2) Fix compilation errors found by patchew.
->
-> Changes in v3:
-> * (Patch 5) Add a is_pmem flag to ram_handle_compressed() and handle
-> PMEM writes in it, so we don't need the _common function.
-> * (Patch 6) Expose qemu_get_buffer_common so we can remove the
-> unnecessary qemu_get_buffer_to_pmem wrapper.
-> * (Patch 8) Add a is_pmem flag to xbzrle_decode_buffer() and handle
-> PMEM writes in it, so we can remove the unnecessary
-> xbzrle_decode_buffer_{common, to_pmem}.
-> * Move libpmem stubs to stubs/pmem.c and fix the compilation failures
-> of test-{xbzrle,vmstate}.c.
->
-> Changes in v2:
-> * (Patch 1) Use a flags parameter in file ram allocation functions.
-> * (Patch 2) Add a new option 'pmem' to hostmem-file.
-> * (Patch 3) Use libpmem to operate on the persistent memory, rather
-> than re-implementing those operations in QEMU.
-> * (Patch 5-8) Consider the write persistence in the migration path.
->
->
-> Junyan:
-> [1/7] memory, exec: Expose all memory block related flags.
-> [6/7] migration/ram: Add check and info message to nvdimm post copy.
-> [7/7] migration/ram: ensure write persistence on loading all date to PMEM=
-.
->
-> Haozhong:
-> [5/7] mem/nvdimm: ensure write persistence to PMEM in label emulation
->
-> Haozhong & Junyan:
-> [2/7] memory, exec: switch file ram allocation functions to 'flags' param=
-eters
-> [3/7] hostmem-file: add the 'pmem' option
-> [4/7] configure: add libpmem support
->
->
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> Signed-off-by: Junyan He <junyan.he@intel.com>
->
+> SUMMARY: AddressSanitizer: 8440 byte(s) leaked in 5 allocation(s).
+> 
+> The relevant members in CPU Structure are freed to fix leak. Meanwhile, although the
+> VMChangeStateEntry added in kvm_arch_init_vcpu does not be reportd by ASAN since it still
+> in vm_change_state_head, it's not longer used after hot-del, so free it, too.
+> 
+> Signed-off-by: liujunjie <liujunjie23@huawei.com>
+> Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 > ---
-> backends/hostmem-file.c | 28 +++++++++++++++++++++++++++-
-> configure               | 29 +++++++++++++++++++++++++++++
-> docs/nvdimm.txt         | 14 ++++++++++++++
-> exec.c                  | 36 ++++++++++++++----------------------
-> hw/mem/nvdimm.c         |  9 ++++++++-
-> include/exec/memory.h   | 31 +++++++++++++++++++++++++++++--
-> include/exec/ram_addr.h | 28 ++++++++++++++++++++++++++--
-> include/qemu/pmem.h     | 24 ++++++++++++++++++++++++
-> memory.c                |  8 +++++---
-> migration/ram.c         | 18 ++++++++++++++++++
-> numa.c                  |  2 +-
-> qemu-options.hx         |  7 +++++++
-> stubs/Makefile.objs     |  1 +
-> stubs/pmem.c            | 23 +++++++++++++++++++++++
-> 14 files changed, 226 insertions(+), 32 deletions(-)
+>  accel/kvm/kvm-all.c  |  3 +++
+>  cpus.c               |  6 ++++++
+>  include/sysemu/kvm.h |  1 +
+>  target/i386/cpu.h    |  2 ++
+>  target/i386/kvm.c    | 19 ++++++++++++++++++-
+>  5 files changed, 30 insertions(+), 1 deletion(-)
+> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index ffee68e..a0491dc 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -305,6 +305,9 @@ int kvm_destroy_vcpu(CPUState *cpu)
+>      vcpu->vcpu_id = kvm_arch_vcpu_id(cpu);
+>      vcpu->kvm_fd = cpu->kvm_fd;
+>      QLIST_INSERT_HEAD(&kvm_state->kvm_parked_vcpus, vcpu, node);
+> +#ifdef TARGET_I386
+> +    kvm_arch_destroy_vcpu(cpu);
+> +#endif
+>  err:
+>      return ret;
+>  }
+> diff --git a/cpus.c b/cpus.c
+> index d1f1629..cbe28d6 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -1842,6 +1842,12 @@ void cpu_remove_sync(CPUState *cpu)
+>      qemu_mutex_unlock_iothread();
+>      qemu_thread_join(cpu->thread);
+>      qemu_mutex_lock_iothread();
+> +    g_free(cpu->thread);
+> +    cpu->thread = NULL;
+> +    g_free(cpu->halt_cond);
+> +    cpu->halt_cond = NULL;
+could you check if it's save to free thread/halt_cond when running in plain TCG mode
+
+> +    g_free(cpu->cpu_ases);
+> +    cpu->cpu_ases = NULL;
+consider TCG usecase, cpu_ases is registered with tcg_as_listener,
+is it really safe to free?
+
+>  }
+>  
+[...]
