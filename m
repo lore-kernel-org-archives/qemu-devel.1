@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSXXw-0005M2-12
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:29 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fSXXx-0005OD-WE
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSXXu-0007ht-IX
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:28 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:34760)
+	(envelope-from <richard.henderson@linaro.org>) id 1fSXXw-0007kF-Hd
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:30 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:46583)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fSXXu-0007h6-9r
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:26 -0400
-Received: by mail-pg0-x244.google.com with SMTP id q4-v6so9531607pgr.1
-	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 17:52:26 -0700 (PDT)
+	id 1fSXXw-0007j6-8T
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 20:52:28 -0400
+Received: by mail-pl0-x241.google.com with SMTP id 30-v6so13299721pld.13
+	for <qemu-devel@nongnu.org>; Mon, 11 Jun 2018 17:52:28 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 11 Jun 2018 14:51:41 -1000
-Message-Id: <20180612005145.3375-16-richard.henderson@linaro.org>
+Date: Mon, 11 Jun 2018 14:51:42 -1000
+Message-Id: <20180612005145.3375-17-richard.henderson@linaro.org>
 In-Reply-To: <20180612005145.3375-1-richard.henderson@linaro.org>
 References: <20180612005145.3375-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3 15/19] linux-user: Split out pread64,
- pwrite64
+Subject: [Qemu-devel] [PATCH v3 16/19] linux-user: Split out
+ name_to_handle_at, open_by_handle_at
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,278 +32,300 @@ Cc: laurent@vivier.eu, peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.h           | 44 +++++++++++++++++++++
- linux-user/syscall.c           | 70 ----------------------------------
- linux-user/syscall_file.c      | 61 +++++++++++++++++++++++++++--
+ linux-user/syscall.h           |  1 +
+ linux-user/strace.c            |  5 +-
+ linux-user/syscall.c           | 98 ----------------------------------
+ linux-user/syscall_file.c      | 88 ++++++++++++++++++++++++++++++
  linux-user/gen_syscall_list.py |  2 +
- linux-user/strace.list         |  6 ---
- 5 files changed, 104 insertions(+), 79 deletions(-)
+ linux-user/strace.list         |  3 --
+ 6 files changed, 95 insertions(+), 102 deletions(-)
 
 diff --git a/linux-user/syscall.h b/linux-user/syscall.h
-index 3fc49d5b65..a157e25bba 100644
+index a157e25bba..217267409b 100644
 --- a/linux-user/syscall.h
 +++ b/linux-user/syscall.h
-@@ -174,6 +174,50 @@ struct iovec *lock_iovec(int type, abi_ulong target_addr,
- void unlock_iovec(struct iovec *vec, abi_ulong target_addr,
-                   abi_ulong count, int copy);
+@@ -52,6 +52,7 @@ typedef enum {
  
-+/* Returns true if syscall NUM expects 64bit types aligned even
-+ * on pairs of registers.
-+ */
-+static inline bool regpairs_aligned(void *cpu_env, int num)
-+{
-+#ifdef TARGET_ARM
-+    return ((CPUARMState *)cpu_env)->eabi;
-+#elif defined(TARGET_MIPS) && TARGET_ABI_BITS == 32
-+    return true;
-+#elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
-+    /* SysV AVI for PPC32 expects 64bit parameters to be passed on
-+     * odd/even pairs of registers which translates to the same as
-+     * we start with r3 as arg1
-+     */
-+    return true;
-+#elif defined(TARGET_SH4)
-+    /* SH4 doesn't align register pairs, except for p{read,write}64 */
-+    switch (num) {
-+    case TARGET_NR_pread64:
-+    case TARGET_NR_pwrite64:
-+        return true;
-+    default:
-+        return false;
-+    }
-+#elif defined(TARGET_XTENSA)
-+    return true;
-+#else
-+    return false;
-+#endif
-+}
-+
-+static inline uint64_t target_offset64(abi_ulong word0, abi_ulong word1)
-+{
-+#if TARGET_ABI_BITS == 32
-+# ifdef TARGET_WORDS_BIGENDIAN
-+    return ((uint64_t)word0 << 32) | word1;
-+# else
-+    return ((uint64_t)word1 << 32) | word0;
-+# endif
-+#else
-+    return word0;
-+#endif
-+}
-+
- /* Temporary declarations from syscall_foo.c back to main syscall.c.
-  * These indicate incomplete conversion.
-  */
+     /* These print as sets of flags.  */
+     ARG_ATDIRFD,
++    ARG_ATFLAG,
+     ARG_MODEFLAG,
+     ARG_OPENFLAG,
+ 
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 1ae0057365..4240ea649a 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -780,7 +780,7 @@ UNUSED static struct flags access_flags[] = {
+     FLAG_END,
+ };
+ 
+-UNUSED static struct flags at_file_flags[] = {
++static struct flags const at_file_flags[] = {
+ #ifdef AT_EACCESS
+     FLAG_GENERIC(AT_EACCESS),
+ #endif
+@@ -2693,6 +2693,9 @@ static void print_syscall_def1(const SyscallDef *def, int64_t args[6])
+         case ARG_ATDIRFD:
+             len = add_atdirfd(b, rest, arg);
+             break;
++        case ARG_ATFLAG:
++            len = add_flags(b, rest, at_file_flags, arg, false);
++            break;
+         case ARG_MODEFLAG:
+             len = add_flags(b, rest, mode_flags, arg, true);
+             break;
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 381ee9c3a2..cdc9787240 100644
+index cdc9787240..8c7dd3049e 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -642,38 +642,6 @@ static inline int next_free_host_timer(void)
- }
- #endif
- 
--/* ARM EABI and MIPS expect 64bit types aligned even on pairs or registers */
--#ifdef TARGET_ARM
--static inline int regpairs_aligned(void *cpu_env, int num)
--{
--    return ((((CPUARMState *)cpu_env)->eabi) == 1) ;
--}
--#elif defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
--static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
--#elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
--/* SysV AVI for PPC32 expects 64bit parameters to be passed on odd/even pairs
-- * of registers which translates to the same as ARM/MIPS, because we start with
-- * r3 as arg1 */
--static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
--#elif defined(TARGET_SH4)
--/* SH4 doesn't align register pairs, except for p{read,write}64 */
--static inline int regpairs_aligned(void *cpu_env, int num)
--{
--    switch (num) {
--    case TARGET_NR_pread64:
--    case TARGET_NR_pwrite64:
--        return 1;
--
--    default:
--        return 0;
--    }
--}
--#elif defined(TARGET_XTENSA)
--static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
--#else
--static inline int regpairs_aligned(void *cpu_env, int num) { return 0; }
--#endif
--
- #define ERRNO_TABLE_SIZE 1200
- 
- /* target_to_host_errno_table[] is initialized from
-@@ -6864,22 +6832,6 @@ void syscall_init(void)
+@@ -7151,93 +7151,6 @@ static int do_futex(target_ulong uaddr, int op, int val, target_ulong timeout,
+         return -TARGET_ENOSYS;
      }
  }
- 
--#if TARGET_ABI_BITS == 32
--static inline uint64_t target_offset64(uint32_t word0, uint32_t word1)
+-#if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
+-static abi_long do_name_to_handle_at(abi_long dirfd, abi_long pathname,
+-                                     abi_long handle, abi_long mount_id,
+-                                     abi_long flags)
 -{
--#ifdef TARGET_WORDS_BIGENDIAN
--    return ((uint64_t)word0 << 32) | word1;
--#else
--    return ((uint64_t)word1 << 32) | word0;
--#endif
--}
--#else /* TARGET_ABI_BITS == 32 */
--static inline uint64_t target_offset64(uint64_t word0, uint64_t word1)
--{
--    return word0;
--}
--#endif /* TARGET_ABI_BITS != 32 */
+-    struct file_handle *target_fh;
+-    struct file_handle *fh;
+-    int mid = 0;
+-    abi_long ret;
+-    char *name;
+-    unsigned int size, total_size;
 -
- #ifdef TARGET_NR_truncate64
- static inline abi_long target_truncate64(void *cpu_env, const char *arg1,
-                                          abi_long arg2,
-@@ -10078,28 +10030,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
- #else
- #error unreachable
- #endif
+-    if (get_user_s32(size, handle)) {
+-        return -TARGET_EFAULT;
+-    }
+-
+-    name = lock_user_string(pathname);
+-    if (!name) {
+-        return -TARGET_EFAULT;
+-    }
+-
+-    total_size = sizeof(struct file_handle) + size;
+-    target_fh = lock_user(VERIFY_WRITE, handle, total_size, 0);
+-    if (!target_fh) {
+-        unlock_user(name, pathname, 0);
+-        return -TARGET_EFAULT;
+-    }
+-
+-    fh = g_malloc0(total_size);
+-    fh->handle_bytes = size;
+-
+-    ret = get_errno(name_to_handle_at(dirfd, path(name), fh, &mid, flags));
+-    unlock_user(name, pathname, 0);
+-
+-    /* man name_to_handle_at(2):
+-     * Other than the use of the handle_bytes field, the caller should treat
+-     * the file_handle structure as an opaque data type
+-     */
+-
+-    memcpy(target_fh, fh, total_size);
+-    target_fh->handle_bytes = tswap32(fh->handle_bytes);
+-    target_fh->handle_type = tswap32(fh->handle_type);
+-    g_free(fh);
+-    unlock_user(target_fh, handle, total_size);
+-
+-    if (put_user_s32(mid, mount_id)) {
+-        return -TARGET_EFAULT;
+-    }
+-
+-    return ret;
+-
+-}
 -#endif
--#ifdef TARGET_NR_pread64
--    case TARGET_NR_pread64:
--        if (regpairs_aligned(cpu_env, num)) {
--            arg4 = arg5;
--            arg5 = arg6;
--        }
--        if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
--            return -TARGET_EFAULT;
--        ret = get_errno(pread64(arg1, p, arg3, target_offset64(arg4, arg5)));
--        unlock_user(p, arg2, ret);
+-
+-#if defined(TARGET_NR_open_by_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
+-static abi_long do_open_by_handle_at(abi_long mount_fd, abi_long handle,
+-                                     abi_long flags)
+-{
+-    struct file_handle *target_fh;
+-    struct file_handle *fh;
+-    unsigned int size, total_size;
+-    abi_long ret;
+-
+-    if (get_user_s32(size, handle)) {
+-        return -TARGET_EFAULT;
+-    }
+-
+-    total_size = sizeof(struct file_handle) + size;
+-    target_fh = lock_user(VERIFY_READ, handle, total_size, 1);
+-    if (!target_fh) {
+-        return -TARGET_EFAULT;
+-    }
+-
+-    fh = g_memdup(target_fh, total_size);
+-    fh->handle_bytes = size;
+-    fh->handle_type = tswap32(target_fh->handle_type);
+-
+-    ret = get_errno(open_by_handle_at(mount_fd, fh,
+-                    target_to_host_bitmask(flags, fcntl_flags_tbl)));
+-
+-    g_free(fh);
+-
+-    unlock_user(target_fh, handle, total_size);
+-
+-    return ret;
+-}
+-#endif
+ 
+ #if defined(TARGET_NR_signalfd) || defined(TARGET_NR_signalfd4)
+ 
+@@ -7533,17 +7446,6 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
+         gdb_exit(cpu_env, arg1);
+         _exit(arg1);
+         return 0; /* avoid warning */
+-#if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
+-    case TARGET_NR_name_to_handle_at:
+-        ret = do_name_to_handle_at(arg1, arg2, arg3, arg4, arg5);
 -        return ret;
--    case TARGET_NR_pwrite64:
--        if (regpairs_aligned(cpu_env, num)) {
--            arg4 = arg5;
--            arg5 = arg6;
--        }
--        if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
--            return -TARGET_EFAULT;
--        ret = get_errno(pwrite64(arg1, p, arg3, target_offset64(arg4, arg5)));
--        unlock_user(p, arg2, 0);
+-#endif
+-#if defined(TARGET_NR_open_by_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
+-    case TARGET_NR_open_by_handle_at:
+-        ret = do_open_by_handle_at(arg1, arg2, arg3);
+-        fd_trans_unregister(ret);
 -        return ret;
- #endif
-     case TARGET_NR_getcwd:
-         if (!(p = lock_user(VERIFY_WRITE, arg1, arg2, 0)))
+-#endif
+     case TARGET_NR_brk:
+         return do_brk(arg1);
+ #ifdef TARGET_NR_fork
 diff --git a/linux-user/syscall_file.c b/linux-user/syscall_file.c
-index 4cc7051847..aae9c49599 100644
+index aae9c49599..9ee10b415e 100644
 --- a/linux-user/syscall_file.c
 +++ b/linux-user/syscall_file.c
-@@ -378,15 +378,70 @@ SYSCALL_IMPL(openat)
- }
- SYSCALL_DEF(openat, ARG_ATDIRFD, ARG_STR, ARG_OPENFLAG, ARG_MODEFLAG);
+@@ -24,8 +24,12 @@
+ #include <linux/unistd.h>
  
-+/* Both pread64 and pwrite64 merge args into a 64-bit offset,
-+ * but the input registers and ordering are target specific.
-+ */
-+#if TARGET_ABI_BITS == 32
-+SYSCALL_ARGS(pread64_pwrite64)
-+{
-+    /* We have already assigned out[0-2].  */
-+    int off = regpairs_aligned(cpu_env, TARGET_NR_pread64);
-+    out[3] = target_offset64(in[3 + off], in[4 + off]);
-+    return def;
-+}
-+#else
-+#define args_pread64_pwrite64 NULL
-+#endif
-+
-+SYSCALL_IMPL(pread64)
-+{
-+    void *p = lock_user(VERIFY_WRITE, arg2, arg3, 0);
-+    abi_long ret;
-+
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(pread64(arg1, p, arg3, arg4));
-+    unlock_user(p, arg2, ret);
-+    return ret;
-+}
-+
-+const SyscallDef def_pread64 = {
-+    .name = "pread64",
-+    .args = args_pread64_pwrite64,
-+    .impl = impl_pread64,
-+    .arg_type = { ARG_DEC, ARG_PTR, ARG_DEC, ARG_DEC64 }
-+};
-+
-+SYSCALL_IMPL(pwrite64)
-+{
-+    void *p = lock_user(VERIFY_READ, arg2, arg3, 0);
-+    abi_long ret;
-+
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(pwrite64(arg1, p, arg3, arg4));
-+    unlock_user(p, arg2, 0);
-+    return ret;
-+}
-+
-+const SyscallDef def_pwrite64 = {
-+    .name = "pwrite64",
-+    .args = args_pread64_pwrite64,
-+    .impl = impl_pwrite64,
-+    .arg_type = { ARG_DEC, ARG_PTR, ARG_DEC, ARG_DEC64 }
-+};
-+
- /* Both preadv and pwritev merge args 4/5 into a 64-bit offset.
-  * Moreover, the parts are *always* in little-endian order.
+ 
++safe_syscall5(int, name_to_handle_at, int, dirfd, const char *, pathname,
++              struct file_handle *, handle, int *, mount_id, int, flags)
+ safe_syscall4(int, openat, int, dirfd, const char *, pathname, \
+               int, flags, mode_t, mode)
++safe_syscall3(int, open_by_handle_at, int, mount_fd,
++              struct file_handle *, handle, int, flags)
+ safe_syscall5(ssize_t, preadv, int, fd, const struct iovec *, iov,
+               int, iovcnt, unsigned long, pos_l, unsigned long, pos_h)
+ safe_syscall5(ssize_t, pwritev, int, fd, const struct iovec *, iov,
+@@ -76,6 +80,90 @@ bitmask_transtbl const fcntl_flags_tbl[] = {
+  * Helpers for do_openat, manipulating /proc/self/foo.
   */
- #if TARGET_ABI_BITS == 32
- SYSCALL_ARGS(preadv_pwritev)
+ 
++SYSCALL_IMPL(name_to_handle_at)
++{
++    struct file_handle *target_fh;
++    struct file_handle *fh;
++    int mid = 0;
++    abi_long ret;
++    char *name;
++    uint32_t size, total_size;
++
++    if (get_user_s32(size, arg3)) {
++        return -TARGET_EFAULT;
++    }
++    total_size = sizeof(struct file_handle) + size;
++    target_fh = lock_user(VERIFY_WRITE, arg3, total_size, 0);
++    if (!target_fh) {
++        return -TARGET_EFAULT;
++    }
++
++    name = lock_user_string(arg2);
++    if (!name) {
++        unlock_user(target_fh, arg3, 0);
++        return -TARGET_EFAULT;
++    }
++
++
++    fh = g_malloc0(total_size);
++    fh->handle_bytes = size;
++
++    ret = get_errno(safe_name_to_handle_at(arg1, path(name), fh, &mid, arg5));
++    unlock_user(name, arg2, 0);
++
++    /* man name_to_handle_at(2):
++     * Other than the use of the handle_bytes field, the caller should treat
++     * the file_handle structure as an opaque data type
++     */
++    if (!is_error(ret)) {
++        memcpy(target_fh, fh, total_size);
++        target_fh->handle_bytes = tswap32(fh->handle_bytes);
++        target_fh->handle_type = tswap32(fh->handle_type);
++        g_free(fh);
++        unlock_user(target_fh, arg3, total_size);
++
++        if (put_user_s32(mid, arg4)) {
++            return -TARGET_EFAULT;
++        }
++    }
++    return ret;
++}
++SYSCALL_DEF(name_to_handle_at,
++            ARG_ATDIRFD, ARG_STR, ARG_PTR, ARG_PTR, ARG_ATFLAG);
++
++SYSCALL_IMPL(open_by_handle_at)
++{
++    abi_long mount_fd = arg1;
++    abi_long handle = arg2;
++    int host_flags = target_to_host_bitmask(arg3, fcntl_flags_tbl);
++    struct file_handle *target_fh;
++    struct file_handle *fh;
++    unsigned int size, total_size;
++    abi_long ret;
++
++    if (get_user_s32(size, handle)) {
++        return -TARGET_EFAULT;
++    }
++    total_size = sizeof(struct file_handle) + size;
++    target_fh = lock_user(VERIFY_READ, handle, total_size, 1);
++    if (!target_fh) {
++        return -TARGET_EFAULT;
++    }
++
++    fh = g_memdup(target_fh, total_size);
++    fh->handle_bytes = size;
++    fh->handle_type = tswap32(target_fh->handle_type);
++
++    ret = get_errno(safe_open_by_handle_at(mount_fd, fh, host_flags));
++
++    g_free(fh);
++    unlock_user(target_fh, handle, total_size);
++
++    fd_trans_unregister(ret);
++    return ret;
++}
++SYSCALL_DEF(open_by_handle_at, ARG_DEC, ARG_PTR, ARG_OPENFLAG);
++
+ static int open_self_cmdline(void *cpu_env, int fd)
  {
--    /* We have already assigned out[0-3].  */
--    abi_ulong lo = in[4], hi = in[5];
--    out[4] = ((hi << (TARGET_ABI_BITS - 1)) << 1) | lo;
-+    /* We have already assigned out[0-2].  */
-+    abi_ulong lo = in[3], hi = in[4];
-+    out[3] = ((hi << (TARGET_ABI_BITS - 1)) << 1) | lo;
-     return def;
- }
- #else
+     CPUState *cpu = ENV_GET_CPU((CPUArchState *)cpu_env);
 diff --git a/linux-user/gen_syscall_list.py b/linux-user/gen_syscall_list.py
-index ce6dca742c..7481d030ee 100644
+index 7481d030ee..cebf111660 100644
 --- a/linux-user/gen_syscall_list.py
 +++ b/linux-user/gen_syscall_list.py
-@@ -27,7 +27,9 @@ import sys
+@@ -26,7 +26,9 @@ import sys
+ # Avoiding ifdefs for these can diagnose typos in $cpu/syscall_nr.h
  unconditional_syscalls = [
      "close",
++    "name_to_handle_at",
      "openat",
-+    "pread64",
++    "open_by_handle_at",
+     "pread64",
      "preadv",
-+    "pwrite64",
-     "pwritev",
-     "read",
-     "readv",
+     "pwrite64",
 diff --git a/linux-user/strace.list b/linux-user/strace.list
-index d5ee55ac82..d978cefa31 100644
+index d978cefa31..d7880665a4 100644
 --- a/linux-user/strace.list
 +++ b/linux-user/strace.list
-@@ -1025,9 +1025,6 @@
- #ifdef TARGET_NR_prctl
- { TARGET_NR_prctl, "prctl" , NULL, NULL, NULL },
+@@ -635,9 +635,6 @@
+ #ifdef TARGET_NR_munmap
+ { TARGET_NR_munmap, "munmap" , NULL, print_munmap, NULL },
  #endif
--#ifdef TARGET_NR_pread64
--{ TARGET_NR_pread64, "pread64" , NULL, NULL, NULL },
+-#ifdef TARGET_NR_name_to_handle_at
+-{ TARGET_NR_name_to_handle_at, "name_to_handle_at" , NULL, NULL, NULL },
 -#endif
- #ifdef TARGET_NR_prlimit64
- { TARGET_NR_prlimit64, "prlimit64" , NULL, NULL, NULL },
- #endif
-@@ -1052,9 +1049,6 @@
- #ifdef TARGET_NR_putpmsg
- { TARGET_NR_putpmsg, "putpmsg" , NULL, NULL, NULL },
- #endif
--#ifdef TARGET_NR_pwrite64
--{ TARGET_NR_pwrite64, "pwrite64" , NULL, NULL, NULL },
--#endif
- #ifdef TARGET_NR_query_module
- { TARGET_NR_query_module, "query_module" , NULL, NULL, NULL },
+ #ifdef TARGET_NR_nanosleep
+ { TARGET_NR_nanosleep, "nanosleep" , NULL, NULL, NULL },
  #endif
 -- 
 2.17.1
