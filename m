@@ -1,57 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fSjyh-0000qj-V7
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 10:09:00 -0400
+	(envelope-from <bounces@canonical.com>) id 1fSiux-0001Fu-0m
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:01:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fSjyf-0005Iw-LB
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 10:08:55 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48159
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fSjyf-0005IW-Ef
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 10:08:53 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5CDxKtI012803
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 10:08:52 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jje3560y4-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 10:08:52 -0400
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Tue, 12 Jun 2018 15:08:49 +0100
-References: <20180509154822.23510-1-cohuck@redhat.com>
-	<20180509154822.23510-3-cohuck@redhat.com>
-	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
-	<20180515181006.0cb1dfc2.cohuck@redhat.com>
-	<a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
-	<20180522145208.310143ea.cohuck@redhat.com>
-	<4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
-	<20180605151449.22aafbfc.cohuck@redhat.com>
-	<e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
-	<20180606142131.74ea2eb7.cohuck@redhat.com>
-	<5b77ec9c-41b8-2e32-ce79-d9005b93fdd0@linux.ibm.com>
-	<20180607115442.6a779ed9.cohuck@redhat.com>
-	<86d57698-3ea7-a390-2217-07c6d41ca9ed@linux.ibm.com>
-	<20180608142022.7dd6a658.cohuck@redhat.com>
-	<d68340a2-bb1b-cef9-e394-f0d55983c0bb@linux.ibm.com>
-	<20180608164514.2e8248f4.cohuck@redhat.com>
-	<99ca65a2-ee33-6353-b6b7-aa4c07a34e2a@linux.ibm.com>
-	<20180612115900.4aa319d1.cohuck@redhat.com>
-	<d5416c61-252a-5bb8-aebe-46d883e5822e@linux.ibm.com>
-From: Halil Pasic <pasic@linux.ibm.com>
-Date: Tue, 12 Jun 2018 16:08:42 +0200
+	(envelope-from <bounces@canonical.com>) id 1fSiut-0005Fd-Qo
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:00:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35258)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fSiut-0005Dt-I2
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 09:00:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fSius-0003U4-AK
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 13:00:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4A3052E80CC
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 13:00:54 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <d5416c61-252a-5bb8-aebe-46d883e5822e@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <e4fc9a67-f3df-c040-8188-37eb3091db1a@linux.ibm.com>
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
- subchannel
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 12 Jun 2018 12:48:21 -0000
+From: guysoft <guysoft@gmail.com>
+Reply-To: Bug 1776478 <1776478@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152880770129.26761.1762643804065210181.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1776478] [NEW] Getting qemu: uncaught target
+ signal 6 when running lv2 plugin cross-compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -60,90 +36,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pmorel@linux.ibm.com, Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-DQoNCk9uIDA2LzEyLzIwMTggMDM6NTYgUE0sIFBpZXJyZSBNb3JlbCB3cm90ZToNCj4+IFNv
-LMKgd2hhdMKgYXJlwqB5b3XCoHByb3Bvc2luZz/CoEJlaW5nwqBtb3JlwqBzcGVjaWZpY8Kg
-YW5kwqBzdGF0aW5nwqB0aGF0wqB0aGUNCj4+IHNjc3fCoGlzwqBub3TCoG5lY2Vzc2FyaWx5
-wqBhwqByZWFswqBzY3N3LMKgYnV0wqBtZXJlbHnCoGHCoHZlaGljbGXCoGZvcsKgc2VuZGlu
-Z8KgYQ0KPj4gY29tbWFuZD/CoE9ywqBrZWVwaW5nwqBpdMKgYXPCoGl0wqBpc8Kgbm93wqBm
-b3LCoHNzY2gswqBhbmTCoGFkZGluZ8KgYcKgc2Vjb25kDQo+PiBpbnRlcmZhY2XCoGZvcsKg
-aHNjaC9jc2NowqAoYW5kwqBtYXliZcKgcnNjaCzCoG1zY2gswqAuLi4pPw0KPj4NCj4gDQo+
-IA0KPiBJwqBzYWlkwqBub8KgcmFkaWNhbMKgc3VyZ2VyeSzCoGJ1dMKgYWZ0ZXLCoHRoaW5r
-aW5nwqBtb3JlwqBhYm91dMKgaXQuLi4NCj4gScKgYW3CoG5vdMKgc3VyZS4NCj4gDQo+IExl
-dCdzwqBleHBsYWluwqB0aGlzOg0KPiANCj4gSSBzZWUgMiB3YXlzIHRvIHByb2NlZWQgYnV0
-IG15IGZhdm9yaXRlIGlzIGRlZmluaXRpdmVseSB0byBpbnRyb2R1Y2UgdmVyc2lvbmluZy4N
-Cj4gDQo+IA0KPiBXYXnCoDEpDQo+IA0KPiBUaGlzwqB3YXPCoHRoZcKgd2F5wqBJwqBmaXJz
-dMKgdGhvdWdodMKgYWJvdXQuDQo+IFdlwqBrZWVwwqB0aGXCoGV4aXN0aW5nwqBJT8KgUmVn
-aW9uYW5kwqBzdHJ1Y3R1cmVzLMKgYW5kwqBhcmXCoG1vcmUNCj4gc3BlY2lmaWPCoGJ5wqBz
-dGF0aW5nwqB0aGF0wqB0aGXCoGlvX3JlZ2lvbsKgaXPCoGHCoGNvbW1hbmTCoHJlZ2lvbsKg
-ZHVyaW5nwqB3cml0ZQ0KPiBlbnRyecKgYW5kwqBhwqBzdGF0dXPCoHJlZ2lvbsKgZHVyaW5n
-wqBpbnRlcnJ1cHTCoGhhbmRsaW5nOg0KPiBUaGlzwqBhbGxvd8KgdXPCoHRvwqB1c2XCoHRo
-ZcKgM8KgYml0c8Kgb2bCoHRoZcKgRkNUTMKgZmllbGTCoG9mwqB0aGXCoFNDU1fCoHRvwqBw
-YXNzDQo+IGNvbW1hbmRzwqB0b8KgdGhlwqBrZXJuZWzCoGFuZMKgc3RhecKgYmFja3dhcmTC
-oGNvbXBhdGlibGUuDQo+IFRoZcKgRkNUTMKgZmllbGTCoGhhc8KgM8KgYml0c8KgPT7CoHdl
-wqBjYW7CoGhhdmXCoDjCoGNvbW1hbmRzLg0KPiANCj4gUFJPOsKgc21hbGzCoGNoYW5nZQ0K
-PiANCj4gQ09OVFJBOsKgVGhpc8KgaXPCoHN0aWxswqBjb25mdXNpbmcswqB3ZcKgZG/CoG5v
-dMKgcmVhbGx5wqBzb2x2ZcKgdGhpcw0KPiAgwqDCoMKgwqDCoMKgwqDCoHVuY2xhcml0ecKg
-cHJvYmxlbcKgc2luY2XCoFFFTVXCoHZpZXfCoC/CoGRvY3VtZW50YXRpb27CoGFuZA0KPiAg
-wqDCoMKgwqDCoMKgwqDCoExpbnV4wqB2aWV3wqAvwqBkb2N1bWVudGF0aW9uwqBkaWZmZXLC
-oG9ywqB3ZcKgdXBkYXRlwqBRRU1VLg0KPiAgwqDCoMKgwqDCoMKgwqDCoE1vcmVvdmVywqB0
-aGlzwqBkb2VzwqBub3TCoGFsbG93wqBmb3LCoGxvbmfCoHRlcm3CoGV4dGVuc2lvbnMNCj4g
-IMKgwqDCoMKgwqDCoMKgwqBhbmQvb3LCoHJlLWRlc2lnbi4NCj4gDQo+IA0KDQpJJ20gbm90
-IHJlYWxseSBpbiBmYXZvciBvZiB3YXkgMS4gQ29uaWUncyBwb2ludCB3aXRoIFJTQ0ggaXMg
-YSBnb29kIG9uZS4NCkFuZCBJTUhPIGl0IHNwZWFrcyBmb3IgYSBuZXcgaW50ZXJmYWNlIGZv
-ciBjb21tYW5kcy4gU3F1ZWV6aW5nIHRoZSBSU0NIDQpjb21tYW5kIGludG8gdGhlIFNDU1cg
-ZG9lcyBub3Qgc2VlbSB0byBiZSBhIGdvb2QgaWRlYS4gQ29uc2lkZXJpbmcgeW91cg0KcHJv
-cG9zYWwgd2l0aCB0aGUgMyBiaXRzLCB3ZSBjb3VsZCBkbyBzb21ldGhpbmcgbGlrZTogaWYg
-aW4gRkNUTCB0aGUNCnN0YXJ0IGFuZCB0aGUgY2xlYXIgYW5kIHRoZSBoYWx0IGJpdHMgYXJl
-IHNldCB0aGVuIHdlIHBvc3R1bGF0ZSB0aGF0IGlzDQpyZXF1ZXN0IGZvciBhIHJlc3VtZS4g
-QnV0IHRoYXQgd291bGQgYmUgcXVpdGUgY29uZnVzaW5nLCBhbmQgd2Ugd291bGQgZW5kDQp1
-cCByZS1kZWZpbmluZyB0aGUgc2VtYW50aWMgb2YgdGhlIHNjc3dfYXJlYSAtLSBpbiByZXNw
-ZWN0IHRvIHdoYXQgaXMNCmRvY3VtZW50ZWQgRG9jdW1lbnRhdGlvbi9zMzkwL3ZmaW8tY2N3
-LnR4dCwgYW5kIGFsc28gd2hhdCBpcyBpbnR1aXRpdmUNCmJhc2VkIG9uIHRoZSB1YXBpIGhl
-YWRlci4NCg0KPiANCj4gV2F5wqAyKQ0KPiANCj4gV2XCoHVzZcKgdGhlwqBkZXZpY2XCoFZG
-SU/CoHZlcnNpb25pbmfCoHVzaW5nwqB0aGXCoGNhcGFiaWxpdHnCoGNoYWluwqB0b8KgYWR2
-ZXJ0aXNlDQo+IGHCoG5ld8KgaW50ZXJmYWNlLg0KPiANCj4gVGhpc8KgdGhlwqBwcmVmZXJy
-ZWTCoHdheSzCoGl0wqBpc8Kgc2FuZSzCoGFsbG93c8KgZm9ywqB0aGXCoHVzZXJsYW5kwqBi
-YWNrd2FyZA0KPiBjb21wYXRpYmlsaXR5wqBhbmTCoGFsbG93c8KgdG/CoGhhdmXCoGHCoG5l
-d8KgY29tbWFuZMKgaW50ZXJmYWNlLMKgZXh0ZW5zaWJsZQ0KPiBmb3LCoGZ1dHVyZcKgdXNl
-Lg0KPiANCj4gSW7CoHRoaXPCoGNhc2XCoHdlwqBjYW7CoGV4dGVuZMKgdGhlwqBpbnRlcmZh
-Y2XCoHRvwqBiZcKgYW55wqBraW5kwqB3ZcKgd2FudA0KPiBpbsKgYcKgbmV4dMKgdmVyc2lv
-bizCoHB3cml0ZcKgd2l0aMKgbmV3wqBpb19yZWdpb24swqBtbWFwwqBvbsKgbmV3DQo+IElP
-wqByZWdpb25zLMKgc3RhdHVzwqByZWdpb24uLi4NCj4gDQo+IFBSTzrCoEV4dGVuc2libGXC
-oGFuZMKgYWxzb8KgZ29lc8KgaW7CoHRoZcKgVkZJT8KgSU5GT8KgZXh0ZW5zaW9uwqBkaXJl
-Y3Rpb24NCj4gIMKgwqDCoMKgwqBwcm9wb3NlZMKgYnnCoEFsZXgNCj4gDQoNCg0KU291bmRz
-IG11Y2ggYmV0dGVyLiBJIGltYWdpbmUgdGhlIGNvZXhpc3RlbmNlIG9mIG9sZCBhbmQgbmV3
-IGxpa2UgdGhpcy4NCkJvdGggdGhlIG9sZCBhbmQgdGhlIG5ldyBRRU1VIHdvdWxkIHN1cHBs
-eSB0aGUgdGhlIFNDU1cgYXJlYSB3aXRoIHRoZSBvbGQNCmRvY3VtZW50ZWQgc2VtYW50aWNz
-IC0tIHRoZSBTQ1NXIG9mIHRoZSB2aXJ0dWFsIHN1YmNoYW5uZWwuIEJ1dCB3aXRoIHRoZQ0K
-bmV3IHZlcnNpb24gYW4gZXhwbGljaXQgY29tbWFuZCB3b3VsZCBiZSBzdXBwbGllZCB2aWEg
-dGhlIGNvbW1hbmQgcmVnaW9uDQooYWxzbyBmb3IgIFNTQ0gpLiBNYXliZSB0aGUgU0NTVyBj
-YW4gc3RpbGwgZW5kIHVwIGJlaW5nIHVzZWZ1bCBmb3INCnNvbWV0aGluZyBpbiB0aGUga2Vy
-bmVsIG1vZHVsZSB0b28gKG1heWJlIHRoZXJlIGFyZSBzb21lICBvcHRpbWl6YXRpb24NCnRo
-YXQgY2FuIGJlIGRvbmUgYmFzZWQgb24gdGhlIFFFTVUgU0NTVykuDQoNCg0KPiBDT05UUkE6
-wqBJwqBzZWXCoG5vbmXCoG91dGVywqBtb3JlwqB3b3JrwqB0b8KgZG/CoChidXTCoGlzwqBp
-dMKgYcKgcHJvYmxlbT8pDQo+IA0KPiANClRoZSBwcm9ibGVtIEkgc2VlIGlzIHRoYXQgZGVz
-aWduaW5nIGEgZ29vZCBpbnRlcmZhY2UgdXN1YWxseSBoYXJkLg0KSSBjb3VsZCBoZWxwIHdp
-dGggcmV2aWV3LCBidXQgSSBkb24ndCBoYXZlIHRoZSByZXNvdXJjZXMgdG8gY29tbWl0DQp0
-byBtb3JlIHRoYW4gdGhhdC4NCg0KPiA9PT09PT09PT09PT09PT09PT09PQ0KPiANCj4gRXh0
-cmHCoGFyZ3VtZW50YXRpb27CoGZvcsKgdmVyc2lvbmluZ8Kgc3VwcG9ydA0KPiANCj4gDQo+
-IFN1cHBvc2XCoGHCoGZ1dHVyZcKgaW1wbGVtZW50YXRpb27CoHdpdGjCoDTCoG1hcHBlZMKg
-cmVnaW9uc8KgbGlrZQ0KPiB0aGXCoGZvbGxvd2luZzoNCj4gDQo+IC3CoEHCoFN0YXR1c8Kg
-cmVnaW9uwqAoUk/CoHVwZGF0ZWTCoGFzwqByZXN1bHTCoG9mwqBjb21tYW5kwqBhbmTCoElS
-USkNCj4gDQo+IC3CoEHCoGNvbW1hbmTCoHJlZ2lvbsKgKFdPwqB3aGVyZcKgdGhlwqB1c2Vy
-wqBzZW5kwqBpdHPCoGNvbW1hbmRzKQ0KPiAgwqDCoHVzZXJsYW5kwqB3cml0ZcKgaGVyZcKg
-dG/CoHRyaWdnZXLCoElPwqAocXVpdGXCoGFzwqBjdXJyZW50bHkpDQo+IA0KPiAtwqBBwqBD
-Q1fCoHByb2dyYW3CoHJlZ2lvbsKgKFJXwqB3aGVyZcKgdGhlwqBDQ1fCoGNoYWluwqBpc8Kg
-aGFuZGxlZCkNCj4gIMKgwqBtb3N0wqBoYW5kbGluZ8KgZG9uZcKgZnJvbcKgdXNlcnNwYWNl
-LMKgbGFzdMKgdHJhbnNsYXRpb25zwqBpbsKga2VybmVsLA0KPiAgwqDCoGRvdWJsZcKgYnVm
-ZmVyaW5nLi4uDQo+IA0KPiAtwqBBwqBwZXJmb3JtYW5jZcKgL8KgbWVhc3VyZW1lbnTCoC/C
-oHN0YXRpc3RpY3PCoHJlZ2lvbsKgKFJPKQ0KPiAgwqDCoFRoaXPCoGlzwqB1cGRhdGVkwqBh
-c3luY2hyb25vdXNsecKgYnnCoGhhcmR3YXJlwqBhbmQvb3LCoGRyaXZlcg0KPiANCj4gVGhp
-c8KgaXPCoHB1cmVsecKgdGhlb3JldGljYWzCoGFuZMKgd2XCoGRvwqBub3TCoG5lZWTCoHRv
-wqBkb8KgYWxswqBhdMKgb25jZQ0KPiBidXTCoGlmwqB3ZcKgd2FudMKgdG/CoGV4dGVuZMKg
-dGhlwqBpbXBsZW1lbnRhdGlvbsKgd2l0aG91dMKgcHJvYmxlbXMNCj4gYW5kwqBjb250aW51
-ZcKgYmFja3dhcmTCoGNvbXBhdGliaWxpdHnCoHRoZcKgdmVyc2lvbmluZ8KgYW5kwqBjYXBh
-YmlsaXR5DQo+IGhhbmRsaW5nwqBpc8KgYcKgbXVzdC4NCg0KSSdtIG5vdCBzdXJlIGFib3V0
-IHRoaXMuDQoNCg0KUmVnYXJkcywNCkhhbGlsDQpbLi5dDQoNCg==
+Public bug reported:
+
+Hey,
+I am part of the Zynthian team and we use qemu-arm-static to cross compile =
+lv2 audio plugins.
+
+When running a compilation of DISTRHO-Ports we get:
+
+lv2_ttl_generator: pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertion=
+ `mutex->__data.__owner =3D=3D 0' failed.
+qemu: uncaught target signal 6 (Aborted) - core dumped
+./scripts/generate-ttl.sh: line 27: 16524 Aborted                 $GEN ./$F=
+ILE
+Makefile:62: recipe for target 'gen_lv2' failed
+make[1]: *** [gen_lv2] Error 134
+make[1]: Leaving directory '/home/pi/zynthian-sw/plugins/DISTRHO-Ports'
+Makefile:104: recipe for target 'lv2' failed
+make: *** [lv2] Error 2
+
+
+lv2_ttl_generator source is here:
+https://github.com/DISTRHO/DISTRHO-Ports/tree/master/libs/lv2-ttl-generator
+
+The command that is ruining is
+lv2_ttl_generator ./TAL-Filter-2.so =
+
+
+And ./TAL-Filter-2.so source is here:
+https://github.com/DISTRHO/DISTRHO-Ports/tree/master/ports/tal-filter-2/sou=
+rce
+
+
+Is there a way to debug what is going on?
+This runs fine on a Raspberrypi which is armv7
+
+A workaround would also help.
+
+
+Bug in Zynthian:
+https://github.com/zynthian/zynthian-sys/issues/59
+Bug in DISTRHO-Ports:
+https://github.com/DISTRHO/DISTRHO-Ports/issues/29
+
+Using qemu-arm-static version from master from two days ago:
+qemu-arm version 2.12.50 (v2.12.0-1182-ga7a7309ca5-dirty), commit: a7a7309c=
+a52c327c6603d60db90ae4feeae719f7
+
+Also saw this in qemu-arm version 2.12.0 (Debian 1:2.12+dfsg-3)
+
+Thanks,
+Guy
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Summary changed:
+
+- Getting qemu: uncaught target signal 6 when running     Work in Progress =
+in Malpelo No milestone Notifications  You=E2=80=99re receiving notificatio=
+ns because you commented. 2 participants @jofemodo @guysoft Lock conversati=
+on @jofemodo Member jofemodo commented 5 days ago  It fails in the automate=
+d building process but it works perfectly when executed from command line i=
+n a RBPi with the latest ZynthianOS image. You can see the error in the Jen=
+kins parsed console output. It remains the last 2 warnings in the list ;-) =
+ lv2_ttl_generator: pthread_mutex_lock.c:81: __pthread_mutex_lock: Assertio=
+n `mutex->__data.__owner =3D=3D 0' failed
++ Getting qemu: uncaught target signal 6 when running  lv2 plugin cross-com=
+pilation
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1776478
+
+Title:
+  Getting qemu: uncaught target signal 6 when running  lv2 plugin cross-
+  compilation
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hey,
+  I am part of the Zynthian team and we use qemu-arm-static to cross compil=
+e lv2 audio plugins.
+
+  When running a compilation of DISTRHO-Ports we get:
+
+  lv2_ttl_generator: pthread_mutex_lock.c:81: __pthread_mutex_lock: Asserti=
+on `mutex->__data.__owner =3D=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  ./scripts/generate-ttl.sh: line 27: 16524 Aborted                 $GEN ./=
+$FILE
+  Makefile:62: recipe for target 'gen_lv2' failed
+  make[1]: *** [gen_lv2] Error 134
+  make[1]: Leaving directory '/home/pi/zynthian-sw/plugins/DISTRHO-Ports'
+  Makefile:104: recipe for target 'lv2' failed
+  make: *** [lv2] Error 2
+
+  =
+
+  lv2_ttl_generator source is here:
+  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/libs/lv2-ttl-generat=
+or
+
+  The command that is ruining is
+  lv2_ttl_generator ./TAL-Filter-2.so =
+
+
+  And ./TAL-Filter-2.so source is here:
+  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/ports/tal-filter-2/s=
+ource
+
+
+  Is there a way to debug what is going on?
+  This runs fine on a Raspberrypi which is armv7
+
+  A workaround would also help.
+
+  =
+
+  Bug in Zynthian:
+  https://github.com/zynthian/zynthian-sys/issues/59
+  Bug in DISTRHO-Ports:
+  https://github.com/DISTRHO/DISTRHO-Ports/issues/29
+
+  Using qemu-arm-static version from master from two days ago:
+  qemu-arm version 2.12.50 (v2.12.0-1182-ga7a7309ca5-dirty), commit: a7a730=
+9ca52c327c6603d60db90ae4feeae719f7
+
+  Also saw this in qemu-arm version 2.12.0 (Debian 1:2.12+dfsg-3)
+
+  Thanks,
+  Guy
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1776478/+subscriptions
