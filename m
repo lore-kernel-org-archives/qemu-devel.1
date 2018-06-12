@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fSYQm-00046W-Qb
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 21:49:13 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fSYWQ-0000Yn-UB
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 21:54:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fSYQi-0003Lo-1H
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 21:49:08 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:33655)
+	(envelope-from <jasowang@redhat.com>) id 1fSYWM-0006Y4-4t
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 21:54:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44164 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fSYQh-0003L8-Ub
-	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 21:49:03 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon, 11 Jun 2018 21:48:56 -0400
-Message-Id: <1528768140-17894-11-git-send-email-cota@braap.org>
-In-Reply-To: <1528768140-17894-1-git-send-email-cota@braap.org>
-References: <1528768140-17894-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH v4 10/14] hardfloat: support float32/64
- multiplication
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fSYWL-0006Xw-UU
+	for qemu-devel@nongnu.org; Mon, 11 Jun 2018 21:54:54 -0400
+References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
+	<20180611202207-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <dc8b1669-b8b6-fb59-94e2-6e4de6b96572@redhat.com>
+Date: Tue, 12 Jun 2018 09:54:44 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180611202207-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qemu: Introduce VIRTIO_NET_F_STANDBY
+ feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,130 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>
+Cc: alexander.h.duyck@intel.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, jiri@resnulli.us, kubakici@wp.pl, netdev@vger.kernel.org, jesse.brandeburg@intel.com, virtualization@lists.linux-foundation.org, loseweigh@gmail.com, aaron.f.brown@intel.com
 
-Performance results for fp-bench:
 
-1. Intel(R) Core(TM) i7-6700K CPU @ 4.00GHz
-- before:
-mul-single: 126.91 MFlops
-mul-double: 118.28 MFlops
-- after:
-mul-single: 258.02 MFlops
-mul-double: 197.96 MFlops
 
-2. ARM Aarch64 A57 @ 2.4GHz
-- before:
-mul-single: 37.42 MFlops
-mul-double: 38.77 MFlops
-- after:
-mul-single: 73.41 MFlops
-mul-double: 76.93 MFlops
+On 2018=E5=B9=B406=E6=9C=8812=E6=97=A5 01:26, Michael S. Tsirkin wrote:
+> On Mon, May 07, 2018 at 04:09:54PM -0700, Sridhar Samudrala wrote:
+>> This feature bit can be used by hypervisor to indicate virtio_net devi=
+ce to
+>> act as a standby for another device with the same MAC address.
+>>
+>> I tested this with a small change to the patch to mark the STANDBY fea=
+ture 'true'
+>> by default as i am using libvirt to start the VMs.
+>> Is there a way to pass the newly added feature bit 'standby' to qemu v=
+ia libvirt
+>> XML file?
+>>
+>> Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+> So I do not think we can commit to this interface: we
+> really need to control visibility of the primary device.
 
-3. IBM POWER8E @ 2.1 GHz
-- before:
-mul-single: 58.40 MFlops
-mul-double: 59.33 MFlops
-- after:
-mul-single: 60.25 MFlops
-mul-double: 94.79 MFlops
+The problem is legacy guest won't use primary device at all if we do this=
+.
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- fpu/softfloat.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 62 insertions(+), 4 deletions(-)
+How about control the visibility of standby device?
 
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index cdce6b2..4fcabf6 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -1276,8 +1276,8 @@ float16 __attribute__((flatten)) float16_mul(float16 a, float16 b,
-     return float16_round_pack_canonical(pr, status);
- }
- 
--float32 __attribute__((flatten)) float32_mul(float32 a, float32 b,
--                                             float_status *status)
-+static float32 QEMU_SOFTFLOAT_ATTR
-+soft_float32_mul(float32 a, float32 b, float_status *status)
- {
-     FloatParts pa = float32_unpack_canonical(a, status);
-     FloatParts pb = float32_unpack_canonical(b, status);
-@@ -1286,8 +1286,8 @@ float32 __attribute__((flatten)) float32_mul(float32 a, float32 b,
-     return float32_round_pack_canonical(pr, status);
- }
- 
--float64 __attribute__((flatten)) float64_mul(float64 a, float64 b,
--                                             float_status *status)
-+static float64 QEMU_SOFTFLOAT_ATTR
-+soft_float64_mul(float64 a, float64 b, float_status *status)
- {
-     FloatParts pa = float64_unpack_canonical(a, status);
-     FloatParts pb = float64_unpack_canonical(b, status);
-@@ -1296,6 +1296,64 @@ float64 __attribute__((flatten)) float64_mul(float64 a, float64 b,
-     return float64_round_pack_canonical(pr, status);
- }
- 
-+static float float_mul(float a, float b)
-+{
-+    return a * b;
-+}
-+
-+static double double_mul(double a, double b)
-+{
-+    return a * b;
-+}
-+
-+static bool f32_mul_fast(float32 a, float32 b, const struct float_status *s)
-+{
-+    return float32_is_zero(a) || float32_is_zero(b);
-+}
-+
-+static bool f64_mul_fast(float64 a, float64 b, const struct float_status *s)
-+{
-+    return float64_is_zero(a) || float64_is_zero(b);
-+}
-+
-+static float32 f32_mul_fast_op(float32 a, float32 b, float_status *s)
-+{
-+    bool signbit = float32_is_neg(a) ^ float32_is_neg(b);
-+
-+    return float32_set_sign(float32_zero, signbit);
-+}
-+
-+static float64 f64_mul_fast_op(float64 a, float64 b, float_status *s)
-+{
-+    bool signbit = float64_is_neg(a) ^ float64_is_neg(b);
-+
-+    return float64_set_sign(float64_zero, signbit);
-+}
-+
-+float32 __attribute__((flatten))
-+float32_mul(float32 a, float32 b, float_status *s)
-+{
-+    if (QEMU_HARDFLOAT_2F32_USE_FP) {
-+        return float_gen2(a, b, s, float_mul, soft_float32_mul, float_is_zon2,
-+                          NULL, f32_mul_fast, f32_mul_fast_op);
-+    } else {
-+        return f32_gen2(a, b, s, float_mul, soft_float32_mul, f32_is_zon2, NULL,
-+                        f32_mul_fast, f32_mul_fast_op);
-+    }
-+}
-+
-+float64 __attribute__((flatten))
-+float64_mul(float64 a, float64 b, float_status *s)
-+{
-+    if (QEMU_HARDFLOAT_2F64_USE_FP) {
-+        return double_gen2(a, b, s, double_mul, soft_float64_mul,
-+                           double_is_zon2, NULL, f64_mul_fast, f64_mul_fast_op);
-+    } else {
-+        return f64_gen2(a, b, s, double_mul, soft_float64_mul, f64_is_zon2,
-+                        NULL, f64_mul_fast, f64_mul_fast_op);
-+    }
-+}
-+
- /*
-  * Returns the result of multiplying the floating-point values `a' and
-  * `b' then adding 'c', with no intermediate rounding step after the
--- 
-2.7.4
+Thanks
+
+> However just for testing purposes, we could add a non-stable
+> interface "x-standby" with the understanding that as any
+> x- prefix it's unstable and will be changed down the road,
+> likely in the next release.
+>
+>
+>> ---
+>>   hw/net/virtio-net.c                         | 2 ++
+>>   include/standard-headers/linux/virtio_net.h | 3 +++
+>>   2 files changed, 5 insertions(+)
+>>
+>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>> index 90502fca7c..38b3140670 100644
+>> --- a/hw/net/virtio-net.c
+>> +++ b/hw/net/virtio-net.c
+>> @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] =3D {
+>>                        true),
+>>       DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKN=
+OWN),
+>>       DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
+>> +    DEFINE_PROP_BIT64("standby", VirtIONet, host_features, VIRTIO_NET=
+_F_STANDBY,
+>> +                      false),
+>>       DEFINE_PROP_END_OF_LIST(),
+>>   };
+>>  =20
+>> diff --git a/include/standard-headers/linux/virtio_net.h b/include/sta=
+ndard-headers/linux/virtio_net.h
+>> index e9f255ea3f..01ec09684c 100644
+>> --- a/include/standard-headers/linux/virtio_net.h
+>> +++ b/include/standard-headers/linux/virtio_net.h
+>> @@ -57,6 +57,9 @@
+>>   					 * Steering */
+>>   #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
+>>  =20
+>> +#define VIRTIO_NET_F_STANDBY      62    /* Act as standby for another=
+ device
+>> +                                         * with the same MAC.
+>> +                                         */
+>>   #define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Device set linkspeed and dup=
+lex */
+>>  =20
+>>   #ifndef VIRTIO_NET_NO_LEGACY
+>> --=20
+>> 2.14.3
