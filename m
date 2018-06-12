@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fShtj-0002Jl-Dx
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:55:42 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fShtz-0002SZ-LK
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:55:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fShti-0004VY-3D
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:55:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51652 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fShth-0004Uw-ST
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:55:38 -0400
-Date: Tue, 12 Jun 2018 13:55:34 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180612135534.000c0fad@redhat.com>
-In-Reply-To: <20180606220501-mutt-send-email-mst@kernel.org>
-References: <20180521163203.26590-4-ross.zwisler@linux.intel.com>
-	<20180605182243-mutt-send-email-mst@kernel.org>
-	<20180605164205.GA21034@linux.intel.com>
-	<CAPcyv4jSoFifTc05WGgxkEX6i7b12zYyB+VchJVW_+QPQzO7Fg@mail.gmail.com>
-	<20180605213547-mutt-send-email-mst@kernel.org>
-	<20180605220700.GB16066@linux.intel.com>
-	<CAPcyv4irudGth3+WZtgF4TjGL53s8mN70aVXpGWjj_Lc=7AMVg@mail.gmail.com>
-	<20180606165051.GC30568@linux.intel.com>
-	<20180606170033.GA29035@linux.intel.com>
-	<20180606170849.GA31789@linux.intel.com>
-	<20180606220501-mutt-send-email-mst@kernel.org>
+	(envelope-from <cohuck@redhat.com>) id 1fShtu-0004lq-OW
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 07:55:55 -0400
+Date: Tue, 12 Jun 2018 13:55:45 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180612135545.1b7c2346.cohuck@redhat.com>
+In-Reply-To: <20180612100448.202315-1-borntraeger@de.ibm.com>
+References: <20180612100448.202315-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu PATCH v4 3/4] nvdimm,
- acpi: support NFIT platform capabilities
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] s390x/ipl: Try to detect Linux vs
+ non Linux for initial IPL PSW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,122 +23,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Dan Williams <dan.j.williams@intel.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 6 Jun 2018 22:06:17 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Tue, 12 Jun 2018 12:04:48 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> On Wed, Jun 06, 2018 at 11:08:49AM -0600, Ross Zwisler wrote:
-> > On Wed, Jun 06, 2018 at 11:00:33AM -0600, Ross Zwisler wrote:  
-> > > On Wed, Jun 06, 2018 at 10:50:51AM -0600, Ross Zwisler wrote:  
-> > > > On Tue, Jun 05, 2018 at 03:21:30PM -0700, Dan Williams wrote:  
-> > > > > On Tue, Jun 5, 2018 at 3:07 PM, Ross Zwisler
-> > > > > <ross.zwisler@linux.intel.com> wrote:  
-> > > > > > On Tue, Jun 05, 2018 at 09:37:25PM +0300, Michael S. Tsirkin wrote:  
-> > > > > >> On Tue, Jun 05, 2018 at 11:15:00AM -0700, Dan Williams wrote:  
-> > > > > >> > On Tue, Jun 5, 2018 at 9:42 AM, Ross Zwisler
-> > > > > >> > <ross.zwisler@linux.intel.com> wrote:  
-> > > > > >> > > On Tue, Jun 05, 2018 at 06:25:27PM +0300, Michael S. Tsirkin wrote:  
-> > > > > >> > >> On Mon, May 21, 2018 at 10:32:02AM -0600, Ross Zwisler wrote:  
-> > > > > >> > >> > Add a machine command line option to allow the user to control the Platform
-> > > > > >> > >> > Capabilities Structure in the virtualized NFIT.  This Platform Capabilities
-> > > > > >> > >> > Structure was added in ACPI 6.2 Errata A.
-> > > > > >> > >> >
-> > > > > >> > >> > Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>  
-> > > > > >> > >>
-> > > > > >> > >> I tried playing with it and encoding the capabilities is
-> > > > > >> > >> quite awkward.
-> > > > > >> > >>
-> > > > > >> > >> Can we add bits for specific capabilities instead of nvdimm-cap?
-> > > > > >> > >>
-> > > > > >> > >> How about:
-> > > > > >> > >>
-> > > > > >> > >> "cpu-flush-on-power-loss-cap"
-> > > > > >> > >> "memory-flush-on-power-loss-cap"
-> > > > > >> > >> "byte-addressable-mirroring-cap"  
-> > > > > >> > >
-> > > > > >> > > Hmmm...I don't like that as much because:
-> > > > > >> > >
-> > > > > >> > > a) It's very verbose.  Looking at my current qemu command line few other
-> > > > > >> > >    options require that many characters, and you'd commonly be defining more
-> > > > > >> > >    than one of these for a given VM.
-> > > > > >> > >
-> > > > > >> > > b) It means that the QEMU will need to be updated if/when new flags are added,
-> > > > > >> > >    because we'll have to have new options for each flag.  The current
-> > > > > >> > >    implementation is more future-proof because you can specify any flags
-> > > > > >> > >    value you want.
-> > > > > >> > >
-> > > > > >> > > However, if you feel strongly about this, I'll make the change.  
-> > > > > >> >
-> > > > > >> > Straw-man: Could we do something similar with what we are doing in ndctl?
-> > > > > >> >
-> > > > > >> > enum ndctl_persistence_domain {
-> > > > > >> >         PERSISTENCE_NONE = 0,
-> > > > > >> >         PERSISTENCE_MEM_CTRL = 10,
-> > > > > >> >         PERSISTENCE_CPU_CACHE = 20,
-> > > > > >> >         PERSISTENCE_UNKNOWN = INT_MAX,
-> > > > > >> > };
-> > > > > >> >
-> > > > > >> > ...and have the command line take a number where "10" and "20" are
-> > > > > >> > supported today, but allows us to adapt to new persistence domains in
-> > > > > >> > the future.  
-> > > > > >>
-> > > > > >> I'm fine with that except can we have symbolic names instead of numbers
-> > > > > >> on command line?
-> > > > > >>
-> > > > > >> --
-> > > > > >> MST  
-> > > > > >
-> > > > > > Okay, we can move to the symbolic names.  Do you want them to be that long, or
-> > > > > > would:
-> > > > > >
-> > > > > > nvdimm-cap-cpu
-> > > > > > nvdimm-cap-mem-ctrl
-> > > > > > nvdimm-cap-mirroring  
-> > > > > 
-> > > > > Wait, why is mirroring part of this?
-> > > > > 
-> > > > > I was thinking this option would be:
-> > > > > 
-> > > > >     --persistence-domain={cpu,mem-ctrl}
-> > > > > 
-> > > > > ...and try not to let ACPI specifics leak into the qemu command line
-> > > > > interface. For example PowerPC qemu could have a persistence domain
-> > > > > communicated via Open Firmware or some other mechanism.  
-> > > > 
-> > > > Sure, this seems fine, though we may want to throw an "nvdimm" in the name
-> > > > somewhere so it's clear what the option affects.
-> > > > 
-> > > > nvdimm-persistence={cpu,mem-ctrl} maybe?
-> > > > 
-> > > > Michael, does this work for you?  
-> > > 
-> > > Hmm...also, the version of these patches that used numeric values did go
-> > > upstream in QEMU.  So, do we need to leave that interface intact, and just add
-> > > a new one that uses symbolic names?  Or did you still just want to replace the
-> > > numeric one since it hasn't appeared in a QEMU release yet?  
-> > 
-> > I guess another alternative would be to just add symbolic name options to the
-> > existing command line option, i.e. allow all of these:
-> > 
-> > nvdimm-cap=3		# CPU cache
-> > nvdimm-cap=cpu		# CPU cache
-> > nvdimm-cap=2		# memory controller
-> > nvdimm-cap=mem-ctrl	# memory controller
-> > 
-> > And just have them as aliases.  This retains backwards compatibility with
-> > what is already there, allows for other numeric values without QEMU updates if
-> > other bits are defined (though we are still tightly tied to ACPI in this
-> > case), and provides a symbolic name which is easier to use.
-> > 
-> > Thoughts?  
+> Right now the IPL device always starts from address 0x10000 (the usual
+> Linux entry point). To run other guests (e.g. test programs) it is
+> useful to use the IPL PSW from address 0. We can use the Linux magic
+> at 0x10008 to decide.
 > 
-> I'm inclined to say let's just keep the symbolic names.
-> Less of a chance users configure something incorrectly,
-> it somehow kind of works and then we get stuck with working
-> around these bugs.
-We used numeric values before (OSPM status) in QMP which is ACPI spec defined,
-so we probably should do so in this case as well, as far as there is clear
-explanation for user where values come from. We can have symbolic aliases,
-but it would be just extra burden to maintain (so I'd prefer not to have it).
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+> v2->v3:
+> 	- check for iplpsw to avoid assert on file errors
+> 	- use 4 bytes at 4 instead of 8 bytes at 0
+> v1->v2:
+> 	- use LINUX_MAGIC_ADDR define
+> 	- use assert for valid iplpsw pointer
+> 	- add endianess conversion
+>  hw/s390x/ipl.c | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 04245b5258..1a42630962 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -29,6 +29,7 @@
+>  #include "exec/exec-all.h"
+>  
+>  #define KERN_IMAGE_START                0x010000UL
+> +#define LINUX_MAGIC_ADDR                0x010008UL
+>  #define KERN_PARM_AREA                  0x010480UL
+>  #define INITRD_START                    0x800000UL
+>  #define INITRD_PARM_START               0x010408UL
+> @@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
+>  static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>  {
+>      S390IPLState *ipl = S390_IPL(dev);
+> -    uint64_t pentry = KERN_IMAGE_START;
+> +    uint32_t *iplpsw;
+
+In case you respin: Can this be ipl_psw, please?
+
+> +    uint64_t pentry;
+> +    char *magic;
+>      int kernel_size;
+>      Error *err = NULL;
+>  
+> @@ -157,6 +160,20 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>                                 NULL, 1, EM_S390, 0, 0);
+>          if (kernel_size < 0) {
+>              kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
+> +            /* if this is Linux use KERN_IMAGE_START */
+> +            magic = rom_ptr(LINUX_MAGIC_ADDR);
+> +            if (magic && !memcmp(magic, "S390EP", 6)) {
+> +                pentry = KERN_IMAGE_START;
+> +            } else {
+> +                /* if not Linux use the IPL PSW */
+
+"use the address of the IPL PSW"?
+
+> +                iplpsw = rom_ptr(4);
+> +                if (iplpsw) {
+> +                    pentry = be32_to_cpu(*iplpsw) & 0x7fffffffUL;
+> +                } else {
+> +                    error_setg(&err, "Could not get IPL PSW");
+> +                    goto error;
+> +                }
+> +            }
+>          }
+>          if (kernel_size < 0) {
+>              error_setg(&err, "could not load kernel '%s'", ipl->kernel);
+
+Is this ever reached now? In any case, it might make sense to move this
+up, as the "could not load kernel 'plahh'" message seems more useful
+than "Could not get IPL PSW"...
+
+Also, further below we copy ipl->cmdline if we think we're dealing with
+a Linux image. Would it make sense to explicitly check for the Linux
+magic there as well? (Separate patch, of course.)
+
+Can/should netboot do a similar check? It uses KERN_IMAGE_START
+unconditionally if it wasn't an ELF file.
