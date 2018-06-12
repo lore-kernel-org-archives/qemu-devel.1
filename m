@@ -1,24 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fSi4e-00067N-7Z
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:06:58 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fSi8h-0007Yo-E5
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:11:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fSi4a-000613-6C
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:06:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52042 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fSi4Z-00060c-W2
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:06:52 -0400
-Date: Tue, 12 Jun 2018 14:06:43 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180612140643.6f6ed34d@redhat.com>
-In-Reply-To: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
-References: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1fSi8b-0008QH-7B
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:11:07 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36652
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fSi8a-0008Px-Vi
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 08:11:01 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5CC63g6058519
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 08:11:00 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jjcjd4vhh-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 08:10:59 -0400
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 12 Jun 2018 13:10:58 +0100
+References: <20180612100448.202315-1-borntraeger@de.ibm.com>
+	<20180612135545.1b7c2346.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 12 Jun 2018 14:10:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V6 0/7] nvdimm: guarantee persistence of
- QEMU writes to persistent memory
+In-Reply-To: <20180612135545.1b7c2346.cohuck@redhat.com>
+Content-Language: en-US
+Message-Id: <4ac300ef-cda8-40bc-60dd-b8f4af94ea6b@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] s390x/ipl: Try to detect Linux vs
+ non Linux for initial IPL PSW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +44,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: junyan.he@gmx.com
-Cc: qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, xiaoguangrong.eric@gmail.com, crosthwaite.peter@gmail.com, mst@redhat.com, dgilbert@redhat.com, ehabkost@redhat.com, quintela@redhat.com, Junyan He <junyan.he@intel.com>, stefanha@redhat.com, pbonzini@redhat.com, rth@twiddle.net
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On Fri,  1 Jun 2018 16:10:22 +0800
-junyan.he@gmx.com wrote:
 
-> From: Junyan He <junyan.he@intel.com>
-> 
-> QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and
-> live migration. If the backend is on the persistent memory, QEMU needs
-> to take proper operations to ensure its writes persistent on the
-> persistent memory. Otherwise, a host power failure may result in the
-> loss the guest data on the persistent memory.
 
-extra question, what are expected behavior when QEMU is built without
-libpmem and user specifies pmem=on for backend?
+On 06/12/2018 01:55 PM, Cornelia Huck wrote:
+> On Tue, 12 Jun 2018 12:04:48 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> 
+>> Right now the IPL device always starts from address 0x10000 (the usual
+>> Linux entry point). To run other guests (e.g. test programs) it is
+>> useful to use the IPL PSW from address 0. We can use the Linux magic
+>> at 0x10008 to decide.
+>>
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> ---
+>> v2->v3:
+>> 	- check for iplpsw to avoid assert on file errors
+>> 	- use 4 bytes at 4 instead of 8 bytes at 0
+>> v1->v2:
+>> 	- use LINUX_MAGIC_ADDR define
+>> 	- use assert for valid iplpsw pointer
+>> 	- add endianess conversion
+>>  hw/s390x/ipl.c | 19 ++++++++++++++++++-
+>>  1 file changed, 18 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+>> index 04245b5258..1a42630962 100644
+>> --- a/hw/s390x/ipl.c
+>> +++ b/hw/s390x/ipl.c
+>> @@ -29,6 +29,7 @@
+>>  #include "exec/exec-all.h"
+>>  
+>>  #define KERN_IMAGE_START                0x010000UL
+>> +#define LINUX_MAGIC_ADDR                0x010008UL
+>>  #define KERN_PARM_AREA                  0x010480UL
+>>  #define INITRD_START                    0x800000UL
+>>  #define INITRD_PARM_START               0x010408UL
+>> @@ -105,7 +106,9 @@ static uint64_t bios_translate_addr(void *opaque, uint64_t srcaddr)
+>>  static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      S390IPLState *ipl = S390_IPL(dev);
+>> -    uint64_t pentry = KERN_IMAGE_START;
+>> +    uint32_t *iplpsw;
+> 
+> In case you respin: Can this be ipl_psw, please?
 
+sure. 
 > 
-> This v3 patch series is based on Marcel's patch "mem: add share
-> parameter to memory-backend-ram" [1] because of the changes in patch 1.
+>> +    uint64_t pentry;
+>> +    char *magic;
+>>      int kernel_size;
+>>      Error *err = NULL;
+>>  
+>> @@ -157,6 +160,20 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>>                                 NULL, 1, EM_S390, 0, 0);
+>>          if (kernel_size < 0) {
+>>              kernel_size = load_image_targphys(ipl->kernel, 0, ram_size);
+>> +            /* if this is Linux use KERN_IMAGE_START */
+>> +            magic = rom_ptr(LINUX_MAGIC_ADDR);
+>> +            if (magic && !memcmp(magic, "S390EP", 6)) {
+>> +                pentry = KERN_IMAGE_START;
+>> +            } else {
+>> +                /* if not Linux use the IPL PSW */
 > 
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03858.html
+> "use the address of the IPL PSW"?
+
+Well we use the IPL PSW (and we need the address to get that) See the * before iplpsw.
 > 
-> Previous versions can be found at
-> v5: https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02258.html
-> V4: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06993.html
-> v3: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04365.html
-> v2: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01579.html
-> v1: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg05040.html
+>> +                iplpsw = rom_ptr(4);
+>> +                if (iplpsw) {
+>> +                    pentry = be32_to_cpu(*iplpsw) & 0x7fffffffUL;
+>> +                } else {
+>> +                    error_setg(&err, "Could not get IPL PSW");
+>> +                    goto error;
+>> +                }
+>> +            }
+>>          }
+>>          if (kernel_size < 0) {
+>>              error_setg(&err, "could not load kernel '%s'", ipl->kernel);
 > 
-> Changes in v6:
-> * (Patch 1) Expose all ram block flags rather than redefine the flags.
-> * (Patch 4) Use pkg-config rather the hard check when configure. 
-> * (Patch 7) Sync and flush all the pmem data when migration completes,
-> rather than sync pages one by one in previous version.
+> Is this ever reached now? In any case, it might make sense to move this
+
+Hmm, Right. If kernel_size < 0  then magic and ipl_psw should be NULL and we
+error out early
+
+
+> up, as the "could not load kernel 'plahh'" message seems more useful
+> than "Could not get IPL PSW"...
 > 
-> Changes in v5:
-> * (Patch 9) Add post copy check and output some messages for nvdimm.
+> Also, further below we copy ipl->cmdline if we think we're dealing with
+> a Linux image. Would it make sense to explicitly check for the Linux
+> magic there as well? (Separate patch, of course.)
 > 
-> Changes in v4:
-> * (Patch 2) Fix compilation errors found by patchew.
-> 
-> Changes in v3:
-> * (Patch 5) Add a is_pmem flag to ram_handle_compressed() and handle
-> PMEM writes in it, so we don't need the _common function.
-> * (Patch 6) Expose qemu_get_buffer_common so we can remove the
-> unnecessary qemu_get_buffer_to_pmem wrapper.
-> * (Patch 8) Add a is_pmem flag to xbzrle_decode_buffer() and handle
-> PMEM writes in it, so we can remove the unnecessary
-> xbzrle_decode_buffer_{common, to_pmem}.
-> * Move libpmem stubs to stubs/pmem.c and fix the compilation failures
-> of test-{xbzrle,vmstate}.c.
-> 
-> Changes in v2:
-> * (Patch 1) Use a flags parameter in file ram allocation functions.
-> * (Patch 2) Add a new option 'pmem' to hostmem-file.
-> * (Patch 3) Use libpmem to operate on the persistent memory, rather
-> than re-implementing those operations in QEMU.
-> * (Patch 5-8) Consider the write persistence in the migration path.
-> 
-> 
-> Junyan:
-> [1/7] memory, exec: Expose all memory block related flags.
-> [6/7] migration/ram: Add check and info message to nvdimm post copy.
-> [7/7] migration/ram: ensure write persistence on loading all date to PMEM.
-> 
-> Haozhong:
-> [5/7] mem/nvdimm: ensure write persistence to PMEM in label emulation
-> 
-> Haozhong & Junyan:
-> [2/7] memory, exec: switch file ram allocation functions to 'flags' parameters
-> [3/7] hostmem-file: add the 'pmem' option
-> [4/7] configure: add libpmem support
-> 
-> 
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> Signed-off-by: Junyan He <junyan.he@intel.com>
-> 
-> ---
-> backends/hostmem-file.c | 28 +++++++++++++++++++++++++++-
-> configure               | 29 +++++++++++++++++++++++++++++
-> docs/nvdimm.txt         | 14 ++++++++++++++
-> exec.c                  | 36 ++++++++++++++----------------------
-> hw/mem/nvdimm.c         |  9 ++++++++-
-> include/exec/memory.h   | 31 +++++++++++++++++++++++++++++--
-> include/exec/ram_addr.h | 28 ++++++++++++++++++++++++++--
-> include/qemu/pmem.h     | 24 ++++++++++++++++++++++++
-> memory.c                |  8 +++++---
-> migration/ram.c         | 18 ++++++++++++++++++
-> numa.c                  |  2 +-
-> qemu-options.hx         |  7 +++++++
-> stubs/Makefile.objs     |  1 +
-> stubs/pmem.c            | 23 +++++++++++++++++++++++
-> 14 files changed, 226 insertions(+), 32 deletions(-)
+> Can/should netboot do a similar check? It uses KERN_IMAGE_START
+> unconditionally if it wasn't an ELF file.
+
+I think we already changed that there (I asked for that change). 
