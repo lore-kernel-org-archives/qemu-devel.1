@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSmOP-00011p-7R
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:43:38 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fSmPb-00027u-L7
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:44:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fSmOO-00056O-E1
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:43:37 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <152882087494.112322.15549780953419438229.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <08279239-43ac-96a8-f01b-b84ab04ee554@amsat.org>
-Date: Tue, 12 Jun 2018 13:43:27 -0300
-MIME-Version: 1.0
-In-Reply-To: <152882087494.112322.15549780953419438229.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] target/ppc: drop empty #if/#endif block
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fSmPZ-0005yZ-1q
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 12:44:51 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Tue, 12 Jun 2018 17:43:59 +0100
+Message-Id: <20180612164402.28680-5-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180612164402.28680-1-mark.cave-ayland@ilande.co.uk>
+References: <20180612164402.28680-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 4/7] mac_newworld: wire up programmer switch to
+ NMI handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +20,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-On 06/12/2018 01:27 PM, Greg Kurz wrote:
-> Commit 9d6f106552fa moved the last line in this block to somewhere else,
-> but it forgot to remove the now useless #if/#endif.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+The programmer switch is wired up via an external GPIO pin and can be used
+to aid debugging Mac guests.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/misc/macio/gpio.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-> ---
->  target/ppc/cpu.h |    2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 0247c1f04c37..a91f1a8777eb 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1300,8 +1300,6 @@ void ppc_store_ptcr(CPUPPCState *env, target_ulong value);
->  void ppc_store_msr (CPUPPCState *env, target_ulong value);
->  
->  void ppc_cpu_list (FILE *f, fprintf_function cpu_fprintf);
-> -#if defined(TARGET_PPC64)
-> -#endif
->  
->  /* Time-base and decrementer management */
->  #ifndef NO_CPU_IO_DEFS
-> 
-> 
+diff --git a/hw/misc/macio/gpio.c b/hw/misc/macio/gpio.c
+index 5630afdf18..9317df759c 100644
+--- a/hw/misc/macio/gpio.c
++++ b/hw/misc/macio/gpio.c
+@@ -28,6 +28,7 @@
+ #include "hw/ppc/mac.h"
+ #include "hw/misc/macio/macio.h"
+ #include "hw/misc/macio/gpio.h"
++#include "hw/nmi.h"
+ #include "qemu/log.h"
+ #include "trace.h"
+ 
+@@ -193,13 +194,21 @@ static void macio_gpio_reset(DeviceState *dev)
+     macio_set_gpio(s, 1, true);
+ }
+ 
++static void macio_gpio_nmi(NMIState *n, int cpu_index, Error **errp)
++{
++    macio_set_gpio(MACIO_GPIO(n), 9, true);
++    macio_set_gpio(MACIO_GPIO(n), 9, false);
++}
++
+ static void macio_gpio_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
++    NMIClass *nc = NMI_CLASS(oc);
+ 
+     dc->realize = macio_gpio_realize;
+     dc->reset = macio_gpio_reset;
+     dc->vmsd = &vmstate_macio_gpio;
++    nc->nmi_monitor_handler = macio_gpio_nmi;
+ }
+ 
+ static const TypeInfo macio_gpio_init_info = {
+@@ -208,6 +217,10 @@ static const TypeInfo macio_gpio_init_info = {
+     .instance_size = sizeof(MacIOGPIOState),
+     .instance_init = macio_gpio_init,
+     .class_init    = macio_gpio_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_NMI },
++        { }
++    },
+ };
+ 
+ static void macio_gpio_register_types(void)
+-- 
+2.11.0
