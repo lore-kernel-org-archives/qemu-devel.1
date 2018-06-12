@@ -1,38 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41836)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fSlBG-000763-RC
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:26:00 -0400
+	(envelope-from <junyan.he@gmx.com>) id 1fSlDV-0008Td-CT
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:28:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fSlBB-0001ze-So
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:25:58 -0400
-Date: Tue, 12 Jun 2018 17:25:48 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180612172548.43ab4143.cohuck@redhat.com>
-In-Reply-To: <e4fc9a67-f3df-c040-8188-37eb3091db1a@linux.ibm.com>
-References: <20180509154822.23510-1-cohuck@redhat.com>
-	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
-	<20180515181006.0cb1dfc2.cohuck@redhat.com>
-	<a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
-	<20180522145208.310143ea.cohuck@redhat.com>
-	<4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
-	<20180605151449.22aafbfc.cohuck@redhat.com>
-	<e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
-	<20180606142131.74ea2eb7.cohuck@redhat.com>
-	<5b77ec9c-41b8-2e32-ce79-d9005b93fdd0@linux.ibm.com>
-	<20180607115442.6a779ed9.cohuck@redhat.com>
-	<86d57698-3ea7-a390-2217-07c6d41ca9ed@linux.ibm.com>
-	<20180608142022.7dd6a658.cohuck@redhat.com>
-	<d68340a2-bb1b-cef9-e394-f0d55983c0bb@linux.ibm.com>
-	<20180608164514.2e8248f4.cohuck@redhat.com>
-	<99ca65a2-ee33-6353-b6b7-aa4c07a34e2a@linux.ibm.com>
-	<20180612115900.4aa319d1.cohuck@redhat.com>
-	<d5416c61-252a-5bb8-aebe-46d883e5822e@linux.ibm.com>
-	<e4fc9a67-f3df-c040-8188-37eb3091db1a@linux.ibm.com>
+	(envelope-from <junyan.he@gmx.com>) id 1fSlDQ-0003c0-R6
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:28:17 -0400
+Received: from mout.gmx.net ([212.227.17.21]:36397)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1fSlDQ-0003b8-Bu
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 11:28:12 -0400
+From: Junyan He <junyan.he@gmx.com>
+Sender: Junyan He <junyan.he@hotmail.com>
+Date: Tue, 12 Jun 2018 15:27:38 +0000
+Message-ID: <HK2PR06MB0531134699538BCF93D65D65EB7F0@HK2PR06MB0531.apcprd06.prod.outlook.com>
+References: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
+	<20180612140643.6f6ed34d@redhat.com>
+	<HK2PR06MB0531F10A69CBFC1D41402F19EB7F0@HK2PR06MB0531.apcprd06.prod.outlook.com>,
+	<20180612165546.0474564f@redhat.com>
+In-Reply-To: <20180612165546.0474564f@redhat.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
- subchannel
+Subject: Re: [Qemu-devel] [PATCH V6 0/7] nvdimm: guarantee persistence of
+ QEMU writes to persistent memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,186 +32,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: pmorel@linux.ibm.com, Dong Jia Shi <bjsdjshi@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>, "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, Junyan He <junyan.he@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 
-On Tue, 12 Jun 2018 16:08:42 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+According to my understand, the file node on real persistent memory do not =
+need to be pmem=3Don
 
-> On 06/12/2018 03:56 PM, Pierre Morel wrote:
-> >> So,=C2=A0what=C2=A0are=C2=A0you=C2=A0proposing?=C2=A0Being=C2=A0more=
-=C2=A0specific=C2=A0and=C2=A0stating=C2=A0that=C2=A0the
-> >> scsw=C2=A0is=C2=A0not=C2=A0necessarily=C2=A0a=C2=A0real=C2=A0scsw,=C2=
-=A0but=C2=A0merely=C2=A0a=C2=A0vehicle=C2=A0for=C2=A0sending=C2=A0a
-> >> command?=C2=A0Or=C2=A0keeping=C2=A0it=C2=A0as=C2=A0it=C2=A0is=C2=A0now=
-=C2=A0for=C2=A0ssch,=C2=A0and=C2=A0adding=C2=A0a=C2=A0second
-> >> interface=C2=A0for=C2=A0hsch/csch=C2=A0(and=C2=A0maybe=C2=A0rsch,=C2=
-=A0msch,=C2=A0...)?
-> >> =20
-> >=20
-> >=20
-> > I=C2=A0said=C2=A0no=C2=A0radical=C2=A0surgery,=C2=A0but=C2=A0after=C2=
-=A0thinking=C2=A0more=C2=A0about=C2=A0it...
-> > I=C2=A0am=C2=A0not=C2=A0sure.
-> >=20
-> > Let's=C2=A0explain=C2=A0this:
-> >=20
-> > I see 2 ways to proceed but my favorite is definitively to introduce ve=
-rsioning.
-> >=20
-> >=20
-> > Way=C2=A01)
-> >=20
-> > This=C2=A0was=C2=A0the=C2=A0way=C2=A0I=C2=A0first=C2=A0thought=C2=A0abo=
-ut.
-> > We=C2=A0keep=C2=A0the=C2=A0existing=C2=A0IO=C2=A0Regionand=C2=A0structu=
-res,=C2=A0and=C2=A0are=C2=A0more
-> > specific=C2=A0by=C2=A0stating=C2=A0that=C2=A0the=C2=A0io_region=C2=A0is=
-=C2=A0a=C2=A0command=C2=A0region=C2=A0during=C2=A0write
-> > entry=C2=A0and=C2=A0a=C2=A0status=C2=A0region=C2=A0during=C2=A0interrup=
-t=C2=A0handling:
-> > This=C2=A0allow=C2=A0us=C2=A0to=C2=A0use=C2=A0the=C2=A03=C2=A0bits=C2=
-=A0of=C2=A0the=C2=A0FCTL=C2=A0field=C2=A0of=C2=A0the=C2=A0SCSW=C2=A0to=C2=
-=A0pass
-> > commands=C2=A0to=C2=A0the=C2=A0kernel=C2=A0and=C2=A0stay=C2=A0backward=
-=C2=A0compatible. =20
-> > The=C2=A0FCTL=C2=A0field=C2=A0has=C2=A03=C2=A0bits=C2=A0=3D>=C2=A0we=C2=
-=A0can=C2=A0have=C2=A08=C2=A0commands. =20
-> >=20
-> > PRO:=C2=A0small=C2=A0change
-> >=20
-> > CONTRA:=C2=A0This=C2=A0is=C2=A0still=C2=A0confusing,=C2=A0we=C2=A0do=C2=
-=A0not=C2=A0really=C2=A0solve=C2=A0this
-> >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0unclarity=C2=A0problem=
-=C2=A0since=C2=A0QEMU=C2=A0view=C2=A0/=C2=A0documentation=C2=A0and
-> >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Linux=C2=A0view=C2=A0/=
-=C2=A0documentation=C2=A0differ=C2=A0or=C2=A0we=C2=A0update=C2=A0QEMU.
-> >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Moreover=C2=A0this=C2=
-=A0does=C2=A0not=C2=A0allow=C2=A0for=C2=A0long=C2=A0term=C2=A0extensions
-> >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0and/or=C2=A0re-design.
-> >=20
-> >  =20
->=20
-> I'm not really in favor of way 1. Conie's point with RSCH is a good one.
-> And IMHO it speaks for a new interface for commands. Squeezing the RSCH
-> command into the SCSW does not seem to be a good idea. Considering your
-> proposal with the 3 bits, we could do something like: if in FCTL the
-> start and the clear and the halt bits are set then we postulate that is
-> request for a resume. But that would be quite confusing, and we would end
-> up re-defining the semantic of the scsw_area -- in respect to what is
-> documented Documentation/s390/vfio-ccw.txt, and also what is intuitive
-> based on the uapi header.
+pmem=3Don is a feature for file backend class. For example, if we do not ha=
+ve enough hard disk space
 
-Agreed. Making scsw_area something like an scsw but still different is
-bound to be confusing, even if documented, and I'm not sure it covers
-all our bases anyway. Just using the halt/clear bits might have been
-feasible, but as that does not cover rsch, we need something different
-anyway.
+and we have enough pmem, we can use file on pmem the same as normal file-ba=
+ckend on hard disk.
 
->=20
-> >=20
-> > Way=C2=A02)
-> >=20
-> > We=C2=A0use=C2=A0the=C2=A0device=C2=A0VFIO=C2=A0versioning=C2=A0using=
-=C2=A0the=C2=A0capability=C2=A0chain=C2=A0to=C2=A0advertise
-> > a=C2=A0new=C2=A0interface.
-> >=20
-> > This=C2=A0the=C2=A0preferred=C2=A0way,=C2=A0it=C2=A0is=C2=A0sane,=C2=A0=
-allows=C2=A0for=C2=A0the=C2=A0userland=C2=A0backward
-> > compatibility=C2=A0and=C2=A0allows=C2=A0to=C2=A0have=C2=A0a=C2=A0new=C2=
-=A0command=C2=A0interface,=C2=A0extensible
-> > for=C2=A0future=C2=A0use.
-> >=20
-> > In=C2=A0this=C2=A0case=C2=A0we=C2=A0can=C2=A0extend=C2=A0the=C2=A0inter=
-face=C2=A0to=C2=A0be=C2=A0any=C2=A0kind=C2=A0we=C2=A0want
-> > in=C2=A0a=C2=A0next=C2=A0version,=C2=A0pwrite=C2=A0with=C2=A0new=C2=A0i=
-o_region,=C2=A0mmap=C2=A0on=C2=A0new
-> > IO=C2=A0regions,=C2=A0status=C2=A0region...
-> >=20
-> > PRO:=C2=A0Extensible=C2=A0and=C2=A0also=C2=A0goes=C2=A0in=C2=A0the=C2=
-=A0VFIO=C2=A0INFO=C2=A0extension=C2=A0direction
-> >  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0proposed=C2=A0by=C2=A0Alex
-> >  =20
->=20
->=20
-> Sounds much better. I imagine the coexistence of old and new like this.
-> Both the old and the new QEMU would supply the the SCSW area with the old
-> documented semantics -- the SCSW of the virtual subchannel. But with the
-> new version an explicit command would be supplied via the command region
-> (also for  SSCH). Maybe the SCSW can still end up being useful for
-> something in the kernel module too (maybe there are some  optimization
-> that can be done based on the QEMU SCSW).
+That is the file-backend on pmem does not necessary to a nvdimm backend, it=
+ can be normal file mapping as well.
 
-We need to keep the old interface anyway. But yes, I think capabilities
-are the way to go.
+so
 
->=20
->=20
-> > CONTRA:=C2=A0I=C2=A0see=C2=A0none=C2=A0outer=C2=A0more=C2=A0work=C2=A0t=
-o=C2=A0do=C2=A0(but=C2=A0is=C2=A0it=C2=A0a=C2=A0problem?)
-> >=20
-> >  =20
-> The problem I see is that designing a good interface usually hard.
+ > detect that backing file is located on pmem storage
 
-I fear that this is always the case :)
+may not  be a good manner.
 
-> I could help with review, but I don't have the resources to commit
-> to more than that.
 
-I'm looking into the halt/clear thing anyway. But review is appreciated.
+> (1) Maybe we should error out if pmem=3Don but compiled without libpmem
+> and add 3rd state pmem=3Dforce for testing purposes.
 
->=20
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >=20
-> > Extra=C2=A0argumentation=C2=A0for=C2=A0versioning=C2=A0support
-> >=20
-> >=20
-> > Suppose=C2=A0a=C2=A0future=C2=A0implementation=C2=A0with=C2=A04=C2=A0ma=
-pped=C2=A0regions=C2=A0like
-> > the=C2=A0following:
-> >=20
-> > -=C2=A0A=C2=A0Status=C2=A0region=C2=A0(RO=C2=A0updated=C2=A0as=C2=A0res=
-ult=C2=A0of=C2=A0command=C2=A0and=C2=A0IRQ)
+I think we can print a warning message to give user a hint, it can really h=
+elp user
 
-scsw/pmcw/anything else? Would also accommodate the path handling
-stuff, I think.
+when they mis-configure.
 
-> >=20
-> > -=C2=A0A=C2=A0command=C2=A0region=C2=A0(WO=C2=A0where=C2=A0the=C2=A0use=
-r=C2=A0send=C2=A0its=C2=A0commands)
-> >  =C2=A0=C2=A0userland=C2=A0write=C2=A0here=C2=A0to=C2=A0trigger=C2=A0IO=
-=C2=A0(quite=C2=A0as=C2=A0currently)
-> >=20
-> > -=C2=A0A=C2=A0CCW=C2=A0program=C2=A0region=C2=A0(RW=C2=A0where=C2=A0the=
-=C2=A0CCW=C2=A0chain=C2=A0is=C2=A0handled)
-> >  =C2=A0=C2=A0most=C2=A0handling=C2=A0done=C2=A0from=C2=A0userspace,=C2=
-=A0last=C2=A0translations=C2=A0in=C2=A0kernel,
-> >  =C2=A0=C2=A0double=C2=A0buffering...
 
-I'm not sure about that. But in any case, we can add this later on. We
-need to keep the orb as it is now, and that should already cover our
-current use cases.
+________________________________
+From: Qemu-devel <qemu-devel-bounces+junyan.he=3Dgmx.com@nongnu.org> on beh=
+alf of Igor Mammedov <imammedo@redhat.com>
+Sent: Tuesday, June 12, 2018 2:55:46 PM
+To: Junyan He
+Cc: Haozhong Zhang; xiaoguangrong.eric@gmail.com; mst@redhat.com; crosthwai=
+te.peter@gmail.com; qemu-devel@nongnu.org; ehabkost@redhat.com; dgilbert@re=
+dhat.com; quintela@redhat.com; Junyan He; stefanha@redhat.com; pbonzini@red=
+hat.com; rth@twiddle.net
+Subject: Re: [Qemu-devel] [PATCH V6 0/7] nvdimm: guarantee persistence of Q=
+EMU writes to persistent memory
 
-> >=20
-> > -=C2=A0A=C2=A0performance=C2=A0/=C2=A0measurement=C2=A0/=C2=A0statistic=
-s=C2=A0region=C2=A0(RO)
-> >  =C2=A0=C2=A0This=C2=A0is=C2=A0updated=C2=A0asynchronously=C2=A0by=C2=
-=A0hardware=C2=A0and/or=C2=A0driver
+On Tue, 12 Jun 2018 13:38:08 +0000
+Junyan He <junyan.he@gmx.com> wrote:
 
-For channel measurements, for example? Makes sense. (I recall that
-there's also a measurement infrastructure triggered via CHSC, but I
-don't have the documentation.)
+> He have pmem_persist and pmem_memcpy_persist stub functions.
+>
+> If no libpmem and user really specify pmem=3Don, we just do nothing or ju=
+st memcpy.
+>
+> Real persistent memory always require libpmem support its load/save.
+>
+> If pmem=3Don and without libpmem, we can think that user want to imitate
+>
+> pmem=3Don while the HW environment is without real persistent memory exis=
+ting.
+>
+> It may help debug on some machine without real pmem.
 
-> >=20
-> > This=C2=A0is=C2=A0purely=C2=A0theoretical=C2=A0and=C2=A0we=C2=A0do=C2=
-=A0not=C2=A0need=C2=A0to=C2=A0do=C2=A0all=C2=A0at=C2=A0once
-> > but=C2=A0if=C2=A0we=C2=A0want=C2=A0to=C2=A0extend=C2=A0the=C2=A0impleme=
-ntation=C2=A0without=C2=A0problems
-> > and=C2=A0continue=C2=A0backward=C2=A0compatibility=C2=A0the=C2=A0versio=
-ning=C2=A0and=C2=A0capability
-> > handling=C2=A0is=C2=A0a=C2=A0must. =20
->=20
-> I'm not sure about this.
+For unaware user it would be easy to misconfigure and think that feature
+works while it isn't, which cloud lead to data loss.
 
-We can think about this later, the capabilities infrastructure enables
-us to do so.
+(1) Maybe we should error out if pmem=3Don but compiled without libpmem
+and add 3rd state pmem=3Dforce for testing purposes.
+
+Also can we detect that backing file is located on pmem storage and do [1] =
+if it's not?
+
+>
+> ________________________________
+> From: Qemu-devel <qemu-devel-bounces+junyan.he=3Dgmx.com@nongnu.org> on b=
+ehalf of Igor Mammedov <imammedo@redhat.com>
+> Sent: Tuesday, June 12, 2018 12:06:43 PM
+> To: junyan.he@gmx.com
+> Cc: Haozhong Zhang; xiaoguangrong.eric@gmail.com; crosthwaite.peter@gmail=
+.com; mst@redhat.com; qemu-devel@nongnu.org; dgilbert@redhat.com; quintela@=
+redhat.com; Junyan He; stefanha@redhat.com; pbonzini@redhat.com; rth@twiddl=
+e.net; ehabkost@redhat.com
+> Subject: Re: [Qemu-devel] [PATCH V6 0/7] nvdimm: guarantee persistence of=
+ QEMU writes to persistent memory
+>
+> On Fri,  1 Jun 2018 16:10:22 +0800
+> junyan.he@gmx.com wrote:
+>
+> > From: Junyan He <junyan.he@intel.com>
+> >
+> > QEMU writes to vNVDIMM backends in the vNVDIMM label emulation and
+> > live migration. If the backend is on the persistent memory, QEMU needs
+> > to take proper operations to ensure its writes persistent on the
+> > persistent memory. Otherwise, a host power failure may result in the
+> > loss the guest data on the persistent memory.
+>
+> extra question, what are expected behavior when QEMU is built without
+> libpmem and user specifies pmem=3Don for backend?
+>
+> >
+> > This v3 patch series is based on Marcel's patch "mem: add share
+> > parameter to memory-backend-ram" [1] because of the changes in patch 1.
+> >
+> > [1] https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg03858.html
+> >
+> > Previous versions can be found at
+> > v5: https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02258.html
+> > V4: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg06993.html
+> > v3: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg04365.html
+> > v2: https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg01579.html
+> > v1: https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg05040.html
+> >
+> > Changes in v6:
+> > * (Patch 1) Expose all ram block flags rather than redefine the flags.
+> > * (Patch 4) Use pkg-config rather the hard check when configure.
+> > * (Patch 7) Sync and flush all the pmem data when migration completes,
+> > rather than sync pages one by one in previous version.
+> >
+> > Changes in v5:
+> > * (Patch 9) Add post copy check and output some messages for nvdimm.
+> >
+> > Changes in v4:
+> > * (Patch 2) Fix compilation errors found by patchew.
+> >
+> > Changes in v3:
+> > * (Patch 5) Add a is_pmem flag to ram_handle_compressed() and handle
+> > PMEM writes in it, so we don't need the _common function.
+> > * (Patch 6) Expose qemu_get_buffer_common so we can remove the
+> > unnecessary qemu_get_buffer_to_pmem wrapper.
+> > * (Patch 8) Add a is_pmem flag to xbzrle_decode_buffer() and handle
+> > PMEM writes in it, so we can remove the unnecessary
+> > xbzrle_decode_buffer_{common, to_pmem}.
+> > * Move libpmem stubs to stubs/pmem.c and fix the compilation failures
+> > of test-{xbzrle,vmstate}.c.
+> >
+> > Changes in v2:
+> > * (Patch 1) Use a flags parameter in file ram allocation functions.
+> > * (Patch 2) Add a new option 'pmem' to hostmem-file.
+> > * (Patch 3) Use libpmem to operate on the persistent memory, rather
+> > than re-implementing those operations in QEMU.
+> > * (Patch 5-8) Consider the write persistence in the migration path.
+> >
+> >
+> > Junyan:
+> > [1/7] memory, exec: Expose all memory block related flags.
+> > [6/7] migration/ram: Add check and info message to nvdimm post copy.
+> > [7/7] migration/ram: ensure write persistence on loading all date to PM=
+EM.
+> >
+> > Haozhong:
+> > [5/7] mem/nvdimm: ensure write persistence to PMEM in label emulation
+> >
+> > Haozhong & Junyan:
+> > [2/7] memory, exec: switch file ram allocation functions to 'flags' par=
+ameters
+> > [3/7] hostmem-file: add the 'pmem' option
+> > [4/7] configure: add libpmem support
+> >
+> >
+> > Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> > Signed-off-by: Junyan He <junyan.he@intel.com>
+> >
+> > ---
+> > backends/hostmem-file.c | 28 +++++++++++++++++++++++++++-
+> > configure               | 29 +++++++++++++++++++++++++++++
+> > docs/nvdimm.txt         | 14 ++++++++++++++
+> > exec.c                  | 36 ++++++++++++++----------------------
+> > hw/mem/nvdimm.c         |  9 ++++++++-
+> > include/exec/memory.h   | 31 +++++++++++++++++++++++++++++--
+> > include/exec/ram_addr.h | 28 ++++++++++++++++++++++++++--
+> > include/qemu/pmem.h     | 24 ++++++++++++++++++++++++
+> > memory.c                |  8 +++++---
+> > migration/ram.c         | 18 ++++++++++++++++++
+> > numa.c                  |  2 +-
+> > qemu-options.hx         |  7 +++++++
+> > stubs/Makefile.objs     |  1 +
+> > stubs/pmem.c            | 23 +++++++++++++++++++++++
+> > 14 files changed, 226 insertions(+), 32 deletions(-)
+>
+>
