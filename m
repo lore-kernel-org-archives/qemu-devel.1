@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1fT6YY-0006hb-UK
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:15:31 -0400
+	(envelope-from <david@redhat.com>) id 1fT6Z1-000764-0s
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:15:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1fT6YX-0001ag-Rm
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:15:26 -0400
-Date: Wed, 13 Jun 2018 10:15:10 -0400
-From: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
-Message-ID: <20180613141510.GA672@byw>
-Reply-To: baiyaowei@cmss.chinamobile.com
-References: <1528859749-25286-1-git-send-email-baiyaowei@cmss.chinamobile.com>
-	<20180613035030.GB25430@flamenco>
-	<23a38716-196f-53a0-0a3d-61f269b1dab4@redhat.com>
+	(envelope-from <david@redhat.com>) id 1fT6Yy-0002h5-5p
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:15:55 -0400
+References: <20180611121655.19616-1-david@redhat.com>
+	<20180611121655.19616-11-david@redhat.com>
+	<20180613151056.6ebbccc2@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <569f9534-162c-29c1-a097-51427e028b4e@redhat.com>
+Date: Wed, 13 Jun 2018 16:15:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <23a38716-196f-53a0-0a3d-61f269b1dab4@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] tracing.txt: add missing '-' for trace
- option
+In-Reply-To: <20180613151056.6ebbccc2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1 10/11] pc-dimm: introduce and use
+ pc_dimm_memory_pre_plug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +26,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Emilio G. Cota" <cota@braap.org>, qemu-trivial@nongnu.org, mjt@tls.msk.ru, laurent@vivier.eu, stefanha@redhat.com, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On Wed, Jun 13, 2018 at 06:27:49AM -0500, Eric Blake wrote:
-> On 06/12/2018 10:50 PM, Emilio G. Cota wrote:
-> >On Tue, Jun 12, 2018 at 23:15:49 -0400, Yaowei Bai wrote:
-> >>Signed-off-by: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
-> >>---
-> >>  docs/devel/tracing.txt | 2 +-
-> >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >>diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
-> >>index 07abbb3..6ab32cc 100644
-> >>--- a/docs/devel/tracing.txt
-> >>+++ b/docs/devel/tracing.txt
-> >>@@ -18,7 +18,7 @@ for debugging, profiling, and observing execution.
-> >>  3. Run the virtual machine to produce a trace file:
-> >>-    qemu -trace events=/tmp/events ... # your normal QEMU invocation
-> >>+    qemu --trace events=/tmp/events ... # your normal QEMU invocation
-> >
-> >The second dash is not missing; both '-args' and '--args' work.
-> >
-> >'-args' seems to be favoured though; see `qemu -h' or `qemu --h' :-)
-> 
-> Actually, we're trying to fix that:
-> https://wiki.qemu.org/BiteSizedTasks#Consistent_option_usage_in_documentation
-> 
-> The one-vs-two dash usage is only supported in qemu, not in qemu-nbd
-> or qemu-img (that is, qemu acts as if it uses getopt_long_only(),
-> while the others use getopt_long() - except that we hand-rolled the
-> parser in qemu, meaning you might find quirks where it sometimes
-> doesn't even match getopt_long_only()).
-> 
-> At any rate, since --trace is an option that is supported across
-> multiple binaries, we SHOULD favor the double-dash spelling in our
-> documentation, so that you can consistently reuse the same --trace
-> invocation without worrying whether the binary parses its arguments
+On 13.06.2018 15:10, Igor Mammedov wrote:
+> On Mon, 11 Jun 2018 14:16:54 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> We'll be factoring out some pc-dimm specific and some memory-device
+>> checks next.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/i386/pc.c             | 2 ++
+>>  hw/mem/pc-dimm.c         | 5 +++++
+>>  hw/ppc/spapr.c           | 1 +
+>>  include/hw/mem/pc-dimm.h | 2 ++
+>>  4 files changed, 10 insertions(+)
+>>
+>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>> index 017396fe84..dc8e7b033b 100644
+>> --- a/hw/i386/pc.c
+>> +++ b/hw/i386/pc.c
+>> @@ -1695,6 +1695,8 @@ static void pc_dimm_pre_plug(HotplugHandler *hot=
+plug_dev, DeviceState *dev,
+> keeping                              ^^^^^
+> similar to newly introduced pc_dimm_memory_pre_plug()
+> and I have no clue what to suggest as alternative
 
-Yes, this patch is inspired by this situation when translating DPRINT into
-trace for a new qemu utility (much like qemu-nbd) following docs/devel/tracing.txt.
-The utility complains it don't support -trace option. So i sent this
-patch after confirming this with qemu-nbd,qemu-io utilities.
+Can you elaborate?
 
-> with getopt_long() (where double is required) or like
-> getopt_long_only() (where the double is optional but supported).
-> 
-> So I'm in favor of this patch, although it may need more of a commit
-> message summarizing the justification I've just pointed you to.
+In pc.c we now have:
+- static void pc_dimm_plug()
+- static void pc_dimm_unplug_request()
+- static void pc_dimm_unplug()
 
-Thanks for your nice explaination. If this patch could be merged i will
-send V2 with a commit message.
+And I add
+- static void pc_dimm_pre_plug()
 
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+I am sticking to the existing naming scheme.
 
-Thanks.
+(maybe the problem is that PC_DIMM should never have been named PC_DIMM
+but simply DIMM, then the "pc_" prefix would be unique)
 
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+>=20
+>>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in =
+'-M'");
+>>          return;
+>>      }
+>> +
+>> +    pc_dimm_memory_pre_plug(dev, MACHINE(hotplug_dev), errp);
+>>  }
+>> =20
+>>  static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+>> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+>> index bc79dd04d8..995ce22d8d 100644
+>> --- a/hw/mem/pc-dimm.c
+>> +++ b/hw/mem/pc-dimm.c
+>> @@ -27,6 +27,11 @@
+>>  #include "sysemu/numa.h"
+>>  #include "trace.h"
+>> =20
+>> +void pc_dimm_memory_pre_plug(DeviceState *dev, MachineState *machine,
+>> +                             Error **errp)
+>> +{
+>> +}
+> why introducing shim without anything?
+
+Because you requested for review to split things up :)
+
+I can easily squash this.
+
+> I'd just merge it with following patch and clarify (in commit message)
+> why the rest of pre_plug code isn't moved here as well.
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
