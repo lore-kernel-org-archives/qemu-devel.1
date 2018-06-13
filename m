@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fT14M-0004vA-UR
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:23:56 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fT16V-0006VA-Kx
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fT14M-00073l-0l
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:23:54 -0400
-Received: from mail-lf0-x236.google.com ([2a00:1450:4010:c07::236]:36678)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
-	id 1fT14L-000733-PR
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:23:53 -0400
-Received: by mail-lf0-x236.google.com with SMTP id u4-v6so2572410lff.3
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 01:23:53 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1fT16R-0000WT-N8
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:26:07 -0400
+Date: Wed, 13 Jun 2018 10:25:56 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180613102556.40293b9c.cohuck@redhat.com>
+In-Reply-To: <20180612125933.262679-1-borntraeger@de.ibm.com>
+References: <20180612125933.262679-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-References: <1528794804-6289-1-git-send-email-whois.zihan.yang@gmail.com>
-	<20180612163301-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180612163301-mutt-send-email-mst@kernel.org>
-From: Zihan Yang <whois.zihan.yang@gmail.com>
-Date: Wed, 13 Jun 2018 16:23:40 +0800
-Message-ID: <CAKwiv-jJbcuLgygcbSBkaZw33mnamHqa5T15gMNi2CqUNN2mkA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 1/3] pci_expander_bridge: add type
- TYPE_PXB_PCIE_HOST
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/1] s390x/ipl: Try to detect Linux vs
+ non Linux for initial IPL PSW
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,61 +23,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-Michael S. Tsirkin <mst@redhat.com> =E4=BA=8E2018=E5=B9=B46=E6=9C=8812=E6=
-=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=889:43=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Tue, Jun 12, 2018 at 05:13:22PM +0800, Zihan Yang wrote:
-> > The inner host bridge created by pxb-pcie is TYPE_PXB_PCI_HOST by defau=
-lt,
-> > add a new type TYPE_PXB_PCIE_HOST to better utilize the ECAM of PCIe
-> >
-> > Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
->
-> I have a concern that there are lots of new properties
-> added here, I'm not sure how are upper layers supposed to
-> manage them all.
->
-> E.g. bus_nr supplied in several places, domain_nr for which
-> it's not clear how it is supposed to be allocated, etc.
+On Tue, 12 Jun 2018 14:59:33 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Indeed they seem to double the properties, but the pxb host is
-an internal structure of pxb-pcie device, created in pxb-pcie's
-realization procedure, and acpi-build queries host bridges instead
-of pxb-pcie devices. This means that users can not directly specify
-the property of pxb host bridge, but must 'inherit' from pxb-pcie
-devices. I had thought about changing the acpi-build process,
-but that would require more modifications.
+> Right now the IPL device always starts from address 0x10000 (the usual
+> Linux entry point). To run other guests (e.g. test programs) it is
+> useful to use the IPL PSW from address 0. We can use the Linux magic
+> at 0x10008 to decide.
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+> v3->v4:
+> 	- iplpsw-> ipl_psw
+> 	- move check for load failures into the non-elf case
+> 	- change comment about ipl psw
+> v2->v3:
+> 	- check for iplpsw to avoid assert on file errors
+> 	- use 4 bytes at 4 instead of 8 bytes at 0
+> v1->v2:
+> 	- use LINUX_MAGIC_ADDR define
+> 	- use assert for valid iplpsw pointer
+> 	- add endianess conversion
+>  hw/s390x/ipl.c | 27 ++++++++++++++++++++++-----
+>  1 file changed, 22 insertions(+), 5 deletions(-)
 
-As for the properties, bus_nr means the start bus number
-of this host bridge. It is used when pxb-pcie is in pci domain 0
-with q35 host to avoid bus number confliction. When it is placed
-in a separate pci domain, it is not used and should be 0.
-
-max_bus means how many buses the user desires, EACH bus in
-PCIe requires 1MB configuration space, thus specifying it could
-reduce the reserved memory in MMCFG as suggested by Marcel.
-Typically, the user can specify
-
--device pxb-pcie,id=3Dbr1,bus=3D"pcie.0",sep_domain=3Don,domain_nr=3D1,max_=
-bus=3D130
-
-this will place the buses under this pxb host bridge in pci domain
-1, and reserve (130 + 1) =3D 131 buses for it. The start bus number
-is always 0 currently for simplicity.
-
-> Can the management interface be simplified?
-> Ideally we wouldn't have to teach libvirt new tricks,
-> just generalize pxb support slightly.
-
-We can delete 'sep_domain' property, I just find 'domain_nr'
-already indicates domain number. But domain_nr and
-max_bus seems unremovable, although they look 'redundant'
-because they appear twice.
-
-I'm not familiar with libvirt, but from the perspective of user,
-only 2 properties are added(domain_nr and max_bus, if we
-delete sep_domain), though the internal structure actually has
-changed.
+Thanks, applied.
