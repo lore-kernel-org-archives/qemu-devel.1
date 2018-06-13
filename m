@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fTByz-0001pi-2A
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 16:03:05 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fTC1e-0002tO-12
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 16:05:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fTByw-0006Zj-0w
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 16:03:05 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180611011501.10235-1-f4bug@amsat.org>
-	<20180611011501.10235-12-f4bug@amsat.org>
-	<15d222dd-d2e9-4855-62c6-f89f2ee59c52@linaro.org>
-	<76aa5170-1d18-8799-6ff1-a7c0dba0b489@redhat.com>
-	<8537ca07-2645-6c2c-5945-a91da035b474@linaro.org>
-	<a856ef80-fcab-0003-2bdd-89a1849fe857@redhat.com>
-	<7c27cd3e-124c-1c03-46de-1b016b37edf1@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <72cb44fc-fb48-49a6-3aa7-3e63762d9586@amsat.org>
-Date: Wed, 13 Jun 2018 17:02:53 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fTC1Z-0000Gy-31
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 16:05:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47484)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTC1Y-0000GN-To
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 16:05:45 -0400
+Date: Wed, 13 Jun 2018 17:05:34 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180613200534.GL7451@localhost.localdomain>
+References: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
+	<20180612140643.6f6ed34d@redhat.com>
+	<HK2PR06MB0531F10A69CBFC1D41402F19EB7F0@HK2PR06MB0531.apcprd06.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <7c27cd3e-124c-1c03-46de-1b016b37edf1@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 11/40] hw/xen: Use the IEC binary prefix
- definitions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <HK2PR06MB0531F10A69CBFC1D41402F19EB7F0@HK2PR06MB0531.apcprd06.prod.outlook.com>
+Subject: Re: [Qemu-devel] [PATCH V6 0/7] nvdimm: guarantee persistence of
+ QEMU writes to persistent memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,32 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, Eric Blake <eblake@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>, Kevin Wolf <kwolf@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Eduardo Habkost <ehabkost@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, Richard Henderson <rth@twiddle.net>
+To: Junyan He <junyan.he@gmx.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, Junyan He <junyan.he@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 
-On 06/13/2018 04:31 PM, Richard Henderson wrote:
-> On 06/13/2018 02:13 AM, Eric Blake wrote:
->> Or spell it UINT64_C(1) if you don't want a cast.
+On Tue, Jun 12, 2018 at 01:38:08PM +0000, Junyan He wrote:
+> He have pmem_persist and pmem_memcpy_persist stub functions.
 > 
-> Not unsigned is what I want most.
+> If no libpmem and user really specify pmem=on, we just do nothing or just memcpy.
+> 
+> Real persistent memory always require libpmem support its load/save.
+> 
+> If pmem=on and without libpmem, we can think that user want to imitate
+> 
+> pmem=on while the HW environment is without real persistent memory existing.
+> 
+> It may help debug on some machine without real pmem.
 
-I used both of your suggestions, but now new format string errors
-appeared due to ram_addr_t being unsigned, so code cleaned using
-MachineState->ram_size now complains.
+What exactly it would help debug?  Is there any difference
+between testing the code with pmem=off and pmem=on if libptest is
+unavailable?
 
-include/exec/cpu-common.h:53:typedef uintptr_t ram_addr_t;
-include/hw/boards.h:259:    ram_addr_t ram_size;
+I would prefer to simply not let the user set pmem=on if libptest
+is not available.
 
-Is the following snippet OK?
-
-     /* allocate RAM */
--    if (ram_size > (2048u << 20)) {
--        error_report("Too much memory for this machine: %dMB, maximum
-2048MB",
--                     ((unsigned int)ram_size / (1 << 20)));
-+    if (ram_size > 2 * GiB) {
-+        error_report("Too much memory for this machine: %luMB, maximum
-2048MB",
-+                     ram_size / MiB);
-         exit(1);
-     }
+-- 
+Eduardo
