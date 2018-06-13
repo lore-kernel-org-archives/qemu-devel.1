@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fTBnP-0006Ug-HV
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 15:51:08 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fTBr5-0007f6-Qu
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 15:54:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fTBnO-00047k-AF
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 15:51:07 -0400
-Date: Wed, 13 Jun 2018 13:50:47 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20180613135047.5c1ce227@w520.home>
-In-Reply-To: <20180613084149.14523-4-kraxel@redhat.com>
-References: <20180613084149.14523-1-kraxel@redhat.com>
-	<20180613084149.14523-4-kraxel@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fTBr5-0000Gl-0E
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 15:54:55 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180611011501.10235-1-f4bug@amsat.org>
+	<20180611011501.10235-5-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <896e3c84-3001-23d8-30a1-072763e86297@amsat.org>
+Date: Wed, 13 Jun 2018 16:54:44 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 3/3] hw/vfio/display: add ramfb support
+In-Reply-To: <20180611011501.10235-5-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 04/40] checkpatch: Recognize IEC binary
+ prefix definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,130 +29,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>, libvir-list@redhat.com, Erik Skultety <eskultet@redhat.com>, Laine Stump <laine@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-On Wed, 13 Jun 2018 10:41:49 +0200
-Gerd Hoffmann <kraxel@redhat.com> wrote:
-
-> So we have a boot display when using a vgpu as primary display.
+On 06/10/2018 10:14 PM, Philippe Mathieu-Daudé wrote:
+> This fixes:
 > 
-> Use vfio-pci-ramfb instead of vfio-pci to enable it.
-
-Using a different device here seems like it almost guarantees a very
-complicated path to support under libvirt.  What necessitates this
-versus a simple ramfb=on option to vfio-pci?
-
-I'm also not sure I understand the usage model, SeaBIOS and OVMF know
-how to write to this display, but it seems that the guest does not.  I
-suppose in the UEFI case runtime services can be used to continue
-writing this display, but BIOS doesn't have such an option, unless
-we're somehow emulating VGA here.  So for UEFI, I can imagine this
-covers us from power on through firmware boot and up to guest drivers
-initializing the GPU (assuming the vGPU supports a kernel mode driver,
-does NVIDIA?), but for BIOS it seems we likely still have a break from
-the bootloader to GPU driver initialization. For instance, what driver
-is used to draw the boot animation (or blue screen) on SeaBIOS Windows
-VM?  I'm assuming that this display and the vGPU display are one in the
-same, so there's some cut from one to the other.  Thanks,
-
-Alex
-
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+>     ERROR: "foo * bar" should be "foo *bar"
+>     #310: FILE: hw/ppc/ppc440_uc.c:564:
+>     +        size = 8 * MiB * sh;
+>     total: 1 errors, 0 warnings, 433 lines checked
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  include/hw/vfio/vfio-common.h |  2 ++
->  hw/vfio/display.c             | 10 ++++++++++
->  hw/vfio/pci.c                 | 15 +++++++++++++++
->  3 files changed, 27 insertions(+)
+>  scripts/checkpatch.pl | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index a9036929b2..a58d7e7e77 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -26,6 +26,7 @@
->  #include "qemu/queue.h"
->  #include "qemu/notify.h"
->  #include "ui/console.h"
-> +#include "hw/display/ramfb.h"
->  #ifdef CONFIG_LINUX
->  #include <linux/vfio.h>
->  #endif
-> @@ -143,6 +144,7 @@ typedef struct VFIODMABuf {
->  
->  typedef struct VFIODisplay {
->      QemuConsole *con;
-> +    RAMFBState *ramfb;
->      struct {
->          VFIORegion buffer;
->          DisplaySurface *surface;
-> diff --git a/hw/vfio/display.c b/hw/vfio/display.c
-> index 59c0e5d1d7..409d5a2e3a 100644
-> --- a/hw/vfio/display.c
-> +++ b/hw/vfio/display.c
-> @@ -124,6 +124,9 @@ static void vfio_display_dmabuf_update(void *opaque)
->  
->      primary = vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_PRIMARY);
->      if (primary == NULL) {
-> +        if (dpy->ramfb) {
-> +            ramfb_display_update(dpy->con, dpy->ramfb);
-> +        }
->          return;
->      }
->  
-> @@ -181,6 +184,8 @@ static int vfio_display_dmabuf_init(VFIOPCIDevice *vdev, Error **errp)
->      vdev->dpy->con = graphic_console_init(DEVICE(vdev), 0,
->                                            &vfio_display_dmabuf_ops,
->                                            vdev);
-> +    if (strcmp(object_get_typename(OBJECT(vdev)), "vfio-pci-ramfb") == 0)
-> +        vdev->dpy->ramfb = ramfb_setup(errp);
->      return 0;
->  }
->  
-> @@ -228,6 +233,9 @@ static void vfio_display_region_update(void *opaque)
->          return;
->      }
->      if (!plane.drm_format || !plane.size) {
-> +        if (dpy->ramfb) {
-> +            ramfb_display_update(dpy->con, dpy->ramfb);
-> +        }
->          return;
->      }
->      format = qemu_drm_format_to_pixman(plane.drm_format);
-> @@ -300,6 +308,8 @@ static int vfio_display_region_init(VFIOPCIDevice *vdev, Error **errp)
->      vdev->dpy->con = graphic_console_init(DEVICE(vdev), 0,
->                                            &vfio_display_region_ops,
->                                            vdev);
-> +    if (strcmp(object_get_typename(OBJECT(vdev)), "vfio-pci-ramfb") == 0)
-> +        vdev->dpy->ramfb = ramfb_setup(errp);
->      return 0;
->  }
->  
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 18c493b49e..6a2b42a595 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -3234,9 +3234,24 @@ static const TypeInfo vfio_pci_dev_info = {
->      },
->  };
->  
-> +static void vfio_pci_ramfb_dev_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->hotpluggable = false;
-> +}
-> +
-> +static const TypeInfo vfio_pci_ramfb_dev_info = {
-> +    .name = "vfio-pci-ramfb",
-> +    .parent = "vfio-pci",
-> +    .instance_size = sizeof(VFIOPCIDevice),
-> +    .class_init = vfio_pci_ramfb_dev_class_init,
-> +};
-> +
->  static void register_vfio_pci_dev_type(void)
->  {
->      type_register_static(&vfio_pci_dev_info);
-> +    type_register_static(&vfio_pci_ramfb_dev_info);
->  }
->  
->  type_init(register_vfio_pci_dev_type)
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index e3d8c2cdfc..4923674c71 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -322,6 +322,7 @@ sub build_types {
+>  				(?:${all}\b)
+>  			)
+>  			(?:\s+$Modifier|\s+const)*
+> +			(?:[KMGTPE]iB)
+>  		  }x;
+>  	$Type	= qr{
+>  			$NonptrType
+> 
+
+Well this patch doesn't work like expected...
+
+$ git diff --cached | \
+  scripts/checkpatch.pl --no-signoff --debug values=2 -
+ <E> <E> <_>WS(         )
+ <E> <E> <_>IDENT(size)
+ <E> <V> <_>WS( )
+ <E> <V> <_>ASSIGN(=)
+ <E> <N> <_>WS( )
+ <E> <N> <_>IDENT(8)
+ <E> <V> <_>WS( )
+ <E> <V> <_>OPV(*)
+ <E> <N> <_>WS( )
+ <E> <N> <_>DECLARE(MiB * ) <------------
+ <E> <T> <_>IDENT(sh)
+ <E> <V> <_>END(;)
+ <E> <E> <_>WS(
+)
+22 > .         size = 8 * MiB * sh;
+22 > EEEEEEEEEEVVVVVNNVVNNTTTTTTVVEE
+22 >  __________________B___________
+
+Which looks OK, but then (example):
+
+$ git diff --cached
+diff --git a/include/net/net.h b/include/net/net.h
+-void qemu_del_nic(NICState *nic);
++void qemu_del_nic(NICState *test);
+
+$ git diff --cached | \
+  scripts/checkpatch.pl --no-signoff --debug values=2 -
+
+ void qemu_del_nic(NICState *test);
+
+ <E> <E> <_>WS( )
+ <E> <E> <_>IDENT(void)
+ <E> <V> <_>WS( )
+ <E> <V> <_>FUNC(qemu_del_nic)
+ <E> <V> <V>PAREN('(')
+ <EV> <N> <_>IDENT(NICState)
+ <EV> <V> <_>WS( )
+ <EV> <V> <_>OPV(*)
+ <EV> <N> <_>IDENT(test)
+ <EV> <V> <_>PAREN(')') -> V
+ <E> <V> <_>END(;)
+ <E> <E> <_>WS(
+)
+10 > . void qemu_del_nic(NICState *test);
+10 > EEVVVVVVVVVVVVVVVVVNVVVVVVVVVNVVVVVEE
+10 >  ____________________________B_______
+ERROR: spaces required around that '*' (ctx:WxV)
+#10: FILE: include/net/net.h:136:
++void qemu_del_nic(NICState *test);
+                            ^
