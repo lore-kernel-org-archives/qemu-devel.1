@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fSvB0-0001P3-57
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:06:26 -0400
+	(envelope-from <zhaoshenglong@huawei.com>) id 1fSvLP-0001kO-TU
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:17:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fSvAy-0001f4-3h
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:06:22 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Tue, 12 Jun 2018 22:06:06 -0400
-Message-Id: <20180613020613.1343-4-jsnow@redhat.com>
-In-Reply-To: <20180613020613.1343-1-jsnow@redhat.com>
-References: <20180613020613.1343-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 03/10] qcow2/bitmap: cache bm_list
+	(envelope-from <zhaoshenglong@huawei.com>) id 1fSvLL-0006SS-3S
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:17:07 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2628 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zhaoshenglong@huawei.com>)
+	id 1fSvLK-0006Ld-LF
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:17:03 -0400
+Message-ID: <5B207E41.3080209@huawei.com>
+Date: Wed, 13 Jun 2018 10:15:29 +0800
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+MIME-Version: 1.0
+References: <1526462314-19720-1-git-send-email-zhaoshenglong@huawei.com>
+	<25094a6a-df4e-3dbb-ef69-e478edb46ff3@redhat.com>
+In-Reply-To: <25094a6a-df4e-3dbb-ef69-e478edb46ff3@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] kvm: Delete the slot only when
+ KVM_MEM_READONLY flag is changed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,243 +29,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, guangrong.xiao@gmail.com
+Cc: kvmarm@lists.cs.columbia.edu, shannon.zhaosl@gmail.com, kvm@vger.kernel.org, zhengxiang9@huawei.com
 
-We don't need to re-read this list every time, exactly. We can keep it cached
-and delete our copy when we flush to disk.
 
-Because we don't try to flush bitmaps on close if there's nothing to flush,
-add a new conditional to delete the state anyway for a clean exit.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- block/qcow2-bitmap.c | 74 ++++++++++++++++++++++++++++++++++------------------
- block/qcow2.c        |  2 ++
- block/qcow2.h        |  2 ++
- 3 files changed, 52 insertions(+), 26 deletions(-)
+On 2018/6/12 20:17, Paolo Bonzini wrote:
+> On 16/05/2018 11:18, Shannon Zhao wrote:
+>> According to KVM commit 75d61fbc, it needs to delete the slot before
+>> changing the KVM_MEM_READONLY flag. But QEMU commit 235e8982 only check
+>> whether KVM_MEM_READONLY flag is set instead of changing. It doesn't
+>> need to delete the slot if the KVM_MEM_READONLY flag is not changed.
+>>
+>> This fixes a issue that migrating a VM at the OVMF startup stage and
+>> VM is executing the codes in rom. Between the deleting and adding the
+>> slot in kvm_set_user_memory_region, there is a chance that guest access
+>> rom and trap to KVM, then KVM can't find the corresponding memslot.
+>> While KVM (on ARM) injects an abort to guest due to the broken hva, then
+>> guest will get stuck.
+>>
+>> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+> 
+> I'm a bit worried about old_flags not being set on all paths to
+> kvm_set_user_memory_region.  This would lead to extra
+> KVM_SET_USER_MEMORY_REGION calls.  It should not be a problem but
+> it is ugly.  Does something like the additional changes below work for you?
+> 
+I test below patch. It works for our testcase.
+Do I need to fold them into one and resend?
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 85c1b5afe3..5ae9b17928 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -636,6 +636,34 @@ fail:
-     return NULL;
- }
- 
-+static Qcow2BitmapList *get_bitmap_list(BlockDriverState *bs, Error **errp)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    Qcow2BitmapList *bm_list;
-+
-+    if (s->bitmap_list) {
-+        return (Qcow2BitmapList *)s->bitmap_list;
-+    }
-+
-+    if (s->nb_bitmaps) {
-+        bm_list = bitmap_list_load(bs, errp);
-+    } else {
-+        bm_list = bitmap_list_new();
-+    }
-+    s->bitmap_list = bm_list;
-+    return bm_list;
-+}
-+
-+static void del_bitmap_list(BlockDriverState *bs)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+
-+    if (s->bitmap_list) {
-+        bitmap_list_free(s->bitmap_list);
-+        s->bitmap_list = NULL;
-+    }
-+}
-+
- int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-                                   void **refcount_table,
-                                   int64_t *refcount_table_size)
-@@ -656,7 +684,7 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-         return ret;
-     }
- 
--    bm_list = bitmap_list_load(bs, NULL);
-+    bm_list = get_bitmap_list(bs, NULL);
-     if (bm_list == NULL) {
-         res->corruptions++;
-         return -EINVAL;
-@@ -706,8 +734,6 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-     }
- 
- out:
--    bitmap_list_free(bm_list);
--
-     return ret;
- }
- 
-@@ -944,7 +970,7 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-         return false;
-     }
- 
--    bm_list = bitmap_list_load(bs, errp);
-+    bm_list = get_bitmap_list(bs, errp);
-     if (bm_list == NULL) {
-         return false;
-     }
-@@ -978,8 +1004,6 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-         }
-     }
- 
--    bitmap_list_free(bm_list);
--
-     return needs_update;
- 
- fail:
-@@ -988,8 +1012,7 @@ fail:
-             bdrv_release_dirty_bitmap(bs, bm->dirty_bitmap);
-         }
-     }
--    bitmap_list_free(bm_list);
--
-+    del_bitmap_list(bs);
-     return false;
- }
- 
-@@ -1016,7 +1039,7 @@ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-         return -EINVAL;
-     }
- 
--    bm_list = bitmap_list_load(bs, errp);
-+    bm_list = get_bitmap_list(bs, errp);
-     if (bm_list == NULL) {
-         return -EINVAL;
-     }
-@@ -1056,7 +1079,6 @@ int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
- 
- out:
-     g_slist_free(ro_dirty_bitmaps);
--    bitmap_list_free(bm_list);
- 
-     return ret;
- }
-@@ -1265,7 +1287,7 @@ void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
-         return;
-     }
- 
--    bm_list = bitmap_list_load(bs, errp);
-+    bm_list = get_bitmap_list(bs, errp);
-     if (bm_list == NULL) {
-         return;
-     }
-@@ -1287,7 +1309,11 @@ void qcow2_remove_persistent_dirty_bitmap(BlockDriverState *bs,
- 
- fail:
-     bitmap_free(bm);
--    bitmap_list_free(bm_list);
-+}
-+
-+void qcow2_persistent_dirty_bitmaps_cache_destroy(BlockDriverState *bs)
-+{
-+    del_bitmap_list(bs);
- }
- 
- void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-@@ -1304,23 +1330,19 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
- 
-     if (!bdrv_has_changed_persistent_bitmaps(bs)) {
-         /* nothing to do */
--        return;
-+        goto out;
-     }
- 
-     if (!can_write(bs)) {
-         error_setg(errp, "No write access");
--        return;
-+        goto out;
-     }
- 
-     QSIMPLEQ_INIT(&drop_tables);
- 
--    if (s->nb_bitmaps == 0) {
--        bm_list = bitmap_list_new();
--    } else {
--        bm_list = bitmap_list_load(bs, errp);
--        if (bm_list == NULL) {
--            return;
--        }
-+    bm_list = get_bitmap_list(bs, errp);
-+    if (bm_list == NULL) {
-+        goto out;
-     }
- 
-     /* check constraints and names */
-@@ -1400,8 +1422,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp)
-         g_free(tb);
-     }
- 
--    bitmap_list_free(bm_list);
--    return;
-+    goto out;
- 
- fail:
-     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-@@ -1416,7 +1437,9 @@ fail:
-         g_free(tb);
-     }
- 
--    bitmap_list_free(bm_list);
-+ out:
-+    del_bitmap_list(bs);
-+    return;
- }
- 
- int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp)
-@@ -1481,13 +1504,12 @@ bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
-         goto fail;
-     }
- 
--    bm_list = bitmap_list_load(bs, errp);
-+    bm_list = get_bitmap_list(bs, errp);
-     if (bm_list == NULL) {
-         goto fail;
-     }
- 
-     found = find_bitmap_by_name(bm_list, name);
--    bitmap_list_free(bm_list);
-     if (found) {
-         error_setg(errp, "Bitmap with the same name is already stored");
-         goto fail;
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 6fa5e1d71a..dbd334b150 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2148,6 +2148,8 @@ static void qcow2_close(BlockDriverState *bs)
- 
-     if (!(s->flags & BDRV_O_INACTIVE)) {
-         qcow2_inactivate(bs);
-+    } else {
-+        qcow2_persistent_dirty_bitmaps_cache_destroy(bs);
-     }
- 
-     cache_clean_timer_del(bs);
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 01b5250415..29b637a0ee 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -295,6 +295,7 @@ typedef struct BDRVQcow2State {
-     uint64_t bitmap_directory_size;
-     uint64_t bitmap_directory_offset;
-     bool dirty_bitmaps_loaded;
-+    void *bitmap_list;
- 
-     int flags;
-     int qcow_version;
-@@ -671,6 +672,7 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- int qcow2_reopen_bitmaps_rw_hint(BlockDriverState *bs, bool *header_updated,
-                                  Error **errp);
- int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
-+void qcow2_persistent_dirty_bitmaps_cache_destroy(BlockDriverState *bs);
- void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs, Error **errp);
- int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
- bool qcow2_can_store_new_dirty_bitmap(BlockDriverState *bs,
+Thanks,
 -- 
-2.14.3
+Shannon
+
+> Thanks,
+> 
+> Paolo
+> 
+> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index b04f193a76..e318bcfb78 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -257,7 +257,7 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram,
+>      return 0;
+>  }
+>  
+> -static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
+> +static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot, bool new)
+>  {
+>      KVMState *s = kvm_state;
+>      struct kvm_userspace_memory_region mem;
+> @@ -268,7 +268,7 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
+>      mem.userspace_addr = (unsigned long)slot->ram;
+>      mem.flags = slot->flags;
+>  
+> -    if (slot->memory_size && (mem.flags ^ slot->old_flags) & KVM_MEM_READONLY) {
+> +    if (slot->memory_size && !new && (mem.flags ^ slot->old_flags) & KVM_MEM_READONLY) {
+>          /* Set the slot size to 0 before setting the slot to the desired
+>           * value. This is needed based on KVM commit 75d61fbc. */
+>          mem.memory_size = 0;
+> @@ -276,6 +276,7 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
+>      }
+>      mem.memory_size = slot->memory_size;
+>      ret = kvm_vm_ioctl(s, KVM_SET_USER_MEMORY_REGION, &mem);
+> +    slot->old_flags = mem.flags;
+>      trace_kvm_set_user_memory(mem.slot, mem.flags, mem.guest_phys_addr,
+>                                mem.memory_size, mem.userspace_addr, ret);
+>      return ret;
+> @@ -394,7 +395,6 @@ static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
+>  {
+>      int old_flags;
+>  
+> -    mem->old_flags = mem->flags;
+>      mem->flags = kvm_mem_flags(mr);
+>  
+>      /* If nothing changed effectively, no need to issue ioctl */
+> @@ -402,7 +402,7 @@ static int kvm_slot_update_flags(KVMMemoryListener *kml, KVMSlot *mem,
+>          return 0;
+>      }
+>  
+> -    return kvm_set_user_memory_region(kml, mem);
+> +    return kvm_set_user_memory_region(kml, mem, false);
+>  }
+>  
+>  static int kvm_section_update_flags(KVMMemoryListener *kml,
+> @@ -756,7 +756,8 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+>  
+>          /* unregister the slot */
+>          mem->memory_size = 0;
+> -        err = kvm_set_user_memory_region(kml, mem);
+> +        mem->flags = 0;
+> +        err = kvm_set_user_memory_region(kml, mem, false);
+>          if (err) {
+>              fprintf(stderr, "%s: error unregistering slot: %s\n",
+>                      __func__, strerror(-err));
+> @@ -772,7 +773,7 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+>      mem->ram = ram;
+>      mem->flags = kvm_mem_flags(mr);
+>  
+> -    err = kvm_set_user_memory_region(kml, mem);
+> +    err = kvm_set_user_memory_region(kml, mem, true);
+>      if (err) {
+>          fprintf(stderr, "%s: error registering slot: %s\n", __func__,
+>                  strerror(-err));
+> 
+> .
+> 
