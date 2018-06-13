@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fT5Jx-0002kr-Dm
+	(envelope-from <alex.bennee@linaro.org>) id 1fT5Jx-0002kx-E1
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:56:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fT5Jt-0005FA-BP
+	(envelope-from <alex.bennee@linaro.org>) id 1fT5Jw-0005KJ-1z
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:56:17 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:38727)
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:55264)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fT5Jt-0005DV-1e
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:56:13 -0400
-Received: by mail-wm0-x244.google.com with SMTP id 69-v6so5208138wmf.3
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 05:56:12 -0700 (PDT)
+	id 1fT5Jv-0005Ir-P6
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:56:15 -0400
+Received: by mail-wm0-x234.google.com with SMTP id o13-v6so4526573wmf.4
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 05:56:15 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 13 Jun 2018 13:55:49 +0100
-Message-Id: <20180613125601.14371-11-alex.bennee@linaro.org>
+Date: Wed, 13 Jun 2018 13:55:56 +0100
+Message-Id: <20180613125601.14371-18-alex.bennee@linaro.org>
 In-Reply-To: <20180613125601.14371-1-alex.bennee@linaro.org>
 References: <20180613125601.14371-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH v3 10/22] risugen: add reg_plus_imm_pl and
- reg_plus_imm_vl address helpers
+Subject: [Qemu-devel] [RISU PATCH v3 17/22] risu_reginfo: introduce
+ reginfo_size()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,156 +33,160 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+In preparation for conditionally supporting SVE we need to be able to
+have different sized reginfos. This introduces reginfo_size() to
+abstract the size away to the code the actually knows. For aarch64 we
+also use this while initialising the block.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- risugen_arm.pm | 126 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 126 insertions(+)
+ reginfo.c              |  6 +++---
+ risu.h                 |  3 +++
+ risu_reginfo_aarch64.c | 11 ++++++++++-
+ risu_reginfo_aarch64.h |  1 +
+ risu_reginfo_arm.c     |  5 +++++
+ risu_reginfo_m68k.c    |  5 +++++
+ risu_reginfo_ppc64.c   |  5 +++++
+ 7 files changed, 32 insertions(+), 4 deletions(-)
 
-diff --git a/risugen_arm.pm b/risugen_arm.pm
-index 485e94e..696bf5f 100644
---- a/risugen_arm.pm
-+++ b/risugen_arm.pm
-@@ -306,6 +306,52 @@ sub write_mov_ri($$)
+diff --git a/reginfo.c b/reginfo.c
+index 1f55d06..dd42ae2 100644
+--- a/reginfo.c
++++ b/reginfo.c
+@@ -39,7 +39,7 @@ int send_register_info(write_fn write_fn, void *uc)
+ 
+     switch (op) {
+     case OP_TESTEND:
+-        write_fn(&ri, sizeof(ri));
++        write_fn(&ri, reginfo_size());
+         /* if we are tracing write_fn will return 0 unlike a remote
+            end, hence we force return of 1 here */
+         return 1;
+@@ -58,7 +58,7 @@ int send_register_info(write_fn write_fn, void *uc)
+         /* Do a simple register compare on (a) explicit request
+          * (b) end of test (c) a non-risuop UNDEF
+          */
+-        return write_fn(&ri, sizeof(ri));
++        return write_fn(&ri, reginfo_size());
      }
+     return 0;
+ }
+@@ -101,7 +101,7 @@ int recv_and_compare_register_info(read_fn read_fn,
+         /* Do a simple register compare on (a) explicit request
+          * (b) end of test (c) a non-risuop UNDEF
+          */
+-        if (read_fn(&apprentice_ri, sizeof(apprentice_ri))) {
++        if (read_fn(&apprentice_ri, reginfo_size())) {
+             packet_mismatch = 1;
+             resp = 2;
+         } else if (!reginfo_is_eq(&master_ri, &apprentice_ri)) {
+diff --git a/risu.h b/risu.h
+index 48c50d9..8d2d646 100644
+--- a/risu.h
++++ b/risu.h
+@@ -133,4 +133,7 @@ int reginfo_dump(struct reginfo *ri, FILE * f);
+ /* reginfo_dump_mismatch: print mismatch details to a stream, ret nonzero=ok */
+ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f);
+ 
++/* return size of reginfo */
++const int reginfo_size(void);
++
+ #endif /* RISU_H */
+diff --git a/risu_reginfo_aarch64.c b/risu_reginfo_aarch64.c
+index 62a5599..5da9e39 100644
+--- a/risu_reginfo_aarch64.c
++++ b/risu_reginfo_aarch64.c
+@@ -15,6 +15,8 @@
+ #include <string.h>
+ #include <signal.h> /* for FPSIMD_MAGIC */
+ #include <stdlib.h>
++#include <stddef.h>
++#include <assert.h>
+ 
+ #include "risu.h"
+ #include "risu_reginfo_aarch64.h"
+@@ -27,6 +29,13 @@ void process_arch_opt(int opt, const char *arg)
+     abort();
  }
  
-+sub write_addpl_rri($$$)
++const int reginfo_size(void)
 +{
-+    my ($rd, $rn, $imm) = @_;
-+    die "write_addpl: invalid operation for this arch.\n" if (!$is_aarch64);
-+
-+    insn32(0x04605000 | ($rn << 16) | (($imm & 0x3f) << 5) | $rd);
++    const int size = offsetof(struct reginfo, simd.end);
++    assert(sizeof(struct reginfo)==size);
++    return size;
 +}
 +
-+sub write_addvl_rri($$$)
-+{
-+    my ($rd, $rn, $imm) = @_;
-+    die "write_addvl: invalid operation for this arch.\n" if (!$is_aarch64);
-+
-+    insn32(0x04205000 | ($rn << 16) | (($imm & 0x3f) << 5) | $rd);
-+}
-+
-+sub write_rdvl_ri($$)
-+{
-+    my ($rd, $imm) = @_;
-+    die "write_rdvl: invalid operation for this arch.\n" if (!$is_aarch64);
-+
-+    insn32(0x04bf5000 | (($imm & 0x3f) << 5) | $rd);
-+}
-+
-+sub write_madd_rrrr($$$$)
-+{
-+    my ($rd, $rn, $rm, $ra) = @_;
-+    die "write_madd: invalid operation for this arch.\n" if (!$is_aarch64);
-+
-+    insn32(0x9b000000 | ($rm << 16) | ($ra << 10) | ($rn << 5) | $rd);
-+}
-+
-+sub write_msub_rrrr($$$$)
-+{
-+    my ($rd, $rn, $rm, $ra) = @_;
-+    die "write_msub: invalid operation for this arch.\n" if (!$is_aarch64);
-+
-+    insn32(0x9b008000 | ($rm << 16) | ($ra << 10) | ($rn << 5) | $rd);
-+}
-+
-+sub write_mul_rrr($$$)
-+{
-+    my ($rd, $rn, $rm) = @_;
-+    write_madd_rrrr($rd, $rn, $rm, 31);
-+}
-+
- # write random fp value of passed precision (1=single, 2=double, 4=quad)
- sub write_random_fpreg_var($)
+ /* reginfo_init: initialize with a ucontext */
+ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
  {
-@@ -767,6 +813,86 @@ sub reg_plus_imm($$@)
-     return $base;
+@@ -71,7 +80,7 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+ /* reginfo_is_eq: compare the reginfo structs, returns nonzero if equal */
+ int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2)
+ {
+-    return memcmp(r1, r2, sizeof(*r1)) == 0;
++    return memcmp(r1, r2, reginfo_size()) == 0;
  }
  
-+sub reg_plus_imm_pl($$@)
+ /* reginfo_dump: print state to a stream, returns nonzero on success */
+diff --git a/risu_reginfo_aarch64.h b/risu_reginfo_aarch64.h
+index a1c708b..ef97622 100644
+--- a/risu_reginfo_aarch64.h
++++ b/risu_reginfo_aarch64.h
+@@ -15,6 +15,7 @@
+ 
+ struct simd_reginfo {
+     __uint128_t vregs[32];
++    char end[0];
+ };
+ 
+ struct reginfo {
+diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
+index 12ad0ef..3662f12 100644
+--- a/risu_reginfo_arm.c
++++ b/risu_reginfo_arm.c
+@@ -36,6 +36,11 @@ void process_arch_opt(int opt, const char *arg)
+     abort();
+ }
+ 
++const int reginfo_size(void)
 +{
-+    # Handle reg + immediate addressing mode
-+    my ($base, $imm, @trashed) = @_;
-+    if ($imm == 0) {
-+        return reg($base, @trashed);
-+    }
-+    write_get_offset();
-+
-+    # Now r0 is the address we want to do the access to,
-+    # so set the basereg by doing the inverse of the
-+    # addressing mode calculation, ie base = r0 - imm
-+    #
-+    # Note that addpl has a 6-bit immediate, but ldr has a 9-bit
-+    # immediate, so we need to be able to support larger immediates.
-+
-+    if (-$imm >= -32 && -$imm <= 31) {
-+        write_addpl_rri($base, 0, -$imm);
-+    } else {
-+        # We borrow r1 and r2 as a temporaries (not a problem
-+        # as long as we don't leave anything in a register
-+        # which depends on the location of the memory block)
-+        write_mov_ri(1, 0);
-+        write_mov_ri(2, $imm);
-+        write_addpl_rri(1, 1, 1);
-+        write_msub_rrrr($base, 1, 2, 0);
-+    }
-+    if (grep $_ == $base, @trashed) {
-+        return -1;
-+    }
-+    return $base;
++    return sizeof(struct reginfo);
 +}
 +
-+sub reg_plus_imm_vl($$@)
-+{
-+    # The usual address formulation is
-+    #   elements = VL DIV esize
-+    #   mbytes = msize DIV 8
-+    #   addr = base + imm * elements * mbytes
-+    # Here we compute
-+    #   scale = log2(esize / msize)
-+    #   base + (imm * VL) >> scale
-+    my ($base, $imm, $scale, @trashed) = @_;
-+    if ($imm == 0) {
-+        return reg($base, @trashed);
-+    }
-+    write_get_offset();
-+
-+    # Now r0 is the address we want to do the access to,
-+    # so set the basereg by doing the inverse of the
-+    # addressing mode calculation, ie base = r0 - imm
-+    #
-+    # Note that rdvl/addvl have a 6-bit immediate, but ldr has a 9-bit
-+    # immediate, so we need to be able to support larger immediates.
-+
-+    use integer;
-+    my $mul = 1 << $scale;
-+    my $imm_div = $imm / $mul;
-+
-+    if ($imm == $imm_div * $mul && -$imm_div >= -32 && -$imm_div <= 31) {
-+        write_addvl_rri($base, 0, -$imm_div);
-+    } elsif ($imm >= -32 && $imm <= 31) {
-+        write_rdvl_ri(1, $imm);
-+        write_sub_rrrs($base, 0, 1, $SHIFT_ASR, $scale);
-+    } else {
-+        write_rdvl_ri(1, 1);
-+        write_mov_ri(2, $imm);
-+        if ($scale == 0) {
-+            write_msub_rrrr($base, 1, 2, 0);
-+        } else {
-+            write_mul_rrr(1, 1, 2);
-+            write_sub_rrrs($base, 0, 1, $SHIFT_ASR, $scale);
-+        }
-+    }
-+    if (grep $_ == $base, @trashed) {
-+        return -1;
-+    }
-+    return $base;
-+}
-+
- sub reg_minus_imm($$@)
+ static void reginfo_init_vfp(struct reginfo *ri, ucontext_t *uc)
  {
-     my ($base, $imm, @trashed) = @_;
+     /* Read VFP registers. These live in uc->uc_regspace, which is
+diff --git a/risu_reginfo_m68k.c b/risu_reginfo_m68k.c
+index 7a1c5a9..32b28c8 100644
+--- a/risu_reginfo_m68k.c
++++ b/risu_reginfo_m68k.c
+@@ -23,6 +23,11 @@ void process_arch_opt(int opt, const char *arg)
+     abort();
+ }
+ 
++const int reginfo_size(void)
++{
++    return sizeof(struct reginfo);
++}
++
+ /* reginfo_init: initialize with a ucontext */
+ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+ {
+diff --git a/risu_reginfo_ppc64.c b/risu_reginfo_ppc64.c
+index 4b70460..f9d2f0d 100644
+--- a/risu_reginfo_ppc64.c
++++ b/risu_reginfo_ppc64.c
+@@ -31,6 +31,11 @@ void process_arch_opt(int opt, const char *arg)
+     abort();
+ }
+ 
++const int reginfo_size(void)
++{
++    return sizeof(struct reginfo);
++}
++
+ /* reginfo_init: initialize with a ucontext */
+ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+ {
 -- 
 2.17.1
