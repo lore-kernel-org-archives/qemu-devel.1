@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fTAM8-0003HM-VM
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:18:56 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fTAMB-0003Ib-Tl
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:19:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fTAM7-0005J6-3p
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:18:52 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fTAM9-0005Rs-DS
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:18:54 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 13 Jun 2018 20:18:14 +0200
-Message-Id: <20180613181823.13618-6-mreitz@redhat.com>
+Date: Wed, 13 Jun 2018 20:18:15 +0200
+Message-Id: <20180613181823.13618-7-mreitz@redhat.com>
 In-Reply-To: <20180613181823.13618-1-mreitz@redhat.com>
 References: <20180613181823.13618-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 05/14] block/mirror: Use source as a
- BdrvChild
+Subject: [Qemu-devel] [PATCH v5 06/14] block: Generalize
+ should_update_child() rule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,92 +23,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-With this, the mirror_top_bs is no longer just a technically required
-node in the BDS graph but actually represents the block job operation.
+Currently, bdrv_replace_node() refuses to create loops from one BDS to
+itself if the BDS to be replaced is the backing node of the BDS to
+replace it: Say there is a node A and a node B.  Replacing B by A means
+making all references to B point to A.  If B is a child of A (i.e. A has
+a reference to B), that would mean we would have to make this reference
+point to A itself -- so we'd create a loop.
 
-Also, drop MirrorBlockJob.source, as we can reach it through
-mirror_top_bs->backing.
+bdrv_replace_node() (through should_update_child()) refuses to do so if
+B is the backing node of A.  There is no reason why we should create
+loops if B is not the backing node of A, though.  The BDS graph should
+never contain loops, so we should always refuse to create them.
+
+If B is a child of A and B is to be replaced by A, we should simply
+leave B in place there because it is the most sensible choice.
+
+A more specific argument would be: Putting filter drivers into the BDS
+graph is basically the same as appending an overlay to a backing chain.
+But the main child BDS of a filter driver is not "backing" but "file",
+so restricting the no-loop rule to backing nodes would fail here.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/mirror.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+ block.c | 44 ++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 34 insertions(+), 10 deletions(-)
 
-diff --git a/block/mirror.c b/block/mirror.c
-index 7c1b8ef5b6..fa94fd9d17 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -41,7 +41,6 @@ typedef struct MirrorBlockJob {
-     BlockJob common;
-     BlockBackend *target;
-     BlockDriverState *mirror_top_bs;
--    BlockDriverState *source;
-     BlockDriverState *base;
+diff --git a/block.c b/block.c
+index 50887087f3..df6dce6a73 100644
+--- a/block.c
++++ b/block.c
+@@ -3394,16 +3394,39 @@ static bool should_update_child(BdrvChild *c, BlockDriverState *to)
+         return false;
+     }
  
-     /* The name of the graph node to replace */
-@@ -299,7 +298,6 @@ static void coroutine_fn mirror_co_read(void *opaque)
- {
-     MirrorOp *op = opaque;
-     MirrorBlockJob *s = op->s;
--    BlockBackend *source = s->common.blk;
-     int nb_chunks;
-     uint64_t ret;
-     uint64_t max_bytes;
-@@ -349,7 +347,8 @@ static void coroutine_fn mirror_co_read(void *opaque)
-     s->bytes_in_flight += op->bytes;
-     trace_mirror_one_iteration(s, op->offset, op->bytes);
+-    if (c->role == &child_backing) {
+-        /* If @from is a backing file of @to, ignore the child to avoid
+-         * creating a loop. We only want to change the pointer of other
+-         * parents. */
+-        QLIST_FOREACH(to_c, &to->children, next) {
+-            if (to_c == c) {
+-                break;
+-            }
+-        }
+-        if (to_c) {
++    /* If the child @c belongs to the BDS @to, replacing the current
++     * c->bs by @to would mean to create a loop.
++     *
++     * Such a case occurs when appending a BDS to a backing chain.
++     * For instance, imagine the following chain:
++     *
++     *   guest device -> node A -> further backing chain...
++     *
++     * Now we create a new BDS B which we want to put on top of this
++     * chain, so we first attach A as its backing node:
++     *
++     *                   node B
++     *                     |
++     *                     v
++     *   guest device -> node A -> further backing chain...
++     *
++     * Finally we want to replace A by B.  When doing that, we want to
++     * replace all pointers to A by pointers to B -- except for the
++     * pointer from B because (1) that would create a loop, and (2)
++     * that pointer should simply stay intact:
++     *
++     *   guest device -> node B
++     *                     |
++     *                     v
++     *                   node A -> further backing chain...
++     *
++     * In general, when replacing a node A (c->bs) by a node B (@to),
++     * if A is a child of B, that means we cannot replace A by B there
++     * because that would create a loop.  Silently detaching A from B
++     * is also not really an option.  So overall just leaving A in
++     * place there is the most sensible choice. */
++    QLIST_FOREACH(to_c, &to->children, next) {
++        if (to_c == c) {
+             return false;
+         }
+     }
+@@ -3429,6 +3452,7 @@ void bdrv_replace_node(BlockDriverState *from, BlockDriverState *to,
  
--    ret = blk_co_preadv(source, op->offset, op->bytes, &op->qiov, 0);
-+    ret = bdrv_co_preadv(s->mirror_top_bs->backing, op->offset, op->bytes,
-+                         &op->qiov, 0);
-     mirror_read_complete(op, ret);
- }
- 
-@@ -427,7 +426,7 @@ static unsigned mirror_perform(MirrorBlockJob *s, int64_t offset,
- 
- static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
- {
--    BlockDriverState *source = s->source;
-+    BlockDriverState *source = s->mirror_top_bs->backing->bs;
-     MirrorOp *pseudo_op;
-     int64_t offset;
-     uint64_t delay_ns = 0, ret = 0;
-@@ -601,7 +600,7 @@ static void mirror_exit(Job *job, void *opaque)
-     BlockJob *bjob = &s->common;
-     MirrorExitData *data = opaque;
-     AioContext *replace_aio_context = NULL;
--    BlockDriverState *src = s->source;
-+    BlockDriverState *src = s->mirror_top_bs->backing->bs;
-     BlockDriverState *target_bs = blk_bs(s->target);
-     BlockDriverState *mirror_top_bs = s->mirror_top_bs;
-     Error *local_err = NULL;
-@@ -716,7 +715,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
- {
-     int64_t offset;
-     BlockDriverState *base = s->base;
--    BlockDriverState *bs = s->source;
-+    BlockDriverState *bs = s->mirror_top_bs->backing->bs;
-     BlockDriverState *target_bs = blk_bs(s->target);
-     int ret;
-     int64_t count;
-@@ -798,7 +797,7 @@ static void coroutine_fn mirror_run(void *opaque)
- {
-     MirrorBlockJob *s = opaque;
-     MirrorExitData *data;
--    BlockDriverState *bs = s->source;
-+    BlockDriverState *bs = s->mirror_top_bs->backing->bs;
-     BlockDriverState *target_bs = blk_bs(s->target);
-     bool need_drain = true;
-     int64_t length;
-@@ -1285,7 +1284,6 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-     /* The block job now has a reference to this node */
-     bdrv_unref(mirror_top_bs);
- 
--    s->source = bs;
-     s->mirror_top_bs = mirror_top_bs;
- 
-     /* No resize for the target either; while the mirror is still running, a
+     /* Put all parents into @list and calculate their cumulative permissions */
+     QLIST_FOREACH_SAFE(c, &from->parents, next_parent, next) {
++        assert(c->bs == from);
+         if (!should_update_child(c, to)) {
+             continue;
+         }
 -- 
 2.17.1
