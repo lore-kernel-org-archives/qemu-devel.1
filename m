@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59358)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fT9pF-0003LC-HW
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fT9pG-0003LG-2k
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:44:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fT9pC-000718-RT
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:44:53 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fT9pF-000787-4y
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:44:54 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Wed, 13 Jun 2018 20:44:19 +0300
-Message-Id: <1528911866-37489-2-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Wed, 13 Jun 2018 20:44:23 +0300
+Message-Id: <1528911866-37489-6-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1528911866-37489-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1528911866-37489-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 1/8] qapi: group BlockDeviceStats fields
+Subject: [Qemu-devel] [PATCH v3 5/8] scsi: move unmap error checking to the
+ complete callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,69 +25,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, eblake@redhat.com, berto@igalia.com, den@virtuozzo.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-Make the stat fields definition slightly more readable.
-Also reorder total_time_ns stats read-write-flush as done elsewhere.
-Cosmetic change only.
+This will help to account the operation in the following commit.
+
+The difference is that we don't call scsi_disk_req_check_error() before
+the 1st discard iteration anymore. That function also checks if
+the request is cancelled, however it shouldn't get canceled until it
+yields in blk_aio() functions anyway.
+Same approach is already used for emulate_write_same.
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- qapi/block-core.json | 34 +++++++++++++++++++++++-----------
- 1 file changed, 23 insertions(+), 11 deletions(-)
+ hw/scsi/scsi-disk.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index b3e94d8..ee75aef 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -784,12 +784,12 @@
- # @flush_operations: The number of cache flush operations performed by the
- #                    device (since 0.15.0)
- #
--# @flush_total_time_ns: Total time spend on cache flushes in nano-seconds
--#                       (since 0.15.0).
-+# @rd_total_time_ns: Total time spent on reads in nanoseconds (since 0.15.0).
- #
--# @wr_total_time_ns: Total time spend on writes in nano-seconds (since 0.15.0).
-+# @wr_total_time_ns: Total time spent on writes in nanoseconds (since 0.15.0).
- #
--# @rd_total_time_ns: Total_time_spend on reads in nano-seconds (since 0.15.0).
-+# @flush_total_time_ns: Total time spent on cache flushes in nanoseconds
-+#                       (since 0.15.0).
- #
- # @wr_highest_offset: The offset after the greatest byte written to the
- #                     device.  The intended use of this information is for
-@@ -842,14 +842,26 @@
- # Since: 0.14.0
- ##
- { 'struct': 'BlockDeviceStats',
--  'data': {'rd_bytes': 'int', 'wr_bytes': 'int', 'rd_operations': 'int',
--           'wr_operations': 'int', 'flush_operations': 'int',
--           'flush_total_time_ns': 'int', 'wr_total_time_ns': 'int',
--           'rd_total_time_ns': 'int', 'wr_highest_offset': 'int',
--           'rd_merged': 'int', 'wr_merged': 'int', '*idle_time_ns': 'int',
-+  'data': {'rd_bytes': 'int', 'wr_bytes': 'int',
-+
-+           'rd_operations': 'int', 'wr_operations': 'int',
-+           'flush_operations': 'int',
-+
-+           'rd_total_time_ns': 'int', 'wr_total_time_ns': 'int',
-+           'flush_total_time_ns': 'int',
-+
-+           'wr_highest_offset': 'int',
-+
-+           'rd_merged': 'int', 'wr_merged': 'int',
-+
-+           '*idle_time_ns': 'int',
-+
-            'failed_rd_operations': 'int', 'failed_wr_operations': 'int',
--           'failed_flush_operations': 'int', 'invalid_rd_operations': 'int',
--           'invalid_wr_operations': 'int', 'invalid_flush_operations': 'int',
-+           'failed_flush_operations': 'int',
-+
-+           'invalid_rd_operations': 'int', 'invalid_wr_operations': 'int',
-+           'invalid_flush_operations': 'int',
-+
-            'account_invalid': 'bool', 'account_failed': 'bool',
-            'timed_stats': ['BlockDeviceTimedStats'],
-            '*x_rd_latency_histogram': 'BlockLatencyHistogramInfo',
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index b08ce8a..0b68a8d 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -1644,9 +1644,6 @@ static void scsi_unmap_complete_noio(UnmapCBData *data, int ret)
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
+ 
+     assert(r->req.aiocb == NULL);
+-    if (scsi_disk_req_check_error(r, ret, false)) {
+-        goto done;
+-    }
+ 
+     if (data->count > 0) {
+         r->sector = ldq_be_p(&data->inbuf[0]);
+@@ -1682,7 +1679,12 @@ static void scsi_unmap_complete(void *opaque, int ret)
+     r->req.aiocb = NULL;
+ 
+     aio_context_acquire(blk_get_aio_context(s->qdev.conf.blk));
+-    scsi_unmap_complete_noio(data, ret);
++    if (scsi_disk_req_check_error(r, ret, false)) {
++        scsi_req_unref(&r->req);
++        g_free(data);
++    } else {
++        scsi_unmap_complete_noio(data, ret);
++    }
+     aio_context_release(blk_get_aio_context(s->qdev.conf.blk));
+ }
+ 
 -- 
 2.7.4
