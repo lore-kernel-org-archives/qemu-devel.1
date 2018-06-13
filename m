@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fT97Q-0008Dl-EJ
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:59:37 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fT99V-0000jo-SE
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:01:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fT97M-00064g-Hb
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:59:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33712)
+	(envelope-from <pbonzini@redhat.com>) id 1fT99R-0003B1-Uo
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:01:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56332 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fT97M-00062p-8s
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:59:32 -0400
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.phx2.redhat.com
-	[10.5.11.25])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 54D8E30015CA
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 16:59:31 +0000 (UTC)
-Date: Wed, 13 Jun 2018 13:59:28 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180613165928.GZ7451@localhost.localdomain>
-References: <20180608130846.22234-1-dgilbert@redhat.com>
-	<20180608130846.22234-6-dgilbert@redhat.com>
-	<87y3flilan.fsf@dusky.pond.sub.org> <20180611174958.GP2661@work-vm>
-	<877en4y07a.fsf@dusky.pond.sub.org> <20180612084914.GA2512@work-vm>
-	<20180613134745.GQ7451@localhost.localdomain>
-	<20180613135337.GV19901@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fT99R-00039Q-QE
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:01:41 -0400
+References: <20180611203712.12086-1-ehabkost@redhat.com>
+	<a8426bf6-7531-6306-d1c6-bb4c6c2099cd@redhat.com>
+	<20180612150153.GK7451@localhost.localdomain>
+	<6c9b3744-7323-cd1f-7b07-2b77df7ae80d@redhat.com>
+	<20180612182541.GN7451@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b93cd6e5-bb2e-b932-bc68-da5c314924a2@redhat.com>
+Date: Wed, 13 Jun 2018 19:01:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180613135337.GV19901@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] hmp: Add info commands for preconfig
+In-Reply-To: <20180612182541.GN7451@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] i386: Remove ospke CPUID flag name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,64 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, imammedo@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On Wed, Jun 13, 2018 at 02:53:37PM +0100, Daniel P. Berrang=E9 wrote:
-> On Wed, Jun 13, 2018 at 10:47:45AM -0300, Eduardo Habkost wrote:
-> > On Tue, Jun 12, 2018 at 09:49:14AM +0100, Dr. David Alan Gilbert wrot=
-e:
-> > [...]
-> > > > > People have been trying to add qom-get etc for quite a while (I=
- tried a
-> > > > > couple of years ago); it gets stuck in type display issues.  I'=
-ve not
-> > > > > directly seen a need for those other variants, but qom-get is s=
-omething
-> > > > > I'd love to have, still that's a job for another patch.
-> > > >=20
-> > > > Yes.
-> > > >=20
-> > > > > 'info qom-tree' is very very useful when debugging qemu to see =
-what the
-> > > > > basic state we're building is; it's primarily for debugging.
-> > > >=20
-> > > > I'm not at all opposed to enabling qom-tree, but I want its QMP b=
-uilding
-> > > > blocks enabled as well then.  I think enabling their HMP buddies =
-as well
-> > > > would only make sense.
-> > >=20
-> > > Hmm; OK, enabling qom-list, qom-get, qom-set, qom-list-types,
-> > > qom-list-properties for qmp.
-> > > qom-list and qom-set enabled in HMP.
-> >=20
-> > I would prefer to avoid enabling qom-set in preconfig mode unless
-> > we have a good reason for that.  I don't trust all existing
-> > property setters to not crash or break if the machine is not
-> > initialized yet.
->=20
-> If we're in early startup, the impact of a crash is pretty minor - QEMU
-> will simply exit, which is not significantly differnt from if a setter
-> handled it "correctly" by setting an Error **errp. A mgmt app that uses
-> this and finds a setter which crashes will detect the problem pretty
-> quickly & report bugs.
->=20
-> QEMU is complex enough that we're unlikely to ever find broken setters
-> by code inspection. So if we don't allow it in preconfig mode, then
-> I doubt we'll ever find & fix the problems.
->=20
-> So, IMHO, we should allow qom-set and just fix problems as they come
-> to light, as we would for any other part of QEMU which has plenty of
-> scope for crashers in rarely tested codepaths.
+On 12/06/2018 20:25, Eduardo Habkost wrote:
+> On Tue, Jun 12, 2018 at 05:12:58PM +0200, Paolo Bonzini wrote:
+>> On 12/06/2018 17:01, Eduardo Habkost wrote:
+>>>>>
+>>>>> Remove OSPKE from the feature name array so users don't try to
+>>>>> configure it manually.
+>>>>>
+>>>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>>> Yes, it's the same as OSXSAVE.  Thanks!
+>>> CR4_OSXSAVE_MASK is automatically enabled on user-mode QEMU,
+>>> though.
+>>>
+>>> My question is if it would make any sense to enable CR4_PKE_MASK
+>>> too.
+>>
+>> If you mean OSPKE, then yes---if PKU is available.  Likewise, OSXSAVE
+>> should only be enabled if XSAVE is available.
+> 
+> Yeah, I mean enabling it only if PKU is available, like we
+> already do with OSXAVE/XSAVE.
+> 
+> But we don't do it today, so enabling it automatically in
+> CONFIG_USER_ONLY would be a new feature.  Would it be useful for
+> anything, though?
+> 
+> I'm asking that to find out if somebody could be already using
+> "-cpu ...,+ospke" with user-mode QEMU today (which this patch
+> would break).  If RDPKRU/WRPKRU is useless under user-mode QEMU,
+> than we don't need to worry about that.
 
-Good points.
+Hmm, actually there are two more things to consider for user-mode emulation.
 
-I'm still worried about making qom-set confused with a supported
-configuration API, and have applications starting to rely on it.
+First, QEMU doesn't support any of pkey_mprotect, pkey_alloc, pkey_free,
+so it should probably never set OSPKE.
 
-But I guess this problem could be solved by properly documenting
-qom-set as a debugging aid, not a supported API.
+Second, for user-mode emulation it makes sense to allow flipping of
+OSPKE and OSXSAVE, because that corresponds to different behaviors of
+the underlying kernels.  There have been bugs in fact with programs that
+incorrectly tested XSAVE instead of OSXSAVE, so it's worthwhile to let
+the user test both configurations.
 
---=20
-Eduardo
+So to sum up, the default for QEMU user-mode emulation should be
+OSXSAVE=XSAVE and OSPKE=0.
+
+Paolo
