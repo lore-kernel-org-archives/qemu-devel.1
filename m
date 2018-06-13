@@ -1,28 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fT9NW-0005qX-Hs
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:16:15 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fT9PK-0006gs-Il
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:18:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fT9NT-0007Bw-3X
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:16:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56092)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fT9NS-0007A7-Sp
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:16:11 -0400
-Date: Wed, 13 Jun 2018 14:16:07 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180613171607.GB7451@localhost.localdomain>
-References: <20180611203712.12086-1-ehabkost@redhat.com>
-	<a8426bf6-7531-6306-d1c6-bb4c6c2099cd@redhat.com>
-	<20180612150153.GK7451@localhost.localdomain>
-	<6c9b3744-7323-cd1f-7b07-2b77df7ae80d@redhat.com>
-	<20180612182541.GN7451@localhost.localdomain>
-	<b93cd6e5-bb2e-b932-bc68-da5c314924a2@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fT9PH-0004q4-4e
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:18:06 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:44640)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fT9PG-0004nQ-P5
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:18:02 -0400
+Received: by mail-qk0-x244.google.com with SMTP id 185-v6so1945433qkk.11
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 10:18:02 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20180313224719.4954-1-pbonzini@redhat.com>
+	<20180313224719.4954-51-pbonzini@redhat.com>
+	<20180601185139.GA25837@flamenco>
+	<f3c45eff-634d-6187-8f65-624bce9d2e4e@redhat.com>
+	<323c9978-2d21-cfec-a613-57f0c675531f@amsat.org>
+Message-ID: <76061b88-b9d5-8095-b60e-cbe53993113c@amsat.org>
+Date: Wed, 13 Jun 2018 14:17:58 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b93cd6e5-bb2e-b932-bc68-da5c314924a2@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH] i386: Remove ospke CPUID flag name
+In-Reply-To: <323c9978-2d21-cfec-a613-57f0c675531f@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 50/69] hw/alpha/dp264: Use the
+ TYPE_SMC37C669_SUPERIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,64 +39,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Jun 13, 2018 at 07:01:23PM +0200, Paolo Bonzini wrote:
-> On 12/06/2018 20:25, Eduardo Habkost wrote:
-> > On Tue, Jun 12, 2018 at 05:12:58PM +0200, Paolo Bonzini wrote:
-> >> On 12/06/2018 17:01, Eduardo Habkost wrote:
-> >>>>>
-> >>>>> Remove OSPKE from the feature name array so users don't try to
-> >>>>> configure it manually.
-> >>>>>
-> >>>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> >>>> Yes, it's the same as OSXSAVE.  Thanks!
-> >>> CR4_OSXSAVE_MASK is automatically enabled on user-mode QEMU,
-> >>> though.
-> >>>
-> >>> My question is if it would make any sense to enable CR4_PKE_MASK
-> >>> too.
-> >>
-> >> If you mean OSPKE, then yes---if PKU is available.  Likewise, OSXSAVE
-> >> should only be enabled if XSAVE is available.
-> > 
-> > Yeah, I mean enabling it only if PKU is available, like we
-> > already do with OSXAVE/XSAVE.
-> > 
-> > But we don't do it today, so enabling it automatically in
-> > CONFIG_USER_ONLY would be a new feature.  Would it be useful for
-> > anything, though?
-> > 
-> > I'm asking that to find out if somebody could be already using
-> > "-cpu ...,+ospke" with user-mode QEMU today (which this patch
-> > would break).  If RDPKRU/WRPKRU is useless under user-mode QEMU,
-> > than we don't need to worry about that.
+On 06/13/2018 01:35 PM, Philippe Mathieu-Daudé wrote:
+> On 06/13/2018 01:21 PM, Paolo Bonzini wrote:
+>> On 01/06/2018 20:51, Emilio G. Cota wrote:
+>>> On Tue, Mar 13, 2018 at 23:47:00 +0100, Paolo Bonzini wrote:
+>>>> From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>>
+>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>> Message-Id: <20180308223946.26784-25-f4bug@amsat.org>
+>>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>>> ---
+>>>>  default-configs/alpha-softmmu.mak |  3 +++
+>>>>  hw/alpha/dp264.c                  | 10 ++++------
+>>>>  2 files changed, 7 insertions(+), 6 deletions(-)
+>>>
+>>> This commit breaks alpha-softmmu bootup for me. I get no console
+>>> output whatsoever -- not even the green "Hello" when invoking
+>>> the alpha-softmmu binary with no arguments.
+>>>
+>>> Did anybody else notice this?
+>>
+>> Philippe, are you going to take a look?  I tested 2.12 and I get the
 > 
-> Hmm, actually there are two more things to consider for user-mode emulation.
+> Sure. Sorry I didn't notice earlier, my mail-filter demotes subject with
+> PULL :/
 > 
-> First, QEMU doesn't support any of pkey_mprotect, pkey_alloc, pkey_free,
-> so it should probably never set OSPKE.
+>> same result as latest mainline: nothing on the VGA and
+>>
+>> PCI: 00:00:0 class 0300 id 1013:00b8
+>> PCI:   region 0: 10000000
+>> PCI:   region 1: 12000000
+>> PCI: 00:01:0 class 0200 id 8086:100e
+>> PCI:   region 0: 12020000
+>> PCI:   region 1: 0000c000
+>> PCI: 00:02:0 class 0101 id 1095:0646
+>> PCI:   region 0: 0000c040
+>> PCI:   region 1: 0000c048
+>> PCI:   region 3: 0000c04c
+>>
+>> on the serial console, respectively for VGA/network/IDE.
 
-This means "-cpu ...,+ospke" is useless today and we can safely
-remove support for it, right?
+Creating the Super I/O _before_ the VGA setup fixes this issue...
 
-> Second, for user-mode emulation it makes sense to allow flipping of
-> OSPKE and OSXSAVE, because that corresponds to different behaviors of
-> the underlying kernels.  There have been bugs in fact with programs that
-> incorrectly tested XSAVE instead of OSXSAVE, so it's worthwhile to let
-> the user test both configurations.
+I suppose the problem is some ISA global variable? I'll keep digging.
 
-However, "-cpu ...,-osxsave" has no effect today (user-mode QEMU
-unconditionally sets OSXSAVE), so that would be a new feature.
+-- >8 --
+diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
+@@ -83,6 +83,12 @@ static void clipper_init(MachineState *machine)
 
-I assume this means I don't need to drop the osxsave patch from
-my queue, either.
+     i8254_pit_init(isa_bus, 0x40, 0, NULL);
 
-> So to sum up, the default for QEMU user-mode emulation should be
-> OSXSAVE=XSAVE and OSPKE=0.
++    /* 2 82C37 (dma) */
++    isa_create_simple(isa_bus, "i82374");
++
++    /* Super I/O */
++    isa_create_simple(isa_bus, TYPE_SMC37C669_SUPERIO);
++
+     /* VGA setup.  Don't bother loading the bios.  */
+     pci_vga_init(pci_bus);
 
-Thanks!
+@@ -91,12 +97,6 @@ static void clipper_init(MachineState *machine)
+         pci_nic_init_nofail(&nd_table[i], pci_bus, "e1000", NULL);
+     }
 
+-    /* 2 82C37 (dma) */
+-    isa_create_simple(isa_bus, "i82374");
+-
+-    /* Super I/O */
+-    isa_create_simple(isa_bus, TYPE_SMC37C669_SUPERIO);
+-
+     /* IDE disk setup.  */
+     {
+         DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
 -- 
-Eduardo
