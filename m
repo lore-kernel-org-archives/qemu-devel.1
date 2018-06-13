@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fTDhY-0001Uw-Lu
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:53:13 -0400
+	(envelope-from <mst@redhat.com>) id 1fTDtg-0004Tl-AX
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 18:05:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fTDhV-0002yr-J2
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:53:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44288 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fTDhV-0002y4-Ct
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:53:09 -0400
-Date: Thu, 14 Jun 2018 00:53:07 +0300
+	(envelope-from <mst@redhat.com>) id 1fTDtb-000194-8j
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 18:05:44 -0400
+Date: Thu, 14 Jun 2018 01:05:27 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180614005150-mutt-send-email-mst@kernel.org>
-References: <20180612184616.90838-1-mst@redhat.com>
-	<20180612184616.90838-2-mst@redhat.com>
-	<20180613210022.GG24764@localhost.localdomain>
+Message-ID: <20180614005745-mutt-send-email-mst@kernel.org>
+References: <20180608142442.0d97b7c6@redhat.com>
+	<397d37ee-b3a8-dae0-37d1-fd3c942448c2@redhat.com>
+	<20180608155432-mutt-send-email-mst@kernel.org>
+	<d6966aa8-54e5-8036-3603-069fbbb88c2a@redhat.com>
+	<20180608181004-mutt-send-email-mst@kernel.org>
+	<a68853da-a664-84ae-c5bd-4e79b967bb65@redhat.com>
+	<20180613174825.1eebef6c@redhat.com>
+	<c84ffb85-628f-4ece-e231-d0d7d45144c9@redhat.com>
+	<20180613212702-mutt-send-email-mst@kernel.org>
+	<5d03c321-4121-a814-ef4f-c649125c0231@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180613210022.GG24764@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] kvm: support -realtime cpu-pm=on|off
+In-Reply-To: <5d03c321-4121-a814-ef4f-c649125c0231@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
+ hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,88 +32,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org, Richard Henderson <rth@twiddle.net>
+To: David Hildenbrand <david@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-On Wed, Jun 13, 2018 at 06:00:22PM -0300, Eduardo Habkost wrote:
-> On Tue, Jun 12, 2018 at 09:47:11PM +0300, Michael S. Tsirkin wrote:
-> > With this flag, kvm allows guest to control host CPU power state.  This
-> > increases latency for other processes using same host CPU in an
-> > unpredictable way, but if decreases idle entry/exit times for the
-> > running VCPU.
+On Wed, Jun 13, 2018 at 09:37:54PM +0200, David Hildenbrand wrote:
+> >>>       [ ... specific to machine_foo wiring ...]
+> >>>
+> >>>       virtio_mem_plug() {
+> >>>          [... some machine specific wiring ...]
+> >>>
+> >>>          bus_hotplug_ctrl = qdev_get_bus_hotplug_handler()
+> >>>          bus_hotplug_ctrl->plug(bus_hotplug_ctrl, dev)
+> >>>
+> >>>          [... some more machine specific wiring ...]
+> >>>       }
+> >>>
+> >>>       [ ... specific to machine_foo wiring ...]
+> >>>
+> >>> i.e. device itself doesn't participate in attaching to external entities,
+> >>> those entities (machine or bus controller virtio device is attached to)
+> >>> do wiring on their own within their own domain.
+> >>
+> >> I am fine with this, but Michael asked if this ("virtio_mem_plug()")
+> >> could go via new DeviceClass functions. Michael, would that also work
+> >> for your use case?
 > > 
-> > Follow-up patches will expose this capability to guest
-> > (using mwait leaf).
-> > 
-> > Based on a patch by Wanpeng Li <kernellwp@gmail.com> .
-> > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> >  include/sysemu/sysemu.h |  1 +
-> >  target/i386/kvm.c       | 22 ++++++++++++++++++++++
-> >  vl.c                    |  6 ++++++
-> >  qemu-options.hx         |  9 +++++++--
-> >  4 files changed, 36 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> > index e893f72f3b..b921c6f3b7 100644
-> > --- a/include/sysemu/sysemu.h
-> > +++ b/include/sysemu/sysemu.h
-> > @@ -128,6 +128,7 @@ extern bool boot_strict;
-> >  extern uint8_t *boot_splash_filedata;
-> >  extern size_t boot_splash_filedata_size;
-> >  extern bool enable_mlock;
-> > +extern bool enable_cpu_pm;
+> > It's not virtio specifically, I'm interested in how this will work for
+> > PCI generally.  Right now we call do_pci_register_device which
+> > immediately makes it guest visible.
 > 
-> After looking at patch 2/2, I see that the global variable is
-> useful, and it's consistent with the existing enable_mlock
-> variable.
+> So you're telling me that a PCI device exposes itself to the system in
+> pci_qdev_realize() instead of letting a hotplug handler handle that? My
+> assumption is that the PCI bridge hotplug handler handles this.
+
+Well given how things work in qemu that's not exactly
+the case. See below.
+
+> What am
+> I missing?
 > 
-> >  extern uint8_t qemu_extra_params_fw[2];
-> >  extern QEMUClockType rtc_clock;
-> >  extern const char *mem_path;
-> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> > index 44f70733e7..f093d55209 100644
-> > --- a/target/i386/kvm.c
-> > +++ b/target/i386/kvm.c
-> > @@ -1357,6 +1357,28 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-> >          smram_machine_done.notify = register_smram_listener;
-> >          qemu_add_machine_init_done_notifier(&smram_machine_done);
-> >      }
-> > +
-> > +    if (enable_cpu_pm) {
-> > +        int disable_exits = kvm_check_extension(s, KVM_CAP_X86_DISABLE_EXITS);
-> > +        int ret;
-> > +
-> > +/* Work around for kernel header with a typo. TODO: fix header and drop. */
-> > +#if defined(KVM_X86_DISABLE_EXITS_HTL) && !defined(KVM_X86_DISABLE_EXITS_HLT)
-> > +#define KVM_X86_DISABLE_EXITS_HLT KVM_X86_DISABLE_EXITS_HTL
-> > +#endif
-> > +        if (disable_exits) {
-> > +            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
-> > +                              KVM_X86_DISABLE_EXITS_HLT |
-> > +                              KVM_X86_DISABLE_EXITS_PAUSE);
-> > +        }
-> > +
-> > +        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0,
-> > +                                disable_exits);
+> I can see that e.g. for a virtio device the realize call chain is
 > 
-> Isn't the kvm_vm_enable_cap() call supposed to be inside the "if
-> (disable_exits)" block?
+> pci_qdev_realize() -> virtio_pci_realize() -> virtio_XXX__pci_realize ->
+> virtio_XXX_realize()
+> 
+> If any realization in pci_qdev_realize() fails, we do a
+> do_pci_unregister_device().
+> 
+> So if it is true what you're saying than we're already exposing
+> partially realized (and possibly unrealized again) devices via PCI. I
+> *guess* because we're holding the iothread mutex this is okay and
+> actually not visible.
 
-Doing it like this causes a warning if pm is requested but
-disable halt is not supported.
+For now but we need ability to have separate new commands for
+realize and plug, so we will drop the mutex.
 
-But I can move it, sure - let me know.
+> And we only seem to be sending events in the PCI
+> bridge hotplug handlers, so my assumption is that this is fine.
 
-> > +        if (ret < 0) {
-> > +            error_report("kvm: guest stopping CPU not supported: %s", strerror(-ret));
-> > +        }
-> > +    }
-> > +
-> >      return 0;
-> >  }
-> [...]
+For core PCI, it's mostly just this line:
+
+    bus->devices[devfn] = pci_dev;
+
+which makes it accessible to pci config cycles.
+
+But failover also cares about vfio, which seems to set up
+e.g. irqfs on realize.
+
+
+
+
+> > 
+> > 
+> >>
+> >> -- 
+> >>
+> >> Thanks,
+> >>
+> >> David / dhildenb
+> 
 > 
 > -- 
-> Eduardo
+> 
+> Thanks,
+> 
+> David / dhildenb
