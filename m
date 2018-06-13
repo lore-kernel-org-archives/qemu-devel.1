@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fT2Sh-00031F-HE
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:53:08 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fT2Wf-0004MY-IL
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:57:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fT2Se-0003WD-C4
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:53:07 -0400
-Resent-Message-Id: <E1fT2Se-0003WD-C4@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21106)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fT2Se-0003VP-1O
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:53:04 -0400
-In-Reply-To: <20180613084149.14523-1-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152888265822.690.4484858613612453007@d39dc562802a>
+	(envelope-from <pbonzini@redhat.com>) id 1fT2Wc-00071y-Dr
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:57:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40944 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fT2Wc-00070u-7s
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:57:10 -0400
+References: <1528830325-5501-1-git-send-email-eric.auger@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <53a44ac2-0b11-9cf7-87fd-8a9acc17aa60@redhat.com>
+Date: Wed, 13 Jun 2018 11:56:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 13 Jun 2018 02:37:39 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v4 0/3] ramfb: simple boot framebuffer
+In-Reply-To: <1528830325-5501-1-git-send-email-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] exec: Fix MAP_RAM for cached access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, ehabkost@redhat.com, mst@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org, pbonzini@redhat.com, lersek@redhat.com, rth@twiddle.net
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org
+Cc: peterx@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjEzMDg0MTQ5LjE0NTIzLTEta3JheGVsQHJlZGhhdC5jb20KU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NCAwLzNdIHJhbWZiOiBzaW1wbGUgYm9vdCBmcmFtZWJ1
-ZmZlcgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49
-MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dy
-YW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZv
-ciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAk
-KGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0t
-Zm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVu
-CiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25l
-CgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
-YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
-cGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8x
-NTI4ODc5NzIzLTI0Njc1LTEtZ2l0LXNlbmQtZW1haWwtZXJpYy5hdWdlckByZWRoYXQuY29tIC0+
-IHBhdGNoZXcvMTUyODg3OTcyMy0yNDY3NS0xLWdpdC1zZW5kLWVtYWlsLWVyaWMuYXVnZXJAcmVk
-aGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNjEyMjIxOTIz
-LjI0NDY5LTEtbWRyb3RoQGxpbnV4LnZuZXQuaWJtLmNvbSAtPiBwYXRjaGV3LzIwMTgwNjEyMjIx
-OTIzLjI0NDY5LTEtbWRyb3RoQGxpbnV4LnZuZXQuaWJtLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAg
-ICAgICAgICBwYXRjaGV3LzIwMTgwNjEzMDY1NzA3LjMwNzY2LTEtZGF2aWRAZ2lic29uLmRyb3Bi
-ZWFyLmlkLmF1IC0+IHBhdGNoZXcvMjAxODA2MTMwNjU3MDcuMzA3NjYtMS1kYXZpZEBnaWJzb24u
-ZHJvcGJlYXIuaWQuYXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDYx
-MzA4NDE0OS4xNDUyMy0xLWtyYXhlbEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODA2MTMwODQx
-NDkuMTQ1MjMtMS1rcmF4ZWxAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
-c3QnCmEzZjYyODk3MDMgaHcvdmZpby9kaXNwbGF5OiBhZGQgcmFtZmIgc3VwcG9ydAplOTI4MzY0
-ZmRlIGh3L2Rpc3BsYXk6IGFkZCBzdGFuZGFsb25lIHJhbWZiIGRldmljZQoyNzE0OTRhMTc0IGh3
-L2Rpc3BsYXk6IGFkZCByYW1mYiwgYSBzaW1wbGUgYm9vdCBmcmFtZWJ1ZmZlciBsaXZpbmcgaW4g
-Z3Vlc3QgcmFtCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzM6IGh3L2Rp
-c3BsYXk6IGFkZCByYW1mYiwgYSBzaW1wbGUgYm9vdCBmcmFtZWJ1ZmZlciBsaXZpbmcgaW4gZ3Vl
-c3QgcmFtLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
-TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQxOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTA5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi8zOiBody9kaXNwbGF5
-OiBhZGQgc3RhbmRhbG9uZSByYW1mYiBkZXZpY2UuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
-IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNzE6IApu
-ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDEgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2lu
-ZyBQQVRDSCAzLzM6IGh3L3ZmaW8vZGlzcGxheTogYWRkIHJhbWZiIHN1cHBvcnQuLi4KRVJST1I6
-IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAoj
-MzE6IEZJTEU6IGh3L3ZmaW8vZGlzcGxheS5jOjE4NzoKKyAgICBpZiAoc3RyY21wKG9iamVjdF9n
-ZXRfdHlwZW5hbWUoT0JKRUNUKHZkZXYpKSwgInZmaW8tcGNpLXJhbWZiIikgPT0gMCkKWy4uLl0K
-CkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0
-ZW1lbnQKIzUwOiBGSUxFOiBody92ZmlvL2Rpc3BsYXkuYzozMTE6CisgICAgaWYgKHN0cmNtcChv
-YmplY3RfZ2V0X3R5cGVuYW1lKE9CSkVDVCh2ZGV2KSksICJ2ZmlvLXBjaS1yYW1mYiIpID09IDAp
-ClsuLi5dCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDcyIGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoK
-VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 12/06/2018 21:05, Eric Auger wrote:
+> When an IOMMUMemoryRegion is in front of a virtio device,
+> address_space_cache_init does not set cache->ptr as the memory
+> region is not RAM. However when the device performs an access,
+> we end up in glue() which performs the translation and then uses
+> MAP_RAM. This latter uses the unset ptr and returns a wrong value
+> which leads to a SIGSEV in address_space_lduw_internal_cached_slow,
+> for instance. Let's test whether the cache->ptr is set, and in
+> the negative use the old macro definition. This fixes the
+> use cases featuring vIOMMU (Intel and ARM SMMU) which lead to
+> a SIGSEV.
+> 
+> Fixes: 48564041a73a (exec: reintroduce MemoryRegion caching)
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> I am not sure whether it doesn't break any targeted optimization
+> but at least it removes the SIGSEV.
+
+Actually cache->ptr is always NULL here, since this is the slow path
+(there is even an assertion in address_space_translate_cached); so
+MAP_RAM can be even simpler and, apart from the bugfix, I think we
+should remove all of IS_DIRECT, MAP_RAM and INVALIDATE as a follow-up.
+They were needed in the original implementation of MemoryRegionCache,
+which only worked with RAM regions but not anymore now that the RAM case
+is open-coded in include/exec/memory_ldst_cached.inc.h.
+
+Thanks,
+
+Paolo
+
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  exec.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/exec.c b/exec.c
+> index f6645ed..46fbd25 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -3800,7 +3800,9 @@ address_space_write_cached_slow(MemoryRegionCache *cache, hwaddr addr,
+>  #define SUFFIX                   _cached_slow
+>  #define TRANSLATE(...)           address_space_translate_cached(cache, __VA_ARGS__)
+>  #define IS_DIRECT(mr, is_write)  memory_access_is_direct(mr, is_write)
+> -#define MAP_RAM(mr, ofs)         (cache->ptr + (ofs - cache->xlat))
+> +#define MAP_RAM(mr, ofs)         (cache->ptr ? \
+> +                                 (cache->ptr + (ofs - cache->xlat)) :  \
+> +                                 qemu_map_ram_ptr((mr)->ram_block, ofs))
+>  #define INVALIDATE(mr, ofs, len) invalidate_and_set_dirty(mr, ofs, len)
+>  #define RCU_READ_LOCK()          ((void)0)
+>  #define RCU_READ_UNLOCK()        ((void)0)
+> 
