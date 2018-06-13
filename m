@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fT0AF-0007xD-BG
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 03:25:56 -0400
+	(envelope-from <clg@kaod.org>) id 1fT0Aq-0008Ib-A9
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 03:26:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fT0AC-000805-7Q
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 03:25:55 -0400
-Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:38631)
+	(envelope-from <clg@kaod.org>) id 1fT0An-00004q-4Z
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 03:26:32 -0400
+Received: from 7.mo173.mail-out.ovh.net ([46.105.44.159]:46155)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fT0AB-0007zD-W0
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 03:25:52 -0400
-Received: from player776.ha.ovh.net (unknown [10.109.105.10])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 39160B6455
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 09:25:50 +0200 (CEST)
-Date: Wed, 13 Jun 2018 09:25:42 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180613092542.576e8c33@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20180612233140.GH30690@umbus.fritz.box>
-References: <20180612064503.14282-1-david@gibson.dropbear.id.au>
-	<CAFEAcA85qHjDLBYxWW9i4T91m1uTS6TAY_y2A6_840n-_tDZKw@mail.gmail.com>
-	<20180612175241.7340be80@bahia.lab.toulouse-stg.fr.ibm.com>
-	<CAFEAcA8yKyHX-xVx5VPxBOy7-hiKDo+DgztVZ_sD5FxK77Z-9w@mail.gmail.com>
-	<20180612204603.7bf254cb@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20180612233140.GH30690@umbus.fritz.box>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fT0Am-0008Vh-Qn
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 03:26:29 -0400
+Received: from player795.ha.ovh.net (unknown [10.109.108.57])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id A29FBC5681
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 09:26:27 +0200 (CEST)
+References: <20180518164405.11804-1-clg@kaod.org>
+	<20180518164405.11804-3-clg@kaod.org>
+	<20180526114023.49ee54e9@bahia.lan>
+	<20180605034418.GV5140@umbus.fritz.box>
+	<e9631178-7bd1-170a-ff28-f1ab717cb8bf@kaod.org>
+	<20180613042726.GU30690@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <820b2f7b-170b-3038-2eef-253b916c586c@kaod.org>
+Date: Wed, 13 Jun 2018 09:26:22 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/rf=ua1hrfbCOIxhhBNo.UMR";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PULL 00/33] ppc-for-3.0 queue 20180612
+In-Reply-To: <20180613042726.GU30690@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/4] sparp_pci: simplify how the PCI LSIs
+ are allocated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,114 +37,119 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
 
---Sig_/rf=ua1hrfbCOIxhhBNo.UMR
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, 13 Jun 2018 09:31:40 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Tue, Jun 12, 2018 at 08:46:03PM +0200, Greg Kurz wrote:
-> > On Tue, 12 Jun 2018 16:55:08 +0100
-> > Peter Maydell <peter.maydell@linaro.org> wrote:
-> >  =20
-> > > On 12 June 2018 at 16:52, Greg Kurz <groug@kaod.org> wrote: =20
-> > > > On Tue, 12 Jun 2018 15:34:22 +0100
-> > > > Peter Maydell <peter.maydell@linaro.org> wrote:
-> > > >   =20
-> > > >> On 12 June 2018 at 07:44, David Gibson <david@gibson.dropbear.id.a=
-u> wrote:   =20
-> > > >> > ----------------------------------------------------------------
-> > > >> > ppc patch queue 2018-06-12
-> > > >> >
-> > > >> > Here's another batch of ppc patches towards the 3.0 release.  Th=
-ere's
-> > > >> > a fair bit here, because I've been working through my mail backl=
-og
-> > > >> > after a holiday.  There's not much of a central theme, amongst o=
-ther
-> > > >> > things we have:
-> > > >> >     * ppc440 / sam460ex improvements
-> > > >> >     * logging and error cleanups
-> > > >> >     * 40p (PReP) bugfixes
-> > > >> >     * Macintosh fixes and cleanups
-> > > >> >     * Add emulation of the new POWER9 store-forwarding barrier
-> > > >> >       instruction variant
-> > > >> >     * Hotplug cleanups
-> > > >> >   =20
-> > > >>
-> > > >> Applied, thanks.   =20
-> > >  =20
-> > > > Oh... so we've broken bisect until Cedric's fix is merged.   =20
-> > >=20
-> > > If you want me not to merge a pullreq you need to follow up to
-> > > the cover letter saying "please don't merge this" or something
-> > > similar. Otherwise I will not notice. =20
-> >=20
-> > Yeah I've only answered to the offending patch, sorry... =20
+On 06/13/2018 06:27 AM, David Gibson wrote:
+> On Tue, Jun 05, 2018 at 08:31:49AM +0200, C=E9dric Le Goater wrote:
+>> On 06/05/2018 05:44 AM, David Gibson wrote:
+>>> On Sat, May 26, 2018 at 11:40:23AM +0200, Greg Kurz wrote:
+>>>> On Fri, 18 May 2018 18:44:03 +0200
+>>>> C=E9dric Le Goater <clg@kaod.org> wrote:
+>>>>
+>>>>> PCI LSIs are today allocated one by one using the IRQ alloc_block
+>>>>> routine. Change the code sequence to first allocate a PCI_NUM_PINS
+>>>>> block. It will help us providing a generic IRQ framework to the
+>>>>> machine.
+>>>>>
+>>>>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>>>>> ---
+>>>>>  hw/ppc/spapr_pci.c | 21 ++++++++++-----------
+>>>>>  1 file changed, 10 insertions(+), 11 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+>>>>> index 39a14980d397..4fd97ffe4c6e 100644
+>>>>> --- a/hw/ppc/spapr_pci.c
+>>>>> +++ b/hw/ppc/spapr_pci.c
+>>>>> @@ -1546,6 +1546,8 @@ static void spapr_phb_realize(DeviceState *de=
+v, Error **errp)
+>>>>>      sPAPRTCETable *tcet;
+>>>>>      const unsigned windows_supported =3D
+>>>>>          sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
+>>>>> +    uint32_t irq;
+>>>>> +    Error *local_err =3D NULL;
+>>>>> =20
+>>>>>      if (!spapr) {
+>>>>>          error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pser=
+ies machine");
+>>>>> @@ -1694,18 +1696,15 @@ static void spapr_phb_realize(DeviceState *=
+dev, Error **errp)
+>>>>>      QLIST_INSERT_HEAD(&spapr->phbs, sphb, list);
+>>>>> =20
+>>>>>      /* Initialize the LSI table */
+>>>>> -    for (i =3D 0; i < PCI_NUM_PINS; i++) {
+>>>>> -        uint32_t irq;
+>>>>> -        Error *local_err =3D NULL;
+>>>>> -
+>>>>> -        irq =3D spapr_irq_alloc_block(spapr, 1, true, false, &loca=
+l_err);
+>>>>> -        if (local_err) {
+>>>>> -            error_propagate(errp, local_err);
+>>>>> -            error_prepend(errp, "can't allocate LSIs: ");
+>>>>> -            return;
+>>>>> -        }
+>>>>> +    irq =3D spapr_irq_alloc_block(spapr, PCI_NUM_PINS, true, false=
+, &local_err);
+>>>>> +    if (local_err) {
+>>>>> +        error_propagate(errp, local_err);
+>>>>> +        error_prepend(errp, "can't allocate LSIs: ");
+>>>>> +        return;
+>>>>> +    }
+>>>>> =20
+>>>>
+>>>> It isn't strictly equivalent. The current code would be happy with
+>>>> sparse IRQ numbers, while the proposed one wouldn't... Anyway, this
+>>>> cannot happen since we don't have PHB hotplug.
+>>>
+>>> This makes me pretty nervous, because it's not obvious it will come u=
+p
+>>> with the same numbers in all circumstances, which we have to do for
+>>> existing machine types.
+>>
+>> Given that :=20
+>>
+>>  - irq_hint is "unused"
+>>  - all IRQs are allocated sequentially at machine init, =20
+>>  - spapr_pci is the only model using the block allocation for MSIs,=20
+>>    potentially fragmenting more the IRQ number space but done at=20
+>>    guest runtime.=20
+>>  - the PHB LSI are the allocated at realize time doing the loop above,=
+=20
+>>  - we don't support PHB hotplug=20
+>>  - we do support PHB coldplug but then the IRQ allocation is done
+>>    at machine time,
+>>
+>> it seems highly improbable that the IRQ number space is fragmented
+>> to a point which would not allow the loop above to return four=20
+>> contiguous IRQ numbers, always.
 >=20
-> And it was the middle of the night for me.
+> Well, assuming irq_hint really is unused, that's right.  But we can't
+> assume that - that's the whole point of the deprecation thing.
 >=20
-> It's only with pretty old gcc, I think we can live with it, I intend
-> to send another pullreq with the fixup as soon as I can.
+> Given that, AIUI, just one vio device with irq=3D set to a value that
+> would be within an LSI block allocated under the old scheme would
+> result in the new scheme returning a non-contiguous set of LSIs -
+> i.e. a different result from what we used to have.
 >=20
+>> That is why I felt confident changing the loop to a single block=20
+>> allocation.=20
+>>
+>>> It's also not obvious to me why it's useful
+>>> to go via this step before going straight to static allocation of the
+>>> irq numbers.
+>>
+>> It pollutes the new sPAPR IRQ interface API with an extra parameter=20
+>> to support both underlying backend and it complexifies the code=20
+>> to handle block allocation of a single IRQ (like above) within an=20
+>> IRQ range (the PCI LSIs).
+>>
+>> So you end up having a family, a device index, a count, an alignment,
+>> and an index within the range. pffut.
+>>
+>> Also, could we kill the alignment ?
+>=20
+> Since we sometimes pass 'true', no, we can't, without changing the
+> existing pattern of allocations, which we can't do.
 
-It was meeting day for me yesterday so I didn't have time to check with
-other GCC versions, but I could finally do it this morning. They fail
-all the same:
+To be honest, this is very much discouraging.=20
 
-hw/intc/xics_kvm.c: In function =E2=80=98ics_set_kvm_state=E2=80=99:
-hw/intc/xics_kvm.c:281:20: error: =E2=80=98ret=E2=80=99 may be used uniniti=
-alized in this
- function [-Werror=3Dmaybe-uninitialized]
-             return ret;
-
-Fedora28:
-
-$ cc --version
-cc (GCC) 8.1.1 20180502 (Red Hat 8.1.1-1)
-
-Ubuntu 18.04:
-
-$ cc --version
-cc (Ubuntu 7.3.0-16ubuntu3) 7.3.0
-
-Ubuntu 17.10:
-
-$ cc --version
-cc (Ubuntu 7.2.0-8ubuntu3.2) 7.2.0
-
-RHEL 7.5:
-
-$ cc --version
-cc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-28)
-
-My concern is more that it requires --enable-debug to be passed to
-configure. As noted by Cedric in another mail, -O2 seems to prevent
-GCC to detect this obvious error...
-
-
---Sig_/rf=ua1hrfbCOIxhhBNo.UMR
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlsgxvYACgkQcdTV5YIv
-c9ZxqA//cMAoRmXcXsrI7uazDRyjoS4Ur4xb1GG/imAHyG6QL9qQAm0a9D7XTJ75
-FEMx1c2MQwxLNOsjSyOVP8rdHgLXxSzfWuUZ4fgqKvC+/jBKpyT5jhEvnkGD6rd2
-AtuegQwNpYu8UlLA6xoVW+4RprAZBmKhybVK74ZkO+o/3N+uYe7NymdHtoTOreWr
-f7IpzJCx0bUBe6DM0O96qyJqt3UFtZL2b2RY5QZgE5JaZ0zeaIuaSllC3W7sOiz6
-IBZftOSvq61phUbvHsQsPDnvUM3m7eCd9HvYJxbZNa7CcdlqeNLrGqxic41EF+sx
-HyT+6C//Wrd3EoHu6lM4RYSA7SD8ZFiaCUjzPMbnonz1kLfPpSMwco2E5HdpLgmr
-Gg9c9rKLLYddHj8hNkyfYuhbCXToklXyx2mfQyBV0efGhzi47EiJYx5sKov3yML/
-EayXEyzHi5dodULKHnsHklSS0J8kZupJySWZJ900VBv8zq8H6sk+dCwAliWQcJA/
-/vnCFQXUzxorwInSISo7FxufkmYT9IGbdqwO1V+D0OdjK13WhaI9FsrBbl6uKY3z
-My/4i2TaZPpTFZ2KrcEQ9+3RduhmxLmB3btO/fCLFi2RVR3bqhBu9SFoKyHOgDPA
-3NKzfQZBNG1TkyvopUrK68BrHOrOiWnes8NuXb7s4vOVd+Fbrh8=
-=Go1U
------END PGP SIGNATURE-----
-
---Sig_/rf=ua1hrfbCOIxhhBNo.UMR--
+C.=20
