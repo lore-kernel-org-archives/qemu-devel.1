@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1fT6wJ-0007fR-3S
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:40:00 -0400
+	(envelope-from <mst@redhat.com>) id 1fT72j-0002fb-Bn
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:46:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1fT6wF-0003Pp-OH
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:39:59 -0400
-Received: from mout.web.de ([212.227.15.3]:38815)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jan.kiszka@web.de>) id 1fT6wF-0003Jn-DY
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:39:55 -0400
-References: <f6aa6ac8-3c3c-bf90-6273-3d584f4707c8@web.de>
-	<a2198ea1-e0f6-6b04-63a8-fd04b40c9ff2@web.de>
-	<20180613172438-mutt-send-email-mst@kernel.org>
-From: Jan Kiszka <jan.kiszka@web.de>
-Message-ID: <7dd2b33f-0ed1-e2c8-d363-f4905948a5c1@web.de>
-Date: Wed, 13 Jun 2018 16:39:39 +0200
+	(envelope-from <mst@redhat.com>) id 1fT72f-0003HC-W3
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:46:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34986 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fT72f-0003Fi-Qd
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:46:33 -0400
+Date: Wed, 13 Jun 2018 17:46:32 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180613173655-mutt-send-email-mst@kernel.org>
+References: <1528794804-6289-1-git-send-email-whois.zihan.yang@gmail.com>
+	<20180612163301-mutt-send-email-mst@kernel.org>
+	<CAKwiv-jJbcuLgygcbSBkaZw33mnamHqa5T15gMNi2CqUNN2mkA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180613172438-mutt-send-email-mst@kernel.org>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="10tL98TzVBGWj3twF5YZEEGrcS5vivyF9"
-Subject: Re: [Qemu-devel] [PATCH] hw/i386: Fix IVHD entry length for AMD
- IOMMU
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAKwiv-jJbcuLgygcbSBkaZw33mnamHqa5T15gMNi2CqUNN2mkA@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v2 1/3] pci_expander_bridge: add type
+ TYPE_PXB_PCIE_HOST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Zihan Yang <whois.zihan.yang@gmail.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---10tL98TzVBGWj3twF5YZEEGrcS5vivyF9
-From: Jan Kiszka <jan.kiszka@web.de>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
-Message-ID: <7dd2b33f-0ed1-e2c8-d363-f4905948a5c1@web.de>
-Subject: Re: [PATCH] hw/i386: Fix IVHD entry length for AMD IOMMU
-References: <f6aa6ac8-3c3c-bf90-6273-3d584f4707c8@web.de>
- <a2198ea1-e0f6-6b04-63a8-fd04b40c9ff2@web.de>
- <20180613172438-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180613172438-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-06-13 16:26, Michael S. Tsirkin wrote:
-> On Tue, May 22, 2018 at 09:06:56AM +0200, Jan Kiszka wrote:
->> On 2018-03-29 14:51, Jan Kiszka wrote:
->>> From: Jan Kiszka <jan.kiszka@siemens.com>
->>>
->>> Counting from the IVHD ID field to the all-devices entry, we have 28
->>> bytes, not 36.
->>>
->>> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
->>> ---
->>>  hw/i386/acpi-build.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->>> index deb440f286..a0cda71411 100644
->>> --- a/hw/i386/acpi-build.c
->>> +++ b/hw/i386/acpi-build.c
->>> @@ -2561,7 +2561,7 @@ build_amd_iommu(GArray *table_data, BIOSLinker =
-*linker)
->>>                               (1UL << 7),  /* PPRSup       */
->>>                               1);
->>>      /* IVHD length */
->>> -    build_append_int_noprefix(table_data, 0x24, 2);
->>> +    build_append_int_noprefix(table_data, 28, 2);
->>>      /* DeviceID */
->>>      build_append_int_noprefix(table_data, s->devid, 2);
->>>      /* Capability offset */
->>>
->>
->> Waiting to be merged.
->>
->> Jan
+On Wed, Jun 13, 2018 at 04:23:40PM +0800, Zihan Yang wrote:
+> Michael S. Tsirkin <mst@redhat.com> =E4=BA=8E2018=E5=B9=B46=E6=9C=8812=E6=
+=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=889:43=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> > On Tue, Jun 12, 2018 at 05:13:22PM +0800, Zihan Yang wrote:
+> > > The inner host bridge created by pxb-pcie is TYPE_PXB_PCI_HOST by d=
+efault,
+> > > add a new type TYPE_PXB_PCIE_HOST to better utilize the ECAM of PCI=
+e
+> > >
+> > > Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
+> >
+> > I have a concern that there are lots of new properties
+> > added here, I'm not sure how are upper layers supposed to
+> > manage them all.
+> >
+> > E.g. bus_nr supplied in several places, domain_nr for which
+> > it's not clear how it is supposed to be allocated, etc.
 >=20
-> I'll queue this but you really should Cc maintainers :)
+> Indeed they seem to double the properties, but the pxb host is
+> an internal structure of pxb-pcie device, created in pxb-pcie's
+> realization procedure, and acpi-build queries host bridges instead
+> of pxb-pcie devices. This means that users can not directly specify
+> the property of pxb host bridge, but must 'inherit' from pxb-pcie
+> devices. I had thought about changing the acpi-build process,
+> but that would require more modifications.
+> As for the properties, bus_nr means the start bus number
+> of this host bridge. It is used when pxb-pcie is in pci domain 0
+> with q35 host to avoid bus number confliction. When it is placed
+> in a separate pci domain, it is not used and should be 0.
 >=20
+> max_bus means how many buses the user desires, EACH bus in
+> PCIe requires 1MB configuration space, thus specifying it could
+> reduce the reserved memory in MMCFG as suggested by Marcel.
+> Typically, the user can specify
+>=20
+> -device pxb-pcie,id=3Dbr1,bus=3D"pcie.0",sep_domain=3Don,domain_nr=3D1,=
+max_bus=3D130
+>=20
+> this will place the buses under this pxb host bridge in pci domain
+> 1, and reserve (130 + 1) =3D 131 buses for it. The start bus number
+> is always 0 currently for simplicity.
+>=20
+> > Can the management interface be simplified?
+> > Ideally we wouldn't have to teach libvirt new tricks,
+> > just generalize pxb support slightly.
+>=20
+> We can delete 'sep_domain' property, I just find 'domain_nr'
+> already indicates domain number. But domain_nr and
+> max_bus seems unremovable, although they look 'redundant'
+> because they appear twice.
+>=20
+> I'm not familiar with libvirt, but from the perspective of user,
+> only 2 properties are added(domain_nr and max_bus, if we
+> delete sep_domain), though the internal structure actually has
+> changed.
 
-Sorry, wasn't clear to me that you are also maintaining the AMD IOMMU cod=
-e.
+If you want a property for an internal purpose,
+you can have a property starting with "x-" this way
+we don't commit to maintaining it.
 
-Thanks,
-Jan
-
-
---10tL98TzVBGWj3twF5YZEEGrcS5vivyF9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlshLK4ACgkQitSsb3rl5xSk6gCgnqtxUHJnZC76J6aE7n/BhecJ
-72QAoN9UNaJCumGB358wDFllySpBOuzQ
-=uIoL
------END PGP SIGNATURE-----
-
---10tL98TzVBGWj3twF5YZEEGrcS5vivyF9--
+--=20
+MST
