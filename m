@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fT4rt-0001sH-TW
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:27:19 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fT4uU-0002se-FZ
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:29:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fT4rq-00009t-NQ
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:27:17 -0400
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:56292)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fT4rq-00007u-GD
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:27:14 -0400
-Received: by mail-wm0-f53.google.com with SMTP id v16-v6so4366997wmh.5
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 05:27:14 -0700 (PDT)
-References: <1528225683-11413-1-git-send-email-wexu@redhat.com>
-	<1528225683-11413-3-git-send-email-wexu@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f9308fe7-5881-7ea6-de60-b3291abaac35@redhat.com>
-Date: Wed, 13 Jun 2018 14:27:10 +0200
-MIME-Version: 1.0
-In-Reply-To: <1528225683-11413-3-git-send-email-wexu@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 2/8] virtio: memory cache for packed ring
+	(envelope-from <kraxel@redhat.com>) id 1fT4uT-00064I-CQ
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:29:58 -0400
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 13 Jun 2018 14:29:44 +0200
+Message-Id: <20180613122948.18149-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 0/4] ramfb: simple boot framebuffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +17,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wexu@redhat.com, qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, jfreimann@redhat.com, tiwei.bie@intel.com, mst@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?L=C3=A1szl=C3=B3=20=C3=89rsek?= <lersek@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-On 05/06/2018 21:07, wexu@redhat.com wrote:
-> From: Wei Xu <wexu@redhat.com>
-> 
-> Mostly reuse memory cache with 1.0 except for the offset calculation.
-> 
-> Signed-off-by: Wei Xu <wexu@redhat.com>
-> ---
->  hw/virtio/virtio.c | 29 ++++++++++++++++++++---------
->  1 file changed, 20 insertions(+), 9 deletions(-)
-> 
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index e192a9a..f6c0689 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -150,11 +150,8 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
->      VRingMemoryRegionCaches *old = vq->vring.caches;
->      VRingMemoryRegionCaches *new;
->      hwaddr addr, size;
-> -    int event_size;
->      int64_t len;
->  
-> -    event_size = virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
-> -
->      addr = vq->vring.desc;
->      if (!addr) {
->          return;
-> @@ -168,7 +165,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
->          goto err_desc;
->      }
->  
-> -    size = virtio_queue_get_used_size(vdev, n) + event_size;
-> +    size = virtio_queue_get_used_size(vdev, n);
->      len = address_space_cache_init(&new->used, vdev->dma_as,
->                                     vq->vring.used, size, true);
->      if (len < size) {
-> @@ -176,7 +173,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
->          goto err_used;
->      }
->  
-> -    size = virtio_queue_get_avail_size(vdev, n) + event_size;
-> +    size = virtio_queue_get_avail_size(vdev, n);
->      len = address_space_cache_init(&new->avail, vdev->dma_as,
->                                     vq->vring.avail, size, false);
->      if (len < size) {
-> @@ -2320,14 +2317,28 @@ hwaddr virtio_queue_get_desc_size(VirtIODevice *vdev, int n)
->  
->  hwaddr virtio_queue_get_avail_size(VirtIODevice *vdev, int n)
->  {
-> -    return offsetof(VRingAvail, ring) +
-> -        sizeof(uint16_t) * vdev->vq[n].vring.num;
-> +    int s;
-> +
-> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> +        return sizeof(struct VRingPackedDescEvent);
-> +    } else {
-> +        s = virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
-> +        return offsetof(VRingAvail, ring) +
-> +            sizeof(uint16_t) * vdev->vq[n].vring.num + s;
-> +    }
->  }
->  
->  hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
->  {
-> -    return offsetof(VRingUsed, ring) +
-> -        sizeof(VRingUsedElem) * vdev->vq[n].vring.num;
-> +    int s;
-> +
-> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> +        return sizeof(struct VRingPackedDescEvent);
-> +    } else {
-> +        s = virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
-> +        return offsetof(VRingUsed, ring) +
-> +            sizeof(VRingUsedElem) * vdev->vq[n].vring.num + s;
-> +    }
->  }
->  
->  uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
-> 
+  Hi,
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+So, the first ramfb bits should be ready for merge.  This series
+includes the ramfb core support bits, the ramfb standalone device
+and vfio-pci-ramfb device for vgpu boot display support.
+
+If you want play with it I recommend getting the bits from
+
+	https://www.kraxel.org/cgit/qemu/log/?h=sirius/ramfb
+
+because they come with an updated seabios and a new vgabios rom and an
+experimental OVMF build.  Firmware patches are here:
+
+	https://www.kraxe.org/cgit/seabios/log/?h=ramfb
+	https://github.com/kraxel/edk2/commits/ramfb
+
+They should land upstream soon.
+
+changes:
+ v5: codestyle fixes.
+
+cheers,
+  Gerd
+
+Gerd Hoffmann (4):
+  hw/display: add ramfb, a simple boot framebuffer living in guest ram
+  hw/display: add standalone ramfb device
+  hw/vfio/display: add ramfb support
+  Add ramfb MAINTAINERS entry
+
+ include/hw/display/ramfb.h    | 12 ++++++
+ include/hw/vfio/vfio-common.h |  2 +
+ hw/arm/sysbus-fdt.c           |  7 ++++
+ hw/arm/virt.c                 |  2 +
+ hw/display/ramfb-standalone.c | 62 ++++++++++++++++++++++++++++
+ hw/display/ramfb.c            | 95 +++++++++++++++++++++++++++++++++++++++++++
+ hw/i386/pc_piix.c             |  2 +
+ hw/i386/pc_q35.c              |  2 +
+ hw/vfio/display.c             | 12 ++++++
+ hw/vfio/pci.c                 | 15 +++++++
+ MAINTAINERS                   |  6 +++
+ hw/display/Makefile.objs      |  3 ++
+ 12 files changed, 220 insertions(+)
+ create mode 100644 include/hw/display/ramfb.h
+ create mode 100644 hw/display/ramfb-standalone.c
+ create mode 100644 hw/display/ramfb.c
+
+-- 
+2.9.3
