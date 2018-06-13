@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fT20b-0004vk-At
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:24:09 -0400
+	(envelope-from <berrange@redhat.com>) id 1fT24f-00062Y-BH
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:28:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fT20W-0005xq-Dy
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:24:05 -0400
-Date: Wed, 13 Jun 2018 11:23:57 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180613112357.26dfcea5@redhat.com>
-In-Reply-To: <20180611121655.19616-2-david@redhat.com>
-References: <20180611121655.19616-1-david@redhat.com>
-	<20180611121655.19616-2-david@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1fT24b-0001cH-GP
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:28:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39788 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fT24b-0001ay-CB
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:28:13 -0400
+Date: Wed, 13 Jun 2018 10:28:09 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180613092809.GF27901@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180612062430.GA15344@xz-mi>
+	<CAFEAcA_Bh4U1X_FDbakcc7YDBHFrkCjCKGrtuTWegn7rAGZUeQ@mail.gmail.com>
+	<20180613040259.GI15344@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 01/11] pc-dimm: remove leftover "struct
- pc_dimms_capacity"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180613040259.GI15344@xz-mi>
+Subject: Re: [Qemu-devel] Is there a way to package QEMU binaries?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
-	. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Peter Xu <peterx@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Devel Mailing List <qemu-devel@nongnu.org>
 
-On Mon, 11 Jun 2018 14:16:45 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> Not needed anymore, let's drop it.
+On Wed, Jun 13, 2018 at 12:02:59PM +0800, Peter Xu wrote:
+> On Tue, Jun 12, 2018 at 09:52:45AM +0100, Peter Maydell wrote:
+> > On 12 June 2018 at 07:24, Peter Xu <peterx@redhat.com> wrote:
+> > > For example, I wanted to compile QEMU once and install it on multiple
+> > > systems.  What would be the suggested way to do so?
+> > 
+> > For this, I would recommend using whatever the packaging
+> > format for those systems is. Eg for Debian use the existing
+> > Debian QEMU packages, for Redhat systems use RPMs, etc.
+> > If you want a newer version of QEMU than is in the distro's
+> > packages, you can probably forward port the packaging parts
+> > to a newer QEMU without too much pain.
+> > 
+> > Or you can use a distro-agnostic packaging tool of some sort;
+> > there are a few out there but I have no particular recommendations.
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> I'll start my investigation with RPM first.  Thanks Peter.
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+If you're interested in Fedora, I maintain a Copr repository which
+provides RPMs for every QEMU version since 1.4.0 and every libvirt
+version since 1.2.0...
 
-> ---
->  hw/mem/pc-dimm.c | 5 -----
->  1 file changed, 5 deletions(-)
-> 
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 12da89d562..62b34a992e 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -27,11 +27,6 @@
->  #include "sysemu/numa.h"
->  #include "trace.h"
->  
-> -typedef struct pc_dimms_capacity {
-> -     uint64_t size;
-> -     Error    **errp;
-> -} pc_dimms_capacity;
-> -
->  void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
->                           uint64_t align, Error **errp)
->  {
+  https://copr.fedorainfracloud.org/coprs/berrange/virt-ark/
+
+Yeah, Fedora 28 is missing, but I'll be adding it real soon.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
