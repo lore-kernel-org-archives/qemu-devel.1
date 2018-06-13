@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fT2py-0006kQ-0Y
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:17:11 -0400
+	(envelope-from <berrange@redhat.com>) id 1fT2sh-0008FY-DJ
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:20:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fT2ps-0006Wy-T9
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:17:09 -0400
-Received: from 10.mo4.mail-out.ovh.net ([188.165.33.109]:52889)
+	(envelope-from <berrange@redhat.com>) id 1fT2sd-0001N9-DD
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:19:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38764 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fT2ps-0006VM-Kf
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:17:04 -0400
-Received: from player739.ha.ovh.net (unknown [10.109.108.77])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id DAF371836B7
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 12:17:02 +0200 (CEST)
-Date: Wed, 13 Jun 2018 12:16:54 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180613121654.77ebe16e@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20180613065707.30766-8-david@gibson.dropbear.id.au>
-References: <20180613065707.30766-1-david@gibson.dropbear.id.au>
-	<20180613065707.30766-8-david@gibson.dropbear.id.au>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fT2sd-0001Mb-8a
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:19:55 -0400
+Date: Wed, 13 Jun 2018 11:19:49 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180613101949.GL27901@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180601145921.9500-1-konrad.wilk@oracle.com>
+	<20180601153809.15259-1-konrad.wilk@oracle.com>
+	<20180601153809.15259-2-konrad.wilk@oracle.com>
+	<20180604200701.GB3184@localhost.localdomain>
+	<20180604202205.GH5867@char.us.oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 7/7] target/ppc,
- spapr: Move VPA information to machine_data
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180604202205.GH5867@char.us.oracle.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] i386: define the AMD 'amd-ssbd' CPUID
+ feature bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,304 +32,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, rth@twiddle.net
 
-On Wed, 13 Jun 2018 16:57:07 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> CPUPPCState currently contains a number of fields containing the state of
-> the VPA.  The VPA is a PAPR specific concept covering several guest/host
-> shared memory areas used to communicate some information with the
-> hypervisor.
+On Mon, Jun 04, 2018 at 04:22:05PM -0400, Konrad Rzeszutek Wilk wrote:
+> On Mon, Jun 04, 2018 at 05:07:01PM -0300, Eduardo Habkost wrote:
+> > On Fri, Jun 01, 2018 at 11:38:08AM -0400, Konrad Rzeszutek Wilk wrote:
+> > > AMD future CPUs expose _two_ ways to utilize the Intel equivalant
+> > > of the Speculative Store Bypass Disable. The first is via
+> > > the virtualized VIRT_SPEC CTRL MSR (0xC001_011f) and the second
+> > > is via the SPEC_CTRL MSR (0x48). The document titled:
+> > > 124441_AMD64_SpeculativeStoreBypassDisable_Whitepaper_final.pdf
+> > > 
+> > > gives priority of SPEC CTRL MSR over the VIRT SPEC CTRL MSR.
+> > > 
+> > > A copy of this document is available at
+> > >       https://bugzilla.kernel.org/show_bug.cgi?id=199889
+> > > 
+> > > Anyhow, this means that on future AMD CPUs there will be  _two_ ways to
+> > > deal with SSBD.
+> > 
+> > Does anybody know if there are AMD CPUs where virt-ssbd won't
+> > work and would require amd-ssbd to mitigate vulnerabilities?
+> > 
+> > Also, do we have kernel arch/x86/kvm/cpuid.c patches, already?
 > 
-> As a PAPR concept this is really machine specific information, although it
-> is per-cpu, so it doesn't really belong in the core CPU state structure.
-> So, move it to the PAPR specific 'machine_data' structure.
+> Not yet. They are being discussed right now. I figured I would send
+> these patches out as a 'Hey, coming at you!', but failed to change
+> the title to be 'RFC'.
 > 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
-
-Nice ! I'll rework VPA migration on top of that.
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/ppc/spapr_cpu_core.c         |  7 +++
->  hw/ppc/spapr_hcall.c            | 77 ++++++++++++++++++---------------
->  include/hw/ppc/spapr_cpu_core.h |  3 ++
->  target/ppc/cpu.h                |  6 ---
->  target/ppc/translate_init.inc.c |  8 ----
->  5 files changed, 52 insertions(+), 49 deletions(-)
+> > I prefer to add new CPUID flag names only after the flag name is
+> > already agreed upon on the kernel side.
 > 
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 544bda93e2..f642c95967 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -28,6 +28,7 @@ static void spapr_cpu_reset(void *opaque)
->      CPUState *cs = CPU(cpu);
->      CPUPPCState *env = &cpu->env;
->      PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
->      target_ulong lpcr;
->  
->      cpu_reset(cs);
-> @@ -69,6 +70,12 @@ static void spapr_cpu_reset(void *opaque)
->  
->      /* Set a full AMOR so guest can use the AMR as it sees fit */
->      env->spr[SPR_AMOR] = 0xffffffffffffffffull;
-> +
-> +    spapr_cpu->vpa_addr = 0;
-> +    spapr_cpu->slb_shadow_addr = 0;
-> +    spapr_cpu->slb_shadow_size = 0;
-> +    spapr_cpu->dtl_addr = 0;
-> +    spapr_cpu->dtl_size = 0;
->  }
->  
->  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r3)
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 8b9a4b577f..ae913d070f 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -8,6 +8,7 @@
->  #include "exec/exec-all.h"
->  #include "helper_regs.h"
->  #include "hw/ppc/spapr.h"
-> +#include "hw/ppc/spapr_cpu_core.h"
->  #include "mmu-hash64.h"
->  #include "cpu-models.h"
->  #include "trace.h"
-> @@ -908,9 +909,11 @@ unmap_out:
->  #define VPA_SHARED_PROC_OFFSET 0x9
->  #define VPA_SHARED_PROC_VAL    0x2
->  
-> -static target_ulong register_vpa(CPUPPCState *env, target_ulong vpa)
-> +static target_ulong register_vpa(PowerPCCPU *cpu, target_ulong vpa)
->  {
-> -    CPUState *cs = CPU(ppc_env_get_cpu(env));
-> +    CPUState *cs = CPU(cpu);
-> +    CPUPPCState *env = &cpu->env;
-> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
->      uint16_t size;
->      uint8_t tmp;
->  
-> @@ -935,32 +938,34 @@ static target_ulong register_vpa(CPUPPCState *env, target_ulong vpa)
->          return H_PARAMETER;
->      }
->  
-> -    env->vpa_addr = vpa;
-> +    spapr_cpu->vpa_addr = vpa;
->  
-> -    tmp = ldub_phys(cs->as, env->vpa_addr + VPA_SHARED_PROC_OFFSET);
-> +    tmp = ldub_phys(cs->as, spapr_cpu->vpa_addr + VPA_SHARED_PROC_OFFSET);
->      tmp |= VPA_SHARED_PROC_VAL;
-> -    stb_phys(cs->as, env->vpa_addr + VPA_SHARED_PROC_OFFSET, tmp);
-> +    stb_phys(cs->as, spapr_cpu->vpa_addr + VPA_SHARED_PROC_OFFSET, tmp);
->  
->      return H_SUCCESS;
->  }
->  
-> -static target_ulong deregister_vpa(CPUPPCState *env, target_ulong vpa)
-> +static target_ulong deregister_vpa(PowerPCCPU *cpu, target_ulong vpa)
->  {
-> -    if (env->slb_shadow_addr) {
-> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
-> +
-> +    if (spapr_cpu->slb_shadow_addr) {
->          return H_RESOURCE;
->      }
->  
-> -    if (env->dtl_addr) {
-> +    if (spapr_cpu->dtl_addr) {
->          return H_RESOURCE;
->      }
->  
-> -    env->vpa_addr = 0;
-> +    spapr_cpu->vpa_addr = 0;
->      return H_SUCCESS;
->  }
->  
-> -static target_ulong register_slb_shadow(CPUPPCState *env, target_ulong addr)
-> +static target_ulong register_slb_shadow(PowerPCCPU *cpu, target_ulong addr)
->  {
-> -    CPUState *cs = CPU(ppc_env_get_cpu(env));
-> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
->      uint32_t size;
->  
->      if (addr == 0) {
-> @@ -968,7 +973,7 @@ static target_ulong register_slb_shadow(CPUPPCState *env, target_ulong addr)
->          return H_HARDWARE;
->      }
->  
-> -    size = ldl_be_phys(cs->as, addr + 0x4);
-> +    size = ldl_be_phys(CPU(cpu)->as, addr + 0x4);
->      if (size < 0x8) {
->          return H_PARAMETER;
->      }
-> @@ -977,26 +982,28 @@ static target_ulong register_slb_shadow(CPUPPCState *env, target_ulong addr)
->          return H_PARAMETER;
->      }
->  
-> -    if (!env->vpa_addr) {
-> +    if (!spapr_cpu->vpa_addr) {
->          return H_RESOURCE;
->      }
->  
-> -    env->slb_shadow_addr = addr;
-> -    env->slb_shadow_size = size;
-> +    spapr_cpu->slb_shadow_addr = addr;
-> +    spapr_cpu->slb_shadow_size = size;
->  
->      return H_SUCCESS;
->  }
->  
-> -static target_ulong deregister_slb_shadow(CPUPPCState *env, target_ulong addr)
-> +static target_ulong deregister_slb_shadow(PowerPCCPU *cpu, target_ulong addr)
->  {
-> -    env->slb_shadow_addr = 0;
-> -    env->slb_shadow_size = 0;
-> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
-> +
-> +    spapr_cpu->slb_shadow_addr = 0;
-> +    spapr_cpu->slb_shadow_size = 0;
->      return H_SUCCESS;
->  }
->  
-> -static target_ulong register_dtl(CPUPPCState *env, target_ulong addr)
-> +static target_ulong register_dtl(PowerPCCPU *cpu, target_ulong addr)
->  {
-> -    CPUState *cs = CPU(ppc_env_get_cpu(env));
-> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
->      uint32_t size;
->  
->      if (addr == 0) {
-> @@ -1004,26 +1011,28 @@ static target_ulong register_dtl(CPUPPCState *env, target_ulong addr)
->          return H_HARDWARE;
->      }
->  
-> -    size = ldl_be_phys(cs->as, addr + 0x4);
-> +    size = ldl_be_phys(CPU(cpu)->as, addr + 0x4);
->  
->      if (size < 48) {
->          return H_PARAMETER;
->      }
->  
-> -    if (!env->vpa_addr) {
-> +    if (!spapr_cpu->vpa_addr) {
->          return H_RESOURCE;
->      }
->  
-> -    env->dtl_addr = addr;
-> -    env->dtl_size = size;
-> +    spapr_cpu->dtl_addr = addr;
-> +    spapr_cpu->dtl_size = size;
->  
->      return H_SUCCESS;
->  }
->  
-> -static target_ulong deregister_dtl(CPUPPCState *env, target_ulong addr)
-> +static target_ulong deregister_dtl(PowerPCCPU *cpu, target_ulong addr)
->  {
-> -    env->dtl_addr = 0;
-> -    env->dtl_size = 0;
-> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
-> +
-> +    spapr_cpu->dtl_addr = 0;
-> +    spapr_cpu->dtl_size = 0;
->  
->      return H_SUCCESS;
->  }
-> @@ -1035,38 +1044,36 @@ static target_ulong h_register_vpa(PowerPCCPU *cpu, sPAPRMachineState *spapr,
->      target_ulong procno = args[1];
->      target_ulong vpa = args[2];
->      target_ulong ret = H_PARAMETER;
-> -    CPUPPCState *tenv;
->      PowerPCCPU *tcpu;
->  
->      tcpu = spapr_find_cpu(procno);
->      if (!tcpu) {
->          return H_PARAMETER;
->      }
-> -    tenv = &tcpu->env;
->  
->      switch (flags) {
->      case FLAGS_REGISTER_VPA:
-> -        ret = register_vpa(tenv, vpa);
-> +        ret = register_vpa(tcpu, vpa);
->          break;
->  
->      case FLAGS_DEREGISTER_VPA:
-> -        ret = deregister_vpa(tenv, vpa);
-> +        ret = deregister_vpa(tcpu, vpa);
->          break;
->  
->      case FLAGS_REGISTER_SLBSHADOW:
-> -        ret = register_slb_shadow(tenv, vpa);
-> +        ret = register_slb_shadow(tcpu, vpa);
->          break;
->  
->      case FLAGS_DEREGISTER_SLBSHADOW:
-> -        ret = deregister_slb_shadow(tenv, vpa);
-> +        ret = deregister_slb_shadow(tcpu, vpa);
->          break;
->  
->      case FLAGS_REGISTER_DTL:
-> -        ret = register_dtl(tenv, vpa);
-> +        ret = register_dtl(tcpu, vpa);
->          break;
->  
->      case FLAGS_DEREGISTER_DTL:
-> -        ret = deregister_dtl(tenv, vpa);
-> +        ret = deregister_dtl(tcpu, vpa);
->          break;
->      }
->  
-> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-> index e3d2aa45a4..40129cc452 100644
-> --- a/include/hw/ppc/spapr_cpu_core.h
-> +++ b/include/hw/ppc/spapr_cpu_core.h
-> @@ -44,6 +44,9 @@ void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r
->  typedef struct ICPState ICPState;
->  typedef struct sPAPRCPUState {
->      ICPState *icp;
-> +    uint64_t vpa_addr;
-> +    uint64_t slb_shadow_addr, slb_shadow_size;
-> +    uint64_t dtl_addr, dtl_size;
->  } sPAPRCPUState;
->  
->  static inline sPAPRCPUState *spapr_cpu_state(PowerPCCPU *cpu)
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index abf0bf0224..6c2f4d29f2 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1091,12 +1091,6 @@ struct CPUPPCState {
->      target_ulong rmls;
->  #endif
->  
-> -#if defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY)
-> -    uint64_t vpa_addr;
-> -    uint64_t slb_shadow_addr, slb_shadow_size;
-> -    uint64_t dtl_addr, dtl_size;
-> -#endif /* TARGET_PPC64 */
-> -
->      int error_code;
->      uint32_t pending_interrupts;
->  #if !defined(CONFIG_USER_ONLY)
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-> index bb9296f5a3..76d6f3fd5e 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -10316,14 +10316,6 @@ static void ppc_cpu_reset(CPUState *s)
->      s->exception_index = POWERPC_EXCP_NONE;
->      env->error_code = 0;
->  
-> -#if defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY)
-> -    env->vpa_addr = 0;
-> -    env->slb_shadow_addr = 0;
-> -    env->slb_shadow_size = 0;
-> -    env->dtl_addr = 0;
-> -    env->dtl_size = 0;
-> -#endif /* TARGET_PPC64 */
-> -
->      for (i = 0; i < ARRAY_SIZE(env->spr_cb); i++) {
->          ppc_spr_t *spr = &env->spr_cb[i];
->  
+> Of course. I will respin once that discussion has calmed down.
+
+Looks like the kernel side has merged now, and we'll need to rename
+the 2nd CPU bit from what I see.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
