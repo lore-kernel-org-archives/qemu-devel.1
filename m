@@ -1,33 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54784)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <konrad.wilk@oracle.com>) id 1fT8j9-0006GS-Ax
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:34:32 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fT8kd-0007Ay-IT
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:36:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <konrad.wilk@oracle.com>) id 1fT8j4-0001t9-D2
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:34:31 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:46192)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <konrad.wilk@oracle.com>)
-	id 1fT8j4-0001qF-2W
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:34:26 -0400
-Date: Wed, 13 Jun 2018 12:34:21 -0400
-From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Message-ID: <20180613163421.GB21340@char.us.oracle.com>
-References: <20180601145921.9500-1-konrad.wilk@oracle.com>
-	<20180601153809.15259-1-konrad.wilk@oracle.com>
-	<20180601153809.15259-2-konrad.wilk@oracle.com>
-	<20180604200701.GB3184@localhost.localdomain>
-	<20180604202205.GH5867@char.us.oracle.com>
-	<20180613101949.GL27901@redhat.com>
-	<20180613160959.GF11438@char.us.oracle.com>
-	<20180613162129.GI19901@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fT8kY-0005gx-Ln
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:36:03 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:46739)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fT8kY-0005gN-GZ
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:35:58 -0400
+Received: by mail-qt0-x241.google.com with SMTP id h5-v6so2939593qtm.13
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 09:35:58 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180313224719.4954-1-pbonzini@redhat.com>
+	<20180313224719.4954-51-pbonzini@redhat.com>
+	<20180601185139.GA25837@flamenco>
+	<f3c45eff-634d-6187-8f65-624bce9d2e4e@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <323c9978-2d21-cfec-a613-57f0c675531f@amsat.org>
+Date: Wed, 13 Jun 2018 13:35:45 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180613162129.GI19901@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] i386: define the AMD 'amd-ssbd' CPUID
- feature bit
+In-Reply-To: <f3c45eff-634d-6187-8f65-624bce9d2e4e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 50/69] hw/alpha/dp264: Use the
+ TYPE_SMC37C669_SUPERIO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,98 +38,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: pbonzini@redhat.com, rth@twiddle.net, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Jun 13, 2018 at 05:21:29PM +0100, Daniel P. Berrang=E9 wrote:
-> On Wed, Jun 13, 2018 at 12:09:59PM -0400, Konrad Rzeszutek Wilk wrote:
-> > On Wed, Jun 13, 2018 at 11:19:49AM +0100, Daniel P. Berrang=E9 wrote:
-> > > On Mon, Jun 04, 2018 at 04:22:05PM -0400, Konrad Rzeszutek Wilk wro=
-te:
-> > > > On Mon, Jun 04, 2018 at 05:07:01PM -0300, Eduardo Habkost wrote:
-> > > > > On Fri, Jun 01, 2018 at 11:38:08AM -0400, Konrad Rzeszutek Wilk=
- wrote:
-> > > > > > AMD future CPUs expose _two_ ways to utilize the Intel equiva=
-lant
-> > > > > > of the Speculative Store Bypass Disable. The first is via
-> > > > > > the virtualized VIRT_SPEC CTRL MSR (0xC001_011f) and the seco=
-nd
-> > > > > > is via the SPEC_CTRL MSR (0x48). The document titled:
-> > > > > > 124441_AMD64_SpeculativeStoreBypassDisable_Whitepaper_final.p=
-df
-> > > > > >=20
-> > > > > > gives priority of SPEC CTRL MSR over the VIRT SPEC CTRL MSR.
-> > > > > >=20
-> > > > > > A copy of this document is available at
-> > > > > >       https://bugzilla.kernel.org/show_bug.cgi?id=3D199889
-> > > > > >=20
-> > > > > > Anyhow, this means that on future AMD CPUs there will be  _tw=
-o_ ways to
-> > > > > > deal with SSBD.
-> > > > >=20
-> > > > > Does anybody know if there are AMD CPUs where virt-ssbd won't
-> > > > > work and would require amd-ssbd to mitigate vulnerabilities?
-> > > > >=20
-> > > > > Also, do we have kernel arch/x86/kvm/cpuid.c patches, already?
-> > > >=20
-> > > > Not yet. They are being discussed right now. I figured I would se=
-nd
-> > > > these patches out as a 'Hey, coming at you!', but failed to chang=
-e
-> > > > the title to be 'RFC'.
-> > > >=20
-> > > > > I prefer to add new CPUID flag names only after the flag name i=
-s
-> > > > > already agreed upon on the kernel side.
-> > > >=20
-> > > > Of course. I will respin once that discussion has calmed down.
-> > >=20
-> > > Looks like the kernel side has merged now, and we'll need to rename
-> > > the 2nd CPU bit from what I see.
-> >=20
-> > What name did you have in mind?
->=20
-> IIUC from the kernel patches, it will be reported as 'amd-ssbd' and
-> 'amd-ssb-no' in /proc/cpuinfo, so only your second patch needs a simple
-> tweak to match that naming.
+On 06/13/2018 01:21 PM, Paolo Bonzini wrote:
+> On 01/06/2018 20:51, Emilio G. Cota wrote:
+>> On Tue, Mar 13, 2018 at 23:47:00 +0100, Paolo Bonzini wrote:
+>>> From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> Message-Id: <20180308223946.26784-25-f4bug@amsat.org>
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> ---
+>>>  default-configs/alpha-softmmu.mak |  3 +++
+>>>  hw/alpha/dp264.c                  | 10 ++++------
+>>>  2 files changed, 7 insertions(+), 6 deletions(-)
+>>
+>> This commit breaks alpha-softmmu bootup for me. I get no console
+>> output whatsoever -- not even the green "Hello" when invoking
+>> the alpha-softmmu binary with no arguments.
+>>
+>> Did anybody else notice this?
+> 
+> Philippe, are you going to take a look?  I tested 2.12 and I get the
 
-It will only report 'ssbd' but not 'amd-ssb-no' nor 'amd-ssbd'.
+Sure. Sorry I didn't notice earlier, my mail-filter demotes subject with
+PULL :/
 
-If the cpufeature.h has "" in the comment section then it is hidden. That=
- is:
-
-#define X86_FEATURE_MSR_SPEC_CTRL       ( 7*32+16) /* "" MSR SPEC_CTRL is=
- implemented */
-..sniup..
-+#define X86_FEATURE_AMD_SSBD           (13*32+24) /* "" Speculative Stor=
-e Bypass Disable */
-+#define X86_FEATURE_AMD_SSB_NO         (13*32+26) /* "" Speculative Stor=
-e Bypass is fixed in hardware. */
-
-are hidden ones, while:
-#define X86_FEATURE_SSBD                ( 7*32+17) /* Speculative Store B=
-ypass Disable */
-
-is visible.
-
-The code that finds the AMD_SSBD and sets the 'ssbd' is:
-
-+       if (cpu_has(c, X86_FEATURE_AMD_SSBD)) {
-+               set_cpu_cap(c, X86_FEATURE_SSBD);
-+               set_cpu_cap(c, X86_FEATURE_MSR_SPEC_CTRL);
-+               clear_cpu_cap(c, X86_FEATURE_VIRT_SSBD);
-+       }
-
-Meaning the 'ssbd' will show up in /proc/cpuinfo=20
-
-
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
+> same result as latest mainline: nothing on the VGA and
+> 
+> PCI: 00:00:0 class 0300 id 1013:00b8
+> PCI:   region 0: 10000000
+> PCI:   region 1: 12000000
+> PCI: 00:01:0 class 0200 id 8086:100e
+> PCI:   region 0: 12020000
+> PCI:   region 1: 0000c000
+> PCI: 00:02:0 class 0101 id 1095:0646
+> PCI:   region 0: 0000c040
+> PCI:   region 1: 0000c048
+> PCI:   region 3: 0000c04c
+> 
+> on the serial console, respectively for VGA/network/IDE.
+> 
+> Paolo
+> 
