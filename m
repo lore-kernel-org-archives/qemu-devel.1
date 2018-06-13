@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1fTEMW-0001e2-Rk
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 18:35:33 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fTENW-00027a-44
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 18:36:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1fTEMT-0003N9-P4
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 18:35:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57652)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1fTEMT-0003LY-Hg
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 18:35:29 -0400
-Date: Wed, 13 Jun 2018 19:34:53 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-Message-ID: <20180613223449.GA18339@amt.cnet>
-References: <20180612184616.90838-1-mst@redhat.com>
+	(envelope-from <kraxel@redhat.com>) id 1fTENV-0004U9-4R
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 18:36:34 -0400
+Date: Thu, 14 Jun 2018 00:36:25 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180613223625.lf6xkzgipzkfslit@sirius.home.kraxel.org>
+References: <20180613084149.14523-1-kraxel@redhat.com>
+	<20180613084149.14523-4-kraxel@redhat.com>
+	<20180613135047.5c1ce227@w520.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180612184616.90838-1-mst@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] kvm: x86 CPU power management
+In-Reply-To: <20180613135047.5c1ce227@w520.home>
+Subject: Re: [Qemu-devel] [PATCH v4 3/3] hw/vfio/display: add ramfb support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?utf-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>, libvir-list@redhat.com, Erik Skultety <eskultet@redhat.com>, Laine Stump <laine@redhat.com>
 
-On Tue, Jun 12, 2018 at 09:47:11PM +0300, Michael S. Tsirkin wrote:
-> This adds ability to expose host CPU power management capabilities to
-> guests. For intel guests, this is sufficient for guest to enable
-> low power CPU power management. For AMD guests it isn't sufficient,
-> deeper C-states are entered using System-IO.
+On Wed, Jun 13, 2018 at 01:50:47PM -0600, Alex Williamson wrote:
+> On Wed, 13 Jun 2018 10:41:49 +0200
+> Gerd Hoffmann <kraxel@redhat.com> wrote:
 > 
-> mwait based power management is tied closely to specifics of CPUID,
-> making migration challenging. At this point only the non-migrateable
-> -cpu host is supported.
+> > So we have a boot display when using a vgpu as primary display.
+> > 
+> > Use vfio-pci-ramfb instead of vfio-pci to enable it.
 > 
-> With this patch applied, VM latency is within the noise of
-> baremetal for some benchmarks.
-> 
-> perf bench sched pipe results:
-> Before:
->     6.452 sec
-> After:
->     4.382 sec
-> Baremetal:
->     4.136 sec
-> 
-> Michael S. Tsirkin (2):
->   kvm: support -realtime cpu-pm=on|off
->   i386/cpu: make -cpu host support monitor/mwait
-> 
->  include/sysemu/sysemu.h |  1 +
->  target/i386/cpu.h       |  9 +++++++++
->  target/i386/cpu.c       | 19 ++++++++++++++-----
->  target/i386/kvm.c       | 30 ++++++++++++++++++++++++++++++
->  vl.c                    |  6 ++++++
->  qemu-options.hx         |  9 +++++++--
->  6 files changed, 67 insertions(+), 7 deletions(-)
-> 
-> -- 
-> MST
+> Using a different device here seems like it almost guarantees a very
+> complicated path to support under libvirt.  What necessitates this
+> versus a simple ramfb=on option to vfio-pci?
 
-Hi Michael,
+Well, it's simliar to qxl vs. qxl-vga.  It's not qxl,vga={on,off} and
+libvirt has no problems to deal with that ...
 
-1) Command line option interface
+Another more technical reason is (again) hotplug.  ramfb needs an fw_cfg
+entry for configuration, and fw_cfg entries can't be hotplugged.  So
+hotplugging vfio-pci with ramfb=on isn't going to fly.  So we need a
+separate device with hotplug turned off.
 
-Why is this not an optional cpu feature such as the other features? 
+> I'm also not sure I understand the usage model, SeaBIOS and OVMF know
+> how to write to this display, but it seems that the guest does not.
 
+Yes.
 
--cpu CPU,+mwait  
+> I suppose in the UEFI case runtime services can be used to continue
+> writing this display,
 
-rather than a separate, architecture independent "-realtime cpu-pm=on|off" 
-command line option?
+Yes.
 
-2) Migration
+> but BIOS doesn't have such an option, unless we're somehow emulating
+> VGA here.
 
-Isnt it sufficient to check that both CPUID leafs are the same, 
-to allow migration ?
+vgabios support is in the pipeline, including text mode emulation (at
+vgabios level, direct access to vga window @ 0xa0000 doesn't work).
 
-1. Check that the processor supports MONITOR and MWAIT. If
-CPUID.01H:ECX.MONITOR[bit 3] = 1, MONITOR and MWAIT are available at
-ring 0.
+> So for UEFI, I can imagine this
+> covers us from power on through firmware boot and up to guest drivers
+> initializing the GPU (assuming the vGPU supports a kernel mode driver,
+> does NVIDIA?),
 
-2. Query the smallest and largest line size that MONITOR uses.
-Use CPUID.05H:EAX.smallest[bits 15:0];EBX.largest[bits15:0]. 
+Yes.  Shouldn't matter whenever the driver is kernel or userspace.
+
+> but for BIOS it seems we likely still have a break from
+> the bootloader to GPU driver initialization.
+
+Depends.  vgacon (text mode console) doesn't work.  fbcon @ vesafb works.
+
+> For instance, what driver
+> is used to draw the boot animation (or blue screen) on SeaBIOS Windows
+> VM?
+
+Windows depends on vgabios for that and it works fine.
+
+> I'm assuming that this display and the vGPU display are one in the
+> same, so there's some cut from one to the other.
+
+Yes.  If the vfio query plane ioctl reports a valid guest video mode
+configuration the vgpu display will be used, ramfb otherwise.
+
+cheers,
+  Gerd
