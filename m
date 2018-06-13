@@ -1,33 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTAKz-0002eB-8z
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:17:42 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fTALs-00033X-Mo
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:18:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTAKw-0001Pm-3r
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:17:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51576)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTAKv-0001Ma-RH
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:17:38 -0400
-Date: Wed, 13 Jun 2018 15:17:30 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180613181730.GG7451@localhost.localdomain>
-References: <20180611205030.GW7451@localhost.localdomain>
-	<20180611211026.GA7451@localhost.localdomain>
-	<DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612174021.GL7451@localhost.localdomain>
-	<DM5PR12MB2471F6EA1525A824A9A94545957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612190554.GO7451@localhost.localdomain>
-	<39f328af-a9c1-15bb-653e-9456b045768d@amd.com>
-	<DM5PR12MB2471C966B5B16FFCACDF33F3957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180613171820.GC7451@localhost.localdomain>
-	<DM5PR12MB2471BCEE4BD9ED0549F027E0957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	(envelope-from <mreitz@redhat.com>) id 1fTALr-0004PG-JA
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:18:36 -0400
+From: Max Reitz <mreitz@redhat.com>
+Date: Wed, 13 Jun 2018 20:18:09 +0200
+Message-Id: <20180613181823.13618-1-mreitz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM5PR12MB2471BCEE4BD9ED0549F027E0957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
- AMD EPYC CPU
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 00/14] block/mirror: Add active-sync
+ mirroring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,53 +21,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Moger, Babu" <Babu.Moger@amd.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-On Wed, Jun 13, 2018 at 06:10:30PM +0000, Moger, Babu wrote:
-> > -----Original Message-----
-> > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> > Sent: Wednesday, June 13, 2018 12:18 PM
-> > To: Moger, Babu <Babu.Moger@amd.com>
-> > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
-> > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> > kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Jiri
-> > Denemark <jdenemar@redhat.com>
-> > Subject: Re: [PATCH v13 3/5] i386: Enable TOPOEXT feature on AMD EPYC
-> > CPU
-> > 
-> > On Wed, Jun 13, 2018 at 04:52:18PM +0000, Moger, Babu wrote:
-> > [...]
-> > > > What do you think our options are here?
-> > >
-> > > Should we drop automatic topoext completely and move forward?
-> > > What are your thoughts?
-> > 
-> > Let's drop automatic topoext by now, and see if we find solutions
-> > later.  I don't want to hold the rest of the patches because of
-> > this.
-> 
-> Ok. I will drop topoext.
-> 
-> > 
-> > I'm thinking we could simply make kvm_arch_get_supported_cpuid()
-> > always return TOPOEXT on AMD CPUs, because the feature flag don't
-> > really depend on any KVM code to work (is that correct?).
-> 
-> Yes, that is correct. I don't see any dependent code on TOPOEXT in KVM driver.
-> 
-> Ok. Let me add TOPOEXT flag for all the AMD cpus and see how it goes.
+This series implements an active and synchronous mirroring mode.
 
-Hmm, this could actually solve all of our problems, then:
+You can read the cover letter of v4 here (I don=E2=80=99t like to copy-pa=
+ste
+that because people who reviewed previous versions know it already and
+this saves them from having to look out for potential changes):
 
-We can forget about auto-topoext: just add TOPOEXT in
-kvm_arch_get_supported_cpuid(), add TOPOEXT unconditionally to
-the CPU models where you are interested into (EPYC only?), and
-add topoext=off to pc-2.12 compat_props.
+http://lists.nongnu.org/archive/html/qemu-block/2018-04/msg00185.html
 
-Sorry for not noticing that before.  I was incorrectly assuming
-that TOPOEXT was safe to enable only if it was returned by
-GET_SUPPORTED_CPUID.
 
--- 
-Eduardo
+v5:
+- Patch 3: Rebase conflict with Kevin=E2=80=99s job series (kept R-bs bec=
+ause
+    it=E2=80=99s just a change in removed code (and a trivial one on top)=
+)
+- Patch 6: Removed completely unused BdrvChildList typedef [Berto]
+    (kept R-bs again because this isn=E2=80=99t even a functional change.=
+..)
+- Patch 11: Added, because jobs are no longer supposed to have direct
+    access to their progress info, but we need some way of just adding
+    an offset to the progress end value in the next patch
+- Patch 12:
+  - s/2.12/3.0/ [Eric]
+  - Use job_progress_*() functions
+  (kept R-b because I think those to be very obvious changes)
+- Patch 13: s/2.13/3.0/ (kept R-b because come on)
+- Patch 14:
+  - s/2017/2018/ (hey, why not)
+  - qmp_to_opts() has been moved to VM
+  (kept R-bs because I consider those to be trivial or obvious changes,
+  respectively)
+
+
+git-backport-diff to v4:
+
+Key:
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream pat=
+ch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
+tively
+
+001/14:[----] [--] 'block/mirror: Pull out mirror_perform()'
+002/14:[----] [--] 'block/mirror: Convert to coroutines'
+003/14:[0002] [FC] 'block/mirror: Use CoQueue to wait on in-flight ops'
+004/14:[----] [-C] 'block/mirror: Wait for in-flight op conflicts'
+005/14:[----] [-C] 'block/mirror: Use source as a BdrvChild'
+006/14:[0002] [FC] 'block: Generalize should_update_child() rule'
+007/14:[----] [--] 'hbitmap: Add @advance param to hbitmap_iter_next()'
+008/14:[----] [--] 'test-hbitmap: Add non-advancing iter_next tests'
+009/14:[----] [--] 'block/dirty-bitmap: Add bdrv_dirty_iter_next_area'
+010/14:[----] [-C] 'block/mirror: Add MirrorBDSOpaque'
+011/14:[down] 'job: Add job_progress_increase_remaining()'
+012/14:[0006] [FC] 'block/mirror: Add active mirroring'
+013/14:[0004] [FC] 'block/mirror: Add copy mode QAPI interface'
+014/14:[0006] [FC] 'iotests: Add test for active mirroring'
+
+
+Max Reitz (14):
+  block/mirror: Pull out mirror_perform()
+  block/mirror: Convert to coroutines
+  block/mirror: Use CoQueue to wait on in-flight ops
+  block/mirror: Wait for in-flight op conflicts
+  block/mirror: Use source as a BdrvChild
+  block: Generalize should_update_child() rule
+  hbitmap: Add @advance param to hbitmap_iter_next()
+  test-hbitmap: Add non-advancing iter_next tests
+  block/dirty-bitmap: Add bdrv_dirty_iter_next_area
+  block/mirror: Add MirrorBDSOpaque
+  job: Add job_progress_increase_remaining()
+  block/mirror: Add active mirroring
+  block/mirror: Add copy mode QAPI interface
+  iotests: Add test for active mirroring
+
+ qapi/block-core.json         |  29 +-
+ include/block/block_int.h    |   4 +-
+ include/block/dirty-bitmap.h |   2 +
+ include/qemu/hbitmap.h       |   5 +-
+ include/qemu/job.h           |  15 +
+ block.c                      |  44 ++-
+ block/backup.c               |   2 +-
+ block/dirty-bitmap.c         |  57 +++-
+ block/mirror.c               | 605 ++++++++++++++++++++++++++++-------
+ blockdev.c                   |   9 +-
+ job.c                        |   5 +
+ tests/test-hbitmap.c         |  38 ++-
+ util/hbitmap.c               |  10 +-
+ tests/qemu-iotests/151       | 120 +++++++
+ tests/qemu-iotests/151.out   |   5 +
+ tests/qemu-iotests/group     |   1 +
+ 16 files changed, 799 insertions(+), 152 deletions(-)
+ create mode 100755 tests/qemu-iotests/151
+ create mode 100644 tests/qemu-iotests/151.out
+
+--=20
+2.17.1
