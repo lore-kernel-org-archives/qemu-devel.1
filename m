@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <amade@asmblr.net>) id 1fT9WT-0001AI-93
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:25:30 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fT9XS-0001pJ-61
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:26:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <amade@asmblr.net>) id 1fT9WO-0005LX-1K
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:25:29 -0400
-Received: from srv2.anyservers.com ([77.79.239.202]:46046)
+	(envelope-from <pbonzini@redhat.com>) id 1fT9XN-0008L7-4r
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:26:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57364 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <amade@asmblr.net>) id 1fT9WN-0005Ej-Oz
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:25:23 -0400
-From: =?UTF-8?q?Amadeusz=20S=C5=82awi=C5=84ski?= <amade@asmblr.net>
-Date: Wed, 13 Jun 2018 19:27:07 +0200
-Message-Id: <20180613172707.31530-1-amade@asmblr.net>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fT9XM-0008Iy-UX
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:26:25 -0400
+References: <20180611203712.12086-1-ehabkost@redhat.com>
+	<a8426bf6-7531-6306-d1c6-bb4c6c2099cd@redhat.com>
+	<20180612150153.GK7451@localhost.localdomain>
+	<6c9b3744-7323-cd1f-7b07-2b77df7ae80d@redhat.com>
+	<20180612182541.GN7451@localhost.localdomain>
+	<b93cd6e5-bb2e-b932-bc68-da5c314924a2@redhat.com>
+	<20180613171607.GB7451@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <05f69c85-af96-a53a-a534-ce8f83f7249a@redhat.com>
+Date: Wed, 13 Jun 2018 19:26:14 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] sdl2: restore window dimensions by resize
+In-Reply-To: <20180613171607.GB7451@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] i386: Remove ospke CPUID flag name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,47 +33,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Amadeusz=20S=C5=82awi=C5=84ski?= <amade@asmblr.net>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-instead of destroying and recreating window, fixes segfault caused by
-handle_keyup trying to access no more existing window when using
-Ctrl-Alt-U to restore window "un-scaled" dimensions
+On 13/06/2018 19:16, Eduardo Habkost wrote:
+>> Second, for user-mode emulation it makes sense to allow flipping of
+>> OSPKE and OSXSAVE, because that corresponds to different behaviors of
+>> the underlying kernels.  There have been bugs in fact with programs that
+>> incorrectly tested XSAVE instead of OSXSAVE, so it's worthwhile to let
+>> the user test both configurations.
+>
+> However, "-cpu ...,-osxsave" has no effect today (user-mode QEMU
+> unconditionally sets OSXSAVE), so that would be a new feature.
 
- Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
- [Switching to Thread 0x7ffff7f92b80 (LWP 3711)]
- handle_keyup (ev=0x7fffffffd010) at ui/sdl2.c:416
- 416         scon->ignore_hotkeys = false;
- (gdb) bt
- #0  handle_keyup (ev=0x7fffffffd010) at ui/sdl2.c:416
- #1  sdl2_poll_events (scon=0x100fee5a8) at ui/sdl2.c:608
- #2  0x0000000100585bf2 in dpy_refresh (s=0x101ad3e00) at ui/console.c:1658
- #3  gui_update (opaque=0x101ad3e00) at ui/console.c:205
- #4  0x0000000100690f2c in timerlist_run_timers (timer_list=0x100ede130) at util/qemu-timer.c:536
- #5  0x0000000100691177 in qemu_clock_run_timers (type=QEMU_CLOCK_REALTIME) at util/qemu-timer.c:547
- #6  qemu_clock_run_all_timers () at util/qemu-timer.c:674
- #7  0x0000000100691651 in main_loop_wait (nonblocking=<optimized out>) at util/main-loop.c:503
- #8  0x00000001003d650f in main_loop () at vl.c:1848
- #9  0x0000000100289681 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4605
+Yes, understood.
 
-Signed-off-by: Amadeusz Sławiński <amade@asmblr.net>
----
- ui/sdl2.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Paolo
 
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index a0f9b16bc1..3ae4719c32 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -371,8 +371,7 @@ static void handle_keydown(SDL_Event *ev)
-             }
-             break;
-         case SDL_SCANCODE_U:
--            sdl2_window_destroy(scon);
--            sdl2_window_create(scon);
-+            sdl2_window_resize(scon);
-             if (!scon->opengl) {
-                 /* re-create scon->texture */
-                 sdl2_2d_switch(&scon->dcl, scon->surface);
--- 
-2.17.1
+> I assume this means I don't need to drop the osxsave patch from
+> my queue, either.
+> 
+>> So to sum up, the default for QEMU user-mode emulation should be
+>> OSXSAVE=XSAVE and OSPKE=0.
+> Thanks!
