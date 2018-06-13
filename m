@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fT8yn-0003W2-Kb
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:50:43 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fT90U-0004TA-2Y
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:52:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fT8yj-0008Tt-Li
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:50:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56322 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fT8yj-0008SS-E6
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:50:37 -0400
-Date: Wed, 13 Jun 2018 17:50:32 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180613165032.GO2676@work-vm>
-References: <20180603050546.6827-1-zhangckid@gmail.com>
-	<20180603050546.6827-12-zhangckid@gmail.com>
-	<87efhiwy4e.fsf@dusky.pond.sub.org>
-	<CAK3tnvJ9W7fUxYBDYLcwhtDwruSh28HVo96dHyXfrBhYB9QB9g@mail.gmail.com>
-	<87h8m9n7j1.fsf@dusky.pond.sub.org>
-	<CAK3tnv+5i-C5vhkA6BNa=PWVgJY8ikonELB7EQ=nNz2LsbtmMA@mail.gmail.com>
+	(envelope-from <Babu.Moger@amd.com>) id 1fT90Q-0004p8-4n
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:52:26 -0400
+Received: from mail-sn1nam01on0052.outbound.protection.outlook.com
+	([104.47.32.52]:37868
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fT90P-0004kS-O6
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:52:22 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Wed, 13 Jun 2018 16:52:18 +0000
+Message-ID: <DM5PR12MB2471C966B5B16FFCACDF33F3957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
+References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
+	<1528498581-131037-4-git-send-email-babu.moger@amd.com>
+	<20180611205030.GW7451@localhost.localdomain>
+	<20180611211026.GA7451@localhost.localdomain>
+	<DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180612174021.GL7451@localhost.localdomain>
+	<DM5PR12MB2471F6EA1525A824A9A94545957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180612190554.GO7451@localhost.localdomain>
+	<39f328af-a9c1-15bb-653e-9456b045768d@amd.com>
+In-Reply-To: <39f328af-a9c1-15bb-653e-9456b045768d@amd.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK3tnv+5i-C5vhkA6BNa=PWVgJY8ikonELB7EQ=nNz2LsbtmMA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH V8 11/17] qapi: Add new command to query
- colo status
+Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
+ AMD EPYC CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,216 +38,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: Markus Armbruster <armbru@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: "Moger, Babu" <Babu.Moger@amd.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
 
-* Zhang Chen (zhangckid@gmail.com) wrote:
-> On Mon, Jun 11, 2018 at 2:48 PM, Markus Armbruster <armbru@redhat.com>
-> wrote:
-> 
-> > Zhang Chen <zhangckid@gmail.com> writes:
-> >
-> > > On Thu, Jun 7, 2018 at 8:59 PM, Markus Armbruster <armbru@redhat.com>
-> > wrote:
-> > >
-> > >> Zhang Chen <zhangckid@gmail.com> writes:
-> > >>
-> > >> > Libvirt or other high level software can use this command query colo
-> > >> status.
-> > >> > You can test this command like that:
-> > >> > {'execute':'query-colo-status'}
-> > >> >
-> > >> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> > >> > ---
-> > >> >  migration/colo.c    | 39 +++++++++++++++++++++++++++++++++++++++
-> > >> >  qapi/migration.json | 34 ++++++++++++++++++++++++++++++++++
-> > >> >  2 files changed, 73 insertions(+)
-> > >> >
-> > >> > diff --git a/migration/colo.c b/migration/colo.c
-> > >> > index bedb677788..8c6b8e9a4e 100644
-> > >> > --- a/migration/colo.c
-> > >> > +++ b/migration/colo.c
-> > >> > @@ -29,6 +29,7 @@
-> > >> >  #include "net/colo.h"
-> > >> >  #include "block/block.h"
-> > >> >  #include "qapi/qapi-events-migration.h"
-> > >> > +#include "qapi/qmp/qerror.h"
-> > >> >
-> > >> >  static bool vmstate_loading;
-> > >> >  static Notifier packets_compare_notifier;
-> > >> > @@ -237,6 +238,44 @@ void qmp_xen_colo_do_checkpoint(Error **errp)
-> > >> >  #endif
-> > >> >  }
-> > >> >
-> > >> > +COLOStatus *qmp_query_colo_status(Error **errp)
-> > >> > +{
-> > >> > +    int state;
-> > >> > +    COLOStatus *s = g_new0(COLOStatus, 1);
-> > >> > +
-> > >> > +    s->mode = get_colo_mode();
-> > >> > +
-> > >> > +    switch (s->mode) {
-> > >> > +    case COLO_MODE_UNKNOWN:
-> > >> > +        error_setg(errp, "COLO is disabled");
-> > >> > +        state = MIGRATION_STATUS_NONE;
-> > >> > +        break;
-> > >> > +    case COLO_MODE_PRIMARY:
-> > >> > +        state = migrate_get_current()->state;
-> > >> > +        break;
-> > >> > +    case COLO_MODE_SECONDARY:
-> > >> > +        state = migration_incoming_get_current()->state;
-> > >> > +        break;
-> > >> > +    default:
-> > >> > +        abort();
-> > >> > +    }
-> > >> > +
-> > >> > +    s->colo_running = state == MIGRATION_STATUS_COLO;
-> > >> > +
-> > >> > +    switch (failover_get_state()) {
-> > >> > +    case FAILOVER_STATUS_NONE:
-> > >> > +        s->reason = COLO_EXIT_REASON_NONE;
-> > >> > +        break;
-> > >> > +    case FAILOVER_STATUS_REQUIRE:
-> > >> > +        s->reason = COLO_EXIT_REASON_REQUEST;
-> > >> > +        break;
-> > >> > +    default:
-> > >> > +        s->reason = COLO_EXIT_REASON_ERROR;
-> > >> > +    }
-> > >> > +
-> > >> > +    return s;
-> > >> > +}
-> > >> > +
-> > >> >  static void colo_send_message(QEMUFile *f, COLOMessage msg,
-> > >> >                                Error **errp)
-> > >> >  {
-> > >> > diff --git a/qapi/migration.json b/qapi/migration.json
-> > >> > index 93136ce5a0..356a370949 100644
-> > >> > --- a/qapi/migration.json
-> > >> > +++ b/qapi/migration.json
-> > >> > @@ -1231,6 +1231,40 @@
-> > >> >  ##
-> > >> >  { 'command': 'xen-colo-do-checkpoint' }
-> > >> >
-> > >> > +##
-> > >> > +# @COLOStatus:
-> > >> > +#
-> > >> > +# The result format for 'query-colo-status'.
-> > >> > +#
-> > >> > +# @mode: COLO running mode. If COLO is running, this field will
-> > return
-> > >> > +#        'primary' or 'secodary'.
-> > >> > +#
-> > >> > +# @colo-running: true if COLO is running.
-> > >> > +#
-> > >> > +# @reason: describes the reason for the COLO exit.
-> > >>
-> > >> What's the value of @reason before a "COLO exit"?
-> > >>
-> > >
-> > > Before a "COLO exit", we just return 'none' in this field.
-> >
-> > Please add that to the documentation.
-> >
-> 
-> OK.
-> 
-> 
-> >
-> > Please excuse my ignorance on COLO...  I'm still not sure I fully
-> > understand how the three members are related, or even how the COLO state
-> > machine works and how its related to / embedded in RunState.  I searched
-> > docs/ for a state diagram, but couldn't find one.
-> >
-> > According to runstate_transitions_def[], the part of the RunState state
-> > machine that's directly connected to state "colo" looks like this:
-> >
-> >     inmigrate  -+
-> >                 |
-> >     paused  ----+
-> >                 |
-> >     migrate  ---+->  colo  <------>  running
-> >                 |
-> >     suspended  -+
-> >                 |
-> >     watchdog  --+
-> >
-> > For each of the seven state transitions: how is the state transition
-> > triggered (e.g. by QMP command, spontaneously when a certain condition
-> > is detected, ...), and what events (if any) are emitted then?
-> >
-> >
-> When you start COLO, the VM always running in "MIGRATION_STATUS_COLO" still
-> occur failover.
-> And in the flow diagram, you can think COLO always running in migrate state.
-> Because into COLO mode, we will control VM state in COLO code itself, for
-> example:
-> When we start COLO, it will do the first migration as normal live
-> migration, after that we will enter
-> the COLO process, at that time COLO think the primary VM state is same with
-> secondary VM(the first checkpoint),
-> so we will use vm_start() start the primary VM(unlike to normal migration)
-> and secondary VM.
-> In this time, primary VM and secondary VM will parallel running, and if
-> COLO found two VM state are
-> not same, it will trigger checkpoint(like another migration). Finally, if
-> occurred some fault that will trigger
-> failover, after that primary VM maybe return to normal running
-> mode(secondary dead).
-> So, if we just see the primary VM state, may be it has out of the RunState
-> state
-> machine or it still in migrate state.
-> 
-> 
-> 
-> 
-> > How is @colo-running related to the run state?
-> >
-> 
-> Not related, as I say above.
-
-Right; this is a different type of 'running' - it might be better to say
-'active' rather than running.
-
-  COLO has a pair of VMs in sync with a constant stream of migrations
-between them.
-The 'mode' is whether it's the source (primary) or destination (secondary) VM.
-(Also sometimes written PVM/SVM)
-
-If COLO fails for some reason (e.g. the
-secondary host fails) then I think this is saying the 'colo-running'
-would be false.
-
-Some monitoring tool would be watching this to make sure you
-really do have a redundent pair of VMs, and if one of them failed
-you'd want to know and alert.
-
-Dave
-
-> > Which run states are considered to be "before a COLO exit"?  If "before
-> > a COLO exit" doesn't map to run states, the state machine is too coarse
-> > to fully describe COLO, and I'd like to see a suitably refined one.
-> >
-> >
-> COLO just is a special case. It's worthy to refined one?
-> CC: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Any comments?
-> 
-> 
-> 
-> > If @colo-running is true, then @mode is either "primary" or "secondary".
-> > What are the possible values when @colo-running is false?
-> >
-> 
-> The @mode will in "unknown" state.
-> 
-> 
-> Thanks
-> Zhang Chen
-> 
-> 
-> 
-> >
-> > [...]
-> >
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbToga3ZtLW93bmVyQHZnZXIu
+a2VybmVsLm9yZyBbbWFpbHRvOmt2bS1vd25lckB2Z2VyLmtlcm5lbC5vcmddDQo+IE9uIEJlaGFs
+ZiBPZiBCYWJ1IE1vZ2VyDQo+IFNlbnQ6IFR1ZXNkYXksIEp1bmUgMTIsIDIwMTggMjo0NyBQTQ0K
+PiBUbzogRWR1YXJkbyBIYWJrb3N0IDxlaGFia29zdEByZWRoYXQuY29tPg0KPiBDYzogbXN0QHJl
+ZGhhdC5jb207IG1hcmNlbC5hcGZlbGJhdW1AZ21haWwuY29tOyBwYm9uemluaUByZWRoYXQuY29t
+Ow0KPiBydGhAdHdpZGRsZS5uZXQ7IG10b3NhdHRpQHJlZGhhdC5jb207IHFlbXUtZGV2ZWxAbm9u
+Z251Lm9yZzsNCj4ga3ZtQHZnZXIua2VybmVsLm9yZzsga2FzaEB0cmlwbGViYWNrLm5ldDsgZ2Vv
+ZmZAaG9zdGZpc3Npb24uY29tOyBKaXJpDQo+IERlbmVtYXJrIDxqZGVuZW1hckByZWRoYXQuY29t
+Pg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYxMyAzLzVdIGkzODY6IEVuYWJsZSBUT1BPRVhUIGZl
+YXR1cmUgb24gQU1EIEVQWUMNCj4gQ1BVDQo+IA0KPiANCj4gDQo+IE9uIDA2LzEyLzIwMTggMDI6
+MDUgUE0sIEVkdWFyZG8gSGFia29zdCB3cm90ZToNCj4gPiBPbiBUdWUsIEp1biAxMiwgMjAxOCBh
+dCAwNjozODowOFBNICswMDAwLCBNb2dlciwgQmFidSB3cm90ZToNCj4gPiBbLi4uXQ0KPiA+Pj4g
+SSdtIHN0YXJ0aW5nIHRvIHRoaW5rIHRoYXQgZW5hYmxpbmcgVE9QT0VYVCBhdXRvbWF0aWNhbGx5
+IGlzDQo+ID4+PiBhZGRpbmcgdG9vIG11Y2ggY29tcGxleGl0eSBhbmQgY29tcGF0aWJpbGl0eSBw
+cm9ibGVtcywgYW5kIGl0J3MNCj4gPj4+IGJldHRlciB0byBsZWF2ZSB0aGlzIHRhc2sgdG8gbWFu
+YWdlbWVudCBzb2Z0d2FyZS4NCj4gPj4+DQo+ID4+PiBUaGUgbWFpbiBwcm9ibGVtIGhlcmUgaXM6
+DQo+ID4+Pg0KPiA+Pj4gVGhpcyB3b3JrcyB0b2RheSB3aXRoIFFFTVUgMi4xMiArIExpbnV4IDw9
+IDQuMTU6DQo+ID4+PiAgICAkICRRRU1VIC1tYWNoaW5lIHBjIC1jcHUgRVBZQyxlbmZvcmNlIC1z
+bXANCj4gPj4+IDgsc29ja2V0cz0yLGNvcmVzPTIsdGhyZWFkcz0yIg0KPiA+Pj4gYW5kIG11c3Qg
+a2VlcCB3b3JraW5nIHdpdGggUUVNVSAzLjAgYW5kIExpbnV4IDw9IDQuMTUuDQo+ID4+Pg0KPiA+
+Pj4gSW4gYWRkaXRpb24gdG8gdGhhdCwgdGhlIHJlc3VsdHMgZm9yOg0KPiA+Pj4gICAgJCAkUUVN
+VSAtbWFjaGluZSBwYy1xMzUtMy4wIC1jcHUgRVBZQyxlbmZvcmNlIFsuLi5dDQo+ID4+PiBtdXN0
+IGJlIGRldGVybWluaXN0aWMgYW5kIGV4cG9zZSBleGFjdGx5IHRoZSBzYW1lIENQVUlEIGRhdGEg
+ZXZlbg0KPiA+Pj4gaWYgaG9zdCBoYXJkd2FyZSBvciBzb2Z0d2FyZSBjaGFuZ2VzLCBhcyBsb25n
+IGFzIHRoZSBRRU1VDQo+ID4+PiBjb21tYW5kLWxpbmUgaXMgdGhlIHNhbWUuDQo+ID4+Pg0KPiA+
+Pj4gRG8geW91IHNlZSBhIHdheSB0byBmdWxmaWxsIHRob3NlIHR3byBjb25zdHJhaW50cyB3aGls
+ZSBtYWtpbmcNCj4gPj4+ICItbWFjaGluZSBwYy1xMzUtMy4wIC1jcHUgRVBZQyIgZW5hYmxlIFRP
+UE9FWFQgYXV0b21hdGljYWxseT8NCj4gPj4+DQo+ID4+IE5vdyhzZXR0aW5nIGZlYXR1cmUgYmVm
+b3JlIHg4Nl9jcHVfZXhwYW5kX2ZlYXR1cmVzKSwgZW5hYmxpbmcNCj4gPj4gVE9QT0VYVCBhcHBl
+YXJzIHRvIHdvcmsgZmluZS4NCj4gPiBXaGF0IGFib3V0IHRoZSBhYm92ZSBjb25zdHJhaW50cz8g
+IEFyZSB5b3UgcmVhbGx5IGZ1bGZpbGxpbmcNCj4gPiB0aGVtPw0KPiA+DQo+ID4gVGhpcyBvbmUg
+aXMgdHJpY2t5Og0KPiA+DQo+ID4gXSBUaGlzIHdvcmtzIHRvZGF5IHdpdGggUUVNVSAyLjEyICsg
+TGludXggPD0gNC4xNToNCj4gPiBdICAgJCAkUUVNVSAtbWFjaGluZSBwYyAtY3B1IEVQWUMsZW5m
+b3JjZSAtc21wDQo+IDgsc29ja2V0cz0yLGNvcmVzPTIsdGhyZWFkcz0yIg0KPiA+IF0gYW5kIG11
+c3Qga2VlcCB3b3JraW5nIHdpdGggUUVNVSAzLjAgYW5kIExpbnV4IDw9IDQuMTUuDQo+ICDCoFRo
+aXMgd29ya3MgZmluZSBvbiBrZXJuZWwgPD0gNC4xNSB3aXRoIHNvbWUgd2FybmluZ3MoLXNtcA0K
+PiA4LHNvY2tldHM9Mixjb3Jlcz0yLHRocmVhZHM9MiAtY3B1IEVQWUMpLg0KPiANCj4gcWVtdS1z
+eXN0ZW0teDg2XzY0OiB3YXJuaW5nOiBob3N0IGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVh
+dHVyZToNCj4gQ1BVSUQuODAwMDAwMDFIOkVEWC5yZHRzY3AgW2JpdCAyN10NCj4gcWVtdS1zeXN0
+ZW0teDg2XzY0OiB3YXJuaW5nOiBob3N0IGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVy
+ZToNCj4gQ1BVSUQuODAwMDAwMDFIOkVDWC50b3BvZXh0IFtiaXQgMjJdDQo+IHFlbXUtc3lzdGVt
+LXg4Nl82NDogVGhpcyBmYW1pbHkgb2YgQU1EIENQVSBkb2Vzbid0IHN1cHBvcnQNCj4gaHlwZXJ0
+aHJlYWRpbmcoMikuIFBsZWFzZSBjb25maWd1cmUgLXNtcCBvcHRpb25zIHByb3Blcmx5IG9yIHRy
+eQ0KPiBlbmFibGluZyB0b3BvZXh0IGZlYXR1cmUuDQo+IGNvbnRpbnVlcy4uDQo+ID4NCj4gPiBJ
+ZiB3ZSBlbmFibGUgVE9QT0VYVCB1bmNvbmRpdGlvbmFsbHksIHRoZSBjb21tYW5kLWxpbmUgd29u
+J3Qgd29yaw0KPiA+IHdpdGggTGludXggPD0gNC4xNS4NCj4gPg0KPiA+IElmIHdlIGVuYWJsZSBU
+T1BPRVhUIG9ubHkgaWYgdGhlIGtlcm5lbCByZXR1cm5zIFRPUE9FWFQgb24NCj4gPiBHRVRfU1VQ
+UE9SVEVEX0NQVUlELCB3ZSBicmVhayB0aGUgc2Vjb25kIGNvbnN0cmFpbnQ6DQo+ID4NCj4gPiBd
+IFRoZSByZXN1bHRzIGZvcjoNCj4gPiBdICAgJCAkUUVNVSAtbWFjaGluZSBwYy1xMzUtMy4wIC1j
+cHUgRVBZQyxlbmZvcmNlIFsuLi5dDQo+ID4gXSBtdXN0IGJlIGRldGVybWluaXN0aWMgYW5kIGV4
+cG9zZSBleGFjdGx5IHRoZSBzYW1lIENQVUlEIGRhdGEgZXZlbg0KPiA+IF0gaWYgaG9zdCBoYXJk
+d2FyZSBvciBzb2Z0d2FyZSBjaGFuZ2VzLCBhcyBsb25nIGFzIHRoZSBRRU1VDQo+ID4gXSBjb21t
+YW5kLWxpbmUgaXMgdGhlIHNhbWUuDQo+ID4NCj4gVGhpcyBmYWlscyBvbiBrZXJuZWzCoCA8PSA0
+LjE1IHdpdGggZm9sbG93aW5nIG1lc3NhZ2VzKCgtc21wDQo+IDgsc29ja2V0cz0yLGNvcmVzPTIs
+dGhyZWFkcz0yIC1jcHUgRVBZQyxlbmZvcmNlKS4NCj4gcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJu
+aW5nOiBob3N0IGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZToNCj4gQ1BVSUQuODAw
+MDAwMDFIOkVEWC5yZHRzY3AgW2JpdCAyN10NCj4gcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJuaW5n
+OiBob3N0IGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZToNCj4gQ1BVSUQuODAwMDAw
+MDFIOkVDWC50b3BvZXh0IFtiaXQgMjJdDQo+IHFlbXUtc3lzdGVtLXg4Nl82NDogSG9zdCBkb2Vz
+bid0IHN1cHBvcnQgcmVxdWVzdGVkIGZlYXR1cmVzDQo+IGV4aXRzLi4NCj4gDQo+IFdoYXQgZG8g
+eW91IHRoaW5rIG91ciBvcHRpb25zIGFyZSBoZXJlPw0KDQpTaG91bGQgd2UgZHJvcCBhdXRvbWF0
+aWMgdG9wb2V4dCBjb21wbGV0ZWx5IGFuZCBtb3ZlIGZvcndhcmQ/IFdoYXQgYXJlIHlvdXIgdGhv
+dWdodHM/DQoNCg==
