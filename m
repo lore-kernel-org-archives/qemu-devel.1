@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sridhar.samudrala@intel.com>) id 1fStLJ-00065u-1Y
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:08:54 -0400
+	(envelope-from <sridhar.samudrala@intel.com>) id 1fStWh-00006e-5k
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:20:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sridhar.samudrala@intel.com>) id 1fStLE-0005Fj-Sa
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:08:52 -0400
-Received: from mga12.intel.com ([192.55.52.136]:58203)
+	(envelope-from <sridhar.samudrala@intel.com>) id 1fStWd-0002cg-RI
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:20:39 -0400
+Received: from mga02.intel.com ([134.134.136.20]:45200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sridhar.samudrala@intel.com>)
-	id 1fStLE-0005Ee-Ga
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:08:48 -0400
+	id 1fStWd-0002bH-Ct
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:20:35 -0400
 References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
-	<20180611202207-mutt-send-email-mst@kernel.org>
-	<dc8b1669-b8b6-fb59-94e2-6e4de6b96572@redhat.com>
-	<20180612051432-mutt-send-email-mst@kernel.org>
-	<23fc4aa4-ec41-d6e2-3354-10cbfc13b7ec@intel.com>
-	<20180612142557-mutt-send-email-mst@kernel.org>
+	<fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
+	<20180605152344-mutt-send-email-mst@kernel.org>
+	<a45625c9-d2cd-f8f7-ce31-37c558e70b88@redhat.com>
+	<20180612144743-mutt-send-email-mst@kernel.org>
 From: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
-Message-ID: <b9c88515-cf41-2a9a-078e-9c9e5adbbf14@intel.com>
-Date: Tue, 12 Jun 2018 17:08:45 -0700
+Message-ID: <7aa6dbe7-bac2-96f6-d96c-f51e5173c556@intel.com>
+Date: Tue, 12 Jun 2018 17:20:25 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180612142557-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180612144743-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+Subject: Re: [Qemu-devel] [PATCH] qemu: Introduce VIRTIO_NET_F_STANDBY
+ feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,116 +33,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, alexander.h.duyck@intel.com, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, jiri@resnulli.us, kubakici@wp.pl, netdev@vger.kernel.org, jesse.brandeburg@intel.com, virtualization@lists.linux-foundation.org, loseweigh@gmail.com, aaron.f.brown@intel.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, jesse.brandeburg@intel.com, alexander.h.duyck@intel.com, qemu-devel@nongnu.org
 
-On 6/12/2018 4:34 AM, Michael S. Tsirkin wrote:
-> On Mon, Jun 11, 2018 at 10:02:45PM -0700, Samudrala, Sridhar wrote:
->> On 6/11/2018 7:17 PM, Michael S. Tsirkin wrote:
->>> On Tue, Jun 12, 2018 at 09:54:44AM +0800, Jason Wang wrote:
->>>> On 2018年06月12日 01:26, Michael S. Tsirkin wrote:
->>>>> On Mon, May 07, 2018 at 04:09:54PM -0700, Sridhar Samudrala wrote:
->>>>>> This feature bit can be used by hypervisor to indicate virtio_net device to
->>>>>> act as a standby for another device with the same MAC address.
->>>>>>
->>>>>> I tested this with a small change to the patch to mark the STANDBY feature 'true'
->>>>>> by default as i am using libvirt to start the VMs.
->>>>>> Is there a way to pass the newly added feature bit 'standby' to qemu via libvirt
->>>>>> XML file?
->>>>>>
->>>>>> Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
->>>>> So I do not think we can commit to this interface: we
->>>>> really need to control visibility of the primary device.
->>>> The problem is legacy guest won't use primary device at all if we do this.
->>> And that's by design - I think it's the only way to ensure the
->>> legacy guest isn't confused.
->> Yes. I think so. But i am not sure if Qemu is the right place to control the visibility
->> of the primary device. The primary device may not be specified as an argument to Qemu. It
->> may be plugged in later.
->> The cloud service provider is providing a feature that enables low latency datapath and live
->> migration capability.
->> A tenant can use this feature only if he is running a VM that has virtio-net with failover support.
-> Well live migration is there already. The new feature is low latency
-> data path.
-
-we get live migration with just virtio.  But I meant live migration with VF as
-primary device.
-
->
-> And it's the guest that needs failover support not the VM.
-
-Isn't guest and VM synonymous?
-
-
->
->
->> I think Qemu should check if guest virtio-net supports this feature and provide a mechanism for
->> an upper layer indicating if the STANDBY feature is successfully negotiated or not.
->> The upper layer can then decide if it should hot plug a VF with the same MAC and manage the 2 links.
->> If VF is successfully hot plugged, virtio-net link should be disabled.
-> Did you even talk to upper layer management about it?
-> Just list the steps they need to do and you will see
-> that's a lot of machinery to manage by the upper layer.
->
-> What do we gain in flexibility? As far as I can see the
-> only gain is some resources saved for legacy VMs.
->
-> That's not a lot as tenant of the upper layer probably already has
-> at least a hunch that it's a new guest otherwise
-> why bother specifying the feature at all - you
-> save even more resources without it.
->
-
-I am not all that familiar with how Qemu manages network devices. If we can do all the
-required management of the primary/standby devices within Qemu, that is definitely a better
-approach without upper layer involvement.
-
-
->
->
->>>> How about control the visibility of standby device?
->>>>
->>>> Thanks
->>> standy the always there to guarantee no downtime.
+On 6/12/2018 4:54 AM, Michael S. Tsirkin wrote:
+> On Wed, Jun 06, 2018 at 10:29:03AM +0800, Jason Wang wrote:
+>>
+>> On 2018年06月05日 20:33, Michael S. Tsirkin wrote:
+>>> I don't think this is sufficient.
 >>>
->>>>> However just for testing purposes, we could add a non-stable
->>>>> interface "x-standby" with the understanding that as any
->>>>> x- prefix it's unstable and will be changed down the road,
->>>>> likely in the next release.
->>>>>
->>>>>
->>>>>> ---
->>>>>>     hw/net/virtio-net.c                         | 2 ++
->>>>>>     include/standard-headers/linux/virtio_net.h | 3 +++
->>>>>>     2 files changed, 5 insertions(+)
->>>>>>
->>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->>>>>> index 90502fca7c..38b3140670 100644
->>>>>> --- a/hw/net/virtio-net.c
->>>>>> +++ b/hw/net/virtio-net.c
->>>>>> @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] = {
->>>>>>                          true),
->>>>>>         DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKNOWN),
->>>>>>         DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
->>>>>> +    DEFINE_PROP_BIT64("standby", VirtIONet, host_features, VIRTIO_NET_F_STANDBY,
->>>>>> +                      false),
->>>>>>         DEFINE_PROP_END_OF_LIST(),
->>>>>>     };
->>>>>> diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
->>>>>> index e9f255ea3f..01ec09684c 100644
->>>>>> --- a/include/standard-headers/linux/virtio_net.h
->>>>>> +++ b/include/standard-headers/linux/virtio_net.h
->>>>>> @@ -57,6 +57,9 @@
->>>>>>     					 * Steering */
->>>>>>     #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
->>>>>> +#define VIRTIO_NET_F_STANDBY      62    /* Act as standby for another device
->>>>>> +                                         * with the same MAC.
->>>>>> +                                         */
->>>>>>     #define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Device set linkspeed and duplex */
->>>>>>     #ifndef VIRTIO_NET_NO_LEGACY
->>>>>> -- 
->>>>>> 2.14.3
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+>>> If both primary and standby devices are present, a legacy guest without
+>>> support for the feature might see two devices with same mac and get
+>>> confused.
+>>>
+>>> I think that we should only make primary visible after guest acked the
+>>> backup feature bit.
+>> I think we want exactly the reverse? E.g fail the negotiation when guest
+>> does not ack backup feature.
+>>
+>> Otherwise legacy guest won't even have the chance to see primary device in
+>> the guest.
+> That's by design.
 >
+>>> And on reset or when backup is cleared in some other way, unplug the
+>>> primary.
+>> What if guest does not support hotplug?
+> It shouldn't ack the backup feature then and it's a good point.
+> We should both document this and check kernel config has
+> hotplug support. Sridhar could you take a look pls?
+
+Right now we select NET_FAILOVER when virtio-net is enabled,  Should we select
+PCI_HOTPLUG when NET_FAILOVER is enabled?
+
+>
+>>> Something like the below will do the job:
+>>>
+>>> Primary device is added with a special "primary-failover" flag.
+>>> A virtual machine is then initialized with just a standby virtio
+>>> device. Primary is not yet added.
+>> A question is how to do the matching? Qemu knows nothing about e.g mac
+>> address of a pass-through device I believe?
+> Supply a flag to the VFIO when it's added, this way QEMU will know.
+>
+>>> Later QEMU detects that guest driver device set DRIVER_OK.
+>>> It then exposes the primary device to the guest, and triggers
+>>> a device addition event (hot-plug event) for it.
+>> Do you mean we won't have primary device in the initial qemu cli?
+> No, that's not what I mean.
+>
+> I mean management will supply a flag to VFIO and then
+>
+>
+> - VFIO defers exposing
+> primary to guest until guest acks the feature bit.
+> - When we see guest ack, initiate hotplug.
+> - On reboot, hide it again.
+> - On reset without reboot, request hot-unplug and on eject hide it again.
+>
+>
+>>> If QEMU detects guest driver removal, it initiates a hot-unplug sequence
+>>> to remove the primary driver.  In particular, if QEMU detects guest
+>>> re-initialization (e.g. by detecting guest reset) it immediately removes
+>>> the primary device.
+>> I believe guest failover module should handle this gracefully?
+> It can't control enumeration order, if primary is enumerated before
+> standby then guest will load its driver and it's too late
+> when failover driver is loaded.
+
+Does it mean that if guest unloads virtio-net driver, Qemu should automatically
+unplug the associated primary device?
+
+What about guest unloading/re-loading primary device driver?
+
+
+>
+>> Thanks
+>>
+>>> We can move some of this code to management as well, architecturally it
+>>> does not make too much sense but it might be easier implementation-wise.
+>>>
+>>> HTH
+>>>
+>>> On Mon, Jun 04, 2018 at 06:41:48PM -0700, Samudrala, Sridhar wrote:
+>>>> Ping on this patch now that the kernel patches are accepted into davem's net-next tree.
+>>>> https://patchwork.ozlabs.org/cover/920005/
+>>>>
+>>>>
+>>>> On 5/7/2018 4:09 PM, Sridhar Samudrala wrote:
+>>>>> This feature bit can be used by hypervisor to indicate virtio_net device to
+>>>>> act as a standby for another device with the same MAC address.
+>>>>>
+>>>>> I tested this with a small change to the patch to mark the STANDBY feature 'true'
+>>>>> by default as i am using libvirt to start the VMs.
+>>>>> Is there a way to pass the newly added feature bit 'standby' to qemu via libvirt
+>>>>> XML file?
+>>>>>
+>>>>> Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+>>>>> ---
+>>>>>     hw/net/virtio-net.c                         | 2 ++
+>>>>>     include/standard-headers/linux/virtio_net.h | 3 +++
+>>>>>     2 files changed, 5 insertions(+)
+>>>>>
+>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>>>>> index 90502fca7c..38b3140670 100644
+>>>>> --- a/hw/net/virtio-net.c
+>>>>> +++ b/hw/net/virtio-net.c
+>>>>> @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] = {
+>>>>>                          true),
+>>>>>         DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKNOWN),
+>>>>>         DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
+>>>>> +    DEFINE_PROP_BIT64("standby", VirtIONet, host_features, VIRTIO_NET_F_STANDBY,
+>>>>> +                      false),
+>>>>>         DEFINE_PROP_END_OF_LIST(),
+>>>>>     };
+>>>>> diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
+>>>>> index e9f255ea3f..01ec09684c 100644
+>>>>> --- a/include/standard-headers/linux/virtio_net.h
+>>>>> +++ b/include/standard-headers/linux/virtio_net.h
+>>>>> @@ -57,6 +57,9 @@
+>>>>>     					 * Steering */
+>>>>>     #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
+>>>>> +#define VIRTIO_NET_F_STANDBY      62    /* Act as standby for another device
+>>>>> +                                         * with the same MAC.
+>>>>> +                                         */
+>>>>>     #define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Device set linkspeed and duplex */
+>>>>>     #ifndef VIRTIO_NET_NO_LEGACY
