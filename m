@@ -1,29 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46944)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTA96-0005Mv-Nc
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:05:25 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fTAEA-0000GW-RK
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:10:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTA93-0005iJ-IR
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:05:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59828)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTA93-0005f7-AF
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:05:21 -0400
-Date: Wed, 13 Jun 2018 15:05:08 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180613180508.GD24764@localhost.localdomain>
-References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
-	<20180604042928-mutt-send-email-mst@kernel.org>
-	<23040757-b561-e0bf-a41d-38d3c44555ee@gmail.com>
-	<20180605072746.v6xxabsbewiuw7ka@sirius.home.kraxel.org>
-	<20180605084300.GF32286@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180605084300.GF32286@redhat.com>
+	(envelope-from <Babu.Moger@amd.com>) id 1fTAE7-00046W-IY
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:10:38 -0400
+Received: from mail-eopbgr690044.outbound.protection.outlook.com
+	([40.107.69.44]:14587
+	helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fTAE6-0003zb-NJ
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:10:35 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Wed, 13 Jun 2018 18:10:30 +0000
+Message-ID: <DM5PR12MB2471BCEE4BD9ED0549F027E0957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
+References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
+	<1528498581-131037-4-git-send-email-babu.moger@amd.com>
+	<20180611205030.GW7451@localhost.localdomain>
+	<20180611211026.GA7451@localhost.localdomain>
+	<DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180612174021.GL7451@localhost.localdomain>
+	<DM5PR12MB2471F6EA1525A824A9A94545957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180612190554.GO7451@localhost.localdomain>
+	<39f328af-a9c1-15bb-653e-9456b045768d@amd.com>
+	<DM5PR12MB2471C966B5B16FFCACDF33F3957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180613171820.GC7451@localhost.localdomain>
+In-Reply-To: <20180613171820.GC7451@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC] hw/pc: set q35 as the default x86
- machine
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
+ AMD EPYC CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,40 +40,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, libvir-list@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
 
-Getting back to this discussion:
 
-On Tue, Jun 05, 2018 at 09:43:00AM +0100, Daniel P. Berrang=E9 wrote:
-> On Tue, Jun 05, 2018 at 09:27:46AM +0200, Gerd Hoffmann wrote:
-> >   Hi,
-> >=20
-> > > >   Add to that shortcuts like -cdrom
-> > > > stop working,
-> > >=20
-> > > Maybe is fixable.
-> >=20
-> > Already fixed for ages.
-> >=20
-> > > I see marking Q35 as the default machine a first step.
-> >=20
-> > Maybe the better option is to go the arm route:  Just don't define a
-> > default, so users have to specify pc or q35.  That will make them not=
-ice
-> > there is a world beside 'pc', and we also avoid breaking things
-> > silently.
+> -----Original Message-----
+> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> Sent: Wednesday, June 13, 2018 12:18 PM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
+> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Jiri
+> Denemark <jdenemar@redhat.com>
+> Subject: Re: [PATCH v13 3/5] i386: Enable TOPOEXT feature on AMD EPYC
+> CPU
 >=20
-> If QEMU removes the default, then libvirt will have to hardcode
-> 'pc' as the default to maintain back compatibility, so I don't
-> think that ends up as a net win
+> On Wed, Jun 13, 2018 at 04:52:18PM +0000, Moger, Babu wrote:
+> [...]
+> > > What do you think our options are here?
+> >
+> > Should we drop automatic topoext completely and move forward?
+> > What are your thoughts?
+>=20
+> Let's drop automatic topoext by now, and see if we find solutions
+> later.  I don't want to hold the rest of the patches because of
+> this.
 
-I believe there's consensus that applications blindly relying on
-the default machine-type when creating a domain is a bad idea.
+Ok. I will drop topoext.
 
-That said, can we deprecate this feature in libvirt, encourage
-applications to always specify an explicit machine-type, thus
-making it possible to deprecate the i440fx machine-types one day?
+>=20
+> I'm thinking we could simply make kvm_arch_get_supported_cpuid()
+> always return TOPOEXT on AMD CPUs, because the feature flag don't
+> really depend on any KVM code to work (is that correct?).
 
---=20
-Eduardo
+Yes, that is correct. I don't see any dependent code on TOPOEXT in KVM driv=
+er.
+
+Ok. Let me add TOPOEXT flag for all the AMD cpus and see how it goes.
+
+>=20
+> --
+> Eduardo
