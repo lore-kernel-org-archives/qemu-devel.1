@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSzBr-0004eG-Kc
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 02:23:32 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fSzJi-0006Kh-CB
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 02:31:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fSzBn-0006gF-MR
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 02:23:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58750 helo=mx1.redhat.com)
+	(envelope-from <eric.auger@redhat.com>) id 1fSzJe-0001qA-Da
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 02:31:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42600 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fSzBn-0006fr-HR
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 02:23:27 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 19D5C87A7C
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 06:23:27 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1525843212-31922-1-git-send-email-thuth@redhat.com>
-	<87bmch48w6.fsf@dusky.pond.sub.org>
-	<a16c729a-8856-1141-5a6f-e647624bab44@redhat.com>
-	<dcd08712-9dbd-eeda-7040-40b1afb14429@redhat.com>
-Date: Wed, 13 Jun 2018 08:23:25 +0200
-In-Reply-To: <dcd08712-9dbd-eeda-7040-40b1afb14429@redhat.com> (Paolo
-	Bonzini's message of "Tue, 12 Jun 2018 17:04:07 +0200")
-Message-ID: <87d0wvkxwi.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fSzJe-0001pw-7i
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 02:31:34 -0400
+References: <1528830325-5501-1-git-send-email-eric.auger@redhat.com>
+	<20180613031501.GF15344@xz-mi>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <2b2c55a8-6ad4-9039-6f12-fd40100fc539@redhat.com>
+Date: Wed, 13 Jun 2018 08:31:31 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180613031501.GF15344@xz-mi>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add an entry for
- qemu-options* files in main directory
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] exec: Fix MAP_RAM for cached access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,71 +28,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, eric.auger.pro@gmail.com
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Hi Peter,
 
-> On 12/06/2018 12:46, Thomas Huth wrote:
->> Markus Armbruster <armbru@redhat.com> writes:
->>> CLI is like QMP in that there's infrastructure, interface and
->>> implementation.
->>>=20
->>> QMP infrastructure is MAINTAINERS sections QMP and QAPI.  These are
->>> proper subsystems, with clear boundaries.  Its maintainers get copied on
->>> relatively few patches.
->>>=20
->>> QMP infrastructure doesn't own the actual commands[1], subsystems do.
->>> For instance, the block subsystem owns commands dealing with block
->>> devices.
->>>=20
->>> The QMP interface is specified in the QAPI schema.  Again, QMP
->>> infrastructure doesn't own it, subsystems do.  However, to maintain some
->>> measure of cohesion, we co-maintain the interface: MAINTAINERS section
->>> QAPI schema covers the complete schema, and subsystems cover individual
->>> modules of the schema[2].
->>>=20
->>> I think a similar arrangement make sense for CLI.  We'll get it for free
->>> with CLI QAPIfication, but that'll take time.
->>>
->>> Your patch does what is possible with a monolithic interface definition:
->>> it dumps it all on one maintainer: me.  I'm struggling to keep up with
->>> the QAPI schema, I'm not sure I can take more.
->>>
->>> Note that "Command line option argument parsing" is phrased carefully:
->>> it's not "CLI", not even "CLI parsing".  qemu-options* does not fit
->>> there.  Two solutions: widen the section so it fits better, create a new
->>> section.  The latter would be closer to how we do QMP.
->>>
->>> What do you think?
->> Both ideas sound fine to me. What about adding a new section called
->> "Generic command line options"? I hope that the word "generic" then
->> makes it clear that this entry is primarily thought for generic options
->> - subsystem specific options can and should still go through the
->> subsystem trees instead.
+On 06/13/2018 05:15 AM, Peter Xu wrote:
+> On Tue, Jun 12, 2018 at 09:05:25PM +0200, Eric Auger wrote:
+>> When an IOMMUMemoryRegion is in front of a virtio device,
+>> address_space_cache_init does not set cache->ptr as the memory
+>> region is not RAM. However when the device performs an access,
+>> we end up in glue() which performs the translation and then uses
+>> MAP_RAM. This latter uses the unset ptr and returns a wrong value
+>> which leads to a SIGSEV in address_space_lduw_internal_cached_slow,
+>> for instance. Let's test whether the cache->ptr is set, and in
+>> the negative use the old macro definition. This fixes the
+>> use cases featuring vIOMMU (Intel and ARM SMMU) which lead to
+>> a SIGSEV.
+>>
+>> Fixes: 48564041a73a (exec: reintroduce MemoryRegion caching)
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> I am not sure whether it doesn't break any targeted optimization
+>> but at least it removes the SIGSEV.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  exec.c | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/exec.c b/exec.c
+>> index f6645ed..46fbd25 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -3800,7 +3800,9 @@ address_space_write_cached_slow(MemoryRegionCache *cache, hwaddr addr,
+>>  #define SUFFIX                   _cached_slow
+>>  #define TRANSLATE(...)           address_space_translate_cached(cache, __VA_ARGS__)
+>>  #define IS_DIRECT(mr, is_write)  memory_access_is_direct(mr, is_write)
+>> -#define MAP_RAM(mr, ofs)         (cache->ptr + (ofs - cache->xlat))
+>> +#define MAP_RAM(mr, ofs)         (cache->ptr ? \
+>> +                                 (cache->ptr + (ofs - cache->xlat)) :  \
+>> +                                 qemu_map_ram_ptr((mr)->ram_block, ofs))
+> 
+> A pure question: if the MR is not a RAM (I think the only case for
+> virtio case should be an IOMMU MR), then why we'll call MAP_RAM()
+> after all?  An glue() example:
+> 
+> void glue(address_space_stb, SUFFIX)(ARG1_DECL,
+>     hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
+> {
+>     uint8_t *ptr;
+>     MemoryRegion *mr;
+>     hwaddr l = 1;
+>     hwaddr addr1;
+>     MemTxResult r;
+>     bool release_lock = false;
+> 
+>     RCU_READ_LOCK();
+>     mr = TRANSLATE(addr, &addr1, &l, true, attrs);
+>     if (!IS_DIRECT(mr, true)) {                <----------------- [1]
+after the translate, mr points to the actual RAM region, downstream to
+the IOMMU MR. And this one is direct. addr1 is the offset within the RAM
+region if I am not wrong.
 
-How well would that work in practice?  get_maintainers.pl can't tell
-apart "generic" from "specific to subsystem S"...
+Am i missing something?
 
-For QMP, get_maintainers.pl identifies the parts.  Subsystem-specific
-parts are co-maintained by subsystem and QAPI schema maintainers, and
-expected to go through the subsystem tree.  The "whatever remains" part
-is maintained just by QAPI schema maintainers, and goes through various
-trees in practice.  Note "whatever remains" > "generic"; it's a bit of a
-dumping ground right now.
+Thanks
 
->> Do you think you could still be available as (co-)maintainer of that new
->> section? If not, who are going to be the maintainers of that new
->> section? Paolo? Eric? Daniel? ...?
->
-> Well, currently it's going through me.  I'd add vl.c too, by the way.
-
-vl.c has much more than just CLI parsing.  It's pushing 4kSLOC...
-Splitting it up would be nice.  As long as it's not, I guess the
-pragmatic solution is to have multiple MAINTAINERS sections claim it:
-existing "Main loop", proposed "CLI", ...
-
-Me helping to maintain CLI in addition to some of its infrastructure
-would make plenty of sense if my day had 32 hours or so.  Ask Marc-Andr=C3=
-=A9
-what he thinks of me taking on *more* maintenance %-}
+Eric
+>         release_lock |= prepare_mmio_access(mr);
+>         r = memory_region_dispatch_write(mr, addr1, val, 1, attrs);
+>     } else {
+>         /* RAM case */
+>         ptr = MAP_RAM(mr, addr1);
+>         stb_p(ptr, val);
+>         INVALIDATE(mr, addr1, 1);
+>         r = MEMTX_OK;
+>     }
+>     if (result) {
+>         *result = r;
+>     }
+>     if (release_lock) {
+>         qemu_mutex_unlock_iothread();
+>     }
+>     RCU_READ_UNLOCK();
+> }
+> 
+> At [1] we should check first against whether it's direct after all.
+> AFAIU IOMMU MR should not be direct then it'll go the slow path rather
+> than calling MAP_RAM()?
+> 
+> Since at it, I have another (pure) question about the address space
+> cache.  I don't think it's urgent since I think it's never a problem
+> for virtio, but I'm still asking anyways...
+> 
+> Still taking the stb example:
+> 
+> static inline void address_space_stb_cached(MemoryRegionCache *cache,
+>     hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
+> {
+>     assert(addr < cache->len);   <----------------------------- [2]
+>     if (likely(cache->ptr)) {
+>         stb_p(cache->ptr + addr, val);
+>     } else {
+>         address_space_stb_cached_slow(cache, addr, val, attrs, result);
+>     }
+> }
+> 
+> Here at [2] what if the region cached is smaller than provided when
+> doing address_space_cache_init()?  AFAIU the "len" provided to
+> address_space_cache_init() can actually shrink (though for virtio it
+> should never) when do:
+> 
+>     l = len;
+>     ...
+>     cache->mrs = *address_space_translate_internal(d, addr, &cache->xlat, &l, true);
+>     ...
+>     cache->len = l;
+> 
+> And here not sure whether we should not assert, instead we only run
+> the fast path if the address falls into the cache region, say:
+> 
+> static inline void address_space_stb_cached(MemoryRegionCache *cache,
+>     hwaddr addr, uint32_t val, MemTxAttrs attrs, MemTxResult *result)
+> {
+>     if (likely(cache->ptr && addr < cache->len)) {
+>         stb_p(cache->ptr + addr, val);
+>     } else {
+>         address_space_stb_cached_slow(cache, addr, val, attrs, result);
+>     }
+> }
+> 
+> Or we should add a check in address_space_cache_init() to make sure
+> the region won't shrink.
+> 
+> Regards,
+> 
