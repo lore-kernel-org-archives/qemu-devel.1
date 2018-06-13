@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fT841-0005wZ-NL
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 11:52:02 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fT863-0007V3-WD
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 11:54:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fT83x-0003Sv-Ao
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 11:52:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53050 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fT83x-0003S2-6C
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 11:51:57 -0400
-Date: Wed, 13 Jun 2018 16:51:48 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180613155147.GJ2676@work-vm>
-References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
-	<20180604095520.8563-3-xiaoguangrong@tencent.com>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fT85z-0000j7-RW
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 11:54:08 -0400
+Received: from mail-he1eur04on0719.outbound.protection.outlook.com
+	([2a01:111:f400:fe0d::719]:12324
+	helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
+	id 1fT85z-0000d6-1b
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 11:54:03 -0400
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Wed, 13 Jun 2018 18:53:46 +0300
+Message-Id: <1528905228-25694-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180604095520.8563-3-xiaoguangrong@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH 02/12] migration: fix counting normal page
- for compression
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 0/2] qapi: allow empty branches in flat
+ unions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: guangrong.xiao@gmail.com
-Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: qemu-devel@nongnu.org
+Cc: eblake@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-* guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
-> From: Xiao Guangrong <xiaoguangrong@tencent.com>
-> 
-> The compressed page is not normal page
+since v3:
+ - patch 2 fixed: BlockdevQcow2Encryption::QCryptoBlockOptionsQCow
+   deletion was a mistake
 
-Is this the right reason?
-I think we always increment some counter for a page - so
-what gets incremented for a compressed page?
-Is the real answer that we do:
+v3: http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg06836.html
 
-  ram_save_target_page
-     control_save_page
-     compress_page_with_multi_thread
+Anton Nefedov (2):
+  qapi: allow empty branches in flat unions
+  qapi: remove empty flat union branches and types
 
-and control_save_page already increments the counter?
+ docs/devel/qapi-code-gen.txt                       |  8 ++--
+ qapi/block-core.json                               | 52 ++--------------------
+ qapi/crypto.json                                   | 13 +-----
+ qapi/misc.json                                     | 46 +------------------
+ qapi/net.json                                      | 12 -----
+ qapi/ui.json                                       | 19 +-------
+ .../qapi-schema/flat-union-incomplete-branch.json  |  9 ----
+ tests/qapi-schema/qapi-schema-test.json            |  4 +-
+ block/qcow2.c                                      |  1 -
+ cpus.c                                             |  2 -
+ scripts/qapi/common.py                             | 11 ++---
+ scripts/qapi/types.py                              |  4 +-
+ scripts/qapi/visit.py                              | 17 +++++--
+ tests/Makefile.include                             |  1 -
+ tests/qapi-schema/flat-union-incomplete-branch.err |  1 -
+ .../qapi-schema/flat-union-incomplete-branch.exit  |  1 -
+ tests/qapi-schema/flat-union-incomplete-branch.out |  0
+ tests/qapi-schema/qapi-schema-test.out             |  3 +-
+ 18 files changed, 36 insertions(+), 168 deletions(-)
+ delete mode 100644 tests/qapi-schema/flat-union-incomplete-branch.json
+ delete mode 100644 tests/qapi-schema/flat-union-incomplete-branch.err
+ delete mode 100644 tests/qapi-schema/flat-union-incomplete-branch.exit
+ delete mode 100644 tests/qapi-schema/flat-union-incomplete-branch.out
 
-Dave
-
-> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
-> ---
->  migration/ram.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 0caf32ab0a..dbf24d8c87 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1432,7 +1432,6 @@ static int compress_page_with_multi_thread(RAMState *rs, RAMBlock *block,
->              qemu_cond_signal(&comp_param[idx].cond);
->              qemu_mutex_unlock(&comp_param[idx].mutex);
->              pages = 1;
-> -            ram_counters.normal++;
-
->              ram_counters.transferred += bytes_xmit;
->              break;
->          }
-> -- 
-> 2.14.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+2.7.4
