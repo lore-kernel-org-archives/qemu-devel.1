@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56489)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fT1So-0002Hv-E3
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:49:11 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fT1Sx-0002Pv-37
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:49:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fT1Sn-0003vD-Me
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:49:10 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fT1Sw-0003xZ-7U
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:49:19 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 13 Jun 2018 10:48:40 +0200
-Message-Id: <1528879723-24675-7-git-send-email-eric.auger@redhat.com>
+Date: Wed, 13 Jun 2018 10:48:41 +0200
+Message-Id: <1528879723-24675-8-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1528879723-24675-1-git-send-email-eric.auger@redhat.com>
 References: <1528879723-24675-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/9] hw/arm/virt-acpi-build: Advertise one or
- two GICR structures
+Subject: [Qemu-devel] [PATCH 7/9] hw/arm/virt: Register two redistributor
+ regions when necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +23,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
 Cc: drjones@redhat.com, wei@redhat.com, zhaoshenglong@huawei.com, lersek@redhat.com, ard.biesheuvel@linaro.org, christoffer.dall@arm.com, marc.zyngier@arm.com
 
-Depending on the number of smp_cpus we now register one or two
-GICR structures.
+With a VGICv3 KVM device, if the number of vcpus exceeds the
+capacity of the legacy redistributor region (123 redistributors),
+we now attempt to register a second redistributor region. Up to
+512 redistributors can fit in this latter on top of the 123 allowed
+by the legacy redistributor region.
+
+Registering this second redistributor region is possible if the
+host kernel supports the following VGICv3 KVM device group/attribute:
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION.
+
+In case the host kernel does not support the registration of several
+redistributor regions and the requested number of vcpus exceeds the
+capacity of the legacy redistributor region, the GICv3 device
+initialization fails with a proper error message and qemu exits.
+
+At the moment the max number of vcpus still is capped by the
+virt machine class max_cpus.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/virt-acpi-build.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 74f5744..eefd1d4 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -670,6 +670,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+---
+
+v2 -> v3:
+- remove spare space
+---
+ hw/arm/virt.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 5c02cc5..2a1c0fb 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -528,6 +528,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+     SysBusDevice *gicbusdev;
+     const char *gictype;
+     int type = vms->gic_version, i;
++    uint32_t nb_redist_regions = 0;
  
-     if (vms->gic_version == 3) {
-         AcpiMadtGenericTranslator *gic_its;
-+        int nb_redist_regions = virt_gicv3_redist_region_count(vms);
-         AcpiMadtGenericRedistributor *gicr = acpi_data_push(table_data,
-                                                          sizeof *gicr);
+     gictype = (type == 3) ? gicv3_class_name() : gic_class_name();
  
-@@ -678,6 +679,14 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-         gicr->base_address = cpu_to_le64(memmap[VIRT_GIC_REDIST].base);
-         gicr->range_length = cpu_to_le32(memmap[VIRT_GIC_REDIST].size);
+@@ -547,14 +548,28 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+                     vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+         uint32_t redist0_count = MIN(smp_cpus, redist0_capacity);
  
-+        if (nb_redist_regions == 2) {
-+            gicr = acpi_data_push(table_data, sizeof(*gicr));
-+            gicr->type = ACPI_APIC_GENERIC_REDISTRIBUTOR;
-+            gicr->length = sizeof(*gicr);
-+            gicr->base_address = cpu_to_le64(memmap[VIRT_GIC_REDIST2].base);
-+            gicr->range_length = cpu_to_le32(memmap[VIRT_GIC_REDIST2].size);
-+        }
+-        qdev_prop_set_uint32(gicdev, "len-redist-region-count", 1);
++        nb_redist_regions = virt_gicv3_redist_region_count(vms);
 +
-         if (its_class_name() && !vmc->no_its) {
-             gic_its = acpi_data_push(table_data, sizeof *gic_its);
-             gic_its->type = ACPI_APIC_GENERIC_TRANSLATOR;
++        qdev_prop_set_uint32(gicdev, "len-redist-region-count",
++                             nb_redist_regions);
+         qdev_prop_set_uint32(gicdev, "redist-region-count[0]", redist0_count);
++
++        if (nb_redist_regions == 2) {
++            uint32_t redist1_capacity =
++                        vms->memmap[VIRT_GIC_REDIST2].size / GICV3_REDIST_SIZE;
++
++            qdev_prop_set_uint32(gicdev, "redist-region-count[1]",
++                MIN(smp_cpus - redist0_count, redist1_capacity));
++        }
+     }
+     qdev_init_nofail(gicdev);
+     gicbusdev = SYS_BUS_DEVICE(gicdev);
+     sysbus_mmio_map(gicbusdev, 0, vms->memmap[VIRT_GIC_DIST].base);
+     if (type == 3) {
+         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_REDIST].base);
++        if (nb_redist_regions == 2) {
++            sysbus_mmio_map(gicbusdev, 2, vms->memmap[VIRT_GIC_REDIST2].base);
++        }
+     } else {
+         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
+     }
+@@ -1350,6 +1365,7 @@ static void machvirt_init(MachineState *machine)
+      */
+     if (vms->gic_version == 3) {
+         virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
++        virt_max_cpus += vms->memmap[VIRT_GIC_REDIST2].size / GICV3_REDIST_SIZE;
+     } else {
+         virt_max_cpus = GIC_NCPU;
+     }
 -- 
 2.5.5
