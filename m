@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1fSthJ-0002vn-2h
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:31:38 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fSu4N-0006oF-NZ
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:55:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1fSthF-00079t-VJ
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:31:37 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2277 helo=huawei.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1fSthF-00076w-Cy
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:31:33 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Wed, 13 Jun 2018 00:31:10 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DB018593@dggeml511-mbx.china.huawei.com>
-References: <cover.1528462918.git.alifm@linux.ibm.com>
-	<a9a06d82df69387bf1e66975b520d9049e9976e8.1528462918.git.alifm@linux.ibm.com>
-	<33183CC9F5247A488A2544077AF19020DB015ABF@dggeml511-mbx.china.huawei.com>
-	<7957a36b-6881-1967-fa60-eaeaa38256c0@linux.ibm.com>
-In-Reply-To: <7957a36b-6881-1967-fa60-eaeaa38256c0@linux.ibm.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <dgibson@ozlabs.org>) id 1fSu4M-0007LG-Fn
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:55:27 -0400
+Date: Wed, 13 Jun 2018 10:47:52 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180613004752.GN30690@umbus.fritz.box>
+References: <20180530100754.15833-1-clg@kaod.org>
+	<20180606063910.GK17757@umbus.fritz.box>
+	<326e1949-28d0-941d-54f7-dbba6825388d@kaod.org>
+	<20180612055855.GE30690@umbus.fritz.box>
+	<87436236-09f6-9ee0-dbe6-00f0147050dc@kaod.org>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v1 2/2] crypto/virtio-crypto: Register an
- algo only if it's supported
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ggdAeHltlv4tpqCr"
+Content-Disposition: inline
+In-Reply-To: <87436236-09f6-9ee0-dbe6-00f0147050dc@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2] pnv: add a physical mapping array
+ describing MMIO ranges in each chip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +28,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.ibm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, longpeng <longpeng2@huawei.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>, "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRmFyaGFuIEFsaSBbbWFp
-bHRvOmFsaWZtQGxpbnV4LmlibS5jb21dDQo+IFNlbnQ6IFdlZG5lc2RheSwgSnVuZSAxMywgMjAx
-OCAxOjA4IEFNDQo+IFRvOiBHb25nbGVpIChBcmVpKSA8YXJlaS5nb25nbGVpQGh1YXdlaS5jb20+
-OyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOw0KPiBrdm1Admdlci5rZXJuZWwub3JnDQo+
-IENjOiBtc3RAcmVkaGF0LmNvbTsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBsb25ncGVuZw0KPiA8
-bG9uZ3BlbmcyQGh1YXdlaS5jb20+OyBwYXNpY0BsaW51eC5pYm0uY29tOyBmcmFua2phQGxpbnV4
-LmlibS5jb207DQo+IGJvcm50cmFlZ2VyQGRlLmlibS5jb20NCj4gU3ViamVjdDogUmU6IFtSRkMg
-djEgMi8yXSBjcnlwdG8vdmlydGlvLWNyeXB0bzogUmVnaXN0ZXIgYW4gYWxnbyBvbmx5IGlmIGl0
-J3MNCj4gc3VwcG9ydGVkDQo+IA0KPiANCj4gDQo+IE9uIDA2LzExLzIwMTggMDQ6NDggQU0sIEdv
-bmdsZWkgKEFyZWkpIHdyb3RlOg0KPiA+DQo+ID4NCj4gPj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdl
-LS0tLS0NCj4gPj4gRnJvbTogRmFyaGFuIEFsaSBbbWFpbHRvOmFsaWZtQGxpbnV4LmlibS5jb21d
-DQo+ID4+IFNlbnQ6IFNhdHVyZGF5LCBKdW5lIDA5LCAyMDE4IDM6MDkgQU0NCj4gPj4gVG86IGxp
-bnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmcNCj4gPj4gQ2M6
-IG1zdEByZWRoYXQuY29tOyBxZW11LWRldmVsQG5vbmdudS5vcmc7IEdvbmdsZWkgKEFyZWkpDQo+
-ID4+IDxhcmVpLmdvbmdsZWlAaHVhd2VpLmNvbT47IGxvbmdwZW5nIDxsb25ncGVuZzJAaHVhd2Vp
-LmNvbT47DQo+ID4+IHBhc2ljQGxpbnV4LmlibS5jb207IGZyYW5ramFAbGludXguaWJtLmNvbTsg
-Ym9ybnRyYWVnZXJAZGUuaWJtLmNvbTsNCj4gPj4gYWxpZm1AbGludXguaWJtLmNvbQ0KPiA+PiBT
-dWJqZWN0OiBbUkZDIHYxIDIvMl0gY3J5cHRvL3ZpcnRpby1jcnlwdG86IFJlZ2lzdGVyIGFuIGFs
-Z28gb25seSBpZiBpdCdzDQo+IHN1cHBvcnRlZA0KPiA+Pg0KPiA+PiBGcm9tOiBGYXJoYW4gQWxp
-IDxhbGlmbUBsaW51eC52bmV0LmlibS5jb20+DQo+ID4+DQo+ID4+IFJlZ2lzdGVyIGEgY3J5cHRv
-IGFsZ28gd2l0aCB0aGUgTGludXggY3J5cHRvIGxheWVyIG9ubHkgaWYNCj4gPj4gdGhlIGFsZ29y
-aXRobSBpcyBzdXBwb3J0ZWQgYnkgdGhlIGJhY2tlbmQgdmlydGlvLWNyeXB0bw0KPiA+PiBkZXZp
-Y2UuDQo+ID4+DQo+ID4+IEFsc28gcm91dGUgY3J5cHRvIHJlcXVlc3RzIHRvIGEgdmlydGlvLWNy
-eXB0bw0KPiA+PiBkZXZpY2UsIG9ubHkgaWYgaXQgY2FuIHN1cHBvcnQgdGhlIHJlcXVlc3RlZCBz
-ZXJ2aWNlIGFuZA0KPiA+PiBhbGdvcml0aG0uDQo+ID4+DQo+ID4+IFNpZ25lZC1vZmYtYnk6IEZh
-cmhhbiBBbGkgPGFsaWZtQGxpbnV4LmlibS5jb20+DQo+ID4+IC0tLQ0KPiA+PiAgIGRyaXZlcnMv
-Y3J5cHRvL3ZpcnRpby92aXJ0aW9fY3J5cHRvX2FsZ3MuYyAgIHwgMTEwDQo+ID4+ICsrKysrKysr
-KysrKysrKysrKy0tLS0tLS0tLQ0KPiA+PiAgIGRyaXZlcnMvY3J5cHRvL3ZpcnRpby92aXJ0aW9f
-Y3J5cHRvX2NvbW1vbi5oIHwgIDExICsrLQ0KPiA+PiAgIGRyaXZlcnMvY3J5cHRvL3ZpcnRpby92
-aXJ0aW9fY3J5cHRvX21nci5jICAgIHwgIDgxDQo+ICsrKysrKysrKysrKysrKysrKy0tDQo+ID4+
-ICAgMyBmaWxlcyBjaGFuZ2VkLCAxNTggaW5zZXJ0aW9ucygrKSwgNDQgZGVsZXRpb25zKC0pDQo+
-ID4+DQo+ID4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by92aXJ0aW8vdmlydGlvX2NyeXB0
-b19hbGdzLmMNCj4gPj4gYi9kcml2ZXJzL2NyeXB0by92aXJ0aW8vdmlydGlvX2NyeXB0b19hbGdz
-LmMNCj4gPj4gaW5kZXggYmExOTBjZi4uZmVmMTEyYSAxMDA2NDQNCj4gPj4gLS0tIGEvZHJpdmVy
-cy9jcnlwdG8vdmlydGlvL3ZpcnRpb19jcnlwdG9fYWxncy5jDQo+ID4+ICsrKyBiL2RyaXZlcnMv
-Y3J5cHRvL3ZpcnRpby92aXJ0aW9fY3J5cHRvX2FsZ3MuYw0KPiA+PiBAQCAtNDksMTIgKzQ5LDE4
-IEBAIHN0cnVjdCB2aXJ0aW9fY3J5cHRvX3N5bV9yZXF1ZXN0IHsNCj4gPj4gICAJYm9vbCBlbmNy
-eXB0Ow0KPiA+PiAgIH07DQo+ID4+DQo+ID4+ICtzdHJ1Y3QgdmlydGlvX2NyeXB0b19hbGdvIHsN
-Cj4gPj4gKwl1aW50MzJfdCBhbGdvbnVtOw0KPiA+PiArCXVpbnQzMl90IHNlcnZpY2U7DQo+ID4+
-ICsJdW5zaWduZWQgaW50IGFjdGl2ZV9kZXZzOw0KPiA+PiArCXN0cnVjdCBjcnlwdG9fYWxnIGFs
-Z287DQo+ID4+ICt9Ow0KPiA+PiArDQo+ID4+ICAgLyoNCj4gPj4gICAgKiBUaGUgYWxnc19sb2Nr
-IHByb3RlY3RzIHRoZSBiZWxvdyBnbG9iYWwgdmlydGlvX2NyeXB0b19hY3RpdmVfZGV2cw0KPiA+
-PiAgICAqIGFuZCBjcnlwdG8gYWxnb3JpdGhtcyByZWdpc3Rpb24uDQo+ID4+ICAgICovDQo+ID4+
-ICAgc3RhdGljIERFRklORV9NVVRFWChhbGdzX2xvY2spOw0KPiA+PiAtc3RhdGljIHVuc2lnbmVk
-IGludCB2aXJ0aW9fY3J5cHRvX2FjdGl2ZV9kZXZzOw0KPiA+PiAgIHN0YXRpYyB2b2lkIHZpcnRp
-b19jcnlwdG9fYWJsa2NpcGhlcl9maW5hbGl6ZV9yZXEoDQo+ID4+ICAgCXN0cnVjdCB2aXJ0aW9f
-Y3J5cHRvX3N5bV9yZXF1ZXN0ICp2Y19zeW1fcmVxLA0KPiA+PiAgIAlzdHJ1Y3QgYWJsa2NpcGhl
-cl9yZXF1ZXN0ICpyZXEsDQo+ID4+IEBAIC0zMTIsMTMgKzMxOCwxOSBAQCBzdGF0aWMgaW50IHZp
-cnRpb19jcnlwdG9fYWJsa2NpcGhlcl9zZXRrZXkoc3RydWN0DQo+ID4+IGNyeXB0b19hYmxrY2lw
-aGVyICp0Zm0sDQo+ID4+ICAgCQkJCQkgdW5zaWduZWQgaW50IGtleWxlbikNCj4gPj4gICB7DQo+
-ID4+ICAgCXN0cnVjdCB2aXJ0aW9fY3J5cHRvX2FibGtjaXBoZXJfY3R4ICpjdHggPQ0KPiBjcnlw
-dG9fYWJsa2NpcGhlcl9jdHgodGZtKTsNCj4gPj4gKwl1aW50MzJfdCBhbGc7DQo+ID4+ICAgCWlu
-dCByZXQ7DQo+ID4+DQo+ID4+ICsJcmV0ID0gdmlydGlvX2NyeXB0b19hbGdfdmFsaWRhdGVfa2V5
-KGtleWxlbiwgJmFsZyk7DQo+ID4+ICsJaWYgKHJldCkNCj4gPj4gKwkJcmV0dXJuIHJldDsNCj4g
-Pj4gKw0KPiA+PiAgIAlpZiAoIWN0eC0+dmNyeXB0bykgew0KPiA+PiAgIAkJLyogTmV3IGtleSAq
-Lw0KPiA+PiAgIAkJaW50IG5vZGUgPSB2aXJ0aW9fY3J5cHRvX2dldF9jdXJyZW50X25vZGUoKTsN
-Cj4gPj4gICAJCXN0cnVjdCB2aXJ0aW9fY3J5cHRvICp2Y3J5cHRvID0NCj4gPj4gLQkJCQkgICAg
-ICB2aXJ0Y3J5cHRvX2dldF9kZXZfbm9kZShub2RlKTsNCj4gPj4gKwkJCQkgICAgICB2aXJ0Y3J5
-cHRvX2dldF9kZXZfbm9kZShub2RlLA0KPiA+PiArCQkJCSAgICAgIFZJUlRJT19DUllQVE9fU0VS
-VklDRV9DSVBIRVIsIGFsZyk7DQo+ID4+ICAgCQlpZiAoIXZjcnlwdG8pIHsNCj4gPj4gICAJCQlw
-cl9lcnIoInZpcnRpb19jcnlwdG86IENvdWxkIG5vdCBmaW5kIGEgdmlydGlvIGRldmljZSBpbiB0
-aGUNCj4gPj4gc3lzdGVtXG4iKTsNCj4gPg0KPiA+IFdlJ2QgYmV0dGVyIGNoYW5nZSB0aGUgYWJv
-dmUgZXJyb3IgbWVzc2FnZSBub3cuIFdoYXQgYWJvdXQ6DQo+ID4gICAiIHZpcnRpb19jcnlwdG86
-IENvdWxkIG5vdCBmaW5kIGEgdmlydGlvIGRldmljZSBpbiB0aGUgc3lzdGVtIG9yIHVuc3VwcG9y
-dGVkDQo+IGFsZ28iID8NCj4gPg0KPiA+IFJlZ2FyZHMsDQo+ID4gLUdvbmdsZWkNCj4gDQo+IA0K
-PiBTdXJlLCBJIHdpbGwgdXBkYXRlIHRoZSBlcnJvciBtZXNzYWdlLiBCdXQgb3RoZXIgdGhhbiB0
-aGF0IGRvZXMgdGhlIHJlc3QNCj4gb2YgdGhlIGNvZGUgbG9va3MgZ29vZCB0byB5b3U/DQo+IA0K
-WWVzLCBnb29kIHdvcmsuIFlvdSBjYW4gYWRkIG15IGFjayBpbiB2MjoNCg0KQWNrZWQtYnk6IEdv
-bmdsZWkgPGFyZWkuZ29uZ2xlaUBodWF3ZWkuY29tPg0KDQpSZWdhcmRzLA0KLUdvbmdsZWkNCg0K
-DQoNCg==
+
+--ggdAeHltlv4tpqCr
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Jun 12, 2018 at 08:13:49AM +0200, C=E9dric Le Goater wrote:
+> On 06/12/2018 07:58 AM, David Gibson wrote:
+> > On Wed, Jun 06, 2018 at 09:04:10AM +0200, C=E9dric Le Goater wrote:
+> >> On 06/06/2018 08:39 AM, David Gibson wrote:
+> >>> On Wed, May 30, 2018 at 12:07:54PM +0200, C=E9dric Le Goater wrote:
+> >>>> Based on previous work done in skiboot, the physical mapping array
+> >>>> helps in calculating the MMIO ranges of each controller depending on
+> >>>> the chip id and the chip type. This is will be particularly useful f=
+or
+> >>>> the P9 models which use less the XSCOM bus and rely more on MMIOs.
+> >>>>
+> >>>> A link on the chip is now necessary to calculate MMIO BARs and
+> >>>> sizes. This is why such a link is introduced in the PSIHB model.
+> >>>
+> >>> I think this message needs some work.  This says what it's for, but
+> >>> what actually *is* this array, and how does it work?
+> >>
+> >> OK. It is relatively simple: each controller has an entry defining its=
+=20
+> >> MMIO range.=20
+> >>
+> >>> The outside-core differences between POWER8 and POWER9 are substantial
+> >>> enough that I'm wondering if pnvP8 and pnvP9 would be better off as
+> >>> different machine types (sharing some routines, of course).
+> >>
+> >> yes and no. I have survived using a common PnvChip framework but
+> >> it is true that I had to add P9 classes for each: LPC, PSI, OCC=20
+> >> They are very similar but not enough. P9 uses much more MMIOs than=20
+> >> P8 which still uses a lot of XSCOM. I haven't looked at PHB4.=20
+> >=20
+> > Well, it's certainly *possible* to use the same machine type, I'm just
+> > not convinced it's a good idea.  It seems kind of dodgy to me that so
+> > many peripherals on the system change as a side-effect of setting the
+> > cpu.  Compare to how x86 works where cpu really does change the CPU,
+> > plugging it into the same virtual "chipset".  Different chipsets *are*
+> > different machine types there (pc vs. q35).
+>=20
+> OK, I agree, and we can use a set of common routines to instantiate the=
+=20
+> different chipset models.=20
+>=20
+> So we would have a common pnv_init() routine to initialize the different=
+=20
+> 'powernv8' and 'powernv9' machines and the PnvChip typename would be a=20
+> machine class attribute ?
+
+Well.. that's one option.  Usually for these things, it works out
+better to instead of parameterizing big high-level routines like
+pnv_init(), you have separate versions of those calling a combination
+of case-specific and common routines as necessary.
+
+Mostly it just comes down to what is simplest to implement for you, though.
+
+> Nevertheless we would still need to introduce "a physical mapping array=
+=20
+> describing MMIO ranges" but we can start by differentiating the chipsets=
+=20
+> first.
+
+Well, maybe.  I'm wondering if you can more easily encapsulate the
+information in that array in a top-level init routine, that calls
+common helpers with different addresses / device types / whatever.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ggdAeHltlv4tpqCr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsgabgACgkQbDjKyiDZ
+s5I92hAAyjbdvj+TalI/6UudyEdRPJSYKOienRUOetWnVIt89HP0Qvmq+PmfQjo0
+2hIwsgO+2SkHDeqekzoGQMKsED9SdEs2M1/UdeU03gMtWSCUb9SZRWPzEhFs6ac0
+hQHOuerTifglP0byUY+dustS6qlZL3D7Pr99saB7e6q0qtAxYszjcXHq6uJZbi1V
+zfE3OeLFOx4cQuk0E2pRI2zzPH05QVmn6KrQwZh1sgcvQCpU/E40CNlOK2qMukst
+/th8e+qv34cQU90tX1W3IZkODImDA/uCFNKFF0SxhddPT4JWLi9IDcGAGKtJE/Yr
+jIL3MsbWv+6iXtfrGb7JIH6XvjU4UU8AgVRlrSRNPvsLJpxOMmV7oHT3ZmhI/j4r
+R/xPPlUq+RDNLJJCKKzXJlRGGohWo5ecmFLGJEbx6d0pJeB6D8mgJf7WKZtObTzv
+r2INXGSyXK96Em2Q3BJslOVFabCZmtYDvfLNpKLuwrR80v+VWmiR+gW49DiEE8uT
+gBVtX/UQu0AA1e99Qve+yKNe/CIm7HV+RF8onwwHei8mx8OOvgL30/lOCgOMdjvu
+nzYYEZ8msuqv4u8aA4HRcFZ86vHRld5lDzCsaL3v8CMiIZq4txt/XD0v+XmQJ4dL
+9YRsJR2DEuJEGISKFJi21A5Vz5IVhTJFvDm4SeY4dtMFrjrJhV8=
+=YxNI
+-----END PGP SIGNATURE-----
+
+--ggdAeHltlv4tpqCr--
