@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56871)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fTAMB-0003Ib-Tl
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:19:00 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fTAMJ-0003PY-T4
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fTAM9-0005Rs-DS
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:18:54 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fTAMI-0005yo-FJ
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:19:03 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 13 Jun 2018 20:18:15 +0200
-Message-Id: <20180613181823.13618-7-mreitz@redhat.com>
+Date: Wed, 13 Jun 2018 20:18:16 +0200
+Message-Id: <20180613181823.13618-8-mreitz@redhat.com>
 In-Reply-To: <20180613181823.13618-1-mreitz@redhat.com>
 References: <20180613181823.13618-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 06/14] block: Generalize
- should_update_child() rule
+Subject: [Qemu-devel] [PATCH v5 07/14] hbitmap: Add @advance param to
+ hbitmap_iter_next()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,94 +23,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-Currently, bdrv_replace_node() refuses to create loops from one BDS to
-itself if the BDS to be replaced is the backing node of the BDS to
-replace it: Say there is a node A and a node B.  Replacing B by A means
-making all references to B point to A.  If B is a child of A (i.e. A has
-a reference to B), that would mean we would have to make this reference
-point to A itself -- so we'd create a loop.
-
-bdrv_replace_node() (through should_update_child()) refuses to do so if
-B is the backing node of A.  There is no reason why we should create
-loops if B is not the backing node of A, though.  The BDS graph should
-never contain loops, so we should always refuse to create them.
-
-If B is a child of A and B is to be replaced by A, we should simply
-leave B in place there because it is the most sensible choice.
-
-A more specific argument would be: Putting filter drivers into the BDS
-graph is basically the same as appending an overlay to a backing chain.
-But the main child BDS of a filter driver is not "backing" but "file",
-so restricting the no-loop rule to backing nodes would fail here.
+This new parameter allows the caller to just query the next dirty
+position without moving the iterator.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- block.c | 44 ++++++++++++++++++++++++++++++++++----------
- 1 file changed, 34 insertions(+), 10 deletions(-)
+ include/qemu/hbitmap.h |  5 ++++-
+ block/backup.c         |  2 +-
+ block/dirty-bitmap.c   |  2 +-
+ tests/test-hbitmap.c   | 26 +++++++++++++-------------
+ util/hbitmap.c         | 10 +++++++---
+ 5 files changed, 26 insertions(+), 19 deletions(-)
 
-diff --git a/block.c b/block.c
-index 50887087f3..df6dce6a73 100644
---- a/block.c
-+++ b/block.c
-@@ -3394,16 +3394,39 @@ static bool should_update_child(BdrvChild *c, BlockDriverState *to)
-         return false;
-     }
+diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
+index 6b6490ecad..ddca52c48e 100644
+--- a/include/qemu/hbitmap.h
++++ b/include/qemu/hbitmap.h
+@@ -324,11 +324,14 @@ void hbitmap_free_meta(HBitmap *hb);
+ /**
+  * hbitmap_iter_next:
+  * @hbi: HBitmapIter to operate on.
++ * @advance: If true, advance the iterator.  Otherwise, the next call
++ *           of this function will return the same result (if that
++ *           position is still dirty).
+  *
+  * Return the next bit that is set in @hbi's associated HBitmap,
+  * or -1 if all remaining bits are zero.
+  */
+-int64_t hbitmap_iter_next(HBitmapIter *hbi);
++int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance);
  
--    if (c->role == &child_backing) {
--        /* If @from is a backing file of @to, ignore the child to avoid
--         * creating a loop. We only want to change the pointer of other
--         * parents. */
--        QLIST_FOREACH(to_c, &to->children, next) {
--            if (to_c == c) {
--                break;
--            }
--        }
--        if (to_c) {
-+    /* If the child @c belongs to the BDS @to, replacing the current
-+     * c->bs by @to would mean to create a loop.
-+     *
-+     * Such a case occurs when appending a BDS to a backing chain.
-+     * For instance, imagine the following chain:
-+     *
-+     *   guest device -> node A -> further backing chain...
-+     *
-+     * Now we create a new BDS B which we want to put on top of this
-+     * chain, so we first attach A as its backing node:
-+     *
-+     *                   node B
-+     *                     |
-+     *                     v
-+     *   guest device -> node A -> further backing chain...
-+     *
-+     * Finally we want to replace A by B.  When doing that, we want to
-+     * replace all pointers to A by pointers to B -- except for the
-+     * pointer from B because (1) that would create a loop, and (2)
-+     * that pointer should simply stay intact:
-+     *
-+     *   guest device -> node B
-+     *                     |
-+     *                     v
-+     *                   node A -> further backing chain...
-+     *
-+     * In general, when replacing a node A (c->bs) by a node B (@to),
-+     * if A is a child of B, that means we cannot replace A by B there
-+     * because that would create a loop.  Silently detaching A from B
-+     * is also not really an option.  So overall just leaving A in
-+     * place there is the most sensible choice. */
-+    QLIST_FOREACH(to_c, &to->children, next) {
-+        if (to_c == c) {
-             return false;
+ /**
+  * hbitmap_iter_next_word:
+diff --git a/block/backup.c b/block/backup.c
+index 5661435675..d18be40caf 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -354,7 +354,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+     HBitmapIter hbi;
+ 
+     hbitmap_iter_init(&hbi, job->copy_bitmap, 0);
+-    while ((cluster = hbitmap_iter_next(&hbi)) != -1) {
++    while ((cluster = hbitmap_iter_next(&hbi, true)) != -1) {
+         do {
+             if (yield_and_check(job)) {
+                 return 0;
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 383d742cdb..cedb971765 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -519,7 +519,7 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
+ 
+ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
+ {
+-    return hbitmap_iter_next(&iter->hbi);
++    return hbitmap_iter_next(&iter->hbi, true);
+ }
+ 
+ /* Called within bdrv_dirty_bitmap_lock..unlock */
+diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
+index f29631f939..f2158f767d 100644
+--- a/tests/test-hbitmap.c
++++ b/tests/test-hbitmap.c
+@@ -46,7 +46,7 @@ static void hbitmap_test_check(TestHBitmapData *data,
+ 
+     i = first;
+     for (;;) {
+-        next = hbitmap_iter_next(&hbi);
++        next = hbitmap_iter_next(&hbi, true);
+         if (next < 0) {
+             next = data->size;
+         }
+@@ -435,25 +435,25 @@ static void test_hbitmap_iter_granularity(TestHBitmapData *data,
+     /* Note that hbitmap_test_check has to be invoked manually in this test.  */
+     hbitmap_test_init(data, 131072 << 7, 7);
+     hbitmap_iter_init(&hbi, data->hb, 0);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ 
+     hbitmap_test_set(data, ((L2 + L1 + 1) << 7) + 8, 8);
+     hbitmap_iter_init(&hbi, data->hb, 0);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ 
+     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ 
+     hbitmap_test_set(data, (131072 << 7) - 8, 8);
+     hbitmap_iter_init(&hbi, data->hb, 0);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ 
+     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), ==, 131071 << 7);
+-    g_assert_cmpint(hbitmap_iter_next(&hbi), <, 0);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
++    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
+ }
+ 
+ static void hbitmap_test_set_boundary_bits(TestHBitmapData *data, ssize_t diff)
+@@ -893,7 +893,7 @@ static void test_hbitmap_serialize_zeroes(TestHBitmapData *data,
+     for (i = 0; i < num_positions; i++) {
+         hbitmap_deserialize_zeroes(data->hb, positions[i], min_l1, true);
+         hbitmap_iter_init(&iter, data->hb, 0);
+-        next = hbitmap_iter_next(&iter);
++        next = hbitmap_iter_next(&iter, true);
+         if (i == num_positions - 1) {
+             g_assert_cmpint(next, ==, -1);
+         } else {
+@@ -919,10 +919,10 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
+ 
+     hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
+ 
+-    hbitmap_iter_next(&hbi);
++    hbitmap_iter_next(&hbi, true);
+ 
+     hbitmap_reset_all(data->hb);
+-    hbitmap_iter_next(&hbi);
++    hbitmap_iter_next(&hbi, true);
+ }
+ 
+ static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
+diff --git a/util/hbitmap.c b/util/hbitmap.c
+index 58a2c93842..bcd304041a 100644
+--- a/util/hbitmap.c
++++ b/util/hbitmap.c
+@@ -141,7 +141,7 @@ unsigned long hbitmap_iter_skip_words(HBitmapIter *hbi)
+     return cur;
+ }
+ 
+-int64_t hbitmap_iter_next(HBitmapIter *hbi)
++int64_t hbitmap_iter_next(HBitmapIter *hbi, bool advance)
+ {
+     unsigned long cur = hbi->cur[HBITMAP_LEVELS - 1] &
+             hbi->hb->levels[HBITMAP_LEVELS - 1][hbi->pos];
+@@ -154,8 +154,12 @@ int64_t hbitmap_iter_next(HBitmapIter *hbi)
          }
      }
-@@ -3429,6 +3452,7 @@ void bdrv_replace_node(BlockDriverState *from, BlockDriverState *to,
  
-     /* Put all parents into @list and calculate their cumulative permissions */
-     QLIST_FOREACH_SAFE(c, &from->parents, next_parent, next) {
-+        assert(c->bs == from);
-         if (!should_update_child(c, to)) {
-             continue;
-         }
+-    /* The next call will resume work from the next bit.  */
+-    hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
++    if (advance) {
++        /* The next call will resume work from the next bit.  */
++        hbi->cur[HBITMAP_LEVELS - 1] = cur & (cur - 1);
++    } else {
++        hbi->cur[HBITMAP_LEVELS - 1] = cur;
++    }
+     item = ((uint64_t)hbi->pos << BITS_PER_LEVEL) + ctzl(cur);
+ 
+     return item << hbi->granularity;
 -- 
 2.17.1
