@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fT08r-000752-4L
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 03:24:30 -0400
+	(envelope-from <groug@kaod.org>) id 1fT0AF-0007xD-BG
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 03:25:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fT08n-0006wG-Tp
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 03:24:29 -0400
-Received: from 7.mo173.mail-out.ovh.net ([46.105.44.159]:56353)
+	(envelope-from <groug@kaod.org>) id 1fT0AC-000805-7Q
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 03:25:55 -0400
+Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:38631)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fT08n-0006vO-JX
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 03:24:25 -0400
-Received: from player755.ha.ovh.net (unknown [10.109.105.104])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 7B4DCC2599
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 09:24:23 +0200 (CEST)
-References: <20180518164405.11804-1-clg@kaod.org>
-	<20180518164405.11804-2-clg@kaod.org>
-	<20180525160249.7cb0a5bc@bahia.lan>
-	<82ee8b24-91d7-9396-82b7-be37200cfacd@redhat.com>
-	<a567d42f-af8e-01da-5e0b-9b6f41c150cf@kaod.org>
-	<20180605033401.GU5140@umbus.fritz.box>
-	<48e319d0-2cf7-ab9a-f3d4-085880e1bda8@kaod.org>
-	<20180613042217.GT30690@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <67d4e25d-0f37-1282-5a40-6bfece16d1cb@kaod.org>
-Date: Wed, 13 Jun 2018 09:24:12 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fT0AB-0007zD-W0
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 03:25:52 -0400
+Received: from player776.ha.ovh.net (unknown [10.109.105.10])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 39160B6455
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 09:25:50 +0200 (CEST)
+Date: Wed, 13 Jun 2018 09:25:42 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180613092542.576e8c33@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20180612233140.GH30690@umbus.fritz.box>
+References: <20180612064503.14282-1-david@gibson.dropbear.id.au>
+	<CAFEAcA85qHjDLBYxWW9i4T91m1uTS6TAY_y2A6_840n-_tDZKw@mail.gmail.com>
+	<20180612175241.7340be80@bahia.lab.toulouse-stg.fr.ibm.com>
+	<CAFEAcA8yKyHX-xVx5VPxBOy7-hiKDo+DgztVZ_sD5FxK77Z-9w@mail.gmail.com>
+	<20180612204603.7bf254cb@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20180612233140.GH30690@umbus.fritz.box>
 MIME-Version: 1.0
-In-Reply-To: <20180613042217.GT30690@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] spapr: remove irq_hint parameter from
- spapr_irq_alloc()
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/rf=ua1hrfbCOIxhhBNo.UMR";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PULL 00/33] ppc-for-3.0 queue 20180612
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,166 +36,114 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
 
-On 06/13/2018 06:22 AM, David Gibson wrote:
-> On Tue, Jun 05, 2018 at 08:41:13AM +0200, C=E9dric Le Goater wrote:
->> On 06/05/2018 05:34 AM, David Gibson wrote:
->>> On Mon, May 28, 2018 at 09:06:12AM +0200, C=E9dric Le Goater wrote:
->>>> On 05/28/2018 08:17 AM, Thomas Huth wrote:
->>>>> On 25.05.2018 16:02, Greg Kurz wrote:
->>>>>> On Fri, 18 May 2018 18:44:02 +0200
->>>>>> C=E9dric Le Goater <clg@kaod.org> wrote:
->>>>>>
->>>>>>> This IRQ number hint can possibly be used by the VIO devices if t=
-he
->>>>>>> "irq" property is defined on the command line but it seems it is =
-never
->>>>>>> the case. It is not used in libvirt for instance. So, let's remov=
-e it
->>>>>>> to simplify future changes.
->>>>>>>
->>>>>>
->>>>>> Setting an irq manually looks a bit anachronistic. I doubt anyone =
-would
->>>>>> do that nowadays, and the patch does a nice cleanup. So this looks=
- like
->>>>>> a good idea.
->>>>> [...]
->>>>>>> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
->>>>>>> index 472dd6f33a96..cc064f64fccf 100644
->>>>>>> --- a/hw/ppc/spapr_vio.c
->>>>>>> +++ b/hw/ppc/spapr_vio.c
->>>>>>> @@ -455,7 +455,7 @@ static void spapr_vio_busdev_realize(DeviceSt=
-ate *qdev, Error **errp)
->>>>>>>          dev->qdev.id =3D id;
->>>>>>>      }
->>>>>>> =20
->>>>>>> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_=
-err);
->>>>>>> +    dev->irq =3D spapr_irq_alloc(spapr, false, &local_err);
->>>>>>
->>>>>> Silently breaking "irq" like this looks wrong. I'd rather official=
-ly remove
->>>>>> it first (ie, kill spapr_vio_props, -5 lines in spapr_vio.c).
->>>>>>
->>>>>> Of course, this raises the question of interface deprecation, and =
-it should
->>>>>> theoretically follow the process described at:
->>>>>>
->>>>>> https://wiki.qemu.org/Features/LegacyRemoval#Rules_for_removing_an=
-_interface
->>>>>>
->>>>>> Cc'ing Thomas, our Chief Deprecation Officer, for insights :)
->>>>>
->>>>> The property is a public interface. Just because it's not used by
->>>>> libvirt does not mean that nobody is using it. So yes, please follo=
-w the
->>>>> rules and mark it as deprecated first for two release, before you r=
-eally
->>>>> remove it.
->>>>
->>>> This "irq" property is a problem to introduce a new static layout of=
- IRQ=20
->>>> numbers. It is in complete opposition.=20
->>>>
->>>> Can we keep it as it is for old pseries machine (settable) and ignor=
-e it=20
->>>> for newer ? Would that be fine ?
->>>
->>> So, Thomas is right that we need to keep the interface while we go
->>> through the deprecation process, even though it's a bit of a pain
->>> (like you, I seriously doubt anyone ever used it).
->>
->> That's OK. The patch is simple. But it means that we have to keep the=20
->> irq_hint parameter for 2 QEMU versions.
+--Sig_/rf=ua1hrfbCOIxhhBNo.UMR
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, 13 Jun 2018 09:31:40 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Tue, Jun 12, 2018 at 08:46:03PM +0200, Greg Kurz wrote:
+> > On Tue, 12 Jun 2018 16:55:08 +0100
+> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> >  =20
+> > > On 12 June 2018 at 16:52, Greg Kurz <groug@kaod.org> wrote: =20
+> > > > On Tue, 12 Jun 2018 15:34:22 +0100
+> > > > Peter Maydell <peter.maydell@linaro.org> wrote:
+> > > >   =20
+> > > >> On 12 June 2018 at 07:44, David Gibson <david@gibson.dropbear.id.a=
+u> wrote:   =20
+> > > >> > ----------------------------------------------------------------
+> > > >> > ppc patch queue 2018-06-12
+> > > >> >
+> > > >> > Here's another batch of ppc patches towards the 3.0 release.  Th=
+ere's
+> > > >> > a fair bit here, because I've been working through my mail backl=
+og
+> > > >> > after a holiday.  There's not much of a central theme, amongst o=
+ther
+> > > >> > things we have:
+> > > >> >     * ppc440 / sam460ex improvements
+> > > >> >     * logging and error cleanups
+> > > >> >     * 40p (PReP) bugfixes
+> > > >> >     * Macintosh fixes and cleanups
+> > > >> >     * Add emulation of the new POWER9 store-forwarding barrier
+> > > >> >       instruction variant
+> > > >> >     * Hotplug cleanups
+> > > >> >   =20
+> > > >>
+> > > >> Applied, thanks.   =20
+> > >  =20
+> > > > Oh... so we've broken bisect until Cedric's fix is merged.   =20
+> > >=20
+> > > If you want me not to merge a pullreq you need to follow up to
+> > > the cover letter saying "please don't merge this" or something
+> > > similar. Otherwise I will not notice. =20
+> >=20
+> > Yeah I've only answered to the offending patch, sorry... =20
 >=20
-> No.. the suggestion below is designed to avoid that..
+> And it was the middle of the night for me.
 >=20
->>> But, I think there's a way to avoid that getting in the way of your
->>> cleanups too much.
->>>
->>> A bunch of the current problems are caused because spapr_irq_alloc()
->>> conflates two meanings of "allocate": 1) finding a free irq to use fo=
-r
->>> this device and 2) assigning that irq exclusively to this device.
->>>
->>> I think the first thing to do is to split those two parts.  (1) will
->>> never take an irq parameter, (2) will always take an irq parameter.
->>> To implement the (to be deprecated) "irq" property on vio devices you
->>> should skip (1) and just call (2) with the given irq number.
->>
->> well, we need to call both because if "irq" is zero then when we=20
->> fallback to "1) finding a free irq to use."
->=20
-> No, basically in the VIO code itself you'd have:
-> 	irq =3D <irq property value>;
-> 	if (!irq)
-> 		irq =3D find_irq()
-> 	claim_irq(irq);
->
-> find_irq() never takes a hint, claim_irq() always does (except it's
-> not really a hint).
-
-ok. I add something like that in mind :=20
-=20
-    if (dev->irq) {
-        spapr_irq_assign(spapr, SPAPR_IRQ_VIO, dev->irq, &local_err);
-        if (local_err) {
-            error_propagate(errp, local_err);
-            return;
-        }
-    } else {
-        dev->irq =3D spapr_irq_alloc(spapr, SPAPR_IRQ_VIO, vio_index++, =20
-                                   &local_err);
-        if (local_err) {
-            error_propagate(errp, local_err);
-            return;
-        }
-
-and spapr_irq_assign() would die when the vio "irq" property does.
-
->> But we can move the exclusive IRQ assignment (2) under the VIO model=20
->> which is the only one using it and start deprecating the property.
->=20
-> No.. the exclusive claim would be global - everything would use that.
-
-Yes, I see the model. I am not sure it's useful to have two routines
-in the long term.
-
->>> The point of this series is to basically get rid of (1), but this
->>> first step means we don't need to worry about the hint parameter as w=
-e
->>> gradually remove it.
->>
->> OK. I think I got what you are asking for. (2) means adding an extra=20
->> handler to the sPAPR IRQ interface, which would always fail in the
->> new XICS sPAPR IRQ backend using static numbers.
->=20
-> No.. (2), "claim_irq()" as I called it above, would _always_ be used.
-> find_irq() would only be used to implement the legacy allocation.
-> In various places we'll have code like this:
->=20
-> 	if (legacy) {
-> 		irq =3D find_irq();
-> 	} else {
-> 		irq =3D <fixed value or formula>;
-> 	}
-> 	claim_irq(irq);
-
-I rather hide all this behind a class machine operation doing the=20
-allocation, it will give us a clear view of the IRQ number space usage=20
-instead of spreading the definitions in the code.=20
-
-we will need something for XIVE any how.
-
-> Where that fixed value could be something like:
-> 	irq =3D PCI_LSI_BASE + phb->index*4 + pin#;
+> It's only with pretty old gcc, I think we can live with it, I intend
+> to send another pullreq with the fixup as soon as I can.
 >=20
 
-If you use a different class machine operation for allocation claim_irq()=
-=20
-is not needed at all. The only case to handle is the VIO "irq" property=20
-which requires and extra operation.=20
+It was meeting day for me yesterday so I didn't have time to check with
+other GCC versions, but I could finally do it this morning. They fail
+all the same:
 
-C.
+hw/intc/xics_kvm.c: In function =E2=80=98ics_set_kvm_state=E2=80=99:
+hw/intc/xics_kvm.c:281:20: error: =E2=80=98ret=E2=80=99 may be used uniniti=
+alized in this
+ function [-Werror=3Dmaybe-uninitialized]
+             return ret;
+
+Fedora28:
+
+$ cc --version
+cc (GCC) 8.1.1 20180502 (Red Hat 8.1.1-1)
+
+Ubuntu 18.04:
+
+$ cc --version
+cc (Ubuntu 7.3.0-16ubuntu3) 7.3.0
+
+Ubuntu 17.10:
+
+$ cc --version
+cc (Ubuntu 7.2.0-8ubuntu3.2) 7.2.0
+
+RHEL 7.5:
+
+$ cc --version
+cc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-28)
+
+My concern is more that it requires --enable-debug to be passed to
+configure. As noted by Cedric in another mail, -O2 seems to prevent
+GCC to detect this obvious error...
+
+
+--Sig_/rf=ua1hrfbCOIxhhBNo.UMR
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlsgxvYACgkQcdTV5YIv
+c9ZxqA//cMAoRmXcXsrI7uazDRyjoS4Ur4xb1GG/imAHyG6QL9qQAm0a9D7XTJ75
+FEMx1c2MQwxLNOsjSyOVP8rdHgLXxSzfWuUZ4fgqKvC+/jBKpyT5jhEvnkGD6rd2
+AtuegQwNpYu8UlLA6xoVW+4RprAZBmKhybVK74ZkO+o/3N+uYe7NymdHtoTOreWr
+f7IpzJCx0bUBe6DM0O96qyJqt3UFtZL2b2RY5QZgE5JaZ0zeaIuaSllC3W7sOiz6
+IBZftOSvq61phUbvHsQsPDnvUM3m7eCd9HvYJxbZNa7CcdlqeNLrGqxic41EF+sx
+HyT+6C//Wrd3EoHu6lM4RYSA7SD8ZFiaCUjzPMbnonz1kLfPpSMwco2E5HdpLgmr
+Gg9c9rKLLYddHj8hNkyfYuhbCXToklXyx2mfQyBV0efGhzi47EiJYx5sKov3yML/
+EayXEyzHi5dodULKHnsHklSS0J8kZupJySWZJ900VBv8zq8H6sk+dCwAliWQcJA/
+/vnCFQXUzxorwInSISo7FxufkmYT9IGbdqwO1V+D0OdjK13WhaI9FsrBbl6uKY3z
+My/4i2TaZPpTFZ2KrcEQ9+3RduhmxLmB3btO/fCLFi2RVR3bqhBu9SFoKyHOgDPA
+3NKzfQZBNG1TkyvopUrK68BrHOrOiWnes8NuXb7s4vOVd+Fbrh8=
+=Go1U
+-----END PGP SIGNATURE-----
+
+--Sig_/rf=ua1hrfbCOIxhhBNo.UMR--
