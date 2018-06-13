@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fT4vR-0003ez-6D
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:30:59 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fT4yM-0005lf-1j
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:33:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fT4vN-0008Sj-73
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:30:57 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:34491)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fT4vM-0008RH-PN
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:30:53 -0400
-Received: by mail-ot0-x244.google.com with SMTP id r18-v6so2748182otk.1
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 05:30:52 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1fT4yG-00075i-Se
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:33:58 -0400
+Date: Wed, 13 Jun 2018 14:33:45 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180613143345.3c70a3de.cohuck@redhat.com>
+In-Reply-To: <20180613081819.147178-1-borntraeger@de.ibm.com>
+References: <20180613081819.147178-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
-References: <20180611141716.3813-1-peter.maydell@linaro.org>
-	<650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 13 Jun 2018 13:30:31 +0100
-Message-ID: <CAFEAcA-vZH0KUxi+iYP3eYzXeHxNTotNwCMhEPcGhOLksbG71A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
- for multiline comments
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390x/cpumodels: add z14 Model ZR1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +22,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On 12 June 2018 at 18:30, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 06/11/2018 04:17 AM, Peter Maydell wrote:
->> The codebase has a bit of a mix of different multiline
->> comment styles. State a preference for the Linux kernel
->> style:
->>     /*
->>      * Star on the left for each line.
->>      * Leading slash-star and trailing star-slash
->>      * each go on a line of their own.
->>      */
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> This is not my personal favourite, but seemed to be the
->> closest we had to consensus in the mail thread for v1;
->> I can live with it in order to avoid getting patches which
->> use the styles I like even less :-)
->
-> Honestly, I don't like this except for "important" comments.
->
-> A "small" comment, e.g. one that doesn't quite fit on a single line, now takes
-> 4 lines instead of 2.  Which is really annoying and IMO tends to break flow.
+On Wed, 13 Jun 2018 10:18:19 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-That's why I prefer
- /* two
-  * lines
-  */
-style over kernel-style. But apparently nobody else does...
+> introduce the new z14 Model ZR1 cpu model. Mostly identical to z14, only
+> the cpu type differs (3906 vs. 3907)
+> 
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  target/s390x/cpu_models.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index e10035aaa8..cfdbccf46d 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -79,6 +79,7 @@ static S390CPUDef s390_cpu_defs[] = {
+>      CPUDEF_INIT(0x2964, 13, 2, 47, 0x08000000U, "z13.2", "IBM z13 GA2"),
+>      CPUDEF_INIT(0x2965, 13, 2, 47, 0x08000000U, "z13s", "IBM z13s GA1"),
+>      CPUDEF_INIT(0x3906, 14, 1, 47, 0x08000000U, "z14", "IBM z14 GA1"),
+> +    CPUDEF_INIT(0x3907, 14, 1, 47, 0x08000000U, "z14ZR1", "IBM z14 Model ZR1 GA1"),
+>  };
+>  
+>  #define QEMU_MAX_CPU_TYPE 0x2827
 
-thanks
--- PMM
+Thanks, applied.
