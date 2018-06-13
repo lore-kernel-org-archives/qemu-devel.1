@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fT6ZF-0007HA-47
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:16:10 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fT6a8-0007sI-5C
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:17:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fT6ZE-0003N0-0S
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:16:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48692 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fT6a2-0005OO-JF
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:17:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51758 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fT6ZD-0003Md-PK
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:16:07 -0400
-Date: Wed, 13 Jun 2018 15:16:05 +0100
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fT6a2-0005NR-Ea
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:16:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1A54988843
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 14:16:58 +0000 (UTC)
+Date: Wed, 13 Jun 2018 15:16:56 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180613141605.GT24528@stefanha-x1.localdomain>
-References: <e74aee54657de6f8d643a92ba21f467db149c2c8.1528714312.git.yi.z.zhang@linux.intel.com>
-	<20180611162630.GH17756@stefanha-x1.localdomain>
-	<CAPcyv4jJSYiCu_qNWgU8KR3sFQE032Uu6LCQq-CTxF0jpkooiA@mail.gmail.com>
-	<20180612150425.hjydg5cbtlllzh67@HZ>
+Message-ID: <20180613141656.GU24528@stefanha-x1.localdomain>
+References: <20180611180152.2681-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yypaS3FvPkEUiGyo"
+	protocol="application/pgp-signature"; boundary="iBHcHRCIarfY7C0j"
 Content-Disposition: inline
-In-Reply-To: <20180612150425.hjydg5cbtlllzh67@HZ>
-Subject: Re: [Qemu-devel] [RFC PATCH 1/1] nvdimm: let qemu requiring section
- alignment of pmem resource.
+In-Reply-To: <20180611180152.2681-1-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] Remove COPYING.PYTHON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <hzzhan9@gmail.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, Zhang Yi <yi.z.zhang@linux.intel.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, yu.c.zhang@linux.intel.com, Igor Mammedov <imammedo@redhat.com>, Ross Zwisler <ross.zwisler@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
 
---yypaS3FvPkEUiGyo
+--iBHcHRCIarfY7C0j
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 12, 2018 at 11:04:25PM +0800, Haozhong Zhang wrote:
-> On 06/11/18 19:55, Dan Williams wrote:
-> > On Mon, Jun 11, 2018 at 9:26 AM, Stefan Hajnoczi <stefanha@redhat.com> =
-wrote:
-> > > On Mon, Jun 11, 2018 at 06:54:25PM +0800, Zhang Yi wrote:
-> > >> Nvdimm driver use Memory hot-plug APIs to map it's pmem resource,
-> > >> which at a section granularity.
-> > >>
-> > >> When QEMU emulated the vNVDIMM device, decrease the label-storage,
-> > >> QEMU will put the vNVDIMMs directly next to one another in physical
-> > >> address space, which means that the boundary between them won't
-> > >> align to the 128 MB memory section size.
-> > >
-> > > I'm having a hard time parsing this.
-> > >
-> > > Where does the "128 MB memory section size" come from?  ACPI?
-> > > A chipset-specific value?
-> > >
-> >=20
-> > The devm_memremap_pages() implementation use the memory hotplug core
-> > to allocate the 'struct page' array/map for persistent memory. Memory
-> > hotplug can only be performed in terms of sections, 128MB on x86_64.
+On Mon, Jun 11, 2018 at 03:01:52PM -0300, Eduardo Habkost wrote:
+> The COPYING.PYTHON file was added when we added the compatibility
+> argparse.py module, which was licensed under the Python Software
+> Foundation License Version 2.
 >=20
-> IIUC, it also affects the normal RAM hotplug to a Linux VM on QEMU. If
-> that is the case, it will be helpful to lift this option to pc-dimm.
+> Now the compatibility argparse.py module was removed, and we are
+> not carrying any code under that license anymore.  Remove
+> COPYING.PYTHON.
+>=20
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+>  COPYING.PYTHON | 270 -------------------------------------------------
+>  1 file changed, 270 deletions(-)
+>  delete mode 100644 COPYING.PYTHON
 
-I agree.  There should be one place in QEMU for the machine-specific
-hotplug memory alignment value.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-It would be best to track down the property of the hardware that
-determines these alignment values instead of letting current Linux
-software limitations determine QEMU's behavior.  That way we know that
-QEMU emulates real hardware accurately and will work with any guest OS.
-I imagine it depends on the chipset (i.e. QEMU machine type).
-
-If it proves hard to pinpoint the hardware limit, then please include a
-comment in the code explaining that a value that works with Linux guests
-is being used for now.  This will allow people reading the code to
-understand where this behavior comes from.
-
-Stefan
-
---yypaS3FvPkEUiGyo
+--iBHcHRCIarfY7C0j
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJbISclAAoJEJykq7OBq3PIFkgIAI1azCPPD0eZkKwcHEAq4kUD
-+eqZt1g5YbI+911Enz+wXWP3ryTwDXKsVOiwqHcG17ha5g7u4L57AdV/PHl/pUjy
-tWv3WFd+ivuNhHBcOaWbu4kFStJ+oBoLTC5T4xqFLoPvsqX0DMEzNPRqQ16VYHp9
-iIP1GJFynwdwYQZNImcl1/5PYkrWSn7REKfSrJ9YRIXJWWyDDkAQVcaJrCScirrn
-7aOFHVBqK5YtKPLwZLdptVBzMIdYpwK1oa5UA8cccvdcWDmoT3twpgPJ0MCawRaV
-SJV6jKCiHauf/sfjBdPDUsctn7VEsOc4KW7kxwEY2vcLwm9RUC+83EeyjDpIf60=
-=Nc9t
+iQEcBAEBAgAGBQJbISdYAAoJEJykq7OBq3PIPG8IAIT8oweYaZY1NGiMhF6BRM1U
+MPgI8uHplUOz41POZZDEAphu9y3MCrVa+JiCws456uGrvBLuyKaIQNSayEBgh5O+
+mUDBwHUSIQeN6ZEAKoRnUOYVh0/ooKcjjr/3QWkF9jLe1x0BKG9VnCkgL+mmbJs0
+vXC9lF74mLw3P1ct5AUCSJnHUHF8nf8waDyDiH3RqRC2ODCS1NUzow7GwxUHkCI2
+h/V01dy7Cjdvzn1nF3CWueVkuPHyLMIcc+XXh38uty0aa5uu0Katix9eIjlisGtb
+XQHtR09uweeUeFSz7up6MlO+ZJ2Shy3UnCWypP4Ou9OkY0OCWyJ9u5h2TBVFh0s=
+=gzSB
 -----END PGP SIGNATURE-----
 
---yypaS3FvPkEUiGyo--
+--iBHcHRCIarfY7C0j--
