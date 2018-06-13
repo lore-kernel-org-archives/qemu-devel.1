@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fT1Xv-0006oL-VM
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:54:31 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fT1ZC-00080B-SN
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:55:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fT1Xs-0005ot-Pb
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:54:28 -0400
-Date: Wed, 13 Jun 2018 10:54:22 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180613012236.GQ30690@umbus.fritz.box>
-Message-ID: <alpine.BSF.2.21.1806131051410.620@zero.eik.bme.hu>
-References: <cover.1528291908.git.balaton@eik.bme.hu>
-	<d13ea58b288f386a12a76c41a617c500c4454341.1528291908.git.balaton@eik.bme.hu>
-	<20180613012236.GQ30690@umbus.fritz.box>
+	(envelope-from <imammedo@redhat.com>) id 1fT1ZC-0006cp-3N
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:55:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51206 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fT1ZB-0006c6-Ug
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:55:46 -0400
+Date: Wed, 13 Jun 2018 10:55:43 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180613105543.32e58e99@redhat.com>
+In-Reply-To: <20180612144922.GJ7451@localhost.localdomain>
+References: <20180608205830.308627-1-mst@redhat.com>
+	<20180612145605.50f64965@redhat.com>
+	<20180612155708-mutt-send-email-mst@kernel.org>
+	<20180612155803.4ca0d137@redhat.com>
+	<20180612144922.GJ7451@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] ppc4xx_i2c: Implement directcntl
- register
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC untested PATCH] i386/cpu: make -cpu host
+ support monitor/mwait
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,89 +31,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 13 Jun 2018, David Gibson wrote:
-> On Wed, Jun 06, 2018 at 03:31:48PM +0200, BALATON Zoltan wrote:
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> ---
->>  default-configs/ppc-softmmu.mak    |  1 +
->>  default-configs/ppcemb-softmmu.mak |  1 +
->>  hw/i2c/ppc4xx_i2c.c                | 14 +++++++++++++-
->>  3 files changed, 15 insertions(+), 1 deletion(-)
->>
->> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
->> index 4d7be45..7d0dc2f 100644
->> --- a/default-configs/ppc-softmmu.mak
->> +++ b/default-configs/ppc-softmmu.mak
->> @@ -26,6 +26,7 @@ CONFIG_USB_EHCI_SYSBUS=y
->>  CONFIG_SM501=y
->>  CONFIG_IDE_SII3112=y
->>  CONFIG_I2C=y
->> +CONFIG_BITBANG_I2C=y
->>
->>  # For Macs
->>  CONFIG_MAC=y
->> diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
->> index 67d18b2..37af193 100644
->> --- a/default-configs/ppcemb-softmmu.mak
->> +++ b/default-configs/ppcemb-softmmu.mak
->> @@ -19,3 +19,4 @@ CONFIG_USB_EHCI_SYSBUS=y
->>  CONFIG_SM501=y
->>  CONFIG_IDE_SII3112=y
->>  CONFIG_I2C=y
->> +CONFIG_BITBANG_I2C=y
->> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
->> index a68b5f7..5806209 100644
->> --- a/hw/i2c/ppc4xx_i2c.c
->> +++ b/hw/i2c/ppc4xx_i2c.c
->> @@ -30,6 +30,7 @@
->>  #include "cpu.h"
->>  #include "hw/hw.h"
->>  #include "hw/i2c/ppc4xx_i2c.h"
->> +#include "bitbang_i2c.h"
->>
->>  #define PPC4xx_I2C_MEM_SIZE 18
->>
->> @@ -46,7 +47,13 @@
->>
->>  #define IIC_XTCNTLSS_SRST   (1 << 0)
->>
->> +#define IIC_DIRECTCNTL_SDAC (1 << 3)
->> +#define IIC_DIRECTCNTL_SCLC (1 << 2)
->> +#define IIC_DIRECTCNTL_MSDA (1 << 1)
->> +#define IIC_DIRECTCNTL_MSCL (1 << 0)
->> +
->>  typedef struct {
->> +    bitbang_i2c_interface *bitbang;
->>      uint8_t mdata;
->>      uint8_t lmadr;
->>      uint8_t hmadr;
->> @@ -308,7 +315,11 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
->>          i2c->xtcntlss = value;
->>          break;
->>      case 16:
->> -        i2c->directcntl = value & 0x7;
->> +        i2c->directcntl = value & (IIC_DIRECTCNTL_SDAC & IIC_DIRECTCNTL_SCLC);
->> +        i2c->directcntl |= (value & IIC_DIRECTCNTL_SCLC ? 1 : 0);
->> +        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL, i2c->directcntl & 1);
->
-> Shouldn't that use i2c->directcntl & IIC_DIRECTCNTL_MSCL ?
->
->> +        i2c->directcntl |= bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SDA,
->> +                               (value & IIC_DIRECTCNTL_SDAC) != 0) << 1;
->
-> Last expression might be clearer as:
-> 	value & IIC_DIRECTCNTL_SDAC ? IIC_DIRECTCNTL_MSDA : 0
+On Tue, 12 Jun 2018 11:49:22 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-I guess this is a matter of taste but to me IIC_DIRECTCNTL_MSDA is a bit 
-position in the register so I use that when accessing that bit but when I 
-check for the values of a bit being 0 or 1 I don't use the define which is 
-for something else, just happens to have value 1 as well.
+> On Tue, Jun 12, 2018 at 03:58:03PM +0200, Igor Mammedov wrote:
+> [...]
+> > > > > +    if (xcc->host_cpuid_required && enable_cpu_pm) {
+> > > > > +        host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx,
+> > > > > +                   &cpu->mwait.ecx, &cpu->mwait.edx);
+> > > > > +    }    
+[...]
+> > > > also max_x86_cpu_initfn() might be better place for filling it up.  
+> 
+> Why?
+I've missed 'enable_cpu_pm' which is probably a property,
+so yep it can't go into initfn.
 
-If this does not explain your question and you think it's better to use 
-defines here I can change that in next version, please let me know.
-
-Regards,
-BALATON Zoltan
+However if we not going to migrate this state or use outside of
+cpu_x86_cpuid(), I don't see why we should add it to X86CPU state
+and keep around.
+We can query it on demand from cpu_x86_cpuid() like we do for
+PMU leaf.
