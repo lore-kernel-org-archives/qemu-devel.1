@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fT6b2-00006V-Se
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:18:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1fT6bc-0000aQ-J9
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:18:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fT6b0-0007vt-2u
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:18:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33306 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fT6az-0007uj-SQ
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:17:57 -0400
-Date: Wed, 13 Jun 2018 16:17:54 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180613161754.61ffa57f@redhat.com>
-In-Reply-To: <B526101FCAB4654DB0892B650DEFC555903F82@dggemm501-mbs.china.huawei.com>
-References: <20180608094324.23288-1-liujunjie23@huawei.com>
-	<20180612154026.59a0f1fd@redhat.com>
-	<B526101FCAB4654DB0892B650DEFC555903F82@dggemm501-mbs.china.huawei.com>
+	(envelope-from <armbru@redhat.com>) id 1fT6bX-0000zw-Fa
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:18:36 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180613123458.24685-1-kwolf@redhat.com>
+	<20180613123458.24685-4-kwolf@redhat.com>
+Date: Wed, 13 Jun 2018 16:18:17 +0200
+In-Reply-To: <20180613123458.24685-4-kwolf@redhat.com> (Kevin Wolf's message
+	of "Wed, 13 Jun 2018 14:34:58 +0200")
+Message-ID: <87in6mixcm.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] cpu hot-del: leak fix by free the
- relevant members
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 3/3] block: Remove deprecated -drive option
+ serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,184 +24,342 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "liujunjie (A)" <liujunjie23@huawei.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, linzhecheng <linzhecheng@huawei.com>, "Huangweidong (C)" <weidong.huang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Gonglei (Arei)" <arei.gonglei@huawei.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On Wed, 13 Jun 2018 13:15:37 +0000
-"liujunjie (A)" <liujunjie23@huawei.com> wrote:
+Kevin Wolf <kwolf@redhat.com> writes:
 
-> Hi
-> 
-> > -----Original Message-----
-> > From: Igor Mammedov [mailto:imammedo@redhat.com]
-> > Sent: Tuesday, June 12, 2018 9:40 PM
-> > To: liujunjie (A) <liujunjie23@huawei.com>
-> > Cc: pbonzini@redhat.com; rth@twiddle.net; crosthwaite.peter@gmail.com;
-> > linzhecheng <linzhecheng@huawei.com>; Huangweidong (C)
-> > <weidong.huang@huawei.com>; wangxin (U)
-> > <wangxinxin.wang@huawei.com>; qemu-devel@nongnu.org; Gonglei (Arei)
-> > <arei.gonglei@huawei.com>
-> > Subject: Re: [Qemu-devel] [PATCH v2] cpu hot-del: leak fix by free the relevant
-> > members
-> > 
-> > On Fri, 8 Jun 2018 17:43:24 +0800
-> > liujunjie <liujunjie23@huawei.com> wrote:
-> >   
-> > > THese leaks are found by ASAN with CPU hot-add and hot-del actions,
-> > > such as:  
-> > it would be better to split patch into several, 1 leak per patch
-> >   
-> > > ==14127==ERROR: LeakSanitizer: detected memory leaks
-> > >
-> > > Direct leak of 4096 byte(s) in 1 object(s) allocated from:
-> > >     #0 0x7fc321cb6ec0 in posix_memalign  
-> > (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7ec0)  
-> > >     #1 0xf756b9 in qemu_try_memalign util/oslib-posix.c:110
-> > >     #2 0xf7575b in qemu_memalign util/oslib-posix.c:126
-> > >     #3 0x7769cb in kvm_arch_init_vcpu  
-> > /root/qemu/target/i386/kvm.c:1103  
-> > >     #4 0x4cc4e6 in qemu_kvm_cpu_thread_fn /root/qemu/cpus.c:1201
-> > >     #5 0x7fc31cb28dc4 in start_thread
-> > > (/usr/lib64/libpthread.so.0+0x7dc4)
-> > >
-> > > Direct leak of 4096 byte(s) in 1 object(s) allocated from:
-> > >     #0 0x7fc321cb6560 in calloc  
-> > (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)  
-> > >     #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
-> > >     #2 0x4cc4e6 in qemu_kvm_cpu_thread_fn /root/qemu/cpus.c:1201
-> > >     #3 0x7fc31cb28dc4 in start_thread
-> > > (/usr/lib64/libpthread.so.0+0x7dc4)
-> > >
-> > > Direct leak of 184 byte(s) in 1 object(s) allocated from:
-> > >     #0 0x7fc321cb6560 in calloc  
-> > (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)  
-> > >     #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
-> > >     #2 0x4cda83 in qemu_init_vcpu /root/qemu/cpus.c:1993
-> > >     #3 0x6aedbd in x86_cpu_realizefn /root/qemu/target/i386/cpu.c:4739
-> > >     #4 0x8edfc8 in device_set_realized hw/core/qdev.c:826
-> > >     #5 0xcff60c in property_set_bool qom/object.c:1928
-> > >     #6 0xd09bd2 in object_property_set_qobject qom/qom-qobject.c:27
-> > >     #7 0xd048e3 in object_property_set_bool qom/object.c:1188
-> > >     #8 0x79ad83 in qdev_device_add /root/qemu/qdev-monitor.c:627
-> > >     #9 0x79b50c in qmp_device_add /root/qemu/qdev-monitor.c:807
-> > >     #10 0xf4ca5d in do_qmp_dispatch qapi/qmp-dispatch.c:119
-> > >     #11 0xf4ce3c in qmp_dispatch qapi/qmp-dispatch.c:168
-> > >     #12 0x4e2a5a in monitor_qmp_dispatch_one  
-> > /root/qemu/monitor.c:4088  
-> > >     #13 0x4e2baf in monitor_qmp_bh_dispatcher  
-> > /root/qemu/monitor.c:4146  
-> > >     #14 0xf67ad1 in aio_bh_poll util/async.c:118
-> > >     #15 0xf724a3 in aio_dispatch util/aio-posix.c:436
-> > >     #16 0xf67270 in aio_ctx_dispatch util/async.c:261
-> > >     #17 0x7fc31cf8e999 in g_main_context_dispatch
-> > > (/usr/lib64/libglib-2.0.so.0+0x49999)
-> > >
-> > > Direct leak of 64 byte(s) in 2 object(s) allocated from:
-> > >     #0 0x7fc321cb6560 in calloc  
-> > (/usr/local/gcc-6-4/lib64/libasan.so.3+0xc7560)  
-> > >     #1 0x7fc31cf944d6 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x4f4d6)
-> > >     #2 0x4cda1f in qemu_init_vcpu /root/qemu/cpus.c:1997
-> > >     #3 0x6aedbd in x86_cpu_realizefn /root/qemu/target/i386/cpu.c:4739
-> > >     #4 0x8edfc8 in device_set_realized hw/core/qdev.c:826
-> > >     #5 0xcff60c in property_set_bool qom/object.c:1928
-> > >     #6 0xd09bd2 in object_property_set_qobject qom/qom-qobject.c:27
-> > >     #7 0xd048e3 in object_property_set_bool qom/object.c:1188
-> > >     #8 0x79ad83 in qdev_device_add /root/qemu/qdev-monitor.c:627
-> > >     #9 0x79b50c in qmp_device_add /root/qemu/qdev-monitor.c:807
-> > >     #10 0xf4ca5d in do_qmp_dispatch qapi/qmp-dispatch.c:119
-> > >     #11 0xf4ce3c in qmp_dispatch qapi/qmp-dispatch.c:168
-> > >     #12 0x4e2a5a in monitor_qmp_dispatch_one  
-> > /root/qemu/monitor.c:4088  
-> > >     #13 0x4e2baf in monitor_qmp_bh_dispatcher  
-> > /root/qemu/monitor.c:4146  
-> > >     #14 0xf67ad1 in aio_bh_poll util/async.c:118
-> > >     #15 0xf724a3 in aio_dispatch util/aio-posix.c:436
-> > >     #16 0xf67270 in aio_ctx_dispatch util/async.c:261
-> > >     #17 0x7fc31cf8e999 in g_main_context_dispatch
-> > > (/usr/lib64/libglib-2.0.so.0+0x49999)  
-> > back trace (including line numbers) is a moving target so it's only useful for
-> > concrete copy.
-> > I'd drop it and cite offending hunk in commit message instead.
-> > 
-> >   
-> > > SUMMARY: AddressSanitizer: 8440 byte(s) leaked in 5 allocation(s).
-> > >
-> > > The relevant members in CPU Structure are freed to fix leak.
-> > > Meanwhile, although the VMChangeStateEntry added in kvm_arch_init_vcpu
-> > > does not be reportd by ASAN since it still in vm_change_state_head, it's not  
-> > longer used after hot-del, so free it, too.  
-> > >
-> > > Signed-off-by: liujunjie <liujunjie23@huawei.com>
-> > > Signed-off-by: linzhecheng <linzhecheng@huawei.com>
-> > > ---
-> > >  accel/kvm/kvm-all.c  |  3 +++
-> > >  cpus.c               |  6 ++++++
-> > >  include/sysemu/kvm.h |  1 +
-> > >  target/i386/cpu.h    |  2 ++
-> > >  target/i386/kvm.c    | 19 ++++++++++++++++++-
-> > >  5 files changed, 30 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c index
-> > > ffee68e..a0491dc 100644
-> > > --- a/accel/kvm/kvm-all.c
-> > > +++ b/accel/kvm/kvm-all.c
-> > > @@ -305,6 +305,9 @@ int kvm_destroy_vcpu(CPUState *cpu)
-> > >      vcpu->vcpu_id = kvm_arch_vcpu_id(cpu);
-> > >      vcpu->kvm_fd = cpu->kvm_fd;
-> > >      QLIST_INSERT_HEAD(&kvm_state->kvm_parked_vcpus, vcpu, node);
-> > > +#ifdef TARGET_I386
-> > > +    kvm_arch_destroy_vcpu(cpu);
-> > > +#endif
-> > >  err:
-> > >      return ret;
-> > >  }
-> > > diff --git a/cpus.c b/cpus.c
-> > > index d1f1629..cbe28d6 100644
-> > > --- a/cpus.c
-> > > +++ b/cpus.c
-> > > @@ -1842,6 +1842,12 @@ void cpu_remove_sync(CPUState *cpu)
-> > >      qemu_mutex_unlock_iothread();
-> > >      qemu_thread_join(cpu->thread);
-> > >      qemu_mutex_lock_iothread();
-> > > +    g_free(cpu->thread);
-> > > +    cpu->thread = NULL;
-> > > +    g_free(cpu->halt_cond);
-> > > +    cpu->halt_cond = NULL;  
-> > could you check if it's save to free thread/halt_cond when running in plain TCG
-> > mode
-> >   
-> > > +    g_free(cpu->cpu_ases);
-> > > +    cpu->cpu_ases = NULL;  
-> > consider TCG usecase, cpu_ases is registered with tcg_as_listener, is it really
-> > safe to free?
-> >   
-> > >  }
-> > >  
-> > [...]  
-> 
-> 
-> 1. Since all these leaks are sit in two locations, one is in the common CPUState structure, the other is in the specific X86CPU structure. It is a good idea to split the whole patch into two patches.
+> The -drive option serial was deprecated in QEMU 2.10. It's time to
+> remove it.
+>
+> Tests need to be updated to set the serial number with -global instead
+> of using the -drive option.
+>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/hw/block/block.h  |  1 -
+>  include/sysemu/blockdev.h |  1 -
+>  block/block-backend.c     |  1 -
+>  blockdev.c                | 22 ----------------------
+>  hw/block/block.c          | 13 -------------
+>  hw/block/nvme.c           |  1 -
+>  hw/block/virtio-blk.c     |  1 -
+>  hw/ide/qdev.c             |  1 -
+>  hw/scsi/scsi-disk.c       |  1 -
+>  hw/usb/dev-storage.c      |  1 -
+>  tests/ahci-test.c         |  6 +++---
+>  tests/ide-test.c          |  8 ++++----
+>  qemu-doc.texi             |  5 -----
+>  qemu-options.hx           |  6 +-----
+>  14 files changed, 8 insertions(+), 60 deletions(-)
+>
+> diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+> index d4f4dfffab..e9f9e2223f 100644
+> --- a/include/hw/block/block.h
+> +++ b/include/hw/block/block.h
+> @@ -72,7 +72,6 @@ static inline unsigned int get_physical_block_exp(BlockConf *conf)
+>  
+>  /* Configuration helpers */
+>  
+> -void blkconf_serial(BlockConf *conf, char **serial);
+>  bool blkconf_geometry(BlockConf *conf, int *trans,
+>                        unsigned cyls_max, unsigned heads_max, unsigned secs_max,
+>                        Error **errp);
+> diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
+> index c0ae3700ec..24954b94e0 100644
+> --- a/include/sysemu/blockdev.h
+> +++ b/include/sysemu/blockdev.h
+> @@ -35,7 +35,6 @@ struct DriveInfo {
+>      bool is_default;            /* Added by default_drive() ?  */
+>      int media_cd;
+>      QemuOpts *opts;
+> -    char *serial;
+>      QTAILQ_ENTRY(DriveInfo) next;
+>  };
+>  
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index d55c328736..2d1a3463e8 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -419,7 +419,6 @@ static void drive_info_del(DriveInfo *dinfo)
+>          return;
+>      }
+>      qemu_opts_del(dinfo->opts);
+> -    g_free(dinfo->serial);
+>      g_free(dinfo);
+>  }
+>  
+> diff --git a/blockdev.c b/blockdev.c
+> index 83b3cc12e9..4ab3d6ec0b 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -730,10 +730,6 @@ QemuOptsList qemu_legacy_drive_opts = {
+>              .type = QEMU_OPT_STRING,
+>              .help = "interface (ide, scsi, sd, mtd, floppy, pflash, virtio)",
+>          },{
+> -            .name = "serial",
+> -            .type = QEMU_OPT_STRING,
+> -            .help = "disk serial number",
+> -        },{
+>              .name = "file",
+>              .type = QEMU_OPT_STRING,
+>              .help = "file name",
+> @@ -775,13 +771,9 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+>      const char *werror, *rerror;
+>      bool read_only = false;
+>      bool copy_on_read;
+> -    const char *serial;
+>      const char *filename;
+>      Error *local_err = NULL;
+>      int i;
+> -    const char *deprecated[] = {
+> -        "serial"
+> -    };
+>  
+>      /* Change legacy command line options into QMP ones */
+>      static const struct {
+> @@ -858,16 +850,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+>          goto fail;
+>      }
+>  
+> -    /* Other deprecated options */
+> -    if (!qtest_enabled()) {
+> -        for (i = 0; i < ARRAY_SIZE(deprecated); i++) {
+> -            if (qemu_opt_get(legacy_opts, deprecated[i]) != NULL) {
+> -                error_report("'%s' is deprecated, please use the corresponding "
+> -                             "option of '-device' instead", deprecated[i]);
+> -            }
+> -        }
+> -    }
+> -
+>      /* Media type */
+>      value = qemu_opt_get(legacy_opts, "media");
+>      if (value) {
 
-It's easier to review in-depended and self sufficient patches with one change and
-revert it in case it causes trouble. 
+I guess I'd remove this in a separate patch, to make bringing it back
+easier in case we need it again.
 
-> 2. I look back to the commit history and find the way to fix memory leak may be like commit ab105cc138, so I try to use the same way. And I do not know what "cite offending hunk in commit message" means. Can you explain more or is there an example?
-I've meant backtrace with linenumbers is meaning-less as lines change depending on
-version and it skips on inlined finctions , so while it point to exact place in
-your copy of source, the same line could point to another code in other source copy.
-Hence it might be problematic to find code that causes leak.
+> @@ -948,9 +930,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+>          goto fail;
+>      }
+>  
+> -    /* Serial number */
+> -    serial = qemu_opt_get(legacy_opts, "serial");
+> -
+>      /* no id supplied -> create one */
+>      if (qemu_opts_id(all_opts) == NULL) {
+>          char *new_id;
+> @@ -1025,7 +1004,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+>      dinfo->type = type;
+>      dinfo->bus = bus_id;
+>      dinfo->unit = unit_id;
+> -    dinfo->serial = g_strdup(serial);
+>  
+>      blk_set_legacy_dinfo(blk, dinfo);
+>  
+> diff --git a/hw/block/block.c b/hw/block/block.c
+> index b6c80ab0b7..cf0eb826f1 100644
+> --- a/hw/block/block.c
+> +++ b/hw/block/block.c
+> @@ -15,19 +15,6 @@
+>  #include "qapi/qapi-types-block.h"
+>  #include "qemu/error-report.h"
+>  
+> -void blkconf_serial(BlockConf *conf, char **serial)
+> -{
+> -    DriveInfo *dinfo;
+> -
+> -    if (!*serial) {
+> -        /* try to fall back to value set with legacy -drive serial=... */
+> -        dinfo = blk_legacy_dinfo(conf->blk);
+> -        if (dinfo) {
+> -            *serial = g_strdup(dinfo->serial);
+> -        }
+> -    }
+> -}
+> -
+>  void blkconf_blocksizes(BlockConf *conf)
+>  {
+>      BlockBackend *blk = conf->blk;
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 811084b6a7..d5bf95b79b 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -1215,7 +1215,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+>          return;
+>      }
+>  
+> -    blkconf_serial(&n->conf, &n->serial);
+>      if (!n->serial) {
+>          error_setg(errp, "serial property not set");
+>          return;
+> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+> index 50b5c869e3..225fe44b7a 100644
+> --- a/hw/block/virtio-blk.c
+> +++ b/hw/block/virtio-blk.c
+> @@ -935,7 +935,6 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+>          return;
+>      }
+>  
+> -    blkconf_serial(&conf->conf, &conf->serial);
+>      if (!blkconf_apply_backend_options(&conf->conf,
+>                                         blk_is_read_only(conf->conf.blk), true,
+>                                         errp)) {
+> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+> index f395d24592..573b022e1e 100644
+> --- a/hw/ide/qdev.c
+> +++ b/hw/ide/qdev.c
+> @@ -188,7 +188,6 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+>          return;
+>      }
+>  
+> -    blkconf_serial(&dev->conf, &dev->serial);
+>      if (kind != IDE_CD) {
+>          if (!blkconf_geometry(&dev->conf, &dev->chs_trans, 65535, 16, 255,
+>                                errp)) {
+> diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+> index 9f43583ea0..920850a1c1 100644
+> --- a/hw/scsi/scsi-disk.c
+> +++ b/hw/scsi/scsi-disk.c
+> @@ -2372,7 +2372,6 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
+>          return;
+>      }
+>  
+> -    blkconf_serial(&s->qdev.conf, &s->serial);
+>      blkconf_blocksizes(&s->qdev.conf);
+>  
+>      if (s->qdev.conf.logical_block_size >
+> diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+> index 481694a473..47b992f403 100644
+> --- a/hw/usb/dev-storage.c
+> +++ b/hw/usb/dev-storage.c
+> @@ -606,7 +606,6 @@ static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
+>          return;
+>      }
+>  
+> -    blkconf_serial(&s->conf, &dev->serial);
+>      blkconf_blocksizes(&s->conf);
+>      if (!blkconf_apply_backend_options(&s->conf, blk_is_read_only(blk), true,
+>                                         errp)) {
+> diff --git a/tests/ahci-test.c b/tests/ahci-test.c
+> index 1a7b761304..937ed2f910 100644
+> --- a/tests/ahci-test.c
+> +++ b/tests/ahci-test.c
+> @@ -180,12 +180,12 @@ static AHCIQState *ahci_boot(const char *cli, ...)
+>          s = ahci_vboot(cli, ap);
+>          va_end(ap);
+>      } else {
+> -        cli = "-drive if=none,id=drive0,file=%s,cache=writeback,serial=%s"
+> -            ",format=%s"
+> +        cli = "-drive if=none,id=drive0,file=%s,cache=writeback,format=%s"
+>              " -M q35 "
+>              "-device ide-hd,drive=drive0 "
+> +            "-global ide-hd.serial=%s "
+>              "-global ide-hd.ver=%s";
+> -        s = ahci_boot(cli, tmp_path, "testdisk", imgfmt, "version");
+> +        s = ahci_boot(cli, tmp_path, imgfmt, "testdisk", "version");
 
-something like this might be more useful:
+Not this patch's problem: ahci_boot() and ahci_boot_and_enable() lack
+GCC_FMT_ATTR().
 
-   x86_cpu_realizefn
-       qemu_init_vcpu
-           qemu_kvm_start_vcpu
-               cpu->thread = g_malloc0(sizeof(QemuThread))
+This patch's problem, sort of: once they have it, we'll have to
+eliminate @cli here.
 
+I figure adding GCC_FMT_ATTR() will require us to clean up the
+ahci_boot(NULL) silliness:
 
-> 3. I am not familiar with the plain TCG mode and can not find out whether is safe to free in this mode. I need some time to check it or is there anyone can figure it out?
-Look for single_tcg_halt_cond/single_tcg_cpu_thread and how they are used.
+   static AHCIQState *ahci_boot(const char *cli, ...)
+   {
+       AHCIQState *s;
+       va_list ap;
 
-I'm not sure about tcg_as_listener usage, but it looks rather suspicious to delete memory that might be referenced. We might have an actual bug here but if you find a place where
-listener is unregistered on unplug and mention it in commit message then it should be fine to delete
-this memory.
+       va_start(ap, cli);
+       s = ahci_vboot(cli, ap);
+       va_end(ap);
+
+       return s;
+   }
+
+   static AHCIQState *ahci_boot_defaults(void)
+   {
+       return ahci_boot("-drive if=none,id=drive0,file=%s,"
+                        "cache=writeback,serial=%s,format=%s"
+                        " -M q35 "
+                        "-device ide-hd,drive=drive0 "
+                        "-global ide-hd.ver=%s",
+                        tmp_path, "testdisk", imgfmt, "version");
+   }
+
+Anyway, you decide whether you want to do anything here now.
+
+>      }
+>  
+>      return s;
+> diff --git a/tests/ide-test.c b/tests/ide-test.c
+> index 2384c2c3e2..f39431b1a9 100644
+> --- a/tests/ide-test.c
+> +++ b/tests/ide-test.c
+> @@ -529,8 +529,8 @@ static void test_bmdma_no_busmaster(void)
+>  static void test_bmdma_setup(void)
+>  {
+>      ide_test_start(
+> -        "-drive file=%s,if=ide,serial=%s,cache=writeback,format=raw "
+> -        "-global ide-hd.ver=%s",
+> +        "-drive file=%s,if=ide,cache=writeback,format=raw "
+> +        "-global ide-hd.serial=%s -global ide-hd.ver=%s",
+>          tmp_path, "testdisk", "version");
+>      qtest_irq_intercept_in(global_qtest, "ioapic");
+>  }
+> @@ -561,8 +561,8 @@ static void test_identify(void)
+>      int ret;
+>  
+>      ide_test_start(
+> -        "-drive file=%s,if=ide,serial=%s,cache=writeback,format=raw "
+> -        "-global ide-hd.ver=%s",
+> +        "-drive file=%s,if=ide,cache=writeback,format=raw "
+> +        "-global ide-hd.serial=%s -global ide-hd.ver=%s",
+>          tmp_path, "testdisk", "version");
+>  
+>      dev = get_pci_device(&bmdma_bar, &ide_bar);
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 338477725f..282bc3dc35 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2850,11 +2850,6 @@ with ``-device ...,netdev=x''), or ``-nic user,smb=/some/dir''
+>  (for embedded NICs). The new syntax allows different settings to be
+>  provided per NIC.
+>  
+> -@subsection -drive serial=... (since 2.10.0)
+> -
+> -The drive serial argument is replaced by the the serial argument
+> -that can be specified with the ``-device'' parameter.
+> -
+>  @subsection -usbdevice (since 2.10.0)
+>  
+>  The ``-usbdevice DEV'' argument is now a synonym for setting
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index c2531e2f3c..d5b0c26e8e 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -805,7 +805,7 @@ ETEXI
+>  DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+>      "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
+>      "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
+> -    "       [,snapshot=on|off][,serial=s][,rerror=ignore|stop|report]\n"
+> +    "       [,snapshot=on|off][,rerror=ignore|stop|report]\n"
+>      "       [,werror=ignore|stop|report|enospc][,id=name][,aio=threads|native]\n"
+>      "       [,readonly=on|off][,copy-on-read=on|off]\n"
+>      "       [,discard=ignore|unmap][,detect-zeroes=on|off|unmap]\n"
+> @@ -879,10 +879,6 @@ The default mode is @option{cache=writeback}.
+>  Specify which disk @var{format} will be used rather than detecting
+>  the format.  Can be used to specify format=raw to avoid interpreting
+>  an untrusted format header.
+> -@item serial=@var{serial}
+> -This option specifies the serial number to assign to the device. This
+> -parameter is deprecated, use the corresponding parameter of @code{-device}
+> -instead.
+>  @item werror=@var{action},rerror=@var{action}
+>  Specify which @var{action} to take on write and read errors. Valid actions are:
+>  "ignore" (ignore the error and try to continue), "stop" (pause QEMU),
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
