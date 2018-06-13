@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fT6g9-0004I0-9H
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:23:18 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fT6hh-0005Ts-6n
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:24:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fT6g5-0004Al-7O
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:23:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49396 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fT6hc-0008Ci-SQ
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:24:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49440 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fT6g4-00049d-WE
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:23:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8F9844005F8A
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 14:23:12 +0000 (UTC)
-Date: Wed, 13 Jun 2018 15:23:09 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180613142309.GX19901@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1528372809-175770-1-git-send-email-imammedo@redhat.com>
-	<20180608132105.GA24764@localhost.localdomain>
-	<20180611151625.4b2420b8@redhat.com>
-	<20180611190607.GU7451@localhost.localdomain>
-	<20180611232924.6e04b6f8@igors-macbook-pro.local>
-	<20180611223633.GG7451@localhost.localdomain>
-	<5cef972d-250b-5464-7482-90fa24d36c80@redhat.com>
-	<20180612144205.2169e7a2@redhat.com>
-	<20180612125033.GF24690@redhat.com>
-	<20180613141730.GR7451@localhost.localdomain>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fT6hc-0008BX-MU
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:24:48 -0400
+Date: Wed, 13 Jun 2018 15:24:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180613142443.GF2676@work-vm>
+References: <1528212489-19137-1-git-send-email-lidongchen@tencent.com>
+	<1528212489-19137-10-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180613141730.GR7451@localhost.localdomain>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PATCH v6 2/2] vl: fix use of
- --daemonize with --preconfig
+In-Reply-To: <1528212489-19137-10-git-send-email-lidongchen@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH v5 09/10] migration: poll the cm event
+ while wait RDMA work request completion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,95 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Michal Privoznik <mprivozn@redhat.com>, ldoktor@redhat.com, libvir-list@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, pkrempa@redhat.com
+To: Lidong Chen <jemmy858585@gmail.com>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, berrange@redhat.com, aviadye@mellanox.com, pbonzini@redhat.com, qemu-devel@nongnu.org, adido@mellanox.com, galsha@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-On Wed, Jun 13, 2018 at 11:17:30AM -0300, Eduardo Habkost wrote:
-> On Tue, Jun 12, 2018 at 01:50:33PM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Tue, Jun 12, 2018 at 02:42:05PM +0200, Igor Mammedov wrote:
-> > > We can keep daemonizing flow in QEMU as it's now.
-> > > But Eduardo's idea about libvirt created socked + letting QEMU conn=
-ect to it
-> > > has a merit. It should fix current deadlock issue with as monitor
-> > > won't be depending on lead exit event.
-> >=20
-> > NB, libvirt only ever uses --daemonize when probing capabilities, nev=
-er
-> > when launching QEMU for a real VM. In the latter case, we now use FD
-> > passing, so libvirt opens the UNIX domain socket listener, and passes
-> > this into QEMU. So libvirt knows it can connect to the listener
-> > immediately and will only ever get a failure if QEMU has exited.
->=20
-> So, what I'm really missing here is: do we have a good reason to
-> support --daemonize + --preconfig today?
+* Lidong Chen (jemmy858585@gmail.com) wrote:
+> If the peer qemu is crashed, the qemu_rdma_wait_comp_channel function
+> maybe loop forever. so we should also poll the cm event fd, and when
+> receive RDMA_CM_EVENT_DISCONNECTED and RDMA_CM_EVENT_DEVICE_REMOVAL,
+> we consider some error happened.
+> 
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 
-On the libvirt zero, I don't see a compelling need for it.
+Was there a reply which explained/pointed to docs for cm_event?
+Or a Review-by from one of the Infiniband people would be fine.
 
-> The options I see are:
->=20
-> 1) complete daemonization before preconfig main loop
-> ----------------------------------------------------
->=20
-> By "complete daemonization" I mean doing chdir("/"),
-> stderr/stdout cleanup, chroot, and UID magic before calling
-> exit(0) on the main QEMU process.
->=20
-> Pros:
-> * More intuitive
->=20
-> Cons:
-> * Can break existing initialization code that don't expect
->   this to happen.
->   (can this be fixed?)
-> * Can break any preconfig-time QMP commands that rely on opening
->   files
->   (is it a real problem?)
+Dave
 
-NB Use of -chroot is separate from -daemonize, so it is not
-an issue with -preconfig + -daemonize alone.
-
-There's soo many caveats around -chroot, I struggle to
-care about adding another caveats.
-
-> * Any initialization error conditions that currently rely on
->   error_report()+exit() will be very inconvenient to handle
->   properly
->   (this can be fixed eventually, but it's not trivial)
-
-
-> 3) daemonize only after leaving preconfig state
-> -----------------------------------------------
->=20
-> AFAICS, this is the current behavior.
->=20
-> Pros:
-> * Less likely to break init code
-> * Keeps existing code as is
->=20
-> Cons:
-> * Less intuitive
-> * -daemonize becomes useless as synchronization point for monitor
->   availability
-
-Yeah that honestly kills the key benefit of having -daemonize
-imho.
-
-> * Would this be useful for anybody, at all?
-> * We won't be able to change this behavior later
->=20
->=20
-
-> I believe the only reasonable options are (1) and (4).
-
-Agreed.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> ---
+>  migration/rdma.c | 33 ++++++++++++++++++++++++++++++---
+>  1 file changed, 30 insertions(+), 3 deletions(-)
+> 
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index f12e8d5..bb6989e 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -1489,6 +1489,9 @@ static uint64_t qemu_rdma_poll(RDMAContext *rdma, uint64_t *wr_id_out,
+>   */
+>  static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
+>  {
+> +    struct rdma_cm_event *cm_event;
+> +    int ret = -1;
+> +
+>      /*
+>       * Coroutine doesn't start until migration_fd_process_incoming()
+>       * so don't yield unless we know we're running inside of a coroutine.
+> @@ -1505,13 +1508,37 @@ static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
+>           * without hanging forever.
+>           */
+>          while (!rdma->error_state  && !rdma->received_error) {
+> -            GPollFD pfds[1];
+> +            GPollFD pfds[2];
+>              pfds[0].fd = rdma->comp_channel->fd;
+>              pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
+> +            pfds[0].revents = 0;
+> +
+> +            pfds[1].fd = rdma->channel->fd;
+> +            pfds[1].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
+> +            pfds[1].revents = 0;
+> +
+>              /* 0.1s timeout, should be fine for a 'cancel' */
+> -            switch (qemu_poll_ns(pfds, 1, 100 * 1000 * 1000)) {
+> +            switch (qemu_poll_ns(pfds, 2, 100 * 1000 * 1000)) {
+> +            case 2:
+>              case 1: /* fd active */
+> -                return 0;
+> +                if (pfds[0].revents) {
+> +                    return 0;
+> +                }
+> +
+> +                if (pfds[1].revents) {
+> +                    ret = rdma_get_cm_event(rdma->channel, &cm_event);
+> +                    if (!ret) {
+> +                        rdma_ack_cm_event(cm_event);
+> +                    }
+> +
+> +                    error_report("receive cm event while wait comp channel,"
+> +                                 "cm event is %d", cm_event->event);
+> +                    if (cm_event->event == RDMA_CM_EVENT_DISCONNECTED ||
+> +                        cm_event->event == RDMA_CM_EVENT_DEVICE_REMOVAL) {
+> +                        return -EPIPE;
+> +                    }
+> +                }
+> +                break;
+>  
+>              case 0: /* Timeout, go around again */
+>                  break;
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
