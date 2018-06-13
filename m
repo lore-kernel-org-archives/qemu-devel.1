@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fT8SD-0005wY-KC
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:17:05 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fT8Sn-0006DU-0A
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:17:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fT8SC-0000WN-Kt
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:17:01 -0400
-References: <20180612104430.25745-1-kraxel@redhat.com>
-	<20180612104430.25745-7-kraxel@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <69ff0c99-803c-ff9f-737e-dbf0ae1019a6@redhat.com>
-Date: Wed, 13 Jun 2018 18:16:37 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fT8Sj-0002A5-BR
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:17:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59842 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fT8Sj-00028Q-5r
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:17:33 -0400
+Date: Wed, 13 Jun 2018 17:17:24 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180613161723.GL2676@work-vm>
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180604095520.8563-5-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <20180612104430.25745-7-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 6/8] usb-ccid: fix bus leak
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180604095520.8563-5-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH 04/12] migration: introduce
+ migration_update_rates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, Li Zhijian <lizhijian@cn.fujitsu.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Zhang Chen <zhangckid@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <minyard@acm.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On 12/06/2018 12:44, Gerd Hoffmann wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> qbus_create_inplace() creates a new reference in realize(), it must be
-> released in unrealize().
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Message-id: 20180531195119.22021-4-marcandre.lureau@redhat.com
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+* guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> 
+> It is used to slightly clean the code up, no logic is changed
 
-Nope, that's only happening because patch 3 was wrong---and if we did
-keep patch 3, you would have to do it in all devices that produce buses;
-not just this one.
+Actually, there is a slight change; iterations_prev is always updated
+when previously it was only updated with xbzrle on; still the change
+makes more sense.
 
-Paolo
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 > ---
->  hw/usb/dev-smartcard-reader.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reade=
-r.c
-> index 2131e33d27..f7c91230d5 100644
-> --- a/hw/usb/dev-smartcard-reader.c
-> +++ b/hw/usb/dev-smartcard-reader.c
-> @@ -1147,6 +1147,7 @@ static void ccid_unrealize(USBDevice *dev, Error =
-**errp)
->      USBCCIDState *s =3D USB_CCID_DEV(dev);
-> =20
->      ccid_bulk_in_clear(s);
-> +    object_unref(OBJECT(&s->bus));
+>  migration/ram.c | 35 ++++++++++++++++++++++-------------
+>  1 file changed, 22 insertions(+), 13 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index dd1283dd45..ee03b28435 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1130,6 +1130,25 @@ uint64_t ram_pagesize_summary(void)
+>      return summary;
 >  }
-> =20
->  static void ccid_flush_pending_answers(USBCCIDState *s)
->=20
+>  
+> +static void migration_update_rates(RAMState *rs, int64_t end_time)
+> +{
+> +    uint64_t iter_count = rs->iterations - rs->iterations_prev;
+> +
+> +    /* calculate period counters */
+> +    ram_counters.dirty_pages_rate = rs->num_dirty_pages_period * 1000
+> +                / (end_time - rs->time_last_bitmap_sync);
+> +
+> +    if (!iter_count) {
+> +        return;
+> +    }
+> +
+> +    if (migrate_use_xbzrle()) {
+> +        xbzrle_counters.cache_miss_rate = (double)(xbzrle_counters.cache_miss -
+> +            rs->xbzrle_cache_miss_prev) / iter_count;
+> +        rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
+> +    }
+> +}
+> +
+>  static void migration_bitmap_sync(RAMState *rs)
+>  {
+>      RAMBlock *block;
+> @@ -1159,9 +1178,6 @@ static void migration_bitmap_sync(RAMState *rs)
+>  
+>      /* more than 1 second = 1000 millisecons */
+>      if (end_time > rs->time_last_bitmap_sync + 1000) {
+> -        /* calculate period counters */
+> -        ram_counters.dirty_pages_rate = rs->num_dirty_pages_period * 1000
+> -            / (end_time - rs->time_last_bitmap_sync);
+>          bytes_xfer_now = ram_counters.transferred;
+>  
+>          /* During block migration the auto-converge logic incorrectly detects
+> @@ -1183,16 +1199,9 @@ static void migration_bitmap_sync(RAMState *rs)
+>              }
+>          }
+>  
+> -        if (migrate_use_xbzrle()) {
+> -            if (rs->iterations_prev != rs->iterations) {
+> -                xbzrle_counters.cache_miss_rate =
+> -                   (double)(xbzrle_counters.cache_miss -
+> -                            rs->xbzrle_cache_miss_prev) /
+> -                   (rs->iterations - rs->iterations_prev);
+> -                rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
+> -            }
+> -            rs->iterations_prev = rs->iterations;
+> -        }
+> +        migration_update_rates(rs, end_time);
+> +
+> +        rs->iterations_prev = rs->iterations;
+>  
+>          /* reset period counters */
+>          rs->time_last_bitmap_sync = end_time;
+> -- 
+> 2.14.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
