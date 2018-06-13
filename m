@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fT1Ul-00044q-9d
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:51:12 -0400
+	(envelope-from <groug@kaod.org>) id 1fT1VW-0004kU-VO
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:52:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fT1Ui-00050h-5f
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:51:11 -0400
-Date: Wed, 13 Jun 2018 10:50:59 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180613041115.GS30690@umbus.fritz.box>
-Message-ID: <alpine.BSF.2.21.1806131044020.620@zero.eik.bme.hu>
-References: <cover.1528291908.git.balaton@eik.bme.hu>
-	<8c404c8c4ee1bfd2e4d079877d481094f797df8f.1528291908.git.balaton@eik.bme.hu>
-	<6aa1bc4e-a4b0-d7be-b9eb-85dfe8c06781@amsat.org>
-	<alpine.BSF.2.21.1806061920120.94568@zero.eik.bme.hu>
-	<20180613041115.GS30690@umbus.fritz.box>
+	(envelope-from <groug@kaod.org>) id 1fT1VT-0005K7-Rk
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:51:59 -0400
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:54445)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fT1VT-0005Jl-HL
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:51:55 -0400
+Received: from player746.ha.ovh.net (unknown [10.109.122.112])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 5BCA7136723
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 10:51:53 +0200 (CEST)
+Date: Wed, 13 Jun 2018 10:51:46 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180613105146.4170d9ac@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <6a1cc08b-5509-f03d-7da7-97429d7003c5@kaod.org>
+References: <20180613065707.30766-1-david@gibson.dropbear.id.au>
+	<20180613065707.30766-2-david@gibson.dropbear.id.au>
+	<6a1cc08b-5509-f03d-7da7-97429d7003c5@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 5/8] hw/timer: Add basic
- M41T80 emulation
+Subject: Re: [Qemu-devel] [PATCH 1/7] spapr: Clean up cpu realize/unrealize
+ paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +32,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Wed, 13 Jun 2018, David Gibson wrote:
-> On Wed, Jun 06, 2018 at 07:35:28PM +0200, BALATON Zoltan wrote:
->> On Wed, 6 Jun 2018, Philippe Mathieu-Daud=E9 wrote:
->>> On 06/06/2018 10:31 AM, BALATON Zoltan wrote:
->>>> Basic emulation of the M41T80 serial (I2C) RTC chip. Only getting ti=
-me
->>>> of day is implemented. Setting time and RTC alarm are not supported.
->> [...]
->>>> diff --git a/hw/timer/m41t80.c b/hw/timer/m41t80.c
->>>> new file mode 100644
->>>> index 0000000..9dbdb1b
->>>> --- /dev/null
->>>> +++ b/hw/timer/m41t80.c
->>>> @@ -0,0 +1,117 @@
->>>> +/*
->>>> + * M41T80 serial rtc emulation
->>>> + *
->>>> + * Copyright (c) 2018 BALATON Zoltan
->>>> + *
->>>> + * This work is licensed under the GNU GPL license version 2 or lat=
-er.
->>>> + *
->>>> + */
->>>> +
->>>> +#include "qemu/osdep.h"
->>>> +#include "qemu/log.h"
->>>> +#include "qemu/timer.h"
->>>> +#include "qemu/bcd.h"
->>>> +#include "hw/i2c/i2c.h"
->>>> +
->>>> +#define TYPE_M41T80 "m41t80"
->>>> +#define M41T80(obj) OBJECT_CHECK(M41t80State, (obj), TYPE_M41T80)
->>>> +
->>>> +typedef struct M41t80State {
->>>> +    I2CSlave parent_obj;
->>>> +    int8_t addr;
->>>> +} M41t80State;
->>>> +
->>>> +static void m41t80_realize(DeviceState *dev, Error **errp)
->>>> +{
->>>> +    M41t80State *s =3D M41T80(dev);
->>>> +
->>>> +    s->addr =3D -1;
->>>> +}
->>>> +
->>>> +static int m41t80_send(I2CSlave *i2c, uint8_t data)
->>>> +{
->>>> +    M41t80State *s =3D M41T80(i2c);
->>>> +
->>>> +    if (s->addr < 0) {
->>>> +        s->addr =3D data;
->>>> +    } else {
->>>> +        s->addr++;
->>>> +    }
->>>
->>> What about adding enum i2c_event in M41t80State and use the enum here
->>> rather than the addr < 0? Also this wrap at INT8_MAX =3D 127, is this
->>> expected?
->>
->> Thanks for the review. I guess we could add enum for device bytes and =
-the
->> special case -1 meaning no register address selected yet but this is a=
- very
->> simple device with only 20 bytes and the datasheet also lists them by =
-number
->> without naming them so I think we can also refer to them by number. Si=
-nce
->> the device has only this 20 bytes the case with 127 should also not be=
- a
->> problem as that's invalid address anyway. Or did you mean something el=
-se?
->
-> So, I'm not particularly in favour of adding extra state variables.
->
-> But is using addr < 0 safe here?  You're assigning the uint8_t data to
-> addr - could that result in a negative value?
+On Wed, 13 Jun 2018 10:11:45 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-Why wouldn't it be safe with the expected values for register address=20
-between 0-19? If the guest sends garbage values over 127 it will either=20
-result in invalid register or unselected register and lead to an error=20
-when trying to read/write that register so I don't see what other problem=
-=20
-this may cause.
+> On 06/13/2018 08:57 AM, David Gibson wrote:
+> > spapr_cpu_init() and spapr_cpu_destroy() are only called from the spapr
+> > cpu core realize/unrealize paths, and really can only be called from th=
+ere.
+> >=20
+> > Those are all short functions, so fold the pairs together for simplicit=
+y.
+> > While we're there rename some functions and change some parameter types
+> > for brevity and clarity.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au> =20
+>=20
+> Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>=20
+> Still a call to spapr_cpu_reset(cpu). We should try to get rid of it
+> one day.
+> =20
 
-The addr < 0 is to check if no address was selected before (on creating=20
-the device and when sending first value from host addr is set to -1. In=20
-this case first write will set register address, then subsequent=20
-reads/writes increment register address as the datasheet says).
+Yeah, CPU reset should ideally be triggered during machine reset or during
+hotplug. There have been several tries to do so but we hit an issue with
+hotplug... If we don't call spapr_cpu_reset() here then CPUState::halted
+isn't set and the CPU can start executing before the hotplug path has a
+chance to reset it...
 
-Regards,
-BALATON Zoltan
+https://lists.nongnu.org/archive/html/qemu-ppc/2018-04/msg00126.html
+
+This requires a deeper investigation.
+
+> Thanks,
+>=20
+> C.
+>=20
+> > ---
+> >  hw/ppc/spapr_cpu_core.c | 69 +++++++++++++++--------------------------
+> >  1 file changed, 25 insertions(+), 44 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index f3e9b879b2..7fdb3b6667 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -83,26 +83,6 @@ void spapr_cpu_set_entry_state(PowerPCCPU *cpu, targ=
+et_ulong nip, target_ulong r
+> >      ppc_store_lpcr(cpu, env->spr[SPR_LPCR] | pcc->lpcr_pm);
+> >  }
+> > =20
+> > -static void spapr_cpu_destroy(PowerPCCPU *cpu)
+> > -{
+> > -    qemu_unregister_reset(spapr_cpu_reset, cpu);
+> > -}
+> > -
+> > -static void spapr_cpu_init(sPAPRMachineState *spapr, PowerPCCPU *cpu,
+> > -                           Error **errp)
+> > -{
+> > -    CPUPPCState *env =3D &cpu->env;
+> > -
+> > -    /* Set time-base frequency to 512 MHz */
+> > -    cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
+> > -
+> > -    cpu_ppc_set_vhyp(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+> > -    kvmppc_set_papr(cpu);
+> > -
+> > -    qemu_register_reset(spapr_cpu_reset, cpu);
+> > -    spapr_cpu_reset(cpu);
+> > -}
+> > -
+> >  /*
+> >   * Return the sPAPR CPU core type for @model which essentially is the =
+CPU
+> >   * model specified with -cpu cmdline option.
+> > @@ -122,44 +102,47 @@ const char *spapr_get_cpu_core_type(const char *c=
+pu_type)
+> >      return object_class_get_name(oc);
+> >  }
+> > =20
+> > -static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
+> > +static void spapr_unrealize_vcpu(PowerPCCPU *cpu)
+> > +{
+> > +    qemu_unregister_reset(spapr_cpu_reset, cpu);
+> > +    object_unparent(cpu->intc);
+> > +    cpu_remove_sync(CPU(cpu));
+> > +    object_unparent(OBJECT(cpu));
+> > +}
+> > +
+> > +static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
+> >  {
+> >      sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+> >      CPUCore *cc =3D CPU_CORE(dev);
+> >      int i;
+> > =20
+> >      for (i =3D 0; i < cc->nr_threads; i++) {
+> > -        Object *obj =3D OBJECT(sc->threads[i]);
+> > -        DeviceState *dev =3D DEVICE(obj);
+> > -        CPUState *cs =3D CPU(dev);
+> > -        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> > -
+> > -        spapr_cpu_destroy(cpu);
+> > -        object_unparent(cpu->intc);
+> > -        cpu_remove_sync(cs);
+> > -        object_unparent(obj);
+> > +        spapr_unrealize_vcpu(sc->threads[i]);
+> >      }
+> >      g_free(sc->threads);
+> >  }
+> > =20
+> > -static void spapr_cpu_core_realize_child(Object *child,
+> > -                                         sPAPRMachineState *spapr, Err=
+or **errp)
+> > +static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spa=
+pr,
+> > +                               Error **errp)
+> >  {
+> > +    CPUPPCState *env =3D &cpu->env;
+> >      Error *local_err =3D NULL;
+> > -    CPUState *cs =3D CPU(child);
+> > -    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> > =20
+> > -    object_property_set_bool(child, true, "realized", &local_err);
+> > +    object_property_set_bool(OBJECT(cpu), true, "realized", &local_err=
+);
+> >      if (local_err) {
+> >          goto error;
+> >      }
+> > =20
+> > -    spapr_cpu_init(spapr, cpu, &local_err);
+> > -    if (local_err) {
+> > -        goto error;
+> > -    }
+> > +    /* Set time-base frequency to 512 MHz */
+> > +    cpu_ppc_tb_init(env, SPAPR_TIMEBASE_FREQ);
+> > +
+> > +    cpu_ppc_set_vhyp(cpu, PPC_VIRTUAL_HYPERVISOR(spapr));
+> > +    kvmppc_set_papr(cpu);
+> > =20
+> > -    cpu->intc =3D icp_create(child, spapr->icp_type, XICS_FABRIC(spapr=
+),
+> > +    qemu_register_reset(spapr_cpu_reset, cpu);
+> > +    spapr_cpu_reset(cpu);
+> > +
+> > +    cpu->intc =3D icp_create(OBJECT(cpu), spapr->icp_type, XICS_FABRIC=
+(spapr),
+> >                             &local_err);
+> >      if (local_err) {
+> >          goto error;
+> > @@ -220,9 +203,7 @@ static void spapr_cpu_core_realize(DeviceState *dev=
+, Error **errp)
+> >      }
+> > =20
+> >      for (j =3D 0; j < cc->nr_threads; j++) {
+> > -        obj =3D OBJECT(sc->threads[j]);
+> > -
+> > -        spapr_cpu_core_realize_child(obj, spapr, &local_err);
+> > +        spapr_realize_vcpu(sc->threads[j], spapr, &local_err);
+> >          if (local_err) {
+> >              goto err;
+> >          }
+> > @@ -249,7 +230,7 @@ static void spapr_cpu_core_class_init(ObjectClass *=
+oc, void *data)
+> >      sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_CLASS(oc);
+> > =20
+> >      dc->realize =3D spapr_cpu_core_realize;
+> > -    dc->unrealize =3D spapr_cpu_core_unrealizefn;
+> > +    dc->unrealize =3D spapr_cpu_core_unrealize;
+> >      dc->props =3D spapr_cpu_core_properties;
+> >      scc->cpu_type =3D data;
+> >  }
+> >  =20
+>=20
