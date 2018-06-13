@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fSuUv-00045X-Cn
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:22:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fSuZg-0005zn-Ey
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:27:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fSuUr-0003IY-B2
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:22:53 -0400
-Date: Wed, 13 Jun 2018 11:20:27 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180613012027.GP30690@umbus.fritz.box>
-References: <cover.1528291908.git.balaton@eik.bme.hu>
-	<7017cb3e0ed918bc3a9df823175d91a24692e2ef.1528291908.git.balaton@eik.bme.hu>
-	<20180608085618.GT3344@umbus.fritz.box>
-	<alpine.BSF.2.21.1806081112180.22949@zero.eik.bme.hu>
+	(envelope-from <richard.henderson@linaro.org>) id 1fSuZb-0005Lj-I4
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:27:48 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:37912)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fSuZb-0005LU-Av
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:27:43 -0400
+Received: by mail-pg0-x243.google.com with SMTP id c9-v6so428284pgf.5
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:27:43 -0700 (PDT)
+References: <20180530180120.13355-1-richard.henderson@linaro.org>
+	<20180530180120.13355-16-richard.henderson@linaro.org>
+	<CAFEAcA-weWiOLsrucjWMUjAh3tgS02RgBChpZOiOgd3HZK+imw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <fef082f7-e297-61d8-8850-6d33e93b976f@linaro.org>
+Date: Tue, 12 Jun 2018 15:27:37 -1000
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="mejza3ZMMA5Za1mX"
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1806081112180.22949@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] ppc4xx_i2c: Move register state to
- private struct and remove unimplemented sdata and intr registers
+In-Reply-To: <CAFEAcA-weWiOLsrucjWMUjAh3tgS02RgBChpZOiOgd3HZK+imw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3b 15/18] target/arm: Implement SVE
+ Integer Compare - Scalars Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,116 +33,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+
+On 06/05/2018 08:02 AM, Peter Maydell wrote:
+>> +    if (count & 63) {
+>> +        d->p[i] = ~(-1ull << (count & 63)) & esz_mask;
+> 
+> Is this d->p[i] = MAKE_64BIT_MASK(0, count & 63) & esz_mask; ?
+
+Fixed.
 
 
---mejza3ZMMA5Za1mX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>> +    tcg_gen_setcond_i64(cond, cmp, rn, rm);
+>> +    tcg_gen_extrl_i64_i32(cpu_NF, cmp);
+>> +    tcg_temp_free_i64(cmp);
+>> +
+>> +    /* VF = !NF & !CF.  */
+>> +    tcg_gen_xori_i32(cpu_VF, cpu_NF, 1);
+>> +    tcg_gen_andc_i32(cpu_VF, cpu_VF, cpu_CF);
+>> +
+>> +    /* Both NF and VF actually look at bit 31.  */
+>> +    tcg_gen_neg_i32(cpu_NF, cpu_NF);
+>> +    tcg_gen_neg_i32(cpu_VF, cpu_VF);
+> 
+> Microoptimization, but I think you can save an instruction here
+> using
+>        /* VF = !NF & !CF == !(NF || CF); we know NF and CF are
+>         * both 0 or 1, so the result of the logical NOT has
+>         * VF bit 31 set or clear as required.
+>         */
+>        tcg_gen_or_i32(cpu_VF, cpu_NF, cpu_CF);
+>        tcg_gen_not_i32(cpu_VF, cpu_VF);
 
-On Fri, Jun 08, 2018 at 11:20:50AM +0200, BALATON Zoltan wrote:
-> On Fri, 8 Jun 2018, David Gibson wrote:
-> > On Wed, Jun 06, 2018 at 03:31:48PM +0200, BALATON Zoltan wrote:
-> > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> >=20
-> > It's not clear to me why this is preferable to having the registers
-> > embedded in the state structure.  The latter is pretty standard
-> > practice for qemu.
->=20
-> Maybe it will be clearer after the next patch in the series. I needed a
-> place to store the bitbang_i2c_interface for the directcntl way of access=
-ing
-> the i2c bus but I can't include bitbang_i2c.h from the public header beca=
-use
-> it's a local header. So I needed a local extension to the state struct. O=
-nce
-> I have that then it's a good place to also store private registers which =
-are
-> now defined in the same file so I don't have to look up them in a differe=
-nt
-> place. This seemed clearer to me and easier to work with. Maybe the split=
-ing
-> of the rewrite did not make this clear.
+No, ~({0,1} | {0,1}) -> {-1,-2}.
 
-Oh.. right.  There's a better way.
 
-You can just forward declare the bitbang_i2c_interface structure like
-this in your header:
-	typdef struct bitbang_i2c_interface bitbang_i2c_interface;
+>> +    /* For the helper, compress the different conditions into a computation
+>> +     * of how many iterations for which the condition is true.
+>> +     *
+>> +     * This is slightly complicated by 0 <= UINT64_MAX, which is nominally
+>> +     * 2**64 iterations, overflowing to 0.  Of course, predicate registers
+>> +     * aren't that large, so any value >= predicate size is sufficient.
+>> +     */
+> 
+> The comment says that 0 <= UINT64_MAX is a special case,
+> but I don't understand how the code accounts for it ?
+> 
+>> +    tcg_gen_sub_i64(t0, op1, op0);
+>> +
+>> +    /* t0 = MIN(op1 - op0, vsz).  */
+>> +    if (a->eq) {
+>> +        /* Equality means one more iteration.  */
+>> +        tcg_gen_movi_i64(t1, vsz - 1);
+>> +        tcg_gen_movcond_i64(TCG_COND_LTU, t0, t0, t1, t0, t1);
 
-So you're declaring the existence of the structure, but not its
-contents - that's sufficient to create a pointer to it.  Then you
-don't need to creat the substructure and extra level of indirection.
+By bounding the input, here, to the vector size.  This reduces the (2**64-1)+1
+case, which we can't represent, to a vsz+1 case, which we can.  This produces
+the same result for this instruction.
 
-> One thing I'm not sure about though:
->=20
-> > > ---
-> > >  hw/i2c/ppc4xx_i2c.c         | 75 +++++++++++++++++++++++++----------=
-----------
-> > >  include/hw/i2c/ppc4xx_i2c.h | 19 ++----------
-> > >  2 files changed, 43 insertions(+), 51 deletions(-)
-> > >=20
-> > > diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-> > > index d1936db..a68b5f7 100644
-> > > --- a/hw/i2c/ppc4xx_i2c.c
-> > > +++ b/hw/i2c/ppc4xx_i2c.c
-> [...]
-> > > @@ -330,7 +335,9 @@ static const MemoryRegionOps ppc4xx_i2c_ops =3D {
-> > >  static void ppc4xx_i2c_init(Object *o)
-> > >  {
-> > >      PPC4xxI2CState *s =3D PPC4xx_I2C(o);
-> > > +    PPC4xxI2CRegs *r =3D g_malloc0(sizeof(PPC4xxI2CRegs));
-> > >=20
-> > > +    s->regs =3D r;
-> > >      memory_region_init_io(&s->iomem, OBJECT(s), &ppc4xx_i2c_ops, s,
-> > >                            TYPE_PPC4xx_I2C, PPC4xx_I2C_MEM_SIZE);
-> > >      sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
->=20
-> I allocate memory here but I'm not sure if it should be g_free'd somewhere
-> and if so where? I was not able to detangle QOM object hierarchies and th=
-ere
-> seems to be no good docs available or I haven't found them. (PCI devices
-> seem to have unrealize methods but this did not work for I2C objects.)
+This does point out that I should be using the new tcg_gen_umin_i64 helper
+instead of open-coding with movcond.
 
-Yes, if you're allocating you definitely should be free()ing.  It
-should go in the corresponding cleanup routine to where it is
-allocated.  Since the allocation is in instance_init(), the free()
-should be in instance_finalize() (which you'd need to add).
 
-Except that the above should let you avoid that.
-
-=2E.and I guess this won't actually ever be finalized in practice.
-
-=2E.and there doesn't seem to be a way to free up a bitbang_interface,
-so even if you added the finalize, it still wouldn't really clean up
-properly.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---mejza3ZMMA5Za1mX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsgcVgACgkQbDjKyiDZ
-s5Jckg//RxR+UFRJtmHUlj09kB4kcjNcoSKmN0+1L7S6rYWHZE449PAfvHMDw5Dk
-BC3rgosCOelGAzLmXti5/Ms1gr5UTaERmDjhteM7VhchizcOJQuvyx5FvX+uHxO+
-4ffzmHNN9S17bX/Rx/gjCF6BYk8sNMYLoRnstwPCBevTNr9/lkSYeYRjJzYOStis
-P0yLI4YAp63eKN+1TGxNft97R7uQUFQLGpVPMHH8Ir27RewN42Qc/6isSUcAC3Uv
-88dTSX2hL2Rg09uQeO8dX4ClfQwfKDyj9ZNTd4AkQEULa6dQXYquzPwdnNNBnHoq
-vzoOj3umkMFInLungoFMXixYubjF8xen7AFhUtHyc4Y0o3CV1+Bkzt9fXlN8cLjj
-UUpzTFZ8ZnKQxPV59jvgVfU+GDKa4+xk6evk6kwU2SsySZGK8r5zHh9ZPjIECTs/
-t1wRBUU4Y/oyKxwuupvjnZ7smezwj0zPjuHjVLHhp7LG3YGlDmlBtiekbCyyweHT
-Btj98pTWBiO/Q9TZgCCkuMvJc3X0ipSCYVSjMlM0otpkvt7ZorkMkQh5wnLcGjEf
-79TzRS5MurdsM8df3aQVOYi4l3Uy50ewjIAgKbUBJTQgIc9JWKT+idmJoBrQNyZH
-TQJj4qk8RQLuTMxSmNx0CSS5FFPJ4Jc6ZPUwGKtqSBgeGAKVAqw=
-=Vh61
------END PGP SIGNATURE-----
-
---mejza3ZMMA5Za1mX--
+r~
