@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fT8WO-00005f-UG
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:21:21 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fT8Wd-0000E1-E6
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:21:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fT8WL-0003Mc-PC
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:21:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60236 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fT8WL-0003LD-IB
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:21:17 -0400
-References: <20180313224719.4954-1-pbonzini@redhat.com>
-	<20180313224719.4954-51-pbonzini@redhat.com>
-	<20180601185139.GA25837@flamenco>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f3c45eff-634d-6187-8f65-624bce9d2e4e@redhat.com>
-Date: Wed, 13 Jun 2018 18:21:10 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fT8Wc-000408-14
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:21:35 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180601185139.GA25837@flamenco>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <431f487d-71f0-a766-eea4-7f3369984a7f@redhat.com>
+References: <20180612104430.25745-1-kraxel@redhat.com>
+	<20180612104430.25745-5-kraxel@redhat.com>
+	<431f487d-71f0-a766-eea4-7f3369984a7f@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 13 Jun 2018 18:21:30 +0200
+Message-ID: <CAJ+F1CK3R7ap=mEd5pDQzKcU2g9z1v3LzutHx4ibxj=Rk9uUCg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 50/69] hw/alpha/dp264: Use the
- TYPE_SMC37C669_SUPERIO
+Subject: Re: [Qemu-devel] [PULL 4/8] bus: do not unref the added child bus
+ on realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +25,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU <qemu-devel@nongnu.org>, Corey Minyard <minyard@acm.org>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Jason Wang <jasowang@redhat.com>, Alistair Francis <alistair@alistair23.me>, "open list:ARM" <qemu-arm@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Zhang Chen <zhangckid@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On 01/06/2018 20:51, Emilio G. Cota wrote:
-> On Tue, Mar 13, 2018 at 23:47:00 +0100, Paolo Bonzini wrote:
->> From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Hi
+
+On Wed, Jun 13, 2018 at 6:05 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 12/06/2018 12:44, Gerd Hoffmann wrote:
 >>
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Message-Id: <20180308223946.26784-25-f4bug@amsat.org>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> When the parent bus removes the child property, it takes care of
+>> removing the added reference, in object_finalize_child_property().
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> Message-id: 20180531195119.22021-2-marcandre.lureau@redhat.com
+>> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 >> ---
->>  default-configs/alpha-softmmu.mak |  3 +++
->>  hw/alpha/dp264.c                  | 10 ++++------
->>  2 files changed, 7 insertions(+), 6 deletions(-)
->=20
-> This commit breaks alpha-softmmu bootup for me. I get no console
-> output whatsoever -- not even the green "Hello" when invoking
-> the alpha-softmmu binary with no arguments.
->=20
-> Did anybody else notice this?
+>>  hw/core/bus.c | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/hw/core/bus.c b/hw/core/bus.c
+>> index 4651f24486..ad0c9df335 100644
+>> --- a/hw/core/bus.c
+>> +++ b/hw/core/bus.c
+>> @@ -102,7 +102,6 @@ static void qbus_realize(BusState *bus, DeviceState =
+*parent, const char *name)
+>>          QLIST_INSERT_HEAD(&bus->parent->child_bus, bus, sibling);
+>>          bus->parent->num_child_bus++;
+>>          object_property_add_child(OBJECT(bus->parent), bus->name, OBJEC=
+T(bus), NULL);
+>> -        object_unref(OBJECT(bus));
+>
+> This is wrong.  object_finalize_child_property()'s unref balances the
+> ref in object_property_add_child().  qbus_realize's unref balances the
+> ref that was initially placed by object_new/object_initialize.
+>
+> So you're introducing a leak.
 
-Philippe, are you going to take a look?  I tested 2.12 and I get the
-same result as latest mainline: nothing on the VGA and
+Oops, too bad you didn't review earlier. Hmm.. I vote for reverting
+the 4 patches.
 
-PCI: 00:00:0 class 0300 id 1013:00b8
-PCI:   region 0: 10000000
-PCI:   region 1: 12000000
-PCI: 00:01:0 class 0200 id 8086:100e
-PCI:   region 0: 12020000
-PCI:   region 1: 0000c000
-PCI: 00:02:0 class 0101 id 1095:0646
-PCI:   region 0: 0000c040
-PCI:   region 1: 0000c048
-PCI:   region 3: 0000c04c
 
-on the serial console, respectively for VGA/network/IDE.
 
-Paolo
+--=20
+Marc-Andr=C3=A9 Lureau
