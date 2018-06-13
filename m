@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fSwmD-0001Pw-Mw
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 23:48:55 -0400
+	(envelope-from <cota@braap.org>) id 1fSwnr-0002bU-Ap
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 23:50:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fSwmA-0004JG-Ie
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 23:48:53 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36361)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fSwmA-0004Ib-7U
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 23:48:50 -0400
-Received: by mail-qt0-x244.google.com with SMTP id o9-v6so1191762qtp.3
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 20:48:48 -0700 (PDT)
-From: Keno Fischer <keno@juliacomputing.com>
-Date: Tue, 12 Jun 2018 23:48:31 -0400
-Message-Id: <1528861711-23200-1-git-send-email-keno@juliacomputing.com>
-Subject: [Qemu-devel] [PATCH v5] cutils: Provide strchrnul
+	(envelope-from <cota@braap.org>) id 1fSwno-00054s-8v
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 23:50:35 -0400
+Date: Tue, 12 Jun 2018 23:50:30 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180613035030.GB25430@flamenco>
+References: <1528859749-25286-1-git-send-email-baiyaowei@cmss.chinamobile.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1528859749-25286-1-git-send-email-baiyaowei@cmss.chinamobile.com>
+Subject: Re: [Qemu-devel] [PATCH] tracing.txt: add missing '-' for trace
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,227 +23,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Keno Fischer <keno@juliacomputing.com>, groug@kaod.org, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+Cc: mjt@tls.msk.ru, laurent@vivier.eu, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com
 
-strchrnul is a GNU extension and thus unavailable on a number of targets.
-In the review for a commit removing strchrnul from 9p, I was asked to
-create a qemu_strchrnul helper to factor out this functionality.
-Do so, and use it in a number of other places in the code base that inlined
-the replacement pattern in a place where strchrnul could be used.
+On Tue, Jun 12, 2018 at 23:15:49 -0400, Yaowei Bai wrote:
+> Signed-off-by: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+> ---
+>  docs/devel/tracing.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
+> index 07abbb3..6ab32cc 100644
+> --- a/docs/devel/tracing.txt
+> +++ b/docs/devel/tracing.txt
+> @@ -18,7 +18,7 @@ for debugging, profiling, and observing execution.
+>  
+>  3. Run the virtual machine to produce a trace file:
+>  
+> -    qemu -trace events=/tmp/events ... # your normal QEMU invocation
+> +    qemu --trace events=/tmp/events ... # your normal QEMU invocation
 
-Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-Acked-by: Greg Kurz <groug@kaod.org>
----
+The second dash is not missing; both '-args' and '--args' work.
 
-Changes since v4:
- - `CONFIG_STRCHRNUL` -> `HAVE_STRCHRNUL` name change
- - In the strchrnul configure check
-   - Return the value of strchrnul to avoid it being optimized away
-   - Use `&main` (i.e. the assembly of the generated function as
-     the haystack) to avoid concerns about constant folding. `main`
-     seemed like the simplest symbol guaranteed to exist, but with
-     non-foldable content.
+'-args' seems to be favoured though; see `qemu -h' or `qemu --h' :-)
 
- configure             | 18 ++++++++++++++++++
- hmp.c                 |  8 ++++----
- hw/9pfs/9p-local.c    |  2 +-
- include/qemu/cutils.h |  8 ++++++++
- monitor.c             |  8 ++------
- util/cutils.c         | 15 +++++++++++++++
- util/qemu-option.c    |  6 +-----
- util/uri.c            |  6 ++----
- 8 files changed, 51 insertions(+), 20 deletions(-)
-
-diff --git a/configure b/configure
-index 14b1113..8a75745 100755
---- a/configure
-+++ b/configure
-@@ -4747,6 +4747,21 @@ if compile_prog "" "" ; then
- fi
- 
- ##########################################
-+# check if we have strchrnul
-+
-+strchrnul=no
-+cat > $TMPC << EOF
-+#include <string.h>
-+int main(void);
-+// Use a haystack that the compiler shouldn't be able to constant fold
-+char *haystack = (char*)&main;
-+int main(void) { return strchrnul(haystack, 'x') != &haystack[6]; }
-+EOF
-+if compile_prog "" "" ; then
-+    strchrnul=yes
-+fi
-+
-+##########################################
- # check if trace backend exists
- 
- $python "$source_path/scripts/tracetool.py" "--backends=$trace_backends" --check-backends  > /dev/null 2> /dev/null
-@@ -6229,6 +6244,9 @@ fi
- if test "$sem_timedwait" = "yes" ; then
-   echo "CONFIG_SEM_TIMEDWAIT=y" >> $config_host_mak
- fi
-+if test "$strchrnul" = "yes" ; then
-+  echo "HAVE_STRCHRNUL=y" >> $config_host_mak
-+fi
- if test "$byteswap_h" = "yes" ; then
-   echo "CONFIG_BYTESWAP_H=y" >> $config_host_mak
- fi
-diff --git a/hmp.c b/hmp.c
-index ef93f48..416d4c9 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2123,12 +2123,12 @@ void hmp_sendkey(Monitor *mon, const QDict *qdict)
-     int has_hold_time = qdict_haskey(qdict, "hold-time");
-     int hold_time = qdict_get_try_int(qdict, "hold-time", -1);
-     Error *err = NULL;
--    char *separator;
-+    const char *separator;
-     int keyname_len;
- 
-     while (1) {
--        separator = strchr(keys, '-');
--        keyname_len = separator ? separator - keys : strlen(keys);
-+        separator = qemu_strchrnul(keys, '-');
-+        keyname_len = separator - keys;
- 
-         /* Be compatible with old interface, convert user inputted "<" */
-         if (keys[0] == '<' && keyname_len == 1) {
-@@ -2165,7 +2165,7 @@ void hmp_sendkey(Monitor *mon, const QDict *qdict)
-             keylist->value->u.qcode.data = idx;
-         }
- 
--        if (!separator) {
-+        if (!*separator) {
-             break;
-         }
-         keys = separator + 1;
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 5721eff..828e8d6 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -65,7 +65,7 @@ int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
-         assert(*path != '/');
- 
-         head = g_strdup(path);
--        c = strchrnul(path, '/');
-+        c = qemu_strchrnul(path, '/');
-         if (*c) {
-             /* Intermediate path element */
-             head[c - path] = 0;
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index a663340..274d419 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -122,6 +122,14 @@ int qemu_strnlen(const char *s, int max_len);
-  * Returns: the pointer originally in @input.
-  */
- char *qemu_strsep(char **input, const char *delim);
-+#ifdef HAVE_STRCHRNUL
-+static inline const char *qemu_strchrnul(const char *s, int c)
-+{
-+    return strchrnul(s, c);
-+}
-+#else
-+const char *qemu_strchrnul(const char *s, int c);
-+#endif
- time_t mktimegm(struct tm *tm);
- int qemu_fdatasync(int fd);
- int fcntl_setfl(int fd, int flag);
-diff --git a/monitor.c b/monitor.c
-index 6d0cec5..4484d74 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -797,9 +797,7 @@ static int compare_cmd(const char *name, const char *list)
-     p = list;
-     for(;;) {
-         pstart = p;
--        p = strchr(p, '|');
--        if (!p)
--            p = pstart + strlen(pstart);
-+        p = qemu_strchrnul(p, '|');
-         if ((p - pstart) == len && !memcmp(pstart, name, len))
-             return 1;
-         if (*p == '\0')
-@@ -3400,9 +3398,7 @@ static void cmd_completion(Monitor *mon, const char *name, const char *list)
-     p = list;
-     for(;;) {
-         pstart = p;
--        p = strchr(p, '|');
--        if (!p)
--            p = pstart + strlen(pstart);
-+        p = qemu_strchrnul(p, '|');
-         len = p - pstart;
-         if (len > sizeof(cmd) - 2)
-             len = sizeof(cmd) - 2;
-diff --git a/util/cutils.c b/util/cutils.c
-index 0de69e6..9205e09 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -545,6 +545,21 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
- }
- 
- /**
-+ * Searches for the first occurrence of 'c' in 's', and returns a pointer
-+ * to the trailing null byte if none was found.
-+ */
-+#ifndef HAVE_STRCHRNUL
-+const char *qemu_strchrnul(const char *s, int c)
-+{
-+    const char *e = strchr(s, c);
-+    if (!e) {
-+        e = s + strlen(s);
-+    }
-+    return e;
-+}
-+#endif
-+
-+/**
-  * parse_uint:
-  *
-  * @s: String to parse
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 58d1c23..54eca12 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -77,11 +77,7 @@ const char *get_opt_value(const char *p, char **value)
- 
-     *value = NULL;
-     while (1) {
--        offset = strchr(p, ',');
--        if (!offset) {
--            offset = p + strlen(p);
--        }
--
-+        offset = qemu_strchrnul(p, ',');
-         length = offset - p;
-         if (*offset != '\0' && *(offset + 1) == ',') {
-             length++;
-diff --git a/util/uri.c b/util/uri.c
-index 8624a7a..8bdef84 100644
---- a/util/uri.c
-+++ b/util/uri.c
-@@ -52,6 +52,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- 
- #include "qemu/uri.h"
- 
-@@ -2266,10 +2267,7 @@ struct QueryParams *query_params_parse(const char *query)
-         /* Find the next separator, or end of the string. */
-         end = strchr(query, '&');
-         if (!end) {
--            end = strchr(query, ';');
--        }
--        if (!end) {
--            end = query + strlen(query);
-+            end = qemu_strchrnul(query, ';');
-         }
- 
-         /* Find the first '=' character between here and end. */
--- 
-2.8.1
+		Emilio
