@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fT6hh-0005Ts-6n
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:24:54 -0400
+	(envelope-from <mst@redhat.com>) id 1fT6jK-0006t5-PU
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:26:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fT6hc-0008Ci-SQ
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:24:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49440 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fT6jG-0003io-TX
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:26:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48962 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fT6hc-0008BX-MU
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:24:48 -0400
-Date: Wed, 13 Jun 2018 15:24:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180613142443.GF2676@work-vm>
-References: <1528212489-19137-1-git-send-email-lidongchen@tencent.com>
-	<1528212489-19137-10-git-send-email-lidongchen@tencent.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fT6jG-0003fr-O5
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:26:30 -0400
+Date: Wed, 13 Jun 2018 17:26:28 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180613172438-mutt-send-email-mst@kernel.org>
+References: <f6aa6ac8-3c3c-bf90-6273-3d584f4707c8@web.de>
+	<a2198ea1-e0f6-6b04-63a8-fd04b40c9ff2@web.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1528212489-19137-10-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH v5 09/10] migration: poll the cm event
- while wait RDMA work request completion
+In-Reply-To: <a2198ea1-e0f6-6b04-63a8-fd04b40c9ff2@web.de>
+Subject: Re: [Qemu-devel] [PATCH] hw/i386: Fix IVHD entry length for AMD
+ IOMMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>
-Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, berrange@redhat.com, aviadye@mellanox.com, pbonzini@redhat.com, qemu-devel@nongnu.org, adido@mellanox.com, galsha@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: Jan Kiszka <jan.kiszka@web.de>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-* Lidong Chen (jemmy858585@gmail.com) wrote:
-> If the peer qemu is crashed, the qemu_rdma_wait_comp_channel function
-> maybe loop forever. so we should also poll the cm event fd, and when
-> receive RDMA_CM_EVENT_DISCONNECTED and RDMA_CM_EVENT_DEVICE_REMOVAL,
-> we consider some error happened.
+On Tue, May 22, 2018 at 09:06:56AM +0200, Jan Kiszka wrote:
+> On 2018-03-29 14:51, Jan Kiszka wrote:
+> > From: Jan Kiszka <jan.kiszka@siemens.com>
+> > 
+> > Counting from the IVHD ID field to the all-devices entry, we have 28
+> > bytes, not 36.
+> > 
+> > Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> > ---
+> >  hw/i386/acpi-build.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> > index deb440f286..a0cda71411 100644
+> > --- a/hw/i386/acpi-build.c
+> > +++ b/hw/i386/acpi-build.c
+> > @@ -2561,7 +2561,7 @@ build_amd_iommu(GArray *table_data, BIOSLinker *linker)
+> >                               (1UL << 7),  /* PPRSup       */
+> >                               1);
+> >      /* IVHD length */
+> > -    build_append_int_noprefix(table_data, 0x24, 2);
+> > +    build_append_int_noprefix(table_data, 28, 2);
+> >      /* DeviceID */
+> >      build_append_int_noprefix(table_data, s->devid, 2);
+> >      /* Capability offset */
+> > 
 > 
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-
-Was there a reply which explained/pointed to docs for cm_event?
-Or a Review-by from one of the Infiniband people would be fine.
-
-Dave
-
-> ---
->  migration/rdma.c | 33 ++++++++++++++++++++++++++++++---
->  1 file changed, 30 insertions(+), 3 deletions(-)
+> Waiting to be merged.
 > 
-> diff --git a/migration/rdma.c b/migration/rdma.c
-> index f12e8d5..bb6989e 100644
-> --- a/migration/rdma.c
-> +++ b/migration/rdma.c
-> @@ -1489,6 +1489,9 @@ static uint64_t qemu_rdma_poll(RDMAContext *rdma, uint64_t *wr_id_out,
->   */
->  static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
->  {
-> +    struct rdma_cm_event *cm_event;
-> +    int ret = -1;
-> +
->      /*
->       * Coroutine doesn't start until migration_fd_process_incoming()
->       * so don't yield unless we know we're running inside of a coroutine.
-> @@ -1505,13 +1508,37 @@ static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
->           * without hanging forever.
->           */
->          while (!rdma->error_state  && !rdma->received_error) {
-> -            GPollFD pfds[1];
-> +            GPollFD pfds[2];
->              pfds[0].fd = rdma->comp_channel->fd;
->              pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
-> +            pfds[0].revents = 0;
-> +
-> +            pfds[1].fd = rdma->channel->fd;
-> +            pfds[1].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
-> +            pfds[1].revents = 0;
-> +
->              /* 0.1s timeout, should be fine for a 'cancel' */
-> -            switch (qemu_poll_ns(pfds, 1, 100 * 1000 * 1000)) {
-> +            switch (qemu_poll_ns(pfds, 2, 100 * 1000 * 1000)) {
-> +            case 2:
->              case 1: /* fd active */
-> -                return 0;
-> +                if (pfds[0].revents) {
-> +                    return 0;
-> +                }
-> +
-> +                if (pfds[1].revents) {
-> +                    ret = rdma_get_cm_event(rdma->channel, &cm_event);
-> +                    if (!ret) {
-> +                        rdma_ack_cm_event(cm_event);
-> +                    }
-> +
-> +                    error_report("receive cm event while wait comp channel,"
-> +                                 "cm event is %d", cm_event->event);
-> +                    if (cm_event->event == RDMA_CM_EVENT_DISCONNECTED ||
-> +                        cm_event->event == RDMA_CM_EVENT_DEVICE_REMOVAL) {
-> +                        return -EPIPE;
-> +                    }
-> +                }
-> +                break;
->  
->              case 0: /* Timeout, go around again */
->                  break;
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Jan
+
+I'll queue this but you really should Cc maintainers :)
+
+-- 
+MST
