@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fSxQZ-0005ov-Nh
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:30:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1fSxQb-0005pv-3U
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:30:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fSxQY-0003c7-OY
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:30:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55920)
+	(envelope-from <bounces@canonical.com>) id 1fSxQa-0003d9-AP
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:30:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55968)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fSxQY-0003aj-Et
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:30:34 -0400
+	id 1fSxQZ-0003cI-Uh
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:30:36 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fSxQX-0001rb-JE
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 04:30:33 +0000
+	id 1fSxQZ-0001sQ-2T
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 04:30:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8C0272E8031
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 04:30:33 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 11D362E8031
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 04:30:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 13 Jun 2018 04:17:33 -0000
-From: Launchpad Bug Tracker <1190525@bugs.launchpad.net>
-Reply-To: Bug 1190525 <1190525@bugs.launchpad.net>
+Date: Wed, 13 Jun 2018 04:17:32 -0000
+From: Launchpad Bug Tracker <1013241@bugs.launchpad.net>
+Reply-To: Bug 1013241 <1013241@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130613093337.13816.43323.malonedeb@soybean.canonical.com>
-Message-Id: <152886345349.16396.2758216153968049369.malone@loganberry.canonical.com>
+References: <20120614155150.12135.95018.malonedeb@gac.canonical.com>
+Message-Id: <152886345267.16396.12811704404432428212.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1190525] Re: fdisk still shows the "/dev/sdb"
- partitions even after the removal of scsi disk
+Subject: [Qemu-devel] [Bug 1013241] Re: qemu-system-ppc64 hanging
+ occasionally in disk writes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,58 +48,85 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1190525
+https://bugs.launchpad.net/bugs/1013241
 
 Title:
-  fdisk still shows the "/dev/sdb" partitions even after the removal of
-  scsi disk
+  qemu-system-ppc64 hanging occasionally in disk writes
 
 Status in QEMU:
   Expired
 
 Bug description:
-  RHEL guest shows the partittions even after the removal of scsi disk:
-  fdisk still shows the "/dev/sdb" partitions even after the removal of scs=
-i disk.
+  I found last week that qemu-system-ppc64 (from git) hangs occasionally   =
+       =
 
-  Guest details:
-  -------------------
-  Kernel : 2.6.32-358
+  under load, and I have a reproducer for it now.  Unfortunately the       =
+       =
 
-  =
+  reproducer really takes a long time to run -- usually I can get a hang   =
+       =
 
-  Host Details :
+  in under 12 hours.                                                       =
+       =
 
-  Upstream Kernel, Qemu, Libvirt and virt-manager
-  ---------------------------------------------------------------------
+                                                                           =
+       =
 
-  kernel version : 3.9.0+
-  qemu version : QEMU emulator version 1.5.0
-  libvirt version : 1.0.5
-  virt-install : 0.600.3
+  Here is the reproducer case:                                             =
+       =
 
-  =
+                                                                           =
+       =
 
-  Steps to reproduce the issue:
+    https://lists.fedoraproject.org/pipermail/ppc/2012-June/001698.html    =
+       =
 
-  I. Add the SCSI disk through the virt-manager.
-  2. Create the partition using fdisk  (eg: /dev/sbb) =
+                                                                           =
+       =
 
-  3. Create a filesystem and format using mkfs.ext3 or mkfs.ext4 =
+  Notes:                                                                   =
+       =
 
-  4. Remove the scsi disk  through the virt-manager. =
+                                                                           =
+       =
 
-  5. Again run the fdisk /dev/sdb, the guests still shows the partition eve=
-n after the removal of the disk.
+  (1) Verified by one other person (other than me).  Happens on both       =
+       =
 
-  This issue is not seen with virt-io disk.
+      ppc64 and x86-64 host.                                               =
+       =
 
-  This issue is also reproducible without even creating the partitions.
+                                                                           =
+       =
 
-  Expected Result:
+  (2) Happens with both Fedora guest kernel 3.3.4-5.fc17.ppc64 and kernel  =
+       =
 
-  The output of fdisk /dev/sd*  should not show the enties after the
-  removal of scsi disks
+      3.5.0 that I compiled myself.  The test case above contains 3.3.4-5. =
+       =
+
+                                                                           =
+       =
+
+  (3) Seems to be a problem in qemu, not the guest.  The reason I think    =
+       =
+
+      this is because I tried to capture a backtrace of the hang using     =
+       =
+
+      remote gdb, but gdb just hung when trying to connect to qemu         =
+       =
+
+      (gdb connects fine before the bug happens).                          =
+       =
+
+                                                                           =
+       =
+
+  (4) Judging by guest messages, appears to be happening when writing      =
+       =
+
+      to the disk.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1190525/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1013241/+subscriptions
