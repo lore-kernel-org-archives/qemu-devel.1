@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fT1ry-0000zq-Cv
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:15:11 -0400
+	(envelope-from <groug@kaod.org>) id 1fT1sS-0001Lq-Ep
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fT1rs-0007tz-SH
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:15:10 -0400
-Received: from 6.mo4.mail-out.ovh.net ([188.165.36.253]:51231)
+	(envelope-from <groug@kaod.org>) id 1fT1sP-0008P9-68
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:15:40 -0400
+Received: from 13.mo4.mail-out.ovh.net ([178.33.251.8]:53015)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fT1rs-0007qS-LV
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:15:04 -0400
-Received: from player799.ha.ovh.net (unknown [10.109.122.124])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id AEFF3183AC9
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 11:15:02 +0200 (CEST)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fT1sO-0008OE-U2
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:15:37 -0400
+Received: from player718.ha.ovh.net (unknown [10.109.105.18])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 514E3183ADC
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 11:15:35 +0200 (CEST)
+Date: Wed, 13 Jun 2018 11:15:30 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180613111530.20e6489e@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20180613065707.30766-5-david@gibson.dropbear.id.au>
 References: <20180613065707.30766-1-david@gibson.dropbear.id.au>
-	<20180613065707.30766-3-david@gibson.dropbear.id.au>
-	<20180613110939.28d30cf0@bahia.lab.toulouse-stg.fr.ibm.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e69b80c7-8334-cf7a-5b23-85c5e6c3517b@kaod.org>
-Date: Wed, 13 Jun 2018 11:14:57 +0200
+	<20180613065707.30766-5-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20180613110939.28d30cf0@bahia.lab.toulouse-stg.fr.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/7] pnv: Add missing error check during
- cpu realize()
+Subject: Re: [Qemu-devel] [PATCH 4/7] pnv: Clean up cpu realize path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +30,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
->> index 13ad7d9e04..efb68226bb 100644
->> --- a/hw/ppc/pnv_core.c
->> +++ b/hw/ppc/pnv_core.c
->> @@ -173,6 +173,9 @@ static void pnv_core_realize(DeviceState *dev, Error **errp)
->>  
->>          snprintf(name, sizeof(name), "thread[%d]", i);
->>          object_property_add_child(OBJECT(pc), name, obj, &local_err);
->> +        if (local_err) {
->> +            goto err;
->> +        }
->>          object_property_add_alias(obj, "core-pir", OBJECT(pc),
->>                                    "pir", &local_err);
->>          if (local_err) {
+On Wed, 13 Jun 2018 16:57:04 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> pnv_cpu_init() is only called from the the pnv cpu core realize path, and
+> really only can be called from there.  So fold it into its caller, which
+> we also rename for brevity.
 > 
-> Hmm... the current error path seems to assume failures to be
-> caused by object_property_add_child(). It hence unparents the
-> previously parented CPUs, but not the current one. So we'll
-> miss one call to object_unparent() if object_property_add_alias()
-> fails.
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-yes, let's just put NULL or &error_abort instead.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-C. 
+>  hw/ppc/pnv_core.c | 56 ++++++++++++++++++-----------------------------
+>  1 file changed, 21 insertions(+), 35 deletions(-)
+> 
+> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+> index 59309e149c..c9648fd1ad 100644
+> --- a/hw/ppc/pnv_core.c
+> +++ b/hw/ppc/pnv_core.c
+> @@ -54,28 +54,6 @@ static void pnv_cpu_reset(void *opaque)
+>      env->msr |= MSR_HVB; /* Hypervisor mode */
+>  }
+>  
+> -static void pnv_cpu_init(PowerPCCPU *cpu, Error **errp)
+> -{
+> -    CPUPPCState *env = &cpu->env;
+> -    int core_pir;
+> -    int thread_index = 0; /* TODO: TCG supports only one thread */
+> -    ppc_spr_t *pir = &env->spr_cb[SPR_PIR];
+> -
+> -    core_pir = object_property_get_uint(OBJECT(cpu), "core-pir", &error_abort);
+> -
+> -    /*
+> -     * The PIR of a thread is the core PIR + the thread index. We will
+> -     * need to find a way to get the thread index when TCG supports
+> -     * more than 1. We could use the object name ?
+> -     */
+> -    pir->default_value = core_pir + thread_index;
+> -
+> -    /* Set time-base frequency to 512 MHz */
+> -    cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
+> -
+> -    qemu_register_reset(pnv_cpu_reset, cpu);
+> -}
+> -
+>  /*
+>   * These values are read by the PowerNV HW monitors under Linux
+>   */
+> @@ -121,29 +99,39 @@ static const MemoryRegionOps pnv_core_xscom_ops = {
+>      .endianness = DEVICE_BIG_ENDIAN,
+>  };
+>  
+> -static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error **errp)
+> +static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFabric *xi, Error **errp)
+>  {
+> +    CPUPPCState *env = &cpu->env;
+> +    int core_pir;
+> +    int thread_index = 0; /* TODO: TCG supports only one thread */
+> +    ppc_spr_t *pir = &env->spr_cb[SPR_PIR];
+>      Error *local_err = NULL;
+> -    CPUState *cs = CPU(child);
+> -    PowerPCCPU *cpu = POWERPC_CPU(cs);
+>  
+> -    object_property_set_bool(child, true, "realized", &local_err);
+> +    object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return;
+>      }
+>  
+> -    cpu->intc = icp_create(child, TYPE_PNV_ICP, xi, &local_err);
+> +    cpu->intc = icp_create(OBJECT(cpu), TYPE_PNV_ICP, xi, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return;
+>      }
+>  
+> -    pnv_cpu_init(cpu, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        return;
+> -    }
+> +    core_pir = object_property_get_uint(OBJECT(cpu), "core-pir", &error_abort);
+> +
+> +    /*
+> +     * The PIR of a thread is the core PIR + the thread index. We will
+> +     * need to find a way to get the thread index when TCG supports
+> +     * more than 1. We could use the object name ?
+> +     */
+> +    pir->default_value = core_pir + thread_index;
+> +
+> +    /* Set time-base frequency to 512 MHz */
+> +    cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
+> +
+> +    qemu_register_reset(pnv_cpu_reset, cpu);
+>  }
+>  
+>  static void pnv_core_realize(DeviceState *dev, Error **errp)
+> @@ -184,9 +172,7 @@ static void pnv_core_realize(DeviceState *dev, Error **errp)
+>      }
+>  
+>      for (j = 0; j < cc->nr_threads; j++) {
+> -        obj = OBJECT(pc->threads[j]);
+> -
+> -        pnv_core_realize_child(obj, XICS_FABRIC(xi), &local_err);
+> +        pnv_realize_vcpu(pc->threads[j], XICS_FABRIC(xi), &local_err);
+>          if (local_err) {
+>              goto err;
+>          }
