@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTDOo-0004y8-Rt
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:33:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fTDU7-0007Ct-M4
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:39:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTDOk-000819-TT
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:33:50 -0400
-Date: Wed, 13 Jun 2018 18:33:37 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fTDU4-0004XO-2w
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:39:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46370)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTDTp-0004PU-Hh
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:39:15 -0400
+Date: Wed, 13 Jun 2018 18:38:58 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180613213337.GP7451@localhost.localdomain>
-References: <20180611121655.19616-1-david@redhat.com>
-	<20180611121655.19616-7-david@redhat.com>
-	<20180613145624.3004935c@redhat.com>
-	<bb0b033f-d048-06db-96d1-89085000d792@redhat.com>
+Message-ID: <20180613213858.GI24764@localhost.localdomain>
+References: <20180601145921.9500-1-konrad.wilk@oracle.com>
+	<20180601153809.15259-1-konrad.wilk@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bb0b033f-d048-06db-96d1-89085000d792@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v1 06/11] pc-dimm: don't allow to access
- "size" before the device was realized
+In-Reply-To: <20180601153809.15259-1-konrad.wilk@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH QEMU] Patches for new AMD CPU bits.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,29 +27,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
-On Wed, Jun 13, 2018 at 04:03:35PM +0200, David Hildenbrand wrote:
-> On 13.06.2018 14:56, Igor Mammedov wrote:
-> > On Mon, 11 Jun 2018 14:16:50 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> > 
-> >> "size" should not be queried before the device was realized. Let' make
-> >> that explicit.
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> > It's generic property getter, it should work even before realize is called.
+On Fri, Jun 01, 2018 at 11:38:07AM -0400, Konrad Rzeszutek Wilk wrote:
+> Hi!
 > 
-> That's the point, as we can see in NVDIMM code , it is *not* a generic
-> property getter.
+> 
+> I was reading the AMD whitepaper on SSBD and noticed that they have added
+> two new bits in the 8000_0008 CPUID. EBX:
+>  1) Bit[26] - similar to Intel's SSB_NO not needed anymore.
+>  2) Bit[24] - use SPEC_CTRL MSR (0x48) instead of VIRT SPEC_CTRL MSR
+>     (0xC001_011f).
+> 
+> See 124441_AMD64_SpeculativeStoreBypassDisable_Whitepaper_final.pdf
+> A copy of this document is available at
+>         https://bugzilla.kernel.org/show_bug.cgi?id=199889
+> 
+> These two patches along with the kernel ones allow us to expose those
+> two bits to the guest.
 
-If it were a writeable property, I would agree with Igor because
-it would make it impossible to find out what's the default value
-for the property.
-
-As it's a read-only property, returning an error seems harmless.
-Igor, why exactly do you think it's a problem?
+Queued on x86-next, thanks!
 
 -- 
 Eduardo
