@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fT5zI-0008UH-PJ
+	(envelope-from <stefanha@redhat.com>) id 1fT5zI-0008UK-Qy
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:39:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fT5zE-0005xL-GU
+	(envelope-from <stefanha@redhat.com>) id 1fT5zF-00060Z-LM
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:39:00 -0400
-Date: Wed, 13 Jun 2018 14:38:47 +0100
+Date: Wed, 13 Jun 2018 14:38:55 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180613133847.GL24528@stefanha-x1.localdomain>
+Message-ID: <20180613133855.GN24528@stefanha-x1.localdomain>
 References: <1528866321-23886-1-git-send-email-thuth@redhat.com>
-	<1528866321-23886-2-git-send-email-thuth@redhat.com>
+	<1528866321-23886-4-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="L/Qt9NZ8t00Dhfad"
+	protocol="application/pgp-signature"; boundary="yK/6QRnH3Zanb0EF"
 Content-Disposition: inline
-In-Reply-To: <1528866321-23886-2-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/4] Replace '-machine accel=xyz' with
- '-accel xyz'
+In-Reply-To: <1528866321-23886-4-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/4] qemu-options: Improve the
+ documentation of '-accel' and '-machine accel=...'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +29,38 @@ To: Thomas Huth <thuth@redhat.com>
 Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, zhang.zhanghailiang@huawei.com, Markus Armbruster <armbru@redhat.com>, qemu-trivial@nongnu.org
 
 
---L/Qt9NZ8t00Dhfad
+--yK/6QRnH3Zanb0EF
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 13, 2018 at 07:05:18AM +0200, Thomas Huth wrote:
-> We've got a separate option to configure the accelerator nowadays.
-> Use it in the source and examples to demonstrate that this is the
-> preferred way of setting this option now.
+On Wed, Jun 13, 2018 at 07:05:20AM +0200, Thomas Huth wrote:
+> Instead of repeating the same text for both options, let's rather change
+> the '-machine accel' documentation to point to the preferred '-accel' opt=
+ion
+> instead.
+> And in the documenation of the -accel option, make it clear that you can
+> use colons to specify multiple accelerators.
 >=20
 > Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  qemu-doc.texi                       | 3 +--
->  qemu-options.hx                     | 2 +-
->  scripts/qtest.py                    | 2 +-
->  tests/bios-tables-test.c            | 2 +-
->  tests/boot-serial-test.c            | 2 +-
->  tests/libqtest.c                    | 2 +-
->  tests/migration-test.c              | 8 ++++----
->  tests/migration/guestperf/engine.py | 2 +-
->  tests/pnv-xscom-test.c              | 2 +-
->  tests/prom-env-test.c               | 2 +-
->  tests/pxe-test.c                    | 2 +-
->  tests/qemu-iotests/172              | 2 +-
->  tests/qemu-iotests/check            | 2 +-
->  tests/vmgenid-test.c                | 2 +-
->  14 files changed, 17 insertions(+), 18 deletions(-)
+>  qemu-options.hx | 20 +++++++++-----------
+>  1 file changed, 9 insertions(+), 11 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---L/Qt9NZ8t00Dhfad
+--yK/6QRnH3Zanb0EF
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJbIR5nAAoJEJykq7OBq3PInR0H/iJIPy0ic80YAqyRpW9uzgor
-LebJlACCgr8DRirs74++bgOQjPdGjpCDtFcyNePeHgK6owcnzf+vkgXLBOfGYoV+
-02NMC1vkF7yk4NSgEpCH0QPzpJFIyS/F43Us7KBD6xG/Abkni+R6cP+lFNvPtQQA
-qy92icuRmRKwCeJNh+71IcOmLkY0dYfJDWVemlEIN8FGrIZgz9gXbiFWaIc8YCfg
-pCG12B5XKdzGQ0TmtngEf2bp4v2rfvmGAHsidbYJPBdiv+BXmtzcbOART62y/rgb
-1uvCGG1WgXLCqydcfAI4E5Gzj/YEpnFGJFmo4Qe0qpLQOQT6XJePvyYbkk0qA/k=
-=uWkU
+iQEcBAEBAgAGBQJbIR5uAAoJEJykq7OBq3PICDkH/3hsoMwaLqVnLNd5wKeZZ5wh
+S7/H/LUvhexLs7VMhOMCOX6Z8eEOonr36VXyw4dVscmqY5ufIam9hw88yk2uypma
+5ETbex5gQPS/osSlq/9ph8/wlXlnSc2P7bUHHmg9PmF1n4r8rT7v7LgXULT76qqi
+fNDCmoJtpnZxaVNabbzNTX4voqaWTWJQ/4FdMKzM2NUQbt7p5QYYanNJqSsIt0fL
+dgl+VjHcrHWQt561SVG+vAB7Cz0iNoPTxauG2WOxAYzwlSW9za+GT6o3iu0XDxiL
+6hQhAjHfYi6BKmtbsCHSd1hTfWr6/79mAt0xgah1VTHa5glywplunfkllVx0Uew=
+=opkH
 -----END PGP SIGNATURE-----
 
---L/Qt9NZ8t00Dhfad--
+--yK/6QRnH3Zanb0EF--
