@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fT8Ha-00089I-6S
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:06:05 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fT8Kv-0001u9-Qj
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:09:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fT8HU-00060z-Ft
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:06:02 -0400
-References: <20180612104430.25745-1-kraxel@redhat.com>
-	<20180612104430.25745-5-kraxel@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <431f487d-71f0-a766-eea4-7f3369984a7f@redhat.com>
-Date: Wed, 13 Jun 2018 18:05:35 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fT8Ks-0006tc-7S
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:09:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53978 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fT8Ks-0006rW-1v
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:09:26 -0400
+Date: Wed, 13 Jun 2018 17:09:21 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180613160920.GK2676@work-vm>
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180604095520.8563-4-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <20180612104430.25745-5-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 4/8] bus: do not unref the added child bus
- on realize
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180604095520.8563-4-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH 03/12] migration: fix counting xbzrle
+ cache_miss_rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, Li Zhijian <lizhijian@cn.fujitsu.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Zhang Chen <zhangckid@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Alistair Francis <alistair@alistair23.me>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Corey Minyard <minyard@acm.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On 12/06/2018 12:44, Gerd Hoffmann wrote:
->=20
-> When the parent bus removes the child property, it takes care of
-> removing the added reference, in object_finalize_child_property().
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Message-id: 20180531195119.22021-2-marcandre.lureau@redhat.com
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+* guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> 
+> Sync up xbzrle_cache_miss_prev only after migration iteration goes
+> forward
+> 
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
+
+Yeh, I think you're right.
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  hw/core/bus.c | 1 -
->  1 file changed, 1 deletion(-)
->=20
-> diff --git a/hw/core/bus.c b/hw/core/bus.c
-> index 4651f24486..ad0c9df335 100644
-> --- a/hw/core/bus.c
-> +++ b/hw/core/bus.c
-> @@ -102,7 +102,6 @@ static void qbus_realize(BusState *bus, DeviceState=
- *parent, const char *name)
->          QLIST_INSERT_HEAD(&bus->parent->child_bus, bus, sibling);
->          bus->parent->num_child_bus++;
->          object_property_add_child(OBJECT(bus->parent), bus->name, OBJE=
-CT(bus), NULL);
-> -        object_unref(OBJECT(bus));
-
-This is wrong.  object_finalize_child_property()'s unref balances the
-ref in object_property_add_child().  qbus_realize's unref balances the
-ref that was initially placed by object_new/object_initialize.
-
-So you're introducing a leak.
-
-Paolo
+>  migration/ram.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index dbf24d8c87..dd1283dd45 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1189,9 +1189,9 @@ static void migration_bitmap_sync(RAMState *rs)
+>                     (double)(xbzrle_counters.cache_miss -
+>                              rs->xbzrle_cache_miss_prev) /
+>                     (rs->iterations - rs->iterations_prev);
+> +                rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
+>              }
+>              rs->iterations_prev = rs->iterations;
+> -            rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
+>          }
+>  
+>          /* reset period counters */
+> -- 
+> 2.14.4
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
