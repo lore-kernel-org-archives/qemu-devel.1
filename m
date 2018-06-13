@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fT5zg-0000Q6-7k
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:39:25 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fT64Q-0004h9-CF
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:44:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fT5zc-00075k-3w
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:39:24 -0400
-Date: Wed, 13 Jun 2018 14:39:18 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180613133918.GO24528@stefanha-x1.localdomain>
-References: <1528866321-23886-1-git-send-email-thuth@redhat.com>
+	(envelope-from <eric.auger@redhat.com>) id 1fT64M-0005C3-79
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:44:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47822 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fT64M-00059y-0n
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:44:14 -0400
+References: <1528895946-28677-1-git-send-email-eric.auger@redhat.com>
+	<ed56ac4b-6e22-c6b1-4cfa-ce3a9a8af35a@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8e5da16e-2283-ff87-9426-293e7770e2aa@redhat.com>
+Date: Wed, 13 Jun 2018 15:44:09 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="acOuGx3oQeOcSZJu"
-Content-Disposition: inline
-In-Reply-To: <1528866321-23886-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/4] Clean up accelerator options
+In-Reply-To: <ed56ac4b-6e22-c6b1-4cfa-ce3a9a8af35a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] exec: Fix MAP_RAM for cached access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +28,285 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, zhang.zhanghailiang@huawei.com, Markus Armbruster <armbru@redhat.com>, qemu-trivial@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org
+Cc: peterx@redhat.com
 
+Hi Paolo,
 
---acOuGx3oQeOcSZJu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 06/13/2018 03:36 PM, Paolo Bonzini wrote:
+> On 13/06/2018 15:19, Eric Auger wrote:
+>> When an IOMMUMemoryRegion is in front of a virtio device,
+>> address_space_cache_init does not set cache->ptr as the memory
+>> region is not RAM. However when the device performs an access,
+>> we end up in glue() which performs the translation and then uses
+>> MAP_RAM. This latter uses the unset ptr and returns a wrong value
+>> which leads to a SIGSEV in address_space_lduw_internal_cached_slow,
+>> for instance.
+>>
+>> In slow path cache->ptr is NULL and MAP_RAM must redirect to
+>> qemu_map_ram_ptr((mr)->ram_block, ofs).
+>>
+>> As MAP_RAM, IS_DIRECT and INVALIDATE are the same in _cached_slow
+>> and non cached mode, let's remove those macros.
+>>
+>> This fixes the use cases featuring vIOMMU (Intel and ARM SMMU)
+>> which lead to a SIGSEV.
+>>
+>> Fixes: 48564041a73a (exec: reintroduce MemoryRegion caching)
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v1 -> v2:
+>> - directly use qemu_map_ram_ptr in place for MAP_RAM,
+>>   memory_access_is_direct in place of IS_DIRECT and
+>>   invalidate_and_set_dirty in place of INVALIDATE. The
+>>   macros are removed.
+> 
+> Thanks!  FWIW it would have been just fine to fix MAP_RAM without
+> cleaning up after my mess. :)
+> 
+> Queuing this patch.  I'm not sure how I missed this, I have actually
+> tested it with SMMU.
+no problem. Strange also I was the only one facing the issue.
+> 
+> Do you also need the MemTxAttrs so that the right PCI requestor id is
+> used, or do you get it from somewhere else?
+which call site do you have in mind, sorry?
 
-On Wed, Jun 13, 2018 at 07:05:17AM +0200, Thomas Huth wrote:
-> The current state of the accelerator options is quite messy: There are
-> three ways of enabling an accelerator (-machine accel=3Dxyz, -accel xyz
-> and -enable-xyz) and this can be very confusing for the users. This
-> patch series now tries to standardize our documentation and examples
-> on the preferred -accel option.
+Thanks
 
-Nice, thank you for keeping things tidy.
-
-Stefan
-
-> Thomas Huth (4):
->   Replace '-machine accel=3Dxyz' with '-accel xyz'
->   Replace '-enable-kvm' with '-accel kvm' in docs and help texts
->   qemu-options: Improve the documentation of '-accel' and '-machine
->     accel=3D...'
->   qemu-options: Do not show -enable-kvm and -enable-hax in the docs
->     anymore
->=20
->  docs/COLO-FT.txt                    |  8 +++----
->  docs/can.txt                        |  4 ++--
->  docs/multi-thread-compression.txt   |  2 +-
->  docs/multiseat.txt                  |  2 +-
->  docs/specs/tpm.txt                  |  8 +++----
->  hw/block/dataplane/virtio-blk.c     |  4 ++--
->  hw/scsi/virtio-scsi-dataplane.c     |  4 ++--
->  qemu-doc.texi                       |  3 +--
->  qemu-options.hx                     | 44 ++++++++++++-------------------=
-------
->  scripts/qtest.py                    |  2 +-
->  tests/bios-tables-test.c            |  2 +-
->  tests/boot-serial-test.c            |  2 +-
->  tests/libqtest.c                    |  2 +-
->  tests/migration-test.c              |  8 +++----
->  tests/migration/guestperf/engine.py |  2 +-
->  tests/pnv-xscom-test.c              |  2 +-
->  tests/prom-env-test.c               |  2 +-
->  tests/pxe-test.c                    |  2 +-
->  tests/qemu-iotests/172              |  2 +-
->  tests/qemu-iotests/check            |  2 +-
->  tests/vmgenid-test.c                |  2 +-
->  21 files changed, 46 insertions(+), 63 deletions(-)
->=20
-> --=20
-> 1.8.3.1
->=20
-
---acOuGx3oQeOcSZJu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbIR6GAAoJEJykq7OBq3PIJOsH/iWqLso90sBguyhhVuCKZw2Z
-4Urs0pql1Jpfoi5Paug8yBhPuSIuR79NP0vRFxIXfj7J5DjBFk5nVPXHB6mBWSlB
-hYvhcU7ZyWtsAnXth7jSXnW0NI84unMdxbIUTHgXjkbufQ3e5F8Nae6edtNmQdnL
-XWJUlWTYTtAs9P68UXJ4o643dYJuGqie1KlhSHquNk0GBeHem6mH7JkLvrxZjqWq
-x4OtvBnDKaVTxjMsrDow1HA2e2PaL3T9cFok00M58W3fLgyqimTXfnKCJVRjrI91
-7lZWkevICzcN+i1DI3Z1eI33c4VsIw6LJXw7/9oSdXlVkXO0MppWlzLrz3kDcFc=
-=6n5L
------END PGP SIGNATURE-----
-
---acOuGx3oQeOcSZJu--
+Eric
+> 
+> Paolo
+> 
+> 
+>> ---
+>>  exec.c            |  6 ------
+>>  memory_ldst.inc.c | 47 ++++++++++++++++++++++-------------------------
+>>  2 files changed, 22 insertions(+), 31 deletions(-)
+>>
+>> diff --git a/exec.c b/exec.c
+>> index f6645ed..f5a7caf 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -3660,9 +3660,6 @@ void cpu_physical_memory_unmap(void *buffer, hwaddr len,
+>>  #define ARG1                     as
+>>  #define SUFFIX
+>>  #define TRANSLATE(...)           address_space_translate(as, __VA_ARGS__)
+>> -#define IS_DIRECT(mr, is_write)  memory_access_is_direct(mr, is_write)
+>> -#define MAP_RAM(mr, ofs)         qemu_map_ram_ptr((mr)->ram_block, ofs)
+>> -#define INVALIDATE(mr, ofs, len) invalidate_and_set_dirty(mr, ofs, len)
+>>  #define RCU_READ_LOCK(...)       rcu_read_lock()
+>>  #define RCU_READ_UNLOCK(...)     rcu_read_unlock()
+>>  #include "memory_ldst.inc.c"
+>> @@ -3799,9 +3796,6 @@ address_space_write_cached_slow(MemoryRegionCache *cache, hwaddr addr,
+>>  #define ARG1                     cache
+>>  #define SUFFIX                   _cached_slow
+>>  #define TRANSLATE(...)           address_space_translate_cached(cache, __VA_ARGS__)
+>> -#define IS_DIRECT(mr, is_write)  memory_access_is_direct(mr, is_write)
+>> -#define MAP_RAM(mr, ofs)         (cache->ptr + (ofs - cache->xlat))
+>> -#define INVALIDATE(mr, ofs, len) invalidate_and_set_dirty(mr, ofs, len)
+>>  #define RCU_READ_LOCK()          ((void)0)
+>>  #define RCU_READ_UNLOCK()        ((void)0)
+>>  #include "memory_ldst.inc.c"
+>> diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
+>> index 1548398..acf865b 100644
+>> --- a/memory_ldst.inc.c
+>> +++ b/memory_ldst.inc.c
+>> @@ -34,7 +34,7 @@ static inline uint32_t glue(address_space_ldl_internal, SUFFIX)(ARG1_DECL,
+>>  
+>>      RCU_READ_LOCK();
+>>      mr = TRANSLATE(addr, &addr1, &l, false, attrs);
+>> -    if (l < 4 || !IS_DIRECT(mr, false)) {
+>> +    if (l < 4 || !memory_access_is_direct(mr, false)) {
+>>          release_lock |= prepare_mmio_access(mr);
+>>  
+>>          /* I/O case */
+>> @@ -50,7 +50,7 @@ static inline uint32_t glue(address_space_ldl_internal, SUFFIX)(ARG1_DECL,
+>>  #endif
+>>      } else {
+>>          /* RAM case */
+>> -        ptr = MAP_RAM(mr, addr1);
+>> +        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+>>          switch (endian) {
+>>          case DEVICE_LITTLE_ENDIAN:
+>>              val = ldl_le_p(ptr);
+>> @@ -110,7 +110,7 @@ static inline uint64_t glue(address_space_ldq_internal, SUFFIX)(ARG1_DECL,
+>>  
+>>      RCU_READ_LOCK();
+>>      mr = TRANSLATE(addr, &addr1, &l, false, attrs);
+>> -    if (l < 8 || !IS_DIRECT(mr, false)) {
+>> +    if (l < 8 || !memory_access_is_direct(mr, false)) {
+>>          release_lock |= prepare_mmio_access(mr);
+>>  
+>>          /* I/O case */
+>> @@ -126,7 +126,7 @@ static inline uint64_t glue(address_space_ldq_internal, SUFFIX)(ARG1_DECL,
+>>  #endif
+>>      } else {
+>>          /* RAM case */
+>> -        ptr = MAP_RAM(mr, addr1);
+>> +        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+>>          switch (endian) {
+>>          case DEVICE_LITTLE_ENDIAN:
+>>              val = ldq_le_p(ptr);
+>> @@ -184,14 +184,14 @@ uint32_t glue(address_space_ldub, SUFFIX)(ARG1_DECL,
+>>  
+>>      RCU_READ_LOCK();
+>>      mr = TRANSLATE(addr, &addr1, &l, false, attrs);
+>> -    if (!IS_DIRECT(mr, false)) {
+>> +    if (!memory_access_is_direct(mr, false)) {
+>>          release_lock |= prepare_mmio_access(mr);
+>>  
+>>          /* I/O case */
+>>          r = memory_region_dispatch_read(mr, addr1, &val, 1, attrs);
+>>      } else {
+>>          /* RAM case */
+>> -        ptr = MAP_RAM(mr, addr1);
+>> +        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+>>          val = ldub_p(ptr);
+>>          r = MEMTX_OK;
+>>      }
+>> @@ -220,7 +220,7 @@ static inline uint32_t glue(address_space_lduw_internal, SUFFIX)(ARG1_DECL,
+>>  
+>>      RCU_READ_LOCK();
+>>      mr = TRANSLATE(addr, &addr1, &l, false, attrs);
+>> -    if (l < 2 || !IS_DIRECT(mr, false)) {
+>> +    if (l < 2 || !memory_access_is_direct(mr, false)) {
+>>          release_lock |= prepare_mmio_access(mr);
+>>  
+>>          /* I/O case */
+>> @@ -236,7 +236,7 @@ static inline uint32_t glue(address_space_lduw_internal, SUFFIX)(ARG1_DECL,
+>>  #endif
+>>      } else {
+>>          /* RAM case */
+>> -        ptr = MAP_RAM(mr, addr1);
+>> +        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+>>          switch (endian) {
+>>          case DEVICE_LITTLE_ENDIAN:
+>>              val = lduw_le_p(ptr);
+>> @@ -297,12 +297,12 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
+>>  
+>>      RCU_READ_LOCK();
+>>      mr = TRANSLATE(addr, &addr1, &l, true, attrs);
+>> -    if (l < 4 || !IS_DIRECT(mr, true)) {
+>> +    if (l < 4 || !memory_access_is_direct(mr, true)) {
+>>          release_lock |= prepare_mmio_access(mr);
+>>  
+>>          r = memory_region_dispatch_write(mr, addr1, val, 4, attrs);
+>>      } else {
+>> -        ptr = MAP_RAM(mr, addr1);
+>> +        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+>>          stl_p(ptr, val);
+>>  
+>>          dirty_log_mask = memory_region_get_dirty_log_mask(mr);
+>> @@ -334,7 +334,7 @@ static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL,
+>>  
+>>      RCU_READ_LOCK();
+>>      mr = TRANSLATE(addr, &addr1, &l, true, attrs);
+>> -    if (l < 4 || !IS_DIRECT(mr, true)) {
+>> +    if (l < 4 || !memory_access_is_direct(mr, true)) {
+>>          release_lock |= prepare_mmio_access(mr);
+>>  
+>>  #if defined(TARGET_WORDS_BIGENDIAN)
+>> @@ -349,7 +349,7 @@ static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL,
+>>          r = memory_region_dispatch_write(mr, addr1, val, 4, attrs);
+>>      } else {
+>>          /* RAM case */
+>> -        ptr = MAP_RAM(mr, addr1);
+>> +        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+>>          switch (endian) {
+>>          case DEVICE_LITTLE_ENDIAN:
+>>              stl_le_p(ptr, val);
+>> @@ -361,7 +361,7 @@ static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL,
+>>              stl_p(ptr, val);
+>>              break;
+>>          }
+>> -        INVALIDATE(mr, addr1, 4);
+>> +        invalidate_and_set_dirty(mr, addr1, 4);
+>>          r = MEMTX_OK;
+>>      }
+>>      if (result) {
+>> @@ -406,14 +406,14 @@ void glue(address_space_stb, SUFFIX)(ARG1_DECL,
+>>  
+>>      RCU_READ_LOCK();
+>>      mr = TRANSLATE(addr, &addr1, &l, true, attrs);
+>> -    if (!IS_DIRECT(mr, true)) {
+>> +    if (!memory_access_is_direct(mr, true)) {
+>>          release_lock |= prepare_mmio_access(mr);
+>>          r = memory_region_dispatch_write(mr, addr1, val, 1, attrs);
+>>      } else {
+>>          /* RAM case */
+>> -        ptr = MAP_RAM(mr, addr1);
+>> +        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+>>          stb_p(ptr, val);
+>> -        INVALIDATE(mr, addr1, 1);
+>> +        invalidate_and_set_dirty(mr, addr1, 1);
+>>          r = MEMTX_OK;
+>>      }
+>>      if (result) {
+>> @@ -439,7 +439,7 @@ static inline void glue(address_space_stw_internal, SUFFIX)(ARG1_DECL,
+>>  
+>>      RCU_READ_LOCK();
+>>      mr = TRANSLATE(addr, &addr1, &l, true, attrs);
+>> -    if (l < 2 || !IS_DIRECT(mr, true)) {
+>> +    if (l < 2 || !memory_access_is_direct(mr, true)) {
+>>          release_lock |= prepare_mmio_access(mr);
+>>  
+>>  #if defined(TARGET_WORDS_BIGENDIAN)
+>> @@ -454,7 +454,7 @@ static inline void glue(address_space_stw_internal, SUFFIX)(ARG1_DECL,
+>>          r = memory_region_dispatch_write(mr, addr1, val, 2, attrs);
+>>      } else {
+>>          /* RAM case */
+>> -        ptr = MAP_RAM(mr, addr1);
+>> +        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+>>          switch (endian) {
+>>          case DEVICE_LITTLE_ENDIAN:
+>>              stw_le_p(ptr, val);
+>> @@ -466,7 +466,7 @@ static inline void glue(address_space_stw_internal, SUFFIX)(ARG1_DECL,
+>>              stw_p(ptr, val);
+>>              break;
+>>          }
+>> -        INVALIDATE(mr, addr1, 2);
+>> +        invalidate_and_set_dirty(mr, addr1, 2);
+>>          r = MEMTX_OK;
+>>      }
+>>      if (result) {
+>> @@ -512,7 +512,7 @@ static void glue(address_space_stq_internal, SUFFIX)(ARG1_DECL,
+>>  
+>>      RCU_READ_LOCK();
+>>      mr = TRANSLATE(addr, &addr1, &l, true, attrs);
+>> -    if (l < 8 || !IS_DIRECT(mr, true)) {
+>> +    if (l < 8 || !memory_access_is_direct(mr, true)) {
+>>          release_lock |= prepare_mmio_access(mr);
+>>  
+>>  #if defined(TARGET_WORDS_BIGENDIAN)
+>> @@ -527,7 +527,7 @@ static void glue(address_space_stq_internal, SUFFIX)(ARG1_DECL,
+>>          r = memory_region_dispatch_write(mr, addr1, val, 8, attrs);
+>>      } else {
+>>          /* RAM case */
+>> -        ptr = MAP_RAM(mr, addr1);
+>> +        ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
+>>          switch (endian) {
+>>          case DEVICE_LITTLE_ENDIAN:
+>>              stq_le_p(ptr, val);
+>> @@ -539,7 +539,7 @@ static void glue(address_space_stq_internal, SUFFIX)(ARG1_DECL,
+>>              stq_p(ptr, val);
+>>              break;
+>>          }
+>> -        INVALIDATE(mr, addr1, 8);
+>> +        invalidate_and_set_dirty(mr, addr1, 8);
+>>          r = MEMTX_OK;
+>>      }
+>>      if (result) {
+>> @@ -576,8 +576,5 @@ void glue(address_space_stq_be, SUFFIX)(ARG1_DECL,
+>>  #undef ARG1
+>>  #undef SUFFIX
+>>  #undef TRANSLATE
+>> -#undef IS_DIRECT
+>> -#undef MAP_RAM
+>> -#undef INVALIDATE
+>>  #undef RCU_READ_LOCK
+>>  #undef RCU_READ_UNLOCK
+>>
+> 
