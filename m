@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fT2zJ-0002Gv-8c
+	(envelope-from <dgilbert@redhat.com>) id 1fT2zJ-0002Gu-8Q
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:26:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fT2zH-0000uj-4M
+	(envelope-from <dgilbert@redhat.com>) id 1fT2zG-0000tA-0o
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:26:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41646 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39080 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fT2zG-0000uJ-VM
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:26:47 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fT2zF-0000sg-S8
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:26:45 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9556D4021CC5
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 10:26:46 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 803D087A7F
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 10:26:45 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 13 Jun 2018 11:26:41 +0100
-Message-Id: <20180613102642.23995-3-dgilbert@redhat.com>
+Date: Wed, 13 Jun 2018 11:26:40 +0100
+Message-Id: <20180613102642.23995-2-dgilbert@redhat.com>
 In-Reply-To: <20180613102642.23995-1-dgilbert@redhat.com>
 References: <20180613102642.23995-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] migration: Wake rate limiting for urgent
- requests
+Subject: [Qemu-devel] [PATCH 1/3] migration/postcopy: Add
+ max-postcopy-bandwidth parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,138 +35,208 @@ Cc: jdenemar@redhat.com
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Rate limiting sleeps the migration thread for a while when it runs
-out of bandwidth; but sometimes we want to wake up to get on with
-something more urgent (like a postcopy request).  Here we use
-a semaphore with a timedwait instead of a simple sleep; Incrementing
-the sempahore will wake it up sooner.  Anything that consumes
-these urgent events must decrement the sempahore.
+Limit the background transfer bandwidth during the postcopy
+phase to the value set on this new parameter.  The default, 0,
+corresponds to the existing behaviour which is unlimited bandwidth.
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.c  | 35 +++++++++++++++++++++++++++++++----
- migration/migration.h  |  8 ++++++++
- migration/trace-events |  2 ++
- 3 files changed, 41 insertions(+), 4 deletions(-)
+ hmp.c                 |  7 +++++++
+ migration/migration.c | 35 ++++++++++++++++++++++++++++++++++-
+ qapi/migration.json   | 19 ++++++++++++++++---
+ 3 files changed, 57 insertions(+), 4 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 3a50d4c35c..108c3d7142 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2852,6 +2852,16 @@ static void migration_iteration_finish(MigrationState *s)
-     qemu_mutex_unlock_iothread();
- }
- 
-+void migration_make_urgent_request(void)
-+{
-+    qemu_sem_post(&migrate_get_current()->rate_limit_sem);
-+}
-+
-+void migration_consume_urgent_request(void)
-+{
-+    qemu_sem_wait(&migrate_get_current()->rate_limit_sem);
-+}
-+
- /*
-  * Master migration thread on the source VM.
-  * It drives the migration and pumps the data down the outgoing channel.
-@@ -2861,6 +2871,7 @@ static void *migration_thread(void *opaque)
-     MigrationState *s = opaque;
-     int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
-     MigThrError thr_error;
-+    bool urgent = false;
- 
-     rcu_register_thread();
- 
-@@ -2901,7 +2912,7 @@ static void *migration_thread(void *opaque)
-            s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-         int64_t current_time;
- 
--        if (!qemu_file_rate_limit(s->to_dst_file)) {
-+        if (urgent || !qemu_file_rate_limit(s->to_dst_file)) {
-             MigIterateState iter_state = migration_iteration_run(s);
-             if (iter_state == MIG_ITERATE_SKIP) {
-                 continue;
-@@ -2932,10 +2943,24 @@ static void *migration_thread(void *opaque)
- 
-         migration_update_counters(s, current_time);
- 
-+        urgent = false;
-         if (qemu_file_rate_limit(s->to_dst_file)) {
--            /* usleep expects microseconds */
--            g_usleep((s->iteration_start_time + BUFFER_DELAY -
--                      current_time) * 1000);
-+            /* Wait for a delay to do rate limiting OR
-+             * something urgent to post the semaphore.
-+             */
-+            int ms = s->iteration_start_time + BUFFER_DELAY - current_time;
-+            trace_migration_thread_ratelimit_pre(ms);
-+            if (qemu_sem_timedwait(&s->rate_limit_sem, ms) == 0) {
-+                /* We were worken by one or more urgent things but
-+                 * the timedwait will have consumed one of them.
-+                 * The service routine for the urgent wake will dec
-+                 * the semaphore itself for each item it consumes,
-+                 * so add this one we just eat back.
-+                 */
-+                qemu_sem_post(&s->rate_limit_sem);
-+                urgent = true;
-+            }
-+            trace_migration_thread_ratelimit_post(urgent);
-         }
+diff --git a/hmp.c b/hmp.c
+index 983e3be1a1..f601099f90 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -370,6 +370,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "%s: %" PRIu64 "\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
+             params->xbzrle_cache_size);
++        monitor_printf(mon, "%s: %" PRIu64 "\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_MAX_POSTCOPY_BANDWIDTH),
++            params->max_postcopy_bandwidth);
      }
  
-@@ -3109,6 +3134,7 @@ static void migration_instance_finalize(Object *obj)
-     qemu_mutex_destroy(&ms->qemu_file_lock);
-     g_free(params->tls_hostname);
-     g_free(params->tls_creds);
-+    qemu_sem_destroy(&ms->rate_limit_sem);
-     qemu_sem_destroy(&ms->pause_sem);
-     qemu_sem_destroy(&ms->postcopy_pause_sem);
-     qemu_sem_destroy(&ms->postcopy_pause_rp_sem);
-@@ -3147,6 +3173,7 @@ static void migration_instance_init(Object *obj)
-     qemu_sem_init(&ms->postcopy_pause_sem, 0);
-     qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
-     qemu_sem_init(&ms->rp_state.rp_sem, 0);
-+    qemu_sem_init(&ms->rate_limit_sem, 0);
-     qemu_mutex_init(&ms->qemu_file_lock);
+     qapi_free_MigrationParameters(params);
+@@ -1684,6 +1687,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+         }
+         p->xbzrle_cache_size = cache_size;
+         break;
++    case MIGRATION_PARAMETER_MAX_POSTCOPY_BANDWIDTH:
++        p->has_max_postcopy_bandwidth = true;
++        visit_type_size(v, param, &p->max_postcopy_bandwidth, &err);
++        break;
+     default:
+         assert(0);
+     }
+diff --git a/migration/migration.c b/migration/migration.c
+index 1e99ec9b7e..3a50d4c35c 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -82,6 +82,11 @@
+ #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
+ #define DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT 16
+ 
++/* Background transfer rate for postcopy, 0 means unlimited, note
++ * that page requests can still exceed this limit.
++ */
++#define DEFAULT_MIGRATE_MAX_POSTCOPY_BANDWIDTH 0
++
+ static NotifierList migration_state_notifiers =
+     NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
+ 
+@@ -659,6 +664,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+     params->x_multifd_page_count = s->parameters.x_multifd_page_count;
+     params->has_xbzrle_cache_size = true;
+     params->xbzrle_cache_size = s->parameters.xbzrle_cache_size;
++    params->has_max_postcopy_bandwidth = true;
++    params->max_postcopy_bandwidth = s->parameters.max_postcopy_bandwidth;
+ 
+     return params;
+ }
+@@ -1066,6 +1073,9 @@ static void migrate_params_test_apply(MigrateSetParameters *params,
+     if (params->has_xbzrle_cache_size) {
+         dest->xbzrle_cache_size = params->xbzrle_cache_size;
+     }
++    if (params->has_max_postcopy_bandwidth) {
++        dest->max_postcopy_bandwidth = params->max_postcopy_bandwidth;
++    }
  }
  
-diff --git a/migration/migration.h b/migration/migration.h
-index 31d3ed12dc..64a7b33735 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -121,6 +121,11 @@ struct MigrationState
+ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+@@ -1138,6 +1148,9 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+         s->parameters.xbzrle_cache_size = params->xbzrle_cache_size;
+         xbzrle_cache_resize(params->xbzrle_cache_size, errp);
+     }
++    if (params->has_max_postcopy_bandwidth) {
++        s->parameters.max_postcopy_bandwidth = params->max_postcopy_bandwidth;
++    }
+ }
+ 
+ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+@@ -1887,6 +1900,16 @@ int64_t migrate_xbzrle_cache_size(void)
+     return s->parameters.xbzrle_cache_size;
+ }
+ 
++static int64_t migrate_max_postcopy_bandwidth(void)
++{
++    MigrationState *s;
++
++    s = migrate_get_current();
++
++    return s->parameters.max_postcopy_bandwidth;
++}
++
++
+ bool migrate_use_block(void)
+ {
+     MigrationState *s;
+@@ -2226,6 +2249,7 @@ static int postcopy_start(MigrationState *ms)
+     QIOChannelBuffer *bioc;
+     QEMUFile *fb;
+     int64_t time_at_stop = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++    int64_t bandwidth = migrate_max_postcopy_bandwidth();
+     bool restart_block = false;
+     int cur_state = MIGRATION_STATUS_ACTIVE;
+     if (!migrate_pause_before_switchover()) {
+@@ -2280,7 +2304,12 @@ static int postcopy_start(MigrationState *ms)
+      * will notice we're in POSTCOPY_ACTIVE and not actually
+      * wrap their state up here
       */
-     QemuMutex qemu_file_lock;
+-    qemu_file_set_rate_limit(ms->to_dst_file, INT64_MAX);
++    /* 0 max-postcopy-bandwidth means unlimited */
++    if (!bandwidth) {
++        qemu_file_set_rate_limit(ms->to_dst_file, INT64_MAX);
++    } else {
++        qemu_file_set_rate_limit(ms->to_dst_file, bandwidth / XFER_LIMIT_RATIO);
++    }
+     if (migrate_postcopy_ram()) {
+         /* Ping just for debugging, helps line traces up */
+         qemu_savevm_send_ping(ms->to_dst_file, 2);
+@@ -3042,6 +3071,9 @@ static Property migration_properties[] = {
+     DEFINE_PROP_SIZE("xbzrle-cache-size", MigrationState,
+                       parameters.xbzrle_cache_size,
+                       DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE),
++    DEFINE_PROP_SIZE("max-postcopy-bandwidth", MigrationState,
++                      parameters.max_postcopy_bandwidth,
++                      DEFAULT_MIGRATE_MAX_POSTCOPY_BANDWIDTH),
  
-+    /*
-+     * Used to allow urgent requests to override rate limiting.
-+     */
-+    QemuSemaphore rate_limit_sem;
-+
-     /* bytes already send at the beggining of current interation */
-     uint64_t iteration_initial_bytes;
-     /* time at the start of current iteration */
-@@ -287,4 +292,7 @@ void init_dirty_bitmap_incoming_migration(void);
- #define qemu_ram_foreach_block \
-   #warning "Use qemu_ram_foreach_block_migratable in migration code"
+     /* Migration capabilities */
+     DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
+@@ -3110,6 +3142,7 @@ static void migration_instance_init(Object *obj)
+     params->has_x_multifd_channels = true;
+     params->has_x_multifd_page_count = true;
+     params->has_xbzrle_cache_size = true;
++    params->has_max_postcopy_bandwidth = true;
  
-+void migration_make_urgent_request(void);
-+void migration_consume_urgent_request(void);
-+
- #endif
-diff --git a/migration/trace-events b/migration/trace-events
-index 4a768eaaeb..3f67758893 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -108,6 +108,8 @@ migration_return_path_end_before(void) ""
- migration_return_path_end_after(int rp_error) "%d"
- migration_thread_after_loop(void) ""
- migration_thread_file_err(void) ""
-+migration_thread_ratelimit_pre(int ms) "%d ms"
-+migration_thread_ratelimit_post(int urgent) "urgent: %d"
- migration_thread_setup_complete(void) ""
- open_return_path_on_source(void) ""
- open_return_path_on_source_continue(void) ""
+     qemu_sem_init(&ms->postcopy_pause_sem, 0);
+     qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index f7e10ee90f..1b4c1db670 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -517,6 +517,9 @@
+ #                     and a power of 2
+ #                     (Since 2.11)
+ #
++# @max-postcopy-bandwidth: Background transfer bandwidth during postcopy.
++#                     Defaults to 0 (unlimited).  In bytes per second.
++#                     (Since 3.0)
+ # Since: 2.4
+ ##
+ { 'enum': 'MigrationParameter',
+@@ -525,7 +528,7 @@
+            'tls-creds', 'tls-hostname', 'max-bandwidth',
+            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+            'x-multifd-channels', 'x-multifd-page-count',
+-           'xbzrle-cache-size' ] }
++           'xbzrle-cache-size', 'max-postcopy-bandwidth' ] }
+ 
+ ##
+ # @MigrateSetParameters:
+@@ -593,6 +596,10 @@
+ #                     needs to be a multiple of the target page size
+ #                     and a power of 2
+ #                     (Since 2.11)
++#
++# @max-postcopy-bandwidth: Background transfer bandwidth during postcopy.
++#                     Defaults to 0 (unlimited).  In bytes per second.
++#                     (Since 3.0)
+ # Since: 2.4
+ ##
+ # TODO either fuse back into MigrationParameters, or make
+@@ -611,7 +618,8 @@
+             '*block-incremental': 'bool',
+             '*x-multifd-channels': 'int',
+             '*x-multifd-page-count': 'int',
+-            '*xbzrle-cache-size': 'size' } }
++            '*xbzrle-cache-size': 'size',
++            '*max-postcopy-bandwidth': 'size' } }
+ 
+ ##
+ # @migrate-set-parameters:
+@@ -694,6 +702,10 @@
+ #                     needs to be a multiple of the target page size
+ #                     and a power of 2
+ #                     (Since 2.11)
++#
++# @max-postcopy-bandwidth: Background transfer bandwidth during postcopy.
++#                     Defaults to 0 (unlimited).  In bytes per second.
++#                     (Since 3.0)
+ # Since: 2.4
+ ##
+ { 'struct': 'MigrationParameters',
+@@ -710,7 +722,8 @@
+             '*block-incremental': 'bool' ,
+             '*x-multifd-channels': 'uint8',
+             '*x-multifd-page-count': 'uint32',
+-            '*xbzrle-cache-size': 'size' } }
++            '*xbzrle-cache-size': 'size',
++            '*max-postcopy-bandwidth': 'size'  } }
+ 
+ ##
+ # @query-migrate-parameters:
 -- 
 2.17.1
