@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sridhar.samudrala@intel.com>) id 1fSxKN-0003kn-53
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:24:12 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fSxNi-0004nu-Hj
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:27:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sridhar.samudrala@intel.com>) id 1fSxKI-00013p-Pt
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:24:11 -0400
-Received: from mga18.intel.com ([134.134.136.126]:9432)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sridhar.samudrala@intel.com>)
-	id 1fSxKI-00013d-Dc
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:24:06 -0400
-References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
-	<fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
-	<20180605152344-mutt-send-email-mst@kernel.org>
-	<a45625c9-d2cd-f8f7-ce31-37c558e70b88@redhat.com>
-	<20180612144743-mutt-send-email-mst@kernel.org>
-	<5718de66-74c9-1362-a87b-2eba02475b48@redhat.com>
-From: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
-Message-ID: <c29a5ac9-cfb5-0a19-f28c-30d41bd5efcf@intel.com>
-Date: Tue, 12 Jun 2018 21:24:01 -0700
+	(envelope-from <dgibson@ozlabs.org>) id 1fSxNh-0002NT-4Y
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:27:38 -0400
+Date: Wed, 13 Jun 2018 14:27:26 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180613042726.GU30690@umbus.fritz.box>
+References: <20180518164405.11804-1-clg@kaod.org>
+	<20180518164405.11804-3-clg@kaod.org>
+	<20180526114023.49ee54e9@bahia.lan>
+	<20180605034418.GV5140@umbus.fritz.box>
+	<e9631178-7bd1-170a-ff28-f1ab717cb8bf@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <5718de66-74c9-1362-a87b-2eba02475b48@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] qemu: Introduce VIRTIO_NET_F_STANDBY
- feature bit to virtio_net
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="QXliVHAuIB9eJ4yJ"
+Content-Disposition: inline
+In-Reply-To: <e9631178-7bd1-170a-ff28-f1ab717cb8bf@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 2/4] sparp_pci: simplify how the PCI LSIs
+ are allocated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,167 +28,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, jesse.brandeburg@intel.com, alexander.h.duyck@intel.com, qemu-devel@nongnu.org
-
-On 6/12/2018 7:38 PM, Jason Wang wrote:
->
->
-> On 2018年06月12日 19:54, Michael S. Tsirkin wrote:
->> On Wed, Jun 06, 2018 at 10:29:03AM +0800, Jason Wang wrote:
->>>
->>> On 2018年06月05日 20:33, Michael S. Tsirkin wrote:
->>>> I don't think this is sufficient.
->>>>
->>>> If both primary and standby devices are present, a legacy guest 
->>>> without
->>>> support for the feature might see two devices with same mac and get
->>>> confused.
->>>>
->>>> I think that we should only make primary visible after guest acked the
->>>> backup feature bit.
->>> I think we want exactly the reverse? E.g fail the negotiation when 
->>> guest
->>> does not ack backup feature.
->>>
->>> Otherwise legacy guest won't even have the chance to see primary 
->>> device in
->>> the guest.
->> That's by design.
->
-> So management needs to know the capability of guest to set the backup 
-> feature. This looks a chicken or egg problem to me.
-
-I don't think so. If the tenant requests 'accelerated datapath feature', the management
-will set 'standby' feature bit on virtio-net interface and if the guest virtio-net driver
-supports this feature, then the tenant VM will get that capability via a hot-plugged
-primary device.
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
 
 
->
->>
->>>> And on reset or when backup is cleared in some other way, unplug the
->>>> primary.
->>> What if guest does not support hotplug?
->> It shouldn't ack the backup feature then and it's a good point.
->> We should both document this and check kernel config has
->> hotplug support. Sridhar could you take a look pls?
->>
->>>> Something like the below will do the job:
->>>>
->>>> Primary device is added with a special "primary-failover" flag.
->>>> A virtual machine is then initialized with just a standby virtio
->>>> device. Primary is not yet added.
->>> A question is how to do the matching? Qemu knows nothing about e.g mac
->>> address of a pass-through device I believe?
->> Supply a flag to the VFIO when it's added, this way QEMU will know.
->>
->>>> Later QEMU detects that guest driver device set DRIVER_OK.
->>>> It then exposes the primary device to the guest, and triggers
->>>> a device addition event (hot-plug event) for it.
->>> Do you mean we won't have primary device in the initial qemu cli?
->> No, that's not what I mean.
->>
->> I mean management will supply a flag to VFIO and then
->>
->>
->> - VFIO defers exposing
->> primary to guest until guest acks the feature bit.
->> - When we see guest ack, initiate hotplug.
->> - On reboot, hide it again.
->> - On reset without reboot, request hot-unplug and on eject hide it 
->> again.
->
-> This sounds much like a kind of bonding in qemu.
->
->>
->>>> If QEMU detects guest driver removal, it initiates a hot-unplug 
->>>> sequence
->>>> to remove the primary driver.  In particular, if QEMU detects guest
->>>> re-initialization (e.g. by detecting guest reset) it immediately 
->>>> removes
->>>> the primary device.
->>> I believe guest failover module should handle this gracefully?
->> It can't control enumeration order, if primary is enumerated before
->> standby then guest will load its driver and it's too late
->> when failover driver is loaded.
->
-> Well, even if we can delay the visibility of primary until DRIVER_OK, 
-> there still be a race I think? And it looks to me it's still a bug of 
-> guest:
->
-> E.g primary could be probed before failover_register() in guest. Then 
-> we will miss the enslaving of primary forever.
+--QXliVHAuIB9eJ4yJ
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-That is not an issue. Even if the primary is probed before failover driver, it will
-enslave the primary via the call to failover_existing_slave_register() as part of
-failover_register() routine.
+On Tue, Jun 05, 2018 at 08:31:49AM +0200, C=E9dric Le Goater wrote:
+> On 06/05/2018 05:44 AM, David Gibson wrote:
+> > On Sat, May 26, 2018 at 11:40:23AM +0200, Greg Kurz wrote:
+> >> On Fri, 18 May 2018 18:44:03 +0200
+> >> C=E9dric Le Goater <clg@kaod.org> wrote:
+> >>
+> >>> PCI LSIs are today allocated one by one using the IRQ alloc_block
+> >>> routine. Change the code sequence to first allocate a PCI_NUM_PINS
+> >>> block. It will help us providing a generic IRQ framework to the
+> >>> machine.
+> >>>
+> >>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >>> ---
+> >>>  hw/ppc/spapr_pci.c | 21 ++++++++++-----------
+> >>>  1 file changed, 10 insertions(+), 11 deletions(-)
+> >>>
+> >>> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> >>> index 39a14980d397..4fd97ffe4c6e 100644
+> >>> --- a/hw/ppc/spapr_pci.c
+> >>> +++ b/hw/ppc/spapr_pci.c
+> >>> @@ -1546,6 +1546,8 @@ static void spapr_phb_realize(DeviceState *dev,=
+ Error **errp)
+> >>>      sPAPRTCETable *tcet;
+> >>>      const unsigned windows_supported =3D
+> >>>          sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
+> >>> +    uint32_t irq;
+> >>> +    Error *local_err =3D NULL;
+> >>> =20
+> >>>      if (!spapr) {
+> >>>          error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pserie=
+s machine");
+> >>> @@ -1694,18 +1696,15 @@ static void spapr_phb_realize(DeviceState *de=
+v, Error **errp)
+> >>>      QLIST_INSERT_HEAD(&spapr->phbs, sphb, list);
+> >>> =20
+> >>>      /* Initialize the LSI table */
+> >>> -    for (i =3D 0; i < PCI_NUM_PINS; i++) {
+> >>> -        uint32_t irq;
+> >>> -        Error *local_err =3D NULL;
+> >>> -
+> >>> -        irq =3D spapr_irq_alloc_block(spapr, 1, true, false, &local_=
+err);
+> >>> -        if (local_err) {
+> >>> -            error_propagate(errp, local_err);
+> >>> -            error_prepend(errp, "can't allocate LSIs: ");
+> >>> -            return;
+> >>> -        }
+> >>> +    irq =3D spapr_irq_alloc_block(spapr, PCI_NUM_PINS, true, false, =
+&local_err);
+> >>> +    if (local_err) {
+> >>> +        error_propagate(errp, local_err);
+> >>> +        error_prepend(errp, "can't allocate LSIs: ");
+> >>> +        return;
+> >>> +    }
+> >>> =20
+> >>
+> >> It isn't strictly equivalent. The current code would be happy with
+> >> sparse IRQ numbers, while the proposed one wouldn't... Anyway, this
+> >> cannot happen since we don't have PHB hotplug.
+> >=20
+> > This makes me pretty nervous, because it's not obvious it will come up
+> > with the same numbers in all circumstances, which we have to do for
+> > existing machine types.
+>=20
+> Given that :=20
+>=20
+>  - irq_hint is "unused"
+>  - all IRQs are allocated sequentially at machine init, =20
+>  - spapr_pci is the only model using the block allocation for MSIs,=20
+>    potentially fragmenting more the IRQ number space but done at=20
+>    guest runtime.=20
+>  - the PHB LSI are the allocated at realize time doing the loop above,=20
+>  - we don't support PHB hotplug=20
+>  - we do support PHB coldplug but then the IRQ allocation is done
+>    at machine time,
+>=20
+> it seems highly improbable that the IRQ number space is fragmented
+> to a point which would not allow the loop above to return four=20
+> contiguous IRQ numbers, always.
 
->
-> Thanks
->
->>
->>> Thanks
->>>
->>>> We can move some of this code to management as well, 
->>>> architecturally it
->>>> does not make too much sense but it might be easier 
->>>> implementation-wise.
->>>>
->>>> HTH
->>>>
->>>> On Mon, Jun 04, 2018 at 06:41:48PM -0700, Samudrala, Sridhar wrote:
->>>>> Ping on this patch now that the kernel patches are accepted into 
->>>>> davem's net-next tree.
->>>>> https://patchwork.ozlabs.org/cover/920005/
->>>>>
->>>>>
->>>>> On 5/7/2018 4:09 PM, Sridhar Samudrala wrote:
->>>>>> This feature bit can be used by hypervisor to indicate virtio_net 
->>>>>> device to
->>>>>> act as a standby for another device with the same MAC address.
->>>>>>
->>>>>> I tested this with a small change to the patch to mark the 
->>>>>> STANDBY feature 'true'
->>>>>> by default as i am using libvirt to start the VMs.
->>>>>> Is there a way to pass the newly added feature bit 'standby' to 
->>>>>> qemu via libvirt
->>>>>> XML file?
->>>>>>
->>>>>> Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
->>>>>> ---
->>>>>>     hw/net/virtio-net.c                         | 2 ++
->>>>>>     include/standard-headers/linux/virtio_net.h | 3 +++
->>>>>>     2 files changed, 5 insertions(+)
->>>>>>
->>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->>>>>> index 90502fca7c..38b3140670 100644
->>>>>> --- a/hw/net/virtio-net.c
->>>>>> +++ b/hw/net/virtio-net.c
->>>>>> @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] = {
->>>>>>                          true),
->>>>>>         DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, 
->>>>>> SPEED_UNKNOWN),
->>>>>>         DEFINE_PROP_STRING("duplex", VirtIONet, 
->>>>>> net_conf.duplex_str),
->>>>>> +    DEFINE_PROP_BIT64("standby", VirtIONet, host_features, 
->>>>>> VIRTIO_NET_F_STANDBY,
->>>>>> +                      false),
->>>>>>         DEFINE_PROP_END_OF_LIST(),
->>>>>>     };
->>>>>> diff --git a/include/standard-headers/linux/virtio_net.h 
->>>>>> b/include/standard-headers/linux/virtio_net.h
->>>>>> index e9f255ea3f..01ec09684c 100644
->>>>>> --- a/include/standard-headers/linux/virtio_net.h
->>>>>> +++ b/include/standard-headers/linux/virtio_net.h
->>>>>> @@ -57,6 +57,9 @@
->>>>>>                          * Steering */
->>>>>>     #define VIRTIO_NET_F_CTRL_MAC_ADDR 23    /* Set MAC address */
->>>>>> +#define VIRTIO_NET_F_STANDBY      62    /* Act as standby for 
->>>>>> another device
->>>>>> +                                         * with the same MAC.
->>>>>> +                                         */
->>>>>>     #define VIRTIO_NET_F_SPEED_DUPLEX 63    /* Device set 
->>>>>> linkspeed and duplex */
->>>>>>     #ifndef VIRTIO_NET_NO_LEGACY
->
+Well, assuming irq_hint really is unused, that's right.  But we can't
+assume that - that's the whole point of the deprecation thing.
+
+Given that, AIUI, just one vio device with irq=3D set to a value that
+would be within an LSI block allocated under the old scheme would
+result in the new scheme returning a non-contiguous set of LSIs -
+i.e. a different result from what we used to have.
+
+> That is why I felt confident changing the loop to a single block=20
+> allocation.=20
+>=20
+> > It's also not obvious to me why it's useful
+> > to go via this step before going straight to static allocation of the
+> > irq numbers.
+>=20
+> It pollutes the new sPAPR IRQ interface API with an extra parameter=20
+> to support both underlying backend and it complexifies the code=20
+> to handle block allocation of a single IRQ (like above) within an=20
+> IRQ range (the PCI LSIs).
+>=20
+> So you end up having a family, a device index, a count, an alignment,
+> and an index within the range. pffut.
+>=20
+> Also, could we kill the alignment ?
+
+Since we sometimes pass 'true', no, we can't, without changing the
+existing pattern of allocations, which we can't do.
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--QXliVHAuIB9eJ4yJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsgnS4ACgkQbDjKyiDZ
+s5K0gg/+P4qX0md9IOBmiidI35ZcAXZGqKB/qg//gCV4soBilNbyCEVvOvh9xZn6
+wYchOWY90qnHKLCJGqNDisodIBcYUx476w4j78dFsy+V53cz1Sla7LzsC8Z78Ks5
+044NTht4nUl43XnxGO6XCgmY2LyOC60tZOf/20doE3aCpsHzps7a/K1eynsuawJ0
+P6DTkkq1mH8xr+Lp2PhMG9Pcvdl8ZivbeGmPBI+2XkpBRx1xKvgbXecVmQ0/Jzr/
+A2nKEDa+8n2r+8kuRShuCGjywQEn2HQ5Yc2+41ovIOyuqAMwGSb5uguO2fmu4LZM
+ewThHqDY1dXEGgG6bCR1mvsVCI5/et0YZC9oUgwA7Av6TWoT4oakJZpWiH/qs/sA
+JAF/02pZoXzOAvbW7SQY+sWPjoglY3BYwx95pjmz247XRF+oRVeHTAbl4XwVqMcA
+rJWiWgUzifmOC7Sqn4VySbbg1WzPqzHlv1LfrYkKsQN34bZVMlpmgoQhyx3ipWrF
+80uIVmquN7w9MyYP0k7M+OFjrhYIGDl8/FwPH/BN4XKZK/1cyiz+Wak3sj7eDuz1
+18I6KPIVT3oodyg0w0fMwejD3ltlYnkbyqhBbrNaIPaScy48uCd2La6naxdu2jl5
+p9+Kr0j+1EEDJsnkwGybh59wJ/x3rkcSqQwE/Fy8k8i+j/gPld8=
+=67U5
+-----END PGP SIGNATURE-----
+
+--QXliVHAuIB9eJ4yJ--
