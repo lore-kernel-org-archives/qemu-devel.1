@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fT90U-0004TA-2Y
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:52:27 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fT93m-0005y6-9p
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:55:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fT90Q-0004p8-4n
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:52:26 -0400
-Received: from mail-sn1nam01on0052.outbound.protection.outlook.com
-	([104.47.32.52]:37868
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fT90P-0004kS-O6
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:52:22 -0400
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Wed, 13 Jun 2018 16:52:18 +0000
-Message-ID: <DM5PR12MB2471C966B5B16FFCACDF33F3957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
-References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
-	<1528498581-131037-4-git-send-email-babu.moger@amd.com>
-	<20180611205030.GW7451@localhost.localdomain>
-	<20180611211026.GA7451@localhost.localdomain>
-	<DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612174021.GL7451@localhost.localdomain>
-	<DM5PR12MB2471F6EA1525A824A9A94545957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612190554.GO7451@localhost.localdomain>
-	<39f328af-a9c1-15bb-653e-9456b045768d@amd.com>
-In-Reply-To: <39f328af-a9c1-15bb-653e-9456b045768d@amd.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <jsnow@redhat.com>) id 1fT93i-0004fN-Cf
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 12:55:50 -0400
+References: <20180611141716.3813-1-peter.maydell@linaro.org>
+	<650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
+	<CAFEAcA-vZH0KUxi+iYP3eYzXeHxNTotNwCMhEPcGhOLksbG71A@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <f9beda14-7c4a-8f89-baf1-5a79e847c4ac@redhat.com>
+Date: Wed, 13 Jun 2018 12:55:43 -0400
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
- AMD EPYC CPU
+In-Reply-To: <CAFEAcA-vZH0KUxi+iYP3eYzXeHxNTotNwCMhEPcGhOLksbG71A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
+ for multiline comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,69 +26,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Moger, Babu" <Babu.Moger@amd.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbToga3ZtLW93bmVyQHZnZXIu
-a2VybmVsLm9yZyBbbWFpbHRvOmt2bS1vd25lckB2Z2VyLmtlcm5lbC5vcmddDQo+IE9uIEJlaGFs
-ZiBPZiBCYWJ1IE1vZ2VyDQo+IFNlbnQ6IFR1ZXNkYXksIEp1bmUgMTIsIDIwMTggMjo0NyBQTQ0K
-PiBUbzogRWR1YXJkbyBIYWJrb3N0IDxlaGFia29zdEByZWRoYXQuY29tPg0KPiBDYzogbXN0QHJl
-ZGhhdC5jb207IG1hcmNlbC5hcGZlbGJhdW1AZ21haWwuY29tOyBwYm9uemluaUByZWRoYXQuY29t
-Ow0KPiBydGhAdHdpZGRsZS5uZXQ7IG10b3NhdHRpQHJlZGhhdC5jb207IHFlbXUtZGV2ZWxAbm9u
-Z251Lm9yZzsNCj4ga3ZtQHZnZXIua2VybmVsLm9yZzsga2FzaEB0cmlwbGViYWNrLm5ldDsgZ2Vv
-ZmZAaG9zdGZpc3Npb24uY29tOyBKaXJpDQo+IERlbmVtYXJrIDxqZGVuZW1hckByZWRoYXQuY29t
-Pg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYxMyAzLzVdIGkzODY6IEVuYWJsZSBUT1BPRVhUIGZl
-YXR1cmUgb24gQU1EIEVQWUMNCj4gQ1BVDQo+IA0KPiANCj4gDQo+IE9uIDA2LzEyLzIwMTggMDI6
-MDUgUE0sIEVkdWFyZG8gSGFia29zdCB3cm90ZToNCj4gPiBPbiBUdWUsIEp1biAxMiwgMjAxOCBh
-dCAwNjozODowOFBNICswMDAwLCBNb2dlciwgQmFidSB3cm90ZToNCj4gPiBbLi4uXQ0KPiA+Pj4g
-SSdtIHN0YXJ0aW5nIHRvIHRoaW5rIHRoYXQgZW5hYmxpbmcgVE9QT0VYVCBhdXRvbWF0aWNhbGx5
-IGlzDQo+ID4+PiBhZGRpbmcgdG9vIG11Y2ggY29tcGxleGl0eSBhbmQgY29tcGF0aWJpbGl0eSBw
-cm9ibGVtcywgYW5kIGl0J3MNCj4gPj4+IGJldHRlciB0byBsZWF2ZSB0aGlzIHRhc2sgdG8gbWFu
-YWdlbWVudCBzb2Z0d2FyZS4NCj4gPj4+DQo+ID4+PiBUaGUgbWFpbiBwcm9ibGVtIGhlcmUgaXM6
-DQo+ID4+Pg0KPiA+Pj4gVGhpcyB3b3JrcyB0b2RheSB3aXRoIFFFTVUgMi4xMiArIExpbnV4IDw9
-IDQuMTU6DQo+ID4+PiAgICAkICRRRU1VIC1tYWNoaW5lIHBjIC1jcHUgRVBZQyxlbmZvcmNlIC1z
-bXANCj4gPj4+IDgsc29ja2V0cz0yLGNvcmVzPTIsdGhyZWFkcz0yIg0KPiA+Pj4gYW5kIG11c3Qg
-a2VlcCB3b3JraW5nIHdpdGggUUVNVSAzLjAgYW5kIExpbnV4IDw9IDQuMTUuDQo+ID4+Pg0KPiA+
-Pj4gSW4gYWRkaXRpb24gdG8gdGhhdCwgdGhlIHJlc3VsdHMgZm9yOg0KPiA+Pj4gICAgJCAkUUVN
-VSAtbWFjaGluZSBwYy1xMzUtMy4wIC1jcHUgRVBZQyxlbmZvcmNlIFsuLi5dDQo+ID4+PiBtdXN0
-IGJlIGRldGVybWluaXN0aWMgYW5kIGV4cG9zZSBleGFjdGx5IHRoZSBzYW1lIENQVUlEIGRhdGEg
-ZXZlbg0KPiA+Pj4gaWYgaG9zdCBoYXJkd2FyZSBvciBzb2Z0d2FyZSBjaGFuZ2VzLCBhcyBsb25n
-IGFzIHRoZSBRRU1VDQo+ID4+PiBjb21tYW5kLWxpbmUgaXMgdGhlIHNhbWUuDQo+ID4+Pg0KPiA+
-Pj4gRG8geW91IHNlZSBhIHdheSB0byBmdWxmaWxsIHRob3NlIHR3byBjb25zdHJhaW50cyB3aGls
-ZSBtYWtpbmcNCj4gPj4+ICItbWFjaGluZSBwYy1xMzUtMy4wIC1jcHUgRVBZQyIgZW5hYmxlIFRP
-UE9FWFQgYXV0b21hdGljYWxseT8NCj4gPj4+DQo+ID4+IE5vdyhzZXR0aW5nIGZlYXR1cmUgYmVm
-b3JlIHg4Nl9jcHVfZXhwYW5kX2ZlYXR1cmVzKSwgZW5hYmxpbmcNCj4gPj4gVE9QT0VYVCBhcHBl
-YXJzIHRvIHdvcmsgZmluZS4NCj4gPiBXaGF0IGFib3V0IHRoZSBhYm92ZSBjb25zdHJhaW50cz8g
-IEFyZSB5b3UgcmVhbGx5IGZ1bGZpbGxpbmcNCj4gPiB0aGVtPw0KPiA+DQo+ID4gVGhpcyBvbmUg
-aXMgdHJpY2t5Og0KPiA+DQo+ID4gXSBUaGlzIHdvcmtzIHRvZGF5IHdpdGggUUVNVSAyLjEyICsg
-TGludXggPD0gNC4xNToNCj4gPiBdICAgJCAkUUVNVSAtbWFjaGluZSBwYyAtY3B1IEVQWUMsZW5m
-b3JjZSAtc21wDQo+IDgsc29ja2V0cz0yLGNvcmVzPTIsdGhyZWFkcz0yIg0KPiA+IF0gYW5kIG11
-c3Qga2VlcCB3b3JraW5nIHdpdGggUUVNVSAzLjAgYW5kIExpbnV4IDw9IDQuMTUuDQo+ICDCoFRo
-aXMgd29ya3MgZmluZSBvbiBrZXJuZWwgPD0gNC4xNSB3aXRoIHNvbWUgd2FybmluZ3MoLXNtcA0K
-PiA4LHNvY2tldHM9Mixjb3Jlcz0yLHRocmVhZHM9MiAtY3B1IEVQWUMpLg0KPiANCj4gcWVtdS1z
-eXN0ZW0teDg2XzY0OiB3YXJuaW5nOiBob3N0IGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVh
-dHVyZToNCj4gQ1BVSUQuODAwMDAwMDFIOkVEWC5yZHRzY3AgW2JpdCAyN10NCj4gcWVtdS1zeXN0
-ZW0teDg2XzY0OiB3YXJuaW5nOiBob3N0IGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVy
-ZToNCj4gQ1BVSUQuODAwMDAwMDFIOkVDWC50b3BvZXh0IFtiaXQgMjJdDQo+IHFlbXUtc3lzdGVt
-LXg4Nl82NDogVGhpcyBmYW1pbHkgb2YgQU1EIENQVSBkb2Vzbid0IHN1cHBvcnQNCj4gaHlwZXJ0
-aHJlYWRpbmcoMikuIFBsZWFzZSBjb25maWd1cmUgLXNtcCBvcHRpb25zIHByb3Blcmx5IG9yIHRy
-eQ0KPiBlbmFibGluZyB0b3BvZXh0IGZlYXR1cmUuDQo+IGNvbnRpbnVlcy4uDQo+ID4NCj4gPiBJ
-ZiB3ZSBlbmFibGUgVE9QT0VYVCB1bmNvbmRpdGlvbmFsbHksIHRoZSBjb21tYW5kLWxpbmUgd29u
-J3Qgd29yaw0KPiA+IHdpdGggTGludXggPD0gNC4xNS4NCj4gPg0KPiA+IElmIHdlIGVuYWJsZSBU
-T1BPRVhUIG9ubHkgaWYgdGhlIGtlcm5lbCByZXR1cm5zIFRPUE9FWFQgb24NCj4gPiBHRVRfU1VQ
-UE9SVEVEX0NQVUlELCB3ZSBicmVhayB0aGUgc2Vjb25kIGNvbnN0cmFpbnQ6DQo+ID4NCj4gPiBd
-IFRoZSByZXN1bHRzIGZvcjoNCj4gPiBdICAgJCAkUUVNVSAtbWFjaGluZSBwYy1xMzUtMy4wIC1j
-cHUgRVBZQyxlbmZvcmNlIFsuLi5dDQo+ID4gXSBtdXN0IGJlIGRldGVybWluaXN0aWMgYW5kIGV4
-cG9zZSBleGFjdGx5IHRoZSBzYW1lIENQVUlEIGRhdGEgZXZlbg0KPiA+IF0gaWYgaG9zdCBoYXJk
-d2FyZSBvciBzb2Z0d2FyZSBjaGFuZ2VzLCBhcyBsb25nIGFzIHRoZSBRRU1VDQo+ID4gXSBjb21t
-YW5kLWxpbmUgaXMgdGhlIHNhbWUuDQo+ID4NCj4gVGhpcyBmYWlscyBvbiBrZXJuZWzCoCA8PSA0
-LjE1IHdpdGggZm9sbG93aW5nIG1lc3NhZ2VzKCgtc21wDQo+IDgsc29ja2V0cz0yLGNvcmVzPTIs
-dGhyZWFkcz0yIC1jcHUgRVBZQyxlbmZvcmNlKS4NCj4gcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJu
-aW5nOiBob3N0IGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZToNCj4gQ1BVSUQuODAw
-MDAwMDFIOkVEWC5yZHRzY3AgW2JpdCAyN10NCj4gcWVtdS1zeXN0ZW0teDg2XzY0OiB3YXJuaW5n
-OiBob3N0IGRvZXNuJ3Qgc3VwcG9ydCByZXF1ZXN0ZWQgZmVhdHVyZToNCj4gQ1BVSUQuODAwMDAw
-MDFIOkVDWC50b3BvZXh0IFtiaXQgMjJdDQo+IHFlbXUtc3lzdGVtLXg4Nl82NDogSG9zdCBkb2Vz
-bid0IHN1cHBvcnQgcmVxdWVzdGVkIGZlYXR1cmVzDQo+IGV4aXRzLi4NCj4gDQo+IFdoYXQgZG8g
-eW91IHRoaW5rIG91ciBvcHRpb25zIGFyZSBoZXJlPw0KDQpTaG91bGQgd2UgZHJvcCBhdXRvbWF0
-aWMgdG9wb2V4dCBjb21wbGV0ZWx5IGFuZCBtb3ZlIGZvcndhcmQ/IFdoYXQgYXJlIHlvdXIgdGhv
-dWdodHM/DQoNCg==
+
+
+On 06/13/2018 08:30 AM, Peter Maydell wrote:
+> On 12 June 2018 at 18:30, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> On 06/11/2018 04:17 AM, Peter Maydell wrote:
+>>> The codebase has a bit of a mix of different multiline
+>>> comment styles. State a preference for the Linux kernel
+>>> style:
+>>>     /*
+>>>      * Star on the left for each line.
+>>>      * Leading slash-star and trailing star-slash
+>>>      * each go on a line of their own.
+>>>      */
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>> ---
+>>> This is not my personal favourite, but seemed to be the
+>>> closest we had to consensus in the mail thread for v1;
+>>> I can live with it in order to avoid getting patches which
+>>> use the styles I like even less :-)
+>>
+>> Honestly, I don't like this except for "important" comments.
+>>
+>> A "small" comment, e.g. one that doesn't quite fit on a single line, now takes
+>> 4 lines instead of 2.  Which is really annoying and IMO tends to break flow.
+> 
+> That's why I prefer
+>  /* two
+>   * lines
+>   */
+> style over kernel-style. But apparently nobody else does...
+
+The same reasoning could be used to justify
+
+/* two
+ * lines */
+
+as it's ... actually just two lines. I think people don't seem to like
+this much either (why? does it look 'naked' on the end?) and seemingly
+the asymmetry is a bit of a killer for the isolated close-comment style:
+
+/* asymmetric
+ * three lines
+ */
+
+so we seemed to have arrived on the vertically symmetric:
+
+/*
+ * four
+ * lines
+ */
+
+style. I think this is a pretty reasonable compromise with the tastes of
+the various maintainers that have chimed in so far -- it seems to be
+nobody's favorite but everyone's second choice :)
+
+If there is concern this will balloon "almost" single line comments into
+four lines, I think the overall strategy of being either more concise
+(or being 70 characters more detailed!) is probably reasonable enough.
+
+...Overall I think it probably doesn't matter too much as long as
+comments in each individual file are consistent.
+
+It would only begin to matter terribly much if we actually decided we
+wanted to do a doxygen-style doc generation for our internal APIs for
+compatibility with, say, fancier IDEs than vim/emacs.
+
+As it stands, we're pretty inconsistent about which exact style we apply
+when we "document" internal functions -- sometimes we document the
+header, sometimes the implementation, sometimes both (but differently!)
+and always with different styles all over the place. That's the real
+problem, IMO.
+
+For non-javadoc style comments that aren't intended to document a
+function in some methodical way, I think as long as it looks nice in the
+file as deemed by the maintainer and it's consistent, it's probably fine.
+
+> 
+> thanks
+> -- PMM
+>
+Now I can say after working at Red Hat for four years that I've finally
+had a real life "tabs vs spaces" argument, too. I guess I had a good run
+without :)
+
+--js
