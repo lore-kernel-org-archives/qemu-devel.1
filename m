@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fSuUv-00045W-Ax
+	(envelope-from <dgibson@ozlabs.org>) id 1fSuUv-00045X-Cn
 	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:22:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fSuUr-0003IT-Ab
+	(envelope-from <dgibson@ozlabs.org>) id 1fSuUr-0003IY-B2
 	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:22:53 -0400
-Date: Wed, 13 Jun 2018 11:22:37 +1000
+Date: Wed, 13 Jun 2018 11:20:27 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180613012236.GQ30690@umbus.fritz.box>
+Message-ID: <20180613012027.GP30690@umbus.fritz.box>
 References: <cover.1528291908.git.balaton@eik.bme.hu>
-	<d13ea58b288f386a12a76c41a617c500c4454341.1528291908.git.balaton@eik.bme.hu>
+	<7017cb3e0ed918bc3a9df823175d91a24692e2ef.1528291908.git.balaton@eik.bme.hu>
+	<20180608085618.GT3344@umbus.fritz.box>
+	<alpine.BSF.2.21.1806081112180.22949@zero.eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hIO1AjEoFJ7b3ahE"
+	protocol="application/pgp-signature"; boundary="mejza3ZMMA5Za1mX"
 Content-Disposition: inline
-In-Reply-To: <d13ea58b288f386a12a76c41a617c500c4454341.1528291908.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] ppc4xx_i2c: Implement directcntl
- register
+In-Reply-To: <alpine.BSF.2.21.1806081112180.22949@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v2 2/8] ppc4xx_i2c: Move register state to
+ private struct and remove unimplemented sdata and intr registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +31,87 @@ To: BALATON Zoltan <balaton@eik.bme.hu>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
 
---hIO1AjEoFJ7b3ahE
+--mejza3ZMMA5Za1mX
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 06, 2018 at 03:31:48PM +0200, BALATON Zoltan wrote:
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->  default-configs/ppc-softmmu.mak    |  1 +
->  default-configs/ppcemb-softmmu.mak |  1 +
->  hw/i2c/ppc4xx_i2c.c                | 14 +++++++++++++-
->  3 files changed, 15 insertions(+), 1 deletion(-)
+On Fri, Jun 08, 2018 at 11:20:50AM +0200, BALATON Zoltan wrote:
+> On Fri, 8 Jun 2018, David Gibson wrote:
+> > On Wed, Jun 06, 2018 at 03:31:48PM +0200, BALATON Zoltan wrote:
+> > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> >=20
+> > It's not clear to me why this is preferable to having the registers
+> > embedded in the state structure.  The latter is pretty standard
+> > practice for qemu.
 >=20
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmm=
-u.mak
-> index 4d7be45..7d0dc2f 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -26,6 +26,7 @@ CONFIG_USB_EHCI_SYSBUS=3Dy
->  CONFIG_SM501=3Dy
->  CONFIG_IDE_SII3112=3Dy
->  CONFIG_I2C=3Dy
-> +CONFIG_BITBANG_I2C=3Dy
-> =20
->  # For Macs
->  CONFIG_MAC=3Dy
-> diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-=
-softmmu.mak
-> index 67d18b2..37af193 100644
-> --- a/default-configs/ppcemb-softmmu.mak
-> +++ b/default-configs/ppcemb-softmmu.mak
-> @@ -19,3 +19,4 @@ CONFIG_USB_EHCI_SYSBUS=3Dy
->  CONFIG_SM501=3Dy
->  CONFIG_IDE_SII3112=3Dy
->  CONFIG_I2C=3Dy
-> +CONFIG_BITBANG_I2C=3Dy
-> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-> index a68b5f7..5806209 100644
-> --- a/hw/i2c/ppc4xx_i2c.c
-> +++ b/hw/i2c/ppc4xx_i2c.c
-> @@ -30,6 +30,7 @@
->  #include "cpu.h"
->  #include "hw/hw.h"
->  #include "hw/i2c/ppc4xx_i2c.h"
-> +#include "bitbang_i2c.h"
-> =20
->  #define PPC4xx_I2C_MEM_SIZE 18
-> =20
-> @@ -46,7 +47,13 @@
-> =20
->  #define IIC_XTCNTLSS_SRST   (1 << 0)
-> =20
-> +#define IIC_DIRECTCNTL_SDAC (1 << 3)
-> +#define IIC_DIRECTCNTL_SCLC (1 << 2)
-> +#define IIC_DIRECTCNTL_MSDA (1 << 1)
-> +#define IIC_DIRECTCNTL_MSCL (1 << 0)
-> +
->  typedef struct {
-> +    bitbang_i2c_interface *bitbang;
->      uint8_t mdata;
->      uint8_t lmadr;
->      uint8_t hmadr;
-> @@ -308,7 +315,11 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr a=
-ddr, uint64_t value,
->          i2c->xtcntlss =3D value;
->          break;
->      case 16:
-> -        i2c->directcntl =3D value & 0x7;
-> +        i2c->directcntl =3D value & (IIC_DIRECTCNTL_SDAC & IIC_DIRECTCNT=
-L_SCLC);
-> +        i2c->directcntl |=3D (value & IIC_DIRECTCNTL_SCLC ? 1 : 0);
-> +        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL, i2c->directcntl &=
- 1);
+> Maybe it will be clearer after the next patch in the series. I needed a
+> place to store the bitbang_i2c_interface for the directcntl way of access=
+ing
+> the i2c bus but I can't include bitbang_i2c.h from the public header beca=
+use
+> it's a local header. So I needed a local extension to the state struct. O=
+nce
+> I have that then it's a good place to also store private registers which =
+are
+> now defined in the same file so I don't have to look up them in a differe=
+nt
+> place. This seemed clearer to me and easier to work with. Maybe the split=
+ing
+> of the rewrite did not make this clear.
 
-Shouldn't that use i2c->directcntl & IIC_DIRECTCNTL_MSCL ?
+Oh.. right.  There's a better way.
 
-> +        i2c->directcntl |=3D bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_S=
-DA,
-> +                               (value & IIC_DIRECTCNTL_SDAC) !=3D 0) << =
-1;
+You can just forward declare the bitbang_i2c_interface structure like
+this in your header:
+	typdef struct bitbang_i2c_interface bitbang_i2c_interface;
 
-Last expression might be clearer as:
-	value & IIC_DIRECTCNTL_SDAC ? IIC_DIRECTCNTL_MSDA : 0
+So you're declaring the existence of the structure, but not its
+contents - that's sufficient to create a pointer to it.  Then you
+don't need to creat the substructure and extra level of indirection.
 
->          break;
->      default:
->          if (addr < PPC4xx_I2C_MEM_SIZE) {
-> @@ -343,6 +354,7 @@ static void ppc4xx_i2c_init(Object *o)
->      sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
->      sysbus_init_irq(SYS_BUS_DEVICE(s), &s->irq);
->      s->bus =3D i2c_init_bus(DEVICE(s), "i2c");
-> +    r->bitbang =3D bitbang_i2c_init(s->bus);
->  }
-> =20
->  static void ppc4xx_i2c_class_init(ObjectClass *klass, void *data)
+> One thing I'm not sure about though:
+>=20
+> > > ---
+> > >  hw/i2c/ppc4xx_i2c.c         | 75 +++++++++++++++++++++++++----------=
+----------
+> > >  include/hw/i2c/ppc4xx_i2c.h | 19 ++----------
+> > >  2 files changed, 43 insertions(+), 51 deletions(-)
+> > >=20
+> > > diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+> > > index d1936db..a68b5f7 100644
+> > > --- a/hw/i2c/ppc4xx_i2c.c
+> > > +++ b/hw/i2c/ppc4xx_i2c.c
+> [...]
+> > > @@ -330,7 +335,9 @@ static const MemoryRegionOps ppc4xx_i2c_ops =3D {
+> > >  static void ppc4xx_i2c_init(Object *o)
+> > >  {
+> > >      PPC4xxI2CState *s =3D PPC4xx_I2C(o);
+> > > +    PPC4xxI2CRegs *r =3D g_malloc0(sizeof(PPC4xxI2CRegs));
+> > >=20
+> > > +    s->regs =3D r;
+> > >      memory_region_init_io(&s->iomem, OBJECT(s), &ppc4xx_i2c_ops, s,
+> > >                            TYPE_PPC4xx_I2C, PPC4xx_I2C_MEM_SIZE);
+> > >      sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
+>=20
+> I allocate memory here but I'm not sure if it should be g_free'd somewhere
+> and if so where? I was not able to detangle QOM object hierarchies and th=
+ere
+> seems to be no good docs available or I haven't found them. (PCI devices
+> seem to have unrealize methods but this did not work for I2C objects.)
+
+Yes, if you're allocating you definitely should be free()ing.  It
+should go in the corresponding cleanup routine to where it is
+allocated.  Since the allocation is in instance_init(), the free()
+should be in instance_finalize() (which you'd need to add).
+
+Except that the above should let you avoid that.
+
+=2E.and I guess this won't actually ever be finalized in practice.
+
+=2E.and there doesn't seem to be a way to free up a bitbang_interface,
+so even if you added the finalize, it still wouldn't really clean up
+properly.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -131,24 +119,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hIO1AjEoFJ7b3ahE
+--mejza3ZMMA5Za1mX
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsgcdwACgkQbDjKyiDZ
-s5LKBg/9EPhDTCCBwS+yE6AN+QvO6QsOkl8Srb46G0L7EFoizp/wTyZo/KeBMg7j
-QJ/en3/i11avWHj+zrV5mMtQqoD3S1A+BNRPIJ4yv2R+jO5w0msQYKntrXpdwlnE
-GHWP6FEZfZZ5KWMXKb2lyIBDiSaz6W596N/zlppWdcJz+sLgRDtavHn6iyhxgzrh
-Nfl7evj0QXXjboWZQybiMavymTZWkQ8n3mAQbjewZdwCxIkfT3Nix6sZsfc87tIj
-oDUV0aOX/YCrrOU6FyeLtYANDYeIQOLqToNqoS+XcJTijauReOKpBXAgt0hqvEX4
-bty5gh/274Kf/WoQnEV9JOgRM8WnRP4dmarnkLOxiyq5sBLoNVy6XyVbh9dlAe9g
-Eh6C5IA4KRXzPrkyoCio6vIP/wRIJbnfTxqoWDswf+zTvfGnbWVaq7da80Yx7KQC
-pb6eAhCj5X4mM0uAyBBs2gBkR6C52yavmQWrmoqK6mFr0ovwKi3L17xWI2sQJh00
-jygw7bTcPP4RFC+2AZbBp0I+Zi2wJdGhPqN3sS9wD6Wd5B9dWVUZi6O8PF1n1CRD
-VcMd+HaDZ5U1EuErDVvqz2BBX81iMm2v98faB54vZVIoZ3yZFizdJf9AalRd7CvQ
-UmijxuOW+YhqMX+TXIXIqdzGQqBTPw/jDJ18hbQlPywUYgEdBe8=
-=7Ydu
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsgcVgACgkQbDjKyiDZ
+s5Jckg//RxR+UFRJtmHUlj09kB4kcjNcoSKmN0+1L7S6rYWHZE449PAfvHMDw5Dk
+BC3rgosCOelGAzLmXti5/Ms1gr5UTaERmDjhteM7VhchizcOJQuvyx5FvX+uHxO+
+4ffzmHNN9S17bX/Rx/gjCF6BYk8sNMYLoRnstwPCBevTNr9/lkSYeYRjJzYOStis
+P0yLI4YAp63eKN+1TGxNft97R7uQUFQLGpVPMHH8Ir27RewN42Qc/6isSUcAC3Uv
+88dTSX2hL2Rg09uQeO8dX4ClfQwfKDyj9ZNTd4AkQEULa6dQXYquzPwdnNNBnHoq
+vzoOj3umkMFInLungoFMXixYubjF8xen7AFhUtHyc4Y0o3CV1+Bkzt9fXlN8cLjj
+UUpzTFZ8ZnKQxPV59jvgVfU+GDKa4+xk6evk6kwU2SsySZGK8r5zHh9ZPjIECTs/
+t1wRBUU4Y/oyKxwuupvjnZ7smezwj0zPjuHjVLHhp7LG3YGlDmlBtiekbCyyweHT
+Btj98pTWBiO/Q9TZgCCkuMvJc3X0ipSCYVSjMlM0otpkvt7ZorkMkQh5wnLcGjEf
+79TzRS5MurdsM8df3aQVOYi4l3Uy50ewjIAgKbUBJTQgIc9JWKT+idmJoBrQNyZH
+TQJj4qk8RQLuTMxSmNx0CSS5FFPJ4Jc6ZPUwGKtqSBgeGAKVAqw=
+=Vh61
 -----END PGP SIGNATURE-----
 
---hIO1AjEoFJ7b3ahE--
+--mejza3ZMMA5Za1mX--
