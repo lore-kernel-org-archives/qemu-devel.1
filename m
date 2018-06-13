@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fT5SD-0001Ui-3h
+	(envelope-from <alex.bennee@linaro.org>) id 1fT5SH-0001Wu-8Q
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:04:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fT5SB-0005Gj-HK
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:04:49 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:37688)
+	(envelope-from <alex.bennee@linaro.org>) id 1fT5SE-0005SI-Ry
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:04:53 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:35194)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fT5SB-0005Dy-8f
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:04:47 -0400
-Received: by mail-wr0-x242.google.com with SMTP id d8-v6so2693143wro.4
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 06:04:47 -0700 (PDT)
+	id 1fT5SE-0005PE-J1
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:04:50 -0400
+Received: by mail-wm0-x236.google.com with SMTP id j15-v6so5322957wme.0
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 06:04:50 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 13 Jun 2018 13:55:58 +0100
-Message-Id: <20180613125601.14371-20-alex.bennee@linaro.org>
+Date: Wed, 13 Jun 2018 13:55:53 +0100
+Message-Id: <20180613125601.14371-15-alex.bennee@linaro.org>
 In-Reply-To: <20180613125601.14371-1-alex.bennee@linaro.org>
 References: <20180613125601.14371-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH v3 19/22] risu_reginfo_aarch64: add
- support for copying SVE register state
+Subject: [Qemu-devel] [RISU PATCH v3 14/22] risu: add process_arch_opt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,216 +32,251 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Add the ability to save SVE registers from the signal context. This is
-controlled with an optional flag --test-sve. The whole thing is
-conditionally compiled when SVE support is in the sigcontext headers.
+From: Richard Henderson <richard.henderson@linaro.org>
 
+Allows the backend to do more that just set a flag when it comes to
+processing options.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+[AJB: tweaked order, added stdlib includes]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
 ---
-v2
-  - support EXTRA_MAGIC contexts
-v3
-  - handle conditional bits
-  - include <signal.h> in reginfo.h
-  - move from helper function to main init function
-  - (void *) cast for memcpy
-  - additional ifdef SVE_MAGIC stuff
----
- risu_reginfo_aarch64.c | 107 ++++++++++++++++++++++++++++++++++++-----
- risu_reginfo_aarch64.h |  16 ++++++
- 2 files changed, 110 insertions(+), 13 deletions(-)
+ risu.c                 | 33 +++++++++++----------------------
+ risu.h                 |  7 +++++--
+ risu_reginfo_aarch64.c | 10 ++++++++--
+ risu_reginfo_arm.c     | 14 ++++++++++----
+ risu_reginfo_m68k.c    | 10 ++++++++--
+ risu_reginfo_ppc64.c   | 10 ++++++++--
+ 6 files changed, 50 insertions(+), 34 deletions(-)
 
+diff --git a/risu.c b/risu.c
+index 18de351..01525d2 100644
+--- a/risu.c
++++ b/risu.c
+@@ -18,7 +18,6 @@
+ #include <errno.h>
+ #include <signal.h>
+ #include <ucontext.h>
+-#include <getopt.h>
+ #include <setjmp.h>
+ #include <assert.h>
+ #include <sys/stat.h>
+@@ -27,7 +26,6 @@
+ #include <string.h>
+ 
+ #include "config.h"
+-
+ #include "risu.h"
+ 
+ void *memblock;
+@@ -287,7 +285,7 @@ void usage(void)
+     }
+ }
+ 
+-struct option * setup_options(char **short_opts)
++static struct option * setup_options(char **short_opts)
+ {
+     static struct option default_longopts[] = {
+         {"help", no_argument, 0, '?'},
+@@ -303,20 +301,19 @@ struct option * setup_options(char **short_opts)
+ 
+     if (arch_long_opts) {
+         const size_t osize = sizeof(struct option);
+-        const int default_count = ARRAY_SIZE(default_longopts);
+-        struct option *dptr;
+-        int extra_count = 0;
++        const int default_count = ARRAY_SIZE(default_longopts) - 1;
++        int arch_count;
+ 
+         /* count additional opts */
+-        dptr = arch_long_opts;
+-        do {} while (dptr[extra_count++].name);
++        for (arch_count = 0; arch_long_opts[arch_count].name; arch_count++) {
++            continue;
++        }
+ 
+-        lopts = calloc(default_count + extra_count, osize);
++        lopts = calloc(default_count + arch_count + 1, osize);
+ 
+         /* Copy default opts + extra opts */
+         memcpy(lopts, default_longopts, default_count * osize);
+-        dptr = &lopts[default_count - 1];
+-        memcpy(dptr, arch_long_opts, extra_count * osize);
++        memcpy(lopts + default_count, arch_long_opts, arch_count * osize);
+     }
+ 
+     return lopts;
+@@ -343,34 +340,26 @@ int main(int argc, char **argv)
+ 
+         switch (c) {
+         case 0:
+-        {
+             /* flag set by getopt_long, do nothing */
+             break;
+-        }
+         case 't':
+-        {
+             trace_fn = optarg;
+             trace = 1;
+             break;
+-        }
+         case 'h':
+-        {
+             hostname = optarg;
+             break;
+-        }
+         case 'p':
+-        {
+             /* FIXME err handling */
+             port = strtol(optarg, 0, 10);
+             break;
+-        }
+         case '?':
+-        {
+             usage();
+             exit(1);
+-        }
+         default:
+-            abort();
++            assert(c >= FIRST_ARCH_OPT);
++            process_arch_opt(c, optarg);
++            break;
+         }
+     }
+ 
+diff --git a/risu.h b/risu.h
+index 89811f4..48c50d9 100644
+--- a/risu.h
++++ b/risu.h
+@@ -16,10 +16,13 @@
+ #include <stdint.h>
+ #include <ucontext.h>
+ #include <stdio.h>
++#include <getopt.h>
+ 
+ /* Extra option processing for architectures */
+-extern void *arch_long_opts;
+-extern char *arch_extra_help;
++extern const struct option * const arch_long_opts;
++extern const char * const arch_extra_help;
++void process_arch_opt(int opt, const char *arg);
++#define FIRST_ARCH_OPT   0x100
+ 
+ /* GCC computed include to pull in the correct risu_reginfo_*.h for
+  * the architecture.
 diff --git a/risu_reginfo_aarch64.c b/risu_reginfo_aarch64.c
-index 3ccaf0e..79db5dd 100644
+index ab12270..c270e0b 100644
 --- a/risu_reginfo_aarch64.c
 +++ b/risu_reginfo_aarch64.c
-@@ -16,13 +16,26 @@
+@@ -14,12 +14,18 @@
+ #include <ucontext.h>
+ #include <string.h>
  #include <signal.h> /* for FPSIMD_MAGIC */
- #include <stdlib.h>
- #include <stddef.h>
--#include <assert.h>
-+#include <stdbool.h>
++#include <stdlib.h>
  
  #include "risu.h"
  #include "risu_reginfo_aarch64.h"
  
-+#ifndef SVE_MAGIC
- const struct option * const arch_long_opts;
- const char * const arch_extra_help;
-+#else
+-void *arch_long_opts;
+-char *arch_extra_help;
++const struct option * const arch_long_opts;
++const char * const arch_extra_help;
 +
-+/* Should we test SVE register state */
-+static int test_sve;
-+static const struct option extra_opts[] = {
-+    {"test-sve", no_argument, &test_sve, 1},
-+    {0, 0, 0, 0}
-+};
-+
-+const struct option * const arch_long_opts = &extra_opts[0];
-+const char * const arch_extra_help = "  --test-sve        Compare SVE registers\n";
-+#endif
++void process_arch_opt(int opt, const char *arg)
++{
++    abort();
++}
  
- void process_arch_opt(int opt, const char *arg)
- {
-@@ -31,8 +44,12 @@ void process_arch_opt(int opt, const char *arg)
- 
- const int reginfo_size(void)
- {
--    const int size = offsetof(struct reginfo, simd.end);
--    assert(sizeof(struct reginfo)==size);
-+    int size = offsetof(struct reginfo, simd.end);
-+#ifdef SVE_MAGIC
-+    if (test_sve) {
-+        size = offsetof(struct reginfo, sve.end);
-+    }
-+#endif
-     return size;
- }
- 
-@@ -40,8 +57,12 @@ const int reginfo_size(void)
+ /* reginfo_init: initialize with a ucontext */
  void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
+index 5acad02..12ad0ef 100644
+--- a/risu_reginfo_arm.c
++++ b/risu_reginfo_arm.c
+@@ -13,7 +13,7 @@
+ #include <stdio.h>
+ #include <ucontext.h>
+ #include <string.h>
+-#include <getopt.h>
++#include <stdlib.h>
+ 
+ #include "risu.h"
+ #include "risu_reginfo_arm.h"
+@@ -22,13 +22,19 @@ extern int insnsize(ucontext_t *uc);
+ 
+ /* Should we test for FP exception status bits? */
+ static int test_fp_exc;
+-static struct option extra_opts[] = {
++static const struct option extra_opts[] = {
+     {"test-fp-exc", no_argument, &test_fp_exc, 1},
+     {0, 0, 0, 0}
+ };
+ 
+-void *arch_long_opts = &extra_opts[0];
+-char *arch_extra_help = "  --test-fp-exc     Check FP exception bits when comparing\n";
++const struct option * const arch_long_opts = &extra_opts[0];
++const char * const arch_extra_help =
++    "  --test-fp-exc     Check FP exception bits when comparing\n";
++
++void process_arch_opt(int opt, const char *arg)
++{
++    abort();
++}
+ 
+ static void reginfo_init_vfp(struct reginfo *ri, ucontext_t *uc)
  {
-     int i;
--    struct _aarch64_ctx *ctx;
--    struct fpsimd_context *fp;
-+    struct _aarch64_ctx *ctx, *extra = NULL;
-+    struct fpsimd_context *fp = NULL;
-+#ifdef SVE_MAGIC
-+    struct sve_context *sve = NULL;
-+#endif
-+
-     /* necessary to be able to compare with memcmp later */
-     memset(ri, 0, sizeof(*ri));
+diff --git a/risu_reginfo_m68k.c b/risu_reginfo_m68k.c
+index d429502..7a1c5a9 100644
+--- a/risu_reginfo_m68k.c
++++ b/risu_reginfo_m68k.c
+@@ -10,12 +10,18 @@
+ #include <ucontext.h>
+ #include <string.h>
+ #include <math.h>
++#include <stdlib.h>
  
-@@ -57,21 +78,81 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
-     ri->faulting_insn = *((uint32_t *) uc->uc_mcontext.pc);
+ #include "risu.h"
+ #include "risu_reginfo_m68k.h"
  
-     ctx = (struct _aarch64_ctx *) &uc->uc_mcontext.__reserved[0];
--
--    while (ctx->magic != FPSIMD_MAGIC && ctx->size != 0) {
--        ctx += (ctx->size + sizeof(*ctx) - 1) / sizeof(*ctx);
-+    while (ctx) {
-+        switch (ctx->magic) {
-+        case FPSIMD_MAGIC:
-+            fp = (void *)ctx;
-+            break;
-+#ifdef SVE_MAGIC
-+        case SVE_MAGIC:
-+            sve = (void *)ctx;
-+            break;
-+        case EXTRA_MAGIC:
-+            extra = (void *)((struct extra_context *)(ctx))->datap;
-+            break;
-+#endif
-+        case 0:
-+            /* End of list.  */
-+            ctx = extra;
-+            extra = NULL;
-+            continue;
-+        default:
-+            /* Unknown record -- skip it.  */
-+            break;
-+        }
-+        ctx = (void *)ctx + ctx->size;
-     }
+-void *arch_long_opts;
+-char *arch_extra_help;
++const struct option * const arch_long_opts;
++const char * const arch_extra_help;
++
++void process_arch_opt(int opt, const char *arg)
++{
++    abort();
++}
  
--    if (ctx->magic != FPSIMD_MAGIC || ctx->size != sizeof(*fp)) {
--        fprintf(stderr,
--                "risu_reginfo_aarch64: failed to get FP/SIMD state\n");
-+    if (!fp || fp->head.size != sizeof(*fp)) {
-+        fprintf(stderr, "risu_reginfo_aarch64: failed to get FP/SIMD state\n");
-         return;
-     }
--
--    fp = (struct fpsimd_context *) ctx;
-     ri->fpsr = fp->fpsr;
-     ri->fpcr = fp->fpcr;
+ /* reginfo_init: initialize with a ucontext */
+ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+diff --git a/risu_reginfo_ppc64.c b/risu_reginfo_ppc64.c
+index 395111c..4b70460 100644
+--- a/risu_reginfo_ppc64.c
++++ b/risu_reginfo_ppc64.c
+@@ -15,6 +15,7 @@
+ #include <ucontext.h>
+ #include <string.h>
+ #include <math.h>
++#include <stdlib.h>
  
-+#ifdef SVE_MAGIC
-+    if (test_sve) {
-+        int vq = sve_vq_from_vl(sve->vl); /* number of quads for whole vl */
-+
-+        if (sve == NULL) {
-+            fprintf(stderr, "risu_reginfo_aarch64: failed to get SVE state\n");
-+            return;
-+        }
-+
-+        ri->sve.vl = sve->vl;
-+
-+        if (sve->head.size < SVE_SIG_CONTEXT_SIZE(vq)) {
-+            if (sve->head.size == sizeof(*sve)) {
-+                /* SVE state is empty -- not an error.  */
-+            } else {
-+                fprintf(stderr, "risu_reginfo_aarch64: "
-+                        "failed to get complete SVE state\n");
-+            }
-+            return;
-+        }
-+
-+        /* Copy ZREG's one at a time */
-+        for (i = 0; i < SVE_NUM_ZREGS; i++) {
-+            memcpy(&ri->sve.zregs[i],
-+                   (void *)sve + SVE_SIG_ZREG_OFFSET(vq, i),
-+                   SVE_SIG_ZREG_SIZE(vq));
-+        }
-+
-+        /* Copy PREG's one at a time */
-+        for (i = 0; i < SVE_NUM_PREGS; i++) {
-+            memcpy(&ri->sve.pregs[i],
-+                   (void *)sve + SVE_SIG_PREG_OFFSET(vq, i),
-+                   SVE_SIG_PREG_SIZE(vq));
-+        }
-+
-+        /* Finally the FFR */
-+        memcpy(&ri->sve.ffr,(void *)sve + SVE_SIG_FFR_OFFSET(vq),
-+               SVE_SIG_FFR_SIZE(vq));
-+
-+        return;
-+    }
-+#endif
-+
-     for (i = 0; i < 32; i++) {
-         ri->simd.vregs[i] = fp->vregs[i];
-     }
-diff --git a/risu_reginfo_aarch64.h b/risu_reginfo_aarch64.h
-index ef97622..b3701b3 100644
---- a/risu_reginfo_aarch64.h
-+++ b/risu_reginfo_aarch64.h
-@@ -13,11 +13,24 @@
- #ifndef RISU_REGINFO_AARCH64_H
- #define RISU_REGINFO_AARCH64_H
+ #include "risu.h"
+ #include "risu_reginfo_ppc64.h"
+@@ -22,8 +23,13 @@
+ #define XER 37
+ #define CCR 38
  
-+#include <signal.h> /* for SVE_MAGIC */
+-void *arch_long_opts;
+-char *arch_extra_help;
++const struct option * const arch_long_opts;
++const char * const arch_extra_help;
 +
- struct simd_reginfo {
-     __uint128_t vregs[32];
-     char end[0];
- };
++void process_arch_opt(int opt, const char *arg)
++{
++    abort();
++}
  
-+#ifdef SVE_MAGIC
-+struct sve_reginfo {
-+    /* SVE */
-+    uint16_t    vl; /* current VL */
-+    __uint128_t zregs[SVE_NUM_ZREGS][SVE_VQ_MAX];
-+    uint16_t    pregs[SVE_NUM_PREGS][SVE_VQ_MAX];
-+    uint16_t    ffr[SVE_VQ_MAX];
-+    char end[0];
-+};
-+#endif
-+
- struct reginfo {
-     uint64_t fault_address;
-     uint64_t regs[31];
-@@ -32,6 +45,9 @@ struct reginfo {
- 
-     union {
-         struct simd_reginfo simd;
-+#ifdef SVE_MAGIC
-+        struct sve_reginfo sve;
-+#endif
-     };
- };
- 
+ /* reginfo_init: initialize with a ucontext */
+ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
 -- 
 2.17.1
