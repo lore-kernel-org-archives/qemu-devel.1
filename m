@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fT48s-0006cb-QG
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 07:40:47 -0400
+	(envelope-from <prvs=69586b2aa=anthony.perard@citrix.com>)
+	id 1fT4E9-0007qC-4z
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 07:46:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fT48r-0001c9-Rz
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 07:40:46 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516366207-109842-9-git-send-email-anton.nefedov@virtuozzo.com>
-	<b0066a7f-0197-73c9-4012-67b5e48e178a@redhat.com>
-	<87tvuyf4it.fsf@dusky.pond.sub.org>
-	<959271ee-c39e-09ab-9f9a-90d97d34f4f5@virtuozzo.com>
-	<87wovar5tl.fsf@dusky.pond.sub.org>
-	<c807b13d-8176-46a5-72b9-dade0ad0712a@virtuozzo.com>
-	<02f27bf7-e371-c396-eaec-1f9e3e24611e@redhat.com>
-	<87a7s5q20q.fsf@dusky.pond.sub.org>
-	<a6ebab62-ac31-46ef-79d7-4eefa72bdd2e@virtuozzo.com>
-Date: Wed, 13 Jun 2018 13:40:38 +0200
-In-Reply-To: <a6ebab62-ac31-46ef-79d7-4eefa72bdd2e@virtuozzo.com> (Anton
-	Nefedov's message of "Wed, 13 Jun 2018 13:36:05 +0300")
-Message-ID: <87wov2kj7t.fsf@dusky.pond.sub.org>
+	(envelope-from <prvs=69586b2aa=anthony.perard@citrix.com>)
+	id 1fT4E6-0004Zw-38
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 07:46:13 -0400
+Date: Wed, 13 Jun 2018 12:46:02 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20180613114602.GC2165@perard.uk.xensource.com>
+References: <20180612235103.12633-1-brogers@suse.com>
+	<20180612235103.12633-2-brogers@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] qapi: query-blockstat: add driver
- specific file-posix stats
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20180612235103.12633-2-brogers@suse.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] xen: add xen disk naming for use in
+ monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,133 +26,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, kwolf@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+To: Bruce Rogers <brogers@suse.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, sstabellini@kernel.org, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com
 
-Anton Nefedov <anton.nefedov@virtuozzo.com> writes:
+On Tue, Jun 12, 2018 at 05:51:02PM -0600, Bruce Rogers wrote:
+> Provide monitor naming of xen disks, including associating an
+> attached dev_id for a BlockBackend which has legacy_dev set.
+> Currently, only xen disks have legacy_dev set to true.
+> 
+> Signed-off-by: Bruce Rogers <brogers@suse.com>
+> ---
+>  block/block-backend.c |  5 ++++-
+>  hw/block/xen_disk.c   | 15 +++++++++++++++
+>  include/hw/xen/xen.h  |  2 ++
+>  stubs/xen-common.c    |  5 +++++
+>  4 files changed, 26 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index d55c328736..db39dfe867 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -23,6 +23,7 @@
+>  #include "qemu/option.h"
+>  #include "trace.h"
+>  #include "migration/misc.h"
+> +#include "hw/xen/xen.h"
+>  
+>  /* Number of coroutines to reserve per attached device model */
+>  #define COROUTINE_POOL_RESERVATION 64
+> @@ -895,7 +896,9 @@ char *blk_get_attached_dev_id(BlockBackend *blk)
+>  {
+>      DeviceState *dev;
+>  
+> -    assert(!blk->legacy_dev);
+> +    if (blk->legacy_dev) {
+> +        return xen_blk_get_attached_dev_id(blk->dev);
+> +    }
+>      dev = blk->dev;
+>  
+>      if (!dev) {
 
-> On 8/6/2018 8:29 AM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->>
->>> On 06/07/2018 10:23 AM, Anton Nefedov wrote:
->>>>>> If we introduce BlockdevDriver as a discriminator as Markus suggests
->>>>>> above, we need some way to define its value.
->>>>>> I guess one would be to check blk->bs->drv->format_name but it won't
->>>>>> always work; often it's even blk->bs =3D=3D NULL.
->>>>>
->>>>> There is no blk->bs, at least not if blk is a BlockBackend *.
->>>>>
->>>>> I figure the problem you're trying to describe is query-blockstats
->>>>> running into BlockBackends that aren't associated with a
->>>>> BlockDriverState (blk->root is null), and thus aren't associated with=
- a
->>>>> BlockDriver.=C2=A0 Correct?
->>>>>
->>>>
->>>> Sorry, yes, exactly
->>>
->>> Okay, that sounds like the driver stats have to be optional, present
->>> only when blk->bs is non-NULL.
->>>
->>>>
->>>>>> I guess we could add a default ('unspecified'?) to BlockdevDriver en=
-um?
->>>>>
->>>>> This part I understand, but...
->>>>>
->>>>>> But I'd rather leave an optional BlockDriverStats union (but make it
->>>>>> flat). Only the drivers that provide these stats will need to set
->>>>>> BlockdevDriver field. What do you think?
->>>>>
->>>>> I'm not sure I got this part.=C2=A0 Care to sketch the QAPI schema sn=
-ippet?
->>>>>
->>>>
->>>> You earlier proposed:
->>>>
->>>>   >>> You're adding a union of driver-specific stats to a struct of ge=
-neric
->>>>   >>> stats.=C2=A0 That's unnecessarily complicated.=C2=A0 Instead, tu=
-rn the struct of
->>>>   >>> generic stats into a flat union, like this:
->>>>   >>>
->>>>   >>> { 'union': 'BlockStats',
->>>>   >>>=C2=A0=C2=A0=C2=A0=C2=A0 'base': { ... the generic stats, i.e. th=
-e members of BlockStats
->>>>   >>>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 before this patch ...
->>>>   >>>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 'driver': 'BlockdevDriver' }
->>>>   >>>=C2=A0=C2=A0=C2=A0=C2=A0 'discriminator': 'driver',
->>>>   >>>=C2=A0=C2=A0=C2=A0=C2=A0 'data': {
->>>>   >>>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'file': 'BlockDr=
-iverStatsFile',
->>>>   >>>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ... } }
->>>
->>> That would require 'driver' to always resolve to something, even when
->>> there is no driver (unless we create a superset enum that adds 'none'
->>> beyond what 'BlockdevDriver' supports).
->>>
->>>>
->>>> But I meant to leave it as:
->>>>
->>>> + { 'union': 'BlockDriverStats':
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0 'base': { 'driver': 'BlockdevDriver' },
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0 'discriminator': 'driver',
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0 'data': {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'file': 'BlockDriver=
-StatsFile' } }
->>>>
->>>>
->>>>   =C2=A0 { 'struct': 'BlockStats',
->>>>   =C2=A0=C2=A0=C2=A0 'data': {'*device': 'str', '*node-name': 'str',
->>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 'stats': 'BlockDeviceStats',
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*=
-driver-stats': 'BlockDriverStats',
->>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 '*parent': 'BlockStats',
->>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 '*backing': 'BlockStats'} }
->>>>
->>>> so those block backends which do not provide driver stats do not need =
-to
->>>> set BlockdevDriver field.
->>>
->>> This makes the most sense to me - we're stuck with a layer of nesting,
->>> but that's because driver-stats truly is optional (we don't always
->>> have access to a driver).
->>
->> Agree.
->>
->> Now we have to name the thing.  You propose @driver-stats.  Servicable,
->> but let's review how existing driver-specific things are named.
->>
->> BlockdevOptions and BlockdevCreateOptions have them inline, thus no
->> name.
->>
->> ImageInfo has '*format-specific': 'ImageInfoSpecific'.
->>
->> If we follow ImageInfo precedence, we get '*driver-specific':
->> 'BlockStatsSpecific'.  driver-specific I like well enough.
->> BlockStatsSpecific less so.  BlockStatsDriverSpecific feels better, but
->> perhaps a bit long.
->>
->
-> following it further we will have BlockStatsDriverSpecificFile which is
-> even longer.
->
-> Personally, both
-> '*driver-specific': 'BlockDriverStats'; 'BlockDriverStatsFile'
-> '*driver-specific': 'BlockStatsSpecific'; 'BlockStatsSpecificFile'
-> look right to me.
->
-> Function signatures look ok too except that BlockDriverStats is easy to
-> confuse with BlockDriverState
->
-> BlockDriverStats *bdrv_get_stats(BlockDriverState *bs);
-> BlockStatsSpecific *bdrv_get_specific_stats(BlockDriverState *bs);
->
-> so maybe BlockStatsSpecific indeed?
+Hi Bruce,
 
-Works for me, but block maintainers have veto powers :)
+Thanks for your patches!
+
+But I don't think that the right way to go. We probably needs to
+qdevifie xen_disk instead. This is point out by the numerous TODO about
+"qdevified", and this very old mail:
+https://lists.nongnu.org/archive/html/qemu-devel/2016-09/msg07902.html
+
+Thanks,
+
+-- 
+Anthony PERARD
