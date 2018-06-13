@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45953)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fSvAy-0001NG-Hh
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:06:21 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fSvAy-0001NR-PZ
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:06:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fSvAx-0001e6-CO
+	(envelope-from <jsnow@redhat.com>) id 1fSvAx-0001eV-Lc
 	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:06:20 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue, 12 Jun 2018 22:06:11 -0400
-Message-Id: <20180613020613.1343-9-jsnow@redhat.com>
-In-Reply-To: <20180613020613.1343-1-jsnow@redhat.com>
-References: <20180613020613.1343-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 08/10] qcow2/bitmap: track extra_data_size
+Date: Tue, 12 Jun 2018 22:06:03 -0400
+Message-Id: <20180613020613.1343-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 00/10] qemu-img: add bitmap info output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +20,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>
 
-Similarly to the last patch, track the extra_data_size field that we read.
-We do reject anything other than zero, but if this restriction is lifted
-in the future, we'll need to update the _info field, so loosen this now.
+Allow qemu-img to show information about bitmaps stored in qcow2 images.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- block/qcow2-bitmap.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+v2:
+- Remove bitmap manipulation command in favor of a part 2 series later
+- Responded to much of Vladimir's feedback (Thank you!);
+  - In particular, make sure IN_USE bitmaps cannot be remounted RW.
+  - Fixed semantics of the extra_data flag
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 36573f7b52..3c2e974458 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -86,6 +86,7 @@ typedef struct Qcow2Bitmap {
-     uint8_t type;
-     uint8_t granularity_bits;
-     char *name;
-+    uint32_t extra_data_size;
- 
-     BdrvDirtyBitmap *dirty_bitmap;
- 
-@@ -609,6 +610,7 @@ static Qcow2BitmapList *bitmap_list_load(BlockDriverState *bs, Error **errp)
-         bm->table.size = e->bitmap_table_size;
-         bm->flags = e->flags;
-         bm->type = e->type;
-+        bm->extra_data_size = e->extra_data_size;
-         bm->granularity_bits = e->granularity_bits;
-         bm->name = dir_entry_copy_name(e);
-         QSIMPLEQ_INSERT_TAIL(bm_list, bm, entry);
-@@ -782,7 +784,7 @@ static int bitmap_list_store(BlockDriverState *bs, Qcow2BitmapList *bm_list,
-         e->type = bm->type;
-         e->granularity_bits = bm->granularity_bits;
-         e->name_size = strlen(bm->name);
--        e->extra_data_size = 0;
-+        e->extra_data_size = bm->extra_data_size;
-         memcpy(e + 1, bm->name, e->name_size);
- 
-         if (check_dir_entry(bs, e) < 0) {
+John Snow (10):
+  qcow2/bitmap: remove redundant arguments from bitmap_list_load
+  qcow2/bitmap: avoid adjusting bm->flags for RO bitmaps
+  qcow2/bitmap: cache bm_list
+  qcow2/bitmap: cache loaded bitmaps
+  qcow2/bitmap: reject IN_USE bitmaps on rw reload
+  qcow2/bitmap: load IN_USE bitmaps if disk is RO
+  qcow2/bitmap: track bitmap type
+  qcow2/bitmap: track extra_data_size
+  qapi: add bitmap info
+  qcow2/bitmap: add basic bitmaps info
+
+ block/qcow2-bitmap.c | 276 ++++++++++++++++++++++++++++++++++-----------------
+ block/qcow2.c        |   9 ++
+ block/qcow2.h        |   3 +
+ qapi/block-core.json |  64 +++++++++++-
+ 4 files changed, 260 insertions(+), 92 deletions(-)
+
 -- 
 2.14.3
