@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fT142-0004gS-9l
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:23:36 -0400
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fT14M-0004vA-UR
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:23:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fT13y-0006hv-8s
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:23:34 -0400
-Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:38488)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fT13y-0006gg-2X
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:23:30 -0400
-Received: from player788.ha.ovh.net (unknown [10.109.108.125])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 42C29CD832
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 10:23:27 +0200 (CEST)
-References: <20180613065707.30766-1-david@gibson.dropbear.id.au>
-	<20180613065707.30766-6-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <e872d169-10dd-55aa-a0bc-5973263925f5@kaod.org>
-Date: Wed, 13 Jun 2018 10:23:21 +0200
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fT14M-00073l-0l
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:23:54 -0400
+Received: from mail-lf0-x236.google.com ([2a00:1450:4010:c07::236]:36678)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
+	id 1fT14L-000733-PR
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:23:53 -0400
+Received: by mail-lf0-x236.google.com with SMTP id u4-v6so2572410lff.3
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 01:23:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180613065707.30766-6-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+References: <1528794804-6289-1-git-send-email-whois.zihan.yang@gmail.com>
+	<20180612163301-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180612163301-mutt-send-email-mst@kernel.org>
+From: Zihan Yang <whois.zihan.yang@gmail.com>
+Date: Wed, 13 Jun 2018 16:23:40 +0800
+Message-ID: <CAKwiv-jJbcuLgygcbSBkaZw33mnamHqa5T15gMNi2CqUNN2mkA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/7] pnv: Add cpu unrealize path
+Subject: Re: [Qemu-devel] [RFC v2 1/3] pci_expander_bridge: add type
+ TYPE_PXB_PCIE_HOST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +31,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 
-On 06/13/2018 08:57 AM, David Gibson wrote:
-> Currently we don't have any unrealize path for pnv cpu cores.  We get a=
-way
-> with this because we don't yet support cpu hotplug for pnv.
->=20
-> However, we're going to want it eventually, and in the meantime, it mak=
-es
-> it non-obvious why there are a bunch of allocations on the realize() pa=
-th
-> that don't have matching frees.
->=20
-> So, implement the missing unrealize path.
->=20
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Michael S. Tsirkin <mst@redhat.com> =E4=BA=8E2018=E5=B9=B46=E6=9C=8812=E6=
+=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=889:43=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Tue, Jun 12, 2018 at 05:13:22PM +0800, Zihan Yang wrote:
+> > The inner host bridge created by pxb-pcie is TYPE_PXB_PCI_HOST by defau=
+lt,
+> > add a new type TYPE_PXB_PCIE_HOST to better utilize the ECAM of PCIe
+> >
+> > Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
+>
+> I have a concern that there are lots of new properties
+> added here, I'm not sure how are upper layers supposed to
+> manage them all.
+>
+> E.g. bus_nr supplied in several places, domain_nr for which
+> it's not clear how it is supposed to be allocated, etc.
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Indeed they seem to double the properties, but the pxb host is
+an internal structure of pxb-pcie device, created in pxb-pcie's
+realization procedure, and acpi-build queries host bridges instead
+of pxb-pcie devices. This means that users can not directly specify
+the property of pxb host bridge, but must 'inherit' from pxb-pcie
+devices. I had thought about changing the acpi-build process,
+but that would require more modifications.
 
-Thanks,
+As for the properties, bus_nr means the start bus number
+of this host bridge. It is used when pxb-pcie is in pci domain 0
+with q35 host to avoid bus number confliction. When it is placed
+in a separate pci domain, it is not used and should be 0.
 
-C.
+max_bus means how many buses the user desires, EACH bus in
+PCIe requires 1MB configuration space, thus specifying it could
+reduce the reserved memory in MMCFG as suggested by Marcel.
+Typically, the user can specify
 
+-device pxb-pcie,id=3Dbr1,bus=3D"pcie.0",sep_domain=3Don,domain_nr=3D1,max_=
+bus=3D130
 
-> ---
->  hw/ppc/pnv_core.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
->=20
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index c9648fd1ad..c70dbbe056 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -192,6 +192,26 @@ err:
->      error_propagate(errp, local_err);
->  }
-> =20
-> +static void pnv_unrealize_vcpu(PowerPCCPU *cpu)
-> +{
-> +    qemu_unregister_reset(pnv_cpu_reset, cpu);
-> +    object_unparent(cpu->intc);
-> +    cpu_remove_sync(CPU(cpu));
-> +    object_unparent(OBJECT(cpu));
-> +}
-> +
-> +static void pnv_core_unrealize(DeviceState *dev, Error **errp)
-> +{
-> +    PnvCore *pc =3D PNV_CORE(dev);
-> +    CPUCore *cc =3D CPU_CORE(dev);
-> +    int i;
-> +
-> +    for (i =3D 0; i < cc->nr_threads; i++) {
-> +        pnv_unrealize_vcpu(pc->threads[i]);
-> +    }
-> +    g_free(pc->threads);
-> +}
-> +
->  static Property pnv_core_properties[] =3D {
->      DEFINE_PROP_UINT32("pir", PnvCore, pir, 0),
->      DEFINE_PROP_END_OF_LIST(),
-> @@ -202,6 +222,7 @@ static void pnv_core_class_init(ObjectClass *oc, vo=
-id *data)
->      DeviceClass *dc =3D DEVICE_CLASS(oc);
-> =20
->      dc->realize =3D pnv_core_realize;
-> +    dc->unrealize =3D pnv_core_unrealize;
->      dc->props =3D pnv_core_properties;
->  }
-> =20
->=20
+this will place the buses under this pxb host bridge in pci domain
+1, and reserve (130 + 1) =3D 131 buses for it. The start bus number
+is always 0 currently for simplicity.
+
+> Can the management interface be simplified?
+> Ideally we wouldn't have to teach libvirt new tricks,
+> just generalize pxb support slightly.
+
+We can delete 'sep_domain' property, I just find 'domain_nr'
+already indicates domain number. But domain_nr and
+max_bus seems unremovable, although they look 'redundant'
+because they appear twice.
+
+I'm not familiar with libvirt, but from the perspective of user,
+only 2 properties are added(domain_nr and max_bus, if we
+delete sep_domain), though the internal structure actually has
+changed.
