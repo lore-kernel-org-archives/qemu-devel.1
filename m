@@ -1,37 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fTAPE-00065K-TV
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:22:06 -0400
+	(envelope-from <mst@redhat.com>) id 1fTAPQ-0006FO-Ad
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:22:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fTAPA-00081I-Fk
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:22:04 -0400
-Received: from mail-bl2nam02on061d.outbound.protection.outlook.com
-	([2a01:111:f400:fe46::61d]:9824
-	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fTAPA-0007yh-8Z
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:22:00 -0400
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Wed, 13 Jun 2018 18:21:58 +0000
-Message-ID: <DM5PR12MB24715894687B9D55A47422A2957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
-References: <20180611205030.GW7451@localhost.localdomain>
-	<20180611211026.GA7451@localhost.localdomain>
-	<DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612174021.GL7451@localhost.localdomain>
-	<DM5PR12MB2471F6EA1525A824A9A94545957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612190554.GO7451@localhost.localdomain>
-	<39f328af-a9c1-15bb-653e-9456b045768d@amd.com>
-	<DM5PR12MB2471C966B5B16FFCACDF33F3957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180613171820.GC7451@localhost.localdomain>
-	<DM5PR12MB2471BCEE4BD9ED0549F027E0957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180613181730.GG7451@localhost.localdomain>
-In-Reply-To: <20180613181730.GG7451@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mst@redhat.com>) id 1fTAPL-0000AA-3b
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:22:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42650 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fTAPK-00008R-Vn
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:22:11 -0400
+Date: Wed, 13 Jun 2018 21:22:10 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180613211921-mutt-send-email-mst@kernel.org>
+References: <20180608205830.308627-1-mst@redhat.com>
+	<20180612145605.50f64965@redhat.com>
+	<20180612155708-mutt-send-email-mst@kernel.org>
+	<20180612155803.4ca0d137@redhat.com>
+	<20180612144922.GJ7451@localhost.localdomain>
+	<20180613105543.32e58e99@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
- AMD EPYC CPU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180613105543.32e58e99@redhat.com>
+Subject: Re: [Qemu-devel] [RFC untested PATCH] i386/cpu: make -cpu host
+ support monitor/mwait
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,74 +32,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+On Wed, Jun 13, 2018 at 10:55:43AM +0200, Igor Mammedov wrote:
+> On Tue, 12 Jun 2018 11:49:22 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> 
+> > On Tue, Jun 12, 2018 at 03:58:03PM +0200, Igor Mammedov wrote:
+> > [...]
+> > > > > > +    if (xcc->host_cpuid_required && enable_cpu_pm) {
+> > > > > > +        host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx,
+> > > > > > +                   &cpu->mwait.ecx, &cpu->mwait.edx);
+> > > > > > +    }    
+> [...]
+> > > > > also max_x86_cpu_initfn() might be better place for filling it up.  
+> > 
+> > Why?
+> I've missed 'enable_cpu_pm' which is probably a property,
+> so yep it can't go into initfn.
+> 
+> However if we not going to migrate this state or use outside of
+> cpu_x86_cpuid(), I don't see why we should add it to X86CPU state
+> and keep around.
+> We can query it on demand from cpu_x86_cpuid() like we do for
+> PMU leaf.
 
+We can do it but the annoying thing is that it spreads
+the info around as we also need to set CPUID_EXT_MONITOR.
 
-> -----Original Message-----
-> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Wednesday, June 13, 2018 1:18 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
-> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Jiri
-> Denemark <jdenemar@redhat.com>
-> Subject: Re: [PATCH v13 3/5] i386: Enable TOPOEXT feature on AMD EPYC
-> CPU
->=20
-> On Wed, Jun 13, 2018 at 06:10:30PM +0000, Moger, Babu wrote:
-> > > -----Original Message-----
-> > > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> > > Sent: Wednesday, June 13, 2018 12:18 PM
-> > > To: Moger, Babu <Babu.Moger@amd.com>
-> > > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com;
-> pbonzini@redhat.com;
-> > > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> > > kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Jiri
-> > > Denemark <jdenemar@redhat.com>
-> > > Subject: Re: [PATCH v13 3/5] i386: Enable TOPOEXT feature on AMD EPYC
-> > > CPU
-> > >
-> > > On Wed, Jun 13, 2018 at 04:52:18PM +0000, Moger, Babu wrote:
-> > > [...]
-> > > > > What do you think our options are here?
-> > > >
-> > > > Should we drop automatic topoext completely and move forward?
-> > > > What are your thoughts?
-> > >
-> > > Let's drop automatic topoext by now, and see if we find solutions
-> > > later.  I don't want to hold the rest of the patches because of
-> > > this.
-> >
-> > Ok. I will drop topoext.
-> >
-> > >
-> > > I'm thinking we could simply make kvm_arch_get_supported_cpuid()
-> > > always return TOPOEXT on AMD CPUs, because the feature flag don't
-> > > really depend on any KVM code to work (is that correct?).
-> >
-> > Yes, that is correct. I don't see any dependent code on TOPOEXT in KVM
-> driver.
-> >
-> > Ok. Let me add TOPOEXT flag for all the AMD cpus and see how it goes.
->=20
-> Hmm, this could actually solve all of our problems, then:
->=20
-> We can forget about auto-topoext: just add TOPOEXT in
-> kvm_arch_get_supported_cpuid(), add TOPOEXT unconditionally to
-> the CPU models where you are interested into (EPYC only?), and
-> add topoext=3Doff to pc-2.12 compat_props.
->=20
+This way we set all the info in one place on realize.
 
-Ok Sure.
-
-> Sorry for not noticing that before.  I was incorrectly assuming
-
-No problem.
-
-> that TOPOEXT was safe to enable only if it was returned by
-> GET_SUPPORTED_CPUID.
->=20
-> --
-> Eduardo
+-- 
+MST
