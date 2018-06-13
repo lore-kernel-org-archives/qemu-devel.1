@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fT9ZP-0003Jq-Bg
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:28:32 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fT9pF-0003LF-IS
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:44:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fT9ZO-0006Y7-F4
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:28:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57404 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fT9ZO-0006WP-AP
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:28:30 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F1D394022414
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 17:28:29 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Wed, 13 Jun 2018 19:28:15 +0200
-Message-Id: <20180613172815.32738-4-marcandre.lureau@redhat.com>
-In-Reply-To: <20180613172815.32738-1-marcandre.lureau@redhat.com>
-References: <20180613172815.32738-1-marcandre.lureau@redhat.com>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fT9pE-00075g-HG
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:44:53 -0400
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Date: Wed, 13 Jun 2018 20:44:22 +0300
+Message-Id: <1528911866-37489-5-git-send-email-anton.nefedov@virtuozzo.com>
+In-Reply-To: <1528911866-37489-1-git-send-email-anton.nefedov@virtuozzo.com>
+References: <1528911866-37489-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 3/3] Revert "bus: do not unref the added child
- bus on realize"
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 4/8] scsi: store unmap offset and nb_sectors
+ in request struct
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,34 +23,51 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com, pbonzini@redhat.com, eblake@redhat.com, berto@igalia.com, den@virtuozzo.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-This is wrong.  object_finalize_child_property()'s unref balances the
-ref in object_property_add_child().  qbus_realize's unref balances the
-ref that was initially placed by object_new/object_initialize.
+it allows to report it in the error handler
 
-This reverts commit f3d58385a6d3d82f65db602c5506e2d3d8c82394.
-
-Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- hw/core/bus.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/scsi/scsi-disk.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/hw/core/bus.c b/hw/core/bus.c
-index ad0c9df335..4651f24486 100644
---- a/hw/core/bus.c
-+++ b/hw/core/bus.c
-@@ -102,6 +102,7 @@ static void qbus_realize(BusState *bus, DeviceState *=
-parent, const char *name)
-         QLIST_INSERT_HEAD(&bus->parent->child_bus, bus, sibling);
-         bus->parent->num_child_bus++;
-         object_property_add_child(OBJECT(bus->parent), bus->name, OBJECT=
-(bus), NULL);
-+        object_unref(OBJECT(bus));
-     } else if (bus !=3D sysbus_get_default()) {
-         /* TODO: once all bus devices are qdevified,
-            only reset handler for main_system_bus should be registered h=
-ere. */
---=20
-2.18.0.rc1
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index ded23d3..b08ce8a 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -1642,8 +1642,6 @@ static void scsi_unmap_complete_noio(UnmapCBData *data, int ret)
+ {
+     SCSIDiskReq *r = data->r;
+     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
+-    uint64_t sector_num;
+-    uint32_t nb_sectors;
+ 
+     assert(r->req.aiocb == NULL);
+     if (scsi_disk_req_check_error(r, ret, false)) {
+@@ -1651,16 +1649,16 @@ static void scsi_unmap_complete_noio(UnmapCBData *data, int ret)
+     }
+ 
+     if (data->count > 0) {
+-        sector_num = ldq_be_p(&data->inbuf[0]);
+-        nb_sectors = ldl_be_p(&data->inbuf[8]) & 0xffffffffULL;
+-        if (!check_lba_range(s, sector_num, nb_sectors)) {
++        r->sector = ldq_be_p(&data->inbuf[0]);
++        r->sector_count = ldl_be_p(&data->inbuf[8]) & 0xffffffffULL;
++        if (!check_lba_range(s, r->sector, r->sector_count)) {
+             scsi_check_condition(r, SENSE_CODE(LBA_OUT_OF_RANGE));
+             goto done;
+         }
+ 
+         r->req.aiocb = blk_aio_pdiscard(s->qdev.conf.blk,
+-                                        sector_num * s->qdev.blocksize,
+-                                        nb_sectors * s->qdev.blocksize,
++                                        r->sector * s->qdev.blocksize,
++                                        r->sector_count * s->qdev.blocksize,
+                                         scsi_unmap_complete, data);
+         data->count--;
+         data->inbuf += 16;
+-- 
+2.7.4
