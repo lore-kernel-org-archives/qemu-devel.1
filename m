@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sdasgup3@illinois.edu>) id 1fSsbF-0002w1-OV
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 19:21:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fSv1s-0002A6-OX
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:56:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sdasgup3@illinois.edu>) id 1fSsbB-0001Qq-PO
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 19:21:17 -0400
-Received: from relays-agent08.techservices.illinois.edu ([204.93.2.8]:53096
-	helo=illinois.edu)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sdasgup3@illinois.edu>)
-	id 1fSsbB-0001Pk-IQ
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 19:21:13 -0400
-Received: from uex131.ad.uillinois.edu (uex131.cites.illinois.edu
-	[192.17.212.207])
-	by relays-agent08.techservices.illinois.edu (8.16.0.21/8.16.0.21) with
-	ESMTPS id w5CNLAYb017343
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:21:10 -0500
-From: Sandeep Dasgupta <sdasgup3@illinois.edu>
-Message-ID: <5aaca0bf-c8ea-26d9-20fa-985c4d19b2f7@illinois.edu>
-Date: Tue, 12 Jun 2018 18:21:09 -0500
-MIME-Version: 1.0
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Test cases for X6-64
+	(envelope-from <richard.henderson@linaro.org>) id 1fSv1p-0006CN-KU
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:56:56 -0400
+Received: from mail-pg0-x236.google.com ([2607:f8b0:400e:c05::236]:40312)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fSv1p-0006C8-DK
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:56:53 -0400
+Received: by mail-pg0-x236.google.com with SMTP id l2-v6so457681pgc.7
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:56:52 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 12 Jun 2018 15:56:23 -1000
+Message-Id: <20180613015641.5667-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v4b 00/18] target/arm: SVE instructions, part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,13 +25,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: sdasgup3@illinois.edu
+Cc: peter.maydell@linaro.org
 
-Hello Team,
-I am looking in your repository=C2=A0 for any testsuite to test the seman=
-tics=20
-for x86-64 instruction. But unfortunately did not get any success. Do=20
-you guys mind pointing me ot the right place.
+Here's the second installment of SVE instructions.
+There are about 25 patches waiting for a third installment;
+this makes a nice break before beginning with the memory ops.
 
-Regards,
-Sandeep
+Since v3, r-b tags, comment fixes, and other review feedback.
+
+
+r~
+
+
+Richard Henderson (18):
+  target/arm: Extend vec_reg_offset to larger sizes
+  target/arm: Implement SVE Permute - Unpredicated Group
+  target/arm: Implement SVE Permute - Predicates Group
+  target/arm: Implement SVE Permute - Interleaving Group
+  target/arm: Implement SVE compress active elements
+  target/arm: Implement SVE conditionally broadcast/extract element
+  target/arm: Implement SVE copy to vector (predicated)
+  target/arm: Implement SVE reverse within elements
+  target/arm: Implement SVE vector splice (predicated)
+  target/arm: Implement SVE Select Vectors Group
+  target/arm: Implement SVE Integer Compare - Vectors Group
+  target/arm: Implement SVE Integer Compare - Immediate Group
+  target/arm: Implement SVE Partition Break Group
+  target/arm: Implement SVE Predicate Count Group
+  target/arm: Implement SVE Integer Compare - Scalars Group
+  target/arm: Implement FDUP/DUP
+  target/arm: Implement SVE Integer Wide Immediate - Unpredicated Group
+  target/arm: Implement SVE Floating Point Arithmetic - Unpredicated
+    Group
+
+ target/arm/helper-sve.h    |  294 ++++++++
+ target/arm/helper.h        |   19 +
+ target/arm/translate-a64.h |   26 +-
+ target/arm/sve_helper.c    | 1250 +++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 1458 ++++++++++++++++++++++++++++++++++++
+ target/arm/vec_helper.c    |   69 ++
+ target/arm/sve.decode      |  248 ++++++
+ 7 files changed, 3355 insertions(+), 9 deletions(-)
+
+-- 
+2.17.1
