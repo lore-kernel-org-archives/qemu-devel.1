@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fT2fr-0001zl-R2
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:06:44 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fT2gn-0002kg-3n
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:07:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fT2fm-0002dl-Pu
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:06:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53412 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fT2fm-0002c4-LX
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:06:38 -0400
-References: <20180613094727.11326-1-mark.cave-ayland@ilande.co.uk>
-	<20180613094727.11326-2-mark.cave-ayland@ilande.co.uk>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <51d6368f-8a13-0daf-dcc2-78303af152ad@redhat.com>
-Date: Wed, 13 Jun 2018 12:06:20 +0200
+	(envelope-from <imammedo@redhat.com>) id 1fT2gi-0003qW-2E
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:07:41 -0400
+Date: Wed, 13 Jun 2018 12:07:33 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180613120733.1bb8ee10@redhat.com>
+In-Reply-To: <20180611121655.19616-4-david@redhat.com>
+References: <20180611121655.19616-1-david@redhat.com>
+	<20180611121655.19616-4-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180613094727.11326-2-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] hw/mips/jazz: create ESP device
- directly via qdev
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 03/11] pc: factor out pc-dimm checks
+ into pc_dimm_pre_plug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, hpoussin@reactos.org, famz@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
+	. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 13/06/2018 11:47, Mark Cave-Ayland wrote:
-> +    dev =3D qdev_create(NULL, TYPE_ESP);
-> +    sysbus_esp =3D ESP_STATE(dev);
-> +    esp =3D &sysbus_esp->esp;
-> +    esp->dma_memory_read =3D rc4030_dma_read;
-> +    esp->dma_memory_write =3D rc4030_dma_write;
-> +    esp->dma_opaque =3D dmas[0];
+On Mon, 11 Jun 2018 14:16:47 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Poking at the functions here is a bit ugly, and it's the last user of
-rc4030_dma_{read,write}.  It would be nicer if ESP could get a memory
-region like it's done a bit above for the NIC.  I guess it's not a big
-deal, but perhaps there could be a TODO comment.
+> We can perform these checks before the device is actually realized.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-I'm mostly mentioning this because Herv=C3=A9 is copied and because SPARC=
- DMA
-has the same issue of using function pointers instead of an IOMMU memory
-region...
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Thanks,
-
-Paolo
-
-> +    sysbus_esp->it_shift =3D 0;
-> +    /* XXX for now until rc4030 has been changed to use DMA enable sig=
-nal */
-> +    esp->dma_enabled =3D 1;
-> +    qdev_init_nofail(dev);
+> ---
+>  hw/i386/pc.c | 44 ++++++++++++++++++++++++++------------------
+>  1 file changed, 26 insertions(+), 18 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index f3befe6721..85c040482e 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1674,6 +1674,29 @@ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name)
+>      }
+>  }
+>  
+> +static void pc_dimm_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                             Error **errp)
+> +{
+> +    const PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+> +    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
 > +
-> +    sysbus =3D SYS_BUS_DEVICE(dev);
-> +    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in(rc4030, 5));
-> +    sysbus_mmio_map(sysbus, 0, 0x80002000);
+> +    /*
+> +     * When -no-acpi is used with Q35 machine type, no ACPI is built,
+> +     * but pcms->acpi_dev is still created. Check !acpi_enabled in
+> +     * addition to cover this case.
+> +     */
+> +    if (!pcms->acpi_dev || !acpi_enabled) {
+> +        error_setg(errp,
+> +                   "memory hotplug is not enabled: missing acpi device or acpi disabled");
+> +        return;
+> +    }
 > +
+> +    if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
+> +        error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+> +        return;
+> +    }
+> +}
+> +
+>  static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+>                           DeviceState *dev, Error **errp)
+>  {
+> @@ -1696,23 +1719,6 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+>          align = memory_region_get_alignment(mr);
+>      }
+>  
+> -    /*
+> -     * When -no-acpi is used with Q35 machine type, no ACPI is built,
+> -     * but pcms->acpi_dev is still created. Check !acpi_enabled in
+> -     * addition to cover this case.
+> -     */
+> -    if (!pcms->acpi_dev || !acpi_enabled) {
+> -        error_setg(&local_err,
+> -                   "memory hotplug is not enabled: missing acpi device or acpi disabled");
+> -        goto out;
+> -    }
+> -
+> -    if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
+> -        error_setg(&local_err,
+> -                   "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+> -        goto out;
+> -    }
+> -
+>      pc_dimm_memory_plug(dev, MACHINE(pcms), align, &local_err);
+>      if (local_err) {
+>          goto out;
+> @@ -2006,7 +2012,9 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+>                                            DeviceState *dev, Error **errp)
+>  {
+> -    if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> +        pc_dimm_pre_plug(hotplug_dev, dev, errp);
+> +    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          pc_cpu_pre_plug(hotplug_dev, dev, errp);
+>      }
+>  }
