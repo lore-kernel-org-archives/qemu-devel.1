@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fT5SN-0001d4-0G
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:05:02 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fT5UG-0003Br-1t
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:06:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fT5SH-0005a0-JP
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:04:58 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:38598)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fT5SH-0005Wj-8K
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:04:53 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id 69-v6so5264145wmf.3
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 06:04:53 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 13 Jun 2018 13:55:52 +0100
-Message-Id: <20180613125601.14371-14-alex.bennee@linaro.org>
-In-Reply-To: <20180613125601.14371-1-alex.bennee@linaro.org>
-References: <20180613125601.14371-1-alex.bennee@linaro.org>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fT5UC-0001hQ-Pu
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:06:56 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:60416
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1fT5UC-0001eC-Ib
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:06:52 -0400
+References: <20180613094727.11326-1-mark.cave-ayland@ilande.co.uk>
+	<20180613094727.11326-2-mark.cave-ayland@ilande.co.uk>
+	<51d6368f-8a13-0daf-dcc2-78303af152ad@redhat.com>
+	<2b146796-ade4-ec2c-34a9-6d6532d94175@ilande.co.uk>
+	<4a2d3eca-95d0-c1ca-4769-7a06115cc2e5@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <6515c082-3904-e077-144d-d1f3f9fd7ee1@ilande.co.uk>
+Date: Wed, 13 Jun 2018 14:06:44 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH v3 13/22] risu: move optional args to each
- architecture
+In-Reply-To: <4a2d3eca-95d0-c1ca-4769-7a06115cc2e5@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/mips/jazz: create ESP device
+ directly via qdev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,182 +34,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, hpoussin@reactos.org, famz@redhat.com
 
-The key variables here are: *arch_long_opts and *arch_extra_help. If
-they are not NULL then we concatenate the extra options to appropriate
-structure to enable the support. Adding architecture short options is
-not supported.
+On 13/06/18 12:19, Paolo Bonzini wrote:
 
-This also includes moving the ARM specific test_fp_exc/test-fp-exc
-into ARM specific code.
+> On 13/06/2018 12:36, Mark Cave-Ayland wrote:
+>> Check out hw/dma/sparc32_dma.c for some ugly examples:
+>> espdma_memory_read()/espdma_memory_write() update the DMA address
+>> pointer register after each read/write, and
+>> ledma_memory_read()/ledma_memory_write() need to determine if the pcnet
+>> card has byte-swapping enabled: if so, then don't perform the required
+>> lance 16-bit swap and if not, do perform the 16-bit swap.
+> 
+> Heh, those are disgusting indeed. :)  So I guess it would have to stay,
+> only MIPS can use the pure MemoryRegion-based approach.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+The only option I can think of is inserting an AddressSpace between the 
+esp/ledma device and the IOMMU AddressSpace which intercepts the DMA 
+request (addr, len, direction).
 
----
-v2
-  - better concatenation of default and extra opts
----
- risu.c                 | 29 +++++++++++++++++++++++++----
- risu.h                 |  6 ++++--
- risu_reginfo_aarch64.c |  3 +++
- risu_reginfo_arm.c     | 11 +++++++++++
- risu_reginfo_m68k.c    |  3 +++
- risu_reginfo_ppc64.c   |  3 +++
- 6 files changed, 49 insertions(+), 6 deletions(-)
+I can then grab a reference to the device from the MemoryRegion opaque, 
+perform the magic, and then manually invoke address_space_rw() on iommu_as.
 
-diff --git a/risu.c b/risu.c
-index c684c90..18de351 100644
---- a/risu.c
-+++ b/risu.c
-@@ -46,8 +46,7 @@ gzFile gz_trace_file;
- 
- sigjmp_buf jmpbuf;
- 
--/* Should we test for FP exception status bits? */
--int test_fp_exc;
-+#define ARRAY_SIZE(x)	(sizeof(x) / sizeof((x)[0]))
- 
- /* Master functions */
- 
-@@ -283,6 +282,9 @@ void usage(void)
-     fprintf(stderr,
-             "  -p, --port=PORT   Specify the port to connect to/listen on "
-             "(default 9191)\n");
-+    if (arch_extra_help) {
-+        fprintf(stderr, "%s", arch_extra_help);
-+    }
- }
- 
- struct option * setup_options(char **short_opts)
-@@ -293,12 +295,31 @@ struct option * setup_options(char **short_opts)
-         {"host", required_argument, 0, 'h'},
-         {"port", required_argument, 0, 'p'},
-         {"trace", required_argument, 0, 't'},
--        {"test-fp-exc", no_argument, &test_fp_exc, 1},
-         {0, 0, 0, 0}
-     };
-+    struct option *lopts = &default_longopts[0];
- 
-     *short_opts = "h:p:t:";
--    return default_longopts;
-+
-+    if (arch_long_opts) {
-+        const size_t osize = sizeof(struct option);
-+        const int default_count = ARRAY_SIZE(default_longopts);
-+        struct option *dptr;
-+        int extra_count = 0;
-+
-+        /* count additional opts */
-+        dptr = arch_long_opts;
-+        do {} while (dptr[extra_count++].name);
-+
-+        lopts = calloc(default_count + extra_count, osize);
-+
-+        /* Copy default opts + extra opts */
-+        memcpy(lopts, default_longopts, default_count * osize);
-+        dptr = &lopts[default_count - 1];
-+        memcpy(dptr, arch_long_opts, extra_count * osize);
-+    }
-+
-+    return lopts;
- }
- 
- int main(int argc, char **argv)
-diff --git a/risu.h b/risu.h
-index 1c8ecee..89811f4 100644
---- a/risu.h
-+++ b/risu.h
-@@ -17,6 +17,10 @@
- #include <ucontext.h>
- #include <stdio.h>
- 
-+/* Extra option processing for architectures */
-+extern void *arch_long_opts;
-+extern char *arch_extra_help;
-+
- /* GCC computed include to pull in the correct risu_reginfo_*.h for
-  * the architecture.
-  */
-@@ -36,8 +40,6 @@ void send_response_byte(int sock, int resp);
- extern uintptr_t image_start_address;
- extern void *memblock;
- 
--extern int test_fp_exc;
--
- /* Ops code under test can request from risu: */
- #define OP_COMPARE 0
- #define OP_TESTEND 1
-diff --git a/risu_reginfo_aarch64.c b/risu_reginfo_aarch64.c
-index 3bb4339..ab12270 100644
---- a/risu_reginfo_aarch64.c
-+++ b/risu_reginfo_aarch64.c
-@@ -18,6 +18,9 @@
- #include "risu.h"
- #include "risu_reginfo_aarch64.h"
- 
-+void *arch_long_opts;
-+char *arch_extra_help;
-+
- /* reginfo_init: initialize with a ucontext */
- void reginfo_init(struct reginfo *ri, ucontext_t *uc)
- {
-diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
-index 6b9ee7b..5acad02 100644
---- a/risu_reginfo_arm.c
-+++ b/risu_reginfo_arm.c
-@@ -13,12 +13,23 @@
- #include <stdio.h>
- #include <ucontext.h>
- #include <string.h>
-+#include <getopt.h>
- 
- #include "risu.h"
- #include "risu_reginfo_arm.h"
- 
- extern int insnsize(ucontext_t *uc);
- 
-+/* Should we test for FP exception status bits? */
-+static int test_fp_exc;
-+static struct option extra_opts[] = {
-+    {"test-fp-exc", no_argument, &test_fp_exc, 1},
-+    {0, 0, 0, 0}
-+};
-+
-+void *arch_long_opts = &extra_opts[0];
-+char *arch_extra_help = "  --test-fp-exc     Check FP exception bits when comparing\n";
-+
- static void reginfo_init_vfp(struct reginfo *ri, ucontext_t *uc)
- {
-     /* Read VFP registers. These live in uc->uc_regspace, which is
-diff --git a/risu_reginfo_m68k.c b/risu_reginfo_m68k.c
-index 4ff0aa8..d429502 100644
---- a/risu_reginfo_m68k.c
-+++ b/risu_reginfo_m68k.c
-@@ -14,6 +14,9 @@
- #include "risu.h"
- #include "risu_reginfo_m68k.h"
- 
-+void *arch_long_opts;
-+char *arch_extra_help;
-+
- /* reginfo_init: initialize with a ucontext */
- void reginfo_init(struct reginfo *ri, ucontext_t *uc)
- {
-diff --git a/risu_reginfo_ppc64.c b/risu_reginfo_ppc64.c
-index 5f33648..395111c 100644
---- a/risu_reginfo_ppc64.c
-+++ b/risu_reginfo_ppc64.c
-@@ -22,6 +22,9 @@
- #define XER 37
- #define CCR 38
- 
-+void *arch_long_opts;
-+char *arch_extra_help;
-+
- /* reginfo_init: initialize with a ucontext */
- void reginfo_init(struct reginfo *ri, ucontext_t *uc)
- {
--- 
-2.17.1
+Is there a hook somewhere in the memory API that could allow me to do this?
+
+> Regarding pcnet, is CSR_BSWP really a no-op on PCI cards?  If not, an
+> option could be to move that handling to pcnet.c - making the ledma swap
+> unconditional and removing the do_bswap argument.  The disadvantage is
+> that SPARC would swap twice, and you'd have to keep the callback because
+> of s->dmaregs[3], but maybe it's still worthwhile.
+
+Hmmm good question. If we can intercept the request above, that would be 
+my preferred option as something tells it me it might be useful for 
+other similar situations.
+
+
+ATB,
+
+Mark.
