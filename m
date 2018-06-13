@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fT9Ph-0006u1-0J
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:18:29 -0400
+	(envelope-from <amade@asmblr.net>) id 1fT9WT-0001AI-93
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:25:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fT9Pd-00068q-PE
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:18:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42198)
+	(envelope-from <amade@asmblr.net>) id 1fT9WO-0005LX-1K
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:25:29 -0400
+Received: from srv2.anyservers.com ([77.79.239.202]:46046)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fT9Pd-000669-Hu
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:18:25 -0400
-Date: Wed, 13 Jun 2018 14:18:20 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180613171820.GC7451@localhost.localdomain>
-References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
-	<1528498581-131037-4-git-send-email-babu.moger@amd.com>
-	<20180611205030.GW7451@localhost.localdomain>
-	<20180611211026.GA7451@localhost.localdomain>
-	<DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612174021.GL7451@localhost.localdomain>
-	<DM5PR12MB2471F6EA1525A824A9A94545957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612190554.GO7451@localhost.localdomain>
-	<39f328af-a9c1-15bb-653e-9456b045768d@amd.com>
-	<DM5PR12MB2471C966B5B16FFCACDF33F3957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	(Exim 4.71) (envelope-from <amade@asmblr.net>) id 1fT9WN-0005Ej-Oz
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:25:23 -0400
+From: =?UTF-8?q?Amadeusz=20S=C5=82awi=C5=84ski?= <amade@asmblr.net>
+Date: Wed, 13 Jun 2018 19:27:07 +0200
+Message-Id: <20180613172707.31530-1-amade@asmblr.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM5PR12MB2471C966B5B16FFCACDF33F3957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
- AMD EPYC CPU
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] sdl2: restore window dimensions by resize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,23 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Moger, Babu" <Babu.Moger@amd.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Amadeusz=20S=C5=82awi=C5=84ski?= <amade@asmblr.net>
 
-On Wed, Jun 13, 2018 at 04:52:18PM +0000, Moger, Babu wrote:
-[...]
-> > What do you think our options are here?
-> 
-> Should we drop automatic topoext completely and move forward?
-> What are your thoughts?
+instead of destroying and recreating window, fixes segfault caused by
+handle_keyup trying to access no more existing window when using
+Ctrl-Alt-U to restore window "un-scaled" dimensions
 
-Let's drop automatic topoext by now, and see if we find solutions
-later.  I don't want to hold the rest of the patches because of
-this.
+ Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
+ [Switching to Thread 0x7ffff7f92b80 (LWP 3711)]
+ handle_keyup (ev=0x7fffffffd010) at ui/sdl2.c:416
+ 416         scon->ignore_hotkeys = false;
+ (gdb) bt
+ #0  handle_keyup (ev=0x7fffffffd010) at ui/sdl2.c:416
+ #1  sdl2_poll_events (scon=0x100fee5a8) at ui/sdl2.c:608
+ #2  0x0000000100585bf2 in dpy_refresh (s=0x101ad3e00) at ui/console.c:1658
+ #3  gui_update (opaque=0x101ad3e00) at ui/console.c:205
+ #4  0x0000000100690f2c in timerlist_run_timers (timer_list=0x100ede130) at util/qemu-timer.c:536
+ #5  0x0000000100691177 in qemu_clock_run_timers (type=QEMU_CLOCK_REALTIME) at util/qemu-timer.c:547
+ #6  qemu_clock_run_all_timers () at util/qemu-timer.c:674
+ #7  0x0000000100691651 in main_loop_wait (nonblocking=<optimized out>) at util/main-loop.c:503
+ #8  0x00000001003d650f in main_loop () at vl.c:1848
+ #9  0x0000000100289681 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4605
 
-I'm thinking we could simply make kvm_arch_get_supported_cpuid()
-always return TOPOEXT on AMD CPUs, because the feature flag don't
-really depend on any KVM code to work (is that correct?).
+Signed-off-by: Amadeusz Sławiński <amade@asmblr.net>
+---
+ ui/sdl2.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index a0f9b16bc1..3ae4719c32 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -371,8 +371,7 @@ static void handle_keydown(SDL_Event *ev)
+             }
+             break;
+         case SDL_SCANCODE_U:
+-            sdl2_window_destroy(scon);
+-            sdl2_window_create(scon);
++            sdl2_window_resize(scon);
+             if (!scon->opengl) {
+                 /* re-create scon->texture */
+                 sdl2_2d_switch(&scon->dcl, scon->surface);
 -- 
-Eduardo
+2.17.1
