@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fT6vX-00073y-9l
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:39:12 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fT6vp-0007EY-Us
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:39:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fT6vT-0001Ro-Vm
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:39:11 -0400
-Date: Wed, 13 Jun 2018 15:38:56 +0100
+	(envelope-from <stefanha@redhat.com>) id 1fT6vo-0002Ew-Vn
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:39:29 -0400
+Date: Wed, 13 Jun 2018 15:39:19 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180613143856.GY24528@stefanha-x1.localdomain>
+Message-ID: <20180613143919.GZ24528@stefanha-x1.localdomain>
 References: <20180601144328.23817-1-peter.maydell@linaro.org>
-	<20180601144328.23817-2-peter.maydell@linaro.org>
+	<20180601144328.23817-3-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="lYVfafuUkPqz/tKz"
+	protocol="application/pgp-signature"; boundary="H7BIH7T1fRJ3RGOi"
 Content-Disposition: inline
-In-Reply-To: <20180601144328.23817-2-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 1/2] stellaris: Stop using armv7m_init()
+In-Reply-To: <20180601144328.23817-3-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/arm/armv7m: Remove unused
+ armv7m_init() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +29,48 @@ To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Julia Suvorova <jusual@mail.ru>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>
 
 
---lYVfafuUkPqz/tKz
+--H7BIH7T1fRJ3RGOi
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 01, 2018 at 03:43:27PM +0100, Peter Maydell wrote:
-> The stellaris board is still using the legacy armv7m_init() function,
-> which predates conversion of the ARMv7M into a proper QOM container
-> object. Make the board code directly create the ARMv7M object instead.
+On Fri, Jun 01, 2018 at 03:43:28PM +0100, Peter Maydell wrote:
+> Remove the now-unused armv7m_init() function. This was a legacy from
+> before we properly QOMified ARMv7M, and it has some flaws:
+>=20
+>  * it combines work that needs to be done by an SoC object (creating
+>    and initializing the TYPE_ARMV7M object) with work that needs to
+>    be done by the board model (setting the system up to load the ELF
+>    file specified with -kernel)
+>  * TYPE_ARMV7M creation failure is fatal, but an SoC object wants to
+>    arrange to propagate the failure outward
+>  * it uses allocate-and-create via qdev_create() whereas the current
+>    preferred style for SoC objects is to do creation in-place
+>=20
+> Board and SoC models can instead do the two jobs this function
+> was doing themselves, in the right places and with whatever their
+> preferred style/error handling is.
 >=20
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/arm/stellaris.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
+>  include/hw/arm/arm.h |  8 ++------
+>  hw/arm/armv7m.c      | 21 ---------------------
+>  2 files changed, 2 insertions(+), 27 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---lYVfafuUkPqz/tKz
+--H7BIH7T1fRJ3RGOi
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJbISyAAAoJEJykq7OBq3PIC/YIAMlH038PrZW0uS7wt54qFRO8
-nKuVI7KZD+IJpd7hzSBB5/DBFGSUQAYDCkX/npgb7pjBakV9dDLNqQiik1ft7RCR
-ZisTHOJdW8brAPT54WUTm7DRbsznDnRoZy2WdABSzAkM+Loz+nOr47r3lJdXiLr0
-WJWvWpj5/StzobkZJTngkLJv725+A2Ncy3bhokQPRks3smO9MG1j78tgxTqA1Zrm
-Fkexnje62vv0cgP1PRwaieyV3h9lT2a4JRoYVbtWgxyU80BO8/p6ZOuk8XWJepfa
-Y4koRvGQYDjsoCCeo1uRuom0ebLIcrZuFV33bX1LaQcYsNFzpo2E3WIqNjufjjA=
-=+alR
+iQEcBAEBAgAGBQJbISyXAAoJEJykq7OBq3PIOs0IAKAH2H2D5E5P5jGpKM7t0Fb8
+H7ohNN/GM1Xeyzny2FqaGZQTEsktHTpF52YwryqazQO2oZdjw/FuEMfsHaTQEgtb
+6F3XnC4Hbrw1CaRrv1wlUlMmVxlJqcuWaeal9dbVr++X7son3l3itn7oGOMpQQwT
+yPFGwHRaxLaVtxEYXW02avXgj+Q64DXWNqN75Mckn4wYfGk73R1TWUVB955+K2zl
+lmc5M5pyWybeBNbRdF9o6FU7oykPU2iFveRZrqTzU5aoWesob55Hxt4z7HqBhGOn
+o1wGjkIghJDBsKnSbkPvbekxQ4cSUuiq7gWi2wPpl2Mrsf8rMlVGJqG93XUVOXE=
+=3dWH
 -----END PGP SIGNATURE-----
 
---lYVfafuUkPqz/tKz--
+--H7BIH7T1fRJ3RGOi--
