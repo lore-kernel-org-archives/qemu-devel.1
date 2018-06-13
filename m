@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fT5KC-0002xe-Ua
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:56:38 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fT5Qx-0000Hc-Vi
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:03:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fT5K8-0005i9-Us
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:56:32 -0400
-Date: Wed, 13 Jun 2018 14:56:24 +0200
+	(envelope-from <imammedo@redhat.com>) id 1fT5Qu-0002Wm-OC
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 09:03:32 -0400
+Date: Wed, 13 Jun 2018 15:03:20 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180613145624.3004935c@redhat.com>
-In-Reply-To: <20180611121655.19616-7-david@redhat.com>
+Message-ID: <20180613150320.3d6d11ca@redhat.com>
+In-Reply-To: <20180611121655.19616-8-david@redhat.com>
 References: <20180611121655.19616-1-david@redhat.com>
-	<20180611121655.19616-7-david@redhat.com>
+	<20180611121655.19616-8-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 06/11] pc-dimm: don't allow to access
- "size" before the device was realized
+Subject: Re: [Qemu-devel] [PATCH v1 07/11] pc-dimm: get_memory_region() can
+ never fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +28,190 @@ To: David Hildenbrand <david@redhat.com>
 Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
 	. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On Mon, 11 Jun 2018 14:16:50 +0200
+On Mon, 11 Jun 2018 14:16:51 +0200
 David Hildenbrand <david@redhat.com> wrote:
 
-> "size" should not be queried before the device was realized. Let' make
-> that explicit.
+> We already verify when realizing that the memdev property has been
+> set. We have no more accesses to get_memory_region() before the device
+> is realized.
+this stems from assumption that get_memory_region shouldn't be called
+before devices realize is executed, which I don't agree to begin with.
+
+However wrt error handling, we should probably leave device internal error
+up to devices and make check for error only in pre_plug handler
+(since pre_plug was successful, the rest machine helpers would have
+access to the same region until device is removed.
+
+
+> So this function will never fail. Remove the stale check and the
+> error variable. Add a comment to the functions stating that they should
+> never be called on uninitialized devices.
 > 
 > Signed-off-by: David Hildenbrand <david@redhat.com>
-It's generic property getter, it should work even before realize is called.
-
-if issues described in 5/11 are properly fixed, this patch won't be needed.
-
-So drop this patch
-
-
 > ---
->  hw/mem/pc-dimm.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  hw/i386/pc.c             |  7 +------
+>  hw/mem/nvdimm.c          |  2 +-
+>  hw/mem/pc-dimm.c         | 21 ++++++---------------
+>  hw/ppc/spapr.c           | 14 +++-----------
+>  include/hw/mem/pc-dimm.h |  4 +++-
+>  5 files changed, 14 insertions(+), 34 deletions(-)
 > 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 85c040482e..017396fe84 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1706,15 +1706,10 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+>      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+> -    MemoryRegion *mr;
+> +    MemoryRegion *mr = ddc->get_memory_region(dimm);
+>      uint64_t align = TARGET_PAGE_SIZE;
+>      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>  
+> -    mr = ddc->get_memory_region(dimm, &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+> -
+>      if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
+>          align = memory_region_get_alignment(mr);
+>      }
+> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+> index df9716231f..b2dc2bbb50 100644
+> --- a/hw/mem/nvdimm.c
+> +++ b/hw/mem/nvdimm.c
+> @@ -96,7 +96,7 @@ static void nvdimm_init(Object *obj)
+>                               nvdimm_get_unarmed, nvdimm_set_unarmed, NULL);
+>  }
+>  
+> -static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+> +static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm)
+>  {
+>      NVDIMMDevice *nvdimm = NVDIMM(dimm);
+>  
 > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 86fbcf2d0c..5294734529 100644
+> index 5294734529..7bb6ce509c 100644
 > --- a/hw/mem/pc-dimm.c
 > +++ b/hw/mem/pc-dimm.c
-> @@ -166,6 +166,12 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
->      PCDIMMDevice *dimm = PC_DIMM(obj);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(obj);
+> @@ -35,14 +35,9 @@ void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+>      MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
+>      Error *local_err = NULL;
+> -    MemoryRegion *mr;
+> +    MemoryRegion *mr = ddc->get_memory_region(dimm);
+>      uint64_t addr;
 >  
-> +    if (!DEVICE(obj)->realized) {
-> +        error_setg(errp, "Property \"%s\" not accessible before realized",
-> +                   name);
-> +        return;
-> +    }
-> +
->      mr = ddc->get_memory_region(dimm, errp);
+> -    mr = ddc->get_memory_region(dimm, &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+> -
+>      addr = object_property_get_uint(OBJECT(dimm),
+>                                      PC_DIMM_ADDR_PROP, &local_err);
+>      if (local_err) {
+> @@ -89,7 +84,7 @@ void pc_dimm_memory_unplug(DeviceState *dev, MachineState *machine)
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+>      MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
+> -    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+> +    MemoryRegion *mr = ddc->get_memory_region(dimm);
+>  
+>      memory_device_unplug_region(machine, mr);
+>      vmstate_unregister_ram(vmstate_mr, dev);
+> @@ -172,7 +167,7 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
+>          return;
+>      }
+>  
+> -    mr = ddc->get_memory_region(dimm, errp);
+> +    mr = ddc->get_memory_region(dimm);
 >      if (!mr) {
 >          return;
+>      }
+> @@ -223,13 +218,9 @@ static void pc_dimm_unrealize(DeviceState *dev, Error **errp)
+>      host_memory_backend_set_mapped(dimm->hostmem, false);
+>  }
+>  
+> -static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+> +static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm)
+>  {
+> -    if (!dimm->hostmem) {
+> -        error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property must be set");
+> -        return NULL;
+> -    }
+> -
+> +    g_assert(dimm->hostmem);
+>      return host_memory_backend_get_memory(dimm->hostmem);
+>  }
+>  
+> @@ -252,7 +243,7 @@ static uint64_t pc_dimm_md_get_region_size(const MemoryDeviceState *md)
+>      const PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(md);
+>      MemoryRegion *mr;
+>  
+> -    mr = ddc->get_memory_region(dimm, &error_abort);
+> +    mr = ddc->get_memory_region(dimm);
+>      if (!mr) {
+>          return 0;
+>      }
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index a5f1bbd58a..214286fd2f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3142,14 +3142,10 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      sPAPRMachineState *ms = SPAPR_MACHINE(hotplug_dev);
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+> -    MemoryRegion *mr;
+> +    MemoryRegion *mr = ddc->get_memory_region(dimm);
+>      uint64_t align, size, addr;
+>      uint32_t node;
+>  
+> -    mr = ddc->get_memory_region(dimm, &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+>      align = memory_region_get_alignment(mr);
+>      size = memory_region_size(mr);
+>  
+> @@ -3263,7 +3259,7 @@ static sPAPRDIMMState *spapr_recover_pending_dimm_state(sPAPRMachineState *ms,
+>  {
+>      sPAPRDRConnector *drc;
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+> -    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+> +    MemoryRegion *mr = ddc->get_memory_region(dimm);
+>      uint64_t size = memory_region_size(mr);
+>      uint32_t nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
+>      uint32_t avail_lmbs = 0;
+> @@ -3331,16 +3327,12 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
+>      Error *local_err = NULL;
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+> -    MemoryRegion *mr;
+> +    MemoryRegion *mr = ddc->get_memory_region(dimm);
+>      uint32_t nr_lmbs;
+>      uint64_t size, addr_start, addr;
+>      int i;
+>      sPAPRDRConnector *drc;
+>  
+> -    mr = ddc->get_memory_region(dimm, &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+>      size = memory_region_size(mr);
+>      nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
+>  
+> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+> index 627c8601d9..f0e6867803 100644
+> --- a/include/hw/mem/pc-dimm.h
+> +++ b/include/hw/mem/pc-dimm.h
+> @@ -72,7 +72,9 @@ typedef struct PCDIMMDeviceClass {
+>  
+>      /* public */
+>      void (*realize)(PCDIMMDevice *dimm, Error **errp);
+> -    MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm, Error **errp);
+> +
+> +    /* functions should not be called before the device was realized */
+> +    MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm);
+>      MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
+>  } PCDIMMDeviceClass;
+>  
