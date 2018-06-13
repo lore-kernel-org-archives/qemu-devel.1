@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fT4WY-0004D2-Uw
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:05:17 -0400
+	(envelope-from <brogers@suse.com>) id 1fT4ee-0006ES-U2
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:13:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fT4WU-000071-By
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:05:14 -0400
-Date: Wed, 13 Jun 2018 22:05:02 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180613120502.GO30690@umbus.fritz.box>
-References: <152882087494.112322.15549780953419438229.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<152882305541.114463.3137854902721347235.stgit@bahia.lan>
-	<20180613004506.GM30690@umbus.fritz.box>
-	<20180613101915.4cc9485b@bahia.lab.toulouse-stg.fr.ibm.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tbBCmy51UvWhYeBI"
+	(envelope-from <brogers@suse.com>) id 1fT4ed-0004r7-OI
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:13:36 -0400
+Message-Id: <5B210A66020000480007D5B8@prv-mh.provo.novell.com>
+Date: Wed, 13 Jun 2018 06:13:26 -0600
+From: "Bruce Rogers" <brogers@suse.com>
+References: <20180612235103.12633-1-brogers@suse.com>
+	<20180612235103.12633-2-brogers@suse.com>
+	<20180613114602.GC2165@perard.uk.xensource.com>
+In-Reply-To: <20180613114602.GC2165@perard.uk.xensource.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <20180613101915.4cc9485b@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] target/ppc: filter out non-zero PCR
- values when using TCG
+Subject: Re: [Qemu-devel] [PATCH 1/2] xen: add xen disk naming for use in
+ monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,100 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: anthony.perard@citrix.com
+Cc: sstabellini@kernel.org, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, qemu-devel@nongnu.org, armbru@redhat.com, Kevin Wolf <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>
 
-
---tbBCmy51UvWhYeBI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jun 13, 2018 at 10:19:15AM +0200, Greg Kurz wrote:
-> On Wed, 13 Jun 2018 10:45:06 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+>>> On 6/13/2018 at 5:46 AM, Anthony PERARD <anthony.perard@citrix.com> =
+wrote:
+> On Tue, Jun 12, 2018 at 05:51:02PM =E2=80=910600, Bruce Rogers wrote:
+>> Provide monitor naming of xen disks, including associating an
+>> attached dev_id for a BlockBackend which has legacy_dev set.
+>> Currently, only xen disks have legacy_dev set to true.
+>>=20
+>> Signed=E2=80=91off=E2=80=91by: Bruce Rogers <brogers@suse.com>
+>> =E2=80=91=E2=80=91=E2=80=91
+>>  block/block=E2=80=91backend.c |  5 ++++=E2=80=91
+>>  hw/block/xen_disk.c   | 15 +++++++++++++++
+>>  include/hw/xen/xen.h  |  2 ++
+>>  stubs/xen=E2=80=91common.c    |  5 +++++
+>>  4 files changed, 26 insertions(+), 1 deletion(=E2=80=91)
+>>=20
+>> diff =E2=80=91=E2=80=91git a/block/block=E2=80=91backend.c b/block/block=
+=E2=80=91backend.c
+>> index d55c328736..db39dfe867 100644
+>> =E2=80=91=E2=80=91=E2=80=91 a/block/block=E2=80=91backend.c
+>> +++ b/block/block=E2=80=91backend.c
+>> @@ =E2=80=9123,6 +23,7 @@
+>>  #include "qemu/option.h"
+>>  #include "trace.h"
+>>  #include "migration/misc.h"
+>> +#include "hw/xen/xen.h"
+>> =20
+>>  /* Number of coroutines to reserve per attached device model */
+>>  #define COROUTINE_POOL_RESERVATION 64
+>> @@ =E2=80=91895,7 +896,9 @@ char *blk_get_attached_dev_id(BlockBackend =
+*blk)
+>>  {
+>>      DeviceState *dev;
+>> =20
+>> =E2=80=91    assert(!blk=E2=80=91>legacy_dev);
+>> +    if (blk=E2=80=91>legacy_dev) {
+>> +        return xen_blk_get_attached_dev_id(blk=E2=80=91>dev);
+>> +    }
+>>      dev =3D blk=E2=80=91>dev;
+>> =20
+>>      if (!dev) {
 >=20
-> > On Tue, Jun 12, 2018 at 07:04:15PM +0200, Greg Kurz wrote:
-> > > Bits set in the PCR disable features of the processor. TCG currently
-> > > doesn't implement that, ie, we always act like if PCR is all zeros.
-> > >=20
-> > > But it is still possible for the PCR to have a non-null value. This m=
-ay
-> > > confuse the guest.
-> > >=20
-> > > There are three distinct cases:
-> > >=20
-> > > 1) a powernv guest doing mtspr SPR_PCR
-> > >=20
-> > > 2) reset of a pseries guest if the max-cpu-compat machine property is=
- set
-> > >=20
-> > > 3) CAS of a pseries guest
-> > >=20
-> > > This patch adds a ppc_store_pcr() helper that ensures we cannot put
-> > > a non-null value in the PCR when using TCG. This helper also has
-> > > error propagation support, so that each case listed above can be
-> > > handled appropriately:
-> > >=20
-> > > 1) since the powernv machine is mostly used for OpenPOWER FW devel,
-> > >    we just print an error and let QEMU continue execution
-> > >=20
-> > > 2) an error is printed and QEMU exits, ie, same behaviour as when
-> > >    KVM doesn't support the requested compat mode
-> > >=20
-> > > 3) an error is printed and QEMU reports H_HARDWARE to the guest
-> > >=20
-> > > Signed-off-by: Greg Kurz <groug@kaod.org> =20
-> >=20
-> > I'm not really convinced this is a good idea.  Printing a (non fatal)
-> > error if the guest attempts to write a non-zero value to the PCR
-> > should be ok.  However, you're generating a fatal error if the machine
-> > tries to set the PCR in TCG mode.  That could easily happen using,
-> > e.g. the cap-htm flag on a TCG guest.  That would take TCG from mostly
-> > working, to refusing to run at all.
-> >=20
+> Hi Bruce,
 >=20
-> I'm confused... I don't see anything related to HTM in TCG. Also we have
-> the following in cap_htm_apply():
+> Thanks for your patches!
 >=20
->     if (tcg_enabled()) {
->         error_setg(errp,
->                    "No Transactional Memory support in TCG, try cap-htm=
-=3Doff");
->=20
-> I'm probably missing something... can you enlighten me ?
+> But I don't think that the right way to go. We probably needs to
+> qdevifie xen_disk instead. This is point out by the numerous TODO about
+> "qdevified", and this very old mail:
+> https://lists.nongnu.org/archive/html/qemu=E2=80=91devel/2016=E2=80=9109/=
+msg07902.html=20
 
-Ok, so right now when cap-htm=3Doff we don't actually enforce that, we
-just don't advertise it to the guest.  We probably _should_ enforce
-that, and the way we'd do it is to set the appropriate bit in the
-PCR.  That'll do the right thing for KVM (well, once we update KVM to
-actually pass on the PCR value) but would break TCG in conjunction
-with your patch above.
+Understood. These patches come from an effort to provide this functionality=
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+to older qemu releases that SUSE supports. I didn't try to work on a =
+qdevify type
+solution, as I figured if the block experts hadn't done that yet, I would =
+probably
+not be too successful myself.
+>From what I can see, the xen support in qemu is not well integrated in =
+general,
+so my patches here are implemented in that "spirit" - not elegant, but =
+getting the
+job done. I'd certainly rather see good integration of the xen model into =
+qemu,
+and if that is the right way forward to get this type of functionality, =
+I'd be happy
+with that approach as well.
 
---tbBCmy51UvWhYeBI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlshCG0ACgkQbDjKyiDZ
-s5J3GRAA4Orwrt6a7ICCeuOii1QOHwPqnQPupuCYNUx/ENSKpMuZTsYtGzJZ43V3
-EPzCM6VywiPIWsDEx89d9bim5C20No9IgMvuoMsBxAM29f5++O/BrPEJJbWLuuCr
-RMYSIMLWFEjSXUWzMd/gqI90BtugFZkyTuaf6lftv5PpAGW5ToFc4H/LX1n2YdLP
-tOstJUlB8r1tilJ7C/5EPVXLI5i2CxRa0MVX4OPByqucN/w2YrXUggvrdlqpevHF
-SEVR5+9zXpR5jDjylp0E+R6rBk+7tDEEFLJDkpynryzSUi+Uk+Oy4tEzrE/D3fEy
-sLndiX45x2YjYhvlpsXFmTZUh5jeo1gSZh4Mf69iKC2u7VaVL1qFEBQetethCF8K
-eyrFYUKENCMHdzW7+9M9bA1bzd+PlCepfqxxAxYkzQUWiV5msLSsoduOhHSpozQx
-CocF8VVBjUKktlIsg0/9mYRQer4IXa4dbkv7ym0iC6E4qEWBfr1tkTFH9pbjo22Z
-FESQ+UZWluqzvfc070sI/s0a/KeESTIgpy8RhwBj2cp5JNt+W7C2EyoOqODNHTC3
-ZowZ3UXd4a0BLpHG/JuDTDVgP3qOn+g590PzJ5Ob0YzNcsDyBwaL4s4ohMVCW/8/
-d61wuI6fplrRJBoPS8WYPpc6Agdx3jVxXu0AeT6/5UJsKYKagXE=
-=EHBf
------END PGP SIGNATURE-----
-
---tbBCmy51UvWhYeBI--
+Bruce
