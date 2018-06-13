@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sridhar.samudrala@intel.com>) id 1fStWh-00006e-5k
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:20:40 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1fStdq-0001w4-5h
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:28:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sridhar.samudrala@intel.com>) id 1fStWd-0002cg-RI
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:20:39 -0400
-Received: from mga02.intel.com ([134.134.136.20]:45200)
+	(envelope-from <arei.gonglei@huawei.com>) id 1fStdm-0005ut-Sq
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:28:02 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2397 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sridhar.samudrala@intel.com>)
-	id 1fStWd-0002bH-Ct
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:20:35 -0400
-References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
-	<fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
-	<20180605152344-mutt-send-email-mst@kernel.org>
-	<a45625c9-d2cd-f8f7-ce31-37c558e70b88@redhat.com>
-	<20180612144743-mutt-send-email-mst@kernel.org>
-From: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
-Message-ID: <7aa6dbe7-bac2-96f6-d96c-f51e5173c556@intel.com>
-Date: Tue, 12 Jun 2018 17:20:25 -0700
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1fStdm-0005t9-AE
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 20:27:58 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Wed, 13 Jun 2018 00:27:42 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DB01857D@dggeml511-mbx.china.huawei.com>
+References: <cover.1528462918.git.alifm@linux.ibm.com>
+	<e0fe84d1df4e0c2c88d7d29f94d621c988c22194.1528462918.git.alifm@linux.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DB015842@dggeml511-mbx.china.huawei.com>
+	<226dad9f-8931-3886-eb00-352a190c5b5b@linux.ibm.com>
+In-Reply-To: <226dad9f-8931-3886-eb00-352a190c5b5b@linux.ibm.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20180612144743-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] qemu: Introduce VIRTIO_NET_F_STANDBY
- feature bit to virtio_net
+Subject: Re: [Qemu-devel] [RFC v1 1/2] crypto/virtio-crypto: Read crypto
+ services and algorithm masks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,128 +32,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, jesse.brandeburg@intel.com, alexander.h.duyck@intel.com, qemu-devel@nongnu.org
+To: Farhan Ali <alifm@linux.ibm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: "mst@redhat.com" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, longpeng <longpeng2@huawei.com>, "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>, "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>
 
-On 6/12/2018 4:54 AM, Michael S. Tsirkin wrote:
-> On Wed, Jun 06, 2018 at 10:29:03AM +0800, Jason Wang wrote:
->>
->> On 2018年06月05日 20:33, Michael S. Tsirkin wrote:
->>> I don't think this is sufficient.
->>>
->>> If both primary and standby devices are present, a legacy guest without
->>> support for the feature might see two devices with same mac and get
->>> confused.
->>>
->>> I think that we should only make primary visible after guest acked the
->>> backup feature bit.
->> I think we want exactly the reverse? E.g fail the negotiation when guest
->> does not ack backup feature.
->>
->> Otherwise legacy guest won't even have the chance to see primary device in
->> the guest.
-> That's by design.
->
->>> And on reset or when backup is cleared in some other way, unplug the
->>> primary.
->> What if guest does not support hotplug?
-> It shouldn't ack the backup feature then and it's a good point.
-> We should both document this and check kernel config has
-> hotplug support. Sridhar could you take a look pls?
-
-Right now we select NET_FAILOVER when virtio-net is enabled,  Should we select
-PCI_HOTPLUG when NET_FAILOVER is enabled?
-
->
->>> Something like the below will do the job:
->>>
->>> Primary device is added with a special "primary-failover" flag.
->>> A virtual machine is then initialized with just a standby virtio
->>> device. Primary is not yet added.
->> A question is how to do the matching? Qemu knows nothing about e.g mac
->> address of a pass-through device I believe?
-> Supply a flag to the VFIO when it's added, this way QEMU will know.
->
->>> Later QEMU detects that guest driver device set DRIVER_OK.
->>> It then exposes the primary device to the guest, and triggers
->>> a device addition event (hot-plug event) for it.
->> Do you mean we won't have primary device in the initial qemu cli?
-> No, that's not what I mean.
->
-> I mean management will supply a flag to VFIO and then
->
->
-> - VFIO defers exposing
-> primary to guest until guest acks the feature bit.
-> - When we see guest ack, initiate hotplug.
-> - On reboot, hide it again.
-> - On reset without reboot, request hot-unplug and on eject hide it again.
->
->
->>> If QEMU detects guest driver removal, it initiates a hot-unplug sequence
->>> to remove the primary driver.  In particular, if QEMU detects guest
->>> re-initialization (e.g. by detecting guest reset) it immediately removes
->>> the primary device.
->> I believe guest failover module should handle this gracefully?
-> It can't control enumeration order, if primary is enumerated before
-> standby then guest will load its driver and it's too late
-> when failover driver is loaded.
-
-Does it mean that if guest unloads virtio-net driver, Qemu should automatically
-unplug the associated primary device?
-
-What about guest unloading/re-loading primary device driver?
-
-
->
->> Thanks
->>
->>> We can move some of this code to management as well, architecturally it
->>> does not make too much sense but it might be easier implementation-wise.
->>>
->>> HTH
->>>
->>> On Mon, Jun 04, 2018 at 06:41:48PM -0700, Samudrala, Sridhar wrote:
->>>> Ping on this patch now that the kernel patches are accepted into davem's net-next tree.
->>>> https://patchwork.ozlabs.org/cover/920005/
->>>>
->>>>
->>>> On 5/7/2018 4:09 PM, Sridhar Samudrala wrote:
->>>>> This feature bit can be used by hypervisor to indicate virtio_net device to
->>>>> act as a standby for another device with the same MAC address.
->>>>>
->>>>> I tested this with a small change to the patch to mark the STANDBY feature 'true'
->>>>> by default as i am using libvirt to start the VMs.
->>>>> Is there a way to pass the newly added feature bit 'standby' to qemu via libvirt
->>>>> XML file?
->>>>>
->>>>> Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
->>>>> ---
->>>>>     hw/net/virtio-net.c                         | 2 ++
->>>>>     include/standard-headers/linux/virtio_net.h | 3 +++
->>>>>     2 files changed, 5 insertions(+)
->>>>>
->>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->>>>> index 90502fca7c..38b3140670 100644
->>>>> --- a/hw/net/virtio-net.c
->>>>> +++ b/hw/net/virtio-net.c
->>>>> @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] = {
->>>>>                          true),
->>>>>         DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKNOWN),
->>>>>         DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
->>>>> +    DEFINE_PROP_BIT64("standby", VirtIONet, host_features, VIRTIO_NET_F_STANDBY,
->>>>> +                      false),
->>>>>         DEFINE_PROP_END_OF_LIST(),
->>>>>     };
->>>>> diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
->>>>> index e9f255ea3f..01ec09684c 100644
->>>>> --- a/include/standard-headers/linux/virtio_net.h
->>>>> +++ b/include/standard-headers/linux/virtio_net.h
->>>>> @@ -57,6 +57,9 @@
->>>>>     					 * Steering */
->>>>>     #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
->>>>> +#define VIRTIO_NET_F_STANDBY      62    /* Act as standby for another device
->>>>> +                                         * with the same MAC.
->>>>> +                                         */
->>>>>     #define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Device set linkspeed and duplex */
->>>>>     #ifndef VIRTIO_NET_NO_LEGACY
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEZhcmhhbiBBbGkgW21haWx0
+bzphbGlmbUBsaW51eC5pYm0uY29tXQ0KPiBTZW50OiBXZWRuZXNkYXksIEp1bmUgMTMsIDIwMTgg
+MTowNyBBTQ0KPiBUbzogR29uZ2xlaSAoQXJlaSkgPGFyZWkuZ29uZ2xlaUBodWF3ZWkuY29tPjsg
+bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsNCj4ga3ZtQHZnZXIua2VybmVsLm9yZw0KPiBD
+YzogbXN0QHJlZGhhdC5jb207IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsgbG9uZ3BlbmcNCj4gPGxv
+bmdwZW5nMkBodWF3ZWkuY29tPjsgcGFzaWNAbGludXguaWJtLmNvbTsgZnJhbmtqYUBsaW51eC5p
+Ym0uY29tOw0KPiBib3JudHJhZWdlckBkZS5pYm0uY29tDQo+IFN1YmplY3Q6IFJlOiBbUkZDIHYx
+IDEvMl0gY3J5cHRvL3ZpcnRpby1jcnlwdG86IFJlYWQgY3J5cHRvIHNlcnZpY2VzIGFuZA0KPiBh
+bGdvcml0aG0gbWFza3MNCj4gDQo+IEhpIEFyZWkNCj4gDQo+IE9uIDA2LzExLzIwMTggMDI6NDMg
+QU0sIEdvbmdsZWkgKEFyZWkpIHdyb3RlOg0KPiA+DQo+ID4+IC0tLS0tT3JpZ2luYWwgTWVzc2Fn
+ZS0tLS0tDQo+ID4+IEZyb206IEZhcmhhbiBBbGkgW21haWx0bzphbGlmbUBsaW51eC5pYm0uY29t
+XQ0KPiA+PiBTZW50OiBTYXR1cmRheSwgSnVuZSAwOSwgMjAxOCAzOjA5IEFNDQo+ID4+IFRvOiBs
+aW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBrdm1Admdlci5rZXJuZWwub3JnDQo+ID4+IENj
+OiBtc3RAcmVkaGF0LmNvbTsgcWVtdS1kZXZlbEBub25nbnUub3JnOyBHb25nbGVpIChBcmVpKQ0K
+PiA+PiA8YXJlaS5nb25nbGVpQGh1YXdlaS5jb20+OyBsb25ncGVuZyA8bG9uZ3BlbmcyQGh1YXdl
+aS5jb20+Ow0KPiA+PiBwYXNpY0BsaW51eC5pYm0uY29tOyBmcmFua2phQGxpbnV4LmlibS5jb207
+IGJvcm50cmFlZ2VyQGRlLmlibS5jb207DQo+ID4+IGFsaWZtQGxpbnV4LmlibS5jb20NCj4gPj4g
+U3ViamVjdDogW1JGQyB2MSAxLzJdIGNyeXB0by92aXJ0aW8tY3J5cHRvOiBSZWFkIGNyeXB0byBz
+ZXJ2aWNlcyBhbmQNCj4gYWxnb3JpdGhtDQo+ID4+IG1hc2tzDQo+ID4+DQo+ID4+IFJlYWQgdGhl
+IGNyeXB0byBzZXJ2aWNlcyBhbmQgYWxnb3JpdGhtIG1hc2tzIHdoaWNoIHByb3ZpZGVzDQo+ID4+
+IGluZm9ybWF0aW9uIGFib3V0IHRoZSBzZXJ2aWNlcyBhbmQgYWxnb3JpdGhtcyBzdXBwb3J0ZWQg
+YnkNCj4gPj4gdmlydGlvLWNyeXB0byBiYWNrZW5kLg0KPiA+Pg0KPiA+PiBTaWduZWQtb2ZmLWJ5
+OiBGYXJoYW4gQWxpIDxhbGlmbUBsaW51eC5pYm0uY29tPg0KPiA+PiAtLS0NCj4gPj4gICBkcml2
+ZXJzL2NyeXB0by92aXJ0aW8vdmlydGlvX2NyeXB0b19jb21tb24uaCB8IDE0ICsrKysrKysrKysr
+KysrDQo+ID4+ICAgZHJpdmVycy9jcnlwdG8vdmlydGlvL3ZpcnRpb19jcnlwdG9fY29yZS5jICAg
+fCAyOQ0KPiA+PiArKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ID4+ICAgMiBmaWxlcyBj
+aGFuZ2VkLCA0MyBpbnNlcnRpb25zKCspDQo+ID4+DQo+ID4+IGRpZmYgLS1naXQgYS9kcml2ZXJz
+L2NyeXB0by92aXJ0aW8vdmlydGlvX2NyeXB0b19jb21tb24uaA0KPiA+PiBiL2RyaXZlcnMvY3J5
+cHRvL3ZpcnRpby92aXJ0aW9fY3J5cHRvX2NvbW1vbi5oDQo+ID4+IGluZGV4IDY2NTAxYTUuLjA1
+ZWNhMTJlIDEwMDY0NA0KPiA+PiAtLS0gYS9kcml2ZXJzL2NyeXB0by92aXJ0aW8vdmlydGlvX2Ny
+eXB0b19jb21tb24uaA0KPiA+PiArKysgYi9kcml2ZXJzL2NyeXB0by92aXJ0aW8vdmlydGlvX2Ny
+eXB0b19jb21tb24uaA0KPiA+PiBAQCAtNTUsNiArNTUsMjAgQEAgc3RydWN0IHZpcnRpb19jcnlw
+dG8gew0KPiA+PiAgIAkvKiBOdW1iZXIgb2YgcXVldWUgY3VycmVudGx5IHVzZWQgYnkgdGhlIGRy
+aXZlciAqLw0KPiA+PiAgIAl1MzIgY3Vycl9xdWV1ZTsNCj4gPj4NCj4gPj4gKwkvKg0KPiA+PiAr
+CSAqIFNwZWNpZmllcyB0aGUgc2VydmljZXMgbWFzayB3aGljaCB0aGUgZGV2aWNlIHN1cHBvcnQs
+DQo+ID4+ICsJICogc2VlIFZJUlRJT19DUllQVE9fU0VSVklDRV8qIGFib3ZlDQo+ID4+ICsJICov
+DQo+ID4NCj4gPiBQbHMgdXBkYXRlIHRoZSBhYm92ZSBjb21tZW50cy4gRXhjZXB0IHRoYXQ6DQo+
+ID4NCj4gPiBBY2tlZC1ieTogR29uZ2xlaSA8YXJlaS5nb25nbGVpQGh1YXdlaS5jb20+DQo+ID4N
+Cj4gDQo+IFN1cmUgd2lsbCB1cGRhdGUgdGhlIGNvbW1lbnQuIEhvdyBhYm91dCAiIFNwZWNpZmll
+cyB0aGUgc2VydmljZXMgbWFzaw0KPiB3aGljaCB0aGUgZGV2aWNlIHN1cHBvcnQsICogc2VlIFZJ
+UlRJT19DUllQVE9fU0VSVklDRV8qIiA/DQo+IA0KSXQgbWFrZXMgc2Vuc2UgSU1ITyA6KQ0KDQpS
+ZWdhcmRzLA0KLUdvbmdsZWkNCg0KPiBvciBzaG91bGQgSSBzcGVjaWZ5IHRoZSBmaWxlIHdoZXJl
+IHRoZSBWSVJUSU9fQ1JZUFRPX1NFUlZJQ0VfKiBhcmUgZGVmaW5lZD8NCj4gDQo+IFRoYW5rcw0K
+PiBGYXJoYW4NCj4gDQo+ID4+ICsJdTMyIGNyeXB0b19zZXJ2aWNlczsNCj4gPj4gKw0KPiA+PiAr
+CS8qIERldGFpbGVkIGFsZ29yaXRobXMgbWFzayAqLw0KPiA+PiArCXUzMiBjaXBoZXJfYWxnb19s
+Ow0KPiA+PiArCXUzMiBjaXBoZXJfYWxnb19oOw0KPiA+PiArCXUzMiBoYXNoX2FsZ287DQo+ID4+
+ICsJdTMyIG1hY19hbGdvX2w7DQo+ID4+ICsJdTMyIG1hY19hbGdvX2g7DQo+ID4+ICsJdTMyIGFl
+YWRfYWxnbzsNCj4gPj4gKw0KPiA+PiAgIAkvKiBNYXhpbXVtIGxlbmd0aCBvZiBjaXBoZXIga2V5
+ICovDQo+ID4+ICAgCXUzMiBtYXhfY2lwaGVyX2tleV9sZW47DQo+ID4+ICAgCS8qIE1heGltdW0g
+bGVuZ3RoIG9mIGF1dGhlbnRpY2F0ZWQga2V5ICovDQo+ID4+IGRpZmYgLS1naXQgYS9kcml2ZXJz
+L2NyeXB0by92aXJ0aW8vdmlydGlvX2NyeXB0b19jb3JlLmMNCj4gPj4gYi9kcml2ZXJzL2NyeXB0
+by92aXJ0aW8vdmlydGlvX2NyeXB0b19jb3JlLmMNCj4gPj4gaW5kZXggODMzMjY5OC4uOGY3NDVm
+MiAxMDA2NDQNCj4gPj4gLS0tIGEvZHJpdmVycy9jcnlwdG8vdmlydGlvL3ZpcnRpb19jcnlwdG9f
+Y29yZS5jDQo+ID4+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL3ZpcnRpby92aXJ0aW9fY3J5cHRvX2Nv
+cmUuYw0KPiA+PiBAQCAtMzAzLDYgKzMwMywxMyBAQCBzdGF0aWMgaW50IHZpcnRjcnlwdG9fcHJv
+YmUoc3RydWN0IHZpcnRpb19kZXZpY2UNCj4gKnZkZXYpDQo+ID4+ICAgCXUzMiBtYXhfZGF0YV9x
+dWV1ZXMgPSAwLCBtYXhfY2lwaGVyX2tleV9sZW4gPSAwOw0KPiA+PiAgIAl1MzIgbWF4X2F1dGhf
+a2V5X2xlbiA9IDA7DQo+ID4+ICAgCXU2NCBtYXhfc2l6ZSA9IDA7DQo+ID4+ICsJdTMyIGNpcGhl
+cl9hbGdvX2wgPSAwOw0KPiA+PiArCXUzMiBjaXBoZXJfYWxnb19oID0gMDsNCj4gPj4gKwl1MzIg
+aGFzaF9hbGdvID0gMDsNCj4gPj4gKwl1MzIgbWFjX2FsZ29fbCA9IDA7DQo+ID4+ICsJdTMyIG1h
+Y19hbGdvX2ggPSAwOw0KPiA+PiArCXUzMiBhZWFkX2FsZ28gPSAwOw0KPiA+PiArCXUzMiBjcnlw
+dG9fc2VydmljZXMgPSAwOw0KPiA+Pg0KPiA+PiAgIAlpZiAoIXZpcnRpb19oYXNfZmVhdHVyZSh2
+ZGV2LCBWSVJUSU9fRl9WRVJTSU9OXzEpKQ0KPiA+PiAgIAkJcmV0dXJuIC1FTk9ERVY7DQo+ID4+
+IEBAIC0zMzksNiArMzQ2LDIwIEBAIHN0YXRpYyBpbnQgdmlydGNyeXB0b19wcm9iZShzdHJ1Y3Qg
+dmlydGlvX2RldmljZQ0KPiAqdmRldikNCj4gPj4gICAJCW1heF9hdXRoX2tleV9sZW4sICZtYXhf
+YXV0aF9rZXlfbGVuKTsNCj4gPj4gICAJdmlydGlvX2NyZWFkKHZkZXYsIHN0cnVjdCB2aXJ0aW9f
+Y3J5cHRvX2NvbmZpZywNCj4gPj4gICAJCW1heF9zaXplLCAmbWF4X3NpemUpOw0KPiA+PiArCXZp
+cnRpb19jcmVhZCh2ZGV2LCBzdHJ1Y3QgdmlydGlvX2NyeXB0b19jb25maWcsDQo+ID4+ICsJCWNy
+eXB0b19zZXJ2aWNlcywgJmNyeXB0b19zZXJ2aWNlcyk7DQo+ID4+ICsJdmlydGlvX2NyZWFkKHZk
+ZXYsIHN0cnVjdCB2aXJ0aW9fY3J5cHRvX2NvbmZpZywNCj4gPj4gKwkJY2lwaGVyX2FsZ29fbCwg
+JmNpcGhlcl9hbGdvX2wpOw0KPiA+PiArCXZpcnRpb19jcmVhZCh2ZGV2LCBzdHJ1Y3QgdmlydGlv
+X2NyeXB0b19jb25maWcsDQo+ID4+ICsJCWNpcGhlcl9hbGdvX2gsICZjaXBoZXJfYWxnb19oKTsN
+Cj4gPj4gKwl2aXJ0aW9fY3JlYWQodmRldiwgc3RydWN0IHZpcnRpb19jcnlwdG9fY29uZmlnLA0K
+PiA+PiArCQloYXNoX2FsZ28sICZoYXNoX2FsZ28pOw0KPiA+PiArCXZpcnRpb19jcmVhZCh2ZGV2
+LCBzdHJ1Y3QgdmlydGlvX2NyeXB0b19jb25maWcsDQo+ID4+ICsJCW1hY19hbGdvX2wsICZtYWNf
+YWxnb19sKTsNCj4gPj4gKwl2aXJ0aW9fY3JlYWQodmRldiwgc3RydWN0IHZpcnRpb19jcnlwdG9f
+Y29uZmlnLA0KPiA+PiArCQltYWNfYWxnb19oLCAmbWFjX2FsZ29faCk7DQo+ID4+ICsJdmlydGlv
+X2NyZWFkKHZkZXYsIHN0cnVjdCB2aXJ0aW9fY3J5cHRvX2NvbmZpZywNCj4gPj4gKwkJYWVhZF9h
+bGdvLCAmYWVhZF9hbGdvKTsNCj4gPj4NCj4gPj4gICAJLyogQWRkIHZpcnRpbyBjcnlwdG8gZGV2
+aWNlIHRvIGdsb2JhbCB0YWJsZSAqLw0KPiA+PiAgIAllcnIgPSB2aXJ0Y3J5cHRvX2Rldm1ncl9h
+ZGRfZGV2KHZjcnlwdG8pOw0KPiA+PiBAQCAtMzU4LDYgKzM3OSwxNCBAQCBzdGF0aWMgaW50IHZp
+cnRjcnlwdG9fcHJvYmUoc3RydWN0IHZpcnRpb19kZXZpY2UNCj4gKnZkZXYpDQo+ID4+ICAgCXZj
+cnlwdG8tPm1heF9jaXBoZXJfa2V5X2xlbiA9IG1heF9jaXBoZXJfa2V5X2xlbjsNCj4gPj4gICAJ
+dmNyeXB0by0+bWF4X2F1dGhfa2V5X2xlbiA9IG1heF9hdXRoX2tleV9sZW47DQo+ID4+ICAgCXZj
+cnlwdG8tPm1heF9zaXplID0gbWF4X3NpemU7DQo+ID4+ICsJdmNyeXB0by0+Y3J5cHRvX3NlcnZp
+Y2VzID0gY3J5cHRvX3NlcnZpY2VzOw0KPiA+PiArCXZjcnlwdG8tPmNpcGhlcl9hbGdvX2wgPSBj
+aXBoZXJfYWxnb19sOw0KPiA+PiArCXZjcnlwdG8tPmNpcGhlcl9hbGdvX2ggPSBjaXBoZXJfYWxn
+b19oOw0KPiA+PiArCXZjcnlwdG8tPm1hY19hbGdvX2wgPSBtYWNfYWxnb19sOw0KPiA+PiArCXZj
+cnlwdG8tPm1hY19hbGdvX2ggPSBtYWNfYWxnb19oOw0KPiA+PiArCXZjcnlwdG8tPmhhc2hfYWxn
+byA9IGhhc2hfYWxnbzsNCj4gPj4gKwl2Y3J5cHRvLT5hZWFkX2FsZ28gPSBhZWFkX2FsZ287DQo+
+ID4+ICsNCj4gPj4NCj4gPj4gICAJZGV2X2luZm8oJnZkZXYtPmRldiwNCj4gPj4gICAJCSJtYXhf
+cXVldWVzOiAldSwgbWF4X2NpcGhlcl9rZXlfbGVuOiAldSwNCj4gbWF4X2F1dGhfa2V5X2xlbjog
+JXUsDQo+ID4+IG1heF9zaXplIDB4JWxseFxuIiwNCj4gPj4gLS0NCj4gPj4gMi43LjQNCj4gPg0K
+PiA+DQoNCg==
