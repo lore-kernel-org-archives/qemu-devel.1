@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fT6Z1-000764-0s
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:15:56 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fT6ZF-0007HA-47
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:16:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fT6Yy-0002h5-5p
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:15:55 -0400
-References: <20180611121655.19616-1-david@redhat.com>
-	<20180611121655.19616-11-david@redhat.com>
-	<20180613151056.6ebbccc2@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <569f9534-162c-29c1-a097-51427e028b4e@redhat.com>
-Date: Wed, 13 Jun 2018 16:15:48 +0200
+	(envelope-from <stefanha@redhat.com>) id 1fT6ZE-0003N0-0S
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:16:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48692 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fT6ZD-0003Md-PK
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:16:07 -0400
+Date: Wed, 13 Jun 2018 15:16:05 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180613141605.GT24528@stefanha-x1.localdomain>
+References: <e74aee54657de6f8d643a92ba21f467db149c2c8.1528714312.git.yi.z.zhang@linux.intel.com>
+	<20180611162630.GH17756@stefanha-x1.localdomain>
+	<CAPcyv4jJSYiCu_qNWgU8KR3sFQE032Uu6LCQq-CTxF0jpkooiA@mail.gmail.com>
+	<20180612150425.hjydg5cbtlllzh67@HZ>
 MIME-Version: 1.0
-In-Reply-To: <20180613151056.6ebbccc2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 10/11] pc-dimm: introduce and use
- pc_dimm_memory_pre_plug()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="yypaS3FvPkEUiGyo"
+Content-Disposition: inline
+In-Reply-To: <20180612150425.hjydg5cbtlllzh67@HZ>
+Subject: Re: [Qemu-devel] [RFC PATCH 1/1] nvdimm: let qemu requiring section
+ alignment of pmem resource.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,83 +31,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Haozhong Zhang <hzzhan9@gmail.com>
+Cc: Dan Williams <dan.j.williams@intel.com>, Zhang Yi <yi.z.zhang@linux.intel.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, yu.c.zhang@linux.intel.com, Igor Mammedov <imammedo@redhat.com>, Ross Zwisler <ross.zwisler@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 13.06.2018 15:10, Igor Mammedov wrote:
-> On Mon, 11 Jun 2018 14:16:54 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+
+--yypaS3FvPkEUiGyo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Jun 12, 2018 at 11:04:25PM +0800, Haozhong Zhang wrote:
+> On 06/11/18 19:55, Dan Williams wrote:
+> > On Mon, Jun 11, 2018 at 9:26 AM, Stefan Hajnoczi <stefanha@redhat.com> =
+wrote:
+> > > On Mon, Jun 11, 2018 at 06:54:25PM +0800, Zhang Yi wrote:
+> > >> Nvdimm driver use Memory hot-plug APIs to map it's pmem resource,
+> > >> which at a section granularity.
+> > >>
+> > >> When QEMU emulated the vNVDIMM device, decrease the label-storage,
+> > >> QEMU will put the vNVDIMMs directly next to one another in physical
+> > >> address space, which means that the boundary between them won't
+> > >> align to the 128 MB memory section size.
+> > >
+> > > I'm having a hard time parsing this.
+> > >
+> > > Where does the "128 MB memory section size" come from?  ACPI?
+> > > A chipset-specific value?
+> > >
+> >=20
+> > The devm_memremap_pages() implementation use the memory hotplug core
+> > to allocate the 'struct page' array/map for persistent memory. Memory
+> > hotplug can only be performed in terms of sections, 128MB on x86_64.
 >=20
->> We'll be factoring out some pc-dimm specific and some memory-device
->> checks next.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/i386/pc.c             | 2 ++
->>  hw/mem/pc-dimm.c         | 5 +++++
->>  hw/ppc/spapr.c           | 1 +
->>  include/hw/mem/pc-dimm.h | 2 ++
->>  4 files changed, 10 insertions(+)
->>
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 017396fe84..dc8e7b033b 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -1695,6 +1695,8 @@ static void pc_dimm_pre_plug(HotplugHandler *hot=
-plug_dev, DeviceState *dev,
-> keeping                              ^^^^^
-> similar to newly introduced pc_dimm_memory_pre_plug()
-> and I have no clue what to suggest as alternative
+> IIUC, it also affects the normal RAM hotplug to a Linux VM on QEMU. If
+> that is the case, it will be helpful to lift this option to pc-dimm.
 
-Can you elaborate?
+I agree.  There should be one place in QEMU for the machine-specific
+hotplug memory alignment value.
 
-In pc.c we now have:
-- static void pc_dimm_plug()
-- static void pc_dimm_unplug_request()
-- static void pc_dimm_unplug()
+It would be best to track down the property of the hardware that
+determines these alignment values instead of letting current Linux
+software limitations determine QEMU's behavior.  That way we know that
+QEMU emulates real hardware accurately and will work with any guest OS.
+I imagine it depends on the chipset (i.e. QEMU machine type).
 
-And I add
-- static void pc_dimm_pre_plug()
+If it proves hard to pinpoint the hardware limit, then please include a
+comment in the code explaining that a value that works with Linux guests
+is being used for now.  This will allow people reading the code to
+understand where this behavior comes from.
 
-I am sticking to the existing naming scheme.
+Stefan
 
-(maybe the problem is that PC_DIMM should never have been named PC_DIMM
-but simply DIMM, then the "pc_" prefix would be unique)
+--yypaS3FvPkEUiGyo
+Content-Type: application/pgp-signature; name="signature.asc"
 
->=20
->>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in =
-'-M'");
->>          return;
->>      }
->> +
->> +    pc_dimm_memory_pre_plug(dev, MACHINE(hotplug_dev), errp);
->>  }
->> =20
->>  static void pc_dimm_plug(HotplugHandler *hotplug_dev,
->> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
->> index bc79dd04d8..995ce22d8d 100644
->> --- a/hw/mem/pc-dimm.c
->> +++ b/hw/mem/pc-dimm.c
->> @@ -27,6 +27,11 @@
->>  #include "sysemu/numa.h"
->>  #include "trace.h"
->> =20
->> +void pc_dimm_memory_pre_plug(DeviceState *dev, MachineState *machine,
->> +                             Error **errp)
->> +{
->> +}
-> why introducing shim without anything?
+-----BEGIN PGP SIGNATURE-----
 
-Because you requested for review to split things up :)
+iQEcBAEBAgAGBQJbISclAAoJEJykq7OBq3PIFkgIAI1azCPPD0eZkKwcHEAq4kUD
++eqZt1g5YbI+911Enz+wXWP3ryTwDXKsVOiwqHcG17ha5g7u4L57AdV/PHl/pUjy
+tWv3WFd+ivuNhHBcOaWbu4kFStJ+oBoLTC5T4xqFLoPvsqX0DMEzNPRqQ16VYHp9
+iIP1GJFynwdwYQZNImcl1/5PYkrWSn7REKfSrJ9YRIXJWWyDDkAQVcaJrCScirrn
+7aOFHVBqK5YtKPLwZLdptVBzMIdYpwK1oa5UA8cccvdcWDmoT3twpgPJ0MCawRaV
+SJV6jKCiHauf/sfjBdPDUsctn7VEsOc4KW7kxwEY2vcLwm9RUC+83EeyjDpIf60=
+=Nc9t
+-----END PGP SIGNATURE-----
 
-I can easily squash this.
-
-> I'd just merge it with following patch and clarify (in commit message)
-> why the rest of pre_plug code isn't moved here as well.
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+--yypaS3FvPkEUiGyo--
