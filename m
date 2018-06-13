@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSv2H-0002T0-W2
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:25 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fSv2L-0002Vx-3Z
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSv2F-0006I8-Pu
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:22 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:32974)
+	(envelope-from <richard.henderson@linaro.org>) id 1fSv2H-0006IY-Un
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:25 -0400
+Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:46043)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fSv2F-0006I4-Ge
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:19 -0400
-Received: by mail-pg0-x242.google.com with SMTP id e11-v6so464599pgq.0
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:57:19 -0700 (PDT)
+	id 1fSv2H-0006IN-Lb
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:21 -0400
+Received: by mail-pf0-x231.google.com with SMTP id a22-v6so497781pfo.12
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:57:21 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 12 Jun 2018 15:56:34 -1000
-Message-Id: <20180613015641.5667-12-richard.henderson@linaro.org>
+Date: Tue, 12 Jun 2018 15:56:35 -1000
+Message-Id: <20180613015641.5667-13-richard.henderson@linaro.org>
 In-Reply-To: <20180613015641.5667-1-richard.henderson@linaro.org>
 References: <20180613015641.5667-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v4b 11/18] target/arm: Implement SVE Integer
- Compare - Vectors Group
+Subject: [Qemu-devel] [PATCH v4b 12/18] target/arm: Implement SVE Integer
+ Compare - Immediate Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,367 +33,188 @@ Cc: peter.maydell@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 115 +++++++++++++++++++++++
- target/arm/sve_helper.c    | 187 +++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c |  91 ++++++++++++++++++
- target/arm/sve.decode      |  24 +++++
- 4 files changed, 417 insertions(+)
+ target/arm/helper-sve.h    | 44 +++++++++++++++++++
+ target/arm/sve_helper.c    | 88 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 66 ++++++++++++++++++++++++++++
+ target/arm/sve.decode      | 23 ++++++++++
+ 4 files changed, 221 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 0f57f64895..6ffd1fbe8e 100644
+index 6ffd1fbe8e..ae38c0a4be 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -490,6 +490,121 @@ DEF_HELPER_FLAGS_4(sve_rbit_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+@@ -605,6 +605,50 @@ DEF_HELPER_FLAGS_5(sve_cmplo_ppzw_s, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(sve_cmpls_ppzw_s, TCG_CALL_NO_RWG,
+                    i32, ptr, ptr, ptr, ptr, i32)
  
- DEF_HELPER_FLAGS_5(sve_splice, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_5(sve_cmpeq_ppzz_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpne_ppzz_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpge_ppzz_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpgt_ppzz_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphi_ppzz_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphs_ppzz_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpeq_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpne_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpgt_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpge_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmplt_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmple_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmphs_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmphi_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmplo_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpls_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_5(sve_cmpeq_ppzz_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpne_ppzz_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpge_ppzz_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpgt_ppzz_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphi_ppzz_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphs_ppzz_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpeq_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpne_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpgt_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpge_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmplt_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmple_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmphs_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmphi_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmplo_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpls_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_5(sve_cmpeq_ppzz_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpne_ppzz_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpge_ppzz_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpgt_ppzz_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphi_ppzz_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphs_ppzz_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpeq_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpne_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpgt_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpge_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmplt_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmple_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmphs_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmphi_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmplo_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpls_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_5(sve_cmpeq_ppzz_d, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpne_ppzz_d, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpge_ppzz_d, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpgt_ppzz_d, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphi_ppzz_d, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphs_ppzz_d, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_cmpeq_ppzw_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpne_ppzw_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpge_ppzw_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpgt_ppzw_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphi_ppzw_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphs_ppzw_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmple_ppzw_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmplt_ppzw_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmplo_ppzw_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpls_ppzw_b, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_cmpeq_ppzw_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpne_ppzw_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpge_ppzw_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpgt_ppzw_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphi_ppzw_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphs_ppzw_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmple_ppzw_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmplt_ppzw_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmplo_ppzw_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpls_ppzw_h, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_cmpeq_ppzw_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpne_ppzw_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpge_ppzw_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpgt_ppzw_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphi_ppzw_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmphs_ppzw_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmple_ppzw_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmplt_ppzw_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmplo_ppzw_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_cmpls_ppzw_s, TCG_CALL_NO_RWG,
-+                   i32, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpeq_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpne_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpgt_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpge_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmplt_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmple_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmphs_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmphi_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmplo_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_cmpls_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
 +
  DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index f55fdc7dbe..d11f591661 100644
+index d11f591661..c1d95edfca 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -74,6 +74,28 @@ static uint32_t iter_predtest_fwd(uint64_t d, uint64_t g, uint32_t flags)
-     return flags;
- }
- 
-+/* This is an iterative function, called for each Pd and Pg word
-+ * moving backward.
-+ */
-+static uint32_t iter_predtest_bwd(uint64_t d, uint64_t g, uint32_t flags)
-+{
-+    if (likely(g)) {
-+        /* Compute C from first (i.e last) !(D & G).
-+           Use bit 2 to signal first G bit seen.  */
-+        if (!(flags & 4)) {
-+            flags += 4 - 1; /* add bit 2, subtract C from PREDTEST_INIT */
-+            flags |= (d & pow2floor(g)) == 0;
-+        }
+@@ -2388,3 +2388,91 @@ DO_CMP_PPZW_S(sve_cmpls_ppzw_s, uint32_t, uint64_t, <=)
+ #undef DO_CMP_PPZW_H
+ #undef DO_CMP_PPZW_S
+ #undef DO_CMP_PPZW
 +
-+        /* Accumulate Z from each D & G.  */
-+        flags |= ((d & g) != 0) << 1;
-+
-+        /* Compute N from last (i.e first) D & G.  Replace previous.  */
-+        flags = deposit32(flags, 31, 1, (d & (g & -g)) != 0);
-+    }
-+    return flags;
++/* Similar, but the second source is immediate.  */
++#define DO_CMP_PPZI(NAME, TYPE, OP, H, MASK)                         \
++uint32_t HELPER(NAME)(void *vd, void *vn, void *vg, uint32_t desc)   \
++{                                                                    \
++    intptr_t opr_sz = simd_oprsz(desc);                              \
++    uint32_t flags = PREDTEST_INIT;                                  \
++    TYPE mm = simd_data(desc);                                       \
++    intptr_t i = opr_sz;                                             \
++    do {                                                             \
++        uint64_t out = 0, pg;                                        \
++        do {                                                         \
++            i -= sizeof(TYPE), out <<= sizeof(TYPE);                 \
++            TYPE nn = *(TYPE *)(vn + H(i));                          \
++            out |= nn OP mm;                                         \
++        } while (i & 63);                                            \
++        pg = *(uint64_t *)(vg + (i >> 3)) & MASK;                    \
++        out &= pg;                                                   \
++        *(uint64_t *)(vd + (i >> 3)) = out;                          \
++        flags = iter_predtest_bwd(out, pg, flags);                   \
++    } while (i > 0);                                                 \
++    return flags;                                                    \
 +}
 +
- /* The same for a single word predicate.  */
- uint32_t HELPER(sve_predtest1)(uint64_t d, uint64_t g)
- {
-@@ -2201,3 +2223,168 @@ void HELPER(sve_sel_zpzz_d)(void *vd, void *vn, void *vm,
-         d[i] = (pg[H1(i)] & 1 ? nn : mm);
-     }
- }
++#define DO_CMP_PPZI_B(NAME, TYPE, OP) \
++    DO_CMP_PPZI(NAME, TYPE, OP, H1,   0xffffffffffffffffull)
++#define DO_CMP_PPZI_H(NAME, TYPE, OP) \
++    DO_CMP_PPZI(NAME, TYPE, OP, H1_2, 0x5555555555555555ull)
++#define DO_CMP_PPZI_S(NAME, TYPE, OP) \
++    DO_CMP_PPZI(NAME, TYPE, OP, H1_4, 0x1111111111111111ull)
++#define DO_CMP_PPZI_D(NAME, TYPE, OP) \
++    DO_CMP_PPZI(NAME, TYPE, OP,     , 0x0101010101010101ull)
 +
-+/* Two operand comparison controlled by a predicate.
-+ * ??? It is very tempting to want to be able to expand this inline
-+ * with x86 instructions, e.g.
-+ *
-+ *    vcmpeqw    zm, zn, %ymm0
-+ *    vpmovmskb  %ymm0, %eax
-+ *    and        $0x5555, %eax
-+ *    and        pg, %eax
-+ *
-+ * or even aarch64, e.g.
-+ *
-+ *    // mask = 4000 1000 0400 0100 0040 0010 0004 0001
-+ *    cmeq       v0.8h, zn, zm
-+ *    and        v0.8h, v0.8h, mask
-+ *    addv       h0, v0.8h
-+ *    and        v0.8b, pg
-+ *
-+ * However, coming up with an abstraction that allows vector inputs and
-+ * a scalar output, and also handles the byte-ordering of sub-uint64_t
-+ * scalar outputs, is tricky.
-+ */
-+#define DO_CMP_PPZZ(NAME, TYPE, OP, H, MASK)                                 \
-+uint32_t HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc) \
-+{                                                                            \
-+    intptr_t opr_sz = simd_oprsz(desc);                                      \
-+    uint32_t flags = PREDTEST_INIT;                                          \
-+    intptr_t i = opr_sz;                                                     \
-+    do {                                                                     \
-+        uint64_t out = 0, pg;                                                \
-+        do {                                                                 \
-+            i -= sizeof(TYPE), out <<= sizeof(TYPE);                         \
-+            TYPE nn = *(TYPE *)(vn + H(i));                                  \
-+            TYPE mm = *(TYPE *)(vm + H(i));                                  \
-+            out |= nn OP mm;                                                 \
-+        } while (i & 63);                                                    \
-+        pg = *(uint64_t *)(vg + (i >> 3)) & MASK;                            \
-+        out &= pg;                                                           \
-+        *(uint64_t *)(vd + (i >> 3)) = out;                                  \
-+        flags = iter_predtest_bwd(out, pg, flags);                           \
-+    } while (i > 0);                                                         \
-+    return flags;                                                            \
-+}
++DO_CMP_PPZI_B(sve_cmpeq_ppzi_b, uint8_t,  ==)
++DO_CMP_PPZI_H(sve_cmpeq_ppzi_h, uint16_t, ==)
++DO_CMP_PPZI_S(sve_cmpeq_ppzi_s, uint32_t, ==)
++DO_CMP_PPZI_D(sve_cmpeq_ppzi_d, uint64_t, ==)
 +
-+#define DO_CMP_PPZZ_B(NAME, TYPE, OP) \
-+    DO_CMP_PPZZ(NAME, TYPE, OP, H1,   0xffffffffffffffffull)
-+#define DO_CMP_PPZZ_H(NAME, TYPE, OP) \
-+    DO_CMP_PPZZ(NAME, TYPE, OP, H1_2, 0x5555555555555555ull)
-+#define DO_CMP_PPZZ_S(NAME, TYPE, OP) \
-+    DO_CMP_PPZZ(NAME, TYPE, OP, H1_4, 0x1111111111111111ull)
-+#define DO_CMP_PPZZ_D(NAME, TYPE, OP) \
-+    DO_CMP_PPZZ(NAME, TYPE, OP,     , 0x0101010101010101ull)
++DO_CMP_PPZI_B(sve_cmpne_ppzi_b, uint8_t,  !=)
++DO_CMP_PPZI_H(sve_cmpne_ppzi_h, uint16_t, !=)
++DO_CMP_PPZI_S(sve_cmpne_ppzi_s, uint32_t, !=)
++DO_CMP_PPZI_D(sve_cmpne_ppzi_d, uint64_t, !=)
 +
-+DO_CMP_PPZZ_B(sve_cmpeq_ppzz_b, uint8_t,  ==)
-+DO_CMP_PPZZ_H(sve_cmpeq_ppzz_h, uint16_t, ==)
-+DO_CMP_PPZZ_S(sve_cmpeq_ppzz_s, uint32_t, ==)
-+DO_CMP_PPZZ_D(sve_cmpeq_ppzz_d, uint64_t, ==)
++DO_CMP_PPZI_B(sve_cmpgt_ppzi_b, int8_t,  >)
++DO_CMP_PPZI_H(sve_cmpgt_ppzi_h, int16_t, >)
++DO_CMP_PPZI_S(sve_cmpgt_ppzi_s, int32_t, >)
++DO_CMP_PPZI_D(sve_cmpgt_ppzi_d, int64_t, >)
 +
-+DO_CMP_PPZZ_B(sve_cmpne_ppzz_b, uint8_t,  !=)
-+DO_CMP_PPZZ_H(sve_cmpne_ppzz_h, uint16_t, !=)
-+DO_CMP_PPZZ_S(sve_cmpne_ppzz_s, uint32_t, !=)
-+DO_CMP_PPZZ_D(sve_cmpne_ppzz_d, uint64_t, !=)
++DO_CMP_PPZI_B(sve_cmpge_ppzi_b, int8_t,  >=)
++DO_CMP_PPZI_H(sve_cmpge_ppzi_h, int16_t, >=)
++DO_CMP_PPZI_S(sve_cmpge_ppzi_s, int32_t, >=)
++DO_CMP_PPZI_D(sve_cmpge_ppzi_d, int64_t, >=)
 +
-+DO_CMP_PPZZ_B(sve_cmpgt_ppzz_b, int8_t,  >)
-+DO_CMP_PPZZ_H(sve_cmpgt_ppzz_h, int16_t, >)
-+DO_CMP_PPZZ_S(sve_cmpgt_ppzz_s, int32_t, >)
-+DO_CMP_PPZZ_D(sve_cmpgt_ppzz_d, int64_t, >)
++DO_CMP_PPZI_B(sve_cmphi_ppzi_b, uint8_t,  >)
++DO_CMP_PPZI_H(sve_cmphi_ppzi_h, uint16_t, >)
++DO_CMP_PPZI_S(sve_cmphi_ppzi_s, uint32_t, >)
++DO_CMP_PPZI_D(sve_cmphi_ppzi_d, uint64_t, >)
 +
-+DO_CMP_PPZZ_B(sve_cmpge_ppzz_b, int8_t,  >=)
-+DO_CMP_PPZZ_H(sve_cmpge_ppzz_h, int16_t, >=)
-+DO_CMP_PPZZ_S(sve_cmpge_ppzz_s, int32_t, >=)
-+DO_CMP_PPZZ_D(sve_cmpge_ppzz_d, int64_t, >=)
++DO_CMP_PPZI_B(sve_cmphs_ppzi_b, uint8_t,  >=)
++DO_CMP_PPZI_H(sve_cmphs_ppzi_h, uint16_t, >=)
++DO_CMP_PPZI_S(sve_cmphs_ppzi_s, uint32_t, >=)
++DO_CMP_PPZI_D(sve_cmphs_ppzi_d, uint64_t, >=)
 +
-+DO_CMP_PPZZ_B(sve_cmphi_ppzz_b, uint8_t,  >)
-+DO_CMP_PPZZ_H(sve_cmphi_ppzz_h, uint16_t, >)
-+DO_CMP_PPZZ_S(sve_cmphi_ppzz_s, uint32_t, >)
-+DO_CMP_PPZZ_D(sve_cmphi_ppzz_d, uint64_t, >)
++DO_CMP_PPZI_B(sve_cmplt_ppzi_b, int8_t,  <)
++DO_CMP_PPZI_H(sve_cmplt_ppzi_h, int16_t, <)
++DO_CMP_PPZI_S(sve_cmplt_ppzi_s, int32_t, <)
++DO_CMP_PPZI_D(sve_cmplt_ppzi_d, int64_t, <)
 +
-+DO_CMP_PPZZ_B(sve_cmphs_ppzz_b, uint8_t,  >=)
-+DO_CMP_PPZZ_H(sve_cmphs_ppzz_h, uint16_t, >=)
-+DO_CMP_PPZZ_S(sve_cmphs_ppzz_s, uint32_t, >=)
-+DO_CMP_PPZZ_D(sve_cmphs_ppzz_d, uint64_t, >=)
++DO_CMP_PPZI_B(sve_cmple_ppzi_b, int8_t,  <=)
++DO_CMP_PPZI_H(sve_cmple_ppzi_h, int16_t, <=)
++DO_CMP_PPZI_S(sve_cmple_ppzi_s, int32_t, <=)
++DO_CMP_PPZI_D(sve_cmple_ppzi_d, int64_t, <=)
 +
-+#undef DO_CMP_PPZZ_B
-+#undef DO_CMP_PPZZ_H
-+#undef DO_CMP_PPZZ_S
-+#undef DO_CMP_PPZZ_D
-+#undef DO_CMP_PPZZ
++DO_CMP_PPZI_B(sve_cmplo_ppzi_b, uint8_t,  <)
++DO_CMP_PPZI_H(sve_cmplo_ppzi_h, uint16_t, <)
++DO_CMP_PPZI_S(sve_cmplo_ppzi_s, uint32_t, <)
++DO_CMP_PPZI_D(sve_cmplo_ppzi_d, uint64_t, <)
 +
-+/* Similar, but the second source is "wide".  */
-+#define DO_CMP_PPZW(NAME, TYPE, TYPEW, OP, H, MASK)                     \
-+uint32_t HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc) \
-+{                                                                            \
-+    intptr_t opr_sz = simd_oprsz(desc);                                      \
-+    uint32_t flags = PREDTEST_INIT;                                          \
-+    intptr_t i = opr_sz;                                                     \
-+    do {                                                                     \
-+        uint64_t out = 0, pg;                                                \
-+        do {                                                                 \
-+            TYPEW mm = *(TYPEW *)(vm + i - 8);                               \
-+            do {                                                             \
-+                i -= sizeof(TYPE), out <<= sizeof(TYPE);                     \
-+                TYPE nn = *(TYPE *)(vn + H(i));                              \
-+                out |= nn OP mm;                                             \
-+            } while (i & 7);                                                 \
-+        } while (i & 63);                                                    \
-+        pg = *(uint64_t *)(vg + (i >> 3)) & MASK;                            \
-+        out &= pg;                                                           \
-+        *(uint64_t *)(vd + (i >> 3)) = out;                                  \
-+        flags = iter_predtest_bwd(out, pg, flags);                           \
-+    } while (i > 0);                                                         \
-+    return flags;                                                            \
-+}
++DO_CMP_PPZI_B(sve_cmpls_ppzi_b, uint8_t,  <=)
++DO_CMP_PPZI_H(sve_cmpls_ppzi_h, uint16_t, <=)
++DO_CMP_PPZI_S(sve_cmpls_ppzi_s, uint32_t, <=)
++DO_CMP_PPZI_D(sve_cmpls_ppzi_d, uint64_t, <=)
 +
-+#define DO_CMP_PPZW_B(NAME, TYPE, TYPEW, OP) \
-+    DO_CMP_PPZW(NAME, TYPE, TYPEW, OP, H1,   0xffffffffffffffffull)
-+#define DO_CMP_PPZW_H(NAME, TYPE, TYPEW, OP) \
-+    DO_CMP_PPZW(NAME, TYPE, TYPEW, OP, H1_2, 0x5555555555555555ull)
-+#define DO_CMP_PPZW_S(NAME, TYPE, TYPEW, OP) \
-+    DO_CMP_PPZW(NAME, TYPE, TYPEW, OP, H1_4, 0x1111111111111111ull)
-+
-+DO_CMP_PPZW_B(sve_cmpeq_ppzw_b, uint8_t,  uint64_t, ==)
-+DO_CMP_PPZW_H(sve_cmpeq_ppzw_h, uint16_t, uint64_t, ==)
-+DO_CMP_PPZW_S(sve_cmpeq_ppzw_s, uint32_t, uint64_t, ==)
-+
-+DO_CMP_PPZW_B(sve_cmpne_ppzw_b, uint8_t,  uint64_t, !=)
-+DO_CMP_PPZW_H(sve_cmpne_ppzw_h, uint16_t, uint64_t, !=)
-+DO_CMP_PPZW_S(sve_cmpne_ppzw_s, uint32_t, uint64_t, !=)
-+
-+DO_CMP_PPZW_B(sve_cmpgt_ppzw_b, int8_t,   int64_t, >)
-+DO_CMP_PPZW_H(sve_cmpgt_ppzw_h, int16_t,  int64_t, >)
-+DO_CMP_PPZW_S(sve_cmpgt_ppzw_s, int32_t,  int64_t, >)
-+
-+DO_CMP_PPZW_B(sve_cmpge_ppzw_b, int8_t,   int64_t, >=)
-+DO_CMP_PPZW_H(sve_cmpge_ppzw_h, int16_t,  int64_t, >=)
-+DO_CMP_PPZW_S(sve_cmpge_ppzw_s, int32_t,  int64_t, >=)
-+
-+DO_CMP_PPZW_B(sve_cmphi_ppzw_b, uint8_t,  uint64_t, >)
-+DO_CMP_PPZW_H(sve_cmphi_ppzw_h, uint16_t, uint64_t, >)
-+DO_CMP_PPZW_S(sve_cmphi_ppzw_s, uint32_t, uint64_t, >)
-+
-+DO_CMP_PPZW_B(sve_cmphs_ppzw_b, uint8_t,  uint64_t, >=)
-+DO_CMP_PPZW_H(sve_cmphs_ppzw_h, uint16_t, uint64_t, >=)
-+DO_CMP_PPZW_S(sve_cmphs_ppzw_s, uint32_t, uint64_t, >=)
-+
-+DO_CMP_PPZW_B(sve_cmplt_ppzw_b, int8_t,   int64_t, <)
-+DO_CMP_PPZW_H(sve_cmplt_ppzw_h, int16_t,  int64_t, <)
-+DO_CMP_PPZW_S(sve_cmplt_ppzw_s, int32_t,  int64_t, <)
-+
-+DO_CMP_PPZW_B(sve_cmple_ppzw_b, int8_t,   int64_t, <=)
-+DO_CMP_PPZW_H(sve_cmple_ppzw_h, int16_t,  int64_t, <=)
-+DO_CMP_PPZW_S(sve_cmple_ppzw_s, int32_t,  int64_t, <=)
-+
-+DO_CMP_PPZW_B(sve_cmplo_ppzw_b, uint8_t,  uint64_t, <)
-+DO_CMP_PPZW_H(sve_cmplo_ppzw_h, uint16_t, uint64_t, <)
-+DO_CMP_PPZW_S(sve_cmplo_ppzw_s, uint32_t, uint64_t, <)
-+
-+DO_CMP_PPZW_B(sve_cmpls_ppzw_b, uint8_t,  uint64_t, <=)
-+DO_CMP_PPZW_H(sve_cmpls_ppzw_h, uint16_t, uint64_t, <=)
-+DO_CMP_PPZW_S(sve_cmpls_ppzw_s, uint32_t, uint64_t, <=)
-+
-+#undef DO_CMP_PPZW_B
-+#undef DO_CMP_PPZW_H
-+#undef DO_CMP_PPZW_S
-+#undef DO_CMP_PPZW
++#undef DO_CMP_PPZI_B
++#undef DO_CMP_PPZI_H
++#undef DO_CMP_PPZI_S
++#undef DO_CMP_PPZI_D
++#undef DO_CMP_PPZI
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 0de9118fdf..1510af6ece 100644
+index 1510af6ece..00481e92de 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -33,6 +33,10 @@
- #include "trace-tcg.h"
+@@ -34,6 +34,8 @@
  #include "translate-a64.h"
  
-+
-+typedef void gen_helper_gvec_flags_4(TCGv_i32, TCGv_ptr, TCGv_ptr,
-+                                     TCGv_ptr, TCGv_ptr, TCGv_i32);
-+
- /*
-  * Helpers for extracting complex instruction fields.
-  */
-@@ -2696,6 +2700,93 @@ static bool trans_SPLICE(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
-     return true;
- }
+ 
++typedef void gen_helper_gvec_flags_3(TCGv_i32, TCGv_ptr, TCGv_ptr,
++                                     TCGv_ptr, TCGv_i32);
+ typedef void gen_helper_gvec_flags_4(TCGv_i32, TCGv_ptr, TCGv_ptr,
+                                      TCGv_ptr, TCGv_ptr, TCGv_i32);
+ 
+@@ -2787,6 +2789,70 @@ DO_PPZW(CMPLS, cmpls)
+ 
+ #undef DO_PPZW
  
 +/*
-+ *** SVE Integer Compare - Vectors Group
++ *** SVE Integer Compare - Immediate Groups
 + */
 +
-+static bool do_ppzz_flags(DisasContext *s, arg_rprr_esz *a,
-+                          gen_helper_gvec_flags_4 *gen_fn)
++static bool do_ppzi_flags(DisasContext *s, arg_rpri_esz *a,
++                          gen_helper_gvec_flags_3 *gen_fn)
 +{
-+    TCGv_ptr pd, zn, zm, pg;
++    TCGv_ptr pd, zn, pg;
 +    unsigned vsz;
 +    TCGv_i32 t;
 +
@@ -405,22 +226,19 @@ index 0de9118fdf..1510af6ece 100644
 +    }
 +
 +    vsz = vec_full_reg_size(s);
-+    t = tcg_const_i32(simd_desc(vsz, vsz, 0));
++    t = tcg_const_i32(simd_desc(vsz, vsz, a->imm));
 +    pd = tcg_temp_new_ptr();
 +    zn = tcg_temp_new_ptr();
-+    zm = tcg_temp_new_ptr();
 +    pg = tcg_temp_new_ptr();
 +
 +    tcg_gen_addi_ptr(pd, cpu_env, pred_full_reg_offset(s, a->rd));
 +    tcg_gen_addi_ptr(zn, cpu_env, vec_full_reg_offset(s, a->rn));
-+    tcg_gen_addi_ptr(zm, cpu_env, vec_full_reg_offset(s, a->rm));
 +    tcg_gen_addi_ptr(pg, cpu_env, pred_full_reg_offset(s, a->pg));
 +
-+    gen_fn(t, pd, zn, zm, pg, t);
++    gen_fn(t, pd, zn, pg, t);
 +
 +    tcg_temp_free_ptr(pd);
 +    tcg_temp_free_ptr(zn);
-+    tcg_temp_free_ptr(zm);
 +    tcg_temp_free_ptr(pg);
 +
 +    do_pred_flags(t);
@@ -429,91 +247,70 @@ index 0de9118fdf..1510af6ece 100644
 +    return true;
 +}
 +
-+#define DO_PPZZ(NAME, name) \
-+static bool trans_##NAME##_ppzz(DisasContext *s, arg_rprr_esz *a,         \
++#define DO_PPZI(NAME, name) \
++static bool trans_##NAME##_ppzi(DisasContext *s, arg_rpri_esz *a,         \
 +                                uint32_t insn)                            \
 +{                                                                         \
-+    static gen_helper_gvec_flags_4 * const fns[4] = {                     \
-+        gen_helper_sve_##name##_ppzz_b, gen_helper_sve_##name##_ppzz_h,   \
-+        gen_helper_sve_##name##_ppzz_s, gen_helper_sve_##name##_ppzz_d,   \
++    static gen_helper_gvec_flags_3 * const fns[4] = {                     \
++        gen_helper_sve_##name##_ppzi_b, gen_helper_sve_##name##_ppzi_h,   \
++        gen_helper_sve_##name##_ppzi_s, gen_helper_sve_##name##_ppzi_d,   \
 +    };                                                                    \
-+    return do_ppzz_flags(s, a, fns[a->esz]);                              \
++    return do_ppzi_flags(s, a, fns[a->esz]);                              \
 +}
 +
-+DO_PPZZ(CMPEQ, cmpeq)
-+DO_PPZZ(CMPNE, cmpne)
-+DO_PPZZ(CMPGT, cmpgt)
-+DO_PPZZ(CMPGE, cmpge)
-+DO_PPZZ(CMPHI, cmphi)
-+DO_PPZZ(CMPHS, cmphs)
++DO_PPZI(CMPEQ, cmpeq)
++DO_PPZI(CMPNE, cmpne)
++DO_PPZI(CMPGT, cmpgt)
++DO_PPZI(CMPGE, cmpge)
++DO_PPZI(CMPHI, cmphi)
++DO_PPZI(CMPHS, cmphs)
++DO_PPZI(CMPLT, cmplt)
++DO_PPZI(CMPLE, cmple)
++DO_PPZI(CMPLO, cmplo)
++DO_PPZI(CMPLS, cmpls)
 +
-+#undef DO_PPZZ
-+
-+#define DO_PPZW(NAME, name) \
-+static bool trans_##NAME##_ppzw(DisasContext *s, arg_rprr_esz *a,         \
-+                                uint32_t insn)                            \
-+{                                                                         \
-+    static gen_helper_gvec_flags_4 * const fns[4] = {                     \
-+        gen_helper_sve_##name##_ppzw_b, gen_helper_sve_##name##_ppzw_h,   \
-+        gen_helper_sve_##name##_ppzw_s, NULL                              \
-+    };                                                                    \
-+    return do_ppzz_flags(s, a, fns[a->esz]);                              \
-+}
-+
-+DO_PPZW(CMPEQ, cmpeq)
-+DO_PPZW(CMPNE, cmpne)
-+DO_PPZW(CMPGT, cmpgt)
-+DO_PPZW(CMPGE, cmpge)
-+DO_PPZW(CMPHI, cmphi)
-+DO_PPZW(CMPHS, cmphs)
-+DO_PPZW(CMPLT, cmplt)
-+DO_PPZW(CMPLE, cmple)
-+DO_PPZW(CMPLO, cmplo)
-+DO_PPZW(CMPLS, cmpls)
-+
-+#undef DO_PPZW
++#undef DO_PPZI
 +
  /*
   *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 91522d8e13..76a42193e4 100644
+index 76a42193e4..9bc383b085 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -99,6 +99,7 @@
- @rdm_pg_rn      ........ esz:2 ... ... ... pg:3 rn:5 rd:5 \
-                 &rprr_esz rm=%reg_movprfx
- @rd_pg4_rn_rm   ........ esz:2 . rm:5  .. pg:4  rn:5 rd:5       &rprr_esz
-+@pd_pg_rn_rm    ........ esz:2 . rm:5 ... pg:3 rn:5 . rd:4      &rprr_esz
+@@ -131,6 +131,11 @@
+ @rdn_dbm        ........ .. .... dbm:13 rd:5 \
+                 &rr_dbm rn=%reg_movprfx
  
- # Three register operand, with governing predicate, vector element size
- @rda_pg_rn_rm   ........ esz:2 . rm:5  ... pg:3 rn:5 rd:5 \
-@@ -472,6 +473,29 @@ SPLICE          00000101 .. 101 100 100 ... ..... .....         @rdn_pg_rm
- # SVE select vector elements (predicated)
- SEL_zpzz        00000101 .. 1 ..... 11 .... ..... .....         @rd_pg4_rn_rm
++# Predicate output, vector and immediate input,
++# controlling predicate, element size.
++@pd_pg_rn_i7    ........ esz:2 . imm:7 . pg:3 rn:5 . rd:4       &rpri_esz
++@pd_pg_rn_i5    ........ esz:2 . imm:s5 ... pg:3 rn:5 . rd:4    &rpri_esz
++
+ # Basic Load/Store with 9-bit immediate offset
+ @pd_rn_i9       ........ ........ ...... rn:5 . rd:4    \
+                 &rri imm=%imm9_16_10
+@@ -496,6 +501,24 @@ CMPHI_ppzw      00100100 .. 0 ..... 110 ... ..... 1 ....        @pd_pg_rn_rm
+ CMPLO_ppzw      00100100 .. 0 ..... 111 ... ..... 0 ....        @pd_pg_rn_rm
+ CMPLS_ppzw      00100100 .. 0 ..... 111 ... ..... 1 ....        @pd_pg_rn_rm
  
-+### SVE Integer Compare - Vectors Group
++### SVE Integer Compare - Unsigned Immediate Group
 +
-+# SVE integer compare_vectors
-+CMPHS_ppzz      00100100 .. 0 ..... 000 ... ..... 0 ....        @pd_pg_rn_rm
-+CMPHI_ppzz      00100100 .. 0 ..... 000 ... ..... 1 ....        @pd_pg_rn_rm
-+CMPGE_ppzz      00100100 .. 0 ..... 100 ... ..... 0 ....        @pd_pg_rn_rm
-+CMPGT_ppzz      00100100 .. 0 ..... 100 ... ..... 1 ....        @pd_pg_rn_rm
-+CMPEQ_ppzz      00100100 .. 0 ..... 101 ... ..... 0 ....        @pd_pg_rn_rm
-+CMPNE_ppzz      00100100 .. 0 ..... 101 ... ..... 1 ....        @pd_pg_rn_rm
++# SVE integer compare with unsigned immediate
++CMPHS_ppzi      00100100 .. 1 ....... 0 ... ..... 0 ....      @pd_pg_rn_i7
++CMPHI_ppzi      00100100 .. 1 ....... 0 ... ..... 1 ....      @pd_pg_rn_i7
++CMPLO_ppzi      00100100 .. 1 ....... 1 ... ..... 0 ....      @pd_pg_rn_i7
++CMPLS_ppzi      00100100 .. 1 ....... 1 ... ..... 1 ....      @pd_pg_rn_i7
 +
-+# SVE integer compare with wide elements
-+# Note these require esz != 3.
-+CMPEQ_ppzw      00100100 .. 0 ..... 001 ... ..... 0 ....        @pd_pg_rn_rm
-+CMPNE_ppzw      00100100 .. 0 ..... 001 ... ..... 1 ....        @pd_pg_rn_rm
-+CMPGE_ppzw      00100100 .. 0 ..... 010 ... ..... 0 ....        @pd_pg_rn_rm
-+CMPGT_ppzw      00100100 .. 0 ..... 010 ... ..... 1 ....        @pd_pg_rn_rm
-+CMPLT_ppzw      00100100 .. 0 ..... 011 ... ..... 0 ....        @pd_pg_rn_rm
-+CMPLE_ppzw      00100100 .. 0 ..... 011 ... ..... 1 ....        @pd_pg_rn_rm
-+CMPHS_ppzw      00100100 .. 0 ..... 110 ... ..... 0 ....        @pd_pg_rn_rm
-+CMPHI_ppzw      00100100 .. 0 ..... 110 ... ..... 1 ....        @pd_pg_rn_rm
-+CMPLO_ppzw      00100100 .. 0 ..... 111 ... ..... 0 ....        @pd_pg_rn_rm
-+CMPLS_ppzw      00100100 .. 0 ..... 111 ... ..... 1 ....        @pd_pg_rn_rm
++### SVE Integer Compare - Signed Immediate Group
++
++# SVE integer compare with signed immediate
++CMPGE_ppzi      00100101 .. 0 ..... 000 ... ..... 0 ....      @pd_pg_rn_i5
++CMPGT_ppzi      00100101 .. 0 ..... 000 ... ..... 1 ....      @pd_pg_rn_i5
++CMPLT_ppzi      00100101 .. 0 ..... 001 ... ..... 0 ....      @pd_pg_rn_i5
++CMPLE_ppzi      00100101 .. 0 ..... 001 ... ..... 1 ....      @pd_pg_rn_i5
++CMPEQ_ppzi      00100101 .. 0 ..... 100 ... ..... 0 ....      @pd_pg_rn_i5
++CMPNE_ppzi      00100101 .. 0 ..... 100 ... ..... 1 ....      @pd_pg_rn_i5
 +
  ### SVE Predicate Logical Operations Group
  
