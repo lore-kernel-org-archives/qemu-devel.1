@@ -1,36 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fT9PK-0006gs-Il
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:18:07 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fT9Ph-0006u1-0J
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:18:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fT9PH-0004q4-4e
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:18:06 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:44640)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fT9PG-0004nQ-P5
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:18:02 -0400
-Received: by mail-qk0-x244.google.com with SMTP id 185-v6so1945433qkk.11
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 10:18:02 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20180313224719.4954-1-pbonzini@redhat.com>
-	<20180313224719.4954-51-pbonzini@redhat.com>
-	<20180601185139.GA25837@flamenco>
-	<f3c45eff-634d-6187-8f65-624bce9d2e4e@redhat.com>
-	<323c9978-2d21-cfec-a613-57f0c675531f@amsat.org>
-Message-ID: <76061b88-b9d5-8095-b60e-cbe53993113c@amsat.org>
-Date: Wed, 13 Jun 2018 14:17:58 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fT9Pd-00068q-PE
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:18:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42198)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fT9Pd-000669-Hu
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:18:25 -0400
+Date: Wed, 13 Jun 2018 14:18:20 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180613171820.GC7451@localhost.localdomain>
+References: <1528498581-131037-1-git-send-email-babu.moger@amd.com>
+	<1528498581-131037-4-git-send-email-babu.moger@amd.com>
+	<20180611205030.GW7451@localhost.localdomain>
+	<20180611211026.GA7451@localhost.localdomain>
+	<DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180612174021.GL7451@localhost.localdomain>
+	<DM5PR12MB2471F6EA1525A824A9A94545957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180612190554.GO7451@localhost.localdomain>
+	<39f328af-a9c1-15bb-653e-9456b045768d@amd.com>
+	<DM5PR12MB2471C966B5B16FFCACDF33F3957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <323c9978-2d21-cfec-a613-57f0c675531f@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 50/69] hw/alpha/dp264: Use the
- TYPE_SMC37C669_SUPERIO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM5PR12MB2471C966B5B16FFCACDF33F3957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
+Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
+ AMD EPYC CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,79 +36,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: "Moger, Babu" <Babu.Moger@amd.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
 
-On 06/13/2018 01:35 PM, Philippe Mathieu-Daudé wrote:
-> On 06/13/2018 01:21 PM, Paolo Bonzini wrote:
->> On 01/06/2018 20:51, Emilio G. Cota wrote:
->>> On Tue, Mar 13, 2018 at 23:47:00 +0100, Paolo Bonzini wrote:
->>>> From: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>> Message-Id: <20180308223946.26784-25-f4bug@amsat.org>
->>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->>>> ---
->>>>  default-configs/alpha-softmmu.mak |  3 +++
->>>>  hw/alpha/dp264.c                  | 10 ++++------
->>>>  2 files changed, 7 insertions(+), 6 deletions(-)
->>>
->>> This commit breaks alpha-softmmu bootup for me. I get no console
->>> output whatsoever -- not even the green "Hello" when invoking
->>> the alpha-softmmu binary with no arguments.
->>>
->>> Did anybody else notice this?
->>
->> Philippe, are you going to take a look?  I tested 2.12 and I get the
+On Wed, Jun 13, 2018 at 04:52:18PM +0000, Moger, Babu wrote:
+[...]
+> > What do you think our options are here?
 > 
-> Sure. Sorry I didn't notice earlier, my mail-filter demotes subject with
-> PULL :/
-> 
->> same result as latest mainline: nothing on the VGA and
->>
->> PCI: 00:00:0 class 0300 id 1013:00b8
->> PCI:   region 0: 10000000
->> PCI:   region 1: 12000000
->> PCI: 00:01:0 class 0200 id 8086:100e
->> PCI:   region 0: 12020000
->> PCI:   region 1: 0000c000
->> PCI: 00:02:0 class 0101 id 1095:0646
->> PCI:   region 0: 0000c040
->> PCI:   region 1: 0000c048
->> PCI:   region 3: 0000c04c
->>
->> on the serial console, respectively for VGA/network/IDE.
+> Should we drop automatic topoext completely and move forward?
+> What are your thoughts?
 
-Creating the Super I/O _before_ the VGA setup fixes this issue...
+Let's drop automatic topoext by now, and see if we find solutions
+later.  I don't want to hold the rest of the patches because of
+this.
 
-I suppose the problem is some ISA global variable? I'll keep digging.
+I'm thinking we could simply make kvm_arch_get_supported_cpuid()
+always return TOPOEXT on AMD CPUs, because the feature flag don't
+really depend on any KVM code to work (is that correct?).
 
--- >8 --
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-@@ -83,6 +83,12 @@ static void clipper_init(MachineState *machine)
-
-     i8254_pit_init(isa_bus, 0x40, 0, NULL);
-
-+    /* 2 82C37 (dma) */
-+    isa_create_simple(isa_bus, "i82374");
-+
-+    /* Super I/O */
-+    isa_create_simple(isa_bus, TYPE_SMC37C669_SUPERIO);
-+
-     /* VGA setup.  Don't bother loading the bios.  */
-     pci_vga_init(pci_bus);
-
-@@ -91,12 +97,6 @@ static void clipper_init(MachineState *machine)
-         pci_nic_init_nofail(&nd_table[i], pci_bus, "e1000", NULL);
-     }
-
--    /* 2 82C37 (dma) */
--    isa_create_simple(isa_bus, "i82374");
--
--    /* Super I/O */
--    isa_create_simple(isa_bus, TYPE_SMC37C669_SUPERIO);
--
-     /* IDE disk setup.  */
-     {
-         DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
 -- 
+Eduardo
