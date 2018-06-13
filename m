@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42413)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fT6Ve-0004OY-S8
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:12:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1fT6Vg-0004PT-1C
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:12:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fT6Vd-0003IX-TL
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:12:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49090 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fT6Vd-0003HZ-My
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:12:25 -0400
-References: <20180613094727.11326-1-mark.cave-ayland@ilande.co.uk>
-	<20180613094727.11326-2-mark.cave-ayland@ilande.co.uk>
-	<51d6368f-8a13-0daf-dcc2-78303af152ad@redhat.com>
-	<2b146796-ade4-ec2c-34a9-6d6532d94175@ilande.co.uk>
-	<4a2d3eca-95d0-c1ca-4769-7a06115cc2e5@redhat.com>
-	<6515c082-3904-e077-144d-d1f3f9fd7ee1@ilande.co.uk>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ee19138b-fc56-abef-a556-c725fcd4841b@redhat.com>
-Date: Wed, 13 Jun 2018 16:12:04 +0200
+	(envelope-from <thuth@redhat.com>) id 1fT6Vb-0003Dt-E2
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:12:28 -0400
+References: <1528866321-23886-1-git-send-email-thuth@redhat.com>
+	<1528866321-23886-2-git-send-email-thuth@redhat.com>
+	<540abc07-2b96-bf0b-6f5a-2a4efc5184d9@redhat.com>
+	<c203ab47-c88b-544d-0233-f7ba48e5e639@redhat.com>
+	<dafdc212-9fa1-34c4-d498-23c8a0413e9d@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <818e90a5-b61c-cf3d-9910-6cc028e39362@redhat.com>
+Date: Wed, 13 Jun 2018 16:12:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <6515c082-3904-e077-144d-d1f3f9fd7ee1@ilande.co.uk>
+In-Reply-To: <dafdc212-9fa1-34c4-d498-23c8a0413e9d@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] hw/mips/jazz: create ESP device
- directly via qdev
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/4] Replace '-machine accel=xyz' with
+ '-accel xyz'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, hpoussin@reactos.org, famz@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, zhang.zhanghailiang@huawei.com
 
-On 13/06/2018 15:06, Mark Cave-Ayland wrote:
+On 13.06.2018 15:54, Paolo Bonzini wrote:
+> On 13/06/2018 14:53, Thomas Huth wrote:
+>> On 13.06.2018 14:48, Paolo Bonzini wrote:
+>>> On 13/06/2018 07:05, Thomas Huth wrote:
+>>>> diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+>>>> index 8d915c6..4324034 100644
+>>>> --- a/tests/vmgenid-test.c
+>>>> +++ b/tests/vmgenid-test.c
+>>>> @@ -131,7 +131,7 @@ static void read_guid_from_monitor(QemuUUID *guid)
+>>>>  static char disk[] = "tests/vmgenid-test-disk-XXXXXX";
+>>>>  
+>>>>  #define GUID_CMD(guid)                          \
+>>>> -    "-machine accel=kvm:tcg "                   \
+>>>> +    "-accel kvm:tcg "                           \
+>>>>      "-device vmgenid,id=testvgid,guid=%s "      \
+>>>
+>>> "-accel kvm:tcg" works, but it really shouldn't (and I think we can
+>>> change it without a deprecation period).   The right syntax would be
+>>> "-accel kvm -accel tcg", so that you can specify options that are valid
+>>> only for KVM, or onlty for TCG.
 >>
->> Heh, those are disgusting indeed. :)=C2=A0 So I guess it would have to=
- stay,
->> only MIPS can use the pure MemoryRegion-based approach.
->=20
-> The only option I can think of is inserting an AddressSpace between the
-> esp/ledma device and the IOMMU AddressSpace which intercepts the DMA
-> request (addr, len, direction).
->=20
-> I can then grab a reference to the device from the MemoryRegion opaque,
-> perform the magic, and then manually invoke address_space_rw() on iommu=
-_as.
->=20
-> Is there a hook somewhere in the memory API that could allow me to do t=
-his?
+>> I see your point, but this would break these qtests that are trying to
+>> override the "-machine accel=qtest" from libqtest.c this way...
+> 
+> The solution would be to put "-accel kvm -accel tcg" before "-accel qtest".
+> 
+>> and if
+>> any other tool out there in the wild is already depending on this
+>> behavior, too, we can not change it so easily anymore.
+> 
+> I think -accel is new and obscure enough that it's unlikely to be used
+> with a colon.  In my opinion, the risk is worth the benefit of finally
+> getting a proper interface for accelerators.
 
-No, I don't think so.  Only MMIO regions intercept reads/writes, and
-they only do it at 1/2/4/8 byte granularity.
+I agree with you. Let's try to get this right before it's too late!
 
->> Regarding pcnet, is CSR_BSWP really a no-op on PCI cards?=C2=A0 If not=
-, an
->> option could be to move that handling to pcnet.c - making the ledma sw=
-ap
->> unconditional and removing the do_bswap argument.=C2=A0 The disadvanta=
-ge is
->> that SPARC would swap twice, and you'd have to keep the callback becau=
-se
->> of s->dmaregs[3], but maybe it's still worthwhile.
->=20
-> Hmmm good question. If we can intercept the request above, that would b=
-e
-> my preferred option as something tells it me it might be useful for
-> other similar situations.
-
-Yeah, it wouldn't be a great improvement, but there would be the benefit
-of more accurate emulation.
-
-Paolo
+ Thomas
