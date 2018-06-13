@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fT6jd-00077u-Jw
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:26:55 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fT6mr-0001AA-0k
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:30:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fT6jZ-0004Se-Bi
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:26:53 -0400
-Received: from 7.mo4.mail-out.ovh.net ([178.33.253.54]:37315)
+	(envelope-from <stefanha@redhat.com>) id 1fT6ml-0004AZ-5z
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:30:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48570 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fT6jZ-0004OT-2O
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:26:49 -0400
-Received: from player779.ha.ovh.net (unknown [10.109.120.85])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 3A6FE1836E4
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 16:26:47 +0200 (CEST)
-Date: Wed, 13 Jun 2018 16:26:39 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180613162639.08d8cc17@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20180613120502.GO30690@umbus.fritz.box>
-References: <152882087494.112322.15549780953419438229.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<152882305541.114463.3137854902721347235.stgit@bahia.lan>
-	<20180613004506.GM30690@umbus.fritz.box>
-	<20180613101915.4cc9485b@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20180613120502.GO30690@umbus.fritz.box>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fT6ml-00049Z-0F
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:30:07 -0400
+Date: Wed, 13 Jun 2018 15:30:05 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180613143005.GW24528@stefanha-x1.localdomain>
+References: <20180604080630.10946-1-peterx@redhat.com>
+	<87tvqeyfs2.fsf@dusky.pond.sub.org> <20180608044235.GA7736@xz-mi>
+	<20180608080446.GH29183@stefanha-x1.localdomain>
+	<87a7s5snce.fsf@dusky.pond.sub.org>
+	<20180611164549.GI17756@stefanha-x1.localdomain>
+	<20180612054700.GN7736@xz-mi>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/+cbqSFs1r+EK+GHd=vLoFH6";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 3/3] target/ppc: filter out non-zero PCR
- values when using TCG
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="fCmRXBY78W5odcVA"
+Content-Disposition: inline
+In-Reply-To: <20180612054700.GN7736@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH] monitor: postpone
+ monitor_qmp_cleanup_queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,127 +33,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
---Sig_/+cbqSFs1r+EK+GHd=vLoFH6
-Content-Type: text/plain; charset=US-ASCII
+
+--fCmRXBY78W5odcVA
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 13 Jun 2018 22:05:02 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Wed, Jun 13, 2018 at 10:19:15AM +0200, Greg Kurz wrote:
-> > On Wed, 13 Jun 2018 10:45:06 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >  =20
-> > > On Tue, Jun 12, 2018 at 07:04:15PM +0200, Greg Kurz wrote: =20
-> > > > Bits set in the PCR disable features of the processor. TCG currently
-> > > > doesn't implement that, ie, we always act like if PCR is all zeros.
-> > > >=20
-> > > > But it is still possible for the PCR to have a non-null value. This=
- may
-> > > > confuse the guest.
-> > > >=20
-> > > > There are three distinct cases:
-> > > >=20
-> > > > 1) a powernv guest doing mtspr SPR_PCR
-> > > >=20
-> > > > 2) reset of a pseries guest if the max-cpu-compat machine property =
-is set
-> > > >=20
-> > > > 3) CAS of a pseries guest
-> > > >=20
-> > > > This patch adds a ppc_store_pcr() helper that ensures we cannot put
-> > > > a non-null value in the PCR when using TCG. This helper also has
-> > > > error propagation support, so that each case listed above can be
-> > > > handled appropriately:
-> > > >=20
-> > > > 1) since the powernv machine is mostly used for OpenPOWER FW devel,
-> > > >    we just print an error and let QEMU continue execution
-> > > >=20
-> > > > 2) an error is printed and QEMU exits, ie, same behaviour as when
-> > > >    KVM doesn't support the requested compat mode
-> > > >=20
-> > > > 3) an error is printed and QEMU reports H_HARDWARE to the guest
-> > > >=20
-> > > > Signed-off-by: Greg Kurz <groug@kaod.org>   =20
+On Tue, Jun 12, 2018 at 01:47:00PM +0800, Peter Xu wrote:
+> On Mon, Jun 11, 2018 at 05:45:49PM +0100, Stefan Hajnoczi wrote:
+> > On Fri, Jun 08, 2018 at 10:18:25AM +0200, Markus Armbruster wrote:
+> > > Stefan Hajnoczi <stefanha@gmail.com> writes:
+> > > > On Fri, Jun 08, 2018 at 12:42:35PM +0800, Peter Xu wrote:
+> > > >> On Thu, Jun 07, 2018 at 01:53:01PM +0200, Markus Armbruster wrote:
+> > > >> > Peter Xu <peterx@redhat.com> writes:
+> > > >> >=20
+> > > >> > > Previously we cleanup the queues when we got CLOSED event.  It=
+ was used
+> > > >> >=20
+> > > >> > we clean up
+> > > >> >=20
+> > > >> > > to make sure we won't leftover replies/events of a old client =
+to a new
+> > > >> >=20
+> > > >> > we won't send leftover replies/events of an old client
+> > > >> >=20
+> > > >> > > client.  Now this patch postpones that until OPENED.
+> > > >> >=20
+> > > >> > What if OPENED never comes?
+> > > >>=20
+> > > >> Then we clean that up until destruction of the monitor.  IMHO it's
+> > > >> fine, but I'm not sure whether that's an overall acceptable approa=
+ch.
+> > > >
+> > > > I think this patch fixes the problem at the wrong level.  Marc-Andr=
+=E9's
+> > > > fix seemed like a cleaner solution.
 > > >=20
-> > > I'm not really convinced this is a good idea.  Printing a (non fatal)
-> > > error if the guest attempts to write a non-zero value to the PCR
-> > > should be ok.  However, you're generating a fatal error if the machine
-> > > tries to set the PCR in TCG mode.  That could easily happen using,
-> > > e.g. the cap-htm flag on a TCG guest.  That would take TCG from mostly
-> > > working, to refusing to run at all.
-> > >  =20
+> > > Is it the right solution?
+> > >=20
+> > > I proposed another one:
 > >=20
-> > I'm confused... I don't see anything related to HTM in TCG. Also we have
-> > the following in cap_htm_apply():
+> > Sorry, I won't be able to participate in this because I'm behind on
+> > other patches and tasks.  Therefore, feel free to disregard but I'll
+> > give my 2 cents:
 > >=20
-> >     if (tcg_enabled()) {
-> >         error_setg(errp,
-> >                    "No Transactional Memory support in TCG, try cap-htm=
-=3Doff");
-> >=20
-> > I'm probably missing something... can you enlighten me ? =20
+> > This seems like a chardev bug.  The solution should probably be in the
+> > chardev layer (Marc-Andr=E9's patch or something else), not in the moni=
+tor
+> > (this patch).
 >=20
-> Ok, so right now when cap-htm=3Doff we don't actually enforce that, we
-> just don't advertise it to the guest.  We probably _should_ enforce
-> that, and the way we'd do it is to set the appropriate bit in the
-> PCR.  That'll do the right thing for KVM (well, once we update KVM to
-> actually pass on the PCR value) but would break TCG in conjunction
-> with your patch above.
+> Yes that's why I said I like Marc-Andre's patch. :) I just don't know
+> an reliable way to achieve what we want there.
 >=20
+> The thing is that we don't really monitor the ioc_out for fd-typed
+> chardevs.  We only do that when we call qemu_chr_fe_add_watch() (e.g.,
+> in monitor_flush_locked()) when the writting buffer is full.  But
+> normally we can't detect any event from the output side, hence no way
+> to deliever a CLOSED event when the output fd is the last fd that is
+> closed.
+>=20
+> Maybe we can keep that output watch for the whole lifecycle of the
+> chardev?  I'm not sure yet.
 
-Hmm... The granularity of the PCR bits is PowerISA versions, not individual
-facilities AFAIK... or am I missing something again ?
+It's not possible to keep a POLLOUT fd watch since poll(2) would return
+instantly and the event loop would spin.  However, POLLHUP (G_IO_HUP)
+might work.
 
-Anyway, with the current code, if we start the guest with:
+Stefan
 
--machine accel=3Dtcg,max-cpu-compat=3Dpower8 -cpu POWER9
-
-We get this in the guest:
-
-# grep ^cpu /proc/cpuinfo=20
-cpu             : POWER8 (architected), altivec supported
-
-This is the expected result of the CAS negotiation, but
-the guest can still execute PowerISA 3.0 instructions
-that should cause an invalid instruction exception.
-
-I agree this shouldn't cause QEMU to exit, but I guess we should
-at least leave the PCR to all zeroes, so that the guest view
-is consistent with what TGC does (ie, raw mode). And maybe an
-error message to indicate that the PCR is ignored in TCG... but
-since that could be guest triggered, and the user cannot do anything
-about it, I'm wondering if this should rather be a trace actually.
-
-Does it make sense for you ?
-
-Cheers,
-
---
-Greg
-
---Sig_/+cbqSFs1r+EK+GHd=vLoFH6
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+--fCmRXBY78W5odcVA
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlshKZ8ACgkQcdTV5YIv
-c9ZFvQ/8CbjlgNCkV9wkqfbuPN953d0pZVju5bx20SQO5PLESQ0YsSk4BoLT2DXM
-JWrY+WG4SFG/RBLLN1FdHXcUj4SuYLoQSe+m2qoUwXLsSuDNxLHuQHxsb/VFe+pI
-1Mj35UvQOU8DdBDz1m5SdvveWB7VZ4uT94C09A0nH5+yZ4IZWLr4nMidXjefyfkq
-GyScLkL6IqMLKTk/SuKZo224aMqM0Rx/Gn7uIK9lKp696XxbK5BPJqnj28jKio+1
-RVDfywuWkJcXQPDXUQ/37RftWyRGhB7FZzubCP9WKLj8G/SM+vUc3tYGLScPN64u
-RvBN4vJc87ufzJ3MZmrNmYQnm7ySyK9HHciFKcWMvvaa+zWFwmI/X+KQSoWdY66B
-mbn4c8C+9ioYUrswD+BdCucW9YtP+Z1ngLBltbjC7OQM/vEo5rmmp3Bu2PPVgIR4
-NVE2eXwroZacvickb/sKlX8JlW7rmip1EwoWQltHHuDG3V4uCtlChxDMyjEv9qya
-c3ykwS75WmTILRQfwtPPT4q7bvJ2XGWWahhx2NX/7t+SPXFI5TwR8oGrFa163nn7
-54QYRWinVk2uVAUltVWCgsgWnQF01MLSyVegTU9xaATof7SBknUXNSfzuggSsLgy
-TYirOo1bDPOcv6ZQswHOTkygizxlwbWDFs1zx0iTukHiWJbPDWY=
-=flTQ
+iQEcBAEBAgAGBQJbISptAAoJEJykq7OBq3PIJzQH/i8dwBORqDXikSNgGw6NQaIQ
+d0NdADXDYChbhkLkQgenhQ8PP6hZGKiqS14gelkA0QEDx+Bos1+9qG8o9VplpPja
+1utEVq04R29j7oLU83YzFiM+l7F2KfU4yMWEGaQ9xq063jIc00dpudlCq8Rcls9w
+ZWl3pENZDSYN5+0nUIJdGFJ3rEXNU5HlEcDtcR2aFlZr7hJKD/CFkZmiNWjzV+NL
+AxC76+owa73nvkdbwf0/lE+dSUxVSzlZaqF5zdnmT0FxXDYtq0K8zjmIZlehd8Fd
+EojZvllWIsaLiiv+OgAmZiqB5f6i948j7sfYFonYovcvW5hpjOQxN0Dj5KELeos=
+=DTnv
 -----END PGP SIGNATURE-----
 
---Sig_/+cbqSFs1r+EK+GHd=vLoFH6--
+--fCmRXBY78W5odcVA--
