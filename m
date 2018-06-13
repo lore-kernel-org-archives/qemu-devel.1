@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSv2L-0002Vx-3Z
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:27 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fSv2M-0002Y0-Vn
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSv2H-0006IY-Un
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:25 -0400
-Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:46043)
+	(envelope-from <richard.henderson@linaro.org>) id 1fSv2K-0006JK-Uz
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:27 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:37933)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fSv2H-0006IN-Lb
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:21 -0400
-Received: by mail-pf0-x231.google.com with SMTP id a22-v6so497781pfo.12
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:57:21 -0700 (PDT)
+	id 1fSv2K-0006J9-MK
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:24 -0400
+Received: by mail-pl0-x241.google.com with SMTP id b14-v6so553871pls.5
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:57:24 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 12 Jun 2018 15:56:35 -1000
-Message-Id: <20180613015641.5667-13-richard.henderson@linaro.org>
+Date: Tue, 12 Jun 2018 15:56:36 -1000
+Message-Id: <20180613015641.5667-14-richard.henderson@linaro.org>
 In-Reply-To: <20180613015641.5667-1-richard.henderson@linaro.org>
 References: <20180613015641.5667-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v4b 12/18] target/arm: Implement SVE Integer
- Compare - Immediate Group
+Subject: [Qemu-devel] [PATCH v4b 13/18] target/arm: Implement SVE Partition
+ Break Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,287 +33,454 @@ Cc: peter.maydell@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 44 +++++++++++++++++++
- target/arm/sve_helper.c    | 88 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 66 ++++++++++++++++++++++++++++
- target/arm/sve.decode      | 23 ++++++++++
- 4 files changed, 221 insertions(+)
+ target/arm/helper-sve.h    |  18 +++
+ target/arm/sve_helper.c    | 248 +++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 106 ++++++++++++++++
+ target/arm/sve.decode      |  19 +++
+ 4 files changed, 391 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 6ffd1fbe8e..ae38c0a4be 100644
+index ae38c0a4be..f0a3ed3414 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -605,6 +605,50 @@ DEF_HELPER_FLAGS_5(sve_cmplo_ppzw_s, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(sve_cmpls_ppzw_s, TCG_CALL_NO_RWG,
-                    i32, ptr, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_4(sve_cmpeq_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpne_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpgt_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpge_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmplt_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmple_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmphs_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmphi_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmplo_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpls_ppzi_b, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
+@@ -658,3 +658,21 @@ DEF_HELPER_FLAGS_5(sve_orn_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve_nor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve_nand_pppp, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_4(sve_cmpeq_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpne_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpgt_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpge_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmplt_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmple_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmphs_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmphi_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmplo_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpls_ppzi_h, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_brkpa, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_brkpb, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_brkpas, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_brkpbs, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_4(sve_cmpeq_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpne_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpgt_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpge_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmplt_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmple_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmphs_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmphi_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmplo_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpls_ppzi_s, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brka_z, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkb_z, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brka_m, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkb_m, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_4(sve_cmpeq_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpne_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpgt_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpge_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmplt_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmple_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmphs_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmphi_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmplo_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_cmpls_ppzi_d, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkas_z, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkbs_z, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkas_m, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkbs_m, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
 +
- DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkn, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_brkns, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index d11f591661..c1d95edfca 100644
+index c1d95edfca..b27b502d75 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -2388,3 +2388,91 @@ DO_CMP_PPZW_S(sve_cmpls_ppzw_s, uint32_t, uint64_t, <=)
- #undef DO_CMP_PPZW_H
- #undef DO_CMP_PPZW_S
- #undef DO_CMP_PPZW
+@@ -2476,3 +2476,251 @@ DO_CMP_PPZI_D(sve_cmpls_ppzi_d, uint64_t, <=)
+ #undef DO_CMP_PPZI_S
+ #undef DO_CMP_PPZI_D
+ #undef DO_CMP_PPZI
 +
-+/* Similar, but the second source is immediate.  */
-+#define DO_CMP_PPZI(NAME, TYPE, OP, H, MASK)                         \
-+uint32_t HELPER(NAME)(void *vd, void *vn, void *vg, uint32_t desc)   \
-+{                                                                    \
-+    intptr_t opr_sz = simd_oprsz(desc);                              \
-+    uint32_t flags = PREDTEST_INIT;                                  \
-+    TYPE mm = simd_data(desc);                                       \
-+    intptr_t i = opr_sz;                                             \
-+    do {                                                             \
-+        uint64_t out = 0, pg;                                        \
-+        do {                                                         \
-+            i -= sizeof(TYPE), out <<= sizeof(TYPE);                 \
-+            TYPE nn = *(TYPE *)(vn + H(i));                          \
-+            out |= nn OP mm;                                         \
-+        } while (i & 63);                                            \
-+        pg = *(uint64_t *)(vg + (i >> 3)) & MASK;                    \
-+        out &= pg;                                                   \
-+        *(uint64_t *)(vd + (i >> 3)) = out;                          \
-+        flags = iter_predtest_bwd(out, pg, flags);                   \
-+    } while (i > 0);                                                 \
-+    return flags;                                                    \
++/* Similar to the ARM LastActive pseudocode function.  */
++static bool last_active_pred(void *vd, void *vg, intptr_t oprsz)
++{
++    intptr_t i;
++
++    for (i = QEMU_ALIGN_UP(oprsz, 8) - 8; i >= 0; i -= 8) {
++        uint64_t pg = *(uint64_t *)(vg + i);
++        if (pg) {
++            return (pow2floor(pg) & *(uint64_t *)(vd + i)) != 0;
++        }
++    }
++    return 0;
 +}
 +
-+#define DO_CMP_PPZI_B(NAME, TYPE, OP) \
-+    DO_CMP_PPZI(NAME, TYPE, OP, H1,   0xffffffffffffffffull)
-+#define DO_CMP_PPZI_H(NAME, TYPE, OP) \
-+    DO_CMP_PPZI(NAME, TYPE, OP, H1_2, 0x5555555555555555ull)
-+#define DO_CMP_PPZI_S(NAME, TYPE, OP) \
-+    DO_CMP_PPZI(NAME, TYPE, OP, H1_4, 0x1111111111111111ull)
-+#define DO_CMP_PPZI_D(NAME, TYPE, OP) \
-+    DO_CMP_PPZI(NAME, TYPE, OP,     , 0x0101010101010101ull)
++/* Compute a mask into RETB that is true for all G, up to and including
++ * (if after) or excluding (if !after) the first G & N.
++ * Return true if BRK found.
++ */
++static bool compute_brk(uint64_t *retb, uint64_t n, uint64_t g,
++                        bool brk, bool after)
++{
++    uint64_t b;
 +
-+DO_CMP_PPZI_B(sve_cmpeq_ppzi_b, uint8_t,  ==)
-+DO_CMP_PPZI_H(sve_cmpeq_ppzi_h, uint16_t, ==)
-+DO_CMP_PPZI_S(sve_cmpeq_ppzi_s, uint32_t, ==)
-+DO_CMP_PPZI_D(sve_cmpeq_ppzi_d, uint64_t, ==)
++    if (brk) {
++        b = 0;
++    } else if ((g & n) == 0) {
++        /* For all G, no N are set; break not found.  */
++        b = g;
++    } else {
++        /* Break somewhere in N.  Locate it.  */
++        b = g & n;            /* guard true, pred true */
++        b = b & -b;           /* first such */
++        if (after) {
++            b = b | (b - 1);  /* break after same */
++        } else {
++            b = b - 1;        /* break before same */
++        }
++        brk = true;
++    }
 +
-+DO_CMP_PPZI_B(sve_cmpne_ppzi_b, uint8_t,  !=)
-+DO_CMP_PPZI_H(sve_cmpne_ppzi_h, uint16_t, !=)
-+DO_CMP_PPZI_S(sve_cmpne_ppzi_s, uint32_t, !=)
-+DO_CMP_PPZI_D(sve_cmpne_ppzi_d, uint64_t, !=)
++    *retb = b;
++    return brk;
++}
 +
-+DO_CMP_PPZI_B(sve_cmpgt_ppzi_b, int8_t,  >)
-+DO_CMP_PPZI_H(sve_cmpgt_ppzi_h, int16_t, >)
-+DO_CMP_PPZI_S(sve_cmpgt_ppzi_s, int32_t, >)
-+DO_CMP_PPZI_D(sve_cmpgt_ppzi_d, int64_t, >)
++/* Compute a zeroing BRK.  */
++static void compute_brk_z(uint64_t *d, uint64_t *n, uint64_t *g,
++                          intptr_t oprsz, bool after)
++{
++    bool brk = false;
++    intptr_t i;
 +
-+DO_CMP_PPZI_B(sve_cmpge_ppzi_b, int8_t,  >=)
-+DO_CMP_PPZI_H(sve_cmpge_ppzi_h, int16_t, >=)
-+DO_CMP_PPZI_S(sve_cmpge_ppzi_s, int32_t, >=)
-+DO_CMP_PPZI_D(sve_cmpge_ppzi_d, int64_t, >=)
++    for (i = 0; i < DIV_ROUND_UP(oprsz, 8); ++i) {
++        uint64_t this_b, this_g = g[i];
 +
-+DO_CMP_PPZI_B(sve_cmphi_ppzi_b, uint8_t,  >)
-+DO_CMP_PPZI_H(sve_cmphi_ppzi_h, uint16_t, >)
-+DO_CMP_PPZI_S(sve_cmphi_ppzi_s, uint32_t, >)
-+DO_CMP_PPZI_D(sve_cmphi_ppzi_d, uint64_t, >)
++        brk = compute_brk(&this_b, n[i], this_g, brk, after);
++        d[i] = this_b & this_g;
++    }
++}
 +
-+DO_CMP_PPZI_B(sve_cmphs_ppzi_b, uint8_t,  >=)
-+DO_CMP_PPZI_H(sve_cmphs_ppzi_h, uint16_t, >=)
-+DO_CMP_PPZI_S(sve_cmphs_ppzi_s, uint32_t, >=)
-+DO_CMP_PPZI_D(sve_cmphs_ppzi_d, uint64_t, >=)
++/* Likewise, but also compute flags.  */
++static uint32_t compute_brks_z(uint64_t *d, uint64_t *n, uint64_t *g,
++                               intptr_t oprsz, bool after)
++{
++    uint32_t flags = PREDTEST_INIT;
++    bool brk = false;
++    intptr_t i;
 +
-+DO_CMP_PPZI_B(sve_cmplt_ppzi_b, int8_t,  <)
-+DO_CMP_PPZI_H(sve_cmplt_ppzi_h, int16_t, <)
-+DO_CMP_PPZI_S(sve_cmplt_ppzi_s, int32_t, <)
-+DO_CMP_PPZI_D(sve_cmplt_ppzi_d, int64_t, <)
++    for (i = 0; i < DIV_ROUND_UP(oprsz, 8); ++i) {
++        uint64_t this_b, this_d, this_g = g[i];
 +
-+DO_CMP_PPZI_B(sve_cmple_ppzi_b, int8_t,  <=)
-+DO_CMP_PPZI_H(sve_cmple_ppzi_h, int16_t, <=)
-+DO_CMP_PPZI_S(sve_cmple_ppzi_s, int32_t, <=)
-+DO_CMP_PPZI_D(sve_cmple_ppzi_d, int64_t, <=)
++        brk = compute_brk(&this_b, n[i], this_g, brk, after);
++        d[i] = this_d = this_b & this_g;
++        flags = iter_predtest_fwd(this_d, this_g, flags);
++    }
++    return flags;
++}
 +
-+DO_CMP_PPZI_B(sve_cmplo_ppzi_b, uint8_t,  <)
-+DO_CMP_PPZI_H(sve_cmplo_ppzi_h, uint16_t, <)
-+DO_CMP_PPZI_S(sve_cmplo_ppzi_s, uint32_t, <)
-+DO_CMP_PPZI_D(sve_cmplo_ppzi_d, uint64_t, <)
++/* Compute a merging BRK.  */
++static void compute_brk_m(uint64_t *d, uint64_t *n, uint64_t *g,
++                          intptr_t oprsz, bool after)
++{
++    bool brk = false;
++    intptr_t i;
 +
-+DO_CMP_PPZI_B(sve_cmpls_ppzi_b, uint8_t,  <=)
-+DO_CMP_PPZI_H(sve_cmpls_ppzi_h, uint16_t, <=)
-+DO_CMP_PPZI_S(sve_cmpls_ppzi_s, uint32_t, <=)
-+DO_CMP_PPZI_D(sve_cmpls_ppzi_d, uint64_t, <=)
++    for (i = 0; i < DIV_ROUND_UP(oprsz, 8); ++i) {
++        uint64_t this_b, this_g = g[i];
 +
-+#undef DO_CMP_PPZI_B
-+#undef DO_CMP_PPZI_H
-+#undef DO_CMP_PPZI_S
-+#undef DO_CMP_PPZI_D
-+#undef DO_CMP_PPZI
++        brk = compute_brk(&this_b, n[i], this_g, brk, after);
++        d[i] = (this_b & this_g) | (d[i] & ~this_g);
++    }
++}
++
++/* Likewise, but also compute flags.  */
++static uint32_t compute_brks_m(uint64_t *d, uint64_t *n, uint64_t *g,
++                               intptr_t oprsz, bool after)
++{
++    uint32_t flags = PREDTEST_INIT;
++    bool brk = false;
++    intptr_t i;
++
++    for (i = 0; i < oprsz / 8; ++i) {
++        uint64_t this_b, this_d = d[i], this_g = g[i];
++
++        brk = compute_brk(&this_b, n[i], this_g, brk, after);
++        d[i] = this_d = (this_b & this_g) | (this_d & ~this_g);
++        flags = iter_predtest_fwd(this_d, this_g, flags);
++    }
++    return flags;
++}
++
++static uint32_t do_zero(ARMPredicateReg *d, intptr_t oprsz)
++{
++    /* It is quicker to zero the whole predicate than loop on OPRSZ.
++     * The compiler should turn this into 4 64-bit integer stores.
++     */
++    memset(d, 0, sizeof(ARMPredicateReg));
++    return PREDTEST_INIT;
++}
++
++void HELPER(sve_brkpa)(void *vd, void *vn, void *vm, void *vg,
++                       uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    if (last_active_pred(vn, vg, oprsz)) {
++        compute_brk_z(vd, vm, vg, oprsz, true);
++    } else {
++        do_zero(vd, oprsz);
++    }
++}
++
++uint32_t HELPER(sve_brkpas)(void *vd, void *vn, void *vm, void *vg,
++                            uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    if (last_active_pred(vn, vg, oprsz)) {
++        return compute_brks_z(vd, vm, vg, oprsz, true);
++    } else {
++        return do_zero(vd, oprsz);
++    }
++}
++
++void HELPER(sve_brkpb)(void *vd, void *vn, void *vm, void *vg,
++                       uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    if (last_active_pred(vn, vg, oprsz)) {
++        compute_brk_z(vd, vm, vg, oprsz, false);
++    } else {
++        do_zero(vd, oprsz);
++    }
++}
++
++uint32_t HELPER(sve_brkpbs)(void *vd, void *vn, void *vm, void *vg,
++                            uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    if (last_active_pred(vn, vg, oprsz)) {
++        return compute_brks_z(vd, vm, vg, oprsz, false);
++    } else {
++        return do_zero(vd, oprsz);
++    }
++}
++
++void HELPER(sve_brka_z)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    compute_brk_z(vd, vn, vg, oprsz, true);
++}
++
++uint32_t HELPER(sve_brkas_z)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    return compute_brks_z(vd, vn, vg, oprsz, true);
++}
++
++void HELPER(sve_brkb_z)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    compute_brk_z(vd, vn, vg, oprsz, false);
++}
++
++uint32_t HELPER(sve_brkbs_z)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    return compute_brks_z(vd, vn, vg, oprsz, false);
++}
++
++void HELPER(sve_brka_m)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    compute_brk_m(vd, vn, vg, oprsz, true);
++}
++
++uint32_t HELPER(sve_brkas_m)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    return compute_brks_m(vd, vn, vg, oprsz, true);
++}
++
++void HELPER(sve_brkb_m)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    compute_brk_m(vd, vn, vg, oprsz, false);
++}
++
++uint32_t HELPER(sve_brkbs_m)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    return compute_brks_m(vd, vn, vg, oprsz, false);
++}
++
++void HELPER(sve_brkn)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++
++    if (!last_active_pred(vn, vg, oprsz)) {
++        do_zero(vd, oprsz);
++    }
++}
++
++/* As if PredTest(Ones(PL), D, esz).  */
++static uint32_t predtest_ones(ARMPredicateReg *d, intptr_t oprsz,
++                              uint64_t esz_mask)
++{
++    uint32_t flags = PREDTEST_INIT;
++    intptr_t i;
++
++    for (i = 0; i < oprsz / 8; i++) {
++        flags = iter_predtest_fwd(d->p[i], esz_mask, flags);
++    }
++    if (oprsz & 7) {
++        uint64_t mask = ~(-1ULL << (8 * (oprsz & 7)));
++        flags = iter_predtest_fwd(d->p[i], esz_mask & mask, flags);
++    }
++    return flags;
++}
++
++uint32_t HELPER(sve_brkns)(void *vd, void *vn, void *vg, uint32_t pred_desc)
++{
++    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++
++    if (last_active_pred(vn, vg, oprsz)) {
++        return predtest_ones(vd, oprsz, -1);
++    } else {
++        return do_zero(vd, oprsz);
++    }
++}
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 1510af6ece..00481e92de 100644
+index 00481e92de..c381240b6f 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -34,6 +34,8 @@
- #include "translate-a64.h"
+@@ -2853,6 +2853,112 @@ DO_PPZI(CMPLS, cmpls)
  
- 
-+typedef void gen_helper_gvec_flags_3(TCGv_i32, TCGv_ptr, TCGv_ptr,
-+                                     TCGv_ptr, TCGv_i32);
- typedef void gen_helper_gvec_flags_4(TCGv_i32, TCGv_ptr, TCGv_ptr,
-                                      TCGv_ptr, TCGv_ptr, TCGv_i32);
- 
-@@ -2787,6 +2789,70 @@ DO_PPZW(CMPLS, cmpls)
- 
- #undef DO_PPZW
+ #undef DO_PPZI
  
 +/*
-+ *** SVE Integer Compare - Immediate Groups
++ *** SVE Partition Break Group
 + */
 +
-+static bool do_ppzi_flags(DisasContext *s, arg_rpri_esz *a,
-+                          gen_helper_gvec_flags_3 *gen_fn)
++static bool do_brk3(DisasContext *s, arg_rprr_s *a,
++                    gen_helper_gvec_4 *fn, gen_helper_gvec_flags_4 *fn_s)
 +{
-+    TCGv_ptr pd, zn, pg;
-+    unsigned vsz;
-+    TCGv_i32 t;
-+
-+    if (gen_fn == NULL) {
-+        return false;
-+    }
 +    if (!sve_access_check(s)) {
 +        return true;
 +    }
 +
-+    vsz = vec_full_reg_size(s);
-+    t = tcg_const_i32(simd_desc(vsz, vsz, a->imm));
-+    pd = tcg_temp_new_ptr();
-+    zn = tcg_temp_new_ptr();
-+    pg = tcg_temp_new_ptr();
++    unsigned vsz = pred_full_reg_size(s);
 +
-+    tcg_gen_addi_ptr(pd, cpu_env, pred_full_reg_offset(s, a->rd));
-+    tcg_gen_addi_ptr(zn, cpu_env, vec_full_reg_offset(s, a->rn));
-+    tcg_gen_addi_ptr(pg, cpu_env, pred_full_reg_offset(s, a->pg));
++    /* Predicate sizes may be smaller and cannot use simd_desc.  */
++    TCGv_ptr d = tcg_temp_new_ptr();
++    TCGv_ptr n = tcg_temp_new_ptr();
++    TCGv_ptr m = tcg_temp_new_ptr();
++    TCGv_ptr g = tcg_temp_new_ptr();
++    TCGv_i32 t = tcg_const_i32(vsz - 2);
 +
-+    gen_fn(t, pd, zn, pg, t);
++    tcg_gen_addi_ptr(d, cpu_env, pred_full_reg_offset(s, a->rd));
++    tcg_gen_addi_ptr(n, cpu_env, pred_full_reg_offset(s, a->rn));
++    tcg_gen_addi_ptr(m, cpu_env, pred_full_reg_offset(s, a->rm));
++    tcg_gen_addi_ptr(g, cpu_env, pred_full_reg_offset(s, a->pg));
 +
-+    tcg_temp_free_ptr(pd);
-+    tcg_temp_free_ptr(zn);
-+    tcg_temp_free_ptr(pg);
-+
-+    do_pred_flags(t);
-+
++    if (a->s) {
++        fn_s(t, d, n, m, g, t);
++        do_pred_flags(t);
++    } else {
++        fn(d, n, m, g, t);
++    }
++    tcg_temp_free_ptr(d);
++    tcg_temp_free_ptr(n);
++    tcg_temp_free_ptr(m);
++    tcg_temp_free_ptr(g);
 +    tcg_temp_free_i32(t);
 +    return true;
 +}
 +
-+#define DO_PPZI(NAME, name) \
-+static bool trans_##NAME##_ppzi(DisasContext *s, arg_rpri_esz *a,         \
-+                                uint32_t insn)                            \
-+{                                                                         \
-+    static gen_helper_gvec_flags_3 * const fns[4] = {                     \
-+        gen_helper_sve_##name##_ppzi_b, gen_helper_sve_##name##_ppzi_h,   \
-+        gen_helper_sve_##name##_ppzi_s, gen_helper_sve_##name##_ppzi_d,   \
-+    };                                                                    \
-+    return do_ppzi_flags(s, a, fns[a->esz]);                              \
++static bool do_brk2(DisasContext *s, arg_rpr_s *a,
++                    gen_helper_gvec_3 *fn, gen_helper_gvec_flags_3 *fn_s)
++{
++    if (!sve_access_check(s)) {
++        return true;
++    }
++
++    unsigned vsz = pred_full_reg_size(s);
++
++    /* Predicate sizes may be smaller and cannot use simd_desc.  */
++    TCGv_ptr d = tcg_temp_new_ptr();
++    TCGv_ptr n = tcg_temp_new_ptr();
++    TCGv_ptr g = tcg_temp_new_ptr();
++    TCGv_i32 t = tcg_const_i32(vsz - 2);
++
++    tcg_gen_addi_ptr(d, cpu_env, pred_full_reg_offset(s, a->rd));
++    tcg_gen_addi_ptr(n, cpu_env, pred_full_reg_offset(s, a->rn));
++    tcg_gen_addi_ptr(g, cpu_env, pred_full_reg_offset(s, a->pg));
++
++    if (a->s) {
++        fn_s(t, d, n, g, t);
++        do_pred_flags(t);
++    } else {
++        fn(d, n, g, t);
++    }
++    tcg_temp_free_ptr(d);
++    tcg_temp_free_ptr(n);
++    tcg_temp_free_ptr(g);
++    tcg_temp_free_i32(t);
++    return true;
 +}
 +
-+DO_PPZI(CMPEQ, cmpeq)
-+DO_PPZI(CMPNE, cmpne)
-+DO_PPZI(CMPGT, cmpgt)
-+DO_PPZI(CMPGE, cmpge)
-+DO_PPZI(CMPHI, cmphi)
-+DO_PPZI(CMPHS, cmphs)
-+DO_PPZI(CMPLT, cmplt)
-+DO_PPZI(CMPLE, cmple)
-+DO_PPZI(CMPLO, cmplo)
-+DO_PPZI(CMPLS, cmpls)
++static bool trans_BRKPA(DisasContext *s, arg_rprr_s *a, uint32_t insn)
++{
++    return do_brk3(s, a, gen_helper_sve_brkpa, gen_helper_sve_brkpas);
++}
 +
-+#undef DO_PPZI
++static bool trans_BRKPB(DisasContext *s, arg_rprr_s *a, uint32_t insn)
++{
++    return do_brk3(s, a, gen_helper_sve_brkpb, gen_helper_sve_brkpbs);
++}
++
++static bool trans_BRKA_m(DisasContext *s, arg_rpr_s *a, uint32_t insn)
++{
++    return do_brk2(s, a, gen_helper_sve_brka_m, gen_helper_sve_brkas_m);
++}
++
++static bool trans_BRKB_m(DisasContext *s, arg_rpr_s *a, uint32_t insn)
++{
++    return do_brk2(s, a, gen_helper_sve_brkb_m, gen_helper_sve_brkbs_m);
++}
++
++static bool trans_BRKA_z(DisasContext *s, arg_rpr_s *a, uint32_t insn)
++{
++    return do_brk2(s, a, gen_helper_sve_brka_z, gen_helper_sve_brkas_z);
++}
++
++static bool trans_BRKB_z(DisasContext *s, arg_rpr_s *a, uint32_t insn)
++{
++    return do_brk2(s, a, gen_helper_sve_brkb_z, gen_helper_sve_brkbs_z);
++}
++
++static bool trans_BRKN(DisasContext *s, arg_rpr_s *a, uint32_t insn)
++{
++    return do_brk2(s, a, gen_helper_sve_brkn, gen_helper_sve_brkns);
++}
 +
  /*
   *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 76a42193e4..9bc383b085 100644
+index 9bc383b085..66e1ee6b5c 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -131,6 +131,11 @@
- @rdn_dbm        ........ .. .... dbm:13 rd:5 \
-                 &rr_dbm rn=%reg_movprfx
+@@ -59,6 +59,7 @@
+ &rri_esz        rd rn imm esz
+ &rrr_esz        rd rn rm esz
+ &rpr_esz        rd pg rn esz
++&rpr_s          rd pg rn s
+ &rprr_s         rd pg rn rm s
+ &rprr_esz       rd pg rn rm esz
+ &rprrr_esz      rd pg rn rm ra esz
+@@ -78,6 +79,9 @@
+ @pd_pn          ........ esz:2 .. .... ....... rn:4 . rd:4      &rr_esz
+ @rd_rn          ........ esz:2 ...... ...... rn:5 rd:5          &rr_esz
  
-+# Predicate output, vector and immediate input,
-+# controlling predicate, element size.
-+@pd_pg_rn_i7    ........ esz:2 . imm:7 . pg:3 rn:5 . rd:4       &rpri_esz
-+@pd_pg_rn_i5    ........ esz:2 . imm:s5 ... pg:3 rn:5 . rd:4    &rpri_esz
++# Two operand with governing predicate, flags setting
++@pd_pg_pn_s     ........ . s:1 ...... .. pg:4 . rn:4 . rd:4     &rpr_s
 +
- # Basic Load/Store with 9-bit immediate offset
- @pd_rn_i9       ........ ........ ...... rn:5 . rd:4    \
-                 &rri imm=%imm9_16_10
-@@ -496,6 +501,24 @@ CMPHI_ppzw      00100100 .. 0 ..... 110 ... ..... 1 ....        @pd_pg_rn_rm
- CMPLO_ppzw      00100100 .. 0 ..... 111 ... ..... 0 ....        @pd_pg_rn_rm
- CMPLS_ppzw      00100100 .. 0 ..... 111 ... ..... 1 ....        @pd_pg_rn_rm
+ # Three operand with unused vector element size
+ @rd_rn_rm_e0    ........ ... rm:5 ... ... rn:5 rd:5             &rrr_esz esz=0
  
-+### SVE Integer Compare - Unsigned Immediate Group
-+
-+# SVE integer compare with unsigned immediate
-+CMPHS_ppzi      00100100 .. 1 ....... 0 ... ..... 0 ....      @pd_pg_rn_i7
-+CMPHI_ppzi      00100100 .. 1 ....... 0 ... ..... 1 ....      @pd_pg_rn_i7
-+CMPLO_ppzi      00100100 .. 1 ....... 1 ... ..... 0 ....      @pd_pg_rn_i7
-+CMPLS_ppzi      00100100 .. 1 ....... 1 ... ..... 1 ....      @pd_pg_rn_i7
-+
-+### SVE Integer Compare - Signed Immediate Group
-+
-+# SVE integer compare with signed immediate
-+CMPGE_ppzi      00100101 .. 0 ..... 000 ... ..... 0 ....      @pd_pg_rn_i5
-+CMPGT_ppzi      00100101 .. 0 ..... 000 ... ..... 1 ....      @pd_pg_rn_i5
-+CMPLT_ppzi      00100101 .. 0 ..... 001 ... ..... 0 ....      @pd_pg_rn_i5
-+CMPLE_ppzi      00100101 .. 0 ..... 001 ... ..... 1 ....      @pd_pg_rn_i5
-+CMPEQ_ppzi      00100101 .. 0 ..... 100 ... ..... 0 ....      @pd_pg_rn_i5
-+CMPNE_ppzi      00100101 .. 0 ..... 100 ... ..... 1 ....      @pd_pg_rn_i5
-+
- ### SVE Predicate Logical Operations Group
+@@ -560,6 +564,21 @@ PFIRST          00100101 01 011 000 11000 00 .... 0 ....        @pd_pn_e0
+ # SVE predicate next active
+ PNEXT           00100101 .. 011 001 11000 10 .... 0 ....        @pd_pn
  
- # SVE predicate logical operations
++### SVE Partition Break Group
++
++# SVE propagate break from previous partition
++BRKPA           00100101 0. 00 .... 11 .... 0 .... 0 ....       @pd_pg_pn_pm_s
++BRKPB           00100101 0. 00 .... 11 .... 0 .... 1 ....       @pd_pg_pn_pm_s
++
++# SVE partition break condition
++BRKA_z          00100101 0. 01000001 .... 0 .... 0 ....         @pd_pg_pn_s
++BRKB_z          00100101 1. 01000001 .... 0 .... 0 ....         @pd_pg_pn_s
++BRKA_m          00100101 0. 01000001 .... 0 .... 1 ....         @pd_pg_pn_s
++BRKB_m          00100101 1. 01000001 .... 0 .... 1 ....         @pd_pg_pn_s
++
++# SVE propagate break to next partition
++BRKN            00100101 0. 01100001 .... 0 .... 0 ....         @pd_pg_pn_s
++
+ ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
+ 
+ # SVE load predicate register
 -- 
 2.17.1
