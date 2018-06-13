@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fSwnr-0002bU-Ap
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 23:50:36 -0400
+	(envelope-from <peterx@redhat.com>) id 1fSwzz-0006jU-VL
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:03:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fSwno-00054s-8v
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 23:50:35 -0400
-Date: Tue, 12 Jun 2018 23:50:30 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180613035030.GB25430@flamenco>
-References: <1528859749-25286-1-git-send-email-baiyaowei@cmss.chinamobile.com>
+	(envelope-from <peterx@redhat.com>) id 1fSwzw-0001Pj-Sm
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:03:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59340 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fSwzw-0001PX-Nz
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:03:04 -0400
+Date: Wed, 13 Jun 2018 12:02:59 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180613040259.GI15344@xz-mi>
+References: <20180612062430.GA15344@xz-mi>
+	<CAFEAcA_Bh4U1X_FDbakcc7YDBHFrkCjCKGrtuTWegn7rAGZUeQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1528859749-25286-1-git-send-email-baiyaowei@cmss.chinamobile.com>
-Subject: Re: [Qemu-devel] [PATCH] tracing.txt: add missing '-' for trace
- option
+In-Reply-To: <CAFEAcA_Bh4U1X_FDbakcc7YDBHFrkCjCKGrtuTWegn7rAGZUeQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] Is there a way to package QEMU binaries?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,28 +27,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
-Cc: mjt@tls.msk.ru, laurent@vivier.eu, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>
 
-On Tue, Jun 12, 2018 at 23:15:49 -0400, Yaowei Bai wrote:
-> Signed-off-by: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
-> ---
->  docs/devel/tracing.txt | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, Jun 12, 2018 at 09:52:45AM +0100, Peter Maydell wrote:
+> On 12 June 2018 at 07:24, Peter Xu <peterx@redhat.com> wrote:
+> > For example, I wanted to compile QEMU once and install it on multiple
+> > systems.  What would be the suggested way to do so?
 > 
-> diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
-> index 07abbb3..6ab32cc 100644
-> --- a/docs/devel/tracing.txt
-> +++ b/docs/devel/tracing.txt
-> @@ -18,7 +18,7 @@ for debugging, profiling, and observing execution.
->  
->  3. Run the virtual machine to produce a trace file:
->  
-> -    qemu -trace events=/tmp/events ... # your normal QEMU invocation
-> +    qemu --trace events=/tmp/events ... # your normal QEMU invocation
+> For this, I would recommend using whatever the packaging
+> format for those systems is. Eg for Debian use the existing
+> Debian QEMU packages, for Redhat systems use RPMs, etc.
+> If you want a newer version of QEMU than is in the distro's
+> packages, you can probably forward port the packaging parts
+> to a newer QEMU without too much pain.
+> 
+> Or you can use a distro-agnostic packaging tool of some sort;
+> there are a few out there but I have no particular recommendations.
 
-The second dash is not missing; both '-args' and '--args' work.
+I'll start my investigation with RPM first.  Thanks Peter.
 
-'-args' seems to be favoured though; see `qemu -h' or `qemu --h' :-)
-
-		Emilio
+-- 
+Peter Xu
