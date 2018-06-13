@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSv23-0002FI-Hd
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:08 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fSv25-0002IW-Ue
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fSv20-0006F0-E1
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:07 -0400
-Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:32937)
+	(envelope-from <richard.henderson@linaro.org>) id 1fSv25-0006G9-6G
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:10 -0400
+Received: from mail-pl0-x231.google.com ([2607:f8b0:400e:c01::231]:39474)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fSv20-0006Eq-7n
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:04 -0400
-Received: by mail-pf0-x233.google.com with SMTP id b17-v6so513648pfi.0
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:57:04 -0700 (PDT)
+	id 1fSv25-0006Fw-08
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 21:57:09 -0400
+Received: by mail-pl0-x231.google.com with SMTP id f1-v6so549743plt.6
+	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 18:57:08 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 12 Jun 2018 15:56:28 -1000
-Message-Id: <20180613015641.5667-6-richard.henderson@linaro.org>
+Date: Tue, 12 Jun 2018 15:56:30 -1000
+Message-Id: <20180613015641.5667-8-richard.henderson@linaro.org>
 In-Reply-To: <20180613015641.5667-1-richard.henderson@linaro.org>
 References: <20180613015641.5667-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v4b 05/18] target/arm: Implement SVE compress
- active elements
+Subject: [Qemu-devel] [PATCH v4b 07/18] target/arm: Implement SVE copy to
+ vector (predicated)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,104 +33,53 @@ Cc: peter.maydell@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    |  3 +++
- target/arm/sve_helper.c    | 34 ++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 12 ++++++++++++
+ target/arm/translate-sve.c | 19 +++++++++++++++++++
  target/arm/sve.decode      |  6 ++++++
- 4 files changed, 55 insertions(+)
+ 2 files changed, 25 insertions(+)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index bab20345c6..d977aea00d 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -460,6 +460,9 @@ DEF_HELPER_FLAGS_4(sve_trn_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_trn_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_trn_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_4(sve_compact_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_compact_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index f114e9ab63..ed3c6d4ca9 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -2036,3 +2036,37 @@ DO_TRN(sve_trn_d, uint64_t, )
- #undef DO_ZIP
- #undef DO_UZP
- #undef DO_TRN
-+
-+void HELPER(sve_compact_s)(void *vd, void *vn, void *vg, uint32_t desc)
-+{
-+    intptr_t i, j, opr_sz = simd_oprsz(desc) / 4;
-+    uint32_t *d = vd, *n = vn;
-+    uint8_t *pg = vg;
-+
-+    for (i = j = 0; i < opr_sz; i++) {
-+        if (pg[H1(i / 2)] & (i & 1 ? 0x10 : 0x01)) {
-+            d[H4(j)] = n[H4(i)];
-+            j++;
-+        }
-+    }
-+    for (; j < opr_sz; j++) {
-+        d[H4(j)] = 0;
-+    }
-+}
-+
-+void HELPER(sve_compact_d)(void *vd, void *vn, void *vg, uint32_t desc)
-+{
-+    intptr_t i, j, opr_sz = simd_oprsz(desc) / 8;
-+    uint64_t *d = vd, *n = vn;
-+    uint8_t *pg = vg;
-+
-+    for (i = j = 0; i < opr_sz; i++) {
-+        if (pg[H1(i)] & 1) {
-+            d[j] = n[i];
-+            j++;
-+        }
-+    }
-+    for (; j < opr_sz; j++) {
-+        d[j] = 0;
-+    }
-+}
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 21319518d7..ed0f48a927 100644
+index feb4c09f1b..eed59524a9 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -2284,6 +2284,18 @@ static bool trans_TRN2_z(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
-     return do_zzz_data_ool(s, a, 1 << a->esz, trn_fns[a->esz]);
+@@ -2624,6 +2624,25 @@ static bool trans_LASTB_r(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
+     return do_last_general(s, a, true);
  }
  
-+/*
-+ *** SVE Permute Vector - Predicated Group
-+ */
-+
-+static bool trans_COMPACT(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static bool trans_CPY_m_r(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
 +{
-+    static gen_helper_gvec_3 * const fns[4] = {
-+        NULL, NULL, gen_helper_sve_compact_s, gen_helper_sve_compact_d
-+    };
-+    return do_zpz_ool(s, a, fns[a->esz]);
++    if (sve_access_check(s)) {
++        do_cpy_m(s, a->esz, a->rd, a->rd, a->pg, cpu_reg_sp(s, a->rn));
++    }
++    return true;
++}
++
++static bool trans_CPY_m_v(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++{
++    if (sve_access_check(s)) {
++        int ofs = vec_reg_offset(s, a->rn, 0, a->esz);
++        TCGv_i64 t = load_esz(cpu_env, ofs, a->esz);
++        do_cpy_m(s, a->esz, a->rd, a->rd, a->pg, t);
++        tcg_temp_free_i64(t);
++    }
++    return true;
 +}
 +
  /*
   *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index df2b94dc0a..9da6566d32 100644
+index 1226867f69..519139f684 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -424,6 +424,12 @@ UZP2_z          00000101 .. 1 ..... 011 011 ..... .....         @rd_rn_rm
- TRN1_z          00000101 .. 1 ..... 011 100 ..... .....         @rd_rn_rm
- TRN2_z          00000101 .. 1 ..... 011 101 ..... .....         @rd_rn_rm
+@@ -450,6 +450,12 @@ LASTB_v         00000101 .. 10001 1 100 ... ..... .....         @rd_pg_rn
+ LASTA_r         00000101 .. 10000 0 101 ... ..... .....         @rd_pg_rn
+ LASTB_r         00000101 .. 10000 1 101 ... ..... .....         @rd_pg_rn
  
-+### SVE Permute - Predicated Group
++# SVE copy element from SIMD&FP scalar register
++CPY_m_v         00000101 .. 100000 100 ... ..... .....          @rd_pg_rn
 +
-+# SVE compress active elements
-+# Note esz >= 2
-+COMPACT         00000101 .. 100001 100 ... ..... .....          @rd_pg_rn
++# SVE copy element from general register to vector (predicated)
++CPY_m_r         00000101 .. 101000 101 ... ..... .....          @rd_pg_rn
 +
  ### SVE Predicate Logical Operations Group
  
