@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fT2dD-0008TO-Fw
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:04:00 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fT2dD-0008TR-ML
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:04:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fT2d9-00077T-Em
+	(envelope-from <dgibson@ozlabs.org>) id 1fT2d9-00077K-Dp
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 06:03:59 -0400
-Date: Wed, 13 Jun 2018 20:01:45 +1000
+Date: Wed, 13 Jun 2018 20:03:39 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180613100145.GI30690@umbus.fritz.box>
+Message-ID: <20180613100339.GK30690@umbus.fritz.box>
 References: <cover.1528291908.git.balaton@eik.bme.hu>
-	<7017cb3e0ed918bc3a9df823175d91a24692e2ef.1528291908.git.balaton@eik.bme.hu>
-	<20180608085618.GT3344@umbus.fritz.box>
-	<alpine.BSF.2.21.1806081112180.22949@zero.eik.bme.hu>
-	<20180613012027.GP30690@umbus.fritz.box>
-	<alpine.BSF.2.21.1806131054300.620@zero.eik.bme.hu>
+	<8c404c8c4ee1bfd2e4d079877d481094f797df8f.1528291908.git.balaton@eik.bme.hu>
+	<6aa1bc4e-a4b0-d7be-b9eb-85dfe8c06781@amsat.org>
+	<alpine.BSF.2.21.1806061920120.94568@zero.eik.bme.hu>
+	<20180613041115.GS30690@umbus.fritz.box>
+	<alpine.BSF.2.21.1806131044020.620@zero.eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WVhxcSV8VTJlfoH7"
+	protocol="application/pgp-signature"; boundary="XkdrZ7OMnakiJ6dL"
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1806131054300.620@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] ppc4xx_i2c: Move register state to
- private struct and remove unimplemented sdata and intr registers
+In-Reply-To: <alpine.BSF.2.21.1806131044020.620@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 5/8] hw/timer: Add basic
+ M41T80 emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,106 +30,113 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+Cc: qemu-ppc@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
 
---WVhxcSV8VTJlfoH7
-Content-Type: text/plain; charset=us-ascii
+--XkdrZ7OMnakiJ6dL
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 13, 2018 at 10:56:59AM +0200, BALATON Zoltan wrote:
+On Wed, Jun 13, 2018 at 10:50:59AM +0200, BALATON Zoltan wrote:
 > On Wed, 13 Jun 2018, David Gibson wrote:
-> > On Fri, Jun 08, 2018 at 11:20:50AM +0200, BALATON Zoltan wrote:
-> > > On Fri, 8 Jun 2018, David Gibson wrote:
-> > > > On Wed, Jun 06, 2018 at 03:31:48PM +0200, BALATON Zoltan wrote:
-> > > > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> > > >=20
-> > > > It's not clear to me why this is preferable to having the registers
-> > > > embedded in the state structure.  The latter is pretty standard
-> > > > practice for qemu.
-> > >=20
-> > > Maybe it will be clearer after the next patch in the series. I needed=
- a
-> > > place to store the bitbang_i2c_interface for the directcntl way of ac=
-cessing
-> > > the i2c bus but I can't include bitbang_i2c.h from the public header =
-because
-> > > it's a local header. So I needed a local extension to the state struc=
-t. Once
-> > > I have that then it's a good place to also store private registers wh=
-ich are
-> > > now defined in the same file so I don't have to look up them in a dif=
-ferent
-> > > place. This seemed clearer to me and easier to work with. Maybe the s=
-pliting
-> > > of the rewrite did not make this clear.
-> >=20
-> > Oh.. right.  There's a better way.
-> >=20
-> > You can just forward declare the bitbang_i2c_interface structure like
-> > this in your header:
-> > 	typdef struct bitbang_i2c_interface bitbang_i2c_interface;
-> >=20
-> > So you're declaring the existence of the structure, but not its
-> > contents - that's sufficient to create a pointer to it.  Then you
-> > don't need to creat the substructure and extra level of indirection.
-> >=20
-> > > One thing I'm not sure about though:
-> > >=20
-> > > > > ---
-> > > > >  hw/i2c/ppc4xx_i2c.c         | 75 +++++++++++++++++++++++++------=
---------------
-> > > > >  include/hw/i2c/ppc4xx_i2c.h | 19 ++----------
-> > > > >  2 files changed, 43 insertions(+), 51 deletions(-)
-> > > > >=20
-> > > > > diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-> > > > > index d1936db..a68b5f7 100644
-> > > > > --- a/hw/i2c/ppc4xx_i2c.c
-> > > > > +++ b/hw/i2c/ppc4xx_i2c.c
+> > On Wed, Jun 06, 2018 at 07:35:28PM +0200, BALATON Zoltan wrote:
+> > > On Wed, 6 Jun 2018, Philippe Mathieu-Daud=E9 wrote:
+> > > > On 06/06/2018 10:31 AM, BALATON Zoltan wrote:
+> > > > > Basic emulation of the M41T80 serial (I2C) RTC chip. Only getting=
+ time
+> > > > > of day is implemented. Setting time and RTC alarm are not support=
+ed.
 > > > [...]
-> > > > > @@ -330,7 +335,9 @@ static const MemoryRegionOps ppc4xx_i2c_ops =
-=3D {
-> > > > >  static void ppc4xx_i2c_init(Object *o)
-> > > > >  {
-> > > > >      PPC4xxI2CState *s =3D PPC4xx_I2C(o);
-> > > > > +    PPC4xxI2CRegs *r =3D g_malloc0(sizeof(PPC4xxI2CRegs));
-> > > > >=20
-> > > > > +    s->regs =3D r;
-> > > > >      memory_region_init_io(&s->iomem, OBJECT(s), &ppc4xx_i2c_ops,=
- s,
-> > > > >                            TYPE_PPC4xx_I2C, PPC4xx_I2C_MEM_SIZE);
-> > > > >      sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
+> > > > > diff --git a/hw/timer/m41t80.c b/hw/timer/m41t80.c
+> > > > > new file mode 100644
+> > > > > index 0000000..9dbdb1b
+> > > > > --- /dev/null
+> > > > > +++ b/hw/timer/m41t80.c
+> > > > > @@ -0,0 +1,117 @@
+> > > > > +/*
+> > > > > + * M41T80 serial rtc emulation
+> > > > > + *
+> > > > > + * Copyright (c) 2018 BALATON Zoltan
+> > > > > + *
+> > > > > + * This work is licensed under the GNU GPL license version 2 or =
+later.
+> > > > > + *
+> > > > > + */
+> > > > > +
+> > > > > +#include "qemu/osdep.h"
+> > > > > +#include "qemu/log.h"
+> > > > > +#include "qemu/timer.h"
+> > > > > +#include "qemu/bcd.h"
+> > > > > +#include "hw/i2c/i2c.h"
+> > > > > +
+> > > > > +#define TYPE_M41T80 "m41t80"
+> > > > > +#define M41T80(obj) OBJECT_CHECK(M41t80State, (obj), TYPE_M41T80)
+> > > > > +
+> > > > > +typedef struct M41t80State {
+> > > > > +    I2CSlave parent_obj;
+> > > > > +    int8_t addr;
+> > > > > +} M41t80State;
+> > > > > +
+> > > > > +static void m41t80_realize(DeviceState *dev, Error **errp)
+> > > > > +{
+> > > > > +    M41t80State *s =3D M41T80(dev);
+> > > > > +
+> > > > > +    s->addr =3D -1;
+> > > > > +}
+> > > > > +
+> > > > > +static int m41t80_send(I2CSlave *i2c, uint8_t data)
+> > > > > +{
+> > > > > +    M41t80State *s =3D M41T80(i2c);
+> > > > > +
+> > > > > +    if (s->addr < 0) {
+> > > > > +        s->addr =3D data;
+> > > > > +    } else {
+> > > > > +        s->addr++;
+> > > > > +    }
+> > > >=20
+> > > > What about adding enum i2c_event in M41t80State and use the enum he=
+re
+> > > > rather than the addr < 0? Also this wrap at INT8_MAX =3D 127, is th=
+is
+> > > > expected?
 > > >=20
-> > > I allocate memory here but I'm not sure if it should be g_free'd some=
-where
-> > > and if so where? I was not able to detangle QOM object hierarchies an=
-d there
-> > > seems to be no good docs available or I haven't found them. (PCI devi=
-ces
-> > > seem to have unrealize methods but this did not work for I2C objects.)
+> > > Thanks for the review. I guess we could add enum for device bytes and=
+ the
+> > > special case -1 meaning no register address selected yet but this is =
+a very
+> > > simple device with only 20 bytes and the datasheet also lists them by=
+ number
+> > > without naming them so I think we can also refer to them by number. S=
+ince
+> > > the device has only this 20 bytes the case with 127 should also not b=
+e a
+> > > problem as that's invalid address anyway. Or did you mean something e=
+lse?
 > >=20
-> > Yes, if you're allocating you definitely should be free()ing.  It
-> > should go in the corresponding cleanup routine to where it is
-> > allocated.  Since the allocation is in instance_init(), the free()
-> > should be in instance_finalize() (which you'd need to add).
+> > So, I'm not particularly in favour of adding extra state variables.
 > >=20
-> > Except that the above should let you avoid that.
-> >=20
-> > ..and I guess this won't actually ever be finalized in practice.
-> >=20
-> > ..and there doesn't seem to be a way to free up a bitbang_interface,
-> > so even if you added the finalize, it still wouldn't really clean up
-> > properly.
+> > But is using addr < 0 safe here?  You're assigning the uint8_t data to
+> > addr - could that result in a negative value?
 >=20
-> Yes, I suspected it won't matter anyway. I'll try your suggestion to just
-> declare the bitbang_i2c_interface in the public header in next version.
->=20
-> Any more reviews to expect from you for other patches or should I send a =
-v3
-> with the changes so far?
+> Why wouldn't it be safe with the expected values for register address
+> between 0-19? If the guest sends garbage values over 127 it will either
+> result in invalid register or unselected register and lead to an error wh=
+en
+> trying to read/write that register so I don't see what other problem this
+> may cause.
 
-Go ahead with v3.
+Ok, but where is that enforced?
+
+> The addr < 0 is to check if no address was selected before (on creating t=
+he
+> device and when sending first value from host addr is set to -1. In this
+> case first write will set register address, then subsequent reads/writes
+> increment register address as the datasheet says).
+>=20
+> Regards,
+> BALATON Zoltan
+
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -137,24 +144,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---WVhxcSV8VTJlfoH7
+--XkdrZ7OMnakiJ6dL
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsg64kACgkQbDjKyiDZ
-s5LirQ//eNkBR4VBvhh+K96sth10vEP6pxXQwV+kMea+VkAa/wwKYQWpw3Z203dM
-+eTkWTiOP7aaFwn2XGgRz+QfpW2uq3lG4XmI/rCbogH+twiwIdJ+O0VAeUWRVaU8
-rURvxfc0Uw/yMFbAHbQH+7OiZB1S6AaPf70+fHAfVUhpN8vwqBFmTBliikvfXl7P
-w/85YZJLYlEqUKK9nJ8uB7oHMCn1lE63OFyDKWKlMq7ZPqcYlvhMNGEVJNWWqsc8
-GHp4dlMKiB3myrkeFkawFi8YrwnITxK3nH6oeVrm4j/pV8nNw6tIbbtRlC/Jc3aU
-GYAJuHlCKcX8gVEAJbPuQKoocB0ehfFPBY4ukWIHorU246iC5WGuF03iKFIigPcO
-9J1hx1ZfC1ghtfImYLKIkPPe0yRdGMxuBKpaAn60OgIaNUJyADUOsJ7LBs4WeGET
-HRXQ4CsTjr5rgJksUl7PAWXSNm0rCwyy9NMVSTvrjQIWjSy7DRurUcTSSTnNPSHP
-uXXcl8QprOQGSiSgpMUWiHqAn2wwJsPMAEqZ5OoP6NeV/mFBufDIVxUgMphVaVpJ
-KXMkt9VuELkTME9Yn5A6yDMfHhqgNrs4ceJLHhvoP96kPEzHNZE/fs5ykGJSre+y
-CmaxVp4ElLZs/unx4az7PsAP97VXh5suhscb1Jtzgqw9qK1mPEY=
-=n+fa
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsg6/sACgkQbDjKyiDZ
+s5LHWRAApKr9i1AWW0Cg1J3b17eThFnp/i4jyaJ931WvVSKeab7IIkB3ILHFc3fN
+pkgeEYmmQiYTqKdv3i+Ye+qpGpi8SiNP3ENjJ/TkrXD5m2g7cNE4SmwZYyf+XWz9
+3V3dVxawAROfSVFkTnaUgkh03qUt+KTmPxcicEydegmhWLvisKRH51pem92Zsqqj
+CwKSn6nFYtgdOHHaxHGhbEEh/tOhrlv4rD2ze/Qco2CGn9d0oKsHSIszvEemOLgT
+pRPXJUnrLLXkXMMtUd1HVrC42BMHHkeANHlQ3370FKREDhPiwCvpjGHaHQTctU6a
+0HBPCbfNVeEGW6+G1afKMMoUfL598DIrg1DayKiWFqVwgaR+IDdJU2OB5AfO+bLe
+DvnolgQfothDvkGmmlC0UHVFgqXv48YHea4TTsjBnfaICjAnkplvan3PXCx7Drrz
+oyODsarxid5ssz9jEj8H47VMiiO7q2YlrilqQT7Eyq3v4mvQIFiewj4oX/iI158z
+DZZMVQsoaR3Fr1rU4a2JPhLkR1gYPXumuPaoXb8uY3NaydzbTo7yCsZzhBWVCrc5
+YlUc+tu4VNA09pbl+wbnK6eOeY4NV/lxx5idi0KD89VLOS6a6qAV5qQLyBQKiQd6
+fq6f0c+tf3VwBbo6u361TI1HV7d12cEFHbLqpQ7djISv8tfG3tQ=
+=Z7Iy
 -----END PGP SIGNATURE-----
 
---WVhxcSV8VTJlfoH7--
+--XkdrZ7OMnakiJ6dL--
