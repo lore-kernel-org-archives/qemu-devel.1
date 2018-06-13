@@ -1,14 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1fSwGh-0002en-8Z
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 23:16:20 -0400
+	(envelope-from <cota@braap.org>) id 1fSwXp-0005WF-KS
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 23:34:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <baiyaowei@cmss.chinamobile.com>) id 1fSwGg-0006V4-HO
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 23:16:19 -0400
-From: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
-Date: Tue, 12 Jun 2018 23:15:49 -0400
-Message-Id: <1528859749-25286-1-git-send-email-baiyaowei@cmss.chinamobile.com>
-Subject: [Qemu-devel] [PATCH] tracing.txt: add missing '-' for trace option
+	(envelope-from <cota@braap.org>) id 1fSwXk-0006hj-Ov
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 23:34:01 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:43889)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fSwXk-0006h0-Dq
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 23:33:56 -0400
+Date: Tue, 12 Jun 2018 23:33:53 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180613033353.GA25430@flamenco>
+References: <20180611125633.32755-1-peter.maydell@linaro.org>
+	<20180611125633.32755-2-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180611125633.32755-2-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 1/2] cpu-defs.h: Document CPUIOTLBEntry
+ 'addr' field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,26 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mjt@tls.msk.ru, laurent@vivier.eu
-Cc: qemu-trivial@nongnu.org, stefanha@redhat.com, qemu-devel@nongnu.org, Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
-Signed-off-by: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
----
- docs/devel/tracing.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Jun 11, 2018 at 13:56:32 +0100, Peter Maydell wrote:
+>  typedef struct CPUIOTLBEntry {
+> +    /*
+> +     * @addr contains:
+> +     *  - in the lower TARGET_PAGE_BITS, a physical section number
+> +     *  - with the lower TARGET_PAGE_BITS masked off, an offset which
+> +     *    must be added to the virtual address to obtain:
+> +     *     + the ramaddr_t of the target RAM (if the physical section
 
-diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
-index 07abbb3..6ab32cc 100644
---- a/docs/devel/tracing.txt
-+++ b/docs/devel/tracing.txt
-@@ -18,7 +18,7 @@ for debugging, profiling, and observing execution.
- 
- 3. Run the virtual machine to produce a trace file:
- 
--    qemu -trace events=/tmp/events ... # your normal QEMU invocation
-+    qemu --trace events=/tmp/events ... # your normal QEMU invocation
- 
- 4. Pretty-print the binary trace file:
- 
--- 
-1.8.3.1
+s/ramaddr_t/ram_addr_t/ ? Also in cputlb.c:
+
+> +     * TARGET_PAGE_BITS, and either
+> +     *  + the ramaddr_t of the page base of the target RAM (if NOTDIRTY or ROM)
+
+Thanks,
+
+		Emilio
