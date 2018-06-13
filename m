@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fT29P-0007Fa-Ht
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:33:17 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fT2CK-000158-KC
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:36:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fT29O-0006tb-GO
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:33:11 -0400
-Date: Wed, 13 Jun 2018 19:21:11 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180613092111.GC30690@umbus.fritz.box>
-References: <20180613083015.15749-1-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <eric.auger@redhat.com>) id 1fT2CG-0001kr-DB
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:36:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40486 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fT2CG-0001kP-8W
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:36:08 -0400
+References: <20180524044454.11792-1-peterx@redhat.com>
+	<20180524044454.11792-3-peterx@redhat.com>
+	<87r2lbkt5u.fsf@dusky.pond.sub.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <dfb61dcd-c180-1307-bf9d-086aa15478ec@redhat.com>
+Date: Wed, 13 Jun 2018 11:36:05 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="KtWcatouGV9Nk9BU"
-Content-Disposition: inline
-In-Reply-To: <20180613083015.15749-1-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 0/3] mos6522: allow IRQs from external port
- pins
+In-Reply-To: <87r2lbkt5u.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] intel-iommu: start to use
+ error_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, lvivier@redhat.com
+To: Markus Armbruster <armbru@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>
 
-
---KtWcatouGV9Nk9BU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jun 13, 2018 at 09:30:12AM +0100, Mark Cave-Ayland wrote:
-> Whilst testing a conversion of Laurent's q800 patchset over to use mos6522
-> I discovered some issues which prevented IRQs being generated from inputs=
- to
-> external port pins.
+Hi,
+On 06/13/2018 10:05 AM, Markus Armbruster wrote:
+> Peter Xu <peterx@redhat.com> writes:
 >=20
-> This is a requirement for the q800 patchset which uses external clocks to
-> generate periodic interrupts.
+>> Replace existing trace_vtd_err() with error_report_once() then stderr
+>> will capture something if any of the error happens, meanwhile we don't
+>> suffer from any DDOS.  Then remove the trace point.  Since at it,
+>> provide more information where proper (now we can pass parameters into
+>> the report function).
+>>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>> ---
+>>  hw/i386/intel_iommu.c | 59 ++++++++++++++++++++++++------------------=
+-
+>>  hw/i386/trace-events  |  1 -
+>>  2 files changed, 33 insertions(+), 27 deletions(-)
 >=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Applied, thanks.
-
+> Michael, would you give your Reviewed-by or Acked-by?  I'd take the
+> series through my tree then.
 >=20
+> [...]
 >=20
-> Mark Cave-Ayland (3):
->   mos6522: only clear the shift register interrupt upon write
->   mos6522: remove additional interrupt flag filter from
->     mos6522_update_irq()
->   mos6522: expose mos6522_update_irq() through MOS6522DeviceClass
->=20
->  hw/misc/mos6522.c         | 5 +++--
->  include/hw/misc/mos6522.h | 1 +
->  2 files changed, 4 insertions(+), 2 deletions(-)
->=20
+Sorry to enter this thread at this late stage. Just one question: on the
+smmuv3 emulation code, Peter (Maydell) urged me to use
+qemu_log_mask(LOG_GUEST_ERROR, ...) whenever the error was triggered by
+a guest bad behavior. So what is the final guidance to avoid the DOS you
+mention?
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Thanks
 
---KtWcatouGV9Nk9BU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsg4gcACgkQbDjKyiDZ
-s5JAYBAAqTA937cET8yTaI3fad/oPmS5hiBnuKEeDSsu0gxRcLnF6yZ9e4uFWE4D
-ADz8oItSlWn+WOMqNxarnpefKzTKqdOdnYsjyAUQ7dv8X4CnMKmMiy+akfwQWHDY
-bqS8snwsOPzwtfrqgWem7t5iDU2+0v+L2zmHxUfx88F6BF3OfF769C5G9hWYyLJr
-n0ZLX1otl1P+7qUHVnXTRfORDQUcsaWNK4sFa1tYD6cWNkFDOi4gm3eKt7jcY3CH
-6SETaNnldVBacPjdCvP4yCdvCw1weqN3diBvH5Kcmj24lotd/s2QLn4WJThJfQqB
-ybCEL7cBur/oPlCMsg+FyrAUkQsCzdGnGoR36dfK+8wEWW79MCIbrHzhuqov02Kz
-AN2SFSDuvdmuv/es+ahj9sTRmY206k3mz+KJNFCuDp4vNxZ9fRiLki93CAIZdUkq
-sxiFOV0yPncpHauh+NGmTmqbWijGg97ba0LUe3CapNN8PhYQJl5bv7qUyloEAYbL
-5cZxvfRdsPkBmnmMWycbtbJ+fHz0g5BBbNd2yHFA3/qz7ajLhQVC07mnT7m+efCJ
-utaeNroQjsGSHxVF1/0d750A396Ptv+q1OUUUivCLKOlmMlqNKUsnJ8g8dwrREin
-nlsSMFGiTrcs6YCoLmmONX70aj+VI8mTwv3YPoiu53frLZTOwYQ=
-=zulO
------END PGP SIGNATURE-----
-
---KtWcatouGV9Nk9BU--
+Eric
