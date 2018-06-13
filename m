@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fSxNi-0004nu-Hj
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:27:39 -0400
+	(envelope-from <bounces@canonical.com>) id 1fSxQW-0005oX-13
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:30:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fSxNh-0002NT-4Y
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:27:38 -0400
-Date: Wed, 13 Jun 2018 14:27:26 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180613042726.GU30690@umbus.fritz.box>
-References: <20180518164405.11804-1-clg@kaod.org>
-	<20180518164405.11804-3-clg@kaod.org>
-	<20180526114023.49ee54e9@bahia.lan>
-	<20180605034418.GV5140@umbus.fritz.box>
-	<e9631178-7bd1-170a-ff28-f1ab717cb8bf@kaod.org>
+	(envelope-from <bounces@canonical.com>) id 1fSxQR-0003V0-28
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:30:32 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55626)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fSxQQ-0003UK-PH
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 00:30:26 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fSxQP-0001iP-Ne
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 04:30:25 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AF34E2E8031
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 04:30:25 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="QXliVHAuIB9eJ4yJ"
-Content-Disposition: inline
-In-Reply-To: <e9631178-7bd1-170a-ff28-f1ab717cb8bf@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 2/4] sparp_pci: simplify how the PCI LSIs
- are allocated
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 13 Jun 2018 04:17:34 -0000
+From: Launchpad Bug Tracker <1446726@bugs.launchpad.net>
+Reply-To: Bug 1446726 <1446726@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150421153539.13624.79753.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152886345507.16396.2906419067883120702.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1446726] Re: qemu stable 2.0 crashes during loadvm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,148 +36,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: qemu-devel@nongnu.org
 
+[Expired for QEMU because there has been no activity for 60 days.]
 
---QXliVHAuIB9eJ4yJ
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-On Tue, Jun 05, 2018 at 08:31:49AM +0200, C=E9dric Le Goater wrote:
-> On 06/05/2018 05:44 AM, David Gibson wrote:
-> > On Sat, May 26, 2018 at 11:40:23AM +0200, Greg Kurz wrote:
-> >> On Fri, 18 May 2018 18:44:03 +0200
-> >> C=E9dric Le Goater <clg@kaod.org> wrote:
-> >>
-> >>> PCI LSIs are today allocated one by one using the IRQ alloc_block
-> >>> routine. Change the code sequence to first allocate a PCI_NUM_PINS
-> >>> block. It will help us providing a generic IRQ framework to the
-> >>> machine.
-> >>>
-> >>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >>> ---
-> >>>  hw/ppc/spapr_pci.c | 21 ++++++++++-----------
-> >>>  1 file changed, 10 insertions(+), 11 deletions(-)
-> >>>
-> >>> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> >>> index 39a14980d397..4fd97ffe4c6e 100644
-> >>> --- a/hw/ppc/spapr_pci.c
-> >>> +++ b/hw/ppc/spapr_pci.c
-> >>> @@ -1546,6 +1546,8 @@ static void spapr_phb_realize(DeviceState *dev,=
- Error **errp)
-> >>>      sPAPRTCETable *tcet;
-> >>>      const unsigned windows_supported =3D
-> >>>          sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
-> >>> +    uint32_t irq;
-> >>> +    Error *local_err =3D NULL;
-> >>> =20
-> >>>      if (!spapr) {
-> >>>          error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pserie=
-s machine");
-> >>> @@ -1694,18 +1696,15 @@ static void spapr_phb_realize(DeviceState *de=
-v, Error **errp)
-> >>>      QLIST_INSERT_HEAD(&spapr->phbs, sphb, list);
-> >>> =20
-> >>>      /* Initialize the LSI table */
-> >>> -    for (i =3D 0; i < PCI_NUM_PINS; i++) {
-> >>> -        uint32_t irq;
-> >>> -        Error *local_err =3D NULL;
-> >>> -
-> >>> -        irq =3D spapr_irq_alloc_block(spapr, 1, true, false, &local_=
-err);
-> >>> -        if (local_err) {
-> >>> -            error_propagate(errp, local_err);
-> >>> -            error_prepend(errp, "can't allocate LSIs: ");
-> >>> -            return;
-> >>> -        }
-> >>> +    irq =3D spapr_irq_alloc_block(spapr, PCI_NUM_PINS, true, false, =
-&local_err);
-> >>> +    if (local_err) {
-> >>> +        error_propagate(errp, local_err);
-> >>> +        error_prepend(errp, "can't allocate LSIs: ");
-> >>> +        return;
-> >>> +    }
-> >>> =20
-> >>
-> >> It isn't strictly equivalent. The current code would be happy with
-> >> sparse IRQ numbers, while the proposed one wouldn't... Anyway, this
-> >> cannot happen since we don't have PHB hotplug.
-> >=20
-> > This makes me pretty nervous, because it's not obvious it will come up
-> > with the same numbers in all circumstances, which we have to do for
-> > existing machine types.
->=20
-> Given that :=20
->=20
->  - irq_hint is "unused"
->  - all IRQs are allocated sequentially at machine init, =20
->  - spapr_pci is the only model using the block allocation for MSIs,=20
->    potentially fragmenting more the IRQ number space but done at=20
->    guest runtime.=20
->  - the PHB LSI are the allocated at realize time doing the loop above,=20
->  - we don't support PHB hotplug=20
->  - we do support PHB coldplug but then the IRQ allocation is done
->    at machine time,
->=20
-> it seems highly improbable that the IRQ number space is fragmented
-> to a point which would not allow the loop above to return four=20
-> contiguous IRQ numbers, always.
+-- =
 
-Well, assuming irq_hint really is unused, that's right.  But we can't
-assume that - that's the whole point of the deprecation thing.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1446726
 
-Given that, AIUI, just one vio device with irq=3D set to a value that
-would be within an LSI block allocated under the old scheme would
-result in the new scheme returning a non-contiguous set of LSIs -
-i.e. a different result from what we used to have.
+Title:
+  qemu stable 2.0 crashes during loadvm
 
-> That is why I felt confident changing the loop to a single block=20
-> allocation.=20
->=20
-> > It's also not obvious to me why it's useful
-> > to go via this step before going straight to static allocation of the
-> > irq numbers.
->=20
-> It pollutes the new sPAPR IRQ interface API with an extra parameter=20
-> to support both underlying backend and it complexifies the code=20
-> to handle block allocation of a single IRQ (like above) within an=20
-> IRQ range (the PCI LSIs).
->=20
-> So you end up having a family, a device index, a count, an alignment,
-> and an index within the range. pffut.
->=20
-> Also, could we kill the alignment ?
+Status in QEMU:
+  Expired
 
-Since we sometimes pass 'true', no, we can't, without changing the
-existing pattern of allocations, which we can't do.
->=20
+Bug description:
+  Qemu output:
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+  2015-03-06 01:06:54.255+0000: starting up =
 
---QXliVHAuIB9eJ4yJ
-Content-Type: application/pgp-signature; name="signature.asc"
+  LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/sbin:/sbin=
+:/bin QEMU_AUDIO_DRV=3Dnone /usr/bin/qemu-system-x86_64 -name instance-0000=
+462a -S -machine pc-i440fx-trusty,accel=3Dkvm,usb=3Doff -cpu Westmere,+erms=
+,+smep,+3dnowprefetch,+rdtscp,+rdrand,+tsc-deadline,+movbe,+pdcm,+xtpr,+tm2=
+,+est,+vmx,+ds_cpl,+monitor,+dtes64,+pclmuldq,+pbe,+tm,+ht,+ss,+acpi,+ds,+v=
+me -m 4096 -realtime mlock=3Doff -smp 1,sockets=3D1,cores=3D1,threads=3D1 -=
+uuid 7c3f225c-df2a-4014-997b-3200fcfff43d -smbios type=3D1,manufacturer=3DO=
+penStack Foundation,product=3DOpenStack Nova,version=3D2014.1.2,serial=3D47=
+4aef35-d474-8001-e411-6108001017ac,uuid=3D7c3f225c-df2a-4014-997b-3200fcfff=
+43d -no-user-config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/va=
+r/lib/libvirt/qemu/instance-0000462a.monitor,server,nowait -mon chardev=3Dc=
+harmonitor,id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc,driftfix=3Dslew -glo=
+bal kvm-pit.lost_tick_policy=3Ddiscard -no-hpet -no-shutdown -boot strict=
+=3Don -device piix3-usb-uhci,id=3Dusb,bus=3Dpci.0,addr=3D0x1.0x2 -drive fil=
+e=3D/var/lib/nova/instances/7c3f225c-df2a-4014-997b-3200fcfff43d/disk,if=3D=
+none,id=3Ddrive-virtio-disk0,format=3Dqcow2,cache=3Dnone,iops_rd=3D100,iops=
+_wr=3D100 -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.0,addr=3D0x6,drive=3D=
+drive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1 -drive file=3D/dev/mappe=
+r/258c232d7056e0047,if=3Dnone,id=3Ddrive-virtio-disk1,format=3Draw,serial=
+=3Ddedb9d8d-e727-4d09-bf89-52e870125303,cache=3Dnone -device virtio-blk-pci=
+,scsi=3Doff,bus=3Dpci.0,addr=3D0x9,drive=3Ddrive-virtio-disk1,id=3Dvirtio-d=
+isk1 -drive file=3D/var/lib/nova/instances/7c3f225c-df2a-4014-997b-3200fcff=
+f43d/disk.config,if=3Dnone,id=3Ddrive-virtio-disk25,format=3Draw,cache=3Dno=
+ne,iops_rd=3D100,iops_wr=3D100 -device virtio-blk-pci,scsi=3Doff,bus=3Dpci.=
+0,addr=3D0x7,drive=3Ddrive-virtio-disk25,id=3Dvirtio-disk25 -chardev file,i=
+d=3Dcharserial0,path=3D/var/lib/nova/instances/7c3f225c-df2a-4014-997b-3200=
+fcfff43d/console.log -device isa-serial,chardev=3Dcharserial0,id=3Dserial0 =
+-chardev pty,id=3Dcharserial1 -device isa-serial,chardev=3Dcharserial1,id=
+=3Dserial1 -device usb-tablet,id=3Dinput0 -vnc 127.0.0.1:0 -k ja -device ci=
+rrus-vga,id=3Dvideo0,bus=3Dpci.0,addr=3D0x2 -incoming fd:23 -device virtio-=
+balloon-pci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x8 =
 
------BEGIN PGP SIGNATURE-----
+  char device redirected to /dev/pts/3 (label charserial1) =
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsgnS4ACgkQbDjKyiDZ
-s5K0gg/+P4qX0md9IOBmiidI35ZcAXZGqKB/qg//gCV4soBilNbyCEVvOvh9xZn6
-wYchOWY90qnHKLCJGqNDisodIBcYUx476w4j78dFsy+V53cz1Sla7LzsC8Z78Ks5
-044NTht4nUl43XnxGO6XCgmY2LyOC60tZOf/20doE3aCpsHzps7a/K1eynsuawJ0
-P6DTkkq1mH8xr+Lp2PhMG9Pcvdl8ZivbeGmPBI+2XkpBRx1xKvgbXecVmQ0/Jzr/
-A2nKEDa+8n2r+8kuRShuCGjywQEn2HQ5Yc2+41ovIOyuqAMwGSb5uguO2fmu4LZM
-ewThHqDY1dXEGgG6bCR1mvsVCI5/et0YZC9oUgwA7Av6TWoT4oakJZpWiH/qs/sA
-JAF/02pZoXzOAvbW7SQY+sWPjoglY3BYwx95pjmz247XRF+oRVeHTAbl4XwVqMcA
-rJWiWgUzifmOC7Sqn4VySbbg1WzPqzHlv1LfrYkKsQN34bZVMlpmgoQhyx3ipWrF
-80uIVmquN7w9MyYP0k7M+OFjrhYIGDl8/FwPH/BN4XKZK/1cyiz+Wak3sj7eDuz1
-18I6KPIVT3oodyg0w0fMwejD3ltlYnkbyqhBbrNaIPaScy48uCd2La6naxdu2jl5
-p9+Kr0j+1EEDJsnkwGybh59wJ/x3rkcSqQwE/Fy8k8i+j/gPld8=
-=67U5
------END PGP SIGNATURE-----
+  qemu-system-x86_64: /build/buildd/qemu-2.0.0+dfsg/memory.c:1403: memory_r=
+egion_del_eventfd: Assertion `i !=3D mr->ioeventfd_nb' failed. =
 
---QXliVHAuIB9eJ4yJ--
+  2015-03-06 01:09:02.585+0000: shutting down
+
+  =
+
+  Libvirt log:
+  2015-03-05 11:29:48.434+0000: 8392: error : qemuMonitorIO:656 : internal =
+error: End of file from monitor
+  2015-03-06 00:13:33.077+0000: 8397: warning : AppArmorSetFDLabel:919 : co=
+uld not find path for descriptor /proc/self/fd/26, skipping
+  2015-03-06 00:13:40.981+0000: 8397: warning : virFileWrapperFdClose:308 :=
+ iohelper reports:
+  2015-03-06 00:14:27.206+0000: 8396: warning : qemuDomainObjStart:6073 : U=
+nable to restore from managed state /var/lib/libvirt/qemu/save/instance-000=
+0462a.save. Maybe the file is corrupted?
+  2015-03-06 00:14:40.160+0000: 8392: warning : qemuMonitorJSONHandleDevice=
+Deleted:931 : missing device in device deleted event
+  2015-03-06 00:20:45.414+0000: 8392: error : qemuMonitorIO:656 : internal =
+error: End of file from monitor
+  2015-03-06 00:26:21.849+0000: 8396: warning : AppArmorSetFDLabel:919 : co=
+uld not find path for descriptor /proc/self/fd/25, skipping
+  2015-03-06 00:26:24.764+0000: 8396: warning : virFileWrapperFdClose:308 :=
+ iohelper reports:
+  2015-03-06 00:28:09.425+0000: 8398: warning : qemuDomainObjStart:6073 : U=
+nable to restore from managed state /var/lib/libvirt/qemu/save/instance-000=
+0462a.save. Maybe the file is corrupted?
+  2015-03-06 00:29:29.981+0000: 8392: error : qemuMonitorIO:656 : internal =
+error: End of file from monitor
+  2015-03-06 00:35:06.485+0000: 8398: warning : AppArmorSetFDLabel:919 : co=
+uld not find path for descriptor /proc/self/fd/26, skipping
+  2015-03-06 00:35:09.645+0000: 8398: warning : virFileWrapperFdClose:308 :=
+ iohelper reports:
+  2015-03-06 00:37:58.701+0000: 8397: warning : qemuDomainObjStart:6073 : U=
+nable to restore from managed state /var/lib/libvirt/qemu/save/instance-000=
+0462a.save. Maybe the file is corrupted?
+  2015-03-06 00:59:12.925+0000: 8392: error : qemuMonitorIO:656 : internal =
+error: End of file from monitor
+  2015-03-06 01:04:57.990+0000: 8392: warning : qemuMonitorJSONHandleDevice=
+Deleted:931 : missing device in device deleted event
+  2015-03-06 01:05:18.031+0000: 8392: warning : qemuMonitorJSONHandleDevice=
+Deleted:931 : missing device in device deleted event
+  2015-03-06 01:05:37.954+0000: 8392: warning : qemuMonitorJSONHandleDevice=
+Deleted:931 : missing device in device deleted event
+  2015-03-06 01:06:13.213+0000: 8392: error : qemuMonitorIO:656 : internal =
+error: End of file from monitor
+  2015-03-06 01:06:29.870+0000: 8398: warning : AppArmorSetFDLabel:919 : co=
+uld not find path for descriptor /proc/self/fd/26, skipping
+  2015-03-06 01:06:31.024+0000: 8398: warning : virFileWrapperFdClose:308 :=
+ iohelper reports:
+  2015-03-06 01:06:57.274+0000: 8395: warning : qemuDomainObjStart:6073 : U=
+nable to restore from managed state /var/lib/libvirt/qemu/save/instance-000=
+0462a.save. Maybe the file is corrupted?
+  2015-03-06 01:09:02.581+0000: 8392: error : qemuMonitorIORead:554 : Unabl=
+e to read from monitor: Connection reset by peer
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1446726/+subscriptions
