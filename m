@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=69586b2aa=anthony.perard@citrix.com>)
-	id 1fT4E9-0007qC-4z
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 07:46:14 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1fT4Gn-0000Ec-IP
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 07:48:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=69586b2aa=anthony.perard@citrix.com>)
-	id 1fT4E6-0004Zw-38
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 07:46:13 -0400
-Date: Wed, 13 Jun 2018 12:46:02 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20180613114602.GC2165@perard.uk.xensource.com>
-References: <20180612235103.12633-1-brogers@suse.com>
-	<20180612235103.12633-2-brogers@suse.com>
+	(envelope-from <joel.stan@gmail.com>) id 1fT4Gi-00069u-Tm
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 07:48:57 -0400
+Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
+From: Joel Stanley <joel@jms.id.au>
+Date: Wed, 13 Jun 2018 21:18:36 +0930
+Message-Id: <20180613114836.9265-1-joel@jms.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20180612235103.12633-2-brogers@suse.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] xen: add xen disk naming for use in
- monitor
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4] aspeed_scu: Implement RNG register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +21,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bruce Rogers <brogers@suse.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, sstabellini@kernel.org, kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: Andrew Jeffery <andrew@aj.id.au>
 
-On Tue, Jun 12, 2018 at 05:51:02PM -0600, Bruce Rogers wrote:
-> Provide monitor naming of xen disks, including associating an
-> attached dev_id for a BlockBackend which has legacy_dev set.
-> Currently, only xen disks have legacy_dev set to true.
-> 
-> Signed-off-by: Bruce Rogers <brogers@suse.com>
-> ---
->  block/block-backend.c |  5 ++++-
->  hw/block/xen_disk.c   | 15 +++++++++++++++
->  include/hw/xen/xen.h  |  2 ++
->  stubs/xen-common.c    |  5 +++++
->  4 files changed, 26 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/block-backend.c b/block/block-backend.c
-> index d55c328736..db39dfe867 100644
-> --- a/block/block-backend.c
-> +++ b/block/block-backend.c
-> @@ -23,6 +23,7 @@
->  #include "qemu/option.h"
->  #include "trace.h"
->  #include "migration/misc.h"
-> +#include "hw/xen/xen.h"
->  
->  /* Number of coroutines to reserve per attached device model */
->  #define COROUTINE_POOL_RESERVATION 64
-> @@ -895,7 +896,9 @@ char *blk_get_attached_dev_id(BlockBackend *blk)
->  {
->      DeviceState *dev;
->  
-> -    assert(!blk->legacy_dev);
-> +    if (blk->legacy_dev) {
-> +        return xen_blk_get_attached_dev_id(blk->dev);
-> +    }
->      dev = blk->dev;
->  
->      if (!dev) {
+The ASPEED SoCs contain a single register that returns random data when
+read. This models that register so that guests can use it.
 
-Hi Bruce,
+The random number data register has a corresponding control register,
+however it returns data regardless of the state of the enabled bit, so
+the model follows this behaviour.
 
-Thanks for your patches!
+When the qcrypto call fails we exit as the guest uses the random number
+device to feed it's entropy pool, which is used for cryptographic
+purposes.
 
-But I don't think that the right way to go. We probably needs to
-qdevifie xen_disk instead. This is point out by the numerous TODO about
-"qdevified", and this very old mail:
-https://lists.nongnu.org/archive/html/qemu-devel/2016-09/msg07902.html
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+---
+v2:
+ - Remove call to qcrypto_random_init as this is done in main()
+v3:
+ - Add Cédric's reviewed-by
+ - Add a comment about why we don't check for the rng enable bit
+v4:
+ - Bail out when random number api fails
+---
+ hw/misc/aspeed_scu.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-Thanks,
-
+diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
+index 5e6d5744eeca..59315010db9a 100644
+--- a/hw/misc/aspeed_scu.c
++++ b/hw/misc/aspeed_scu.c
+@@ -16,6 +16,7 @@
+ #include "qapi/visitor.h"
+ #include "qemu/bitops.h"
+ #include "qemu/log.h"
++#include "crypto/random.h"
+ #include "trace.h"
+ 
+ #define TO_REG(offset) ((offset) >> 2)
+@@ -154,6 +155,19 @@ static const uint32_t ast2500_a1_resets[ASPEED_SCU_NR_REGS] = {
+      [BMC_DEV_ID]      = 0x00002402U
+ };
+ 
++static uint32_t aspeed_scu_get_random(void)
++{
++    Error *err = NULL;
++    uint32_t num;
++
++    if (qcrypto_random_bytes((uint8_t *)&num, sizeof(num), &err)) {
++        error_report_err(err);
++        exit(1);
++    }
++
++    return num;
++}
++
+ static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsigned size)
+ {
+     AspeedSCUState *s = ASPEED_SCU(opaque);
+@@ -167,6 +181,12 @@ static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsigned size)
+     }
+ 
+     switch (reg) {
++    case RNG_DATA:
++        /* On hardware, RNG_DATA works regardless of
++         * the state of the enable bit in RNG_CTRL
++         */
++        s->regs[RNG_DATA] = aspeed_scu_get_random();
++        break;
+     case WAKEUP_EN:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "%s: Read of write-only offset 0x%" HWADDR_PRIx "\n",
 -- 
-Anthony PERARD
+2.17.1
