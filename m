@@ -1,16 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fT1T4-0002X7-LQ
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:49:29 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fT1Ul-00044q-9d
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:51:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fT1Sy-0003yH-IE
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:49:26 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 13 Jun 2018 10:48:43 +0200
-Message-Id: <1528879723-24675-10-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1528879723-24675-1-git-send-email-eric.auger@redhat.com>
-References: <1528879723-24675-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH 9/9] hw/arm/virt: Add virt-3.0 machine type
+	(envelope-from <balaton@eik.bme.hu>) id 1fT1Ui-00050h-5f
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 04:51:11 -0400
+Date: Wed, 13 Jun 2018 10:50:59 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20180613041115.GS30690@umbus.fritz.box>
+Message-ID: <alpine.BSF.2.21.1806131044020.620@zero.eik.bme.hu>
+References: <cover.1528291908.git.balaton@eik.bme.hu>
+	<8c404c8c4ee1bfd2e4d079877d481094f797df8f.1528291908.git.balaton@eik.bme.hu>
+	<6aa1bc4e-a4b0-d7be-b9eb-85dfe8c06781@amsat.org>
+	<alpine.BSF.2.21.1806061920120.94568@zero.eik.bme.hu>
+	<20180613041115.GS30690@umbus.fritz.box>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 5/8] hw/timer: Add basic
+ M41T80 emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,140 +27,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: drjones@redhat.com, wei@redhat.com, zhaoshenglong@huawei.com, lersek@redhat.com, ard.biesheuvel@linaro.org, christoffer.dall@arm.com, marc.zyngier@arm.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-This machine type supports two new features:
-- highmem 256MB ECAM (default). This feature is disabled for
-  earlier machine types and if highmem is off.
-- max_cpus set to 512 vcpus (255 before)
+On Wed, 13 Jun 2018, David Gibson wrote:
+> On Wed, Jun 06, 2018 at 07:35:28PM +0200, BALATON Zoltan wrote:
+>> On Wed, 6 Jun 2018, Philippe Mathieu-Daud=E9 wrote:
+>>> On 06/06/2018 10:31 AM, BALATON Zoltan wrote:
+>>>> Basic emulation of the M41T80 serial (I2C) RTC chip. Only getting ti=
+me
+>>>> of day is implemented. Setting time and RTC alarm are not supported.
+>> [...]
+>>>> diff --git a/hw/timer/m41t80.c b/hw/timer/m41t80.c
+>>>> new file mode 100644
+>>>> index 0000000..9dbdb1b
+>>>> --- /dev/null
+>>>> +++ b/hw/timer/m41t80.c
+>>>> @@ -0,0 +1,117 @@
+>>>> +/*
+>>>> + * M41T80 serial rtc emulation
+>>>> + *
+>>>> + * Copyright (c) 2018 BALATON Zoltan
+>>>> + *
+>>>> + * This work is licensed under the GNU GPL license version 2 or lat=
+er.
+>>>> + *
+>>>> + */
+>>>> +
+>>>> +#include "qemu/osdep.h"
+>>>> +#include "qemu/log.h"
+>>>> +#include "qemu/timer.h"
+>>>> +#include "qemu/bcd.h"
+>>>> +#include "hw/i2c/i2c.h"
+>>>> +
+>>>> +#define TYPE_M41T80 "m41t80"
+>>>> +#define M41T80(obj) OBJECT_CHECK(M41t80State, (obj), TYPE_M41T80)
+>>>> +
+>>>> +typedef struct M41t80State {
+>>>> +    I2CSlave parent_obj;
+>>>> +    int8_t addr;
+>>>> +} M41t80State;
+>>>> +
+>>>> +static void m41t80_realize(DeviceState *dev, Error **errp)
+>>>> +{
+>>>> +    M41t80State *s =3D M41T80(dev);
+>>>> +
+>>>> +    s->addr =3D -1;
+>>>> +}
+>>>> +
+>>>> +static int m41t80_send(I2CSlave *i2c, uint8_t data)
+>>>> +{
+>>>> +    M41t80State *s =3D M41T80(i2c);
+>>>> +
+>>>> +    if (s->addr < 0) {
+>>>> +        s->addr =3D data;
+>>>> +    } else {
+>>>> +        s->addr++;
+>>>> +    }
+>>>
+>>> What about adding enum i2c_event in M41t80State and use the enum here
+>>> rather than the addr < 0? Also this wrap at INT8_MAX =3D 127, is this
+>>> expected?
+>>
+>> Thanks for the review. I guess we could add enum for device bytes and =
+the
+>> special case -1 meaning no register address selected yet but this is a=
+ very
+>> simple device with only 20 bytes and the datasheet also lists them by =
+number
+>> without naming them so I think we can also refer to them by number. Si=
+nce
+>> the device has only this 20 bytes the case with 127 should also not be=
+ a
+>> problem as that's invalid address anyway. Or did you mean something el=
+se?
+>
+> So, I'm not particularly in favour of adding extra state variables.
+>
+> But is using addr < 0 safe here?  You're assigning the uint8_t data to
+> addr - could that result in a negative value?
 
-The high 256MB ECAM region is chosen instead of the legacy
-16MB one if the machine type allows it, if highmem is set
-(LPAE supported by the guest) and (!firmware_loaded || aarch64).
-Indeed aarch32 mode FW may not support this high ECAM region.
+Why wouldn't it be safe with the expected values for register address=20
+between 0-19? If the guest sends garbage values over 127 it will either=20
+result in invalid register or unselected register and lead to an error=20
+when trying to read/write that register so I don't see what other problem=
+=20
+this may cause.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+The addr < 0 is to check if no address was selected before (on creating=20
+the device and when sending first value from host addr is set to -1. In=20
+this case first write will set register address, then subsequent=20
+reads/writes increment register address as the datasheet says).
 
----
-
-PATCH: merge of ECAM and VCPU extension
-- Laszlo reviewed the ECAM changes but I dropped his R-b
-  due to the squash
-
-RFC -> v1
-- check firmware_loaded and aarch64 value
-- do all the computation in machvirt_init
----
- hw/arm/virt.c         | 36 ++++++++++++++++++++++++++++++------
- include/hw/arm/virt.h |  1 +
- 2 files changed, 31 insertions(+), 6 deletions(-)
-
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 22b9bd1..5ed25b4 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1317,6 +1317,7 @@ static void machvirt_init(MachineState *machine)
-     int n, virt_max_cpus;
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
-+    bool aarch64 = true;
- 
-     /* We can probe only here because during property set
-      * KVM is not available yet
-@@ -1432,6 +1433,8 @@ static void machvirt_init(MachineState *machine)
-         numa_cpu_pre_plug(&possible_cpus->cpus[cs->cpu_index], DEVICE(cpuobj),
-                           &error_fatal);
- 
-+        aarch64 &= object_property_get_bool(cpuobj, "aarch64", NULL);
-+
-         if (!vms->secure) {
-             object_property_set_bool(cpuobj, false, "has_el3", NULL);
-         }
-@@ -1490,6 +1493,8 @@ static void machvirt_init(MachineState *machine)
-         create_uart(vms, pic, VIRT_SECURE_UART, secure_sysmem, serial_hd(1));
-     }
- 
-+    vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
-+
-     create_rtc(vms, pic);
- 
-     create_pcie(vms, pic);
-@@ -1700,11 +1705,13 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
- 
-     mc->init = machvirt_init;
--    /* Start max_cpus at the maximum QEMU supports. We'll further restrict
--     * it later in machvirt_init, where we have more information about the
--     * configuration of the particular instance.
-+    /* Start with max_cpus set to 512. This value is chosen since achievable
-+     * in accelerated mode with GICv3 and recent host supporting up to 512 vcpus
-+     * and multiple redistributor region registration.
-+     * This value will be refined later on once we collect more information
-+     * about the configuration of the particular instance.
-      */
--    mc->max_cpus = 255;
-+    mc->max_cpus = 512;
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_CALXEDA_XGMAC);
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
-     mc->block_default_type = IF_VIRTIO;
-@@ -1743,7 +1750,7 @@ type_init(machvirt_machine_init);
- #define VIRT_COMPAT_2_12 \
-     HW_COMPAT_2_12
- 
--static void virt_2_12_instance_init(Object *obj)
-+static void virt_3_0_instance_init(Object *obj)
- {
-     VirtMachineState *vms = VIRT_MACHINE(obj);
-     VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-@@ -1786,6 +1793,8 @@ static void virt_2_12_instance_init(Object *obj)
-                                     "Set GIC version. "
-                                     "Valid values are 2, 3 and host", NULL);
- 
-+    vms->highmem_ecam = !vmc->no_highmem_ecam;
-+
-     if (vmc->no_its) {
-         vms->its = false;
-     } else {
-@@ -1811,11 +1820,26 @@ static void virt_2_12_instance_init(Object *obj)
-     vms->irqmap = a15irqmap;
- }
- 
-+static void virt_machine_3_0_options(MachineClass *mc)
-+{
-+}
-+DEFINE_VIRT_MACHINE_AS_LATEST(3, 0)
-+
-+static void virt_2_12_instance_init(Object *obj)
-+{
-+    virt_3_0_instance_init(obj);
-+}
-+
- static void virt_machine_2_12_options(MachineClass *mc)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-+
-+    virt_machine_3_0_options(mc);
-     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_12);
-+    vmc->no_highmem_ecam = true;
-+    mc->max_cpus = 255;
- }
--DEFINE_VIRT_MACHINE_AS_LATEST(2, 12)
-+DEFINE_VIRT_MACHINE(2, 12)
- 
- #define VIRT_COMPAT_2_11 \
-     HW_COMPAT_2_11
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 2c18a59..8c74d4c 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -98,6 +98,7 @@ typedef struct {
-     bool no_pmu;
-     bool claim_edge_triggered_timers;
-     bool smbios_old_sys_ver;
-+    bool no_highmem_ecam;
- } VirtMachineClass;
- 
- typedef struct {
--- 
-2.5.5
+Regards,
+BALATON Zoltan
