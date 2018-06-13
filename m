@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fT5Jr-0002dA-Dc
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:56:12 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fT5Jp-0002a2-7e
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:56:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fT5Jp-00058g-WD
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:56:11 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:38846)
+	(envelope-from <alex.bennee@linaro.org>) id 1fT5Jn-00053e-Vt
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:56:09 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:35152)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fT5Jp-00056B-It
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:56:09 -0400
-Received: by mail-wr0-x244.google.com with SMTP id e18-v6so2661432wrs.5
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 05:56:09 -0700 (PDT)
+	id 1fT5Jn-00052X-ND
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:56:07 -0400
+Received: by mail-wr0-x244.google.com with SMTP id l10-v6so2673568wrn.2
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 05:56:07 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 13 Jun 2018 13:55:46 +0100
-Message-Id: <20180613125601.14371-8-alex.bennee@linaro.org>
+Date: Wed, 13 Jun 2018 13:55:45 +0100
+Message-Id: <20180613125601.14371-7-alex.bennee@linaro.org>
 In-Reply-To: <20180613125601.14371-1-alex.bennee@linaro.org>
 References: <20180613125601.14371-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH v3 07/22] risugen: add --sve support
+Subject: [Qemu-devel] [RISU PATCH v3 06/22] Makefile: include
+ risu_reginfo_$(ARCH) in HDRS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,151 +33,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This is similar to the approach used by the FP/simd data in so far as
-we generate a block of random data and then load into it. The loading
-is actually done by the current vector length but that is implicit in
-the run anyway.
+Otherwise changes to reginfo don't cause the whole thing to be
+re-built causing much confusion when bisecting.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
 ---
-v2
-  - only one SIMD/FP/SVE block as they alias
-  - move efficient loading as suggested by Dave
----
- risugen        |  3 +++
- risugen_arm.pm | 56 ++++++++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 50 insertions(+), 9 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/risugen b/risugen
-index 488d804..de3f5ea 100755
---- a/risugen
-+++ b/risugen
-@@ -319,6 +319,7 @@ sub main()
-     my $condprob = 0;
-     my $fpscr = 0;
-     my $fp_enabled = 1;
-+    my $sve_enabled = 1;
-     my $big_endian = 0;
-     my ($infile, $outfile);
+diff --git a/Makefile b/Makefile
+index 16e48a0..4aad448 100644
+--- a/Makefile
++++ b/Makefile
+@@ -21,7 +21,7 @@ ALL_CFLAGS = -Wall -D_GNU_SOURCE -DARCH=$(ARCH) $(BUILD_INC) $(CFLAGS) $(EXTRA_C
  
-@@ -336,6 +337,7 @@ sub main()
-                 },
-                 "be" => sub { $big_endian = 1; },
-                 "no-fp" => sub { $fp_enabled = 0; },
-+                "sve" => sub { $sve_enabled = 1; },
-         ) or return 1;
-     # allow "--pattern re,re" and "--pattern re --pattern re"
-     @pattern_re = split(/,/,join(',',@pattern_re));
-@@ -363,6 +365,7 @@ sub main()
-         'fpscr' => $fpscr,
-         'numinsns' => $numinsns,
-         'fp_enabled' => $fp_enabled,
-+        'sve_enabled' => $sve_enabled,
-         'outfile' => $outfile,
-         'details' => \%insn_details,
-         'keys' => \@insn_keys,
-diff --git a/risugen_arm.pm b/risugen_arm.pm
-index 2f10d58..bb3ee90 100644
---- a/risugen_arm.pm
-+++ b/risugen_arm.pm
-@@ -472,14 +472,51 @@ sub write_random_aarch64_fpdata()
-     }
- }
+ PROG=risu
+ SRCS=risu.c comms.c reginfo.c risu_$(ARCH).c risu_reginfo_$(ARCH).c
+-HDRS=risu.h
++HDRS=risu.h risu_reginfo_$(ARCH).h
+ BINS=test_$(ARCH).bin
  
--sub write_random_aarch64_regdata($)
-+sub write_random_aarch64_svedata()
- {
--    my ($fp_enabled) = @_;
-+    # Load SVE registers
-+    my $align = 16;
-+    my $vq = 16;                             # quadwords per vector
-+    my $datalen = (32 * $vq * 16) + $align;
-+
-+    write_pc_adr(0, (3 * 4) + ($align - 1)); # insn 1
-+    write_align_reg(0, $align);              # insn 2
-+    write_jump_fwd($datalen);                # insn 3
-+
-+    # align safety
-+    for (my $i = 0; $i < ($align / 4); $i++) {
-+        # align with nops
-+        insn32(0xd503201f);
-+    };
-+
-+    for (my $rt = 0; $rt <= 31; $rt++) {
-+        for (my $q = 0; $q < $vq; $q++) {
-+            write_random_fpreg_var(4); # quad
-+        }
-+    }
-+
-+    # Reset all the predicate registers to all true
-+    for (my $p = 0; $p < 16; $p++) {
-+        insn32(0x2518e3e0 | $p);
-+    }
-+
-+    for (my $rt = 0; $rt <= 31; $rt++) {
-+        # ldr z$rt, [x0, #$rt, mul vl]
-+        insn32(0x85804000 + $rt + (($rt & 7) << 10) + (($rt & 0x18) << 13));
-+    }
-+}
-+
-+sub write_random_aarch64_regdata($$)
-+{
-+    my ($fp_enabled, $sve_enabled) = @_;
-     # clear flags
-     insn32(0xd51b421f);     # msr nzcv, xzr
- 
--    if ($fp_enabled) {
--        # load floating point / SIMD registers
-+    # Load floating point / SIMD registers
-+    # (one or the other as they overlap)
-+    if ($sve_enabled) {
-+        write_random_aarch64_svedata();
-+    } elsif ($fp_enabled) {
-         write_random_aarch64_fpdata();
-     }
- 
-@@ -490,12 +527,12 @@ sub write_random_aarch64_regdata($)
-     }
- }
- 
--sub write_random_register_data($)
-+sub write_random_register_data($$)
- {
--    my ($fp_enabled) = @_;
-+    my ($fp_enabled, $sve_enabled) = @_;
- 
-     if ($is_aarch64) {
--        write_random_aarch64_regdata($fp_enabled);
-+        write_random_aarch64_regdata($fp_enabled, $sve_enabled);
-     } else {
-         write_random_arm_regdata($fp_enabled);
-     }
-@@ -893,6 +930,7 @@ sub write_test_code($$$$$$$$)
-     my $fpscr = $params->{ 'fpscr' };
-     my $numinsns = $params->{ 'numinsns' };
-     my $fp_enabled = $params->{ 'fp_enabled' };
-+    my $sve_enabled = $params->{ 'sve_enabled' };
-     my $outfile = $params->{ 'outfile' };
- 
-     my %insn_details = %{ $params->{ 'details' } };
-@@ -918,7 +956,7 @@ sub write_test_code($$$$$$$$)
-         write_memblock_setup();
-     }
-     # memblock setup doesn't clean its registers, so this must come afterwards.
--    write_random_register_data($fp_enabled);
-+    write_random_register_data($fp_enabled, $sve_enabled);
-     write_switch_to_test_mode();
- 
-     for my $i (1..$numinsns) {
-@@ -930,7 +968,7 @@ sub write_test_code($$$$$$$$)
-         # Rewrite the registers periodically. This avoids the tendency
-         # for the VFP registers to decay to NaNs and zeroes.
-         if ($periodic_reg_random && ($i % 100) == 0) {
--            write_random_register_data($fp_enabled);
-+            write_random_register_data($fp_enabled, $sve_enabled);
-             write_switch_to_test_mode();
-         }
-         progress_update($i);
+ # For dumping test patterns
 -- 
 2.17.1
