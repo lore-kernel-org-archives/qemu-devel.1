@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fT4lG-00008y-DT
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:20:27 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fT4rt-0001sH-TW
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fT4lD-0001YV-79
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:20:26 -0400
-References: <1528866321-23886-1-git-send-email-thuth@redhat.com>
-	<1528866321-23886-2-git-send-email-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b4b86190-1f16-758b-448f-b3766327d635@redhat.com>
-Date: Wed, 13 Jun 2018 07:20:20 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1fT4rq-00009t-NQ
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:27:17 -0400
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:56292)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fT4rq-00007u-GD
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 08:27:14 -0400
+Received: by mail-wm0-f53.google.com with SMTP id v16-v6so4366997wmh.5
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 05:27:14 -0700 (PDT)
+References: <1528225683-11413-1-git-send-email-wexu@redhat.com>
+	<1528225683-11413-3-git-send-email-wexu@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f9308fe7-5881-7ea6-de60-b3291abaac35@redhat.com>
+Date: Wed, 13 Jun 2018 14:27:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <1528866321-23886-2-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1528225683-11413-3-git-send-email-wexu@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] Replace '-machine accel=xyz' with
- '-accel xyz'
+Subject: Re: [Qemu-devel] [RFC v2 2/8] virtio: memory cache for packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,27 +30,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, zhang.zhanghailiang@huawei.com
+To: wexu@redhat.com, qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, jfreimann@redhat.com, tiwei.bie@intel.com, mst@redhat.com
 
-On 06/13/2018 12:05 AM, Thomas Huth wrote:
-> We've got a separate option to configure the accelerator nowadays.
-> Use it in the source and examples to demonstrate that this is the
-> preferred way of setting this option now.
-
-Is it worth bike-shedding the preferred spelling as '--accel xyz', to 
-match 
-https://wiki.qemu.org/BiteSizedTasks#Consistent_option_usage_in_documentation?
-
-It's more important to use double-dash for options shared between 
-binaries, but qemu-nbd and qemu-img don't use --accel, so that makes the 
-argument slightly weaker for the doubled form here.
-
+On 05/06/2018 21:07, wexu@redhat.com wrote:
+> From: Wei Xu <wexu@redhat.com>
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Mostly reuse memory cache with 1.0 except for the offset calculation.
+> 
+> Signed-off-by: Wei Xu <wexu@redhat.com>
 > ---
+>  hw/virtio/virtio.c | 29 ++++++++++++++++++++---------
+>  1 file changed, 20 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index e192a9a..f6c0689 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -150,11 +150,8 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
+>      VRingMemoryRegionCaches *old = vq->vring.caches;
+>      VRingMemoryRegionCaches *new;
+>      hwaddr addr, size;
+> -    int event_size;
+>      int64_t len;
+>  
+> -    event_size = virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
+> -
+>      addr = vq->vring.desc;
+>      if (!addr) {
+>          return;
+> @@ -168,7 +165,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
+>          goto err_desc;
+>      }
+>  
+> -    size = virtio_queue_get_used_size(vdev, n) + event_size;
+> +    size = virtio_queue_get_used_size(vdev, n);
+>      len = address_space_cache_init(&new->used, vdev->dma_as,
+>                                     vq->vring.used, size, true);
+>      if (len < size) {
+> @@ -176,7 +173,7 @@ static void virtio_init_region_cache(VirtIODevice *vdev, int n)
+>          goto err_used;
+>      }
+>  
+> -    size = virtio_queue_get_avail_size(vdev, n) + event_size;
+> +    size = virtio_queue_get_avail_size(vdev, n);
+>      len = address_space_cache_init(&new->avail, vdev->dma_as,
+>                                     vq->vring.avail, size, false);
+>      if (len < size) {
+> @@ -2320,14 +2317,28 @@ hwaddr virtio_queue_get_desc_size(VirtIODevice *vdev, int n)
+>  
+>  hwaddr virtio_queue_get_avail_size(VirtIODevice *vdev, int n)
+>  {
+> -    return offsetof(VRingAvail, ring) +
+> -        sizeof(uint16_t) * vdev->vq[n].vring.num;
+> +    int s;
+> +
+> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> +        return sizeof(struct VRingPackedDescEvent);
+> +    } else {
+> +        s = virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
+> +        return offsetof(VRingAvail, ring) +
+> +            sizeof(uint16_t) * vdev->vq[n].vring.num + s;
+> +    }
+>  }
+>  
+>  hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
+>  {
+> -    return offsetof(VRingUsed, ring) +
+> -        sizeof(VRingUsedElem) * vdev->vq[n].vring.num;
+> +    int s;
+> +
+> +    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+> +        return sizeof(struct VRingPackedDescEvent);
+> +    } else {
+> +        s = virtio_vdev_has_feature(vdev, VIRTIO_RING_F_EVENT_IDX) ? 2 : 0;
+> +        return offsetof(VRingUsed, ring) +
+> +            sizeof(VRingUsedElem) * vdev->vq[n].vring.num + s;
+> +    }
+>  }
+>  
+>  uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
+> 
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
