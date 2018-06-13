@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTDU7-0007Ct-M4
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:39:20 -0400
+	(envelope-from <mst@redhat.com>) id 1fTDhY-0001Uw-Lu
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:53:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTDU4-0004XO-2w
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:39:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46370)
+	(envelope-from <mst@redhat.com>) id 1fTDhV-0002yr-J2
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:53:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44288 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTDTp-0004PU-Hh
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:39:15 -0400
-Date: Wed, 13 Jun 2018 18:38:58 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180613213858.GI24764@localhost.localdomain>
-References: <20180601145921.9500-1-konrad.wilk@oracle.com>
-	<20180601153809.15259-1-konrad.wilk@oracle.com>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fTDhV-0002y4-Ct
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 17:53:09 -0400
+Date: Thu, 14 Jun 2018 00:53:07 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180614005150-mutt-send-email-mst@kernel.org>
+References: <20180612184616.90838-1-mst@redhat.com>
+	<20180612184616.90838-2-mst@redhat.com>
+	<20180613210022.GG24764@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180601153809.15259-1-konrad.wilk@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH QEMU] Patches for new AMD CPU bits.
+In-Reply-To: <20180613210022.GG24764@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] kvm: support -realtime cpu-pm=on|off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,27 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org, Richard Henderson <rth@twiddle.net>
 
-On Fri, Jun 01, 2018 at 11:38:07AM -0400, Konrad Rzeszutek Wilk wrote:
-> Hi!
+On Wed, Jun 13, 2018 at 06:00:22PM -0300, Eduardo Habkost wrote:
+> On Tue, Jun 12, 2018 at 09:47:11PM +0300, Michael S. Tsirkin wrote:
+> > With this flag, kvm allows guest to control host CPU power state.  This
+> > increases latency for other processes using same host CPU in an
+> > unpredictable way, but if decreases idle entry/exit times for the
+> > running VCPU.
+> > 
+> > Follow-up patches will expose this capability to guest
+> > (using mwait leaf).
+> > 
+> > Based on a patch by Wanpeng Li <kernellwp@gmail.com> .
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  include/sysemu/sysemu.h |  1 +
+> >  target/i386/kvm.c       | 22 ++++++++++++++++++++++
+> >  vl.c                    |  6 ++++++
+> >  qemu-options.hx         |  9 +++++++--
+> >  4 files changed, 36 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> > index e893f72f3b..b921c6f3b7 100644
+> > --- a/include/sysemu/sysemu.h
+> > +++ b/include/sysemu/sysemu.h
+> > @@ -128,6 +128,7 @@ extern bool boot_strict;
+> >  extern uint8_t *boot_splash_filedata;
+> >  extern size_t boot_splash_filedata_size;
+> >  extern bool enable_mlock;
+> > +extern bool enable_cpu_pm;
 > 
+> After looking at patch 2/2, I see that the global variable is
+> useful, and it's consistent with the existing enable_mlock
+> variable.
 > 
-> I was reading the AMD whitepaper on SSBD and noticed that they have added
-> two new bits in the 8000_0008 CPUID. EBX:
->  1) Bit[26] - similar to Intel's SSB_NO not needed anymore.
->  2) Bit[24] - use SPEC_CTRL MSR (0x48) instead of VIRT SPEC_CTRL MSR
->     (0xC001_011f).
+> >  extern uint8_t qemu_extra_params_fw[2];
+> >  extern QEMUClockType rtc_clock;
+> >  extern const char *mem_path;
+> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> > index 44f70733e7..f093d55209 100644
+> > --- a/target/i386/kvm.c
+> > +++ b/target/i386/kvm.c
+> > @@ -1357,6 +1357,28 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+> >          smram_machine_done.notify = register_smram_listener;
+> >          qemu_add_machine_init_done_notifier(&smram_machine_done);
+> >      }
+> > +
+> > +    if (enable_cpu_pm) {
+> > +        int disable_exits = kvm_check_extension(s, KVM_CAP_X86_DISABLE_EXITS);
+> > +        int ret;
+> > +
+> > +/* Work around for kernel header with a typo. TODO: fix header and drop. */
+> > +#if defined(KVM_X86_DISABLE_EXITS_HTL) && !defined(KVM_X86_DISABLE_EXITS_HLT)
+> > +#define KVM_X86_DISABLE_EXITS_HLT KVM_X86_DISABLE_EXITS_HTL
+> > +#endif
+> > +        if (disable_exits) {
+> > +            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
+> > +                              KVM_X86_DISABLE_EXITS_HLT |
+> > +                              KVM_X86_DISABLE_EXITS_PAUSE);
+> > +        }
+> > +
+> > +        ret = kvm_vm_enable_cap(s, KVM_CAP_X86_DISABLE_EXITS, 0,
+> > +                                disable_exits);
 > 
-> See 124441_AMD64_SpeculativeStoreBypassDisable_Whitepaper_final.pdf
-> A copy of this document is available at
->         https://bugzilla.kernel.org/show_bug.cgi?id=199889
-> 
-> These two patches along with the kernel ones allow us to expose those
-> two bits to the guest.
+> Isn't the kvm_vm_enable_cap() call supposed to be inside the "if
+> (disable_exits)" block?
 
-Queued on x86-next, thanks!
+Doing it like this causes a warning if pm is requested but
+disable halt is not supported.
 
--- 
-Eduardo
+But I can move it, sure - let me know.
+
+> > +        if (ret < 0) {
+> > +            error_report("kvm: guest stopping CPU not supported: %s", strerror(-ret));
+> > +        }
+> > +    }
+> > +
+> >      return 0;
+> >  }
+> [...]
+> 
+> -- 
+> Eduardo
