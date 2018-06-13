@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fTBar-0002Kl-G1
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 15:38:10 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fTBnP-0006Ug-HV
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 15:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fTBan-0007Yk-Hs
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 15:38:09 -0400
-References: <20180607154455.6eab4e24@redhat.com>
-	<5dda6237-88d8-f0f8-58d2-af996368cea4@redhat.com>
-	<20180608142442.0d97b7c6@redhat.com>
-	<397d37ee-b3a8-dae0-37d1-fd3c942448c2@redhat.com>
-	<20180608155432-mutt-send-email-mst@kernel.org>
-	<d6966aa8-54e5-8036-3603-069fbbb88c2a@redhat.com>
-	<20180608181004-mutt-send-email-mst@kernel.org>
-	<a68853da-a664-84ae-c5bd-4e79b967bb65@redhat.com>
-	<20180613174825.1eebef6c@redhat.com>
-	<c84ffb85-628f-4ece-e231-d0d7d45144c9@redhat.com>
-	<20180613212702-mutt-send-email-mst@kernel.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <5d03c321-4121-a814-ef4f-c649125c0231@redhat.com>
-Date: Wed, 13 Jun 2018 21:37:54 +0200
+	(envelope-from <alex.williamson@redhat.com>) id 1fTBnO-00047k-AF
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 15:51:07 -0400
+Date: Wed, 13 Jun 2018 13:50:47 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180613135047.5c1ce227@w520.home>
+In-Reply-To: <20180613084149.14523-4-kraxel@redhat.com>
+References: <20180613084149.14523-1-kraxel@redhat.com>
+	<20180613084149.14523-4-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180613212702-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
- hotplug handlers
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/3] hw/vfio/display: add ramfb support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,67 +23,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>, libvir-list@redhat.com, Erik Skultety <eskultet@redhat.com>, Laine Stump <laine@redhat.com>
 
->>>       [ ... specific to machine_foo wiring ...]
->>>
->>>       virtio_mem_plug() {
->>>          [... some machine specific wiring ...]
->>>
->>>          bus_hotplug_ctrl =3D qdev_get_bus_hotplug_handler()
->>>          bus_hotplug_ctrl->plug(bus_hotplug_ctrl, dev)
->>>
->>>          [... some more machine specific wiring ...]
->>>       }
->>>
->>>       [ ... specific to machine_foo wiring ...]
->>>
->>> i.e. device itself doesn't participate in attaching to external entit=
-ies,
->>> those entities (machine or bus controller virtio device is attached t=
-o)
->>> do wiring on their own within their own domain.
->>
->> I am fine with this, but Michael asked if this ("virtio_mem_plug()")
->> could go via new DeviceClass functions. Michael, would that also work
->> for your use case?
->=20
-> It's not virtio specifically, I'm interested in how this will work for
-> PCI generally.  Right now we call do_pci_register_device which
-> immediately makes it guest visible.
+On Wed, 13 Jun 2018 10:41:49 +0200
+Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-So you're telling me that a PCI device exposes itself to the system in
-pci_qdev_realize() instead of letting a hotplug handler handle that? My
-assumption is that the PCI bridge hotplug handler handles this. What am
-I missing?
+> So we have a boot display when using a vgpu as primary display.
+> 
+> Use vfio-pci-ramfb instead of vfio-pci to enable it.
 
-I can see that e.g. for a virtio device the realize call chain is
+Using a different device here seems like it almost guarantees a very
+complicated path to support under libvirt.  What necessitates this
+versus a simple ramfb=on option to vfio-pci?
 
-pci_qdev_realize() -> virtio_pci_realize() -> virtio_XXX__pci_realize ->
-virtio_XXX_realize()
+I'm also not sure I understand the usage model, SeaBIOS and OVMF know
+how to write to this display, but it seems that the guest does not.  I
+suppose in the UEFI case runtime services can be used to continue
+writing this display, but BIOS doesn't have such an option, unless
+we're somehow emulating VGA here.  So for UEFI, I can imagine this
+covers us from power on through firmware boot and up to guest drivers
+initializing the GPU (assuming the vGPU supports a kernel mode driver,
+does NVIDIA?), but for BIOS it seems we likely still have a break from
+the bootloader to GPU driver initialization. For instance, what driver
+is used to draw the boot animation (or blue screen) on SeaBIOS Windows
+VM?  I'm assuming that this display and the vGPU display are one in the
+same, so there's some cut from one to the other.  Thanks,
 
-If any realization in pci_qdev_realize() fails, we do a
-do_pci_unregister_device().
+Alex
 
-So if it is true what you're saying than we're already exposing
-partially realized (and possibly unrealized again) devices via PCI. I
-*guess* because we're holding the iothread mutex this is okay and
-actually not visible. And we only seem to be sending events in the PCI
-bridge hotplug handlers, so my assumption is that this is fine.
-
->=20
->=20
->>
->> --=20
->>
->> Thanks,
->>
->> David / dhildenb
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  include/hw/vfio/vfio-common.h |  2 ++
+>  hw/vfio/display.c             | 10 ++++++++++
+>  hw/vfio/pci.c                 | 15 +++++++++++++++
+>  3 files changed, 27 insertions(+)
+> 
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index a9036929b2..a58d7e7e77 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -26,6 +26,7 @@
+>  #include "qemu/queue.h"
+>  #include "qemu/notify.h"
+>  #include "ui/console.h"
+> +#include "hw/display/ramfb.h"
+>  #ifdef CONFIG_LINUX
+>  #include <linux/vfio.h>
+>  #endif
+> @@ -143,6 +144,7 @@ typedef struct VFIODMABuf {
+>  
+>  typedef struct VFIODisplay {
+>      QemuConsole *con;
+> +    RAMFBState *ramfb;
+>      struct {
+>          VFIORegion buffer;
+>          DisplaySurface *surface;
+> diff --git a/hw/vfio/display.c b/hw/vfio/display.c
+> index 59c0e5d1d7..409d5a2e3a 100644
+> --- a/hw/vfio/display.c
+> +++ b/hw/vfio/display.c
+> @@ -124,6 +124,9 @@ static void vfio_display_dmabuf_update(void *opaque)
+>  
+>      primary = vfio_display_get_dmabuf(vdev, DRM_PLANE_TYPE_PRIMARY);
+>      if (primary == NULL) {
+> +        if (dpy->ramfb) {
+> +            ramfb_display_update(dpy->con, dpy->ramfb);
+> +        }
+>          return;
+>      }
+>  
+> @@ -181,6 +184,8 @@ static int vfio_display_dmabuf_init(VFIOPCIDevice *vdev, Error **errp)
+>      vdev->dpy->con = graphic_console_init(DEVICE(vdev), 0,
+>                                            &vfio_display_dmabuf_ops,
+>                                            vdev);
+> +    if (strcmp(object_get_typename(OBJECT(vdev)), "vfio-pci-ramfb") == 0)
+> +        vdev->dpy->ramfb = ramfb_setup(errp);
+>      return 0;
+>  }
+>  
+> @@ -228,6 +233,9 @@ static void vfio_display_region_update(void *opaque)
+>          return;
+>      }
+>      if (!plane.drm_format || !plane.size) {
+> +        if (dpy->ramfb) {
+> +            ramfb_display_update(dpy->con, dpy->ramfb);
+> +        }
+>          return;
+>      }
+>      format = qemu_drm_format_to_pixman(plane.drm_format);
+> @@ -300,6 +308,8 @@ static int vfio_display_region_init(VFIOPCIDevice *vdev, Error **errp)
+>      vdev->dpy->con = graphic_console_init(DEVICE(vdev), 0,
+>                                            &vfio_display_region_ops,
+>                                            vdev);
+> +    if (strcmp(object_get_typename(OBJECT(vdev)), "vfio-pci-ramfb") == 0)
+> +        vdev->dpy->ramfb = ramfb_setup(errp);
+>      return 0;
+>  }
+>  
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 18c493b49e..6a2b42a595 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -3234,9 +3234,24 @@ static const TypeInfo vfio_pci_dev_info = {
+>      },
+>  };
+>  
+> +static void vfio_pci_ramfb_dev_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->hotpluggable = false;
+> +}
+> +
+> +static const TypeInfo vfio_pci_ramfb_dev_info = {
+> +    .name = "vfio-pci-ramfb",
+> +    .parent = "vfio-pci",
+> +    .instance_size = sizeof(VFIOPCIDevice),
+> +    .class_init = vfio_pci_ramfb_dev_class_init,
+> +};
+> +
+>  static void register_vfio_pci_dev_type(void)
+>  {
+>      type_register_static(&vfio_pci_dev_info);
+> +    type_register_static(&vfio_pci_ramfb_dev_info);
+>  }
+>  
+>  type_init(register_vfio_pci_dev_type)
