@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60804)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60947)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fT1m0-0006cf-F2
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:09:02 -0400
+	(envelope-from <groug@kaod.org>) id 1fT1mq-00074n-CP
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:09:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fT1lw-0003xN-Tf
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:09:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39392 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1fT1mn-0004VM-60
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:09:52 -0400
+Received: from 13.mo1.mail-out.ovh.net ([178.33.253.128]:40853)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fT1lw-0003x1-OI
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:08:56 -0400
-Date: Wed, 13 Jun 2018 17:08:48 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180613090848.GK15344@xz-mi>
-References: <20180524044454.11792-1-peterx@redhat.com>
-	<20180524044454.11792-2-peterx@redhat.com>
-	<87vaanktd9.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fT1mm-0004Tz-Vt
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 05:09:49 -0400
+Received: from player762.ha.ovh.net (unknown [10.109.105.97])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 6597C107C33
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 11:09:47 +0200 (CEST)
+Date: Wed, 13 Jun 2018 11:09:39 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180613110939.28d30cf0@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20180613065707.30766-3-david@gibson.dropbear.id.au>
+References: <20180613065707.30766-1-david@gibson.dropbear.id.au>
+	<20180613065707.30766-3-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87vaanktd9.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] qemu-error: introduce
- {error|warn}_report_once
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/7] pnv: Add missing error check during
+ cpu realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,115 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Wed, Jun 13, 2018 at 10:01:22AM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
-> 
-> > There are many error_report()s that can be used in frequently called
-> > functions, especially on IO paths.  That can be unideal in that
-> > malicious guest can try to trigger the error tons of time which might
-> > use up the log space on the host (e.g., libvirt can capture the stderr
-> > of QEMU and put it persistently onto disk).  In VT-d emulation code, we
-> > have trace_vtd_error() tracer.  AFAIU all those places can be replaced
-> > by something like error_report() but trace points are mostly used to
-> > avoid the DDOS attack that mentioned above.  However using trace points
-> > mean that errors are not dumped if trace not enabled.
-> >
-> > It's not a big deal in most modern server managements since we have
-> > things like logrotate to maintain the logs and make sure the quota is
-> > expected.  However it'll still be nice that we just provide another way
-> > to restrict message generations.  In most cases, this kind of
-> > error_report()s will only provide valid information on the first message
-> > sent, and all the rest of similar messages will be mostly talking about
-> > the same thing.  This patch introduces *_report_once() helpers to allow
-> > a message to be dumped only once during one QEMU process's life cycle.
-> > It will make sure: (1) it's on by deffault, so we can even get something
-> 
-> default
-> 
-> > without turning the trace on and reproducing, and (2) it won't be
-> > affected by DDOS attack.
-> >
-> > To implement it, I stole the printk_once() macro from Linux.
-> >
-> > CC: Eric Blake <eblake@redhat.com>
-> > CC: Markus Armbruster <armbru@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  include/qemu/error-report.h | 32 ++++++++++++++++++++++++++++++++
-> >  1 file changed, 32 insertions(+)
-> >
-> > diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
-> > index e1c8ae1a52..c7ec54cb97 100644
-> > --- a/include/qemu/error-report.h
-> > +++ b/include/qemu/error-report.h
-> > @@ -44,6 +44,38 @@ void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-> >  void warn_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-> >  void info_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-> >  
-> > +/*
-> > + * Similar to error_report(), but it only prints the message once.  It
-> > + * returns true when it prints the first time, otherwise false.
-> 
-> I like to start function contracts with a single line stating the
-> function's purpose, and I prefer imperative mood, like this:
-> 
->     * Similar to error_report(), but it only prints the message once.
->     * Return true when it prints, false otherwise.
-> 
-> > + */
-> > +#define error_report_once(fmt, ...)             \
-> > +    ({                                          \
-> > +        static bool print_once_;               \
-> > +        bool ret_print_once_ = !print_once_;  \
-> > +                                                \
-> > +        if (!print_once_) {                    \
-> > +            print_once_ = true;                \
-> > +            error_report(fmt, ##__VA_ARGS__);   \
-> > +        }                                       \
-> > +        unlikely(ret_print_once_);             \
-> > +    })
-> 
-> Please align the backslashes, say with emacs command c-backslash-region,
-> bound to C-c C-\.
+On Wed, 13 Jun 2018 16:57:02 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-I am with evil mode so mostly I'm using evil-indent.  It's strange why
-the patches were not indented correctly.  Now indent will be fine
-locally if I redo the evil-indent.  I must have done something wrong
-before. :(
+> In pnv_core_realize() we call two functions with an Error * parameter in
+> succession, which means if they both cause errors we'll lose the first one.
 
-> 
-> > +
-> > +/*
-> > + * Similar to warn_report(), but it only prints the message once.  It
-> > + * returns true when it prints the first time, otherwise false.
-> > + */
-> > +#define warn_report_once(fmt, ...)              \
-> > +    ({                                          \
-> > +        static bool print_once_;               \
-> > +        bool ret_print_once_ = !print_once_;  \
-> > +                                                \
-> > +        if (!print_once_) {                    \
-> > +            print_once_ = true;                \
-> > +            warn_report(fmt, ##__VA_ARGS__);   \
-> > +        }                                       \
-> > +        unlikely(ret_print_once_);             \
-> > +    })
-> 
-> Likewise.
-> 
-> > +
-> >  const char *error_get_progname(void);
-> >  extern bool enable_timestamp_msg;
-> 
-> With these nits addressed:
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> 
-> I can touch them up when I apply.
+Not exactly. The error code doesn't allow that and QEMU will abort.
 
-Thanks, Markus.
+static void error_setv(Error **errp,
+                       const char *src, int line, const char *func,
+                       ErrorClass err_class, const char *fmt, va_list ap,
+                       const char *suffix)
+{
+    Error *err;
+    int saved_errno = errno;
 
--- 
-Peter Xu
+    if (errp == NULL) {
+        return;
+    }
+    assert(*errp == NULL);
+
+
+> Add an extra test/escape to fix this.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/pnv_core.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+> index 13ad7d9e04..efb68226bb 100644
+> --- a/hw/ppc/pnv_core.c
+> +++ b/hw/ppc/pnv_core.c
+> @@ -173,6 +173,9 @@ static void pnv_core_realize(DeviceState *dev, Error **errp)
+>  
+>          snprintf(name, sizeof(name), "thread[%d]", i);
+>          object_property_add_child(OBJECT(pc), name, obj, &local_err);
+> +        if (local_err) {
+> +            goto err;
+> +        }
+>          object_property_add_alias(obj, "core-pir", OBJECT(pc),
+>                                    "pir", &local_err);
+>          if (local_err) {
+
+Hmm... the current error path seems to assume failures to be
+caused by object_property_add_child(). It hence unparents the
+previously parented CPUs, but not the current one. So we'll
+miss one call to object_unparent() if object_property_add_alias()
+fails.
