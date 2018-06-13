@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fT9I2-0004Fn-8L
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:10:35 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fT9NW-0005qX-Hs
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:16:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fT9Hz-0008F0-0R
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:10:34 -0400
-Received: from smtp55.i.mail.ru ([217.69.128.35]:39914)
+	(envelope-from <ehabkost@redhat.com>) id 1fT9NT-0007Bw-3X
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:16:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56092)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fT9Hy-00088p-GZ
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:10:30 -0400
-References: <20180612204632.28780-1-jusual@mail.ru>
-	<20180613140505.GS24528@stefanha-x1.localdomain>
-From: Julia Suvorova <jusual@mail.ru>
-Message-ID: <9047ab62-0bf7-d473-e4c3-562f33c68349@mail.ru>
-Date: Wed, 13 Jun 2018 20:10:23 +0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fT9NS-0007A7-Sp
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 13:16:11 -0400
+Date: Wed, 13 Jun 2018 14:16:07 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180613171607.GB7451@localhost.localdomain>
+References: <20180611203712.12086-1-ehabkost@redhat.com>
+	<a8426bf6-7531-6306-d1c6-bb4c6c2099cd@redhat.com>
+	<20180612150153.GK7451@localhost.localdomain>
+	<6c9b3744-7323-cd1f-7b07-2b77df7ae80d@redhat.com>
+	<20180612182541.GN7451@localhost.localdomain>
+	<b93cd6e5-bb2e-b932-bc68-da5c314924a2@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180613140505.GS24528@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow ARMv6-M Thumb2
- instructions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b93cd6e5-bb2e-b932-bc68-da5c314924a2@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH] i386: Remove ospke CPUID flag name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +31,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 13.06.2018 17:05, Stefan Hajnoczi wrote:
-> On Tue, Jun 12, 2018 at 11:46:32PM +0300, Julia Suvorova wrote:
->> ARMv6-M supports 6 Thumb2 instructions. This patch checks for these
->> instructions and allows their execution.
->> Like Thumb2 cores, ARMv6-M always interprets BL instruction as 32-bit.
->>
->> This patch is required for future Cortex-M0 support.
->>
->> Signed-off-by: Julia Suvorova <jusual@mail.ru>
->> ---
->>   target/arm/translate.c | 35 ++++++++++++++++++++++++++++++-----
->>   1 file changed, 30 insertions(+), 5 deletions(-)
+On Wed, Jun 13, 2018 at 07:01:23PM +0200, Paolo Bonzini wrote:
+> On 12/06/2018 20:25, Eduardo Habkost wrote:
+> > On Tue, Jun 12, 2018 at 05:12:58PM +0200, Paolo Bonzini wrote:
+> >> On 12/06/2018 17:01, Eduardo Habkost wrote:
+> >>>>>
+> >>>>> Remove OSPKE from the feature name array so users don't try to
+> >>>>> configure it manually.
+> >>>>>
+> >>>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> >>>> Yes, it's the same as OSXSAVE.  Thanks!
+> >>> CR4_OSXSAVE_MASK is automatically enabled on user-mode QEMU,
+> >>> though.
+> >>>
+> >>> My question is if it would make any sense to enable CR4_PKE_MASK
+> >>> too.
+> >>
+> >> If you mean OSPKE, then yes---if PKU is available.  Likewise, OSXSAVE
+> >> should only be enabled if XSAVE is available.
+> > 
+> > Yeah, I mean enabling it only if PKU is available, like we
+> > already do with OSXAVE/XSAVE.
+> > 
+> > But we don't do it today, so enabling it automatically in
+> > CONFIG_USER_ONLY would be a new feature.  Would it be useful for
+> > anything, though?
+> > 
+> > I'm asking that to find out if somebody could be already using
+> > "-cpu ...,+ospke" with user-mode QEMU today (which this patch
+> > would break).  If RDPKRU/WRPKRU is useless under user-mode QEMU,
+> > than we don't need to worry about that.
 > 
-> Does make the undefined instruction test case that I recently posted
-> pass (including all commented out instructions that weren't working
-> yet)?
+> Hmm, actually there are two more things to consider for user-mode emulation.
 > 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> 
+> First, QEMU doesn't support any of pkey_mprotect, pkey_alloc, pkey_free,
+> so it should probably never set OSPKE.
 
-Yes, test with all instructions is passed.
+This means "-cpu ...,+ospke" is useless today and we can safely
+remove support for it, right?
 
-Best regards, Julia Suvorova.
+> Second, for user-mode emulation it makes sense to allow flipping of
+> OSPKE and OSXSAVE, because that corresponds to different behaviors of
+> the underlying kernels.  There have been bugs in fact with programs that
+> incorrectly tested XSAVE instead of OSXSAVE, so it's worthwhile to let
+> the user test both configurations.
+
+However, "-cpu ...,-osxsave" has no effect today (user-mode QEMU
+unconditionally sets OSXSAVE), so that would be a new feature.
+
+I assume this means I don't need to drop the osxsave patch from
+my queue, either.
+
+> So to sum up, the default for QEMU user-mode emulation should be
+> OSXSAVE=XSAVE and OSPKE=0.
+
+Thanks!
+
+-- 
+Eduardo
