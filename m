@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fT79r-0006Zm-2k
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:54:00 -0400
+	(envelope-from <jcody@redhat.com>) id 1fT79t-0006c5-RM
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:54:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fT79q-0005Vr-9A
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:53:59 -0400
+	(envelope-from <jcody@redhat.com>) id 1fT79s-0005c3-WB
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 10:54:01 -0400
 From: Jeff Cody <jcody@redhat.com>
-Date: Wed, 13 Jun 2018 10:53:51 -0400
-Message-Id: <20180613145351.414-2-jcody@redhat.com>
-In-Reply-To: <20180613145351.414-1-jcody@redhat.com>
-References: <20180613145351.414-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 1/1] block: Ignore generated job QAPI files
+Date: Wed, 13 Jun 2018 10:53:50 -0400
+Message-Id: <20180613145351.414-1-jcody@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,55 +20,27 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: peter.maydell@linaro.org, jcody@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+The following changes since commit 2ab09bf2f9f55b9fb8d2de6eb2ba2a8570e268e2:
 
-Commit bf42508f introduced new generated files; make sure they
-don't get accidentally committed from an in-tree build.
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20180612-pull-request' into staging (2018-06-12 15:34:34 +0100)
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20180531212435.165261-1-eblake@redhat.com
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
+are available in the git repository at:
+
+  git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
+
+for you to fetch changes up to b61acdecbf19c3c5a327baec1e8e4c06d0da68b7:
+
+  block: Ignore generated job QAPI files (2018-06-13 10:51:49 -0400)
+
+----------------------------------------------------------------
+Block patch for .gitignore
+----------------------------------------------------------------
+
+Eric Blake (1):
+  block: Ignore generated job QAPI files
+
  .gitignore | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/.gitignore b/.gitignore
-index 81e1f2fb0f..9da3b3e626 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -36,6 +36,7 @@
- /qapi/qapi-commands-common.[ch]
- /qapi/qapi-commands-crypto.[ch]
- /qapi/qapi-commands-introspect.[ch]
-+/qapi/qapi-commands-job.[ch]
- /qapi/qapi-commands-migration.[ch]
- /qapi/qapi-commands-misc.[ch]
- /qapi/qapi-commands-net.[ch]
-@@ -53,6 +54,7 @@
- /qapi/qapi-events-common.[ch]
- /qapi/qapi-events-crypto.[ch]
- /qapi/qapi-events-introspect.[ch]
-+/qapi/qapi-events-job.[ch]
- /qapi/qapi-events-migration.[ch]
- /qapi/qapi-events-misc.[ch]
- /qapi/qapi-events-net.[ch]
-@@ -71,6 +73,7 @@
- /qapi/qapi-types-common.[ch]
- /qapi/qapi-types-crypto.[ch]
- /qapi/qapi-types-introspect.[ch]
-+/qapi/qapi-types-job.[ch]
- /qapi/qapi-types-migration.[ch]
- /qapi/qapi-types-misc.[ch]
- /qapi/qapi-types-net.[ch]
-@@ -88,6 +91,7 @@
- /qapi/qapi-visit-common.[ch]
- /qapi/qapi-visit-crypto.[ch]
- /qapi/qapi-visit-introspect.[ch]
-+/qapi/qapi-visit-job.[ch]
- /qapi/qapi-visit-migration.[ch]
- /qapi/qapi-visit-misc.[ch]
- /qapi/qapi-visit-net.[ch]
 -- 
 2.13.6
