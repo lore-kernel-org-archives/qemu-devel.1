@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44622)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akalita@cs.stonybrook.edu>) id 1fSv51-0004tm-7S
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:00:12 -0400
+	(envelope-from <peterx@redhat.com>) id 1fSv6D-0005qD-06
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:01:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akalita@cs.stonybrook.edu>) id 1fSv50-0007yB-Fm
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:00:11 -0400
-Received: from mail-lf0-x234.google.com ([2a00:1450:4010:c07::234]:41815)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <akalita@cs.stonybrook.edu>)
-	id 1fSv50-0007xa-4C
-	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:00:10 -0400
-Received: by mail-lf0-x234.google.com with SMTP id d24-v6so1368516lfa.8
-	for <qemu-devel@nongnu.org>; Tue, 12 Jun 2018 19:00:09 -0700 (PDT)
+	(envelope-from <peterx@redhat.com>) id 1fSv69-0008ST-Vf
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:01:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56030 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fSv69-0008SD-RD
+	for qemu-devel@nongnu.org; Tue, 12 Jun 2018 22:01:21 -0400
+Date: Wed, 13 Jun 2018 10:01:11 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180613020111.GE15344@xz-mi>
+References: <1528445443-43406-1-git-send-email-wei.w.wang@intel.com>
+	<1528445443-43406-5-git-send-email-wei.w.wang@intel.com>
+	<20180612075016.GD15344@xz-mi> <5B1FAAAF.4030705@intel.com>
 MIME-Version: 1.0
-From: Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
-Date: Tue, 12 Jun 2018 22:00:07 -0400
-Message-ID: <CAJGDS+G_c5O=xtngCa5ZjG3jU1yJPBq3fV6TV4fq_CgKRs+yVw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Confusion regarding VMEntry events
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5B1FAAAF.4030705@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v8 4/6] migration/ram.c: add ram save state
+ notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,30 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-Hello all,
+On Tue, Jun 12, 2018 at 07:12:47PM +0800, Wei Wang wrote:
 
-I am working on developing a "modified" record-replay mechanism for
-recording and replaying disk and network events along with VMEntry events.
-I have managed to identify the "correct" points where I am going to record
-the disk and the network events. But I am not quite sure at which point in
-the source code do I call the "VMEntry record" handler.
+[...]
 
-I am assuming that the VMEntry usually happens just before the ioctl
-"KVM_RUN" is called. Specifically the below lines of code :-
+> Hi Peter,
+> 
+> Thanks for the review. We just got a little accident in the kernel part,
+> which may cause some modifications to the QEMU side interfaces. So I will
+> implement a new version and let you review in v9 patches.
 
-function : kvm_cpu_exec()
-.....
-.....
-// record(VMENTRY)       -- calling VMENTRY record and replay handler
-run_ret = kvm_vcpu_ioctl(cpu, KVM_RUN, 0);
-
-Is this the correct point where a VMEntry command is "logically" executed
-by the host CPU ? Are there other places in the KVM code where VMEntries
-can happen as well ?  Please help me out regarding these questions.
-
-Thank you.
+No problem.  Yeah I actually noticed the accident.  Please feel free
+to postpone the QEMU part until the kernel part is fully settled.
 
 Regards,
-Arnab
+
+-- 
+Peter Xu
