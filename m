@@ -1,29 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fTAa1-0007sW-7V
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:33:14 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fTAiS-0006R5-RH
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:41:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fTAZw-0001io-Uk
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:33:13 -0400
-Date: Wed, 13 Jun 2018 21:32:59 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180613212702-mutt-send-email-mst@kernel.org>
-References: <20180607154455.6eab4e24@redhat.com>
-	<5dda6237-88d8-f0f8-58d2-af996368cea4@redhat.com>
-	<20180608142442.0d97b7c6@redhat.com>
-	<397d37ee-b3a8-dae0-37d1-fd3c942448c2@redhat.com>
-	<20180608155432-mutt-send-email-mst@kernel.org>
-	<d6966aa8-54e5-8036-3603-069fbbb88c2a@redhat.com>
-	<20180608181004-mutt-send-email-mst@kernel.org>
-	<a68853da-a664-84ae-c5bd-4e79b967bb65@redhat.com>
-	<20180613174825.1eebef6c@redhat.com>
-	<c84ffb85-628f-4ece-e231-d0d7d45144c9@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fTAiO-0005Tx-SK
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:41:56 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:34515)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fTAiO-0005Of-OL
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:41:52 -0400
+Received: by mail-qk0-x244.google.com with SMTP id q70-v6so2142708qke.1
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 11:41:51 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180530184156.15634-1-crosa@redhat.com>
+	<20180530184156.15634-6-crosa@redhat.com>
+	<a8ec6474-707b-8272-7a79-a842f11d2f7f@amsat.org>
+	<20180613183041.GF24764@localhost.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <00bbd06d-09f4-0cf1-7ac2-8dcf6ec3cf0a@amsat.org>
+Date: Wed, 13 Jun 2018 15:41:47 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c84ffb85-628f-4ece-e231-d0d7d45144c9@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
- hotplug handlers
+In-Reply-To: <20180613183041.GF24764@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 5/5] Acceptance tests: add Linux kernel
+ boot and console checking test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,120 +38,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Amador Pahim <amador@pahim.org>
 
-On Wed, Jun 13, 2018 at 05:51:01PM +0200, David Hildenbrand wrote:
-> On 13.06.2018 17:48, Igor Mammedov wrote:
-> > On Wed, 13 Jun 2018 12:58:46 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> > 
-> >> On 08.06.2018 17:12, Michael S. Tsirkin wrote:
-> >>> On Fri, Jun 08, 2018 at 03:07:53PM +0200, David Hildenbrand wrote:  
-> >>>> On 08.06.2018 14:55, Michael S. Tsirkin wrote:  
-> >>>>> On Fri, Jun 08, 2018 at 02:32:09PM +0200, David Hildenbrand wrote:  
-> >>>>>>  
-> >>>>>>>>> if (TYPE_PC_DIMM) {
-> >>>>>>>>>     pc_dimm_plug()
-> >>>>>>>>>     /* do here additional concrete machine specific things */
-> >>>>>>>>> } else if (TYPE_VIRTIO_MEM) {
-> >>>>>>>>>     virtio_mem_plug() <- do forwarding in there
-> >>>>>>>>>     /* and do here additional concrete machine specific things */
-> >>>>>>>>> } else if (TYPE_CPU) {
-> >>>>>>>>>     cpu_plug()
-> >>>>>>>>>     /* do here additional concrete machine specific things */
-> >>>>>>>>> }    
-> >>>>>>>>
-> >>>>>>>> That will result in a lot of duplicate code - for every machine we
-> >>>>>>>> support (dimm/virtio-mem/virtio-pmem/*add more memory devices here*) -
-> >>>>>>>> virtio-mem and virtio-pmem could most probably share the code.  
-> >>>>>>> maybe or maybe not, depending on if pmem endups as memory device or
-> >>>>>>> separate controller. And even with duplication, machine code would
-> >>>>>>> be easy to follow just down one explicit call chain.  
-> >>>>>>
-> >>>>>> Not 100% convinced but I am now going into that direction.  
-> >>>>>
-> >>>>> Can this go into DeviceClass? Failover has the same need to
-> >>>>> allocate/free resources for vfio without a full realize/unrealize.
-> >>>>>  
-> >>>>
-> >>>> Conceptually, I would have called here something like
-> >>>>
-> >>>> virtio_mem_plug() ...
-> >>>>
-> >>>> Which would end up calling memory_device_plug() and triggering the
-> >>>> target hotplug handler.
-> >>>>
-> >>>> I assume this can also be done from a device class callback.
-> >>>>
-> >>>> So we would need a total of 3 callbacks for
-> >>>>
-> >>>> a) pre_plug
-> >>>> b) plug
-> >>>> c) unplug
-> >>>>
-> >>>> In addition, unplug requests might be necessary, so
-> >>>>
-> >>>> d) unplug_request  
-> >>>
-> >>>
-> >>> Right - basically HotplugHandlerClass.  
-> >>
-> >> Looking into this idea:
-> >>
-> >> What I would have right now (conceptually)
-> >>
-> >> if (TYPE_PC_DIMM) {
-> >>     pc_dimm_plug(machine);
-> >> } else if (TYPE_CPU) {
-> >>     cpu_plug(machine);
-> >> } else if (TYPE_VIRTIO_MEM) {
-> >>     virtio_mem_plug(machine);
-> >> }
-> >>
-> >> Instead you want something like:
-> >>
-> >> if (TYPE_PC_DIMM) {
-> >>     pc_dimm_plug(machine);
-> >> } else if (TYPE_CPU) {
-> >>     cpu_plug(machine);
-> >> // igor requested an explicit list here, we could also check for
-> >> // DEVICE_CLASS(device)->plug and make it generic
-> >> } else if (TYPE_VIRTIO_MEM) {
-> >>     DEVICE_CLASS(device)->plug(machine);
-> >>     // call bus hotplug handler if necessary, or let the previous call
-> >>     // handle it?
-> > not exactly this, I suggested following:
-> > 
-> >       [ ... specific to machine_foo wiring ...]
-> > 
-> >       virtio_mem_plug() {
-> >          [... some machine specific wiring ...]
-> > 
-> >          bus_hotplug_ctrl = qdev_get_bus_hotplug_handler()
-> >          bus_hotplug_ctrl->plug(bus_hotplug_ctrl, dev)
-> > 
-> >          [... some more machine specific wiring ...]
-> >       }
-> > 
-> >       [ ... specific to machine_foo wiring ...]
-> > 
-> > i.e. device itself doesn't participate in attaching to external entities,
-> > those entities (machine or bus controller virtio device is attached to)
-> > do wiring on their own within their own domain.
+On 06/13/2018 03:30 PM, Eduardo Habkost wrote:
+> On Wed, May 30, 2018 at 05:57:52PM -0300, Philippe Mathieu-Daudé wrote:
+> [...]
+>>> +class BootLinuxConsole(Test):
+>>> +    """
+>>> +    Boots a x86_64 Linux kernel and checks that the console is operational
+>>> +    and the kernel command line is properly passed from QEMU to the kernel
+>>> +
+>>> +    :avocado: enable
+>>> +    :avocado: tags=x86_64
+>>
+>> Can you move tags=x86_64 to the test() method?
 > 
-> I am fine with this, but Michael asked if this ("virtio_mem_plug()")
-> could go via new DeviceClass functions. Michael, would that also work
-> for your use case?
+> I'm queueing this patch as is, as the tag here seems harmless.  A
+> follow-up patch will be required if you want to move the tag.
 
-It's not virtio specifically, I'm interested in how this will work for
-PCI generally.  Right now we call do_pci_register_device which
-immediately makes it guest visible.
-
-
-> 
-> -- 
-> 
-> Thanks,
-> 
-> David / dhildenb
+No problem!
