@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fTAMT-0003Ya-0k
+	(envelope-from <mreitz@redhat.com>) id 1fTAMT-0003ZT-Uf
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:19:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fTAMR-0006XL-OP
+	(envelope-from <mreitz@redhat.com>) id 1fTAMS-0006cn-SG
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 14:19:13 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 13 Jun 2018 20:18:18 +0200
-Message-Id: <20180613181823.13618-10-mreitz@redhat.com>
+Date: Wed, 13 Jun 2018 20:18:19 +0200
+Message-Id: <20180613181823.13618-11-mreitz@redhat.com>
 In-Reply-To: <20180613181823.13618-1-mreitz@redhat.com>
 References: <20180613181823.13618-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 09/14] block/dirty-bitmap: Add
- bdrv_dirty_iter_next_area
+Subject: [Qemu-devel] [PATCH v5 10/14] block/mirror: Add MirrorBDSOpaque
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +22,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-This new function allows to look for a consecutively dirty area in a
-dirty bitmap.
+This will allow us to access the block job data when the mirror block
+driver becomes more complex.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- include/block/dirty-bitmap.h |  2 ++
- block/dirty-bitmap.c         | 55 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+)
+ block/mirror.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index 02e0cbabd2..288dc6adb6 100644
---- a/include/block/dirty-bitmap.h
-+++ b/include/block/dirty-bitmap.h
-@@ -82,6 +82,8 @@ void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
- void bdrv_reset_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                     int64_t offset, int64_t bytes);
- int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
-+bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t max_offset,
-+                               uint64_t *offset, int *bytes);
- void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t offset);
- int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
- int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index cedb971765..db1782ec1f 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -522,6 +522,61 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
-     return hbitmap_iter_next(&iter->hbi, true);
- }
+diff --git a/block/mirror.c b/block/mirror.c
+index fa94fd9d17..f060bd8bb4 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -76,6 +76,10 @@ typedef struct MirrorBlockJob {
+     bool initial_zeroing_ongoing;
+ } MirrorBlockJob;
  
-+/**
-+ * Return the next consecutively dirty area in the dirty bitmap
-+ * belonging to the given iterator @iter.
-+ *
-+ * @max_offset: Maximum value that may be returned for
-+ *              *offset + *bytes
-+ * @offset:     Will contain the start offset of the next dirty area
-+ * @bytes:      Will contain the length of the next dirty area
-+ *
-+ * Returns: True if a dirty area could be found before max_offset
-+ *          (which means that *offset and *bytes then contain valid
-+ *          values), false otherwise.
-+ *
-+ * Note that @iter is never advanced if false is returned.  If an area
-+ * is found (which means that true is returned), it will be advanced
-+ * past that area.
-+ */
-+bool bdrv_dirty_iter_next_area(BdrvDirtyBitmapIter *iter, uint64_t max_offset,
-+                               uint64_t *offset, int *bytes)
-+{
-+    uint32_t granularity = bdrv_dirty_bitmap_granularity(iter->bitmap);
-+    uint64_t gran_max_offset;
-+    int64_t ret;
-+    int size;
++typedef struct MirrorBDSOpaque {
++    MirrorBlockJob *job;
++} MirrorBDSOpaque;
 +
-+    if (max_offset == iter->bitmap->size) {
-+        /* If max_offset points to the image end, round it up by the
-+         * bitmap granularity */
-+        gran_max_offset = ROUND_UP(max_offset, granularity);
-+    } else {
-+        gran_max_offset = max_offset;
-+    }
+ struct MirrorOp {
+     MirrorBlockJob *s;
+     QEMUIOVector qiov;
+@@ -599,6 +603,7 @@ static void mirror_exit(Job *job, void *opaque)
+     MirrorBlockJob *s = container_of(job, MirrorBlockJob, common.job);
+     BlockJob *bjob = &s->common;
+     MirrorExitData *data = opaque;
++    MirrorBDSOpaque *bs_opaque = s->mirror_top_bs->opaque;
+     AioContext *replace_aio_context = NULL;
+     BlockDriverState *src = s->mirror_top_bs->backing->bs;
+     BlockDriverState *target_bs = blk_bs(s->target);
+@@ -691,6 +696,7 @@ static void mirror_exit(Job *job, void *opaque)
+     blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
+     blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
+ 
++    bs_opaque->job = NULL;
+     job_completed(job, data->ret, NULL);
+ 
+     g_free(data);
+@@ -1222,6 +1228,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+                              Error **errp)
+ {
+     MirrorBlockJob *s;
++    MirrorBDSOpaque *bs_opaque;
+     BlockDriverState *mirror_top_bs;
+     bool target_graph_mod;
+     bool target_is_backing;
+@@ -1257,6 +1264,8 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+     mirror_top_bs->total_sectors = bs->total_sectors;
+     mirror_top_bs->supported_write_flags = BDRV_REQ_WRITE_UNCHANGED;
+     mirror_top_bs->supported_zero_flags = BDRV_REQ_WRITE_UNCHANGED;
++    bs_opaque = g_new0(MirrorBDSOpaque, 1);
++    mirror_top_bs->opaque = bs_opaque;
+     bdrv_set_aio_context(mirror_top_bs, bdrv_get_aio_context(bs));
+ 
+     /* bdrv_append takes ownership of the mirror_top_bs reference, need to keep
+@@ -1281,6 +1290,8 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+     if (!s) {
+         goto fail;
+     }
++    bs_opaque->job = s;
 +
-+    ret = hbitmap_iter_next(&iter->hbi, false);
-+    if (ret < 0 || ret + granularity > gran_max_offset) {
-+        return false;
-+    }
-+
-+    *offset = ret;
-+    size = 0;
-+
-+    assert(granularity <= INT_MAX);
-+
-+    do {
-+        /* Advance iterator */
-+        ret = hbitmap_iter_next(&iter->hbi, true);
-+        size += granularity;
-+    } while (ret + granularity <= gran_max_offset &&
-+             hbitmap_iter_next(&iter->hbi, false) == ret + granularity &&
-+             size <= INT_MAX - granularity);
-+
-+    *bytes = MIN(size, max_offset - *offset);
-+    return true;
-+}
-+
- /* Called within bdrv_dirty_bitmap_lock..unlock */
- void bdrv_set_dirty_bitmap_locked(BdrvDirtyBitmap *bitmap,
-                                   int64_t offset, int64_t bytes)
+     /* The block job now has a reference to this node */
+     bdrv_unref(mirror_top_bs);
+ 
+@@ -1370,6 +1381,7 @@ fail:
+ 
+         g_free(s->replaces);
+         blk_unref(s->target);
++        bs_opaque->job = NULL;
+         job_early_fail(&s->common.job);
+     }
+ 
 -- 
 2.17.1
