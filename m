@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fTSZ1-0000mF-Uf
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:45:29 -0400
+	(envelope-from <thuth@redhat.com>) id 1fTSaI-0001Zr-VJ
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:46:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fTSZ0-0003I6-Ox
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:45:23 -0400
-Date: Thu, 14 Jun 2018 15:45:14 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180614134514.fxae6m2ucsfpczpl@kamzik.brq.redhat.com>
-References: <1528879723-24675-1-git-send-email-eric.auger@redhat.com>
-	<1528879723-24675-8-git-send-email-eric.auger@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1528879723-24675-8-git-send-email-eric.auger@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 7/9] hw/arm/virt: Register two
- redistributor regions when necessary
+	(envelope-from <thuth@redhat.com>) id 1fTSaE-0003eU-2k
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:46:43 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Thu, 14 Jun 2018 15:46:35 +0200
+Message-Id: <1528983995-16233-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] pc-bios/s390-ccw: Optimize the
+ s390-netboot.img for size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,91 +18,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, wei@redhat.com, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, christoffer.dall@arm.com, zhaoshenglong@huawei.com, lersek@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Jun 13, 2018 at 10:48:41AM +0200, Eric Auger wrote:
-> With a VGICv3 KVM device, if the number of vcpus exceeds the
-> capacity of the legacy redistributor region (123 redistributors),
-> we now attempt to register a second redistributor region. Up to
-> 512 redistributors can fit in this latter on top of the 123 allowed
-> by the legacy redistributor region.
-> 
-> Registering this second redistributor region is possible if the
-> host kernel supports the following VGICv3 KVM device group/attribute:
-> KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION.
-> 
-> In case the host kernel does not support the registration of several
-> redistributor regions and the requested number of vcpus exceeds the
-> capacity of the legacy redistributor region, the GICv3 device
-> initialization fails with a proper error message and qemu exits.
-> 
-> At the moment the max number of vcpus still is capped by the
-> virt machine class max_cpus.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> 
-> ---
-> 
-> v2 -> v3:
-> - remove spare space
-> ---
->  hw/arm/virt.c | 18 +++++++++++++++++-
->  1 file changed, 17 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 5c02cc5..2a1c0fb 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -528,6 +528,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
->      SysBusDevice *gicbusdev;
->      const char *gictype;
->      int type = vms->gic_version, i;
-> +    uint32_t nb_redist_regions = 0;
->  
->      gictype = (type == 3) ? gicv3_class_name() : gic_class_name();
->  
-> @@ -547,14 +548,28 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
->                      vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
->          uint32_t redist0_count = MIN(smp_cpus, redist0_capacity);
->  
-> -        qdev_prop_set_uint32(gicdev, "len-redist-region-count", 1);
-> +        nb_redist_regions = virt_gicv3_redist_region_count(vms);
-> +
-> +        qdev_prop_set_uint32(gicdev, "len-redist-region-count",
-> +                             nb_redist_regions);
->          qdev_prop_set_uint32(gicdev, "redist-region-count[0]", redist0_count);
-> +
-> +        if (nb_redist_regions == 2) {
-> +            uint32_t redist1_capacity =
-> +                        vms->memmap[VIRT_GIC_REDIST2].size / GICV3_REDIST_SIZE;
-> +
-> +            qdev_prop_set_uint32(gicdev, "redist-region-count[1]",
-> +                MIN(smp_cpus - redist0_count, redist1_capacity));
-> +        }
->      }
->      qdev_init_nofail(gicdev);
->      gicbusdev = SYS_BUS_DEVICE(gicdev);
->      sysbus_mmio_map(gicbusdev, 0, vms->memmap[VIRT_GIC_DIST].base);
->      if (type == 3) {
->          sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_REDIST].base);
-> +        if (nb_redist_regions == 2) {
-> +            sysbus_mmio_map(gicbusdev, 2, vms->memmap[VIRT_GIC_REDIST2].base);
-> +        }
->      } else {
->          sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
->      }
-> @@ -1350,6 +1365,7 @@ static void machvirt_init(MachineState *machine)
->       */
->      if (vms->gic_version == 3) {
->          virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
-> +        virt_max_cpus += vms->memmap[VIRT_GIC_REDIST2].size / GICV3_REDIST_SIZE;
->      } else {
->          virt_max_cpus = GIC_NCPU;
->      }
-> -- 
-> 2.5.5
-> 
->
+The -O2 optimization flag is passed via CFLAGS to the firmware Makefile,
+but in netbook.mak, we've got some rules that only use QEMU_CFLAGS for
+compiling the libc and libnet from SLOF, so these files get compiled
+without optimization so far. Use CFLAGS here, too, to create faster
+and smaller code.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+We can additionally save some more bytes in the firmware images by compi-
+ling the code with -fno-asynchronous-unwind-tables. This will omit some
+ELF sections (used for stack unwinding for example) from the image that
+we do not need in the firmware.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/Makefile    | 1 +
+ pc-bios/s390-ccw/netboot.mak | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index 439e3cc..1eb316b 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -15,6 +15,7 @@ OBJECTS = start.o main.o bootmap.o jump2ipl.o sclp.o menu.o \
+ QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
+ QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
+ QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
++QEMU_CFLAGS += -fno-asynchronous-unwind-tables
+ QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -fno-stack-protector)
+ LDFLAGS += -Wl,-pie -nostdlib
+ 
+diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
+index 8af0cfd..14e96b2 100644
+--- a/pc-bios/s390-ccw/netboot.mak
++++ b/pc-bios/s390-ccw/netboot.mak
+@@ -19,7 +19,7 @@ s390-netboot.img: s390-netboot.elf
+ 
+ # libc files:
+ 
+-LIBC_CFLAGS :=  $(QEMU_CFLAGS) $(LIBC_INC) $(LIBNET_INC)
++LIBC_CFLAGS :=  $(QEMU_CFLAGS) $(CFLAGS) $(LIBC_INC) $(LIBNET_INC)
+ 
+ CTYPE_OBJS = isdigit.o isxdigit.o toupper.o
+ %.o : $(SLOF_DIR)/lib/libc/ctype/%.c
+@@ -52,7 +52,7 @@ libc.a: $(LIBCOBJS)
+ 
+ LIBNETOBJS := args.o dhcp.o dns.o icmpv6.o ipv6.o tcp.o udp.o bootp.o \
+ 	      dhcpv6.o ethernet.o ipv4.o ndp.o tftp.o pxelinux.o
+-LIBNETCFLAGS := $(QEMU_CFLAGS) -DDHCPARCH=0x1F $(LIBC_INC) $(LIBNET_INC)
++LIBNETCFLAGS := $(QEMU_CFLAGS) $(CFLAGS) -DDHCPARCH=0x1F $(LIBC_INC) $(LIBNET_INC)
+ 
+ %.o : $(SLOF_DIR)/lib/libnet/%.c
+ 	$(call quiet-command,$(CC) $(LIBNETCFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
+-- 
+1.8.3.1
