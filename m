@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTaun-0001Wh-Jk
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 18:40:26 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fTbMl-0006wh-Dz
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 19:09:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTauk-0004jK-Gq
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 18:40:25 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:35284)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fTauk-0004ia-8m
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 18:40:22 -0400
-Received: by mail-pf0-x243.google.com with SMTP id c22-v6so3930091pfi.2
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 15:40:22 -0700 (PDT)
-References: <20180614222830.19725-1-mark.cave-ayland@ilande.co.uk>
-	<20180614222830.19725-2-mark.cave-ayland@ilande.co.uk>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <57720c98-3454-218b-6e29-078a9dfd9e53@linaro.org>
-Date: Thu, 14 Jun 2018 12:40:16 -1000
-MIME-Version: 1.0
-In-Reply-To: <20180614222830.19725-2-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <Babu.Moger@amd.com>) id 1fTbMg-0001jJ-Hl
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 19:09:19 -0400
+Received: from mail-sn1nam01on0080.outbound.protection.outlook.com
+	([104.47.32.80]:38654
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fTbMg-0001iG-0c
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 19:09:14 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Thu, 14 Jun 2018 23:09:11 +0000
+Message-ID: <DM5PR12MB24713FFFC7E1E88E34B7801D957D0@DM5PR12MB2471.namprd12.prod.outlook.com>
+References: <1528939107-17193-1-git-send-email-babu.moger@amd.com>
+	<1528939107-17193-6-git-send-email-babu.moger@amd.com>
+	<20180614191317.GY7451@localhost.localdomain>
+	<BL0PR12MB2468B28832BA657B1C9340E9957D0@BL0PR12MB2468.namprd12.prod.outlook.com>
+In-Reply-To: <BL0PR12MB2468B28832BA657B1C9340E9957D0@BL0PR12MB2468.namprd12.prod.outlook.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH v3 1/1] SPARC64: add icount support
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v14 5/6] i386: Disable TOPOEXT feature if
+ it cannot be supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +33,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, atar4qemu@gmail.com, cota@braap.org
-
-On 06/14/2018 12:28 PM, Mark Cave-Ayland wrote:
-> @@ -5834,6 +5928,11 @@ static void sparc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
->              save_npc(dc);
->              tcg_gen_exit_tb(NULL, 0);
->          }
-> +    } else if (dc->base.is_jmp == DISAS_EXIT) {
-> +        /* Exit TB */
-> +        save_state(dc);
-> +        gen_op_next_insn();
-> +        tcg_gen_exit_tb(NULL, 0);
->      }
-
-This doesn't look reachable, since the IF that goes with this ELSE is
-
-    if (dc->base.is_jmp != DISAS_NORETURN) {
-
-I suggest
-
-    switch (dc->base.is_jmp) {
-    case DISAS_NORETURN:
-       break;
-
-    case DISAS_TOO_MANY:
-       /* existing block */
-       break;
-
-    case DISAS_EXIT:
-       /* new code from above */
-
-    default:
-        g_assert_not_reached();
-    }
+To: "Moger, Babu" <Babu.Moger@amd.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>
 
 
-r~
+> -----Original Message-----
+> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org]
+> On Behalf Of Moger, Babu
+> Sent: Thursday, June 14, 2018 5:19 PM
+> To: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
+> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com
+> Subject: RE: [PATCH v14 5/6] i386: Disable TOPOEXT feature if it cannot b=
+e
+> supported
+>=20
+>=20
+>=20
+> > -----Original Message-----
+> > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> > Sent: Thursday, June 14, 2018 2:13 PM
+> > To: Moger, Babu <Babu.Moger@amd.com>
+> > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com;
+> pbonzini@redhat.com;
+> > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> > kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com
+> > Subject: Re: [PATCH v14 5/6] i386: Disable TOPOEXT feature if it cannot=
+ be
+> > supported
+> >
+> > On Wed, Jun 13, 2018 at 09:18:26PM -0400, Babu Moger wrote:
+> > > Disable the TOPOEXT feature if it cannot be supported.
+> > > We cannot support this feature with more than 2 nr_threads
+> > > or more than 32 cores in a socket.
+> > >
+> > > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > > ---
+> > >  target/i386/cpu.c | 17 ++++++++++++++++-
+> > >  1 file changed, 16 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > > index 2eb26da..637d8eb 100644
+> > > --- a/target/i386/cpu.c
+> > > +++ b/target/i386/cpu.c
+> > > @@ -4765,7 +4765,7 @@ static void x86_cpu_realizefn(DeviceState *dev,
+> > Error **errp)
+> > >      X86CPUClass *xcc =3D X86_CPU_GET_CLASS(dev);
+> > >      CPUX86State *env =3D &cpu->env;
+> > >      Error *local_err =3D NULL;
+> > > -    static bool ht_warned;
+> > > +    static bool ht_warned, topo_warned;
+> > >
+> > >      if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
+> > >          char *name =3D x86_cpu_class_get_model_name(xcc);
+> > > @@ -4779,6 +4779,21 @@ static void x86_cpu_realizefn(DeviceState
+> *dev,
+> > Error **errp)
+> > >          return;
+> > >      }
+> > >
+> > > +    /* Disable TOPOEXT if topology cannot be supported */
+> > > +    if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) {
+> > > +        if (!topology_supports_topoext(MAX_CORES_IN_NODE *
+> > MAX_NODES_PER_SOCKET,
+> > > +                                      2)) {
+> >
+> > I understand you stopped using cpu->nr_cores/cpu->nr_threads
+> > because it was not filled yet.
+> >
+> > But why exactly do you need to do this before calling
+> > x86_cpu_expand_features()?
+>=20
+> We extend the xlevel in x86_cpu_expand_features based on the TOPOEXT
+> feature.
+> So, I thought it would be right to do that way.
+> >
+> > If you really need nr_cores and nr_threads to be available
+> > earlier, we could simply move their initialization to
+> > cpu_exec_initfn() instead of the solution you implemented in
+> > patch 4/6.
+> >
+> > > +            env->features[FEAT_8000_0001_ECX] &=3D
+> !CPUID_EXT3_TOPOEXT;
+> >
+> > !CPUID_EXT3_TOPOEXT is 0, this will clear all bits in
+> > env->features[FEAT_8000_0001_ECX].  Did you mean
+> > ~CPUID_EXT3_TOPOEXT?
+>=20
+> Yes. That is correct.  Sorry.. I missed it.
+> >
+> >
+> > > +            if (!topo_warned) {
+> > > +                error_report("TOPOEXT feature cannot be supported wi=
+th
+> more"
+> > > +                             " than %d cores or more than 2 threads =
+per socket."
+> > > +                             " Disabling the feature.",
+> > > +                             (MAX_CORES_IN_NODE * MAX_NODES_PER_SOCK=
+ET));
+> > > +                topo_warned =3D true;
+> >
+> > This will print a warning for "-cpu EPYC -smp 64,cores=3D64".
+> > We shouldn't.
+
+If we support all the values, we may not need this.=20
+> >
+> > I'm starting to believe we shouldn't add TOPOEXT to EPYC unless
+> > we're ready to make the TOPOEXT CPUID leaves work for all valid
+> > -smp configurations.  If the feature will work only on a few
+> > specific cases, the feature should be enabled explicitly using
+> > "-cpu ...,+topoext".
+> >
+> > Is it really impossible to make CPUID return reasonable topology
+> > data for larger nr_cores and nr_threads values?  It would make
+> > everything much simpler.
+>=20
+> I am starting to think about this.  We tried to limit the configuration b=
+ased on
+> the actual hardware configuration.
+> If we leave that decision to the user then we might allow the config
+> whatever the user wants.
+> I need to make some changes in for topology(0x80000001e) information to
+> make this work.
+>=20
+
+One  more thought, we can allow all the configurations. If user creates sup=
+ported configuration, it will work perfectly fine.
+If user creates unsupported configuration(like more threads, more cores etc=
+), we still create the topology, but it will not be ideal topology.
+Reason for this is, I don't want to mess up the good configuration to suppo=
+rt invalid config. That way we don't have to change anything in topology co=
+de now.
+=20
+> >
+> > --
+> > Eduardo
