@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTYnf-0002Ll-8P
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:24:55 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fTYnt-0002UG-L6
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:25:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTYnc-0005oT-As
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:24:55 -0400
-Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:33415)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fTYnq-000690-F8
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:25:09 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:41595)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fTYnc-0005nq-51
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:24:52 -0400
-Received: by mail-pf0-x233.google.com with SMTP id b17-v6so3782637pfi.0
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 13:24:52 -0700 (PDT)
-References: <20180613125601.14371-1-alex.bennee@linaro.org>
-	<20180613125601.14371-17-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <dd909890-3c79-cb7e-6e25-c8b672361782@linaro.org>
-Date: Thu, 14 Jun 2018 10:24:47 -1000
-MIME-Version: 1.0
-In-Reply-To: <20180613125601.14371-17-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RISU PATCH v3 16/22] risu_reginfo_aarch64:
- unionify VFP regs
+	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+	id 1fTYnq-00067X-5N
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:25:06 -0400
+Received: by mail-lf0-x243.google.com with SMTP id d24-v6so11380513lfa.8
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 13:25:05 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Date: Thu, 14 Jun 2018 22:25:00 +0200
+Message-Id: <20180614202502.668-1-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PATCH v1 0/2] target-microblaze: Coverity fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,19 +24,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adacore.com, alistair@alistair23.me, frasse.iglesias@gmail.com, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
-On 06/13/2018 02:55 AM, Alex Bennée wrote:
-> This is preparation for the SVE work as we won't want to be carrying
-> around both VFP and SVE registers at the same time as they overlap.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  risu_reginfo_aarch64.c | 16 ++++++++--------
->  risu_reginfo_aarch64.h |  9 ++++++++-
->  2 files changed, 16 insertions(+), 9 deletions(-)
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This series has fixes for the Coverity issues that Peter Maydell
+reported.
 
-r~
+CID 1391441
+CID 1391443
+
+Best regards,
+Edgar
+
+
+Edgar E. Iglesias (2):
+  target-microblaze: mmu: Correct masking of output addresses
+  target-microblaze: Rework NOP/zero instruction handling
+
+ target/microblaze/mmu.c       |  1 -
+ target/microblaze/translate.c | 15 ++++-----------
+ 2 files changed, 4 insertions(+), 12 deletions(-)
+
+-- 
+2.14.1
