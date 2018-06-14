@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTRnj-0008M8-0T
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:56:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTRnw-0008WQ-HZ
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:56:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTRnf-0003C0-VY
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:56:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46942 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fTRnf-0003Bu-Ri
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:56:27 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1527186303-192100-1-git-send-email-mst@redhat.com>
-	<1527186303-192100-2-git-send-email-mst@redhat.com>
-Date: Thu, 14 Jun 2018 14:56:23 +0200
-In-Reply-To: <1527186303-192100-2-git-send-email-mst@redhat.com> (Michael
-	S. Tsirkin's message of "Thu, 24 May 2018 21:25:26 +0300")
-Message-ID: <87y3fhjzm0.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fTRnv-0003Hb-L3
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:56:44 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:45067)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fTRnv-0003Gh-FX
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:56:43 -0400
+Received: by mail-oi0-x244.google.com with SMTP id 188-v6so5510142oid.12
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 05:56:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 1/3] osdep: add wait.h compat macros
+In-Reply-To: <874li5leel.fsf@dusky.pond.sub.org>
+References: <20180524044454.11792-1-peterx@redhat.com>
+	<20180524044454.11792-3-peterx@redhat.com>
+	<87r2lbkt5u.fsf@dusky.pond.sub.org>
+	<dfb61dcd-c180-1307-bf9d-086aa15478ec@redhat.com>
+	<874li5leel.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Jun 2018 13:56:22 +0100
+Message-ID: <CAFEAcA9DGGopD_zhZyzCUmN_jcRB=y2jmN-JEupHt_jcHtyaYA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/2] intel-iommu: start to use
+ error_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,51 +34,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Auger Eric <eric.auger@redhat.com>, Peter Xu <peterx@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-"Michael S. Tsirkin" <mst@redhat.com> writes:
-
-> Man page for WCOREDUMP says:
+On 14 June 2018 at 13:51, Markus Armbruster <armbru@redhat.com> wrote:
+> Auger Eric <eric.auger@redhat.com> writes:
 >
->   WCOREDUMP(wstatus) returns true if the child produced a core dump.
->   This macro should be employed only if WIFSIGNALED returned true.
+>> Hi,
+>> On 06/13/2018 10:05 AM, Markus Armbruster wrote:
+>>> Peter Xu <peterx@redhat.com> writes:
+>>>
+>>>> Replace existing trace_vtd_err() with error_report_once() then stderr
+>>>> will capture something if any of the error happens, meanwhile we don't
+>>>> suffer from any DDOS.  Then remove the trace point.  Since at it,
+>>>> provide more information where proper (now we can pass parameters into
+>>>> the report function).
+>>>>
+>>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>>>> ---
+>>>>  hw/i386/intel_iommu.c | 59 ++++++++++++++++++++++++------------------=
+-
+>>>>  hw/i386/trace-events  |  1 -
+>>>>  2 files changed, 33 insertions(+), 27 deletions(-)
+>>>
+>>> Michael, would you give your Reviewed-by or Acked-by?  I'd take the
+>>> series through my tree then.
+>>>
+>>> [...]
+>>>
+>> Sorry to enter this thread at this late stage. Just one question: on the
+>> smmuv3 emulation code, Peter (Maydell) urged me to use
+>> qemu_log_mask(LOG_GUEST_ERROR, ...) whenever the error was triggered by
+>> a guest bad behavior. So what is the final guidance to avoid the DOS you
+>> mention?
 >
->   This  macro  is  not  specified  in POSIX.1-2001 and is not
->   available on some UNIX implementations (e.g., AIX, SunOS).  Therefore,
->   enclose its use inside #ifdef WCOREDUMP ... #endif.
+> Does the user need to know about the error condition?
 >
-> Let's do exactly this.
-
-Sorry to nitpick, but you're not doing "exactly this", you're providing
-a stub:
-
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  include/qemu/osdep.h | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+> If yes, we should tell him.  Logging is not telling.
 >
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 4165806..afc28e5 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -108,6 +108,16 @@ extern int daemon(int, int);
->  #include "qemu/typedefs.h"
->  
->  /*
-> + * According to waitpid man page:
-> + * WCOREDUMP
-> + *  This  macro  is  not  specified  in POSIX.1-2001 and is not
-> + *  available on some UNIX implementations (e.g., AIX, SunOS).
-> + *  Therefore, enclose its use inside #ifdef WCOREDUMP ... #endif.
-> + */
-> +#ifndef WCOREDUMP
-> +#define WCOREDUMP(status) 0
-> +#endif
-> +/*
->   * We have a lot of unaudited code that may fail in strange ways, or
->   * even be a security risk during migration, if you disable assertions
->   * at compile-time.  You may comment out these safety checks if you
+> Peter, what do you think?
 
-Suggest to drop the last sentence from the comment, and have the commit
-message state you're providing a stub.
+My view is that "guest does something stupid" should be
+LOG_GUEST_ERROR, because (a) maybe you'd like to know about it
+but (b) usually you don't unless you happen to be the person
+trying to develop or debug the guest OS, in which case you can
+turn on the logging to help you in that debugging task.
+
+thanks
+-- PMM
