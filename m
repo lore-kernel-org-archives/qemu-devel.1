@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTK4t-0008Pi-6Q
+	(envelope-from <dgibson@ozlabs.org>) id 1fTK4t-0008Pj-8u
 	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 00:41:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTK4s-00014f-7m
+	(envelope-from <dgibson@ozlabs.org>) id 1fTK4s-00014Q-6M
 	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 00:41:43 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 14 Jun 2018 14:41:22 +1000
-Message-Id: <20180614044129.13606-1-david@gibson.dropbear.id.au>
+Date: Thu, 14 Jun 2018 14:41:25 +1000
+Message-Id: <20180614044129.13606-4-david@gibson.dropbear.id.au>
+In-Reply-To: <20180614044129.13606-1-david@gibson.dropbear.id.au>
+References: <20180614044129.13606-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCHv3 0/7] Better handling of machine specific
- per-cpu information
+Subject: [Qemu-devel] [PATCHv3 3/7] pnv_core: Allocate cpu thread objects
+ individually
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,49 +26,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org
 Cc: clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-It's moderately common for a machine type to need to keep track of
-information that is specific to the platform it implements, but
-per-cpu.
+Currently, we allocate space for all the cpu objects within a single core
+in one big block.  This was copied from an older version of the spapr cod=
+e
+and requires some ugly pointer manipulation to extract the individual
+objects.
 
-While it could keep such information inside the MachineState, this
-makes lookup from the CPUState awkward.  So, this series adds a
-standard way to stash machine-specific per-cpu information using a
-void pointer in the PowerPCCPU object.  The machine is responsible for
-alloc()ing, free()ing and (if applicable) migrating this state.
+This design was due to a misunderstanding of qemu lifetime conventions an=
+d
+has already been changed in spapr (in 94ad93bd "spapr_cpu_core: instantia=
+te
+CPUs separately".
 
-The meat of the series is the last two patches.  The first 5 clean up
-a number of minor uglies I encountered while implementing.
+Make an equivalent change in pnv_core to get rid of the nasty pointer
+arithmetic.
 
-Chganges since v2:
-  * Fix compile (and other) errors in KVM code.
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/pnv.c              |  4 ++--
+ hw/ppc/pnv_core.c         | 11 +++++------
+ include/hw/ppc/pnv_core.h |  2 +-
+ 3 files changed, 8 insertions(+), 9 deletions(-)
 
-Changes since v1:
-  * Simplify the error handling cleanup in 2/7 to use &error_abort
-    instead of more propagations
-
-David Gibson (7):
-  spapr: Clean up cpu realize/unrealize paths
-  pnv: Fix some error handling cpu realize()
-  pnv_core: Allocate cpu thread objects individually
-  pnv: Clean up cpu realize path
-  pnv: Add cpu unrealize path
-  target/ppc: Replace intc pointer with a general machine_data pointer
-  target/ppc, spapr: Move VPA information to machine_data
-
- hw/intc/xics.c                  |   5 +-
- hw/intc/xics_spapr.c            |  16 +++--
- hw/ppc/pnv.c                    |   8 +--
- hw/ppc/pnv_core.c               | 100 ++++++++++++++++++--------------
- hw/ppc/spapr.c                  |   8 +--
- hw/ppc/spapr_cpu_core.c         |  85 +++++++++++++--------------
- hw/ppc/spapr_hcall.c            |  77 +++++++++++++-----------
- include/hw/ppc/pnv_core.h       |  11 +++-
- include/hw/ppc/spapr_cpu_core.h |  13 +++++
- include/hw/ppc/xics.h           |   4 +-
- target/ppc/cpu.h                |   8 +--
- target/ppc/kvm.c                |  36 ++++++------
- target/ppc/translate_init.inc.c |   8 ---
- 13 files changed, 203 insertions(+), 176 deletions(-)
-
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 0314881316..0b9508d94d 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -121,9 +121,9 @@ static int get_cpus_node(void *fdt)
+  */
+ static void pnv_dt_core(PnvChip *chip, PnvCore *pc, void *fdt)
+ {
+-    CPUState *cs =3D CPU(DEVICE(pc->threads));
++    PowerPCCPU *cpu =3D pc->threads[0];
++    CPUState *cs =3D CPU(cpu);
+     DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
+-    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+     int smt_threads =3D CPU_CORE(pc)->nr_threads;
+     CPUPPCState *env =3D &cpu->env;
+     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cs);
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index 01f47c8037..1e40f01e98 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -151,7 +151,6 @@ static void pnv_core_realize(DeviceState *dev, Error =
+**errp)
+     PnvCore *pc =3D PNV_CORE(OBJECT(dev));
+     CPUCore *cc =3D CPU_CORE(OBJECT(dev));
+     const char *typename =3D pnv_core_cpu_typename(pc);
+-    size_t size =3D object_type_get_instance_size(typename);
+     Error *local_err =3D NULL;
+     void *obj;
+     int i, j;
+@@ -165,11 +164,11 @@ static void pnv_core_realize(DeviceState *dev, Erro=
+r **errp)
+         return;
+     }
+=20
+-    pc->threads =3D g_malloc0(size * cc->nr_threads);
++    pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
+     for (i =3D 0; i < cc->nr_threads; i++) {
+-        obj =3D pc->threads + i * size;
++        obj =3D object_new(typename);
+=20
+-        object_initialize(obj, size, typename);
++        pc->threads[i] =3D POWERPC_CPU(obj);
+=20
+         snprintf(name, sizeof(name), "thread[%d]", i);
+         object_property_add_child(OBJECT(pc), name, obj, &error_abort);
+@@ -179,7 +178,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
+**errp)
+     }
+=20
+     for (j =3D 0; j < cc->nr_threads; j++) {
+-        obj =3D pc->threads + j * size;
++        obj =3D OBJECT(pc->threads[j]);
+=20
+         pnv_core_realize_child(obj, XICS_FABRIC(xi), &local_err);
+         if (local_err) {
+@@ -194,7 +193,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
+**errp)
+=20
+ err:
+     while (--i >=3D 0) {
+-        obj =3D pc->threads + i * size;
++        obj =3D OBJECT(pc->threads[i]);
+         object_unparent(obj);
+     }
+     g_free(pc->threads);
+diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
+index e337af7a3a..447ae761f7 100644
+--- a/include/hw/ppc/pnv_core.h
++++ b/include/hw/ppc/pnv_core.h
+@@ -34,7 +34,7 @@ typedef struct PnvCore {
+     CPUCore parent_obj;
+=20
+     /*< public >*/
+-    void *threads;
++    PowerPCCPU **threads;
+     uint32_t pir;
+=20
+     MemoryRegion xscom_regs;
 --=20
 2.17.1
