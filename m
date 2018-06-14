@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTbqI-0005x1-Rg
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 19:39:51 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fTbqI-0005x3-T2
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 19:39:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTbqH-00043o-MH
+	(envelope-from <dgibson@ozlabs.org>) id 1fTbqH-00043x-Nb
 	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 19:39:50 -0400
-Date: Thu, 14 Jun 2018 22:43:06 +1000
+Date: Thu, 14 Jun 2018 22:42:37 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180614124306.GD19339@umbus.fritz.box>
+Message-ID: <20180614124237.GC19339@umbus.fritz.box>
 References: <cover.1528935420.git.balaton@eik.bme.hu>
-	<79692361d82a4d0b1f9c36b0d988369062351f00.1528935420.git.balaton@eik.bme.hu>
-	<20180614013612.GF3042@umbus.fritz.box>
-	<alpine.BSF.2.21.1806141001260.19899@zero.eik.bme.hu>
+	<a9d502cce05cfa57895c415164efd288f4926fb6.1528935420.git.balaton@eik.bme.hu>
+	<20180614013532.GE3042@umbus.fritz.box>
+	<alpine.BSF.2.21.1806140955020.19899@zero.eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="u65IjBhB3TIa72Vp"
+	protocol="application/pgp-signature"; boundary="O3RTKUHj+75w1tg5"
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1806141001260.19899@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v3 9/9] target/ppc: Add missing opcode for
- icbt on PPC440
+In-Reply-To: <alpine.BSF.2.21.1806140955020.19899@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v3 8/9] sm501: Perform a full update after
+ palette change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +28,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Sebastian Bauer <mail@sebastianbauer.info>
 
 
---u65IjBhB3TIa72Vp
+--O3RTKUHj+75w1tg5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 14, 2018 at 10:03:41AM +0200, BALATON Zoltan wrote:
+On Thu, Jun 14, 2018 at 10:00:50AM +0200, BALATON Zoltan wrote:
 > On Thu, 14 Jun 2018, David Gibson wrote:
 > > On Thu, Jun 14, 2018 at 02:17:00AM +0200, BALATON Zoltan wrote:
+> > > From: Sebastian Bauer <mail@sebastianbauer.info>
+> > >=20
+> > > Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+> > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> >=20
+> > Commit message.  Why is this necessary?
 >=20
-> Maybe amend commit message like this:
+> Maybe because changing palette does not change display unless an update is
+> done and dirty tracking which is used in update_display does not detect
+> changes in device registers where palette is stored.
 >=20
-> According to PPC440 User Manual
+> I'm not sure this is needed in all modes but I guess palette is not used =
+in
+> modes that are not indexed so unecessary updates should not happen evem in
+> those cases because if palette is not used anyway, guest is unlikely to
+> change it unless doing something really strange but we haven't seen any
+> guests yet that would do that. Therefore this simple way of handling this
+> should be OK.
 
-On which page?  Where can I get that manual?
+Sure, so, put that into a commit message in the next spin.
 
-> > > PPC440 has two opcodes for icbt, add the missing one.
->=20
-> If you can do this when committing then please feel free to adjust this
-> commit message as necessary, otherwise I'll change it in next iteration.
 >=20
 > Regards,
 > BALATON Zoltan
 >=20
-> > A document reference to confim this would be nice.
-> >=20
-> > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > > > ---
-> > >  target/ppc/translate.c | 2 ++
-> > >  1 file changed, 2 insertions(+)
+> > >  hw/display/sm501.c | 8 ++++++++
+> > >  1 file changed, 8 insertions(+)
 > > >=20
-> > > diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> > > index 5fe1ba6..3a215a1 100644
-> > > --- a/target/ppc/translate.c
-> > > +++ b/target/ppc/translate.c
-> > > @@ -6707,6 +6707,8 @@ GEN_HANDLER_E(mbar, 0x1F, 0x16, 0x1a, 0x001FF80=
-1,
-> > >  GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x03FFF801, PPC_BOOKE),
-> > >  GEN_HANDLER2_E(icbt_440, "icbt", 0x1F, 0x16, 0x00, 0x03E00001,
-> > >                 PPC_BOOKE, PPC2_BOOKE206),
-> > > +GEN_HANDLER2(icbt_440, "icbt", 0x1F, 0x06, 0x08, 0x03E00001,
-> > > +               PPC_440_SPEC),
-> > >  GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
-> > >  GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
-> > >  GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
+> > > diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+> > > index 0625cf5..a2ee6e3 100644
+> > > --- a/hw/display/sm501.c
+> > > +++ b/hw/display/sm501.c
+> > > @@ -479,6 +479,7 @@ typedef struct SM501State {
+> > >      MemoryRegion twoD_engine_region;
+> > >      uint32_t last_width;
+> > >      uint32_t last_height;
+> > > +    uint32_t do_full_update; /* perform a full update next time */
+> > >      I2CBus *i2c_bus;
+> > >=20
+> > >      /* mmio registers */
+> > > @@ -1032,6 +1033,7 @@ static void sm501_palette_write(void *opaque, h=
+waddr addr,
+> > >=20
+> > >      assert(range_covers_byte(0, 0x400 * 3, addr));
+> > >      *(uint32_t *)&s->dc_palette[addr] =3D value;
+> > > +    s->do_full_update =3D 1;
+> > >  }
+> > >=20
+> > >  static uint64_t sm501_disp_ctrl_read(void *opaque, hwaddr addr,
+> > > @@ -1620,6 +1622,12 @@ static void sm501_update_display(void *opaque)
+> > >          full_update =3D 1;
+> > >      }
+> > >=20
+> > > +    /* someone else requested a full update */
+> > > +    if (s->do_full_update) {
+> > > +        s->do_full_update =3D 0;
+> > > +        full_update =3D 1;
+> > > +    }
+> > > +
+> > >      /* draw each line according to conditions */
+> > >      snap =3D memory_region_snapshot_and_clear_dirty(&s->local_mem_re=
+gion,
+> > >                offset, width * height * src_bpp, DIRTY_MEMORY_VGA);
 > >=20
 > >=20
 >=20
@@ -85,24 +113,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---u65IjBhB3TIa72Vp
+--O3RTKUHj+75w1tg5
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsiYtoACgkQbDjKyiDZ
-s5Jadg//acSQx5SUI778mOXKZmSk2+N90gCFvg37mEMSoU6IgtlUbSa4Qaz8WR4K
-5zbkGcWPRg9GTUgg3LFPsslrGGSOha8L7qqptFX9Uox+TM2AyQHvwoA2DN/b3CO+
-MFEFaJWuzUrOiMtrctag/92uFQ1oov416sK0BNcnLrnsqP/cjQJpqxM2/iv7ZUdV
-++siPklUHyDDLQszObQUcBWxOqH4fHJY3VNJai9PxJfxDfT522JIZ4phbSh3yD8h
-jsLhwia56cdFJsV1huLPxqwWeI3YRfvmrrZTIf4j+Q8orwcRPUXjEDC6Q7T/cv6g
-lI1hnf9w0P1wMfxmnmEqDVZ5zVpEIJ7FkpG+U7581PT4MD+RzTkzWG4zOLKIhMQo
-OKQV0T7KYGjnvHFGe5epkx5T9rFLlVxCgPsU+FWA3kGFZj4Hgw1aCrdKshBfVKKK
-apvW6MXqlHei76PgIi34LAiBvkd8DNksuXD7Gwz2ZpefBhxrZB14gdjM/ACtucAi
-YuvczyvMsD2NvvDw4TLdzoLyPBlHFCDmYku8QIT0V5TM+ZmF/KGzTMOP6WDaTw1i
-R9DrnequMHMuYTjIB+V8NDWzHd5GSaMaOp+rZGC5GD455GvrjIZKLCEEcUx4K2sm
-stqW3RUtQJKNcddqlxI6h+2M4v5WILyH/D0bO+K8+XrVlmSRQCg=
-=63qo
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsiYr0ACgkQbDjKyiDZ
+s5L+8RAA3wJoVHt1BBZjMO0/NOoAch867niVjQ6mIsdyXl4uyppDjLJ2O62xkUdg
+ke2EnjlSixgHzdEiqEfjAbmmglBs8F/WDNEXAbNUhmJ06G+PW0CCyVRK79g33ZZS
+/gMFnyKKRWdKGx1guwkEalJON3vXUS4mvFU8sNxj5BBioVNCL5aSg3mAvoFKf1Qh
+EyF7ZCL8taT7FNqn1Hucf+S1Hxxi9pRMbvjYuVbdF1g4PAyqqEvAXXlLT+jfVbgR
+KIftc69mUM34nuwUF7fJVV8FLhWOdiA5DaI19aFyyaR9Qsp+xhnH/shmLKcbr6dI
+WSHSHb3IpR9jcLZGszJxhlWYoLmvKrDTqgVHSg7E/j5Uasb2miMJO3B8MVHs1+I1
+HhcPZ0HyxJEMb3YiFsZ/ll1WXBmCDgo1HdGN0fwK3ubhjM35IJwnFWelMk3ANVt8
+ryp9jfOmUKOrXfkXjaBaAj+AgtMZIJYvmVeWcAh8q9QvxHuf+u7pIEO/4+O+Y30J
+QZTJFJ/BBpb91O7pV8RcqgbAJcFgH9/6417m8nH5/kwYlOQhLYmVFV2bKfsb0gr3
+V8goVDMtwI2WLm2CLs7kjW03unPo/R11snziSoLUTmo8wGdSZMCk6v1coZ/fxhLd
+hkK2skOVye6lMLlkh2nN64j837aOWjoqkF9VMJhNuj+wxU0FKWM=
+=lnHE
 -----END PGP SIGNATURE-----
 
---u65IjBhB3TIa72Vp--
+--O3RTKUHj+75w1tg5--
