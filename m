@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTSoS-0007tK-Ga
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:01:21 -0400
+	(envelope-from <clg@kaod.org>) id 1fTSob-00081o-H9
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:01:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTSoM-00009p-GJ
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:01:20 -0400
-Received: from 13.mo6.mail-out.ovh.net ([188.165.56.124]:37352)
+	(envelope-from <clg@kaod.org>) id 1fTSoV-0000Ft-IT
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:01:29 -0400
+Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:49363)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTSoM-00009D-9x
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:01:14 -0400
-Received: from player738.ha.ovh.net (unknown [10.109.108.77])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id BD535160540
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 16:01:12 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTSoV-0000F6-6q
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:01:23 -0400
+Received: from player738.ha.ovh.net (unknown [10.109.108.92])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 51A4BE475E
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 16:01:21 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 14 Jun 2018 16:00:41 +0200
-Message-Id: <20180614140043.9231-5-clg@kaod.org>
+Date: Thu, 14 Jun 2018 16:00:43 +0200
+Message-Id: <20180614140043.9231-7-clg@kaod.org>
 In-Reply-To: <20180614140043.9231-1-clg@kaod.org>
 References: <20180614140043.9231-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 4/6] ppc/pnv: introduce a
- pnv_chip_core_realize() routine
+Subject: [Qemu-devel] [PATCH 6/6] ppc/pnv: introduce Pnv8Chip and Pnv9Chip
+ models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,75 +33,613 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-This extracts from the PvChip realize routine the part creating the
-cores. On Power9, we will need to create the cores after the Xive
-interrupt controller is created.
+This is a major reshuffle of the PowerNV machine and chip models to
+introduce a machine type per processor. It is quite noisy but it
+doesn't change much the code flow.
+
+It introduces a base PnvChip class from which the specific processor
+chip classes, Pnv8Chip and Pnv9Chip, inherit. Each of them needs to
+define an init and a realize routine which will create the controllers
+of the target processor.
+
+For the moment, the base PnvChip class handles the XSCOM bus and the
+cores but the core creation will surely move to the specific processor
+chip classes because of the new XIVE interrupt controller in Power9.
+The base class also has pointers on the main controllers of the chip
+which are common to all processors : PSI, LPC, OCC. These controllers
+have some subtil differences in each processor version, but, globally,
+they are very similar and provide the same feature. This is how we
+have a console for instance.
+
+>From there, we introduce two different machines : "powernv8" and
+"powernv9" but, a part from the XICSFabric interface, this is not
+strictly needed as it is the cpu type which determines the PnvChip
+class. Something to discuss.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/pnv.c | 32 ++++++++++++++++++++++----------
- 1 file changed, 22 insertions(+), 10 deletions(-)
+ include/hw/ppc/pnv.h |  28 ++++-
+ hw/ppc/pnv.c         | 322 +++++++++++++++++++++++++++++++++------------=
+------
+ hw/ppc/pnv_lpc.c     |   2 +-
+ 3 files changed, 236 insertions(+), 116 deletions(-)
 
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index e934e84f555e..4942add9458a 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -57,12 +57,37 @@ typedef struct PnvChip {
+     MemoryRegion xscom_mmio;
+     MemoryRegion xscom;
+     AddressSpace xscom_as;
++
++    /* Base class controllers */
++    PnvLpcController *lpc;
++    PnvPsi       *psi;
++    PnvOCC       *occ;
++} PnvChip;
++
++#define TYPE_PNV8_CHIP "pnv8-chip"
++#define PNV8_CHIP(obj) OBJECT_CHECK(Pnv8Chip, (obj), TYPE_PNV8_CHIP)
++
++typedef struct Pnv8Chip {
++    /*< private >*/
++    PnvChip      parent_obj;
++
++    /*< public >*/
+     MemoryRegion icp_mmio;
+=20
+     PnvLpcController lpc;
+     PnvPsi       psi;
+     PnvOCC       occ;
+-} PnvChip;
++} Pnv8Chip;
++
++#define TYPE_PNV9_CHIP "pnv9-chip"
++#define PNV9_CHIP(obj) OBJECT_CHECK(Pnv9Chip, (obj), TYPE_PNV9_CHIP)
++
++typedef struct Pnv9Chip {
++    /*< private >*/
++    PnvChip      parent_obj;
++
++    /*< public >*/
++} Pnv9Chip;
+=20
+ typedef struct PnvChipClass {
+     /*< private >*/
+@@ -75,6 +100,7 @@ typedef struct PnvChipClass {
+=20
+     hwaddr       xscom_base;
+=20
++    void (*realize)(PnvChip *chip, Error **errp);
+     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
+     Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
+ } PnvChipClass;
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 72cfe4c2627c..b3b0dd44582f 100644
+index 7d99366daf90..60b56c7fe07b 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -822,9 +822,8 @@ static void pnv_chip_icp_realize(PnvChip *chip, Error=
- **errp)
+@@ -267,7 +267,7 @@ static void pnv_dt_icp(PnvChip *chip, void *fdt, uint=
+32_t pir,
+=20
+ static int pnv_chip_lpc_offset(PnvChip *chip, void *fdt)
+ {
+-    return fdt_path_offset(fdt, chip->lpc.isa_bus_name);
++    return fdt_path_offset(fdt, chip->lpc->isa_bus_name);
+ }
+=20
+ static void pnv_dt_chip(PnvChip *chip, void *fdt)
+@@ -516,7 +516,7 @@ static ISABus *pnv_isa_create(PnvChip *chip)
+ {
+     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+=20
+-    return pnv_lpc_isa_create(&chip->lpc, pcc->chip_type);
++    return pnv_lpc_isa_create(chip->lpc, pcc->chip_type);
+ }
+=20
+ static void pnv_init(MachineState *machine)
+@@ -695,6 +695,106 @@ static Object *pnv_chip_power9_intc_create(PnvChip =
+*chip, Object *child,
+  */
+ #define POWER9_CORE_MASK   (0xffffffffffffffull)
+=20
++static void pnv_chip_power8_initfn(Object *obj)
++{
++    Pnv8Chip *chip8 =3D PNV8_CHIP(obj);
++    PnvChip *chip =3D PNV_CHIP(obj);
++
++    object_initialize(&chip8->lpc, sizeof(chip8->lpc), TYPE_PNV_LPC);
++    object_property_add_child(obj, "lpc", OBJECT(&chip8->lpc), NULL);
++
++    object_initialize(&chip8->psi, sizeof(chip8->psi), TYPE_PNV_PSI);
++    object_property_add_child(obj, "psi", OBJECT(&chip8->psi), NULL);
++    object_property_add_const_link(OBJECT(&chip8->psi), "xics",
++                                   OBJECT(qdev_get_machine()), &error_ab=
+ort);
++
++    object_initialize(&chip8->occ, sizeof(chip8->occ), TYPE_PNV_OCC);
++    object_property_add_child(obj, "occ", OBJECT(&chip8->occ), NULL);
++    object_property_add_const_link(OBJECT(&chip8->occ), "psi",
++                                   OBJECT(&chip8->psi), &error_abort);
++
++    /*
++     * The LPC controller needs a few things from the chip : to know
++     * if it's primary and PSI to generate interrupts
++     */
++    object_property_add_const_link(OBJECT(&chip8->lpc), "chip",
++                                   OBJECT(chip8), &error_abort);
++
++    /* Intialize the controllers in the base class also */
++    chip->lpc =3D &chip8->lpc;
++    chip->psi =3D &chip8->psi;
++    chip->occ =3D &chip8->occ;
++}
++
++static void pnv_chip_icp_realize(Pnv8Chip *chip8, Error **errp)
++ {
++    PnvChip *chip =3D PNV_CHIP(chip8);
++    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
++    const char *typename =3D pnv_chip_core_typename(chip);
++    size_t typesize =3D object_type_get_instance_size(typename);
++    int i, j;
++    char *name;
++    XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
++
++    name =3D g_strdup_printf("icp-%x", chip->chip_id);
++    memory_region_init(&chip8->icp_mmio, OBJECT(chip), name, PNV_ICP_SIZ=
+E);
++    sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip8->icp_mmio);
++    g_free(name);
++
++    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 1, PNV_ICP_BASE(chip));
++
++    /* Map the ICP registers for each thread */
++    for (i =3D 0; i < chip->nr_cores; i++) {
++        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
++        int core_hwid =3D CPU_CORE(pnv_core)->core_id;
++
++        for (j =3D 0; j < CPU_CORE(pnv_core)->nr_threads; j++) {
++            uint32_t pir =3D pcc->core_pir(chip, core_hwid) + j;
++            PnvICPState *icp =3D PNV_ICP(xics_icp_get(xi, pir));
++
++            memory_region_add_subregion(&chip8->icp_mmio, pir << 12,
++                                        &icp->mmio);
++        }
++    }
++}
++
++static void pnv_chip_power8_realize(PnvChip *chip, Error **errp)
++ {
++    Pnv8Chip *chip8 =3D PNV8_CHIP(chip);
++    Error *error =3D NULL;
++
++    /* Create LPC controller */
++    object_property_set_bool(OBJECT(&chip8->lpc), true, "realized",
++                             &error_fatal);
++    pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip8->lpc.xscom_=
+regs);
++
++    /* Interrupt Management Area. This is the memory region holding
++     * all the Interrupt Control Presenter (ICP) registers */
++    pnv_chip_icp_realize(chip8, &error);
++    if (error) {
++        error_propagate(errp, error);
++        return;
++    }
++
++    /* Processor Service Interface (PSI) Host Bridge */
++    object_property_set_int(OBJECT(&chip8->psi), PNV_PSIHB_BASE(chip),
++                            "bar", &error_fatal);
++    object_property_set_bool(OBJECT(&chip8->psi), true, "realized", &err=
+or);
++    if (error) {
++        error_propagate(errp, error);
++        return;
++    }
++    pnv_xscom_add_subregion(chip, PNV_XSCOM_PSIHB_BASE, &chip8->psi.xsco=
+m_regs);
++
++    /* Create the simplified OCC model */
++    object_property_set_bool(OBJECT(&chip8->occ), true, "realized", &err=
+or);
++    if (error) {
++        error_propagate(errp, error);
++        return;
++    }
++    pnv_xscom_add_subregion(chip, PNV_XSCOM_OCC_BASE, &chip8->occ.xscom_=
+regs);
++}
++
+ static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+@@ -719,6 +819,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
+lass, void *data)
+     k->cores_mask =3D POWER8_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
+     k->intc_create =3D pnv_chip_power8_intc_create;
++    k->realize  =3D pnv_chip_power8_realize;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8";
+ }
+@@ -733,10 +834,20 @@ static void pnv_chip_power8nvl_class_init(ObjectCla=
+ss *klass, void *data)
+     k->cores_mask =3D POWER8_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
+     k->intc_create =3D pnv_chip_power8_intc_create;
++    k->realize  =3D pnv_chip_power8_realize;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8NVL";
+ }
+=20
++static void pnv_chip_power9_initfn(Object *obj)
++{
++}
++
++static void pnv_chip_power9_realize(PnvChip *chip, Error **errp)
++{
++
++}
++
+ static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+@@ -747,6 +858,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
+lass, void *data)
+     k->cores_mask =3D POWER9_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p9;
+     k->intc_create =3D pnv_chip_power9_intc_create;
++    k->realize  =3D pnv_chip_power9_realize;
+     k->xscom_base =3D 0x00603fc00000000ull;
+     dc->desc =3D "PowerNV Chip POWER9";
+ }
+@@ -781,62 +893,9 @@ static void pnv_chip_core_sanitize(PnvChip *chip, Er=
+ror **errp)
      }
  }
 =20
--static void pnv_chip_realize(DeviceState *dev, Error **errp)
-+static void pnv_chip_core_realize(PnvChip *chip, Error **errp)
+-static void pnv_chip_init(Object *obj)
++static void pnv_chip_initfn(Object *obj)
  {
--    PnvChip *chip =3D PNV_CHIP(dev);
+-    PnvChip *chip =3D PNV_CHIP(obj);
+-    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+-
+-    chip->xscom_base =3D pcc->xscom_base;
+-
+-    object_initialize(&chip->lpc, sizeof(chip->lpc), TYPE_PNV_LPC);
+-    object_property_add_child(obj, "lpc", OBJECT(&chip->lpc), NULL);
+-
+-    object_initialize(&chip->psi, sizeof(chip->psi), TYPE_PNV_PSI);
+-    object_property_add_child(obj, "psi", OBJECT(&chip->psi), NULL);
+-    object_property_add_const_link(OBJECT(&chip->psi), "xics",
+-                                   OBJECT(qdev_get_machine()), &error_ab=
+ort);
+-
+-    object_initialize(&chip->occ, sizeof(chip->occ), TYPE_PNV_OCC);
+-    object_property_add_child(obj, "occ", OBJECT(&chip->occ), NULL);
+-    object_property_add_const_link(OBJECT(&chip->occ), "psi",
+-                                   OBJECT(&chip->psi), &error_abort);
+-
+-    /*
+-     * The LPC controller needs a few things from the chip : to know
+-     * if it's primary and PSI to generate interrupts
+-     */
+-    object_property_add_const_link(OBJECT(&chip->lpc), "chip",
+-                                   OBJECT(chip), &error_abort);
+-}
+-
+-static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
+-{
+-    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+-    const char *typename =3D pnv_chip_core_typename(chip);
+-    size_t typesize =3D object_type_get_instance_size(typename);
+-    int i, j;
+-    char *name;
+-    XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
+-
+-    name =3D g_strdup_printf("icp-%x", chip->chip_id);
+-    memory_region_init(&chip->icp_mmio, OBJECT(chip), name, PNV_ICP_SIZE=
+);
+-    sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip->icp_mmio);
+-    g_free(name);
+-
+-    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 1, PNV_ICP_BASE(chip));
+-
+-    /* Map the ICP registers for each thread */
+-    for (i =3D 0; i < chip->nr_cores; i++) {
+-        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
+-        int core_hwid =3D CPU_CORE(pnv_core)->core_id;
+-
+-        for (j =3D 0; j < CPU_CORE(pnv_core)->nr_threads; j++) {
+-            uint32_t pir =3D pcc->core_pir(chip, core_hwid) + j;
+-            PnvICPState *icp =3D PNV_ICP(xics_icp_get(xi, pir));
+-
+-            memory_region_add_subregion(&chip->icp_mmio, pir << 12, &icp=
+->mmio);
+-        }
+-    }
++    PNV_CHIP(obj)->xscom_base =3D PNV_CHIP_GET_CLASS(obj)->xscom_base;
+ }
+=20
+ static void pnv_chip_core_realize(PnvChip *chip, Error **errp)
+@@ -904,6 +963,7 @@ static void pnv_chip_core_realize(PnvChip *chip, Erro=
+r **errp)
+ static void pnv_chip_realize(DeviceState *dev, Error **errp)
+ {
+     PnvChip *chip =3D PNV_CHIP(dev);
++    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
      Error *error =3D NULL;
-     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-     const char *typename =3D pnv_chip_core_typename(chip);
-@@ -836,14 +835,6 @@ static void pnv_chip_realize(DeviceState *dev, Error=
+=20
+     /* XSCOM bridge */
+@@ -921,36 +981,7 @@ static void pnv_chip_realize(DeviceState *dev, Error=
  **errp)
          return;
      }
 =20
--    /* XSCOM bridge */
--    pnv_xscom_realize(chip, &error);
+-    /* Create LPC controller */
+-    object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
+-                             &error_fatal);
+-    pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip->lpc.xscom_r=
+egs);
+-
+-    /* Interrupt Management Area. This is the memory region holding
+-     * all the Interrupt Control Presenter (ICP) registers */
+-    pnv_chip_icp_realize(chip, &error);
 -    if (error) {
 -        error_propagate(errp, error);
 -        return;
 -    }
--    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV_XSCOM_BASE(chip));
 -
-     /* Cores */
-     pnv_chip_core_sanitize(chip, &error);
-     if (error) {
-@@ -891,6 +882,27 @@ static void pnv_chip_realize(DeviceState *dev, Error=
- **errp)
-                                 &PNV_CORE(pnv_core)->xscom_regs);
-         i++;
+-    /* Processor Service Interface (PSI) Host Bridge */
+-    object_property_set_int(OBJECT(&chip->psi), PNV_PSIHB_BASE(chip),
+-                            "bar", &error_fatal);
+-    object_property_set_bool(OBJECT(&chip->psi), true, "realized", &erro=
+r);
+-    if (error) {
+-        error_propagate(errp, error);
+-        return;
+-    }
+-    pnv_xscom_add_subregion(chip, PNV_XSCOM_PSIHB_BASE, &chip->psi.xscom=
+_regs);
+-
+-    /* Create the simplified OCC model */
+-    object_property_set_bool(OBJECT(&chip->occ), true, "realized", &erro=
+r);
+-    if (error) {
+-        error_propagate(errp, error);
+-        return;
+-    }
+-    pnv_xscom_add_subregion(chip, PNV_XSCOM_OCC_BASE, &chip->occ.xscom_r=
+egs);
++    pcc->realize(chip, errp);
+ }
+=20
+ static Property pnv_chip_properties[] =3D {
+@@ -972,26 +1003,29 @@ static void pnv_chip_class_init(ObjectClass *klass=
+, void *data)
+     dc->desc =3D "PowerNV Chip";
+ }
+=20
+-static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
++static ICSState *pnv8_ics_get(XICSFabric *xi, int irq)
+ {
+     PnvMachineState *pnv =3D PNV_MACHINE(xi);
+     int i;
+=20
+     for (i =3D 0; i < pnv->num_chips; i++) {
+-        if (ics_valid_irq(&pnv->chips[i]->psi.ics, irq)) {
+-            return &pnv->chips[i]->psi.ics;
++        Pnv8Chip *chip =3D PNV8_CHIP(pnv->chips[i]);
++
++        if (ics_valid_irq(&chip->psi.ics, irq)) {
++            return &chip->psi.ics;
+         }
      }
+     return NULL;
+ }
+=20
+-static void pnv_ics_resend(XICSFabric *xi)
++static void pnv8_ics_resend(XICSFabric *xi)
+ {
+     PnvMachineState *pnv =3D PNV_MACHINE(xi);
+     int i;
+=20
+     for (i =3D 0; i < pnv->num_chips; i++) {
+-        ics_resend(&pnv->chips[i]->psi.ics);
++        Pnv8Chip *chip =3D PNV8_CHIP(pnv->chips[i]);
++        ics_resend(&chip->psi.ics);
+     }
+ }
+=20
+@@ -1011,15 +1045,14 @@ static PowerPCCPU *ppc_get_vcpu_by_pir(int pir)
+     return NULL;
+ }
+=20
+-static ICPState *pnv_icp_get(XICSFabric *xi, int pir)
++static ICPState *pnv8_icp_get(XICSFabric *xi, int pir)
+ {
+     PowerPCCPU *cpu =3D ppc_get_vcpu_by_pir(pir);
+=20
+     return cpu ? ICP(cpu->intc) : NULL;
+ }
+=20
+-static void pnv_pic_print_info(InterruptStatsProvider *obj,
+-                               Monitor *mon)
++static void pnv8_pic_print_info(InterruptStatsProvider *obj, Monitor *mo=
+n)
+ {
+     PnvMachineState *pnv =3D PNV_MACHINE(obj);
+     int i;
+@@ -1032,7 +1065,8 @@ static void pnv_pic_print_info(InterruptStatsProvid=
+er *obj,
+     }
+=20
+     for (i =3D 0; i < pnv->num_chips; i++) {
+-        ics_pic_print_info(&pnv->chips[i]->psi.ics, mon);
++        Pnv8Chip *chip =3D PNV8_CHIP(pnv->chips[i]);
++        ics_pic_print_info(&chip->psi.ics, mon);
+     }
+ }
+=20
+@@ -1086,8 +1120,6 @@ static void pnv_machine_class_props_init(ObjectClas=
+s *oc)
+ static void pnv_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc =3D MACHINE_CLASS(oc);
+-    XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
+-    InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CLASS=
+(oc);
+=20
+     mc->desc =3D "IBM PowerNV (Non-Virtualized)";
+     mc->init =3D pnv_init;
+@@ -1099,48 +1131,110 @@ static void pnv_machine_class_init(ObjectClass *=
+oc, void *data)
+     mc->no_parallel =3D 1;
+     mc->default_boot_order =3D NULL;
+     mc->default_ram_size =3D 1 * G_BYTE;
+-    xic->icp_get =3D pnv_icp_get;
+-    xic->ics_get =3D pnv_ics_get;
+-    xic->ics_resend =3D pnv_ics_resend;
+-    ispc->print_info =3D pnv_pic_print_info;
+=20
+     pnv_machine_class_props_init(oc);
+ }
+=20
+-#define DEFINE_PNV_CHIP_TYPE(type, class_initfn) \
+-    {                                            \
+-        .name          =3D type,                   \
+-        .class_init    =3D class_initfn,           \
+-        .parent        =3D TYPE_PNV_CHIP,          \
++static void pnv8_machine_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc =3D MACHINE_CLASS(oc);
++    XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
++    InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CLASS=
+(oc);
++
++    /* Power8 is the default */
++    mc->alias =3D "powernv";
++    mc->is_default =3D 1;
++
++    xic->icp_get =3D pnv8_icp_get;
++    xic->ics_get =3D pnv8_ics_get;
++    xic->ics_resend =3D pnv8_ics_resend;
++    ispc->print_info =3D pnv8_pic_print_info;
 +}
 +
-+static void pnv_chip_realize(DeviceState *dev, Error **errp)
++static void pnv9_machine_class_init(ObjectClass *oc, void *data)
 +{
-+    PnvChip *chip =3D PNV_CHIP(dev);
-+    Error *error =3D NULL;
++}
 +
-+    /* XSCOM bridge */
-+    pnv_xscom_realize(chip, &error);
-+    if (error) {
-+        error_propagate(errp, error);
-+        return;
++#define DEFINE_PNV8_CHIP_TYPE(type, class_initfn) \
++    {                                             \
++        .name          =3D type,                    \
++        .class_init    =3D class_initfn,            \
++        .parent        =3D TYPE_PNV8_CHIP,          \
 +    }
-+    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV_XSCOM_BASE(chip));
 +
-+    /* Cores */
-+    pnv_chip_core_realize(chip, &error);
-+    if (error) {
-+        error_propagate(errp, error);
-+        return;
-+    }
++#define DEFINE_PNV9_CHIP_TYPE(type, class_initfn) \
++    {                                             \
++        .name          =3D type,                    \
++        .class_init    =3D class_initfn,            \
++        .parent        =3D TYPE_PNV9_CHIP,          \
+     }
 =20
-     /* Create LPC controller */
-     object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
+ static const TypeInfo types[] =3D {
++    /*
++     * PowerNV machines and variants
++     */
+     {
+         .name          =3D TYPE_PNV_MACHINE,
+         .parent        =3D TYPE_MACHINE,
++        .abstract      =3D true,
+         .instance_size =3D sizeof(PnvMachineState),
+         .instance_init =3D pnv_machine_initfn,
+         .class_init    =3D pnv_machine_class_init,
+         .interfaces =3D (InterfaceInfo[]) {
+-            { TYPE_XICS_FABRIC },
+             { TYPE_INTERRUPT_STATS_PROVIDER },
+             { },
+         },
+     },
+     {
++        .name          =3D MACHINE_TYPE_NAME("powernv9"),
++        .parent        =3D TYPE_PNV_MACHINE,
++        .class_init    =3D pnv9_machine_class_init,
++    },
++    {
++        .name          =3D MACHINE_TYPE_NAME("powernv8"),
++        .parent        =3D TYPE_PNV_MACHINE,
++        .class_init    =3D pnv8_machine_class_init,
++        .interfaces    =3D (InterfaceInfo[]) {
++            { TYPE_XICS_FABRIC },
++            { },
++        },
++    },
++
++    /* Power Chip */
++    {
+         .name          =3D TYPE_PNV_CHIP,
+         .parent        =3D TYPE_SYS_BUS_DEVICE,
+         .class_init    =3D pnv_chip_class_init,
+-        .instance_init =3D pnv_chip_init,
++        .instance_init =3D pnv_chip_initfn,
+         .instance_size =3D sizeof(PnvChip),
+         .class_size    =3D sizeof(PnvChipClass),
+         .abstract      =3D true,
+     },
+-    DEFINE_PNV_CHIP_TYPE(TYPE_PNV_CHIP_POWER9, pnv_chip_power9_class_ini=
+t),
+-    DEFINE_PNV_CHIP_TYPE(TYPE_PNV_CHIP_POWER8, pnv_chip_power8_class_ini=
+t),
+-    DEFINE_PNV_CHIP_TYPE(TYPE_PNV_CHIP_POWER8E, pnv_chip_power8e_class_i=
+nit),
+-    DEFINE_PNV_CHIP_TYPE(TYPE_PNV_CHIP_POWER8NVL,
+-                         pnv_chip_power8nvl_class_init),
++
++    /*
++     * P9 chips and variants
++     */
++    {
++        .name          =3D TYPE_PNV9_CHIP,
++        .parent        =3D TYPE_PNV_CHIP,
++        .instance_init =3D pnv_chip_power9_initfn,
++        .instance_size =3D sizeof(Pnv9Chip),
++    },
++    DEFINE_PNV9_CHIP_TYPE(TYPE_PNV_CHIP_POWER9, pnv_chip_power9_class_in=
+it),
++
++    /*
++     * P8 chips and variants
++     */
++    {
++        .name          =3D TYPE_PNV8_CHIP,
++        .parent        =3D TYPE_PNV_CHIP,
++        .instance_init =3D pnv_chip_power8_initfn,
++        .instance_size =3D sizeof(Pnv8Chip),
++    },
++    DEFINE_PNV8_CHIP_TYPE(TYPE_PNV_CHIP_POWER8, pnv_chip_power8_class_in=
+it),
++    DEFINE_PNV8_CHIP_TYPE(TYPE_PNV_CHIP_POWER8E, pnv_chip_power8e_class_=
+init),
++    DEFINE_PNV8_CHIP_TYPE(TYPE_PNV_CHIP_POWER8NVL,
++                          pnv_chip_power8nvl_class_init),
+ };
+=20
+ DEFINE_TYPES(types)
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index 7f13c4bcf52c..265d94c3240d 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -435,7 +435,7 @@ static void pnv_lpc_realize(DeviceState *dev, Error *=
+*errp)
+         return;
+     }
+     chip =3D PNV_CHIP(obj);
+-    lpc->psi =3D &chip->psi;
++    lpc->psi =3D chip->psi;
+     lpc->primary =3D chip->chip_id =3D=3D 0;
+=20
+     /* Reg inits */
 --=20
 2.13.6
