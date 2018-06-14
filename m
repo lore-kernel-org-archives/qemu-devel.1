@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTZZv-0007VR-Sl
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 17:14:48 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fTZgX-0001H1-5G
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 17:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTZZs-0004tF-Oy
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 17:14:47 -0400
-Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:44989)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fTZZs-0004so-IE
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 17:14:44 -0400
-Received: by mail-pf0-x22a.google.com with SMTP id h12-v6so3823982pfk.11
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 14:14:44 -0700 (PDT)
-References: <20180614180119.1704-1-f4bug@amsat.org>
-	<20180614180119.1704-2-f4bug@amsat.org>
-	<bafda81a-a33b-6137-b30a-1cf98ab8393b@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <eeeb48f8-b89e-5675-047b-fa838ae8dac5@linaro.org>
-Date: Thu, 14 Jun 2018 11:14:38 -1000
+	(envelope-from <pbonzini@redhat.com>) id 1fTZgU-00006z-1U
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 17:21:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44436 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fTZgT-0008Vj-SN
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 17:21:33 -0400
+References: <20180612184616.90838-1-mst@redhat.com>
+	<20180614081800.GH6355@redhat.com>
+	<2219a7fd-b496-6653-b79a-c20136727f98@redhat.com>
+	<20180614165313.GT7451@localhost.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f708d976-e79e-a004-d8ca-2d28912c30c0@redhat.com>
+Date: Thu, 14 Jun 2018 23:21:29 +0200
 MIME-Version: 1.0
-In-Reply-To: <bafda81a-a33b-6137-b30a-1cf98ab8393b@redhat.com>
+In-Reply-To: <20180614165313.GT7451@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] hw/isa/smc37c669-superio: Basic
- 'Config Registers' implementation
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] kvm: x86 CPU power management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,16 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Emilio G . Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Cc: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 06/14/2018 08:19 AM, Paolo Bonzini wrote:
-> But why isn't the parallel port at 0x378?  That's the expected place on
-> PC (the second parallel port is at 0x278 and the third is at 0x3bc), and
-> I would expect other SuperIO chips to have it there too.  That would be
-> a one line fix.
+On 14/06/2018 18:53, Eduardo Habkost wrote:
+>>
+>> A separate issue is whether the same flag should control both
+>> KVM_CAP_X86_DISABLE_EXITS and the monitor/mwait CPUID leaf.  Eduardo,
+>> what do you think?
+> Making "-cpu host" be affected by a host-side option is
+> acceptable to me.  A "-cpu" option would be more appropriate if
+> we decide to allow monitor/mwait be enabled for other CPU models
+> too.
 
-Agreed.
+Sounds fair enough, we should probably add a note in the documentation
+of "-cpu host" though.
 
-
-r~
+Paolo
