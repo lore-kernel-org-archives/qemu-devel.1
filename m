@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fTaSM-0006cT-3X
+	(envelope-from <bounces@canonical.com>) id 1fTaSM-0006cU-42
 	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 18:11:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fTaSJ-0005Up-2l
+	(envelope-from <bounces@canonical.com>) id 1fTaSK-0005W4-VD
 	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 18:11:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:37306)
+Received: from indium.canonical.com ([91.189.90.7]:37408)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fTaSI-0005U2-Rq
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 18:10:58 -0400
+	id 1fTaSK-0005Va-O1
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 18:11:00 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fTaSH-0004aV-IA
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 22:10:57 +0000
+	id 1fTaSJ-0004dQ-Sg
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 22:10:59 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 814162E80CB
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 22:10:57 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id BCD112E802D
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 22:10:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 14 Jun 2018 21:54:14 -0000
+Date: Thu, 14 Jun 2018 22:02:47 -0000
 From: Waldemar Kozaczuk <1776920@bugs.launchpad.net>
 Reply-To: Bug 1776920 <1776920@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152898515528.25954.5483198787570860596.malonedeb@soybean.canonical.com>
-Message-Id: <152901325464.2222.6347781291154676682.malone@chaenomeles.canonical.com>
+Message-Id: <152901376781.6853.16371617301483551851.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1776920] Re: qemu-img convert on Mac OSX creates
  corrupt images
@@ -39,11 +39,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Source file 2
+Also if I use the same image.qemu file and convert to vmdk format I get
+even smaller file which for sure is wrong as well:
 
-** Attachment added: "boot.bin"
-   https://bugs.launchpad.net/qemu/+bug/1776920/+attachment/5152721/+files/=
-boot.bin
+qemu-img convert image.qemu -O vmdk image2.vbox
+
+ll image*
+-rw-r--r--  1 *** ***  6684672 Jun 14 17:17 image.img
+-rw-r--r--  1 *** ***  7012352 Jun 14 17:40 image.qemu
+-rw-r--r--  1 *** ***   196616 Jun 14 17:40 image2.qemu
+-rw-r--r--  1 *** ***    65536 Jun 14 18:00 image2.vbox
+
+** Attachment added: "image2.vbox"
+   https://bugs.launchpad.net/qemu/+bug/1776920/+attachment/5152725/+files/=
+image2.vbox
 
 -- =
 
