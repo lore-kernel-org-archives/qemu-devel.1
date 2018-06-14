@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55270)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fTSqR-00015I-Hr
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:03:29 -0400
+	(envelope-from <yuzibode@126.com>) id 1fTSrO-0001ua-Rs
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:04:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fTSqM-0000pa-ML
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:03:23 -0400
-Date: Thu, 14 Jun 2018 16:03:04 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180614140304.bmcznq65cccpzigk@kamzik.brq.redhat.com>
-References: <1528879723-24675-1-git-send-email-eric.auger@redhat.com>
-	<1528879723-24675-5-git-send-email-eric.auger@redhat.com>
-	<20180614133904.bic4wwjeed4ybu2u@kamzik.brq.redhat.com>
-	<29a2642b-87e4-b4c3-b7b9-632a3c0adc87@redhat.com>
+	(envelope-from <yuzibode@126.com>) id 1fTSrK-000190-Ic
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:04:22 -0400
+Received: from m50-111.126.com ([123.125.50.111]:55756)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <yuzibode@126.com>) id 1fTSrK-00018E-0Z
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:04:18 -0400
+Date: Thu, 14 Jun 2018 22:04:09 +0800
+From: Bo YU <yuzibode@126.com>
+Message-ID: <20180614140409.tn22ucju5dcizvwc@debian.debian>
+References: <20180614034744.dcato6eemcrr3drq@debian.debian>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <29a2642b-87e4-b4c3-b7b9-632a3c0adc87@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 4/9] hw/intc/arm_gicv3_kvm: Get prepared to
- handle multiple redist regions
+In-Reply-To: <20180614034744.dcato6eemcrr3drq@debian.debian>
+Subject: Re: [Qemu-devel] Error: virtio_net: Too few free TX rings available.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,121 +26,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: wei@redhat.com, peter.maydell@linaro.org, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, qemu-devel@nongnu.org, christoffer.dall@arm.com, qemu-arm@nongnu.org, zhaoshenglong@huawei.com, lersek@redhat.com, eric.auger.pro@gmail.com
+To: qemu-devel@nongnu.org
 
-On Thu, Jun 14, 2018 at 03:48:52PM +0200, Auger Eric wrote:
-> Hi Drew,
-> 
-> On 06/14/2018 03:39 PM, Andrew Jones wrote:
-> > On Wed, Jun 13, 2018 at 10:48:38AM +0200, Eric Auger wrote:
-> >> Let's check if KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION is supported.
-> >> If not, we check the number of redist region is equal to 1 and use the
-> >> legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute. Otherwise we use
-> >> the new attribute and allow to register multiple regions to the
-> >> KVM device.
-> >>
-> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> >> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> >>
-> >> ---
-> >>
-> >> v2 -> v3:
-> >> - In kvm_arm_gicv3_realize rename val into add_ormask local variable and
-> >>   add a comment
-> >> - start the redist region registration  from s->nb_redist_regions - 1
-> >>   downwards
-> >> ---
-> >>  hw/intc/arm_gicv3_kvm.c | 33 ++++++++++++++++++++++++++++++---
-> >>  1 file changed, 30 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-> >> index ed7b719..52e6e70 100644
-> >> --- a/hw/intc/arm_gicv3_kvm.c
-> >> +++ b/hw/intc/arm_gicv3_kvm.c
-> >> @@ -753,6 +753,7 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
-> >>  {
-> >>      GICv3State *s = KVM_ARM_GICV3(dev);
-> >>      KVMARMGICv3Class *kgc = KVM_ARM_GICV3_GET_CLASS(s);
-> >> +    bool multiple_redist_region_allowed;
-> >>      Error *local_err = NULL;
-> >>      int i;
-> >>  
-> >> @@ -789,6 +790,18 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
-> >>          return;
-> >>      }
-> >>  
-> >> +    multiple_redist_region_allowed =
-> >> +        kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> >> +                              KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION);
-> >> +
-> >> +    if (!multiple_redist_region_allowed && s->nb_redist_regions > 1) {
-> >> +        error_setg(errp, "Multiple VGICv3 redistributor regions are not "
-> >> +                   "supported by this host kernel");
-> >> +        error_append_hint(errp, "A maximum of %d VCPUs can be used",
-> >> +                          s->redist_region_count[0]);
-> >> +        return;
-> >> +    }
-> >> +
-> >>      kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
-> >>                        0, &s->num_irq, true, &error_abort);
-> >>  
-> >> @@ -798,9 +811,23 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
-> >>  
-> >>      kvm_arm_register_device(&s->iomem_dist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> >>                              KVM_VGIC_V3_ADDR_TYPE_DIST, s->dev_fd, 0);
-> >> -    kvm_arm_register_device(&s->iomem_redist[0], -1,
-> >> -                            KVM_DEV_ARM_VGIC_GRP_ADDR,
-> >> -                            KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
-> >> +
-> >> +    if (!multiple_redist_region_allowed) {
-> >> +        kvm_arm_register_device(&s->iomem_redist[0], -1,
-> >> +                                KVM_DEV_ARM_VGIC_GRP_ADDR,
-> >> +                                KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
-> >> +    } else {
-> >> +        for (i = s->nb_redist_regions - 1; i >= 0; i--) {
-> > 
-> > So we register in reverse-index order? Looking at your update to Linux doc
-> > Documentation/virtual/kvm/devices/arm-vgic-v3.txt, shouldn't they be
-> > registered in index-order? The doc says "Redistributor regions must be
-> > registered in the incremental index order, starting from index 0."
-> kvm_arm_register_device adds the device in a QSLIST using
-> QSLIST_INSERT_HEAD. Then the list is read by kvm_arm_machine_init_done
-> from the HEAD. So we need to register in reversed order.
+Hello,
+On Thu, Jun 14, 2018 at 11:47:44AM +0800, Bo YU wrote:
+>Hello,
+>A am newbie to qemu.
+>I am using qemu now:
+>qemu-io --version
+>qemu-io version 2.12.50 (v2.12.0-1296-g2ab09bf2f9-dirty)
+>Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+>
+>I have to talk about using qemu with libvirt recently libvirt deadlocked
+>when libvirt fetching qemu capabilities.Under Michal Privoznik help, i
+>restart my VM.
+>
+>The reason which cause recompile  qume from version 2.8 is:
+>i want to modify some features:
+>
+>Fowllowing the instrustions:
+>
+>http://cilium.readthedocs.io/en/latest/bpf/#bpftool
+>
+>$ clang -O2 -Wall -target bpf -c xdp-example.c -o xdp-example.o
+>
+>I get the error:
+>
+># sudo /sbin/ip link set dev ens3 xdp obj xdp_2.o
+>Error: virtio_net: Too few free TX rings available.
+># sudo dmesg
+>virtio_net virtio0 ens3: request 4 queues but max is 1
+>
+>
+>And i type: sudo ethtool -g ens3
+>Ring parameters for ens3:
+>Pre-set maximums:
+>RX: 256
+>RX Mini:0
+>RX Jumbo:0
+>TX:256
+>Current hardware settings:
+>RX:256
+>RX Mini:0
+>RX Jumbo:0
+>TX:256
+>
+>sudo ethtool -G ens3 rx 512
+>Cannot set device ring parameters: Operation not supported
+>
+>
+>I have trace the mail-list:
+>https://bugzilla.redhat.com/show_bug.cgi?id=1301548
+>and there:
+>https://groups.google.com/forum/#!topic/snabb-devel/ng78LbcaFgII
+>I remeber there is a patch for qemu for modfing paramertes in
+>hw/virtio-net.c,sorry, i can't find the patch.
+>
+>If i modify the rx_queue_max by hand to 1024, Is it ok?
+qemu-io  --version
+qemu-io version 2.12.50 (v2.12.0-1296-g2ab09bf2f9-dirty)
+Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 
-Oh, that's sort of horrible, as I can't even see where that's documented
-anywhere. Can we at least document it here in a comment? Actually, we
-should probably reverse the list first in kvm_arm_machine_init_done()
-and document that devices should be registered in the order KVM needs
-them to be - just in the name of sanity. But, I'm not sure what we'd
-break if we reversed the order now though...
+Under the above version of qemu,i modifyi and recompile qemu:
++#define VIRTIO_NET_RX_QUEUE_DEFAULT_SIZE 1024
+in hw/net/virtio-net.c
+Now, i have got the result:
 
-Thanks,
-drew
+sudo ethtool -g ens3
+[sudo] password for yubo-2:
+Ring parameters for ens3:
+Pre-set maximums:
+RX:   1024
+RX Mini:0
+RX Jumbo:0
+TX:   1024
+Current hardware settings:
+RX:    1024
+RX Mini:0
+RX Jumbo:0
+TX:    1024
 
-> 
-> Thanks
-> 
-> Eric
-> > 
-> > Thanks,
-> > drew
-> > 
-> >> +            /* Address mask made of the rdist region index and count */
-> >> +            uint64_t addr_ormask =
-> >> +                        i | ((uint64_t)s->redist_region_count[i] << 52);
-> >> +
-> >> +            kvm_arm_register_device(&s->iomem_redist[i], -1,
-> >> +                                    KVM_DEV_ARM_VGIC_GRP_ADDR,
-> >> +                                    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION,
-> >> +                                    s->dev_fd, addr_ormask);
-> >> +        }
-> >> +    }
-> >>  
-> >>      if (kvm_has_gsi_routing()) {
-> >>          /* set up irq routing */
-> >> -- 
-> >> 2.5.5
-> >>
-> >>
-> 
+If you want to test xdp expertiment,maybe you have to do it follow below.
+
+https://marc.info/?l=xdp-newbies&m=14948693111365&w=2
+
+Here is the right incantation to add to the "interface" section(with 4 vcpus)
+<driver name='vhost' queue='8'>
+	<host tso4='off' tso6='off' ecn='off' ufo='off'/>
+	<guest tso4='off' tso6='off' ecn='off' ufo='off'/>
+</driiver>
+
+Bo
+>
+>Thank you in advance!
+>
+>
