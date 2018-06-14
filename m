@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44091)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fTaeq-0004Ql-8K
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 18:23:57 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fTajV-0005gf-Fv
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 18:28:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fTaep-0008Sy-1v
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 18:23:56 -0400
-References: <1528461148-17925-1-git-send-email-ari@tuxera.com>
-From: Ari Sundholm <ari@tuxera.com>
-Message-ID: <2c6256af-ae8d-8bff-b5f9-1d737ddeee26@tuxera.com>
-Date: Fri, 15 Jun 2018 01:23:43 +0300
-MIME-Version: 1.0
-In-Reply-To: <1528461148-17925-1-git-send-email-ari@tuxera.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 00/10] New block driver: blklogwrites
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fTajT-0003wH-FA
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 18:28:45 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:35563
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1fTajT-0003vd-30
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 18:28:43 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Thu, 14 Jun 2018 23:28:30 +0100
+Message-Id: <20180614222830.19725-2-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180614222830.19725-1-mark.cave-ayland@ilande.co.uk>
+References: <20180614222830.19725-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [RFC PATCH v3 1/1] SPARC64: add icount support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,110 +25,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org, atar4qemu@gmail.com, richard.henderson@linaro.org, cota@braap.org
 
-ping. Any comments or suggestions would be welcome whenever you have the 
-time. :)
+This patch adds gen_io_start()/gen_io_end() to various instructions as required
+in order to boot my OpenBIOS test images on qemu-system-sparc64 with icount
+enabled.
 
-Thank you,
-Ari Sundholm
-ari@tuxera.com
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ target/sparc/translate.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 99 insertions(+)
 
-
-On 06/08/2018 03:32 PM, Ari Sundholm wrote:
-> This patch series adds a new block driver, blklogwrites, to QEMU. The
-> driver is given two block devices: a raw device backed by an image or a
-> host block device, and a log device, typically backed by a file, on
-> which writes to the raw device are logged.
-> 
-> The logging format used is the same as in the dm-log-writes target of
-> the Linux kernel device mapper. The log reflects the writes that have
-> been performed on the guest block device and flushed. To be strict, the
-> log may contain writes that have not been flushed yet, but they are
-> technically outside the bounds of the log until the next flush updates
-> the metadata in the log superblock. We believe these semantics to be
-> useful even though they may not be completely identical to those of
-> dm-log-writes.
-> 
-> This functionality can be used for crash consistency and fs consistency
-> testing in filesystem drivers, including on non-Linux guests and older
-> guests running Linux versions without support for dm-log-writes. This
-> is simple and useful. Admittedly this and more advanced things could
-> perhaps be done by extending the quorum driver, but this approach would
-> require re-engineering the functionality and involve a more complicated
-> setup, so we offer this simple solution which we have found useful
-> internally.
-> 
-> In the first patch of this series, two block permission constants are
-> moved from block.c to include/block/block.h to make them available
-> outside of block.c. The next patch uses these constants.
-> 
-> The driver requires all requests to be aligned to the sector size. In
-> the second patch of this series, which includes the bulk of the
-> blklogwrites driver, this sector size is assumed to be equal to
-> BDRV_SECTOR_SIZE for simplicity.
-> 
-> In patches 3-8, a mechanism to pass the block configuration of a block
-> backend to a block driver is introduced, and this mechanism is
-> integrated in various hw/block drivers.
-> 
-> In patch 9, blklogwrites is changed to use the block configuration of
-> the relevant block backend to set its block limits.
-> 
-> Finally, in patch 10, blklogwrites is improved to use the logical
-> sector size of the block backend for logging. This means that the
-> sector size in the log metadata will be set to the logical sector size,
-> and offsets and sizes of writes will be expressed as a multiple of that
-> instead of BDRV_SECTOR_SIZE.
-> 
-> v4:
->    - Check return value of snprintf() (flagged by patchew)
->    - Don't use C99 for loop initial declaration (flagged by patchew, but
->      wasn't QEMU supposed to be C99? Oh well.)
->    - Add proper "Since" fields for blklogwrites in block-core.json
->    - Rebase on current upstream master
-> 
-> v3:
->    - Rebase on current upstream master
-> 
-> v2:
->    - Incorporate review feedback
->    - Add patches to apply block configurations in more block device
->      drivers
-> 
-> Aapo Vienamo (1):
->    block: Add blklogwrites
-> 
-> Ari Sundholm (9):
->    block: Move two block permission constants to the relevant enum
->    block: Add a mechanism for passing a block driver a block
->      configuration
->    hw/scsi/scsi-disk: Always apply block configuration to block driver
->    hw/ide/qdev: Always apply block configuration to block driver
->    hw/block/virtio-blk: Always apply block configuration to block driver
->    hw/block/nvme: Always apply block configuration to block driver
->    hw/block/fdc: Always apply block configuration to block driver
->    block/blklogwrites: Use block limits from the backend block
->      configuration
->    block/blklogwrites: Use the block device logical sector size when
->      logging writes
-> 
->   MAINTAINERS               |   6 +
->   block.c                   |   6 -
->   block/Makefile.objs       |   1 +
->   block/blklogwrites.c      | 426 ++++++++++++++++++++++++++++++++++++++++++++++
->   block/io.c                |  22 +++
->   hw/block/block.c          |  12 +-
->   hw/block/fdc.c            |   4 +
->   hw/block/nvme.c           |   1 +
->   hw/block/virtio-blk.c     |   1 +
->   hw/ide/qdev.c             |   2 +
->   hw/scsi/scsi-disk.c       |   1 +
->   include/block/block.h     |  17 ++
->   include/block/block_int.h |   9 +
->   include/hw/block/block.h  |   1 +
->   qapi/block-core.json      |  30 +++-
->   15 files changed, 526 insertions(+), 13 deletions(-)
->   create mode 100644 block/blklogwrites.c
-> 
+diff --git a/target/sparc/translate.c b/target/sparc/translate.c
+index f3d430c1b2..cefce91a96 100644
+--- a/target/sparc/translate.c
++++ b/target/sparc/translate.c
+@@ -41,6 +41,8 @@
+ #define JUMP_PC     2 /* dynamic pc value which takes only two values
+                          according to jump_pc[T2] */
+ 
++#define DISAS_EXIT  DISAS_TARGET_0
++
+ /* global register indexes */
+ static TCGv_ptr cpu_regwptr;
+ static TCGv cpu_cc_src, cpu_cc_src2, cpu_cc_dst;
+@@ -3400,11 +3402,17 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                         r_const = tcg_const_i32(dc->mem_idx);
+                         tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                        offsetof(CPUSPARCState, tick));
++                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                            gen_io_start();
++                        }
+                         gen_helper_tick_get_count(cpu_dst, cpu_env, r_tickptr,
+                                                   r_const);
+                         tcg_temp_free_ptr(r_tickptr);
+                         tcg_temp_free_i32(r_const);
+                         gen_store_gpr(dc, rd, cpu_dst);
++                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                            gen_io_end();
++                        }
+                     }
+                     break;
+                 case 0x5: /* V9 rdpc */
+@@ -3447,11 +3455,17 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                         r_const = tcg_const_i32(dc->mem_idx);
+                         tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                        offsetof(CPUSPARCState, stick));
++                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                            gen_io_start();
++                        }
+                         gen_helper_tick_get_count(cpu_dst, cpu_env, r_tickptr,
+                                                   r_const);
+                         tcg_temp_free_ptr(r_tickptr);
+                         tcg_temp_free_i32(r_const);
+                         gen_store_gpr(dc, rd, cpu_dst);
++                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                            gen_io_end();
++                        }
+                     }
+                     break;
+                 case 0x19: /* System tick compare */
+@@ -3576,10 +3590,16 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                         r_const = tcg_const_i32(dc->mem_idx);
+                         tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                        offsetof(CPUSPARCState, tick));
++                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                            gen_io_start();
++                        }
+                         gen_helper_tick_get_count(cpu_tmp0, cpu_env,
+                                                   r_tickptr, r_const);
+                         tcg_temp_free_ptr(r_tickptr);
+                         tcg_temp_free_i32(r_const);
++                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                            gen_io_end();
++                        }
+                     }
+                     break;
+                 case 5: // tba
+@@ -4385,9 +4405,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                     r_tickptr = tcg_temp_new_ptr();
+                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                                    offsetof(CPUSPARCState, tick));
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_start();
++                                    }
+                                     gen_helper_tick_set_limit(r_tickptr,
+                                                               cpu_tick_cmpr);
+                                     tcg_temp_free_ptr(r_tickptr);
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_end();
++                                    }
++                                    /* End TB to handle timer interrupt */
++                                    dc->base.is_jmp = DISAS_EXIT;
+                                 }
+                                 break;
+                             case 0x18: /* System tick */
+@@ -4403,9 +4433,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                     r_tickptr = tcg_temp_new_ptr();
+                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                                    offsetof(CPUSPARCState, stick));
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_start();
++                                    }
+                                     gen_helper_tick_set_count(r_tickptr,
+                                                               cpu_tmp0);
+                                     tcg_temp_free_ptr(r_tickptr);
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_end();
++                                    }
++                                    /* End TB to handle timer interrupt */
++                                    dc->base.is_jmp = DISAS_EXIT;
+                                 }
+                                 break;
+                             case 0x19: /* System tick compare */
+@@ -4421,9 +4461,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                     r_tickptr = tcg_temp_new_ptr();
+                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                                    offsetof(CPUSPARCState, stick));
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_start();
++                                    }
+                                     gen_helper_tick_set_limit(r_tickptr,
+                                                               cpu_stick_cmpr);
+                                     tcg_temp_free_ptr(r_tickptr);
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_end();
++                                    }
++                                    /* End TB to handle timer interrupt */
++                                    dc->base.is_jmp = DISAS_EXIT;
+                                 }
+                                 break;
+ 
+@@ -4531,9 +4581,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                     r_tickptr = tcg_temp_new_ptr();
+                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                                    offsetof(CPUSPARCState, tick));
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_start();
++                                    }
+                                     gen_helper_tick_set_count(r_tickptr,
+                                                               cpu_tmp0);
+                                     tcg_temp_free_ptr(r_tickptr);
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_end();
++                                    }
++                                    /* End TB to handle timer interrupt */
++                                    dc->base.is_jmp = DISAS_EXIT;
+                                 }
+                                 break;
+                             case 5: // tba
+@@ -4541,7 +4601,13 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                 break;
+                             case 6: // pstate
+                                 save_state(dc);
++                                if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                    gen_io_start();
++                                }
+                                 gen_helper_wrpstate(cpu_env, cpu_tmp0);
++                                if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                    gen_io_end();
++                                }
+                                 dc->npc = DYNAMIC_PC;
+                                 break;
+                             case 7: // tl
+@@ -4551,7 +4617,13 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                 dc->npc = DYNAMIC_PC;
+                                 break;
+                             case 8: // pil
++                                if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                    gen_io_start();
++                                }
+                                 gen_helper_wrpil(cpu_env, cpu_tmp0);
++                                if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                    gen_io_end();
++                                }
+                                 break;
+                             case 9: // cwp
+                                 gen_helper_wrcwp(cpu_env, cpu_tmp0);
+@@ -4642,9 +4714,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                     r_tickptr = tcg_temp_new_ptr();
+                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                                    offsetof(CPUSPARCState, hstick));
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_start();
++                                    }
+                                     gen_helper_tick_set_limit(r_tickptr,
+                                                               cpu_hstick_cmpr);
+                                     tcg_temp_free_ptr(r_tickptr);
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_end();
++                                    }
++                                    /* End TB to handle timer interrupt */
++                                    dc->base.is_jmp = DISAS_EXIT;
+                                 }
+                                 break;
+                             case 6: // hver readonly
+@@ -5265,14 +5347,26 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                 goto priv_insn;
+                             dc->npc = DYNAMIC_PC;
+                             dc->pc = DYNAMIC_PC;
++                            if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                gen_io_start();
++                            }
+                             gen_helper_done(cpu_env);
++                            if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                gen_io_end();
++                            }
+                             goto jmp_insn;
+                         case 1:
+                             if (!supervisor(dc))
+                                 goto priv_insn;
+                             dc->npc = DYNAMIC_PC;
+                             dc->pc = DYNAMIC_PC;
++                            if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                gen_io_start();
++                            }
+                             gen_helper_retry(cpu_env);
++                            if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                gen_io_end();
++                            }
+                             goto jmp_insn;
+                         default:
+                             goto illegal_insn;
+@@ -5834,6 +5928,11 @@ static void sparc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
+             save_npc(dc);
+             tcg_gen_exit_tb(NULL, 0);
+         }
++    } else if (dc->base.is_jmp == DISAS_EXIT) {
++        /* Exit TB */
++        save_state(dc);
++        gen_op_next_insn();
++        tcg_gen_exit_tb(NULL, 0);
+     }
+ }
+ 
+-- 
+2.11.0
