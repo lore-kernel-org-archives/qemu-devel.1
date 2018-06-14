@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuzibode@126.com>) id 1fTJEu-0007ty-OC
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:48:01 -0400
+	(envelope-from <suratiamol@gmail.com>) id 1fTL69-00021T-Bq
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 01:47:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <yuzibode@126.com>) id 1fTJEq-000671-Oc
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:48:00 -0400
-Received: from m50-112.126.com ([123.125.50.112]:42040)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <yuzibode@126.com>) id 1fTJEq-000668-1A
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:47:56 -0400
-Date: Thu, 14 Jun 2018 11:47:44 +0800
-From: Bo YU <yuzibode@126.com>
-Message-ID: <20180614034744.dcato6eemcrr3drq@debian.debian>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Subject: [Qemu-devel] Error: virtio_net: Too few free TX rings available.
+	(envelope-from <suratiamol@gmail.com>) id 1fTL66-0003jV-96
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 01:47:05 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:45247)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <suratiamol@gmail.com>)
+	id 1fTL66-0003jL-2s
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 01:47:02 -0400
+Received: by mail-pf0-x243.google.com with SMTP id a22-v6so2638589pfo.12
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 22:47:01 -0700 (PDT)
+From: Amol Surati <suratiamol@gmail.com>
+Date: Thu, 14 Jun 2018 11:18:57 +0530
+Message-Id: <20180614054857.26248-1-suratiamol@gmail.com>
+Subject: [Qemu-devel] [PATCH] hw/intc/arm_gicv3: fix an extra left-shift
+ when reading IPRIORITYR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +26,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: yuzibode@126.com
+Cc: peter.maydell@linaro.org, Amol Surati <suratiamol@gmail.com>
 
-Hello,
-A am newbie to qemu.
-I am using qemu now:
-qemu-io --version
-qemu-io version 2.12.50 (v2.12.0-1296-g2ab09bf2f9-dirty)
-Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+When either GICD_IPRIORITYR or GICR_IPRIORITYR is read as a 32-bit
+register, the post left-shift operator in the for loop causes an
+extra shift after the least significant byte has been placed.
 
-I have to talk about using qemu with libvirt recently libvirt deadlocked
-when libvirt fetching qemu capabilities.Under Michal Privoznik help, i
-restart my VM.
+The 32-bit value actually returned is therefore the expected value
+shifted left by 8 bits.
 
-The reason which cause recompile  qume from version 2.8 is:
-i want to modify some features:
+Signed-off-by: Amol Surati <suratiamol@gmail.com>
+---
+ hw/intc/arm_gicv3_dist.c   | 3 ++-
+ hw/intc/arm_gicv3_redist.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-Fowllowing the instrustions:
-
-http://cilium.readthedocs.io/en/latest/bpf/#bpftool
-
-$ clang -O2 -Wall -target bpf -c xdp-example.c -o xdp-example.o
-
-I get the error:
-
-# sudo /sbin/ip link set dev ens3 xdp obj xdp_2.o
-Error: virtio_net: Too few free TX rings available.
-# sudo dmesg
-virtio_net virtio0 ens3: request 4 queues but max is 1
-
-
-And i type: sudo ethtool -g ens3
-Ring parameters for ens3:
-Pre-set maximums:
-RX: 256
-RX Mini:0
-RX Jumbo:0
-TX:256
-Current hardware settings:
-RX:256
-RX Mini:0
-RX Jumbo:0
-TX:256
-
-sudo ethtool -G ens3 rx 512
-Cannot set device ring parameters: Operation not supported
-
-
-I have trace the mail-list:
-https://bugzilla.redhat.com/show_bug.cgi?id=1301548
-and there:
-https://groups.google.com/forum/#!topic/snabb-devel/ng78LbcaFgII
-I remeber there is a patch for qemu for modfing paramertes in
-hw/virtio-net.c,sorry, i can't find the patch.
-
-If i modify the rx_queue_max by hand to 1024, Is it ok?
-
-Thank you in advance!
+diff --git a/hw/intc/arm_gicv3_dist.c b/hw/intc/arm_gicv3_dist.c
+index 93fe936862..53c55c5729 100644
+--- a/hw/intc/arm_gicv3_dist.c
++++ b/hw/intc/arm_gicv3_dist.c
+@@ -441,7 +441,8 @@ static MemTxResult gicd_readl(GICv3State *s, hwaddr offset,
+         int i, irq = offset - GICD_IPRIORITYR;
+         uint32_t value = 0;
+ 
+-        for (i = irq + 3; i >= irq; i--, value <<= 8) {
++        for (i = irq + 3; i >= irq; i--) {
++            value <<= 8;
+             value |= gicd_read_ipriorityr(s, attrs, i);
+         }
+         *data = value;
+diff --git a/hw/intc/arm_gicv3_redist.c b/hw/intc/arm_gicv3_redist.c
+index 8a8684d76e..3b0ba6de1a 100644
+--- a/hw/intc/arm_gicv3_redist.c
++++ b/hw/intc/arm_gicv3_redist.c
+@@ -192,7 +192,8 @@ static MemTxResult gicr_readl(GICv3CPUState *cs, hwaddr offset,
+         int i, irq = offset - GICR_IPRIORITYR;
+         uint32_t value = 0;
+ 
+-        for (i = irq + 3; i >= irq; i--, value <<= 8) {
++        for (i = irq + 3; i >= irq; i--) {
++            value <<= 8;
+             value |= gicr_read_ipriorityr(cs, attrs, i);
+         }
+         *data = value;
+-- 
+2.17.1
