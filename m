@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45319)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTGeJ-0000xq-NF
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 21:02:04 -0400
+	(envelope-from <loseweigh@gmail.com>) id 1fTGeK-0000yG-HC
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 21:02:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTGeG-0000NL-0c
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 21:02:03 -0400
-Date: Thu, 14 Jun 2018 11:01:43 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180614010143.GQ30690@umbus.fritz.box>
-References: <20180613065707.30766-1-david@gibson.dropbear.id.au>
-	<20180613065707.30766-3-david@gibson.dropbear.id.au>
-	<20180613110939.28d30cf0@bahia.lab.toulouse-stg.fr.ibm.com>
-	<e69b80c7-8334-cf7a-5b23-85c5e6c3517b@kaod.org>
-	<20180613114207.32431053@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20180613095329.GG30690@umbus.fritz.box>
+	(envelope-from <loseweigh@gmail.com>) id 1fTGeI-0000OU-VS
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 21:02:04 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:46202)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <loseweigh@gmail.com>) id 1fTGeI-0000OK-OW
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 21:02:02 -0400
+Received: by mail-io0-x241.google.com with SMTP id d22-v6so5415590iof.13
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 18:02:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pMRnfHSWYEVtk438"
-Content-Disposition: inline
-In-Reply-To: <20180613095329.GG30690@umbus.fritz.box>
-Subject: Re: [Qemu-devel] [PATCH 2/7] pnv: Add missing error check during
- cpu realize()
+In-Reply-To: <b9c88515-cf41-2a9a-078e-9c9e5adbbf14@intel.com>
+References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
+	<20180611202207-mutt-send-email-mst@kernel.org>
+	<dc8b1669-b8b6-fb59-94e2-6e4de6b96572@redhat.com>
+	<20180612051432-mutt-send-email-mst@kernel.org>
+	<23fc4aa4-ec41-d6e2-3354-10cbfc13b7ec@intel.com>
+	<20180612142557-mutt-send-email-mst@kernel.org>
+	<b9c88515-cf41-2a9a-078e-9c9e5adbbf14@intel.com>
+From: Siwei Liu <loseweigh@gmail.com>
+Date: Wed, 13 Jun 2018 18:02:01 -0700
+Message-ID: <CADGSJ213f8tJpNXuOhv8qRew-Y5VZAwA+srNMrLZYnKdVGLdAA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,87 +35,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, "Brandeburg,
+	Jesse" <jesse.brandeburg@intel.com>, virtualization@lists.linux-foundation.org, aaron.f.brown@intel.com
 
+On Tue, Jun 12, 2018 at 5:08 PM, Samudrala, Sridhar
+<sridhar.samudrala@intel.com> wrote:
+> On 6/12/2018 4:34 AM, Michael S. Tsirkin wrote:
+>>
+>> On Mon, Jun 11, 2018 at 10:02:45PM -0700, Samudrala, Sridhar wrote:
+>>>
+>>> On 6/11/2018 7:17 PM, Michael S. Tsirkin wrote:
+>>>>
+>>>> On Tue, Jun 12, 2018 at 09:54:44AM +0800, Jason Wang wrote:
+>>>>>
+>>>>> On 2018=E5=B9=B406=E6=9C=8812=E6=97=A5 01:26, Michael S. Tsirkin wrot=
+e:
+>>>>>>
+>>>>>> On Mon, May 07, 2018 at 04:09:54PM -0700, Sridhar Samudrala wrote:
+>>>>>>>
+>>>>>>> This feature bit can be used by hypervisor to indicate virtio_net
+>>>>>>> device to
+>>>>>>> act as a standby for another device with the same MAC address.
+>>>>>>>
+>>>>>>> I tested this with a small change to the patch to mark the STANDBY
+>>>>>>> feature 'true'
+>>>>>>> by default as i am using libvirt to start the VMs.
+>>>>>>> Is there a way to pass the newly added feature bit 'standby' to qem=
+u
+>>>>>>> via libvirt
+>>>>>>> XML file?
+>>>>>>>
+>>>>>>> Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+>>>>>>
+>>>>>> So I do not think we can commit to this interface: we
+>>>>>> really need to control visibility of the primary device.
+>>>>>
+>>>>> The problem is legacy guest won't use primary device at all if we do
+>>>>> this.
+>>>>
+>>>> And that's by design - I think it's the only way to ensure the
+>>>> legacy guest isn't confused.
+>>>
+>>> Yes. I think so. But i am not sure if Qemu is the right place to contro=
+l
+>>> the visibility
+>>> of the primary device. The primary device may not be specified as an
+>>> argument to Qemu. It
+>>> may be plugged in later.
+>>> The cloud service provider is providing a feature that enables low
+>>> latency datapath and live
+>>> migration capability.
+>>> A tenant can use this feature only if he is running a VM that has
+>>> virtio-net with failover support.
+>>
+>> Well live migration is there already. The new feature is low latency
+>> data path.
+>
+>
+> we get live migration with just virtio.  But I meant live migration with =
+VF
+> as
+> primary device.
+>
+>>
+>> And it's the guest that needs failover support not the VM.
+>
+>
+> Isn't guest and VM synonymous?
+>
+>
+>>
+>>
+>>> I think Qemu should check if guest virtio-net supports this feature and
+>>> provide a mechanism for
+>>> an upper layer indicating if the STANDBY feature is successfully
+>>> negotiated or not.
+>>> The upper layer can then decide if it should hot plug a VF with the sam=
+e
+>>> MAC and manage the 2 links.
+>>> If VF is successfully hot plugged, virtio-net link should be disabled.
+>>
+>> Did you even talk to upper layer management about it?
+>> Just list the steps they need to do and you will see
+>> that's a lot of machinery to manage by the upper layer.
+>>
+>> What do we gain in flexibility? As far as I can see the
+>> only gain is some resources saved for legacy VMs.
+>>
+>> That's not a lot as tenant of the upper layer probably already has
+>> at least a hunch that it's a new guest otherwise
+>> why bother specifying the feature at all - you
+>> save even more resources without it.
+>>
+>
+> I am not all that familiar with how Qemu manages network devices. If we c=
+an
+> do all the
+> required management of the primary/standby devices within Qemu, that is
+> definitely a better
+> approach without upper layer involvement.
 
---pMRnfHSWYEVtk438
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Right. I would imagine in the extreme case the upper layer doesn't
+have to be involved at all if QEMU manages all hot plug/unplug logic.
+The management tool can supply passthrough device and virtio with the
+same group UUID, QEMU auto-manages the presence of the primary, and
+hot plug the device as needed before or after the migration.
 
-On Wed, Jun 13, 2018 at 07:53:29PM +1000, David Gibson wrote:
-> On Wed, Jun 13, 2018 at 11:42:07AM +0200, Greg Kurz wrote:
-> > On Wed, 13 Jun 2018 11:14:57 +0200
-> > C=E9dric Le Goater <clg@kaod.org> wrote:
-> >=20
-> > > >> index 13ad7d9e04..efb68226bb 100644
-> > > >> --- a/hw/ppc/pnv_core.c
-> > > >> +++ b/hw/ppc/pnv_core.c
-> > > >> @@ -173,6 +173,9 @@ static void pnv_core_realize(DeviceState *dev,=
- Error **errp)
-> > > >> =20
-> > > >>          snprintf(name, sizeof(name), "thread[%d]", i);
-> > > >>          object_property_add_child(OBJECT(pc), name, obj, &local_e=
-rr);
-> > > >> +        if (local_err) {
-> > > >> +            goto err;
-> > > >> +        }
-> > > >>          object_property_add_alias(obj, "core-pir", OBJECT(pc),
-> > > >>                                    "pir", &local_err);
-> > > >>          if (local_err) { =20
-> > > >=20
-> > > > Hmm... the current error path seems to assume failures to be
-> > > > caused by object_property_add_child(). It hence unparents the
-> > > > previously parented CPUs, but not the current one. So we'll
-> > > > miss one call to object_unparent() if object_property_add_alias()
-> > > > fails. =20
-> > >=20
-> > > yes, let's just put NULL or &error_abort instead.
-> > >=20
-> >=20
-> > NULL means we really don't care if the call fails or succeeds.
-> >=20
-> > &error_abort means we consider a failure to be a unrecoverable bug.
-> >=20
-> > So I would rather pass &error_abort here.
-> >=20
-> > But if the guest is already running and functional, and we hit
-> > the error during hotplug, does the guest really deserve to be
-> > aborted or should we just fail the hotplug ?
->=20
-> Ah, dammit, that's why it wasn't an abort in the first place.  Yeah,
-> we'd better propagate the errors.
+-Siwei
 
-No.. thinking about this yet again, we should be ok with error_abort.
-These really aren't things that should fail.  If they do something has
-gone so horribly wrong, that I think an abort() is a reasonable
-reaction, even on hotplug.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---pMRnfHSWYEVtk438
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlshvnUACgkQbDjKyiDZ
-s5LPZxAA4XuSi5+Ixqoo6bcGyYo1NNaHqy/bqXNBe3HRpN4HLS1IVwqvd9x4Ltvv
-wXgOVV75OYOx/9UEyNce8/IN/f5T/OF3r3WjNnswxd+A+KzSC7NwmRqyTgUYK2V+
-0SYgtQYHDxeEsI46n/ZRjzRUJH6owPXTwKmHfsAyTeEDZn8MWAr/K5IAh8joXWvw
-PZS9U5Mtcw6Dqb9khS4Swa/tv6QYzySXpXv1zlBMwVAjkxSakcndAuWMlMpoCRqA
-TJQ5knSZ85REuh6aivUksQ+MuDWD/x5aQnx9gLwtr18nwDWgG1JXXwPaIsOitVE8
-jQmJoG7TPKKoErKIkBi3mYU42XT47hKMPC3sNboha17Vuv587mEjPk0fxkiwmruY
-nEWWTq7DEfzaBQgCIgUC1iKJ3OyS8EYOIcQNpKRZRHa9Hm8Ogw24yrGsWUgHMZ1a
-Akajy0QdaEgQONIef+/VA67LvRBHO1a2WgjsiVW9ZS++VpA/lVNXQcs/T9lb+ewB
-tTgLbC0Y73ngS2In3fyYVq9O7zq9v5B/ymNOzcCpy8woaU2ukRg05/ro0v0UTAgx
-CrCGRtqCSAWOPjjyDvSuV/eNLXoWv2obdcPwANn1m7kkh3dCP32ONaOQvUAIllBP
-StkPWRlRV9Yu9dnpYPTC4QhMDi4C/kt7WARqYDZc9a1T4YMA3UI=
-=ywVw
------END PGP SIGNATURE-----
-
---pMRnfHSWYEVtk438--
+>
+>
+>>
+>>
+>>>>> How about control the visibility of standby device?
+>>>>>
+>>>>> Thanks
+>>>>
+>>>> standy the always there to guarantee no downtime.
+>>>>
+>>>>>> However just for testing purposes, we could add a non-stable
+>>>>>> interface "x-standby" with the understanding that as any
+>>>>>> x- prefix it's unstable and will be changed down the road,
+>>>>>> likely in the next release.
+>>>>>>
+>>>>>>
+>>>>>>> ---
+>>>>>>>     hw/net/virtio-net.c                         | 2 ++
+>>>>>>>     include/standard-headers/linux/virtio_net.h | 3 +++
+>>>>>>>     2 files changed, 5 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+>>>>>>> index 90502fca7c..38b3140670 100644
+>>>>>>> --- a/hw/net/virtio-net.c
+>>>>>>> +++ b/hw/net/virtio-net.c
+>>>>>>> @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] =3D {
+>>>>>>>                          true),
+>>>>>>>         DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed,
+>>>>>>> SPEED_UNKNOWN),
+>>>>>>>         DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str=
+),
+>>>>>>> +    DEFINE_PROP_BIT64("standby", VirtIONet, host_features,
+>>>>>>> VIRTIO_NET_F_STANDBY,
+>>>>>>> +                      false),
+>>>>>>>         DEFINE_PROP_END_OF_LIST(),
+>>>>>>>     };
+>>>>>>> diff --git a/include/standard-headers/linux/virtio_net.h
+>>>>>>> b/include/standard-headers/linux/virtio_net.h
+>>>>>>> index e9f255ea3f..01ec09684c 100644
+>>>>>>> --- a/include/standard-headers/linux/virtio_net.h
+>>>>>>> +++ b/include/standard-headers/linux/virtio_net.h
+>>>>>>> @@ -57,6 +57,9 @@
+>>>>>>>                                          * Steering */
+>>>>>>>     #define VIRTIO_NET_F_CTRL_MAC_ADDR 23       /* Set MAC address =
+*/
+>>>>>>> +#define VIRTIO_NET_F_STANDBY      62    /* Act as standby for
+>>>>>>> another device
+>>>>>>> +                                         * with the same MAC.
+>>>>>>> +                                         */
+>>>>>>>     #define VIRTIO_NET_F_SPEED_DUPLEX 63        /* Device set
+>>>>>>> linkspeed and duplex */
+>>>>>>>     #ifndef VIRTIO_NET_NO_LEGACY
+>>>>>>> --
+>>>>>>> 2.14.3
+>>
+>> ---------------------------------------------------------------------
+>> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+>> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+>>
+>
