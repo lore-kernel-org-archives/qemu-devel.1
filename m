@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suratiamol@gmail.com>) id 1fTL69-00021T-Bq
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 01:47:06 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fTNBk-0001MT-6D
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:01:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suratiamol@gmail.com>) id 1fTL66-0003jV-96
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 01:47:05 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:45247)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <suratiamol@gmail.com>)
-	id 1fTL66-0003jL-2s
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 01:47:02 -0400
-Received: by mail-pf0-x243.google.com with SMTP id a22-v6so2638589pfo.12
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 22:47:01 -0700 (PDT)
-From: Amol Surati <suratiamol@gmail.com>
-Date: Thu, 14 Jun 2018 11:18:57 +0530
-Message-Id: <20180614054857.26248-1-suratiamol@gmail.com>
-Subject: [Qemu-devel] [PATCH] hw/intc/arm_gicv3: fix an extra left-shift
- when reading IPRIORITYR
+	(envelope-from <balaton@eik.bme.hu>) id 1fTNBc-0008Pg-5n
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:01:00 -0400
+Date: Thu, 14 Jun 2018 10:00:50 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20180614013532.GE3042@umbus.fritz.box>
+Message-ID: <alpine.BSF.2.21.1806140955020.19899@zero.eik.bme.hu>
+References: <cover.1528935420.git.balaton@eik.bme.hu>
+	<a9d502cce05cfa57895c415164efd288f4926fb6.1528935420.git.balaton@eik.bme.hu>
+	<20180614013532.GE3042@umbus.fritz.box>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v3 8/9] sm501: Perform a full update after
+ palette change
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Amol Surati <suratiamol@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Sebastian Bauer <mail@sebastianbauer.info>
 
-When either GICD_IPRIORITYR or GICR_IPRIORITYR is read as a 32-bit
-register, the post left-shift operator in the for loop causes an
-extra shift after the least significant byte has been placed.
+On Thu, 14 Jun 2018, David Gibson wrote:
+> On Thu, Jun 14, 2018 at 02:17:00AM +0200, BALATON Zoltan wrote:
+>> From: Sebastian Bauer <mail@sebastianbauer.info>
+>>
+>> Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>
+> Commit message.  Why is this necessary?
 
-The 32-bit value actually returned is therefore the expected value
-shifted left by 8 bits.
+Maybe because changing palette does not change display unless an update is 
+done and dirty tracking which is used in update_display does not detect 
+changes in device registers where palette is stored.
 
-Signed-off-by: Amol Surati <suratiamol@gmail.com>
----
- hw/intc/arm_gicv3_dist.c   | 3 ++-
- hw/intc/arm_gicv3_redist.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+I'm not sure this is needed in all modes but I guess palette is not used 
+in modes that are not indexed so unecessary updates should not happen evem 
+in those cases because if palette is not used anyway, guest is unlikely to 
+change it unless doing something really strange but we haven't seen any 
+guests yet that would do that. Therefore this simple way of handling this 
+should be OK.
 
-diff --git a/hw/intc/arm_gicv3_dist.c b/hw/intc/arm_gicv3_dist.c
-index 93fe936862..53c55c5729 100644
---- a/hw/intc/arm_gicv3_dist.c
-+++ b/hw/intc/arm_gicv3_dist.c
-@@ -441,7 +441,8 @@ static MemTxResult gicd_readl(GICv3State *s, hwaddr offset,
-         int i, irq = offset - GICD_IPRIORITYR;
-         uint32_t value = 0;
- 
--        for (i = irq + 3; i >= irq; i--, value <<= 8) {
-+        for (i = irq + 3; i >= irq; i--) {
-+            value <<= 8;
-             value |= gicd_read_ipriorityr(s, attrs, i);
-         }
-         *data = value;
-diff --git a/hw/intc/arm_gicv3_redist.c b/hw/intc/arm_gicv3_redist.c
-index 8a8684d76e..3b0ba6de1a 100644
---- a/hw/intc/arm_gicv3_redist.c
-+++ b/hw/intc/arm_gicv3_redist.c
-@@ -192,7 +192,8 @@ static MemTxResult gicr_readl(GICv3CPUState *cs, hwaddr offset,
-         int i, irq = offset - GICR_IPRIORITYR;
-         uint32_t value = 0;
- 
--        for (i = irq + 3; i >= irq; i--, value <<= 8) {
-+        for (i = irq + 3; i >= irq; i--) {
-+            value <<= 8;
-             value |= gicr_read_ipriorityr(cs, attrs, i);
-         }
-         *data = value;
--- 
-2.17.1
+Regards,
+BALATON Zoltan
+
+>> ---
+>>  hw/display/sm501.c | 8 ++++++++
+>>  1 file changed, 8 insertions(+)
+>>
+>> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+>> index 0625cf5..a2ee6e3 100644
+>> --- a/hw/display/sm501.c
+>> +++ b/hw/display/sm501.c
+>> @@ -479,6 +479,7 @@ typedef struct SM501State {
+>>      MemoryRegion twoD_engine_region;
+>>      uint32_t last_width;
+>>      uint32_t last_height;
+>> +    uint32_t do_full_update; /* perform a full update next time */
+>>      I2CBus *i2c_bus;
+>>
+>>      /* mmio registers */
+>> @@ -1032,6 +1033,7 @@ static void sm501_palette_write(void *opaque, hwaddr addr,
+>>
+>>      assert(range_covers_byte(0, 0x400 * 3, addr));
+>>      *(uint32_t *)&s->dc_palette[addr] = value;
+>> +    s->do_full_update = 1;
+>>  }
+>>
+>>  static uint64_t sm501_disp_ctrl_read(void *opaque, hwaddr addr,
+>> @@ -1620,6 +1622,12 @@ static void sm501_update_display(void *opaque)
+>>          full_update = 1;
+>>      }
+>>
+>> +    /* someone else requested a full update */
+>> +    if (s->do_full_update) {
+>> +        s->do_full_update = 0;
+>> +        full_update = 1;
+>> +    }
+>> +
+>>      /* draw each line according to conditions */
+>>      snap = memory_region_snapshot_and_clear_dirty(&s->local_mem_region,
+>>                offset, width * height * src_bpp, DIRTY_MEMORY_VGA);
+>
+>
