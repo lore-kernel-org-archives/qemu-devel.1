@@ -1,22 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fTPsv-0005wK-LB
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:53:47 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fTPv3-0007Hn-2w
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:55:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fTPst-00086J-2j
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:53:45 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:34366
-	helo=s16892447.onlinehome-server.info)
+	(envelope-from <borntraeger@de.ibm.com>) id 1fTPuy-00013p-Vm
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:55:57 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51244)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1fTPss-000800-Oh
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:53:43 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Thu, 14 Jun 2018 11:53:23 +0100
-Message-Id: <20180614105323.22524-2-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180614105323.22524-1-mark.cave-ayland@ilande.co.uk>
-References: <20180614105323.22524-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [RFCv2 PATCH 1/1] SPARC64: add icount support
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fTPuy-00013A-Ns
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:55:52 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5EAnP9E013834
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 06:55:51 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jkpakhrf9-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 06:55:51 -0400
+Received: from localhost
+	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 14 Jun 2018 11:55:48 +0100
+References: <1528966108-28324-1-git-send-email-thuth@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 14 Jun 2018 12:55:45 +0200
+MIME-Version: 1.0
+In-Reply-To: <1528966108-28324-1-git-send-email-thuth@redhat.com>
+Content-Language: en-US
+Message-Id: <5b07c617-318d-53d5-46ee-8e4f3646cd79@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] pc-bios/s390-ccw: Optimize
+ the s390-ccw bios for size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,233 +42,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, atar4qemu@gmail.com, cota@braap.org, richard.henderson@linaro.org
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 
-This patch adds gen_io_start()/gen_io_end() to various instructions as required
-in order to boot my OpenBIOS test images on qemu-system-sparc64 with icount
-enabled.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- target/sparc/translate.c | 97 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 97 insertions(+)
+On 06/14/2018 10:48 AM, Thomas Huth wrote:
+> Since we're storing the firmware blobs in the QEMU git repository, it
+> would be nice if the blobs would be a little bit smaller. By using -Os
+> and -fno-asynchronous-unwind-tables the size of the s390-ccw.img can be
+> decreased by ca. 4kB, and the size of s390-netboot.img even by ca. 45kB.
+> The change of speed of the firmware should not really matter compared to
+> a binary that has been compiled with -O2 since the firmware still starts
+> very fast.
 
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index f3d430c1b2..56101387a8 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -3400,11 +3400,17 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-                         r_const = tcg_const_i32(dc->mem_idx);
-                         tcg_gen_ld_ptr(r_tickptr, cpu_env,
-                                        offsetof(CPUSPARCState, tick));
-+                        if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                            gen_io_start();
-+                        }
-                         gen_helper_tick_get_count(cpu_dst, cpu_env, r_tickptr,
-                                                   r_const);
-                         tcg_temp_free_ptr(r_tickptr);
-                         tcg_temp_free_i32(r_const);
-                         gen_store_gpr(dc, rd, cpu_dst);
-+                        if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                            gen_io_end();
-+                        }
-                     }
-                     break;
-                 case 0x5: /* V9 rdpc */
-@@ -3447,11 +3453,17 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-                         r_const = tcg_const_i32(dc->mem_idx);
-                         tcg_gen_ld_ptr(r_tickptr, cpu_env,
-                                        offsetof(CPUSPARCState, stick));
-+                        if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                            gen_io_start();
-+                        }
-                         gen_helper_tick_get_count(cpu_dst, cpu_env, r_tickptr,
-                                                   r_const);
-                         tcg_temp_free_ptr(r_tickptr);
-                         tcg_temp_free_i32(r_const);
-                         gen_store_gpr(dc, rd, cpu_dst);
-+                        if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                            gen_io_end();
-+                        }
-                     }
-                     break;
-                 case 0x19: /* System tick compare */
-@@ -3576,10 +3588,16 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-                         r_const = tcg_const_i32(dc->mem_idx);
-                         tcg_gen_ld_ptr(r_tickptr, cpu_env,
-                                        offsetof(CPUSPARCState, tick));
-+                        if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                            gen_io_start();
-+                        }
-                         gen_helper_tick_get_count(cpu_tmp0, cpu_env,
-                                                   r_tickptr, r_const);
-                         tcg_temp_free_ptr(r_tickptr);
-                         tcg_temp_free_i32(r_const);
-+                        if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                            gen_io_end();
-+                        }
-                     }
-                     break;
-                 case 5: // tba
-@@ -4385,9 +4403,20 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-                                     r_tickptr = tcg_temp_new_ptr();
-                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
-                                                    offsetof(CPUSPARCState, tick));
-+                                    if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                        gen_io_start();
-+                                    }
-                                     gen_helper_tick_set_limit(r_tickptr,
-                                                               cpu_tick_cmpr);
-                                     tcg_temp_free_ptr(r_tickptr);
-+                                    if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                        gen_io_end();
-+                                        /* End TB to handle timer interrupt */
-+                                        save_state(dc);
-+                                        gen_op_next_insn();
-+                                        tcg_gen_exit_tb(NULL, 0);
-+                                        dc->base.is_jmp = DISAS_NORETURN;
-+                                    }
-                                 }
-                                 break;
-                             case 0x18: /* System tick */
-@@ -4403,9 +4432,20 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-                                     r_tickptr = tcg_temp_new_ptr();
-                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
-                                                    offsetof(CPUSPARCState, stick));
-+                                    if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                        gen_io_start();
-+                                    }
-                                     gen_helper_tick_set_count(r_tickptr,
-                                                               cpu_tmp0);
-                                     tcg_temp_free_ptr(r_tickptr);
-+                                    if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                        gen_io_end();
-+                                        /* End TB to handle timer interrupt */
-+                                        save_state(dc);
-+                                        gen_op_next_insn();
-+                                        tcg_gen_exit_tb(NULL, 0);
-+                                        dc->base.is_jmp = DISAS_NORETURN;
-+                                    }
-                                 }
-                                 break;
-                             case 0x19: /* System tick compare */
-@@ -4421,9 +4461,20 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-                                     r_tickptr = tcg_temp_new_ptr();
-                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
-                                                    offsetof(CPUSPARCState, stick));
-+                                    if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                        gen_io_start();
-+                                    }
-                                     gen_helper_tick_set_limit(r_tickptr,
-                                                               cpu_stick_cmpr);
-                                     tcg_temp_free_ptr(r_tickptr);
-+                                    if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                        gen_io_end();
-+                                        /* End TB to handle timer interrupt */
-+                                        save_state(dc);
-+                                        gen_op_next_insn();
-+                                        tcg_gen_exit_tb(NULL, 0);
-+                                        dc->base.is_jmp = DISAS_NORETURN;
-+                                    }
-                                 }
-                                 break;
- 
-@@ -4531,9 +4582,20 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-                                     r_tickptr = tcg_temp_new_ptr();
-                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
-                                                    offsetof(CPUSPARCState, tick));
-+                                    if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                        gen_io_start();
-+                                    }
-                                     gen_helper_tick_set_count(r_tickptr,
-                                                               cpu_tmp0);
-                                     tcg_temp_free_ptr(r_tickptr);
-+                                    if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                        gen_io_end();
-+                                        /* End TB to handle timer interrupt */
-+                                        save_state(dc);
-+                                        gen_op_next_insn();
-+                                        tcg_gen_exit_tb(NULL, 0);
-+                                        dc->base.is_jmp = DISAS_NORETURN;
-+                                    }
-                                 }
-                                 break;
-                             case 5: // tba
-@@ -4541,7 +4603,13 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-                                 break;
-                             case 6: // pstate
-                                 save_state(dc);
-+                                if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                    gen_io_start();
-+                                }
-                                 gen_helper_wrpstate(cpu_env, cpu_tmp0);
-+                                if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                    gen_io_end();
-+                                }
-                                 dc->npc = DYNAMIC_PC;
-                                 break;
-                             case 7: // tl
-@@ -4551,7 +4619,13 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-                                 dc->npc = DYNAMIC_PC;
-                                 break;
-                             case 8: // pil
-+                                if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                    gen_io_start();
-+                                }
-                                 gen_helper_wrpil(cpu_env, cpu_tmp0);
-+                                if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                    gen_io_end();
-+                                }
-                                 break;
-                             case 9: // cwp
-                                 gen_helper_wrcwp(cpu_env, cpu_tmp0);
-@@ -4642,9 +4716,20 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-                                     r_tickptr = tcg_temp_new_ptr();
-                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
-                                                    offsetof(CPUSPARCState, hstick));
-+                                    if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                        gen_io_start();
-+                                    }
-                                     gen_helper_tick_set_limit(r_tickptr,
-                                                               cpu_hstick_cmpr);
-                                     tcg_temp_free_ptr(r_tickptr);
-+                                    if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                        gen_io_end();
-+                                        /* End TB to handle timer interrupt */
-+                                        save_state(dc);
-+                                        gen_op_next_insn();
-+                                        tcg_gen_exit_tb(NULL, 0);
-+                                        dc->base.is_jmp = DISAS_NORETURN;
-+                                    }
-                                 }
-                                 break;
-                             case 6: // hver readonly
-@@ -5265,14 +5350,26 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
-                                 goto priv_insn;
-                             dc->npc = DYNAMIC_PC;
-                             dc->pc = DYNAMIC_PC;
-+                            if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                gen_io_start();
-+                            }
-                             gen_helper_done(cpu_env);
-+                            if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                gen_io_end();
-+                            }
-                             goto jmp_insn;
-                         case 1:
-                             if (!supervisor(dc))
-                                 goto priv_insn;
-                             dc->npc = DYNAMIC_PC;
-                             dc->pc = DYNAMIC_PC;
-+                            if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                gen_io_start();
-+                            }
-                             gen_helper_retry(cpu_env);
-+                            if (dc->base.tb->cflags & CF_USE_ICOUNT) {
-+                                gen_io_end();
-+                            }
-                             goto jmp_insn;
-                         default:
-                             goto illegal_insn;
--- 
-2.11.0
+
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  pc-bios/s390-ccw/Makefile | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+> index 439e3cc..f22a5ca 100644
+> --- a/pc-bios/s390-ccw/Makefile
+> +++ b/pc-bios/s390-ccw/Makefile
+> @@ -13,6 +13,7 @@ OBJECTS = start.o main.o bootmap.o jump2ipl.o sclp.o menu.o \
+>  	  virtio.o virtio-scsi.o virtio-blkdev.o libc.o
+>  
+>  QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
+> +QEMU_CFLAGS += -Os -fno-asynchronous-unwind-tables
+
+Hmm, it looks like that the O2 comes after Os for me (which would override Os).
+
+cc -iquote /home/cborntra/REPOS/qemu/build/. -iquote . -iquote /home/cborntra/REPOS/qemu/tcg -iquote /home/cborntra/REPOS/qemu/tcg/s390 -I/home/cborntra/REPOS/qemu/linux-headers -I/home/cborntra/REPOS/qemu/build/linux-headers -iquote . -iquote /home/cborntra/REPOS/qemu -iquote /home/cborntra/REPOS/qemu/accel/tcg -iquote /home/cborntra/REPOS/qemu/include -Werror -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -Wexpansion-to-defined -Wendif-labels -Wno-shift-negative-value -Wno-missing-include-dirs -Wempty-body -Wnested-externs -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers -Wold-style-declaration -Wold-style-definition -Wtype-limits -Os -fno-asynchronous-unwind-tables -ffreestanding -fno-delete-null-pointer-checks -msoft-float -march=z900 -fPIE -fno-strict-aliasing   -fno-stack-protector -MMD -MP -MT libc.o -MF ./libc.d -O2 -g  -c -o libc.o /home/cborntra/REPOS/qemu/pc-bios/s390-ccw/libc.c
+
+
+so the effect is only because of the -fno-asynchronous-unwind-tables.
+
+
+
+>  QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
+>  QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
+>  QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -fno-stack-protector)
+> 
