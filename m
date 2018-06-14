@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTH1p-0006vH-V8
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 21:26:23 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fTH3k-0007jE-Gd
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 21:28:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTH1l-0005Fh-Vd
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 21:26:21 -0400
-Date: Thu, 14 Jun 2018 11:26:10 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fTH3j-0006Ug-80
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 21:28:20 -0400
+Date: Thu, 14 Jun 2018 11:27:54 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180614012610.GA3042@umbus.fritz.box>
-References: <152882087494.112322.15549780953419438229.stgit@bahia.lab.toulouse-stg.fr.ibm.com>
-	<152882305541.114463.3137854902721347235.stgit@bahia.lan>
-	<20180613004506.GM30690@umbus.fritz.box>
-	<20180613101915.4cc9485b@bahia.lab.toulouse-stg.fr.ibm.com>
-	<20180613120502.GO30690@umbus.fritz.box>
-	<20180613162639.08d8cc17@bahia.lab.toulouse-stg.fr.ibm.com>
+Message-ID: <20180614012754.GB3042@umbus.fritz.box>
+References: <cover.1528291908.git.balaton@eik.bme.hu>
+	<8c404c8c4ee1bfd2e4d079877d481094f797df8f.1528291908.git.balaton@eik.bme.hu>
+	<6aa1bc4e-a4b0-d7be-b9eb-85dfe8c06781@amsat.org>
+	<alpine.BSF.2.21.1806061920120.94568@zero.eik.bme.hu>
+	<20180613041115.GS30690@umbus.fritz.box>
+	<alpine.BSF.2.21.1806131044020.620@zero.eik.bme.hu>
+	<20180613100339.GK30690@umbus.fritz.box>
+	<alpine.BSF.2.21.1806131603270.90524@zero.eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="gBBFr7Ir9EOA20Yy"
+	protocol="application/pgp-signature"; boundary="WhfpMioaduB5tiZL"
 Content-Disposition: inline
-In-Reply-To: <20180613162639.08d8cc17@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 3/3] target/ppc: filter out non-zero PCR
- values when using TCG
+In-Reply-To: <alpine.BSF.2.21.1806131603270.90524@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v2 5/8] hw/timer: Add basic
+ M41T80 emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,125 +31,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-ppc@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
 
---gBBFr7Ir9EOA20Yy
-Content-Type: text/plain; charset=us-ascii
+--WhfpMioaduB5tiZL
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 13, 2018 at 04:26:39PM +0200, Greg Kurz wrote:
-> On Wed, 13 Jun 2018 22:05:02 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Wed, Jun 13, 2018 at 10:19:15AM +0200, Greg Kurz wrote:
-> > > On Wed, 13 Jun 2018 10:45:06 +1000
-> > > David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >  =20
-> > > > On Tue, Jun 12, 2018 at 07:04:15PM +0200, Greg Kurz wrote: =20
-> > > > > Bits set in the PCR disable features of the processor. TCG curren=
-tly
-> > > > > doesn't implement that, ie, we always act like if PCR is all zero=
-s.
+On Wed, Jun 13, 2018 at 04:13:57PM +0200, BALATON Zoltan wrote:
+> On Wed, 13 Jun 2018, David Gibson wrote:
+> > On Wed, Jun 13, 2018 at 10:50:59AM +0200, BALATON Zoltan wrote:
+> > > On Wed, 13 Jun 2018, David Gibson wrote:
+> > > > On Wed, Jun 06, 2018 at 07:35:28PM +0200, BALATON Zoltan wrote:
+> > > > > On Wed, 6 Jun 2018, Philippe Mathieu-Daud=E9 wrote:
+> > > > > > On 06/06/2018 10:31 AM, BALATON Zoltan wrote:
+> > > > > > > Basic emulation of the M41T80 serial (I2C) RTC chip. Only get=
+ting time
+> > > > > > > of day is implemented. Setting time and RTC alarm are not sup=
+ported.
+> > > > > [...]
+> > > > > > > diff --git a/hw/timer/m41t80.c b/hw/timer/m41t80.c
+> > > > > > > new file mode 100644
+> > > > > > > index 0000000..9dbdb1b
+> > > > > > > --- /dev/null
+> > > > > > > +++ b/hw/timer/m41t80.c
+> > > > > > > @@ -0,0 +1,117 @@
+> > > > > > > +/*
+> > > > > > > + * M41T80 serial rtc emulation
+> > > > > > > + *
+> > > > > > > + * Copyright (c) 2018 BALATON Zoltan
+> > > > > > > + *
+> > > > > > > + * This work is licensed under the GNU GPL license version 2=
+ or later.
+> > > > > > > + *
+> > > > > > > + */
+> > > > > > > +
+> > > > > > > +#include "qemu/osdep.h"
+> > > > > > > +#include "qemu/log.h"
+> > > > > > > +#include "qemu/timer.h"
+> > > > > > > +#include "qemu/bcd.h"
+> > > > > > > +#include "hw/i2c/i2c.h"
+> > > > > > > +
+> > > > > > > +#define TYPE_M41T80 "m41t80"
+> > > > > > > +#define M41T80(obj) OBJECT_CHECK(M41t80State, (obj), TYPE_M4=
+1T80)
+> > > > > > > +
+> > > > > > > +typedef struct M41t80State {
+> > > > > > > +    I2CSlave parent_obj;
+> > > > > > > +    int8_t addr;
+> > > > > > > +} M41t80State;
+> > > > > > > +
+> > > > > > > +static void m41t80_realize(DeviceState *dev, Error **errp)
+> > > > > > > +{
+> > > > > > > +    M41t80State *s =3D M41T80(dev);
+> > > > > > > +
+> > > > > > > +    s->addr =3D -1;
+> > > > > > > +}
+> > > > > > > +
+> > > > > > > +static int m41t80_send(I2CSlave *i2c, uint8_t data)
+> > > > > > > +{
+> > > > > > > +    M41t80State *s =3D M41T80(i2c);
+> > > > > > > +
+> > > > > > > +    if (s->addr < 0) {
+> > > > > > > +        s->addr =3D data;
+> > > > > > > +    } else {
+> > > > > > > +        s->addr++;
+> > > > > > > +    }
+> > > > > >=20
+> > > > > > What about adding enum i2c_event in M41t80State and use the enu=
+m here
+> > > > > > rather than the addr < 0? Also this wrap at INT8_MAX =3D 127, i=
+s this
+> > > > > > expected?
 > > > > >=20
-> > > > > But it is still possible for the PCR to have a non-null value. Th=
-is may
-> > > > > confuse the guest.
-> > > > >=20
-> > > > > There are three distinct cases:
-> > > > >=20
-> > > > > 1) a powernv guest doing mtspr SPR_PCR
-> > > > >=20
-> > > > > 2) reset of a pseries guest if the max-cpu-compat machine propert=
-y is set
-> > > > >=20
-> > > > > 3) CAS of a pseries guest
-> > > > >=20
-> > > > > This patch adds a ppc_store_pcr() helper that ensures we cannot p=
-ut
-> > > > > a non-null value in the PCR when using TCG. This helper also has
-> > > > > error propagation support, so that each case listed above can be
-> > > > > handled appropriately:
-> > > > >=20
-> > > > > 1) since the powernv machine is mostly used for OpenPOWER FW deve=
-l,
-> > > > >    we just print an error and let QEMU continue execution
-> > > > >=20
-> > > > > 2) an error is printed and QEMU exits, ie, same behaviour as when
-> > > > >    KVM doesn't support the requested compat mode
-> > > > >=20
-> > > > > 3) an error is printed and QEMU reports H_HARDWARE to the guest
-> > > > >=20
-> > > > > Signed-off-by: Greg Kurz <groug@kaod.org>   =20
+> > > > > Thanks for the review. I guess we could add enum for device bytes=
+ and the
+> > > > > special case -1 meaning no register address selected yet but this=
+ is a very
+> > > > > simple device with only 20 bytes and the datasheet also lists the=
+m by number
+> > > > > without naming them so I think we can also refer to them by numbe=
+r. Since
+> > > > > the device has only this 20 bytes the case with 127 should also n=
+ot be a
+> > > > > problem as that's invalid address anyway. Or did you mean somethi=
+ng else?
 > > > >=20
-> > > > I'm not really convinced this is a good idea.  Printing a (non fata=
-l)
-> > > > error if the guest attempts to write a non-zero value to the PCR
-> > > > should be ok.  However, you're generating a fatal error if the mach=
-ine
-> > > > tries to set the PCR in TCG mode.  That could easily happen using,
-> > > > e.g. the cap-htm flag on a TCG guest.  That would take TCG from mos=
-tly
-> > > > working, to refusing to run at all.
-> > > >  =20
+> > > > So, I'm not particularly in favour of adding extra state variables.
+> > > >=20
+> > > > But is using addr < 0 safe here?  You're assigning the uint8_t data=
+ to
+> > > > addr - could that result in a negative value?
 > > >=20
-> > > I'm confused... I don't see anything related to HTM in TCG. Also we h=
-ave
-> > > the following in cap_htm_apply():
-> > >=20
-> > >     if (tcg_enabled()) {
-> > >         error_setg(errp,
-> > >                    "No Transactional Memory support in TCG, try cap-h=
-tm=3Doff");
-> > >=20
-> > > I'm probably missing something... can you enlighten me ? =20
+> > > Why wouldn't it be safe with the expected values for register address
+> > > between 0-19? If the guest sends garbage values over 127 it will eith=
+er
+> > > result in invalid register or unselected register and lead to an erro=
+r when
+> > > trying to read/write that register so I don't see what other problem =
+this
+> > > may cause.
 > >=20
-> > Ok, so right now when cap-htm=3Doff we don't actually enforce that, we
-> > just don't advertise it to the guest.  We probably _should_ enforce
-> > that, and the way we'd do it is to set the appropriate bit in the
-> > PCR.  That'll do the right thing for KVM (well, once we update KVM to
-> > actually pass on the PCR value) but would break TCG in conjunction
-> > with your patch above.
+> > Ok, but where is that enforced?
 >=20
-> Hmm... The granularity of the PCR bits is PowerISA versions, not individu=
-al
-> facilities AFAIK... or am I missing something again ?
+> I don't see the problem. The addr register selects the register to read or
+> write. It is set by the first write when the device is accessed the first
+> time (this is denoted by addr =3D=3D -1 (or really any negative value). T=
+he
+> device has 20 registers and trying to read any register outside addr betw=
+een
+> 0-19 will result in returning 0 and logging a warning about invalid regis=
+ter
+> in m41t80_recv. What could fail here when guest sends garbage? It will set
+> addr to invalid value and try to read non-exitent register and get an err=
+or
+> just like for any other nonexistent value of addr (or start to read from
+> register 0 if it manages to set a negative value). All writes of registers
+> are ignored currently (except setting addr by the first write). What shou=
+ld
+> be enforced here?
 
-Huh.. so.  In the 3.0 ISA, there are only ISA version bits.  But in
-the 2.07 ISA, there are ISA version bits *and* a bit to control HTM.
+Ah, I see your point.  I mean strictly we should match the hardware
+behaviour if you write garbage addresses here, but really I don't
+think it matters much.
 
-I'm not quite sure what to make of that.  I kind of love the fact that
-they incompatibly change the compatibility register.
-
-> Anyway, with the current code, if we start the guest with:
->=20
-> -machine accel=3Dtcg,max-cpu-compat=3Dpower8 -cpu POWER9
->=20
-> We get this in the guest:
->=20
-> # grep ^cpu /proc/cpuinfo=20
-> cpu             : POWER8 (architected), altivec supported
->=20
-> This is the expected result of the CAS negotiation, but
-> the guest can still execute PowerISA 3.0 instructions
-> that should cause an invalid instruction exception.
-
-Right, this is a bug, albeit not a very high priority one.
-
-> I agree this shouldn't cause QEMU to exit, but I guess we should
-> at least leave the PCR to all zeroes, so that the guest view
-> is consistent with what TGC does (ie, raw mode). And maybe an
-> error message to indicate that the PCR is ignored in TCG... but
-> since that could be guest triggered, and the user cannot do anything
-> about it, I'm wondering if this should rather be a trace actually.
->=20
-> Does it make sense for you ?
-
-TBH, I don't care all that much.  There are a bunch of cases where TCG
-doesn't behave quite right, most without warnings.  One more or less
-doesn't make a huge difference.
+Ok, it should be fine.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -155,24 +165,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---gBBFr7Ir9EOA20Yy
+--WhfpMioaduB5tiZL
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlshxDIACgkQbDjKyiDZ
-s5KBZw/+PVdp/dL/Xa5NvDd9ssm4EUvXafS1RDe8LQaruODba9uUw5Zh0bl7u7Ss
-XBCxv96MaHnydgaG5pgQApkPNZIRyExcpB+qrCoPIpgsy2maJt6VfNEn0qH8j3AV
-7jCmHkSXEpNMH9YZtFXWwrolqHq8dAq6Bid/s/V2J2yD2X0Ka08d6kuUSr/b/17I
-Tut1QeIOuMph/C0QMtz/BFmSldw3wLtr5elYnQdBC3Jt1DlvYgEnhrEmtkChbTg1
-va0kUocs9VFfKv0R25t9JegZ+BzYKpgtGnvOqFE/W0gxuN1OTd0vgvRFS6r5qrKH
-5l6TidYKbBO10ND/MkksKG6A1Xu+Og+nC020oukn/mmV6gC52GPN6os+4SAGBT8N
-kfwiBDvtDy9JMZ3Gud+dqJ+93ipYteb5rOyeW00ORqscV6DRSStDfX1fSb+E08hk
-mpgtJZ57zV4pL8EjIo8eFNtCKYRcC8PfEI2K965Csy320KbQk2Db7YBgGJE+h3Ok
-qmxLp+pGuRlF5C5TgPaGfp5W+aBDascrWoljkpLfXQ0/QXnN/74lp81W6pk+U3VO
-i1cKe8JSD+mZb/Dir1rERFTb2G5FpG156ULNr3S2Qbz7r/8E0nNvpdkwRmzbKZcp
-rr8hFltaZH0f7xQZZr6tXcvXWL/QJXwmgTDSycb9Bd6+8+i1rnA=
-=VT+S
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlshxJoACgkQbDjKyiDZ
+s5KjhBAAsciaExIvLyv2PyyDnrZdES78iv91vyK+ofFGqDYxkwVAVQWOvB5oUzi5
+Vktify8/vKiAl3QCyPnuz6s9X0c+aTDYyfcfwwevpCGZ5L9I9h+5HVzd0+f6+yAC
+cVyJwqxITlQwvKyloNAz6M6OMZvc2WxM0JYP0fRAIdMq97R+Kw8CO9fLjJDxmvHz
+XiLKcDliwk4ZJqDKMK/WaaYTwG2GQ6gVtHTZrbfKm4HgdO7F1w03FkFlWDarqU0b
+DVfvyOOj08aPPaBlV+AMulsvLxoz1TCsj66KWvjbkwxWQTPvtxc3t2SIm3gmScV+
+fQewbUb85HyxpJE3zjLu1O+SkYQao4o71Rii+dlaPyKVXh4sDb8yhz7hwddNv9ox
+TG9bSoSbqyGjn5cRl0c2hPvH6XvkHLEnEmgMuKt+eGUGqs1Ky1wiYCj8uN/+uVRO
+Xe6mFG8ao5/odyqVny779c34igudyGfbKStufC4yrEFDVWnjky8RLTQWMu7dDMiG
+y4PNptiV1HKIr23ScBSk15cz5DL3b6LYT+4lDbRsltzyelntZKIxYnZ5ZzrpgQrw
+A2q3Z2EQpBQ0mBRhas77X3h6manAjDAS1Wp+ClpCD5YDLcziKn2IfgL5bggn7Wl7
+46KZWs9T69u1H7FYv6tBWLr0ux83GY0lb4VcRKIsrRiWePwP57U=
+=xDlZ
 -----END PGP SIGNATURE-----
 
---gBBFr7Ir9EOA20Yy--
+--WhfpMioaduB5tiZL--
