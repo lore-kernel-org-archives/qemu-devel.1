@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fTYud-0007pF-Dz
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:32:10 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fTYvl-0008UE-Op
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:33:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fTYua-0006UR-8W
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:32:07 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:36815)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fTYua-0006SE-1O
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:32:04 -0400
-Received: by mail-wm0-x241.google.com with SMTP id v131-v6so133865wma.1
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 13:32:03 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20180612184616.90838-1-mst@redhat.com>
-	<20180614081800.GH6355@redhat.com>
-	<2219a7fd-b496-6653-b79a-c20136727f98@redhat.com>
-	<20180614154441.GC18967@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <14e39e34-6314-05f1-2b90-42bea564efaa@redhat.com>
-Date: Thu, 14 Jun 2018 22:32:00 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fTYvl-0008DU-1n
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:33:17 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180614164431.29305-1-stefanha@redhat.com>
+	<5768e8f3-eae5-30ef-888a-5e62692c238d@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c5c1f362-d51d-df1e-c1dd-f57b64c3f1a1@amsat.org>
+Date: Thu, 14 Jun 2018 17:33:04 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180614154441.GC18967@redhat.com>
+In-Reply-To: <5768e8f3-eae5-30ef-888a-5e62692c238d@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] kvm: x86 CPU power management
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] compiler: add a sizeof_field() macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,22 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: John Snow <jsnow@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org
 
-On 14/06/2018 17:44, Daniel P. Berrangé wrote:
->> "-cpu" is certainly wrong for KVM_CAP_X86_DISABLE_EXITS. "-cpu" is a
->> device option, while this is about host behavior.  "-realtime"'s name is
->> awful, but I still think it's the best place for this option.  Maybe we
->> could call it "-realtime power-mgmt={host|guest}".
-> If none of the existing ones are a suitable fit, then we should just
-> introduce a new CLI arg instead stuffing it into somewhere odd.
+On 06/14/2018 04:17 PM, John Snow wrote:
+> On 06/14/2018 12:44 PM, Stefan Hajnoczi wrote:
+>> Determining the size of a field is useful when you don't have a struct
+>> variable handy.  Open-coding this is ugly.
+>>
+>> This patch adds the sizeof_field() macro, which is similar to
+>> typeof_field().  Existing instances are updated to use the macro.
+>>
+>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> 
+> How'd you find all the existing instances?
 
-It is related to mlock in my opinion.  Both options are about applying
-settings that reduce latency but may not be applicable in general.
-Maybe "-realtime" could be renamed to "-perftune" or something like
-that, but I'd like to keep the grouping.
+This works:
 
-Paolo
+$ git grep -E 'sizeof.*)0)->'
 
-> IOW, why not just "--power-mgmt host|guest"
+> 
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> 
+>> ---
+>>  include/hw/xen/io/ring.h      |  2 +-
+>>  include/qemu/compiler.h       |  2 ++
+>>  accel/tcg/translate-all.c     |  2 +-
+>>  hw/display/xenfb.c            |  4 ++--
+>>  hw/net/rocker/rocker_of_dpa.c |  2 +-
+>>  hw/net/virtio-net.c           |  2 +-
+>>  target/i386/kvm.c             |  2 +-
+>>  target/ppc/arch_dump.c        | 10 +++++-----
+>>  target/s390x/arch_dump.c      | 20 ++++++++++----------
+>>  9 files changed, 24 insertions(+), 22 deletions(-)
