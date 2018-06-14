@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTLjh-0002mt-T7
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:27:58 -0400
+	(envelope-from <groug@kaod.org>) id 1fTLrZ-0004Ub-Ds
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:36:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTLjg-0006wS-VL
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:27:57 -0400
-References: <1528879723-24675-1-git-send-email-eric.auger@redhat.com>
-	<1528879723-24675-10-git-send-email-eric.auger@redhat.com>
-	<8bf1bccc-b32a-9982-6123-b644c41a96d3@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <33a3fa10-bf1a-45cd-73bd-403cbd8d4792@redhat.com>
-Date: Thu, 14 Jun 2018 08:27:46 +0200
+	(envelope-from <groug@kaod.org>) id 1fTLrW-0008TS-97
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:36:05 -0400
+Received: from 11.mo5.mail-out.ovh.net ([46.105.47.167]:58681)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fTLrW-0008TA-2I
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:36:02 -0400
+Received: from player738.ha.ovh.net (unknown [10.109.122.28])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 056531BC9A9
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 08:35:59 +0200 (CEST)
+Date: Thu, 14 Jun 2018 08:35:52 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180614083552.4c6a9085@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <20180614044129.13606-3-david@gibson.dropbear.id.au>
+References: <20180614044129.13606-1-david@gibson.dropbear.id.au>
+	<20180614044129.13606-3-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <8bf1bccc-b32a-9982-6123-b644c41a96d3@redhat.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 9/9] hw/arm/virt: Add virt-3.0 machine type
+Subject: Re: [Qemu-devel] [PATCHv3 2/7] pnv: Fix some error handling cpu
+ realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +31,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: wei@redhat.com, drjones@redhat.com, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, christoffer.dall@arm.com, zhaoshenglong@huawei.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-Hi Laszlo,
+On Thu, 14 Jun 2018 14:41:24 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-On 06/13/2018 11:05 PM, Laszlo Ersek wrote:
-> On 06/13/18 10:48, Eric Auger wrote:
+> In pnv_core_realize() we call two functions with an Error * parameter in
+> succession, which will go badly if they both cause errors.  In fact, a
+> failure in either of them indicates a qemu internal error, so we can just
+> use &error_abort in both cases.
 > 
->> PATCH: merge of ECAM and VCPU extension
->> - Laszlo reviewed the ECAM changes but I dropped his R-b
->>   due to the squash
-> 
-> Was there any particular reason why the previous patch set (with only
-> the ECAM enlargement) couldn't be merged first? To be honest I'm not
-> super happy when my R-b is dropped for non-technical reasons; it seems
-> like wasted work for both of us.
-> 
-> Obviously if there's a technical dependency or some other reason why
-> committing the ECAM enlargement in separation would be *wrong*, that's
-> different. Even in that case, wouldn't it be possible to keep the
-> initial virt-3.0 machtype addition as I reviewed it, and then add the
-> rest in an incremental patch?
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-Sorry about that. My fear was about migration. We would have had 2 virt
-3.0 machine models not supporting the same features. While bisecting
-migration we could have had the source using the high mem ECAM and the
-destination not supporting it. So I preferred to avoid this trouble by
-merging the 2 features in one patch. However I may have kept your R-b
-restricting its scope to the ECAM stuff.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Thanks
-
-Eric
+>  hw/ppc/pnv_core.c | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
 > 
-> Thanks,
-> Laszlo
-> 
+> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+> index 13ad7d9e04..01f47c8037 100644
+> --- a/hw/ppc/pnv_core.c
+> +++ b/hw/ppc/pnv_core.c
+> @@ -172,12 +172,9 @@ static void pnv_core_realize(DeviceState *dev, Error **errp)
+>          object_initialize(obj, size, typename);
+>  
+>          snprintf(name, sizeof(name), "thread[%d]", i);
+> -        object_property_add_child(OBJECT(pc), name, obj, &local_err);
+> +        object_property_add_child(OBJECT(pc), name, obj, &error_abort);
+>          object_property_add_alias(obj, "core-pir", OBJECT(pc),
+> -                                  "pir", &local_err);
+> -        if (local_err) {
+> -            goto err;
+> -        }
+> +                                  "pir", &error_abort);
+>          object_unref(obj);
+>      }
+>  
