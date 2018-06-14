@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fTNH7-0003Mc-S1
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:06:39 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fTNHC-0003OC-8N
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:06:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fTNH4-0001Iv-Nu
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:06:33 -0400
-Received: from m15-111.126.com ([220.181.15.111]:38816)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fTNH3-0001Fa-Vf
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:06:30 -0400
-From: Chen Hanxiao <chen_han_xiao@126.com>
-Date: Thu, 14 Jun 2018 16:06:05 +0800
-Message-Id: <20180614080607.16604-1-chen_han_xiao@126.com>
+	(envelope-from <balaton@eik.bme.hu>) id 1fTNH9-0001N5-4S
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:06:38 -0400
+Date: Thu, 14 Jun 2018 10:06:33 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20180614013510.GD3042@umbus.fritz.box>
+Message-ID: <alpine.BSF.2.21.1806141003570.19899@zero.eik.bme.hu>
+References: <cover.1528935420.git.balaton@eik.bme.hu>
+	<c1ca5bce109e674d0cc7ed46bbcaa41863a6319c.1528935420.git.balaton@eik.bme.hu>
+	<20180614013510.GD3042@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5.2 0/2] qga: report the usage of fs in guests
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v3 7/9] sm501: Implement i2c part for
+ reading monitor EDID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,20 +24,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Chen Hanxiao <chen_han_xiao@126.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
 
-This series report the usage of guest's fs
-by "used_bytes" and "total_bytes" in guest-get-fsinfo.
+On Thu, 14 Jun 2018, David Gibson wrote:
+> On Thu, Jun 14, 2018 at 02:17:00AM +0200, BALATON Zoltan wrote:
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>
+> Again needs a commit message expanding on what this is and why it's
+> useful.
 
-Chen Hanxiao (2):
-  qga: add mountpoint usage info to GuestFilesystemInfo
-  qga-win: add driver path usage to GuestFilesystemInfo
+What else need to be explained apart from that SM501 has an i2c part which 
+is used to access EDID info of attached monitor. But this is what the 
+commit title already says. This patch implements that so far not emulated 
+part of the chip.
 
- qga/commands-posix.c | 15 +++++++++++++++
- qga/commands-win32.c | 12 ++++++++++++
- qga/qapi-schema.json |  3 +++
- 3 files changed, 30 insertions(+)
+> [snip]
+>>  static const VMStateDescription vmstate_sm501_sysbus = {
+>>      .name = TYPE_SYSBUS_SM501,
+>> -    .version_id = 1,
+>> -    .minimum_version_id = 1,
+>> +    .version_id = 2,
+>> +    .minimum_version_id = 2,
+>>      .fields = (VMStateField[]) {
+>>          VMSTATE_STRUCT(state, SM501SysBusState, 1,
+>>                         vmstate_sm501_state, SM501State),
+>
+> Additionally, since you're changing the migration stream, you need to
+> point out that this is not used in any machine types which support
+> cross-version migration.
 
--- 
-2.17.1
+AFAIK it is only used in SH4 and PPC sam460ex.
