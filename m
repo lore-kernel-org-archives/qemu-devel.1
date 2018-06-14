@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTOPr-0001D4-VF
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 05:19:41 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fTOQu-0001us-0o
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 05:20:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTOPq-0002Xc-SN
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 05:19:39 -0400
-Date: Thu, 14 Jun 2018 11:19:26 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180614091926.GC8564@localhost.localdomain>
-References: <20180613154711.12977-1-dplotnikov@virtuozzo.com>
-	<20180613154711.12977-3-dplotnikov@virtuozzo.com>
-	<ebef7765-3ea7-b575-69ec-29ae66be561f@redhat.com>
-	<b78d2918-9ba8-5f4d-0953-bf2420aabae0@redhat.com>
-	<20180614090055.GB8564@localhost.localdomain>
-	<w51o9gdpwo5.fsf@maestria.local.igalia.com>
+	(envelope-from <imammedo@redhat.com>) id 1fTOQq-0003Ef-RU
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 05:20:43 -0400
+Date: Thu, 14 Jun 2018 11:20:28 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180614112028.768e1106@redhat.com>
+In-Reply-To: <c84ffb85-628f-4ece-e231-d0d7d45144c9@redhat.com>
+References: <20180530150806.061c26b9@redhat.com>
+	<5dcb16e5-b9b9-d07d-dfe3-98724e911f83@redhat.com>
+	<20180531161310.52ea9507@redhat.com>
+	<e451e0d6-a181-b027-cdb7-f44beb11b37c@redhat.com>
+	<20180607154455.6eab4e24@redhat.com>
+	<5dda6237-88d8-f0f8-58d2-af996368cea4@redhat.com>
+	<20180608142442.0d97b7c6@redhat.com>
+	<397d37ee-b3a8-dae0-37d1-fd3c942448c2@redhat.com>
+	<20180608155432-mutt-send-email-mst@kernel.org>
+	<d6966aa8-54e5-8036-3603-069fbbb88c2a@redhat.com>
+	<20180608181004-mutt-send-email-mst@kernel.org>
+	<a68853da-a664-84ae-c5bd-4e79b967bb65@redhat.com>
+	<20180613174825.1eebef6c@redhat.com>
+	<c84ffb85-628f-4ece-e231-d0d7d45144c9@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w51o9gdpwo5.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v0 2/2] qmp: add block-set-copy-on-read
- command
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
+ hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +36,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Denis Plotnikov <dplotnikov@virtuozzo.com>, qemu-block@nongnu.org, armbru@redhat.com, famz@redhat.com, stefanha@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, den@virtuozzo.com, rkagan@virtuozzo.com
+To: David Hildenbrand <david@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-Am 14.06.2018 um 11:03 hat Alberto Garcia geschrieben:
-> On Thu 14 Jun 2018 11:00:55 AM CEST, Kevin Wolf <kwolf@redhat.com> wrote:
-> > Am 13.06.2018 um 18:41 hat Max Reitz geschrieben:
-> >> On 2018-06-13 18:02, Eric Blake wrote:
-> >> > On 06/13/2018 10:47 AM, Denis Plotnikov wrote:
-> >> >> The command enables/disables copy-on-read mode for VM's disk while
-> >> >> VM is running.
-> >> >>
-> >> >> This is needed when using external disk readers to shape access pattern
-> >> >> to the disk backend.
-> >> >>
-> >> >> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> >> >> ---
-> >> > 
-> >> > Deferring thoughts on the actual design for later;
-> >> 
-> >> But why? ;-)
-> >> 
-> >> This patch would definitely be superseded by a block reconfiguration
-> >> command (i.e. presumably one that makes reopen accessible over QMP).
-> >> With such a command, you could insert or remove a copy-on-read filter
-> >> node at any point in time.
-> >> 
-> >> Since we definitely want block graph configuration, I don't think we
-> >> want to add special commands now.
-> >
-> > I agree, and it seems that we get more and more use cases for a block
-> > reconfiguration commands. Only yesterday we talked about the "true"
-> > blockdev way for libvirt to implement I/O throttling. The result was
-> > that without reopen, we still need to use the old QMP command to set
-> > BlockBackend-based I/O throttling instead of using a filter node.
-> >
-> > So I'm eagerly awaiting Berto's promised patches for it.
+On Wed, 13 Jun 2018 17:51:01 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 13.06.2018 17:48, Igor Mammedov wrote:
+> > On Wed, 13 Jun 2018 12:58:46 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 08.06.2018 17:12, Michael S. Tsirkin wrote:  
+> >>> On Fri, Jun 08, 2018 at 03:07:53PM +0200, David Hildenbrand wrote:    
+> >>>> On 08.06.2018 14:55, Michael S. Tsirkin wrote:    
+> >>>>> On Fri, Jun 08, 2018 at 02:32:09PM +0200, David Hildenbrand wrote:    
+> >>>>>>    
+> >>>>>>>>> if (TYPE_PC_DIMM) {
+> >>>>>>>>>     pc_dimm_plug()
+> >>>>>>>>>     /* do here additional concrete machine specific things */
+> >>>>>>>>> } else if (TYPE_VIRTIO_MEM) {
+> >>>>>>>>>     virtio_mem_plug() <- do forwarding in there
+> >>>>>>>>>     /* and do here additional concrete machine specific things */
+> >>>>>>>>> } else if (TYPE_CPU) {
+> >>>>>>>>>     cpu_plug()
+> >>>>>>>>>     /* do here additional concrete machine specific things */
+> >>>>>>>>> }      
+> >>>>>>>>
+> >>>>>>>> That will result in a lot of duplicate code - for every machine we
+> >>>>>>>> support (dimm/virtio-mem/virtio-pmem/*add more memory devices here*) -
+> >>>>>>>> virtio-mem and virtio-pmem could most probably share the code.    
+> >>>>>>> maybe or maybe not, depending on if pmem endups as memory device or
+> >>>>>>> separate controller. And even with duplication, machine code would
+> >>>>>>> be easy to follow just down one explicit call chain.    
+> >>>>>>
+> >>>>>> Not 100% convinced but I am now going into that direction.    
+> >>>>>
+> >>>>> Can this go into DeviceClass? Failover has the same need to
+> >>>>> allocate/free resources for vfio without a full realize/unrealize.
+> >>>>>    
+> >>>>
+> >>>> Conceptually, I would have called here something like
+> >>>>
+> >>>> virtio_mem_plug() ...
+> >>>>
+> >>>> Which would end up calling memory_device_plug() and triggering the
+> >>>> target hotplug handler.
+> >>>>
+> >>>> I assume this can also be done from a device class callback.
+> >>>>
+> >>>> So we would need a total of 3 callbacks for
+> >>>>
+> >>>> a) pre_plug
+> >>>> b) plug
+> >>>> c) unplug
+> >>>>
+> >>>> In addition, unplug requests might be necessary, so
+> >>>>
+> >>>> d) unplug_request    
+> >>>
+> >>>
+> >>> Right - basically HotplugHandlerClass.    
+> >>
+> >> Looking into this idea:
+> >>
+> >> What I would have right now (conceptually)
+> >>
+> >> if (TYPE_PC_DIMM) {
+> >>     pc_dimm_plug(machine);
+> >> } else if (TYPE_CPU) {
+> >>     cpu_plug(machine);
+> >> } else if (TYPE_VIRTIO_MEM) {
+> >>     virtio_mem_plug(machine);
+> >> }
+> >>
+> >> Instead you want something like:
+> >>
+> >> if (TYPE_PC_DIMM) {
+> >>     pc_dimm_plug(machine);
+> >> } else if (TYPE_CPU) {
+> >>     cpu_plug(machine);
+> >> // igor requested an explicit list here, we could also check for
+> >> // DEVICE_CLASS(device)->plug and make it generic
+> >> } else if (TYPE_VIRTIO_MEM) {
+> >>     DEVICE_CLASS(device)->plug(machine);
+> >>     // call bus hotplug handler if necessary, or let the previous call
+> >>     // handle it?  
+> > not exactly this, I suggested following:
+> > 
+> >       [ ... specific to machine_foo wiring ...]
+> > 
+> >       virtio_mem_plug() {
+> >          [... some machine specific wiring ...]
+> > 
+> >          bus_hotplug_ctrl = qdev_get_bus_hotplug_handler()
+> >          bus_hotplug_ctrl->plug(bus_hotplug_ctrl, dev)
+> > 
+> >          [... some more machine specific wiring ...]
+> >       }
+> > 
+> >       [ ... specific to machine_foo wiring ...]
+> > 
+> > i.e. device itself doesn't participate in attaching to external entities,
+> > those entities (machine or bus controller virtio device is attached to)
+> > do wiring on their own within their own domain.  
 > 
-> They're coming, it's just a bit tricker than I initially though. I'll
-> probably send the first series as an RFC if I don't manage to fix all
-> problems, so we can discuss them a bit.
-
-Sounds good to me. It's not completely surprising that there are some
-tricky spots there, we've been postponing this for a reason...
-
-Kevin
+> I am fine with this, but Michael asked if this ("virtio_mem_plug()")
+> could go via new DeviceClass functions. Michael, would that also work
+> for your use case?
+We can discuss DeviceClass functions when patches for failover surface
+and if it's really need.
