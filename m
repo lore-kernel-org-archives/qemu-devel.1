@@ -1,15 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fTSaI-0001Zr-VJ
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:46:44 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fTScY-0002nL-UZ
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:49:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fTSaE-0003eU-2k
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:46:43 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 14 Jun 2018 15:46:35 +0200
-Message-Id: <1528983995-16233-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] pc-bios/s390-ccw: Optimize the
- s390-netboot.img for size
+	(envelope-from <eric.auger@redhat.com>) id 1fTScX-0004fQ-UC
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:49:03 -0400
+References: <1528879723-24675-1-git-send-email-eric.auger@redhat.com>
+	<1528879723-24675-5-git-send-email-eric.auger@redhat.com>
+	<20180614133904.bic4wwjeed4ybu2u@kamzik.brq.redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <29a2642b-87e4-b4c3-b7b9-632a3c0adc87@redhat.com>
+Date: Thu, 14 Jun 2018 15:48:52 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180614133904.bic4wwjeed4ybu2u@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/9] hw/intc/arm_gicv3_kvm: Get prepared to
+ handle multiple redist regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,59 +25,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, wei@redhat.com, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, christoffer.dall@arm.com, zhaoshenglong@huawei.com, lersek@redhat.com
 
-The -O2 optimization flag is passed via CFLAGS to the firmware Makefile,
-but in netbook.mak, we've got some rules that only use QEMU_CFLAGS for
-compiling the libc and libnet from SLOF, so these files get compiled
-without optimization so far. Use CFLAGS here, too, to create faster
-and smaller code.
+Hi Drew,
 
-We can additionally save some more bytes in the firmware images by compi-
-ling the code with -fno-asynchronous-unwind-tables. This will omit some
-ELF sections (used for stack unwinding for example) from the image that
-we do not need in the firmware.
+On 06/14/2018 03:39 PM, Andrew Jones wrote:
+> On Wed, Jun 13, 2018 at 10:48:38AM +0200, Eric Auger wrote:
+>> Let's check if KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION is supported.
+>> If not, we check the number of redist region is equal to 1 and use the
+>> legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute. Otherwise we use
+>> the new attribute and allow to register multiple regions to the
+>> KVM device.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>>
+>> ---
+>>
+>> v2 -> v3:
+>> - In kvm_arm_gicv3_realize rename val into add_ormask local variable and
+>>   add a comment
+>> - start the redist region registration  from s->nb_redist_regions - 1
+>>   downwards
+>> ---
+>>  hw/intc/arm_gicv3_kvm.c | 33 ++++++++++++++++++++++++++++++---
+>>  1 file changed, 30 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+>> index ed7b719..52e6e70 100644
+>> --- a/hw/intc/arm_gicv3_kvm.c
+>> +++ b/hw/intc/arm_gicv3_kvm.c
+>> @@ -753,6 +753,7 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      GICv3State *s = KVM_ARM_GICV3(dev);
+>>      KVMARMGICv3Class *kgc = KVM_ARM_GICV3_GET_CLASS(s);
+>> +    bool multiple_redist_region_allowed;
+>>      Error *local_err = NULL;
+>>      int i;
+>>  
+>> @@ -789,6 +790,18 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+>>          return;
+>>      }
+>>  
+>> +    multiple_redist_region_allowed =
+>> +        kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>> +                              KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION);
+>> +
+>> +    if (!multiple_redist_region_allowed && s->nb_redist_regions > 1) {
+>> +        error_setg(errp, "Multiple VGICv3 redistributor regions are not "
+>> +                   "supported by this host kernel");
+>> +        error_append_hint(errp, "A maximum of %d VCPUs can be used",
+>> +                          s->redist_region_count[0]);
+>> +        return;
+>> +    }
+>> +
+>>      kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+>>                        0, &s->num_irq, true, &error_abort);
+>>  
+>> @@ -798,9 +811,23 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+>>  
+>>      kvm_arm_register_device(&s->iomem_dist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>>                              KVM_VGIC_V3_ADDR_TYPE_DIST, s->dev_fd, 0);
+>> -    kvm_arm_register_device(&s->iomem_redist[0], -1,
+>> -                            KVM_DEV_ARM_VGIC_GRP_ADDR,
+>> -                            KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
+>> +
+>> +    if (!multiple_redist_region_allowed) {
+>> +        kvm_arm_register_device(&s->iomem_redist[0], -1,
+>> +                                KVM_DEV_ARM_VGIC_GRP_ADDR,
+>> +                                KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
+>> +    } else {
+>> +        for (i = s->nb_redist_regions - 1; i >= 0; i--) {
+> 
+> So we register in reverse-index order? Looking at your update to Linux doc
+> Documentation/virtual/kvm/devices/arm-vgic-v3.txt, shouldn't they be
+> registered in index-order? The doc says "Redistributor regions must be
+> registered in the incremental index order, starting from index 0."
+kvm_arm_register_device adds the device in a QSLIST using
+QSLIST_INSERT_HEAD. Then the list is read by kvm_arm_machine_init_done
+from the HEAD. So we need to register in reversed order.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/Makefile    | 1 +
- pc-bios/s390-ccw/netboot.mak | 4 ++--
- 2 files changed, 3 insertions(+), 2 deletions(-)
+Thanks
 
-diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-index 439e3cc..1eb316b 100644
---- a/pc-bios/s390-ccw/Makefile
-+++ b/pc-bios/s390-ccw/Makefile
-@@ -15,6 +15,7 @@ OBJECTS = start.o main.o bootmap.o jump2ipl.o sclp.o menu.o \
- QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
- QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
- QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
-+QEMU_CFLAGS += -fno-asynchronous-unwind-tables
- QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -fno-stack-protector)
- LDFLAGS += -Wl,-pie -nostdlib
- 
-diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
-index 8af0cfd..14e96b2 100644
---- a/pc-bios/s390-ccw/netboot.mak
-+++ b/pc-bios/s390-ccw/netboot.mak
-@@ -19,7 +19,7 @@ s390-netboot.img: s390-netboot.elf
- 
- # libc files:
- 
--LIBC_CFLAGS :=  $(QEMU_CFLAGS) $(LIBC_INC) $(LIBNET_INC)
-+LIBC_CFLAGS :=  $(QEMU_CFLAGS) $(CFLAGS) $(LIBC_INC) $(LIBNET_INC)
- 
- CTYPE_OBJS = isdigit.o isxdigit.o toupper.o
- %.o : $(SLOF_DIR)/lib/libc/ctype/%.c
-@@ -52,7 +52,7 @@ libc.a: $(LIBCOBJS)
- 
- LIBNETOBJS := args.o dhcp.o dns.o icmpv6.o ipv6.o tcp.o udp.o bootp.o \
- 	      dhcpv6.o ethernet.o ipv4.o ndp.o tftp.o pxelinux.o
--LIBNETCFLAGS := $(QEMU_CFLAGS) -DDHCPARCH=0x1F $(LIBC_INC) $(LIBNET_INC)
-+LIBNETCFLAGS := $(QEMU_CFLAGS) $(CFLAGS) -DDHCPARCH=0x1F $(LIBC_INC) $(LIBNET_INC)
- 
- %.o : $(SLOF_DIR)/lib/libnet/%.c
- 	$(call quiet-command,$(CC) $(LIBNETCFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
--- 
-1.8.3.1
+Eric
+> 
+> Thanks,
+> drew
+> 
+>> +            /* Address mask made of the rdist region index and count */
+>> +            uint64_t addr_ormask =
+>> +                        i | ((uint64_t)s->redist_region_count[i] << 52);
+>> +
+>> +            kvm_arm_register_device(&s->iomem_redist[i], -1,
+>> +                                    KVM_DEV_ARM_VGIC_GRP_ADDR,
+>> +                                    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION,
+>> +                                    s->dev_fd, addr_ormask);
+>> +        }
+>> +    }
+>>  
+>>      if (kvm_has_gsi_routing()) {
+>>          /* set up irq routing */
+>> -- 
+>> 2.5.5
+>>
+>>
