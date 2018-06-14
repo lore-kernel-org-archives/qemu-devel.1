@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fTLrZ-0004Ub-Ds
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:36:06 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fTLyo-0005wP-Qe
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:43:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fTLrW-0008TS-97
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:36:05 -0400
-Received: from 11.mo5.mail-out.ovh.net ([46.105.47.167]:58681)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fTLrW-0008TA-2I
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:36:02 -0400
-Received: from player738.ha.ovh.net (unknown [10.109.122.28])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 056531BC9A9
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 08:35:59 +0200 (CEST)
-Date: Thu, 14 Jun 2018 08:35:52 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180614083552.4c6a9085@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20180614044129.13606-3-david@gibson.dropbear.id.au>
-References: <20180614044129.13606-1-david@gibson.dropbear.id.au>
-	<20180614044129.13606-3-david@gibson.dropbear.id.au>
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fTLyk-0003mi-FK
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:43:34 -0400
+Received: from smtp65.cstnet.cn ([159.226.251.65]:33109 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fTLyj-0003mA-Pp
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:43:30 -0400
+Date: Thu, 14 Jun 2018 14:43:11 +0800 (GMT+08:00)
+From: "Su Hang" <suhang16@mails.ucas.ac.cn>
+In-Reply-To: <20180611135507.GF17756@stefanha-x1.localdomain>
+References: <20180609163252.27506-1-stefanha@redhat.com>
+	<6d70ea23.116b3.163e77016fb.Coremail.suhang16@mails.ucas.ac.cn>
+	<20180611135507.GF17756@stefanha-x1.localdomain>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCHv3 2/7] pnv: Fix some error handling cpu
- realize()
+Message-ID: <4fd442ad.5c78.163fd08a244.Coremail.suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [PATCH] loader: implement START_SEG_ADDR_RECORD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,41 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: stefan hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, jusual@mail.ru, jim@groklearning.com, joel@jms.id.au, qemu.ml@steffen-goertz.de
 
-On Thu, 14 Jun 2018 14:41:24 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> In pnv_core_realize() we call two functions with an Error * parameter in
-> succession, which will go badly if they both cause errors.  In fact, a
-> failure in either of them indicates a qemu internal error, so we can just
-> use &error_abort in both cases.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/ppc/pnv_core.c | 7 ++-----
->  1 file changed, 2 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index 13ad7d9e04..01f47c8037 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -172,12 +172,9 @@ static void pnv_core_realize(DeviceState *dev, Error **errp)
->          object_initialize(obj, size, typename);
->  
->          snprintf(name, sizeof(name), "thread[%d]", i);
-> -        object_property_add_child(OBJECT(pc), name, obj, &local_err);
-> +        object_property_add_child(OBJECT(pc), name, obj, &error_abort);
->          object_property_add_alias(obj, "core-pir", OBJECT(pc),
-> -                                  "pir", &local_err);
-> -        if (local_err) {
-> -            goto err;
-> -        }
-> +                                  "pir", &error_abort);
->          object_unref(obj);
->      }
->  
+ClNvcnJ5LCBKdWxpYSBhbmQgU3RlZmFuLiBNeSBzY2hvb2wgbWVudG9yIGFzc2lnbiBhbiBlbWVy
+Z2VuY3kgdGFzayB0byBtZSwgaGUgYXNrCm1lIHRvIGZpbmlzaCBpdCB3aXRoaW4gdHdvIHdlZWtz
+LiBJJ20gYWZyYWlkIEkgbWF5IG5vdCBhYmxlIHRvIGltcGxlbWVudCB0aGUKZnVuY3Rpb24gbWVu
+dGlvbmVkIGluIGxhc3QgY29tbWVudHMgaW4gdGhpcyB0d28gd2Vla3MuIElmIHRoZSBuZXcgZnVu
+Y3Rpb24gaXMKaW4gdXJnZW50IG5lZWQsIHBsZWFzZSBmZWVsIGZyZWUgdG8gdGFrZSBvdmVyIHRo
+ZSBwYXRjaGVzOyBpZiBub3QsIEkgd2lsbAppbXBsZW1lbnQgaXQgYWZ0ZXIgbXkgdGFzayBnZXQg
+ZmluaXNoZWQuCgpTaW5jZXJlbHkgc29ycnkgZm9yIHRoZSB0cm91YmxlIEkgbWlnaHQgbWFkZS4K
+ClNVIEhhbmcKCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlcy0tLS0tCj4gRnJvbTogIlN0ZWZhbiBI
+YWpub2N6aSIgPHN0ZWZhbmhhQHJlZGhhdC5jb20+Cj4gU2VudCBUaW1lOiAyMDE4LTA2LTExIDIx
+OjU1OjA3IChNb25kYXkpCj4gVG86ICJTdSBIYW5nIiA8c3VoYW5nMTZAbWFpbHMudWNhcy5hYy5j
+bj4KPiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnLCBqdXN1YWxAbWFpbC5ydSwgamltQGdyb2ts
+ZWFybmluZy5jb20sIGpvZWxAam1zLmlkLmF1LCBxZW11Lm1sQHN0ZWZmZW4tZ29lcnR6LmRlCj4g
+U3ViamVjdDogUmU6IFtQQVRDSF0gbG9hZGVyOiBpbXBsZW1lbnQgU1RBUlRfU0VHX0FERFJfUkVD
+T1JECj4gCj4gT24gU3VuLCBKdW4gMTAsIDIwMTggYXQgMTA6MDQ6MzJBTSArMDgwMCwgU3UgSGFu
+ZyB3cm90ZToKPiA+IFN1cmUsIFRoYW5rcyBmb3IgcmVtaW5kIG1lIG9mIHRoaXMuCj4gPiBPbmUg
+dGhpbmcgSSBtdXN0IHBvaW50IG91dCwgaW4gY3VycmVudCBjb2RlIGxvZ2ljLCBpZiAiU1RBUlRf
+U0VHX0FERFJfUkVDT1JEIgo+ID4gb2NjdXJlZCBtdWx0aXBsZSB0aW1lcywgb25seSB0aGUgbGFz
+dCBvbmUgd29ya3MuIEkgZG9uJ3Qga25vdyB3aGV0aGVyIEdOVQo+ID4gYmludXRpbHMgd291bGQg
+ZW1pdCAnVGhlIFJlY29yZCcgbWFueSB0aW1lcy4KPiAKPiBJdCBkb2VzIG5vdC4gIFRoZSBiZWhh
+dmlvciB5b3UgZGVzY3JpYmVkIHNlZW1zIGZpbmUuCj4gCj4gRG8geW91IGhhdmUgdGltZSB0byBz
+ZW5kIGEgbmV3IHJldmlzaW9uIG9mIHlvdXIgcGF0Y2ggc2VyaWVzIGFkZHJlc3NpbmcKPiB0aGUg
+Y29tbWVudHMgZnJvbSBsYXN0IHRpbWU/Cj4gCj4gVGhhbmtzLAo+IFN0ZWZhbgo=
