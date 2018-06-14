@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTRl1-0006Q0-Fz
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:53:44 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTRm6-0007An-H4
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:54:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTRl0-0002YR-Ct
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:53:43 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:43653)
+	(envelope-from <peter.maydell@linaro.org>) id 1fTRm5-0002kT-Ox
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:54:50 -0400
+Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:41083)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fTRl0-0002Y6-5W
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:53:42 -0400
-Received: by mail-wr0-x241.google.com with SMTP id d2-v6so6298631wrm.10
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 05:53:41 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 14 Jun 2018 13:53:37 +0100
-Message-Id: <20180614125337.24950-4-alex.bennee@linaro.org>
-In-Reply-To: <20180614125337.24950-1-alex.bennee@linaro.org>
-References: <20180614125337.24950-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fTRm5-0002kJ-B3
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:54:49 -0400
+Received: by mail-ot0-x235.google.com with SMTP id d19-v6so6925535oti.8
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 05:54:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 3/3] travis: reduce time taken for
- trace-backend testing
+In-Reply-To: <20180614124330.12224-1-armbru@redhat.com>
+References: <20180614124330.12224-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Jun 2018 13:49:11 +0100
+Message-ID: <CAFEAcA9CR3AV3WUronfitr-_AAjw5O32WMQ6_7x4EpE=YQwqXA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 0/3] Miscellaneous patches for 2018-06-13
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-These builds are reaching regular timeouts and probably don't need to
-be so widely exercised. ftrace and ust in particular are used in
-conjunction with whole system profiling which makes most sense with
-KVM setups, hence the native softmmu target.
+On 14 June 2018 at 13:43, Markus Armbruster <armbru@redhat.com> wrote:
+> The following changes since commit 2ab09bf2f9f55b9fb8d2de6eb2ba2a8570e268e2:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20180612-pull-request' into staging (2018-06-12 15:34:34 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2018-06-13-v2
+>
+> for you to fetch changes up to 3190af2dea9aceee72a0dfa087b8ea67ecff5519:
+>
+>   Purge uses of banned g_assert_FOO() (2018-06-14 14:33:28 +0200)
+>
+> ----------------------------------------------------------------
+> Miscellaneous patches for 2018-06-13
+>
 
-We also expand simple to cover the multiple log backends while
-restricting its scope to user-mode testing only.
+Too late, I already applied the first version...
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- .travis.yml | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/.travis.yml b/.travis.yml
-index c200dde534..fabfe9ec34 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -86,13 +86,14 @@ matrix:
-     - env: CONFIG="--enable-debug --enable-tcg-interpreter"
-            TEST_CMD=""
-       compiler: gcc
--    - env: CONFIG="--enable-trace-backends=simple"
-+    # We don't need to exercise every backend with every front-end
-+    - env: CONFIG="--enable-trace-backends=log,simple,syslog --disable-system"
-            TEST_CMD=""
-       compiler: gcc
--    - env: CONFIG="--enable-trace-backends=ftrace"
-+    - env: CONFIG="--enable-trace-backends=ftrace --target-list=x86_64-softmmu"
-            TEST_CMD=""
-       compiler: gcc
--    - env: CONFIG="--enable-trace-backends=ust"
-+    - env: CONFIG="--enable-trace-backends=ust --target-list=x86_64-softmmu"
-            TEST_CMD=""
-       compiler: gcc
-     - env: CONFIG="--disable-tcg"
--- 
-2.17.1
+thanks
+-- PMM
