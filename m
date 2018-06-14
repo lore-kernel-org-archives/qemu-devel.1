@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTS7x-0006Lg-6z
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:17:26 -0400
+	(envelope-from <armbru@redhat.com>) id 1fTS8M-0006cP-JZ
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:17:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTS7w-0002VJ-AY
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:17:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1fTS8L-0002bg-Qa
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:17:50 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <20180614095544.31549-1-kwolf@redhat.com>
-	<20180614095544.31549-2-kwolf@redhat.com>
-Date: Thu, 14 Jun 2018 15:17:16 +0200
-In-Reply-To: <20180614095544.31549-2-kwolf@redhat.com> (Kevin Wolf's message
-	of "Thu, 14 Jun 2018 11:55:41 +0200")
-Message-ID: <87r2l9ik2r.fsf@dusky.pond.sub.org>
+	<20180614095544.31549-5-kwolf@redhat.com>
+Date: Thu, 14 Jun 2018 15:17:42 +0200
+In-Reply-To: <20180614095544.31549-5-kwolf@redhat.com> (Kevin Wolf's message
+	of "Thu, 14 Jun 2018 11:55:44 +0200")
+Message-ID: <87muvxik21.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] block: Remove deprecated -drive
- geometry options
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] block: Remove dead deprecation
+ warning code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,13 +29,8 @@ Cc: qemu-block@nongnu.org, jcody@redhat.com, qemu-devel@nongnu.org, armbru@redha
 
 Kevin Wolf <kwolf@redhat.com> writes:
 
-> The -drive options cyls, heads, secs and trans were deprecated in
-> QEMU 2.10. It's time to remove them.
->
-> hd-geo-test tested both the old version with geometry options in -drive
-> and the new one with -device. Therefore the code using -drive doesn't
-> have to be replaced there, we just need to remove the -drive test cases.
-> This in turn allows some simplification of the code.
+> We removed all options from the 'deprecated' array, so the code is dead
+> and can be removed as well.
 >
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
