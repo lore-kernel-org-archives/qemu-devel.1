@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTZ2m-0003eA-QL
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:40:33 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fTZ3a-0004Ht-Bl
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTZ2l-00073d-Sh
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:40:32 -0400
-References: <20180604152941.20374-1-peter.maydell@linaro.org>
-	<20180604152941.20374-8-peter.maydell@linaro.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <a7777026-e81c-45c7-3920-66f4b7146b41@redhat.com>
-Date: Thu, 14 Jun 2018 22:40:20 +0200
+	(envelope-from <Babu.Moger@amd.com>) id 1fTZ3V-0007l8-KN
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:41:22 -0400
+Received: from mail-sn1nam01on0068.outbound.protection.outlook.com
+	([104.47.32.68]:18784
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fTZ3V-0007jn-3j
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 16:41:17 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Thu, 14 Jun 2018 20:41:14 +0000
+Message-ID: <DM5PR12MB24711B87385BD36335447CC7957D0@DM5PR12MB2471.namprd12.prod.outlook.com>
+References: <1528939107-17193-1-git-send-email-babu.moger@amd.com>
+	<1528939107-17193-3-git-send-email-babu.moger@amd.com>
+	<20180614184019.GV7451@localhost.localdomain>
+In-Reply-To: <20180614184019.GV7451@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20180604152941.20374-8-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 07/13] hw/misc/tz-mpc.c: Implement
- correct blocked-access behaviour
+Subject: Re: [Qemu-devel] [PATCH v14 2/6] i386: Enable TOPOEXT feature on
+ AMD EPYC CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,112 +32,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>
 
-Hi Peter,
-On 06/04/2018 05:29 PM, Peter Maydell wrote:
-> The MPC is guest-configurable for whether blocked accesses:
->  * should be RAZ/WI or cause a bus error
->  * should generate an interrupt or not
-> 
-> Implement this behaviour in the blocked-access handlers.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/misc/tz-mpc.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 48 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
-> index 9db55e23daf..704bb3fb44d 100644
-> --- a/hw/misc/tz-mpc.c
-> +++ b/hw/misc/tz-mpc.c
-> @@ -43,6 +43,9 @@ REG32(INT_EN, 0x28)
->      FIELD(INT_EN, IRQ, 0, 1)
->  REG32(INT_INFO1, 0x2c)
->  REG32(INT_INFO2, 0x30)
-> +    FIELD(INT_INFO2, HMASTER, 0, 16)
-> +    FIELD(INT_INFO2, HNONSEC, 16, 1)
-> +    FIELD(INT_INFO2, CFG_NS, 17, 1)
->  REG32(INT_SET, 0x34)
->      FIELD(INT_SET, IRQ, 0, 1)
->  REG32(PIDR4, 0xfd0)
-> @@ -266,6 +269,45 @@ static const MemoryRegionOps tz_mpc_reg_ops = {
->      .impl.max_access_size = 4,
->  };
->  
-> +static inline bool tz_mpc_cfg_ns(TZMPC *s, hwaddr addr)
-> +{
-> +    /* Return the cfg_ns bit from the LUT for the specified address */
-> +    hwaddr blknum = addr / s->blocksize;
-> +    hwaddr blkword = blknum / 32;
-> +    uint32_t blkbit = 1U << (blknum % 32);
-> +
-> +    /* This would imply the address was larger than the size we
-> +     * defined this memory region to be, so it can't happen.
-> +     */
-> +    assert(blkword < s->blk_max);
-> +    return s->blk_lut[blkword] & blkbit;
-> +}
-> +
-> +static MemTxResult tz_mpc_handle_block(TZMPC *s, hwaddr addr, MemTxAttrs attrs)
-> +{
-> +    /* Handle a blocked transaction: raise IRQ, capture info, etc */
-> +    if (!s->int_stat) {
-> +        /* First blocked transfer: capture information into INT_INFO1 and
-> +         * INT_INFO2. Subsequent transfers are still blocked but don't
-> +         * capture information until the guest clears the interrupt.
-> +         */
-> +
-> +        s->int_info1 = addr;
-> +        s->int_info2 = 0;
-> +        s->int_info2 = FIELD_DP32(s->int_info2, INT_INFO2, HMASTER,
-> +                                  attrs.requester_id & 0xffff);
-> +        s->int_info2 = FIELD_DP32(s->int_info2, INT_INFO2, HNONSEC,
-> +                                  ~attrs.secure);
-> +        s->int_info2 = FIELD_DP32(s->int_info2, INT_INFO2, CFG_NS,
-> +                                  tz_mpc_cfg_ns(s, addr));
-> +        s->int_stat |= R_INT_STAT_IRQ_MASK;
-> +        tz_mpc_irq_update(s);
-> +    }
-> +
-> +    /* Generate bus error if desired; otherwise RAZ/WI */
-> +    return (s->ctrl & R_CTRL_SEC_RESP_MASK) ? MEMTX_ERROR : MEMTX_OK;
-> +}
-> +
->  /* Accesses only reach these read and write functions if the MPC is
->   * blocking them; non-blocked accesses go directly to the downstream
->   * memory region without passing through this code.
-> @@ -274,19 +316,23 @@ static MemTxResult tz_mpc_mem_blocked_read(void *opaque, hwaddr addr,
->                                             uint64_t *pdata,
->                                             unsigned size, MemTxAttrs attrs)
->  {
-> +    TZMPC *s = TZ_MPC(opaque);
-> +
->      trace_tz_mpc_mem_blocked_read(addr, size, attrs.secure);
->  
->      *pdata = 0;
-> -    return MEMTX_OK;
-> +    return tz_mpc_handle_block(s, addr, attrs);
->  }
->  
->  static MemTxResult tz_mpc_mem_blocked_write(void *opaque, hwaddr addr,
->                                              uint64_t value,
->                                              unsigned size, MemTxAttrs attrs)
->  {
-> +    TZMPC *s = TZ_MPC(opaque);
-> +
->      trace_tz_mpc_mem_blocked_write(addr, value, size, attrs.secure);
->  
-> -    return MEMTX_OK;
-> +    return tz_mpc_handle_block(s, addr, attrs);
->  }
->  
->  static const MemoryRegionOps tz_mpc_mem_blocked_ops = {
-> 
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Thanks
+> -----Original Message-----
+> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> Sent: Thursday, June 14, 2018 1:40 PM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
+> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com
+> Subject: Re: [PATCH v14 2/6] i386: Enable TOPOEXT feature on AMD EPYC
+> CPU
+>=20
+> On Wed, Jun 13, 2018 at 09:18:23PM -0400, Babu Moger wrote:
+> > Enable TOPOEXT feature on EPYC CPU. This is required to support
+> > hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
+> >
+> > Signed-off-by: Babu Moger <babu.moger@amd.com>
+> > ---
+> >  target/i386/cpu.c | 11 +++++++++--
+> >  1 file changed, 9 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index 86fb1a4..2eb26da 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -2554,7 +2554,8 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+> >          .features[FEAT_8000_0001_ECX] =3D
+> >              CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
+> >              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
+> CPUID_EXT3_ABM |
+> > -            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
+> > +            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM
+> |
+> > +            CPUID_EXT3_TOPOEXT,
+> >          .features[FEAT_7_0_EBX] =3D
+> >              CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
+> CPUID_7_0_EBX_AVX2 |
+> >              CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
+> CPUID_7_0_EBX_RDSEED |
+> > @@ -2599,7 +2600,8 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+> >          .features[FEAT_8000_0001_ECX] =3D
+> >              CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
+> >              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
+> CPUID_EXT3_ABM |
+> > -            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
+> > +            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM
+> |
+> > +            CPUID_EXT3_TOPOEXT,
+> >          .features[FEAT_8000_0008_EBX] =3D
+> >              CPUID_8000_0008_EBX_IBPB,
+> >          .features[FEAT_7_0_EBX] =3D
+>=20
+> This part is OK, but it requires patch 3/6 to be included in the
+> same patch.
 
-Eric
+Ok. Sure.
+>=20
+> > @@ -4667,6 +4669,11 @@ static void x86_cpu_expand_features(X86CPU
+> *cpu, Error **errp)
+> >              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x800000=
+0A);
+> >          }
+> >
+> > +        /* TOPOEXT feature requires 0x8000001E */
+> > +        if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) {
+> > +            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x800000=
+1E);
+> > +        }
+>=20
+> This part needs to be done more carefully to avoid breaking
+> compatibility.  "-machine pc-q35-2.12 -cpu Opteron_G5,+topoext"
+> currently results in xlevel=3D0x8000001A, and this must not change.
+Ok.
+>=20
+> I suggest just changing setting .xlevel=3D0x8000001E on EPYC at
+> builtin_x86_defs[1], and worry about automatically increasing
+> xlevel later.
+Ok.
+>=20
+> (If you change EPYC.xlevel in builtin_x86_defs, don't forget to
+> set EPYC.xlevel=3D0x8000000A on PC_COMPAT_2_12)
+Sure.
+>=20
+> --
+> Eduardo
