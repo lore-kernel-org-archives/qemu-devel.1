@@ -1,16 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fTGBF-0006O4-I6
+	(envelope-from <balaton@eik.bme.hu>) id 1fTGBF-0006O5-J6
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:32:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fTGBC-00037R-BU
+	(envelope-from <balaton@eik.bme.hu>) id 1fTGBC-00037Z-Bx
 	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:32:01 -0400
-Message-Id: <9862fa0cf70d29b686e80039696596f2c23b148c.1528935420.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1528935420.git.balaton@eik.bme.hu>
-References: <cover.1528935420.git.balaton@eik.bme.hu>
+Message-Id: <cover.1528935420.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Thu, 14 Jun 2018 02:17:00 +0200
-Subject: [Qemu-devel] [PATCH v3 5/9] sam460ex: Add RTC device
+Date: Thu, 14 Jun 2018 02:17:00 +0200
+Subject: [Qemu-devel] [PATCH v3 0/9] Misc sam460ex improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,26 +19,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Sebastian Bauer <mail@sebastianbauer.info>
 
-The Sam460ex has an M41T80 serial RTC chip on I2C bus 0 at address 0x68.
+This is v3 of sam460ex improvements addressing review comments and
+adding two additional patches that allow AmigaOS to progress further
+(does not boot fully yet).
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- hw/ppc/sam460ex.c | 1 +
- 1 file changed, 1 insertion(+)
+BALATON Zoltan (8):
+  ppc4xx_i2c: Remove unimplemented sdata and intr registers
+  ppc4xx_i2c: Implement directcntl register
+  ppc4xx_i2c: Rewrite to model hardware more closely
+  hw/timer: Add basic M41T80 emulation
+  sam460ex: Add RTC device
+  sm501: Do not clear read only bits when writing registers
+  sm501: Implement i2c part for reading monitor EDID
+  target/ppc: Add missing opcode for icbt on PPC440
 
-diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index bdc53d2..dc730cc 100644
---- a/hw/ppc/sam460ex.c
-+++ b/hw/ppc/sam460ex.c
-@@ -457,6 +457,7 @@ static void sam460ex_init(MachineState *machine)
-     object_property_set_bool(OBJECT(dev), true, "realized", NULL);
-     smbus_eeprom_init(i2c[0]->bus, 8, smbus_eeprom_buf, smbus_eeprom_size);
-     g_free(smbus_eeprom_buf);
-+    i2c_create_slave(i2c[0]->bus, "m41t80", 0x68);
- 
-     dev = sysbus_create_simple(TYPE_PPC4xx_I2C, 0x4ef600800, uic[0][3]);
-     i2c[1] = PPC4xx_I2C(dev);
+Sebastian Bauer (1):
+  sm501: Perform a full update after palette change
+
+ MAINTAINERS                        |   1 +
+ default-configs/ppc-softmmu.mak    |   3 +
+ default-configs/ppcemb-softmmu.mak |   2 +
+ default-configs/sh4-softmmu.mak    |   1 +
+ default-configs/sh4eb-softmmu.mak  |   1 +
+ hw/display/sm501.c                 | 159 +++++++++++++++++++++--
+ hw/i2c/ppc4xx_i2c.c                | 251 ++++++++++++++++++-------------------
+ hw/ppc/sam460ex.c                  |   1 +
+ hw/timer/Makefile.objs             |   1 +
+ hw/timer/m41t80.c                  | 117 +++++++++++++++++
+ include/hw/i2c/ppc4xx_i2c.h        |  11 +-
+ target/ppc/translate.c             |   2 +
+ 12 files changed, 406 insertions(+), 144 deletions(-)
+ create mode 100644 hw/timer/m41t80.c
+
 -- 
 2.7.6
