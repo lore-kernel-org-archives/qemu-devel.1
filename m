@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52824)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTScY-0002nL-UZ
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:49:04 -0400
+	(envelope-from <drjones@redhat.com>) id 1fTShA-0004LZ-G1
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:53:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTScX-0004fQ-UC
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:49:03 -0400
+	(envelope-from <drjones@redhat.com>) id 1fTSh9-0006Wa-62
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:53:48 -0400
+Date: Thu, 14 Jun 2018 15:53:33 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180614135333.vukhyuzuei37uihg@kamzik.brq.redhat.com>
 References: <1528879723-24675-1-git-send-email-eric.auger@redhat.com>
-	<1528879723-24675-5-git-send-email-eric.auger@redhat.com>
-	<20180614133904.bic4wwjeed4ybu2u@kamzik.brq.redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <29a2642b-87e4-b4c3-b7b9-632a3c0adc87@redhat.com>
-Date: Thu, 14 Jun 2018 15:48:52 +0200
+	<1528879723-24675-9-git-send-email-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180614133904.bic4wwjeed4ybu2u@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/9] hw/intc/arm_gicv3_kvm: Get prepared to
- handle multiple redist regions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1528879723-24675-9-git-send-email-eric.auger@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 8/9] hw/arm/virt: Add a new 256MB ECAM
+ region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,108 +24,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
 Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, wei@redhat.com, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, christoffer.dall@arm.com, zhaoshenglong@huawei.com, lersek@redhat.com
 
-Hi Drew,
-
-On 06/14/2018 03:39 PM, Andrew Jones wrote:
-> On Wed, Jun 13, 2018 at 10:48:38AM +0200, Eric Auger wrote:
->> Let's check if KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION is supported.
->> If not, we check the number of redist region is equal to 1 and use the
->> legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute. Otherwise we use
->> the new attribute and allow to register multiple regions to the
->> KVM device.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->>
->> ---
->>
->> v2 -> v3:
->> - In kvm_arm_gicv3_realize rename val into add_ormask local variable and
->>   add a comment
->> - start the redist region registration  from s->nb_redist_regions - 1
->>   downwards
->> ---
->>  hw/intc/arm_gicv3_kvm.c | 33 ++++++++++++++++++++++++++++++---
->>  1 file changed, 30 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
->> index ed7b719..52e6e70 100644
->> --- a/hw/intc/arm_gicv3_kvm.c
->> +++ b/hw/intc/arm_gicv3_kvm.c
->> @@ -753,6 +753,7 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->>  {
->>      GICv3State *s = KVM_ARM_GICV3(dev);
->>      KVMARMGICv3Class *kgc = KVM_ARM_GICV3_GET_CLASS(s);
->> +    bool multiple_redist_region_allowed;
->>      Error *local_err = NULL;
->>      int i;
->>  
->> @@ -789,6 +790,18 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->>          return;
->>      }
->>  
->> +    multiple_redist_region_allowed =
->> +        kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +                              KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION);
->> +
->> +    if (!multiple_redist_region_allowed && s->nb_redist_regions > 1) {
->> +        error_setg(errp, "Multiple VGICv3 redistributor regions are not "
->> +                   "supported by this host kernel");
->> +        error_append_hint(errp, "A maximum of %d VCPUs can be used",
->> +                          s->redist_region_count[0]);
->> +        return;
->> +    }
->> +
->>      kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
->>                        0, &s->num_irq, true, &error_abort);
->>  
->> @@ -798,9 +811,23 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->>  
->>      kvm_arm_register_device(&s->iomem_dist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
->>                              KVM_VGIC_V3_ADDR_TYPE_DIST, s->dev_fd, 0);
->> -    kvm_arm_register_device(&s->iomem_redist[0], -1,
->> -                            KVM_DEV_ARM_VGIC_GRP_ADDR,
->> -                            KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
->> +
->> +    if (!multiple_redist_region_allowed) {
->> +        kvm_arm_register_device(&s->iomem_redist[0], -1,
->> +                                KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +                                KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
->> +    } else {
->> +        for (i = s->nb_redist_regions - 1; i >= 0; i--) {
+On Wed, Jun 13, 2018 at 10:48:42AM +0200, Eric Auger wrote:
+> This patch defines a new ECAM region located after the 256GB limit.
 > 
-> So we register in reverse-index order? Looking at your update to Linux doc
-> Documentation/virtual/kvm/devices/arm-vgic-v3.txt, shouldn't they be
-> registered in index-order? The doc says "Redistributor regions must be
-> registered in the incremental index order, starting from index 0."
-kvm_arm_register_device adds the device in a QSLIST using
-QSLIST_INSERT_HEAD. Then the list is read by kvm_arm_machine_init_done
-from the HEAD. So we need to register in reversed order.
-
-Thanks
-
-Eric
+> The virt machine state is augmented with a new highmem_ecam field
+> which guards the usage of this new ECAM region instead of the legacy
+> 16MB one. With the highmem ECAM region, up to 256 PCIe buses can be
+> used.
 > 
-> Thanks,
-> drew
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 > 
->> +            /* Address mask made of the rdist region index and count */
->> +            uint64_t addr_ormask =
->> +                        i | ((uint64_t)s->redist_region_count[i] << 52);
->> +
->> +            kvm_arm_register_device(&s->iomem_redist[i], -1,
->> +                                    KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +                                    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION,
->> +                                    s->dev_fd, addr_ormask);
->> +        }
->> +    }
->>  
->>      if (kvm_has_gsi_routing()) {
->>          /* set up irq routing */
->> -- 
->> 2.5.5
->>
->>
+> ---
+> 
+> RFC -> PATCH:
+> - remove the newline at the end of acpi_dsdt_add_pci
+> - use vms->highmem_ecam to select the memmap id
+> ---
+>  hw/arm/virt-acpi-build.c | 21 +++++++++++++--------
+>  hw/arm/virt.c            | 12 ++++++++----
+>  include/hw/arm/virt.h    |  2 ++
+>  3 files changed, 23 insertions(+), 12 deletions(-)
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index eefd1d4..4409a51 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -150,16 +150,17 @@ static void acpi_dsdt_add_virtio(Aml *scope,
+>  }
+>  
+>  static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+> -                              uint32_t irq, bool use_highmem)
+> +                              uint32_t irq, bool use_highmem, bool highmem_ecam)
+>  {
+> +    int ecam_id = highmem_ecam ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM;
+
+This id selection gets used a lot. It might be nice to introduce a helper.
+
+>      Aml *method, *crs, *ifctx, *UUID, *ifctx1, *elsectx, *buf;
+>      int i, bus_no;
+>      hwaddr base_mmio = memmap[VIRT_PCIE_MMIO].base;
+>      hwaddr size_mmio = memmap[VIRT_PCIE_MMIO].size;
+>      hwaddr base_pio = memmap[VIRT_PCIE_PIO].base;
+>      hwaddr size_pio = memmap[VIRT_PCIE_PIO].size;
+> -    hwaddr base_ecam = memmap[VIRT_PCIE_ECAM].base;
+> -    hwaddr size_ecam = memmap[VIRT_PCIE_ECAM].size;
+> +    hwaddr base_ecam = memmap[ecam_id].base;
+> +    hwaddr size_ecam = memmap[ecam_id].size;
+>      int nr_pcie_buses = size_ecam / PCIE_MMCFG_SIZE_MIN;
+>  
+>      Aml *dev = aml_device("%s", "PCI0");
+> @@ -173,7 +174,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>      aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+>  
+>      /* Declare the PCI Routing Table. */
+> -    Aml *rt_pkg = aml_package(nr_pcie_buses * PCI_NUM_PINS);
+> +    Aml *rt_pkg = aml_varpackage(nr_pcie_buses * PCI_NUM_PINS);
+
+I guess this change is because we want to support 256 buses and
+aml_package() only supports up to 255. That may be worth a comment.
+
+>      for (bus_no = 0; bus_no < nr_pcie_buses; bus_no++) {
+>          for (i = 0; i < PCI_NUM_PINS; i++) {
+>              int gsi = (i + bus_no) % PCI_NUM_PINS;
+> @@ -316,7 +317,10 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>      Aml *dev_res0 = aml_device("%s", "RES0");
+>      aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
+>      crs = aml_resource_template();
+> -    aml_append(crs, aml_memory32_fixed(base_ecam, size_ecam, AML_READ_WRITE));
+> +    aml_append(crs,
+> +        aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
+> +                         AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000, base_ecam,
+> +                         base_ecam + size_ecam - 1, 0x0000, size_ecam));
+>      aml_append(dev_res0, aml_name_decl("_CRS", crs));
+>      aml_append(dev, dev_res0);
+>      aml_append(scope, dev);
+> @@ -573,16 +577,17 @@ build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>  {
+>      AcpiTableMcfg *mcfg;
+>      const MemMapEntry *memmap = vms->memmap;
+> +    int ecam_id = vms->highmem_ecam ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM;
+>      int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
+>      int mcfg_start = table_data->len;
+>  
+>      mcfg = acpi_data_push(table_data, len);
+> -    mcfg->allocation[0].address = cpu_to_le64(memmap[VIRT_PCIE_ECAM].base);
+> +    mcfg->allocation[0].address = cpu_to_le64(memmap[ecam_id].base);
+>  
+>      /* Only a single allocation so no need to play with segments */
+>      mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+>      mcfg->allocation[0].start_bus_number = 0;
+> -    mcfg->allocation[0].end_bus_number = (memmap[VIRT_PCIE_ECAM].size
+> +    mcfg->allocation[0].end_bus_number = (memmap[ecam_id].size
+>                                            / PCIE_MMCFG_SIZE_MIN) - 1;
+>  
+>      build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
+> @@ -766,7 +771,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>      acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
+>                      (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
+>      acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] + ARM_SPI_BASE),
+> -                      vms->highmem);
+> +                      vms->highmem, vms->highmem_ecam);
+>      acpi_dsdt_add_gpio(scope, &memmap[VIRT_GPIO],
+>                         (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
+>      acpi_dsdt_add_power_button(scope);
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 2a1c0fb..22b9bd1 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -150,6 +150,7 @@ static const MemMapEntry a15memmap[] = {
+>      [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
+>      /* Additional 64 MB redist region (can contain up to 512 redistributors) */
+>      [VIRT_GIC_REDIST2] =        { 0x4000000000ULL, 0x4000000ULL },
+> +    [VIRT_PCIE_ECAM_HIGH] =     { 0x4010000000ULL, 0x10000000 },
+>      /* Second PCIe window, 512GB wide at the 512GB boundary */
+>      [VIRT_PCIE_MMIO_HIGH] =   { 0x8000000000ULL, 0x8000000000ULL },
+>  };
+> @@ -1043,10 +1044,9 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
+>      hwaddr size_mmio_high = vms->memmap[VIRT_PCIE_MMIO_HIGH].size;
+>      hwaddr base_pio = vms->memmap[VIRT_PCIE_PIO].base;
+>      hwaddr size_pio = vms->memmap[VIRT_PCIE_PIO].size;
+> -    hwaddr base_ecam = vms->memmap[VIRT_PCIE_ECAM].base;
+> -    hwaddr size_ecam = vms->memmap[VIRT_PCIE_ECAM].size;
+> +    hwaddr base_ecam, size_ecam;
+>      hwaddr base = base_mmio;
+> -    int nr_pcie_buses = size_ecam / PCIE_MMCFG_SIZE_MIN;
+> +    int nr_pcie_buses;
+>      int irq = vms->irqmap[VIRT_PCIE];
+>      MemoryRegion *mmio_alias;
+>      MemoryRegion *mmio_reg;
+> @@ -1054,12 +1054,16 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
+>      MemoryRegion *ecam_reg;
+>      DeviceState *dev;
+>      char *nodename;
+> -    int i;
+> +    int i, ecam_memmap_id;
+>      PCIHostState *pci;
+>  
+>      dev = qdev_create(NULL, TYPE_GPEX_HOST);
+>      qdev_init_nofail(dev);
+>  
+> +    ecam_memmap_id = vms->highmem_ecam ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM;
+> +    base_ecam = vms->memmap[ecam_memmap_id].base;
+> +    size_ecam = vms->memmap[ecam_memmap_id].size;
+> +    nr_pcie_buses = size_ecam / PCIE_MMCFG_SIZE_MIN;
+>      /* Map only the first size_ecam bytes of ECAM space */
+>      ecam_alias = g_new0(MemoryRegion, 1);
+>      ecam_reg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 308156f..2c18a59 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -72,6 +72,7 @@ enum {
+>      VIRT_PCIE_MMIO,
+>      VIRT_PCIE_PIO,
+>      VIRT_PCIE_ECAM,
+> +    VIRT_PCIE_ECAM_HIGH,
+>      VIRT_PLATFORM_BUS,
+>      VIRT_PCIE_MMIO_HIGH,
+>      VIRT_GPIO,
+> @@ -106,6 +107,7 @@ typedef struct {
+>      FWCfgState *fw_cfg;
+>      bool secure;
+>      bool highmem;
+> +    bool highmem_ecam;
+>      bool its;
+>      bool virt;
+>      int32_t gic_version;
+> -- 
+> 2.5.5
+> 
+>
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
