@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fTWd7-0001KE-RM
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:05:58 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fTWqK-0005iV-Cv
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:19:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fTWd3-0001g4-Pr
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:05:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60642)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fTWqH-0008EH-8B
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:19:32 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:38818)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fTWd3-0001eG-Iz
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:05:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fTWd2-0006jX-Hf
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 18:05:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 777802E8024
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 18:05:48 +0000 (UTC)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1fTWqH-0008Dx-0A
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:19:29 -0400
+Received: by mail-wr0-x241.google.com with SMTP id e18-v6so7429653wrs.5
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 11:19:28 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20180614180119.1704-1-f4bug@amsat.org>
+	<20180614180119.1704-2-f4bug@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <bafda81a-a33b-6137-b30a-1cf98ab8393b@redhat.com>
+Date: Thu, 14 Jun 2018 20:19:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 14 Jun 2018 17:48:17 -0000
-From: Thomas Huth <1462944@bugs.launchpad.net>
-Reply-To: Bug 1462944 <1462944@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150608092329.15949.23710.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152899849748.7095.13259885863343880972.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1462944] Re: vpc file causes qemu-img to consume
- lots of time and memory
+In-Reply-To: <20180614180119.1704-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 1/2] hw/isa/smc37c669-superio: Basic
+ 'Config Registers' implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +33,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Emilio G . Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Cc: qemu-devel@nongnu.org
 
-Is there still something left to do here, or could we close this ticket
-nowadays?
+On 14/06/2018 20:01, Philippe Mathieu-Daudé wrote:
+> +
+> +static Property smc37c669_properties[] = {
+> +    DEFINE_PROP_UINT32("config", SMC37C669State, config, 0x78889c28),
+> +    DEFINE_PROP_BIT("parallel", SMC37C669State, config, 8 + 2, true),
+> +    DEFINE_PROP_END_OF_LIST()
+> +};
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+I would initialize the config word in instance_init rather
+than using a property.  Having overlapping properties for the same field
+sounds like a recipe for undesired behavior.
 
--- =
+But why isn't the parallel port at 0x378?  That's the expected place on
+PC (the second parallel port is at 0x278 and the third is at 0x3bc), and
+I would expect other SuperIO chips to have it there too.  That would be
+a one line fix.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1462944
+Yet another possibility is to disable EPP on the parallel port, so that
+it occupies only the addresses from 0x3bc to 0x3be.
 
-Title:
-  vpc file causes qemu-img to consume lots of time and memory
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  The attached vpc file causes 'qemu-img info' to consume 3 or 4 seconds
-  of CPU time and 1.3 GB of heap, causing a minor denial of service.
-
-  $ /usr/bin/time ~/d/qemu/qemu-img info afl12.img
-  block-vpc: The header checksum of 'afl12.img' is incorrect.
-  qemu-img: Could not open 'afl12.img': block-vpc: free_data_block_offset p=
-oints after the end of file. The image has been truncated.
-  1.19user 3.15system 0:04.35elapsed 99%CPU (0avgtext+0avgdata 1324504maxre=
-sident)k
-  0inputs+0outputs (0major+327314minor)pagefaults 0swaps
-
-  The file was found using american-fuzzy-lop.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1462944/+subscriptions
+Paolo
