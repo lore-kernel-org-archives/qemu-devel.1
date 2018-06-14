@@ -1,32 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fTNxq-0007HP-Bm
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:50:43 -0400
+	(envelope-from <lersek@redhat.com>) id 1fTO3V-0008W7-7W
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:56:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fTNxn-0005zf-Jr
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:50:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51534 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fTNxn-0005yd-Ex
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:50:39 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 05D3C4023334
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 08:50:39 +0000 (UTC)
-Date: Thu, 14 Jun 2018 09:50:35 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180614085035.GB2616@work-vm>
-References: <20180613102642.23995-1-dgilbert@redhat.com>
-	<20180613102642.23995-3-dgilbert@redhat.com>
-	<20180614022130.GQ15344@xz-mi>
+	(envelope-from <lersek@redhat.com>) id 1fTO3U-00087U-Bn
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:56:33 -0400
+References: <1528879723-24675-1-git-send-email-eric.auger@redhat.com>
+	<1528879723-24675-10-git-send-email-eric.auger@redhat.com>
+	<8bf1bccc-b32a-9982-6123-b644c41a96d3@redhat.com>
+	<33a3fa10-bf1a-45cd-73bd-403cbd8d4792@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <fbd7ea65-8f3e-bda3-1bb6-09b3b67d2543@redhat.com>
+Date: Thu, 14 Jun 2018 10:56:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180614022130.GQ15344@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Wake rate limiting for
- urgent requests
+In-Reply-To: <33a3fa10-bf1a-45cd-73bd-403cbd8d4792@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 9/9] hw/arm/virt: Add virt-3.0 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,50 +26,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, jdenemar@redhat.com
+To: Auger Eric <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
+Cc: wei@redhat.com, drjones@redhat.com, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, christoffer.dall@arm.com, zhaoshenglong@huawei.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Wed, Jun 13, 2018 at 11:26:41AM +0100, Dr. David Alan Gilbert (git) wrote:
+Hi Eric,
+
+On 06/14/18 08:27, Auger Eric wrote:
+> Hi Laszlo,
 > 
-> [...]
+> On 06/13/2018 11:05 PM, Laszlo Ersek wrote:
+>> On 06/13/18 10:48, Eric Auger wrote:
+>>
+>>> PATCH: merge of ECAM and VCPU extension
+>>> - Laszlo reviewed the ECAM changes but I dropped his R-b
+>>>   due to the squash
+>>
+>> Was there any particular reason why the previous patch set (with only
+>> the ECAM enlargement) couldn't be merged first? To be honest I'm not
+>> super happy when my R-b is dropped for non-technical reasons; it seems
+>> like wasted work for both of us.
+>>
+>> Obviously if there's a technical dependency or some other reason why
+>> committing the ECAM enlargement in separation would be *wrong*, that's
+>> different. Even in that case, wouldn't it be possible to keep the
+>> initial virt-3.0 machtype addition as I reviewed it, and then add the
+>> rest in an incremental patch?
 > 
-> > @@ -2932,10 +2943,24 @@ static void *migration_thread(void *opaque)
-> >  
-> >          migration_update_counters(s, current_time);
-> >  
-> > +        urgent = false;
-> >          if (qemu_file_rate_limit(s->to_dst_file)) {
-> > -            /* usleep expects microseconds */
-> > -            g_usleep((s->iteration_start_time + BUFFER_DELAY -
-> > -                      current_time) * 1000);
-> > +            /* Wait for a delay to do rate limiting OR
-> > +             * something urgent to post the semaphore.
-> > +             */
-> > +            int ms = s->iteration_start_time + BUFFER_DELAY - current_time;
-> > +            trace_migration_thread_ratelimit_pre(ms);
-> > +            if (qemu_sem_timedwait(&s->rate_limit_sem, ms) == 0) {
-> > +                /* We were worken by one or more urgent things but
-> > +                 * the timedwait will have consumed one of them.
-> > +                 * The service routine for the urgent wake will dec
-> > +                 * the semaphore itself for each item it consumes,
-> > +                 * so add this one we just eat back.
-> > +                 */
-> > +                qemu_sem_post(&s->rate_limit_sem);
-> 
-> Is it possible that we just avoid eating that in the next patch?  Then
-> we only provide a helper to "trigger an urgent request" but we only
-> consume the point here?
+> Sorry about that. My fear was about migration. We would have had 2 virt
+> 3.0 machine models not supporting the same features. While bisecting
+> migration we could have had the source using the high mem ECAM and the
+> destination not supporting it. So I preferred to avoid this trouble by
+> merging the 2 features in one patch. However I may have kept your R-b
+> restricting its scope to the ECAM stuff.
 
-I think it's harder;
-This code is generic in migration.c where as the next patch is all
-specific in ram.c; so we'd have to push a flag all the way down.
-Also, the code later is very simple - every request it adds/removes
-it posts/waits the semaphore - it's nice to keep that simple.
+to my understanding, it is normal to *gradually* add new properties
+during the development cycle, to the new machine type of the upcoming
+QEMU release. To my understanding, it's not expected that migration work
+between development snapshots built from git. What matters is that two
+official releases, specifying the same machine type, enable the user to
+migrate a guest between them (in forward direction).
 
-Dave
+In every release, so many new features are introduced that it's
+impossible to introduce the new machine type with all the compat knobs
+added at once. Instead, the new machine type is introduced when the
+first feature that requires a compat knob is added to git. All other
+such features extend the compat knobs gradually, during the development
+cycle. Until the new official release is made (which contains all the
+compat knobs for all the new features), the new machine type simply
+doesn't exist, as far as the public is concerned, so it cannot partake
+in migration either.
 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+This is my understanding anyway.
+
+Thanks!
+Laszlo
