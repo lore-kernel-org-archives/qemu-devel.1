@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fTZjg-0002Ty-Lv
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 17:24:53 -0400
+	(envelope-from <groug@kaod.org>) id 1fTa8D-0007AF-O9
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 17:50:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fTZjd-0006Gu-Gi
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 17:24:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40248 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1fTa88-0001eG-LJ
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 17:50:13 -0400
+Received: from 3.mo3.mail-out.ovh.net ([46.105.44.175]:44200)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fTZjd-0006FI-9w
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 17:24:49 -0400
-References: <20180614180119.1704-1-f4bug@amsat.org>
-	<20180614180119.1704-2-f4bug@amsat.org>
-	<bafda81a-a33b-6137-b30a-1cf98ab8393b@redhat.com>
-	<eeeb48f8-b89e-5675-047b-fa838ae8dac5@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <831880a1-e584-690b-ec6b-1371926f5581@redhat.com>
-Date: Thu, 14 Jun 2018 23:24:40 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fTa88-0001cs-CX
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 17:50:08 -0400
+Received: from player734.ha.ovh.net (unknown [10.109.108.75])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 66A631BC9B4
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 23:50:06 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 14 Jun 2018 23:49:54 +0200
+Message-ID: <152901299450.252222.14219708016930421485.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <eeeb48f8-b89e-5675-047b-fa838ae8dac5@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] hw/isa/smc37c669-superio: Basic
- 'Config Registers' implementation
+Subject: [Qemu-devel] [PATCH 0/5] spapr_cpu_core: fixes and cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Emilio G . Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>
 
-On 14/06/2018 23:14, Richard Henderson wrote:
-> On 06/14/2018 08:19 AM, Paolo Bonzini wrote:
->> But why isn't the parallel port at 0x378?  That's the expected place on
->> PC (the second parallel port is at 0x278 and the third is at 0x3bc), and
->> I would expect other SuperIO chips to have it there too.  That would be
->> a one line fix.
-> 
-> Agreed.
+This series is a follow-up to David's "Better handling of machine specific
+per-cpu information" v3 patchset. It addresses issues mentioned at:
 
-FWIW the datasheet says that the base parallel port address is
-configurable using the config registers, and can be placed between 0x100
-(inclusive) and 0x400 (exclusive), in 4-bytes increments if EPP is
-disabled and in 8-byte increments if it is enabled.  Therefore, 0x378
-sounds like something that PALcode would probably use.
+https://lists.nongnu.org/archive/html/qemu-ppc/2018-06/msg00514.html
 
-Paolo
+This series fixes potential crashes and leaks in case of error during
+CPU hotplug. It hence assumes that the machine_data pointer is set a
+bit earlier as suggested at the above URL, for CPU hotplug to work.
+
+Patch 1 is just code cleanup.
+
+Patch 2 fixes a 2.12 regression.
+
+Patch 3 fixes a long standing issue. It could possibly be fixed in
+current master but this would require to rebase David's series on
+top of it. Not sure it's worth the pain.
+
+Patch 4 and 5 are some more cleanup.
+
+--
+Greg
+
+---
+
+Greg Kurz (5):
+      spapr_cpu_core: convert last snprintf() to g_strdup_printf()
+      spapr_cpu_core: fix potential leak in spapr_cpu_core_realize()
+      spapr_cpu_core: add missing rollback on realization path
+      spapr_cpu_core: introduce spapr_create_vcpu()
+      spapr_cpu_core: simplify spapr_cpu_core_realize()
+
+
+ hw/ppc/spapr_cpu_core.c |   93 ++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 60 insertions(+), 33 deletions(-)
