@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fTIZg-0005Th-77
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:05:25 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fTIni-0000Dh-JX
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:19:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fTIZb-0006uO-WB
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:05:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54458 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fTIZb-0006uG-NA
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:05:19 -0400
-Date: Thu, 14 Jun 2018 11:05:06 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180614030506.GS15344@xz-mi>
-References: <20180604080630.10946-1-peterx@redhat.com>
-	<87tvqeyfs2.fsf@dusky.pond.sub.org> <20180608044235.GA7736@xz-mi>
-	<20180608080446.GH29183@stefanha-x1.localdomain>
-	<87a7s5snce.fsf@dusky.pond.sub.org>
-	<20180611164549.GI17756@stefanha-x1.localdomain>
-	<20180612054700.GN7736@xz-mi>
-	<20180613143005.GW24528@stefanha-x1.localdomain>
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fTInf-0005c5-CV
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:19:54 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:41851)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
+	id 1fTInf-0005bd-5w
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:19:51 -0400
+Received: by mail-pg0-x242.google.com with SMTP id l65-v6so2225952pgl.8
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 20:19:50 -0700 (PDT)
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180604095520.8563-2-xiaoguangrong@tencent.com>
+	<20180611073920.GJ7736@xz-mi>
+	<f9915861-a0bd-aa94-8796-64465cbf937c@gmail.com>
+	<20180612031503.GL7736@xz-mi> <20180613154314.GI2676@work-vm>
+From: Xiao Guangrong <guangrong.xiao@gmail.com>
+Message-ID: <089249ff-7f39-44db-310d-ae9ba7912b33@gmail.com>
+Date: Thu, 14 Jun 2018 11:19:42 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180613143005.GW24528@stefanha-x1.localdomain>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] monitor: postpone
- monitor_qmp_cleanup_queues
+In-Reply-To: <20180613154314.GI2676@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/12] migration: do not wait if no free
+ thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,81 +35,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On Wed, Jun 13, 2018 at 03:30:05PM +0100, Stefan Hajnoczi wrote:
-> On Tue, Jun 12, 2018 at 01:47:00PM +0800, Peter Xu wrote:
-> > On Mon, Jun 11, 2018 at 05:45:49PM +0100, Stefan Hajnoczi wrote:
-> > > On Fri, Jun 08, 2018 at 10:18:25AM +0200, Markus Armbruster wrote:
-> > > > Stefan Hajnoczi <stefanha@gmail.com> writes:
-> > > > > On Fri, Jun 08, 2018 at 12:42:35PM +0800, Peter Xu wrote:
-> > > > >> On Thu, Jun 07, 2018 at 01:53:01PM +0200, Markus Armbruster wr=
-ote:
-> > > > >> > Peter Xu <peterx@redhat.com> writes:
-> > > > >> >=20
-> > > > >> > > Previously we cleanup the queues when we got CLOSED event.=
-  It was used
-> > > > >> >=20
-> > > > >> > we clean up
-> > > > >> >=20
-> > > > >> > > to make sure we won't leftover replies/events of a old cli=
-ent to a new
-> > > > >> >=20
-> > > > >> > we won't send leftover replies/events of an old client
-> > > > >> >=20
-> > > > >> > > client.  Now this patch postpones that until OPENED.
-> > > > >> >=20
-> > > > >> > What if OPENED never comes?
-> > > > >>=20
-> > > > >> Then we clean that up until destruction of the monitor.  IMHO =
-it's
-> > > > >> fine, but I'm not sure whether that's an overall acceptable ap=
-proach.
-> > > > >
-> > > > > I think this patch fixes the problem at the wrong level.  Marc-=
-Andr=C3=A9's
-> > > > > fix seemed like a cleaner solution.
-> > > >=20
-> > > > Is it the right solution?
-> > > >=20
-> > > > I proposed another one:
-> > >=20
-> > > Sorry, I won't be able to participate in this because I'm behind on
-> > > other patches and tasks.  Therefore, feel free to disregard but I'l=
-l
-> > > give my 2 cents:
-> > >=20
-> > > This seems like a chardev bug.  The solution should probably be in =
-the
-> > > chardev layer (Marc-Andr=C3=A9's patch or something else), not in t=
-he monitor
-> > > (this patch).
-> >=20
-> > Yes that's why I said I like Marc-Andre's patch. :) I just don't know
-> > an reliable way to achieve what we want there.
-> >=20
-> > The thing is that we don't really monitor the ioc_out for fd-typed
-> > chardevs.  We only do that when we call qemu_chr_fe_add_watch() (e.g.=
-,
-> > in monitor_flush_locked()) when the writting buffer is full.  But
-> > normally we can't detect any event from the output side, hence no way
-> > to deliever a CLOSED event when the output fd is the last fd that is
-> > closed.
-> >=20
-> > Maybe we can keep that output watch for the whole lifecycle of the
-> > chardev?  I'm not sure yet.
->=20
-> It's not possible to keep a POLLOUT fd watch since poll(2) would return
-> instantly and the event loop would spin.  However, POLLHUP (G_IO_HUP)
-> might work.
 
-It seems so.  But I am not confident enough to quickly provide a
-mature patch for chardev.  I'll just work around for monitor right
-now.  I'll comment with your ideas there and also on the events.  We
-can rework upon when we have time with it.
 
-Regards,
+On 06/13/2018 11:43 PM, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+>> On Tue, Jun 12, 2018 at 10:42:25AM +0800, Xiao Guangrong wrote:
+>>>
+>>>
+>>> On 06/11/2018 03:39 PM, Peter Xu wrote:
+>>>> On Mon, Jun 04, 2018 at 05:55:09PM +0800, guangrong.xiao@gmail.com wrote:
+>>>>> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+>>>>>
+>>>>> Instead of putting the main thread to sleep state to wait for
+>>>>> free compression thread, we can directly post it out as normal
+>>>>> page that reduces the latency and uses CPUs more efficiently
+>>>>
+>>>> The feature looks good, though I'm not sure whether we should make a
+>>>> capability flag for this feature since otherwise it'll be hard to
+>>>> switch back to the old full-compression way no matter for what
+>>>> reason.  Would that be a problem?
+>>>>
+>>>
+>>> We assume this optimization should always be optimistic for all cases,
+>>> particularly, we introduced the statistics of compression, then the user
+>>> should adjust its parameters based on those statistics if anything works
+>>> worse.
+>>
+>> Ah, that'll be good.
+>>
+>>>
+>>> Furthermore, we really need to improve this optimization if it hurts
+>>> any case rather than leaving a option to the user. :)
+>>
+>> Yeah, even if we make it a parameter/capability we can still turn that
+>> on by default in new versions but keep the old behavior in old
+>> versions. :) The major difference is that, then we can still _have_ a
+>> way to compress every page. I'm just thinking if we don't have a
+>> switch for that then if someone wants to measure e.g.  how a new
+>> compression algo could help VM migration, then he/she won't be
+>> possible to do that again since the numbers will be meaningless if
+>> that bit is out of control on which page will be compressed.
+>>
+>> Though I don't know how much use it'll bring...  But if that won't be
+>> too hard, it still seems good.  Not a strong opinion.
+> 
+> I think that is needed; it might be that some users have really awful
+> networking and need the compression; I'd expect that for people who turn
+> on compression they really expect the slowdown because they need it for
+> their network, so changing that is a bit odd.
 
---=20
-Peter Xu
+People should make sure the system has enough CPU resource to do
+compression as well, so the perfect usage is that the 'busy-rate'
+is low enough i think.
+
+However, it's not a big deal, i will introduce a parameter,
+maybe, compress-wait-free-thread.
+
+Thank you all, Dave and Peter! :)
