@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTXyS-0006qQ-0K
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:32:01 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTXyQ-0005hO-Ml
+	(envelope-from <richard.henderson@linaro.org>) id 1fTXyQ-0006qP-NB
 	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:32:00 -0400
-Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:40832)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <richard.henderson@linaro.org>) id 1fTXyP-0005gJ-3s
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:31:58 -0400
+Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:37423)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fTXyQ-0005h6-FK
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:31:58 -0400
-Received: by mail-pg0-x22a.google.com with SMTP id w8-v6so330697pgp.7
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 12:31:58 -0700 (PDT)
+	id 1fTXyO-0005ff-Rf
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:31:57 -0400
+Received: by mail-pg0-x22a.google.com with SMTP id r21-v6so3364224pgv.4
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 12:31:56 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 14 Jun 2018 09:31:32 -1000
-Message-Id: <20180614193147.29680-4-richard.henderson@linaro.org>
+Date: Thu, 14 Jun 2018 09:31:31 -1000
+Message-Id: <20180614193147.29680-3-richard.henderson@linaro.org>
 In-Reply-To: <20180614193147.29680-1-richard.henderson@linaro.org>
 References: <20180614193147.29680-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 03/18] qht: return existing entry when
- qht_insert fails
+Subject: [Qemu-devel] [PULL 02/18] qht: require a default comparison function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,179 +34,295 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-The meaning of "existing" is now changed to "matches in hash and
-ht->cmp result". This is saner than just checking the pointer value.
+qht_lookup now uses the default cmp function. qht_lookup_custom is defined
+to retain the old behaviour, that is a cmp function is explicitly provided.
 
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by:  Richard Henderson <richard.henderson@linaro.org>
+qht_insert will gain use of the default cmp in the next patch.
+
+Note that we move qht_lookup_custom's @func to be the last argument,
+which makes the new qht_lookup as simple as possible.
+Instead of this (i.e. keeping @func 2nd):
+0000000000010750 <qht_lookup>:
+   10750:       89 d1                   mov    %edx,%ecx
+   10752:       48 89 f2                mov    %rsi,%rdx
+   10755:       48 8b 77 08             mov    0x8(%rdi),%rsi
+   10759:       e9 22 ff ff ff          jmpq   10680 <qht_lookup_custom>
+   1075e:       66 90                   xchg   %ax,%ax
+
+We get:
+0000000000010740 <qht_lookup>:
+   10740:       48 8b 4f 08             mov    0x8(%rdi),%rcx
+   10744:       e9 37 ff ff ff          jmpq   10680 <qht_lookup_custom>
+   10749:       0f 1f 80 00 00 00 00    nopl   0x0(%rax)
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/qemu/qht.h        |  7 +++++--
- accel/tcg/translate-all.c |  2 +-
- tests/qht-bench.c         |  4 ++--
- tests/test-qht.c          |  8 +++++++-
- util/qht.c                | 27 +++++++++++++++++----------
- 5 files changed, 32 insertions(+), 16 deletions(-)
+ include/qemu/qht.h        | 25 ++++++++++++++++++++-----
+ accel/tcg/cpu-exec.c      |  4 ++--
+ accel/tcg/translate-all.c | 16 +++++++++++++++-
+ tests/qht-bench.c         | 14 +++++++-------
+ tests/test-qht.c          | 15 ++++++++++-----
+ util/qht.c                | 14 +++++++++++---
+ 6 files changed, 65 insertions(+), 23 deletions(-)
 
 diff --git a/include/qemu/qht.h b/include/qemu/qht.h
-index 5f03a0f4cb..1fb9116fa0 100644
+index 531aa95325..5f03a0f4cb 100644
 --- a/include/qemu/qht.h
 +++ b/include/qemu/qht.h
-@@ -70,6 +70,7 @@ void qht_destroy(struct qht *ht);
-  * @ht: QHT to insert to
-  * @p: pointer to be inserted
-  * @hash: hash corresponding to @p
-+ * @existing: address where the pointer to an existing entry can be copied to
-  *
-  * Attempting to insert a NULL @p is a bug.
-  * Inserting the same pointer @p with different @hash values is a bug.
-@@ -78,9 +79,11 @@ void qht_destroy(struct qht *ht);
-  * inserted into the hash table.
-  *
-  * Returns true on success.
-- * Returns false if the @p-@hash pair already exists in the hash table.
-+ * Returns false if there is an existing entry in the table that is equivalent
-+ * (i.e. ht->cmp matches and the hash is the same) to @p-@h. If @existing
-+ * is !NULL, a pointer to this existing entry is copied to it.
+@@ -11,8 +11,11 @@
+ #include "qemu/thread.h"
+ #include "qemu/qdist.h"
+ 
++typedef bool (*qht_cmp_func_t)(const void *a, const void *b);
++
+ struct qht {
+     struct qht_map *map;
++    qht_cmp_func_t cmp;
+     QemuMutex lock; /* serializes setters of ht->map */
+     unsigned int mode;
+ };
+@@ -47,10 +50,12 @@ typedef void (*qht_iter_func_t)(struct qht *ht, void *p, uint32_t h, void *up);
+ /**
+  * qht_init - Initialize a QHT
+  * @ht: QHT to be initialized
++ * @cmp: default comparison function. Cannot be NULL.
+  * @n_elems: number of entries the hash table should be optimized for.
+  * @mode: bitmask with OR'ed QHT_MODE_*
   */
--bool qht_insert(struct qht *ht, void *p, uint32_t hash);
-+bool qht_insert(struct qht *ht, void *p, uint32_t hash, void **existing);
+-void qht_init(struct qht *ht, size_t n_elems, unsigned int mode);
++void qht_init(struct qht *ht, qht_cmp_func_t cmp, size_t n_elems,
++              unsigned int mode);
  
  /**
-  * qht_lookup_custom - Look up a pointer using a custom comparison function.
+  * qht_destroy - destroy a previously initialized QHT
+@@ -78,11 +83,11 @@ void qht_destroy(struct qht *ht);
+ bool qht_insert(struct qht *ht, void *p, uint32_t hash);
+ 
+ /**
+- * qht_lookup - Look up a pointer in a QHT
++ * qht_lookup_custom - Look up a pointer using a custom comparison function.
+  * @ht: QHT to be looked up
+- * @func: function to compare existing pointers against @userp
+  * @userp: pointer to pass to @func
+  * @hash: hash of the pointer to be looked up
++ * @func: function to compare existing pointers against @userp
+  *
+  * Needs to be called under an RCU read-critical section.
+  *
+@@ -94,8 +99,18 @@ bool qht_insert(struct qht *ht, void *p, uint32_t hash);
+  * Returns the corresponding pointer when a match is found.
+  * Returns NULL otherwise.
+  */
+-void *qht_lookup(struct qht *ht, qht_lookup_func_t func, const void *userp,
+-                 uint32_t hash);
++void *qht_lookup_custom(struct qht *ht, const void *userp, uint32_t hash,
++                        qht_lookup_func_t func);
++
++/**
++ * qht_lookup - Look up a pointer in a QHT
++ * @ht: QHT to be looked up
++ * @userp: pointer to pass to the comparison function
++ * @hash: hash of the pointer to be looked up
++ *
++ * Calls qht_lookup_custom() using @ht's default comparison function.
++ */
++void *qht_lookup(struct qht *ht, const void *userp, uint32_t hash);
+ 
+ /**
+  * qht_remove - remove a pointer from the hash table
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 4ef95d8dd3..6d6c51b686 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -295,7 +295,7 @@ struct tb_desc {
+     uint32_t trace_vcpu_dstate;
+ };
+ 
+-static bool tb_cmp(const void *p, const void *d)
++static bool tb_lookup_cmp(const void *p, const void *d)
+ {
+     const TranslationBlock *tb = p;
+     const struct tb_desc *desc = d;
+@@ -340,7 +340,7 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+     phys_pc = get_page_addr_code(desc.env, pc);
+     desc.phys_page1 = phys_pc & TARGET_PAGE_MASK;
+     h = tb_hash_func(phys_pc, pc, flags, cf_mask, *cpu->trace_dstate);
+-    return qht_lookup(&tb_ctx.htable, tb_cmp, &desc, h);
++    return qht_lookup_custom(&tb_ctx.htable, &desc, h, tb_lookup_cmp);
+ }
+ 
+ void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr)
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index f39123bd5a..1695f8c352 100644
+index d48b56ca38..f39123bd5a 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -1242,7 +1242,7 @@ static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
-     /* add in the hash table */
-     h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
-                      tb->trace_vcpu_dstate);
--    qht_insert(&tb_ctx.htable, tb, h);
-+    qht_insert(&tb_ctx.htable, tb, h, NULL);
+@@ -782,11 +782,25 @@ static inline void code_gen_alloc(size_t tb_size)
+     qemu_mutex_init(&tb_ctx.tb_lock);
+ }
  
- #ifdef CONFIG_USER_ONLY
-     if (DEBUG_TB_CHECK_GATE) {
++static bool tb_cmp(const void *ap, const void *bp)
++{
++    const TranslationBlock *a = ap;
++    const TranslationBlock *b = bp;
++
++    return a->pc == b->pc &&
++        a->cs_base == b->cs_base &&
++        a->flags == b->flags &&
++        (tb_cflags(a) & CF_HASH_MASK) == (tb_cflags(b) & CF_HASH_MASK) &&
++        a->trace_vcpu_dstate == b->trace_vcpu_dstate &&
++        a->page_addr[0] == b->page_addr[0] &&
++        a->page_addr[1] == b->page_addr[1];
++}
++
+ static void tb_htable_init(void)
+ {
+     unsigned int mode = QHT_MODE_AUTO_RESIZE;
+ 
+-    qht_init(&tb_ctx.htable, CODE_GEN_HTABLE_SIZE, mode);
++    qht_init(&tb_ctx.htable, tb_cmp, CODE_GEN_HTABLE_SIZE, mode);
+ }
+ 
+ /* Must be called before using the QEMU cpus. 'tb_size' is the size
 diff --git a/tests/qht-bench.c b/tests/qht-bench.c
-index c94ac25158..f492b3a20a 100644
+index 4cabdfd62a..c94ac25158 100644
 --- a/tests/qht-bench.c
 +++ b/tests/qht-bench.c
-@@ -163,7 +163,7 @@ static void do_rw(struct thread_info *info)
+@@ -93,10 +93,10 @@ static void usage_complete(int argc, char *argv[])
+     exit(-1);
+ }
+ 
+-static bool is_equal(const void *obj, const void *userp)
++static bool is_equal(const void *ap, const void *bp)
+ {
+-    const long *a = obj;
+-    const long *b = userp;
++    const long *a = ap;
++    const long *b = bp;
+ 
+     return *a == *b;
+ }
+@@ -150,7 +150,7 @@ static void do_rw(struct thread_info *info)
+ 
+         p = &keys[info->r & (lookup_range - 1)];
+         hash = h(*p);
+-        read = qht_lookup(&ht, is_equal, p, hash);
++        read = qht_lookup(&ht, p, hash);
+         if (read) {
+             stats->rd++;
+         } else {
+@@ -162,7 +162,7 @@ static void do_rw(struct thread_info *info)
+         if (info->write_op) {
              bool written = false;
  
-             if (qht_lookup(&ht, p, hash) == NULL) {
--                written = qht_insert(&ht, p, hash);
-+                written = qht_insert(&ht, p, hash, NULL);
+-            if (qht_lookup(&ht, is_equal, p, hash) == NULL) {
++            if (qht_lookup(&ht, p, hash) == NULL) {
+                 written = qht_insert(&ht, p, hash);
              }
              if (written) {
-                 stats->in++;
-@@ -322,7 +322,7 @@ static void htable_init(void)
-             r = xorshift64star(r);
-             p = &keys[r & (init_range - 1)];
-             hash = h(*p);
--            if (qht_insert(&ht, p, hash)) {
-+            if (qht_insert(&ht, p, hash, NULL)) {
-                 break;
+@@ -173,7 +173,7 @@ static void do_rw(struct thread_info *info)
+         } else {
+             bool removed = false;
+ 
+-            if (qht_lookup(&ht, is_equal, p, hash)) {
++            if (qht_lookup(&ht, p, hash)) {
+                 removed = qht_remove(&ht, p, hash);
              }
-             retries++;
+             if (removed) {
+@@ -308,7 +308,7 @@ static void htable_init(void)
+     }
+ 
+     /* initialize the hash table */
+-    qht_init(&ht, qht_n_elems, qht_mode);
++    qht_init(&ht, is_equal, qht_n_elems, qht_mode);
+     assert(init_size <= init_range);
+ 
+     pr_params();
 diff --git a/tests/test-qht.c b/tests/test-qht.c
-index b069881342..dda6a067be 100644
+index 9b7423abb6..b069881342 100644
 --- a/tests/test-qht.c
 +++ b/tests/test-qht.c
-@@ -27,11 +27,17 @@ static void insert(int a, int b)
+@@ -13,10 +13,10 @@
+ static struct qht ht;
+ static int32_t arr[N * 2];
  
-     for (i = a; i < b; i++) {
-         uint32_t hash;
-+        void *existing;
-+        bool inserted;
+-static bool is_equal(const void *obj, const void *userp)
++static bool is_equal(const void *ap, const void *bp)
+ {
+-    const int32_t *a = obj;
+-    const int32_t *b = userp;
++    const int32_t *a = ap;
++    const int32_t *b = bp;
  
-         arr[i] = i;
-         hash = i;
- 
--        qht_insert(&ht, &arr[i], hash);
-+        inserted = qht_insert(&ht, &arr[i], hash, NULL);
-+        g_assert_true(inserted);
-+        inserted = qht_insert(&ht, &arr[i], hash, &existing);
-+        g_assert_false(inserted);
-+        g_assert_true(existing == &arr[i]);
-     }
+     return *a == *b;
  }
+@@ -60,7 +60,12 @@ static void check(int a, int b, bool expected)
  
+         val = i;
+         hash = i;
+-        p = qht_lookup(&ht, is_equal, &val, hash);
++        /* test both lookup variants; results should be the same */
++        if (i % 2) {
++            p = qht_lookup(&ht, &val, hash);
++        } else {
++            p = qht_lookup_custom(&ht, &val, hash, is_equal);
++        }
+         g_assert_true(!!p == expected);
+     }
+     rcu_read_unlock();
+@@ -102,7 +107,7 @@ static void qht_do_test(unsigned int mode, size_t init_entries)
+     /* under KVM we might fetch stats from an uninitialized qht */
+     check_n(0);
+ 
+-    qht_init(&ht, 0, mode);
++    qht_init(&ht, is_equal, 0, mode);
+ 
+     check_n(0);
+     insert(0, N);
 diff --git a/util/qht.c b/util/qht.c
-index 8610ce3644..9d030e7b76 100644
+index ff4d2e6974..8610ce3644 100644
 --- a/util/qht.c
 +++ b/util/qht.c
-@@ -511,9 +511,9 @@ void *qht_lookup(struct qht *ht, const void *userp, uint32_t hash)
+@@ -351,11 +351,14 @@ static struct qht_map *qht_map_create(size_t n_buckets)
+     return map;
  }
  
- /* call with head->lock held */
--static bool qht_insert__locked(struct qht *ht, struct qht_map *map,
--                               struct qht_bucket *head, void *p, uint32_t hash,
--                               bool *needs_resize)
-+static void *qht_insert__locked(struct qht *ht, struct qht_map *map,
-+                                struct qht_bucket *head, void *p, uint32_t hash,
-+                                bool *needs_resize)
+-void qht_init(struct qht *ht, size_t n_elems, unsigned int mode)
++void qht_init(struct qht *ht, qht_cmp_func_t cmp, size_t n_elems,
++              unsigned int mode)
  {
-     struct qht_bucket *b = head;
-     struct qht_bucket *prev = NULL;
-@@ -523,8 +523,9 @@ static bool qht_insert__locked(struct qht *ht, struct qht_map *map,
-     do {
-         for (i = 0; i < QHT_BUCKET_ENTRIES; i++) {
-             if (b->pointers[i]) {
--                if (unlikely(b->pointers[i] == p)) {
--                    return false;
-+                if (unlikely(b->hashes[i] == hash &&
-+                             ht->cmp(b->pointers[i], p))) {
-+                    return b->pointers[i];
-                 }
-             } else {
-                 goto found;
-@@ -553,7 +554,7 @@ static bool qht_insert__locked(struct qht *ht, struct qht_map *map,
-     atomic_set(&b->hashes[i], hash);
-     atomic_set(&b->pointers[i], p);
-     seqlock_write_end(&head->sequence);
--    return true;
-+    return NULL;
+     struct qht_map *map;
+     size_t n_buckets = qht_elems_to_buckets(n_elems);
+ 
++    g_assert(cmp);
++    ht->cmp = cmp;
+     ht->mode = mode;
+     qemu_mutex_init(&ht->lock);
+     map = qht_map_create(n_buckets);
+@@ -479,8 +482,8 @@ void *qht_lookup__slowpath(struct qht_bucket *b, qht_lookup_func_t func,
+     return ret;
  }
  
- static __attribute__((noinline)) void qht_grow_maybe(struct qht *ht)
-@@ -577,25 +578,31 @@ static __attribute__((noinline)) void qht_grow_maybe(struct qht *ht)
-     qemu_mutex_unlock(&ht->lock);
- }
- 
--bool qht_insert(struct qht *ht, void *p, uint32_t hash)
-+bool qht_insert(struct qht *ht, void *p, uint32_t hash, void **existing)
+-void *qht_lookup(struct qht *ht, qht_lookup_func_t func, const void *userp,
+-                 uint32_t hash)
++void *qht_lookup_custom(struct qht *ht, const void *userp, uint32_t hash,
++                        qht_lookup_func_t func)
  {
      struct qht_bucket *b;
      struct qht_map *map;
-     bool needs_resize = false;
--    bool ret;
-+    void *prev;
- 
-     /* NULL pointers are not supported */
-     qht_debug_assert(p);
- 
-     b = qht_bucket_lock__no_stale(ht, hash, &map);
--    ret = qht_insert__locked(ht, map, b, p, hash, &needs_resize);
-+    prev = qht_insert__locked(ht, map, b, p, hash, &needs_resize);
-     qht_bucket_debug__locked(b);
-     qemu_spin_unlock(&b->lock);
- 
-     if (unlikely(needs_resize) && ht->mode & QHT_MODE_AUTO_RESIZE) {
-         qht_grow_maybe(ht);
-     }
--    return ret;
-+    if (likely(prev == NULL)) {
-+        return true;
-+    }
-+    if (existing) {
-+        *existing = prev;
-+    }
-+    return false;
+@@ -502,6 +505,11 @@ void *qht_lookup(struct qht *ht, qht_lookup_func_t func, const void *userp,
+     return qht_lookup__slowpath(b, func, userp, hash);
  }
  
- static inline bool qht_entry_is_last(struct qht_bucket *b, int pos)
++void *qht_lookup(struct qht *ht, const void *userp, uint32_t hash)
++{
++    return qht_lookup_custom(ht, userp, hash, ht->cmp);
++}
++
+ /* call with head->lock held */
+ static bool qht_insert__locked(struct qht *ht, struct qht_map *map,
+                                struct qht_bucket *head, void *p, uint32_t hash,
 -- 
 2.17.1
