@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTMf2-0002gP-GY
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 03:27:13 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fTN2h-0006I0-6B
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 03:51:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTMex-0006pT-IZ
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 03:27:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32964 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fTMex-0006pD-Dw
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 03:27:07 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1528905228-25694-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1528905228-25694-3-git-send-email-anton.nefedov@virtuozzo.com>
-Date: Thu, 14 Jun 2018 09:27:05 +0200
-In-Reply-To: <1528905228-25694-3-git-send-email-anton.nefedov@virtuozzo.com>
-	(Anton Nefedov's message of "Wed, 13 Jun 2018 18:53:48 +0300")
-Message-ID: <87r2l9omk6.fsf@dusky.pond.sub.org>
+	(envelope-from <balaton@eik.bme.hu>) id 1fTN2d-0004Cn-A4
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 03:51:39 -0400
+Date: Thu, 14 Jun 2018 09:51:33 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20180614011705.GS30690@umbus.fritz.box>
+Message-ID: <alpine.BSF.2.21.1806140948540.19899@zero.eik.bme.hu>
+References: <cover.1528935420.git.balaton@eik.bme.hu>
+	<51f6ea83be6b66d61e3129edecddc3399a1df1b8.1528935420.git.balaton@eik.bme.hu>
+	<20180614011705.GS30690@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] qapi: remove empty flat union
- branches and types
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v3 2/9] ppc4xx_i2c: Implement directcntl
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +24,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, mdroth@linux.vnet.ibm.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
-Anton Nefedov <anton.nefedov@virtuozzo.com> writes:
-
-> Flat unions may now have uncovered branches, so it is possible to get rid
-> of empty types defined for that purpose only.
+On Thu, 14 Jun 2018, David Gibson wrote:
+> On Thu, Jun 14, 2018 at 02:17:00AM +0200, BALATON Zoltan wrote:
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 >
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Patch looks good, but it needs a commit message.  What is the
+> directcntl register?  Now does the bitbang interface play into that?
+> (Note that I know the answer to those questions right now, but it
+> needs to be in the commit message for the benefit of people looking
+> back in the future).
 
-I observe a nice shrinking of generated code:
+If you know the answer could you please suggest an appropriate commit 
+message? I'm a bit lost what should be written here that would explain the 
+patch to someone who knows nothing about what this is. And for those who 
+know, the patch itself should be fairly simple and not need more 
+explanation.
 
- qapi-doc.texi           |  134 -----
- qapi-introspect.c       | 1124 +++++++++++++++++++++++-------------------------
- qapi-types-block-core.c |   26 -
- qapi-types-block-core.h |   43 -
- qapi-types-crypto.c     |   13 
- qapi-types-crypto.h     |    9 
- qapi-types-misc.c       |   13 
- qapi-types-misc.h       |   40 -
- qapi-types-net.c        |   13 
- qapi-types-net.h        |   10 
- qapi-types-ui.c         |   13 
- qapi-types-ui.h         |   14 
- qapi-visit-block-core.c |  185 +------
- qapi-visit-block-core.h |    6 
- qapi-visit-core.d       |   15 
- qapi-visit-crypto.c     |   38 -
- qapi-visit-crypto.h     |    3 
- qapi-visit-misc.c       |   71 ---
- qapi-visit-misc.h       |    3 
- qapi-visit-net.c        |   43 -
- qapi-visit-net.h        |    3 
- qapi-visit-ui.c         |   45 -
- qapi-visit-ui.h         |    3 
- 23 files changed, 607 insertions(+), 1260 deletions(-)
+Regards,
+BALATON Zoltan
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  default-configs/ppc-softmmu.mak    |  1 +
+>>  default-configs/ppcemb-softmmu.mak |  1 +
+>>  hw/i2c/ppc4xx_i2c.c                | 13 ++++++++++++-
+>>  include/hw/i2c/ppc4xx_i2c.h        |  4 ++++
+>>  4 files changed, 18 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+>> index 4d7be45..7d0dc2f 100644
+>> --- a/default-configs/ppc-softmmu.mak
+>> +++ b/default-configs/ppc-softmmu.mak
+>> @@ -26,6 +26,7 @@ CONFIG_USB_EHCI_SYSBUS=y
+>>  CONFIG_SM501=y
+>>  CONFIG_IDE_SII3112=y
+>>  CONFIG_I2C=y
+>> +CONFIG_BITBANG_I2C=y
+>>
+>>  # For Macs
+>>  CONFIG_MAC=y
+>> diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
+>> index 67d18b2..37af193 100644
+>> --- a/default-configs/ppcemb-softmmu.mak
+>> +++ b/default-configs/ppcemb-softmmu.mak
+>> @@ -19,3 +19,4 @@ CONFIG_USB_EHCI_SYSBUS=y
+>>  CONFIG_SM501=y
+>>  CONFIG_IDE_SII3112=y
+>>  CONFIG_I2C=y
+>> +CONFIG_BITBANG_I2C=y
+>> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+>> index 4e0aaae..c0a1930 100644
+>> --- a/hw/i2c/ppc4xx_i2c.c
+>> +++ b/hw/i2c/ppc4xx_i2c.c
+>> @@ -30,6 +30,7 @@
+>>  #include "cpu.h"
+>>  #include "hw/hw.h"
+>>  #include "hw/i2c/ppc4xx_i2c.h"
+>> +#include "bitbang_i2c.h"
+>>
+>>  #define PPC4xx_I2C_MEM_SIZE 18
+>>
+>> @@ -46,6 +47,11 @@
+>>
+>>  #define IIC_XTCNTLSS_SRST   (1 << 0)
+>>
+>> +#define IIC_DIRECTCNTL_SDAC (1 << 3)
+>> +#define IIC_DIRECTCNTL_SCLC (1 << 2)
+>> +#define IIC_DIRECTCNTL_MSDA (1 << 1)
+>> +#define IIC_DIRECTCNTL_MSCL (1 << 0)
+>> +
+>>  static void ppc4xx_i2c_reset(DeviceState *s)
+>>  {
+>>      PPC4xxI2CState *i2c = PPC4xx_I2C(s);
+>> @@ -289,7 +295,11 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+>>          i2c->xtcntlss = value;
+>>          break;
+>>      case 16:
+>> -        i2c->directcntl = value & 0x7;
+>> +        i2c->directcntl = value & (IIC_DIRECTCNTL_SDAC & IIC_DIRECTCNTL_SCLC);
+>> +        i2c->directcntl |= (value & IIC_DIRECTCNTL_SCLC ? 1 : 0);
+>> +        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL, i2c->directcntl & 1);
+>> +        i2c->directcntl |= bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SDA,
+>> +                               (value & IIC_DIRECTCNTL_SDAC) != 0) << 1;
+>>          break;
+>>      default:
+>>          if (addr < PPC4xx_I2C_MEM_SIZE) {
+>> @@ -322,6 +332,7 @@ static void ppc4xx_i2c_init(Object *o)
+>>      sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
+>>      sysbus_init_irq(SYS_BUS_DEVICE(s), &s->irq);
+>>      s->bus = i2c_init_bus(DEVICE(s), "i2c");
+>> +    s->bitbang = bitbang_i2c_init(s->bus);
+>>  }
+>>
+>>  static void ppc4xx_i2c_class_init(ObjectClass *klass, void *data)
+>> diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
+>> index e4b6ded..ea6c8e1 100644
+>> --- a/include/hw/i2c/ppc4xx_i2c.h
+>> +++ b/include/hw/i2c/ppc4xx_i2c.h
+>> @@ -31,6 +31,9 @@
+>>  #include "hw/sysbus.h"
+>>  #include "hw/i2c/i2c.h"
+>>
+>> +/* from hw/i2c/bitbang_i2c.h */
+>> +typedef struct bitbang_i2c_interface bitbang_i2c_interface;
+>> +
+>>  #define TYPE_PPC4xx_I2C "ppc4xx-i2c"
+>>  #define PPC4xx_I2C(obj) OBJECT_CHECK(PPC4xxI2CState, (obj), TYPE_PPC4xx_I2C)
+>>
+>> @@ -42,6 +45,7 @@ typedef struct PPC4xxI2CState {
+>>      I2CBus *bus;
+>>      qemu_irq irq;
+>>      MemoryRegion iomem;
+>> +    bitbang_i2c_interface *bitbang;
+>>      uint8_t mdata;
+>>      uint8_t lmadr;
+>>      uint8_t hmadr;
+>
+>
