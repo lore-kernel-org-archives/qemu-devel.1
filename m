@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTWsK-0006b4-CN
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:21:37 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fTWsi-0006sD-Mb
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:22:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTWsH-0000n0-6u
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:21:36 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:39908)
+	(envelope-from <alex.bennee@linaro.org>) id 1fTWsf-00015C-GV
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:22:00 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:40758)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fTWsG-0000mf-So
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:21:33 -0400
-Received: by mail-wr0-x243.google.com with SMTP id w7-v6so7410793wrn.6
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 11:21:32 -0700 (PDT)
+	id 1fTWsf-00014S-5Q
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:21:57 -0400
+Received: by mail-wm0-x241.google.com with SMTP id n5-v6so13681903wmc.5
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 11:21:57 -0700 (PDT)
 References: <20180604152941.20374-1-peter.maydell@linaro.org>
-	<20180604152941.20374-2-peter.maydell@linaro.org>
+	<20180604152941.20374-3-peter.maydell@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180604152941.20374-2-peter.maydell@linaro.org>
-Date: Thu, 14 Jun 2018 19:21:29 +0100
-Message-ID: <87wov1z0t2.fsf@linaro.org>
+In-reply-to: <20180604152941.20374-3-peter.maydell@linaro.org>
+Date: Thu, 14 Jun 2018 19:21:54 +0100
+Message-ID: <87vaalz0sd.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 01/13] iommu: Add IOMMU index concept to
- IOMMU API
+Subject: Re: [Qemu-devel] [PATCH v2 02/13] iommu: Add IOMMU index argument
+ to notifier APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,11 +37,17 @@ Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Richard Hend
 
 Peter Maydell <peter.maydell@linaro.org> writes:
 
-> If an IOMMU supports mappings that care about the memory
-> transaction attributes, then it no longer has a unique
-> address -> output mapping, but more than one. We can
-> represent these using an IOMMU index, analogous to TCG's
-> mmu indexes.
+> Add support for multiple IOMMU indexes to the IOMMU notifier APIs.
+> When initializing a notifier with iommu_notifier_init(), the caller
+> must pass the IOMMU index that it is interested in. When a change
+> happens, the IOMMU implementation must pass
+> memory_region_notify_iommu() the IOMMU index that has changed and
+> that notifiers must be called for.
+>
+> IOMMUs which support only a single index don't need to change.
+> Callers which only really support working with IOMMUs with a single
+> index can use the result of passing MEMTXATTRS_UNSPECIFIED to
+> memory_region_iommu_attrs_to_index().
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
@@ -49,133 +55,229 @@ Peter Maydell <peter.maydell@linaro.org> writes:
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  include/exec/memory.h | 55 +++++++++++++++++++++++++++++++++++++++++++
->  memory.c              | 23 ++++++++++++++++++
->  2 files changed, 78 insertions(+)
+>  include/exec/memory.h    | 7 ++++++-
+>  hw/i386/intel_iommu.c    | 6 +++---
+>  hw/ppc/spapr_iommu.c     | 2 +-
+>  hw/s390x/s390-pci-inst.c | 4 ++--
+>  hw/vfio/common.c         | 6 +++++-
+>  hw/virtio/vhost.c        | 7 ++++++-
+>  memory.c                 | 8 +++++++-
+>  7 files changed, 30 insertions(+), 10 deletions(-)
 >
 > diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index eb2ba065195..fa6e98ee7be 100644
+> index fa6e98ee7be..ec75c45296e 100644
 > --- a/include/exec/memory.h
 > +++ b/include/exec/memory.h
-> @@ -206,6 +206,20 @@ enum IOMMUMemoryRegionAttr {
->   * to report whenever mappings are changed, by calling
->   * memory_region_notify_iommu() (or, if necessary, by calling
->   * memory_region_notify_one() for each registered notifier).
-> + *
-> + * Conceptually an IOMMU provides a mapping from input address
-> + * to an output TLB entry. If the IOMMU is aware of memory transaction
-> + * attributes and the output TLB entry depends on the transaction
-> + * attributes, we represent this using IOMMU indexes. Each index
-> + * selects a particular translation table that the IOMMU has:
-> + *   @attrs_to_index returns the IOMMU index for a set of transaction at=
-tributes
-> + *   @translate takes an input address and an IOMMU index
-> + * and the mapping returned can only depend on the input address and the
-> + * IOMMU index.
-> + *
-> + * Most IOMMUs don't care about the transaction attributes and support
-> + * only a single IOMMU index. A more complex IOMMU might have one index
-> + * for secure transactions and one for non-secure transactions.
->   */
->  typedef struct IOMMUMemoryRegionClass {
->      /* private */
-> @@ -290,6 +304,29 @@ typedef struct IOMMUMemoryRegionClass {
->       */
->      int (*get_attr)(IOMMUMemoryRegion *iommu, enum IOMMUMemoryRegionAttr=
- attr,
->                      void *data);
-> +
-> +    /* Return the IOMMU index to use for a given set of transaction attr=
-ibutes.
-> +     *
-> +     * Optional method: if an IOMMU only supports a single IOMMU index t=
-hen
-> +     * the default implementation of memory_region_iommu_attrs_to_index()
-> +     * will return 0.
-> +     *
-> +     * The indexes supported by an IOMMU must be contiguous, starting at=
- 0.
-> +     *
-> +     * @iommu: the IOMMUMemoryRegion
-> +     * @attrs: memory transaction attributes
-> +     */
-> +    int (*attrs_to_index)(IOMMUMemoryRegion *iommu, MemTxAttrs attrs);
-> +
-> +    /* Return the number of IOMMU indexes this IOMMU supports.
-> +     *
-> +     * Optional method: if this method is not provided, then
-> +     * memory_region_iommu_num_indexes() will return 1, indicating that
-> +     * only a single IOMMU index is supported.
-> +     *
-> +     * @iommu: the IOMMUMemoryRegion
-> +     */
-> +    int (*num_indexes)(IOMMUMemoryRegion *iommu);
->  } IOMMUMemoryRegionClass;
+> @@ -98,18 +98,21 @@ struct IOMMUNotifier {
+>      /* Notify for address space range start <=3D addr <=3D end */
+>      hwaddr start;
+>      hwaddr end;
+> +    int iommu_idx;
+>      QLIST_ENTRY(IOMMUNotifier) node;
+>  };
+>  typedef struct IOMMUNotifier IOMMUNotifier;
 >
->  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
-> @@ -1054,6 +1091,24 @@ int memory_region_iommu_get_attr(IOMMUMemoryRegion=
- *iommu_mr,
->                                   enum IOMMUMemoryRegionAttr attr,
->                                   void *data);
->
-> +/**
-> + * memory_region_iommu_attrs_to_index: return the IOMMU index to
-> + * use for translations with the given memory transaction attributes.
-> + *
-> + * @iommu_mr: the memory region
-> + * @attrs: the memory transaction attributes
-> + */
-> +int memory_region_iommu_attrs_to_index(IOMMUMemoryRegion *iommu_mr,
-> +                                       MemTxAttrs attrs);
-> +
-> +/**
-> + * memory_region_iommu_num_indexes: return the total number of IOMMU
-> + * indexes that this IOMMU supports.
-> + *
-> + * @iommu_mr: the memory region
-> + */
-> +int memory_region_iommu_num_indexes(IOMMUMemoryRegion *iommu_mr);
-> +
->  /**
->   * memory_region_name: get a memory region's name
->   *
-> diff --git a/memory.c b/memory.c
-> index 3212acc7f49..64f4a55d546 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1915,6 +1915,29 @@ int memory_region_iommu_get_attr(IOMMUMemoryRegion=
- *iommu_mr,
->      return imrc->get_attr(iommu_mr, attr, data);
+>  static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+>                                         IOMMUNotifierFlag flags,
+> -                                       hwaddr start, hwaddr end)
+> +                                       hwaddr start, hwaddr end,
+> +                                       int iommu_idx)
+>  {
+>      n->notify =3D fn;
+>      n->notifier_flags =3D flags;
+>      n->start =3D start;
+>      n->end =3D end;
+> +    n->iommu_idx =3D iommu_idx;
 >  }
 >
-> +int memory_region_iommu_attrs_to_index(IOMMUMemoryRegion *iommu_mr,
-> +                                       MemTxAttrs attrs)
-> +{
-> +    IOMMUMemoryRegionClass *imrc =3D IOMMU_MEMORY_REGION_GET_CLASS(iommu=
-_mr);
-> +
-> +    if (!imrc->attrs_to_index) {
-> +        return 0;
-> +    }
-> +
-> +    return imrc->attrs_to_index(iommu_mr, attrs);
-> +}
-> +
-> +int memory_region_iommu_num_indexes(IOMMUMemoryRegion *iommu_mr)
-> +{
-> +    IOMMUMemoryRegionClass *imrc =3D IOMMU_MEMORY_REGION_GET_CLASS(iommu=
-_mr);
-> +
-> +    if (!imrc->num_indexes) {
-> +        return 1;
-> +    }
-> +
-> +    return imrc->num_indexes(iommu_mr);
-> +}
-> +
->  void memory_region_set_log(MemoryRegion *mr, bool log, unsigned client)
+>  /*
+> @@ -1008,11 +1011,13 @@ uint64_t memory_region_iommu_get_min_page_size(IO=
+MMUMemoryRegion *iommu_mr);
+>   * should be notified with an UNMAP followed by a MAP.
+>   *
+>   * @iommu_mr: the memory region that was changed
+> + * @iommu_idx: the IOMMU index for the translation table which has chang=
+ed
+>   * @entry: the new entry in the IOMMU translation table.  The entry
+>   *         replaces all old entries for the same virtual I/O address ran=
+ge.
+>   *         Deleted entries have .@perm =3D=3D 0.
+>   */
+>  void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+> +                                int iommu_idx,
+>                                  IOMMUTLBEntry entry);
+>
+>  /**
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index b5a09b79089..9c0b45963b5 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -1023,7 +1023,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState=
+ *s, uint8_t bus_num,
+>  static int vtd_sync_shadow_page_hook(IOMMUTLBEntry *entry,
+>                                       void *private)
 >  {
->      uint8_t mask =3D 1 << client;
+> -    memory_region_notify_iommu((IOMMUMemoryRegion *)private, *entry);
+> +    memory_region_notify_iommu((IOMMUMemoryRegion *)private, 0, *entry);
+>      return 0;
+>  }
+>
+> @@ -1581,7 +1581,7 @@ static void vtd_iotlb_page_invalidate_notify(IntelI=
+OMMUState *s,
+>                      .addr_mask =3D size - 1,
+>                      .perm =3D IOMMU_NONE,
+>                  };
+> -                memory_region_notify_iommu(&vtd_as->iommu, entry);
+> +                memory_region_notify_iommu(&vtd_as->iommu, 0, entry);
+>              }
+>          }
+>      }
+> @@ -2015,7 +2015,7 @@ static bool vtd_process_device_iotlb_desc(IntelIOMM=
+UState *s,
+>      entry.iova =3D addr;
+>      entry.perm =3D IOMMU_NONE;
+>      entry.translated_addr =3D 0;
+> -    memory_region_notify_iommu(&vtd_dev_as->iommu, entry);
+> +    memory_region_notify_iommu(&vtd_dev_as->iommu, 0, entry);
+>
+>  done:
+>      return true;
+> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+> index aaa6010d5c9..301708e45eb 100644
+> --- a/hw/ppc/spapr_iommu.c
+> +++ b/hw/ppc/spapr_iommu.c
+> @@ -428,7 +428,7 @@ static target_ulong put_tce_emu(sPAPRTCETable *tcet, =
+target_ulong ioba,
+>      entry.translated_addr =3D tce & page_mask;
+>      entry.addr_mask =3D ~page_mask;
+>      entry.perm =3D spapr_tce_iommu_access_flags(tce);
+> -    memory_region_notify_iommu(&tcet->iommu, entry);
+> +    memory_region_notify_iommu(&tcet->iommu, 0, entry);
+>
+>      return H_SUCCESS;
+>  }
+> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+> index d1a5f796783..7b61367ee31 100644
+> --- a/hw/s390x/s390-pci-inst.c
+> +++ b/hw/s390x/s390-pci-inst.c
+> @@ -589,7 +589,7 @@ static void s390_pci_update_iotlb(S390PCIIOMMU *iommu=
+, S390IOTLBEntry *entry)
+>              }
+>
+>              notify.perm =3D IOMMU_NONE;
+> -            memory_region_notify_iommu(&iommu->iommu_mr, notify);
+> +            memory_region_notify_iommu(&iommu->iommu_mr, 0, notify);
+>              notify.perm =3D entry->perm;
+>          }
+>
+> @@ -601,7 +601,7 @@ static void s390_pci_update_iotlb(S390PCIIOMMU *iommu=
+, S390IOTLBEntry *entry)
+>          g_hash_table_replace(iommu->iotlb, &cache->iova, cache);
+>      }
+>
+> -    memory_region_notify_iommu(&iommu->iommu_mr, notify);
+> +    memory_region_notify_iommu(&iommu->iommu_mr, 0, notify);
+>  }
+>
+>  int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t r=
+a)
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 8e57265edf1..fb396cf00ac 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -507,6 +507,7 @@ static void vfio_listener_region_add(MemoryListener *=
+listener,
+>      if (memory_region_is_iommu(section->mr)) {
+>          VFIOGuestIOMMU *giommu;
+>          IOMMUMemoryRegion *iommu_mr =3D IOMMU_MEMORY_REGION(section->mr);
+> +        int iommu_idx;
+>
+>          trace_vfio_listener_region_add_iommu(iova, end);
+>          /*
+> @@ -523,10 +524,13 @@ static void vfio_listener_region_add(MemoryListener=
+ *listener,
+>          llend =3D int128_add(int128_make64(section->offset_within_region=
+),
+>                             section->size);
+>          llend =3D int128_sub(llend, int128_one());
+> +        iommu_idx =3D memory_region_iommu_attrs_to_index(iommu_mr,
+> +                                                       MEMTXATTRS_UNSPEC=
+IFIED);
+>          iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
+>                              IOMMU_NOTIFIER_ALL,
+>                              section->offset_within_region,
+> -                            int128_get64(llend));
+> +                            int128_get64(llend),
+> +                            iommu_idx);
+>          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+>
+>          memory_region_register_iommu_notifier(section->mr, &giommu->n);
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 96175b214d7..b129cb9dddd 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -662,6 +662,8 @@ static void vhost_iommu_region_add(MemoryListener *li=
+stener,
+>                                           iommu_listener);
+>      struct vhost_iommu *iommu;
+>      Int128 end;
+> +    int iommu_idx;
+> +    IOMMUMemoryRegion *iommu_mr =3D IOMMU_MEMORY_REGION(section->mr);
+>
+>      if (!memory_region_is_iommu(section->mr)) {
+>          return;
+> @@ -671,10 +673,13 @@ static void vhost_iommu_region_add(MemoryListener *=
+listener,
+>      end =3D int128_add(int128_make64(section->offset_within_region),
+>                       section->size);
+>      end =3D int128_sub(end, int128_one());
+> +    iommu_idx =3D memory_region_iommu_attrs_to_index(iommu_mr,
+> +                                                   MEMTXATTRS_UNSPECIFIE=
+D);
+>      iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
+>                          IOMMU_NOTIFIER_UNMAP,
+>                          section->offset_within_region,
+> -                        int128_get64(end));
+> +                        int128_get64(end),
+> +                        iommu_idx);
+>      iommu->mr =3D section->mr;
+>      iommu->iommu_offset =3D section->offset_within_address_space -
+>                            section->offset_within_region;
+> diff --git a/memory.c b/memory.c
+> index 64f4a55d546..7aa75ff02d3 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1799,6 +1799,9 @@ void memory_region_register_iommu_notifier(MemoryRe=
+gion *mr,
+>      iommu_mr =3D IOMMU_MEMORY_REGION(mr);
+>      assert(n->notifier_flags !=3D IOMMU_NOTIFIER_NONE);
+>      assert(n->start <=3D n->end);
+> +    assert(n->iommu_idx >=3D 0 &&
+> +           n->iommu_idx < memory_region_iommu_num_indexes(iommu_mr));
+> +
+>      QLIST_INSERT_HEAD(&iommu_mr->iommu_notify, n, node);
+>      memory_region_update_iommu_notify_flags(iommu_mr);
+>  }
+> @@ -1891,6 +1894,7 @@ void memory_region_notify_one(IOMMUNotifier *notifi=
+er,
+>  }
+>
+>  void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+> +                                int iommu_idx,
+>                                  IOMMUTLBEntry entry)
+>  {
+>      IOMMUNotifier *iommu_notifier;
+> @@ -1898,7 +1902,9 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *=
+iommu_mr,
+>      assert(memory_region_is_iommu(MEMORY_REGION(iommu_mr)));
+>
+>      IOMMU_NOTIFIER_FOREACH(iommu_notifier, iommu_mr) {
+> -        memory_region_notify_one(iommu_notifier, &entry);
+> +        if (iommu_notifier->iommu_idx =3D=3D iommu_idx) {
+> +            memory_region_notify_one(iommu_notifier, &entry);
+> +        }
+>      }
+>  }
 
 
 --
