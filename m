@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fTNSq-0001m2-0n
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:18:41 -0400
+	(envelope-from <berrange@redhat.com>) id 1fTNW9-0003aG-8C
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:22:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fTNSl-0004rm-0i
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:18:39 -0400
-Date: Thu, 14 Jun 2018 10:18:33 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180614011449.GR30690@umbus.fritz.box>
-Message-ID: <alpine.BSF.2.21.1806141007300.19899@zero.eik.bme.hu>
-References: <cover.1528935420.git.balaton@eik.bme.hu>
-	<16139dc707e8de2b79bcdb2b0fcb4749216f2e86.1528935420.git.balaton@eik.bme.hu>
-	<20180614011449.GR30690@umbus.fritz.box>
+	(envelope-from <berrange@redhat.com>) id 1fTNW5-0005yf-3R
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:22:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36914 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fTNW4-0005yJ-Sg
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:22:01 -0400
+Date: Thu, 14 Jun 2018 09:21:55 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180614082155.GI6355@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <cover.1528832686.git.alifm@linux.ibm.com>
+	<dd7e90c5b3de6f98218908c7f57d9d0286089ad5.1528832686.git.alifm@linux.ibm.com>
+	<20180613093700.GG27901@redhat.com>
+	<7b51465a-b7c1-58ec-1ef6-9fe791e96bbf@linux.ibm.com>
+	<20180613150512.GA19901@redhat.com>
+	<5833f4ec-dcd1-19ac-2848-facf31aec7cf@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5833f4ec-dcd1-19ac-2848-facf31aec7cf@linux.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/9] ppc4xx_i2c: Remove unimplemented
- sdata and intr registers
+Subject: Re: [Qemu-devel] [RFC v1 1/1] virtio-crypto: Allow disabling of
+ cipher algorithms for virtio-crypto device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,154 +34,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Farhan Ali <alifm@linux.ibm.com>, qemu-devel@nongnu.org, frankja@linux.ibm.com, mst@redhat.com, borntraeger@de.ibm.com, arei.gonglei@huawei.com, longpeng2@huawei.com, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, mjrosato@linux.vnet.ibm.com
 
-On Thu, 14 Jun 2018, David Gibson wrote:
-> On Thu, Jun 14, 2018 at 02:17:00AM +0200, BALATON Zoltan wrote:
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->
-> But.. they are implemented.  Albeit as an entirely software controlled
-> register.
+On Wed, Jun 13, 2018 at 07:28:08PM +0200, Halil Pasic wrote:
+>=20
+>=20
+> On 06/13/2018 05:05 PM, Daniel P. Berrang=C3=A9 wrote:
+> > On Wed, Jun 13, 2018 at 11:01:05AM -0400, Farhan Ali wrote:
+> > > Hi Daniel
+> > >=20
+> > > On 06/13/2018 05:37 AM, Daniel P. Berrang=C3=A9 wrote:
+> > > > On Tue, Jun 12, 2018 at 03:48:34PM -0400, Farhan Ali wrote:
+> > > > > The virtio-crypto driver currently propagates to the guest
+> > > > > all the cipher algorithms that the backend cryptodev can
+> > > > > support. But in certain cases where the guest has more
+> > > > > performant mechanism to handle some algorithms, it would be
+> > > > > useful to propagate only a subset of the algorithms.
+> > > >=20
+> > > > I'm not really convinced by this.
+> > > >=20
+> > > > The performance of crypto algorithms has many influencing
+> > > > factors, making it pretty hard to decide which is best
+> > > > without actively testing specific impls and comparing
+> > > > them in a manner which matches the application usage
+> > > > pattern. eg in theory the kernel crypto impl of an alg
+> > > > is faster than a userspace impl, if the kernel uses
+> > > > hardware accel and userspace does not. This, however,
+> > > > ignores the overhead of the kernel/userspace switch.
+> > > > The real world performance winner, thus depends on the
+> > > > amount of data being processed in each operation. Some
+> > > > times userspace can win & sometimes kernel space can
+> > > > win. This is even more relevant to virtio-crypto as
+> > > > it has more expensive context switches.
+> > >=20
+> > > True. But what if the guest can perform some crypto algorithms with=
+out a
+> > > incurring a VM exit? For example in s390 we have the cpacf instruct=
+ions to
+> > > perform crypto and this instruction is implemented for us by our ha=
+rdware
+> > > virtualization technology. In such a case it would be better not to=
+ use
+> > > virtio-crypto's implementation of such a crypto algorithm.
+> > >=20
+> > > At the same time we would like to take advantage of virtio-crypto's
+> > > acceleration capabilities for certain crypto algorithms for which t=
+here is
+> > > no hardware assistance.
+> >=20
+> > IIUC, the kernel's crypto layer can support multiple implementations =
+of
+> > any algorithm. Providers can report a priority against implementation=
+s
+> > which influences which impl is used in practice. So if there's a nati=
+ve
+> > instruction for a partiuclar algorithm I would expect the impl regist=
+ered
+> > for that to be designated higher priority than other impls, so that i=
+t is
+> > used in preference to other impls.
+> >=20
+>=20
+> AFAIR the problem here is that in (the guest) kernel the virtio-crypto
+> driver has to register it's crypto algo implementations with a priority
+> (single number), which dictates if it's going to be the preferred (used=
+)
+> implementation of the algorithm or not. The virtio-crypto driver does t=
+his
+> without having information about the (comparative or absolute) performa=
+nce
+> of it's implementation (which depends on the backend among others). I d=
+on't think
+> any dynamic re-prioritization of the algorithms takes place (e.g. based=
+ on how these
+> perform in for the given configuration).
+>=20
+> I think the strategy of the virtio-crypto is to rather overstate, than
+> understate the performance of it's implementation. If we were to 'be
+> conservative' and say, 'hey we don't know nothing about the performance=
+,
+> let's make it lowest priority implementation' the implementations provi=
+ded
+> by virtio-crypto would end up being used only if there is no other
+> implementation. And that does not sound like a good idea either.
 
-They were implemented only in that they could be written and read but did=
-=20
-not implement any of the functionality they have in real hardware so in=20
-that sense they were not really implemented.
 
-> I'm guessing that's not what they're supposed to do, which is why
-> you're removing them, but that needs to be explained in the commit
-> message.
+This problem you describe, however, is something that applies to *any*
+kerenl code that is registering a crypto algo impl for accelerator
+hardware. A non-virtualized crypto cards in bare metal likewise cannot
+assume that its AES impl is better then the host CPU's  aes-ni instructio=
+n.
 
-Maybe adding this explanation:
+> So the idea is to give the user the power to effectively not provide
+> an algorithm via virtio-crypto. That is, if the user observes a perform=
+ance
+> degradation because of virtio-crypto, he can turn off the bad algorithm=
+s
+> at the device. That way overstatement becomes a much smaller problem.
+> The user can turn off the bad algorithms for reasons other than perform=
+ance
+> too.
+>=20
+> Of course there are other ways to deal with the problem of virtio-crypt=
+o
+> driver not knowing how good it's implementation of a given algo is. We
+> could make the in kernel crypto priorities dynamically adjustable in ge=
+neral
+> or we could provide the user with means to specify the priorities (e.g.
+> as module parameter) with which the virtio-crypto driver registers each=
+ algo.
+> Both of these would be knobs in the guest. It's hard to tell if these f=
+irst
+> one would be useful in scenarios not involving virtualization. Same goe=
+s
+> for some kind of dynamic priority management for crypto algorithm imple=
+mentations
+> in the Linux kernel. I assume the people involved with the respective
+> subsystem do not see the necessity for something like that.
 
-We dont emulate slave mode so related registers are not needed. [lh]sadr=20
-are only retained to avoid too many warnings and simplify debugging but=20
-sdata is not even correct because device has a 4 byte FIFO instead so=20
-just remove this unimplemented register for now.
+It still feels like this is a problem for the guest OS to solve. If you
+put a physical crypto accelerator in a bare metal machine, that has the
+same problem you describe here, so the kernel surely already needs to fin=
+d
+a viable solution for this problem.=20
 
-The intr register is also not implemented correctly, it is for diagnostic=
-s=20
-and normally not even visible on device without explicitly enabling it. A=
-s=20
-no guests are known to need this remove it as well.
 
 Regards,
-BALATON Zoltan
-
-> As a general rule cases where a one line commit message is acceptable
-> are *very* rare.
->
->> ---
->>  hw/i2c/ppc4xx_i2c.c         | 16 +---------------
->>  include/hw/i2c/ppc4xx_i2c.h |  4 +---
->>  2 files changed, 2 insertions(+), 18 deletions(-)
->>
->> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
->> index d1936db..4e0aaae 100644
->> --- a/hw/i2c/ppc4xx_i2c.c
->> +++ b/hw/i2c/ppc4xx_i2c.c
->> @@ -3,7 +3,7 @@
->>   *
->>   * Copyright (c) 2007 Jocelyn Mayer
->>   * Copyright (c) 2012 Fran=E7ois Revol
->> - * Copyright (c) 2016 BALATON Zoltan
->> + * Copyright (c) 2016-2018 BALATON Zoltan
->>   *
->>   * Permission is hereby granted, free of charge, to any person obtain=
-ing a copy
->>   * of this software and associated documentation files (the "Software=
-"), to deal
->> @@ -63,7 +63,6 @@ static void ppc4xx_i2c_reset(DeviceState *s)
->>      i2c->mdcntl =3D 0;
->>      i2c->sts =3D 0;
->>      i2c->extsts =3D 0x8f;
->> -    i2c->sdata =3D 0;
->>      i2c->lsadr =3D 0;
->>      i2c->hsadr =3D 0;
->>      i2c->clkdiv =3D 0;
->> @@ -71,7 +70,6 @@ static void ppc4xx_i2c_reset(DeviceState *s)
->>      i2c->xfrcnt =3D 0;
->>      i2c->xtcntlss =3D 0;
->>      i2c->directcntl =3D 0xf;
->> -    i2c->intr =3D 0;
->>  }
->>
->>  static inline bool ppc4xx_i2c_is_master(PPC4xxI2CState *i2c)
->> @@ -139,9 +137,6 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwa=
-ddr addr, unsigned int size)
->>                            TYPE_PPC4xx_I2C, __func__);
->>          }
->>          break;
->> -    case 2:
->> -        ret =3D i2c->sdata;
->> -        break;
->>      case 4:
->>          ret =3D i2c->lmadr;
->>          break;
->> @@ -181,9 +176,6 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwa=
-ddr addr, unsigned int size)
->>      case 16:
->>          ret =3D i2c->directcntl;
->>          break;
->> -    case 17:
->> -        ret =3D i2c->intr;
->> -        break;
->>      default:
->>          if (addr < PPC4xx_I2C_MEM_SIZE) {
->>              qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
->> @@ -229,9 +221,6 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr=
- addr, uint64_t value,
->>              }
->>          }
->>          break;
->> -    case 2:
->> -        i2c->sdata =3D value;
->> -        break;
->>      case 4:
->>          i2c->lmadr =3D value;
->>          if (i2c_bus_busy(i2c->bus)) {
->> @@ -302,9 +291,6 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr=
- addr, uint64_t value,
->>      case 16:
->>          i2c->directcntl =3D value & 0x7;
->>          break;
->> -    case 17:
->> -        i2c->intr =3D value;
->> -        break;
->>      default:
->>          if (addr < PPC4xx_I2C_MEM_SIZE) {
->>              qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
->> diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
->> index 3c60307..e4b6ded 100644
->> --- a/include/hw/i2c/ppc4xx_i2c.h
->> +++ b/include/hw/i2c/ppc4xx_i2c.h
->> @@ -3,7 +3,7 @@
->>   *
->>   * Copyright (c) 2007 Jocelyn Mayer
->>   * Copyright (c) 2012 Fran=E7ois Revol
->> - * Copyright (c) 2016 BALATON Zoltan
->> + * Copyright (c) 2016-2018 BALATON Zoltan
->>   *
->>   * Permission is hereby granted, free of charge, to any person obtain=
-ing a copy
->>   * of this software and associated documentation files (the "Software=
-"), to deal
->> @@ -49,7 +49,6 @@ typedef struct PPC4xxI2CState {
->>      uint8_t mdcntl;
->>      uint8_t sts;
->>      uint8_t extsts;
->> -    uint8_t sdata;
->>      uint8_t lsadr;
->>      uint8_t hsadr;
->>      uint8_t clkdiv;
->> @@ -57,7 +56,6 @@ typedef struct PPC4xxI2CState {
->>      uint8_t xfrcnt;
->>      uint8_t xtcntlss;
->>      uint8_t directcntl;
->> -    uint8_t intr;
->>  } PPC4xxI2CState;
->>
->>  #endif /* PPC4XX_I2C_H */
->
->
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
