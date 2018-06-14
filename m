@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40013)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fTTd3-00073C-Cm
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:53:38 -0400
+	(envelope-from <thuth@redhat.com>) id 1fTTd4-000751-RD
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:53:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fTTd2-0006TT-0Y
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:53:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1fTTd3-0006UE-SO
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:53:38 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Thu, 14 Jun 2018 16:53:20 +0200
-Message-Id: <1528988003-21855-5-git-send-email-thuth@redhat.com>
+Date: Thu, 14 Jun 2018 16:53:21 +0200
+Message-Id: <1528988003-21855-6-git-send-email-thuth@redhat.com>
 In-Reply-To: <1528988003-21855-1-git-send-email-thuth@redhat.com>
 References: <1528988003-21855-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 4/7] pc-bios/s390-ccw/net: Add
- support for pxelinux-style config files
+Subject: [Qemu-devel] [PULL SUBSYSTEM s390x 5/7] pc-bios/s390-ccw/net: Try
+ to load pxelinux.cfg file accoring to the UUID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,191 +23,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-Since it is quite cumbersome to manually create a combined kernel with
-initrd image for network booting, we now support loading via pxelinux
-configuration files, too. In these files, the kernel, initrd and command
-line parameters can be specified seperately, and the firmware then takes
-care of glueing everything together in memory after the files have been
-downloaded. See this URL for details about the config file layout:
-https://www.syslinux.org/wiki/index.php?title=PXELINUX
-
-The user can either specify a config file directly as bootfile via DHCP
-(but in this case, the file has to start either with "default" or a "#"
-comment so we can distinguish it from binary kernels), or a folder (i.e.
-the bootfile name must end with "/") where the firmware should look for
-the typical pxelinux.cfg file names, e.g. based on MAC or IP address.
-We also support the pxelinux.cfg DHCP options 209 and 210 from RFC 5071.
+With the STSI instruction, we can get the UUID of the current VM instance,
+so we can support loading pxelinux config files via UUID in the file name,
+too.
 
 Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Tested-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/netboot.mak |  7 ++--
- pc-bios/s390-ccw/netmain.c   | 86 +++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 89 insertions(+), 4 deletions(-)
+ pc-bios/s390-ccw/netmain.c | 56 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 55 insertions(+), 1 deletion(-)
 
-diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
-index a73be36..8af0cfd 100644
---- a/pc-bios/s390-ccw/netboot.mak
-+++ b/pc-bios/s390-ccw/netboot.mak
-@@ -25,8 +25,9 @@ CTYPE_OBJS = isdigit.o isxdigit.o toupper.o
- %.o : $(SLOF_DIR)/lib/libc/ctype/%.c
- 	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
- 
--STRING_OBJS = strcat.o strchr.o strcmp.o strcpy.o strlen.o strncmp.o strncpy.o \
--	      strstr.o memset.o memcpy.o memmove.o memcmp.o
-+STRING_OBJS = strcat.o strchr.o strrchr.o strcpy.o strlen.o strncpy.o \
-+	      strcmp.o strncmp.o strcasecmp.o strncasecmp.o strstr.o \
-+	      memset.o memcpy.o memmove.o memcmp.o
- %.o : $(SLOF_DIR)/lib/libc/string/%.c
- 	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
- 
-@@ -50,7 +51,7 @@ libc.a: $(LIBCOBJS)
- # libnet files:
- 
- LIBNETOBJS := args.o dhcp.o dns.o icmpv6.o ipv6.o tcp.o udp.o bootp.o \
--	      dhcpv6.o ethernet.o ipv4.o ndp.o tftp.o
-+	      dhcpv6.o ethernet.o ipv4.o ndp.o tftp.o pxelinux.o
- LIBNETCFLAGS := $(QEMU_CFLAGS) -DDHCPARCH=0x1F $(LIBC_INC) $(LIBNET_INC)
- 
- %.o : $(SLOF_DIR)/lib/libnet/%.c
 diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index d007fb7..c059546 100644
+index c059546..0392131 100644
 --- a/pc-bios/s390-ccw/netmain.c
 +++ b/pc-bios/s390-ccw/netmain.c
-@@ -30,6 +30,7 @@
- #include <ipv6.h>
- #include <dns.h>
- #include <time.h>
-+#include <pxelinux.h>
- 
- #include "s390-ccw.h"
- #include "virtio.h"
-@@ -41,12 +42,14 @@ extern char _start[];
- 
- #define KERNEL_ADDR             ((void *)0L)
+@@ -44,6 +44,9 @@ extern char _start[];
  #define KERNEL_MAX_SIZE         ((long)_start)
-+#define ARCH_COMMAND_LINE_SIZE  896              /* Taken from Linux kernel */
+ #define ARCH_COMMAND_LINE_SIZE  896              /* Taken from Linux kernel */
  
++/* STSI 3.2.2 offset of first vmdb + offset of uuid inside vmdb */
++#define STSI322_VMDB_UUID_OFFSET ((8 + 12) * 4)
++
  char stack[PAGE_SIZE * 8] __attribute__((aligned(PAGE_SIZE)));
  IplParameterBlock iplb __attribute__((aligned(PAGE_SIZE)));
  static char cfgbuf[2048];
- 
- static SubChannelId net_schid = { .one = 1 };
-+static uint8_t mac[6];
- static uint64_t dest_timer;
- 
- static uint64_t get_timer_ms(void)
-@@ -159,7 +162,6 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
- 
- static int net_init(filename_ip_t *fn_ip)
- {
--    uint8_t mac[6];
-     int rc;
- 
-     memset(fn_ip, 0, sizeof(filename_ip_t));
-@@ -234,6 +236,66 @@ static void net_release(filename_ip_t *fn_ip)
+@@ -236,6 +239,56 @@ static void net_release(filename_ip_t *fn_ip)
  }
  
  /**
-+ * Load a kernel with initrd (i.e. with the information that we've got from
-+ * a pxelinux.cfg config file)
++ * Retrieve the Universally Unique Identifier of the VM.
++ * @return UUID string, or NULL in case of errors
 + */
-+static int load_kernel_with_initrd(filename_ip_t *fn_ip,
-+                                   struct pl_cfg_entry *entry)
++static const char *get_uuid(void)
 +{
-+    int rc;
++    register int r0 asm("0");
++    register int r1 asm("1");
++    uint8_t *mem, *buf, uuid[16];
++    int i, cc, chk = 0;
++    static char uuid_str[37];
 +
-+    printf("Loading pxelinux.cfg entry '%s'\n", entry->label);
++    mem = malloc(2 * PAGE_SIZE);
++    if (!mem) {
++        puts("Out of memory ... can not get UUID.");
++        return NULL;
++    }
++    buf = (uint8_t *)(((uint64_t)mem + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1));
++    memset(buf, 0, PAGE_SIZE);
 +
-+    if (!entry->kernel) {
-+        printf("Kernel entry is missing!\n");
-+        return -1;
++    /* Get SYSIB 3.2.2 */
++    r0 = (3 << 28) | 2;
++    r1 = 2;
++    asm volatile(" stsi 0(%[addr])\n"
++                 " ipm  %[cc]\n"
++                 " srl  %[cc],28\n"
++                 : [cc] "=d" (cc)
++                 : "d" (r0), "d" (r1), [addr] "a" (buf)
++                 : "cc", "memory");
++    if (cc) {
++        return NULL;
 +    }
 +
-+    strncpy(fn_ip->filename, entry->kernel, sizeof(fn_ip->filename));
-+    rc = tftp_load(fn_ip, KERNEL_ADDR, KERNEL_MAX_SIZE);
-+    if (rc < 0) {
-+        return rc;
++    for (i = 0; i < 16; i++) {
++        uuid[i] = buf[STSI322_VMDB_UUID_OFFSET + i];
++        chk |= uuid[i];
++    }
++    free(mem);
++    if (!chk) {
++        return NULL;
 +    }
 +
-+    if (entry->initrd) {
-+        uint64_t iaddr = (rc + 0xfff) & ~0xfffUL;
++    sprintf(uuid_str, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-"
++            "%02x%02x%02x%02x%02x%02x", uuid[0], uuid[1], uuid[2], uuid[3],
++            uuid[4], uuid[5], uuid[6], uuid[7], uuid[8], uuid[9], uuid[10],
++            uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]);
 +
-+        strncpy(fn_ip->filename, entry->initrd, sizeof(fn_ip->filename));
-+        rc = tftp_load(fn_ip, (void *)iaddr, KERNEL_MAX_SIZE - iaddr);
-+        if (rc < 0) {
-+            return rc;
-+        }
-+        /* Patch location and size: */
-+        *(uint64_t *)0x10408 = iaddr;
-+        *(uint64_t *)0x10410 = rc;
-+        rc += iaddr;
-+    }
-+
-+    if (entry->append) {
-+        strncpy((char *)0x10480, entry->append, ARCH_COMMAND_LINE_SIZE);
-+    }
-+
-+    return rc;
-+}
-+
-+#define MAX_PXELINUX_ENTRIES 16
-+
-+static int net_try_pxelinux_cfg(filename_ip_t *fn_ip)
-+{
-+    struct pl_cfg_entry entries[MAX_PXELINUX_ENTRIES];
-+    int num_ent, def_ent = 0;
-+
-+    num_ent = pxelinux_load_parse_cfg(fn_ip, mac, NULL, DEFAULT_TFTP_RETRIES,
-+                                      cfgbuf, sizeof(cfgbuf),
-+                                      entries, MAX_PXELINUX_ENTRIES, &def_ent);
-+    if (num_ent > 0) {
-+        return load_kernel_with_initrd(fn_ip, &entries[def_ent]);
-+    }
-+
-+    return -1;
++    return uuid_str;
 +}
 +
 +/**
-  * Load via information from a .INS file (which can be found on CD-ROMs
-  * for example)
+  * Load a kernel with initrd (i.e. with the information that we've got from
+  * a pxelinux.cfg config file)
   */
-@@ -302,6 +364,25 @@ static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
-         if (!strncmp("* ", cfgbuf, 2)) {
-             return handle_ins_cfg(fn_ip, cfgbuf, rc);
-         }
-+        /*
-+         * pxelinux.cfg support via bootfile name is just here for developers'
-+         * convenience (it eases testing with the built-in DHCP server of QEMU
-+         * that does not support RFC 5071). The official way to configure a
-+         * pxelinux.cfg file name is to use DHCP options 209 and 210 instead.
-+         * So only use the pxelinux.cfg parser here for files that start with
-+         * a magic comment string.
-+         */
-+        if (!strncasecmp("# pxelinux", cfgbuf, 10)) {
-+            struct pl_cfg_entry entries[MAX_PXELINUX_ENTRIES];
-+            int num_ent, def_ent = 0;
-+
-+            num_ent = pxelinux_parse_cfg(cfgbuf, sizeof(cfgbuf), entries,
-+                                         MAX_PXELINUX_ENTRIES, &def_ent);
-+            if (num_ent <= 0) {
-+                return -1;
-+            }
-+            return load_kernel_with_initrd(fn_ip, &entries[def_ent]);
-+        }
-     }
+@@ -285,7 +338,8 @@ static int net_try_pxelinux_cfg(filename_ip_t *fn_ip)
+     struct pl_cfg_entry entries[MAX_PXELINUX_ENTRIES];
+     int num_ent, def_ent = 0;
  
-     /* Move kernel to right location */
-@@ -407,6 +488,9 @@ void main(void)
-     if (fnlen > 0 && fn_ip.filename[fnlen - 1] != '/') {
-         rc = net_try_direct_tftp_load(&fn_ip);
-     }
-+    if (rc <= 0) {
-+        rc = net_try_pxelinux_cfg(&fn_ip);
-+    }
- 
-     net_release(&fn_ip);
- 
+-    num_ent = pxelinux_load_parse_cfg(fn_ip, mac, NULL, DEFAULT_TFTP_RETRIES,
++    num_ent = pxelinux_load_parse_cfg(fn_ip, mac, get_uuid(),
++                                      DEFAULT_TFTP_RETRIES,
+                                       cfgbuf, sizeof(cfgbuf),
+                                       entries, MAX_PXELINUX_ENTRIES, &def_ent);
+     if (num_ent > 0) {
 -- 
 1.8.3.1
