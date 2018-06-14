@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37202)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTL9T-0003Bc-Pn
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 01:50:32 -0400
+	(envelope-from <david@redhat.com>) id 1fTLWZ-0008SQ-5b
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:14:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTL9Q-0004Mo-TU
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 01:50:31 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:33363)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fTL9Q-0004MS-Na
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 01:50:28 -0400
-Received: by mail-pl0-x243.google.com with SMTP id 6-v6so2341594plb.0
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 22:50:28 -0700 (PDT)
-References: <20180613125601.14371-1-alex.bennee@linaro.org>
-	<20180613125601.14371-7-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d293c78c-c068-ba50-f4ee-c0a9d4b1d0be@linaro.org>
-Date: Wed, 13 Jun 2018 19:50:23 -1000
+	(envelope-from <david@redhat.com>) id 1fTLWV-0002Kf-4t
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 02:14:23 -0400
+References: <20180608142442.0d97b7c6@redhat.com>
+	<397d37ee-b3a8-dae0-37d1-fd3c942448c2@redhat.com>
+	<20180608155432-mutt-send-email-mst@kernel.org>
+	<d6966aa8-54e5-8036-3603-069fbbb88c2a@redhat.com>
+	<20180608181004-mutt-send-email-mst@kernel.org>
+	<a68853da-a664-84ae-c5bd-4e79b967bb65@redhat.com>
+	<20180613174825.1eebef6c@redhat.com>
+	<c84ffb85-628f-4ece-e231-d0d7d45144c9@redhat.com>
+	<20180613212702-mutt-send-email-mst@kernel.org>
+	<5d03c321-4121-a814-ef4f-c649125c0231@redhat.com>
+	<20180614005745-mutt-send-email-mst@kernel.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <1a5dc38f-0bc7-75f6-f68f-d327e18c8934@redhat.com>
+Date: Thu, 14 Jun 2018 08:14:05 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180613125601.14371-7-alex.bennee@linaro.org>
+In-Reply-To: <20180614005745-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RISU PATCH v3 06/22] Makefile: include
- risu_reginfo_$(ARCH) in HDRS
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
+ hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,18 +34,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, peter.maydell@linaro.org
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-On 06/13/2018 02:55 AM, Alex Bennée wrote:
-> Otherwise changes to reginfo don't cause the whole thing to be
-> re-built causing much confusion when bisecting.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On 14.06.2018 00:05, Michael S. Tsirkin wrote:
+> On Wed, Jun 13, 2018 at 09:37:54PM +0200, David Hildenbrand wrote:
+>>>>>       [ ... specific to machine_foo wiring ...]
+>>>>>
+>>>>>       virtio_mem_plug() {
+>>>>>          [... some machine specific wiring ...]
+>>>>>
+>>>>>          bus_hotplug_ctrl =3D qdev_get_bus_hotplug_handler()
+>>>>>          bus_hotplug_ctrl->plug(bus_hotplug_ctrl, dev)
+>>>>>
+>>>>>          [... some more machine specific wiring ...]
+>>>>>       }
+>>>>>
+>>>>>       [ ... specific to machine_foo wiring ...]
+>>>>>
+>>>>> i.e. device itself doesn't participate in attaching to external ent=
+ities,
+>>>>> those entities (machine or bus controller virtio device is attached=
+ to)
+>>>>> do wiring on their own within their own domain.
+>>>>
+>>>> I am fine with this, but Michael asked if this ("virtio_mem_plug()")
+>>>> could go via new DeviceClass functions. Michael, would that also wor=
+k
+>>>> for your use case?
+>>>
+>>> It's not virtio specifically, I'm interested in how this will work fo=
+r
+>>> PCI generally.  Right now we call do_pci_register_device which
+>>> immediately makes it guest visible.
+>>
+>> So you're telling me that a PCI device exposes itself to the system in
+>> pci_qdev_realize() instead of letting a hotplug handler handle that? M=
+y
+>> assumption is that the PCI bridge hotplug handler handles this.
+>=20
+> Well given how things work in qemu that's not exactly
+> the case. See below.
+>=20
+>> What am
+>> I missing?
+>>
+>> I can see that e.g. for a virtio device the realize call chain is
+>>
+>> pci_qdev_realize() -> virtio_pci_realize() -> virtio_XXX__pci_realize =
+->
+>> virtio_XXX_realize()
+>>
+>> If any realization in pci_qdev_realize() fails, we do a
+>> do_pci_unregister_device().
+>>
+>> So if it is true what you're saying than we're already exposing
+>> partially realized (and possibly unrealized again) devices via PCI. I
+>> *guess* because we're holding the iothread mutex this is okay and
+>> actually not visible.
+>=20
+> For now but we need ability to have separate new commands for
+> realize and plug, so we will drop the mutex.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+If you want to actually drop the mutex, I assume that quite some rework
+will be necessary (not only for this specific PCI hotplug handler case),
+most probably also in other code parts (to) - all of the hotplug/realize
+code seems to rely on the mutex being locked and not being dropped
+temporarily.
 
-r~
+>=20
+>> And we only seem to be sending events in the PCI
+>> bridge hotplug handlers, so my assumption is that this is fine.
+>=20
+> For core PCI, it's mostly just this line:
+>=20
+>     bus->devices[devfn] =3D pci_dev;
+
+This should go into the hotplug handler if I am not wrong. From what I
+learned from Igor, this is a layer violation. Resource assignment should
+happen during pre_plug / plug. But then you might need a different way
+to "reserve" a function (if there could be races then with the lock
+temporarily dropped).
+
+>=20
+> which makes it accessible to pci config cycles.
+>=20
+> But failover also cares about vfio, which seems to set up
+> e.g. irqfs on realize.
+
+--=20
+
+Thanks,
+
+David / dhildenb
