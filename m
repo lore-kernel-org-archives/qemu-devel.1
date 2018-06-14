@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fTRwZ-0006dj-GA
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:05:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTRxV-0007FU-77
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:06:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fTRwT-0006Zl-QJ
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:05:39 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:39895)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fTRwT-0006Zd-NF
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:05:33 -0400
-Received: by mail-qt0-x242.google.com with SMTP id p23-v6so5645290qtn.6
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 06:05:33 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180614125337.24950-1-alex.bennee@linaro.org>
-	<20180614125337.24950-3-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3440ee22-fc89-f3ff-7967-bf8d8c3bd76f@amsat.org>
-Date: Thu, 14 Jun 2018 10:05:26 -0300
+	(envelope-from <kwolf@redhat.com>) id 1fTRxU-0007MP-7N
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:06:37 -0400
+Date: Thu, 14 Jun 2018 15:06:13 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180614130613.GE8564@localhost.localdomain>
+References: <20180608192027.284601-1-vsementsov@virtuozzo.com>
+	<20180608192027.284601-3-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20180614125337.24950-3-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 2/3] travis: reduce coverage of gprof
- build
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180608192027.284601-3-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] qcow2: refactor data compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +23,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, famz@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@gmail.com, pl@kamp.de, den@openvz.org
 
-On 06/14/2018 09:53 AM, Alex Bennée wrote:
-> This build is regularly timing out and even switching off linux-user
-> wasn't enough. Instead explicitly choose a target list of broadly the
-> "major" architectures. This is enough to check the gprof build
-> machinery works without worrying about the actual coverage results.
-> 
-> I did try various YAML constructs for specifying CONFIG with
-> continuation but couldn't get any of them to work hence the very long
-> line.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Am 08.06.2018 um 21:20 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> Make a separate function for compression to be parallelized later.
+>  - use .avail_aut field instead of .next_out to calculate size of
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+s/avail_aut/avail_out/
 
-> ---
->  .travis.yml | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>    compressed data. It looks more natural and it allows to keep dest to
+>    be void pointer
+>  - set avail_out to be at least one byte less than input, to be sure
+>    avoid inefficient compression earlier
 > 
-> diff --git a/.travis.yml b/.travis.yml
-> index d5e6d50e6d..c200dde534 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -80,7 +80,7 @@ matrix:
->      - env: CONFIG="--disable-user"
->        compiler: clang
->      # gprof/gcov are GCC features
-> -    - env: CONFIG="--enable-gprof --enable-gcov --disable-pie --disable-linux-user"
-> +    - env: CONFIG="--enable-gprof --enable-gcov --disable-pie --target-list=aarch64-softmmu,arm-softmmu,i386-softmmu,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-softmmu,x86_64-softmmu"
->        compiler: gcc
->      # We manually include builds which we disable "make check" for
->      - env: CONFIG="--enable-debug --enable-tcg-interpreter"
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+>  block/qcow2.c | 74 +++++++++++++++++++++++++++++++++++++----------------------
+>  1 file changed, 47 insertions(+), 27 deletions(-)
 > 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 549fee9b69..d4dbe329ab 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -22,11 +22,13 @@
+>   * THE SOFTWARE.
+>   */
+>  
+> +#define ZLIB_CONST
+> +#include <zlib.h>
+
+The first #include must always be "qemu/osdep.h". If you want to
+separate zlib.h from the internal headers, you can move it down instead.
+
+>  #include "qemu/osdep.h"
+>  #include "block/block_int.h"
+>  #include "sysemu/block-backend.h"
+>  #include "qemu/module.h"
+> -#include <zlib.h>
+>  #include "qcow2.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+> @@ -3674,6 +3676,45 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
+>      return 0;
+>  }
+>  
+> +/* qcow2_compress()
+
+The first line of the comment should contain only the /*
+
+> + *
+> + * @dest - destination buffer, at least of @size-1 bytes
+> + * @src - source buffer, @size bytes
+> + *
+> + * Returns: compressed size on success
+> + *          -1 if compression is inefficient
+> + *          -2 on any other error
+> + */
+
+The logic looks fine.
+
+Initially I intended to request splitting the code motion from the
+changes, but I see that this would probably only make things more
+complicated, so I'm okay with leaving that as it is.
+
+Kevin
