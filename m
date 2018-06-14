@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tamiko@kyomu.43-1.org>) id 1fTUQG-00068b-BM
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 11:44:29 -0400
+	(envelope-from <tamiko@kyomu.43-1.org>) id 1fTUQB-00067c-Tp
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 11:44:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tamiko@kyomu.43-1.org>) id 1fTUQF-0001oQ-Br
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 11:44:28 -0400
-Received: from tsukuyomi.43-1.org ([2a01:4f8:173:743::1:50]:50743)
+	(envelope-from <tamiko@kyomu.43-1.org>) id 1fTUQA-0001nK-PE
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 11:44:23 -0400
+Received: from tsukuyomi.43-1.org ([188.40.248.50]:46759)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <tamiko@kyomu.43-1.org>)
-	id 1fTUQF-0001nu-4v
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 11:44:27 -0400
+	id 1fTUQA-0001my-Hw
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 11:44:22 -0400
 From: Matthias Maier <tamiko@43-1.org>
-Date: Thu, 14 Jun 2018 10:43:57 -0500
-Message-Id: <20180614154357.20132-3-tamiko@43-1.org>
+Date: Thu, 14 Jun 2018 10:43:56 -0500
+Message-Id: <20180614154357.20132-2-tamiko@43-1.org>
 In-Reply-To: <20180614154357.20132-1-tamiko@43-1.org>
 References: <20180614154357.20132-1-tamiko@43-1.org>
-Subject: [Qemu-devel] [PATCH 2/2] qapi: open files in binary mode and use
- explicit decoding/encoding in common.py
+Subject: [Qemu-devel] [PATCH 1/2] Partially revert commit d4e5ec877ca
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +29,84 @@ Cc: "Daniel P . Berrange" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redha
 
 From: Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
 
-This is a different approach to fix the locale dependent encode/decode
-problem in common.py utilizing the binary read/write mode [1,2] and
-decode/encode with explicit UTF-8 encoding arguments [3].
+This commit removes the PYTHON_UTF8 workaround. The problem with setting
 
-This approach is preferred over the fix in commit d4e5ec877ca because it
-is (a) locale independent, and (b) does not depend on the en_US.UTF_8
-locale to be available.
+  LC_ALL= LANG=C LC_CTYPE=en_US.UTF-8
 
-[1] https://docs.python.org/3.6/library/stdtypes.html#bytes.decode
-[2] https://docs.python.org/3.6/library/stdtypes.html#str.encode
-[3] https://docs.python.org/3/howto/unicode.html
+is that the en_US.UTF-8 locale might not be available. In this case
+setting above locales results in build errors even though another UTF-8
+locale was originally set [1]. The only stable way of fixing the
+encoding problem is by explicitly annotating encoding/decoding in the
+python script.
+
+[1] https://bugs.gentoo.org/657766
 
 Signed-off-by: Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
 Signed-off-by: Matthias Maier <tamiko@43-1.org>
 ---
- scripts/qapi/common.py | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ Makefile               | 6 ++----
+ tests/Makefile.include | 6 +++---
+ 2 files changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index 2462fc0291..8f8ccc65c3 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -258,7 +258,7 @@ class QAPISchemaParser(object):
-         self.fname = fp.name
-         previously_included.append(os.path.abspath(fp.name))
-         self.incl_info = incl_info
--        self.src = fp.read()
-+        self.src = fp.read().decode("UTF-8")
-         if self.src == '' or self.src[-1] != '\n':
-             self.src += '\n'
-         self.cursor = 0
-@@ -340,7 +340,7 @@ class QAPISchemaParser(object):
-             return None
+diff --git a/Makefile b/Makefile
+index 6c6664d9a3..9f7fd9e5dc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -20,8 +20,6 @@ ifneq ($(wildcard config-host.mak),)
+ all:
+ include config-host.mak
  
-         try:
--            fobj = open(incl_fname, 'r')
-+            fobj = open(incl_fname, 'rb')
-         except IOError as e:
-             raise QAPISemError(info, '%s: %s' % (e.strerror, incl_fname))
-         return QAPISchemaParser(fobj, previously_included, info)
-@@ -1492,7 +1492,7 @@ class QAPISchemaEvent(QAPISchemaEntity):
- class QAPISchema(object):
-     def __init__(self, fname):
-         self._fname = fname
--        parser = QAPISchemaParser(open(fname, 'r'))
-+        parser = QAPISchemaParser(open(fname, 'rb'))
-         exprs = check_exprs(parser.exprs)
-         self.docs = parser.docs
-         self._entity_list = []
-@@ -2006,14 +2006,14 @@ class QAPIGen(object):
-                 if e.errno != errno.EEXIST:
-                     raise
-         fd = os.open(pathname, os.O_RDWR | os.O_CREAT, 0o666)
--        f = os.fdopen(fd, 'r+')
-+        f = os.fdopen(fd, 'r+b')
-         text = (self._top(fname) + self._preamble + self._body
-                 + self._bottom(fname))
--        oldtext = f.read(len(text) + 1)
-+        oldtext = f.read(len(text) + 1).decode("UTF-8")
-         if text != oldtext:
-             f.seek(0)
-             f.truncate(0)
--            f.write(text)
-+            f.write(text.encode("UTF-8"))
-         f.close()
+-PYTHON_UTF8 = LC_ALL= LANG=C LC_CTYPE=en_US.UTF-8 $(PYTHON)
+-
+ git-submodule-update:
  
+ .PHONY: git-submodule-update
+@@ -575,7 +573,7 @@ qga/qapi-generated/qga-qapi-commands.h qga/qapi-generated/qga-qapi-commands.c \
+ qga/qapi-generated/qga-qapi-doc.texi: \
+ qga/qapi-generated/qapi-gen-timestamp ;
+ qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
+-	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
++	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+ 		-o qga/qapi-generated -p "qga-" $<, \
+ 		"GEN","$(@:%-timestamp=%)")
+ 	@>$@
+@@ -675,7 +673,7 @@ qapi/qapi-introspect.h qapi/qapi-introspect.c \
+ qapi/qapi-doc.texi: \
+ qapi-gen-timestamp ;
+ qapi-gen-timestamp: $(qapi-modules) $(qapi-py)
+-	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
++	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+ 		-o "qapi" -b $<, \
+ 		"GEN","$(@:%-timestamp=%)")
+ 	@>$@
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index bb08e37b9d..618ed36cbb 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -674,13 +674,13 @@ tests/test-qapi-events.c tests/test-qapi-events.h \
+ tests/test-qapi-introspect.c tests/test-qapi-introspect.h: \
+ tests/test-qapi-gen-timestamp ;
+ tests/test-qapi-gen-timestamp: $(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(qapi-py)
+-	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
++	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+ 		-o tests -p "test-" $<, \
+ 		"GEN","$(@:%-timestamp=%)")
+ 	@>$@
  
+ tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc-good.json $(qapi-py)
+-	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
++	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+ 		-o tests/qapi-schema -p "doc-good-" $<, \
+ 		"GEN","$@")
+ 	@mv tests/qapi-schema/doc-good-qapi-doc.texi $@
+@@ -938,7 +938,7 @@ check-tests/qemu-iotests-quick.sh: tests/qemu-iotests-quick.sh qemu-img$(EXESUF)
+ .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
+ $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH)/%.json
+ 	$(call quiet-command, PYTHONPATH=$(SRC_PATH)/scripts \
+-		$(PYTHON_UTF8) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
++		$(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
+ 		$^ >$*.test.out 2>$*.test.err; \
+ 		echo $$? >$*.test.exit, \
+ 		"TEST","$*.out")
 -- 
 2.16.4
