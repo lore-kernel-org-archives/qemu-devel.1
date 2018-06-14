@@ -1,19 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fTUVM-0000j8-V4
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 11:49:46 -0400
+	(envelope-from <berto@igalia.com>) id 1fTUVM-0000jA-Vt
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 11:49:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fTUVI-0003nj-8y
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 11:49:45 -0400
+	(envelope-from <berto@igalia.com>) id 1fTUVI-0003nZ-7D
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 11:49:44 -0400
 From: Alberto Garcia <berto@igalia.com>
-Date: Thu, 14 Jun 2018 18:49:04 +0300
-Message-Id: <54751f9032d94639042f0d502b1731a7b89f9099.1528991017.git.berto@igalia.com>
+Date: Thu, 14 Jun 2018 18:49:07 +0300
+Message-Id: <aac2bc0b0bdefcfd2d3a0568236fdf3038175400.1528991017.git.berto@igalia.com>
 In-Reply-To: <cover.1528991017.git.berto@igalia.com>
 References: <cover.1528991017.git.berto@igalia.com>
 In-Reply-To: <cover.1528991017.git.berto@igalia.com>
 References: <cover.1528991017.git.berto@igalia.com>
-Subject: [Qemu-devel] [RFC PATCH 07/10] block: Add 'runtime_opts' and
- 'mutable_opts' fields to BlockDriver
+Subject: [Qemu-devel] [RFC PATCH 10/10] qemu-iotests: Test the
+ x-blockdev-reopen QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,234 +25,766 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>
 
-This patch adds two new fields to BlockDriver:
-
-   - runtime_opts: list of runtime options for a particular block
-     driver. We'll use this list later to detect what options are
-     missing when we try to reopen a block device.
-
-   - mutable_opts: names of the runtime options that can be modified
-     after a block device has been added. This way an option can not
-     be changed unless we explicitly allow it.
-
-This also sets runtime_opts (and mutable_opts where appropriate) in
-all drivers that allow reopening. Most of those drivers don't actually
-support changing any of their options. If the user specifies a new
-value for an option that can't be changed then we already detect that
-and forbid it (in bdrv_reopen_prepare()). But if the user omits an
-option in order to try to reset it to its default value we need to
-detect that, so we'll use these two new fields for that.
+This patch adds several tests for the x-blockdev-reopen QMP command.
 
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 ---
- block/blkdebug.c          |  1 +
- block/crypto.c            |  1 +
- block/file-posix.c        | 10 ++++++++++
- block/iscsi.c             |  2 ++
- block/null.c              |  2 ++
- block/nvme.c              |  1 +
- block/qcow.c              |  1 +
- block/rbd.c               |  1 +
- block/sheepdog.c          |  2 ++
- block/vpc.c               |  1 +
- include/block/block_int.h |  4 ++++
- 11 files changed, 26 insertions(+)
+ tests/qemu-iotests/220     | 724 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/220.out |   5 +
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 730 insertions(+)
+ create mode 100755 tests/qemu-iotests/220
+ create mode 100644 tests/qemu-iotests/220.out
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 526af2a808..9b52465642 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -893,6 +893,7 @@ static BlockDriver bdrv_blkdebug = {
-     .protocol_name          = "blkdebug",
-     .instance_size          = sizeof(BDRVBlkdebugState),
-     .is_filter              = true,
-+    .runtime_opts           = &runtime_opts,
- 
-     .bdrv_parse_filename    = blkdebug_parse_filename,
-     .bdrv_file_open         = blkdebug_open,
-diff --git a/block/crypto.c b/block/crypto.c
-index bc322b50f5..5da97799b2 100644
---- a/block/crypto.c
-+++ b/block/crypto.c
-@@ -696,6 +696,7 @@ BlockDriver bdrv_crypto_luks = {
-     .bdrv_co_create_opts = block_crypto_co_create_opts_luks,
-     .bdrv_truncate      = block_crypto_truncate,
-     .create_opts        = &block_crypto_create_opts_luks,
-+    .runtime_opts       = &block_crypto_runtime_opts_luks,
- 
-     .bdrv_reopen_prepare = block_crypto_reopen_prepare,
-     .bdrv_refresh_limits = block_crypto_refresh_limits,
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 1511a4d69d..d6fe8d17cf 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -429,6 +429,8 @@ static QemuOptsList raw_runtime_opts = {
-     },
- };
- 
-+static const char *const mutable_opts[] = { "x-check-cache-dropped", NULL };
+diff --git a/tests/qemu-iotests/220 b/tests/qemu-iotests/220
+new file mode 100755
+index 0000000000..ac737845d8
+--- /dev/null
++++ b/tests/qemu-iotests/220
+@@ -0,0 +1,724 @@
++#!/usr/bin/env python
++#
++# Test cases for the QMP 'x-blockdev-reopen' command
++#
++# Copyright (C) 2018 Igalia, S.L.
++# Author: Alberto Garcia <berto@igalia.com>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
- static int raw_open_common(BlockDriverState *bs, QDict *options,
-                            int bdrv_flags, int open_flags, Error **errp)
- {
-@@ -2582,6 +2584,8 @@ BlockDriver bdrv_file = {
-     .format_name = "file",
-     .protocol_name = "file",
-     .instance_size = sizeof(BDRVRawState),
-+    .runtime_opts = &raw_runtime_opts,
-+    .mutable_opts = mutable_opts,
-     .bdrv_needs_filename = true,
-     .bdrv_probe = NULL, /* no probe for protocols */
-     .bdrv_parse_filename = raw_parse_filename,
-@@ -3064,6 +3068,8 @@ static BlockDriver bdrv_host_device = {
-     .format_name        = "host_device",
-     .protocol_name        = "host_device",
-     .instance_size      = sizeof(BDRVRawState),
-+    .runtime_opts = &raw_runtime_opts,
-+    .mutable_opts = mutable_opts,
-     .bdrv_needs_filename = true,
-     .bdrv_probe_device  = hdev_probe_device,
-     .bdrv_parse_filename = hdev_parse_filename,
-@@ -3189,6 +3195,8 @@ static BlockDriver bdrv_host_cdrom = {
-     .format_name        = "host_cdrom",
-     .protocol_name      = "host_cdrom",
-     .instance_size      = sizeof(BDRVRawState),
-+    .runtime_opts = &raw_runtime_opts,
-+    .mutable_opts = mutable_opts,
-     .bdrv_needs_filename = true,
-     .bdrv_probe_device	= cdrom_probe_device,
-     .bdrv_parse_filename = cdrom_parse_filename,
-@@ -3321,6 +3329,8 @@ static BlockDriver bdrv_host_cdrom = {
-     .format_name        = "host_cdrom",
-     .protocol_name      = "host_cdrom",
-     .instance_size      = sizeof(BDRVRawState),
-+    .runtime_opts = &raw_runtime_opts,
-+    .mutable_opts = mutable_opts,
-     .bdrv_needs_filename = true,
-     .bdrv_probe_device	= cdrom_probe_device,
-     .bdrv_parse_filename = cdrom_parse_filename,
-diff --git a/block/iscsi.c b/block/iscsi.c
-index c2fbd8a8aa..5f68d11176 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -2443,6 +2443,7 @@ static BlockDriver bdrv_iscsi = {
-     .bdrv_close             = iscsi_close,
-     .bdrv_co_create_opts    = iscsi_co_create_opts,
-     .create_opts            = &iscsi_create_opts,
-+    .runtime_opts           = &runtime_opts,
-     .bdrv_reopen_prepare    = iscsi_reopen_prepare,
-     .bdrv_reopen_commit     = iscsi_reopen_commit,
-     .bdrv_co_invalidate_cache = iscsi_co_invalidate_cache,
-@@ -2480,6 +2481,7 @@ static BlockDriver bdrv_iser = {
-     .bdrv_close             = iscsi_close,
-     .bdrv_co_create_opts    = iscsi_co_create_opts,
-     .create_opts            = &iscsi_create_opts,
-+    .runtime_opts           = &runtime_opts,
-     .bdrv_reopen_prepare    = iscsi_reopen_prepare,
-     .bdrv_reopen_commit     = iscsi_reopen_commit,
-     .bdrv_co_invalidate_cache  = iscsi_co_invalidate_cache,
-diff --git a/block/null.c b/block/null.c
-index 5d610fdfba..fff3b12099 100644
---- a/block/null.c
-+++ b/block/null.c
-@@ -260,6 +260,7 @@ static BlockDriver bdrv_null_co = {
-     .format_name            = "null-co",
-     .protocol_name          = "null-co",
-     .instance_size          = sizeof(BDRVNullState),
-+    .runtime_opts           = &runtime_opts,
- 
-     .bdrv_file_open         = null_file_open,
-     .bdrv_parse_filename    = null_co_parse_filename,
-@@ -280,6 +281,7 @@ static BlockDriver bdrv_null_aio = {
-     .format_name            = "null-aio",
-     .protocol_name          = "null-aio",
-     .instance_size          = sizeof(BDRVNullState),
-+    .runtime_opts           = &runtime_opts,
- 
-     .bdrv_file_open         = null_file_open,
-     .bdrv_parse_filename    = null_aio_parse_filename,
-diff --git a/block/nvme.c b/block/nvme.c
-index 6f71122bf5..5c77f82adb 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -1158,6 +1158,7 @@ static BlockDriver bdrv_nvme = {
-     .format_name              = "nvme",
-     .protocol_name            = "nvme",
-     .instance_size            = sizeof(BDRVNVMeState),
-+    .runtime_opts             = &runtime_opts,
- 
-     .bdrv_parse_filename      = nvme_parse_filename,
-     .bdrv_file_open           = nvme_file_open,
-diff --git a/block/qcow.c b/block/qcow.c
-index 1f866af0d3..1176d5dbef 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -1188,6 +1188,7 @@ static QemuOptsList qcow_create_opts = {
- static BlockDriver bdrv_qcow = {
-     .format_name	= "qcow",
-     .instance_size	= sizeof(BDRVQcowState),
-+    .runtime_opts       = &qcow_runtime_opts,
-     .bdrv_probe		= qcow_probe,
-     .bdrv_open		= qcow_open,
-     .bdrv_close		= qcow_close,
-diff --git a/block/rbd.c b/block/rbd.c
-index a16431e267..173d7a50b0 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -1160,6 +1160,7 @@ static QemuOptsList qemu_rbd_create_opts = {
- static BlockDriver bdrv_rbd = {
-     .format_name            = "rbd",
-     .instance_size          = sizeof(BDRVRBDState),
-+    .runtime_opts           = &runtime_opts,
-     .bdrv_parse_filename    = qemu_rbd_parse_filename,
-     .bdrv_refresh_limits    = qemu_rbd_refresh_limits,
-     .bdrv_file_open         = qemu_rbd_open,
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 7b98725af7..6b27df169a 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -3301,6 +3301,7 @@ static BlockDriver bdrv_sheepdog_tcp = {
-     .bdrv_attach_aio_context      = sd_attach_aio_context,
- 
-     .create_opts                  = &sd_create_opts,
-+    .runtime_opts                 = &runtime_opts,
- };
- 
- static BlockDriver bdrv_sheepdog_unix = {
-@@ -3338,6 +3339,7 @@ static BlockDriver bdrv_sheepdog_unix = {
-     .bdrv_attach_aio_context      = sd_attach_aio_context,
- 
-     .create_opts                  = &sd_create_opts,
-+    .runtime_opts                 = &runtime_opts,
- };
- 
- static void bdrv_sheepdog_init(void)
-diff --git a/block/vpc.c b/block/vpc.c
-index 0ebfcd3cc8..460212c261 100644
---- a/block/vpc.c
-+++ b/block/vpc.c
-@@ -1234,6 +1234,7 @@ static BlockDriver bdrv_vpc = {
-     .bdrv_get_info          = vpc_get_info,
- 
-     .create_opts            = &vpc_create_opts,
-+    .runtime_opts           = &vpc_runtime_opts,
-     .bdrv_has_zero_init     = vpc_has_zero_init,
- };
- 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 327e478a73..eef3a55220 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -342,6 +342,10 @@ struct BlockDriver {
- 
-     /* List of options for creating images, terminated by name == NULL */
-     QemuOptsList *create_opts;
-+    /* Runtime options for a block device, terminated by name == NULL */
-+    QemuOptsList *runtime_opts;
-+    /* Names of the runtime options that can be modified, NULL-terminated */
-+    const char *const *mutable_opts;
- 
-     /*
-      * Returns 0 for completed check, -errno for internal errors.
++import os
++import re
++import iotests
++import copy
++import json
++from iotests import qemu_img, qemu_io
++
++hd_path = [
++    os.path.join(iotests.test_dir, 'hd0.img'),
++    os.path.join(iotests.test_dir, 'hd1.img'),
++    os.path.join(iotests.test_dir, 'hd2.img')
++]
++
++def hd_opts(idx):
++    return {'driver': iotests.imgfmt,
++            'node-name': 'hd%d' % idx,
++            'file': {'driver': 'file',
++                     'node-name': 'hd%d-file' % idx,
++                     'filename':  hd_path[idx] } }
++
++class TestBlockdevReopen(iotests.QMPTestCase):
++    total_io_cmds = 0
++
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, hd_path[0], '3M')
++        qemu_img('create', '-f', iotests.imgfmt, '-b', hd_path[0], hd_path[1])
++        qemu_img('create', '-f', iotests.imgfmt, hd_path[2], '3M')
++        qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0xa0  0 1M', hd_path[0])
++        qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0xa1 1M 1M', hd_path[1])
++        qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0xa2 2M 1M', hd_path[2])
++        self.vm = iotests.VM()
++        self.vm.launch()
++
++    def tearDown(self):
++        self.vm.shutdown()
++        self.check_qemu_io_errors()
++        os.remove(hd_path[0])
++        os.remove(hd_path[1])
++        os.remove(hd_path[2])
++
++    # The output of qemu-io is not returned by vm.hmp_qemu_io() but
++    # it's stored in the log and can only be read when the VM has been
++    # shut down. This function runs qemu-io and keeps track of the
++    # number of times it's been called.
++    def run_qemu_io(self, img, cmd):
++        result = self.vm.hmp_qemu_io(img, cmd)
++        self.assert_qmp(result, 'return', '')
++        self.total_io_cmds += 1
++
++    # Once the VM is shut down we can parse the log and see if qemu-io
++    # ran without errors.
++    def check_qemu_io_errors(self):
++        self.assertFalse(self.vm.is_running())
++        found = 0
++        log = self.vm.get_log()
++        for line in log.split("\n"):
++            if line.startswith("Pattern verification failed"):
++                raise Exception("%s (command #%d)" % (line, found))
++            if re.match("read .*/.* bytes at offset", line):
++                found += 1
++        self.assertEqual(found, self.total_io_cmds,
++                         "Expected output of %d qemu-io commands, found %d" %
++                         (found, self.total_io_cmds))
++
++    # Run x-blockdev-reopen with 'opts' but applying 'newopts'
++    # on top of it. The original 'opts' dict is unmodified
++    def reopen(self, opts, newopts = {}, errmsg = None):
++        opts = copy.deepcopy(opts)
++
++        # Apply the changes from 'newopts' on top of 'opts'
++        for key in newopts:
++            value = newopts[key]
++            # If key has the form "foo.bar" then we need to do
++            # opts["foo"]["bar"] = value, not opts["foo.bar"] = value
++            subdict = opts
++            while key.find('.') != -1:
++                [prefix, key] = key.split('.', 1)
++                subdict = opts[prefix]
++            subdict[key] = value
++
++        result = self.vm.qmp('x-blockdev-reopen', conv_keys = False, **opts)
++        if errmsg:
++            self.assert_qmp(result, 'error/class', 'GenericError')
++            self.assert_qmp(result, 'error/desc', errmsg)
++        else:
++            self.assert_qmp(result, 'return', {})
++
++
++    # Run query-named-block-nodes and return the specified entry
++    def get_node(self, node_name):
++        result = self.vm.qmp('query-named-block-nodes')
++        for node in result['return']:
++            if node['node-name'] == node_name:
++                return node
++        return None
++
++    # Run 'query-named-block-nodes' and compare its output with the
++    # value passed by the user in 'graph'
++    def check_node_graph(self, graph):
++        result = self.vm.qmp('query-named-block-nodes')
++        self.assertEqual(json.dumps(graph,  sort_keys=True),
++                         json.dumps(result, sort_keys=True))
++
++    # This test opens one single disk image (without backing files)
++    # and tries to reopen it with illegal / incorrect parameters.
++    def test_incorrect_parameters_single_file(self):
++        # Open 'hd0' only (no backing files)
++        opts = hd_opts(0)
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++        original_graph = self.vm.qmp('query-named-block-nodes')
++
++        # We can reopen the image passing the same options
++        self.reopen(opts)
++
++        # We cannot change any of these
++        self.reopen(opts, {'node-name': 'not-found'}, "Cannot find node named 'not-found'")
++        self.reopen(opts, {'node-name': ''}, "Cannot find node named ''")
++        self.reopen(opts, {'node-name': None}, "Invalid parameter type for 'node-name', expected: string")
++        self.reopen(opts, {'driver': 'raw'}, "Cannot change the option 'driver'")
++        self.reopen(opts, {'driver': ''}, "Invalid parameter ''")
++        self.reopen(opts, {'driver': None}, "Invalid parameter type for 'driver', expected: string")
++        self.reopen(opts, {'file': 'not-found'}, "Cannot change the option 'file'")
++        self.reopen(opts, {'file': ''}, "Cannot change the option 'file'")
++        self.reopen(opts, {'file': None}, "Invalid parameter type for 'file', expected: BlockdevRef")
++        self.reopen(opts, {'file': 'hd0-file'}, "Cannot change the option 'file'")
++        self.reopen(opts, {'file.node-name': 'newname'}, "Cannot change the option 'node-name'")
++        self.reopen(opts, {'file.driver': 'host_device'}, "Cannot change the option 'driver'")
++        self.reopen(opts, {'file.filename': hd_path[1]}, "Cannot change the option 'filename'")
++        self.reopen(opts, {'file.aio': 'native'}, "Cannot change the option 'aio'")
++        self.reopen(opts, {'file.locking': 'off'}, "Cannot change the option 'locking'")
++        self.reopen(opts, {'file.filename': None}, "Invalid parameter type for 'file.filename', expected: string")
++
++        # node-name is optional in BlockdevOptions, but x-blockdev-reopen needs it
++        del opts['node-name']
++        self.reopen(opts, {}, "Node name not specified")
++
++        # Check that nothing has changed
++        self.check_node_graph(original_graph)
++
++        # Remove the node
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'hd0')
++        self.assert_qmp(result, 'return', {})
++
++    # This test opens an image with a backing file and tries to reopen
++    # it with illegal / incorrect parameters.
++    def test_incorrect_parameters_backing_file(self):
++        # Open hd1 omitting the backing options (hd0 will be opened
++        # with the default options)
++        opts = hd_opts(1)
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++        original_graph = self.vm.qmp('query-named-block-nodes')
++
++        # We can reopen the image passing the same options
++        self.reopen(opts)
++
++        # We can't use a non-existing or empty (non-NULL) node as the backing image
++        self.reopen(opts, {'backing': 'not-found'}, "Cannot find device= nor node_name=not-found")
++        self.reopen(opts, {'backing': ''}, "Cannot find device= nor node_name=")
++
++        # We can reopen the image just fine if we specify the backing options
++        opts['backing'] = {'driver': iotests.imgfmt,
++                           'file': {'driver': 'file',
++                                    'filename': hd_path[0]}}
++        self.reopen(opts)
++
++        # We cannot change any of these options
++        self.reopen(opts, {'backing.node-name': 'newname'}, "Cannot change the option 'node-name'")
++        self.reopen(opts, {'backing.driver': 'raw'}, "Cannot change the option 'driver'")
++        self.reopen(opts, {'backing.file.node-name': 'newname'}, "Cannot change the option 'node-name'")
++        self.reopen(opts, {'backing.file.driver': 'host_device'}, "Cannot change the option 'driver'")
++
++        # Check that nothing has changed since the beginning
++        self.check_node_graph(original_graph)
++
++        # Remove the node
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'hd1')
++        self.assert_qmp(result, 'return', {})
++
++    def test_reopen(self):
++        # Open the hd1 image passing all backing options
++        opts = hd_opts(1)
++        opts['backing'] = hd_opts(0)
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++        original_graph = self.vm.qmp('query-named-block-nodes')
++
++        # We can reopen the image passing the same options
++        self.reopen(opts)
++
++        # Reopen in read-only mode
++        self.assert_qmp(self.get_node('hd1'), 'ro', False)
++
++        self.reopen(opts, {'read-only': True})
++        self.assert_qmp(self.get_node('hd1'), 'ro', True)
++        self.reopen(opts)
++        self.assert_qmp(self.get_node('hd1'), 'ro', False)
++
++        # Change the cache options
++        self.assert_qmp(self.get_node('hd1'), 'cache/writeback', True)
++        self.assert_qmp(self.get_node('hd1'), 'cache/direct', False)
++        self.assert_qmp(self.get_node('hd1'), 'cache/no-flush', False)
++        self.reopen(opts, {'cache': { 'direct': True, 'no-flush': True }})
++        self.assert_qmp(self.get_node('hd1'), 'cache/writeback', True)
++        self.assert_qmp(self.get_node('hd1'), 'cache/direct', True)
++        self.assert_qmp(self.get_node('hd1'), 'cache/no-flush', True)
++
++        # Reopen again with the original options
++        self.reopen(opts)
++        self.assert_qmp(self.get_node('hd1'), 'cache/writeback', True)
++        self.assert_qmp(self.get_node('hd1'), 'cache/direct', False)
++        self.assert_qmp(self.get_node('hd1'), 'cache/no-flush', False)
++
++        # Change 'detect-zeroes' and 'discard'
++        self.assert_qmp(self.get_node('hd1'), 'detect_zeroes', 'off')
++        self.reopen(opts, {'detect-zeroes': 'on'})
++        self.assert_qmp(self.get_node('hd1'), 'detect_zeroes', 'on')
++        self.reopen(opts, {'detect-zeroes': 'unmap'},
++                    "setting detect-zeroes to unmap is not allowed " +
++                    "without setting discard operation to unmap")
++        self.assert_qmp(self.get_node('hd1'), 'detect_zeroes', 'on')
++        self.reopen(opts, {'detect-zeroes': 'unmap', 'discard': 'unmap'})
++        self.assert_qmp(self.get_node('hd1'), 'detect_zeroes', 'unmap')
++        self.reopen(opts)
++        self.assert_qmp(self.get_node('hd1'), 'detect_zeroes', 'off')
++
++        # Change 'force-share'
++        self.reopen(opts, {'force-share': True},
++                    "force-share=on can only be used with read-only images")
++        self.reopen(opts, {'force-share': True, 'read-only': True})
++        self.reopen(opts, {'force-share': False})
++
++        # Change some qcow2-specific options
++        # No way to test for success other than checking the return message
++        if iotests.imgfmt == 'qcow2':
++            self.reopen(opts, {'l2-cache-entry-size': 128 * 1024},
++                        "L2 cache entry size must be a power of two "+
++                        "between 512 and the cluster size (65536)")
++            self.reopen(opts, {'l2-cache-size': 1024 * 1024,
++                               'cache-size':     512 * 1024},
++                        "l2-cache-size may not exceed cache-size")
++            self.reopen(opts, {'l2-cache-size':        4 * 1024 * 1024,
++                               'refcount-cache-size':  4 * 1024 * 1024,
++                               'l2-cache-entry-size': 32 * 1024})
++            self.reopen(opts, {'pass-discard-request': True})
++
++        # Check that nothing has changed since the beginning
++        # (from the parameters that we can check)
++        self.check_node_graph(original_graph)
++
++        # Check that the node names (other than the top-level one) are optional
++        del opts['file']['node-name']
++        del opts['backing']['node-name']
++        del opts['backing']['file']['node-name']
++        self.reopen(opts)
++        self.check_node_graph(original_graph)
++
++        # Reopen setting backing = null, this removes the backing image from the chain
++        self.reopen(opts, {'backing': None})
++        self.assert_qmp_absent(self.get_node('hd1'), 'image/backing-image')
++
++        # Open the 'hd0' image
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **hd_opts(0))
++        self.assert_qmp(result, 'return', {})
++
++        # Reopen the hd1 image setting 'hd0' as its backing image
++        self.reopen(opts, {'backing': 'hd0'})
++        self.assert_qmp(self.get_node('hd1'), 'image/backing-image/filename', hd_path[0])
++
++        # Check that nothing has changed since the beginning
++        self.reopen(hd_opts(0), {'read-only': True})
++        self.check_node_graph(original_graph)
++
++        # FIXME: the backing file (hd0) is now a reference so should
++        # we still be able to change backing.* ?
++        self.reopen(opts)
++
++        # We can't remove 'hd0' while it's a backing image of 'hd1'
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'hd0')
++        self.assert_qmp(result, 'error/class', 'GenericError')
++        self.assert_qmp(result, 'error/desc', "Node 'hd0' is busy: node is used as backing hd of 'hd1'")
++
++        # But we can remove both nodes if done in the proper order
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'hd1')
++        self.assert_qmp(result, 'return', {})
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'hd0')
++        self.assert_qmp(result, 'return', {})
++
++    # Reopen a raw image and see the effect of changing the 'offset' option
++    def test_reopen_raw(self):
++        opts = {'driver': 'raw', 'node-name': 'hd0',
++                'file': { 'driver': 'file',
++                          'filename': hd_path[0],
++                          'node-name': 'hd0-file' } }
++
++        # First we create a 2MB raw file, and fill each half with a
++        # different value
++        qemu_img('create', '-f', 'raw', hd_path[0], '2M')
++        qemu_io('-f', 'raw', '-c', 'write -P 0xa0  0 1M', hd_path[0])
++        qemu_io('-f', 'raw', '-c', 'write -P 0xa1 1M 1M', hd_path[0])
++
++        # Open the raw file with QEMU
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++
++        # Read 1MB from offset 0
++        self.run_qemu_io("hd0", "read -P 0xa0  0 1M")
++
++        # Reopen the image with a 1MB offset.
++        # Now the results are different
++        self.reopen(opts, {'offset': 1024*1024})
++        self.run_qemu_io("hd0", "read -P 0xa1  0 1M")
++
++        # Reopen again with the original options.
++        # We get the original results again
++        self.reopen(opts)
++        self.run_qemu_io("hd0", "read -P 0xa0  0 1M")
++
++        # Remove the block device
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'hd0')
++        self.assert_qmp(result, 'return', {})
++
++    # Omitting an option should reset it to the default value, but if
++    # an option cannot be changed it shouldn't be possible to reset it
++    # to its default value either
++    def test_reset_default_values(self):
++        opts = {'driver': 'qcow2', 'node-name': 'hd0',
++                'file': { 'driver': 'file',
++                          'filename': hd_path[0],
++                          'x-check-cache-dropped': True, # This one can be changed
++                          'locking': 'off',              # This one can NOT be changed
++                          'node-name': 'hd0-file' } }
++
++        # Open the file with QEMU
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++
++        # file.x-check-cache-dropped can be changed...
++        self.reopen(opts, { 'file.x-check-cache-dropped': False })
++        # ...and dropped completely (resetting to the default value)
++        del opts['file']['x-check-cache-dropped']
++        self.reopen(opts)
++
++        # file.locking cannot be changed nor reset to the default value
++        self.reopen(opts, { 'file.locking': 'on' }, "Cannot change the option 'locking'")
++        del opts['file']['locking']
++        self.reopen(opts, {}, "Option 'locking' can't be reset to its default value")
++        # But we can reopen it if we maintain its previous value
++        self.reopen(opts, { 'file.locking': 'off' })
++
++        # Remove the block device
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'hd0')
++        self.assert_qmp(result, 'return', {})
++
++    # This test modifies the node graph a few times by changing the
++    # 'backing' option on reopen and verifies that the guest data that
++    # is read afterwards is consistent with the graph changes.
++    def test_io_with_graph_changes(self):
++        opts = []
++
++        # Open hd0, hd1 and hd2 without any backing image
++        for i in range(3):
++            opts.append(hd_opts(i))
++            opts[i]['backing'] = None
++            result = self.vm.qmp('blockdev-add', conv_keys = False, **opts[i])
++            self.assert_qmp(result, 'return', {})
++
++        # hd0
++        self.run_qemu_io("hd0", "read -P 0xa0  0 1M")
++        self.run_qemu_io("hd0", "read -P 0    1M 1M")
++        self.run_qemu_io("hd0", "read -P 0    2M 1M")
++
++        # hd1 <- hd0
++        self.reopen(opts[0], {'backing': 'hd1'})
++
++        self.run_qemu_io("hd0", "read -P 0xa0  0 1M")
++        self.run_qemu_io("hd0", "read -P 0xa1 1M 1M")
++        self.run_qemu_io("hd0", "read -P 0    2M 1M")
++
++        # hd1 <- hd0 , hd1 <- hd2
++        self.reopen(opts[2], {'backing': 'hd1'})
++
++        self.run_qemu_io("hd2", "read -P 0     0 1M")
++        self.run_qemu_io("hd2", "read -P 0xa1 1M 1M")
++        self.run_qemu_io("hd2", "read -P 0xa2 2M 1M")
++
++        # hd1 <- hd2 <- hd0
++        self.reopen(opts[0], {'backing': 'hd2'})
++
++        self.run_qemu_io("hd0", "read -P 0xa0  0 1M")
++        self.run_qemu_io("hd0", "read -P 0xa1 1M 1M")
++        self.run_qemu_io("hd0", "read -P 0xa2 2M 1M")
++
++        # hd2 <- hd0
++        self.reopen(opts[2], {'backing': None})
++
++        self.run_qemu_io("hd0", "read -P 0xa0  0 1M")
++        self.run_qemu_io("hd0", "read -P 0    1M 1M")
++        self.run_qemu_io("hd0", "read -P 0xa2 2M 1M")
++
++        # hd2 <- hd1 <- hd0
++        self.reopen(opts[1], {'backing': 'hd2'})
++        self.reopen(opts[0], {'backing': 'hd1'})
++
++        self.run_qemu_io("hd0", "read -P 0xa0  0 1M")
++        self.run_qemu_io("hd0", "read -P 0xa1 1M 1M")
++        self.run_qemu_io("hd0", "read -P 0xa2 2M 1M")
++
++        # Illegal operation: hd2 is a child of hd1
++        self.reopen(opts[2], {'backing': 'hd1'},
++                    "Making 'hd1' a backing file of 'hd2' would create a cycle")
++
++        # hd2 <- hd0, hd2 <- hd1
++        self.reopen(opts[0], {'backing': 'hd2'})
++
++        self.run_qemu_io("hd1", "read -P 0     0 1M")
++        self.run_qemu_io("hd1", "read -P 0xa1 1M 1M")
++        self.run_qemu_io("hd1", "read -P 0xa2 2M 1M")
++
++        # More illegal operations
++        self.reopen(opts[2], {'backing': 'hd1'},
++                    "Making 'hd1' a backing file of 'hd2' would create a cycle")
++        self.reopen(opts[2], {'file': 'hd0-file'}, "Cannot change the option 'file'")
++
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'hd2')
++        self.assert_qmp(result, 'error/class', 'GenericError')
++        self.assert_qmp(result, 'error/desc', "Node 'hd2' is busy: node is used as backing hd of 'hd0'")
++
++        # hd1 doesn't have a backing file now
++        self.reopen(opts[1], {'backing': None})
++
++        self.run_qemu_io("hd1", "read -P 0     0 1M")
++        self.run_qemu_io("hd1", "read -P 0xa1 1M 1M")
++        self.run_qemu_io("hd1", "read -P 0    2M 1M")
++
++        # Removing the 'backing' option doesn't open the default
++        # backing file specified in the image (hd0 in this case).
++        # TODO: change this behavior??
++        del opts[1]['backing']
++        self.reopen(opts[1])
++
++        self.run_qemu_io("hd1", "read -P 0     0 1M")
++        self.run_qemu_io("hd1", "read -P 0xa1 1M 1M")
++        self.run_qemu_io("hd1", "read -P 0    2M 1M")
++
++    # This test verifies that we can't change the children of a block
++    # device during a reopen operation in a way that would create
++    # cycles in the node graph
++    def test_graph_cycles(self):
++        opts = []
++
++        # Open all three images without backing file
++        for i in range(3):
++            opts.append(hd_opts(i))
++            opts[i]['backing'] = None
++            result = self.vm.qmp('blockdev-add', conv_keys = False, **opts[i])
++            self.assert_qmp(result, 'return', {})
++
++        # hd1 <- hd0, hd1 <- hd2
++        self.reopen(opts[0], {'backing': 'hd1'})
++        self.reopen(opts[2], {'backing': 'hd1'})
++
++        # Illegal: hd2 is backed by hd1
++        self.reopen(opts[1], {'backing': 'hd2'},
++                    "Making 'hd2' a backing file of 'hd1' would create a cycle")
++
++        # hd1 <- hd0 <- hd2
++        self.reopen(opts[2], {'backing': 'hd0'})
++
++        # Illegal: hd2 is backed by hd0, which is backed by hd1
++        self.reopen(opts[1], {'backing': 'hd2'},
++                    "Making 'hd2' a backing file of 'hd1' would create a cycle")
++
++        # Illegal: hd1 cannot point to itself
++        self.reopen(opts[1], {'backing': 'hd1'},
++                    "Making 'hd1' a backing file of 'hd1' would create a cycle")
++
++        # Remove all backing files
++        self.reopen(opts[0])
++        self.reopen(opts[2])
++
++        ##########################################
++        # Add a blkverify node using hd0 and hd1 #
++        ##########################################
++        bvopts = {'driver': 'blkverify',
++                  'node-name': 'bv',
++                  'test': 'hd0',
++                  'raw': 'hd1'}
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **bvopts)
++        self.assert_qmp(result, 'return', {})
++
++        # blkverify doesn't currently allow reopening. TODO: implement this
++        self.reopen(bvopts, {}, "Block format 'blkverify' used by node 'bv'" +
++                    " does not support reopening files")
++
++        # Illegal: hd0 is a child of the blkverify node
++        self.reopen(opts[0], {'backing': 'bv'},
++                    "Making 'bv' a backing file of 'hd0' would create a cycle")
++
++        # Delete the blkverify node
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'bv')
++        self.assert_qmp(result, 'return', {})
++
++    # Misc reopen tests with different block drivers
++    def test_misc_drivers(self):
++        ####################
++        ###### quorum ######
++        ####################
++        for i in range(3):
++            opts = hd_opts(i)
++            # Open all three images without backing file
++            opts['backing'] = None
++            result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++            self.assert_qmp(result, 'return', {})
++
++        opts = {'driver': 'quorum',
++                'node-name': 'quorum0',
++                'children': ['hd0', 'hd1', 'hd2'],
++                'vote-threshold': 2}
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++
++        # Quorum doesn't currently allow reopening. TODO: implement this
++        self.reopen(opts, {}, "Block format 'quorum' used by node 'quorum0'" +
++                    " does not support reopening files")
++
++        # You can't make quorum0 a backing file of hd0:
++        # hd0 is already a child of quorum0.
++        self.reopen(hd_opts(0), {'backing': 'quorum0'},
++                    "Making 'quorum0' a backing file of 'hd0' would create a cycle")
++
++        # Delete quorum0
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'quorum0')
++        self.assert_qmp(result, 'return', {})
++
++        # Delete hd0, hd1 and hd2
++        for i in range(3):
++            result = self.vm.qmp('blockdev-del', conv_keys = True,
++                                 node_name = 'hd%d' % i)
++            self.assert_qmp(result, 'return', {})
++
++        ######################
++        ###### blkdebug ######
++        ######################
++        opts = {'driver': 'blkdebug',
++                'node-name': 'bd',
++                'config': '/dev/null',
++                'image': hd_opts(0)}
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++
++        # blkdebug allows reopening if we keep the same options
++        self.reopen(opts)
++
++        # but it currently does not allow changes
++        self.reopen(opts, {'image': 'hd1'}, "Cannot change the option 'image'")
++        self.reopen(opts, {'align': 33554432}, "Cannot change the option 'align'")
++        self.reopen(opts, {'config': '/non/existent'}, "Cannot change the option 'config'")
++        del opts['config']
++        self.reopen(opts, {}, "Option 'config' can't be reset to its default value")
++
++        # Delete the blkdebug node
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'bd')
++        self.assert_qmp(result, 'return', {})
++
++        ##################
++        ###### null ######
++        ##################
++        opts = {'driver': 'null-aio', 'node-name': 'root', 'size': 1024}
++
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++
++        # 1 << 30 is the default value, but we cannot change it explicitly
++        self.reopen(opts, {'size': (1 << 30)}, "Cannot change the option 'size'")
++
++        # We cannot change 'size' back to its default value either
++        del opts['size']
++        self.reopen(opts, {}, "Option 'size' can't be reset to its default value")
++
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'root')
++        self.assert_qmp(result, 'return', {})
++
++        ##################
++        ###### file ######
++        ##################
++        opts = hd_opts(0)
++        opts['file']['locking'] = 'on'
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++
++        # 'locking' cannot be changed
++        del opts['file']['locking']
++        self.reopen(opts, {'file.locking': 'on'})
++        self.reopen(opts, {'file.locking': 'off'}, "Cannot change the option 'locking'")
++        self.reopen(opts, {}, "Option 'locking' can't be reset to its default value")
++
++        # Trying to reopen the 'file' node directly does not make a difference
++        opts = opts['file']
++        self.reopen(opts, {'locking': 'on'})
++        self.reopen(opts, {'locking': 'off'}, "Cannot change the option 'locking'")
++        self.reopen(opts, {}, "Option 'locking' can't be reset to its default value")
++
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'hd0')
++        self.assert_qmp(result, 'return', {})
++
++        ######################
++        ###### throttle ######
++        ######################
++        opts = { 'qom-type': 'throttle-group', 'id': 'group0',
++                 'props': { 'limits': { 'iops-total': 1000 } } }
++        result = self.vm.qmp('object-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++
++        opts = { 'qom-type': 'throttle-group', 'id': 'group1',
++                 'props': { 'limits': { 'iops-total': 2000 } } }
++        result = self.vm.qmp('object-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++
++        # Add a throttle filter with group = group0
++        opts = { 'driver': 'throttle', 'node-name': 'throttle0',
++                 'throttle-group': 'group0', 'file': hd_opts(0) }
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++
++        # We can reopen it if we keep the same options
++        self.reopen(opts)
++
++        # These are illegal
++        self.reopen(opts, {'file': 'hd0'}, "Cannot change the option 'file'")
++        self.reopen(opts, {'throttle-group': 'notfound'}, "Throttle group 'notfound' does not exist")
++
++        # But it's possible to change the group to group1
++        self.reopen(opts, {'throttle-group': 'group1'})
++
++        # Now group1 is in use, it cannot be deleted
++        result = self.vm.qmp('object-del', id = 'group1')
++        self.assert_qmp(result, 'error/class', 'GenericError')
++        self.assert_qmp(result, 'error/desc', "object 'group1' is in use, can not be deleted")
++
++        # Default options, this switches the group back to group0
++        self.reopen(opts)
++
++        # So now we cannot delete group0
++        result = self.vm.qmp('object-del', id = 'group0')
++        self.assert_qmp(result, 'error/class', 'GenericError')
++        self.assert_qmp(result, 'error/desc', "object 'group0' is in use, can not be deleted")
++
++        # But group1 is free this time, and it can be deleted
++        result = self.vm.qmp('object-del', id = 'group1')
++        self.assert_qmp(result, 'return', {})
++
++        # Let's delete the filter node
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'throttle0')
++        self.assert_qmp(result, 'return', {})
++
++        # And we can finally get rid of group0
++        result = self.vm.qmp('object-del', id = 'group0')
++        self.assert_qmp(result, 'return', {})
++
++    def test_missing_backing_file(self):
++        # hd1 <- hd0
++        opts = hd_opts(0)
++        opts['backing'] = hd_opts(1)
++        opts['backing']['backing'] = None
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++
++        # Remove hd1
++        self.reopen(opts, {'backing': None})
++
++        # FIXME: this should fail because we're specifying backing.*
++        # options but we have just removed the backing file
++        self.reopen(opts)
++
++    # Test what happens if the graph changes due to other operations
++    # such as block-stream
++    def test_block_stream(self):
++        # hd1 <- hd0
++        opts = hd_opts(0)
++        opts['backing'] = hd_opts(1)
++        opts['backing']['backing'] = None
++        result = self.vm.qmp('blockdev-add', conv_keys = False, **opts)
++        self.assert_qmp(result, 'return', {})
++
++        # Stream hd1 into hd0 and wait until it's done
++        result = self.vm.qmp('block-stream', conv_keys = True, job_id = 'stream0', device = 'hd0')
++        self.assert_qmp(result, 'return', {})
++        self.wait_until_completed(drive = 'stream0')
++
++        # Now we have only hd0
++        self.assertEqual(self.get_node('hd1'), None)
++
++        # FIXME: This should fail, we have backing.* options but
++        # there's no backing file anymore
++        self.reopen(opts)
++
++        result = self.vm.qmp('blockdev-del', conv_keys = True, node_name = 'hd0')
++        self.assert_qmp(result, 'return', {})
++
++if __name__ == '__main__':
++    iotests.main(supported_fmts=["qcow2"])
+diff --git a/tests/qemu-iotests/220.out b/tests/qemu-iotests/220.out
+new file mode 100644
+index 0000000000..36376bed87
+--- /dev/null
++++ b/tests/qemu-iotests/220.out
+@@ -0,0 +1,5 @@
++..........
++----------------------------------------------------------------------
++Ran 10 tests
++
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 0914c922d7..7646f9b621 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -218,3 +218,4 @@
+ 217 rw auto quick
+ 218 rw auto quick
+ 219 rw auto
++220 rw auto quick
 -- 
 2.11.0
