@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fTHtK-0000zX-EM
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 22:21:39 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fTHtU-000161-5T
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 22:21:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fTHtH-0003M0-8k
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 22:21:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54360 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fTHtR-0003St-2p
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 22:21:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41886)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fTHtH-0003Ls-3W
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 22:21:35 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B674E401EF1D
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 02:21:34 +0000 (UTC)
-Date: Thu, 14 Jun 2018 10:21:30 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180614022130.GQ15344@xz-mi>
-References: <20180613102642.23995-1-dgilbert@redhat.com>
-	<20180613102642.23995-3-dgilbert@redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTHtQ-0003Sf-S6
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 22:21:45 -0400
+Date: Wed, 13 Jun 2018 23:21:39 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180614022139.GS7451@localhost.localdomain>
+References: <1528939107-17193-1-git-send-email-babu.moger@amd.com>
+	<1528939107-17193-2-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180613102642.23995-3-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Wake rate limiting for
- urgent requests
+In-Reply-To: <1528939107-17193-2-git-send-email-babu.moger@amd.com>
+Subject: Re: [Qemu-devel] [PATCH v14 1/6] i386: Set TOPOEXT unconditionally
+ for comapatibility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, jdenemar@redhat.com
+To: Babu Moger <babu.moger@amd.com>
+Cc: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, kash@tripleback.net, geoff@hostfission.com
 
-On Wed, Jun 13, 2018 at 11:26:41AM +0100, Dr. David Alan Gilbert (git) wrote:
+On Wed, Jun 13, 2018 at 09:18:22PM -0400, Babu Moger wrote:
+> Enabling TOPOEXT feature might cause compatibility issues if
+> older kernels does not set this feature. Lets set this feature
+> unconditionally.
+> 
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  target/i386/kvm.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 445e0e0..6f2cca7 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -372,6 +372,12 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+>          if (host_tsx_blacklisted()) {
+>              ret &= ~(CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_HLE);
+>          }
+> +    } else if (function == 0x80000001 && reg == R_ECX) {
+> +        /* Enabling topoext feature might cause compatibility issues if
+> +         * older kernel does not set this feature. Lets set this feature
+> +         * unconditionally.
+> +         */
 
-[...]
+Thanks.  I will apply and rewrite the comment as:
 
-> @@ -2932,10 +2943,24 @@ static void *migration_thread(void *opaque)
->  
->          migration_update_counters(s, current_time);
->  
-> +        urgent = false;
->          if (qemu_file_rate_limit(s->to_dst_file)) {
-> -            /* usleep expects microseconds */
-> -            g_usleep((s->iteration_start_time + BUFFER_DELAY -
-> -                      current_time) * 1000);
-> +            /* Wait for a delay to do rate limiting OR
-> +             * something urgent to post the semaphore.
-> +             */
-> +            int ms = s->iteration_start_time + BUFFER_DELAY - current_time;
-> +            trace_migration_thread_ratelimit_pre(ms);
-> +            if (qemu_sem_timedwait(&s->rate_limit_sem, ms) == 0) {
-> +                /* We were worken by one or more urgent things but
-> +                 * the timedwait will have consumed one of them.
-> +                 * The service routine for the urgent wake will dec
-> +                 * the semaphore itself for each item it consumes,
-> +                 * so add this one we just eat back.
-> +                 */
-> +                qemu_sem_post(&s->rate_limit_sem);
+        /*
+         * It's safe to enable TOPOEXT even if it's not returned
+         * by GET_SUPPORTED_CPUID.  Unconditionally enabling
+         * TOPOEXT here let us keep CPU models runnable on
+         * older kernels even when TOPOEXT is enabled.
+         */
 
-Is it possible that we just avoid eating that in the next patch?  Then
-we only provide a helper to "trigger an urgent request" but we only
-consume the point here?
+> +        ret |= CPUID_EXT3_TOPOEXT;
+>      } else if (function == 0x80000001 && reg == R_EDX) {
+>          /* On Intel, kvm returns cpuid according to the Intel spec,
+>           * so add missing bits according to the AMD spec:
+> -- 
+> 1.8.3.1
+> 
 
 -- 
-Peter Xu
+Eduardo
