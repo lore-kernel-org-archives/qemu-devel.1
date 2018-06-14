@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTPdc-0008F9-0j
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:37:56 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTPm4-0001pM-TF
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:46:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTPdb-0007iL-7M
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:37:56 -0400
-Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:45386)
+	(envelope-from <peter.maydell@linaro.org>) id 1fTPm3-0003Tg-Gt
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:46:40 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:32913)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fTPdb-0007i1-2D
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:37:55 -0400
-Received: by mail-oi0-x22f.google.com with SMTP id 188-v6so5168123oid.12
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 03:37:54 -0700 (PDT)
+	id 1fTPm3-0003Sm-29
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:46:39 -0400
+Received: by mail-ot0-x242.google.com with SMTP id h6-v6so6541800otj.0
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 03:46:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CABhKiVVkQkBECYauEZpjvdm=1L5V5zXhx=C=vZ_dZhF2AkSsnA@mail.gmail.com>
-References: <CABhKiVVkQkBECYauEZpjvdm=1L5V5zXhx=C=vZ_dZhF2AkSsnA@mail.gmail.com>
+In-Reply-To: <f9beda14-7c4a-8f89-baf1-5a79e847c4ac@redhat.com>
+References: <20180611141716.3813-1-peter.maydell@linaro.org>
+	<650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
+	<CAFEAcA-vZH0KUxi+iYP3eYzXeHxNTotNwCMhEPcGhOLksbG71A@mail.gmail.com>
+	<f9beda14-7c4a-8f89-baf1-5a79e847c4ac@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Jun 2018 11:37:33 +0100
-Message-ID: <CAFEAcA9WKhQLpTkkjz2ETTrtbVVqAPdkf7_Y4uBhvKAQ9qvvxg@mail.gmail.com>
+Date: Thu, 14 Jun 2018 11:46:17 +0100
+Message-ID: <CAFEAcA_egToeW7ksTncbFCsW6uTh1FcPSgW6gx+VnjvQpqwWsw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Questions about qemu enabling TCI (tcg/tci.c)
+Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
+ for multiline comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yt zhang <zyt510998645@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-discuss <qemu-discuss@nongnu.org>
+To: John Snow <jsnow@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 13 June 2018 at 15:10, yt zhang <zyt510998645@gmail.com> wrote:
->  Dear technicians=EF=BC=8C
-> Good day.
-> I encountered some difficulties in learning about the TCI part of QEMU.
-> When I use the following configuration command to enable TCI:
+On 13 June 2018 at 17:55, John Snow <jsnow@redhat.com> wrote:
+> The same reasoning could be used to justify
 >
->          "configure --enable-tcg-interpreter"
+> /* two
+>  * lines */
 >
-> Run the command as:
->
->         "qemu-x86_64 hello-one" (hello-one is my own executable file).
->
-> Then I counted the number of times TB was interpreted in the
-> "tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)" function in the
-> tcg/tci.c file.However, I found that running the above command several
-> times on the same host computer [Intel(R) Pentium(R) CPU G3250 @ 3.20GHz]=
-,
-> the number of TB counts may sometimes be different (as shown below).
+> as it's ... actually just two lines. I think people don't seem to like
+> this much either (why? does it look 'naked' on the end?)
 
-I think that's expected. We don't try to be purely deterministic
-by default. You may find that suitable use of the -icount option
-will give you more deterministic behaviour (though if your guest
-program works with timers or signals or multiple threads it
-will likely still not be deterministic.)
+I dislike the way it breaks up the line of stars. For me it is the
+/*
+ *
+ */
+shape that defines a multiline comment, and where exactly the text is
+on the RHS of it is not important to my sense of visual neatness :-)
+
+> It would only begin to matter terribly much if we actually decided we
+> wanted to do a doxygen-style doc generation for our internal APIs for
+> compatibility with, say, fancier IDEs than vim/emacs.
+
+We ought to do that at some point -- I had some prototype patches
+for it. Doc-comment comments always start /** on a line of its own,
+though.
+
+> As it stands, we're pretty inconsistent about which exact style we apply
+> when we "document" internal functions -- sometimes we document the
+> header, sometimes the implementation, sometimes both (but differently!)
+> and always with different styles all over the place. That's the real
+> problem, IMO.
+
+IMHO -- global functions should always be documented in the header
+with the prototype, and any new global function should get a
+doc comment (I require this for code I review...) I should be able
+to read about the API your code exposes to the rest of QEMU purely
+by looking at your headers.
 
 thanks
 -- PMM
