@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fTIzv-0003Zu-3N
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:32:31 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fTJ2g-0004lG-D8
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:35:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fTIzq-00026z-5T
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:32:31 -0400
-Received: from mail-pf0-x230.google.com ([2607:f8b0:400e:c00::230]:34691)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fTJ2b-00038Y-Bk
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:35:22 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:33938)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fTIzp-00026p-Uq
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:32:26 -0400
-Received: by mail-pf0-x230.google.com with SMTP id a63-v6so2494078pfl.1
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 20:32:25 -0700 (PDT)
+	id 1fTJ2a-00038N-Rc
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 23:35:17 -0400
+Received: by mail-pf0-x242.google.com with SMTP id a63-v6so2497368pfl.1
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 20:35:16 -0700 (PDT)
 References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
-	<20180604095520.8563-3-xiaoguangrong@tencent.com>
-	<20180613155147.GJ2676@work-vm>
+	<20180604095520.8563-5-xiaoguangrong@tencent.com>
+	<20180613161723.GL2676@work-vm>
 From: Xiao Guangrong <guangrong.xiao@gmail.com>
-Message-ID: <8a88b788-bc3e-4806-04a4-13e5cf62fd44@gmail.com>
-Date: Thu, 14 Jun 2018 11:32:17 +0800
+Message-ID: <f336272c-1922-800c-d8c1-9d3eb7fffd26@gmail.com>
+Date: Thu, 14 Jun 2018 11:35:08 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180613155147.GJ2676@work-vm>
+In-Reply-To: <20180613161723.GL2676@work-vm>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 02/12] migration: fix counting normal page
- for compression
+Subject: Re: [Qemu-devel] [PATCH 04/12] migration: introduce
+ migration_update_rates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,34 +38,14 @@ Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.
 
 
 
-On 06/13/2018 11:51 PM, Dr. David Alan Gilbert wrote:
+On 06/14/2018 12:17 AM, Dr. David Alan Gilbert wrote:
 > * guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
 >> From: Xiao Guangrong <xiaoguangrong@tencent.com>
 >>
->> The compressed page is not normal page
+>> It is used to slightly clean the code up, no logic is changed
 > 
-> Is this the right reason?
+> Actually, there is a slight change; iterations_prev is always updated
+> when previously it was only updated with xbzrle on; still the change
+> makes more sense.
 
-I think the 'normal' page shouldn't include the compressed
-page and XBZRLE-ed page (the current code does not treat
-xbzrle pages are normal as well).
-
-> I think we always increment some counter for a page - so
-> what gets incremented for a compressed page?
-
-In the later patch, we will introduce the statistics of
-compression which contains "pages":
-    @pages: amount of pages compressed and transferred to the target VM
-
-> Is the real answer that we do:
-> 
->    ram_save_target_page
->       control_save_page
->       compress_page_with_multi_thread
-> 
-> and control_save_page already increments the counter?
-
-No :), control_save_page increments the counter only if it posted
-data out, under that case, the compression path is not invoked.
-
-Thanks!
+Yes, indeed. I will update the changelog.
