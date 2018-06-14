@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTMVT-0006yA-62
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 03:17:20 -0400
+	(envelope-from <armbru@redhat.com>) id 1fTMXH-0007mh-4m
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 03:19:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTMVM-00024q-QM
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 03:17:19 -0400
-Received: from 2.mo68.mail-out.ovh.net ([46.105.52.162]:43599)
+	(envelope-from <armbru@redhat.com>) id 1fTMXD-0002YR-TH
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 03:19:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57120 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTMVM-000248-GJ
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 03:17:12 -0400
-Received: from player734.ha.ovh.net (unknown [10.109.120.40])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 85F37E6AE3
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 09:17:07 +0200 (CEST)
-References: <20180530100754.15833-1-clg@kaod.org>
-	<20180606063910.GK17757@umbus.fritz.box>
-	<326e1949-28d0-941d-54f7-dbba6825388d@kaod.org>
-	<20180612055855.GE30690@umbus.fritz.box>
-	<87436236-09f6-9ee0-dbe6-00f0147050dc@kaod.org>
-	<20180613004752.GN30690@umbus.fritz.box>
-	<aa7ef7f9-f387-c99f-7d58-5048f81d4ab0@kaod.org>
-	<20180614064459.GA19339@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <fda8f209-92de-d386-c46f-d72176f29e76@kaod.org>
-Date: Thu, 14 Jun 2018 09:16:57 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fTMXD-0002Xo-NB
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 03:19:07 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1528905228-25694-1-git-send-email-anton.nefedov@virtuozzo.com>
+	<1528905228-25694-2-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Thu, 14 Jun 2018 09:19:04 +0200
+In-Reply-To: <1528905228-25694-2-git-send-email-anton.nefedov@virtuozzo.com>
+	(Anton Nefedov's message of "Wed, 13 Jun 2018 18:53:47 +0300")
+Message-ID: <87sh5pomxj.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180614064459.GA19339@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] pnv: add a physical mapping array
- describing MMIO ranges in each chip
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] qapi: allow empty branches in flat
+ unions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,181 +28,295 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 06/14/2018 08:44 AM, David Gibson wrote:
-> On Wed, Jun 13, 2018 at 09:03:22AM +0200, C=E9dric Le Goater wrote:
->> On 06/13/2018 02:47 AM, David Gibson wrote:
->>> On Tue, Jun 12, 2018 at 08:13:49AM +0200, C=E9dric Le Goater wrote:
->>>> On 06/12/2018 07:58 AM, David Gibson wrote:
->>>>> On Wed, Jun 06, 2018 at 09:04:10AM +0200, C=E9dric Le Goater wrote:
->>>>>> On 06/06/2018 08:39 AM, David Gibson wrote:
->>>>>>> On Wed, May 30, 2018 at 12:07:54PM +0200, C=E9dric Le Goater wrot=
-e:
->>>>>>>> Based on previous work done in skiboot, the physical mapping arr=
-ay
->>>>>>>> helps in calculating the MMIO ranges of each controller dependin=
-g on
->>>>>>>> the chip id and the chip type. This is will be particularly usef=
-ul for
->>>>>>>> the P9 models which use less the XSCOM bus and rely more on MMIO=
-s.
->>>>>>>>
->>>>>>>> A link on the chip is now necessary to calculate MMIO BARs and
->>>>>>>> sizes. This is why such a link is introduced in the PSIHB model.
->>>>>>>
->>>>>>> I think this message needs some work.  This says what it's for, b=
-ut
->>>>>>> what actually *is* this array, and how does it work?
->>>>>>
->>>>>> OK. It is relatively simple: each controller has an entry defining=
- its=20
->>>>>> MMIO range.=20
->>>>>>
->>>>>>> The outside-core differences between POWER8 and POWER9 are substa=
-ntial
->>>>>>> enough that I'm wondering if pnvP8 and pnvP9 would be better off =
-as
->>>>>>> different machine types (sharing some routines, of course).
->>>>>>
->>>>>> yes and no. I have survived using a common PnvChip framework but
->>>>>> it is true that I had to add P9 classes for each: LPC, PSI, OCC=20
->>>>>> They are very similar but not enough. P9 uses much more MMIOs than=
-=20
->>>>>> P8 which still uses a lot of XSCOM. I haven't looked at PHB4.=20
->>>>>
->>>>> Well, it's certainly *possible* to use the same machine type, I'm j=
-ust
->>>>> not convinced it's a good idea.  It seems kind of dodgy to me that =
-so
->>>>> many peripherals on the system change as a side-effect of setting t=
-he
->>>>> cpu.  Compare to how x86 works where cpu really does change the CPU=
-,
->>>>> plugging it into the same virtual "chipset".  Different chipsets *a=
-re*
->>>>> different machine types there (pc vs. q35).
->>>>
->>>> OK, I agree, and we can use a set of common routines to instantiate =
-the=20
->>>> different chipset models.=20
->>>>
->>>> So we would have a common pnv_init() routine to initialize the diffe=
-rent=20
->>>> 'powernv8' and 'powernv9' machines and the PnvChip typename would be=
- a=20
->>>> machine class attribute ?
->>>
->>> Well.. that's one option.  Usually for these things, it works out
->>> better to instead of parameterizing big high-level routines like
->>> pnv_init(), you have separate versions of those calling a combination
->>> of case-specific and common routines as necessary.
->>>
->>> Mostly it just comes down to what is simplest to implement for you, t=
-hough.
->>
->> I am introducing a powernv8 machine, the machine init routine is still
->> generic and did not change much. But I have deepen the PnvChip class
->> inheritance hierarchy with an intermediate class taking care of the
->> Chip sub controllers, which gives us something like :
->>
->>   pnv_init()
->>     . skiboot
->>     . kernel
->>     . initrd
->>     . chips creation
->>     . platform bus/device :
->>        isa bus
->>        pci layout
->>        bmc handling.
->>
->>   p8 chip hierarchy:
->> =20
->>    power8_v2.0-pnv-chip (gives the cpu type)
->>    pnv8-chip   : creates the devices only      =20
->>    pnv-chip    : creates xscom and the cores=20
->>
->> The powervn9 machine has this hierarchy :
->>
->>    power9_v2.0-pnv-chip
->>    pnv9-chip
->>    pnv-chip
->>
->> I had to introduce these new PnvChipClass ops :=20
->>
->>     void (*realize)(PnvChip *chip, Error **errp);
->=20
-> Looks sensible up to this point.
+Anton Nefedov <anton.nefedov@virtuozzo.com> writes:
 
-yes.=20
+> It often happens that just a few discriminator values imply extra data in
+> a flat union. Existing checks did not make possible to leave other values
+> uncovered. Such cases had to be worked around by either stating a dummy
+> (empty) type or introducing another (subset) discriminator enumeration.
+>
+> Both options create redundant entities in qapi files for little profit.
+>
+> With this patch it is not necessary anymore to add designated union
+> fields for every possible value of a discriminator enumeration.
+>
+> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  docs/devel/qapi-code-gen.txt                        |  8 +++++---
+>  tests/qapi-schema/flat-union-incomplete-branch.json |  9 ---------
+>  tests/qapi-schema/qapi-schema-test.json             |  4 ++--
+>  scripts/qapi/common.py                              | 11 ++++-------
+>  scripts/qapi/types.py                               |  4 +++-
+>  scripts/qapi/visit.py                               | 17 +++++++++++++----
+>  tests/Makefile.include                              |  1 -
+>  tests/qapi-schema/flat-union-incomplete-branch.err  |  1 -
+>  tests/qapi-schema/flat-union-incomplete-branch.exit |  1 -
+>  tests/qapi-schema/flat-union-incomplete-branch.out  |  0
+>  tests/qapi-schema/qapi-schema-test.out              |  3 ++-
+>  11 files changed, 29 insertions(+), 30 deletions(-)
+>  delete mode 100644 tests/qapi-schema/flat-union-incomplete-branch.json
+>  delete mode 100644 tests/qapi-schema/flat-union-incomplete-branch.err
+>  delete mode 100644 tests/qapi-schema/flat-union-incomplete-branch.exit
+>  delete mode 100644 tests/qapi-schema/flat-union-incomplete-branch.out
+>
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index 1366228..88a70e4 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -496,9 +496,11 @@ Resulting in these JSON objects:
+>  
+>  Notice that in a flat union, the discriminator name is controlled by
+>  the user, but because it must map to a base member with enum type, the
+> -code generator can ensure that branches exist for all values of the
+> -enum (although the order of the keys need not match the declaration of
+> -the enum).  In the resulting generated C data types, a flat union is
+> +code generator ensures that branches match the existing values of the
+> +enum. The order of the keys need not match the declaration of the enum.
+> +The keys need not cover all possible enum values. Omitted enum values
+> +are still valid branches that add no additional members to the data type.
+> +In the resulting generated C data types, a flat union is
+>  represented as a struct with the base members included directly, and
+>  then a union of structures for each branch of the struct.
+>  
+> diff --git a/tests/qapi-schema/flat-union-incomplete-branch.json b/tests/qapi-schema/flat-union-incomplete-branch.json
+> deleted file mode 100644
+> index 25a411b..0000000
+> --- a/tests/qapi-schema/flat-union-incomplete-branch.json
+> +++ /dev/null
+> @@ -1,9 +0,0 @@
+> -# we require all branches of the union to be covered
+> -{ 'enum': 'TestEnum',
+> -  'data': [ 'value1', 'value2' ] }
+> -{ 'struct': 'TestTypeA',
+> -  'data': { 'string': 'str' } }
+> -{ 'union': 'TestUnion',
+> -  'base': { 'type': 'TestEnum' },
+> -  'discriminator': 'type',
+> -  'data': { 'value1': 'TestTypeA' } }
+> diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
+> index 46c7282..881b53b 100644
+> --- a/tests/qapi-schema/qapi-schema-test.json
+> +++ b/tests/qapi-schema/qapi-schema-test.json
+> @@ -39,7 +39,7 @@
+>              '*enum1': 'EnumOne' } }   # intentional forward reference
+>  
+>  { 'enum': 'EnumOne',
+> -  'data': [ 'value1', 'value2', 'value3' ] }
+> +  'data': [ 'value1', 'value2', 'value3', 'value4' ] }
+>  
+>  { 'struct': 'UserDefZero',
+>    'data': { 'integer': 'int' } }
+> @@ -76,7 +76,7 @@
+>    'discriminator': 'enum1',
+>    'data': { 'value1' : 'UserDefA',
+>              'value2' : 'UserDefB',
+> -            'value3' : 'UserDefB' } }
+> +            'value3' : 'UserDefB' } } # skip 'value4'
 
-The common part only initializes the xscom bus. I wished we could create=20
-also the cores but, on the P9, we need the XIVE interrupt controller
-to be realized before :/=20
+Perhaps
 
->=20
->>     Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp)=
-;
->>     ISABus *(*isa_create)(PnvChip *chip);
->=20
-> I'm a little more dubious about this - I would have thought your
-> realize() hook could construct the right intc and isa, rather than
-> going into generic code, then back out to the callback.
+               'value3' : 'UserDefB'
+                # 'value4' defaults to empty
+             } }
 
-The 'intc_create' op creates the interrupt presenter. it is called from=20
-the powernv core realize routine and each chip has a different interrupt=20
-controller, and so a different presenter type. We cannot create the
-presenter before and 'pass' it to the core object at realize time=20
-because the presenter links in the CPU state. It's a bit of a chicken
-and egg problem, but I think it is good to have a presenter object
-all well initialized before we use it. I am open to any suggestions
-to get rid of this op. sPAPR has exactly the same need.
+would be clearer.
 
-As for the isa_create op, this is because there is only one isa_bus=20
-per machine, but you might be right. We can probably create the isa
-bus on all chips and link the machine to the one on chip0. It should=20
-save the op.
+>  
+>  { 'struct': 'UserDefUnionBase',
+>    'base': 'UserDefZero',
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 2462fc0..0f3d89b 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -779,13 +779,6 @@ def check_union(expr, info):
+>                                     "enum '%s'"
+>                                     % (key, enum_define['enum']))
+>  
+> -    # If discriminator is user-defined, ensure all values are covered
+> -    if enum_define:
+> -        for value in enum_define['data']:
+> -            if value not in members.keys():
+> -                raise QAPISemError(info, "Union '%s' data missing '%s' branch"
+> -                                   % (name, value))
+> -
+>  
+>  def check_alternate(expr, info):
+>      name = expr['alternate']
+> @@ -1644,6 +1637,10 @@ class QAPISchema(object):
+>          if tag_name:
+>              variants = [self._make_variant(key, value)
+>                          for (key, value) in data.items()]
+> +            # branches that are not explicitly covered get an empty type
+> +            variants += [self._make_variant(key, 'q_empty')
+> +                         for key in discriminator_find_enum_define(expr)['data']
+
+Long line, flagged by pycodestyle --diff.
+
+> +                         if key not in data.keys()]
+>              members = []
+>          else:
+>              variants = [self._make_simple_variant(key, value, info)
+
+The way you desugar the union is simple enough, but it uses
+discriminator_find_enum_define() outside check_exprs(), which I'd rather
+avoid.  Not something you could be reasonably expected to know.
+
+We could desugar in QAPISchemaObjectTypeVariants.check(), where we have
+self.tag_member.type.values.
+
+   @@ -1346,10 +1346,17 @@ class QAPISchemaObjectTypeVariants(object):
+                v.set_owner(name)
+
+        def check(self, schema, seen):
+   -        if not self.tag_member:    # flat union
+   +        if not self.tag_member: # flat union
+                self.tag_member = seen[c_name(self._tag_name)]
+                assert self._tag_name == self.tag_member.name
+            assert isinstance(self.tag_member.type, QAPISchemaEnumType)
+   +        if self._tag_name:      # flat union
+   +            cases = set([v.name for v in self.variants])
+   +            for val in self.tag_member.type.values:
+   +                if val.name not in cases:
+   +                    v = QAPISchemaObjectTypeVariant(val.name, 'q_empty')
+   +                    v.set_owner(self.tag_member.owner)
+   +                    self.variants.append(v)
+            for v in self.variants:
+                v.check(schema)
+                # Union names must match enum values; alternate names are
+
+Not so simple anymore.
+
+Simpler: desugar in check_union(), i.e. replace your two hunks by just
+
+   @@ -783,8 +783,7 @@ def check_union(expr, info):
+        if enum_define:
+            for value in enum_define['data']:
+                if value not in members.keys():
+   -                raise QAPISemError(info, "Union '%s' data missing '%s' branch"
+   -                                   % (name, value))
+   +                members[value] = 'q_empty'
 
 
-> But it's not a big deal.
->=20
->> Overall, it's looking fine and it should remove most of these tests :
->>
->> 	 pnv_chip_is_power9(chip)
->>
->> If not, it means we are missing a PnvChipClass ops anyway.
->=20
-> Nice.
->=20
->> I will send a patchset this week, the final one will shuffle quite a
->> bit of code and the resulting diff will be a bit fuzy. You will have
->> to trust me on this one.
->>
->> =20
->>>> Nevertheless we would still need to introduce "a physical mapping ar=
-ray=20
->>>> describing MMIO ranges" but we can start by differentiating the chip=
-sets=20
->>>> first.
->>>
->>> Well, maybe.  I'm wondering if you can more easily encapsulate the
->>> information in that array in a top-level init routine, that calls
->>> common helpers with different addresses / device types / whatever.
->>
->> Hmm, I think I understand but could you give me a prototype example.=20
->> Please. To make sure.
->>
->> I would like to keep the array somewhere because, in a quick look,=20
->> it gives you an overview of the POWER Processor address space.
->=20
-> Ok.  Going to a data-driven approach for constructing things sounds
-> like it might be a reasonable plan in its own right.  But I'd prefer
-> not to conflate with other structural questions.
->=20
+    def check_alternate(expr, info):
 
-OK. It can come later with XIVE, which needs 4 extra MMIO regions.
+What do you think?
 
-Thanks,
+> diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+> index 64d9c0f..1fb2b6d 100644
+> --- a/scripts/qapi/types.py
+> +++ b/scripts/qapi/types.py
+> @@ -124,7 +124,9 @@ def gen_variants(variants):
+>  ''',
+>                  c_name=c_name(variants.tag_member.name))
+>  
+> -    for var in variants.variants:
+> +    # filter out the empty types
+> +    for var in filter(lambda var: var.type.name != 'q_empty',
+> +                      variants.variants):
 
-C.=20
+The comment's position suggests it tells what the loop does, but that's
+not the case.  Let's do it the old-fashioned obvious way instead:
+
+       for var in variants.variants:
+           if var.type.name == 'q_empty':
+               continue
+
+Aside: we need to filter out q_empty, because we don't generate a C type
+for it.  Perhaps generating one would be simpler, but that's beyond the
+scope of this patch.
+
+>          ret += mcgen('''
+>          %(c_type)s %(c_name)s;
+>  ''',
+> diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+> index 5d72d89..96bd32c 100644
+> --- a/scripts/qapi/visit.py
+> +++ b/scripts/qapi/visit.py
+> @@ -81,14 +81,23 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
+>                       c_name=c_name(variants.tag_member.name))
+>  
+>          for var in variants.variants:
+> -            ret += mcgen('''
+> +            case_str = c_enum_const(variants.tag_member.type.name,
+> +                                    var.name,
+> +                                    variants.tag_member.type.prefix)
+> +            if var.type.name == 'q_empty':
+> +                # valid variant and nothing to do
+> +                ret += mcgen('''
+> +    case %(case)s:
+> +        break;
+> +''',
+> +                             case=case_str)
+> +            else:
+> +                ret += mcgen('''
+
+Aside: we need this, because we don't generate a visitor for q_empty.
+
+>      case %(case)s:
+>          visit_type_%(c_type)s_members(v, &obj->u.%(c_name)s, &err);
+>          break;
+>  ''',
+> -                         case=c_enum_const(variants.tag_member.type.name,
+> -                                           var.name,
+> -                                           variants.tag_member.type.prefix),
+> +                         case=case_str,
+>                           c_type=var.type.c_name(), c_name=c_name(var.name))
+
+Indentation's off, flagged by pycodestyle --diff.
+
+>  
+>          ret += mcgen('''
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index bb08e37..afdd0db 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -496,7 +496,6 @@ qapi-schema += flat-union-base-any.json
+>  qapi-schema += flat-union-base-union.json
+>  qapi-schema += flat-union-clash-member.json
+>  qapi-schema += flat-union-empty.json
+> -qapi-schema += flat-union-incomplete-branch.json
+>  qapi-schema += flat-union-inline.json
+>  qapi-schema += flat-union-int-branch.json
+>  qapi-schema += flat-union-invalid-branch-key.json
+> diff --git a/tests/qapi-schema/flat-union-incomplete-branch.err b/tests/qapi-schema/flat-union-incomplete-branch.err
+> deleted file mode 100644
+> index e826bf0..0000000
+> --- a/tests/qapi-schema/flat-union-incomplete-branch.err
+> +++ /dev/null
+> @@ -1 +0,0 @@
+> -tests/qapi-schema/flat-union-incomplete-branch.json:6: Union 'TestUnion' data missing 'value2' branch
+> diff --git a/tests/qapi-schema/flat-union-incomplete-branch.exit b/tests/qapi-schema/flat-union-incomplete-branch.exit
+> deleted file mode 100644
+> index d00491f..0000000
+> --- a/tests/qapi-schema/flat-union-incomplete-branch.exit
+> +++ /dev/null
+> @@ -1 +0,0 @@
+> -1
+> diff --git a/tests/qapi-schema/flat-union-incomplete-branch.out b/tests/qapi-schema/flat-union-incomplete-branch.out
+> deleted file mode 100644
+> index e69de29..0000000
+> diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
+> index 542a19c..0dbcdaf 100644
+> --- a/tests/qapi-schema/qapi-schema-test.out
+> +++ b/tests/qapi-schema/qapi-schema-test.out
+> @@ -23,7 +23,7 @@ object UserDefOne
+>      base UserDefZero
+>      member string: str optional=False
+>      member enum1: EnumOne optional=True
+> -enum EnumOne ['value1', 'value2', 'value3']
+> +enum EnumOne ['value1', 'value2', 'value3', 'value4']
+>  object UserDefZero
+>      member integer: int optional=False
+>  object UserDefTwoDictDict
+> @@ -52,6 +52,7 @@ object UserDefFlatUnion
+>      case value1: UserDefA
+>      case value2: UserDefB
+>      case value3: UserDefB
+> +    case value4: q_empty
+>  object UserDefUnionBase
+>      base UserDefZero
+>      member string: str optional=False
