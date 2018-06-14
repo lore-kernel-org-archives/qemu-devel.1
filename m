@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTWvQ-0000I4-68
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:24:49 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fTX54-00033F-VQ
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:34:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTWvP-00025N-5V
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:24:48 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35125)
+	(envelope-from <alex.bennee@linaro.org>) id 1fTX51-0005hD-0S
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:34:46 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36109)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fTWvO-000259-UD
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:24:47 -0400
-Received: by mail-wr0-x241.google.com with SMTP id l10-v6so7448854wrn.2
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 11:24:46 -0700 (PDT)
-References: <20180604152941.20374-1-peter.maydell@linaro.org>
-	<20180604152941.20374-10-peter.maydell@linaro.org>
+	id 1fTX50-0005gs-PF
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:34:42 -0400
+Received: by mail-wm0-x244.google.com with SMTP id v131-v6so13784903wma.1
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 11:34:42 -0700 (PDT)
+References: <1526945967-9687-1-git-send-email-cota@braap.org>
+	<ff49bf54-3d5c-c2a4-95cd-3cb8c2efab51@linaro.org>
+	<ada5eac5-eceb-b330-6f12-ac6e9c58268d@linaro.org>
+	<20180602002905.GA19122@flamenco> <87vab1zip9.fsf@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180604152941.20374-10-peter.maydell@linaro.org>
-Date: Thu, 14 Jun 2018 19:24:44 +0100
-Message-ID: <87sh5pz0nn.fsf@linaro.org>
+In-reply-to: <87vab1zip9.fsf@linaro.org>
+Date: Thu, 14 Jun 2018 19:34:39 +0100
+Message-ID: <87r2l9z074.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/13] hw/core/or-irq: Support more than
- 16 inputs to an OR gate
+Subject: Re: [Qemu-devel] [PATCH v3 00/17] tcg: tb_lock removal redux v3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +32,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger@redhat.com>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-> For the IoTKit MPC support, we need to wire together the
-> interrupt outputs of 17 MPCs; this exceeds the current
-> value of MAX_OR_LINES. Increase MAX_OR_LINES to 32 (which
-> should be enough for anyone).
+> Emilio G. Cota <cota@braap.org> writes:
 >
-> The tricky part is retaining the migration compatibility for
-> existing OR gates; we add a subsection which is only used
-> for larger OR gates, and define it such that we can freely
-> increase MAX_OR_LINES in future (or even move to a dynamically
-> allocated levels[] array without an upper size limit) without
-> breaking compatibility.
+>> On Wed, May 30, 2018 at 16:05:14 -0700, Richard Henderson wrote:
+>>> On 05/30/2018 03:46 PM, Richard Henderson wrote:
+>>> > Thanks.  Queued to tcg-next.
+>>> Hmph.  Unqueued, at least for now.
+>>>
+>>> ERROR:/home/rth/work/qemu/qemu/accel/tcg/translate-all.c:615:page_unloc=
+k__debug:
+>>> assertion failed: (page_is_locked(pd))
+>>
+>> Gaah, sorry. In v3 forgot to call the lock__debug function from
+>> a successful trylock. I tested v3 on aarch64, which explains why
+>> I didn't catch the bug. Fixed now:
+>>
+>> --- a/accel/tcg/translate-all.c
+>> +++ b/accel/tcg/translate-all.c
+>> @@ -704,6 +704,7 @@ static bool page_entry_trylock(struct page_entry *pe)
+>>      if (!busy) {
+>>          g_assert(!pe->locked);
+>>          pe->locked =3D true;
+>> +        page_lock__debug(pe->pd);
+>>      }
+>>      return busy;
+>>  }
+>>
+>> I also added the following, which cannot hurt:
+>>
+>> diff --git a/exec.c b/exec.c
+>> index afc37e0..e874d67 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -2493,6 +2493,7 @@ void memory_notdirty_write_complete(NotDirtyInfo *=
+ndi)
+>>  {
+>>      if (ndi->pages) {
+>>          page_collection_unlock(ndi->pages);
+>> +        ndi->pages =3D NULL;
+>>      }
+>>
+>> (Note that calling page_collection_unlock twice on that pointer
+>> would blow up.)
+>>
+>> The above two one-liners are the only code changes between v3 and v4.
+>> I also added Alex's R-b tag for the qht patch.
+>>
+>> I've boot-tested v4 on aarch64, arm, x86_64-softmmu, riscv64, sh4,
+>> sparc, s390x, ppc64 and or1k, with and without TCG debug.
+>>
+>> You can fetch v4 from:
+>>   https://github.com/cota/qemu/tree/tb-lock-removal-redux-v4
 >
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> I've just spun up v4 and it still works on aarch64 and now also passes
+> the coldfire test rich passed me. So have a:
+>
+> Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> For those two.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-> ---
->  include/hw/or-irq.h |  5 ++++-
->  hw/core/or-irq.c    | 39 +++++++++++++++++++++++++++++++++++++--
->  2 files changed, 41 insertions(+), 3 deletions(-)
+Ping, Richard are you happy with the fix?
+
 >
-> diff --git a/include/hw/or-irq.h b/include/hw/or-irq.h
-> index 3f6fc1b58a4..5a31e5a1881 100644
-> --- a/include/hw/or-irq.h
-> +++ b/include/hw/or-irq.h
-> @@ -31,7 +31,10 @@
->
->  #define TYPE_OR_IRQ "or-irq"
->
-> -#define MAX_OR_LINES      16
-> +/* This can safely be increased if necessary without breaking
-> + * migration compatibility (as long as it remains greater than 15).
-> + */
-> +#define MAX_OR_LINES      32
->
->  typedef struct OrIRQState qemu_or_irq;
->
-> diff --git a/hw/core/or-irq.c b/hw/core/or-irq.c
-> index f9d76c46415..a86901b673c 100644
-> --- a/hw/core/or-irq.c
-> +++ b/hw/core/or-irq.c
-> @@ -66,14 +66,49 @@ static void or_irq_init(Object *obj)
->      qdev_init_gpio_out(DEVICE(obj), &s->out_irq, 1);
->  }
->
-> +/* The original version of this device had a fixed 16 entries in its
-> + * VMState array; devices with more inputs than this need to
-> + * migrate the extra lines via a subsection.
-> + * The subsection migrates as much of the levels[] array as is needed
-> + * (including repeating the first 16 elements), to avoid the awkwardness
-> + * of splitting it in two to meet the requirements of VMSTATE_VARRAY_UIN=
-T16.
-> + */
-> +#define OLD_MAX_OR_LINES 16
-> +#if MAX_OR_LINES < OLD_MAX_OR_LINES
-> +#error MAX_OR_LINES must be at least 16 for migration compatibility
-> +#endif
-> +
-> +static bool vmstate_extras_needed(void *opaque)
-> +{
-> +    qemu_or_irq *s =3D OR_IRQ(opaque);
-> +
-> +    return s->num_lines >=3D OLD_MAX_OR_LINES;
-> +}
-> +
-> +static const VMStateDescription vmstate_or_irq_extras =3D {
-> +    .name =3D "or-irq-extras",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .needed =3D vmstate_extras_needed,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_VARRAY_UINT16_UNSAFE(levels, qemu_or_irq, num_lines, 0,
-> +                                     vmstate_info_bool, bool),
-> +        VMSTATE_END_OF_LIST(),
-> +    },
-> +};
-> +
->  static const VMStateDescription vmstate_or_irq =3D {
->      .name =3D TYPE_OR_IRQ,
->      .version_id =3D 1,
->      .minimum_version_id =3D 1,
->      .fields =3D (VMStateField[]) {
-> -        VMSTATE_BOOL_ARRAY(levels, qemu_or_irq, MAX_OR_LINES),
-> +        VMSTATE_BOOL_SUB_ARRAY(levels, qemu_or_irq, 0, OLD_MAX_OR_LINES),
->          VMSTATE_END_OF_LIST(),
-> -    }
-> +    },
-> +    .subsections =3D (const VMStateDescription*[]) {
-> +        &vmstate_or_irq_extras,
-> +        NULL
-> +    },
->  };
->
->  static Property or_irq_properties[] =3D {
+>>
+>> Thanks,
+>>
+>> 		Emilio
 
 
 --
