@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fTWqK-0005iV-Cv
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:19:33 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fTWsK-0006b4-CN
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:21:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fTWqH-0008EH-8B
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:19:32 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:38818)
+	(envelope-from <alex.bennee@linaro.org>) id 1fTWsH-0000n0-6u
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:21:36 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:39908)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fTWqH-0008Dx-0A
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:19:29 -0400
-Received: by mail-wr0-x241.google.com with SMTP id e18-v6so7429653wrs.5
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 11:19:28 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20180614180119.1704-1-f4bug@amsat.org>
-	<20180614180119.1704-2-f4bug@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bafda81a-a33b-6137-b30a-1cf98ab8393b@redhat.com>
-Date: Thu, 14 Jun 2018 20:19:25 +0200
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fTWsG-0000mf-So
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:21:33 -0400
+Received: by mail-wr0-x243.google.com with SMTP id w7-v6so7410793wrn.6
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 11:21:32 -0700 (PDT)
+References: <20180604152941.20374-1-peter.maydell@linaro.org>
+	<20180604152941.20374-2-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180604152941.20374-2-peter.maydell@linaro.org>
+Date: Thu, 14 Jun 2018 19:21:29 +0100
+Message-ID: <87wov1z0t2.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180614180119.1704-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 1/2] hw/isa/smc37c669-superio: Basic
- 'Config Registers' implementation
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 01/13] iommu: Add IOMMU index concept to
+ IOMMU API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +31,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Emilio G . Cota" <cota@braap.org>, Richard Henderson <rth@twiddle.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger@redhat.com>
 
-On 14/06/2018 20:01, Philippe Mathieu-Daudé wrote:
+
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> If an IOMMU supports mappings that care about the memory
+> transaction attributes, then it no longer has a unique
+> address -> output mapping, but more than one. We can
+> represent these using an IOMMU index, analogous to TCG's
+> mmu indexes.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  include/exec/memory.h | 55 +++++++++++++++++++++++++++++++++++++++++++
+>  memory.c              | 23 ++++++++++++++++++
+>  2 files changed, 78 insertions(+)
+>
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index eb2ba065195..fa6e98ee7be 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -206,6 +206,20 @@ enum IOMMUMemoryRegionAttr {
+>   * to report whenever mappings are changed, by calling
+>   * memory_region_notify_iommu() (or, if necessary, by calling
+>   * memory_region_notify_one() for each registered notifier).
+> + *
+> + * Conceptually an IOMMU provides a mapping from input address
+> + * to an output TLB entry. If the IOMMU is aware of memory transaction
+> + * attributes and the output TLB entry depends on the transaction
+> + * attributes, we represent this using IOMMU indexes. Each index
+> + * selects a particular translation table that the IOMMU has:
+> + *   @attrs_to_index returns the IOMMU index for a set of transaction at=
+tributes
+> + *   @translate takes an input address and an IOMMU index
+> + * and the mapping returned can only depend on the input address and the
+> + * IOMMU index.
+> + *
+> + * Most IOMMUs don't care about the transaction attributes and support
+> + * only a single IOMMU index. A more complex IOMMU might have one index
+> + * for secure transactions and one for non-secure transactions.
+>   */
+>  typedef struct IOMMUMemoryRegionClass {
+>      /* private */
+> @@ -290,6 +304,29 @@ typedef struct IOMMUMemoryRegionClass {
+>       */
+>      int (*get_attr)(IOMMUMemoryRegion *iommu, enum IOMMUMemoryRegionAttr=
+ attr,
+>                      void *data);
 > +
-> +static Property smc37c669_properties[] = {
-> +    DEFINE_PROP_UINT32("config", SMC37C669State, config, 0x78889c28),
-> +    DEFINE_PROP_BIT("parallel", SMC37C669State, config, 8 + 2, true),
-> +    DEFINE_PROP_END_OF_LIST()
-> +};
+> +    /* Return the IOMMU index to use for a given set of transaction attr=
+ibutes.
+> +     *
+> +     * Optional method: if an IOMMU only supports a single IOMMU index t=
+hen
+> +     * the default implementation of memory_region_iommu_attrs_to_index()
+> +     * will return 0.
+> +     *
+> +     * The indexes supported by an IOMMU must be contiguous, starting at=
+ 0.
+> +     *
+> +     * @iommu: the IOMMUMemoryRegion
+> +     * @attrs: memory transaction attributes
+> +     */
+> +    int (*attrs_to_index)(IOMMUMemoryRegion *iommu, MemTxAttrs attrs);
+> +
+> +    /* Return the number of IOMMU indexes this IOMMU supports.
+> +     *
+> +     * Optional method: if this method is not provided, then
+> +     * memory_region_iommu_num_indexes() will return 1, indicating that
+> +     * only a single IOMMU index is supported.
+> +     *
+> +     * @iommu: the IOMMUMemoryRegion
+> +     */
+> +    int (*num_indexes)(IOMMUMemoryRegion *iommu);
+>  } IOMMUMemoryRegionClass;
+>
+>  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
+> @@ -1054,6 +1091,24 @@ int memory_region_iommu_get_attr(IOMMUMemoryRegion=
+ *iommu_mr,
+>                                   enum IOMMUMemoryRegionAttr attr,
+>                                   void *data);
+>
+> +/**
+> + * memory_region_iommu_attrs_to_index: return the IOMMU index to
+> + * use for translations with the given memory transaction attributes.
+> + *
+> + * @iommu_mr: the memory region
+> + * @attrs: the memory transaction attributes
+> + */
+> +int memory_region_iommu_attrs_to_index(IOMMUMemoryRegion *iommu_mr,
+> +                                       MemTxAttrs attrs);
+> +
+> +/**
+> + * memory_region_iommu_num_indexes: return the total number of IOMMU
+> + * indexes that this IOMMU supports.
+> + *
+> + * @iommu_mr: the memory region
+> + */
+> +int memory_region_iommu_num_indexes(IOMMUMemoryRegion *iommu_mr);
+> +
+>  /**
+>   * memory_region_name: get a memory region's name
+>   *
+> diff --git a/memory.c b/memory.c
+> index 3212acc7f49..64f4a55d546 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1915,6 +1915,29 @@ int memory_region_iommu_get_attr(IOMMUMemoryRegion=
+ *iommu_mr,
+>      return imrc->get_attr(iommu_mr, attr, data);
+>  }
+>
+> +int memory_region_iommu_attrs_to_index(IOMMUMemoryRegion *iommu_mr,
+> +                                       MemTxAttrs attrs)
+> +{
+> +    IOMMUMemoryRegionClass *imrc =3D IOMMU_MEMORY_REGION_GET_CLASS(iommu=
+_mr);
+> +
+> +    if (!imrc->attrs_to_index) {
+> +        return 0;
+> +    }
+> +
+> +    return imrc->attrs_to_index(iommu_mr, attrs);
+> +}
+> +
+> +int memory_region_iommu_num_indexes(IOMMUMemoryRegion *iommu_mr)
+> +{
+> +    IOMMUMemoryRegionClass *imrc =3D IOMMU_MEMORY_REGION_GET_CLASS(iommu=
+_mr);
+> +
+> +    if (!imrc->num_indexes) {
+> +        return 1;
+> +    }
+> +
+> +    return imrc->num_indexes(iommu_mr);
+> +}
+> +
+>  void memory_region_set_log(MemoryRegion *mr, bool log, unsigned client)
+>  {
+>      uint8_t mask =3D 1 << client;
 
-I would initialize the config word in instance_init rather
-than using a property.  Having overlapping properties for the same field
-sounds like a recipe for undesired behavior.
 
-But why isn't the parallel port at 0x378?  That's the expected place on
-PC (the second parallel port is at 0x278 and the third is at 0x3bc), and
-I would expect other SuperIO chips to have it there too.  That would be
-a one line fix.
-
-Yet another possibility is to disable EPP on the parallel port, so that
-it occupies only the addresses from 0x3bc to 0x3be.
-
-Paolo
+--
+Alex Benn=C3=A9e
