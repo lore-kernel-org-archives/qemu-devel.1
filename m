@@ -1,31 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44601)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <loseweigh@gmail.com>) id 1fTGYa-0007Fe-WA
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:56:09 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fTGaW-0007y2-9j
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <loseweigh@gmail.com>) id 1fTGYa-0006ZY-5g
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:56:09 -0400
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:53289)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <loseweigh@gmail.com>) id 1fTGYZ-0006ZL-VW
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:56:08 -0400
-Received: by mail-it0-x242.google.com with SMTP id a195-v6so6171899itd.3
-	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 17:56:07 -0700 (PDT)
+	(envelope-from <Babu.Moger@amd.com>) id 1fTGaT-0007HJ-6z
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:58:08 -0400
+Received: from mail-cys01nam02on0617.outbound.protection.outlook.com
+	([2a01:111:f400:fe45::617]:10486
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fTGaS-0007H0-Q5
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:58:05 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Thu, 14 Jun 2018 00:58:01 +0000
+Message-ID: <DM5PR12MB2471F6BB6111340B7FB0FB0C957D0@DM5PR12MB2471.namprd12.prod.outlook.com>
+References: <DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180612174021.GL7451@localhost.localdomain>
+	<DM5PR12MB2471F6EA1525A824A9A94545957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180612190554.GO7451@localhost.localdomain>
+	<39f328af-a9c1-15bb-653e-9456b045768d@amd.com>
+	<DM5PR12MB2471C966B5B16FFCACDF33F3957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180613171820.GC7451@localhost.localdomain>
+	<DM5PR12MB2471BCEE4BD9ED0549F027E0957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180613181730.GG7451@localhost.localdomain>
+	<DM5PR12MB24715894687B9D55A47422A2957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
+	<20180613184928.GI7451@localhost.localdomain>
+In-Reply-To: <20180613184928.GI7451@localhost.localdomain>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20180612143554-mutt-send-email-mst@kernel.org>
-References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
-	<fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
-	<20180605152344-mutt-send-email-mst@kernel.org>
-	<CADGSJ21Qf6KpLzr+og5DOFjMPqu69n6dWRLvvj1FGAR5kVRNew@mail.gmail.com>
-	<20180606002650-mutt-send-email-mst@kernel.org>
-	<CADGSJ21AMp02vV+qxa+DuyvAUCCsXUFwV7wjzQ1Vy1jKV=n1HA@mail.gmail.com>
-	<20180612143554-mutt-send-email-mst@kernel.org>
-From: Siwei Liu <loseweigh@gmail.com>
-Date: Wed, 13 Jun 2018 17:56:06 -0700
-Message-ID: <CADGSJ21gEYTMQv+-nOxXiwKmFp0c5EDqfCXHqy2EbF3iLZfuXg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
+ AMD EPYC CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,26 +40,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
 
-On Tue, Jun 12, 2018 at 4:47 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Tue, Jun 05, 2018 at 03:09:26PM -0700, Siwei Liu wrote:
->> The thing is cloud service provider might prefer sticking to the same
->> level of service agreement (SLA) of keeping VF over migration,
->
-> That requirement is trivially satisfied by just a single VF :) If your
-> SLA does not require live migration, you should do just that.
 
-The requirement is enable live migration by default without getting
-user too much attention. Migration should be attempted if guest is
-live migratable. If not, present a single VF to legacy guest.
 
-You seem to think it's not a valid use case? Or impossible to do so?
-What if I have something in mind that can support my theory as well?
+> -----Original Message-----
+> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> Sent: Wednesday, June 13, 2018 1:49 PM
+> To: Moger, Babu <Babu.Moger@amd.com>
+> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
+> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Jiri
+> Denemark <jdenemar@redhat.com>
+> Subject: Re: [PATCH v13 3/5] i386: Enable TOPOEXT feature on AMD EPYC
+> CPU
+>=20
+> On Wed, Jun 13, 2018 at 06:21:58PM +0000, Moger, Babu wrote:
+> >
+> >
+> > > -----Original Message-----
+> > > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> > > Sent: Wednesday, June 13, 2018 1:18 PM
+> > > To: Moger, Babu <Babu.Moger@amd.com>
+> > > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com;
+> pbonzini@redhat.com;
+> > > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> > > kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Jiri
+> > > Denemark <jdenemar@redhat.com>
+> > > Subject: Re: [PATCH v13 3/5] i386: Enable TOPOEXT feature on AMD EPYC
+> > > CPU
+> > >
+> > > On Wed, Jun 13, 2018 at 06:10:30PM +0000, Moger, Babu wrote:
+> > > > > -----Original Message-----
+> > > > > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+> > > > > Sent: Wednesday, June 13, 2018 12:18 PM
+> > > > > To: Moger, Babu <Babu.Moger@amd.com>
+> > > > > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com;
+> > > pbonzini@redhat.com;
+> > > > > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
+> > > > > kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com;
+> Jiri
+> > > > > Denemark <jdenemar@redhat.com>
+> > > > > Subject: Re: [PATCH v13 3/5] i386: Enable TOPOEXT feature on AMD
+> EPYC
+> > > > > CPU
+> > > > >
+> > > > > On Wed, Jun 13, 2018 at 04:52:18PM +0000, Moger, Babu wrote:
+> > > > > [...]
+> > > > > > > What do you think our options are here?
+> > > > > >
+> > > > > > Should we drop automatic topoext completely and move forward?
+> > > > > > What are your thoughts?
+> > > > >
+> > > > > Let's drop automatic topoext by now, and see if we find solutions
+> > > > > later.  I don't want to hold the rest of the patches because of
+> > > > > this.
+> > > >
+> > > > Ok. I will drop topoext.
+> > > >
+> > > > >
+> > > > > I'm thinking we could simply make kvm_arch_get_supported_cpuid()
+> > > > > always return TOPOEXT on AMD CPUs, because the feature flag don't
+> > > > > really depend on any KVM code to work (is that correct?).
+> > > >
+> > > > Yes, that is correct. I don't see any dependent code on TOPOEXT in
+> KVM
+> > > driver.
+> > > >
+> > > > Ok. Let me add TOPOEXT flag for all the AMD cpus and see how it goe=
+s.
+> > >
+> > > Hmm, this could actually solve all of our problems, then:
+> > >
+> > > We can forget about auto-topoext: just add TOPOEXT in
+> > > kvm_arch_get_supported_cpuid(), add TOPOEXT unconditionally to
+> > > the CPU models where you are interested into (EPYC only?), and
+> > > add topoext=3Doff to pc-2.12 compat_props.
+> > >
+> >
+> > Ok Sure.
+>=20
+> Sorry, I forgot we still need to decide what to do if TOPOEXT is
+> enabled in the CPU model (or command-line) but the -smp options
+> are not compatible with it.
 
--Siwei
+Yes.  I have kept that check.  But, I had to implement topology_supports_to=
+poext bit differently.
+Reason for this is we need to disable this feature before the  x86_cpu_expa=
+nd_features.
+But problem is nr_cores and nr_threads are not populated at this time. It i=
+s populated in qemu_init_vcpus.
+Please take a look at topology_supports_topoext again.
+>=20
+> In other words, what should guest see on CPUID if using:
+>=20
+> "-machine pc-q35-3.0 -cpu EPYC -smp 64,cores=3D64"
+> or:
+> "-machine pc-q35-3.0 -cpu Opteron_G5,+topoext -smp 64,cores=3D64"
+>=20
+Tested both these cases. It works fine with some warning messages.
 
->
+> I wonder what would happen if we just return zeroes on
+> CPUID[0x800001E] if !topology_supports_topoext(), instead of
+> trying to clear/set TOPOEXT depending on the -smp option?  It
+> would make things much simpler for QEMU and libvirt.
+
+I did not see that difference in behavior if we clear the bit versus return=
+ 0s.
+Sending new patches now. Please review.
+One note: I will going on vacation from June 20th for couple of weeks.
+ If possible I would like to close this feature. If we cannot that is fine.=
+ Just an FYI.
+
+>=20
 > --
-> MST
+> Eduardo
