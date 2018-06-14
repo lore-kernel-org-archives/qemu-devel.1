@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTXi1-0001gF-8h
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:15:03 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTXhw-0001cV-VG
+	(envelope-from <armbru@redhat.com>) id 1fTXhx-0001aA-03
 	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:15:01 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1fTXht-0001ZS-Sk
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:14:56 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Thu, 14 Jun 2018 21:14:42 +0200
-Message-Id: <20180614191443.14361-18-armbru@redhat.com>
-In-Reply-To: <20180614191443.14361-1-armbru@redhat.com>
-References: <20180614191443.14361-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 17/18] rbd: New parameter
- auth-client-required
+Date: Thu, 14 Jun 2018 21:14:25 +0200
+Message-Id: <20180614191443.14361-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 00/18] block: Configuration fixes and rbd
+ authentication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,172 +21,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, eblake@redhat.com
 
-Parameter auth-client-required lets you configure authentication
-methods.  We tried to provide that in v2.9.0, but backed out due to
-interface design doubts (commit 464444fcc16).
+PATCH 01-17 are configuration fixes and cleanup, in particular
+-blockdev driver=nfs,... and -drive driver=(nbd|sheepdog|ssh),... with
+non-string scalars.
 
-This commit is similar to what we backed out, but simpler: we use a
-list of enumeration values instead of a list of objects with a member
-of enumeration type.
+PATCH 18-19 provide support for configuring rbd authentication.
 
-Let's review our reasons for backing out the first try, as stated in
-the commit message:
+I'm happy to split the series if that helps.
 
-    * The implementation uses deprecated rados_conf_set() key
-      "auth_supported".  No biggie.
+Jeff Cody tested the RFC on his Ceph rig.  All results match
+expectations.  Since code changes since then have been minimal, I
+believe his test results remain valid.
 
-Fixed: we use "auth-client-required".
+v2:
+* PATCH 03+05: Fix typos and pastos in commit message [Kevin]
+* PATCH 09: Fix error handling [Kevin]
+* PATCH 12: Redo for clarity [Kevin]
 
-    * The implementation makes -drive silently ignore invalid parameters
-      "auth" and "auth-supported.*.X" where X isn't "auth".  Fixable (in
-      fact I'm going to fix similar bugs around parameter server), so
-      again no biggie.
+Markus Armbruster (17):
+  rbd: Drop deprecated -drive parameter "filename"
+  iscsi: Drop deprecated -drive parameter "filename"
+  qobject: Move block-specific qdict code to block-qdict.c
+  block: Fix -blockdev for certain non-string scalars
+  block: Fix -drive for certain non-string scalars
+  block: Clean up a misuse of qobject_to() in .bdrv_co_create_opts()
+  block: Factor out qobject_input_visitor_new_flat_confused()
+  block: Make remaining uses of qobject input visitor more robust
+  block-qdict: Simplify qdict_flatten_qdict()
+  block-qdict: Tweak qdict_flatten_qdict(), qdict_flatten_qlist()
+  block-qdict: Clean up qdict_crumple() a bit
+  block-qdict: Simplify qdict_is_list() some
+  check-block-qdict: Rename qdict_flatten()'s variables for clarity
+  check-block-qdict: Cover flattening of empty lists and dictionaries
+  block: Fix -blockdev / blockdev-add for empty objects and arrays
+  rbd: New parameter auth-client-required
+  rbd: New parameter key-secret
 
-That fix is commit 2836284db60.  This commit doesn't bring the bugs
-back.
+Max Reitz (1):
+  block: Add block-specific QDict header
 
-    * BlockdevOptionsRbd member @password-secret applies only to
-      authentication method cephx.  Should it be a variant member of
-      RbdAuthMethod?
+ MAINTAINERS               |   2 +
+ block.c                   |   1 +
+ block/crypto.c            |  12 +-
+ block/gluster.c           |   1 +
+ block/iscsi.c             |  24 +-
+ block/nbd.c               |  16 +-
+ block/nfs.c               |   8 +-
+ block/parallels.c         |  11 +-
+ block/qcow.c              |  11 +-
+ block/qcow2.c             |  11 +-
+ block/qed.c               |  11 +-
+ block/quorum.c            |   1 +
+ block/rbd.c               |  85 +++--
+ block/sheepdog.c          |  23 +-
+ block/snapshot.c          |   1 +
+ block/ssh.c               |  16 +-
+ block/vdi.c               |   8 +-
+ block/vhdx.c              |  11 +-
+ block/vpc.c               |  11 +-
+ block/vvfat.c             |   1 +
+ block/vxhs.c              |   1 +
+ blockdev.c                |   1 +
+ include/block/qdict.h     |  34 ++
+ include/qapi/qmp/qdict.h  |  17 -
+ qapi/block-core.json      |  19 +
+ qobject/Makefile.objs     |   1 +
+ qobject/block-qdict.c     | 722 ++++++++++++++++++++++++++++++++++++++
+ qobject/qdict.c           | 628 ---------------------------------
+ tests/Makefile.include    |   4 +
+ tests/check-block-qdict.c | 690 ++++++++++++++++++++++++++++++++++++
+ tests/check-qdict.c       | 641 ---------------------------------
+ tests/check-qobject.c     |   1 +
+ tests/test-replication.c  |   1 +
+ util/qemu-config.c        |   1 +
+ 34 files changed, 1587 insertions(+), 1439 deletions(-)
+ create mode 100644 include/block/qdict.h
+ create mode 100644 qobject/block-qdict.c
+ create mode 100644 tests/check-block-qdict.c
 
-We've had time to ponder, and we decided to stick to the way Ceph
-configuration works: the key configured separately, and silently
-ignored if the authentication method doesn't use it.
-
-    * BlockdevOptionsRbd member @user could apply to both methods cephx
-      and none, but I'm not sure it's actually used with none.  If it
-      isn't, should it be a variant member of RbdAuthMethod?
-
-Likewise.
-
-    * The client offers a *set* of authentication methods, not a list.
-      Should the methods be optional members of BlockdevOptionsRbd instead
-      of members of list @auth-supported?  The latter begs the question
-      what multiple entries for the same method mean.  Trivial question
-      now that RbdAuthMethod contains nothing but @type, but less so when
-      RbdAuthMethod acquires other members, such the ones discussed above.
-
-Again, we decided to stick to the way Ceph configuration works, except
-we make auth-client-required a list of enumeration values instead of a
-string containing keywords separated by delimiters.
-
-    * How BlockdevOptionsRbd member @auth-supported interacts with
-      settings from a configuration file specified with @conf is
-      undocumented.  I suspect it's untested, too.
-
-Not actually true, the documentation for @conf says "Values in the
-configuration file will be overridden by options specified via QAPI",
-and we've tested this.
-
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
----
- block/rbd.c          | 42 ++++++++++++++++++++++++++++++++----------
- qapi/block-core.json | 13 +++++++++++++
- 2 files changed, 45 insertions(+), 10 deletions(-)
-
-diff --git a/block/rbd.c b/block/rbd.c
-index 82346a2a5e..ea0575d068 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -240,20 +240,42 @@ static void qemu_rbd_refresh_limits(BlockDriverState *bs, Error **errp)
- 
- 
- static int qemu_rbd_set_auth(rados_t cluster, const char *secretid,
-+                             BlockdevOptionsRbd *opts,
-                              Error **errp)
- {
--    if (secretid == 0) {
--        return 0;
--    }
-+    char *acr;
-+    int r;
-+    GString *accu;
-+    RbdAuthModeList *auth;
-+
-+    if (secretid) {
-+        gchar *secret = qcrypto_secret_lookup_as_base64(secretid,
-+                                                        errp);
-+        if (!secret) {
-+            return -1;
-+        }
- 
--    gchar *secret = qcrypto_secret_lookup_as_base64(secretid,
--                                                    errp);
--    if (!secret) {
--        return -1;
-+        rados_conf_set(cluster, "key", secret);
-+        g_free(secret);
-     }
- 
--    rados_conf_set(cluster, "key", secret);
--    g_free(secret);
-+    if (opts->has_auth_client_required) {
-+        accu = g_string_new("");
-+        for (auth = opts->auth_client_required; auth; auth = auth->next) {
-+            if (accu->str[0]) {
-+                g_string_append_c(accu, ';');
-+            }
-+            g_string_append(accu, RbdAuthMode_str(auth->value));
-+        }
-+        acr = g_string_free(accu, FALSE);
-+        r = rados_conf_set(cluster, "auth_client_required", acr);
-+        g_free(acr);
-+        if (r < 0) {
-+            error_setg_errno(errp, -r,
-+                             "Could not set 'auth_client_required'");
-+            return r;
-+        }
-+    }
- 
-     return 0;
- }
-@@ -585,7 +607,7 @@ static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-         }
-     }
- 
--    if (qemu_rbd_set_auth(*cluster, secretid, errp) < 0) {
-+    if (qemu_rbd_set_auth(*cluster, secretid, opts, errp) < 0) {
-         r = -EIO;
-         goto failed_shutdown;
-     }
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index fff23fc82b..0f68ca56f3 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3177,6 +3177,14 @@
-             '*timeout': 'int' } }
- 
- 
-+##
-+# @RbdAuthMode:
-+#
-+# Since: 3.0
-+##
-+{ 'enum': 'RbdAuthMode',
-+  'data': [ 'cephx', 'none' ] }
-+
- ##
- # @BlockdevOptionsRbd:
- #
-@@ -3192,6 +3200,10 @@
- #
- # @user:               Ceph id name.
- #
-+# @auth-client-required: Acceptable authentication modes.
-+#                      This maps to Ceph configuration option
-+#                      "auth_client_required".  (Since 3.0)
-+#
- # @server:             Monitor host address and port.  This maps
- #                      to the "mon_host" Ceph option.
- #
-@@ -3203,6 +3215,7 @@
-             '*conf': 'str',
-             '*snapshot': 'str',
-             '*user': 'str',
-+            '*auth-client-required': ['RbdAuthMode'],
-             '*server': ['InetSocketAddressBase'] } }
- 
- ##
 -- 
 2.17.1
