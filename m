@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTRq6-0001rJ-Uh
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:58:59 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fTRtH-0004L0-UF
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:02:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTRq3-0003tn-TX
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:58:59 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:41812)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fTRq3-0003tO-MV
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 08:58:55 -0400
-Received: by mail-wr0-x243.google.com with SMTP id h10-v6so6316200wrq.8
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 05:58:55 -0700 (PDT)
-References: <20180612062430.GA15344@xz-mi>
-	<CAFEAcA_Bh4U1X_FDbakcc7YDBHFrkCjCKGrtuTWegn7rAGZUeQ@mail.gmail.com>
-	<20180613040259.GI15344@xz-mi> <20180613092809.GF27901@redhat.com>
-	<20180614025521.GR15344@xz-mi> <20180614081420.GG6355@redhat.com>
-	<CAFEAcA-d8mVd2d7mAAVH6aWGHwyi=9yzKiwm2pX9unJ5OaACxg@mail.gmail.com>
-	<20180614110322.GD14019@xz-mi>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180614110322.GD14019@xz-mi>
-Date: Thu, 14 Jun 2018 13:58:53 +0100
-Message-ID: <87y3fhzfqq.fsf@linaro.org>
+	(envelope-from <imammedo@redhat.com>) id 1fTRtC-00051P-5G
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:02:15 -0400
+Date: Thu, 14 Jun 2018 15:02:04 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180614150204.78047e2e@redhat.com>
+In-Reply-To: <20180613213337.GP7451@localhost.localdomain>
+References: <20180611121655.19616-1-david@redhat.com>
+	<20180611121655.19616-7-david@redhat.com>
+	<20180613145624.3004935c@redhat.com>
+	<bb0b033f-d048-06db-96d1-89085000d792@redhat.com>
+	<20180613213337.GP7451@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Is there a way to package QEMU binaries?
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 06/11] pc-dimm: don't allow to access
+ "size" before the device was realized
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,64 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Devel Mailing List <qemu-devel@nongnu.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, "Michael S
+	. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
+On Wed, 13 Jun 2018 18:33:37 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Peter Xu <peterx@redhat.com> writes:
+> On Wed, Jun 13, 2018 at 04:03:35PM +0200, David Hildenbrand wrote:
+> > On 13.06.2018 14:56, Igor Mammedov wrote:  
+> > > On Mon, 11 Jun 2018 14:16:50 +0200
+> > > David Hildenbrand <david@redhat.com> wrote:
+> > >   
+> > >> "size" should not be queried before the device was realized. Let' make
+> > >> that explicit.
+> > >>
+> > >> Signed-off-by: David Hildenbrand <david@redhat.com>  
+> > > It's generic property getter, it should work even before realize is called.  
+> > 
+> > That's the point, as we can see in NVDIMM code , it is *not* a generic
+> > property getter.  
+> 
+> If it were a writeable property, I would agree with Igor because
+> it would make it impossible to find out what's the default value
+> for the property.
+> 
+> As it's a read-only property, returning an error seems harmless.
+> Igor, why exactly do you think it's a problem?
+I'm not welcoming putting random restrictions on when property could be read.
+For me it's just another qom property and it should return valid value
+that corresponds to the current state of the object or error out if
+it can't return anything useful at the moment.
 
-> On Thu, Jun 14, 2018 at 11:50:23AM +0100, Peter Maydell wrote:
->> On 14 June 2018 at 09:14, Daniel P. Berrang=C3=A9 <berrange@redhat.com> =
-wrote:
->> > On Thu, Jun 14, 2018 at 10:55:21AM +0800, Peter Xu wrote:
->> >> Then is there an easy way to port the specfile and tools to QEMU
->> >> repository so that we can pack that even with a git tree?
->>
->> > Well if we want to have a RPM spec file for QEMU distributed with upst=
-ream
->> > QEMU, then I think it would be better todo what libvirt does[2], and s=
-imply
->> > have the real Fedora  specfile kept in QEMU git [3].
->>
->> I would prefer not to. I think packaging is a job for downstream
->> distributors, and having our own (probably under-maintained)
->> version of the packaging infrastructure in upstream git just
->> makes things awkward for downstream, and requires us to make
->> choices about which distros we think "important" enough to
->> provide packaging for...
->
-> AFAIU that's not a problem; we can just provide more ways to package
-> the system gradually, just like what Linux did:
->
-> Kernel packaging:
->   rpm-pkg             - Build both source and binary RPM kernel packages
->   binrpm-pkg          - Build only the binary kernel RPM package
->   deb-pkg             - Build both source and binary deb kernel packages
->   bindeb-pkg          - Build only the binary kernel deb package
->   snap-pkg            - Build only the binary kernel snap package (will c=
-onnect to external hosts)
->   tar-pkg             - Build the kernel as an uncompressed tarball
->   targz-pkg           - Build the kernel as a gzip compressed tarball
->   tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball
->   tarxz-pkg           - Build the kernel as a xz compressed tarball
+In this particular case it should error out if 'memdev' isn't set and
+return a value corresponding to current state of [pc|nv]dimm object
+if 'memdev' is set.
 
-I suspect the kernel is a special case as there aren't that many
-dependencies or interactions to worry about. That said I think the make
-install logic interfaces with some distro supplied hooks.
-
-> But it seems that this package thing is not really that welcomed (and
-> after all we have multiple specfiles here and there).  Then I think
-> I'll just live with it now.
-
-I could see an argument for hosting distro-agnostic packaging in the
-QEMU source tree for things like snap or flatpak. However there is no
-one uniform packaging approach for either deb or rpm based systems. They
-all have their own rules and approaches to where things go that means
-they are best served by the respective distributions.
-
->
-> Regards,
-
-
---
-Alex Benn=C3=A9e
+This patch is obviously wrong, putting restriction based on "realized"
+as getter might be easily accessed before Device::realized becomes True,
+i.e. during setting properties or within device_set_realized() time.
