@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fTVSa-0008VP-Hk
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 12:50:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTVT8-0000Lz-Ie
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 12:51:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fTVSX-00008O-Ed
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 12:50:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57044)
+	(envelope-from <peter.maydell@linaro.org>) id 1fTVT6-0000aL-8N
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 12:51:30 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:44343)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fTVSX-00007K-7S
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 12:50:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fTVSU-0007WJ-7h
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 16:50:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 209B22E818A
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 16:50:48 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fTVT5-0000Zh-L8
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 12:51:28 -0400
+Received: by mail-oi0-x242.google.com with SMTP id c128-v6so6272577oig.11
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 09:51:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 14 Jun 2018 16:36:02 -0000
-From: John Snow <1769189@bugs.launchpad.net>
-Reply-To: Bug 1769189 <1769189@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152544791493.32626.6219738999075353422.malonedeb@gac.canonical.com>
-Message-Id: <152899416237.2025.5939797243918106224.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1769189] Re: Issue with qemu 2.12.0 + SATA
+In-Reply-To: <20180604152941.20374-1-peter.maydell@linaro.org>
+References: <20180604152941.20374-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Jun 2018 17:51:06 +0100
+Message-ID: <CAFEAcA8OO0SdmE4nJhcQg6kWPcqs-5g8BkjOREw40aUchc6RXw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 00/13] iommu: support txattrs,
+ support TCG execution, implement TZ MPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,41 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "patches@linaro.org" <patches@linaro.org>, Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-5694c7eacce6b263ad7497cc1bb76aad746cfd4e ahci: fix PxCI register race
+On 4 June 2018 at 16:29, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Hi; this is v2 of my iommu patchset, which does:
+>  * support IOMMUs that are aware of memory transaction attributes and
+>    may generate different translations for different attributes
+>  * support TCG execution out of memory which is behind an IOMMU
+>  * implement the Arm TrustZone Memory Protection Controller
+>    (which needs both the above features in the IOMMU core code)
+>  * use the MPC in the mps2-an505 board
 
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D5694c7eacce6b263ad749=
-7cc1bb76aad746cfd4e
+> Unreviewed patches: 4, 6, 7, 8, 9, 10
 
--- =
+Ping for further reviews, comments, etc, please. I'd like
+to put this in via target-arm.next in the not too distant
+future.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1769189
-
-Title:
-  Issue with qemu 2.12.0 + SATA
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  [EDIT: I first thought that OVMF was the issue, but it turns out to be
-  SATA]
-
-  I had a Windows 10 VM running perfectly fine with a SATA drive, since
-  I upgraded to qemu 2.12, the guests hangs for a couple of minutes,
-  works for a few seconds, and hangs again, etc. By "hang" I mean it
-  doesn't freeze, but it looks like it's waiting on IO or something, I
-  can move the mouse but everything needing disk access is unresponsive.
-
-  What doesn't work: qemu 2.12 with SATA
-  What works: using VirIO-SCSI with qemu 2.12 or downgrading qemu to 2.11.1=
- and keep using SATA.
-
-  Platform is arch linux 4.16.7 on skylake and Haswell, I have attached
-  the vm xml file.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1769189/+subscriptions
+thanks
+-- PMM
