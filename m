@@ -1,35 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fTUuT-0007vo-Hs
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 12:15:43 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fTVMZ-0005YR-1I
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 12:44:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fTUuP-00074g-Fs
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 12:15:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36406 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fTUuP-000742-8h
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 12:15:37 -0400
-Date: Thu, 14 Jun 2018 17:15:31 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180614161531.GI18967@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <cover.1528832686.git.alifm@linux.ibm.com>
-	<dd7e90c5b3de6f98218908c7f57d9d0286089ad5.1528832686.git.alifm@linux.ibm.com>
-	<20180613093700.GG27901@redhat.com>
-	<7b51465a-b7c1-58ec-1ef6-9fe791e96bbf@linux.ibm.com>
-	<20180613150512.GA19901@redhat.com>
-	<5833f4ec-dcd1-19ac-2848-facf31aec7cf@linux.ibm.com>
-	<20180614082155.GI6355@redhat.com>
-	<79597909-fdb5-2983-19ac-74332229c8ef@linux.ibm.com>
-	<20180614151048.GA18967@redhat.com>
-	<28dca328-6920-91a1-0962-b336a3ffcb5b@linux.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <28dca328-6920-91a1-0962-b336a3ffcb5b@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v1 1/1] virtio-crypto: Allow disabling of
- cipher algorithms for virtio-crypto device
+	(envelope-from <stefanha@redhat.com>) id 1fTVMV-0002ut-TN
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 12:44:43 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Thu, 14 Jun 2018 17:44:31 +0100
+Message-Id: <20180614164431.29305-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH] compiler: add a sizeof_field() macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,220 +17,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-devel@nongnu.org, frankja@linux.ibm.com, mst@redhat.com, borntraeger@de.ibm.com, arei.gonglei@huawei.com, longpeng2@huawei.com, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, mjrosato@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, xen-devel@lists.xenproject.org, qemu-s390x@nongnu.org
 
-On Thu, Jun 14, 2018 at 12:12:23PM -0400, Farhan Ali wrote:
->=20
->=20
-> On 06/14/2018 11:10 AM, Daniel P. Berrang=C3=A9 wrote:
-> > On Thu, Jun 14, 2018 at 10:50:40AM -0400, Farhan Ali wrote:
-> > >=20
-> > >=20
-> > > On 06/14/2018 04:21 AM, Daniel P. Berrang=C3=A9 wrote:
-> > > > On Wed, Jun 13, 2018 at 07:28:08PM +0200, Halil Pasic wrote:
-> > > > >=20
-> > > > >=20
-> > > > > On 06/13/2018 05:05 PM, Daniel P. Berrang=C3=A9 wrote:
-> > > > > > On Wed, Jun 13, 2018 at 11:01:05AM -0400, Farhan Ali wrote:
-> > > > > > > Hi Daniel
-> > > > > > >=20
-> > > > > > > On 06/13/2018 05:37 AM, Daniel P. Berrang=C3=A9 wrote:
-> > > > > > > > On Tue, Jun 12, 2018 at 03:48:34PM -0400, Farhan Ali wrot=
-e:
-> > > > > > > > > The virtio-crypto driver currently propagates to the gu=
-est
-> > > > > > > > > all the cipher algorithms that the backend cryptodev ca=
-n
-> > > > > > > > > support. But in certain cases where the guest has more
-> > > > > > > > > performant mechanism to handle some algorithms, it woul=
-d be
-> > > > > > > > > useful to propagate only a subset of the algorithms.
-> > > > > > > >=20
-> > > > > > > > I'm not really convinced by this.
-> > > > > > > >=20
-> > > > > > > > The performance of crypto algorithms has many influencing
-> > > > > > > > factors, making it pretty hard to decide which is best
-> > > > > > > > without actively testing specific impls and comparing
-> > > > > > > > them in a manner which matches the application usage
-> > > > > > > > pattern. eg in theory the kernel crypto impl of an alg
-> > > > > > > > is faster than a userspace impl, if the kernel uses
-> > > > > > > > hardware accel and userspace does not. This, however,
-> > > > > > > > ignores the overhead of the kernel/userspace switch.
-> > > > > > > > The real world performance winner, thus depends on the
-> > > > > > > > amount of data being processed in each operation. Some
-> > > > > > > > times userspace can win & sometimes kernel space can
-> > > > > > > > win. This is even more relevant to virtio-crypto as
-> > > > > > > > it has more expensive context switches.
-> > > > > > >=20
-> > > > > > > True. But what if the guest can perform some crypto algorit=
-hms without a
-> > > > > > > incurring a VM exit? For example in s390 we have the cpacf =
-instructions to
-> > > > > > > perform crypto and this instruction is implemented for us b=
-y our hardware
-> > > > > > > virtualization technology. In such a case it would be bette=
-r not to use
-> > > > > > > virtio-crypto's implementation of such a crypto algorithm.
-> > > > > > >=20
-> > > > > > > At the same time we would like to take advantage of virtio-=
-crypto's
-> > > > > > > acceleration capabilities for certain crypto algorithms for=
- which there is
-> > > > > > > no hardware assistance.
-> > > > > >=20
-> > > > > > IIUC, the kernel's crypto layer can support multiple implemen=
-tations of
-> > > > > > any algorithm. Providers can report a priority against implem=
-entations
-> > > > > > which influences which impl is used in practice. So if there'=
-s a native
-> > > > > > instruction for a partiuclar algorithm I would expect the imp=
-l registered
-> > > > > > for that to be designated higher priority than other impls, s=
-o that it is
-> > > > > > used in preference to other impls.
-> > > > > >=20
-> > > > >=20
-> > > > > AFAIR the problem here is that in (the guest) kernel the virtio=
--crypto
-> > > > > driver has to register it's crypto algo implementations with a =
-priority
-> > > > > (single number), which dictates if it's going to be the preferr=
-ed (used)
-> > > > > implementation of the algorithm or not. The virtio-crypto drive=
-r does this
-> > > > > without having information about the (comparative or absolute) =
-performance
-> > > > > of it's implementation (which depends on the backend among othe=
-rs). I don't think
-> > > > > any dynamic re-prioritization of the algorithms takes place (e.=
-g. based on how these
-> > > > > perform in for the given configuration).
-> > > > >=20
-> > > > > I think the strategy of the virtio-crypto is to rather overstat=
-e, than
-> > > > > understate the performance of it's implementation. If we were t=
-o 'be
-> > > > > conservative' and say, 'hey we don't know nothing about the per=
-formance,
-> > > > > let's make it lowest priority implementation' the implementatio=
-ns provided
-> > > > > by virtio-crypto would end up being used only if there is no ot=
-her
-> > > > > implementation. And that does not sound like a good idea either=
-.
-> > > >=20
-> > > >=20
-> > > > This problem you describe, however, is something that applies to =
-*any*
-> > > > kerenl code that is registering a crypto algo impl for accelerato=
-r
-> > > > hardware. A non-virtualized crypto cards in bare metal likewise c=
-annot
-> > > > assume that its AES impl is better then the host CPU's  aes-ni in=
-struction.
-> > > >=20
-> > > > > So the idea is to give the user the power to effectively not pr=
-ovide
-> > > > > an algorithm via virtio-crypto. That is, if the user observes a=
- performance
-> > > > > degradation because of virtio-crypto, he can turn off the bad a=
-lgorithms
-> > > > > at the device. That way overstatement becomes a much smaller pr=
-oblem.
-> > > > > The user can turn off the bad algorithms for reasons other than=
- performance
-> > > > > too.
-> > > > >=20
-> > > > > Of course there are other ways to deal with the problem of virt=
-io-crypto
-> > > > > driver not knowing how good it's implementation of a given algo=
- is. We
-> > > > > could make the in kernel crypto priorities dynamically adjustab=
-le in general
-> > > > > or we could provide the user with means to specify the prioriti=
-es (e.g.
-> > > > > as module parameter) with which the virtio-crypto driver regist=
-ers each algo.
-> > > > > Both of these would be knobs in the guest. It's hard to tell if=
- these first
-> > > > > one would be useful in scenarios not involving virtualization. =
-Same goes
-> > > > > for some kind of dynamic priority management for crypto algorit=
-hm implementations
-> > > > > in the Linux kernel. I assume the people involved with the resp=
-ective
-> > > > > subsystem do not see the necessity for something like that.
-> > > >=20
-> > > > It still feels like this is a problem for the guest OS to solve. =
-If you
-> > > > put a physical crypto accelerator in a bare metal machine, that h=
-as the
-> > > > same problem you describe here, so the kernel surely already need=
-s to find
-> > > > a viable solution for this problem.
-> > > >=20
-> > >=20
-> > > How would the guest OS know which algo is better? As you mentioned =
-it does
-> > > depend on few factors and the best the kernel can do is use some so=
-rt of
-> > > heuristics. Such a solution might not be very dynamic and might not=
- work for
-> > > all the cases for a user.
-> >=20
-> > Which is better will likely depend on the application using it. One m=
-ight
-> > be better for use by the kernel, while another is better for use by a
-> > userspace application, or two userspace apps might have different pre=
-ferences.
-> >=20
-> > > Shouldn't we use virtualization to give us the flexibility that we =
-don't
-> > > have with physical crypto accelerator? The crypto accelerator might=
- not know
-> > > if it's implementation is any better, but the user can experiment a=
-nd see
-> > > what works better.
-> >=20
-> > It is better to provide it all to the guest and let the guest decide =
-which
-> > is best to use.  If nothing else the virtio-crypto kernel module itse=
-lf
-> > can have module parameters to control the priority it gives to each
-> > algorithm, or can avoid registering certain algorithms.  Doing it gue=
-st
-> > side is more flexible, because realistically many virt host deploymen=
-ts
-> > will never give the guest admin ability to control this from the host
-> > side, so a guest kernel config ability will be the only thing availab=
-le.
-> >=20
->=20
-> I am not sure if putting all that complexity on the guest OS is the rig=
-ht
-> approach. I thought it would be better to let the user decide through d=
-evice
-> definition what algorithms should be available to the guest. But I am o=
-pen
-> to other approaches and suggestion :)
+Determining the size of a field is useful when you don't have a struct
+variable handy.  Open-coding this is ugly.
 
-Well the guest admin always has 100% control over what happens inside the=
-ir
-guest OS. They often have no control at all over how QEMU is configured o=
-n
-the host. eg apps like oVirt, OpenStack, etc may let them create a guest
-with a virtio-crypto dev, but not provide any way to configure these kind
-of fine details of it. So in many cases, configuring it in the guest is
-going to be the only option you have.
+This patch adds the sizeof_field() macro, which is similar to
+typeof_field().  Existing instances are updated to use the macro.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ include/hw/xen/io/ring.h      |  2 +-
+ include/qemu/compiler.h       |  2 ++
+ accel/tcg/translate-all.c     |  2 +-
+ hw/display/xenfb.c            |  4 ++--
+ hw/net/rocker/rocker_of_dpa.c |  2 +-
+ hw/net/virtio-net.c           |  2 +-
+ target/i386/kvm.c             |  2 +-
+ target/ppc/arch_dump.c        | 10 +++++-----
+ target/s390x/arch_dump.c      | 20 ++++++++++----------
+ 9 files changed, 24 insertions(+), 22 deletions(-)
+
+diff --git a/include/hw/xen/io/ring.h b/include/hw/xen/io/ring.h
+index abbca47687..ffa3ebadc8 100644
+--- a/include/hw/xen/io/ring.h
++++ b/include/hw/xen/io/ring.h
+@@ -65,7 +65,7 @@ typedef unsigned int RING_IDX;
+  */
+ #define __CONST_RING_SIZE(_s, _sz) \
+     (__RD32(((_sz) - offsetof(struct _s##_sring, ring)) / \
+-	    sizeof(((struct _s##_sring *)0)->ring[0])))
++            sizeof_field(struct _s##_sring, ring[0])))
+ /*
+  * The same for passing in an actual pointer instead of a name tag.
+  */
+diff --git a/include/qemu/compiler.h b/include/qemu/compiler.h
+index 9f762695d1..5843812710 100644
+--- a/include/qemu/compiler.h
++++ b/include/qemu/compiler.h
+@@ -64,6 +64,8 @@
+         (type *) ((char *) __mptr - offsetof(type, member));})
+ #endif
+ 
++#define sizeof_field(type, field) sizeof(((type *)0)->field)
++
+ /* Convert from a base type to a parent type, with compile time checking.  */
+ #ifdef __GNUC__
+ #define DO_UPCAST(type, field, dev) ( __extension__ ( { \
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index d48b56ca38..767066ecd6 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -132,7 +132,7 @@ typedef struct PageDesc {
+ 
+ /* Make sure all possible CPU event bits fit in tb->trace_vcpu_dstate */
+ QEMU_BUILD_BUG_ON(CPU_TRACE_DSTATE_MAX_EVENTS >
+-                  sizeof(((TranslationBlock *)0)->trace_vcpu_dstate)
++                  sizeof_field(TranslationBlock, trace_vcpu_dstate)
+                   * BITS_PER_BYTE);
+ 
+ /*
+diff --git a/hw/display/xenfb.c b/hw/display/xenfb.c
+index f5afcc0358..911291c5c3 100644
+--- a/hw/display/xenfb.c
++++ b/hw/display/xenfb.c
+@@ -525,8 +525,8 @@ static int xenfb_configure_fb(struct XenFB *xenfb, size_t fb_len_lim,
+                               int width, int height, int depth,
+                               size_t fb_len, int offset, int row_stride)
+ {
+-    size_t mfn_sz = sizeof(*((struct xenfb_page *)0)->pd);
+-    size_t pd_len = sizeof(((struct xenfb_page *)0)->pd) / mfn_sz;
++    size_t mfn_sz = sizeof_field(struct xenfb_page, pd[0]);
++    size_t pd_len = sizeof_field(struct xenfb_page, pd) / mfn_sz;
+     size_t fb_pages = pd_len * XC_PAGE_SIZE / mfn_sz;
+     size_t fb_len_max = fb_pages * XC_PAGE_SIZE;
+     int max_width, max_height;
+diff --git a/hw/net/rocker/rocker_of_dpa.c b/hw/net/rocker/rocker_of_dpa.c
+index 60046720a5..8e347d1ee4 100644
+--- a/hw/net/rocker/rocker_of_dpa.c
++++ b/hw/net/rocker/rocker_of_dpa.c
+@@ -104,7 +104,7 @@ typedef struct of_dpa_flow_key {
+ 
+ /* Width of key which includes field 'f' in u64s, rounded up */
+ #define FLOW_KEY_WIDTH(f) \
+-    DIV_ROUND_UP(offsetof(OfDpaFlowKey, f) + sizeof(((OfDpaFlowKey *)0)->f), \
++    DIV_ROUND_UP(offsetof(OfDpaFlowKey, f) + sizeof_field(OfDpaFlowKey, f), \
+     sizeof(uint64_t))
+ 
+ typedef struct of_dpa_flow_action {
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 90502fca7c..f154756e85 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -46,7 +46,7 @@
+  * 'container'.
+  */
+ #define endof(container, field) \
+-    (offsetof(container, field) + sizeof(((container *)0)->field))
++    (offsetof(container, field) + sizeof_field(container, field))
+ 
+ typedef struct VirtIOFeature {
+     uint64_t flags;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 445e0e0b11..ad0e904b2c 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1526,7 +1526,7 @@ static int kvm_put_fpu(X86CPU *cpu)
+ #define XSAVE_PKRU        672
+ 
+ #define XSAVE_BYTE_OFFSET(word_offset) \
+-    ((word_offset) * sizeof(((struct kvm_xsave *)0)->region[0]))
++    ((word_offset) * sizeof_field(struct kvm_xsave, region[0]))
+ 
+ #define ASSERT_OFFSET(word_offset, field) \
+     QEMU_BUILD_BUG_ON(XSAVE_BYTE_OFFSET(word_offset) != \
+diff --git a/target/ppc/arch_dump.c b/target/ppc/arch_dump.c
+index 351a65b22f..cc1460e4e3 100644
+--- a/target/ppc/arch_dump.c
++++ b/target/ppc/arch_dump.c
+@@ -210,11 +210,11 @@ static const struct NoteFuncDescStruct {
+     int contents_size;
+     void (*note_contents_func)(NoteFuncArg *arg, PowerPCCPU *cpu);
+ } note_func[] = {
+-    {sizeof(((Note *)0)->contents.prstatus),  ppc_write_elf_prstatus},
+-    {sizeof(((Note *)0)->contents.fpregset),  ppc_write_elf_fpregset},
+-    {sizeof(((Note *)0)->contents.vmxregset), ppc_write_elf_vmxregset},
+-    {sizeof(((Note *)0)->contents.vsxregset), ppc_write_elf_vsxregset},
+-    {sizeof(((Note *)0)->contents.speregset), ppc_write_elf_speregset},
++    {sizeof_field(Note, contents.prstatus),  ppc_write_elf_prstatus},
++    {sizeof_field(Note, contents.fpregset),  ppc_write_elf_fpregset},
++    {sizeof_field(Note, contents.vmxregset), ppc_write_elf_vmxregset},
++    {sizeof_field(Note, contents.vsxregset), ppc_write_elf_vsxregset},
++    {sizeof_field(Note, contents.speregset), ppc_write_elf_speregset},
+     { 0, NULL}
+ };
+ 
+diff --git a/target/s390x/arch_dump.c b/target/s390x/arch_dump.c
+index 6f61ff95af..c9ef0a6e60 100644
+--- a/target/s390x/arch_dump.c
++++ b/target/s390x/arch_dump.c
+@@ -184,20 +184,20 @@ typedef struct NoteFuncDescStruct {
+ } NoteFuncDesc;
+ 
+ static const NoteFuncDesc note_core[] = {
+-    {sizeof(((Note *)0)->contents.prstatus), s390x_write_elf64_prstatus},
+-    {sizeof(((Note *)0)->contents.fpregset), s390x_write_elf64_fpregset},
++    {sizeof_field(Note, contents.prstatus), s390x_write_elf64_prstatus},
++    {sizeof_field(Note, contents.fpregset), s390x_write_elf64_fpregset},
+     { 0, NULL}
+ };
+ 
+ static const NoteFuncDesc note_linux[] = {
+-    {sizeof(((Note *)0)->contents.prefix),   s390x_write_elf64_prefix},
+-    {sizeof(((Note *)0)->contents.ctrs),     s390x_write_elf64_ctrs},
+-    {sizeof(((Note *)0)->contents.timer),    s390x_write_elf64_timer},
+-    {sizeof(((Note *)0)->contents.todcmp),   s390x_write_elf64_todcmp},
+-    {sizeof(((Note *)0)->contents.todpreg),  s390x_write_elf64_todpreg},
+-    {sizeof(((Note *)0)->contents.vregslo),  s390x_write_elf64_vregslo},
+-    {sizeof(((Note *)0)->contents.vregshi),  s390x_write_elf64_vregshi},
+-    {sizeof(((Note *)0)->contents.gscb),     s390x_write_elf64_gscb},
++    {sizeof_field(Note, contents.prefix),   s390x_write_elf64_prefix},
++    {sizeof_field(Note, contents.ctrs),     s390x_write_elf64_ctrs},
++    {sizeof_field(Note, contents.timer),    s390x_write_elf64_timer},
++    {sizeof_field(Note, contents.todcmp),   s390x_write_elf64_todcmp},
++    {sizeof_field(Note, contents.todpreg),  s390x_write_elf64_todpreg},
++    {sizeof_field(Note, contents.vregslo),  s390x_write_elf64_vregslo},
++    {sizeof_field(Note, contents.vregshi),  s390x_write_elf64_vregshi},
++    {sizeof_field(Note, contents.gscb),     s390x_write_elf64_gscb},
+     { 0, NULL}
+ };
+ 
+-- 
+2.17.1
