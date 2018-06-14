@@ -1,17 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fTGBF-0006O2-HO
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:32:04 -0400
+	(envelope-from <loseweigh@gmail.com>) id 1fTGYa-0007Fe-WA
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:56:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fTGBC-00037g-DY
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:32:01 -0400
-Message-Id: <51f6ea83be6b66d61e3129edecddc3399a1df1b8.1528935420.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1528935420.git.balaton@eik.bme.hu>
-References: <cover.1528935420.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Thu, 14 Jun 2018 02:17:00 +0200
-Subject: [Qemu-devel] [PATCH v3 2/9] ppc4xx_i2c: Implement directcntl
- register
+	(envelope-from <loseweigh@gmail.com>) id 1fTGYa-0006ZY-5g
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:56:09 -0400
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:53289)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <loseweigh@gmail.com>) id 1fTGYZ-0006ZL-VW
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:56:08 -0400
+Received: by mail-it0-x242.google.com with SMTP id a195-v6so6171899itd.3
+	for <qemu-devel@nongnu.org>; Wed, 13 Jun 2018 17:56:07 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180612143554-mutt-send-email-mst@kernel.org>
+References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
+	<fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
+	<20180605152344-mutt-send-email-mst@kernel.org>
+	<CADGSJ21Qf6KpLzr+og5DOFjMPqu69n6dWRLvvj1FGAR5kVRNew@mail.gmail.com>
+	<20180606002650-mutt-send-email-mst@kernel.org>
+	<CADGSJ21AMp02vV+qxa+DuyvAUCCsXUFwV7wjzQ1Vy1jKV=n1HA@mail.gmail.com>
+	<20180612143554-mutt-send-email-mst@kernel.org>
+From: Siwei Liu <loseweigh@gmail.com>
+Date: Wed, 13 Jun 2018 17:56:06 -0700
+Message-ID: <CADGSJ21gEYTMQv+-nOxXiwKmFp0c5EDqfCXHqy2EbF3iLZfuXg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,104 +34,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- default-configs/ppc-softmmu.mak    |  1 +
- default-configs/ppcemb-softmmu.mak |  1 +
- hw/i2c/ppc4xx_i2c.c                | 13 ++++++++++++-
- include/hw/i2c/ppc4xx_i2c.h        |  4 ++++
- 4 files changed, 18 insertions(+), 1 deletion(-)
+On Tue, Jun 12, 2018 at 4:47 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Tue, Jun 05, 2018 at 03:09:26PM -0700, Siwei Liu wrote:
+>> The thing is cloud service provider might prefer sticking to the same
+>> level of service agreement (SLA) of keeping VF over migration,
+>
+> That requirement is trivially satisfied by just a single VF :) If your
+> SLA does not require live migration, you should do just that.
 
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 4d7be45..7d0dc2f 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -26,6 +26,7 @@ CONFIG_USB_EHCI_SYSBUS=y
- CONFIG_SM501=y
- CONFIG_IDE_SII3112=y
- CONFIG_I2C=y
-+CONFIG_BITBANG_I2C=y
- 
- # For Macs
- CONFIG_MAC=y
-diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
-index 67d18b2..37af193 100644
---- a/default-configs/ppcemb-softmmu.mak
-+++ b/default-configs/ppcemb-softmmu.mak
-@@ -19,3 +19,4 @@ CONFIG_USB_EHCI_SYSBUS=y
- CONFIG_SM501=y
- CONFIG_IDE_SII3112=y
- CONFIG_I2C=y
-+CONFIG_BITBANG_I2C=y
-diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-index 4e0aaae..c0a1930 100644
---- a/hw/i2c/ppc4xx_i2c.c
-+++ b/hw/i2c/ppc4xx_i2c.c
-@@ -30,6 +30,7 @@
- #include "cpu.h"
- #include "hw/hw.h"
- #include "hw/i2c/ppc4xx_i2c.h"
-+#include "bitbang_i2c.h"
- 
- #define PPC4xx_I2C_MEM_SIZE 18
- 
-@@ -46,6 +47,11 @@
- 
- #define IIC_XTCNTLSS_SRST   (1 << 0)
- 
-+#define IIC_DIRECTCNTL_SDAC (1 << 3)
-+#define IIC_DIRECTCNTL_SCLC (1 << 2)
-+#define IIC_DIRECTCNTL_MSDA (1 << 1)
-+#define IIC_DIRECTCNTL_MSCL (1 << 0)
-+
- static void ppc4xx_i2c_reset(DeviceState *s)
- {
-     PPC4xxI2CState *i2c = PPC4xx_I2C(s);
-@@ -289,7 +295,11 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
-         i2c->xtcntlss = value;
-         break;
-     case 16:
--        i2c->directcntl = value & 0x7;
-+        i2c->directcntl = value & (IIC_DIRECTCNTL_SDAC & IIC_DIRECTCNTL_SCLC);
-+        i2c->directcntl |= (value & IIC_DIRECTCNTL_SCLC ? 1 : 0);
-+        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL, i2c->directcntl & 1);
-+        i2c->directcntl |= bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SDA,
-+                               (value & IIC_DIRECTCNTL_SDAC) != 0) << 1;
-         break;
-     default:
-         if (addr < PPC4xx_I2C_MEM_SIZE) {
-@@ -322,6 +332,7 @@ static void ppc4xx_i2c_init(Object *o)
-     sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
-     sysbus_init_irq(SYS_BUS_DEVICE(s), &s->irq);
-     s->bus = i2c_init_bus(DEVICE(s), "i2c");
-+    s->bitbang = bitbang_i2c_init(s->bus);
- }
- 
- static void ppc4xx_i2c_class_init(ObjectClass *klass, void *data)
-diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
-index e4b6ded..ea6c8e1 100644
---- a/include/hw/i2c/ppc4xx_i2c.h
-+++ b/include/hw/i2c/ppc4xx_i2c.h
-@@ -31,6 +31,9 @@
- #include "hw/sysbus.h"
- #include "hw/i2c/i2c.h"
- 
-+/* from hw/i2c/bitbang_i2c.h */
-+typedef struct bitbang_i2c_interface bitbang_i2c_interface;
-+
- #define TYPE_PPC4xx_I2C "ppc4xx-i2c"
- #define PPC4xx_I2C(obj) OBJECT_CHECK(PPC4xxI2CState, (obj), TYPE_PPC4xx_I2C)
- 
-@@ -42,6 +45,7 @@ typedef struct PPC4xxI2CState {
-     I2CBus *bus;
-     qemu_irq irq;
-     MemoryRegion iomem;
-+    bitbang_i2c_interface *bitbang;
-     uint8_t mdata;
-     uint8_t lmadr;
-     uint8_t hmadr;
--- 
-2.7.6
+The requirement is enable live migration by default without getting
+user too much attention. Migration should be attempted if guest is
+live migratable. If not, present a single VF to legacy guest.
+
+You seem to think it's not a valid use case? Or impossible to do so?
+What if I have something in mind that can support my theory as well?
+
+-Siwei
+
+>
+> --
+> MST
