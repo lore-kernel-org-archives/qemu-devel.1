@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTXCN-0006D1-1e
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:42:19 -0400
+	(envelope-from <thuth@redhat.com>) id 1fTXc4-0007Bk-85
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:08:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTXCI-0000gB-S3
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:42:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTXCI-0000fb-M1
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:42:14 -0400
-Date: Thu, 14 Jun 2018 15:42:07 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180614184207.GX7451@localhost.localdomain>
-References: <1528939107-17193-1-git-send-email-babu.moger@amd.com>
-	<1528939107-17193-5-git-send-email-babu.moger@amd.com>
+	(envelope-from <thuth@redhat.com>) id 1fTXbz-0005xi-6Q
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:08:52 -0400
+From: Thomas Huth <thuth@redhat.com>
+References: <1528738007-29122-1-git-send-email-thuth@redhat.com>
+Message-ID: <d4a53d7a-60c0-b98a-bd2a-fd06b2f0e822@redhat.com>
+Date: Thu, 14 Jun 2018 21:08:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1528939107-17193-5-git-send-email-babu.moger@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v14 4/6] cpus: Add new function
- topology_supports_topoext
+In-Reply-To: <1528738007-29122-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2] hw/s390x/ipl: Fix crashes
+ that occurs when -kernel is used with small images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Babu Moger <babu.moger@amd.com>
-Cc: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, kash@tripleback.net, geoff@hostfission.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 
-On Wed, Jun 13, 2018 at 09:18:25PM -0400, Babu Moger wrote:
-> Add new function topology_supports_topoext to verify
-> if we can support topoext feature. Will be used to enable/disable
-> topoext feature.
+On 11.06.2018 19:26, Thomas Huth wrote:
+> Add a sanity checks to fix the following two crashes:
 > 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> $ echo "Insane in the mainframe" > /tmp/test.txt
+> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -append xyz
+> Segmentation fault (core dumped)
+> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -initrd /tmp/test.txt
+> Segmentation fault (core dumped)
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  accel/tcg/user-exec-stub.c |  5 +++++
->  cpus.c                     | 13 +++++++++++++
->  include/qom/cpu.h          |  9 +++++++++
->  3 files changed, 27 insertions(+)
+>  v2: Fixed 2nd crash with -initrd
 > 
+>  hw/s390x/ipl.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 04245b5..2ff8f20 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -168,7 +168,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>           * we can not rely on the ELF entry point - it was 0x800 (the SALIPL
+>           * loader) and it won't work. For this case we force it to 0x10000, too.
+>           */
+> -        if (pentry == KERN_IMAGE_START || pentry == 0x800) {
+> +        if ((pentry == KERN_IMAGE_START || pentry == 0x800) &&
+> +            kernel_size > KERN_PARM_AREA + strlen(ipl->cmdline)) {
+>              ipl->start_addr = KERN_IMAGE_START;
+>              /* Overwrite parameters in the kernel image, which are "rom" */
+>              strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
+> @@ -195,8 +196,10 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+>               * we have to overwrite values in the kernel image,
+>               * which are "rom"
+>               */
+> -            stq_p(rom_ptr(INITRD_PARM_START), initrd_offset);
+> -            stq_p(rom_ptr(INITRD_PARM_SIZE), initrd_size);
+> +            if (kernel_size > INITRD_PARM_SIZE + 8) {
+> +                stq_p(rom_ptr(INITRD_PARM_START), initrd_offset);
+> +                stq_p(rom_ptr(INITRD_PARM_SIZE), initrd_size);
+> +            }
+>          }
+>      }
+>      /*
 
-x86-specific code doesn't belong to arch-independent code.  Why
-not keep it in target/i386/cpu.c like before?
+I just had to discover that this breaks the argv handling in
+kvm-unit-tests. Cornelia, could you please unqueue this patch again?
+I'll try to come up with a better solution...
 
--- 
-Eduardo
+ Thomas
