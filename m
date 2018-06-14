@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTXyj-000773-1o
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:32:20 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fTXym-000781-Sz
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:32:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTXyh-0005vb-LO
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:32:17 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:38217)
+	(envelope-from <richard.henderson@linaro.org>) id 1fTXyl-0005yd-Gp
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:32:20 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:46141)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fTXyh-0005uj-Dh
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:32:15 -0400
-Received: by mail-pg0-x241.google.com with SMTP id c9-v6so3364332pgf.5
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 12:32:15 -0700 (PDT)
+	id 1fTXyl-0005xy-8K
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:32:19 -0400
+Received: by mail-pg0-x242.google.com with SMTP id d2-v6so3353563pga.13
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 12:32:19 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 14 Jun 2018 09:31:41 -1000
-Message-Id: <20180614193147.29680-13-richard.henderson@linaro.org>
+Date: Thu, 14 Jun 2018 09:31:43 -1000
+Message-Id: <20180614193147.29680-15-richard.henderson@linaro.org>
 In-Reply-To: <20180614193147.29680-1-richard.henderson@linaro.org>
 References: <20180614193147.29680-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 12/18] translate-all: add page_locked assertions
+Subject: [Qemu-devel] [PULL 14/18] translate-all: discard TB when
+ tb_link_page returns an existing matching TB
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,199 +32,167 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-This is only compiled under CONFIG_DEBUG_TCG to avoid
-bloating the binary.
+Use the recently-gained QHT feature of returning the matching TB if it
+already exists. This allows us to get rid of the lookup we perform
+right after acquiring tb_lock.
 
-In user-mode, assert_page_locked is equivalent to assert_mmap_lock.
-
-Note: There are some tb_lock assertions left that will be
-removed by later patches.
-
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Suggested-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/tcg/translate-all.c | 82 +++++++++++++++++++++++++++++++++++++--
- 1 file changed, 79 insertions(+), 3 deletions(-)
+ accel/tcg/cpu-exec.c            | 14 ++-------
+ accel/tcg/translate-all.c       | 50 +++++++++++++++++++++++++++------
+ docs/devel/multi-thread-tcg.txt |  3 ++
+ 3 files changed, 46 insertions(+), 21 deletions(-)
 
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index d75c35380a..45f6ebc65e 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -245,10 +245,7 @@ void cpu_exec_step_atomic(CPUState *cpu)
+         if (tb == NULL) {
+             mmap_lock();
+             tb_lock();
+-            tb = tb_htable_lookup(cpu, pc, cs_base, flags, cf_mask);
+-            if (likely(tb == NULL)) {
+-                tb = tb_gen_code(cpu, pc, cs_base, flags, cflags);
+-            }
++            tb = tb_gen_code(cpu, pc, cs_base, flags, cflags);
+             tb_unlock();
+             mmap_unlock();
+         }
+@@ -398,14 +395,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+         tb_lock();
+         acquired_tb_lock = true;
+ 
+-        /* There's a chance that our desired tb has been translated while
+-         * taking the locks so we check again inside the lock.
+-         */
+-        tb = tb_htable_lookup(cpu, pc, cs_base, flags, cf_mask);
+-        if (likely(tb == NULL)) {
+-            /* if no translated code available, then translate it now */
+-            tb = tb_gen_code(cpu, pc, cs_base, flags, cf_mask);
+-        }
++        tb = tb_gen_code(cpu, pc, cs_base, flags, cf_mask);
+ 
+         mmap_unlock();
+         /* We add the TB in the virtual pc hash table for the fast lookup */
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 1cc7aab82c..8b378586f4 100644
+index c75298d08a..2585e6fd3e 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -583,6 +583,9 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_addr_t phys1,
+@@ -1581,18 +1581,30 @@ static inline void tb_page_add(PageDesc *p, TranslationBlock *tb,
+  * (-1) to indicate that only one page contains the TB.
+  *
+  * Called with mmap_lock held for user-mode emulation.
++ *
++ * Returns a pointer @tb, or a pointer to an existing TB that matches @tb.
++ * Note that in !user-mode, another thread might have already added a TB
++ * for the same block of guest code that @tb corresponds to. In that case,
++ * the caller should discard the original @tb, and use instead the returned TB.
+  */
+-static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
+-                         tb_page_addr_t phys_page2)
++static TranslationBlock *
++tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
++             tb_page_addr_t phys_page2)
+ {
+     PageDesc *p;
+     PageDesc *p2 = NULL;
++    void *existing_tb = NULL;
+     uint32_t h;
  
- /* In user-mode page locks aren't used; mmap_lock is enough */
+     assert_memory_lock();
+ 
+     /*
+      * Add the TB to the page list, acquiring first the pages's locks.
++     * We keep the locks held until after inserting the TB in the hash table,
++     * so that if the insertion fails we know for sure that the TBs are still
++     * in the page descriptors.
++     * Note that inserting into the hash table first isn't an option, since
++     * we can only insert TBs that are fully initialized.
+      */
+     page_lock_pair(&p, phys_pc, &p2, phys_page2, 1);
+     tb_page_add(p, tb, 0, phys_pc & TARGET_PAGE_MASK);
+@@ -1602,21 +1614,33 @@ static void tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
+         tb->page_addr[1] = -1;
+     }
+ 
++    /* add in the hash table */
++    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
++                     tb->trace_vcpu_dstate);
++    qht_insert(&tb_ctx.htable, tb, h, &existing_tb);
++
++    /* remove TB from the page(s) if we couldn't insert it */
++    if (unlikely(existing_tb)) {
++        tb_page_remove(p, tb);
++        invalidate_page_bitmap(p);
++        if (p2) {
++            tb_page_remove(p2, tb);
++            invalidate_page_bitmap(p2);
++        }
++        tb = existing_tb;
++    }
++
+     if (p2) {
+         page_unlock(p2);
+     }
+     page_unlock(p);
+ 
+-    /* add in the hash table */
+-    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
+-                     tb->trace_vcpu_dstate);
+-    qht_insert(&tb_ctx.htable, tb, h, NULL);
+-
  #ifdef CONFIG_USER_ONLY
-+
-+#define assert_page_locked(pd) tcg_debug_assert(have_mmap_lock())
-+
- static inline void page_lock(PageDesc *pd)
- { }
- 
-@@ -605,14 +608,80 @@ void page_collection_unlock(struct page_collection *set)
- { }
- #else /* !CONFIG_USER_ONLY */
- 
-+#ifdef CONFIG_DEBUG_TCG
-+
-+static __thread GHashTable *ht_pages_locked_debug;
-+
-+static void ht_pages_locked_debug_init(void)
-+{
-+    if (ht_pages_locked_debug) {
-+        return;
-+    }
-+    ht_pages_locked_debug = g_hash_table_new(NULL, NULL);
-+}
-+
-+static bool page_is_locked(const PageDesc *pd)
-+{
-+    PageDesc *found;
-+
-+    ht_pages_locked_debug_init();
-+    found = g_hash_table_lookup(ht_pages_locked_debug, pd);
-+    return !!found;
-+}
-+
-+static void page_lock__debug(PageDesc *pd)
-+{
-+    ht_pages_locked_debug_init();
-+    g_assert(!page_is_locked(pd));
-+    g_hash_table_insert(ht_pages_locked_debug, pd, pd);
-+}
-+
-+static void page_unlock__debug(const PageDesc *pd)
-+{
-+    bool removed;
-+
-+    ht_pages_locked_debug_init();
-+    g_assert(page_is_locked(pd));
-+    removed = g_hash_table_remove(ht_pages_locked_debug, pd);
-+    g_assert(removed);
-+}
-+
-+static void
-+do_assert_page_locked(const PageDesc *pd, const char *file, int line)
-+{
-+    if (unlikely(!page_is_locked(pd))) {
-+        error_report("assert_page_lock: PageDesc %p not locked @ %s:%d",
-+                     pd, file, line);
-+        abort();
-+    }
-+}
-+
-+#define assert_page_locked(pd) do_assert_page_locked(pd, __FILE__, __LINE__)
-+
-+#else /* !CONFIG_DEBUG_TCG */
-+
-+#define assert_page_locked(pd)
-+
-+static inline void page_lock__debug(const PageDesc *pd)
-+{
-+}
-+
-+static inline void page_unlock__debug(const PageDesc *pd)
-+{
-+}
-+
-+#endif /* CONFIG_DEBUG_TCG */
-+
- static inline void page_lock(PageDesc *pd)
- {
-+    page_lock__debug(pd);
-     qemu_spin_lock(&pd->lock);
- }
- 
- static inline void page_unlock(PageDesc *pd)
- {
-     qemu_spin_unlock(&pd->lock);
-+    page_unlock__debug(pd);
- }
- 
- /* lock the page(s) of a TB in the correct acquisition order */
-@@ -658,6 +727,7 @@ static bool page_entry_trylock(struct page_entry *pe)
-     if (!busy) {
-         g_assert(!pe->locked);
-         pe->locked = true;
-+        page_lock__debug(pe->pd);
-     }
-     return busy;
- }
-@@ -775,6 +845,7 @@ page_collection_lock(tb_page_addr_t start, tb_page_addr_t end)
-             g_tree_foreach(set->tree, page_entry_unlock, NULL);
-             goto retry;
-         }
-+        assert_page_locked(pd);
-         PAGE_FOR_EACH_TB(pd, tb, n) {
-             if (page_trylock_add(set, tb->page_addr[0]) ||
-                 (tb->page_addr[1] != -1 &&
-@@ -1113,6 +1184,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
- /* call with @p->lock held */
- static inline void invalidate_page_bitmap(PageDesc *p)
- {
-+    assert_page_locked(p);
- #ifdef CONFIG_SOFTMMU
-     g_free(p->code_bitmap);
-     p->code_bitmap = NULL;
-@@ -1269,6 +1341,7 @@ static inline void tb_page_remove(PageDesc *pd, TranslationBlock *tb)
-     uintptr_t *pprev;
-     unsigned int n1;
- 
-+    assert_page_locked(pd);
-     pprev = &pd->first_tb;
-     PAGE_FOR_EACH_TB(pd, tb1, n1) {
-         if (tb1 == tb) {
-@@ -1417,6 +1490,7 @@ static void build_page_bitmap(PageDesc *p)
-     int n, tb_start, tb_end;
-     TranslationBlock *tb;
- 
-+    assert_page_locked(p);
-     p->code_bitmap = bitmap_new(TARGET_PAGE_SIZE);
- 
-     PAGE_FOR_EACH_TB(p, tb, n) {
-@@ -1450,7 +1524,7 @@ static inline void tb_page_add(PageDesc *p, TranslationBlock *tb,
-     bool page_already_protected;
- #endif
- 
--    assert_memory_lock();
-+    assert_page_locked(p);
- 
-     tb->page_addr[n] = page_addr;
-     tb->page_next[n] = p->first_tb;
-@@ -1721,8 +1795,7 @@ tb_invalidate_phys_page_range__locked(struct page_collection *pages,
-     uint32_t current_flags = 0;
- #endif /* TARGET_HAS_PRECISE_SMC */
- 
--    assert_memory_lock();
--    assert_tb_locked();
-+    assert_page_locked(p);
- 
- #if defined(TARGET_HAS_PRECISE_SMC)
-     if (cpu != NULL) {
-@@ -1734,6 +1807,7 @@ tb_invalidate_phys_page_range__locked(struct page_collection *pages,
-     /* XXX: see if in some cases it could be faster to invalidate all
-        the code */
-     PAGE_FOR_EACH_TB(p, tb, n) {
-+        assert_page_locked(p);
-         /* NOTE: this is subtle as a TB may span two physical pages */
-         if (n == 0) {
-             /* NOTE: tb_end may be after the end of the page, but
-@@ -1891,6 +1965,7 @@ void tb_invalidate_phys_page_fast(tb_page_addr_t start, int len)
-     }
- 
-     pages = page_collection_lock(start, start + len);
-+    assert_page_locked(p);
-     if (!p->code_bitmap &&
-         ++p->code_write_count >= SMC_BITMAP_USE_THRESHOLD) {
-         build_page_bitmap(p);
-@@ -1949,6 +2024,7 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
-         env = cpu->env_ptr;
+     if (DEBUG_TB_CHECK_GATE) {
+         tb_page_check();
      }
  #endif
-+    assert_page_locked(p);
-     PAGE_FOR_EACH_TB(p, tb, n) {
- #ifdef TARGET_HAS_PRECISE_SMC
-         if (current_tb == tb &&
++    return tb;
+ }
+ 
+ /* Called with mmap_lock held for user mode emulation.  */
+@@ -1625,7 +1649,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+                               uint32_t flags, int cflags)
+ {
+     CPUArchState *env = cpu->env_ptr;
+-    TranslationBlock *tb;
++    TranslationBlock *tb, *existing_tb;
+     tb_page_addr_t phys_pc, phys_page2;
+     target_ulong virt_page2;
+     tcg_insn_unit *gen_code_buf;
+@@ -1773,7 +1797,15 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+      * memory barrier is required before tb_link_page() makes the TB visible
+      * through the physical hash table and physical page list.
+      */
+-    tb_link_page(tb, phys_pc, phys_page2);
++    existing_tb = tb_link_page(tb, phys_pc, phys_page2);
++    /* if the TB already exists, discard what we just translated */
++    if (unlikely(existing_tb != tb)) {
++        uintptr_t orig_aligned = (uintptr_t)gen_code_buf;
++
++        orig_aligned -= ROUND_UP(sizeof(*tb), qemu_icache_linesize);
++        atomic_set(&tcg_ctx->code_gen_ptr, orig_aligned);
++        return existing_tb;
++    }
+     tcg_tb_insert(tb);
+     return tb;
+ }
+diff --git a/docs/devel/multi-thread-tcg.txt b/docs/devel/multi-thread-tcg.txt
+index faf8918b23..faf09c6069 100644
+--- a/docs/devel/multi-thread-tcg.txt
++++ b/docs/devel/multi-thread-tcg.txt
+@@ -140,6 +140,9 @@ to atomically insert new elements.
+ The lookup caches are updated atomically and the lookup hash uses QHT
+ which is designed for concurrent safe lookup.
+ 
++Parallel code generation is supported. QHT is used at insertion time
++as the synchronization point across threads, thereby ensuring that we only
++keep track of a single TranslationBlock for each guest code block.
+ 
+ Memory maps and TLBs
+ --------------------
 -- 
 2.17.1
