@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTPm4-0001pM-TF
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:46:42 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTPmU-00022A-RK
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:47:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTPm3-0003Tg-Gt
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:46:40 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:32913)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fTPm3-0003Sm-29
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:46:39 -0400
-Received: by mail-ot0-x242.google.com with SMTP id h6-v6so6541800otj.0
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 03:46:38 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1fTPmU-0003ig-1l
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:47:06 -0400
+Date: Thu, 14 Jun 2018 12:46:56 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180614104656.GD8564@localhost.localdomain>
+References: <f9a9b5bb-4941-a6b3-ff6b-02ab2cb046df@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <f9beda14-7c4a-8f89-baf1-5a79e847c4ac@redhat.com>
-References: <20180611141716.3813-1-peter.maydell@linaro.org>
-	<650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
-	<CAFEAcA-vZH0KUxi+iYP3eYzXeHxNTotNwCMhEPcGhOLksbG71A@mail.gmail.com>
-	<f9beda14-7c4a-8f89-baf1-5a79e847c4ac@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Jun 2018 11:46:17 +0100
-Message-ID: <CAFEAcA_egToeW7ksTncbFCsW6uTh1FcPSgW6gx+VnjvQpqwWsw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
- for multiline comments
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <f9a9b5bb-4941-a6b3-ff6b-02ab2cb046df@virtuozzo.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] bug in reopen arch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-On 13 June 2018 at 17:55, John Snow <jsnow@redhat.com> wrote:
-> The same reasoning could be used to justify
->
-> /* two
->  * lines */
->
-> as it's ... actually just two lines. I think people don't seem to like
-> this much either (why? does it look 'naked' on the end?)
+Am 12.06.2018 um 20:57 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> Hi all!
+>=20
+> I've faced the following problem:
+>=20
+> =A0=A0=A0 1. create image with dirty bitmap, a.qcow2 (start qemu and ru=
+n qmp
+> =A0=A0=A0 command block-dirty-bitmap-add)
+>=20
+> =A0=A0=A0 2. run the following commands:
+>=20
+> =A0=A0=A0=A0=A0=A0=A0 qemu-img create -f qcow2 -b a.qcow2 b.qcow2 10M
+> =A0=A0=A0=A0=A0=A0=A0 qemu-io -c 'write 0 512' b.qcow2
+> =A0=A0=A0=A0=A0=A0=A0 qemu-img commit b.qcow2
+>=20
+> =A0=A0=A0 3. last command fails with the following output:
+>=20
+> Formatting 'b.qcow2', fmt=3Dqcow2 size=3D68719476736 backing_file=3Da.q=
+cow2
+> cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+> wrote 512/512 bytes at offset 0
+> 512 bytes, 1 ops; 0.0953 sec (5.243 KiB/sec and 10.4867 ops/sec)
+> qemu-img: #block397: Failed to make dirty bitmaps writable: Can't updat=
+e
+> bitmap directory: Operation not permitted
+> qemu-img: Block job failed: Operation not permitted
+>=20
+> And problem is that children are reopened _after_ parent. But qcow2 reo=
+pen
+> needs write access to its file, to write IN_USE flag to dirty-bitmaps
+> extension.
 
-I dislike the way it breaks up the line of stars. For me it is the
-/*
- *
- */
-shape that defines a multiline comment, and where exactly the text is
-on the RHS of it is not important to my sense of visual neatness :-)
+I was aware of a different instance of this problem: Assume a qcow2
+image with an unknown autoclear flag (so it will be cleared on r/w
+open), which is first opened r/o and then reopened r/w. This will fail
+because .bdrv_reopen_prepare doesn't have the permissions yet.
 
-> It would only begin to matter terribly much if we actually decided we
-> wanted to do a doxygen-style doc generation for our internal APIs for
-> compatibility with, say, fancier IDEs than vim/emacs.
+Simply changing the order won't fix this because in the r/w -> r/o, the
+driver will legitimately flush its caches in .bdrv_reopen_prepare, and
+for this it still needs to be able to write.
 
-We ought to do that at some point -- I had some prototype patches
-for it. Doc-comment comments always start /** on a line of its own,
-though.
+We may need to have a way for nodes to access both the old and the new
+state of their children. I'm not completely sure how to achieve this
+best, though.
 
-> As it stands, we're pretty inconsistent about which exact style we apply
-> when we "document" internal functions -- sometimes we document the
-> header, sometimes the implementation, sometimes both (but differently!)
-> and always with different styles all over the place. That's the real
-> problem, IMO.
+When I thought only of permissions, the obvious and simple thing to do
+was to just get combined permissions for the old and new state, i.e.
+'old_perm | new_perm' and 'old_shared & new_shared'. But I don't think
+this is actually enough when the child node switches between a r/w and
+a r/o file descriptor because even though QEMU's permission system would
+allow the write, you still can't successfully write to a r/o file
+descriptor.
 
-IMHO -- global functions should always be documented in the header
-with the prototype, and any new global function should get a
-doc comment (I require this for code I review...) I should be able
-to read about the API your code exposes to the rest of QEMU purely
-by looking at your headers.
-
-thanks
--- PMM
+Kevin
