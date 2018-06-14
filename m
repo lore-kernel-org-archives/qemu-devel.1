@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fTNgq-00078H-38
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:33:09 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fTNie-0000BB-C2
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fTNgk-0000o1-Cr
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:33:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58940 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fTNgk-0000ns-7s
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:33:02 -0400
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 14 Jun 2018 10:32:57 +0200
-Message-Id: <20180614083258.14618-2-kraxel@redhat.com>
-In-Reply-To: <20180614083258.14618-1-kraxel@redhat.com>
-References: <20180614083258.14618-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/2] ui: darwin: gtk: Add missing input keymap
+	(envelope-from <alex.bennee@linaro.org>) id 1fTNia-0001FX-Ee
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:35:00 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:53268)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fTNia-0001FM-78
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:34:56 -0400
+Received: by mail-wm0-x242.google.com with SMTP id x6-v6so9022090wmc.3
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 01:34:56 -0700 (PDT)
+References: <20180613125601.14371-1-alex.bennee@linaro.org>
+	<20180613125601.14371-6-alex.bennee@linaro.org>
+	<a24ec09d-9bf8-ea12-092f-9df1d4ad7786@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <a24ec09d-9bf8-ea12-092f-9df1d4ad7786@linaro.org>
+Date: Thu, 14 Jun 2018 09:34:53 +0100
+Message-ID: <871sd922c2.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RISU PATCH v3 05/22] risu: add zlib indication to
+ help text
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,60 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Keno Fischer <keno@juliacomputing.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-From: Keno Fischer <keno@juliacomputing.com>
 
-In appears the input keymap for osx was forgotten in the commit that
-converted the gtk frontend to keycodemapdb. Add it.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Fixes: 2ec78706 ("ui: convert GTK and SDL1 frontends to keycodemapdb")
-CC: Daniel P. Berrange <berrange@redhat.com>
-Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-Message-id: 1528933916-40670-1-git-send-email-keno@juliacomputing.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- Makefile           | 1 +
- include/ui/input.h | 3 +++
- ui/input-keymap.c  | 1 +
- 3 files changed, 5 insertions(+)
+> On 06/13/2018 02:55 AM, Alex Benn=C3=A9e wrote:
+>> This is a simple aide-memoir as it can be tricky to determine this
+>> with a simple statically compiled binary.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  risu.c | 5 ++++-
+>>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> Eh, sure.  Or we could simply require zlib...
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/Makefile b/Makefile
-index 6c6664d9a3..bdae3133fb 100644
---- a/Makefile
-+++ b/Makefile
-@@ -322,6 +322,7 @@ KEYCODEMAP_FILES = \
- 		 ui/input-keymap-xorgkbd-to-qcode.c \
- 		 ui/input-keymap-xorgxquartz-to-qcode.c \
- 		 ui/input-keymap-xorgxwin-to-qcode.c \
-+		 ui/input-keymap-osx-to-qcode.c \
- 		 $(NULL)
- 
- GENERATED_FILES += $(KEYCODEMAP_FILES)
-diff --git a/include/ui/input.h b/include/ui/input.h
-index 16395ab8f2..34ebc67c5a 100644
---- a/include/ui/input.h
-+++ b/include/ui/input.h
-@@ -116,4 +116,7 @@ extern const guint16 qemu_input_map_xorgxquartz_to_qcode[];
- extern const guint qemu_input_map_xorgxwin_to_qcode_len;
- extern const guint16 qemu_input_map_xorgxwin_to_qcode[];
- 
-+extern const guint qemu_input_map_osx_to_qcode_len;
-+extern const guint16 qemu_input_map_osx_to_qcode[];
-+
- #endif /* INPUT_H */
-diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-index 87cc301b7a..db5ccff5ad 100644
---- a/ui/input-keymap.c
-+++ b/ui/input-keymap.c
-@@ -21,6 +21,7 @@
- #include "ui/input-keymap-xorgkbd-to-qcode.c"
- #include "ui/input-keymap-xorgxquartz-to-qcode.c"
- #include "ui/input-keymap-xorgxwin-to-qcode.c"
-+#include "ui/input-keymap-osx-to-qcode.c"
- 
- int qemu_input_linux_to_qcode(unsigned int lnx)
- {
--- 
-2.9.3
+I would be some cross compilers (or more correctly multiarch setups) are
+broken in this regard. There was a time before I moved to 18.04 that I
+couldn't have multiple zlib1g-dev packages installed due to clashing
+files.
+
+As risu accepts stdin/stdout for trace files you can work around this
+with pipes and native gzip so a non-zlib enabled risu is still usable.
+But I'm happy to defer to Peter on this one.
+
+--
+Alex Benn=C3=A9e
