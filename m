@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39390)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fTNgl-00076F-Ot
+	(envelope-from <kraxel@redhat.com>) id 1fTNgl-00076G-PJ
 	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:33:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fTNgk-0000o6-Dx
+	(envelope-from <kraxel@redhat.com>) id 1fTNgh-0000nL-SU
 	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:33:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37690 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58938 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fTNgk-0000nu-9j
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:33:02 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fTNgh-0000n4-Ni
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:32:59 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 59A0281A8A05
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 08:32:59 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 14 Jun 2018 10:32:58 +0200
-Message-Id: <20180614083258.14618-3-kraxel@redhat.com>
-In-Reply-To: <20180614083258.14618-1-kraxel@redhat.com>
-References: <20180614083258.14618-1-kraxel@redhat.com>
+Date: Thu, 14 Jun 2018 10:32:56 +0200
+Message-Id: <20180614083258.14618-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 2/2] sdl2: restore window dimensions by resize
+Subject: [Qemu-devel] [PULL 0/2] Ui 20180614 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +31,38 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Amadeusz=20S=C5=82awi=C5=84ski?= <amade@asmblr.net>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Amadeusz S=C5=82awi=C5=84ski <amade@asmblr.net>
+The following changes since commit 2ab09bf2f9f55b9fb8d2de6eb2ba2a8570e268=
+e2:
 
-instead of destroying and recreating window, fixes segfault caused by
-handle_keyup trying to access no more existing window when using
-Ctrl-Alt-U to restore window "un-scaled" dimensions
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20180612-pull-req=
+uest' into staging (2018-06-12 15:34:34 +0100)
 
- Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
- [Switching to Thread 0x7ffff7f92b80 (LWP 3711)]
- handle_keyup (ev=3D0x7fffffffd010) at ui/sdl2.c:416
- 416         scon->ignore_hotkeys =3D false;
- (gdb) bt
- #0  handle_keyup (ev=3D0x7fffffffd010) at ui/sdl2.c:416
- #1  sdl2_poll_events (scon=3D0x100fee5a8) at ui/sdl2.c:608
- #2  0x0000000100585bf2 in dpy_refresh (s=3D0x101ad3e00) at ui/console.c:=
-1658
- #3  gui_update (opaque=3D0x101ad3e00) at ui/console.c:205
- #4  0x0000000100690f2c in timerlist_run_timers (timer_list=3D0x100ede130=
-) at util/qemu-timer.c:536
- #5  0x0000000100691177 in qemu_clock_run_timers (type=3DQEMU_CLOCK_REALT=
-IME) at util/qemu-timer.c:547
- #6  qemu_clock_run_all_timers () at util/qemu-timer.c:674
- #7  0x0000000100691651 in main_loop_wait (nonblocking=3D<optimized out>)=
- at util/main-loop.c:503
- #8  0x00000001003d650f in main_loop () at vl.c:1848
- #9  0x0000000100289681 in main (argc=3D<optimized out>, argv=3D<optimize=
-d out>, envp=3D<optimized out>) at vl.c:4605
+are available in the git repository at:
 
-Signed-off-by: Amadeusz S=C5=82awi=C5=84ski <amade@asmblr.net>
-Message-id: 20180613172707.31530-1-amade@asmblr.net
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/sdl2.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+  git://git.kraxel.org/qemu tags/ui-20180614-pull-request
 
-diff --git a/ui/sdl2.c b/ui/sdl2.c
-index a0f9b16bc1..3ae4719c32 100644
---- a/ui/sdl2.c
-+++ b/ui/sdl2.c
-@@ -371,8 +371,7 @@ static void handle_keydown(SDL_Event *ev)
-             }
-             break;
-         case SDL_SCANCODE_U:
--            sdl2_window_destroy(scon);
--            sdl2_window_create(scon);
-+            sdl2_window_resize(scon);
-             if (!scon->opengl) {
-                 /* re-create scon->texture */
-                 sdl2_2d_switch(&scon->dcl, scon->surface);
+for you to fetch changes up to 64bf97e56f3ab44d587c92c40503d646273a24df:
+
+  sdl2: restore window dimensions by resize (2018-06-14 09:55:09 +0200)
+
+----------------------------------------------------------------
+ui: bugfixes for sdl and gtk
+
+----------------------------------------------------------------
+
+Amadeusz S=C5=82awi=C5=84ski (1):
+  sdl2: restore window dimensions by resize
+
+Keno Fischer (1):
+  ui: darwin: gtk: Add missing input keymap
+
+ Makefile           | 1 +
+ include/ui/input.h | 3 +++
+ ui/input-keymap.c  | 1 +
+ ui/sdl2.c          | 3 +--
+ 4 files changed, 6 insertions(+), 2 deletions(-)
+
 --=20
 2.9.3
