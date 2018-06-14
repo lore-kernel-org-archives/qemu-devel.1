@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fTNRS-0000wm-33
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:17:14 -0400
+	(envelope-from <berrange@redhat.com>) id 1fTNSH-0001Pv-Nt
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:18:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fTNRN-0004Lf-4R
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:17:14 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:36516)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fTNRM-0004LV-SX
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:17:09 -0400
-Received: by mail-wm0-x242.google.com with SMTP id v131-v6so10189902wma.1
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 01:17:08 -0700 (PDT)
-Date: Thu, 14 Jun 2018 09:17:05 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180614081705.GA12035@stefanha-x1.localdomain>
-References: <20180612204632.28780-1-jusual@mail.ru>
-	<20180613140505.GS24528@stefanha-x1.localdomain>
-	<9047ab62-0bf7-d473-e4c3-562f33c68349@mail.ru>
+	(envelope-from <berrange@redhat.com>) id 1fTNSG-0004gs-KS
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:18:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55214 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fTNSG-0004gj-EE
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:18:04 -0400
+Date: Thu, 14 Jun 2018 09:18:00 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180614081800.GH6355@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180612184616.90838-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="NzB8fVQJ5HfG6fxh"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <9047ab62-0bf7-d473-e4c3-562f33c68349@mail.ru>
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow ARMv6-M Thumb2
- instructions
+In-Reply-To: <20180612184616.90838-1-mst@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/2] kvm: x86 CPU power management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,56 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, Richard Henderson <rth@twiddle.net>
+
+On Tue, Jun 12, 2018 at 09:47:11PM +0300, Michael S. Tsirkin wrote:
+> This adds ability to expose host CPU power management capabilities to
+> guests. For intel guests, this is sufficient for guest to enable
+> low power CPU power management. For AMD guests it isn't sufficient,
+> deeper C-states are entered using System-IO.
+> 
+> mwait based power management is tied closely to specifics of CPUID,
+> making migration challenging. At this point only the non-migrateable
+> -cpu host is supported.
+> 
+> With this patch applied, VM latency is within the noise of
+> baremetal for some benchmarks.
+> 
+> perf bench sched pipe results:
+> Before:
+>     6.452 sec
+> After:
+>     4.382 sec
+> Baremetal:
+>     4.136 sec
+> 
+> Michael S. Tsirkin (2):
+>   kvm: support -realtime cpu-pm=on|off
+
+IMHO this really shouldn't be under the -realtime flag. I don't think
+the -realtime flag should ever have been introduced, and we certainly
+shouldn't add more stuff under it.
+
+"-realtime" is referring to a very specific use case, while the
+properties listed under it are all general purpose features. Real
+time guests just happen to be one possible use case, but it is
+valid to use them for non-real time guests.
+
+IOW, I think we should just have this as an option under -cpu or
+some other *functionally* named option, not a option named after
+a specific usage scenario.
 
 
---NzB8fVQJ5HfG6fxh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Jun 13, 2018 at 08:10:23PM +0300, Julia Suvorova via Qemu-devel wro=
-te:
-> On 13.06.2018 17:05, Stefan Hajnoczi wrote:
-> > On Tue, Jun 12, 2018 at 11:46:32PM +0300, Julia Suvorova wrote:
-> > > ARMv6-M supports 6 Thumb2 instructions. This patch checks for these
-> > > instructions and allows their execution.
-> > > Like Thumb2 cores, ARMv6-M always interprets BL instruction as 32-bit.
-> > >=20
-> > > This patch is required for future Cortex-M0 support.
-> > >=20
-> > > Signed-off-by: Julia Suvorova <jusual@mail.ru>
-> > > ---
-> > >   target/arm/translate.c | 35 ++++++++++++++++++++++++++++++-----
-> > >   1 file changed, 30 insertions(+), 5 deletions(-)
-> >=20
-> > Does make the undefined instruction test case that I recently posted
-> > pass (including all commented out instructions that weren't working
-> > yet)?
-> >=20
-> > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> >=20
->=20
-> Yes, test with all instructions is passed.
-
-Great, I have sent a v2 of that patch.  It now also includes the 6 valid
-32-bit instructions to prove that your patch has enabled them.
-
-Stefan
-
---NzB8fVQJ5HfG6fxh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbIiSBAAoJEJykq7OBq3PIZnwIAIXepul5mHLE8tl+9776q6xy
-eyEI0S0JwR/cHnMMRPzItKI2cKddwVloDGQ53+NFdXmaFdnpaR4eHMvBAhPmBdwN
-liEFfQbZ1nzCeDTHKpaSqDrRBMHQMmspGazdgoR6kpNnKV88cinvoTb/DvfvQZIf
-noXHENBqAtFswbpt//xVwNZ1XtF+h7ee/XrWJ1N3ldahPV1ASuOe9bsoCaS3Q2Ht
-7iWDGPA7xZoB91YkZ+r8Z5pQ8ti5x+4+qku5Oyffz9o4PB85zL0z5UushSRKqX33
-HF0j5ULRjjK16Ldt85kpMJm+um3VC+xc81oi52c4vmF3hvefDy15cWKkGOG4HZ8=
-=lyyH
------END PGP SIGNATURE-----
-
---NzB8fVQJ5HfG6fxh--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
