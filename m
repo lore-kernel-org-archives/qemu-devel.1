@@ -1,37 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fTGaW-0007y2-9j
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:58:10 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fTGeJ-0000xq-NF
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 21:02:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fTGaT-0007HJ-6z
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:58:08 -0400
-Received: from mail-cys01nam02on0617.outbound.protection.outlook.com
-	([2a01:111:f400:fe45::617]:10486
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fTGaS-0007H0-Q5
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 20:58:05 -0400
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Thu, 14 Jun 2018 00:58:01 +0000
-Message-ID: <DM5PR12MB2471F6BB6111340B7FB0FB0C957D0@DM5PR12MB2471.namprd12.prod.outlook.com>
-References: <DM5PR12MB247152846B93E574639E3AE7957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612174021.GL7451@localhost.localdomain>
-	<DM5PR12MB2471F6EA1525A824A9A94545957F0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180612190554.GO7451@localhost.localdomain>
-	<39f328af-a9c1-15bb-653e-9456b045768d@amd.com>
-	<DM5PR12MB2471C966B5B16FFCACDF33F3957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180613171820.GC7451@localhost.localdomain>
-	<DM5PR12MB2471BCEE4BD9ED0549F027E0957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180613181730.GG7451@localhost.localdomain>
-	<DM5PR12MB24715894687B9D55A47422A2957E0@DM5PR12MB2471.namprd12.prod.outlook.com>
-	<20180613184928.GI7451@localhost.localdomain>
-In-Reply-To: <20180613184928.GI7451@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dgibson@ozlabs.org>) id 1fTGeG-0000NL-0c
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 21:02:03 -0400
+Date: Thu, 14 Jun 2018 11:01:43 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180614010143.GQ30690@umbus.fritz.box>
+References: <20180613065707.30766-1-david@gibson.dropbear.id.au>
+	<20180613065707.30766-3-david@gibson.dropbear.id.au>
+	<20180613110939.28d30cf0@bahia.lab.toulouse-stg.fr.ibm.com>
+	<e69b80c7-8334-cf7a-5b23-85c5e6c3517b@kaod.org>
+	<20180613114207.32431053@bahia.lab.toulouse-stg.fr.ibm.com>
+	<20180613095329.GG30690@umbus.fritz.box>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v13 3/5] i386: Enable TOPOEXT feature on
- AMD EPYC CPU
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="pMRnfHSWYEVtk438"
+Content-Disposition: inline
+In-Reply-To: <20180613095329.GG30690@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH 2/7] pnv: Add missing error check during
+ cpu realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,119 +29,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>, Jiri Denemark <jdenemar@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
+--pMRnfHSWYEVtk438
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Wednesday, June 13, 2018 1:49 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
-> rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Jiri
-> Denemark <jdenemar@redhat.com>
-> Subject: Re: [PATCH v13 3/5] i386: Enable TOPOEXT feature on AMD EPYC
-> CPU
+On Wed, Jun 13, 2018 at 07:53:29PM +1000, David Gibson wrote:
+> On Wed, Jun 13, 2018 at 11:42:07AM +0200, Greg Kurz wrote:
+> > On Wed, 13 Jun 2018 11:14:57 +0200
+> > C=E9dric Le Goater <clg@kaod.org> wrote:
+> >=20
+> > > >> index 13ad7d9e04..efb68226bb 100644
+> > > >> --- a/hw/ppc/pnv_core.c
+> > > >> +++ b/hw/ppc/pnv_core.c
+> > > >> @@ -173,6 +173,9 @@ static void pnv_core_realize(DeviceState *dev,=
+ Error **errp)
+> > > >> =20
+> > > >>          snprintf(name, sizeof(name), "thread[%d]", i);
+> > > >>          object_property_add_child(OBJECT(pc), name, obj, &local_e=
+rr);
+> > > >> +        if (local_err) {
+> > > >> +            goto err;
+> > > >> +        }
+> > > >>          object_property_add_alias(obj, "core-pir", OBJECT(pc),
+> > > >>                                    "pir", &local_err);
+> > > >>          if (local_err) { =20
+> > > >=20
+> > > > Hmm... the current error path seems to assume failures to be
+> > > > caused by object_property_add_child(). It hence unparents the
+> > > > previously parented CPUs, but not the current one. So we'll
+> > > > miss one call to object_unparent() if object_property_add_alias()
+> > > > fails. =20
+> > >=20
+> > > yes, let's just put NULL or &error_abort instead.
+> > >=20
+> >=20
+> > NULL means we really don't care if the call fails or succeeds.
+> >=20
+> > &error_abort means we consider a failure to be a unrecoverable bug.
+> >=20
+> > So I would rather pass &error_abort here.
+> >=20
+> > But if the guest is already running and functional, and we hit
+> > the error during hotplug, does the guest really deserve to be
+> > aborted or should we just fail the hotplug ?
 >=20
-> On Wed, Jun 13, 2018 at 06:21:58PM +0000, Moger, Babu wrote:
-> >
-> >
-> > > -----Original Message-----
-> > > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> > > Sent: Wednesday, June 13, 2018 1:18 PM
-> > > To: Moger, Babu <Babu.Moger@amd.com>
-> > > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com;
-> pbonzini@redhat.com;
-> > > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> > > kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com; Jiri
-> > > Denemark <jdenemar@redhat.com>
-> > > Subject: Re: [PATCH v13 3/5] i386: Enable TOPOEXT feature on AMD EPYC
-> > > CPU
-> > >
-> > > On Wed, Jun 13, 2018 at 06:10:30PM +0000, Moger, Babu wrote:
-> > > > > -----Original Message-----
-> > > > > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> > > > > Sent: Wednesday, June 13, 2018 12:18 PM
-> > > > > To: Moger, Babu <Babu.Moger@amd.com>
-> > > > > Cc: mst@redhat.com; marcel.apfelbaum@gmail.com;
-> > > pbonzini@redhat.com;
-> > > > > rth@twiddle.net; mtosatti@redhat.com; qemu-devel@nongnu.org;
-> > > > > kvm@vger.kernel.org; kash@tripleback.net; geoff@hostfission.com;
-> Jiri
-> > > > > Denemark <jdenemar@redhat.com>
-> > > > > Subject: Re: [PATCH v13 3/5] i386: Enable TOPOEXT feature on AMD
-> EPYC
-> > > > > CPU
-> > > > >
-> > > > > On Wed, Jun 13, 2018 at 04:52:18PM +0000, Moger, Babu wrote:
-> > > > > [...]
-> > > > > > > What do you think our options are here?
-> > > > > >
-> > > > > > Should we drop automatic topoext completely and move forward?
-> > > > > > What are your thoughts?
-> > > > >
-> > > > > Let's drop automatic topoext by now, and see if we find solutions
-> > > > > later.  I don't want to hold the rest of the patches because of
-> > > > > this.
-> > > >
-> > > > Ok. I will drop topoext.
-> > > >
-> > > > >
-> > > > > I'm thinking we could simply make kvm_arch_get_supported_cpuid()
-> > > > > always return TOPOEXT on AMD CPUs, because the feature flag don't
-> > > > > really depend on any KVM code to work (is that correct?).
-> > > >
-> > > > Yes, that is correct. I don't see any dependent code on TOPOEXT in
-> KVM
-> > > driver.
-> > > >
-> > > > Ok. Let me add TOPOEXT flag for all the AMD cpus and see how it goe=
-s.
-> > >
-> > > Hmm, this could actually solve all of our problems, then:
-> > >
-> > > We can forget about auto-topoext: just add TOPOEXT in
-> > > kvm_arch_get_supported_cpuid(), add TOPOEXT unconditionally to
-> > > the CPU models where you are interested into (EPYC only?), and
-> > > add topoext=3Doff to pc-2.12 compat_props.
-> > >
-> >
-> > Ok Sure.
->=20
-> Sorry, I forgot we still need to decide what to do if TOPOEXT is
-> enabled in the CPU model (or command-line) but the -smp options
-> are not compatible with it.
+> Ah, dammit, that's why it wasn't an abort in the first place.  Yeah,
+> we'd better propagate the errors.
 
-Yes.  I have kept that check.  But, I had to implement topology_supports_to=
-poext bit differently.
-Reason for this is we need to disable this feature before the  x86_cpu_expa=
-nd_features.
-But problem is nr_cores and nr_threads are not populated at this time. It i=
-s populated in qemu_init_vcpus.
-Please take a look at topology_supports_topoext again.
->=20
-> In other words, what should guest see on CPUID if using:
->=20
-> "-machine pc-q35-3.0 -cpu EPYC -smp 64,cores=3D64"
-> or:
-> "-machine pc-q35-3.0 -cpu Opteron_G5,+topoext -smp 64,cores=3D64"
->=20
-Tested both these cases. It works fine with some warning messages.
+No.. thinking about this yet again, we should be ok with error_abort.
+These really aren't things that should fail.  If they do something has
+gone so horribly wrong, that I think an abort() is a reasonable
+reaction, even on hotplug.
 
-> I wonder what would happen if we just return zeroes on
-> CPUID[0x800001E] if !topology_supports_topoext(), instead of
-> trying to clear/set TOPOEXT depending on the -smp option?  It
-> would make things much simpler for QEMU and libvirt.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-I did not see that difference in behavior if we clear the bit versus return=
- 0s.
-Sending new patches now. Please review.
-One note: I will going on vacation from June 20th for couple of weeks.
- If possible I would like to close this feature. If we cannot that is fine.=
- Just an FYI.
+--pMRnfHSWYEVtk438
+Content-Type: application/pgp-signature; name="signature.asc"
 
->=20
-> --
-> Eduardo
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlshvnUACgkQbDjKyiDZ
+s5LPZxAA4XuSi5+Ixqoo6bcGyYo1NNaHqy/bqXNBe3HRpN4HLS1IVwqvd9x4Ltvv
+wXgOVV75OYOx/9UEyNce8/IN/f5T/OF3r3WjNnswxd+A+KzSC7NwmRqyTgUYK2V+
+0SYgtQYHDxeEsI46n/ZRjzRUJH6owPXTwKmHfsAyTeEDZn8MWAr/K5IAh8joXWvw
+PZS9U5Mtcw6Dqb9khS4Swa/tv6QYzySXpXv1zlBMwVAjkxSakcndAuWMlMpoCRqA
+TJQ5knSZ85REuh6aivUksQ+MuDWD/x5aQnx9gLwtr18nwDWgG1JXXwPaIsOitVE8
+jQmJoG7TPKKoErKIkBi3mYU42XT47hKMPC3sNboha17Vuv587mEjPk0fxkiwmruY
+nEWWTq7DEfzaBQgCIgUC1iKJ3OyS8EYOIcQNpKRZRHa9Hm8Ogw24yrGsWUgHMZ1a
+Akajy0QdaEgQONIef+/VA67LvRBHO1a2WgjsiVW9ZS++VpA/lVNXQcs/T9lb+ewB
+tTgLbC0Y73ngS2In3fyYVq9O7zq9v5B/ymNOzcCpy8woaU2ukRg05/ro0v0UTAgx
+CrCGRtqCSAWOPjjyDvSuV/eNLXoWv2obdcPwANn1m7kkh3dCP32ONaOQvUAIllBP
+StkPWRlRV9Yu9dnpYPTC4QhMDi4C/kt7WARqYDZc9a1T4YMA3UI=
+=ywVw
+-----END PGP SIGNATURE-----
+
+--pMRnfHSWYEVtk438--
