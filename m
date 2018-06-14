@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTS33-0003Q2-Ed
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:12:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTS7k-0006ES-5q
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:17:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTS32-0001Mj-Hr
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:12:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47966 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fTS32-0001MV-DL
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:12:20 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180614124330.12224-1-armbru@redhat.com>
-	<CAFEAcA9CR3AV3WUronfitr-_AAjw5O32WMQ6_7x4EpE=YQwqXA@mail.gmail.com>
-Date: Thu, 14 Jun 2018 15:12:19 +0200
-In-Reply-To: <CAFEAcA9CR3AV3WUronfitr-_AAjw5O32WMQ6_7x4EpE=YQwqXA@mail.gmail.com>
-	(Peter Maydell's message of "Thu, 14 Jun 2018 13:49:11 +0100")
-Message-ID: <87vaalikb0.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1fTS7f-0002PY-28
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:17:11 -0400
+Date: Thu, 14 Jun 2018 15:16:52 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180614131652.GF8564@localhost.localdomain>
+References: <20180608192027.284601-1-vsementsov@virtuozzo.com>
+	<20180608192027.284601-4-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL v2 0/3] Miscellaneous patches for 2018-06-13
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180608192027.284601-4-vsementsov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] qcow2: add compress threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +23,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com, stefanha@gmail.com, pl@kamp.de, den@openvz.org
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Am 08.06.2018 um 21:20 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> Do data compression in separate threads. This significantly improve
+> performance for qemu-img convert with -W (allow async writes) and -c
+> (compressed) options.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-> On 14 June 2018 at 13:43, Markus Armbruster <armbru@redhat.com> wrote:
->> The following changes since commit 2ab09bf2f9f55b9fb8d2de6eb2ba2a8570e268e2:
->>
->>   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20180612-pull-request' into staging (2018-06-12 15:34:34 +0100)
->>
->> are available in the Git repository at:
->>
->>   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2018-06-13-v2
->>
->> for you to fetch changes up to 3190af2dea9aceee72a0dfa087b8ea67ecff5519:
->>
->>   Purge uses of banned g_assert_FOO() (2018-06-14 14:33:28 +0200)
->>
->> ----------------------------------------------------------------
->> Miscellaneous patches for 2018-06-13
->>
->
-> Too late, I already applied the first version...
+Looks correct to me, but why do we introduce a separate
+MAX_COMPRESS_THREADS? Can't we simply leave the maximum number of
+threads to the thread poll?
 
-No biggie, I can clean up the odd spacing in a follow-up.
+I see that you chose a much smaller number here (4 vs. 64), but is there
+actually a good reason for this?
+
+Kevin
