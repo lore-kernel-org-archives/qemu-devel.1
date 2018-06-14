@@ -1,39 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fTPv3-0007Hn-2w
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:55:58 -0400
+	(envelope-from <peterx@redhat.com>) id 1fTPvc-0007hC-0O
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:56:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fTPuy-00013p-Vm
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:55:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51244)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fTPuy-00013A-Ns
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:55:52 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5EAnP9E013834
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 06:55:51 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jkpakhrf9-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 06:55:51 -0400
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 14 Jun 2018 11:55:48 +0100
-References: <1528966108-28324-1-git-send-email-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 14 Jun 2018 12:55:45 +0200
+	(envelope-from <peterx@redhat.com>) id 1fTPvY-0001W1-3P
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:56:32 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60106 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fTPvX-0001Uf-TO
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 06:56:28 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5352C9BB46
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 10:56:26 +0000 (UTC)
+Date: Thu, 14 Jun 2018 18:56:21 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180614105621.GB14019@xz-mi>
+References: <20180613102642.23995-1-dgilbert@redhat.com>
+	<20180613102642.23995-3-dgilbert@redhat.com>
+	<20180614022130.GQ15344@xz-mi> <20180614085035.GB2616@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <1528966108-28324-1-git-send-email-thuth@redhat.com>
-Content-Language: en-US
-Message-Id: <5b07c617-318d-53d5-46ee-8e4f3646cd79@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] pc-bios/s390-ccw: Optimize
- the s390-ccw bios for size
+Content-Disposition: inline
+In-Reply-To: <20180614085035.GB2616@work-vm>
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Wake rate limiting for
+ urgent requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,46 +35,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, jdenemar@redhat.com
 
-
-On 06/14/2018 10:48 AM, Thomas Huth wrote:
-> Since we're storing the firmware blobs in the QEMU git repository, it
-> would be nice if the blobs would be a little bit smaller. By using -Os
-> and -fno-asynchronous-unwind-tables the size of the s390-ccw.img can be
-> decreased by ca. 4kB, and the size of s390-netboot.img even by ca. 45kB.
-> The change of speed of the firmware should not really matter compared to
-> a binary that has been compiled with -O2 since the firmware still starts
-> very fast.
-
-
+On Thu, Jun 14, 2018 at 09:50:35AM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > On Wed, Jun 13, 2018 at 11:26:41AM +0100, Dr. David Alan Gilbert (git) wrote:
+> > 
+> > [...]
+> > 
+> > > @@ -2932,10 +2943,24 @@ static void *migration_thread(void *opaque)
+> > >  
+> > >          migration_update_counters(s, current_time);
+> > >  
+> > > +        urgent = false;
+> > >          if (qemu_file_rate_limit(s->to_dst_file)) {
+> > > -            /* usleep expects microseconds */
+> > > -            g_usleep((s->iteration_start_time + BUFFER_DELAY -
+> > > -                      current_time) * 1000);
+> > > +            /* Wait for a delay to do rate limiting OR
+> > > +             * something urgent to post the semaphore.
+> > > +             */
+> > > +            int ms = s->iteration_start_time + BUFFER_DELAY - current_time;
+> > > +            trace_migration_thread_ratelimit_pre(ms);
+> > > +            if (qemu_sem_timedwait(&s->rate_limit_sem, ms) == 0) {
+> > > +                /* We were worken by one or more urgent things but
+> > > +                 * the timedwait will have consumed one of them.
+> > > +                 * The service routine for the urgent wake will dec
+> > > +                 * the semaphore itself for each item it consumes,
+> > > +                 * so add this one we just eat back.
+> > > +                 */
+> > > +                qemu_sem_post(&s->rate_limit_sem);
+> > 
+> > Is it possible that we just avoid eating that in the next patch?  Then
+> > we only provide a helper to "trigger an urgent request" but we only
+> > consume the point here?
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  pc-bios/s390-ccw/Makefile | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
-> index 439e3cc..f22a5ca 100644
-> --- a/pc-bios/s390-ccw/Makefile
-> +++ b/pc-bios/s390-ccw/Makefile
-> @@ -13,6 +13,7 @@ OBJECTS = start.o main.o bootmap.o jump2ipl.o sclp.o menu.o \
->  	  virtio.o virtio-scsi.o virtio-blkdev.o libc.o
->  
->  QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
-> +QEMU_CFLAGS += -Os -fno-asynchronous-unwind-tables
+> I think it's harder;
+> This code is generic in migration.c where as the next patch is all
+> specific in ram.c; so we'd have to push a flag all the way down.
+> Also, the code later is very simple - every request it adds/removes
+> it posts/waits the semaphore - it's nice to keep that simple.
 
-Hmm, it looks like that the O2 comes after Os for me (which would override Os).
+So what I meant above was to remove this post() meanwhile remove the
+wait() in unqueue_page() in the next page.  Then it'll be a
+single-direction message telling that "we have some urgent work to do"
+without any ACK.  That'll possibly work but we might need to run the
+loop even if we don't really have postcopy pages to send (e.g., when 2
+continuous postcopy requests come, we'll handle the two pages in the
+first loop, but we'll run the whole iteration twice while in the 2nd
+loop we'll see that the postcopy queue is empty).
 
-cc -iquote /home/cborntra/REPOS/qemu/build/. -iquote . -iquote /home/cborntra/REPOS/qemu/tcg -iquote /home/cborntra/REPOS/qemu/tcg/s390 -I/home/cborntra/REPOS/qemu/linux-headers -I/home/cborntra/REPOS/qemu/build/linux-headers -iquote . -iquote /home/cborntra/REPOS/qemu -iquote /home/cborntra/REPOS/qemu/accel/tcg -iquote /home/cborntra/REPOS/qemu/include -Werror -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings -Wmissing-prototypes -Wexpansion-to-defined -Wendif-labels -Wno-shift-negative-value -Wno-missing-include-dirs -Wempty-body -Wnested-externs -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers -Wold-style-declaration -Wold-style-definition -Wtype-limits -Os -fno-asynchronous-unwind-tables -ffreestanding -fno-delete-null-pointer-checks -msoft-float -march=z900 -fPIE -fno-strict-aliasing   -fno-stack-protector -MMD -MP -MT libc.o -MF ./libc.d -O2 -g  -c -o libc.o /home/cborntra/REPOS/qemu/pc-bios/s390-ccw/libc.c
+The ideal solution I can think of is to use a semaphore that only with
+max value equals to 1.  I suppose that can be emulated by an eventfd
+but I think it's fine now with current approach; we just need to make
+sure the post() and wait() are "very" paired up well when calling the
+new APIs.
 
+As a summary:
 
-so the effect is only because of the -fno-asynchronous-unwind-tables.
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
+(One important reason for the r-b is that I see Dave's graph when
+ testing the series; it's very beautiful!)
 
+Thanks,
 
->  QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
->  QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
->  QEMU_CFLAGS += $(call cc-option, $(QEMU_CFLAGS), -fno-stack-protector)
-> 
+-- 
+Peter Xu
