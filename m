@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTWsi-0006sD-Mb
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:22:02 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fTWtl-0007b1-4y
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:23:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTWsf-00015C-GV
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:22:00 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:40758)
+	(envelope-from <alex.bennee@linaro.org>) id 1fTWtj-0001b3-MV
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:23:05 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:39914)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fTWsf-00014S-5Q
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:21:57 -0400
-Received: by mail-wm0-x241.google.com with SMTP id n5-v6so13681903wmc.5
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 11:21:57 -0700 (PDT)
+	id 1fTWtj-0001am-Cs
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 14:23:03 -0400
+Received: by mail-wr0-x244.google.com with SMTP id w7-v6so7414587wrn.6
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 11:23:03 -0700 (PDT)
 References: <20180604152941.20374-1-peter.maydell@linaro.org>
-	<20180604152941.20374-3-peter.maydell@linaro.org>
+	<20180604152941.20374-5-peter.maydell@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180604152941.20374-3-peter.maydell@linaro.org>
-Date: Thu, 14 Jun 2018 19:21:54 +0100
-Message-ID: <87vaalz0sd.fsf@linaro.org>
+In-reply-to: <20180604152941.20374-5-peter.maydell@linaro.org>
+Date: Thu, 14 Jun 2018 19:23:01 +0100
+Message-ID: <87tvq5z0qi.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 02/13] iommu: Add IOMMU index argument
- to notifier APIs
+Subject: Re: [Qemu-devel] [PATCH v2 04/13] exec.c: Handle IOMMUs in
+ address_space_translate_for_iotlb()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,246 +37,257 @@ Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Richard Hend
 
 Peter Maydell <peter.maydell@linaro.org> writes:
 
-> Add support for multiple IOMMU indexes to the IOMMU notifier APIs.
-> When initializing a notifier with iommu_notifier_init(), the caller
-> must pass the IOMMU index that it is interested in. When a change
-> happens, the IOMMU implementation must pass
-> memory_region_notify_iommu() the IOMMU index that has changed and
-> that notifiers must be called for.
+> Currently we don't support board configurations that put an IOMMU
+> in the path of the CPU's memory transactions, and instead just
+> assert() if the memory region fonud in address_space_translate_for_iotlb()
+> is an IOMMUMemoryRegion.
 >
-> IOMMUs which support only a single index don't need to change.
-> Callers which only really support working with IOMMUs with a single
-> index can use the result of passing MEMTXATTRS_UNSPECIFIED to
-> memory_region_iommu_attrs_to_index().
+> Remove this limitation by having the function handle IOMMUs.
+> This is mostly straightforward, but we must make sure we have
+> a notifier registered for every IOMMU that a transaction has
+> passed through, so that we can flush the TLB appropriately
+> when any of the IOMMUs change their mappings.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  include/exec/memory.h    | 7 ++++++-
->  hw/i386/intel_iommu.c    | 6 +++---
->  hw/ppc/spapr_iommu.c     | 2 +-
->  hw/s390x/s390-pci-inst.c | 4 ++--
->  hw/vfio/common.c         | 6 +++++-
->  hw/virtio/vhost.c        | 7 ++++++-
->  memory.c                 | 8 +++++++-
->  7 files changed, 30 insertions(+), 10 deletions(-)
+>  include/exec/exec-all.h |   3 +-
+>  include/qom/cpu.h       |   3 +
+>  accel/tcg/cputlb.c      |   3 +-
+>  exec.c                  | 135 +++++++++++++++++++++++++++++++++++++++-
+>  4 files changed, 140 insertions(+), 4 deletions(-)
 >
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index fa6e98ee7be..ec75c45296e 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -98,18 +98,21 @@ struct IOMMUNotifier {
->      /* Notify for address space range start <=3D addr <=3D end */
->      hwaddr start;
->      hwaddr end;
-> +    int iommu_idx;
->      QLIST_ENTRY(IOMMUNotifier) node;
->  };
->  typedef struct IOMMUNotifier IOMMUNotifier;
+> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+> index 4d09eaba72d..e0ff19b7112 100644
+> --- a/include/exec/exec-all.h
+> +++ b/include/exec/exec-all.h
+> @@ -469,7 +469,8 @@ void tb_flush_jmp_cache(CPUState *cpu, target_ulong a=
+ddr);
 >
->  static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
->                                         IOMMUNotifierFlag flags,
-> -                                       hwaddr start, hwaddr end)
-> +                                       hwaddr start, hwaddr end,
-> +                                       int iommu_idx)
->  {
->      n->notify =3D fn;
->      n->notifier_flags =3D flags;
->      n->start =3D start;
->      n->end =3D end;
-> +    n->iommu_idx =3D iommu_idx;
->  }
+>  MemoryRegionSection *
+>  address_space_translate_for_iotlb(CPUState *cpu, int asidx, hwaddr addr,
+> -                                  hwaddr *xlat, hwaddr *plen);
+> +                                  hwaddr *xlat, hwaddr *plen,
+> +                                  MemTxAttrs attrs, int *prot);
+>  hwaddr memory_region_section_get_iotlb(CPUState *cpu,
+>                                         MemoryRegionSection *section,
+>                                         target_ulong vaddr,
+> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+> index 9d3afc6c759..cce2fd6acc2 100644
+> --- a/include/qom/cpu.h
+> +++ b/include/qom/cpu.h
+> @@ -429,6 +429,9 @@ struct CPUState {
+>      uint16_t pending_tlb_flush;
 >
->  /*
-> @@ -1008,11 +1011,13 @@ uint64_t memory_region_iommu_get_min_page_size(IO=
-MMUMemoryRegion *iommu_mr);
->   * should be notified with an UNMAP followed by a MAP.
->   *
->   * @iommu_mr: the memory region that was changed
-> + * @iommu_idx: the IOMMU index for the translation table which has chang=
-ed
->   * @entry: the new entry in the IOMMU translation table.  The entry
->   *         replaces all old entries for the same virtual I/O address ran=
-ge.
->   *         Deleted entries have .@perm =3D=3D 0.
->   */
->  void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
-> +                                int iommu_idx,
->                                  IOMMUTLBEntry entry);
->
->  /**
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index b5a09b79089..9c0b45963b5 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -1023,7 +1023,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState=
- *s, uint8_t bus_num,
->  static int vtd_sync_shadow_page_hook(IOMMUTLBEntry *entry,
->                                       void *private)
->  {
-> -    memory_region_notify_iommu((IOMMUMemoryRegion *)private, *entry);
-> +    memory_region_notify_iommu((IOMMUMemoryRegion *)private, 0, *entry);
->      return 0;
->  }
->
-> @@ -1581,7 +1581,7 @@ static void vtd_iotlb_page_invalidate_notify(IntelI=
-OMMUState *s,
->                      .addr_mask =3D size - 1,
->                      .perm =3D IOMMU_NONE,
->                  };
-> -                memory_region_notify_iommu(&vtd_as->iommu, entry);
-> +                memory_region_notify_iommu(&vtd_as->iommu, 0, entry);
->              }
->          }
->      }
-> @@ -2015,7 +2015,7 @@ static bool vtd_process_device_iotlb_desc(IntelIOMM=
-UState *s,
->      entry.iova =3D addr;
->      entry.perm =3D IOMMU_NONE;
->      entry.translated_addr =3D 0;
-> -    memory_region_notify_iommu(&vtd_dev_as->iommu, entry);
-> +    memory_region_notify_iommu(&vtd_dev_as->iommu, 0, entry);
->
->  done:
->      return true;
-> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-> index aaa6010d5c9..301708e45eb 100644
-> --- a/hw/ppc/spapr_iommu.c
-> +++ b/hw/ppc/spapr_iommu.c
-> @@ -428,7 +428,7 @@ static target_ulong put_tce_emu(sPAPRTCETable *tcet, =
-target_ulong ioba,
->      entry.translated_addr =3D tce & page_mask;
->      entry.addr_mask =3D ~page_mask;
->      entry.perm =3D spapr_tce_iommu_access_flags(tce);
-> -    memory_region_notify_iommu(&tcet->iommu, entry);
-> +    memory_region_notify_iommu(&tcet->iommu, 0, entry);
->
->      return H_SUCCESS;
->  }
-> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-> index d1a5f796783..7b61367ee31 100644
-> --- a/hw/s390x/s390-pci-inst.c
-> +++ b/hw/s390x/s390-pci-inst.c
-> @@ -589,7 +589,7 @@ static void s390_pci_update_iotlb(S390PCIIOMMU *iommu=
-, S390IOTLBEntry *entry)
->              }
->
->              notify.perm =3D IOMMU_NONE;
-> -            memory_region_notify_iommu(&iommu->iommu_mr, notify);
-> +            memory_region_notify_iommu(&iommu->iommu_mr, 0, notify);
->              notify.perm =3D entry->perm;
->          }
->
-> @@ -601,7 +601,7 @@ static void s390_pci_update_iotlb(S390PCIIOMMU *iommu=
-, S390IOTLBEntry *entry)
->          g_hash_table_replace(iommu->iotlb, &cache->iova, cache);
->      }
->
-> -    memory_region_notify_iommu(&iommu->iommu_mr, notify);
-> +    memory_region_notify_iommu(&iommu->iommu_mr, 0, notify);
->  }
->
->  int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t r=
-a)
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index 8e57265edf1..fb396cf00ac 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -507,6 +507,7 @@ static void vfio_listener_region_add(MemoryListener *=
-listener,
->      if (memory_region_is_iommu(section->mr)) {
->          VFIOGuestIOMMU *giommu;
->          IOMMUMemoryRegion *iommu_mr =3D IOMMU_MEMORY_REGION(section->mr);
-> +        int iommu_idx;
->
->          trace_vfio_listener_region_add_iommu(iova, end);
->          /*
-> @@ -523,10 +524,13 @@ static void vfio_listener_region_add(MemoryListener=
- *listener,
->          llend =3D int128_add(int128_make64(section->offset_within_region=
-),
->                             section->size);
->          llend =3D int128_sub(llend, int128_one());
-> +        iommu_idx =3D memory_region_iommu_attrs_to_index(iommu_mr,
-> +                                                       MEMTXATTRS_UNSPEC=
-IFIED);
->          iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
->                              IOMMU_NOTIFIER_ALL,
->                              section->offset_within_region,
-> -                            int128_get64(llend));
-> +                            int128_get64(llend),
-> +                            iommu_idx);
->          QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
->
->          memory_region_register_iommu_notifier(section->mr, &giommu->n);
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 96175b214d7..b129cb9dddd 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -662,6 +662,8 @@ static void vhost_iommu_region_add(MemoryListener *li=
-stener,
->                                           iommu_listener);
->      struct vhost_iommu *iommu;
->      Int128 end;
-> +    int iommu_idx;
-> +    IOMMUMemoryRegion *iommu_mr =3D IOMMU_MEMORY_REGION(section->mr);
->
->      if (!memory_region_is_iommu(section->mr)) {
->          return;
-> @@ -671,10 +673,13 @@ static void vhost_iommu_region_add(MemoryListener *=
-listener,
->      end =3D int128_add(int128_make64(section->offset_within_region),
->                       section->size);
->      end =3D int128_sub(end, int128_one());
-> +    iommu_idx =3D memory_region_iommu_attrs_to_index(iommu_mr,
-> +                                                   MEMTXATTRS_UNSPECIFIE=
-D);
->      iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
->                          IOMMU_NOTIFIER_UNMAP,
->                          section->offset_within_region,
-> -                        int128_get64(end));
-> +                        int128_get64(end),
-> +                        iommu_idx);
->      iommu->mr =3D section->mr;
->      iommu->iommu_offset =3D section->offset_within_address_space -
->                            section->offset_within_region;
-> diff --git a/memory.c b/memory.c
-> index 64f4a55d546..7aa75ff02d3 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1799,6 +1799,9 @@ void memory_region_register_iommu_notifier(MemoryRe=
-gion *mr,
->      iommu_mr =3D IOMMU_MEMORY_REGION(mr);
->      assert(n->notifier_flags !=3D IOMMU_NOTIFIER_NONE);
->      assert(n->start <=3D n->end);
-> +    assert(n->iommu_idx >=3D 0 &&
-> +           n->iommu_idx < memory_region_iommu_num_indexes(iommu_mr));
+>      int hvf_fd;
 > +
->      QLIST_INSERT_HEAD(&iommu_mr->iommu_notify, n, node);
->      memory_region_update_iommu_notify_flags(iommu_mr);
->  }
-> @@ -1891,6 +1894,7 @@ void memory_region_notify_one(IOMMUNotifier *notifi=
-er,
->  }
+> +    /* track IOMMUs whose translations we've cached in the TCG TLB */
+> +    GArray *iommu_notifiers;
+>  };
 >
->  void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
-> +                                int iommu_idx,
->                                  IOMMUTLBEntry entry)
->  {
->      IOMMUNotifier *iommu_notifier;
-> @@ -1898,7 +1902,9 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *=
-iommu_mr,
->      assert(memory_region_is_iommu(MEMORY_REGION(iommu_mr)));
->
->      IOMMU_NOTIFIER_FOREACH(iommu_notifier, iommu_mr) {
-> -        memory_region_notify_one(iommu_notifier, &entry);
-> +        if (iommu_notifier->iommu_idx =3D=3D iommu_idx) {
-> +            memory_region_notify_one(iommu_notifier, &entry);
-> +        }
+>  QTAILQ_HEAD(CPUTailQ, CPUState);
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index 05439039e91..c8acaf21e9f 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -632,7 +632,8 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ul=
+ong vaddr,
 >      }
+>
+>      sz =3D size;
+> -    section =3D address_space_translate_for_iotlb(cpu, asidx, paddr, &xl=
+at, &sz);
+> +    section =3D address_space_translate_for_iotlb(cpu, asidx, paddr, &xl=
+at, &sz,
+> +                                                attrs, &prot);
+>      assert(sz >=3D TARGET_PAGE_SIZE);
+>
+>      tlb_debug("vaddr=3D" TARGET_FMT_lx " paddr=3D0x" TARGET_FMT_plx
+> diff --git a/exec.c b/exec.c
+> index 033e74c36e4..28181115cc2 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -650,18 +650,144 @@ MemoryRegion *flatview_translate(FlatView *fv, hwa=
+ddr addr, hwaddr *xlat,
+>      return mr;
+>  }
+>
+> +typedef struct TCGIOMMUNotifier {
+> +    IOMMUNotifier n;
+> +    MemoryRegion *mr;
+> +    CPUState *cpu;
+> +    int iommu_idx;
+> +    bool active;
+> +} TCGIOMMUNotifier;
+> +
+> +static void tcg_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotl=
+b)
+> +{
+> +    TCGIOMMUNotifier *notifier =3D container_of(n, TCGIOMMUNotifier, n);
+> +
+> +    if (!notifier->active) {
+> +        return;
+> +    }
+> +    tlb_flush(notifier->cpu);
+> +    notifier->active =3D false;
+> +    /* We leave the notifier struct on the list to avoid reallocating it=
+ later.
+> +     * Generally the number of IOMMUs a CPU deals with will be small.
+> +     * In any case we can't unregister the iommu notifier from a notify
+> +     * callback.
+> +     */
+> +}
+> +
+> +static void tcg_register_iommu_notifier(CPUState *cpu,
+> +                                        IOMMUMemoryRegion *iommu_mr,
+> +                                        int iommu_idx)
+> +{
+> +    /* Make sure this CPU has an IOMMU notifier registered for this
+> +     * IOMMU/IOMMU index combination, so that we can flush its TLB
+> +     * when the IOMMU tells us the mappings we've cached have changed.
+> +     */
+> +    MemoryRegion *mr =3D MEMORY_REGION(iommu_mr);
+> +    TCGIOMMUNotifier *notifier;
+> +    int i;
+> +
+> +    for (i =3D 0; i < cpu->iommu_notifiers->len; i++) {
+> +        notifier =3D &g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifi=
+er, i);
+> +        if (notifier->mr =3D=3D mr && notifier->iommu_idx =3D=3D iommu_i=
+dx) {
+> +            break;
+> +        }
+> +    }
+> +    if (i =3D=3D cpu->iommu_notifiers->len) {
+> +        /* Not found, add a new entry at the end of the array */
+> +        cpu->iommu_notifiers =3D g_array_set_size(cpu->iommu_notifiers, =
+i + 1);
+> +        notifier =3D &g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifi=
+er, i);
+> +
+> +        notifier->mr =3D mr;
+> +        notifier->iommu_idx =3D iommu_idx;
+> +        notifier->cpu =3D cpu;
+> +        /* Rather than trying to register interest in the specific part
+> +         * of the iommu's address space that we've accessed and then
+> +         * expand it later as subsequent accesses touch more of it, we
+> +         * just register interest in the whole thing, on the assumption
+> +         * that iommu reconfiguration will be rare.
+> +         */
+> +        iommu_notifier_init(&notifier->n,
+> +                            tcg_iommu_unmap_notify,
+> +                            IOMMU_NOTIFIER_UNMAP,
+> +                            0,
+> +                            HWADDR_MAX,
+> +                            iommu_idx);
+> +        memory_region_register_iommu_notifier(notifier->mr, &notifier->n=
+);
+> +    }
+> +
+> +    if (!notifier->active) {
+> +        notifier->active =3D true;
+> +    }
+> +}
+> +
+> +static void tcg_iommu_free_notifier_list(CPUState *cpu)
+> +{
+> +    /* Destroy the CPU's notifier list */
+> +    int i;
+> +    TCGIOMMUNotifier *notifier;
+> +
+> +    for (i =3D 0; i < cpu->iommu_notifiers->len; i++) {
+> +        notifier =3D &g_array_index(cpu->iommu_notifiers, TCGIOMMUNotifi=
+er, i);
+> +        memory_region_unregister_iommu_notifier(notifier->mr, &notifier-=
+>n);
+> +    }
+> +    g_array_free(cpu->iommu_notifiers, true);
+> +}
+> +
+>  /* Called from RCU critical section */
+>  MemoryRegionSection *
+>  address_space_translate_for_iotlb(CPUState *cpu, int asidx, hwaddr addr,
+> -                                  hwaddr *xlat, hwaddr *plen)
+> +                                  hwaddr *xlat, hwaddr *plen,
+> +                                  MemTxAttrs attrs, int *prot)
+>  {
+>      MemoryRegionSection *section;
+> +    IOMMUMemoryRegion *iommu_mr;
+> +    IOMMUMemoryRegionClass *imrc;
+> +    IOMMUTLBEntry iotlb;
+> +    int iommu_idx;
+>      AddressSpaceDispatch *d =3D atomic_rcu_read(&cpu->cpu_ases[asidx].me=
+mory_dispatch);
+>
+> -    section =3D address_space_translate_internal(d, addr, xlat, plen, fa=
+lse);
+> +    for (;;) {
+> +        section =3D address_space_translate_internal(d, addr, &addr, ple=
+n, false);
+> +
+> +        iommu_mr =3D memory_region_get_iommu(section->mr);
+> +        if (!iommu_mr) {
+> +            break;
+> +        }
+> +
+> +        imrc =3D memory_region_get_iommu_class_nocheck(iommu_mr);
+> +
+> +        iommu_idx =3D imrc->attrs_to_index(iommu_mr, attrs);
+> +        tcg_register_iommu_notifier(cpu, iommu_mr, iommu_idx);
+> +        /* We need all the permissions, so pass IOMMU_NONE so the IOMMU
+> +         * doesn't short-cut its translation table walk.
+> +         */
+> +        iotlb =3D imrc->translate(iommu_mr, addr, IOMMU_NONE, iommu_idx);
+> +        addr =3D ((iotlb.translated_addr & ~iotlb.addr_mask)
+> +                | (addr & iotlb.addr_mask));
+> +        /* Update the caller's prot bits to remove permissions the IOMMU
+> +         * is giving us a failure response for. If we get down to no
+> +         * permissions left at all we can give up now.
+> +         */
+> +        if (!(iotlb.perm & IOMMU_RO)) {
+> +            *prot &=3D ~(PAGE_READ | PAGE_EXEC);
+> +        }
+> +        if (!(iotlb.perm & IOMMU_WO)) {
+> +            *prot &=3D ~PAGE_WRITE;
+> +        }
+> +
+> +        if (!*prot) {
+> +            goto translate_fail;
+> +        }
+> +
+> +        d =3D flatview_to_dispatch(address_space_to_flatview(iotlb.targe=
+t_as));
+> +    }
+>
+>      assert(!memory_region_is_iommu(section->mr));
+> +    *xlat =3D addr;
+>      return section;
+> +
+> +translate_fail:
+> +    return &d->map.sections[PHYS_SECTION_UNASSIGNED];
+>  }
+>  #endif
+>
+> @@ -820,6 +946,9 @@ void cpu_exec_unrealizefn(CPUState *cpu)
+>      if (qdev_get_vmsd(DEVICE(cpu)) =3D=3D NULL) {
+>          vmstate_unregister(NULL, &vmstate_cpu_common, cpu);
+>      }
+> +#ifndef CONFIG_USER_ONLY
+> +    tcg_iommu_free_notifier_list(cpu);
+> +#endif
+>  }
+>
+>  Property cpu_common_props[] =3D {
+> @@ -867,6 +996,8 @@ void cpu_exec_realizefn(CPUState *cpu, Error **errp)
+>      if (cc->vmsd !=3D NULL) {
+>          vmstate_register(NULL, cpu->cpu_index, cc->vmsd, cpu);
+>      }
+> +
+> +    cpu->iommu_notifiers =3D g_array_new(false, true, sizeof(TCGIOMMUNot=
+ifier));
+>  #endif
 >  }
 
 
