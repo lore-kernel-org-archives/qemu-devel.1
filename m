@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTSoW-0007wz-SQ
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:01:34 -0400
+	(envelope-from <drjones@redhat.com>) id 1fTSqR-00015I-Hr
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:03:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTSoR-0000CY-0B
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:01:24 -0400
-Received: from 8.mo173.mail-out.ovh.net ([46.105.46.122]:50519)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTSoQ-0000BZ-Mt
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:01:18 -0400
-Received: from player738.ha.ovh.net (unknown [10.109.120.28])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 18C36C5524
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 16:01:16 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Thu, 14 Jun 2018 16:00:42 +0200
-Message-Id: <20180614140043.9231-6-clg@kaod.org>
-In-Reply-To: <20180614140043.9231-1-clg@kaod.org>
-References: <20180614140043.9231-1-clg@kaod.org>
+	(envelope-from <drjones@redhat.com>) id 1fTSqM-0000pa-ML
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:03:23 -0400
+Date: Thu, 14 Jun 2018 16:03:04 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180614140304.bmcznq65cccpzigk@kamzik.brq.redhat.com>
+References: <1528879723-24675-1-git-send-email-eric.auger@redhat.com>
+	<1528879723-24675-5-git-send-email-eric.auger@redhat.com>
+	<20180614133904.bic4wwjeed4ybu2u@kamzik.brq.redhat.com>
+	<29a2642b-87e4-b4c3-b7b9-632a3c0adc87@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 5/6] ppc/pnv: introduce a new intc_create()
- operation to the chip model
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <29a2642b-87e4-b4c3-b7b9-632a3c0adc87@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/9] hw/intc/arm_gicv3_kvm: Get prepared to
+ handle multiple redist regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,174 +26,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: wei@redhat.com, peter.maydell@linaro.org, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, qemu-devel@nongnu.org, christoffer.dall@arm.com, qemu-arm@nongnu.org, zhaoshenglong@huawei.com, lersek@redhat.com, eric.auger.pro@gmail.com
 
-On Power9, the thread interrupt presenter has a different type and is
-linked to the chip owning the cores.
+On Thu, Jun 14, 2018 at 03:48:52PM +0200, Auger Eric wrote:
+> Hi Drew,
+> 
+> On 06/14/2018 03:39 PM, Andrew Jones wrote:
+> > On Wed, Jun 13, 2018 at 10:48:38AM +0200, Eric Auger wrote:
+> >> Let's check if KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION is supported.
+> >> If not, we check the number of redist region is equal to 1 and use the
+> >> legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute. Otherwise we use
+> >> the new attribute and allow to register multiple regions to the
+> >> KVM device.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> >> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> >>
+> >> ---
+> >>
+> >> v2 -> v3:
+> >> - In kvm_arm_gicv3_realize rename val into add_ormask local variable and
+> >>   add a comment
+> >> - start the redist region registration  from s->nb_redist_regions - 1
+> >>   downwards
+> >> ---
+> >>  hw/intc/arm_gicv3_kvm.c | 33 ++++++++++++++++++++++++++++++---
+> >>  1 file changed, 30 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+> >> index ed7b719..52e6e70 100644
+> >> --- a/hw/intc/arm_gicv3_kvm.c
+> >> +++ b/hw/intc/arm_gicv3_kvm.c
+> >> @@ -753,6 +753,7 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+> >>  {
+> >>      GICv3State *s = KVM_ARM_GICV3(dev);
+> >>      KVMARMGICv3Class *kgc = KVM_ARM_GICV3_GET_CLASS(s);
+> >> +    bool multiple_redist_region_allowed;
+> >>      Error *local_err = NULL;
+> >>      int i;
+> >>  
+> >> @@ -789,6 +790,18 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+> >>          return;
+> >>      }
+> >>  
+> >> +    multiple_redist_region_allowed =
+> >> +        kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> >> +                              KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION);
+> >> +
+> >> +    if (!multiple_redist_region_allowed && s->nb_redist_regions > 1) {
+> >> +        error_setg(errp, "Multiple VGICv3 redistributor regions are not "
+> >> +                   "supported by this host kernel");
+> >> +        error_append_hint(errp, "A maximum of %d VCPUs can be used",
+> >> +                          s->redist_region_count[0]);
+> >> +        return;
+> >> +    }
+> >> +
+> >>      kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+> >>                        0, &s->num_irq, true, &error_abort);
+> >>  
+> >> @@ -798,9 +811,23 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
+> >>  
+> >>      kvm_arm_register_device(&s->iomem_dist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> >>                              KVM_VGIC_V3_ADDR_TYPE_DIST, s->dev_fd, 0);
+> >> -    kvm_arm_register_device(&s->iomem_redist[0], -1,
+> >> -                            KVM_DEV_ARM_VGIC_GRP_ADDR,
+> >> -                            KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
+> >> +
+> >> +    if (!multiple_redist_region_allowed) {
+> >> +        kvm_arm_register_device(&s->iomem_redist[0], -1,
+> >> +                                KVM_DEV_ARM_VGIC_GRP_ADDR,
+> >> +                                KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
+> >> +    } else {
+> >> +        for (i = s->nb_redist_regions - 1; i >= 0; i--) {
+> > 
+> > So we register in reverse-index order? Looking at your update to Linux doc
+> > Documentation/virtual/kvm/devices/arm-vgic-v3.txt, shouldn't they be
+> > registered in index-order? The doc says "Redistributor regions must be
+> > registered in the incremental index order, starting from index 0."
+> kvm_arm_register_device adds the device in a QSLIST using
+> QSLIST_INSERT_HEAD. Then the list is read by kvm_arm_machine_init_done
+> from the HEAD. So we need to register in reversed order.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/ppc/pnv.h |  1 +
- hw/ppc/pnv.c         | 21 +++++++++++++++++++--
- hw/ppc/pnv_core.c    | 18 +++++++++---------
- 3 files changed, 29 insertions(+), 11 deletions(-)
+Oh, that's sort of horrible, as I can't even see where that's documented
+anywhere. Can we at least document it here in a comment? Actually, we
+should probably reverse the list first in kvm_arm_machine_init_done()
+and document that devices should be registered in the order KVM needs
+them to be - just in the name of sanity. But, I'm not sure what we'd
+break if we reversed the order now though...
 
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 90759240a7b1..e934e84f555e 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -76,6 +76,7 @@ typedef struct PnvChipClass {
-     hwaddr       xscom_base;
-=20
-     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
-+    Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
- } PnvChipClass;
-=20
- #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index b3b0dd44582f..7d99366daf90 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -641,6 +641,13 @@ static uint32_t pnv_chip_core_pir_p8(PnvChip *chip, =
-uint32_t core_id)
-     return (chip->chip_id << 7) | (core_id << 3);
- }
-=20
-+static Object *pnv_chip_power8_intc_create(PnvChip *chip, Object *child,
-+                                           Error **errp)
-+{
-+    return icp_create(child, TYPE_PNV_ICP, XICS_FABRIC(qdev_get_machine(=
-)),
-+                      errp);
-+}
-+
- /*
-  *    0:48  Reserved - Read as zeroes
-  *   49:52  Node ID
-@@ -656,6 +663,12 @@ static uint32_t pnv_chip_core_pir_p9(PnvChip *chip, =
-uint32_t core_id)
-     return (chip->chip_id << 8) | (core_id << 2);
- }
-=20
-+static Object *pnv_chip_power9_intc_create(PnvChip *chip, Object *child,
-+                                           Error **errp)
-+{
-+    return NULL;
-+}
-+
- /* Allowed core identifiers on a POWER8 Processor Chip :
-  *
-  * <EX0 reserved>
-@@ -691,6 +704,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
-klass, void *data)
-     k->chip_cfam_id =3D 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
-     k->cores_mask =3D POWER8E_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-+    k->intc_create =3D pnv_chip_power8_intc_create;
-     k->xscom_base =3D 0x003fc0000000000ull;
-     dc->desc =3D "PowerNV Chip POWER8E";
- }
-@@ -704,6 +718,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
-lass, void *data)
-     k->chip_cfam_id =3D 0x220ea04980000000ull; /* P8 Venice DD2.0 */
-     k->cores_mask =3D POWER8_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-+    k->intc_create =3D pnv_chip_power8_intc_create;
-     k->xscom_base =3D 0x003fc0000000000ull;
-     dc->desc =3D "PowerNV Chip POWER8";
- }
-@@ -717,6 +732,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
- *klass, void *data)
-     k->chip_cfam_id =3D 0x120d304980000000ull;  /* P8 Naples DD1.0 */
-     k->cores_mask =3D POWER8_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-+    k->intc_create =3D pnv_chip_power8_intc_create;
-     k->xscom_base =3D 0x003fc0000000000ull;
-     dc->desc =3D "PowerNV Chip POWER8NVL";
- }
-@@ -730,6 +746,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
-lass, void *data)
-     k->chip_cfam_id =3D 0x220d104900008000ull; /* P9 Nimbus DD2.0 */
-     k->cores_mask =3D POWER9_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p9;
-+    k->intc_create =3D pnv_chip_power9_intc_create;
-     k->xscom_base =3D 0x00603fc00000000ull;
-     dc->desc =3D "PowerNV Chip POWER9";
- }
-@@ -865,8 +882,8 @@ static void pnv_chip_core_realize(PnvChip *chip, Erro=
-r **errp)
-         object_property_set_int(OBJECT(pnv_core),
-                                 pcc->core_pir(chip, core_hwid),
-                                 "pir", &error_fatal);
--        object_property_add_const_link(OBJECT(pnv_core), "xics",
--                                       qdev_get_machine(), &error_fatal)=
-;
-+        object_property_add_const_link(OBJECT(pnv_core), "chip",
-+                                       OBJECT(chip), &error_fatal);
-         object_property_set_bool(OBJECT(pnv_core), true, "realized",
-                                  &error_fatal);
-         object_unref(OBJECT(pnv_core));
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index 13ad7d9e0470..5805bcd10abf 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -121,11 +121,12 @@ static const MemoryRegionOps pnv_core_xscom_ops =3D=
- {
-     .endianness =3D DEVICE_BIG_ENDIAN,
- };
-=20
--static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error =
-**errp)
-+static void pnv_core_realize_child(Object *child, PnvChip *chip, Error *=
-*errp)
- {
-     Error *local_err =3D NULL;
-     CPUState *cs =3D CPU(child);
-     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-=20
-     object_property_set_bool(child, true, "realized", &local_err);
-     if (local_err) {
-@@ -133,7 +134,7 @@ static void pnv_core_realize_child(Object *child, XIC=
-SFabric *xi, Error **errp)
-         return;
-     }
-=20
--    cpu->intc =3D icp_create(child, TYPE_PNV_ICP, xi, &local_err);
-+    cpu->intc =3D pcc->intc_create(chip, child, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -156,13 +157,12 @@ static void pnv_core_realize(DeviceState *dev, Erro=
-r **errp)
-     void *obj;
-     int i, j;
-     char name[32];
--    Object *xi;
-+    Object *chip;
-=20
--    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
--    if (!xi) {
--        error_setg(errp, "%s: required link 'xics' not found: %s",
--                   __func__, error_get_pretty(local_err));
--        return;
-+    chip =3D object_property_get_link(OBJECT(dev), "chip", &local_err);
-+    if (!chip) {
-+        error_propagate(errp, local_err);
-+        error_prepend(errp, "required link 'chip' not found: ");
-     }
-=20
-     pc->threads =3D g_malloc0(size * cc->nr_threads);
-@@ -184,7 +184,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
-     for (j =3D 0; j < cc->nr_threads; j++) {
-         obj =3D pc->threads + j * size;
-=20
--        pnv_core_realize_child(obj, XICS_FABRIC(xi), &local_err);
-+        pnv_core_realize_child(obj, PNV_CHIP(chip), &local_err);
-         if (local_err) {
-             goto err;
-         }
---=20
-2.13.6
+Thanks,
+drew
+
+> 
+> Thanks
+> 
+> Eric
+> > 
+> > Thanks,
+> > drew
+> > 
+> >> +            /* Address mask made of the rdist region index and count */
+> >> +            uint64_t addr_ormask =
+> >> +                        i | ((uint64_t)s->redist_region_count[i] << 52);
+> >> +
+> >> +            kvm_arm_register_device(&s->iomem_redist[i], -1,
+> >> +                                    KVM_DEV_ARM_VGIC_GRP_ADDR,
+> >> +                                    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION,
+> >> +                                    s->dev_fd, addr_ormask);
+> >> +        }
+> >> +    }
+> >>  
+> >>      if (kvm_has_gsi_routing()) {
+> >>          /* set up irq routing */
+> >> -- 
+> >> 2.5.5
+> >>
+> >>
+> 
