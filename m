@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fTXc4-0007Bk-85
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:08:53 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fTXgX-0000WM-MU
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:13:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fTXbz-0005xi-6Q
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:08:52 -0400
-From: Thomas Huth <thuth@redhat.com>
-References: <1528738007-29122-1-git-send-email-thuth@redhat.com>
-Message-ID: <d4a53d7a-60c0-b98a-bd2a-fd06b2f0e822@redhat.com>
-Date: Thu, 14 Jun 2018 21:08:43 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1fTXgS-0000dh-OP
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:13:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTXgS-0000d5-F2
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 15:13:24 -0400
+Date: Thu, 14 Jun 2018 16:13:17 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180614191317.GY7451@localhost.localdomain>
+References: <1528939107-17193-1-git-send-email-babu.moger@amd.com>
+	<1528939107-17193-6-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <1528738007-29122-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2] hw/s390x/ipl: Fix crashes
- that occurs when -kernel is used with small images
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1528939107-17193-6-git-send-email-babu.moger@amd.com>
+Subject: Re: [Qemu-devel] [PATCH v14 5/6] i386: Disable TOPOEXT feature if
+ it cannot be supported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
+To: Babu Moger <babu.moger@amd.com>
+Cc: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, kash@tripleback.net, geoff@hostfission.com
 
-On 11.06.2018 19:26, Thomas Huth wrote:
-> Add a sanity checks to fix the following two crashes:
+On Wed, Jun 13, 2018 at 09:18:26PM -0400, Babu Moger wrote:
+> Disable the TOPOEXT feature if it cannot be supported.
+> We cannot support this feature with more than 2 nr_threads
+> or more than 32 cores in a socket.
 > 
-> $ echo "Insane in the mainframe" > /tmp/test.txt
-> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -append xyz
-> Segmentation fault (core dumped)
-> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -initrd /tmp/test.txt
-> Segmentation fault (core dumped)
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
 > ---
->  v2: Fixed 2nd crash with -initrd
+>  target/i386/cpu.c | 17 ++++++++++++++++-
+>  1 file changed, 16 insertions(+), 1 deletion(-)
 > 
->  hw/s390x/ipl.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 04245b5..2ff8f20 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -168,7 +168,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->           * we can not rely on the ELF entry point - it was 0x800 (the SALIPL
->           * loader) and it won't work. For this case we force it to 0x10000, too.
->           */
-> -        if (pentry == KERN_IMAGE_START || pentry == 0x800) {
-> +        if ((pentry == KERN_IMAGE_START || pentry == 0x800) &&
-> +            kernel_size > KERN_PARM_AREA + strlen(ipl->cmdline)) {
->              ipl->start_addr = KERN_IMAGE_START;
->              /* Overwrite parameters in the kernel image, which are "rom" */
->              strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
-> @@ -195,8 +196,10 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->               * we have to overwrite values in the kernel image,
->               * which are "rom"
->               */
-> -            stq_p(rom_ptr(INITRD_PARM_START), initrd_offset);
-> -            stq_p(rom_ptr(INITRD_PARM_SIZE), initrd_size);
-> +            if (kernel_size > INITRD_PARM_SIZE + 8) {
-> +                stq_p(rom_ptr(INITRD_PARM_START), initrd_offset);
-> +                stq_p(rom_ptr(INITRD_PARM_SIZE), initrd_size);
-> +            }
->          }
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 2eb26da..637d8eb 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -4765,7 +4765,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+>      X86CPUClass *xcc = X86_CPU_GET_CLASS(dev);
+>      CPUX86State *env = &cpu->env;
+>      Error *local_err = NULL;
+> -    static bool ht_warned;
+> +    static bool ht_warned, topo_warned;
+>  
+>      if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
+>          char *name = x86_cpu_class_get_model_name(xcc);
+> @@ -4779,6 +4779,21 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+>          return;
 >      }
->      /*
+>  
+> +    /* Disable TOPOEXT if topology cannot be supported */
+> +    if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) {
+> +        if (!topology_supports_topoext(MAX_CORES_IN_NODE * MAX_NODES_PER_SOCKET,
+> +                                      2)) {
 
-I just had to discover that this breaks the argv handling in
-kvm-unit-tests. Cornelia, could you please unqueue this patch again?
-I'll try to come up with a better solution...
+I understand you stopped using cpu->nr_cores/cpu->nr_threads
+because it was not filled yet.
 
- Thomas
+But why exactly do you need to do this before calling
+x86_cpu_expand_features()?
+
+If you really need nr_cores and nr_threads to be available
+earlier, we could simply move their initialization to
+cpu_exec_initfn() instead of the solution you implemented in
+patch 4/6.
+
+> +            env->features[FEAT_8000_0001_ECX] &= !CPUID_EXT3_TOPOEXT;
+
+!CPUID_EXT3_TOPOEXT is 0, this will clear all bits in
+env->features[FEAT_8000_0001_ECX].  Did you mean
+~CPUID_EXT3_TOPOEXT?
+
+
+> +            if (!topo_warned) {
+> +                error_report("TOPOEXT feature cannot be supported with more"
+> +                             " than %d cores or more than 2 threads per socket."
+> +                             " Disabling the feature.",
+> +                             (MAX_CORES_IN_NODE * MAX_NODES_PER_SOCKET));
+> +                topo_warned = true;
+
+This will print a warning for "-cpu EPYC -smp 64,cores=64".
+We shouldn't.
+
+I'm starting to believe we shouldn't add TOPOEXT to EPYC unless
+we're ready to make the TOPOEXT CPUID leaves work for all valid
+-smp configurations.  If the feature will work only on a few
+specific cases, the feature should be enabled explicitly using
+"-cpu ...,+topoext".
+
+Is it really impossible to make CPUID return reasonable topology
+data for larger nr_cores and nr_threads values?  It would make
+everything much simpler.
+
+-- 
+Eduardo
