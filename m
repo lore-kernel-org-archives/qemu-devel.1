@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTISW-0000VD-VX
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 22:58:02 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fTISU-0000Ux-2t
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 22:57:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTIST-0004UW-3L
-	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 22:58:01 -0400
-Date: Thu, 14 Jun 2018 11:33:06 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fTIST-0004Um-4I
+	for qemu-devel@nongnu.org; Wed, 13 Jun 2018 22:57:58 -0400
+Date: Thu, 14 Jun 2018 11:36:44 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180614013306.GC3042@umbus.fritz.box>
+Message-ID: <20180614013644.GH3042@umbus.fritz.box>
 References: <cover.1528935420.git.balaton@eik.bme.hu>
-	<7a407b15b683417745e71a95452d5094e6e9fe94.1528935420.git.balaton@eik.bme.hu>
+	<9862fa0cf70d29b686e80039696596f2c23b148c.1528935420.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="uh9ZiVrAOUUm9fzH"
+	protocol="application/pgp-signature"; boundary="it/zdz3K1bH9Y8/E"
 Content-Disposition: inline
-In-Reply-To: <7a407b15b683417745e71a95452d5094e6e9fe94.1528935420.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v3 6/9] sm501: Do not clear read only bits
- when writing registers
+In-Reply-To: <9862fa0cf70d29b686e80039696596f2c23b148c.1528935420.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v3 5/9] sam460ex: Add RTC device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, h@umbus.fritz.box
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
 
---uh9ZiVrAOUUm9fzH
+--it/zdz3K1bH9Y8/E
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 On Thu, Jun 14, 2018 at 02:17:00AM +0200, BALATON Zoltan wrote:
-> When writing registers that have read only bits we have to avoid
-> changing these bits as they may have non zero values. Make sure we use
-> the correct masks to mask out read only and reserved bits when
-> changing registers.
->=20
-> Also remove extra spaces from dram_control and arbitration_control
-> assignments.
+> The Sam460ex has an M41T80 serial RTC chip on I2C bus 0 at address 0x68.
 >=20
 > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
 > ---
-> v3: Not only preserve read only bits but also allow clearing r/w
-> bits
-
-Applied to ppc-for-3.0, thanks.
-
+>  hw/ppc/sam460ex.c | 1 +
+>  1 file changed, 1 insertion(+)
 >=20
->  hw/display/sm501.c | 15 +++++++++------
->  1 file changed, 9 insertions(+), 6 deletions(-)
->=20
-> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> index e47be99..ca0840f 100644
-> --- a/hw/display/sm501.c
-> +++ b/hw/display/sm501.c
-> @@ -836,27 +836,30 @@ static void sm501_system_config_write(void *opaque,=
- hwaddr addr,
+> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+> index bdc53d2..dc730cc 100644
+> --- a/hw/ppc/sam460ex.c
+> +++ b/hw/ppc/sam460ex.c
+> @@ -457,6 +457,7 @@ static void sam460ex_init(MachineState *machine)
+>      object_property_set_bool(OBJECT(dev), true, "realized", NULL);
+>      smbus_eeprom_init(i2c[0]->bus, 8, smbus_eeprom_buf, smbus_eeprom_siz=
+e);
+>      g_free(smbus_eeprom_buf);
+> +    i2c_create_slave(i2c[0]->bus, "m41t80", 0x68);
 > =20
->      switch (addr) {
->      case SM501_SYSTEM_CONTROL:
-> -        s->system_control =3D value & 0xE300B8F7;
-> +        s->system_control &=3D 0x10DB0000;
-> +        s->system_control |=3D value & 0xEF00B8F7;
->          break;
->      case SM501_MISC_CONTROL:
-> -        s->misc_control =3D value & 0xFF7FFF20;
-> +        s->misc_control &=3D 0xEF;
-> +        s->misc_control |=3D value & 0xFF7FFF10;
->          break;
->      case SM501_GPIO31_0_CONTROL:
->          s->gpio_31_0_control =3D value;
->          break;
->      case SM501_GPIO63_32_CONTROL:
-> -        s->gpio_63_32_control =3D value;
-> +        s->gpio_63_32_control =3D value & 0xFF80FFFF;
->          break;
->      case SM501_DRAM_CONTROL:
->          s->local_mem_size_index =3D (value >> 13) & 0x7;
->          /* TODO : check validity of size change */
-> -        s->dram_control |=3D  value & 0x7FFFFFC3;
-> +        s->dram_control &=3D 0x80000000;
-> +        s->dram_control |=3D value & 0x7FFFFFC3;
->          break;
->      case SM501_ARBTRTN_CONTROL:
-> -        s->arbitration_control =3D  value & 0x37777777;
-> +        s->arbitration_control =3D value & 0x37777777;
->          break;
->      case SM501_IRQ_MASK:
-> -        s->irq_mask =3D value;
-> +        s->irq_mask =3D value & 0xFFDF3F5F;
->          break;
->      case SM501_MISC_TIMING:
->          s->misc_timing =3D value & 0xF31F1FFF;
+>      dev =3D sysbus_create_simple(TYPE_PPC4xx_I2C, 0x4ef600800, uic[0][3]=
+);
+>      i2c[1] =3D PPC4xx_I2C(dev);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -103,24 +65,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---uh9ZiVrAOUUm9fzH
+--it/zdz3K1bH9Y8/E
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlshxdIACgkQbDjKyiDZ
-s5KmZRAAw9dw1O3lq720b9M1ZU/+VP8OzwhF5NFQmg+zDXXgTNLb0Afv/4jCr2d1
-vPRzMoXHwQmnDqhmBgn8DUVRytAs2i1XW2od5Lv/mxKloaLm33C6ec5LhXiXy6wr
-VqE4VDHutBElsDbYDtmxfluRyDxxE5hnC+F1yx56bLY4z+5dLDSG/YcSiNeqyTrr
-DNPhqnrum3a5X6vgXbngWxwgvpE/yW9JzVVWvi+j06xwPu9II/9Er5DnUwsJ3Yfl
-CZmLefYbimcXxnKGnYlhvJ8exnLr+W9wf+AMyf4BpxbXW9sOT6k/2EBGbToamoOJ
-HgO4lOH3V45/i4DOr+Vm3+s5RP7Ub2r0HEE3KoP/5cfwQfAHq751QGAzS46geyUT
-6tgTwPs6fQ5rg8z0rGdevJdachRasbjzXS1bYtkukTE4XaI+s8vxeLHjalKIkqZF
-2tNkgzELjL9/NoluHgpLuEpPv/PgBM9v/+znaI20rCg8arH6sTvm5ONu9+3dffR/
-CLTqXvmEoGVMW9563TZrWBEfjRbg1fyMv/gNJZovnGioAA3ogdCtdI/2j2OYrcTC
-8jpAifd1TGbq7V8bcZMzY9uP2vGBjSSXRFvncJsWTKZ7iqg+wj343cVteo548oqt
-UN8VNgcL+d4N8UGaSGzer05LJJvfHPrQ0FCg7qCsI6149WmXAbU=
-=cJkZ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlshxqwACgkQbDjKyiDZ
+s5IIlw/+MtJ9Br7ua1BS8uQ2ba+pIgKGDXw893WvdpG29p8QrztpTjrjOZaOoTiU
+SGzdCKg6T20sD32zazd2Lne+g7qa0vL/6hDctddpjzoQ9sEaMQurzJOqAy7xhHrI
+xcsIqxpWfDFfd2RBPnIduROPRmqSzoPTwz2LJ4sGuKjnhDfTvcpIjv23VpYkoyDg
+Cgjn2uSm59pH781+FrORUpN3o/DoGQOo+u2a86C0crHhQGimzkaMAzsj9nnWeBO6
+uJLBCme74rYuGBFvhaGOlmFNC6qKAoYUTBU3BNqULBvy4iGZB8vf7Wo048+QGQ7W
+KTQhLti3ElL36+64mLLtlv7HtOz8rr1D+WlDCOv6c8vYbsYA4oiqXSOCENx7IGgL
+ZjD8f7+HhMIqRyhRfpHVZdLPDeZ6gZc4G0Sw7ri9Qv8EAfRmwLRN4KQ3mqiuLZHX
+Ry4D825V5OahoRoJLfduWyCXKvoRY3Crpt4IvECz5rLgVoeFMJW8711P23LWsbh8
+9N5bQ74YX6b4bp9aqBmz+gdOVuHaKNNQE1+3EHFpKduQfwPMUmHdv4lBBgXLT+ME
+LM4YSeXCgRktlHh8xLNiHd803K9mXz3JpansFjzCExGgubic2lOAOcNSe9cNWVwu
+RP3dx5GRNojvOBfcj5vcVHA7souXzvdfApQrdkKYwkw3xvl1KMs=
+=iHDh
 -----END PGP SIGNATURE-----
 
---uh9ZiVrAOUUm9fzH--
+--it/zdz3K1bH9Y8/E--
