@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTSjQ-0005w9-7R
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:56:09 -0400
+	(envelope-from <clg@kaod.org>) id 1fTSoD-0007fI-0c
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:01:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTSjO-0007Ad-Pr
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 09:56:08 -0400
-References: <1528879723-24675-1-git-send-email-eric.auger@redhat.com>
-	<1528879723-24675-4-git-send-email-eric.auger@redhat.com>
-	<20180614133215.khbod4vx4w6drh2x@kamzik.brq.redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <38a734ec-e813-03c9-d110-50dd327a60be@redhat.com>
-Date: Thu, 14 Jun 2018 15:55:56 +0200
+	(envelope-from <clg@kaod.org>) id 1fTSo9-0008Sw-Tk
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:01:05 -0400
+Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:55450)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTSo9-0008Rg-MT
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 10:01:01 -0400
+Received: from player738.ha.ovh.net (unknown [10.109.105.21])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 1FBEE108439
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 16:01:00 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Thu, 14 Jun 2018 16:00:38 +0200
+Message-Id: <20180614140043.9231-2-clg@kaod.org>
+In-Reply-To: <20180614140043.9231-1-clg@kaod.org>
+References: <20180614140043.9231-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20180614133215.khbod4vx4w6drh2x@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 3/9] hw/intc/arm_gicv3: Introduce
- redist-region-count array property
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 1/6] ppc/pnv: introduce a 'primary' field under
+ the LPC model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,258 +30,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Andrew Jones <drjones@redhat.com>
-Cc: wei@redhat.com, peter.maydell@linaro.org, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, qemu-devel@nongnu.org, christoffer.dall@arm.com, qemu-arm@nongnu.org, zhaoshenglong@huawei.com, lersek@redhat.com, eric.auger.pro@gmail.com
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hi Drew,
+When a PowerNV system is started, the firmware (skiboot) looks for a
+"primary" property to determine which LPC bus is the default on a
+multichip system. This property is currently populated in the main
+routine creating the device tree of a chip, which is the not the right
+place to do so.
 
-On 06/14/2018 03:32 PM, Andrew Jones wrote:
-> On Wed, Jun 13, 2018 at 10:48:37AM +0200, Eric Auger wrote:
->> To prepare for multiple redistributor regions, we introduce
->> an array of uint32_t properties that stores the redistributor
->> count of each redistributor region.
->>
->> Non accelerated VGICv3 only supports a single redistributor region.
->> The capacity of all redist regions is checked against the number of
->> vcpus.
->>
->> Machvirt is updated to set those properties, ie. a single
->> redistributor region with count set to the number of vcpus
->> capped by 123.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v2 -> v3:
->> - add missing return in arm_gic_realize
->> - in gicv3_init_irqs_and_mmio, compute/check rdist_capacity first
->> - rdist region 0 size set to MIN(smp_cpus, redist0_capacity)
->> - add GICV3_REDIST_SIZE
->> ---
->>  hw/arm/virt.c                      | 11 ++++++++++-
->>  hw/intc/arm_gicv3.c                | 12 +++++++++++-
->>  hw/intc/arm_gicv3_common.c         | 38 +++++++++++++++++++++++++++++++++-----
->>  hw/intc/arm_gicv3_kvm.c            |  9 +++++++--
->>  include/hw/intc/arm_gicv3_common.h |  8 ++++++--
->>  5 files changed, 67 insertions(+), 11 deletions(-)
->>
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index f0a4fa0..2885d18 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -522,6 +522,15 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
->>      if (!kvm_irqchip_in_kernel()) {
->>          qdev_prop_set_bit(gicdev, "has-security-extensions", vms->secure);
->>      }
->> +
->> +    if (type == 3) {
->> +        uint32_t redist0_capacity =
->> +                    vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
->> +        uint32_t redist0_count = MIN(smp_cpus, redist0_capacity);
->> +
->> +        qdev_prop_set_uint32(gicdev, "len-redist-region-count", 1);
-> 
-> I don't see where this property is defined or used.
+Check the chip id to flag the LPC controller as "primary", or not, and
+use that to add the property in the LPC device tree routine.
 
-This is due to the fact we have an array property. nb_redist_regions is
-the storage of this value. len-redist-region-count is the name of the
-field (size of the array) from the user point of view.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ include/hw/ppc/pnv_lpc.h |  2 ++
+ hw/ppc/pnv.c             | 19 ++++++-------------
+ hw/ppc/pnv_lpc.c         | 29 ++++++++++++++++++++---------
+ 3 files changed, 28 insertions(+), 22 deletions(-)
 
-DEFINE_PROP_ARRAY("redist-region-count", GICv3State, nb_redist_regions,
-                      redist_region_count, qdev_prop_uint32, uint32_t),
-
-see len-db-voltage property in hw/arm/vexpress.c and
-hw/misc/arm_sysctl.c for a similar usage.
-
-Thanks
-
-Eric
-
-
-> 
->> +        qdev_prop_set_uint32(gicdev, "redist-region-count[0]", redist0_count);
->> +    }
->>      qdev_init_nofail(gicdev);
->>      gicbusdev = SYS_BUS_DEVICE(gicdev);
->>      sysbus_mmio_map(gicbusdev, 0, vms->memmap[VIRT_GIC_DIST].base);
->> @@ -1321,7 +1330,7 @@ static void machvirt_init(MachineState *machine)
->>       * many redistributors we can fit into the memory map.
->>       */
->>      if (vms->gic_version == 3) {
->> -        virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / 0x20000;
->> +        virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
->>      } else {
->>          virt_max_cpus = GIC_NCPU;
->>      }
->> diff --git a/hw/intc/arm_gicv3.c b/hw/intc/arm_gicv3.c
->> index 479c667..7044133 100644
->> --- a/hw/intc/arm_gicv3.c
->> +++ b/hw/intc/arm_gicv3.c
->> @@ -373,7 +373,17 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
->>          return;
->>      }
->>  
->> -    gicv3_init_irqs_and_mmio(s, gicv3_set_irq, gic_ops);
->> +    if (s->nb_redist_regions != 1) {
->> +        error_setg(errp, "VGICv3 redist region number(%d) not equal to 1",
->> +                   s->nb_redist_regions);
->> +        return;
->> +    }
->> +
->> +    gicv3_init_irqs_and_mmio(s, gicv3_set_irq, gic_ops, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->>  
->>      gicv3_init_cpuif(s);
->>  }
->> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
->> index 864b7c6..ff326b3 100644
->> --- a/hw/intc/arm_gicv3_common.c
->> +++ b/hw/intc/arm_gicv3_common.c
->> @@ -247,11 +247,22 @@ static const VMStateDescription vmstate_gicv3 = {
->>  };
->>  
->>  void gicv3_init_irqs_and_mmio(GICv3State *s, qemu_irq_handler handler,
->> -                              const MemoryRegionOps *ops)
->> +                              const MemoryRegionOps *ops, Error **errp)
->>  {
->>      SysBusDevice *sbd = SYS_BUS_DEVICE(s);
->> +    int rdist_capacity = 0;
->>      int i;
->>  
->> +    for (i = 0; i < s->nb_redist_regions; i++) {
->> +        rdist_capacity += s->redist_region_count[i];
->> +    }
->> +    if (rdist_capacity < s->num_cpu) {
->> +        error_setg(errp, "Capacity of the redist regions(%d) "
->> +                   "is less than number of vcpus(%d)",
->> +                   rdist_capacity, s->num_cpu);
->> +        return;
->> +    }
->> +
->>      /* For the GIC, also expose incoming GPIO lines for PPIs for each CPU.
->>       * GPIO array layout is thus:
->>       *  [0..N-1] spi
->> @@ -277,11 +288,18 @@ void gicv3_init_irqs_and_mmio(GICv3State *s, qemu_irq_handler handler,
->>  
->>      memory_region_init_io(&s->iomem_dist, OBJECT(s), ops, s,
->>                            "gicv3_dist", 0x10000);
->> -    memory_region_init_io(&s->iomem_redist, OBJECT(s), ops ? &ops[1] : NULL, s,
->> -                          "gicv3_redist", 0x20000 * s->num_cpu);
->> -
->>      sysbus_init_mmio(sbd, &s->iomem_dist);
->> -    sysbus_init_mmio(sbd, &s->iomem_redist);
->> +
->> +    s->iomem_redist = g_new0(MemoryRegion, s->nb_redist_regions);
->> +    for (i = 0; i < s->nb_redist_regions; i++) {
->> +        char *name = g_strdup_printf("gicv3_redist_region[%d]", i);
->> +
->> +        memory_region_init_io(&s->iomem_redist[i], OBJECT(s),
->> +                              ops ? &ops[1] : NULL, s, name,
->> +                              s->redist_region_count[i] * GICV3_REDIST_SIZE);
->> +        sysbus_init_mmio(sbd, &s->iomem_redist[i]);
->> +        g_free(name);
->> +    }
->>  }
->>  
->>  static void arm_gicv3_common_realize(DeviceState *dev, Error **errp)
->> @@ -363,6 +381,13 @@ static void arm_gicv3_common_realize(DeviceState *dev, Error **errp)
->>      }
->>  }
->>  
->> +static void arm_gicv3_finalize(Object *obj)
->> +{
->> +    GICv3State *s = ARM_GICV3_COMMON(obj);
->> +
->> +    g_free(s->redist_region_count);
->> +}
->> +
->>  static void arm_gicv3_common_reset(DeviceState *dev)
->>  {
->>      GICv3State *s = ARM_GICV3_COMMON(dev);
->> @@ -467,6 +492,8 @@ static Property arm_gicv3_common_properties[] = {
->>      DEFINE_PROP_UINT32("num-irq", GICv3State, num_irq, 32),
->>      DEFINE_PROP_UINT32("revision", GICv3State, revision, 3),
->>      DEFINE_PROP_BOOL("has-security-extensions", GICv3State, security_extn, 0),
->> +    DEFINE_PROP_ARRAY("redist-region-count", GICv3State, nb_redist_regions,
->> +                      redist_region_count, qdev_prop_uint32, uint32_t),
->>      DEFINE_PROP_END_OF_LIST(),
->>  };
->>  
->> @@ -488,6 +515,7 @@ static const TypeInfo arm_gicv3_common_type = {
->>      .instance_size = sizeof(GICv3State),
->>      .class_size = sizeof(ARMGICv3CommonClass),
->>      .class_init = arm_gicv3_common_class_init,
->> +    .instance_finalize = arm_gicv3_finalize,
->>      .abstract = true,
->>      .interfaces = (InterfaceInfo []) {
->>          { TYPE_ARM_LINUX_BOOT_IF },
->> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
->> index 46d9afb..ed7b719 100644
->> --- a/hw/intc/arm_gicv3_kvm.c
->> +++ b/hw/intc/arm_gicv3_kvm.c
->> @@ -770,7 +770,11 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->>          return;
->>      }
->>  
->> -    gicv3_init_irqs_and_mmio(s, kvm_arm_gicv3_set_irq, NULL);
->> +    gicv3_init_irqs_and_mmio(s, kvm_arm_gicv3_set_irq, NULL, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->>  
->>      for (i = 0; i < s->num_cpu; i++) {
->>          ARMCPU *cpu = ARM_CPU(qemu_get_cpu(i));
->> @@ -794,7 +798,8 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->>  
->>      kvm_arm_register_device(&s->iomem_dist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
->>                              KVM_VGIC_V3_ADDR_TYPE_DIST, s->dev_fd, 0);
->> -    kvm_arm_register_device(&s->iomem_redist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
->> +    kvm_arm_register_device(&s->iomem_redist[0], -1,
->> +                            KVM_DEV_ARM_VGIC_GRP_ADDR,
->>                              KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
->>  
->>      if (kvm_has_gsi_routing()) {
->> diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
->> index d75b49d..b798486 100644
->> --- a/include/hw/intc/arm_gicv3_common.h
->> +++ b/include/hw/intc/arm_gicv3_common.h
->> @@ -35,6 +35,8 @@
->>  #define GICV3_MAXIRQ 1020
->>  #define GICV3_MAXSPI (GICV3_MAXIRQ - GIC_INTERNAL)
->>  
->> +#define GICV3_REDIST_SIZE 0x20000
->> +
->>  /* Number of SGI target-list bits */
->>  #define GICV3_TARGETLIST_BITS 16
->>  
->> @@ -210,7 +212,9 @@ struct GICv3State {
->>      /*< public >*/
->>  
->>      MemoryRegion iomem_dist; /* Distributor */
->> -    MemoryRegion iomem_redist; /* Redistributors */
->> +    MemoryRegion *iomem_redist; /* Redistributor Regions */
->> +    uint32_t *redist_region_count; /* redistributor count within each region */
->> +    uint32_t nb_redist_regions; /* number of redist regions */
->>  
->>      uint32_t num_cpu;
->>      uint32_t num_irq;
->> @@ -292,6 +296,6 @@ typedef struct ARMGICv3CommonClass {
->>  } ARMGICv3CommonClass;
->>  
->>  void gicv3_init_irqs_and_mmio(GICv3State *s, qemu_irq_handler handler,
->> -                              const MemoryRegionOps *ops);
->> +                              const MemoryRegionOps *ops, Error **errp);
->>  
->>  #endif
->> -- 
->> 2.5.5
->>
->>
-> 
-> Thanks,
-> drew 
-> 
+diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
+index 53fdd5bb6450..fddcb1c054b3 100644
+--- a/include/hw/ppc/pnv_lpc.h
++++ b/include/hw/ppc/pnv_lpc.h
+@@ -68,6 +68,8 @@ typedef struct PnvLpcController {
+=20
+     /* PSI to generate interrupts */
+     PnvPsi *psi;
++
++    bool   primary;
+ } PnvLpcController;
+=20
+ qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type,
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 031488131629..b419d3323100 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -285,16 +285,6 @@ static void pnv_dt_chip(PnvChip *chip, void *fdt)
+=20
+     pnv_dt_xscom(chip, fdt, 0);
+=20
+-    /* The default LPC bus of a multichip system is on chip 0. It's
+-     * recognized by the firmware (skiboot) using a "primary"
+-     * property.
+-     */
+-    if (chip->chip_id =3D=3D 0x0) {
+-        int lpc_offset =3D pnv_chip_lpc_offset(chip, fdt);
+-
+-        _FDT((fdt_setprop(fdt, lpc_offset, "primary", NULL, 0)));
+-    }
+-
+     for (i =3D 0; i < chip->nr_cores; i++) {
+         PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
+=20
+@@ -814,9 +804,12 @@ static void pnv_chip_init(Object *obj)
+     object_property_add_const_link(OBJECT(&chip->occ), "psi",
+                                    OBJECT(&chip->psi), &error_abort);
+=20
+-    /* The LPC controller needs PSI to generate interrupts */
+-    object_property_add_const_link(OBJECT(&chip->lpc), "psi",
+-                                   OBJECT(&chip->psi), &error_abort);
++    /*
++     * The LPC controller needs a few things from the chip : to know
++     * if it's primary and PSI to generate interrupts
++     */
++    object_property_add_const_link(OBJECT(&chip->lpc), "chip",
++                                   OBJECT(chip), &error_abort);
+ }
+=20
+ static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index 402c4fefa886..1e70c8c19d52 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -113,6 +113,14 @@ static int pnv_lpc_dt_xscom(PnvXScomInterface *dev, =
+void *fdt, int xscom_offset)
+     _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 2)));
+     _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 1)));
+     _FDT((fdt_setprop(fdt, offset, "compatible", compat, sizeof(compat))=
+));
++
++    /*
++     * The default LPC bus of a multichip system is on chip 0. It's
++     * recognized by the firmware (skiboot) using a "primary" property.
++     */
++    if (PNV_LPC(dev)->primary) {
++        _FDT((fdt_setprop(fdt, offset, "primary", NULL, 0)));
++    }
+     return 0;
+ }
+=20
+@@ -416,6 +424,18 @@ static void pnv_lpc_realize(DeviceState *dev, Error =
+**errp)
+     PnvLpcController *lpc =3D PNV_LPC(dev);
+     Object *obj;
+     Error *error =3D NULL;
++    PnvChip *chip;
++
++    /* get PSI object from chip */
++    obj =3D object_property_get_link(OBJECT(dev), "chip", &error);
++    if (!obj) {
++        error_propagate(errp, error);
++        error_prepend(errp, "required link 'chip' not found: ");
++        return;
++    }
++    chip =3D PNV_CHIP(obj);
++    lpc->psi =3D &chip->psi;
++    lpc->primary =3D chip->chip_id =3D=3D 0;
+=20
+     /* Reg inits */
+     lpc->lpc_hc_fw_rd_acc_size =3D LPC_HC_FW_RD_4B;
+@@ -460,15 +480,6 @@ static void pnv_lpc_realize(DeviceState *dev, Error =
+**errp)
+     pnv_xscom_region_init(&lpc->xscom_regs, OBJECT(dev),
+                           &pnv_lpc_xscom_ops, lpc, "xscom-lpc",
+                           PNV_XSCOM_LPC_SIZE);
+-
+-    /* get PSI object from chip */
+-    obj =3D object_property_get_link(OBJECT(dev), "psi", &error);
+-    if (!obj) {
+-        error_setg(errp, "%s: required link 'psi' not found: %s",
+-                   __func__, error_get_pretty(error));
+-        return;
+-    }
+-    lpc->psi =3D PNV_PSI(obj);
+ }
+=20
+ static void pnv_lpc_class_init(ObjectClass *klass, void *data)
+--=20
+2.13.6
