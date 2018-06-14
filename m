@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fTNZH-0005Wk-FD
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:25:23 -0400
+	(envelope-from <lersek@redhat.com>) id 1fTNgX-0006zk-Fq
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:32:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fTNZD-0006rz-Bc
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:25:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58794 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fTNZD-0006rk-0C
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:25:15 -0400
-Date: Thu, 14 Jun 2018 09:25:09 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180614082509.GK6355@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1528933916-40670-1-git-send-email-keno@juliacomputing.com>
-	<20180614082355.GJ6355@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1fTNgW-0000eO-QX
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 04:32:49 -0400
+References: <20180613084149.14523-1-kraxel@redhat.com>
+	<20180613084149.14523-4-kraxel@redhat.com>
+	<20180613135047.5c1ce227@w520.home>
+	<20180613223625.lf6xkzgipzkfslit@sirius.home.kraxel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <c259c930-6082-cb2b-5adf-d8f6c9de7100@redhat.com>
+Date: Thu, 14 Jun 2018 10:32:40 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180613223625.lf6xkzgipzkfslit@sirius.home.kraxel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180614082355.GJ6355@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ui: darwin: gtk: Add missing input keymap
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 3/3] hw/vfio/display: add ramfb support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +26,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Keno Fischer <keno@juliacomputing.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Gerd Hoffmann <kraxel@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, libvir-list@redhat.com, Erik Skultety <eskultet@redhat.com>, Laine Stump <laine@redhat.com>
 
-CC'ing Gerd as ui/ tree maintainer.
+On 06/14/18 00:36, Gerd Hoffmann wrote:
+> On Wed, Jun 13, 2018 at 01:50:47PM -0600, Alex Williamson wrote:
 
-On Thu, Jun 14, 2018 at 09:23:55AM +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Jun 13, 2018 at 07:51:56PM -0400, Keno Fischer wrote:
-> > In appears the input keymap for osx was forgotten in the commit that
-> > converted the gtk frontend to keycodemapdb. Add it.
-> >=20
-> > Fixes: 2ec78706 ("ui: convert GTK and SDL1 frontends to keycodemapdb"=
-)
-> > CC: Daniel P. Berrange <berrange@redhat.com>
-> > Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-> > ---
-> >  Makefile           | 1 +
-> >  include/ui/input.h | 3 +++
-> >  ui/input-keymap.c  | 1 +
-> >  3 files changed, 5 insertions(+)
->=20
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->=20
-> I guess this shows just how (in-)frequently people try to compile the G=
-TK
-> frontend on OS-X :-(
->=20
-> >=20
-> > diff --git a/Makefile b/Makefile
-> > index 6a5fff0..1e79914 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -322,6 +322,7 @@ KEYCODEMAP_FILES =3D \
-> >  		 ui/input-keymap-xorgkbd-to-qcode.c \
-> >  		 ui/input-keymap-xorgxquartz-to-qcode.c \
-> >  		 ui/input-keymap-xorgxwin-to-qcode.c \
-> > +		 ui/input-keymap-osx-to-qcode.c \
-> >  		 $(NULL)
-> > =20
-> >  GENERATED_FILES +=3D $(KEYCODEMAP_FILES)
-> > diff --git a/include/ui/input.h b/include/ui/input.h
-> > index 16395ab..34ebc67 100644
-> > --- a/include/ui/input.h
-> > +++ b/include/ui/input.h
-> > @@ -116,4 +116,7 @@ extern const guint16 qemu_input_map_xorgxquartz_t=
-o_qcode[];
-> >  extern const guint qemu_input_map_xorgxwin_to_qcode_len;
-> >  extern const guint16 qemu_input_map_xorgxwin_to_qcode[];
-> > =20
-> > +extern const guint qemu_input_map_osx_to_qcode_len;
-> > +extern const guint16 qemu_input_map_osx_to_qcode[];
-> > +
-> >  #endif /* INPUT_H */
-> > diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-> > index 87cc301..db5ccff 100644
-> > --- a/ui/input-keymap.c
-> > +++ b/ui/input-keymap.c
-> > @@ -21,6 +21,7 @@
-> >  #include "ui/input-keymap-xorgkbd-to-qcode.c"
-> >  #include "ui/input-keymap-xorgxquartz-to-qcode.c"
-> >  #include "ui/input-keymap-xorgxwin-to-qcode.c"
-> > +#include "ui/input-keymap-osx-to-qcode.c"
-> > =20
-> >  int qemu_input_linux_to_qcode(unsigned int lnx)
-> >  {
-> > --=20
-> > 2.8.1
-> >=20
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
->=20
+>> I suppose in the UEFI case runtime services can be used to continue
+>> writing this display,
+> 
+> Yes.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Small clarification for the wording -- "UEFI runtime services" do not
+include anything display- or graphics-related. Instead, the OS kernel
+may inherit the framebuffer properties (base address, size, pixel
+format), and continue accessing the framebuffer directly.
+
+Thanks
+Laszlo
