@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbL-0005q9-S4
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbO-0005tX-Mm
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbK-0003TK-Qv
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbK-0003Tc-Ru
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:22 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 15 Jun 2018 16:20:43 +0200
-Message-Id: <20180615142108.27814-2-kwolf@redhat.com>
+Date: Fri, 15 Jun 2018 16:20:45 +0200
+Message-Id: <20180615142108.27814-4-kwolf@redhat.com>
 In-Reply-To: <20180615142108.27814-1-kwolf@redhat.com>
 References: <20180615142108.27814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 01/26] qemu-img: Fix assert when mapping
- unaligned raw file
+Subject: [Qemu-devel] [PULL 03/26] jobs: fix stale wording
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +22,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-From: Eric Blake <eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
 
-Commit a290f085 exposed a latent bug in qemu-img map introduced
-during the conversion of block status to be byte-based.  Earlier in
-commit 5e344dd8, the internal interface get_block_status() switched
-to take byte-based parameters, but still called a sector-based
-block layer function; as such, rounding was added in the lone
-caller to obey the contract.  However, commit 237d78f8 changed
-get_block_status() to truly be byte-based, at which point rounding
-to sector boundaries can result in calling bdrv_block_status() with
-'bytes == 0' (a coding error) when the boundary between data and a
-hole falls mid-sector (true for the past-EOF implicit hole present
-in POSIX files).  Fix things by removing the rounding that is now
-no longer necessary.
+During the design for manual completion, we decided not to use the
+"manual" property as a shorthand for both auto-dismiss and auto-finalize.
 
-See also https://bugzilla.redhat.com/1589738
+Fix the wording.
 
-Fixes: 237d78f8
-Reported-by: Dan Kenigsberg <danken@redhat.com>
-Reported-by: Nir Soffer <nsoffer@redhat.com>
-Reported-by: Maor Lipchuk <mlipchuk@redhat.com>
-CC: qemu-stable@nongnu.org
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qemu-img.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ qapi/job.json | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 1dcdd47254..e1a506f7f6 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -2906,7 +2906,7 @@ static int img_map(int argc, char **argv)
-         int64_t n;
- 
-         /* Probe up to 1 GiB at a time.  */
--        n = QEMU_ALIGN_DOWN(MIN(1 << 30, length - offset), BDRV_SECTOR_SIZE);
-+        n = MIN(1 << 30, length - offset);
-         ret = get_block_status(bs, offset, n, &next);
- 
-         if (ret < 0) {
+diff --git a/qapi/job.json b/qapi/job.json
+index 17d10037c4..226443594b 100644
+--- a/qapi/job.json
++++ b/qapi/job.json
+@@ -50,16 +50,17 @@
+ #           the last job in a transaction.
+ #
+ # @pending: The job has finished its work, but has finalization steps that it
+-#           needs to make prior to completing. These changes may require
+-#           manual intervention by the management process if manual was set
+-#           to true. These changes may still fail.
++#           needs to make prior to completing. These changes will require
++#           manual intervention via @job-finalize if auto-finalize was set to
++#           false. These pending changes may still fail.
+ #
+ # @aborting: The job is in the process of being aborted, and will finish with
+ #            an error. The job will afterwards report that it is @concluded.
+ #            This status may not be visible to the management process.
+ #
+-# @concluded: The job has finished all work. If manual was set to true, the job
+-#             will remain in the query list until it is dismissed.
++# @concluded: The job has finished all work. If auto-dismiss was set to false,
++#             the job will remain in the query list until it is dismissed via
++#             @job-dismiss.
+ #
+ # @null: The job is in the process of being dismantled. This state should not
+ #        ever be visible externally.
 -- 
 2.13.6
