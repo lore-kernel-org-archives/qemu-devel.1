@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTpif-0004cH-Ip
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:28:54 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fTpii-0004fg-RF
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:28:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTpie-00016e-C3
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:28:53 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fTpih-0001CR-NP
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:28:56 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 15 Jun 2018 16:28:23 +0200
-Message-Id: <1529072910-16156-5-git-send-email-eric.auger@redhat.com>
+Date: Fri, 15 Jun 2018 16:28:26 +0200
+Message-Id: <1529072910-16156-8-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1529072910-16156-1-git-send-email-eric.auger@redhat.com>
 References: <1529072910-16156-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 04/11] hw/intc/arm_gicv3_kvm: Get prepared
- to handle multiple redist regions
+Subject: [Qemu-devel] [PATCH v2 07/11] hw/arm/virt: Register two
+ redistributor regions when necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,91 +23,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
 Cc: drjones@redhat.com, wei@redhat.com, zhaoshenglong@huawei.com, lersek@redhat.com, ard.biesheuvel@linaro.org, christoffer.dall@arm.com, marc.zyngier@arm.com
 
-Let's check if KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION is supported.
-If not, we check the number of redist region is equal to 1 and use the
-legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute. Otherwise we use
-the new attribute and allow to register multiple regions to the
-KVM device.
+With a VGICv3 KVM device, if the number of vcpus exceeds the
+capacity of the legacy redistributor region (123 redistributors),
+we now attempt to register a second redistributor region. Up to
+512 redistributors can fit in this latter on top of the 123 allowed
+by the legacy redistributor region.
+
+Registering this second redistributor region is possible if the
+host kernel supports the following VGICv3 KVM device group/attribute:
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION.
+
+In case the host kernel does not support the registration of several
+redistributor regions and the requested number of vcpus exceeds the
+capacity of the legacy redistributor region, the GICv3 device
+initialization fails with a proper error message and qemu exits.
+
+At the moment the max number of vcpus still is capped by the
+virt machine class max_cpus.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 ---
-
-v1 (virt3.0)-> v2
-- added a comment to explain why the regions are registered in
-  reverse order
 
 v2 -> v3:
-- In kvm_arm_gicv3_realize rename val into add_ormask local variable and
-  add a comment
-- start the redist region registration  from s->nb_redist_regions - 1
-  downwards
+- remove spare space
 ---
- hw/intc/arm_gicv3_kvm.c | 37 ++++++++++++++++++++++++++++++++++---
- 1 file changed, 34 insertions(+), 3 deletions(-)
+ hw/arm/virt.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index ed7b719..5cb94fc 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -753,6 +753,7 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
- {
-     GICv3State *s = KVM_ARM_GICV3(dev);
-     KVMARMGICv3Class *kgc = KVM_ARM_GICV3_GET_CLASS(s);
-+    bool multiple_redist_region_allowed;
-     Error *local_err = NULL;
-     int i;
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index d9f72eb..936cb3a 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -528,6 +528,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+     SysBusDevice *gicbusdev;
+     const char *gictype;
+     int type = vms->gic_version, i;
++    uint32_t nb_redist_regions = 0;
  
-@@ -789,6 +790,18 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
-         return;
-     }
+     gictype = (type == 3) ? gicv3_class_name() : gic_class_name();
  
-+    multiple_redist_region_allowed =
-+        kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+                              KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION);
-+
-+    if (!multiple_redist_region_allowed && s->nb_redist_regions > 1) {
-+        error_setg(errp, "Multiple VGICv3 redistributor regions are not "
-+                   "supported by this host kernel");
-+        error_append_hint(errp, "A maximum of %d VCPUs can be used",
-+                          s->redist_region_count[0]);
-+        return;
-+    }
-+
-     kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
-                       0, &s->num_irq, true, &error_abort);
+@@ -547,14 +548,28 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+                     vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+         uint32_t redist0_count = MIN(smp_cpus, redist0_capacity);
  
-@@ -798,9 +811,27 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
- 
-     kvm_arm_register_device(&s->iomem_dist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
-                             KVM_VGIC_V3_ADDR_TYPE_DIST, s->dev_fd, 0);
--    kvm_arm_register_device(&s->iomem_redist[0], -1,
--                            KVM_DEV_ARM_VGIC_GRP_ADDR,
--                            KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
+-        qdev_prop_set_uint32(gicdev, "len-redist-region-count", 1);
++        nb_redist_regions = virt_gicv3_redist_region_count(vms);
 +
-+    if (!multiple_redist_region_allowed) {
-+        kvm_arm_register_device(&s->iomem_redist[0], -1,
-+                                KVM_DEV_ARM_VGIC_GRP_ADDR,
-+                                KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
-+    } else {
-+        /* we register regions in reverse order as "devices" are inserted at
-+         * the head of a QSLIST and the list is then popped from the head
-+         * onwards by kvm_arm_machine_init_done()
-+         */
-+        for (i = s->nb_redist_regions - 1; i >= 0; i--) {
-+            /* Address mask made of the rdist region index and count */
-+            uint64_t addr_ormask =
-+                        i | ((uint64_t)s->redist_region_count[i] << 52);
++        qdev_prop_set_uint32(gicdev, "len-redist-region-count",
++                             nb_redist_regions);
+         qdev_prop_set_uint32(gicdev, "redist-region-count[0]", redist0_count);
 +
-+            kvm_arm_register_device(&s->iomem_redist[i], -1,
-+                                    KVM_DEV_ARM_VGIC_GRP_ADDR,
-+                                    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION,
-+                                    s->dev_fd, addr_ormask);
++        if (nb_redist_regions == 2) {
++            uint32_t redist1_capacity =
++                        vms->memmap[VIRT_GIC_REDIST2].size / GICV3_REDIST_SIZE;
++
++            qdev_prop_set_uint32(gicdev, "redist-region-count[1]",
++                MIN(smp_cpus - redist0_count, redist1_capacity));
 +        }
-+    }
- 
-     if (kvm_has_gsi_routing()) {
-         /* set up irq routing */
+     }
+     qdev_init_nofail(gicdev);
+     gicbusdev = SYS_BUS_DEVICE(gicdev);
+     sysbus_mmio_map(gicbusdev, 0, vms->memmap[VIRT_GIC_DIST].base);
+     if (type == 3) {
+         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_REDIST].base);
++        if (nb_redist_regions == 2) {
++            sysbus_mmio_map(gicbusdev, 2, vms->memmap[VIRT_GIC_REDIST2].base);
++        }
+     } else {
+         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
+     }
+@@ -1350,6 +1365,7 @@ static void machvirt_init(MachineState *machine)
+      */
+     if (vms->gic_version == 3) {
+         virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
++        virt_max_cpus += vms->memmap[VIRT_GIC_REDIST2].size / GICV3_REDIST_SIZE;
+     } else {
+         virt_max_cpus = GIC_NCPU;
+     }
 -- 
 2.5.5
