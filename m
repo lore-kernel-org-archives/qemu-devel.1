@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbQ-0005w0-Sl
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbQ-0005w2-Th
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbP-0003Zy-SQ
+	(envelope-from <kwolf@redhat.com>) id 1fTpbP-0003Zr-Pw
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:24 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 15 Jun 2018 16:20:47 +0200
-Message-Id: <20180615142108.27814-6-kwolf@redhat.com>
+Date: Fri, 15 Jun 2018 16:20:48 +0200
+Message-Id: <20180615142108.27814-7-kwolf@redhat.com>
 In-Reply-To: <20180615142108.27814-1-kwolf@redhat.com>
 References: <20180615142108.27814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 05/26] rbd: Drop deprecated -drive parameter
+Subject: [Qemu-devel] [PULL 06/26] iscsi: Drop deprecated -drive parameter
  "filename"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,27 +25,41 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Markus Armbruster <armbru@redhat.com>
 
-Parameter "filename" is deprecated since commit 91589d9e5ca, v2.10.0.
+Parameter "filename" is deprecated since commit 5c3ad1a6a8f, v2.10.0.
 Time to get rid of it.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/rbd.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+ block/iscsi.c | 23 ++---------------------
+ 1 file changed, 2 insertions(+), 21 deletions(-)
 
-diff --git a/block/rbd.c b/block/rbd.c
-index a16431e267..40c6e4185f 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -632,25 +632,9 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
-     QObject *crumpled = NULL;
-     const QDictEntry *e;
+diff --git a/block/iscsi.c b/block/iscsi.c
+index c2fbd8a8aa..7e3ea72bd2 100644
+--- a/block/iscsi.c
++++ b/block/iscsi.c
+@@ -1713,10 +1713,6 @@ static QemuOptsList runtime_opts = {
+             .name = "timeout",
+             .type = QEMU_OPT_NUMBER,
+         },
+-        {
+-            .name = "filename",
+-            .type = QEMU_OPT_STRING,
+-        },
+         { /* end of list */ }
+     },
+ };
+@@ -1756,27 +1752,12 @@ static int iscsi_open(BlockDriverState *bs, QDict *options, int flags,
+     char *initiator_name = NULL;
+     QemuOpts *opts;
      Error *local_err = NULL;
--    const char *filename;
-     char *keypairs, *secretid;
-     int r;
+-    const char *transport_name, *portal, *target, *filename;
++    const char *transport_name, *portal, *target;
+ #if LIBISCSI_API_VERSION >= (20160603)
+     enum iscsi_transport_type transport;
+ #endif
+     int i, ret = 0, timeout = 0, lun;
  
 -    /* If we are given a filename, parse the filename, with precedence given to
 -     * filename encoded options */
@@ -54,16 +68,25 @@ index a16431e267..40c6e4185f 100644
 -        warn_report("'filename' option specified. "
 -                    "This is an unsupported option, and may be deprecated "
 -                    "in the future");
--        qemu_rbd_parse_filename(filename, options, &local_err);
--        qdict_del(options, "filename");
+-        iscsi_parse_filename(filename, options, &local_err);
 -        if (local_err) {
+-            ret = -EINVAL;
 -            error_propagate(errp, local_err);
--            return -EINVAL;
+-            goto exit;
 -        }
 -    }
 -
-     keypairs = g_strdup(qdict_get_try_str(options, "=keyvalue-pairs"));
-     if (keypairs) {
-         qdict_del(options, "=keyvalue-pairs");
+     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
+     qemu_opts_absorb_qdict(opts, options, &local_err);
+     if (local_err) {
+@@ -2006,7 +1987,7 @@ out:
+         }
+         memset(iscsilun, 0, sizeof(IscsiLun));
+     }
+-exit:
++
+     return ret;
+ }
+ 
 -- 
 2.13.6
