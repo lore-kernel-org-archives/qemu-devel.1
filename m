@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fTtgt-0002MA-No
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 14:43:21 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fTtiF-0003U2-AT
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 14:44:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fTtgq-0003Ft-JK
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 14:43:19 -0400
-References: <f9a9b5bb-4941-a6b3-ff6b-02ab2cb046df@virtuozzo.com>
-	<20180614104656.GD8564@localhost.localdomain>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <8114a2a4-8bd1-809e-44c2-f3c8fb52b773@virtuozzo.com>
-Date: Fri, 15 Jun 2018 21:42:59 +0300
+	(envelope-from <ehabkost@redhat.com>) id 1fTtiC-000484-6f
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 14:44:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5513)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTtiB-00046p-Tc
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 14:44:40 -0400
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.phx2.redhat.com
+	[10.5.11.25])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7466230C10E7
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 18:44:38 +0000 (UTC)
+Date: Fri, 15 Jun 2018 15:44:34 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180615184434.GD7451@localhost.localdomain>
+References: <20180608130846.22234-1-dgilbert@redhat.com>
+	<20180608130846.22234-6-dgilbert@redhat.com>
+	<87y3flilan.fsf@dusky.pond.sub.org> <20180611174958.GP2661@work-vm>
+	<20180612053720.pp2xvb7r34o6ort7@sirius.home.kraxel.org>
+	<87k1r4use2.fsf@dusky.pond.sub.org> <20180612125254.GB2512@work-vm>
+	<878t7gxc6v.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180614104656.GD8564@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] bug in reopen arch
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878t7gxc6v.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] Abandon our QMP first policy? (was: [PATCH v3 5/7]
+ hmp: Add info commands for preconfig)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,211 +38,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org, imammedo@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-14.06.2018 13:46, Kevin Wolf wrote:
-> Am 12.06.2018 um 20:57 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> Hi all!
->>
->> I've faced the following problem:
->>
->>  =C2=A0=C2=A0=C2=A0 1. create image with dirty bitmap, a.qcow2 (start qe=
-mu and run qmp
->>  =C2=A0=C2=A0=C2=A0 command block-dirty-bitmap-add)
->>
->>  =C2=A0=C2=A0=C2=A0 2. run the following commands:
->>
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu-img create -f qcow2 -b =
-a.qcow2 b.qcow2 10M
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu-io -c 'write 0 512' b.q=
-cow2
->>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu-img commit b.qcow2
->>
->>  =C2=A0=C2=A0=C2=A0 3. last command fails with the following output:
->>
->> Formatting 'b.qcow2', fmt=3Dqcow2 size=3D68719476736 backing_file=3Da.qc=
-ow2
->> cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
->> wrote 512/512 bytes at offset 0
->> 512 bytes, 1 ops; 0.0953 sec (5.243 KiB/sec and 10.4867 ops/sec)
->> qemu-img: #block397: Failed to make dirty bitmaps writable: Can't update
->> bitmap directory: Operation not permitted
->> qemu-img: Block job failed: Operation not permitted
->>
->> And problem is that children are reopened _after_ parent. But qcow2 reop=
-en
->> needs write access to its file, to write IN_USE flag to dirty-bitmaps
->> extension.
-> I was aware of a different instance of this problem: Assume a qcow2
-> image with an unknown autoclear flag (so it will be cleared on r/w
-> open), which is first opened r/o and then reopened r/w. This will fail
-> because .bdrv_reopen_prepare doesn't have the permissions yet.
+On Fri, Jun 15, 2018 at 06:10:48PM +0200, Markus Armbruster wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+> 
+> > * Markus Armbruster (armbru@redhat.com) wrote:
+> >> Gerd Hoffmann <kraxel@redhat.com> writes:
+> >> 
+> >> >   Hi,
+> >> >
+> >> >> > Now let's review the three commands:
+> >> >> > 
+> >> >> > * Gerd, why does "info usbhost" have no QMP equivalent?
+> >> >
+> >> > Works only when running qemu directly, in the libvirt sandbox qemu
+> >> > hasn't the permissions needed to scan the host usb bus so that would be
+> >> > rather pointless ...
+> >> 
+> >> I don't think this meets either of the two criteria:
+> >> 
+> >> * I meets "makes no sense in QMP" only if QMP implies "can't scan host
+> >>   USB bus".  Libvirt implies it, but QMP doesn't imply libvirt; it's its
+> >>   most important, not its sole user.
+> >> 
+> >> * It meets "of use only for human users" only if we're convinced it's of
+> >>   no use to programs.
+> >> 
+> >>   To avoid speculation and endless arguments about what could or could
+> >>   not be of use, we've always stuck to "when in doubt, assume it could
+> >>   be of use".
+> >> 
+> >>   "Libvirt can't use it" falls short.
+> >> 
+> >>   "Any management application worth anything would deny QEMU the
+> >>   capability to scan the USB host bus, and thus wouldn't be able to use
+> >>   it" is exactly the argument we intended to avoid.
+> >> 
+> >> QMP falling short of completeness in relatively unimportant ways like
+> >> this one isn't exactly terrible.  The most serious effect is probably
+> >> serving as a bad example that leads to further arguments like this one.
+> >> These are well worth avoiding, though.
+> >
+> > Markus:
+> >   a) This is a separate discussion; info usbhost has been there for many
+> > years;  this patch set doesn't change that.
+> 
+> Yes, it's separate.
+> 
+> >   b) From HMP, if someone wants to add a command like 'info usbhost' to
+> > make their debugging of USB easy, then HMP is all for that and there's
+> > no way I'm going to require QMP implementations for a debug command.
+> 
+> As I said before, said someone is welcome to make his case for why the
+> command is of use only for human users in the commit message.
+> 
+> If the QMP maintainer gets a say in judging that case, good.
+> 
+> But if your "no way" means what I have to assume it means, namely "no
+> way I'm taking no for an answer", then we're at an impasse.
 
-Hm.. If I understand correctly qcow2_reopen_prepare doesn't deal with=C2=A0=
-=20
-autoclear flags, as it doesn't call qcow2_do_open.
+Is this really an impasse?  Dave says he isn't going to require
+QMP implementations of debug commands.  Isn't a debug command
+just for humans, by definition?
 
->
-> Simply changing the order won't fix this because in the r/w -> r/o, the
-> driver will legitimately flush its caches in .bdrv_reopen_prepare, and
-> for this it still needs to be able to write.
->
-> We may need to have a way for nodes to access both the old and the new
-> state of their children. I'm not completely sure how to achieve this
-> best, though.
->
-> When I thought only of permissions, the obvious and simple thing to do
-> was to just get combined permissions for the old and new state, i.e.
-> 'old_perm | new_perm' and 'old_shared & new_shared'. But I don't think
-> this is actually enough when the child node switches between a r/w and
-> a r/o file descriptor because even though QEMU's permission system would
-> allow the write, you still can't successfully write to a r/o file
-> descriptor.
->
-> Kevin
-
-Maybe we want two .bdrv_reopen_prepare:=20
-.bdrv_reopen_prepare_before_children and=20
-.bdrv_reopen_prepare_after_children. But to write something in=20
-reopen_prepare, we need to move bdrv_set_perm from reopen_commit to=20
-reopen_prepare.. Is it possible?
-
-Now, I've found the following workaround, what do you think about=20
-something like this as a temporary fix:
-
-diff --git a/include/block/block.h b/include/block/block.h
-index e677080c4e..c21392491d 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -266,7 +266,8 @@ BlockDriverState *bdrv_new_open_driver(BlockDriver=20
-*drv, const char *node_name,
- =C2=A0BlockReopenQueue *bdrv_reopen_queue(BlockReopenQueue *bs_queue,
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Block=
-DriverState *bs,
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QDict=
- *options, int flags);
--int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue,=20
-Error **errp);
-+int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue,
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bo=
-ol cheat_reopen_rw, Error **errp);
- =C2=A0int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp);
- =C2=A0int bdrv_reopen_prepare(BDRVReopenState *reopen_state,
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Bl=
-ockReopenQueue *queue, Error **errp);
-diff --git a/block.c b/block.c
-index 50887087f3..9b50828cd2 100644
---- a/block.c
-+++ b/block.c
-@@ -2988,7 +2988,8 @@ BlockReopenQueue=20
-*bdrv_reopen_queue(BlockReopenQueue *bs_queue,
- =C2=A0 * All affected nodes must be drained between bdrv_reopen_queue() an=
-d
- =C2=A0 * bdrv_reopen_multiple().
- =C2=A0 */
--int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue,=20
-Error **errp)
-+int bdrv_reopen_multiple(AioContext *ctx, BlockReopenQueue *bs_queue,
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bo=
-ol cheat_reopen_rw, Error **errp)
- =C2=A0{
- =C2=A0=C2=A0=C2=A0=C2=A0 int ret =3D -1;
- =C2=A0=C2=A0=C2=A0=C2=A0 BlockReopenQueueEntry *bs_entry, *next;
-@@ -3005,6 +3006,14 @@ int bdrv_reopen_multiple(AioContext *ctx,=20
-BlockReopenQueue *bs_queue, Error **er
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs_entry->prepared =3D tr=
-ue;
- =C2=A0=C2=A0=C2=A0=C2=A0 }
-
-+=C2=A0=C2=A0=C2=A0 if (cheat_reopen_rw) {
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* reverse queue, to reopen chi=
-ldren first */
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QSIMPLEQ_FOREACH_SAFE(bs_entry,=
- bs_queue, entry, next) {
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QSIMPLE=
-Q_REMOVE(bs_queue, bs_entry, BlockReopenQueueEntry,=20
-entry);
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 QSIMPLE=
-Q_INSERT_HEAD(bs_queue, bs_entry, entry);
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-+=C2=A0=C2=A0=C2=A0 }
-+
- =C2=A0=C2=A0=C2=A0=C2=A0 /* If we reach this point, we have success and ju=
-st need to apply the
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * changes
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-@@ -3036,11 +3045,13 @@ int bdrv_reopen(BlockDriverState *bs, int=20
-bdrv_flags, Error **errp)
- =C2=A0=C2=A0=C2=A0=C2=A0 int ret =3D -1;
- =C2=A0=C2=A0=C2=A0=C2=A0 Error *local_err =3D NULL;
- =C2=A0=C2=A0=C2=A0=C2=A0 BlockReopenQueue *queue;
-+=C2=A0=C2=A0=C2=A0 bool cheat_reopen_rw =3D bdrv_is_read_only(bs) && (bdrv=
-_flags &=20
-BDRV_O_RDWR);
-
- =C2=A0=C2=A0=C2=A0=C2=A0 bdrv_subtree_drained_begin(bs);
-
- =C2=A0=C2=A0=C2=A0=C2=A0 queue =3D bdrv_reopen_queue(NULL, bs, NULL, bdrv_=
-flags);
--=C2=A0=C2=A0=C2=A0 ret =3D bdrv_reopen_multiple(bdrv_get_aio_context(bs), =
-queue,=20
-&local_err);
-+=C2=A0=C2=A0=C2=A0 ret =3D bdrv_reopen_multiple(bdrv_get_aio_context(bs), =
-queue,=20
-cheat_reopen_rw,
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &local_err);
- =C2=A0=C2=A0=C2=A0=C2=A0 if (local_err !=3D NULL) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_propagate(errp, loc=
-al_err);
- =C2=A0=C2=A0=C2=A0=C2=A0 }
-diff --git a/block/replication.c b/block/replication.c
-index 826db7b304..e528969e2b 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -411,7 +411,7 @@ static void reopen_backing_file(BlockDriverState=20
-*bs, bool writable,
-
- =C2=A0=C2=A0=C2=A0=C2=A0 if (reopen_queue) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_reopen_multiple(bdrv=
-_get_aio_context(bs),
--=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 reopen_queue, &local_err);
-+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 reopen_queue, false, &local_err);
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_propagate(errp, loc=
-al_err);
- =C2=A0=C2=A0=C2=A0=C2=A0 }
-
-diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-index 5bf5f28178..e0c4de323c 100644
---- a/qemu-io-cmds.c
-+++ b/qemu-io-cmds.c
-@@ -2051,7 +2051,7 @@ static int reopen_f(BlockBackend *blk, int argc,=20
-char **argv)
-
- =C2=A0=C2=A0=C2=A0=C2=A0 bdrv_subtree_drained_begin(bs);
- =C2=A0=C2=A0=C2=A0=C2=A0 brq =3D bdrv_reopen_queue(NULL, bs, opts, flags);
--=C2=A0=C2=A0=C2=A0 bdrv_reopen_multiple(bdrv_get_aio_context(bs), brq, &lo=
-cal_err);
-+=C2=A0=C2=A0=C2=A0 bdrv_reopen_multiple(bdrv_get_aio_context(bs), brq, fal=
-se, &local_err);
- =C2=A0=C2=A0=C2=A0=C2=A0 bdrv_subtree_drained_end(bs);
-
- =C2=A0=C2=A0=C2=A0=C2=A0 if (local_err) {
+(Which I think is true in the specific case of "info usbhost",
+because it's really just a wrapper around libusb.  I'm 100% sure
+QEMU doesn't need to provide a QMP interface for libusb.)
 
 
---=20
-Best regards,
-Vladimir
+
+> 
+> Evolving HMP without consideration for QMP's mission makes carrying out
+> that mission harder.  Specifically, me having to watch for new HMP
+> commands bypassing QMP, then judge and maybe debate whether that's okay
+> is beyond my capacity.  The debate part in particular.  I expect to fail
+> as a QMP maintainer in that case.
+
+What's QMP mission, exactly?
+
+Do we have any signs of HMP evolving without consideration for
+QMP's mission, recently?
+
+Would it help if the HMP maintainer makes sure commit messages or
+comments document more clearly why a QMP equivalent is not
+necessary?
+
+
+> 
+> Avoiding QMP maintenance balloon out of control was one of our reasons
+> for the rule "HMP commands must be implemented in terms of QMP".  We pay
+> a modest amount of extra developer effort for a much-needed
+> simplification of the maintainers' job.
+
+I don't understand why "HMP commands must be implemented in terms
+of QMP" helps avoiding QMP maintenance to balloon out of control.
+My impression is that it's the opposite.
+
+I fail to see the benefits of that policy.  What exactly is the
+goal here?
+
+
+> 
+> Regarding "modest amount of effort": I already told you I'm prepared to
+> back that claim with patches whenever requiring QMP blocks HMP patches.
+> If that can't shake your conviction that requiring QMP is impractical, I
+> figure nothing will.
+> 
+> Ways out of the impasse:
+> 
+> 1. Find a more capable maintainer for QMP (MAINTAINERS sections QMP and
+> QAPI Schema).  To give you an idea of the work involved, almost 10% of
+> the commits in 2.9 touched the latter.
+> 
+> 2. Split the work differently: make the HMP maintainer responsible for
+> keeping QMP complete.
+
+This sounds like a reasonable way to split responsibilities, to
+me.
+
+
+> 
+> 3. Abandon QMP's goal to be complete.  Tell management applications to
+> use HMP where QMP falls short.
+
+What "complete" means here?  Why would we ever tell management
+applications to use HMP?  We can always implement new QMP
+commands if management applications need them.
+
+
+> 
+> To be brutally frank, 2. requires more trust in your willingness to care
+> about QMP than I have right now.
+> 
+> By refusing to cooperate, you can force 3.
+> 
+> The solution most conducive to my personal well-being is probably 1.
+> 
+> Any other bright ideas?
+> 
+> Separate discussion, does not block this series.
+
+-- 
+Eduardo
