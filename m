@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTovs-0006rb-1E
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:38:29 -0400
+	(envelope-from <clg@kaod.org>) id 1fToy4-0007hv-MY
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:40:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTovn-0003cX-S7
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:38:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54106 helo=mx1.redhat.com)
+	(envelope-from <clg@kaod.org>) id 1fToxz-00058L-G7
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:40:44 -0400
+Received: from 7.mo173.mail-out.ovh.net ([46.105.44.159]:57449)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fTovn-0003cK-MM
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:38:23 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1528905228-25694-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1528905228-25694-2-git-send-email-anton.nefedov@virtuozzo.com>
-	<87sh5pomxj.fsf@dusky.pond.sub.org>
-	<d6d3f6ec-3d6b-99b7-8e09-8b3072355916@virtuozzo.com>
-Date: Fri, 15 Jun 2018 15:38:21 +0200
-In-Reply-To: <d6d3f6ec-3d6b-99b7-8e09-8b3072355916@virtuozzo.com> (Anton
-	Nefedov's message of "Thu, 14 Jun 2018 12:01:21 +0300")
-Message-ID: <87602k186q.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fToxh-0004rf-AV
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:40:39 -0400
+Received: from player692.ha.ovh.net (unknown [10.109.122.124])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 92EB4C5B57
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 15:40:19 +0200 (CEST)
+References: <20180614140043.9231-1-clg@kaod.org>
+	<20180614140043.9231-2-clg@kaod.org>
+	<20180615023850.GJ4129@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <75baf432-14e5-d6ff-b53f-f0ad76f18dba@kaod.org>
+Date: Fri, 15 Jun 2018 15:40:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] qapi: allow empty branches in flat
- unions
+In-Reply-To: <20180615023850.GJ4129@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/6] ppc/pnv: introduce a 'primary' field
+ under the LPC model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,152 +33,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Anton Nefedov <anton.nefedov@virtuozzo.com> writes:
+On 06/15/2018 04:38 AM, David Gibson wrote:
+> On Thu, Jun 14, 2018 at 04:00:38PM +0200, C=E9dric Le Goater wrote:
+>> When a PowerNV system is started, the firmware (skiboot) looks for a
+>> "primary" property to determine which LPC bus is the default on a
+>> multichip system. This property is currently populated in the main
+>> routine creating the device tree of a chip, which is the not the right
+>> place to do so.
+>>
+>> Check the chip id to flag the LPC controller as "primary", or not, and
+>> use that to add the property in the LPC device tree routine.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>=20
+> This doesn't seem particularly useful to me.  Is there ever likely to
+> be a case where we want the primary LPC to be something other than the
+> one on chip 0?
+>=20
+> If not, we seem to be just creating properties and states and a bunch
+> of stuff just to cache a (chip# =3D=3D 0) test.
 
-> On 14/6/2018 10:19 AM, Markus Armbruster wrote:
->> Anton Nefedov <anton.nefedov@virtuozzo.com> writes:
->>
->>> It often happens that just a few discriminator values imply extra data in
->>> a flat union. Existing checks did not make possible to leave other values
->>> uncovered. Such cases had to be worked around by either stating a dummy
->>> (empty) type or introducing another (subset) discriminator enumeration.
->>>
->>> Both options create redundant entities in qapi files for little profit.
->>>
->>> With this patch it is not necessary anymore to add designated union
->>> fields for every possible value of a discriminator enumeration.
->>>
->>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
-[...]
->>> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
->>> index 2462fc0..0f3d89b 100644
->>> --- a/scripts/qapi/common.py
->>> +++ b/scripts/qapi/common.py
->>> @@ -779,13 +779,6 @@ def check_union(expr, info):
->>>                                      "enum '%s'"
->>>                                      % (key, enum_define['enum']))
->>>   -    # If discriminator is user-defined, ensure all values are
->>> covered
->>> -    if enum_define:
->>> -        for value in enum_define['data']:
->>> -            if value not in members.keys():
->>> -                raise QAPISemError(info, "Union '%s' data missing '%s' branch"
->>> -                                   % (name, value))
->>> -
->>>     def check_alternate(expr, info):
->>>       name = expr['alternate']
->>> @@ -1644,6 +1637,10 @@ class QAPISchema(object):
->>>           if tag_name:
->>>               variants = [self._make_variant(key, value)
->>>                           for (key, value) in data.items()]
->>> +            # branches that are not explicitly covered get an empty type
->>> +            variants += [self._make_variant(key, 'q_empty')
->>> +                         for key in discriminator_find_enum_define(expr)['data']
->>
->> Long line, flagged by pycodestyle --diff.
->>
->
-> Done.
->
->>> +                         if key not in data.keys()]
->>>               members = []
->>>           else:
->>>               variants = [self._make_simple_variant(key, value, info)
->>
->> The way you desugar the union is simple enough, but it uses
->> discriminator_find_enum_define() outside check_exprs(), which I'd rather
->> avoid.  Not something you could be reasonably expected to know.
->>
->> We could desugar in QAPISchemaObjectTypeVariants.check(), where we have
->> self.tag_member.type.values.
->>
->>     @@ -1346,10 +1346,17 @@ class QAPISchemaObjectTypeVariants(object):
->>                  v.set_owner(name)
->>
->>          def check(self, schema, seen):
->>     -        if not self.tag_member:    # flat union
->>     +        if not self.tag_member: # flat union
->>                  self.tag_member = seen[c_name(self._tag_name)]
->>                  assert self._tag_name == self.tag_member.name
->>              assert isinstance(self.tag_member.type, QAPISchemaEnumType)
->>     +        if self._tag_name:      # flat union
->>     +            cases = set([v.name for v in self.variants])
->>     +            for val in self.tag_member.type.values:
->>     +                if val.name not in cases:
->>     +                    v = QAPISchemaObjectTypeVariant(val.name, 'q_empty')
->>     +                    v.set_owner(self.tag_member.owner)
->>     +                    self.variants.append(v)
->>              for v in self.variants:
->>                  v.check(schema)
->>                  # Union names must match enum values; alternate names are
->>
->> Not so simple anymore.
->>
->> Simpler: desugar in check_union(), i.e. replace your two hunks by just
->>
->>     @@ -783,8 +783,7 @@ def check_union(expr, info):
->>          if enum_define:
->>              for value in enum_define['data']:
->>                  if value not in members.keys():
->>     -                raise QAPISemError(info, "Union '%s' data missing '%s' branch"
->>     -                                   % (name, value))
->>     +                members[value] = 'q_empty'
->>
->>
->>      def check_alternate(expr, info):
->>
->> What do you think?
->>
->
-> it didn't feel right aesthetically to normalize by modifying the parsed
-> expressions especially at check_exprs() stage. But maybe using
-> discriminator_find_enum_define() is more sloppy, I can't quite see
+knowing that the LPC controller is on chip0 is important, that's how
+we build the ISA bus of the machine and I am trying to untangle this
+relation :=20
 
-The issue isn't sloppiness, it's adding to our technical debt.  To
-explain this, I need to relate a bit of history.
+	pnv->isa_bus <-> pnv->chip->lpc->regions=20
 
-In the beginning, we did everything with syntax trees.  Commit
-ac88219a6c7 (Sep 2015) spliced in an intermediate representation.  Its
-commit message explains:
+The chip is in the middle and it is problematic to introduce an=20
+abstract PnvChip class.=20
 
-    The QAPI code generators work with a syntax tree (nested dictionaries)
-    plus a few symbol tables (also dictionaries) on the side.
+Still working on it.
 
-    They have clearly outgrown these simple data structures.  There's lots
-    of rummaging around in dictionaries, and information is recomputed on
-    the fly.  For the work I'm going to do, I want more clearly defined
-    and more convenient interfaces.
-    
-    Going forward, I also want less coupling between the back-ends and the
-    syntax tree, to make messing with the syntax easier.
+Thanks,
 
-We accepted some technical debt back then.  Same commit message:
+C.=20
 
-    Shortcut: the semantic analysis still relies on existing check_exprs()
-    to do the actual semantic checking.  All this code needs to move into
-    the classes.  Mark as TODO.
 
-It's this one:
-
-    #
-    # Semantic analysis of schema expressions
-    # TODO fold into QAPISchema
-    # TODO catching name collisions in generated code would be nice
-    #
-
-check_exprs() is the only entry point into the code under this TODO.
-Your patch adds another one.  I don't like that.
-
-Nobody expects you to deduce this from the code by yourself :)
-
-Now, I agree hacking up the syntax tree isn't particularly clean,
-either.  Perhaps doing it in QAPISchemaObjectTypeVariants.check() is
-best after all.  In case you feel unsure about making that change, I can
-take your solution, and address its technical debt issue in a follow-up
-patch.
-
-[...]
+>> ---
+>>  include/hw/ppc/pnv_lpc.h |  2 ++
+>>  hw/ppc/pnv.c             | 19 ++++++-------------
+>>  hw/ppc/pnv_lpc.c         | 29 ++++++++++++++++++++---------
+>>  3 files changed, 28 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
+>> index 53fdd5bb6450..fddcb1c054b3 100644
+>> --- a/include/hw/ppc/pnv_lpc.h
+>> +++ b/include/hw/ppc/pnv_lpc.h
+>> @@ -68,6 +68,8 @@ typedef struct PnvLpcController {
+>> =20
+>>      /* PSI to generate interrupts */
+>>      PnvPsi *psi;
+>> +
+>> +    bool   primary;
+>>  } PnvLpcController;
+>> =20
+>>  qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type=
+,
+>> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+>> index 031488131629..b419d3323100 100644
+>> --- a/hw/ppc/pnv.c
+>> +++ b/hw/ppc/pnv.c
+>> @@ -285,16 +285,6 @@ static void pnv_dt_chip(PnvChip *chip, void *fdt)
+>> =20
+>>      pnv_dt_xscom(chip, fdt, 0);
+>> =20
+>> -    /* The default LPC bus of a multichip system is on chip 0. It's
+>> -     * recognized by the firmware (skiboot) using a "primary"
+>> -     * property.
+>> -     */
+>> -    if (chip->chip_id =3D=3D 0x0) {
+>> -        int lpc_offset =3D pnv_chip_lpc_offset(chip, fdt);
+>> -
+>> -        _FDT((fdt_setprop(fdt, lpc_offset, "primary", NULL, 0)));
+>> -    }
+>> -
+>>      for (i =3D 0; i < chip->nr_cores; i++) {
+>>          PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
+>> =20
+>> @@ -814,9 +804,12 @@ static void pnv_chip_init(Object *obj)
+>>      object_property_add_const_link(OBJECT(&chip->occ), "psi",
+>>                                     OBJECT(&chip->psi), &error_abort);
+>> =20
+>> -    /* The LPC controller needs PSI to generate interrupts */
+>> -    object_property_add_const_link(OBJECT(&chip->lpc), "psi",
+>> -                                   OBJECT(&chip->psi), &error_abort);
+>> +    /*
+>> +     * The LPC controller needs a few things from the chip : to know
+>> +     * if it's primary and PSI to generate interrupts
+>> +     */
+>> +    object_property_add_const_link(OBJECT(&chip->lpc), "chip",
+>> +                                   OBJECT(chip), &error_abort);
+>>  }
+>> =20
+>>  static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
+>> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+>> index 402c4fefa886..1e70c8c19d52 100644
+>> --- a/hw/ppc/pnv_lpc.c
+>> +++ b/hw/ppc/pnv_lpc.c
+>> @@ -113,6 +113,14 @@ static int pnv_lpc_dt_xscom(PnvXScomInterface *de=
+v, void *fdt, int xscom_offset)
+>>      _FDT((fdt_setprop_cell(fdt, offset, "#address-cells", 2)));
+>>      _FDT((fdt_setprop_cell(fdt, offset, "#size-cells", 1)));
+>>      _FDT((fdt_setprop(fdt, offset, "compatible", compat, sizeof(compa=
+t))));
+>> +
+>> +    /*
+>> +     * The default LPC bus of a multichip system is on chip 0. It's
+>> +     * recognized by the firmware (skiboot) using a "primary" propert=
+y.
+>> +     */
+>> +    if (PNV_LPC(dev)->primary) {
+>> +        _FDT((fdt_setprop(fdt, offset, "primary", NULL, 0)));
+>> +    }
+>>      return 0;
+>>  }
+>> =20
+>> @@ -416,6 +424,18 @@ static void pnv_lpc_realize(DeviceState *dev, Err=
+or **errp)
+>>      PnvLpcController *lpc =3D PNV_LPC(dev);
+>>      Object *obj;
+>>      Error *error =3D NULL;
+>> +    PnvChip *chip;
+>> +
+>> +    /* get PSI object from chip */
+>> +    obj =3D object_property_get_link(OBJECT(dev), "chip", &error);
+>> +    if (!obj) {
+>> +        error_propagate(errp, error);
+>> +        error_prepend(errp, "required link 'chip' not found: ");
+>> +        return;
+>> +    }
+>> +    chip =3D PNV_CHIP(obj);
+>> +    lpc->psi =3D &chip->psi;
+>> +    lpc->primary =3D chip->chip_id =3D=3D 0;
+>> =20
+>>      /* Reg inits */
+>>      lpc->lpc_hc_fw_rd_acc_size =3D LPC_HC_FW_RD_4B;
+>> @@ -460,15 +480,6 @@ static void pnv_lpc_realize(DeviceState *dev, Err=
+or **errp)
+>>      pnv_xscom_region_init(&lpc->xscom_regs, OBJECT(dev),
+>>                            &pnv_lpc_xscom_ops, lpc, "xscom-lpc",
+>>                            PNV_XSCOM_LPC_SIZE);
+>> -
+>> -    /* get PSI object from chip */
+>> -    obj =3D object_property_get_link(OBJECT(dev), "psi", &error);
+>> -    if (!obj) {
+>> -        error_setg(errp, "%s: required link 'psi' not found: %s",
+>> -                   __func__, error_get_pretty(error));
+>> -        return;
+>> -    }
+>> -    lpc->psi =3D PNV_PSI(obj);
+>>  }
+>> =20
+>>  static void pnv_lpc_class_init(ObjectClass *klass, void *data)
+>=20
