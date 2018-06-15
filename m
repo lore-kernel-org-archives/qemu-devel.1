@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTuyL-0000e5-KM
+	(envelope-from <alex.bennee@linaro.org>) id 1fTuyL-0000e2-JV
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 16:05:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTuyJ-0007r9-Oc
+	(envelope-from <alex.bennee@linaro.org>) id 1fTuyI-0007p1-1I
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 16:05:25 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:46550)
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:40368)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fTuyJ-0007q2-Gq
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 16:05:23 -0400
-Received: by mail-wr0-x242.google.com with SMTP id v13-v6so10979558wrp.13
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 13:05:23 -0700 (PDT)
+	id 1fTuyH-0007oA-LI
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 16:05:21 -0400
+Received: by mail-wm0-x235.google.com with SMTP id n5-v6so5756228wmc.5
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 13:05:21 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 15 Jun 2018 20:46:45 +0100
-Message-Id: <20180615194705.28019-35-alex.bennee@linaro.org>
+Date: Fri, 15 Jun 2018 20:46:57 +0100
+Message-Id: <20180615194705.28019-47-alex.bennee@linaro.org>
 In-Reply-To: <20180615194705.28019-1-alex.bennee@linaro.org>
 References: <20180615194705.28019-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 34/54] tests/tcg/alpha: add Alpha specific
- tests
+Subject: [Qemu-devel] [PATCH v7 46/54] tests/tcg: add run, diff,
+ and skip helper macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,157 +31,139 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:ARM" <qemu-arm@nongnu.org>
 
-These tests did use their own crt.o stub however that is a little
-stone age so we drop crt.S and just statically link to the cross
-compilers libraries.
+As we aren't using the default runners for all the test cases it is
+easy to miss out things like timeouts. To help with this we add some
+helpers and use them so we only need to make core changes in one
+place.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v4
-  - drop crt.s
-  - drop skipping of threadtest
-  - drop write() hack, include unistd.h
 v5
-  - merge fixes
+  - new for v5
+v5.1
+  - diff-test->diff-out
+v7
+  - mention $(TARGET_NAME) when skipping
 ---
- tests/tcg/alpha/Makefile        | 35 ---------------------------------
- tests/tcg/alpha/Makefile.target | 12 +++++++++++
- tests/tcg/alpha/crt.s           | 26 ------------------------
- tests/tcg/alpha/hello-alpha.c   |  2 ++
- tests/tcg/alpha/test-cond.c     |  1 +
- tests/tcg/alpha/test-ovf.c      |  2 ++
- 6 files changed, 17 insertions(+), 61 deletions(-)
- delete mode 100644 tests/tcg/alpha/Makefile
- delete mode 100644 tests/tcg/alpha/crt.s
+ tests/tcg/Makefile                  | 13 ++++++++++---
+ tests/tcg/aarch64/Makefile.target   |  6 ++----
+ tests/tcg/arm/Makefile.target       |  6 ++----
+ tests/tcg/i386/Makefile.target      | 10 ++++------
+ tests/tcg/multiarch/Makefile.target |  4 ++--
+ 5 files changed, 20 insertions(+), 19 deletions(-)
 
-diff --git a/tests/tcg/alpha/Makefile b/tests/tcg/alpha/Makefile
-deleted file mode 100644
-index 2b1f03d048..0000000000
---- a/tests/tcg/alpha/Makefile
-+++ /dev/null
-@@ -1,35 +0,0 @@
--CROSS=alpha-linux-gnu-
--CC=$(CROSS)gcc
--AS=$(CROSS)as
--
--SIM=../../alpha-linux-user/qemu-alpha
--
--CFLAGS=-O
--LINK=$(CC) -o $@ crt.o $< -nostdlib
--
--TESTS=test-cond test-cmov
--
--all: hello-alpha $(TESTS)
--
--hello-alpha: hello-alpha.o crt.o
--	$(LINK)
--
--test-cond: test-cond.o crt.o
--	$(LINK)
--
--test-cmov.o: test-cond.c
--	$(CC) -c $(CFLAGS) -DTEST_CMOV -o $@ $<
--
--test-cmov: test-cmov.o crt.o
--	$(LINK)
--
--test-ovf: test-ovf.o crt.o
--	$(LINK)
--
--check: $(TESTS)
--	for f in $(TESTS); do $(SIM) $$f || exit 1; done
--
--clean:
--	$(RM) *.o *~ hello-alpha $(TESTS)
--
--.PHONY: clean all check
-diff --git a/tests/tcg/alpha/Makefile.target b/tests/tcg/alpha/Makefile.target
-index bedf1b6444..a585080328 100644
---- a/tests/tcg/alpha/Makefile.target
-+++ b/tests/tcg/alpha/Makefile.target
-@@ -2,5 +2,17 @@
- #
- # Alpha specific tweaks
+diff --git a/tests/tcg/Makefile b/tests/tcg/Makefile
+index e7dbcdb5bf..bf06415390 100644
+--- a/tests/tcg/Makefile
++++ b/tests/tcg/Makefile
+@@ -34,6 +34,15 @@
  
-+ALPHA_SRC=$(SRC_PATH)/tests/tcg/alpha
-+VPATH+=$(ALPHA_SRC)
-+
-+ALPHA_TESTS=hello-alpha test-cond test-cmov test-ovf
-+TESTS+=$(ALPHA_TESTS)
-+
-+test-cmov: EXTRA_CFLAGS=-DTEST_CMOV
-+test-cmov: test-cond.c
-+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
-+
-+run-test-cmov: test-cmov
-+
- # On Alpha Linux only supports 8k pages
- EXTRA_RUNS+=run-test-mmap-8192
-diff --git a/tests/tcg/alpha/crt.s b/tests/tcg/alpha/crt.s
-deleted file mode 100644
-index 31af8825bc..0000000000
---- a/tests/tcg/alpha/crt.s
-+++ /dev/null
-@@ -1,26 +0,0 @@
--	.text
--
--	.globl _start
--	.ent _start,0
--_start:
--	.frame $15,0,$15
--	br $29,1f
--1:	ldgp $29, 0($29)
--	.prologue 0
--	ldq $27,main($29) !literal!1
--	jsr $26,($27)
--	or $0,$0,$16
--	.end _start
--
--	.globl _exit
--_exit:
--	lda $0,1
--	callsys
--
--	call_pal 0
--
--	.globl write
--write:
--	lda $0,4
--	callsys
--	ret
-diff --git a/tests/tcg/alpha/hello-alpha.c b/tests/tcg/alpha/hello-alpha.c
-index 79892e6522..84e43b2fc4 100644
---- a/tests/tcg/alpha/hello-alpha.c
-+++ b/tests/tcg/alpha/hello-alpha.c
-@@ -1,3 +1,5 @@
-+#include <unistd.h>
-+
- int main (void)
- {
-   write (1, "hello\n", 6);
-diff --git a/tests/tcg/alpha/test-cond.c b/tests/tcg/alpha/test-cond.c
-index 74adffaa69..e625313b3e 100644
---- a/tests/tcg/alpha/test-cond.c
-+++ b/tests/tcg/alpha/test-cond.c
-@@ -1,3 +1,4 @@
-+#include <unistd.h>
+ quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
  
- #ifdef TEST_CMOV
- 
-diff --git a/tests/tcg/alpha/test-ovf.c b/tests/tcg/alpha/test-ovf.c
-index 01c80e7525..17892f1e89 100644
---- a/tests/tcg/alpha/test-ovf.c
-+++ b/tests/tcg/alpha/test-ovf.c
-@@ -1,3 +1,5 @@
-+#include <unistd.h>
++# $1 = test name, $2 = cmd, $3 = desc
++run-test = $(call quiet-command, timeout $(TIMEOUT) $2 > $1.out,"TEST",$3)
 +
- static long test_subqv (long a, long b)
- {
-   long res;
++# $1 = test name, $2 = reference
++diff-out = $(call quiet-command, diff -u $1.out $2 | head -n 10,"DIFF","$1.out with $2")
++
++# $1 = test name, $2 = reason
++skip-test = @printf "  SKIPPED %s on $(TARGET_NAME) because %s\n" $1 $2
++
+ # Tests we are building
+ TESTS=
+ 
+@@ -84,9 +93,7 @@ RUN_TESTS=$(patsubst %,run-%, $(TESTS))
+ RUN_TESTS+=$(EXTRA_RUNS)
+ 
+ run-%: %
+-	$(call quiet-command, \
+-		timeout $(TIMEOUT) $(QEMU) $< > $<.out, \
+-		"TEST", "$< on $(TARGET_NAME)")
++	$(call run-test, $<, $(QEMU) $<, "$< on $(TARGET_NAME)")
+ 
+ .PHONY: run
+ run: $(RUN_TESTS)
+diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
+index 7dba32138d..08c45b8470 100644
+--- a/tests/tcg/aarch64/Makefile.target
++++ b/tests/tcg/aarch64/Makefile.target
+@@ -13,7 +13,5 @@ TESTS:=$(AARCH64_TESTS)
+ fcvt: LDFLAGS+=-lm
+ 
+ run-fcvt: fcvt
+-	$(call quiet-command, \
+-		$(QEMU) $< > fcvt.out && \
+-		diff -u $(AARCH64_SRC)/fcvt.ref fcvt.out, \
+-		"TEST", "$< (default) on $(TARGET_NAME)")
++	$(call run-test,$<,$(QEMU) $<, "$< on $(TARGET_NAME)")
++	$(call diff-out,$<,$(AARCH64_SRC)/fcvt.ref)
+diff --git a/tests/tcg/arm/Makefile.target b/tests/tcg/arm/Makefile.target
+index 14b5435fc6..aa4e4e3782 100644
+--- a/tests/tcg/arm/Makefile.target
++++ b/tests/tcg/arm/Makefile.target
+@@ -24,10 +24,8 @@ fcvt: LDFLAGS+=-lm
+ # fcvt: CFLAGS+=-march=armv8.2-a+fp16 -mfpu=neon-fp-armv8
+ 
+ run-fcvt: fcvt
+-	$(call quiet-command, \
+-		$(QEMU) $< > fcvt.out && \
+-		diff -u $(ARM_SRC)/fcvt.ref fcvt.out, \
+-		"TEST", "$< (default) on $(TARGET_NAME)")
++	$(call run-test,fcvt,$(QEMU) $<,"$< on $(TARGET_NAME)")
++	$(call diff-out,fcvt,$(ARM_SRC)/fcvt.ref)
+ endif
+ 
+ # On ARM Linux only supports 4k pages
+diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
+index cd173363ee..97b7c23cf1 100644
+--- a/tests/tcg/i386/Makefile.target
++++ b/tests/tcg/i386/Makefile.target
+@@ -31,7 +31,7 @@ test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S test-i386.h test-i386
+ 
+ # Specialist test runners
+ run-runcom: runcom pi_10.com
+-	$(call quiet-command, $(QEMU) ./runcom $(I386_SRC)/pi_10.com > runcom.out, "TEST", "$< on $(TARGET_NAME)")
++	$(call run-test,$<,$(QEMU) ./runcom $(I386_SRC)/pi_10.com,"$< on $(TARGET_NAME)")
+ 
+ ifeq ($(SPEED), slow)
+ 
+@@ -40,13 +40,11 @@ test-i386-fprem.ref: test-i386-fprem
+ 
+ run-test-i386-fprem: TIMEOUT=60
+ run-test-i386-fprem: test-i386-fprem
+-	$(call quiet-command, \
+-		$(QEMU) $< > $<.out && \
+-		diff -u $(I386_SRC)/$<.ref $<.out, \
+-		"TEST", "$< (default) on $(TARGET_NAME)")
++	$(call run-test,test-i386-fprem, $(QEMU) $<,"$< on $(TARGET_NAME)")
++	$(call diff-out,test-i386-fprem, $(I386_SRC)/$<.ref)
+ else
+ run-test-i386-fprem: test-i386-fprem
+-	$(call quiet-command, /bin/true, "SLOW TEST", "$< SKIPPED on $(TARGET_NAME)")
++	$(call skip-test, $<, "SLOW")
+ endif
+ 
+ # On i386 and x86_64 Linux only supports 4k pages (large pages are a different hack)
+diff --git a/tests/tcg/multiarch/Makefile.target b/tests/tcg/multiarch/Makefile.target
+index 90e45a881e..b77084c146 100644
+--- a/tests/tcg/multiarch/Makefile.target
++++ b/tests/tcg/multiarch/Makefile.target
+@@ -27,10 +27,10 @@ testthread: LDFLAGS+=-lpthread
+ 
+ # default case (host page size)
+ run-test-mmap: test-mmap
+-	$(call quiet-command, $(QEMU) $< > test-mmap.out, "TEST", \
++	$(call run-test, test-mmap, $(QEMU) $<, \
+ 		"$< (default) on $(TARGET_NAME)")
+ 
+ # additional page sizes (defined by each architecture adding to EXTRA_RUNS)
+ run-test-mmap-%: test-mmap
+-	$(call quiet-command, $(QEMU) -p $* $< > test-mmap-$*.out, "TEST", \
++	$(call run-test, test-mmap-$*, $(QEMU) -p $* $<,\
+ 		"$< ($* byte pages) on $(TARGET_NAME)")
 -- 
 2.17.1
