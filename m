@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fTjY3-0005ZB-BH
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:53:32 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fTjbN-0006b4-EV
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:56:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fTjY2-0006PP-Kn
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:53:31 -0400
-Date: Fri, 15 Jun 2018 09:53:14 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180615075314.fc3jattcaizpf6yd@sirius.home.kraxel.org>
-References: <20180613084149.14523-1-kraxel@redhat.com>
-	<20180613084149.14523-4-kraxel@redhat.com>
-	<20180613135047.5c1ce227@w520.home>
-	<20180613223625.lf6xkzgipzkfslit@sirius.home.kraxel.org>
-	<20180614094856.GD2220@beluga.usersys.redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1fTjbJ-0001Zy-4X
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:56:57 -0400
+Resent-Message-Id: <E1fTjbJ-0001Zy-4X@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21027)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fTjbI-0001Xo-QE
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:56:53 -0400
+In-Reply-To: <20180615064701.40928-1-tomeu.vizoso@collabora.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152904939063.705.12039469404858691064@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180614094856.GD2220@beluga.usersys.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 3/3] hw/vfio/display: add ramfb support
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 15 Jun 2018 00:56:31 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] egl-headless: Allow OpenGL ES context
+ creation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Erik Skultety <eskultet@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?utf-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>, libvir-list@redhat.com, Laine Stump <laine@redhat.com>
+To: tomeu.vizoso@collabora.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, kernel@collabora.com, kraxel@redhat.com
 
-> > Well, it's simliar to qxl vs. qxl-vga.  It's not qxl,vga={on,off} and
-> > libvirt has no problems to deal with that ...
-> >
-> > Another more technical reason is (again) hotplug.  ramfb needs an fw_cfg
-> > entry for configuration, and fw_cfg entries can't be hotplugged.  So
-> > hotplugging vfio-pci with ramfb=on isn't going to fly.  So we need a
-> > separate device with hotplug turned off.
-> 
-> Well if that's not supposed to work ever, libvirt's hotplug code could format
-> the following FWIW:
-> "-device vfio-pci [opts],ramfb=off"
-> 
-> As such, new device wouldn't be that of an issue for libvirt if vfio-pci and
-> vfio-pci-ramfb are back to back compatible with all the device options that are
-> available for vfio-pci (I mean in terms of using an mdev). Because in that
-> case, what libvirt could do is to look whether we're supposed to turn on the
-> display, if so, then we need support for this in capabilities to query and then
-> we could prefer this new device over the "legacy" vfio-pci one. However, if we
-> expect a case where QEMU would succeed to start with an mdev mapped to this
-> new ramfb device but not with vfio-pci, then that's an issue.
-
-vfio-pci and vfio-pci-ramfb are identical, except for the later having a
-boot display (with display=on), and vfio-pci-ramfb not being
-hotplugable.  So, yes, all pcu/mdev devices should work with both
-vfio-pci variants.
-
-> But I'm still curious about the ramfb=off possibility I asked above
-> for hotplug nonetheless.
-
-Well, the problem is introspection.  qemu can report via qmp whenever a
-specific device supports hotplug.  A device which can both be
-hot-pluggable or not hot-pluggable depending on some condition is a
-problem here ...
-
-cheers,
-  Gerd
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjE1MDY0NzAxLjQwOTI4LTEtdG9tZXUudml6b3NvQGNvbGxhYm9yYS5j
+b20KU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gZWdsLWhlYWRsZXNzOiBBbGxvdyBPcGVu
+R0wgRVMgY29udGV4dCBjcmVhdGlvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
+YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
+dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
+UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
+ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
+ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBo
+dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAg
+ICAgICAgICAgcGF0Y2hldy8yMDE4MDYxNTA2NDcwMS40MDkyOC0xLXRvbWV1LnZpem9zb0Bjb2xs
+YWJvcmEuY29tIC0+IHBhdGNoZXcvMjAxODA2MTUwNjQ3MDEuNDA5MjgtMS10b21ldS52aXpvc29A
+Y29sbGFib3JhLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmI0MDE1ZTkyMTEg
+ZWdsLWhlYWRsZXNzOiBBbGxvdyBPcGVuR0wgRVMgY29udGV4dCBjcmVhdGlvbgoKPT09IE9VVFBV
+VCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBlZ2wtaGVhZGxlc3M6IEFsbG93IE9wZW5H
+TCBFUyBjb250ZXh0IGNyZWF0aW9uLi4uCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBm
+b3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzEyMjogRklMRTogdWkvZWdsLWhlbHBlcnMu
+Yzo0MzM6CisgICAgaWYgKGdsZXMpClsuLi5dCisgICAgZWxzZQpbLi4uXQoKdG90YWw6IDEgZXJy
+b3JzLCAwIHdhcm5pbmdzLCAxNjkgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVk
+IHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
+YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
