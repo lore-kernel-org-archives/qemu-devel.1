@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fTqY7-0000e8-TT
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:22:04 -0400
+	(envelope-from <clg@kaod.org>) id 1fTqbl-0003oh-C8
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fTqY6-0004Vj-Tp
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:22:03 -0400
-Date: Fri, 15 Jun 2018 16:21:56 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180615152156.GC12972@stefanha-x1.localdomain>
-References: <20180608060417.10170-1-famz@redhat.com>
-	<20180608060417.10170-4-famz@redhat.com>
+	(envelope-from <clg@kaod.org>) id 1fTqbi-0006VW-3j
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:49 -0400
+Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:53785)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTqbh-0006U2-Sf
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:46 -0400
+Received: from player794.ha.ovh.net (unknown [10.109.105.29])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 4A354B68D6
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 17:25:44 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Fri, 15 Jun 2018 17:25:32 +0200
+Message-Id: <20180615152536.30093-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="IpbVkmxF4tDyP/Kb"
-Content-Disposition: inline
-In-Reply-To: <20180608060417.10170-4-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/6] block-backend: Refactor AIO emulation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/4] ppc/pnv: new Pnv8Chip and Pnv9Chip
+ models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
+Hello,
 
---IpbVkmxF4tDyP/Kb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+First are some cleanups around the ISA bus of the machine. Then
+additions of new chip models for the different processor the PowerNV
+machine supports, which come with their respective "powernv8" and
+"powernv9" machines.
 
-On Fri, Jun 08, 2018 at 02:04:14PM +0800, Fam Zheng wrote:
-> BlkRwCo fields are multi-purposed. @offset is sometimes used to pass the
-> 'req' number for blk_ioctl and blk_aio_ioctl; @iobuf is sometimes the
-> pointer for QEMUIOVector @qiov sometimes the ioctl @buf. This is not as
-> clean as it can be. As the coming copy range emulation wants to add
-> more differentiation in parameters, refactor a bit.
->=20
-> Move the per-request fields to a union and create one struct for each
-> type. While at it also move the bytes parameter from BlkAioEmAIOCB to
-> BlkRwCo.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/block-backend.c | 211 +++++++++++++++++++++++++++---------------
->  1 file changed, 134 insertions(+), 77 deletions(-)
+For some obscure reasons, this patchset breaks 'make check' :
 
-I'm not sure about this patch.  It makes the code longer and adds more
-types but still includes hacky cases for pdiscard and flush that only
-partially use the union.
+  TEST: tests/spapr-phb-test... (pid=3D8196)
+  qemu-system-ppc64: -device spapr-pci-host-bridge,index=3D30: spapr-pci-=
+host-bridge needs a pseries machine
+  Broken pipe
+ FAIL: tests/spapr-phb-test
 
-IMO either make the code really clean with proper types or stick with
-the short but unsafe form.
+Any idea ? I guess this is because of the new machines.=20
 
---IpbVkmxF4tDyP/Kb
-Content-Type: application/pgp-signature; name="signature.asc"
+Thanks,
 
------BEGIN PGP SIGNATURE-----
+C.=20
 
-iQEcBAEBAgAGBQJbI9mUAAoJEJykq7OBq3PIOXUIAIeIh6wHw8id1+Iy9I+s4TKd
-BM82j+/cwHSKrIhSBr1SqJF2XnXCtu4JfpRUkKxLKwmvkR0gTiUoqOfeg7O+AVWM
-PvU9ceUV3f0GOIGT2Tqa8WIAXZ1yZPXDpxOkFqHi99LHnQ5ebUnCrFxx2A5zgX5C
-jGvHX4Y1W/BJ/f82uwgEXHWvSsqo7YcvLpZyGvdSu8B0kBD6UwsdDD4YOreP8Pvs
-tep2MTfRaAxXUFhSROr8vJOp9YVxNwx3JiOWwifOKECPXHkMb7vRJbvCnl7vk5YW
-qfyt+D1RWrLIp1w8AnK4QHSNAb52/WP7uuKuF6JExqAFxNZstUtn6+7ZWmXRVvQ=
-=UMpd
------END PGP SIGNATURE-----
+Changes since v1:
 
---IpbVkmxF4tDyP/Kb--
+ - reworked the ISABus creation interface with the chip, the machine
+   is not aware anymore of the chip controllers.
+ - removed the bizarre controllers under the PnvChip base class.
+ - kept back some changes on the ISA device tree name. They will come
+   in time with the LPC controller for P9
+
+C=C3=A9dric Le Goater (4):
+  ppc/pnv: introduce a new intc_create() operation to the chip model
+  ppc/pnv: introduce a new isa_create() operation to the chip model
+  ppc/pnv: introduce Pnv8Chip and Pnv9Chip models
+  ppc/pnv: consolidate the creation of the ISA bus device tree
+
+ include/hw/ppc/pnv.h     |  25 ++-
+ include/hw/ppc/pnv_lpc.h |   3 +-
+ hw/ppc/pnv.c             | 424 ++++++++++++++++++++++++++++++-----------=
+------
+ hw/ppc/pnv_core.c        |  18 +-
+ hw/ppc/pnv_lpc.c         |  30 +++-
+ 5 files changed, 327 insertions(+), 173 deletions(-)
+
+--=20
+2.13.6
