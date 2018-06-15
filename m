@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fTny8-0001GR-0y
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:36:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTnz7-0001vG-Mn
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:37:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fTny7-00087q-58
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:36:44 -0400
-Date: Fri, 15 Jun 2018 14:36:39 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180615143639.7a86cde7@redhat.com>
-In-Reply-To: <20180615112500.19854-5-david@redhat.com>
-References: <20180615112500.19854-1-david@redhat.com>
-	<20180615112500.19854-5-david@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fTnz6-0000zb-SV
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:37:45 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:37922)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fTnz6-0000yp-Dn
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:37:44 -0400
+Received: by mail-oi0-x241.google.com with SMTP id d5-v6so8659143oib.5
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 05:37:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 04/12] pc-dimm: remove
- pc_dimm_get_free_slot() from header
+In-Reply-To: <1527690380-9782-3-git-send-email-eric.auger@redhat.com>
+References: <1527690380-9782-1-git-send-email-eric.auger@redhat.com>
+	<1527690380-9782-3-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 15 Jun 2018 13:37:23 +0100
+Message-ID: <CAFEAcA_urHG9cDqeoq0ot8zEFR=9WW3qdp4sQtq4YQJvQz5SxQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/arm/virt: Add virt-3.0 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Laszlo Ersek <lersek@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On Fri, 15 Jun 2018 13:24:52 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 30 May 2018 at 15:26, Eric Auger <eric.auger@redhat.com> wrote:
+> Add virt-3.0 machine type.
+>
+> This machine type supports highmem 256MB ECAM by default.
+> This feature is disabled for earlier machine types and
+> if highmem is off.
+>
+> The high 256MB ECAM region is chosen instead of the legacy
+> 16MB one if the machine type allows it, if highmem is set
+> (LPAE supported by the guest) and (!firmware_loaded || aarch64).
+> Indeed aarch32 mode FW may not support this high ECAM region.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-> Not used outside of pc-dimm.c and there shouldn't be other users. If
-> other devices ever have to also sue slots, this has to be factored out.
-s/sue/use/ or better rephrase the last sentence (it's hard to read)
+I think these patches should be the other way round --
+create the new 3.0 machine type first, and then in the
+patch adding the high ECAM region you can make it be
+only if newer machine type.
 
-with that fixed
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/mem/pc-dimm.c         | 4 +++-
->  include/hw/mem/pc-dimm.h | 2 --
->  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 9e0c83e415..7387963cf1 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -27,6 +27,8 @@
->  #include "sysemu/numa.h"
->  #include "trace.h"
->  
-> +static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
-> +
->  void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
->                    Error **errp)
->  {
-> @@ -111,7 +113,7 @@ static int pc_dimm_slot2bitmap(Object *obj, void *opaque)
->      return 0;
->  }
->  
-> -int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp)
-> +static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp)
->  {
->      unsigned long *bitmap;
->      int slot = 0;
-> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> index 860343d64f..cf71247630 100644
-> --- a/include/hw/mem/pc-dimm.h
-> +++ b/include/hw/mem/pc-dimm.h
-> @@ -76,8 +76,6 @@ typedef struct PCDIMMDeviceClass {
->      MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
->  } PCDIMMDeviceClass;
->  
-> -int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
-> -
->  void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
->                    Error **errp);
->  void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
+thanks
+-- PMM
