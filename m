@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52691)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTnId-0007sK-V4
+	(envelope-from <clg@kaod.org>) id 1fTnIe-0007sh-5j
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTnIa-0000je-St
+	(envelope-from <clg@kaod.org>) id 1fTnIa-0000jj-T2
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:53:52 -0400
-Received: from 14.mo3.mail-out.ovh.net ([188.165.43.98]:46910)
+Received: from 9.mo3.mail-out.ovh.net ([87.98.184.141]:43568)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTnIa-0000hB-Lm
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTnIa-0000jF-Lv
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:53:48 -0400
-Received: from player734.ha.ovh.net (unknown [10.109.105.20])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 14C221BDA6C
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 13:53:39 +0200 (CEST)
+Received: from player734.ha.ovh.net (unknown [10.109.120.50])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 2E5041BDA20
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 13:53:47 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 15 Jun 2018 13:53:00 +0200
-Message-Id: <20180615115303.31125-1-clg@kaod.org>
+Date: Fri, 15 Jun 2018 13:53:02 +0200
+Message-Id: <20180615115303.31125-3-clg@kaod.org>
+In-Reply-To: <20180615115303.31125-1-clg@kaod.org>
+References: <20180615115303.31125-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 0/3] introduce a fixed IRQ number space
+Subject: [Qemu-devel] [PATCH 2/3] spapr: remove unused spapr_irq routines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +32,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Gibson <david@gibson.dropbear.id.au>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hello,
+spapr_irq_alloc_block and spapr_irq_alloc() are now deprecated.
 
-Here is a proposal for a new IRQ number space layout using static
-numbers and a bitmap allocator for the MSIs. The previous layout is
-kept for compatibly in machines raising the 'xics_legacy' flag.
-
-These are just the basics preparing ground for the new XIVE
-controller. I would also like to introduce a structure like below to
-abstract the IRQ controller in the sPAPR machine :
-
-
-typedef struct sPAPRIrq {
-    uint32_t    nr_irqs;
-    uint8_t     ov5;
-
-    void (*init)(sPAPRMachineState *spapr, uint32_t nr_servers, Error **e=
-rrp);
-    int (*claim)(sPAPRMachineState *spapr, uint32_t range, uint32_t irq,
-                  Error **errp);
-    void (*free)(sPAPRMachineState *spapr, int irq, int num, Error **errp=
-);
-    qemu_irq (*qirq)(sPAPRMachineState *spapr, int irq);
-    void (*print_info)(sPAPRMachineState *spapr, Monitor *mon);
-    void (*dt_populate)(sPAPRMachineState *spapr, uint32_t nr_servers,
-                        void *fdt, uint32_t phandle);
-    Object *(*cpu_intc_create)(sPAPRMachineState *spapr, Object *cpu,
-                               Error **errp);
-    void (*post_load)(sPAPRMachineState *spapr);
-} sPAPRIrq;
-
-
-Let's discuss !
-
-Cheers,
-
-C.
-
-C=C3=A9dric Le Goater (3):
-  spapr: split the IRQ allocation sequence
-  spapr: remove unused spapr_irq routines
-  spapr: introduce a fixed IRQ number space
-
- include/hw/ppc/spapr.h     |  11 +++--
- include/hw/ppc/spapr_irq.h |  30 ++++++++++++
- hw/ppc/spapr.c             | 115 ++++++++++++++++++++++++++-------------=
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ include/hw/ppc/spapr.h |  4 ---
+ hw/ppc/spapr.c         | 80 +-------------------------------------------=
 ------
- hw/ppc/spapr_events.c      |  26 ++++++++--
- hw/ppc/spapr_irq.c         |  57 ++++++++++++++++++++++
- hw/ppc/spapr_pci.c         |  35 ++++++++++++--
- hw/ppc/spapr_vio.c         |  17 ++++++-
- hw/ppc/Makefile.objs       |   2 +-
- 8 files changed, 232 insertions(+), 61 deletions(-)
- create mode 100644 include/hw/ppc/spapr_irq.h
- create mode 100644 hw/ppc/spapr_irq.c
+ 2 files changed, 1 insertion(+), 83 deletions(-)
 
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 6088f44c1b2a..49cda04b1493 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -772,10 +772,6 @@ int spapr_get_vcpu_id(PowerPCCPU *cpu);
+ void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp);
+ PowerPCCPU *spapr_find_cpu(int vcpu_id);
+=20
+-int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
+-                    Error **errp);
+-int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
+-                          bool align, Error **errp);
+ int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align,
+                    Error **errp);
+ #define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false, e=
+rrp)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index b1d19b328166..c464951747e3 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3840,84 +3840,6 @@ int spapr_irq_find(sPAPRMachineState *spapr, int n=
+um, bool align, Error **errp)
+     return first + ics->offset;
+ }
+=20
+-/*
+- * Allocate the IRQ number and set the IRQ type, LSI or MSI
+- */
+-static void spapr_irq_set_lsi(sPAPRMachineState *spapr, int irq, bool ls=
+i)
+-{
+-    ics_set_irq_type(spapr->ics, irq - spapr->ics->offset, lsi);
+-}
+-
+-int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
+-                    Error **errp)
+-{
+-    ICSState *ics =3D spapr->ics;
+-    int irq;
+-
+-    assert(ics);
+-
+-    if (irq_hint) {
+-        if (!ICS_IRQ_FREE(ics, irq_hint - ics->offset)) {
+-            error_setg(errp, "can't allocate IRQ %d: already in use", ir=
+q_hint);
+-            return -1;
+-        }
+-        irq =3D irq_hint;
+-    } else {
+-        irq =3D ics_find_free_block(ics, 1, 1);
+-        if (irq < 0) {
+-            error_setg(errp, "can't allocate IRQ: no IRQ left");
+-            return -1;
+-        }
+-        irq +=3D ics->offset;
+-    }
+-
+-    spapr_irq_set_lsi(spapr, irq, lsi);
+-    trace_spapr_irq_alloc(irq);
+-
+-    return irq;
+-}
+-
+-/*
+- * Allocate block of consecutive IRQs, and return the number of the firs=
+t IRQ in
+- * the block. If align=3D=3Dtrue, aligns the first IRQ number to num.
+- */
+-int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
+-                          bool align, Error **errp)
+-{
+-    ICSState *ics =3D spapr->ics;
+-    int i, first =3D -1;
+-
+-    assert(ics);
+-
+-    /*
+-     * MSIMesage::data is used for storing VIRQ so
+-     * it has to be aligned to num to support multiple
+-     * MSI vectors. MSI-X is not affected by this.
+-     * The hint is used for the first IRQ, the rest should
+-     * be allocated continuously.
+-     */
+-    if (align) {
+-        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+-               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+-        first =3D ics_find_free_block(ics, num, num);
+-    } else {
+-        first =3D ics_find_free_block(ics, num, 1);
+-    }
+-    if (first < 0) {
+-        error_setg(errp, "can't find a free %d-IRQ block", num);
+-        return -1;
+-    }
+-
+-    first +=3D ics->offset;
+-    for (i =3D first; i < first + num; ++i) {
+-        spapr_irq_set_lsi(spapr, i, lsi);
+-    }
+-
+-    trace_spapr_irq_alloc_block(first, num, lsi, align);
+-
+-    return first;
+-}
+-
+ int spapr_irq_claim(sPAPRMachineState *spapr, int irq, int num, bool lsi=
+,
+                     Error **errp)
+ {
+@@ -3934,7 +3856,7 @@ int spapr_irq_claim(sPAPRMachineState *spapr, int i=
+rq, int num, bool lsi,
+=20
+     for (i =3D srcno; i < srcno + num; ++i) {
+         if (ICS_IRQ_FREE(ics, i)) {
+-            spapr_irq_set_lsi(spapr, i + ics->offset, lsi);
++            ics_set_irq_type(ics, i, lsi);
+         } else {
+             error_setg(errp, "IRQ %d is not free", i + ics->offset);
+             ret =3D -1;
 --=20
 2.13.6
