@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53150)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fTpFr-0005uK-QM
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:59:09 -0400
+	(envelope-from <groug@kaod.org>) id 1fTpHL-0006hu-Bx
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:00:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fTpFo-0006gD-Hq
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:59:07 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:43521)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fTpFo-0006g9-Cn
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:59:04 -0400
-Received: by mail-qk0-x244.google.com with SMTP id g126-v6so5623583qke.10
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 06:59:04 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180615062547.4798-1-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5351959f-75d4-014f-409e-d8a2a89bc433@amsat.org>
-Date: Fri, 15 Jun 2018 10:58:56 -0300
+	(envelope-from <groug@kaod.org>) id 1fTpHH-0007QQ-SQ
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:00:39 -0400
+Received: from 5.mo7.mail-out.ovh.net ([178.32.120.239]:51701)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fTpHH-0007N6-F7
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:00:35 -0400
+Received: from player771.ha.ovh.net (unknown [10.109.108.86])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id D8BA4B3BCF
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 16:00:31 +0200 (CEST)
+Date: Fri, 15 Jun 2018 16:00:24 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180615160024.079e7daf@bahia.lan>
+In-Reply-To: <20180615122928.9356-1-david@gibson.dropbear.id.au>
+References: <20180615122928.9356-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20180615062547.4798-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg: Reduce max TB opcode count
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv2] target/ppc,
+ spapr: Move VPA information to machine_data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,203 +30,462 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: Jason@zx2c4.com, sstabellini@kernel.org, pmatouse@redhat.com, mst@redhat.com, sw@weilnetz.de, crosthwaite.peter@gmail.com, mdroth@linux.vnet.ibm.com, pbonzini@redhat.com, pjp@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru
 
-On 06/15/2018 03:25 AM, Richard Henderson wrote:
-> Also, assert that we don't overflow any of two different offsets into
-> the TB. Both unwind and goto_tb both record a uint16_t for later use.
+On Fri, 15 Jun 2018 22:29:28 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> CPUPPCState currently contains a number of fields containing the state of
+> the VPA.  The VPA is a PAPR specific concept covering several guest/host
+> shared memory areas used to communicate some information with the
+> hypervisor.
 > 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> As a PAPR concept this is really machine specific information, although it
+> is per-cpu, so it doesn't really belong in the core CPU state structure.
+> 
+> There's also other information that's per-cpu, but platform/machine
+> specific.  So create a (void *)machine_data in PowerPCCPU which can be
+> used by the machine to locate per-cpu data.  Intialization, lifetime and
+> cleanup of machine_data is entirely up to the machine type.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
-> 
-> This fixes an arm-softmmu test case forwarded to me by Michael Tsirkin.
-> 
-> There is a TB generated from that test case that runs to 7800 opcodes,
-> and compiles to 96k on an x64 host.  This overflows the 16-bit offset
-> in which we record the goto_tb reset offset.  Because of that overflow,
-> we install a jump destination that goes to neverland.  Boom.
-> 
-> With this reduced op count, the same TB compiles to about 48k for
-> both x64 and ppc64le hosts, and neither assertion fires.
 
-Why not keep that comment in the git history, to follow the 8k -> 4k change?
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+and
 
+Tested-by: Greg Kurz <groug@kaod.org>
+
+(threads=4 with hotplug, both success and error paths)
+
+And now I'll look into migrating this *new* state.
+
+>  hw/ppc/spapr_cpu_core.c         | 13 ++++++
+>  hw/ppc/spapr_hcall.c            | 77 ++++++++++++++++++---------------
+>  include/hw/ppc/spapr_cpu_core.h | 11 +++++
+>  target/ppc/cpu.h                |  7 +--
+>  target/ppc/kvm.c                | 39 +++++++++--------
+>  target/ppc/translate_init.inc.c |  8 ----
+>  6 files changed, 88 insertions(+), 67 deletions(-)
 > 
+> Changes in v2:
+>  * Move alloc/free of machine_data to spapr_{create,delete}_vcpu()
+>    instead of spapr_{,un}realize_vcpu() (fixing a possible leak in the
+>    process)
 > 
-> r~
-> 
-> ---
->  tcg/tcg.h                    |  2 +-
->  tcg/aarch64/tcg-target.inc.c |  2 +-
->  tcg/arm/tcg-target.inc.c     |  2 +-
->  tcg/i386/tcg-target.inc.c    |  2 +-
->  tcg/mips/tcg-target.inc.c    |  2 +-
->  tcg/ppc/tcg-target.inc.c     |  4 ++--
->  tcg/s390/tcg-target.inc.c    |  2 +-
->  tcg/sparc/tcg-target.inc.c   |  4 ++--
->  tcg/tcg.c                    | 13 ++++++++++++-
->  tcg/tci/tcg-target.inc.c     |  2 +-
->  10 files changed, 23 insertions(+), 12 deletions(-)
-> 
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index 532d2a0710..2902a51505 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -852,7 +852,7 @@ static inline bool tcg_op_buf_full(void)
->       * such that a RISC host can reasonably use a 16-bit signed
->       * branch within the TB.
->       */
-> -    return tcg_ctx->nb_ops >= 8000;
-> +    return tcg_ctx->nb_ops >= 4000;
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 4f0c168784..f416212ae0 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -28,6 +28,7 @@ static void spapr_cpu_reset(void *opaque)
+>      CPUState *cs = CPU(cpu);
+>      CPUPPCState *env = &cpu->env;
+>      PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
+> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+>      target_ulong lpcr;
+>  
+>      cpu_reset(cs);
+> @@ -69,6 +70,12 @@ static void spapr_cpu_reset(void *opaque)
+>  
+>      /* Set a full AMOR so guest can use the AMR as it sees fit */
+>      env->spr[SPR_AMOR] = 0xffffffffffffffffull;
+> +
+> +    spapr_cpu->vpa_addr = 0;
+> +    spapr_cpu->slb_shadow_addr = 0;
+> +    spapr_cpu->slb_shadow_size = 0;
+> +    spapr_cpu->dtl_addr = 0;
+> +    spapr_cpu->dtl_size = 0;
 >  }
 >  
->  /* pool based memory allocation */
-> diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
-> index be3192078d..4562d36d1b 100644
-> --- a/tcg/aarch64/tcg-target.inc.c
-> +++ b/tcg/aarch64/tcg-target.inc.c
-> @@ -1733,7 +1733,7 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
->              tcg_out_insn(s, 3305, LDR, offset, TCG_REG_TMP);
->          }
->          tcg_out_insn(s, 3207, BR, TCG_REG_TMP);
-> -        s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
-> +        set_jmp_reset_offset(s, a0);
->          break;
+>  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r3)
+> @@ -186,6 +193,8 @@ static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore *sc, int i, Error **errp)
+>          goto err;
+>      }
 >  
->      case INDEX_op_goto_ptr:
-> diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-> index 56a32a470f..e1fbf465cb 100644
-> --- a/tcg/arm/tcg-target.inc.c
-> +++ b/tcg/arm/tcg-target.inc.c
-> @@ -1822,7 +1822,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
->                  tcg_out_movi32(s, COND_AL, base, ptr - dil);
->              }
->              tcg_out_ld32_12(s, COND_AL, TCG_REG_PC, base, dil);
-> -            s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
-> +            set_jmp_reset_offset(s, args[0]);
->          }
->          break;
->      case INDEX_op_goto_ptr:
-> diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
-> index 0d0ff524b7..e87b0d445e 100644
-> --- a/tcg/i386/tcg-target.inc.c
-> +++ b/tcg/i386/tcg-target.inc.c
-> @@ -2245,7 +2245,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
->              tcg_out_modrm_offset(s, OPC_GRP5, EXT5_JMPN_Ev, -1,
->                                   (intptr_t)(s->tb_jmp_target_addr + a0));
->          }
-> -        s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
-> +        set_jmp_reset_offset(s, a0);
->          break;
->      case INDEX_op_goto_ptr:
->          /* jmp to the given host address (could be epilogue) */
-> diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-> index ca5f1d4894..cff525373b 100644
-> --- a/tcg/mips/tcg-target.inc.c
-> +++ b/tcg/mips/tcg-target.inc.c
-> @@ -1744,7 +1744,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
->              tcg_out_opc_reg(s, OPC_JR, 0, TCG_TMP0, 0);
->          }
->          tcg_out_nop(s);
-> -        s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
-> +        set_jmp_reset_offset(s, a0);
->          break;
->      case INDEX_op_goto_ptr:
->          /* jmp to the given host address (could be epilogue) */
-> diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-> index 86f7de5f7e..c2f729ee8f 100644
-> --- a/tcg/ppc/tcg-target.inc.c
-> +++ b/tcg/ppc/tcg-target.inc.c
-> @@ -2025,10 +2025,10 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
->          }
->          tcg_out32(s, MTSPR | RS(TCG_REG_TB) | CTR);
->          tcg_out32(s, BCCTR | BO_ALWAYS);
-> -        s->tb_jmp_reset_offset[args[0]] = c = tcg_current_code_size(s);
-> +        set_jmp_reset_offset(s, args[0]);
->          if (USE_REG_TB) {
->              /* For the unlinked case, need to reset TCG_REG_TB.  */
-> -            c = -c;
-> +            c = -tcg_current_code_size(s);
->              assert(c == (int16_t)c);
->              tcg_out32(s, ADDI | TAI(TCG_REG_TB, TCG_REG_TB, c));
->          }
-> diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-> index 9af6dcef05..17c435ade5 100644
-> --- a/tcg/s390/tcg-target.inc.c
-> +++ b/tcg/s390/tcg-target.inc.c
-> @@ -1783,7 +1783,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
->              /* and go there */
->              tcg_out_insn(s, RR, BCR, S390_CC_ALWAYS, TCG_REG_TB);
->          }
-> -        s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
-> +        set_jmp_reset_offset(s, a0);
+> +    cpu->machine_data = g_new0(sPAPRCPUState, 1);
+> +
+>      object_unref(obj);
+>      return cpu;
 >  
->          /* For the unlinked path of goto_tb, we need to reset
->             TCG_REG_TB to the beginning of this TB.  */
-> diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
-> index bc673bd8c6..04bdc3df5e 100644
-> --- a/tcg/sparc/tcg-target.inc.c
-> +++ b/tcg/sparc/tcg-target.inc.c
-> @@ -1388,12 +1388,12 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
->              tcg_out_arithi(s, TCG_REG_G0, TCG_REG_TB, 0, JMPL);
->              tcg_out_nop(s);
->          }
-> -        s->tb_jmp_reset_offset[a0] = c = tcg_current_code_size(s);
-> +        set_jmp_reset_offset(s, a0);
+> @@ -197,6 +206,10 @@ err:
 >  
->          /* For the unlinked path of goto_tb, we need to reset
->             TCG_REG_TB to the beginning of this TB.  */
->          if (USE_REG_TB) {
-> -            c = -c;
-> +            c = -tcg_current_code_size(s);
->              if (check_fit_i32(c, 13)) {
->                  tcg_out_arithi(s, TCG_REG_TB, TCG_REG_TB, c, ARITH_ADD);
->              } else {
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index 1d1dfd7f7c..f27b22bd3c 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -306,6 +306,14 @@ TCGLabel *gen_new_label(void)
->      return l;
+>  static void spapr_delete_vcpu(PowerPCCPU *cpu)
+>  {
+> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+> +
+> +    cpu->machine_data = NULL;
+> +    g_free(spapr_cpu);
+>      object_unparent(OBJECT(cpu));
 >  }
 >  
-> +static void set_jmp_reset_offset(TCGContext *s, int which)
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 8b9a4b577f..ae913d070f 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -8,6 +8,7 @@
+>  #include "exec/exec-all.h"
+>  #include "helper_regs.h"
+>  #include "hw/ppc/spapr.h"
+> +#include "hw/ppc/spapr_cpu_core.h"
+>  #include "mmu-hash64.h"
+>  #include "cpu-models.h"
+>  #include "trace.h"
+> @@ -908,9 +909,11 @@ unmap_out:
+>  #define VPA_SHARED_PROC_OFFSET 0x9
+>  #define VPA_SHARED_PROC_VAL    0x2
+>  
+> -static target_ulong register_vpa(CPUPPCState *env, target_ulong vpa)
+> +static target_ulong register_vpa(PowerPCCPU *cpu, target_ulong vpa)
+>  {
+> -    CPUState *cs = CPU(ppc_env_get_cpu(env));
+> +    CPUState *cs = CPU(cpu);
+> +    CPUPPCState *env = &cpu->env;
+> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+>      uint16_t size;
+>      uint8_t tmp;
+>  
+> @@ -935,32 +938,34 @@ static target_ulong register_vpa(CPUPPCState *env, target_ulong vpa)
+>          return H_PARAMETER;
+>      }
+>  
+> -    env->vpa_addr = vpa;
+> +    spapr_cpu->vpa_addr = vpa;
+>  
+> -    tmp = ldub_phys(cs->as, env->vpa_addr + VPA_SHARED_PROC_OFFSET);
+> +    tmp = ldub_phys(cs->as, spapr_cpu->vpa_addr + VPA_SHARED_PROC_OFFSET);
+>      tmp |= VPA_SHARED_PROC_VAL;
+> -    stb_phys(cs->as, env->vpa_addr + VPA_SHARED_PROC_OFFSET, tmp);
+> +    stb_phys(cs->as, spapr_cpu->vpa_addr + VPA_SHARED_PROC_OFFSET, tmp);
+>  
+>      return H_SUCCESS;
+>  }
+>  
+> -static target_ulong deregister_vpa(CPUPPCState *env, target_ulong vpa)
+> +static target_ulong deregister_vpa(PowerPCCPU *cpu, target_ulong vpa)
+>  {
+> -    if (env->slb_shadow_addr) {
+> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+> +
+> +    if (spapr_cpu->slb_shadow_addr) {
+>          return H_RESOURCE;
+>      }
+>  
+> -    if (env->dtl_addr) {
+> +    if (spapr_cpu->dtl_addr) {
+>          return H_RESOURCE;
+>      }
+>  
+> -    env->vpa_addr = 0;
+> +    spapr_cpu->vpa_addr = 0;
+>      return H_SUCCESS;
+>  }
+>  
+> -static target_ulong register_slb_shadow(CPUPPCState *env, target_ulong addr)
+> +static target_ulong register_slb_shadow(PowerPCCPU *cpu, target_ulong addr)
+>  {
+> -    CPUState *cs = CPU(ppc_env_get_cpu(env));
+> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+>      uint32_t size;
+>  
+>      if (addr == 0) {
+> @@ -968,7 +973,7 @@ static target_ulong register_slb_shadow(CPUPPCState *env, target_ulong addr)
+>          return H_HARDWARE;
+>      }
+>  
+> -    size = ldl_be_phys(cs->as, addr + 0x4);
+> +    size = ldl_be_phys(CPU(cpu)->as, addr + 0x4);
+>      if (size < 0x8) {
+>          return H_PARAMETER;
+>      }
+> @@ -977,26 +982,28 @@ static target_ulong register_slb_shadow(CPUPPCState *env, target_ulong addr)
+>          return H_PARAMETER;
+>      }
+>  
+> -    if (!env->vpa_addr) {
+> +    if (!spapr_cpu->vpa_addr) {
+>          return H_RESOURCE;
+>      }
+>  
+> -    env->slb_shadow_addr = addr;
+> -    env->slb_shadow_size = size;
+> +    spapr_cpu->slb_shadow_addr = addr;
+> +    spapr_cpu->slb_shadow_size = size;
+>  
+>      return H_SUCCESS;
+>  }
+>  
+> -static target_ulong deregister_slb_shadow(CPUPPCState *env, target_ulong addr)
+> +static target_ulong deregister_slb_shadow(PowerPCCPU *cpu, target_ulong addr)
+>  {
+> -    env->slb_shadow_addr = 0;
+> -    env->slb_shadow_size = 0;
+> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+> +
+> +    spapr_cpu->slb_shadow_addr = 0;
+> +    spapr_cpu->slb_shadow_size = 0;
+>      return H_SUCCESS;
+>  }
+>  
+> -static target_ulong register_dtl(CPUPPCState *env, target_ulong addr)
+> +static target_ulong register_dtl(PowerPCCPU *cpu, target_ulong addr)
+>  {
+> -    CPUState *cs = CPU(ppc_env_get_cpu(env));
+> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+>      uint32_t size;
+>  
+>      if (addr == 0) {
+> @@ -1004,26 +1011,28 @@ static target_ulong register_dtl(CPUPPCState *env, target_ulong addr)
+>          return H_HARDWARE;
+>      }
+>  
+> -    size = ldl_be_phys(cs->as, addr + 0x4);
+> +    size = ldl_be_phys(CPU(cpu)->as, addr + 0x4);
+>  
+>      if (size < 48) {
+>          return H_PARAMETER;
+>      }
+>  
+> -    if (!env->vpa_addr) {
+> +    if (!spapr_cpu->vpa_addr) {
+>          return H_RESOURCE;
+>      }
+>  
+> -    env->dtl_addr = addr;
+> -    env->dtl_size = size;
+> +    spapr_cpu->dtl_addr = addr;
+> +    spapr_cpu->dtl_size = size;
+>  
+>      return H_SUCCESS;
+>  }
+>  
+> -static target_ulong deregister_dtl(CPUPPCState *env, target_ulong addr)
+> +static target_ulong deregister_dtl(PowerPCCPU *cpu, target_ulong addr)
+>  {
+> -    env->dtl_addr = 0;
+> -    env->dtl_size = 0;
+> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+> +
+> +    spapr_cpu->dtl_addr = 0;
+> +    spapr_cpu->dtl_size = 0;
+>  
+>      return H_SUCCESS;
+>  }
+> @@ -1035,38 +1044,36 @@ static target_ulong h_register_vpa(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+>      target_ulong procno = args[1];
+>      target_ulong vpa = args[2];
+>      target_ulong ret = H_PARAMETER;
+> -    CPUPPCState *tenv;
+>      PowerPCCPU *tcpu;
+>  
+>      tcpu = spapr_find_cpu(procno);
+>      if (!tcpu) {
+>          return H_PARAMETER;
+>      }
+> -    tenv = &tcpu->env;
+>  
+>      switch (flags) {
+>      case FLAGS_REGISTER_VPA:
+> -        ret = register_vpa(tenv, vpa);
+> +        ret = register_vpa(tcpu, vpa);
+>          break;
+>  
+>      case FLAGS_DEREGISTER_VPA:
+> -        ret = deregister_vpa(tenv, vpa);
+> +        ret = deregister_vpa(tcpu, vpa);
+>          break;
+>  
+>      case FLAGS_REGISTER_SLBSHADOW:
+> -        ret = register_slb_shadow(tenv, vpa);
+> +        ret = register_slb_shadow(tcpu, vpa);
+>          break;
+>  
+>      case FLAGS_DEREGISTER_SLBSHADOW:
+> -        ret = deregister_slb_shadow(tenv, vpa);
+> +        ret = deregister_slb_shadow(tcpu, vpa);
+>          break;
+>  
+>      case FLAGS_REGISTER_DTL:
+> -        ret = register_dtl(tenv, vpa);
+> +        ret = register_dtl(tcpu, vpa);
+>          break;
+>  
+>      case FLAGS_DEREGISTER_DTL:
+> -        ret = deregister_dtl(tenv, vpa);
+> +        ret = deregister_dtl(tcpu, vpa);
+>          break;
+>      }
+>  
+> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+> index 47dcfda12b..8ceea2973a 100644
+> --- a/include/hw/ppc/spapr_cpu_core.h
+> +++ b/include/hw/ppc/spapr_cpu_core.h
+> @@ -41,4 +41,15 @@ typedef struct sPAPRCPUCoreClass {
+>  const char *spapr_get_cpu_core_type(const char *cpu_type);
+>  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r3);
+>  
+> +typedef struct sPAPRCPUState {
+> +    uint64_t vpa_addr;
+> +    uint64_t slb_shadow_addr, slb_shadow_size;
+> +    uint64_t dtl_addr, dtl_size;
+> +} sPAPRCPUState;
+> +
+> +static inline sPAPRCPUState *spapr_cpu_state(PowerPCCPU *cpu)
 > +{
-> +    size_t off = tcg_current_code_size(s);
-> +    s->tb_jmp_reset_offset[which] = off;
-> +    /* Make sure that we didn't overflow the stored offset.  */
-> +    assert(s->tb_jmp_reset_offset[which] == off);
+> +    return (sPAPRCPUState *)cpu->machine_data;
 > +}
 > +
->  #include "tcg-target.inc.c"
+>  #endif
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index a91f1a8777..874da6efbc 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1091,12 +1091,6 @@ struct CPUPPCState {
+>      target_ulong rmls;
+>  #endif
 >  
->  /* compare a pointer @ptr and a tb_tc @s */
-> @@ -3532,7 +3540,10 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
->              break;
->          case INDEX_op_insn_start:
->              if (num_insns >= 0) {
-> -                s->gen_insn_end_off[num_insns] = tcg_current_code_size(s);
-> +                size_t off = tcg_current_code_size(s);
-> +                s->gen_insn_end_off[num_insns] = off;
-> +                /* Assert that we do not overflow our stored offset.  */
-> +                assert(s->gen_insn_end_off[num_insns] == off);
->              }
->              num_insns++;
->              for (i = 0; i < TARGET_INSN_START_WORDS; ++i) {
-> diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
-> index cc949bea85..62ed097254 100644
-> --- a/tcg/tci/tcg-target.inc.c
-> +++ b/tcg/tci/tcg-target.inc.c
-> @@ -574,7 +574,7 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
->              /* Indirect jump method. */
->              TODO();
+> -#if defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY)
+> -    uint64_t vpa_addr;
+> -    uint64_t slb_shadow_addr, slb_shadow_size;
+> -    uint64_t dtl_addr, dtl_size;
+> -#endif /* TARGET_PPC64 */
+> -
+>      int error_code;
+>      uint32_t pending_interrupts;
+>  #if !defined(CONFIG_USER_ONLY)
+> @@ -1205,6 +1199,7 @@ struct PowerPCCPU {
+>      uint32_t compat_pvr;
+>      PPCVirtualHypervisor *vhyp;
+>      Object *intc;
+> +    void *machine_data;
+>      int32_t node_id; /* NUMA node this CPU belongs to */
+>      PPCHash64Options *hash64_opts;
+>  
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 7fe9d0126b..5c0e313ca6 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -829,22 +829,22 @@ static int kvm_get_fp(CPUState *cs)
+>  static int kvm_get_vpa(CPUState *cs)
+>  {
+>      PowerPCCPU *cpu = POWERPC_CPU(cs);
+> -    CPUPPCState *env = &cpu->env;
+> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+>      struct kvm_one_reg reg;
+>      int ret;
+>  
+>      reg.id = KVM_REG_PPC_VPA_ADDR;
+> -    reg.addr = (uintptr_t)&env->vpa_addr;
+> +    reg.addr = (uintptr_t)&spapr_cpu->vpa_addr;
+>      ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>      if (ret < 0) {
+>          DPRINTF("Unable to get VPA address from KVM: %s\n", strerror(errno));
+>          return ret;
+>      }
+>  
+> -    assert((uintptr_t)&env->slb_shadow_size
+> -           == ((uintptr_t)&env->slb_shadow_addr + 8));
+> +    assert((uintptr_t)&spapr_cpu->slb_shadow_size
+> +           == ((uintptr_t)&spapr_cpu->slb_shadow_addr + 8));
+>      reg.id = KVM_REG_PPC_VPA_SLB;
+> -    reg.addr = (uintptr_t)&env->slb_shadow_addr;
+> +    reg.addr = (uintptr_t)&spapr_cpu->slb_shadow_addr;
+>      ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>      if (ret < 0) {
+>          DPRINTF("Unable to get SLB shadow state from KVM: %s\n",
+> @@ -852,9 +852,10 @@ static int kvm_get_vpa(CPUState *cs)
+>          return ret;
+>      }
+>  
+> -    assert((uintptr_t)&env->dtl_size == ((uintptr_t)&env->dtl_addr + 8));
+> +    assert((uintptr_t)&spapr_cpu->dtl_size
+> +           == ((uintptr_t)&spapr_cpu->dtl_addr + 8));
+>      reg.id = KVM_REG_PPC_VPA_DTL;
+> -    reg.addr = (uintptr_t)&env->dtl_addr;
+> +    reg.addr = (uintptr_t)&spapr_cpu->dtl_addr;
+>      ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>      if (ret < 0) {
+>          DPRINTF("Unable to get dispatch trace log state from KVM: %s\n",
+> @@ -868,7 +869,7 @@ static int kvm_get_vpa(CPUState *cs)
+>  static int kvm_put_vpa(CPUState *cs)
+>  {
+>      PowerPCCPU *cpu = POWERPC_CPU(cs);
+> -    CPUPPCState *env = &cpu->env;
+> +    sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+>      struct kvm_one_reg reg;
+>      int ret;
+>  
+> @@ -876,11 +877,12 @@ static int kvm_put_vpa(CPUState *cs)
+>       * registered.  That means when restoring state, if a VPA *is*
+>       * registered, we need to set that up first.  If not, we need to
+>       * deregister the others before deregistering the master VPA */
+> -    assert(env->vpa_addr || !(env->slb_shadow_addr || env->dtl_addr));
+> +    assert(spapr_cpu->vpa_addr
+> +           || !(spapr_cpu->slb_shadow_addr || spapr_cpu->dtl_addr));
+>  
+> -    if (env->vpa_addr) {
+> +    if (spapr_cpu->vpa_addr) {
+>          reg.id = KVM_REG_PPC_VPA_ADDR;
+> -        reg.addr = (uintptr_t)&env->vpa_addr;
+> +        reg.addr = (uintptr_t)&spapr_cpu->vpa_addr;
+>          ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>          if (ret < 0) {
+>              DPRINTF("Unable to set VPA address to KVM: %s\n", strerror(errno));
+> @@ -888,19 +890,20 @@ static int kvm_put_vpa(CPUState *cs)
 >          }
-> -        s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
-> +        set_jmp_reset_offset(s, args[0]);
->          break;
->      case INDEX_op_br:
->          tci_out_label(s, arg_label(args[0]));
-> 
+>      }
+>  
+> -    assert((uintptr_t)&env->slb_shadow_size
+> -           == ((uintptr_t)&env->slb_shadow_addr + 8));
+> +    assert((uintptr_t)&spapr_cpu->slb_shadow_size
+> +           == ((uintptr_t)&spapr_cpu->slb_shadow_addr + 8));
+>      reg.id = KVM_REG_PPC_VPA_SLB;
+> -    reg.addr = (uintptr_t)&env->slb_shadow_addr;
+> +    reg.addr = (uintptr_t)&spapr_cpu->slb_shadow_addr;
+>      ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>      if (ret < 0) {
+>          DPRINTF("Unable to set SLB shadow state to KVM: %s\n", strerror(errno));
+>          return ret;
+>      }
+>  
+> -    assert((uintptr_t)&env->dtl_size == ((uintptr_t)&env->dtl_addr + 8));
+> +    assert((uintptr_t)&spapr_cpu->dtl_size
+> +           == ((uintptr_t)&spapr_cpu->dtl_addr + 8));
+>      reg.id = KVM_REG_PPC_VPA_DTL;
+> -    reg.addr = (uintptr_t)&env->dtl_addr;
+> +    reg.addr = (uintptr_t)&spapr_cpu->dtl_addr;
+>      ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>      if (ret < 0) {
+>          DPRINTF("Unable to set dispatch trace log state to KVM: %s\n",
+> @@ -908,9 +911,9 @@ static int kvm_put_vpa(CPUState *cs)
+>          return ret;
+>      }
+>  
+> -    if (!env->vpa_addr) {
+> +    if (!spapr_cpu->vpa_addr) {
+>          reg.id = KVM_REG_PPC_VPA_ADDR;
+> -        reg.addr = (uintptr_t)&env->vpa_addr;
+> +        reg.addr = (uintptr_t)&spapr_cpu->vpa_addr;
+>          ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>          if (ret < 0) {
+>              DPRINTF("Unable to set VPA address to KVM: %s\n", strerror(errno));
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+> index bb9296f5a3..76d6f3fd5e 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -10316,14 +10316,6 @@ static void ppc_cpu_reset(CPUState *s)
+>      s->exception_index = POWERPC_EXCP_NONE;
+>      env->error_code = 0;
+>  
+> -#if defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY)
+> -    env->vpa_addr = 0;
+> -    env->slb_shadow_addr = 0;
+> -    env->slb_shadow_size = 0;
+> -    env->dtl_addr = 0;
+> -    env->dtl_size = 0;
+> -#endif /* TARGET_PPC64 */
+> -
+>      for (i = 0; i < ARRAY_SIZE(env->spr_cb); i++) {
+>          ppc_spr_t *spr = &env->spr_cb[i];
+>  
