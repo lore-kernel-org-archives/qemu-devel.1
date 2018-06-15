@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTue4-0000WB-NN
+	(envelope-from <richard.henderson@linaro.org>) id 1fTue4-0000Vl-7z
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:44:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fTue1-0002cL-GH
+	(envelope-from <richard.henderson@linaro.org>) id 1fTudz-0002ap-Q5
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:44:28 -0400
-Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:43852)
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:37971)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fTue1-0002bl-Ad
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:44:25 -0400
-Received: by mail-pg0-x22c.google.com with SMTP id a14-v6so4852466pgw.10
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 12:44:25 -0700 (PDT)
+	id 1fTudz-0002aP-Gk
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:44:23 -0400
+Received: by mail-pf0-x243.google.com with SMTP id b74-v6so5326324pfl.5
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 12:44:23 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 15 Jun 2018 09:43:48 -1000
-Message-Id: <20180615194354.12489-14-richard.henderson@linaro.org>
+Date: Fri, 15 Jun 2018 09:43:47 -1000
+Message-Id: <20180615194354.12489-13-richard.henderson@linaro.org>
 In-Reply-To: <20180615194354.12489-1-richard.henderson@linaro.org>
 References: <20180615194354.12489-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL v2 13/19] translate-all: introduce
- assert_no_pages_locked
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 12/19] translate-all: add page_locked
+ assertions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,74 +35,199 @@ Cc: peter.maydell@linaro.org, "Emilio G. Cota" <cota@braap.org>
 
 From: "Emilio G. Cota" <cota@braap.org>
 
-The appended adds assertions to make sure we do not longjmp with page
-locks held. Note that user-mode has nothing to check, since page_locks
-are !user-mode only.
+This is only compiled under CONFIG_DEBUG_TCG to avoid
+bloating the binary.
+
+In user-mode, assert_page_locked is equivalent to assert_mmap_lock.
+
+Note: There are some tb_lock assertions left that will be
+removed by later patches.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Suggested-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/exec/exec-all.h   | 8 ++++++++
- accel/tcg/cpu-exec.c      | 1 +
- accel/tcg/translate-all.c | 7 +++++++
- 3 files changed, 16 insertions(+)
+ accel/tcg/translate-all.c | 82 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 79 insertions(+), 3 deletions(-)
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 8d92e3cea9..4f07a17052 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -435,6 +435,14 @@ void tb_lock(void);
- void tb_unlock(void);
- void tb_lock_reset(void);
- 
-+#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_DEBUG_TCG)
-+void assert_no_pages_locked(void);
-+#else
-+static inline void assert_no_pages_locked(void)
-+{
-+}
-+#endif
-+
- #if !defined(CONFIG_USER_ONLY)
- 
- /**
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 7570c59f09..d75c35380a 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -273,6 +273,7 @@ void cpu_exec_step_atomic(CPUState *cpu)
-         tcg_debug_assert(!have_mmap_lock());
- #endif
-         tb_lock_reset();
-+        assert_no_pages_locked();
-     }
- 
-     if (in_exclusive_region) {
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 8b378586f4..c75298d08a 100644
+index 1cc7aab82c..8b378586f4 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -658,6 +658,12 @@ do_assert_page_locked(const PageDesc *pd, const char *file, int line)
+@@ -583,6 +583,9 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_addr_t phys1,
  
- #define assert_page_locked(pd) do_assert_page_locked(pd, __FILE__, __LINE__)
+ /* In user-mode page locks aren't used; mmap_lock is enough */
+ #ifdef CONFIG_USER_ONLY
++
++#define assert_page_locked(pd) tcg_debug_assert(have_mmap_lock())
++
+ static inline void page_lock(PageDesc *pd)
+ { }
  
-+void assert_no_pages_locked(void)
+@@ -605,14 +608,80 @@ void page_collection_unlock(struct page_collection *set)
+ { }
+ #else /* !CONFIG_USER_ONLY */
+ 
++#ifdef CONFIG_DEBUG_TCG
++
++static __thread GHashTable *ht_pages_locked_debug;
++
++static void ht_pages_locked_debug_init(void)
 +{
-+    ht_pages_locked_debug_init();
-+    g_assert(g_hash_table_size(ht_pages_locked_debug) == 0);
++    if (ht_pages_locked_debug) {
++        return;
++    }
++    ht_pages_locked_debug = g_hash_table_new(NULL, NULL);
 +}
 +
- #else /* !CONFIG_DEBUG_TCG */
++static bool page_is_locked(const PageDesc *pd)
++{
++    PageDesc *found;
++
++    ht_pages_locked_debug_init();
++    found = g_hash_table_lookup(ht_pages_locked_debug, pd);
++    return !!found;
++}
++
++static void page_lock__debug(PageDesc *pd)
++{
++    ht_pages_locked_debug_init();
++    g_assert(!page_is_locked(pd));
++    g_hash_table_insert(ht_pages_locked_debug, pd, pd);
++}
++
++static void page_unlock__debug(const PageDesc *pd)
++{
++    bool removed;
++
++    ht_pages_locked_debug_init();
++    g_assert(page_is_locked(pd));
++    removed = g_hash_table_remove(ht_pages_locked_debug, pd);
++    g_assert(removed);
++}
++
++static void
++do_assert_page_locked(const PageDesc *pd, const char *file, int line)
++{
++    if (unlikely(!page_is_locked(pd))) {
++        error_report("assert_page_lock: PageDesc %p not locked @ %s:%d",
++                     pd, file, line);
++        abort();
++    }
++}
++
++#define assert_page_locked(pd) do_assert_page_locked(pd, __FILE__, __LINE__)
++
++#else /* !CONFIG_DEBUG_TCG */
++
++#define assert_page_locked(pd)
++
++static inline void page_lock__debug(const PageDesc *pd)
++{
++}
++
++static inline void page_unlock__debug(const PageDesc *pd)
++{
++}
++
++#endif /* CONFIG_DEBUG_TCG */
++
+ static inline void page_lock(PageDesc *pd)
+ {
++    page_lock__debug(pd);
+     qemu_spin_lock(&pd->lock);
+ }
  
- #define assert_page_locked(pd)
-@@ -829,6 +835,7 @@ page_collection_lock(tb_page_addr_t start, tb_page_addr_t end)
-     set->tree = g_tree_new_full(tb_page_addr_cmp, NULL, NULL,
-                                 page_entry_destroy);
-     set->max = NULL;
-+    assert_no_pages_locked();
+ static inline void page_unlock(PageDesc *pd)
+ {
+     qemu_spin_unlock(&pd->lock);
++    page_unlock__debug(pd);
+ }
  
-  retry:
-     g_tree_foreach(set->tree, page_entry_lock, NULL);
+ /* lock the page(s) of a TB in the correct acquisition order */
+@@ -658,6 +727,7 @@ static bool page_entry_trylock(struct page_entry *pe)
+     if (!busy) {
+         g_assert(!pe->locked);
+         pe->locked = true;
++        page_lock__debug(pe->pd);
+     }
+     return busy;
+ }
+@@ -775,6 +845,7 @@ page_collection_lock(tb_page_addr_t start, tb_page_addr_t end)
+             g_tree_foreach(set->tree, page_entry_unlock, NULL);
+             goto retry;
+         }
++        assert_page_locked(pd);
+         PAGE_FOR_EACH_TB(pd, tb, n) {
+             if (page_trylock_add(set, tb->page_addr[0]) ||
+                 (tb->page_addr[1] != -1 &&
+@@ -1113,6 +1184,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
+ /* call with @p->lock held */
+ static inline void invalidate_page_bitmap(PageDesc *p)
+ {
++    assert_page_locked(p);
+ #ifdef CONFIG_SOFTMMU
+     g_free(p->code_bitmap);
+     p->code_bitmap = NULL;
+@@ -1269,6 +1341,7 @@ static inline void tb_page_remove(PageDesc *pd, TranslationBlock *tb)
+     uintptr_t *pprev;
+     unsigned int n1;
+ 
++    assert_page_locked(pd);
+     pprev = &pd->first_tb;
+     PAGE_FOR_EACH_TB(pd, tb1, n1) {
+         if (tb1 == tb) {
+@@ -1417,6 +1490,7 @@ static void build_page_bitmap(PageDesc *p)
+     int n, tb_start, tb_end;
+     TranslationBlock *tb;
+ 
++    assert_page_locked(p);
+     p->code_bitmap = bitmap_new(TARGET_PAGE_SIZE);
+ 
+     PAGE_FOR_EACH_TB(p, tb, n) {
+@@ -1450,7 +1524,7 @@ static inline void tb_page_add(PageDesc *p, TranslationBlock *tb,
+     bool page_already_protected;
+ #endif
+ 
+-    assert_memory_lock();
++    assert_page_locked(p);
+ 
+     tb->page_addr[n] = page_addr;
+     tb->page_next[n] = p->first_tb;
+@@ -1721,8 +1795,7 @@ tb_invalidate_phys_page_range__locked(struct page_collection *pages,
+     uint32_t current_flags = 0;
+ #endif /* TARGET_HAS_PRECISE_SMC */
+ 
+-    assert_memory_lock();
+-    assert_tb_locked();
++    assert_page_locked(p);
+ 
+ #if defined(TARGET_HAS_PRECISE_SMC)
+     if (cpu != NULL) {
+@@ -1734,6 +1807,7 @@ tb_invalidate_phys_page_range__locked(struct page_collection *pages,
+     /* XXX: see if in some cases it could be faster to invalidate all
+        the code */
+     PAGE_FOR_EACH_TB(p, tb, n) {
++        assert_page_locked(p);
+         /* NOTE: this is subtle as a TB may span two physical pages */
+         if (n == 0) {
+             /* NOTE: tb_end may be after the end of the page, but
+@@ -1891,6 +1965,7 @@ void tb_invalidate_phys_page_fast(tb_page_addr_t start, int len)
+     }
+ 
+     pages = page_collection_lock(start, start + len);
++    assert_page_locked(p);
+     if (!p->code_bitmap &&
+         ++p->code_write_count >= SMC_BITMAP_USE_THRESHOLD) {
+         build_page_bitmap(p);
+@@ -1949,6 +2024,7 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
+         env = cpu->env_ptr;
+     }
+ #endif
++    assert_page_locked(p);
+     PAGE_FOR_EACH_TB(p, tb, n) {
+ #ifdef TARGET_HAS_PRECISE_SMC
+         if (current_tb == tb &&
 -- 
 2.17.1
