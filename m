@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fTpLa-0000rQ-2k
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:05:07 -0400
+	(envelope-from <david@redhat.com>) id 1fTpLf-0000tn-Q3
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:05:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fTpLY-0003TB-Oj
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:05:02 -0400
+	(envelope-from <david@redhat.com>) id 1fTpLb-0003XL-Ae
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:05:07 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Fri, 15 Jun 2018 16:04:37 +0200
-Message-Id: <20180615140448.32234-3-david@redhat.com>
+Date: Fri, 15 Jun 2018 16:04:38 +0200
+Message-Id: <20180615140448.32234-4-david@redhat.com>
 In-Reply-To: <20180615140448.32234-1-david@redhat.com>
 References: <20180615140448.32234-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 02/13] pc: rename pc_dimm_(plug|unplug|...)*
- into pc_memory_(plug|unplug|...)*
+Subject: [Qemu-devel] [PATCH v3 03/13] pc-dimm: rename pc_dimm_memory_* to
+ pc_dimm_*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +23,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-Use a similar naming scheme as spapr. This way, we can go ahead and
-rename e.g. pc_dimm_memory_plug to pc_dimm_plug, which avoids
-confusion.
+Let's rename it to make it look more consistent.
 
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/i386/pc.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ hw/i386/pc.c             | 4 ++--
+ hw/mem/pc-dimm.c         | 6 +++---
+ hw/ppc/spapr.c           | 6 +++---
+ include/hw/mem/pc-dimm.h | 6 +++---
+ 4 files changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 622e49d6bc..f9250ffae7 100644
+index f9250ffae7..f23133facc 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -1674,8 +1674,8 @@ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name)
+@@ -1713,7 +1713,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+         goto out;
      }
- }
  
--static void pc_dimm_plug(HotplugHandler *hotplug_dev,
--                         DeviceState *dev, Error **errp)
-+static void pc_memory_plug(HotplugHandler *hotplug_dev,
-+                           DeviceState *dev, Error **errp)
+-    pc_dimm_memory_plug(dev, MACHINE(pcms), align, &local_err);
++    pc_dimm_plug(dev, MACHINE(pcms), align, &local_err);
+     if (local_err) {
+         goto out;
+     }
+@@ -1773,7 +1773,7 @@ static void pc_memory_unplug(HotplugHandler *hotplug_dev,
+         goto out;
+     }
+ 
+-    pc_dimm_memory_unplug(dev, MACHINE(pcms));
++    pc_dimm_unplug(dev, MACHINE(pcms));
+     object_unparent(OBJECT(dev));
+ 
+  out:
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 62b34a992e..9e0c83e415 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -27,8 +27,8 @@
+ #include "sysemu/numa.h"
+ #include "trace.h"
+ 
+-void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+-                         uint64_t align, Error **errp)
++void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
++                  Error **errp)
  {
-     HotplugHandlerClass *hhc;
-     Error *local_err = NULL;
-@@ -1728,8 +1728,8 @@ out:
+     int slot;
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+@@ -84,7 +84,7 @@ out:
      error_propagate(errp, local_err);
  }
  
--static void pc_dimm_unplug_request(HotplugHandler *hotplug_dev,
--                                   DeviceState *dev, Error **errp)
-+static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
-+                                     DeviceState *dev, Error **errp)
+-void pc_dimm_memory_unplug(DeviceState *dev, MachineState *machine)
++void pc_dimm_unplug(DeviceState *dev, MachineState *machine)
  {
-     HotplugHandlerClass *hhc;
-     Error *local_err = NULL;
-@@ -1759,8 +1759,8 @@ out:
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f59999daac..3e5320020f 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3153,7 +3153,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     align = memory_region_get_alignment(mr);
+     size = memory_region_size(mr);
+ 
+-    pc_dimm_memory_plug(dev, MACHINE(ms), align, &local_err);
++    pc_dimm_plug(dev, MACHINE(ms), align, &local_err);
+     if (local_err) {
+         goto out;
+     }
+@@ -3176,7 +3176,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     return;
+ 
+ out_unplug:
+-    pc_dimm_memory_unplug(dev, MACHINE(ms));
++    pc_dimm_unplug(dev, MACHINE(ms));
+ out:
      error_propagate(errp, local_err);
  }
+@@ -3328,7 +3328,7 @@ static void spapr_memory_unplug(HotplugHandler *hotplug_dev, DeviceState *dev)
+     sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+     sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr, PC_DIMM(dev));
  
--static void pc_dimm_unplug(HotplugHandler *hotplug_dev,
--                           DeviceState *dev, Error **errp)
-+static void pc_memory_unplug(HotplugHandler *hotplug_dev,
-+                             DeviceState *dev, Error **errp)
- {
-     PCMachineState *pcms = PC_MACHINE(hotplug_dev);
-     HotplugHandlerClass *hhc;
-@@ -2015,7 +2015,7 @@ static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                       DeviceState *dev, Error **errp)
- {
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
--        pc_dimm_plug(hotplug_dev, dev, errp);
-+        pc_memory_plug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_plug(hotplug_dev, dev, errp);
-     }
-@@ -2025,7 +2025,7 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-                                                 DeviceState *dev, Error **errp)
- {
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
--        pc_dimm_unplug_request(hotplug_dev, dev, errp);
-+        pc_memory_unplug_request(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
-     } else {
-@@ -2038,7 +2038,7 @@ static void pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
-                                         DeviceState *dev, Error **errp)
- {
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
--        pc_dimm_unplug(hotplug_dev, dev, errp);
-+        pc_memory_unplug(hotplug_dev, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_unplug_cb(hotplug_dev, dev, errp);
-     } else {
+-    pc_dimm_memory_unplug(dev, MACHINE(hotplug_dev));
++    pc_dimm_unplug(dev, MACHINE(hotplug_dev));
+     object_unparent(OBJECT(dev));
+     spapr_pending_dimm_unplugs_remove(spapr, ds);
+ }
+diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+index 627c8601d9..860343d64f 100644
+--- a/include/hw/mem/pc-dimm.h
++++ b/include/hw/mem/pc-dimm.h
+@@ -78,7 +78,7 @@ typedef struct PCDIMMDeviceClass {
+ 
+ int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
+ 
+-void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+-                         uint64_t align, Error **errp);
+-void pc_dimm_memory_unplug(DeviceState *dev, MachineState *machine);
++void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
++                  Error **errp);
++void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
+ #endif
 -- 
 2.17.1
