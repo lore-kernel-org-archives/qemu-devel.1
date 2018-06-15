@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43105)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fTezX-0000Ws-BT
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:36 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fTezZ-0000XD-MO
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fTezS-0002Ir-W9
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36736 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fTezS-0002Hr-RD
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:30 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fTezY-0002Pt-Qs
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:37 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 15 Jun 2018 11:01:19 +0800
-Message-Id: <1529031683-27458-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 0/4] Net patches
+Date: Fri, 15 Jun 2018 11:01:20 +0800
+Message-Id: <1529031683-27458-2-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1529031683-27458-1-git-send-email-jasowang@redhat.com>
+References: <1529031683-27458-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PULL 1/4] tap: set vhostfd passed from qemu cli to
+ non-blocking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +21,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: Brijesh Singh <brijesh.singh@amd.com>, qemu-stable@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+
+From: Brijesh Singh <brijesh.singh@amd.com>
+
+A guest boot hangs while probing the network interface when
+iommu_platform=on is used.
+
+The following qemu cli hangs without this patch:
+
+# $QEMU \
+  -netdev tap,fd=3,id=hostnet0,vhost=on,vhostfd=4 3<>/dev/tap67 4<>/dev/host-net \
+  -device virtio-net-pci,netdev=hostnet0,id=net0,iommu_platform=on,disable-legacy=on \
+  ...
+
+Commit: c471ad0e9bd46 (vhost_net: device IOTLB support) took care of
+setting vhostfd to non-blocking when QEMU opens /dev/host-net but if
+the fd is passed from qemu cli then we need to ensure that fd is set
+to non-blocking.
+
+Fixes: c471ad0e9bd46 ("vhost_net: device IOTLB support")
+Cc: qemu-stable@nongnu.org
+Cc: Michael S. Tsirkin <mst@redhat.com>
 Cc: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ net/tap.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-The following changes since commit 409c241f887a38bb7a2ac12e34d3a8d73922a9a5:
-
-  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180614-pull-request' into staging (2018-06-14 14:04:14 +0100)
-
-are available in the git repository at:
-
-  https://github.com/jasowang/qemu.git tags/net-pull-request
-
-for you to fetch changes up to c67daf4a24442d1bb404a11a6a54dc45ea10f234:
-
-  vhost-user: delete net client if necessary (2018-06-15 10:39:53 +0800)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-Brijesh Singh (1):
-      tap: set vhostfd passed from qemu cli to non-blocking
-
-Jan Kiszka (1):
-      e1000e: Do not auto-clear ICR bits which aren't set in EIAC
-
-Lin Ma (1):
-      net: Fix a potential segfault
-
-linzhecheng (1):
-      vhost-user: delete net client if necessary
-
- hw/net/e1000e_core.c | 4 ----
- net/net.c            | 4 +++-
- net/tap.c            | 2 ++
- net/vhost-user.c     | 3 +++
- 4 files changed, 8 insertions(+), 5 deletions(-)
+diff --git a/net/tap.c b/net/tap.c
+index de05f20..2126f48 100644
+--- a/net/tap.c
++++ b/net/tap.c
+@@ -40,6 +40,7 @@
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
+ #include "qemu/error-report.h"
++#include "qemu/sockets.h"
+ 
+ #include "net/tap.h"
+ 
+@@ -693,6 +694,7 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
+                 }
+                 return;
+             }
++            qemu_set_nonblock(vhostfd);
+         } else {
+             vhostfd = open("/dev/vhost-net", O_RDWR);
+             if (vhostfd < 0) {
+-- 
+2.7.4
