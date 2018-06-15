@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbc-0006Bd-Ot
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbf-0006FH-AP
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbb-0003mp-2K
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbY-0003jY-Di
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:39 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 15 Jun 2018 16:21:03 +0200
-Message-Id: <20180615142108.27814-22-kwolf@redhat.com>
+Date: Fri, 15 Jun 2018 16:20:53 +0200
+Message-Id: <20180615142108.27814-12-kwolf@redhat.com>
 In-Reply-To: <20180615142108.27814-1-kwolf@redhat.com>
 References: <20180615142108.27814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 21/26] rbd: New parameter auth-client-required
+Subject: [Qemu-devel] [PULL 11/26] block: Clean up a misuse of qobject_to()
+ in .bdrv_co_create_opts()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,173 +25,226 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Markus Armbruster <armbru@redhat.com>
 
-Parameter auth-client-required lets you configure authentication
-methods.  We tried to provide that in v2.9.0, but backed out due to
-interface design doubts (commit 464444fcc16).
+The following pattern occurs in the .bdrv_co_create_opts() methods of
+parallels, qcow, qcow2, qed, vhdx and vpc:
 
-This commit is similar to what we backed out, but simpler: we use a
-list of enumeration values instead of a list of objects with a member
-of enumeration type.
+    qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
+    qobject_unref(qdict);
+    qdict = qobject_to(QDict, qobj);
+    if (qdict == NULL) {
+         ret = -EINVAL;
+         goto done;
+    }
 
-Let's review our reasons for backing out the first try, as stated in
-the commit message:
+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
+    [...]
+    ret = 0;
+done:
+    qobject_unref(qdict);
+    [...]
+    return ret;
 
-    * The implementation uses deprecated rados_conf_set() key
-      "auth_supported".  No biggie.
-
-Fixed: we use "auth-client-required".
-
-    * The implementation makes -drive silently ignore invalid parameters
-      "auth" and "auth-supported.*.X" where X isn't "auth".  Fixable (in
-      fact I'm going to fix similar bugs around parameter server), so
-      again no biggie.
-
-That fix is commit 2836284db60.  This commit doesn't bring the bugs
-back.
-
-    * BlockdevOptionsRbd member @password-secret applies only to
-      authentication method cephx.  Should it be a variant member of
-      RbdAuthMethod?
-
-We've had time to ponder, and we decided to stick to the way Ceph
-configuration works: the key configured separately, and silently
-ignored if the authentication method doesn't use it.
-
-    * BlockdevOptionsRbd member @user could apply to both methods cephx
-      and none, but I'm not sure it's actually used with none.  If it
-      isn't, should it be a variant member of RbdAuthMethod?
-
-Likewise.
-
-    * The client offers a *set* of authentication methods, not a list.
-      Should the methods be optional members of BlockdevOptionsRbd instead
-      of members of list @auth-supported?  The latter begs the question
-      what multiple entries for the same method mean.  Trivial question
-      now that RbdAuthMethod contains nothing but @type, but less so when
-      RbdAuthMethod acquires other members, such the ones discussed above.
-
-Again, we decided to stick to the way Ceph configuration works, except
-we make auth-client-required a list of enumeration values instead of a
-string containing keywords separated by delimiters.
-
-    * How BlockdevOptionsRbd member @auth-supported interacts with
-      settings from a configuration file specified with @conf is
-      undocumented.  I suspect it's untested, too.
-
-Not actually true, the documentation for @conf says "Values in the
-configuration file will be overridden by options specified via QAPI",
-and we've tested this.
+If qobject_to() fails, we return failure without setting errp.  That's
+wrong.  As far as I can tell, it cannot fail here.  Clean it up
+anyway, by removing the useless conversion.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json | 13 +++++++++++++
- block/rbd.c          | 42 ++++++++++++++++++++++++++++++++----------
- 2 files changed, 45 insertions(+), 10 deletions(-)
+ block/parallels.c | 9 ++++-----
+ block/qcow.c      | 9 ++++-----
+ block/qcow2.c     | 9 ++++-----
+ block/qed.c       | 9 ++++-----
+ block/vhdx.c      | 9 ++++-----
+ block/vpc.c       | 9 ++++-----
+ 6 files changed, 24 insertions(+), 30 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index fff23fc82b..0f68ca56f3 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -3178,6 +3178,14 @@
+diff --git a/block/parallels.c b/block/parallels.c
+index 695899fc4b..ceb7a15d62 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -616,7 +616,7 @@ static int coroutine_fn parallels_co_create_opts(const char *filename,
+     BlockdevCreateOptions *create_options = NULL;
+     Error *local_err = NULL;
+     BlockDriverState *bs = NULL;
+-    QDict *qdict = NULL;
++    QDict *qdict;
+     QObject *qobj;
+     Visitor *v;
+     int ret;
+@@ -654,14 +654,13 @@ static int coroutine_fn parallels_co_create_opts(const char *filename,
+     qdict_put_str(qdict, "file", bs->node_name);
  
+     qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
+-    qobject_unref(qdict);
+-    qdict = qobject_to(QDict, qobj);
+-    if (qdict == NULL) {
++    if (!qobj) {
+         ret = -EINVAL;
+         goto done;
+     }
  
- ##
-+# @RbdAuthMode:
-+#
-+# Since: 3.0
-+##
-+{ 'enum': 'RbdAuthMode',
-+  'data': [ 'cephx', 'none' ] }
-+
-+##
- # @BlockdevOptionsRbd:
- #
- # @pool:               Ceph pool name.
-@@ -3192,6 +3200,10 @@
- #
- # @user:               Ceph id name.
- #
-+# @auth-client-required: Acceptable authentication modes.
-+#                      This maps to Ceph configuration option
-+#                      "auth_client_required".  (Since 3.0)
-+#
- # @server:             Monitor host address and port.  This maps
- #                      to the "mon_host" Ceph option.
- #
-@@ -3203,6 +3215,7 @@
-             '*conf': 'str',
-             '*snapshot': 'str',
-             '*user': 'str',
-+            '*auth-client-required': ['RbdAuthMode'],
-             '*server': ['InetSocketAddressBase'] } }
+-    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
++    v = qobject_input_visitor_new_keyval(qobj);
++    qobject_unref(qobj);
+     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
+     visit_free(v);
  
- ##
-diff --git a/block/rbd.c b/block/rbd.c
-index 82346a2a5e..ea0575d068 100644
---- a/block/rbd.c
-+++ b/block/rbd.c
-@@ -240,20 +240,42 @@ static void qemu_rbd_refresh_limits(BlockDriverState *bs, Error **errp)
- 
- 
- static int qemu_rbd_set_auth(rados_t cluster, const char *secretid,
-+                             BlockdevOptionsRbd *opts,
-                              Error **errp)
+diff --git a/block/qcow.c b/block/qcow.c
+index 860b058240..2f81f081fd 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -946,7 +946,7 @@ static int coroutine_fn qcow_co_create_opts(const char *filename,
  {
--    if (secretid == 0) {
--        return 0;
--    }
-+    char *acr;
-+    int r;
-+    GString *accu;
-+    RbdAuthModeList *auth;
-+
-+    if (secretid) {
-+        gchar *secret = qcrypto_secret_lookup_as_base64(secretid,
-+                                                        errp);
-+        if (!secret) {
-+            return -1;
-+        }
+     BlockdevCreateOptions *create_options = NULL;
+     BlockDriverState *bs = NULL;
+-    QDict *qdict = NULL;
++    QDict *qdict;
+     QObject *qobj;
+     Visitor *v;
+     const char *val;
+@@ -998,14 +998,13 @@ static int coroutine_fn qcow_co_create_opts(const char *filename,
+     qdict_put_str(qdict, "file", bs->node_name);
  
--    gchar *secret = qcrypto_secret_lookup_as_base64(secretid,
--                                                    errp);
--    if (!secret) {
--        return -1;
-+        rados_conf_set(cluster, "key", secret);
-+        g_free(secret);
+     qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
+-    qobject_unref(qdict);
+-    qdict = qobject_to(QDict, qobj);
+-    if (qdict == NULL) {
++    if (!qobj) {
+         ret = -EINVAL;
+         goto fail;
      }
  
--    rados_conf_set(cluster, "key", secret);
--    g_free(secret);
-+    if (opts->has_auth_client_required) {
-+        accu = g_string_new("");
-+        for (auth = opts->auth_client_required; auth; auth = auth->next) {
-+            if (accu->str[0]) {
-+                g_string_append_c(accu, ';');
-+            }
-+            g_string_append(accu, RbdAuthMode_str(auth->value));
-+        }
-+        acr = g_string_free(accu, FALSE);
-+        r = rados_conf_set(cluster, "auth_client_required", acr);
-+        g_free(acr);
-+        if (r < 0) {
-+            error_setg_errno(errp, -r,
-+                             "Could not set 'auth_client_required'");
-+            return r;
-+        }
-+    }
+-    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
++    v = qobject_input_visitor_new_keyval(qobj);
++    qobject_unref(qobj);
+     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
+     visit_free(v);
  
-     return 0;
- }
-@@ -585,7 +607,7 @@ static int qemu_rbd_connect(rados_t *cluster, rados_ioctx_t *io_ctx,
-         }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 0a27afa2ef..8c338661db 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3080,7 +3080,7 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
+                                              Error **errp)
+ {
+     BlockdevCreateOptions *create_options = NULL;
+-    QDict *qdict = NULL;
++    QDict *qdict;
+     QObject *qobj;
+     Visitor *v;
+     BlockDriverState *bs = NULL;
+@@ -3153,14 +3153,13 @@ static int coroutine_fn qcow2_co_create_opts(const char *filename, QemuOpts *opt
+ 
+     /* Now get the QAPI type BlockdevCreateOptions */
+     qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
+-    qobject_unref(qdict);
+-    qdict = qobject_to(QDict, qobj);
+-    if (qdict == NULL) {
++    if (!qobj) {
+         ret = -EINVAL;
+         goto finish;
      }
  
--    if (qemu_rbd_set_auth(*cluster, secretid, errp) < 0) {
-+    if (qemu_rbd_set_auth(*cluster, secretid, opts, errp) < 0) {
-         r = -EIO;
-         goto failed_shutdown;
+-    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
++    v = qobject_input_visitor_new_keyval(qobj);
++    qobject_unref(qobj);
+     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
+     visit_free(v);
+ 
+diff --git a/block/qed.c b/block/qed.c
+index 88fa36d409..fcec760b26 100644
+--- a/block/qed.c
++++ b/block/qed.c
+@@ -722,7 +722,7 @@ static int coroutine_fn bdrv_qed_co_create_opts(const char *filename,
+                                                 Error **errp)
+ {
+     BlockdevCreateOptions *create_options = NULL;
+-    QDict *qdict = NULL;
++    QDict *qdict;
+     QObject *qobj;
+     Visitor *v;
+     BlockDriverState *bs = NULL;
+@@ -764,14 +764,13 @@ static int coroutine_fn bdrv_qed_co_create_opts(const char *filename,
+     qdict_put_str(qdict, "file", bs->node_name);
+ 
+     qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
+-    qobject_unref(qdict);
+-    qdict = qobject_to(QDict, qobj);
+-    if (qdict == NULL) {
++    if (!qobj) {
+         ret = -EINVAL;
+         goto fail;
      }
+ 
+-    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
++    v = qobject_input_visitor_new_keyval(qobj);
++    qobject_unref(qobj);
+     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
+     visit_free(v);
+ 
+diff --git a/block/vhdx.c b/block/vhdx.c
+index 78b29d9fc7..f2aec3d2cd 100644
+--- a/block/vhdx.c
++++ b/block/vhdx.c
+@@ -1965,7 +1965,7 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename,
+                                             Error **errp)
+ {
+     BlockdevCreateOptions *create_options = NULL;
+-    QDict *qdict = NULL;
++    QDict *qdict;
+     QObject *qobj;
+     Visitor *v;
+     BlockDriverState *bs = NULL;
+@@ -2006,14 +2006,13 @@ static int coroutine_fn vhdx_co_create_opts(const char *filename,
+     qdict_put_str(qdict, "file", bs->node_name);
+ 
+     qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
+-    qobject_unref(qdict);
+-    qdict = qobject_to(QDict, qobj);
+-    if (qdict == NULL) {
++    if (!qobj) {
+         ret = -EINVAL;
+         goto fail;
+     }
+ 
+-    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
++    v = qobject_input_visitor_new_keyval(qobj);
++    qobject_unref(qobj);
+     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
+     visit_free(v);
+ 
+diff --git a/block/vpc.c b/block/vpc.c
+index 16178e5a90..a9bb04149d 100644
+--- a/block/vpc.c
++++ b/block/vpc.c
+@@ -1081,7 +1081,7 @@ static int coroutine_fn vpc_co_create_opts(const char *filename,
+                                            QemuOpts *opts, Error **errp)
+ {
+     BlockdevCreateOptions *create_options = NULL;
+-    QDict *qdict = NULL;
++    QDict *qdict;
+     QObject *qobj;
+     Visitor *v;
+     BlockDriverState *bs = NULL;
+@@ -1120,14 +1120,13 @@ static int coroutine_fn vpc_co_create_opts(const char *filename,
+     qdict_put_str(qdict, "file", bs->node_name);
+ 
+     qobj = qdict_crumple_for_keyval_qiv(qdict, errp);
+-    qobject_unref(qdict);
+-    qdict = qobject_to(QDict, qobj);
+-    if (qdict == NULL) {
++    if (!qobj) {
+         ret = -EINVAL;
+         goto fail;
+     }
+ 
+-    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
++    v = qobject_input_visitor_new_keyval(qobj);
++    qobject_unref(qobj);
+     visit_type_BlockdevCreateOptions(v, NULL, &create_options, &local_err);
+     visit_free(v);
+ 
 -- 
 2.13.6
