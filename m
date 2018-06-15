@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fTpfQ-0001Xm-67
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:33 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fTpfQ-0001Xz-Uu
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fTpfO-0006Af-OL
+	(envelope-from <pm215@archaic.org.uk>) id 1fTpfP-0006Az-M1
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:32 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42762)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fTpfO-00065w-E6
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:30 -0400
+	id 1fTpfP-00065w-DW
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:31 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fTpfG-0003a4-P0
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:25:22 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fTpfN-0003eQ-Su
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:25:29 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Jun 2018 15:24:38 +0100
-Message-Id: <20180615142521.19143-1-peter.maydell@linaro.org>
+Date: Fri, 15 Jun 2018 15:24:48 +0100
+Message-Id: <20180615142521.19143-11-peter.maydell@linaro.org>
+In-Reply-To: <20180615142521.19143-1-peter.maydell@linaro.org>
+References: <20180615142521.19143-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/43] target-arm queue
+Subject: [Qemu-devel] [PULL 10/43] hw/arm/armv7m: Remove unused
+ armv7m_init() function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,153 +33,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-target-arm queue; this one has a fair scattering of more
-miscellaneous things in it which I've sent out this week.
-I've shoved those in as well as it seemed the least-effort
-way of getting them into master; a few of them are dependencies
-on arm-related patches I have brewing.
+Remove the now-unused armv7m_init() function. This was a legacy from
+before we properly QOMified ARMv7M, and it has some flaws:
 
-thanks
--- PMM
+ * it combines work that needs to be done by an SoC object (creating
+   and initializing the TYPE_ARMV7M object) with work that needs to
+   be done by the board model (setting the system up to load the ELF
+   file specified with -kernel)
+ * TYPE_ARMV7M creation failure is fatal, but an SoC object wants to
+   arrange to propagate the failure outward
+ * it uses allocate-and-create via qdev_create() whereas the current
+   preferred style for SoC objects is to do creation in-place
 
+Board and SoC models can instead do the two jobs this function
+was doing themselves, in the right places and with whatever their
+preferred style/error handling is.
 
-The following changes since commit 2702c2d3eb74e3908c0c5dbf3a71c8987595a86e:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20180601144328.23817-3-peter.maydell@linaro.org
+---
+ include/hw/arm/arm.h |  8 ++------
+ hw/arm/armv7m.c      | 21 ---------------------
+ 2 files changed, 2 insertions(+), 27 deletions(-)
 
-  Merge remote-tracking branch 'remotes/stsquad/tags/pull-travis-updates-140618-1' into staging (2018-06-15 12:49:36 +0100)
-
-are available in the Git repository at:
-
-  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180615
-
-for you to fetch changes up to 14120108f87b3f9e1beacdf0a6096e464e62bb65:
-
-  target/arm: Allow ARMv6-M Thumb2 instructions (2018-06-15 15:23:34 +0100)
-
-----------------------------------------------------------------
-target-arm and miscellaneous queue:
- * fix KVM state save/restore for GICv3 priority registers for high IRQ numbers
- * hw/arm/mps2-tz: Put ethernet controller behind PPC
- * hw/sh/sh7750: Convert away from old_mmio
- * hw/m68k/mcf5206: Convert away from old_mmio
- * hw/block/pflash_cfi02: Convert away from old_mmio
- * hw/watchdog/wdt_i6300esb: Convert away from old_mmio
- * hw/input/pckbd: Convert away from old_mmio
- * hw/char/parallel: Convert away from old_mmio
- * armv7m: refactor to get rid of armv7m_init() function
- * arm: Don't crash if user tries to use a Cortex-M CPU without an NVIC
- * hw/core/or-irq: Support more than 16 inputs to an OR gate
- * cpu-defs.h: Document CPUIOTLBEntry 'addr' field
- * cputlb: Pass cpu_transaction_failed() the correct physaddr
- * CODING_STYLE: Define our preferred form for multiline comments
- * Add and use new stn_*_p() and ldn_*_p() memory access functions
- * target/arm: More parts of the upcoming SVE support
- * aspeed_scu: Implement RNG register
- * m25p80: add support for two bytes WRSR for Macronix chips
- * exec.c: Handle IOMMUs being in the path of TCG CPU memory accesses
- * target/arm: Allow ARMv6-M Thumb2 instructions
-
-----------------------------------------------------------------
-Cédric Le Goater (1):
-      m25p80: add support for two bytes WRSR for Macronix chips
-
-Joel Stanley (1):
-      aspeed_scu: Implement RNG register
-
-Julia Suvorova (1):
-      target/arm: Allow ARMv6-M Thumb2 instructions
-
-Peter Maydell (21):
-      hw/arm/mps2-tz: Put ethernet controller behind PPC
-      hw/sh/sh7750: Convert away from old_mmio
-      hw/m68k/mcf5206: Convert away from old_mmio
-      hw/block/pflash_cfi02: Convert away from old_mmio
-      hw/watchdog/wdt_i6300esb: Convert away from old_mmio
-      hw/input/pckbd: Convert away from old_mmio
-      hw/char/parallel: Convert away from old_mmio
-      stellaris: Stop using armv7m_init()
-      hw/arm/armv7m: Remove unused armv7m_init() function
-      arm: Don't crash if user tries to use a Cortex-M CPU without an NVIC
-      hw/core/or-irq: Support more than 16 inputs to an OR gate
-      cpu-defs.h: Document CPUIOTLBEntry 'addr' field
-      cputlb: Pass cpu_transaction_failed() the correct physaddr
-      CODING_STYLE: Define our preferred form for multiline comments
-      bswap: Add new stn_*_p() and ldn_*_p() memory access functions
-      exec.c: Don't accidentally sign-extend 4-byte loads in subpage_read()
-      exec.c: Use stn_p() and ldn_p() instead of explicit switches
-      iommu: Add IOMMU index concept to IOMMU API
-      iommu: Add IOMMU index argument to notifier APIs
-      iommu: Add IOMMU index argument to translate method
-      exec.c: Handle IOMMUs in address_space_translate_for_iotlb()
-
-Richard Henderson (18):
-      target/arm: Extend vec_reg_offset to larger sizes
-      target/arm: Implement SVE Permute - Unpredicated Group
-      target/arm: Implement SVE Permute - Predicates Group
-      target/arm: Implement SVE Permute - Interleaving Group
-      target/arm: Implement SVE compress active elements
-      target/arm: Implement SVE conditionally broadcast/extract element
-      target/arm: Implement SVE copy to vector (predicated)
-      target/arm: Implement SVE reverse within elements
-      target/arm: Implement SVE vector splice (predicated)
-      target/arm: Implement SVE Select Vectors Group
-      target/arm: Implement SVE Integer Compare - Vectors Group
-      target/arm: Implement SVE Integer Compare - Immediate Group
-      target/arm: Implement SVE Partition Break Group
-      target/arm: Implement SVE Predicate Count Group
-      target/arm: Implement SVE Integer Compare - Scalars Group
-      target/arm: Implement FDUP/DUP
-      target/arm: Implement SVE Integer Wide Immediate - Unpredicated Group
-      target/arm: Implement SVE Floating Point Arithmetic - Unpredicated Group
-
-Shannon Zhao (1):
-      arm_gicv3_kvm: kvm_dist_get/put_priority: skip the registers banked by GICR_IPRIORITYR
-
- include/exec/cpu-all.h      |    4 +
- include/exec/cpu-defs.h     |    9 +
- include/exec/exec-all.h     |   16 +-
- include/exec/memory.h       |   65 +-
- include/hw/arm/arm.h        |    8 +-
- include/hw/or-irq.h         |    5 +-
- include/qemu/bswap.h        |   52 ++
- include/qom/cpu.h           |    3 +
- target/arm/helper-sve.h     |  294 +++++++++
- target/arm/helper.h         |   19 +
- target/arm/translate-a64.h  |   26 +-
- accel/tcg/cputlb.c          |   59 +-
- exec.c                      |  263 ++++----
- hw/alpha/typhoon.c          |    3 +-
- hw/arm/armv7m.c             |   28 +-
- hw/arm/mps2-tz.c            |   32 +-
- hw/arm/smmuv3.c             |    2 +-
- hw/arm/stellaris.c          |   12 +-
- hw/block/m25p80.c           |    1 +
- hw/block/pflash_cfi02.c     |   97 +--
- hw/char/parallel.c          |   50 +-
- hw/core/or-irq.c            |   39 +-
- hw/dma/rc4030.c             |    2 +-
- hw/i386/amd_iommu.c         |    2 +-
- hw/i386/intel_iommu.c       |    8 +-
- hw/input/pckbd.c            |   14 +-
- hw/intc/arm_gicv3_kvm.c     |   18 +-
- hw/intc/armv7m_nvic.c       |    6 +-
- hw/m68k/mcf5206.c           |   48 +-
- hw/misc/aspeed_scu.c        |   20 +
- hw/ppc/spapr_iommu.c        |    5 +-
- hw/s390x/s390-pci-bus.c     |    2 +-
- hw/s390x/s390-pci-inst.c    |    4 +-
- hw/sh4/sh7750.c             |   44 +-
- hw/sparc/sun4m_iommu.c      |    3 +-
- hw/sparc64/sun4u_iommu.c    |    2 +-
- hw/vfio/common.c            |    6 +-
- hw/virtio/vhost.c           |    7 +-
- hw/watchdog/wdt_i6300esb.c  |   48 +-
- memory.c                    |   33 +-
- target/arm/cpu.c            |   18 +
- target/arm/sve_helper.c     | 1250 +++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c  | 1458 +++++++++++++++++++++++++++++++++++++++++++
- target/arm/translate.c      |   43 +-
- target/arm/vec_helper.c     |   69 ++
- CODING_STYLE                |   17 +
- docs/devel/loads-stores.rst |   15 +
- target/arm/sve.decode       |  248 ++++++++
- 48 files changed, 4114 insertions(+), 363 deletions(-)
+diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
+index 70fa2287e2c..ffed39252d8 100644
+--- a/include/hw/arm/arm.h
++++ b/include/hw/arm/arm.h
+@@ -23,9 +23,6 @@ typedef enum {
+     ARM_ENDIANNESS_BE32,
+ } arm_endianness;
+ 
+-/* armv7m.c */
+-DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+-                         const char *kernel_filename, const char *cpu_type);
+ /**
+  * armv7m_load_kernel:
+  * @cpu: CPU
+@@ -33,9 +30,8 @@ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+  * @mem_size: mem_size: maximum image size to load
+  *
+  * Load the guest image for an ARMv7M system. This must be called by
+- * any ARMv7M board, either directly or via armv7m_init(). (This is
+- * necessary to ensure that the CPU resets correctly on system reset,
+- * as well as for kernel loading.)
++ * any ARMv7M board. (This is necessary to ensure that the CPU resets
++ * correctly on system reset, as well as for kernel loading.)
+  */
+ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size);
+ 
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index f123cc7d3d2..a4ab7d20696 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -261,27 +261,6 @@ static void armv7m_reset(void *opaque)
+     cpu_reset(CPU(cpu));
+ }
+ 
+-/* Init CPU and memory for a v7-M based board.
+-   mem_size is in bytes.
+-   Returns the ARMv7M device.  */
+-
+-DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+-                         const char *kernel_filename, const char *cpu_type)
+-{
+-    DeviceState *armv7m;
+-
+-    armv7m = qdev_create(NULL, TYPE_ARMV7M);
+-    qdev_prop_set_uint32(armv7m, "num-irq", num_irq);
+-    qdev_prop_set_string(armv7m, "cpu-type", cpu_type);
+-    object_property_set_link(OBJECT(armv7m), OBJECT(get_system_memory()),
+-                                     "memory", &error_abort);
+-    /* This will exit with an error if the user passed us a bad cpu_type */
+-    qdev_init_nofail(armv7m);
+-
+-    armv7m_load_kernel(ARM_CPU(first_cpu), kernel_filename, mem_size);
+-    return armv7m;
+-}
+-
+ void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
+ {
+     int image_size;
+-- 
+2.17.1
