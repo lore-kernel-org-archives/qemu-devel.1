@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fTgal-000062-2K
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 00:44:07 -0400
+	(envelope-from <thuth@redhat.com>) id 1fTh5G-0006Kn-F0
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 01:15:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fTgah-0004X2-4B
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 00:44:07 -0400
-References: <20180611141716.3813-1-peter.maydell@linaro.org>
-	<650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
-	<CAFEAcA-vZH0KUxi+iYP3eYzXeHxNTotNwCMhEPcGhOLksbG71A@mail.gmail.com>
-	<f9beda14-7c4a-8f89-baf1-5a79e847c4ac@redhat.com>
-	<CAFEAcA_egToeW7ksTncbFCsW6uTh1FcPSgW6gx+VnjvQpqwWsw@mail.gmail.com>
-	<ba6b4e80-c31a-6033-ea59-b4c4f1923be7@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1fTh5B-0000ni-CS
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 01:15:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56378 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fTh5B-0000mh-5r
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 01:15:33 -0400
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ddf0a4cf-2286-9d3d-ea18-f61865f40fa9@redhat.com>
-Date: Fri, 15 Jun 2018 06:43:50 +0200
+References: <1522924983-4523-1-git-send-email-thuth@redhat.com>
+Message-ID: <16444602-26f5-46ba-2d39-92e68c5bf904@redhat.com>
+Date: Fri, 15 Jun 2018 07:15:29 +0200
 MIME-Version: 1.0
-In-Reply-To: <ba6b4e80-c31a-6033-ea59-b4c4f1923be7@redhat.com>
+In-Reply-To: <1522924983-4523-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
- for multiline comments
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/sparc/sun4m: Fix problems with device
+ introspection
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +28,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 
-On 14.06.2018 22:11, John Snow wrote:
->=20
-> On 06/14/2018 06:46 AM, Peter Maydell wrote:
-[...]
->=20
-> *cough* I hate the way it looks too, but C99 comments have a few things
-> going for them:
->=20
-> // A multi-line comment block like this has no extra lines and every
-> // line in the comment is prefaced individually which aids grep
-> // readability, while maintained good vertical symmetry.
->=20
-> I think we hate C99 comments, though? Certainly we don't use them at al=
-l
-> right now, so it's not a good fit.
+On 05.04.2018 12:43, Thomas Huth wrote:
+> Several devices of the sun4m machines are using &error_fatal in
+> their instance_init function and thus can cause QEMU to abort
+> unexpectedly:
+> 
+> $ echo "{'execute':'qmp_capabilities'}"\
+>        "{'execute':'device-list-properties',"\
+>        " 'arguments':{'typename':'openprom'}}" \
+>        | sparc-softmmu/qemu-system-sparc -M SS-10 -S -qmp stdio
+> {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
+>  "package": "build-all"}, "capabilities": []}}
+> {"return": {}}
+> RAMBlock "sun4m.prom" already registered, abort!
+> Aborted (core dumped)
+> 
+> $ echo "{'execute':'qmp_capabilities'}"\
+>        "{'execute':'device-list-properties',"\
+>        " 'arguments':{'typename':'macio_idreg'}}" \
+>        | sparc-softmmu/qemu-system-sparc -M SS-10 -S -qmp stdio
+> {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
+>  "package": "build-all"}, "capabilities": []}}
+> {"return": {}}
+> RAMBlock "sun4m.idreg" already registered, abort!
+> Aborted (core dumped)
+> 
+> $ echo "{'execute':'qmp_capabilities'}"\
+>        "{'execute':'device-list-properties',"\
+>        " 'arguments':{'typename':'tcx_afx'}}" \
+>        | sparc-softmmu/qemu-system-sparc -M SS-5 -S -qmp stdio
+> {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
+>  "package": "build-all"}, "capabilities": []}}
+> {"return": {}}
+> RAMBlock "sun4m.afx" already registered, abort!
+> Aborted (core dumped)
+> 
+> Fix the issues by converting the instance_init functions into realize()
+> functions instead, which are allowed to fail (and not called during
+> device introspection).
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/sparc/sun4m.c | 67 ++++++++++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 50 insertions(+), 17 deletions(-)
+> 
+> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+> index 6471aca..8254ec3 100644
+> --- a/hw/sparc/sun4m.c
+> +++ b/hw/sparc/sun4m.c
+> @@ -572,23 +572,36 @@ typedef struct IDRegState {
+>      MemoryRegion mem;
+>  } IDRegState;
+>  
+> -static void idreg_init1(Object *obj)
+> +static void idreg_realize(DeviceState *ds, Error **errp)
+>  {
+> -    IDRegState *s = MACIO_ID_REGISTER(obj);
+> -    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+> +    IDRegState *s = MACIO_ID_REGISTER(ds);
+> +    SysBusDevice *dev = SYS_BUS_DEVICE(ds);
+> +    Error *local_err = NULL;
+> +
+> +    memory_region_init_ram_nomigrate(&s->mem, OBJECT(ds), "sun4m.idreg",
+> +                                     sizeof(idreg_data), &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+>  
+> -    memory_region_init_ram_nomigrate(&s->mem, obj,
+> -                           "sun4m.idreg", sizeof(idreg_data), &error_fatal);
+>      vmstate_register_ram_global(&s->mem);
+>      memory_region_set_readonly(&s->mem, true);
+>      sysbus_init_mmio(dev, &s->mem);
+>  }
+>  
+> +static void idreg_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +
+> +    dc->realize = idreg_realize;
+> +}
+> +
+>  static const TypeInfo idreg_info = {
+>      .name          = TYPE_MACIO_ID_REGISTER,
+>      .parent        = TYPE_SYS_BUS_DEVICE,
+>      .instance_size = sizeof(IDRegState),
+> -    .instance_init = idreg_init1,
+> +    .class_init    = idreg_class_init,
+>  };
+>  
+>  #define TYPE_TCX_AFX "tcx_afx"
+> @@ -613,21 +626,35 @@ static void afx_init(hwaddr addr)
+>      sysbus_mmio_map(s, 0, addr);
+>  }
+>  
+> -static void afx_init1(Object *obj)
+> +static void afx_realize(DeviceState *ds, Error **errp)
+>  {
+> -    AFXState *s = TCX_AFX(obj);
+> -    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+> +    AFXState *s = TCX_AFX(ds);
+> +    SysBusDevice *dev = SYS_BUS_DEVICE(ds);
+> +    Error *local_err = NULL;
+> +
+> +    memory_region_init_ram_nomigrate(&s->mem, OBJECT(ds), "sun4m.afx", 4,
+> +                                     &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+>  
+> -    memory_region_init_ram_nomigrate(&s->mem, obj, "sun4m.afx", 4, &error_fatal);
+>      vmstate_register_ram_global(&s->mem);
+>      sysbus_init_mmio(dev, &s->mem);
+>  }
+>  
+> +static void afx_class_init(ObjectClass *oc, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +
+> +    dc->realize = afx_realize;
+> +}
+> +
+>  static const TypeInfo afx_info = {
+>      .name          = TYPE_TCX_AFX,
+>      .parent        = TYPE_SYS_BUS_DEVICE,
+>      .instance_size = sizeof(AFXState),
+> -    .instance_init = afx_init1,
+> +    .class_init    = afx_class_init,
+>  };
+>  
+>  #define TYPE_OPENPROM "openprom"
+> @@ -680,13 +707,19 @@ static void prom_init(hwaddr addr, const char *bios_name)
+>      }
+>  }
+>  
+> -static void prom_init1(Object *obj)
+> +static void prom_realize(DeviceState *ds, Error **errp)
+>  {
+> -    PROMState *s = OPENPROM(obj);
+> -    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
+> +    PROMState *s = OPENPROM(ds);
+> +    SysBusDevice *dev = SYS_BUS_DEVICE(ds);
+> +    Error *local_err = NULL;
+> +
+> +    memory_region_init_ram_nomigrate(&s->prom, OBJECT(ds), "sun4m.prom",
+> +                                     PROM_SIZE_MAX, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+>  
+> -    memory_region_init_ram_nomigrate(&s->prom, obj, "sun4m.prom", PROM_SIZE_MAX,
+> -                           &error_fatal);
+>      vmstate_register_ram_global(&s->prom);
+>      memory_region_set_readonly(&s->prom, true);
+>      sysbus_init_mmio(dev, &s->prom);
+> @@ -701,6 +734,7 @@ static void prom_class_init(ObjectClass *klass, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>  
+>      dc->props = prom_properties;
+> +    dc->realize = prom_realize;
+>  }
+>  
+>  static const TypeInfo prom_info = {
+> @@ -708,7 +742,6 @@ static const TypeInfo prom_info = {
+>      .parent        = TYPE_SYS_BUS_DEVICE,
+>      .instance_size = sizeof(PROMState),
+>      .class_init    = prom_class_init,
+> -    .instance_init = prom_init1,
+>  };
+>  
+>  #define TYPE_SUN4M_MEMORY "memory"
+> 
 
-But why do we hate them? I remember there were some reasons for not
-using them 10 or 15 years ago (some old C-compilers still did not
-support them yet), but today? ... it's likely just a legacy feeling.
-Maybe it's time to get over that feeling now?
-
->>> It would only begin to matter terribly much if we actually decided we
->>> wanted to do a doxygen-style doc generation for our internal APIs for
->>> compatibility with, say, fancier IDEs than vim/emacs.
-[...]
-> Do you have a proposed standard / do we have some consensus on which
-> generator tool or doc format we'd most like to see in QEMU? I could put
-> in some elbow grease to shine up the block layer if so...
-
-I remember that some years ago, somebody (I forgot who it was, sorry)
-once told me that we should use the same format in QEMU as in glib, i.e.
-GTK-Doc. But citing the GTK-Doc homepage: "For a more polished
-general-purpose documentation tool you may want to look at Doxygen" - so
-maybe that's the better choice instead.
+Ping!
 
  Thomas
