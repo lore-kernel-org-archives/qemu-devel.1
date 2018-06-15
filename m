@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTuAD-0007yC-7o
+	(envelope-from <ehabkost@redhat.com>) id 1fTuAB-0007xI-JT
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:13:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTuAC-0007Jj-9b
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:13:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58666)
+	(envelope-from <ehabkost@redhat.com>) id 1fTuA8-0007GZ-Ru
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:13:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47566)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTuAC-0007J6-3G
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:13:36 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTuA8-0007Fx-JH
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:13:32 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 15 Jun 2018 16:13:23 -0300
-Message-Id: <20180615191327.11480-4-ehabkost@redhat.com>
+Date: Fri, 15 Jun 2018 16:13:21 -0300
+Message-Id: <20180615191327.11480-2-ehabkost@redhat.com>
 In-Reply-To: <20180615191327.11480-1-ehabkost@redhat.com>
 References: <20180615191327.11480-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/7] scripts/qemu.py: allow adding to the list
- of extra arguments
+Subject: [Qemu-devel] [PULL 1/7] Remove COPYING.PYTHON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +29,303 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-From: Cleber Rosa <crosa@redhat.com>
+The COPYING.PYTHON file was added when we added the compatibility
+argparse.py module, which was licensed under the Python Software
+Foundation License Version 2.
 
-Tests will often need to add extra arguments to QEMU command
-line arguments.
+Now the compatibility argparse.py module was removed, and we are
+not carrying any code under that license anymore.  Remove
+COPYING.PYTHON.
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20180611180152.2681-1-ehabkost@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-Id: <20180530184156.15634-3-crosa@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/qemu.py | 6 ++++++
- 1 file changed, 6 insertions(+)
+ COPYING.PYTHON | 270 -------------------------------------------------
+ 1 file changed, 270 deletions(-)
+ delete mode 100644 COPYING.PYTHON
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index 08a3e9af5a..7cd8193df8 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -359,3 +359,9 @@ class QEMUMachine(object):
-         of the qemu process.
-         '''
-         return self._iolog
-+
-+    def add_args(self, *args):
-+        '''
-+        Adds to the list of extra arguments to be given to the QEMU bina=
-ry
-+        '''
-+        self._args.extend(args)
+diff --git a/COPYING.PYTHON b/COPYING.PYTHON
+deleted file mode 100644
+index 4d3f1ef276..0000000000
+--- a/COPYING.PYTHON
++++ /dev/null
+@@ -1,270 +0,0 @@
+-A. HISTORY OF THE SOFTWARE
+-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+-
+-Python was created in the early 1990s by Guido van Rossum at Stichting
+-Mathematisch Centrum (CWI, see http://www.cwi.nl) in the Netherlands
+-as a successor of a language called ABC.  Guido remains Python's
+-principal author, although it includes many contributions from others.
+-
+-In 1995, Guido continued his work on Python at the Corporation for
+-National Research Initiatives (CNRI, see http://www.cnri.reston.va.us)
+-in Reston, Virginia where he released several versions of the
+-software.
+-
+-In May 2000, Guido and the Python core development team moved to
+-BeOpen.com to form the BeOpen PythonLabs team.  In October of the same
+-year, the PythonLabs team moved to Digital Creations (now Zope
+-Corporation, see http://www.zope.com).  In 2001, the Python Software
+-Foundation (PSF, see http://www.python.org/psf/) was formed, a
+-non-profit organization created specifically to own Python-related
+-Intellectual Property.  Zope Corporation is a sponsoring member of
+-the PSF.
+-
+-All Python releases are Open Source (see http://www.opensource.org for
+-the Open Source Definition).  Historically, most, but not all, Python
+-releases have also been GPL-compatible; the table below summarizes
+-the various releases.
+-
+-    Release         Derived     Year        Owner       GPL-
+-                    from                                compatible? (1)
+-
+-    0.9.0 thru 1.2              1991-1995   CWI         yes
+-    1.3 thru 1.5.2  1.2         1995-1999   CNRI        yes
+-    1.6             1.5.2       2000        CNRI        no
+-    2.0             1.6         2000        BeOpen.com  no
+-    1.6.1           1.6         2001        CNRI        yes (2)
+-    2.1             2.0+1.6.1   2001        PSF         no
+-    2.0.1           2.0+1.6.1   2001        PSF         yes
+-    2.1.1           2.1+2.0.1   2001        PSF         yes
+-    2.2             2.1.1       2001        PSF         yes
+-    2.1.2           2.1.1       2002        PSF         yes
+-    2.1.3           2.1.2       2002        PSF         yes
+-    2.2.1           2.2         2002        PSF         yes
+-    2.2.2           2.2.1       2002        PSF         yes
+-    2.2.3           2.2.2       2003        PSF         yes
+-    2.3             2.2.2       2002-2003   PSF         yes
+-    2.3.1           2.3         2002-2003   PSF         yes
+-    2.3.2           2.3.1       2002-2003   PSF         yes
+-    2.3.3           2.3.2       2002-2003   PSF         yes
+-    2.3.4           2.3.3       2004        PSF         yes
+-    2.3.5           2.3.4       2005        PSF         yes
+-    2.4             2.3         2004        PSF         yes
+-    2.4.1           2.4         2005        PSF         yes
+-    2.4.2           2.4.1       2005        PSF         yes
+-    2.4.3           2.4.2       2006        PSF         yes
+-    2.5             2.4         2006        PSF         yes
+-    2.7             2.6         2010        PSF         yes
+-
+-Footnotes:
+-
+-(1) GPL-compatible doesn't mean that we're distributing Python under
+-    the GPL.  All Python licenses, unlike the GPL, let you distribute
+-    a modified version without making your changes open source.  The
+-    GPL-compatible licenses make it possible to combine Python with
+-    other software that is released under the GPL; the others don't.
+-
+-(2) According to Richard Stallman, 1.6.1 is not GPL-compatible,
+-    because its license has a choice of law clause.  According to
+-    CNRI, however, Stallman's lawyer has told CNRI's lawyer that 1.6.1
+-    is "not incompatible" with the GPL.
+-
+-Thanks to the many outside volunteers who have worked under Guido's
+-direction to make these releases possible.
+-
+-
+-B. TERMS AND CONDITIONS FOR ACCESSING OR OTHERWISE USING PYTHON
+-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+-
+-PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+---------------------------------------------
+-
+-1. This LICENSE AGREEMENT is between the Python Software Foundation
+-("PSF"), and the Individual or Organization ("Licensee") accessing and
+-otherwise using this software ("Python") in source or binary form and
+-its associated documentation.
+-
+-2. Subject to the terms and conditions of this License Agreement, PSF
+-hereby grants Licensee a nonexclusive, royalty-free, world-wide
+-license to reproduce, analyze, test, perform and/or display publicly,
+-prepare derivative works, distribute, and otherwise use Python
+-alone or in any derivative version, provided, however, that PSF's
+-License Agreement and PSF's notice of copyright, i.e., "Copyright (c)
+-2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Right=
+s
+-Reserved" are retained in Python alone or in any derivative version=20
+-prepared by Licensee.
+-
+-3. In the event Licensee prepares a derivative work that is based on
+-or incorporates Python or any part thereof, and wants to make
+-the derivative work available to others as provided herein, then
+-Licensee hereby agrees to include in any such work a brief summary of
+-the changes made to Python.
+-
+-4. PSF is making Python available to Licensee on an "AS IS"
+-basis.  PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+-IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND
+-DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+-FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON WILL NOT
+-INFRINGE ANY THIRD PARTY RIGHTS.
+-
+-5. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+-FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+-A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON,
+-OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+-
+-6. This License Agreement will automatically terminate upon a material
+-breach of its terms and conditions.
+-
+-7. Nothing in this License Agreement shall be deemed to create any
+-relationship of agency, partnership, or joint venture between PSF and
+-Licensee.  This License Agreement does not grant permission to use PSF
+-trademarks or trade name in a trademark sense to endorse or promote
+-products or services of Licensee, or any third party.
+-
+-8. By copying, installing or otherwise using Python, Licensee
+-agrees to be bound by the terms and conditions of this License
+-Agreement.
+-
+-
+-BEOPEN.COM LICENSE AGREEMENT FOR PYTHON 2.0
+--------------------------------------------
+-
+-BEOPEN PYTHON OPEN SOURCE LICENSE AGREEMENT VERSION 1
+-
+-1. This LICENSE AGREEMENT is between BeOpen.com ("BeOpen"), having an
+-office at 160 Saratoga Avenue, Santa Clara, CA 95051, and the
+-Individual or Organization ("Licensee") accessing and otherwise using
+-this software in source or binary form and its associated
+-documentation ("the Software").
+-
+-2. Subject to the terms and conditions of this BeOpen Python License
+-Agreement, BeOpen hereby grants Licensee a non-exclusive,
+-royalty-free, world-wide license to reproduce, analyze, test, perform
+-and/or display publicly, prepare derivative works, distribute, and
+-otherwise use the Software alone or in any derivative version,
+-provided, however, that the BeOpen Python License is retained in the
+-Software, alone or in any derivative version prepared by Licensee.
+-
+-3. BeOpen is making the Software available to Licensee on an "AS IS"
+-basis.  BEOPEN MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+-IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, BEOPEN MAKES NO AND
+-DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+-FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE WILL NOT
+-INFRINGE ANY THIRD PARTY RIGHTS.
+-
+-4. BEOPEN SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF THE
+-SOFTWARE FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS
+-AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THE SOFTWARE, OR ANY
+-DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+-
+-5. This License Agreement will automatically terminate upon a material
+-breach of its terms and conditions.
+-
+-6. This License Agreement shall be governed by and interpreted in all
+-respects by the law of the State of California, excluding conflict of
+-law provisions.  Nothing in this License Agreement shall be deemed to
+-create any relationship of agency, partnership, or joint venture
+-between BeOpen and Licensee.  This License Agreement does not grant
+-permission to use BeOpen trademarks or trade names in a trademark
+-sense to endorse or promote products or services of Licensee, or any
+-third party.  As an exception, the "BeOpen Python" logos available at
+-http://www.pythonlabs.com/logos.html may be used according to the
+-permissions granted on that web page.
+-
+-7. By copying, installing or otherwise using the software, Licensee
+-agrees to be bound by the terms and conditions of this License
+-Agreement.
+-
+-
+-CNRI LICENSE AGREEMENT FOR PYTHON 1.6.1
+----------------------------------------
+-
+-1. This LICENSE AGREEMENT is between the Corporation for National
+-Research Initiatives, having an office at 1895 Preston White Drive,
+-Reston, VA 20191 ("CNRI"), and the Individual or Organization
+-("Licensee") accessing and otherwise using Python 1.6.1 software in
+-source or binary form and its associated documentation.
+-
+-2. Subject to the terms and conditions of this License Agreement, CNRI
+-hereby grants Licensee a nonexclusive, royalty-free, world-wide
+-license to reproduce, analyze, test, perform and/or display publicly,
+-prepare derivative works, distribute, and otherwise use Python 1.6.1
+-alone or in any derivative version, provided, however, that CNRI's
+-License Agreement and CNRI's notice of copyright, i.e., "Copyright (c)
+-1995-2001 Corporation for National Research Initiatives; All Rights
+-Reserved" are retained in Python 1.6.1 alone or in any derivative
+-version prepared by Licensee.  Alternately, in lieu of CNRI's License
+-Agreement, Licensee may substitute the following text (omitting the
+-quotes): "Python 1.6.1 is made available subject to the terms and
+-conditions in CNRI's License Agreement.  This Agreement together with
+-Python 1.6.1 may be located on the Internet using the following
+-unique, persistent identifier (known as a handle): 1895.22/1013.  This
+-Agreement may also be obtained from a proxy server on the Internet
+-using the following URL: http://hdl.handle.net/1895.22/1013".
+-
+-3. In the event Licensee prepares a derivative work that is based on
+-or incorporates Python 1.6.1 or any part thereof, and wants to make
+-the derivative work available to others as provided herein, then
+-Licensee hereby agrees to include in any such work a brief summary of
+-the changes made to Python 1.6.1.
+-
+-4. CNRI is making Python 1.6.1 available to Licensee on an "AS IS"
+-basis.  CNRI MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+-IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, CNRI MAKES NO AND
+-DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+-FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON 1.6.1 WILL NOT
+-INFRINGE ANY THIRD PARTY RIGHTS.
+-
+-5. CNRI SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+-1.6.1 FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+-A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON 1.6.1,
+-OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+-
+-6. This License Agreement will automatically terminate upon a material
+-breach of its terms and conditions.
+-
+-7. This License Agreement shall be governed by the federal
+-intellectual property law of the United States, including without
+-limitation the federal copyright law, and, to the extent such
+-U.S. federal law does not apply, by the law of the Commonwealth of
+-Virginia, excluding Virginia's conflict of law provisions.
+-Notwithstanding the foregoing, with regard to derivative works based
+-on Python 1.6.1 that incorporate non-separable material that was
+-previously distributed under the GNU General Public License (GPL), the
+-law of the Commonwealth of Virginia shall govern this License
+-Agreement only as to issues arising under or with respect to
+-Paragraphs 4, 5, and 7 of this License Agreement.  Nothing in this
+-License Agreement shall be deemed to create any relationship of
+-agency, partnership, or joint venture between CNRI and Licensee.  This
+-License Agreement does not grant permission to use CNRI trademarks or
+-trade name in a trademark sense to endorse or promote products or
+-services of Licensee, or any third party.
+-
+-8. By clicking on the "ACCEPT" button where indicated, or by copying,
+-installing or otherwise using Python 1.6.1, Licensee agrees to be
+-bound by the terms and conditions of this License Agreement.
+-
+-        ACCEPT
+-
+-
+-CWI LICENSE AGREEMENT FOR PYTHON 0.9.0 THROUGH 1.2
+---------------------------------------------------
+-
+-Copyright (c) 1991 - 1995, Stichting Mathematisch Centrum Amsterdam,
+-The Netherlands.  All rights reserved.
+-
+-Permission to use, copy, modify, and distribute this software and its
+-documentation for any purpose and without fee is hereby granted,
+-provided that the above copyright notice appear in all copies and that
+-both that copyright notice and this permission notice appear in
+-supporting documentation, and that the name of Stichting Mathematisch
+-Centrum or CWI not be used in advertising or publicity pertaining to
+-distribution of the software without specific, written prior
+-permission.
+-
+-STICHTING MATHEMATISCH CENTRUM DISCLAIMS ALL WARRANTIES WITH REGARD TO
+-THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+-FITNESS, IN NO EVENT SHALL STICHTING MATHEMATISCH CENTRUM BE LIABLE
+-FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+-OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 --=20
 2.18.0.rc1.1.g3f1ff2140
