@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fTj7q-0002nv-0M
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:26:27 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fTjCk-0005BP-10
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:31:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fTj7m-0008Fp-1L
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:26:26 -0400
-References: <1528738007-29122-1-git-send-email-thuth@redhat.com>
-	<d4a53d7a-60c0-b98a-bd2a-fd06b2f0e822@redhat.com>
-	<20180615091350.73bcc26f.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <380c533c-de45-8f35-8bad-a41d28b7e222@redhat.com>
-Date: Fri, 15 Jun 2018 09:26:17 +0200
+	(envelope-from <eric.auger@redhat.com>) id 1fTjCi-0002XN-Rs
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:31:30 -0400
+References: <20180604152941.20374-1-peter.maydell@linaro.org>
+	<20180604152941.20374-9-peter.maydell@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <64ff124d-fe34-75eb-e9e6-7c419827ee3c@redhat.com>
+Date: Fri, 15 Jun 2018 09:31:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180615091350.73bcc26f.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20180604152941.20374-9-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2] hw/s390x/ipl: Fix crashes
- that occurs when -kernel is used with small images
+Subject: Re: [Qemu-devel] [PATCH v2 08/13] hw/misc/tz_mpc.c: Honour the
+ BLK_LUT settings in translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,72 +24,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-On 15.06.2018 09:13, Cornelia Huck wrote:
-> On Thu, 14 Jun 2018 21:08:43 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
+Hi Peter,
+
+On 06/04/2018 05:29 PM, Peter Maydell wrote:
+> The final part of the Memory Protection Controller we need to
+> implement is actually using the BLK_LUT data programmed by the
+> guest to determine whether to block the transaction or not.
 > 
->> On 11.06.2018 19:26, Thomas Huth wrote:
->>> Add a sanity checks to fix the following two crashes:
->>>
->>> $ echo "Insane in the mainframe" > /tmp/test.txt
->>> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -append xyz
->>> Segmentation fault (core dumped)
->>> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -initrd /tmp/test.txt
->>> Segmentation fault (core dumped)
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  v2: Fixed 2nd crash with -initrd
->>>
->>>  hw/s390x/ipl.c | 9 ++++++---
->>>  1 file changed, 6 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
->>> index 04245b5..2ff8f20 100644
->>> --- a/hw/s390x/ipl.c
->>> +++ b/hw/s390x/ipl.c
->>> @@ -168,7 +168,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->>>           * we can not rely on the ELF entry point - it was 0x800 (the SALIPL
->>>           * loader) and it won't work. For this case we force it to 0x10000, too.
->>>           */
->>> -        if (pentry == KERN_IMAGE_START || pentry == 0x800) {
->>> +        if ((pentry == KERN_IMAGE_START || pentry == 0x800) &&
->>> +            kernel_size > KERN_PARM_AREA + strlen(ipl->cmdline)) {
->>>              ipl->start_addr = KERN_IMAGE_START;
->>>              /* Overwrite parameters in the kernel image, which are "rom" */
->>>              strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
->>> @@ -195,8 +196,10 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->>>               * we have to overwrite values in the kernel image,
->>>               * which are "rom"
->>>               */
->>> -            stq_p(rom_ptr(INITRD_PARM_START), initrd_offset);
->>> -            stq_p(rom_ptr(INITRD_PARM_SIZE), initrd_size);
->>> +            if (kernel_size > INITRD_PARM_SIZE + 8) {
->>> +                stq_p(rom_ptr(INITRD_PARM_START), initrd_offset);
->>> +                stq_p(rom_ptr(INITRD_PARM_SIZE), initrd_size);
->>> +            }
->>>          }
->>>      }
->>>      /*  
->>
->> I just had to discover that this breaks the argv handling in
->> kvm-unit-tests. Cornelia, could you please unqueue this patch again?
->> I'll try to come up with a better solution...
+> Since this means we now change transaction mappings when
+> the guest writes to BLK_LUT, we must also call the IOMMU
+> notifiers at that point.
 > 
-> Argh. I wonder why?
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/misc/tz-mpc.c     | 50 ++++++++++++++++++++++++++++++++++++++++++--
+>  hw/misc/trace-events |  1 +
+>  2 files changed, 49 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
+> index 704bb3fb44d..7a6117c90b3 100644
+> --- a/hw/misc/tz-mpc.c
+> +++ b/hw/misc/tz-mpc.c
+> @@ -72,6 +72,50 @@ static void tz_mpc_irq_update(TZMPC *s)
+>      qemu_set_irq(s->irq, s->int_stat && s->int_en);
+>  }
+>  
+> +static void tz_mpc_iommu_notify(TZMPC *s, uint32_t lutidx,
+> +                                uint32_t oldlut, uint32_t newlut)
+> +{
+> +    /* Called when the LUT word at lutidx has changed from oldlut to newlut;
+> +     * must call the IOMMU notifiers for the changed blocks.
+> +     */
+> +    IOMMUTLBEntry entry = {
+> +        .addr_mask = s->blocksize - 1,
+> +    };
+> +    hwaddr addr = lutidx * s->blocksize * 32;
+> +    int i;
+> +
+> +    for (i = 0; i < 32; i++, addr += s->blocksize) {
+> +        if (!((oldlut ^ newlut) & (1 << i))) {
+> +            continue;
+> +        }
+> +        /* This changes the mappings for both the S and the NS space,
+> +         * so we need to do four notifies: an UNMAP then a MAP for each.
+> +         */
+> +
+> +        trace_tz_mpc_iommu_notify(addr);
+> +        entry.iova = addr;
+> +        entry.translated_addr = addr;
+> +
+> +        entry.perm = IOMMU_NONE;
+> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
+> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
+> +
+> +        entry.perm = IOMMU_RW;
 
-kvm-unit-tests are ELF files which are not loaded to address 0, but
-still use the same entry point as Linux (0x10000) to be able to use the
-"--append" option of QEMU. Thus the check "kernel_size > KERN_PARM_AREA
-+ strlen(ipl->cmdline)" does not work here. We'd need something like
-"start_addr + kernel_size > KERN_PARM_AREA + strlen(ipl->cmdline)"
-instead - but this does not make too much sense with ELF files that have
-multiple segments either.
+> +        if (newlut & (1 << i)) {
+Add a comment saying the block is configured as non-secure?
+> +            entry.target_as = &s->blocked_io_as;
+> +        } else {
+> +            entry.target_as = &s->downstream_as;
+so this disallows any secure access to non secure blocks. I have a
+reduced knowledge of TZ but I would have thought that a secure access
+would have sufficient priviledge to access NS memory?
 
-The correct fix is to check the size when calling rom_ptr() instead. I
-just sent a patch that does this.
+Thanks
 
- Thomas
+Eric
+> +        }
+> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
+> +        if (newlut & (1 << i)) {
+> +            entry.target_as = &s->downstream_as;
+> +        } else {
+> +            entry.target_as = &s->blocked_io_as;
+> +        }
+> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
+> +    }
+> +}
+> +
+>  static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
+>                                     uint64_t *pdata,
+>                                     unsigned size, MemTxAttrs attrs)
+> @@ -213,6 +257,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+>          s->blk_idx = value % s->blk_max;
+>          break;
+>      case A_BLK_LUT:
+> +        tz_mpc_iommu_notify(s, s->blk_idx, s->blk_lut[s->blk_idx], value);
+>          s->blk_lut[s->blk_idx] = value;
+>          if (size == 4) {
+>              s->blk_idx++;
+> @@ -362,9 +407,10 @@ static IOMMUTLBEntry tz_mpc_translate(IOMMUMemoryRegion *iommu,
+>      /* Look at the per-block configuration for this address, and
+>       * return a TLB entry directing the transaction at either
+>       * downstream_as or blocked_io_as, as appropriate.
+> -     * For the moment, always permit accesses.
+> +     * If the LUT cfg_ns bit is 1, only non-secure transactions
+> +     * may pass. If the bit is 0, only secure transactions may pass.
+>       */
+> -    ok = true;
+> +    ok = tz_mpc_cfg_ns(s, addr) == (iommu_idx == IOMMU_IDX_NS);
+>  
+>      trace_tz_mpc_translate(addr, flags,
+>                             iommu_idx == IOMMU_IDX_S ? "S" : "NS",
+> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+> index 72bf9d57000..c956e1419b7 100644
+> --- a/hw/misc/trace-events
+> +++ b/hw/misc/trace-events
+> @@ -90,6 +90,7 @@ tz_mpc_reg_write(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs wri
+>  tz_mpc_mem_blocked_read(uint64_t addr, unsigned size, bool secure) "TZ MPC blocked read: offset 0x%" PRIx64 " size %u secure %d"
+>  tz_mpc_mem_blocked_write(uint64_t addr, uint64_t data, unsigned size, bool secure) "TZ MPC blocked write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u secure %d"
+>  tz_mpc_translate(uint64_t addr, int flags, const char *idx, const char *res) "TZ MPC translate: addr 0x%" PRIx64 " flags 0x%x iommu_idx %s: %s"
+> +tz_mpc_iommu_notify(uint64_t addr) "TZ MPC iommu: notifying UNMAP/MAP for 0x%" PRIx64
+>  
+>  # hw/misc/tz-ppc.c
+>  tz_ppc_reset(void) "TZ PPC: reset"
+> 
