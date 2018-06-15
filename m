@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fTt13-0000IZ-76
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 14:00:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTtOI-0006PQ-B4
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 14:24:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fTt0y-0005Rn-Ce
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 14:00:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48476)
+	(envelope-from <peter.maydell@linaro.org>) id 1fTtOH-0000Ef-IW
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 14:24:06 -0400
+Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:45078)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fTt0y-0005RZ-7H
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 14:00:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fTt0w-0000Rv-Se
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 17:59:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C91F42E80D3
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 17:59:58 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fTtOH-0000EY-CZ
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 14:24:05 -0400
+Received: by mail-oi0-x22e.google.com with SMTP id 188-v6so9574873oid.12
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 11:24:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Jun 2018 17:41:38 -0000
-From: Thomas Huth <1094564@bugs.launchpad.net>
-Reply-To: Bug 1094564 <1094564@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20121229222619.26431.54663.malonedeb@soybean.canonical.com>
-Message-Id: <152908449999.1989.8652947358649336632.launchpad@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1094564] Re: images used as scsi disks not
- readable (qemu-system-arm, macos 10.8)
+In-Reply-To: <20180615151518.83637-1-dgilbert@redhat.com>
+References: <20180615151518.83637-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 15 Jun 2018 19:23:44 +0100
+Message-ID: <CAFEAcA-EdDsdxMOGFeuMZ1httwJZ_Ot5jnp-QgndrfV=ticjMg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/10] migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Peter Xu <peterx@redhat.com>, Greg Kurz <groug@kaod.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, xiaoguangrong@tencent.com, bala24@linux.vnet.ibm.com
 
-** Changed in: qemu
-       Status: Incomplete =3D> Won't Fix
+On 15 June 2018 at 16:15, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The following changes since commit 2702c2d3eb74e3908c0c5dbf3a71c8987595a86e:
+>
+>   Merge remote-tracking branch 'remotes/stsquad/tags/pull-travis-updates-140618-1' into staging (2018-06-15 12:49:36 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-migration-20180615a
+>
+> for you to fetch changes up to 650af8907bd567db914b7ce3a7e9df4c323f4619:
+>
+>   migration: calculate expected_downtime with ram_bytes_remaining() (2018-06-15 14:40:56 +0100)
+>
+> ----------------------------------------------------------------
+> Migration pull 2018-06-15
+>
+> ----------------------------------------------------------------
 
--- =
+Applied, thanks.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1094564
-
-Title:
-  images used as scsi disks not readable (qemu-system-arm, macos 10.8)
-
-Status in MacPorts:
-  New
-Status in QEMU:
-  Won't Fix
-
-Bug description:
-  Using a arm1176 kernel and the raspbian image (10-28 or 12-16) as my
-  disk, I get as far as mounting root and then get SCSI errors with
-  1.3.0 and the current origin/master. git bisect says the issue is
-
-  commit f563a5d7a820424756f358e747238f03e866838a
-  Merge: a273652 aee0bf7
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Wed Oct 31 10:42:51 2012 +0100
-
-      Merge remote-tracking branch 'origin/master' into threadpool
-      =
-
-      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  =
-
-  I am using:
-  qemu-system-arm -no-reboot -M versatilepb -cpu arm1176 -m 256 -hda 2012-1=
-2-16-wheezy-raspbian.img -kernel kernel-qemu -append "root=3D/dev/sda2 root=
-fstype=3Dext4 elevator=3Ddeadline rootwait panic=3D1" -serial stdio -usbdev=
-ice tablet -net nic -net user,hostfwd=3Dtcp::40022-:22
-
-  Configured on MacOS 10.8.2 with current Xcode and MacPorts installed, thu=
-s:
-  CPATH=3D/opt/local/include CFLAGS=3D"-pipe -O2 -arch x86_64" CPPFLAGS=3D"=
--I/opt/local/include" CXXFLAGS=3D"-pipe -O2 -arch x86_64" LIBRARY_PATH=3D"/=
-opt/local/lib" MACOSX_DEPLOYMENT_TARGET=3D"10.8" CXX=3D"/usr/bin/clang++" L=
-DFLAGS=3D"-L/opt/local/lib -arch x86_64" OBJC=3D/usr/bin/clang FCFLAGS=3D"-=
-pipe -O2 -m64" INSTALL=3D"/usr/bin/install -c" OBJCFLAGS=3D"-pipe -O2 -arch=
- x86_64" CC=3D"/usr/bin/clang"  ./configure --prefix=3D/opt/local --cpu=3Dx=
-86_64 --cc=3D/usr/bin/clang --objcc=3D/usr/bin/clang --host-cc=3D/usr/bin/c=
-lang --python=3D/opt/local/bin/python2.7 --target-list=3Darm-softmmu
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/macports/+bug/1094564/+subscriptions
+-- PMM
