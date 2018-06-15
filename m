@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTcIr-0003ky-GS
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 20:09:22 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fTcUE-0000mw-O7
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 20:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTcIo-00004z-CK
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 20:09:21 -0400
-Date: Fri, 15 Jun 2018 09:59:55 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180614235955.GB4129@umbus.fritz.box>
-References: <152901299450.252222.14219708016930421485.stgit@bahia.lan>
-	<152901302718.252222.18367624313137740494.stgit@bahia.lan>
+	(envelope-from <no-reply@patchew.org>) id 1fTcUA-0000SI-C0
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 20:21:06 -0400
+Resent-Message-Id: <E1fTcUA-0000SI-C0@eggs.gnu.org>
+In-Reply-To: <20180614232119.31669-1-naravamudan@digitalocean.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152902204022.702.14504228746970552526@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="zx4FCpZtqtKETZ7O"
-Content-Disposition: inline
-In-Reply-To: <152901302718.252222.18367624313137740494.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 2/5] spapr_cpu_core: fix potential leak in
- spapr_cpu_core_realize()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 14 Jun 2018 17:20:40 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] [RFC] aio: properly bubble up errors from
+ initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, naravamudan@digitalocean.com, qemu-block@nongnu.org
 
-
---zx4FCpZtqtKETZ7O
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jun 14, 2018 at 11:50:27PM +0200, Greg Kurz wrote:
-> Commit 94ad93bd97684 (QEMU 2.12) switched to instantiate CPUs separately
-> but it missed to adapt the error path accordingly. If something fails in
-> the CPU creation loop, then the CPU object that was just created is leake=
-d.
->=20
-> The error paths in this function are a bit obfuscated, and adding
-> yet another label to free this CPU object makes it worse. We should
-> move the block of the loop to a separate function, with a proper
-> rollback path, but this is a bigger cleanup.
->=20
-> For now, let's just fix the bug by adding the missing calls to
-> object_unref(). This will allow easier backport to older QEMU
-> versions.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-
-Applied to ppc-for-3.0, thanks.
-
-> ---
->  hw/ppc/spapr_cpu_core.c |    2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index 27602245fd55..003c4c5a79d2 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -201,6 +201,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
-Error **errp)
->          cs->cpu_index =3D cc->core_id + i;
->          spapr_set_vcpu_id(cpu, cs->cpu_index, &local_err);
->          if (local_err) {
-> +            object_unref(obj);
->              goto err;
->          }
-> =20
-> @@ -212,6 +213,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
-Error **errp)
->          object_property_add_child(OBJECT(sc), id, obj, &local_err);
->          g_free(id);
->          if (local_err) {
-> +            object_unref(obj);
->              goto err;
->          }
->          object_unref(obj);
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---zx4FCpZtqtKETZ7O
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsjAXoACgkQbDjKyiDZ
-s5KP9BAAy0+kKqDGLgOp+JhrhZANN3U+J2YoIQF70Ld1qgu1GbCcWfyPHL8TloY0
-jMiFry55v6IY/O1nByYEaWafieslKK7SAC1TzhDsjJnQu4ppttThi4bB1BGL6FaS
-GxnG+1XBrPGNSl7+3U4SS71BpiKY2+mfDcsF+utlY+FvCtUtOf6aGVt0qQ6U8rSD
-4i5vQJ9sqroAZyzzypeQuvbacFhbemFNMMQT2FbN7YSiU5fddsi9m42qE/iKkIy8
-1dSpx4yrf6e9nejsNMbbOKF9fP9Ks5PxXoibhK7gxJ+YGd/uQnnL3bEiysQ8bAfo
-jPPrGdeR8CQA4QSD0j5g5t5GaxYVM4hTA/TU0DcH5BuhV2RscaM9UfRfbMUqz6at
-ZWIPr158dAaNZDpW3bDuv4i6OFUfoKfi+HOLBCgkvD5gycfpKVuqgvBKrYspRsZS
-gRCvT4UERNZwrti3YqFU7aVrRBwE4jGbIM9q6ZHBIQmA4nHx8beBB5FNQv8smTG2
-HKO59MwDm8FEDMruDZX+Y4HPOupghyN0RyKs1YKxG3HHf5WPWHyBk048YgEoo35I
-Gn3fPUYNJIihXrAnCOVd9X8Rs+MF0BIpsAzERFKbZmTDDquP/AYo8752UAPlr2WH
-Q3U36YLPWz9TwbuoFSQTebaJ3jcCIeGM3vsiDVCKHklqAgRQGa8=
-=1BSf
------END PGP SIGNATURE-----
-
---zx4FCpZtqtKETZ7O--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjE0MjMyMTE5LjMxNjY5LTEtbmFyYXZhbXVkYW5AZGlnaXRhbG9jZWFu
+LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBbUkZDXSBhaW86IHByb3Blcmx5IGJ1
+YmJsZSB1cCBlcnJvcnMgZnJvbSBpbml0aWFsaXphdGlvbgoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5l
+ICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
+cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
+byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
+YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
+ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
+Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
+SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25l
+dyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDYxNDIzMjExOS4zMTY2OS0xLW5hcmF2
+YW11ZGFuQGRpZ2l0YWxvY2Vhbi5jb20gLT4gcGF0Y2hldy8yMDE4MDYxNDIzMjExOS4zMTY2OS0x
+LW5hcmF2YW11ZGFuQGRpZ2l0YWxvY2Vhbi5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0JwplNzJiZjQ5NzgzIGFpbzogcHJvcGVybHkgYnViYmxlIHVwIGVycm9ycyBmcm9tIGluaXRp
+YWxpemF0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGFpbzog
+cHJvcGVybHkgYnViYmxlIHVwIGVycm9ycyBmcm9tIGluaXRpYWxpemF0aW9uLi4uCkVSUk9SOiBk
+byBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTQ2OiBGSUxFOiBibG9jay9pby5jOjI3ODg6Cisg
+ICAgICAgIC8vIFhYWDogZG8gd2UgbmVlZCB0byB1bmRvIHRoZSBzdWNjZXNzZnVsIHNldHVwcyBp
+ZiB3ZSBmYWlsIG1pZHdheT8KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTU3
+OiBGSUxFOiBibG9jay9pby5jOjI3OTk6CisgICAgICAgICAgICAvLyBYWFg6IGRvIHdlIG5lZWQg
+dG8gdW5kbyB0aGUgc3VjY2Vzc2Z1bCBzZXR1cHMgaWYgd2UgZmFpbCBtaWR3YXk/Cgp0b3RhbDog
+MiBlcnJvcnMsIDAgd2FybmluZ3MsIDI1OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
+eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
+IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
