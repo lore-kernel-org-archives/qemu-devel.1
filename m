@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fTo6Q-0005uK-Oy
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:45:19 -0400
+	(envelope-from <david@redhat.com>) id 1fTo6n-00065W-RY
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:45:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fTo6L-00040I-QI
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:45:18 -0400
-Date: Fri, 15 Jun 2018 14:45:09 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180615144509.143fa1a2@redhat.com>
-In-Reply-To: <20180615112500.19854-8-david@redhat.com>
+	(envelope-from <david@redhat.com>) id 1fTo6n-00049K-0n
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:45:41 -0400
 References: <20180615112500.19854-1-david@redhat.com>
-	<20180615112500.19854-8-david@redhat.com>
+	<20180615112500.19854-7-david@redhat.com>
+	<20180615143923.1babac86@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <b47a7a83-84da-d239-e52a-d683668e77a8@redhat.com>
+Date: Fri, 15 Jun 2018 14:45:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 07/12] pc-dimm: merge
- get_(vmstate_)memory_region()
+In-Reply-To: <20180615143923.1babac86@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 06/12] hostmem: drop error variable from
+ host_memory_backend_get_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +26,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-On Fri, 15 Jun 2018 13:24:55 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 15.06.2018 14:39, Igor Mammedov wrote:
+> On Fri, 15 Jun 2018 13:24:54 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> Unused, so let's remove it.
+>>
+>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> breaks compilation with
+>=20
+>  hw/mem/nvdimm.c:171:5: error: too many arguments to function =E2=80=98=
+host_memory_backend_get_memory=E2=80=99
+>      return host_memory_backend_get_memory(dimm->hostmem, &error_abort)=
+;
+>=20
 
-> Importantly, get_vmstate_memory_region() should also fail with a proper
-> error if called before the device is realized. For a PCDIMM, both functions
-> are to return the same thing, so share the implementation.
-> 
-> All current users are called after the device has been realized, so we
-> can expect the calls to succeed.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/mem/pc-dimm.c         | 13 +++++--------
->  include/hw/mem/pc-dimm.h |  3 ++-
->  2 files changed, 7 insertions(+), 9 deletions(-)
-> 
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 73f0eee4c7..4ff39b59ef 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -35,7 +35,8 @@ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
->      int slot;
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
-> +    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
-> +                                                              &error_abort);
->      Error *local_err = NULL;
->      MemoryRegion *mr;
->      uint64_t addr;
-> @@ -90,7 +91,8 @@ void pc_dimm_unplug(DeviceState *dev, MachineState *machine)
->  {
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
-> +    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
-> +                                                              &error_abort);
->      MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
->  
->      memory_device_unplug_region(machine, mr);
-> @@ -229,11 +231,6 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
->      return host_memory_backend_get_memory(dimm->hostmem);
->  }
->  
-> -static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
-> -{
-> -    return host_memory_backend_get_memory(dimm->hostmem);
-> -}
-> -
->  static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
->  {
->      const PCDIMMDevice *dimm = PC_DIMM(md);
-> @@ -298,7 +295,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
->      dc->desc = "DIMM memory module";
->  
->      ddc->get_memory_region = pc_dimm_get_memory_region;
-> -    ddc->get_vmstate_memory_region = pc_dimm_get_vmstate_memory_region;
-> +    ddc->get_vmstate_memory_region = pc_dimm_get_memory_region;
->  
->      mdc->get_addr = pc_dimm_md_get_addr;
->      /* for a dimm plugged_size == region_size */
-> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> index cf71247630..5679a80465 100644
-> --- a/include/hw/mem/pc-dimm.h
-> +++ b/include/hw/mem/pc-dimm.h
-> @@ -73,7 +73,8 @@ typedef struct PCDIMMDeviceClass {
->      /* public */
->      void (*realize)(PCDIMMDevice *dimm, Error **errp);
->      MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm, Error **errp);
-> -    MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
-> +    MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm,
-> +                                               Error **errp);
-nvdimm also uses this callback, so patch as it is will break bisection.
+Looks like some reshuffling of patches was not that healthy. Will fix.
 
+--=20
 
->  } PCDIMMDeviceClass;
->  
->  void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+Thanks,
+
+David / dhildenb
