@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fTlVo-0001zB-Td
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:59:22 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fTlXZ-0003S1-Hz
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:01:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fTlVn-0007tV-Fe
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:59:21 -0400
-Date: Fri, 15 Jun 2018 11:59:09 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180615115909.1c7df252.cohuck@redhat.com>
-In-Reply-To: <1529056145-6404-1-git-send-email-thuth@redhat.com>
-References: <1529056145-6404-1-git-send-email-thuth@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1fTlXT-0001Ux-Tj
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:01:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46764 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fTlXT-0001Tx-Oh
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:01:03 -0400
+Date: Fri, 15 Jun 2018 11:00:58 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180615100058.GB2615@work-vm>
+References: <20180612085009.17594-1-bala24@linux.vnet.ibm.com>
+	<20180612085009.17594-2-bala24@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] loader: Check access size when calling
- rom_ptr() to avoid crashes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180612085009.17594-2-bala24@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/1] migration: calculate
+ expected_downtime with ram_bytes_remaining()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,65 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org
+To: Balamuruhan S <bala24@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, david@gibson.dropbear.id.au, lvivier@redhat.com
 
-On Fri, 15 Jun 2018 11:49:05 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> The rom_ptr() function allows direct access to the ROM blobs that we
-> load during startup. However, there are currently no checks for the
-> size of the accesses, so it's currently possible to crash QEMU for
-> example with:
+* Balamuruhan S (bala24@linux.vnet.ibm.com) wrote:
+> expected_downtime value is not accurate with dirty_pages_rate * page_size,
+> using ram_bytes_remaining() would yeild it resonable.
 > 
-> $ echo "Insane in the mainframe" > /tmp/test.txt
-> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -append xyz
-> Segmentation fault (core dumped)
-> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -initrd /tmp/test.txt
-> Segmentation fault (core dumped)
-> $ echo -n HdrS > /tmp/hdr.txt
-> $ sparc64-softmmu/qemu-system-sparc64 -kernel /tmp/hdr.txt -initrd /tmp/hdr.txt
-> Segmentation fault (core dumped)
+> consider to read the remaining ram just after having updated the dirty
+> pages count later migration_bitmap_sync_range() in migration_bitmap_sync()
+> and reuse the `remaining` field in ram_counters to hold ram_bytes_remaining()
+> for calculating expected_downtime.
 > 
-> We need a possibility to check the size of the ROM area that we want
-> to access, thus let's add a size parameter to the rom_ptr() function
-> to avoid these problems.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 > ---
->  v3: Fix the check in find_rom()
+>  migration/migration.c | 3 +--
+>  migration/ram.c       | 1 +
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
->  hw/core/loader.c     | 10 +++++-----
->  hw/mips/mips_malta.c |  6 ++++--
->  hw/s390x/ipl.c       | 13 ++++++++++---
->  hw/sparc/sun4m.c     |  4 ++--
->  hw/sparc64/sun4u.c   |  4 ++--
->  include/hw/loader.h  |  2 +-
->  target/arm/cpu.c     |  2 +-
->  7 files changed, 25 insertions(+), 16 deletions(-)
-
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 04245b5..bcac204 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-
-> @@ -195,8 +199,11 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
->               * we have to overwrite values in the kernel image,
->               * which are "rom"
->               */
-> -            stq_p(rom_ptr(INITRD_PARM_START), initrd_offset);
-> -            stq_p(rom_ptr(INITRD_PARM_SIZE), initrd_size);
-> +            romptr = rom_ptr(INITRD_PARM_START, 16);
-> +            if (romptr) {
-> +                stq_p(romptr, initrd_offset);
-> +                stq_p(romptr + 1, initrd_size);
-
-INITRD_PARM_SIZE seems to be unused now. We can remove it in a separate
-patch if you don't respin, though.
-
-> +            }
->          }
+> diff --git a/migration/migration.c b/migration/migration.c
+> index ea9a6cbb87..cb14dadb26 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2739,8 +2739,7 @@ static void migration_update_counters(MigrationState *s,
+>       * recalculate. 10000 is a small enough number for our purposes
+>       */
+>      if (ram_counters.dirty_pages_rate && transferred > 10000) {
+> -        s->expected_downtime = ram_counters.dirty_pages_rate *
+> -            qemu_target_page_size() / bandwidth;
+> +        s->expected_downtime = ram_counters.remaining / bandwidth;
 >      }
->      /*
+>  
+>      qemu_file_reset_rate_limit(s->to_dst_file);
+> diff --git a/migration/ram.c b/migration/ram.c
+> index a500015a2f..a94a2b829e 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1159,6 +1159,7 @@ static void migration_bitmap_sync(RAMState *rs)
+>      RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          migration_bitmap_sync_range(rs, block, 0, block->used_length);
+>      }
+> +    ram_counters.remaining = ram_bytes_remaining();
+>      rcu_read_unlock();
+>      qemu_mutex_unlock(&rs->bitmap_mutex);
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+OK, that's interesting.
+One thing to note is that migration_bitmap_sync isn't just called when
+we've run out of dirty pages and need to see if there are any fresh
+ones.
+In the case where we hit the bandwidth limit, then we call it whenever
+we go back through ram_save_pending even though the current 
+remaining isn't 0 yet (it's got to be below the threshold for us to
+resync) - so you may over estimate a bit?
+
+Anyway, I  think it's worth a go;
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+> -- 
+> 2.14.3
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
