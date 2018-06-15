@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tamiko@kyomu.43-1.org>) id 1fTgXf-0006gp-5b
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 00:40:56 -0400
+	(envelope-from <thuth@redhat.com>) id 1fTgal-000062-2K
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 00:44:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tamiko@kyomu.43-1.org>) id 1fTgXb-0003P7-8E
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 00:40:55 -0400
-Received: from tsukuyomi.43-1.org ([188.40.248.50]:49145)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tamiko@kyomu.43-1.org>)
-	id 1fTgXb-0003OC-0U
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 00:40:51 -0400
-From: Matthias Maier <tamiko@43-1.org>
-Date: Thu, 14 Jun 2018 23:40:41 -0500
-Message-Id: <20180615044042.7928-2-tamiko@43-1.org>
-In-Reply-To: <20180615044042.7928-1-tamiko@43-1.org>
-References: <20180615044042.7928-1-tamiko@43-1.org>
-Subject: [Qemu-devel] [PATCH v2 1/2] Partially revert commit d4e5ec877ca
+	(envelope-from <thuth@redhat.com>) id 1fTgah-0004X2-4B
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 00:44:07 -0400
+References: <20180611141716.3813-1-peter.maydell@linaro.org>
+	<650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
+	<CAFEAcA-vZH0KUxi+iYP3eYzXeHxNTotNwCMhEPcGhOLksbG71A@mail.gmail.com>
+	<f9beda14-7c4a-8f89-baf1-5a79e847c4ac@redhat.com>
+	<CAFEAcA_egToeW7ksTncbFCsW6uTh1FcPSgW6gx+VnjvQpqwWsw@mail.gmail.com>
+	<ba6b4e80-c31a-6033-ea59-b4c4f1923be7@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ddf0a4cf-2286-9d3d-ea18-f61865f40fa9@redhat.com>
+Date: Fri, 15 Jun 2018 06:43:50 +0200
+MIME-Version: 1.0
+In-Reply-To: <ba6b4e80-c31a-6033-ea59-b4c4f1923be7@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
+ for multiline comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: "Daniel P . Berrange" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Matthias Maier <tamiko@43-1.org>, Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
+To: John Snow <jsnow@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This commit removes the PYTHON_UTF8 workaround. The problem with setting
+On 14.06.2018 22:11, John Snow wrote:
+>=20
+> On 06/14/2018 06:46 AM, Peter Maydell wrote:
+[...]
+>=20
+> *cough* I hate the way it looks too, but C99 comments have a few things
+> going for them:
+>=20
+> // A multi-line comment block like this has no extra lines and every
+> // line in the comment is prefaced individually which aids grep
+> // readability, while maintained good vertical symmetry.
+>=20
+> I think we hate C99 comments, though? Certainly we don't use them at al=
+l
+> right now, so it's not a good fit.
 
-  LC_ALL= LANG=C LC_CTYPE=en_US.UTF-8
+But why do we hate them? I remember there were some reasons for not
+using them 10 or 15 years ago (some old C-compilers still did not
+support them yet), but today? ... it's likely just a legacy feeling.
+Maybe it's time to get over that feeling now?
 
-is that the en_US.UTF-8 locale might not be available. In this case
-setting above locales results in build errors even though another UTF-8
-locale was originally set [1]. The only stable way of fixing the
-encoding problem is by explicitly annotating encoding/decoding in the
-python script.
+>>> It would only begin to matter terribly much if we actually decided we
+>>> wanted to do a doxygen-style doc generation for our internal APIs for
+>>> compatibility with, say, fancier IDEs than vim/emacs.
+[...]
+> Do you have a proposed standard / do we have some consensus on which
+> generator tool or doc format we'd most like to see in QEMU? I could put
+> in some elbow grease to shine up the block layer if so...
 
-[1] https://bugs.gentoo.org/657766
+I remember that some years ago, somebody (I forgot who it was, sorry)
+once told me that we should use the same format in QEMU as in glib, i.e.
+GTK-Doc. But citing the GTK-Doc homepage: "For a more polished
+general-purpose documentation tool you may want to look at Doxygen" - so
+maybe that's the better choice instead.
 
-Signed-off-by: Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
-Signed-off-by: Matthias Maier <tamiko@43-1.org>
----
- Makefile               | 6 ++----
- tests/Makefile.include | 6 +++---
- 2 files changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index e46f2b625a..7ed9cc4a21 100644
---- a/Makefile
-+++ b/Makefile
-@@ -20,8 +20,6 @@ ifneq ($(wildcard config-host.mak),)
- all:
- include config-host.mak
- 
--PYTHON_UTF8 = LC_ALL= LANG=C LC_CTYPE=en_US.UTF-8 $(PYTHON)
--
- git-submodule-update:
- 
- .PHONY: git-submodule-update
-@@ -576,7 +574,7 @@ qga/qapi-generated/qga-qapi-commands.h qga/qapi-generated/qga-qapi-commands.c \
- qga/qapi-generated/qga-qapi-doc.texi: \
- qga/qapi-generated/qapi-gen-timestamp ;
- qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
--	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
- 		-o qga/qapi-generated -p "qga-" $<, \
- 		"GEN","$(@:%-timestamp=%)")
- 	@>$@
-@@ -676,7 +674,7 @@ qapi/qapi-introspect.h qapi/qapi-introspect.c \
- qapi/qapi-doc.texi: \
- qapi-gen-timestamp ;
- qapi-gen-timestamp: $(qapi-modules) $(qapi-py)
--	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
- 		-o "qapi" -b $<, \
- 		"GEN","$(@:%-timestamp=%)")
- 	@>$@
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 607afe5bed..b5121f2851 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -674,13 +674,13 @@ tests/test-qapi-events.c tests/test-qapi-events.h \
- tests/test-qapi-introspect.c tests/test-qapi-introspect.h: \
- tests/test-qapi-gen-timestamp ;
- tests/test-qapi-gen-timestamp: $(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(qapi-py)
--	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
- 		-o tests -p "test-" $<, \
- 		"GEN","$(@:%-timestamp=%)")
- 	@>$@
- 
- tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc-good.json $(qapi-py)
--	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
- 		-o tests/qapi-schema -p "doc-good-" $<, \
- 		"GEN","$@")
- 	@mv tests/qapi-schema/doc-good-qapi-doc.texi $@
-@@ -938,7 +938,7 @@ check-tests/qemu-iotests-quick.sh: tests/qemu-iotests-quick.sh qemu-img$(EXESUF)
- .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
- $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH)/%.json
- 	$(call quiet-command, PYTHONPATH=$(SRC_PATH)/scripts \
--		$(PYTHON_UTF8) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
-+		$(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
- 		$^ >$*.test.out 2>$*.test.err; \
- 		echo $$? >$*.test.exit, \
- 		"TEST","$*.out")
--- 
-2.16.4
+ Thomas
