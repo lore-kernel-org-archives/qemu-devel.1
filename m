@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTjCk-0005BP-10
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:31:31 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fTjEU-0006BV-Ee
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:33:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTjCi-0002XN-Rs
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:31:30 -0400
-References: <20180604152941.20374-1-peter.maydell@linaro.org>
-	<20180604152941.20374-9-peter.maydell@linaro.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <64ff124d-fe34-75eb-e9e6-7c419827ee3c@redhat.com>
-Date: Fri, 15 Jun 2018 09:31:18 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180604152941.20374-9-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/13] hw/misc/tz_mpc.c: Honour the
- BLK_LUT settings in translate
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fTjES-0003ZT-0g
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:33:18 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:36408
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1fTjER-0003Z3-Ml
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:33:15 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Fri, 15 Jun 2018 08:33:03 +0100
+Message-Id: <20180615073303.502-2-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180615073303.502-1-mark.cave-ayland@ilande.co.uk>
+References: <20180615073303.502-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [RFC PATCH v4 1/1] SPARC64: add icount support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,121 +25,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org, atar4qemu@gmail.com, richard.henderson@linaro.org, cota@braap.org
 
-Hi Peter,
+This patch adds gen_io_start()/gen_io_end() to various instructions as required
+in order to boot my OpenBIOS test images on qemu-system-sparc64 with icount
+enabled.
 
-On 06/04/2018 05:29 PM, Peter Maydell wrote:
-> The final part of the Memory Protection Controller we need to
-> implement is actually using the BLK_LUT data programmed by the
-> guest to determine whether to block the transaction or not.
-> 
-> Since this means we now change transaction mappings when
-> the guest writes to BLK_LUT, we must also call the IOMMU
-> notifiers at that point.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/misc/tz-mpc.c     | 50 ++++++++++++++++++++++++++++++++++++++++++--
->  hw/misc/trace-events |  1 +
->  2 files changed, 49 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
-> index 704bb3fb44d..7a6117c90b3 100644
-> --- a/hw/misc/tz-mpc.c
-> +++ b/hw/misc/tz-mpc.c
-> @@ -72,6 +72,50 @@ static void tz_mpc_irq_update(TZMPC *s)
->      qemu_set_irq(s->irq, s->int_stat && s->int_en);
->  }
->  
-> +static void tz_mpc_iommu_notify(TZMPC *s, uint32_t lutidx,
-> +                                uint32_t oldlut, uint32_t newlut)
-> +{
-> +    /* Called when the LUT word at lutidx has changed from oldlut to newlut;
-> +     * must call the IOMMU notifiers for the changed blocks.
-> +     */
-> +    IOMMUTLBEntry entry = {
-> +        .addr_mask = s->blocksize - 1,
-> +    };
-> +    hwaddr addr = lutidx * s->blocksize * 32;
-> +    int i;
-> +
-> +    for (i = 0; i < 32; i++, addr += s->blocksize) {
-> +        if (!((oldlut ^ newlut) & (1 << i))) {
-> +            continue;
-> +        }
-> +        /* This changes the mappings for both the S and the NS space,
-> +         * so we need to do four notifies: an UNMAP then a MAP for each.
-> +         */
-> +
-> +        trace_tz_mpc_iommu_notify(addr);
-> +        entry.iova = addr;
-> +        entry.translated_addr = addr;
-> +
-> +        entry.perm = IOMMU_NONE;
-> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
-> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
-> +
-> +        entry.perm = IOMMU_RW;
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ target/sparc/translate.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 110 insertions(+), 1 deletion(-)
 
-> +        if (newlut & (1 << i)) {
-Add a comment saying the block is configured as non-secure?
-> +            entry.target_as = &s->blocked_io_as;
-> +        } else {
-> +            entry.target_as = &s->downstream_as;
-so this disallows any secure access to non secure blocks. I have a
-reduced knowledge of TZ but I would have thought that a secure access
-would have sufficient priviledge to access NS memory?
-
-Thanks
-
-Eric
-> +        }
-> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
-> +        if (newlut & (1 << i)) {
-> +            entry.target_as = &s->downstream_as;
-> +        } else {
-> +            entry.target_as = &s->blocked_io_as;
-> +        }
-> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
-> +    }
-> +}
-> +
->  static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
->                                     uint64_t *pdata,
->                                     unsigned size, MemTxAttrs attrs)
-> @@ -213,6 +257,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
->          s->blk_idx = value % s->blk_max;
->          break;
->      case A_BLK_LUT:
-> +        tz_mpc_iommu_notify(s, s->blk_idx, s->blk_lut[s->blk_idx], value);
->          s->blk_lut[s->blk_idx] = value;
->          if (size == 4) {
->              s->blk_idx++;
-> @@ -362,9 +407,10 @@ static IOMMUTLBEntry tz_mpc_translate(IOMMUMemoryRegion *iommu,
->      /* Look at the per-block configuration for this address, and
->       * return a TLB entry directing the transaction at either
->       * downstream_as or blocked_io_as, as appropriate.
-> -     * For the moment, always permit accesses.
-> +     * If the LUT cfg_ns bit is 1, only non-secure transactions
-> +     * may pass. If the bit is 0, only secure transactions may pass.
->       */
-> -    ok = true;
-> +    ok = tz_mpc_cfg_ns(s, addr) == (iommu_idx == IOMMU_IDX_NS);
->  
->      trace_tz_mpc_translate(addr, flags,
->                             iommu_idx == IOMMU_IDX_S ? "S" : "NS",
-> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-> index 72bf9d57000..c956e1419b7 100644
-> --- a/hw/misc/trace-events
-> +++ b/hw/misc/trace-events
-> @@ -90,6 +90,7 @@ tz_mpc_reg_write(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs wri
->  tz_mpc_mem_blocked_read(uint64_t addr, unsigned size, bool secure) "TZ MPC blocked read: offset 0x%" PRIx64 " size %u secure %d"
->  tz_mpc_mem_blocked_write(uint64_t addr, uint64_t data, unsigned size, bool secure) "TZ MPC blocked write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u secure %d"
->  tz_mpc_translate(uint64_t addr, int flags, const char *idx, const char *res) "TZ MPC translate: addr 0x%" PRIx64 " flags 0x%x iommu_idx %s: %s"
-> +tz_mpc_iommu_notify(uint64_t addr) "TZ MPC iommu: notifying UNMAP/MAP for 0x%" PRIx64
->  
->  # hw/misc/tz-ppc.c
->  tz_ppc_reset(void) "TZ PPC: reset"
-> 
+diff --git a/target/sparc/translate.c b/target/sparc/translate.c
+index f3d430c1b2..74315cdf09 100644
+--- a/target/sparc/translate.c
++++ b/target/sparc/translate.c
+@@ -41,6 +41,8 @@
+ #define JUMP_PC     2 /* dynamic pc value which takes only two values
+                          according to jump_pc[T2] */
+ 
++#define DISAS_EXIT  DISAS_TARGET_0
++
+ /* global register indexes */
+ static TCGv_ptr cpu_regwptr;
+ static TCGv cpu_cc_src, cpu_cc_src2, cpu_cc_dst;
+@@ -3400,11 +3402,17 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                         r_const = tcg_const_i32(dc->mem_idx);
+                         tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                        offsetof(CPUSPARCState, tick));
++                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                            gen_io_start();
++                        }
+                         gen_helper_tick_get_count(cpu_dst, cpu_env, r_tickptr,
+                                                   r_const);
+                         tcg_temp_free_ptr(r_tickptr);
+                         tcg_temp_free_i32(r_const);
+                         gen_store_gpr(dc, rd, cpu_dst);
++                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                            gen_io_end();
++                        }
+                     }
+                     break;
+                 case 0x5: /* V9 rdpc */
+@@ -3447,11 +3455,17 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                         r_const = tcg_const_i32(dc->mem_idx);
+                         tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                        offsetof(CPUSPARCState, stick));
++                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                            gen_io_start();
++                        }
+                         gen_helper_tick_get_count(cpu_dst, cpu_env, r_tickptr,
+                                                   r_const);
+                         tcg_temp_free_ptr(r_tickptr);
+                         tcg_temp_free_i32(r_const);
+                         gen_store_gpr(dc, rd, cpu_dst);
++                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                            gen_io_end();
++                        }
+                     }
+                     break;
+                 case 0x19: /* System tick compare */
+@@ -3576,10 +3590,16 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                         r_const = tcg_const_i32(dc->mem_idx);
+                         tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                        offsetof(CPUSPARCState, tick));
++                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                            gen_io_start();
++                        }
+                         gen_helper_tick_get_count(cpu_tmp0, cpu_env,
+                                                   r_tickptr, r_const);
+                         tcg_temp_free_ptr(r_tickptr);
+                         tcg_temp_free_i32(r_const);
++                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                            gen_io_end();
++                        }
+                     }
+                     break;
+                 case 5: // tba
+@@ -4385,9 +4405,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                     r_tickptr = tcg_temp_new_ptr();
+                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                                    offsetof(CPUSPARCState, tick));
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_start();
++                                    }
+                                     gen_helper_tick_set_limit(r_tickptr,
+                                                               cpu_tick_cmpr);
+                                     tcg_temp_free_ptr(r_tickptr);
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_end();
++                                    }
++                                    /* End TB to handle timer interrupt */
++                                    dc->base.is_jmp = DISAS_EXIT;
+                                 }
+                                 break;
+                             case 0x18: /* System tick */
+@@ -4403,9 +4433,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                     r_tickptr = tcg_temp_new_ptr();
+                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                                    offsetof(CPUSPARCState, stick));
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_start();
++                                    }
+                                     gen_helper_tick_set_count(r_tickptr,
+                                                               cpu_tmp0);
+                                     tcg_temp_free_ptr(r_tickptr);
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_end();
++                                    }
++                                    /* End TB to handle timer interrupt */
++                                    dc->base.is_jmp = DISAS_EXIT;
+                                 }
+                                 break;
+                             case 0x19: /* System tick compare */
+@@ -4421,9 +4461,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                     r_tickptr = tcg_temp_new_ptr();
+                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                                    offsetof(CPUSPARCState, stick));
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_start();
++                                    }
+                                     gen_helper_tick_set_limit(r_tickptr,
+                                                               cpu_stick_cmpr);
+                                     tcg_temp_free_ptr(r_tickptr);
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_end();
++                                    }
++                                    /* End TB to handle timer interrupt */
++                                    dc->base.is_jmp = DISAS_EXIT;
+                                 }
+                                 break;
+ 
+@@ -4531,9 +4581,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                     r_tickptr = tcg_temp_new_ptr();
+                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                                    offsetof(CPUSPARCState, tick));
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_start();
++                                    }
+                                     gen_helper_tick_set_count(r_tickptr,
+                                                               cpu_tmp0);
+                                     tcg_temp_free_ptr(r_tickptr);
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_end();
++                                    }
++                                    /* End TB to handle timer interrupt */
++                                    dc->base.is_jmp = DISAS_EXIT;
+                                 }
+                                 break;
+                             case 5: // tba
+@@ -4541,7 +4601,13 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                 break;
+                             case 6: // pstate
+                                 save_state(dc);
++                                if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                    gen_io_start();
++                                }
+                                 gen_helper_wrpstate(cpu_env, cpu_tmp0);
++                                if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                    gen_io_end();
++                                }
+                                 dc->npc = DYNAMIC_PC;
+                                 break;
+                             case 7: // tl
+@@ -4551,7 +4617,13 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                 dc->npc = DYNAMIC_PC;
+                                 break;
+                             case 8: // pil
++                                if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                    gen_io_start();
++                                }
+                                 gen_helper_wrpil(cpu_env, cpu_tmp0);
++                                if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                    gen_io_end();
++                                }
+                                 break;
+                             case 9: // cwp
+                                 gen_helper_wrcwp(cpu_env, cpu_tmp0);
+@@ -4642,9 +4714,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                     r_tickptr = tcg_temp_new_ptr();
+                                     tcg_gen_ld_ptr(r_tickptr, cpu_env,
+                                                    offsetof(CPUSPARCState, hstick));
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_start();
++                                    }
+                                     gen_helper_tick_set_limit(r_tickptr,
+                                                               cpu_hstick_cmpr);
+                                     tcg_temp_free_ptr(r_tickptr);
++                                    if (tb_cflags(dc->base.tb) &
++                                           CF_USE_ICOUNT) {
++                                        gen_io_end();
++                                    }
++                                    /* End TB to handle timer interrupt */
++                                    dc->base.is_jmp = DISAS_EXIT;
+                                 }
+                                 break;
+                             case 6: // hver readonly
+@@ -5265,14 +5347,26 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
+                                 goto priv_insn;
+                             dc->npc = DYNAMIC_PC;
+                             dc->pc = DYNAMIC_PC;
++                            if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                gen_io_start();
++                            }
+                             gen_helper_done(cpu_env);
++                            if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                gen_io_end();
++                            }
+                             goto jmp_insn;
+                         case 1:
+                             if (!supervisor(dc))
+                                 goto priv_insn;
+                             dc->npc = DYNAMIC_PC;
+                             dc->pc = DYNAMIC_PC;
++                            if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                gen_io_start();
++                            }
+                             gen_helper_retry(cpu_env);
++                            if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
++                                gen_io_end();
++                            }
+                             goto jmp_insn;
+                         default:
+                             goto illegal_insn;
+@@ -5822,7 +5916,9 @@ static void sparc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+ 
+-    if (dc->base.is_jmp != DISAS_NORETURN) {
++    switch (dc->base.is_jmp) {
++    case DISAS_NEXT:
++    case DISAS_TOO_MANY:
+         if (dc->pc != DYNAMIC_PC &&
+             (dc->npc != DYNAMIC_PC && dc->npc != JUMP_PC)) {
+             /* static PC and NPC: we can use direct chaining */
+@@ -5834,6 +5930,19 @@ static void sparc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
+             save_npc(dc);
+             tcg_gen_exit_tb(NULL, 0);
+         }
++        break;
++
++    case DISAS_NORETURN:
++       break;
++
++    case DISAS_EXIT:
++        /* Exit TB */
++        save_state(dc);
++        tcg_gen_exit_tb(NULL, 0);
++        break;
++
++    default:
++        g_assert_not_reached();
+     }
+ }
+ 
+-- 
+2.11.0
