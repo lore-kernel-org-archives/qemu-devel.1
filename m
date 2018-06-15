@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fTqGU-0001lu-4H
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:03:50 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fTqGX-0001oy-BJ
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:03:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fTqGQ-0007BQ-Sh
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:03:50 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33406)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fTqGW-0007Da-Bc
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:03:53 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35399)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fTqGQ-0007Aa-KL
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:03:46 -0400
-Received: by mail-lf0-x241.google.com with SMTP id y20-v6so15130056lfy.0
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 08:03:46 -0700 (PDT)
+	id 1fTqGW-0007D7-4q
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:03:52 -0400
+Received: by mail-lf0-x244.google.com with SMTP id i15-v6so15120526lfc.2
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 08:03:51 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Fri, 15 Jun 2018 17:03:41 +0200
-Message-Id: <20180615150343.4937-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v1 0/2] MicroBlaze Coverity fixes
+Date: Fri, 15 Jun 2018 17:03:43 +0200
+Message-Id: <20180615150343.4937-3-edgar.iglesias@gmail.com>
+In-Reply-To: <20180615150343.4937-1-edgar.iglesias@gmail.com>
+References: <20180615150343.4937-1-edgar.iglesias@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v1 2/2] target-microblaze: Rework NOP/zero
+ instruction handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,29 +35,58 @@ Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-The following changes since commit 3b2a4d3901b8b45840c0e0495ee1cbd13123739d:
+Remove the abort on a sequence of NOP/zero instructions.
+Always return early and avoid decoding NOP/zero instructions.
 
-  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.0-pull-request' into staging (2018-06-12 16:42:53 +0100)
+This fixes Coverity CID 1391443.
 
-are available in the git repository at:
-
-  git@github.com:edgarigl/qemu.git tags/edgar/xilinx-next-2018-06-15.for-upstream
-
-for you to fetch changes up to 462c254430b49ef708c75e038d7e796764058ca1:
-
-  target-microblaze: Rework NOP/zero instruction handling (2018-06-15 09:05:00 +0200)
-
-----------------------------------------------------------------
-xilinx-next-2018-06-15.for-upstream
-
-----------------------------------------------------------------
-Edgar E. Iglesias (2):
-      target-microblaze: mmu: Correct masking of output addresses
-      target-microblaze: Rework NOP/zero instruction handling
-
- target/microblaze/mmu.c       |  1 -
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
  target/microblaze/translate.c | 15 ++++-----------
- 2 files changed, 4 insertions(+), 12 deletions(-)
+ 1 file changed, 4 insertions(+), 11 deletions(-)
 
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index 6c64946398..78ca265b04 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -90,7 +90,6 @@ typedef struct DisasContext {
+     uint32_t jmp_pc;
+ 
+     int abort_at_next_insn;
+-    int nr_nops;
+     struct TranslationBlock *tb;
+     int singlestep_enabled;
+ } DisasContext;
+@@ -1576,17 +1575,12 @@ static inline void decode(DisasContext *dc, uint32_t ir)
+     dc->ir = ir;
+     LOG_DIS("%8.8x\t", dc->ir);
+ 
+-    if (dc->ir)
+-        dc->nr_nops = 0;
+-    else {
++    if (ir == 0) {
+         trap_illegal(dc, dc->cpu->env.pvr.regs[2] & PVR2_OPCODE_0x0_ILL_MASK);
+-
+-        LOG_DIS("nr_nops=%d\t", dc->nr_nops);
+-        dc->nr_nops++;
+-        if (dc->nr_nops > 4) {
+-            cpu_abort(CPU(dc->cpu), "fetching nop sequence\n");
+-        }
++        /* Don't decode nop/zero instructions any further.  */
++        return;
+     }
++
+     /* bit 2 seems to indicate insn type.  */
+     dc->type_b = ir & (1 << 29);
+ 
+@@ -1633,7 +1627,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
+     dc->singlestep_enabled = cs->singlestep_enabled;
+     dc->cpustate_changed = 0;
+     dc->abort_at_next_insn = 0;
+-    dc->nr_nops = 0;
+ 
+     if (pc_start & 3) {
+         cpu_abort(cs, "Microblaze: unaligned PC=%x\n", pc_start);
 -- 
 2.14.1
