@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fTnus-0007Gf-Uf
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:33:23 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fTnvE-0007QY-6I
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:33:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fTnup-0006h9-RA
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:33:22 -0400
-Received: from mail-db5eur01on0139.outbound.protection.outlook.com
-	([104.47.2.139]:41120
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1fTnup-0006gR-Am
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:33:19 -0400
-References: <20180609141457.6283-1-vsementsov@virtuozzo.com>
-	<20180615120649.GC2615@work-vm>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f40607cd-a777-b033-ae37-0be50e3bc3d2@virtuozzo.com>
-Date: Fri, 15 Jun 2018 15:33:12 +0300
+	(envelope-from <imammedo@redhat.com>) id 1fTnvB-0006mB-26
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:33:44 -0400
+Date: Fri, 15 Jun 2018 14:33:37 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180615143337.22e61fe9@redhat.com>
+In-Reply-To: <20180615112500.19854-4-david@redhat.com>
+References: <20180615112500.19854-1-david@redhat.com>
+	<20180615112500.19854-4-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180615120649.GC2615@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] migration: invalidate cache before source
- start
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 03/12] pc-dimm: rename pc_dimm_memory_*
+ to pc_dimm_*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +24,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-15.06.2018 15:06, Dr. David Alan Gilbert wrote:
-> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
->> Invalidate cache before source start in case of failed migration.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Why doesn't the code at the bottom of migration_completion,
-> fail_invalidate:   and the code in migrate_fd_cancel   handle this?
->
-> What case did you see it in that those didn't handle?
-> (Also I guess it probably should set s->block_inactive =3D false)
+On Fri, 15 Jun 2018 13:24:51 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-on source I see:
+> Let's rename it to make it look more consistent.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-81392@1529065750.766289:migrate_set_state new state 7
-81392@1529065750.766330:migration_thread_file_err
-81392@1529065750.766332:migration_thread_after_loop
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-so, we are leaving loop on
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (qemu_file_get_error(s->to_d=
-st_file)) {
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 migrate=
-_set_state(&s->state, current_active_state,
-MIGRATION_STATUS_FAILED);
-trace_migration_thread_file_err();
-break;
- =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-
-and skip migration_completion()
-
-
->
-> Dave
->
->> ---
->>
->>   migration/migration.c | 9 ++++++++-
->>   1 file changed, 8 insertions(+), 1 deletion(-)
->>
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 1e99ec9b7e..8f39e0dc02 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -2806,7 +2806,14 @@ static void migration_iteration_finish(MigrationS=
-tate *s)
->>       case MIGRATION_STATUS_FAILED:
->>       case MIGRATION_STATUS_CANCELLED:
->>           if (s->vm_was_running) {
->> -            vm_start();
->> +            Error *local_err =3D NULL;
->> +            bdrv_invalidate_cache_all(&local_err);
->> +            if (local_err) {
->> +                error_reportf_err(local_err, "Can't invalidate disks be=
-fore "
->> +                                  "source vm start");
->> +            } else {
->> +                vm_start();
->> +            }
->>           } else {
->>               if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
->>                   runstate_set(RUN_STATE_POSTMIGRATE);
->> --=20
->> 2.11.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
-
---=20
-Best regards,
-Vladimir
+> ---
+>  hw/i386/pc.c             | 4 ++--
+>  hw/mem/pc-dimm.c         | 6 +++---
+>  hw/ppc/spapr.c           | 6 +++---
+>  include/hw/mem/pc-dimm.h | 6 +++---
+>  4 files changed, 11 insertions(+), 11 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index f9250ffae7..f23133facc 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1713,7 +1713,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+>          goto out;
+>      }
+>  
+> -    pc_dimm_memory_plug(dev, MACHINE(pcms), align, &local_err);
+> +    pc_dimm_plug(dev, MACHINE(pcms), align, &local_err);
+>      if (local_err) {
+>          goto out;
+>      }
+> @@ -1773,7 +1773,7 @@ static void pc_memory_unplug(HotplugHandler *hotplug_dev,
+>          goto out;
+>      }
+>  
+> -    pc_dimm_memory_unplug(dev, MACHINE(pcms));
+> +    pc_dimm_unplug(dev, MACHINE(pcms));
+>      object_unparent(OBJECT(dev));
+>  
+>   out:
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index 62b34a992e..9e0c83e415 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -27,8 +27,8 @@
+>  #include "sysemu/numa.h"
+>  #include "trace.h"
+>  
+> -void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+> -                         uint64_t align, Error **errp)
+> +void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+> +                  Error **errp)
+>  {
+>      int slot;
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+> @@ -84,7 +84,7 @@ out:
+>      error_propagate(errp, local_err);
+>  }
+>  
+> -void pc_dimm_memory_unplug(DeviceState *dev, MachineState *machine)
+> +void pc_dimm_unplug(DeviceState *dev, MachineState *machine)
+>  {
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index f59999daac..3e5320020f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3153,7 +3153,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      align = memory_region_get_alignment(mr);
+>      size = memory_region_size(mr);
+>  
+> -    pc_dimm_memory_plug(dev, MACHINE(ms), align, &local_err);
+> +    pc_dimm_plug(dev, MACHINE(ms), align, &local_err);
+>      if (local_err) {
+>          goto out;
+>      }
+> @@ -3176,7 +3176,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>      return;
+>  
+>  out_unplug:
+> -    pc_dimm_memory_unplug(dev, MACHINE(ms));
+> +    pc_dimm_unplug(dev, MACHINE(ms));
+>  out:
+>      error_propagate(errp, local_err);
+>  }
+> @@ -3328,7 +3328,7 @@ static void spapr_memory_unplug(HotplugHandler *hotplug_dev, DeviceState *dev)
+>      sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+>      sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr, PC_DIMM(dev));
+>  
+> -    pc_dimm_memory_unplug(dev, MACHINE(hotplug_dev));
+> +    pc_dimm_unplug(dev, MACHINE(hotplug_dev));
+>      object_unparent(OBJECT(dev));
+>      spapr_pending_dimm_unplugs_remove(spapr, ds);
+>  }
+> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+> index 627c8601d9..860343d64f 100644
+> --- a/include/hw/mem/pc-dimm.h
+> +++ b/include/hw/mem/pc-dimm.h
+> @@ -78,7 +78,7 @@ typedef struct PCDIMMDeviceClass {
+>  
+>  int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
+>  
+> -void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+> -                         uint64_t align, Error **errp);
+> -void pc_dimm_memory_unplug(DeviceState *dev, MachineState *machine);
+> +void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+> +                  Error **errp);
+> +void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
+>  #endif
