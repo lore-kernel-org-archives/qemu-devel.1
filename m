@@ -1,22 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tomeu.vizoso@gmail.com>) id 1fTiWM-0007CL-IK
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 02:47:44 -0400
+	(envelope-from <groug@kaod.org>) id 1fTigF-0001JR-Q9
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 02:57:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tomeu.vizoso@gmail.com>) id 1fTiWJ-000770-ED
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 02:47:42 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:52460)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tomeu.vizoso@gmail.com>)
-	id 1fTiWJ-000756-4t
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 02:47:39 -0400
-Received: by mail-wm0-x232.google.com with SMTP id p126-v6so1755347wmb.2
-	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 23:47:38 -0700 (PDT)
-Sender: Tomeu Vizoso <tomeu.vizoso@gmail.com>
-From: Tomeu Vizoso <tomeu.vizoso@collabora.com>
-Date: Fri, 15 Jun 2018 08:47:01 +0200
-Message-Id: <20180615064701.40928-1-tomeu.vizoso@collabora.com>
-Subject: [Qemu-devel] [PATCH] egl-headless: Allow OpenGL ES context creation
+	(envelope-from <groug@kaod.org>) id 1fTigC-0000Eo-OO
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 02:57:55 -0400
+Received: from 10.mo177.mail-out.ovh.net ([46.105.73.133]:50837)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fTigC-0000DT-EH
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 02:57:52 -0400
+Received: from player688.ha.ovh.net (unknown [10.109.120.60])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 56A12B6869
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 08:57:50 +0200 (CEST)
+Date: Fri, 15 Jun 2018 08:57:43 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180615085743.10d0cd62@bahia.lan>
+In-Reply-To: <20180615000829.GE4129@umbus.fritz.box>
+References: <152901299450.252222.14219708016930421485.stgit@bahia.lan>
+	<152901307192.252222.7502403316148525219.stgit@bahia.lan>
+	<20180615000829.GE4129@umbus.fritz.box>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/fCNDUCHE0PsSPk/g9fWBJCO";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH 5/5] spapr_cpu_core: simplify
+ spapr_cpu_core_realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,226 +33,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kernel@collabora.com, Tomeu Vizoso <tomeu.vizoso@collabora.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
 
-This will be mainly useful for automated testing of virglrenderer on ES.
+--Sig_/fCNDUCHE0PsSPk/g9fWBJCO
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Tomeu Vizoso <tomeu.vizoso@collabora.com>
----
- include/ui/egl-helpers.h |  6 ++---
- qemu-options.hx          |  1 +
- ui/egl-headless.c        |  2 +-
- ui/egl-helpers.c         | 56 +++++++++++++++++++++++++++++-----------
- ui/gtk-egl.c             |  2 +-
- ui/spice-core.c          |  2 +-
- 6 files changed, 48 insertions(+), 21 deletions(-)
+On Fri, 15 Jun 2018 10:08:29 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-diff --git a/include/ui/egl-helpers.h b/include/ui/egl-helpers.h
-index 747233ce5846..9c76a04a2492 100644
---- a/include/ui/egl-helpers.h
-+++ b/include/ui/egl-helpers.h
-@@ -34,7 +34,7 @@ extern int qemu_egl_rn_fd;
- extern struct gbm_device *qemu_egl_rn_gbm_dev;
- extern EGLContext qemu_egl_rn_ctx;
- 
--int egl_rendernode_init(const char *rendernode);
-+int egl_rendernode_init(const char *rendernode, bool gles);
- int egl_get_fd_for_texture(uint32_t tex_id, EGLint *stride, EGLint *fourcc);
- 
- void egl_dmabuf_import_texture(QemuDmaBuf *dmabuf);
-@@ -45,7 +45,7 @@ void egl_dmabuf_release_texture(QemuDmaBuf *dmabuf);
- EGLSurface qemu_egl_init_surface_x11(EGLContext ectx, Window win);
- 
- int qemu_egl_init_dpy_x11(EGLNativeDisplayType dpy);
--int qemu_egl_init_dpy_mesa(EGLNativeDisplayType dpy);
--EGLContext qemu_egl_init_ctx(void);
-+int qemu_egl_init_dpy_mesa(EGLNativeDisplayType dpy, bool gles);
-+EGLContext qemu_egl_init_ctx(bool gles);
- 
- #endif /* EGL_HELPERS_H */
-diff --git a/qemu-options.hx b/qemu-options.hx
-index c0d3951e9ffd..baa320ce615d 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1242,6 +1242,7 @@ DEF("display", HAS_ARG, QEMU_OPTION_display,
-     "-display sdl[,frame=on|off][,alt_grab=on|off][,ctrl_grab=on|off]\n"
-     "            [,window_close=on|off][,gl=on|core|es|off]\n"
-     "-display gtk[,grab_on_hover=on|off][,gl=on|off]|\n"
-+    "-display egl-headless[,gl=core|es]|\n"
-     "-display vnc=<display>[,<optargs>]\n"
-     "-display curses\n"
-     "-display none"
-diff --git a/ui/egl-headless.c b/ui/egl-headless.c
-index 7c877122d385..796bce0bfa67 100644
---- a/ui/egl-headless.c
-+++ b/ui/egl-headless.c
-@@ -175,7 +175,7 @@ static void egl_headless_init(DisplayState *ds, DisplayOptions *opts)
-     egl_dpy *edpy;
-     int idx;
- 
--    if (egl_rendernode_init(NULL) < 0) {
-+    if (egl_rendernode_init(NULL, opts->gl == DISPLAYGL_MODE_ES) < 0) {
-         error_report("egl: render node init failed");
-         exit(1);
-     }
-diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
-index 16dc3ded3630..a775f4ffb725 100644
---- a/ui/egl-helpers.c
-+++ b/ui/egl-helpers.c
-@@ -191,7 +191,7 @@ static int qemu_egl_rendernode_open(const char *rendernode)
-     return fd;
- }
- 
--int egl_rendernode_init(const char *rendernode)
-+int egl_rendernode_init(const char *rendernode, bool gles)
- {
-     qemu_egl_rn_fd = -1;
-     int rc;
-@@ -208,7 +208,8 @@ int egl_rendernode_init(const char *rendernode)
-         goto err;
-     }
- 
--    rc = qemu_egl_init_dpy_mesa((EGLNativeDisplayType)qemu_egl_rn_gbm_dev);
-+    rc = qemu_egl_init_dpy_mesa((EGLNativeDisplayType)qemu_egl_rn_gbm_dev,
-+                                gles);
-     if (rc != 0) {
-         /* qemu_egl_init_dpy_mesa reports error */
-         goto err;
-@@ -225,7 +226,7 @@ int egl_rendernode_init(const char *rendernode)
-         goto err;
-     }
- 
--    qemu_egl_rn_ctx = qemu_egl_init_ctx();
-+    qemu_egl_rn_ctx = qemu_egl_init_ctx(gles);
-     if (!qemu_egl_rn_ctx) {
-         error_report("egl: egl_init_ctx failed");
-         goto err;
-@@ -392,7 +393,8 @@ static EGLDisplay qemu_egl_get_display(EGLNativeDisplayType native,
- }
- 
- static int qemu_egl_init_dpy(EGLNativeDisplayType dpy,
--                             EGLenum platform)
-+                             EGLenum platform,
-+                             bool gles)
- {
-     static const EGLint conf_att_gl[] = {
-         EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-@@ -403,6 +405,15 @@ static int qemu_egl_init_dpy(EGLNativeDisplayType dpy,
-         EGL_ALPHA_SIZE, 0,
-         EGL_NONE,
-     };
-+    static const EGLint conf_att_gles[] = {
-+        EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-+        EGL_RED_SIZE,   5,
-+        EGL_GREEN_SIZE, 5,
-+        EGL_BLUE_SIZE,  5,
-+        EGL_ALPHA_SIZE, 0,
-+        EGL_NONE,
-+    };
-     EGLint major, minor;
-     EGLBoolean b;
-     EGLint n;
-@@ -419,14 +430,21 @@ static int qemu_egl_init_dpy(EGLNativeDisplayType dpy,
-         return -1;
-     }
- 
--    b = eglBindAPI(EGL_OPENGL_API);
-+    if (gles)
-+        b = eglBindAPI(EGL_OPENGL_ES_API);
-+    else
-+        b = eglBindAPI(EGL_OPENGL_API);
-     if (b == EGL_FALSE) {
-         error_report("egl: eglBindAPI failed");
-         return -1;
-     }
- 
--    b = eglChooseConfig(qemu_egl_display, conf_att_gl,
--                        &qemu_egl_config, 1, &n);
-+    if (gles)
-+        b = eglChooseConfig(qemu_egl_display, conf_att_gles,
-+                            &qemu_egl_config, 1, &n);
-+    else
-+        b = eglChooseConfig(qemu_egl_display, conf_att_gl,
-+                            &qemu_egl_config, 1, &n);
-     if (b == EGL_FALSE || n != 1) {
-         error_report("egl: eglChooseConfig failed");
-         return -1;
-@@ -437,32 +455,40 @@ static int qemu_egl_init_dpy(EGLNativeDisplayType dpy,
- int qemu_egl_init_dpy_x11(EGLNativeDisplayType dpy)
- {
- #ifdef EGL_KHR_platform_x11
--    return qemu_egl_init_dpy(dpy, EGL_PLATFORM_X11_KHR);
-+    return qemu_egl_init_dpy(dpy, EGL_PLATFORM_X11_KHR, false);
- #else
--    return qemu_egl_init_dpy(dpy, 0);
-+    return qemu_egl_init_dpy(dpy, 0, false);
- #endif
- }
- 
--int qemu_egl_init_dpy_mesa(EGLNativeDisplayType dpy)
-+int qemu_egl_init_dpy_mesa(EGLNativeDisplayType dpy, bool gles)
- {
- #ifdef EGL_MESA_platform_gbm
--    return qemu_egl_init_dpy(dpy, EGL_PLATFORM_GBM_MESA);
-+    return qemu_egl_init_dpy(dpy, EGL_PLATFORM_GBM_MESA, gles);
- #else
--    return qemu_egl_init_dpy(dpy, 0);
-+    return qemu_egl_init_dpy(dpy, 0, gles);
- #endif
- }
- 
--EGLContext qemu_egl_init_ctx(void)
-+EGLContext qemu_egl_init_ctx(bool gles)
- {
-     static const EGLint ctx_att_gl[] = {
-         EGL_CONTEXT_OPENGL_PROFILE_MASK, EGL_CONTEXT_OPENGL_CORE_PROFILE_BIT,
-         EGL_NONE
-     };
-+    static const EGLint ctx_att_gles[] = {
-+        EGL_CONTEXT_CLIENT_VERSION, 2,
-+        EGL_NONE
-+    };
-     EGLContext ectx;
-     EGLBoolean b;
- 
--    ectx = eglCreateContext(qemu_egl_display, qemu_egl_config, EGL_NO_CONTEXT,
--                            ctx_att_gl);
-+    if (gles)
-+        ectx = eglCreateContext(qemu_egl_display, qemu_egl_config,
-+                                EGL_NO_CONTEXT, ctx_att_gles);
-+    else
-+        ectx = eglCreateContext(qemu_egl_display, qemu_egl_config,
-+                                EGL_NO_CONTEXT, ctx_att_gl);
-     if (ectx == EGL_NO_CONTEXT) {
-         error_report("egl: eglCreateContext failed");
-         return NULL;
-diff --git a/ui/gtk-egl.c b/ui/gtk-egl.c
-index 9390c6762e87..9ab50a17c029 100644
---- a/ui/gtk-egl.c
-+++ b/ui/gtk-egl.c
-@@ -57,7 +57,7 @@ void gd_egl_init(VirtualConsole *vc)
-         return;
-     }
- 
--    vc->gfx.ectx = qemu_egl_init_ctx();
-+    vc->gfx.ectx = qemu_egl_init_ctx(false);
-     vc->gfx.esurface = qemu_egl_init_surface_x11(vc->gfx.ectx, x11_window);
- 
-     assert(vc->gfx.esurface);
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index ae8921a201ca..6d659b64b4ce 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -829,7 +829,7 @@ void qemu_spice_init(void)
-                          "incompatible with -spice port/tls-port");
-             exit(1);
-         }
--        if (egl_rendernode_init(qemu_opt_get(opts, "rendernode")) != 0) {
-+        if (egl_rendernode_init(qemu_opt_get(opts, "rendernode"), false) != 0) {
-             error_report("Failed to initialize EGL render node for SPICE GL");
-             exit(1);
-         }
--- 
-2.17.0
+> On Thu, Jun 14, 2018 at 11:51:11PM +0200, Greg Kurz wrote:
+> > There's no real reason to create all CPUs in a first pass and to realize
+> > them in a second pass. Merging these two loops makes the code simpler.
+> >=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org> =20
+>=20
+> I'm a bit uncertain about this one.  It's correct at the moment, but
+> I'm wondering if there might be things we want to do wile the cpu
+> objects are constructed, but not initialized.
+>=20
+
+Yeah, I thought about that also, but I couldn't find any case...
+
+> In fact, I thought I wanted something like that for allowing earlier
+> initialization of the default caps values, though in the end I found a
+> simpler and better approach.
+>=20
+> So, I'm holding off on this one for the time being.
+>=20
+
+Sure.
+
+> > ---
+> >  hw/ppc/spapr_cpu_core.c |   25 ++++++++++++-------------
+> >  1 file changed, 12 insertions(+), 13 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> > index 0ebaf804a9bc..f52af20e0096 100644
+> > --- a/hw/ppc/spapr_cpu_core.c
+> > +++ b/hw/ppc/spapr_cpu_core.c
+> > @@ -172,7 +172,8 @@ error:
+> >      error_propagate(errp, local_err);
+> >  }
+> > =20
+> > -static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore *sc, int i, Error **=
+errp)
+> > +static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore *sc, int i,
+> > +                                     sPAPRMachineState *spapr, Error *=
+*errp)
+> >  {
+> >      sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(sc);
+> >      CPUCore *cc =3D CPU_CORE(sc);
+> > @@ -201,9 +202,16 @@ static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore =
+*sc, int i, Error **errp)
+> >          goto err;
+> >      }
+> > =20
+> > +    spapr_realize_vcpu(cpu, spapr, &local_err);
+> > +    if (local_err) {
+> > +        goto err_unparent;
+> > +    }
+> > +
+> >      object_unref(obj);
+> >      return cpu;
+> > =20
+> > +err_unparent:
+> > +    object_unparent(obj);
+> >  err:
+> >      object_unref(obj);
+> >      error_propagate(errp, local_err);
+> > @@ -212,6 +220,7 @@ err:
+> > =20
+> >  static void spapr_delete_vcpu(PowerPCCPU *cpu)
+> >  {
+> > +    spapr_unrealize_vcpu(cpu);
+> >      object_unparent(OBJECT(cpu));
+> >  }
+> > =20
+> > @@ -226,7 +235,7 @@ static void spapr_cpu_core_realize(DeviceState *dev=
+, Error **errp)
+> >      sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+> >      CPUCore *cc =3D CPU_CORE(OBJECT(dev));
+> >      Error *local_err =3D NULL;
+> > -    int i, j;
+> > +    int i;
+> > =20
+> >      if (!spapr) {
+> >          error_setg(errp, TYPE_SPAPR_CPU_CORE " needs a pseries machine=
+");
+> > @@ -235,24 +244,14 @@ static void spapr_cpu_core_realize(DeviceState *d=
+ev, Error **errp)
+> > =20
+> >      sc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
+> >      for (i =3D 0; i < cc->nr_threads; i++) {
+> > -        sc->threads[i] =3D spapr_create_vcpu(sc, i, &local_err);
+> > +        sc->threads[i] =3D spapr_create_vcpu(sc, i, spapr, &local_err);
+> >          if (local_err) {
+> >              goto err;
+> >          }
+> >      }
+> > =20
+> > -    for (j =3D 0; j < cc->nr_threads; j++) {
+> > -        spapr_realize_vcpu(sc->threads[j], spapr, &local_err);
+> > -        if (local_err) {
+> > -            goto err_unrealize;
+> > -        }
+> > -    }
+> >      return;
+> > =20
+> > -err_unrealize:
+> > -    while (--j >=3D 0) {
+> > -        spapr_unrealize_vcpu(sc->threads[i]);
+> > -    }
+> >  err:
+> >      while (--i >=3D 0) {
+> >          spapr_delete_vcpu(sc->threads[i]);
+> >  =20
+>=20
+
+
+--Sig_/fCNDUCHE0PsSPk/g9fWBJCO
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlsjY2cACgkQcdTV5YIv
+c9YFKQ/+KWloitsQSdnxLsVuP0oL9s4ArOD2o7lpdRi1RjVBr9qhbs/ax/9yNX2B
+QZ3kbobqN//jA+F4vGCdW5Vtw6cSGmXmLnW3KukunpPPMx94kC8Krs+G+BkvhAMi
+Q+102TRbzKpGl9Rl1D7JsSRx2x1FLe2RzgPITab2MTloX1roINSJh0MVGliTZQiN
+SElKGk1k7/OoEi2OMcv+zDMMnpw765mQDN4Y8r1ioq2SuIp2tVJzMxwg29i92bXv
+3i08QvU9wECgXB93cOTeIza86FEZjpW0vZrMY/wwM/ESZIbRq9EmS6mfKHvBCqkO
+yuHqM0WFVja9ZhBt5E9FgdDB/ghFFzLlgN4W4/viDcc29hH5a0InogksAaDqCjmw
+V67JNXjUwVJJczJEGM5quBv0y6ECo7hrltt2qK/CwnTAtww69ikCrsnipAbxd0kk
+gqaCi6INC3q8+D/9mjyAqz+9t0wu4+Y5V/y2f9Bc9qIENDeljQ3A1jF/xI6b3zTj
+TzxMnwOBDbzhd7gCxKimJC/gMITzvvd1ea9PP/7kS0TxOtbd/4IkAmr/xMVg/dhd
+u09x5HioktqSykOEPLHzx6p1hnZ3LMnerKm8buTcNf68L/4d9z7Rv3i8jDwBQ/mp
+vQtRNkGb3tpu6ncwMfQ96XDL583eJVtQksZDhYwywTePwuk+4Jg=
+=LCXI
+-----END PGP SIGNATURE-----
+
+--Sig_/fCNDUCHE0PsSPk/g9fWBJCO--
