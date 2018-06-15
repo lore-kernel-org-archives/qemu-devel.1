@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59032)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTlnb-0001Hg-99
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:17:44 -0400
+	(envelope-from <david@redhat.com>) id 1fTlzX-0003zq-7T
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:30:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTlna-0007xi-HX
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:17:43 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:41814)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fTlna-0007xG-Cg
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:17:42 -0400
-Received: by mail-ot0-x242.google.com with SMTP id d19-v6so10414663oti.8
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 03:17:42 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fTlzU-0000Pi-5h
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:30:03 -0400
+References: <20180611121655.19616-1-david@redhat.com>
+	<20180611121655.19616-8-david@redhat.com>
+	<20180613150320.3d6d11ca@redhat.com>
+	<430ef63d-0e9b-5925-5d5a-b6804ec7d988@redhat.com>
+	<045b1a53-fdf2-36db-2898-cfee0849232a@redhat.com>
+	<20180614170051.62104d16@redhat.com>
+	<3ba714d3-2031-5ddd-d21a-afdaee97f685@redhat.com>
+	<20180615115912.59bae274@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <7e671ffb-712c-4cf5-42ca-8bd4cf891edb@redhat.com>
+Date: Fri, 15 Jun 2018 12:29:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180611171007.4165-1-peter.maydell@linaro.org>
-References: <20180611171007.4165-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Jun 2018 11:17:21 +0100
-Message-ID: <CAFEAcA_gc_5WZZbRrYCt7xUo1C-TKbyoWzhWX0Rwd1f=wtc85g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/3] Add ldn_*_p() and stn_*_p() and use
- them in exec.c
+In-Reply-To: <20180615115912.59bae274@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 07/11] pc-dimm: get_memory_region() can
+ never fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "patches@linaro.org" <patches@linaro.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 11 June 2018 at 18:10, Peter Maydell <peter.maydell@linaro.org> wrote:
-> There's a common pattern in QEMU where a function needs to perform
-> a data load or store of an N byte integer in a particular endianness.
-> At the moment this is handled by doing a switch() on the size and
-> calling the appropriate ld*_p or st*_p function for each size.
->
-> This patchset provides a new family of functions ldn_*_p() and stn_*_p()
-> which take the size as an argument and do the switch() themselves,
-> and uses them in 5 callsites in exec.c.
->
-> If people like the idea, naming convention, etc, we can look for
-> and convert other callsites, extend this to eg an address_space_ldn()
-> and address_space_stn() (sample use cases in watch_mem_read(),
-> watch_mem_write(), dino_chip_write_with_attrs(), tx_ppc_read(),
-> tx_ppc_write()...)
->
-> Patch 2 here fixes an apparently unintentional sign-extension in
-> subpage_read(), so that patch 3 is a no-behaviour-change patch.
->
-> thanks
-> -- PMM
->
-> Peter Maydell (3):
->   bswap: Add new stn_*_p() and ldn_*_p() memory access functions
->   exec.c: Don't accidentally sign-extend 4-byte loads in subpage_read()
->   exec.c: Use stn_p() and ldn_p() instead of explicit switches
 
-Thanks for the review; I plan to put these into target-arm.next
-(with the silly typo fixed). I have another series brewing which
-depends on this one, so having them in-tree will reduce the
-dependencies there.
+>>> pre_plug isn't part of device, it's a separate part that might vary
+>>> depending on machine and which might modify device properties along
+>>> the way and then exaggerating we would need 'prepare2()' and after
+>>> that 'pre_plug2()' and ...  
+>>
+>> That's how two parties (device vs hotplug handler) work together to get
+>> results done ... Just like inititalize() -> realized() vs. pre_plug ->
+>> plug(). There has to be some hand shaking.
+> In general hotplug handler is optional, for example a board might
+> create initial memory wit fixed layout as:
+>   dev = object_new(dimm)
+>   set memdev + set addr
+>   qdev_init_no_fail()
+> 
+> generalized pc-dimm helpers for hotplug handler is just impl. detail,
+> a board might have other ideas how to use pc-dimm and choose to
+> implement wiring differently. So device model should do sanity checks
+> independently from whomever uses it.
 
-thanks
--- PMM
+In general, I am not a fan of implementing things the "what if someday
+..." way. It overcomplicates code and you can be sure that usually
+something is missed either way (as there is no concrete use case, not
+even in somebodys mind).
+
+But I can see that for pc-dimms that can actually make sense (in
+contrast to other, more specific devices).
+
+-- 
+
+Thanks,
+
+David / dhildenb
