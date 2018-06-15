@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tamiko@43-1.org>) id 1fTwgc-0006EU-Vo
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 17:55:15 -0400
+	(envelope-from <tamiko@kyomu.43-1.org>) id 1fTwo2-0001LX-0j
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 18:02:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tamiko@43-1.org>) id 1fTwgZ-0000It-Pe
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 17:55:15 -0400
-Received: from tsukuyomi.43-1.org ([188.40.248.50]:52238)
+	(envelope-from <tamiko@kyomu.43-1.org>) id 1fTwo1-00088H-9Q
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 18:02:54 -0400
+Received: from tsukuyomi.43-1.org ([2a01:4f8:173:743::1:50]:56236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tamiko@43-1.org>) id 1fTwgZ-0000Hn-Ia
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 17:55:11 -0400
+	(Exim 4.71) (envelope-from <tamiko@kyomu.43-1.org>)
+	id 1fTwo1-00086a-3A
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 18:02:53 -0400
 From: Matthias Maier <tamiko@43-1.org>
-In-Reply-To: <87602kysk2.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Fri, 15 Jun 2018 17:31:57 +0200")
-References: <20180615044042.7928-1-tamiko@43-1.org>
-	<20180615044042.7928-3-tamiko@43-1.org>
-	<87602kysk2.fsf@dusky.pond.sub.org>
-Date: Fri, 15 Jun 2018 16:55:06 -0500
-Message-ID: <87efh7pvet.fsf@43-1.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] qapi: open files in binary mode and
- use explicit decoding/encoding in common.py
+Date: Fri, 15 Jun 2018 17:02:03 -0500
+Message-Id: <20180615220205.6929-1-tamiko@43-1.org>
+Subject: [Qemu-devel] [PATCH v3 0/2] Fix compilation with python-3 if
+ en_US.UTF-8 is unavailable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,14 +23,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
+Hi,
 
-On Fri, Jun 15, 2018, at 10:31 CDT, Markus Armbruster <armbru@redhat.com> wrote:
+this is hopefully the final iteration of the patches.
 
-> If I understand 7.2.3. Standard Encodings[*] correctly, the canonical
-> name is "utf-8".  Let's use that.  Wait, it's the default, no need to
-> pass an argument.
+v3:
+ - reverse order of patches
+ - rename second patch to "Revert commit ..."
+ - drop "UTF-8" argument in decode()/encode(); bot functions default to
+   utf-8 already.
 
-Roger. I will change this in v3.
+v2:
+ - ensure compatibility with python2 by only calling encode()/decode() if
+   script is run with a python3 interpreter
+
+Best,
+Matthias
