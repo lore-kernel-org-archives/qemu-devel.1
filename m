@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTkgG-0000tD-Tv
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:06:10 -0400
+	(envelope-from <dimastep@yandex-team.ru>) id 1fTkly-000320-MN
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:11:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTkgD-0004PQ-3K
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:06:04 -0400
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:39481)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fTkgC-0004Ox-U2
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:06:01 -0400
-Received: by mail-oi0-x22e.google.com with SMTP id t22-v6so8206199oih.6
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 02:06:00 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <12713e19-d67f-2196-7fed-5552d2aa95d5@redhat.com>
-References: <20180604152941.20374-1-peter.maydell@linaro.org>
-	<20180604152941.20374-7-peter.maydell@linaro.org>
-	<12713e19-d67f-2196-7fed-5552d2aa95d5@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Jun 2018 10:05:39 +0100
-Message-ID: <CAFEAcA8ZPAWD8JuvOZYpMC5xBBqJqY_KtytXBkO-_tzoLtkKUA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 06/13] hw/misc/tz-mpc.c: Implement
- registers
+	(envelope-from <dimastep@yandex-team.ru>) id 1fTklt-0002X7-Se
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:11:58 -0400
+Received: from forwardcorp1o.cmail.yandex.net ([37.9.109.47]:35800)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dimastep@yandex-team.ru>)
+	id 1fTklt-0002US-FG
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:11:53 -0400
+From: Dima Stepanov <dimastep@yandex-team.ru>
+Date: Fri, 15 Jun 2018 12:11:44 +0300
+Message-Id: <1529053904-12607-1-git-send-email-dimastep@yandex-team.ru>
+Subject: [Qemu-devel] [PATCH v1] qemu-pr-helper: garbage response structure
+ can be used to write data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: wrfsh@yandex-team.ru
 
-On 15 June 2018 at 08:23, Auger Eric <eric.auger@redhat.com> wrote:
-> Hi Peter,
->
-> On 06/04/2018 05:29 PM, Peter Maydell wrote:
->> Implement the missing registers for the TZ MPC.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+The prh_co_entry() routine handles requests. The first part is to read a
+request by calling the prh_read_request() routine, if:
+  1. scsi_cdb_xfer(req->cdb) call returns 0, and
+  2. req->cdb[0] == PERSISTENT_RESERVE_IN, then
+The resp->result field will be uninitialized. As a result the resp.sz
+field will be also uninitialized in the prh_co_entry() function.
+The second part is to send the response by calling the
+prh_write_response() routine:
+  1. For the PERSISTENT_RESERVE_IN command, and
+  2. resp->result == GOOD (previous successful reply or just luck), then
+There is a probability that the following assert will not be trigered:
+  assert(resp->sz <= req->sz && resp->sz <= sizeof(client->data));
+As a result some uninitialized response will be sent.
 
->> +    case A_BLK_LUT:
->> +        r = s->blk_lut[s->blk_idx];
->> +        if (size == 4) {
-> don't you need to test CTRL[8] before doing the auto-increment?
->
-> spec says:
-> "A full word write or read to this register
-> automatically increments the BLK_IDX by one if
-> enabled by CTRL[8]."
+The fix is to initialize the response structure to CHECK_CONDITION and 0
+values before calling the prh_read_request() routine.
 
-Oops, yes, definitely.
+Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+---
+ scsi/qemu-pr-helper.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-thanks
--- PMM
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index d0f8317..85878c2 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -768,6 +768,8 @@ static void coroutine_fn prh_co_entry(void *opaque)
+         PRHelperResponse resp;
+         int sz;
+ 
++        resp.result = CHECK_CONDITION;
++        resp.sz = 0;
+         sz = prh_read_request(client, &req, &resp, &local_err);
+         if (sz < 0) {
+             break;
+-- 
+2.7.4
