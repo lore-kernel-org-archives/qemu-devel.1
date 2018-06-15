@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47666)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTj4p-0001De-Lw
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:23:21 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fTj6u-0002JY-55
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:25:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTj4o-0006K5-9V
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:23:19 -0400
-References: <20180604152941.20374-1-peter.maydell@linaro.org>
-	<20180604152941.20374-7-peter.maydell@linaro.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <12713e19-d67f-2196-7fed-5552d2aa95d5@redhat.com>
-Date: Fri, 15 Jun 2018 09:23:08 +0200
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fTj6p-0007Pb-5q
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:25:28 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:36383
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1fTj6o-0007NL-Vb
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:25:23 -0400
+References: <20180614222830.19725-1-mark.cave-ayland@ilande.co.uk>
+	<20180614222830.19725-2-mark.cave-ayland@ilande.co.uk>
+	<57720c98-3454-218b-6e29-078a9dfd9e53@linaro.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <7e20bf60-709d-7bcb-c433-3ecb1decfb5a@ilande.co.uk>
+Date: Fri, 15 Jun 2018 08:25:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180604152941.20374-7-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <57720c98-3454-218b-6e29-078a9dfd9e53@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 06/13] hw/misc/tz-mpc.c: Implement
- registers
+Subject: Re: [Qemu-devel] [RFC PATCH v3 1/1] SPARC64: add icount support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,266 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, atar4qemu@gmail.com, cota@braap.org
 
-Hi Peter,
+On 14/06/18 23:40, Richard Henderson wrote:
 
-On 06/04/2018 05:29 PM, Peter Maydell wrote:
-> Implement the missing registers for the TZ MPC.
+> On 06/14/2018 12:28 PM, Mark Cave-Ayland wrote:
+>> @@ -5834,6 +5928,11 @@ static void sparc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
+>>               save_npc(dc);
+>>               tcg_gen_exit_tb(NULL, 0);
+>>           }
+>> +    } else if (dc->base.is_jmp == DISAS_EXIT) {
+>> +        /* Exit TB */
+>> +        save_state(dc);
+>> +        gen_op_next_insn();
+>> +        tcg_gen_exit_tb(NULL, 0);
+>>       }
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/misc/tz-mpc.h |  10 +++
->  hw/misc/tz-mpc.c         | 137 ++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 144 insertions(+), 3 deletions(-)
+> This doesn't look reachable, since the IF that goes with this ELSE is
 > 
-> diff --git a/include/hw/misc/tz-mpc.h b/include/hw/misc/tz-mpc.h
-> index b5eaf1699ea..1fff4d6029a 100644
-> --- a/include/hw/misc/tz-mpc.h
-> +++ b/include/hw/misc/tz-mpc.h
-> @@ -48,6 +48,16 @@ struct TZMPC {
->  
->      /*< public >*/
->  
-> +    /* State */
-> +    uint32_t ctrl;
-> +    uint32_t blk_idx;
-> +    uint32_t int_stat;
-> +    uint32_t int_en;
-> +    uint32_t int_info1;
-> +    uint32_t int_info2;
-> +
-> +    uint32_t *blk_lut;
-> +
->      qemu_irq irq;
->  
->      /* Properties */
-> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
-> index d4467ccc3b2..9db55e23daf 100644
-> --- a/hw/misc/tz-mpc.c
-> +++ b/hw/misc/tz-mpc.c
-> @@ -28,16 +28,23 @@ enum {
->  
->  /* Config registers */
->  REG32(CTRL, 0x00)
-> +    FIELD(CTRL, SEC_RESP, 4, 1)
-> +    FIELD(CTRL, AUTOINC, 8, 1)
-> +    FIELD(CTRL, LOCKDOWN, 31, 1)
->  REG32(BLK_MAX, 0x10)
->  REG32(BLK_CFG, 0x14)
->  REG32(BLK_IDX, 0x18)
->  REG32(BLK_LUT, 0x1c)
->  REG32(INT_STAT, 0x20)
-> +    FIELD(INT_STAT, IRQ, 0, 1)
->  REG32(INT_CLEAR, 0x24)
-> +    FIELD(INT_CLEAR, IRQ, 0, 1)
->  REG32(INT_EN, 0x28)
-> +    FIELD(INT_EN, IRQ, 0, 1)
->  REG32(INT_INFO1, 0x2c)
->  REG32(INT_INFO2, 0x30)
->  REG32(INT_SET, 0x34)
-> +    FIELD(INT_SET, IRQ, 0, 1)
->  REG32(PIDR4, 0xfd0)
->  REG32(PIDR5, 0xfd4)
->  REG32(PIDR6, 0xfd8)
-> @@ -57,14 +64,55 @@ static const uint8_t tz_mpc_idregs[] = {
->      0x0d, 0xf0, 0x05, 0xb1,
->  };
->  
-> +static void tz_mpc_irq_update(TZMPC *s)
-> +{
-> +    qemu_set_irq(s->irq, s->int_stat && s->int_en);
-> +}
-> +
->  static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
->                                     uint64_t *pdata,
->                                     unsigned size, MemTxAttrs attrs)
->  {
-> +    TZMPC *s = TZ_MPC(opaque);
->      uint64_t r;
->      uint32_t offset = addr & ~0x3;
->  
->      switch (offset) {
-> +    case A_CTRL:
-> +        r = s->ctrl;
-> +        break;
-> +    case A_BLK_MAX:
-> +        r = s->blk_max;
-> +        break;
-> +    case A_BLK_CFG:
-> +        /* We are never in "init in progress state", so this just indicates
-> +         * the block size. s->blocksize == (1 << BLK_CFG + 5), so
-> +         * BLK_CFG == ctz32(s->blocksize) - 5
-> +         */
-> +        r = ctz32(s->blocksize) - 5;
-> +        break;
-> +    case A_BLK_IDX:
-> +        r = s->blk_idx;
-> +        break;
-> +    case A_BLK_LUT:
-> +        r = s->blk_lut[s->blk_idx];
-> +        if (size == 4) {
-don't you need to test CTRL[8] before doing the auto-increment?
-
-spec says:
-"A full word write or read to this register
-automatically increments the BLK_IDX by one if
-enabled by CTRL[8]."
-> +            s->blk_idx++;
-> +            s->blk_idx %= s->blk_max;
-> +        }
-> +        break;
-> +    case A_INT_STAT:
-> +        r = s->int_stat;
-> +        break;
-> +    case A_INT_EN:
-> +        r = s->int_en;
-> +        break;
-> +    case A_INT_INFO1:
-> +        r = s->int_info1;
-> +        break;
-> +    case A_INT_INFO2:
-> +        r = s->int_info2;
-> +        break;
->      case A_PIDR4:
->      case A_PIDR5:
->      case A_PIDR6:
-> @@ -110,6 +158,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
->                                      uint64_t value,
->                                      unsigned size, MemTxAttrs attrs)
->  {
-> +    TZMPC *s = TZ_MPC(opaque);
->      uint32_t offset = addr & ~0x3;
->  
->      trace_tz_mpc_reg_write(addr, value, size);
-> @@ -122,9 +171,15 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
->          uint32_t oldval;
->  
->          switch (offset) {
-> -            /* As we add support for registers which need expansions
-> -             * other than zeroes we'll fill in cases here.
-> -             */
-> +        case A_CTRL:
-> +            oldval = s->ctrl;
-> +            break;
-> +        case A_BLK_IDX:
-> +            oldval = s->blk_idx;
-> +            break;
-> +        case A_BLK_LUT:
-> +            oldval = s->blk_lut[s->blk_idx];
-> +            break;
->          default:
->              oldval = 0;
->              break;
-> @@ -132,7 +187,51 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
->          value = deposit32(oldval, (addr & 3) * 8, size * 8, value);
+>      if (dc->base.is_jmp != DISAS_NORETURN) {
+> 
+> I suggest
+> 
+>      switch (dc->base.is_jmp) {
+>      case DISAS_NORETURN:
+>         break;
+> 
+>      case DISAS_TOO_MANY:
+>         /* existing block */
+>         break;
+> 
+>      case DISAS_EXIT:
+>         /* new code from above */
+> 
+>      default:
+>          g_assert_not_reached();
 >      }
->  
-> +    if ((s->ctrl & R_CTRL_LOCKDOWN_MASK) &&
-> +        (offset == A_CTRL || offset == A_BLK_LUT || offset == A_INT_EN)) {
-> +        /* Lockdown mode makes these three registers read-only, and
-> +         * the only way out of it is to reset the device.
-> +         */
-> +        qemu_log_mask(LOG_GUEST_ERROR, "TZ MPC register write to offset 0x%x "
-> +                      "while MPC is in lockdown mode\n", offset);
-> +        return MEMTX_OK;
-> +    }
-> +
->      switch (offset) {
-> +    case A_CTRL:
-> +        /* We don't implement the 'data gating' feature so all other bits
-> +         * are reserved and we make them RAZ/WI.
-> +         */
-> +        s->ctrl = value & (R_CTRL_SEC_RESP_MASK |
-> +                           R_CTRL_AUTOINC_MASK |
-> +                           R_CTRL_LOCKDOWN_MASK);
-> +        break;
-> +    case A_BLK_IDX:
-> +        s->blk_idx = value % s->blk_max;
-> +        break;
-> +    case A_BLK_LUT:
-> +        s->blk_lut[s->blk_idx] = value;
-> +        if (size == 4) {
-> +            s->blk_idx++;
-same?
 
-Thanks
+Ah sorry my bad - it was getting quite late here.
 
-Eric
-> +            s->blk_idx %= s->blk_max;
-> +        }
-> +        break;
-> +    case A_INT_CLEAR:
-> +        if (value & R_INT_CLEAR_IRQ_MASK) {
-> +            s->int_stat = 0;
-> +            tz_mpc_irq_update(s);
-> +        }
-> +        break;
-> +    case A_INT_EN:
-> +        s->int_en = value & R_INT_EN_IRQ_MASK;
-> +        tz_mpc_irq_update(s);
-> +        break;
-> +    case A_INT_SET:
-> +        if (value & R_INT_SET_IRQ_MASK) {
-> +            s->int_stat = R_INT_STAT_IRQ_MASK;
-> +            tz_mpc_irq_update(s);
-> +        }
-> +        break;
->      case A_PIDR4:
->      case A_PIDR5:
->      case A_PIDR6:
-> @@ -248,6 +347,16 @@ static int tz_mpc_num_indexes(IOMMUMemoryRegion *iommu)
->  
->  static void tz_mpc_reset(DeviceState *dev)
->  {
-> +    TZMPC *s = TZ_MPC(dev);
-> +
-> +    s->ctrl = 0x00000100;
-> +    s->blk_idx = 0;
-> +    s->int_stat = 0;
-> +    s->int_en = 1;
-> +    s->int_info1 = 0;
-> +    s->int_info2 = 0;
-> +
-> +    memset(s->blk_lut, 0, s->blk_max * sizeof(uint32_t));
->  }
->  
->  static void tz_mpc_init(Object *obj)
-> @@ -321,13 +430,35 @@ static void tz_mpc_realize(DeviceState *dev, Error **errp)
->                         "tz-mpc-downstream");
->      address_space_init(&s->blocked_io_as, &s->blocked_io,
->                         "tz-mpc-blocked-io");
-> +
-> +    s->blk_lut = g_new(uint32_t, s->blk_max);
-> +}
-> +
-> +static int tz_mpc_post_load(void *opaque, int version_id)
-> +{
-> +    TZMPC *s = TZ_MPC(opaque);
-> +
-> +    /* Check the incoming data doesn't point blk_idx off the end of blk_lut. */
-> +    if (s->blk_idx >= s->blk_max) {
-> +        return -1;
-> +    }
-> +    return 0;
->  }
->  
->  static const VMStateDescription tz_mpc_vmstate = {
->      .name = "tz-mpc",
->      .version_id = 1,
->      .minimum_version_id = 1,
-> +    .post_load = tz_mpc_post_load,
->      .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32(ctrl, TZMPC),
-> +        VMSTATE_UINT32(blk_idx, TZMPC),
-> +        VMSTATE_UINT32(int_stat, TZMPC),
-> +        VMSTATE_UINT32(int_en, TZMPC),
-> +        VMSTATE_UINT32(int_info1, TZMPC),
-> +        VMSTATE_UINT32(int_info2, TZMPC),
-> +        VMSTATE_VARRAY_UINT32(blk_lut, TZMPC, blk_max,
-> +                              0, vmstate_info_uint32, uint32_t),
->          VMSTATE_END_OF_LIST()
->      }
->  };
-> 
+Okay that works, although I noticed that I had to drop 
+gen_op_next_insn() from the above code that was originally inline for it 
+to work correctly in sparc_tr_tb_stop(). V4 is on its way shortly.
+
+
+ATB,
+
+Mark.
