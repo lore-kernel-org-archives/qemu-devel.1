@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fTmha-0004IT-8I
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:15:35 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fTmlK-0005EI-UO
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:19:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fTmhX-0002j9-31
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:15:34 -0400
-Received: from smtp16.mail.ru ([94.100.176.153]:41600)
+	(envelope-from <dgilbert@redhat.com>) id 1fTmlH-0006HN-P7
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:19:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38422 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fTmhW-0002hg-H3
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:15:30 -0400
-References: <20180612204632.28780-1-jusual@mail.ru>
-	<CAFEAcA-p5A4S=+ncW42KU2ivBHyALJdUswLUYhh=By6rKYstZw@mail.gmail.com>
-From: Julia Suvorova <jusual@mail.ru>
-Message-ID: <53c12f1b-6bd8-5f6d-dc9d-7b3116392d1c@mail.ru>
-Date: Fri, 15 Jun 2018 14:15:18 +0300
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fTmlH-0006HF-JA
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:19:23 -0400
+Date: Fri, 15 Jun 2018 12:19:19 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180615111918.GA13796@work-vm>
+References: <152844714981.11789.3657734445739553287.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-p5A4S=+ncW42KU2ivBHyALJdUswLUYhh=By6rKYstZw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow ARMv6-M Thumb2
- instructions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <152844714981.11789.3657734445739553287.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] typedefs: add QJSON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +26,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-On 15.06.2018 13:55, Peter Maydell wrote:
-> On 12 June 2018 at 21:46, Julia Suvorova <jusual@mail.ru> wrote:
->> ARMv6-M supports 6 Thumb2 instructions. This patch checks for these
->> instructions and allows their execution.
->> Like Thumb2 cores, ARMv6-M always interprets BL instruction as 32-bit.
->>
->> This patch is required for future Cortex-M0 support.
->>
->> Signed-off-by: Julia Suvorova <jusual@mail.ru>
->> @@ -10075,6 +10076,11 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
->>   {
->>       uint32_t imm, shift, offset;
->>       uint32_t rd, rn, rm, rs;
->> +    uint32_t armv6m_insn[] = {0xf3808000 /* msr */, 0xf3b08040 /* dsb */,
->> +                              0xf3b08050 /* dmb */, 0xf3b08060 /* isb */,
->> +                              0xf3e08000 /* mrs */, 0xf000d000 /* bl */};
->> +    uint32_t armv6m_mask[] = {0xffe0d000, 0xfff0d0f0, 0xfff0d0f0,
->> +                              0xfff0d0f0, 0xffe0d000, 0xf800d000};
+* Greg Kurz (groug@kaod.org) wrote:
+> Since commit 83ee768d6247b, we now have two places that define the
+> QJSON type:
 > 
-> I think these arrays should be 'const'; we can also move them closer
-> to their point of use, inside the scope of the if() below.
+> $ git grep 'typedef struct QJSON QJSON'
+> include/migration/vmstate.h:typedef struct QJSON QJSON;
+> migration/qjson.h:typedef struct QJSON QJSON;
 > 
-> Since those are trivial tweaks, I'm going to put this into
-> target-arm.next with those changes made, if that's OK.
+> This breaks docker-test-build@centos6:
+> 
+> In file included from /tmp/qemu-test/src/migration/savevm.c:59:
+> /tmp/qemu-test/src/migration/qjson.h:16: error: redefinition of typedef
+>  'QJSON'
+> /tmp/qemu-test/src/include/migration/vmstate.h:30: note: previous
+>  declaration of 'QJSON' was here
+> make: *** [migration/savevm.o] Error 1
+> 
+> This happens because CentOS 6 has an old GCC 4.4.7. Even if redefining
+> a typedef with the same type is permitted since GCC 4.6, unless -pedantic
+> is passed, we don't really need to do that on purpose. Let's have a
+> single definition in <qemu/typedefs.h> instead.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Sure, thanks.
+Queued.
 
-Best regards, Julia Suvorova.
+Dave
+
+> ---
+>  include/migration/vmstate.h |    2 --
+>  include/qemu/typedefs.h     |    1 +
+>  migration/qjson.h           |    2 --
+>  3 files changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+> index 3747110f951a..42b946ce902c 100644
+> --- a/include/migration/vmstate.h
+> +++ b/include/migration/vmstate.h
+> @@ -27,8 +27,6 @@
+>  #ifndef QEMU_VMSTATE_H
+>  #define QEMU_VMSTATE_H
+>  
+> -typedef struct QJSON QJSON;
+> -
+>  typedef struct VMStateInfo VMStateInfo;
+>  typedef struct VMStateDescription VMStateDescription;
+>  typedef struct VMStateField VMStateField;
+> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> index 325c72de3313..3ec0e13a967f 100644
+> --- a/include/qemu/typedefs.h
+> +++ b/include/qemu/typedefs.h
+> @@ -97,6 +97,7 @@ typedef struct QEMUTimer QEMUTimer;
+>  typedef struct QEMUTimerListGroup QEMUTimerListGroup;
+>  typedef struct QBool QBool;
+>  typedef struct QDict QDict;
+> +typedef struct QJSON QJSON;
+>  typedef struct QList QList;
+>  typedef struct QNull QNull;
+>  typedef struct QNum QNum;
+> diff --git a/migration/qjson.h b/migration/qjson.h
+> index 2978b5f37121..41664f2d71b5 100644
+> --- a/migration/qjson.h
+> +++ b/migration/qjson.h
+> @@ -13,8 +13,6 @@
+>  #ifndef QEMU_QJSON_H
+>  #define QEMU_QJSON_H
+>  
+> -typedef struct QJSON QJSON;
+> -
+>  QJSON *qjson_new(void);
+>  void qjson_destroy(QJSON *json);
+>  void json_prop_str(QJSON *json, const char *name, const char *str);
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
