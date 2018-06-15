@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fTlXZ-0003S1-Hz
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:01:14 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fTlXb-0003UQ-LG
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:01:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fTlXT-0001Ux-Tj
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:01:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46764 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fTlXT-0001Tx-Oh
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:01:03 -0400
-Date: Fri, 15 Jun 2018 11:00:58 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180615100058.GB2615@work-vm>
-References: <20180612085009.17594-1-bala24@linux.vnet.ibm.com>
-	<20180612085009.17594-2-bala24@linux.vnet.ibm.com>
+	(envelope-from <imammedo@redhat.com>) id 1fTlXa-0001aB-Lm
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:01:11 -0400
+Date: Fri, 15 Jun 2018 12:01:06 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180615120106.537970f0@redhat.com>
+In-Reply-To: <abdd97d1-5ffb-9b4b-e667-26b603cff57c@redhat.com>
+References: <20180611121655.19616-1-david@redhat.com>
+	<20180611121655.19616-11-david@redhat.com>
+	<20180613151056.6ebbccc2@redhat.com>
+	<569f9534-162c-29c1-a097-51427e028b4e@redhat.com>
+	<20180615113440.56844675@redhat.com>
+	<abdd97d1-5ffb-9b4b-e667-26b603cff57c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180612085009.17594-2-bala24@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/1] migration: calculate
- expected_downtime with ram_bytes_remaining()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 10/11] pc-dimm: introduce and use
+ pc_dimm_memory_pre_plug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +28,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Balamuruhan S <bala24@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, david@gibson.dropbear.id.au, lvivier@redhat.com
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
+	. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-* Balamuruhan S (bala24@linux.vnet.ibm.com) wrote:
-> expected_downtime value is not accurate with dirty_pages_rate * page_size,
-> using ram_bytes_remaining() would yeild it resonable.
+On Fri, 15 Jun 2018 11:48:33 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 15.06.2018 11:34, Igor Mammedov wrote:
+> > On Wed, 13 Jun 2018 16:15:48 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> On 13.06.2018 15:10, Igor Mammedov wrote:  
+> >>> On Mon, 11 Jun 2018 14:16:54 +0200
+> >>> David Hildenbrand <david@redhat.com> wrote:
+> >>>     
+> >>>> We'll be factoring out some pc-dimm specific and some memory-device
+> >>>> checks next.
+> >>>>
+> >>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >>>> ---
+> >>>>  hw/i386/pc.c             | 2 ++
+> >>>>  hw/mem/pc-dimm.c         | 5 +++++
+> >>>>  hw/ppc/spapr.c           | 1 +
+> >>>>  include/hw/mem/pc-dimm.h | 2 ++
+> >>>>  4 files changed, 10 insertions(+)
+> >>>>
+> >>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> >>>> index 017396fe84..dc8e7b033b 100644
+> >>>> --- a/hw/i386/pc.c
+> >>>> +++ b/hw/i386/pc.c
+> >>>> @@ -1695,6 +1695,8 @@ static void pc_dimm_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,    
+> >>> keeping                              ^^^^^
+> >>> similar to newly introduced pc_dimm_memory_pre_plug()
+> >>> and I have no clue what to suggest as alternative    
+> >>
+> >> Can you elaborate?  
+> > 
+> > It's just that pc_dimm_pre_plug and pc_dimm_memory_pre_plug
+> > are very similar so it become confusing and with name alone
+> > you can't figure if both do the same or different things.
+> > 
+> > Looking at 11/11 maybe you could just drop this and the next
+> > patch for now as there isn't obvious (if any) demand for it
+> > within this series at all.
+> > And introduce similar patch when it's actually required.
+> > 
+> > I might imagine following naming in future:
+> > 
+> >    pc_dimm_pre_plug()
+> >        memory_device_pre_plug()
+> >        ... some pc-dimm only stuff ...
+> > 
+> >    virtio_mem_pre_plug()
+> >        memory_device_pre_plug()
+> >        ... some virtio-mem only stuff ...  
 > 
-> consider to read the remaining ram just after having updated the dirty
-> pages count later migration_bitmap_sync_range() in migration_bitmap_sync()
-> and reuse the `remaining` field in ram_counters to hold ram_bytes_remaining()
-> for calculating expected_downtime.
+> We will always have the chain
 > 
-> Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  migration/migration.c | 3 +--
->  migration/ram.c       | 1 +
->  2 files changed, 2 insertions(+), 2 deletions(-)
+> $machine_XXX_pre_plug()
+> 	... some machine specific stuff
+> 	pc_dimm_memory_pre_plug()
+> 		... some pc-dimm specific stuff
+> 		memory_device_pre_plug()
 > 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index ea9a6cbb87..cb14dadb26 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2739,8 +2739,7 @@ static void migration_update_counters(MigrationState *s,
->       * recalculate. 10000 is a small enough number for our purposes
->       */
->      if (ram_counters.dirty_pages_rate && transferred > 10000) {
-> -        s->expected_downtime = ram_counters.dirty_pages_rate *
-> -            qemu_target_page_size() / bandwidth;
-> +        s->expected_downtime = ram_counters.remaining / bandwidth;
->      }
->  
->      qemu_file_reset_rate_limit(s->to_dst_file);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index a500015a2f..a94a2b829e 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1159,6 +1159,7 @@ static void migration_bitmap_sync(RAMState *rs)
->      RAMBLOCK_FOREACH_MIGRATABLE(block) {
->          migration_bitmap_sync_range(rs, block, 0, block->used_length);
->      }
-> +    ram_counters.remaining = ram_bytes_remaining();
->      rcu_read_unlock();
->      qemu_mutex_unlock(&rs->bitmap_mutex);
-
-OK, that's interesting.
-One thing to note is that migration_bitmap_sync isn't just called when
-we've run out of dirty pages and need to see if there are any fresh
-ones.
-In the case where we hit the bandwidth limit, then we call it whenever
-we go back through ram_save_pending even though the current 
-remaining isn't 0 yet (it's got to be below the threshold for us to
-resync) - so you may over estimate a bit?
-
-Anyway, I  think it's worth a go;
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> -- 
-> 2.14.3
+> I can rename
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> pc_dimm_(plug|unplug ...) to
+> pc_memory_(plug|unplug ...)
+> 
+> and pc_dimm_memory_(plug|unplug ...) to
+> pc_dimm_(plug|unplug ...)
+> 
+> That way we match spapr naming scheme:
+> 
+> spapr_memory_plug/spapr_memory_unplug
+
+sounds good to me
