@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fTh6A-0006qS-Fv
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 01:16:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fThGd-0001DT-9n
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 01:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fTh65-0001my-Ei
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 01:16:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54692 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fTh65-0001mM-90
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 01:16:29 -0400
-From: Thomas Huth <thuth@redhat.com>
-References: <1522920750-11020-1-git-send-email-thuth@redhat.com>
-Message-ID: <e31dfa59-6c9a-8ef0-6fb7-88cc578ca592@redhat.com>
-Date: Fri, 15 Jun 2018 07:16:26 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1fThGb-0006sW-QR
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 01:27:23 -0400
+Date: Fri, 15 Jun 2018 15:27:10 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180615052710.GS4129@umbus.fritz.box>
+References: <cover.1528935420.git.balaton@eik.bme.hu>
+	<16139dc707e8de2b79bcdb2b0fcb4749216f2e86.1528935420.git.balaton@eik.bme.hu>
+	<20180614011449.GR30690@umbus.fritz.box>
+	<alpine.BSF.2.21.1806141007300.19899@zero.eik.bme.hu>
 MIME-Version: 1.0
-In-Reply-To: <1522920750-11020-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/sparc64/sun4u: Fix introspection by
- converting prom instance_init to realize
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Pa4xkLBhPDIhDLv1"
+Content-Disposition: inline
+In-Reply-To: <alpine.BSF.2.21.1806141007300.19899@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v3 1/9] ppc4xx_i2c: Remove unimplemented
+ sdata and intr registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +27,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
-On 05.04.2018 11:32, Thomas Huth wrote:
-> The instance_init function of devices should always succeed to be able
-> to introspect the device. However, the instance_init function of the
-> "openprom" device can currently fail, for example like this:
-> 
-> $ echo "{'execute':'qmp_capabilities'}"\
->        "{'execute':'device-list-properties',"\
->        " 'arguments':{'typename':'openprom'}}" \
->        | sparc64-softmmu/qemu-system-sparc64 -M sun4v,accel=qtest -qmp stdio
-> {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
->  "package": "build-all"}, "capabilities": []}}
-> {"return": {}}
-> RAMBlock "sun4u.prom" already registered, abort!
-> Aborted (core dumped)
-> 
-> This should not happen. Fix this problem by moving the affected code from
-> instance_init into a realize function instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/sparc64/sun4u.c | 18 ++++++++++++------
->  1 file changed, 12 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index 2044a52..d62f5a2 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -425,13 +425,19 @@ static void prom_init(hwaddr addr, const char *bios_name)
->      }
->  }
->  
-> -static void prom_init1(Object *obj)
-> +static void prom_realize(DeviceState *ds, Error **errp)
->  {
-> -    PROMState *s = OPENPROM(obj);
-> -    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-> +    PROMState *s = OPENPROM(ds);
-> +    SysBusDevice *dev = SYS_BUS_DEVICE(ds);
-> +    Error *local_err = NULL;
-> +
-> +    memory_region_init_ram_nomigrate(&s->prom, OBJECT(ds), "sun4u.prom",
-> +                                     PROM_SIZE_MAX, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
->  
-> -    memory_region_init_ram_nomigrate(&s->prom, obj, "sun4u.prom", PROM_SIZE_MAX,
-> -                           &error_fatal);
->      vmstate_register_ram_global(&s->prom);
->      memory_region_set_readonly(&s->prom, true);
->      sysbus_init_mmio(dev, &s->prom);
-> @@ -446,6 +452,7 @@ static void prom_class_init(ObjectClass *klass, void *data)
->      DeviceClass *dc = DEVICE_CLASS(klass);
->  
->      dc->props = prom_properties;
-> +    dc->realize = prom_realize;
->  }
->  
->  static const TypeInfo prom_info = {
-> @@ -453,7 +460,6 @@ static const TypeInfo prom_info = {
->      .parent        = TYPE_SYS_BUS_DEVICE,
->      .instance_size = sizeof(PROMState),
->      .class_init    = prom_class_init,
-> -    .instance_init = prom_init1,
->  };
 
-Ping!
+--Pa4xkLBhPDIhDLv1
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- Thomas
+On Thu, Jun 14, 2018 at 10:18:33AM +0200, BALATON Zoltan wrote:
+> On Thu, 14 Jun 2018, David Gibson wrote:
+> > On Thu, Jun 14, 2018 at 02:17:00AM +0200, BALATON Zoltan wrote:
+> > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> >=20
+> > But.. they are implemented.  Albeit as an entirely software controlled
+> > register.
+>=20
+> They were implemented only in that they could be written and read but did
+> not implement any of the functionality they have in real hardware so in t=
+hat
+> sense they were not really implemented.
+>=20
+> > I'm guessing that's not what they're supposed to do, which is why
+> > you're removing them, but that needs to be explained in the commit
+> > message.
+>=20
+> Maybe adding this explanation:
+>=20
+> We dont emulate slave mode so related registers are not needed. [lh]sadr =
+are
+> only retained to avoid too many warnings and simplify debugging but sdata=
+ is
+> not even correct because device has a 4 byte FIFO instead so just remove
+> this unimplemented register for now.
+>=20
+> The intr register is also not implemented correctly, it is for diagnostics
+> and normally not even visible on device without explicitly enabling it. As
+> no guests are known to need this remove it as well.
+
+That sounds reasonable.
+
+>=20
+> Regards,
+> BALATON Zoltan
+>=20
+> > As a general rule cases where a one line commit message is acceptable
+> > are *very* rare.
+> >=20
+> > > ---
+> > >  hw/i2c/ppc4xx_i2c.c         | 16 +---------------
+> > >  include/hw/i2c/ppc4xx_i2c.h |  4 +---
+> > >  2 files changed, 2 insertions(+), 18 deletions(-)
+> > >=20
+> > > diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+> > > index d1936db..4e0aaae 100644
+> > > --- a/hw/i2c/ppc4xx_i2c.c
+> > > +++ b/hw/i2c/ppc4xx_i2c.c
+> > > @@ -3,7 +3,7 @@
+> > >   *
+> > >   * Copyright (c) 2007 Jocelyn Mayer
+> > >   * Copyright (c) 2012 Fran=E7ois Revol
+> > > - * Copyright (c) 2016 BALATON Zoltan
+> > > + * Copyright (c) 2016-2018 BALATON Zoltan
+> > >   *
+> > >   * Permission is hereby granted, free of charge, to any person obtai=
+ning a copy
+> > >   * of this software and associated documentation files (the "Softwar=
+e"), to deal
+> > > @@ -63,7 +63,6 @@ static void ppc4xx_i2c_reset(DeviceState *s)
+> > >      i2c->mdcntl =3D 0;
+> > >      i2c->sts =3D 0;
+> > >      i2c->extsts =3D 0x8f;
+> > > -    i2c->sdata =3D 0;
+> > >      i2c->lsadr =3D 0;
+> > >      i2c->hsadr =3D 0;
+> > >      i2c->clkdiv =3D 0;
+> > > @@ -71,7 +70,6 @@ static void ppc4xx_i2c_reset(DeviceState *s)
+> > >      i2c->xfrcnt =3D 0;
+> > >      i2c->xtcntlss =3D 0;
+> > >      i2c->directcntl =3D 0xf;
+> > > -    i2c->intr =3D 0;
+> > >  }
+> > >=20
+> > >  static inline bool ppc4xx_i2c_is_master(PPC4xxI2CState *i2c)
+> > > @@ -139,9 +137,6 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hw=
+addr addr, unsigned int size)
+> > >                            TYPE_PPC4xx_I2C, __func__);
+> > >          }
+> > >          break;
+> > > -    case 2:
+> > > -        ret =3D i2c->sdata;
+> > > -        break;
+> > >      case 4:
+> > >          ret =3D i2c->lmadr;
+> > >          break;
+> > > @@ -181,9 +176,6 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hw=
+addr addr, unsigned int size)
+> > >      case 16:
+> > >          ret =3D i2c->directcntl;
+> > >          break;
+> > > -    case 17:
+> > > -        ret =3D i2c->intr;
+> > > -        break;
+> > >      default:
+> > >          if (addr < PPC4xx_I2C_MEM_SIZE) {
+> > >              qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
+> > > @@ -229,9 +221,6 @@ static void ppc4xx_i2c_writeb(void *opaque, hwadd=
+r addr, uint64_t value,
+> > >              }
+> > >          }
+> > >          break;
+> > > -    case 2:
+> > > -        i2c->sdata =3D value;
+> > > -        break;
+> > >      case 4:
+> > >          i2c->lmadr =3D value;
+> > >          if (i2c_bus_busy(i2c->bus)) {
+> > > @@ -302,9 +291,6 @@ static void ppc4xx_i2c_writeb(void *opaque, hwadd=
+r addr, uint64_t value,
+> > >      case 16:
+> > >          i2c->directcntl =3D value & 0x7;
+> > >          break;
+> > > -    case 17:
+> > > -        i2c->intr =3D value;
+> > > -        break;
+> > >      default:
+> > >          if (addr < PPC4xx_I2C_MEM_SIZE) {
+> > >              qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
+> > > diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
+> > > index 3c60307..e4b6ded 100644
+> > > --- a/include/hw/i2c/ppc4xx_i2c.h
+> > > +++ b/include/hw/i2c/ppc4xx_i2c.h
+> > > @@ -3,7 +3,7 @@
+> > >   *
+> > >   * Copyright (c) 2007 Jocelyn Mayer
+> > >   * Copyright (c) 2012 Fran=E7ois Revol
+> > > - * Copyright (c) 2016 BALATON Zoltan
+> > > + * Copyright (c) 2016-2018 BALATON Zoltan
+> > >   *
+> > >   * Permission is hereby granted, free of charge, to any person obtai=
+ning a copy
+> > >   * of this software and associated documentation files (the "Softwar=
+e"), to deal
+> > > @@ -49,7 +49,6 @@ typedef struct PPC4xxI2CState {
+> > >      uint8_t mdcntl;
+> > >      uint8_t sts;
+> > >      uint8_t extsts;
+> > > -    uint8_t sdata;
+> > >      uint8_t lsadr;
+> > >      uint8_t hsadr;
+> > >      uint8_t clkdiv;
+> > > @@ -57,7 +56,6 @@ typedef struct PPC4xxI2CState {
+> > >      uint8_t xfrcnt;
+> > >      uint8_t xtcntlss;
+> > >      uint8_t directcntl;
+> > > -    uint8_t intr;
+> > >  } PPC4xxI2CState;
+> > >=20
+> > >  #endif /* PPC4XX_I2C_H */
+> >=20
+> >=20
+
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Pa4xkLBhPDIhDLv1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsjTi4ACgkQbDjKyiDZ
+s5LL+BAAs3FEv3HnMTtdfVzoowvhJYzP3OVwQdNDeEs/YYhZNA5eu5cQPgXAbK62
+3ASWLiMnY9yF2D2VsKz+StQ2WSA0AfpTG6HS96Lthl7cFGfwkRL7jgZCYuPZiCpP
+25/zMn0qskKC0kaK7IMbZzFOpVpiUfHEGo/J4/dYWRlXDwmRi0cKP7MKyHBA+SO2
+Cs8Rrem2ZUNHSuoGvQzBd3st8DXDEO/b5s6a0mrk15GEleSYJmWZyZB3KFzy5vbx
+wAxeA9Pjgp7qGSEjB6uUeVxEY+apKlXg65rMKoS7/ApyFAu4a3SqFWz7CaNVXuFa
+9VcNAhJq4mNMESknAkHYmb/6LyZAorR7sRXJNj5KRb8LfgR0gEI4MMptivEN18Q6
+SgqY6fLc6L6PWyrz52oam0ueZCjx0AObGVVdnOX5lXkL9lDfCnnRx2KTePScTvIP
+N1tmi8hR+Kup2nkuEJNXxP5gUAXw8EEc8zUKfEooR2tppgXZqZeMIDLxp7J5kw7Q
+NVvxtlIRA7MHYcKgvKKLYidq8+2JEz0VuWS76e/QibducVn67Bl/RBP66hjg+6jJ
+BCbt4aYNUwSxceh+ywPwalqm/VnMmH/gY98DJdW033iyNnb68qgxu5DWFkRrREjY
+rYQgxlLEZLsvQicNfHLdr8A1168Lo0HSAp7QEYDZtWkxAvljNG8=
+=9B9H
+-----END PGP SIGNATURE-----
+
+--Pa4xkLBhPDIhDLv1--
