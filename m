@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbj-0006Kk-Iw
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:47 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbn-0006LV-54
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbd-0003pb-Gs
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:43 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbg-0003sm-Ba
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:47 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 15 Jun 2018 16:21:06 +0200
-Message-Id: <20180615142108.27814-25-kwolf@redhat.com>
+Date: Fri, 15 Jun 2018 16:21:07 +0200
+Message-Id: <20180615142108.27814-26-kwolf@redhat.com>
 In-Reply-To: <20180615142108.27814-1-kwolf@redhat.com>
 References: <20180615142108.27814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 24/26] block: Remove deprecated -drive option
- addr
+Subject: [Qemu-devel] [PULL 25/26] block: Remove deprecated -drive option
+ serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,146 +23,281 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-The -drive option addr was deprecated in QEMU 2.10. It's time to remove
-it.
+The -drive option serial was deprecated in QEMU 2.10. It's time to
+remove it.
+
+Tests need to be updated to set the serial number with -global instead
+of using the -drive option.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Jeff Cody <jcody@redhat.com>
 ---
+ include/hw/block/block.h  |  1 -
  include/sysemu/blockdev.h |  1 -
- blockdev.c                | 17 +----------------
- device-hotplug.c          |  4 ----
+ block/block-backend.c     |  1 -
+ blockdev.c                | 10 ----------
+ hw/block/block.c          | 13 -------------
+ hw/block/nvme.c           |  1 -
+ hw/block/virtio-blk.c     |  1 -
+ hw/ide/qdev.c             |  1 -
+ hw/scsi/scsi-disk.c       |  1 -
+ hw/usb/dev-storage.c      |  1 -
+ tests/ahci-test.c         |  6 +++---
+ tests/ide-test.c          |  8 ++++----
  qemu-doc.texi             |  5 -----
- qemu-options.hx           |  5 +----
- 5 files changed, 2 insertions(+), 30 deletions(-)
+ qemu-options.hx           |  6 +-----
+ 14 files changed, 8 insertions(+), 48 deletions(-)
 
+diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+index d4f4dfffab..e9f9e2223f 100644
+--- a/include/hw/block/block.h
++++ b/include/hw/block/block.h
+@@ -72,7 +72,6 @@ static inline unsigned int get_physical_block_exp(BlockConf *conf)
+ 
+ /* Configuration helpers */
+ 
+-void blkconf_serial(BlockConf *conf, char **serial);
+ bool blkconf_geometry(BlockConf *conf, int *trans,
+                       unsigned cyls_max, unsigned heads_max, unsigned secs_max,
+                       Error **errp);
 diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
-index 37ea39719e..c0ae3700ec 100644
+index c0ae3700ec..24954b94e0 100644
 --- a/include/sysemu/blockdev.h
 +++ b/include/sysemu/blockdev.h
-@@ -28,7 +28,6 @@ typedef enum {
- } BlockInterfaceType;
+@@ -35,7 +35,6 @@ struct DriveInfo {
+     bool is_default;            /* Added by default_drive() ?  */
+     int media_cd;
+     QemuOpts *opts;
+-    char *serial;
+     QTAILQ_ENTRY(DriveInfo) next;
+ };
  
- struct DriveInfo {
--    const char *devaddr;
-     BlockInterfaceType type;
-     int bus;
-     int unit;
+diff --git a/block/block-backend.c b/block/block-backend.c
+index d55c328736..2d1a3463e8 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -419,7 +419,6 @@ static void drive_info_del(DriveInfo *dinfo)
+         return;
+     }
+     qemu_opts_del(dinfo->opts);
+-    g_free(dinfo->serial);
+     g_free(dinfo);
+ }
+ 
 diff --git a/blockdev.c b/blockdev.c
-index bc9f34810f..2984e400c2 100644
+index 2984e400c2..d1ab425085 100644
 --- a/blockdev.c
 +++ b/blockdev.c
 @@ -731,10 +731,6 @@ QemuOptsList qemu_legacy_drive_opts = {
              .type = QEMU_OPT_STRING,
              .help = "interface (ide, scsi, sd, mtd, floppy, pflash, virtio)",
          },{
--            .name = "addr",
+-            .name = "serial",
 -            .type = QEMU_OPT_STRING,
--            .help = "pci address (virtio only)",
+-            .help = "disk serial number",
 -        },{
-             .name = "serial",
+             .name = "file",
              .type = QEMU_OPT_STRING,
-             .help = "disk serial number",
-@@ -777,7 +773,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-     DriveMediaType media = MEDIA_DISK;
-     BlockInterfaceType type;
-     int max_devs, bus_id, unit_id, index;
--    const char *devaddr;
+             .help = "file name",
+@@ -776,12 +772,10 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
      const char *werror, *rerror;
      bool read_only = false;
      bool copy_on_read;
-@@ -786,7 +781,7 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+-    const char *serial;
+     const char *filename;
      Error *local_err = NULL;
      int i;
      const char *deprecated[] = {
--        "serial", "addr"
-+        "serial"
+-        "serial"
      };
  
      /* Change legacy command line options into QMP ones */
-@@ -976,12 +971,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+@@ -949,9 +943,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+         goto fail;
      }
  
-     /* Add virtio block device */
--    devaddr = qemu_opt_get(legacy_opts, "addr");
--    if (devaddr && type != IF_VIRTIO) {
--        error_report("addr is not supported by this bus type");
--        goto fail;
--    }
+-    /* Serial number */
+-    serial = qemu_opt_get(legacy_opts, "serial");
 -
-     if (type == IF_VIRTIO) {
-         QemuOpts *devopts;
-         devopts = qemu_opts_create(qemu_find_opts("device"), NULL, 0,
-@@ -993,9 +982,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-         }
-         qemu_opt_set(devopts, "drive", qdict_get_str(bs_opts, "id"),
-                      &error_abort);
--        if (devaddr) {
--            qemu_opt_set(devopts, "addr", devaddr, &error_abort);
--        }
-     }
- 
-     filename = qemu_opt_get(legacy_opts, "file");
-@@ -1040,7 +1026,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
+     /* no id supplied -> create one */
+     if (qemu_opts_id(all_opts) == NULL) {
+         char *new_id;
+@@ -1026,7 +1017,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
      dinfo->type = type;
      dinfo->bus = bus_id;
      dinfo->unit = unit_id;
--    dinfo->devaddr = devaddr;
-     dinfo->serial = g_strdup(serial);
+-    dinfo->serial = g_strdup(serial);
  
      blk_set_legacy_dinfo(blk, dinfo);
-diff --git a/device-hotplug.c b/device-hotplug.c
-index 23fd6656f1..cd427e2c76 100644
---- a/device-hotplug.c
-+++ b/device-hotplug.c
-@@ -69,10 +69,6 @@ void hmp_drive_add(Monitor *mon, const QDict *qdict)
-     if (!dinfo) {
-         goto err;
-     }
--    if (dinfo->devaddr) {
--        monitor_printf(mon, "Parameter addr not supported\n");
--        goto err;
--    }
  
-     switch (dinfo->type) {
-     case IF_NONE:
+diff --git a/hw/block/block.c b/hw/block/block.c
+index b6c80ab0b7..cf0eb826f1 100644
+--- a/hw/block/block.c
++++ b/hw/block/block.c
+@@ -15,19 +15,6 @@
+ #include "qapi/qapi-types-block.h"
+ #include "qemu/error-report.h"
+ 
+-void blkconf_serial(BlockConf *conf, char **serial)
+-{
+-    DriveInfo *dinfo;
+-
+-    if (!*serial) {
+-        /* try to fall back to value set with legacy -drive serial=... */
+-        dinfo = blk_legacy_dinfo(conf->blk);
+-        if (dinfo) {
+-            *serial = g_strdup(dinfo->serial);
+-        }
+-    }
+-}
+-
+ void blkconf_blocksizes(BlockConf *conf)
+ {
+     BlockBackend *blk = conf->blk;
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 811084b6a7..d5bf95b79b 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -1215,7 +1215,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+         return;
+     }
+ 
+-    blkconf_serial(&n->conf, &n->serial);
+     if (!n->serial) {
+         error_setg(errp, "serial property not set");
+         return;
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 50b5c869e3..225fe44b7a 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -935,7 +935,6 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    blkconf_serial(&conf->conf, &conf->serial);
+     if (!blkconf_apply_backend_options(&conf->conf,
+                                        blk_is_read_only(conf->conf.blk), true,
+                                        errp)) {
+diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+index f395d24592..573b022e1e 100644
+--- a/hw/ide/qdev.c
++++ b/hw/ide/qdev.c
+@@ -188,7 +188,6 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+         return;
+     }
+ 
+-    blkconf_serial(&dev->conf, &dev->serial);
+     if (kind != IDE_CD) {
+         if (!blkconf_geometry(&dev->conf, &dev->chs_trans, 65535, 16, 255,
+                               errp)) {
+diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
+index ded23d36ca..aeaf611854 100644
+--- a/hw/scsi/scsi-disk.c
++++ b/hw/scsi/scsi-disk.c
+@@ -2368,7 +2368,6 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
+         return;
+     }
+ 
+-    blkconf_serial(&s->qdev.conf, &s->serial);
+     blkconf_blocksizes(&s->qdev.conf);
+ 
+     if (s->qdev.conf.logical_block_size >
+diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+index 481694a473..47b992f403 100644
+--- a/hw/usb/dev-storage.c
++++ b/hw/usb/dev-storage.c
+@@ -606,7 +606,6 @@ static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
+         return;
+     }
+ 
+-    blkconf_serial(&s->conf, &dev->serial);
+     blkconf_blocksizes(&s->conf);
+     if (!blkconf_apply_backend_options(&s->conf, blk_is_read_only(blk), true,
+                                        errp)) {
+diff --git a/tests/ahci-test.c b/tests/ahci-test.c
+index 1a7b761304..937ed2f910 100644
+--- a/tests/ahci-test.c
++++ b/tests/ahci-test.c
+@@ -180,12 +180,12 @@ static AHCIQState *ahci_boot(const char *cli, ...)
+         s = ahci_vboot(cli, ap);
+         va_end(ap);
+     } else {
+-        cli = "-drive if=none,id=drive0,file=%s,cache=writeback,serial=%s"
+-            ",format=%s"
++        cli = "-drive if=none,id=drive0,file=%s,cache=writeback,format=%s"
+             " -M q35 "
+             "-device ide-hd,drive=drive0 "
++            "-global ide-hd.serial=%s "
+             "-global ide-hd.ver=%s";
+-        s = ahci_boot(cli, tmp_path, "testdisk", imgfmt, "version");
++        s = ahci_boot(cli, tmp_path, imgfmt, "testdisk", "version");
+     }
+ 
+     return s;
+diff --git a/tests/ide-test.c b/tests/ide-test.c
+index 2384c2c3e2..f39431b1a9 100644
+--- a/tests/ide-test.c
++++ b/tests/ide-test.c
+@@ -529,8 +529,8 @@ static void test_bmdma_no_busmaster(void)
+ static void test_bmdma_setup(void)
+ {
+     ide_test_start(
+-        "-drive file=%s,if=ide,serial=%s,cache=writeback,format=raw "
+-        "-global ide-hd.ver=%s",
++        "-drive file=%s,if=ide,cache=writeback,format=raw "
++        "-global ide-hd.serial=%s -global ide-hd.ver=%s",
+         tmp_path, "testdisk", "version");
+     qtest_irq_intercept_in(global_qtest, "ioapic");
+ }
+@@ -561,8 +561,8 @@ static void test_identify(void)
+     int ret;
+ 
+     ide_test_start(
+-        "-drive file=%s,if=ide,serial=%s,cache=writeback,format=raw "
+-        "-global ide-hd.ver=%s",
++        "-drive file=%s,if=ide,cache=writeback,format=raw "
++        "-global ide-hd.serial=%s -global ide-hd.ver=%s",
+         tmp_path, "testdisk", "version");
+ 
+     dev = get_pci_device(&bmdma_bar, &ide_bar);
 diff --git a/qemu-doc.texi b/qemu-doc.texi
-index ab95bffc74..338477725f 100644
+index 338477725f..282bc3dc35 100644
 --- a/qemu-doc.texi
 +++ b/qemu-doc.texi
-@@ -2855,11 +2855,6 @@ provided per NIC.
- The drive serial argument is replaced by the the serial argument
- that can be specified with the ``-device'' parameter.
+@@ -2850,11 +2850,6 @@ with ``-device ...,netdev=x''), or ``-nic user,smb=/some/dir''
+ (for embedded NICs). The new syntax allows different settings to be
+ provided per NIC.
  
--@subsection -drive addr=... (since 2.10.0)
+-@subsection -drive serial=... (since 2.10.0)
 -
--The drive addr argument is replaced by the the addr argument
+-The drive serial argument is replaced by the the serial argument
 -that can be specified with the ``-device'' parameter.
 -
  @subsection -usbdevice (since 2.10.0)
  
  The ``-usbdevice DEV'' argument is now a synonym for setting
 diff --git a/qemu-options.hx b/qemu-options.hx
-index a14b9655c5..c2531e2f3c 100644
+index c2531e2f3c..d5b0c26e8e 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
 @@ -805,7 +805,7 @@ ETEXI
  DEF("drive", HAS_ARG, QEMU_OPTION_drive,
      "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
      "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
--    "       [,snapshot=on|off][,serial=s][,addr=A][,rerror=ignore|stop|report]\n"
-+    "       [,snapshot=on|off][,serial=s][,rerror=ignore|stop|report]\n"
+-    "       [,snapshot=on|off][,serial=s][,rerror=ignore|stop|report]\n"
++    "       [,snapshot=on|off][,rerror=ignore|stop|report]\n"
      "       [,werror=ignore|stop|report|enospc][,id=name][,aio=threads|native]\n"
      "       [,readonly=on|off][,copy-on-read=on|off]\n"
      "       [,discard=ignore|unmap][,detect-zeroes=on|off|unmap]\n"
-@@ -883,9 +883,6 @@ an untrusted format header.
- This option specifies the serial number to assign to the device. This
- parameter is deprecated, use the corresponding parameter of @code{-device}
- instead.
--@item addr=@var{addr}
--Specify the controller's PCI address (if=virtio only). This parameter is
--deprecated, use the corresponding parameter of @code{-device} instead.
+@@ -879,10 +879,6 @@ The default mode is @option{cache=writeback}.
+ Specify which disk @var{format} will be used rather than detecting
+ the format.  Can be used to specify format=raw to avoid interpreting
+ an untrusted format header.
+-@item serial=@var{serial}
+-This option specifies the serial number to assign to the device. This
+-parameter is deprecated, use the corresponding parameter of @code{-device}
+-instead.
  @item werror=@var{action},rerror=@var{action}
  Specify which @var{action} to take on write and read errors. Valid actions are:
  "ignore" (ignore the error and try to continue), "stop" (pause QEMU),
