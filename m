@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tamiko@kyomu.43-1.org>) id 1fTwoJ-0001Sd-IW
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 18:03:12 -0400
+	(envelope-from <mst@redhat.com>) id 1fTxDP-0005L9-60
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 18:29:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tamiko@kyomu.43-1.org>) id 1fTwoI-0008Ny-8L
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 18:03:11 -0400
-Received: from tsukuyomi.43-1.org ([2a01:4f8:173:743::1:50]:56242)
+	(envelope-from <mst@redhat.com>) id 1fTxDL-0001l3-Qx
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 18:29:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44976 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tamiko@kyomu.43-1.org>)
-	id 1fTwoI-0008ND-2U
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 18:03:10 -0400
-From: Matthias Maier <tamiko@43-1.org>
-Date: Fri, 15 Jun 2018 17:02:05 -0500
-Message-Id: <20180615220205.6929-3-tamiko@43-1.org>
-In-Reply-To: <20180615220205.6929-1-tamiko@43-1.org>
-References: <20180615220205.6929-1-tamiko@43-1.org>
-Subject: [Qemu-devel] [PATCH v3 2/2] Revert commit d4e5ec877ca
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fTxDL-0001ki-LX
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 18:29:03 -0400
+Date: Sat, 16 Jun 2018 01:29:02 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180615222855.44421-1-mst@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH v3 0/2] kvm: limited x86 CPU power management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,86 +25,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>, Markus Armbruster <armbru@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Matthias Maier <tamiko@43-1.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
 
-This commit removes the PYTHON_UTF8 workaround. The problem with setting
+This adds ability to expose some host CPU power management capabilities
+to guests. For intel guests, this is sufficient for guest to enable low
+power CPU states on idle. For AMD guests it isn't sufficient, deeper
+C-states are entered using System-IO.
 
-  LC_ALL= LANG=C LC_CTYPE=en_US.UTF-8
+When enabled this puts CPU in a low power state with exit latencies that
+can go up to multiple milliseconds, and makes host scheduler as well as
+host utilities such as top and powertop think the CPU is constantly
+busy.  Thus it has the effect of dedicating a host CPU for this guest.
 
-is that the en_US.UTF-8 locale might not be available. In this case
-setting above locales results in build errors even though another UTF-8
-locale was originally set [1]. The only stable way of fixing the
-encoding problem is by explicitly annotating encoding/decoding in the
-python script.
+mwait based power management is tied closely to specifics of CPUID,
+making migration challenging. At this point only the non-migrateable
+-cpu host is supported.
 
-[1] https://bugs.gentoo.org/657766
+With this patch applied, VM latency is within the noise of
+baremetal for some benchmarks.
 
-Signed-off-by: Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
-Signed-off-by: Matthias Maier <tamiko@43-1.org>
----
- Makefile               | 6 ++----
- tests/Makefile.include | 6 +++---
- 2 files changed, 5 insertions(+), 7 deletions(-)
+perf bench sched pipe results:
+Before:
+    6.452 sec
+After:
+    4.382 sec
+Baremetal:
+    4.136 sec
 
-diff --git a/Makefile b/Makefile
-index e46f2b625a..7ed9cc4a21 100644
---- a/Makefile
-+++ b/Makefile
-@@ -20,8 +20,6 @@ ifneq ($(wildcard config-host.mak),)
- all:
- include config-host.mak
- 
--PYTHON_UTF8 = LC_ALL= LANG=C LC_CTYPE=en_US.UTF-8 $(PYTHON)
--
- git-submodule-update:
- 
- .PHONY: git-submodule-update
-@@ -576,7 +574,7 @@ qga/qapi-generated/qga-qapi-commands.h qga/qapi-generated/qga-qapi-commands.c \
- qga/qapi-generated/qga-qapi-doc.texi: \
- qga/qapi-generated/qapi-gen-timestamp ;
- qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
--	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
- 		-o qga/qapi-generated -p "qga-" $<, \
- 		"GEN","$(@:%-timestamp=%)")
- 	@>$@
-@@ -676,7 +674,7 @@ qapi/qapi-introspect.h qapi/qapi-introspect.c \
- qapi/qapi-doc.texi: \
- qapi-gen-timestamp ;
- qapi-gen-timestamp: $(qapi-modules) $(qapi-py)
--	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
- 		-o "qapi" -b $<, \
- 		"GEN","$(@:%-timestamp=%)")
- 	@>$@
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index ca91da26cb..88f1bc1242 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -678,13 +678,13 @@ tests/test-qapi-events.c tests/test-qapi-events.h \
- tests/test-qapi-introspect.c tests/test-qapi-introspect.h: \
- tests/test-qapi-gen-timestamp ;
- tests/test-qapi-gen-timestamp: $(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(qapi-py)
--	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
- 		-o tests -p "test-" $<, \
- 		"GEN","$(@:%-timestamp=%)")
- 	@>$@
- 
- tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc-good.json $(qapi-py)
--	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
- 		-o tests/qapi-schema -p "doc-good-" $<, \
- 		"GEN","$@")
- 	@mv tests/qapi-schema/doc-good-qapi-doc.texi $@
-@@ -942,7 +942,7 @@ check-tests/qemu-iotests-quick.sh: tests/qemu-iotests-quick.sh qemu-img$(EXESUF)
- .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
- $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH)/%.json
- 	$(call quiet-command, PYTHONPATH=$(SRC_PATH)/scripts \
--		$(PYTHON_UTF8) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
-+		$(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
- 		$^ >$*.test.out 2>$*.test.err; \
- 		echo $$? >$*.test.exit, \
- 		"TEST","$*.out")
+Changes since v2:
+    At Daniel's suggestion, don't use the -realtime flag.
+
+    At Paolo's suggestion, group this with memory lock flag
+    which has a similar effect of dedicating memory to this VM.
+
+Michael S. Tsirkin (2):
+  kvm: support -dedicated cpu-pm=on|off
+  i386/cpu: make -cpu host support monitor/mwait
+
+ include/sysemu/sysemu.h |  1 +
+ target/i386/cpu.h       |  9 +++++++++
+ target/i386/cpu.c       | 19 ++++++++++++++-----
+ target/i386/kvm.c       | 32 ++++++++++++++++++++++++++++++++
+ vl.c                    | 32 +++++++++++++++++++++++++++++++-
+ qemu-options.hx         | 18 ++++++++++++++++++
+ 6 files changed, 105 insertions(+), 6 deletions(-)
+
 -- 
-2.16.4
+MST
