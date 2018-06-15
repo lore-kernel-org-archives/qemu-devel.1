@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fTsra-0004UU-7l
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:50:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fTsvi-0006BY-Uo
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:54:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fTsrX-0000Mk-1e
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:50:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46984)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fTsrW-0000MJ-Nu
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:50:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fTsrV-0007zJ-BA
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 17:50:13 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4DDAA2E80C7
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 17:50:13 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1fTsvh-0003SC-P6
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:54:35 -0400
+Date: Fri, 15 Jun 2018 18:54:23 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180615175423.GI2615@work-vm>
+References: <20180615155103.11924-1-berrange@redhat.com>
+	<20180615155103.11924-4-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180615155103.11924-4-berrange@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Jun 2018 17:37:58 -0000
-From: Thomas Huth <1516446@bugs.launchpad.net>
-Reply-To: Bug 1516446 <1516446@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20151115213157.12208.66685.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152908427885.26799.16427679405308743928.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1516446] Re: Migration always causes guest freeze
- in one direction.
+Subject: Re: [Qemu-devel] [PATCH 3/6] migration: add support for a
+ "tls-authz" migration parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,679 +25,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-** Bug watch removed: Red Hat Bugzilla #1401767
-   https://bugzilla.redhat.com/show_bug.cgi?id=3D1401767
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> From: "Daniel P. Berrange" <berrange@redhat.com>
+>=20
+> The QEMU instance that runs as the server for the migration data
+> transport (ie the target QEMU) needs to be able to configure access
+> control so it can prevent unauthorized clients initiating an incoming
+> migration. This adds a new 'tls-authz' migration parameter that is used
+> to provide the QOM ID of a QAuthZ subclass instance that provides the
+> access control check. This is checked against the x509 certificate
+> obtained during the TLS handshake.
+>=20
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 
--- =
+I'd appreciate an example of using it, either in the migration docs or
+the commit message.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1516446
+> ---
+>  hmp.c                 |  9 +++++++++
+>  migration/migration.c |  8 ++++++++
+>  migration/tls.c       |  2 +-
+>  qapi/migration.json   | 12 +++++++++++-
+>  4 files changed, 29 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hmp.c b/hmp.c
+> index 74e18db103..bef8ea2531 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -370,6 +370,9 @@ void hmp_info_migrate_parameters(Monitor *mon, cons=
+t QDict *qdict)
+>          monitor_printf(mon, "%s: %" PRIu64 "\n",
+>              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SI=
+ZE),
+>              params->xbzrle_cache_size);
+> +        monitor_printf(mon, " %s: '%s'\n",
+> +            MigrationParameter_str(MIGRATION_PARAMETER_TLS_AUTHZ),
+> +            params->has_tls_authz ? params->tls_authz : "");
+>      }
+> =20
+>      qapi_free_MigrationParameters(params);
+> @@ -1632,6 +1635,12 @@ void hmp_migrate_set_parameter(Monitor *mon, con=
+st QDict *qdict)
+>          p->tls_hostname->type =3D QTYPE_QSTRING;
+>          visit_type_str(v, param, &p->tls_hostname->u.s, &err);
+>          break;
+> +    case MIGRATION_PARAMETER_TLS_AUTHZ:
+> +        p->has_tls_authz =3D true;
+> +        p->tls_authz =3D g_new0(StrOrNull, 1);
+> +        p->tls_authz->type =3D QTYPE_QSTRING;
+> +        visit_type_str(v, param, &p->tls_authz->u.s, &err);
+> +        break;
+>      case MIGRATION_PARAMETER_MAX_BANDWIDTH:
+>          p->has_max_bandwidth =3D true;
+>          /*
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 1e99ec9b7e..d14c8d7003 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -645,6 +645,8 @@ MigrationParameters *qmp_query_migrate_parameters(E=
+rror **errp)
+>      params->tls_creds =3D g_strdup(s->parameters.tls_creds);
+>      params->has_tls_hostname =3D true;
+>      params->tls_hostname =3D g_strdup(s->parameters.tls_hostname);
+> +    params->has_tls_authz =3D true;
+> +    params->tls_authz =3D g_strdup(s->parameters.tls_authz);
+>      params->has_max_bandwidth =3D true;
+>      params->max_bandwidth =3D s->parameters.max_bandwidth;
+>      params->has_downtime_limit =3D true;
+> @@ -1106,6 +1108,12 @@ static void migrate_params_apply(MigrateSetParam=
+eters *params, Error **errp)
+>          s->parameters.tls_hostname =3D g_strdup(params->tls_hostname->=
+u.s);
+>      }
+> =20
+> +    if (params->has_tls_authz) {
+> +        g_free(s->parameters.tls_authz);
+> +        assert(params->tls_authz->type =3D=3D QTYPE_QSTRING);
+> +        s->parameters.tls_authz =3D g_strdup(params->tls_authz->u.s);
+> +    }
+> +
+>      if (params->has_max_bandwidth) {
+>          s->parameters.max_bandwidth =3D params->max_bandwidth;
+>          if (s->to_dst_file) {
+> diff --git a/migration/tls.c b/migration/tls.c
+> index 3b9e8c9263..5171afc6c4 100644
+> --- a/migration/tls.c
+> +++ b/migration/tls.c
+> @@ -94,7 +94,7 @@ void migration_tls_channel_process_incoming(Migration=
+State *s,
+> =20
+>      tioc =3D qio_channel_tls_new_server(
+>          ioc, creds,
+> -        NULL, /* XXX pass ACL name */
+> +        s->parameters.tls_authz,
+>          errp);
+>      if (!tioc) {
+>          return;
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index f7e10ee90f..b9ba34e3a6 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -488,6 +488,10 @@
+>  #                hostname must be provided so that the server's x509
+>  #                certificate identity can be validated. (Since 2.7)
+>  #
+> +# @tls-authz: ID of the 'authz' object subclass that provides access c=
+ontrol
+> +#             checking of the TLS x509 certificate distinguished name.=
+ (Since
+> +#             2.13)
+> +#
 
-Title:
-  Migration always causes guest freeze in one direction.
+Oops, 2.13 strikes again :-)
 
-Status in QEMU:
-  Incomplete
+Other than that, OK from migration and HMP.
 
-Bug description:
-  Hello,
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-  I have three debian jessie machines standard installations except for
-  homebuild qemu-2.4.0 package using the source package from testing. I
-  had the same problem with the standard debian jessie qemu 2.1 too.
-
-  I have host A, B and C.
-
-  Migrations work between all combinations of these except A -> B. B ->
-  A works.
-
-  I use libvirt but as per your written request I have run qemu directly
-  and verified the same problem.
-
-  Host A:
-  qemu-system-x86_64 --enable-kvm -name ashole -cpu kvm64 -m 1024 -drive fi=
-le=3D/mnt/synctest/ashole.raw,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dra=
-w,cache=3Dnone -vnc 0.0.0.0:600 -k sv -vga std -device virtio-blk-pci,scsi=
-=3Doff,bus=3Dpci.0,addr=3D0x9,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,=
-bootindex=3D1
-
-  Host B:
-  qemu-system-x86_64 --enable-kvm -name ashole -cpu kvm64 -m 1024 -drive fi=
-le=3D/mnt/synctest/ashole.raw,if=3Dnone,id=3Ddrive-virtio-disk0,format=3Dra=
-w,cache=3Dnone -vnc 0.0.0.0:600 -k sv -vga std -device virtio-blk-pci,scsi=
-=3Doff,bus=3Dpci.0,addr=3D0x9,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,=
-bootindex=3D1 -incoming tcp:0:4444
-
-  Then in qemu monitor I run migrate -d tcp:B:4444 and the guest freeze.
-
-  I have tried with these guest os:es, freebsd 9.1, debian wheezy and
-  debian jessie (Standard 3.16 kernel and backported 4.2 kernel), same
-  problem with all of them. when running the migration through libvirt
-  virt-manager says the guest is using 100% cpu.
-
-  I had a similar problem
-  (https://bugzilla.kernel.org/show_bug.cgi?id=3D61971) 2 years ago which
-  was solved in kernel 3.13 if I remember correctly.
-
-  Best Regards
-  Magnus
-
-  CPU info:
-  Host A
-  processor	: 0
-  vendor_id	: AuthenticAMD
-  cpu family	: 21
-  model		: 2
-  model name	: AMD FX(tm)-8320 Eight-Core Processor
-  stepping	: 0
-  microcode	: 0x600081f
-  cpu MHz		: 1400.000
-  cache size	: 2048 KB
-  physical id	: 0
-  siblings	: 8
-  core id		: 0
-  cpu cores	: 4
-  apicid		: 16
-  initial apicid	: 0
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm constant_tsc rep_good nopl nonstop_tsc extd_apicid aperfmperf pni pc=
-lmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xsave avx f16c lahf=
-_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch o=
-svw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoext perfctr_core per=
-fctr_nb arat cpb hw_pstate npt lbrv svm_lock nrip_save tsc_scale vmcb_clean=
- flushbyasid decodeassists pausefilter pfthreshold vmmcall bmi1
-  bugs		: fxsave_leak sysret_ss_attrs
-  bogomips	: 7023.54
-  TLB size	: 1536 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro
-
-  processor	: 1
-  vendor_id	: AuthenticAMD
-  cpu family	: 21
-  model		: 2
-  model name	: AMD FX(tm)-8320 Eight-Core Processor
-  stepping	: 0
-  microcode	: 0x600081f
-  cpu MHz		: 1400.000
-  cache size	: 2048 KB
-  physical id	: 0
-  siblings	: 8
-  core id		: 1
-  cpu cores	: 4
-  apicid		: 17
-  initial apicid	: 1
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm constant_tsc rep_good nopl nonstop_tsc extd_apicid aperfmperf pni pc=
-lmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xsave avx f16c lahf=
-_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch o=
-svw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoext perfctr_core per=
-fctr_nb arat cpb hw_pstate npt lbrv svm_lock nrip_save tsc_scale vmcb_clean=
- flushbyasid decodeassists pausefilter pfthreshold vmmcall bmi1
-  bugs		: fxsave_leak sysret_ss_attrs
-  bogomips	: 7023.54
-  TLB size	: 1536 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro
-
-  processor	: 2
-  vendor_id	: AuthenticAMD
-  cpu family	: 21
-  model		: 2
-  model name	: AMD FX(tm)-8320 Eight-Core Processor
-  stepping	: 0
-  microcode	: 0x600081f
-  cpu MHz		: 1700.000
-  cache size	: 2048 KB
-  physical id	: 0
-  siblings	: 8
-  core id		: 2
-  cpu cores	: 4
-  apicid		: 18
-  initial apicid	: 2
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm constant_tsc rep_good nopl nonstop_tsc extd_apicid aperfmperf pni pc=
-lmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xsave avx f16c lahf=
-_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch o=
-svw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoext perfctr_core per=
-fctr_nb arat cpb hw_pstate npt lbrv svm_lock nrip_save tsc_scale vmcb_clean=
- flushbyasid decodeassists pausefilter pfthreshold vmmcall bmi1
-  bugs		: fxsave_leak sysret_ss_attrs
-  bogomips	: 7023.54
-  TLB size	: 1536 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro
-
-  processor	: 3
-  vendor_id	: AuthenticAMD
-  cpu family	: 21
-  model		: 2
-  model name	: AMD FX(tm)-8320 Eight-Core Processor
-  stepping	: 0
-  microcode	: 0x600081f
-  cpu MHz		: 1400.000
-  cache size	: 2048 KB
-  physical id	: 0
-  siblings	: 8
-  core id		: 3
-  cpu cores	: 4
-  apicid		: 19
-  initial apicid	: 3
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm constant_tsc rep_good nopl nonstop_tsc extd_apicid aperfmperf pni pc=
-lmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xsave avx f16c lahf=
-_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch o=
-svw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoext perfctr_core per=
-fctr_nb arat cpb hw_pstate npt lbrv svm_lock nrip_save tsc_scale vmcb_clean=
- flushbyasid decodeassists pausefilter pfthreshold vmmcall bmi1
-  bugs		: fxsave_leak sysret_ss_attrs
-  bogomips	: 7023.54
-  TLB size	: 1536 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro
-
-  processor	: 4
-  vendor_id	: AuthenticAMD
-  cpu family	: 21
-  model		: 2
-  model name	: AMD FX(tm)-8320 Eight-Core Processor
-  stepping	: 0
-  microcode	: 0x600081f
-  cpu MHz		: 1400.000
-  cache size	: 2048 KB
-  physical id	: 0
-  siblings	: 8
-  core id		: 4
-  cpu cores	: 4
-  apicid		: 20
-  initial apicid	: 4
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm constant_tsc rep_good nopl nonstop_tsc extd_apicid aperfmperf pni pc=
-lmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xsave avx f16c lahf=
-_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch o=
-svw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoext perfctr_core per=
-fctr_nb arat cpb hw_pstate npt lbrv svm_lock nrip_save tsc_scale vmcb_clean=
- flushbyasid decodeassists pausefilter pfthreshold vmmcall bmi1
-  bugs		: fxsave_leak sysret_ss_attrs
-  bogomips	: 7023.54
-  TLB size	: 1536 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro
-
-  processor	: 5
-  vendor_id	: AuthenticAMD
-  cpu family	: 21
-  model		: 2
-  model name	: AMD FX(tm)-8320 Eight-Core Processor
-  stepping	: 0
-  microcode	: 0x600081f
-  cpu MHz		: 1400.000
-  cache size	: 2048 KB
-  physical id	: 0
-  siblings	: 8
-  core id		: 5
-  cpu cores	: 4
-  apicid		: 21
-  initial apicid	: 5
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm constant_tsc rep_good nopl nonstop_tsc extd_apicid aperfmperf pni pc=
-lmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xsave avx f16c lahf=
-_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch o=
-svw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoext perfctr_core per=
-fctr_nb arat cpb hw_pstate npt lbrv svm_lock nrip_save tsc_scale vmcb_clean=
- flushbyasid decodeassists pausefilter pfthreshold vmmcall bmi1
-  bugs		: fxsave_leak sysret_ss_attrs
-  bogomips	: 7023.54
-  TLB size	: 1536 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro
-
-  processor	: 6
-  vendor_id	: AuthenticAMD
-  cpu family	: 21
-  model		: 2
-  model name	: AMD FX(tm)-8320 Eight-Core Processor
-  stepping	: 0
-  microcode	: 0x600081f
-  cpu MHz		: 1400.000
-  cache size	: 2048 KB
-  physical id	: 0
-  siblings	: 8
-  core id		: 6
-  cpu cores	: 4
-  apicid		: 22
-  initial apicid	: 6
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm constant_tsc rep_good nopl nonstop_tsc extd_apicid aperfmperf pni pc=
-lmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xsave avx f16c lahf=
-_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch o=
-svw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoext perfctr_core per=
-fctr_nb arat cpb hw_pstate npt lbrv svm_lock nrip_save tsc_scale vmcb_clean=
- flushbyasid decodeassists pausefilter pfthreshold vmmcall bmi1
-  bugs		: fxsave_leak sysret_ss_attrs
-  bogomips	: 7023.54
-  TLB size	: 1536 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro
-
-  processor	: 7
-  vendor_id	: AuthenticAMD
-  cpu family	: 21
-  model		: 2
-  model name	: AMD FX(tm)-8320 Eight-Core Processor
-  stepping	: 0
-  microcode	: 0x600081f
-  cpu MHz		: 1400.000
-  cache size	: 2048 KB
-  physical id	: 0
-  siblings	: 8
-  core id		: 7
-  cpu cores	: 4
-  apicid		: 23
-  initial apicid	: 7
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm constant_tsc rep_good nopl nonstop_tsc extd_apicid aperfmperf pni pc=
-lmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 popcnt aes xsave avx f16c lahf=
-_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch o=
-svw ibs xop skinit wdt lwp fma4 tce nodeid_msr tbm topoext perfctr_core per=
-fctr_nb arat cpb hw_pstate npt lbrv svm_lock nrip_save tsc_scale vmcb_clean=
- flushbyasid decodeassists pausefilter pfthreshold vmmcall bmi1
-  bugs		: fxsave_leak sysret_ss_attrs
-  bogomips	: 7023.54
-  TLB size	: 1536 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm 100mhzsteps hwpstate cpb eff_freq_ro
-
-  Host B:
-  processor	: 0
-  vendor_id	: AuthenticAMD
-  cpu family	: 16
-  model		: 10
-  model name	: AMD Phenom(tm) II X6 1055T Processor
-  stepping	: 0
-  microcode	: 0x10000bf
-  cpu MHz		: 800.000
-  cache size	: 512 KB
-  physical id	: 0
-  siblings	: 6
-  core id		: 0
-  cpu cores	: 6
-  apicid		: 0
-  initial apicid	: 0
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 6
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm 3dnowext 3dnow constant_tsc rep_good nopl nonstop_tsc extd_apicid ap=
-erfmperf pni monitor cx16 popcnt lahf_lm cmp_legacy svm extapic cr8_legacy =
-abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt cpb hw_pstate npt l=
-brv svm_lock nrip_save pausefilter vmmcall
-  bugs		: tlb_mmatch apic_c1e fxsave_leak sysret_ss_attrs
-  bogomips	: 5624.68
-  TLB size	: 1024 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm stc 100mhzsteps hwpstate cpb
-
-  processor	: 1
-  vendor_id	: AuthenticAMD
-  cpu family	: 16
-  model		: 10
-  model name	: AMD Phenom(tm) II X6 1055T Processor
-  stepping	: 0
-  microcode	: 0x10000bf
-  cpu MHz		: 800.000
-  cache size	: 512 KB
-  physical id	: 0
-  siblings	: 6
-  core id		: 1
-  cpu cores	: 6
-  apicid		: 1
-  initial apicid	: 1
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 6
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm 3dnowext 3dnow constant_tsc rep_good nopl nonstop_tsc extd_apicid ap=
-erfmperf pni monitor cx16 popcnt lahf_lm cmp_legacy svm extapic cr8_legacy =
-abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt cpb hw_pstate npt l=
-brv svm_lock nrip_save pausefilter vmmcall
-  bugs		: tlb_mmatch apic_c1e fxsave_leak sysret_ss_attrs
-  bogomips	: 5624.68
-  TLB size	: 1024 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm stc 100mhzsteps hwpstate cpb
-
-  processor	: 2
-  vendor_id	: AuthenticAMD
-  cpu family	: 16
-  model		: 10
-  model name	: AMD Phenom(tm) II X6 1055T Processor
-  stepping	: 0
-  microcode	: 0x10000bf
-  cpu MHz		: 800.000
-  cache size	: 512 KB
-  physical id	: 0
-  siblings	: 6
-  core id		: 2
-  cpu cores	: 6
-  apicid		: 2
-  initial apicid	: 2
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 6
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm 3dnowext 3dnow constant_tsc rep_good nopl nonstop_tsc extd_apicid ap=
-erfmperf pni monitor cx16 popcnt lahf_lm cmp_legacy svm extapic cr8_legacy =
-abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt cpb hw_pstate npt l=
-brv svm_lock nrip_save pausefilter vmmcall
-  bugs		: tlb_mmatch apic_c1e fxsave_leak sysret_ss_attrs
-  bogomips	: 5624.68
-  TLB size	: 1024 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm stc 100mhzsteps hwpstate cpb
-
-  processor	: 3
-  vendor_id	: AuthenticAMD
-  cpu family	: 16
-  model		: 10
-  model name	: AMD Phenom(tm) II X6 1055T Processor
-  stepping	: 0
-  microcode	: 0x10000bf
-  cpu MHz		: 800.000
-  cache size	: 512 KB
-  physical id	: 0
-  siblings	: 6
-  core id		: 3
-  cpu cores	: 6
-  apicid		: 3
-  initial apicid	: 3
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 6
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm 3dnowext 3dnow constant_tsc rep_good nopl nonstop_tsc extd_apicid ap=
-erfmperf pni monitor cx16 popcnt lahf_lm cmp_legacy svm extapic cr8_legacy =
-abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt cpb hw_pstate npt l=
-brv svm_lock nrip_save pausefilter vmmcall
-  bugs		: tlb_mmatch apic_c1e fxsave_leak sysret_ss_attrs
-  bogomips	: 5624.68
-  TLB size	: 1024 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm stc 100mhzsteps hwpstate cpb
-
-  processor	: 4
-  vendor_id	: AuthenticAMD
-  cpu family	: 16
-  model		: 10
-  model name	: AMD Phenom(tm) II X6 1055T Processor
-  stepping	: 0
-  microcode	: 0x10000bf
-  cpu MHz		: 800.000
-  cache size	: 512 KB
-  physical id	: 0
-  siblings	: 6
-  core id		: 4
-  cpu cores	: 6
-  apicid		: 4
-  initial apicid	: 4
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 6
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm 3dnowext 3dnow constant_tsc rep_good nopl nonstop_tsc extd_apicid ap=
-erfmperf pni monitor cx16 popcnt lahf_lm cmp_legacy svm extapic cr8_legacy =
-abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt cpb hw_pstate npt l=
-brv svm_lock nrip_save pausefilter vmmcall
-  bugs		: tlb_mmatch apic_c1e fxsave_leak sysret_ss_attrs
-  bogomips	: 5624.68
-  TLB size	: 1024 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm stc 100mhzsteps hwpstate cpb
-
-  processor	: 5
-  vendor_id	: AuthenticAMD
-  cpu family	: 16
-  model		: 10
-  model name	: AMD Phenom(tm) II X6 1055T Processor
-  stepping	: 0
-  microcode	: 0x10000bf
-  cpu MHz		: 800.000
-  cache size	: 512 KB
-  physical id	: 0
-  siblings	: 6
-  core id		: 5
-  cpu cores	: 6
-  apicid		: 5
-  initial apicid	: 5
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 6
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdt=
-scp lm 3dnowext 3dnow constant_tsc rep_good nopl nonstop_tsc extd_apicid ap=
-erfmperf pni monitor cx16 popcnt lahf_lm cmp_legacy svm extapic cr8_legacy =
-abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt cpb hw_pstate npt l=
-brv svm_lock nrip_save pausefilter vmmcall
-  bugs		: tlb_mmatch apic_c1e fxsave_leak sysret_ss_attrs
-  bogomips	: 5624.68
-  TLB size	: 1024 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm stc 100mhzsteps hwpstate cpb
-
-  Host C:
-  processor	: 0
-  vendor_id	: GenuineIntel
-  cpu family	: 6
-  model		: 58
-  model name	: Intel(R) Core(TM) i5-3450 CPU @ 3.10GHz
-  stepping	: 9
-  microcode	: 0x12
-  cpu MHz		: 1607.156
-  cache size	: 6144 KB
-  physical id	: 0
-  siblings	: 4
-  core id		: 0
-  cpu cores	: 4
-  apicid		: 0
-  initial apicid	: 0
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp l=
-m constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc ap=
-erfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 cx1=
-6 xtpr pdcm pcid sse4_1 sse4_2 popcnt tsc_deadline_timer xsave avx f16c rdr=
-and lahf_lm ida arat epb pln pts dtherm tpr_shadow vnmi flexpriority ept vp=
-id fsgsbase smep erms xsaveopt
-  bugs		:
-  bogomips	: 6186.23
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 36 bits physical, 48 bits virtual
-  power management:
-
-  processor	: 1
-  vendor_id	: GenuineIntel
-  cpu family	: 6
-  model		: 58
-  model name	: Intel(R) Core(TM) i5-3450 CPU @ 3.10GHz
-  stepping	: 9
-  microcode	: 0x12
-  cpu MHz		: 1730.066
-  cache size	: 6144 KB
-  physical id	: 0
-  siblings	: 4
-  core id		: 1
-  cpu cores	: 4
-  apicid		: 2
-  initial apicid	: 2
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp l=
-m constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc ap=
-erfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 cx1=
-6 xtpr pdcm pcid sse4_1 sse4_2 popcnt tsc_deadline_timer xsave avx f16c rdr=
-and lahf_lm ida arat epb pln pts dtherm tpr_shadow vnmi flexpriority ept vp=
-id fsgsbase smep erms xsaveopt
-  bugs		:
-  bogomips	: 6186.23
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 36 bits physical, 48 bits virtual
-  power management:
-
-  processor	: 2
-  vendor_id	: GenuineIntel
-  cpu family	: 6
-  model		: 58
-  model name	: Intel(R) Core(TM) i5-3450 CPU @ 3.10GHz
-  stepping	: 9
-  microcode	: 0x12
-  cpu MHz		: 1654.382
-  cache size	: 6144 KB
-  physical id	: 0
-  siblings	: 4
-  core id		: 2
-  cpu cores	: 4
-  apicid		: 4
-  initial apicid	: 4
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp l=
-m constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc ap=
-erfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 cx1=
-6 xtpr pdcm pcid sse4_1 sse4_2 popcnt tsc_deadline_timer xsave avx f16c rdr=
-and lahf_lm ida arat epb pln pts dtherm tpr_shadow vnmi flexpriority ept vp=
-id fsgsbase smep erms xsaveopt
-  bugs		:
-  bogomips	: 6186.23
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 36 bits physical, 48 bits virtual
-  power management:
-
-  processor	: 3
-  vendor_id	: GenuineIntel
-  cpu family	: 6
-  model		: 58
-  model name	: Intel(R) Core(TM) i5-3450 CPU @ 3.10GHz
-  stepping	: 9
-  microcode	: 0x12
-  cpu MHz		: 1610.304
-  cache size	: 6144 KB
-  physical id	: 0
-  siblings	: 4
-  core id		: 3
-  cpu cores	: 4
-  apicid		: 6
-  initial apicid	: 6
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
-t pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp l=
-m constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc ap=
-erfmperf eagerfpu pni pclmulqdq dtes64 monitor ds_cpl vmx est tm2 ssse3 cx1=
-6 xtpr pdcm pcid sse4_1 sse4_2 popcnt tsc_deadline_timer xsave avx f16c rdr=
-and lahf_lm ida arat epb pln pts dtherm tpr_shadow vnmi flexpriority ept vp=
-id fsgsbase smep erms xsaveopt
-  bugs		:
-  bogomips	: 6186.23
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 36 bits physical, 48 bits virtual
-  power management:
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1516446/+subscriptions
+>  # @max-bandwidth: to set maximum speed for migration. maximum speed in
+>  #                 bytes per second. (Since 2.8)
+>  #
+> @@ -522,7 +526,7 @@
+>  { 'enum': 'MigrationParameter',
+>    'data': ['compress-level', 'compress-threads', 'decompress-threads',
+>             'cpu-throttle-initial', 'cpu-throttle-increment',
+> -           'tls-creds', 'tls-hostname', 'max-bandwidth',
+> +           'tls-creds', 'tls-hostname', 'tls-authz', 'max-bandwidth',
+>             'downtime-limit', 'x-checkpoint-delay', 'block-incremental'=
+,
+>             'x-multifd-channels', 'x-multifd-page-count',
+>             'xbzrle-cache-size' ] }
+> @@ -605,6 +609,7 @@
+>              '*cpu-throttle-increment': 'int',
+>              '*tls-creds': 'StrOrNull',
+>              '*tls-hostname': 'StrOrNull',
+> +            '*tls-authz': 'StrOrNull',
+>              '*max-bandwidth': 'int',
+>              '*downtime-limit': 'int',
+>              '*x-checkpoint-delay': 'int',
+> @@ -667,6 +672,10 @@
+>  #                associated with the migration URI, if any. (Since 2.9=
+)
+>  #                Note: 2.8 reports this by omitting tls-hostname inste=
+ad.
+>  #
+> +# @tls-authz: ID of the 'authz' object subclass that provides access c=
+ontrol
+> +#             checking of the TLS x509 certificate distinguished name.=
+ (Since
+> +#             2.13)
+> +#
+>  # @max-bandwidth: to set maximum speed for migration. maximum speed in
+>  #                 bytes per second. (Since 2.8)
+>  #
+> @@ -704,6 +713,7 @@
+>              '*cpu-throttle-increment': 'uint8',
+>              '*tls-creds': 'str',
+>              '*tls-hostname': 'str',
+> +            '*tls-authz': 'str',
+>              '*max-bandwidth': 'size',
+>              '*downtime-limit': 'uint64',
+>              '*x-checkpoint-delay': 'uint32',
+> --=20
+> 2.17.0
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
