@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbd-0006Cd-GU
+	(envelope-from <kwolf@redhat.com>) id 1fTpbf-0006FN-DD
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbb-0003n2-B1
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:37 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbZ-0003kh-2e
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:39 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 15 Jun 2018 16:21:02 +0200
-Message-Id: <20180615142108.27814-21-kwolf@redhat.com>
+Date: Fri, 15 Jun 2018 16:21:00 +0200
+Message-Id: <20180615142108.27814-19-kwolf@redhat.com>
 In-Reply-To: <20180615142108.27814-1-kwolf@redhat.com>
 References: <20180615142108.27814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 20/26] block: Fix -blockdev / blockdev-add for
- empty objects and arrays
+Subject: [Qemu-devel] [PULL 18/26] check-block-qdict: Rename
+ qdict_flatten()'s variables for clarity
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,263 +25,93 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Markus Armbruster <armbru@redhat.com>
 
--blockdev and blockdev-add silently ignore empty objects and arrays in
-their argument.  That's because qmp_blockdev_add() converts the
-argument to a flat QDict, and qdict_flatten() eats empty QDict and
-QList members.  For instance, we ignore an empty BlockdevOptions
-member @cache.  No real harm, as absent means the same as empty there.
-
-Thus, the flaw puts an artificial restriction on the QAPI schema: we
-can't have potentially empty objects and arrays within
-BlockdevOptions, except when they're optional and "empty" has the same
-meaning as "absent".
-
-Our QAPI schema satisfies this restriction (I checked), but it's a
-trap for the unwary, and a temptation to employ awkward workarounds
-for the wary.  Let's get rid of it.
-
-Change qdict_flatten() and qdict_crumple() to treat empty dictionaries
-and lists exactly like scalars.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qobject/block-qdict.c     | 54 +++++++++++++++++++++++++++++------------------
- tests/check-block-qdict.c | 38 ++++++++++++++++++++++++++-------
- 2 files changed, 63 insertions(+), 29 deletions(-)
+ tests/check-block-qdict.c | 57 ++++++++++++++++++++++++-----------------------
+ 1 file changed, 29 insertions(+), 28 deletions(-)
 
-diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
-index e51a3d2c0f..df833083a7 100644
---- a/qobject/block-qdict.c
-+++ b/qobject/block-qdict.c
-@@ -56,6 +56,8 @@ static void qdict_flatten_qlist(QList *qlist, QDict *target, const char *prefix)
- {
-     QObject *value;
-     const QListEntry *entry;
-+    QDict *dict_val;
-+    QList *list_val;
-     char *new_key;
-     int i;
- 
-@@ -69,16 +71,18 @@ static void qdict_flatten_qlist(QList *qlist, QDict *target, const char *prefix)
- 
-     for (i = 0; entry; entry = qlist_next(entry), i++) {
-         value = qlist_entry_obj(entry);
-+        dict_val = qobject_to(QDict, value);
-+        list_val = qobject_to(QList, value);
-         new_key = g_strdup_printf("%s.%i", prefix, i);
- 
-         /*
-          * Flatten non-empty QDict and QList recursively into @target,
-          * copy other objects to @target
-          */
--        if (qobject_type(value) == QTYPE_QDICT) {
--            qdict_flatten_qdict(qobject_to(QDict, value), target, new_key);
--        } else if (qobject_type(value) == QTYPE_QLIST) {
--            qdict_flatten_qlist(qobject_to(QList, value), target, new_key);
-+        if (dict_val && qdict_size(dict_val)) {
-+            qdict_flatten_qdict(dict_val, target, new_key);
-+        } else if (list_val && !qlist_empty(list_val)) {
-+            qdict_flatten_qlist(list_val, target, new_key);
-         } else {
-             qdict_put_obj(target, new_key, qobject_ref(value));
-         }
-@@ -91,6 +95,8 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
- {
-     QObject *value;
-     const QDictEntry *entry, *next;
-+    QDict *dict_val;
-+    QList *list_val;
-     char *new_key;
- 
-     entry = qdict_first(qdict);
-@@ -98,6 +104,8 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
-     while (entry != NULL) {
-         next = qdict_next(qdict, entry);
-         value = qdict_entry_value(entry);
-+        dict_val = qobject_to(QDict, value);
-+        list_val = qobject_to(QList, value);
-         new_key = NULL;
- 
-         if (prefix) {
-@@ -108,12 +116,12 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
-          * Flatten non-empty QDict and QList recursively into @target,
-          * copy other objects to @target
-          */
--        if (qobject_type(value) == QTYPE_QDICT) {
--            qdict_flatten_qdict(qobject_to(QDict, value), target,
-+        if (dict_val && qdict_size(dict_val)) {
-+            qdict_flatten_qdict(dict_val, target,
-                                 new_key ? new_key : entry->key);
-             qdict_del(qdict, entry->key);
--        } else if (qobject_type(value) == QTYPE_QLIST) {
--            qdict_flatten_qlist(qobject_to(QList, value), target,
-+        } else if (list_val && !qlist_empty(list_val)) {
-+            qdict_flatten_qlist(list_val, target,
-                                 new_key ? new_key : entry->key);
-             qdict_del(qdict, entry->key);
-         } else if (target != qdict) {
-@@ -127,10 +135,11 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
- }
- 
- /**
-- * qdict_flatten(): For each nested QDict with key x, all fields with key y
-- * are moved to this QDict and their key is renamed to "x.y". For each nested
-- * QList with key x, the field at index y is moved to this QDict with the key
-- * "x.y" (i.e., the reverse of what qdict_array_split() does).
-+ * qdict_flatten(): For each nested non-empty QDict with key x, all
-+ * fields with key y are moved to this QDict and their key is renamed
-+ * to "x.y". For each nested non-empty QList with key x, the field at
-+ * index y is moved to this QDict with the key "x.y" (i.e., the
-+ * reverse of what qdict_array_split() does).
-  * This operation is applied recursively for nested QDicts and QLists.
-  */
- void qdict_flatten(QDict *qdict)
-@@ -361,8 +370,8 @@ static int qdict_is_list(QDict *maybe_list, Error **errp)
-  * @src: the original flat dictionary (only scalar values) to crumple
-  *
-  * Takes a flat dictionary whose keys use '.' separator to indicate
-- * nesting, and values are scalars, and crumples it into a nested
-- * structure.
-+ * nesting, and values are scalars, empty dictionaries or empty lists,
-+ * and crumples it into a nested structure.
-  *
-  * To include a literal '.' in a key name, it must be escaped as '..'
-  *
-@@ -399,6 +408,8 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
- {
-     const QDictEntry *ent;
-     QDict *two_level, *multi_level = NULL, *child_dict;
-+    QDict *dict_val;
-+    QList *list_val;
-     QObject *dst = NULL, *child;
-     size_t i;
-     char *prefix = NULL;
-@@ -409,10 +420,11 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
- 
-     /* Step 1: split our totally flat dict into a two level dict */
-     for (ent = qdict_first(src); ent != NULL; ent = qdict_next(src, ent)) {
--        if (qobject_type(ent->value) == QTYPE_QDICT ||
--            qobject_type(ent->value) == QTYPE_QLIST) {
--            error_setg(errp, "Value %s is not a scalar",
--                       ent->key);
-+        dict_val = qobject_to(QDict, ent->value);
-+        list_val = qobject_to(QList, ent->value);
-+        if ((dict_val && qdict_size(dict_val))
-+            || (list_val && !qlist_empty(list_val))) {
-+            error_setg(errp, "Value %s is not flat", ent->key);
-             goto error;
-         }
- 
-@@ -451,9 +463,9 @@ QObject *qdict_crumple(const QDict *src, Error **errp)
-     multi_level = qdict_new();
-     for (ent = qdict_first(two_level); ent != NULL;
-          ent = qdict_next(two_level, ent)) {
--        QDict *dict = qobject_to(QDict, ent->value);
--        if (dict) {
--            child = qdict_crumple(dict, errp);
-+        dict_val = qobject_to(QDict, ent->value);
-+        if (dict_val && qdict_size(dict_val)) {
-+            child = qdict_crumple(dict_val, errp);
-             if (!child) {
-                 goto error;
-             }
 diff --git a/tests/check-block-qdict.c b/tests/check-block-qdict.c
-index 2da16f01a6..1d20fccbd4 100644
+index 5b9f4d506e..29f58a2d3d 100644
 --- a/tests/check-block-qdict.c
 +++ b/tests/check-block-qdict.c
-@@ -79,10 +79,10 @@ static void qdict_flatten_test(void)
-      *     "e.1.2.b": 1,
-      *     "f.c": 2,
-      *     "f.d": 3,
--     *     "g": 4
-+     *     "g": 4,
-+     *     "y.0": {},
-+     *     "z.a": []
+@@ -37,11 +37,11 @@ static void qdict_defaults_test(void)
+ 
+ static void qdict_flatten_test(void)
+ {
+-    QList *list1 = qlist_new();
+-    QList *list2 = qlist_new();
+-    QDict *dict1 = qdict_new();
+-    QDict *dict2 = qdict_new();
+-    QDict *dict3 = qdict_new();
++    QList *e_1 = qlist_new();
++    QList *e = qlist_new();
++    QDict *e_1_2 = qdict_new();
++    QDict *f = qdict_new();
++    QDict *root = qdict_new();
+ 
+     /*
+      * Test the flattening of
+@@ -79,35 +79,36 @@ static void qdict_flatten_test(void)
       * }
--     *
--     * Note that "y" and "z" get eaten.
       */
  
-     qdict_put_int(e_1_2, "a", 0);
-@@ -117,8 +117,10 @@ static void qdict_flatten_test(void)
-     g_assert(qdict_get_int(root, "f.c") == 2);
-     g_assert(qdict_get_int(root, "f.d") == 3);
-     g_assert(qdict_get_int(root, "g") == 4);
-+    g_assert(!qdict_size(qdict_get_qdict(root, "y.0")));
-+    g_assert(qlist_empty(qdict_get_qlist(root, "z.a")));
+-    qdict_put_int(dict1, "a", 0);
+-    qdict_put_int(dict1, "b", 1);
++    qdict_put_int(e_1_2, "a", 0);
++    qdict_put_int(e_1_2, "b", 1);
  
--    g_assert(qdict_size(root) == 8);
-+    g_assert(qdict_size(root) == 10);
+-    qlist_append_int(list1, 23);
+-    qlist_append_int(list1, 66);
+-    qlist_append(list1, dict1);
+-    qlist_append_int(list2, 42);
+-    qlist_append(list2, list1);
++    qlist_append_int(e_1, 23);
++    qlist_append_int(e_1, 66);
++    qlist_append(e_1, e_1_2);
++    qlist_append_int(e, 42);
++    qlist_append(e, e_1);
  
-     qobject_unref(root);
- }
-@@ -387,7 +389,8 @@ static void qdict_join_test(void)
- static void qdict_crumple_test_recursive(void)
- {
-     QDict *src, *dst, *rule, *vnc, *acl, *listen;
--    QList *rules;
-+    QDict *empty, *empty_dict, *empty_list_0;
-+    QList *rules, *empty_list, *empty_dict_a;
+-    qdict_put_int(dict2, "c", 2);
+-    qdict_put_int(dict2, "d", 3);
+-    qdict_put(dict3, "e", list2);
+-    qdict_put(dict3, "f", dict2);
+-    qdict_put_int(dict3, "g", 4);
++    qdict_put_int(f, "c", 2);
++    qdict_put_int(f, "d", 3);
  
-     src = qdict_new();
-     qdict_put_str(src, "vnc.listen.addr", "127.0.0.1");
-@@ -399,10 +402,12 @@ static void qdict_crumple_test_recursive(void)
-     qdict_put_str(src, "vnc.acl.default", "deny");
-     qdict_put_str(src, "vnc.acl..name", "acl0");
-     qdict_put_str(src, "vnc.acl.rule..name", "acl0");
-+    qdict_put(src, "empty.dict.a", qlist_new());
-+    qdict_put(src, "empty.list.0", qdict_new());
+-    qdict_flatten(dict3);
++    qdict_put(root, "e", e);
++    qdict_put(root, "f", f);
++    qdict_put_int(root, "g", 4);
  
-     dst = qobject_to(QDict, qdict_crumple(src, &error_abort));
-     g_assert(dst);
--    g_assert_cmpint(qdict_size(dst), ==, 1);
-+    g_assert_cmpint(qdict_size(dst), ==, 2);
+-    g_assert(qdict_get_int(dict3, "e.0") == 42);
+-    g_assert(qdict_get_int(dict3, "e.1.0") == 23);
+-    g_assert(qdict_get_int(dict3, "e.1.1") == 66);
+-    g_assert(qdict_get_int(dict3, "e.1.2.a") == 0);
+-    g_assert(qdict_get_int(dict3, "e.1.2.b") == 1);
+-    g_assert(qdict_get_int(dict3, "f.c") == 2);
+-    g_assert(qdict_get_int(dict3, "f.d") == 3);
+-    g_assert(qdict_get_int(dict3, "g") == 4);
++    qdict_flatten(root);
  
-     vnc = qdict_get_qdict(dst, "vnc");
-     g_assert(vnc);
-@@ -440,6 +445,21 @@ static void qdict_crumple_test_recursive(void)
-     g_assert_cmpstr("acl0", ==, qdict_get_str(vnc, "acl.name"));
-     g_assert_cmpstr("acl0", ==, qdict_get_str(acl, "rule.name"));
+-    g_assert(qdict_size(dict3) == 8);
++    g_assert(qdict_get_int(root, "e.0") == 42);
++    g_assert(qdict_get_int(root, "e.1.0") == 23);
++    g_assert(qdict_get_int(root, "e.1.1") == 66);
++    g_assert(qdict_get_int(root, "e.1.2.a") == 0);
++    g_assert(qdict_get_int(root, "e.1.2.b") == 1);
++    g_assert(qdict_get_int(root, "f.c") == 2);
++    g_assert(qdict_get_int(root, "f.d") == 3);
++    g_assert(qdict_get_int(root, "g") == 4);
  
-+    empty = qdict_get_qdict(dst, "empty");
-+    g_assert(empty);
-+    g_assert_cmpint(qdict_size(empty), ==, 2);
-+    empty_dict = qdict_get_qdict(empty, "dict");
-+    g_assert(empty_dict);
-+    g_assert_cmpint(qdict_size(empty_dict), ==, 1);
-+    empty_dict_a = qdict_get_qlist(empty_dict, "a");
-+    g_assert(empty_dict_a && qlist_empty(empty_dict_a));
-+    empty_list = qdict_get_qlist(empty, "list");
-+    g_assert(empty_list);
-+    g_assert_cmpint(qlist_size(empty_list), ==, 1);
-+    empty_list_0 = qobject_to(QDict, qlist_pop(empty_list));
-+    g_assert(empty_list_0);
-+    g_assert_cmpint(qdict_size(empty_list_0), ==, 0);
+-    qobject_unref(dict3);
++    g_assert(qdict_size(root) == 8);
 +
-     qobject_unref(src);
-     qobject_unref(dst);
++    qobject_unref(root);
  }
-@@ -587,7 +607,7 @@ static void qdict_rename_keys_test(void)
  
- static void qdict_crumple_test_bad_inputs(void)
- {
--    QDict *src;
-+    QDict *src, *nested;
-     Error *error = NULL;
- 
-     src = qdict_new();
-@@ -614,7 +634,9 @@ static void qdict_crumple_test_bad_inputs(void)
- 
-     src = qdict_new();
-     /* The input should be flat, ie no dicts or lists */
--    qdict_put(src, "rule.a", qdict_new());
-+    nested = qdict_new();
-+    qdict_put(nested, "x", qdict_new());
-+    qdict_put(src, "rule.a", nested);
-     qdict_put_str(src, "rule.b", "allow");
- 
-     g_assert(qdict_crumple(src, &error) == NULL);
+ static void qdict_array_split_test(void)
 -- 
 2.13.6
