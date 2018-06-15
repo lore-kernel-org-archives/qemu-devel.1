@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fTr0T-00007H-V7
+	(envelope-from <berrange@redhat.com>) id 1fTr0U-00007K-1D
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:51:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fTr0S-0006d9-QL
+	(envelope-from <berrange@redhat.com>) id 1fTr0S-0006cy-Mg
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:51:22 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Fri, 15 Jun 2018 16:51:01 +0100
-Message-Id: <20180615155103.11924-5-berrange@redhat.com>
+Date: Fri, 15 Jun 2018 16:51:00 +0100
+Message-Id: <20180615155103.11924-4-berrange@redhat.com>
 In-Reply-To: <20180615155103.11924-1-berrange@redhat.com>
 References: <20180615155103.11924-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH 4/6] chardev: add support for authorization for
- TLS clients
+Subject: [Qemu-devel] [PATCH 3/6] migration: add support for a "tls-authz"
+ migration parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,134 +25,138 @@ Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mr
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Currently any client which can complete the TLS handshake is able to use
-a chardev server. The server admin can turn on the 'verify-peer' option
-for the x509 creds to require the client to provide a x509
-certificate. This means the client will have to acquire a certificate
-from the CA before they are permitted to use the chardev server. This is
-still a fairly low bar.
-
-This adds a 'tls-authz=OBJECT-ID' option to the socket chardev backend
-which takes the ID of a previously added 'QAuthZ' object instance. This
-will be used to validate the client's x509 distinguished name. Clients
-failing the check will not be permitted to use the chardev server.
-
-For example to setup authorization that only allows connection from a
-client whose x509 certificate distinguished name contains 'CN=fred', you
-would use:
-
-  $QEMU -object tls-creds-x509,id=tls0,dir=/home/berrange/qemutls,\
-                endpoint=server,verify-peer=yes \
-        -object authz-simple,id=authz0,policy=deny,\
-                rules.0.match=\*CN=fred,rules.0.policy=allow \
-        -chardev socket,host=127.0.0.1,port=9000,server,\
-	         tls-creds=tls0,tls-authz=authz0 \
-        ...other qemud args...
+The QEMU instance that runs as the server for the migration data
+transport (ie the target QEMU) needs to be able to configure access
+control so it can prevent unauthorized clients initiating an incoming
+migration. This adds a new 'tls-authz' migration parameter that is used
+to provide the QOM ID of a QAuthZ subclass instance that provides the
+access control check. This is checked against the x509 certificate
+obtained during the TLS handshake.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- chardev/char-socket.c | 11 ++++++++++-
- chardev/char.c        |  3 +++
- qapi/char.json        |  2 ++
- 3 files changed, 15 insertions(+), 1 deletion(-)
+ hmp.c                 |  9 +++++++++
+ migration/migration.c |  8 ++++++++
+ migration/tls.c       |  2 +-
+ qapi/migration.json   | 12 +++++++++++-
+ 4 files changed, 29 insertions(+), 2 deletions(-)
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index 159e69c3b1..d0c9d26025 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -53,6 +53,7 @@ typedef struct {
-     QIONetListener *listener;
-     GSource *hup_source;
-     QCryptoTLSCreds *tls_creds;
-+    char *tls_authz;
-     int connected;
-     int max_size;
-     int do_telnetopt;
-@@ -729,7 +730,7 @@ static void tcp_chr_tls_init(Chardev *chr)
-     if (s->is_listen) {
-         tioc = qio_channel_tls_new_server(
-             s->ioc, s->tls_creds,
--            NULL, /* XXX Use an ACL */
-+            s->tls_authz,
-             &err);
-     } else {
-         tioc = qio_channel_tls_new_client(
-@@ -881,6 +882,7 @@ static void char_socket_finalize(Object *obj)
-     if (s->tls_creds) {
-         object_unref(OBJECT(s->tls_creds));
+diff --git a/hmp.c b/hmp.c
+index 74e18db103..bef8ea2531 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -370,6 +370,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "%s: %" PRIu64 "\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_SIZE),
+             params->xbzrle_cache_size);
++        monitor_printf(mon, " %s: '%s'\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_TLS_AUTHZ),
++            params->has_tls_authz ? params->tls_authz : "");
      }
-+    g_free(s->tls_authz);
  
-     qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
- }
-@@ -986,6 +988,7 @@ static void qmp_chardev_open_socket(Chardev *chr,
-             }
-         }
+     qapi_free_MigrationParameters(params);
+@@ -1632,6 +1635,12 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+         p->tls_hostname->type = QTYPE_QSTRING;
+         visit_type_str(v, param, &p->tls_hostname->u.s, &err);
+         break;
++    case MIGRATION_PARAMETER_TLS_AUTHZ:
++        p->has_tls_authz = true;
++        p->tls_authz = g_new0(StrOrNull, 1);
++        p->tls_authz->type = QTYPE_QSTRING;
++        visit_type_str(v, param, &p->tls_authz->u.s, &err);
++        break;
+     case MIGRATION_PARAMETER_MAX_BANDWIDTH:
+         p->has_max_bandwidth = true;
+         /*
+diff --git a/migration/migration.c b/migration/migration.c
+index 1e99ec9b7e..d14c8d7003 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -645,6 +645,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+     params->tls_creds = g_strdup(s->parameters.tls_creds);
+     params->has_tls_hostname = true;
+     params->tls_hostname = g_strdup(s->parameters.tls_hostname);
++    params->has_tls_authz = true;
++    params->tls_authz = g_strdup(s->parameters.tls_authz);
+     params->has_max_bandwidth = true;
+     params->max_bandwidth = s->parameters.max_bandwidth;
+     params->has_downtime_limit = true;
+@@ -1106,6 +1108,12 @@ static void migrate_params_apply(MigrateSetParameters *params, Error **errp)
+         s->parameters.tls_hostname = g_strdup(params->tls_hostname->u.s);
      }
-+    s->tls_authz = g_strdup(sock->tls_authz);
  
-     s->addr = addr = socket_address_flatten(sock->addr);
- 
-@@ -1066,6 +1069,7 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
-     const char *fd = qemu_opt_get(opts, "fd");
-     const char *tls_creds = qemu_opt_get(opts, "tls-creds");
-     SocketAddressLegacy *addr;
-+    const char *tls_authz = qemu_opt_get(opts, "tls-authz");
-     ChardevSocket *sock;
- 
-     if ((!!path + !!fd + !!host) != 1) {
-@@ -1094,6 +1098,10 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
-     } else {
-         g_assert_not_reached();
-     }
-+    if (tls_authz && !tls_creds) {
-+        error_setg(errp, "Authorization can only be used when TLS is enabled");
-+        return;
++    if (params->has_tls_authz) {
++        g_free(s->parameters.tls_authz);
++        assert(params->tls_authz->type == QTYPE_QSTRING);
++        s->parameters.tls_authz = g_strdup(params->tls_authz->u.s);
 +    }
++
+     if (params->has_max_bandwidth) {
+         s->parameters.max_bandwidth = params->max_bandwidth;
+         if (s->to_dst_file) {
+diff --git a/migration/tls.c b/migration/tls.c
+index 3b9e8c9263..5171afc6c4 100644
+--- a/migration/tls.c
++++ b/migration/tls.c
+@@ -94,7 +94,7 @@ void migration_tls_channel_process_incoming(MigrationState *s,
  
-     sock = backend->u.socket.data = g_new0(ChardevSocket, 1);
-     qemu_chr_parse_common(opts, qapi_ChardevSocket_base(sock));
-@@ -1111,6 +1119,7 @@ static void qemu_chr_parse_socket(QemuOpts *opts, ChardevBackend *backend,
-     sock->has_reconnect = true;
-     sock->reconnect = reconnect;
-     sock->tls_creds = g_strdup(tls_creds);
-+    sock->tls_authz = g_strdup(tls_authz);
- 
-     addr = g_new0(SocketAddressLegacy, 1);
-     if (path) {
-diff --git a/chardev/char.c b/chardev/char.c
-index 76d866e6fe..d28c16ccca 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -837,6 +837,9 @@ QemuOptsList qemu_chardev_opts = {
-         },{
-             .name = "tls-creds",
-             .type = QEMU_OPT_STRING,
-+        },{
-+            .name = "tls-authz",
-+            .type = QEMU_OPT_STRING,
-         },{
-             .name = "width",
-             .type = QEMU_OPT_NUMBER,
-diff --git a/qapi/char.json b/qapi/char.json
-index ae19dcd1ed..284f3ee4f1 100644
---- a/qapi/char.json
-+++ b/qapi/char.json
-@@ -242,6 +242,7 @@
- # @addr: socket address to listen on (server=true)
- #        or connect to (server=false)
- # @tls-creds: the ID of the TLS credentials object (since 2.6)
-+# @tls-authz: the ID of the QAuthZ authorization object (since 2.13)
- # @server: create server socket (default: true)
- # @wait: wait for incoming connection on server
- #        sockets (default: false).
-@@ -259,6 +260,7 @@
- ##
- { 'struct': 'ChardevSocket', 'data': { 'addr'       : 'SocketAddressLegacy',
-                                      '*tls-creds'  : 'str',
-+                                     '*tls-authz'  : 'str',
-                                      '*server'    : 'bool',
-                                      '*wait'      : 'bool',
-                                      '*nodelay'   : 'bool',
+     tioc = qio_channel_tls_new_server(
+         ioc, creds,
+-        NULL, /* XXX pass ACL name */
++        s->parameters.tls_authz,
+         errp);
+     if (!tioc) {
+         return;
+diff --git a/qapi/migration.json b/qapi/migration.json
+index f7e10ee90f..b9ba34e3a6 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -488,6 +488,10 @@
+ #                hostname must be provided so that the server's x509
+ #                certificate identity can be validated. (Since 2.7)
+ #
++# @tls-authz: ID of the 'authz' object subclass that provides access control
++#             checking of the TLS x509 certificate distinguished name. (Since
++#             2.13)
++#
+ # @max-bandwidth: to set maximum speed for migration. maximum speed in
+ #                 bytes per second. (Since 2.8)
+ #
+@@ -522,7 +526,7 @@
+ { 'enum': 'MigrationParameter',
+   'data': ['compress-level', 'compress-threads', 'decompress-threads',
+            'cpu-throttle-initial', 'cpu-throttle-increment',
+-           'tls-creds', 'tls-hostname', 'max-bandwidth',
++           'tls-creds', 'tls-hostname', 'tls-authz', 'max-bandwidth',
+            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+            'x-multifd-channels', 'x-multifd-page-count',
+            'xbzrle-cache-size' ] }
+@@ -605,6 +609,7 @@
+             '*cpu-throttle-increment': 'int',
+             '*tls-creds': 'StrOrNull',
+             '*tls-hostname': 'StrOrNull',
++            '*tls-authz': 'StrOrNull',
+             '*max-bandwidth': 'int',
+             '*downtime-limit': 'int',
+             '*x-checkpoint-delay': 'int',
+@@ -667,6 +672,10 @@
+ #                associated with the migration URI, if any. (Since 2.9)
+ #                Note: 2.8 reports this by omitting tls-hostname instead.
+ #
++# @tls-authz: ID of the 'authz' object subclass that provides access control
++#             checking of the TLS x509 certificate distinguished name. (Since
++#             2.13)
++#
+ # @max-bandwidth: to set maximum speed for migration. maximum speed in
+ #                 bytes per second. (Since 2.8)
+ #
+@@ -704,6 +713,7 @@
+             '*cpu-throttle-increment': 'uint8',
+             '*tls-creds': 'str',
+             '*tls-hostname': 'str',
++            '*tls-authz': 'str',
+             '*max-bandwidth': 'size',
+             '*downtime-limit': 'uint64',
+             '*x-checkpoint-delay': 'uint32',
 -- 
 2.17.0
