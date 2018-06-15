@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34504)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@pond.sub.org>) id 1fTnzO-0002Aw-9s
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:38:04 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fTo0t-0003IP-S8
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:39:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@pond.sub.org>) id 1fTnzL-00017D-67
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:38:02 -0400
-Received: from oxygen.pond.sub.org ([144.76.244.19]:35466)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@pond.sub.org>) id 1fTnzK-00015A-Uo
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:37:59 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180615014249.22730-1-peterx@redhat.com>
-	<20180615014249.22730-5-peterx@redhat.com>
-Date: Fri, 15 Jun 2018 14:37:49 +0200
-Message-ID: <87wov02pk2.fsf@dusky.pond.sub.org>
+	(envelope-from <imammedo@redhat.com>) id 1fTo0p-0001j2-Pg
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:39:34 -0400
+Date: Fri, 15 Jun 2018 14:39:23 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180615143923.1babac86@redhat.com>
+In-Reply-To: <20180615112500.19854-7-david@redhat.com>
+References: <20180615112500.19854-1-david@redhat.com>
+	<20180615112500.19854-7-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 4/6] docs: mention shared state protect
- for OOB
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 06/12] hostmem: drop error variable from
+ host_memory_backend_get_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,79 +24,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Dr
-	. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-Peter Xu <peterx@redhat.com> writes:
+On Fri, 15 Jun 2018 13:24:54 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> Out-Of-Band handlers need to protect shared state if there is any.
-> Mention it in the document.
->
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> Unused, so let's remove it.
+>=20
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+breaks compilation with
+
+ hw/mem/nvdimm.c:171:5: error: too many arguments to function =E2=80=98host=
+_memory_backend_get_memory=E2=80=99
+     return host_memory_backend_get_memory(dimm->hostmem, &error_abort);
+
+
 > ---
->  docs/devel/qapi-code-gen.txt | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-> index 1366228b2a..bee9de35df 100644
-> --- a/docs/devel/qapi-code-gen.txt
-> +++ b/docs/devel/qapi-code-gen.txt
-> @@ -680,6 +680,9 @@ OOB command handlers must satisfy the following conditions:
-   Under normal QMP command execution, the following apply to each
-   command:
-
-   - They are executed in order,
-   - They run only in main thread of QEMU,
-   - They have the BQL taken during execution.
-
-Not this patch's fault, but this sounds awkward.  Perhaps "They run with
-the BQL held."
-
-   When a command is executed with OOB, the following changes occur:
-
-   - They can be completed before a pending in-band command,
-   - They run in a dedicated monitor thread,
-   - They do not take the BQL during execution.
-
-"They run with the BQL not held".
-
-   OOB command handlers must satisfy the following conditions:
-
-   - It executes extremely fast,
-
-"It terminates quickly"
-
-   - It does not take any lock, or, it can take very small locks if all
-     critical regions also follow the rules for OOB command handler code,
-
-"It takes only "fast" locks, i.e. all critical sections protected by any
-lock it takes also satisfy the conditions for OOB command handler code."
-Maybe make it the last item.
-
->  - It does not invoke system calls that may block,
->  - It does not access guest RAM that may block when userfaultfd is
->    enabled for postcopy live migration.
-
-All these are corollaries of the first item.  But that's okay.
-
-> +- It needs to protect any shared state, since as long as a command
-> +  supports Out-Of-Band it means the handler can be run in parallel
-> +  with the same handler running in the other thread.
-
-"in another thread"
-
-Not just the same handler is a potential problem.  Any code accessing
-shared state from another thread is.
-
-"It needs" is not really a condition.
-
-Perhaps we can make this a separate paragraph rather than an additional
-item:
-
-   The restrictions on locking limit access to shared state.  Such
-   access requires synchronization, but OOB commands can't take the BQL
-   or any other "slow" lock.
-
->  If in doubt, do not implement OOB execution support.
+>  backends/hostmem.c       | 3 +--
+>  hw/mem/nvdimm.c          | 4 ++--
+>  hw/mem/pc-dimm.c         | 4 ++--
+>  hw/misc/ivshmem.c        | 3 +--
+>  include/sysemu/hostmem.h | 3 +--
+>  numa.c                   | 3 +--
+>  6 files changed, 8 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/backends/hostmem.c b/backends/hostmem.c
+> index 3627e61584..4908946cd3 100644
+> --- a/backends/hostmem.c
+> +++ b/backends/hostmem.c
+> @@ -247,8 +247,7 @@ bool host_memory_backend_mr_inited(HostMemoryBackend =
+*backend)
+>      return memory_region_size(&backend->mr) !=3D 0;
+>  }
+> =20
+> -MemoryRegion *
+> -host_memory_backend_get_memory(HostMemoryBackend *backend, Error **errp)
+> +MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend)
+>  {
+>      return host_memory_backend_mr_inited(backend) ? &backend->mr : NULL;
+>  }
+> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+> index 4087aca25e..37e19044d6 100644
+> --- a/hw/mem/nvdimm.c
+> +++ b/hw/mem/nvdimm.c
+> @@ -105,7 +105,7 @@ static MemoryRegion *nvdimm_get_memory_region(PCDIMMD=
+evice *dimm, Error **errp)
+> =20
+>  static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+>  {
+> -    MemoryRegion *mr =3D host_memory_backend_get_memory(dimm->hostmem, e=
+rrp);
+> +    MemoryRegion *mr =3D host_memory_backend_get_memory(dimm->hostmem);
+>      NVDIMMDevice *nvdimm =3D NVDIMM(dimm);
+>      uint64_t align, pmem_size, size =3D memory_region_size(mr);
+> =20
+> @@ -161,7 +161,7 @@ static void nvdimm_write_label_data(NVDIMMDevice *nvd=
+imm, const void *buf,
+> =20
+>      memcpy(nvdimm->label_data + offset, buf, size);
+> =20
+> -    mr =3D host_memory_backend_get_memory(dimm->hostmem, &error_abort);
+> +    mr =3D host_memory_backend_get_memory(dimm->hostmem);
+>      backend_offset =3D memory_region_size(mr) - nvdimm->label_size + off=
+set;
+>      memory_region_set_dirty(mr, backend_offset, size);
+>  }
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index 7387963cf1..73f0eee4c7 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -226,12 +226,12 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDI=
+MMDevice *dimm, Error **errp)
+>          return NULL;
+>      }
+> =20
+> -    return host_memory_backend_get_memory(dimm->hostmem, errp);
+> +    return host_memory_backend_get_memory(dimm->hostmem);
+>  }
+> =20
+>  static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dim=
+m)
+>  {
+> -    return host_memory_backend_get_memory(dimm->hostmem, &error_abort);
+> +    return host_memory_backend_get_memory(dimm->hostmem);
+>  }
+> =20
+>  static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+> index 16f03701b7..ee01c5e66b 100644
+> --- a/hw/misc/ivshmem.c
+> +++ b/hw/misc/ivshmem.c
+> @@ -909,8 +909,7 @@ static void ivshmem_common_realize(PCIDevice *dev, Er=
+ror **errp)
+>      if (s->hostmem !=3D NULL) {
+>          IVSHMEM_DPRINTF("using hostmem\n");
+> =20
+> -        s->ivshmem_bar2 =3D host_memory_backend_get_memory(s->hostmem,
+> -                                                         &error_abort);
+> +        s->ivshmem_bar2 =3D host_memory_backend_get_memory(s->hostmem);
+>      } else {
+>          Chardev *chr =3D qemu_chr_fe_get_driver(&s->server_chr);
+>          assert(chr);
+> diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+> index 5beb0ef8ab..6e6bd2c1cb 100644
+> --- a/include/sysemu/hostmem.h
+> +++ b/include/sysemu/hostmem.h
+> @@ -62,8 +62,7 @@ struct HostMemoryBackend {
+>  };
+> =20
+>  bool host_memory_backend_mr_inited(HostMemoryBackend *backend);
+> -MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend,
+> -                                             Error **errp);
+> +MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend);
+> =20
+>  void host_memory_backend_set_mapped(HostMemoryBackend *backend, bool map=
+ped);
+>  bool host_memory_backend_is_mapped(HostMemoryBackend *backend);
+> diff --git a/numa.c b/numa.c
+> index 33572bfa74..94f758c757 100644
+> --- a/numa.c
+> +++ b/numa.c
+> @@ -523,8 +523,7 @@ void memory_region_allocate_system_memory(MemoryRegio=
+n *mr, Object *owner,
+>          if (!backend) {
+>              continue;
+>          }
+> -        MemoryRegion *seg =3D host_memory_backend_get_memory(backend,
+> -                                                           &error_fatal);
+> +        MemoryRegion *seg =3D host_memory_backend_get_memory(backend);
+> =20
+>          if (memory_region_is_mapped(seg)) {
+>              char *path =3D object_get_canonical_path_component(OBJECT(ba=
+ckend));
