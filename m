@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1fTujh-0004ni-CO
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:50:18 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fTuoW-0000WG-Ba
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:55:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1fTujc-00007H-GV
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:50:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44060)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1fTujc-000067-6o
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:50:12 -0400
-Date: Fri, 15 Jun 2018 15:32:27 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-Message-ID: <20180615183224.GA6108@amt.cnet>
-References: <20180612184616.90838-1-mst@redhat.com>
-	<20180613223449.GA18339@amt.cnet>
-	<20180614022834-mutt-send-email-mst@kernel.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1fTuoS-0006QV-9D
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:55:16 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:38949)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fTuoS-0006P0-2G
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:55:12 -0400
+Received: by mail-wr0-x244.google.com with SMTP id w7-v6so10981487wrn.6
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 12:55:11 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 15 Jun 2018 20:46:30 +0100
+Message-Id: <20180615194705.28019-20-alex.bennee@linaro.org>
+In-Reply-To: <20180615194705.28019-1-alex.bennee@linaro.org>
+References: <20180615194705.28019-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180614022834-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] kvm: x86 CPU power management
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v7 19/54] tests/tcg/x86_64: add Makefile.target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org
+To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Thu, Jun 14, 2018 at 02:37:28AM +0300, Michael S. Tsirkin wrote:
-> On Wed, Jun 13, 2018 at 07:34:53PM -0300, Marcelo Tosatti wrote:
-> > On Tue, Jun 12, 2018 at 09:47:11PM +0300, Michael S. Tsirkin wrote:
-> > > This adds ability to expose host CPU power management capabilities to
-> > > guests. For intel guests, this is sufficient for guest to enable
-> > > low power CPU power management. For AMD guests it isn't sufficient,
-> > > deeper C-states are entered using System-IO.
-> > > 
-> > > mwait based power management is tied closely to specifics of CPUID,
-> > > making migration challenging. At this point only the non-migrateable
-> > > -cpu host is supported.
-> > > 
-> > > With this patch applied, VM latency is within the noise of
-> > > baremetal for some benchmarks.
-> > > 
-> > > perf bench sched pipe results:
-> > > Before:
-> > >     6.452 sec
-> > > After:
-> > >     4.382 sec
-> > > Baremetal:
-> > >     4.136 sec
-> > > 
-> > > Michael S. Tsirkin (2):
-> > >   kvm: support -realtime cpu-pm=on|off
-> > >   i386/cpu: make -cpu host support monitor/mwait
-> > > 
-> > >  include/sysemu/sysemu.h |  1 +
-> > >  target/i386/cpu.h       |  9 +++++++++
-> > >  target/i386/cpu.c       | 19 ++++++++++++++-----
-> > >  target/i386/kvm.c       | 30 ++++++++++++++++++++++++++++++
-> > >  vl.c                    |  6 ++++++
-> > >  qemu-options.hx         |  9 +++++++--
-> > >  6 files changed, 67 insertions(+), 7 deletions(-)
-> > > 
-> > > -- 
-> > > MST
-> > 
-> > Hi Michael,
-> > 
-> > 1) Command line option interface
-> > 
-> > Why is this not an optional cpu feature such as the other features? 
-> > 
-> > 
-> > -cpu CPU,+mwait  
-> > 
-> > rather than a separate, architecture independent "-realtime cpu-pm=on|off" 
-> > command line option?
-> 
-> Because it's not just a guest flag. With guest pm on, one guest
-> can severely affect the latency of others on the same host CPU.
+The sources for x86_64 are shared in the i386 directory which will be
+included thanks to TARGET_BASE_ARCH. However not all sources build so
+we need to filter out the ones we can't build in the 64 bit world and
+those that can't be built for 32 bit.
 
-How so ?
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> > 2) Migration
-> > 
-> > Isnt it sufficient to check that both CPUID leafs are the same, 
-> > to allow migration ?
-> 
-> Not at the moment since linux guests use mwait hints and latency values
-> from a table in intel_idle.  If the host and guest models do not match,
-> mwait will get a wrong hint.
-> 
-> It will not do the right thing then!
-> 
-> You want exactly the same host CPU for it to work.
-> 
-> This isn't different from how -host cpu works generally.
+---
+v4
+  - update MAINTAINERS
+v5
+  - merge with disable i386 version of test-i386-ssse
+---
+ MAINTAINERS                      |  1 +
+ tests/tcg/i386/Makefile.target   |  4 ++--
+ tests/tcg/x86_64/Makefile.target | 15 +++++++++++++++
+ 3 files changed, 18 insertions(+), 2 deletions(-)
+ create mode 100644 tests/tcg/x86_64/Makefile.target
 
-Ok, makes sense.
-
-> > 1. Check that the processor supports MONITOR and MWAIT. If
-> > CPUID.01H:ECX.MONITOR[bit 3] = 1, MONITOR and MWAIT are available at
-> > ring 0.
-> > 
-> > 2. Query the smallest and largest line size that MONITOR uses.
-> > Use CPUID.05H:EAX.smallest[bits 15:0];EBX.largest[bits15:0]. 
-> > 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index ea298cc910..57c828644f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -284,6 +284,7 @@ M: Eduardo Habkost <ehabkost@redhat.com>
+ S: Maintained
+ F: target/i386/
+ F: tests/tcg/i386/
++F: tests/tcg/x86_64/
+ F: hw/i386/
+ F: disas/i386.c
+ T: git git://github.com/ehabkost/qemu.git x86-next
+diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
+index 64d241cfdf..cd173363ee 100644
+--- a/tests/tcg/i386/Makefile.target
++++ b/tests/tcg/i386/Makefile.target
+@@ -7,9 +7,9 @@ VPATH 		+= $(I386_SRC)
+ 
+ I386_SRCS=$(notdir $(wildcard $(I386_SRC)/*.c))
+ I386_TESTS=$(I386_SRCS:.c=)
+-
++I386_ONLY_TESTS=$(filter-out test-i386-ssse3, $(I386_TESTS))
+ # Update TESTS
+-TESTS+=$(I386_TESTS)
++TESTS+=$(I386_ONLY_TESTS)
+ 
+ ifneq ($(TARGET_NAME),x86_64)
+ CFLAGS+=-m32
+diff --git a/tests/tcg/x86_64/Makefile.target b/tests/tcg/x86_64/Makefile.target
+new file mode 100644
+index 0000000000..74f170b9ed
+--- /dev/null
++++ b/tests/tcg/x86_64/Makefile.target
+@@ -0,0 +1,15 @@
++# -*- Mode: makefile -*-
++#
++# x86_64 tests - included from tests/tcg/Makefile.target
++#
++# Currently we only build test-x86_64 and test-i386-ssse3 from
++# $(SRC)/tests/tcg/i386/
++#
++
++X86_64_TESTS=$(filter-out $(I386_ONLY_TESTS), $(TESTS))
++X86_64_TESTS+=test-x86_64
++TESTS:=$(X86_64_TESTS)
++
++test-x86_64: LDFLAGS+=-lm -lc
++test-x86_64: test-i386.c test-i386.h test-i386-shift.h test-i386-muldiv.h
++	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
+-- 
+2.17.1
