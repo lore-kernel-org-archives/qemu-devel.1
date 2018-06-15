@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTugj-0002Ub-Dl
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:47:14 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fTugk-0002Vd-JF
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:47:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTugg-0005Ei-Jj
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:47:13 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:46488)
+	(envelope-from <alex.bennee@linaro.org>) id 1fTugj-0005J0-BH
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:47:14 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:43808)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fTugg-0005Dy-D8
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:47:10 -0400
-Received: by mail-wr0-x242.google.com with SMTP id v13-v6so10940278wrp.13
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 12:47:10 -0700 (PDT)
+	id 1fTugj-0005HT-4a
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:47:13 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id d2-v6so10941971wrm.10
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 12:47:12 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 15 Jun 2018 20:46:13 +0100
-Message-Id: <20180615194705.28019-3-alex.bennee@linaro.org>
+Date: Fri, 15 Jun 2018 20:46:16 +0100
+Message-Id: <20180615194705.28019-6-alex.bennee@linaro.org>
 In-Reply-To: <20180615194705.28019-1-alex.bennee@linaro.org>
 References: <20180615194705.28019-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v7 02/54] configure: move i386_cc to
- cross_cc_i386
+Subject: [Qemu-devel] [PATCH v7 05/54] docker: Add "cc" subcommand
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,120 +32,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Also dont assume x86_64 compiler can build i386 binaries.
-
+Signed-off-by: Fam Zheng <famz@redhat.com>
+[AJB: add if args.paths check]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
 v2
-  - drop using system x86_64 compiler for i386 compiles
-v3
-  - fix cross_cc_i386 when on i386
-v4
-  - fix merge conflicts
-  - sort cross_cc defines
+  - add if args.paths check to avoid iterating null argument
 ---
- configure | 24 +++++++++++++++++-------
- 1 file changed, 17 insertions(+), 7 deletions(-)
+ tests/docker/docker.py | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/configure b/configure
-index 089de03918..6e33dbbe10 100755
---- a/configure
-+++ b/configure
-@@ -289,7 +289,6 @@ libs_softmmu=""
- libs_tools=""
- audio_pt_int=""
- audio_win_int=""
--cc_i386=i386-pc-linux-gnu-gcc
- libs_qga=""
- debug_info="yes"
- stack_protector=""
-@@ -461,6 +460,8 @@ docker="no"
- # cross compilers defaults, can be overridden with --cross-cc-ARCH
- cross_cc_aarch64="aarch64-linux-gnu-gcc"
- cross_cc_arm="arm-linux-gnueabihf-gcc"
-+cross_cc_i386="i386-pc-linux-gnu-gcc"
-+cross_cc_cflags_i386=""
- cross_cc_powerpc="powerpc-linux-gnu-gcc"
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 306e14cf69..4cd6f9b8ec 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -409,6 +409,31 @@ class ProbeCommand(SubCommand):
+         return
  
- enabled_cross_compilers=""
-@@ -1447,7 +1448,8 @@ case "$cpu" in
-     i386)
-            CPU_CFLAGS="-m32"
-            LDFLAGS="-m32 $LDFLAGS"
--           cc_i386='$(CC) -m32'
-+           cross_cc_i386=$cc
-+           cross_cc_cflags_i386=$CPU_CFLAGS
-            ;;
-     x86_64)
-            # ??? Only extremely old AMD cpus do not have cmpxchg16b.
-@@ -1455,12 +1457,14 @@ case "$cpu" in
-            # runtime and generate the fallback to serial emulation.
-            CPU_CFLAGS="-m64 -mcx16"
-            LDFLAGS="-m64 $LDFLAGS"
--           cc_i386='$(CC) -m32'
-+           cross_cc_x86_64=$cc
-+           cross_cc_cflags_x86_64=$CPU_CFLAGS
-            ;;
-     x32)
-            CPU_CFLAGS="-mx32"
-            LDFLAGS="-mx32 $LDFLAGS"
--           cc_i386='$(CC) -m32'
-+           cross_cc_i386=$cc
-+           cross_cc_cflags_i386="-m32"
-            ;;
-     # No special flags required for other host CPUs
- esac
-@@ -6723,7 +6727,6 @@ echo "CC=$cc" >> $config_host_mak
- if $iasl -h > /dev/null 2>&1; then
-   echo "IASL=$iasl" >> $config_host_mak
- fi
--echo "CC_I386=$cc_i386" >> $config_host_mak
- echo "HOST_CC=$host_cc" >> $config_host_mak
- echo "CXX=$cxx" >> $config_host_mak
- echo "OBJCC=$objcc" >> $config_host_mak
-@@ -6844,6 +6847,7 @@ esac
  
- target_compiler=""
- target_compiler_static=""
-+target_compiler_cflags=""
- 
- mkdir -p $target_dir
- echo "# Automatically generated by configure - do not modify" > $config_target_mak
-@@ -6861,6 +6865,7 @@ case "$target_name" in
-   i386)
-     gdb_xml_files="i386-32bit.xml i386-32bit-core.xml i386-32bit-sse.xml"
-     target_compiler=$cross_cc_i386
-+    target_compiler_cflags=$cross_cc_ccflags_i386
-   ;;
-   x86_64)
-     TARGET_BASE_ARCH=i386
-@@ -7033,9 +7038,9 @@ if has $target_compiler; then
- 
-     write_c_skeleton
- 
--    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
-+    if ! do_compiler $target_compiler $target_compiler_cflags -o $TMPE $TMPC -static ; then
-         # For host systems we might get away with building without -static
--        if ! do_compiler $target_compiler -o $TMPE $TMPC ; then
-+        if ! do_compiler $target_compiler $target_compiler_cflags -o $TMPE $TMPC ; then
-             target_compiler=""
-         else
-             enabled_cross_compilers="${enabled_cross_compilers} ${target_compiler}"
-@@ -7128,8 +7133,13 @@ if test -n "$target_compiler"; then
-   if test -n "$target_compiler_static"; then
-       echo "CROSS_CC_GUEST_STATIC=$target_compiler_static" >> $config_target_mak
-   fi
++class CcCommand(SubCommand):
++    """Compile sources with cc in images"""
++    name = "cc"
 +
-+  if test -n "$target_compiler_cflags"; then
-+      echo "CROSS_CC_GUEST_CFLAGS=$target_compiler_cflags" >> $config_target_mak
-+  fi
- fi
- 
++    def args(self, parser):
++        parser.add_argument("--image", "-i", required=True,
++                            help="The docker image in which to run cc")
++        parser.add_argument("--source-path", "-s", nargs="*", dest="paths",
++                            help="""Extra paths to (ro) mount into container for
++                            reading sources""")
 +
- # generate QEMU_CFLAGS/LDFLAGS for targets
- 
- cflags=""
++    def run(self, args, argv):
++        if argv and argv[0] == "--":
++            argv = argv[1:]
++        cwd = os.getcwd()
++        cmd = ["--rm", "-w", cwd,
++               "-v", "%s:%s:rw" % (cwd, cwd)]
++        if args.paths:
++            for p in args.paths:
++                cmd += ["-v", "%s:%s:ro,z" % (p, p)]
++        cmd += [args.image, "cc"]
++        cmd += argv
++        return Docker().command("run", cmd, args.quiet)
++
++
+ def main():
+     parser = argparse.ArgumentParser(description="A Docker helper",
+             usage="%s <subcommand> ..." % os.path.basename(sys.argv[0]))
 -- 
 2.17.1
