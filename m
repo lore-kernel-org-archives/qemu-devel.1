@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fTsKT-0006G2-1r
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:16:06 -0400
+	(envelope-from <clg@kaod.org>) id 1fTsMg-0007zD-P1
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:18:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fTsKO-0007SI-Ru
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:16:05 -0400
-Received: from mail-eopbgr730053.outbound.protection.outlook.com
-	([40.107.73.53]:16992
-	helo=NAM05-DM3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fTsKO-0007R7-Fh
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:16:00 -0400
-From: Babu Moger <babu.moger@amd.com>
-Date: Fri, 15 Jun 2018 13:15:44 -0400
-Message-ID: <1529082947-60001-1-git-send-email-babu.moger@amd.com>
+	(envelope-from <clg@kaod.org>) id 1fTsMc-0001Aj-Iz
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:18:22 -0400
+Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:35253)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTsMc-00019X-90
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:18:18 -0400
+Received: from player759.ha.ovh.net (unknown [10.109.108.65])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 3699817D6C
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 19:18:15 +0200 (CEST)
+References: <20180615115303.31125-1-clg@kaod.org>
+	<20180615115303.31125-4-clg@kaod.org>
+	<20180615180311.6d16e506@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <c5182296-b9f5-0072-8d13-551d71560394@kaod.org>
+Date: Fri, 15 Jun 2018 19:18:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180615180311.6d16e506@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v15 0/3] i386: Enable TOPOEXT to support
- hyperthreading on AMD CPU
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 3/3] spapr: introduce a fixed
+ IRQ number space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,237 +33,473 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
-Cc: qemu-devel@nongnu.org, mtosatti@redhat.com, kvm@vger.kernel.org, kash@tripleback.net, geoff@hostfission.com, babu.moger@amd.com
+To: Greg Kurz <groug@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-This series enables the TOPOEXT feature for AMD CPUs. This is required to
-support hyperthreading on kvm guests.
+Hello,
 
-This addresses the issues reported in these bugs:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1481253
-https://bugs.launchpad.net/qemu/+bug/1703506=20
+On 06/15/2018 06:03 PM, Greg Kurz wrote:
+> On Fri, 15 Jun 2018 13:53:03 +0200
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> This proposal introduces a new IRQ number space layout using static
+>> numbers for all devices and a bitmap allocator for the MSI numbers
+>> which are negotiated by the guest at runtime.
+>>
+>> The previous layout is kept in machines raising the 'xics_legacy'
+>> flag.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/spapr.h     |  4 ++++
+>>  include/hw/ppc/spapr_irq.h | 30 ++++++++++++++++++++++++
+>>  hw/ppc/spapr.c             | 31 +++++++++++++++++++++++++
+>>  hw/ppc/spapr_events.c      | 12 ++++++++--
+>>  hw/ppc/spapr_irq.c         | 57 +++++++++++++++++++++++++++++++++++++=
++++++++++
+>>  hw/ppc/spapr_pci.c         | 28 ++++++++++++++++++-----
+>>  hw/ppc/spapr_vio.c         | 15 ++++++++----
+>>  hw/ppc/Makefile.objs       |  2 +-
+>>  8 files changed, 166 insertions(+), 13 deletions(-)
+>>  create mode 100644 include/hw/ppc/spapr_irq.h
+>>  create mode 100644 hw/ppc/spapr_irq.c
+>>
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index 49cda04b1493..094c7780130e 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -7,6 +7,7 @@
+>>  #include "hw/ppc/spapr_drc.h"
+>>  #include "hw/mem/pc-dimm.h"
+>>  #include "hw/ppc/spapr_ovec.h"
+>> +#include "hw/ppc/spapr_irq.h"
+>> =20
+>>  struct VIOsPAPRBus;
+>>  struct sPAPRPHBState;
+>> @@ -164,6 +165,9 @@ struct sPAPRMachineState {
+>>      char *kvm_type;
+>> =20
+>>      const char *icp_type;
+>> +    bool xics_legacy;
+>> +    int32_t irq_map_nr;
+>> +    unsigned long *irq_map;
+>> =20
+>>      bool cmd_line_caps[SPAPR_CAP_NUM];
+>>      sPAPRCapabilities def, eff, mig;
+>> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+>> new file mode 100644
+>> index 000000000000..07e36d1c7e74
+>> --- /dev/null
+>> +++ b/include/hw/ppc/spapr_irq.h
+>> @@ -0,0 +1,30 @@
+>> +/*
+>> + * QEMU PowerPC sPAPR IRQ backend definitions
+>> + *
+>> + * Copyright (c) 2018, IBM Corporation.
+>> + *
+>> + * This code is licensed under the GPL version 2 or later. See the
+>> + * COPYING file in the top-level directory.
+>> + */
+>> +#ifndef HW_SPAPR_IRQ_H
+>> +#define HW_SPAPR_IRQ_H
+>> +
+>> +/*
+>> + * IRQ ranges per type
+>=20
+> Well, range offsets actually. Maybe you could document the range size
+> as well for each type.
 
-v15:
- Patches are based off of Eduardo's git://github.com/ehabkost/qemu.git x86-=
-next.
- Some of the patches are queued already. Submitting remaining series.
- Summary of changes.
- 1. Added changes to support all the currently supported nr_cores and nr_th=
-reads.
-    Fixed up the node id to support this.
- 2. Removed topology_supports_topoext function. This is not required anymor=
-e as
-    we allow all the combinations to work now.
- 3. Fixed other feedback from Eduardo for v14.
+yes. I am waiting for people to scream : "I want more !"
 
-v14:
- Patches are based off of Eduardo's git://github.com/ehabkost/qemu.git x86-=
-next.
- Some of the patches are queued already. Submitting remaining series.
- Summary of changes.
- 1. Always set TOPOEXT feature in kvm_arch_get_supported_cpuid
- 2. Implemented topology_supports_topoext bit differently. Reason for this =
-is, if we
-    need to disable this feature before the x86_cpu_expand_features. But pr=
-oblem is
-    nr_cores and nr_threads are not populated at this time. It is populated=
- in qemu_init_vcpus.
- 3. Removed auto-topoext feature completely. The can cause lots of compatib=
-ility issues.
+>> + */
+>> +#define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
+>> +#define SPAPR_IRQ_HOTPLUG    0x1001
+>=20
+> This is just 1 irq, ie, range 0x1002-0x103F is unused
+>=20
+>> +#define SPAPR_IRQ_VIO        0x1040
+>=20
+> This is 1 irq per device, hence up to 64 devices
+>=20
+>> +#define SPAPR_IRQ_PCI_LSI    0x1080
+>> +
+>=20
+> This is 4 irqs per PHB, hence up to 32 PHBs. Cool, we're currently
+> limited to 31 PHBs.
+>=20
+>> +#define SPAPR_IRQ_MSI        0x1100  /* Offset of the dynamic range c=
+overed
+>=20
+> We only support dynamic MSIs with PCI, maybe rename to SPAPR_IRQ_PCI_MS=
+I ?
 
-v13:
- Patches are based off of Eduardo's git://github.com/ehabkost/qemu.git x86-=
-next.
- Some of the patches are queued already. Submitting remaining series.
- Summary of changes.
- 1.Fixed the error format if the topology cannot be supported.
- 2.Fixed the compatibility issues with old cpu models and new machine types=
-.
-   Here is the discussion thread.
-   Here is the discussion thread. https://lists.gnu.org/archive/html/qemu-d=
-evel/2018-06/msg01239.html
- 3.I am still testing it. But sending it to get review feedback.
+hmm, no. We could have CAPI devices there. remember ? ;)
 
-v12:
- Patches are based off of Eduardo's git://github.com/ehabkost/qemu.git x86-=
-next.
- Some of the patches are queued already. Submitting remaining series.
+>> +                                      * by the bitmap allocator */
+>=20
+> The range size is hence 1k (XICS_IRQS_SPAPR) for the time being.
 
- Summary of changes.
- 1.Added more comments explaining CPUID_Fn8000001E bit definitions.
- 2.Split the patch into separate patch to check the topology. Moved the cod=
-e to
-   x86_cpu_realizefn. Display the error if topoext feature cannot be enable=
-d.
- 3.Few more text corrections.
+in fact we could this bogus limit and use spapr->irq_map_nr now.
 
-v11:
- Patches are based off of Eduardo's git://github.com/ehabkost/qemu.git x86-=
-next.
- Summary of changes.
- 1.Added more comments explaining different constants and variables.
- 2.Removed NUM_SHARING_CACHE macro and made the code simpler.
- 3.Changed the function name num_sharing_l3_cache to cores_in_core_complex.
-   This function is actually finding the number of cores in a core complex.
-   Purpose here is to re-use the code in couple more places.
- 4.Added new function nodes_in_socket to find number of nodes in the config=
-.
-   Purpose here is to re-use the code.
- 5.Used DIV_ROUND_UP wherever applicable.
- 6.Renamed few constants and functions to generic names.
- 7.Few more text corrections.
-=20
-v10:
- Based the patches on Eduardo's git://github.com/ehabkost/qemu.git x86-next
- Some of the earlier patches are already queued. So, submitting the rest of
- the series here. This series adds complete redesign of the cpu topology.
- Based on user given parameter, we try to build topology very close to the
- hardware. Maintains symmetry as much as possible. Added new function
- epyc_build_topology to build the topology based on user given nr_cores,
- nr_threads.
- Summary of changes.
- 1. Build the topology dinamically based on nr_cores and nr_threads
- 2. Added new epyc_build_topology to build the new topology.
- 3. Added new function num_sharing_l3_cache to calculate the L3 sharing
- 4. Added a check to verify the topology. Disabled the TOPOEXT if the
-    topology cannot be built.
+>> +
+>> +void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_irqs,
+>> +                       Error **errp);
+>                          ^
+>                      missing space
+>
+>> +int spapr_irq_msi_alloc(sPAPRMachineState *spapr, uint32_t num, bool =
+align,
+>> +                        Error **errp);
+>> +void spapr_irq_msi_free(sPAPRMachineState *spapr, int irq, uint32_t n=
+um);
+>> +void spapr_irq_msi_reset(sPAPRMachineState *spapr);
+>> +
+>> +#endif
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index c464951747e3..32aa5d869d9c 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -187,6 +187,11 @@ static void xics_system_init(MachineState *machin=
+e, int nr_irqs, Error **errp)
+>>  {
+>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
+>> =20
+>> +    /* Initialize the MSI IRQ allocator. */
+>> +    if (!spapr->xics_legacy) {
+>> +        spapr_irq_msi_init(spapr, nr_irqs, &error_fatal);
+>=20
+> The error should be propagated to the caller.
 
-v9:
- Based the patches on Eduardo's git://github.com/ehabkost/qemu.git x86-next
- tree. Following 3 patches from v8 are already queued.
-  i386: Add cache information in X86CPUDefinition
-  i386: Initialize cache information for EPYC family processors
-  i386: Helpers to encode cache information consistently
- So, submitting the rest of the series here.
-
- Changes:
- 1. Included Eduardo's clean up patch
- 2. Added 2.13 machine types
- 3. Disabled topoext for 2.12 and below versions.
- 4. Added the assert to core_id as discussed.
-
-v8:
- Addressed feedback from Eduardo. Thanks Eduardo for being patient with me.
- Tested on AMD EPYC server and also did some basic testing on intel box.
- Summary of changes.
- 1. Reverted back l2 cache associativity. Kept it same as legacy.
- 2. Changed cache_info structure in X86CPUDefinition and CPUX86State to=20
-pointers.
- 3. Added legacy_cache property in PC_COMPAT_2_12 and initialized legacy_ca=
-che
-    based on static cache_info availability.
- 4. Squashed patch 4 and 5 and applied it before patch 3.
- 5. Added legacy cache check for cpuid[2] and cpuid[4] for consistancy.
- 6. Simplified NUM_SHARING_CACHE definition for readability,
- 7. Removed assert for core_id as it appeared redundant.
- 8. Simplified encode_cache_cpuid8000001d little bit.
- 9. Few more minor changes
-
-v7:
- Rebased on top of latest tree after 2.12 release and done few basic tests.=
-=20
-There are
- no changes except for few minor hunks. Hopefully this gets pulled into 2.1=
-3=20
-release.
- Please review, let me know of any feedback.
-
-v6:
-1.Fixed problem with patch#4(Add new property to control cache info). The=20
-parameter
- legacy_cache should be "on" by default on machine type "pc-q35-2.10". This=
- was
- found by Alexandr Iarygin.
-2.Fixed the l3 cache size for EPYC based machines(patch#3). Also, fixed the=
-=20
-number of
- logical processors sharing the cache(patch#6). Only L3 cache is shared by=
-=20
-multiple
- cores but not L1 or L2. This was a bug while decoding. This was found by=20
-Geoffrey McRae
- and he verified the fix.=20
-
-v5:
- In this series I tried to address the feedback from Eduardo Habkost.
- The discussion thread is here.
- https://patchwork.kernel.org/patch/10299745/
- The previous thread is here.
- http://patchwork.ozlabs.org/cover/884885/
-
-Reason for these changes.
- The cache properties for AMD family of processors have changed from
- previous releases. We don't want to display the new information on the
- old family of processors as this might cause compatibility issues.
-
-Changes:
-1.Based the patches on top of Eduardo's(patch#1) patch.
-  Changed few things.
-  Moved the Cache definitions to cpu.h file.
-  Changed the CPUID_4 names to generic names.
-2.Added a new propery "legacy-cache" in cpu object(patch#2). This can be
-  used to display the old property even if the host supports the new cache
-  properties.
-3.Added cache information in X86CPUDefinition and CPUX86State
-4.Patch 6-7 changed quite a bit from previous version does to new approach.
-5.Addressed few issues with CPUID_8000_001d and CPUID_8000_001E.
-
-v4:
-1.Removed the checks under cpuid 0x8000001D leaf(patch #2). These check are
-  not necessary. Found this during internal review.
-2.Added CPUID_EXT3_TOPOEXT feature for all the 17 family(patch #4). This wa=
-s
-  found by Kash Pande during his testing.
-3.Removed th hardcoded cpuid xlevel and dynamically extended if=20
-CPUID_EXT3_TOPOEXT
-  is supported(Suggested by Brijesh Singh).=20
-
-v3:
-1.Removed the patch #1. Radim mentioned that original typo problem is in=20
-  linux kernel header. qemu is just copying those files.
-2.In previous version, I used the cpuid 4 definitions for AMDs cpuid leaf
-  0x8000001D. CPUID 4 is very intel specific and we dont want to expose tho=
-se
-  details under AMD. I have renamed some of these definitions as generic.
-  These changes are in patch#1. Radim, let me know if this is what you inte=
-nded.
-3.Added assert to for core_id(Suggested by Radim Krcm=C3=A1r).
-4.Changed the if condition under "L3 cache info"(Suggested by Gary Hook).
-5.Addressed few more text correction and code cleanup(Suggested by Thomas=20
-Lendacky).
-
-v2:
-  Fixed few more minor issues per Gary Hook's comments. Thank you Gary.
-  Removed the patch#1. We need to handle the instruction cache associativit=
-y=20
-  seperately. It varies based on the cpu family. I will comeback to that la=
-ter.
-  Added two more typo corrections in patch#1 and patch#5.
-
-v1:
-  Stanislav Lanci posted few patches earlier.=20
-  https://patchwork.kernel.org/patch/10040903/
-
-Rebased his patches with few changes.
-1.Spit the patches into two, separating cpuid functions=20
-  0x8000001D and 0x8000001E (Patch 2 and 3).
-2.Removed the generic non-intel check and made a separate patch
-  with some changes(Patch 5).
-3.Fixed L3_N_SETS_AMD(from 4096 to 8192) based on CPUID_Fn8000001D_ECX_x03.
-Added 2 more patches.
-Patch 1. Fixes cache associativity.
-Patch 4. Adds TOPOEXT feature on AMD EPYC CPU.
+I think the Error is useless here.
 
 
-Babu Moger (3):
-  i386: Fix up the Node id for CPUID_8000_001E
-  i386: Enable TOPOEXT feature on AMD EPYC CPU
-  i386: Remove generic SMT thread check
+>=20
+>> +    }
+>> +
+>>      if (kvm_enabled()) {
+>>          if (machine_kernel_irqchip_allowed(machine) &&
+>>              !xics_kvm_init(spapr, errp)) {
+>=20
+> And I now realize that the way errors are handled here is badly
+> broken.
+>=20
+> In the default case, this function is supposed to try in-kernel XICS
+> first and if it fails, then fallback to userland XICS. But since we
+> pass errp down to xics_kvm_init() and the caller happens to pass
+> &error_fatal, we stop right here instead of trying the fallback.
+>=20
+> And if the caller changes to pass a standard &local_err instead,
+> things would be even worse. With the same scenario, QEMU would
+> probably exit if it could fallback to the userland XICS, or abort
+> otherwise because error_set() would be called with an already set
+> *errp.
+>=20
+> Since this beha^wug is mine (commit 3d85885a1b1f3), let me fix it
+> first :)
+>=20
+>> @@ -1629,6 +1634,10 @@ static void spapr_machine_reset(void)
+>>          ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_f=
+atal);
+>>      }
+>> =20
+>> +    if (!spapr->xics_legacy) {
+>> +        spapr_irq_msi_reset(spapr);
+>> +    }
+>> +
+>>      qemu_devices_reset();
+>> =20
+>>      /* DRC reset may cause a device to be unplugged. This will cause =
+troubles
+>> @@ -1903,6 +1912,24 @@ static const VMStateDescription vmstate_spapr_p=
+atb_entry =3D {
+>>      },
+>>  };
+>> =20
+>> +static bool spapr_irq_map_needed(void *opaque)
+>> +{
+>> +    sPAPRMachineState *spapr =3D opaque;
+>> +
+>> +    return spapr->irq_map && !bitmap_empty(spapr->irq_map, spapr->irq=
+_map_nr);
+>=20
+> Maybe check !spapr->xics_legacy as well to preserve backward migration
+> to older machines ?
 
- include/hw/i386/pc.h |  8 ++++++++
- target/i386/cpu.c    | 50 +++++++++++++++++++++++++++++++++++++++---------=
---
- 2 files changed, 47 insertions(+), 11 deletions(-)
+no need. It is redudant with spapr->irq_map which is not allocated in tha=
+t case.
 
---=20
-1.8.3.1
+>> +}
+>> +
+>> +static const VMStateDescription vmstate_spapr_irq_map =3D {
+>> +    .name =3D "spapr_irq_map",
+>> +    .version_id =3D 1,
+>> +    .minimum_version_id =3D 1,
+>> +    .needed =3D spapr_irq_map_needed,
+>> +    .fields =3D (VMStateField[]) {
+>> +        VMSTATE_BITMAP(irq_map, sPAPRMachineState, 0, irq_map_nr),
+>> +        VMSTATE_END_OF_LIST()
+>> +    },
+>> +};
+>> +
+>>  static const VMStateDescription vmstate_spapr =3D {
+>>      .name =3D "spapr",
+>>      .version_id =3D 3,
+>> @@ -1930,6 +1957,7 @@ static const VMStateDescription vmstate_spapr =3D=
+ {
+>>          &vmstate_spapr_cap_cfpc,
+>>          &vmstate_spapr_cap_sbbc,
+>>          &vmstate_spapr_cap_ibs,
+>> +        &vmstate_spapr_irq_map,
+>>          NULL
+>>      }
+>>  };
+>> @@ -4101,7 +4129,10 @@ DEFINE_SPAPR_MACHINE(3_0, "3.0", true);
+>> =20
+>>  static void spapr_machine_2_12_instance_options(MachineState *machine=
+)
+>>  {
+>> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
+>> +
+>>      spapr_machine_3_0_instance_options(machine);
+>> +    spapr->xics_legacy =3D true;
+>>  }
+>> =20
+>>  static void spapr_machine_2_12_class_options(MachineClass *mc)
+>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+>> index 3b6ae7272092..1ef7ce7f1509 100644
+>> --- a/hw/ppc/spapr_events.c
+>> +++ b/hw/ppc/spapr_events.c
+>> @@ -709,7 +709,11 @@ void spapr_events_init(sPAPRMachineState *spapr)
+>>  {
+>>      int epow_irq;
+>> =20
+>> -    epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
+>> +    if (spapr->xics_legacy) {
+>> +        epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
+>> +    } else {
+>> +        epow_irq =3D SPAPR_IRQ_EPOW;
+>> +    }
+>> =20
+>>      spapr_irq_claim(spapr, epow_irq, 1, false, &error_fatal);
+>> =20
+>> @@ -731,7 +735,11 @@ void spapr_events_init(sPAPRMachineState *spapr)
+>>      if (spapr->use_hotplug_event_source) {
+>>          int hp_irq;
+>> =20
+>> -        hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
+>> +        if (spapr->xics_legacy) {
+>> +            hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
+>> +        } else {
+>> +            hp_irq =3D SPAPR_IRQ_HOTPLUG;
+>> +        }
+>> =20
+>>          spapr_irq_claim(spapr, hp_irq, 1, false, &error_fatal);
+>> =20
+>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+>> new file mode 100644
+>> index 000000000000..55fa764c85d1
+>> --- /dev/null
+>> +++ b/hw/ppc/spapr_irq.c
+>> @@ -0,0 +1,57 @@
+>> +/*
+>> + * QEMU PowerPC sPAPR IRQ interface
+>> + *
+>> + * Copyright (c) 2018, IBM Corporation.
+>> + *
+>> + * This code is licensed under the GPL version 2 or later. See the
+>> + * COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qemu/log.h"
+>> +#include "qemu/error-report.h"
+>> +#include "qapi/error.h"
+>> +#include "hw/ppc/spapr.h"
+>> +#include "hw/ppc/xics.h"
+>> +
+>> +void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_irqs,
+>> +                        Error **errp)
+>=20
+> What's the errp for ? It looks like this function can never return
+> an error. Maybe just drop it.
+
+yes
+
+>=20
+>> +{
+>> +    spapr->irq_map_nr =3D XICS_IRQ_BASE + nr_irqs - SPAPR_IRQ_MSI;
+>> +    spapr->irq_map =3D bitmap_new(spapr->irq_map_nr);
+>> +}
+>> +
+>> +int spapr_irq_msi_alloc(sPAPRMachineState *spapr, uint32_t num, bool =
+align,
+>> +                        Error **errp)
+>> +{
+>> +    int irq;
+>> +
+>> +    /*
+>> +     * The 'align_mask' parameter of bitmap_find_next_zero_area()
+>> +     * should be one less than a power of 2; 0 means no
+>> +     * alignment. Adapt the 'align' value of the former allocator
+>> +     * to fit the requirements of bitmap_find_next_zero_area()
+>> +     */
+>> +    align -=3D 1;
+>> +
+>> +    irq =3D bitmap_find_next_zero_area(spapr->irq_map, spapr->irq_map=
+_nr, 0, num,
+>> +                                     align);
+>> +    if (irq =3D=3D spapr->irq_map_nr) {
+>> +        error_setg(errp, "can't find a free %d-IRQ block", num);
+>> +        return -1;
+>> +    }
+>> +
+>> +    bitmap_set(spapr->irq_map, irq, num);
+>> +
+>> +    return irq + SPAPR_IRQ_MSI;
+>> +}
+>> +
+>> +void spapr_irq_msi_free(sPAPRMachineState *spapr, int irq, uint32_t n=
+um)
+>> +{
+>> +    bitmap_clear(spapr->irq_map, irq - SPAPR_IRQ_MSI, num);
+>> +}
+>> +
+>> +void spapr_irq_msi_reset(sPAPRMachineState *spapr)
+>> +{
+>> +    bitmap_clear(spapr->irq_map, 0, spapr->irq_map_nr);
+>> +}
+>> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+>> index 7394c62b4a8b..f3c4a25fb482 100644
+>> --- a/hw/ppc/spapr_pci.c
+>> +++ b/hw/ppc/spapr_pci.c
+>> @@ -333,6 +333,9 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, s=
+PAPRMachineState *spapr,
+>>              return;
+>>          }
+>> =20
+>> +        if (!spapr->xics_legacy) {
+>> +            spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
+>> +        }
+>>          spapr_irq_free(spapr, msi->first_irq, msi->num);
+>=20
+> Shouldn't ^^ be in an else block ?
+
+no. one is for the MSI IRQ allocator, the other for the controller.=20
+
+>=20
+>>          if (msi_present(pdev)) {
+>>              spapr_msi_setmsg(pdev, 0, false, 0, 0);
+>> @@ -371,7 +374,13 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, =
+sPAPRMachineState *spapr,
+>>      }
+>> =20
+>>      /* Allocate MSIs */
+>> -    irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS_=
+TYPE_MSI, &err);
+>> +    if (spapr->xics_legacy) {
+>> +        irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D R=
+TAS_TYPE_MSI,
+>> +                             &err);
+>> +    } else {
+>> +        irq =3D spapr_irq_msi_alloc(spapr, req_num,
+>> +                                  ret_intr_type =3D=3D RTAS_TYPE_MSI,=
+ &err);
+>> +    }
+>>      if (err) {
+>>          error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+>>                            config_addr);
+>> @@ -388,6 +397,9 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, s=
+PAPRMachineState *spapr,
+>> =20
+>>      /* Release previous MSIs */
+>>      if (msi) {
+>> +        if (!spapr->xics_legacy) {
+>> +            spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
+>> +        }
+>>          spapr_irq_free(spapr, msi->first_irq, msi->num);
+>>          g_hash_table_remove(phb->msi, &config_addr);
+>>      }
+>> @@ -1704,11 +1716,15 @@ static void spapr_phb_realize(DeviceState *dev=
+, Error **errp)
+>>          uint32_t irq;
+>>          Error *local_err =3D NULL;
+>> =20
+>> -        irq =3D spapr_irq_findone(spapr, &local_err);
+>> -        if (local_err) {
+>> -            error_propagate(errp, local_err);
+>> -            error_prepend(errp, "can't allocate LSIs: ");
+>> -            return;
+>> +        if (spapr->xics_legacy) {
+>> +            irq =3D spapr_irq_findone(spapr, &local_err);
+>> +            if (local_err) {
+>> +                error_propagate(errp, local_err);
+>> +                error_prepend(errp, "can't allocate LSIs: ");
+>> +                return;
+>> +            }
+>> +        } else {
+>> +            irq =3D SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS + =
+i;
+>>          }
+>> =20
+>>          spapr_irq_claim(spapr, irq, 1, true, &local_err);
+>> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+>> index ad9b56e28447..7707bda6a38d 100644
+>> --- a/hw/ppc/spapr_vio.c
+>> +++ b/hw/ppc/spapr_vio.c
+>> @@ -436,6 +436,9 @@ static void spapr_vio_busdev_reset(DeviceState *qd=
+ev)
+>>      }
+>>  }
+>> =20
+>> +/* TODO : poor VIO device indexing ... */
+>> +static uint32_t vio_index;
+>> +
+>>  static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
+>>  {
+>>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>> @@ -476,10 +479,14 @@ static void spapr_vio_busdev_realize(DeviceState=
+ *qdev, Error **errp)
+>>      }
+>> =20
+>>      if (!dev->irq) {
+>> -        dev->irq =3D spapr_irq_findone(spapr, &local_err);
+>> -        if (local_err) {
+>> -            error_propagate(errp, local_err);
+>> -            return;
+>> +        if (spapr->xics_legacy) {
+>> +            dev->irq =3D spapr_irq_findone(spapr, &local_err);
+>> +            if (local_err) {
+>> +                error_propagate(errp, local_err);
+>> +                return;
+>> +            }
+>> +        } else {
+>> +            dev->irq =3D SPAPR_IRQ_VIO + vio_index++;
+>=20
+> This can overlap the next range if we have more than 64 VIO devices...
+
+yes. but claim() should fail.
+
+Thanks,
+
+C.
+
+>>          }
+>>      }
+>> =20
+>> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
+>> index 86d82a6ec3ac..4fe3b7804d43 100644
+>> --- a/hw/ppc/Makefile.objs
+>> +++ b/hw/ppc/Makefile.objs
+>> @@ -4,7 +4,7 @@ obj-y +=3D ppc.o ppc_booke.o fdt.o
+>>  obj-$(CONFIG_PSERIES) +=3D spapr.o spapr_caps.o spapr_vio.o spapr_eve=
+nts.o
+>>  obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o spapr_rtas.o
+>>  obj-$(CONFIG_PSERIES) +=3D spapr_pci.o spapr_rtc.o spapr_drc.o spapr_=
+rng.o
+>> -obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o
+>> +obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o spapr_irq.o
+>>  # IBM PowerNV
+>>  obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv=
+_psi.o pnv_occ.o pnv_bmc.o
+>>  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
+>=20
