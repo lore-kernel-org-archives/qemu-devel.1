@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41685)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTmbP-00010e-1n
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:09:15 -0400
+	(envelope-from <jusual@mail.ru>) id 1fTmha-0004IT-8I
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:15:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTmbO-0006I2-0W
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:09:11 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:45512)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fTmbN-0006Gw-Q7
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:09:09 -0400
-Received: by mail-wr0-x241.google.com with SMTP id o12-v6so9508878wrm.12
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 04:09:09 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 15 Jun 2018 12:09:03 +0100
-Message-Id: <20180615110903.29674-4-alex.bennee@linaro.org>
-In-Reply-To: <20180615110903.29674-1-alex.bennee@linaro.org>
-References: <20180615110903.29674-1-alex.bennee@linaro.org>
+	(envelope-from <jusual@mail.ru>) id 1fTmhX-0002j9-31
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:15:34 -0400
+Received: from smtp16.mail.ru ([94.100.176.153]:41600)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fTmhW-0002hg-H3
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:15:30 -0400
+References: <20180612204632.28780-1-jusual@mail.ru>
+	<CAFEAcA-p5A4S=+ncW42KU2ivBHyALJdUswLUYhh=By6rKYstZw@mail.gmail.com>
+From: Julia Suvorova <jusual@mail.ru>
+Message-ID: <53c12f1b-6bd8-5f6d-dc9d-7b3116392d1c@mail.ru>
+Date: Fri, 15 Jun 2018 14:15:18 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 3/3] travis: reduce time taken for trace-backend
- testing
+In-Reply-To: <CAFEAcA-p5A4S=+ncW42KU2ivBHyALJdUswLUYhh=By6rKYstZw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow ARMv6-M Thumb2
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>
 
-These builds are reaching regular timeouts and probably don't need to
-be so widely exercised. ftrace and ust in particular are used in
-conjunction with whole system profiling which makes most sense with
-KVM setups, hence the native softmmu target.
+On 15.06.2018 13:55, Peter Maydell wrote:
+> On 12 June 2018 at 21:46, Julia Suvorova <jusual@mail.ru> wrote:
+>> ARMv6-M supports 6 Thumb2 instructions. This patch checks for these
+>> instructions and allows their execution.
+>> Like Thumb2 cores, ARMv6-M always interprets BL instruction as 32-bit.
+>>
+>> This patch is required for future Cortex-M0 support.
+>>
+>> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+>> @@ -10075,6 +10076,11 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+>>   {
+>>       uint32_t imm, shift, offset;
+>>       uint32_t rd, rn, rm, rs;
+>> +    uint32_t armv6m_insn[] = {0xf3808000 /* msr */, 0xf3b08040 /* dsb */,
+>> +                              0xf3b08050 /* dmb */, 0xf3b08060 /* isb */,
+>> +                              0xf3e08000 /* mrs */, 0xf000d000 /* bl */};
+>> +    uint32_t armv6m_mask[] = {0xffe0d000, 0xfff0d0f0, 0xfff0d0f0,
+>> +                              0xfff0d0f0, 0xffe0d000, 0xf800d000};
+> 
+> I think these arrays should be 'const'; we can also move them closer
+> to their point of use, inside the scope of the if() below.
+> 
+> Since those are trivial tweaks, I'm going to put this into
+> target-arm.next with those changes made, if that's OK.
 
-We also expand simple to cover the multiple log backends while
-restricting its scope to user-mode testing only.
+Sure, thanks.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-diff --git a/.travis.yml b/.travis.yml
-index c200dde534..fabfe9ec34 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -86,13 +86,14 @@ matrix:
-     - env: CONFIG="--enable-debug --enable-tcg-interpreter"
-            TEST_CMD=""
-       compiler: gcc
--    - env: CONFIG="--enable-trace-backends=simple"
-+    # We don't need to exercise every backend with every front-end
-+    - env: CONFIG="--enable-trace-backends=log,simple,syslog --disable-system"
-            TEST_CMD=""
-       compiler: gcc
--    - env: CONFIG="--enable-trace-backends=ftrace"
-+    - env: CONFIG="--enable-trace-backends=ftrace --target-list=x86_64-softmmu"
-            TEST_CMD=""
-       compiler: gcc
--    - env: CONFIG="--enable-trace-backends=ust"
-+    - env: CONFIG="--enable-trace-backends=ust --target-list=x86_64-softmmu"
-            TEST_CMD=""
-       compiler: gcc
-     - env: CONFIG="--disable-tcg"
--- 
-2.17.1
+Best regards, Julia Suvorova.
