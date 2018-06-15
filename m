@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTmAw-0001ly-Am
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:41:51 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTmE1-0002xk-2U
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:45:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTmAv-0000uo-IX
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:41:50 -0400
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:37906)
+	(envelope-from <peter.maydell@linaro.org>) id 1fTmE0-0001tM-8z
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:45:01 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:43487)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fTmAv-0000uZ-Cs
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:41:49 -0400
-Received: by mail-oi0-x22e.google.com with SMTP id d5-v6so8400536oib.5
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 03:41:49 -0700 (PDT)
+	id 1fTmE0-0001sn-2C
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:45:00 -0400
+Received: by mail-ot0-x241.google.com with SMTP id i19-v6so10472531otk.10
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 03:44:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180614193147.29680-1-richard.henderson@linaro.org>
-References: <20180614193147.29680-1-richard.henderson@linaro.org>
+In-Reply-To: <CAKmqyKOm6O_Tj1Bru9DpQN_uWsHQ+V1Jh2cN3EzwMCFOu=hOUg@mail.gmail.com>
+References: <20180611171518.3390-1-clg@kaod.org>
+	<bfdc313f-f8b0-77a5-e87b-cc9c75f8e110@kaod.org>
+	<CAKmqyKOm6O_Tj1Bru9DpQN_uWsHQ+V1Jh2cN3EzwMCFOu=hOUg@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Jun 2018 11:41:28 +0100
-Message-ID: <CAFEAcA-n9U90h8j_-cu0Y+vxnM0mJra0Ldw880t33G122jdCiQ@mail.gmail.com>
+Date: Fri, 15 Jun 2018 11:44:38 +0100
+Message-ID: <CAFEAcA_PzsfgA-QeSPb7qRnNnbuFe2A9ZwUuF9KNyf_hENzcwA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/18] tcg queued patches
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] m25p80: add support for two bytes WRSR for
+ Macronix chips
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Max Reitz <mreitz@redhat.com>
 
-On 14 June 2018 at 20:31, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> The following changes since commit 2ab09bf2f9f55b9fb8d2de6eb2ba2a8570e268e2:
+On 11 June 2018 at 23:03, Alistair Francis <alistair23@gmail.com> wrote:
+> On Mon, Jun 11, 2018 at 10:18 AM, C=C3=A9dric Le Goater <clg@kaod.org> wr=
+ote:
+>> On 06/11/2018 07:15 PM, C=C3=A9dric Le Goater wrote:
+>>> On Macronix chips, two bytes can written to the WRSR. First byte will
+>>> configure the status register and the second the configuration
+>>> register. It is important to save the configuration value as it
+>>> contains the dummy cycle setting when using dual or quad IO mode.
+>>>
+>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 >
->   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20180612-pull-request' into staging (2018-06-12 15:34:34 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-tcg-20180614
->
-> for you to fetch changes up to ba3e9674da7b60ad627e122a6496d3e13f20c34f:
->
->   tcg: remove tb_lock (2018-06-12 08:26:19 -1000)
->
-> ----------------------------------------------------------------
-> Workaround macos assembler lossage.
-> Eliminate tb_lock.
->
+> Acked-by: Alistair Francis <alistair.francis@wdc.com>
 
-Hi; I get compile failures with clang I'm afraid
-(seen on x86-64 Linux, OSX and FreeBSD):
 
-/home/petmay01/linaro/qemu-for-merges/accel/tcg/translate-all.c:1800:44:
-error: incompatible integer to pointer conversion passing 'uintptr_t'
-(aka 'unsigned long') to parameter of type 'void *'
-[-Werror,-Wint-conversion]
-        atomic_set(&tcg_ctx->code_gen_ptr, orig_aligned);
-                                           ^~~~~~~~~~~~
-/home/petmay01/linaro/qemu-for-merges/include/qemu/atomic.h:134:30:
-note: expanded from macro 'atomic_set'
-    atomic_set__nocheck(ptr, i);                      \
-                             ^
-/home/petmay01/linaro/qemu-for-merges/include/qemu/atomic.h:130:27:
-note: expanded from macro 'atomic_set__nocheck'
-    __atomic_store_n(ptr, i, __ATOMIC_RELAXED)
-                          ^
-1 error generated.
 
-thanks
+Applied to target-arm.next, thanks.
+
 -- PMM
