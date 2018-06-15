@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTuAB-0007xI-JT
+	(envelope-from <ehabkost@redhat.com>) id 1fTuAC-0007xs-Mg
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:13:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTuA8-0007GZ-Ru
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:13:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47566)
+	(envelope-from <ehabkost@redhat.com>) id 1fTuAA-0007I9-JV
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:13:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42524)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTuA8-0007Fx-JH
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:13:32 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTuAA-0007HS-AD
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:13:34 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 15 Jun 2018 16:13:21 -0300
-Message-Id: <20180615191327.11480-2-ehabkost@redhat.com>
+Date: Fri, 15 Jun 2018 16:13:22 -0300
+Message-Id: <20180615191327.11480-3-ehabkost@redhat.com>
 In-Reply-To: <20180615191327.11480-1-ehabkost@redhat.com>
 References: <20180615191327.11480-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/7] Remove COPYING.PYTHON
+Subject: [Qemu-devel] [PULL 2/7] Add functional/acceptance tests
+ infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,303 +30,355 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-The COPYING.PYTHON file was added when we added the compatibility
-argparse.py module, which was licensed under the Python Software
-Foundation License Version 2.
+From: Cleber Rosa <crosa@redhat.com>
 
-Now the compatibility argparse.py module was removed, and we are
-not carrying any code under that license anymore.  Remove
-COPYING.PYTHON.
+This patch adds the very minimum infrastructure necessary for writing
+and running functional/acceptance tests, including:
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20180611180152.2681-1-ehabkost@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+ * Documentation
+ * The avocado_qemu.Test base test class
+ * One example tests (version.py)
+
+Additional functionality is expected to be added along the tests that
+require them.
+
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Message-Id: <20180530184156.15634-2-crosa@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+[ehabkost: fix typo on testing.rst]
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- COPYING.PYTHON | 270 -------------------------------------------------
- 1 file changed, 270 deletions(-)
- delete mode 100644 COPYING.PYTHON
+ docs/devel/testing.rst                    | 192 ++++++++++++++++++++++
+ tests/acceptance/README.rst               |  10 ++
+ tests/acceptance/avocado_qemu/__init__.py |  54 ++++++
+ tests/acceptance/version.py               |  24 +++
+ 4 files changed, 280 insertions(+)
+ create mode 100644 tests/acceptance/README.rst
+ create mode 100644 tests/acceptance/avocado_qemu/__init__.py
+ create mode 100644 tests/acceptance/version.py
 
-diff --git a/COPYING.PYTHON b/COPYING.PYTHON
-deleted file mode 100644
-index 4d3f1ef276..0000000000
---- a/COPYING.PYTHON
-+++ /dev/null
-@@ -1,270 +0,0 @@
--A. HISTORY OF THE SOFTWARE
--=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
--
--Python was created in the early 1990s by Guido van Rossum at Stichting
--Mathematisch Centrum (CWI, see http://www.cwi.nl) in the Netherlands
--as a successor of a language called ABC.  Guido remains Python's
--principal author, although it includes many contributions from others.
--
--In 1995, Guido continued his work on Python at the Corporation for
--National Research Initiatives (CNRI, see http://www.cnri.reston.va.us)
--in Reston, Virginia where he released several versions of the
--software.
--
--In May 2000, Guido and the Python core development team moved to
--BeOpen.com to form the BeOpen PythonLabs team.  In October of the same
--year, the PythonLabs team moved to Digital Creations (now Zope
--Corporation, see http://www.zope.com).  In 2001, the Python Software
--Foundation (PSF, see http://www.python.org/psf/) was formed, a
--non-profit organization created specifically to own Python-related
--Intellectual Property.  Zope Corporation is a sponsoring member of
--the PSF.
--
--All Python releases are Open Source (see http://www.opensource.org for
--the Open Source Definition).  Historically, most, but not all, Python
--releases have also been GPL-compatible; the table below summarizes
--the various releases.
--
--    Release         Derived     Year        Owner       GPL-
--                    from                                compatible? (1)
--
--    0.9.0 thru 1.2              1991-1995   CWI         yes
--    1.3 thru 1.5.2  1.2         1995-1999   CNRI        yes
--    1.6             1.5.2       2000        CNRI        no
--    2.0             1.6         2000        BeOpen.com  no
--    1.6.1           1.6         2001        CNRI        yes (2)
--    2.1             2.0+1.6.1   2001        PSF         no
--    2.0.1           2.0+1.6.1   2001        PSF         yes
--    2.1.1           2.1+2.0.1   2001        PSF         yes
--    2.2             2.1.1       2001        PSF         yes
--    2.1.2           2.1.1       2002        PSF         yes
--    2.1.3           2.1.2       2002        PSF         yes
--    2.2.1           2.2         2002        PSF         yes
--    2.2.2           2.2.1       2002        PSF         yes
--    2.2.3           2.2.2       2003        PSF         yes
--    2.3             2.2.2       2002-2003   PSF         yes
--    2.3.1           2.3         2002-2003   PSF         yes
--    2.3.2           2.3.1       2002-2003   PSF         yes
--    2.3.3           2.3.2       2002-2003   PSF         yes
--    2.3.4           2.3.3       2004        PSF         yes
--    2.3.5           2.3.4       2005        PSF         yes
--    2.4             2.3         2004        PSF         yes
--    2.4.1           2.4         2005        PSF         yes
--    2.4.2           2.4.1       2005        PSF         yes
--    2.4.3           2.4.2       2006        PSF         yes
--    2.5             2.4         2006        PSF         yes
--    2.7             2.6         2010        PSF         yes
--
--Footnotes:
--
--(1) GPL-compatible doesn't mean that we're distributing Python under
--    the GPL.  All Python licenses, unlike the GPL, let you distribute
--    a modified version without making your changes open source.  The
--    GPL-compatible licenses make it possible to combine Python with
--    other software that is released under the GPL; the others don't.
--
--(2) According to Richard Stallman, 1.6.1 is not GPL-compatible,
--    because its license has a choice of law clause.  According to
--    CNRI, however, Stallman's lawyer has told CNRI's lawyer that 1.6.1
--    is "not incompatible" with the GPL.
--
--Thanks to the many outside volunteers who have worked under Guido's
--direction to make these releases possible.
--
--
--B. TERMS AND CONDITIONS FOR ACCESSING OR OTHERWISE USING PYTHON
--=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
--
--PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
----------------------------------------------
--
--1. This LICENSE AGREEMENT is between the Python Software Foundation
--("PSF"), and the Individual or Organization ("Licensee") accessing and
--otherwise using this software ("Python") in source or binary form and
--its associated documentation.
--
--2. Subject to the terms and conditions of this License Agreement, PSF
--hereby grants Licensee a nonexclusive, royalty-free, world-wide
--license to reproduce, analyze, test, perform and/or display publicly,
--prepare derivative works, distribute, and otherwise use Python
--alone or in any derivative version, provided, however, that PSF's
--License Agreement and PSF's notice of copyright, i.e., "Copyright (c)
--2001, 2002, 2003, 2004, 2005, 2006 Python Software Foundation; All Right=
-s
--Reserved" are retained in Python alone or in any derivative version=20
--prepared by Licensee.
--
--3. In the event Licensee prepares a derivative work that is based on
--or incorporates Python or any part thereof, and wants to make
--the derivative work available to others as provided herein, then
--Licensee hereby agrees to include in any such work a brief summary of
--the changes made to Python.
--
--4. PSF is making Python available to Licensee on an "AS IS"
--basis.  PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
--IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND
--DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
--FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON WILL NOT
--INFRINGE ANY THIRD PARTY RIGHTS.
--
--5. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
--FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
--A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON,
--OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
--
--6. This License Agreement will automatically terminate upon a material
--breach of its terms and conditions.
--
--7. Nothing in this License Agreement shall be deemed to create any
--relationship of agency, partnership, or joint venture between PSF and
--Licensee.  This License Agreement does not grant permission to use PSF
--trademarks or trade name in a trademark sense to endorse or promote
--products or services of Licensee, or any third party.
--
--8. By copying, installing or otherwise using Python, Licensee
--agrees to be bound by the terms and conditions of this License
--Agreement.
--
--
--BEOPEN.COM LICENSE AGREEMENT FOR PYTHON 2.0
---------------------------------------------
--
--BEOPEN PYTHON OPEN SOURCE LICENSE AGREEMENT VERSION 1
--
--1. This LICENSE AGREEMENT is between BeOpen.com ("BeOpen"), having an
--office at 160 Saratoga Avenue, Santa Clara, CA 95051, and the
--Individual or Organization ("Licensee") accessing and otherwise using
--this software in source or binary form and its associated
--documentation ("the Software").
--
--2. Subject to the terms and conditions of this BeOpen Python License
--Agreement, BeOpen hereby grants Licensee a non-exclusive,
--royalty-free, world-wide license to reproduce, analyze, test, perform
--and/or display publicly, prepare derivative works, distribute, and
--otherwise use the Software alone or in any derivative version,
--provided, however, that the BeOpen Python License is retained in the
--Software, alone or in any derivative version prepared by Licensee.
--
--3. BeOpen is making the Software available to Licensee on an "AS IS"
--basis.  BEOPEN MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
--IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, BEOPEN MAKES NO AND
--DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
--FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE WILL NOT
--INFRINGE ANY THIRD PARTY RIGHTS.
--
--4. BEOPEN SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF THE
--SOFTWARE FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS
--AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THE SOFTWARE, OR ANY
--DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
--
--5. This License Agreement will automatically terminate upon a material
--breach of its terms and conditions.
--
--6. This License Agreement shall be governed by and interpreted in all
--respects by the law of the State of California, excluding conflict of
--law provisions.  Nothing in this License Agreement shall be deemed to
--create any relationship of agency, partnership, or joint venture
--between BeOpen and Licensee.  This License Agreement does not grant
--permission to use BeOpen trademarks or trade names in a trademark
--sense to endorse or promote products or services of Licensee, or any
--third party.  As an exception, the "BeOpen Python" logos available at
--http://www.pythonlabs.com/logos.html may be used according to the
--permissions granted on that web page.
--
--7. By copying, installing or otherwise using the software, Licensee
--agrees to be bound by the terms and conditions of this License
--Agreement.
--
--
--CNRI LICENSE AGREEMENT FOR PYTHON 1.6.1
-----------------------------------------
--
--1. This LICENSE AGREEMENT is between the Corporation for National
--Research Initiatives, having an office at 1895 Preston White Drive,
--Reston, VA 20191 ("CNRI"), and the Individual or Organization
--("Licensee") accessing and otherwise using Python 1.6.1 software in
--source or binary form and its associated documentation.
--
--2. Subject to the terms and conditions of this License Agreement, CNRI
--hereby grants Licensee a nonexclusive, royalty-free, world-wide
--license to reproduce, analyze, test, perform and/or display publicly,
--prepare derivative works, distribute, and otherwise use Python 1.6.1
--alone or in any derivative version, provided, however, that CNRI's
--License Agreement and CNRI's notice of copyright, i.e., "Copyright (c)
--1995-2001 Corporation for National Research Initiatives; All Rights
--Reserved" are retained in Python 1.6.1 alone or in any derivative
--version prepared by Licensee.  Alternately, in lieu of CNRI's License
--Agreement, Licensee may substitute the following text (omitting the
--quotes): "Python 1.6.1 is made available subject to the terms and
--conditions in CNRI's License Agreement.  This Agreement together with
--Python 1.6.1 may be located on the Internet using the following
--unique, persistent identifier (known as a handle): 1895.22/1013.  This
--Agreement may also be obtained from a proxy server on the Internet
--using the following URL: http://hdl.handle.net/1895.22/1013".
--
--3. In the event Licensee prepares a derivative work that is based on
--or incorporates Python 1.6.1 or any part thereof, and wants to make
--the derivative work available to others as provided herein, then
--Licensee hereby agrees to include in any such work a brief summary of
--the changes made to Python 1.6.1.
--
--4. CNRI is making Python 1.6.1 available to Licensee on an "AS IS"
--basis.  CNRI MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
--IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, CNRI MAKES NO AND
--DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
--FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON 1.6.1 WILL NOT
--INFRINGE ANY THIRD PARTY RIGHTS.
--
--5. CNRI SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
--1.6.1 FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
--A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON 1.6.1,
--OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
--
--6. This License Agreement will automatically terminate upon a material
--breach of its terms and conditions.
--
--7. This License Agreement shall be governed by the federal
--intellectual property law of the United States, including without
--limitation the federal copyright law, and, to the extent such
--U.S. federal law does not apply, by the law of the Commonwealth of
--Virginia, excluding Virginia's conflict of law provisions.
--Notwithstanding the foregoing, with regard to derivative works based
--on Python 1.6.1 that incorporate non-separable material that was
--previously distributed under the GNU General Public License (GPL), the
--law of the Commonwealth of Virginia shall govern this License
--Agreement only as to issues arising under or with respect to
--Paragraphs 4, 5, and 7 of this License Agreement.  Nothing in this
--License Agreement shall be deemed to create any relationship of
--agency, partnership, or joint venture between CNRI and Licensee.  This
--License Agreement does not grant permission to use CNRI trademarks or
--trade name in a trademark sense to endorse or promote products or
--services of Licensee, or any third party.
--
--8. By clicking on the "ACCEPT" button where indicated, or by copying,
--installing or otherwise using Python 1.6.1, Licensee agrees to be
--bound by the terms and conditions of this License Agreement.
--
--        ACCEPT
--
--
--CWI LICENSE AGREEMENT FOR PYTHON 0.9.0 THROUGH 1.2
----------------------------------------------------
--
--Copyright (c) 1991 - 1995, Stichting Mathematisch Centrum Amsterdam,
--The Netherlands.  All rights reserved.
--
--Permission to use, copy, modify, and distribute this software and its
--documentation for any purpose and without fee is hereby granted,
--provided that the above copyright notice appear in all copies and that
--both that copyright notice and this permission notice appear in
--supporting documentation, and that the name of Stichting Mathematisch
--Centrum or CWI not be used in advertising or publicity pertaining to
--distribution of the software without specific, written prior
--permission.
--
--STICHTING MATHEMATISCH CENTRUM DISCLAIMS ALL WARRANTIES WITH REGARD TO
--THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
--FITNESS, IN NO EVENT SHALL STICHTING MATHEMATISCH CENTRUM BE LIABLE
--FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
--WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
--ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
--OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+index 0ca1a2d4b5..f33e5a8423 100644
+--- a/docs/devel/testing.rst
++++ b/docs/devel/testing.rst
+@@ -484,3 +484,195 @@ supported. To start the fuzzer, run
+=20
+ Alternatively, some command different from "qemu-img info" can be tested=
+, by
+ changing the ``-c`` option.
++
++Acceptance tests using the Avocado Framework
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The ``tests/acceptance`` directory hosts functional tests, also known
++as acceptance level tests.  They're usually higher level tests, and
++may interact with external resources and with various guest operating
++systems.
++
++These tests are written using the Avocado Testing Framework (which must
++be installed separately) in conjunction with a the ``avocado_qemu.Test``
++class, implemented at ``tests/acceptance/avocado_qemu``.
++
++Tests based on ``avocado_qemu.Test`` can easily:
++
++ * Customize the command line arguments given to the convenience
++   ``self.vm`` attribute (a QEMUMachine instance)
++
++ * Interact with the QEMU monitor, send QMP commands and check
++   their results
++
++ * Interact with the guest OS, using the convenience console device
++   (which may be useful to assert the effectiveness and correctness of
++   command line arguments or QMP commands)
++
++ * Interact with external data files that accompany the test itself
++   (see ``self.get_data()``)
++
++ * Download (and cache) remote data files, such as firmware and kernel
++   images
++
++ * Have access to a library of guest OS images (by means of the
++   ``avocado.utils.vmimage`` library)
++
++ * Make use of various other test related utilities available at the
++   test class itself and at the utility library:
++
++   - http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.=
+html#avocado.Test
++   - http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado=
+.utils.html
++
++Installation
++------------
++
++To install Avocado and its dependencies, run:
++
++.. code::
++
++  pip install --user avocado-framework
++
++Alternatively, follow the instructions on this link:
++
++  http://avocado-framework.readthedocs.io/en/latest/GetStartedGuide.html=
+#installing-avocado
++
++Overview
++--------
++
++This directory provides the ``avocado_qemu`` Python module, containing
++the ``avocado_qemu.Test`` class.  Here's a simple usage example:
++
++.. code::
++
++  from avocado_qemu import Test
++
++
++  class Version(Test):
++      """
++      :avocado: enable
++      :avocado: tags=3Dquick
++      """
++      def test_qmp_human_info_version(self):
++          self.vm.launch()
++          res =3D self.vm.command('human-monitor-command',
++                                command_line=3D'info version')
++          self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
++
++To execute your test, run:
++
++.. code::
++
++  avocado run version.py
++
++Tests may be classified according to a convention by using docstring
++directives such as ``:avocado: tags=3DTAG1,TAG2``.  To run all tests
++in the current directory, tagged as "quick", run:
++
++.. code::
++
++  avocado run -t quick .
++
++The ``avocado_qemu.Test`` base test class
++-----------------------------------------
++
++The ``avocado_qemu.Test`` class has a number of characteristics that
++are worth being mentioned right away.
++
++First of all, it attempts to give each test a ready to use QEMUMachine
++instance, available at ``self.vm``.  Because many tests will tweak the
++QEMU command line, launching the QEMUMachine (by using ``self.vm.launch(=
+)``)
++is left to the test writer.
++
++At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
++shutdown.
++
++QEMUMachine
++~~~~~~~~~~~
++
++The QEMUMachine API is already widely used in the Python iotests,
++device-crash-test and other Python scripts.  It's a wrapper around the
++execution of a QEMU binary, giving its users:
++
++ * the ability to set command line arguments to be given to the QEMU
++   binary
++
++ * a ready to use QMP connection and interface, which can be used to
++   send commands and inspect its results, as well as asynchronous
++   events
++
++ * convenience methods to set commonly used command line arguments in
++   a more succinct and intuitive way
++
++QEMU binary selection
++~~~~~~~~~~~~~~~~~~~~~
++
++The QEMU binary used for the ``self.vm`` QEMUMachine instance will
++primarily depend on the value of the ``qemu_bin`` parameter.  If it's
++not explicitly set, its default value will be the result of a dynamic
++probe in the same source tree.  A suitable binary will be one that
++targets the architecture matching host machine.
++
++Based on this description, test writers will usually rely on one of
++the following approaches:
++
++1) Set ``qemu_bin``, and use the given binary
++
++2) Do not set ``qemu_bin``, and use a QEMU binary named like
++   "${arch}-softmmu/qemu-system-${arch}", either in the current
++   working directory, or in the current source tree.
++
++The resulting ``qemu_bin`` value will be preserved in the
++``avocado_qemu.Test`` as an attribute with the same name.
++
++Attribute reference
++-------------------
++
++Besides the attributes and methods that are part of the base
++``avocado.Test`` class, the following attributes are available on any
++``avocado_qemu.Test`` instance.
++
++vm
++~~
++
++A QEMUMachine instance, initially configured according to the given
++``qemu_bin`` parameter.
++
++qemu_bin
++~~~~~~~~
++
++The preserved value of the ``qemu_bin`` parameter or the result of the
++dynamic probe for a QEMU binary in the current working directory or
++source tree.
++
++Parameter reference
++-------------------
++
++To understand how Avocado parameters are accessed by tests, and how
++they can be passed to tests, please refer to::
++
++  http://avocado-framework.readthedocs.io/en/latest/WritingTests.html#ac=
+cessing-test-parameters
++
++Parameter values can be easily seen in the log files, and will look
++like the following:
++
++.. code::
++
++  PARAMS (key=3Dqemu_bin, path=3D*, default=3Dx86_64-softmmu/qemu-system=
+-x86_64) =3D> 'x86_64-softmmu/qemu-system-x86_64
++
++qemu_bin
++~~~~~~~~
++
++The exact QEMU binary to be used on QEMUMachine.
++
++Uninstalling Avocado
++--------------------
++
++If you've followed the installation instructions above, you can easily
++uninstall Avocado.  Start by listing the packages you have installed::
++
++  pip list --user
++
++And remove any package you want with::
++
++  pip uninstall <package_name>
+diff --git a/tests/acceptance/README.rst b/tests/acceptance/README.rst
+new file mode 100644
+index 0000000000..89260faed6
+--- /dev/null
++++ b/tests/acceptance/README.rst
+@@ -0,0 +1,10 @@
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++Acceptance tests using the Avocado Framework
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++This directory contains functional tests, also known as acceptance
++level tests.  They're usually higher level, and may interact with
++external resources and with various guest operating systems.
++
++For more information, please refer to ``docs/devel/testing.rst``,
++section "Acceptance tests using the Avocado Framework".
+diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
+/avocado_qemu/__init__.py
+new file mode 100644
+index 0000000000..1e54fd5932
+--- /dev/null
++++ b/tests/acceptance/avocado_qemu/__init__.py
+@@ -0,0 +1,54 @@
++# Test class and utilities for functional tests
++#
++# Copyright (c) 2018 Red Hat, Inc.
++#
++# Author:
++#  Cleber Rosa <crosa@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
++
++import os
++import sys
++
++import avocado
++
++SRC_ROOT_DIR =3D os.path.dirname(os.path.dirname(os.path.dirname(__file_=
+_)))
++SRC_ROOT_DIR =3D os.path.abspath(os.path.dirname(SRC_ROOT_DIR))
++sys.path.append(os.path.join(SRC_ROOT_DIR, 'scripts'))
++
++from qemu import QEMUMachine
++
++def is_readable_executable_file(path):
++    return os.path.isfile(path) and os.access(path, os.R_OK | os.X_OK)
++
++
++def pick_default_qemu_bin():
++    """
++    Picks the path of a QEMU binary, starting either in the current work=
+ing
++    directory or in the source tree root directory.
++    """
++    arch =3D os.uname()[4]
++    qemu_bin_relative_path =3D os.path.join("%s-softmmu" % arch,
++                                          "qemu-system-%s" % arch)
++    if is_readable_executable_file(qemu_bin_relative_path):
++        return qemu_bin_relative_path
++
++    qemu_bin_from_src_dir_path =3D os.path.join(SRC_ROOT_DIR,
++                                              qemu_bin_relative_path)
++    if is_readable_executable_file(qemu_bin_from_src_dir_path):
++        return qemu_bin_from_src_dir_path
++
++
++class Test(avocado.Test):
++    def setUp(self):
++        self.vm =3D None
++        self.qemu_bin =3D self.params.get('qemu_bin',
++                                        default=3Dpick_default_qemu_bin(=
+))
++        if self.qemu_bin is None:
++            self.cancel("No QEMU binary defined or found in the source t=
+ree")
++        self.vm =3D QEMUMachine(self.qemu_bin)
++
++    def tearDown(self):
++        if self.vm is not None:
++            self.vm.shutdown()
+diff --git a/tests/acceptance/version.py b/tests/acceptance/version.py
+new file mode 100644
+index 0000000000..13b0a7440d
+--- /dev/null
++++ b/tests/acceptance/version.py
+@@ -0,0 +1,24 @@
++# Version check example test
++#
++# Copyright (c) 2018 Red Hat, Inc.
++#
++# Author:
++#  Cleber Rosa <crosa@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
++
++
++from avocado_qemu import Test
++
++
++class Version(Test):
++    """
++    :avocado: enable
++    :avocado: tags=3Dquick
++    """
++    def test_qmp_human_info_version(self):
++        self.vm.launch()
++        res =3D self.vm.command('human-monitor-command',
++                              command_line=3D'info version')
++        self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
 --=20
 2.18.0.rc1.1.g3f1ff2140
