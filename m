@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTjr6-0004lp-RJ
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 04:13:13 -0400
+	(envelope-from <thuth@redhat.com>) id 1fTk0c-00082j-KW
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 04:23:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fTjr2-0001X4-OY
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 04:13:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43792 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fTjr2-0001Wp-JE
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 04:13:08 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180615014249.22730-1-peterx@redhat.com>
-	<20180615014249.22730-4-peterx@redhat.com>
-Date: Fri, 15 Jun 2018 10:13:07 +0200
-In-Reply-To: <20180615014249.22730-4-peterx@redhat.com> (Peter Xu's message of
-	"Fri, 15 Jun 2018 09:42:46 +0800")
-Message-ID: <87tvq4bh7w.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1fTk0b-0000p8-FN
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 04:23:02 -0400
+References: <1529045897-25260-1-git-send-email-thuth@redhat.com>
+	<20180615095752.536f4642.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <4cc50226-8510-4343-8913-538d8f35c543@redhat.com>
+Date: Fri, 15 Jun 2018 10:22:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3 3/6] tests: iotests: drop some stderr
- line
+In-Reply-To: <20180615095752.536f4642.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] loader: Check access size when calling
+ rom_ptr() to avoid crashes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +25,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Dr
-	. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org
 
-Peter Xu <peterx@redhat.com> writes:
+On 15.06.2018 09:57, Cornelia Huck wrote:
+> On Fri, 15 Jun 2018 08:58:17 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+> 
+>> The rom_ptr() function allows direct access to the ROM blobs that we
+>> load during startup. However, there are currently no checks for the
+>> size of the accesses, so it's currently possible to crash QEMU for
+>> example with:
+>>
+>> $ echo "Insane in the mainframe" > /tmp/test.txt
+>> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -append xyz
+>> Segmentation fault (core dumped)
+>> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -initrd /tmp/test.txt
+>> Segmentation fault (core dumped)
+> 
+> It seems nobody managed to trigger the other places yet?
 
-> In my Out-Of-Band test, "check -qcow2 060" fail with this:
->
-> 060 5s ... - output mismatch (see 060.out.bad)
-> --- /home/peterx/git/qemu/tests/qemu-iotests/060.out    2018-06-15 08:31:14.607411950 +0800
-> +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/060.out.bad    2018-06-15 08:33:09.679880113 +0800
-> @@ -427,8 +427,8 @@
->  QMP_VERSION
->  {"return": {}}
->  qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1 index: 0); further non-fatal corruption events will be suppressed
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a0
-> 0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
->  read failed: Input/output error
-> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a0
-> 0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
->  {"return": ""}
->  {"return": {}}
->  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> Failures: 060
-> Failed 1 of 1 tests
+mips_malta.c already seems to check bios_size, so it's not affected as
+far as I can tell.
 
-Please indent this diff; git-am chokes on it for me.
+But you can crash sparc64 like this:
 
-> The order of the event and the in/out error line is swapped.  I didn't
-> dig up the reason, but AFAIU what we want to verify is the event rather
-> than stderr.  Let's drop the stderr line directly for this test.
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+$ echo -n HdrS > /tmp/test.txt
+$ sparc64-softmmu/qemu-system-sparc64 -kernel /tmp/test.txt \
+                                      -initrd /tmp/test.txt
+Segmentation fault (core dumped)
 
-Lose one S-o-b, please :)
+I was not able to crash sparc32 in the same way, but you can see the bad
+access with valgrind there:
+
+$ valgrind sparc-softmmu/qemu-system-sparc -kernel /tmp/test.txt -initrd
+/tmp/test.txt
+==14301== Memcheck, a memory error detector
+==14301== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==14301== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==14301== Command: sparc-softmmu/qemu-system-sparc -kernel /tmp/test.txt
+-initrd /tmp/test.txt
+==14301==
+==14301== Invalid write of size 4
+==14301==    at 0x2C8477: memcpy (string3.h:51)
+==14301==    by 0x2C8477: stl_he_p (bswap.h:342)
+==14301==    by 0x2C8477: stl_be_p (bswap.h:449)
+==14301==    by 0x2C8477: sun4m_load_kernel (sun4m.c:277)
+==14301==    by 0x2C8477: sun4m_hw_init (sun4m.c:992)
+==14301==    by 0x3272F9: machine_run_board_init (machine.c:830)
+==14301==    by 0x23F809: main (vl.c:4477)
+==14301==  Address 0x2702fac0 is 12 bytes after a block of size 4 alloc'd
+==14301==    at 0x4C2B955: calloc (vg_replace_malloc.c:711)
+==14301==    by 0x77B5F55: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.5400.2)
+==14301==    by 0x3282A8: rom_add_file (loader.c:950)
+==14301==    by 0x3285EB: load_image_targphys_as (loader.c:153)
+==14301==    by 0x2C8BDD: sun4m_load_kernel (sun4m.c:253)
+==14301==    by 0x2C8BDD: sun4m_hw_init (sun4m.c:992)
+==14301==    by 0x3272F9: machine_run_board_init (machine.c:830)
+==14301==    by 0x23F809: main (vl.c:4477)
+==14301==
+==14301== Invalid write of size 4
+==14301==    at 0x2C847E: memcpy (string3.h:51)
+==14301==    by 0x2C847E: stl_he_p (bswap.h:342)
+==14301==    by 0x2C847E: stl_be_p (bswap.h:449)
+==14301==    by 0x2C847E: sun4m_load_kernel (sun4m.c:278)
+==14301==    by 0x2C847E: sun4m_hw_init (sun4m.c:992)
+==14301==    by 0x3272F9: machine_run_board_init (machine.c:830)
+==14301==    by 0x23F809: main (vl.c:4477)
+==14301==  Address 0x2702fac4 is 16 bytes after a block of size 4 alloc'd
+==14301==    at 0x4C2B955: calloc (vg_replace_malloc.c:711)
+==14301==    by 0x77B5F55: g_malloc0 (in /usr/lib64/libglib-2.0.so.0.5400.2)
+==14301==    by 0x3282A8: rom_add_file (loader.c:950)
+==14301==    by 0x3285EB: load_image_targphys_as (loader.c:153)
+==14301==    by 0x2C8BDD: sun4m_load_kernel (sun4m.c:253)
+==14301==    by 0x2C8BDD: sun4m_hw_init (sun4m.c:992)
+==14301==    by 0x3272F9: machine_run_board_init (machine.c:830)
+==14301==    by 0x23F809: main (vl.c:4477)
+==14301==
+
+ Thomas
