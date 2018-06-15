@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fTjcS-0007IN-CC
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:58:05 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fTje1-0008HW-CT
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:59:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fTjcR-000352-G8
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:58:04 -0400
-Date: Fri, 15 Jun 2018 09:57:52 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180615095752.536f4642.cohuck@redhat.com>
-In-Reply-To: <1529045897-25260-1-git-send-email-thuth@redhat.com>
-References: <1529045897-25260-1-git-send-email-thuth@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1fTje0-0004va-LJ
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:59:41 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] loader: Check access size when calling
- rom_ptr() to avoid crashes
+In-Reply-To: <c5c1f362-d51d-df1e-c1dd-f57b64c3f1a1@amsat.org>
+References: <20180614164431.29305-1-stefanha@redhat.com>
+	<5768e8f3-eae5-30ef-888a-5e62692c238d@redhat.com>
+	<c5c1f362-d51d-df1e-c1dd-f57b64c3f1a1@amsat.org>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 15 Jun 2018 08:59:34 +0100
+Message-ID: <CAJSP0QU2BLvBVgtwSmNzip-7Kf=LzsrvbBjv87D9FLiswH=o0g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] compiler: add a sizeof_field() macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: John Snow <jsnow@redhat.com>, xen-devel@lists.xenproject.org, qemu-s390x@nongnu.org, "qemu-ppc@nongnu.org list:PowerPC" <qemu-ppc@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, 15 Jun 2018 08:58:17 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On Thu, Jun 14, 2018 at 9:33 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> On 06/14/2018 04:17 PM, John Snow wrote:
+>> On 06/14/2018 12:44 PM, Stefan Hajnoczi wrote:
+>>> Determining the size of a field is useful when you don't have a struct
+>>> variable handy.  Open-coding this is ugly.
+>>>
+>>> This patch adds the sizeof_field() macro, which is similar to
+>>> typeof_field().  Existing instances are updated to use the macro.
+>>>
+>>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>>
+>> How'd you find all the existing instances?
+>
+> This works:
+>
+> $ git grep -E 'sizeof.*)0)->'
 
-> The rom_ptr() function allows direct access to the ROM blobs that we
-> load during startup. However, there are currently no checks for the
-> size of the accesses, so it's currently possible to crash QEMU for
-> example with:
-> 
-> $ echo "Insane in the mainframe" > /tmp/test.txt
-> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -append xyz
-> Segmentation fault (core dumped)
-> $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -initrd /tmp/test.txt
-> Segmentation fault (core dumped)
+Yes, I used a similar grep command-line.
 
-It seems nobody managed to trigger the other places yet?
+I also checked for "sizeof.*)NULL" but nothing uses that syntax.
 
-> 
-> We need a possibility to check the size of the ROM area that we want
-> to access, thus let's add a size parameter to the rom_ptr() function
-> to avoid these problems.
-
-Makes sense.
-
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/core/loader.c     | 10 +++++-----
->  hw/mips/mips_malta.c |  6 ++++--
->  hw/s390x/ipl.c       | 13 ++++++++++---
->  hw/sparc/sun4m.c     |  2 +-
->  hw/sparc64/sun4u.c   |  2 +-
->  include/hw/loader.h  |  2 +-
->  target/arm/cpu.c     |  2 +-
->  7 files changed, 23 insertions(+), 14 deletions(-)
-> 
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Stefan
