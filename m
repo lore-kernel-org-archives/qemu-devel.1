@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fTdlW-000883-2U
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 21:43:03 -0400
+	(envelope-from <peterx@redhat.com>) id 1fTdlZ-00088m-Vc
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 21:43:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fTdlS-0003J1-Up
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 21:43:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35112 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fTdlZ-0003P8-Ai
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 21:43:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35116 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fTdlS-0003Ha-QF
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 21:42:58 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fTdlZ-0003Oc-4o
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 21:43:05 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Fri, 15 Jun 2018 09:42:43 +0800
-Message-Id: <20180615014249.22730-1-peterx@redhat.com>
+Date: Fri, 15 Jun 2018 09:42:44 +0800
+Message-Id: <20180615014249.22730-2-peterx@redhat.com>
+In-Reply-To: <20180615014249.22730-1-peterx@redhat.com>
+References: <20180615014249.22730-1-peterx@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 0/6] monitor: enable OOB by default
+Subject: [Qemu-devel] [PATCH v3 1/6] chardev: comment details for CLOSED
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,45 +28,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, peterx@redhat.com, Eric Auger <eric.auger@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, peterx@redhat.com, Eric Auger <eric.auger@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Patches 1-3 are new. I am not sure about patch 3; I hope current hack
-works for us.
+It was unclear before on what does the CLOSED event mean.  Meanwhile we
+add a TODO to fix up the CLOSED event in the future when the in/out
+ports are different for a chardev.
 
-v3:
-- drop patch "tests: iotests: don't compare SHUTDOWN event", replace
-  it with "monitor: flush qmp responses when CLOSED" to fix up the
-  race. [Eric, Markus]
-- tweak the oob revert patch to not break qmp-test [Eric]
-- quite a few comment and commit message fix-ups [Eric]
-- add more comment in commit message, mention about why MUX can't be
-  used for Out-Of-Band [Markus]
-- one new patch to comment on chardev CLOSED event [Stefan]
-- one new patch to fix iotest breakage on 060 specifically
+CC: Paolo Bonzini <pbonzini@redhat.com>
+CC: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>
+CC: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ include/chardev/char.h | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-Tests: make check, iotests
-
-Please review.  Thanks,
-
-Peter Xu (6):
-  chardev: comment details for CLOSED event
-  monitor: flush qmp responses when CLOSED
-  tests: iotests: drop some stderr line
-  docs: mention shared state protect for OOB
-  monitor: remove "x-oob", turn oob on by default
-  Revert "tests: Add parameter to qtest_init_without_qmp_handshake"
-
- docs/devel/qapi-code-gen.txt |  3 +++
- include/chardev/char.h       | 11 ++++++++-
- include/monitor/monitor.h    |  1 -
- tests/libqtest.h             |  4 +--
- monitor.c                    | 47 ++++++++++++++++++++----------------
- tests/libqtest.c             | 10 +++-----
- tests/qmp-test.c             |  6 ++---
- vl.c                         |  5 ----
- tests/qemu-iotests/060       | 10 +++++++-
- tests/qemu-iotests/060.out   |  1 -
- 10 files changed, 56 insertions(+), 42 deletions(-)
-
+diff --git a/include/chardev/char.h b/include/chardev/char.h
+index 04de45795e..6f0576e214 100644
+--- a/include/chardev/char.h
++++ b/include/chardev/char.h
+@@ -22,7 +22,16 @@ typedef enum {
+     CHR_EVENT_OPENED, /* new connection established */
+     CHR_EVENT_MUX_IN, /* mux-focus was set to this terminal */
+     CHR_EVENT_MUX_OUT, /* mux-focus will move on */
+-    CHR_EVENT_CLOSED /* connection closed */
++    CHR_EVENT_CLOSED /* connection closed.  NOTE: currently this event
++                      * is only bound to the read port of the chardev.
++                      * Normally the read port and write port of a
++                      * chardev should be the same, but it can be
++                      * different, e.g., for fd chardevs, when the two
++                      * fds are different.  So when we received the
++                      * CLOSED event it's still possible that the out
++                      * port is still open.  TODO: we should only send
++                      * the CLOSED event when both ports are closed.
++                      */
+ } QEMUChrEvent;
+=20
+ #define CHR_READ_BUF_LEN 4096
 --=20
 2.17.1
