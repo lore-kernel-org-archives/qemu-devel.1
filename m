@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fTpHo-00071n-I8
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:01:12 -0400
+	(envelope-from <david@redhat.com>) id 1fTpLY-0000qG-1d
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fTpHl-0007gu-Du
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:01:08 -0400
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:35261)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fTpHl-0007fw-69
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:01:05 -0400
-Date: Fri, 15 Jun 2018 10:01:03 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180615140103.GB9752@flamenco>
-References: <20180614193147.29680-1-richard.henderson@linaro.org>
-	<CAFEAcA-n9U90h8j_-cu0Y+vxnM0mJra0Ldw880t33G122jdCiQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-n9U90h8j_-cu0Y+vxnM0mJra0Ldw880t33G122jdCiQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL 00/18] tcg queued patches
+	(envelope-from <david@redhat.com>) id 1fTpLW-0003Qz-Ii
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:05:00 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Fri, 15 Jun 2018 16:04:36 +0200
+Message-Id: <20180615140448.32234-2-david@redhat.com>
+In-Reply-To: <20180615140448.32234-1-david@redhat.com>
+References: <20180615140448.32234-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 01/13] pc-dimm: remove leftover "struct
+ pc_dimms_capacity"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +20,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-On Fri, Jun 15, 2018 at 11:41:28 +0100, Peter Maydell wrote:
-> Hi; I get compile failures with clang I'm afraid
-> (seen on x86-64 Linux, OSX and FreeBSD):
-> 
-> /home/petmay01/linaro/qemu-for-merges/accel/tcg/translate-all.c:1800:44:
-> error: incompatible integer to pointer conversion passing 'uintptr_t'
-> (aka 'unsigned long') to parameter of type 'void *'
-> [-Werror,-Wint-conversion]
->         atomic_set(&tcg_ctx->code_gen_ptr, orig_aligned);
+Not needed anymore, let's drop it.
 
-Fixed with:
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/mem/pc-dimm.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1797,7 +1797,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-         uintptr_t orig_aligned = (uintptr_t)gen_code_buf;
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 12da89d562..62b34a992e 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -27,11 +27,6 @@
+ #include "sysemu/numa.h"
+ #include "trace.h"
  
-         orig_aligned -= ROUND_UP(sizeof(*tb), qemu_icache_linesize);
--        atomic_set(&tcg_ctx->code_gen_ptr, orig_aligned);
-+        atomic_set(&tcg_ctx->code_gen_ptr, (void *)orig_aligned);
-         return existing_tb;
-     }
-     tcg_tb_insert(tb);
-
-This applies to patch 14/18 ("translate-all: discard TB when
-tb_link_page returns an existing matching TB") of the pull request.
-
-The rest compiles OK for me on clang 7.0.0.
-
-Richard: can you fold this fixup into patch 14?
-
-Thanks,
-
-		Emilio
+-typedef struct pc_dimms_capacity {
+-     uint64_t size;
+-     Error    **errp;
+-} pc_dimms_capacity;
+-
+ void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+                          uint64_t align, Error **errp)
+ {
+-- 
+2.17.1
