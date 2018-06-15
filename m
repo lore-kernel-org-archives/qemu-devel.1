@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38921)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTpiq-0004mX-Lb
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:29:05 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fTpri-0004gK-BB
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:38:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fTpip-0001OL-Nr
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:29:04 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 15 Jun 2018 16:28:29 +0200
-Message-Id: <1529072910-16156-11-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1529072910-16156-1-git-send-email-eric.auger@redhat.com>
-References: <1529072910-16156-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 10/11] hw/arm/virt: Use 256MB ECAM region by
- default
+	(envelope-from <stefanha@redhat.com>) id 1fTprh-00018Y-EO
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:38:14 -0400
+Date: Fri, 15 Jun 2018 15:38:05 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180615143805.GA12972@stefanha-x1.localdomain>
+References: <20180608060417.10170-1-famz@redhat.com>
+	<20180608060417.10170-2-famz@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="7JfCtLOvnd9MIVvH"
+Content-Disposition: inline
+In-Reply-To: <20180608060417.10170-2-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/6] file-posix: Fix EINTR handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,85 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: drjones@redhat.com, wei@redhat.com, zhaoshenglong@huawei.com, lersek@redhat.com, ard.biesheuvel@linaro.org, christoffer.dall@arm.com, marc.zyngier@arm.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-With this patch, virt-3.0 machine uses a new 256MB ECAM region
-by default instead of the legacy 16MB one, if highmem is set
-(LPAE supported by the guest) and (!firmware_loaded || aarch64).
 
-Indeed aarch32 mode FW may not support this high ECAM region.
+--7JfCtLOvnd9MIVvH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- hw/arm/virt.c         | 10 ++++++++++
- include/hw/arm/virt.h |  1 +
- 2 files changed, 11 insertions(+)
+On Fri, Jun 08, 2018 at 02:04:12PM +0800, Fam Zheng wrote:
+> EINTR should be checked against errno, not ret. While fixing the bug,
+> collecting the branches with a switch block.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/file-posix.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 513d371bb1..c6dae38f94 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -1473,20 +1473,20 @@ static ssize_t handle_aiocb_copy_range(RawPosixAI=
+OData *aiocb)
+>          ssize_t ret =3D copy_file_range(aiocb->aio_fildes, &in_off,
+>                                        aiocb->aio_fd2, &out_off,
+>                                        bytes, 0);
+> -        if (ret =3D=3D -EINTR) {
+> -            continue;
+> -        }
+> -        if (ret < 0) {
+> -            if (errno =3D=3D ENOSYS) {
+> +        if (ret <=3D 0) {
+> +            switch (errno) {
+> +            case 0:
+> +                /* No progress (e.g. when beyond EOF), let the caller fa=
+ll back
+> +                 * to buffer I/O. */
+> +                /* fall through */
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 75a1a14..5a16e6c 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1317,6 +1317,7 @@ static void machvirt_init(MachineState *machine)
-     int n, virt_max_cpus;
-     MemoryRegion *ram = g_new(MemoryRegion, 1);
-     bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
-+    bool aarch64 = true;
- 
-     /* We can probe only here because during property set
-      * KVM is not available yet
-@@ -1432,6 +1433,8 @@ static void machvirt_init(MachineState *machine)
-         numa_cpu_pre_plug(&possible_cpus->cpus[cs->cpu_index], DEVICE(cpuobj),
-                           &error_fatal);
- 
-+        aarch64 &= object_property_get_bool(cpuobj, "aarch64", NULL);
-+
-         if (!vms->secure) {
-             object_property_set_bool(cpuobj, false, "has_el3", NULL);
-         }
-@@ -1490,6 +1493,8 @@ static void machvirt_init(MachineState *machine)
-         create_uart(vms, pic, VIRT_SECURE_UART, secure_sysmem, serial_hd(1));
-     }
- 
-+    vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
-+
-     create_rtc(vms, pic);
- 
-     create_pcie(vms, pic);
-@@ -1786,6 +1791,8 @@ static void virt_3_0_instance_init(Object *obj)
-                                     "Set GIC version. "
-                                     "Valid values are 2, 3 and host", NULL);
- 
-+    vms->highmem_ecam = !vmc->no_highmem_ecam;
-+
-     if (vmc->no_its) {
-         vms->its = false;
-     } else {
-@@ -1823,8 +1830,11 @@ static void virt_2_12_instance_init(Object *obj)
- 
- static void virt_machine_2_12_options(MachineClass *mc)
- {
-+    VirtMachineClass *vmc = VIRT_MACHINE_CLASS(OBJECT_CLASS(mc));
-+
-     virt_machine_3_0_options(mc);
-     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_12);
-+    vmc->no_highmem_ecam = true;
- }
- DEFINE_VIRT_MACHINE(2, 12)
- 
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 085fdcc..9a870cc 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -98,6 +98,7 @@ typedef struct {
-     bool no_pmu;
-     bool claim_edge_triggered_timers;
-     bool smbios_old_sys_ver;
-+    bool no_highmem_ecam;
- } VirtMachineClass;
- 
- typedef struct {
--- 
-2.5.5
+The C11 standard says:
+
+  The value of errno in the initial thread is zero at program startup
+  (the initial value of errno in other threads is an indeterminate
+  value), but is never set to zero by any library function.
+
+So this code is buggy because it assumes copy_file_range(2) sets errno
+to 0 on success.  errno could actually contain a stale value from a
+previous function).
+
+--7JfCtLOvnd9MIVvH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbI89NAAoJEJykq7OBq3PIrt8H/1p24pgPvYgJWTEQegpTWfiN
+fL/1W3B7mrBWegDAuk1pJVFITNqIVJluzLEw9ujva6Pj6iyX1zorPo2g2yh7lMHw
+8RgnoUm6E0E7eyMEzGcRVfWbDNrPPapaAe+DMTqSDHz4qjm62B7yH9eX/jLLc6Hq
+wp4qXpGugpjboMBzGzp84wKTcvC6VgN3vUQX7lPclSzwEPgivUUgNneQBLJzP4xT
+iqYPZfl3R/5Hso2mTeJB7enXw0zJgf2MMrP7oT6abQJFR1Fo0zCuN53GE4xLYgsD
+2/e5xTiDpYHV5wK0gL511gdfhrBWMYkb6javXok5fuXd4nZJg+wZN7U7LN5cM/I=
+=hrod
+-----END PGP SIGNATURE-----
+
+--7JfCtLOvnd9MIVvH--
