@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTmOL-0004zZ-0e
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:55:42 -0400
+	(envelope-from <david@redhat.com>) id 1fTmS0-0006CY-2S
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:59:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTmOK-00079y-7K
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:55:41 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:40152)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fTmOJ-00078T-Gg
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:55:39 -0400
-Received: by mail-ot0-x243.google.com with SMTP id w9-v6so10502276otj.7
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 03:55:39 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fTmRw-0001SY-0c
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:59:28 -0400
+From: David Hildenbrand <david@redhat.com>
+References: <20180611121655.19616-1-david@redhat.com>
+	<20180613153454.3e0a07a3@redhat.com>
+	<11ae5790-03c8-d81c-1074-dcc1e054fedc@redhat.com>
+Message-ID: <2d90f07a-cdaa-a0da-1efc-8e24f6d0f539@redhat.com>
+Date: Fri, 15 Jun 2018 12:59:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180612204632.28780-1-jusual@mail.ru>
-References: <20180612204632.28780-1-jusual@mail.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Jun 2018 11:55:18 +0100
-Message-ID: <CAFEAcA-p5A4S=+ncW42KU2ivBHyALJdUswLUYhh=By6rKYstZw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow ARMv6-M Thumb2
- instructions
+In-Reply-To: <11ae5790-03c8-d81c-1074-dcc1e054fedc@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 00/11] pc-dimm: next bunch of cleanups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +25,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
+To: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 12 June 2018 at 21:46, Julia Suvorova <jusual@mail.ru> wrote:
-> ARMv6-M supports 6 Thumb2 instructions. This patch checks for these
-> instructions and allows their execution.
-> Like Thumb2 cores, ARMv6-M always interprets BL instruction as 32-bit.
->
-> This patch is required for future Cortex-M0 support.
->
-> Signed-off-by: Julia Suvorova <jusual@mail.ru>
-> @@ -10075,6 +10076,11 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
->  {
->      uint32_t imm, shift, offset;
->      uint32_t rd, rn, rm, rs;
-> +    uint32_t armv6m_insn[] = {0xf3808000 /* msr */, 0xf3b08040 /* dsb */,
-> +                              0xf3b08050 /* dmb */, 0xf3b08060 /* isb */,
-> +                              0xf3e08000 /* mrs */, 0xf000d000 /* bl */};
-> +    uint32_t armv6m_mask[] = {0xffe0d000, 0xfff0d0f0, 0xfff0d0f0,
-> +                              0xfff0d0f0, 0xffe0d000, 0xf800d000};
+On 13.06.2018 16:11, David Hildenbrand wrote:
+> On 13.06.2018 15:34, Igor Mammedov wrote:
+>> On Mon, 11 Jun 2018 14:16:44 +0200
+>> David Hildenbrand <david@redhat.com> wrote:
+>>
+>>> This is another set of cleanups as the result from
+>>>     [PATCH v4 00/14] MemoryDevice: use multi stage hotplug handlers
+>>> And is based on the two series
+>>>     [PATCH v1 0/2] memory: fix alignment checks/asserts
+>>>     [PATCH v2 0/6] spapr: machine hotplug handler cleanups
+>>>
+>>> These cleanup are the last step before factoring out the
+>>> pre_plug, plug and unplug logic of memory devices completely, to make it
+>>> more independent from pc-dimm.
+>> patches 1-4 are fine,
+>> the rest starting from 5/11 is based on wrong assumptions so should
+>> be reworked or dropped.
+> 
+> @Paolo can you pick up patch 1-4, so we have them out of the way (while
+> I potentially create new and more patches?)
 
-I think these arrays should be 'const'; we can also move them closer
-to their point of use, inside the scope of the if() below.
+I'll drag these 4 along and perform some renaming in patch nr 3.
 
-Since those are trivial tweaks, I'm going to put this into
-target-arm.next with those changes made, if that's OK.
 
-thanks
--- PMM
+-- 
+
+Thanks,
+
+David / dhildenb
