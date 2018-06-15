@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fTkAp-0001pi-T4
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 04:33:37 -0400
+	(envelope-from <groug@kaod.org>) id 1fTkB3-0001zy-R7
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 04:33:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fTkAm-0003eo-LO
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 04:33:35 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:36511
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1fTkAm-0003cy-DR
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 04:33:32 -0400
-References: <1522924983-4523-1-git-send-email-thuth@redhat.com>
-	<16444602-26f5-46ba-2d39-92e68c5bf904@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <8de353d3-c4bc-f10e-1eaf-8ea7b989b97d@ilande.co.uk>
-Date: Fri, 15 Jun 2018 09:33:23 +0100
+	(envelope-from <groug@kaod.org>) id 1fTkB0-0003yN-8T
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 04:33:49 -0400
+Received: from 3.mo6.mail-out.ovh.net ([178.33.253.26]:42749)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fTkAz-0003wY-Tu
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 04:33:46 -0400
+Received: from player728.ha.ovh.net (unknown [10.109.105.96])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 0DABA16473F
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 10:33:43 +0200 (CEST)
+Date: Fri, 15 Jun 2018 10:33:36 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180615103336.4bcda3dc@bahia.lan>
+In-Reply-To: <20180615021628.20594-1-david@gibson.dropbear.id.au>
+References: <20180615021628.20594-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <16444602-26f5-46ba-2d39-92e68c5bf904@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/sparc/sun4m: Fix problems with device
- introspection
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] target/ppc,
+ spapr: Move VPA information to machine_data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,193 +30,488 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru
 
-On 15/06/18 06:15, Thomas Huth wrote:
+On Fri, 15 Jun 2018 12:16:28 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On 05.04.2018 12:43, Thomas Huth wrote:
->> Several devices of the sun4m machines are using &error_fatal in
->> their instance_init function and thus can cause QEMU to abort
->> unexpectedly:
->>
->> $ echo "{'execute':'qmp_capabilities'}"\
->>         "{'execute':'device-list-properties',"\
->>         " 'arguments':{'typename':'openprom'}}" \
->>         | sparc-softmmu/qemu-system-sparc -M SS-10 -S -qmp stdio
->> {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
->>   "package": "build-all"}, "capabilities": []}}
->> {"return": {}}
->> RAMBlock "sun4m.prom" already registered, abort!
->> Aborted (core dumped)
->>
->> $ echo "{'execute':'qmp_capabilities'}"\
->>         "{'execute':'device-list-properties',"\
->>         " 'arguments':{'typename':'macio_idreg'}}" \
->>         | sparc-softmmu/qemu-system-sparc -M SS-10 -S -qmp stdio
->> {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
->>   "package": "build-all"}, "capabilities": []}}
->> {"return": {}}
->> RAMBlock "sun4m.idreg" already registered, abort!
->> Aborted (core dumped)
->>
->> $ echo "{'execute':'qmp_capabilities'}"\
->>         "{'execute':'device-list-properties',"\
->>         " 'arguments':{'typename':'tcx_afx'}}" \
->>         | sparc-softmmu/qemu-system-sparc -M SS-5 -S -qmp stdio
->> {"QMP": {"version": {"qemu": {"micro": 91, "minor": 11, "major": 2},
->>   "package": "build-all"}, "capabilities": []}}
->> {"return": {}}
->> RAMBlock "sun4m.afx" already registered, abort!
->> Aborted (core dumped)
->>
->> Fix the issues by converting the instance_init functions into realize()
->> functions instead, which are allowed to fail (and not called during
->> device introspection).
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>   hw/sparc/sun4m.c | 67 ++++++++++++++++++++++++++++++++++++++++++--------------
->>   1 file changed, 50 insertions(+), 17 deletions(-)
->>
->> diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
->> index 6471aca..8254ec3 100644
->> --- a/hw/sparc/sun4m.c
->> +++ b/hw/sparc/sun4m.c
->> @@ -572,23 +572,36 @@ typedef struct IDRegState {
->>       MemoryRegion mem;
->>   } IDRegState;
->>   
->> -static void idreg_init1(Object *obj)
->> +static void idreg_realize(DeviceState *ds, Error **errp)
->>   {
->> -    IDRegState *s = MACIO_ID_REGISTER(obj);
->> -    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
->> +    IDRegState *s = MACIO_ID_REGISTER(ds);
->> +    SysBusDevice *dev = SYS_BUS_DEVICE(ds);
->> +    Error *local_err = NULL;
->> +
->> +    memory_region_init_ram_nomigrate(&s->mem, OBJECT(ds), "sun4m.idreg",
->> +                                     sizeof(idreg_data), &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->>   
->> -    memory_region_init_ram_nomigrate(&s->mem, obj,
->> -                           "sun4m.idreg", sizeof(idreg_data), &error_fatal);
->>       vmstate_register_ram_global(&s->mem);
->>       memory_region_set_readonly(&s->mem, true);
->>       sysbus_init_mmio(dev, &s->mem);
->>   }
->>   
->> +static void idreg_class_init(ObjectClass *oc, void *data)
->> +{
->> +    DeviceClass *dc = DEVICE_CLASS(oc);
->> +
->> +    dc->realize = idreg_realize;
->> +}
->> +
->>   static const TypeInfo idreg_info = {
->>       .name          = TYPE_MACIO_ID_REGISTER,
->>       .parent        = TYPE_SYS_BUS_DEVICE,
->>       .instance_size = sizeof(IDRegState),
->> -    .instance_init = idreg_init1,
->> +    .class_init    = idreg_class_init,
->>   };
->>   
->>   #define TYPE_TCX_AFX "tcx_afx"
->> @@ -613,21 +626,35 @@ static void afx_init(hwaddr addr)
->>       sysbus_mmio_map(s, 0, addr);
->>   }
->>   
->> -static void afx_init1(Object *obj)
->> +static void afx_realize(DeviceState *ds, Error **errp)
->>   {
->> -    AFXState *s = TCX_AFX(obj);
->> -    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
->> +    AFXState *s = TCX_AFX(ds);
->> +    SysBusDevice *dev = SYS_BUS_DEVICE(ds);
->> +    Error *local_err = NULL;
->> +
->> +    memory_region_init_ram_nomigrate(&s->mem, OBJECT(ds), "sun4m.afx", 4,
->> +                                     &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->>   
->> -    memory_region_init_ram_nomigrate(&s->mem, obj, "sun4m.afx", 4, &error_fatal);
->>       vmstate_register_ram_global(&s->mem);
->>       sysbus_init_mmio(dev, &s->mem);
->>   }
->>   
->> +static void afx_class_init(ObjectClass *oc, void *data)
->> +{
->> +    DeviceClass *dc = DEVICE_CLASS(oc);
->> +
->> +    dc->realize = afx_realize;
->> +}
->> +
->>   static const TypeInfo afx_info = {
->>       .name          = TYPE_TCX_AFX,
->>       .parent        = TYPE_SYS_BUS_DEVICE,
->>       .instance_size = sizeof(AFXState),
->> -    .instance_init = afx_init1,
->> +    .class_init    = afx_class_init,
->>   };
->>   
->>   #define TYPE_OPENPROM "openprom"
->> @@ -680,13 +707,19 @@ static void prom_init(hwaddr addr, const char *bios_name)
->>       }
->>   }
->>   
->> -static void prom_init1(Object *obj)
->> +static void prom_realize(DeviceState *ds, Error **errp)
->>   {
->> -    PROMState *s = OPENPROM(obj);
->> -    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
->> +    PROMState *s = OPENPROM(ds);
->> +    SysBusDevice *dev = SYS_BUS_DEVICE(ds);
->> +    Error *local_err = NULL;
->> +
->> +    memory_region_init_ram_nomigrate(&s->prom, OBJECT(ds), "sun4m.prom",
->> +                                     PROM_SIZE_MAX, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->>   
->> -    memory_region_init_ram_nomigrate(&s->prom, obj, "sun4m.prom", PROM_SIZE_MAX,
->> -                           &error_fatal);
->>       vmstate_register_ram_global(&s->prom);
->>       memory_region_set_readonly(&s->prom, true);
->>       sysbus_init_mmio(dev, &s->prom);
->> @@ -701,6 +734,7 @@ static void prom_class_init(ObjectClass *klass, void *data)
->>       DeviceClass *dc = DEVICE_CLASS(klass);
->>   
->>       dc->props = prom_properties;
->> +    dc->realize = prom_realize;
->>   }
->>   
->>   static const TypeInfo prom_info = {
->> @@ -708,7 +742,6 @@ static const TypeInfo prom_info = {
->>       .parent        = TYPE_SYS_BUS_DEVICE,
->>       .instance_size = sizeof(PROMState),
->>       .class_init    = prom_class_init,
->> -    .instance_init = prom_init1,
->>   };
->>   
->>   #define TYPE_SUN4M_MEMORY "memory"
->>
-> 
-> Ping!
+> CPUPPCState currently contains a number of fields containing the state of
+> the VPA.  The VPA is a PAPR specific concept covering several guest/host
+> shared memory areas used to communicate some information with the
+> hypervisor.
+>=20
+> As a PAPR concept this is really machine specific information, although it
+> is per-cpu, so it doesn't really belong in the core CPU state structure.
+>=20
+> There's also other information that's per-cpu, but platform/machine
+> specific.  So create a (void *)machine_data in PowerPCCPU which can be
+> used by the machine to locate per-cpu data.  Intialization, lifetime and
+> cleanup of machine_data is entirely up to the machine type.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr_cpu_core.c         | 13 ++++++
+>  hw/ppc/spapr_hcall.c            | 77 ++++++++++++++++++---------------
+>  include/hw/ppc/spapr_cpu_core.h | 11 +++++
+>  target/ppc/cpu.h                |  7 +--
+>  target/ppc/kvm.c                | 39 +++++++++--------
+>  target/ppc/translate_init.inc.c |  8 ----
+>  6 files changed, 88 insertions(+), 67 deletions(-)
+>=20
+> I pulled out the earlier pathces adding machine_data, since putting
+> intc there broke C=C3=A9dric's XIVE work.  Here's a version of just the V=
+PA
+> part revised to be standalone.
+>=20
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index 4f0c168784..c4db975d70 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -28,6 +28,7 @@ static void spapr_cpu_reset(void *opaque)
+>      CPUState *cs =3D CPU(cpu);
+>      CPUPPCState *env =3D &cpu->env;
+>      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
+>      target_ulong lpcr;
+> =20
+>      cpu_reset(cs);
+> @@ -69,6 +70,12 @@ static void spapr_cpu_reset(void *opaque)
+> =20
+>      /* Set a full AMOR so guest can use the AMR as it sees fit */
+>      env->spr[SPR_AMOR] =3D 0xffffffffffffffffull;
+> +
+> +    spapr_cpu->vpa_addr =3D 0;
+> +    spapr_cpu->slb_shadow_addr =3D 0;
+> +    spapr_cpu->slb_shadow_size =3D 0;
+> +    spapr_cpu->dtl_addr =3D 0;
+> +    spapr_cpu->dtl_size =3D 0;
+>  }
+> =20
+>  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
+_ulong r3)
+> @@ -104,8 +111,12 @@ const char *spapr_get_cpu_core_type(const char *cpu_=
+type)
+> =20
+>  static void spapr_unrealize_vcpu(PowerPCCPU *cpu)
+>  {
+> +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
+> +
+>      qemu_unregister_reset(spapr_cpu_reset, cpu);
+>      object_unparent(cpu->intc);
+> +    cpu->machine_data =3D NULL;
+> +    g_free(spapr_cpu);
+>      cpu_remove_sync(CPU(cpu));
+>      object_unparent(OBJECT(cpu));
+>  }
+> @@ -128,6 +139,8 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPR=
+MachineState *spapr,
+>      CPUPPCState *env =3D &cpu->env;
+>      Error *local_err =3D NULL;
+> =20
+> +    cpu->machine_data =3D g_new0(sPAPRCPUState, 1);
+> +
+>      object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
+>      if (local_err) {
+>          goto error;
 
-Ooops sorry - I vaguely remember seeing this before but must have 
-forgotten about them. Both patches look good to me, so I'll add my R-B 
-and add them to my qemu-sparc queue.
+This function should g_free(cpu->machine_data) in case of error to
+avoid a leak, ie, the g_free() you had to drop in my other patch.
 
+With that fixed,
 
-ATB,
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Mark.
+Alternatively, I'm now thinking machine_data could be handled by
+spapr_create_vcpu()/spapr_destroy_cpu(). It would stick more
+to the CPU object life cycle, which makes sense since it holds
+former CPU bits.
+
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 8b9a4b577f..ae913d070f 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -8,6 +8,7 @@
+>  #include "exec/exec-all.h"
+>  #include "helper_regs.h"
+>  #include "hw/ppc/spapr.h"
+> +#include "hw/ppc/spapr_cpu_core.h"
+>  #include "mmu-hash64.h"
+>  #include "cpu-models.h"
+>  #include "trace.h"
+> @@ -908,9 +909,11 @@ unmap_out:
+>  #define VPA_SHARED_PROC_OFFSET 0x9
+>  #define VPA_SHARED_PROC_VAL    0x2
+> =20
+> -static target_ulong register_vpa(CPUPPCState *env, target_ulong vpa)
+> +static target_ulong register_vpa(PowerPCCPU *cpu, target_ulong vpa)
+>  {
+> -    CPUState *cs =3D CPU(ppc_env_get_cpu(env));
+> +    CPUState *cs =3D CPU(cpu);
+> +    CPUPPCState *env =3D &cpu->env;
+> +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
+>      uint16_t size;
+>      uint8_t tmp;
+> =20
+> @@ -935,32 +938,34 @@ static target_ulong register_vpa(CPUPPCState *env, =
+target_ulong vpa)
+>          return H_PARAMETER;
+>      }
+> =20
+> -    env->vpa_addr =3D vpa;
+> +    spapr_cpu->vpa_addr =3D vpa;
+> =20
+> -    tmp =3D ldub_phys(cs->as, env->vpa_addr + VPA_SHARED_PROC_OFFSET);
+> +    tmp =3D ldub_phys(cs->as, spapr_cpu->vpa_addr + VPA_SHARED_PROC_OFFS=
+ET);
+>      tmp |=3D VPA_SHARED_PROC_VAL;
+> -    stb_phys(cs->as, env->vpa_addr + VPA_SHARED_PROC_OFFSET, tmp);
+> +    stb_phys(cs->as, spapr_cpu->vpa_addr + VPA_SHARED_PROC_OFFSET, tmp);
+> =20
+>      return H_SUCCESS;
+>  }
+> =20
+> -static target_ulong deregister_vpa(CPUPPCState *env, target_ulong vpa)
+> +static target_ulong deregister_vpa(PowerPCCPU *cpu, target_ulong vpa)
+>  {
+> -    if (env->slb_shadow_addr) {
+> +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
+> +
+> +    if (spapr_cpu->slb_shadow_addr) {
+>          return H_RESOURCE;
+>      }
+> =20
+> -    if (env->dtl_addr) {
+> +    if (spapr_cpu->dtl_addr) {
+>          return H_RESOURCE;
+>      }
+> =20
+> -    env->vpa_addr =3D 0;
+> +    spapr_cpu->vpa_addr =3D 0;
+>      return H_SUCCESS;
+>  }
+> =20
+> -static target_ulong register_slb_shadow(CPUPPCState *env, target_ulong a=
+ddr)
+> +static target_ulong register_slb_shadow(PowerPCCPU *cpu, target_ulong ad=
+dr)
+>  {
+> -    CPUState *cs =3D CPU(ppc_env_get_cpu(env));
+> +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
+>      uint32_t size;
+> =20
+>      if (addr =3D=3D 0) {
+> @@ -968,7 +973,7 @@ static target_ulong register_slb_shadow(CPUPPCState *=
+env, target_ulong addr)
+>          return H_HARDWARE;
+>      }
+> =20
+> -    size =3D ldl_be_phys(cs->as, addr + 0x4);
+> +    size =3D ldl_be_phys(CPU(cpu)->as, addr + 0x4);
+>      if (size < 0x8) {
+>          return H_PARAMETER;
+>      }
+> @@ -977,26 +982,28 @@ static target_ulong register_slb_shadow(CPUPPCState=
+ *env, target_ulong addr)
+>          return H_PARAMETER;
+>      }
+> =20
+> -    if (!env->vpa_addr) {
+> +    if (!spapr_cpu->vpa_addr) {
+>          return H_RESOURCE;
+>      }
+> =20
+> -    env->slb_shadow_addr =3D addr;
+> -    env->slb_shadow_size =3D size;
+> +    spapr_cpu->slb_shadow_addr =3D addr;
+> +    spapr_cpu->slb_shadow_size =3D size;
+> =20
+>      return H_SUCCESS;
+>  }
+> =20
+> -static target_ulong deregister_slb_shadow(CPUPPCState *env, target_ulong=
+ addr)
+> +static target_ulong deregister_slb_shadow(PowerPCCPU *cpu, target_ulong =
+addr)
+>  {
+> -    env->slb_shadow_addr =3D 0;
+> -    env->slb_shadow_size =3D 0;
+> +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
+> +
+> +    spapr_cpu->slb_shadow_addr =3D 0;
+> +    spapr_cpu->slb_shadow_size =3D 0;
+>      return H_SUCCESS;
+>  }
+> =20
+> -static target_ulong register_dtl(CPUPPCState *env, target_ulong addr)
+> +static target_ulong register_dtl(PowerPCCPU *cpu, target_ulong addr)
+>  {
+> -    CPUState *cs =3D CPU(ppc_env_get_cpu(env));
+> +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
+>      uint32_t size;
+> =20
+>      if (addr =3D=3D 0) {
+> @@ -1004,26 +1011,28 @@ static target_ulong register_dtl(CPUPPCState *env=
+, target_ulong addr)
+>          return H_HARDWARE;
+>      }
+> =20
+> -    size =3D ldl_be_phys(cs->as, addr + 0x4);
+> +    size =3D ldl_be_phys(CPU(cpu)->as, addr + 0x4);
+> =20
+>      if (size < 48) {
+>          return H_PARAMETER;
+>      }
+> =20
+> -    if (!env->vpa_addr) {
+> +    if (!spapr_cpu->vpa_addr) {
+>          return H_RESOURCE;
+>      }
+> =20
+> -    env->dtl_addr =3D addr;
+> -    env->dtl_size =3D size;
+> +    spapr_cpu->dtl_addr =3D addr;
+> +    spapr_cpu->dtl_size =3D size;
+> =20
+>      return H_SUCCESS;
+>  }
+> =20
+> -static target_ulong deregister_dtl(CPUPPCState *env, target_ulong addr)
+> +static target_ulong deregister_dtl(PowerPCCPU *cpu, target_ulong addr)
+>  {
+> -    env->dtl_addr =3D 0;
+> -    env->dtl_size =3D 0;
+> +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
+> +
+> +    spapr_cpu->dtl_addr =3D 0;
+> +    spapr_cpu->dtl_size =3D 0;
+> =20
+>      return H_SUCCESS;
+>  }
+> @@ -1035,38 +1044,36 @@ static target_ulong h_register_vpa(PowerPCCPU *cp=
+u, sPAPRMachineState *spapr,
+>      target_ulong procno =3D args[1];
+>      target_ulong vpa =3D args[2];
+>      target_ulong ret =3D H_PARAMETER;
+> -    CPUPPCState *tenv;
+>      PowerPCCPU *tcpu;
+> =20
+>      tcpu =3D spapr_find_cpu(procno);
+>      if (!tcpu) {
+>          return H_PARAMETER;
+>      }
+> -    tenv =3D &tcpu->env;
+> =20
+>      switch (flags) {
+>      case FLAGS_REGISTER_VPA:
+> -        ret =3D register_vpa(tenv, vpa);
+> +        ret =3D register_vpa(tcpu, vpa);
+>          break;
+> =20
+>      case FLAGS_DEREGISTER_VPA:
+> -        ret =3D deregister_vpa(tenv, vpa);
+> +        ret =3D deregister_vpa(tcpu, vpa);
+>          break;
+> =20
+>      case FLAGS_REGISTER_SLBSHADOW:
+> -        ret =3D register_slb_shadow(tenv, vpa);
+> +        ret =3D register_slb_shadow(tcpu, vpa);
+>          break;
+> =20
+>      case FLAGS_DEREGISTER_SLBSHADOW:
+> -        ret =3D deregister_slb_shadow(tenv, vpa);
+> +        ret =3D deregister_slb_shadow(tcpu, vpa);
+>          break;
+> =20
+>      case FLAGS_REGISTER_DTL:
+> -        ret =3D register_dtl(tenv, vpa);
+> +        ret =3D register_dtl(tcpu, vpa);
+>          break;
+> =20
+>      case FLAGS_DEREGISTER_DTL:
+> -        ret =3D deregister_dtl(tenv, vpa);
+> +        ret =3D deregister_dtl(tcpu, vpa);
+>          break;
+>      }
+> =20
+> diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_c=
+ore.h
+> index 47dcfda12b..8ceea2973a 100644
+> --- a/include/hw/ppc/spapr_cpu_core.h
+> +++ b/include/hw/ppc/spapr_cpu_core.h
+> @@ -41,4 +41,15 @@ typedef struct sPAPRCPUCoreClass {
+>  const char *spapr_get_cpu_core_type(const char *cpu_type);
+>  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
+_ulong r3);
+> =20
+> +typedef struct sPAPRCPUState {
+> +    uint64_t vpa_addr;
+> +    uint64_t slb_shadow_addr, slb_shadow_size;
+> +    uint64_t dtl_addr, dtl_size;
+> +} sPAPRCPUState;
+> +
+> +static inline sPAPRCPUState *spapr_cpu_state(PowerPCCPU *cpu)
+> +{
+> +    return (sPAPRCPUState *)cpu->machine_data;
+> +}
+> +
+>  #endif
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index a91f1a8777..874da6efbc 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1091,12 +1091,6 @@ struct CPUPPCState {
+>      target_ulong rmls;
+>  #endif
+> =20
+> -#if defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY)
+> -    uint64_t vpa_addr;
+> -    uint64_t slb_shadow_addr, slb_shadow_size;
+> -    uint64_t dtl_addr, dtl_size;
+> -#endif /* TARGET_PPC64 */
+> -
+>      int error_code;
+>      uint32_t pending_interrupts;
+>  #if !defined(CONFIG_USER_ONLY)
+> @@ -1205,6 +1199,7 @@ struct PowerPCCPU {
+>      uint32_t compat_pvr;
+>      PPCVirtualHypervisor *vhyp;
+>      Object *intc;
+> +    void *machine_data;
+>      int32_t node_id; /* NUMA node this CPU belongs to */
+>      PPCHash64Options *hash64_opts;
+> =20
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 7fe9d0126b..5c0e313ca6 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -829,22 +829,22 @@ static int kvm_get_fp(CPUState *cs)
+>  static int kvm_get_vpa(CPUState *cs)
+>  {
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> -    CPUPPCState *env =3D &cpu->env;
+> +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
+>      struct kvm_one_reg reg;
+>      int ret;
+> =20
+>      reg.id =3D KVM_REG_PPC_VPA_ADDR;
+> -    reg.addr =3D (uintptr_t)&env->vpa_addr;
+> +    reg.addr =3D (uintptr_t)&spapr_cpu->vpa_addr;
+>      ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>      if (ret < 0) {
+>          DPRINTF("Unable to get VPA address from KVM: %s\n", strerror(err=
+no));
+>          return ret;
+>      }
+> =20
+> -    assert((uintptr_t)&env->slb_shadow_size
+> -           =3D=3D ((uintptr_t)&env->slb_shadow_addr + 8));
+> +    assert((uintptr_t)&spapr_cpu->slb_shadow_size
+> +           =3D=3D ((uintptr_t)&spapr_cpu->slb_shadow_addr + 8));
+>      reg.id =3D KVM_REG_PPC_VPA_SLB;
+> -    reg.addr =3D (uintptr_t)&env->slb_shadow_addr;
+> +    reg.addr =3D (uintptr_t)&spapr_cpu->slb_shadow_addr;
+>      ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>      if (ret < 0) {
+>          DPRINTF("Unable to get SLB shadow state from KVM: %s\n",
+> @@ -852,9 +852,10 @@ static int kvm_get_vpa(CPUState *cs)
+>          return ret;
+>      }
+> =20
+> -    assert((uintptr_t)&env->dtl_size =3D=3D ((uintptr_t)&env->dtl_addr +=
+ 8));
+> +    assert((uintptr_t)&spapr_cpu->dtl_size
+> +           =3D=3D ((uintptr_t)&spapr_cpu->dtl_addr + 8));
+>      reg.id =3D KVM_REG_PPC_VPA_DTL;
+> -    reg.addr =3D (uintptr_t)&env->dtl_addr;
+> +    reg.addr =3D (uintptr_t)&spapr_cpu->dtl_addr;
+>      ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>      if (ret < 0) {
+>          DPRINTF("Unable to get dispatch trace log state from KVM: %s\n",
+> @@ -868,7 +869,7 @@ static int kvm_get_vpa(CPUState *cs)
+>  static int kvm_put_vpa(CPUState *cs)
+>  {
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> -    CPUPPCState *env =3D &cpu->env;
+> +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
+>      struct kvm_one_reg reg;
+>      int ret;
+> =20
+> @@ -876,11 +877,12 @@ static int kvm_put_vpa(CPUState *cs)
+>       * registered.  That means when restoring state, if a VPA *is*
+>       * registered, we need to set that up first.  If not, we need to
+>       * deregister the others before deregistering the master VPA */
+> -    assert(env->vpa_addr || !(env->slb_shadow_addr || env->dtl_addr));
+> +    assert(spapr_cpu->vpa_addr
+> +           || !(spapr_cpu->slb_shadow_addr || spapr_cpu->dtl_addr));
+> =20
+> -    if (env->vpa_addr) {
+> +    if (spapr_cpu->vpa_addr) {
+>          reg.id =3D KVM_REG_PPC_VPA_ADDR;
+> -        reg.addr =3D (uintptr_t)&env->vpa_addr;
+> +        reg.addr =3D (uintptr_t)&spapr_cpu->vpa_addr;
+>          ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>          if (ret < 0) {
+>              DPRINTF("Unable to set VPA address to KVM: %s\n", strerror(e=
+rrno));
+> @@ -888,19 +890,20 @@ static int kvm_put_vpa(CPUState *cs)
+>          }
+>      }
+> =20
+> -    assert((uintptr_t)&env->slb_shadow_size
+> -           =3D=3D ((uintptr_t)&env->slb_shadow_addr + 8));
+> +    assert((uintptr_t)&spapr_cpu->slb_shadow_size
+> +           =3D=3D ((uintptr_t)&spapr_cpu->slb_shadow_addr + 8));
+>      reg.id =3D KVM_REG_PPC_VPA_SLB;
+> -    reg.addr =3D (uintptr_t)&env->slb_shadow_addr;
+> +    reg.addr =3D (uintptr_t)&spapr_cpu->slb_shadow_addr;
+>      ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>      if (ret < 0) {
+>          DPRINTF("Unable to set SLB shadow state to KVM: %s\n", strerror(=
+errno));
+>          return ret;
+>      }
+> =20
+> -    assert((uintptr_t)&env->dtl_size =3D=3D ((uintptr_t)&env->dtl_addr +=
+ 8));
+> +    assert((uintptr_t)&spapr_cpu->dtl_size
+> +           =3D=3D ((uintptr_t)&spapr_cpu->dtl_addr + 8));
+>      reg.id =3D KVM_REG_PPC_VPA_DTL;
+> -    reg.addr =3D (uintptr_t)&env->dtl_addr;
+> +    reg.addr =3D (uintptr_t)&spapr_cpu->dtl_addr;
+>      ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>      if (ret < 0) {
+>          DPRINTF("Unable to set dispatch trace log state to KVM: %s\n",
+> @@ -908,9 +911,9 @@ static int kvm_put_vpa(CPUState *cs)
+>          return ret;
+>      }
+> =20
+> -    if (!env->vpa_addr) {
+> +    if (!spapr_cpu->vpa_addr) {
+>          reg.id =3D KVM_REG_PPC_VPA_ADDR;
+> -        reg.addr =3D (uintptr_t)&env->vpa_addr;
+> +        reg.addr =3D (uintptr_t)&spapr_cpu->vpa_addr;
+>          ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>          if (ret < 0) {
+>              DPRINTF("Unable to set VPA address to KVM: %s\n", strerror(e=
+rrno));
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index bb9296f5a3..76d6f3fd5e 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -10316,14 +10316,6 @@ static void ppc_cpu_reset(CPUState *s)
+>      s->exception_index =3D POWERPC_EXCP_NONE;
+>      env->error_code =3D 0;
+> =20
+> -#if defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY)
+> -    env->vpa_addr =3D 0;
+> -    env->slb_shadow_addr =3D 0;
+> -    env->slb_shadow_size =3D 0;
+> -    env->dtl_addr =3D 0;
+> -    env->dtl_size =3D 0;
+> -#endif /* TARGET_PPC64 */
+> -
+>      for (i =3D 0; i < ARRAY_SIZE(env->spr_cb); i++) {
+>          ppc_spr_t *spr =3D &env->spr_cb[i];
+> =20
