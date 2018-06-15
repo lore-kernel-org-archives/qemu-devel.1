@@ -1,15 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kieran@bingham.xyz>) id 1fTpuy-0007Wh-WC
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:41:38 -0400
+	(envelope-from <clg@kaod.org>) id 1fTqbs-0003vp-Uw
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kieran@bingham.xyz>) id 1fTpux-0004tO-NO
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:41:37 -0400
-From: Kieran Bingham <kieran@bingham.xyz>
-Date: Fri, 15 Jun 2018 15:41:23 +0100
-Message-Id: <20180615144123.20844-1-kieran@bingham.xyz>
-Subject: [Qemu-devel] [PATCH] [QEMU][RFC] hw/arm/sysbus-fdt: Enable
- rcar-gen3-scif dynamic instantiation
+	(envelope-from <clg@kaod.org>) id 1fTqbp-0006dL-Pt
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:56 -0400
+Received: from 6.mo68.mail-out.ovh.net ([46.105.63.100]:45507)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTqbp-0006bM-Ft
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:53 -0400
+Received: from player794.ha.ovh.net (unknown [10.109.108.22])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id E139CE7C91
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 17:25:51 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Fri, 15 Jun 2018 17:25:34 +0200
+Message-Id: <20180615152536.30093-3-clg@kaod.org>
+In-Reply-To: <20180615152536.30093-1-clg@kaod.org>
+References: <20180615152536.30093-1-clg@kaod.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 2/4] ppc/pnv: introduce a new isa_create()
+ operation to the chip model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,129 +30,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-renesas-soc@vger.kernel.org, qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, geert@glider.be, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Kieran Bingham <kieran@bingham.xyz>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Allow the provision of a Renesas R-Car Gen3 (H)SCIF controller device
-from the Qemu command line:
+This moves the details of the ISA bus creation under the LPC model but
+more important, the new PnvChip operation will let us choose the chip
+class to use when we introduce the different chip classes for Power9
+and Power8. It hides away the processor chip controllers from the
+machine.
 
-  -device vfio-platform,host=e6e68000.serial,manufacturer=renesas,model=rcar-gen3-scif
-
-To support this, the serial device must be unbound from the host, and
-rebound to the vfio-platform driver:
-
-  echo 1 > /sys/module/vfio/parameters/enable_unsafe_noiommu_mode
-  echo e6e68000.serial > /sys/bus/platform/drivers/sh-sci/unbind
-  echo vfio-platform > /sys/bus/platform/devices/e6e68000.serial/driver_override
-  echo e6e68000.serial > /sys/bus/platform/drivers/vfio-platform/bind
-
-Ideally, this patch should be unnecessary and the FDT should be
-generated automatically from the host, or perhaps with the provision of
-a DTO, allowing the configuration to be provided externally from Q-Emu.
-
-The functionality of this patch mostly duplicates the
-add_rcar_gpio_fdt_node() with the exception of the gpio-controller node,
-and #gpio-cells.
-
-Not-Signed-off-by: Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>
-
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
 
-This patch supports testing of serial device passthrough on R-Car Gen3,
-and is not meant to be upstreamed as is. This serves as a purpose for
-ongoing development and investigation into para-virtualisation of the
-R-Car Gen3 platforms, and highlights the extensions needed to support
-passing through a basic serial device to a guest.
+ pnv_isa_create() is a onliner but it looks better like that than to
+ use it directly with pnv->chips[0]
 
-This patch and its dependencies is available at the following branch:
+ include/hw/ppc/pnv.h     |  1 +
+ include/hw/ppc/pnv_lpc.h |  3 +--
+ hw/ppc/pnv.c             | 34 +++++++++++++++++++---------------
+ hw/ppc/pnv_lpc.c         | 30 +++++++++++++++++++++++++-----
+ 4 files changed, 46 insertions(+), 22 deletions(-)
 
-  https://github.com/kbingham/qemu.git rcar3/serial/passthrough
-
-This builds upon existing work [0] done by Geert Uytterhoeven
-
- [0]  https://www.spinics.net/lists/kvm/msg163975.html
----
- hw/arm/sysbus-fdt.c | 61 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 61 insertions(+)
-
-diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-index a04e5b384c29..ec755e0f4652 100644
---- a/hw/arm/sysbus-fdt.c
-+++ b/hw/arm/sysbus-fdt.c
-@@ -477,6 +477,66 @@ static int add_rcar_gpio_fdt_node(SysBusDevice *sbdev, void *opaque)
-     return 0;
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index e934e84f555e..563279f3e00c 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -77,6 +77,7 @@ typedef struct PnvChipClass {
+=20
+     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
+     Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
++    ISABus *(*isa_create)(PnvChip *chip, Error **errp);
+ } PnvChipClass;
+=20
+ #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
+diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
+index 53fdd5bb6450..d657489b07ce 100644
+--- a/include/hw/ppc/pnv_lpc.h
++++ b/include/hw/ppc/pnv_lpc.h
+@@ -70,7 +70,6 @@ typedef struct PnvLpcController {
+     PnvPsi *psi;
+ } PnvLpcController;
+=20
+-qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type,
+-                                 int nirqs);
++ISABus *pnv_lpc_isa_create(PnvLpcController *lpc, bool use_cpld, Error *=
+*errp);
+=20
+ #endif /* _PPC_PNV_LPC_H */
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index c7e127ae97db..ac828d133173 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -529,24 +529,24 @@ static void pnv_reset(void)
+     cpu_physical_memory_write(PNV_FDT_ADDR, fdt, fdt_totalsize(fdt));
  }
- 
-+/**
-+ * add_rcar_scif_fdt_node
-+ *
-+ * Generates a simple node with following properties:
-+ * compatible string, regs, #gpio-cells, gpio-controller
-+ */
-+static int add_rcar_scif_fdt_node(SysBusDevice *sbdev, void *opaque)
-+{
-+    PlatformBusFDTData *data = opaque;
-+    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(sbdev);
-+    const char *parent_node = data->pbus_node_name;
-+    VFIODevice *vbasedev = &vdev->vbasedev;
-+    PlatformBusDevice *pbus = data->pbus;
-+    int compat_str_len, i, irq_number;
-+    uint32_t *reg_attr, *irq_attr;
-+    void *fdt = data->fdt;
-+    uint64_t mmio_base;
-+    char *nodename;
-+
-+    mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, 0);
-+    nodename = g_strdup_printf("%s/%s@%" PRIx64, parent_node,
-+                               vbasedev->name, mmio_base);
-+    qemu_fdt_add_subnode(fdt, nodename);
-+
-+    printf("%s - using nodename :%s\n", __func__, nodename);
-+
-+    /* Add compatible */
-+    compat_str_len = strlen(vdev->compat) + 1;
-+    qemu_fdt_setprop(fdt, nodename, "compatible",
-+                          vdev->compat, compat_str_len);
-+
-+    /* Copy reg */
-+    reg_attr = g_new(uint32_t, vbasedev->num_regions * 2);
-+    for (i = 0; i < vbasedev->num_regions; i++) {
-+        mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, i);
-+        reg_attr[2 * i] = cpu_to_be32(mmio_base);
-+        reg_attr[2 * i + 1] = cpu_to_be32(
-+                                memory_region_size(vdev->regions[i]->mem));
-+    }
-+    qemu_fdt_setprop(fdt, nodename, "reg", reg_attr,
-+                     vbasedev->num_regions * 2 * sizeof(uint32_t));
-+
-+    /* Copy interrupts */
-+    irq_attr = g_new(uint32_t, vbasedev->num_irqs * 3);
-+    for (i = 0; i < vbasedev->num_irqs; i++) {
-+        irq_number = platform_bus_get_irqn(pbus, sbdev , i)
-+                         + data->irq_start;
-+        irq_attr[3 * i] = cpu_to_be32(GIC_FDT_IRQ_TYPE_SPI);
-+        irq_attr[3 * i + 1] = cpu_to_be32(irq_number);
-+        irq_attr[3 * i + 2] = cpu_to_be32(GIC_FDT_IRQ_FLAGS_LEVEL_HI);
-+    }
-+    qemu_fdt_setprop(fdt, nodename, "interrupts",
-+                     irq_attr, vbasedev->num_irqs * 3 * sizeof(uint32_t));
-+
-+    g_free(irq_attr);
-+    g_free(reg_attr);
-+    g_free(nodename);
-+    return 0;
+=20
+-static ISABus *pnv_isa_create(PnvChip *chip)
++static ISABus *pnv_chip_power8_isa_create(PnvChip *chip, Error **errp)
+ {
+-    PnvLpcController *lpc =3D &chip->lpc;
+-    ISABus *isa_bus;
+-    qemu_irq *irqs;
+-    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
++    return pnv_lpc_isa_create(&chip->lpc, true, errp);
 +}
+=20
+-    /* let isa_bus_new() create its own bridge on SysBus otherwise
+-     * devices speficied on the command line won't find the bus and
+-     * will fail to create.
+-     */
+-    isa_bus =3D isa_bus_new(NULL, &lpc->isa_mem, &lpc->isa_io,
+-                          &error_fatal);
++static ISABus *pnv_chip_power8nvl_isa_create(PnvChip *chip, Error **errp=
+)
++{
++    return pnv_lpc_isa_create(&chip->lpc, false, errp);
++}
+=20
+-    irqs =3D pnv_lpc_isa_irq_create(lpc, pcc->chip_type, ISA_NUM_IRQS);
++static ISABus *pnv_chip_power9_isa_create(PnvChip *chip, Error **errp)
++{
++    return NULL;
++}
+=20
+-    isa_bus_irqs(isa_bus, irqs);
+-    return isa_bus;
++static ISABus *pnv_isa_create(PnvChip *chip, Error **errp)
++{
++    return PNV_CHIP_GET_CLASS(chip)->isa_create(chip, errp);
+ }
+=20
+ static void pnv_init(MachineState *machine)
+@@ -646,7 +646,7 @@ static void pnv_init(MachineState *machine)
+     g_free(chip_typename);
+=20
+     /* Instantiate ISA bus on chip 0 */
+-    pnv->isa_bus =3D pnv_isa_create(pnv->chips[0]);
++    pnv->isa_bus =3D pnv_isa_create(pnv->chips[0], &error_fatal);
+=20
+     /* Create serial port */
+     serial_hds_isa_init(pnv->isa_bus, 0, MAX_ISA_SERIAL_PORTS);
+@@ -735,6 +735,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
+klass, void *data)
+     k->cores_mask =3D POWER8E_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
+     k->intc_create =3D pnv_chip_power8_intc_create;
++    k->isa_create =3D pnv_chip_power8_isa_create;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8E";
+ }
+@@ -749,6 +750,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
+lass, void *data)
+     k->cores_mask =3D POWER8_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
+     k->intc_create =3D pnv_chip_power8_intc_create;
++    k->isa_create =3D pnv_chip_power8_isa_create;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8";
+ }
+@@ -763,6 +765,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
+ *klass, void *data)
+     k->cores_mask =3D POWER8_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
+     k->intc_create =3D pnv_chip_power8_intc_create;
++    k->isa_create =3D pnv_chip_power8nvl_isa_create;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8NVL";
+ }
+@@ -777,6 +780,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
+lass, void *data)
+     k->cores_mask =3D POWER9_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p9;
+     k->intc_create =3D pnv_chip_power9_intc_create;
++    k->isa_create =3D pnv_chip_power9_isa_create;
+     k->xscom_base =3D 0x00603fc00000000ull;
+     dc->desc =3D "PowerNV Chip POWER9";
+ }
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index 402c4fefa886..d7721320a25b 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -22,6 +22,7 @@
+ #include "target/ppc/cpu.h"
+ #include "qapi/error.h"
+ #include "qemu/log.h"
++#include "hw/isa/isa.h"
+=20
+ #include "hw/ppc/pnv.h"
+ #include "hw/ppc/pnv_lpc.h"
+@@ -535,16 +536,35 @@ static void pnv_lpc_isa_irq_handler(void *opaque, i=
+nt n, int level)
+     }
+ }
+=20
+-qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type,
+-                                 int nirqs)
++ISABus *pnv_lpc_isa_create(PnvLpcController *lpc, bool use_cpld, Error *=
+*errp)
+ {
++    Error *local_err =3D NULL;
++    ISABus *isa_bus;
++    qemu_irq *irqs;
++    qemu_irq_handler handler;
 +
- /* manufacturer/model matching */
- static bool vfio_platform_match(SysBusDevice *sbdev,
-                                 const BindingEntry *entry)
-@@ -516,6 +576,7 @@ static const BindingEntry bindings[] = {
-     TYPE_BINDING(TYPE_VFIO_AMD_XGBE, add_amd_xgbe_fdt_node),
-     VFIO_PLATFORM_BINDING("amd", "xgbe-seattle-v1a", add_amd_xgbe_fdt_node),
-     VFIO_PLATFORM_BINDING("renesas", "rcar-gen3-gpio", add_rcar_gpio_fdt_node),
-+    VFIO_PLATFORM_BINDING("renesas", "rcar-gen3-scif", add_rcar_scif_fdt_node),
- #endif
-     TYPE_BINDING("", NULL), /* last element */
- };
--- 
-2.17.1
++    /* let isa_bus_new() create its own bridge on SysBus otherwise
++     * devices speficied on the command line won't find the bus and
++     * will fail to create.
++     */
++    isa_bus =3D isa_bus_new(NULL, &lpc->isa_mem, &lpc->isa_io, &local_er=
+r);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return NULL;
++    }
++
+     /* Not all variants have a working serial irq decoder. If not,
+      * handling of LPC interrupts becomes a platform issue (some
+      * platforms have a CPLD to do it).
+      */
+-    if (chip_type =3D=3D PNV_CHIP_POWER8NVL) {
+-        return qemu_allocate_irqs(pnv_lpc_isa_irq_handler, lpc, nirqs);
++    if (use_cpld) {
++        handler =3D pnv_lpc_isa_irq_handler_cpld;
+     } else {
+-        return qemu_allocate_irqs(pnv_lpc_isa_irq_handler_cpld, lpc, nir=
+qs);
++        handler =3D pnv_lpc_isa_irq_handler;
+     }
++
++    irqs =3D qemu_allocate_irqs(handler, lpc, ISA_NUM_IRQS);
++
++    isa_bus_irqs(isa_bus, irqs);
++    return isa_bus;
+ }
+--=20
+2.13.6
