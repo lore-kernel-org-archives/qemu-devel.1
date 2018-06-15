@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTqbp-0003sD-8C
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:54 -0400
+	(envelope-from <kieran@bingham.xyz>) id 1fTpuy-0007Wh-WC
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:41:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTqbm-0006ZX-2v
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:53 -0400
-Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:56395)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTqbl-0006Ym-PV
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:49 -0400
-Received: from player794.ha.ovh.net (unknown [10.109.120.58])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 6C0ED1C1D6A
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 17:25:47 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 15 Jun 2018 17:25:33 +0200
-Message-Id: <20180615152536.30093-2-clg@kaod.org>
-In-Reply-To: <20180615152536.30093-1-clg@kaod.org>
-References: <20180615152536.30093-1-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 1/4] ppc/pnv: introduce a new intc_create()
- operation to the chip model
+	(envelope-from <kieran@bingham.xyz>) id 1fTpux-0004tO-NO
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:41:37 -0400
+From: Kieran Bingham <kieran@bingham.xyz>
+Date: Fri, 15 Jun 2018 15:41:23 +0100
+Message-Id: <20180615144123.20844-1-kieran@bingham.xyz>
+Subject: [Qemu-devel] [PATCH] [QEMU][RFC] hw/arm/sysbus-fdt: Enable
+ rcar-gen3-scif dynamic instantiation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,175 +18,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: linux-renesas-soc@vger.kernel.org, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, geert@glider.be, Laurent Pinchart <laurent.pinchart@ideasonboard.com>, Kieran Bingham <kieran@bingham.xyz>
 
-On Power9, the thread interrupt presenter has a different type and is
-linked to the chip owning the cores.
+Allow the provision of a Renesas R-Car Gen3 (H)SCIF controller device
+from the Qemu command line:
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+  -device vfio-platform,host=e6e68000.serial,manufacturer=renesas,model=rcar-gen3-scif
+
+To support this, the serial device must be unbound from the host, and
+rebound to the vfio-platform driver:
+
+  echo 1 > /sys/module/vfio/parameters/enable_unsafe_noiommu_mode
+  echo e6e68000.serial > /sys/bus/platform/drivers/sh-sci/unbind
+  echo vfio-platform > /sys/bus/platform/devices/e6e68000.serial/driver_override
+  echo e6e68000.serial > /sys/bus/platform/drivers/vfio-platform/bind
+
+Ideally, this patch should be unnecessary and the FDT should be
+generated automatically from the host, or perhaps with the provision of
+a DTO, allowing the configuration to be provided externally from Q-Emu.
+
+The functionality of this patch mostly duplicates the
+add_rcar_gpio_fdt_node() with the exception of the gpio-controller node,
+and #gpio-cells.
+
+Not-Signed-off-by: Kieran Bingham <kieran.bingham+renesas@ideasonboard.com>
+
 ---
- include/hw/ppc/pnv.h |  1 +
- hw/ppc/pnv.c         | 21 +++++++++++++++++++--
- hw/ppc/pnv_core.c    | 18 +++++++++---------
- 3 files changed, 29 insertions(+), 11 deletions(-)
 
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 90759240a7b1..e934e84f555e 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -76,6 +76,7 @@ typedef struct PnvChipClass {
-     hwaddr       xscom_base;
-=20
-     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
-+    Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
- } PnvChipClass;
-=20
- #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 0d2b79f7980f..c7e127ae97db 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -671,6 +671,13 @@ static uint32_t pnv_chip_core_pir_p8(PnvChip *chip, =
-uint32_t core_id)
-     return (chip->chip_id << 7) | (core_id << 3);
+This patch supports testing of serial device passthrough on R-Car Gen3,
+and is not meant to be upstreamed as is. This serves as a purpose for
+ongoing development and investigation into para-virtualisation of the
+R-Car Gen3 platforms, and highlights the extensions needed to support
+passing through a basic serial device to a guest.
+
+This patch and its dependencies is available at the following branch:
+
+  https://github.com/kbingham/qemu.git rcar3/serial/passthrough
+
+This builds upon existing work [0] done by Geert Uytterhoeven
+
+ [0]  https://www.spinics.net/lists/kvm/msg163975.html
+---
+ hw/arm/sysbus-fdt.c | 61 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
+
+diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
+index a04e5b384c29..ec755e0f4652 100644
+--- a/hw/arm/sysbus-fdt.c
++++ b/hw/arm/sysbus-fdt.c
+@@ -477,6 +477,66 @@ static int add_rcar_gpio_fdt_node(SysBusDevice *sbdev, void *opaque)
+     return 0;
  }
-=20
-+static Object *pnv_chip_power8_intc_create(PnvChip *chip, Object *child,
-+                                           Error **errp)
+ 
++/**
++ * add_rcar_scif_fdt_node
++ *
++ * Generates a simple node with following properties:
++ * compatible string, regs, #gpio-cells, gpio-controller
++ */
++static int add_rcar_scif_fdt_node(SysBusDevice *sbdev, void *opaque)
 +{
-+    return icp_create(child, TYPE_PNV_ICP, XICS_FABRIC(qdev_get_machine(=
-)),
-+                      errp);
++    PlatformBusFDTData *data = opaque;
++    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(sbdev);
++    const char *parent_node = data->pbus_node_name;
++    VFIODevice *vbasedev = &vdev->vbasedev;
++    PlatformBusDevice *pbus = data->pbus;
++    int compat_str_len, i, irq_number;
++    uint32_t *reg_attr, *irq_attr;
++    void *fdt = data->fdt;
++    uint64_t mmio_base;
++    char *nodename;
++
++    mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, 0);
++    nodename = g_strdup_printf("%s/%s@%" PRIx64, parent_node,
++                               vbasedev->name, mmio_base);
++    qemu_fdt_add_subnode(fdt, nodename);
++
++    printf("%s - using nodename :%s\n", __func__, nodename);
++
++    /* Add compatible */
++    compat_str_len = strlen(vdev->compat) + 1;
++    qemu_fdt_setprop(fdt, nodename, "compatible",
++                          vdev->compat, compat_str_len);
++
++    /* Copy reg */
++    reg_attr = g_new(uint32_t, vbasedev->num_regions * 2);
++    for (i = 0; i < vbasedev->num_regions; i++) {
++        mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, i);
++        reg_attr[2 * i] = cpu_to_be32(mmio_base);
++        reg_attr[2 * i + 1] = cpu_to_be32(
++                                memory_region_size(vdev->regions[i]->mem));
++    }
++    qemu_fdt_setprop(fdt, nodename, "reg", reg_attr,
++                     vbasedev->num_regions * 2 * sizeof(uint32_t));
++
++    /* Copy interrupts */
++    irq_attr = g_new(uint32_t, vbasedev->num_irqs * 3);
++    for (i = 0; i < vbasedev->num_irqs; i++) {
++        irq_number = platform_bus_get_irqn(pbus, sbdev , i)
++                         + data->irq_start;
++        irq_attr[3 * i] = cpu_to_be32(GIC_FDT_IRQ_TYPE_SPI);
++        irq_attr[3 * i + 1] = cpu_to_be32(irq_number);
++        irq_attr[3 * i + 2] = cpu_to_be32(GIC_FDT_IRQ_FLAGS_LEVEL_HI);
++    }
++    qemu_fdt_setprop(fdt, nodename, "interrupts",
++                     irq_attr, vbasedev->num_irqs * 3 * sizeof(uint32_t));
++
++    g_free(irq_attr);
++    g_free(reg_attr);
++    g_free(nodename);
++    return 0;
 +}
 +
- /*
-  *    0:48  Reserved - Read as zeroes
-  *   49:52  Node ID
-@@ -686,6 +693,12 @@ static uint32_t pnv_chip_core_pir_p9(PnvChip *chip, =
-uint32_t core_id)
-     return (chip->chip_id << 8) | (core_id << 2);
- }
-=20
-+static Object *pnv_chip_power9_intc_create(PnvChip *chip, Object *child,
-+                                           Error **errp)
-+{
-+    return NULL;
-+}
-+
- /* Allowed core identifiers on a POWER8 Processor Chip :
-  *
-  * <EX0 reserved>
-@@ -721,6 +734,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
-klass, void *data)
-     k->chip_cfam_id =3D 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
-     k->cores_mask =3D POWER8E_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-+    k->intc_create =3D pnv_chip_power8_intc_create;
-     k->xscom_base =3D 0x003fc0000000000ull;
-     dc->desc =3D "PowerNV Chip POWER8E";
- }
-@@ -734,6 +748,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
-lass, void *data)
-     k->chip_cfam_id =3D 0x220ea04980000000ull; /* P8 Venice DD2.0 */
-     k->cores_mask =3D POWER8_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-+    k->intc_create =3D pnv_chip_power8_intc_create;
-     k->xscom_base =3D 0x003fc0000000000ull;
-     dc->desc =3D "PowerNV Chip POWER8";
- }
-@@ -747,6 +762,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
- *klass, void *data)
-     k->chip_cfam_id =3D 0x120d304980000000ull;  /* P8 Naples DD1.0 */
-     k->cores_mask =3D POWER8_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-+    k->intc_create =3D pnv_chip_power8_intc_create;
-     k->xscom_base =3D 0x003fc0000000000ull;
-     dc->desc =3D "PowerNV Chip POWER8NVL";
- }
-@@ -760,6 +776,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
-lass, void *data)
-     k->chip_cfam_id =3D 0x220d104900008000ull; /* P9 Nimbus DD2.0 */
-     k->cores_mask =3D POWER9_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p9;
-+    k->intc_create =3D pnv_chip_power9_intc_create;
-     k->xscom_base =3D 0x00603fc00000000ull;
-     dc->desc =3D "PowerNV Chip POWER9";
- }
-@@ -892,8 +909,8 @@ static void pnv_chip_core_realize(PnvChip *chip, Erro=
-r **errp)
-         object_property_set_int(OBJECT(pnv_core),
-                                 pcc->core_pir(chip, core_hwid),
-                                 "pir", &error_fatal);
--        object_property_add_const_link(OBJECT(pnv_core), "xics",
--                                       qdev_get_machine(), &error_fatal)=
-;
-+        object_property_add_const_link(OBJECT(pnv_core), "chip",
-+                                       OBJECT(chip), &error_fatal);
-         object_property_set_bool(OBJECT(pnv_core), true, "realized",
-                                  &error_fatal);
-         object_unref(OBJECT(pnv_core));
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index f7cf33f547a5..a9f129fc2c5f 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -99,13 +99,14 @@ static const MemoryRegionOps pnv_core_xscom_ops =3D {
-     .endianness =3D DEVICE_BIG_ENDIAN,
+ /* manufacturer/model matching */
+ static bool vfio_platform_match(SysBusDevice *sbdev,
+                                 const BindingEntry *entry)
+@@ -516,6 +576,7 @@ static const BindingEntry bindings[] = {
+     TYPE_BINDING(TYPE_VFIO_AMD_XGBE, add_amd_xgbe_fdt_node),
+     VFIO_PLATFORM_BINDING("amd", "xgbe-seattle-v1a", add_amd_xgbe_fdt_node),
+     VFIO_PLATFORM_BINDING("renesas", "rcar-gen3-gpio", add_rcar_gpio_fdt_node),
++    VFIO_PLATFORM_BINDING("renesas", "rcar-gen3-scif", add_rcar_scif_fdt_node),
+ #endif
+     TYPE_BINDING("", NULL), /* last element */
  };
-=20
--static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFabric *xi, Error **er=
-rp)
-+static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip *chip, Error **err=
-p)
- {
-     CPUPPCState *env =3D &cpu->env;
-     int core_pir;
-     int thread_index =3D 0; /* TODO: TCG supports only one thread */
-     ppc_spr_t *pir =3D &env->spr_cb[SPR_PIR];
-     Error *local_err =3D NULL;
-+    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-=20
-     object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
-     if (local_err) {
-@@ -113,7 +114,7 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFab=
-ric *xi, Error **errp)
-         return;
-     }
-=20
--    cpu->intc =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, xi, &local_err);
-+    cpu->intc =3D pcc->intc_create(chip, OBJECT(cpu), &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -143,13 +144,12 @@ static void pnv_core_realize(DeviceState *dev, Erro=
-r **errp)
-     void *obj;
-     int i, j;
-     char name[32];
--    Object *xi;
-+    Object *chip;
-=20
--    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
--    if (!xi) {
--        error_setg(errp, "%s: required link 'xics' not found: %s",
--                   __func__, error_get_pretty(local_err));
--        return;
-+    chip =3D object_property_get_link(OBJECT(dev), "chip", &local_err);
-+    if (!chip) {
-+        error_propagate(errp, local_err);
-+        error_prepend(errp, "required link 'chip' not found: ");
-     }
-=20
-     pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
-@@ -166,7 +166,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
-     }
-=20
-     for (j =3D 0; j < cc->nr_threads; j++) {
--        pnv_realize_vcpu(pc->threads[j], XICS_FABRIC(xi), &local_err);
-+        pnv_realize_vcpu(pc->threads[j], PNV_CHIP(chip), &local_err);
-         if (local_err) {
-             goto err;
-         }
---=20
-2.13.6
+-- 
+2.17.1
