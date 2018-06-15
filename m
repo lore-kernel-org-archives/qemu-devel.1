@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39041)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fTrVN-0001c1-UY
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 12:23:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTrae-0006DP-BM
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 12:28:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fTrVN-0008Et-1K
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 12:23:17 -0400
-Date: Fri, 15 Jun 2018 17:23:08 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180615162308.GF12972@stefanha-x1.localdomain>
-References: <20180608060417.10170-1-famz@redhat.com>
-	<20180608060417.10170-7-famz@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fTrad-0003iW-Ar
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 12:28:44 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:39580)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fTrad-0003iC-4q
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 12:28:43 -0400
+Received: by mail-ot0-x243.google.com with SMTP id l15-v6so11619872oth.6
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 09:28:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="aPdhxNJGSeOG9wFI"
-Content-Disposition: inline
-In-Reply-To: <20180608060417.10170-7-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 6/6] mirror: Use copy offloading
+In-Reply-To: <20180615142108.27814-1-kwolf@redhat.com>
+References: <20180615142108.27814-1-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 15 Jun 2018 17:28:22 +0100
+Message-ID: <CAFEAcA82PF0K0kzjcmWns44d5XcF2bPWcnudr-f_6S_BCNo38w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/26] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,75 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
+On 15 June 2018 at 15:20, Kevin Wolf <kwolf@redhat.com> wrote:
+> The following changes since commit 91fe7a376ad46e3cc5e82d418aad22173c948a3c:
+>
+>   Merge remote-tracking branch 'remotes/jasowang/tags/net-pull-request' into staging (2018-06-15 11:41:44 +0100)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/kevin.git tags/for-upstream
+>
+> for you to fetch changes up to 6266e900b8083945cb766b45c124fb3c42932cb3:
+>
+>   block: Remove dead deprecation warning code (2018-06-15 14:49:44 +0200)
+>
+> ----------------------------------------------------------------
+> Block layer patches:
+>
+> - Fix options that work only with -drive or -blockdev, but not with
+>   both, because of QDict type confusion
+> - rbd: Add options 'auth-client-required' and 'key-secret'
+> - Remove deprecated -drive options serial/addr/cyls/heads/secs/trans
+> - rbd, iscsi: Remove deprecated 'filename' option
+> - Fix 'qemu-img map' crash with unaligned image size
+> - Improve QMP documentation for jobs
+>
 
---aPdhxNJGSeOG9wFI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Applied, thanks.
 
-On Fri, Jun 08, 2018 at 02:04:17PM +0800, Fam Zheng wrote:
-> +static void mirror_copy_range_complete(void *opaque, int ret)
-> +{
-> +    MirrorOp *op = opaque;
-> +    MirrorBlockJob *s = op->s;
-> +
-> +    aio_context_acquire(blk_get_aio_context(s->common.blk));
-> +    trace_mirror_copy_range_complete(s, ret, op->offset, op->bytes);
-> +    if (!ret) {
-> +        mirror_iteration_done(op, ret);
-> +    } else {
-> +        uint64_t bytes;
-> +
-> +        s->use_copy_range = false;
-> +        s->in_flight--;
-> +        s->bytes_in_flight -= op->bytes;
-> +        bytes = mirror_do_read(s, op->offset, op->bytes);
-
-A coroutine_fn cannot be called from a non-coroutine_fn.  This will
-crash if mirror_do_read() yields.
-
-> +        /* No alignment adjusting in mirror_do_read since we've already done
-> +         * that in mirror_do_copy(). */
-> +        assert(bytes == op->bytes);
-> +        g_free(op);
-> +    }
-> +    aio_context_release(blk_get_aio_context(s->common.blk));
-> +}
-> +
-> +static uint64_t mirror_do_copy(MirrorBlockJob *s, int64_t offset,
-> +                               uint64_t bytes)
-> +{
-> +    uint64_t ret;
-> +    MirrorOp *op;
-> +
-> +    if (!s->use_copy_range || offset < BLOCK_PROBE_BUF_SIZE) {
-
-BLOCK_PROBE_BUF_SIZE is a detail of the raw-format.c driver.  Is it
-appropriate to do this in the mirror job?
-
-Can raw-format.c's copy_range() callbacks check BLOCK_PROBE_BUF_SIZE and
-handle this case?  That way nothing besides raw-format.c needs to know
-about probe protection.
-
-> +        return mirror_do_read(s, offset, bytes);
-
-mirror_do_read() can (indirectly) yield, so mirror_do_copy() must be
-declared coroutine_fn.
-
---aPdhxNJGSeOG9wFI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbI+frAAoJEJykq7OBq3PIAOQH/RtD0WZdwpbf4o4XnT5huvr0
-RKyaKz15otmbRePX2771KvIOb1E4hga4g38hGFIAvlbZEzduMAwWAs2y8lh8FSVX
-mPYWDMew5X0PHjvMi++j33Zho7q0Wl+TMW7avrfQsxJi00LPtibWNIuOuh5UoOjA
-YE8/l7PVqz7Umlsjp3Z7a2WkyKehLmqCDeq/ZAWukFRnNY/OpXlVidRQDICVVx0q
-n0Stmw7x4CtF/S6zx/gD7AolwZ/yier8XemYb0dgOMpYKTMj0GMGsGy6EnyhrUGw
-FalZHcHphe6+nuA/bMXQFzLaI1Eiz9UkpMvg8LKS+6JTa8AFy6j/xA3GvPp6En8=
-=dYHg
------END PGP SIGNATURE-----
-
---aPdhxNJGSeOG9wFI--
+-- PMM
