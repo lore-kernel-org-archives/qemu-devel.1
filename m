@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fTl6D-0000os-1K
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:32:54 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fTl88-0001jv-91
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:34:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fTl69-0003KU-3F
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:32:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34212 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fTl68-0003KB-Sy
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:32:49 -0400
-Date: Fri, 15 Jun 2018 11:32:42 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180615113242.799974f6.cohuck@redhat.com>
-In-Reply-To: <20180615052743-mutt-send-email-mst@kernel.org>
-References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
-	<20180611202207-mutt-send-email-mst@kernel.org>
-	<dc8b1669-b8b6-fb59-94e2-6e4de6b96572@redhat.com>
-	<20180612051432-mutt-send-email-mst@kernel.org>
-	<23fc4aa4-ec41-d6e2-3354-10cbfc13b7ec@intel.com>
-	<20180612142557-mutt-send-email-mst@kernel.org>
-	<b9c88515-cf41-2a9a-078e-9c9e5adbbf14@intel.com>
-	<CADGSJ213f8tJpNXuOhv8qRew-Y5VZAwA+srNMrLZYnKdVGLdAA@mail.gmail.com>
-	<20180614120231.0a72bd5f.cohuck@redhat.com>
-	<20180615052743-mutt-send-email-mst@kernel.org>
+	(envelope-from <imammedo@redhat.com>) id 1fTl84-0004Z3-Aq
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:34:52 -0400
+Date: Fri, 15 Jun 2018 11:34:40 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180615113440.56844675@redhat.com>
+In-Reply-To: <569f9534-162c-29c1-a097-51427e028b4e@redhat.com>
+References: <20180611121655.19616-1-david@redhat.com>
+	<20180611121655.19616-11-david@redhat.com>
+	<20180613151056.6ebbccc2@redhat.com>
+	<569f9534-162c-29c1-a097-51427e028b4e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+Subject: Re: [Qemu-devel] [PATCH v1 10/11] pc-dimm: introduce and use
+ pc_dimm_memory_pre_plug()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,45 +26,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
+	. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On Fri, 15 Jun 2018 05:34:24 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Wed, 13 Jun 2018 16:15:48 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-> On Thu, Jun 14, 2018 at 12:02:31PM +0200, Cornelia Huck wrote:
-
-> > > > I am not all that familiar with how Qemu manages network devices. If we can
-> > > > do all the
-> > > > required management of the primary/standby devices within Qemu, that is
-> > > > definitely a better
-> > > > approach without upper layer involvement.    
-> > > 
-> > > Right. I would imagine in the extreme case the upper layer doesn't
-> > > have to be involved at all if QEMU manages all hot plug/unplug logic.
-> > > The management tool can supply passthrough device and virtio with the
-> > > same group UUID, QEMU auto-manages the presence of the primary, and
-> > > hot plug the device as needed before or after the migration.  
-> > 
-> > I do not really see how you can manage that kind of stuff in QEMU only.  
+> On 13.06.2018 15:10, Igor Mammedov wrote:
+> > On Mon, 11 Jun 2018 14:16:54 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> We'll be factoring out some pc-dimm specific and some memory-device
+> >> checks next.
+> >>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  hw/i386/pc.c             | 2 ++
+> >>  hw/mem/pc-dimm.c         | 5 +++++
+> >>  hw/ppc/spapr.c           | 1 +
+> >>  include/hw/mem/pc-dimm.h | 2 ++
+> >>  4 files changed, 10 insertions(+)
+> >>
+> >> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> >> index 017396fe84..dc8e7b033b 100644
+> >> --- a/hw/i386/pc.c
+> >> +++ b/hw/i386/pc.c
+> >> @@ -1695,6 +1695,8 @@ static void pc_dimm_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,  
+> > keeping                              ^^^^^
+> > similar to newly introduced pc_dimm_memory_pre_plug()
+> > and I have no clue what to suggest as alternative  
 > 
-> So right now failover is limited to pci passthrough devices only.
-> The idea is to realize the vfio device but not expose it
-> to guest. Have a separate command to expose it to guest.
-> Hotunplug would also hide it from guest but not unrealize it.
+> Can you elaborate?
 
-So, this would not be real hot(un)plug, but 'hide it from the guest',
-right? The concept of "we have it realized in QEMU, but the guest can't
-discover and use it" should be translatable to non-pci as well (at
-least for ccw).
+It's just that pc_dimm_pre_plug and pc_dimm_memory_pre_plug
+are very similar so it become confusing and with name alone
+you can't figure if both do the same or different things.
 
+Looking at 11/11 maybe you could just drop this and the next
+patch for now as there isn't obvious (if any) demand for it
+within this series at all.
+And introduce similar patch when it's actually required.
+
+I might imagine following naming in future:
+
+   pc_dimm_pre_plug()
+       memory_device_pre_plug()
+       ... some pc-dimm only stuff ...
+
+   virtio_mem_pre_plug()
+       memory_device_pre_plug()
+       ... some virtio-mem only stuff ...
+
+> In pc.c we now have:
+> - static void pc_dimm_plug()
+> - static void pc_dimm_unplug_request()
+> - static void pc_dimm_unplug()
 > 
-> This will help ensure that e.g. on migration failure we can
-> re-expose the device without risk of running out of resources.
+> And I add
+> - static void pc_dimm_pre_plug()
+> 
+> I am sticking to the existing naming scheme.
+> 
+> (maybe the problem is that PC_DIMM should never have been named PC_DIMM
+> but simply DIMM, then the "pc_" prefix would be unique)
+Agreed,
+but now type name is part of interface so we are stuck with it.
 
-Makes sense.
 
-Should that 'hidden' state be visible/settable from outside as well
-(e.g. via a property)? I guess yes, so that management software has a
-chance to see whether a device is visible. Settable may be useful if we
-find another use case for hiding realized devices.
+> >>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+> >>          return;
+> >>      }
+> >> +
+> >> +    pc_dimm_memory_pre_plug(dev, MACHINE(hotplug_dev), errp);
+> >>  }
+> >>  
+> >>  static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+> >> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> >> index bc79dd04d8..995ce22d8d 100644
+> >> --- a/hw/mem/pc-dimm.c
+> >> +++ b/hw/mem/pc-dimm.c
+> >> @@ -27,6 +27,11 @@
+> >>  #include "sysemu/numa.h"
+> >>  #include "trace.h"
+> >>  
+> >> +void pc_dimm_memory_pre_plug(DeviceState *dev, MachineState *machine,
+> >> +                             Error **errp)
+> >> +{
+> >> +}  
+> > why introducing shim without anything?  
+> 
+> Because you requested for review to split things up :)
+> 
+> I can easily squash this.
+> 
+> > I'd just merge it with following patch and clarify (in commit message)
+> > why the rest of pre_plug code isn't moved here as well.  
+> 
+> 
