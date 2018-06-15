@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbU-00060q-Do
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbV-000628-J6
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbT-0003eY-Bf
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:28 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbU-0003fZ-Bp
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:29 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 15 Jun 2018 16:20:56 +0200
-Message-Id: <20180615142108.27814-15-kwolf@redhat.com>
+Date: Fri, 15 Jun 2018 16:20:52 +0200
+Message-Id: <20180615142108.27814-11-kwolf@redhat.com>
 In-Reply-To: <20180615142108.27814-1-kwolf@redhat.com>
 References: <20180615142108.27814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 14/26] block-qdict: Simplify
- qdict_flatten_qdict()
+Subject: [Qemu-devel] [PULL 10/26] block: Fix -drive for certain non-string
+ scalars
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +25,109 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Markus Armbruster <armbru@redhat.com>
 
-There's no need to restart the loop.  We don't elsewhere, e.g. in
-qdict_extract_subqdict(), qdict_join() and qemu_opts_absorb_qdict().
-Simplify accordingly.
+The previous commit fixed -blockdev breakage due to misuse of the
+qobject input visitor's keyval flavor in bdrv_file_open().  The commit
+message explain why using the plain flavor would be just as wrong; it
+would break -drive.  Turns out we break it in three places:
+nbd_open(), sd_open() and ssh_file_open().  They are even marked
+FIXME.  Example breakage:
+
+    $ qemu-system-x86 -drive node-name=n1,driver=nbd,server.type=inet,server.host=localhost,server.port=1234,server.numeric=off
+    qemu-system-x86: -drive node-name=n1,driver=nbd,server.type=inet,server.host=localhost,server.port=1234,server.numeric=off: Invalid parameter type for 'numeric', expected: boolean
+
+Fix it the same way: replace qdict_crumple() by
+qdict_crumple_for_keyval_qiv(), and switch from plain to the keyval
+flavor.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qobject/block-qdict.c | 18 +++---------------
- 1 file changed, 3 insertions(+), 15 deletions(-)
+ block/nbd.c      | 12 ++----------
+ block/sheepdog.c | 12 ++----------
+ block/ssh.c      | 12 ++----------
+ 3 files changed, 6 insertions(+), 30 deletions(-)
 
-diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
-index 41f39abc4a..f32df343e8 100644
---- a/qobject/block-qdict.c
-+++ b/qobject/block-qdict.c
-@@ -89,16 +89,13 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
-     QObject *value;
-     const QDictEntry *entry, *next;
-     char *new_key;
--    bool delete;
- 
-     entry = qdict_first(qdict);
- 
-     while (entry != NULL) {
--
-         next = qdict_next(qdict, entry);
-         value = qdict_entry_value(entry);
-         new_key = NULL;
--        delete = false;
- 
-         if (prefix) {
-             new_key = g_strdup_printf("%s.%s", prefix, entry->key);
-@@ -109,27 +106,18 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
-              * itself disappears. */
-             qdict_flatten_qdict(qobject_to(QDict, value), target,
-                                 new_key ? new_key : entry->key);
--            delete = true;
-+            qdict_del(qdict, entry->key);
-         } else if (qobject_type(value) == QTYPE_QLIST) {
-             qdict_flatten_qlist(qobject_to(QList, value), target,
-                                 new_key ? new_key : entry->key);
--            delete = true;
-+            qdict_del(qdict, entry->key);
-         } else if (prefix) {
-             /* All other objects are moved to the target unchanged. */
-             qdict_put_obj(target, new_key, qobject_ref(value));
--            delete = true;
--        }
--
--        g_free(new_key);
--
--        if (delete) {
-             qdict_del(qdict, entry->key);
--
--            /* Restart loop after modifying the iterated QDict */
--            entry = qdict_first(qdict);
--            continue;
-         }
- 
-+        g_free(new_key);
-         entry = next;
+diff --git a/block/nbd.c b/block/nbd.c
+index d6c4c4ddbc..614dd9fec0 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -273,20 +273,12 @@ static SocketAddress *nbd_config(BDRVNBDState *s, QDict *options,
+         goto done;
      }
- }
+ 
+-    crumpled_addr = qdict_crumple(addr, errp);
++    crumpled_addr = qdict_crumple_for_keyval_qiv(addr, errp);
+     if (!crumpled_addr) {
+         goto done;
+     }
+ 
+-    /*
+-     * FIXME .numeric, .to, .ipv4 or .ipv6 don't work with -drive
+-     * server.type=inet.  .to doesn't matter, it's ignored anyway.
+-     * That's because when @options come from -blockdev or
+-     * blockdev_add, members are typed according to the QAPI schema,
+-     * but when they come from -drive, they're all QString.  The
+-     * visitor expects the former.
+-     */
+-    iv = qobject_input_visitor_new(crumpled_addr);
++    iv = qobject_input_visitor_new_keyval(crumpled_addr);
+     visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index a93f93d360..29e3e1eaaa 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -546,20 +546,12 @@ static SocketAddress *sd_server_config(QDict *options, Error **errp)
+ 
+     qdict_extract_subqdict(options, &server, "server.");
+ 
+-    crumpled_server = qdict_crumple(server, errp);
++    crumpled_server = qdict_crumple_for_keyval_qiv(server, errp);
+     if (!crumpled_server) {
+         goto done;
+     }
+ 
+-    /*
+-     * FIXME .numeric, .to, .ipv4 or .ipv6 don't work with -drive
+-     * server.type=inet.  .to doesn't matter, it's ignored anyway.
+-     * That's because when @options come from -blockdev or
+-     * blockdev_add, members are typed according to the QAPI schema,
+-     * but when they come from -drive, they're all QString.  The
+-     * visitor expects the former.
+-     */
+-    iv = qobject_input_visitor_new(crumpled_server);
++    iv = qobject_input_visitor_new_keyval(crumpled_server);
+     visit_type_SocketAddress(iv, NULL, &saddr, &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+diff --git a/block/ssh.c b/block/ssh.c
+index eec37dd27c..bd85d989d5 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -623,20 +623,12 @@ static BlockdevOptionsSsh *ssh_parse_options(QDict *options, Error **errp)
+     }
+ 
+     /* Create the QAPI object */
+-    crumpled = qdict_crumple(options, errp);
++    crumpled = qdict_crumple_for_keyval_qiv(options, errp);
+     if (crumpled == NULL) {
+         goto fail;
+     }
+ 
+-    /*
+-     * FIXME .numeric, .to, .ipv4 or .ipv6 don't work with -drive.
+-     * .to doesn't matter, it's ignored anyway.
+-     * That's because when @options come from -blockdev or
+-     * blockdev_add, members are typed according to the QAPI schema,
+-     * but when they come from -drive, they're all QString.  The
+-     * visitor expects the former.
+-     */
+-    v = qobject_input_visitor_new(crumpled);
++    v = qobject_input_visitor_new_keyval(crumpled);
+     visit_type_BlockdevOptionsSsh(v, NULL, &result, &local_err);
+     visit_free(v);
+     qobject_unref(crumpled);
 -- 
 2.13.6
