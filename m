@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fThkV-000799-Nh
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 01:58:17 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fTiBM-0002oc-Rd
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 02:26:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fThkS-0003DP-M5
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 01:58:15 -0400
-Received: from 1.mo4.mail-out.ovh.net ([178.33.248.196]:54839)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fThkS-0003Ce-B9
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 01:58:12 -0400
-Received: from player738.ha.ovh.net (unknown [10.109.108.22])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 8C98A1825A7
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 07:58:10 +0200 (CEST)
-Date: Fri, 15 Jun 2018 07:58:05 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180615075805.1213ed06@bahia.lan>
-In-Reply-To: <20180615001431.GF4129@umbus.fritz.box>
-References: <152901299450.252222.14219708016930421485.stgit@bahia.lan>
-	<152901304242.252222.9947658955703347553.stgit@bahia.lan>
-	<20180615000225.GC4129@umbus.fritz.box>
-	<20180615001431.GF4129@umbus.fritz.box>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/Rp5uISAV/+K6NtgEs4IwN/Z";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 3/5] spapr_cpu_core: add missing rollback
- on realization path
+	(envelope-from <richard.henderson@linaro.org>) id 1fTiBH-0001s1-CM
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 02:26:00 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:37301)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fTiBH-0001r9-2D
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 02:25:55 -0400
+Received: by mail-pl0-x243.google.com with SMTP id 31-v6so4836740plc.4
+	for <qemu-devel@nongnu.org>; Thu, 14 Jun 2018 23:25:54 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu, 14 Jun 2018 20:25:47 -1000
+Message-Id: <20180615062547.4798-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] tcg: Reduce max TB opcode count
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,147 +24,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, Jason@zx2c4.com, pmatouse@redhat.com, mdroth@linux.vnet.ibm.com, pjp@redhat.com, sstabellini@kernel.org, pbonzini@redhat.com, crosthwaite.peter@gmail.com, sw@weilnetz.de
 
---Sig_/Rp5uISAV/+K6NtgEs4IwN/Z
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Also, assert that we don't overflow any of two different offsets into
+the TB. Both unwind and goto_tb both record a uint16_t for later use.
 
-On Fri, 15 Jun 2018 10:14:31 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
 
-> On Fri, Jun 15, 2018 at 10:02:25AM +1000, David Gibson wrote:
-> > On Thu, Jun 14, 2018 at 11:50:42PM +0200, Greg Kurz wrote: =20
-> > > The spapr_realize_vcpu() function doesn't rollback in case of error.
-> > > This isn't a problem with coldplugged CPUs because the machine won't
-> > > start and QEMU will exit. Hotplug is a different story though: the
-> > > CPU thread is started under object_property_set_bool() and it assumes
-> > > it can access the CPU object.
-> > >=20
-> > > If icp_create() fails, we return an error without unregistering the
-> > > reset handler for this CPU, and we let the underlying QEMU thread for
-> > > this CPU alive. Since spapr_cpu_core_realize() doesn't care to unreal=
-ize
-> > > already realized CPUs either, but happily frees all of them anyway, t=
-he
-> > > CPU thread crashes instantly:
-> > >=20
-> > > (qemu) device_add host-spapr-cpu-core,core-id=3D1,id=3Dgku
-> > > GKU: failing icp_create (cpu 0x11497fd0)
-> > >                              ^^^^^^^^^^
-> > > Program received signal SIGSEGV, Segmentation fault.
-> > > [Switching to Thread 0x7fffee3feaa0 (LWP 24725)]
-> > > 0x00000000104c8374 in object_dynamic_cast_assert (obj=3D0x11497fd0,
-> > >                                                   ^^^^^^^^^^^^^^
-> > >                                              pointer to the CPU object
-> > > 623         trace_object_dynamic_cast_assert(obj ? obj->class->type->=
-name
-> > > (gdb) p obj->class->type
-> > > $1 =3D (Type) 0x0
-> > > (gdb) p * obj
-> > > $2 =3D {class =3D 0x10ea9c10, free =3D 0x11244620,
-> > >                                  ^^^^^^^^^^
-> > >                               should be g_free
-> > > (gdb) p g_free
-> > > $3 =3D {<text variable, no debug info>} 0x7ffff282bef0 <g_free>
-> > >=20
-> > > obj is a dangling pointer to the CPU that was just destroyed in
-> > > spapr_cpu_core_realize().
-> > >=20
-> > > This patch adds proper rollback to both spapr_realize_vcpu() and
-> > > spapr_cpu_core_realize().
-> > >=20
-> > > Signed-off-by: Greg Kurz <groug@kaod.org> =20
-> >=20
-> > Applied to ppc-for-3.0, since it definitely looks to fix some
-> > problems. =20
->=20
-> Uh.. actually it has a definite bug - the first exit point will call
-> g_free() on an uninitialized spapr_cpu.  I fixed it up with a NULL
-> initialization in my tree.
->=20
+This fixes an arm-softmmu test case forwarded to me by Michael Tsirkin.
 
-Ah... as said in the cover letter, all the series is based on machine_data
-being set before the call to object_property_set_bool()... Maybe I should
-have made that explicit with a preparatory patch... Sorry.
+There is a TB generated from that test case that runs to 7800 opcodes,
+and compiles to 96k on an x64 host.  This overflows the 16-bit offset
+in which we record the goto_tb reset offset.  Because of that overflow,
+we install a jump destination that goes to neverland.  Boom.
 
-> >  =20
-> > > ---
-> > >  hw/ppc/spapr_cpu_core.c |   12 ++++++++++--
-> > >  1 file changed, 10 insertions(+), 2 deletions(-)
-> > >=20
-> > > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > > index 003c4c5a79d2..04c818a6ecac 100644
-> > > --- a/hw/ppc/spapr_cpu_core.c
-> > > +++ b/hw/ppc/spapr_cpu_core.c
-> > > @@ -159,12 +159,16 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu,=
- sPAPRMachineState *spapr,
-> > >      spapr_cpu->icp =3D icp_create(OBJECT(cpu), spapr->icp_type,
-> > >                                  XICS_FABRIC(spapr), &local_err);
-> > >      if (local_err) {
-> > > -        goto error;
-> > > +        goto error_unregister;
-> > >      }
-> > > =20
-> > >      return;
-> > > =20
-> > > +error_unregister:
-> > > +    qemu_unregister_reset(spapr_cpu_reset, cpu);
-> > > +    cpu_remove_sync(CPU(cpu)); =20
-> >=20
-> > I'm a little unclear on exactly what init the cpu_remove_sync() is
-> > mirroring, though.
-> >  =20
-> > >  error:
-> > > +    g_free(spapr_cpu);
-> > >      error_propagate(errp, local_err);
-> > >  }
-> > > =20
-> > > @@ -222,11 +226,15 @@ static void spapr_cpu_core_realize(DeviceState =
-*dev, Error **errp)
-> > >      for (j =3D 0; j < cc->nr_threads; j++) {
-> > >          spapr_realize_vcpu(sc->threads[j], spapr, &local_err);
-> > >          if (local_err) {
-> > > -            goto err;
-> > > +            goto err_unrealize;
-> > >          }
-> > >      }
-> > >      return;
-> > > =20
-> > > +err_unrealize:
-> > > +    while (--j >=3D 0) {
-> > > +        spapr_unrealize_vcpu(sc->threads[i]);
-> > > +    }
-> > >  err:
-> > >      while (--i >=3D 0) {
-> > >          obj =3D OBJECT(sc->threads[i]);
-> > >  =20
-> >  =20
->=20
->=20
->=20
+With this reduced op count, the same TB compiles to about 48k for
+both x64 and ppc64le hosts, and neither assertion fires.
 
 
---Sig_/Rp5uISAV/+K6NtgEs4IwN/Z
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+r~
 
------BEGIN PGP SIGNATURE-----
+---
+ tcg/tcg.h                    |  2 +-
+ tcg/aarch64/tcg-target.inc.c |  2 +-
+ tcg/arm/tcg-target.inc.c     |  2 +-
+ tcg/i386/tcg-target.inc.c    |  2 +-
+ tcg/mips/tcg-target.inc.c    |  2 +-
+ tcg/ppc/tcg-target.inc.c     |  4 ++--
+ tcg/s390/tcg-target.inc.c    |  2 +-
+ tcg/sparc/tcg-target.inc.c   |  4 ++--
+ tcg/tcg.c                    | 13 ++++++++++++-
+ tcg/tci/tcg-target.inc.c     |  2 +-
+ 10 files changed, 23 insertions(+), 12 deletions(-)
 
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlsjVW0ACgkQcdTV5YIv
-c9YXBg//YGF7x/9i9bfZ6BzzzFg8B5/dadKfenJyKnREviFwAgLMnNQolz+3MRbv
-zRlTVPjbkqX62rz3KUb8iEGB/+O25ErFlygUfjiOeOMHJj4faRpDUwMLi4zliWnQ
-4XTYrHYtivSJaieJ2XERJwGE077XK4BFYaTli3ZjKfkSyDohxyiZ9Fe1VbPxZ6eX
-GpOnZnW8+MeOTbyZ+geHpBbLGpKqK3k1RnaAzcPOnlfRRE/oWL2IyVX7lkpwUABQ
-ZmZQWw7bRu3soiQkmxIm7VyFNSKewDvj5h8indfwCQ4hTjIxUwF+NqWCMGMSETNA
-IfSmsXiGYeNriC92FGW5Hxg/WziB/lWvkBNYEC0dHqwm5UkOE7a6huY/3uzF7Q90
-HiiZwP7sJD/TF8jKjgE74jvNA5dBCqoSrNNXFICv9O4p+IXgcu8nmhMc7NABN8np
-sTNPQPCttgJTfAeeJ3CuWjmLTI1o+YZwqttlRpzhoxqCjnrbjC65lPKAqIxXHJjG
-hWnhulHiu4LvH+09sKP0pUcyzeBJEfQUsmpyP06VnvJNzlOJ3nTEeZtrXI3fAE+g
-/si0QKi54wRKE9qNAI1Sgf3MdeSvW7/diV3TvtI0IOBb8+wQoipSfgju559CnVZ/
-oS+7HlhRZW0qUhKKXHeca1esoLtVLEy2d6EVORjxD8aTHZ1QqWw=
-=eYhi
------END PGP SIGNATURE-----
-
---Sig_/Rp5uISAV/+K6NtgEs4IwN/Z--
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 532d2a0710..2902a51505 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -852,7 +852,7 @@ static inline bool tcg_op_buf_full(void)
+      * such that a RISC host can reasonably use a 16-bit signed
+      * branch within the TB.
+      */
+-    return tcg_ctx->nb_ops >= 8000;
++    return tcg_ctx->nb_ops >= 4000;
+ }
+ 
+ /* pool based memory allocation */
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index be3192078d..4562d36d1b 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -1733,7 +1733,7 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+             tcg_out_insn(s, 3305, LDR, offset, TCG_REG_TMP);
+         }
+         tcg_out_insn(s, 3207, BR, TCG_REG_TMP);
+-        s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
++        set_jmp_reset_offset(s, a0);
+         break;
+ 
+     case INDEX_op_goto_ptr:
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index 56a32a470f..e1fbf465cb 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -1822,7 +1822,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+                 tcg_out_movi32(s, COND_AL, base, ptr - dil);
+             }
+             tcg_out_ld32_12(s, COND_AL, TCG_REG_PC, base, dil);
+-            s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
++            set_jmp_reset_offset(s, args[0]);
+         }
+         break;
+     case INDEX_op_goto_ptr:
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 0d0ff524b7..e87b0d445e 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -2245,7 +2245,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+             tcg_out_modrm_offset(s, OPC_GRP5, EXT5_JMPN_Ev, -1,
+                                  (intptr_t)(s->tb_jmp_target_addr + a0));
+         }
+-        s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
++        set_jmp_reset_offset(s, a0);
+         break;
+     case INDEX_op_goto_ptr:
+         /* jmp to the given host address (could be epilogue) */
+diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
+index ca5f1d4894..cff525373b 100644
+--- a/tcg/mips/tcg-target.inc.c
++++ b/tcg/mips/tcg-target.inc.c
+@@ -1744,7 +1744,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+             tcg_out_opc_reg(s, OPC_JR, 0, TCG_TMP0, 0);
+         }
+         tcg_out_nop(s);
+-        s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
++        set_jmp_reset_offset(s, a0);
+         break;
+     case INDEX_op_goto_ptr:
+         /* jmp to the given host address (could be epilogue) */
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 86f7de5f7e..c2f729ee8f 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -2025,10 +2025,10 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+         }
+         tcg_out32(s, MTSPR | RS(TCG_REG_TB) | CTR);
+         tcg_out32(s, BCCTR | BO_ALWAYS);
+-        s->tb_jmp_reset_offset[args[0]] = c = tcg_current_code_size(s);
++        set_jmp_reset_offset(s, args[0]);
+         if (USE_REG_TB) {
+             /* For the unlinked case, need to reset TCG_REG_TB.  */
+-            c = -c;
++            c = -tcg_current_code_size(s);
+             assert(c == (int16_t)c);
+             tcg_out32(s, ADDI | TAI(TCG_REG_TB, TCG_REG_TB, c));
+         }
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index 9af6dcef05..17c435ade5 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -1783,7 +1783,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
+             /* and go there */
+             tcg_out_insn(s, RR, BCR, S390_CC_ALWAYS, TCG_REG_TB);
+         }
+-        s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
++        set_jmp_reset_offset(s, a0);
+ 
+         /* For the unlinked path of goto_tb, we need to reset
+            TCG_REG_TB to the beginning of this TB.  */
+diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
+index bc673bd8c6..04bdc3df5e 100644
+--- a/tcg/sparc/tcg-target.inc.c
++++ b/tcg/sparc/tcg-target.inc.c
+@@ -1388,12 +1388,12 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc,
+             tcg_out_arithi(s, TCG_REG_G0, TCG_REG_TB, 0, JMPL);
+             tcg_out_nop(s);
+         }
+-        s->tb_jmp_reset_offset[a0] = c = tcg_current_code_size(s);
++        set_jmp_reset_offset(s, a0);
+ 
+         /* For the unlinked path of goto_tb, we need to reset
+            TCG_REG_TB to the beginning of this TB.  */
+         if (USE_REG_TB) {
+-            c = -c;
++            c = -tcg_current_code_size(s);
+             if (check_fit_i32(c, 13)) {
+                 tcg_out_arithi(s, TCG_REG_TB, TCG_REG_TB, c, ARITH_ADD);
+             } else {
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 1d1dfd7f7c..f27b22bd3c 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -306,6 +306,14 @@ TCGLabel *gen_new_label(void)
+     return l;
+ }
+ 
++static void set_jmp_reset_offset(TCGContext *s, int which)
++{
++    size_t off = tcg_current_code_size(s);
++    s->tb_jmp_reset_offset[which] = off;
++    /* Make sure that we didn't overflow the stored offset.  */
++    assert(s->tb_jmp_reset_offset[which] == off);
++}
++
+ #include "tcg-target.inc.c"
+ 
+ /* compare a pointer @ptr and a tb_tc @s */
+@@ -3532,7 +3540,10 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+             break;
+         case INDEX_op_insn_start:
+             if (num_insns >= 0) {
+-                s->gen_insn_end_off[num_insns] = tcg_current_code_size(s);
++                size_t off = tcg_current_code_size(s);
++                s->gen_insn_end_off[num_insns] = off;
++                /* Assert that we do not overflow our stored offset.  */
++                assert(s->gen_insn_end_off[num_insns] == off);
+             }
+             num_insns++;
+             for (i = 0; i < TARGET_INSN_START_WORDS; ++i) {
+diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
+index cc949bea85..62ed097254 100644
+--- a/tcg/tci/tcg-target.inc.c
++++ b/tcg/tci/tcg-target.inc.c
+@@ -574,7 +574,7 @@ static void tcg_out_op(TCGContext *s, TCGOpcode opc, const TCGArg *args,
+             /* Indirect jump method. */
+             TODO();
+         }
+-        s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
++        set_jmp_reset_offset(s, args[0]);
+         break;
+     case INDEX_op_br:
+         tci_out_label(s, arg_label(args[0]));
+-- 
+2.17.1
