@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fTodD-0005Kp-Az
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:19:14 -0400
+	(envelope-from <cota@braap.org>) id 1fToeQ-0006HV-2T
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:20:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fTodA-0004xs-2x
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:19:11 -0400
-Date: Fri, 15 Jun 2018 15:19:05 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180615151905.3b2d553c@redhat.com>
-In-Reply-To: <20180615112500.19854-13-david@redhat.com>
-References: <20180615112500.19854-1-david@redhat.com>
-	<20180615112500.19854-13-david@redhat.com>
+	(envelope-from <cota@braap.org>) id 1fToeM-0005Q3-SM
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:20:26 -0400
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:57127)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fToeM-0005Pc-Eb
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:20:22 -0400
+Date: Fri, 15 Jun 2018 09:20:18 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180615132018.GA9752@flamenco>
+References: <20180614233935.26585-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 12/12] pc-dimm: get_memory_region() will
- not fail after realize
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20180614233935.26585-1-f4bug@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH] hw/isa/smc37c669: Change the parallel I/O
+ base to 378H
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,125 +28,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?iso-8859-1?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>, qemu-devel@nongnu.org
 
-On Fri, 15 Jun 2018 13:25:00 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Thu, Jun 14, 2018 at 20:39:35 -0300, Philippe Mathieu-Daudé wrote:
+> As there is no particular reason to use this base address
+> (introduced in 7bea0dd434e), change to 378H which is the
+> default on PC machines.
 
-> Let's try to reduce error handling a bit. In the plug/unplug case, the
-> device was realized and therefore we can assume that getting access to
-> the memory region will not fail.
-> 
-> For get_vmstate_memory_region() this is already handled that way.
-> Document both cases.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+Tested-by: Emilio G. Cota <cota@braap.org>
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Thanks,
 
-> ---
->  hw/i386/pc.c             |  7 +------
->  hw/mem/pc-dimm.c         |  7 +------
->  hw/ppc/spapr.c           | 12 ++----------
->  include/hw/mem/pc-dimm.h |  6 ++++--
->  4 files changed, 8 insertions(+), 24 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 2db032a6df..f310040351 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1706,15 +1706,10 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
->      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr;
-> +    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
->      uint64_t align = TARGET_PAGE_SIZE;
->      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->  
-> -    mr = ddc->get_memory_region(dimm, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> -
->      if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
->          align = memory_region_get_alignment(mr);
->      }
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 4ff39b59ef..65843bc52a 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -37,15 +37,10 @@ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
->      MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
->                                                                &error_abort);
-> +    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
->      Error *local_err = NULL;
-> -    MemoryRegion *mr;
->      uint64_t addr;
->  
-> -    mr = ddc->get_memory_region(dimm, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> -
->      addr = object_property_get_uint(OBJECT(dimm),
->                                      PC_DIMM_ADDR_PROP, &local_err);
->      if (local_err) {
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 3e5320020f..6934abc21e 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3142,14 +3142,10 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->      sPAPRMachineState *ms = SPAPR_MACHINE(hotplug_dev);
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr;
-> +    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
->      uint64_t align, size, addr;
->      uint32_t node;
->  
-> -    mr = ddc->get_memory_region(dimm, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
->      align = memory_region_get_alignment(mr);
->      size = memory_region_size(mr);
->  
-> @@ -3340,16 +3336,12 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
->      Error *local_err = NULL;
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr;
-> +    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
->      uint32_t nr_lmbs;
->      uint64_t size, addr_start, addr;
->      int i;
->      sPAPRDRConnector *drc;
->  
-> -    mr = ddc->get_memory_region(dimm, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
->      size = memory_region_size(mr);
->      nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
->  
-> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> index 5679a80465..26ebb7d5e9 100644
-> --- a/include/hw/mem/pc-dimm.h
-> +++ b/include/hw/mem/pc-dimm.h
-> @@ -62,9 +62,11 @@ typedef struct PCDIMMDevice {
->   * @realize: called after common dimm is realized so that the dimm based
->   * devices get the chance to do specified operations.
->   * @get_memory_region: returns #MemoryRegion associated with @dimm which
-> - * is directly mapped into the physical address space of guest.
-> + * is directly mapped into the physical address space of guest. Will not
-> + * fail after the device was realized.
->   * @get_vmstate_memory_region: returns #MemoryRegion which indicates the
-> - * memory of @dimm should be kept during live migration.
-> + * memory of @dimm should be kept during live migration. Will not fail
-> + * after the device was realized.
->   */
->  typedef struct PCDIMMDeviceClass {
->      /* private */
+		Emilio
