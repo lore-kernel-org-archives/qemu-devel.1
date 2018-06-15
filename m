@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTrGw-0005Qp-7G
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 12:08:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTrIC-0006W2-6H
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 12:09:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTrGv-0008Gu-92
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 12:08:22 -0400
-Date: Fri, 15 Jun 2018 18:08:13 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180615160813.GF5187@localhost.localdomain>
-References: <20180529172156.29311-1-kwolf@redhat.com>
-	<20180611122314.GF15038@localhost.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1fTrIB-0000HH-5N
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 12:09:40 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:44487)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fTrIB-0000H4-0E
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 12:09:39 -0400
+Received: by mail-oi0-x243.google.com with SMTP id c128-v6so9244070oig.11
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 09:09:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180611122314.GF15038@localhost.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 00/20] Drain fixes and
- cleanups, part 3
+In-Reply-To: <CAFEAcA8ioVZuB61XWQKKRyGAJxn1gge4fjbrQuK21-drh6y81Q@mail.gmail.com>
+References: <20180604152941.20374-1-peter.maydell@linaro.org>
+	<20180604152941.20374-9-peter.maydell@linaro.org>
+	<64ff124d-fe34-75eb-e9e6-7c419827ee3c@redhat.com>
+	<CAFEAcA8ioVZuB61XWQKKRyGAJxn1gge4fjbrQuK21-drh6y81Q@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 15 Jun 2018 17:09:18 +0100
+Message-ID: <CAFEAcA-keXSuHBN9HVem0yoG5bySo01DH1GtbzNcRjsFcLPU_g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 08/13] hw/misc/tz_mpc.c: Honour the
+ BLK_LUT settings in translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: Auger Eric <eric.auger@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-Am 11.06.2018 um 14:23 hat Kevin Wolf geschrieben:
-> ping?
-> 
-> Am 29.05.2018 um 19:21 hat Kevin Wolf geschrieben:
-> > This is the third and hopefully for now last part of my work to fix
-> > drain. The main goal of this series is to make drain robust against
-> > graph changes that happen in any callbacks of in-flight requests while
-> > we drain a block node.
-> > 
-> > The individual patches describe the details, but the rough plan is to
-> > change all three drain types (single node, subtree and all) to work like
-> > this:
-> > 
-> > 1. First call all the necessary callbacks to quiesce external sources
-> >    for new requests. This includes the block driver callbacks, the child
-> >    node callbacks and disabling external AioContext events. This is done
-> >    recursively.
-> > 
-> >    Much of the trouble we had with drain resulted from the fact that the
-> >    graph changed while we were traversing the graph recursively. None of
-> >    the callbacks called in this phase may change the graph.
-> > 
-> > 2. Then do a single AIO_WAIT_WHILE() to drain the requests of all
-> >    affected nodes. The aio_poll() called by it is where graph changes
-> >    can happen and we need to be careful.
-> > 
-> >    However, while evaluating the loop condition, the graph can't change,
-> >    so we can safely call all necessary callbacks, if needed recursively,
-> >    to determine whether there are still pending requests in any affected
-> >    nodes. We just need to make sure that we don't rely on the set of
-> >    nodes being the same between any two evaluation of the condition.
-> > 
-> > There are a few more smaller, mostly self-contained changes needed
-> > before we're actually safe, but this is the main mechanism that will
-> > help you understand what we're working towards during the series.
+On 15 June 2018 at 17:07, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 15 June 2018 at 08:31, Auger Eric <eric.auger@redhat.com> wrote:
+>> Hi Peter,
+>>
+>> On 06/04/2018 05:29 PM, Peter Maydell wrote:
+>>> The final part of the Memory Protection Controller we need to
+>>> implement is actually using the BLK_LUT data programmed by the
+>>> guest to determine whether to block the transaction or not.
+>>>
+>>> Since this means we now change transaction mappings when
+>>> the guest writes to BLK_LUT, we must also call the IOMMU
+>>> notifiers at that point.
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>
+>>> +        if (newlut & (1 << i)) {
+>> Add a comment saying the block is configured as non-secure?
 
-Without objection, applied to the block branch.
+...actually, how about instead having a new variable
+   bool block_is_ns = newlut & (1 << i);
 
-Kevin
+and then here and in the later if() having "if (block_is_ns)" ?
+I think that clarifies without needing a comment.
+
+thanks
+-- PMM
