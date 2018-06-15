@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbn-0006LV-54
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:51 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbl-0006LG-Do
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbg-0003sm-Ba
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:47 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbd-0003pN-CM
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:45 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 15 Jun 2018 16:21:07 +0200
-Message-Id: <20180615142108.27814-26-kwolf@redhat.com>
+Date: Fri, 15 Jun 2018 16:20:50 +0200
+Message-Id: <20180615142108.27814-9-kwolf@redhat.com>
 In-Reply-To: <20180615142108.27814-1-kwolf@redhat.com>
 References: <20180615142108.27814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 25/26] block: Remove deprecated -drive option
- serial
+Subject: [Qemu-devel] [PULL 08/26] qobject: Move block-specific qdict code
+ to block-qdict.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,283 +23,2715 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-The -drive option serial was deprecated in QEMU 2.10. It's time to
-remove it.
+From: Markus Armbruster <armbru@redhat.com>
 
-Tests need to be updated to set the serial number with -global instead
-of using the -drive option.
+Pure code motion, except for two brace placements and a comment
+tweaked to appease checkpatch.
 
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
 ---
- include/hw/block/block.h  |  1 -
- include/sysemu/blockdev.h |  1 -
- block/block-backend.c     |  1 -
- blockdev.c                | 10 ----------
- hw/block/block.c          | 13 -------------
- hw/block/nvme.c           |  1 -
- hw/block/virtio-blk.c     |  1 -
- hw/ide/qdev.c             |  1 -
- hw/scsi/scsi-disk.c       |  1 -
- hw/usb/dev-storage.c      |  1 -
- tests/ahci-test.c         |  6 +++---
- tests/ide-test.c          |  8 ++++----
- qemu-doc.texi             |  5 -----
- qemu-options.hx           |  6 +-----
- 14 files changed, 8 insertions(+), 48 deletions(-)
+ qobject/block-qdict.c     | 640 ++++++++++++++++++++++++++++++++++++++++++++
+ qobject/qdict.c           | 629 --------------------------------------------
+ tests/check-block-qdict.c | 655 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/check-qdict.c       | 642 ---------------------------------------------
+ MAINTAINERS               |   2 +
+ qobject/Makefile.objs     |   1 +
+ tests/Makefile.include    |   4 +
+ 7 files changed, 1302 insertions(+), 1271 deletions(-)
+ create mode 100644 qobject/block-qdict.c
+ create mode 100644 tests/check-block-qdict.c
 
-diff --git a/include/hw/block/block.h b/include/hw/block/block.h
-index d4f4dfffab..e9f9e2223f 100644
---- a/include/hw/block/block.h
-+++ b/include/hw/block/block.h
-@@ -72,7 +72,6 @@ static inline unsigned int get_physical_block_exp(BlockConf *conf)
+diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
+new file mode 100644
+index 0000000000..fb92010dc5
+--- /dev/null
++++ b/qobject/block-qdict.c
+@@ -0,0 +1,640 @@
++/*
++ * Special QDict functions used by the block layer
++ *
++ * Copyright (c) 2013-2018 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "block/qdict.h"
++#include "qapi/qmp/qlist.h"
++#include "qemu/cutils.h"
++#include "qapi/error.h"
++
++/**
++ * qdict_copy_default(): If no entry mapped by 'key' exists in 'dst' yet, the
++ * value of 'key' in 'src' is copied there (and the refcount increased
++ * accordingly).
++ */
++void qdict_copy_default(QDict *dst, QDict *src, const char *key)
++{
++    QObject *val;
++
++    if (qdict_haskey(dst, key)) {
++        return;
++    }
++
++    val = qdict_get(src, key);
++    if (val) {
++        qdict_put_obj(dst, key, qobject_ref(val));
++    }
++}
++
++/**
++ * qdict_set_default_str(): If no entry mapped by 'key' exists in 'dst' yet, a
++ * new QString initialised by 'val' is put there.
++ */
++void qdict_set_default_str(QDict *dst, const char *key, const char *val)
++{
++    if (qdict_haskey(dst, key)) {
++        return;
++    }
++
++    qdict_put_str(dst, key, val);
++}
++
++static void qdict_flatten_qdict(QDict *qdict, QDict *target,
++                                const char *prefix);
++
++static void qdict_flatten_qlist(QList *qlist, QDict *target, const char *prefix)
++{
++    QObject *value;
++    const QListEntry *entry;
++    char *new_key;
++    int i;
++
++    /* This function is never called with prefix == NULL, i.e., it is always
++     * called from within qdict_flatten_q(list|dict)(). Therefore, it does not
++     * need to remove list entries during the iteration (the whole list will be
++     * deleted eventually anyway from qdict_flatten_qdict()). */
++    assert(prefix);
++
++    entry = qlist_first(qlist);
++
++    for (i = 0; entry; entry = qlist_next(entry), i++) {
++        value = qlist_entry_obj(entry);
++        new_key = g_strdup_printf("%s.%i", prefix, i);
++
++        if (qobject_type(value) == QTYPE_QDICT) {
++            qdict_flatten_qdict(qobject_to(QDict, value), target, new_key);
++        } else if (qobject_type(value) == QTYPE_QLIST) {
++            qdict_flatten_qlist(qobject_to(QList, value), target, new_key);
++        } else {
++            /* All other types are moved to the target unchanged. */
++            qdict_put_obj(target, new_key, qobject_ref(value));
++        }
++
++        g_free(new_key);
++    }
++}
++
++static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
++{
++    QObject *value;
++    const QDictEntry *entry, *next;
++    char *new_key;
++    bool delete;
++
++    entry = qdict_first(qdict);
++
++    while (entry != NULL) {
++
++        next = qdict_next(qdict, entry);
++        value = qdict_entry_value(entry);
++        new_key = NULL;
++        delete = false;
++
++        if (prefix) {
++            new_key = g_strdup_printf("%s.%s", prefix, entry->key);
++        }
++
++        if (qobject_type(value) == QTYPE_QDICT) {
++            /* Entries of QDicts are processed recursively, the QDict object
++             * itself disappears. */
++            qdict_flatten_qdict(qobject_to(QDict, value), target,
++                                new_key ? new_key : entry->key);
++            delete = true;
++        } else if (qobject_type(value) == QTYPE_QLIST) {
++            qdict_flatten_qlist(qobject_to(QList, value), target,
++                                new_key ? new_key : entry->key);
++            delete = true;
++        } else if (prefix) {
++            /* All other objects are moved to the target unchanged. */
++            qdict_put_obj(target, new_key, qobject_ref(value));
++            delete = true;
++        }
++
++        g_free(new_key);
++
++        if (delete) {
++            qdict_del(qdict, entry->key);
++
++            /* Restart loop after modifying the iterated QDict */
++            entry = qdict_first(qdict);
++            continue;
++        }
++
++        entry = next;
++    }
++}
++
++/**
++ * qdict_flatten(): For each nested QDict with key x, all fields with key y
++ * are moved to this QDict and their key is renamed to "x.y". For each nested
++ * QList with key x, the field at index y is moved to this QDict with the key
++ * "x.y" (i.e., the reverse of what qdict_array_split() does).
++ * This operation is applied recursively for nested QDicts and QLists.
++ */
++void qdict_flatten(QDict *qdict)
++{
++    qdict_flatten_qdict(qdict, qdict, NULL);
++}
++
++/* extract all the src QDict entries starting by start into dst */
++void qdict_extract_subqdict(QDict *src, QDict **dst, const char *start)
++
++{
++    const QDictEntry *entry, *next;
++    const char *p;
++
++    *dst = qdict_new();
++    entry = qdict_first(src);
++
++    while (entry != NULL) {
++        next = qdict_next(src, entry);
++        if (strstart(entry->key, start, &p)) {
++            qdict_put_obj(*dst, p, qobject_ref(entry->value));
++            qdict_del(src, entry->key);
++        }
++        entry = next;
++    }
++}
++
++static int qdict_count_prefixed_entries(const QDict *src, const char *start)
++{
++    const QDictEntry *entry;
++    int count = 0;
++
++    for (entry = qdict_first(src); entry; entry = qdict_next(src, entry)) {
++        if (strstart(entry->key, start, NULL)) {
++            if (count == INT_MAX) {
++                return -ERANGE;
++            }
++            count++;
++        }
++    }
++
++    return count;
++}
++
++/**
++ * qdict_array_split(): This function moves array-like elements of a QDict into
++ * a new QList. Every entry in the original QDict with a key "%u" or one
++ * prefixed "%u.", where %u designates an unsigned integer starting at 0 and
++ * incrementally counting up, will be moved to a new QDict at index %u in the
++ * output QList with the key prefix removed, if that prefix is "%u.". If the
++ * whole key is just "%u", the whole QObject will be moved unchanged without
++ * creating a new QDict. The function terminates when there is no entry in the
++ * QDict with a prefix directly (incrementally) following the last one; it also
++ * returns if there are both entries with "%u" and "%u." for the same index %u.
++ * Example: {"0.a": 42, "0.b": 23, "1.x": 0, "4.y": 1, "o.o": 7, "2": 66}
++ *      (or {"1.x": 0, "4.y": 1, "0.a": 42, "o.o": 7, "0.b": 23, "2": 66})
++ *       => [{"a": 42, "b": 23}, {"x": 0}, 66]
++ *      and {"4.y": 1, "o.o": 7} (remainder of the old QDict)
++ */
++void qdict_array_split(QDict *src, QList **dst)
++{
++    unsigned i;
++
++    *dst = qlist_new();
++
++    for (i = 0; i < UINT_MAX; i++) {
++        QObject *subqobj;
++        bool is_subqdict;
++        QDict *subqdict;
++        char indexstr[32], prefix[32];
++        size_t snprintf_ret;
++
++        snprintf_ret = snprintf(indexstr, 32, "%u", i);
++        assert(snprintf_ret < 32);
++
++        subqobj = qdict_get(src, indexstr);
++
++        snprintf_ret = snprintf(prefix, 32, "%u.", i);
++        assert(snprintf_ret < 32);
++
++        /* Overflow is the same as positive non-zero results */
++        is_subqdict = qdict_count_prefixed_entries(src, prefix);
++
++        /*
++         * There may be either a single subordinate object (named
++         * "%u") or multiple objects (each with a key prefixed "%u."),
++         * but not both.
++         */
++        if (!subqobj == !is_subqdict) {
++            break;
++        }
++
++        if (is_subqdict) {
++            qdict_extract_subqdict(src, &subqdict, prefix);
++            assert(qdict_size(subqdict) > 0);
++        } else {
++            qobject_ref(subqobj);
++            qdict_del(src, indexstr);
++        }
++
++        qlist_append_obj(*dst, subqobj ?: QOBJECT(subqdict));
++    }
++}
++
++/**
++ * qdict_split_flat_key:
++ * @key: the key string to split
++ * @prefix: non-NULL pointer to hold extracted prefix
++ * @suffix: non-NULL pointer to remaining suffix
++ *
++ * Given a flattened key such as 'foo.0.bar', split it into two parts
++ * at the first '.' separator. Allows double dot ('..') to escape the
++ * normal separator.
++ *
++ * e.g.
++ *    'foo.0.bar' -> prefix='foo' and suffix='0.bar'
++ *    'foo..0.bar' -> prefix='foo.0' and suffix='bar'
++ *
++ * The '..' sequence will be unescaped in the returned 'prefix'
++ * string. The 'suffix' string will be left in escaped format, so it
++ * can be fed back into the qdict_split_flat_key() key as the input
++ * later.
++ *
++ * The caller is responsible for freeing the string returned in @prefix
++ * using g_free().
++ */
++static void qdict_split_flat_key(const char *key, char **prefix,
++                                 const char **suffix)
++{
++    const char *separator;
++    size_t i, j;
++
++    /* Find first '.' separator, but if there is a pair '..'
++     * that acts as an escape, so skip over '..' */
++    separator = NULL;
++    do {
++        if (separator) {
++            separator += 2;
++        } else {
++            separator = key;
++        }
++        separator = strchr(separator, '.');
++    } while (separator && separator[1] == '.');
++
++    if (separator) {
++        *prefix = g_strndup(key, separator - key);
++        *suffix = separator + 1;
++    } else {
++        *prefix = g_strdup(key);
++        *suffix = NULL;
++    }
++
++    /* Unescape the '..' sequence into '.' */
++    for (i = 0, j = 0; (*prefix)[i] != '\0'; i++, j++) {
++        if ((*prefix)[i] == '.') {
++            assert((*prefix)[i + 1] == '.');
++            i++;
++        }
++        (*prefix)[j] = (*prefix)[i];
++    }
++    (*prefix)[j] = '\0';
++}
++
++/**
++ * qdict_is_list:
++ * @maybe_list: dict to check if keys represent list elements.
++ *
++ * Determine whether all keys in @maybe_list are valid list elements.
++ * If @maybe_list is non-zero in length and all the keys look like
++ * valid list indexes, this will return 1. If @maybe_list is zero
++ * length or all keys are non-numeric then it will return 0 to indicate
++ * it is a normal qdict. If there is a mix of numeric and non-numeric
++ * keys, or the list indexes are non-contiguous, an error is reported.
++ *
++ * Returns: 1 if a valid list, 0 if a dict, -1 on error
++ */
++static int qdict_is_list(QDict *maybe_list, Error **errp)
++{
++    const QDictEntry *ent;
++    ssize_t len = 0;
++    ssize_t max = -1;
++    int is_list = -1;
++    int64_t val;
++
++    for (ent = qdict_first(maybe_list); ent != NULL;
++         ent = qdict_next(maybe_list, ent)) {
++
++        if (qemu_strtoi64(ent->key, NULL, 10, &val) == 0) {
++            if (is_list == -1) {
++                is_list = 1;
++            } else if (!is_list) {
++                error_setg(errp,
++                           "Cannot mix list and non-list keys");
++                return -1;
++            }
++            len++;
++            if (val > max) {
++                max = val;
++            }
++        } else {
++            if (is_list == -1) {
++                is_list = 0;
++            } else if (is_list) {
++                error_setg(errp,
++                           "Cannot mix list and non-list keys");
++                return -1;
++            }
++        }
++    }
++
++    if (is_list == -1) {
++        assert(!qdict_size(maybe_list));
++        is_list = 0;
++    }
++
++    /* NB this isn't a perfect check - e.g. it won't catch
++     * a list containing '1', '+1', '01', '3', but that
++     * does not matter - we've still proved that the
++     * input is a list. It is up the caller to do a
++     * stricter check if desired */
++    if (len != (max + 1)) {
++        error_setg(errp, "List indices are not contiguous, "
++                   "saw %zd elements but %zd largest index",
++                   len, max);
++        return -1;
++    }
++
++    return is_list;
++}
++
++/**
++ * qdict_crumple:
++ * @src: the original flat dictionary (only scalar values) to crumple
++ *
++ * Takes a flat dictionary whose keys use '.' separator to indicate
++ * nesting, and values are scalars, and crumples it into a nested
++ * structure.
++ *
++ * To include a literal '.' in a key name, it must be escaped as '..'
++ *
++ * For example, an input of:
++ *
++ * { 'foo.0.bar': 'one', 'foo.0.wizz': '1',
++ *   'foo.1.bar': 'two', 'foo.1.wizz': '2' }
++ *
++ * will result in an output of:
++ *
++ * {
++ *   'foo': [
++ *      { 'bar': 'one', 'wizz': '1' },
++ *      { 'bar': 'two', 'wizz': '2' }
++ *   ],
++ * }
++ *
++ * The following scenarios in the input dict will result in an
++ * error being returned:
++ *
++ *  - Any values in @src are non-scalar types
++ *  - If keys in @src imply that a particular level is both a
++ *    list and a dict. e.g., "foo.0.bar" and "foo.eek.bar".
++ *  - If keys in @src imply that a particular level is a list,
++ *    but the indices are non-contiguous. e.g. "foo.0.bar" and
++ *    "foo.2.bar" without any "foo.1.bar" present.
++ *  - If keys in @src represent list indexes, but are not in
++ *    the "%zu" format. e.g. "foo.+0.bar"
++ *
++ * Returns: either a QDict or QList for the nested data structure, or NULL
++ * on error
++ */
++QObject *qdict_crumple(const QDict *src, Error **errp)
++{
++    const QDictEntry *ent;
++    QDict *two_level, *multi_level = NULL;
++    QObject *dst = NULL, *child;
++    size_t i;
++    char *prefix = NULL;
++    const char *suffix = NULL;
++    int is_list;
++
++    two_level = qdict_new();
++
++    /* Step 1: split our totally flat dict into a two level dict */
++    for (ent = qdict_first(src); ent != NULL; ent = qdict_next(src, ent)) {
++        if (qobject_type(ent->value) == QTYPE_QDICT ||
++            qobject_type(ent->value) == QTYPE_QLIST) {
++            error_setg(errp, "Value %s is not a scalar",
++                       ent->key);
++            goto error;
++        }
++
++        qdict_split_flat_key(ent->key, &prefix, &suffix);
++
++        child = qdict_get(two_level, prefix);
++        if (suffix) {
++            QDict *child_dict = qobject_to(QDict, child);
++            if (!child_dict) {
++                if (child) {
++                    error_setg(errp, "Key %s prefix is already set as a scalar",
++                               prefix);
++                    goto error;
++                }
++
++                child_dict = qdict_new();
++                qdict_put_obj(two_level, prefix, QOBJECT(child_dict));
++            }
++
++            qdict_put_obj(child_dict, suffix, qobject_ref(ent->value));
++        } else {
++            if (child) {
++                error_setg(errp, "Key %s prefix is already set as a dict",
++                           prefix);
++                goto error;
++            }
++            qdict_put_obj(two_level, prefix, qobject_ref(ent->value));
++        }
++
++        g_free(prefix);
++        prefix = NULL;
++    }
++
++    /* Step 2: optionally process the two level dict recursively
++     * into a multi-level dict */
++    multi_level = qdict_new();
++    for (ent = qdict_first(two_level); ent != NULL;
++         ent = qdict_next(two_level, ent)) {
++        QDict *dict = qobject_to(QDict, ent->value);
++        if (dict) {
++            child = qdict_crumple(dict, errp);
++            if (!child) {
++                goto error;
++            }
++
++            qdict_put_obj(multi_level, ent->key, child);
++        } else {
++            qdict_put_obj(multi_level, ent->key, qobject_ref(ent->value));
++        }
++    }
++    qobject_unref(two_level);
++    two_level = NULL;
++
++    /* Step 3: detect if we need to turn our dict into list */
++    is_list = qdict_is_list(multi_level, errp);
++    if (is_list < 0) {
++        goto error;
++    }
++
++    if (is_list) {
++        dst = QOBJECT(qlist_new());
++
++        for (i = 0; i < qdict_size(multi_level); i++) {
++            char *key = g_strdup_printf("%zu", i);
++
++            child = qdict_get(multi_level, key);
++            g_free(key);
++
++            if (!child) {
++                error_setg(errp, "Missing list index %zu", i);
++                goto error;
++            }
++
++            qlist_append_obj(qobject_to(QList, dst), qobject_ref(child));
++        }
++        qobject_unref(multi_level);
++        multi_level = NULL;
++    } else {
++        dst = QOBJECT(multi_level);
++    }
++
++    return dst;
++
++ error:
++    g_free(prefix);
++    qobject_unref(multi_level);
++    qobject_unref(two_level);
++    qobject_unref(dst);
++    return NULL;
++}
++
++/**
++ * qdict_array_entries(): Returns the number of direct array entries if the
++ * sub-QDict of src specified by the prefix in subqdict (or src itself for
++ * prefix == "") is valid as an array, i.e. the length of the created list if
++ * the sub-QDict would become empty after calling qdict_array_split() on it. If
++ * the array is not valid, -EINVAL is returned.
++ */
++int qdict_array_entries(QDict *src, const char *subqdict)
++{
++    const QDictEntry *entry;
++    unsigned i;
++    unsigned entries = 0;
++    size_t subqdict_len = strlen(subqdict);
++
++    assert(!subqdict_len || subqdict[subqdict_len - 1] == '.');
++
++    /* qdict_array_split() loops until UINT_MAX, but as we want to return
++     * negative errors, we only have a signed return value here. Any additional
++     * entries will lead to -EINVAL. */
++    for (i = 0; i < INT_MAX; i++) {
++        QObject *subqobj;
++        int subqdict_entries;
++        char *prefix = g_strdup_printf("%s%u.", subqdict, i);
++
++        subqdict_entries = qdict_count_prefixed_entries(src, prefix);
++
++        /* Remove ending "." */
++        prefix[strlen(prefix) - 1] = 0;
++        subqobj = qdict_get(src, prefix);
++
++        g_free(prefix);
++
++        if (subqdict_entries < 0) {
++            return subqdict_entries;
++        }
++
++        /* There may be either a single subordinate object (named "%u") or
++         * multiple objects (each with a key prefixed "%u."), but not both. */
++        if (subqobj && subqdict_entries) {
++            return -EINVAL;
++        } else if (!subqobj && !subqdict_entries) {
++            break;
++        }
++
++        entries += subqdict_entries ? subqdict_entries : 1;
++    }
++
++    /* Consider everything handled that isn't part of the given sub-QDict */
++    for (entry = qdict_first(src); entry; entry = qdict_next(src, entry)) {
++        if (!strstart(qdict_entry_key(entry), subqdict, NULL)) {
++            entries++;
++        }
++    }
++
++    /* Anything left in the sub-QDict that wasn't handled? */
++    if (qdict_size(src) != entries) {
++        return -EINVAL;
++    }
++
++    return i;
++}
++
++/**
++ * qdict_join(): Absorb the src QDict into the dest QDict, that is, move all
++ * elements from src to dest.
++ *
++ * If an element from src has a key already present in dest, it will not be
++ * moved unless overwrite is true.
++ *
++ * If overwrite is true, the conflicting values in dest will be discarded and
++ * replaced by the corresponding values from src.
++ *
++ * Therefore, with overwrite being true, the src QDict will always be empty when
++ * this function returns. If overwrite is false, the src QDict will be empty
++ * iff there were no conflicts.
++ */
++void qdict_join(QDict *dest, QDict *src, bool overwrite)
++{
++    const QDictEntry *entry, *next;
++
++    entry = qdict_first(src);
++    while (entry) {
++        next = qdict_next(src, entry);
++
++        if (overwrite || !qdict_haskey(dest, entry->key)) {
++            qdict_put_obj(dest, entry->key, qobject_ref(entry->value));
++            qdict_del(src, entry->key);
++        }
++
++        entry = next;
++    }
++}
++
++/**
++ * qdict_rename_keys(): Rename keys in qdict according to the replacements
++ * specified in the array renames. The array must be terminated by an entry
++ * with from = NULL.
++ *
++ * The renames are performed individually in the order of the array, so entries
++ * may be renamed multiple times and may or may not conflict depending on the
++ * order of the renames array.
++ *
++ * Returns true for success, false in error cases.
++ */
++bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp)
++{
++    QObject *qobj;
++
++    while (renames->from) {
++        if (qdict_haskey(qdict, renames->from)) {
++            if (qdict_haskey(qdict, renames->to)) {
++                error_setg(errp, "'%s' and its alias '%s' can't be used at the "
++                           "same time", renames->to, renames->from);
++                return false;
++            }
++
++            qobj = qdict_get(qdict, renames->from);
++            qdict_put_obj(qdict, renames->to, qobject_ref(qobj));
++            qdict_del(qdict, renames->from);
++        }
++
++        renames++;
++    }
++    return true;
++}
+diff --git a/qobject/qdict.c b/qobject/qdict.c
+index 0554c64553..3d8c2f7bbc 100644
+--- a/qobject/qdict.c
++++ b/qobject/qdict.c
+@@ -11,17 +11,11 @@
+  */
  
- /* Configuration helpers */
+ #include "qemu/osdep.h"
+-#include "block/qdict.h"
+ #include "qapi/qmp/qnum.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qbool.h"
+-#include "qapi/qmp/qlist.h"
+ #include "qapi/qmp/qnull.h"
+ #include "qapi/qmp/qstring.h"
+-#include "qapi/error.h"
+-#include "qemu/queue.h"
+-#include "qemu-common.h"
+-#include "qemu/cutils.h"
  
--void blkconf_serial(BlockConf *conf, char **serial);
- bool blkconf_geometry(BlockConf *conf, int *trans,
-                       unsigned cyls_max, unsigned heads_max, unsigned secs_max,
-                       Error **errp);
-diff --git a/include/sysemu/blockdev.h b/include/sysemu/blockdev.h
-index c0ae3700ec..24954b94e0 100644
---- a/include/sysemu/blockdev.h
-+++ b/include/sysemu/blockdev.h
-@@ -35,7 +35,6 @@ struct DriveInfo {
-     bool is_default;            /* Added by default_drive() ?  */
-     int media_cd;
-     QemuOpts *opts;
--    char *serial;
-     QTAILQ_ENTRY(DriveInfo) next;
- };
+ /**
+  * qdict_new(): Create a new QDict
+@@ -464,626 +458,3 @@ void qdict_destroy_obj(QObject *obj)
  
-diff --git a/block/block-backend.c b/block/block-backend.c
-index d55c328736..2d1a3463e8 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -419,7 +419,6 @@ static void drive_info_del(DriveInfo *dinfo)
-         return;
-     }
-     qemu_opts_del(dinfo->opts);
--    g_free(dinfo->serial);
-     g_free(dinfo);
+     g_free(qdict);
  }
- 
-diff --git a/blockdev.c b/blockdev.c
-index 2984e400c2..d1ab425085 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -731,10 +731,6 @@ QemuOptsList qemu_legacy_drive_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "interface (ide, scsi, sd, mtd, floppy, pflash, virtio)",
-         },{
--            .name = "serial",
--            .type = QEMU_OPT_STRING,
--            .help = "disk serial number",
--        },{
-             .name = "file",
-             .type = QEMU_OPT_STRING,
-             .help = "file name",
-@@ -776,12 +772,10 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-     const char *werror, *rerror;
-     bool read_only = false;
-     bool copy_on_read;
--    const char *serial;
-     const char *filename;
-     Error *local_err = NULL;
-     int i;
-     const char *deprecated[] = {
--        "serial"
-     };
- 
-     /* Change legacy command line options into QMP ones */
-@@ -949,9 +943,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-         goto fail;
-     }
- 
--    /* Serial number */
--    serial = qemu_opt_get(legacy_opts, "serial");
 -
-     /* no id supplied -> create one */
-     if (qemu_opts_id(all_opts) == NULL) {
-         char *new_id;
-@@ -1026,7 +1017,6 @@ DriveInfo *drive_new(QemuOpts *all_opts, BlockInterfaceType block_default_type)
-     dinfo->type = type;
-     dinfo->bus = bus_id;
-     dinfo->unit = unit_id;
--    dinfo->serial = g_strdup(serial);
- 
-     blk_set_legacy_dinfo(blk, dinfo);
- 
-diff --git a/hw/block/block.c b/hw/block/block.c
-index b6c80ab0b7..cf0eb826f1 100644
---- a/hw/block/block.c
-+++ b/hw/block/block.c
-@@ -15,19 +15,6 @@
- #include "qapi/qapi-types-block.h"
- #include "qemu/error-report.h"
- 
--void blkconf_serial(BlockConf *conf, char **serial)
+-/**
+- * qdict_copy_default(): If no entry mapped by 'key' exists in 'dst' yet, the
+- * value of 'key' in 'src' is copied there (and the refcount increased
+- * accordingly).
+- */
+-void qdict_copy_default(QDict *dst, QDict *src, const char *key)
 -{
--    DriveInfo *dinfo;
+-    QObject *val;
 -
--    if (!*serial) {
--        /* try to fall back to value set with legacy -drive serial=... */
--        dinfo = blk_legacy_dinfo(conf->blk);
--        if (dinfo) {
--            *serial = g_strdup(dinfo->serial);
--        }
+-    if (qdict_haskey(dst, key)) {
+-        return;
+-    }
+-
+-    val = qdict_get(src, key);
+-    if (val) {
+-        qdict_put_obj(dst, key, qobject_ref(val));
 -    }
 -}
 -
- void blkconf_blocksizes(BlockConf *conf)
- {
-     BlockBackend *blk = conf->blk;
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 811084b6a7..d5bf95b79b 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1215,7 +1215,6 @@ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
-         return;
-     }
+-/**
+- * qdict_set_default_str(): If no entry mapped by 'key' exists in 'dst' yet, a
+- * new QString initialised by 'val' is put there.
+- */
+-void qdict_set_default_str(QDict *dst, const char *key, const char *val)
+-{
+-    if (qdict_haskey(dst, key)) {
+-        return;
+-    }
+-
+-    qdict_put_str(dst, key, val);
+-}
+-
+-static void qdict_flatten_qdict(QDict *qdict, QDict *target,
+-                                const char *prefix);
+-
+-static void qdict_flatten_qlist(QList *qlist, QDict *target, const char *prefix)
+-{
+-    QObject *value;
+-    const QListEntry *entry;
+-    char *new_key;
+-    int i;
+-
+-    /* This function is never called with prefix == NULL, i.e., it is always
+-     * called from within qdict_flatten_q(list|dict)(). Therefore, it does not
+-     * need to remove list entries during the iteration (the whole list will be
+-     * deleted eventually anyway from qdict_flatten_qdict()). */
+-    assert(prefix);
+-
+-    entry = qlist_first(qlist);
+-
+-    for (i = 0; entry; entry = qlist_next(entry), i++) {
+-        value = qlist_entry_obj(entry);
+-        new_key = g_strdup_printf("%s.%i", prefix, i);
+-
+-        if (qobject_type(value) == QTYPE_QDICT) {
+-            qdict_flatten_qdict(qobject_to(QDict, value), target, new_key);
+-        } else if (qobject_type(value) == QTYPE_QLIST) {
+-            qdict_flatten_qlist(qobject_to(QList, value), target, new_key);
+-        } else {
+-            /* All other types are moved to the target unchanged. */
+-            qdict_put_obj(target, new_key, qobject_ref(value));
+-        }
+-
+-        g_free(new_key);
+-    }
+-}
+-
+-static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
+-{
+-    QObject *value;
+-    const QDictEntry *entry, *next;
+-    char *new_key;
+-    bool delete;
+-
+-    entry = qdict_first(qdict);
+-
+-    while (entry != NULL) {
+-
+-        next = qdict_next(qdict, entry);
+-        value = qdict_entry_value(entry);
+-        new_key = NULL;
+-        delete = false;
+-
+-        if (prefix) {
+-            new_key = g_strdup_printf("%s.%s", prefix, entry->key);
+-        }
+-
+-        if (qobject_type(value) == QTYPE_QDICT) {
+-            /* Entries of QDicts are processed recursively, the QDict object
+-             * itself disappears. */
+-            qdict_flatten_qdict(qobject_to(QDict, value), target,
+-                                new_key ? new_key : entry->key);
+-            delete = true;
+-        } else if (qobject_type(value) == QTYPE_QLIST) {
+-            qdict_flatten_qlist(qobject_to(QList, value), target,
+-                                new_key ? new_key : entry->key);
+-            delete = true;
+-        } else if (prefix) {
+-            /* All other objects are moved to the target unchanged. */
+-            qdict_put_obj(target, new_key, qobject_ref(value));
+-            delete = true;
+-        }
+-
+-        g_free(new_key);
+-
+-        if (delete) {
+-            qdict_del(qdict, entry->key);
+-
+-            /* Restart loop after modifying the iterated QDict */
+-            entry = qdict_first(qdict);
+-            continue;
+-        }
+-
+-        entry = next;
+-    }
+-}
+-
+-/**
+- * qdict_flatten(): For each nested QDict with key x, all fields with key y
+- * are moved to this QDict and their key is renamed to "x.y". For each nested
+- * QList with key x, the field at index y is moved to this QDict with the key
+- * "x.y" (i.e., the reverse of what qdict_array_split() does).
+- * This operation is applied recursively for nested QDicts and QLists.
+- */
+-void qdict_flatten(QDict *qdict)
+-{
+-    qdict_flatten_qdict(qdict, qdict, NULL);
+-}
+-
+-/* extract all the src QDict entries starting by start into dst */
+-void qdict_extract_subqdict(QDict *src, QDict **dst, const char *start)
+-
+-{
+-    const QDictEntry *entry, *next;
+-    const char *p;
+-
+-    *dst = qdict_new();
+-    entry = qdict_first(src);
+-
+-    while (entry != NULL) {
+-        next = qdict_next(src, entry);
+-        if (strstart(entry->key, start, &p)) {
+-            qdict_put_obj(*dst, p, qobject_ref(entry->value));
+-            qdict_del(src, entry->key);
+-        }
+-        entry = next;
+-    }
+-}
+-
+-static int qdict_count_prefixed_entries(const QDict *src, const char *start)
+-{
+-    const QDictEntry *entry;
+-    int count = 0;
+-
+-    for (entry = qdict_first(src); entry; entry = qdict_next(src, entry)) {
+-        if (strstart(entry->key, start, NULL)) {
+-            if (count == INT_MAX) {
+-                return -ERANGE;
+-            }
+-            count++;
+-        }
+-    }
+-
+-    return count;
+-}
+-
+-/**
+- * qdict_array_split(): This function moves array-like elements of a QDict into
+- * a new QList. Every entry in the original QDict with a key "%u" or one
+- * prefixed "%u.", where %u designates an unsigned integer starting at 0 and
+- * incrementally counting up, will be moved to a new QDict at index %u in the
+- * output QList with the key prefix removed, if that prefix is "%u.". If the
+- * whole key is just "%u", the whole QObject will be moved unchanged without
+- * creating a new QDict. The function terminates when there is no entry in the
+- * QDict with a prefix directly (incrementally) following the last one; it also
+- * returns if there are both entries with "%u" and "%u." for the same index %u.
+- * Example: {"0.a": 42, "0.b": 23, "1.x": 0, "4.y": 1, "o.o": 7, "2": 66}
+- *      (or {"1.x": 0, "4.y": 1, "0.a": 42, "o.o": 7, "0.b": 23, "2": 66})
+- *       => [{"a": 42, "b": 23}, {"x": 0}, 66]
+- *      and {"4.y": 1, "o.o": 7} (remainder of the old QDict)
+- */
+-void qdict_array_split(QDict *src, QList **dst)
+-{
+-    unsigned i;
+-
+-    *dst = qlist_new();
+-
+-    for (i = 0; i < UINT_MAX; i++) {
+-        QObject *subqobj;
+-        bool is_subqdict;
+-        QDict *subqdict;
+-        char indexstr[32], prefix[32];
+-        size_t snprintf_ret;
+-
+-        snprintf_ret = snprintf(indexstr, 32, "%u", i);
+-        assert(snprintf_ret < 32);
+-
+-        subqobj = qdict_get(src, indexstr);
+-
+-        snprintf_ret = snprintf(prefix, 32, "%u.", i);
+-        assert(snprintf_ret < 32);
+-
+-        /* Overflow is the same as positive non-zero results */
+-        is_subqdict = qdict_count_prefixed_entries(src, prefix);
+-
+-        // There may be either a single subordinate object (named "%u") or
+-        // multiple objects (each with a key prefixed "%u."), but not both.
+-        if (!subqobj == !is_subqdict) {
+-            break;
+-        }
+-
+-        if (is_subqdict) {
+-            qdict_extract_subqdict(src, &subqdict, prefix);
+-            assert(qdict_size(subqdict) > 0);
+-        } else {
+-            qobject_ref(subqobj);
+-            qdict_del(src, indexstr);
+-        }
+-
+-        qlist_append_obj(*dst, subqobj ?: QOBJECT(subqdict));
+-    }
+-}
+-
+-/**
+- * qdict_split_flat_key:
+- * @key: the key string to split
+- * @prefix: non-NULL pointer to hold extracted prefix
+- * @suffix: non-NULL pointer to remaining suffix
+- *
+- * Given a flattened key such as 'foo.0.bar', split it into two parts
+- * at the first '.' separator. Allows double dot ('..') to escape the
+- * normal separator.
+- *
+- * e.g.
+- *    'foo.0.bar' -> prefix='foo' and suffix='0.bar'
+- *    'foo..0.bar' -> prefix='foo.0' and suffix='bar'
+- *
+- * The '..' sequence will be unescaped in the returned 'prefix'
+- * string. The 'suffix' string will be left in escaped format, so it
+- * can be fed back into the qdict_split_flat_key() key as the input
+- * later.
+- *
+- * The caller is responsible for freeing the string returned in @prefix
+- * using g_free().
+- */
+-static void qdict_split_flat_key(const char *key, char **prefix,
+-                                 const char **suffix)
+-{
+-    const char *separator;
+-    size_t i, j;
+-
+-    /* Find first '.' separator, but if there is a pair '..'
+-     * that acts as an escape, so skip over '..' */
+-    separator = NULL;
+-    do {
+-        if (separator) {
+-            separator += 2;
+-        } else {
+-            separator = key;
+-        }
+-        separator = strchr(separator, '.');
+-    } while (separator && separator[1] == '.');
+-
+-    if (separator) {
+-        *prefix = g_strndup(key, separator - key);
+-        *suffix = separator + 1;
+-    } else {
+-        *prefix = g_strdup(key);
+-        *suffix = NULL;
+-    }
+-
+-    /* Unescape the '..' sequence into '.' */
+-    for (i = 0, j = 0; (*prefix)[i] != '\0'; i++, j++) {
+-        if ((*prefix)[i] == '.') {
+-            assert((*prefix)[i + 1] == '.');
+-            i++;
+-        }
+-        (*prefix)[j] = (*prefix)[i];
+-    }
+-    (*prefix)[j] = '\0';
+-}
+-
+-/**
+- * qdict_is_list:
+- * @maybe_list: dict to check if keys represent list elements.
+- *
+- * Determine whether all keys in @maybe_list are valid list elements.
+- * If @maybe_list is non-zero in length and all the keys look like
+- * valid list indexes, this will return 1. If @maybe_list is zero
+- * length or all keys are non-numeric then it will return 0 to indicate
+- * it is a normal qdict. If there is a mix of numeric and non-numeric
+- * keys, or the list indexes are non-contiguous, an error is reported.
+- *
+- * Returns: 1 if a valid list, 0 if a dict, -1 on error
+- */
+-static int qdict_is_list(QDict *maybe_list, Error **errp)
+-{
+-    const QDictEntry *ent;
+-    ssize_t len = 0;
+-    ssize_t max = -1;
+-    int is_list = -1;
+-    int64_t val;
+-
+-    for (ent = qdict_first(maybe_list); ent != NULL;
+-         ent = qdict_next(maybe_list, ent)) {
+-
+-        if (qemu_strtoi64(ent->key, NULL, 10, &val) == 0) {
+-            if (is_list == -1) {
+-                is_list = 1;
+-            } else if (!is_list) {
+-                error_setg(errp,
+-                           "Cannot mix list and non-list keys");
+-                return -1;
+-            }
+-            len++;
+-            if (val > max) {
+-                max = val;
+-            }
+-        } else {
+-            if (is_list == -1) {
+-                is_list = 0;
+-            } else if (is_list) {
+-                error_setg(errp,
+-                           "Cannot mix list and non-list keys");
+-                return -1;
+-            }
+-        }
+-    }
+-
+-    if (is_list == -1) {
+-        assert(!qdict_size(maybe_list));
+-        is_list = 0;
+-    }
+-
+-    /* NB this isn't a perfect check - e.g. it won't catch
+-     * a list containing '1', '+1', '01', '3', but that
+-     * does not matter - we've still proved that the
+-     * input is a list. It is up the caller to do a
+-     * stricter check if desired */
+-    if (len != (max + 1)) {
+-        error_setg(errp, "List indices are not contiguous, "
+-                   "saw %zd elements but %zd largest index",
+-                   len, max);
+-        return -1;
+-    }
+-
+-    return is_list;
+-}
+-
+-/**
+- * qdict_crumple:
+- * @src: the original flat dictionary (only scalar values) to crumple
+- *
+- * Takes a flat dictionary whose keys use '.' separator to indicate
+- * nesting, and values are scalars, and crumples it into a nested
+- * structure.
+- *
+- * To include a literal '.' in a key name, it must be escaped as '..'
+- *
+- * For example, an input of:
+- *
+- * { 'foo.0.bar': 'one', 'foo.0.wizz': '1',
+- *   'foo.1.bar': 'two', 'foo.1.wizz': '2' }
+- *
+- * will result in an output of:
+- *
+- * {
+- *   'foo': [
+- *      { 'bar': 'one', 'wizz': '1' },
+- *      { 'bar': 'two', 'wizz': '2' }
+- *   ],
+- * }
+- *
+- * The following scenarios in the input dict will result in an
+- * error being returned:
+- *
+- *  - Any values in @src are non-scalar types
+- *  - If keys in @src imply that a particular level is both a
+- *    list and a dict. e.g., "foo.0.bar" and "foo.eek.bar".
+- *  - If keys in @src imply that a particular level is a list,
+- *    but the indices are non-contiguous. e.g. "foo.0.bar" and
+- *    "foo.2.bar" without any "foo.1.bar" present.
+- *  - If keys in @src represent list indexes, but are not in
+- *    the "%zu" format. e.g. "foo.+0.bar"
+- *
+- * Returns: either a QDict or QList for the nested data structure, or NULL
+- * on error
+- */
+-QObject *qdict_crumple(const QDict *src, Error **errp)
+-{
+-    const QDictEntry *ent;
+-    QDict *two_level, *multi_level = NULL;
+-    QObject *dst = NULL, *child;
+-    size_t i;
+-    char *prefix = NULL;
+-    const char *suffix = NULL;
+-    int is_list;
+-
+-    two_level = qdict_new();
+-
+-    /* Step 1: split our totally flat dict into a two level dict */
+-    for (ent = qdict_first(src); ent != NULL; ent = qdict_next(src, ent)) {
+-        if (qobject_type(ent->value) == QTYPE_QDICT ||
+-            qobject_type(ent->value) == QTYPE_QLIST) {
+-            error_setg(errp, "Value %s is not a scalar",
+-                       ent->key);
+-            goto error;
+-        }
+-
+-        qdict_split_flat_key(ent->key, &prefix, &suffix);
+-
+-        child = qdict_get(two_level, prefix);
+-        if (suffix) {
+-            QDict *child_dict = qobject_to(QDict, child);
+-            if (!child_dict) {
+-                if (child) {
+-                    error_setg(errp, "Key %s prefix is already set as a scalar",
+-                               prefix);
+-                    goto error;
+-                }
+-
+-                child_dict = qdict_new();
+-                qdict_put_obj(two_level, prefix, QOBJECT(child_dict));
+-            }
+-
+-            qdict_put_obj(child_dict, suffix, qobject_ref(ent->value));
+-        } else {
+-            if (child) {
+-                error_setg(errp, "Key %s prefix is already set as a dict",
+-                           prefix);
+-                goto error;
+-            }
+-            qdict_put_obj(two_level, prefix, qobject_ref(ent->value));
+-        }
+-
+-        g_free(prefix);
+-        prefix = NULL;
+-    }
+-
+-    /* Step 2: optionally process the two level dict recursively
+-     * into a multi-level dict */
+-    multi_level = qdict_new();
+-    for (ent = qdict_first(two_level); ent != NULL;
+-         ent = qdict_next(two_level, ent)) {
+-        QDict *dict = qobject_to(QDict, ent->value);
+-        if (dict) {
+-            child = qdict_crumple(dict, errp);
+-            if (!child) {
+-                goto error;
+-            }
+-
+-            qdict_put_obj(multi_level, ent->key, child);
+-        } else {
+-            qdict_put_obj(multi_level, ent->key, qobject_ref(ent->value));
+-        }
+-    }
+-    qobject_unref(two_level);
+-    two_level = NULL;
+-
+-    /* Step 3: detect if we need to turn our dict into list */
+-    is_list = qdict_is_list(multi_level, errp);
+-    if (is_list < 0) {
+-        goto error;
+-    }
+-
+-    if (is_list) {
+-        dst = QOBJECT(qlist_new());
+-
+-        for (i = 0; i < qdict_size(multi_level); i++) {
+-            char *key = g_strdup_printf("%zu", i);
+-
+-            child = qdict_get(multi_level, key);
+-            g_free(key);
+-
+-            if (!child) {
+-                error_setg(errp, "Missing list index %zu", i);
+-                goto error;
+-            }
+-
+-            qlist_append_obj(qobject_to(QList, dst), qobject_ref(child));
+-        }
+-        qobject_unref(multi_level);
+-        multi_level = NULL;
+-    } else {
+-        dst = QOBJECT(multi_level);
+-    }
+-
+-    return dst;
+-
+- error:
+-    g_free(prefix);
+-    qobject_unref(multi_level);
+-    qobject_unref(two_level);
+-    qobject_unref(dst);
+-    return NULL;
+-}
+-
+-/**
+- * qdict_array_entries(): Returns the number of direct array entries if the
+- * sub-QDict of src specified by the prefix in subqdict (or src itself for
+- * prefix == "") is valid as an array, i.e. the length of the created list if
+- * the sub-QDict would become empty after calling qdict_array_split() on it. If
+- * the array is not valid, -EINVAL is returned.
+- */
+-int qdict_array_entries(QDict *src, const char *subqdict)
+-{
+-    const QDictEntry *entry;
+-    unsigned i;
+-    unsigned entries = 0;
+-    size_t subqdict_len = strlen(subqdict);
+-
+-    assert(!subqdict_len || subqdict[subqdict_len - 1] == '.');
+-
+-    /* qdict_array_split() loops until UINT_MAX, but as we want to return
+-     * negative errors, we only have a signed return value here. Any additional
+-     * entries will lead to -EINVAL. */
+-    for (i = 0; i < INT_MAX; i++) {
+-        QObject *subqobj;
+-        int subqdict_entries;
+-        char *prefix = g_strdup_printf("%s%u.", subqdict, i);
+-
+-        subqdict_entries = qdict_count_prefixed_entries(src, prefix);
+-
+-        /* Remove ending "." */
+-        prefix[strlen(prefix) - 1] = 0;
+-        subqobj = qdict_get(src, prefix);
+-
+-        g_free(prefix);
+-
+-        if (subqdict_entries < 0) {
+-            return subqdict_entries;
+-        }
+-
+-        /* There may be either a single subordinate object (named "%u") or
+-         * multiple objects (each with a key prefixed "%u."), but not both. */
+-        if (subqobj && subqdict_entries) {
+-            return -EINVAL;
+-        } else if (!subqobj && !subqdict_entries) {
+-            break;
+-        }
+-
+-        entries += subqdict_entries ? subqdict_entries : 1;
+-    }
+-
+-    /* Consider everything handled that isn't part of the given sub-QDict */
+-    for (entry = qdict_first(src); entry; entry = qdict_next(src, entry)) {
+-        if (!strstart(qdict_entry_key(entry), subqdict, NULL)) {
+-            entries++;
+-        }
+-    }
+-
+-    /* Anything left in the sub-QDict that wasn't handled? */
+-    if (qdict_size(src) != entries) {
+-        return -EINVAL;
+-    }
+-
+-    return i;
+-}
+-
+-/**
+- * qdict_join(): Absorb the src QDict into the dest QDict, that is, move all
+- * elements from src to dest.
+- *
+- * If an element from src has a key already present in dest, it will not be
+- * moved unless overwrite is true.
+- *
+- * If overwrite is true, the conflicting values in dest will be discarded and
+- * replaced by the corresponding values from src.
+- *
+- * Therefore, with overwrite being true, the src QDict will always be empty when
+- * this function returns. If overwrite is false, the src QDict will be empty
+- * iff there were no conflicts.
+- */
+-void qdict_join(QDict *dest, QDict *src, bool overwrite)
+-{
+-    const QDictEntry *entry, *next;
+-
+-    entry = qdict_first(src);
+-    while (entry) {
+-        next = qdict_next(src, entry);
+-
+-        if (overwrite || !qdict_haskey(dest, entry->key)) {
+-            qdict_put_obj(dest, entry->key, qobject_ref(entry->value));
+-            qdict_del(src, entry->key);
+-        }
+-
+-        entry = next;
+-    }
+-}
+-
+-/**
+- * qdict_rename_keys(): Rename keys in qdict according to the replacements
+- * specified in the array renames. The array must be terminated by an entry
+- * with from = NULL.
+- *
+- * The renames are performed individually in the order of the array, so entries
+- * may be renamed multiple times and may or may not conflict depending on the
+- * order of the renames array.
+- *
+- * Returns true for success, false in error cases.
+- */
+-bool qdict_rename_keys(QDict *qdict, const QDictRenames *renames, Error **errp)
+-{
+-    QObject *qobj;
+-
+-    while (renames->from) {
+-        if (qdict_haskey(qdict, renames->from)) {
+-            if (qdict_haskey(qdict, renames->to)) {
+-                error_setg(errp, "'%s' and its alias '%s' can't be used at the "
+-                           "same time", renames->to, renames->from);
+-                return false;
+-            }
+-
+-            qobj = qdict_get(qdict, renames->from);
+-            qdict_put_obj(qdict, renames->to, qobject_ref(qobj));
+-            qdict_del(qdict, renames->from);
+-        }
+-
+-        renames++;
+-    }
+-    return true;
+-}
+diff --git a/tests/check-block-qdict.c b/tests/check-block-qdict.c
+new file mode 100644
+index 0000000000..5b9f4d506e
+--- /dev/null
++++ b/tests/check-block-qdict.c
+@@ -0,0 +1,655 @@
++/*
++ * Unit-tests for Block layer QDict extras
++ *
++ * Copyright (c) 2013-2018 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.
++ * See the COPYING.LIB file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "block/qdict.h"
++#include "qapi/qmp/qlist.h"
++#include "qapi/qmp/qnum.h"
++#include "qapi/error.h"
++
++static void qdict_defaults_test(void)
++{
++    QDict *dict, *copy;
++
++    dict = qdict_new();
++    copy = qdict_new();
++
++    qdict_set_default_str(dict, "foo", "abc");
++    qdict_set_default_str(dict, "foo", "def");
++    g_assert_cmpstr(qdict_get_str(dict, "foo"), ==, "abc");
++    qdict_set_default_str(dict, "bar", "ghi");
++
++    qdict_copy_default(copy, dict, "foo");
++    g_assert_cmpstr(qdict_get_str(copy, "foo"), ==, "abc");
++    qdict_set_default_str(copy, "bar", "xyz");
++    qdict_copy_default(copy, dict, "bar");
++    g_assert_cmpstr(qdict_get_str(copy, "bar"), ==, "xyz");
++
++    qobject_unref(copy);
++    qobject_unref(dict);
++}
++
++static void qdict_flatten_test(void)
++{
++    QList *list1 = qlist_new();
++    QList *list2 = qlist_new();
++    QDict *dict1 = qdict_new();
++    QDict *dict2 = qdict_new();
++    QDict *dict3 = qdict_new();
++
++    /*
++     * Test the flattening of
++     *
++     * {
++     *     "e": [
++     *         42,
++     *         [
++     *             23,
++     *             66,
++     *             {
++     *                 "a": 0,
++     *                 "b": 1
++     *             }
++     *         ]
++     *     ],
++     *     "f": {
++     *         "c": 2,
++     *         "d": 3,
++     *     },
++     *     "g": 4
++     * }
++     *
++     * to
++     *
++     * {
++     *     "e.0": 42,
++     *     "e.1.0": 23,
++     *     "e.1.1": 66,
++     *     "e.1.2.a": 0,
++     *     "e.1.2.b": 1,
++     *     "f.c": 2,
++     *     "f.d": 3,
++     *     "g": 4
++     * }
++     */
++
++    qdict_put_int(dict1, "a", 0);
++    qdict_put_int(dict1, "b", 1);
++
++    qlist_append_int(list1, 23);
++    qlist_append_int(list1, 66);
++    qlist_append(list1, dict1);
++    qlist_append_int(list2, 42);
++    qlist_append(list2, list1);
++
++    qdict_put_int(dict2, "c", 2);
++    qdict_put_int(dict2, "d", 3);
++    qdict_put(dict3, "e", list2);
++    qdict_put(dict3, "f", dict2);
++    qdict_put_int(dict3, "g", 4);
++
++    qdict_flatten(dict3);
++
++    g_assert(qdict_get_int(dict3, "e.0") == 42);
++    g_assert(qdict_get_int(dict3, "e.1.0") == 23);
++    g_assert(qdict_get_int(dict3, "e.1.1") == 66);
++    g_assert(qdict_get_int(dict3, "e.1.2.a") == 0);
++    g_assert(qdict_get_int(dict3, "e.1.2.b") == 1);
++    g_assert(qdict_get_int(dict3, "f.c") == 2);
++    g_assert(qdict_get_int(dict3, "f.d") == 3);
++    g_assert(qdict_get_int(dict3, "g") == 4);
++
++    g_assert(qdict_size(dict3) == 8);
++
++    qobject_unref(dict3);
++}
++
++static void qdict_array_split_test(void)
++{
++    QDict *test_dict = qdict_new();
++    QDict *dict1, *dict2;
++    QNum *int1;
++    QList *test_list;
++
++    /*
++     * Test the split of
++     *
++     * {
++     *     "1.x": 0,
++     *     "4.y": 1,
++     *     "0.a": 42,
++     *     "o.o": 7,
++     *     "0.b": 23,
++     *     "2": 66
++     * }
++     *
++     * to
++     *
++     * [
++     *     {
++     *         "a": 42,
++     *         "b": 23
++     *     },
++     *     {
++     *         "x": 0
++     *     },
++     *     66
++     * ]
++     *
++     * and
++     *
++     * {
++     *     "4.y": 1,
++     *     "o.o": 7
++     * }
++     *
++     * (remaining in the old QDict)
++     *
++     * This example is given in the comment of qdict_array_split().
++     */
++
++    qdict_put_int(test_dict, "1.x", 0);
++    qdict_put_int(test_dict, "4.y", 1);
++    qdict_put_int(test_dict, "0.a", 42);
++    qdict_put_int(test_dict, "o.o", 7);
++    qdict_put_int(test_dict, "0.b", 23);
++    qdict_put_int(test_dict, "2", 66);
++
++    qdict_array_split(test_dict, &test_list);
++
++    dict1 = qobject_to(QDict, qlist_pop(test_list));
++    dict2 = qobject_to(QDict, qlist_pop(test_list));
++    int1 = qobject_to(QNum, qlist_pop(test_list));
++
++    g_assert(dict1);
++    g_assert(dict2);
++    g_assert(int1);
++    g_assert(qlist_empty(test_list));
++
++    qobject_unref(test_list);
++
++    g_assert(qdict_get_int(dict1, "a") == 42);
++    g_assert(qdict_get_int(dict1, "b") == 23);
++
++    g_assert(qdict_size(dict1) == 2);
++
++    qobject_unref(dict1);
++
++    g_assert(qdict_get_int(dict2, "x") == 0);
++
++    g_assert(qdict_size(dict2) == 1);
++
++    qobject_unref(dict2);
++
++    g_assert_cmpint(qnum_get_int(int1), ==, 66);
++
++    qobject_unref(int1);
++
++    g_assert(qdict_get_int(test_dict, "4.y") == 1);
++    g_assert(qdict_get_int(test_dict, "o.o") == 7);
++
++    g_assert(qdict_size(test_dict) == 2);
++
++    qobject_unref(test_dict);
++
++    /*
++     * Test the split of
++     *
++     * {
++     *     "0": 42,
++     *     "1": 23,
++     *     "1.x": 84
++     * }
++     *
++     * to
++     *
++     * [
++     *     42
++     * ]
++     *
++     * and
++     *
++     * {
++     *     "1": 23,
++     *     "1.x": 84
++     * }
++     *
++     * That is, test whether splitting stops if there is both an entry with key
++     * of "%u" and other entries with keys prefixed "%u." for the same index.
++     */
++
++    test_dict = qdict_new();
++
++    qdict_put_int(test_dict, "0", 42);
++    qdict_put_int(test_dict, "1", 23);
++    qdict_put_int(test_dict, "1.x", 84);
++
++    qdict_array_split(test_dict, &test_list);
++
++    int1 = qobject_to(QNum, qlist_pop(test_list));
++
++    g_assert(int1);
++    g_assert(qlist_empty(test_list));
++
++    qobject_unref(test_list);
++
++    g_assert_cmpint(qnum_get_int(int1), ==, 42);
++
++    qobject_unref(int1);
++
++    g_assert(qdict_get_int(test_dict, "1") == 23);
++    g_assert(qdict_get_int(test_dict, "1.x") == 84);
++
++    g_assert(qdict_size(test_dict) == 2);
++
++    qobject_unref(test_dict);
++}
++
++static void qdict_array_entries_test(void)
++{
++    QDict *dict = qdict_new();
++
++    g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, 0);
++
++    qdict_put_int(dict, "bar", 0);
++    qdict_put_int(dict, "baz.0", 0);
++    g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, 0);
++
++    qdict_put_int(dict, "foo.1", 0);
++    g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, -EINVAL);
++    qdict_put_int(dict, "foo.0", 0);
++    g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, 2);
++    qdict_put_int(dict, "foo.bar", 0);
++    g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, -EINVAL);
++    qdict_del(dict, "foo.bar");
++
++    qdict_put_int(dict, "foo.2.a", 0);
++    qdict_put_int(dict, "foo.2.b", 0);
++    qdict_put_int(dict, "foo.2.c", 0);
++    g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, 3);
++    g_assert_cmpint(qdict_array_entries(dict, ""), ==, -EINVAL);
++
++    qobject_unref(dict);
++
++    dict = qdict_new();
++    qdict_put_int(dict, "1", 0);
++    g_assert_cmpint(qdict_array_entries(dict, ""), ==, -EINVAL);
++    qdict_put_int(dict, "0", 0);
++    g_assert_cmpint(qdict_array_entries(dict, ""), ==, 2);
++    qdict_put_int(dict, "bar", 0);
++    g_assert_cmpint(qdict_array_entries(dict, ""), ==, -EINVAL);
++    qdict_del(dict, "bar");
++
++    qdict_put_int(dict, "2.a", 0);
++    qdict_put_int(dict, "2.b", 0);
++    qdict_put_int(dict, "2.c", 0);
++    g_assert_cmpint(qdict_array_entries(dict, ""), ==, 3);
++
++    qobject_unref(dict);
++}
++
++static void qdict_join_test(void)
++{
++    QDict *dict1, *dict2;
++    bool overwrite = false;
++    int i;
++
++    dict1 = qdict_new();
++    dict2 = qdict_new();
++
++    /* Test everything once without overwrite and once with */
++    do {
++        /* Test empty dicts */
++        qdict_join(dict1, dict2, overwrite);
++
++        g_assert(qdict_size(dict1) == 0);
++        g_assert(qdict_size(dict2) == 0);
++
++        /* First iteration: Test movement */
++        /* Second iteration: Test empty source and non-empty destination */
++        qdict_put_int(dict2, "foo", 42);
++
++        for (i = 0; i < 2; i++) {
++            qdict_join(dict1, dict2, overwrite);
++
++            g_assert(qdict_size(dict1) == 1);
++            g_assert(qdict_size(dict2) == 0);
++
++            g_assert(qdict_get_int(dict1, "foo") == 42);
++        }
++
++        /* Test non-empty source and destination without conflict */
++        qdict_put_int(dict2, "bar", 23);
++
++        qdict_join(dict1, dict2, overwrite);
++
++        g_assert(qdict_size(dict1) == 2);
++        g_assert(qdict_size(dict2) == 0);
++
++        g_assert(qdict_get_int(dict1, "foo") == 42);
++        g_assert(qdict_get_int(dict1, "bar") == 23);
++
++        /* Test conflict */
++        qdict_put_int(dict2, "foo", 84);
++
++        qdict_join(dict1, dict2, overwrite);
++
++        g_assert(qdict_size(dict1) == 2);
++        g_assert(qdict_size(dict2) == !overwrite);
++
++        g_assert(qdict_get_int(dict1, "foo") == (overwrite ? 84 : 42));
++        g_assert(qdict_get_int(dict1, "bar") == 23);
++
++        if (!overwrite) {
++            g_assert(qdict_get_int(dict2, "foo") == 84);
++        }
++
++        /* Check the references */
++        g_assert(qdict_get(dict1, "foo")->base.refcnt == 1);
++        g_assert(qdict_get(dict1, "bar")->base.refcnt == 1);
++
++        if (!overwrite) {
++            g_assert(qdict_get(dict2, "foo")->base.refcnt == 1);
++        }
++
++        /* Clean up */
++        qdict_del(dict1, "foo");
++        qdict_del(dict1, "bar");
++
++        if (!overwrite) {
++            qdict_del(dict2, "foo");
++        }
++    } while (overwrite ^= true);
++
++    qobject_unref(dict1);
++    qobject_unref(dict2);
++}
++
++static void qdict_crumple_test_recursive(void)
++{
++    QDict *src, *dst, *rule, *vnc, *acl, *listen;
++    QList *rules;
++
++    src = qdict_new();
++    qdict_put_str(src, "vnc.listen.addr", "127.0.0.1");
++    qdict_put_str(src, "vnc.listen.port", "5901");
++    qdict_put_str(src, "vnc.acl.rules.0.match", "fred");
++    qdict_put_str(src, "vnc.acl.rules.0.policy", "allow");
++    qdict_put_str(src, "vnc.acl.rules.1.match", "bob");
++    qdict_put_str(src, "vnc.acl.rules.1.policy", "deny");
++    qdict_put_str(src, "vnc.acl.default", "deny");
++    qdict_put_str(src, "vnc.acl..name", "acl0");
++    qdict_put_str(src, "vnc.acl.rule..name", "acl0");
++
++    dst = qobject_to(QDict, qdict_crumple(src, &error_abort));
++    g_assert(dst);
++    g_assert_cmpint(qdict_size(dst), ==, 1);
++
++    vnc = qdict_get_qdict(dst, "vnc");
++    g_assert(vnc);
++    g_assert_cmpint(qdict_size(vnc), ==, 3);
++
++    listen = qdict_get_qdict(vnc, "listen");
++    g_assert(listen);
++    g_assert_cmpint(qdict_size(listen), ==, 2);
++    g_assert_cmpstr("127.0.0.1", ==, qdict_get_str(listen, "addr"));
++    g_assert_cmpstr("5901", ==, qdict_get_str(listen, "port"));
++
++    acl = qdict_get_qdict(vnc, "acl");
++    g_assert(acl);
++    g_assert_cmpint(qdict_size(acl), ==, 3);
++
++    rules = qdict_get_qlist(acl, "rules");
++    g_assert(rules);
++    g_assert_cmpint(qlist_size(rules), ==, 2);
++
++    rule = qobject_to(QDict, qlist_pop(rules));
++    g_assert(rule);
++    g_assert_cmpint(qdict_size(rule), ==, 2);
++    g_assert_cmpstr("fred", ==, qdict_get_str(rule, "match"));
++    g_assert_cmpstr("allow", ==, qdict_get_str(rule, "policy"));
++    qobject_unref(rule);
++
++    rule = qobject_to(QDict, qlist_pop(rules));
++    g_assert(rule);
++    g_assert_cmpint(qdict_size(rule), ==, 2);
++    g_assert_cmpstr("bob", ==, qdict_get_str(rule, "match"));
++    g_assert_cmpstr("deny", ==, qdict_get_str(rule, "policy"));
++    qobject_unref(rule);
++
++    /* With recursive crumpling, we should see all names unescaped */
++    g_assert_cmpstr("acl0", ==, qdict_get_str(vnc, "acl.name"));
++    g_assert_cmpstr("acl0", ==, qdict_get_str(acl, "rule.name"));
++
++    qobject_unref(src);
++    qobject_unref(dst);
++}
++
++static void qdict_crumple_test_empty(void)
++{
++    QDict *src, *dst;
++
++    src = qdict_new();
++
++    dst = qobject_to(QDict, qdict_crumple(src, &error_abort));
++
++    g_assert_cmpint(qdict_size(dst), ==, 0);
++
++    qobject_unref(src);
++    qobject_unref(dst);
++}
++
++static int qdict_count_entries(QDict *dict)
++{
++    const QDictEntry *e;
++    int count = 0;
++
++    for (e = qdict_first(dict); e; e = qdict_next(dict, e)) {
++        count++;
++    }
++
++    return count;
++}
++
++static void qdict_rename_keys_test(void)
++{
++    QDict *dict = qdict_new();
++    QDict *copy;
++    QDictRenames *renames;
++    Error *local_err = NULL;
++
++    qdict_put_str(dict, "abc", "foo");
++    qdict_put_str(dict, "abcdef", "bar");
++    qdict_put_int(dict, "number", 42);
++    qdict_put_bool(dict, "flag", true);
++    qdict_put_null(dict, "nothing");
++
++    /* Empty rename list */
++    renames = (QDictRenames[]) {
++        { NULL, "this can be anything" }
++    };
++    copy = qdict_clone_shallow(dict);
++    qdict_rename_keys(copy, renames, &error_abort);
++
++    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
++    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
++    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
++    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
++    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
++
++    qobject_unref(copy);
++
++    /* Simple rename of all entries */
++    renames = (QDictRenames[]) {
++        { "abc",        "str1" },
++        { "abcdef",     "str2" },
++        { "number",     "int" },
++        { "flag",       "bool" },
++        { "nothing",    "null" },
++        { NULL , NULL }
++    };
++    copy = qdict_clone_shallow(dict);
++    qdict_rename_keys(copy, renames, &error_abort);
++
++    g_assert(!qdict_haskey(copy, "abc"));
++    g_assert(!qdict_haskey(copy, "abcdef"));
++    g_assert(!qdict_haskey(copy, "number"));
++    g_assert(!qdict_haskey(copy, "flag"));
++    g_assert(!qdict_haskey(copy, "nothing"));
++
++    g_assert_cmpstr(qdict_get_str(copy, "str1"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(copy, "str2"), ==, "bar");
++    g_assert_cmpint(qdict_get_int(copy, "int"), ==, 42);
++    g_assert_cmpint(qdict_get_bool(copy, "bool"), ==, true);
++    g_assert(qobject_type(qdict_get(copy, "null")) == QTYPE_QNULL);
++    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
++
++    qobject_unref(copy);
++
++    /* Renames are processed top to bottom */
++    renames = (QDictRenames[]) {
++        { "abc",        "tmp" },
++        { "abcdef",     "abc" },
++        { "number",     "abcdef" },
++        { "flag",       "number" },
++        { "nothing",    "flag" },
++        { "tmp",        "nothing" },
++        { NULL , NULL }
++    };
++    copy = qdict_clone_shallow(dict);
++    qdict_rename_keys(copy, renames, &error_abort);
++
++    g_assert_cmpstr(qdict_get_str(copy, "nothing"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "bar");
++    g_assert_cmpint(qdict_get_int(copy, "abcdef"), ==, 42);
++    g_assert_cmpint(qdict_get_bool(copy, "number"), ==, true);
++    g_assert(qobject_type(qdict_get(copy, "flag")) == QTYPE_QNULL);
++    g_assert(!qdict_haskey(copy, "tmp"));
++    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
++
++    qobject_unref(copy);
++
++    /* Conflicting rename */
++    renames = (QDictRenames[]) {
++        { "abcdef",     "abc" },
++        { NULL , NULL }
++    };
++    copy = qdict_clone_shallow(dict);
++    qdict_rename_keys(copy, renames, &local_err);
++
++    g_assert(local_err != NULL);
++    error_free(local_err);
++    local_err = NULL;
++
++    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
++    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
++    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
++    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
++    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
++    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
++
++    qobject_unref(copy);
++
++    /* Renames in an empty dict */
++    renames = (QDictRenames[]) {
++        { "abcdef",     "abc" },
++        { NULL , NULL }
++    };
++
++    qobject_unref(dict);
++    dict = qdict_new();
++
++    qdict_rename_keys(dict, renames, &error_abort);
++    g_assert(qdict_first(dict) == NULL);
++
++    qobject_unref(dict);
++}
++
++static void qdict_crumple_test_bad_inputs(void)
++{
++    QDict *src;
++    Error *error = NULL;
++
++    src = qdict_new();
++    /* rule.0 can't be both a string and a dict */
++    qdict_put_str(src, "rule.0", "fred");
++    qdict_put_str(src, "rule.0.policy", "allow");
++
++    g_assert(qdict_crumple(src, &error) == NULL);
++    g_assert(error != NULL);
++    error_free(error);
++    error = NULL;
++    qobject_unref(src);
++
++    src = qdict_new();
++    /* rule can't be both a list and a dict */
++    qdict_put_str(src, "rule.0", "fred");
++    qdict_put_str(src, "rule.a", "allow");
++
++    g_assert(qdict_crumple(src, &error) == NULL);
++    g_assert(error != NULL);
++    error_free(error);
++    error = NULL;
++    qobject_unref(src);
++
++    src = qdict_new();
++    /* The input should be flat, ie no dicts or lists */
++    qdict_put(src, "rule.a", qdict_new());
++    qdict_put_str(src, "rule.b", "allow");
++
++    g_assert(qdict_crumple(src, &error) == NULL);
++    g_assert(error != NULL);
++    error_free(error);
++    error = NULL;
++    qobject_unref(src);
++
++    src = qdict_new();
++    /* List indexes must not have gaps */
++    qdict_put_str(src, "rule.0", "deny");
++    qdict_put_str(src, "rule.3", "allow");
++
++    g_assert(qdict_crumple(src, &error) == NULL);
++    g_assert(error != NULL);
++    error_free(error);
++    error = NULL;
++    qobject_unref(src);
++
++    src = qdict_new();
++    /* List indexes must be in %zu format */
++    qdict_put_str(src, "rule.0", "deny");
++    qdict_put_str(src, "rule.+1", "allow");
++
++    g_assert(qdict_crumple(src, &error) == NULL);
++    g_assert(error != NULL);
++    error_free(error);
++    error = NULL;
++    qobject_unref(src);
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    g_test_add_func("/public/defaults", qdict_defaults_test);
++    g_test_add_func("/public/flatten", qdict_flatten_test);
++    g_test_add_func("/public/array_split", qdict_array_split_test);
++    g_test_add_func("/public/array_entries", qdict_array_entries_test);
++    g_test_add_func("/public/join", qdict_join_test);
++    g_test_add_func("/public/crumple/recursive",
++                    qdict_crumple_test_recursive);
++    g_test_add_func("/public/crumple/empty",
++                    qdict_crumple_test_empty);
++    g_test_add_func("/public/crumple/bad_inputs",
++                    qdict_crumple_test_bad_inputs);
++
++    g_test_add_func("/public/rename_keys", qdict_rename_keys_test);
++
++    return g_test_run();
++}
+diff --git a/tests/check-qdict.c b/tests/check-qdict.c
+index 93e2112b6d..86e9fe7dc4 100644
+--- a/tests/check-qdict.c
++++ b/tests/check-qdict.c
+@@ -11,13 +11,7 @@
+  */
  
--    blkconf_serial(&n->conf, &n->serial);
-     if (!n->serial) {
-         error_setg(errp, "serial property not set");
-         return;
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index 50b5c869e3..225fe44b7a 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -935,7 +935,6 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-         return;
-     }
+ #include "qemu/osdep.h"
+-#include "block/qdict.h"
+ #include "qapi/qmp/qdict.h"
+-#include "qapi/qmp/qlist.h"
+-#include "qapi/qmp/qnum.h"
+-#include "qapi/qmp/qstring.h"
+-#include "qapi/error.h"
+-#include "qemu-common.h"
  
--    blkconf_serial(&conf->conf, &conf->serial);
-     if (!blkconf_apply_backend_options(&conf->conf,
-                                        blk_is_read_only(conf->conf.blk), true,
-                                        errp)) {
-diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
-index f395d24592..573b022e1e 100644
---- a/hw/ide/qdev.c
-+++ b/hw/ide/qdev.c
-@@ -188,7 +188,6 @@ static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
-         return;
-     }
- 
--    blkconf_serial(&dev->conf, &dev->serial);
-     if (kind != IDE_CD) {
-         if (!blkconf_geometry(&dev->conf, &dev->chs_trans, 65535, 16, 255,
-                               errp)) {
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index ded23d36ca..aeaf611854 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2368,7 +2368,6 @@ static void scsi_realize(SCSIDevice *dev, Error **errp)
-         return;
-     }
- 
--    blkconf_serial(&s->qdev.conf, &s->serial);
-     blkconf_blocksizes(&s->qdev.conf);
- 
-     if (s->qdev.conf.logical_block_size >
-diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
-index 481694a473..47b992f403 100644
---- a/hw/usb/dev-storage.c
-+++ b/hw/usb/dev-storage.c
-@@ -606,7 +606,6 @@ static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
-         return;
-     }
- 
--    blkconf_serial(&s->conf, &dev->serial);
-     blkconf_blocksizes(&s->conf);
-     if (!blkconf_apply_backend_options(&s->conf, blk_is_read_only(blk), true,
-                                        errp)) {
-diff --git a/tests/ahci-test.c b/tests/ahci-test.c
-index 1a7b761304..937ed2f910 100644
---- a/tests/ahci-test.c
-+++ b/tests/ahci-test.c
-@@ -180,12 +180,12 @@ static AHCIQState *ahci_boot(const char *cli, ...)
-         s = ahci_vboot(cli, ap);
-         va_end(ap);
-     } else {
--        cli = "-drive if=none,id=drive0,file=%s,cache=writeback,serial=%s"
--            ",format=%s"
-+        cli = "-drive if=none,id=drive0,file=%s,cache=writeback,format=%s"
-             " -M q35 "
-             "-device ide-hd,drive=drive0 "
-+            "-global ide-hd.serial=%s "
-             "-global ide-hd.ver=%s";
--        s = ahci_boot(cli, tmp_path, "testdisk", imgfmt, "version");
-+        s = ahci_boot(cli, tmp_path, imgfmt, "testdisk", "version");
-     }
- 
-     return s;
-diff --git a/tests/ide-test.c b/tests/ide-test.c
-index 2384c2c3e2..f39431b1a9 100644
---- a/tests/ide-test.c
-+++ b/tests/ide-test.c
-@@ -529,8 +529,8 @@ static void test_bmdma_no_busmaster(void)
- static void test_bmdma_setup(void)
- {
-     ide_test_start(
--        "-drive file=%s,if=ide,serial=%s,cache=writeback,format=raw "
--        "-global ide-hd.ver=%s",
-+        "-drive file=%s,if=ide,cache=writeback,format=raw "
-+        "-global ide-hd.serial=%s -global ide-hd.ver=%s",
-         tmp_path, "testdisk", "version");
-     qtest_irq_intercept_in(global_qtest, "ioapic");
+ /*
+  * Public Interface test-cases
+@@ -157,28 +151,6 @@ static void qdict_get_try_str_test(void)
+     qobject_unref(tests_dict);
  }
-@@ -561,8 +561,8 @@ static void test_identify(void)
-     int ret;
  
-     ide_test_start(
--        "-drive file=%s,if=ide,serial=%s,cache=writeback,format=raw "
--        "-global ide-hd.ver=%s",
-+        "-drive file=%s,if=ide,cache=writeback,format=raw "
-+        "-global ide-hd.serial=%s -global ide-hd.ver=%s",
-         tmp_path, "testdisk", "version");
- 
-     dev = get_pci_device(&bmdma_bar, &ide_bar);
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 338477725f..282bc3dc35 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2850,11 +2850,6 @@ with ``-device ...,netdev=x''), or ``-nic user,smb=/some/dir''
- (for embedded NICs). The new syntax allows different settings to be
- provided per NIC.
- 
--@subsection -drive serial=... (since 2.10.0)
+-static void qdict_defaults_test(void)
+-{
+-    QDict *dict, *copy;
 -
--The drive serial argument is replaced by the the serial argument
--that can be specified with the ``-device'' parameter.
+-    dict = qdict_new();
+-    copy = qdict_new();
 -
- @subsection -usbdevice (since 2.10.0)
+-    qdict_set_default_str(dict, "foo", "abc");
+-    qdict_set_default_str(dict, "foo", "def");
+-    g_assert_cmpstr(qdict_get_str(dict, "foo"), ==, "abc");
+-    qdict_set_default_str(dict, "bar", "ghi");
+-
+-    qdict_copy_default(copy, dict, "foo");
+-    g_assert_cmpstr(qdict_get_str(copy, "foo"), ==, "abc");
+-    qdict_set_default_str(copy, "bar", "xyz");
+-    qdict_copy_default(copy, dict, "bar");
+-    g_assert_cmpstr(qdict_get_str(copy, "bar"), ==, "xyz");
+-
+-    qobject_unref(copy);
+-    qobject_unref(dict);
+-}
+-
+ static void qdict_haskey_not_test(void)
+ {
+     QDict *tests_dict = qdict_new();
+@@ -254,606 +226,6 @@ static void qdict_iterapi_test(void)
+     qobject_unref(tests_dict);
+ }
  
- The ``-usbdevice DEV'' argument is now a synonym for setting
-diff --git a/qemu-options.hx b/qemu-options.hx
-index c2531e2f3c..d5b0c26e8e 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -805,7 +805,7 @@ ETEXI
- DEF("drive", HAS_ARG, QEMU_OPTION_drive,
-     "-drive [file=file][,if=type][,bus=n][,unit=m][,media=d][,index=i]\n"
-     "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
--    "       [,snapshot=on|off][,serial=s][,rerror=ignore|stop|report]\n"
-+    "       [,snapshot=on|off][,rerror=ignore|stop|report]\n"
-     "       [,werror=ignore|stop|report|enospc][,id=name][,aio=threads|native]\n"
-     "       [,readonly=on|off][,copy-on-read=on|off]\n"
-     "       [,discard=ignore|unmap][,detect-zeroes=on|off|unmap]\n"
-@@ -879,10 +879,6 @@ The default mode is @option{cache=writeback}.
- Specify which disk @var{format} will be used rather than detecting
- the format.  Can be used to specify format=raw to avoid interpreting
- an untrusted format header.
--@item serial=@var{serial}
--This option specifies the serial number to assign to the device. This
--parameter is deprecated, use the corresponding parameter of @code{-device}
--instead.
- @item werror=@var{action},rerror=@var{action}
- Specify which @var{action} to take on write and read errors. Valid actions are:
- "ignore" (ignore the error and try to continue), "stop" (pause QEMU),
+-static void qdict_flatten_test(void)
+-{
+-    QList *list1 = qlist_new();
+-    QList *list2 = qlist_new();
+-    QDict *dict1 = qdict_new();
+-    QDict *dict2 = qdict_new();
+-    QDict *dict3 = qdict_new();
+-
+-    /*
+-     * Test the flattening of
+-     *
+-     * {
+-     *     "e": [
+-     *         42,
+-     *         [
+-     *             23,
+-     *             66,
+-     *             {
+-     *                 "a": 0,
+-     *                 "b": 1
+-     *             }
+-     *         ]
+-     *     ],
+-     *     "f": {
+-     *         "c": 2,
+-     *         "d": 3,
+-     *     },
+-     *     "g": 4
+-     * }
+-     *
+-     * to
+-     *
+-     * {
+-     *     "e.0": 42,
+-     *     "e.1.0": 23,
+-     *     "e.1.1": 66,
+-     *     "e.1.2.a": 0,
+-     *     "e.1.2.b": 1,
+-     *     "f.c": 2,
+-     *     "f.d": 3,
+-     *     "g": 4
+-     * }
+-     */
+-
+-    qdict_put_int(dict1, "a", 0);
+-    qdict_put_int(dict1, "b", 1);
+-
+-    qlist_append_int(list1, 23);
+-    qlist_append_int(list1, 66);
+-    qlist_append(list1, dict1);
+-    qlist_append_int(list2, 42);
+-    qlist_append(list2, list1);
+-
+-    qdict_put_int(dict2, "c", 2);
+-    qdict_put_int(dict2, "d", 3);
+-    qdict_put(dict3, "e", list2);
+-    qdict_put(dict3, "f", dict2);
+-    qdict_put_int(dict3, "g", 4);
+-
+-    qdict_flatten(dict3);
+-
+-    g_assert(qdict_get_int(dict3, "e.0") == 42);
+-    g_assert(qdict_get_int(dict3, "e.1.0") == 23);
+-    g_assert(qdict_get_int(dict3, "e.1.1") == 66);
+-    g_assert(qdict_get_int(dict3, "e.1.2.a") == 0);
+-    g_assert(qdict_get_int(dict3, "e.1.2.b") == 1);
+-    g_assert(qdict_get_int(dict3, "f.c") == 2);
+-    g_assert(qdict_get_int(dict3, "f.d") == 3);
+-    g_assert(qdict_get_int(dict3, "g") == 4);
+-
+-    g_assert(qdict_size(dict3) == 8);
+-
+-    qobject_unref(dict3);
+-}
+-
+-static void qdict_array_split_test(void)
+-{
+-    QDict *test_dict = qdict_new();
+-    QDict *dict1, *dict2;
+-    QNum *int1;
+-    QList *test_list;
+-
+-    /*
+-     * Test the split of
+-     *
+-     * {
+-     *     "1.x": 0,
+-     *     "4.y": 1,
+-     *     "0.a": 42,
+-     *     "o.o": 7,
+-     *     "0.b": 23,
+-     *     "2": 66
+-     * }
+-     *
+-     * to
+-     *
+-     * [
+-     *     {
+-     *         "a": 42,
+-     *         "b": 23
+-     *     },
+-     *     {
+-     *         "x": 0
+-     *     },
+-     *     66
+-     * ]
+-     *
+-     * and
+-     *
+-     * {
+-     *     "4.y": 1,
+-     *     "o.o": 7
+-     * }
+-     *
+-     * (remaining in the old QDict)
+-     *
+-     * This example is given in the comment of qdict_array_split().
+-     */
+-
+-    qdict_put_int(test_dict, "1.x", 0);
+-    qdict_put_int(test_dict, "4.y", 1);
+-    qdict_put_int(test_dict, "0.a", 42);
+-    qdict_put_int(test_dict, "o.o", 7);
+-    qdict_put_int(test_dict, "0.b", 23);
+-    qdict_put_int(test_dict, "2", 66);
+-
+-    qdict_array_split(test_dict, &test_list);
+-
+-    dict1 = qobject_to(QDict, qlist_pop(test_list));
+-    dict2 = qobject_to(QDict, qlist_pop(test_list));
+-    int1 = qobject_to(QNum, qlist_pop(test_list));
+-
+-    g_assert(dict1);
+-    g_assert(dict2);
+-    g_assert(int1);
+-    g_assert(qlist_empty(test_list));
+-
+-    qobject_unref(test_list);
+-
+-    g_assert(qdict_get_int(dict1, "a") == 42);
+-    g_assert(qdict_get_int(dict1, "b") == 23);
+-
+-    g_assert(qdict_size(dict1) == 2);
+-
+-    qobject_unref(dict1);
+-
+-    g_assert(qdict_get_int(dict2, "x") == 0);
+-
+-    g_assert(qdict_size(dict2) == 1);
+-
+-    qobject_unref(dict2);
+-
+-    g_assert_cmpint(qnum_get_int(int1), ==, 66);
+-
+-    qobject_unref(int1);
+-
+-    g_assert(qdict_get_int(test_dict, "4.y") == 1);
+-    g_assert(qdict_get_int(test_dict, "o.o") == 7);
+-
+-    g_assert(qdict_size(test_dict) == 2);
+-
+-    qobject_unref(test_dict);
+-
+-    /*
+-     * Test the split of
+-     *
+-     * {
+-     *     "0": 42,
+-     *     "1": 23,
+-     *     "1.x": 84
+-     * }
+-     *
+-     * to
+-     *
+-     * [
+-     *     42
+-     * ]
+-     *
+-     * and
+-     *
+-     * {
+-     *     "1": 23,
+-     *     "1.x": 84
+-     * }
+-     *
+-     * That is, test whether splitting stops if there is both an entry with key
+-     * of "%u" and other entries with keys prefixed "%u." for the same index.
+-     */
+-
+-    test_dict = qdict_new();
+-
+-    qdict_put_int(test_dict, "0", 42);
+-    qdict_put_int(test_dict, "1", 23);
+-    qdict_put_int(test_dict, "1.x", 84);
+-
+-    qdict_array_split(test_dict, &test_list);
+-
+-    int1 = qobject_to(QNum, qlist_pop(test_list));
+-
+-    g_assert(int1);
+-    g_assert(qlist_empty(test_list));
+-
+-    qobject_unref(test_list);
+-
+-    g_assert_cmpint(qnum_get_int(int1), ==, 42);
+-
+-    qobject_unref(int1);
+-
+-    g_assert(qdict_get_int(test_dict, "1") == 23);
+-    g_assert(qdict_get_int(test_dict, "1.x") == 84);
+-
+-    g_assert(qdict_size(test_dict) == 2);
+-
+-    qobject_unref(test_dict);
+-}
+-
+-static void qdict_array_entries_test(void)
+-{
+-    QDict *dict = qdict_new();
+-
+-    g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, 0);
+-
+-    qdict_put_int(dict, "bar", 0);
+-    qdict_put_int(dict, "baz.0", 0);
+-    g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, 0);
+-
+-    qdict_put_int(dict, "foo.1", 0);
+-    g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, -EINVAL);
+-    qdict_put_int(dict, "foo.0", 0);
+-    g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, 2);
+-    qdict_put_int(dict, "foo.bar", 0);
+-    g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, -EINVAL);
+-    qdict_del(dict, "foo.bar");
+-
+-    qdict_put_int(dict, "foo.2.a", 0);
+-    qdict_put_int(dict, "foo.2.b", 0);
+-    qdict_put_int(dict, "foo.2.c", 0);
+-    g_assert_cmpint(qdict_array_entries(dict, "foo."), ==, 3);
+-    g_assert_cmpint(qdict_array_entries(dict, ""), ==, -EINVAL);
+-
+-    qobject_unref(dict);
+-
+-    dict = qdict_new();
+-    qdict_put_int(dict, "1", 0);
+-    g_assert_cmpint(qdict_array_entries(dict, ""), ==, -EINVAL);
+-    qdict_put_int(dict, "0", 0);
+-    g_assert_cmpint(qdict_array_entries(dict, ""), ==, 2);
+-    qdict_put_int(dict, "bar", 0);
+-    g_assert_cmpint(qdict_array_entries(dict, ""), ==, -EINVAL);
+-    qdict_del(dict, "bar");
+-
+-    qdict_put_int(dict, "2.a", 0);
+-    qdict_put_int(dict, "2.b", 0);
+-    qdict_put_int(dict, "2.c", 0);
+-    g_assert_cmpint(qdict_array_entries(dict, ""), ==, 3);
+-
+-    qobject_unref(dict);
+-}
+-
+-static void qdict_join_test(void)
+-{
+-    QDict *dict1, *dict2;
+-    bool overwrite = false;
+-    int i;
+-
+-    dict1 = qdict_new();
+-    dict2 = qdict_new();
+-
+-    /* Test everything once without overwrite and once with */
+-    do
+-    {
+-        /* Test empty dicts */
+-        qdict_join(dict1, dict2, overwrite);
+-
+-        g_assert(qdict_size(dict1) == 0);
+-        g_assert(qdict_size(dict2) == 0);
+-
+-        /* First iteration: Test movement */
+-        /* Second iteration: Test empty source and non-empty destination */
+-        qdict_put_int(dict2, "foo", 42);
+-
+-        for (i = 0; i < 2; i++) {
+-            qdict_join(dict1, dict2, overwrite);
+-
+-            g_assert(qdict_size(dict1) == 1);
+-            g_assert(qdict_size(dict2) == 0);
+-
+-            g_assert(qdict_get_int(dict1, "foo") == 42);
+-        }
+-
+-        /* Test non-empty source and destination without conflict */
+-        qdict_put_int(dict2, "bar", 23);
+-
+-        qdict_join(dict1, dict2, overwrite);
+-
+-        g_assert(qdict_size(dict1) == 2);
+-        g_assert(qdict_size(dict2) == 0);
+-
+-        g_assert(qdict_get_int(dict1, "foo") == 42);
+-        g_assert(qdict_get_int(dict1, "bar") == 23);
+-
+-        /* Test conflict */
+-        qdict_put_int(dict2, "foo", 84);
+-
+-        qdict_join(dict1, dict2, overwrite);
+-
+-        g_assert(qdict_size(dict1) == 2);
+-        g_assert(qdict_size(dict2) == !overwrite);
+-
+-        g_assert(qdict_get_int(dict1, "foo") == (overwrite ? 84 : 42));
+-        g_assert(qdict_get_int(dict1, "bar") == 23);
+-
+-        if (!overwrite) {
+-            g_assert(qdict_get_int(dict2, "foo") == 84);
+-        }
+-
+-        /* Check the references */
+-        g_assert(qdict_get(dict1, "foo")->base.refcnt == 1);
+-        g_assert(qdict_get(dict1, "bar")->base.refcnt == 1);
+-
+-        if (!overwrite) {
+-            g_assert(qdict_get(dict2, "foo")->base.refcnt == 1);
+-        }
+-
+-        /* Clean up */
+-        qdict_del(dict1, "foo");
+-        qdict_del(dict1, "bar");
+-
+-        if (!overwrite) {
+-            qdict_del(dict2, "foo");
+-        }
+-    }
+-    while (overwrite ^= true);
+-
+-    qobject_unref(dict1);
+-    qobject_unref(dict2);
+-}
+-
+-static void qdict_crumple_test_recursive(void)
+-{
+-    QDict *src, *dst, *rule, *vnc, *acl, *listen;
+-    QList *rules;
+-
+-    src = qdict_new();
+-    qdict_put_str(src, "vnc.listen.addr", "127.0.0.1");
+-    qdict_put_str(src, "vnc.listen.port", "5901");
+-    qdict_put_str(src, "vnc.acl.rules.0.match", "fred");
+-    qdict_put_str(src, "vnc.acl.rules.0.policy", "allow");
+-    qdict_put_str(src, "vnc.acl.rules.1.match", "bob");
+-    qdict_put_str(src, "vnc.acl.rules.1.policy", "deny");
+-    qdict_put_str(src, "vnc.acl.default", "deny");
+-    qdict_put_str(src, "vnc.acl..name", "acl0");
+-    qdict_put_str(src, "vnc.acl.rule..name", "acl0");
+-
+-    dst = qobject_to(QDict, qdict_crumple(src, &error_abort));
+-    g_assert(dst);
+-    g_assert_cmpint(qdict_size(dst), ==, 1);
+-
+-    vnc = qdict_get_qdict(dst, "vnc");
+-    g_assert(vnc);
+-    g_assert_cmpint(qdict_size(vnc), ==, 3);
+-
+-    listen = qdict_get_qdict(vnc, "listen");
+-    g_assert(listen);
+-    g_assert_cmpint(qdict_size(listen), ==, 2);
+-    g_assert_cmpstr("127.0.0.1", ==, qdict_get_str(listen, "addr"));
+-    g_assert_cmpstr("5901", ==, qdict_get_str(listen, "port"));
+-
+-    acl = qdict_get_qdict(vnc, "acl");
+-    g_assert(acl);
+-    g_assert_cmpint(qdict_size(acl), ==, 3);
+-
+-    rules = qdict_get_qlist(acl, "rules");
+-    g_assert(rules);
+-    g_assert_cmpint(qlist_size(rules), ==, 2);
+-
+-    rule = qobject_to(QDict, qlist_pop(rules));
+-    g_assert(rule);
+-    g_assert_cmpint(qdict_size(rule), ==, 2);
+-    g_assert_cmpstr("fred", ==, qdict_get_str(rule, "match"));
+-    g_assert_cmpstr("allow", ==, qdict_get_str(rule, "policy"));
+-    qobject_unref(rule);
+-
+-    rule = qobject_to(QDict, qlist_pop(rules));
+-    g_assert(rule);
+-    g_assert_cmpint(qdict_size(rule), ==, 2);
+-    g_assert_cmpstr("bob", ==, qdict_get_str(rule, "match"));
+-    g_assert_cmpstr("deny", ==, qdict_get_str(rule, "policy"));
+-    qobject_unref(rule);
+-
+-    /* With recursive crumpling, we should see all names unescaped */
+-    g_assert_cmpstr("acl0", ==, qdict_get_str(vnc, "acl.name"));
+-    g_assert_cmpstr("acl0", ==, qdict_get_str(acl, "rule.name"));
+-
+-    qobject_unref(src);
+-    qobject_unref(dst);
+-}
+-
+-static void qdict_crumple_test_empty(void)
+-{
+-    QDict *src, *dst;
+-
+-    src = qdict_new();
+-
+-    dst = qobject_to(QDict, qdict_crumple(src, &error_abort));
+-
+-    g_assert_cmpint(qdict_size(dst), ==, 0);
+-
+-    qobject_unref(src);
+-    qobject_unref(dst);
+-}
+-
+-static int qdict_count_entries(QDict *dict)
+-{
+-    const QDictEntry *e;
+-    int count = 0;
+-
+-    for (e = qdict_first(dict); e; e = qdict_next(dict, e)) {
+-        count++;
+-    }
+-
+-    return count;
+-}
+-
+-static void qdict_rename_keys_test(void)
+-{
+-    QDict *dict = qdict_new();
+-    QDict *copy;
+-    QDictRenames *renames;
+-    Error *local_err = NULL;
+-
+-    qdict_put_str(dict, "abc", "foo");
+-    qdict_put_str(dict, "abcdef", "bar");
+-    qdict_put_int(dict, "number", 42);
+-    qdict_put_bool(dict, "flag", true);
+-    qdict_put_null(dict, "nothing");
+-
+-    /* Empty rename list */
+-    renames = (QDictRenames[]) {
+-        { NULL, "this can be anything" }
+-    };
+-    copy = qdict_clone_shallow(dict);
+-    qdict_rename_keys(copy, renames, &error_abort);
+-
+-    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
+-    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
+-    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
+-    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
+-    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
+-    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
+-
+-    qobject_unref(copy);
+-
+-    /* Simple rename of all entries */
+-    renames = (QDictRenames[]) {
+-        { "abc",        "str1" },
+-        { "abcdef",     "str2" },
+-        { "number",     "int" },
+-        { "flag",       "bool" },
+-        { "nothing",    "null" },
+-        { NULL , NULL }
+-    };
+-    copy = qdict_clone_shallow(dict);
+-    qdict_rename_keys(copy, renames, &error_abort);
+-
+-    g_assert(!qdict_haskey(copy, "abc"));
+-    g_assert(!qdict_haskey(copy, "abcdef"));
+-    g_assert(!qdict_haskey(copy, "number"));
+-    g_assert(!qdict_haskey(copy, "flag"));
+-    g_assert(!qdict_haskey(copy, "nothing"));
+-
+-    g_assert_cmpstr(qdict_get_str(copy, "str1"), ==, "foo");
+-    g_assert_cmpstr(qdict_get_str(copy, "str2"), ==, "bar");
+-    g_assert_cmpint(qdict_get_int(copy, "int"), ==, 42);
+-    g_assert_cmpint(qdict_get_bool(copy, "bool"), ==, true);
+-    g_assert(qobject_type(qdict_get(copy, "null")) == QTYPE_QNULL);
+-    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
+-
+-    qobject_unref(copy);
+-
+-    /* Renames are processed top to bottom */
+-    renames = (QDictRenames[]) {
+-        { "abc",        "tmp" },
+-        { "abcdef",     "abc" },
+-        { "number",     "abcdef" },
+-        { "flag",       "number" },
+-        { "nothing",    "flag" },
+-        { "tmp",        "nothing" },
+-        { NULL , NULL }
+-    };
+-    copy = qdict_clone_shallow(dict);
+-    qdict_rename_keys(copy, renames, &error_abort);
+-
+-    g_assert_cmpstr(qdict_get_str(copy, "nothing"), ==, "foo");
+-    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "bar");
+-    g_assert_cmpint(qdict_get_int(copy, "abcdef"), ==, 42);
+-    g_assert_cmpint(qdict_get_bool(copy, "number"), ==, true);
+-    g_assert(qobject_type(qdict_get(copy, "flag")) == QTYPE_QNULL);
+-    g_assert(!qdict_haskey(copy, "tmp"));
+-    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
+-
+-    qobject_unref(copy);
+-
+-    /* Conflicting rename */
+-    renames = (QDictRenames[]) {
+-        { "abcdef",     "abc" },
+-        { NULL , NULL }
+-    };
+-    copy = qdict_clone_shallow(dict);
+-    qdict_rename_keys(copy, renames, &local_err);
+-
+-    g_assert(local_err != NULL);
+-    error_free(local_err);
+-    local_err = NULL;
+-
+-    g_assert_cmpstr(qdict_get_str(copy, "abc"), ==, "foo");
+-    g_assert_cmpstr(qdict_get_str(copy, "abcdef"), ==, "bar");
+-    g_assert_cmpint(qdict_get_int(copy, "number"), ==, 42);
+-    g_assert_cmpint(qdict_get_bool(copy, "flag"), ==, true);
+-    g_assert(qobject_type(qdict_get(copy, "nothing")) == QTYPE_QNULL);
+-    g_assert_cmpint(qdict_count_entries(copy), ==, 5);
+-
+-    qobject_unref(copy);
+-
+-    /* Renames in an empty dict */
+-    renames = (QDictRenames[]) {
+-        { "abcdef",     "abc" },
+-        { NULL , NULL }
+-    };
+-
+-    qobject_unref(dict);
+-    dict = qdict_new();
+-
+-    qdict_rename_keys(dict, renames, &error_abort);
+-    g_assert(qdict_first(dict) == NULL);
+-
+-    qobject_unref(dict);
+-}
+-
+-static void qdict_crumple_test_bad_inputs(void)
+-{
+-    QDict *src;
+-    Error *error = NULL;
+-
+-    src = qdict_new();
+-    /* rule.0 can't be both a string and a dict */
+-    qdict_put_str(src, "rule.0", "fred");
+-    qdict_put_str(src, "rule.0.policy", "allow");
+-
+-    g_assert(qdict_crumple(src, &error) == NULL);
+-    g_assert(error != NULL);
+-    error_free(error);
+-    error = NULL;
+-    qobject_unref(src);
+-
+-    src = qdict_new();
+-    /* rule can't be both a list and a dict */
+-    qdict_put_str(src, "rule.0", "fred");
+-    qdict_put_str(src, "rule.a", "allow");
+-
+-    g_assert(qdict_crumple(src, &error) == NULL);
+-    g_assert(error != NULL);
+-    error_free(error);
+-    error = NULL;
+-    qobject_unref(src);
+-
+-    src = qdict_new();
+-    /* The input should be flat, ie no dicts or lists */
+-    qdict_put(src, "rule.a", qdict_new());
+-    qdict_put_str(src, "rule.b", "allow");
+-
+-    g_assert(qdict_crumple(src, &error) == NULL);
+-    g_assert(error != NULL);
+-    error_free(error);
+-    error = NULL;
+-    qobject_unref(src);
+-
+-    src = qdict_new();
+-    /* List indexes must not have gaps */
+-    qdict_put_str(src, "rule.0", "deny");
+-    qdict_put_str(src, "rule.3", "allow");
+-
+-    g_assert(qdict_crumple(src, &error) == NULL);
+-    g_assert(error != NULL);
+-    error_free(error);
+-    error = NULL;
+-    qobject_unref(src);
+-
+-    src = qdict_new();
+-    /* List indexes must be in %zu format */
+-    qdict_put_str(src, "rule.0", "deny");
+-    qdict_put_str(src, "rule.+1", "allow");
+-
+-    g_assert(qdict_crumple(src, &error) == NULL);
+-    g_assert(error != NULL);
+-    error_free(error);
+-    error = NULL;
+-    qobject_unref(src);
+-}
+-
+ /*
+  * Errors test-cases
+  */
+@@ -987,29 +359,15 @@ int main(int argc, char **argv)
+     g_test_add_func("/public/get_try_int", qdict_get_try_int_test);
+     g_test_add_func("/public/get_str", qdict_get_str_test);
+     g_test_add_func("/public/get_try_str", qdict_get_try_str_test);
+-    g_test_add_func("/public/defaults", qdict_defaults_test);
+     g_test_add_func("/public/haskey_not", qdict_haskey_not_test);
+     g_test_add_func("/public/haskey", qdict_haskey_test);
+     g_test_add_func("/public/del", qdict_del_test);
+     g_test_add_func("/public/to_qdict", qobject_to_qdict_test);
+     g_test_add_func("/public/iterapi", qdict_iterapi_test);
+-    g_test_add_func("/public/flatten", qdict_flatten_test);
+-    g_test_add_func("/public/array_split", qdict_array_split_test);
+-    g_test_add_func("/public/array_entries", qdict_array_entries_test);
+-    g_test_add_func("/public/join", qdict_join_test);
+ 
+     g_test_add_func("/errors/put_exists", qdict_put_exists_test);
+     g_test_add_func("/errors/get_not_exists", qdict_get_not_exists_test);
+ 
+-    g_test_add_func("/public/crumple/recursive",
+-                    qdict_crumple_test_recursive);
+-    g_test_add_func("/public/crumple/empty",
+-                    qdict_crumple_test_empty);
+-    g_test_add_func("/public/crumple/bad_inputs",
+-                    qdict_crumple_test_bad_inputs);
+-
+-    g_test_add_func("/public/rename_keys", qdict_rename_keys_test);
+-
+     /* The Big one */
+     if (g_test_slow()) {
+         g_test_add_func("/stress/test", qdict_stress_test);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8a94517e9e..0fb5f38f9f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1369,6 +1369,8 @@ F: qemu-img*
+ F: qemu-io*
+ F: tests/qemu-iotests/
+ F: util/qemu-progress.c
++F: qobject/block-qdict.c
++F: test/check-block-qdict.c
+ T: git git://repo.or.cz/qemu/kevin.git block
+ 
+ Block I/O path
+diff --git a/qobject/Makefile.objs b/qobject/Makefile.objs
+index 002d25873a..7b12c9cacf 100644
+--- a/qobject/Makefile.objs
++++ b/qobject/Makefile.objs
+@@ -1,2 +1,3 @@
+ util-obj-y = qnull.o qnum.o qstring.o qdict.o qlist.o qbool.o qlit.o
+ util-obj-y += qjson.o qobject.o json-lexer.o json-streamer.o json-parser.o
++util-obj-y += block-qdict.o
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 607afe5bed..ca91da26cb 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -39,6 +39,8 @@ SYSEMU_TARGET_LIST := $(subst -softmmu.mak,,$(notdir \
+ 
+ check-unit-y = tests/check-qdict$(EXESUF)
+ gcov-files-check-qdict-y = qobject/qdict.c
++check-unit-y = tests/check-block-qdict$(EXESUF)
++gcov-files-check-block-qdict-y = qobject/block-qdict.c
+ check-unit-y += tests/test-char$(EXESUF)
+ gcov-files-check-qdict-y = chardev/char.c
+ check-unit-y += tests/check-qnum$(EXESUF)
+@@ -584,6 +586,7 @@ GENERATED_FILES += tests/test-qapi-types.h tests/test-qapi-visit.h \
+ test-obj-y = tests/check-qnum.o tests/check-qstring.o tests/check-qdict.o \
+ 	tests/check-qlist.o tests/check-qnull.o tests/check-qobject.o \
+ 	tests/check-qjson.o tests/check-qlit.o \
++	tests/check-block-qtest.o \
+ 	tests/test-coroutine.o tests/test-string-output-visitor.o \
+ 	tests/test-string-input-visitor.o tests/test-qobject-output-visitor.o \
+ 	tests/test-clone-visitor.o \
+@@ -614,6 +617,7 @@ test-block-obj-y = $(block-obj-y) $(test-io-obj-y) tests/iothread.o
+ tests/check-qnum$(EXESUF): tests/check-qnum.o $(test-util-obj-y)
+ tests/check-qstring$(EXESUF): tests/check-qstring.o $(test-util-obj-y)
+ tests/check-qdict$(EXESUF): tests/check-qdict.o $(test-util-obj-y)
++tests/check-block-qdict$(EXESUF): tests/check-block-qdict.o $(test-util-obj-y)
+ tests/check-qlist$(EXESUF): tests/check-qlist.o $(test-util-obj-y)
+ tests/check-qnull$(EXESUF): tests/check-qnull.o $(test-util-obj-y)
+ tests/check-qobject$(EXESUF): tests/check-qobject.o $(test-util-obj-y)
 -- 
 2.13.6
