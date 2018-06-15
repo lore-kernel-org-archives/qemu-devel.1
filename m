@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTqgH-0008T6-HJ
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:30:30 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fTqgY-0000EB-Ju
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:30:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTqgG-0000ud-T1
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:30:29 -0400
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:33070)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fTqgG-0000uI-B7
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:30:28 -0400
-Received: by mail-oi0-x230.google.com with SMTP id c6-v6so9153126oiy.0
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 08:30:28 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1fTqgS-00012q-45
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:30:46 -0400
+Date: Fri, 15 Jun 2018 16:30:33 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180615153033.GE12972@stefanha-x1.localdomain>
+References: <20180608060417.10170-1-famz@redhat.com>
+	<20180608060417.10170-6-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180615142521.19143-1-peter.maydell@linaro.org>
-References: <20180615142521.19143-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Jun 2018 16:30:06 +0100
-Message-ID: <CAFEAcA84+E_zbjwFg9QDXv-1EhZSrF=nDzkMiu1JnAtEJ8aOLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/43] target-arm queue
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="X3gaHHMYHkYqP6yf"
+Content-Disposition: inline
+In-Reply-To: <20180608060417.10170-6-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/6] block: Add backing passthrough
+ implementations for copy_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,20 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-On 15 June 2018 at 15:24, Peter Maydell <peter.maydell@linaro.org> wrote:
-> target-arm queue; this one has a fair scattering of more
-> miscellaneous things in it which I've sent out this week.
-> I've shoved those in as well as it seemed the least-effort
-> way of getting them into master; a few of them are dependencies
-> on arm-related patches I have brewing.
->
-> thanks
-> -- PMM
->
->
 
-Applied, thanks.
+--X3gaHHMYHkYqP6yf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
--- PMM
+On Fri, Jun 08, 2018 at 02:04:16PM +0800, Fam Zheng wrote:
+> +int coroutine_fn bdrv_co_copy_range_from_backing(BlockDriverState *bs,
+> +                                                 BdrvChild *src, uint64_t src_offset,
+> +                                                 BdrvChild *dst, uint64_t dst_offset,
+> +                                                 uint64_t bytes, BdrvRequestFlags flags)
+> +{
+> +    if (!src->bs) {
+> +        return -ENOMEDIUM;
+> +    }
+> +    return bdrv_co_copy_range_from(src->bs->backing, src_offset, dst,
+> +                                   dst_offset, bytes, flags);
+> +}
+> +
+> +int coroutine_fn bdrv_co_copy_range_to_backing(BlockDriverState *bs,
+> +                                               BdrvChild *src, uint64_t src_offset,
+> +                                               BdrvChild *dst, uint64_t dst_offset,
+> +                                               uint64_t bytes, BdrvRequestFlags flags)
+> +{
+> +    if (!dst->bs) {
+> +        return -ENOMEDIUM;
+> +    }
+> +    return bdrv_co_copy_range_to(src, src_offset, dst->bs->backing,
+> +                                 dst_offset, bytes, flags);
+> +}
+
+If src->bs or dst->bs were NULL, then bdrv_co_copy_range() would have
+already crashed in bdrv_inc_in_flight(src/dst_bs).  Should
+.bdrv_co_copy_range_to/from() implementations really check for
+ENOMEDIUM?
+
+--X3gaHHMYHkYqP6yf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbI9uZAAoJEJykq7OBq3PIiUYIAIyp2/q4Kl7Z5xYEA+CeOo9A
+ABx4KqWFPvi4pY8LnGaZrVA6NoVyjLBEZSmou8OzU7hTuky34QzZm6GOZvxOcrFC
+CuqLBUmh6j/M87+hiDVyTZYxpQ0fyvXwU+PNe2owUTLbwpjKOsxLl4wqWtMplnkt
+xu4aWJEmjHJoHXjjYkLsQCmmtglnCufcqtNsPxWowz5p33wnBjiJc8fGNpuS3bf0
+zny3n4QzsdsjJS1NW7jSZkG80ZT9Ag/85yb1O6jdGHTowNUiUHa+OOhJ7YEFjRLZ
+1ktPL8UaJR71YeU67+cwpj3jTdSdXO0WG1YaSRcwO9VL3fN6vtSklxLl8tugfJY=
+=B+K8
+-----END PGP SIGNATURE-----
+
+--X3gaHHMYHkYqP6yf--
