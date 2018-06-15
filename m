@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35021)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTmE1-0002xk-2U
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:45:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTmOL-0004zZ-0e
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTmE0-0001tM-8z
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:45:01 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:43487)
+	(envelope-from <peter.maydell@linaro.org>) id 1fTmOK-00079y-7K
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:55:41 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:40152)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fTmE0-0001sn-2C
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:45:00 -0400
-Received: by mail-ot0-x241.google.com with SMTP id i19-v6so10472531otk.10
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 03:44:59 -0700 (PDT)
+	id 1fTmOJ-00078T-Gg
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:55:39 -0400
+Received: by mail-ot0-x243.google.com with SMTP id w9-v6so10502276otj.7
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 03:55:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKOm6O_Tj1Bru9DpQN_uWsHQ+V1Jh2cN3EzwMCFOu=hOUg@mail.gmail.com>
-References: <20180611171518.3390-1-clg@kaod.org>
-	<bfdc313f-f8b0-77a5-e87b-cc9c75f8e110@kaod.org>
-	<CAKmqyKOm6O_Tj1Bru9DpQN_uWsHQ+V1Jh2cN3EzwMCFOu=hOUg@mail.gmail.com>
+In-Reply-To: <20180612204632.28780-1-jusual@mail.ru>
+References: <20180612204632.28780-1-jusual@mail.ru>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Jun 2018 11:44:38 +0100
-Message-ID: <CAFEAcA_PzsfgA-QeSPb7qRnNnbuFe2A9ZwUuF9KNyf_hENzcwA@mail.gmail.com>
+Date: Fri, 15 Jun 2018 11:55:18 +0100
+Message-ID: <CAFEAcA-p5A4S=+ncW42KU2ivBHyALJdUswLUYhh=By6rKYstZw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] m25p80: add support for two bytes WRSR for
- Macronix chips
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow ARMv6-M Thumb2
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Max Reitz <mreitz@redhat.com>
+To: Julia Suvorova <jusual@mail.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
 
-On 11 June 2018 at 23:03, Alistair Francis <alistair23@gmail.com> wrote:
-> On Mon, Jun 11, 2018 at 10:18 AM, C=C3=A9dric Le Goater <clg@kaod.org> wr=
-ote:
->> On 06/11/2018 07:15 PM, C=C3=A9dric Le Goater wrote:
->>> On Macronix chips, two bytes can written to the WRSR. First byte will
->>> configure the status register and the second the configuration
->>> register. It is important to save the configuration value as it
->>> contains the dummy cycle setting when using dual or quad IO mode.
->>>
->>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+On 12 June 2018 at 21:46, Julia Suvorova <jusual@mail.ru> wrote:
+> ARMv6-M supports 6 Thumb2 instructions. This patch checks for these
+> instructions and allows their execution.
+> Like Thumb2 cores, ARMv6-M always interprets BL instruction as 32-bit.
 >
-> Acked-by: Alistair Francis <alistair.francis@wdc.com>
+> This patch is required for future Cortex-M0 support.
+>
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> @@ -10075,6 +10076,11 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+>  {
+>      uint32_t imm, shift, offset;
+>      uint32_t rd, rn, rm, rs;
+> +    uint32_t armv6m_insn[] = {0xf3808000 /* msr */, 0xf3b08040 /* dsb */,
+> +                              0xf3b08050 /* dmb */, 0xf3b08060 /* isb */,
+> +                              0xf3e08000 /* mrs */, 0xf000d000 /* bl */};
+> +    uint32_t armv6m_mask[] = {0xffe0d000, 0xfff0d0f0, 0xfff0d0f0,
+> +                              0xfff0d0f0, 0xffe0d000, 0xf800d000};
 
+I think these arrays should be 'const'; we can also move them closer
+to their point of use, inside the scope of the if() below.
 
+Since those are trivial tweaks, I'm going to put this into
+target-arm.next with those changes made, if that's OK.
 
-Applied to target-arm.next, thanks.
-
+thanks
 -- PMM
