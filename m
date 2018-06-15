@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36720)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTo7N-0006Ue-N4
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:46:18 -0400
+	(envelope-from <armbru@redhat.com>) id 1fTo7f-0006iP-5S
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:46:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTo7M-0004hC-KC
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:46:17 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:38362)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fTo7M-0004gV-64
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:46:16 -0400
-Received: by mail-ot0-x244.google.com with SMTP id p95-v6so10835166ota.5
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 05:46:16 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fTo7e-0004tX-BB
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 08:46:35 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180614191443.14361-1-armbru@redhat.com>
+	<20180614191443.14361-10-armbru@redhat.com>
+	<20180615103607.GB5187@localhost.localdomain>
+Date: Fri, 15 Jun 2018 14:46:30 +0200
+In-Reply-To: <20180615103607.GB5187@localhost.localdomain> (Kevin Wolf's
+	message of "Fri, 15 Jun 2018 12:36:07 +0200")
+Message-ID: <87fu1o1al5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8OO0SdmE4nJhcQg6kWPcqs-5g8BkjOREw40aUchc6RXw@mail.gmail.com>
-References: <20180604152941.20374-1-peter.maydell@linaro.org>
-	<CAFEAcA8OO0SdmE4nJhcQg6kWPcqs-5g8BkjOREw40aUchc6RXw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Jun 2018 13:45:54 +0100
-Message-ID: <CAFEAcA-2xOnL=U1VGVAP8uZhgJBYffohM0rE6XO7_bRr_XaU9Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 00/13] iommu: support txattrs,
- support TCG execution, implement TZ MPC
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2 09/18] block: Make remaining uses of
+ qobject input visitor more robust
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +25,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>, Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, jcody@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-On 14 June 2018 at 17:51, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 4 June 2018 at 16:29, Peter Maydell <peter.maydell@linaro.org> wrote:
->> Hi; this is v2 of my iommu patchset, which does:
->>  * support IOMMUs that are aware of memory transaction attributes and
->>    may generate different translations for different attributes
->>  * support TCG execution out of memory which is behind an IOMMU
->>  * implement the Arm TrustZone Memory Protection Controller
->>    (which needs both the above features in the IOMMU core code)
->>  * use the MPC in the mps2-an505 board
+Kevin Wolf <kwolf@redhat.com> writes:
+
+> Am 14.06.2018 um 21:14 hat Markus Armbruster geschrieben:
+>> Remaining uses of qobject_input_visitor_new_keyval() in the block
+>> subsystem:
+>> 
+>> * block_crypto_create_opts_init()
 >
->> Unreviewed patches: 4, 6, 7, 8, 9, 10
->
-> Ping for further reviews, comments, etc, please. I'd like
-> to put this in via target-arm.next in the not too distant
-> future.
+> Still the wrong function name. Will fix this while applying. (Should be
+> block_crypto_open_opts_init())
 
-Thanks for the reviews; since 1-5 and 9 have been reviewed and
-have no issues, I'm going to put those into target-arm.next
-(to reduce the size of v3 of this series and avoid possible
-issues with conflicts with other iommu related patchsets).
+Forgot that one.  Thanks for catching and fixing my mistake!
 
-thanks
--- PMM
+[...]
