@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTlji-0000A5-R5
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:13:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTlnb-0001Hg-99
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:17:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fTljh-0004ua-Tz
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:13:42 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:46206)
+	(envelope-from <peter.maydell@linaro.org>) id 1fTlna-0007xi-HX
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:17:43 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:41814)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fTljh-0004uC-HE
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:13:41 -0400
-Received: by mail-ot0-x241.google.com with SMTP id v24-v6so1869575otk.13
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 03:13:41 -0700 (PDT)
+	id 1fTlna-0007xG-Cg
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:17:42 -0400
+Received: by mail-ot0-x242.google.com with SMTP id d19-v6so10414663oti.8
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 03:17:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180611125633.32755-1-peter.maydell@linaro.org>
-References: <20180611125633.32755-1-peter.maydell@linaro.org>
+In-Reply-To: <20180611171007.4165-1-peter.maydell@linaro.org>
+References: <20180611171007.4165-1-peter.maydell@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Jun 2018 11:13:20 +0100
-Message-ID: <CAFEAcA88FD2pEM_GmPy6QtRVwd2f41Y9V84pvcpNtt_vu7LKeg@mail.gmail.com>
+Date: Fri, 15 Jun 2018 11:17:21 +0100
+Message-ID: <CAFEAcA_gc_5WZZbRrYCt7xUo1C-TKbyoWzhWX0Rwd1f=wtc85g@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/2] cputlb: document iotlb.addr,
- fix txfail physaddr
+Subject: Re: [Qemu-devel] [PATCH 0/3] Add ldn_*_p() and stn_*_p() and use
+ them in exec.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +32,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: QEMU Developers <qemu-devel@nongnu.org>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "patches@linaro.org" <patches@linaro.org>
 
-On 11 June 2018 at 13:56, Peter Maydell <peter.maydell@linaro.org> wrote:
-> This patchset is two vaguely related patches that I wrote
-> while I was trying to understand the cputlb code enough to
-> add support for small-MPU-regions for v7M/v8M.
+On 11 June 2018 at 18:10, Peter Maydell <peter.maydell@linaro.org> wrote:
+> There's a common pattern in QEMU where a function needs to perform
+> a data load or store of an N byte integer in a particular endianness.
+> At the moment this is handled by doing a switch() on the size and
+> calling the appropriate ld*_p or st*_p function for each size.
 >
-> Patch 1 is just a docs comment patch, describing what the
-> CPUIOTLBEntry 'addr' field actually contains.
+> This patchset provides a new family of functions ldn_*_p() and stn_*_p()
+> which take the size as an argument and do the switch() themselves,
+> and uses them in 5 callsites in exec.c.
 >
-> Patch 2 fixes a bug that doesn't yet have any visible effects
-> (we were passing cpu_transaction_failed() the wrong value for
-> the physaddr) roughly as suggested by Paolo back in
-> https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg02419.html
+> If people like the idea, naming convention, etc, we can look for
+> and convert other callsites, extend this to eg an address_space_ldn()
+> and address_space_stn() (sample use cases in watch_mem_read(),
+> watch_mem_write(), dino_chip_write_with_attrs(), tx_ppc_read(),
+> tx_ppc_write()...)
+>
+> Patch 2 here fixes an apparently unintentional sign-extension in
+> subpage_read(), so that patch 3 is a no-behaviour-change patch.
 >
 > thanks
 > -- PMM
 >
-> Peter Maydell (2):
->   cpu-defs.h: Document CPUIOTLBEntry 'addr' field
->   cputlb: Pass cpu_transaction_failed() the correct physaddr
+> Peter Maydell (3):
+>   bswap: Add new stn_*_p() and ldn_*_p() memory access functions
+>   exec.c: Don't accidentally sign-extend 4-byte loads in subpage_read()
+>   exec.c: Use stn_p() and ldn_p() instead of explicit switches
 
-I'll put these in via target-arm.next (with the ramaddr_t/ram_addr_t
-typo fixed), unless anybody would prefer them to go via another route.
+Thanks for the review; I plan to put these into target-arm.next
+(with the silly typo fixed). I have another series brewing which
+depends on this one, so having them in-tree will reduce the
+dependencies there.
 
 thanks
 -- PMM
