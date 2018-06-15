@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fTqVd-00076r-0v
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:19:30 -0400
+	(envelope-from <berrange@redhat.com>) id 1fTqX7-0008K0-OS
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fTqVc-0002YG-2Y
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:19:28 -0400
-Date: Fri, 15 Jun 2018 17:19:18 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180615151918.f6vnevdv2ayusn3e@kamzik.brq.redhat.com>
-References: <1529072910-16156-1-git-send-email-eric.auger@redhat.com>
-	<1529072910-16156-5-git-send-email-eric.auger@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1fTqX4-0003aJ-Pg
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:21:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42922 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fTqX4-0003ZF-Kp
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:20:58 -0400
+Date: Fri, 15 Jun 2018 16:20:52 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180615152052.GO31552@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180615044042.7928-1-tamiko@43-1.org>
+	<20180615044042.7928-2-tamiko@43-1.org>
+	<20180615094207.GK31552@redhat.com> <8736xorxsr.fsf@43-1.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1529072910-16156-5-git-send-email-eric.auger@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 04/11] hw/intc/arm_gicv3_kvm: Get
- prepared to handle multiple redist regions
+In-Reply-To: <8736xorxsr.fsf@43-1.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] Partially revert commit d4e5ec877ca
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,101 +30,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, wei@redhat.com, zhaoshenglong@huawei.com, lersek@redhat.com, ard.biesheuvel@linaro.org, christoffer.dall@arm.com, marc.zyngier@arm.com
+To: Matthias Maier <tamiko@43-1.org>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
 
-On Fri, Jun 15, 2018 at 04:28:23PM +0200, Eric Auger wrote:
-> Let's check if KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION is supported.
-> If not, we check the number of redist region is equal to 1 and use the
-> legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute. Otherwise we use
-> the new attribute and allow to register multiple regions to the
-> KVM device.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> 
-> ---
-> 
-> v1 (virt3.0)-> v2
-> - added a comment to explain why the regions are registered in
->   reverse order
-> 
-> v2 -> v3:
-> - In kvm_arm_gicv3_realize rename val into add_ormask local variable and
->   add a comment
-> - start the redist region registration  from s->nb_redist_regions - 1
->   downwards
-> ---
->  hw/intc/arm_gicv3_kvm.c | 37 ++++++++++++++++++++++++++++++++++---
->  1 file changed, 34 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-> index ed7b719..5cb94fc 100644
-> --- a/hw/intc/arm_gicv3_kvm.c
-> +++ b/hw/intc/arm_gicv3_kvm.c
-> @@ -753,6 +753,7 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->  {
->      GICv3State *s = KVM_ARM_GICV3(dev);
->      KVMARMGICv3Class *kgc = KVM_ARM_GICV3_GET_CLASS(s);
-> +    bool multiple_redist_region_allowed;
->      Error *local_err = NULL;
->      int i;
->  
-> @@ -789,6 +790,18 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->          return;
->      }
->  
-> +    multiple_redist_region_allowed =
-> +        kvm_device_check_attr(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> +                              KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION);
-> +
-> +    if (!multiple_redist_region_allowed && s->nb_redist_regions > 1) {
-> +        error_setg(errp, "Multiple VGICv3 redistributor regions are not "
-> +                   "supported by this host kernel");
-> +        error_append_hint(errp, "A maximum of %d VCPUs can be used",
-> +                          s->redist_region_count[0]);
-> +        return;
-> +    }
-> +
->      kvm_device_access(s->dev_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
->                        0, &s->num_irq, true, &error_abort);
->  
-> @@ -798,9 +811,27 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->  
->      kvm_arm_register_device(&s->iomem_dist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
->                              KVM_VGIC_V3_ADDR_TYPE_DIST, s->dev_fd, 0);
-> -    kvm_arm_register_device(&s->iomem_redist[0], -1,
-> -                            KVM_DEV_ARM_VGIC_GRP_ADDR,
-> -                            KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
-> +
-> +    if (!multiple_redist_region_allowed) {
-> +        kvm_arm_register_device(&s->iomem_redist[0], -1,
-> +                                KVM_DEV_ARM_VGIC_GRP_ADDR,
-> +                                KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
-> +    } else {
-> +        /* we register regions in reverse order as "devices" are inserted at
+On Fri, Jun 15, 2018 at 08:20:36AM -0500, Matthias Maier wrote:
+>=20
+> On Fri, Jun 15, 2018, at 04:42 CDT, Daniel P. Berrang=C3=A9 <berrange@r=
+edhat.com> wrote:
+>=20
+> > On Thu, Jun 14, 2018 at 11:40:41PM -0500, Matthias Maier wrote:
+> >> This commit removes the PYTHON_UTF8 workaround. The problem with set=
+ting
+> >>=20
+> >>   LC_ALL=3D LANG=3DC LC_CTYPE=3Den_US.UTF-8
+> >>=20
+> >> is that the en_US.UTF-8 locale might not be available. In this case
+> >
+> > What platform are you using where  UTF8 locale is not available ?
+>=20
+> For example, neither Debian (and for that matter Ubuntu) nor Gentoo
+> guarantee that the en_US.UTF-8 locale is available.
+>=20
+> We in particular encounter build problems on Gentoo when users have onl=
+y
+> set very specific, non en_US locales, for example de_DE.UTF-8 (or
+> similar).
+>=20
+> > Indeed I would ideally like to make the entire of QEMU build with an
+> > explicit en_US.UTF-8 or C.UTF-8 locale, to ensure that we get reliabl=
+y
+> > reproducible builds, as locale differences have been known to impact
+> > output of many tools not just python.
+>=20
+> We face the same problem in Gentoo and usually advice users to set
+> LC_ALL=3DC when submitting bug reports. (It is frustrating that glibc
+> upstream doesn't get their act together fixing and merging the current
+> C.UTF-8 proposal.)
+>=20
+> So what about making the build system more robust (by merging the
+> patches, or a variant) and either setting C.UTF-8, or C globally
+> (depending on availability)?
 
-Capital w on we would be nicer, but probably not worth respinning for
+Yes, if we could figure out a way to check for existance of locales, we
+could make configure check for C.UTF-*, en_US.UTF-8, C  in that order,
+using the first it finds to work. Fun fact, on macOS 'C' is always
+UTF-8, so its valid to use just 'C'.
 
-> +         * the head of a QSLIST and the list is then popped from the head
-> +         * onwards by kvm_arm_machine_init_done()
-> +         */
-> +        for (i = s->nb_redist_regions - 1; i >= 0; i--) {
-> +            /* Address mask made of the rdist region index and count */
-> +            uint64_t addr_ormask =
-> +                        i | ((uint64_t)s->redist_region_count[i] << 52);
-> +
-> +            kvm_arm_register_device(&s->iomem_redist[i], -1,
-> +                                    KVM_DEV_ARM_VGIC_GRP_ADDR,
-> +                                    KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION,
-> +                                    s->dev_fd, addr_ormask);
-> +        }
-> +    }
->  
->      if (kvm_has_gsi_routing()) {
->          /* set up irq routing */
-> -- 
-> 2.5.5
->
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
