@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbV-00062T-QF
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbY-00066Q-Qs
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fTpbU-0003fW-BE
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:29 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fTpbX-0003iv-Qb
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:21:32 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 15 Jun 2018 16:20:57 +0200
-Message-Id: <20180615142108.27814-16-kwolf@redhat.com>
+Date: Fri, 15 Jun 2018 16:20:59 +0200
+Message-Id: <20180615142108.27814-18-kwolf@redhat.com>
 In-Reply-To: <20180615142108.27814-1-kwolf@redhat.com>
 References: <20180615142108.27814-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 15/26] block-qdict: Tweak qdict_flatten_qdict(),
- qdict_flatten_qlist()
+Subject: [Qemu-devel] [PULL 17/26] block-qdict: Simplify qdict_is_list() some
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +24,55 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Markus Armbruster <armbru@redhat.com>
 
-qdict_flatten_qdict() skips copying scalars from @qdict to @target
-when the two are the same.  Fair enough, but it uses a non-obvious
-test for "same".  Replace it by the obvious one.  While there, improve
-comments.
-
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qobject/block-qdict.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ qobject/block-qdict.c | 27 +++++++++++----------------
+ 1 file changed, 11 insertions(+), 16 deletions(-)
 
 diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
-index f32df343e8..a4e1c8d08f 100644
+index 36cf58acc8..e51a3d2c0f 100644
 --- a/qobject/block-qdict.c
 +++ b/qobject/block-qdict.c
-@@ -71,12 +71,15 @@ static void qdict_flatten_qlist(QList *qlist, QDict *target, const char *prefix)
-         value = qlist_entry_obj(entry);
-         new_key = g_strdup_printf("%s.%i", prefix, i);
+@@ -317,27 +317,22 @@ static int qdict_is_list(QDict *maybe_list, Error **errp)
  
-+        /*
-+         * Flatten non-empty QDict and QList recursively into @target,
-+         * copy other objects to @target
-+         */
-         if (qobject_type(value) == QTYPE_QDICT) {
-             qdict_flatten_qdict(qobject_to(QDict, value), target, new_key);
-         } else if (qobject_type(value) == QTYPE_QLIST) {
-             qdict_flatten_qlist(qobject_to(QList, value), target, new_key);
-         } else {
--            /* All other types are moved to the target unchanged. */
-             qdict_put_obj(target, new_key, qobject_ref(value));
-         }
+     for (ent = qdict_first(maybe_list); ent != NULL;
+          ent = qdict_next(maybe_list, ent)) {
++        int is_index = !qemu_strtoi64(ent->key, NULL, 10, &val);
  
-@@ -101,9 +104,11 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
-             new_key = g_strdup_printf("%s.%s", prefix, entry->key);
+-        if (qemu_strtoi64(ent->key, NULL, 10, &val) == 0) {
+-            if (is_list == -1) {
+-                is_list = 1;
+-            } else if (!is_list) {
+-                error_setg(errp,
+-                           "Cannot mix list and non-list keys");
+-                return -1;
+-            }
++        if (is_list == -1) {
++            is_list = is_index;
++        }
++
++        if (is_index != is_list) {
++            error_setg(errp, "Cannot mix list and non-list keys");
++            return -1;
++        }
++
++        if (is_index) {
+             len++;
+             if (val > max) {
+                 max = val;
+             }
+-        } else {
+-            if (is_list == -1) {
+-                is_list = 0;
+-            } else if (is_list) {
+-                error_setg(errp,
+-                           "Cannot mix list and non-list keys");
+-                return -1;
+-            }
          }
+     }
  
-+        /*
-+         * Flatten non-empty QDict and QList recursively into @target,
-+         * copy other objects to @target
-+         */
-         if (qobject_type(value) == QTYPE_QDICT) {
--            /* Entries of QDicts are processed recursively, the QDict object
--             * itself disappears. */
-             qdict_flatten_qdict(qobject_to(QDict, value), target,
-                                 new_key ? new_key : entry->key);
-             qdict_del(qdict, entry->key);
-@@ -111,8 +116,7 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
-             qdict_flatten_qlist(qobject_to(QList, value), target,
-                                 new_key ? new_key : entry->key);
-             qdict_del(qdict, entry->key);
--        } else if (prefix) {
--            /* All other objects are moved to the target unchanged. */
-+        } else if (target != qdict) {
-             qdict_put_obj(target, new_key, qobject_ref(value));
-             qdict_del(qdict, entry->key);
-         }
 -- 
 2.13.6
