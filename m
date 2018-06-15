@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53255)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1fTjUX-0004WA-U4
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:49:55 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fTjY3-0005ZB-BH
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:53:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1fTjUW-0003Y5-24
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:49:53 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:40280)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1fTjUV-0003Xe-Pe
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:49:51 -0400
-Received: by mail-it0-x243.google.com with SMTP id 188-v6so1569167ita.5
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 00:49:51 -0700 (PDT)
+	(envelope-from <kraxel@redhat.com>) id 1fTjY2-0006PP-Kn
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:53:31 -0400
+Date: Fri, 15 Jun 2018 09:53:14 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180615075314.fc3jattcaizpf6yd@sirius.home.kraxel.org>
+References: <20180613084149.14523-1-kraxel@redhat.com>
+	<20180613084149.14523-4-kraxel@redhat.com>
+	<20180613135047.5c1ce227@w520.home>
+	<20180613223625.lf6xkzgipzkfslit@sirius.home.kraxel.org>
+	<20180614094856.GD2220@beluga.usersys.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180615073303.502-2-mark.cave-ayland@ilande.co.uk>
-References: <20180615073303.502-1-mark.cave-ayland@ilande.co.uk>
-	<20180615073303.502-2-mark.cave-ayland@ilande.co.uk>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Fri, 15 Jun 2018 09:49:29 +0200
-Message-ID: <CACXAS8Bgj1H=NbHxeFTHuBEDL2+9qZnbq+gU-gc3nY+GLoASgw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH v4 1/1] SPARC64: add icount support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180614094856.GD2220@beluga.usersys.redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 3/3] hw/vfio/display: add ramfb support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,285 +26,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>, richard.henderson@linaro.org, "Emilio G. Cota" <cota@braap.org>
+To: Erik Skultety <eskultet@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?utf-8?B?TMOhc3psw7Mgw4lyc2Vr?= <lersek@redhat.com>, libvir-list@redhat.com, Laine Stump <laine@redhat.com>
 
-On Fri, Jun 15, 2018 at 9:33 AM, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> This patch adds gen_io_start()/gen_io_end() to various instructions as required
-> in order to boot my OpenBIOS test images on qemu-system-sparc64 with icount
-> enabled.
->
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > Well, it's simliar to qxl vs. qxl-vga.  It's not qxl,vga={on,off} and
+> > libvirt has no problems to deal with that ...
+> >
+> > Another more technical reason is (again) hotplug.  ramfb needs an fw_cfg
+> > entry for configuration, and fw_cfg entries can't be hotplugged.  So
+> > hotplugging vfio-pci with ramfb=on isn't going to fly.  So we need a
+> > separate device with hotplug turned off.
+> 
+> Well if that's not supposed to work ever, libvirt's hotplug code could format
+> the following FWIW:
+> "-device vfio-pci [opts],ramfb=off"
+> 
+> As such, new device wouldn't be that of an issue for libvirt if vfio-pci and
+> vfio-pci-ramfb are back to back compatible with all the device options that are
+> available for vfio-pci (I mean in terms of using an mdev). Because in that
+> case, what libvirt could do is to look whether we're supposed to turn on the
+> display, if so, then we need support for this in capabilities to query and then
+> we could prefer this new device over the "legacy" vfio-pci one. However, if we
+> expect a case where QEMU would succeed to start with an mdev mapped to this
+> new ramfb device but not with vfio-pci, then that's an issue.
 
-It's really good to have icount support for SPARC64. Good job, Mark!
+vfio-pci and vfio-pci-ramfb are identical, except for the later having a
+boot display (with display=on), and vfio-pci-ramfb not being
+hotplugable.  So, yes, all pcu/mdev devices should work with both
+vfio-pci variants.
 
-Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
+> But I'm still curious about the ramfb=off possibility I asked above
+> for hotplug nonetheless.
 
-> ---
->  target/sparc/translate.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 110 insertions(+), 1 deletion(-)
->
-> diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-> index f3d430c1b2..74315cdf09 100644
-> --- a/target/sparc/translate.c
-> +++ b/target/sparc/translate.c
-> @@ -41,6 +41,8 @@
->  #define JUMP_PC     2 /* dynamic pc value which takes only two values
->                           according to jump_pc[T2] */
->
-> +#define DISAS_EXIT  DISAS_TARGET_0
-> +
->  /* global register indexes */
->  static TCGv_ptr cpu_regwptr;
->  static TCGv cpu_cc_src, cpu_cc_src2, cpu_cc_dst;
-> @@ -3400,11 +3402,17 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
->                          r_const = tcg_const_i32(dc->mem_idx);
->                          tcg_gen_ld_ptr(r_tickptr, cpu_env,
->                                         offsetof(CPUSPARCState, tick));
-> +                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                            gen_io_start();
-> +                        }
->                          gen_helper_tick_get_count(cpu_dst, cpu_env, r_tickptr,
->                                                    r_const);
->                          tcg_temp_free_ptr(r_tickptr);
->                          tcg_temp_free_i32(r_const);
->                          gen_store_gpr(dc, rd, cpu_dst);
-> +                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                            gen_io_end();
-> +                        }
->                      }
->                      break;
->                  case 0x5: /* V9 rdpc */
-> @@ -3447,11 +3455,17 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
->                          r_const = tcg_const_i32(dc->mem_idx);
->                          tcg_gen_ld_ptr(r_tickptr, cpu_env,
->                                         offsetof(CPUSPARCState, stick));
-> +                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                            gen_io_start();
-> +                        }
->                          gen_helper_tick_get_count(cpu_dst, cpu_env, r_tickptr,
->                                                    r_const);
->                          tcg_temp_free_ptr(r_tickptr);
->                          tcg_temp_free_i32(r_const);
->                          gen_store_gpr(dc, rd, cpu_dst);
-> +                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                            gen_io_end();
-> +                        }
->                      }
->                      break;
->                  case 0x19: /* System tick compare */
-> @@ -3576,10 +3590,16 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
->                          r_const = tcg_const_i32(dc->mem_idx);
->                          tcg_gen_ld_ptr(r_tickptr, cpu_env,
->                                         offsetof(CPUSPARCState, tick));
-> +                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                            gen_io_start();
-> +                        }
->                          gen_helper_tick_get_count(cpu_tmp0, cpu_env,
->                                                    r_tickptr, r_const);
->                          tcg_temp_free_ptr(r_tickptr);
->                          tcg_temp_free_i32(r_const);
-> +                        if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                            gen_io_end();
-> +                        }
->                      }
->                      break;
->                  case 5: // tba
-> @@ -4385,9 +4405,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
->                                      r_tickptr = tcg_temp_new_ptr();
->                                      tcg_gen_ld_ptr(r_tickptr, cpu_env,
->                                                     offsetof(CPUSPARCState, tick));
-> +                                    if (tb_cflags(dc->base.tb) &
-> +                                           CF_USE_ICOUNT) {
-> +                                        gen_io_start();
-> +                                    }
->                                      gen_helper_tick_set_limit(r_tickptr,
->                                                                cpu_tick_cmpr);
->                                      tcg_temp_free_ptr(r_tickptr);
-> +                                    if (tb_cflags(dc->base.tb) &
-> +                                           CF_USE_ICOUNT) {
-> +                                        gen_io_end();
-> +                                    }
-> +                                    /* End TB to handle timer interrupt */
-> +                                    dc->base.is_jmp = DISAS_EXIT;
->                                  }
->                                  break;
->                              case 0x18: /* System tick */
-> @@ -4403,9 +4433,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
->                                      r_tickptr = tcg_temp_new_ptr();
->                                      tcg_gen_ld_ptr(r_tickptr, cpu_env,
->                                                     offsetof(CPUSPARCState, stick));
-> +                                    if (tb_cflags(dc->base.tb) &
-> +                                           CF_USE_ICOUNT) {
-> +                                        gen_io_start();
-> +                                    }
->                                      gen_helper_tick_set_count(r_tickptr,
->                                                                cpu_tmp0);
->                                      tcg_temp_free_ptr(r_tickptr);
-> +                                    if (tb_cflags(dc->base.tb) &
-> +                                           CF_USE_ICOUNT) {
-> +                                        gen_io_end();
-> +                                    }
-> +                                    /* End TB to handle timer interrupt */
-> +                                    dc->base.is_jmp = DISAS_EXIT;
->                                  }
->                                  break;
->                              case 0x19: /* System tick compare */
-> @@ -4421,9 +4461,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
->                                      r_tickptr = tcg_temp_new_ptr();
->                                      tcg_gen_ld_ptr(r_tickptr, cpu_env,
->                                                     offsetof(CPUSPARCState, stick));
-> +                                    if (tb_cflags(dc->base.tb) &
-> +                                           CF_USE_ICOUNT) {
-> +                                        gen_io_start();
-> +                                    }
->                                      gen_helper_tick_set_limit(r_tickptr,
->                                                                cpu_stick_cmpr);
->                                      tcg_temp_free_ptr(r_tickptr);
-> +                                    if (tb_cflags(dc->base.tb) &
-> +                                           CF_USE_ICOUNT) {
-> +                                        gen_io_end();
-> +                                    }
-> +                                    /* End TB to handle timer interrupt */
-> +                                    dc->base.is_jmp = DISAS_EXIT;
->                                  }
->                                  break;
->
-> @@ -4531,9 +4581,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
->                                      r_tickptr = tcg_temp_new_ptr();
->                                      tcg_gen_ld_ptr(r_tickptr, cpu_env,
->                                                     offsetof(CPUSPARCState, tick));
-> +                                    if (tb_cflags(dc->base.tb) &
-> +                                           CF_USE_ICOUNT) {
-> +                                        gen_io_start();
-> +                                    }
->                                      gen_helper_tick_set_count(r_tickptr,
->                                                                cpu_tmp0);
->                                      tcg_temp_free_ptr(r_tickptr);
-> +                                    if (tb_cflags(dc->base.tb) &
-> +                                           CF_USE_ICOUNT) {
-> +                                        gen_io_end();
-> +                                    }
-> +                                    /* End TB to handle timer interrupt */
-> +                                    dc->base.is_jmp = DISAS_EXIT;
->                                  }
->                                  break;
->                              case 5: // tba
-> @@ -4541,7 +4601,13 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
->                                  break;
->                              case 6: // pstate
->                                  save_state(dc);
-> +                                if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                                    gen_io_start();
-> +                                }
->                                  gen_helper_wrpstate(cpu_env, cpu_tmp0);
-> +                                if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                                    gen_io_end();
-> +                                }
->                                  dc->npc = DYNAMIC_PC;
->                                  break;
->                              case 7: // tl
-> @@ -4551,7 +4617,13 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
->                                  dc->npc = DYNAMIC_PC;
->                                  break;
->                              case 8: // pil
-> +                                if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                                    gen_io_start();
-> +                                }
->                                  gen_helper_wrpil(cpu_env, cpu_tmp0);
-> +                                if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                                    gen_io_end();
-> +                                }
->                                  break;
->                              case 9: // cwp
->                                  gen_helper_wrcwp(cpu_env, cpu_tmp0);
-> @@ -4642,9 +4714,19 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
->                                      r_tickptr = tcg_temp_new_ptr();
->                                      tcg_gen_ld_ptr(r_tickptr, cpu_env,
->                                                     offsetof(CPUSPARCState, hstick));
-> +                                    if (tb_cflags(dc->base.tb) &
-> +                                           CF_USE_ICOUNT) {
-> +                                        gen_io_start();
-> +                                    }
->                                      gen_helper_tick_set_limit(r_tickptr,
->                                                                cpu_hstick_cmpr);
->                                      tcg_temp_free_ptr(r_tickptr);
-> +                                    if (tb_cflags(dc->base.tb) &
-> +                                           CF_USE_ICOUNT) {
-> +                                        gen_io_end();
-> +                                    }
-> +                                    /* End TB to handle timer interrupt */
-> +                                    dc->base.is_jmp = DISAS_EXIT;
->                                  }
->                                  break;
->                              case 6: // hver readonly
-> @@ -5265,14 +5347,26 @@ static void disas_sparc_insn(DisasContext * dc, unsigned int insn)
->                                  goto priv_insn;
->                              dc->npc = DYNAMIC_PC;
->                              dc->pc = DYNAMIC_PC;
-> +                            if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                                gen_io_start();
-> +                            }
->                              gen_helper_done(cpu_env);
-> +                            if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                                gen_io_end();
-> +                            }
->                              goto jmp_insn;
->                          case 1:
->                              if (!supervisor(dc))
->                                  goto priv_insn;
->                              dc->npc = DYNAMIC_PC;
->                              dc->pc = DYNAMIC_PC;
-> +                            if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                                gen_io_start();
-> +                            }
->                              gen_helper_retry(cpu_env);
-> +                            if (tb_cflags(dc->base.tb) & CF_USE_ICOUNT) {
-> +                                gen_io_end();
-> +                            }
->                              goto jmp_insn;
->                          default:
->                              goto illegal_insn;
-> @@ -5822,7 +5916,9 @@ static void sparc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
->  {
->      DisasContext *dc = container_of(dcbase, DisasContext, base);
->
-> -    if (dc->base.is_jmp != DISAS_NORETURN) {
-> +    switch (dc->base.is_jmp) {
-> +    case DISAS_NEXT:
-> +    case DISAS_TOO_MANY:
->          if (dc->pc != DYNAMIC_PC &&
->              (dc->npc != DYNAMIC_PC && dc->npc != JUMP_PC)) {
->              /* static PC and NPC: we can use direct chaining */
-> @@ -5834,6 +5930,19 @@ static void sparc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
->              save_npc(dc);
->              tcg_gen_exit_tb(NULL, 0);
->          }
-> +        break;
-> +
-> +    case DISAS_NORETURN:
-> +       break;
-> +
-> +    case DISAS_EXIT:
-> +        /* Exit TB */
-> +        save_state(dc);
-> +        tcg_gen_exit_tb(NULL, 0);
-> +        break;
-> +
-> +    default:
-> +        g_assert_not_reached();
->      }
->  }
->
-> --
-> 2.11.0
->
+Well, the problem is introspection.  qemu can report via qmp whenever a
+specific device supports hotplug.  A device which can both be
+hot-pluggable or not hot-pluggable depending on some condition is a
+problem here ...
 
-
-
--- 
-Regards,
-Artyom Tarasenko
-
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
+cheers,
+  Gerd
