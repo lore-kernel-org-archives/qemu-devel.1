@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTsMg-0007zD-P1
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:18:24 -0400
+	(envelope-from <clg@kaod.org>) id 1fTsPm-0001pX-Hp
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:21:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTsMc-0001Aj-Iz
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:18:22 -0400
-Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:35253)
+	(envelope-from <clg@kaod.org>) id 1fTsPi-00040H-Du
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:21:34 -0400
+Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:38095)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTsMc-00019X-90
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:18:18 -0400
-Received: from player759.ha.ovh.net (unknown [10.109.108.65])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 3699817D6C
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 19:18:15 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTsPi-0003zA-3a
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:21:30 -0400
+Received: from player799.ha.ovh.net (unknown [10.109.122.113])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 5CAC610854B
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 19:21:28 +0200 (CEST)
 References: <20180615115303.31125-1-clg@kaod.org>
-	<20180615115303.31125-4-clg@kaod.org>
-	<20180615180311.6d16e506@bahia.lan>
+	<20180615115303.31125-2-clg@kaod.org>
+	<20180615151453.535f507e@bahia.lan>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <c5182296-b9f5-0072-8d13-551d71560394@kaod.org>
-Date: Fri, 15 Jun 2018 19:18:08 +0200
+Message-ID: <45f5ee26-1243-39fa-06f6-e0b6c4cb3bc4@kaod.org>
+Date: Fri, 15 Jun 2018 19:21:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180615180311.6d16e506@bahia.lan>
+In-Reply-To: <20180615151453.535f507e@bahia.lan>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 3/3] spapr: introduce a fixed
- IRQ number space
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/3] spapr: split the IRQ
+ allocation sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,470 +36,266 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Greg Kurz <groug@kaod.org>
 Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-Hello,
-
-On 06/15/2018 06:03 PM, Greg Kurz wrote:
-> On Fri, 15 Jun 2018 13:53:03 +0200
+On 06/15/2018 03:14 PM, Greg Kurz wrote:
+> On Fri, 15 Jun 2018 13:53:01 +0200
 > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >=20
->> This proposal introduces a new IRQ number space layout using static
->> numbers for all devices and a bitmap allocator for the MSI numbers
->> which are negotiated by the guest at runtime.
+>> Today, when a device requests for IRQ number in a sPAPR machine, the
+>> spapr_irq_alloc() routine first scans the ICSState status array to
+>> find an empty slot and then performs the assignement of the selected
+>> numbers. Split this sequence in two distinct routines : spapr_irq_find=
+()
+>> for lookups and spapr_irq_claim() for claiming the IRQ numbers.
 >>
->> The previous layout is kept in machines raising the 'xics_legacy'
->> flag.
+>> This will ease the introduction of a static layout of IRQ numbers.
 >>
 >> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 >> ---
->>  include/hw/ppc/spapr.h     |  4 ++++
->>  include/hw/ppc/spapr_irq.h | 30 ++++++++++++++++++++++++
->>  hw/ppc/spapr.c             | 31 +++++++++++++++++++++++++
->>  hw/ppc/spapr_events.c      | 12 ++++++++--
->>  hw/ppc/spapr_irq.c         | 57 +++++++++++++++++++++++++++++++++++++=
+>>  include/hw/ppc/spapr.h |  5 ++++
+>>  hw/ppc/spapr.c         | 64 +++++++++++++++++++++++++++++++++++++++++=
 +++++++++
->>  hw/ppc/spapr_pci.c         | 28 ++++++++++++++++++-----
->>  hw/ppc/spapr_vio.c         | 15 ++++++++----
->>  hw/ppc/Makefile.objs       |  2 +-
->>  8 files changed, 166 insertions(+), 13 deletions(-)
->>  create mode 100644 include/hw/ppc/spapr_irq.h
->>  create mode 100644 hw/ppc/spapr_irq.c
+>>  hw/ppc/spapr_events.c  | 18 ++++++++++----
+>>  hw/ppc/spapr_pci.c     | 19 ++++++++++++---
+>>  hw/ppc/spapr_vio.c     | 10 +++++++-
+>>  5 files changed, 108 insertions(+), 8 deletions(-)
 >>
 >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 49cda04b1493..094c7780130e 100644
+>> index 3388750fc795..6088f44c1b2a 100644
 >> --- a/include/hw/ppc/spapr.h
 >> +++ b/include/hw/ppc/spapr.h
->> @@ -7,6 +7,7 @@
->>  #include "hw/ppc/spapr_drc.h"
->>  #include "hw/mem/pc-dimm.h"
->>  #include "hw/ppc/spapr_ovec.h"
->> +#include "hw/ppc/spapr_irq.h"
+>> @@ -776,6 +776,11 @@ int spapr_irq_alloc(sPAPRMachineState *spapr, int=
+ irq_hint, bool lsi,
+>>                      Error **errp);
+>>  int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi=
+,
+>>                            bool align, Error **errp);
+>> +int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align,
+>> +                   Error **errp);
+>> +#define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false=
+, errp)
+>> +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, int num, bool =
+lsi,
+>> +                    Error **errp);
+>>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+>>  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
 >> =20
->>  struct VIOsPAPRBus;
->>  struct sPAPRPHBState;
->> @@ -164,6 +165,9 @@ struct sPAPRMachineState {
->>      char *kvm_type;
->> =20
->>      const char *icp_type;
->> +    bool xics_legacy;
->> +    int32_t irq_map_nr;
->> +    unsigned long *irq_map;
->> =20
->>      bool cmd_line_caps[SPAPR_CAP_NUM];
->>      sPAPRCapabilities def, eff, mig;
->> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
->> new file mode 100644
->> index 000000000000..07e36d1c7e74
->> --- /dev/null
->> +++ b/include/hw/ppc/spapr_irq.h
->> @@ -0,0 +1,30 @@
->> +/*
->> + * QEMU PowerPC sPAPR IRQ backend definitions
->> + *
->> + * Copyright (c) 2018, IBM Corporation.
->> + *
->> + * This code is licensed under the GPL version 2 or later. See the
->> + * COPYING file in the top-level directory.
->> + */
->> +#ifndef HW_SPAPR_IRQ_H
->> +#define HW_SPAPR_IRQ_H
->> +
->> +/*
->> + * IRQ ranges per type
->=20
-> Well, range offsets actually. Maybe you could document the range size
-> as well for each type.
-
-yes. I am waiting for people to scream : "I want more !"
-
->> + */
->> +#define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
->> +#define SPAPR_IRQ_HOTPLUG    0x1001
->=20
-> This is just 1 irq, ie, range 0x1002-0x103F is unused
->=20
->> +#define SPAPR_IRQ_VIO        0x1040
->=20
-> This is 1 irq per device, hence up to 64 devices
->=20
->> +#define SPAPR_IRQ_PCI_LSI    0x1080
->> +
->=20
-> This is 4 irqs per PHB, hence up to 32 PHBs. Cool, we're currently
-> limited to 31 PHBs.
->=20
->> +#define SPAPR_IRQ_MSI        0x1100  /* Offset of the dynamic range c=
-overed
->=20
-> We only support dynamic MSIs with PCI, maybe rename to SPAPR_IRQ_PCI_MS=
-I ?
-
-hmm, no. We could have CAPI devices there. remember ? ;)
-
->> +                                      * by the bitmap allocator */
->=20
-> The range size is hence 1k (XICS_IRQS_SPAPR) for the time being.
-
-in fact we could this bogus limit and use spapr->irq_map_nr now.
-
->> +
->> +void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_irqs,
->> +                       Error **errp);
->                          ^
->                      missing space
->
->> +int spapr_irq_msi_alloc(sPAPRMachineState *spapr, uint32_t num, bool =
-align,
->> +                        Error **errp);
->> +void spapr_irq_msi_free(sPAPRMachineState *spapr, int irq, uint32_t n=
-um);
->> +void spapr_irq_msi_reset(sPAPRMachineState *spapr);
->> +
->> +#endif
 >> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index c464951747e3..32aa5d869d9c 100644
+>> index f59999daacfc..b1d19b328166 100644
 >> --- a/hw/ppc/spapr.c
 >> +++ b/hw/ppc/spapr.c
->> @@ -187,6 +187,11 @@ static void xics_system_init(MachineState *machin=
-e, int nr_irqs, Error **errp)
->>  {
->>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
->> =20
->> +    /* Initialize the MSI IRQ allocator. */
->> +    if (!spapr->xics_legacy) {
->> +        spapr_irq_msi_init(spapr, nr_irqs, &error_fatal);
->=20
-> The error should be propagated to the caller.
-
-I think the Error is useless here.
-
-
->=20
->> +    }
->> +
->>      if (kvm_enabled()) {
->>          if (machine_kernel_irqchip_allowed(machine) &&
->>              !xics_kvm_init(spapr, errp)) {
->=20
-> And I now realize that the way errors are handled here is badly
-> broken.
->=20
-> In the default case, this function is supposed to try in-kernel XICS
-> first and if it fails, then fallback to userland XICS. But since we
-> pass errp down to xics_kvm_init() and the caller happens to pass
-> &error_fatal, we stop right here instead of trying the fallback.
->=20
-> And if the caller changes to pass a standard &local_err instead,
-> things would be even worse. With the same scenario, QEMU would
-> probably exit if it could fallback to the userland XICS, or abort
-> otherwise because error_set() would be called with an already set
-> *errp.
->=20
-> Since this beha^wug is mine (commit 3d85885a1b1f3), let me fix it
-> first :)
->=20
->> @@ -1629,6 +1634,10 @@ static void spapr_machine_reset(void)
->>          ppc_set_compat(first_ppc_cpu, spapr->max_compat_pvr, &error_f=
-atal);
->>      }
->> =20
->> +    if (!spapr->xics_legacy) {
->> +        spapr_irq_msi_reset(spapr);
->> +    }
->> +
->>      qemu_devices_reset();
->> =20
->>      /* DRC reset may cause a device to be unplugged. This will cause =
-troubles
->> @@ -1903,6 +1912,24 @@ static const VMStateDescription vmstate_spapr_p=
-atb_entry =3D {
->>      },
->>  };
->> =20
->> +static bool spapr_irq_map_needed(void *opaque)
->> +{
->> +    sPAPRMachineState *spapr =3D opaque;
->> +
->> +    return spapr->irq_map && !bitmap_empty(spapr->irq_map, spapr->irq=
-_map_nr);
->=20
-> Maybe check !spapr->xics_legacy as well to preserve backward migration
-> to older machines ?
-
-no need. It is redudant with spapr->irq_map which is not allocated in tha=
-t case.
-
->> +}
->> +
->> +static const VMStateDescription vmstate_spapr_irq_map =3D {
->> +    .name =3D "spapr_irq_map",
->> +    .version_id =3D 1,
->> +    .minimum_version_id =3D 1,
->> +    .needed =3D spapr_irq_map_needed,
->> +    .fields =3D (VMStateField[]) {
->> +        VMSTATE_BITMAP(irq_map, sPAPRMachineState, 0, irq_map_nr),
->> +        VMSTATE_END_OF_LIST()
->> +    },
->> +};
->> +
->>  static const VMStateDescription vmstate_spapr =3D {
->>      .name =3D "spapr",
->>      .version_id =3D 3,
->> @@ -1930,6 +1957,7 @@ static const VMStateDescription vmstate_spapr =3D=
- {
->>          &vmstate_spapr_cap_cfpc,
->>          &vmstate_spapr_cap_sbbc,
->>          &vmstate_spapr_cap_ibs,
->> +        &vmstate_spapr_irq_map,
->>          NULL
->>      }
->>  };
->> @@ -4101,7 +4129,10 @@ DEFINE_SPAPR_MACHINE(3_0, "3.0", true);
->> =20
->>  static void spapr_machine_2_12_instance_options(MachineState *machine=
-)
->>  {
->> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
->> +
->>      spapr_machine_3_0_instance_options(machine);
->> +    spapr->xics_legacy =3D true;
+>> @@ -3810,6 +3810,36 @@ static int ics_find_free_block(ICSState *ics, i=
+nt num, int alignnum)
+>>      return -1;
 >>  }
 >> =20
->>  static void spapr_machine_2_12_class_options(MachineClass *mc)
->> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
->> index 3b6ae7272092..1ef7ce7f1509 100644
->> --- a/hw/ppc/spapr_events.c
->> +++ b/hw/ppc/spapr_events.c
->> @@ -709,7 +709,11 @@ void spapr_events_init(sPAPRMachineState *spapr)
->>  {
->>      int epow_irq;
->> =20
->> -    epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
->> +    if (spapr->xics_legacy) {
->> +        epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
->> +    } else {
->> +        epow_irq =3D SPAPR_IRQ_EPOW;
->> +    }
->> =20
->>      spapr_irq_claim(spapr, epow_irq, 1, false, &error_fatal);
->> =20
->> @@ -731,7 +735,11 @@ void spapr_events_init(sPAPRMachineState *spapr)
->>      if (spapr->use_hotplug_event_source) {
->>          int hp_irq;
->> =20
->> -        hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
->> +        if (spapr->xics_legacy) {
->> +            hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
->> +        } else {
->> +            hp_irq =3D SPAPR_IRQ_HOTPLUG;
->> +        }
->> =20
->>          spapr_irq_claim(spapr, hp_irq, 1, false, &error_fatal);
->> =20
->> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
->> new file mode 100644
->> index 000000000000..55fa764c85d1
->> --- /dev/null
->> +++ b/hw/ppc/spapr_irq.c
->> @@ -0,0 +1,57 @@
->> +/*
->> + * QEMU PowerPC sPAPR IRQ interface
->> + *
->> + * Copyright (c) 2018, IBM Corporation.
->> + *
->> + * This code is licensed under the GPL version 2 or later. See the
->> + * COPYING file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qemu/log.h"
->> +#include "qemu/error-report.h"
->> +#include "qapi/error.h"
->> +#include "hw/ppc/spapr.h"
->> +#include "hw/ppc/xics.h"
->> +
->> +void spapr_irq_msi_init(sPAPRMachineState *spapr, uint32_t nr_irqs,
->> +                        Error **errp)
->=20
-> What's the errp for ? It looks like this function can never return
-> an error. Maybe just drop it.
-
-yes
-
->=20
+>> +int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Err=
+or **errp)
 >> +{
->> +    spapr->irq_map_nr =3D XICS_IRQ_BASE + nr_irqs - SPAPR_IRQ_MSI;
->> +    spapr->irq_map =3D bitmap_new(spapr->irq_map_nr);
->> +}
+>> +    ICSState *ics =3D spapr->ics;
+>> +    int first =3D -1;
 >> +
->> +int spapr_irq_msi_alloc(sPAPRMachineState *spapr, uint32_t num, bool =
-align,
->> +                        Error **errp)
->> +{
->> +    int irq;
+>> +    assert(ics);
 >> +
 >> +    /*
->> +     * The 'align_mask' parameter of bitmap_find_next_zero_area()
->> +     * should be one less than a power of 2; 0 means no
->> +     * alignment. Adapt the 'align' value of the former allocator
->> +     * to fit the requirements of bitmap_find_next_zero_area()
+>> +     * MSIMesage::data is used for storing VIRQ so
+>> +     * it has to be aligned to num to support multiple
+>> +     * MSI vectors. MSI-X is not affected by this.
+>> +     * The hint is used for the first IRQ, the rest should
+>> +     * be allocated continuously.
 >> +     */
->> +    align -=3D 1;
+>> +    if (align) {
+>> +        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+>> +               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+>> +        first =3D ics_find_free_block(ics, num, num);
+>> +    } else {
+>> +        first =3D ics_find_free_block(ics, num, 1);
+>> +    }
 >> +
->> +    irq =3D bitmap_find_next_zero_area(spapr->irq_map, spapr->irq_map=
-_nr, 0, num,
->> +                                     align);
->> +    if (irq =3D=3D spapr->irq_map_nr) {
+>> +    if (first < 0) {
 >> +        error_setg(errp, "can't find a free %d-IRQ block", num);
 >> +        return -1;
 >> +    }
 >> +
->> +    bitmap_set(spapr->irq_map, irq, num);
->> +
->> +    return irq + SPAPR_IRQ_MSI;
+>> +    return first + ics->offset;
 >> +}
 >> +
->> +void spapr_irq_msi_free(sPAPRMachineState *spapr, int irq, uint32_t n=
-um)
+>>  /*
+>>   * Allocate the IRQ number and set the IRQ type, LSI or MSI
+>>   */
+>> @@ -3888,6 +3918,40 @@ int spapr_irq_alloc_block(sPAPRMachineState *sp=
+apr, int num, bool lsi,
+>>      return first;
+>>  }
+>> =20
+>> +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, int num, bool =
+lsi,
+>> +                    Error **errp)
 >> +{
->> +    bitmap_clear(spapr->irq_map, irq - SPAPR_IRQ_MSI, num);
+>> +    ICSState *ics =3D spapr->ics;
+>> +    int i;
+>> +    int srcno =3D irq - ics->offset;
+>> +    int ret =3D 0;
+>> +
+>> +    assert(ics);
+>> +
+>> +    if (!ics_valid_irq(ics, irq) || !ics_valid_irq(ics, irq + num)) {
+>=20
+> I guess it is okay to assume that if the first and last irqs are valid,
+> so are all numbers in between. Shouldn't the second check be against
+> irq + num - 1 though ?
+
+yes. thanks.
+
+> This lacks an error_setg() BTW.
+>=20
+>> +        return -1;
+>> +    }
+>> +
+>> +    for (i =3D srcno; i < srcno + num; ++i) {
+>> +        if (ICS_IRQ_FREE(ics, i)) {
+>> +            spapr_irq_set_lsi(spapr, i + ics->offset, lsi);
+>> +        } else {
+>> +            error_setg(errp, "IRQ %d is not free", i + ics->offset);
+>> +            ret =3D -1;
+>> +            break;
+>> +        }
+>> +    }
+>> +
+>> +    /* we could call spapr_irq_free() when rolling back */
+>> +    if (ret) {
+>> +        while (--i >=3D srcno) {
+>> +            memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
+>> +        }
+>> +    }
+>=20
+> Hmm... I guess we should free the whole range otherwise we leak
+> srcno + num - i irqs, preferably using spapr_irq_free() to match
+> the traces from spapr_irq_alloc().
+
+I don't understand. This is undoing what has been done.=20
+
+> Alternatively, the rollback could be pushed to the callers.
+
+Yes. Today none is done so we might just do nothing about it
+and return an error.
+=20
+> Rest looks good.
+>=20
+>> +
+>> +    return ret;
 >> +}
 >> +
->> +void spapr_irq_msi_reset(sPAPRMachineState *spapr)
->> +{
->> +    bitmap_clear(spapr->irq_map, 0, spapr->irq_map_nr);
->> +}
+>>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
+>>  {
+>>      ICSState *ics =3D spapr->ics;
+>> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+>> index 86836f0626dc..3b6ae7272092 100644
+>> --- a/hw/ppc/spapr_events.c
+>> +++ b/hw/ppc/spapr_events.c
+>> @@ -707,13 +707,18 @@ void spapr_clear_pending_events(sPAPRMachineStat=
+e *spapr)
+>> =20
+>>  void spapr_events_init(sPAPRMachineState *spapr)
+>>  {
+>> +    int epow_irq;
+>> +
+>> +    epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
+>> +
+>> +    spapr_irq_claim(spapr, epow_irq, 1, false, &error_fatal);
+>> +
+>>      QTAILQ_INIT(&spapr->pending_events);
+>> =20
+>>      spapr->event_sources =3D spapr_event_sources_new();
+>> =20
+>>      spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_EP=
+OW,
+>> -                                 spapr_irq_alloc(spapr, 0, false,
+>> -                                                  &error_fatal));
+>> +                                 epow_irq);
+>> =20
+>>      /* NOTE: if machine supports modern/dedicated hotplug event sourc=
+e,
+>>       * we add it to the device-tree unconditionally. This means we ma=
+y
+>> @@ -724,9 +729,14 @@ void spapr_events_init(sPAPRMachineState *spapr)
+>>       * checking that it's enabled.
+>>       */
+>>      if (spapr->use_hotplug_event_source) {
+>> +        int hp_irq;
+>> +
+>> +        hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
+>> +
+>> +        spapr_irq_claim(spapr, hp_irq, 1, false, &error_fatal);
+>> +
+>>          spapr_event_sources_register(spapr->event_sources, EVENT_CLAS=
+S_HOT_PLUG,
+>> -                                     spapr_irq_alloc(spapr, 0, false,
+>> -                                                      &error_fatal));
+>> +                                     hp_irq);
+>>      }
+>> =20
+>>      spapr->epow_notifier.notify =3D spapr_powerdown_req;
 >> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
->> index 7394c62b4a8b..f3c4a25fb482 100644
+>> index f936ce63effa..7394c62b4a8b 100644
 >> --- a/hw/ppc/spapr_pci.c
 >> +++ b/hw/ppc/spapr_pci.c
->> @@ -333,6 +333,9 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, s=
-PAPRMachineState *spapr,
->>              return;
->>          }
->> =20
->> +        if (!spapr->xics_legacy) {
->> +            spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
->> +        }
->>          spapr_irq_free(spapr, msi->first_irq, msi->num);
->=20
-> Shouldn't ^^ be in an else block ?
-
-no. one is for the MSI IRQ allocator, the other for the controller.=20
-
->=20
->>          if (msi_present(pdev)) {
->>              spapr_msi_setmsg(pdev, 0, false, 0, 0);
->> @@ -371,7 +374,13 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, =
+>> @@ -371,8 +371,14 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, =
 sPAPRMachineState *spapr,
 >>      }
 >> =20
 >>      /* Allocate MSIs */
->> -    irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS_=
+>> -    irq =3D spapr_irq_alloc_block(spapr, req_num, false,
+>> -                           ret_intr_type =3D=3D RTAS_TYPE_MSI, &err);
+>> +    irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS_=
 TYPE_MSI, &err);
->> +    if (spapr->xics_legacy) {
->> +        irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D R=
-TAS_TYPE_MSI,
->> +                             &err);
->> +    } else {
->> +        irq =3D spapr_irq_msi_alloc(spapr, req_num,
->> +                                  ret_intr_type =3D=3D RTAS_TYPE_MSI,=
- &err);
+>> +    if (err) {
+>> +        error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+>> +                          config_addr);
+>> +        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+>> +        return;
 >> +    }
+>> +    spapr_irq_claim(spapr, irq, req_num, false, &err);
 >>      if (err) {
 >>          error_reportf_err(err, "Can't allocate MSIs for device %x: ",
 >>                            config_addr);
->> @@ -388,6 +397,9 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, s=
-PAPRMachineState *spapr,
->> =20
->>      /* Release previous MSIs */
->>      if (msi) {
->> +        if (!spapr->xics_legacy) {
->> +            spapr_irq_msi_free(spapr, msi->first_irq, msi->num);
->> +        }
->>          spapr_irq_free(spapr, msi->first_irq, msi->num);
->>          g_hash_table_remove(phb->msi, &config_addr);
->>      }
->> @@ -1704,11 +1716,15 @@ static void spapr_phb_realize(DeviceState *dev=
-, Error **errp)
+>> @@ -1698,7 +1704,14 @@ static void spapr_phb_realize(DeviceState *dev,=
+ Error **errp)
 >>          uint32_t irq;
 >>          Error *local_err =3D NULL;
 >> =20
->> -        irq =3D spapr_irq_findone(spapr, &local_err);
->> -        if (local_err) {
->> -            error_propagate(errp, local_err);
->> -            error_prepend(errp, "can't allocate LSIs: ");
->> -            return;
->> +        if (spapr->xics_legacy) {
->> +            irq =3D spapr_irq_findone(spapr, &local_err);
->> +            if (local_err) {
->> +                error_propagate(errp, local_err);
->> +                error_prepend(errp, "can't allocate LSIs: ");
->> +                return;
->> +            }
->> +        } else {
->> +            irq =3D SPAPR_IRQ_PCI_LSI + sphb->index * PCI_NUM_PINS + =
-i;
->>          }
->> =20
->>          spapr_irq_claim(spapr, irq, 1, true, &local_err);
+>> -        irq =3D spapr_irq_alloc_block(spapr, 1, true, false, &local_e=
+rr);
+>> +        irq =3D spapr_irq_findone(spapr, &local_err);
+>> +        if (local_err) {
+>> +            error_propagate(errp, local_err);
+>> +            error_prepend(errp, "can't allocate LSIs: ");
+>> +            return;
+>> +        }
+>> +
+>> +        spapr_irq_claim(spapr, irq, 1, true, &local_err);
+>>          if (local_err) {
+>>              error_propagate(errp, local_err);
+>>              error_prepend(errp, "can't allocate LSIs: ");
 >> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
->> index ad9b56e28447..7707bda6a38d 100644
+>> index 4555c648a8e2..ad9b56e28447 100644
 >> --- a/hw/ppc/spapr_vio.c
 >> +++ b/hw/ppc/spapr_vio.c
->> @@ -436,6 +436,9 @@ static void spapr_vio_busdev_reset(DeviceState *qd=
-ev)
+>> @@ -475,7 +475,15 @@ static void spapr_vio_busdev_realize(DeviceState =
+*qdev, Error **errp)
+>>          dev->qdev.id =3D id;
 >>      }
->>  }
 >> =20
->> +/* TODO : poor VIO device indexing ... */
->> +static uint32_t vio_index;
+>> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err);
+>> +    if (!dev->irq) {
+>> +        dev->irq =3D spapr_irq_findone(spapr, &local_err);
+>> +        if (local_err) {
+>> +            error_propagate(errp, local_err);
+>> +            return;
+>> +        }
+>> +    }
 >> +
->>  static void spapr_vio_busdev_realize(DeviceState *qdev, Error **errp)
->>  {
->>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->> @@ -476,10 +479,14 @@ static void spapr_vio_busdev_realize(DeviceState=
- *qdev, Error **errp)
->>      }
->> =20
->>      if (!dev->irq) {
->> -        dev->irq =3D spapr_irq_findone(spapr, &local_err);
->> -        if (local_err) {
->> -            error_propagate(errp, local_err);
->> -            return;
->> +        if (spapr->xics_legacy) {
->> +            dev->irq =3D spapr_irq_findone(spapr, &local_err);
->> +            if (local_err) {
->> +                error_propagate(errp, local_err);
->> +                return;
->> +            }
->> +        } else {
->> +            dev->irq =3D SPAPR_IRQ_VIO + vio_index++;
->=20
-> This can overlap the next range if we have more than 64 VIO devices...
-
-yes. but claim() should fail.
-
-Thanks,
-
-C.
-
->>          }
->>      }
->> =20
->> diff --git a/hw/ppc/Makefile.objs b/hw/ppc/Makefile.objs
->> index 86d82a6ec3ac..4fe3b7804d43 100644
->> --- a/hw/ppc/Makefile.objs
->> +++ b/hw/ppc/Makefile.objs
->> @@ -4,7 +4,7 @@ obj-y +=3D ppc.o ppc_booke.o fdt.o
->>  obj-$(CONFIG_PSERIES) +=3D spapr.o spapr_caps.o spapr_vio.o spapr_eve=
-nts.o
->>  obj-$(CONFIG_PSERIES) +=3D spapr_hcall.o spapr_iommu.o spapr_rtas.o
->>  obj-$(CONFIG_PSERIES) +=3D spapr_pci.o spapr_rtc.o spapr_drc.o spapr_=
-rng.o
->> -obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o
->> +obj-$(CONFIG_PSERIES) +=3D spapr_cpu_core.o spapr_ovec.o spapr_irq.o
->>  # IBM PowerNV
->>  obj-$(CONFIG_POWERNV) +=3D pnv.o pnv_xscom.o pnv_core.o pnv_lpc.o pnv=
-_psi.o pnv_occ.o pnv_bmc.o
->>  ifeq ($(CONFIG_PCI)$(CONFIG_PSERIES)$(CONFIG_LINUX), yyy)
+>> +    spapr_irq_claim(spapr, dev->irq, 1, false, &local_err);
+>>      if (local_err) {
+>>          error_propagate(errp, local_err);
+>>          return;
 >=20
