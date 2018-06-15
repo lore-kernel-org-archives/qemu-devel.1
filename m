@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fTl94-0002NV-Ke
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:35:51 -0400
+	(envelope-from <berrange@redhat.com>) id 1fTlFG-0004Fi-DF
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:42:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fTl90-000513-Kr
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:35:50 -0400
-Date: Fri, 15 Jun 2018 11:35:37 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180614124306.GD19339@umbus.fritz.box>
-Message-ID: <alpine.BSF.2.21.1806151131500.89745@zero.eik.bme.hu>
-References: <cover.1528935420.git.balaton@eik.bme.hu>
-	<79692361d82a4d0b1f9c36b0d988369062351f00.1528935420.git.balaton@eik.bme.hu>
-	<20180614013612.GF3042@umbus.fritz.box>
-	<alpine.BSF.2.21.1806141001260.19899@zero.eik.bme.hu>
-	<20180614124306.GD19339@umbus.fritz.box>
+	(envelope-from <berrange@redhat.com>) id 1fTlFD-0008Ey-8b
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:42:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42324 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fTlFD-0008ET-4b
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:42:11 -0400
+Date: Fri, 15 Jun 2018 10:42:07 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180615094207.GK31552@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180615044042.7928-1-tamiko@43-1.org>
+	<20180615044042.7928-2-tamiko@43-1.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v3 9/9] target/ppc: Add missing opcode for
- icbt on PPC440
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180615044042.7928-2-tamiko@43-1.org>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] Partially revert commit d4e5ec877ca
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Matthias Maier <tamiko@43-1.org>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
 
-On Thu, 14 Jun 2018, David Gibson wrote:
-> On Thu, Jun 14, 2018 at 10:03:41AM +0200, BALATON Zoltan wrote:
->> On Thu, 14 Jun 2018, David Gibson wrote:
->>> On Thu, Jun 14, 2018 at 02:17:00AM +0200, BALATON Zoltan wrote:
->>
->> Maybe amend commit message like this:
->>
->> According to PPC440 User Manual
->
-> On which page?  Where can I get that manual?
+On Thu, Jun 14, 2018 at 11:40:41PM -0500, Matthias Maier wrote:
+> This commit removes the PYTHON_UTF8 workaround. The problem with setting
+> 
+>   LC_ALL= LANG=C LC_CTYPE=en_US.UTF-8
+> 
+> is that the en_US.UTF-8 locale might not be available. In this case
 
-By searching for "PPC440 User Manual"? The one I've found had an opcode 
-table at the end in an appendix but I've seen one guest using this machine 
-code and get invalid instruction on QEMU while apparently it works on real 
-hardware (but I can't test that myself as I don't have real hardware).
+What platform are you using where  UTF8 locale is not available ?
+
+Indeed I would ideally like to make the entire of QEMU build with an
+explicit en_US.UTF-8 or C.UTF-8 locale, to ensure that we get reliably
+reproducible builds, as locale differences have been known to impact
+output of many tools not just python.
 
 Regards,
-BALATON Zoltan
-
->>>> PPC440 has two opcodes for icbt, add the missing one.
->>
->> If you can do this when committing then please feel free to adjust this
->> commit message as necessary, otherwise I'll change it in next iteration.
->>
->> Regards,
->> BALATON Zoltan
->>
->>> A document reference to confim this would be nice.
->>>
->>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>>> ---
->>>>  target/ppc/translate.c | 2 ++
->>>>  1 file changed, 2 insertions(+)
->>>>
->>>> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
->>>> index 5fe1ba6..3a215a1 100644
->>>> --- a/target/ppc/translate.c
->>>> +++ b/target/ppc/translate.c
->>>> @@ -6707,6 +6707,8 @@ GEN_HANDLER_E(mbar, 0x1F, 0x16, 0x1a, 0x001FF801,
->>>>  GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x03FFF801, PPC_BOOKE),
->>>>  GEN_HANDLER2_E(icbt_440, "icbt", 0x1F, 0x16, 0x00, 0x03E00001,
->>>>                 PPC_BOOKE, PPC2_BOOKE206),
->>>> +GEN_HANDLER2(icbt_440, "icbt", 0x1F, 0x06, 0x08, 0x03E00001,
->>>> +               PPC_440_SPEC),
->>>>  GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
->>>>  GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
->>>>  GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
->>>
->>>
->>
->
->
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
