@@ -1,48 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1fTocF-0004g2-0r
+	(envelope-from <groug@kaod.org>) id 1fTocI-0004i1-En
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:18:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1fTocB-0004bA-HD
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:18:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43072)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1fTocB-0004Wk-8e
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:18:07 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5FDEDFg035484
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 09:17:49 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jmbh5q0de-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 09:17:49 -0400
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Fri, 15 Jun 2018 14:17:44 +0100
-References: <cover.1528832686.git.alifm@linux.ibm.com>
-	<dd7e90c5b3de6f98218908c7f57d9d0286089ad5.1528832686.git.alifm@linux.ibm.com>
-	<20180613093700.GG27901@redhat.com>
-	<7b51465a-b7c1-58ec-1ef6-9fe791e96bbf@linux.ibm.com>
-	<20180613150512.GA19901@redhat.com>
-	<5833f4ec-dcd1-19ac-2848-facf31aec7cf@linux.ibm.com>
-	<20180614082155.GI6355@redhat.com>
-	<79597909-fdb5-2983-19ac-74332229c8ef@linux.ibm.com>
-	<20180614151048.GA18967@redhat.com>
-	<28dca328-6920-91a1-0962-b336a3ffcb5b@linux.ibm.com>
-From: Viktor VM Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Fri, 15 Jun 2018 15:17:39 +0200
+	(envelope-from <groug@kaod.org>) id 1fTocD-0004bo-Nt
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:18:14 -0400
+Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:44153)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fTocD-0004bP-E3
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 09:18:09 -0400
+Received: from player763.ha.ovh.net (unknown [10.109.108.45])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id D1D71B6B46
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 15:18:07 +0200 (CEST)
+Date: Fri, 15 Jun 2018 15:14:53 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180615151453.535f507e@bahia.lan>
+In-Reply-To: <20180615115303.31125-2-clg@kaod.org>
+References: <20180615115303.31125-1-clg@kaod.org>
+	<20180615115303.31125-2-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <28dca328-6920-91a1-0962-b336a3ffcb5b@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Message-Id: <921fea52-8e68-57d3-154d-26cf063a164a@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v1 1/1] virtio-crypto: Allow disabling of
- cipher algorithms for virtio-crypto device
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/3] spapr: split the IRQ
+ allocation sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -51,216 +31,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.ibm.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>, qemu-devel@nongnu.org, frankja@linux.ibm.com, mst@redhat.com, borntraeger@de.ibm.com, arei.gonglei@huawei.com, longpeng2@huawei.com, mjrosato@linux.vnet.ibm.com
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 14.06.2018 18:12, Farhan Ali wrote:
->=20
->=20
-> On 06/14/2018 11:10 AM, Daniel P. Berrang=C3=A9 wrote:
->> On Thu, Jun 14, 2018 at 10:50:40AM -0400, Farhan Ali wrote:
->>>
->>>
->>> On 06/14/2018 04:21 AM, Daniel P. Berrang=C3=A9 wrote:
->>>> On Wed, Jun 13, 2018 at 07:28:08PM +0200, Halil Pasic wrote:
->>>>>
->>>>>
->>>>> On 06/13/2018 05:05 PM, Daniel P. Berrang=C3=A9 wrote:
->>>>>> On Wed, Jun 13, 2018 at 11:01:05AM -0400, Farhan Ali wrote:
->>>>>>> Hi Daniel
->>>>>>>
->>>>>>> On 06/13/2018 05:37 AM, Daniel P. Berrang=C3=A9 wrote:
->>>>>>>> On Tue, Jun 12, 2018 at 03:48:34PM -0400, Farhan Ali wrote:
->>>>>>>>> The virtio-crypto driver currently propagates to the guest
->>>>>>>>> all the cipher algorithms that the backend cryptodev can
->>>>>>>>> support. But in certain cases where the guest has more
->>>>>>>>> performant mechanism to handle some algorithms, it would be
->>>>>>>>> useful to propagate only a subset of the algorithms.
->>>>>>>>
->>>>>>>> I'm not really convinced by this.
->>>>>>>>
->>>>>>>> The performance of crypto algorithms has many influencing
->>>>>>>> factors, making it pretty hard to decide which is best
->>>>>>>> without actively testing specific impls and comparing
->>>>>>>> them in a manner which matches the application usage
->>>>>>>> pattern. eg in theory the kernel crypto impl of an alg
->>>>>>>> is faster than a userspace impl, if the kernel uses
->>>>>>>> hardware accel and userspace does not. This, however,
->>>>>>>> ignores the overhead of the kernel/userspace switch.
->>>>>>>> The real world performance winner, thus depends on the
->>>>>>>> amount of data being processed in each operation. Some
->>>>>>>> times userspace can win & sometimes kernel space can
->>>>>>>> win. This is even more relevant to virtio-crypto as
->>>>>>>> it has more expensive context switches.
->>>>>>>
->>>>>>> True. But what if the guest can perform some crypto algorithms
->>>>>>> without a
->>>>>>> incurring a VM exit? For example in s390 we have the cpacf
->>>>>>> instructions to
->>>>>>> perform crypto and this instruction is implemented for us by our
->>>>>>> hardware
->>>>>>> virtualization technology. In such a case it would be better not
->>>>>>> to use
->>>>>>> virtio-crypto's implementation of such a crypto algorithm.
->>>>>>>
->>>>>>> At the same time we would like to take advantage of virtio-crypto=
-'s
->>>>>>> acceleration capabilities for certain crypto algorithms for which
->>>>>>> there is
->>>>>>> no hardware assistance.
->>>>>>
->>>>>> IIUC, the kernel's crypto layer can support multiple
->>>>>> implementations of
->>>>>> any algorithm. Providers can report a priority against
->>>>>> implementations
->>>>>> which influences which impl is used in practice. So if there's a
->>>>>> native
->>>>>> instruction for a partiuclar algorithm I would expect the impl
->>>>>> registered
->>>>>> for that to be designated higher priority than other impls, so
->>>>>> that it is
->>>>>> used in preference to other impls.
->>>>>>
->>>>>
->>>>> AFAIR the problem here is that in (the guest) kernel the virtio-cry=
-pto
->>>>> driver has to register it's crypto algo implementations with a
->>>>> priority
->>>>> (single number), which dictates if it's going to be the preferred
->>>>> (used)
->>>>> implementation of the algorithm or not. The virtio-crypto driver
->>>>> does this
->>>>> without having information about the (comparative or absolute)
->>>>> performance
->>>>> of it's implementation (which depends on the backend among others).
->>>>> I don't think
->>>>> any dynamic re-prioritization of the algorithms takes place (e.g.
->>>>> based on how these
->>>>> perform in for the given configuration).
->>>>>
->>>>> I think the strategy of the virtio-crypto is to rather overstate, t=
-han
->>>>> understate the performance of it's implementation. If we were to 'b=
-e
->>>>> conservative' and say, 'hey we don't know nothing about the
->>>>> performance,
->>>>> let's make it lowest priority implementation' the implementations
->>>>> provided
->>>>> by virtio-crypto would end up being used only if there is no other
->>>>> implementation. And that does not sound like a good idea either.
->>>>
->>>>
->>>> This problem you describe, however, is something that applies to *an=
-y*
->>>> kerenl code that is registering a crypto algo impl for accelerator
->>>> hardware. A non-virtualized crypto cards in bare metal likewise cann=
-ot
->>>> assume that its AES impl is better then the host CPU's=C2=A0 aes-ni
->>>> instruction.
->>>>
->>>>> So the idea is to give the user the power to effectively not provid=
-e
->>>>> an algorithm via virtio-crypto. That is, if the user observes a
->>>>> performance
->>>>> degradation because of virtio-crypto, he can turn off the bad
->>>>> algorithms
->>>>> at the device. That way overstatement becomes a much smaller proble=
-m.
->>>>> The user can turn off the bad algorithms for reasons other than
->>>>> performance
->>>>> too.
->>>>>
->>>>> Of course there are other ways to deal with the problem of
->>>>> virtio-crypto
->>>>> driver not knowing how good it's implementation of a given algo is.=
- We
->>>>> could make the in kernel crypto priorities dynamically adjustable
->>>>> in general
->>>>> or we could provide the user with means to specify the priorities
->>>>> (e.g.
->>>>> as module parameter) with which the virtio-crypto driver registers
->>>>> each algo.
->>>>> Both of these would be knobs in the guest. It's hard to tell if
->>>>> these first
->>>>> one would be useful in scenarios not involving virtualization. Same
->>>>> goes
->>>>> for some kind of dynamic priority management for crypto algorithm
->>>>> implementations
->>>>> in the Linux kernel. I assume the people involved with the respecti=
-ve
->>>>> subsystem do not see the necessity for something like that.
->>>>
->>>> It still feels like this is a problem for the guest OS to solve. If =
-you
->>>> put a physical crypto accelerator in a bare metal machine, that has =
-the
->>>> same problem you describe here, so the kernel surely already needs
->>>> to find
->>>> a viable solution for this problem.
->>>>
->>>
->>> How would the guest OS know which algo is better? As you mentioned it
->>> does
->>> depend on few factors and the best the kernel can do is use some sort=
- of
->>> heuristics. Such a solution might not be very dynamic and might not
->>> work for
->>> all the cases for a user.
->>
->> Which is better will likely depend on the application using it. One mi=
-ght
->> be better for use by the kernel, while another is better for use by a
->> userspace application, or two userspace apps might have different
->> preferences.
->>
->>> Shouldn't we use virtualization to give us the flexibility that we do=
-n't
->>> have with physical crypto accelerator? The crypto accelerator might
->>> not know
->>> if it's implementation is any better, but the user can experiment and
->>> see
->>> what works better.
->>
->> It is better to provide it all to the guest and let the guest decide
->> which
->> is best to use.=C2=A0 If nothing else the virtio-crypto kernel module =
-itself
->> can have module parameters to control the priority it gives to each
->> algorithm, or can avoid registering certain algorithms.=C2=A0 Doing it=
- guest
->> side is more flexible, because realistically many virt host deployment=
-s
->> will never give the guest admin ability to control this from the host
->> side, so a guest kernel config ability will be the only thing availabl=
-e.
->>
->=20
-> I am not sure if putting all that complexity on the guest OS is the
-> right approach. I thought it would be better to let the user decide
-> through device definition what algorithms should be available to the
-> guest. But I am open to other approaches and suggestion :)
->=20
-> I would like to know if Arei or Longpeng(Mike) has any suggestion
-> regarding this?
->=20
-> Thanks
-> Farhan
->=20
+On Fri, 15 Jun 2018 13:53:01 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-With the current virtio-crypto backend functionality offered (CBC AES
-only) it may seem a bit over-engineered to offer a configuration option
-to remove the only supported algorithm...
+> Today, when a device requests for IRQ number in a sPAPR machine, the
+> spapr_irq_alloc() routine first scans the ICSState status array to
+> find an empty slot and then performs the assignement of the selected
+> numbers. Split this sequence in two distinct routines : spapr_irq_find()
+> for lookups and spapr_irq_claim() for claiming the IRQ numbers.
+>=20
+> This will ease the introduction of a static layout of IRQ numbers.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  include/hw/ppc/spapr.h |  5 ++++
+>  hw/ppc/spapr.c         | 64 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  hw/ppc/spapr_events.c  | 18 ++++++++++----
+>  hw/ppc/spapr_pci.c     | 19 ++++++++++++---
+>  hw/ppc/spapr_vio.c     | 10 +++++++-
+>  5 files changed, 108 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 3388750fc795..6088f44c1b2a 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -776,6 +776,11 @@ int spapr_irq_alloc(sPAPRMachineState *spapr, int ir=
+q_hint, bool lsi,
+>                      Error **errp);
+>  int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
+>                            bool align, Error **errp);
+> +int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align,
+> +                   Error **errp);
+> +#define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false, e=
+rrp)
+> +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, int num, bool lsi,
+> +                    Error **errp);
+>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+>  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+> =20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index f59999daacfc..b1d19b328166 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3810,6 +3810,36 @@ static int ics_find_free_block(ICSState *ics, int =
+num, int alignnum)
+>      return -1;
+>  }
+> =20
+> +int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Error =
+**errp)
+> +{
+> +    ICSState *ics =3D spapr->ics;
+> +    int first =3D -1;
+> +
+> +    assert(ics);
+> +
+> +    /*
+> +     * MSIMesage::data is used for storing VIRQ so
+> +     * it has to be aligned to num to support multiple
+> +     * MSI vectors. MSI-X is not affected by this.
+> +     * The hint is used for the first IRQ, the rest should
+> +     * be allocated continuously.
+> +     */
+> +    if (align) {
+> +        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+> +               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+> +        first =3D ics_find_free_block(ics, num, num);
+> +    } else {
+> +        first =3D ics_find_free_block(ics, num, 1);
+> +    }
+> +
+> +    if (first < 0) {
+> +        error_setg(errp, "can't find a free %d-IRQ block", num);
+> +        return -1;
+> +    }
+> +
+> +    return first + ics->offset;
+> +}
+> +
+>  /*
+>   * Allocate the IRQ number and set the IRQ type, LSI or MSI
+>   */
+> @@ -3888,6 +3918,40 @@ int spapr_irq_alloc_block(sPAPRMachineState *spapr=
+, int num, bool lsi,
+>      return first;
+>  }
+> =20
+> +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, int num, bool lsi,
+> +                    Error **errp)
+> +{
+> +    ICSState *ics =3D spapr->ics;
+> +    int i;
+> +    int srcno =3D irq - ics->offset;
+> +    int ret =3D 0;
+> +
+> +    assert(ics);
+> +
+> +    if (!ics_valid_irq(ics, irq) || !ics_valid_irq(ics, irq + num)) {
 
-What I could imagine to be useful though, would be to allow the backend
-to advertise its capabilities to the guest virtio-crypto device, so that
-the guest driver can register the algorithms supported dynamically.
-Currently, the algorithms are hard-coded on both sides which makes it a
-bit hard to extend the backends to support new algorithms (or write new
-backends if so desired).
+I guess it is okay to assume that if the first and last irqs are valid,
+so are all numbers in between. Shouldn't the second check be against
+irq + num - 1 though ?
 
-Whether the backend itself was configurable would be of less importance
-then (but still could make sense).
+This lacks an error_setg() BTW.
 
---=20
-Regards,
-  Viktor Mihajlovski
+> +        return -1;
+> +    }
+> +
+> +    for (i =3D srcno; i < srcno + num; ++i) {
+> +        if (ICS_IRQ_FREE(ics, i)) {
+> +            spapr_irq_set_lsi(spapr, i + ics->offset, lsi);
+> +        } else {
+> +            error_setg(errp, "IRQ %d is not free", i + ics->offset);
+> +            ret =3D -1;
+> +            break;
+> +        }
+> +    }
+> +
+> +    /* we could call spapr_irq_free() when rolling back */
+> +    if (ret) {
+> +        while (--i >=3D srcno) {
+> +            memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
+> +        }
+> +    }
+
+Hmm... I guess we should free the whole range otherwise we leak
+srcno + num - i irqs, preferably using spapr_irq_free() to match
+the traces from spapr_irq_alloc().
+
+Alternatively, the rollback could be pushed to the callers.
+
+Rest looks good.
+
+> +
+> +    return ret;
+> +}
+> +
+>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
+>  {
+>      ICSState *ics =3D spapr->ics;
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 86836f0626dc..3b6ae7272092 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -707,13 +707,18 @@ void spapr_clear_pending_events(sPAPRMachineState *=
+spapr)
+> =20
+>  void spapr_events_init(sPAPRMachineState *spapr)
+>  {
+> +    int epow_irq;
+> +
+> +    epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
+> +
+> +    spapr_irq_claim(spapr, epow_irq, 1, false, &error_fatal);
+> +
+>      QTAILQ_INIT(&spapr->pending_events);
+> =20
+>      spapr->event_sources =3D spapr_event_sources_new();
+> =20
+>      spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_EPOW,
+> -                                 spapr_irq_alloc(spapr, 0, false,
+> -                                                  &error_fatal));
+> +                                 epow_irq);
+> =20
+>      /* NOTE: if machine supports modern/dedicated hotplug event source,
+>       * we add it to the device-tree unconditionally. This means we may
+> @@ -724,9 +729,14 @@ void spapr_events_init(sPAPRMachineState *spapr)
+>       * checking that it's enabled.
+>       */
+>      if (spapr->use_hotplug_event_source) {
+> +        int hp_irq;
+> +
+> +        hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
+> +
+> +        spapr_irq_claim(spapr, hp_irq, 1, false, &error_fatal);
+> +
+>          spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_H=
+OT_PLUG,
+> -                                     spapr_irq_alloc(spapr, 0, false,
+> -                                                      &error_fatal));
+> +                                     hp_irq);
+>      }
+> =20
+>      spapr->epow_notifier.notify =3D spapr_powerdown_req;
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index f936ce63effa..7394c62b4a8b 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -371,8 +371,14 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPA=
+PRMachineState *spapr,
+>      }
+> =20
+>      /* Allocate MSIs */
+> -    irq =3D spapr_irq_alloc_block(spapr, req_num, false,
+> -                           ret_intr_type =3D=3D RTAS_TYPE_MSI, &err);
+> +    irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS_TYP=
+E_MSI, &err);
+> +    if (err) {
+> +        error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+> +                          config_addr);
+> +        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+> +        return;
+> +    }
+> +    spapr_irq_claim(spapr, irq, req_num, false, &err);
+>      if (err) {
+>          error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+>                            config_addr);
+> @@ -1698,7 +1704,14 @@ static void spapr_phb_realize(DeviceState *dev, Er=
+ror **errp)
+>          uint32_t irq;
+>          Error *local_err =3D NULL;
+> =20
+> -        irq =3D spapr_irq_alloc_block(spapr, 1, true, false, &local_err);
+> +        irq =3D spapr_irq_findone(spapr, &local_err);
+> +        if (local_err) {
+> +            error_propagate(errp, local_err);
+> +            error_prepend(errp, "can't allocate LSIs: ");
+> +            return;
+> +        }
+> +
+> +        spapr_irq_claim(spapr, irq, 1, true, &local_err);
+>          if (local_err) {
+>              error_propagate(errp, local_err);
+>              error_prepend(errp, "can't allocate LSIs: ");
+> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+> index 4555c648a8e2..ad9b56e28447 100644
+> --- a/hw/ppc/spapr_vio.c
+> +++ b/hw/ppc/spapr_vio.c
+> @@ -475,7 +475,15 @@ static void spapr_vio_busdev_realize(DeviceState *qd=
+ev, Error **errp)
+>          dev->qdev.id =3D id;
+>      }
+> =20
+> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err);
+> +    if (!dev->irq) {
+> +        dev->irq =3D spapr_irq_findone(spapr, &local_err);
+> +        if (local_err) {
+> +            error_propagate(errp, local_err);
+> +            return;
+> +        }
+> +    }
+> +
+> +    spapr_irq_claim(spapr, dev->irq, 1, false, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return;
