@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fTpfU-0001bS-Ay
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:37 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fTpfV-0001cp-JV
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fTpfT-0006DC-7K
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:36 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42766)
+	(envelope-from <pm215@archaic.org.uk>) id 1fTpfT-0006Dx-So
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:37 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42762)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fTpfS-0006Bk-Un
+	id 1fTpfT-00065w-LI
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:35 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fTpfL-0003d8-Pz
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:25:27 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fTpfK-0003cB-Ch
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:25:26 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Jun 2018 15:24:45 +0100
-Message-Id: <20180615142521.19143-8-peter.maydell@linaro.org>
+Date: Fri, 15 Jun 2018 15:24:43 +0100
+Message-Id: <20180615142521.19143-6-peter.maydell@linaro.org>
 In-Reply-To: <20180615142521.19143-1-peter.maydell@linaro.org>
 References: <20180615142521.19143-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/43] hw/input/pckbd: Convert away from old_mmio
+Subject: [Qemu-devel] [PULL 05/43] hw/block/pflash_cfi02: Convert away from
+ old_mmio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +33,141 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Convert the pckbd device away from using the old_mmio field
-of MemoryRegionOps. This change only affects the memory-mapped
-variant of the i8042, which is used by the Unicore32 'puv3'
-board and the MIPS Jazz boards 'magnum' and 'pica61'.
+Convert the pflash_cfi02 device away from using the old_mmio field
+of MemoryRegionOps.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20180601141223.26630-6-peter.maydell@linaro.org
+Acked-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20180601141223.26630-4-peter.maydell@linaro.org
 ---
- hw/input/pckbd.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ hw/block/pflash_cfi02.c | 97 ++++++++---------------------------------
+ 1 file changed, 18 insertions(+), 79 deletions(-)
 
-diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
-index f17f18e51b3..f33e3fc63d6 100644
---- a/hw/input/pckbd.c
-+++ b/hw/input/pckbd.c
-@@ -434,7 +434,7 @@ static const VMStateDescription vmstate_kbd = {
- };
- 
- /* Memory mapped interface */
--static uint32_t kbd_mm_readb (void *opaque, hwaddr addr)
-+static uint64_t kbd_mm_readfn(void *opaque, hwaddr addr, unsigned size)
- {
-     KBDState *s = opaque;
- 
-@@ -444,7 +444,8 @@ static uint32_t kbd_mm_readb (void *opaque, hwaddr addr)
-         return kbd_read_data(s, 0, 1) & 0xff;
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index a8b3f7f9780..6c18e5e5786 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -493,102 +493,41 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
+     pfl->cmd = 0;
  }
  
--static void kbd_mm_writeb (void *opaque, hwaddr addr, uint32_t value)
-+static void kbd_mm_writefn(void *opaque, hwaddr addr,
-+                           uint64_t value, unsigned size)
+-
+-static uint32_t pflash_readb_be(void *opaque, hwaddr addr)
++static uint64_t pflash_be_readfn(void *opaque, hwaddr addr, unsigned size)
  {
-     KBDState *s = opaque;
- 
-@@ -454,12 +455,13 @@ static void kbd_mm_writeb (void *opaque, hwaddr addr, uint32_t value)
-         kbd_write_data(s, 0, value & 0xff, 1);
+-    return pflash_read(opaque, addr, 1, 1);
++    return pflash_read(opaque, addr, size, 1);
  }
  
-+
- static const MemoryRegionOps i8042_mmio_ops = {
-+    .read = kbd_mm_readfn,
-+    .write = kbd_mm_writefn,
+-static uint32_t pflash_readb_le(void *opaque, hwaddr addr)
++static void pflash_be_writefn(void *opaque, hwaddr addr,
++                              uint64_t value, unsigned size)
+ {
+-    return pflash_read(opaque, addr, 1, 0);
++    pflash_write(opaque, addr, value, size, 1);
+ }
+ 
+-static uint32_t pflash_readw_be(void *opaque, hwaddr addr)
++static uint64_t pflash_le_readfn(void *opaque, hwaddr addr, unsigned size)
+ {
+-    pflash_t *pfl = opaque;
+-
+-    return pflash_read(pfl, addr, 2, 1);
++    return pflash_read(opaque, addr, size, 0);
+ }
+ 
+-static uint32_t pflash_readw_le(void *opaque, hwaddr addr)
++static void pflash_le_writefn(void *opaque, hwaddr addr,
++                              uint64_t value, unsigned size)
+ {
+-    pflash_t *pfl = opaque;
+-
+-    return pflash_read(pfl, addr, 2, 0);
+-}
+-
+-static uint32_t pflash_readl_be(void *opaque, hwaddr addr)
+-{
+-    pflash_t *pfl = opaque;
+-
+-    return pflash_read(pfl, addr, 4, 1);
+-}
+-
+-static uint32_t pflash_readl_le(void *opaque, hwaddr addr)
+-{
+-    pflash_t *pfl = opaque;
+-
+-    return pflash_read(pfl, addr, 4, 0);
+-}
+-
+-static void pflash_writeb_be(void *opaque, hwaddr addr,
+-                             uint32_t value)
+-{
+-    pflash_write(opaque, addr, value, 1, 1);
+-}
+-
+-static void pflash_writeb_le(void *opaque, hwaddr addr,
+-                             uint32_t value)
+-{
+-    pflash_write(opaque, addr, value, 1, 0);
+-}
+-
+-static void pflash_writew_be(void *opaque, hwaddr addr,
+-                             uint32_t value)
+-{
+-    pflash_t *pfl = opaque;
+-
+-    pflash_write(pfl, addr, value, 2, 1);
+-}
+-
+-static void pflash_writew_le(void *opaque, hwaddr addr,
+-                             uint32_t value)
+-{
+-    pflash_t *pfl = opaque;
+-
+-    pflash_write(pfl, addr, value, 2, 0);
+-}
+-
+-static void pflash_writel_be(void *opaque, hwaddr addr,
+-                             uint32_t value)
+-{
+-    pflash_t *pfl = opaque;
+-
+-    pflash_write(pfl, addr, value, 4, 1);
+-}
+-
+-static void pflash_writel_le(void *opaque, hwaddr addr,
+-                             uint32_t value)
+-{
+-    pflash_t *pfl = opaque;
+-
+-    pflash_write(pfl, addr, value, 4, 0);
++    pflash_write(opaque, addr, value, size, 0);
+ }
+ 
+ static const MemoryRegionOps pflash_cfi02_ops_be = {
+-    .old_mmio = {
+-        .read = { pflash_readb_be, pflash_readw_be, pflash_readl_be, },
+-        .write = { pflash_writeb_be, pflash_writew_be, pflash_writel_be, },
+-    },
++    .read = pflash_be_readfn,
++    .write = pflash_be_writefn,
 +    .valid.min_access_size = 1,
 +    .valid.max_access_size = 4,
      .endianness = DEVICE_NATIVE_ENDIAN,
--    .old_mmio = {
--        .read = { kbd_mm_readb, kbd_mm_readb, kbd_mm_readb },
--        .write = { kbd_mm_writeb, kbd_mm_writeb, kbd_mm_writeb },
--    },
  };
  
- void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
+ static const MemoryRegionOps pflash_cfi02_ops_le = {
+-    .old_mmio = {
+-        .read = { pflash_readb_le, pflash_readw_le, pflash_readl_le, },
+-        .write = { pflash_writeb_le, pflash_writew_le, pflash_writel_le, },
+-    },
++    .read = pflash_le_readfn,
++    .write = pflash_le_writefn,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 4,
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
+ 
 -- 
 2.17.1
