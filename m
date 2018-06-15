@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fTmrN-0008GT-Hu
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:25:42 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fTmwZ-0004gf-EO
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:31:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fTmrL-00011q-RA
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:25:41 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Fri, 15 Jun 2018 13:25:00 +0200
-Message-Id: <20180615112500.19854-13-david@redhat.com>
-In-Reply-To: <20180615112500.19854-1-david@redhat.com>
-References: <20180615112500.19854-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 12/12] pc-dimm: get_memory_region() will not
- fail after realize
+	(envelope-from <dgilbert@redhat.com>) id 1fTmwV-0002kL-Sx
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:31:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39106 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fTmwV-0002jz-OO
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:30:59 -0400
+Date: Fri, 15 Jun 2018 12:30:54 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180615113054.GD13796@work-vm>
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180604095520.8563-4-xiaoguangrong@tencent.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180604095520.8563-4-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH 03/12] migration: fix counting xbzrle
+ cache_miss_rate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,121 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, peterx@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Let's try to reduce error handling a bit. In the plug/unplug case, the
-device was realized and therefore we can assume that getting access to
-the memory region will not fail.
+* guangrong.xiao@gmail.com (guangrong.xiao@gmail.com) wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> 
+> Sync up xbzrle_cache_miss_prev only after migration iteration goes
+> forward
+> 
+> Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-For get_vmstate_memory_region() this is already handled that way.
-Document both cases.
+This patch (not the whole set) queued
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/i386/pc.c             |  7 +------
- hw/mem/pc-dimm.c         |  7 +------
- hw/ppc/spapr.c           | 12 ++----------
- include/hw/mem/pc-dimm.h |  6 ++++--
- 4 files changed, 8 insertions(+), 24 deletions(-)
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2db032a6df..f310040351 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1706,15 +1706,10 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
-     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *mr;
-+    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
-     uint64_t align = TARGET_PAGE_SIZE;
-     bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
- 
--    mr = ddc->get_memory_region(dimm, &local_err);
--    if (local_err) {
--        goto out;
--    }
--
-     if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
-         align = memory_region_get_alignment(mr);
-     }
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 4ff39b59ef..65843bc52a 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -37,15 +37,10 @@ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
-                                                               &error_abort);
-+    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
-     Error *local_err = NULL;
--    MemoryRegion *mr;
-     uint64_t addr;
- 
--    mr = ddc->get_memory_region(dimm, &local_err);
--    if (local_err) {
--        goto out;
--    }
--
-     addr = object_property_get_uint(OBJECT(dimm),
-                                     PC_DIMM_ADDR_PROP, &local_err);
-     if (local_err) {
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 3e5320020f..6934abc21e 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3142,14 +3142,10 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     sPAPRMachineState *ms = SPAPR_MACHINE(hotplug_dev);
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *mr;
-+    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
-     uint64_t align, size, addr;
-     uint32_t node;
- 
--    mr = ddc->get_memory_region(dimm, &local_err);
--    if (local_err) {
--        goto out;
--    }
-     align = memory_region_get_alignment(mr);
-     size = memory_region_size(mr);
- 
-@@ -3340,16 +3336,12 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
-     Error *local_err = NULL;
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *mr;
-+    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
-     uint32_t nr_lmbs;
-     uint64_t size, addr_start, addr;
-     int i;
-     sPAPRDRConnector *drc;
- 
--    mr = ddc->get_memory_region(dimm, &local_err);
--    if (local_err) {
--        goto out;
--    }
-     size = memory_region_size(mr);
-     nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
- 
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index 5679a80465..26ebb7d5e9 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -62,9 +62,11 @@ typedef struct PCDIMMDevice {
-  * @realize: called after common dimm is realized so that the dimm based
-  * devices get the chance to do specified operations.
-  * @get_memory_region: returns #MemoryRegion associated with @dimm which
-- * is directly mapped into the physical address space of guest.
-+ * is directly mapped into the physical address space of guest. Will not
-+ * fail after the device was realized.
-  * @get_vmstate_memory_region: returns #MemoryRegion which indicates the
-- * memory of @dimm should be kept during live migration.
-+ * memory of @dimm should be kept during live migration. Will not fail
-+ * after the device was realized.
-  */
- typedef struct PCDIMMDeviceClass {
-     /* private */
--- 
-2.17.1
+> ---
+>  migration/ram.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index dbf24d8c87..dd1283dd45 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1189,9 +1189,9 @@ static void migration_bitmap_sync(RAMState *rs)
+>                     (double)(xbzrle_counters.cache_miss -
+>                              rs->xbzrle_cache_miss_prev) /
+>                     (rs->iterations - rs->iterations_prev);
+> +                rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
+>              }
+>              rs->iterations_prev = rs->iterations;
+> -            rs->xbzrle_cache_miss_prev = xbzrle_counters.cache_miss;
+>          }
+>  
+>          /* reset period counters */
+> -- 
+> 2.14.4
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
