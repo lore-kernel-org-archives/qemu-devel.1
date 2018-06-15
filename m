@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fTezh-0000d4-I4
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:48 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fTezk-0000dk-Ta
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fTezd-0002WW-4s
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:45 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fTezi-0002d1-JX
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51934 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fTezi-0002ci-ER
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:46 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 15 Jun 2018 11:01:21 +0800
-Message-Id: <1529031683-27458-3-git-send-email-jasowang@redhat.com>
+Date: Fri, 15 Jun 2018 11:01:22 +0800
+Message-Id: <1529031683-27458-4-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1529031683-27458-1-git-send-email-jasowang@redhat.com>
 References: <1529031683-27458-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 2/4] net: Fix a potential segfault
+Subject: [Qemu-devel] [PULL 3/4] e1000e: Do not auto-clear ICR bits which
+ aren't set in EIAC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,46 +25,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: Lin Ma <lma@suse.com>, qemu-stable@nongnu.org, Jason Wang <jasowang@redhat.com>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>
 
-From: Lin Ma <lma@suse.com>
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-If user forgets to provide any backend types for '-netdev' in qemu CLI,
-It triggers seg fault.
+The spec does not justify clearing of any E1000_ICR_OTHER_CAUSES when
+E1000_ICR_OTHER is set in EIAC. In fact, removing this code fixes the
+issue the Linux driver runs into since 4aea7a5c5e94 ("e1000e: Avoid
+receiver overrun interrupt bursts") and was worked around by
+745d0bd3af99 ("e1000e: Remove Other from EIAC").
 
-e.g.
-
-Expected:
-$ qemu -netdev id=net0
-qemu-system-x86_64: Parameter 'type' is missing
-
-Actual:
-$ qemu -netdev id=net0
-Segmentation fault (core dumped)
-
-Fixes: 547203ead4327 ("net: List available netdevs with "-netdev help")
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Lin Ma <lma@suse.com>
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/net.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/net/e1000e_core.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/net/net.c b/net/net.c
-index efb9eaf..2a31339 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1093,7 +1093,9 @@ static int net_client_init(QemuOpts *opts, bool is_netdev, Error **errp)
-     int ret = -1;
-     Visitor *v = opts_visitor_new(opts);
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index c93c466..9504891 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -2022,10 +2022,6 @@ e1000e_msix_notify_one(E1000ECore *core, uint32_t cause, uint32_t int_cfg)
  
--    if (is_netdev && is_help_option(qemu_opt_get(opts, "type"))) {
-+    const char *type = qemu_opt_get(opts, "type");
-+
-+    if (is_netdev && type && is_help_option(type)) {
-         show_netdevs();
-         exit(0);
-     } else {
+     effective_eiac = core->mac[EIAC] & cause;
+ 
+-    if (effective_eiac == E1000_ICR_OTHER) {
+-        effective_eiac |= E1000_ICR_OTHER_CAUSES;
+-    }
+-
+     core->mac[ICR] &= ~effective_eiac;
+ 
+     if (!(core->mac[CTRL_EXT] & E1000_CTRL_EXT_IAME)) {
 -- 
 2.7.4
