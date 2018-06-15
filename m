@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fTsYI-0004v9-LY
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:30:23 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fTscP-00076w-FM
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:34:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fTsYF-0001NP-DN
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:30:22 -0400
-Date: Fri, 15 Jun 2018 18:30:13 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180615173013.GH12972@stefanha-x1.localdomain>
-References: <1528859749-25286-1-git-send-email-baiyaowei@cmss.chinamobile.com>
-	<20180613035030.GB25430@flamenco>
-	<23a38716-196f-53a0-0a3d-61f269b1dab4@redhat.com>
-	<20180613141510.GA672@byw>
+	(envelope-from <Babu.Moger@amd.com>) id 1fTscM-00056L-6j
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:34:37 -0400
+Received: from mail-sn1nam01on0055.outbound.protection.outlook.com
+	([104.47.32.55]:21067
+	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fTscL-00055f-U5
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 13:34:34 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Fri, 15 Jun 2018 17:34:30 +0000
+Message-ID: <DM5PR12MB2471CC9A8FE01A13F4DD03B0957C0@DM5PR12MB2471.namprd12.prod.outlook.com>
+References: <1529082947-60001-1-git-send-email-babu.moger@amd.com>
+	<1529082947-60001-2-git-send-email-babu.moger@amd.com>
+In-Reply-To: <1529082947-60001-2-git-send-email-babu.moger@amd.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cW+P/jduATWpL925"
-Content-Disposition: inline
-In-Reply-To: <20180613141510.GA672@byw>
-Subject: Re: [Qemu-devel] [PATCH] tracing.txt: add missing '-' for trace
- option
+Subject: Re: [Qemu-devel] [PATCH v15 1/3] i386: Fix up the Node id for
+ CPUID_8000_001E
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +31,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
-Cc: Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, qemu-trivial@nongnu.org, mjt@tls.msk.ru, laurent@vivier.eu, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: "Moger, Babu" <Babu.Moger@amd.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>
 
 
---cW+P/jduATWpL925
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 13, 2018 at 10:15:10AM -0400, Yaowei Bai wrote:
-> On Wed, Jun 13, 2018 at 06:27:49AM -0500, Eric Blake wrote:
-> > On 06/12/2018 10:50 PM, Emilio G. Cota wrote:
-> > >On Tue, Jun 12, 2018 at 23:15:49 -0400, Yaowei Bai wrote:
-> > >>Signed-off-by: Yaowei Bai <baiyaowei@cmss.chinamobile.com>
-> > >>---
-> > >>  docs/devel/tracing.txt | 2 +-
-> > >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >>
-> > >>diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
-> > >>index 07abbb3..6ab32cc 100644
-> > >>--- a/docs/devel/tracing.txt
-> > >>+++ b/docs/devel/tracing.txt
-> > >>@@ -18,7 +18,7 @@ for debugging, profiling, and observing execution.
-> > >>  3. Run the virtual machine to produce a trace file:
-> > >>-    qemu -trace events=3D/tmp/events ... # your normal QEMU invocati=
-on
-> > >>+    qemu --trace events=3D/tmp/events ... # your normal QEMU invocat=
-ion
-> > >
-> > >The second dash is not missing; both '-args' and '--args' work.
-> > >
-> > >'-args' seems to be favoured though; see `qemu -h' or `qemu --h' :-)
-> >=20
-> > Actually, we're trying to fix that:
-> > https://wiki.qemu.org/BiteSizedTasks#Consistent_option_usage_in_documen=
-tation
-> >=20
-> > The one-vs-two dash usage is only supported in qemu, not in qemu-nbd
-> > or qemu-img (that is, qemu acts as if it uses getopt_long_only(),
-> > while the others use getopt_long() - except that we hand-rolled the
-> > parser in qemu, meaning you might find quirks where it sometimes
-> > doesn't even match getopt_long_only()).
-> >=20
-> > At any rate, since --trace is an option that is supported across
-> > multiple binaries, we SHOULD favor the double-dash spelling in our
-> > documentation, so that you can consistently reuse the same --trace
-> > invocation without worrying whether the binary parses its arguments
+> -----Original Message-----
+> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org]
+> On Behalf Of Babu Moger
+> Sent: Friday, June 15, 2018 12:16 PM
+> To: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
+> rth@twiddle.net; ehabkost@redhat.com
+> Cc: qemu-devel@nongnu.org; mtosatti@redhat.com; kvm@vger.kernel.org;
+> kash@tripleback.net; geoff@hostfission.com; Moger, Babu
+> <Babu.Moger@amd.com>
+> Subject: [PATCH v15 1/3] i386: Fix up the Node id for CPUID_8000_001E
 >=20
-> Yes, this patch is inspired by this situation when translating DPRINT into
-> trace for a new qemu utility (much like qemu-nbd) following docs/devel/tr=
-acing.txt.
-> The utility complains it don't support -trace option. So i sent this
-> patch after confirming this with qemu-nbd,qemu-io utilities.
+> This is part of topoext support. To keep the compatibility, we need
+> to support all the combination of nr_cores and nr_threads currently
+> supported. With this combination, we might end up with more nodes than
+> we can support with real hardware. We need to fix up the node id to
+> accommodate more nodes here. We can achieve this by shifting the bits.
 >=20
-> > with getopt_long() (where double is required) or like
-> > getopt_long_only() (where the double is optional but supported).
-> >=20
-> > So I'm in favor of this patch, although it may need more of a commit
-> > message summarizing the justification I've just pointed you to.
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  target/i386/cpu.c | 23 ++++++++++++++++++++++-
+>  1 file changed, 22 insertions(+), 1 deletion(-)
 >=20
-> Thanks for your nice explaination. If this patch could be merged i will
-> send V2 with a commit message.
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 7a4484b..5246be4 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -19,6 +19,7 @@
+>=20
+>  #include "qemu/osdep.h"
+>  #include "qemu/cutils.h"
+> +#include "qemu/bitops.h"
+>=20
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+> @@ -472,6 +473,8 @@ static void encode_topo_cpuid8000001e(CPUState
+> *cs, X86CPU *cpu,
+>                                         uint32_t *ecx, uint32_t *edx)
+>  {
+>      struct core_topology topo =3D {0};
+> +    unsigned long nodes;
+> +    int shift;
+>=20
+>      build_core_topology(cs->nr_cores, cpu->core_id, &topo);
+>      *eax =3D cpu->apic_id;
+> @@ -504,7 +507,25 @@ static void encode_topo_cpuid8000001e(CPUState
+> *cs, X86CPU *cpu,
+>       *         2  Socket id
+>       *       1:0  Node id
+>       */
+> -    *ecx =3D ((topo.num_nodes - 1) << 8) | (cpu->socket_id << 2) |
+> topo.node_id;
+> +    if (topo.num_nodes <=3D 4) {
+> +        *ecx =3D ((topo.num_nodes - 1) << 8) | (cpu->socket_id << 2) |
+> +                topo.node_id;
+> +    } else {
+> +        /*
+> +         * Node id fix up. Actual hardware supports up to 4 nodes. But w=
+ith
+> +         * more than 32 cores, we may end up with more than 4 nodes.
+> +         * Node id is a combination of socket id and node id. Only requi=
+rement
+> +         * here is that this number should be unique accross the system.
+> +         * Shift the socket id to accommodate more nodes. We dont expect
+> both
+> +         * socket id and node id to be big number at the same time. This=
+ is not
+> +         * an ideal config but we need to to support it. Max bit we can =
+have
+> +         * here is 8.
+> +         */
+> +        nodes =3D topo.num_nodes - 1;
+> +        shift =3D find_last_bit(&nodes, 8);
+> +        *ecx =3D ((topo.num_nodes - 1) << 8) | (cpu->socket_id << shift)=
+ |
 
-Please update the remaining occurrences of the -trace option syntax in
-v2:
+Sorry. There is a bug here.  This should be (cpu->socket_id << (shift + 1) =
+). I will fix it.  Let me know the rest of the code.
 
-  $ git grep -- -trace docs/devel/tracing.txt
 
-Stefan
-
---cW+P/jduATWpL925
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbI/elAAoJEJykq7OBq3PIDEcH/3tjlc9aVPiS7+IQoouv1ytk
-bEDQFIeW6fp2RJy4l+e4k9M95cjeVu0t3tl3j1mxy7hYny75sZFoXGUcIkwGx2Dp
-jz+VZDc3iAFSOtITib9gTzPquyh8m8jCKXo8k0ZUsuW5jQmqB+heY4+C7eFdNqOp
-CqlmH2JF20bH0fymLSg+1Vr0z4FS6SBVmbDQCd2mP5tXAfJph7dAJaiGtTDUT08s
-l5z0uM5MVmk3anBWs0e7BK5yxNXUBTP3sLWadVbcNfmK9uRZxU8DXzVELqHWiY5J
-Ra1y1MLLurX9fzNe4AICwn/5uyR6FuahznxtUpziSfl0VMoFOwXvqpxIT223i78=
-=ygn1
------END PGP SIGNATURE-----
-
---cW+P/jduATWpL925--
+> +                topo.node_id;
+> +    }
+>      *edx =3D 0;
+>  }
+>=20
+> --
+> 1.8.3.1
