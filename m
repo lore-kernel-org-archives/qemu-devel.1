@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTepg-0006Rd-7p
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 22:51:25 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fTer5-00077k-Km
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 22:52:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fTepd-0007C7-4H
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 22:51:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47234)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fTepc-0007Aw-RP
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 22:51:21 -0400
-Date: Thu, 14 Jun 2018 23:50:56 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180615025056.GB7451@localhost.localdomain>
-References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
-	<20180604042928-mutt-send-email-mst@kernel.org>
-	<23040757-b561-e0bf-a41d-38d3c44555ee@gmail.com>
-	<20180605072746.v6xxabsbewiuw7ka@sirius.home.kraxel.org>
-	<20180605084300.GF32286@redhat.com>
-	<20180613180508.GD24764@localhost.localdomain>
-	<20180614080948.GF6355@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fTer4-0000zI-Io
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 22:52:51 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180611141716.3813-1-peter.maydell@linaro.org>
+	<650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
+	<CAFEAcA-vZH0KUxi+iYP3eYzXeHxNTotNwCMhEPcGhOLksbG71A@mail.gmail.com>
+	<f9beda14-7c4a-8f89-baf1-5a79e847c4ac@redhat.com>
+	<CAFEAcA_egToeW7ksTncbFCsW6uTh1FcPSgW6gx+VnjvQpqwWsw@mail.gmail.com>
+	<ba6b4e80-c31a-6033-ea59-b4c4f1923be7@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8e29cd6e-6c54-30a2-a397-dbbacf343f0c@amsat.org>
+Date: Thu, 14 Jun 2018 23:52:34 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180614080948.GF6355@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC] hw/pc: set q35 as the default x86
- machine
+In-Reply-To: <ba6b4e80-c31a-6033-ea59-b4c4f1923be7@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
+ for multiline comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +33,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, libvir-list@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, Jun 14, 2018 at 09:09:48AM +0100, Daniel P. Berrang=E9 wrote:
-> On Wed, Jun 13, 2018 at 03:05:08PM -0300, Eduardo Habkost wrote:
-> > Getting back to this discussion:
-> >=20
-> > On Tue, Jun 05, 2018 at 09:43:00AM +0100, Daniel P. Berrang=E9 wrote:
-> > > On Tue, Jun 05, 2018 at 09:27:46AM +0200, Gerd Hoffmann wrote:
-> > > >   Hi,
-> > > >=20
-> > > > > >   Add to that shortcuts like -cdrom
-> > > > > > stop working,
-> > > > >=20
-> > > > > Maybe is fixable.
-> > > >=20
-> > > > Already fixed for ages.
-> > > >=20
-> > > > > I see marking Q35 as the default machine a first step.
-> > > >=20
-> > > > Maybe the better option is to go the arm route:  Just don't defin=
-e a
-> > > > default, so users have to specify pc or q35.  That will make them=
- notice
-> > > > there is a world beside 'pc', and we also avoid breaking things
-> > > > silently.
-> > >=20
-> > > If QEMU removes the default, then libvirt will have to hardcode
-> > > 'pc' as the default to maintain back compatibility, so I don't
-> > > think that ends up as a net win
-> >=20
-> > I believe there's consensus that applications blindly relying on
-> > the default machine-type when creating a domain is a bad idea.
-> >=20
-> > That said, can we deprecate this feature in libvirt, encourage
-> > applications to always specify an explicit machine-type, thus
-> > making it possible to deprecate the i440fx machine-types one day?
->=20
-> Well from libvirt's POV this scenario arrives if a mgmt app simply omit=
-s
-> the relevant element/attribute from the XML config. Deprecating somethi=
-ng
-> implies that in future we'd drop support for it, but we're never going
-> to make this mandatory in libvirt as that would be a regression in
-> behaviour from libvirt's POV. So I don't think it is something we would
-> deprecate.
+On 06/14/2018 05:11 PM, John Snow wrote:
+> On 06/14/2018 06:46 AM, Peter Maydell wrote:
+>> On 13 June 2018 at 17:55, John Snow <jsnow@redhat.com> wrote:
+>>> The same reasoning could be used to justify
+>>>
+>>> /* two
+>>>  * lines */
+>>>
+>>> as it's ... actually just two lines. I think people don't seem to like
+>>> this much either (why? does it look 'naked' on the end?)
+>>
+>> I dislike the way it breaks up the line of stars. For me it is the
+>> /*
+>>  *
+>>  */
+>> shape that defines a multiline comment, and where exactly the text is
+>> on the RHS of it is not important to my sense of visual neatness :-)
+>>
+> 
+> Yours does look an awful lot more symmetrical once you remove the text,
+> yeah.
+> 
+> *cough* I hate the way it looks too, but C99 comments have a few things
+> going for them:
+> 
+> // A multi-line comment block like this has no extra lines and every
+> // line in the comment is prefaced individually which aids grep
+> // readability, while maintained good vertical symmetry.
+> 
+> I think we hate C99 comments, though? Certainly we don't use them at all
+> right now, so it's not a good fit.
+> 
+>>> It would only begin to matter terribly much if we actually decided we
+>>> wanted to do a doxygen-style doc generation for our internal APIs for
+>>> compatibility with, say, fancier IDEs than vim/emacs.
+>>
+>> We ought to do that at some point -- I had some prototype patches
+>> for it. Doc-comment comments always start /** on a line of its own,
+>> though.
+>>
+> 
+> I'd love this! I love vim/emacs, but my usage of it is not wizard-tier
+> and in the past when working on large C++ projects I have benefited from
+> the magical refactoring click-buttons, tool-tips and etc. These
+> operations are infrequent enough that I believe it's reasonable to not
+> know how to do them in traditional CLI editors. If we want to lure in
+> new contributors, maybe this could sweeten the pot a bit?
+> 
+> Rigorous, mechanically verifiable function documentation is quite nice
+> to have in these cases. It'd be nice in general, really. It would go a
+> long way to help us attract less "hardcore" developers implementing
+> devices and features for QEMU without such a steep onboarding curve.
+> 
+> Do you have a proposed standard / do we have some consensus on which
+> generator tool or doc format we'd most like to see in QEMU? I could put
+> in some elbow grease to shine up the block layer if so...
+> 
+>>> As it stands, we're pretty inconsistent about which exact style we apply
+>>> when we "document" internal functions -- sometimes we document the
+>>> header, sometimes the implementation, sometimes both (but differently!)
+>>> and always with different styles all over the place. That's the real
+>>> problem, IMO.
+>>
+>> IMHO -- global functions should always be documented in the header
+>> with the prototype, and any new global function should get a
+>> doc comment (I require this for code I review...) I should be able
+>> to read about the API your code exposes to the rest of QEMU purely
+>> by looking at your headers.
+>>
+> 
+> This makes sense, though the way C code is laid out makes it unfortunate
+> you don't get to see the same comment right beside the implementation if
+> that's what you're working on -- but I suppose this is why we have tabs,
+> multi-monitors and IDEs with tooltips.
 
-Does libvirt really have an option, here?  I'm sure that sooner
-or later somebody will distribute QEMU binaries without "pc".
-
-
-> I'm happy to see an update to the XML docs to strongly recommend that
-> apps always provide a machine type though. Many will likely already be
-> doing so with aarch64 to get the "virt" machine type anyway, since the
-> default libvirt picks is often not suitable.
-
-Well, if you don't want to explicitly remove the default-is-pc
-feature from libvirt, strongly recommending against it (and
-letting people know that it may stop working in the future) might
-be enough.
-
---=20
-Eduardo
+Thanks to tabs we don't need multi-monitors of 1600+ resolution to fit
+80 chars per line.
