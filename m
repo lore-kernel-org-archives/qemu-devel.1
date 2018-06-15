@@ -1,30 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fTer5-00077k-Km
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 22:52:52 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fTezX-0000Ws-BT
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fTer4-0000zI-Io
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 22:52:51 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180611141716.3813-1-peter.maydell@linaro.org>
-	<650048df-f4b1-b351-f877-be8c84197ba2@linaro.org>
-	<CAFEAcA-vZH0KUxi+iYP3eYzXeHxNTotNwCMhEPcGhOLksbG71A@mail.gmail.com>
-	<f9beda14-7c4a-8f89-baf1-5a79e847c4ac@redhat.com>
-	<CAFEAcA_egToeW7ksTncbFCsW6uTh1FcPSgW6gx+VnjvQpqwWsw@mail.gmail.com>
-	<ba6b4e80-c31a-6033-ea59-b4c4f1923be7@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8e29cd6e-6c54-30a2-a397-dbbacf343f0c@amsat.org>
-Date: Thu, 14 Jun 2018 23:52:34 -0300
-MIME-Version: 1.0
-In-Reply-To: <ba6b4e80-c31a-6033-ea59-b4c4f1923be7@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] CODING_STYLE: Define our preferred form
- for multiline comments
+	(envelope-from <jasowang@redhat.com>) id 1fTezS-0002Ir-W9
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36736 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fTezS-0002Hr-RD
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 23:01:30 -0400
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 15 Jun 2018 11:01:19 +0800
+Message-Id: <1529031683-27458-1-git-send-email-jasowang@redhat.com>
+Subject: [Qemu-devel] [PULL 0/4] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +21,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>, "patches@linaro.org" <patches@linaro.org>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: Jason Wang <jasowang@redhat.com>
 
-On 06/14/2018 05:11 PM, John Snow wrote:
-> On 06/14/2018 06:46 AM, Peter Maydell wrote:
->> On 13 June 2018 at 17:55, John Snow <jsnow@redhat.com> wrote:
->>> The same reasoning could be used to justify
->>>
->>> /* two
->>>  * lines */
->>>
->>> as it's ... actually just two lines. I think people don't seem to like
->>> this much either (why? does it look 'naked' on the end?)
->>
->> I dislike the way it breaks up the line of stars. For me it is the
->> /*
->>  *
->>  */
->> shape that defines a multiline comment, and where exactly the text is
->> on the RHS of it is not important to my sense of visual neatness :-)
->>
-> 
-> Yours does look an awful lot more symmetrical once you remove the text,
-> yeah.
-> 
-> *cough* I hate the way it looks too, but C99 comments have a few things
-> going for them:
-> 
-> // A multi-line comment block like this has no extra lines and every
-> // line in the comment is prefaced individually which aids grep
-> // readability, while maintained good vertical symmetry.
-> 
-> I think we hate C99 comments, though? Certainly we don't use them at all
-> right now, so it's not a good fit.
-> 
->>> It would only begin to matter terribly much if we actually decided we
->>> wanted to do a doxygen-style doc generation for our internal APIs for
->>> compatibility with, say, fancier IDEs than vim/emacs.
->>
->> We ought to do that at some point -- I had some prototype patches
->> for it. Doc-comment comments always start /** on a line of its own,
->> though.
->>
-> 
-> I'd love this! I love vim/emacs, but my usage of it is not wizard-tier
-> and in the past when working on large C++ projects I have benefited from
-> the magical refactoring click-buttons, tool-tips and etc. These
-> operations are infrequent enough that I believe it's reasonable to not
-> know how to do them in traditional CLI editors. If we want to lure in
-> new contributors, maybe this could sweeten the pot a bit?
-> 
-> Rigorous, mechanically verifiable function documentation is quite nice
-> to have in these cases. It'd be nice in general, really. It would go a
-> long way to help us attract less "hardcore" developers implementing
-> devices and features for QEMU without such a steep onboarding curve.
-> 
-> Do you have a proposed standard / do we have some consensus on which
-> generator tool or doc format we'd most like to see in QEMU? I could put
-> in some elbow grease to shine up the block layer if so...
-> 
->>> As it stands, we're pretty inconsistent about which exact style we apply
->>> when we "document" internal functions -- sometimes we document the
->>> header, sometimes the implementation, sometimes both (but differently!)
->>> and always with different styles all over the place. That's the real
->>> problem, IMO.
->>
->> IMHO -- global functions should always be documented in the header
->> with the prototype, and any new global function should get a
->> doc comment (I require this for code I review...) I should be able
->> to read about the API your code exposes to the rest of QEMU purely
->> by looking at your headers.
->>
-> 
-> This makes sense, though the way C code is laid out makes it unfortunate
-> you don't get to see the same comment right beside the implementation if
-> that's what you're working on -- but I suppose this is why we have tabs,
-> multi-monitors and IDEs with tooltips.
+The following changes since commit 409c241f887a38bb7a2ac12e34d3a8d73922a9a5:
 
-Thanks to tabs we don't need multi-monitors of 1600+ resolution to fit
-80 chars per line.
+  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20180614-pull-request' into staging (2018-06-14 14:04:14 +0100)
+
+are available in the git repository at:
+
+  https://github.com/jasowang/qemu.git tags/net-pull-request
+
+for you to fetch changes up to c67daf4a24442d1bb404a11a6a54dc45ea10f234:
+
+  vhost-user: delete net client if necessary (2018-06-15 10:39:53 +0800)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+Brijesh Singh (1):
+      tap: set vhostfd passed from qemu cli to non-blocking
+
+Jan Kiszka (1):
+      e1000e: Do not auto-clear ICR bits which aren't set in EIAC
+
+Lin Ma (1):
+      net: Fix a potential segfault
+
+linzhecheng (1):
+      vhost-user: delete net client if necessary
+
+ hw/net/e1000e_core.c | 4 ----
+ net/net.c            | 4 +++-
+ net/tap.c            | 2 ++
+ net/vhost-user.c     | 3 +++
+ 4 files changed, 8 insertions(+), 5 deletions(-)
