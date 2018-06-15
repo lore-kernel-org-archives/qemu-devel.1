@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48254)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fTl88-0001jv-91
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:34:53 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fTl94-0002NV-Ke
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:35:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fTl84-0004Z3-Aq
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:34:52 -0400
-Date: Fri, 15 Jun 2018 11:34:40 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180615113440.56844675@redhat.com>
-In-Reply-To: <569f9534-162c-29c1-a097-51427e028b4e@redhat.com>
-References: <20180611121655.19616-1-david@redhat.com>
-	<20180611121655.19616-11-david@redhat.com>
-	<20180613151056.6ebbccc2@redhat.com>
-	<569f9534-162c-29c1-a097-51427e028b4e@redhat.com>
+	(envelope-from <balaton@eik.bme.hu>) id 1fTl90-000513-Kr
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 05:35:50 -0400
+Date: Fri, 15 Jun 2018 11:35:37 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20180614124306.GD19339@umbus.fritz.box>
+Message-ID: <alpine.BSF.2.21.1806151131500.89745@zero.eik.bme.hu>
+References: <cover.1528935420.git.balaton@eik.bme.hu>
+	<79692361d82a4d0b1f9c36b0d988369062351f00.1528935420.git.balaton@eik.bme.hu>
+	<20180614013612.GF3042@umbus.fritz.box>
+	<alpine.BSF.2.21.1806141001260.19899@zero.eik.bme.hu>
+	<20180614124306.GD19339@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 10/11] pc-dimm: introduce and use
- pc_dimm_memory_pre_plug()
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v3 9/9] target/ppc: Add missing opcode for
+ icbt on PPC440
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,101 +26,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
-	. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
-On Wed, 13 Jun 2018 16:15:48 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Thu, 14 Jun 2018, David Gibson wrote:
+> On Thu, Jun 14, 2018 at 10:03:41AM +0200, BALATON Zoltan wrote:
+>> On Thu, 14 Jun 2018, David Gibson wrote:
+>>> On Thu, Jun 14, 2018 at 02:17:00AM +0200, BALATON Zoltan wrote:
+>>
+>> Maybe amend commit message like this:
+>>
+>> According to PPC440 User Manual
+>
+> On which page?  Where can I get that manual?
 
-> On 13.06.2018 15:10, Igor Mammedov wrote:
-> > On Mon, 11 Jun 2018 14:16:54 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> We'll be factoring out some pc-dimm specific and some memory-device
-> >> checks next.
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  hw/i386/pc.c             | 2 ++
-> >>  hw/mem/pc-dimm.c         | 5 +++++
-> >>  hw/ppc/spapr.c           | 1 +
-> >>  include/hw/mem/pc-dimm.h | 2 ++
-> >>  4 files changed, 10 insertions(+)
-> >>
-> >> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> >> index 017396fe84..dc8e7b033b 100644
-> >> --- a/hw/i386/pc.c
-> >> +++ b/hw/i386/pc.c
-> >> @@ -1695,6 +1695,8 @@ static void pc_dimm_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,  
-> > keeping                              ^^^^^
-> > similar to newly introduced pc_dimm_memory_pre_plug()
-> > and I have no clue what to suggest as alternative  
-> 
-> Can you elaborate?
+By searching for "PPC440 User Manual"? The one I've found had an opcode 
+table at the end in an appendix but I've seen one guest using this machine 
+code and get invalid instruction on QEMU while apparently it works on real 
+hardware (but I can't test that myself as I don't have real hardware).
 
-It's just that pc_dimm_pre_plug and pc_dimm_memory_pre_plug
-are very similar so it become confusing and with name alone
-you can't figure if both do the same or different things.
+Regards,
+BALATON Zoltan
 
-Looking at 11/11 maybe you could just drop this and the next
-patch for now as there isn't obvious (if any) demand for it
-within this series at all.
-And introduce similar patch when it's actually required.
-
-I might imagine following naming in future:
-
-   pc_dimm_pre_plug()
-       memory_device_pre_plug()
-       ... some pc-dimm only stuff ...
-
-   virtio_mem_pre_plug()
-       memory_device_pre_plug()
-       ... some virtio-mem only stuff ...
-
-> In pc.c we now have:
-> - static void pc_dimm_plug()
-> - static void pc_dimm_unplug_request()
-> - static void pc_dimm_unplug()
-> 
-> And I add
-> - static void pc_dimm_pre_plug()
-> 
-> I am sticking to the existing naming scheme.
-> 
-> (maybe the problem is that PC_DIMM should never have been named PC_DIMM
-> but simply DIMM, then the "pc_" prefix would be unique)
-Agreed,
-but now type name is part of interface so we are stuck with it.
-
-
-> >>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
-> >>          return;
-> >>      }
-> >> +
-> >> +    pc_dimm_memory_pre_plug(dev, MACHINE(hotplug_dev), errp);
-> >>  }
-> >>  
-> >>  static void pc_dimm_plug(HotplugHandler *hotplug_dev,
-> >> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> >> index bc79dd04d8..995ce22d8d 100644
-> >> --- a/hw/mem/pc-dimm.c
-> >> +++ b/hw/mem/pc-dimm.c
-> >> @@ -27,6 +27,11 @@
-> >>  #include "sysemu/numa.h"
-> >>  #include "trace.h"
-> >>  
-> >> +void pc_dimm_memory_pre_plug(DeviceState *dev, MachineState *machine,
-> >> +                             Error **errp)
-> >> +{
-> >> +}  
-> > why introducing shim without anything?  
-> 
-> Because you requested for review to split things up :)
-> 
-> I can easily squash this.
-> 
-> > I'd just merge it with following patch and clarify (in commit message)
-> > why the rest of pre_plug code isn't moved here as well.  
-> 
-> 
+>>>> PPC440 has two opcodes for icbt, add the missing one.
+>>
+>> If you can do this when committing then please feel free to adjust this
+>> commit message as necessary, otherwise I'll change it in next iteration.
+>>
+>> Regards,
+>> BALATON Zoltan
+>>
+>>> A document reference to confim this would be nice.
+>>>
+>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>>> ---
+>>>>  target/ppc/translate.c | 2 ++
+>>>>  1 file changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+>>>> index 5fe1ba6..3a215a1 100644
+>>>> --- a/target/ppc/translate.c
+>>>> +++ b/target/ppc/translate.c
+>>>> @@ -6707,6 +6707,8 @@ GEN_HANDLER_E(mbar, 0x1F, 0x16, 0x1a, 0x001FF801,
+>>>>  GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x03FFF801, PPC_BOOKE),
+>>>>  GEN_HANDLER2_E(icbt_440, "icbt", 0x1F, 0x16, 0x00, 0x03E00001,
+>>>>                 PPC_BOOKE, PPC2_BOOKE206),
+>>>> +GEN_HANDLER2(icbt_440, "icbt", 0x1F, 0x06, 0x08, 0x03E00001,
+>>>> +               PPC_440_SPEC),
+>>>>  GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
+>>>>  GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
+>>>>  GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
+>>>
+>>>
+>>
+>
+>
