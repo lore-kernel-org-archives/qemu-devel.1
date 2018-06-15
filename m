@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTqbl-0003oh-C8
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:50 -0400
+	(envelope-from <clg@kaod.org>) id 1fTqbp-0003sD-8C
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTqbi-0006VW-3j
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:49 -0400
-Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:53785)
+	(envelope-from <clg@kaod.org>) id 1fTqbm-0006ZX-2v
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:53 -0400
+Received: from 12.mo5.mail-out.ovh.net ([46.105.39.65]:56395)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTqbh-0006U2-Sf
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:46 -0400
-Received: from player794.ha.ovh.net (unknown [10.109.105.29])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 4A354B68D6
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 17:25:44 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTqbl-0006Ym-PV
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:25:49 -0400
+Received: from player794.ha.ovh.net (unknown [10.109.120.58])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 6C0ED1C1D6A
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 17:25:47 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 15 Jun 2018 17:25:32 +0200
-Message-Id: <20180615152536.30093-1-clg@kaod.org>
+Date: Fri, 15 Jun 2018 17:25:33 +0200
+Message-Id: <20180615152536.30093-2-clg@kaod.org>
+In-Reply-To: <20180615152536.30093-1-clg@kaod.org>
+References: <20180615152536.30093-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 0/4] ppc/pnv: new Pnv8Chip and Pnv9Chip
- models
+Subject: [Qemu-devel] [PATCH v2 1/4] ppc/pnv: introduce a new intc_create()
+ operation to the chip model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +33,172 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org
 Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hello,
+On Power9, the thread interrupt presenter has a different type and is
+linked to the chip owning the cores.
 
-First are some cleanups around the ISA bus of the machine. Then
-additions of new chip models for the different processor the PowerNV
-machine supports, which come with their respective "powernv8" and
-"powernv9" machines.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ include/hw/ppc/pnv.h |  1 +
+ hw/ppc/pnv.c         | 21 +++++++++++++++++++--
+ hw/ppc/pnv_core.c    | 18 +++++++++---------
+ 3 files changed, 29 insertions(+), 11 deletions(-)
 
-For some obscure reasons, this patchset breaks 'make check' :
-
-  TEST: tests/spapr-phb-test... (pid=3D8196)
-  qemu-system-ppc64: -device spapr-pci-host-bridge,index=3D30: spapr-pci-=
-host-bridge needs a pseries machine
-  Broken pipe
- FAIL: tests/spapr-phb-test
-
-Any idea ? I guess this is because of the new machines.=20
-
-Thanks,
-
-C.=20
-
-Changes since v1:
-
- - reworked the ISABus creation interface with the chip, the machine
-   is not aware anymore of the chip controllers.
- - removed the bizarre controllers under the PnvChip base class.
- - kept back some changes on the ISA device tree name. They will come
-   in time with the LPC controller for P9
-
-C=C3=A9dric Le Goater (4):
-  ppc/pnv: introduce a new intc_create() operation to the chip model
-  ppc/pnv: introduce a new isa_create() operation to the chip model
-  ppc/pnv: introduce Pnv8Chip and Pnv9Chip models
-  ppc/pnv: consolidate the creation of the ISA bus device tree
-
- include/hw/ppc/pnv.h     |  25 ++-
- include/hw/ppc/pnv_lpc.h |   3 +-
- hw/ppc/pnv.c             | 424 ++++++++++++++++++++++++++++++-----------=
-------
- hw/ppc/pnv_core.c        |  18 +-
- hw/ppc/pnv_lpc.c         |  30 +++-
- 5 files changed, 327 insertions(+), 173 deletions(-)
-
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 90759240a7b1..e934e84f555e 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -76,6 +76,7 @@ typedef struct PnvChipClass {
+     hwaddr       xscom_base;
+=20
+     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
++    Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
+ } PnvChipClass;
+=20
+ #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 0d2b79f7980f..c7e127ae97db 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -671,6 +671,13 @@ static uint32_t pnv_chip_core_pir_p8(PnvChip *chip, =
+uint32_t core_id)
+     return (chip->chip_id << 7) | (core_id << 3);
+ }
+=20
++static Object *pnv_chip_power8_intc_create(PnvChip *chip, Object *child,
++                                           Error **errp)
++{
++    return icp_create(child, TYPE_PNV_ICP, XICS_FABRIC(qdev_get_machine(=
+)),
++                      errp);
++}
++
+ /*
+  *    0:48  Reserved - Read as zeroes
+  *   49:52  Node ID
+@@ -686,6 +693,12 @@ static uint32_t pnv_chip_core_pir_p9(PnvChip *chip, =
+uint32_t core_id)
+     return (chip->chip_id << 8) | (core_id << 2);
+ }
+=20
++static Object *pnv_chip_power9_intc_create(PnvChip *chip, Object *child,
++                                           Error **errp)
++{
++    return NULL;
++}
++
+ /* Allowed core identifiers on a POWER8 Processor Chip :
+  *
+  * <EX0 reserved>
+@@ -721,6 +734,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
+klass, void *data)
+     k->chip_cfam_id =3D 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
+     k->cores_mask =3D POWER8E_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
++    k->intc_create =3D pnv_chip_power8_intc_create;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8E";
+ }
+@@ -734,6 +748,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
+lass, void *data)
+     k->chip_cfam_id =3D 0x220ea04980000000ull; /* P8 Venice DD2.0 */
+     k->cores_mask =3D POWER8_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
++    k->intc_create =3D pnv_chip_power8_intc_create;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8";
+ }
+@@ -747,6 +762,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
+ *klass, void *data)
+     k->chip_cfam_id =3D 0x120d304980000000ull;  /* P8 Naples DD1.0 */
+     k->cores_mask =3D POWER8_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
++    k->intc_create =3D pnv_chip_power8_intc_create;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8NVL";
+ }
+@@ -760,6 +776,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
+lass, void *data)
+     k->chip_cfam_id =3D 0x220d104900008000ull; /* P9 Nimbus DD2.0 */
+     k->cores_mask =3D POWER9_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p9;
++    k->intc_create =3D pnv_chip_power9_intc_create;
+     k->xscom_base =3D 0x00603fc00000000ull;
+     dc->desc =3D "PowerNV Chip POWER9";
+ }
+@@ -892,8 +909,8 @@ static void pnv_chip_core_realize(PnvChip *chip, Erro=
+r **errp)
+         object_property_set_int(OBJECT(pnv_core),
+                                 pcc->core_pir(chip, core_hwid),
+                                 "pir", &error_fatal);
+-        object_property_add_const_link(OBJECT(pnv_core), "xics",
+-                                       qdev_get_machine(), &error_fatal)=
+;
++        object_property_add_const_link(OBJECT(pnv_core), "chip",
++                                       OBJECT(chip), &error_fatal);
+         object_property_set_bool(OBJECT(pnv_core), true, "realized",
+                                  &error_fatal);
+         object_unref(OBJECT(pnv_core));
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index f7cf33f547a5..a9f129fc2c5f 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -99,13 +99,14 @@ static const MemoryRegionOps pnv_core_xscom_ops =3D {
+     .endianness =3D DEVICE_BIG_ENDIAN,
+ };
+=20
+-static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFabric *xi, Error **er=
+rp)
++static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip *chip, Error **err=
+p)
+ {
+     CPUPPCState *env =3D &cpu->env;
+     int core_pir;
+     int thread_index =3D 0; /* TODO: TCG supports only one thread */
+     ppc_spr_t *pir =3D &env->spr_cb[SPR_PIR];
+     Error *local_err =3D NULL;
++    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+=20
+     object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
+     if (local_err) {
+@@ -113,7 +114,7 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFab=
+ric *xi, Error **errp)
+         return;
+     }
+=20
+-    cpu->intc =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, xi, &local_err);
++    cpu->intc =3D pcc->intc_create(chip, OBJECT(cpu), &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -143,13 +144,12 @@ static void pnv_core_realize(DeviceState *dev, Erro=
+r **errp)
+     void *obj;
+     int i, j;
+     char name[32];
+-    Object *xi;
++    Object *chip;
+=20
+-    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
+-    if (!xi) {
+-        error_setg(errp, "%s: required link 'xics' not found: %s",
+-                   __func__, error_get_pretty(local_err));
+-        return;
++    chip =3D object_property_get_link(OBJECT(dev), "chip", &local_err);
++    if (!chip) {
++        error_propagate(errp, local_err);
++        error_prepend(errp, "required link 'chip' not found: ");
+     }
+=20
+     pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
+@@ -166,7 +166,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
+**errp)
+     }
+=20
+     for (j =3D 0; j < cc->nr_threads; j++) {
+-        pnv_realize_vcpu(pc->threads[j], XICS_FABRIC(xi), &local_err);
++        pnv_realize_vcpu(pc->threads[j], PNV_CHIP(chip), &local_err);
+         if (local_err) {
+             goto err;
+         }
 --=20
 2.13.6
