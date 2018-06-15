@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fTqGX-0001oy-BJ
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:03:54 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fTqGy-0002AA-4f
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:04:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fTqGW-0007Da-Bc
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:03:53 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:35399)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fTqGW-0007D7-4q
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:03:52 -0400
-Received: by mail-lf0-x244.google.com with SMTP id i15-v6so15120526lfc.2
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 08:03:51 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Fri, 15 Jun 2018 17:03:43 +0200
-Message-Id: <20180615150343.4937-3-edgar.iglesias@gmail.com>
-In-Reply-To: <20180615150343.4937-1-edgar.iglesias@gmail.com>
-References: <20180615150343.4937-1-edgar.iglesias@gmail.com>
+	(envelope-from <eric.auger@redhat.com>) id 1fTqGx-0007QE-9d
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:04:20 -0400
+References: <1528554193-27270-1-git-send-email-eric.auger@redhat.com>
+	<1528554193-27270-3-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA_R_68FDq-=1coazcTpc1MGqh2ZanccP8C=C9ZJ9_T_6Q@mail.gmail.com>
+	<CAFEAcA8B2qu1g2yGn4HiWCBhX2Can+UyrL==QTdKvxL7_Wq2Xg@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <b3b74960-f3a6-4db9-946a-055e25534564@redhat.com>
+Date: Fri, 15 Jun 2018 17:04:12 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v1 2/2] target-microblaze: Rework NOP/zero
- instruction handling
+In-Reply-To: <CAFEAcA8B2qu1g2yGn4HiWCBhX2Can+UyrL==QTdKvxL7_Wq2Xg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/arm/virt: Silence dtc /memory
+ warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Hi Peter,
 
-Remove the abort on a sequence of NOP/zero instructions.
-Always return early and avoid decoding NOP/zero instructions.
+On 06/15/2018 03:16 PM, Peter Maydell wrote:
+> On 15 June 2018 at 13:26, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 9 June 2018 at 15:23, Eric Auger <eric.auger@redhat.com> wrote:
+>>> When running dtc on the guest /proc/device-tree we get the
+>>> following warning: Warning (unit_address_vs_reg): Node /memory
+>>> has a reg or ranges property, but no unit name".
+>>>
+>>> Let's fix that by adding the unit address to the node name. We also
+>>> don't create the /memory node anymore in create_fdt(). We directly
+>>> create it in load_dtb. /chosen still needs to be created in create_fdt
+>>> as the uart needs it. In case the user provided his own dtb, either
+>>> the bank is added to the existing /memory node or if this latter is
+>>> not found we create a new separate memory node.
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>> ---
+>>>  hw/arm/boot.c | 20 ++++++++++++++------
+>>>  hw/arm/virt.c |  6 ------
+>>>  2 files changed, 14 insertions(+), 12 deletions(-)
+>>>
+>>> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+>>> index 1e2be20..2054670 100644
+>>> --- a/hw/arm/boot.c
+>>> +++ b/hw/arm/boot.c
+>>> @@ -593,24 +593,32 @@ static int load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>>>              g_free(nodename);
+>>>          }
+>>>      } else {
+>>
+>> I think you need also to change the "if" half of this if..else,
+>> which deals with NUMA, because it assumes a "/memory" node was
+>> created by the virt.c code and now it will not be.
+> 
+> ...I think this breaks the tests/numa-test part of 'make check'.
 
-This fixes Coverity CID 1391443.
+correct!
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- target/microblaze/translate.c | 15 ++++-----------
- 1 file changed, 4 insertions(+), 11 deletions(-)
+Thanks
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 6c64946398..78ca265b04 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -90,7 +90,6 @@ typedef struct DisasContext {
-     uint32_t jmp_pc;
- 
-     int abort_at_next_insn;
--    int nr_nops;
-     struct TranslationBlock *tb;
-     int singlestep_enabled;
- } DisasContext;
-@@ -1576,17 +1575,12 @@ static inline void decode(DisasContext *dc, uint32_t ir)
-     dc->ir = ir;
-     LOG_DIS("%8.8x\t", dc->ir);
- 
--    if (dc->ir)
--        dc->nr_nops = 0;
--    else {
-+    if (ir == 0) {
-         trap_illegal(dc, dc->cpu->env.pvr.regs[2] & PVR2_OPCODE_0x0_ILL_MASK);
--
--        LOG_DIS("nr_nops=%d\t", dc->nr_nops);
--        dc->nr_nops++;
--        if (dc->nr_nops > 4) {
--            cpu_abort(CPU(dc->cpu), "fetching nop sequence\n");
--        }
-+        /* Don't decode nop/zero instructions any further.  */
-+        return;
-     }
-+
-     /* bit 2 seems to indicate insn type.  */
-     dc->type_b = ir & (1 << 29);
- 
-@@ -1633,7 +1627,6 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     dc->singlestep_enabled = cs->singlestep_enabled;
-     dc->cpustate_changed = 0;
-     dc->abort_at_next_insn = 0;
--    dc->nr_nops = 0;
- 
-     if (pc_start & 3) {
-         cpu_abort(cs, "Microblaze: unaligned PC=%x\n", pc_start);
--- 
-2.14.1
+Eric
+> 
+> thanks
+> -- PMM
+> 
