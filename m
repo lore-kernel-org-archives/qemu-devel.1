@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fTlXb-0003UQ-LG
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:01:17 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fTlcq-00063g-Oj
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:06:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fTlXa-0001aB-Lm
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:01:11 -0400
-Date: Fri, 15 Jun 2018 12:01:06 +0200
+	(envelope-from <imammedo@redhat.com>) id 1fTlcn-0000Zi-5w
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:06:36 -0400
+Date: Fri, 15 Jun 2018 12:06:29 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180615120106.537970f0@redhat.com>
-In-Reply-To: <abdd97d1-5ffb-9b4b-e667-26b603cff57c@redhat.com>
+Message-ID: <20180615120629.47a2d292@redhat.com>
+In-Reply-To: <51518904-1e3c-aca4-6f4a-474aa845138e@redhat.com>
 References: <20180611121655.19616-1-david@redhat.com>
-	<20180611121655.19616-11-david@redhat.com>
-	<20180613151056.6ebbccc2@redhat.com>
-	<569f9534-162c-29c1-a097-51427e028b4e@redhat.com>
-	<20180615113440.56844675@redhat.com>
-	<abdd97d1-5ffb-9b4b-e667-26b603cff57c@redhat.com>
+	<20180611121655.19616-7-david@redhat.com>
+	<20180613145624.3004935c@redhat.com>
+	<bb0b033f-d048-06db-96d1-89085000d792@redhat.com>
+	<20180614152409.2886dc65@redhat.com>
+	<4e2e230c-865e-2cfe-0085-1a62da70fa15@redhat.com>
+	<20180615111620.6ceb2067@redhat.com>
+	<51518904-1e3c-aca4-6f4a-474aa845138e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 10/11] pc-dimm: introduce and use
- pc_dimm_memory_pre_plug()
+Subject: Re: [Qemu-devel] [PATCH v1 06/11] pc-dimm: don't allow to access
+ "size" before the device was realized
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +31,79 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S
-	. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S . Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Fri, 15 Jun 2018 11:48:33 +0200
+On Fri, 15 Jun 2018 11:25:59 +0200
 David Hildenbrand <david@redhat.com> wrote:
 
-> On 15.06.2018 11:34, Igor Mammedov wrote:
-> > On Wed, 13 Jun 2018 16:15:48 +0200
+> On 15.06.2018 11:16, Igor Mammedov wrote:
+> > On Thu, 14 Jun 2018 16:10:14 +0200
 > > David Hildenbrand <david@redhat.com> wrote:
 > >   
-> >> On 13.06.2018 15:10, Igor Mammedov wrote:  
-> >>> On Mon, 11 Jun 2018 14:16:54 +0200
+> >> On 14.06.2018 15:24, Igor Mammedov wrote:  
+> >>> On Wed, 13 Jun 2018 16:03:35 +0200
 > >>> David Hildenbrand <david@redhat.com> wrote:
 > >>>     
-> >>>> We'll be factoring out some pc-dimm specific and some memory-device
-> >>>> checks next.
+> >>>> On 13.06.2018 14:56, Igor Mammedov wrote:    
+> >>>>> On Mon, 11 Jun 2018 14:16:50 +0200
+> >>>>> David Hildenbrand <david@redhat.com> wrote:
+> >>>>>       
+> >>>>>> "size" should not be queried before the device was realized. Let' make
+> >>>>>> that explicit.
+> >>>>>>
+> >>>>>> Signed-off-by: David Hildenbrand <david@redhat.com>      
+> >>>>> It's generic property getter, it should work even before realize is called.      
 > >>>>
-> >>>> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >>>> ---
-> >>>>  hw/i386/pc.c             | 2 ++
-> >>>>  hw/mem/pc-dimm.c         | 5 +++++
-> >>>>  hw/ppc/spapr.c           | 1 +
-> >>>>  include/hw/mem/pc-dimm.h | 2 ++
-> >>>>  4 files changed, 10 insertions(+)
-> >>>>
-> >>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> >>>> index 017396fe84..dc8e7b033b 100644
-> >>>> --- a/hw/i386/pc.c
-> >>>> +++ b/hw/i386/pc.c
-> >>>> @@ -1695,6 +1695,8 @@ static void pc_dimm_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,    
-> >>> keeping                              ^^^^^
-> >>> similar to newly introduced pc_dimm_memory_pre_plug()
-> >>> and I have no clue what to suggest as alternative    
+> >>>> That's the point, as we can see in NVDIMM code , it is *not* a generic
+> >>>> property getter.    
+> >>> it is added by 
+> >>>     object_property_add(obj, PC_DIMM_SIZE_PROP, "uint64", pc_dimm_get_size,      
+> >>>                         NULL, NULL, NULL, &error_abort); 
+> >>> hence it's generic QOM property as opposed to memory device class specific callbacks.
+> >>>     
+> >>>>    
+> >>>>>
+> >>>>> if issues described in 5/11 are properly fixed, this patch won't be needed.
+> >>>>>
+> >>>>> So drop this patch
+> >>>>>
+> >>>>>       
+> >>>>>> ---
+> >>>>>>  hw/mem/pc-dimm.c | 6 ++++++
+> >>>>>>  1 file changed, 6 insertions(+)
+> >>>>>>
+> >>>>>> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> >>>>>> index 86fbcf2d0c..5294734529 100644
+> >>>>>> --- a/hw/mem/pc-dimm.c
+> >>>>>> +++ b/hw/mem/pc-dimm.c
+> >>>>>> @@ -166,6 +166,12 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
+> >>>>>>      PCDIMMDevice *dimm = PC_DIMM(obj);
+> >>>>>>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(obj);
+> >>>>>>  
+> >>>>>> +    if (!DEVICE(obj)->realized) {
+> >>>>>> +        error_setg(errp, "Property \"%s\" not accessible before realized",
+> >>>>>> +                   name);
+> >>>>>> +        return;
+> >>>>>> +    }
+> >>>>>> +
+> >>>>>>      mr = ddc->get_memory_region(dimm, errp);    
+> >>> just make ddc->get_memory_region return error if 'memdev' isn't set yet
+> >>> and add local_error handling here as proper property assessor should do.
+> >>>     
 > >>
-> >> Can you elaborate?  
-> > 
-> > It's just that pc_dimm_pre_plug and pc_dimm_memory_pre_plug
-> > are very similar so it become confusing and with name alone
-> > you can't figure if both do the same or different things.
-> > 
-> > Looking at 11/11 maybe you could just drop this and the next
-> > patch for now as there isn't obvious (if any) demand for it
-> > within this series at all.
-> > And introduce similar patch when it's actually required.
-> > 
-> > I might imagine following naming in future:
-> > 
-> >    pc_dimm_pre_plug()
-> >        memory_device_pre_plug()
-> >        ... some pc-dimm only stuff ...
-> > 
-> >    virtio_mem_pre_plug()
-> >        memory_device_pre_plug()
-> >        ... some virtio-mem only stuff ...  
+> >> Does not help for NVDIMM.  
+> > NVDIMM should be fixed as it's broken now and works just by accident.
+> > I don't like tailoring infrastructure changes to a particular broken
+> > device especially when the later could be made to work within current
+> > framework.
+> >   
 > 
-> We will always have the chain
-> 
-> $machine_XXX_pre_plug()
-> 	... some machine specific stuff
-> 	pc_dimm_memory_pre_plug()
-> 		... some pc-dimm specific stuff
-> 		memory_device_pre_plug()
-> 
-> I can rename
-> 
-> pc_dimm_(plug|unplug ...) to
-> pc_memory_(plug|unplug ...)
-> 
-> and pc_dimm_memory_(plug|unplug ...) to
-> pc_dimm_(plug|unplug ...)
-> 
-> That way we match spapr naming scheme:
-> 
-> spapr_memory_plug/spapr_memory_unplug
-
-sounds good to me
+> Yes, but I will go the path of static properties for NVDIMM instead.
+> Trying to initialize the memory region in a property setter
+> ("label-size") and then bailing out because another property (memdev) is
+> not set looks strange. I will do checks+initialization in realize() and
+> in get_memory_region(). This looks better in my point of view and looks
+> like a nice NVDIMM refactoring (at least judging from the patches I have
+> on my list now :) ).
+sure, I worry less about how it's implemented inside of device model as
+far as it behaves nicely to external user.
