@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fTpfX-0001ef-4I
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:40 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fTpfc-0001m9-SW
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fTpfV-0006Ex-E3
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:39 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42762)
+	(envelope-from <pm215@archaic.org.uk>) id 1fTpfb-0006LR-6z
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:44 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42776)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fTpfU-00065w-Jf
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:37 -0400
+	id 1fTpfa-0006JR-U8
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:43 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fTpfI-0003ar-8q
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:25:24 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fTpfZ-0003lq-M5
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:25:41 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Jun 2018 15:24:40 +0100
-Message-Id: <20180615142521.19143-3-peter.maydell@linaro.org>
+Date: Fri, 15 Jun 2018 15:25:04 +0100
+Message-Id: <20180615142521.19143-27-peter.maydell@linaro.org>
 In-Reply-To: <20180615142521.19143-1-peter.maydell@linaro.org>
 References: <20180615142521.19143-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 02/43] hw/arm/mps2-tz: Put ethernet controller
- behind PPC
+Subject: [Qemu-devel] [PULL 26/43] target/arm: Implement SVE reverse within
+ elements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,92 +30,176 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The ethernet controller in the AN505 MPC FPGA image is behind
-the same AHB Peripheral Protection Controller that handles
-the graphics and GPIOs. (In the documentation this is clear
-in the block diagram but the ethernet controller was omitted
-from the table listing devices connected to the PPC.)
-The ethernet sits behind AHB PPCEXP0 interface 5. We had
-incorrectly claimed that this was a "gpio4", but there are
-only 4 GPIOs in this image.
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Correct the QEMU model to match the hardware.
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20180613015641.5667-9-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20180515171446.10834-1-peter.maydell@linaro.org
 ---
- hw/arm/mps2-tz.c | 32 +++++++++++++++++++++++---------
- 1 file changed, 23 insertions(+), 9 deletions(-)
+ target/arm/helper-sve.h    | 14 +++++++++++++
+ target/arm/sve_helper.c    | 41 +++++++++++++++++++++++++++++++-------
+ target/arm/translate-sve.c | 38 +++++++++++++++++++++++++++++++++++
+ target/arm/sve.decode      |  7 +++++++
+ 4 files changed, 93 insertions(+), 7 deletions(-)
 
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index 8dc8bfd4ab2..c5ef95e4cc0 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -74,12 +74,13 @@ typedef struct {
-     UnimplementedDeviceState spi[5];
-     UnimplementedDeviceState i2c[4];
-     UnimplementedDeviceState i2s_audio;
--    UnimplementedDeviceState gpio[5];
-+    UnimplementedDeviceState gpio[4];
-     UnimplementedDeviceState dma[4];
-     UnimplementedDeviceState gfx;
-     CMSDKAPBUART uart[5];
-     SplitIRQ sec_resp_splitter;
-     qemu_or_irq uart_irq_orgate;
-+    DeviceState *lan9118;
- } MPS2TZMachineState;
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
+index a58fb4ba011..3b7c54905dd 100644
+--- a/target/arm/helper-sve.h
++++ b/target/arm/helper-sve.h
+@@ -465,6 +465,20 @@ DEF_HELPER_FLAGS_4(sve_compact_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
  
- #define TYPE_MPS2TZ_MACHINE "mps2tz"
-@@ -224,6 +225,26 @@ static MemoryRegion *make_fpgaio(MPS2TZMachineState *mms, void *opaque,
-     return sysbus_mmio_get_region(SYS_BUS_DEVICE(fpgaio), 0);
+ DEF_HELPER_FLAGS_2(sve_last_active_element, TCG_CALL_NO_RWG, s32, ptr, i32)
+ 
++DEF_HELPER_FLAGS_4(sve_revb_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_revb_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_revb_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_4(sve_revh_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_revh_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_4(sve_revw_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_4(sve_rbit_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_rbit_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_rbit_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_rbit_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++
+ DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+index cb7d101b573..4017b9eed14 100644
+--- a/target/arm/sve_helper.c
++++ b/target/arm/sve_helper.c
+@@ -238,6 +238,26 @@ static inline uint64_t expand_pred_s(uint8_t byte)
+     return word[byte & 0x11];
  }
  
-+static MemoryRegion *make_eth_dev(MPS2TZMachineState *mms, void *opaque,
-+                                  const char *name, hwaddr size)
++/* Swap 16-bit words within a 32-bit word.  */
++static inline uint32_t hswap32(uint32_t h)
 +{
-+    SysBusDevice *s;
-+    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
-+    NICInfo *nd = &nd_table[0];
-+
-+    /* In hardware this is a LAN9220; the LAN9118 is software compatible
-+     * except that it doesn't support the checksum-offload feature.
-+     */
-+    qemu_check_nic_model(nd, "lan9118");
-+    mms->lan9118 = qdev_create(NULL, "lan9118");
-+    qdev_set_nic_properties(mms->lan9118, nd);
-+    qdev_init_nofail(mms->lan9118);
-+
-+    s = SYS_BUS_DEVICE(mms->lan9118);
-+    sysbus_connect_irq(s, 0, qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
-+    return sysbus_mmio_get_region(s, 0);
++    return rol32(h, 16);
 +}
 +
- static void mps2tz_common_init(MachineState *machine)
- {
-     MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
-@@ -363,7 +384,7 @@ static void mps2tz_common_init(MachineState *machine)
-                 { "gpio1", make_unimp_dev, &mms->gpio[1], 0x40101000, 0x1000 },
-                 { "gpio2", make_unimp_dev, &mms->gpio[2], 0x40102000, 0x1000 },
-                 { "gpio3", make_unimp_dev, &mms->gpio[3], 0x40103000, 0x1000 },
--                { "gpio4", make_unimp_dev, &mms->gpio[4], 0x40104000, 0x1000 },
-+                { "eth", make_eth_dev, NULL, 0x42000000, 0x100000 },
-             },
-         }, {
-             .name = "ahb_ppcexp1",
-@@ -447,13 +468,6 @@ static void mps2tz_common_init(MachineState *machine)
-                                                      "cfg_sec_resp", 0));
++/* Swap 16-bit words within a 64-bit word.  */
++static inline uint64_t hswap64(uint64_t h)
++{
++    uint64_t m = 0x0000ffff0000ffffull;
++    h = rol64(h, 32);
++    return ((h & m) << 16) | ((h >> 16) & m);
++}
++
++/* Swap 32-bit words within a 64-bit word.  */
++static inline uint64_t wswap64(uint64_t h)
++{
++    return rol64(h, 32);
++}
++
+ #define LOGICAL_PPPP(NAME, FUNC) \
+ void HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc)  \
+ {                                                                         \
+@@ -616,6 +636,20 @@ DO_ZPZ(sve_neg_h, uint16_t, H1_2, DO_NEG)
+ DO_ZPZ(sve_neg_s, uint32_t, H1_4, DO_NEG)
+ DO_ZPZ_D(sve_neg_d, uint64_t, DO_NEG)
+ 
++DO_ZPZ(sve_revb_h, uint16_t, H1_2, bswap16)
++DO_ZPZ(sve_revb_s, uint32_t, H1_4, bswap32)
++DO_ZPZ_D(sve_revb_d, uint64_t, bswap64)
++
++DO_ZPZ(sve_revh_s, uint32_t, H1_4, hswap32)
++DO_ZPZ_D(sve_revh_d, uint64_t, hswap64)
++
++DO_ZPZ_D(sve_revw_d, uint64_t, wswap64)
++
++DO_ZPZ(sve_rbit_b, uint8_t, H1, revbit8)
++DO_ZPZ(sve_rbit_h, uint16_t, H1_2, revbit16)
++DO_ZPZ(sve_rbit_s, uint32_t, H1_4, revbit32)
++DO_ZPZ_D(sve_rbit_d, uint64_t, revbit64)
++
+ /* Three-operand expander, unpredicated, in which the third operand is "wide".
+  */
+ #define DO_ZZW(NAME, TYPE, TYPEW, H, OP)                       \
+@@ -1587,13 +1621,6 @@ void HELPER(sve_rev_b)(void *vd, void *vn, uint32_t desc)
      }
+ }
  
--    /* In hardware this is a LAN9220; the LAN9118 is software compatible
--     * except that it doesn't support the checksum-offload feature.
--     * The ethernet controller is not behind a PPC.
--     */
--    lan9118_init(&nd_table[0], 0x42000000,
--                 qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
+-static inline uint64_t hswap64(uint64_t h)
+-{
+-    uint64_t m = 0x0000ffff0000ffffull;
+-    h = rol64(h, 32);
+-    return ((h & m) << 16) | ((h >> 16) & m);
+-}
 -
-     create_unimplemented_device("FPGA NS PC", 0x48007000, 0x1000);
+ void HELPER(sve_rev_h)(void *vd, void *vn, uint32_t desc)
+ {
+     intptr_t i, j, opr_sz = simd_oprsz(desc);
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index eed59524a9c..f8d8cf1547a 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -2643,6 +2643,44 @@ static bool trans_CPY_m_v(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
+     return true;
+ }
  
-     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x400000);
++static bool trans_REVB(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++{
++    static gen_helper_gvec_3 * const fns[4] = {
++        NULL,
++        gen_helper_sve_revb_h,
++        gen_helper_sve_revb_s,
++        gen_helper_sve_revb_d,
++    };
++    return do_zpz_ool(s, a, fns[a->esz]);
++}
++
++static bool trans_REVH(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++{
++    static gen_helper_gvec_3 * const fns[4] = {
++        NULL,
++        NULL,
++        gen_helper_sve_revh_s,
++        gen_helper_sve_revh_d,
++    };
++    return do_zpz_ool(s, a, fns[a->esz]);
++}
++
++static bool trans_REVW(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++{
++    return do_zpz_ool(s, a, a->esz == 3 ? gen_helper_sve_revw_d : NULL);
++}
++
++static bool trans_RBIT(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++{
++    static gen_helper_gvec_3 * const fns[4] = {
++        gen_helper_sve_rbit_b,
++        gen_helper_sve_rbit_h,
++        gen_helper_sve_rbit_s,
++        gen_helper_sve_rbit_d,
++    };
++    return do_zpz_ool(s, a, fns[a->esz]);
++}
++
+ /*
+  *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
+  */
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index 519139f6844..95eb4968a9f 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -456,6 +456,13 @@ CPY_m_v         00000101 .. 100000 100 ... ..... .....          @rd_pg_rn
+ # SVE copy element from general register to vector (predicated)
+ CPY_m_r         00000101 .. 101000 101 ... ..... .....          @rd_pg_rn
+ 
++# SVE reverse within elements
++# Note esz >= operation size
++REVB            00000101 .. 1001 00 100 ... ..... .....         @rd_pg_rn
++REVH            00000101 .. 1001 01 100 ... ..... .....         @rd_pg_rn
++REVW            00000101 .. 1001 10 100 ... ..... .....         @rd_pg_rn
++RBIT            00000101 .. 1001 11 100 ... ..... .....         @rd_pg_rn
++
+ ### SVE Predicate Logical Operations Group
+ 
+ # SVE predicate logical operations
 -- 
 2.17.1
