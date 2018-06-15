@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTmbO-00010Z-BQ
+	(envelope-from <alex.bennee@linaro.org>) id 1fTmbO-00010Y-Bo
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:09:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fTmbM-0006Gc-Ni
+	(envelope-from <alex.bennee@linaro.org>) id 1fTmbL-0006Fa-Go
 	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:09:10 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35675)
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:42902)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fTmbM-0006Fw-GF
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:09:08 -0400
-Received: by mail-wr0-x241.google.com with SMTP id l10-v6so9555181wrn.2
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 04:09:08 -0700 (PDT)
+	id 1fTmbL-0006Ez-9E
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 07:09:07 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id w10-v6so9525447wrk.9
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 04:09:07 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 15 Jun 2018 12:09:02 +0100
-Message-Id: <20180615110903.29674-3-alex.bennee@linaro.org>
+Date: Fri, 15 Jun 2018 12:09:01 +0100
+Message-Id: <20180615110903.29674-2-alex.bennee@linaro.org>
 In-Reply-To: <20180615110903.29674-1-alex.bennee@linaro.org>
 References: <20180615110903.29674-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 2/3] travis: reduce coverage of gprof build
+Subject: [Qemu-devel] [PULL 1/3] travis: display config.log when configure
+ fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +33,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-This build is regularly timing out and even switching off linux-user
-wasn't enough. Instead explicitly choose a target list of broadly the
-"major" architectures. This is enough to check the gprof build
-machinery works without worrying about the actual coverage results.
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-I did try various YAML constructs for specifying CONFIG with
-continuation but couldn't get any of them to work hence the very long
-line.
+When configure fails in CI systems we must be able to see the contents
+of the config.log file to diagnose the root cause.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+[AJB: used Eric's suggested {} form]
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
 diff --git a/.travis.yml b/.travis.yml
-index d5e6d50e6d..c200dde534 100644
+index 814be151f4..d5e6d50e6d 100644
 --- a/.travis.yml
 +++ b/.travis.yml
-@@ -80,7 +80,7 @@ matrix:
-     - env: CONFIG="--disable-user"
-       compiler: clang
-     # gprof/gcov are GCC features
--    - env: CONFIG="--enable-gprof --enable-gcov --disable-pie --disable-linux-user"
-+    - env: CONFIG="--enable-gprof --enable-gcov --disable-pie --target-list=aarch64-softmmu,arm-softmmu,i386-softmmu,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-softmmu,x86_64-softmmu"
-       compiler: gcc
-     # We manually include builds which we disable "make check" for
-     - env: CONFIG="--enable-debug --enable-tcg-interpreter"
+@@ -69,7 +69,7 @@ before_install:
+   - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
+   - git submodule update --init --recursive
+ before_script:
+-  - ./configure ${CONFIG}
++  - ./configure ${CONFIG} || { cat config.log && exit 1; }
+ script:
+   - make ${MAKEFLAGS} && ${TEST_CMD}
+ matrix:
+@@ -151,4 +151,4 @@ matrix:
+         - CONFIG="--cc=gcc-7 --cxx=g++-7 --disable-pie --disable-linux-user"
+         - TEST_CMD=""
+       before_script:
+-        - ./configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread -fuse-ld=gold" || cat config.log
++        - ./configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread -fuse-ld=gold" || { cat config.log && exit 1; }
 -- 
 2.17.1
