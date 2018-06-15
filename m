@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fTitX-0005gC-3x
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:11:40 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fTivn-0006tN-69
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:14:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fTitS-0002Us-3x
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:11:39 -0400
-Received: from 1.mo5.mail-out.ovh.net ([188.165.57.91]:50606)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fTitR-0002Sn-TK
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:11:34 -0400
-Received: from player729.ha.ovh.net (unknown [10.109.120.29])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 4BB761BF51E
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 09:11:32 +0200 (CEST)
-Date: Fri, 15 Jun 2018 09:07:24 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180615090724.6755df6f@bahia.lan>
-In-Reply-To: <20180615062915.GU4129@umbus.fritz.box>
-References: <152901299450.252222.14219708016930421485.stgit@bahia.lan>
-	<152901304242.252222.9947658955703347553.stgit@bahia.lan>
-	<20180615000225.GC4129@umbus.fritz.box>
-	<20180615001431.GF4129@umbus.fritz.box>
-	<20180615075805.1213ed06@bahia.lan>
-	<20180615062915.GU4129@umbus.fritz.box>
+	(envelope-from <cohuck@redhat.com>) id 1fTivi-00055W-5u
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 03:13:59 -0400
+Date: Fri, 15 Jun 2018 09:13:50 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180615091350.73bcc26f.cohuck@redhat.com>
+In-Reply-To: <d4a53d7a-60c0-b98a-bd2a-fd06b2f0e822@redhat.com>
+References: <1528738007-29122-1-git-send-email-thuth@redhat.com>
+	<d4a53d7a-60c0-b98a-bd2a-fd06b2f0e822@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/ED/u/3.8Fc4y.ucZ6_WWc/s";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH 3/5] spapr_cpu_core: add missing rollback
- on realization path
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2] hw/s390x/ipl: Fix crashes
+ that occurs when -kernel is used with small images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,112 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
---Sig_/ED/u/3.8Fc4y.ucZ6_WWc/s
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, 14 Jun 2018 21:08:43 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-On Fri, 15 Jun 2018 16:29:15 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+> On 11.06.2018 19:26, Thomas Huth wrote:
+> > Add a sanity checks to fix the following two crashes:
+> > 
+> > $ echo "Insane in the mainframe" > /tmp/test.txt
+> > $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -append xyz
+> > Segmentation fault (core dumped)
+> > $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -initrd /tmp/test.txt
+> > Segmentation fault (core dumped)
+> > 
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  v2: Fixed 2nd crash with -initrd
+> > 
+> >  hw/s390x/ipl.c | 9 ++++++---
+> >  1 file changed, 6 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> > index 04245b5..2ff8f20 100644
+> > --- a/hw/s390x/ipl.c
+> > +++ b/hw/s390x/ipl.c
+> > @@ -168,7 +168,8 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+> >           * we can not rely on the ELF entry point - it was 0x800 (the SALIPL
+> >           * loader) and it won't work. For this case we force it to 0x10000, too.
+> >           */
+> > -        if (pentry == KERN_IMAGE_START || pentry == 0x800) {
+> > +        if ((pentry == KERN_IMAGE_START || pentry == 0x800) &&
+> > +            kernel_size > KERN_PARM_AREA + strlen(ipl->cmdline)) {
+> >              ipl->start_addr = KERN_IMAGE_START;
+> >              /* Overwrite parameters in the kernel image, which are "rom" */
+> >              strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
+> > @@ -195,8 +196,10 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
+> >               * we have to overwrite values in the kernel image,
+> >               * which are "rom"
+> >               */
+> > -            stq_p(rom_ptr(INITRD_PARM_START), initrd_offset);
+> > -            stq_p(rom_ptr(INITRD_PARM_SIZE), initrd_size);
+> > +            if (kernel_size > INITRD_PARM_SIZE + 8) {
+> > +                stq_p(rom_ptr(INITRD_PARM_START), initrd_offset);
+> > +                stq_p(rom_ptr(INITRD_PARM_SIZE), initrd_size);
+> > +            }
+> >          }
+> >      }
+> >      /*  
+> 
+> I just had to discover that this breaks the argv handling in
+> kvm-unit-tests. Cornelia, could you please unqueue this patch again?
+> I'll try to come up with a better solution...
 
-> On Fri, Jun 15, 2018 at 07:58:05AM +0200, Greg Kurz wrote:
-> > On Fri, 15 Jun 2018 10:14:31 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >  =20
-> > > On Fri, Jun 15, 2018 at 10:02:25AM +1000, David Gibson wrote: =20
-> > > > On Thu, Jun 14, 2018 at 11:50:42PM +0200, Greg Kurz wrote:   =20
-> > > > > The spapr_realize_vcpu() function doesn't rollback in case of err=
-or.
-> > > > > This isn't a problem with coldplugged CPUs because the machine wo=
-n't
-> > > > > start and QEMU will exit. Hotplug is a different story though: the
-> > > > > CPU thread is started under object_property_set_bool() and it ass=
-umes
-> > > > > it can access the CPU object.
-> > > > >=20
-> > > > > If icp_create() fails, we return an error without unregistering t=
-he
-> > > > > reset handler for this CPU, and we let the underlying QEMU thread=
- for
-> > > > > this CPU alive. Since spapr_cpu_core_realize() doesn't care to un=
-realize
-> > > > > already realized CPUs either, but happily frees all of them anywa=
-y, the
-> > > > > CPU thread crashes instantly:
-> > > > >=20
-> > > > > (qemu) device_add host-spapr-cpu-core,core-id=3D1,id=3Dgku
-> > > > > GKU: failing icp_create (cpu 0x11497fd0)
-> > > > >                              ^^^^^^^^^^
-> > > > > Program received signal SIGSEGV, Segmentation fault.
-> > > > > [Switching to Thread 0x7fffee3feaa0 (LWP 24725)]
-> > > > > 0x00000000104c8374 in object_dynamic_cast_assert (obj=3D0x11497fd=
-0,
-> > > > >                                                   ^^^^^^^^^^^^^^
-> > > > >                                              pointer to the CPU o=
-bject
-> > > > > 623         trace_object_dynamic_cast_assert(obj ? obj->class->ty=
-pe->name
-> > > > > (gdb) p obj->class->type
-> > > > > $1 =3D (Type) 0x0
-> > > > > (gdb) p * obj
-> > > > > $2 =3D {class =3D 0x10ea9c10, free =3D 0x11244620,
-> > > > >                                  ^^^^^^^^^^
-> > > > >                               should be g_free
-> > > > > (gdb) p g_free
-> > > > > $3 =3D {<text variable, no debug info>} 0x7ffff282bef0 <g_free>
-> > > > >=20
-> > > > > obj is a dangling pointer to the CPU that was just destroyed in
-> > > > > spapr_cpu_core_realize().
-> > > > >=20
-> > > > > This patch adds proper rollback to both spapr_realize_vcpu() and
-> > > > > spapr_cpu_core_realize().
-> > > > >=20
-> > > > > Signed-off-by: Greg Kurz <groug@kaod.org>   =20
-> > > >=20
-> > > > Applied to ppc-for-3.0, since it definitely looks to fix some
-> > > > problems.   =20
-> > >=20
-> > > Uh.. actually it has a definite bug - the first exit point will call
-> > > g_free() on an uninitialized spapr_cpu.  I fixed it up with a NULL
-> > > initialization in my tree. =20
-> >=20
-> > Ah... as said in the cover letter, all the series is based on machine_d=
-ata
-> > being set before the call to object_property_set_bool()... Maybe I shou=
-ld
-> > have made that explicit with a preparatory patch... Sorry. =20
->=20
-> Ah, that makes sense.
->=20
-> So, I ended up having to rework a little differently, after I yanked
-> by intc -> machine_data patch because it broke things for clg.  I
-> think I've fixed it up correctly now - if you can check the latest
-> ppc-for-3.0 I pushed out, that would be great.
->=20
+Argh. I wonder why?
 
-I'll do this ASAP.
-
---Sig_/ED/u/3.8Fc4y.ucZ6_WWc/s
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlsjZawACgkQcdTV5YIv
-c9Y16g/9F3lL1Qzow6RatuijLQ8+SI7Be68Vu/p6B3Vv+TTVhzYfIQlhpXGQop23
-SClQPY7PU6HR/2sJjq7eKMi/IkwKbgNgyGt3eEXI8E8JG0tu99843sVCLooNTOKt
-k/FIUpE2CnSoVW7fZtqD748dpOQAsrsV5VV8OxAQwraVWGB5ppZyCipYftMJqEGZ
-KlK/xah1KB76cy4Lxi7FJFbhWY1pDHRNtNOsbCpcVOo7gbGt6+GKMREwkfDgsuuN
-iFFAsb5Ws5B+jX9lEFdQUe0H9ndowmIVtx+EMus+ckUoSW6vmhB10rwzdGyTyOOt
-F2BhvC4h7s3Ajd7Ft4fDB0CRnbDAuXHGgnUxNufnE4dYL8KYa00Ivr5ecr8U8NW+
-pJ1ONU46voYKVoyCTeTJb+5Fkv/I6Pb+1TooMCGsuSgkvivKi0EyGNxpoaFM4V5m
-cq82wL6zxk7S4Mvk7Io7NjNAcllZK7hS802l058qCY7Zp36YC0V8GUqF3slUktsR
-fIGNP+/uVl2wD/Lyr45wIGW/5OzG4g/Mn2OE9qAIVBthcxe6TqSGYvIOg75pmY20
-o8z6/jwmBO3DcnI8Sej8gK6NW8iS5bUPS2Yvvt49lKUwWfg/q1qE5O01IN1UXG1i
-0zyJMUcnlZtRFLQDfFt/79/hSAt0bOlzeEf17DBfVsEwKwY3eBY=
-=QdKi
------END PGP SIGNATURE-----
-
---Sig_/ED/u/3.8Fc4y.ucZ6_WWc/s--
+Unqueued.
