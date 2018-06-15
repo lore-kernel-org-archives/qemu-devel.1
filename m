@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fTlzX-0003zq-7T
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:30:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTm47-0006G3-Rt
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:34:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fTlzU-0000Pi-5h
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:30:03 -0400
-References: <20180611121655.19616-1-david@redhat.com>
-	<20180611121655.19616-8-david@redhat.com>
-	<20180613150320.3d6d11ca@redhat.com>
-	<430ef63d-0e9b-5925-5d5a-b6804ec7d988@redhat.com>
-	<045b1a53-fdf2-36db-2898-cfee0849232a@redhat.com>
-	<20180614170051.62104d16@redhat.com>
-	<3ba714d3-2031-5ddd-d21a-afdaee97f685@redhat.com>
-	<20180615115912.59bae274@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <7e671ffb-712c-4cf5-42ca-8bd4cf891edb@redhat.com>
-Date: Fri, 15 Jun 2018 12:29:54 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fTm47-0005hP-6J
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:34:47 -0400
+Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:39996)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fTm46-0005hI-Uq
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:34:47 -0400
+Received: by mail-ot0-x229.google.com with SMTP id w9-v6so10449841otj.7
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 03:34:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180615115912.59bae274@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 07/11] pc-dimm: get_memory_region() can
- never fail
+In-Reply-To: <20180613015641.5667-1-richard.henderson@linaro.org>
+References: <20180613015641.5667-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 15 Jun 2018 11:34:25 +0100
+Message-ID: <CAFEAcA9nU4Sd3KzamhFTSZsPcC9BrAsgHuO=f7zdRnAvgFhnkg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4b 00/18] target/arm: SVE instructions,
+ part 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +29,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
+
+On 13 June 2018 at 02:56, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Here's the second installment of SVE instructions.
+> There are about 25 patches waiting for a third installment;
+> this makes a nice break before beginning with the memory ops.
+>
+> Since v3, r-b tags, comment fixes, and other review feedback.
+>
+>
 
 
->>> pre_plug isn't part of device, it's a separate part that might vary
->>> depending on machine and which might modify device properties along
->>> the way and then exaggerating we would need 'prepare2()' and after
->>> that 'pre_plug2()' and ...  
->>
->> That's how two parties (device vs hotplug handler) work together to get
->> results done ... Just like inititalize() -> realized() vs. pre_plug ->
->> plug(). There has to be some hand shaking.
-> In general hotplug handler is optional, for example a board might
-> create initial memory wit fixed layout as:
->   dev = object_new(dimm)
->   set memdev + set addr
->   qdev_init_no_fail()
-> 
-> generalized pc-dimm helpers for hotplug handler is just impl. detail,
-> a board might have other ideas how to use pc-dimm and choose to
-> implement wiring differently. So device model should do sanity checks
-> independently from whomever uses it.
 
-In general, I am not a fan of implementing things the "what if someday
-..." way. It overcomplicates code and you can be sure that usually
-something is missed either way (as there is no concrete use case, not
-even in somebodys mind).
+Applied to target-arm.next, thanks.
 
-But I can see that for pc-dimms that can actually make sense (in
-contrast to other, more specific devices).
-
--- 
-
-Thanks,
-
-David / dhildenb
+-- PMM
