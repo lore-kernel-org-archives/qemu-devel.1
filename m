@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fTlcq-00063g-Oj
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:06:37 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fTldO-0006Lb-4s
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:07:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fTlcn-0000Zi-5w
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:06:36 -0400
-Date: Fri, 15 Jun 2018 12:06:29 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180615120629.47a2d292@redhat.com>
-In-Reply-To: <51518904-1e3c-aca4-6f4a-474aa845138e@redhat.com>
-References: <20180611121655.19616-1-david@redhat.com>
-	<20180611121655.19616-7-david@redhat.com>
-	<20180613145624.3004935c@redhat.com>
-	<bb0b033f-d048-06db-96d1-89085000d792@redhat.com>
-	<20180614152409.2886dc65@redhat.com>
-	<4e2e230c-865e-2cfe-0085-1a62da70fa15@redhat.com>
-	<20180615111620.6ceb2067@redhat.com>
-	<51518904-1e3c-aca4-6f4a-474aa845138e@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fTldN-0001Gd-2X
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:07:10 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:39378)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fTldM-0001Ft-KK
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 06:07:08 -0400
+Received: by mail-oi0-x241.google.com with SMTP id t22-v6so8330678oih.6
+	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 03:07:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 06/11] pc-dimm: don't allow to access
- "size" before the device was realized
+In-Reply-To: <20180605165507.GB2165@perard.uk.xensource.com>
+References: <20180601175910.28146-1-peter.maydell@linaro.org>
+	<20180605165507.GB2165@perard.uk.xensource.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 15 Jun 2018 11:06:47 +0100
+Message-ID: <CAFEAcA_X2V-YkM1ZeCHMPW3cQBk2=ZQ4BAgtcg67Eb+OuADbgQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC] xen: Don't use
+ memory_region_init_ram_nomigrate() in pci_assign_dev_load_option_rom()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,80 +30,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Xiao Guangrong <xiaoguangrong.eric@gmail.com>, "Michael S . Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Eduardo Habkost <ehabkost@redhat.com>
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Stefano Stabellini <sstabellini@kernel.org>, "open list:X86" <xen-devel@lists.xenproject.org>
 
-On Fri, 15 Jun 2018 11:25:59 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 5 June 2018 at 17:55, Anthony PERARD <anthony.perard@citrix.com> wrote:
+> On Fri, Jun 01, 2018 at 06:59:10PM +0100, Peter Maydell wrote:
+>> The xen pci_assign_dev_load_option_rom() currently creates a RAM
+>> memory region with memory_region_init_ram_nomigrate(), and then
+>> manually registers it with vmstate_register_ram(). In fact for
+>> its only callsite, the 'owner' pointer we use for the init call
+>> and the '&dev->qdev' pointer we use for the vmstate_register_ram()
+>> call refer to the same object. Simplify the function to only
+>> take a pointer to the device once instead of twice, and use
+>> memory_region_init_ram() which automatically does the vmstate
+>> register for us.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> This is a fairly trivial no-behaviour-change code cleanup, but
+>> I've marked it as RFC because I don't have a setup for doing
+>> more than just compile-testing Xen related patches.
+>> This was found as part of a sweep through for code using
+>> the _nomigrate versions of functions.
+>
+> That patch looks fine, and seams fine after hacking my way into testing
+> the change.
+>
+> Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
-> On 15.06.2018 11:16, Igor Mammedov wrote:
-> > On Thu, 14 Jun 2018 16:10:14 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 14.06.2018 15:24, Igor Mammedov wrote:  
-> >>> On Wed, 13 Jun 2018 16:03:35 +0200
-> >>> David Hildenbrand <david@redhat.com> wrote:
-> >>>     
-> >>>> On 13.06.2018 14:56, Igor Mammedov wrote:    
-> >>>>> On Mon, 11 Jun 2018 14:16:50 +0200
-> >>>>> David Hildenbrand <david@redhat.com> wrote:
-> >>>>>       
-> >>>>>> "size" should not be queried before the device was realized. Let' make
-> >>>>>> that explicit.
-> >>>>>>
-> >>>>>> Signed-off-by: David Hildenbrand <david@redhat.com>      
-> >>>>> It's generic property getter, it should work even before realize is called.      
-> >>>>
-> >>>> That's the point, as we can see in NVDIMM code , it is *not* a generic
-> >>>> property getter.    
-> >>> it is added by 
-> >>>     object_property_add(obj, PC_DIMM_SIZE_PROP, "uint64", pc_dimm_get_size,      
-> >>>                         NULL, NULL, NULL, &error_abort); 
-> >>> hence it's generic QOM property as opposed to memory device class specific callbacks.
-> >>>     
-> >>>>    
-> >>>>>
-> >>>>> if issues described in 5/11 are properly fixed, this patch won't be needed.
-> >>>>>
-> >>>>> So drop this patch
-> >>>>>
-> >>>>>       
-> >>>>>> ---
-> >>>>>>  hw/mem/pc-dimm.c | 6 ++++++
-> >>>>>>  1 file changed, 6 insertions(+)
-> >>>>>>
-> >>>>>> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> >>>>>> index 86fbcf2d0c..5294734529 100644
-> >>>>>> --- a/hw/mem/pc-dimm.c
-> >>>>>> +++ b/hw/mem/pc-dimm.c
-> >>>>>> @@ -166,6 +166,12 @@ static void pc_dimm_get_size(Object *obj, Visitor *v, const char *name,
-> >>>>>>      PCDIMMDevice *dimm = PC_DIMM(obj);
-> >>>>>>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(obj);
-> >>>>>>  
-> >>>>>> +    if (!DEVICE(obj)->realized) {
-> >>>>>> +        error_setg(errp, "Property \"%s\" not accessible before realized",
-> >>>>>> +                   name);
-> >>>>>> +        return;
-> >>>>>> +    }
-> >>>>>> +
-> >>>>>>      mr = ddc->get_memory_region(dimm, errp);    
-> >>> just make ddc->get_memory_region return error if 'memdev' isn't set yet
-> >>> and add local_error handling here as proper property assessor should do.
-> >>>     
-> >>
-> >> Does not help for NVDIMM.  
-> > NVDIMM should be fixed as it's broken now and works just by accident.
-> > I don't like tailoring infrastructure changes to a particular broken
-> > device especially when the later could be made to work within current
-> > framework.
-> >   
-> 
-> Yes, but I will go the path of static properties for NVDIMM instead.
-> Trying to initialize the memory region in a property setter
-> ("label-size") and then bailing out because another property (memdev) is
-> not set looks strange. I will do checks+initialization in realize() and
-> in get_memory_region(). This looks better in my point of view and looks
-> like a nice NVDIMM refactoring (at least judging from the patches I have
-> on my list now :) ).
-sure, I worry less about how it's implemented inside of device model as
-far as it behaves nicely to external user.
+Thanks for the review. Stefano, do you want to take it via the
+xen subtree?
+
+thanks
+-- PMM
