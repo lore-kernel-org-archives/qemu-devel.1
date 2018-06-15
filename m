@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fTpfh-0001sw-3X
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:55 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fTpfm-0001zG-S8
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fTpff-0006OX-DX
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:49 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42780)
+	(envelope-from <pm215@archaic.org.uk>) id 1fTpfl-0006Sn-DY
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:54 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42790)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fTpff-0006My-3C
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:47 -0400
+	id 1fTpfl-0006RO-2j
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 10:25:53 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fTpfe-0003oX-2S
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:25:46 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fTpfj-0003s5-RX
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 15:25:51 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Jun 2018 15:25:10 +0100
-Message-Id: <20180615142521.19143-33-peter.maydell@linaro.org>
+Date: Fri, 15 Jun 2018 15:25:18 +0100
+Message-Id: <20180615142521.19143-41-peter.maydell@linaro.org>
 In-Reply-To: <20180615142521.19143-1-peter.maydell@linaro.org>
 References: <20180615142521.19143-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 32/43] target/arm: Implement SVE Predicate Count
- Group
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 40/43] iommu: Add IOMMU index argument to
+ notifier APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,260 +33,226 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+Add support for multiple IOMMU indexes to the IOMMU notifier APIs.
+When initializing a notifier with iommu_notifier_init(), the caller
+must pass the IOMMU index that it is interested in. When a change
+happens, the IOMMU implementation must pass
+memory_region_notify_iommu() the IOMMU index that has changed and
+that notifiers must be called for.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180613015641.5667-15-richard.henderson@linaro.org
+IOMMUs which support only a single index don't need to change.
+Callers which only really support working with IOMMUs with a single
+index can use the result of passing MEMTXATTRS_UNSPECIFIED to
+memory_region_iommu_attrs_to_index().
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Message-id: 20180604152941.20374-3-peter.maydell@linaro.org
 ---
- target/arm/helper-sve.h    |   2 +
- target/arm/sve_helper.c    |  14 ++++
- target/arm/translate-sve.c | 133 +++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      |  27 ++++++++
- 4 files changed, 176 insertions(+)
+ include/exec/memory.h    | 7 ++++++-
+ hw/i386/intel_iommu.c    | 6 +++---
+ hw/ppc/spapr_iommu.c     | 2 +-
+ hw/s390x/s390-pci-inst.c | 4 ++--
+ hw/vfio/common.c         | 6 +++++-
+ hw/virtio/vhost.c        | 7 ++++++-
+ memory.c                 | 8 +++++++-
+ 7 files changed, 30 insertions(+), 10 deletions(-)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index f0a3ed3414c..dd4f8f754d8 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -676,3 +676,5 @@ DEF_HELPER_FLAGS_4(sve_brkbs_m, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index fa6e98ee7be..ec75c45296e 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -98,18 +98,21 @@ struct IOMMUNotifier {
+     /* Notify for address space range start <= addr <= end */
+     hwaddr start;
+     hwaddr end;
++    int iommu_idx;
+     QLIST_ENTRY(IOMMUNotifier) node;
+ };
+ typedef struct IOMMUNotifier IOMMUNotifier;
  
- DEF_HELPER_FLAGS_4(sve_brkn, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_brkns, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
+ static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
+                                        IOMMUNotifierFlag flags,
+-                                       hwaddr start, hwaddr end)
++                                       hwaddr start, hwaddr end,
++                                       int iommu_idx)
+ {
+     n->notify = fn;
+     n->notifier_flags = flags;
+     n->start = start;
+     n->end = end;
++    n->iommu_idx = iommu_idx;
+ }
+ 
+ /*
+@@ -1008,11 +1011,13 @@ uint64_t memory_region_iommu_get_min_page_size(IOMMUMemoryRegion *iommu_mr);
+  * should be notified with an UNMAP followed by a MAP.
+  *
+  * @iommu_mr: the memory region that was changed
++ * @iommu_idx: the IOMMU index for the translation table which has changed
+  * @entry: the new entry in the IOMMU translation table.  The entry
+  *         replaces all old entries for the same virtual I/O address range.
+  *         Deleted entries have .@perm == 0.
+  */
+ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
++                                int iommu_idx,
+                                 IOMMUTLBEntry entry);
+ 
+ /**
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index b5a09b79089..9c0b45963b5 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -1023,7 +1023,7 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+ static int vtd_sync_shadow_page_hook(IOMMUTLBEntry *entry,
+                                      void *private)
+ {
+-    memory_region_notify_iommu((IOMMUMemoryRegion *)private, *entry);
++    memory_region_notify_iommu((IOMMUMemoryRegion *)private, 0, *entry);
+     return 0;
+ }
+ 
+@@ -1581,7 +1581,7 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
+                     .addr_mask = size - 1,
+                     .perm = IOMMU_NONE,
+                 };
+-                memory_region_notify_iommu(&vtd_as->iommu, entry);
++                memory_region_notify_iommu(&vtd_as->iommu, 0, entry);
+             }
+         }
+     }
+@@ -2015,7 +2015,7 @@ static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
+     entry.iova = addr;
+     entry.perm = IOMMU_NONE;
+     entry.translated_addr = 0;
+-    memory_region_notify_iommu(&vtd_dev_as->iommu, entry);
++    memory_region_notify_iommu(&vtd_dev_as->iommu, 0, entry);
+ 
+ done:
+     return true;
+diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+index aaa6010d5c9..301708e45eb 100644
+--- a/hw/ppc/spapr_iommu.c
++++ b/hw/ppc/spapr_iommu.c
+@@ -428,7 +428,7 @@ static target_ulong put_tce_emu(sPAPRTCETable *tcet, target_ulong ioba,
+     entry.translated_addr = tce & page_mask;
+     entry.addr_mask = ~page_mask;
+     entry.perm = spapr_tce_iommu_access_flags(tce);
+-    memory_region_notify_iommu(&tcet->iommu, entry);
++    memory_region_notify_iommu(&tcet->iommu, 0, entry);
+ 
+     return H_SUCCESS;
+ }
+diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
+index d1a5f796783..7b61367ee31 100644
+--- a/hw/s390x/s390-pci-inst.c
++++ b/hw/s390x/s390-pci-inst.c
+@@ -589,7 +589,7 @@ static void s390_pci_update_iotlb(S390PCIIOMMU *iommu, S390IOTLBEntry *entry)
+             }
+ 
+             notify.perm = IOMMU_NONE;
+-            memory_region_notify_iommu(&iommu->iommu_mr, notify);
++            memory_region_notify_iommu(&iommu->iommu_mr, 0, notify);
+             notify.perm = entry->perm;
+         }
+ 
+@@ -601,7 +601,7 @@ static void s390_pci_update_iotlb(S390PCIIOMMU *iommu, S390IOTLBEntry *entry)
+         g_hash_table_replace(iommu->iotlb, &cache->iova, cache);
+     }
+ 
+-    memory_region_notify_iommu(&iommu->iommu_mr, notify);
++    memory_region_notify_iommu(&iommu->iommu_mr, 0, notify);
+ }
+ 
+ int rpcit_service_call(S390CPU *cpu, uint8_t r1, uint8_t r2, uintptr_t ra)
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 8e57265edf1..fb396cf00ac 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -507,6 +507,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
+     if (memory_region_is_iommu(section->mr)) {
+         VFIOGuestIOMMU *giommu;
+         IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
++        int iommu_idx;
+ 
+         trace_vfio_listener_region_add_iommu(iova, end);
+         /*
+@@ -523,10 +524,13 @@ static void vfio_listener_region_add(MemoryListener *listener,
+         llend = int128_add(int128_make64(section->offset_within_region),
+                            section->size);
+         llend = int128_sub(llend, int128_one());
++        iommu_idx = memory_region_iommu_attrs_to_index(iommu_mr,
++                                                       MEMTXATTRS_UNSPECIFIED);
+         iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
+                             IOMMU_NOTIFIER_ALL,
+                             section->offset_within_region,
+-                            int128_get64(llend));
++                            int128_get64(llend),
++                            iommu_idx);
+         QLIST_INSERT_HEAD(&container->giommu_list, giommu, giommu_next);
+ 
+         memory_region_register_iommu_notifier(section->mr, &giommu->n);
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 96175b214d7..b129cb9dddd 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -662,6 +662,8 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+                                          iommu_listener);
+     struct vhost_iommu *iommu;
+     Int128 end;
++    int iommu_idx;
++    IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
+ 
+     if (!memory_region_is_iommu(section->mr)) {
+         return;
+@@ -671,10 +673,13 @@ static void vhost_iommu_region_add(MemoryListener *listener,
+     end = int128_add(int128_make64(section->offset_within_region),
+                      section->size);
+     end = int128_sub(end, int128_one());
++    iommu_idx = memory_region_iommu_attrs_to_index(iommu_mr,
++                                                   MEMTXATTRS_UNSPECIFIED);
+     iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
+                         IOMMU_NOTIFIER_UNMAP,
+                         section->offset_within_region,
+-                        int128_get64(end));
++                        int128_get64(end),
++                        iommu_idx);
+     iommu->mr = section->mr;
+     iommu->iommu_offset = section->offset_within_address_space -
+                           section->offset_within_region;
+diff --git a/memory.c b/memory.c
+index 64f4a55d546..7aa75ff02d3 100644
+--- a/memory.c
++++ b/memory.c
+@@ -1799,6 +1799,9 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
+     iommu_mr = IOMMU_MEMORY_REGION(mr);
+     assert(n->notifier_flags != IOMMU_NOTIFIER_NONE);
+     assert(n->start <= n->end);
++    assert(n->iommu_idx >= 0 &&
++           n->iommu_idx < memory_region_iommu_num_indexes(iommu_mr));
 +
-+DEF_HELPER_FLAGS_3(sve_cntp, TCG_CALL_NO_RWG, i64, ptr, ptr, i32)
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index b27b502d750..a4ecd653c15 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -2724,3 +2724,17 @@ uint32_t HELPER(sve_brkns)(void *vd, void *vn, void *vg, uint32_t pred_desc)
-         return do_zero(vd, oprsz);
+     QLIST_INSERT_HEAD(&iommu_mr->iommu_notify, n, node);
+     memory_region_update_iommu_notify_flags(iommu_mr);
+ }
+@@ -1891,6 +1894,7 @@ void memory_region_notify_one(IOMMUNotifier *notifier,
+ }
+ 
+ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
++                                int iommu_idx,
+                                 IOMMUTLBEntry entry)
+ {
+     IOMMUNotifier *iommu_notifier;
+@@ -1898,7 +1902,9 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+     assert(memory_region_is_iommu(MEMORY_REGION(iommu_mr)));
+ 
+     IOMMU_NOTIFIER_FOREACH(iommu_notifier, iommu_mr) {
+-        memory_region_notify_one(iommu_notifier, &entry);
++        if (iommu_notifier->iommu_idx == iommu_idx) {
++            memory_region_notify_one(iommu_notifier, &entry);
++        }
      }
  }
-+
-+uint64_t HELPER(sve_cntp)(void *vn, void *vg, uint32_t pred_desc)
-+{
-+    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
-+    intptr_t esz = extract32(pred_desc, SIMD_DATA_SHIFT, 2);
-+    uint64_t *n = vn, *g = vg, sum = 0, mask = pred_esz_masks[esz];
-+    intptr_t i;
-+
-+    for (i = 0; i < DIV_ROUND_UP(oprsz, 8); ++i) {
-+        uint64_t t = n[i] & g[i] & mask;
-+        sum += ctpop64(t);
-+    }
-+    return sum;
-+}
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index c381240b6f4..6b0b8c55d00 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -34,6 +34,9 @@
- #include "translate-a64.h"
  
- 
-+typedef void GVecGen2sFn(unsigned, uint32_t, uint32_t,
-+                         TCGv_i64, uint32_t, uint32_t);
-+
- typedef void gen_helper_gvec_flags_3(TCGv_i32, TCGv_ptr, TCGv_ptr,
-                                      TCGv_ptr, TCGv_i32);
- typedef void gen_helper_gvec_flags_4(TCGv_i32, TCGv_ptr, TCGv_ptr,
-@@ -2959,6 +2962,136 @@ static bool trans_BRKN(DisasContext *s, arg_rpr_s *a, uint32_t insn)
-     return do_brk2(s, a, gen_helper_sve_brkn, gen_helper_sve_brkns);
- }
- 
-+/*
-+ *** SVE Predicate Count Group
-+ */
-+
-+static void do_cntp(DisasContext *s, TCGv_i64 val, int esz, int pn, int pg)
-+{
-+    unsigned psz = pred_full_reg_size(s);
-+
-+    if (psz <= 8) {
-+        uint64_t psz_mask;
-+
-+        tcg_gen_ld_i64(val, cpu_env, pred_full_reg_offset(s, pn));
-+        if (pn != pg) {
-+            TCGv_i64 g = tcg_temp_new_i64();
-+            tcg_gen_ld_i64(g, cpu_env, pred_full_reg_offset(s, pg));
-+            tcg_gen_and_i64(val, val, g);
-+            tcg_temp_free_i64(g);
-+        }
-+
-+        /* Reduce the pred_esz_masks value simply to reduce the
-+         * size of the code generated here.
-+         */
-+        psz_mask = MAKE_64BIT_MASK(0, psz * 8);
-+        tcg_gen_andi_i64(val, val, pred_esz_masks[esz] & psz_mask);
-+
-+        tcg_gen_ctpop_i64(val, val);
-+    } else {
-+        TCGv_ptr t_pn = tcg_temp_new_ptr();
-+        TCGv_ptr t_pg = tcg_temp_new_ptr();
-+        unsigned desc;
-+        TCGv_i32 t_desc;
-+
-+        desc = psz - 2;
-+        desc = deposit32(desc, SIMD_DATA_SHIFT, 2, esz);
-+
-+        tcg_gen_addi_ptr(t_pn, cpu_env, pred_full_reg_offset(s, pn));
-+        tcg_gen_addi_ptr(t_pg, cpu_env, pred_full_reg_offset(s, pg));
-+        t_desc = tcg_const_i32(desc);
-+
-+        gen_helper_sve_cntp(val, t_pn, t_pg, t_desc);
-+        tcg_temp_free_ptr(t_pn);
-+        tcg_temp_free_ptr(t_pg);
-+        tcg_temp_free_i32(t_desc);
-+    }
-+}
-+
-+static bool trans_CNTP(DisasContext *s, arg_CNTP *a, uint32_t insn)
-+{
-+    if (sve_access_check(s)) {
-+        do_cntp(s, cpu_reg(s, a->rd), a->esz, a->rn, a->pg);
-+    }
-+    return true;
-+}
-+
-+static bool trans_INCDECP_r(DisasContext *s, arg_incdec_pred *a,
-+                            uint32_t insn)
-+{
-+    if (sve_access_check(s)) {
-+        TCGv_i64 reg = cpu_reg(s, a->rd);
-+        TCGv_i64 val = tcg_temp_new_i64();
-+
-+        do_cntp(s, val, a->esz, a->pg, a->pg);
-+        if (a->d) {
-+            tcg_gen_sub_i64(reg, reg, val);
-+        } else {
-+            tcg_gen_add_i64(reg, reg, val);
-+        }
-+        tcg_temp_free_i64(val);
-+    }
-+    return true;
-+}
-+
-+static bool trans_INCDECP_z(DisasContext *s, arg_incdec2_pred *a,
-+                            uint32_t insn)
-+{
-+    if (a->esz == 0) {
-+        return false;
-+    }
-+    if (sve_access_check(s)) {
-+        unsigned vsz = vec_full_reg_size(s);
-+        TCGv_i64 val = tcg_temp_new_i64();
-+        GVecGen2sFn *gvec_fn = a->d ? tcg_gen_gvec_subs : tcg_gen_gvec_adds;
-+
-+        do_cntp(s, val, a->esz, a->pg, a->pg);
-+        gvec_fn(a->esz, vec_full_reg_offset(s, a->rd),
-+                vec_full_reg_offset(s, a->rn), val, vsz, vsz);
-+    }
-+    return true;
-+}
-+
-+static bool trans_SINCDECP_r_32(DisasContext *s, arg_incdec_pred *a,
-+                                uint32_t insn)
-+{
-+    if (sve_access_check(s)) {
-+        TCGv_i64 reg = cpu_reg(s, a->rd);
-+        TCGv_i64 val = tcg_temp_new_i64();
-+
-+        do_cntp(s, val, a->esz, a->pg, a->pg);
-+        do_sat_addsub_32(reg, val, a->u, a->d);
-+    }
-+    return true;
-+}
-+
-+static bool trans_SINCDECP_r_64(DisasContext *s, arg_incdec_pred *a,
-+                                uint32_t insn)
-+{
-+    if (sve_access_check(s)) {
-+        TCGv_i64 reg = cpu_reg(s, a->rd);
-+        TCGv_i64 val = tcg_temp_new_i64();
-+
-+        do_cntp(s, val, a->esz, a->pg, a->pg);
-+        do_sat_addsub_64(reg, val, a->u, a->d);
-+    }
-+    return true;
-+}
-+
-+static bool trans_SINCDECP_z(DisasContext *s, arg_incdec2_pred *a,
-+                             uint32_t insn)
-+{
-+    if (a->esz == 0) {
-+        return false;
-+    }
-+    if (sve_access_check(s)) {
-+        TCGv_i64 val = tcg_temp_new_i64();
-+        do_cntp(s, val, a->esz, a->pg, a->pg);
-+        do_sat_addsub_vec(s, a->esz, a->rd, a->rn, val, a->u, a->d);
-+    }
-+    return true;
-+}
-+
- /*
-  *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
-  */
-diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 66e1ee6b5c3..62d51c252b7 100644
---- a/target/arm/sve.decode
-+++ b/target/arm/sve.decode
-@@ -67,6 +67,8 @@
- &ptrue          rd esz pat s
- &incdec_cnt     rd pat esz imm d u
- &incdec2_cnt    rd rn pat esz imm d u
-+&incdec_pred    rd pg esz d u
-+&incdec2_pred   rd rn pg esz d u
- 
- ###########################################################################
- # Named instruction formats.  These are generally used to
-@@ -113,6 +115,7 @@
- 
- # One register operand, with governing predicate, vector element size
- @rd_pg_rn       ........ esz:2 ... ... ... pg:3 rn:5 rd:5       &rpr_esz
-+@rd_pg4_pn      ........ esz:2 ... ... .. pg:4 . rn:4 rd:5      &rpr_esz
- 
- # Two register operands with a 6-bit signed immediate.
- @rd_rn_i6       ........ ... rn:5 ..... imm:s6 rd:5             &rri
-@@ -153,6 +156,12 @@
- @incdec2_cnt    ........ esz:2 .. .... ...... pat:5 rd:5 \
-                 &incdec2_cnt imm=%imm4_16_p1 rn=%reg_movprfx
- 
-+# One register, predicate.
-+# User must fill in U and D.
-+@incdec_pred    ........ esz:2 .... .. ..... .. pg:4 rd:5       &incdec_pred
-+@incdec2_pred   ........ esz:2 .... .. ..... .. pg:4 rd:5 \
-+                &incdec2_pred rn=%reg_movprfx
-+
- ###########################################################################
- # Instruction patterns.  Grouped according to the SVE encodingindex.xhtml.
- 
-@@ -579,6 +588,24 @@ BRKB_m          00100101 1. 01000001 .... 0 .... 1 ....         @pd_pg_pn_s
- # SVE propagate break to next partition
- BRKN            00100101 0. 01100001 .... 0 .... 0 ....         @pd_pg_pn_s
- 
-+### SVE Predicate Count Group
-+
-+# SVE predicate count
-+CNTP            00100101 .. 100 000 10 .... 0 .... .....        @rd_pg4_pn
-+
-+# SVE inc/dec register by predicate count
-+INCDECP_r       00100101 .. 10110 d:1 10001 00 .... .....     @incdec_pred u=1
-+
-+# SVE inc/dec vector by predicate count
-+INCDECP_z       00100101 .. 10110 d:1 10000 00 .... .....    @incdec2_pred u=1
-+
-+# SVE saturating inc/dec register by predicate count
-+SINCDECP_r_32   00100101 .. 1010 d:1 u:1 10001 00 .... .....    @incdec_pred
-+SINCDECP_r_64   00100101 .. 1010 d:1 u:1 10001 10 .... .....    @incdec_pred
-+
-+# SVE saturating inc/dec vector by predicate count
-+SINCDECP_z      00100101 .. 1010 d:1 u:1 10000 00 .... .....    @incdec2_pred
-+
- ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
- 
- # SVE load predicate register
 -- 
 2.17.1
