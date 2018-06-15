@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTqc0-00042a-Cv
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:26:05 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fTqcW-0004WD-OR
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:26:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fTqbx-0006mv-8E
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:26:04 -0400
-Received: from 10.mo177.mail-out.ovh.net ([46.105.73.133]:53177)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fTqbx-0006mH-29
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:26:01 -0400
-Received: from player794.ha.ovh.net (unknown [10.109.122.50])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id EA3BAB68D6
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 17:25:59 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 15 Jun 2018 17:25:36 +0200
-Message-Id: <20180615152536.30093-5-clg@kaod.org>
-In-Reply-To: <20180615152536.30093-1-clg@kaod.org>
-References: <20180615152536.30093-1-clg@kaod.org>
+	(envelope-from <stefanha@redhat.com>) id 1fTqcV-0007EO-MC
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 11:26:36 -0400
+Date: Fri, 15 Jun 2018 16:26:28 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180615152628.GD12972@stefanha-x1.localdomain>
+References: <20180608060417.10170-1-famz@redhat.com>
+	<20180608060417.10170-5-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 4/4] ppc/pnv: consolidate the creation of
- the ISA bus device tree
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="osDK9TLjxFScVI/L"
+Content-Disposition: inline
+In-Reply-To: <20180608060417.10170-5-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/6] block-backend: Add blk_aio_copy_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,119 +24,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-The device tree node of the ISA bus was being partially done in
-different places. Move all the nodes creation under the same routine.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/ppc/pnv.c | 51 +++++++++++++++++++++++----------------------------
- 1 file changed, 23 insertions(+), 28 deletions(-)
+--osDK9TLjxFScVI/L
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index b416a1a6ed63..8969ccdd7ba3 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -265,18 +265,6 @@ static void pnv_dt_icp(PnvChip *chip, void *fdt, uin=
-t32_t pir,
-     g_free(reg);
- }
-=20
--static int pnv_chip_lpc_offset(PnvChip *chip, void *fdt)
--{
--    char *name;
--    int offset;
--
--    name =3D g_strdup_printf("/xscom@%" PRIx64 "/isa@%x",
--                           (uint64_t) PNV_XSCOM_BASE(chip), PNV_XSCOM_LP=
-C_BASE);
--    offset =3D fdt_path_offset(fdt, name);
--    g_free(name);
--    return offset;
--}
--
- static void pnv_dt_chip(PnvChip *chip, void *fdt)
- {
-     const char *typename =3D pnv_chip_core_typename(chip);
-@@ -285,16 +273,6 @@ static void pnv_dt_chip(PnvChip *chip, void *fdt)
-=20
-     pnv_dt_xscom(chip, fdt, 0);
-=20
--    /* The default LPC bus of a multichip system is on chip 0. It's
--     * recognized by the firmware (skiboot) using a "primary"
--     * property.
--     */
--    if (chip->chip_id =3D=3D 0x0) {
--        int lpc_offset =3D pnv_chip_lpc_offset(chip, fdt);
--
--        _FDT((fdt_setprop(fdt, lpc_offset, "primary", NULL, 0)));
--    }
--
-     for (i =3D 0; i < chip->nr_cores; i++) {
-         PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-=20
-@@ -418,16 +396,35 @@ static int pnv_dt_isa_device(DeviceState *dev, void=
- *opaque)
-     return 0;
- }
-=20
--static void pnv_dt_isa(ISABus *bus, void *fdt, int lpc_offset)
-+static int pnv_chip_isa_offset(PnvChip *chip, void *fdt)
-+{
-+    char *name;
-+    int offset;
-+
-+    name =3D g_strdup_printf("/xscom@%" PRIx64 "/isa@%x",
-+                           (uint64_t) PNV_XSCOM_BASE(chip), PNV_XSCOM_LP=
-C_BASE);
-+    offset =3D fdt_path_offset(fdt, name);
-+    g_free(name);
-+    return offset;
-+}
-+
-+/* The default LPC bus of a multichip system is on chip 0. It's
-+ * recognized by the firmware (skiboot) using a "primary" property.
-+ */
-+static void pnv_dt_isa(PnvMachineState *pnv, void *fdt)
- {
-+    int isa_offset =3D pnv_chip_isa_offset(pnv->chips[0], fdt);
-     ForeachPopulateArgs args =3D {
-         .fdt =3D fdt,
--        .offset =3D lpc_offset,
-+        .offset =3D isa_offset,
-     };
-=20
-+    _FDT((fdt_setprop(fdt, isa_offset, "primary", NULL, 0)));
-+
-     /* ISA devices are not necessarily parented to the ISA bus so we
-      * can not use object_child_foreach() */
--    qbus_walk_children(BUS(bus), pnv_dt_isa_device, NULL, NULL, NULL, &a=
-rgs);
-+    qbus_walk_children(BUS(pnv->isa_bus), pnv_dt_isa_device, NULL, NULL,=
- NULL,
-+                       &args);
- }
-=20
- static void *pnv_dt_create(MachineState *machine)
-@@ -438,7 +435,6 @@ static void *pnv_dt_create(MachineState *machine)
-     char *buf;
-     int off;
-     int i;
--    int lpc_offset;
-=20
-     fdt =3D g_malloc0(FDT_MAX_SIZE);
-     _FDT((fdt_create_empty_tree(fdt, FDT_MAX_SIZE)));
-@@ -480,8 +476,7 @@ static void *pnv_dt_create(MachineState *machine)
-     }
-=20
-     /* Populate ISA devices on chip 0 */
--    lpc_offset =3D pnv_chip_lpc_offset(pnv->chips[0], fdt);
--    pnv_dt_isa(pnv->isa_bus, fdt, lpc_offset);
-+    pnv_dt_isa(pnv, fdt);
-=20
-     if (pnv->bmc) {
-         pnv_dt_bmc_sensors(pnv->bmc, fdt);
---=20
-2.13.6
+On Fri, Jun 08, 2018 at 02:04:15PM +0800, Fam Zheng wrote:
+
+Why is a new _aio_ interface needed?  Aren't the copy_range callers
+coroutines?
+
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/block-backend.c          | 36 ++++++++++++++++++++++++++++++++++
+>  include/sysemu/block-backend.h |  4 ++++
+>  2 files changed, 40 insertions(+)
+>=20
+> diff --git a/block/block-backend.c b/block/block-backend.c
+> index e20a204bee..36d928e13d 100644
+> --- a/block/block-backend.c
+> +++ b/block/block-backend.c
+> @@ -1213,6 +1213,14 @@ typedef struct BlkRwCo {
+>              unsigned long int req;
+>              void *buf;
+>          } ioctl;
+> +
+> +        struct {
+> +            BlockBackend *dst_blk;
+> +            int64_t src_off;
+> +            int64_t dst_off;
+> +            int bytes;
+> +            BdrvRequestFlags flags;
+> +        } copy_range;
+>      };
+> =20
+>  } BlkRwCo;
+> @@ -1505,6 +1513,34 @@ BlockAIOCB *blk_aio_pwritev(BlockBackend *blk, int=
+64_t offset,
+>      return blk_aio_prwv(blk, &rwco, blk_aio_write_entry, cb, opaque);
+>  }
+> =20
+> +static void blk_aio_copy_range_entry(void *opaque)
+> +{
+> +    BlkAioEmAIOCB *acb =3D opaque;
+> +    BlkRwCo *rwco =3D &acb->rwco;
+> +
+> +    rwco->ret =3D blk_co_copy_range(rwco->blk, rwco->copy_range.src_off,
+> +                                  rwco->copy_range.dst_blk,
+> +                                  rwco->copy_range.dst_off,
+> +                                  rwco->copy_range.bytes,
+> +                                  rwco->copy_range.flags);
+> +    blk_aio_complete(acb);
+> +}
+> +
+> +BlockAIOCB *blk_aio_copy_range(BlockBackend *src, int64_t src_offset,
+> +                               BlockBackend *dst, int64_t dst_offset,
+> +                               uint64_t bytes, BdrvRequestFlags flags,
+> +                               BlockCompletionFunc *cb, void *opaque)
+> +{
+> +    BlkRwCo rwco =3D (BlkRwCo) {
+> +        .copy_range.src_off =3D src_offset,
+> +        .copy_range.dst_blk =3D dst,
+> +        .copy_range.dst_off =3D dst_offset,
+> +        .copy_range.bytes =3D bytes,
+> +        .copy_range.flags =3D flags,
+> +    };
+> +    return blk_aio_prwv(src, &rwco, blk_aio_copy_range_entry, cb, opaque=
+);
+> +}
+> +
+>  static void blk_aio_flush_entry(void *opaque)
+>  {
+>      BlkAioEmAIOCB *acb =3D opaque;
+> diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backen=
+d.h
+> index 8d03d493c2..ea121eac3f 100644
+> --- a/include/sysemu/block-backend.h
+> +++ b/include/sysemu/block-backend.h
+> @@ -147,6 +147,10 @@ BlockAIOCB *blk_aio_flush(BlockBackend *blk,
+>                            BlockCompletionFunc *cb, void *opaque);
+>  BlockAIOCB *blk_aio_pdiscard(BlockBackend *blk, int64_t offset, int byte=
+s,
+>                               BlockCompletionFunc *cb, void *opaque);
+> +BlockAIOCB *blk_aio_copy_range(BlockBackend *src, int64_t src_offset,
+> +                               BlockBackend *dst, int64_t dst_offset,
+> +                               uint64_t bytes, BdrvRequestFlags flags,
+> +                               BlockCompletionFunc *cb, void *opaque);
+>  void blk_aio_cancel(BlockAIOCB *acb);
+>  void blk_aio_cancel_async(BlockAIOCB *acb);
+>  int blk_co_ioctl(BlockBackend *blk, unsigned long int req, void *buf);
+> --=20
+> 2.17.0
+>=20
+
+--osDK9TLjxFScVI/L
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbI9qjAAoJEJykq7OBq3PIiz4IAL3vjb1utC+sjdhvuAwZxk1A
+/+pW9hi4IkMIvJuNlR7X8cakwQOPbehNjTO5GGbFRDy96pQoC3Zj9gNWbR5NQOXV
+zJIUH0W1EcSV5JXuas3tTHWt5Y2WpZO4mkJ5TA1bm9XLHvLFjyyElD/0lNzkWULr
+3y07EHqGO9o/jz6cEMRCl5VH4EdP76a7sDmlnOGXL9FnEP0pbWX3JJJNqp17GfgF
+aCGRogzUgoVeqGBLZ1GIkBR7vDpf3rF83ddUu485qjIdHrPUCJS9SZuvsiQU1L1L
+N/jVjoDb24o3jpEqQ3USrbYVyU/5emLdCqC85JAqrF5sl0Ym3eAs6YkpmFUP8vU=
+=rRQA
+-----END PGP SIGNATURE-----
+
+--osDK9TLjxFScVI/L--
