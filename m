@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTcua-0006cj-8x
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 20:48:22 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1fTcyg-0008RH-BU
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 20:52:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fTcuX-0006Bc-SH
-	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 20:48:20 -0400
-Date: Fri, 15 Jun 2018 10:19:51 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180615001951.GG4129@umbus.fritz.box>
-References: <20180614044129.13606-1-david@gibson.dropbear.id.au>
-	<20180614044129.13606-7-david@gibson.dropbear.id.au>
-	<20180614153443.42951304@bahia.lab.toulouse-stg.fr.ibm.com>
+	(envelope-from <arei.gonglei@huawei.com>) id 1fTcyd-0002g2-5c
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 20:52:34 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2333 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1fTcyc-0002a6-AO
+	for qemu-devel@nongnu.org; Thu, 14 Jun 2018 20:52:31 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Fri, 15 Jun 2018 00:52:05 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DB01BFEE@dggeml511-mbx.china.huawei.com>
+References: <cover.1528832686.git.alifm@linux.ibm.com>
+	<dd7e90c5b3de6f98218908c7f57d9d0286089ad5.1528832686.git.alifm@linux.ibm.com>
+	<20180613093700.GG27901@redhat.com>
+	<7b51465a-b7c1-58ec-1ef6-9fe791e96bbf@linux.ibm.com>
+	<20180613150512.GA19901@redhat.com>
+	<5833f4ec-dcd1-19ac-2848-facf31aec7cf@linux.ibm.com>
+	<20180614082155.GI6355@redhat.com>
+	<79597909-fdb5-2983-19ac-74332229c8ef@linux.ibm.com>
+	<20180614151048.GA18967@redhat.com>
+In-Reply-To: <20180614151048.GA18967@redhat.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9/eUdp+dLtKXvemk"
-Content-Disposition: inline
-In-Reply-To: <20180614153443.42951304@bahia.lab.toulouse-stg.fr.ibm.com>
-Subject: Re: [Qemu-devel] [PATCHv3 6/7] target/ppc: Replace intc pointer
- with a general machine_data pointer
+Subject: Re: [Qemu-devel] [RFC v1 1/1] virtio-crypto: Allow disabling of
+ cipher algorithms for virtio-crypto device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,399 +37,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>, Farhan Ali <alifm@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "frankja@linux.ibm.com" <frankja@linux.ibm.com>, "mst@redhat.com" <mst@redhat.com>, "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>, longpeng <longpeng2@huawei.com>, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, "mjrosato@linux.vnet.ibm.com" <mjrosato@linux.vnet.ibm.com>
 
-
---9/eUdp+dLtKXvemk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jun 14, 2018 at 03:34:43PM +0200, Greg Kurz wrote:
-> On Thu, 14 Jun 2018 14:41:28 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > PowerPCCPU contains an (Object *)intc used to point to the cpu's interr=
-upt
-> > controller.  Or more precisely to the "presentation" component of the
-> > interrupt controller relevant to this cpu.
-> >=20
-> > Really, this field is machine specific.  The machines which use it can
-> > point it to different types of object depending on their needs, and most
-> > machines don't use it at all (since they have older style PICs which do=
-n't
-> > have per-cpu presentation components).
-> >=20
-> > There's also other information that's per-cpu, but platform/machine
-> > specific.  So replace the intc pointer with a (void *)machine_data which
-> > can be managed as the machine type likes to conveniently store per cpu
-> > information.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > Reviewed-by: Greg Kurz <groug@kaod.org>
-> > ---
->=20
-> Ouch... I am having some concerns with this patch now.
->=20
-> First, I gave a try to CPU hotplug with the full series applied. It
-> causes QEMU to crash:
->=20
-> Program received signal SIGSEGV, Segmentation fault.
-> [Switching to Thread 0x7fffee3feaa0 (LWP 23290)]
-> kvm_arch_put_registers (cs=3D0x11497fd0, level=3D<optimized out>) at /hom=
-e/greg/Work/qemu/qemu-spapr/target/ppc/kvm.c:1068
-> 1068                if (kvm_put_vpa(cs) < 0) {
-> (gdb) p ((PowerPCCPU *)cs)->machine_data
-> $1 =3D (void *) 0x0
-> (gdb) thread apply all bt
->=20
-> Thread 6 (Thread 0x7fffee3feaa0 (LWP 23290)):
-> #0  kvm_arch_put_registers (cs=3D0x11497fd0, level=3D<optimized out>) at =
-/home/greg/Work/qemu/qemu-spapr/target/ppc/kvm.c:1068
-> #1  0x00000000100b3a18 in do_kvm_cpu_synchronize_post_init (cpu=3D<optimi=
-zed out>, arg=3D...) at /home/greg/Work/qemu/qemu-spapr/accel/kvm/kvm-all.c=
-:1817
-> #2  0x00000000102c2d18 in process_queued_cpu_work (cpu=3D<optimized out>)=
- at /home/greg/Work/qemu/qemu-spapr/cpus-common.c:342
-> #3  0x0000000010081e88 in qemu_wait_io_event_common (cpu=3D0x11497fd0) at=
- /home/greg/Work/qemu/qemu-spapr/cpus.c:1158
-> #4  0x0000000010081f38 in qemu_wait_io_event (cpu=3D0x11497fd0) at /home/=
-greg/Work/qemu/qemu-spapr/cpus.c:1185
-> #5  0x0000000010084248 in qemu_kvm_cpu_thread_fn (arg=3D0x11497fd0) at /h=
-ome/greg/Work/qemu/qemu-spapr/cpus.c:1220
-> #6  0x0000000010608cb0 in qemu_thread_start (args=3D0x10eb0510) at /home/=
-greg/Work/qemu/qemu-spapr/util/qemu-thread-posix.c:507
-> #7  0x00007ffff2758af4 in start_thread () from /lib64/libpthread.so.0
-> #8  0x00007ffff2688814 in clone () from /lib64/libc.so.6
->=20
-> [...]
->=20
-> Thread 1 (Thread 0x7ffff0ee2650 (LWP 23234)):
-> #0  0x00007ffff275e72c in pthread_cond_wait@@GLIBC_2.17 () from /lib64/li=
-bpthread.so.0
-> #1  0x00000000106095d0 in qemu_cond_wait_impl (cond=3D0x10cf7028 <qemu_wo=
-rk_cond>, mutex=3D0x10cd4d60 <qemu_global_mutex>, file=3D0x107b2ea8 "/home/=
-greg/Work/qemu/qemu-spapr/cpus-common.c", line=3D<optimized out>) at /home/=
-greg/Work/qemu/qemu-spapr/util/qemu-thread-posix.c:164
-> #2  0x00000000102c23d8 in do_run_on_cpu (cpu=3D<optimized out>, func=3D<o=
-ptimized out>, data=3D..., mutex=3D0x10cd4d60 <qemu_global_mutex>) at /home=
-/greg/Work/qemu/qemu-spapr/cpus-common.c:152
-> #3  0x0000000010083cb0 in run_on_cpu (cpu=3D<optimized out>, func=3D<opti=
-mized out>, data=3D...) at /home/greg/Work/qemu/qemu-spapr/cpus.c:1126
-> #4  0x00000000100b4bc4 in kvm_cpu_synchronize_post_init (cpu=3D<optimized=
- out>) at /home/greg/Work/qemu/qemu-spapr/accel/kvm/kvm-all.c:1823
-> #5  0x000000001047dbe8 in cpu_synchronize_post_init (cpu=3D0x11497fd0) at=
- /home/greg/Work/qemu/qemu-spapr/include/sysemu/hw_accel.h:48
-> #6  cpu_common_realizefn (dev=3D0x11497fd0, errp=3D<optimized out>) at /h=
-ome/greg/Work/qemu/qemu-spapr/qom/cpu.c:347
-> #7  0x00000000101aded4 in ppc_cpu_realize (dev=3D0x11497fd0, errp=3D0x7ff=
-fffffce50) at /home/greg/Work/qemu/qemu-spapr/target/ppc/translate_init.inc=
-=2Ec:9695
-> #8  0x0000000010326410 in device_set_realized (obj=3D0x11497fd0, value=3D=
-<optimized out>, errp=3D0x7fffffffd080) at /home/greg/Work/qemu/qemu-spapr/=
-hw/core/qdev.c:826
-> #9  0x00000000104c6ae0 in property_set_bool (obj=3D0x11497fd0, v=3D<optim=
-ized out>, name=3D<optimized out>, opaque=3D0x1182a120, errp=3D0x7fffffffd0=
-80) at /home/greg/Work/qemu/qemu-spapr/qom/object.c:1930
-> #10 0x00000000104c9838 in object_property_set (obj=3D0x11497fd0, v=3D0x11=
-9a0e20, name=3D0x1074fd90 "realized", errp=3D0x7fffffffd080) at /home/greg/=
-Work/qemu/qemu-spapr/qom/object.c:1122
-> #11 0x00000000104ccd6c in object_property_set_qobject (obj=3D0x11497fd0, =
-value=3D<optimized out>, name=3D<optimized out>, errp=3D<optimized out>) at=
- /home/greg/Work/qemu/qemu-spapr/qom/qom-qobject.c:27
-> #12 0x00000000104c9b00 in object_property_set_bool (obj=3D0x11497fd0, val=
-ue=3D<optimized out>, name=3D<optimized out>, errp=3D<optimized out>) at /h=
-ome/greg/Work/qemu/qemu-spapr/qom/object.c:1188
-> #13 0x0000000010168500 in spapr_realize_vcpu (errp=3D0x7fffffffd078, spap=
-r=3D<optimized out>, cpu=3D0x11497fd0) at /home/greg/Work/qemu/qemu-spapr/h=
-w/ppc/spapr_cpu_core.c:143
->=20
-> This happens when the core CPU realization code decides to copy the full
-> set of registers to KVM, but the machine_data pointer is still NULL.
->=20
-> So I think the fix belongs to this patch, see below.
->=20
-> >  hw/intc/xics.c                  |  5 +++--
-> >  hw/intc/xics_spapr.c            | 16 +++++++++++-----
-> >  hw/ppc/pnv.c                    |  4 ++--
-> >  hw/ppc/pnv_core.c               | 11 +++++++++--
-> >  hw/ppc/spapr.c                  |  8 ++++----
-> >  hw/ppc/spapr_cpu_core.c         | 13 ++++++++++---
-> >  include/hw/ppc/pnv_core.h       |  9 +++++++++
-> >  include/hw/ppc/spapr_cpu_core.h | 10 ++++++++++
-> >  include/hw/ppc/xics.h           |  4 ++--
-> >  target/ppc/cpu.h                |  2 +-
-> >  10 files changed, 61 insertions(+), 21 deletions(-)
-> >=20
-> > diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> > index e73e623e3b..689ad44e5f 100644
-> > --- a/hw/intc/xics.c
-> > +++ b/hw/intc/xics.c
-> > @@ -383,7 +383,8 @@ static const TypeInfo icp_info =3D {
-> >      .class_size =3D sizeof(ICPStateClass),
-> >  };
-> > =20
-> > -Object *icp_create(Object *cpu, const char *type, XICSFabric *xi, Erro=
-r **errp)
-> > +ICPState *icp_create(Object *cpu, const char *type, XICSFabric *xi,
-> > +                     Error **errp)
-> >  {
-> >      Error *local_err =3D NULL;
-> >      Object *obj;
-> > @@ -401,7 +402,7 @@ Object *icp_create(Object *cpu, const char *type, X=
-ICSFabric *xi, Error **errp)
-> >          obj =3D NULL;
-> >      }
-> > =20
-> > -    return obj;
-> > +    return ICP(obj);
-> >  }
-> > =20
-> >  /*
-> > diff --git a/hw/intc/xics_spapr.c b/hw/intc/xics_spapr.c
-> > index 2e27b92b87..01c76717cf 100644
-> > --- a/hw/intc/xics_spapr.c
-> > +++ b/hw/intc/xics_spapr.c
-> > @@ -31,6 +31,7 @@
-> >  #include "trace.h"
-> >  #include "qemu/timer.h"
-> >  #include "hw/ppc/spapr.h"
-> > +#include "hw/ppc/spapr_cpu_core.h"
-> >  #include "hw/ppc/xics.h"
-> >  #include "hw/ppc/fdt.h"
-> >  #include "qapi/visitor.h"
-> > @@ -43,8 +44,9 @@ static target_ulong h_cppr(PowerPCCPU *cpu, sPAPRMach=
-ineState *spapr,
-> >                             target_ulong opcode, target_ulong *args)
-> >  {
-> >      target_ulong cppr =3D args[0];
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> > =20
-> > -    icp_set_cppr(ICP(cpu->intc), cppr);
-> > +    icp_set_cppr(spapr_cpu->icp, cppr);
-> >      return H_SUCCESS;
-> >  }
-> > =20
-> > @@ -65,7 +67,8 @@ static target_ulong h_ipi(PowerPCCPU *cpu, sPAPRMachi=
-neState *spapr,
-> >  static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-> >                             target_ulong opcode, target_ulong *args)
-> >  {
-> > -    uint32_t xirr =3D icp_accept(ICP(cpu->intc));
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> > +    uint32_t xirr =3D icp_accept(spapr_cpu->icp);
-> > =20
-> >      args[0] =3D xirr;
-> >      return H_SUCCESS;
-> > @@ -74,7 +77,8 @@ static target_ulong h_xirr(PowerPCCPU *cpu, sPAPRMach=
-ineState *spapr,
-> >  static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-> >                               target_ulong opcode, target_ulong *args)
-> >  {
-> > -    uint32_t xirr =3D icp_accept(ICP(cpu->intc));
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> > +    uint32_t xirr =3D icp_accept(spapr_cpu->icp);
-> > =20
-> >      args[0] =3D xirr;
-> >      args[1] =3D cpu_get_host_ticks();
-> > @@ -84,9 +88,10 @@ static target_ulong h_xirr_x(PowerPCCPU *cpu, sPAPRM=
-achineState *spapr,
-> >  static target_ulong h_eoi(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-> >                            target_ulong opcode, target_ulong *args)
-> >  {
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> >      target_ulong xirr =3D args[0];
-> > =20
-> > -    icp_eoi(ICP(cpu->intc), xirr);
-> > +    icp_eoi(spapr_cpu->icp, xirr);
-> >      return H_SUCCESS;
-> >  }
-> > =20
-> > @@ -94,7 +99,8 @@ static target_ulong h_ipoll(PowerPCCPU *cpu, sPAPRMac=
-hineState *spapr,
-> >                              target_ulong opcode, target_ulong *args)
-> >  {
-> >      uint32_t mfrr;
-> > -    uint32_t xirr =3D icp_ipoll(ICP(cpu->intc), &mfrr);
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> > +    uint32_t xirr =3D icp_ipoll(spapr_cpu->icp, &mfrr);
-> > =20
-> >      args[0] =3D xirr;
-> >      args[1] =3D mfrr;
-> > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> > index 0b9508d94d..3a36c6ac6a 100644
-> > --- a/hw/ppc/pnv.c
-> > +++ b/hw/ppc/pnv.c
-> > @@ -1013,7 +1013,7 @@ static ICPState *pnv_icp_get(XICSFabric *xi, int =
-pir)
-> >  {
-> >      PowerPCCPU *cpu =3D ppc_get_vcpu_by_pir(pir);
-> > =20
-> > -    return cpu ? ICP(cpu->intc) : NULL;
-> > +    return cpu ? pnv_cpu_state(cpu)->icp : NULL;
-> >  }
-> > =20
-> >  static void pnv_pic_print_info(InterruptStatsProvider *obj,
-> > @@ -1026,7 +1026,7 @@ static void pnv_pic_print_info(InterruptStatsProv=
-ider *obj,
-> >      CPU_FOREACH(cs) {
-> >          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > =20
-> > -        icp_pic_print_info(ICP(cpu->intc), mon);
-> > +        icp_pic_print_info(pnv_cpu_state(cpu)->icp, mon);
-> >      }
-> > =20
-> >      for (i =3D 0; i < pnv->num_chips; i++) {
-> > diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> > index f7cf33f547..746bc5c2c5 100644
-> > --- a/hw/ppc/pnv_core.c
-> > +++ b/hw/ppc/pnv_core.c
-> > @@ -105,6 +105,7 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSF=
-abric *xi, Error **errp)
-> >      int core_pir;
-> >      int thread_index =3D 0; /* TODO: TCG supports only one thread */
-> >      ppc_spr_t *pir =3D &env->spr_cb[SPR_PIR];
-> > +    PnvCPUState *pnv_cpu;
-> >      Error *local_err =3D NULL;
-> > =20
-> >      object_property_set_bool(OBJECT(cpu), true, "realized", &local_err=
-);
-> > @@ -113,7 +114,9 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSF=
-abric *xi, Error **errp)
-> >          return;
-> >      }
-> > =20
-> > -    cpu->intc =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, xi, &local_err=
-);
-> > +    cpu->machine_data =3D pnv_cpu =3D g_new0(PnvCPUState, 1);
-> > +
-> > +    pnv_cpu->icp =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, xi, &local_=
-err);
-> >      if (local_err) {
-> >          error_propagate(errp, local_err);
-> >          return;
-> > @@ -188,8 +191,12 @@ err:
-> > =20
-> >  static void pnv_unrealize_vcpu(PowerPCCPU *cpu)
-> >  {
-> > +    PnvCPUState *pnv_cpu =3D pnv_cpu_state(cpu);
-> > +
-> >      qemu_unregister_reset(pnv_cpu_reset, cpu);
-> > -    object_unparent(cpu->intc);
-> > +    object_unparent(OBJECT(pnv_cpu->icp));
-> > +    cpu->machine_data =3D NULL;
-> > +    g_free(pnv_cpu);
-> >      cpu_remove_sync(CPU(cpu));
-> >      object_unparent(OBJECT(cpu));
-> >  }
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index f59999daac..cbab6b6b7e 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -1745,8 +1745,8 @@ static int spapr_post_load(void *opaque, int vers=
-ion_id)
-> >      if (!object_dynamic_cast(OBJECT(spapr->ics), TYPE_ICS_KVM)) {
-> >          CPUState *cs;
-> >          CPU_FOREACH(cs) {
-> > -            PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > -            icp_resend(ICP(cpu->intc));
-> > +            sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(POWERPC_CPU(c=
-s));
-> > +            icp_resend(spapr_cpu->icp);
-> >          }
-> >      }
-> > =20
-> > @@ -3783,7 +3783,7 @@ static ICPState *spapr_icp_get(XICSFabric *xi, in=
-t vcpu_id)
-> >  {
-> >      PowerPCCPU *cpu =3D spapr_find_cpu(vcpu_id);
-> > =20
-> > -    return cpu ? ICP(cpu->intc) : NULL;
-> > +    return cpu ? spapr_cpu_state(cpu)->icp : NULL;
-> >  }
-> > =20
-> >  #define ICS_IRQ_FREE(ics, srcno)   \
-> > @@ -3925,7 +3925,7 @@ static void spapr_pic_print_info(InterruptStatsPr=
-ovider *obj,
-> >      CPU_FOREACH(cs) {
-> >          PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > =20
-> > -        icp_pic_print_info(ICP(cpu->intc), mon);
-> > +        icp_pic_print_info(spapr_cpu_state(cpu)->icp, mon);
-> >      }
-> > =20
-> >      ics_pic_print_info(spapr->ics, mon);
-> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > index 7fdb3b6667..544bda93e2 100644
-> > --- a/hw/ppc/spapr_cpu_core.c
-> > +++ b/hw/ppc/spapr_cpu_core.c
-> > @@ -104,8 +104,12 @@ const char *spapr_get_cpu_core_type(const char *cp=
-u_type)
-> > =20
-> >  static void spapr_unrealize_vcpu(PowerPCCPU *cpu)
-> >  {
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> > +
-> >      qemu_unregister_reset(spapr_cpu_reset, cpu);
-> > -    object_unparent(cpu->intc);
-> > +    object_unparent(OBJECT(spapr_cpu->icp));
-> > +    cpu->machine_data =3D NULL;
-> > +    g_free(spapr_cpu);
-> >      cpu_remove_sync(CPU(cpu));
-> >      object_unparent(OBJECT(cpu));
-> >  }
-> > @@ -127,12 +131,15 @@ static void spapr_realize_vcpu(PowerPCCPU *cpu, s=
-PAPRMachineState *spapr,
-> >  {
-> >      CPUPPCState *env =3D &cpu->env;
-> >      Error *local_err =3D NULL;
-> > +    sPAPRCPUState *spapr_cpu;
-> > =20
-> >      object_property_set_bool(OBJECT(cpu), true, "realized", &local_err=
-);
-> >      if (local_err) {
-> >          goto error;
-> >      }
-> > =20
-> > +    spapr_cpu =3D cpu->machine_data =3D g_new0(sPAPRCPUState, 1);
-> > +
->=20
-> machine_data is a cpu attribute and all users of spapr_cpu_state() assume=
- it
-> is always valid. It should be set before any code tries to dereference it,
-> which I believe cannot happen before the call to object_property_set_bool=
-().
-> So I guess setting it at the beginning of the function should be fine (at
-> least, it fixes the crash).
-
-Ah, good point.  I've moved it up before setting realized, for both
-spapr and pnv.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---9/eUdp+dLtKXvemk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsjBicACgkQbDjKyiDZ
-s5LdSRAApO5dVsvE1NIZ4wQVxYjN0vi8Pw3GSjkRCZ1cHy3apduGZuHOIPZ2w7oL
-5vuJloDJWAd+X2/VVCO9ASBGu621KCNtlkzpH2j8+inZrYVNCKNRHQkVw9sMwnNX
-den579aZhdAFlpcC17wltDaIdAbuzF19L0jTA9QDTQotOJupiv50CRHqiq0bCl8s
-98kxGdICGOsOXwqd3vOqpDYHubD1OJaWGytOO37ze6qegDuwLuVT6wSQzkcOGgll
-PxtNGIiLwzpJowuXP6u9eyICHdsBCFlXSXlKF2icOWWn/e3JXwJaksKGcVqYYeDd
-MgAz8R8j+dWNBm1J4SNF1dR50boj2pTJDo8trKKv3MknKFofmnpCmWXe5JNCdPqp
-+dkG6F40qftdBU/NWMD+wK1Jj9RohDJqc6KItpZ8Myb5ycxt3j/rl2WKH1uAYB4c
-l9yV6WDfRfvUeUrGEAimH/65eBOyyITfj4TUt8runNTBnDptzyyzRRNnx2b4Z8i0
-wW7AHHoz/TiRCT6+D4IzNCrjn9uMXeXawLPnKXtCrOtEQfs4EUjc5BSonvl9Zl09
-L6cwn68tuT+xbsqd9n6kitazUaGB96aV63u29vil/2SIAUYuMpxIMy6+5DrT+ged
-EdBZEIbtEyJ5MVyNmO0gojKXm0WmcpQJbXObTdAdcfv0bcxgPUI=
-=qBww
------END PGP SIGNATURE-----
-
---9/eUdp+dLtKXvemk--
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRGFuaWVsIFAuIEJlcnJh
+bmfDqSBbbWFpbHRvOmJlcnJhbmdlQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFRodXJzZGF5LCBKdW5l
+IDE0LCAyMDE4IDExOjExIFBNDQo+IFRvOiBGYXJoYW4gQWxpIDxhbGlmbUBsaW51eC5pYm0uY29t
+Pg0KPiBDYzogSGFsaWwgUGFzaWMgPHBhc2ljQGxpbnV4LmlibS5jb20+OyBxZW11LWRldmVsQG5v
+bmdudS5vcmc7DQo+IGZyYW5ramFAbGludXguaWJtLmNvbTsgbXN0QHJlZGhhdC5jb207IGJvcm50
+cmFlZ2VyQGRlLmlibS5jb207IEdvbmdsZWkNCj4gKEFyZWkpIDxhcmVpLmdvbmdsZWlAaHVhd2Vp
+LmNvbT47IGxvbmdwZW5nIDxsb25ncGVuZzJAaHVhd2VpLmNvbT47DQo+IFZpa3RvciBNaWhhamxv
+dnNraSA8bWloYWpsb3ZAbGludXgudm5ldC5pYm0uY29tPjsNCj4gbWpyb3NhdG9AbGludXgudm5l
+dC5pYm0uY29tDQo+IFN1YmplY3Q6IFJlOiBbUWVtdS1kZXZlbF0gW1JGQyB2MSAxLzFdIHZpcnRp
+by1jcnlwdG86IEFsbG93IGRpc2FibGluZyBvZiBjaXBoZXINCj4gYWxnb3JpdGhtcyBmb3Igdmly
+dGlvLWNyeXB0byBkZXZpY2UNCj4gDQo+IE9uIFRodSwgSnVuIDE0LCAyMDE4IGF0IDEwOjUwOjQw
+QU0gLTA0MDAsIEZhcmhhbiBBbGkgd3JvdGU6DQo+ID4NCj4gPg0KPiA+IE9uIDA2LzE0LzIwMTgg
+MDQ6MjEgQU0sIERhbmllbCBQLiBCZXJyYW5nw6kgd3JvdGU6DQo+ID4gPiBPbiBXZWQsIEp1biAx
+MywgMjAxOCBhdCAwNzoyODowOFBNICswMjAwLCBIYWxpbCBQYXNpYyB3cm90ZToNCj4gPiA+ID4N
+Cj4gPiA+ID4NCj4gPiA+ID4gT24gMDYvMTMvMjAxOCAwNTowNSBQTSwgRGFuaWVsIFAuIEJlcnJh
+bmfDqSB3cm90ZToNCj4gPiA+ID4gPiBPbiBXZWQsIEp1biAxMywgMjAxOCBhdCAxMTowMTowNUFN
+IC0wNDAwLCBGYXJoYW4gQWxpIHdyb3RlOg0KPiA+ID4gPiA+ID4gSGkgRGFuaWVsDQo+ID4gPiA+
+ID4gPg0KPiA+ID4gPiA+ID4gT24gMDYvMTMvMjAxOCAwNTozNyBBTSwgRGFuaWVsIFAuIEJlcnJh
+bmfDqSB3cm90ZToNCj4gPiA+ID4gPiA+ID4gT24gVHVlLCBKdW4gMTIsIDIwMTggYXQgMDM6NDg6
+MzRQTSAtMDQwMCwgRmFyaGFuIEFsaSB3cm90ZToNCj4gPiA+ID4gPiA+ID4gPiBUaGUgdmlydGlv
+LWNyeXB0byBkcml2ZXIgY3VycmVudGx5IHByb3BhZ2F0ZXMgdG8gdGhlIGd1ZXN0DQo+ID4gPiA+
+ID4gPiA+ID4gYWxsIHRoZSBjaXBoZXIgYWxnb3JpdGhtcyB0aGF0IHRoZSBiYWNrZW5kIGNyeXB0
+b2RldiBjYW4NCj4gPiA+ID4gPiA+ID4gPiBzdXBwb3J0LiBCdXQgaW4gY2VydGFpbiBjYXNlcyB3
+aGVyZSB0aGUgZ3Vlc3QgaGFzIG1vcmUNCj4gPiA+ID4gPiA+ID4gPiBwZXJmb3JtYW50IG1lY2hh
+bmlzbSB0byBoYW5kbGUgc29tZSBhbGdvcml0aG1zLCBpdCB3b3VsZCBiZQ0KPiA+ID4gPiA+ID4g
+PiA+IHVzZWZ1bCB0byBwcm9wYWdhdGUgb25seSBhIHN1YnNldCBvZiB0aGUgYWxnb3JpdGhtcy4N
+Cj4gPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gSSdtIG5vdCByZWFsbHkgY29udmluY2VkIGJ5
+IHRoaXMuDQo+ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4gPiA+IFRoZSBwZXJmb3JtYW5jZSBvZiBj
+cnlwdG8gYWxnb3JpdGhtcyBoYXMgbWFueSBpbmZsdWVuY2luZw0KPiA+ID4gPiA+ID4gPiBmYWN0
+b3JzLCBtYWtpbmcgaXQgcHJldHR5IGhhcmQgdG8gZGVjaWRlIHdoaWNoIGlzIGJlc3QNCj4gPiA+
+ID4gPiA+ID4gd2l0aG91dCBhY3RpdmVseSB0ZXN0aW5nIHNwZWNpZmljIGltcGxzIGFuZCBjb21w
+YXJpbmcNCj4gPiA+ID4gPiA+ID4gdGhlbSBpbiBhIG1hbm5lciB3aGljaCBtYXRjaGVzIHRoZSBh
+cHBsaWNhdGlvbiB1c2FnZQ0KPiA+ID4gPiA+ID4gPiBwYXR0ZXJuLiBlZyBpbiB0aGVvcnkgdGhl
+IGtlcm5lbCBjcnlwdG8gaW1wbCBvZiBhbiBhbGcNCj4gPiA+ID4gPiA+ID4gaXMgZmFzdGVyIHRo
+YW4gYSB1c2Vyc3BhY2UgaW1wbCwgaWYgdGhlIGtlcm5lbCB1c2VzDQo+ID4gPiA+ID4gPiA+IGhh
+cmR3YXJlIGFjY2VsIGFuZCB1c2Vyc3BhY2UgZG9lcyBub3QuIFRoaXMsIGhvd2V2ZXIsDQo+ID4g
+PiA+ID4gPiA+IGlnbm9yZXMgdGhlIG92ZXJoZWFkIG9mIHRoZSBrZXJuZWwvdXNlcnNwYWNlIHN3
+aXRjaC4NCj4gPiA+ID4gPiA+ID4gVGhlIHJlYWwgd29ybGQgcGVyZm9ybWFuY2Ugd2lubmVyLCB0
+aHVzIGRlcGVuZHMgb24gdGhlDQo+ID4gPiA+ID4gPiA+IGFtb3VudCBvZiBkYXRhIGJlaW5nIHBy
+b2Nlc3NlZCBpbiBlYWNoIG9wZXJhdGlvbi4gU29tZQ0KPiA+ID4gPiA+ID4gPiB0aW1lcyB1c2Vy
+c3BhY2UgY2FuIHdpbiAmIHNvbWV0aW1lcyBrZXJuZWwgc3BhY2UgY2FuDQo+ID4gPiA+ID4gPiA+
+IHdpbi4gVGhpcyBpcyBldmVuIG1vcmUgcmVsZXZhbnQgdG8gdmlydGlvLWNyeXB0byBhcw0KPiA+
+ID4gPiA+ID4gPiBpdCBoYXMgbW9yZSBleHBlbnNpdmUgY29udGV4dCBzd2l0Y2hlcy4NCj4gPiA+
+ID4gPiA+DQo+ID4gPiA+ID4gPiBUcnVlLiBCdXQgd2hhdCBpZiB0aGUgZ3Vlc3QgY2FuIHBlcmZv
+cm0gc29tZSBjcnlwdG8gYWxnb3JpdGhtcw0KPiB3aXRob3V0IGENCj4gPiA+ID4gPiA+IGluY3Vy
+cmluZyBhIFZNIGV4aXQ/IEZvciBleGFtcGxlIGluIHMzOTAgd2UgaGF2ZSB0aGUgY3BhY2YNCj4g
+aW5zdHJ1Y3Rpb25zIHRvDQo+ID4gPiA+ID4gPiBwZXJmb3JtIGNyeXB0byBhbmQgdGhpcyBpbnN0
+cnVjdGlvbiBpcyBpbXBsZW1lbnRlZCBmb3IgdXMgYnkgb3VyDQo+IGhhcmR3YXJlDQo+ID4gPiA+
+ID4gPiB2aXJ0dWFsaXphdGlvbiB0ZWNobm9sb2d5LiBJbiBzdWNoIGEgY2FzZSBpdCB3b3VsZCBi
+ZSBiZXR0ZXIgbm90IHRvIHVzZQ0KPiA+ID4gPiA+ID4gdmlydGlvLWNyeXB0bydzIGltcGxlbWVu
+dGF0aW9uIG9mIHN1Y2ggYSBjcnlwdG8gYWxnb3JpdGhtLg0KPiA+ID4gPiA+ID4NCj4gPiA+ID4g
+PiA+IEF0IHRoZSBzYW1lIHRpbWUgd2Ugd291bGQgbGlrZSB0byB0YWtlIGFkdmFudGFnZSBvZiB2
+aXJ0aW8tY3J5cHRvJ3MNCj4gPiA+ID4gPiA+IGFjY2VsZXJhdGlvbiBjYXBhYmlsaXRpZXMgZm9y
+IGNlcnRhaW4gY3J5cHRvIGFsZ29yaXRobXMgZm9yIHdoaWNoIHRoZXJlDQo+IGlzDQo+ID4gPiA+
+ID4gPiBubyBoYXJkd2FyZSBhc3Npc3RhbmNlLg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gSUlVQywg
+dGhlIGtlcm5lbCdzIGNyeXB0byBsYXllciBjYW4gc3VwcG9ydCBtdWx0aXBsZSBpbXBsZW1lbnRh
+dGlvbnMgb2YNCj4gPiA+ID4gPiBhbnkgYWxnb3JpdGhtLiBQcm92aWRlcnMgY2FuIHJlcG9ydCBh
+IHByaW9yaXR5IGFnYWluc3QgaW1wbGVtZW50YXRpb25zDQo+ID4gPiA+ID4gd2hpY2ggaW5mbHVl
+bmNlcyB3aGljaCBpbXBsIGlzIHVzZWQgaW4gcHJhY3RpY2UuIFNvIGlmIHRoZXJlJ3MgYSBuYXRp
+dmUNCj4gPiA+ID4gPiBpbnN0cnVjdGlvbiBmb3IgYSBwYXJ0aXVjbGFyIGFsZ29yaXRobSBJIHdv
+dWxkIGV4cGVjdCB0aGUgaW1wbCByZWdpc3RlcmVkDQo+ID4gPiA+ID4gZm9yIHRoYXQgdG8gYmUg
+ZGVzaWduYXRlZCBoaWdoZXIgcHJpb3JpdHkgdGhhbiBvdGhlciBpbXBscywgc28gdGhhdCBpdCBp
+cw0KPiA+ID4gPiA+IHVzZWQgaW4gcHJlZmVyZW5jZSB0byBvdGhlciBpbXBscy4NCj4gPiA+ID4g
+Pg0KPiA+ID4gPg0KPiA+ID4gPiBBRkFJUiB0aGUgcHJvYmxlbSBoZXJlIGlzIHRoYXQgaW4gKHRo
+ZSBndWVzdCkga2VybmVsIHRoZSB2aXJ0aW8tY3J5cHRvDQo+ID4gPiA+IGRyaXZlciBoYXMgdG8g
+cmVnaXN0ZXIgaXQncyBjcnlwdG8gYWxnbyBpbXBsZW1lbnRhdGlvbnMgd2l0aCBhIHByaW9yaXR5
+DQo+ID4gPiA+IChzaW5nbGUgbnVtYmVyKSwgd2hpY2ggZGljdGF0ZXMgaWYgaXQncyBnb2luZyB0
+byBiZSB0aGUgcHJlZmVycmVkICh1c2VkKQ0KPiA+ID4gPiBpbXBsZW1lbnRhdGlvbiBvZiB0aGUg
+YWxnb3JpdGhtIG9yIG5vdC4gVGhlIHZpcnRpby1jcnlwdG8gZHJpdmVyIGRvZXMgdGhpcw0KPiA+
+ID4gPiB3aXRob3V0IGhhdmluZyBpbmZvcm1hdGlvbiBhYm91dCB0aGUgKGNvbXBhcmF0aXZlIG9y
+IGFic29sdXRlKQ0KPiBwZXJmb3JtYW5jZQ0KPiA+ID4gPiBvZiBpdCdzIGltcGxlbWVudGF0aW9u
+ICh3aGljaCBkZXBlbmRzIG9uIHRoZSBiYWNrZW5kIGFtb25nIG90aGVycykuIEkNCj4gZG9uJ3Qg
+dGhpbmsNCj4gPiA+ID4gYW55IGR5bmFtaWMgcmUtcHJpb3JpdGl6YXRpb24gb2YgdGhlIGFsZ29y
+aXRobXMgdGFrZXMgcGxhY2UgKGUuZy4gYmFzZWQgb24NCj4gaG93IHRoZXNlDQo+ID4gPiA+IHBl
+cmZvcm0gaW4gZm9yIHRoZSBnaXZlbiBjb25maWd1cmF0aW9uKS4NCj4gPiA+ID4NCj4gPiA+ID4g
+SSB0aGluayB0aGUgc3RyYXRlZ3kgb2YgdGhlIHZpcnRpby1jcnlwdG8gaXMgdG8gcmF0aGVyIG92
+ZXJzdGF0ZSwgdGhhbg0KPiA+ID4gPiB1bmRlcnN0YXRlIHRoZSBwZXJmb3JtYW5jZSBvZiBpdCdz
+IGltcGxlbWVudGF0aW9uLiBJZiB3ZSB3ZXJlIHRvICdiZQ0KPiA+ID4gPiBjb25zZXJ2YXRpdmUn
+IGFuZCBzYXksICdoZXkgd2UgZG9uJ3Qga25vdyBub3RoaW5nIGFib3V0IHRoZSBwZXJmb3JtYW5j
+ZSwNCj4gPiA+ID4gbGV0J3MgbWFrZSBpdCBsb3dlc3QgcHJpb3JpdHkgaW1wbGVtZW50YXRpb24n
+IHRoZSBpbXBsZW1lbnRhdGlvbnMNCj4gcHJvdmlkZWQNCj4gPiA+ID4gYnkgdmlydGlvLWNyeXB0
+byB3b3VsZCBlbmQgdXAgYmVpbmcgdXNlZCBvbmx5IGlmIHRoZXJlIGlzIG5vIG90aGVyDQo+ID4g
+PiA+IGltcGxlbWVudGF0aW9uLiBBbmQgdGhhdCBkb2VzIG5vdCBzb3VuZCBsaWtlIGEgZ29vZCBp
+ZGVhIGVpdGhlci4NCj4gPiA+DQo+ID4gPg0KPiA+ID4gVGhpcyBwcm9ibGVtIHlvdSBkZXNjcmli
+ZSwgaG93ZXZlciwgaXMgc29tZXRoaW5nIHRoYXQgYXBwbGllcyB0byAqYW55Kg0KPiA+ID4ga2Vy
+ZW5sIGNvZGUgdGhhdCBpcyByZWdpc3RlcmluZyBhIGNyeXB0byBhbGdvIGltcGwgZm9yIGFjY2Vs
+ZXJhdG9yDQo+ID4gPiBoYXJkd2FyZS4gQSBub24tdmlydHVhbGl6ZWQgY3J5cHRvIGNhcmRzIGlu
+IGJhcmUgbWV0YWwgbGlrZXdpc2UgY2Fubm90DQo+ID4gPiBhc3N1bWUgdGhhdCBpdHMgQUVTIGlt
+cGwgaXMgYmV0dGVyIHRoZW4gdGhlIGhvc3QgQ1BVJ3MgIGFlcy1uaSBpbnN0cnVjdGlvbi4NCj4g
+PiA+DQo+ID4gPiA+IFNvIHRoZSBpZGVhIGlzIHRvIGdpdmUgdGhlIHVzZXIgdGhlIHBvd2VyIHRv
+IGVmZmVjdGl2ZWx5IG5vdCBwcm92aWRlDQo+ID4gPiA+IGFuIGFsZ29yaXRobSB2aWEgdmlydGlv
+LWNyeXB0by4gVGhhdCBpcywgaWYgdGhlIHVzZXIgb2JzZXJ2ZXMgYSBwZXJmb3JtYW5jZQ0KPiA+
+ID4gPiBkZWdyYWRhdGlvbiBiZWNhdXNlIG9mIHZpcnRpby1jcnlwdG8sIGhlIGNhbiB0dXJuIG9m
+ZiB0aGUgYmFkIGFsZ29yaXRobXMNCj4gPiA+ID4gYXQgdGhlIGRldmljZS4gVGhhdCB3YXkgb3Zl
+cnN0YXRlbWVudCBiZWNvbWVzIGEgbXVjaCBzbWFsbGVyIHByb2JsZW0uDQo+ID4gPiA+IFRoZSB1
+c2VyIGNhbiB0dXJuIG9mZiB0aGUgYmFkIGFsZ29yaXRobXMgZm9yIHJlYXNvbnMgb3RoZXIgdGhh
+bg0KPiBwZXJmb3JtYW5jZQ0KPiA+ID4gPiB0b28uDQo+ID4gPiA+DQo+ID4gPiA+IE9mIGNvdXJz
+ZSB0aGVyZSBhcmUgb3RoZXIgd2F5cyB0byBkZWFsIHdpdGggdGhlIHByb2JsZW0gb2YgdmlydGlv
+LWNyeXB0bw0KPiA+ID4gPiBkcml2ZXIgbm90IGtub3dpbmcgaG93IGdvb2QgaXQncyBpbXBsZW1l
+bnRhdGlvbiBvZiBhIGdpdmVuIGFsZ28gaXMuIFdlDQo+ID4gPiA+IGNvdWxkIG1ha2UgdGhlIGlu
+IGtlcm5lbCBjcnlwdG8gcHJpb3JpdGllcyBkeW5hbWljYWxseSBhZGp1c3RhYmxlIGluDQo+IGdl
+bmVyYWwNCj4gPiA+ID4gb3Igd2UgY291bGQgcHJvdmlkZSB0aGUgdXNlciB3aXRoIG1lYW5zIHRv
+IHNwZWNpZnkgdGhlIHByaW9yaXRpZXMgKGUuZy4NCj4gPiA+ID4gYXMgbW9kdWxlIHBhcmFtZXRl
+cikgd2l0aCB3aGljaCB0aGUgdmlydGlvLWNyeXB0byBkcml2ZXIgcmVnaXN0ZXJzIGVhY2gNCj4g
+YWxnby4NCj4gPiA+ID4gQm90aCBvZiB0aGVzZSB3b3VsZCBiZSBrbm9icyBpbiB0aGUgZ3Vlc3Qu
+IEl0J3MgaGFyZCB0byB0ZWxsIGlmIHRoZXNlIGZpcnN0DQo+ID4gPiA+IG9uZSB3b3VsZCBiZSB1
+c2VmdWwgaW4gc2NlbmFyaW9zIG5vdCBpbnZvbHZpbmcgdmlydHVhbGl6YXRpb24uIFNhbWUgZ29l
+cw0KPiA+ID4gPiBmb3Igc29tZSBraW5kIG9mIGR5bmFtaWMgcHJpb3JpdHkgbWFuYWdlbWVudCBm
+b3IgY3J5cHRvIGFsZ29yaXRobQ0KPiBpbXBsZW1lbnRhdGlvbnMNCj4gPiA+ID4gaW4gdGhlIExp
+bnV4IGtlcm5lbC4gSSBhc3N1bWUgdGhlIHBlb3BsZSBpbnZvbHZlZCB3aXRoIHRoZSByZXNwZWN0
+aXZlDQo+ID4gPiA+IHN1YnN5c3RlbSBkbyBub3Qgc2VlIHRoZSBuZWNlc3NpdHkgZm9yIHNvbWV0
+aGluZyBsaWtlIHRoYXQuDQo+ID4gPg0KPiA+ID4gSXQgc3RpbGwgZmVlbHMgbGlrZSB0aGlzIGlz
+IGEgcHJvYmxlbSBmb3IgdGhlIGd1ZXN0IE9TIHRvIHNvbHZlLiBJZiB5b3UNCj4gPiA+IHB1dCBh
+IHBoeXNpY2FsIGNyeXB0byBhY2NlbGVyYXRvciBpbiBhIGJhcmUgbWV0YWwgbWFjaGluZSwgdGhh
+dCBoYXMgdGhlDQo+ID4gPiBzYW1lIHByb2JsZW0geW91IGRlc2NyaWJlIGhlcmUsIHNvIHRoZSBr
+ZXJuZWwgc3VyZWx5IGFscmVhZHkgbmVlZHMgdG8gZmluZA0KPiA+ID4gYSB2aWFibGUgc29sdXRp
+b24gZm9yIHRoaXMgcHJvYmxlbS4NCj4gPiA+DQo+ID4NCj4gPiBIb3cgd291bGQgdGhlIGd1ZXN0
+IE9TIGtub3cgd2hpY2ggYWxnbyBpcyBiZXR0ZXI/IEFzIHlvdSBtZW50aW9uZWQgaXQgZG9lcw0K
+PiA+IGRlcGVuZCBvbiBmZXcgZmFjdG9ycyBhbmQgdGhlIGJlc3QgdGhlIGtlcm5lbCBjYW4gZG8g
+aXMgdXNlIHNvbWUgc29ydCBvZg0KPiA+IGhldXJpc3RpY3MuIFN1Y2ggYSBzb2x1dGlvbiBtaWdo
+dCBub3QgYmUgdmVyeSBkeW5hbWljIGFuZCBtaWdodCBub3Qgd29yayBmb3INCj4gPiBhbGwgdGhl
+IGNhc2VzIGZvciBhIHVzZXIuDQo+IA0KPiBXaGljaCBpcyBiZXR0ZXIgd2lsbCBsaWtlbHkgZGVw
+ZW5kIG9uIHRoZSBhcHBsaWNhdGlvbiB1c2luZyBpdC4gT25lIG1pZ2h0DQo+IGJlIGJldHRlciBm
+b3IgdXNlIGJ5IHRoZSBrZXJuZWwsIHdoaWxlIGFub3RoZXIgaXMgYmV0dGVyIGZvciB1c2UgYnkg
+YQ0KPiB1c2Vyc3BhY2UgYXBwbGljYXRpb24sIG9yIHR3byB1c2Vyc3BhY2UgYXBwcyBtaWdodCBo
+YXZlIGRpZmZlcmVudA0KPiBwcmVmZXJlbmNlcy4NCj4gDQo+ID4gU2hvdWxkbid0IHdlIHVzZSB2
+aXJ0dWFsaXphdGlvbiB0byBnaXZlIHVzIHRoZSBmbGV4aWJpbGl0eSB0aGF0IHdlIGRvbid0DQo+
+ID4gaGF2ZSB3aXRoIHBoeXNpY2FsIGNyeXB0byBhY2NlbGVyYXRvcj8gVGhlIGNyeXB0byBhY2Nl
+bGVyYXRvciBtaWdodCBub3Qga25vdw0KPiA+IGlmIGl0J3MgaW1wbGVtZW50YXRpb24gaXMgYW55
+IGJldHRlciwgYnV0IHRoZSB1c2VyIGNhbiBleHBlcmltZW50IGFuZCBzZWUNCj4gPiB3aGF0IHdv
+cmtzIGJldHRlci4NCj4gDQo+IEl0IGlzIGJldHRlciB0byBwcm92aWRlIGl0IGFsbCB0byB0aGUg
+Z3Vlc3QgYW5kIGxldCB0aGUgZ3Vlc3QgZGVjaWRlIHdoaWNoDQo+IGlzIGJlc3QgdG8gdXNlLiAg
+SWYgbm90aGluZyBlbHNlIHRoZSB2aXJ0aW8tY3J5cHRvIGtlcm5lbCBtb2R1bGUgaXRzZWxmDQo+
+IGNhbiBoYXZlIG1vZHVsZSBwYXJhbWV0ZXJzIHRvIGNvbnRyb2wgdGhlIHByaW9yaXR5IGl0IGdp
+dmVzIHRvIGVhY2gNCj4gYWxnb3JpdGhtLCBvciBjYW4gYXZvaWQgcmVnaXN0ZXJpbmcgY2VydGFp
+biBhbGdvcml0aG1zLiAgRG9pbmcgaXQgZ3Vlc3QNCj4gc2lkZSBpcyBtb3JlIGZsZXhpYmxlLCBi
+ZWNhdXNlIHJlYWxpc3RpY2FsbHkgbWFueSB2aXJ0IGhvc3QgZGVwbG95bWVudHMNCj4gd2lsbCBu
+ZXZlciBnaXZlIHRoZSBndWVzdCBhZG1pbiBhYmlsaXR5IHRvIGNvbnRyb2wgdGhpcyBmcm9tIHRo
+ZSBob3N0DQo+IHNpZGUsIHNvIGEgZ3Vlc3Qga2VybmVsIGNvbmZpZyBhYmlsaXR5IHdpbGwgYmUg
+dGhlIG9ubHkgdGhpbmcgYXZhaWxhYmxlLg0KPiANCg0KRnJvbSB0aGUgcGVyc3BlY3RpdmUgb2Yg
+eW91ciBjb21tdW5pY2F0aW9uIGFuZCBwcm9kdWN0aW9uIGRlcGxveW1lbnQsIA0KSSB0ZW5kIHRv
+IGFncmVlIHdpdGggRGFuaWVs4oCZcyBwb2ludCBvZiB2aWV3LiBBRkFJQ1QgRFBESyBjcnlwdG9k
+ZXYgc2NoZWR1bGVyDQpQTUQgZHJpdmVyIGRpZCB0aGlzIHRoaW5nOg0KDQoiIEFkZGVkIGEgcGFj
+a2V0LXNpemUgYmFzZWQgZGlzdHJpYnV0aW9uIG1vZGUsIHdoaWNoIGRpc3RyaWJ1dGVzIHRoZSBl
+bnF1ZXVlZA0KQ3J5cHRvIG9wZXJhdGlvbnMgYW1vbmcgdHdvIHNsYXZlcywgYmFzZWQgb24gdGhl
+aXIgZGF0YSBsZW5ndGhzLiINCg0KV2hpY2ggaXQgbWVhbnMgdGhhdCB0aGUgZ3Vlc3QncyBkcml2
+ZXIgbWFrZXMgdGhlIGRlY2lzaW9uLg0KDQpDdXJyZW50bHkgdGhlIExpbnV4IGNyeXB0byBmcmFt
+ZXdvcmsgdXNlcyB0aGUgc3RhdGljIHByaW9yaXR5IG9mIG9uZSBhbGdvIHRvIGRlY2lkZSANCnRv
+IGNob29zZSB3aGF0IGlzIHNpbXBseS4gTWF5YmUgaXQgc2hvdWxkIGFkZCBhIHNjaGVkdWxlciBs
+YXllciB0b28/DQoNClJlZ2FyZHMsDQotR29uZ2xlaQ0K
