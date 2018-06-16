@@ -1,38 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34152)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <evgreen@chromium.org>) id 1fTxa5-0002hm-BW
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 18:52:34 -0400
+	(envelope-from <hzzhan9@gmail.com>) id 1fU0bF-0006Ce-5i
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 22:05:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <evgreen@chromium.org>) id 1fTxa2-0002p8-9R
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 18:52:33 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:38805)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <evgreen@chromium.org>)
-	id 1fTxa2-0002mq-3H
-	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 18:52:30 -0400
-Received: by mail-ot0-x243.google.com with SMTP id p95-v6so12685393ota.5
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 15:52:29 -0700 (PDT)
-Received: from mail-ot0-f170.google.com (mail-ot0-f170.google.com.
-	[74.125.82.170]) by smtp.gmail.com with ESMTPSA id
-	t4-v6sm9811691otd.40.2018.06.15.15.52.27 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Fri, 15 Jun 2018 15:52:27 -0700 (PDT)
-Received: by mail-ot0-f170.google.com with SMTP id 92-v6so12673416otw.9
-	for <qemu-devel@nongnu.org>; Fri, 15 Jun 2018 15:52:27 -0700 (PDT)
+	(envelope-from <hzzhan9@gmail.com>) id 1fU0bB-0000Bf-3o
+	for qemu-devel@nongnu.org; Fri, 15 Jun 2018 22:05:57 -0400
+Date: Sat, 16 Jun 2018 10:05:28 +0800
+From: Haozhong Zhang <hzzhan9@gmail.com>
+Message-ID: <20180616020528.sz7luae4axtlupai@HZ>
+References: <20180615140448.32234-1-david@redhat.com>
+	<20180615140448.32234-12-david@redhat.com>
 MIME-Version: 1.0
-References: <20180531224911.23725-1-richard.henderson@linaro.org>
-	<20180531224911.23725-7-richard.henderson@linaro.org>
-	<788ee514-a026-d415-73ce-67cc996e6259@vivier.eu>
-	<149da730-950c-a527-2373-9cb0433543b1@linaro.org>
-	<d9298b1e-d600-879b-b19d-0e38e15dbbd6@vivier.eu>
-	<5d817a6f-a963-148f-bb8d-f62b8f7c0207@linaro.org>
-In-Reply-To: <5d817a6f-a963-148f-bb8d-f62b8f7c0207@linaro.org>
-From: Evan Green <evgreen@chromium.org>
-Date: Fri, 15 Jun 2018 15:51:50 -0700
-Message-ID: <CAE=gft5EYwvZQKEWtfXQ0B7t3L4ckePvZ1p+ehGCQLhrUAtDDg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 6/6] linux-user: Use *at functions to
- implement interp_prefix
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="bmpmajvu42jt7q4l"
+Content-Disposition: inline
+In-Reply-To: <20180615140448.32234-12-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 11/13] nvdimm: allow setting the
+ label-size to 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,25 +25,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-Apologies for getting lost in the dust storm, but where does this
-leave this patch? Sounds like there's a real failure caused by it?
--Evan
-On Thu, Jun 7, 2018 at 9:43 AM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 06/07/2018 01:01 AM, Laurent Vivier wrote:
-> >> Your script doesn't work outside debian, lacking debootstrap.
-> >> At the moment, I can't build on debian *at all*.  Some bit of the build
-> >> infrastructure is off and QEMU_FULL_VERSION gets incorrectly defined.  I have
-> >> no idea how or why it is different than Fedora.
-> >
-> > I had this problem on Fedora building in a separate directory, "make
-> > distclean" at the top source directory fixed the problem for me.
->
-> Thanks.  I had never seen this failure mode before.
->
->
-> r~
+
+--bmpmajvu42jt7q4l
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 06/15/18 16:04, David Hildenbrand wrote:
+> It is inititally 0, so setting it to 0 should be allowed, too.
+
+I'm fine with this change and believe nothing is broken in practice,
+but what is expected by the user who sets a zero label size?
+
+Look at nvdimm_dsm_device() which enables label DSMs only if the label
+size is not smaller than 128 KB. If a user sets a zero label size
+explicitly, does he/she expect those label DSMs are available in
+guest?  (according to Intel spec, the minimal label size is 128
+KBytes)
+
+I think if it's allowed to set a zero label-size, it would be better
+to document its difference from other non-zero values in docs/nvdimm.txt.
+
+Thanks,
+Haozhong
+
+>=20
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/mem/nvdimm.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+> index db7d8c3050..df7646488b 100644
+> --- a/hw/mem/nvdimm.c
+> +++ b/hw/mem/nvdimm.c
+> @@ -52,9 +52,9 @@ static void nvdimm_set_label_size(Object *obj, Visitor =
+*v, const char *name,
+>      if (local_err) {
+>          goto out;
+>      }
+> -    if (value < MIN_NAMESPACE_LABEL_SIZE) {
+> +    if (value && value < MIN_NAMESPACE_LABEL_SIZE) {
+>          error_setg(&local_err, "Property '%s.%s' (0x%" PRIx64 ") is requ=
+ired"
+> -                   " at least 0x%lx", object_get_typename(obj),
+> +                   " either 0 or at least 0x%lx", object_get_typename(ob=
+j),
+>                     name, value, MIN_NAMESPACE_LABEL_SIZE);
+>          goto out;
+>      }
+> --=20
+> 2.17.1
+>=20
+>=20
+
+
+--bmpmajvu42jt7q4l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEr9A2n0Sq9CPUvBJWWSn3ETy7JRYFAlskcGgACgkQWSn3ETy7
+JRaUUA//Y27zY8nI9qsyXEcmJ9uEN6JIwXGPUxHFjk720+43wUJygHFoGPfJPdao
+qJmv4w0kwfvbzDcupFvOQ/1vm0lgadoGfHfQSchvrnUyp1+0Xe0OCt6uMFSxJffd
+QKy61JxTzMmm64FQM2+k8MY2CP8+QRVrbiZsh8CSJ5M0nZqHTiUIc9+sQxOuzzTA
+4tYJCJ6IEbPG1IbNZNhBIPv5bM6wn8XkMPGVggUKamroJjmdQa601S7uReQxwnrb
+blb4eOCNysCRn9pPpbzXGOeIhvpVsJJVmFWnUi3C18x97ajGTsbX1r3zUhPeFjkk
+jB36OvMFzesTyqju27r8T1RDsuVQHAucWCx21GFL4qYE8Xx4M/xOoTvKCI4iRmCL
+I9U64iiajFVADyaDx82Br6aavVe5pPz7vVLM6GaV86e2jI2aI633Dmp3f/KCSi8X
+LC7h+SnHO+L61reW42jcJurNiV98QsIUauARCzfMeSz4WUypse2sgPPltGOiVg9D
+yAhj6MTAQ8ftfceeYT8SdCHs45emOaaXyHDDYFZD8lS4RupmzS0gPT8DaQu4Cyta
+j1qYf2J2FcDi9ewOzkemBrAyC588YS3/OD8tGXyyiwfkcdTKiRaXrSLvBKxsMwCF
+JnjHnfMtcT9JG35+QJU/CcDlesD3zOZUebNzZBCoP1lHSe3ktbQ=
+=r7ZM
+-----END PGP SIGNATURE-----
+
+--bmpmajvu42jt7q4l--
