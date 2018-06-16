@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38697)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38927)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fUJcr-0008E4-PG
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 18:24:55 -0400
+	id 1fUJfu-0000b4-HP
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 18:28:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fUJco-0000Qj-Ld
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 18:24:53 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35492)
+	id 1fUJfr-0001nd-Dy
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 18:28:02 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:42324)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fUJco-0000QV-GG
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 18:24:50 -0400
-Received: by mail-qt0-x244.google.com with SMTP id s9-v6so12240040qtg.2
-	for <qemu-devel@nongnu.org>; Sat, 16 Jun 2018 15:24:50 -0700 (PDT)
+	id 1fUJfr-0001nQ-9E
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 18:27:59 -0400
+Received: by mail-qk0-x244.google.com with SMTP id j80-v6so7565755qke.9
+	for <qemu-devel@nongnu.org>; Sat, 16 Jun 2018 15:27:59 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180615194705.28019-1-alex.bennee@linaro.org>
-	<20180615194705.28019-13-alex.bennee@linaro.org>
+	<20180615194705.28019-30-alex.bennee@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <02569193-5865-e408-86bf-7137b76b6792@amsat.org>
-Date: Sat, 16 Jun 2018 19:24:41 -0300
+Message-ID: <7012e6f7-8f67-0263-4f24-a62ed1086e96@amsat.org>
+Date: Sat, 16 Jun 2018 19:27:51 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180615194705.28019-13-alex.bennee@linaro.org>
+In-Reply-To: <20180615194705.28019-30-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 12/54] tests/tcg/multiarch: don't hard
- code paths/ports for linux-test
+Subject: Re: [Qemu-devel] [PATCH v7 29/54] tests/docker/Makefile.include:
+ fix mipsel-cross dependancy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,146 +39,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org
 
-Hi Alex,
-
 On 06/15/2018 04:46 PM, Alex Bennée wrote:
-> The fixed path and ports get in the way of running our tests and
-> builds in parallel. Instead of using TESTPATH we use mkdtemp() and
-> instead of a fixed port we allow the kernel to assign one and query it
-> afterwards.
+> This got broken in commit 4319db7 but generally only shows up when you
+> try and do massive parallel builds on fresh machines.
 > 
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  tests/tcg/multiarch/linux-test.c | 37 ++++++++++++++++----------------
->  1 file changed, 19 insertions(+), 18 deletions(-)
+>  tests/docker/Makefile.include | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
-> index 6f2c531474..3f73b96420 100644
-> --- a/tests/tcg/multiarch/linux-test.c
-> +++ b/tests/tcg/multiarch/linux-test.c
-> @@ -41,8 +41,6 @@
->  #include <setjmp.h>
->  #include <sys/shm.h>
->  
-> -#define TESTPATH "/tmp/linux-test.tmp"
-> -#define TESTPORT 7654
->  #define STACK_SIZE 16384
->  
->  static void error1(const char *filename, int line, const char *fmt, ...)
-> @@ -85,19 +83,15 @@ static void test_file(void)
->      struct iovec vecs[2];
->      DIR *dir;
->      struct dirent *de;
-> +    char template[] = "/tmp/linux-test-XXXXXX";
-
-Since /tmp doesn't always fit, can this be:
-
-       char *tmpbase = getenv("TMPDIR");
-       char *template = g_strdup_printf("%s/qemu-test-XXXXXX",
-                                        tmpbase ? tmpbase : "/tmp");
-
-> +    char *tmpdir = mkdtemp(template);
-
-       g_free(template);
-
->  
-> -    /* clean up, just in case */
-> -    unlink(TESTPATH "/file1");
-> -    unlink(TESTPATH "/file2");
-> -    unlink(TESTPATH "/file3");
-> -    rmdir(TESTPATH);
-> +    chk_error(strlen(tmpdir));
->  
->      if (getcwd(cur_dir, sizeof(cur_dir)) == NULL)
->          error("getcwd");
->  
-> -    chk_error(mkdir(TESTPATH, 0755));
-> -
-> -    chk_error(chdir(TESTPATH));
-> +    chk_error(chdir(tmpdir));
->  
->      /* open/read/write/close/readv/writev/lseek */
->  
-> @@ -163,7 +157,7 @@ static void test_file(void)
->          st.st_mtime != 1000)
->          error("stat time");
->  
-> -    chk_error(stat(TESTPATH, &st));
-> +    chk_error(stat(tmpdir, &st));
->      if (!S_ISDIR(st.st_mode))
->          error("stat mode");
->  
-> @@ -185,7 +179,7 @@ static void test_file(void)
->          error("stat mode");
->  
->      /* getdents */
-> -    dir = opendir(TESTPATH);
-> +    dir = opendir(tmpdir);
->      if (!dir)
->          error("opendir");
->      len = 0;
-> @@ -207,7 +201,7 @@ static void test_file(void)
->      chk_error(unlink("file3"));
->      chk_error(unlink("file2"));
->      chk_error(chdir(cur_dir));
-> -    chk_error(rmdir(TESTPATH));
-> +    chk_error(rmdir(tmpdir));
->  }
->  
->  static void test_fork(void)
-> @@ -264,7 +258,7 @@ static int server_socket(void)
->      chk_error(setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)));
->  
->      sockaddr.sin_family = AF_INET;
-> -    sockaddr.sin_port = htons(TESTPORT);
-> +    sockaddr.sin_port = htons(0); /* choose random ephemeral port) */
->      sockaddr.sin_addr.s_addr = 0;
->      chk_error(bind(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)));
->      chk_error(listen(fd, 0));
-> @@ -272,7 +266,7 @@ static int server_socket(void)
->  
->  }
->  
-> -static int client_socket(void)
-> +static int client_socket(uint16_t port)
->  {
->      int fd;
->      struct sockaddr_in sockaddr;
-> @@ -280,7 +274,7 @@ static int client_socket(void)
->      /* server socket */
->      fd = chk_error(socket(PF_INET, SOCK_STREAM, 0));
->      sockaddr.sin_family = AF_INET;
-> -    sockaddr.sin_port = htons(TESTPORT);
-> +    sockaddr.sin_port = htons(port);
->      inet_aton("127.0.0.1", &sockaddr.sin_addr);
->      chk_error(connect(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)));
->      return fd;
-> @@ -292,10 +286,17 @@ static void test_socket(void)
->  {
->      int server_fd, client_fd, fd, pid, ret, val;
->      struct sockaddr_in sockaddr;
-> -    socklen_t len;
-> +    struct sockaddr_in server_addr;
-> +    socklen_t len, socklen;
-> +    uint16_t server_port;
->      char buf[512];
->  
->      server_fd = server_socket();
-> +    /* find out what port we got */
-> +    socklen = sizeof(server_addr);
-> +    ret = getsockname(server_fd, &server_addr, &socklen);
-> +    chk_error(ret);
-> +    server_port = ntohs(server_addr.sin_port);
->  
->      /* test a few socket options */
->      len = sizeof(val);
-> @@ -305,7 +306,7 @@ static void test_socket(void)
->  
->      pid = chk_error(fork());
->      if (pid == 0) {
-> -        client_fd = client_socket();
-> +        client_fd = client_socket(server_port);
->          send(client_fd, socket_msg, sizeof(socket_msg), 0);
->          close(client_fd);
->          exit(0);
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index 8afb383478..4a2b028a3b 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -57,6 +57,7 @@ docker-image-debian-armel-cross: docker-image-debian9
+>  docker-image-debian-armhf-cross: docker-image-debian9
+>  docker-image-debian-arm64-cross: docker-image-debian9
+>  docker-image-debian-mips-cross: docker-image-debian9
+> +docker-image-debian-mipsel-cross: docker-image-debian9
+>  docker-image-debian-mips64el-cross: docker-image-debian9
+>  docker-image-debian-powerpc-cross: docker-image-debian8
+>  docker-image-debian-ppc64el-cross: docker-image-debian9
 > 
