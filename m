@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fUHX5-0002ii-Bk
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 16:10:48 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fUJcr-0008E4-PG
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 18:24:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fUHX0-0005ul-9k
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 16:10:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54974)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fUJco-0000Qj-Ld
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 18:24:53 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35492)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fUHX0-0005tm-2B
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 16:10:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fUHWy-0001zx-W8
-	for <qemu-devel@nongnu.org>; Sat, 16 Jun 2018 20:10:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id EBFB02E80C8
-	for <qemu-devel@nongnu.org>; Sat, 16 Jun 2018 20:10:40 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fUJco-0000QV-GG
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 18:24:50 -0400
+Received: by mail-qt0-x244.google.com with SMTP id s9-v6so12240040qtg.2
+	for <qemu-devel@nongnu.org>; Sat, 16 Jun 2018 15:24:50 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180615194705.28019-1-alex.bennee@linaro.org>
+	<20180615194705.28019-13-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <02569193-5865-e408-86bf-7137b76b6792@amsat.org>
+Date: Sat, 16 Jun 2018 19:24:41 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 16 Jun 2018 20:04:54 -0000
-From: Thomas Huth <1721222@bugs.launchpad.net>
-Reply-To: Bug 1721222 <1721222@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150711232495.21489.16130885545383141656.malonedeb@soybean.canonical.com>
-Message-Id: <152917949460.25800.11502491045253441075.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1721222] Re: qemu crashes with Assertion
- `fdctrl->dma' failed
+In-Reply-To: <20180615194705.28019-13-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 12/54] tests/tcg/multiarch: don't hard
+ code paths/ports for linux-test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,49 +36,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org
 
-Fixed here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Db3da551389c86ce214
+Hi Alex,
 
-** Changed in: qemu
-       Status: Confirmed =3D> Fix Released
+On 06/15/2018 04:46 PM, Alex Bennée wrote:
+> The fixed path and ports get in the way of running our tests and
+> builds in parallel. Instead of using TESTPATH we use mkdtemp() and
+> instead of a fixed port we allow the kernel to assign one and query it
+> afterwards.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  tests/tcg/multiarch/linux-test.c | 37 ++++++++++++++++----------------
+>  1 file changed, 19 insertions(+), 18 deletions(-)
+> 
+> diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
+> index 6f2c531474..3f73b96420 100644
+> --- a/tests/tcg/multiarch/linux-test.c
+> +++ b/tests/tcg/multiarch/linux-test.c
+> @@ -41,8 +41,6 @@
+>  #include <setjmp.h>
+>  #include <sys/shm.h>
+>  
+> -#define TESTPATH "/tmp/linux-test.tmp"
+> -#define TESTPORT 7654
+>  #define STACK_SIZE 16384
+>  
+>  static void error1(const char *filename, int line, const char *fmt, ...)
+> @@ -85,19 +83,15 @@ static void test_file(void)
+>      struct iovec vecs[2];
+>      DIR *dir;
+>      struct dirent *de;
+> +    char template[] = "/tmp/linux-test-XXXXXX";
 
--- =
+Since /tmp doesn't always fit, can this be:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1721222
+       char *tmpbase = getenv("TMPDIR");
+       char *template = g_strdup_printf("%s/qemu-test-XXXXXX",
+                                        tmpbase ? tmpbase : "/tmp");
 
-Title:
-  qemu crashes with Assertion `fdctrl->dma' failed
+> +    char *tmpdir = mkdtemp(template);
 
-Status in QEMU:
-  Fix Released
+       g_free(template);
 
-Bug description:
-  Re-production steps:
-  git clone today's qemu git tree (4th Oct 2017)
-  ./configure --target-list=3Dppc64-softmmu && make -j 8
-
-  Run the device-crash-test from scripts folder, seeing the following
-  error
-
-  =
-
-  INFO: running test case: machine=3Dpowernv binary=3Dppc64-softmmu/qemu-sy=
-stem-ppc64 device=3Disa-fdc accel=3Dtcg
-  WARNING: qemu received signal -6: ppc64-softmmu/qemu-system-ppc64 -charde=
-v socket,id=3Dmon,path=3D/var/tmp/qemu-30972-monitor.sock -mon chardev=3Dmo=
-n,mode=3Dcontrol -display none -vga none -S -machine powernv,accel=3Dtcg -d=
-evice isa-fdc
-  CRITICAL: failed: machine=3Dpowernv binary=3Dppc64-softmmu/qemu-system-pp=
-c64 device=3Disa-fdc accel=3Dtcg
-  CRITICAL: cmdline: ppc64-softmmu/qemu-system-ppc64 -S -machine powernv,ac=
-cel=3Dtcg -device isa-fdc
-  CRITICAL: log: qemu-system-ppc64: hw/block/fdc.c:2703: isabus_fdc_realize=
-: Assertion `fdctrl->dma' failed.
-  CRITICAL: exit code: -6
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1721222/+subscriptions
+>  
+> -    /* clean up, just in case */
+> -    unlink(TESTPATH "/file1");
+> -    unlink(TESTPATH "/file2");
+> -    unlink(TESTPATH "/file3");
+> -    rmdir(TESTPATH);
+> +    chk_error(strlen(tmpdir));
+>  
+>      if (getcwd(cur_dir, sizeof(cur_dir)) == NULL)
+>          error("getcwd");
+>  
+> -    chk_error(mkdir(TESTPATH, 0755));
+> -
+> -    chk_error(chdir(TESTPATH));
+> +    chk_error(chdir(tmpdir));
+>  
+>      /* open/read/write/close/readv/writev/lseek */
+>  
+> @@ -163,7 +157,7 @@ static void test_file(void)
+>          st.st_mtime != 1000)
+>          error("stat time");
+>  
+> -    chk_error(stat(TESTPATH, &st));
+> +    chk_error(stat(tmpdir, &st));
+>      if (!S_ISDIR(st.st_mode))
+>          error("stat mode");
+>  
+> @@ -185,7 +179,7 @@ static void test_file(void)
+>          error("stat mode");
+>  
+>      /* getdents */
+> -    dir = opendir(TESTPATH);
+> +    dir = opendir(tmpdir);
+>      if (!dir)
+>          error("opendir");
+>      len = 0;
+> @@ -207,7 +201,7 @@ static void test_file(void)
+>      chk_error(unlink("file3"));
+>      chk_error(unlink("file2"));
+>      chk_error(chdir(cur_dir));
+> -    chk_error(rmdir(TESTPATH));
+> +    chk_error(rmdir(tmpdir));
+>  }
+>  
+>  static void test_fork(void)
+> @@ -264,7 +258,7 @@ static int server_socket(void)
+>      chk_error(setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)));
+>  
+>      sockaddr.sin_family = AF_INET;
+> -    sockaddr.sin_port = htons(TESTPORT);
+> +    sockaddr.sin_port = htons(0); /* choose random ephemeral port) */
+>      sockaddr.sin_addr.s_addr = 0;
+>      chk_error(bind(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)));
+>      chk_error(listen(fd, 0));
+> @@ -272,7 +266,7 @@ static int server_socket(void)
+>  
+>  }
+>  
+> -static int client_socket(void)
+> +static int client_socket(uint16_t port)
+>  {
+>      int fd;
+>      struct sockaddr_in sockaddr;
+> @@ -280,7 +274,7 @@ static int client_socket(void)
+>      /* server socket */
+>      fd = chk_error(socket(PF_INET, SOCK_STREAM, 0));
+>      sockaddr.sin_family = AF_INET;
+> -    sockaddr.sin_port = htons(TESTPORT);
+> +    sockaddr.sin_port = htons(port);
+>      inet_aton("127.0.0.1", &sockaddr.sin_addr);
+>      chk_error(connect(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)));
+>      return fd;
+> @@ -292,10 +286,17 @@ static void test_socket(void)
+>  {
+>      int server_fd, client_fd, fd, pid, ret, val;
+>      struct sockaddr_in sockaddr;
+> -    socklen_t len;
+> +    struct sockaddr_in server_addr;
+> +    socklen_t len, socklen;
+> +    uint16_t server_port;
+>      char buf[512];
+>  
+>      server_fd = server_socket();
+> +    /* find out what port we got */
+> +    socklen = sizeof(server_addr);
+> +    ret = getsockname(server_fd, &server_addr, &socklen);
+> +    chk_error(ret);
+> +    server_port = ntohs(server_addr.sin_port);
+>  
+>      /* test a few socket options */
+>      len = sizeof(val);
+> @@ -305,7 +306,7 @@ static void test_socket(void)
+>  
+>      pid = chk_error(fork());
+>      if (pid == 0) {
+> -        client_fd = client_socket();
+> +        client_fd = client_socket(server_port);
+>          send(client_fd, socket_msg, sizeof(socket_msg), 0);
+>          close(client_fd);
+>          exit(0);
+> 
