@@ -1,15 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fUZzc-0002eb-58
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 11:53:29 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fUZzj-0002iD-7d
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 11:53:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fUZzY-0001nE-8s
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 11:53:28 -0400
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Sun, 17 Jun 2018 11:53:09 -0400
-Message-Id: <20180617155309.1653-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH] fpu_helper.c: fix helper_fpscr_clrbit()
- function
+	(envelope-from <no-reply@patchew.org>) id 1fUZzf-0001rV-CU
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 11:53:35 -0400
+Resent-Message-Id: <E1fUZzf-0001rV-CU@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21035)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fUZzf-0001r4-3j
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 11:53:31 -0400
+In-Reply-To: <20180615222855.44421-1-mst@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152910755004.708.82579643736289459@d39dc562802a>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 15 Jun 2018 17:05:50 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] kvm: limited x86 CPU power
+ management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,84 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org, aurelien@aurel32.net, david@gibson.dropbear.id.au, agraf@suse.de, qemu-ppc@nongnu.org
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: mst@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com, ehabkost@redhat.com, kvm@vger.kernel.org, rth@twiddle.net
 
-Fix the helper_fpscr_clrbit() function so it correctly
-sets the FEX and VX bits.
-
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
----
- target/ppc/fpu_helper.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
-
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index d31a933cbb..7e697a11d0 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -325,6 +325,63 @@ void helper_fpscr_clrbit(CPUPPCState *env, uint32_t bit)
-         case FPSCR_RN:
-             fpscr_set_rounding_mode(env);
-             break;
-+        case FPSCR_VXSNAN:
-+        case FPSCR_VXISI:
-+        case FPSCR_VXIDI:
-+        case FPSCR_VXZDZ:
-+        case FPSCR_VXIMZ:
-+        case FPSCR_VXVC:
-+        case FPSCR_VXSOFT:
-+        case FPSCR_VXSQRT:
-+        case FPSCR_VXCVI:
-+        {
-+            int vxsnan, vxisi, vxidi, vxzdz, vximz, vxvc, vxsoft, vxsqrt, vxcvi;
-+            vxsnan = (env->fpscr >> (31 - FPSCR_VXSNAN)) & 1;
-+            vxisi = (env->fpscr >> (31 - FPSCR_VXISI)) & 1;
-+            vxidi = (env->fpscr >> (31 - FPSCR_VXIDI)) & 1;
-+            vxzdz = (env->fpscr >> (31 - FPSCR_VXZDZ)) & 1;
-+            vximz = (env->fpscr >> (31 - FPSCR_VXIMZ)) & 1;
-+            vxvc = (env->fpscr >> (31 - FPSCR_VXVC)) & 1;
-+            vxsoft = (env->fpscr >> (31 - FPSCR_VXSOFT)) & 1;
-+            vxsqrt = (env->fpscr >> (31 - FPSCR_VXSQRT)) & 1;
-+            vxcvi = (env->fpscr >> (31 - FPSCR_VXCVI)) & 1;
-+            if (~(vxsnan & vxisi & vxidi & vxzdz & vximz & vxvc & vxsoft &
-+                  vxsqrt & vxcvi)) {
-+                /* Set VX bit to zero */
-+                env->fpscr = env->fpscr & ~(1 << FPSCR_VX);
-+            }
-+        }
-+            break;
-+        case FPSCR_VX:
-+        case FPSCR_OX:
-+        case FPSCR_UX:
-+        case FPSCR_ZX:
-+        case FPSCR_XX:
-+        case FPSCR_VE:
-+        case FPSCR_OE:
-+        case FPSCR_UE:
-+        case FPSCR_ZE:
-+        case FPSCR_XE:
-+        {
-+            int vx, ox, ux, zx, xx, ve, oe, ue, ze, xe;
-+            vx = (env->fpscr >> (31 - FPSCR_VX)) & 1;
-+            ox = (env->fpscr >> (31 - FPSCR_OX)) & 1;
-+            ux = (env->fpscr >> (31 - FPSCR_UX)) & 1;
-+            zx = (env->fpscr >> (31 - FPSCR_ZX)) & 1;
-+            xx = (env->fpscr >> (31 - FPSCR_XX)) & 1;
-+            ve = (env->fpscr >> (31 - FPSCR_VE)) & 1;
-+            oe = (env->fpscr >> (31 - FPSCR_OE)) & 1;
-+            ue = (env->fpscr >> (31 - FPSCR_UE)) & 1;
-+            ze = (env->fpscr >> (31 - FPSCR_ZE)) & 1;
-+            xe = (env->fpscr >> (31 - FPSCR_XE)) & 1;
-+            bool fex;
-+            fex = (vx & ve) | (ox & oe) | (ux & ue) | (zx & ze) | (xx & xe);
-+            unsigned int mask;
-+            mask = (1 << FPSCR_FEX);
-+            /* Set the FEX bit */
-+            env->fpscr = (env->fpscr & ~mask) | (-fex & mask);
-+        }
-+            break;
-         default:
-             break;
-         }
--- 
-2.14.3 (Apple Git-98)
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjE1MjIyODU1LjQ0NDIxLTEtbXN0QHJlZGhhdC5jb20KU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwLzJdIGt2bTogbGltaXRlZCB4ODYgQ1BVIHBvd2VyIG1h
+bmFnZW1lbnQKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFz
+ZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0w
+CgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
+dG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4p
+Igpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3Rh
+bDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAk
+YyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsg
+dGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkK
+ZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
+ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
+Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNo
+ZXcvMjAxODA2MTUyMjI4NTUuNDQ0MjEtMS1tc3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgw
+NjE1MjIyODU1LjQ0NDIxLTEtbXN0QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0JwplYzZmMjhjYmM5IGkzODYvY3B1OiBtYWtlIC1jcHUgaG9zdCBzdXBwb3J0IG1vbml0
+b3IvbXdhaXQKOGRmNGJlYjVjNSBrdm06IHN1cHBvcnQgLWRlZGljYXRlZCBjcHUtcG09b258b2Zm
+Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI6IGt2bTogc3VwcG9ydCAt
+ZGVkaWNhdGVkIGNwdS1wbT1vbnxvZmYuLi4KRVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIGdsb2Jh
+bHMgdG8gMCBvciBOVUxMCiMxMDM6IEZJTEU6IHZsLmM6MTQ1OgorYm9vbCBlbmFibGVfY3B1X3Bt
+ID0gZmFsc2U7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDExMCBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAy
+LzI6IGkzODYvY3B1OiBtYWtlIC1jcHUgaG9zdCBzdXBwb3J0IG1vbml0b3IvbXdhaXQuLi4KPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
+b20=
