@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fUM0S-0005hQ-4G
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:24 -0400
+	(envelope-from <keno@juliacomputing.com>) id 1fUM0T-0005iJ-Ut
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fUM0R-0003Fc-9o
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:24 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:42649)
+	(envelope-from <keno@juliacomputing.com>) id 1fUM0T-0003Gc-9b
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:26 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:35378)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fUM0R-0003FW-5G
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:23 -0400
-Received: by mail-qk0-x242.google.com with SMTP id j80-v6so7659717qke.9
-	for <qemu-devel@nongnu.org>; Sat, 16 Jun 2018 17:57:22 -0700 (PDT)
+	id 1fUM0T-0003GP-5N
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:25 -0400
+Received: by mail-qk0-x241.google.com with SMTP id d130-v6so7676791qkc.2
+	for <qemu-devel@nongnu.org>; Sat, 16 Jun 2018 17:57:25 -0700 (PDT)
 From: Keno Fischer <keno@juliacomputing.com>
-Date: Sat, 16 Jun 2018 20:56:49 -0400
-Message-Id: <08ebbb93dbfc29bbb727c05a16cd5ded6dec42b3.1529196703.git.keno@juliacomputing.com>
+Date: Sat, 16 Jun 2018 20:56:51 -0400
+Message-Id: <b8df01a2077daf301da4f3e3cd9c2fbbbd0fea5e.1529196703.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1529196703.git.keno@juliacomputing.com>
 References: <cover.1529196703.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1529196703.git.keno@juliacomputing.com>
 References: <cover.1529196703.git.keno@juliacomputing.com>
-Subject: [Qemu-devel] [PATCH v3 05/13] 9p: darwin: Explicitly cast
- comparisons of mode_t with -1
+Subject: [Qemu-devel] [PATCH v3 07/13] 9p: darwin: Provide a compatibility
+ definition for XATTR_SIZE_MAX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,35 +32,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Keno Fischer <keno@juliacomputing.com>, groug@kaod.org
 
-Comparisons of mode_t with -1 require an explicit cast, since mode_t
-is unsigned on Darwin.
-
 Signed-off-by: Keno Fischer <keno@juliacomputing.com>
 ---
- hw/9pfs/9p-local.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/9pfs/9p.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index d713983..98d4073 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -310,7 +310,7 @@ update_map_file:
-     if (credp->fc_gid != -1) {
-         gid = credp->fc_gid;
-     }
--    if (credp->fc_mode != -1) {
-+    if (credp->fc_mode != (mode_t)-1) {
-         mode = credp->fc_mode;
-     }
-     if (credp->fc_rdev != -1) {
-@@ -416,7 +416,7 @@ static int local_set_xattrat(int dirfd, const char *path, FsCred *credp)
-             return err;
-         }
-     }
--    if (credp->fc_mode != -1) {
-+    if (credp->fc_mode != (mode_t)-1) {
-         uint32_t tmp_mode = cpu_to_le32(credp->fc_mode);
-         err = fsetxattrat_nofollow(dirfd, path, "user.virtfs.mode", &tmp_mode,
-                                    sizeof(mode_t), 0);
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index e650459..abfb8dc 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -3374,6 +3374,13 @@ out_nofid:
+     v9fs_string_free(&name);
+ }
+ 
++#if defined(CONFIG_DARWIN) && !defined(XATTR_SIZE_MAX)
++/* Darwin doesn't seem to define a maximum xattr size in its user
++   user space header, but looking at the kernel source, HFS supports
++   up to INT32_MAX, so use that as the maximum.
++*/
++#define XATTR_SIZE_MAX INT32_MAX
++#endif
+ static void coroutine_fn v9fs_xattrcreate(void *opaque)
+ {
+     int flags, rflags = 0;
 -- 
 2.8.1
