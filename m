@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fUM0W-0005iN-4B
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:29 -0400
+	(envelope-from <keno@juliacomputing.com>) id 1fUM0R-0005h4-Ly
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fUM0V-0003H6-2v
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:28 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:39038)
+	(envelope-from <keno@juliacomputing.com>) id 1fUM0O-0003Ey-GQ
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:23 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:45247)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fUM0U-0003H1-Tt
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:27 -0400
-Received: by mail-qt0-x244.google.com with SMTP id p23-v6so12394487qtn.6
-	for <qemu-devel@nongnu.org>; Sat, 16 Jun 2018 17:57:26 -0700 (PDT)
+	id 1fUM0O-0003Ep-B1
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:20 -0400
+Received: by mail-qt0-x241.google.com with SMTP id i18-v6so12370287qtp.12
+	for <qemu-devel@nongnu.org>; Sat, 16 Jun 2018 17:57:20 -0700 (PDT)
 From: Keno Fischer <keno@juliacomputing.com>
-Date: Sat, 16 Jun 2018 20:56:53 -0400
-Message-Id: <7cdeccb2d0f1b5543c07f40bb053769744ae9777.1529196703.git.keno@juliacomputing.com>
+Date: Sat, 16 Jun 2018 20:56:46 -0400
+Message-Id: <2fafd9bc91e8104f302eda0bc7da5e90b868c7e3.1529196703.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1529196703.git.keno@juliacomputing.com>
 References: <cover.1529196703.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1529196703.git.keno@juliacomputing.com>
 References: <cover.1529196703.git.keno@juliacomputing.com>
-Subject: [Qemu-devel] [PATCH v3 09/13] 9p: darwin: Compatibility for
- f/l*xattr
+Subject: [Qemu-devel] [PATCH v3 02/13] 9p: Rename 9p-util -> 9p-util-linux
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,140 +31,161 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Keno Fischer <keno@juliacomputing.com>, groug@kaod.org
 
-On darwin `fgetxattr` takes two extra optional arguments,
-and the l* variants are not defined (in favor of an extra
-flag to the regular variants.
+The current file only has the Linux versions of these functions.
+Rename the file accordingly and update the Makefile to only build
+it on Linux. A Darwin version of these will follow later in the
+series.
 
 Signed-off-by: Keno Fischer <keno@juliacomputing.com>
 ---
- Makefile                    |  6 ++++++
- fsdev/virtfs-proxy-helper.c |  9 +++++----
- hw/9pfs/9p-local.c          | 12 ++++++++----
- hw/9pfs/9p-util.h           | 17 +++++++++++++++++
- 4 files changed, 36 insertions(+), 8 deletions(-)
+ hw/9pfs/9p-util-linux.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/9pfs/9p-util.c       | 59 -------------------------------------------------
+ hw/9pfs/Makefile.objs   |  3 ++-
+ 3 files changed, 61 insertions(+), 60 deletions(-)
+ create mode 100644 hw/9pfs/9p-util-linux.c
+ delete mode 100644 hw/9pfs/9p-util.c
 
-diff --git a/Makefile b/Makefile
-index e46f2b6..046e553 100644
---- a/Makefile
-+++ b/Makefile
-@@ -545,7 +545,13 @@ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
- qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
- 
- fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
-+ifdef CONFIG_DARWIN
-+fsdev/virtfs-proxy-helper$(EXESUF): hw/9pfs/9p-util-darwin.o
-+endif
-+ifdef CONFIG_LINUX
-+fsdev/virtfs-proxy-helper$(EXESUF): hw/9pfs/9p-util-linux.o
- fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
-+endif
- 
- scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
- ifdef CONFIG_MPATH
-diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
-index 3bc1269..a26f8b8 100644
---- a/fsdev/virtfs-proxy-helper.c
-+++ b/fsdev/virtfs-proxy-helper.c
-@@ -28,6 +28,7 @@
- #include "qemu/statfs.h"
- #include "9p-iov-marshal.h"
- #include "hw/9pfs/9p-proxy.h"
-+#include "hw/9pfs/9p-util.h"
- #include "fsdev/9p-iov-marshal.h"
- 
- #define PROGNAME "virtfs-proxy-helper"
-@@ -459,7 +460,7 @@ static int do_getxattr(int type, struct iovec *iovec, struct iovec *out_iovec)
-         v9fs_string_init(&name);
-         retval = proxy_unmarshal(iovec, offset, "s", &name);
-         if (retval > 0) {
--            retval = lgetxattr(path.data, name.data, xattr.data, size);
-+            retval = qemu_lgetxattr(path.data, name.data, xattr.data, size);
-             if (retval < 0) {
-                 retval = -errno;
-             } else {
-@@ -469,7 +470,7 @@ static int do_getxattr(int type, struct iovec *iovec, struct iovec *out_iovec)
-         v9fs_string_free(&name);
-         break;
-     case T_LLISTXATTR:
--        retval = llistxattr(path.data, xattr.data, size);
-+        retval = qemu_llistxattr(path.data, xattr.data, size);
-         if (retval < 0) {
-             retval = -errno;
-         } else {
-@@ -1000,7 +1001,7 @@ static int process_requests(int sock)
-             retval = proxy_unmarshal(&in_iovec, PROXY_HDR_SZ, "sssdd", &path,
-                                      &name, &value, &size, &flags);
-             if (retval > 0) {
--                retval = lsetxattr(path.data,
-+                retval = qemu_lsetxattr(path.data,
-                                    name.data, value.data, size, flags);
-                 if (retval < 0) {
-                     retval = -errno;
-@@ -1016,7 +1017,7 @@ static int process_requests(int sock)
-             retval = proxy_unmarshal(&in_iovec,
-                                      PROXY_HDR_SZ, "ss", &path, &name);
-             if (retval > 0) {
--                retval = lremovexattr(path.data, name.data);
-+                retval = qemu_lremovexattr(path.data, name.data);
-                 if (retval < 0) {
-                     retval = -errno;
-                 }
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 98d4073..768ef6f 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -776,16 +776,20 @@ static int local_fstat(FsContext *fs_ctx, int fid_type,
-         mode_t tmp_mode;
-         dev_t tmp_dev;
- 
--        if (fgetxattr(fd, "user.virtfs.uid", &tmp_uid, sizeof(uid_t)) > 0) {
-+        if (qemu_fgetxattr(fd, "user.virtfs.uid",
-+                           &tmp_uid, sizeof(uid_t)) > 0) {
-             stbuf->st_uid = le32_to_cpu(tmp_uid);
-         }
--        if (fgetxattr(fd, "user.virtfs.gid", &tmp_gid, sizeof(gid_t)) > 0) {
-+        if (qemu_fgetxattr(fd, "user.virtfs.gid",
-+                           &tmp_gid, sizeof(gid_t)) > 0) {
-             stbuf->st_gid = le32_to_cpu(tmp_gid);
-         }
--        if (fgetxattr(fd, "user.virtfs.mode", &tmp_mode, sizeof(mode_t)) > 0) {
-+        if (qemu_fgetxattr(fd, "user.virtfs.mode",
-+                           &tmp_mode, sizeof(mode_t)) > 0) {
-             stbuf->st_mode = le32_to_cpu(tmp_mode);
-         }
--        if (fgetxattr(fd, "user.virtfs.rdev", &tmp_dev, sizeof(dev_t)) > 0) {
-+        if (qemu_fgetxattr(fd, "user.virtfs.rdev",
-+                           &tmp_dev, sizeof(dev_t)) > 0) {
-             stbuf->st_rdev = le64_to_cpu(tmp_dev);
-         }
-     } else if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
-diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
-index 79ed6b2..50a03c7 100644
---- a/hw/9pfs/9p-util.h
-+++ b/hw/9pfs/9p-util.h
-@@ -19,6 +19,23 @@
- #define O_PATH_9P_UTIL 0
- #endif
- 
-+#ifdef CONFIG_DARWIN
-+#define qemu_fgetxattr(...) fgetxattr(__VA_ARGS__, 0, 0)
-+#define qemu_lgetxattr(...) getxattr(__VA_ARGS__, 0, XATTR_NOFOLLOW)
-+#define qemu_llistxattr(...) listxattr(__VA_ARGS__, XATTR_NOFOLLOW)
-+#define qemu_lremovexattr(...) removexattr(__VA_ARGS__, XATTR_NOFOLLOW)
-+static inline int qemu_lsetxattr(const char *path, const char *name,
-+                                 const void *value, size_t size, int flags) {
-+    return setxattr(path, name, value, size, 0, flags | XATTR_NOFOLLOW);
-+}
-+#else
-+#define qemu_fgetxattr fgetxattr
-+#define qemu_lgetxattr lgetxattr
-+#define qemu_llistxattr llistxattr
-+#define qemu_lremovexattr lremovexattr
-+#define qemu_lsetxattr lsetxattr
-+#endif
+diff --git a/hw/9pfs/9p-util-linux.c b/hw/9pfs/9p-util-linux.c
+new file mode 100644
+index 0000000..defa3a4
+--- /dev/null
++++ b/hw/9pfs/9p-util-linux.c
+@@ -0,0 +1,59 @@
++/*
++ * 9p utilities (Linux Implementation)
++ *
++ * Copyright IBM, Corp. 2017
++ *
++ * Authors:
++ *  Greg Kurz <groug@kaod.org>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
- static inline void close_preserve_errno(int fd)
- {
-     int serrno = errno;
++#include "qemu/osdep.h"
++#include "qemu/xattr.h"
++#include "9p-util.h"
++
++ssize_t fgetxattrat_nofollow(int dirfd, const char *filename, const char *name,
++                             void *value, size_t size)
++{
++    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
++    int ret;
++
++    ret = lgetxattr(proc_path, name, value, size);
++    g_free(proc_path);
++    return ret;
++}
++
++ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
++                              char *list, size_t size)
++{
++    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
++    int ret;
++
++    ret = llistxattr(proc_path, list, size);
++    g_free(proc_path);
++    return ret;
++}
++
++ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
++                                const char *name)
++{
++    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
++    int ret;
++
++    ret = lremovexattr(proc_path, name);
++    g_free(proc_path);
++    return ret;
++}
++
++int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
++                         void *value, size_t size, int flags)
++{
++    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
++    int ret;
++
++    ret = lsetxattr(proc_path, name, value, size, flags);
++    g_free(proc_path);
++    return ret;
++}
+diff --git a/hw/9pfs/9p-util.c b/hw/9pfs/9p-util.c
+deleted file mode 100644
+index 614b7fc..0000000
+--- a/hw/9pfs/9p-util.c
++++ /dev/null
+@@ -1,59 +0,0 @@
+-/*
+- * 9p utilities
+- *
+- * Copyright IBM, Corp. 2017
+- *
+- * Authors:
+- *  Greg Kurz <groug@kaod.org>
+- *
+- * This work is licensed under the terms of the GNU GPL, version 2 or later.
+- * See the COPYING file in the top-level directory.
+- */
+-
+-#include "qemu/osdep.h"
+-#include "qemu/xattr.h"
+-#include "9p-util.h"
+-
+-ssize_t fgetxattrat_nofollow(int dirfd, const char *filename, const char *name,
+-                             void *value, size_t size)
+-{
+-    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+-    int ret;
+-
+-    ret = lgetxattr(proc_path, name, value, size);
+-    g_free(proc_path);
+-    return ret;
+-}
+-
+-ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
+-                              char *list, size_t size)
+-{
+-    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+-    int ret;
+-
+-    ret = llistxattr(proc_path, list, size);
+-    g_free(proc_path);
+-    return ret;
+-}
+-
+-ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
+-                                const char *name)
+-{
+-    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+-    int ret;
+-
+-    ret = lremovexattr(proc_path, name);
+-    g_free(proc_path);
+-    return ret;
+-}
+-
+-int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
+-                         void *value, size_t size, int flags)
+-{
+-    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+-    int ret;
+-
+-    ret = lsetxattr(proc_path, name, value, size, flags);
+-    g_free(proc_path);
+-    return ret;
+-}
+diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
+index e3fa673..95e3bc0 100644
+--- a/hw/9pfs/Makefile.objs
++++ b/hw/9pfs/Makefile.objs
+@@ -1,5 +1,6 @@
+ ifeq ($(call lor,$(CONFIG_VIRTIO_9P),$(CONFIG_XEN)),y)
+-common-obj-y  = 9p.o 9p-util.o
++common-obj-y  = 9p.o
++common-obj-$(CONFIG_LINUX) += 9p-util-linux.o
+ common-obj-y += 9p-local.o 9p-xattr.o
+ common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
+ common-obj-y += coth.o cofs.o codir.o cofile.o
 -- 
 2.8.1
