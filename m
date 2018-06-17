@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fUcjI-0007o3-5B
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 14:48:48 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fUhTm-0003HM-9F
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 19:53:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fUcjF-0007kU-3I
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 14:48:48 -0400
-Received: from smtp39.i.mail.ru ([94.100.177.99]:40484)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fUcjE-0007hT-OF
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 14:48:45 -0400
-References: <20180612204632.28780-1-jusual@mail.ru>
-	<CAFEAcA-p5A4S=+ncW42KU2ivBHyALJdUswLUYhh=By6rKYstZw@mail.gmail.com>
-	<826808f0-4dc4-261d-4c54-46c807bb75c9@linaro.org>
-	<CAFEAcA9BVi_yzA6wPjrE62mdd21d9QtVixc1OvB9PWLN2ydq+A@mail.gmail.com>
-From: Julia Suvorova <jusual@mail.ru>
-Message-ID: <be965630-767c-4721-6239-474f61a08e6e@mail.ru>
-Date: Sun, 17 Jun 2018 21:48:34 +0300
+	(envelope-from <dgibson@ozlabs.org>) id 1fUhTl-0007Oq-8Z
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 19:53:06 -0400
+Date: Mon, 18 Jun 2018 09:43:32 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180617234332.GA25461@umbus.fritz.box>
+References: <152908188027.303663.3989619661643297289.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9BVi_yzA6wPjrE62mdd21d9QtVixc1OvB9PWLN2ydq+A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow ARMv6-M Thumb2
- instructions
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="zhXaljGHf11kAtnf"
+Content-Disposition: inline
+In-Reply-To: <152908188027.303663.3989619661643297289.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] spapr: fix xics_system_init() error path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +23,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 
-On 17.06.2018 19:33, Peter Maydell wrote:
-> On 17 June 2018 at 06:36, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->> On 06/15/2018 12:55 AM, Peter Maydell wrote:
->>>> +    uint32_t armv6m_insn[] = {0xf3808000 /* msr */, 0xf3b08040 /* dsb */,
->>>> +                              0xf3b08050 /* dmb */, 0xf3b08060 /* isb */,
->>>> +                              0xf3e08000 /* mrs */, 0xf000d000 /* bl */};
->>>> +    uint32_t armv6m_mask[] = {0xffe0d000, 0xfff0d0f0, 0xfff0d0f0,
->>>> +                              0xfff0d0f0, 0xffe0d000, 0xf800d000};
->>> I think these arrays should be 'const'; we can also move them closer
->>> to their point of use, inside the scope of the if() below.
->>
->> static as well.
-> 
-> Mmm; commit is already in master though, will need a followup patch.
 
-I can make it if you wish.
-In addition, we can simplify following "if" by removing ARM_FEATURE_V6
-since V7M and V8M define V6:
+--zhXaljGHf11kAtnf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-     if (!arm_dc_feature(s, ARM_FEATURE_V7) &&
-         !(arm_dc_feature(s, ARM_FEATURE_V6) &&
-           arm_dc_feature(s, ARM_FEATURE_M))) {
-         goto illegal_op;
-     }
+On Fri, Jun 15, 2018 at 06:58:00PM +0200, Greg Kurz wrote:
+> Commit 3d85885a1b1f3 tried to fix error handling, but it actually
+> went into the wrong direction by dropping the local Error *.
+>=20
+> In the default KVM case, the rationale is to try the in-kernel XICS first,
+> and if not possible, to fallback to userland XICS. Passing errp everywhere
+> makes this fallback impossible if errp is &error_fatal (which happens to
+> be the case). And anyway, if the caller would pass a regular &local_err,
+> things would be worse: we could possibly pass an already set *errp to
+> error_setg() and crash, or return an error even in case of success.
+>=20
+> So we definitely need a local Error * and only propagate it when we're
+> done with the fallback logic. This is what this patch does.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Like this:
+Applied to ppc-for-3.0, thanks.
 
-     if (!arm_dc_feature(s, ARM_FEATURE_V7) &&
-         !arm_dc_feature(s, ARM_FEATURE_M)) {
-         goto illegal_op;
-     }
+> ---
+>  hw/ppc/spapr.c |   22 ++++++++++++++--------
+>  1 file changed, 14 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index f59999daacfc..db0fb385d4e0 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -186,27 +186,33 @@ static int xics_max_server_number(sPAPRMachineState=
+ *spapr)
+>  static void xics_system_init(MachineState *machine, int nr_irqs, Error *=
+*errp)
+>  {
+>      sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
+> +    Error *local_err =3D NULL;
+> =20
+>      if (kvm_enabled()) {
+>          if (machine_kernel_irqchip_allowed(machine) &&
+> -            !xics_kvm_init(spapr, errp)) {
+> +            !xics_kvm_init(spapr, &local_err)) {
+>              spapr->icp_type =3D TYPE_KVM_ICP;
+> -            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_irqs=
+, errp);
+> +            spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_KVM, nr_irqs,
+> +                                          &local_err);
+>          }
+>          if (machine_kernel_irqchip_required(machine) && !spapr->ics) {
+> -            error_prepend(errp, "kernel_irqchip requested but unavailabl=
+e: ");
+> -            return;
+> +            error_prepend(&local_err,
+> +                          "kernel_irqchip requested but unavailable: ");
+> +            goto error;
+>          }
+> +        error_free(local_err);
+> +        local_err =3D NULL;
+>      }
+> =20
+>      if (!spapr->ics) {
+>          xics_spapr_init(spapr);
+>          spapr->icp_type =3D TYPE_ICP;
+> -        spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs,=
+ errp);
+> -        if (!spapr->ics) {
+> -            return;
+> -        }
+> +        spapr->ics =3D spapr_ics_create(spapr, TYPE_ICS_SIMPLE, nr_irqs,
+> +                                      &local_err);
+>      }
+> +
+> +error:
+> +    error_propagate(errp, local_err);
+>  }
+> =20
+>  static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
+>=20
 
-What do you think?
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Best regards, Julia Suvorova.
+--zhXaljGHf11kAtnf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsm8iEACgkQbDjKyiDZ
+s5LmgA//RiqQu4UQ5uLAmLbn/Dl58NO+HKx0cZC8MEMtoAk8I11ro/gOvtZIUTKh
+oDg/F0bWJWcw2moP+e+wKKTvckQ0icP44pzY7mx/Snk/KeV8KJnI4A3z07ZU/cb0
+rFjWNsnCHjSSiouzzvw+3hyg2UxzXrOPxhj3fFY6PUt7UBzT2NRo4lYID/W1pOcl
+zCy/OdsvjVXxZych4UIK5+xJHV+vVbg4r84YF10cHEW1RljEK+Ufua85yCcG6g7+
+O8lpDN5L0fE5Di+y7X98pHLzKZUxxUNj9XwYe6+T269IYx0sRgVHt36hW8fzSfvq
+kjZKa6BwpSzGUmMIUeClHUDfA1XVUXKIez3uyvIs2OANnBsNEyRqrX86sr7UTVlE
+mp9rFxt71cyH0EM8ZcDIkiohET6YlOMBzK8iITZ82rcUQ5egXY7SiN3vaMTITxBA
+O9kYfhvh6EEEPYhlV/3WZSwzDuCZGpHmLmCcjObDymhHkgAVpcsD7fGCpGnpm1EW
+bR+15/k9w5dmugftXESGNtS7Uet0Gc+AKYy34OGHb5p7+sna95dGr3e1H1BBvCZ7
+5dZN8jKp2LTMlXRlTv2DATEnu2cTLNnAdE4ZgwMfwN+bzGtjtpxZR82hIdriL+2a
+mpEDnEiDJohv+cH5vi3fvSTLtrQe7ATLDgyX4LUZuBCGIcCP0Eo=
+=P2sk
+-----END PGP SIGNATURE-----
+
+--zhXaljGHf11kAtnf--
