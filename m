@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fUacL-0002lD-UR
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 12:33:30 -0400
+	(envelope-from <suratiamol@gmail.com>) id 1fUcUV-0002ob-Lw
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 14:33:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fUacL-0006w8-5d
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 12:33:29 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:41525)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fUacK-0006uV-Vu
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 12:33:29 -0400
-Received: by mail-oi0-x243.google.com with SMTP id a141-v6so12821740oii.8
-	for <qemu-devel@nongnu.org>; Sun, 17 Jun 2018 09:33:28 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <826808f0-4dc4-261d-4c54-46c807bb75c9@linaro.org>
-References: <20180612204632.28780-1-jusual@mail.ru>
-	<CAFEAcA-p5A4S=+ncW42KU2ivBHyALJdUswLUYhh=By6rKYstZw@mail.gmail.com>
-	<826808f0-4dc4-261d-4c54-46c807bb75c9@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 17 Jun 2018 17:33:07 +0100
-Message-ID: <CAFEAcA9BVi_yzA6wPjrE62mdd21d9QtVixc1OvB9PWLN2ydq+A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow ARMv6-M Thumb2
- instructions
+	(envelope-from <suratiamol@gmail.com>) id 1fUcUU-00075S-Pq
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 14:33:31 -0400
+From: Amol Surati <suratiamol@gmail.com>
+Date: Mon, 18 Jun 2018 00:05:15 +0530
+Message-Id: <20180617183515.3982-2-suratiamol@gmail.com>
+In-Reply-To: <20180617183515.3982-1-suratiamol@gmail.com>
+References: <20180617183515.3982-1-suratiamol@gmail.com>
+Subject: [Qemu-devel] [RFC 1/1] ide: bug #1777315: io_buffer_size and
+ sg.size can represent partial sector sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +20,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Julia Suvorova <jusual@mail.ru>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>
+To: qemu-devel@nongnu.org
+Cc: Amol Surati <suratiamol@gmail.com>, John Snow <jsnow@redhat.com>, "open list:IDE" <qemu-block@nongnu.org>
 
-On 17 June 2018 at 06:36, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 06/15/2018 12:55 AM, Peter Maydell wrote:
->>> +    uint32_t armv6m_insn[] = {0xf3808000 /* msr */, 0xf3b08040 /* dsb */,
->>> +                              0xf3b08050 /* dmb */, 0xf3b08060 /* isb */,
->>> +                              0xf3e08000 /* mrs */, 0xf000d000 /* bl */};
->>> +    uint32_t armv6m_mask[] = {0xffe0d000, 0xfff0d0f0, 0xfff0d0f0,
->>> +                              0xfff0d0f0, 0xffe0d000, 0xf800d000};
->> I think these arrays should be 'const'; we can also move them closer
->> to their point of use, inside the scope of the if() below.
->
-> static as well.
+This patch fixes the assumption that io_buffer_size is always a perfect
+multiple of the sector size. The assumption is the cause of the firing
+of 'assert(n * 512 == s->sg.size);'.
 
-Mmm; commit is already in master though, will need a followup patch.
+Signed-off-by: Amol Surati <suratiamol@gmail.com>
+---
+ hw/ide/core.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-thanks
--- PMM
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 2c62efc536..53a7c68196 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -835,7 +835,7 @@ int ide_handle_rw_error(IDEState *s, int error, int op)
+ static void ide_dma_cb(void *opaque, int ret)
+ {
+     IDEState *s = opaque;
+-    int n;
++    int m, n;
+     int64_t sector_num;
+     uint64_t offset;
+     bool stay_active = false;
+@@ -858,6 +858,10 @@ static void ide_dma_cb(void *opaque, int ret)
+     }
+ 
+     n = s->io_buffer_size >> 9;
++    if (s->io_buffer_size & (~BDRV_SECTOR_MASK)) {
++        n++;
++    }
++
+     if (n > s->nsector) {
+         /* The PRDs were longer than needed for this request. Shorten them so
+          * we don't get a negative remainder. The Active bit must remain set
+@@ -868,7 +872,11 @@ static void ide_dma_cb(void *opaque, int ret)
+ 
+     sector_num = ide_get_sector(s);
+     if (n > 0) {
+-        assert(n * 512 == s->sg.size);
++        m = s->sg.size >> 9;
++        if (s->sg.size & (~BDRV_SECTOR_MASK)) {
++            m++;
++        }
++        assert(n == m);
+         dma_buf_commit(s, s->sg.size);
+         sector_num += n;
+         ide_set_sector(s, sector_num);
+-- 
+2.17.1
