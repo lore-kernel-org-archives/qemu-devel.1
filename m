@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fUJfu-0000b4-HP
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 18:28:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1fULPz-0000D2-Ia
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:19:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fUJfr-0001nd-Dy
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 18:28:02 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:42324)
+	(envelope-from <bounces@canonical.com>) id 1fULPw-0001yB-Be
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:19:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43828)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fUJfr-0001nQ-9E
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 18:27:59 -0400
-Received: by mail-qk0-x244.google.com with SMTP id j80-v6so7565755qke.9
-	for <qemu-devel@nongnu.org>; Sat, 16 Jun 2018 15:27:59 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180615194705.28019-1-alex.bennee@linaro.org>
-	<20180615194705.28019-30-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7012e6f7-8f67-0263-4f24-a62ed1086e96@amsat.org>
-Date: Sat, 16 Jun 2018 19:27:51 -0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fULPw-0001xn-4k
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:19:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fULPv-0006mZ-2L
+	for <qemu-devel@nongnu.org>; Sun, 17 Jun 2018 00:19:39 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0AE492E802E
+	for <qemu-devel@nongnu.org>; Sun, 17 Jun 2018 00:19:39 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180615194705.28019-30-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 29/54] tests/docker/Makefile.include:
- fix mipsel-cross dependancy
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 17 Jun 2018 00:06:36 -0000
+From: =?utf-8?b?Q2lybyBTYW50aWxsaSDlha3lm5vkuovku7Yg5rOV6L2u5Yqf?=
+	<ciro.santilli@gmail.com>
+Reply-To: Bug 614958 <614958@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20100808101945.28279.87619.malonedeb@potassium.ubuntu.com>
+Message-Id: <152919399670.6742.7633438482379141163.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 614958] Re: copy-paste between client and host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +37,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 06/15/2018 04:46 PM, Alex Bennée wrote:
-> This got broken in commit 4319db7 but generally only shows up when you
-> try and do massive parallel builds on fresh machines.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Having to launch a separate `remote-viewer` command to view the desktop
+is not very satisfactory for me, as you then have to think about two
+processes instead of one.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+-- =
 
-> ---
->  tests/docker/Makefile.include | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-> index 8afb383478..4a2b028a3b 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -57,6 +57,7 @@ docker-image-debian-armel-cross: docker-image-debian9
->  docker-image-debian-armhf-cross: docker-image-debian9
->  docker-image-debian-arm64-cross: docker-image-debian9
->  docker-image-debian-mips-cross: docker-image-debian9
-> +docker-image-debian-mipsel-cross: docker-image-debian9
->  docker-image-debian-mips64el-cross: docker-image-debian9
->  docker-image-debian-powerpc-cross: docker-image-debian8
->  docker-image-debian-ppc64el-cross: docker-image-debian9
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/614958
+
+Title:
+  copy-paste between client and host
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  Hi,
+
+  I propose that copy/paste between VMs be implemented somehow directly in =
+QEMU.
+  This has been discussed repeatedly elsewhere; various solutions are propo=
+sed.  See below.
+
+  As it is, each user has to do their own research and testing if they
+  are to find a solution.   This makes the product frustratingly
+  unattractive for many.
+
+  Most solutions involve either running vnc and using a vnc client that
+  supports copy/paste (this can be tricky to find itself), or running
+  some other tcp-based copy-paste application.
+
+  For many users, the networking in a client VM is unimportant--they
+  just want to run some application there, and setting up netoworking in
+  a VM itself can be an issue.  Most of these solutions rely on un-
+  maintained software, and some require that other software be installed
+  to make them work (Basic interpreter, Java, etc).  Any of these
+  solutions take some work to set up.
+
+  I can tell you, the absence of a copy/paste mechanism makes the
+  project an immediate no-go for many users.  I work with a guy who
+  spent a lot of time trying, gave up, and switched to VirtualBox for
+  this exact reason.
+
+  It would be much better if copy/paste worked out of the box.  Ideally,
+  it should work independently of networking.
+
+  Cheers!
+
+  Some discussions and proposed solutions:
+  -----------------------------------------------------
+  http://qemu-forum.ipi.fi/viewtopic.php?f=3D4&t=3D161
+      Somebody suggests VNC into the virtual host, and use vncviewer
+      Somebody else suggests TCP/IP Clipboard (text editor with tcp/ip)
+
+  http://qemu-forum.ipi.fi/viewtopic.php?f=3D4&t=3D2626
+      primitive app for sharing text across machines (in Basic)
+      http://homepage.mac.com/bnej/shareclip/
+
+  http://borderworlds.dk/blog/20070217-00.html
+      Says doesn't know a good solution but points to unmaintained package
+      Qemu Guest Tools
+      http://wolfpackally.wo.funpic.de/qemu/qgt/
+
+  http://bonzoli.com/docs/How_to_setup_Qemu_on_Fedora_8.html
+      proposes Java remoteclip running on client and server
+      http://www.cs.cmu.edu/afs/cs/user/rcm/WWW/RemoteClip/
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/614958/+subscriptions
