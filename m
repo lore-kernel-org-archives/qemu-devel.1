@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suratiamol@gmail.com>) id 1fUcUV-0002oV-IB
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 14:33:32 -0400
+	(envelope-from <jusual@mail.ru>) id 1fUcjI-0007o3-5B
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 14:48:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suratiamol@gmail.com>) id 1fUcUQ-00074H-Lc
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 14:33:31 -0400
-Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:42750)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <suratiamol@gmail.com>)
-	id 1fUcUQ-00073y-GI
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 14:33:26 -0400
-Received: by mail-pg0-x22a.google.com with SMTP id c10-v6so6505294pgu.9
-	for <qemu-devel@nongnu.org>; Sun, 17 Jun 2018 11:33:26 -0700 (PDT)
-From: Amol Surati <suratiamol@gmail.com>
-Date: Mon, 18 Jun 2018 00:05:14 +0530
-Message-Id: <20180617183515.3982-1-suratiamol@gmail.com>
-Subject: [Qemu-devel] [RFC 0/1] ide: attempt at fixing the bug #1777315.
+	(envelope-from <jusual@mail.ru>) id 1fUcjF-0007kU-3I
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 14:48:48 -0400
+Received: from smtp39.i.mail.ru ([94.100.177.99]:40484)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fUcjE-0007hT-OF
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 14:48:45 -0400
+References: <20180612204632.28780-1-jusual@mail.ru>
+	<CAFEAcA-p5A4S=+ncW42KU2ivBHyALJdUswLUYhh=By6rKYstZw@mail.gmail.com>
+	<826808f0-4dc4-261d-4c54-46c807bb75c9@linaro.org>
+	<CAFEAcA9BVi_yzA6wPjrE62mdd21d9QtVixc1OvB9PWLN2ydq+A@mail.gmail.com>
+From: Julia Suvorova <jusual@mail.ru>
+Message-ID: <be965630-767c-4721-6239-474f61a08e6e@mail.ru>
+Date: Sun, 17 Jun 2018 21:48:34 +0300
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9BVi_yzA6wPjrE62mdd21d9QtVixc1OvB9PWLN2ydq+A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow ARMv6-M Thumb2
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Amol Surati <suratiamol@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>
 
-This is an attempt at fixing the bug #1777315, through code review
-alone (i.e. test and debugging are pending.)
+On 17.06.2018 19:33, Peter Maydell wrote:
+> On 17 June 2018 at 06:36, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> On 06/15/2018 12:55 AM, Peter Maydell wrote:
+>>>> +    uint32_t armv6m_insn[] = {0xf3808000 /* msr */, 0xf3b08040 /* dsb */,
+>>>> +                              0xf3b08050 /* dmb */, 0xf3b08060 /* isb */,
+>>>> +                              0xf3e08000 /* mrs */, 0xf000d000 /* bl */};
+>>>> +    uint32_t armv6m_mask[] = {0xffe0d000, 0xfff0d0f0, 0xfff0d0f0,
+>>>> +                              0xfff0d0f0, 0xffe0d000, 0xf800d000};
+>>> I think these arrays should be 'const'; we can also move them closer
+>>> to their point of use, inside the scope of the if() below.
+>>
+>> static as well.
+> 
+> Mmm; commit is already in master though, will need a followup patch.
 
-The function bmdma_prepare_buf shows that s->io_buffer_size can be
-controlled through the PRDs, and it is possible for it to not be a
-perfect multiple of the sector size (the function ide_dma_cb assumes
-that s->io_buffer_size is a perfect multiple of the sector size.)
+I can make it if you wish.
+In addition, we can simplify following "if" by removing ARM_FEATURE_V6
+since V7M and V8M define V6:
 
-For instance, consider a transfer of 630 bytes.
-s->nsector should be (probably, I did not verify through test/debug) 2.
+     if (!arm_dc_feature(s, ARM_FEATURE_V7) &&
+         !(arm_dc_feature(s, ARM_FEATURE_V6) &&
+           arm_dc_feature(s, ARM_FEATURE_M))) {
+         goto illegal_op;
+     }
 
-Let there be two PRDs, handed over to the bus-master:
-prd[0]: len=512, eot=0
-prd[1]: len=128, eot=1
+Like this:
 
-The function bmdma_prepare_buf receives limit as 2*512 = 1024. During
-the processing of the two PRDs, s->sg.size and s->io_buffer_size both
-end up being set to 630.
+     if (!arm_dc_feature(s, ARM_FEATURE_V7) &&
+         !arm_dc_feature(s, ARM_FEATURE_M)) {
+         goto illegal_op;
+     }
 
-Within the function ide_dma_cb, s->io_buffer_size >> 9 results in n
-being set to 1, which is not greater than s->nsector (which must be
-2.)
+What do you think?
 
-n * 512 is 512, while s->sg.size is 630; the difference results in
-the firing of 'assert(n * 512 == s->sg.size);'.
-
-Alternatively, a single change (discarding the current patch),
-
-'assert(n * 512 == s->sg.size || s->io_buffer_size == s->sg.size);',
-
-could work, provided these two are the only possibilities.
-
-
-
-
-Amol Surati (1):
-  ide: bug #1777315: io_buffer_size and sg.size can represent partial
-    sector sizes
-
- hw/ide/core.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
--- 
-2.17.1
+Best regards, Julia Suvorova.
