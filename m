@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fUM0R-0005h7-MC
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:25 -0400
+	(envelope-from <keno@juliacomputing.com>) id 1fUM0V-0005iM-6L
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fUM0P-0003FA-Hj
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:23 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36120)
+	(envelope-from <keno@juliacomputing.com>) id 1fUM0U-0003Gp-3B
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:27 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:32913)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fUM0P-0003F3-D0
-	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:21 -0400
-Received: by mail-qt0-x243.google.com with SMTP id o9-v6so12402700qtp.3
-	for <qemu-devel@nongnu.org>; Sat, 16 Jun 2018 17:57:21 -0700 (PDT)
+	id 1fUM0T-0003Gi-UP
+	for qemu-devel@nongnu.org; Sat, 16 Jun 2018 20:57:26 -0400
+Received: by mail-qt0-x244.google.com with SMTP id l10-v6so12414206qtj.0
+	for <qemu-devel@nongnu.org>; Sat, 16 Jun 2018 17:57:25 -0700 (PDT)
 From: Keno Fischer <keno@juliacomputing.com>
-Date: Sat, 16 Jun 2018 20:56:47 -0400
-Message-Id: <ec573a3aaa6aeeb5ba1ffac528e22501b7b168f6.1529196703.git.keno@juliacomputing.com>
+Date: Sat, 16 Jun 2018 20:56:52 -0400
+Message-Id: <d2e05ff145f160cb99454f98821dc0250247f1f8.1529196703.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1529196703.git.keno@juliacomputing.com>
 References: <cover.1529196703.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1529196703.git.keno@juliacomputing.com>
 References: <cover.1529196703.git.keno@juliacomputing.com>
-Subject: [Qemu-devel] [PATCH v3 03/13] 9p: darwin: Handle struct stat(fs)
- differences
+Subject: [Qemu-devel] [PATCH v3 08/13] 9p: darwin: *xattr_nofollow
+ implementations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,148 +32,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Keno Fischer <keno@juliacomputing.com>, groug@kaod.org
 
+This implements the darwin equivalent of the functions that were
+moved to 9p-util(-linux) earlier in this series in the new
+9p-util-darwin file.
+
 Signed-off-by: Keno Fischer <keno@juliacomputing.com>
 ---
- fsdev/virtfs-proxy-helper.c | 14 +++++++++++---
- hw/9pfs/9p-proxy.c          | 17 ++++++++++++++---
- hw/9pfs/9p-synth.c          |  2 ++
- hw/9pfs/9p.c                | 16 ++++++++++++++--
- 4 files changed, 41 insertions(+), 8 deletions(-)
+ hw/9pfs/9p-util-darwin.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/9pfs/Makefile.objs    |  1 +
+ 2 files changed, 65 insertions(+)
+ create mode 100644 hw/9pfs/9p-util-darwin.c
 
-diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
-index 94fb069..3bc1269 100644
---- a/fsdev/virtfs-proxy-helper.c
-+++ b/fsdev/virtfs-proxy-helper.c
-@@ -506,12 +506,15 @@ static void stat_to_prstat(ProxyStat *pr_stat, struct stat *stat)
-     pr_stat->st_size = stat->st_size;
-     pr_stat->st_blksize = stat->st_blksize;
-     pr_stat->st_blocks = stat->st_blocks;
-+#ifdef CONFIG_DARWIN
-+    pr_stat->st_atim_nsec = stat->st_atimespec.tv_nsec;
-+    pr_stat->st_mtim_nsec = stat->st_mtimespec.tv_nsec;
-+    pr_stat->st_ctim_nsec = stat->st_ctimespec.tv_nsec;
-+#else
-     pr_stat->st_atim_sec = stat->st_atim.tv_sec;
--    pr_stat->st_atim_nsec = stat->st_atim.tv_nsec;
-     pr_stat->st_mtim_sec = stat->st_mtim.tv_sec;
--    pr_stat->st_mtim_nsec = stat->st_mtim.tv_nsec;
-     pr_stat->st_ctim_sec = stat->st_ctim.tv_sec;
--    pr_stat->st_ctim_nsec = stat->st_ctim.tv_nsec;
-+#endif
- }
- 
- static void statfs_to_prstatfs(ProxyStatFS *pr_stfs, struct statfs *stfs)
-@@ -524,10 +527,15 @@ static void statfs_to_prstatfs(ProxyStatFS *pr_stfs, struct statfs *stfs)
-     pr_stfs->f_bavail = stfs->f_bavail;
-     pr_stfs->f_files = stfs->f_files;
-     pr_stfs->f_ffree = stfs->f_ffree;
-+#ifdef CONFIG_DARWIN
-+    pr_stfs->f_fsid[0] = stfs->f_fsid.val[0];
-+    pr_stfs->f_fsid[1] = stfs->f_fsid.val[1];
-+#else
-     pr_stfs->f_fsid[0] = stfs->f_fsid.__val[0];
-     pr_stfs->f_fsid[1] = stfs->f_fsid.__val[1];
-     pr_stfs->f_namelen = stfs->f_namelen;
-     pr_stfs->f_frsize = stfs->f_frsize;
-+#endif
- }
- 
- /*
-diff --git a/hw/9pfs/9p-proxy.c b/hw/9pfs/9p-proxy.c
-index 47a94e0..8a2c174 100644
---- a/hw/9pfs/9p-proxy.c
-+++ b/hw/9pfs/9p-proxy.c
-@@ -117,10 +117,15 @@ static void prstatfs_to_statfs(struct statfs *stfs, ProxyStatFS *prstfs)
-     stfs->f_bavail = prstfs->f_bavail;
-     stfs->f_files = prstfs->f_files;
-     stfs->f_ffree = prstfs->f_ffree;
-+#ifdef CONFIG_DARWIN
-+    stfs->f_fsid.val[0] = prstfs->f_fsid[0] & 0xFFFFFFFFU;
-+    stfs->f_fsid.val[1] = prstfs->f_fsid[1] >> 32 & 0xFFFFFFFFU;
-+#else
-     stfs->f_fsid.__val[0] = prstfs->f_fsid[0] & 0xFFFFFFFFU;
-     stfs->f_fsid.__val[1] = prstfs->f_fsid[1] >> 32 & 0xFFFFFFFFU;
-     stfs->f_namelen = prstfs->f_namelen;
-     stfs->f_frsize = prstfs->f_frsize;
-+#endif
- }
- 
- /* Converts proxy_stat structure to VFS stat structure */
-@@ -137,12 +142,18 @@ static void prstat_to_stat(struct stat *stbuf, ProxyStat *prstat)
-    stbuf->st_size = prstat->st_size;
-    stbuf->st_blksize = prstat->st_blksize;
-    stbuf->st_blocks = prstat->st_blocks;
--   stbuf->st_atim.tv_sec = prstat->st_atim_sec;
--   stbuf->st_atim.tv_nsec = prstat->st_atim_nsec;
-+   stbuf->st_atime = prstat->st_atim_sec;
-    stbuf->st_mtime = prstat->st_mtim_sec;
--   stbuf->st_mtim.tv_nsec = prstat->st_mtim_nsec;
-    stbuf->st_ctime = prstat->st_ctim_sec;
-+#ifdef CONFIG_DARWIN
-+   stbuf->st_atimespec.tv_nsec = prstat->st_atim_nsec;
-+   stbuf->st_mtimespec.tv_nsec = prstat->st_mtim_nsec;
-+   stbuf->st_ctimespec.tv_nsec = prstat->st_ctim_nsec;
-+#else
-+   stbuf->st_atim.tv_nsec = prstat->st_atim_nsec;
-+   stbuf->st_mtim.tv_nsec = prstat->st_mtim_nsec;
-    stbuf->st_ctim.tv_nsec = prstat->st_ctim_nsec;
-+#endif
- }
- 
- /*
-diff --git a/hw/9pfs/9p-synth.c b/hw/9pfs/9p-synth.c
-index 54239c9..eb68b42 100644
---- a/hw/9pfs/9p-synth.c
-+++ b/hw/9pfs/9p-synth.c
-@@ -426,7 +426,9 @@ static int synth_statfs(FsContext *s, V9fsPath *fs_path,
-     stbuf->f_bsize = 512;
-     stbuf->f_blocks = 0;
-     stbuf->f_files = synth_node_count;
-+#ifndef CONFIG_DARWIN
-     stbuf->f_namelen = NAME_MAX;
-+#endif
-     return 0;
- }
- 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index eef289e..8e6b908 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -905,11 +905,17 @@ static void stat_to_v9stat_dotl(V9fsState *s, const struct stat *stbuf,
-     v9lstat->st_blksize = stbuf->st_blksize;
-     v9lstat->st_blocks = stbuf->st_blocks;
-     v9lstat->st_atime_sec = stbuf->st_atime;
--    v9lstat->st_atime_nsec = stbuf->st_atim.tv_nsec;
-     v9lstat->st_mtime_sec = stbuf->st_mtime;
--    v9lstat->st_mtime_nsec = stbuf->st_mtim.tv_nsec;
-     v9lstat->st_ctime_sec = stbuf->st_ctime;
-+#ifdef CONFIG_DARWIN
-+    v9lstat->st_atime_nsec = stbuf->st_atimespec.tv_nsec;
-+    v9lstat->st_mtime_nsec = stbuf->st_mtimespec.tv_nsec;
-+    v9lstat->st_ctime_nsec = stbuf->st_ctimespec.tv_nsec;
-+#else
-+    v9lstat->st_atime_nsec = stbuf->st_atim.tv_nsec;
-+    v9lstat->st_mtime_nsec = stbuf->st_mtim.tv_nsec;
-     v9lstat->st_ctime_nsec = stbuf->st_ctim.tv_nsec;
-+#endif
-     /* Currently we only support BASIC fields in stat */
-     v9lstat->st_result_mask = P9_STATS_BASIC;
- 
-@@ -2959,9 +2965,15 @@ static int v9fs_fill_statfs(V9fsState *s, V9fsPDU *pdu, struct statfs *stbuf)
-     f_bavail = stbuf->f_bavail/bsize_factor;
-     f_files  = stbuf->f_files;
-     f_ffree  = stbuf->f_ffree;
-+#ifdef CONFIG_DARWIN
-+    fsid_val = (unsigned int)stbuf->f_fsid.val[0] |
-+               (unsigned long long)stbuf->f_fsid.val[1] << 32;
-+    f_namelen = MAXNAMLEN;
-+#else
-     fsid_val = (unsigned int) stbuf->f_fsid.__val[0] |
-                (unsigned long long)stbuf->f_fsid.__val[1] << 32;
-     f_namelen = stbuf->f_namelen;
-+#endif
- 
-     return pdu_marshal(pdu, offset, "ddqqqqqqd",
-                        f_type, f_bsize, f_blocks, f_bfree,
+diff --git a/hw/9pfs/9p-util-darwin.c b/hw/9pfs/9p-util-darwin.c
+new file mode 100644
+index 0000000..cdb4c9e
+--- /dev/null
++++ b/hw/9pfs/9p-util-darwin.c
+@@ -0,0 +1,64 @@
++/*
++ * 9p utilities (Darwin Implementation)
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/xattr.h"
++#include "9p-util.h"
++
++ssize_t fgetxattrat_nofollow(int dirfd, const char *filename, const char *name,
++                             void *value, size_t size)
++{
++    int ret;
++    int fd = openat_file(dirfd, filename,
++                         O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
++    if (fd == -1) {
++        return -1;
++    }
++    ret = fgetxattr(fd, name, value, size, 0, 0);
++    close_preserve_errno(fd);
++    return ret;
++}
++
++ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
++                              char *list, size_t size)
++{
++    int ret;
++    int fd = openat_file(dirfd, filename,
++                         O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
++    if (fd == -1) {
++        return -1;
++    }
++    ret = flistxattr(fd, list, size, 0);
++    close_preserve_errno(fd);
++    return ret;
++}
++
++ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
++                                const char *name)
++{
++    int ret;
++    int fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
++    if (fd == -1) {
++        return -1;
++    }
++    ret = fremovexattr(fd, name, 0);
++    close_preserve_errno(fd);
++    return ret;
++}
++
++int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
++                         void *value, size_t size, int flags)
++{
++    int ret;
++    int fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
++    if (fd == -1) {
++        return -1;
++    }
++    ret = fsetxattr(fd, name, value, size, 0, flags);
++    close_preserve_errno(fd);
++    return ret;
++}
+diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
+index 95e3bc0..0de39af 100644
+--- a/hw/9pfs/Makefile.objs
++++ b/hw/9pfs/Makefile.objs
+@@ -1,6 +1,7 @@
+ ifeq ($(call lor,$(CONFIG_VIRTIO_9P),$(CONFIG_XEN)),y)
+ common-obj-y  = 9p.o
+ common-obj-$(CONFIG_LINUX) += 9p-util-linux.o
++common-obj-$(CONFIG_DARWIN) += 9p-util-darwin.o
+ common-obj-y += 9p-local.o 9p-xattr.o
+ common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
+ common-obj-y += coth.o cofs.o codir.o cofile.o
 -- 
 2.8.1
