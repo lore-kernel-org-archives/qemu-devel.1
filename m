@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUQrv-0002mj-7c
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 02:08:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1fURzS-0005gu-NB
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 03:20:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUQrr-0000nK-Oo
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 02:08:55 -0400
-Date: Sat, 16 Jun 2018 16:34:38 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180616063438.GA31695@umbus.fritz.box>
-References: <20180615122928.9356-1-david@gibson.dropbear.id.au>
-	<20180615160024.079e7daf@bahia.lan>
+	(envelope-from <bounces@canonical.com>) id 1fURzN-0006UK-Ih
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 03:20:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60960)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fURzN-0006Sv-2q
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 03:20:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fURzK-0006it-MP
+	for <qemu-devel@nongnu.org>; Sun, 17 Jun 2018 07:20:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 853B22E80D0
+	for <qemu-devel@nongnu.org>; Sun, 17 Jun 2018 07:20:38 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="lrZ03NoBR/3+SXJZ"
-Content-Disposition: inline
-In-Reply-To: <20180615160024.079e7daf@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCHv2] target/ppc,
- spapr: Move VPA information to machine_data
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 17 Jun 2018 07:15:31 -0000
+From: Haldun ALIMLI <1777301@bugs.launchpad.net>
+Reply-To: Bug 1777301 <1777301@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152921973161.6894.5433227514724824372.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1777301] [NEW] Boot failed after installing
+ Checkpoint Pointsec FDE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,528 +36,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: clg@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru
+To: qemu-devel@nongnu.org
+
+Public bug reported:
+
+Boot failed after installing Checkpoint Pointsec FDE
 
 
---lrZ03NoBR/3+SXJZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi,
+I installed Windows 10 64-bit guest on CentOS 7. Everything works great as =
+expected.
+However after installing CheckPoint AlertSec full disk encryption, the gues=
+t failed to boot.
 
-On Fri, Jun 15, 2018 at 04:00:24PM +0200, Greg Kurz wrote:
-> On Fri, 15 Jun 2018 22:29:28 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > CPUPPCState currently contains a number of fields containing the state =
-of
-> > the VPA.  The VPA is a PAPR specific concept covering several guest/host
-> > shared memory areas used to communicate some information with the
-> > hypervisor.
-> >=20
-> > As a PAPR concept this is really machine specific information, although=
- it
-> > is per-cpu, so it doesn't really belong in the core CPU state structure.
-> >=20
-> > There's also other information that's per-cpu, but platform/machine
-> > specific.  So create a (void *)machine_data in PowerPCCPU which can be
-> > used by the machine to locate per-cpu data.  Intialization, lifetime and
-> > cleanup of machine_data is entirely up to the machine type.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
-> and
->=20
-> Tested-by: Greg Kurz <groug@kaod.org>
->=20
-> (threads=3D4 with hotplug, both success and error paths)
+The following error is displayed in qemu log file.
+KVM internal error. Suberror: 1
+emulation failure
 
-Thanks.  I've merged this into ppc-for-3.0 again.
 
-> And now I'll look into migrating this *new* state.
+Installed Software
+[root@sesamvmh01 qemu]# yum list installed | grep qemu
+ipxe-roms-qemu.noarch                   20170123-1.git4e85b27.el7_4.1  @bas=
+e    =
 
-Great.
+libvirt-daemon-driver-qemu.x86_64       3.9.0-14.el7_5.5               @upd=
+ates =
 
->=20
-> >  hw/ppc/spapr_cpu_core.c         | 13 ++++++
-> >  hw/ppc/spapr_hcall.c            | 77 ++++++++++++++++++---------------
-> >  include/hw/ppc/spapr_cpu_core.h | 11 +++++
-> >  target/ppc/cpu.h                |  7 +--
-> >  target/ppc/kvm.c                | 39 +++++++++--------
-> >  target/ppc/translate_init.inc.c |  8 ----
-> >  6 files changed, 88 insertions(+), 67 deletions(-)
-> >=20
-> > Changes in v2:
-> >  * Move alloc/free of machine_data to spapr_{create,delete}_vcpu()
-> >    instead of spapr_{,un}realize_vcpu() (fixing a possible leak in the
-> >    process)
-> >=20
-> > diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> > index 4f0c168784..f416212ae0 100644
-> > --- a/hw/ppc/spapr_cpu_core.c
-> > +++ b/hw/ppc/spapr_cpu_core.c
-> > @@ -28,6 +28,7 @@ static void spapr_cpu_reset(void *opaque)
-> >      CPUState *cs =3D CPU(cpu);
-> >      CPUPPCState *env =3D &cpu->env;
-> >      PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> >      target_ulong lpcr;
-> > =20
-> >      cpu_reset(cs);
-> > @@ -69,6 +70,12 @@ static void spapr_cpu_reset(void *opaque)
-> > =20
-> >      /* Set a full AMOR so guest can use the AMR as it sees fit */
-> >      env->spr[SPR_AMOR] =3D 0xffffffffffffffffull;
-> > +
-> > +    spapr_cpu->vpa_addr =3D 0;
-> > +    spapr_cpu->slb_shadow_addr =3D 0;
-> > +    spapr_cpu->slb_shadow_size =3D 0;
-> > +    spapr_cpu->dtl_addr =3D 0;
-> > +    spapr_cpu->dtl_size =3D 0;
-> >  }
-> > =20
-> >  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, targ=
-et_ulong r3)
-> > @@ -186,6 +193,8 @@ static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore *=
-sc, int i, Error **errp)
-> >          goto err;
-> >      }
-> > =20
-> > +    cpu->machine_data =3D g_new0(sPAPRCPUState, 1);
-> > +
-> >      object_unref(obj);
-> >      return cpu;
-> > =20
-> > @@ -197,6 +206,10 @@ err:
-> > =20
-> >  static void spapr_delete_vcpu(PowerPCCPU *cpu)
-> >  {
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> > +
-> > +    cpu->machine_data =3D NULL;
-> > +    g_free(spapr_cpu);
-> >      object_unparent(OBJECT(cpu));
-> >  }
-> > =20
-> > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> > index 8b9a4b577f..ae913d070f 100644
-> > --- a/hw/ppc/spapr_hcall.c
-> > +++ b/hw/ppc/spapr_hcall.c
-> > @@ -8,6 +8,7 @@
-> >  #include "exec/exec-all.h"
-> >  #include "helper_regs.h"
-> >  #include "hw/ppc/spapr.h"
-> > +#include "hw/ppc/spapr_cpu_core.h"
-> >  #include "mmu-hash64.h"
-> >  #include "cpu-models.h"
-> >  #include "trace.h"
-> > @@ -908,9 +909,11 @@ unmap_out:
-> >  #define VPA_SHARED_PROC_OFFSET 0x9
-> >  #define VPA_SHARED_PROC_VAL    0x2
-> > =20
-> > -static target_ulong register_vpa(CPUPPCState *env, target_ulong vpa)
-> > +static target_ulong register_vpa(PowerPCCPU *cpu, target_ulong vpa)
-> >  {
-> > -    CPUState *cs =3D CPU(ppc_env_get_cpu(env));
-> > +    CPUState *cs =3D CPU(cpu);
-> > +    CPUPPCState *env =3D &cpu->env;
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> >      uint16_t size;
-> >      uint8_t tmp;
-> > =20
-> > @@ -935,32 +938,34 @@ static target_ulong register_vpa(CPUPPCState *env=
-, target_ulong vpa)
-> >          return H_PARAMETER;
-> >      }
-> > =20
-> > -    env->vpa_addr =3D vpa;
-> > +    spapr_cpu->vpa_addr =3D vpa;
-> > =20
-> > -    tmp =3D ldub_phys(cs->as, env->vpa_addr + VPA_SHARED_PROC_OFFSET);
-> > +    tmp =3D ldub_phys(cs->as, spapr_cpu->vpa_addr + VPA_SHARED_PROC_OF=
-FSET);
-> >      tmp |=3D VPA_SHARED_PROC_VAL;
-> > -    stb_phys(cs->as, env->vpa_addr + VPA_SHARED_PROC_OFFSET, tmp);
-> > +    stb_phys(cs->as, spapr_cpu->vpa_addr + VPA_SHARED_PROC_OFFSET, tmp=
-);
-> > =20
-> >      return H_SUCCESS;
-> >  }
-> > =20
-> > -static target_ulong deregister_vpa(CPUPPCState *env, target_ulong vpa)
-> > +static target_ulong deregister_vpa(PowerPCCPU *cpu, target_ulong vpa)
-> >  {
-> > -    if (env->slb_shadow_addr) {
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> > +
-> > +    if (spapr_cpu->slb_shadow_addr) {
-> >          return H_RESOURCE;
-> >      }
-> > =20
-> > -    if (env->dtl_addr) {
-> > +    if (spapr_cpu->dtl_addr) {
-> >          return H_RESOURCE;
-> >      }
-> > =20
-> > -    env->vpa_addr =3D 0;
-> > +    spapr_cpu->vpa_addr =3D 0;
-> >      return H_SUCCESS;
-> >  }
-> > =20
-> > -static target_ulong register_slb_shadow(CPUPPCState *env, target_ulong=
- addr)
-> > +static target_ulong register_slb_shadow(PowerPCCPU *cpu, target_ulong =
-addr)
-> >  {
-> > -    CPUState *cs =3D CPU(ppc_env_get_cpu(env));
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> >      uint32_t size;
-> > =20
-> >      if (addr =3D=3D 0) {
-> > @@ -968,7 +973,7 @@ static target_ulong register_slb_shadow(CPUPPCState=
- *env, target_ulong addr)
-> >          return H_HARDWARE;
-> >      }
-> > =20
-> > -    size =3D ldl_be_phys(cs->as, addr + 0x4);
-> > +    size =3D ldl_be_phys(CPU(cpu)->as, addr + 0x4);
-> >      if (size < 0x8) {
-> >          return H_PARAMETER;
-> >      }
-> > @@ -977,26 +982,28 @@ static target_ulong register_slb_shadow(CPUPPCSta=
-te *env, target_ulong addr)
-> >          return H_PARAMETER;
-> >      }
-> > =20
-> > -    if (!env->vpa_addr) {
-> > +    if (!spapr_cpu->vpa_addr) {
-> >          return H_RESOURCE;
-> >      }
-> > =20
-> > -    env->slb_shadow_addr =3D addr;
-> > -    env->slb_shadow_size =3D size;
-> > +    spapr_cpu->slb_shadow_addr =3D addr;
-> > +    spapr_cpu->slb_shadow_size =3D size;
-> > =20
-> >      return H_SUCCESS;
-> >  }
-> > =20
-> > -static target_ulong deregister_slb_shadow(CPUPPCState *env, target_ulo=
-ng addr)
-> > +static target_ulong deregister_slb_shadow(PowerPCCPU *cpu, target_ulon=
-g addr)
-> >  {
-> > -    env->slb_shadow_addr =3D 0;
-> > -    env->slb_shadow_size =3D 0;
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> > +
-> > +    spapr_cpu->slb_shadow_addr =3D 0;
-> > +    spapr_cpu->slb_shadow_size =3D 0;
-> >      return H_SUCCESS;
-> >  }
-> > =20
-> > -static target_ulong register_dtl(CPUPPCState *env, target_ulong addr)
-> > +static target_ulong register_dtl(PowerPCCPU *cpu, target_ulong addr)
-> >  {
-> > -    CPUState *cs =3D CPU(ppc_env_get_cpu(env));
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> >      uint32_t size;
-> > =20
-> >      if (addr =3D=3D 0) {
-> > @@ -1004,26 +1011,28 @@ static target_ulong register_dtl(CPUPPCState *e=
-nv, target_ulong addr)
-> >          return H_HARDWARE;
-> >      }
-> > =20
-> > -    size =3D ldl_be_phys(cs->as, addr + 0x4);
-> > +    size =3D ldl_be_phys(CPU(cpu)->as, addr + 0x4);
-> > =20
-> >      if (size < 48) {
-> >          return H_PARAMETER;
-> >      }
-> > =20
-> > -    if (!env->vpa_addr) {
-> > +    if (!spapr_cpu->vpa_addr) {
-> >          return H_RESOURCE;
-> >      }
-> > =20
-> > -    env->dtl_addr =3D addr;
-> > -    env->dtl_size =3D size;
-> > +    spapr_cpu->dtl_addr =3D addr;
-> > +    spapr_cpu->dtl_size =3D size;
-> > =20
-> >      return H_SUCCESS;
-> >  }
-> > =20
-> > -static target_ulong deregister_dtl(CPUPPCState *env, target_ulong addr)
-> > +static target_ulong deregister_dtl(PowerPCCPU *cpu, target_ulong addr)
-> >  {
-> > -    env->dtl_addr =3D 0;
-> > -    env->dtl_size =3D 0;
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> > +
-> > +    spapr_cpu->dtl_addr =3D 0;
-> > +    spapr_cpu->dtl_size =3D 0;
-> > =20
-> >      return H_SUCCESS;
-> >  }
-> > @@ -1035,38 +1044,36 @@ static target_ulong h_register_vpa(PowerPCCPU *=
-cpu, sPAPRMachineState *spapr,
-> >      target_ulong procno =3D args[1];
-> >      target_ulong vpa =3D args[2];
-> >      target_ulong ret =3D H_PARAMETER;
-> > -    CPUPPCState *tenv;
-> >      PowerPCCPU *tcpu;
-> > =20
-> >      tcpu =3D spapr_find_cpu(procno);
-> >      if (!tcpu) {
-> >          return H_PARAMETER;
-> >      }
-> > -    tenv =3D &tcpu->env;
-> > =20
-> >      switch (flags) {
-> >      case FLAGS_REGISTER_VPA:
-> > -        ret =3D register_vpa(tenv, vpa);
-> > +        ret =3D register_vpa(tcpu, vpa);
-> >          break;
-> > =20
-> >      case FLAGS_DEREGISTER_VPA:
-> > -        ret =3D deregister_vpa(tenv, vpa);
-> > +        ret =3D deregister_vpa(tcpu, vpa);
-> >          break;
-> > =20
-> >      case FLAGS_REGISTER_SLBSHADOW:
-> > -        ret =3D register_slb_shadow(tenv, vpa);
-> > +        ret =3D register_slb_shadow(tcpu, vpa);
-> >          break;
-> > =20
-> >      case FLAGS_DEREGISTER_SLBSHADOW:
-> > -        ret =3D deregister_slb_shadow(tenv, vpa);
-> > +        ret =3D deregister_slb_shadow(tcpu, vpa);
-> >          break;
-> > =20
-> >      case FLAGS_REGISTER_DTL:
-> > -        ret =3D register_dtl(tenv, vpa);
-> > +        ret =3D register_dtl(tcpu, vpa);
-> >          break;
-> > =20
-> >      case FLAGS_DEREGISTER_DTL:
-> > -        ret =3D deregister_dtl(tenv, vpa);
-> > +        ret =3D deregister_dtl(tcpu, vpa);
-> >          break;
-> >      }
-> > =20
-> > diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu=
-_core.h
-> > index 47dcfda12b..8ceea2973a 100644
-> > --- a/include/hw/ppc/spapr_cpu_core.h
-> > +++ b/include/hw/ppc/spapr_cpu_core.h
-> > @@ -41,4 +41,15 @@ typedef struct sPAPRCPUCoreClass {
-> >  const char *spapr_get_cpu_core_type(const char *cpu_type);
-> >  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, targ=
-et_ulong r3);
-> > =20
-> > +typedef struct sPAPRCPUState {
-> > +    uint64_t vpa_addr;
-> > +    uint64_t slb_shadow_addr, slb_shadow_size;
-> > +    uint64_t dtl_addr, dtl_size;
-> > +} sPAPRCPUState;
-> > +
-> > +static inline sPAPRCPUState *spapr_cpu_state(PowerPCCPU *cpu)
-> > +{
-> > +    return (sPAPRCPUState *)cpu->machine_data;
-> > +}
-> > +
-> >  #endif
-> > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> > index a91f1a8777..874da6efbc 100644
-> > --- a/target/ppc/cpu.h
-> > +++ b/target/ppc/cpu.h
-> > @@ -1091,12 +1091,6 @@ struct CPUPPCState {
-> >      target_ulong rmls;
-> >  #endif
-> > =20
-> > -#if defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY)
-> > -    uint64_t vpa_addr;
-> > -    uint64_t slb_shadow_addr, slb_shadow_size;
-> > -    uint64_t dtl_addr, dtl_size;
-> > -#endif /* TARGET_PPC64 */
-> > -
-> >      int error_code;
-> >      uint32_t pending_interrupts;
-> >  #if !defined(CONFIG_USER_ONLY)
-> > @@ -1205,6 +1199,7 @@ struct PowerPCCPU {
-> >      uint32_t compat_pvr;
-> >      PPCVirtualHypervisor *vhyp;
-> >      Object *intc;
-> > +    void *machine_data;
-> >      int32_t node_id; /* NUMA node this CPU belongs to */
-> >      PPCHash64Options *hash64_opts;
-> > =20
-> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> > index 7fe9d0126b..5c0e313ca6 100644
-> > --- a/target/ppc/kvm.c
-> > +++ b/target/ppc/kvm.c
-> > @@ -829,22 +829,22 @@ static int kvm_get_fp(CPUState *cs)
-> >  static int kvm_get_vpa(CPUState *cs)
-> >  {
-> >      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > -    CPUPPCState *env =3D &cpu->env;
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> >      struct kvm_one_reg reg;
-> >      int ret;
-> > =20
-> >      reg.id =3D KVM_REG_PPC_VPA_ADDR;
-> > -    reg.addr =3D (uintptr_t)&env->vpa_addr;
-> > +    reg.addr =3D (uintptr_t)&spapr_cpu->vpa_addr;
-> >      ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-> >      if (ret < 0) {
-> >          DPRINTF("Unable to get VPA address from KVM: %s\n", strerror(e=
-rrno));
-> >          return ret;
-> >      }
-> > =20
-> > -    assert((uintptr_t)&env->slb_shadow_size
-> > -           =3D=3D ((uintptr_t)&env->slb_shadow_addr + 8));
-> > +    assert((uintptr_t)&spapr_cpu->slb_shadow_size
-> > +           =3D=3D ((uintptr_t)&spapr_cpu->slb_shadow_addr + 8));
-> >      reg.id =3D KVM_REG_PPC_VPA_SLB;
-> > -    reg.addr =3D (uintptr_t)&env->slb_shadow_addr;
-> > +    reg.addr =3D (uintptr_t)&spapr_cpu->slb_shadow_addr;
-> >      ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-> >      if (ret < 0) {
-> >          DPRINTF("Unable to get SLB shadow state from KVM: %s\n",
-> > @@ -852,9 +852,10 @@ static int kvm_get_vpa(CPUState *cs)
-> >          return ret;
-> >      }
-> > =20
-> > -    assert((uintptr_t)&env->dtl_size =3D=3D ((uintptr_t)&env->dtl_addr=
- + 8));
-> > +    assert((uintptr_t)&spapr_cpu->dtl_size
-> > +           =3D=3D ((uintptr_t)&spapr_cpu->dtl_addr + 8));
-> >      reg.id =3D KVM_REG_PPC_VPA_DTL;
-> > -    reg.addr =3D (uintptr_t)&env->dtl_addr;
-> > +    reg.addr =3D (uintptr_t)&spapr_cpu->dtl_addr;
-> >      ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-> >      if (ret < 0) {
-> >          DPRINTF("Unable to get dispatch trace log state from KVM: %s\n=
-",
-> > @@ -868,7 +869,7 @@ static int kvm_get_vpa(CPUState *cs)
-> >  static int kvm_put_vpa(CPUState *cs)
-> >  {
-> >      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> > -    CPUPPCState *env =3D &cpu->env;
-> > +    sPAPRCPUState *spapr_cpu =3D spapr_cpu_state(cpu);
-> >      struct kvm_one_reg reg;
-> >      int ret;
-> > =20
-> > @@ -876,11 +877,12 @@ static int kvm_put_vpa(CPUState *cs)
-> >       * registered.  That means when restoring state, if a VPA *is*
-> >       * registered, we need to set that up first.  If not, we need to
-> >       * deregister the others before deregistering the master VPA */
-> > -    assert(env->vpa_addr || !(env->slb_shadow_addr || env->dtl_addr));
-> > +    assert(spapr_cpu->vpa_addr
-> > +           || !(spapr_cpu->slb_shadow_addr || spapr_cpu->dtl_addr));
-> > =20
-> > -    if (env->vpa_addr) {
-> > +    if (spapr_cpu->vpa_addr) {
-> >          reg.id =3D KVM_REG_PPC_VPA_ADDR;
-> > -        reg.addr =3D (uintptr_t)&env->vpa_addr;
-> > +        reg.addr =3D (uintptr_t)&spapr_cpu->vpa_addr;
-> >          ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-> >          if (ret < 0) {
-> >              DPRINTF("Unable to set VPA address to KVM: %s\n", strerror=
-(errno));
-> > @@ -888,19 +890,20 @@ static int kvm_put_vpa(CPUState *cs)
-> >          }
-> >      }
-> > =20
-> > -    assert((uintptr_t)&env->slb_shadow_size
-> > -           =3D=3D ((uintptr_t)&env->slb_shadow_addr + 8));
-> > +    assert((uintptr_t)&spapr_cpu->slb_shadow_size
-> > +           =3D=3D ((uintptr_t)&spapr_cpu->slb_shadow_addr + 8));
-> >      reg.id =3D KVM_REG_PPC_VPA_SLB;
-> > -    reg.addr =3D (uintptr_t)&env->slb_shadow_addr;
-> > +    reg.addr =3D (uintptr_t)&spapr_cpu->slb_shadow_addr;
-> >      ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-> >      if (ret < 0) {
-> >          DPRINTF("Unable to set SLB shadow state to KVM: %s\n", strerro=
-r(errno));
-> >          return ret;
-> >      }
-> > =20
-> > -    assert((uintptr_t)&env->dtl_size =3D=3D ((uintptr_t)&env->dtl_addr=
- + 8));
-> > +    assert((uintptr_t)&spapr_cpu->dtl_size
-> > +           =3D=3D ((uintptr_t)&spapr_cpu->dtl_addr + 8));
-> >      reg.id =3D KVM_REG_PPC_VPA_DTL;
-> > -    reg.addr =3D (uintptr_t)&env->dtl_addr;
-> > +    reg.addr =3D (uintptr_t)&spapr_cpu->dtl_addr;
-> >      ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-> >      if (ret < 0) {
-> >          DPRINTF("Unable to set dispatch trace log state to KVM: %s\n",
-> > @@ -908,9 +911,9 @@ static int kvm_put_vpa(CPUState *cs)
-> >          return ret;
-> >      }
-> > =20
-> > -    if (!env->vpa_addr) {
-> > +    if (!spapr_cpu->vpa_addr) {
-> >          reg.id =3D KVM_REG_PPC_VPA_ADDR;
-> > -        reg.addr =3D (uintptr_t)&env->vpa_addr;
-> > +        reg.addr =3D (uintptr_t)&spapr_cpu->vpa_addr;
-> >          ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-> >          if (ret < 0) {
-> >              DPRINTF("Unable to set VPA address to KVM: %s\n", strerror=
-(errno));
-> > diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_ini=
-t.inc.c
-> > index bb9296f5a3..76d6f3fd5e 100644
-> > --- a/target/ppc/translate_init.inc.c
-> > +++ b/target/ppc/translate_init.inc.c
-> > @@ -10316,14 +10316,6 @@ static void ppc_cpu_reset(CPUState *s)
-> >      s->exception_index =3D POWERPC_EXCP_NONE;
-> >      env->error_code =3D 0;
-> > =20
-> > -#if defined(TARGET_PPC64) && !defined(CONFIG_USER_ONLY)
-> > -    env->vpa_addr =3D 0;
-> > -    env->slb_shadow_addr =3D 0;
-> > -    env->slb_shadow_size =3D 0;
-> > -    env->dtl_addr =3D 0;
-> > -    env->dtl_size =3D 0;
-> > -#endif /* TARGET_PPC64 */
-> > -
-> >      for (i =3D 0; i < ARRAY_SIZE(env->spr_cb); i++) {
-> >          ppc_spr_t *spr =3D &env->spr_cb[i];
-> > =20
->=20
+qemu-guest-agent.x86_64                 10:2.8.0-2.el7                 @bas=
+e    =
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+qemu-img-ev.x86_64                      10:2.3.0-29.1.el7              @qem=
+u-kvm-rhev
+qemu-kvm-common-ev.x86_64               10:2.3.0-29.1.el7              @qem=
+u-kvm-rhev
+qemu-kvm-ev.x86_64                      10:2.3.0-29.1.el7              @qem=
+u-kvm-rhev
 
---lrZ03NoBR/3+SXJZ
-Content-Type: application/pgp-signature; name="signature.asc"
+# uname -r
+3.10.0-862.3.2.el7.x86_64
 
------BEGIN PGP SIGNATURE-----
+CPU info:
+processor	: 0..3
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 30
+model name	: Intel(R) Xeon(R) CPU           X3430  @ 2.40GHz
+stepping	: 5
+microcode	: 0x7
+cpu MHz		: 1200.000
+cache size	: 8192 KB
+physical id	: 0
+siblings	: 4
+core id		: 0
+cpu cores	: 4
+apicid		: 0
+initial apicid	: 0
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 11
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat =
+pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp lm =
+constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc aper=
+fmperf pni dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr pdcm sse4_=
+1 sse4_2 popcnt lahf_lm tpr_shadow vnmi flexpriority ept vpid dtherm ida
+bogomips	: 4799.98
+clflush size	: 64
+cache_alignment	: 64
+address sizes	: 36 bits physical, 48 bits virtual
+power management:
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlskr34ACgkQbDjKyiDZ
-s5LFGg/+LVJ2HIRhTY2u2Lnsx/n5tmkjLHJKotufqg3mlHGL/JesnedCbcDIgttP
-JbOao4410XL7yfxJWdj6WsgmEzw0dkWei0V83dk/8VUD0I+QYaagb07Wid//Frnb
-uuceh77ZdvRsVhmcO4NBRrbFISNvlMSVmlYp2nBUpgLwSLdH2DC8X6EwU3QOd1oB
-0KJZ1VcLdPFMF4mqVsPFJ5fvhWb0HlkhHbvfKf/pEXpXeiHnGwc1vzKWl8uNDWJ4
-CDJRVGmu6EnmfoFCCF34PhO2wDRvu0uvng8aAnXlZChfSmj53juhYj3JTqd3kYXY
-dxUSmclcr1JH+rRcRjU0PEFcpNSzC/bQC0P1ui/prJ5Phx7vGSQdFLkaFL1vaV9Q
-dn36K0cEDT9n1S5nEq5lqMVYyGoRi5tFYJqzUFL/ZRwOtreyoy6IwxayaPAqAYVe
-0drP9aaa/oX7GYs812MJw75JphcDowFtIyoDoDmImn5B3RhLNOM27J7mVMIXGPoc
-8aL469K1GETEeCmM0oh6hRWUxoRaEEMvaYcjvuDB5p0qCVyAwVy0k5TlV3Rbe1h1
-CwMd+FUUmWcNdcgP25KUFLVjPLdIynCmaR3Z2JBVCQAweyo5sH4CFBLN+JuqO9qx
-YatiLvlfIRy8/acnidWazMwRcnRUQCSO+0KGGR5m+MVElcM9gQw=
-=WGf5
------END PGP SIGNATURE-----
+Please also check attached logs. I am new to qemu-kvm so please don't
+hesitate to ask missing info.
 
---lrZ03NoBR/3+SXJZ--
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "logs.zip"
+   https://bugs.launchpad.net/bugs/1777301/+attachment/5153543/+files/logs.=
+zip
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1777301
+
+Title:
+  Boot failed after installing Checkpoint Pointsec FDE
+
+Status in QEMU:
+  New
+
+Bug description:
+  Boot failed after installing Checkpoint Pointsec FDE
+
+  =
+
+  Hi,
+  I installed Windows 10 64-bit guest on CentOS 7. Everything works great a=
+s expected.
+  However after installing CheckPoint AlertSec full disk encryption, the gu=
+est failed to boot.
+
+  The following error is displayed in qemu log file.
+  KVM internal error. Suberror: 1
+  emulation failure
+
+
+
+  Installed Software
+  [root@sesamvmh01 qemu]# yum list installed | grep qemu
+  ipxe-roms-qemu.noarch                   20170123-1.git4e85b27.el7_4.1  @b=
+ase    =
+
+  libvirt-daemon-driver-qemu.x86_64       3.9.0-14.el7_5.5               @u=
+pdates =
+
+  qemu-guest-agent.x86_64                 10:2.8.0-2.el7                 @b=
+ase    =
+
+  qemu-img-ev.x86_64                      10:2.3.0-29.1.el7              @q=
+emu-kvm-rhev
+  qemu-kvm-common-ev.x86_64               10:2.3.0-29.1.el7              @q=
+emu-kvm-rhev
+  qemu-kvm-ev.x86_64                      10:2.3.0-29.1.el7              @q=
+emu-kvm-rhev
+
+  # uname -r
+  3.10.0-862.3.2.el7.x86_64
+
+  CPU info:
+  processor	: 0..3
+  vendor_id	: GenuineIntel
+  cpu family	: 6
+  model		: 30
+  model name	: Intel(R) Xeon(R) CPU           X3430  @ 2.40GHz
+  stepping	: 5
+  microcode	: 0x7
+  cpu MHz		: 1200.000
+  cache size	: 8192 KB
+  physical id	: 0
+  siblings	: 4
+  core id		: 0
+  cpu cores	: 4
+  apicid		: 0
+  initial apicid	: 0
+  fpu		: yes
+  fpu_exception	: yes
+  cpuid level	: 11
+  wp		: yes
+  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pa=
+t pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx rdtscp l=
+m constant_tsc arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc ap=
+erfmperf pni dtes64 monitor ds_cpl vmx smx est tm2 ssse3 cx16 xtpr pdcm sse=
+4_1 sse4_2 popcnt lahf_lm tpr_shadow vnmi flexpriority ept vpid dtherm ida
+  bogomips	: 4799.98
+  clflush size	: 64
+  cache_alignment	: 64
+  address sizes	: 36 bits physical, 48 bits virtual
+  power management:
+
+  Please also check attached logs. I am new to qemu-kvm so please don't
+  hesitate to ask missing info.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1777301/+subscriptions
