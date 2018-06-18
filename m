@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fUu6u-00047w-2v
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:22:21 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fUuCL-0005qO-Ej
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:27:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fUu6q-0003qg-P1
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:22:20 -0400
-Received: from 1.mo69.mail-out.ovh.net ([178.33.251.173]:48000)
+	(envelope-from <cohuck@redhat.com>) id 1fUuCI-0008ES-6g
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:27:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38250 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fUu6q-0003q7-EP
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:22:16 -0400
-Received: from player756.ha.ovh.net (unknown [10.109.105.36])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 771FD18990
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 15:22:14 +0200 (CEST)
-Date: Mon, 18 Jun 2018 15:22:03 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180618152203.59158d68@bahia.lan>
-In-Reply-To: <20180618063606.2513-2-david@gibson.dropbear.id.au>
-References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
-	<20180618063606.2513-2-david@gibson.dropbear.id.au>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fUuCI-0008Dx-13
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:27:54 -0400
+Date: Mon, 18 Jun 2018 15:27:47 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180618152747.5b5ab22c.cohuck@redhat.com>
+In-Reply-To: <20180615152926-mutt-send-email-mst@kernel.org>
+References: <20180611202207-mutt-send-email-mst@kernel.org>
+	<dc8b1669-b8b6-fb59-94e2-6e4de6b96572@redhat.com>
+	<20180612051432-mutt-send-email-mst@kernel.org>
+	<23fc4aa4-ec41-d6e2-3354-10cbfc13b7ec@intel.com>
+	<20180612142557-mutt-send-email-mst@kernel.org>
+	<b9c88515-cf41-2a9a-078e-9c9e5adbbf14@intel.com>
+	<CADGSJ213f8tJpNXuOhv8qRew-Y5VZAwA+srNMrLZYnKdVGLdAA@mail.gmail.com>
+	<20180614120231.0a72bd5f.cohuck@redhat.com>
+	<20180615052743-mutt-send-email-mst@kernel.org>
+	<20180615113242.799974f6.cohuck@redhat.com>
+	<20180615152926-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/9] target/ppc: Allow cpu compatiblity
- checks based on type, not instance
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,197 +37,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: abologna@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org
 
-On Mon, 18 Jun 2018 16:35:58 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Fri, 15 Jun 2018 15:31:43 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> ppc_check_compat() is used in a number of places to check if a cpu object
-> supports a certain compatiblity mode, subject to various constraints.
+> On Fri, Jun 15, 2018 at 11:32:42AM +0200, Cornelia Huck wrote:
+> > On Fri, 15 Jun 2018 05:34:24 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Thu, Jun 14, 2018 at 12:02:31PM +0200, Cornelia Huck wrote:  
+> >   
+> > > > > > I am not all that familiar with how Qemu manages network devices. If we can
+> > > > > > do all the
+> > > > > > required management of the primary/standby devices within Qemu, that is
+> > > > > > definitely a better
+> > > > > > approach without upper layer involvement.      
+> > > > > 
+> > > > > Right. I would imagine in the extreme case the upper layer doesn't
+> > > > > have to be involved at all if QEMU manages all hot plug/unplug logic.
+> > > > > The management tool can supply passthrough device and virtio with the
+> > > > > same group UUID, QEMU auto-manages the presence of the primary, and
+> > > > > hot plug the device as needed before or after the migration.    
+> > > > 
+> > > > I do not really see how you can manage that kind of stuff in QEMU only.    
+> > > 
+> > > So right now failover is limited to pci passthrough devices only.
+> > > The idea is to realize the vfio device but not expose it
+> > > to guest. Have a separate command to expose it to guest.
+> > > Hotunplug would also hide it from guest but not unrealize it.  
+> > 
+> > So, this would not be real hot(un)plug, but 'hide it from the guest',
+> > right? The concept of "we have it realized in QEMU, but the guest can't
+> > discover and use it" should be translatable to non-pci as well (at
+> > least for ccw).
+> >   
+> > > 
+> > > This will help ensure that e.g. on migration failure we can
+> > > re-expose the device without risk of running out of resources.  
+> > 
+> > Makes sense.
+> > 
+> > Should that 'hidden' state be visible/settable from outside as well
+> > (e.g. via a property)? I guess yes, so that management software has a
+> > chance to see whether a device is visible.  
 > 
-> It takes a PowerPCCPU *, however it really only depends on the cpu's class.
-> We have upcoming cases where it would be useful to make compatibility
-> checks before we fully instantiate the cpu objects.
-> 
-> ppc_type_check_compat() will now make an equivalent check, but based on a
-> CPU's QOM typename instead of an instantiated CPU object.
-> 
-> We make use of the new interface in several places in spapr, where we're
-> essentially making a global check, rather than one specific to a particular
-> cpu.  This avoids some ugly uses of first_cpu to grab a "representative"
-> instance.
-> 
+> Might be handy for debug, but note that since QEMU manages this
+> state it's transient: can change at any time, so it's kind
+> of hard for management to rely on it.
 
-Nice cleanup !
+Might be another reason to have this controlled by management software;
+being able to find out easily why a device is not visible to the guest
+seems to be a useful thing.
 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+Anyway, let's defer this discussion until it is clear how we actually
+want to handle the whole setup.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/ppc/spapr.c      | 10 ++++------
->  hw/ppc/spapr_caps.c | 19 +++++++++----------
->  target/ppc/compat.c | 27 +++++++++++++++++++++------
->  target/ppc/cpu.h    |  4 ++++
->  4 files changed, 38 insertions(+), 22 deletions(-)
 > 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index db0fb385d4..b0b94fc1f0 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1616,8 +1616,8 @@ static void spapr_machine_reset(void)
->  
->      first_ppc_cpu = POWERPC_CPU(first_cpu);
->      if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
-> -        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-> -                         spapr->max_compat_pvr)) {
-> +        ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_00, 0,
-> +                              spapr->max_compat_pvr)) {
->          /* If using KVM with radix mode available, VCPUs can be started
->           * without a HPT because KVM will start them in radix mode.
->           * Set the GR bit in PATB so that we know there is no HPT. */
-> @@ -2520,7 +2520,6 @@ static void spapr_machine_init(MachineState *machine)
->      long load_limit, fw_size;
->      char *filename;
->      Error *resize_hpt_err = NULL;
-> -    PowerPCCPU *first_ppc_cpu;
->  
->      msi_nonbroken = true;
->  
-> @@ -2618,10 +2617,9 @@ static void spapr_machine_init(MachineState *machine)
->      /* init CPUs */
->      spapr_init_cpus(spapr);
->  
-> -    first_ppc_cpu = POWERPC_CPU(first_cpu);
->      if ((!kvm_enabled() || kvmppc_has_cap_mmu_radix()) &&
-> -        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-> -                         spapr->max_compat_pvr)) {
-> +        ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_00, 0,
-> +                              spapr->max_compat_pvr)) {
->          /* KVM and TCG always allow GTSE with radix... */
->          spapr_ovec_set(spapr->ov5, OV5_MMU_RADIX_GTSE);
->      }
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 00e43a9ba7..469f38f0ef 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -327,27 +327,26 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
->  };
->  
->  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-> -                                               CPUState *cs)
-> +                                               const char *cputype)
->  {
->      sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-> -    PowerPCCPU *cpu = POWERPC_CPU(cs);
->      sPAPRCapabilities caps;
->  
->      caps = smc->default_caps;
->  
-> -    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
-> -                          0, spapr->max_compat_pvr)) {
-> +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_07,
-> +                               0, spapr->max_compat_pvr)) {
->          caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
->          caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
->      }
->  
-> -    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06_PLUS,
-> -                          0, spapr->max_compat_pvr)) {
-> +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_06_PLUS,
-> +                               0, spapr->max_compat_pvr)) {
->          caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
->      }
->  
-> -    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
-> -                          0, spapr->max_compat_pvr)) {
-> +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_06,
-> +                               0, spapr->max_compat_pvr)) {
->          caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_OFF;
->          caps.caps[SPAPR_CAP_DFP] = SPAPR_CAP_OFF;
->          caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
-> @@ -384,7 +383,7 @@ int spapr_caps_post_migration(sPAPRMachineState *spapr)
->      sPAPRCapabilities dstcaps = spapr->eff;
->      sPAPRCapabilities srccaps;
->  
-> -    srccaps = default_caps_with_cpu(spapr, first_cpu);
-> +    srccaps = default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type);
->      for (i = 0; i < SPAPR_CAP_NUM; i++) {
->          /* If not default value then assume came in with the migration */
->          if (spapr->mig.caps[i] != spapr->def.caps[i]) {
-> @@ -446,7 +445,7 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
->      int i;
->  
->      /* First compute the actual set of caps we're running with.. */
-> -    default_caps = default_caps_with_cpu(spapr, first_cpu);
-> +    default_caps = default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type);
->  
->      for (i = 0; i < SPAPR_CAP_NUM; i++) {
->          /* Store the defaults */
-> diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-> index 807c906f68..7de4bf3122 100644
-> --- a/target/ppc/compat.c
-> +++ b/target/ppc/compat.c
-> @@ -105,17 +105,13 @@ static const CompatInfo *compat_by_pvr(uint32_t pvr)
->      return NULL;
->  }
->  
-> -bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
-> -                      uint32_t min_compat_pvr, uint32_t max_compat_pvr)
-> +static bool pcc_compat(PowerPCCPUClass *pcc, uint32_t compat_pvr,
-> +                       uint32_t min_compat_pvr, uint32_t max_compat_pvr)
->  {
-> -    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
->      const CompatInfo *compat = compat_by_pvr(compat_pvr);
->      const CompatInfo *min = compat_by_pvr(min_compat_pvr);
->      const CompatInfo *max = compat_by_pvr(max_compat_pvr);
->  
-> -#if !defined(CONFIG_USER_ONLY)
-> -    g_assert(cpu->vhyp);
-> -#endif
->      g_assert(!min_compat_pvr || min);
->      g_assert(!max_compat_pvr || max);
->  
-> @@ -134,6 +130,25 @@ bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
->      return true;
->  }
->  
-> +bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
-> +                      uint32_t min_compat_pvr, uint32_t max_compat_pvr)
-> +{
-> +    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-> +
-> +#if !defined(CONFIG_USER_ONLY)
-> +    g_assert(cpu->vhyp);
-> +#endif
-> +
-> +    return pcc_compat(pcc, compat_pvr, min_compat_pvr, max_compat_pvr);
-> +}
-> +
-> +bool ppc_type_check_compat(const char *cputype, uint32_t compat_pvr,
-> +                           uint32_t min_compat_pvr, uint32_t max_compat_pvr)
-> +{
-> +    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(object_class_by_name(cputype));
-> +    return pcc_compat(pcc, compat_pvr, min_compat_pvr, max_compat_pvr);
-> +}
-> +
->  void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
->  {
->      const CompatInfo *compat = compat_by_pvr(compat_pvr);
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 874da6efbc..c7f3fb6b73 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1369,7 +1369,11 @@ static inline int cpu_mmu_index (CPUPPCState *env, bool ifetch)
->  #if defined(TARGET_PPC64)
->  bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
->                        uint32_t min_compat_pvr, uint32_t max_compat_pvr);
-> +bool ppc_type_check_compat(const char *cputype, uint32_t compat_pvr,
-> +                           uint32_t min_compat_pvr, uint32_t max_compat_pvr);
-> +
->  void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp);
-> +
->  #if !defined(CONFIG_USER_ONLY)
->  void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
->  #endif
+> > Settable may be useful if we
+> > find another use case for hiding realized devices.  
