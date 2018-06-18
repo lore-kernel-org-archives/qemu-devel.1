@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUlEf-0005Sy-RA
+	(envelope-from <dgibson@ozlabs.org>) id 1fUlEf-0005Su-9n
 	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 23:53:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUlEd-00047n-OY
+	(envelope-from <dgibson@ozlabs.org>) id 1fUlEd-000476-3Y
 	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 23:53:45 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 18 Jun 2018 13:53:16 +1000
-Message-Id: <20180618035324.19907-21-david@gibson.dropbear.id.au>
+Date: Mon, 18 Jun 2018 13:53:15 +1000
+Message-Id: <20180618035324.19907-20-david@gibson.dropbear.id.au>
 In-Reply-To: <20180618035324.19907-1-david@gibson.dropbear.id.au>
 References: <20180618035324.19907-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 20/28] pnv: Clean up cpu realize path
+Subject: [Qemu-devel] [PULL 19/28] pnv_core: Allocate cpu thread objects
+ individually
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,116 +26,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, agraf@suse.de, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-pnv_cpu_init() is only called from the the pnv cpu core realize path, and
-really only can be called from there.  So fold it into its caller, which
-we also rename for brevity.
+Currently, we allocate space for all the cpu objects within a single core
+in one big block.  This was copied from an older version of the spapr cod=
+e
+and requires some ugly pointer manipulation to extract the individual
+objects.
+
+This design was due to a misunderstanding of qemu lifetime conventions an=
+d
+has already been changed in spapr (in 94ad93bd "spapr_cpu_core: instantia=
+te
+CPUs separately".
+
+Make an equivalent change in pnv_core to get rid of the nasty pointer
+arithmetic.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/pnv_core.c | 56 ++++++++++++++++++-----------------------------
- 1 file changed, 21 insertions(+), 35 deletions(-)
+ hw/ppc/pnv.c              |  4 ++--
+ hw/ppc/pnv_core.c         | 11 +++++------
+ include/hw/ppc/pnv_core.h |  2 +-
+ 3 files changed, 8 insertions(+), 9 deletions(-)
 
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 0314881316..0b9508d94d 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -121,9 +121,9 @@ static int get_cpus_node(void *fdt)
+  */
+ static void pnv_dt_core(PnvChip *chip, PnvCore *pc, void *fdt)
+ {
+-    CPUState *cs =3D CPU(DEVICE(pc->threads));
++    PowerPCCPU *cpu =3D pc->threads[0];
++    CPUState *cs =3D CPU(cpu);
+     DeviceClass *dc =3D DEVICE_GET_CLASS(cs);
+-    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+     int smt_threads =3D CPU_CORE(pc)->nr_threads;
+     CPUPPCState *env =3D &cpu->env;
+     PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cs);
 diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index 1e40f01e98..f4c41d89d6 100644
+index 01f47c8037..1e40f01e98 100644
 --- a/hw/ppc/pnv_core.c
 +++ b/hw/ppc/pnv_core.c
-@@ -54,28 +54,6 @@ static void pnv_cpu_reset(void *opaque)
-     env->msr |=3D MSR_HVB; /* Hypervisor mode */
- }
-=20
--static void pnv_cpu_init(PowerPCCPU *cpu, Error **errp)
--{
--    CPUPPCState *env =3D &cpu->env;
--    int core_pir;
--    int thread_index =3D 0; /* TODO: TCG supports only one thread */
--    ppc_spr_t *pir =3D &env->spr_cb[SPR_PIR];
--
--    core_pir =3D object_property_get_uint(OBJECT(cpu), "core-pir", &erro=
-r_abort);
--
--    /*
--     * The PIR of a thread is the core PIR + the thread index. We will
--     * need to find a way to get the thread index when TCG supports
--     * more than 1. We could use the object name ?
--     */
--    pir->default_value =3D core_pir + thread_index;
--
--    /* Set time-base frequency to 512 MHz */
--    cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
--
--    qemu_register_reset(pnv_cpu_reset, cpu);
--}
--
- /*
-  * These values are read by the PowerNV HW monitors under Linux
-  */
-@@ -121,29 +99,39 @@ static const MemoryRegionOps pnv_core_xscom_ops =3D =
-{
-     .endianness =3D DEVICE_BIG_ENDIAN,
- };
-=20
--static void pnv_core_realize_child(Object *child, XICSFabric *xi, Error =
+@@ -151,7 +151,6 @@ static void pnv_core_realize(DeviceState *dev, Error =
 **errp)
-+static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFabric *xi, Error **er=
-rp)
- {
-+    CPUPPCState *env =3D &cpu->env;
-+    int core_pir;
-+    int thread_index =3D 0; /* TODO: TCG supports only one thread */
-+    ppc_spr_t *pir =3D &env->spr_cb[SPR_PIR];
+     PnvCore *pc =3D PNV_CORE(OBJECT(dev));
+     CPUCore *cc =3D CPU_CORE(OBJECT(dev));
+     const char *typename =3D pnv_core_cpu_typename(pc);
+-    size_t size =3D object_type_get_instance_size(typename);
      Error *local_err =3D NULL;
--    CPUState *cs =3D CPU(child);
--    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-=20
--    object_property_set_bool(child, true, "realized", &local_err);
-+    object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
+     void *obj;
+     int i, j;
+@@ -165,11 +164,11 @@ static void pnv_core_realize(DeviceState *dev, Erro=
+r **errp)
          return;
      }
 =20
--    cpu->intc =3D icp_create(child, TYPE_PNV_ICP, xi, &local_err);
-+    cpu->intc =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, xi, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-     }
+-    pc->threads =3D g_malloc0(size * cc->nr_threads);
++    pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
+     for (i =3D 0; i < cc->nr_threads; i++) {
+-        obj =3D pc->threads + i * size;
++        obj =3D object_new(typename);
 =20
--    pnv_cpu_init(cpu, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
-+    core_pir =3D object_property_get_uint(OBJECT(cpu), "core-pir", &erro=
-r_abort);
-+
-+    /*
-+     * The PIR of a thread is the core PIR + the thread index. We will
-+     * need to find a way to get the thread index when TCG supports
-+     * more than 1. We could use the object name ?
-+     */
-+    pir->default_value =3D core_pir + thread_index;
-+
-+    /* Set time-base frequency to 512 MHz */
-+    cpu_ppc_tb_init(env, PNV_TIMEBASE_FREQ);
-+
-+    qemu_register_reset(pnv_cpu_reset, cpu);
- }
+-        object_initialize(obj, size, typename);
++        pc->threads[i] =3D POWERPC_CPU(obj);
 =20
- static void pnv_core_realize(DeviceState *dev, Error **errp)
-@@ -178,9 +166,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
+         snprintf(name, sizeof(name), "thread[%d]", i);
+         object_property_add_child(OBJECT(pc), name, obj, &error_abort);
+@@ -179,7 +178,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
 **errp)
      }
 =20
      for (j =3D 0; j < cc->nr_threads; j++) {
--        obj =3D OBJECT(pc->threads[j]);
--
--        pnv_core_realize_child(obj, XICS_FABRIC(xi), &local_err);
-+        pnv_realize_vcpu(pc->threads[j], XICS_FABRIC(xi), &local_err);
+-        obj =3D pc->threads + j * size;
++        obj =3D OBJECT(pc->threads[j]);
+=20
+         pnv_core_realize_child(obj, XICS_FABRIC(xi), &local_err);
          if (local_err) {
-             goto err;
-         }
+@@ -194,7 +193,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
+**errp)
+=20
+ err:
+     while (--i >=3D 0) {
+-        obj =3D pc->threads + i * size;
++        obj =3D OBJECT(pc->threads[i]);
+         object_unparent(obj);
+     }
+     g_free(pc->threads);
+diff --git a/include/hw/ppc/pnv_core.h b/include/hw/ppc/pnv_core.h
+index e337af7a3a..447ae761f7 100644
+--- a/include/hw/ppc/pnv_core.h
++++ b/include/hw/ppc/pnv_core.h
+@@ -34,7 +34,7 @@ typedef struct PnvCore {
+     CPUCore parent_obj;
+=20
+     /*< public >*/
+-    void *threads;
++    PowerPCCPU **threads;
+     uint32_t pir;
+=20
+     MemoryRegion xscom_regs;
 --=20
 2.17.1
