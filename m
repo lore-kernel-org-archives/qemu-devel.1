@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fUtYU-0002CL-Df
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:46:47 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fUtsM-0005yF-Ns
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:07:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fUtYR-0005Yb-9h
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:46:46 -0400
-Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:37316)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fUtYR-0005XL-34
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:46:43 -0400
-Received: from player792.ha.ovh.net (unknown [10.109.108.92])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 5F772E4F3D
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 14:46:41 +0200 (CEST)
-Date: Mon, 18 Jun 2018 14:46:33 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180618144633.7dc1ba5f@bahia.lan>
-In-Reply-To: <04de8df8-3951-442c-62f4-7ea0309c609b@kaod.org>
-References: <20180615115303.31125-1-clg@kaod.org>
-	<20180615115303.31125-4-clg@kaod.org>
-	<20180615180311.6d16e506@bahia.lan>
-	<c5182296-b9f5-0072-8d13-551d71560394@kaod.org>
-	<20180618104208.66a9f09e@bahia.lan>
-	<26b2695c-8b7e-d5f7-7069-cb234aaf5a2e@kaod.org>
-	<20180618115444.094d4b1c@bahia.lan>
-	<04de8df8-3951-442c-62f4-7ea0309c609b@kaod.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1fUtsL-0002fM-G1
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:07:18 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:51656)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fUtsL-0002er-8D
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:07:17 -0400
+Received: by mail-wm0-x244.google.com with SMTP id r15-v6so13954626wmc.1
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 06:07:17 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 18 Jun 2018 14:07:06 +0100
+Message-Id: <20180618130709.19730-6-alex.bennee@linaro.org>
+In-Reply-To: <20180618130709.19730-1-alex.bennee@linaro.org>
+References: <20180618130709.19730-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 3/3] spapr: introduce a fixed
- IRQ number space
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v1 5/8] docker: docker.py use "ps" to probe
+ usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,73 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: famz@redhat.com, cota@braap.org, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Mon, 18 Jun 2018 13:31:26 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+The "images" command is a fairly heavyweight command to run as it
+involves searching the whole docker file-system inventory. On a
+machine with a lot of images this makes start-up fairly expensive.
 
-> On 06/18/2018 11:54 AM, Greg Kurz wrote:
-> > On Mon, 18 Jun 2018 10:56:55 +0200
-> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> >  =20
-> >> [ ... ]
-> >> =20
-> >>>>> This is 4 irqs per PHB, hence up to 32 PHBs. Cool, we're currently
-> >>>>> limited to 31 PHBs.
-> >>>>>      =20
-> >>>>>> +#define SPAPR_IRQ_MSI        0x1100  /* Offset of the dynamic ran=
-ge covered     =20
-> >>>>>
-> >>>>> We only support dynamic MSIs with PCI, maybe rename to SPAPR_IRQ_PC=
-I_MSI ?     =20
-> >>>>
-> >>>> hmm, no. We could have CAPI devices there. remember ? ;)
-> >>>>   =20
-> >>>
-> >>> Well... OpenCAPI devices are exposed to the OS as PCI devices, so I'm=
- not
-> >>> sure we need a CAPI specific range.   =20
-> >>
-> >> yes. so this range is common to all devices doing dynamic allocation
-> >> of IRQs. How should we call it ?=20
-> >> =20
-> >>>>>> +                                      * by the bitmap allocator *=
-/     =20
-> >>>>>
-> >>>>> The range size is hence 1k (XICS_IRQS_SPAPR) for the time being.   =
-  =20
-> >>>>
-> >>>> in fact we could this bogus limit and use spapr->irq_map_nr now.
-> >>>>   =20
-> >>>
-> >>> "we could *missing verb* this bogus limit"... so I'm not sure to
-> >>> understand...   =20
-> >>
-> >> oups. We could use spapr->irq_map_nr instead of XICS_IRQS_SPAPR when
-> >> defining :=20
-> >>
-> >>     _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi", XICS_IRQS=
-_SPAPR));
-> >>
-> >> in spapr_pci.c
-> >> =20
-> >=20
-> > Ah... yeah, I've always found weird that all PHBs advertise the same nu=
-mber
-> > of available MSIs as the total number of irqs for the whole machine. And
-> > putting spapr->irq_map_nr looks weird all the same if all PHBs rely on =
-the
-> > same bitmap actually.
-> >=20
-> > I'm thinking of doing the other way around: keep XICS_IRQS_SPAPR in
-> > "ibm,pe-total-#msi" and have one XICS_IRQS_SPAPR sized bitmap per PHB. =
-=20
->=20
-> That could be the place where to put the msi allocator.
->=20
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/docker/docker.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Are you suggesting to move @irq_map and @irq_map_nr to sPAPRPHBState and
-to have these setup during PHB realize ? I guess we could do that.
-
-> C.
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index c83fd89985..3072bf4a31 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -49,7 +49,7 @@ def _guess_docker_command():
+     commands = [["docker"], ["sudo", "-n", "docker"]]
+     for cmd in commands:
+         try:
+-            if subprocess.call(cmd + ["images"],
++            if subprocess.call(cmd + ["ps"],
+                                stdout=DEVNULL, stderr=DEVNULL) == 0:
+                 return cmd
+         except OSError:
+-- 
+2.17.1
