@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fUv6Z-00023L-2Q
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:26:04 -0400
+	(envelope-from <david@redhat.com>) id 1fUv6d-00026c-MI
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:26:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fUv6V-0000ko-Tq
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:26:03 -0400
+	(envelope-from <david@redhat.com>) id 1fUv6Y-0000pE-0c
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:26:07 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 18 Jun 2018 16:25:32 +0200
-Message-Id: <20180618142536.23995-9-david@redhat.com>
+Date: Mon, 18 Jun 2018 16:25:33 +0200
+Message-Id: <20180618142536.23995-10-david@redhat.com>
 In-Reply-To: <20180618142536.23995-1-david@redhat.com>
 References: <20180618142536.23995-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 08/12] pc-dimm: merge
- get_(vmstate_)memory_region()
+Subject: [Qemu-devel] [PATCH v4 09/12] nvdimm: convert "unarmed" into a
+ static property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +23,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-Importantly, get_vmstate_memory_region() should also fail with a proper
-error if called before the device is realized. For a PCDIMM, both functions
-are to return the same thing, so share the implementation.
-
-All current users are called after the device has been realized, so we
-can expect the calls to succeed.
+We don't allow to modify it after realization. So we can simply turn
+it into a static property.
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/mem/pc-dimm.c         | 13 +++++--------
- include/hw/mem/pc-dimm.h |  3 ++-
- 2 files changed, 7 insertions(+), 9 deletions(-)
+ hw/mem/nvdimm.c | 32 +++++++-------------------------
+ 1 file changed, 7 insertions(+), 25 deletions(-)
 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 73f0eee4c7..4ff39b59ef 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -35,7 +35,8 @@ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
-     int slot;
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
-+    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
-+                                                              &error_abort);
-     Error *local_err = NULL;
-     MemoryRegion *mr;
-     uint64_t addr;
-@@ -90,7 +91,8 @@ void pc_dimm_unplug(DeviceState *dev, MachineState *machine)
- {
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
-+    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
-+                                                              &error_abort);
-     MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
- 
-     memory_device_unplug_region(machine, mr);
-@@ -229,11 +231,6 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
-     return host_memory_backend_get_memory(dimm->hostmem);
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index df9716231f..7260c9c6b1 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -64,36 +64,11 @@ out:
+     error_propagate(errp, local_err);
  }
  
--static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
+-static bool nvdimm_get_unarmed(Object *obj, Error **errp)
 -{
--    return host_memory_backend_get_memory(dimm->hostmem);
+-    NVDIMMDevice *nvdimm = NVDIMM(obj);
+-
+-    return nvdimm->unarmed;
 -}
 -
- static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+-static void nvdimm_set_unarmed(Object *obj, bool value, Error **errp)
+-{
+-    NVDIMMDevice *nvdimm = NVDIMM(obj);
+-    Error *local_err = NULL;
+-
+-    if (memory_region_size(&nvdimm->nvdimm_mr)) {
+-        error_setg(&local_err, "cannot change property value");
+-        goto out;
+-    }
+-
+-    nvdimm->unarmed = value;
+-
+- out:
+-    error_propagate(errp, local_err);
+-}
+-
+ static void nvdimm_init(Object *obj)
  {
-     const PCDIMMDevice *dimm = PC_DIMM(md);
-@@ -298,7 +295,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
-     dc->desc = "DIMM memory module";
+     object_property_add(obj, NVDIMM_LABEL_SIZE_PROP, "int",
+                         nvdimm_get_label_size, nvdimm_set_label_size, NULL,
+                         NULL, NULL);
+-    object_property_add_bool(obj, NVDIMM_UNARMED_PROP,
+-                             nvdimm_get_unarmed, nvdimm_set_unarmed, NULL);
+ }
  
-     ddc->get_memory_region = pc_dimm_get_memory_region;
--    ddc->get_vmstate_memory_region = pc_dimm_get_vmstate_memory_region;
-+    ddc->get_vmstate_memory_region = pc_dimm_get_memory_region;
+ static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+@@ -166,13 +141,20 @@ static void nvdimm_write_label_data(NVDIMMDevice *nvdimm, const void *buf,
+     memory_region_set_dirty(mr, backend_offset, size);
+ }
  
-     mdc->get_addr = pc_dimm_md_get_addr;
-     /* for a dimm plugged_size == region_size */
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index cf71247630..5679a80465 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -73,7 +73,8 @@ typedef struct PCDIMMDeviceClass {
-     /* public */
-     void (*realize)(PCDIMMDevice *dimm, Error **errp);
-     MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm, Error **errp);
--    MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
-+    MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm,
-+                                               Error **errp);
- } PCDIMMDeviceClass;
++static Property nvdimm_properties[] = {
++    DEFINE_PROP_BOOL(NVDIMM_UNARMED_PROP, NVDIMMDevice, unarmed, false),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void nvdimm_class_init(ObjectClass *oc, void *data)
+ {
+     PCDIMMDeviceClass *ddc = PC_DIMM_CLASS(oc);
+     NVDIMMClass *nvc = NVDIMM_CLASS(oc);
++    DeviceClass *dc = DEVICE_CLASS(oc);
  
- void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+     ddc->realize = nvdimm_realize;
+     ddc->get_memory_region = nvdimm_get_memory_region;
++    dc->props = nvdimm_properties;
+ 
+     nvc->read_label_data = nvdimm_read_label_data;
+     nvc->write_label_data = nvdimm_write_label_data;
 -- 
 2.17.1
