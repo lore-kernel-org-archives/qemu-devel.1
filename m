@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fUtFD-0001h3-RC
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:26:53 -0400
+	(envelope-from <groug@kaod.org>) id 1fUtFR-0001pC-AF
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:27:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fUtF9-0000PE-Rs
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:26:51 -0400
-Received: from 6.mo68.mail-out.ovh.net ([46.105.63.100]:35510)
+	(envelope-from <groug@kaod.org>) id 1fUtFN-0000mT-AG
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:27:05 -0400
+Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:43395)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fUtF9-0000NN-Jx
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:26:47 -0400
-Received: from player792.ha.ovh.net (unknown [10.109.108.92])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 79CB6E5050
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 14:26:45 +0200 (CEST)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fUtFN-0000lA-2e
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:27:01 -0400
+Received: from player692.ha.ovh.net (unknown [10.109.108.51])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 76B4D1B577
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 14:26:59 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 18 Jun 2018 14:26:35 +0200
-Message-ID: <152932479544.500483.1342368406182952616.stgit@bahia.lan>
+Date: Mon, 18 Jun 2018 14:26:49 +0200
+Message-ID: <152932480918.500483.5347446234353746966.stgit@bahia.lan>
+In-Reply-To: <152932479544.500483.1342368406182952616.stgit@bahia.lan>
+References: <152932479544.500483.1342368406182952616.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 1/2] spapr_cpu_core: migrate per-CPU data
+Subject: [Qemu-devel] [PATCH 2/2] spapr_cpu_core: migrate VPA related state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,132 +32,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-A per-CPU machine data pointer was recently added to PowerPCCPU. The
-motivation is to to hide platform specific details from the core CPU
-code. This per-CPU data can hold state which is revelant to the guest
-though, eg, Virtual Processor Areas, and we whould migrate this state.
+QEMU implements the "Shared Processor LPAR" (SPLPAR) option, which allows
+the hypervisor to time-slice a physical processor into multiple virtual
+processor. The intent is to allow more guests to run, and to optimize
+processor utilization.
 
-This patch adds the plumbing so that we can migrate the per-CPU data
-for PAPR guests. We only do this for newer machine types for the sake
-of backword compatibility. No state is migrated for the moment: the
-vmstate_spapr_cpu_state structure will be populated by subsequent
-patches.
+The guest OS can cede idle VCPUs, so that their processing capacity may
+be used by other VCPUs, with the H_CEDE hcall. The guest OS can also
+optimize spinlocks, by confering the time-slice of a spinning VCPU to the
+spinlock holder if it's currently notrunning, with the H_CONFER hcall.
+
+Both hcalls depend on a "Virtual Processor Area" (VPA) to be registered
+by the guest OS, generally during early boot. Other per-VCPU areas can
+be registered: the "SLB Shadow Buffer" which allows a more efficient
+dispatching of VCPUs, and the "Dispatch Trace Log Buffer" (DTL) which
+is used to compute time stolen by the hypervisor. Both DTL and SLB Shadow
+areas depend on the VPA to be registered.
+
+The VPA/SLB Shadow/DTL are state that QEMU should migrate, but this doesn't
+happen, for no apparent reason other than it was just never coded. This
+causes the features listed above to stop working after migration, and it
+breaks the logic of the H_REGISTER_VPA hcall in the destination.
+
+The VPA is set at the guest request, ie, we don't have to migrate
+it before the guest has actually set it. This patch hence adds an
+"spapr_cpu/vpa" subsection to the recently introduced per-CPU machine
+data migration stream.
+
+Since DTL and SLB Shadow are optional and both depend on VPA, they get
+their own subsections "spapr_cpu/vpa/slb_shadow" and "spapr_cpu/vpa/dtl"
+hanging from the "spapr_cpu/vpa" subsection.
+
+Note that this won't break migration to older QEMUs. Is is already handled
+by only registering the vmstate handler for per-CPU data with newer machine
+types.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c                  |    5 +++++
- hw/ppc/spapr_cpu_core.c         |   27 +++++++++++++++++++++++----
- include/hw/ppc/spapr_cpu_core.h |    1 +
- 3 files changed, 29 insertions(+), 4 deletions(-)
+ hw/ppc/spapr_cpu_core.c |   65 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index db0fb385d4e0..37db3e8bc6ca 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4116,6 +4116,11 @@ DEFINE_SPAPR_MACHINE(3_0, "3.0", true);
-     {                                                                  \
-         .driver = TYPE_POWERPC_CPU,                                    \
-         .property = "pre-3.0-migration",                              \
-+        .value    = "on",                                              \
-+            },                                                         \
-+    {                                                                  \
-+        .driver = TYPE_SPAPR_CPU_CORE,                                 \
-+        .property = "pre-3.0-migration",                               \
-         .value    = "on",                                              \
-     },
- 
 diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index aef3be33a3bb..96d1dfad00e1 100644
+index 96d1dfad00e1..f7e7b739ae49 100644
 --- a/hw/ppc/spapr_cpu_core.c
 +++ b/hw/ppc/spapr_cpu_core.c
-@@ -129,6 +129,15 @@ static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
+@@ -129,6 +129,67 @@ static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
      g_free(sc->threads);
  }
  
-+static const VMStateDescription vmstate_spapr_cpu_state = {
-+    .name = "spapr_cpu",
++static bool slb_shadow_needed(void *opaque)
++{
++    sPAPRCPUState *spapr_cpu = opaque;
++
++    return spapr_cpu->slb_shadow_addr != 0;
++}
++
++static const VMStateDescription vmstate_spapr_cpu_slb_shadow = {
++    .name = "spapr_cpu/vpa/slb_shadow",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
++    .needed = slb_shadow_needed,
 +    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(slb_shadow_addr, sPAPRCPUState),
++        VMSTATE_UINT64(slb_shadow_size, sPAPRCPUState),
 +        VMSTATE_END_OF_LIST()
-+    },
++    }
 +};
 +
- static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr,
-                                Error **errp)
- {
-@@ -164,7 +173,8 @@ error:
-     error_propagate(errp, local_err);
- }
- 
--static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore *sc, int i, Error **errp)
-+static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore *sc, int i,
-+                                     sPAPRMachineState *spapr, Error **errp)
- {
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(sc);
-     CPUCore *cc = CPU_CORE(sc);
-@@ -194,6 +204,10 @@ static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore *sc, int i, Error **errp)
-     }
- 
-     cpu->machine_data = g_new0(sPAPRCPUState, 1);
-+    if (!sc->pre_3_0_migration) {
-+        vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
-+                         cpu->machine_data);
++static bool dtl_needed(void *opaque)
++{
++    sPAPRCPUState *spapr_cpu = opaque;
++
++    return spapr_cpu->dtl_addr != 0;
++}
++
++static const VMStateDescription vmstate_spapr_cpu_dtl = {
++    .name = "spapr_cpu/vpa/dtl",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = dtl_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(dtl_addr, sPAPRCPUState),
++        VMSTATE_UINT64(dtl_size, sPAPRCPUState),
++        VMSTATE_END_OF_LIST()
 +    }
- 
-     object_unref(obj);
-     return cpu;
-@@ -204,10 +218,13 @@ err:
-     return NULL;
- }
- 
--static void spapr_delete_vcpu(PowerPCCPU *cpu)
-+static void spapr_delete_vcpu(PowerPCCPU *cpu, sPAPRCPUCore *sc)
- {
-     sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
- 
-+    if (!sc->pre_3_0_migration) {
-+        vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_data);
++};
++
++static bool vpa_needed(void *opaque)
++{
++    sPAPRCPUState *spapr_cpu = opaque;
++
++    return spapr_cpu->vpa_addr != 0;
++}
++
++static const VMStateDescription vmstate_spapr_cpu_vpa = {
++    .name = "spapr_cpu/vpa",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = vpa_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(vpa_addr, sPAPRCPUState),
++        VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_spapr_cpu_slb_shadow,
++        &vmstate_spapr_cpu_dtl,
++        NULL
 +    }
-     cpu->machine_data = NULL;
-     g_free(spapr_cpu);
-     object_unparent(OBJECT(cpu));
-@@ -233,7 +250,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
- 
-     sc->threads = g_new(PowerPCCPU *, cc->nr_threads);
-     for (i = 0; i < cc->nr_threads; i++) {
--        sc->threads[i] = spapr_create_vcpu(sc, i, &local_err);
-+        sc->threads[i] = spapr_create_vcpu(sc, i, spapr, &local_err);
-         if (local_err) {
-             goto err;
-         }
-@@ -253,7 +270,7 @@ err_unrealize:
-     }
- err:
-     while (--i >= 0) {
--        spapr_delete_vcpu(sc->threads[i]);
-+        spapr_delete_vcpu(sc->threads[i], sc);
-     }
-     g_free(sc->threads);
-     error_propagate(errp, local_err);
-@@ -261,6 +278,8 @@ err:
- 
- static Property spapr_cpu_core_properties[] = {
-     DEFINE_PROP_INT32("node-id", sPAPRCPUCore, node_id, CPU_UNSET_NUMA_NODE_ID),
-+    DEFINE_PROP_BOOL("pre-3.0-migration", sPAPRCPUCore, pre_3_0_migration,
-+                     false),
-     DEFINE_PROP_END_OF_LIST()
++};
++
+ static const VMStateDescription vmstate_spapr_cpu_state = {
+     .name = "spapr_cpu",
+     .version_id = 1,
+@@ -136,6 +197,10 @@ static const VMStateDescription vmstate_spapr_cpu_state = {
+     .fields = (VMStateField[]) {
+         VMSTATE_END_OF_LIST()
+     },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_spapr_cpu_vpa,
++        NULL
++    }
  };
  
-diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
-index 8ceea2973a93..9e2821e4b31f 100644
---- a/include/hw/ppc/spapr_cpu_core.h
-+++ b/include/hw/ppc/spapr_cpu_core.h
-@@ -31,6 +31,7 @@ typedef struct sPAPRCPUCore {
-     /*< public >*/
-     PowerPCCPU **threads;
-     int node_id;
-+    bool pre_3_0_migration; /* older machine don't know about sPAPRCPUState */
- } sPAPRCPUCore;
- 
- typedef struct sPAPRCPUCoreClass {
+ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr,
