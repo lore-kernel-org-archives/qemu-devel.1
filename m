@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fUxHh-0005En-S2
+	(envelope-from <kwolf@redhat.com>) id 1fUxHi-0005Ft-He
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fUxHg-0006U6-Li
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:45:41 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fUxHh-0006Vj-NT
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:45:42 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 18 Jun 2018 18:44:58 +0200
-Message-Id: <20180618164504.24488-30-kwolf@redhat.com>
+Date: Mon, 18 Jun 2018 18:45:01 +0200
+Message-Id: <20180618164504.24488-33-kwolf@redhat.com>
 In-Reply-To: <20180618164504.24488-1-kwolf@redhat.com>
 References: <20180618164504.24488-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 29/35] test-hbitmap: Add non-advancing iter_next
- tests
+Subject: [Qemu-devel] [PULL 32/35] job: Add job_progress_increase_remaining()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +24,56 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-Add a function that wraps hbitmap_iter_next() and always calls it in
-non-advancing mode first, and in advancing mode next.  The result should
-always be the same.
-
-By using this function everywhere we called hbitmap_iter_next() before,
-we should get good test coverage for non-advancing hbitmap_iter_next().
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Message-id: 20180613181823.13618-9-mreitz@redhat.com
+Message-id: 20180613181823.13618-12-mreitz@redhat.com
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/test-hbitmap.c | 36 ++++++++++++++++++++++++------------
- 1 file changed, 24 insertions(+), 12 deletions(-)
+ include/qemu/job.h | 15 +++++++++++++++
+ job.c              |  5 +++++
+ 2 files changed, 20 insertions(+)
 
-diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-index f2158f767d..5e67ac1d3a 100644
---- a/tests/test-hbitmap.c
-+++ b/tests/test-hbitmap.c
-@@ -30,6 +30,18 @@ typedef struct TestHBitmapData {
- } TestHBitmapData;
+diff --git a/include/qemu/job.h b/include/qemu/job.h
+index 1d820530fa..18c9223e31 100644
+--- a/include/qemu/job.h
++++ b/include/qemu/job.h
+@@ -335,6 +335,21 @@ void job_progress_update(Job *job, uint64_t done);
+  */
+ void job_progress_set_remaining(Job *job, uint64_t remaining);
  
++/**
++ * @job: The job whose expected progress end value is updated
++ * @delta: Value which is to be added to the current expected end
++ *         value
++ *
++ * Increases the expected end value of the progress counter of a job.
++ * This is useful for parenthesis operations: If a job has to
++ * conditionally perform a high-priority operation as part of its
++ * progress, it calls this function with the expected operation's
++ * length before, and job_progress_update() afterwards.
++ * (So the operation acts as a parenthesis in regards to the main job
++ * operation running in background.)
++ */
++void job_progress_increase_remaining(Job *job, uint64_t delta);
++
+ /** To be called when a cancelled job is finalised. */
+ void job_event_cancelled(Job *job);
  
-+static int64_t check_hbitmap_iter_next(HBitmapIter *hbi)
+diff --git a/job.c b/job.c
+index 84e140238b..fa671b431a 100644
+--- a/job.c
++++ b/job.c
+@@ -385,6 +385,11 @@ void job_progress_set_remaining(Job *job, uint64_t remaining)
+     job->progress_total = job->progress_current + remaining;
+ }
+ 
++void job_progress_increase_remaining(Job *job, uint64_t delta)
 +{
-+    int next0, next1;
-+
-+    next0 = hbitmap_iter_next(hbi, false);
-+    next1 = hbitmap_iter_next(hbi, true);
-+
-+    g_assert_cmpint(next0, ==, next1);
-+
-+    return next0;
++    job->progress_total += delta;
 +}
 +
- /* Check that the HBitmap and the shadow bitmap contain the same data,
-  * ignoring the same "first" bits.
-  */
-@@ -46,7 +58,7 @@ static void hbitmap_test_check(TestHBitmapData *data,
- 
-     i = first;
-     for (;;) {
--        next = hbitmap_iter_next(&hbi, true);
-+        next = check_hbitmap_iter_next(&hbi);
-         if (next < 0) {
-             next = data->size;
-         }
-@@ -435,25 +447,25 @@ static void test_hbitmap_iter_granularity(TestHBitmapData *data,
-     /* Note that hbitmap_test_check has to be invoked manually in this test.  */
-     hbitmap_test_init(data, 131072 << 7, 7);
-     hbitmap_iter_init(&hbi, data->hb, 0);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-+    g_assert_cmpint(check_hbitmap_iter_next(&hbi), <, 0);
- 
-     hbitmap_test_set(data, ((L2 + L1 + 1) << 7) + 8, 8);
-     hbitmap_iter_init(&hbi, data->hb, 0);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-+    g_assert_cmpint(check_hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
-+    g_assert_cmpint(check_hbitmap_iter_next(&hbi), <, 0);
- 
-     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
-     g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
- 
-     hbitmap_test_set(data, (131072 << 7) - 8, 8);
-     hbitmap_iter_init(&hbi, data->hb, 0);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, (L2 + L1 + 1) << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-+    g_assert_cmpint(check_hbitmap_iter_next(&hbi), ==, (L2 + L1 + 1) << 7);
-+    g_assert_cmpint(check_hbitmap_iter_next(&hbi), ==, 131071 << 7);
-+    g_assert_cmpint(check_hbitmap_iter_next(&hbi), <, 0);
- 
-     hbitmap_iter_init(&hbi, data->hb, (L2 + L1 + 2) << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), ==, 131071 << 7);
--    g_assert_cmpint(hbitmap_iter_next(&hbi, true), <, 0);
-+    g_assert_cmpint(check_hbitmap_iter_next(&hbi), ==, 131071 << 7);
-+    g_assert_cmpint(check_hbitmap_iter_next(&hbi), <, 0);
- }
- 
- static void hbitmap_test_set_boundary_bits(TestHBitmapData *data, ssize_t diff)
-@@ -893,7 +905,7 @@ static void test_hbitmap_serialize_zeroes(TestHBitmapData *data,
-     for (i = 0; i < num_positions; i++) {
-         hbitmap_deserialize_zeroes(data->hb, positions[i], min_l1, true);
-         hbitmap_iter_init(&iter, data->hb, 0);
--        next = hbitmap_iter_next(&iter, true);
-+        next = check_hbitmap_iter_next(&iter);
-         if (i == num_positions - 1) {
-             g_assert_cmpint(next, ==, -1);
-         } else {
-@@ -919,10 +931,10 @@ static void test_hbitmap_iter_and_reset(TestHBitmapData *data,
- 
-     hbitmap_iter_init(&hbi, data->hb, BITS_PER_LONG - 1);
- 
--    hbitmap_iter_next(&hbi, true);
-+    check_hbitmap_iter_next(&hbi);
- 
-     hbitmap_reset_all(data->hb);
--    hbitmap_iter_next(&hbi, true);
-+    check_hbitmap_iter_next(&hbi);
- }
- 
- static void test_hbitmap_next_zero_check(TestHBitmapData *data, int64_t start)
+ void job_event_cancelled(Job *job)
+ {
+     notifier_list_notify(&job->on_finalize_cancelled, job);
 -- 
 2.13.6
