@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUi8J-0008IT-Tt
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 20:35:01 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fUiPf-0002fT-0K
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 20:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUi8F-0004VU-N9
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 20:34:59 -0400
-Date: Mon, 18 Jun 2018 10:34:45 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fUiPe-0001aq-2M
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 20:52:55 -0400
+Date: Mon, 18 Jun 2018 10:48:18 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180618003445.GB25461@umbus.fritz.box>
-References: <20180617155309.1653-1-programmingkidx@gmail.com>
+Message-ID: <20180618004818.GG25461@umbus.fritz.box>
+References: <20180615140448.32234-1-david@redhat.com>
+	<20180615140448.32234-10-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="IiVenqGWf+H9Y6IX"
+	protocol="application/pgp-signature"; boundary="Sw7tCqrGA+HQ0/zt"
 Content-Disposition: inline
-In-Reply-To: <20180617155309.1653-1-programmingkidx@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] fpu_helper.c: fix helper_fpscr_clrbit()
- function
+In-Reply-To: <20180615140448.32234-10-david@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 09/13] nvdimm: convert "unarmed" into a
+ static property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,108 +25,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, aurelien@aurel32.net, agraf@suse.de, qemu-ppc@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>
 
 
---IiVenqGWf+H9Y6IX
+--Sw7tCqrGA+HQ0/zt
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jun 17, 2018 at 11:53:09AM -0400, John Arbuckle wrote:
-> Fix the helper_fpscr_clrbit() function so it correctly
-> sets the FEX and VX bits.
-
-This needs a lot more information in the commit message:
-
-  * What exactly was wrong with the previous setting of the FEX and VX
-    bits?
-
-  * Where can we find documentation which describes how they should be
-    set correctly?
- =20
-This is information we need to properly review the patch.
-
+On Fri, Jun 15, 2018 at 04:04:44PM +0200, David Hildenbrand wrote:
+> We don't allow to modify it after realization. So we can simply turn
+> it into a static property.
 >=20
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+
 > ---
->  target/ppc/fpu_helper.c | 57 +++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 57 insertions(+)
+>  hw/mem/nvdimm.c | 32 +++++++-------------------------
+>  1 file changed, 7 insertions(+), 25 deletions(-)
 >=20
-> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-> index d31a933cbb..7e697a11d0 100644
-> --- a/target/ppc/fpu_helper.c
-> +++ b/target/ppc/fpu_helper.c
-> @@ -325,6 +325,63 @@ void helper_fpscr_clrbit(CPUPPCState *env, uint32_t =
-bit)
->          case FPSCR_RN:
->              fpscr_set_rounding_mode(env);
->              break;
-> +        case FPSCR_VXSNAN:
-> +        case FPSCR_VXISI:
-> +        case FPSCR_VXIDI:
-> +        case FPSCR_VXZDZ:
-> +        case FPSCR_VXIMZ:
-> +        case FPSCR_VXVC:
-> +        case FPSCR_VXSOFT:
-> +        case FPSCR_VXSQRT:
-> +        case FPSCR_VXCVI:
-> +        {
-> +            int vxsnan, vxisi, vxidi, vxzdz, vximz, vxvc, vxsoft, vxsqrt=
-, vxcvi;
-> +            vxsnan =3D (env->fpscr >> (31 - FPSCR_VXSNAN)) & 1;
-> +            vxisi =3D (env->fpscr >> (31 - FPSCR_VXISI)) & 1;
-> +            vxidi =3D (env->fpscr >> (31 - FPSCR_VXIDI)) & 1;
-> +            vxzdz =3D (env->fpscr >> (31 - FPSCR_VXZDZ)) & 1;
-> +            vximz =3D (env->fpscr >> (31 - FPSCR_VXIMZ)) & 1;
-> +            vxvc =3D (env->fpscr >> (31 - FPSCR_VXVC)) & 1;
-> +            vxsoft =3D (env->fpscr >> (31 - FPSCR_VXSOFT)) & 1;
-> +            vxsqrt =3D (env->fpscr >> (31 - FPSCR_VXSQRT)) & 1;
-> +            vxcvi =3D (env->fpscr >> (31 - FPSCR_VXCVI)) & 1;
-> +            if (~(vxsnan & vxisi & vxidi & vxzdz & vximz & vxvc & vxsoft=
- &
-> +                  vxsqrt & vxcvi)) {
-> +                /* Set VX bit to zero */
-> +                env->fpscr =3D env->fpscr & ~(1 << FPSCR_VX);
-> +            }
-> +        }
-> +            break;
-> +        case FPSCR_VX:
-> +        case FPSCR_OX:
-> +        case FPSCR_UX:
-> +        case FPSCR_ZX:
-> +        case FPSCR_XX:
-> +        case FPSCR_VE:
-> +        case FPSCR_OE:
-> +        case FPSCR_UE:
-> +        case FPSCR_ZE:
-> +        case FPSCR_XE:
-> +        {
-> +            int vx, ox, ux, zx, xx, ve, oe, ue, ze, xe;
-> +            vx =3D (env->fpscr >> (31 - FPSCR_VX)) & 1;
-> +            ox =3D (env->fpscr >> (31 - FPSCR_OX)) & 1;
-> +            ux =3D (env->fpscr >> (31 - FPSCR_UX)) & 1;
-> +            zx =3D (env->fpscr >> (31 - FPSCR_ZX)) & 1;
-> +            xx =3D (env->fpscr >> (31 - FPSCR_XX)) & 1;
-> +            ve =3D (env->fpscr >> (31 - FPSCR_VE)) & 1;
-> +            oe =3D (env->fpscr >> (31 - FPSCR_OE)) & 1;
-> +            ue =3D (env->fpscr >> (31 - FPSCR_UE)) & 1;
-> +            ze =3D (env->fpscr >> (31 - FPSCR_ZE)) & 1;
-> +            xe =3D (env->fpscr >> (31 - FPSCR_XE)) & 1;
-> +            bool fex;
-> +            fex =3D (vx & ve) | (ox & oe) | (ux & ue) | (zx & ze) | (xx =
-& xe);
-> +            unsigned int mask;
-> +            mask =3D (1 << FPSCR_FEX);
-> +            /* Set the FEX bit */
-> +            env->fpscr =3D (env->fpscr & ~mask) | (-fex & mask);
-> +        }
-> +            break;
->          default:
->              break;
->          }
+> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+> index df9716231f..7260c9c6b1 100644
+> --- a/hw/mem/nvdimm.c
+> +++ b/hw/mem/nvdimm.c
+> @@ -64,36 +64,11 @@ out:
+>      error_propagate(errp, local_err);
+>  }
+> =20
+> -static bool nvdimm_get_unarmed(Object *obj, Error **errp)
+> -{
+> -    NVDIMMDevice *nvdimm =3D NVDIMM(obj);
+> -
+> -    return nvdimm->unarmed;
+> -}
+> -
+> -static void nvdimm_set_unarmed(Object *obj, bool value, Error **errp)
+> -{
+> -    NVDIMMDevice *nvdimm =3D NVDIMM(obj);
+> -    Error *local_err =3D NULL;
+> -
+> -    if (memory_region_size(&nvdimm->nvdimm_mr)) {
+> -        error_setg(&local_err, "cannot change property value");
+> -        goto out;
+> -    }
+> -
+> -    nvdimm->unarmed =3D value;
+> -
+> - out:
+> -    error_propagate(errp, local_err);
+> -}
+> -
+>  static void nvdimm_init(Object *obj)
+>  {
+>      object_property_add(obj, NVDIMM_LABEL_SIZE_PROP, "int",
+>                          nvdimm_get_label_size, nvdimm_set_label_size, NU=
+LL,
+>                          NULL, NULL);
+> -    object_property_add_bool(obj, NVDIMM_UNARMED_PROP,
+> -                             nvdimm_get_unarmed, nvdimm_set_unarmed, NUL=
+L);
+>  }
+> =20
+>  static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error =
+**errp)
+> @@ -166,13 +141,20 @@ static void nvdimm_write_label_data(NVDIMMDevice *n=
+vdimm, const void *buf,
+>      memory_region_set_dirty(mr, backend_offset, size);
+>  }
+> =20
+> +static Property nvdimm_properties[] =3D {
+> +    DEFINE_PROP_BOOL(NVDIMM_UNARMED_PROP, NVDIMMDevice, unarmed, false),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+>  static void nvdimm_class_init(ObjectClass *oc, void *data)
+>  {
+>      PCDIMMDeviceClass *ddc =3D PC_DIMM_CLASS(oc);
+>      NVDIMMClass *nvc =3D NVDIMM_CLASS(oc);
+> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
+> =20
+>      ddc->realize =3D nvdimm_realize;
+>      ddc->get_memory_region =3D nvdimm_get_memory_region;
+> +    dc->props =3D nvdimm_properties;
+> =20
+>      nvc->read_label_data =3D nvdimm_read_label_data;
+>      nvc->write_label_data =3D nvdimm_write_label_data;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -133,24 +119,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---IiVenqGWf+H9Y6IX
+--Sw7tCqrGA+HQ0/zt
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsm/iMACgkQbDjKyiDZ
-s5KWmxAAlhZgDsNKXPQU2j0ewlncL5+gt89mRNrS1WefxDMHHAg8w0DYzlGTHarq
-5k47CkKMeeWezrS0/kKNrr8kjdAiucTRLw8KIWHhzaOB/UA6uppV/VqmoO/nJv/o
-wyaaNXYiSX3f2LAnlPiwAizevjqg1ehJzOUJOPKvK5wx4dVcyGNgPZiiLYvydtEX
-c4p3Vpds0nuOrDyQQLU6h400oytiiOgsa4PW/XgrhCHXh5qJOo8o97wSOiVa+Plj
-siMMavEaWqtQor+2+29ev1LFAU9FWqoNChkY67nfsM+MkImHkgecz+/3QMWm0IuX
-n+eX1Nl1ztrxPcD/7wAuIjbjGH5keppJSJMqXvAiSLVJ/K819umYy14dbAyCOLhH
-DT5sul+Hn63+eLXp4eToPLVOayNGZhruF6C8UOLtELzJs4va8EAfsTEXYzpGLBkd
-eyN/f33NnyVfqk2VKgU+YzCeJNVf6nEZY2M/63goJdE7uRxXDVMhH8HNcz5Mbmwl
-9JVeAWCphX2LvzuiprrW1FlqAx3aspK/WEP6bKPTAPnX30lG8kmBjWLyrEf+FoB+
-sEqTiRZfPTUH28PQxXmd1LEm4SM7lzPdicDHDJuyF2UxtSXmksDTZ+nWoapE7e/K
-aR6B8EoTB2UwcdlzBOlDQFB6hXMBpPKvDqQh/Og6h6bBdCBR5OM=
-=wlhT
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsnAVEACgkQbDjKyiDZ
+s5KjlxAAsLBefCHlYZW5o4QUicsOnfwnbMQg2Gq7TattwBpd9Pe5BoC6Gg+a+uVD
+EfhZRCe/2KdXneJRYw/ZFJ/iIMy2jZQC2sKm+je4M+JAtzdKI08CjBytxyBLq43+
+VYNW5MOP/tBiOOaK83g5sWQ7IY29owM1kwcewY34XhspZz37Z3WQ6VxGmcx+AFsG
+fdZIlz+LomYs/OAjMEB424/2g414l3uRE1F0axIZdO+hve75NXMtRR8+dFtrWCn4
+HyEgnCfDwWpRj9bKskK2vi1nGg9e3tg8frEG6aPL7T3yBlEtuDvceRUY0O1CAqjt
+rB0/FE9WwNxkAfNMx2LqlVN3DT5fa0+QU4iUMCH2+crjk6mydghakEEBU+BfL55c
+LlvuvaXm2Q4EtZColJTg+Vwx0u6a/gNmlntZpfbaEN10TpaDLCxcxZKYASoa+Yrn
+u4u7DmGuG/a4PP7/C2suRlRIJbWApyguwSo1UvXZdyzPWKYllk7roOEBQ92D6yAt
+O4CIoOwSFD44lpQXazh66bpS3TR0FHw6VfU2hh/NTmvXttZ8RyP6H96bgz8KnsnX
+pk+5dbzS4zYqslzOLpxLe+m1IF17z12G/FCnhHfC6B2sfL2rwpmoRTE0GPGl1wea
+Qvj2zKKBHpfCqSdOhu/qdj7X6mbqL1n3xqt4ePFqQmTCgaXT0i0=
+=AW7Z
 -----END PGP SIGNATURE-----
 
---IiVenqGWf+H9Y6IX--
+--Sw7tCqrGA+HQ0/zt--
