@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fUwYd-0007UM-4G
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:59:08 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fUwb8-0000yU-4W
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:01:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fUwYZ-00040Z-Sl
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:59:07 -0400
-Date: Mon, 18 Jun 2018 17:59:00 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180618175900.78578175.cohuck@redhat.com>
-In-Reply-To: <1529330893-12180-1-git-send-email-thuth@redhat.com>
-References: <1529330893-12180-1-git-send-email-thuth@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fUwb2-0004pu-Sd
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:01:40 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33359)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fUwb2-0004pl-Nf
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:01:36 -0400
+Received: by mail-qt0-x241.google.com with SMTP id l10-v6so15584293qtj.0
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 09:01:36 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180618130709.19730-1-alex.bennee@linaro.org>
+	<20180618130709.19730-7-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <24a22655-d876-094f-50ff-09d2cebfd086@amsat.org>
+Date: Mon, 18 Jun 2018 13:01:31 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL SUBSYSTEM s390x v2 0/7] pxelinux.cfg-style
- booting for the s390x bios
+In-Reply-To: <20180618130709.19730-7-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 6/8] docker: docker.py don't conflate
+ checksums for extra_files
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +36,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-s390x@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, famz@redhat.com, cota@braap.org, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org
 
-On Mon, 18 Jun 2018 16:08:12 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+On 06/18/2018 10:07 AM, Alex Bennée wrote:
+> This just gets confusing especially as the helper function doesn't
+> even take into account any extra files (or the executable). Currently
+> the actual check just ignores them and also passes the result through
+> _dockerfile_preprocess so we fix that too.
 
-> This PULL request is not for master.
-> 
-> 
->  Hi Cornelia,
-> 
-> the following changes since commit 2ab09bf2f9f55b9fb8d2de6eb2ba2a8570e268e2:
-> 
->   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20180612-pull-request' into staging (2018-06-12 15:34:34 +0100)
-> 
-> are available in the git repository at:
-> 
->   https://gitlab.com/huth/qemu.git tags/s390x-2018-06-18
-> 
-> for you to fetch changes up to 4046826d46618ef7eb11df41fe8878669ce6991c:
-> 
->   pc-bios/s390-ccw: Update the s390-netboot.img binary (2018-06-18 15:24:44 +0200)
-> 
-> ----------------------------------------------------------------
-> Add support for pxelinux.cfg-style network booting to the s390x firmware
-> ----------------------------------------------------------------
-> 
-> Collin Walling (1):
->       pc-bios/s390-ccw: define loadparm length
-> 
-> Thomas Huth (6):
->       roms: Update SLOF submodule to current status
->       pc-bios/s390-ccw/net: Update code for the latest changes in SLOF
->       pc-bios/s390-ccw/net: Add support for pxelinux-style config files
->       pc-bios/s390-ccw/net: Try to load pxelinux.cfg file accoring to the UUID
->       pc-bios/s390-ccw: Optimize the s390-netboot.img for size
->       pc-bios/s390-ccw: Update the s390-netboot.img binary
-> 
->  pc-bios/s390-ccw/Makefile    |   1 +
->  pc-bios/s390-ccw/iplb.h      |   4 +-
->  pc-bios/s390-ccw/main.c      |   8 +-
->  pc-bios/s390-ccw/netboot.mak |  13 +--
->  pc-bios/s390-ccw/netmain.c   | 226 +++++++++++++++++++++++++++++--------------
->  pc-bios/s390-ccw/sclp.c      |   2 +-
->  pc-bios/s390-ccw/sclp.h      |   2 +-
->  pc-bios/s390-netboot.img     | Bin 87872 -> 54944 bytes
->  roms/SLOF                    |   2 +-
->  9 files changed, 174 insertions(+), 84 deletions(-)
+Looks correct.
 
-Thanks, pulled.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>  tests/docker/docker.py | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index 3072bf4a31..325915a6f9 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -201,8 +201,10 @@ class Docker(object):
+>  
+>          tmp_df.write("\n")
+>          tmp_df.write("LABEL com.qemu.dockerfile-checksum=%s" %
+> -                     _text_checksum("\n".join([dockerfile] +
+> -                                    extra_files_cksum)))
+> +                     _text_checksum(_dockerfile_preprocess(dockerfile)))
+> +        for f, c in extra_files_cksum:
+> +            tmp_df.write("LABEL com.qemu.%s-checksum=%s" % (f, c))
+> +
+>          tmp_df.flush()
+>  
+>          self._do_check(["build", "-t", tag, "-f", tmp_df.name] + argv + \
+> @@ -317,7 +319,7 @@ class BuildCommand(SubCommand):
+>                  _copy_binary_with_libs(args.include_executable, docker_dir)
+>              for filename in args.extra_files or []:
+>                  _copy_with_mkdir(filename, docker_dir)
+> -                cksum += [_file_checksum(filename)]
+> +                cksum += [(filename, _file_checksum(filename))]
+>  
+>              argv += ["--build-arg=" + k.lower() + "=" + v
+>                          for k, v in os.environ.iteritems()
+> 
