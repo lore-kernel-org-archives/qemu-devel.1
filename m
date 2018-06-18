@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUnlz-0008Lw-BP
+	(envelope-from <dgibson@ozlabs.org>) id 1fUnlz-0008Lu-78
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:36:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUnly-0001O8-A8
+	(envelope-from <dgibson@ozlabs.org>) id 1fUnly-0001Np-7r
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:36:19 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 18 Jun 2018 16:35:59 +1000
-Message-Id: <20180618063606.2513-3-david@gibson.dropbear.id.au>
-In-Reply-To: <20180618063606.2513-1-david@gibson.dropbear.id.au>
-References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 2/9] spapr: Compute effective capability values
- earlier
+Date: Mon, 18 Jun 2018 16:35:57 +1000
+Message-Id: <20180618063606.2513-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH 0/9] spapr: Clean up pagesize handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,93 +20,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, abologna@redhat.com
 Cc: clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-Previously, the effective values of the various spapr capability flags
-were only determined at machine reset time.  That was a lazy way of making
-sure it was after cpu initialization so it could use the cpu object to
-inform the defaults.
+Currently the "pseries" machine type will (usually) advertise
+different pagesizes to the guest when running under KVM and TCG, which
+is not how things are supposed to work.
 
-But we've now improved the compat checking code so that we don't need to
-instantiate the cpus to use it.  That lets us move the resolution of the
-capability defaults much earlier.
+This comes from poor handling of hardware limitations which mean that
+under KVM HV the guest is unable to use pagesizes larger than those
+backing the guest's RAM on the host side.
 
-This is going to be necessary for some future capabilities.
+The new scheme turns things around by having an explicit machine
+parameter controlling the largest page size that the guest is allowed
+to use.  This limitation applies regardless of accelerator.  When
+we're running on KVM HV we ensure that our backing pages are adequate
+to supply the requested guest page sizes, rather than adjusting the
+guest page sizes based on what KVM can supply.
 
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr.c         | 6 ++++--
- hw/ppc/spapr_caps.c    | 9 ++++++---
- include/hw/ppc/spapr.h | 3 ++-
- 3 files changed, 12 insertions(+), 6 deletions(-)
+This means that in order to use hugepages in a PAPR guest it's
+necessary to add a "cap-hpt-max-page-size=16m" machine parameter as
+well as setting the mem-path correctly.  This is a bit more work on
+the user and/or management side, but results in consistent behaviour
+so I think it's worth it.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b0b94fc1f0..40858d047c 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1612,7 +1612,7 @@ static void spapr_machine_reset(void)
-     void *fdt;
-     int rc;
- 
--    spapr_caps_reset(spapr);
-+    spapr_caps_apply(spapr);
- 
-     first_ppc_cpu = POWERPC_CPU(first_cpu);
-     if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
-@@ -2526,7 +2526,9 @@ static void spapr_machine_init(MachineState *machine)
-     QLIST_INIT(&spapr->phbs);
-     QTAILQ_INIT(&spapr->pending_dimm_unplugs);
- 
--    /* Check HPT resizing availability */
-+    /* Determine capabilities to run with */
-+    spapr_caps_init(spapr);
-+
-     kvmppc_check_papr_resize_hpt(&resize_hpt_err);
-     if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DEFAULT) {
-         /*
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 469f38f0ef..dabed817d1 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -439,12 +439,12 @@ SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
- SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
- SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
- 
--void spapr_caps_reset(sPAPRMachineState *spapr)
-+void spapr_caps_init(sPAPRMachineState *spapr)
- {
-     sPAPRCapabilities default_caps;
-     int i;
- 
--    /* First compute the actual set of caps we're running with.. */
-+    /* Compute the actual set of caps we should run with */
-     default_caps = default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type);
- 
-     for (i = 0; i < SPAPR_CAP_NUM; i++) {
-@@ -455,8 +455,11 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
-             spapr->eff.caps[i] = default_caps.caps[i];
-         }
-     }
-+}
- 
--    /* .. then apply those caps to the virtual hardware */
-+void spapr_caps_apply(sPAPRMachineState *spapr)
-+{
-+    int i;
- 
-     for (i = 0; i < SPAPR_CAP_NUM; i++) {
-         sPAPRCapabilityInfo *info = &capability_table[i];
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 3388750fc7..9dbd6010f5 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -798,7 +798,8 @@ static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int cap)
-     return spapr->eff.caps[cap];
- }
- 
--void spapr_caps_reset(sPAPRMachineState *spapr);
-+void spapr_caps_init(sPAPRMachineState *spapr);
-+void spapr_caps_apply(sPAPRMachineState *spapr);
- void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
- int spapr_caps_post_migration(sPAPRMachineState *spapr);
- 
+Longer term, we might also use this parameter to control IOMMU page
+sizes.  But, I'm still working out how restrictions deriving from the
+guest kernel, host kernel and hardware capabilities all interact here.
+
+This applies on top of my ppc-for-3.0 tree.
+
+Changes since RFC:
+ * Add preliminary cleanups to allow us to evaluate effective
+   capabilities levels earlier.
+ * Don't try to remove double resetting of cpus.  It doesn't quite
+   work, and is no longer necessary with the above.
+ * Some user-friendliness improvements: use "hpt-max-page-size"
+   instead of the cryptic "hpt-mps", and take an actual page size
+   (allowing k/m/g suffixies) instead of a shift
+
+David Gibson (9):
+  target/ppc: Allow cpu compatiblity checks based on type, not instance
+  spapr: Compute effective capability values earlier
+  spapr: Add cpu_apply hook to capabilities
+  target/ppc: Add kvmppc_hpt_needs_host_contiguous_pages() helper
+  spapr: Maximum (HPT) pagesize property
+  spapr: Use maximum page size capability to simplify memory backend
+    checking
+  target/ppc: Add ppc_hash64_filter_pagesizes()
+  spapr: Limit available pagesizes to provide a consistent guest
+    environment
+  spapr: Don't rewrite mmu capabilities in KVM mode
+
+ hw/ppc/spapr.c          |  45 +++++++-----
+ hw/ppc/spapr_caps.c     | 156 ++++++++++++++++++++++++++++++++++++----
+ hw/ppc/spapr_cpu_core.c |   4 ++
+ include/hw/ppc/spapr.h  |  11 ++-
+ target/ppc/compat.c     |  27 +++++--
+ target/ppc/cpu.h        |   4 ++
+ target/ppc/kvm.c        | 146 ++++++++++++++++++-------------------
+ target/ppc/kvm_ppc.h    |  11 ++-
+ target/ppc/mmu-hash64.c |  59 +++++++++++++++
+ target/ppc/mmu-hash64.h |   3 +
+ 10 files changed, 349 insertions(+), 117 deletions(-)
+
 -- 
 2.17.1
