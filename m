@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fUqvI-0001LS-So
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 05:58:12 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fUqvN-0001PT-60
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 05:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fUqvH-0003KP-RY
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 05:58:08 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fUqvM-0003L1-33
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 05:58:13 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 18 Jun 2018 11:57:57 +0200
-Message-Id: <20180618095758.5006-4-kraxel@redhat.com>
+Date: Mon, 18 Jun 2018 11:57:56 +0200
+Message-Id: <20180618095758.5006-3-kraxel@redhat.com>
 In-Reply-To: <20180618095758.5006-1-kraxel@redhat.com>
 References: <20180618095758.5006-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 3/4] hw/display: add standalone ramfb device
+Subject: [Qemu-devel] [PULL 2/4] hw/display: add ramfb,
+ a simple boot framebuffer living in guest ram
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,201 +23,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-arm@nongnu.org, Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
 
+The boot framebuffer is expected to be configured by the firmware, so it
+uses fw_cfg as interface.  Initialization goes as follows:
+
+  (1) Check whenever etc/ramfb is present.
+  (2) Allocate framebuffer from RAM.
+  (3) Fill struct RAMFBCfg, write it to etc/ramfb.
+
+Done.  You can write stuff to the framebuffer now, and it should appear
+automagically on the screen.
+
+Note that this isn't very efficient because it does a full display
+update on each refresh.  No dirty tracking.  Dirty tracking would have
+to be active for the whole ram slot, so that wouldn't be very efficient
+either.  For a boot display which is active for a short time only this
+isn't a big deal.  As permanent guest display something better should be
+used (if possible).
+
+This is the ramfb core code.  Some windup is needed for display devices
+which want have a ramfb boot display.
+
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Tested-by: Laszlo Ersek <lersek@redhat.com>
-Message-id: 20180613122948.18149-3-kraxel@redhat.com
+Message-id: 20180613122948.18149-2-kraxel@redhat.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/hw/display/ramfb.h    |  3 +++
- hw/arm/sysbus-fdt.c           |  7 +++++
- hw/arm/virt.c                 |  2 ++
- hw/display/ramfb-standalone.c | 62 +++++++++++++++++++++++++++++++++++++++++++
- hw/i386/pc_piix.c             |  2 ++
- hw/i386/pc_q35.c              |  2 ++
- hw/display/Makefile.objs      |  1 +
- 7 files changed, 79 insertions(+)
- create mode 100644 hw/display/ramfb-standalone.c
+ include/hw/display/ramfb.h |  9 +++++
+ hw/display/ramfb.c         | 95 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/display/Makefile.objs   |  2 +
+ 3 files changed, 106 insertions(+)
+ create mode 100644 include/hw/display/ramfb.h
+ create mode 100644 hw/display/ramfb.c
 
 diff --git a/include/hw/display/ramfb.h b/include/hw/display/ramfb.h
-index a3d4c79942..b33a2c467b 100644
---- a/include/hw/display/ramfb.h
-+++ b/include/hw/display/ramfb.h
-@@ -6,4 +6,7 @@ typedef struct RAMFBState RAMFBState;
- void ramfb_display_update(QemuConsole *con, RAMFBState *s);
- RAMFBState *ramfb_setup(Error **errp);
- 
-+/* ramfb-standalone.c */
-+#define TYPE_RAMFB_DEVICE "ramfb"
-+
- #endif /* RAMFB_H */
-diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-index e4c492ea44..277ed872e7 100644
---- a/hw/arm/sysbus-fdt.c
-+++ b/hw/arm/sysbus-fdt.c
-@@ -36,6 +36,7 @@
- #include "hw/vfio/vfio-platform.h"
- #include "hw/vfio/vfio-calxeda-xgmac.h"
- #include "hw/vfio/vfio-amd-xgbe.h"
-+#include "hw/display/ramfb.h"
- #include "hw/arm/fdt.h"
- 
- /*
-@@ -406,12 +407,18 @@ static int add_amd_xgbe_fdt_node(SysBusDevice *sbdev, void *opaque)
- 
- #endif /* CONFIG_LINUX */
- 
-+static int no_fdt_node(SysBusDevice *sbdev, void *opaque)
-+{
-+    return 0;
-+}
-+
- /* list of supported dynamic sysbus devices */
- static const NodeCreationPair add_fdt_node_functions[] = {
- #ifdef CONFIG_LINUX
-     {TYPE_VFIO_CALXEDA_XGMAC, add_calxeda_midway_xgmac_fdt_node},
-     {TYPE_VFIO_AMD_XGBE, add_amd_xgbe_fdt_node},
- #endif
-+    {TYPE_RAMFB_DEVICE, no_fdt_node},
-     {"", NULL}, /* last element */
- };
- 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index f0a4fa004c..98b99cf236 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -36,6 +36,7 @@
- #include "hw/arm/virt.h"
- #include "hw/vfio/vfio-calxeda-xgmac.h"
- #include "hw/vfio/vfio-amd-xgbe.h"
-+#include "hw/display/ramfb.h"
- #include "hw/devices.h"
- #include "net/net.h"
- #include "sysemu/device_tree.h"
-@@ -1659,6 +1660,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     mc->max_cpus = 255;
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_CALXEDA_XGMAC);
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
-+    machine_class_allow_dynamic_sysbus_dev(mc, TYPE_RAMFB_DEVICE);
-     mc->block_default_type = IF_VIRTIO;
-     mc->no_cdrom = 1;
-     mc->pci_allow_0_address = true;
-diff --git a/hw/display/ramfb-standalone.c b/hw/display/ramfb-standalone.c
 new file mode 100644
-index 0000000000..c0d241ba01
+index 0000000000..a3d4c79942
 --- /dev/null
-+++ b/hw/display/ramfb-standalone.c
-@@ -0,0 +1,62 @@
++++ b/include/hw/display/ramfb.h
+@@ -0,0 +1,9 @@
++#ifndef RAMFB_H
++#define RAMFB_H
++
++/* ramfb.c */
++typedef struct RAMFBState RAMFBState;
++void ramfb_display_update(QemuConsole *con, RAMFBState *s);
++RAMFBState *ramfb_setup(Error **errp);
++
++#endif /* RAMFB_H */
+diff --git a/hw/display/ramfb.c b/hw/display/ramfb.c
+new file mode 100644
+index 0000000000..6867bce8ae
+--- /dev/null
++++ b/hw/display/ramfb.c
+@@ -0,0 +1,95 @@
++/*
++ * early boot framebuffer in guest ram
++ * configured using fw_cfg
++ *
++ * Copyright Red Hat, Inc. 2017
++ *
++ * Author:
++ *     Gerd Hoffmann <kraxel@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +#include "qemu/osdep.h"
 +#include "qapi/error.h"
 +#include "hw/loader.h"
-+#include "hw/isa/isa.h"
 +#include "hw/display/ramfb.h"
 +#include "ui/console.h"
 +#include "sysemu/sysemu.h"
 +
-+#define RAMFB(obj) OBJECT_CHECK(RAMFBStandaloneState, (obj), TYPE_RAMFB_DEVICE)
++struct QEMU_PACKED RAMFBCfg {
++    uint64_t addr;
++    uint32_t fourcc;
++    uint32_t flags;
++    uint32_t width;
++    uint32_t height;
++    uint32_t stride;
++};
 +
-+typedef struct RAMFBStandaloneState {
-+    SysBusDevice parent_obj;
-+    QemuConsole *con;
-+    RAMFBState *state;
-+} RAMFBStandaloneState;
++struct RAMFBState {
++    DisplaySurface *ds;
++    uint32_t width, height;
++    struct RAMFBCfg cfg;
++};
 +
-+static void display_update_wrapper(void *dev)
++static void ramfb_fw_cfg_write(void *dev, off_t offset, size_t len)
 +{
-+    RAMFBStandaloneState *ramfb = RAMFB(dev);
++    RAMFBState *s = dev;
++    void *framebuffer;
++    uint32_t stride, fourcc, format;
++    hwaddr addr, length;
 +
-+    if (0 /* native driver active */) {
-+        /* non-standalone device would run native display update here */;
-+    } else {
-+        ramfb_display_update(ramfb->con, ramfb->state);
++    s->width  = be32_to_cpu(s->cfg.width);
++    s->height = be32_to_cpu(s->cfg.height);
++    stride    = be32_to_cpu(s->cfg.stride);
++    fourcc    = be32_to_cpu(s->cfg.fourcc);
++    addr      = be64_to_cpu(s->cfg.addr);
++    length    = stride * s->height;
++    format    = qemu_drm_format_to_pixman(fourcc);
++
++    fprintf(stderr, "%s: %dx%d @ 0x%" PRIx64 "\n", __func__,
++            s->width, s->height, addr);
++    framebuffer = address_space_map(&address_space_memory,
++                                    addr, &length, false,
++                                    MEMTXATTRS_UNSPECIFIED);
++    if (!framebuffer || length < stride * s->height) {
++        s->width = 0;
++        s->height = 0;
++        return;
 +    }
++    s->ds = qemu_create_displaysurface_from(s->width, s->height,
++                                            format, stride, framebuffer);
 +}
 +
-+static const GraphicHwOps wrapper_ops = {
-+    .gfx_update = display_update_wrapper,
-+};
-+
-+static void ramfb_realizefn(DeviceState *dev, Error **errp)
++void ramfb_display_update(QemuConsole *con, RAMFBState *s)
 +{
-+    RAMFBStandaloneState *ramfb = RAMFB(dev);
++    if (!s->width || !s->height) {
++        return;
++    }
 +
-+    ramfb->con = graphic_console_init(dev, 0, &wrapper_ops, dev);
-+    ramfb->state = ramfb_setup(errp);
++    if (s->ds) {
++        dpy_gfx_replace_surface(con, s->ds);
++        s->ds = NULL;
++    }
++
++    /* simple full screen update */
++    dpy_gfx_update_full(con);
 +}
 +
-+static void ramfb_class_initfn(ObjectClass *klass, void *data)
++RAMFBState *ramfb_setup(Error **errp)
 +{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
++    FWCfgState *fw_cfg = fw_cfg_find();
++    RAMFBState *s;
 +
-+    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-+    dc->realize = ramfb_realizefn;
-+    dc->desc = "ram framebuffer standalone device";
-+    dc->user_creatable = true;
++    if (!fw_cfg || !fw_cfg->dma_enabled) {
++        error_setg(errp, "ramfb device requires fw_cfg with DMA");
++        return NULL;
++    }
++
++    s = g_new0(RAMFBState, 1);
++
++    fw_cfg_add_file_callback(fw_cfg, "etc/ramfb",
++                             NULL, ramfb_fw_cfg_write, s,
++                             &s->cfg, sizeof(s->cfg), false);
++    return s;
 +}
-+
-+static const TypeInfo ramfb_info = {
-+    .name          = TYPE_RAMFB_DEVICE,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(RAMFBStandaloneState),
-+    .class_init    = ramfb_class_initfn,
-+};
-+
-+static void ramfb_register_types(void)
-+{
-+    type_register_static(&ramfb_info);
-+}
-+
-+type_init(ramfb_register_types)
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 3b87f3cedb..e9b6f064fb 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -28,6 +28,7 @@
- #include "hw/loader.h"
- #include "hw/i386/pc.h"
- #include "hw/i386/apic.h"
-+#include "hw/display/ramfb.h"
- #include "hw/smbios/smbios.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_ids.h"
-@@ -423,6 +424,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
-     m->desc = "Standard PC (i440FX + PIIX, 1996)";
-     m->default_machine_opts = "firmware=bios-256k.bin";
-     m->default_display = "std";
-+    machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
- }
- 
- static void pc_i440fx_3_0_machine_options(MachineClass *m)
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 087f2630f9..1a73e1848a 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -45,6 +45,7 @@
- #include "hw/i386/ich9.h"
- #include "hw/i386/amd_iommu.h"
- #include "hw/i386/intel_iommu.h"
-+#include "hw/display/ramfb.h"
- #include "hw/smbios/smbios.h"
- #include "hw/ide/pci.h"
- #include "hw/ide/ahci.h"
-@@ -305,6 +306,7 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->no_floppy = 1;
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_AMD_IOMMU_DEVICE);
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
-+    machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
-     m->max_cpus = 288;
- }
- 
 diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 0af04985d2..fb8408c6d0 100644
+index b5d97ab26d..0af04985d2 100644
 --- a/hw/display/Makefile.objs
 +++ b/hw/display/Makefile.objs
-@@ -1,4 +1,5 @@
- common-obj-y += ramfb.o
-+common-obj-y += ramfb-standalone.o
- 
+@@ -1,3 +1,5 @@
++common-obj-y += ramfb.o
++
  common-obj-$(CONFIG_ADS7846) += ads7846.o
  common-obj-$(CONFIG_VGA_CIRRUS) += cirrus_vga.o
+ common-obj-$(CONFIG_G364FB) += g364fb.o
 -- 
 2.9.3
