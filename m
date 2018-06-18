@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1fV2DB-0006X4-4Z
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 18:01:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1fV2Mv-0007oM-2A
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 18:11:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1fV2D7-0008Tk-B6
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 18:01:21 -0400
-Received: from mail-dm3nam03on0112.outbound.protection.outlook.com
-	([104.47.41.112]:48000
-	helo=NAM03-DM3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
-	id 1fV2D6-0008QP-St
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 18:01:17 -0400
-From: "Justin Terry (VM)" <juterry@microsoft.com>
-Date: Mon, 18 Jun 2018 22:01:10 +0000
-Message-ID: <MW2PR2101MB09217AB059213F2EAE1C7B72B6710@MW2PR2101MB0921.namprd21.prod.outlook.com>
-References: <20180605221500.21674-1-juterry@microsoft.com>
-	<20180605221500.21674-2-juterry@microsoft.com>
-	<dfb2eddc-b582-4175-0109-c752d97ccf34@redhat.com>
-In-Reply-To: <dfb2eddc-b582-4175-0109-c752d97ccf34@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <eblake@redhat.com>) id 1fV2Mr-0004H3-T9
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 18:11:25 -0400
+References: <1528859749-25286-1-git-send-email-baiyaowei@cmss.chinamobile.com>
+	<20180613035030.GB25430@flamenco>
+	<23a38716-196f-53a0-0a3d-61f269b1dab4@redhat.com>
+	<20180613141510.GA672@byw>
+	<20180615173013.GH12972@stefanha-x1.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4fb174ba-ec91-483e-63ed-ca3c118ae9f8@redhat.com>
+Date: Mon, 18 Jun 2018 17:11:16 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 2/2] WHPX: register for unrecognized MSR
- exits
+In-Reply-To: <20180615173013.GH12972@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tracing.txt: add missing '-' for trace
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,54 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Yaowei Bai <baiyaowei@cmss.chinamobile.com>
+Cc: "Emilio G. Cota" <cota@braap.org>, qemu-trivial@nongnu.org, mjt@tls.msk.ru, laurent@vivier.eu, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-SGV5IFBhb2xvLA0KDQpUaGFua3MgZm9yIHRoZSByZXBseS4NCg0KSSBhbSBjZXJ0YWlubHkgb3Bl
-biBmb3Igc3VnZ2VzdGlvbnMgaWYgeW91IGhhdmUgYW55IGhlcmUuIFRoaXMgd2FzIG9yaWdpbmFs
-bHkgcmVwb3J0ZWQgd2hlbiBydW5uaW5nIHRoZSBhbmRyb2lkIGtlcm5lbCB3aGljaCBJIGJlbGll
-dmUgaXMgTGludXggNC40LiBJIGFncmVlIHRoYXQgbmV3ZXIga2VybmVscyBkbyBzZWVtIHRvIGhh
-bmRsZSAjR1AgbW9yZSBncmFjZWZ1bGx5IHRoYW4gb3RoZXJzIGJ1dCBpdCBkb2VzbuKAmXQgaGVs
-cCBkb3duIGxldmVsIGtlcm5lbHMgdG8gYm9vdC4NCg0KVGhlIGlzc3VlIGlzIHRoYXQgdGhlIFdp
-bmRvd3MgSHlwZXJ2aXNvciBQbGF0Zm9ybSB3aWxsIHJldHVybiAjR1AgZm9yIGFueSByZG1zci93
-cm1zciB0aGF0IGlzIG5vdCBhIHZpcnR1YWxpemVkIE1TUiBpbiB0aGUgaHlwZXJ2aXNvciBieSBk
-ZWZhdWx0LiBBIHZpcnQgc3RhY2sgKFFFTVUpIGNhbiBvdmVycmlkZSB0aGlzIGRlZmF1bHQgYmVo
-YXZpb3IgYnkgcmVnaXN0ZXJpbmcgZm9yIE1TUiBleGl0cy4gSW4gdGhpcyBjb25maWd1cmF0aW9u
-IHRoZSB2aXJ0IHN0YWNrIHdpbGwgcmVjZWl2ZSBhbnkgbm9uLXZpcnR1YWxpemVkIE1TUiBleGl0
-IGFuZCBmcm9tIHRoZSBoeXBlcnZpc29ycyBwZXJzcGVjdGl2ZSB0aGlzIGlzIG5vdyBlZmZlY3Rp
-dmVseSBoYW5kbGVkLiBJIGNvdWxkIGNlcnRhaW5seSBsaXN0IGVhY2ggTVNSIGluZGl2aWR1YWxs
-eSBidXQgaXQgc2VlbXMgb3Zlcmx5IHByb25lIHRvIHRlc3QtbWF0cml4IGVycm9ycy4gRm9yIGV4
-YW1wbGUsIGVhY2gga2VybmVsIHRoYXQgSSB0cnkgbWlnaHQgc3VjY2VlZCBidXQgYSBzaW5nbGUg
-b3B0aW9uIGRpZmZlcmVuY2UgaW4gYW5vdGhlciBrZXJuZWwgbWlnaHQgZmFpbCAod2hpY2ggd2Fz
-IHRoZSBjYXNlIGhlcmUgYmVjYXVzZSB0aGUgNC40IGtlcm5lbCBpcyBkaWZmZXJlbnQgZnJvbSB0
-aGUgNC4xNCsgaXQgc2VlbXMpLiBCdXQsIEkgd2lsbCBtYWtlIGFueSBjaGFuZ2UgeW91IHNlZSBm
-aXQgdG8gaGFuZGxlIHRoaXMgaW4gdGhlIHdheSBRRU1VIHByZWZlcnMuDQoNCkFzIEZZSSwgdGhp
-cyBpcyB0aGUgc2FtZSBsb2dpYyB0aGF0IEh5cGVyLVYgdXNlcyBpbiBpdHMgdmlydCBzdGFjayBm
-b3IgYW55IGh5cGVydmlzb3IgZXhpdHMgdGhhdCBhcmUgbm90IGhhbmRsZWQgaW4gdGhlIGh5cGVy
-dmlzb3IgaXRzZWxmLg0KDQotSnVzdGluDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0N
-Cj4gRnJvbTogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCj4gU2VudDogV2Vk
-bmVzZGF5LCBKdW5lIDEzLCAyMDE4IDk6MjggQU0NCj4gVG86IEp1c3RpbiBUZXJyeSAoVk0pIDxq
-dXRlcnJ5QG1pY3Jvc29mdC5jb20+OyBxZW11LWRldmVsQG5vbmdudS5vcmcNCj4gQ2M6IHJ0aEB0
-d2lkZGxlLm5ldDsgZWhhYmtvc3RAcmVkaGF0LmNvbQ0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDIv
-Ml0gV0hQWDogcmVnaXN0ZXIgZm9yIHVucmVjb2duaXplZCBNU1IgZXhpdHMNCj4gDQo+IE9uIDA2
-LzA2LzIwMTggMDA6MTUsIEp1c3RpbiBUZXJyeSAoVk0pIHdyb3RlOg0KPiA+IFNvbWUgdmFyaWF0
-aW9ucyBvZiBMaW51eCBrZXJuZWxzIGVuZCB1cCBhY2Nlc3NpbmcgTVNSJ3MgdGhhdCB0aGUNCj4g
-PiBXaW5kb3dzIEh5cGVydmlzb3IgZG9lc24ndCBpbXBsZW1lbnQgd2hpY2ggY2F1c2VzIGEgR1Ag
-dG8gYmUgcmV0dXJuZWQNCj4gdG8gdGhlIGd1ZXN0Lg0KPiA+IFRoaXMgZml4IHJlZ2lzdGVycyBR
-RU1VIGZvciB1bmltcGxlbWVudGVkIE1TUiBhY2Nlc3MgYW5kIGdsb2JhbGx5DQo+ID4gcmV0dXJu
-cyAwIG9uIHJlYWRzIGFuZCBpZ25vcmVzIHdyaXRlcy4gVGhpcyBiZWhhdmlvciBpcyBhbGxvd3Mg
-dGhlDQo+ID4gTGludXgga2VybmVsIHRvIHByb2JlIHRoZSBNU1Igd2l0aCBhIHdyaXRlL3JlYWQv
-Y2hlY2sgc2VxdWVuY2UgaXQgZG9lcw0KPiBvZnRlbiB3aXRob3V0IGZhaWxpbmcgdGhlIGFjY2Vz
-cy4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IEp1c3RpbiBUZXJyeSAoVk0pIDxqdXRlcnJ5QG1p
-Y3Jvc29mdC5jb20+DQo+ID4gLS0tDQo+ID4gIHRhcmdldC9pMzg2L3docHgtYWxsLmMgfCA0MQ0K
-PiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLQ0KPiA+ICAxIGZpbGUg
-Y2hhbmdlZCwgMzggaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4gDQo+IEhtbSwgS1ZN
-IHRyaWVzIHRvIGxpc3QgdGhlIE1TUnMgdGhhdCBMaW51eCAob3IgV2luZG93cyA6KSkgdXNlLiAg
-SXQgY2FuIGRvIHRoZQ0KPiBmdWxsIHdoaXRlbGlzdCwgYnV0IGl0J3Mgb3B0LWluLg0KPiANCj4g
-UmVjZW50IExpbnV4IGtlcm5lbHMgYWxzbyBhcmUgZ2VuZXJhbGx5IGxlc3MgcGlja3kgYWJvdXQg
-I0dQcyBmcm9tIE1TUnMsIHNvIEkNCj4gZG9uJ3QgdGhpbmsgYSBnZW5lcmljIHdoaXRlbGlzdCBp
-cyBhIGdvb2QgaWRlYS4gIElmIHRoZSAibm9uLWhvc3RlZCIgSHlwZXItViBpcw0KPiBkb2luZyB0
-aGUgc2FtZSB0aGF0IHdvdWxkIGJlIGZpbmUgSSBndWVzcywgYnV0IHRoZW4gdGhlcmUgc2hvdWxk
-IHByb2JhYmx5DQo+IGJlIGEgY29tbWVudCBhYm91dCBpdCBpbiB0aGUgY29kZS4NCj4gDQo+IFdo
-aWxlIHRoaXMgaXMgZGlzY3Vzc2VkIGEgYml0IG1vcmUsIEkndmUgcXVldWVkIHBhdGNoIDEuDQo+
-IA0KPiBUaGFua3MsDQo+IA0KPiBQYW9sbw0K
+On 06/15/2018 12:30 PM, Stefan Hajnoczi wrote:
+
+>>>
+>>> So I'm in favor of this patch, although it may need more of a commit
+>>> message summarizing the justification I've just pointed you to.
+>>
+>> Thanks for your nice explaination. If this patch could be merged i will
+>> send V2 with a commit message.
+> 
+> Please update the remaining occurrences of the -trace option syntax in
+> v2:
+> 
+>    $ git grep -- -trace docs/devel/tracing.txt
+
+Also fixing strings in trace/control.[ch] would be appropriate.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
