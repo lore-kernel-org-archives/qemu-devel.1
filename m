@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwrD-0002D9-3R
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:20 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwrE-0002EX-BD
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwr6-0005Bi-QE
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45474 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwrA-0005DO-0H
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44994 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fUwr6-0005BP-LX
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:12 -0400
+	id 1fUwr9-0005DE-R7
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:15 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5A90C7DAC3
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 16:18:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7A375401EF03
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 16:18:15 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 18 Jun 2018 18:17:19 +0200
-Message-Id: <20180618161729.334-17-marcandre.lureau@redhat.com>
+Date: Mon, 18 Jun 2018 18:17:21 +0200
+Message-Id: <20180618161729.334-19-marcandre.lureau@redhat.com>
 In-Reply-To: <20180618161729.334-1-marcandre.lureau@redhat.com>
 References: <20180618161729.334-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 16/26] vhost-user: add
- vhost_user_gpu_get_num_capsets()
+Subject: [Qemu-devel] [PATCH v3 18/26] util: promote
+ qemu_egl_rendernode_open() to libqemuutil
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,75 +37,201 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
+vhost-user-gpu will share the same code to open a DRM node.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.h |  1 +
- include/hw/virtio/vhost-backend.h     |  1 +
- hw/virtio/vhost-user.c                | 15 +++++++++++++++
- 3 files changed, 17 insertions(+)
+ include/qemu/drm.h |  6 +++++
+ ui/egl-helpers.c   | 51 ++---------------------------------
+ util/drm.c         | 66 ++++++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS        |  1 +
+ util/Makefile.objs |  1 +
+ 5 files changed, 76 insertions(+), 49 deletions(-)
+ create mode 100644 include/qemu/drm.h
+ create mode 100644 util/drm.c
 
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
-r/libvhost-user.h
-index 9899bfda9e..b572071d61 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -93,6 +93,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_POSTCOPY_END     =3D 30,
-     VHOST_USER_INPUT_GET_CONFIG,
-     VHOST_USER_GPU_SET_SOCKET,
-+    VHOST_USER_GPU_GET_NUM_CAPSETS,
-     VHOST_USER_MAX
- } VhostUserRequest;
-=20
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-=
-backend.h
-index daf9180c33..730e24c33b 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -164,5 +164,6 @@ int vhost_backend_handle_iotlb_msg(struct vhost_dev *=
-dev,
- int vhost_user_input_get_config(struct vhost_dev *dev,
-                                 struct virtio_input_config **config);
- int vhost_user_gpu_set_socket(struct vhost_dev *dev, int fd);
-+int vhost_user_gpu_get_num_capsets(struct vhost_dev *dev, uint32_t *num)=
-;
-=20
- #endif /* VHOST_BACKEND_H */
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 37864bc06a..8702027269 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -91,6 +91,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_POSTCOPY_END     =3D 30,
-     VHOST_USER_INPUT_GET_CONFIG,
-     VHOST_USER_GPU_SET_SOCKET,
-+    VHOST_USER_GPU_GET_NUM_CAPSETS,
-     VHOST_USER_MAX
- } VhostUserRequest;
-=20
-@@ -922,6 +923,20 @@ static int vhost_user_get_u64(struct vhost_dev *dev,=
- int request, uint64_t *u64)
-     return 0;
- }
-=20
-+int vhost_user_gpu_get_num_capsets(struct vhost_dev *dev, uint32_t *num)
-+{
-+    uint64_t u64;
+diff --git a/include/qemu/drm.h b/include/qemu/drm.h
+new file mode 100644
+index 0000000000..4c3e622f5c
+--- /dev/null
++++ b/include/qemu/drm.h
+@@ -0,0 +1,6 @@
++#ifndef QEMU_DRM_H_
++#define QEMU_DRM_H_
 +
-+    if (vhost_user_get_u64(dev, VHOST_USER_GPU_GET_NUM_CAPSETS, &u64) < =
-0) {
-+        return -1;
-+    }
-+    if (u64 > UINT32_MAX) {
-+        return -1;
-+    }
-+    *num =3D u64;
-+    return 0;
-+}
++int qemu_drm_rendernode_open(const char *rendernode);
 +
- static int vhost_user_get_features(struct vhost_dev *dev, uint64_t *feat=
-ures)
++#endif
+diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
+index 16dc3ded36..472a8aa5f0 100644
+--- a/ui/egl-helpers.c
++++ b/ui/egl-helpers.c
+@@ -15,9 +15,7 @@
+  * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
+  */
+ #include "qemu/osdep.h"
+-#include <glob.h>
+-#include <dirent.h>
+-
++#include "qemu/drm.h"
+ #include "qemu/error-report.h"
+ #include "ui/console.h"
+ #include "ui/egl-helpers.h"
+@@ -146,57 +144,12 @@ int qemu_egl_rn_fd;
+ struct gbm_device *qemu_egl_rn_gbm_dev;
+ EGLContext qemu_egl_rn_ctx;
+=20
+-static int qemu_egl_rendernode_open(const char *rendernode)
+-{
+-    DIR *dir;
+-    struct dirent *e;
+-    int r, fd;
+-    char *p;
+-
+-    if (rendernode) {
+-        return open(rendernode, O_RDWR | O_CLOEXEC | O_NOCTTY | O_NONBLO=
+CK);
+-    }
+-
+-    dir =3D opendir("/dev/dri");
+-    if (!dir) {
+-        return -1;
+-    }
+-
+-    fd =3D -1;
+-    while ((e =3D readdir(dir))) {
+-        if (e->d_type !=3D DT_CHR) {
+-            continue;
+-        }
+-
+-        if (strncmp(e->d_name, "renderD", 7)) {
+-            continue;
+-        }
+-
+-        p =3D g_strdup_printf("/dev/dri/%s", e->d_name);
+-
+-        r =3D open(p, O_RDWR | O_CLOEXEC | O_NOCTTY | O_NONBLOCK);
+-        if (r < 0) {
+-            g_free(p);
+-            continue;
+-        }
+-        fd =3D r;
+-        g_free(p);
+-        break;
+-    }
+-
+-    closedir(dir);
+-    if (fd < 0) {
+-        return -1;
+-    }
+-    return fd;
+-}
+-
+ int egl_rendernode_init(const char *rendernode)
  {
-     return vhost_user_get_u64(dev, VHOST_USER_GET_FEATURES, features);
+     qemu_egl_rn_fd =3D -1;
+     int rc;
+=20
+-    qemu_egl_rn_fd =3D qemu_egl_rendernode_open(rendernode);
++    qemu_egl_rn_fd =3D qemu_drm_rendernode_open(rendernode);
+     if (qemu_egl_rn_fd =3D=3D -1) {
+         error_report("egl: no drm render node available");
+         goto err;
+diff --git a/util/drm.c b/util/drm.c
+new file mode 100644
+index 0000000000..a23ff24538
+--- /dev/null
++++ b/util/drm.c
+@@ -0,0 +1,66 @@
++/*
++ * Copyright (C) 2015-2016 Gerd Hoffmann <kraxel@redhat.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/lice=
+nses/>.
++ */
++#include "qemu/osdep.h"
++#include "qemu/drm.h"
++
++#include <glob.h>
++#include <dirent.h>
++
++int qemu_drm_rendernode_open(const char *rendernode)
++{
++    DIR *dir;
++    struct dirent *e;
++    int r, fd;
++    char *p;
++
++    if (rendernode) {
++        return open(rendernode, O_RDWR | O_CLOEXEC | O_NOCTTY | O_NONBLO=
+CK);
++    }
++
++    dir =3D opendir("/dev/dri");
++    if (!dir) {
++        return -1;
++    }
++
++    fd =3D -1;
++    while ((e =3D readdir(dir))) {
++        if (e->d_type !=3D DT_CHR) {
++            continue;
++        }
++
++        if (strncmp(e->d_name, "renderD", 7)) {
++            continue;
++        }
++
++        p =3D g_strdup_printf("/dev/dri/%s", e->d_name);
++
++        r =3D open(p, O_RDWR | O_CLOEXEC | O_NOCTTY | O_NONBLOCK);
++        if (r < 0) {
++            g_free(p);
++            continue;
++        }
++        fd =3D r;
++        g_free(p);
++        break;
++    }
++
++    closedir(dir);
++    if (fd < 0) {
++        return -1;
++    }
++    return fd;
++}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e5dee15967..42a5d46acd 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1533,6 +1533,7 @@ S: Odd Fixes
+ F: ui/
+ F: include/ui/
+ F: qapi/ui.json
++F: util/drm.c
+=20
+ Cocoa graphics
+ M: Peter Maydell <peter.maydell@linaro.org>
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index e1c3fed4dc..1810f970ef 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -49,3 +49,4 @@ util-obj-y +=3D stats64.o
+ util-obj-y +=3D systemd.o
+ util-obj-y +=3D iova-tree.o
+ util-obj-$(CONFIG_LINUX) +=3D vfio-helpers.o
++util-obj-$(CONFIG_LINUX) +=3D drm.o
 --=20
 2.18.0.rc1
