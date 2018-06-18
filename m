@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44424)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fUqjm-0005fz-QE
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 05:46:16 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1fUqkj-00063O-HP
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 05:47:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fUqjj-0005gh-N3
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 05:46:14 -0400
-Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:40828)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1fUqjj-0005fQ-AY
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 05:46:11 -0400
-Received: by mail-pg0-x22f.google.com with SMTP id w8-v6so4238125pgp.7
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 02:46:10 -0700 (PDT)
-Date: Mon, 18 Jun 2018 19:46:01 +1000
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <20180618194601.3d3e8b4b@aik.ozlabs.ibm.com>
-In-Reply-To: <20180604032511.6980-1-aik@ozlabs.ru>
-References: <20180604032511.6980-1-aik@ozlabs.ru>
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1fUqki-0006ME-8J
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 05:47:13 -0400
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Mon, 18 Jun 2018 09:46:54 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA8387019ED@FRAEML521-MBX.china.huawei.com>
+References: <20180516152026.2920-1-shameerali.kolothum.thodi@huawei.com>
+	<20180516152026.2920-7-shameerali.kolothum.thodi@huawei.com>
+	<bd67ed40-81d6-58dc-ccaf-efd8a40ca96f@redhat.com>
+	<5FC3163CFD30C246ABAA99954A238FA8386F6E04@FRAEML521-MBX.china.huawei.com>
+	<20180615154441.4rr5mtcnran5cf3s@kamzik.brq.redhat.com>
+	<CAFEAcA-nG4Xv=PmxzW3tzs-TStziMDHMFxYi6_teSe1GhLH=hw@mail.gmail.com>
+	<333cd485-dc75-d295-16fd-98a1108e1e15@redhat.com>
+	<CAFEAcA-+Xp6B_g_a89-7wP_DN1ftGrKTON=P6wH_6ESq9GPKKQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA-+Xp6B_g_a89-7wP_DN1ftGrKTON=P6wH_6ESq9GPKKQ@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v4] memory/hmp: Print owners/parents
- in "info mtree"
+Subject: Re: [Qemu-devel] [RFC v2 6/6] hw/arm: Populate non-contiguous
+ memory regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,279 +33,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Auger Eric <eric.auger@redhat.com>
+Cc: Andrew Jones <drjones@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Jonathan Cameron <jonathan.cameron@huawei.com>, Linuxarm <linuxarm@huawei.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>
 
-On Mon,  4 Jun 2018 13:25:11 +1000
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
-
-> This adds owners/parents (which are the same, just occasionally
-> owner==NULL) printing for memory regions; a new '-o' flag
-> enabled new output.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
-Ping? Has this gone anywhere?
-
-
-> ---
-> 
-> The only orphan object I know is printed now as:
->   0000000000000000-ffffffffffffffff (prio 0, i/o): mem-container-smram owner:{obj type=kvm-accel}
-> 
-> 
-> Unrelated observation:
->   QEMU in x86_64 constantly hits breakpoints in unassigned_mem_accepts
->   and unassigned_mem_read (when set), in early boot stage before SeaBIOS
->   even shows up, the address is 0xfed40f00 and that is not anything
->   assigned. "info mtree" shows that it is surrounded by:
-> 
->   	00000000fec00000-00000000fec00fff (prio 0, i/o): kvm-ioapic
-> 	00000000fed00000-00000000fed003ff (prio 0, i/o): hpet
-> 	00000000fee00000-00000000feefffff (prio 4096, i/o): kvm-apic-msi
-> 
->   Is it something to worry about?
-> 
-> ---
-> Changes:
-> v4:
-> * prints object typename if canonical path could not be resolved
-> 
-> v3:
-> * removed QOM's "id" property as there are no objects left which would
-> have this property and own an MR
-> 
-> v2:
-> * cleanups
-> ---
->  include/exec/memory.h |  2 +-
->  memory.c              | 72 ++++++++++++++++++++++++++++++++++++++++++++-------
->  monitor.c             |  4 ++-
->  hmp-commands-info.hx  |  7 ++---
->  4 files changed, 70 insertions(+), 15 deletions(-)
-> 
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 67ea7fe..95340b8 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -1627,7 +1627,7 @@ void memory_global_dirty_log_start(void);
->  void memory_global_dirty_log_stop(void);
->  
->  void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
-> -                bool dispatch_tree);
-> +                bool dispatch_tree, bool owner);
->  
->  /**
->   * memory_region_request_mmio_ptr: request a pointer to an mmio
-> diff --git a/memory.c b/memory.c
-> index 10fa2dd..bf0a9f2 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -2832,10 +2832,49 @@ typedef QTAILQ_HEAD(mrqueue, MemoryRegionList) MemoryRegionListHead;
->                             int128_sub((size), int128_one())) : 0)
->  #define MTREE_INDENT "  "
->  
-> +static void mtree_expand_owner(fprintf_function mon_printf, void *f,
-> +                               const char *label, Object *obj)
-> +{
-> +    DeviceState *dev = (DeviceState *) object_dynamic_cast(obj, TYPE_DEVICE);
-> +
-> +    mon_printf(f, " %s:{%s", label, dev ? "dev" : "obj");
-> +    if (dev && dev->id) {
-> +        mon_printf(f, " id=%s", dev->id);
-> +    } else {
-> +        gchar *canonical_path = object_get_canonical_path(obj);
-> +        if (canonical_path) {
-> +            mon_printf(f, " path=%s", canonical_path);
-> +            g_free(canonical_path);
-> +        } else {
-> +            mon_printf(f, " type=%s", object_get_typename(obj));
-> +        }
-> +    }
-> +    mon_printf(f, "}");
-> +}
-> +
-> +static void mtree_print_mr_owner(fprintf_function mon_printf, void *f,
-> +                                 const MemoryRegion *mr)
-> +{
-> +    Object *owner = mr->owner;
-> +    Object *parent = memory_region_owner((MemoryRegion *)mr);
-> +
-> +    if (!owner && !parent) {
-> +        mon_printf(f, " orphan");
-> +        return;
-> +    }
-> +    if (owner) {
-> +        mtree_expand_owner(mon_printf, f, "owner", owner);
-> +    }
-> +    if (parent && parent != owner) {
-> +        mtree_expand_owner(mon_printf, f, "parent", parent);
-> +    }
-> +}
-> +
->  static void mtree_print_mr(fprintf_function mon_printf, void *f,
->                             const MemoryRegion *mr, unsigned int level,
->                             hwaddr base,
-> -                           MemoryRegionListHead *alias_print_queue)
-> +                           MemoryRegionListHead *alias_print_queue,
-> +                           bool owner)
->  {
->      MemoryRegionList *new_ml, *ml, *next_ml;
->      MemoryRegionListHead submr_print_queue;
-> @@ -2881,7 +2920,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
->          }
->          mon_printf(f, TARGET_FMT_plx "-" TARGET_FMT_plx
->                     " (prio %d, %s): alias %s @%s " TARGET_FMT_plx
-> -                   "-" TARGET_FMT_plx "%s\n",
-> +                   "-" TARGET_FMT_plx "%s",
->                     cur_start, cur_end,
->                     mr->priority,
->                     memory_region_type((MemoryRegion *)mr),
-> @@ -2890,15 +2929,22 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
->                     mr->alias_offset,
->                     mr->alias_offset + MR_SIZE(mr->size),
->                     mr->enabled ? "" : " [disabled]");
-> +        if (owner) {
-> +            mtree_print_mr_owner(mon_printf, f, mr);
-> +        }
->      } else {
->          mon_printf(f,
-> -                   TARGET_FMT_plx "-" TARGET_FMT_plx " (prio %d, %s): %s%s\n",
-> +                   TARGET_FMT_plx "-" TARGET_FMT_plx " (prio %d, %s): %s%s",
->                     cur_start, cur_end,
->                     mr->priority,
->                     memory_region_type((MemoryRegion *)mr),
->                     memory_region_name(mr),
->                     mr->enabled ? "" : " [disabled]");
-> +        if (owner) {
-> +            mtree_print_mr_owner(mon_printf, f, mr);
-> +        }
->      }
-> +    mon_printf(f, "\n");
->  
->      QTAILQ_INIT(&submr_print_queue);
->  
-> @@ -2921,7 +2967,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
->  
->      QTAILQ_FOREACH(ml, &submr_print_queue, mrqueue) {
->          mtree_print_mr(mon_printf, f, ml->mr, level + 1, cur_start,
-> -                       alias_print_queue);
-> +                       alias_print_queue, owner);
->      }
->  
->      QTAILQ_FOREACH_SAFE(ml, &submr_print_queue, mrqueue, next_ml) {
-> @@ -2934,6 +2980,7 @@ struct FlatViewInfo {
->      void *f;
->      int counter;
->      bool dispatch_tree;
-> +    bool owner;
->  };
->  
->  static void mtree_print_flatview(gpointer key, gpointer value,
-> @@ -2974,7 +3021,7 @@ static void mtree_print_flatview(gpointer key, gpointer value,
->          mr = range->mr;
->          if (range->offset_in_region) {
->              p(f, MTREE_INDENT TARGET_FMT_plx "-"
-> -              TARGET_FMT_plx " (prio %d, %s): %s @" TARGET_FMT_plx "\n",
-> +              TARGET_FMT_plx " (prio %d, %s): %s @" TARGET_FMT_plx,
->                int128_get64(range->addr.start),
->                int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
->                mr->priority,
-> @@ -2983,13 +3030,17 @@ static void mtree_print_flatview(gpointer key, gpointer value,
->                range->offset_in_region);
->          } else {
->              p(f, MTREE_INDENT TARGET_FMT_plx "-"
-> -              TARGET_FMT_plx " (prio %d, %s): %s\n",
-> +              TARGET_FMT_plx " (prio %d, %s): %s",
->                int128_get64(range->addr.start),
->                int128_get64(range->addr.start) + MR_SIZE(range->addr.size),
->                mr->priority,
->                range->readonly ? "rom" : memory_region_type(mr),
->                memory_region_name(mr));
->          }
-> +        if (fvi->owner) {
-> +            mtree_print_mr_owner(p, f, mr);
-> +        }
-> +        p(f, "\n");
->          range++;
->      }
->  
-> @@ -3015,7 +3066,7 @@ static gboolean mtree_info_flatview_free(gpointer key, gpointer value,
->  }
->  
->  void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
-> -                bool dispatch_tree)
-> +                bool dispatch_tree, bool owner)
->  {
->      MemoryRegionListHead ml_head;
->      MemoryRegionList *ml, *ml2;
-> @@ -3027,7 +3078,8 @@ void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
->              .mon_printf = mon_printf,
->              .f = f,
->              .counter = 0,
-> -            .dispatch_tree = dispatch_tree
-> +            .dispatch_tree = dispatch_tree,
-> +            .owner = owner,
->          };
->          GArray *fv_address_spaces;
->          GHashTable *views = g_hash_table_new(g_direct_hash, g_direct_equal);
-> @@ -3059,14 +3111,14 @@ void mtree_info(fprintf_function mon_printf, void *f, bool flatview,
->  
->      QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
->          mon_printf(f, "address-space: %s\n", as->name);
-> -        mtree_print_mr(mon_printf, f, as->root, 1, 0, &ml_head);
-> +        mtree_print_mr(mon_printf, f, as->root, 1, 0, &ml_head, owner);
->          mon_printf(f, "\n");
->      }
->  
->      /* print aliased regions */
->      QTAILQ_FOREACH(ml, &ml_head, mrqueue) {
->          mon_printf(f, "memory-region: %s\n", memory_region_name(ml->mr));
-> -        mtree_print_mr(mon_printf, f, ml->mr, 1, 0, &ml_head);
-> +        mtree_print_mr(mon_printf, f, ml->mr, 1, 0, &ml_head, owner);
->          mon_printf(f, "\n");
->      }
->  
-> diff --git a/monitor.c b/monitor.c
-> index 922cfc0..33a6f7d 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -1965,8 +1965,10 @@ static void hmp_info_mtree(Monitor *mon, const QDict *qdict)
->  {
->      bool flatview = qdict_get_try_bool(qdict, "flatview", false);
->      bool dispatch_tree = qdict_get_try_bool(qdict, "dispatch_tree", false);
-> +    bool owner = qdict_get_try_bool(qdict, "owner", false);
->  
-> -    mtree_info((fprintf_function)monitor_printf, mon, flatview, dispatch_tree);
-> +    mtree_info((fprintf_function)monitor_printf, mon, flatview, dispatch_tree,
-> +               owner);
->  }
->  
->  static void hmp_info_numa(Monitor *mon, const QDict *qdict)
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index ddfcd5a..5956495 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -250,10 +250,11 @@ ETEXI
->  
->      {
->          .name       = "mtree",
-> -        .args_type  = "flatview:-f,dispatch_tree:-d",
-> -        .params     = "[-f][-d]",
-> +        .args_type  = "flatview:-f,dispatch_tree:-d,owner:-o",
-> +        .params     = "[-f][-d][-o]",
->          .help       = "show memory tree (-f: dump flat view for address spaces;"
-> -                      "-d: dump dispatch tree, valid with -f only)",
-> +                      "-d: dump dispatch tree, valid with -f only);"
-> +                      "-o: dump region owners/parents",
->          .cmd        = hmp_info_mtree,
->      },
->  
-> -- 
-> 2.11.0
-> 
-
-
-
---
-Alexey
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ZXIgTWF5ZGVsbCBb
+bWFpbHRvOnBldGVyLm1heWRlbGxAbGluYXJvLm9yZ10NCj4gU2VudDogMTUgSnVuZSAyMDE4IDE3
+OjMzDQo+IFRvOiBBdWdlciBFcmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+IENjOiBBbmRy
+ZXcgSm9uZXMgPGRyam9uZXNAcmVkaGF0LmNvbT47IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkN
+Cj4gPHNoYW1lZXJhbGkua29sb3RodW0udGhvZGlAaHVhd2VpLmNvbT47IHFlbXUtZGV2ZWxAbm9u
+Z251Lm9yZzsgcWVtdS0NCj4gYXJtQG5vbmdudS5vcmc7IEpvbmF0aGFuIENhbWVyb24gPGpvbmF0
+aGFuLmNhbWVyb25AaHVhd2VpLmNvbT47DQo+IExpbnV4YXJtIDxsaW51eGFybUBodWF3ZWkuY29t
+PjsgYWxleC53aWxsaWFtc29uQHJlZGhhdC5jb207DQo+IFpoYW9zaGVuZ2xvbmcgPHpoYW9zaGVu
+Z2xvbmdAaHVhd2VpLmNvbT47IGltYW1tZWRvQHJlZGhhdC5jb20NCj4gU3ViamVjdDogUmU6IFtR
+ZW11LWRldmVsXSBbUkZDIHYyIDYvNl0gaHcvYXJtOiBQb3B1bGF0ZSBub24tY29udGlndW91cw0K
+PiBtZW1vcnkgcmVnaW9ucw0KPiANCj4gT24gMTUgSnVuZSAyMDE4IGF0IDE3OjEzLCBBdWdlciBF
+cmljIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+IHdyb3RlOg0KPiA+IE9uIDA2LzE1LzIwMTggMDU6
+NTQgUE0sIFBldGVyIE1heWRlbGwgd3JvdGU6DQo+ID4+IFdoeSBzaG91bGQgdGhlIFZNIGV2ZXIg
+Y2FyZSBhYm91dCB3aGVyZSB0aGUgYWRkcmVzcyByZWdpb25zIGluIHRoZQ0KPiA+PiBob3N0IGhh
+cHBlbiB0byBiZSB3aGVuIGl0IGNvbWVzIHRvIHdoZXJlIGl0J3MgcHV0dGluZyBpdHMgUkFNDQo+
+ID4+IGluIHRoZSBWTSdzIGFkZHJlc3MgbGF5b3V0PyBJIGZlZWwgbGlrZSBJJ20gbWlzc2luZyBz
+b21ldGhpbmcgaGVyZS4uLg0KPiANCj4gPiBUaGUgVk0gY2Fubm90IHVzZSBSQU0gR1BBIHRoYXQg
+bWF0Y2hlcyBhc3NpZ25lZCBkZXZpY2UgcmVzZXJ2ZWQgSU9WQQ0KPiA+IHJlZ2lvbnMuIFdoZW4g
+eW91IGFzc2lnbiBhIGRldmljZSwgdGhlIHdob2xlIFZNIFJBTSBpcyBtYXBwZWQgaW4gdGhlDQo+
+ID4gcGh5c2ljYWwgSU9NTVUgYW5kIElPVkEgY29ycmVzcG9uZHMgdG8gR1BBLiBidXQgc29tZXRp
+bWVzIHNvbWUgSU9WQQ0KPiA+IGNhbm5vdCBiZSB1c2VkIGR1ZSB0byB0aGUgaG9zdCBzcGVjaWZp
+Y2l0aWVzIGFuZCBlc3BlY2lhbGx5IGlvbW11DQo+ID4gcGVjdWxpYXJpdGllcy4gU29tZSBJT1ZB
+cyBtYXkgYmUgc2ltcGx5ICJieXBhc3NlZCIgYnkgdGhlIGlvbW11LCBsaWtlIG9uDQo+ID4geDg2
+IGFuZCBhbHNvIHdpdGggc29tZSBBUk0gU01NVSBpbnRlZ3JhdGlvbi4gSW4gc3VjaCBhIGNhc2Ug
+dGhlIERNQQ0KPiA+IGFjY2Vzc2VzIGhhdmUgbm8gY2hhbmNlIHRvIHJlYWNoIHRoZSBndWVzdCBS
+QU0gYXMgZXhwZWN0ZWQuIEhvcGUgaXQNCj4gPiBjbGFyaWZpZXMuDQo+IA0KPiBIbW0uIFdlIGRv
+bid0IHdhbnQgdG8gaGF2ZSB0aGUgYWRkcmVzcyBsYXlvdXQgb2YNCj4gdGhlIFZNIGhhdmUgdG8g
+Y29wZSB3aXRoIGFsbCB0aGUgdmFyaW91cyBvZGRpdGllcyB0aGF0IGhvc3QNCj4gc3lzdGVtcyBt
+aWdodCBoYXZlLiBJcyB0aGlzIGtpbmQgb2YgdGhpbmcgY29tbW9uLCBvciByYXJlPw0KPiBJJ2Qg
+bXVjaCByYXRoZXIganVzdCBzYXkgIndlIGRvbid0IHN1cHBvcnQgZGV2aWNlIHBhc3N0aHJvdWdo
+DQo+IG9uIHRoYXQgc29ydCBvZiBzeXN0ZW0iLg0KPg0KDQpBcyBmYXIgYXMgSSBrbm93IG9uIEFS
+TTY0IHBsYXRmb3JtcyB0aGlzIGlzIG5vdCB2ZXJ5IHJhcmUgbWFpbmx5IGJlY2F1c2Ugb2YNCnRo
+ZSBwaHlzIE1TSSBkb29yYmVsbCBhbmQgdGhlIGZhY3QgdGhhdCBtZW1vcnkgbWFwIGlzIG5vdCBz
+dGFuZGFyZGl6ZWQuIFRoaXMNCndhcyBkaXNjdXNzZWQgaW4gTFBDIHNvbWV0aW1lIGJhY2tbMV0g
+YW5kIGEgc3lzZnMgaW50ZXJmYWNlIHdhcyBwcm92aWRlZCB0bw0KcmVwb3J0IHRoZXNlIHJlc2Vy
+dmVkIHJlZ2lvbnMuIEFuZCBsYXRlciBBbGV4IGNvbW1lbnRlZCB0aGF0IHZmaW8gbmVlZHMgYSBt
+b3JlDQpyb2J1c3Qgd2F5IG9mIGlkZW50aWZ5aW5nIGFuZCByZXBvcnRpbmcgdGhlc2UgcmVnaW9u
+cyBhbmQgdGhhdOKAmXMgaG93IHRoZSB2ZmlvIGtlcm5lbA0KcGF0Y2ggc2VyaWVzWzJdIHdhcyBp
+bnRyb2R1Y2VkIG9uIHdoaWNoIHRoaXMgcWVtdSBzZXJpZXMgaXMgYmFzZWQgb24uDQoNClRoYW5r
+cywNClNoYW1lZXINCg0KWzFdIGh0dHBzOi8vbGttbC5vcmcvbGttbC8yMDE2LzExLzcvOTM1DQoN
+ClsyXSBodHRwczovL2xrbWwub3JnL2xrbWwvMjAxOC80LzE4LzI5Mw0KDQoNCg==
