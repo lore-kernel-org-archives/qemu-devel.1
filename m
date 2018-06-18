@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49988)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUlEf-0005Sv-Bl
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 23:53:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fUlEf-0005Sw-Gh
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 23:53:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUlEd-00047D-8R
+	(envelope-from <dgibson@ozlabs.org>) id 1fUlEd-00047c-Fs
 	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 23:53:45 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 18 Jun 2018 13:53:17 +1000
-Message-Id: <20180618035324.19907-22-david@gibson.dropbear.id.au>
+Date: Mon, 18 Jun 2018 13:53:22 +1000
+Message-Id: <20180618035324.19907-27-david@gibson.dropbear.id.au>
 In-Reply-To: <20180618035324.19907-1-david@gibson.dropbear.id.au>
 References: <20180618035324.19907-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 21/28] pnv: Add cpu unrealize path
+Subject: [Qemu-devel] [PULL 26/28] ppc/pnv: introduce a
+ pnv_chip_core_realize() routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,62 +26,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, agraf@suse.de, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-Currently we don't have any unrealize path for pnv cpu cores.  We get awa=
-y
-with this because we don't yet support cpu hotplug for pnv.
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-However, we're going to want it eventually, and in the meantime, it makes
-it non-obvious why there are a bunch of allocations on the realize() path
-that don't have matching frees.
+This extracts from the PvChip realize routine the part creating the
+cores. On Power9, we will need to create the cores after the Xive
+interrupt controller is created.
 
-So, implement the missing unrealize path.
-
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/pnv_core.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ hw/ppc/pnv.c | 32 ++++++++++++++++++++++----------
+ 1 file changed, 22 insertions(+), 10 deletions(-)
 
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index f4c41d89d6..f7cf33f547 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -186,6 +186,26 @@ err:
-     error_propagate(errp, local_err);
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 0b9508d94d..0d2b79f798 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -849,9 +849,8 @@ static void pnv_chip_icp_realize(PnvChip *chip, Error=
+ **errp)
+     }
  }
 =20
-+static void pnv_unrealize_vcpu(PowerPCCPU *cpu)
-+{
-+    qemu_unregister_reset(pnv_cpu_reset, cpu);
-+    object_unparent(cpu->intc);
-+    cpu_remove_sync(CPU(cpu));
-+    object_unparent(OBJECT(cpu));
+-static void pnv_chip_realize(DeviceState *dev, Error **errp)
++static void pnv_chip_core_realize(PnvChip *chip, Error **errp)
+ {
+-    PnvChip *chip =3D PNV_CHIP(dev);
+     Error *error =3D NULL;
+     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+     const char *typename =3D pnv_chip_core_typename(chip);
+@@ -863,14 +862,6 @@ static void pnv_chip_realize(DeviceState *dev, Error=
+ **errp)
+         return;
+     }
+=20
+-    /* XSCOM bridge */
+-    pnv_xscom_realize(chip, &error);
+-    if (error) {
+-        error_propagate(errp, error);
+-        return;
+-    }
+-    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV_XSCOM_BASE(chip));
+-
+     /* Cores */
+     pnv_chip_core_sanitize(chip, &error);
+     if (error) {
+@@ -918,6 +909,27 @@ static void pnv_chip_realize(DeviceState *dev, Error=
+ **errp)
+                                 &PNV_CORE(pnv_core)->xscom_regs);
+         i++;
+     }
 +}
 +
-+static void pnv_core_unrealize(DeviceState *dev, Error **errp)
++static void pnv_chip_realize(DeviceState *dev, Error **errp)
 +{
-+    PnvCore *pc =3D PNV_CORE(dev);
-+    CPUCore *cc =3D CPU_CORE(dev);
-+    int i;
++    PnvChip *chip =3D PNV_CHIP(dev);
++    Error *error =3D NULL;
 +
-+    for (i =3D 0; i < cc->nr_threads; i++) {
-+        pnv_unrealize_vcpu(pc->threads[i]);
++    /* XSCOM bridge */
++    pnv_xscom_realize(chip, &error);
++    if (error) {
++        error_propagate(errp, error);
++        return;
 +    }
-+    g_free(pc->threads);
-+}
++    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 0, PNV_XSCOM_BASE(chip));
 +
- static Property pnv_core_properties[] =3D {
-     DEFINE_PROP_UINT32("pir", PnvCore, pir, 0),
-     DEFINE_PROP_END_OF_LIST(),
-@@ -196,6 +216,7 @@ static void pnv_core_class_init(ObjectClass *oc, void=
- *data)
-     DeviceClass *dc =3D DEVICE_CLASS(oc);
++    /* Cores */
++    pnv_chip_core_realize(chip, &error);
++    if (error) {
++        error_propagate(errp, error);
++        return;
++    }
 =20
-     dc->realize =3D pnv_core_realize;
-+    dc->unrealize =3D pnv_core_unrealize;
-     dc->props =3D pnv_core_properties;
- }
-=20
+     /* Create LPC controller */
+     object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
 --=20
 2.17.1
