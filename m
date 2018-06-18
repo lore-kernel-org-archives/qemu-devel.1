@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fUvS0-0006ou-Tb
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:48:14 -0400
+	(envelope-from <david@redhat.com>) id 1fUvS2-0006pE-B9
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:48:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fUvRw-0004kw-4R
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:48:12 -0400
+	(envelope-from <david@redhat.com>) id 1fUvRy-0004lI-62
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:48:14 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 18 Jun 2018 16:47:58 +0200
-Message-Id: <20180618144800.555-3-david@redhat.com>
+Date: Mon, 18 Jun 2018 16:47:59 +0200
+Message-Id: <20180618144800.555-4-david@redhat.com>
 In-Reply-To: <20180618144800.555-1-david@redhat.com>
 References: <20180618144800.555-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 2/4] machine: factor out
- enforce_aligned_dimm into memory_device_align
+Subject: [Qemu-devel] [PATCH v1 3/4] pc-dimm/memory-device: detect alignment
+ internally
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,176 +23,160 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-We want to handle memory device address assignment without passing
-compatibility parameters ("*align").
+We can now avoid having to pass in the alignment explicitly but can
+instead make use of the new machine compat parameter
+"memory_device_align".
 
-As x86 and Power use different strategies to determine an alignment and
-we need clean support for compat handling, let's introduce an enum on
-the machine class level. This is the machine configuration on how to
-align memory devices in guest physical memory.
-
-The three introduced types represent what is being done on x86 and Power
-right now.
+As we are using TARGET_PAGE_SIZE in memory-device.c, we can now longer
+compile it as common object.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/core/machine.c    |  3 +++
- hw/i386/pc.c         | 13 +++++++------
- hw/i386/pc_piix.c    |  2 +-
- include/hw/boards.h  | 13 +++++++++++++
- include/hw/i386/pc.h |  3 ---
- 5 files changed, 24 insertions(+), 10 deletions(-)
+ hw/i386/pc.c                   | 13 +------------
+ hw/mem/Makefile.objs           |  2 +-
+ hw/mem/memory-device.c         | 25 +++++++++++++++++++++++++
+ hw/mem/pc-dimm.c               |  4 ++--
+ hw/ppc/spapr.c                 |  5 ++---
+ include/hw/mem/memory-device.h |  1 +
+ include/hw/mem/pc-dimm.h       |  3 +--
+ 7 files changed, 33 insertions(+), 20 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 617e5f8d75..d34b205125 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -531,6 +531,9 @@ static void machine_class_init(ObjectClass *oc, void *data)
-     mc->numa_mem_align_shift = 23;
-     mc->numa_auto_assign_ram = numa_default_auto_assign_ram;
- 
-+    /* Default: use memory region alignment as memory devices alignment */
-+    mc->memory_device_align = MEMORY_DEVICE_ALIGN_REGION;
-+
-     object_class_property_add_str(oc, "accel",
-         machine_get_accel, machine_set_accel, &error_abort);
-     object_class_property_set_description(oc, "accel",
 diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index bf986baf91..04a97e89e7 100644
+index 04a97e89e7..d5581ab0a1 100644
 --- a/hw/i386/pc.c
 +++ b/hw/i386/pc.c
-@@ -1331,6 +1331,7 @@ void pc_memory_init(PCMachineState *pcms,
-     FWCfgState *fw_cfg;
-     MachineState *machine = MACHINE(pcms);
-     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
- 
-     assert(machine->ram_size == pcms->below_4g_mem_size +
-                                 pcms->above_4g_mem_size);
-@@ -1363,8 +1364,6 @@ void pc_memory_init(PCMachineState *pcms,
-     if (!pcmc->has_reserved_memory &&
-         (machine->ram_slots ||
-          (machine->maxram_size > machine->ram_size))) {
--        MachineClass *mc = MACHINE_GET_CLASS(machine);
--
-         error_report("\"-memory 'slots|maxmem'\" is not supported by: %s",
-                      mc->name);
-         exit(EXIT_FAILURE);
-@@ -1394,7 +1393,7 @@ void pc_memory_init(PCMachineState *pcms,
-         machine->device_memory->base =
-             ROUND_UP(0x100000000ULL + pcms->above_4g_mem_size, 1ULL << 30);
- 
--        if (pcmc->enforce_aligned_dimm) {
-+        if (mc->memory_device_align != MEMORY_DEVICE_ALIGN_PAGE) {
-             /* size device region assuming 1G page max alignment per slot */
-             device_mem_size += (1ULL << 30) * machine->ram_slots;
-         }
-@@ -1705,14 +1704,16 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+@@ -1704,20 +1704,9 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
      HotplugHandlerClass *hhc;
      Error *local_err = NULL;
      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
--    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-+    MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
+-    MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
+-    PCDIMMDevice *dimm = PC_DIMM(dev);
+-    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+-    uint64_t align = TARGET_PAGE_SIZE;
+     bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+ 
+-
+-    if (memory_region_get_alignment(mr) &&
+-        mc->memory_device_align != MEMORY_DEVICE_ALIGN_PAGE) {
+-        align = memory_region_get_alignment(mr);
+-    }
+-
+-    pc_dimm_plug(dev, MACHINE(pcms), align, &local_err);
++    pc_dimm_plug(dev, MACHINE(pcms), &local_err);
+     if (local_err) {
+         goto out;
+     }
+diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
+index 10be4df2a2..f519441091 100644
+--- a/hw/mem/Makefile.objs
++++ b/hw/mem/Makefile.objs
+@@ -1,3 +1,3 @@
+ common-obj-$(CONFIG_MEM_HOTPLUG) += pc-dimm.o
+-common-obj-$(CONFIG_MEM_HOTPLUG) += memory-device.o
++obj-$(CONFIG_MEM_HOTPLUG) += memory-device.o
+ common-obj-$(CONFIG_NVDIMM) += nvdimm.o
+diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+index 6de4f70bb4..968c64be97 100644
+--- a/hw/mem/memory-device.c
++++ b/hw/mem/memory-device.c
+@@ -249,6 +249,31 @@ uint64_t get_plugged_memory_size(void)
+     return size;
+ }
+ 
++uint64_t memory_device_get_align(MachineState *ms, MemoryRegion *mr) {
++    const MachineClass *mc = MACHINE_GET_CLASS(ms);
++    uint64_t align;
++
++    /* use the configured memory device alignment (compat handling) */
++    switch (mc->memory_device_align) {
++    case MEMORY_DEVICE_ALIGN_REGION:
++        align = memory_region_get_alignment(mr);;
++        break;
++    case MEMORY_DEVICE_ALIGN_PAGE:
++        align = TARGET_PAGE_SIZE;
++        break;
++    case MEMORY_DEVICE_ALIGN_REGION_OR_PAGE:
++        align = memory_region_get_alignment(mr);
++        if (!align) {
++            align = TARGET_PAGE_SIZE;
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++    return align;
++}
++
+ void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
+                                uint64_t addr)
+ {
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index e56c4daef2..9198104d34 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -47,14 +47,14 @@ out:
+     error_propagate(errp, local_err);
+ }
+ 
+-void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+-                  Error **errp)
++void pc_dimm_plug(DeviceState *dev, MachineState *machine, Error **errp)
+ {
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
+                                                               &error_abort);
+     MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
++    const uint64_t align = memory_device_get_align(machine, mr);
+     Error *local_err = NULL;
+     uint64_t addr;
+ 
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 9da233588b..03752c6aaf 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3143,13 +3143,12 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
      PCDIMMDevice *dimm = PC_DIMM(dev);
      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
      MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
-     uint64_t align = TARGET_PAGE_SIZE;
-     bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+-    uint64_t align, size, addr;
++    uint64_t size, addr;
+     uint32_t node;
  
--    if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
-+
-+    if (memory_region_get_alignment(mr) &&
-+        mc->memory_device_align != MEMORY_DEVICE_ALIGN_PAGE) {
-         align = memory_region_get_alignment(mr);
+-    align = memory_region_get_alignment(mr);
+     size = memory_region_size(mr);
+ 
+-    pc_dimm_plug(dev, MACHINE(ms), align, &local_err);
++    pc_dimm_plug(dev, MACHINE(ms), &local_err);
+     if (local_err) {
+         goto out;
      }
+diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
+index 2853b084b5..32cd15a0cb 100644
+--- a/include/hw/mem/memory-device.h
++++ b/include/hw/mem/memory-device.h
+@@ -44,6 +44,7 @@ uint64_t get_plugged_memory_size(void);
+ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+                                      uint64_t align, uint64_t size,
+                                      Error **errp);
++uint64_t memory_device_get_align(MachineState *ms, MemoryRegion *mr);
+ void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
+                                uint64_t addr);
+ void memory_device_unplug_region(MachineState *ms, MemoryRegion *mr);
+diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+index 7b120416d1..ba9f7e7146 100644
+--- a/include/hw/mem/pc-dimm.h
++++ b/include/hw/mem/pc-dimm.h
+@@ -80,7 +80,6 @@ typedef struct PCDIMMDeviceClass {
+ } PCDIMMDeviceClass;
  
-@@ -2374,7 +2375,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     pcmc->gigabyte_align = true;
-     pcmc->has_reserved_memory = true;
-     pcmc->kvmclock_enabled = true;
--    pcmc->enforce_aligned_dimm = true;
-     /* BIOS ACPI tables: 128K. Other BIOS datastructures: less than 4K reported
-      * to be used at the moment, 32K should be enough for a while.  */
-     pcmc->acpi_data_size = 0x20000 + 0x8000;
-@@ -2398,6 +2398,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     hc->unplug = pc_machine_device_unplug_cb;
-     nc->nmi_monitor_handler = x86_nmi;
-     mc->default_cpu_type = TARGET_DEFAULT_CPU_TYPE;
-+    mc->memory_device_align = MEMORY_DEVICE_ALIGN_REGION_OR_PAGE;
- 
-     object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int",
-         pc_machine_get_device_memory_region_size, NULL,
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 3b87f3cedb..cc11856c24 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -566,7 +566,7 @@ static void pc_i440fx_2_1_machine_options(MachineClass *m)
-     m->default_display = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_1);
-     pcmc->smbios_uuid_encoded = false;
--    pcmc->enforce_aligned_dimm = false;
-+    m->memory_device_align = MEMORY_DEVICE_ALIGN_PAGE;
- }
- 
- DEFINE_I440FX_MACHINE(v2_1, "pc-i440fx-2.1", pc_compat_2_1,
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index ef7457f5dd..3f151207c1 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -105,6 +105,15 @@ typedef struct {
-     CPUArchId cpus[0];
- } CPUArchIdList;
- 
-+typedef enum MemoryDeviceAlign {
-+    /* use specified memory region alignment */
-+    MEMORY_DEVICE_ALIGN_REGION = 0,
-+    /* use target page size as alignment */
-+    MEMORY_DEVICE_ALIGN_PAGE,
-+    /* use target page size if no memory region alignment has been specified */
-+    MEMORY_DEVICE_ALIGN_REGION_OR_PAGE,
-+} MemoryDeviceAlign;
-+
- /**
-  * MachineClass:
-  * @max_cpus: maximum number of CPUs supported. Default: 1
-@@ -156,6 +165,9 @@ typedef struct {
-  *    should instead use "unimplemented-device" for all memory ranges where
-  *    the guest will attempt to probe for a device that QEMU doesn't
-  *    implement and a stub device is required.
-+ * @memory_device_align: The alignment that will be used as default when
-+ *    searching for a guest physical memory address while plugging a
-+ *    memory device. This is relevant for compatibility handling.
-  */
- struct MachineClass {
-     /*< private >*/
-@@ -202,6 +214,7 @@ struct MachineClass {
-     const char **valid_cpu_types;
-     strList *allowed_dynamic_sysbus_devices;
-     bool auto_enable_numa_with_memhp;
-+    MemoryDeviceAlign memory_device_align;
-     void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
-                                  int nb_nodes, ram_addr_t size);
- 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index fc8dedca12..ffb4654fc8 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -86,8 +86,6 @@ struct PCMachineState {
-  *
-  * Compat fields:
-  *
-- * @enforce_aligned_dimm: check that DIMM's address/size is aligned by
-- *                        backend's alignment value if provided
-  * @acpi_data_size: Size of the chunk of memory at the top of RAM
-  *                  for the BIOS ACPI tables and other BIOS
-  *                  datastructures.
-@@ -124,7 +122,6 @@ struct PCMachineClass {
-     /* RAM / address space compat: */
-     bool gigabyte_align;
-     bool has_reserved_memory;
--    bool enforce_aligned_dimm;
-     bool broken_reserved_end;
- 
-     /* TSC rate migration: */
+ void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp);
+-void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+-                  Error **errp);
++void pc_dimm_plug(DeviceState *dev, MachineState *machine, Error **errp);
+ void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
+ #endif
 -- 
 2.17.1
