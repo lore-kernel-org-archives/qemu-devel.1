@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fV1La-0003VH-Qa
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 17:06:00 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fV1WR-0005Q6-2q
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 17:17:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fV1LX-0007Mv-Ix
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 17:05:58 -0400
-Resent-Message-Id: <E1fV1LX-0007Mv-Ix@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21043)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fV1LX-0007M2-BR
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 17:05:55 -0400
-In-Reply-To: <20180618184046.6270-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152935592362.768.12722466368956355495@d39dc562802a>
+	(envelope-from <ehabkost@redhat.com>) id 1fV1WN-0005Pn-Qn
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 17:17:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54466)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fV1WN-0005Pe-H6
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 17:17:07 -0400
+Date: Mon, 18 Jun 2018 18:17:04 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180618211704.GM7451@localhost.localdomain>
+References: <20180615220205.6929-1-tamiko@43-1.org>
+	<20180615220205.6929-2-tamiko@43-1.org>
+	<87muvssm2t.fsf@dusky.pond.sub.org>
+	<20180618160430.GG7451@localhost.localdomain>
+	<87y3fc6kvh.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 18 Jun 2018 14:05:24 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 00/22] target/openrisc improvements
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87y3fc6kvh.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] qapi: open files in binary mode and
+ use explicit decoding/encoding in common.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,109 +31,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, shorne@gmail.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Matthias Maier <tamiko@43-1.org>, qemu-devel@nongnu.org, Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjE4MTg0MDQ2LjYyNzAtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
-b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMjJdIHRhcmdldC9vcGVucmlz
-YyBpbXByb3ZlbWVudHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJB
-U0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZh
-aWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0
-aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRC
-QVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRu
-LyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQg
-c2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJh
-Y2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgo
-bisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
-ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9n
-aXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAg
-IHBhdGNoZXcvMjAxODA2MTgxODQwNDYuNjI3MC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5v
-cmcgLT4gcGF0Y2hldy8yMDE4MDYxODE4NDA0Ni42MjcwLTEtcmljaGFyZC5oZW5kZXJzb25AbGlu
-YXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmY5NTc0YzliYmEgbGludXgt
-dXNlcjogRml4IHN0cnVjdCBzaWdhbHRzdGFjayBmb3Igb3BlbnJpc2MKOTFhYjg2MjI1ZiBsaW51
-eC11c2VyOiBJbXBsZW1lbnQgc2lnbmFscyBmb3Igb3BlbnJpc2MKNDEzOWU3NGRjMiB0YXJnZXQv
-b3BlbnJpc2M6IEFkZCBzdXBwb3J0IGluIHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaApkZmZl
-YzQ2YzM2IHRhcmdldC9vcGVucmlzYzogQWRkIHByaW50X2luc25fb3IxawpkOWRiZDkxYTVkIHRh
-cmdldC9vcGVucmlzYzogUmVvcmcgdGxiIGxvb2t1cAowZmY2NWU5YmM0IHRhcmdldC9vcGVucmlz
-YzogSW5jcmVhc2UgdGhlIFRMQiBzaXplCjU1NjdmMGQyZWEgdGFyZ2V0L29wZW5yaXNjOiBMb2cg
-aW50ZXJydXB0cwozOWY4NGQzNjFlIHRhcmdldC9vcGVucmlzYzogU3R1YiBvdXQgaGFuZGxlX21t
-dV9mYXVsdCBmb3Igc29mdG1tdQozNzExMmI2YTk0IHRhcmdldC9vcGVucmlzYzogVXNlIGlkZW50
-aWNhbCBzaXplcyBmb3IgSVRMQiBhbmQgRFRMQgoxYTkwZjUyNDY0IHRhcmdldC9vcGVucmlzYzog
-Rml4IGNwdV9tbXVfaW5kZXgKNTRjNmE4YmNjNSB0YXJnZXQvb3BlbnJpc2M6IEZpeCB0bGIgZmx1
-c2hpbmcgaW4gbXRzcHIKOTIyN2Y2ZDNlYyB0YXJnZXQvb3BlbnJpc2M6IFJlZHVjZSB0bGIgdG8g
-YSBzaW5nbGUgZGltZW5zaW9uCmVhNzI3MzdlNDcgdGFyZ2V0L29wZW5yaXNjOiBNZXJnZSBtbXVf
-aGVscGVyLmMgaW50byBtbXUuYwozNmQyYzE5ZGQwIHRhcmdldC9vcGVucmlzYzogUmVtb3ZlIGlu
-ZGlyZWN0IGZ1bmN0aW9uIGNhbGxzIGZvciBtbXUKZWUxN2IzMmM0YSB0YXJnZXQvb3BlbnJpc2M6
-IE1lcmdlIHRsYiBhbGxvY2F0aW9uIGludG8gQ1BVT3BlblJJU0NTdGF0ZQoxMDMwNTg0ZTU3IHRh
-cmdldC9vcGVucmlzYzogRm9ybSB0aGUgc3ByIGluZGV4IGZyb20gdGNnCjc2NzZkMjY5MjYgdGFy
-Z2V0L29wZW5yaXNjOiBFeGl0IHRoZSBUQiBhZnRlciBsLm10c3ByCmI2OWUxYmMzNDcgdGFyZ2V0
-L29wZW5yaXNjOiBTcGxpdCBvdXQgaXNfdXNlcgo5YTZkYjg5NTA1IHRhcmdldC9vcGVucmlzYzog
-TGluayBtb3JlIHRyYW5zbGF0aW9uIGJsb2NrcwplYTllNTI5MDY4IHRhcmdldC9vcGVucmlzYzog
-Rml4IHNpbmdsZXN0ZXBfZW5hYmxlZAowZDU0NWVkZDY1IHRhcmdldC9vcGVucmlzYzogVXNlIGV4
-aXRfdGIgaW5zdGVhZCBvZiBDUFVfSU5URVJSVVBUX0VYSVRUQgoxOTcxNGU2NjUzIHRhcmdldC9v
-cGVucmlzYzogUmVtb3ZlIERJU0FTX0pVTVAgJiBESVNBU19UQl9KVU1QCgo9PT0gT1VUUFVUIEJF
-R0lOID09PQpDaGVja2luZyBQQVRDSCAxLzIyOiB0YXJnZXQvb3BlbnJpc2M6IFJlbW92ZSBESVNB
-U19KVU1QICYgRElTQVNfVEJfSlVNUC4uLgpDaGVja2luZyBQQVRDSCAyLzIyOiB0YXJnZXQvb3Bl
-bnJpc2M6IFVzZSBleGl0X3RiIGluc3RlYWQgb2YgQ1BVX0lOVEVSUlVQVF9FWElUVEIuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMy8yMjogdGFyZ2V0L29wZW5yaXNjOiBGaXggc2luZ2xlc3RlcF9lbmFibGVk
-Li4uCkNoZWNraW5nIFBBVENIIDQvMjI6IHRhcmdldC9vcGVucmlzYzogTGluayBtb3JlIHRyYW5z
-bGF0aW9uIGJsb2Nrcy4uLgpDaGVja2luZyBQQVRDSCA1LzIyOiB0YXJnZXQvb3BlbnJpc2M6IFNw
-bGl0IG91dCBpc191c2VyLi4uCkNoZWNraW5nIFBBVENIIDYvMjI6IHRhcmdldC9vcGVucmlzYzog
-RXhpdCB0aGUgVEIgYWZ0ZXIgbC5tdHNwci4uLgpDaGVja2luZyBQQVRDSCA3LzIyOiB0YXJnZXQv
-b3BlbnJpc2M6IEZvcm0gdGhlIHNwciBpbmRleCBmcm9tIHRjZy4uLgpDaGVja2luZyBQQVRDSCA4
-LzIyOiB0YXJnZXQvb3BlbnJpc2M6IE1lcmdlIHRsYiBhbGxvY2F0aW9uIGludG8gQ1BVT3BlblJJ
-U0NTdGF0ZS4uLgpDaGVja2luZyBQQVRDSCA5LzIyOiB0YXJnZXQvb3BlbnJpc2M6IFJlbW92ZSBp
-bmRpcmVjdCBmdW5jdGlvbiBjYWxscyBmb3IgbW11Li4uCkNoZWNraW5nIFBBVENIIDEwLzIyOiB0
-YXJnZXQvb3BlbnJpc2M6IE1lcmdlIG1tdV9oZWxwZXIuYyBpbnRvIG1tdS5jLi4uCldBUk5JTkc6
-IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1
-cGRhdGluZz8KIzQ5OiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMs
-IDEgd2FybmluZ3MsIDIzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjI6IHRhcmdldC9vcGVucmlzYzogUmVkdWNl
-IHRsYiB0byBhIHNpbmdsZSBkaW1lbnNpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjI6IHRhcmdl
-dC9vcGVucmlzYzogRml4IHRsYiBmbHVzaGluZyBpbiBtdHNwci4uLgpDaGVja2luZyBQQVRDSCAx
-My8yMjogdGFyZ2V0L29wZW5yaXNjOiBGaXggY3B1X21tdV9pbmRleC4uLgpDaGVja2luZyBQQVRD
-SCAxNC8yMjogdGFyZ2V0L29wZW5yaXNjOiBVc2UgaWRlbnRpY2FsIHNpemVzIGZvciBJVExCIGFu
-ZCBEVExCLi4uCkNoZWNraW5nIFBBVENIIDE1LzIyOiB0YXJnZXQvb3BlbnJpc2M6IFN0dWIgb3V0
-IGhhbmRsZV9tbXVfZmF1bHQgZm9yIHNvZnRtbXUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMjI6IHRh
-cmdldC9vcGVucmlzYzogTG9nIGludGVycnVwdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTcvMjI6IHRh
-cmdldC9vcGVucmlzYzogSW5jcmVhc2UgdGhlIFRMQiBzaXplLi4uCkNoZWNraW5nIFBBVENIIDE4
-LzIyOiB0YXJnZXQvb3BlbnJpc2M6IFJlb3JnIHRsYiBsb29rdXAuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTkvMjI6IHRhcmdldC9vcGVucmlzYzogQWRkIHByaW50X2luc25fb3Ixay4uLgpXQVJOSU5HOiBh
-ZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBk
-YXRpbmc/CiM2NTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogTWFjcm9zIHdpdGggY29t
-cGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMxMDA6IEZJTEU6
-IHRhcmdldC9vcGVucmlzYy9kaXNhcy5jOjMxOgorI2RlZmluZSBvdXRwdXQobW5lbW9uaWMsIGZv
-cm1hdCwgLi4uKSBcCisgICAgaW5mby0+ZnByaW50Zl9mdW5jKGluZm8tPnN0cmVhbSwgIiUtOXMg
-IiBmb3JtYXQsIFwKKyAgICAgICAgICAgICAgICAgICAgICAgbW5lbW9uaWMsICMjX19WQV9BUkdT
-X18pCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzEy
-NTogRklMRTogdGFyZ2V0L29wZW5yaXNjL2Rpc2FzLmM6NTY6CisgICAgYXJnX2xfIyNvcGNvZGUg
-KmEsIHVpbnQzMl90IGluc24pICAgICAgICAgICAgICAgICAgIFwKICAgICAgICAgICAgICAgICAg
-ICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzIy
-MDogRklMRTogdGFyZ2V0L29wZW5yaXNjL2Rpc2FzLmM6MTUxOgorICAgIGFyZ19sZl8jI29wY29k
-ZSMjXyMjc3VmZml4ICphLCB1aW50MzJfdCBpbnNuKSAgICAgICAgICAgICAgICBcCiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDMgZXJyb3JzLCAxIHdhcm5pbmdzLCA5
-MjMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoK
-Q2hlY2tpbmcgUEFUQ0ggMjAvMjI6IHRhcmdldC9vcGVucmlzYzogQWRkIHN1cHBvcnQgaW4gc2Ny
-aXB0cy9xZW11LWJpbmZtdC1jb25mLnNoLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiMzMTogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjEyNzoKK29yMWtfbWFn
-aWM9J1x4N2ZFTEZceDAxXHgwMlx4MDFceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4
-MDBceDAwXHgwMlx4MDBceDVjJwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzMjog
-RklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoOjEyODoKK29yMWtfbWFzaz0nXHhmZlx4
-ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4MDBceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhm
-Zlx4ZmZceGZlXHhmZlx4ZmYnCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDIzIGxpbmVz
-IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
-IFBBVENIIDIxLzIyOiBsaW51eC11c2VyOiBJbXBsZW1lbnQgc2lnbmFscyBmb3Igb3BlbnJpc2Mu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMjIvMjI6IGxpbnV4LXVzZXI6IEZpeCBzdHJ1Y3Qgc2lnYWx0c3Rh
-Y2sgZm9yIG9wZW5yaXNjLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Mon, Jun 18, 2018 at 07:54:26PM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+> > On Mon, Jun 18, 2018 at 07:25:14AM +0200, Markus Armbruster wrote:
+> >> Matthias Maier <tamiko@43-1.org> writes:
+> >> 
+> >> > This is a different approach to fix the locale dependent encode/decode
+> >> > problem in common.py utilizing the binary read/write mode [1,2], and (if
+> >> > a python 3 interpreter is used) with explicit decode/encode arguments
+> >> > [3].
+> >> 
+> >> Why can't we simply pass encoding='utf-8' to open()?
+> >
+> > This wouldn't work in Python 2.7 (where the `open()` builtin
+> > doesn't support the `encoding` parameter).
+> >
+> > io.open(..., encoding='utf-8') should work, though.
+> 
+> This falls apart because then f.read() returns objects of type 'unicode'
+> in Python 2, breaking isinstance(..., str) predicates in several places.
+
+If the existing code already works with Python 3, we can import
+Python 3 string semantics in Python 2.7 so we have just one
+string API to care about.
+
+This should do it:
+
+  from __future__ import unicode_literals
+  from builtins import str
+  from builtins import open
+
+We also need a small fixup to the argparse parameters to ensure
+they are of the Python3-like str type instead of the Python 2.7
+str type.
+
+Full patch below.
+
+After this patch, we should be able to unconditionally call
+open(..., encoding='utf-8') or .read().decode('utf-8'), without
+any Python version checks.
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+index 3d98ca2e0c..a0dbc4c913 100755
+--- a/scripts/qapi-gen.py
++++ b/scripts/qapi-gen.py
+@@ -5,6 +5,8 @@
+ # See the COPYING file in the top-level directory.
+ 
+ from __future__ import print_function
++from __future__ import unicode_literals
++from builtins import str
+ import argparse
+ import re
+ import sys
+@@ -23,13 +25,13 @@ def main(argv):
+     parser.add_argument('-b', '--builtins', action='store_true',
+                         help="generate code for built-in types")
+     parser.add_argument('-o', '--output-dir', action='store', default='',
+-                        help="write output to directory OUTPUT_DIR")
++                        type=str, help="write output to directory OUTPUT_DIR")
+     parser.add_argument('-p', '--prefix', action='store', default='',
+-                        help="prefix for symbols")
++                        type=str, help="prefix for symbols")
+     parser.add_argument('-u', '--unmask-non-abi-names', action='store_true',
+                         dest='unmask',
+                         help="expose non-ABI names in introspection")
+-    parser.add_argument('schema', action='store')
++    parser.add_argument('schema', action='store', type=str)
+     args = parser.parse_args()
+ 
+     match = re.match(r'([A-Za-z_.-][A-Za-z0-9_.-]*)?', args.prefix)
+diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+index 3b0867c14f..df69481a4b 100644
+--- a/scripts/qapi/commands.py
++++ b/scripts/qapi/commands.py
+@@ -13,6 +13,7 @@ This work is licensed under the terms of the GNU GPL, version 2.
+ See the COPYING file in the top-level directory.
+ """
+ 
++from __future__ import unicode_literals
+ from qapi.common import *
+ 
+ 
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 2462fc0291..7ff5d1bbdd 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -12,6 +12,9 @@
+ # See the COPYING file in the top-level directory.
+ 
+ from __future__ import print_function
++from __future__ import unicode_literals
++from builtins import str
++from builtins import open
+ import errno
+ import os
+ import re
+diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+index b5630844f9..d223d5cf46 100644
+--- a/scripts/qapi/doc.py
++++ b/scripts/qapi/doc.py
+@@ -6,6 +6,7 @@
+ """This script produces the documentation of a qapi schema in texinfo format"""
+ 
+ from __future__ import print_function
++from __future__ import unicode_literals
+ import re
+ import qapi.common
+ 
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index 4426861ff1..a58d557ccd 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -12,6 +12,7 @@ This work is licensed under the terms of the GNU GPL, version 2.
+ See the COPYING file in the top-level directory.
+ """
+ 
++from __future__ import unicode_literals
+ from qapi.common import *
+ 
+ 
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index 5b6c72c7b2..4a582d3a5d 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -10,6 +10,8 @@ This work is licensed under the terms of the GNU GPL, version 2.
+ See the COPYING file in the top-level directory.
+ """
+ 
++from __future__ import unicode_literals
++from builtins import str
+ from qapi.common import *
+ 
+ 
+diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
+index 64d9c0fb37..a530838f97 100644
+--- a/scripts/qapi/types.py
++++ b/scripts/qapi/types.py
+@@ -13,6 +13,7 @@ This work is licensed under the terms of the GNU GPL, version 2.
+ # See the COPYING file in the top-level directory.
+ """
+ 
++from __future__ import unicode_literals
+ from qapi.common import *
+ 
+ 
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index 5d72d8936c..a6479fa4fa 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -13,6 +13,7 @@ This work is licensed under the terms of the GNU GPL, version 2.
+ See the COPYING file in the top-level directory.
+ """
+ 
++from __future__ import unicode_literals
+ from qapi.common import *
+ 
+ 
+-- 
+Eduardo
