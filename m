@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suratiamol@gmail.com>) id 1fUyrI-0000sB-7A
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:26:33 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fUyuq-0001p9-GO
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:30:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suratiamol@gmail.com>) id 1fUyrE-0003HS-4q
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:26:32 -0400
-From: Amol Surati <suratiamol@gmail.com>
-Date: Mon, 18 Jun 2018 23:54:53 +0530
-Message-ID: <20180618182451.GA3610@arch>
-References: <20180617183515.3982-1-suratiamol@gmail.com>
-	<20180617183515.3982-2-suratiamol@gmail.com>
-	<20180618180254.GA2441@arch>
-	<7b876b98-527d-f158-441b-5004b6bcd3a9@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7b876b98-527d-f158-441b-5004b6bcd3a9@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 1/1] ide: bug #1777315: io_buffer_size and
- sg.size can represent partial sector sizes
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fUyum-0005xu-Hk
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:30:12 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:38573 helo=mail.rt-rk.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+	id 1fUyum-0005SG-AN
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:30:08 -0400
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Date: Mon, 18 Jun 2018 20:29:40 +0200
+Message-Id: <1529346580-25537-1-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: update target-mips maintainers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +22,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Amol Surati <suratiamol@gmail.com>, qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, aurelien@aurel32.net, yongbok.kim@mips.com, rich.fuhler@mips.com, petar.jovanovic@mips.com, aleksandar.markovic@mips.com
 
-On Mon, Jun 18, 2018 at 02:13:52PM -0400, John Snow wrote:
-> 
-> On 06/18/2018 02:02 PM, Amol Surati wrote:
-> > On Mon, Jun 18, 2018 at 12:05:15AM +0530, Amol Surati wrote:
-> >> This patch fixes the assumption that io_buffer_size is always a perfect
-> >> multiple of the sector size. The assumption is the cause of the firing
-> >> of 'assert(n * 512 == s->sg.size);'.
-> >>
-> >> Signed-off-by: Amol Surati <suratiamol@gmail.com>
-> >> ---
-> > 
-> > The repository https://github.com/asurati/1777315 contains a module for
-> > QEMU's 8086:7010 ATA controller, which exercises the code path
-> > described in [RFC 0/1] of this series.
-> > 
-> > Loading the module reproduces the bug. Tested on the latest master
-> > branch.
-> > 
-> > Steps:
-. . .
-. . .
+From: Aleksandar Markovic <aleksandar.markovic@mips.com>
 
-> Are you the original reporter as well?
+Yongbok Kim transfers duties of QEMU for target MIPS maintainer to
+myself as he leaves MIPS. Many thanks to Yongbok for his substantial
+contributing to QEMU for MIPS over many years and taking care of its
+maintainance for almost two years.
 
-I am not the original reporter.
+Signed-off-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
+---
+ MAINTAINERS | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> I'm looking at the patch and the reproducer now, thanks.
-> 
-> --js
-
-
-
--Amol
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0fb5f38..b81a93b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -185,7 +185,7 @@ F: disas/microblaze.c
+ 
+ MIPS
+ M: Aurelien Jarno <aurelien@aurel32.net>
+-M: Yongbok Kim <yongbok.kim@mips.com>
++M: Aleksandar Markovic <aleksandar.markovic@mips.com>
+ S: Maintained
+ F: target/mips/
+ F: hw/mips/
+@@ -696,7 +696,7 @@ S: Maintained
+ F: hw/mips/mips_malta.c
+ 
+ Mipssim
+-M: Yongbok Kim <yongbok.kim@mips.com>
++M: Aleksandar Markovic <aleksandar.markovic@mips.com>
+ S: Odd Fixes
+ F: hw/mips/mips_mipssim.c
+ F: hw/net/mipsnet.c
+@@ -707,7 +707,7 @@ S: Maintained
+ F: hw/mips/mips_r4k.c
+ 
+ Fulong 2E
+-M: Yongbok Kim <yongbok.kim@mips.com>
++M: Aleksandar Markovic <aleksandar.markovic@mips.com>
+ S: Odd Fixes
+ F: hw/mips/mips_fulong2e.c
+ F: hw/isa/vt82c686.c
+-- 
+2.7.4
