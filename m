@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41192)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUnlz-0008Lu-78
+	(envelope-from <dgibson@ozlabs.org>) id 1fUnlz-0008Lx-GE
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:36:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUnly-0001Np-7r
+	(envelope-from <dgibson@ozlabs.org>) id 1fUnly-0001O2-8O
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:36:19 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 18 Jun 2018 16:35:57 +1000
-Message-Id: <20180618063606.2513-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 0/9] spapr: Clean up pagesize handling
+Date: Mon, 18 Jun 2018 16:36:01 +1000
+Message-Id: <20180618063606.2513-5-david@gibson.dropbear.id.au>
+In-Reply-To: <20180618063606.2513-1-david@gibson.dropbear.id.au>
+References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PATCH 4/9] target/ppc: Add
+ kvmppc_hpt_needs_host_contiguous_pages() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,66 +23,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, abologna@redhat.com
 Cc: clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-Currently the "pseries" machine type will (usually) advertise
-different pagesizes to the guest when running under KVM and TCG, which
-is not how things are supposed to work.
+KVM HV has a restriction that for HPT mode guests, guest pages must be hpa
+contiguous as well as gpa contiguous.  We have to account for that in
+various places.  We determine whether we're subject to this restriction
+from the SMMU information exposed by KVM.
 
-This comes from poor handling of hardware limitations which mean that
-under KVM HV the guest is unable to use pagesizes larger than those
-backing the guest's RAM on the host side.
+Planned cleanups to the way we handle this will require knowing whether
+this restriction is in play in wider parts of the code.  So, expose a
+helper function which returns it.
 
-The new scheme turns things around by having an explicit machine
-parameter controlling the largest page size that the guest is allowed
-to use.  This limitation applies regardless of accelerator.  When
-we're running on KVM HV we ensure that our backing pages are adequate
-to supply the requested guest page sizes, rather than adjusting the
-guest page sizes based on what KVM can supply.
+This does mean some redundant calls to kvm_get_smmu_info(), but they'll go
+away again with future cleanups.
 
-This means that in order to use hugepages in a PAPR guest it's
-necessary to add a "cap-hpt-max-page-size=16m" machine parameter as
-well as setting the mem-path correctly.  This is a bit more work on
-the user and/or management side, but results in consistent behaviour
-so I think it's worth it.
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ target/ppc/kvm.c     | 17 +++++++++++++++--
+ target/ppc/kvm_ppc.h |  6 ++++++
+ 2 files changed, 21 insertions(+), 2 deletions(-)
 
-Longer term, we might also use this parameter to control IOMMU page
-sizes.  But, I'm still working out how restrictions deriving from the
-guest kernel, host kernel and hardware capabilities all interact here.
-
-This applies on top of my ppc-for-3.0 tree.
-
-Changes since RFC:
- * Add preliminary cleanups to allow us to evaluate effective
-   capabilities levels earlier.
- * Don't try to remove double resetting of cpus.  It doesn't quite
-   work, and is no longer necessary with the above.
- * Some user-friendliness improvements: use "hpt-max-page-size"
-   instead of the cryptic "hpt-mps", and take an actual page size
-   (allowing k/m/g suffixies) instead of a shift
-
-David Gibson (9):
-  target/ppc: Allow cpu compatiblity checks based on type, not instance
-  spapr: Compute effective capability values earlier
-  spapr: Add cpu_apply hook to capabilities
-  target/ppc: Add kvmppc_hpt_needs_host_contiguous_pages() helper
-  spapr: Maximum (HPT) pagesize property
-  spapr: Use maximum page size capability to simplify memory backend
-    checking
-  target/ppc: Add ppc_hash64_filter_pagesizes()
-  spapr: Limit available pagesizes to provide a consistent guest
-    environment
-  spapr: Don't rewrite mmu capabilities in KVM mode
-
- hw/ppc/spapr.c          |  45 +++++++-----
- hw/ppc/spapr_caps.c     | 156 ++++++++++++++++++++++++++++++++++++----
- hw/ppc/spapr_cpu_core.c |   4 ++
- include/hw/ppc/spapr.h  |  11 ++-
- target/ppc/compat.c     |  27 +++++--
- target/ppc/cpu.h        |   4 ++
- target/ppc/kvm.c        | 146 ++++++++++++++++++-------------------
- target/ppc/kvm_ppc.h    |  11 ++-
- target/ppc/mmu-hash64.c |  59 +++++++++++++++
- target/ppc/mmu-hash64.h |   3 +
- 10 files changed, 349 insertions(+), 117 deletions(-)
-
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 5c0e313ca6..50b5d01432 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -406,9 +406,22 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
+     }
+ }
+ 
++bool kvmppc_hpt_needs_host_contiguous_pages(void)
++{
++    PowerPCCPU *cpu = POWERPC_CPU(first_cpu);
++    static struct kvm_ppc_smmu_info smmu_info;
++
++    if (!kvm_enabled()) {
++        return false;
++    }
++
++    kvm_get_smmu_info(cpu, &smmu_info);
++    return !!(smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL);
++}
++
+ static bool kvm_valid_page_size(uint32_t flags, long rampgsize, uint32_t shift)
+ {
+-    if (!(flags & KVM_PPC_PAGE_SIZES_REAL)) {
++    if (!kvmppc_hpt_needs_host_contiguous_pages()) {
+         return true;
+     }
+ 
+@@ -445,7 +458,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+     /* If we have HV KVM, we need to forbid CI large pages if our
+      * host page size is smaller than 64K.
+      */
+-    if (smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL) {
++    if (kvmppc_hpt_needs_host_contiguous_pages()) {
+         if (getpagesize() >= 0x10000) {
+             cpu->hash64_opts->flags |= PPC_HASH64_CI_LARGEPAGE;
+         } else {
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index e2840e1d33..a7ddb8a5d6 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -70,6 +70,7 @@ int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
+ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
+ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
+ 
++bool kvmppc_hpt_needs_host_contiguous_pages(void);
+ bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
+ 
+ #else
+@@ -222,6 +223,11 @@ static inline uint64_t kvmppc_rma_size(uint64_t current_size,
+     return ram_size;
+ }
+ 
++static inline bool kvmppc_hpt_needs_host_contiguous_pages(void)
++{
++    return false;
++}
++
+ static inline bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+ {
+     return true;
 -- 
 2.17.1
