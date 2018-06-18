@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fUvkQ-0005EA-5T
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:07:15 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fUvl8-0005mV-81
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fUvkM-00070M-Tv
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:07:14 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180618143801.GC4667@localhost.localdomain>
-References: <cover.1528991017.git.berto@igalia.com>
-	<6782db91216488e4fc1509a267a362a3f15a1aaa.1528991017.git.berto@igalia.com>
-	<20180618143801.GC4667@localhost.localdomain>
-Date: Mon, 18 Jun 2018 17:06:32 +0200
-Message-ID: <w51in6gp213.fsf@maestria.local.igalia.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fUvl5-0007TZ-1l
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:07:58 -0400
+Received: from mail-qk0-x236.google.com ([2607:f8b0:400d:c09::236]:36317)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fUvl4-0007TO-Sk
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:07:54 -0400
+Received: by mail-qk0-x236.google.com with SMTP id a195-v6so9532324qkg.3
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 08:07:54 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180615194705.28019-1-alex.bennee@linaro.org>
+	<20180615194705.28019-53-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f61c7358-c446-a2cb-daf7-5d873d468f85@amsat.org>
+Date: Mon, 18 Jun 2018 12:07:49 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH 06/10] block: Allow changing the
- backing file on reopen
+In-Reply-To: <20180615194705.28019-53-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 52/54] docker: docker.py adding age
+ check command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,105 +36,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org
 
-On Mon 18 Jun 2018 04:38:01 PM CEST, Kevin Wolf wrote:
-> Am 14.06.2018 um 17:49 hat Alberto Garcia geschrieben:
->> This patch allows the user to change the backing file of an image that
->> is being reopened. Here's what it does:
->> 
->>  - In bdrv_reopen_queue_child(): if the 'backing' option points to an
->>    image different from the current backing file then it means that
->>    the latter is going be detached so it must not be put in the reopen
->>    queue.
->> 
->>  - In bdrv_reopen_prepare(): check that the value of 'backing' points
->>    to an existing node or is null. If it points to an existing node it
->>    also needs to make sure that replacing the backing file will not
->>    create a cycle in the node graph (i.e. you cannot reach the parent
->>    from the new backing file).
->> 
->>  - In bdrv_reopen_commit(): perform the actual node replacement by
->>    calling bdrv_set_backing_hd(). It may happen that there are
->>    temporary implicit nodes between the BDS that we are reopening and
->>    the backing file that we want to replace (e.g. a commit fiter node),
->>    so we must skip them.
->
-> I think we shouldn't do this. blockdev-reopen is an advanced command
-> that requires knowledge of the graph at the node level. Therefore we can
-> expect the management tool to consider filter nodes when it reconfigures
-> the graph. This is important because it makes a difference whether a
-> new node is inserted above or below the filter node.
+On 06/15/2018 04:47 PM, Alex Bennée wrote:
+> This is useful for querying if an image is too old.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-But those nodes that the management tool knows about would not be
-implicit, or would they?
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-The reason why I did this is because there's several places in the QEMU
-codebase where bdrv_reopen() is called while there's a temporary
-implicit node. For example, on exit bdrv_commit() needs to call
-bdrv_set_backing_hd() to remove intermediate nodes from the chain. This
-happens while bdrv_mirror_top is still there, so if we don't skip it
-then QEMU crashes.
-
->> Although x-blockdev-reopen is meant to be used like blockdev-add,
->> there's two important things that must be taken into account:
->> 
->> 1) The only way to set a new backing file is by using a reference to
->>    an existing node (previously added with e.g. blockdev-add).
->>    If 'backing' contains a dictionary with a new set of options
->>    ({"driver": "qcow2", "file": { ... }}) then it is interpreted that
->>    the _existing_ backing file must be reopened with those options.
->
-> This sounds a bit odd at first, but it makes perfect sense in fact.
->
-> Maybe we should enforce that child nodes that were openend by reference
-> first must be reopened with a reference, and only those that were defined
-> inline (and therefore inherit options from the parent) can be reopened
-> inline?
-
-I think that should be doable, yes.
-
->> 2) If the 'backing' option is omitted altogether then the existing
->>    backing file (if any) is kept. Unlike blockdev-add this will _not_
->>    open the default backing file specified in the image header.
->
-> Hm... This is certainly an inconsistency. Is it unavoidable?
-
-I don't think we want to open new nodes on reopen(), but one easy way to
-avoid this behavior is simply to return an error if the user omits the
-'backing' option.
-
-But this raises a few questions. Let's say you have an image with a
-backing file and you open it with blockdev-add omitting the 'backing'
-option. That means the default backing file is opened.
-
-  - Do you still have to specify 'backing' on reopen? I suppose you
-    don't have to.
-
-  - If you don't have to, can QEMU tell if bs->backing is the original
-    backing file or a new one? I suppose it can, by checking for
-    'backing / backing.*' in bs->options.
-
-  - If you omit 'backing', does the backing file still get reopened? And
-    more importantly, does it keep its current options or are they
-    supposed to be reset to their default values?
-
->> +        /* If the 'backing' option is set and it points to a different
->> +         * node then it means that we want to replace the current one,
->> +         * so we shouldn't put it in the reopen queue */
->> +        if (child->role == &child_backing && qdict_haskey(options, "backing")) {
->
-> I think checking child->name for "backing" makes more sense when we
-> also look for the "backing" key in the options QDict. This would make
-> generalising it for other children easier (which we probably should
-> do, whether in this patch or a follow-up).
-
-Sounds reasonable.
-
-> Do we need some way for e.g. block jobs to forbid changing the backing
-> file of the subchain they are operating on?
-
-Are you thinking of any particular scenario?
-
-Berto
+> ---
+>  tests/docker/docker.py | 49 ++++++++++++++++++++++++++++++++----------
+>  1 file changed, 38 insertions(+), 11 deletions(-)
+> 
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index 3666197a16..ad0c47921a 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -29,6 +29,7 @@ from tarfile import TarFile, TarInfo
+>  from StringIO import StringIO
+>  from shutil import copy, rmtree
+>  from pwd import getpwuid
+> +from datetime import datetime,timedelta
+>  
+>  
+>  FILTERED_ENV_NAMES = ['ftp_proxy', 'http_proxy', 'https_proxy']
+> @@ -184,6 +185,10 @@ class Docker(object):
+>          labels = json.loads(resp)[0]["Config"].get("Labels", {})
+>          return labels.get("com.qemu.dockerfile-checksum", "")
+>  
+> +    def get_image_creation_time(self, tag):
+> +        resp = self._output(["inspect", tag])
+> +        return json.loads(resp)[0]["Created"]
+> +
+>      def build_image(self, tag, docker_dir, dockerfile,
+>                      quiet=True, user=False, argv=None, extra_files_cksum=[]):
+>          if argv == None:
+> @@ -450,21 +455,43 @@ class CheckCommand(SubCommand):
+>      def args(self, parser):
+>          parser.add_argument("tag",
+>                              help="Image Tag")
+> -        parser.add_argument("dockerfile",
+> -                            help="Dockerfile name")
+> +        parser.add_argument("dockerfile", default=None,
+> +                            help="Dockerfile name", nargs='?')
+> +        parser.add_argument("--checktype", choices=["checksum", "age"],
+> +                            default="checksum", help="check type")
+> +        parser.add_argument("--olderthan", default=60, type=int,
+> +                            help="number of minutes")
+>  
+>      def run(self, args, argv):
+> -        dockerfile = open(args.dockerfile, "rb").read()
+>          tag = args.tag
+> -
+>          dkr = Docker()
+> -        if dkr.image_matches_dockerfile(tag, dockerfile):
+> -            if not args.quiet:
+> -                print("Image is up to date.")
+> -            return 0
+> -        else:
+> -            print("Image needs updating")
+> -            return 1
+> +
+> +        if args.checktype == "checksum":
+> +            if not args.dockerfile:
+> +                print("Need a dockerfile for tag:%s" % (tag))
+> +                return 1
+> +
+> +            dockerfile = open(args.dockerfile, "rb").read()
+> +
+> +            if dkr.image_matches_dockerfile(tag, dockerfile):
+> +                if not args.quiet:
+> +                    print("Image is up to date")
+> +                return 0
+> +            else:
+> +                print("Image needs updating")
+> +                return 1
+> +        elif args.checktype == "age":
+> +            timestr = dkr.get_image_creation_time(tag).split(".")[0]
+> +            created = datetime.strptime(timestr, "%Y-%m-%dT%H:%M:%S")
+> +            past = datetime.now() - timedelta(minutes=args.olderthan)
+> +            if created < past:
+> +                print ("Image created @ %s more than %d minutes old" %
+> +                       (timestr, args.olderthan))
+> +                return 1
+> +            else:
+> +                if not args.quiet:
+> +                    print ("Image less than %d minutes old" % (args.olderthan))
+> +                return 0
+>  
+>  
+>  def main():
+> 
