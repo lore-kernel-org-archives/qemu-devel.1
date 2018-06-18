@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fUuPL-0000TB-SI
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:41:25 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fUubd-0002zP-Sj
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:54:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fUuPI-0000iy-NB
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:41:23 -0400
-Date: Mon, 18 Jun 2018 14:40:51 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180618134051.GH3589@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180615155103.11924-1-berrange@redhat.com>
-	<20180615155103.11924-4-berrange@redhat.com>
-	<20180615175423.GI2615@work-vm>
+	(envelope-from <stefanha@gmail.com>) id 1fUuba-000741-Si
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:54:05 -0400
+Date: Mon, 18 Jun 2018 14:53:59 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180618135359.GA29670@stefanha-x1.localdomain>
+References: <20180614164431.29305-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="1yeeQ81UyVL57Vl7"
 Content-Disposition: inline
-In-Reply-To: <20180615175423.GI2615@work-vm>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/6] migration: add support for a
- "tls-authz" migration parameter
+In-Reply-To: <20180614164431.29305-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] compiler: add a sizeof_field() macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,193 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org
 
-On Fri, Jun 15, 2018 at 06:54:23PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > From: "Daniel P. Berrange" <berrange@redhat.com>
-> >=20
-> > The QEMU instance that runs as the server for the migration data
-> > transport (ie the target QEMU) needs to be able to configure access
-> > control so it can prevent unauthorized clients initiating an incoming
-> > migration. This adds a new 'tls-authz' migration parameter that is us=
-ed
-> > to provide the QOM ID of a QAuthZ subclass instance that provides the
-> > access control check. This is checked against the x509 certificate
-> > obtained during the TLS handshake.
-> >=20
-> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
->=20
-> I'd appreciate an example of using it, either in the migration docs or
-> the commit message.
 
-Hmm, yes, it's an oversight to have missed an example in this commit
-message.
+--1yeeQ81UyVL57Vl7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Jun 14, 2018 at 05:44:31PM +0100, Stefan Hajnoczi wrote:
+> Determining the size of a field is useful when you don't have a struct
+> variable handy.  Open-coding this is ugly.
 >=20
-> > ---
-> >  hmp.c                 |  9 +++++++++
-> >  migration/migration.c |  8 ++++++++
-> >  migration/tls.c       |  2 +-
-> >  qapi/migration.json   | 12 +++++++++++-
-> >  4 files changed, 29 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/hmp.c b/hmp.c
-> > index 74e18db103..bef8ea2531 100644
-> > --- a/hmp.c
-> > +++ b/hmp.c
-> > @@ -370,6 +370,9 @@ void hmp_info_migrate_parameters(Monitor *mon, co=
-nst QDict *qdict)
-> >          monitor_printf(mon, "%s: %" PRIu64 "\n",
-> >              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_=
-SIZE),
-> >              params->xbzrle_cache_size);
-> > +        monitor_printf(mon, " %s: '%s'\n",
-> > +            MigrationParameter_str(MIGRATION_PARAMETER_TLS_AUTHZ),
-> > +            params->has_tls_authz ? params->tls_authz : "");
-> >      }
-> > =20
-> >      qapi_free_MigrationParameters(params);
-> > @@ -1632,6 +1635,12 @@ void hmp_migrate_set_parameter(Monitor *mon, c=
-onst QDict *qdict)
-> >          p->tls_hostname->type =3D QTYPE_QSTRING;
-> >          visit_type_str(v, param, &p->tls_hostname->u.s, &err);
-> >          break;
-> > +    case MIGRATION_PARAMETER_TLS_AUTHZ:
-> > +        p->has_tls_authz =3D true;
-> > +        p->tls_authz =3D g_new0(StrOrNull, 1);
-> > +        p->tls_authz->type =3D QTYPE_QSTRING;
-> > +        visit_type_str(v, param, &p->tls_authz->u.s, &err);
-> > +        break;
-> >      case MIGRATION_PARAMETER_MAX_BANDWIDTH:
-> >          p->has_max_bandwidth =3D true;
-> >          /*
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 1e99ec9b7e..d14c8d7003 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -645,6 +645,8 @@ MigrationParameters *qmp_query_migrate_parameters=
-(Error **errp)
-> >      params->tls_creds =3D g_strdup(s->parameters.tls_creds);
-> >      params->has_tls_hostname =3D true;
-> >      params->tls_hostname =3D g_strdup(s->parameters.tls_hostname);
-> > +    params->has_tls_authz =3D true;
-> > +    params->tls_authz =3D g_strdup(s->parameters.tls_authz);
-> >      params->has_max_bandwidth =3D true;
-> >      params->max_bandwidth =3D s->parameters.max_bandwidth;
-> >      params->has_downtime_limit =3D true;
-> > @@ -1106,6 +1108,12 @@ static void migrate_params_apply(MigrateSetPar=
-ameters *params, Error **errp)
-> >          s->parameters.tls_hostname =3D g_strdup(params->tls_hostname=
-->u.s);
-> >      }
-> > =20
-> > +    if (params->has_tls_authz) {
-> > +        g_free(s->parameters.tls_authz);
-> > +        assert(params->tls_authz->type =3D=3D QTYPE_QSTRING);
-> > +        s->parameters.tls_authz =3D g_strdup(params->tls_authz->u.s)=
-;
-> > +    }
-> > +
-> >      if (params->has_max_bandwidth) {
-> >          s->parameters.max_bandwidth =3D params->max_bandwidth;
-> >          if (s->to_dst_file) {
-> > diff --git a/migration/tls.c b/migration/tls.c
-> > index 3b9e8c9263..5171afc6c4 100644
-> > --- a/migration/tls.c
-> > +++ b/migration/tls.c
-> > @@ -94,7 +94,7 @@ void migration_tls_channel_process_incoming(Migrati=
-onState *s,
-> > =20
-> >      tioc =3D qio_channel_tls_new_server(
-> >          ioc, creds,
-> > -        NULL, /* XXX pass ACL name */
-> > +        s->parameters.tls_authz,
-> >          errp);
-> >      if (!tioc) {
-> >          return;
-> > diff --git a/qapi/migration.json b/qapi/migration.json
-> > index f7e10ee90f..b9ba34e3a6 100644
-> > --- a/qapi/migration.json
-> > +++ b/qapi/migration.json
-> > @@ -488,6 +488,10 @@
-> >  #                hostname must be provided so that the server's x509
-> >  #                certificate identity can be validated. (Since 2.7)
-> >  #
-> > +# @tls-authz: ID of the 'authz' object subclass that provides access=
- control
-> > +#             checking of the TLS x509 certificate distinguished nam=
-e. (Since
-> > +#             2.13)
-> > +#
+> This patch adds the sizeof_field() macro, which is similar to
+> typeof_field().  Existing instances are updated to use the macro.
 >=20
-> Oops, 2.13 strikes again :-)
->=20
-> Other than that, OK from migration and HMP.
->=20
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->=20
-> >  # @max-bandwidth: to set maximum speed for migration. maximum speed =
-in
-> >  #                 bytes per second. (Since 2.8)
-> >  #
-> > @@ -522,7 +526,7 @@
-> >  { 'enum': 'MigrationParameter',
-> >    'data': ['compress-level', 'compress-threads', 'decompress-threads=
-',
-> >             'cpu-throttle-initial', 'cpu-throttle-increment',
-> > -           'tls-creds', 'tls-hostname', 'max-bandwidth',
-> > +           'tls-creds', 'tls-hostname', 'tls-authz', 'max-bandwidth'=
-,
-> >             'downtime-limit', 'x-checkpoint-delay', 'block-incrementa=
-l',
-> >             'x-multifd-channels', 'x-multifd-page-count',
-> >             'xbzrle-cache-size' ] }
-> > @@ -605,6 +609,7 @@
-> >              '*cpu-throttle-increment': 'int',
-> >              '*tls-creds': 'StrOrNull',
-> >              '*tls-hostname': 'StrOrNull',
-> > +            '*tls-authz': 'StrOrNull',
-> >              '*max-bandwidth': 'int',
-> >              '*downtime-limit': 'int',
-> >              '*x-checkpoint-delay': 'int',
-> > @@ -667,6 +672,10 @@
-> >  #                associated with the migration URI, if any. (Since 2=
-.9)
-> >  #                Note: 2.8 reports this by omitting tls-hostname ins=
-tead.
-> >  #
-> > +# @tls-authz: ID of the 'authz' object subclass that provides access=
- control
-> > +#             checking of the TLS x509 certificate distinguished nam=
-e. (Since
-> > +#             2.13)
-> > +#
-> >  # @max-bandwidth: to set maximum speed for migration. maximum speed =
-in
-> >  #                 bytes per second. (Since 2.8)
-> >  #
-> > @@ -704,6 +713,7 @@
-> >              '*cpu-throttle-increment': 'uint8',
-> >              '*tls-creds': 'str',
-> >              '*tls-hostname': 'str',
-> > +            '*tls-authz': 'str',
-> >              '*max-bandwidth': 'size',
-> >              '*downtime-limit': 'uint64',
-> >              '*x-checkpoint-delay': 'uint32',
-> > --=20
-> > 2.17.0
-> >=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  include/hw/xen/io/ring.h      |  2 +-
+>  include/qemu/compiler.h       |  2 ++
+>  accel/tcg/translate-all.c     |  2 +-
+>  hw/display/xenfb.c            |  4 ++--
+>  hw/net/rocker/rocker_of_dpa.c |  2 +-
+>  hw/net/virtio-net.c           |  2 +-
+>  target/i386/kvm.c             |  2 +-
+>  target/ppc/arch_dump.c        | 10 +++++-----
+>  target/s390x/arch_dump.c      | 20 ++++++++++----------
+>  9 files changed, 24 insertions(+), 22 deletions(-)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
+
+Stefan
+
+--1yeeQ81UyVL57Vl7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbJ7l3AAoJEJykq7OBq3PIQesH/j+BYQL0WSDN933cos7cjyP4
+AlONbcdVAyhuh/it2FCS0idLKgTKkeY7Wuh7GJajQGRJOa41ZBfhCyAj4zOnwcyU
+/00uHwE6qtycVxVfaxsx5s03QLRSP5ogZR+RMWBWpgX75pmg7/ZD1D8Z2YR4+TTE
+fVCz6Y4WJ0mVEfI6fjqbfK/FV/a4unC9IfngXWFi/Q4d9PXJpN4IvRGxf8Hu9HIM
+bWv2Z4V2u0/R7J48+Y/VmPf9/YYq8efWz+X3U7MlVG6NjUAC6ZHs3BONPg6xZZxU
+/5UjIMZ4V9Fxka7NHuqJNnoBWyG3cnYUYGuBx72B0l0DgpX4Vpyae2fgKkoLVKU=
+=QGc6
+-----END PGP SIGNATURE-----
+
+--1yeeQ81UyVL57Vl7--
