@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58555)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fUuCL-0005qO-Ej
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:27:58 -0400
+	(envelope-from <groug@kaod.org>) id 1fUuM0-0007iP-MV
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:37:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fUuCI-0008ES-6g
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:27:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38250 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1fUuLx-0006ZT-KZ
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:37:56 -0400
+Received: from 2.mo4.mail-out.ovh.net ([46.105.72.36]:45990)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fUuCI-0008Dx-13
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:27:54 -0400
-Date: Mon, 18 Jun 2018 15:27:47 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180618152747.5b5ab22c.cohuck@redhat.com>
-In-Reply-To: <20180615152926-mutt-send-email-mst@kernel.org>
-References: <20180611202207-mutt-send-email-mst@kernel.org>
-	<dc8b1669-b8b6-fb59-94e2-6e4de6b96572@redhat.com>
-	<20180612051432-mutt-send-email-mst@kernel.org>
-	<23fc4aa4-ec41-d6e2-3354-10cbfc13b7ec@intel.com>
-	<20180612142557-mutt-send-email-mst@kernel.org>
-	<b9c88515-cf41-2a9a-078e-9c9e5adbbf14@intel.com>
-	<CADGSJ213f8tJpNXuOhv8qRew-Y5VZAwA+srNMrLZYnKdVGLdAA@mail.gmail.com>
-	<20180614120231.0a72bd5f.cohuck@redhat.com>
-	<20180615052743-mutt-send-email-mst@kernel.org>
-	<20180615113242.799974f6.cohuck@redhat.com>
-	<20180615152926-mutt-send-email-mst@kernel.org>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fUuLx-0006Yg-Dn
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:37:53 -0400
+Received: from player688.ha.ovh.net (unknown [10.109.122.124])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id BA506182528
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 15:37:51 +0200 (CEST)
+Date: Mon, 18 Jun 2018 15:37:41 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180618153741.76a765ff@bahia.lan>
+In-Reply-To: <20180618063606.2513-3-david@gibson.dropbear.id.au>
+References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
+	<20180618063606.2513-3-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+Subject: Re: [Qemu-devel] [PATCH 2/9] spapr: Compute effective capability
+ values earlier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,63 +31,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: abologna@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
-On Fri, 15 Jun 2018 15:31:43 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Mon, 18 Jun 2018 16:35:59 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> On Fri, Jun 15, 2018 at 11:32:42AM +0200, Cornelia Huck wrote:
-> > On Fri, 15 Jun 2018 05:34:24 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Thu, Jun 14, 2018 at 12:02:31PM +0200, Cornelia Huck wrote:  
-> >   
-> > > > > > I am not all that familiar with how Qemu manages network devices. If we can
-> > > > > > do all the
-> > > > > > required management of the primary/standby devices within Qemu, that is
-> > > > > > definitely a better
-> > > > > > approach without upper layer involvement.      
-> > > > > 
-> > > > > Right. I would imagine in the extreme case the upper layer doesn't
-> > > > > have to be involved at all if QEMU manages all hot plug/unplug logic.
-> > > > > The management tool can supply passthrough device and virtio with the
-> > > > > same group UUID, QEMU auto-manages the presence of the primary, and
-> > > > > hot plug the device as needed before or after the migration.    
-> > > > 
-> > > > I do not really see how you can manage that kind of stuff in QEMU only.    
-> > > 
-> > > So right now failover is limited to pci passthrough devices only.
-> > > The idea is to realize the vfio device but not expose it
-> > > to guest. Have a separate command to expose it to guest.
-> > > Hotunplug would also hide it from guest but not unrealize it.  
-> > 
-> > So, this would not be real hot(un)plug, but 'hide it from the guest',
-> > right? The concept of "we have it realized in QEMU, but the guest can't
-> > discover and use it" should be translatable to non-pci as well (at
-> > least for ccw).
-> >   
-> > > 
-> > > This will help ensure that e.g. on migration failure we can
-> > > re-expose the device without risk of running out of resources.  
-> > 
-> > Makes sense.
-> > 
-> > Should that 'hidden' state be visible/settable from outside as well
-> > (e.g. via a property)? I guess yes, so that management software has a
-> > chance to see whether a device is visible.  
+> Previously, the effective values of the various spapr capability flags
+> were only determined at machine reset time.  That was a lazy way of making
+> sure it was after cpu initialization so it could use the cpu object to
+> inform the defaults.
 > 
-> Might be handy for debug, but note that since QEMU manages this
-> state it's transient: can change at any time, so it's kind
-> of hard for management to rely on it.
-
-Might be another reason to have this controlled by management software;
-being able to find out easily why a device is not visible to the guest
-seems to be a useful thing.
-
-Anyway, let's defer this discussion until it is clear how we actually
-want to handle the whole setup.
-
+> But we've now improved the compat checking code so that we don't need to
+> instantiate the cpus to use it.  That lets us move the resolution of the
+> capability defaults much earlier.
 > 
-> > Settable may be useful if we
-> > find another use case for hiding realized devices.  
+> This is going to be necessary for some future capabilities.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr.c         | 6 ++++--
+>  hw/ppc/spapr_caps.c    | 9 ++++++---
+>  include/hw/ppc/spapr.h | 3 ++-
+>  3 files changed, 12 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index b0b94fc1f0..40858d047c 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1612,7 +1612,7 @@ static void spapr_machine_reset(void)
+>      void *fdt;
+>      int rc;
+>  
+> -    spapr_caps_reset(spapr);
+> +    spapr_caps_apply(spapr);
+>  
+>      first_ppc_cpu = POWERPC_CPU(first_cpu);
+>      if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
+> @@ -2526,7 +2526,9 @@ static void spapr_machine_init(MachineState *machine)
+>      QLIST_INIT(&spapr->phbs);
+>      QTAILQ_INIT(&spapr->pending_dimm_unplugs);
+>  
+> -    /* Check HPT resizing availability */
+> +    /* Determine capabilities to run with */
+> +    spapr_caps_init(spapr);
+> +
+>      kvmppc_check_papr_resize_hpt(&resize_hpt_err);
+>      if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DEFAULT) {
+>          /*
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 469f38f0ef..dabed817d1 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -439,12 +439,12 @@ SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
+>  SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
+>  SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
+>  
+> -void spapr_caps_reset(sPAPRMachineState *spapr)
+> +void spapr_caps_init(sPAPRMachineState *spapr)
+>  {
+>      sPAPRCapabilities default_caps;
+>      int i;
+>  
+> -    /* First compute the actual set of caps we're running with.. */
+> +    /* Compute the actual set of caps we should run with */
+>      default_caps = default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type);
+>  
+>      for (i = 0; i < SPAPR_CAP_NUM; i++) {
+> @@ -455,8 +455,11 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
+>              spapr->eff.caps[i] = default_caps.caps[i];
+>          }
+>      }
+> +}
+>  
+> -    /* .. then apply those caps to the virtual hardware */
+> +void spapr_caps_apply(sPAPRMachineState *spapr)
+> +{
+> +    int i;
+>  
+>      for (i = 0; i < SPAPR_CAP_NUM; i++) {
+>          sPAPRCapabilityInfo *info = &capability_table[i];
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 3388750fc7..9dbd6010f5 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -798,7 +798,8 @@ static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int cap)
+>      return spapr->eff.caps[cap];
+>  }
+>  
+> -void spapr_caps_reset(sPAPRMachineState *spapr);
+> +void spapr_caps_init(sPAPRMachineState *spapr);
+> +void spapr_caps_apply(sPAPRMachineState *spapr);
+>  void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
+>  int spapr_caps_post_migration(sPAPRMachineState *spapr);
+>  
