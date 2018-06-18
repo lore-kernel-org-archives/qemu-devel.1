@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUnm1-0008MF-E1
+	(envelope-from <dgibson@ozlabs.org>) id 1fUnm2-0008Ma-40
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:36:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUnly-0001Nl-79
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:36:21 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fUnm0-0001QA-VL
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:36:22 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 18 Jun 2018 16:35:58 +1000
-Message-Id: <20180618063606.2513-2-david@gibson.dropbear.id.au>
+Date: Mon, 18 Jun 2018 16:36:05 +1000
+Message-Id: <20180618063606.2513-9-david@gibson.dropbear.id.au>
 In-Reply-To: <20180618063606.2513-1-david@gibson.dropbear.id.au>
 References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 1/9] target/ppc: Allow cpu compatiblity checks
- based on type, not instance
+Subject: [Qemu-devel] [PATCH 8/9] spapr: Limit available pagesizes to
+ provide a consistent guest environment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,187 +23,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: groug@kaod.org, abologna@redhat.com
 Cc: clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, David Gibson <david@gibson.dropbear.id.au>
 
-ppc_check_compat() is used in a number of places to check if a cpu object
-supports a certain compatiblity mode, subject to various constraints.
+KVM HV has some limitations (deriving from the hardware) that mean not all
+host-cpu supported pagesizes may be usable in the guest.  At present this
+means that KVM guests and TCG guests may see different available page sizes
+even if they notionally have the same vcpu model.  This is confusing and
+also prevents migration between TCG and KVM.
 
-It takes a PowerPCCPU *, however it really only depends on the cpu's class.
-We have upcoming cases where it would be useful to make compatibility
-checks before we fully instantiate the cpu objects.
-
-ppc_type_check_compat() will now make an equivalent check, but based on a
-CPU's QOM typename instead of an instantiated CPU object.
-
-We make use of the new interface in several places in spapr, where we're
-essentially making a global check, rather than one specific to a particular
-cpu.  This avoids some ugly uses of first_cpu to grab a "representative"
-instance.
+This patch makes the environment consistent by always allowing the same set
+of pagesizes.  Since we can't remove the KVM limitations, we do this by
+always applying the same limitations it has, even to TCG guests.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c      | 10 ++++------
- hw/ppc/spapr_caps.c | 19 +++++++++----------
- target/ppc/compat.c | 27 +++++++++++++++++++++------
- target/ppc/cpu.h    |  4 ++++
- 4 files changed, 38 insertions(+), 22 deletions(-)
+ hw/ppc/spapr_caps.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index db0fb385d4..b0b94fc1f0 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1616,8 +1616,8 @@ static void spapr_machine_reset(void)
- 
-     first_ppc_cpu = POWERPC_CPU(first_cpu);
-     if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
--        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
--                         spapr->max_compat_pvr)) {
-+        ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_00, 0,
-+                              spapr->max_compat_pvr)) {
-         /* If using KVM with radix mode available, VCPUs can be started
-          * without a HPT because KVM will start them in radix mode.
-          * Set the GR bit in PATB so that we know there is no HPT. */
-@@ -2520,7 +2520,6 @@ static void spapr_machine_init(MachineState *machine)
-     long load_limit, fw_size;
-     char *filename;
-     Error *resize_hpt_err = NULL;
--    PowerPCCPU *first_ppc_cpu;
- 
-     msi_nonbroken = true;
- 
-@@ -2618,10 +2617,9 @@ static void spapr_machine_init(MachineState *machine)
-     /* init CPUs */
-     spapr_init_cpus(spapr);
- 
--    first_ppc_cpu = POWERPC_CPU(first_cpu);
-     if ((!kvm_enabled() || kvmppc_has_cap_mmu_radix()) &&
--        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
--                         spapr->max_compat_pvr)) {
-+        ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_00, 0,
-+                              spapr->max_compat_pvr)) {
-         /* KVM and TCG always allow GTSE with radix... */
-         spapr_ovec_set(spapr->ov5, OV5_MMU_RADIX_GTSE);
-     }
 diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 00e43a9ba7..469f38f0ef 100644
+index 9fc739b3f5..0584c7c6ab 100644
 --- a/hw/ppc/spapr_caps.c
 +++ b/hw/ppc/spapr_caps.c
-@@ -327,27 +327,26 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+@@ -334,6 +334,38 @@ static void cap_hpt_maxpagesize_apply(sPAPRMachineState *spapr,
+     spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
+ }
+ 
++static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift, uint32_t pshift)
++{
++    unsigned maxshift = *((unsigned *)opaque);
++
++    assert(pshift >= seg_pshift);
++
++    /* Don't allow the guest to use pages bigger than the configured
++     * maximum size */
++    if (pshift > maxshift) {
++        return false;
++    }
++
++    /* For whatever reason, KVM doesn't allow multiple pagesizes
++     * within a segment, *except* for the case of 16M pages in a 4k or
++     * 64k segment.  Always exclude other cases, so that TCG and KVM
++     * guests see a consistent environment */
++    if ((pshift != seg_pshift) && (pshift != 24)) {
++        return false;
++    }
++
++    return true;
++}
++
++static void cap_hpt_maxpagesize_cpu_apply(sPAPRMachineState *spapr,
++                                          PowerPCCPU *cpu,
++                                          uint8_t val, Error **errp)
++{
++    unsigned maxshift = val;
++
++    ppc_hash64_filter_pagesizes(cpu, spapr_pagesize_cb, &maxshift);
++}
++
+ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+     [SPAPR_CAP_HTM] = {
+         .name = "htm",
+@@ -401,6 +433,7 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+         .set = spapr_cap_set_pagesize,
+         .type = "int",
+         .apply = cap_hpt_maxpagesize_apply,
++        .cpu_apply = cap_hpt_maxpagesize_cpu_apply,
+     },
  };
  
- static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
--                                               CPUState *cs)
-+                                               const char *cputype)
- {
-     sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
--    PowerPCCPU *cpu = POWERPC_CPU(cs);
-     sPAPRCapabilities caps;
- 
-     caps = smc->default_caps;
- 
--    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
--                          0, spapr->max_compat_pvr)) {
-+    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_07,
-+                               0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
-         caps.caps[SPAPR_CAP_CFPC] = SPAPR_CAP_BROKEN;
-     }
- 
--    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06_PLUS,
--                          0, spapr->max_compat_pvr)) {
-+    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_06_PLUS,
-+                               0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_SBBC] = SPAPR_CAP_BROKEN;
-     }
- 
--    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
--                          0, spapr->max_compat_pvr)) {
-+    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_06,
-+                               0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_VSX] = SPAPR_CAP_OFF;
-         caps.caps[SPAPR_CAP_DFP] = SPAPR_CAP_OFF;
-         caps.caps[SPAPR_CAP_IBS] = SPAPR_CAP_BROKEN;
-@@ -384,7 +383,7 @@ int spapr_caps_post_migration(sPAPRMachineState *spapr)
-     sPAPRCapabilities dstcaps = spapr->eff;
-     sPAPRCapabilities srccaps;
- 
--    srccaps = default_caps_with_cpu(spapr, first_cpu);
-+    srccaps = default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type);
-     for (i = 0; i < SPAPR_CAP_NUM; i++) {
-         /* If not default value then assume came in with the migration */
-         if (spapr->mig.caps[i] != spapr->def.caps[i]) {
-@@ -446,7 +445,7 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
-     int i;
- 
-     /* First compute the actual set of caps we're running with.. */
--    default_caps = default_caps_with_cpu(spapr, first_cpu);
-+    default_caps = default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type);
- 
-     for (i = 0; i < SPAPR_CAP_NUM; i++) {
-         /* Store the defaults */
-diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-index 807c906f68..7de4bf3122 100644
---- a/target/ppc/compat.c
-+++ b/target/ppc/compat.c
-@@ -105,17 +105,13 @@ static const CompatInfo *compat_by_pvr(uint32_t pvr)
-     return NULL;
- }
- 
--bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
--                      uint32_t min_compat_pvr, uint32_t max_compat_pvr)
-+static bool pcc_compat(PowerPCCPUClass *pcc, uint32_t compat_pvr,
-+                       uint32_t min_compat_pvr, uint32_t max_compat_pvr)
- {
--    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-     const CompatInfo *compat = compat_by_pvr(compat_pvr);
-     const CompatInfo *min = compat_by_pvr(min_compat_pvr);
-     const CompatInfo *max = compat_by_pvr(max_compat_pvr);
- 
--#if !defined(CONFIG_USER_ONLY)
--    g_assert(cpu->vhyp);
--#endif
-     g_assert(!min_compat_pvr || min);
-     g_assert(!max_compat_pvr || max);
- 
-@@ -134,6 +130,25 @@ bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
-     return true;
- }
- 
-+bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
-+                      uint32_t min_compat_pvr, uint32_t max_compat_pvr)
-+{
-+    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-+
-+#if !defined(CONFIG_USER_ONLY)
-+    g_assert(cpu->vhyp);
-+#endif
-+
-+    return pcc_compat(pcc, compat_pvr, min_compat_pvr, max_compat_pvr);
-+}
-+
-+bool ppc_type_check_compat(const char *cputype, uint32_t compat_pvr,
-+                           uint32_t min_compat_pvr, uint32_t max_compat_pvr)
-+{
-+    PowerPCCPUClass *pcc = POWERPC_CPU_CLASS(object_class_by_name(cputype));
-+    return pcc_compat(pcc, compat_pvr, min_compat_pvr, max_compat_pvr);
-+}
-+
- void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
- {
-     const CompatInfo *compat = compat_by_pvr(compat_pvr);
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 874da6efbc..c7f3fb6b73 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1369,7 +1369,11 @@ static inline int cpu_mmu_index (CPUPPCState *env, bool ifetch)
- #if defined(TARGET_PPC64)
- bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
-                       uint32_t min_compat_pvr, uint32_t max_compat_pvr);
-+bool ppc_type_check_compat(const char *cputype, uint32_t compat_pvr,
-+                           uint32_t min_compat_pvr, uint32_t max_compat_pvr);
-+
- void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp);
-+
- #if !defined(CONFIG_USER_ONLY)
- void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
- #endif
 -- 
 2.17.1
