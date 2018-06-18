@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55944)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUlQs-0007lz-Q7
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 00:06:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1fUloD-0006JU-Ea
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 00:30:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUlQr-0006du-8f
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 00:06:22 -0400
-Date: Mon, 18 Jun 2018 14:03:45 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180618040345.GU25461@umbus.fritz.box>
-References: <20180615152536.30093-1-clg@kaod.org>
-	<20180615152536.30093-2-clg@kaod.org>
+	(envelope-from <bounces@canonical.com>) id 1fUlo7-00054M-Hp
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 00:30:29 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59512)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fUlo7-00053X-Ao
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 00:30:23 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fUlo6-0004RT-B6
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 04:30:22 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 52B332E802E
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 04:30:22 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Ma2pZxZcUUd0eybH"
-Content-Disposition: inline
-In-Reply-To: <20180615152536.30093-2-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] ppc/pnv: introduce a new
- intc_create() operation to the chip model
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 18 Jun 2018 04:17:38 -0000
+From: Launchpad Bug Tracker <1228285@bugs.launchpad.net>
+Reply-To: Bug 1228285 <1228285@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130920172123.20190.55970.malonedeb@wampee.canonical.com>
+Message-Id: <152929545901.23342.13254026854170505639.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1228285] Re: e1000 nic TCP performances
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,210 +36,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+[Expired for QEMU because there has been no activity for 60 days.]
 
---Ma2pZxZcUUd0eybH
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
 
-On Fri, Jun 15, 2018 at 05:25:33PM +0200, C=E9dric Le Goater wrote:
-> On Power9, the thread interrupt presenter has a different type and is
-> linked to the chip owning the cores.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+-- =
 
-Applied to ppc-for-3.0, thanks.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1228285
 
-> ---
->  include/hw/ppc/pnv.h |  1 +
->  hw/ppc/pnv.c         | 21 +++++++++++++++++++--
->  hw/ppc/pnv_core.c    | 18 +++++++++---------
->  3 files changed, 29 insertions(+), 11 deletions(-)
->=20
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index 90759240a7b1..e934e84f555e 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -76,6 +76,7 @@ typedef struct PnvChipClass {
->      hwaddr       xscom_base;
-> =20
->      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
-> +    Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
->  } PnvChipClass;
-> =20
->  #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 0d2b79f7980f..c7e127ae97db 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -671,6 +671,13 @@ static uint32_t pnv_chip_core_pir_p8(PnvChip *chip, =
-uint32_t core_id)
->      return (chip->chip_id << 7) | (core_id << 3);
->  }
-> =20
-> +static Object *pnv_chip_power8_intc_create(PnvChip *chip, Object *child,
-> +                                           Error **errp)
-> +{
-> +    return icp_create(child, TYPE_PNV_ICP, XICS_FABRIC(qdev_get_machine(=
-)),
-> +                      errp);
-> +}
-> +
->  /*
->   *    0:48  Reserved - Read as zeroes
->   *   49:52  Node ID
-> @@ -686,6 +693,12 @@ static uint32_t pnv_chip_core_pir_p9(PnvChip *chip, =
-uint32_t core_id)
->      return (chip->chip_id << 8) | (core_id << 2);
->  }
-> =20
-> +static Object *pnv_chip_power9_intc_create(PnvChip *chip, Object *child,
-> +                                           Error **errp)
-> +{
-> +    return NULL;
-> +}
-> +
->  /* Allowed core identifiers on a POWER8 Processor Chip :
->   *
->   * <EX0 reserved>
-> @@ -721,6 +734,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
-klass, void *data)
->      k->chip_cfam_id =3D 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
->      k->cores_mask =3D POWER8E_CORE_MASK;
->      k->core_pir =3D pnv_chip_core_pir_p8;
-> +    k->intc_create =3D pnv_chip_power8_intc_create;
->      k->xscom_base =3D 0x003fc0000000000ull;
->      dc->desc =3D "PowerNV Chip POWER8E";
->  }
-> @@ -734,6 +748,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
-lass, void *data)
->      k->chip_cfam_id =3D 0x220ea04980000000ull; /* P8 Venice DD2.0 */
->      k->cores_mask =3D POWER8_CORE_MASK;
->      k->core_pir =3D pnv_chip_core_pir_p8;
-> +    k->intc_create =3D pnv_chip_power8_intc_create;
->      k->xscom_base =3D 0x003fc0000000000ull;
->      dc->desc =3D "PowerNV Chip POWER8";
->  }
-> @@ -747,6 +762,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
- *klass, void *data)
->      k->chip_cfam_id =3D 0x120d304980000000ull;  /* P8 Naples DD1.0 */
->      k->cores_mask =3D POWER8_CORE_MASK;
->      k->core_pir =3D pnv_chip_core_pir_p8;
-> +    k->intc_create =3D pnv_chip_power8_intc_create;
->      k->xscom_base =3D 0x003fc0000000000ull;
->      dc->desc =3D "PowerNV Chip POWER8NVL";
->  }
-> @@ -760,6 +776,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
-lass, void *data)
->      k->chip_cfam_id =3D 0x220d104900008000ull; /* P9 Nimbus DD2.0 */
->      k->cores_mask =3D POWER9_CORE_MASK;
->      k->core_pir =3D pnv_chip_core_pir_p9;
-> +    k->intc_create =3D pnv_chip_power9_intc_create;
->      k->xscom_base =3D 0x00603fc00000000ull;
->      dc->desc =3D "PowerNV Chip POWER9";
->  }
-> @@ -892,8 +909,8 @@ static void pnv_chip_core_realize(PnvChip *chip, Erro=
-r **errp)
->          object_property_set_int(OBJECT(pnv_core),
->                                  pcc->core_pir(chip, core_hwid),
->                                  "pir", &error_fatal);
-> -        object_property_add_const_link(OBJECT(pnv_core), "xics",
-> -                                       qdev_get_machine(), &error_fatal);
-> +        object_property_add_const_link(OBJECT(pnv_core), "chip",
-> +                                       OBJECT(chip), &error_fatal);
->          object_property_set_bool(OBJECT(pnv_core), true, "realized",
->                                   &error_fatal);
->          object_unref(OBJECT(pnv_core));
-> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-> index f7cf33f547a5..a9f129fc2c5f 100644
-> --- a/hw/ppc/pnv_core.c
-> +++ b/hw/ppc/pnv_core.c
-> @@ -99,13 +99,14 @@ static const MemoryRegionOps pnv_core_xscom_ops =3D {
->      .endianness =3D DEVICE_BIG_ENDIAN,
->  };
-> =20
-> -static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFabric *xi, Error **er=
-rp)
-> +static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip *chip, Error **err=
-p)
->  {
->      CPUPPCState *env =3D &cpu->env;
->      int core_pir;
->      int thread_index =3D 0; /* TODO: TCG supports only one thread */
->      ppc_spr_t *pir =3D &env->spr_cb[SPR_PIR];
->      Error *local_err =3D NULL;
-> +    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> =20
->      object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
->      if (local_err) {
-> @@ -113,7 +114,7 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFab=
-ric *xi, Error **errp)
->          return;
->      }
-> =20
-> -    cpu->intc =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, xi, &local_err);
-> +    cpu->intc =3D pcc->intc_create(chip, OBJECT(cpu), &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
->          return;
-> @@ -143,13 +144,12 @@ static void pnv_core_realize(DeviceState *dev, Erro=
-r **errp)
->      void *obj;
->      int i, j;
->      char name[32];
-> -    Object *xi;
-> +    Object *chip;
-> =20
-> -    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
-> -    if (!xi) {
-> -        error_setg(errp, "%s: required link 'xics' not found: %s",
-> -                   __func__, error_get_pretty(local_err));
-> -        return;
-> +    chip =3D object_property_get_link(OBJECT(dev), "chip", &local_err);
-> +    if (!chip) {
-> +        error_propagate(errp, local_err);
-> +        error_prepend(errp, "required link 'chip' not found: ");
->      }
-> =20
->      pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
-> @@ -166,7 +166,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
->      }
-> =20
->      for (j =3D 0; j < cc->nr_threads; j++) {
-> -        pnv_realize_vcpu(pc->threads[j], XICS_FABRIC(xi), &local_err);
-> +        pnv_realize_vcpu(pc->threads[j], PNV_CHIP(chip), &local_err);
->          if (local_err) {
->              goto err;
->          }
+Title:
+  e1000 nic TCP performances
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Status in QEMU:
+  Expired
 
---Ma2pZxZcUUd0eybH
-Content-Type: application/pgp-signature; name="signature.asc"
+Bug description:
+  Hi,
 
------BEGIN PGP SIGNATURE-----
+  Here is the context :
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsnLyEACgkQbDjKyiDZ
-s5K6bQ/9E5fyLox/TujM1T8sFA6EMqjuVj82R+cxrVCoHz2Xxl16ZxGNOvze7Cjm
-wgbPnLFWnrzWEhd/ewlgvXtA5KK5d/qC0WaDjVZGklPJIfUeSFOUXQQlLjD841lR
-UV2egeO4nUUcWVrlz8hrIjmSnIEEbovYLD5bN1P6KVS+96eCV9D58W+SekCy4KPN
-OrHBt3F1/knh64TfGYZToVB/wnrYIzK4mvUZ2qIHIk/GYlwxvS7vYDVPgXVxoyfT
-JWdwoKmE/qmYBvisgHefWLVMHG46t4u9COlQOAAQqUgL12vUcMlxYgNcodzqESg5
-996vB7d85YygefvnnfA0CZNWGlq1RIzpI473vuy5KJIVvoV23GrPYGoAjCrujLdP
-0HMTwp9Ob1Tc/3eoKBdPjoyjP8KFgjkAEBsTh+TaJDh1aeaD1z4FogkokkXjYDFP
-I/7WWwun3ltGzoCUnL1v3A6MbqBjxL8U8D863OYiHTXS2BA3rQas9P14E32n2DlL
-8b4ewfOd3Sz32TyNQQ8sSb+i0/qQWdYwV0Jx/GIKUQvVAD52Boa5wg5R569+fo29
-b3QtpMjhpc9IZGwH7u2NF4S5tcp7mQ9HPQyCEKz0G2zgSqJ4fBfquZkOrR2wfGRJ
-NgKKhhxy86FVmZgUrYD4e/zKFJujLOVVWjysw69TN0Os4y+Fwpg=
-=cGzK
------END PGP SIGNATURE-----
+  $ qemu -name A -m 1024 -net nic vlan=3D0,model=3De1000 -net socket,vlan=
+=3D0,listen=3D127.0.0.1:7000
+  $ qemu -name B -m 1024 -net nic vlan=3D0,model=3De1000 -net socket,vlan=
+=3D0,connect=3D127.0.0.1:7000
 
---Ma2pZxZcUUd0eybH--
+  The bandwidth is really tiny :
+
+      . Iperf3 reports about 30 Mb/sec
+      . NetPerf reports about 50 Mb/sec
+
+  =
+
+  With UDP sockets, there is no problem at all :
+
+      . Iperf3 reports about 1 Gb/sec
+      . NetPerf reports about 950 Mb/sec
+
+  =
+
+  I've noticed this fact only with the e1000 NIC, not with others (rtl8139,=
+virtio, etc.)
+  I've used the main GIT version of QEMU.
+
+  =
+
+  Thanks in advance.
+
+  See you,
+  VInce
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1228285/+subscriptions
