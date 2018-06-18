@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fUrie-0006i9-Sg
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 06:49:09 -0400
+	(envelope-from <david@redhat.com>) id 1fUrij-0006jY-1h
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 06:49:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fUrie-0002Fh-1J
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 06:49:08 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42989)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fUrid-0002FH-RL
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 06:49:07 -0400
-Received: by mail-oi0-x242.google.com with SMTP id k190-v6so14372092oib.9
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 03:49:07 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fUrig-0002HE-03
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 06:49:13 -0400
+References: <20180615140448.32234-1-david@redhat.com>
+	<20180615140448.32234-12-david@redhat.com>
+	<20180616020528.sz7luae4axtlupai@HZ>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <73cfebe9-50c7-73d5-7e7a-ae43f5d526fe@redhat.com>
+Date: Mon, 18 Jun 2018 12:49:02 +0200
 MIME-Version: 1.0
-In-Reply-To: <be965630-767c-4721-6239-474f61a08e6e@mail.ru>
-References: <20180612204632.28780-1-jusual@mail.ru>
-	<CAFEAcA-p5A4S=+ncW42KU2ivBHyALJdUswLUYhh=By6rKYstZw@mail.gmail.com>
-	<826808f0-4dc4-261d-4c54-46c807bb75c9@linaro.org>
-	<CAFEAcA9BVi_yzA6wPjrE62mdd21d9QtVixc1OvB9PWLN2ydq+A@mail.gmail.com>
-	<be965630-767c-4721-6239-474f61a08e6e@mail.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 Jun 2018 11:48:46 +0100
-Message-ID: <CAFEAcA95CxL+S8X4FLU7HGhonucDnvSogA3D3smir3rWi-nnEw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Allow ARMv6-M Thumb2
- instructions
+In-Reply-To: <20180616020528.sz7luae4axtlupai@HZ>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 11/13] nvdimm: allow setting the
+ label-size to 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +26,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>
+To: Haozhong Zhang <hzzhan9@gmail.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 17 June 2018 at 19:48, Julia Suvorova <jusual@mail.ru> wrote:
-> I can make it if you wish.
-> In addition, we can simplify following "if" by removing ARM_FEATURE_V6
-> since V7M and V8M define V6:
->
->     if (!arm_dc_feature(s, ARM_FEATURE_V7) &&
->         !(arm_dc_feature(s, ARM_FEATURE_V6) &&
->           arm_dc_feature(s, ARM_FEATURE_M))) {
->         goto illegal_op;
->     }
->
-> Like this:
->
->     if (!arm_dc_feature(s, ARM_FEATURE_V7) &&
->         !arm_dc_feature(s, ARM_FEATURE_M)) {
->         goto illegal_op;
->     }
->
-> What do you think?
+On 16.06.2018 04:05, Haozhong Zhang wrote:
+> On 06/15/18 16:04, David Hildenbrand wrote:
+>> It is inititally 0, so setting it to 0 should be allowed, too.
+>=20
+> I'm fine with this change and believe nothing is broken in practice,
+> but what is expected by the user who sets a zero label size?
 
-Yes; that would be reasonable. I did consider making that
-change when I applied the patch, but decided I didn't really
-care much either way. So if you want to send a patch for it
-that's fine; if you don't, that's also fine.
+I'd say exactly the same as if not specifying a label size, because the
+default is initially 0.
 
-thanks
--- PMM
+I remember that the user should be able to spell everything out on the
+cmdline. Relying only on default values is usually not what we want.
+
+>=20
+> Look at nvdimm_dsm_device() which enables label DSMs only if the label
+> size is not smaller than 128 KB. If a user sets a zero label size
+> explicitly, does he/she expect those label DSMs are available in
+> guest?  (according to Intel spec, the minimal label size is 128
+> KBytes)
+>=20
+> I think if it's allowed to set a zero label-size, it would be better
+> to document its difference from other non-zero values in docs/nvdimm.tx=
+t.
+
+We can fixup the the documentation to to explicitly state "default is
+label-size=3D0" and "With label-size=3D0 label support is disabled.".
+
+But this will be a separate patch.
+
+Thanks!
+
+>=20
+> Thanks,
+> Haozhong
+>=20
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/mem/nvdimm.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+>> index db7d8c3050..df7646488b 100644
+>> --- a/hw/mem/nvdimm.c
+>> +++ b/hw/mem/nvdimm.c
+>> @@ -52,9 +52,9 @@ static void nvdimm_set_label_size(Object *obj, Visit=
+or *v, const char *name,
+>>      if (local_err) {
+>>          goto out;
+>>      }
+>> -    if (value < MIN_NAMESPACE_LABEL_SIZE) {
+>> +    if (value && value < MIN_NAMESPACE_LABEL_SIZE) {
+>>          error_setg(&local_err, "Property '%s.%s' (0x%" PRIx64 ") is r=
+equired"
+>> -                   " at least 0x%lx", object_get_typename(obj),
+>> +                   " either 0 or at least 0x%lx", object_get_typename=
+(obj),
+>>                     name, value, MIN_NAMESPACE_LABEL_SIZE);
+>>          goto out;
+>>      }
+>> --=20
+>> 2.17.1
+>>
+>>
+>=20
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
