@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUicc-00017b-CF
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 21:06:19 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1fUiqH-0003FH-Cj
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 21:20:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUicY-0005oA-6A
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 21:06:18 -0400
-Date: Mon, 18 Jun 2018 11:06:06 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180618010606.GL25461@umbus.fritz.box>
-References: <cover.1528935420.git.balaton@eik.bme.hu>
-	<c1ca5bce109e674d0cc7ed46bbcaa41863a6319c.1528935420.git.balaton@eik.bme.hu>
-	<20180614013510.GD3042@umbus.fritz.box>
-	<alpine.BSF.2.21.1806141003570.19899@zero.eik.bme.hu>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="V3eawNQxI9TAjvgi"
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1806141003570.19899@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v3 7/9] sm501: Implement i2c part for
- reading monitor EDID
+	(envelope-from <programmingkidx@gmail.com>) id 1fUiqE-0006H1-40
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 21:20:25 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20180618003445.GB25461@umbus.fritz.box>
+Date: Sun, 17 Jun 2018 21:20:18 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <56C4E888-447F-4FBC-B2E6-6329A807FD6E@gmail.com>
+References: <20180617155309.1653-1-programmingkidx@gmail.com>
+	<20180618003445.GB25461@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH] fpu_helper.c: fix helper_fpscr_clrbit()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +24,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Peter Maydell <peter.maydell@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, aurelien@aurel32.net, agraf@suse.de, qemu-ppc@nongnu.org
 
 
---V3eawNQxI9TAjvgi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Jun 14, 2018 at 10:06:33AM +0200, BALATON Zoltan wrote:
-> On Thu, 14 Jun 2018, David Gibson wrote:
-> > On Thu, Jun 14, 2018 at 02:17:00AM +0200, BALATON Zoltan wrote:
-> > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> >=20
-> > Again needs a commit message expanding on what this is and why it's
-> > useful.
+> On Jun 17, 2018, at 8:34 PM, David Gibson =
+<david@gibson.dropbear.id.au> wrote:
 >=20
-> What else need to be explained apart from that SM501 has an i2c part which
-> is used to access EDID info of attached monitor. But this is what the com=
-mit
-> title already says. This patch implements that so far not emulated part of
-> the chip.
+> On Sun, Jun 17, 2018 at 11:53:09AM -0400, John Arbuckle wrote:
+>> Fix the helper_fpscr_clrbit() function so it correctly
+>> sets the FEX and VX bits.
+>=20
+> This needs a lot more information in the commit message:
+>=20
+>  * What exactly was wrong with the previous setting of the FEX and VX
+>    bits?
 
-In this case it would be sufficient just to say the same thing, but in
-a less compressed form than the subject line.  e.g.
+Determining the value for the FEX bit is suppose to be done like this:
 
-| The sm501 controller includes an i2c slave from which the monitor's
-| EDID information can be read.  This wasn't yet implemented in qemu,
-| so this patch adds it.
-|
-| (The sm501 part is used only by the SH4 and PPC sam460ex machine
-| types in qemu)
+FEX =3D (VX & VE) | (OX & OE) | (UX & UE) | (ZX & ZE) | (XX & XE))
+
+It is described as "the logical OR of all the floating-point exception =
+bits
+masked by their respective enable bits". It was not implemented =
+correctly. The value of FEX would stay on even when all other bits were =
+set to off.
+
+The VX bit is described as "the logical OR of all of the invalid =
+operation exceptions". This bit was also not implemented correctly.
+
+>  * Where can we find documentation which describes how they should be
+>    set correctly?
+
+My main source of information is an IBM document called:=20
+
+PowerPC Microprocessor Family:
+The Programming Environments for 32-Bit Microprocessors
+
+Page 62 is where the FPSCR information is located.
+
+This is an older copy than the one I use but it is still very useful:
+=
+https://www.pdfdrive.net/powerpc-microprocessor-family-the-programming-env=
+ironments-for-32-e3087633.html
+
+I have an G3 and G5 iMac that I used to compare values with QEMU. This =
+patch fixed all the problems I was having with these bits.
+
+Please let me know if there is anything else I could provide to help.
 
 >=20
-> > [snip]
-> > >  static const VMStateDescription vmstate_sm501_sysbus =3D {
-> > >      .name =3D TYPE_SYSBUS_SM501,
-> > > -    .version_id =3D 1,
-> > > -    .minimum_version_id =3D 1,
-> > > +    .version_id =3D 2,
-> > > +    .minimum_version_id =3D 2,
-> > >      .fields =3D (VMStateField[]) {
-> > >          VMSTATE_STRUCT(state, SM501SysBusState, 1,
-> > >                         vmstate_sm501_state, SM501State),
-> >=20
-> > Additionally, since you're changing the migration stream, you need to
-> > point out that this is not used in any machine types which support
-> > cross-version migration.
+> This is information we need to properly review the patch.
 >=20
-> AFAIK it is only used in SH4 and PPC sam460ex.
+>>=20
+>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>> ---
+>> target/ppc/fpu_helper.c | 57 =
++++++++++++++++++++++++++++++++++++++++++++++++++
+>> 1 file changed, 57 insertions(+)
+>>=20
+>> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+>> index d31a933cbb..7e697a11d0 100644
+>> --- a/target/ppc/fpu_helper.c
+>> +++ b/target/ppc/fpu_helper.c
+>> @@ -325,6 +325,63 @@ void helper_fpscr_clrbit(CPUPPCState *env, =
+uint32_t bit)
+>>         case FPSCR_RN:
+>>             fpscr_set_rounding_mode(env);
+>>             break;
+>> +        case FPSCR_VXSNAN:
+>> +        case FPSCR_VXISI:
+>> +        case FPSCR_VXIDI:
+>> +        case FPSCR_VXZDZ:
+>> +        case FPSCR_VXIMZ:
+>> +        case FPSCR_VXVC:
+>> +        case FPSCR_VXSOFT:
+>> +        case FPSCR_VXSQRT:
+>> +        case FPSCR_VXCVI:
+>> +        {
+>> +            int vxsnan, vxisi, vxidi, vxzdz, vximz, vxvc, vxsoft, =
+vxsqrt, vxcvi;
+>> +            vxsnan =3D (env->fpscr >> (31 - FPSCR_VXSNAN)) & 1;
+>> +            vxisi =3D (env->fpscr >> (31 - FPSCR_VXISI)) & 1;
+>> +            vxidi =3D (env->fpscr >> (31 - FPSCR_VXIDI)) & 1;
+>> +            vxzdz =3D (env->fpscr >> (31 - FPSCR_VXZDZ)) & 1;
+>> +            vximz =3D (env->fpscr >> (31 - FPSCR_VXIMZ)) & 1;
+>> +            vxvc =3D (env->fpscr >> (31 - FPSCR_VXVC)) & 1;
+>> +            vxsoft =3D (env->fpscr >> (31 - FPSCR_VXSOFT)) & 1;
+>> +            vxsqrt =3D (env->fpscr >> (31 - FPSCR_VXSQRT)) & 1;
+>> +            vxcvi =3D (env->fpscr >> (31 - FPSCR_VXCVI)) & 1;
+>> +            if (~(vxsnan & vxisi & vxidi & vxzdz & vximz & vxvc & =
+vxsoft &
+>> +                  vxsqrt & vxcvi)) {
+>> +                /* Set VX bit to zero */
+>> +                env->fpscr =3D env->fpscr & ~(1 << FPSCR_VX);
+>> +            }
+>> +        }
+>> +            break;
+>> +        case FPSCR_VX:
+>> +        case FPSCR_OX:
+>> +        case FPSCR_UX:
+>> +        case FPSCR_ZX:
+>> +        case FPSCR_XX:
+>> +        case FPSCR_VE:
+>> +        case FPSCR_OE:
+>> +        case FPSCR_UE:
+>> +        case FPSCR_ZE:
+>> +        case FPSCR_XE:
+>> +        {
+>> +            int vx, ox, ux, zx, xx, ve, oe, ue, ze, xe;
+>> +            vx =3D (env->fpscr >> (31 - FPSCR_VX)) & 1;
+>> +            ox =3D (env->fpscr >> (31 - FPSCR_OX)) & 1;
+>> +            ux =3D (env->fpscr >> (31 - FPSCR_UX)) & 1;
+>> +            zx =3D (env->fpscr >> (31 - FPSCR_ZX)) & 1;
+>> +            xx =3D (env->fpscr >> (31 - FPSCR_XX)) & 1;
+>> +            ve =3D (env->fpscr >> (31 - FPSCR_VE)) & 1;
+>> +            oe =3D (env->fpscr >> (31 - FPSCR_OE)) & 1;
+>> +            ue =3D (env->fpscr >> (31 - FPSCR_UE)) & 1;
+>> +            ze =3D (env->fpscr >> (31 - FPSCR_ZE)) & 1;
+>> +            xe =3D (env->fpscr >> (31 - FPSCR_XE)) & 1;
+>> +            bool fex;
+>> +            fex =3D (vx & ve) | (ox & oe) | (ux & ue) | (zx & ze) | =
+(xx & xe);
+>> +            unsigned int mask;
+>> +            mask =3D (1 << FPSCR_FEX);
+>> +            /* Set the FEX bit */
+>> +            env->fpscr =3D (env->fpscr & ~mask) | (-fex & mask);
+>> +        }
+>> +            break;
+>>         default:
+>>             break;
+>>         }
 >=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---V3eawNQxI9TAjvgi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsnBX0ACgkQbDjKyiDZ
-s5Knaw/8D3n4vG510yct2dpUXn3vchrpMmSxuoI+unte0ZjQwAeslBkzYn2BIE3i
-Z+xwI6KQgJjrTLpWzo5roHtDtpkK1Wu4SGHaGJcPOwBlsYbn2hhaeKyMKY9/X1+A
-eqxLZ7S8zxT/lEPBwL0VDpGDp5poVrL7qiv+8i2gEjPYKjhvPGfVq46YzlzK0BbV
-rAOXwWFKtcl/Ejw4Tpeng29e6VvvHTdUGR5rw/dYphgLzv5TqDlof103oDwT0HOh
-IZi17HzioAklW57I3bJX8/Bd2FkgaqODICJdSTwjmAzf/a4qcrDOwrQjm3Gqfkdn
-Zy1akSPCPctqcRC+6nE1FqCzujvLEZH0b6cZ5fyr5KBvB8hkG6zrrUNi1JoqbYvr
-UqlXTKvtsJetZBJPSAxstgDYYXe/Q6M0pTr78543hC7kgy6cV4FwbTdL9C769XHq
-du7EKFLfmZFOdHu3R+kvejhbYPwN5RJFn0auFX3P42GIR6F0eAs73k+hlb2MDkbk
-VYRcERh5hHGGmO+9syL+8K84Yn9pAy/Yc1v/e8BbSCFC5RBLL8yjXhaMhzDHV43n
-NFpOklaCTdngvZ+c3XhumZnJk65qz7lLhl6FGJ85fk9hkRD6b8F6I/uBfKF1VWe4
-cy6tQeGPT1vjdxVRcxhqCmIGQk4W1oe/eVTp9ZJHkWrV7Wtxo6k=
-=Nb4b
------END PGP SIGNATURE-----
-
---V3eawNQxI9TAjvgi--
+> --=20
+> David Gibson			| I'll have my music baroque, and my =
+code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT =
+_the_ _other_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
