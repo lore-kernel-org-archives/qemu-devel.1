@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46559)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fV2RK-0000yF-M2
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 18:16:00 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1fV2Zc-0002Mh-DK
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 18:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fV2RH-00062b-HD
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 18:15:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58652 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fV2RH-00062I-CO
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 18:15:55 -0400
-References: <152899585150.702.2589994392500110079@d39dc562802a>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d78e8f55-5527-1d8f-c38b-bcbcbb5ef381@redhat.com>
-Date: Mon, 18 Jun 2018 17:15:53 -0500
-MIME-Version: 1.0
-In-Reply-To: <152899585150.702.2589994392500110079@d39dc562802a>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/2] Fix compilation with python-3 if
- en_US.UTF-8 is unavailable
+	(envelope-from <programmingkidx@gmail.com>) id 1fV2ZZ-000285-9E
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 18:24:32 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:34858)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1fV2ZZ-00027i-49
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 18:24:29 -0400
+Received: by mail-io0-x241.google.com with SMTP id u4-v6so18317603iof.2
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 15:24:28 -0700 (PDT)
+Mime-Version: 1.0 (Apple Message framework v1084)
+Content-Type: text/plain; charset=us-ascii
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <CAFEAcA9F1sTX_9b5PJL61K5eRsP9XoY3KKje_4CNh71JKiw39w@mail.gmail.com>
+Date: Mon, 18 Jun 2018 18:24:25 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <5BE60DE6-10C2-4B62-B34D-50F6C014EE7A@gmail.com>
+References: <20180608200150.7032-1-programmingkidx@gmail.com>
+	<CAFEAcA9F1sTX_9b5PJL61K5eRsP9XoY3KKje_4CNh71JKiw39w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] ui/cocoa.m: fix absolute mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, no-reply@patchew.org, tamiko@43-1.org
-Cc: famz@redhat.com, ehabkost@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 06/14/2018 12:04 PM, no-reply@patchew.org wrote:
-> Hi,
-> 
-> This series failed build test on s390x host. Please find the details below.
-> 
 
->    GEN     qemu-options.def
->    GEN     qapi-gen
->    GEN     trace/generated-tcg-tracers.h
-> /var/tmp/patchew-tester-tmp-j902xtzn/src/qapi/qapi-schema.json:56: Pragma returns-whitelist must be a list of strings
+On Jun 18, 2018, at 7:18 AM, Peter Maydell wrote:
 
-Your idea makes sense (force the encoding in our scripts that care about 
-encoding, rather than via the environment), but you'll need to resolve 
-this build failure first.  Looking forward to v2.
+> On 8 June 2018 at 21:01, John Arbuckle <programmingkidx@gmail.com> =
+wrote:
+>> Fix the cocoa front-end to correctly be able to use absolute mode.
+>>=20
+>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>=20
+> This commit message is insufficiently detailed, which makes
+> it hard to review the patch. When you send patches, please
+> can you provide commit messages which describe what the
+> problem is, where the current code gets things wrong and
+> why the changes fix the issue? It is painful to have to
+> reverse-engineer your design from your code changes.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Sorry I will correct this problem now.
+
+This should have been the commit message:
+
+When using an usb-tablet device in QEMU, the Cocoa UI uses absolute mode =
+code to handle mouse events. The absolute mode code does not correctly =
+determine where QEMU's window is located. Tests indicate the current =
+code thinks the window is located in the bottom left of the screen. This =
+makes grabbing and ungrabbing happen at the wrong place. This patch =
+fixes this problem by making mouse grabs happen only in the window and =
+mouse ungrabs happen only when the mouse is moved outside the window.=
