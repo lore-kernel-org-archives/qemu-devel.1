@@ -1,17 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fUv6d-00025y-9e
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:26:13 -0400
+	(envelope-from <armbru@redhat.com>) id 1fUvAV-0005Nj-BC
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:30:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fUv6c-0000rR-A5
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:26:07 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Mon, 18 Jun 2018 16:25:35 +0200
-Message-Id: <20180618142536.23995-12-david@redhat.com>
-In-Reply-To: <20180618142536.23995-1-david@redhat.com>
-References: <20180618142536.23995-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 11/12] nvdimm: make get_memory_region()
- perform checks and initialization
+	(envelope-from <armbru@redhat.com>) id 1fUvAS-0002S2-7T
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:30:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57250 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fUvAS-0002R7-2z
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:30:04 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A9476401DEAF
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 14:30:03 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
+	<20180321115211.17937-2-marcandre.lureau@redhat.com>
+Date: Mon, 18 Jun 2018 16:29:59 +0200
+In-Reply-To: <20180321115211.17937-2-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 21 Mar 2018 12:51:23 +0100")
+Message-ID: <87wouw88wo.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 01/49] qapi/visit: remove useless prefix
+ argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,90 +36,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com
 
-We might get a call to get_memory_region() before the device has been
-realized. We should return a consistent value, as the return value
-will e.g. later on be used in the pre_plug handler.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-To avoid duplicating too much code, factor the initialization and checks
-out into a helper function.
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi/visit.py | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+> index 5d72d8936c..3c5ea1289e 100644
+> --- a/scripts/qapi/visit.py
+> +++ b/scripts/qapi/visit.py
+> @@ -293,7 +293,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVis=
+itor):
+>  #include "qapi/qmp/qerror.h"
+>  #include "%(visit)s.h"
+>  ''',
+> -                                      visit=3Dvisit, prefix=3Dself._pref=
+ix))
+> +                                      visit=3Dvisit))
+>          self._genh.preamble_add(mcgen('''
+>  #include "qapi/qapi-builtin-visit.h"
+>  #include "%(types)s.h"
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- hw/mem/nvdimm.c | 46 +++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 37 insertions(+), 9 deletions(-)
-
-diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-index db7d8c3050..bba98e57e1 100644
---- a/hw/mem/nvdimm.c
-+++ b/hw/mem/nvdimm.c
-@@ -71,20 +71,24 @@ static void nvdimm_init(Object *obj)
-                         NULL, NULL);
- }
- 
--static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
-+static void nvdimm_prepare_memory_region(NVDIMMDevice *nvdimm, Error **errp)
- {
--    NVDIMMDevice *nvdimm = NVDIMM(dimm);
-+    PCDIMMDevice *dimm = PC_DIMM(nvdimm);
-+    uint64_t align, pmem_size, size;
-+    MemoryRegion *mr;
- 
--    return nvdimm->nvdimm_mr;
--}
-+    if (nvdimm->nvdimm_mr) {
-+        return;
-+    }
- 
--static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
--{
--    MemoryRegion *mr = host_memory_backend_get_memory(dimm->hostmem);
--    NVDIMMDevice *nvdimm = NVDIMM(dimm);
--    uint64_t align, pmem_size, size = memory_region_size(mr);
-+    if (!dimm->hostmem) {
-+        error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property must be set");
-+        return;
-+    }
- 
-+    mr = host_memory_backend_get_memory(dimm->hostmem);
-     align = memory_region_get_alignment(mr);
-+    size = memory_region_size(mr);
- 
-     pmem_size = size - nvdimm->label_size;
-     nvdimm->label_data = memory_region_get_ram_ptr(mr) + pmem_size;
-@@ -108,6 +112,30 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
-     nvdimm->nvdimm_mr->align = align;
- }
- 
-+static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
-+{
-+    NVDIMMDevice *nvdimm = NVDIMM(dimm);
-+    Error *local_err = NULL;
-+
-+    if (!nvdimm->nvdimm_mr) {
-+        nvdimm_prepare_memory_region(nvdimm, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            return NULL;
-+        }
-+    }
-+    return nvdimm->nvdimm_mr;
-+}
-+
-+static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
-+{
-+    NVDIMMDevice *nvdimm = NVDIMM(dimm);
-+
-+    if (!nvdimm->nvdimm_mr) {
-+        nvdimm_prepare_memory_region(nvdimm, errp);
-+    }
-+}
-+
- /*
-  * the caller should check the input parameters before calling
-  * label read/write functions.
--- 
-2.17.1
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
