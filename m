@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUlEY-0005Jp-6z
+	(envelope-from <dgibson@ozlabs.org>) id 1fUlEX-0005J9-S2
 	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 23:53:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUlEW-0003yr-Q3
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 23:53:38 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fUlEW-0003yY-JI
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 23:53:37 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 18 Jun 2018 13:53:04 +1000
-Message-Id: <20180618035324.19907-9-david@gibson.dropbear.id.au>
+Date: Mon, 18 Jun 2018 13:53:05 +1000
+Message-Id: <20180618035324.19907-10-david@gibson.dropbear.id.au>
 In-Reply-To: <20180618035324.19907-1-david@gibson.dropbear.id.au>
 References: <20180618035324.19907-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 08/28] mac_newworld: wire up programmer switch
- to NMI handler
+Subject: [Qemu-devel] [PULL 09/28] adb: fix read reg 3 byte ordering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +24,49 @@ Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org, clg@kaod.org, ag
 
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-The programmer switch is wired up via an external GPIO pin and can be used
-to aid debugging Mac guests.
+According to the Apple ADB documentation, register 3 is a 2-byte register
+with the device address in the first byte, and the handler ID in the second
+byte.
+
+This is currently the opposite away to which QEMU returns them so switch the
+order around.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/misc/macio/gpio.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ hw/input/adb-kbd.c   | 4 ++--
+ hw/input/adb-mouse.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/misc/macio/gpio.c b/hw/misc/macio/gpio.c
-index 5630afdf18..9317df759c 100644
---- a/hw/misc/macio/gpio.c
-+++ b/hw/misc/macio/gpio.c
-@@ -28,6 +28,7 @@
- #include "hw/ppc/mac.h"
- #include "hw/misc/macio/macio.h"
- #include "hw/misc/macio/gpio.h"
-+#include "hw/nmi.h"
- #include "qemu/log.h"
- #include "trace.h"
- 
-@@ -193,13 +194,21 @@ static void macio_gpio_reset(DeviceState *dev)
-     macio_set_gpio(s, 1, true);
- }
- 
-+static void macio_gpio_nmi(NMIState *n, int cpu_index, Error **errp)
-+{
-+    macio_set_gpio(MACIO_GPIO(n), 9, true);
-+    macio_set_gpio(MACIO_GPIO(n), 9, false);
-+}
-+
- static void macio_gpio_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-+    NMIClass *nc = NMI_CLASS(oc);
- 
-     dc->realize = macio_gpio_realize;
-     dc->reset = macio_gpio_reset;
-     dc->vmsd = &vmstate_macio_gpio;
-+    nc->nmi_monitor_handler = macio_gpio_nmi;
- }
- 
- static const TypeInfo macio_gpio_init_info = {
-@@ -208,6 +217,10 @@ static const TypeInfo macio_gpio_init_info = {
-     .instance_size = sizeof(MacIOGPIOState),
-     .instance_init = macio_gpio_init,
-     .class_init    = macio_gpio_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_NMI },
-+        { }
-+    },
- };
- 
- static void macio_gpio_register_types(void)
+diff --git a/hw/input/adb-kbd.c b/hw/input/adb-kbd.c
+index 50b62712c8..0ad384dc89 100644
+--- a/hw/input/adb-kbd.c
++++ b/hw/input/adb-kbd.c
+@@ -290,8 +290,8 @@ static int adb_kbd_request(ADBDevice *d, uint8_t *obuf,
+             olen = 2;
+             break;
+         case 3:
+-            obuf[0] = d->handler;
+-            obuf[1] = d->devaddr;
++            obuf[0] = d->devaddr;
++            obuf[1] = d->handler;
+             olen = 2;
+             break;
+         }
+diff --git a/hw/input/adb-mouse.c b/hw/input/adb-mouse.c
+index 3ba6027d33..473045fbac 100644
+--- a/hw/input/adb-mouse.c
++++ b/hw/input/adb-mouse.c
+@@ -172,8 +172,8 @@ static int adb_mouse_request(ADBDevice *d, uint8_t *obuf,
+         case 1:
+             break;
+         case 3:
+-            obuf[0] = d->handler;
+-            obuf[1] = d->devaddr;
++            obuf[0] = d->devaddr;
++            obuf[1] = d->handler;
+             olen = 2;
+             break;
+         }
 -- 
 2.17.1
