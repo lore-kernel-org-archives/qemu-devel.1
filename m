@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUtKJ-00048b-EY
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:32:10 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fUtKJ-00048Z-Dd
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:32:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUtKF-0003lT-FR
+	(envelope-from <dgibson@ozlabs.org>) id 1fUtKF-0003lZ-Ge
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:32:07 -0400
-Date: Mon, 18 Jun 2018 22:13:28 +1000
+Date: Mon, 18 Jun 2018 22:16:33 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180618121328.GY25461@umbus.fritz.box>
-References: <20180615152536.30093-1-clg@kaod.org>
-	<20180615152536.30093-4-clg@kaod.org>
-	<20180618103844.GX25461@umbus.fritz.box>
-	<9d1ce421-9caa-08eb-2417-15307dd271ed@kaod.org>
+Message-ID: <20180618121633.GZ25461@umbus.fritz.box>
+References: <20180615115303.31125-1-clg@kaod.org>
+	<20180615115303.31125-2-clg@kaod.org>
+	<20180618040006.GS25461@umbus.fritz.box>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="PxDrs/Fpf4pPiewX"
+	protocol="application/pgp-signature"; boundary="SzQ167Kp6Zo0TWVn"
 Content-Disposition: inline
-In-Reply-To: <9d1ce421-9caa-08eb-2417-15307dd271ed@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] ppc/pnv: introduce Pnv8Chip and
- Pnv9Chip models
+In-Reply-To: <20180618040006.GS25461@umbus.fritz.box>
+Subject: Re: [Qemu-devel] [PATCH 1/3] spapr: split the IRQ allocation
+ sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,662 +30,262 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---PxDrs/Fpf4pPiewX
+--SzQ167Kp6Zo0TWVn
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 18, 2018 at 01:30:13PM +0200, C=E9dric Le Goater wrote:
-> On 06/18/2018 12:38 PM, David Gibson wrote:
-> > On Fri, Jun 15, 2018 at 05:25:35PM +0200, C=E9dric Le Goater wrote:
-> >> This is a major reshuffle of the PowerNV machine and chip models to
-> >> introduce a machine type per processor. It is quite noisy but it
-> >> doesn't change much the code flow.
-> >>
-> >> It introduces a base PnvChip class from which the specific processor
-> >> chip classes, Pnv8Chip and Pnv9Chip, inherit. Each of them needs to
-> >> define an init and a realize routine which will create the controllers
-> >> of the target processor. For the moment, the base PnvChip class
-> >> handles the XSCOM bus and the cores but the core creation will surely
-> >> move to the specific processor chip classes because of the new XIVE
-> >> interrupt controller in Power9.
-> >>
-> >> >From there, we introduce two different machines : "powernv8" and
-> >> "powernv9" but, a part from the XICSFabric interface, this is not
-> >> strictly needed as it is the cpu type which determines the PnvChip
-> >> class. Something to discuss.
+On Mon, Jun 18, 2018 at 02:00:06PM +1000, David Gibson wrote:
+> On Fri, Jun 15, 2018 at 01:53:01PM +0200, C=E9dric Le Goater wrote:
+> > Today, when a device requests for IRQ number in a sPAPR machine, the
+> > spapr_irq_alloc() routine first scans the ICSState status array to
+> > find an empty slot and then performs the assignement of the selected
+> > numbers. Split this sequence in two distinct routines : spapr_irq_find()
+> > for lookups and spapr_irq_claim() for claiming the IRQ numbers.
 > >=20
-> > Yeah.. I'd leave this bit out for now.  It can go into a later patch,
-> > with the machine type actually determining the chip type.
->=20
-> yes. There are other issues to fix around the machine type anyway. Like
-> making sure we cannot start a machine with : -M powernv9 -cpu POWER8
-> =20
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >> ---
-> >>  include/hw/ppc/pnv.h |  23 +++-
-> >>  hw/ppc/pnv.c         | 322 +++++++++++++++++++++++++++++++++---------=
----------
-> >>  2 files changed, 231 insertions(+), 114 deletions(-)
-> >>
-> >> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> >> index 563279f3e00c..244856414580 100644
-> >> --- a/include/hw/ppc/pnv.h
-> >> +++ b/include/hw/ppc/pnv.h
-> >> @@ -57,12 +57,32 @@ typedef struct PnvChip {
-> >>      MemoryRegion xscom_mmio;
-> >>      MemoryRegion xscom;
-> >>      AddressSpace xscom_as;
-> >> +} PnvChip;
-> >> +
-> >> +#define TYPE_PNV8_CHIP "pnv8-chip"
-> >> +#define PNV8_CHIP(obj) OBJECT_CHECK(Pnv8Chip, (obj), TYPE_PNV8_CHIP)
-> >> +
-> >> +typedef struct Pnv8Chip {
-> >> +    /*< private >*/
-> >> +    PnvChip      parent_obj;
-> >> +
-> >> +    /*< public >*/
-> >>      MemoryRegion icp_mmio;
-> >> =20
-> >>      PnvLpcController lpc;
-> >>      PnvPsi       psi;
-> >>      PnvOCC       occ;
-> >> -} PnvChip;
-> >> +} Pnv8Chip;
-> >> +
-> >> +#define TYPE_PNV9_CHIP "pnv9-chip"
-> >> +#define PNV9_CHIP(obj) OBJECT_CHECK(Pnv9Chip, (obj), TYPE_PNV9_CHIP)
-> >> +
-> >> +typedef struct Pnv9Chip {
-> >> +    /*< private >*/
-> >> +    PnvChip      parent_obj;
-> >> +
-> >> +    /*< public >*/
-> >> +} Pnv9Chip;
-> >> =20
-> >>  typedef struct PnvChipClass {
-> >>      /*< private >*/
-> >> @@ -75,6 +95,7 @@ typedef struct PnvChipClass {
-> >> =20
-> >>      hwaddr       xscom_base;
-> >> =20
-> >> +    void (*realize)(PnvChip *chip, Error **errp);
+> > This will ease the introduction of a static layout of IRQ numbers.
 > >=20
-> > This looks the wrong way round from how things are usually done.
-> > Rather than having the base class realize() call the subclass specific
-> > realize hook, it's more usual for the subclass to set the
-> > dc->realize() and have it call a k->parent_realize() to call up the
-> > chain.  grep for device_class_set_parent_realize() for some more
-> > examples.
+> > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> > ---
+> >  include/hw/ppc/spapr.h |  5 ++++
+> >  hw/ppc/spapr.c         | 64 ++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  hw/ppc/spapr_events.c  | 18 ++++++++++----
+> >  hw/ppc/spapr_pci.c     | 19 ++++++++++++---
+> >  hw/ppc/spapr_vio.c     | 10 +++++++-
+> >  5 files changed, 108 insertions(+), 8 deletions(-)
+> >=20
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index 3388750fc795..6088f44c1b2a 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -776,6 +776,11 @@ int spapr_irq_alloc(sPAPRMachineState *spapr, int =
+irq_hint, bool lsi,
+> >                      Error **errp);
+> >  int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
+> >                            bool align, Error **errp);
+> > +int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align,
+> > +                   Error **errp);
+> > +#define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false,=
+ errp)
+> > +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, int num, bool l=
+si,
+> > +                    Error **errp);
 >=20
-> Ah. That is more to my liking. There are a couple of models following
-> the wrong object pattern, xics, vio. I will check them.
+> Unlike find, there's no reason we need to atomically claim a block of
+> irqs.  So I think claim should just grab a single irq.  Callers can
+> loop if they need multiple irqs.
 
-Ah, yeah, probably my ignorance at the time showing.
+Actually.. I take that back.  We don't *need* a block-claim interface,
+but if it's convenient there's no strong reason not to (as long as
+therer aren't *both* single and block interfaces, which there aren't).
 
-> > As a general rule, giving the overall control flow to the most
-> > specific subclass in the chain tends to work better.
+So feel free to run with that, once the rollback bugs Greg pointed out
+are fixed.
+
+
+> Other than that and the minor points Greg noted, this looks good.
 >=20
-> yes.=20
+> >  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+> >  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+> > =20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index f59999daacfc..b1d19b328166 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -3810,6 +3810,36 @@ static int ics_find_free_block(ICSState *ics, in=
+t num, int alignnum)
+> >      return -1;
+> >  }
+> > =20
+> > +int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Erro=
+r **errp)
+> > +{
+> > +    ICSState *ics =3D spapr->ics;
+> > +    int first =3D -1;
+> > +
+> > +    assert(ics);
+> > +
+> > +    /*
+> > +     * MSIMesage::data is used for storing VIRQ so
+> > +     * it has to be aligned to num to support multiple
+> > +     * MSI vectors. MSI-X is not affected by this.
+> > +     * The hint is used for the first IRQ, the rest should
+> > +     * be allocated continuously.
+> > +     */
+> > +    if (align) {
+> > +        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+> > +               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+> > +        first =3D ics_find_free_block(ics, num, num);
+> > +    } else {
+> > +        first =3D ics_find_free_block(ics, num, 1);
+> > +    }
+> > +
+> > +    if (first < 0) {
+> > +        error_setg(errp, "can't find a free %d-IRQ block", num);
+> > +        return -1;
+> > +    }
+> > +
+> > +    return first + ics->offset;
+> > +}
+> > +
+> >  /*
+> >   * Allocate the IRQ number and set the IRQ type, LSI or MSI
+> >   */
+> > @@ -3888,6 +3918,40 @@ int spapr_irq_alloc_block(sPAPRMachineState *spa=
+pr, int num, bool lsi,
+> >      return first;
+> >  }
+> > =20
+> > +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, int num, bool l=
+si,
+> > +                    Error **errp)
+> > +{
+> > +    ICSState *ics =3D spapr->ics;
+> > +    int i;
+> > +    int srcno =3D irq - ics->offset;
+> > +    int ret =3D 0;
+> > +
+> > +    assert(ics);
+> > +
+> > +    if (!ics_valid_irq(ics, irq) || !ics_valid_irq(ics, irq + num)) {
+> > +        return -1;
+> > +    }
+> > +
+> > +    for (i =3D srcno; i < srcno + num; ++i) {
+> > +        if (ICS_IRQ_FREE(ics, i)) {
+> > +            spapr_irq_set_lsi(spapr, i + ics->offset, lsi);
+> > +        } else {
+> > +            error_setg(errp, "IRQ %d is not free", i + ics->offset);
+> > +            ret =3D -1;
+> > +            break;
+> > +        }
+> > +    }
+> > +
+> > +    /* we could call spapr_irq_free() when rolling back */
+> > +    if (ret) {
+> > +        while (--i >=3D srcno) {
+> > +            memset(&ics->irqs[i], 0, sizeof(ICSIRQState));
+> > +        }
+> > +    }
+> > +
+> > +    return ret;
+> > +}
+> > +
+> >  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
+> >  {
+> >      ICSState *ics =3D spapr->ics;
+> > diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> > index 86836f0626dc..3b6ae7272092 100644
+> > --- a/hw/ppc/spapr_events.c
+> > +++ b/hw/ppc/spapr_events.c
+> > @@ -707,13 +707,18 @@ void spapr_clear_pending_events(sPAPRMachineState=
+ *spapr)
+> > =20
+> >  void spapr_events_init(sPAPRMachineState *spapr)
+> >  {
+> > +    int epow_irq;
+> > +
+> > +    epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
+> > +
+> > +    spapr_irq_claim(spapr, epow_irq, 1, false, &error_fatal);
+> > +
+> >      QTAILQ_INIT(&spapr->pending_events);
+> > =20
+> >      spapr->event_sources =3D spapr_event_sources_new();
+> > =20
+> >      spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_EPO=
+W,
+> > -                                 spapr_irq_alloc(spapr, 0, false,
+> > -                                                  &error_fatal));
+> > +                                 epow_irq);
+> > =20
+> >      /* NOTE: if machine supports modern/dedicated hotplug event source,
+> >       * we add it to the device-tree unconditionally. This means we may
+> > @@ -724,9 +729,14 @@ void spapr_events_init(sPAPRMachineState *spapr)
+> >       * checking that it's enabled.
+> >       */
+> >      if (spapr->use_hotplug_event_source) {
+> > +        int hp_irq;
+> > +
+> > +        hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
+> > +
+> > +        spapr_irq_claim(spapr, hp_irq, 1, false, &error_fatal);
+> > +
+> >          spapr_event_sources_register(spapr->event_sources, EVENT_CLASS=
+_HOT_PLUG,
+> > -                                     spapr_irq_alloc(spapr, 0, false,
+> > -                                                      &error_fatal));
+> > +                                     hp_irq);
+> >      }
+> > =20
+> >      spapr->epow_notifier.notify =3D spapr_powerdown_req;
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index f936ce63effa..7394c62b4a8b 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -371,8 +371,14 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, s=
+PAPRMachineState *spapr,
+> >      }
+> > =20
+> >      /* Allocate MSIs */
+> > -    irq =3D spapr_irq_alloc_block(spapr, req_num, false,
+> > -                           ret_intr_type =3D=3D RTAS_TYPE_MSI, &err);
+> > +    irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS_T=
+YPE_MSI, &err);
+> > +    if (err) {
+> > +        error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+> > +                          config_addr);
+> > +        rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+> > +        return;
+> > +    }
+> > +    spapr_irq_claim(spapr, irq, req_num, false, &err);
+> >      if (err) {
+> >          error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+> >                            config_addr);
+> > @@ -1698,7 +1704,14 @@ static void spapr_phb_realize(DeviceState *dev, =
+Error **errp)
+> >          uint32_t irq;
+> >          Error *local_err =3D NULL;
+> > =20
+> > -        irq =3D spapr_irq_alloc_block(spapr, 1, true, false, &local_er=
+r);
+> > +        irq =3D spapr_irq_findone(spapr, &local_err);
+> > +        if (local_err) {
+> > +            error_propagate(errp, local_err);
+> > +            error_prepend(errp, "can't allocate LSIs: ");
+> > +            return;
+> > +        }
+> > +
+> > +        spapr_irq_claim(spapr, irq, 1, true, &local_err);
+> >          if (local_err) {
+> >              error_propagate(errp, local_err);
+> >              error_prepend(errp, "can't allocate LSIs: ");
+> > diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+> > index 4555c648a8e2..ad9b56e28447 100644
+> > --- a/hw/ppc/spapr_vio.c
+> > +++ b/hw/ppc/spapr_vio.c
+> > @@ -475,7 +475,15 @@ static void spapr_vio_busdev_realize(DeviceState *=
+qdev, Error **errp)
+> >          dev->qdev.id =3D id;
+> >      }
+> > =20
+> > -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err);
+> > +    if (!dev->irq) {
+> > +        dev->irq =3D spapr_irq_findone(spapr, &local_err);
+> > +        if (local_err) {
+> > +            error_propagate(errp, local_err);
+> > +            return;
+> > +        }
+> > +    }
+> > +
+> > +    spapr_irq_claim(spapr, dev->irq, 1, false, &local_err);
+> >      if (local_err) {
+> >          error_propagate(errp, local_err);
+> >          return;
 >=20
-> > Other than that, this looks good.
->=20
-> OK. I will then reshuffle the patchset and move out of the physmap patch=
-=20
-> on which we don't seem to have the same ideas. It can come later.
->=20
-> After that round, the P8/phb3 and P9/Xive can be the next models.
->=20
-> phb3 would be a good extension to the existing machine. It did some
-> code rework, so it looks better.
->=20
-> and Xive is a must of have for P9. But to get a P9 machine running,=20
-> we need a couple of more models :
-> =20
-> 	PSI, LPC, OCC,=20
->=20
-> nothing complex, and I think they are ready, and some P9 CPU work:=20
->=20
-> 	32bit decrementer, stop_lite state, radix.
->=20
-> I worked around these for the moment.
->=20
-> Thanks,
->=20
-> C.=20
->=20
-> >>      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
-> >>      Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp=
-);
-> >>      ISABus *(*isa_create)(PnvChip *chip, Error **errp);
-> >> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> >> index ac828d133173..b416a1a6ed63 100644
-> >> --- a/hw/ppc/pnv.c
-> >> +++ b/hw/ppc/pnv.c
-> >> @@ -531,12 +531,14 @@ static void pnv_reset(void)
-> >> =20
-> >>  static ISABus *pnv_chip_power8_isa_create(PnvChip *chip, Error **errp)
-> >>  {
-> >> -    return pnv_lpc_isa_create(&chip->lpc, true, errp);
-> >> +    Pnv8Chip *chip8 =3D PNV8_CHIP(chip);
-> >> +    return pnv_lpc_isa_create(&chip8->lpc, true, errp);
-> >>  }
-> >> =20
-> >>  static ISABus *pnv_chip_power8nvl_isa_create(PnvChip *chip, Error **e=
-rrp)
-> >>  {
-> >> -    return pnv_lpc_isa_create(&chip->lpc, false, errp);
-> >> +    Pnv8Chip *chip8 =3D PNV8_CHIP(chip);
-> >> +    return pnv_lpc_isa_create(&chip8->lpc, false, errp);
-> >>  }
-> >> =20
-> >>  static ISABus *pnv_chip_power9_isa_create(PnvChip *chip, Error **errp)
-> >> @@ -725,6 +727,97 @@ static Object *pnv_chip_power9_intc_create(PnvChi=
-p *chip, Object *child,
-> >>   */
-> >>  #define POWER9_CORE_MASK   (0xffffffffffffffull)
-> >> =20
-> >> +static void pnv_chip_power8_instance_init(Object *obj)
-> >> +{
-> >> +    Pnv8Chip *chip8 =3D PNV8_CHIP(obj);
-> >> +
-> >> +    object_initialize(&chip8->lpc, sizeof(chip8->lpc), TYPE_PNV_LPC);
-> >> +    object_property_add_child(obj, "lpc", OBJECT(&chip8->lpc), NULL);
-> >> +
-> >> +    object_initialize(&chip8->psi, sizeof(chip8->psi), TYPE_PNV_PSI);
-> >> +    object_property_add_child(obj, "psi", OBJECT(&chip8->psi), NULL);
-> >> +    object_property_add_const_link(OBJECT(&chip8->psi), "xics",
-> >> +                                   OBJECT(qdev_get_machine()), &error=
-_abort);
-> >> +
-> >> +    object_initialize(&chip8->occ, sizeof(chip8->occ), TYPE_PNV_OCC);
-> >> +    object_property_add_child(obj, "occ", OBJECT(&chip8->occ), NULL);
-> >> +    object_property_add_const_link(OBJECT(&chip8->occ), "psi",
-> >> +                                   OBJECT(&chip8->psi), &error_abort);
-> >> +
-> >> +    /* The LPC controller needs PSI to generate interrupts */
-> >> +    object_property_add_const_link(OBJECT(&chip8->lpc), "psi",
-> >> +                                   OBJECT(&chip8->psi), &error_abort);
-> >> +}
-> >> +
-> >> +static void pnv_chip_icp_realize(Pnv8Chip *chip8, Error **errp)
-> >> + {
-> >> +    PnvChip *chip =3D PNV_CHIP(chip8);
-> >> +    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> >> +    const char *typename =3D pnv_chip_core_typename(chip);
-> >> +    size_t typesize =3D object_type_get_instance_size(typename);
-> >> +    int i, j;
-> >> +    char *name;
-> >> +    XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
-> >> +
-> >> +    name =3D g_strdup_printf("icp-%x", chip->chip_id);
-> >> +    memory_region_init(&chip8->icp_mmio, OBJECT(chip), name, PNV_ICP_=
-SIZE);
-> >> +    sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip8->icp_mmio);
-> >> +    g_free(name);
-> >> +
-> >> +    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 1, PNV_ICP_BASE(chip));
-> >> +
-> >> +    /* Map the ICP registers for each thread */
-> >> +    for (i =3D 0; i < chip->nr_cores; i++) {
-> >> +        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-> >> +        int core_hwid =3D CPU_CORE(pnv_core)->core_id;
-> >> +
-> >> +        for (j =3D 0; j < CPU_CORE(pnv_core)->nr_threads; j++) {
-> >> +            uint32_t pir =3D pcc->core_pir(chip, core_hwid) + j;
-> >> +            PnvICPState *icp =3D PNV_ICP(xics_icp_get(xi, pir));
-> >> +
-> >> +            memory_region_add_subregion(&chip8->icp_mmio, pir << 12,
-> >> +                                        &icp->mmio);
-> >> +        }
-> >> +    }
-> >> +}
-> >> +
-> >> +static void pnv_chip_power8_realize(PnvChip *chip, Error **errp)
-> >> + {
-> >> +    Pnv8Chip *chip8 =3D PNV8_CHIP(chip);
-> >> +    Error *error =3D NULL;
-> >> +
-> >> +    /* Create LPC controller */
-> >> +    object_property_set_bool(OBJECT(&chip8->lpc), true, "realized",
-> >> +                             &error_fatal);
-> >> +    pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip8->lpc.xsc=
-om_regs);
-> >> +
-> >> +    /* Interrupt Management Area. This is the memory region holding
-> >> +     * all the Interrupt Control Presenter (ICP) registers */
-> >> +    pnv_chip_icp_realize(chip8, &error);
-> >> +    if (error) {
-> >> +        error_propagate(errp, error);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    /* Processor Service Interface (PSI) Host Bridge */
-> >> +    object_property_set_int(OBJECT(&chip8->psi), PNV_PSIHB_BASE(chip),
-> >> +                            "bar", &error_fatal);
-> >> +    object_property_set_bool(OBJECT(&chip8->psi), true, "realized", &=
-error);
-> >> +    if (error) {
-> >> +        error_propagate(errp, error);
-> >> +        return;
-> >> +    }
-> >> +    pnv_xscom_add_subregion(chip, PNV_XSCOM_PSIHB_BASE, &chip8->psi.x=
-scom_regs);
-> >> +
-> >> +    /* Create the simplified OCC model */
-> >> +    object_property_set_bool(OBJECT(&chip8->occ), true, "realized", &=
-error);
-> >> +    if (error) {
-> >> +        error_propagate(errp, error);
-> >> +        return;
-> >> +    }
-> >> +    pnv_xscom_add_subregion(chip, PNV_XSCOM_OCC_BASE, &chip8->occ.xsc=
-om_regs);
-> >> +}
-> >> +
-> >>  static void pnv_chip_power8e_class_init(ObjectClass *klass, void *dat=
-a)
-> >>  {
-> >>      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> >> @@ -736,6 +829,7 @@ static void pnv_chip_power8e_class_init(ObjectClas=
-s *klass, void *data)
-> >>      k->core_pir =3D pnv_chip_core_pir_p8;
-> >>      k->intc_create =3D pnv_chip_power8_intc_create;
-> >>      k->isa_create =3D pnv_chip_power8_isa_create;
-> >> +    k->realize  =3D pnv_chip_power8_realize;
-> >>      k->xscom_base =3D 0x003fc0000000000ull;
-> >>      dc->desc =3D "PowerNV Chip POWER8E";
-> >>  }
-> >> @@ -751,6 +845,7 @@ static void pnv_chip_power8_class_init(ObjectClass=
- *klass, void *data)
-> >>      k->core_pir =3D pnv_chip_core_pir_p8;
-> >>      k->intc_create =3D pnv_chip_power8_intc_create;
-> >>      k->isa_create =3D pnv_chip_power8_isa_create;
-> >> +    k->realize  =3D pnv_chip_power8_realize;
-> >>      k->xscom_base =3D 0x003fc0000000000ull;
-> >>      dc->desc =3D "PowerNV Chip POWER8";
-> >>  }
-> >> @@ -766,10 +861,20 @@ static void pnv_chip_power8nvl_class_init(Object=
-Class *klass, void *data)
-> >>      k->core_pir =3D pnv_chip_core_pir_p8;
-> >>      k->intc_create =3D pnv_chip_power8_intc_create;
-> >>      k->isa_create =3D pnv_chip_power8nvl_isa_create;
-> >> +    k->realize  =3D pnv_chip_power8_realize;
-> >>      k->xscom_base =3D 0x003fc0000000000ull;
-> >>      dc->desc =3D "PowerNV Chip POWER8NVL";
-> >>  }
-> >> =20
-> >> +static void pnv_chip_power9_instance_init(Object *obj)
-> >> +{
-> >> +}
-> >> +
-> >> +static void pnv_chip_power9_realize(PnvChip *chip, Error **errp)
-> >> +{
-> >> +
-> >> +}
-> >> +
-> >>  static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
-> >>  {
-> >>      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> >> @@ -781,6 +886,7 @@ static void pnv_chip_power9_class_init(ObjectClass=
- *klass, void *data)
-> >>      k->core_pir =3D pnv_chip_core_pir_p9;
-> >>      k->intc_create =3D pnv_chip_power9_intc_create;
-> >>      k->isa_create =3D pnv_chip_power9_isa_create;
-> >> +    k->realize  =3D pnv_chip_power9_realize;
-> >>      k->xscom_base =3D 0x00603fc00000000ull;
-> >>      dc->desc =3D "PowerNV Chip POWER9";
-> >>  }
-> >> @@ -815,59 +921,9 @@ static void pnv_chip_core_sanitize(PnvChip *chip,=
- Error **errp)
-> >>      }
-> >>  }
-> >> =20
-> >> -static void pnv_chip_init(Object *obj)
-> >> +static void pnv_chip_instance_init(Object *obj)
-> >>  {
-> >> -    PnvChip *chip =3D PNV_CHIP(obj);
-> >> -    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> >> -
-> >> -    chip->xscom_base =3D pcc->xscom_base;
-> >> -
-> >> -    object_initialize(&chip->lpc, sizeof(chip->lpc), TYPE_PNV_LPC);
-> >> -    object_property_add_child(obj, "lpc", OBJECT(&chip->lpc), NULL);
-> >> -
-> >> -    object_initialize(&chip->psi, sizeof(chip->psi), TYPE_PNV_PSI);
-> >> -    object_property_add_child(obj, "psi", OBJECT(&chip->psi), NULL);
-> >> -    object_property_add_const_link(OBJECT(&chip->psi), "xics",
-> >> -                                   OBJECT(qdev_get_machine()), &error=
-_abort);
-> >> -
-> >> -    object_initialize(&chip->occ, sizeof(chip->occ), TYPE_PNV_OCC);
-> >> -    object_property_add_child(obj, "occ", OBJECT(&chip->occ), NULL);
-> >> -    object_property_add_const_link(OBJECT(&chip->occ), "psi",
-> >> -                                   OBJECT(&chip->psi), &error_abort);
-> >> -
-> >> -    /* The LPC controller needs PSI to generate interrupts */
-> >> -    object_property_add_const_link(OBJECT(&chip->lpc), "psi",
-> >> -                                   OBJECT(&chip->psi), &error_abort);
-> >> -}
-> >> -
-> >> -static void pnv_chip_icp_realize(PnvChip *chip, Error **errp)
-> >> -{
-> >> -    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> >> -    const char *typename =3D pnv_chip_core_typename(chip);
-> >> -    size_t typesize =3D object_type_get_instance_size(typename);
-> >> -    int i, j;
-> >> -    char *name;
-> >> -    XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
-> >> -
-> >> -    name =3D g_strdup_printf("icp-%x", chip->chip_id);
-> >> -    memory_region_init(&chip->icp_mmio, OBJECT(chip), name, PNV_ICP_S=
-IZE);
-> >> -    sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip->icp_mmio);
-> >> -    g_free(name);
-> >> -
-> >> -    sysbus_mmio_map(SYS_BUS_DEVICE(chip), 1, PNV_ICP_BASE(chip));
-> >> -
-> >> -    /* Map the ICP registers for each thread */
-> >> -    for (i =3D 0; i < chip->nr_cores; i++) {
-> >> -        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-> >> -        int core_hwid =3D CPU_CORE(pnv_core)->core_id;
-> >> -
-> >> -        for (j =3D 0; j < CPU_CORE(pnv_core)->nr_threads; j++) {
-> >> -            uint32_t pir =3D pcc->core_pir(chip, core_hwid) + j;
-> >> -            PnvICPState *icp =3D PNV_ICP(xics_icp_get(xi, pir));
-> >> -
-> >> -            memory_region_add_subregion(&chip->icp_mmio, pir << 12, &=
-icp->mmio);
-> >> -        }
-> >> -    }
-> >> +    PNV_CHIP(obj)->xscom_base =3D PNV_CHIP_GET_CLASS(obj)->xscom_base;
-> >>  }
-> >> =20
-> >>  static void pnv_chip_core_realize(PnvChip *chip, Error **errp)
-> >> @@ -935,6 +991,7 @@ static void pnv_chip_core_realize(PnvChip *chip, E=
-rror **errp)
-> >>  static void pnv_chip_realize(DeviceState *dev, Error **errp)
-> >>  {
-> >>      PnvChip *chip =3D PNV_CHIP(dev);
-> >> +    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> >>      Error *error =3D NULL;
-> >> =20
-> >>      /* XSCOM bridge */
-> >> @@ -952,36 +1009,7 @@ static void pnv_chip_realize(DeviceState *dev, E=
-rror **errp)
-> >>          return;
-> >>      }
-> >> =20
-> >> -    /* Create LPC controller */
-> >> -    object_property_set_bool(OBJECT(&chip->lpc), true, "realized",
-> >> -                             &error_fatal);
-> >> -    pnv_xscom_add_subregion(chip, PNV_XSCOM_LPC_BASE, &chip->lpc.xsco=
-m_regs);
-> >> -
-> >> -    /* Interrupt Management Area. This is the memory region holding
-> >> -     * all the Interrupt Control Presenter (ICP) registers */
-> >> -    pnv_chip_icp_realize(chip, &error);
-> >> -    if (error) {
-> >> -        error_propagate(errp, error);
-> >> -        return;
-> >> -    }
-> >> -
-> >> -    /* Processor Service Interface (PSI) Host Bridge */
-> >> -    object_property_set_int(OBJECT(&chip->psi), PNV_PSIHB_BASE(chip),
-> >> -                            "bar", &error_fatal);
-> >> -    object_property_set_bool(OBJECT(&chip->psi), true, "realized", &e=
-rror);
-> >> -    if (error) {
-> >> -        error_propagate(errp, error);
-> >> -        return;
-> >> -    }
-> >> -    pnv_xscom_add_subregion(chip, PNV_XSCOM_PSIHB_BASE, &chip->psi.xs=
-com_regs);
-> >> -
-> >> -    /* Create the simplified OCC model */
-> >> -    object_property_set_bool(OBJECT(&chip->occ), true, "realized", &e=
-rror);
-> >> -    if (error) {
-> >> -        error_propagate(errp, error);
-> >> -        return;
-> >> -    }
-> >> -    pnv_xscom_add_subregion(chip, PNV_XSCOM_OCC_BASE, &chip->occ.xsco=
-m_regs);
-> >> +    pcc->realize(chip, errp);
-> >>  }
-> >> =20
-> >>  static Property pnv_chip_properties[] =3D {
-> >> @@ -1003,26 +1031,29 @@ static void pnv_chip_class_init(ObjectClass *k=
-lass, void *data)
-> >>      dc->desc =3D "PowerNV Chip";
-> >>  }
-> >> =20
-> >> -static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
-> >> +static ICSState *pnv8_ics_get(XICSFabric *xi, int irq)
-> >>  {
-> >>      PnvMachineState *pnv =3D PNV_MACHINE(xi);
-> >>      int i;
-> >> =20
-> >>      for (i =3D 0; i < pnv->num_chips; i++) {
-> >> -        if (ics_valid_irq(&pnv->chips[i]->psi.ics, irq)) {
-> >> -            return &pnv->chips[i]->psi.ics;
-> >> +        Pnv8Chip *chip8 =3D PNV8_CHIP(pnv->chips[i]);
-> >> +
-> >> +        if (ics_valid_irq(&chip8->psi.ics, irq)) {
-> >> +            return &chip8->psi.ics;
-> >>          }
-> >>      }
-> >>      return NULL;
-> >>  }
-> >> =20
-> >> -static void pnv_ics_resend(XICSFabric *xi)
-> >> +static void pnv8_ics_resend(XICSFabric *xi)
-> >>  {
-> >>      PnvMachineState *pnv =3D PNV_MACHINE(xi);
-> >>      int i;
-> >> =20
-> >>      for (i =3D 0; i < pnv->num_chips; i++) {
-> >> -        ics_resend(&pnv->chips[i]->psi.ics);
-> >> +        Pnv8Chip *chip8 =3D PNV8_CHIP(pnv->chips[i]);
-> >> +        ics_resend(&chip8->psi.ics);
-> >>      }
-> >>  }
-> >> =20
-> >> @@ -1042,15 +1073,14 @@ static PowerPCCPU *ppc_get_vcpu_by_pir(int pir)
-> >>      return NULL;
-> >>  }
-> >> =20
-> >> -static ICPState *pnv_icp_get(XICSFabric *xi, int pir)
-> >> +static ICPState *pnv8_icp_get(XICSFabric *xi, int pir)
-> >>  {
-> >>      PowerPCCPU *cpu =3D ppc_get_vcpu_by_pir(pir);
-> >> =20
-> >>      return cpu ? ICP(cpu->intc) : NULL;
-> >>  }
-> >> =20
-> >> -static void pnv_pic_print_info(InterruptStatsProvider *obj,
-> >> -                               Monitor *mon)
-> >> +static void pnv8_pic_print_info(InterruptStatsProvider *obj, Monitor =
-*mon)
-> >>  {
-> >>      PnvMachineState *pnv =3D PNV_MACHINE(obj);
-> >>      int i;
-> >> @@ -1063,7 +1093,8 @@ static void pnv_pic_print_info(InterruptStatsPro=
-vider *obj,
-> >>      }
-> >> =20
-> >>      for (i =3D 0; i < pnv->num_chips; i++) {
-> >> -        ics_pic_print_info(&pnv->chips[i]->psi.ics, mon);
-> >> +        Pnv8Chip *chip8 =3D PNV8_CHIP(pnv->chips[i]);
-> >> +        ics_pic_print_info(&chip8->psi.ics, mon);
-> >>      }
-> >>  }
-> >> =20
-> >> @@ -1098,7 +1129,7 @@ static void pnv_set_num_chips(Object *obj, Visit=
-or *v, const char *name,
-> >>      pnv->num_chips =3D num_chips;
-> >>  }
-> >> =20
-> >> -static void pnv_machine_initfn(Object *obj)
-> >> +static void pnv_machine_instance_init(Object *obj)
-> >>  {
-> >>      PnvMachineState *pnv =3D PNV_MACHINE(obj);
-> >>      pnv->num_chips =3D 1;
-> >> @@ -1117,8 +1148,6 @@ static void pnv_machine_class_props_init(ObjectC=
-lass *oc)
-> >>  static void pnv_machine_class_init(ObjectClass *oc, void *data)
-> >>  {
-> >>      MachineClass *mc =3D MACHINE_CLASS(oc);
-> >> -    XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
-> >> -    InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CL=
-ASS(oc);
-> >> =20
-> >>      mc->desc =3D "IBM PowerNV (Non-Virtualized)";
-> >>      mc->init =3D pnv_init;
-> >> @@ -1130,48 +1159,115 @@ static void pnv_machine_class_init(ObjectClas=
-s *oc, void *data)
-> >>      mc->no_parallel =3D 1;
-> >>      mc->default_boot_order =3D NULL;
-> >>      mc->default_ram_size =3D 1 * G_BYTE;
-> >> -    xic->icp_get =3D pnv_icp_get;
-> >> -    xic->ics_get =3D pnv_ics_get;
-> >> -    xic->ics_resend =3D pnv_ics_resend;
-> >> -    ispc->print_info =3D pnv_pic_print_info;
-> >> =20
-> >>      pnv_machine_class_props_init(oc);
-> >>  }
-> >> =20
-> >> -#define DEFINE_PNV_CHIP_TYPE(type, class_initfn) \
-> >> -    {                                            \
-> >> -        .name          =3D type,                   \
-> >> -        .class_init    =3D class_initfn,           \
-> >> -        .parent        =3D TYPE_PNV_CHIP,          \
-> >> +static void pnv8_machine_class_init(ObjectClass *oc, void *data)
-> >> +{
-> >> +    MachineClass *mc =3D MACHINE_CLASS(oc);
-> >> +    XICSFabricClass *xic =3D XICS_FABRIC_CLASS(oc);
-> >> +    InterruptStatsProviderClass *ispc =3D INTERRUPT_STATS_PROVIDER_CL=
-ASS(oc);
-> >> +
-> >> +    /* Power8 is the default */
-> >> +    mc->desc =3D "IBM PowerNV (Non-Virtualized) Power8";
-> >> +    mc->alias =3D "powernv";
-> >> +    mc->is_default =3D 1;
-> >> +
-> >> +    xic->icp_get =3D pnv8_icp_get;
-> >> +    xic->ics_get =3D pnv8_ics_get;
-> >> +    xic->ics_resend =3D pnv8_ics_resend;
-> >> +    ispc->print_info =3D pnv8_pic_print_info;
-> >> +}
-> >> +
-> >> +static void pnv9_machine_class_init(ObjectClass *oc, void *data)
-> >> +{
-> >> +   MachineClass *mc =3D MACHINE_CLASS(oc);
-> >> +
-> >> +   mc->desc =3D "IBM PowerNV (Non-Virtualized) Power9";
-> >> +   mc->default_cpu_type =3D POWERPC_CPU_TYPE_NAME("power9_v2.0");
-> >> +}
-> >> +
-> >> +#define DEFINE_PNV8_CHIP_TYPE(type, class_initfn) \
-> >> +    {                                             \
-> >> +        .name          =3D type,                    \
-> >> +        .class_init    =3D class_initfn,            \
-> >> +        .parent        =3D TYPE_PNV8_CHIP,          \
-> >> +    }
-> >> +
-> >> +#define DEFINE_PNV9_CHIP_TYPE(type, class_initfn) \
-> >> +    {                                             \
-> >> +        .name          =3D type,                    \
-> >> +        .class_init    =3D class_initfn,            \
-> >> +        .parent        =3D TYPE_PNV9_CHIP,          \
-> >>      }
-> >> =20
-> >>  static const TypeInfo types[] =3D {
-> >> +    /*
-> >> +     * PowerNV machines and variants
-> >> +     */
-> >>      {
-> >>          .name          =3D TYPE_PNV_MACHINE,
-> >>          .parent        =3D TYPE_MACHINE,
-> >> +        .abstract      =3D true,
-> >>          .instance_size =3D sizeof(PnvMachineState),
-> >> -        .instance_init =3D pnv_machine_initfn,
-> >> +        .instance_init =3D pnv_machine_instance_init,
-> >>          .class_init    =3D pnv_machine_class_init,
-> >>          .interfaces =3D (InterfaceInfo[]) {
-> >> -            { TYPE_XICS_FABRIC },
-> >>              { TYPE_INTERRUPT_STATS_PROVIDER },
-> >>              { },
-> >>          },
-> >>      },
-> >>      {
-> >> +        .name          =3D MACHINE_TYPE_NAME("powernv9"),
-> >> +        .parent        =3D TYPE_PNV_MACHINE,
-> >> +        .class_init    =3D pnv9_machine_class_init,
-> >> +    },
-> >> +    {
-> >> +        .name          =3D MACHINE_TYPE_NAME("powernv8"),
-> >> +        .parent        =3D TYPE_PNV_MACHINE,
-> >> +        .class_init    =3D pnv8_machine_class_init,
-> >> +        .interfaces    =3D (InterfaceInfo[]) {
-> >> +            { TYPE_XICS_FABRIC },
-> >> +            { },
-> >> +        },
-> >> +    },
-> >> +
-> >> +    /* Power Chip */
-> >> +    {
-> >>          .name          =3D TYPE_PNV_CHIP,
-> >>          .parent        =3D TYPE_SYS_BUS_DEVICE,
-> >>          .class_init    =3D pnv_chip_class_init,
-> >> -        .instance_init =3D pnv_chip_init,
-> >> +        .instance_init =3D pnv_chip_instance_init,
-> >>          .instance_size =3D sizeof(PnvChip),
-> >>          .class_size    =3D sizeof(PnvChipClass),
-> >>          .abstract      =3D true,
-> >>      },
-> >> -    DEFINE_PNV_CHIP_TYPE(TYPE_PNV_CHIP_POWER9, pnv_chip_power9_class_=
-init),
-> >> -    DEFINE_PNV_CHIP_TYPE(TYPE_PNV_CHIP_POWER8, pnv_chip_power8_class_=
-init),
-> >> -    DEFINE_PNV_CHIP_TYPE(TYPE_PNV_CHIP_POWER8E, pnv_chip_power8e_clas=
-s_init),
-> >> -    DEFINE_PNV_CHIP_TYPE(TYPE_PNV_CHIP_POWER8NVL,
-> >> -                         pnv_chip_power8nvl_class_init),
-> >> +
-> >> +    /*
-> >> +     * P9 chips and variants
-> >> +     */
-> >> +    {
-> >> +        .name          =3D TYPE_PNV9_CHIP,
-> >> +        .parent        =3D TYPE_PNV_CHIP,
-> >> +        .instance_init =3D pnv_chip_power9_instance_init,
-> >> +        .instance_size =3D sizeof(Pnv9Chip),
-> >> +    },
-> >> +    DEFINE_PNV9_CHIP_TYPE(TYPE_PNV_CHIP_POWER9, pnv_chip_power9_class=
-_init),
-> >> +
-> >> +    /*
-> >> +     * P8 chips and variants
-> >> +     */
-> >> +    {
-> >> +        .name          =3D TYPE_PNV8_CHIP,
-> >> +        .parent        =3D TYPE_PNV_CHIP,
-> >> +        .instance_init =3D pnv_chip_power8_instance_init,
-> >> +        .instance_size =3D sizeof(Pnv8Chip),
-> >> +    },
-> >> +    DEFINE_PNV8_CHIP_TYPE(TYPE_PNV_CHIP_POWER8, pnv_chip_power8_class=
-_init),
-> >> +    DEFINE_PNV8_CHIP_TYPE(TYPE_PNV_CHIP_POWER8E, pnv_chip_power8e_cla=
-ss_init),
-> >> +    DEFINE_PNV8_CHIP_TYPE(TYPE_PNV_CHIP_POWER8NVL,
-> >> +                          pnv_chip_power8nvl_class_init),
-> >>  };
-> >> =20
-> >>  DEFINE_TYPES(types)
-> >=20
->=20
+
+
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -694,24 +293,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---PxDrs/Fpf4pPiewX
+--SzQ167Kp6Zo0TWVn
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsnoeYACgkQbDjKyiDZ
-s5I+Fg//VdRzJKr1wzz4C5frlMIHUJhCyx/I8Tz/LGx1uqRjevLjmI+aa9WVyPkn
-DJtrC2Nm3/i+tWwJPvLPgvZCtLmsIeE19nIkTwTO5U/WgA0oRuxZfnDQ9EtGyhEu
-YKFtjDogz10TuTutXV7w+9vng6OikYdJePMxLnHlbBpneEwhvbMGXXes0UB1zYbQ
-XEhLaM39z6hjOOmD6+sFH85+OurkoKaTaEzrh7DrMZDj9AMlrptEg+GTDjra9hya
-5bcmpMUV/V9zXLf7rnvYwE0SHrQ0xICbFw158owvnyYwskB6C0IE9O6BVJ6PaBm/
-vGZCIz0oOnXypKmJnO0Xhk1CGWZcFi4CCUW2NM6Zk1iPBcOnpa/ur5F41qe/2c5f
-94scSEq3dxSCrvns41F5Zu8CW9h+nGqxdoofZ33zZ3mduQKfTLrTR02D1dLtvB4V
-5Xa+9BuUihCN3H5EWS2RFp8AYkw12Bqk8qzFvowQZXHX0gtyP60DW98FirndPGym
-yNVIrLj7TMC2vAlGTpqGy5B9L8b6SW9fFUUjLeAUJguzAoNcNSMJo1xa3ynCJYLG
-WdpJycY8sgA/DNPI2B9BJ73z/D662RYmNrHtu5sZjQTYQ7kKf/FgudSCguY5LwFj
-5Sd5RdvJZSL08LTgcmld3FsrMw40KTm+1A3Ynf04ylPTjKQqvSA=
-=ZtEU
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsnoqAACgkQbDjKyiDZ
+s5JIUA/9GS3iv4pY4eLubOcG6hWyHtazGZXnPRvJEAYd+Q0gs7hNPwGwsN3opA9N
+2YxEy60nZdQkBBFAor9OeqpLT99ySRe29f0iqNE+LSni3dyItntj/BRObgBN6UvM
+odl1030LJGf5yBKoLapfxWPEqqlKoHo5bkPrM5eBDrlzKXV3KvkSrBePu5MnUw+5
+Msk692FS3mNH1KS06C43dxDqMzS32umL8jhbKcw33pv8Cee5lHxDeQBZ3fp+vlmY
+E5+oegaMN7EQHwt+ywlmM0oLx4gcU7A2V9On240b/yw36uLDFtvZ14PcnbnV2Qp6
+Zuwcue6t7u7Jwv5aLzl9hjTfH5NGbWW1ecJBCBGjjeEBBUJy2Vr7dViuyMKb2qh8
+c4QBAlUlKQtllhXfBwEJOnZjYAuSMD4+40cRB68Vx7CBVqvwrbxWAjz+W0ekwLum
+6gAjoulL43OsvUFO9/5M4aB/Q3emcrmLa0l/RTf93uAM+LJm/hT+BJ1up1+P5wxf
+IWO2iXIfuJtH+CbZA4UeiRiB4jcrBfgwhP4W5zzRJeOiDX14wsKbWayVB4KCIqu/
+j8yeFEhdTrnm5Q+8lRuDJ01au2gFWj+ZTE6Qfq4aZtZurZuLVyD+Pv5g10gXDUPE
+VmjNRbrAFQbnYn/2hWDLTctXlYCmaEzJvUS/q7DnhKbKuWWzWoI=
+=i6b8
 -----END PGP SIGNATURE-----
 
---PxDrs/Fpf4pPiewX--
+--SzQ167Kp6Zo0TWVn--
