@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55112)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fUrlS-00089u-Rh
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 06:52:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fUrom-0000lo-CW
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 06:55:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fUrlP-0005Cc-Qs
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 06:52:02 -0400
-References: <20180615140448.32234-1-david@redhat.com>
-	<20180615140448.32234-11-david@redhat.com>
-	<20180618004950.GH25461@umbus.fritz.box>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <de83299d-8183-f69e-ee5b-203a0ed7c491@redhat.com>
-Date: Mon, 18 Jun 2018 12:51:56 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fUrol-0006sh-4l
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 06:55:28 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42023)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fUrok-0006s6-HD
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 06:55:26 -0400
+Received: by mail-oi0-x242.google.com with SMTP id k190-v6so14385558oib.9
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 03:55:26 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180618004950.GH25461@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 10/13] nvdimm: convert nvdimm_mr into a
- pointer
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 18 Jun 2018 11:55:05 +0100
+Message-ID: <CAFEAcA_S41uEj=ae1efd042aTJcLUe+LXpD8WUwSkeWLnPCj=w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] enabling smart-http git protocol on git.qemu.org
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +27,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Iliya Dyachenko <gandalfthewhite@mail.ru>, QEMU Developers <qemu-devel@nongnu.org>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 18.06.2018 02:49, David Gibson wrote:
-> On Fri, Jun 15, 2018 at 04:04:45PM +0200, David Hildenbrand wrote:
->> This way we can easily check if the region has already been inititalized
->> without having to rely on the size of an uninitialized region being 0.
+On 18 June 2018 at 10:47, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wro=
+te:
+> On Mon, Jun 18, 2018 at 12:32:01PM +0300, Iliya Dyachenko wrote:
+>> Signed-off-by: Iliya Dyachenko <gandalfthewhite@mail.ru>
+>> ---
+>>  .gitmodules | 32 ++++++++++++++++----------------
+>>  1 file changed, 16 insertions(+), 16 deletions(-)
 >>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
-> 
-> I'm not terribly convinced that this is a worthwhile change, but in
-> the sense that the patch appears to be technically correct:
-> 
+>> diff --git a/.gitmodules b/.gitmodules
+>> index 49e9c2e3f4..e6bc732d16 100644
+>> --- a/.gitmodules
+>> +++ b/.gitmodules
+>> @@ -1,48 +1,48 @@
+>>  [submodule "roms/vgabios"]
+>>       path =3D roms/vgabios
+>> -     url =3D git://git.qemu-project.org/vgabios.git/
+>> +     url =3D https://git.qemu.org/git/vgabios.git
+>
+> [snip]
+>
+> This is highly desirable, however, we cannot do it right now.
+>
+> The git.qemu.org server is still using the dumb git http protocol, so it
+> would be a performance regression over git://
+>
+> We need the server config fixing to use the smart http protocol.
+>
+> Essentially this just involves configuring apache to add
+>
+>   <Directory /usr/libexec/git-core>
+>     Allow from all
+>   </Directory>
+>
+>   SetEnv GIT_PROJECT_ROOT /data/git
+>
+>   ScriptAliasMatch "^/git/(.*\.git/(HEAD|info/refs))$" \
+>     /usr/libexec/git-core/git-http-backend/$1
+>   ScriptAliasMatch "^/git/(.*\.git/git-(upload|receive)-pack)$" \
+>     /usr/libexec/git-core/git-http-backend/$1
 
-Igor requested this, and as I had no strong feelings about it, I
-included it. At least we are not able to hand out "uninitialized
-regions" this way anymore.
+Sounds like a good idea -- I've cc'd Jeff and Stefan (who
+are the people who care for our git server)...
 
-Thanks!
-
--- 
-
-Thanks,
-
-David / dhildenb
+thanks
+-- PMM
