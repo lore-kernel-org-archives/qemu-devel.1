@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fUvoO-0007E0-Eq
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:11:21 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1fUvsw-0008Gc-Tb
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:16:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fUvoN-0002eW-Bq
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:11:20 -0400
-References: <20180613181823.13618-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1ae11d68-a29d-9c83-74a7-e6918fc11038@redhat.com>
-Date: Mon, 18 Jun 2018 17:11:11 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180613181823.13618-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="5DyjCIQ0eK1OmxmznUJaMkQXfCR1e6HNl"
-Subject: Re: [Qemu-devel] [PATCH v5 00/14] block/mirror: Add active-sync
- mirroring
+	(envelope-from <programmingkidx@gmail.com>) id 1fUvst-0004qP-NU
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:16:02 -0400
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <CAFEAcA8Z1J39xTxn+f3K35s88B+x50xNi3WdKG8CxrFg5P1CvQ@mail.gmail.com>
+Date: Mon, 18 Jun 2018 11:15:56 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <15282A55-035D-4878-B05D-7F6734F3B593@gmail.com>
+References: <20180617155309.1653-1-programmingkidx@gmail.com>
+	<CAFEAcA8Z1J39xTxn+f3K35s88B+x50xNi3WdKG8CxrFg5P1CvQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] fpu_helper.c: fix helper_fpscr_clrbit()
+ function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +24,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc <qemu-ppc@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5DyjCIQ0eK1OmxmznUJaMkQXfCR1e6HNl
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Jeff Cody <jcody@redhat.com>
-Message-ID: <1ae11d68-a29d-9c83-74a7-e6918fc11038@redhat.com>
-Subject: Re: [PATCH v5 00/14] block/mirror: Add active-sync mirroring
-References: <20180613181823.13618-1-mreitz@redhat.com>
-In-Reply-To: <20180613181823.13618-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 2018-06-13 20:18, Max Reitz wrote:
-> This series implements an active and synchronous mirroring mode.
+> On Jun 18, 2018, at 7:30 AM, Peter Maydell <peter.maydell@linaro.org> =
+wrote:
 >=20
-> You can read the cover letter of v4 here (I don=E2=80=99t like to copy-=
-paste
-> that because people who reviewed previous versions know it already and
-> this saves them from having to look out for potential changes):
+> On 17 June 2018 at 16:53, John Arbuckle <programmingkidx@gmail.com> =
+wrote:
+>> Fix the helper_fpscr_clrbit() function so it correctly
+>> sets the FEX and VX bits.
+>>=20
+>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>> ---
+>> target/ppc/fpu_helper.c | 57 =
++++++++++++++++++++++++++++++++++++++++++++++++++
+>> 1 file changed, 57 insertions(+)
+>>=20
+>> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
+>> index d31a933cbb..7e697a11d0 100644
+>> --- a/target/ppc/fpu_helper.c
+>> +++ b/target/ppc/fpu_helper.c
+>> @@ -325,6 +325,63 @@ void helper_fpscr_clrbit(CPUPPCState *env, =
+uint32_t bit)
+>>         case FPSCR_RN:
+>>             fpscr_set_rounding_mode(env);
+>>             break;
+>> +        case FPSCR_VXSNAN:
+>> +        case FPSCR_VXISI:
+>> +        case FPSCR_VXIDI:
+>> +        case FPSCR_VXZDZ:
+>> +        case FPSCR_VXIMZ:
+>> +        case FPSCR_VXVC:
+>> +        case FPSCR_VXSOFT:
+>> +        case FPSCR_VXSQRT:
+>> +        case FPSCR_VXCVI:
+>> +        {
+>> +            int vxsnan, vxisi, vxidi, vxzdz, vximz, vxvc, vxsoft, =
+vxsqrt, vxcvi;
+>> +            vxsnan =3D (env->fpscr >> (31 - FPSCR_VXSNAN)) & 1;
+>> +            vxisi =3D (env->fpscr >> (31 - FPSCR_VXISI)) & 1;
+>> +            vxidi =3D (env->fpscr >> (31 - FPSCR_VXIDI)) & 1;
+>> +            vxzdz =3D (env->fpscr >> (31 - FPSCR_VXZDZ)) & 1;
+>> +            vximz =3D (env->fpscr >> (31 - FPSCR_VXIMZ)) & 1;
+>> +            vxvc =3D (env->fpscr >> (31 - FPSCR_VXVC)) & 1;
+>> +            vxsoft =3D (env->fpscr >> (31 - FPSCR_VXSOFT)) & 1;
+>> +            vxsqrt =3D (env->fpscr >> (31 - FPSCR_VXSQRT)) & 1;
+>> +            vxcvi =3D (env->fpscr >> (31 - FPSCR_VXCVI)) & 1;
+>> +            if (~(vxsnan & vxisi & vxidi & vxzdz & vximz & vxvc & =
+vxsoft &
+>> +                  vxsqrt & vxcvi)) {
 >=20
-> http://lists.nongnu.org/archive/html/qemu-block/2018-04/msg00185.html
+> If all you're doing is checking "are none of these bits set"
+> then you don't need to laboriously extract every bit and then
+> AND them together -- you can just use
+>    if (!(env->fpscr & some_mask))
+> In fact the headers already define a macro which does that mask
+> on env->fpscr, so this can just be
+>=20
+>    if (!fpscr_ix) {
+>         env->fpscr &=3D ~(1 << FPSCR_VX);
+>    }
+>=20
+>> +                /* Set VX bit to zero */
+>> +                env->fpscr =3D env->fpscr & ~(1 << FPSCR_VX);
+>> +            }
+>> +        }
+>> +            break;
+>> +        case FPSCR_VX:
+>> +        case FPSCR_OX:
+>> +        case FPSCR_UX:
+>> +        case FPSCR_ZX:
+>> +        case FPSCR_XX:
+>> +        case FPSCR_VE:
+>> +        case FPSCR_OE:
+>> +        case FPSCR_UE:
+>> +        case FPSCR_ZE:
+>> +        case FPSCR_XE:
+>> +        {
+>> +            int vx, ox, ux, zx, xx, ve, oe, ue, ze, xe;
+>> +            vx =3D (env->fpscr >> (31 - FPSCR_VX)) & 1;
+>> +            ox =3D (env->fpscr >> (31 - FPSCR_OX)) & 1;
+>> +            ux =3D (env->fpscr >> (31 - FPSCR_UX)) & 1;
+>> +            zx =3D (env->fpscr >> (31 - FPSCR_ZX)) & 1;
+>> +            xx =3D (env->fpscr >> (31 - FPSCR_XX)) & 1;
+>> +            ve =3D (env->fpscr >> (31 - FPSCR_VE)) & 1;
+>> +            oe =3D (env->fpscr >> (31 - FPSCR_OE)) & 1;
+>> +            ue =3D (env->fpscr >> (31 - FPSCR_UE)) & 1;
+>> +            ze =3D (env->fpscr >> (31 - FPSCR_ZE)) & 1;
+>> +            xe =3D (env->fpscr >> (31 - FPSCR_XE)) & 1;
+>> +            bool fex;
+>> +            fex =3D (vx & ve) | (ox & oe) | (ux & ue) | (zx & ze) | =
+(xx & xe);
+>> +            unsigned int mask;
+>> +            mask =3D (1 << FPSCR_FEX);
+>> +            /* Set the FEX bit */
+>> +            env->fpscr =3D (env->fpscr & ~mask) | (-fex & mask);
+>=20
+> Similarly I think this is
+>    if (!fpscr_eex) {
+>       env->fpscr &=3D ~(1 << FPSCR_FEX);
+>    }
+>=20
+>> +        }
+>> +            break;
+>>         default:
+>>             break;
+>>         }
+>> --
+>> 2.14.3 (Apple Git-98)
+>>=20
+>=20
+> thanks
+> -- PMM
 
-Applied to my block branch after deciding (with Kevin) that changing
-bytes_handled's comment is not really worth it considering it's going to
-be removed in a follow-up anyway.
-
-Thank you for all the reviews,
-
-Max
-
-
---5DyjCIQ0eK1OmxmznUJaMkQXfCR1e6HNl
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsny48ACgkQ9AfbAGHV
-z0ClTAf/VQ1GW/+z5EcYstjnLLeRVHvHMkhl/8AjwPzHtd8nfSMc13zgmkhEBgba
-mhgakgnD+ld4mIPhSPkytgdBuGCiwEgh7msJoDOs6lZ4Xse6pejOtWry/HkT2Dpf
-XQMEOgxul7QhTMkUCCm3tVRuaruDLoYkytm70kc1Vd9bVfbeoCSXoKgNJKGPaReO
-aZBVvxZ5ORvyrUMqzZSEyLK9NLiWUSieIb0Monvim7KmrWwLhlnJ3LcsI60+z9sY
-h9zKJuFa+ergajT5g5jgnY/pGHgUsI+73XMdoPF6Eh6P88c60xxIYSLp0vxMdvbh
-ws6fS6CF1WUPMXhjevO90CsljrzKkw==
-=VGXk
------END PGP SIGNATURE-----
-
---5DyjCIQ0eK1OmxmznUJaMkQXfCR1e6HNl--
+Your suggestions look great. Thank you. I will be sure to implement your =
+suggestions and make a better commit message for version 2 of this =
+patch.
