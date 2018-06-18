@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwrE-0002EX-BD
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:21 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwrF-0002GU-W3
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwrA-0005DO-0H
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44994 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwrF-0005IS-0I
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:21 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44998 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fUwr9-0005DE-R7
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:15 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	id 1fUwrE-0005IC-S0
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:20 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7A375401EF03
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 16:18:15 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8AFF3401EF03
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 16:18:20 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 18 Jun 2018 18:17:21 +0200
-Message-Id: <20180618161729.334-19-marcandre.lureau@redhat.com>
+Date: Mon, 18 Jun 2018 18:17:24 +0200
+Message-Id: <20180618161729.334-22-marcandre.lureau@redhat.com>
 In-Reply-To: <20180618161729.334-1-marcandre.lureau@redhat.com>
 References: <20180618161729.334-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 18/26] util: promote
- qemu_egl_rendernode_open() to libqemuutil
+Subject: [Qemu-devel] [PATCH v3 21/26] virtio-gpu: remove unused config_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,201 +36,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-vhost-user-gpu will share the same code to open a DRM node.
-
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qemu/drm.h |  6 +++++
- ui/egl-helpers.c   | 51 ++---------------------------------
- util/drm.c         | 66 ++++++++++++++++++++++++++++++++++++++++++++++
- MAINTAINERS        |  1 +
- util/Makefile.objs |  1 +
- 5 files changed, 76 insertions(+), 49 deletions(-)
- create mode 100644 include/qemu/drm.h
- create mode 100644 util/drm.c
+ include/hw/virtio/virtio-gpu.h | 2 --
+ hw/display/virtio-gpu.c        | 3 +--
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/include/qemu/drm.h b/include/qemu/drm.h
-new file mode 100644
-index 0000000000..4c3e622f5c
---- /dev/null
-+++ b/include/qemu/drm.h
-@@ -0,0 +1,6 @@
-+#ifndef QEMU_DRM_H_
-+#define QEMU_DRM_H_
-+
-+int qemu_drm_rendernode_open(const char *rendernode);
-+
-+#endif
-diff --git a/ui/egl-helpers.c b/ui/egl-helpers.c
-index 16dc3ded36..472a8aa5f0 100644
---- a/ui/egl-helpers.c
-+++ b/ui/egl-helpers.c
-@@ -15,9 +15,7 @@
-  * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-  */
- #include "qemu/osdep.h"
--#include <glob.h>
--#include <dirent.h>
--
-+#include "qemu/drm.h"
- #include "qemu/error-report.h"
- #include "ui/console.h"
- #include "ui/egl-helpers.h"
-@@ -146,57 +144,12 @@ int qemu_egl_rn_fd;
- struct gbm_device *qemu_egl_rn_gbm_dev;
- EGLContext qemu_egl_rn_ctx;
+diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gp=
+u.h
+index 6cb13d2711..1cf8ec1aa8 100644
+--- a/include/hw/virtio/virtio-gpu.h
++++ b/include/hw/virtio/virtio-gpu.h
+@@ -101,8 +101,6 @@ typedef struct VirtIOGPU {
 =20
--static int qemu_egl_rendernode_open(const char *rendernode)
--{
--    DIR *dir;
--    struct dirent *e;
--    int r, fd;
--    char *p;
--
--    if (rendernode) {
--        return open(rendernode, O_RDWR | O_CLOEXEC | O_NOCTTY | O_NONBLO=
-CK);
--    }
--
--    dir =3D opendir("/dev/dri");
--    if (!dir) {
--        return -1;
--    }
--
--    fd =3D -1;
--    while ((e =3D readdir(dir))) {
--        if (e->d_type !=3D DT_CHR) {
--            continue;
--        }
--
--        if (strncmp(e->d_name, "renderD", 7)) {
--            continue;
--        }
--
--        p =3D g_strdup_printf("/dev/dri/%s", e->d_name);
--
--        r =3D open(p, O_RDWR | O_CLOEXEC | O_NOCTTY | O_NONBLOCK);
--        if (r < 0) {
--            g_free(p);
--            continue;
--        }
--        fd =3D r;
--        g_free(p);
--        break;
--    }
--
--    closedir(dir);
--    if (fd < 0) {
--        return -1;
--    }
--    return fd;
--}
--
- int egl_rendernode_init(const char *rendernode)
- {
-     qemu_egl_rn_fd =3D -1;
-     int rc;
+     int enable;
 =20
--    qemu_egl_rn_fd =3D qemu_egl_rendernode_open(rendernode);
-+    qemu_egl_rn_fd =3D qemu_drm_rendernode_open(rendernode);
-     if (qemu_egl_rn_fd =3D=3D -1) {
-         error_report("egl: no drm render node available");
-         goto err;
-diff --git a/util/drm.c b/util/drm.c
-new file mode 100644
-index 0000000000..a23ff24538
---- /dev/null
-+++ b/util/drm.c
-@@ -0,0 +1,66 @@
-+/*
-+ * Copyright (C) 2015-2016 Gerd Hoffmann <kraxel@redhat.com>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu/drm.h"
-+
-+#include <glob.h>
-+#include <dirent.h>
-+
-+int qemu_drm_rendernode_open(const char *rendernode)
-+{
-+    DIR *dir;
-+    struct dirent *e;
-+    int r, fd;
-+    char *p;
-+
-+    if (rendernode) {
-+        return open(rendernode, O_RDWR | O_CLOEXEC | O_NOCTTY | O_NONBLO=
-CK);
-+    }
-+
-+    dir =3D opendir("/dev/dri");
-+    if (!dir) {
-+        return -1;
-+    }
-+
-+    fd =3D -1;
-+    while ((e =3D readdir(dir))) {
-+        if (e->d_type !=3D DT_CHR) {
-+            continue;
-+        }
-+
-+        if (strncmp(e->d_name, "renderD", 7)) {
-+            continue;
-+        }
-+
-+        p =3D g_strdup_printf("/dev/dri/%s", e->d_name);
-+
-+        r =3D open(p, O_RDWR | O_CLOEXEC | O_NOCTTY | O_NONBLOCK);
-+        if (r < 0) {
-+            g_free(p);
-+            continue;
-+        }
-+        fd =3D r;
-+        g_free(p);
-+        break;
-+    }
-+
-+    closedir(dir);
-+    if (fd < 0) {
-+        return -1;
-+    }
-+    return fd;
-+}
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e5dee15967..42a5d46acd 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1533,6 +1533,7 @@ S: Odd Fixes
- F: ui/
- F: include/ui/
- F: qapi/ui.json
-+F: util/drm.c
+-    int config_size;
+-
+     QTAILQ_HEAD(, virtio_gpu_simple_resource) reslist;
+     QTAILQ_HEAD(, virtio_gpu_ctrl_command) cmdq;
+     QTAILQ_HEAD(, virtio_gpu_ctrl_command) fenceq;
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index 7f7e18c2ee..cd48a928ca 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -1162,10 +1162,9 @@ static void virtio_gpu_device_realize(DeviceState =
+*qdev, Error **errp)
+         }
+     }
 =20
- Cocoa graphics
- M: Peter Maydell <peter.maydell@linaro.org>
-diff --git a/util/Makefile.objs b/util/Makefile.objs
-index e1c3fed4dc..1810f970ef 100644
---- a/util/Makefile.objs
-+++ b/util/Makefile.objs
-@@ -49,3 +49,4 @@ util-obj-y +=3D stats64.o
- util-obj-y +=3D systemd.o
- util-obj-y +=3D iova-tree.o
- util-obj-$(CONFIG_LINUX) +=3D vfio-helpers.o
-+util-obj-$(CONFIG_LINUX) +=3D drm.o
+-    g->config_size =3D sizeof(struct virtio_gpu_config);
+     g->virtio_config.num_scanouts =3D cpu_to_le32(g->conf.max_outputs);
+     virtio_init(VIRTIO_DEVICE(g), "virtio-gpu", VIRTIO_ID_GPU,
+-                g->config_size);
++                sizeof(struct virtio_gpu_config));
+=20
+     g->req_state[0].width =3D g->conf.xres;
+     g->req_state[0].height =3D g->conf.yres;
 --=20
 2.18.0.rc1
