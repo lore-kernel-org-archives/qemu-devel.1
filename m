@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fUxHm-0005L5-Fk
+	(envelope-from <kwolf@redhat.com>) id 1fUxHm-0005LT-PJ
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:45:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fUxHk-0006Ya-Lz
+	(envelope-from <kwolf@redhat.com>) id 1fUxHl-0006Yr-D3
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:45:46 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 18 Jun 2018 18:45:02 +0200
-Message-Id: <20180618164504.24488-34-kwolf@redhat.com>
+Date: Mon, 18 Jun 2018 18:45:04 +0200
+Message-Id: <20180618164504.24488-36-kwolf@redhat.com>
 In-Reply-To: <20180618164504.24488-1-kwolf@redhat.com>
 References: <20180618164504.24488-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 33/35] block/mirror: Add active mirroring
+Subject: [Qemu-devel] [PULL 35/35] iotests: Add test for active mirroring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,417 +24,167 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-This patch implements active synchronous mirroring.  In active mode, the
-passive mechanism will still be in place and is used to copy all
-initially dirty clusters off the source disk; but every write request
-will write data both to the source and the target disk, so the source
-cannot be dirtied faster than data is mirrored to the target.  Also,
-once the block job has converged (BLOCK_JOB_READY sent), source and
-target are guaranteed to stay in sync (unless an error occurs).
-
-Active mode is completely optional and currently disabled at runtime.  A
-later patch will add a way for users to enable it.
-
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Fam Zheng <famz@redhat.com>
-Message-id: 20180613181823.13618-13-mreitz@redhat.com
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Message-id: 20180613181823.13618-15-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json |  18 ++++
- block/mirror.c       | 252 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 265 insertions(+), 5 deletions(-)
+ tests/qemu-iotests/151     | 120 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/151.out |   5 ++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 126 insertions(+)
+ create mode 100755 tests/qemu-iotests/151
+ create mode 100644 tests/qemu-iotests/151.out
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index ab629d1647..96f8da1322 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1051,6 +1051,24 @@
-   'data': ['top', 'full', 'none', 'incremental'] }
- 
- ##
-+# @MirrorCopyMode:
+diff --git a/tests/qemu-iotests/151 b/tests/qemu-iotests/151
+new file mode 100755
+index 0000000000..fe53b9f446
+--- /dev/null
++++ b/tests/qemu-iotests/151
+@@ -0,0 +1,120 @@
++#!/usr/bin/env python
 +#
-+# An enumeration whose values tell the mirror block job when to
-+# trigger writes to the target.
++# Tests for active mirroring
 +#
-+# @background: copy data in background only.
++# Copyright (C) 2018 Red Hat, Inc.
 +#
-+# @write-blocking: when data is written to the source, write it
-+#                  (synchronously) to the target as well.  In
-+#                  addition, data is copied in background just like in
-+#                  @background mode.
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
 +#
-+# Since: 3.0
-+##
-+{ 'enum': 'MirrorCopyMode',
-+  'data': ['background', 'write-blocking'] }
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+##
- # @BlockJobInfo:
- #
- # Information about a long-running block device operation.
-diff --git a/block/mirror.c b/block/mirror.c
-index 7da5e43c0d..99b9b92c30 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -51,8 +51,12 @@ typedef struct MirrorBlockJob {
-     Error *replace_blocker;
-     bool is_none_mode;
-     BlockMirrorBackingMode backing_mode;
-+    MirrorCopyMode copy_mode;
-     BlockdevOnError on_source_error, on_target_error;
-     bool synced;
-+    /* Set when the target is synced (dirty bitmap is clean, nothing
-+     * in flight) and the job is running in active mode */
-+    bool actively_synced;
-     bool should_complete;
-     int64_t granularity;
-     size_t buf_size;
-@@ -74,6 +78,7 @@ typedef struct MirrorBlockJob {
-     int target_cluster_size;
-     int max_iov;
-     bool initial_zeroing_ongoing;
-+    int in_active_write_counter;
- } MirrorBlockJob;
- 
- typedef struct MirrorBDSOpaque {
-@@ -91,6 +96,7 @@ struct MirrorOp {
-     int64_t *bytes_handled;
- 
-     bool is_pseudo_op;
-+    bool is_active_write;
-     CoQueue waiting_requests;
- 
-     QTAILQ_ENTRY(MirrorOp) next;
-@@ -106,6 +112,7 @@ static BlockErrorAction mirror_error_action(MirrorBlockJob *s, bool read,
-                                             int error)
- {
-     s->synced = false;
-+    s->actively_synced = false;
-     if (read) {
-         return block_job_error_action(&s->common, s->on_source_error,
-                                       true, error);
-@@ -272,7 +279,7 @@ static int mirror_cow_align(MirrorBlockJob *s, int64_t *offset,
-     return ret;
- }
- 
--static inline void mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s)
-+static inline void mirror_wait_for_any_operation(MirrorBlockJob *s, bool active)
- {
-     MirrorOp *op;
- 
-@@ -282,7 +289,7 @@ static inline void mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s)
-          * caller of this function.  Since there is only one pseudo op
-          * at any given time, we will always find some real operation
-          * to wait on. */
--        if (!op->is_pseudo_op) {
-+        if (!op->is_pseudo_op && op->is_active_write == active) {
-             qemu_co_queue_wait(&op->waiting_requests, NULL);
-             return;
-         }
-@@ -290,6 +297,12 @@ static inline void mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s)
-     abort();
- }
- 
-+static inline void mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s)
-+{
-+    /* Only non-active operations use up in-flight slots */
-+    mirror_wait_for_any_operation(s, false);
-+}
++import os
++import iotests
++from iotests import qemu_img
 +
- /* Perform a mirror copy operation.
-  *
-  * *op->bytes_handled is set to the number of bytes copied after and
-@@ -846,6 +859,7 @@ static void coroutine_fn mirror_run(void *opaque)
-         /* Transition to the READY state and wait for complete. */
-         job_transition_to_ready(&s->common.job);
-         s->synced = true;
-+        s->actively_synced = true;
-         while (!job_is_cancelled(&s->common.job) && !s->should_complete) {
-             job_yield(&s->common.job);
-         }
-@@ -897,6 +911,12 @@ static void coroutine_fn mirror_run(void *opaque)
-         int64_t cnt, delta;
-         bool should_complete;
- 
-+        /* Do not start passive operations while there are active
-+         * writes in progress */
-+        while (s->in_active_write_counter) {
-+            mirror_wait_for_any_operation(s, true);
-+        }
++source_img = os.path.join(iotests.test_dir, 'source.' + iotests.imgfmt)
++target_img = os.path.join(iotests.test_dir, 'target.' + iotests.imgfmt)
 +
-         if (s->ret < 0) {
-             ret = s->ret;
-             goto immediate_exit;
-@@ -942,6 +962,9 @@ static void coroutine_fn mirror_run(void *opaque)
-                  */
-                 job_transition_to_ready(&s->common.job);
-                 s->synced = true;
-+                if (s->copy_mode != MIRROR_COPY_MODE_BACKGROUND) {
-+                    s->actively_synced = true;
-+                }
-             }
- 
-             should_complete = s->should_complete ||
-@@ -1140,16 +1163,232 @@ static const BlockJobDriver commit_active_job_driver = {
-     .drain                  = mirror_drain,
- };
- 
-+static void do_sync_target_write(MirrorBlockJob *job, MirrorMethod method,
-+                                 uint64_t offset, uint64_t bytes,
-+                                 QEMUIOVector *qiov, int flags)
-+{
-+    BdrvDirtyBitmapIter *iter;
-+    QEMUIOVector target_qiov;
-+    uint64_t dirty_offset;
-+    int dirty_bytes;
++class TestActiveMirror(iotests.QMPTestCase):
++    image_len = 128 * 1024 * 1024 # MB
++    potential_writes_in_flight = True
 +
-+    if (qiov) {
-+        qemu_iovec_init(&target_qiov, qiov->niov);
-+    }
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, source_img, '128M')
++        qemu_img('create', '-f', iotests.imgfmt, target_img, '128M')
 +
-+    iter = bdrv_dirty_iter_new(job->dirty_bitmap);
-+    bdrv_set_dirty_iter(iter, offset);
++        blk_source = {'id': 'source',
++                      'if': 'none',
++                      'node-name': 'source-node',
++                      'driver': iotests.imgfmt,
++                      'file': {'driver': 'file',
++                               'filename': source_img}}
 +
-+    while (true) {
-+        bool valid_area;
-+        int ret;
++        blk_target = {'node-name': 'target-node',
++                      'driver': iotests.imgfmt,
++                      'file': {'driver': 'file',
++                               'filename': target_img}}
 +
-+        bdrv_dirty_bitmap_lock(job->dirty_bitmap);
-+        valid_area = bdrv_dirty_iter_next_area(iter, offset + bytes,
-+                                               &dirty_offset, &dirty_bytes);
-+        if (!valid_area) {
-+            bdrv_dirty_bitmap_unlock(job->dirty_bitmap);
-+            break;
-+        }
++        self.vm = iotests.VM()
++        self.vm.add_drive_raw(self.vm.qmp_to_opts(blk_source))
++        self.vm.add_blockdev(self.vm.qmp_to_opts(blk_target))
++        self.vm.add_device('virtio-blk,drive=source')
++        self.vm.launch()
 +
-+        bdrv_reset_dirty_bitmap_locked(job->dirty_bitmap,
-+                                       dirty_offset, dirty_bytes);
-+        bdrv_dirty_bitmap_unlock(job->dirty_bitmap);
++    def tearDown(self):
++        self.vm.shutdown()
 +
-+        job_progress_increase_remaining(&job->common.job, dirty_bytes);
++        if not self.potential_writes_in_flight:
++            self.assertTrue(iotests.compare_images(source_img, target_img),
++                            'mirror target does not match source')
 +
-+        assert(dirty_offset - offset <= SIZE_MAX);
-+        if (qiov) {
-+            qemu_iovec_reset(&target_qiov);
-+            qemu_iovec_concat(&target_qiov, qiov,
-+                              dirty_offset - offset, dirty_bytes);
-+        }
++        os.remove(source_img)
++        os.remove(target_img)
 +
-+        switch (method) {
-+        case MIRROR_METHOD_COPY:
-+            ret = blk_co_pwritev(job->target, dirty_offset, dirty_bytes,
-+                                 qiov ? &target_qiov : NULL, flags);
-+            break;
++    def doActiveIO(self, sync_source_and_target):
++        # Fill the source image
++        self.vm.hmp_qemu_io('source',
++                            'write -P 1 0 %i' % self.image_len);
 +
-+        case MIRROR_METHOD_ZERO:
-+            assert(!qiov);
-+            ret = blk_co_pwrite_zeroes(job->target, dirty_offset, dirty_bytes,
-+                                       flags);
-+            break;
++        # Start some background requests
++        for offset in range(1 * self.image_len / 8, 3 * self.image_len / 8, 1024 * 1024):
++            self.vm.hmp_qemu_io('source', 'aio_write -P 2 %i 1M' % offset)
++        for offset in range(2 * self.image_len / 8, 3 * self.image_len / 8, 1024 * 1024):
++            self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offset)
 +
-+        case MIRROR_METHOD_DISCARD:
-+            assert(!qiov);
-+            ret = blk_co_pdiscard(job->target, dirty_offset, dirty_bytes);
-+            break;
++        # Start the block job
++        result = self.vm.qmp('blockdev-mirror',
++                             job_id='mirror',
++                             filter_node_name='mirror-node',
++                             device='source-node',
++                             target='target-node',
++                             sync='full',
++                             copy_mode='write-blocking')
++        self.assert_qmp(result, 'return', {})
 +
-+        default:
-+            abort();
-+        }
++        # Start some more requests
++        for offset in range(3 * self.image_len / 8, 5 * self.image_len / 8, 1024 * 1024):
++            self.vm.hmp_qemu_io('source', 'aio_write -P 3 %i 1M' % offset)
++        for offset in range(4 * self.image_len / 8, 5 * self.image_len / 8, 1024 * 1024):
++            self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offset)
 +
-+        if (ret >= 0) {
-+            job_progress_update(&job->common.job, dirty_bytes);
-+        } else {
-+            BlockErrorAction action;
++        # Wait for the READY event
++        self.wait_ready(drive='mirror')
 +
-+            bdrv_set_dirty_bitmap(job->dirty_bitmap, dirty_offset, dirty_bytes);
-+            job->actively_synced = false;
++        # Now start some final requests; all of these (which land on
++        # the source) should be settled using the active mechanism.
++        # The mirror code itself asserts that the source BDS's dirty
++        # bitmap will stay clean between READY and COMPLETED.
++        for offset in range(5 * self.image_len / 8, 7 * self.image_len / 8, 1024 * 1024):
++            self.vm.hmp_qemu_io('source', 'aio_write -P 3 %i 1M' % offset)
++        for offset in range(6 * self.image_len / 8, 7 * self.image_len / 8, 1024 * 1024):
++            self.vm.hmp_qemu_io('source', 'aio_write -z %i 1M' % offset)
 +
-+            action = mirror_error_action(job, false, -ret);
-+            if (action == BLOCK_ERROR_ACTION_REPORT) {
-+                if (!job->ret) {
-+                    job->ret = ret;
-+                }
-+                break;
-+            }
-+        }
-+    }
++        if sync_source_and_target:
++            # If source and target should be in sync after the mirror,
++            # we have to flush before completion
++            self.vm.hmp_qemu_io('source', 'aio_flush')
++            self.potential_writes_in_flight = False
 +
-+    bdrv_dirty_iter_free(iter);
-+    if (qiov) {
-+        qemu_iovec_destroy(&target_qiov);
-+    }
-+}
++        self.complete_and_wait(drive='mirror', wait_ready=False)
 +
-+static MirrorOp *coroutine_fn active_write_prepare(MirrorBlockJob *s,
-+                                                   uint64_t offset,
-+                                                   uint64_t bytes)
-+{
-+    MirrorOp *op;
-+    uint64_t start_chunk = offset / s->granularity;
-+    uint64_t end_chunk = DIV_ROUND_UP(offset + bytes, s->granularity);
++    def testActiveIO(self):
++        self.doActiveIO(False)
 +
-+    op = g_new(MirrorOp, 1);
-+    *op = (MirrorOp){
-+        .s                  = s,
-+        .offset             = offset,
-+        .bytes              = bytes,
-+        .is_active_write    = true,
-+    };
-+    qemu_co_queue_init(&op->waiting_requests);
-+    QTAILQ_INSERT_TAIL(&s->ops_in_flight, op, next);
++    def testActiveIOFlushed(self):
++        self.doActiveIO(True)
 +
-+    s->in_active_write_counter++;
 +
-+    mirror_wait_on_conflicts(op, s, offset, bytes);
 +
-+    bitmap_set(s->in_flight_bitmap, start_chunk, end_chunk - start_chunk);
++if __name__ == '__main__':
++    iotests.main(supported_fmts=['qcow2', 'raw'])
+diff --git a/tests/qemu-iotests/151.out b/tests/qemu-iotests/151.out
+new file mode 100644
+index 0000000000..fbc63e62f8
+--- /dev/null
++++ b/tests/qemu-iotests/151.out
+@@ -0,0 +1,5 @@
++..
++----------------------------------------------------------------------
++Ran 2 tests
 +
-+    return op;
-+}
-+
-+static void coroutine_fn active_write_settle(MirrorOp *op)
-+{
-+    uint64_t start_chunk = op->offset / op->s->granularity;
-+    uint64_t end_chunk = DIV_ROUND_UP(op->offset + op->bytes,
-+                                      op->s->granularity);
-+
-+    if (!--op->s->in_active_write_counter && op->s->actively_synced) {
-+        BdrvChild *source = op->s->mirror_top_bs->backing;
-+
-+        if (QLIST_FIRST(&source->bs->parents) == source &&
-+            QLIST_NEXT(source, next_parent) == NULL)
-+        {
-+            /* Assert that we are back in sync once all active write
-+             * operations are settled.
-+             * Note that we can only assert this if the mirror node
-+             * is the source node's only parent. */
-+            assert(!bdrv_get_dirty_count(op->s->dirty_bitmap));
-+        }
-+    }
-+    bitmap_clear(op->s->in_flight_bitmap, start_chunk, end_chunk - start_chunk);
-+    QTAILQ_REMOVE(&op->s->ops_in_flight, op, next);
-+    qemu_co_queue_restart_all(&op->waiting_requests);
-+    g_free(op);
-+}
-+
- static int coroutine_fn bdrv_mirror_top_preadv(BlockDriverState *bs,
-     uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags)
- {
-     return bdrv_co_preadv(bs->backing, offset, bytes, qiov, flags);
- }
- 
-+static int coroutine_fn bdrv_mirror_top_do_write(BlockDriverState *bs,
-+    MirrorMethod method, uint64_t offset, uint64_t bytes, QEMUIOVector *qiov,
-+    int flags)
-+{
-+    MirrorOp *op = NULL;
-+    MirrorBDSOpaque *s = bs->opaque;
-+    int ret = 0;
-+    bool copy_to_target;
-+
-+    copy_to_target = s->job->ret >= 0 &&
-+                     s->job->copy_mode == MIRROR_COPY_MODE_WRITE_BLOCKING;
-+
-+    if (copy_to_target) {
-+        op = active_write_prepare(s->job, offset, bytes);
-+    }
-+
-+    switch (method) {
-+    case MIRROR_METHOD_COPY:
-+        ret = bdrv_co_pwritev(bs->backing, offset, bytes, qiov, flags);
-+        break;
-+
-+    case MIRROR_METHOD_ZERO:
-+        ret = bdrv_co_pwrite_zeroes(bs->backing, offset, bytes, flags);
-+        break;
-+
-+    case MIRROR_METHOD_DISCARD:
-+        ret = bdrv_co_pdiscard(bs->backing->bs, offset, bytes);
-+        break;
-+
-+    default:
-+        abort();
-+    }
-+
-+    if (ret < 0) {
-+        goto out;
-+    }
-+
-+    if (copy_to_target) {
-+        do_sync_target_write(s->job, method, offset, bytes, qiov, flags);
-+    }
-+
-+out:
-+    if (copy_to_target) {
-+        active_write_settle(op);
-+    }
-+    return ret;
-+}
-+
- static int coroutine_fn bdrv_mirror_top_pwritev(BlockDriverState *bs,
-     uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags)
- {
--    return bdrv_co_pwritev(bs->backing, offset, bytes, qiov, flags);
-+    MirrorBDSOpaque *s = bs->opaque;
-+    QEMUIOVector bounce_qiov;
-+    void *bounce_buf;
-+    int ret = 0;
-+    bool copy_to_target;
-+
-+    copy_to_target = s->job->ret >= 0 &&
-+                     s->job->copy_mode == MIRROR_COPY_MODE_WRITE_BLOCKING;
-+
-+    if (copy_to_target) {
-+        /* The guest might concurrently modify the data to write; but
-+         * the data on source and destination must match, so we have
-+         * to use a bounce buffer if we are going to write to the
-+         * target now. */
-+        bounce_buf = qemu_blockalign(bs, bytes);
-+        iov_to_buf_full(qiov->iov, qiov->niov, 0, bounce_buf, bytes);
-+
-+        qemu_iovec_init(&bounce_qiov, 1);
-+        qemu_iovec_add(&bounce_qiov, bounce_buf, bytes);
-+        qiov = &bounce_qiov;
-+    }
-+
-+    ret = bdrv_mirror_top_do_write(bs, MIRROR_METHOD_COPY, offset, bytes, qiov,
-+                                   flags);
-+
-+    if (copy_to_target) {
-+        qemu_iovec_destroy(&bounce_qiov);
-+        qemu_vfree(bounce_buf);
-+    }
-+
-+    return ret;
- }
- 
- static int coroutine_fn bdrv_mirror_top_flush(BlockDriverState *bs)
-@@ -1164,13 +1403,15 @@ static int coroutine_fn bdrv_mirror_top_flush(BlockDriverState *bs)
- static int coroutine_fn bdrv_mirror_top_pwrite_zeroes(BlockDriverState *bs,
-     int64_t offset, int bytes, BdrvRequestFlags flags)
- {
--    return bdrv_co_pwrite_zeroes(bs->backing, offset, bytes, flags);
-+    return bdrv_mirror_top_do_write(bs, MIRROR_METHOD_ZERO, offset, bytes, NULL,
-+                                    flags);
- }
- 
- static int coroutine_fn bdrv_mirror_top_pdiscard(BlockDriverState *bs,
-     int64_t offset, int bytes)
- {
--    return bdrv_co_pdiscard(bs->backing->bs, offset, bytes);
-+    return bdrv_mirror_top_do_write(bs, MIRROR_METHOD_DISCARD, offset, bytes,
-+                                    NULL, 0);
- }
- 
- static void bdrv_mirror_top_refresh_filename(BlockDriverState *bs, QDict *opts)
-@@ -1340,6 +1581,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-     s->on_target_error = on_target_error;
-     s->is_none_mode = is_none_mode;
-     s->backing_mode = backing_mode;
-+    s->copy_mode = MIRROR_COPY_MODE_BACKGROUND;
-     s->base = base;
-     s->granularity = granularity;
-     s->buf_size = ROUND_UP(buf_size, granularity);
++OK
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 937a3d0a4d..eea75819d2 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -157,6 +157,7 @@
+ 148 rw auto quick
+ 149 rw auto sudo
+ 150 rw auto quick
++151 rw auto
+ 152 rw auto quick
+ 153 rw auto quick
+ 154 rw auto backing quick
 -- 
 2.13.6
