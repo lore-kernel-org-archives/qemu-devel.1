@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fUtVl-00019k-Rv
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:44:01 -0400
+	(envelope-from <groug@kaod.org>) id 1fUtYU-0002CL-Df
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:46:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fUtVk-00042j-Ti
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:43:57 -0400
-Date: Mon, 18 Jun 2018 14:43:49 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180618144349.7fb40512@redhat.com>
-In-Reply-To: <20180615140448.32234-13-david@redhat.com>
-References: <20180615140448.32234-1-david@redhat.com>
-	<20180615140448.32234-13-david@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1fUtYR-0005Yb-9h
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:46:46 -0400
+Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:37316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fUtYR-0005XL-34
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 08:46:43 -0400
+Received: from player792.ha.ovh.net (unknown [10.109.108.92])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 5F772E4F3D
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 14:46:41 +0200 (CEST)
+Date: Mon, 18 Jun 2018 14:46:33 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180618144633.7dc1ba5f@bahia.lan>
+In-Reply-To: <04de8df8-3951-442c-62f4-7ea0309c609b@kaod.org>
+References: <20180615115303.31125-1-clg@kaod.org>
+	<20180615115303.31125-4-clg@kaod.org>
+	<20180615180311.6d16e506@bahia.lan>
+	<c5182296-b9f5-0072-8d13-551d71560394@kaod.org>
+	<20180618104208.66a9f09e@bahia.lan>
+	<26b2695c-8b7e-d5f7-7069-cb234aaf5a2e@kaod.org>
+	<20180618115444.094d4b1c@bahia.lan>
+	<04de8df8-3951-442c-62f4-7ea0309c609b@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 12/13] nvdimm: make get_memory_region()
- perform checks and initialization
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 3/3] spapr: introduce a fixed
+ IRQ number space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +37,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Fri, 15 Jun 2018 16:04:47 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Mon, 18 Jun 2018 13:31:26 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-> We might get a call to get_memory_region() before the device has been
-> realized. We should return a consistent value, as the return value
-> will e.g. later on be used in the pre_plug handler.
-> 
-> To avoid duplicating too much code, factor the initialization and checks
-> out into a helper function.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> On 06/18/2018 11:54 AM, Greg Kurz wrote:
+> > On Mon, 18 Jun 2018 10:56:55 +0200
+> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> >  =20
+> >> [ ... ]
+> >> =20
+> >>>>> This is 4 irqs per PHB, hence up to 32 PHBs. Cool, we're currently
+> >>>>> limited to 31 PHBs.
+> >>>>>      =20
+> >>>>>> +#define SPAPR_IRQ_MSI        0x1100  /* Offset of the dynamic ran=
+ge covered     =20
+> >>>>>
+> >>>>> We only support dynamic MSIs with PCI, maybe rename to SPAPR_IRQ_PC=
+I_MSI ?     =20
+> >>>>
+> >>>> hmm, no. We could have CAPI devices there. remember ? ;)
+> >>>>   =20
+> >>>
+> >>> Well... OpenCAPI devices are exposed to the OS as PCI devices, so I'm=
+ not
+> >>> sure we need a CAPI specific range.   =20
+> >>
+> >> yes. so this range is common to all devices doing dynamic allocation
+> >> of IRQs. How should we call it ?=20
+> >> =20
+> >>>>>> +                                      * by the bitmap allocator *=
+/     =20
+> >>>>>
+> >>>>> The range size is hence 1k (XICS_IRQS_SPAPR) for the time being.   =
+  =20
+> >>>>
+> >>>> in fact we could this bogus limit and use spapr->irq_map_nr now.
+> >>>>   =20
+> >>>
+> >>> "we could *missing verb* this bogus limit"... so I'm not sure to
+> >>> understand...   =20
+> >>
+> >> oups. We could use spapr->irq_map_nr instead of XICS_IRQS_SPAPR when
+> >> defining :=20
+> >>
+> >>     _FDT(fdt_setprop_cell(fdt, bus_off, "ibm,pe-total-#msi", XICS_IRQS=
+_SPAPR));
+> >>
+> >> in spapr_pci.c
+> >> =20
+> >=20
+> > Ah... yeah, I've always found weird that all PHBs advertise the same nu=
+mber
+> > of available MSIs as the total number of irqs for the whole machine. And
+> > putting spapr->irq_map_nr looks weird all the same if all PHBs rely on =
+the
+> > same bitmap actually.
+> >=20
+> > I'm thinking of doing the other way around: keep XICS_IRQS_SPAPR in
+> > "ibm,pe-total-#msi" and have one XICS_IRQS_SPAPR sized bitmap per PHB. =
+=20
+>=20
+> That could be the place where to put the msi allocator.
+>=20
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Are you suggesting to move @irq_map and @irq_map_nr to sPAPRPHBState and
+to have these setup during PHB realize ? I guess we could do that.
 
-> ---
->  hw/mem/nvdimm.c | 46 +++++++++++++++++++++++++++++++++++++---------
->  1 file changed, 37 insertions(+), 9 deletions(-)
-> 
-> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-> index df7646488b..deba5719bc 100644
-> --- a/hw/mem/nvdimm.c
-> +++ b/hw/mem/nvdimm.c
-> @@ -71,20 +71,24 @@ static void nvdimm_init(Object *obj)
->                          NULL, NULL);
->  }
->  
-> -static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
-> +static void nvdimm_prepare_memory_region(NVDIMMDevice *nvdimm, Error **errp)
->  {
-> -    NVDIMMDevice *nvdimm = NVDIMM(dimm);
-> +    PCDIMMDevice *dimm = PC_DIMM(nvdimm);
-> +    uint64_t align, pmem_size, size;
-> +    MemoryRegion *mr;
->  
-> -    return nvdimm->nvdimm_mr;
-> -}
-> +    if (nvdimm->nvdimm_mr) {
-> +        return;
-> +    }
->  
-> -static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
-> -{
-> -    MemoryRegion *mr = host_memory_backend_get_memory(dimm->hostmem);
-> -    NVDIMMDevice *nvdimm = NVDIMM(dimm);
-> -    uint64_t align, pmem_size, size = memory_region_size(mr);
-> +    if (!dimm->hostmem) {
-> +        error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property must be set");
-> +        return;
-> +    }
->  
-> +    mr = host_memory_backend_get_memory(dimm->hostmem);
->      align = memory_region_get_alignment(mr);
-> +    size = memory_region_size(mr);
->  
->      pmem_size = size - nvdimm->label_size;
->      nvdimm->label_data = memory_region_get_ram_ptr(mr) + pmem_size;
-> @@ -108,6 +112,30 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
->      nvdimm->nvdimm_mr->align = align;
->  }
->  
-> +static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
-> +{
-> +    NVDIMMDevice *nvdimm = NVDIMM(dimm);
-> +    Error *local_err = NULL;
-> +
-> +    if (!nvdimm->nvdimm_mr) {
-> +        nvdimm_prepare_memory_region(nvdimm, &local_err);
-> +        if (local_err) {
-> +            error_propagate(errp, local_err);
-> +            return NULL;
-> +        }
-> +    }
-> +    return nvdimm->nvdimm_mr;
-> +}
-> +
-> +static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
-> +{
-> +    NVDIMMDevice *nvdimm = NVDIMM(dimm);
-> +
-> +    if (!nvdimm->nvdimm_mr) {
-> +        nvdimm_prepare_memory_region(nvdimm, errp);
-> +    }
-> +}
-> +
->  /*
->   * the caller should check the input parameters before calling
->   * label read/write functions.
+> C.
