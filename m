@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57377)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fUz5Y-0003WO-FX
+	(envelope-from <richard.henderson@linaro.org>) id 1fUz5W-0003VQ-FJ
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:41:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fUz5X-0004ry-6e
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:41:16 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:41688)
+	(envelope-from <richard.henderson@linaro.org>) id 1fUz5V-0004qI-EN
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:41:14 -0400
+Received: from mail-pl0-x233.google.com ([2607:f8b0:400e:c01::233]:35869)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fUz5W-0004rZ-Uw
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:41:15 -0400
-Received: by mail-pf0-x241.google.com with SMTP id a11-v6so8596941pff.8
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 11:41:14 -0700 (PDT)
+	id 1fUz5V-0004pW-8t
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:41:13 -0400
+Received: by mail-pl0-x233.google.com with SMTP id a7-v6so9500246plp.3
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 11:41:13 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 18 Jun 2018 08:40:37 -1000
-Message-Id: <20180618184046.6270-14-richard.henderson@linaro.org>
+Date: Mon, 18 Jun 2018 08:40:36 -1000
+Message-Id: <20180618184046.6270-13-richard.henderson@linaro.org>
 In-Reply-To: <20180618184046.6270-1-richard.henderson@linaro.org>
 References: <20180618184046.6270-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 13/22] target/openrisc: Fix cpu_mmu_index
+Subject: [Qemu-devel] [PATCH v2 12/22] target/openrisc: Fix tlb flushing in
+ mtspr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,181 +30,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: shorne@gmail.com
 
-The code in cpu_mmu_index does not properly honor SR_DME.
-This bug has workarounds elsewhere in that we flush the
-tlb more often than necessary, on the state changes that
-should be reflected in a change of mmu_index.
+The previous code was confused, avoiding the flush of the old entry
+if the new entry is invalid.  We need to flush the old page if the
+old entry is valid and the new page if the new entry is valid.
 
-Fixing this means that we can respect the mmu_index that
-is given to tlb_flush.
+This bug was masked by over-flushing elsewhere.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/openrisc/cpu.h              | 23 +++++++++++++--------
- target/openrisc/interrupt.c        |  4 ----
- target/openrisc/interrupt_helper.c | 15 +++-----------
- target/openrisc/mmu.c              | 33 +++++++++++++++++++++++++++---
- target/openrisc/sys_helper.c       |  4 ----
- target/openrisc/translate.c        |  2 +-
- 6 files changed, 49 insertions(+), 32 deletions(-)
+ target/openrisc/sys_helper.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index 947ca00d8d..c48802ad8f 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -384,9 +384,12 @@ void cpu_openrisc_count_stop(OpenRISCCPU *cpu);
- 
- #include "exec/cpu-all.h"
- 
--#define TB_FLAGS_DFLAG 1
--#define TB_FLAGS_R0_0  2
-+#define TB_FLAGS_SM    SR_SM
-+#define TB_FLAGS_DME   SR_DME
-+#define TB_FLAGS_IME   SR_IME
- #define TB_FLAGS_OVE   SR_OVE
-+#define TB_FLAGS_DFLAG 2      /* reuse SR_TEE */
-+#define TB_FLAGS_R0_0  4      /* reuse SR_IEE */
- 
- static inline uint32_t cpu_get_gpr(const CPUOpenRISCState *env, int i)
- {
-@@ -404,17 +407,21 @@ static inline void cpu_get_tb_cpu_state(CPUOpenRISCState *env,
- {
-     *pc = env->pc;
-     *cs_base = 0;
--    *flags = (env->dflag
--              | (cpu_get_gpr(env, 0) == 0 ? TB_FLAGS_R0_0 : 0)
--              | (env->sr & SR_OVE));
-+    *flags = (env->dflag ? TB_FLAGS_DFLAG : 0)
-+           | (cpu_get_gpr(env, 0) ? 0 : TB_FLAGS_R0_0)
-+           | (env->sr & (SR_SM | SR_DME | SR_IME | SR_OVE));
- }
- 
- static inline int cpu_mmu_index(CPUOpenRISCState *env, bool ifetch)
- {
--    if (!(env->sr & SR_IME)) {
--        return MMU_NOMMU_IDX;
-+    int ret = MMU_NOMMU_IDX;  /* mmu is disabled */
-+
-+    if (env->sr & (ifetch ? SR_IME : SR_DME)) {
-+        /* The mmu is enabled; test supervisor state.  */
-+        ret = env->sr & SR_SM ? MMU_SUPERVISOR_IDX : MMU_USER_IDX;
-     }
--    return (env->sr & SR_SM) == 0 ? MMU_USER_IDX : MMU_SUPERVISOR_IDX;
-+
-+    return ret;
- }
- 
- static inline uint32_t cpu_get_sr(const CPUOpenRISCState *env)
-diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
-index d9cb363fea..e28042856a 100644
---- a/target/openrisc/interrupt.c
-+++ b/target/openrisc/interrupt.c
-@@ -50,10 +50,6 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
-         env->eear = env->pc;
-     }
- 
--    /* For machine-state changed between user-mode and supervisor mode,
--       we need flush TLB when we enter&exit EXCP.  */
--    tlb_flush(cs);
--
-     env->esr = cpu_get_sr(env);
-     env->sr &= ~SR_DME;
-     env->sr &= ~SR_IME;
-diff --git a/target/openrisc/interrupt_helper.c b/target/openrisc/interrupt_helper.c
-index a2e9003969..9c5489f5f7 100644
---- a/target/openrisc/interrupt_helper.c
-+++ b/target/openrisc/interrupt_helper.c
-@@ -25,16 +25,7 @@
- 
- void HELPER(rfe)(CPUOpenRISCState *env)
- {
--    OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
--#ifndef CONFIG_USER_ONLY
--    int need_flush_tlb = (cpu->env.sr & (SR_SM | SR_IME | SR_DME)) ^
--                         (cpu->env.esr & (SR_SM | SR_IME | SR_DME));
--    if (need_flush_tlb) {
--        CPUState *cs = CPU(cpu);
--        tlb_flush(cs);
--    }
--#endif
--    cpu->env.pc = cpu->env.epcr;
--    cpu->env.lock_addr = -1;
--    cpu_set_sr(&cpu->env, cpu->env.esr);
-+    env->pc = env->epcr;
-+    env->lock_addr = -1;
-+    cpu_set_sr(env, env->esr);
- }
-diff --git a/target/openrisc/mmu.c b/target/openrisc/mmu.c
-index 856969a7f2..b293b64e98 100644
---- a/target/openrisc/mmu.c
-+++ b/target/openrisc/mmu.c
-@@ -246,9 +246,36 @@ hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
- void tlb_fill(CPUState *cs, target_ulong addr, int size,
-               MMUAccessType access_type, int mmu_idx, uintptr_t retaddr)
- {
--    int ret = openrisc_cpu_handle_mmu_fault(cs, addr, size,
--                                            access_type, mmu_idx);
--    if (ret) {
-+    OpenRISCCPU *cpu = OPENRISC_CPU(cs);
-+    int ret, prot = 0;
-+    hwaddr physical = 0;
-+
-+    if (mmu_idx == MMU_NOMMU_IDX) {
-+        ret = get_phys_nommu(&physical, &prot, addr);
-+    } else {
-+        bool super = mmu_idx == MMU_SUPERVISOR_IDX;
-+        if (access_type == MMU_INST_FETCH) {
-+            ret = get_phys_code(cpu, &physical, &prot, addr, 2, super);
-+        } else {
-+            ret = get_phys_data(cpu, &physical, &prot, addr,
-+                                access_type == MMU_DATA_STORE, super);
-+        }
-+    }
-+
-+    if (ret == TLBRET_MATCH) {
-+        tlb_set_page(cs, addr & TARGET_PAGE_MASK,
-+                     physical & TARGET_PAGE_MASK, prot,
-+                     mmu_idx, TARGET_PAGE_SIZE);
-+    } else if (ret < 0) {
-+        int rw;
-+        if (access_type == MMU_INST_FETCH) {
-+            rw = 2;
-+        } else if (access_type == MMU_DATA_STORE) {
-+            rw = 1;
-+        } else {
-+            rw = 0;
-+        }
-+        cpu_openrisc_raise_mmu_exception(cpu, addr, rw, ret);
-         /* Raise Exception.  */
-         cpu_loop_exit_restore(cs, retaddr);
-     }
 diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index e00aaa332e..0a74c9522f 100644
+index 8ad7a7d898..e00aaa332e 100644
 --- a/target/openrisc/sys_helper.c
 +++ b/target/openrisc/sys_helper.c
-@@ -56,10 +56,6 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+@@ -32,6 +32,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+ #ifndef CONFIG_USER_ONLY
+     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
+     CPUState *cs = CPU(cpu);
++    target_ulong mr;
+     int idx;
+ 
+     switch (spr) {
+@@ -84,12 +85,15 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+ 
+     case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
+         idx = spr - TO_SPR(1, 512);
+-        if (!(rb & 1)) {
+-            tlb_flush_page(cs, env->tlb.dtlb[idx].mr & TARGET_PAGE_MASK);
++        mr = env->tlb.dtlb[idx].mr;
++        if (mr & 1) {
++            tlb_flush_page(cs, mr & TARGET_PAGE_MASK);
++        }
++        if (rb & 1) {
++            tlb_flush_page(cs, rb & TARGET_PAGE_MASK);
+         }
+         env->tlb.dtlb[idx].mr = rb;
          break;
- 
-     case TO_SPR(0, 17): /* SR */
--        if ((env->sr & (SR_IME | SR_DME | SR_SM)) ^
--            (rb & (SR_IME | SR_DME | SR_SM))) {
--            tlb_flush(cs);
--        }
-         cpu_set_sr(env, rb);
+-
+     case TO_SPR(1, 640) ... TO_SPR(1, 640+DTLB_SIZE-1): /* DTLBW0TR 0-127 */
+         idx = spr - TO_SPR(1, 640);
+         env->tlb.dtlb[idx].tr = rb;
+@@ -101,14 +105,18 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+     case TO_SPR(1, 1280) ... TO_SPR(1, 1407): /* DTLBW3MR 0-127 */
+     case TO_SPR(1, 1408) ... TO_SPR(1, 1535): /* DTLBW3TR 0-127 */
          break;
- 
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index f19f0d257b..60c6e19f4b 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -59,7 +59,7 @@ static inline bool is_user(DisasContext *dc)
- #ifdef CONFIG_USER_ONLY
-     return true;
- #else
--    return dc->mem_idx == MMU_USER_IDX;
-+    return !(dc->tb_flags & TB_FLAGS_SM);
- #endif
- }
- 
++
+     case TO_SPR(2, 512) ... TO_SPR(2, 512+ITLB_SIZE-1):   /* ITLBW0MR 0-127 */
+         idx = spr - TO_SPR(2, 512);
+-        if (!(rb & 1)) {
+-            tlb_flush_page(cs, env->tlb.itlb[idx].mr & TARGET_PAGE_MASK);
++        mr = env->tlb.itlb[idx].mr;
++        if (mr & 1) {
++            tlb_flush_page(cs, mr & TARGET_PAGE_MASK);
++        }
++        if (rb & 1) {
++            tlb_flush_page(cs, rb & TARGET_PAGE_MASK);
+         }
+         env->tlb.itlb[idx].mr = rb;
+         break;
+-
+     case TO_SPR(2, 640) ... TO_SPR(2, 640+ITLB_SIZE-1): /* ITLBW0TR 0-127 */
+         idx = spr - TO_SPR(2, 640);
+         env->tlb.itlb[idx].tr = rb;
+@@ -120,6 +128,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+     case TO_SPR(2, 1280) ... TO_SPR(2, 1407): /* ITLBW3MR 0-127 */
+     case TO_SPR(2, 1408) ... TO_SPR(2, 1535): /* ITLBW3TR 0-127 */
+         break;
++
+     case TO_SPR(5, 1):  /* MACLO */
+         env->mac = deposit64(env->mac, 0, 32, rb);
+         break;
 -- 
 2.17.1
