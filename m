@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fUuM0-0007iP-MV
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:37:57 -0400
+	(envelope-from <berrange@redhat.com>) id 1fUuPL-0000TB-SI
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:41:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fUuLx-0006ZT-KZ
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:37:56 -0400
-Received: from 2.mo4.mail-out.ovh.net ([46.105.72.36]:45990)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fUuLx-0006Yg-Dn
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:37:53 -0400
-Received: from player688.ha.ovh.net (unknown [10.109.122.124])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id BA506182528
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 15:37:51 +0200 (CEST)
-Date: Mon, 18 Jun 2018 15:37:41 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180618153741.76a765ff@bahia.lan>
-In-Reply-To: <20180618063606.2513-3-david@gibson.dropbear.id.au>
-References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
-	<20180618063606.2513-3-david@gibson.dropbear.id.au>
+	(envelope-from <berrange@redhat.com>) id 1fUuPI-0000iy-NB
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 09:41:23 -0400
+Date: Mon, 18 Jun 2018 14:40:51 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180618134051.GH3589@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180615155103.11924-1-berrange@redhat.com>
+	<20180615155103.11924-4-berrange@redhat.com>
+	<20180615175423.GI2615@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/9] spapr: Compute effective capability
- values earlier
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180615175423.GI2615@work-vm>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/6] migration: add support for a
+ "tls-authz" migration parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,100 +27,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: abologna@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On Mon, 18 Jun 2018 16:35:59 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Fri, Jun 15, 2018 at 06:54:23PM +0100, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> > From: "Daniel P. Berrange" <berrange@redhat.com>
+> >=20
+> > The QEMU instance that runs as the server for the migration data
+> > transport (ie the target QEMU) needs to be able to configure access
+> > control so it can prevent unauthorized clients initiating an incoming
+> > migration. This adds a new 'tls-authz' migration parameter that is us=
+ed
+> > to provide the QOM ID of a QAuthZ subclass instance that provides the
+> > access control check. This is checked against the x509 certificate
+> > obtained during the TLS handshake.
+> >=20
+> > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+>=20
+> I'd appreciate an example of using it, either in the migration docs or
+> the commit message.
 
-> Previously, the effective values of the various spapr capability flags
-> were only determined at machine reset time.  That was a lazy way of making
-> sure it was after cpu initialization so it could use the cpu object to
-> inform the defaults.
-> 
-> But we've now improved the compat checking code so that we don't need to
-> instantiate the cpus to use it.  That lets us move the resolution of the
-> capability defaults much earlier.
-> 
-> This is going to be necessary for some future capabilities.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+Hmm, yes, it's an oversight to have missed an example in this commit
+message.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+>=20
+> > ---
+> >  hmp.c                 |  9 +++++++++
+> >  migration/migration.c |  8 ++++++++
+> >  migration/tls.c       |  2 +-
+> >  qapi/migration.json   | 12 +++++++++++-
+> >  4 files changed, 29 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/hmp.c b/hmp.c
+> > index 74e18db103..bef8ea2531 100644
+> > --- a/hmp.c
+> > +++ b/hmp.c
+> > @@ -370,6 +370,9 @@ void hmp_info_migrate_parameters(Monitor *mon, co=
+nst QDict *qdict)
+> >          monitor_printf(mon, "%s: %" PRIu64 "\n",
+> >              MigrationParameter_str(MIGRATION_PARAMETER_XBZRLE_CACHE_=
+SIZE),
+> >              params->xbzrle_cache_size);
+> > +        monitor_printf(mon, " %s: '%s'\n",
+> > +            MigrationParameter_str(MIGRATION_PARAMETER_TLS_AUTHZ),
+> > +            params->has_tls_authz ? params->tls_authz : "");
+> >      }
+> > =20
+> >      qapi_free_MigrationParameters(params);
+> > @@ -1632,6 +1635,12 @@ void hmp_migrate_set_parameter(Monitor *mon, c=
+onst QDict *qdict)
+> >          p->tls_hostname->type =3D QTYPE_QSTRING;
+> >          visit_type_str(v, param, &p->tls_hostname->u.s, &err);
+> >          break;
+> > +    case MIGRATION_PARAMETER_TLS_AUTHZ:
+> > +        p->has_tls_authz =3D true;
+> > +        p->tls_authz =3D g_new0(StrOrNull, 1);
+> > +        p->tls_authz->type =3D QTYPE_QSTRING;
+> > +        visit_type_str(v, param, &p->tls_authz->u.s, &err);
+> > +        break;
+> >      case MIGRATION_PARAMETER_MAX_BANDWIDTH:
+> >          p->has_max_bandwidth =3D true;
+> >          /*
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 1e99ec9b7e..d14c8d7003 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -645,6 +645,8 @@ MigrationParameters *qmp_query_migrate_parameters=
+(Error **errp)
+> >      params->tls_creds =3D g_strdup(s->parameters.tls_creds);
+> >      params->has_tls_hostname =3D true;
+> >      params->tls_hostname =3D g_strdup(s->parameters.tls_hostname);
+> > +    params->has_tls_authz =3D true;
+> > +    params->tls_authz =3D g_strdup(s->parameters.tls_authz);
+> >      params->has_max_bandwidth =3D true;
+> >      params->max_bandwidth =3D s->parameters.max_bandwidth;
+> >      params->has_downtime_limit =3D true;
+> > @@ -1106,6 +1108,12 @@ static void migrate_params_apply(MigrateSetPar=
+ameters *params, Error **errp)
+> >          s->parameters.tls_hostname =3D g_strdup(params->tls_hostname=
+->u.s);
+> >      }
+> > =20
+> > +    if (params->has_tls_authz) {
+> > +        g_free(s->parameters.tls_authz);
+> > +        assert(params->tls_authz->type =3D=3D QTYPE_QSTRING);
+> > +        s->parameters.tls_authz =3D g_strdup(params->tls_authz->u.s)=
+;
+> > +    }
+> > +
+> >      if (params->has_max_bandwidth) {
+> >          s->parameters.max_bandwidth =3D params->max_bandwidth;
+> >          if (s->to_dst_file) {
+> > diff --git a/migration/tls.c b/migration/tls.c
+> > index 3b9e8c9263..5171afc6c4 100644
+> > --- a/migration/tls.c
+> > +++ b/migration/tls.c
+> > @@ -94,7 +94,7 @@ void migration_tls_channel_process_incoming(Migrati=
+onState *s,
+> > =20
+> >      tioc =3D qio_channel_tls_new_server(
+> >          ioc, creds,
+> > -        NULL, /* XXX pass ACL name */
+> > +        s->parameters.tls_authz,
+> >          errp);
+> >      if (!tioc) {
+> >          return;
+> > diff --git a/qapi/migration.json b/qapi/migration.json
+> > index f7e10ee90f..b9ba34e3a6 100644
+> > --- a/qapi/migration.json
+> > +++ b/qapi/migration.json
+> > @@ -488,6 +488,10 @@
+> >  #                hostname must be provided so that the server's x509
+> >  #                certificate identity can be validated. (Since 2.7)
+> >  #
+> > +# @tls-authz: ID of the 'authz' object subclass that provides access=
+ control
+> > +#             checking of the TLS x509 certificate distinguished nam=
+e. (Since
+> > +#             2.13)
+> > +#
+>=20
+> Oops, 2.13 strikes again :-)
+>=20
+> Other than that, OK from migration and HMP.
+>=20
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>=20
+> >  # @max-bandwidth: to set maximum speed for migration. maximum speed =
+in
+> >  #                 bytes per second. (Since 2.8)
+> >  #
+> > @@ -522,7 +526,7 @@
+> >  { 'enum': 'MigrationParameter',
+> >    'data': ['compress-level', 'compress-threads', 'decompress-threads=
+',
+> >             'cpu-throttle-initial', 'cpu-throttle-increment',
+> > -           'tls-creds', 'tls-hostname', 'max-bandwidth',
+> > +           'tls-creds', 'tls-hostname', 'tls-authz', 'max-bandwidth'=
+,
+> >             'downtime-limit', 'x-checkpoint-delay', 'block-incrementa=
+l',
+> >             'x-multifd-channels', 'x-multifd-page-count',
+> >             'xbzrle-cache-size' ] }
+> > @@ -605,6 +609,7 @@
+> >              '*cpu-throttle-increment': 'int',
+> >              '*tls-creds': 'StrOrNull',
+> >              '*tls-hostname': 'StrOrNull',
+> > +            '*tls-authz': 'StrOrNull',
+> >              '*max-bandwidth': 'int',
+> >              '*downtime-limit': 'int',
+> >              '*x-checkpoint-delay': 'int',
+> > @@ -667,6 +672,10 @@
+> >  #                associated with the migration URI, if any. (Since 2=
+.9)
+> >  #                Note: 2.8 reports this by omitting tls-hostname ins=
+tead.
+> >  #
+> > +# @tls-authz: ID of the 'authz' object subclass that provides access=
+ control
+> > +#             checking of the TLS x509 certificate distinguished nam=
+e. (Since
+> > +#             2.13)
+> > +#
+> >  # @max-bandwidth: to set maximum speed for migration. maximum speed =
+in
+> >  #                 bytes per second. (Since 2.8)
+> >  #
+> > @@ -704,6 +713,7 @@
+> >              '*cpu-throttle-increment': 'uint8',
+> >              '*tls-creds': 'str',
+> >              '*tls-hostname': 'str',
+> > +            '*tls-authz': 'str',
+> >              '*max-bandwidth': 'size',
+> >              '*downtime-limit': 'uint64',
+> >              '*x-checkpoint-delay': 'uint32',
+> > --=20
+> > 2.17.0
+> >=20
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
->  hw/ppc/spapr.c         | 6 ++++--
->  hw/ppc/spapr_caps.c    | 9 ++++++---
->  include/hw/ppc/spapr.h | 3 ++-
->  3 files changed, 12 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index b0b94fc1f0..40858d047c 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1612,7 +1612,7 @@ static void spapr_machine_reset(void)
->      void *fdt;
->      int rc;
->  
-> -    spapr_caps_reset(spapr);
-> +    spapr_caps_apply(spapr);
->  
->      first_ppc_cpu = POWERPC_CPU(first_cpu);
->      if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
-> @@ -2526,7 +2526,9 @@ static void spapr_machine_init(MachineState *machine)
->      QLIST_INIT(&spapr->phbs);
->      QTAILQ_INIT(&spapr->pending_dimm_unplugs);
->  
-> -    /* Check HPT resizing availability */
-> +    /* Determine capabilities to run with */
-> +    spapr_caps_init(spapr);
-> +
->      kvmppc_check_papr_resize_hpt(&resize_hpt_err);
->      if (spapr->resize_hpt == SPAPR_RESIZE_HPT_DEFAULT) {
->          /*
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 469f38f0ef..dabed817d1 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -439,12 +439,12 @@ SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
->  SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
->  SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
->  
-> -void spapr_caps_reset(sPAPRMachineState *spapr)
-> +void spapr_caps_init(sPAPRMachineState *spapr)
->  {
->      sPAPRCapabilities default_caps;
->      int i;
->  
-> -    /* First compute the actual set of caps we're running with.. */
-> +    /* Compute the actual set of caps we should run with */
->      default_caps = default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type);
->  
->      for (i = 0; i < SPAPR_CAP_NUM; i++) {
-> @@ -455,8 +455,11 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
->              spapr->eff.caps[i] = default_caps.caps[i];
->          }
->      }
-> +}
->  
-> -    /* .. then apply those caps to the virtual hardware */
-> +void spapr_caps_apply(sPAPRMachineState *spapr)
-> +{
-> +    int i;
->  
->      for (i = 0; i < SPAPR_CAP_NUM; i++) {
->          sPAPRCapabilityInfo *info = &capability_table[i];
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 3388750fc7..9dbd6010f5 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -798,7 +798,8 @@ static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int cap)
->      return spapr->eff.caps[cap];
->  }
->  
-> -void spapr_caps_reset(sPAPRMachineState *spapr);
-> +void spapr_caps_init(sPAPRMachineState *spapr);
-> +void spapr_caps_apply(sPAPRMachineState *spapr);
->  void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
->  int spapr_caps_post_migration(sPAPRMachineState *spapr);
->  
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
