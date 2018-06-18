@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUlQt-0007m0-5U
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 00:06:24 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fUlQs-0007lz-Q7
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 00:06:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUlQr-0006eD-NX
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 00:06:23 -0400
-Date: Mon, 18 Jun 2018 14:05:47 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fUlQr-0006du-8f
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 00:06:22 -0400
+Date: Mon, 18 Jun 2018 14:03:45 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180618040547.GV25461@umbus.fritz.box>
+Message-ID: <20180618040345.GU25461@umbus.fritz.box>
 References: <20180615152536.30093-1-clg@kaod.org>
-	<20180615152536.30093-3-clg@kaod.org>
+	<20180615152536.30093-2-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Zd8I2GZVcdxtyaG/"
+	protocol="application/pgp-signature"; boundary="Ma2pZxZcUUd0eybH"
 Content-Disposition: inline
-In-Reply-To: <20180615152536.30093-3-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] ppc/pnv: introduce a new
- isa_create() operation to the chip model
+In-Reply-To: <20180615152536.30093-2-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] ppc/pnv: introduce a new
+ intc_create() operation to the chip model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,204 +29,181 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---Zd8I2GZVcdxtyaG/
+--Ma2pZxZcUUd0eybH
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 15, 2018 at 05:25:34PM +0200, C=E9dric Le Goater wrote:
-> This moves the details of the ISA bus creation under the LPC model but
-> more important, the new PnvChip operation will let us choose the chip
-> class to use when we introduce the different chip classes for Power9
-> and Power8. It hides away the processor chip controllers from the
-> machine.
+On Fri, Jun 15, 2018 at 05:25:33PM +0200, C=E9dric Le Goater wrote:
+> On Power9, the thread interrupt presenter has a different type and is
+> linked to the chip owning the cores.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
 Applied to ppc-for-3.0, thanks.
 
 > ---
->=20
->  pnv_isa_create() is a onliner but it looks better like that than to
->  use it directly with pnv->chips[0]
->=20
->  include/hw/ppc/pnv.h     |  1 +
->  include/hw/ppc/pnv_lpc.h |  3 +--
->  hw/ppc/pnv.c             | 34 +++++++++++++++++++---------------
->  hw/ppc/pnv_lpc.c         | 30 +++++++++++++++++++++++++-----
->  4 files changed, 46 insertions(+), 22 deletions(-)
+>  include/hw/ppc/pnv.h |  1 +
+>  hw/ppc/pnv.c         | 21 +++++++++++++++++++--
+>  hw/ppc/pnv_core.c    | 18 +++++++++---------
+>  3 files changed, 29 insertions(+), 11 deletions(-)
 >=20
 > diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index e934e84f555e..563279f3e00c 100644
+> index 90759240a7b1..e934e84f555e 100644
 > --- a/include/hw/ppc/pnv.h
 > +++ b/include/hw/ppc/pnv.h
-> @@ -77,6 +77,7 @@ typedef struct PnvChipClass {
+> @@ -76,6 +76,7 @@ typedef struct PnvChipClass {
+>      hwaddr       xscom_base;
 > =20
 >      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
->      Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
-> +    ISABus *(*isa_create)(PnvChip *chip, Error **errp);
+> +    Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
 >  } PnvChipClass;
 > =20
 >  #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
-> diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
-> index 53fdd5bb6450..d657489b07ce 100644
-> --- a/include/hw/ppc/pnv_lpc.h
-> +++ b/include/hw/ppc/pnv_lpc.h
-> @@ -70,7 +70,6 @@ typedef struct PnvLpcController {
->      PnvPsi *psi;
->  } PnvLpcController;
-> =20
-> -qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type,
-> -                                 int nirqs);
-> +ISABus *pnv_lpc_isa_create(PnvLpcController *lpc, bool use_cpld, Error *=
-*errp);
-> =20
->  #endif /* _PPC_PNV_LPC_H */
 > diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index c7e127ae97db..ac828d133173 100644
+> index 0d2b79f7980f..c7e127ae97db 100644
 > --- a/hw/ppc/pnv.c
 > +++ b/hw/ppc/pnv.c
-> @@ -529,24 +529,24 @@ static void pnv_reset(void)
->      cpu_physical_memory_write(PNV_FDT_ADDR, fdt, fdt_totalsize(fdt));
+> @@ -671,6 +671,13 @@ static uint32_t pnv_chip_core_pir_p8(PnvChip *chip, =
+uint32_t core_id)
+>      return (chip->chip_id << 7) | (core_id << 3);
 >  }
 > =20
-> -static ISABus *pnv_isa_create(PnvChip *chip)
-> +static ISABus *pnv_chip_power8_isa_create(PnvChip *chip, Error **errp)
->  {
-> -    PnvLpcController *lpc =3D &chip->lpc;
-> -    ISABus *isa_bus;
-> -    qemu_irq *irqs;
-> -    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-> +    return pnv_lpc_isa_create(&chip->lpc, true, errp);
-> +}
-> =20
-> -    /* let isa_bus_new() create its own bridge on SysBus otherwise
-> -     * devices speficied on the command line won't find the bus and
-> -     * will fail to create.
-> -     */
-> -    isa_bus =3D isa_bus_new(NULL, &lpc->isa_mem, &lpc->isa_io,
-> -                          &error_fatal);
-> +static ISABus *pnv_chip_power8nvl_isa_create(PnvChip *chip, Error **errp)
+> +static Object *pnv_chip_power8_intc_create(PnvChip *chip, Object *child,
+> +                                           Error **errp)
 > +{
-> +    return pnv_lpc_isa_create(&chip->lpc, false, errp);
+> +    return icp_create(child, TYPE_PNV_ICP, XICS_FABRIC(qdev_get_machine(=
+)),
+> +                      errp);
 > +}
+> +
+>  /*
+>   *    0:48  Reserved - Read as zeroes
+>   *   49:52  Node ID
+> @@ -686,6 +693,12 @@ static uint32_t pnv_chip_core_pir_p9(PnvChip *chip, =
+uint32_t core_id)
+>      return (chip->chip_id << 8) | (core_id << 2);
+>  }
 > =20
-> -    irqs =3D pnv_lpc_isa_irq_create(lpc, pcc->chip_type, ISA_NUM_IRQS);
-> +static ISABus *pnv_chip_power9_isa_create(PnvChip *chip, Error **errp)
+> +static Object *pnv_chip_power9_intc_create(PnvChip *chip, Object *child,
+> +                                           Error **errp)
 > +{
 > +    return NULL;
 > +}
-> =20
-> -    isa_bus_irqs(isa_bus, irqs);
-> -    return isa_bus;
-> +static ISABus *pnv_isa_create(PnvChip *chip, Error **errp)
-> +{
-> +    return PNV_CHIP_GET_CLASS(chip)->isa_create(chip, errp);
->  }
-> =20
->  static void pnv_init(MachineState *machine)
-> @@ -646,7 +646,7 @@ static void pnv_init(MachineState *machine)
->      g_free(chip_typename);
-> =20
->      /* Instantiate ISA bus on chip 0 */
-> -    pnv->isa_bus =3D pnv_isa_create(pnv->chips[0]);
-> +    pnv->isa_bus =3D pnv_isa_create(pnv->chips[0], &error_fatal);
-> =20
->      /* Create serial port */
->      serial_hds_isa_init(pnv->isa_bus, 0, MAX_ISA_SERIAL_PORTS);
-> @@ -735,6 +735,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
+> +
+>  /* Allowed core identifiers on a POWER8 Processor Chip :
+>   *
+>   * <EX0 reserved>
+> @@ -721,6 +734,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
 klass, void *data)
+>      k->chip_cfam_id =3D 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
 >      k->cores_mask =3D POWER8E_CORE_MASK;
 >      k->core_pir =3D pnv_chip_core_pir_p8;
->      k->intc_create =3D pnv_chip_power8_intc_create;
-> +    k->isa_create =3D pnv_chip_power8_isa_create;
+> +    k->intc_create =3D pnv_chip_power8_intc_create;
 >      k->xscom_base =3D 0x003fc0000000000ull;
 >      dc->desc =3D "PowerNV Chip POWER8E";
 >  }
-> @@ -749,6 +750,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
+> @@ -734,6 +748,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
 lass, void *data)
+>      k->chip_cfam_id =3D 0x220ea04980000000ull; /* P8 Venice DD2.0 */
 >      k->cores_mask =3D POWER8_CORE_MASK;
 >      k->core_pir =3D pnv_chip_core_pir_p8;
->      k->intc_create =3D pnv_chip_power8_intc_create;
-> +    k->isa_create =3D pnv_chip_power8_isa_create;
+> +    k->intc_create =3D pnv_chip_power8_intc_create;
 >      k->xscom_base =3D 0x003fc0000000000ull;
 >      dc->desc =3D "PowerNV Chip POWER8";
 >  }
-> @@ -763,6 +765,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
+> @@ -747,6 +762,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
  *klass, void *data)
+>      k->chip_cfam_id =3D 0x120d304980000000ull;  /* P8 Naples DD1.0 */
 >      k->cores_mask =3D POWER8_CORE_MASK;
 >      k->core_pir =3D pnv_chip_core_pir_p8;
->      k->intc_create =3D pnv_chip_power8_intc_create;
-> +    k->isa_create =3D pnv_chip_power8nvl_isa_create;
+> +    k->intc_create =3D pnv_chip_power8_intc_create;
 >      k->xscom_base =3D 0x003fc0000000000ull;
 >      dc->desc =3D "PowerNV Chip POWER8NVL";
 >  }
-> @@ -777,6 +780,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
+> @@ -760,6 +776,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
 lass, void *data)
+>      k->chip_cfam_id =3D 0x220d104900008000ull; /* P9 Nimbus DD2.0 */
 >      k->cores_mask =3D POWER9_CORE_MASK;
 >      k->core_pir =3D pnv_chip_core_pir_p9;
->      k->intc_create =3D pnv_chip_power9_intc_create;
-> +    k->isa_create =3D pnv_chip_power9_isa_create;
+> +    k->intc_create =3D pnv_chip_power9_intc_create;
 >      k->xscom_base =3D 0x00603fc00000000ull;
 >      dc->desc =3D "PowerNV Chip POWER9";
 >  }
-> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
-> index 402c4fefa886..d7721320a25b 100644
-> --- a/hw/ppc/pnv_lpc.c
-> +++ b/hw/ppc/pnv_lpc.c
-> @@ -22,6 +22,7 @@
->  #include "target/ppc/cpu.h"
->  #include "qapi/error.h"
->  #include "qemu/log.h"
-> +#include "hw/isa/isa.h"
+> @@ -892,8 +909,8 @@ static void pnv_chip_core_realize(PnvChip *chip, Erro=
+r **errp)
+>          object_property_set_int(OBJECT(pnv_core),
+>                                  pcc->core_pir(chip, core_hwid),
+>                                  "pir", &error_fatal);
+> -        object_property_add_const_link(OBJECT(pnv_core), "xics",
+> -                                       qdev_get_machine(), &error_fatal);
+> +        object_property_add_const_link(OBJECT(pnv_core), "chip",
+> +                                       OBJECT(chip), &error_fatal);
+>          object_property_set_bool(OBJECT(pnv_core), true, "realized",
+>                                   &error_fatal);
+>          object_unref(OBJECT(pnv_core));
+> diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+> index f7cf33f547a5..a9f129fc2c5f 100644
+> --- a/hw/ppc/pnv_core.c
+> +++ b/hw/ppc/pnv_core.c
+> @@ -99,13 +99,14 @@ static const MemoryRegionOps pnv_core_xscom_ops =3D {
+>      .endianness =3D DEVICE_BIG_ENDIAN,
+>  };
 > =20
->  #include "hw/ppc/pnv.h"
->  #include "hw/ppc/pnv_lpc.h"
-> @@ -535,16 +536,35 @@ static void pnv_lpc_isa_irq_handler(void *opaque, i=
-nt n, int level)
->      }
->  }
-> =20
-> -qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type,
-> -                                 int nirqs)
-> +ISABus *pnv_lpc_isa_create(PnvLpcController *lpc, bool use_cpld, Error *=
-*errp)
+> -static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFabric *xi, Error **er=
+rp)
+> +static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip *chip, Error **err=
+p)
 >  {
-> +    Error *local_err =3D NULL;
-> +    ISABus *isa_bus;
-> +    qemu_irq *irqs;
-> +    qemu_irq_handler handler;
-> +
-> +    /* let isa_bus_new() create its own bridge on SysBus otherwise
-> +     * devices speficied on the command line won't find the bus and
-> +     * will fail to create.
-> +     */
-> +    isa_bus =3D isa_bus_new(NULL, &lpc->isa_mem, &lpc->isa_io, &local_er=
-r);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return NULL;
-> +    }
-> +
->      /* Not all variants have a working serial irq decoder. If not,
->       * handling of LPC interrupts becomes a platform issue (some
->       * platforms have a CPLD to do it).
->       */
-> -    if (chip_type =3D=3D PNV_CHIP_POWER8NVL) {
-> -        return qemu_allocate_irqs(pnv_lpc_isa_irq_handler, lpc, nirqs);
-> +    if (use_cpld) {
-> +        handler =3D pnv_lpc_isa_irq_handler_cpld;
->      } else {
-> -        return qemu_allocate_irqs(pnv_lpc_isa_irq_handler_cpld, lpc, nir=
-qs);
-> +        handler =3D pnv_lpc_isa_irq_handler;
+>      CPUPPCState *env =3D &cpu->env;
+>      int core_pir;
+>      int thread_index =3D 0; /* TODO: TCG supports only one thread */
+>      ppc_spr_t *pir =3D &env->spr_cb[SPR_PIR];
+>      Error *local_err =3D NULL;
+> +    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+> =20
+>      object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
+>      if (local_err) {
+> @@ -113,7 +114,7 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFab=
+ric *xi, Error **errp)
+>          return;
 >      }
-> +
-> +    irqs =3D qemu_allocate_irqs(handler, lpc, ISA_NUM_IRQS);
-> +
-> +    isa_bus_irqs(isa_bus, irqs);
-> +    return isa_bus;
->  }
+> =20
+> -    cpu->intc =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, xi, &local_err);
+> +    cpu->intc =3D pcc->intc_create(chip, OBJECT(cpu), &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return;
+> @@ -143,13 +144,12 @@ static void pnv_core_realize(DeviceState *dev, Erro=
+r **errp)
+>      void *obj;
+>      int i, j;
+>      char name[32];
+> -    Object *xi;
+> +    Object *chip;
+> =20
+> -    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
+> -    if (!xi) {
+> -        error_setg(errp, "%s: required link 'xics' not found: %s",
+> -                   __func__, error_get_pretty(local_err));
+> -        return;
+> +    chip =3D object_property_get_link(OBJECT(dev), "chip", &local_err);
+> +    if (!chip) {
+> +        error_propagate(errp, local_err);
+> +        error_prepend(errp, "required link 'chip' not found: ");
+>      }
+> =20
+>      pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
+> @@ -166,7 +166,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
+**errp)
+>      }
+> =20
+>      for (j =3D 0; j < cc->nr_threads; j++) {
+> -        pnv_realize_vcpu(pc->threads[j], XICS_FABRIC(xi), &local_err);
+> +        pnv_realize_vcpu(pc->threads[j], PNV_CHIP(chip), &local_err);
+>          if (local_err) {
+>              goto err;
+>          }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -234,24 +211,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Zd8I2GZVcdxtyaG/
+--Ma2pZxZcUUd0eybH
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsnL5oACgkQbDjKyiDZ
-s5Kvqw/7Bzk4H52uFSxxWO6tD16X4/niIyXEjWp78Pj/zW1WGh9MGBOdbr+1diOl
-Pr0yYuvwZO2/V9qf8c83c4abD7UZuMPCkiIhEBjCCwEou2e5xYEu0cGBOxgzPS2h
-dAdpK2w/0+KwjRWlFiHV/8fyLKFcu0K2eViRr+PGG64Ff7co5GrkrrDM9Vl0hx1M
-eNm7GvKjOpaMoPjDPFjC2BF8m0sb2G/5pwZTk/lPYtQxlGmo34iIjY57IVdCO3P5
-UBkGtI0IJfQRZIKQCYtYUt7pc5BW3tE5Y8ZYIOXFYp3x4n08gdIQUzk/vrplaT6U
-gizR9vbmxQXO6TqG1kMg/aC333/1N/7MsZhjxThreXHljy5JRC0Pnb+2SFHm3Yuw
-YUcMHIfyQMSmEc4PCjxCSq3suLCWap1Z78/nptPjbaId3Gpg1iuzwkZEyswmeaJW
-Ig34T5rtCzjwT0XVhhKqK2dlpoo4ejMNKVyrr++Kj7O04muviq2nYYBZNGrADOhY
-mWRaOSUOrJQ0mLQNSWLyD0dFoEHn2SkLroRC3en3GaeVRPpBttTcUDyAWDP+W2+Z
-Y8FKMKDIdMEsKyjbnycFj6cY7C5GHB/ddtgBE2iFq70sJoTtd8hwk9+0okdzP9Ld
-PnzkyutZw6EZAtgO4bG59KPOUv8pGEKhSfw8/ae1o85WXzXI2T4=
-=WJ/9
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsnLyEACgkQbDjKyiDZ
+s5K6bQ/9E5fyLox/TujM1T8sFA6EMqjuVj82R+cxrVCoHz2Xxl16ZxGNOvze7Cjm
+wgbPnLFWnrzWEhd/ewlgvXtA5KK5d/qC0WaDjVZGklPJIfUeSFOUXQQlLjD841lR
+UV2egeO4nUUcWVrlz8hrIjmSnIEEbovYLD5bN1P6KVS+96eCV9D58W+SekCy4KPN
+OrHBt3F1/knh64TfGYZToVB/wnrYIzK4mvUZ2qIHIk/GYlwxvS7vYDVPgXVxoyfT
+JWdwoKmE/qmYBvisgHefWLVMHG46t4u9COlQOAAQqUgL12vUcMlxYgNcodzqESg5
+996vB7d85YygefvnnfA0CZNWGlq1RIzpI473vuy5KJIVvoV23GrPYGoAjCrujLdP
+0HMTwp9Ob1Tc/3eoKBdPjoyjP8KFgjkAEBsTh+TaJDh1aeaD1z4FogkokkXjYDFP
+I/7WWwun3ltGzoCUnL1v3A6MbqBjxL8U8D863OYiHTXS2BA3rQas9P14E32n2DlL
+8b4ewfOd3Sz32TyNQQ8sSb+i0/qQWdYwV0Jx/GIKUQvVAD52Boa5wg5R569+fo29
+b3QtpMjhpc9IZGwH7u2NF4S5tcp7mQ9HPQyCEKz0G2zgSqJ4fBfquZkOrR2wfGRJ
+NgKKhhxy86FVmZgUrYD4e/zKFJujLOVVWjysw69TN0Os4y+Fwpg=
+=cGzK
 -----END PGP SIGNATURE-----
 
---Zd8I2GZVcdxtyaG/--
+--Ma2pZxZcUUd0eybH--
