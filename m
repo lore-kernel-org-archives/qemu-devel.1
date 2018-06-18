@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fUs7v-00072S-3w
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 07:15:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fUsBp-0008LS-AN
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 07:19:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fUs7t-0005ST-TO
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 07:15:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50482 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fUs7t-0005S5-ON
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 07:15:13 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1529311206-76847-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1529311206-76847-2-git-send-email-anton.nefedov@virtuozzo.com>
-Date: Mon, 18 Jun 2018 13:15:11 +0200
-In-Reply-To: <1529311206-76847-2-git-send-email-anton.nefedov@virtuozzo.com>
-	(Anton Nefedov's message of "Mon, 18 Jun 2018 11:40:05 +0300")
-Message-ID: <87efh45osg.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fUsBj-0007xs-Jd
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 07:19:17 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:39053)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fUsBj-0007xX-El
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 07:19:11 -0400
+Received: by mail-ot0-x241.google.com with SMTP id l15-v6so18011288oth.6
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 04:19:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] qapi: allow empty branches in flat
- unions
+In-Reply-To: <20180608200150.7032-1-programmingkidx@gmail.com>
+References: <20180608200150.7032-1-programmingkidx@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 18 Jun 2018 12:18:50 +0100
+Message-ID: <CAFEAcA9F1sTX_9b5PJL61K5eRsP9XoY3KKje_4CNh71JKiw39w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] ui/cocoa.m: fix absolute mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,21 +28,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, mdroth@linux.vnet.ibm.com
+To: John Arbuckle <programmingkidx@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Anton Nefedov <anton.nefedov@virtuozzo.com> writes:
+On 8 June 2018 at 21:01, John Arbuckle <programmingkidx@gmail.com> wrote:
+> Fix the cocoa front-end to correctly be able to use absolute mode.
+>
+> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
 
-> It often happens that just a few discriminator values imply extra data in
-> a flat union. Existing checks did not make possible to leave other values
-> uncovered. Such cases had to be worked around by either stating a dummy
-> (empty) type or introducing another (subset) discriminator enumeration.
->
-> Both options create redundant entities in qapi files for little profit.
->
-> With this patch it is not necessary anymore to add designated union
-> fields for every possible value of a discriminator enumeration.
->
-> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
+This commit message is insufficiently detailed, which makes
+it hard to review the patch. When you send patches, please
+can you provide commit messages which describe what the
+problem is, where the current code gets things wrong and
+why the changes fix the issue? It is painful to have to
+reverse-engineer your design from your code changes.
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+thanks
+-- PMM
