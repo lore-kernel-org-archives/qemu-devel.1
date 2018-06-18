@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fUz5W-0003VQ-FJ
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:41:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fUz5f-0003ZG-Bx
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:41:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fUz5V-0004qI-EN
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:41:14 -0400
-Received: from mail-pl0-x233.google.com ([2607:f8b0:400e:c01::233]:35869)
+	(envelope-from <richard.henderson@linaro.org>) id 1fUz5d-0004yO-VI
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:41:23 -0400
+Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:34540)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fUz5V-0004pW-8t
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:41:13 -0400
-Received: by mail-pl0-x233.google.com with SMTP id a7-v6so9500246plp.3
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 11:41:13 -0700 (PDT)
+	id 1fUz5d-0004xK-Pj
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 14:41:21 -0400
+Received: by mail-pf0-x231.google.com with SMTP id a63-v6so8613279pfl.1
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 11:41:21 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 18 Jun 2018 08:40:36 -1000
-Message-Id: <20180618184046.6270-13-richard.henderson@linaro.org>
+Date: Mon, 18 Jun 2018 08:40:41 -1000
+Message-Id: <20180618184046.6270-18-richard.henderson@linaro.org>
 In-Reply-To: <20180618184046.6270-1-richard.henderson@linaro.org>
 References: <20180618184046.6270-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 12/22] target/openrisc: Fix tlb flushing in
- mtspr
+Subject: [Qemu-devel] [PATCH v2 17/22] target/openrisc: Increase the TLB size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +29,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: shorne@gmail.com
 
-The previous code was confused, avoiding the flush of the old entry
-if the new entry is invalid.  We need to flush the old page if the
-old entry is valid and the new page if the new entry is valid.
-
-This bug was masked by over-flushing elsewhere.
+The architecture supports 128 TLB entries.  There is no reason
+not to provide all of them.  In the process we need to fix a
+bug that failed to parameterize the configuration register that
+tells the operating system the number of entries.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/openrisc/sys_helper.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index 8ad7a7d898..e00aaa332e 100644
---- a/target/openrisc/sys_helper.c
-+++ b/target/openrisc/sys_helper.c
-@@ -32,6 +32,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+---
+v2:
+  - Change VMState version.
+---
+ target/openrisc/cpu.h     | 2 +-
+ target/openrisc/cpu.c     | 6 ++++--
+ target/openrisc/machine.c | 5 ++---
+ 3 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 53abe965e8..8035654087 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -222,7 +222,7 @@ enum {
+ 
+ /* TLB size */
+ enum {
+-    TLB_SIZE = 64,
++    TLB_SIZE = 128,
+     TLB_MASK = TLB_SIZE - 1,
+ };
+ 
+diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+index 4c166c6329..677f02efa4 100644
+--- a/target/openrisc/cpu.c
++++ b/target/openrisc/cpu.c
+@@ -52,8 +52,10 @@ static void openrisc_cpu_reset(CPUState *s)
+ 
+     cpu->env.upr = UPR_UP | UPR_DMP | UPR_IMP | UPR_PICP | UPR_TTP |
+                    UPR_PMP;
+-    cpu->env.dmmucfgr = (DMMUCFGR_NTW & (0 << 2)) | (DMMUCFGR_NTS & (6 << 2));
+-    cpu->env.immucfgr = (IMMUCFGR_NTW & (0 << 2)) | (IMMUCFGR_NTS & (6 << 2));
++    cpu->env.dmmucfgr = (DMMUCFGR_NTW & (0 << 2))
++                      | (DMMUCFGR_NTS & (ctz32(TLB_SIZE) << 2));
++    cpu->env.immucfgr = (IMMUCFGR_NTW & (0 << 2))
++                      | (IMMUCFGR_NTS & (ctz32(TLB_SIZE) << 2));
+ 
  #ifndef CONFIG_USER_ONLY
-     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
-     CPUState *cs = CPU(cpu);
-+    target_ulong mr;
-     int idx;
+     cpu->env.picmr = 0x00000000;
+diff --git a/target/openrisc/machine.c b/target/openrisc/machine.c
+index 3fc837b925..1eedbf3dbe 100644
+--- a/target/openrisc/machine.c
++++ b/target/openrisc/machine.c
+@@ -38,9 +38,8 @@ static const VMStateDescription vmstate_tlb_entry = {
  
-     switch (spr) {
-@@ -84,12 +85,15 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
- 
-     case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
-         idx = spr - TO_SPR(1, 512);
--        if (!(rb & 1)) {
--            tlb_flush_page(cs, env->tlb.dtlb[idx].mr & TARGET_PAGE_MASK);
-+        mr = env->tlb.dtlb[idx].mr;
-+        if (mr & 1) {
-+            tlb_flush_page(cs, mr & TARGET_PAGE_MASK);
-+        }
-+        if (rb & 1) {
-+            tlb_flush_page(cs, rb & TARGET_PAGE_MASK);
-         }
-         env->tlb.dtlb[idx].mr = rb;
-         break;
--
-     case TO_SPR(1, 640) ... TO_SPR(1, 640+DTLB_SIZE-1): /* DTLBW0TR 0-127 */
-         idx = spr - TO_SPR(1, 640);
-         env->tlb.dtlb[idx].tr = rb;
-@@ -101,14 +105,18 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-     case TO_SPR(1, 1280) ... TO_SPR(1, 1407): /* DTLBW3MR 0-127 */
-     case TO_SPR(1, 1408) ... TO_SPR(1, 1535): /* DTLBW3TR 0-127 */
-         break;
-+
-     case TO_SPR(2, 512) ... TO_SPR(2, 512+ITLB_SIZE-1):   /* ITLBW0MR 0-127 */
-         idx = spr - TO_SPR(2, 512);
--        if (!(rb & 1)) {
--            tlb_flush_page(cs, env->tlb.itlb[idx].mr & TARGET_PAGE_MASK);
-+        mr = env->tlb.itlb[idx].mr;
-+        if (mr & 1) {
-+            tlb_flush_page(cs, mr & TARGET_PAGE_MASK);
-+        }
-+        if (rb & 1) {
-+            tlb_flush_page(cs, rb & TARGET_PAGE_MASK);
-         }
-         env->tlb.itlb[idx].mr = rb;
-         break;
--
-     case TO_SPR(2, 640) ... TO_SPR(2, 640+ITLB_SIZE-1): /* ITLBW0TR 0-127 */
-         idx = spr - TO_SPR(2, 640);
-         env->tlb.itlb[idx].tr = rb;
-@@ -120,6 +128,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
-     case TO_SPR(2, 1280) ... TO_SPR(2, 1407): /* ITLBW3MR 0-127 */
-     case TO_SPR(2, 1408) ... TO_SPR(2, 1535): /* ITLBW3TR 0-127 */
-         break;
-+
-     case TO_SPR(5, 1):  /* MACLO */
-         env->mac = deposit64(env->mac, 0, 32, rb);
-         break;
+ static const VMStateDescription vmstate_cpu_tlb = {
+     .name = "cpu_tlb",
+-    .version_id = 1,
+-    .minimum_version_id = 1,
+-    .minimum_version_id_old = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
+         VMSTATE_STRUCT_ARRAY(itlb, CPUOpenRISCTLBContext, TLB_SIZE, 0,
+                              vmstate_tlb_entry, OpenRISCTLBEntry),
 -- 
 2.17.1
