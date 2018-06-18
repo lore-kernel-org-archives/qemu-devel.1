@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwqm-0001rT-8A
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:17:53 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwqn-0001t2-O1
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:17:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwqk-0004zo-7M
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:17:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40948 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwql-00050y-Qe
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:17:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40952 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fUwqk-0004zQ-1K
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:17:50 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	id 1fUwql-00050d-KF
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:17:51 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AA23D81A4E99
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 16:17:49 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4032B80125CE
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 16:17:51 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 18 Jun 2018 18:17:10 +0200
-Message-Id: <20180618161729.334-8-marcandre.lureau@redhat.com>
+Date: Mon, 18 Jun 2018 18:17:11 +0200
+Message-Id: <20180618161729.334-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20180618161729.334-1-marcandre.lureau@redhat.com>
 References: <20180618161729.334-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 07/26] qio: add
- qio_channel_command_new_spawn_with_pre_exec()
+Subject: [Qemu-devel] [PATCH v3 08/26] Add vhost-user-backend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,114 +36,388 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Add a new function to let caller do some tuning thanks to a callback
-before exec().
+Create a vhost-user-backend object that holds a connection to a
+vhost-user backend and can be referenced from virtio devices that
+support it. See later patches for input & gpu usage.
+
+A chardev can be specified to communicate with the vhost-user backend,
+ex: -chardev socket,id=3Dchar0,path=3D/tmp/foo.sock -object
+vhost-user-backend,id=3Dvuid,chardev=3Dchar0.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/io/channel-command.h | 18 ++++++++++++++++++
- io/channel-command.c         | 33 ++++++++++++++++++++++++++-------
- 2 files changed, 44 insertions(+), 7 deletions(-)
+ include/sysemu/vhost-user-backend.h |  60 +++++++
+ backends/vhost-user.c               | 257 ++++++++++++++++++++++++++++
+ vl.c                                |   3 +-
+ backends/Makefile.objs              |   3 +-
+ 4 files changed, 321 insertions(+), 2 deletions(-)
+ create mode 100644 include/sysemu/vhost-user-backend.h
+ create mode 100644 backends/vhost-user.c
 
-diff --git a/include/io/channel-command.h b/include/io/channel-command.h
-index 336d47fa5c..96c833daab 100644
---- a/include/io/channel-command.h
-+++ b/include/io/channel-command.h
-@@ -71,6 +71,24 @@ qio_channel_command_new_pid(int writefd,
-                             int readfd,
-                             pid_t pid);
-=20
-+/**
-+ * qio_channel_command_new_spawn_with_pre_exec:
-+ * @argv: the NULL terminated list of command arguments
-+ * @flags: the I/O mode, one of O_RDONLY, O_WRONLY, O_RDWR
-+ * @errp: pointer to a NULL-initialized error object
+diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost-u=
+ser-backend.h
+new file mode 100644
+index 0000000000..60f811cae7
+--- /dev/null
++++ b/include/sysemu/vhost-user-backend.h
+@@ -0,0 +1,60 @@
++/*
++ * QEMU vhost-user backend
 + *
-+ * Create a channel for performing I/O with the
-+ * command to be spawned with arguments @argv.
++ * Copyright (C) 2018 Red Hat Inc
 + *
-+ * Returns: the command channel object, or NULL on error
++ * Authors:
++ *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
 + */
-+QIOChannelCommand *
-+qio_channel_command_new_spawn_with_pre_exec(const char *const argv[],
-+                                            int flags,
-+                                            void (*pre_exec_cb)(void *),
-+                                            void *data,
-+                                            Error **errp);
++#ifndef QEMU_VHOST_USER_BACKEND_H
++#define QEMU_VHOST_USER_BACKEND_H
 +
- /**
-  * qio_channel_command_new_spawn:
-  * @argv: the NULL terminated list of command arguments
-diff --git a/io/channel-command.c b/io/channel-command.c
-index 3e7eb17eff..05903ff194 100644
---- a/io/channel-command.c
-+++ b/io/channel-command.c
-@@ -46,9 +46,12 @@ qio_channel_command_new_pid(int writefd,
-=20
- #ifndef WIN32
- QIOChannelCommand *
--qio_channel_command_new_spawn(const char *const argv[],
--                              int flags,
--                              Error **errp)
-+qio_channel_command_new_spawn_with_pre_exec(const char *const argv[],
-+                                            int flags,
-+                                            void (*pre_exec_cb)(void *),
-+                                            void *data,
-+                                            Error **errp)
++#include "qom/object.h"
++#include "exec/memory.h"
++#include "qemu/option.h"
++#include "qemu/bitmap.h"
++#include "hw/virtio/vhost.h"
++#include "hw/virtio/vhost-user.h"
++#include "chardev/char-fe.h"
++#include "io/channel.h"
 +
- {
-     pid_t pid =3D -1;
-     int stdinfd[2] =3D { -1, -1 };
-@@ -104,6 +107,10 @@ qio_channel_command_new_spawn(const char *const argv=
-[],
-             close(devnull);
-         }
-=20
-+        if (pre_exec_cb) {
-+            pre_exec_cb(data);
-+        }
++#define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
++#define VHOST_USER_BACKEND(obj) \
++    OBJECT_CHECK(VhostUserBackend, (obj), TYPE_VHOST_USER_BACKEND)
++#define VHOST_USER_BACKEND_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(VhostUserBackendClass, (obj), TYPE_VHOST_USER_BACKE=
+ND)
++#define VHOST_USER_BACKEND_CLASS(klass) \
++    OBJECT_CLASS_CHECK(VhostUserBackendClass, (klass), TYPE_VHOST_USER_B=
+ACKEND)
 +
-         execv(argv[0], (char * const *)argv);
-         _exit(1);
-     }
-@@ -139,12 +146,13 @@ qio_channel_command_new_spawn(const char *const arg=
-v[],
-     }
-     return NULL;
- }
--
- #else /* WIN32 */
- QIOChannelCommand *
--qio_channel_command_new_spawn(const char *const argv[],
--                              int flags,
--                              Error **errp)
-+qio_channel_command_new_spawn_with_pre_exec(const char *const argv[],
-+                                            int flags,
-+                                            void (*pre_exec_cb)(void *),
-+                                            void *data,
-+                                            Error **errp)
- {
-     error_setg_errno(errp, ENOSYS,
-                      "Command spawn not supported on this platform");
-@@ -152,6 +160,17 @@ qio_channel_command_new_spawn(const char *const argv=
-[],
- }
- #endif /* WIN32 */
-=20
++typedef struct VhostUserBackend VhostUserBackend;
++typedef struct VhostUserBackendClass VhostUserBackendClass;
 +
-+QIOChannelCommand *
-+qio_channel_command_new_spawn(const char *const argv[],
-+                              int flags,
-+                              Error **errp)
++struct VhostUserBackendClass {
++    ObjectClass parent_class;
++};
++
++struct VhostUserBackend {
++    /* private */
++    Object parent;
++
++    char *cmd;
++    char *chr_name;
++
++    CharBackend chr;
++    VhostUserState vhost_user;
++    struct vhost_dev dev;
++    QIOChannel *child;
++    VirtIODevice *vdev;
++    bool started;
++    bool completed;
++};
++
++int vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vdev,
++                                unsigned nvqs, Error **errp);
++void vhost_user_backend_start(VhostUserBackend *b);
++void vhost_user_backend_stop(VhostUserBackend *b);
++
++#endif
+diff --git a/backends/vhost-user.c b/backends/vhost-user.c
+new file mode 100644
+index 0000000000..db97037306
+--- /dev/null
++++ b/backends/vhost-user.c
+@@ -0,0 +1,257 @@
++/*
++ * QEMU vhost-user backend
++ *
++ * Copyright (C) 2018 Red Hat Inc
++ *
++ * Authors:
++ *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++
++#include "qemu/osdep.h"
++#include "hw/qdev.h"
++#include "qapi/error.h"
++#include "qapi/qmp/qerror.h"
++#include "qemu/error-report.h"
++#include "qom/object_interfaces.h"
++#include "sysemu/vhost-user-backend.h"
++#include "sysemu/kvm.h"
++#include "io/channel-command.h"
++#include "hw/virtio/virtio-bus.h"
++
++static bool
++ioeventfd_enabled(void)
 +{
-+    return qio_channel_command_new_spawn_with_pre_exec(argv, flags,
-+                                                       NULL, NULL, errp)=
-;
++    return kvm_enabled() && kvm_eventfds_enabled();
 +}
 +
++int
++vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vdev,
++                            unsigned nvqs, Error **errp)
++{
++    int ret;
 +
- #ifndef WIN32
- static int qio_channel_command_abort(QIOChannelCommand *ioc,
-                                      Error **errp)
++    assert(!b->vdev && vdev);
++
++    if (!ioeventfd_enabled()) {
++        error_setg(errp, "vhost initialization failed: requires kvm");
++        return -1;
++    }
++
++    if (!vhost_user_init(&b->vhost_user, &b->chr, errp)) {
++        return -1;
++    }
++
++    b->vdev =3D vdev;
++    b->dev.nvqs =3D nvqs;
++    b->dev.vqs =3D g_new(struct vhost_virtqueue, nvqs);
++
++    ret =3D vhost_dev_init(&b->dev, &b->vhost_user, VHOST_BACKEND_TYPE_U=
+SER, 0);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "vhost initialization failed");
++        return -1;
++    }
++
++    return 0;
++}
++
++void
++vhost_user_backend_start(VhostUserBackend *b)
++{
++    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
++    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
++    int ret, i ;
++
++    if (b->started) {
++        return;
++    }
++
++    if (!k->set_guest_notifiers) {
++        error_report("binding does not support guest notifiers");
++        return;
++    }
++
++    ret =3D vhost_dev_enable_notifiers(&b->dev, b->vdev);
++    if (ret < 0) {
++        return;
++    }
++
++    ret =3D k->set_guest_notifiers(qbus->parent, b->dev.nvqs, true);
++    if (ret < 0) {
++        error_report("Error binding guest notifier");
++        goto err_host_notifiers;
++    }
++
++    b->dev.acked_features =3D b->vdev->guest_features;
++    ret =3D vhost_dev_start(&b->dev, b->vdev);
++    if (ret < 0) {
++        error_report("Error start vhost dev");
++        goto err_guest_notifiers;
++    }
++
++    /* guest_notifier_mask/pending not used yet, so just unmask
++     * everything here.  virtio-pci will do the right thing by
++     * enabling/disabling irqfd.
++     */
++    for (i =3D 0; i < b->dev.nvqs; i++) {
++        vhost_virtqueue_mask(&b->dev, b->vdev,
++                             b->dev.vq_index + i, false);
++    }
++
++    b->started =3D true;
++    return;
++
++err_guest_notifiers:
++    k->set_guest_notifiers(qbus->parent, b->dev.nvqs, false);
++err_host_notifiers:
++    vhost_dev_disable_notifiers(&b->dev, b->vdev);
++}
++
++void
++vhost_user_backend_stop(VhostUserBackend *b)
++{
++    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
++    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
++    int ret =3D 0;
++
++    if (!b->started) {
++        return;
++    }
++
++    vhost_dev_stop(&b->dev, b->vdev);
++
++    if (k->set_guest_notifiers) {
++        ret =3D k->set_guest_notifiers(qbus->parent,
++                                     b->dev.nvqs, false);
++        if (ret < 0) {
++            error_report("vhost guest notifier cleanup failed: %d", ret)=
+;
++        }
++    }
++    assert(ret >=3D 0);
++
++    vhost_dev_disable_notifiers(&b->dev, b->vdev);
++    b->started =3D false;
++}
++
++static void
++pre_exec_cb(void *data)
++{
++    int *sv =3D data;
++    int maxfd =3D sysconf(_SC_OPEN_MAX);
++    int fd;
++
++    dup2(sv[1], 3);
++    for (fd =3D 4; fd < maxfd; fd++) {
++        close(fd);
++    }
++}
++
++static void
++vhost_user_backend_complete(UserCreatable *uc, Error **errp)
++{
++    VhostUserBackend *b =3D VHOST_USER_BACKEND(uc);
++    Chardev *chr;
++
++    if (!b->chr_name) {
++        error_setg(errp, "You must specificy 'chardev'.");
++        return;
++    }
++
++    chr =3D qemu_chr_find(b->chr_name);
++    if (chr =3D=3D NULL) {
++        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
++                  "Chardev '%s' not found", b->chr_name);
++        return;
++    }
++
++    if (!qemu_chr_fe_init(&b->chr, chr, errp)) {
++        return;
++    }
++
++    b->completed =3D true;
++    /* could vhost_dev_init() happen here, so early vhost-user message
++     * can be exchanged */
++}
++
++static void set_chardev(Object *obj, const char *value, Error **errp)
++{
++    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
++
++    if (b->completed) {
++        error_setg(errp, QERR_PERMISSION_DENIED);
++    } else {
++        g_free(b->chr_name);
++        b->chr_name =3D g_strdup(value);
++    }
++}
++
++static char *get_chardev(Object *obj, Error **errp)
++{
++    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
++    Chardev *chr =3D qemu_chr_fe_get_driver(&b->chr);
++
++    if (chr && chr->label) {
++        return g_strdup(chr->label);
++    }
++
++    return NULL;
++}
++
++static void vhost_user_backend_init(Object *obj)
++{
++    object_property_add_str(obj, "chardev", get_chardev, set_chardev, NU=
+LL);
++}
++
++static void vhost_user_backend_finalize(Object *obj)
++{
++    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
++
++    g_free(b->dev.vqs);
++    g_free(b->chr_name);
++
++    vhost_user_cleanup(&b->vhost_user);
++    qemu_chr_fe_deinit(&b->chr, true);
++
++    if (b->child) {
++        object_unref(OBJECT(b->child));
++    }
++}
++
++static bool
++vhost_user_backend_can_be_deleted(UserCreatable *uc)
++{
++    return true;
++}
++
++static void
++vhost_user_backend_class_init(ObjectClass *oc, void *data)
++{
++    UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
++
++    ucc->complete =3D vhost_user_backend_complete;
++    ucc->can_be_deleted =3D vhost_user_backend_can_be_deleted;
++}
++
++static const TypeInfo vhost_user_backend_info =3D {
++    .name =3D TYPE_VHOST_USER_BACKEND,
++    .parent =3D TYPE_OBJECT,
++    .instance_size =3D sizeof(VhostUserBackend),
++    .instance_init =3D vhost_user_backend_init,
++    .instance_finalize =3D vhost_user_backend_finalize,
++    .class_size =3D sizeof(VhostUserBackendClass),
++    .class_init =3D vhost_user_backend_class_init,
++    .interfaces =3D (InterfaceInfo[]) {
++        { TYPE_USER_CREATABLE },
++        { }
++    }
++};
++
++static void register_types(void)
++{
++    type_register_static(&vhost_user_backend_info);
++}
++
++type_init(register_types);
+diff --git a/vl.c b/vl.c
+index 6e34fb348d..1c21339ba7 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2718,7 +2718,8 @@ static bool object_create_initial(const char *type)
+     }
+=20
+ #if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
+-    if (g_str_equal(type, "cryptodev-vhost-user")) {
++    if (g_str_equal(type, "cryptodev-vhost-user") ||
++        g_str_equal(type, "vhost-user-backend")) {
+         return false;
+     }
+ #endif
+diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+index ad7c0325ed..1ffcf76bb1 100644
+--- a/backends/Makefile.objs
++++ b/backends/Makefile.objs
+@@ -12,7 +12,8 @@ common-obj-y +=3D cryptodev-builtin.o
+ ifeq ($(CONFIG_VIRTIO),y)
+ common-obj-y +=3D cryptodev-vhost.o
+ common-obj-$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) +=3D \
+-    cryptodev-vhost-user.o
++    cryptodev-vhost-user.o \
++    vhost-user.o
+ endif
+=20
+ common-obj-$(CONFIG_LINUX) +=3D hostmem-memfd.o
 --=20
 2.18.0.rc1
