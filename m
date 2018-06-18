@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fUxPU-0002gb-Pu
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:53:45 -0400
+	(envelope-from <clg@kaod.org>) id 1fUxbI-0003Rx-DG
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 13:05:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fUxPU-00037w-03
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:53:44 -0400
-Date: Mon, 18 Jun 2018 18:53:34 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180618165334.GF4667@localhost.localdomain>
-References: <1528759585-51780-1-git-send-email-wangjie88@huawei.com>
-	<20180618155045.GB9785@stefanha-x1.localdomain>
+	(envelope-from <clg@kaod.org>) id 1fUxbE-0002WA-CT
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 13:05:56 -0400
+Received: from 18.mo7.mail-out.ovh.net ([188.165.56.163]:44365)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fUxbE-0002Vg-56
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 13:05:52 -0400
+Received: from player729.ha.ovh.net (unknown [10.109.108.37])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 765ECB3EFA
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 19:05:50 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Mon, 18 Jun 2018 19:05:38 +0200
+Message-Id: <20180618170540.12143-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="OXfL5xGRrasGEqWY"
-Content-Disposition: inline
-In-Reply-To: <20180618155045.GB9785@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] util/async: avoid NULL
- pointer dereference
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/2] ppc/pnv: new Pnv8Chip and Pnv9Chip
+ models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,64 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Jie Wang <wangjie88@huawei.com>, famz@redhat.com, qemu-block@nongnu.org, eric.fangyi@huawei.com, qemu-devel@nongnu.org, wu.wubin@huawei.com
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
+Hello,
 
---OXfL5xGRrasGEqWY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Here comes new chip models for the different processor the PowerNV
+machine supports and some more cleanups around the device tree of the
+ISA bus of the machine.
 
-Am 18.06.2018 um 17:50 hat Stefan Hajnoczi geschrieben:
-> On Tue, Jun 12, 2018 at 07:26:25AM +0800, Jie Wang wrote:
-> > if laio_init create linux_aio failed and return NULL, NULL pointer
-> > dereference will occur when laio_attach_aio_context dereference
-> > linux_aio in aio_get_linux_aio. Let's avoid it and report error.
-> >=20
-> > Signed-off-by: Jie Wang <wangjie88@huawei.com>
-> > ---
-> >  block/file-posix.c | 19 +++++++++++++++++--
-> >  util/async.c       |  5 ++++-
-> >  2 files changed, 21 insertions(+), 3 deletions(-)
->=20
-> If someone wants to split aio_get_linux_aio() into an initialization
-> function and a "get" function which doesn't return NULL if init
-> succeeded, then we can make this a bit cleaner.  But it doesn't matter
-> at the moment since there are few callers and duplicating the NULL check
-> isn't too bad.
->=20
-> Thanks, applied to my block tree:
-> https://github.com/stefanha/qemu/commits/block
+Thanks,
 
-Did you see this patch?
+C.=20
 
-[RFC v2] aio: properly bubble up errors from initialization
-Message-Id: <20180615174729.20544-1-naravamudan@digitalocean.com>
+Changes since v2:
 
-I didn't review it yet, but it seems to be for the same, or at least a
-similar, problem.
+  - introduced a parent_realize
+  - removed the machines
+ =20
+Changes since v1:
 
-Kevin
+ - reworked the ISABus creation interface with the chip, the machine
+   is not aware anymore of the chip controllers.
+ - removed the bizarre controllers under the PnvChip base class.
+ - kept back some changes on the ISA device tree name. They will come
+   in time with the LPC controller for P9
 
---OXfL5xGRrasGEqWY
-Content-Type: application/pgp-signature; name="signature.asc"
+C=C3=A9dric Le Goater (2):
+  ppc/pnv: introduce Pnv8Chip and Pnv9Chip models
+  ppc/pnv: consolidate the creation of the ISA bus device tree
 
------BEGIN PGP SIGNATURE-----
+ include/hw/ppc/pnv.h |  24 +++-
+ hw/ppc/pnv.c         | 332 +++++++++++++++++++++++++++++++--------------=
+------
+ 2 files changed, 225 insertions(+), 131 deletions(-)
 
-iQIcBAEBAgAGBQJbJ+ONAAoJEH8JsnLIjy/WIx4P/3u15+I50Qq/lcDCCVXHXow5
-sI+LmGAGjvFl4UGFueWirTC4voWi9/acLYuzB4AQ3eImv38VZLmAX/4mpyiEBOUA
-ogrzjDipots6cstUMq3hqOjk42OGxW3tMSHnIyWZ7rEi8/GK4kCk7LSi19qmH3Ru
-dm/PqTDsLNOcQXHRUvO9KtcocTTOHfwtEKweFvGDdwm2t5alN+QeuDG0SSgDqsvk
-0LVA0hw1tp6s0G2O0kAtV0qSzZ3B7NHVpCpnUEWjk1jEhuDkKu7BV+eyhxjFcuis
-CTDDXhzc/mEA1UeKs/jyQ2ypawu4ISe5bkBnuwayTh8lg8drHp5wMEUeAeAgg36h
-kC9WBn3DaxanOfk3J9GZ+aTO41Cvznfn8d5oz8zzFSh0jD52zN7PzdW9ezAMMyyA
-p4cN1IQTYmHazIrUsTe1Xx2SSlyirgzM1mGQrjsh+1xg3UA+9wR1UW7SsiUNGhaO
-D9OpyMbcy0kmOJ8zt9+cd60Itf8bxfxCHPckb/lNPpNe6FhCRcam/vJjoIrTu9sr
-LGbpChftmDbjVOzw8iAiBHB7P86y4r7DZN4cmRSuitGSTDqNwfxWk+PaEEDgMi3v
-BTkEYy8dh5jHR29eajniZHFU8MwnruC2YZDWYkVZxXJEDdtOhTgLROm5JwgH5qN9
-wtfRWCsjyG3U1FhNhbXQ
-=6flo
------END PGP SIGNATURE-----
-
---OXfL5xGRrasGEqWY--
+--=20
+2.13.6
