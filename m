@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57963)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUiPi-0002gf-V9
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 20:53:00 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fUiVR-0006Vi-Cw
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 20:58:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fUiPh-0001dz-JH
-	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 20:52:59 -0400
-Date: Mon, 18 Jun 2018 10:52:41 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fUiVN-00081Z-Da
+	for qemu-devel@nongnu.org; Sun, 17 Jun 2018 20:58:53 -0400
+Date: Mon, 18 Jun 2018 10:58:40 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180618005241.GI25461@umbus.fritz.box>
-References: <20180615140448.32234-1-david@redhat.com>
-	<20180615140448.32234-14-david@redhat.com>
+Message-ID: <20180618005840.GJ25461@umbus.fritz.box>
+References: <cover.1528935420.git.balaton@eik.bme.hu>
+	<51f6ea83be6b66d61e3129edecddc3399a1df1b8.1528935420.git.balaton@eik.bme.hu>
+	<20180614011705.GS30690@umbus.fritz.box>
+	<alpine.BSF.2.21.1806140948540.19899@zero.eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="/GPgYEyhnw15BExa"
+	protocol="application/pgp-signature"; boundary="Z8yxTSU1mh2gsre7"
 Content-Disposition: inline
-In-Reply-To: <20180615140448.32234-14-david@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 13/13] pc-dimm: get_memory_region() will
- not fail after realize
+In-Reply-To: <alpine.BSF.2.21.1806140948540.19899@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v3 2/9] ppc4xx_i2c: Implement directcntl
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,142 +27,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
 
---/GPgYEyhnw15BExa
+--Z8yxTSU1mh2gsre7
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jun 15, 2018 at 04:04:48PM +0200, David Hildenbrand wrote:
-> Let's try to reduce error handling a bit. In the plug/unplug case, the
-> device was realized and therefore we can assume that getting access to
-> the memory region will not fail.
+On Thu, Jun 14, 2018 at 09:51:33AM +0200, BALATON Zoltan wrote:
+> On Thu, 14 Jun 2018, David Gibson wrote:
+> > On Thu, Jun 14, 2018 at 02:17:00AM +0200, BALATON Zoltan wrote:
+> > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> >=20
+> > Patch looks good, but it needs a commit message.  What is the
+> > directcntl register?  Now does the bitbang interface play into that?
+> > (Note that I know the answer to those questions right now, but it
+> > needs to be in the commit message for the benefit of people looking
+> > back in the future).
 >=20
-> For get_vmstate_memory_region() this is already handled that way.
-> Document both cases.
+> If you know the answer could you please suggest an appropriate commit
+> message? I'm a bit lost what should be written here that would explain the
+> patch to someone who knows nothing about what this is. And for those who
+> know, the patch itself should be fairly simple and not need more
+> explanation.
+
+It's not really about explaining it to someone ho knows nothing about
+what it is.  Rather it's about explaining to someone who has a general
+familiarity but hasn't been looking at this code recently.  Try
+imagining explaining itself to yourself in several years time having
+been working on something entirely different.
+
+So, perhaps:
+
+| As well as being able to generate its own i2c transactions, the
+| ppc4xx i2c controller has a DIRECTCNTL register which allows
+| explicit control of the i2c lines.
+|
+| Using this register an OS can directly bitbang i2c operations.  In
+| order to let emulated i2c devices respond to this, we need to wire
+| up the DIRECTCNTL register to qemu's bitbanged i2c handling code.
+
+
 >=20
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
-and ppc parts
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
->  hw/i386/pc.c             |  7 +------
->  hw/mem/pc-dimm.c         |  7 +------
->  hw/ppc/spapr.c           | 12 ++----------
->  include/hw/mem/pc-dimm.h |  6 ++++--
->  4 files changed, 8 insertions(+), 24 deletions(-)
+> Regards,
+> BALATON Zoltan
 >=20
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 2db032a6df..f310040351 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1706,15 +1706,10 @@ static void pc_memory_plug(HotplugHandler *hotplu=
-g_dev,
->      PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
->      PCDIMMDevice *dimm =3D PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr;
-> +    MemoryRegion *mr =3D ddc->get_memory_region(dimm, &error_abort);
->      uint64_t align =3D TARGET_PAGE_SIZE;
->      bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
-> =20
-> -    mr =3D ddc->get_memory_region(dimm, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> -
->      if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
->          align =3D memory_region_get_alignment(mr);
->      }
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 4ff39b59ef..65843bc52a 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -37,15 +37,10 @@ void pc_dimm_plug(DeviceState *dev, MachineState *mac=
-hine, uint64_t align,
->      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
->      MemoryRegion *vmstate_mr =3D ddc->get_vmstate_memory_region(dimm,
->                                                                &error_abo=
-rt);
-> +    MemoryRegion *mr =3D ddc->get_memory_region(dimm, &error_abort);
->      Error *local_err =3D NULL;
-> -    MemoryRegion *mr;
->      uint64_t addr;
-> =20
-> -    mr =3D ddc->get_memory_region(dimm, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> -
->      addr =3D object_property_get_uint(OBJECT(dimm),
->                                      PC_DIMM_ADDR_PROP, &local_err);
->      if (local_err) {
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 3e5320020f..6934abc21e 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3142,14 +3142,10 @@ static void spapr_memory_plug(HotplugHandler *hot=
-plug_dev, DeviceState *dev,
->      sPAPRMachineState *ms =3D SPAPR_MACHINE(hotplug_dev);
->      PCDIMMDevice *dimm =3D PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr;
-> +    MemoryRegion *mr =3D ddc->get_memory_region(dimm, &error_abort);
->      uint64_t align, size, addr;
->      uint32_t node;
-> =20
-> -    mr =3D ddc->get_memory_region(dimm, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
->      align =3D memory_region_get_alignment(mr);
->      size =3D memory_region_size(mr);
-> =20
-> @@ -3340,16 +3336,12 @@ static void spapr_memory_unplug_request(HotplugHa=
-ndler *hotplug_dev,
->      Error *local_err =3D NULL;
->      PCDIMMDevice *dimm =3D PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr;
-> +    MemoryRegion *mr =3D ddc->get_memory_region(dimm, &error_abort);
->      uint32_t nr_lmbs;
->      uint64_t size, addr_start, addr;
->      int i;
->      sPAPRDRConnector *drc;
-> =20
-> -    mr =3D ddc->get_memory_region(dimm, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
->      size =3D memory_region_size(mr);
->      nr_lmbs =3D size / SPAPR_MEMORY_BLOCK_SIZE;
-> =20
-> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> index 5679a80465..26ebb7d5e9 100644
-> --- a/include/hw/mem/pc-dimm.h
-> +++ b/include/hw/mem/pc-dimm.h
-> @@ -62,9 +62,11 @@ typedef struct PCDIMMDevice {
->   * @realize: called after common dimm is realized so that the dimm based
->   * devices get the chance to do specified operations.
->   * @get_memory_region: returns #MemoryRegion associated with @dimm which
-> - * is directly mapped into the physical address space of guest.
-> + * is directly mapped into the physical address space of guest. Will not
-> + * fail after the device was realized.
->   * @get_vmstate_memory_region: returns #MemoryRegion which indicates the
-> - * memory of @dimm should be kept during live migration.
-> + * memory of @dimm should be kept during live migration. Will not fail
-> + * after the device was realized.
->   */
->  typedef struct PCDIMMDeviceClass {
->      /* private */
+> > > ---
+> > >  default-configs/ppc-softmmu.mak    |  1 +
+> > >  default-configs/ppcemb-softmmu.mak |  1 +
+> > >  hw/i2c/ppc4xx_i2c.c                | 13 ++++++++++++-
+> > >  include/hw/i2c/ppc4xx_i2c.h        |  4 ++++
+> > >  4 files changed, 18 insertions(+), 1 deletion(-)
+> > >=20
+> > > diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-so=
+ftmmu.mak
+> > > index 4d7be45..7d0dc2f 100644
+> > > --- a/default-configs/ppc-softmmu.mak
+> > > +++ b/default-configs/ppc-softmmu.mak
+> > > @@ -26,6 +26,7 @@ CONFIG_USB_EHCI_SYSBUS=3Dy
+> > >  CONFIG_SM501=3Dy
+> > >  CONFIG_IDE_SII3112=3Dy
+> > >  CONFIG_I2C=3Dy
+> > > +CONFIG_BITBANG_I2C=3Dy
+> > >=20
+> > >  # For Macs
+> > >  CONFIG_MAC=3Dy
+> > > diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppc=
+emb-softmmu.mak
+> > > index 67d18b2..37af193 100644
+> > > --- a/default-configs/ppcemb-softmmu.mak
+> > > +++ b/default-configs/ppcemb-softmmu.mak
+> > > @@ -19,3 +19,4 @@ CONFIG_USB_EHCI_SYSBUS=3Dy
+> > >  CONFIG_SM501=3Dy
+> > >  CONFIG_IDE_SII3112=3Dy
+> > >  CONFIG_I2C=3Dy
+> > > +CONFIG_BITBANG_I2C=3Dy
+> > > diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+> > > index 4e0aaae..c0a1930 100644
+> > > --- a/hw/i2c/ppc4xx_i2c.c
+> > > +++ b/hw/i2c/ppc4xx_i2c.c
+> > > @@ -30,6 +30,7 @@
+> > >  #include "cpu.h"
+> > >  #include "hw/hw.h"
+> > >  #include "hw/i2c/ppc4xx_i2c.h"
+> > > +#include "bitbang_i2c.h"
+> > >=20
+> > >  #define PPC4xx_I2C_MEM_SIZE 18
+> > >=20
+> > > @@ -46,6 +47,11 @@
+> > >=20
+> > >  #define IIC_XTCNTLSS_SRST   (1 << 0)
+> > >=20
+> > > +#define IIC_DIRECTCNTL_SDAC (1 << 3)
+> > > +#define IIC_DIRECTCNTL_SCLC (1 << 2)
+> > > +#define IIC_DIRECTCNTL_MSDA (1 << 1)
+> > > +#define IIC_DIRECTCNTL_MSCL (1 << 0)
+> > > +
+> > >  static void ppc4xx_i2c_reset(DeviceState *s)
+> > >  {
+> > >      PPC4xxI2CState *i2c =3D PPC4xx_I2C(s);
+> > > @@ -289,7 +295,11 @@ static void ppc4xx_i2c_writeb(void *opaque, hwad=
+dr addr, uint64_t value,
+> > >          i2c->xtcntlss =3D value;
+> > >          break;
+> > >      case 16:
+> > > -        i2c->directcntl =3D value & 0x7;
+> > > +        i2c->directcntl =3D value & (IIC_DIRECTCNTL_SDAC & IIC_DIREC=
+TCNTL_SCLC);
+> > > +        i2c->directcntl |=3D (value & IIC_DIRECTCNTL_SCLC ? 1 : 0);
+> > > +        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL, i2c->directcn=
+tl & 1);
+> > > +        i2c->directcntl |=3D bitbang_i2c_set(i2c->bitbang, BITBANG_I=
+2C_SDA,
+> > > +                               (value & IIC_DIRECTCNTL_SDAC) !=3D 0)=
+ << 1;
+> > >          break;
+> > >      default:
+> > >          if (addr < PPC4xx_I2C_MEM_SIZE) {
+> > > @@ -322,6 +332,7 @@ static void ppc4xx_i2c_init(Object *o)
+> > >      sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
+> > >      sysbus_init_irq(SYS_BUS_DEVICE(s), &s->irq);
+> > >      s->bus =3D i2c_init_bus(DEVICE(s), "i2c");
+> > > +    s->bitbang =3D bitbang_i2c_init(s->bus);
+> > >  }
+> > >=20
+> > >  static void ppc4xx_i2c_class_init(ObjectClass *klass, void *data)
+> > > diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
+> > > index e4b6ded..ea6c8e1 100644
+> > > --- a/include/hw/i2c/ppc4xx_i2c.h
+> > > +++ b/include/hw/i2c/ppc4xx_i2c.h
+> > > @@ -31,6 +31,9 @@
+> > >  #include "hw/sysbus.h"
+> > >  #include "hw/i2c/i2c.h"
+> > >=20
+> > > +/* from hw/i2c/bitbang_i2c.h */
+> > > +typedef struct bitbang_i2c_interface bitbang_i2c_interface;
+> > > +
+> > >  #define TYPE_PPC4xx_I2C "ppc4xx-i2c"
+> > >  #define PPC4xx_I2C(obj) OBJECT_CHECK(PPC4xxI2CState, (obj), TYPE_PPC=
+4xx_I2C)
+> > >=20
+> > > @@ -42,6 +45,7 @@ typedef struct PPC4xxI2CState {
+> > >      I2CBus *bus;
+> > >      qemu_irq irq;
+> > >      MemoryRegion iomem;
+> > > +    bitbang_i2c_interface *bitbang;
+> > >      uint8_t mdata;
+> > >      uint8_t lmadr;
+> > >      uint8_t hmadr;
+> >=20
+> >=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -168,24 +187,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---/GPgYEyhnw15BExa
+--Z8yxTSU1mh2gsre7
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsnAlgACgkQbDjKyiDZ
-s5Kbeg/9EuiW7DhVCvQkYb2K9TWdjTROErD5OiWhudMpytICJ39EIdQtEriDag5g
-IbqraYtrfVL+cKwskPxoWyqhUskQG96kISw/PSmdrvZx3SqqpSOtpl7yLUwzjFt1
-Myw6PPQtsO21Sk2JXRRZzfeOEd8og+O3JenOxULxuwjOi5FHaj7WpVgFHK/YJk9P
-jCkVOfnSe7yXFD4Mr8DeXzeQoiPTayhHwa8PZ3Z7ZciDBK9QJdr14qSaHu4GMRP1
-iTJ1ZvZsoTbWZ8+fmuYqFoP4CrwztJMVV/3PiEasncp9nO9bnXilwoohjb1GbJYm
-mlJvUJ/j+N64v1Ix1DqsrB+Yp5Gz9L2+ujpOULT7OzT5tVEpI1y1Iqd942l4l+pc
-9sSVo3wdba6q7h/7gJWZ/YyIDFQ6CXAwIMuv7CSmFrQNEByx6kFVIhxekVXI/FeR
-TKw+uhdz1T8C7xCP0hYeP5kkLFJf/ZuWepjMuaJY8P9628dLKfcuR6G8WT8mJtIq
-WMeQiL5ddDFOmx6xFYpVA1r1JwQ2BWGJ1V8zYe7ui7hvKifiVXT9ryUqfAKLnqQ9
-43dkKvQk7Trwbw+oAxvwstKNxd+MBsEIpL6AnUhpwOknWeWSck5z9w+2Ub5KPxOU
-TGbC+U1YJzJQfI+J0dDH2tWz+nk5OIgxVTYagu/CM7nuDVQ+SLs=
-=ZK5M
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsnA8AACgkQbDjKyiDZ
+s5I57xAAnrKvycyXgLI6nPEL/0Wm4dXPeISNQAtzOEoC1FCyr24bwlc6nQIpstdc
+BG1MdI7d7sKN6ggyzrTqVArjGWmizniPFEhvYRa7yOIiubv/glqtaSKcoTp494nj
+hsS/zgmsWtK/XAnknRT23vyh99PTalQtkgcUy1iraOjWjb5+ywyoA6RJ5R1+8Un8
+Q8lS0QESRoB0Gcxjc7/I3/2gdlQenKntVcD4lg9znv++LD0wop7FVdAfeMwtzQ4n
+EujYI5GHvnN/9cuZQoDoSIM224NEdZqqGGRHFB8q3g+A8NPzOmQqj96+sJ9umjz3
++GD0dvxKWmRnZjOfSmdMJVMaCh9h8RII0E77Ary/BnHdiFH+NevJfx+RMR/yt0Jm
+IZ5hq0vj7m5Bb0/LKV2LOzd0i4lHKCmp0tRsbr2p4b9da+7EOU8P+cJP2FvFjrG9
+1UvFKrOWjhPsDtDFnFytnrPD8hB0OPG+UGQ80qYsTVS1PoQ8qDU8NsEUWHj1iPOq
+rwy6h21S7TXoTz8z36MHGQ4qxPCEJzOd9eSPnAS3hZ2UayRtoWXxWm2BwKQr1Uxs
+2p/oSDXH6RLXbq6WZ8N+uK131vtQSAkjumLsaDLLFR5q5pvVMpsCzCRrATjcAN7U
+NHyWRLP1ZhXrVmi9NAU738UtTQqWysMQ1jDTLwL/LbroKfrK2yM=
+=jdqB
 -----END PGP SIGNATURE-----
 
---/GPgYEyhnw15BExa--
+--Z8yxTSU1mh2gsre7--
