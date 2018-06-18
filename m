@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51730)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fUxHK-0004jS-Bl
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:45:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fUxHL-0004lF-CG
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:45:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fUxHI-0006CX-Nl
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:45:18 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fUxHK-0006Dq-F1
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:45:19 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 18 Jun 2018 18:44:33 +0200
-Message-Id: <20180618164504.24488-5-kwolf@redhat.com>
+Date: Mon, 18 Jun 2018 18:44:35 +0200
+Message-Id: <20180618164504.24488-7-kwolf@redhat.com>
 In-Reply-To: <20180618164504.24488-1-kwolf@redhat.com>
 References: <20180618164504.24488-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 04/35] block: Don't manually poll in
- bdrv_drain_all()
+Subject: [Qemu-devel] [PULL 06/35] block: Avoid unnecessary aio_poll() in
+ AIO_WAIT_WHILE()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,98 +23,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-All involved nodes are already idle, we called bdrv_do_drain_begin() on
-them.
+Commit 91af091f923 added an additional aio_poll() to BDRV_POLL_WHILE()
+in order to make sure that all pending BHs are executed on drain. This
+was the wrong place to make the fix, as it is useless overhead for all
+other users of the macro and unnecessarily complicates the mechanism.
 
-The comment in the code suggested that this was not correct because the
-completion of a request on one node could spawn a new request on a
-different node (which might have been drained before, so we wouldn't
-drain the new request). In reality, new requests to different nodes
-aren't spawned out of nothing, but only in the context of a parent
-request, and they aren't submitted to random nodes, but only to child
-nodes. As long as we still poll for the completion of the parent request
-(which we do), draining each root node separately is good enough.
+This patch effectively reverts said commit (the context has changed a
+bit and the code has moved to AIO_WAIT_WHILE()) and instead polls in the
+loop condition for drain.
 
-Remove the additional polling code from bdrv_drain_all_begin() and
-replace it with an assertion that all nodes are already idle after we
-drained them separately.
+The effect is probably hard to measure in any real-world use case
+because actual I/O will dominate, but if I run only the initialisation
+part of 'qemu-img convert' where it calls bdrv_block_status() for the
+whole image to find out how much data there is copy, this phase actually
+needs only roughly half the time after this patch.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/io.c | 41 ++++++++++++-----------------------------
- 1 file changed, 12 insertions(+), 29 deletions(-)
+ include/block/aio-wait.h | 22 ++++++++--------------
+ block/io.c               | 11 ++++++++++-
+ 2 files changed, 18 insertions(+), 15 deletions(-)
 
+diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
+index 8c90a2e66e..783d3678dd 100644
+--- a/include/block/aio-wait.h
++++ b/include/block/aio-wait.h
+@@ -73,29 +73,23 @@ typedef struct {
+  */
+ #define AIO_WAIT_WHILE(wait, ctx, cond) ({                         \
+     bool waited_ = false;                                          \
+-    bool busy_ = true;                                             \
+     AioWait *wait_ = (wait);                                       \
+     AioContext *ctx_ = (ctx);                                      \
+     if (in_aio_context_home_thread(ctx_)) {                        \
+-        while ((cond) || busy_) {                                  \
+-            busy_ = aio_poll(ctx_, (cond));                        \
+-            waited_ |= !!(cond) | busy_;                           \
++        while ((cond)) {                                           \
++            aio_poll(ctx_, true);                                  \
++            waited_ = true;                                        \
+         }                                                          \
+     } else {                                                       \
+         assert(qemu_get_current_aio_context() ==                   \
+                qemu_get_aio_context());                            \
+         /* Increment wait_->num_waiters before evaluating cond. */ \
+         atomic_inc(&wait_->num_waiters);                           \
+-        while (busy_) {                                            \
+-            if ((cond)) {                                          \
+-                waited_ = busy_ = true;                            \
+-                aio_context_release(ctx_);                         \
+-                aio_poll(qemu_get_aio_context(), true);            \
+-                aio_context_acquire(ctx_);                         \
+-            } else {                                               \
+-                busy_ = aio_poll(ctx_, false);                     \
+-                waited_ |= busy_;                                  \
+-            }                                                      \
++        while ((cond)) {                                           \
++            aio_context_release(ctx_);                             \
++            aio_poll(qemu_get_aio_context(), true);                \
++            aio_context_acquire(ctx_);                             \
++            waited_ = true;                                        \
+         }                                                          \
+         atomic_dec(&wait_->num_waiters);                           \
+     }                                                              \
 diff --git a/block/io.c b/block/io.c
-index b75d68886a..983307cf03 100644
+index 983307cf03..bc7a2d78b8 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -377,6 +377,16 @@ void bdrv_drain(BlockDriverState *bs)
-     bdrv_drained_end(bs);
+@@ -182,13 +182,22 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
+     BDRV_POLL_WHILE(bs, !data.done);
  }
  
-+static void bdrv_drain_assert_idle(BlockDriverState *bs)
++/* Returns true if BDRV_POLL_WHILE() should go into a blocking aio_poll() */
++static bool bdrv_drain_poll(BlockDriverState *bs)
 +{
-+    BdrvChild *child, *next;
-+
-+    assert(atomic_read(&bs->in_flight) == 0);
-+    QLIST_FOREACH_SAFE(child, &bs->children, next, next) {
-+        bdrv_drain_assert_idle(child->bs);
-+    }
++    /* Execute pending BHs first and check everything else only after the BHs
++     * have executed. */
++    while (aio_poll(bs->aio_context, false));
++    return atomic_read(&bs->in_flight);
 +}
 +
- /*
-  * Wait for pending requests to complete across all BlockDriverStates
-  *
-@@ -391,11 +401,8 @@ void bdrv_drain(BlockDriverState *bs)
-  */
- void bdrv_drain_all_begin(void)
+ static bool bdrv_drain_recurse(BlockDriverState *bs)
  {
--    /* Always run first iteration so any pending completion BHs run */
--    bool waited = true;
-     BlockDriverState *bs;
-     BdrvNextIterator it;
--    GSList *aio_ctxs = NULL, *ctx;
+     BdrvChild *child, *tmp;
+     bool waited;
  
-     /* BDRV_POLL_WHILE() for a node can only be called from its own I/O thread
-      * or the main loop AioContext. We potentially use BDRV_POLL_WHILE() on
-@@ -409,35 +416,11 @@ void bdrv_drain_all_begin(void)
-         aio_context_acquire(aio_context);
-         bdrv_do_drained_begin(bs, true, NULL);
-         aio_context_release(aio_context);
--
--        if (!g_slist_find(aio_ctxs, aio_context)) {
--            aio_ctxs = g_slist_prepend(aio_ctxs, aio_context);
--        }
-     }
+     /* Wait for drained requests to finish */
+-    waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
++    waited = BDRV_POLL_WHILE(bs, bdrv_drain_poll(bs));
  
--    /* Note that completion of an asynchronous I/O operation can trigger any
--     * number of other I/O operations on other devices---for example a
--     * coroutine can submit an I/O request to another device in response to
--     * request completion.  Therefore we must keep looping until there was no
--     * more activity rather than simply draining each device independently.
--     */
--    while (waited) {
--        waited = false;
--
--        for (ctx = aio_ctxs; ctx != NULL; ctx = ctx->next) {
--            AioContext *aio_context = ctx->data;
--
--            aio_context_acquire(aio_context);
--            for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
--                if (aio_context == bdrv_get_aio_context(bs)) {
--                    waited |= bdrv_drain_recurse(bs);
--                }
--            }
--            aio_context_release(aio_context);
--        }
-+    for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-+        bdrv_drain_assert_idle(bs);
-     }
--
--    g_slist_free(aio_ctxs);
- }
- 
- void bdrv_drain_all_end(void)
+     QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
+         BlockDriverState *bs = child->bs;
 -- 
 2.13.6
