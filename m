@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fUxHa-00054J-4b
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:45:35 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fUxHZ-0006OO-0L
+	(envelope-from <kwolf@redhat.com>) id 1fUxHZ-00053s-L0
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:45:34 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kwolf@redhat.com>) id 1fUxHY-0006O6-P6
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:45:33 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Mon, 18 Jun 2018 18:44:49 +0200
-Message-Id: <20180618164504.24488-21-kwolf@redhat.com>
+Date: Mon, 18 Jun 2018 18:44:50 +0200
+Message-Id: <20180618164504.24488-22-kwolf@redhat.com>
 In-Reply-To: <20180618164504.24488-1-kwolf@redhat.com>
 References: <20180618164504.24488-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 20/35] test-bdrv-drain: Test graph changes in
- drain_all section
+Subject: [Qemu-devel] [PULL 21/35] block: fix QEMU crash with scsi-hd and
+ drive_del
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,135 +23,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This tests both adding and remove a node between bdrv_drain_all_begin()
-and bdrv_drain_all_end(), and enabled the existing detach test for
-drain_all.
+From: Greg Kurz <groug@kaod.org>
 
+Removing a drive with drive_del while it is being used to run an I/O
+intensive workload can cause QEMU to crash.
+
+An AIO flush can yield at some point:
+
+blk_aio_flush_entry()
+ blk_co_flush(blk)
+  bdrv_co_flush(blk->root->bs)
+   ...
+    qemu_coroutine_yield()
+
+and let the HMP command to run, free blk->root and give control
+back to the AIO flush:
+
+    hmp_drive_del()
+     blk_remove_bs()
+      bdrv_root_unref_child(blk->root)
+       child_bs = blk->root->bs
+       bdrv_detach_child(blk->root)
+        bdrv_replace_child(blk->root, NULL)
+         blk->root->bs = NULL
+        g_free(blk->root) <============== blk->root becomes stale
+       bdrv_unref(child_bs)
+        bdrv_delete(child_bs)
+         bdrv_close()
+          bdrv_drained_begin()
+           bdrv_do_drained_begin()
+            bdrv_drain_recurse()
+             aio_poll()
+              ...
+              qemu_coroutine_switch()
+
+and the AIO flush completion ends up dereferencing blk->root:
+
+  blk_aio_complete()
+   scsi_aio_complete()
+    blk_get_aio_context(blk)
+     bs = blk_bs(blk)
+ ie, bs = blk->root ? blk->root->bs : NULL
+            ^^^^^
+            stale
+
+The problem is that we should avoid making block driver graph
+changes while we have in-flight requests. Let's drain all I/O
+for this BB before calling bdrv_root_unref_child().
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/test-bdrv-drain.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 73 insertions(+), 2 deletions(-)
+ block/block-backend.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 5cc179a778..291a050f86 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -452,7 +452,7 @@ static void test_multiparent(void)
-     blk_unref(blk_b);
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 2d1a3463e8..6b75bca317 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -767,6 +767,11 @@ void blk_remove_bs(BlockBackend *blk)
+ 
+     blk_update_root_state(blk);
+ 
++    /* bdrv_root_unref_child() will cause blk->root to become stale and may
++     * switch to a completion coroutine later on. Let's drain all I/O here
++     * to avoid that and a potential QEMU crash.
++     */
++    blk_drain(blk);
+     bdrv_root_unref_child(blk->root);
+     blk->root = NULL;
  }
- 
--static void test_graph_change(void)
-+static void test_graph_change_drain_subtree(void)
- {
-     BlockBackend *blk_a, *blk_b;
-     BlockDriverState *bs_a, *bs_b, *backing;
-@@ -531,6 +531,63 @@ static void test_graph_change(void)
-     blk_unref(blk_b);
- }
- 
-+static void test_graph_change_drain_all(void)
-+{
-+    BlockBackend *blk_a, *blk_b;
-+    BlockDriverState *bs_a, *bs_b;
-+    BDRVTestState *a_s, *b_s;
-+
-+    /* Create node A with a BlockBackend */
-+    blk_a = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
-+    bs_a = bdrv_new_open_driver(&bdrv_test, "test-node-a", BDRV_O_RDWR,
-+                                &error_abort);
-+    a_s = bs_a->opaque;
-+    blk_insert_bs(blk_a, bs_a, &error_abort);
-+
-+    g_assert_cmpint(bs_a->quiesce_counter, ==, 0);
-+    g_assert_cmpint(a_s->drain_count, ==, 0);
-+
-+    /* Call bdrv_drain_all_begin() */
-+    bdrv_drain_all_begin();
-+
-+    g_assert_cmpint(bs_a->quiesce_counter, ==, 1);
-+    g_assert_cmpint(a_s->drain_count, ==, 1);
-+
-+    /* Create node B with a BlockBackend */
-+    blk_b = blk_new(BLK_PERM_ALL, BLK_PERM_ALL);
-+    bs_b = bdrv_new_open_driver(&bdrv_test, "test-node-b", BDRV_O_RDWR,
-+                                &error_abort);
-+    b_s = bs_b->opaque;
-+    blk_insert_bs(blk_b, bs_b, &error_abort);
-+
-+    g_assert_cmpint(bs_a->quiesce_counter, ==, 1);
-+    g_assert_cmpint(bs_b->quiesce_counter, ==, 1);
-+    g_assert_cmpint(a_s->drain_count, ==, 1);
-+    g_assert_cmpint(b_s->drain_count, ==, 1);
-+
-+    /* Unref and finally delete node A */
-+    blk_unref(blk_a);
-+
-+    g_assert_cmpint(bs_a->quiesce_counter, ==, 1);
-+    g_assert_cmpint(bs_b->quiesce_counter, ==, 1);
-+    g_assert_cmpint(a_s->drain_count, ==, 1);
-+    g_assert_cmpint(b_s->drain_count, ==, 1);
-+
-+    bdrv_unref(bs_a);
-+
-+    g_assert_cmpint(bs_b->quiesce_counter, ==, 1);
-+    g_assert_cmpint(b_s->drain_count, ==, 1);
-+
-+    /* End the drained section */
-+    bdrv_drain_all_end();
-+
-+    g_assert_cmpint(bs_b->quiesce_counter, ==, 0);
-+    g_assert_cmpint(b_s->drain_count, ==, 0);
-+
-+    bdrv_unref(bs_b);
-+    blk_unref(blk_b);
-+}
-+
- struct test_iothread_data {
-     BlockDriverState *bs;
-     enum drain_type drain_type;
-@@ -971,6 +1028,10 @@ static void do_test_delete_by_drain(bool detach_instead_of_delete,
-         bdrv_subtree_drained_begin(bs);
-         bdrv_subtree_drained_end(bs);
-         break;
-+    case BDRV_DRAIN_ALL:
-+        bdrv_drain_all_begin();
-+        bdrv_drain_all_end();
-+        break;
-     default:
-         g_assert_not_reached();
-     }
-@@ -991,6 +1052,11 @@ static void test_delete_by_drain(void)
-     do_test_delete_by_drain(false, BDRV_DRAIN);
- }
- 
-+static void test_detach_by_drain_all(void)
-+{
-+    do_test_delete_by_drain(true, BDRV_DRAIN_ALL);
-+}
-+
- static void test_detach_by_drain(void)
- {
-     do_test_delete_by_drain(true, BDRV_DRAIN);
-@@ -1219,7 +1285,11 @@ int main(int argc, char **argv)
- 
-     g_test_add_func("/bdrv-drain/nested", test_nested);
-     g_test_add_func("/bdrv-drain/multiparent", test_multiparent);
--    g_test_add_func("/bdrv-drain/graph-change", test_graph_change);
-+
-+    g_test_add_func("/bdrv-drain/graph-change/drain_subtree",
-+                    test_graph_change_drain_subtree);
-+    g_test_add_func("/bdrv-drain/graph-change/drain_all",
-+                    test_graph_change_drain_all);
- 
-     g_test_add_func("/bdrv-drain/iothread/drain_all", test_iothread_drain_all);
-     g_test_add_func("/bdrv-drain/iothread/drain", test_iothread_drain);
-@@ -1232,6 +1302,7 @@ int main(int argc, char **argv)
-                     test_blockjob_drain_subtree);
- 
-     g_test_add_func("/bdrv-drain/deletion/drain", test_delete_by_drain);
-+    g_test_add_func("/bdrv-drain/detach/drain_all", test_detach_by_drain_all);
-     g_test_add_func("/bdrv-drain/detach/drain", test_detach_by_drain);
-     g_test_add_func("/bdrv-drain/detach/drain_subtree", test_detach_by_drain_subtree);
-     g_test_add_func("/bdrv-drain/detach/parent_cb", test_detach_by_parent_cb);
 -- 
 2.13.6
