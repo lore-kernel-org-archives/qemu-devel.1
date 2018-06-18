@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwqp-0001un-OS
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:17:56 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwqx-00022R-Sr
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwqo-00053Y-QJ
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:17:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44978 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fUwqu-00056F-IJ
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60976 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fUwqo-00052x-LA
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:17:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	id 1fUwqu-000569-DX
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:18:00 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2ABDB401EF03
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 16:17:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 14F6A401DE60
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 16:18:00 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 18 Jun 2018 18:17:13 +0200
-Message-Id: <20180618161729.334-11-marcandre.lureau@redhat.com>
+Date: Mon, 18 Jun 2018 18:17:14 +0200
+Message-Id: <20180618161729.334-12-marcandre.lureau@redhat.com>
 In-Reply-To: <20180618161729.334-1-marcandre.lureau@redhat.com>
 References: <20180618161729.334-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 10/26] vhost-user: split vhost_user_read()
+Subject: [Qemu-devel] [PATCH v3 11/26] vhost-user: add
+ vhost_user_input_get_config()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,89 +37,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, kraxel@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Split vhost_user_read(), so only header can be read with
-vhost_user_read_header().
+Ask vhost user input backend the list of virtio_input_config.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/virtio/vhost-user.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ include/hw/virtio/vhost-backend.h |  4 +++
+ hw/virtio/vhost-user.c            | 59 +++++++++++++++++++++++++++++++
+ docs/interop/vhost-user.txt       |  7 ++++
+ 3 files changed, 70 insertions(+)
 
+diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-=
+backend.h
+index 81283ec50f..1fca321d8a 100644
+--- a/include/hw/virtio/vhost-backend.h
++++ b/include/hw/virtio/vhost-backend.h
+@@ -12,6 +12,7 @@
+ #define VHOST_BACKEND_H
+=20
+ #include "exec/memory.h"
++#include "standard-headers/linux/virtio_input.h"
+=20
+ typedef enum VhostBackendType {
+     VHOST_BACKEND_TYPE_NONE =3D 0,
+@@ -160,4 +161,7 @@ int vhost_backend_invalidate_device_iotlb(struct vhos=
+t_dev *dev,
+ int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
+                                           struct vhost_iotlb_msg *imsg);
+=20
++int vhost_user_input_get_config(struct vhost_dev *dev,
++                                struct virtio_input_config **config);
++
+ #endif /* VHOST_BACKEND_H */
 diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 5b4188bc27..29f8568a13 100644
+index 29f8568a13..cbd2900f39 100644
 --- a/hw/virtio/vhost-user.c
 +++ b/hw/virtio/vhost-user.c
-@@ -210,7 +210,7 @@ static bool ioeventfd_enabled(void)
-     return kvm_enabled() && kvm_eventfds_enabled();
+@@ -89,6 +89,7 @@ typedef enum VhostUserRequest {
+     VHOST_USER_POSTCOPY_ADVISE  =3D 28,
+     VHOST_USER_POSTCOPY_LISTEN  =3D 29,
+     VHOST_USER_POSTCOPY_END     =3D 30,
++    VHOST_USER_INPUT_GET_CONFIG,
+     VHOST_USER_MAX
+ } VhostUserRequest;
+=20
+@@ -338,6 +339,64 @@ static int vhost_user_write(struct vhost_dev *dev, V=
+hostUserMsg *msg,
+     return 0;
  }
 =20
--static int vhost_user_read(struct vhost_dev *dev, VhostUserMsg *msg)
-+static int vhost_user_read_header(struct vhost_dev *dev, VhostUserMsg *m=
-sg)
- {
-     struct vhost_user *u =3D dev->opaque;
-     CharBackend *chr =3D u->user->chr;
-@@ -221,7 +221,7 @@ static int vhost_user_read(struct vhost_dev *dev, Vho=
-stUserMsg *msg)
-     if (r !=3D size) {
-         error_report("Failed to read msg header. Read %d instead of %d."
-                      " Original request %d.", r, size, msg->hdr.request)=
-;
--        goto fail;
-+        return -1;
-     }
-=20
-     /* validate received flags */
-@@ -229,7 +229,21 @@ static int vhost_user_read(struct vhost_dev *dev, Vh=
-ostUserMsg *msg)
-         error_report("Failed to read msg header."
-                 " Flags 0x%x instead of 0x%x.", msg->hdr.flags,
-                 VHOST_USER_REPLY_MASK | VHOST_USER_VERSION);
--        goto fail;
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+static int vhost_user_read(struct vhost_dev *dev, VhostUserMsg *msg)
++static void *vhost_user_read_size(struct vhost_dev *dev, uint32_t size)
 +{
 +    struct vhost_user *u =3D dev->opaque;
 +    CharBackend *chr =3D u->user->chr;
-+    uint8_t *p =3D (uint8_t *) msg;
-+    int r, size;
++    int r;
++    uint8_t *p =3D g_malloc(size);
 +
-+    if (vhost_user_read_header(dev, msg) < 0) {
-+        return -1;
-     }
++    r =3D qemu_chr_fe_read_all(chr, p, size);
++    if (r !=3D size) {
++        error_report("Failed to read msg payload."
++                     " Read %d instead of %d.", r, size);
++        return NULL;
++    }
++
++    return p;
++}
++
++int vhost_user_input_get_config(struct vhost_dev *dev,
++                                struct virtio_input_config **config)
++{
++    void *p =3D NULL;
++    VhostUserMsg msg =3D {
++        .hdr.request =3D VHOST_USER_INPUT_GET_CONFIG,
++        .hdr.flags =3D VHOST_USER_VERSION,
++    };
++
++    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
++        goto err;
++    }
++
++    if (vhost_user_read_header(dev, &msg) < 0) {
++        goto err;
++    }
++
++    p =3D vhost_user_read_size(dev, msg.hdr.size);
++    if (!p) {
++        goto err;
++    }
++
++    if (msg.hdr.request !=3D VHOST_USER_INPUT_GET_CONFIG) {
++        error_report("Received unexpected msg type. Expected %d received=
+ %d",
++                     VHOST_USER_INPUT_GET_CONFIG, msg.hdr.request);
++        goto err;
++    }
++
++    if (msg.hdr.size % sizeof(struct virtio_input_config)) {
++        error_report("Invalid msg size");
++        goto err;
++    }
++
++    *config =3D p;
++    return msg.hdr.size / sizeof(struct virtio_input_config);
++
++err:
++    g_free(p);
++    return -1;
++}
++
+ static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base,
+                                    struct vhost_log *log)
+ {
+diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
+index d51fd58242..2efa44d124 100644
+--- a/docs/interop/vhost-user.txt
++++ b/docs/interop/vhost-user.txt
+@@ -761,6 +761,13 @@ Master message types
+       was previously sent.
+       The value returned is an error indication; 0 is success.
 =20
-     /* validate message size is sane */
-@@ -237,7 +251,7 @@ static int vhost_user_read(struct vhost_dev *dev, Vho=
-stUserMsg *msg)
-         error_report("Failed to read msg header."
-                 " Size %d exceeds the maximum %zu.", msg->hdr.size,
-                 VHOST_USER_PAYLOAD_SIZE);
--        goto fail;
-+        return -1;
-     }
++ * VHOST_USER_INPUT_GET_CONFIG
++      Id: TBD
++      Master payload: N/A
++      Slave payload: (struct virtio_input_config)*
++
++      Ask vhost user input backend the list of virtio_input_config.
++
+ Slave message types
+ -------------------
 =20
-     if (msg->hdr.size) {
-@@ -247,14 +261,11 @@ static int vhost_user_read(struct vhost_dev *dev, V=
-hostUserMsg *msg)
-         if (r !=3D size) {
-             error_report("Failed to read msg payload."
-                          " Read %d instead of %d.", r, msg->hdr.size);
--            goto fail;
-+            return -1;
-         }
-     }
-=20
-     return 0;
--
--fail:
--    return -1;
- }
-=20
- static int process_message_reply(struct vhost_dev *dev,
 --=20
 2.18.0.rc1
