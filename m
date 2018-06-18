@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fUvl8-0005mV-81
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:07:59 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fUvoO-0007E0-Eq
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:11:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fUvl5-0007TZ-1l
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:07:58 -0400
-Received: from mail-qk0-x236.google.com ([2607:f8b0:400d:c09::236]:36317)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fUvl4-0007TO-Sk
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:07:54 -0400
-Received: by mail-qk0-x236.google.com with SMTP id a195-v6so9532324qkg.3
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 08:07:54 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180615194705.28019-1-alex.bennee@linaro.org>
-	<20180615194705.28019-53-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f61c7358-c446-a2cb-daf7-5d873d468f85@amsat.org>
-Date: Mon, 18 Jun 2018 12:07:49 -0300
+	(envelope-from <mreitz@redhat.com>) id 1fUvoN-0002eW-Bq
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:11:20 -0400
+References: <20180613181823.13618-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <1ae11d68-a29d-9c83-74a7-e6918fc11038@redhat.com>
+Date: Mon, 18 Jun 2018 17:11:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180615194705.28019-53-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 52/54] docker: docker.py adding age
- check command
+In-Reply-To: <20180613181823.13618-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="5DyjCIQ0eK1OmxmznUJaMkQXfCR1e6HNl"
+Subject: Re: [Qemu-devel] [PATCH v5 00/14] block/mirror: Add active-sync
+ mirroring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,96 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-On 06/15/2018 04:47 PM, Alex Bennée wrote:
-> This is useful for querying if an image is too old.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5DyjCIQ0eK1OmxmznUJaMkQXfCR1e6HNl
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Jeff Cody <jcody@redhat.com>
+Message-ID: <1ae11d68-a29d-9c83-74a7-e6918fc11038@redhat.com>
+Subject: Re: [PATCH v5 00/14] block/mirror: Add active-sync mirroring
+References: <20180613181823.13618-1-mreitz@redhat.com>
+In-Reply-To: <20180613181823.13618-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 2018-06-13 20:18, Max Reitz wrote:
+> This series implements an active and synchronous mirroring mode.
+>=20
+> You can read the cover letter of v4 here (I don=E2=80=99t like to copy-=
+paste
+> that because people who reviewed previous versions know it already and
+> this saves them from having to look out for potential changes):
+>=20
+> http://lists.nongnu.org/archive/html/qemu-block/2018-04/msg00185.html
 
-> ---
->  tests/docker/docker.py | 49 ++++++++++++++++++++++++++++++++----------
->  1 file changed, 38 insertions(+), 11 deletions(-)
-> 
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index 3666197a16..ad0c47921a 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -29,6 +29,7 @@ from tarfile import TarFile, TarInfo
->  from StringIO import StringIO
->  from shutil import copy, rmtree
->  from pwd import getpwuid
-> +from datetime import datetime,timedelta
->  
->  
->  FILTERED_ENV_NAMES = ['ftp_proxy', 'http_proxy', 'https_proxy']
-> @@ -184,6 +185,10 @@ class Docker(object):
->          labels = json.loads(resp)[0]["Config"].get("Labels", {})
->          return labels.get("com.qemu.dockerfile-checksum", "")
->  
-> +    def get_image_creation_time(self, tag):
-> +        resp = self._output(["inspect", tag])
-> +        return json.loads(resp)[0]["Created"]
-> +
->      def build_image(self, tag, docker_dir, dockerfile,
->                      quiet=True, user=False, argv=None, extra_files_cksum=[]):
->          if argv == None:
-> @@ -450,21 +455,43 @@ class CheckCommand(SubCommand):
->      def args(self, parser):
->          parser.add_argument("tag",
->                              help="Image Tag")
-> -        parser.add_argument("dockerfile",
-> -                            help="Dockerfile name")
-> +        parser.add_argument("dockerfile", default=None,
-> +                            help="Dockerfile name", nargs='?')
-> +        parser.add_argument("--checktype", choices=["checksum", "age"],
-> +                            default="checksum", help="check type")
-> +        parser.add_argument("--olderthan", default=60, type=int,
-> +                            help="number of minutes")
->  
->      def run(self, args, argv):
-> -        dockerfile = open(args.dockerfile, "rb").read()
->          tag = args.tag
-> -
->          dkr = Docker()
-> -        if dkr.image_matches_dockerfile(tag, dockerfile):
-> -            if not args.quiet:
-> -                print("Image is up to date.")
-> -            return 0
-> -        else:
-> -            print("Image needs updating")
-> -            return 1
-> +
-> +        if args.checktype == "checksum":
-> +            if not args.dockerfile:
-> +                print("Need a dockerfile for tag:%s" % (tag))
-> +                return 1
-> +
-> +            dockerfile = open(args.dockerfile, "rb").read()
-> +
-> +            if dkr.image_matches_dockerfile(tag, dockerfile):
-> +                if not args.quiet:
-> +                    print("Image is up to date")
-> +                return 0
-> +            else:
-> +                print("Image needs updating")
-> +                return 1
-> +        elif args.checktype == "age":
-> +            timestr = dkr.get_image_creation_time(tag).split(".")[0]
-> +            created = datetime.strptime(timestr, "%Y-%m-%dT%H:%M:%S")
-> +            past = datetime.now() - timedelta(minutes=args.olderthan)
-> +            if created < past:
-> +                print ("Image created @ %s more than %d minutes old" %
-> +                       (timestr, args.olderthan))
-> +                return 1
-> +            else:
-> +                if not args.quiet:
-> +                    print ("Image less than %d minutes old" % (args.olderthan))
-> +                return 0
->  
->  
->  def main():
-> 
+Applied to my block branch after deciding (with Kevin) that changing
+bytes_handled's comment is not really worth it considering it's going to
+be removed in a follow-up anyway.
+
+Thank you for all the reviews,
+
+Max
+
+
+--5DyjCIQ0eK1OmxmznUJaMkQXfCR1e6HNl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsny48ACgkQ9AfbAGHV
+z0ClTAf/VQ1GW/+z5EcYstjnLLeRVHvHMkhl/8AjwPzHtd8nfSMc13zgmkhEBgba
+mhgakgnD+ld4mIPhSPkytgdBuGCiwEgh7msJoDOs6lZ4Xse6pejOtWry/HkT2Dpf
+XQMEOgxul7QhTMkUCCm3tVRuaruDLoYkytm70kc1Vd9bVfbeoCSXoKgNJKGPaReO
+aZBVvxZ5ORvyrUMqzZSEyLK9NLiWUSieIb0Monvim7KmrWwLhlnJ3LcsI60+z9sY
+h9zKJuFa+ergajT5g5jgnY/pGHgUsI+73XMdoPF6Eh6P88c60xxIYSLp0vxMdvbh
+ws6fS6CF1WUPMXhjevO90CsljrzKkw==
+=VGXk
+-----END PGP SIGNATURE-----
+
+--5DyjCIQ0eK1OmxmznUJaMkQXfCR1e6HNl--
