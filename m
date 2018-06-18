@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fV1yR-0003Me-2z
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 17:46:08 -0400
+	(envelope-from <jusual@mail.ru>) id 1fV1yn-0003Ww-MO
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 17:46:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fV1yO-0001LS-Q7
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 17:46:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55116 helo=mx1.redhat.com)
+	(envelope-from <jusual@mail.ru>) id 1fV1yj-0001Tc-O2
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 17:46:29 -0400
+Received: from smtp39.i.mail.ru ([94.100.177.99]:55166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fV1yO-0001LD-Lt
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 17:46:04 -0400
-References: <20180612065150.21110-1-ville.skytta@iki.fi>
-	<d26962f9-7f7d-da39-861e-0e5b5515c703@redhat.com>
-	<CABr9L5B9Hspeq8tBe319Rct5XXFH3_NoxuxoVecSNg+-KXWP8g@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <21aaf5e7-a25c-0d07-1638-2537cb5360ce@redhat.com>
-Date: Mon, 18 Jun 2018 16:46:02 -0500
-MIME-Version: 1.0
-In-Reply-To: <CABr9L5B9Hspeq8tBe319Rct5XXFH3_NoxuxoVecSNg+-KXWP8g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] docs: Grammar and spelling fixes
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fV1yj-0001Ri-Co
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 17:46:25 -0400
+From: Julia Suvorova <jusual@mail.ru>
+Date: Tue, 19 Jun 2018 00:46:04 +0300
+Message-Id: <20180618214604.6777-1-jusual@mail.ru>
+Subject: [Qemu-devel] [PATCH] target/arm: Minor cleanup for ARMv6-M 32-bit
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +22,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Ville_Skytt=c3=a4?= <ville.skytta@iki.fi>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Richard Henderson <richard.henderson@linaro.org>, Julia Suvorova <jusual@mail.ru>
 
-On 06/14/2018 11:49 AM, Ville Skytt=C3=A4 wrote:
-> On Tue, Jun 12, 2018 at 3:11 PM, Eric Blake <eblake@redhat.com> wrote:
->> On 06/12/2018 01:51 AM, Ville Skytt=C3=A4 wrote:
->>>
->>> Signed-off-by: Ville Skytt=C3=A4 <ville.skytta@iki.fi>
->>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>> ---
->>
->>
->> It's helpful to use 'git send-email -v3' (or 'git format-patch -v3',
->> depending on your workflow) so that the subject line tags this as a th=
-ird
->> spin of the same patch previously posted, and to include, after the --=
--
->> separator, how it differs from v2 (in this case, incorporating my revi=
-ew
->> comment to reflow a long line).  Otherwise, automated tools might not =
-pick
->> up on the fact that this email replaces your earlier submission as the=
- one
->> to test.  Other submission tips can be found at:
->>
->> https://wiki.qemu.org/Contribute/SubmitAPatch
->=20
-> Ok, will keep that in mind for the future. In the meantime, am I still
-> expected to do something to this latest patch, or just wait :)?
+The arrays were made static, "if" was simplified because V7M and V8M
+define V6 feature.
 
-At this point, waiting is probably fine. If no one else responds after a=20
-week (such as a maintainer confirming they have queued it), then=20
-replying with a ping would be reasonable.
+Signed-off-by: Julia Suvorova <jusual@mail.ru>
+---
+ target/arm/translate.c | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index df26035863..e779942e9b 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -10107,18 +10107,18 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+         !arm_dc_feature(s, ARM_FEATURE_V7)) {
+         int i;
+         bool found = false;
+-        const uint32_t armv6m_insn[] = {0xf3808000 /* msr */,
+-                                        0xf3b08040 /* dsb */,
+-                                        0xf3b08050 /* dmb */,
+-                                        0xf3b08060 /* isb */,
+-                                        0xf3e08000 /* mrs */,
+-                                        0xf000d000 /* bl */};
+-        const uint32_t armv6m_mask[] = {0xffe0d000,
+-                                        0xfff0d0f0,
+-                                        0xfff0d0f0,
+-                                        0xfff0d0f0,
+-                                        0xffe0d000,
+-                                        0xf800d000};
++        static const uint32_t armv6m_insn[] = {0xf3808000 /* msr */,
++                                               0xf3b08040 /* dsb */,
++                                               0xf3b08050 /* dmb */,
++                                               0xf3b08060 /* isb */,
++                                               0xf3e08000 /* mrs */,
++                                               0xf000d000 /* bl */};
++        static const uint32_t armv6m_mask[] = {0xffe0d000,
++                                               0xfff0d0f0,
++                                               0xfff0d0f0,
++                                               0xfff0d0f0,
++                                               0xffe0d000,
++                                               0xf800d000};
+ 
+         for (i = 0; i < ARRAY_SIZE(armv6m_insn); i++) {
+             if ((insn & armv6m_mask[i]) == armv6m_insn[i]) {
+@@ -11051,8 +11051,7 @@ static void disas_thumb2_insn(DisasContext *s, uint32_t insn)
+                         break;
+                     case 3: /* Special control operations.  */
+                         if (!arm_dc_feature(s, ARM_FEATURE_V7) &&
+-                            !(arm_dc_feature(s, ARM_FEATURE_V6) &&
+-                              arm_dc_feature(s, ARM_FEATURE_M))) {
++                            !arm_dc_feature(s, ARM_FEATURE_M)) {
+                             goto illegal_op;
+                         }
+                         op = (insn >> 4) & 0xf;
+-- 
+2.17.0
