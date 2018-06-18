@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fUvAV-0005Nj-BC
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:30:08 -0400
+	(envelope-from <tamiko@43-1.org>) id 1fUvCw-0007JS-C5
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:32:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fUvAS-0002S2-7T
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:30:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57250 helo=mx1.redhat.com)
+	(envelope-from <tamiko@43-1.org>) id 1fUvCp-0004DK-Bc
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:32:38 -0400
+Received: from tsukuyomi.43-1.org ([188.40.248.50]:35448)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fUvAS-0002R7-2z
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:30:04 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A9476401DEAF
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 14:30:03 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
-	<20180321115211.17937-2-marcandre.lureau@redhat.com>
-Date: Mon, 18 Jun 2018 16:29:59 +0200
-In-Reply-To: <20180321115211.17937-2-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 21 Mar 2018 12:51:23 +0100")
-Message-ID: <87wouw88wo.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <tamiko@43-1.org>) id 1fUvCp-00048I-1u
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 10:32:31 -0400
+From: Matthias Maier <tamiko@43-1.org>
+In-Reply-To: <87muvssm2t.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Mon, 18 Jun 2018 07:25:14 +0200")
+References: <20180615220205.6929-1-tamiko@43-1.org>
+	<20180615220205.6929-2-tamiko@43-1.org>
+	<87muvssm2t.fsf@dusky.pond.sub.org>
+Date: Mon, 18 Jun 2018 09:32:22 -0500
+Message-ID: <87y3fcgo7d.fsf@43-1.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 01/49] qapi/visit: remove useless prefix
- argument
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] qapi: open files in binary mode and
+ use explicit decoding/encoding in common.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,30 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi/visit.py | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Jun 18, 2018, at 00:25 CDT, Markus Armbruster <armbru@redhat.com> wrote:
+
+> Matthias Maier <tamiko@43-1.org> writes:
 >
-> diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-> index 5d72d8936c..3c5ea1289e 100644
-> --- a/scripts/qapi/visit.py
-> +++ b/scripts/qapi/visit.py
-> @@ -293,7 +293,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVis=
-itor):
->  #include "qapi/qmp/qerror.h"
->  #include "%(visit)s.h"
->  ''',
-> -                                      visit=3Dvisit, prefix=3Dself._pref=
-ix))
-> +                                      visit=3Dvisit))
->          self._genh.preamble_add(mcgen('''
->  #include "qapi/qapi-builtin-visit.h"
->  #include "%(types)s.h"
+>> This is a different approach to fix the locale dependent encode/decode
+>> problem in common.py utilizing the binary read/write mode [1,2], and (if
+>> a python 3 interpreter is used) with explicit decode/encode arguments
+>> [3].
+>
+> Why can't we simply pass encoding='utf-8' to open()?
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Because this breaks python-2 compatibility.
+
+Best,
+Matthias
