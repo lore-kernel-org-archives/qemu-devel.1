@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fUwbs-0001VV-ML
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:02:31 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fUwe0-0003CY-8Y
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:04:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fUwbr-0005DQ-Jn
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:02:28 -0400
-References: <20180313153458.26822-1-peter.maydell@linaro.org>
-	<20180313153458.26822-7-peter.maydell@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <9d6c5256-289c-6e64-c141-d5ff2f9f121c@redhat.com>
-Date: Mon, 18 Jun 2018 18:02:08 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1fUwdz-00064x-Bx
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:04:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42826)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fUwdz-00061p-6o
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 12:04:39 -0400
+Date: Mon, 18 Jun 2018 13:04:30 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180618160430.GG7451@localhost.localdomain>
+References: <20180615220205.6929-1-tamiko@43-1.org>
+	<20180615220205.6929-2-tamiko@43-1.org>
+	<87muvssm2t.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180313153458.26822-7-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/9] hw/arm/bcm2836: Create proper bcm2837
- device
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87muvssm2t.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] qapi: open files in binary mode and
+ use explicit decoding/encoding in common.py
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,164 +29,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Pekka Enberg <penberg@iki.fi>, Andrew Baumann <Andrew.Baumann@microsoft.com>, patches@linaro.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Matthias Maier <tamiko@43-1.org>, qemu-devel@nongnu.org, Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
 
-On 13.03.2018 16:34, Peter Maydell wrote:
-> The bcm2837 is pretty similar to the bcm2836, but it does have
-> some differences. Notably, the MPIDR affinity aff1 values it
-> sets for the CPUs are 0x0, rather than the 0xf that the bcm2836
-> uses, and if this is wrong Linux will not boot.
+On Mon, Jun 18, 2018 at 07:25:14AM +0200, Markus Armbruster wrote:
+> Matthias Maier <tamiko@43-1.org> writes:
 > 
-> Rather than trying to have one device with properties that
-> configure it differently for the two cases, create two
-> separate QOM devices for the two SoCs. We use the same approach
-> as hw/arm/aspeed_soc.c and share code and have a data table
-> that might differ per-SoC. For the moment the two types don't
-> actually have different behaviour.
+> > This is a different approach to fix the locale dependent encode/decode
+> > problem in common.py utilizing the binary read/write mode [1,2], and (if
+> > a python 3 interpreter is used) with explicit decode/encode arguments
+> > [3].
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/arm/bcm2836.h | 19 +++++++++++++++++++
->  hw/arm/bcm2836.c         | 37 ++++++++++++++++++++++++++++++++-----
->  hw/arm/raspi.c           |  3 ++-
->  3 files changed, 53 insertions(+), 6 deletions(-)
+> Why can't we simply pass encoding='utf-8' to open()?
 
- Hi Peter,
+This wouldn't work in Python 2.7 (where the `open()` builtin
+doesn't support the `encoding` parameter).
 
-if I've bisected it right, this patch introduced a new way to crash QEMU:
+io.open(..., encoding='utf-8') should work, though.
 
-$ aarch64-softmmu/qemu-system-aarch64 -M integratorcp,accel=qtest \
-    -nographic
-QEMU 2.11.50 monitor - type 'help' for more information
-(qemu) device_add bcm2837
-Device 'bcm2837' can not be hotplugged on this machine
-(qemu) device_add corgi-ssp
-Segmentation fault (core dumped)
-
-Not sure why this is happening, though, I can't see anything obvious
-wrong with your patch.
-
- Thomas
-
-
-
-> diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
-> index 9a10a76631..93248399ba 100644
-> --- a/include/hw/arm/bcm2836.h
-> +++ b/include/hw/arm/bcm2836.h
-> @@ -20,6 +20,13 @@
->  
->  #define BCM283X_NCPUS 4
->  
-> +/* These type names are for specific SoCs; other than instantiating
-> + * them, code using these devices should always handle them via the
-> + * BCM283x base class, so they have no BCM2836(obj) etc macros.
-> + */
-> +#define TYPE_BCM2836 "bcm2836"
-> +#define TYPE_BCM2837 "bcm2837"
-> +
->  typedef struct BCM283XState {
->      /*< private >*/
->      DeviceState parent_obj;
-> @@ -33,4 +40,16 @@ typedef struct BCM283XState {
->      BCM2835PeripheralState peripherals;
->  } BCM283XState;
->  
-> +typedef struct BCM283XInfo BCM283XInfo;
-> +
-> +typedef struct BCM283XClass {
-> +    DeviceClass parent_class;
-> +    const BCM283XInfo *info;
-> +} BCM283XClass;
-> +
-> +#define BCM283X_CLASS(klass) \
-> +    OBJECT_CLASS_CHECK(BCM283XClass, (klass), TYPE_BCM283X)
-> +#define BCM283X_GET_CLASS(obj) \
-> +    OBJECT_GET_CLASS(BCM283XClass, (obj), TYPE_BCM283X)
-> +
->  #endif /* BCM2836_H */
-> diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-> index 1d1908654b..07d2705f96 100644
-> --- a/hw/arm/bcm2836.c
-> +++ b/hw/arm/bcm2836.c
-> @@ -23,6 +23,19 @@
->  /* "QA7" (Pi2) interrupt controller and mailboxes etc. */
->  #define BCM2836_CONTROL_BASE    0x40000000
->  
-> +struct BCM283XInfo {
-> +    const char *name;
-> +};
-> +
-> +static const BCM283XInfo bcm283x_socs[] = {
-> +    {
-> +        .name = TYPE_BCM2836,
-> +    },
-> +    {
-> +        .name = TYPE_BCM2837,
-> +    },
-> +};
-> +
->  static void bcm2836_init(Object *obj)
->  {
->      BCM283XState *s = BCM283X(obj);
-> @@ -156,25 +169,39 @@ static Property bcm2836_props[] = {
->      DEFINE_PROP_END_OF_LIST()
->  };
->  
-> -static void bcm2836_class_init(ObjectClass *oc, void *data)
-> +static void bcm283x_class_init(ObjectClass *oc, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(oc);
-> +    BCM283XClass *bc = BCM283X_CLASS(oc);
->  
-> -    dc->props = bcm2836_props;
-> +    bc->info = data;
->      dc->realize = bcm2836_realize;
-> +    dc->props = bcm2836_props;
->  }
->  
-> -static const TypeInfo bcm2836_type_info = {
-> +static const TypeInfo bcm283x_type_info = {
->      .name = TYPE_BCM283X,
->      .parent = TYPE_DEVICE,
->      .instance_size = sizeof(BCM283XState),
->      .instance_init = bcm2836_init,
-> -    .class_init = bcm2836_class_init,
-> +    .class_size = sizeof(BCM283XClass),
-> +    .abstract = true,
->  };
->  
->  static void bcm2836_register_types(void)
->  {
-> -    type_register_static(&bcm2836_type_info);
-> +    int i;
-> +
-> +    type_register_static(&bcm283x_type_info);
-> +    for (i = 0; i < ARRAY_SIZE(bcm283x_socs); i++) {
-> +        TypeInfo ti = {
-> +            .name = bcm283x_socs[i].name,
-> +            .parent = TYPE_BCM283X,
-> +            .class_init = bcm283x_class_init,
-> +            .class_data = (void *) &bcm283x_socs[i],
-> +        };
-> +        type_register(&ti);
-> +    }
->  }
->  
->  type_init(bcm2836_register_types)
-> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-> index 58c6e80a17..f588720138 100644
-> --- a/hw/arm/raspi.c
-> +++ b/hw/arm/raspi.c
-> @@ -136,7 +136,8 @@ static void raspi_init(MachineState *machine, int version)
->      BusState *bus;
->      DeviceState *carddev;
->  
-> -    object_initialize(&s->soc, sizeof(s->soc), TYPE_BCM283X);
-> +    object_initialize(&s->soc, sizeof(s->soc),
-> +                      version == 3 ? TYPE_BCM2837 : TYPE_BCM2836);
->      object_property_add_child(OBJECT(machine), "soc", OBJECT(&s->soc),
->                                &error_abort);
->  
-> 
+-- 
+Eduardo
