@@ -1,36 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fUw0F-00033O-Pi
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:23:37 -0400
+	(envelope-from <groug@kaod.org>) id 1fUw58-0004h5-RW
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:28:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fUw0B-0000Hv-1x
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:23:35 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:45373)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fUw0A-0000Hi-Ru
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:23:30 -0400
-Received: by mail-qt0-x244.google.com with SMTP id i18-v6so15423226qtp.12
-	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 08:23:30 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20180615194705.28019-1-alex.bennee@linaro.org>
-	<20180615194705.28019-13-alex.bennee@linaro.org>
-	<02569193-5865-e408-86bf-7137b76b6792@amsat.org>
-	<87wouxepoz.fsf@linaro.org>
-	<7d926378-946e-e0bc-d354-aa2ff3b7a241@amsat.org>
-Message-ID: <a41890e9-d64d-21f5-31cc-56a1a7ff320b@amsat.org>
-Date: Mon, 18 Jun 2018 12:23:25 -0300
+	(envelope-from <groug@kaod.org>) id 1fUw53-0002WS-RZ
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:28:38 -0400
+Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:58617)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fUw53-0002WB-KK
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 11:28:33 -0400
+Received: from player691.ha.ovh.net (unknown [10.109.105.78])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id D748FB6B3E
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 17:28:31 +0200 (CEST)
+Date: Mon, 18 Jun 2018 17:28:23 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180618172823.4ffd5166@bahia.lan>
+In-Reply-To: <20180618063606.2513-4-david@gibson.dropbear.id.au>
+References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
+	<20180618063606.2513-4-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <7d926378-946e-e0bc-d354-aa2ff3b7a241@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 12/54] tests/tcg/multiarch: don't hard
- code paths/ports for linux-test
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/9] spapr: Add cpu_apply hook to
+ capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,176 +31,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: abologna@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
-On 06/18/2018 12:18 PM, Philippe Mathieu-Daudé wrote:
-> On 06/17/2018 06:18 AM, Alex Bennée wrote:
->> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
->>
->>> Hi Alex,
->>>
->>> On 06/15/2018 04:46 PM, Alex Bennée wrote:
->>>> The fixed path and ports get in the way of running our tests and
->>>> builds in parallel. Instead of using TESTPATH we use mkdtemp() and
->>>> instead of a fixed port we allow the kernel to assign one and query it
->>>> afterwards.
->>>>
->>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>>> ---
->>>>  tests/tcg/multiarch/linux-test.c | 37 ++++++++++++++++----------------
->>>>  1 file changed, 19 insertions(+), 18 deletions(-)
->>>>
->>>> diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
->>>> index 6f2c531474..3f73b96420 100644
->>>> --- a/tests/tcg/multiarch/linux-test.c
->>>> +++ b/tests/tcg/multiarch/linux-test.c
->>>> @@ -41,8 +41,6 @@
->>>>  #include <setjmp.h>
->>>>  #include <sys/shm.h>
->>>>
->>>> -#define TESTPATH "/tmp/linux-test.tmp"
->>>> -#define TESTPORT 7654
->>>>  #define STACK_SIZE 16384
->>>>
->>>>  static void error1(const char *filename, int line, const char *fmt, ...)
->>>> @@ -85,19 +83,15 @@ static void test_file(void)
->>>>      struct iovec vecs[2];
->>>>      DIR *dir;
->>>>      struct dirent *de;
->>>> +    char template[] = "/tmp/linux-test-XXXXXX";
->>>
->>> Since /tmp doesn't always fit, can this be:
->>>
->>>        char *tmpbase = getenv("TMPDIR");
->>>        char *template = g_strdup_printf("%s/qemu-test-XXXXXX",
->>>                                         tmpbase ? tmpbase : "/tmp");
->>
->> It depends if we want to honour TMPDIR, is /tmp not likely to be there?
-> 
-> My /tmp is a not huge tmpfs and I had troubles running iotests which let
-> some dangling big files on failure. Now I prefer run tests with
-> TMPDIR=/scratch where I have plenty of slower space.
-> Shouldn't be a problem here however.
+On Mon, 18 Jun 2018 16:36:00 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-Thus is something that could be addressed in later patch, or not.
+> spapr capabilities have an apply hook to actually activate (or deactivate)
+> the feature in the system at reset time.  However, a number of capabilities
+> affect the setup of cpus, and need to be applied to each of them -
+> including hotplugged cpus for extra complication.  To make this simpler,
+> add an optional cpu_apply hook that is called from spapr_cpu_reset().
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr_caps.c     | 19 +++++++++++++++++++
+>  hw/ppc/spapr_cpu_core.c |  2 ++
+>  include/hw/ppc/spapr.h  |  1 +
+>  3 files changed, 22 insertions(+)
 > 
->>
->> Either way we can't use glib functions for these tests to keep the
->> compilation simple.
-> 
-> char template[PATH_MAX] + snprintf() :)
-> 
->>
->>>
->>>> +    char *tmpdir = mkdtemp(template);
->>>
->>>        g_free(template);
->>>
->>>>
->>>> -    /* clean up, just in case */
->>>> -    unlink(TESTPATH "/file1");
->>>> -    unlink(TESTPATH "/file2");
->>>> -    unlink(TESTPATH "/file3");
->>>> -    rmdir(TESTPATH);
->>>> +    chk_error(strlen(tmpdir));
->>>>
->>>>      if (getcwd(cur_dir, sizeof(cur_dir)) == NULL)
->>>>          error("getcwd");
->>>>
->>>> -    chk_error(mkdir(TESTPATH, 0755));
->>>> -
->>>> -    chk_error(chdir(TESTPATH));
->>>> +    chk_error(chdir(tmpdir));
->>>>
->>>>      /* open/read/write/close/readv/writev/lseek */
->>>>
->>>> @@ -163,7 +157,7 @@ static void test_file(void)
->>>>          st.st_mtime != 1000)
->>>>          error("stat time");
->>>>
->>>> -    chk_error(stat(TESTPATH, &st));
->>>> +    chk_error(stat(tmpdir, &st));
->>>>      if (!S_ISDIR(st.st_mode))
->>>>          error("stat mode");
->>>>
->>>> @@ -185,7 +179,7 @@ static void test_file(void)
->>>>          error("stat mode");
->>>>
->>>>      /* getdents */
->>>> -    dir = opendir(TESTPATH);
->>>> +    dir = opendir(tmpdir);
->>>>      if (!dir)
->>>>          error("opendir");
->>>>      len = 0;
->>>> @@ -207,7 +201,7 @@ static void test_file(void)
->>>>      chk_error(unlink("file3"));
->>>>      chk_error(unlink("file2"));
->>>>      chk_error(chdir(cur_dir));
->>>> -    chk_error(rmdir(TESTPATH));
->>>> +    chk_error(rmdir(tmpdir));
->>>>  }
->>>>
->>>>  static void test_fork(void)
->>>> @@ -264,7 +258,7 @@ static int server_socket(void)
->>>>      chk_error(setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)));
->>>>
->>>>      sockaddr.sin_family = AF_INET;
->>>> -    sockaddr.sin_port = htons(TESTPORT);
->>>> +    sockaddr.sin_port = htons(0); /* choose random ephemeral port) */
->>>>      sockaddr.sin_addr.s_addr = 0;
->>>>      chk_error(bind(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)));
->>>>      chk_error(listen(fd, 0));
->>>> @@ -272,7 +266,7 @@ static int server_socket(void)
->>>>
->>>>  }
->>>>
->>>> -static int client_socket(void)
->>>> +static int client_socket(uint16_t port)
->>>>  {
->>>>      int fd;
->>>>      struct sockaddr_in sockaddr;
->>>> @@ -280,7 +274,7 @@ static int client_socket(void)
->>>>      /* server socket */
->>>>      fd = chk_error(socket(PF_INET, SOCK_STREAM, 0));
->>>>      sockaddr.sin_family = AF_INET;
->>>> -    sockaddr.sin_port = htons(TESTPORT);
->>>> +    sockaddr.sin_port = htons(port);
->>>>      inet_aton("127.0.0.1", &sockaddr.sin_addr);
->>>>      chk_error(connect(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)));
->>>>      return fd;
->>>> @@ -292,10 +286,17 @@ static void test_socket(void)
->>>>  {
->>>>      int server_fd, client_fd, fd, pid, ret, val;
->>>>      struct sockaddr_in sockaddr;
->>>> -    socklen_t len;
->>>> +    struct sockaddr_in server_addr;
->>>> +    socklen_t len, socklen;
->>>> +    uint16_t server_port;
->>>>      char buf[512];
->>>>
->>>>      server_fd = server_socket();
->>>> +    /* find out what port we got */
->>>> +    socklen = sizeof(server_addr);
->>>> +    ret = getsockname(server_fd, &server_addr, &socklen);
->>>> +    chk_error(ret);
->>>> +    server_port = ntohs(server_addr.sin_port);
->>>>
->>>>      /* test a few socket options */
->>>>      len = sizeof(val);
->>>> @@ -305,7 +306,7 @@ static void test_socket(void)
->>>>
->>>>      pid = chk_error(fork());
->>>>      if (pid == 0) {
->>>> -        client_fd = client_socket();
->>>> +        client_fd = client_socket(server_port);
->>>>          send(client_fd, socket_msg, sizeof(socket_msg), 0);
->>>>          close(client_fd);
->>>>          exit(0);
->>>>
->>
->>
->> --
->> Alex Bennée
->>
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index dabed817d1..68a4243efc 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -59,6 +59,8 @@ typedef struct sPAPRCapabilityInfo {
+>      sPAPRCapPossible *possible;
+>      /* Make sure the virtual hardware can support this capability */
+>      void (*apply)(sPAPRMachineState *spapr, uint8_t val, Error **errp);
+> +    void (*cpu_apply)(sPAPRMachineState *spapr, PowerPCCPU *cpu,
+> +                      uint8_t val, Error **errp);
+>  } sPAPRCapabilityInfo;
+>  
+>  static void spapr_cap_get_bool(Object *obj, Visitor *v, const char *name,
+> @@ -472,6 +474,23 @@ void spapr_caps_apply(sPAPRMachineState *spapr)
+>      }
+>  }
+>  
+> +void spapr_caps_cpu_apply(sPAPRMachineState *spapr, PowerPCCPU *cpu)
+> +{
+> +    int i;
+> +
+> +    for (i = 0; i < SPAPR_CAP_NUM; i++) {
+> +        sPAPRCapabilityInfo *info = &capability_table[i];
+> +
+> +        /*
+> +         * If the apply function can't set the desired level and thinks it's
+> +         * fatal, it should cause that.
+> +         */
+> +        if (info->cpu_apply) {
+> +            info->cpu_apply(spapr, cpu, spapr->eff.caps[i], &error_fatal);
+> +        }
+> +    }
+> +}
+> +
+>  void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
+>  {
+>      Error *local_err = NULL;
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index aef3be33a3..324623190d 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -76,6 +76,8 @@ static void spapr_cpu_reset(void *opaque)
+>      spapr_cpu->slb_shadow_size = 0;
+>      spapr_cpu->dtl_addr = 0;
+>      spapr_cpu->dtl_size = 0;
+> +
+> +    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
+>  }
+>  
+>  void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target_ulong r3)
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 9dbd6010f5..9dd46a72f6 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -800,6 +800,7 @@ static inline uint8_t spapr_get_cap(sPAPRMachineState *spapr, int cap)
+>  
+>  void spapr_caps_init(sPAPRMachineState *spapr);
+>  void spapr_caps_apply(sPAPRMachineState *spapr);
+> +void spapr_caps_cpu_apply(sPAPRMachineState *spapr, PowerPCCPU *cpu);
+>  void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
+>  int spapr_caps_post_migration(sPAPRMachineState *spapr);
+>  
