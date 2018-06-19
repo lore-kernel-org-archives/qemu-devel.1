@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVGtL-0002md-9S
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:41:55 -0400
+	(envelope-from <david@redhat.com>) id 1fVGtQ-0002qE-NZ
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:41:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVGtH-00045l-W1
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:41:51 -0400
+	(envelope-from <david@redhat.com>) id 1fVGtP-0004DT-JZ
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:41:56 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 19 Jun 2018 15:41:29 +0200
-Message-Id: <20180619134141.29478-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 00/12] pc-dimm: next bunch of cleanups
+Date: Tue, 19 Jun 2018 15:41:32 +0200
+Message-Id: <20180619134141.29478-4-david@redhat.com>
+In-Reply-To: <20180619134141.29478-1-david@redhat.com>
+References: <20180619134141.29478-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 03/12] pc-dimm: rename pc_dimm_memory_* to
+ pc_dimm_*
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,74 +23,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-This is another set of cleanups as the result from
-    [PATCH v4 00/14] MemoryDevice: use multi stage hotplug handlers
-And is based on
-    [PATCH v1 0/2] memory: fix alignment checks/asserts
+Let's rename it to make it look more consistent.
 
-These cleanup are the last step before
-- 1. moving pc-dimm address and slot assignment into pc_dimm_pre_plug
-- 2. factoring out pre_plug, plug and unplug logic of memory devices
-     completely
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ hw/i386/pc.c             | 4 ++--
+ hw/mem/pc-dimm.c         | 6 +++---
+ hw/ppc/spapr.c           | 6 +++---
+ include/hw/mem/pc-dimm.h | 6 +++---
+ 4 files changed, 11 insertions(+), 11 deletions(-)
 
-v4 -> v5:
-- "nvdimm: convert nvdimm_mr into a pointer"
--- fix memory leak by freeing in instance_finalize()
-- "nvdimm: make get_memory_region() perform checks and initialization"
--- trun check into assert in "
-
-v3 -> v4:
-- drop "nvdimm: allow setting the label-size to 0"
-
-v2 -> v3:
-- "nvdimm: no need to overwrite get_vmstate_memory_region()"
--- reshuffeld to avoid breaking compilation in between patches
-- "nvdimm: convert "label-size" into a static property"
--- replace by "nvdimm: convert nvdimm_mr into a pointer"
--- and "nvdimm: allow setting the label-size to 0"
-
-v1 -> v2:
-- deferring "pc-dimm: assign and verify the "slot" property during pre_plug"
-- deferring "pc-dimm: introduce and use pc_dimm_memory_pre_plug()"
-- dropped "pc-dimm: get_memory_region() will never return a NULL pointer"
-- dropped "pc-dimm: don't allow to access "size" before the device was realized"
-- dropped "spapr: move memory hotplug size check into plug code"
-- dropped "pc-dimm: get_memory_region() can never fail"
--- replaces by "pc-dimm: get_memory_region() will not fail after realize"
-- added "pc: rename pc_dimm_(plug|unplug|...)* into ..."
-- added "pc-dimm: rename pc_dimm_memory_* to pc_dimm_*"
-- added "pc-dimm: remove pc_dimm_get_free_slot() from header"
-- added "pc-dimm: merge get_(vmstate_)memory_region()"
-- added "nvdimm: convert "unarmed" into a static property"
-- added "nvdimm: convert "label-size" into a static property"
-- added "nvdimm: make get_memory_region() perform checks and initialization"
-
-David Hildenbrand (12):
-  pc-dimm: remove leftover "struct pc_dimms_capacity"
-  pc: rename pc_dimm_(plug|unplug|...)* into
-    pc_memory_(plug|unplug|...)*
-  pc-dimm: rename pc_dimm_memory_* to pc_dimm_*
-  pc-dimm: remove pc_dimm_get_free_slot() from header
-  pc: factor out pc specific dimm checks into pc_memory_pre_plug()
-  nvdimm: no need to overwrite get_vmstate_memory_region()
-  hostmem: drop error variable from host_memory_backend_get_memory()
-  pc-dimm: merge get_(vmstate_)memory_region()
-  nvdimm: convert "unarmed" into a static property
-  nvdimm: convert nvdimm_mr into a pointer
-  nvdimm: make get_memory_region() perform checks and initialization
-  pc-dimm: get_memory_region() will not fail after realize
-
- backends/hostmem.c       |  3 +-
- hw/i386/pc.c             | 73 ++++++++++++++++---------------
- hw/mem/nvdimm.c          | 93 ++++++++++++++++++++++------------------
- hw/mem/pc-dimm.c         | 35 ++++++---------
- hw/misc/ivshmem.c        |  3 +-
- hw/ppc/spapr.c           | 18 +++-----
- include/hw/mem/nvdimm.h  |  2 +-
- include/hw/mem/pc-dimm.h | 17 ++++----
- include/sysemu/hostmem.h |  3 +-
- numa.c                   |  3 +-
- 10 files changed, 121 insertions(+), 129 deletions(-)
-
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index f9250ffae7..f23133facc 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1713,7 +1713,7 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+         goto out;
+     }
+ 
+-    pc_dimm_memory_plug(dev, MACHINE(pcms), align, &local_err);
++    pc_dimm_plug(dev, MACHINE(pcms), align, &local_err);
+     if (local_err) {
+         goto out;
+     }
+@@ -1773,7 +1773,7 @@ static void pc_memory_unplug(HotplugHandler *hotplug_dev,
+         goto out;
+     }
+ 
+-    pc_dimm_memory_unplug(dev, MACHINE(pcms));
++    pc_dimm_unplug(dev, MACHINE(pcms));
+     object_unparent(OBJECT(dev));
+ 
+  out:
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 62b34a992e..9e0c83e415 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -27,8 +27,8 @@
+ #include "sysemu/numa.h"
+ #include "trace.h"
+ 
+-void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+-                         uint64_t align, Error **errp)
++void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
++                  Error **errp)
+ {
+     int slot;
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+@@ -84,7 +84,7 @@ out:
+     error_propagate(errp, local_err);
+ }
+ 
+-void pc_dimm_memory_unplug(DeviceState *dev, MachineState *machine)
++void pc_dimm_unplug(DeviceState *dev, MachineState *machine)
+ {
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index db0fb385d4..4250a3c9b8 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3159,7 +3159,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     align = memory_region_get_alignment(mr);
+     size = memory_region_size(mr);
+ 
+-    pc_dimm_memory_plug(dev, MACHINE(ms), align, &local_err);
++    pc_dimm_plug(dev, MACHINE(ms), align, &local_err);
+     if (local_err) {
+         goto out;
+     }
+@@ -3182,7 +3182,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     return;
+ 
+ out_unplug:
+-    pc_dimm_memory_unplug(dev, MACHINE(ms));
++    pc_dimm_unplug(dev, MACHINE(ms));
+ out:
+     error_propagate(errp, local_err);
+ }
+@@ -3334,7 +3334,7 @@ static void spapr_memory_unplug(HotplugHandler *hotplug_dev, DeviceState *dev)
+     sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+     sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr, PC_DIMM(dev));
+ 
+-    pc_dimm_memory_unplug(dev, MACHINE(hotplug_dev));
++    pc_dimm_unplug(dev, MACHINE(hotplug_dev));
+     object_unparent(OBJECT(dev));
+     spapr_pending_dimm_unplugs_remove(spapr, ds);
+ }
+diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+index 627c8601d9..860343d64f 100644
+--- a/include/hw/mem/pc-dimm.h
++++ b/include/hw/mem/pc-dimm.h
+@@ -78,7 +78,7 @@ typedef struct PCDIMMDeviceClass {
+ 
+ int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
+ 
+-void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
+-                         uint64_t align, Error **errp);
+-void pc_dimm_memory_unplug(DeviceState *dev, MachineState *machine);
++void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
++                  Error **errp);
++void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
+ #endif
 -- 
 2.17.1
