@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fVLTB-0007hn-Ch
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:35:10 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fVLTC-0007jD-9s
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:35:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fVLTA-0005YI-5a
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:35:09 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fVLTA-0005aT-OX
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:35:10 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 19 Jun 2018 21:34:57 +0300
-Message-Id: <20180619183457.371081-8-vsementsov@virtuozzo.com>
+Date: Tue, 19 Jun 2018 21:34:51 +0300
+Message-Id: <20180619183457.371081-2-vsementsov@virtuozzo.com>
 In-Reply-To: <20180619183457.371081-1-vsementsov@virtuozzo.com>
 References: <20180619183457.371081-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 7/7] block/qcow2-refcount: fix out-of-file L2
- entries to be read-as-zero
+Subject: [Qemu-devel] [PATCH 1/7] block/qcow2-refcount: fix
+ check_oflag_copied
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,67 +23,52 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Rewrite corrupted L2 table entry, which reference space out of
-underlying file.
-
-Make this L2 table entry read-as-all-zeros without any allocation.
+Increase corruptions_fixed only after successful fix.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow2-refcount.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ block/qcow2-refcount.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 3c9e2da39e..cbad8355f3 100644
+index 18c729aa27..f9d095aa2d 100644
 --- a/block/qcow2-refcount.c
 +++ b/block/qcow2-refcount.c
-@@ -1714,8 +1714,30 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-             /* Mark cluster as used */
-             csize = (((l2_entry >> s->csize_shift) & s->csize_mask) + 1) *
-                     BDRV_SECTOR_SIZE;
-+            if (csize > s->cluster_size) {
-+                ret = fix_l2_entry_to_zero(
-+                        bs, res, fix, l2_offset, i, active,
-+                        "compressed cluster larger than cluster: size 0x%"
-+                        PRIx64, csize);
-+                if (ret < 0) {
-+                    goto fail;
-+                }
-+                continue;
-+            }
-+
-             coffset = l2_entry & s->cluster_offset_mask &
-                       ~(BDRV_SECTOR_SIZE - 1);
-+            if (coffset >= bdrv_getlength(bs->file->bs)) {
-+                ret = fix_l2_entry_to_zero(
-+                        bs, res, fix, l2_offset, i, active,
-+                        "compressed cluster out of file: offset 0x%" PRIx64,
-+                        coffset);
-+                if (ret < 0) {
-+                    goto fail;
-+                }
-+                continue;
-+            }
-+
-             ret = qcow2_inc_refcounts_imrt(bs, res,
-                                            refcount_table, refcount_table_size,
-                                            coffset, csize);
-@@ -1742,6 +1764,16 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-         {
-             uint64_t offset = l2_entry & L2E_OFFSET_MASK;
+@@ -1816,7 +1816,7 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+     for (i = 0; i < s->l1_size; i++) {
+         uint64_t l1_entry = s->l1_table[i];
+         uint64_t l2_offset = l1_entry & L1E_OFFSET_MASK;
+-        bool l2_dirty = false;
++        int l2_fixed_entries = 0;
  
-+            if (offset >= bdrv_getlength(bs->file->bs)) {
-+                ret = fix_l2_entry_to_zero(
-+                        bs, res, fix, l2_offset, i, active,
-+                        "cluster out of file: offset 0x%" PRIx64, offset);
-+                if (ret < 0) {
-+                    goto fail;
-+                }
-+                continue;
-+            }
-+
-             if (flags & CHECK_FRAG_INFO) {
-                 res->bfi.allocated_clusters++;
-                 if (next_contiguous_offset &&
+         if (!l2_offset) {
+             continue;
+@@ -1878,8 +1878,7 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+                         l2_table[j] = cpu_to_be64(refcount == 1
+                                     ? l2_entry |  QCOW_OFLAG_COPIED
+                                     : l2_entry & ~QCOW_OFLAG_COPIED);
+-                        l2_dirty = true;
+-                        res->corruptions_fixed++;
++                        l2_fixed_entries++;
+                     } else {
+                         res->corruptions++;
+                     }
+@@ -1887,7 +1886,7 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+             }
+         }
+ 
+-        if (l2_dirty) {
++        if (l2_fixed_entries > 0) {
+             ret = qcow2_pre_write_overlap_check(bs, QCOW2_OL_ACTIVE_L2,
+                                                 l2_offset, s->cluster_size);
+             if (ret < 0) {
+@@ -1905,6 +1904,7 @@ static int check_oflag_copied(BlockDriverState *bs, BdrvCheckResult *res,
+                 res->check_errors++;
+                 goto fail;
+             }
++            res->corruptions_fixed += l2_fixed_entries;
+         }
+     }
+ 
 -- 
 2.11.1
