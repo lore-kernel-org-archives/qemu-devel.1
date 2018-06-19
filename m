@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57334)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fVISX-0002U1-A7
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:22:20 -0400
+	(envelope-from <jingqi.liu@intel.com>) id 1fVISa-0002Vb-NQ
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:22:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fVIST-0004J9-0B
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:22:17 -0400
+	(envelope-from <jingqi.liu@intel.com>) id 1fVISZ-0004Nh-Em
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:22:20 -0400
 Received: from mga17.intel.com ([192.55.52.151]:5803)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
-	id 1fVISS-0004IO-Je
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:22:12 -0400
+	id 1fVISZ-0004IO-3Y
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:22:19 -0400
 From: Liu Jingqi <jingqi.liu@intel.com>
-Date: Tue, 19 Jun 2018 23:20:52 +0800
-Message-Id: <1529421657-14969-2-git-send-email-jingqi.liu@intel.com>
+Date: Tue, 19 Jun 2018 23:20:56 +0800
+Message-Id: <1529421657-14969-6-git-send-email-jingqi.liu@intel.com>
 In-Reply-To: <1529421657-14969-1-git-send-email-jingqi.liu@intel.com>
 References: <1529421657-14969-1-git-send-email-jingqi.liu@intel.com>
-Subject: [Qemu-devel] [PATCH V1 RESEND 1/6] hmat acpi: Build Memory
- Subsystem Address Range Structure(s) in ACPI HMAT
+Subject: [Qemu-devel] [PATCH V1 RESEND 5/6] numa: Extend the command-line to
+ provide memory side cache information
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,512 +28,205 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: imammedo@redhat.com, ehabkost@redhat.com, eblake@redhat.com, pbonzini@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, rth@twiddle.net, armbru@redhat.com
 Cc: qemu-devel@nongnu.org, Liu Jingqi <jingqi.liu@intel.com>
 
-HMAT is defined in ACPI 6.2: 5.2.27 Heterogeneous Memory Attribute Table (HMAT).
-The specification references below link:
-http://www.uefi.org/sites/default/files/resources/ACPI_6_2.pdf
-
-It describes the memory attributes, such as memory side cache
-attributes and bandwidth and latency details, related to the
-System Physical Address (SPA) Memory Ranges. The software is
-expected to use this information as hint for optimization.
-
-This structure describes the System Physical Address(SPA) range
-occupied by memory subsystem and its associativity with processor
-proximity domain as well as hint for memory usage.
+Add -numa hmat-cache option to provide Memory Side Cache Information.
+These memory attributes help to build Memory Side Cache Information
+Structure(s) in ACPI Heterogeneous Memory Attribute Table (HMAT).
 
 Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
 ---
- default-configs/x86_64-softmmu.mak |   1 +
- hw/acpi/Makefile.objs              |   1 +
- hw/acpi/hmat.c                     | 139 +++++++++++++++++++++++++++++++++++++
- hw/acpi/hmat.h                     |  73 +++++++++++++++++++
- hw/i386/acpi-build.c               | 120 ++++++++++++++++++++------------
- hw/i386/acpi-build.h               |  10 +++
- include/sysemu/numa.h              |   2 +
- numa.c                             |   6 ++
- 8 files changed, 307 insertions(+), 45 deletions(-)
- create mode 100644 hw/acpi/hmat.c
- create mode 100644 hw/acpi/hmat.h
+ numa.c         | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/misc.json | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 142 insertions(+), 2 deletions(-)
 
-diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-index 0390b43..3b4a37d 100644
---- a/default-configs/x86_64-softmmu.mak
-+++ b/default-configs/x86_64-softmmu.mak
-@@ -66,3 +66,4 @@ CONFIG_I2C=y
- CONFIG_SEV=$(CONFIG_KVM)
- CONFIG_VTD=y
- CONFIG_AMD_IOMMU=y
-+CONFIG_ACPI_HMAT=y
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 11c35bc..21889fd 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
- common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
- common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
- common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
-+common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
- common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
- 
- common-obj-y += acpi_interface.o
-diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-new file mode 100644
-index 0000000..d4e586d
---- /dev/null
-+++ b/hw/acpi/hmat.c
-@@ -0,0 +1,139 @@
-+/*
-+ * HMAT ACPI Implementation
-+ *
-+ * Copyright(C) 2018 Intel Corporation.
-+ *
-+ * Author:
-+ *  Liu jingqi <jingqi.liu@linux.intel.com>
-+ *
-+ * HMAT is defined in ACPI 6.2.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#include "unistd.h"
-+#include "fcntl.h"
-+#include "qemu/osdep.h"
-+#include "sysemu/numa.h"
-+#include "hw/i386/pc.h"
-+#include "hw/i386/acpi-build.h"
-+#include "hw/acpi/acpi.h"
-+#include "hw/acpi/hmat.h"
-+#include "hw/acpi/aml-build.h"
-+#include "hw/nvram/fw_cfg.h"
-+#include "hw/acpi/bios-linker-loader.h"
-+
-+/* Build Memory Subsystem Address Range Structure */
-+static void hmat_build_spa_info(GArray *table_data,
-+                                uint64_t base, uint64_t length, int node)
-+{
-+    uint16_t flags = 0;
-+
-+    if (numa_info[node].is_initiator) {
-+        flags |= HMAT_SPA_PROC_VALID;
-+    }
-+    if (numa_info[node].is_target) {
-+        flags |= HMAT_SPA_MEM_VALID;
-+    }
-+
-+    /* Type */
-+    build_append_int_noprefix(table_data, ACPI_HMAT_SPA, sizeof(uint16_t));
-+    /* Reserved0 */
-+    build_append_int_noprefix(table_data, 0, sizeof(uint16_t));
-+    /* Length */
-+    build_append_int_noprefix(table_data, sizeof(AcpiHmatSpaRange),
-+                              sizeof(uint32_t));
-+    /* Flags */
-+    build_append_int_noprefix(table_data, flags, sizeof(uint16_t));
-+    /* Reserved1 */
-+    build_append_int_noprefix(table_data, 0, sizeof(uint16_t));
-+    /* Process Proximity Domain */
-+    build_append_int_noprefix(table_data, node, sizeof(uint32_t));
-+    /* Memory Proximity Domain */
-+    build_append_int_noprefix(table_data, node, sizeof(uint32_t));
-+    /* Reserved2 */
-+    build_append_int_noprefix(table_data, 0, sizeof(uint32_t));
-+    /* System Physical Address Range Base */
-+    build_append_int_noprefix(table_data, base, sizeof(uint64_t));
-+    /* System Physical Address Range Length */
-+    build_append_int_noprefix(table_data, length, sizeof(uint64_t));
-+}
-+
-+static int pc_dimm_device_list(Object *obj, void *opaque)
-+{
-+    GSList **list = opaque;
-+
-+    if (object_dynamic_cast(obj, TYPE_PC_DIMM)) {
-+        *list = g_slist_append(*list, DEVICE(obj));
-+    }
-+
-+    object_child_foreach(obj, pc_dimm_device_list, opaque);
-+    return 0;
-+}
-+
-+/*
-+ * The Proximity Domain of System Physical Address ranges defined
-+ * in the HMAT, NFIT and SRAT tables shall match each other.
-+ */
-+static void hmat_build_spa(GArray *table_data, PCMachineState *pcms)
-+{
-+    GSList *device_list = NULL;
-+    uint64_t mem_base, mem_len;
-+    int i;
-+
-+    if (pcms->numa_nodes && !mem_ranges_number) {
-+        build_mem_ranges(pcms);
-+    }
-+
-+    for (i = 0; i < mem_ranges_number; i++) {
-+        hmat_build_spa_info(table_data, mem_ranges[i].base,
-+                            mem_ranges[i].length, mem_ranges[i].node);
-+    }
-+
-+    /* Build HMAT SPA structures for PC-DIMM devices. */
-+    object_child_foreach(qdev_get_machine(), pc_dimm_device_list, &device_list);
-+
-+    for (; device_list; device_list = device_list->next) {
-+        PCDIMMDevice *dimm = device_list->data;
-+        mem_base = object_property_get_uint(OBJECT(dimm), PC_DIMM_ADDR_PROP,
-+                                            NULL);
-+        mem_len = object_property_get_uint(OBJECT(dimm), PC_DIMM_SIZE_PROP,
-+                                           NULL);
-+        i = object_property_get_uint(OBJECT(dimm), PC_DIMM_NODE_PROP, NULL);
-+        hmat_build_spa_info(table_data, mem_base, mem_len, i);
-+    }
-+}
-+
-+static void hmat_build_hma(GArray *hma, PCMachineState *pcms)
-+{
-+    /* Build HMAT Memory Subsystem Address Range. */
-+    hmat_build_spa(hma, pcms);
-+}
-+
-+void hmat_build_acpi(GArray *table_data, BIOSLinker *linker,
-+                     MachineState *machine)
-+{
-+    PCMachineState *pcms = PC_MACHINE(machine);
-+    uint64_t hmat_start, hmat_len;
-+
-+    hmat_start = table_data->len;
-+    acpi_data_push(table_data, sizeof(AcpiHmat));
-+
-+    hmat_build_hma(table_data, pcms);
-+    hmat_len = table_data->len - hmat_start;
-+
-+    build_header(linker, table_data,
-+                 (void *)(table_data->data + hmat_start),
-+                 "HMAT", hmat_len, 1, NULL, NULL);
-+}
-diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-new file mode 100644
-index 0000000..096415d
---- /dev/null
-+++ b/hw/acpi/hmat.h
-@@ -0,0 +1,73 @@
-+/*
-+ * HMAT ACPI Implementation Header
-+ *
-+ * Copyright(C) 2018 Intel Corporation.
-+ *
-+ * Author:
-+ *  Liu jingqi <jingqi.liu@linux.intel.com>
-+ *
-+ * HMAT is defined in ACPI 6.2.
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#ifndef HMAT_H
-+#define HMAT_H
-+
-+#include "qemu/osdep.h"
-+#include "hw/acpi/acpi-defs.h"
-+#include "hw/acpi/acpi.h"
-+#include "hw/acpi/bios-linker-loader.h"
-+#include "hw/acpi/aml-build.h"
-+
-+#define ACPI_HMAT_SPA               0
-+
-+/* ACPI HMAT sub-structure header */
-+#define ACPI_HMAT_SUB_HEADER_DEF    \
-+    uint16_t  type;                 \
-+    uint16_t  reserved0;            \
-+    uint32_t  length;
-+
-+/* the values of AcpiHmatSpaRange flag */
-+enum {
-+    HMAT_SPA_PROC_VALID = 0x1,
-+    HMAT_SPA_MEM_VALID  = 0x2,
-+    HMAT_SPA_RESERVATION_HINT = 0x4,
-+};
-+
-+/*
-+ * HMAT (Heterogeneous Memory Attributes Table)
-+ */
-+struct AcpiHmat {
-+    ACPI_TABLE_HEADER_DEF
-+    uint32_t    reserved;
-+} QEMU_PACKED;
-+typedef struct AcpiHmat AcpiHmat;
-+
-+struct AcpiHmatSpaRange {
-+    ACPI_HMAT_SUB_HEADER_DEF
-+    uint16_t    flags;
-+    uint16_t    reserved1;
-+    uint32_t    proc_proximity;
-+    uint32_t    mem_proximity;
-+    uint32_t    reserved2;
-+    uint64_t    spa_base;
-+    uint64_t    spa_length;
-+} QEMU_PACKED;
-+typedef struct AcpiHmatSpaRange AcpiHmatSpaRange;
-+
-+void hmat_build_acpi(GArray *table_data, BIOSLinker *linker,
-+                     MachineState *machine);
-+
-+#endif
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 9bc6d97..4cc9cc8 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -64,6 +64,7 @@
- #include "hw/i386/intel_iommu.h"
- 
- #include "hw/acpi/ipmi.h"
-+#include "hw/acpi/hmat.h"
- 
- /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
-  * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
-@@ -119,6 +120,14 @@ typedef struct AcpiBuildPciBusHotplugState {
-     bool pcihp_bridge_en;
- } AcpiBuildPciBusHotplugState;
- 
-+/* The memory contains at least one hole
-+ * from 640k-1M and possibly another one from 3.5G-4G.
-+ * So far, the number of memory ranges is up to 2
-+ * more than the number of numa nodes.
-+ */
-+MemoryRange mem_ranges[MAX_NODES + 2];
-+uint32_t mem_ranges_number;
-+
- static void init_common_fadt_data(Object *o, AcpiFadtData *data)
- {
-     uint32_t io = object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE, NULL);
-@@ -2300,6 +2309,63 @@ static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
-     qapi_free_MemoryDeviceInfoList(info_list);
- }
- 
-+void build_mem_ranges(PCMachineState *pcms)
-+{
-+    uint64_t mem_len, mem_base, next_base;
-+    int i;
-+
-+    /* the memory map is a bit tricky, it contains at least one hole
-+     * from 640k-1M and possibly another one from 3.5G-4G.
-+     */
-+    mem_ranges_number = 0;
-+    next_base = 0;
-+
-+    for (i = 0; i < pcms->numa_nodes; ++i) {
-+        mem_base = next_base;
-+        mem_len = pcms->node_mem[i];
-+        next_base = mem_base + mem_len;
-+
-+        /* Cut out the 640K hole */
-+        if (mem_base <= HOLE_640K_START &&
-+            next_base > HOLE_640K_START) {
-+            mem_len -= next_base - HOLE_640K_START;
-+            if (mem_len > 0) {
-+                mem_ranges[mem_ranges_number].base = mem_base;
-+                mem_ranges[mem_ranges_number].length = mem_len;
-+                mem_ranges[mem_ranges_number].node = i;
-+                mem_ranges_number++;
-+            }
-+
-+            /* Check for the rare case: 640K < RAM < 1M */
-+            if (next_base <= HOLE_640K_END) {
-+                next_base = HOLE_640K_END;
-+                continue;
-+            }
-+            mem_base = HOLE_640K_END;
-+            mem_len = next_base - HOLE_640K_END;
-+        }
-+
-+        /* Cut out the ACPI_PCI hole */
-+        if (mem_base <= pcms->below_4g_mem_size &&
-+            next_base > pcms->below_4g_mem_size) {
-+            mem_len -= next_base - pcms->below_4g_mem_size;
-+            if (mem_len > 0) {
-+                mem_ranges[mem_ranges_number].base = mem_base;
-+                mem_ranges[mem_ranges_number].length = mem_len;
-+                mem_ranges[mem_ranges_number].node = i;
-+                mem_ranges_number++;
-+            }
-+            mem_base = 1ULL << 32;
-+            mem_len = next_base - pcms->below_4g_mem_size;
-+            next_base = mem_base + mem_len;
-+        }
-+        mem_ranges[mem_ranges_number].base = mem_base;
-+        mem_ranges[mem_ranges_number].length = mem_len;
-+        mem_ranges[mem_ranges_number].node = i;
-+        mem_ranges_number++;
-+    }
-+}
-+
- static void
- build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
- {
-@@ -2308,7 +2374,6 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
- 
-     int i;
-     int srat_start, numa_start, slots;
--    uint64_t mem_len, mem_base, next_base;
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     const CPUArchIdList *apic_ids = mc->possible_cpu_arch_ids(machine);
-     PCMachineState *pcms = PC_MACHINE(machine);
-@@ -2348,54 +2413,17 @@ build_srat(GArray *table_data, BIOSLinker *linker, MachineState *machine)
-         }
-     }
- 
-+    if (pcms->numa_nodes && !mem_ranges_number) {
-+        build_mem_ranges(pcms);
-+    }
- 
--    /* the memory map is a bit tricky, it contains at least one hole
--     * from 640k-1M and possibly another one from 3.5G-4G.
--     */
--    next_base = 0;
-     numa_start = table_data->len;
--
--    for (i = 1; i < pcms->numa_nodes + 1; ++i) {
--        mem_base = next_base;
--        mem_len = pcms->node_mem[i - 1];
--        next_base = mem_base + mem_len;
--
--        /* Cut out the 640K hole */
--        if (mem_base <= HOLE_640K_START &&
--            next_base > HOLE_640K_START) {
--            mem_len -= next_base - HOLE_640K_START;
--            if (mem_len > 0) {
--                numamem = acpi_data_push(table_data, sizeof *numamem);
--                build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                                  MEM_AFFINITY_ENABLED);
--            }
--
--            /* Check for the rare case: 640K < RAM < 1M */
--            if (next_base <= HOLE_640K_END) {
--                next_base = HOLE_640K_END;
--                continue;
--            }
--            mem_base = HOLE_640K_END;
--            mem_len = next_base - HOLE_640K_END;
--        }
--
--        /* Cut out the ACPI_PCI hole */
--        if (mem_base <= pcms->below_4g_mem_size &&
--            next_base > pcms->below_4g_mem_size) {
--            mem_len -= next_base - pcms->below_4g_mem_size;
--            if (mem_len > 0) {
--                numamem = acpi_data_push(table_data, sizeof *numamem);
--                build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                                  MEM_AFFINITY_ENABLED);
--            }
--            mem_base = 1ULL << 32;
--            mem_len = next_base - pcms->below_4g_mem_size;
--            next_base = mem_base + mem_len;
--        }
-+    for (i = 0; i < mem_ranges_number; i++) {
-         numamem = acpi_data_push(table_data, sizeof *numamem);
--        build_srat_memory(numamem, mem_base, mem_len, i - 1,
--                          MEM_AFFINITY_ENABLED);
-+        build_srat_memory(numamem, mem_ranges[i].base, mem_ranges[i].length,
-+                          mem_ranges[i].node, MEM_AFFINITY_ENABLED);
-     }
-+
-     slots = (table_data->len - numa_start) / sizeof *numamem;
-     for (; slots < pcms->numa_nodes + 2; slots++) {
-         numamem = acpi_data_push(table_data, sizeof *numamem);
-@@ -2713,6 +2741,8 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-             acpi_add_table(table_offsets, tables_blob);
-             build_slit(tables_blob, tables->linker);
-         }
-+        acpi_add_table(table_offsets, tables_blob);
-+        hmat_build_acpi(tables_blob, tables->linker, machine);
-     }
-     if (acpi_get_mcfg(&mcfg)) {
-         acpi_add_table(table_offsets, tables_blob);
-diff --git a/hw/i386/acpi-build.h b/hw/i386/acpi-build.h
-index 007332e..f17de6a 100644
---- a/hw/i386/acpi-build.h
-+++ b/hw/i386/acpi-build.h
-@@ -2,6 +2,16 @@
- #ifndef HW_I386_ACPI_BUILD_H
- #define HW_I386_ACPI_BUILD_H
- 
-+typedef struct memory_range {
-+    uint64_t base;
-+    uint64_t length;
-+    uint32_t node;
-+} MemoryRange;
-+
-+extern MemoryRange mem_ranges[];
-+extern uint32_t mem_ranges_number;
-+
-+void build_mem_ranges(PCMachineState *pcms);
- void acpi_setup(void);
- 
- #endif
-diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
-index 7a0ae75..09a5225 100644
---- a/include/sysemu/numa.h
-+++ b/include/sysemu/numa.h
-@@ -13,6 +13,8 @@ struct node_info {
-     uint64_t node_mem;
-     struct HostMemoryBackend *node_memdev;
-     bool present;
-+    bool is_initiator;
-+    bool is_target;
-     uint8_t distance[MAX_NODES];
- };
- 
 diff --git a/numa.c b/numa.c
-index 33572bf..7098515 100644
+index d475ef2..6c7b865 100644
 --- a/numa.c
 +++ b/numa.c
-@@ -100,6 +100,10 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-         machine_set_cpu_numa_node(ms, &props, &error_fatal);
+@@ -293,6 +293,72 @@ static void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
      }
+ }
  
-+    if (node->cpus) {
-+        numa_info[nodenr].is_initiator = true;
++static void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
++                            Error **errp)
++{
++    struct numa_hmat_cache_info *hmat_cache;
++
++    if (node->node_id >= nb_numa_nodes) {
++        error_setg(errp, "Invalid node-id=%" PRIu32
++                   ", it should be less than %d.",
++                   node->node_id, nb_numa_nodes);
++        return;
++    }
++    if (!numa_info[node->node_id].is_target) {
++        error_setg(errp, "Invalid node-id=%" PRIu32
++                   ", it isn't a target proximity domain.",
++                   node->node_id);
++        return;
 +    }
 +
-     if (node->has_mem && node->has_memdev) {
-         error_setg(errp, "cannot specify both mem= and memdev=");
-         return;
-@@ -116,6 +120,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
++    if (node->total > MAX_HMAT_CACHE_LEVEL) {
++        error_setg(errp, "Invalid total=%" PRIu8
++                   ", it should be less than or equal to %d.",
++                   node->total, MAX_HMAT_CACHE_LEVEL);
++        return;
++    }
++    if (node->level > node->total) {
++        error_setg(errp, "Invalid level=%" PRIu8
++                   ", it should be less than or equal to"
++                   " total=%" PRIu8 ".",
++                   node->level, node->total);
++        return;
++    }
++    if (hmat_cache_info[node->node_id][node->level]) {
++        error_setg(errp, "Duplicate configuration of the side cache for "
++                   "node-id=%" PRIu32 " and level=%" PRIu8 ".",
++                   node->node_id, node->level);
++        return;
++    }
++
++    if ((node->level > 1) &&
++        hmat_cache_info[node->node_id][node->level - 1] &&
++        (node->size >=
++            hmat_cache_info[node->node_id][node->level - 1]->size)) {
++        error_setg(errp, "Invalid size=0x%" PRIx64
++                   ", the size of level=%" PRIu8
++                   " should be less than the size(0x%" PRIx64
++                   ") of level=%" PRIu8 ".",
++                   node->size, node->level,
++                   hmat_cache_info[node->node_id][node->level - 1]->size,
++                   node->level - 1);
++        return;
++    }
++
++    hmat_cache = g_malloc0(sizeof(*hmat_cache));
++
++    hmat_cache->mem_proximity = node->node_id;
++    hmat_cache->size = node->size;
++    hmat_cache->total_levels = node->total;
++    hmat_cache->level = node->level;
++    hmat_cache->associativity = node->assoc;
++    hmat_cache->write_policy = node->policy;
++    hmat_cache->line_size = node->line;
++    hmat_cache->num_smbios_handles = 0;
++
++    hmat_cache_info[node->node_id][node->level] = hmat_cache;
++}
++
+ static
+ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+ {
+@@ -332,6 +398,12 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+             goto end;
+         }
+         break;
++    case NUMA_OPTIONS_TYPE_HMAT_CACHE:
++        parse_numa_hmat_cache(ms, &object->u.hmat_cache, &err);
++        if (err) {
++            goto end;
++        }
++        break;
+     default:
+         abort();
+     }
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 51bf005..36bbda2 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -2738,10 +2738,12 @@
+ #
+ # @hmat-lb: memory latency and bandwidth information (Since: 2.13)
+ #
++# @hmat-cache: memory side cache information (Since: 2.13)
++#
+ # Since: 2.1
+ ##
+ { 'enum': 'NumaOptionsType',
+-  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
++  'data': [ 'node', 'dist', 'cpu', 'hmat-lb', 'hmat-cache' ] }
  
-     if (node->has_mem) {
-         numa_info[nodenr].node_mem = node->mem;
-+        numa_info[nodenr].is_target = true;
-     }
-     if (node->has_memdev) {
-         Object *o;
-@@ -128,6 +133,7 @@ static void parse_numa_node(MachineState *ms, NumaNodeOptions *node,
-         object_ref(o);
-         numa_info[nodenr].node_mem = object_property_get_uint(o, "size", NULL);
-         numa_info[nodenr].node_memdev = MEMORY_BACKEND(o);
-+        numa_info[nodenr].is_target = true;
-     }
-     numa_info[nodenr].present = true;
-     max_numa_nodeid = MAX(max_numa_nodeid, nodenr + 1);
+ ##
+ # @NumaOptions:
+@@ -2757,7 +2759,8 @@
+     'node': 'NumaNodeOptions',
+     'dist': 'NumaDistOptions',
+     'cpu': 'NumaCpuOptions',
+-    'hmat-lb': 'NumaHmatLBOptions' }}
++    'hmat-lb': 'NumaHmatLBOptions',
++    'hmat-cache': 'NumaHmatCacheOptions' }}
+ 
+ ##
+ # @NumaNodeOptions:
+@@ -2906,6 +2909,71 @@
+    '*bandwidth': 'uint16' }}
+ 
+ ##
++# @HmatCacheAssociativity:
++#
++# Cache associativity in the Memory Side Cache
++# Information Structure of HMAT
++#
++# @none: None
++#
++# @direct: Direct Mapped
++#
++# @complex: Complex Cache Indexing (implementation specific)
++#
++# Since: 2.13
++##
++{ 'enum': 'HmatCacheAssociativity',
++  'data': [ 'none', 'direct', 'complex' ] }
++
++##
++# @HmatCacheWritePolicy:
++#
++# Cache write policy in the Memory Side Cache
++# Information Structure of HMAT
++#
++# @none: None
++#
++# @write-back: Write Back (WB)
++#
++# @write-through: Write Through (WT)
++#
++# Since: 2.13
++##
++{ 'enum': 'HmatCacheWritePolicy',
++  'data': [ 'none', 'write-back', 'write-through' ] }
++
++##
++# @NumaHmatCacheOptions:
++#
++# Set the memory side cache information for a given memory domain.
++#
++# @node-id: the memory proximity domain to which the memory belongs.
++#
++# @size: the size of memory side cache in bytes.
++#
++# @total: the total cache levels for this memory proximity domain.
++#
++# @level: the cache level described in this structure.
++#
++# @assoc: the cache associativity, none/direct-mapped/complex(complex cache indexing).
++
++# @policy: the write policy, none/write-back/write-through.
++#
++# @line: the cache Line size in bytes.
++#
++# Since: 2.13
++##
++{ 'struct': 'NumaHmatCacheOptions',
++  'data': {
++   'node-id': 'uint32',
++   'size': 'size',
++   'total': 'uint8',
++   'level': 'uint8',
++   'assoc': 'HmatCacheAssociativity',
++   'policy': 'HmatCacheWritePolicy',
++   'line': 'uint16' }}
++
++##
+ # @HostMemPolicy:
+ #
+ # Host memory policy types
 -- 
 2.7.4
