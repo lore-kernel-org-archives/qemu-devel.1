@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fVFI2-0004Oq-66
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:59:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1fVFKX-00062o-VR
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:02:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fVFHy-0007U7-9q
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:59:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57610 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fVFKJ-0000OS-ND
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:01:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35850 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVFHy-0007U0-5L
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:59:10 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180618175958.29073-1-armbru@redhat.com>
-	<20180618175958.29073-3-armbru@redhat.com>
-Date: Tue, 19 Jun 2018 13:59:08 +0200
-In-Reply-To: <20180618175958.29073-3-armbru@redhat.com> (Markus Armbruster's
-	message of "Mon, 18 Jun 2018 19:59:58 +0200")
-Message-ID: <87602fvvg3.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVFKJ-0000N7-Fp
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:01:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 584EC40201BE
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 12:01:34 +0000 (UTC)
+Date: Tue, 19 Jun 2018 13:01:26 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180619120126.GQ20929@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180618161729.334-1-marcandre.lureau@redhat.com>
+	<20180618161729.334-2-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 2/2] Revert commit d4e5ec877ca
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180618161729.334-2-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 01/26] chardev: avoid crash if no
+ associated address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +36,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, tamiko@43-1.org, arfrever.fta@gmail.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 
-Markus Armbruster <armbru@redhat.com> writes:
+On Mon, Jun 18, 2018 at 06:17:04PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> A socket chardev may not have associated address (when adding client
+> fd manually for example). But on disconnect, updating socket filename
+> expects an address and may lead to this crash:
+>=20
+>   Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation faul=
+t.
+>   0x0000555555d8c70c in SocketAddress_to_str (prefix=3D0x555556043062 "=
+disconnected:", addr=3D0x0, is_listen=3Dfalse, is_telnet=3Dfalse) at /hom=
+e/elmarco/src/qq/chardev/char-socket.c:388
+>   388	    switch (addr->type) {
+>   (gdb) bt
+>   #0  0x0000555555d8c70c in SocketAddress_to_str (prefix=3D0x5555560430=
+62 "disconnected:", addr=3D0x0, is_listen=3Dfalse, is_telnet=3Dfalse) at =
+/home/elmarco/src/qq/chardev/char-socket.c:388
+>   #1  0x0000555555d8c8aa in update_disconnected_filename (s=3D0x555556b=
+1ed00) at /home/elmarco/src/qq/chardev/char-socket.c:419
+>   #2  0x0000555555d8c959 in tcp_chr_disconnect (chr=3D0x555556b1ed00) a=
+t /home/elmarco/src/qq/chardev/char-socket.c:438
+>   #3  0x0000555555d8cba1 in tcp_chr_hup (channel=3D0x555556b75690, cond=
+=3DG_IO_HUP, opaque=3D0x555556b1ed00) at /home/elmarco/src/qq/chardev/cha=
+r-socket.c:482
+>   #4  0x0000555555da596e in qio_channel_fd_source_dispatch (source=3D0x=
+555556bb68b0, callback=3D0x555555d8cb58 <tcp_chr_hup>, user_data=3D0x5555=
+56b1ed00) at /home/elmarco/src/qq/io/channel-watch.c:84
+>=20
+> Replace filename with a generic "disconnected:socket" in this case.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  chardev/char-socket.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 
-> From: Matthias Maier <tamiko@43-1.org>
->
-> This commit removes the PYTHON_UTF8 workaround. The problem with setting
->
->   LC_ALL= LANG=C LC_CTYPE=en_US.UTF-8
->
-> is that the en_US.UTF-8 locale might not be available. In this case
-> setting above locales results in build errors even though another UTF-8
-> locale was originally set [1]. The only stable way of fixing the
-> encoding problem is by explicitly annotating encoding/decoding in the
-> python script.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-I'd like to tweak the last sentence to
 
-    The only stable way of fixing the encoding problem is by specifying
-    the encoding in Python, like the previous commit does.
 
-if there are no objections.
-
->
-> [1] https://bugs.gentoo.org/657766
->
-> Signed-off-by: Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
-> Signed-off-by: Matthias Maier <tamiko@43-1.org>
-> Message-Id: <20180615220205.6929-3-tamiko@43-1.org>
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
