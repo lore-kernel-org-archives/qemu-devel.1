@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fVLgZ-0008Jy-VQ
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:49:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1fVLhX-0000vm-W4
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:50:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fVLgZ-00018m-1X
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:49:00 -0400
-Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:41344)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fVLgY-00017N-Oa
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:48:58 -0400
-Received: by mail-lf0-x243.google.com with SMTP id d24-v6so1044724lfa.8
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 11:48:58 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fVLhX-00027s-3K
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:50:00 -0400
+References: <20180426025129.621969-1-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5e00e94d-bd70-0c53-d0ed-33aa066e6cf3@redhat.com>
+Date: Tue, 19 Jun 2018 13:49:54 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180619120730.32586-1-peter.maydell@linaro.org>
-References: <20180619120730.32586-1-peter.maydell@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 19 Jun 2018 11:48:25 -0700
-Message-ID: <CAKmqyKNQ0Ce0CHxmtkhsHY1py2Y7mSrugVd3txtwQfYwH7P64w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/pci-host/xilinx-pcie: don't make "io"
- region be RAM
+In-Reply-To: <20180426025129.621969-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 0/6] minor qcow2 compression improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Paul Burton <paul.burton@mips.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>, Patch Tracking <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Tue, Jun 19, 2018 at 5:07 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Currently we use memory_region_init_rom_nomigrate() to create
-> the "io" memory region to pass to pci_register_root_bus().
-> This is a dummy region, because this PCI controller doesn't
-> support accesses to PCI IO space.
->
-> There is no reason for the dummy region to be a RAM region;
-> it is only used as a place where PCI BARs can be mapped,
-> and if you could get a PCI card to do a bus master access
-> to the IO space it should not get acts-like-RAM behaviour.
-> Use a simple container memory region instead. (We do have
-> one PCI card model which can do bus master accesses to IO
-> space -- the LSI53C895A SCSI adaptor.)
->
-> This avoids the oddity of having a memory region which is
-> RAM but where the RAM is not migrated.
->
-> Note that the size of the region we use here has no
-> effect on behaviour.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+ping
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+On 04/25/2018 09:51 PM, Eric Blake wrote:
+> Even though v5 was posted earlier today, it was worth a respin:
+> - 2/6: add R-b [Berto]
+> - 4/6, 6/6: improve commit messages [Max]
+> - 5/6: new patch, with an iotests proving that 4/6 is a bug fix [Max]
+> 
+> The new test is rather slow (nearly 90 seconds for me using
+> tmpfs) unless it skips entirely (such as testing on ext4); ideas
+> for speeding it up are welcome (translation: maybe qemu should
+> optimize the search for the next available cluster to allocate,
+> and/or qemu-img check should be faster at reporting leaked
+> clusters)
+> 
+> 001/6:[----] [--] 'qcow2: Prefer byte-based calls into bs->file'
+> 002/6:[----] [--] 'qcow2: Document some maximum size constraints'
+> 003/6:[----] [--] 'qcow2: Reduce REFT_OFFSET_MASK'
+> 004/6:[----] [--] 'qcow2: Don't allow overflow during cluster allocation'
+> 005/6:[down] 'iotests: Add new test 214 for max compressed cluster offset'
+> 006/6:[----] [--] 'qcow2: Avoid memory over-allocation on compressed images'
+> 
+> Eric Blake (6):
+>    qcow2: Prefer byte-based calls into bs->file
+>    qcow2: Document some maximum size constraints
+>    qcow2: Reduce REFT_OFFSET_MASK
+>    qcow2: Don't allow overflow during cluster allocation
+>    iotests: Add new test 214 for max compressed cluster offset
+>    qcow2: Avoid memory over-allocation on compressed images
+> 
+>   docs/interop/qcow2.txt     | 40 +++++++++++++++++--
+>   block/qcow2.h              |  8 +++-
+>   block/qcow2-cluster.c      | 32 +++++++++------
+>   block/qcow2-refcount.c     | 27 ++++++++-----
+>   block/qcow2.c              |  2 +-
+>   tests/qemu-iotests/214     | 97 ++++++++++++++++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/214.out | 54 ++++++++++++++++++++++++++
+>   tests/qemu-iotests/group   |  1 +
+>   8 files changed, 234 insertions(+), 27 deletions(-)
+>   create mode 100755 tests/qemu-iotests/214
+>   create mode 100644 tests/qemu-iotests/214.out
+> 
 
-Alistair
-
-> ---
->  hw/pci-host/xilinx-pcie.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
-> index 044e312dc18..b0a31b917d8 100644
-> --- a/hw/pci-host/xilinx-pcie.c
-> +++ b/hw/pci-host/xilinx-pcie.c
-> @@ -120,9 +120,8 @@ static void xilinx_pcie_host_realize(DeviceState *dev, Error **errp)
->      memory_region_init(&s->mmio, OBJECT(s), "mmio", UINT64_MAX);
->      memory_region_set_enabled(&s->mmio, false);
->
-> -    /* dummy I/O region */
-> -    memory_region_init_ram_nomigrate(&s->io, OBJECT(s), "io", 16, NULL);
-> -    memory_region_set_enabled(&s->io, false);
-> +    /* dummy PCI I/O region (not visible to the CPU) */
-> +    memory_region_init(&s->io, OBJECT(s), "io", 16);
->
->      /* interrupt out */
->      qdev_init_gpio_out_named(dev, &s->irq, "interrupt_out", 1);
-> --
-> 2.17.1
->
->
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
