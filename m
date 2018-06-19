@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fVISa-0002Vb-NQ
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:22:22 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fVISZ-0004Nh-Em
+	(envelope-from <jingqi.liu@intel.com>) id 1fVISZ-0002Uc-64
 	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:22:20 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <jingqi.liu@intel.com>) id 1fVISU-0004KD-9v
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:22:19 -0400
 Received: from mga17.intel.com ([192.55.52.151]:5803)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
-	id 1fVISZ-0004IO-3Y
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:22:19 -0400
+	id 1fVIST-0004IO-UN
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:22:14 -0400
 From: Liu Jingqi <jingqi.liu@intel.com>
-Date: Tue, 19 Jun 2018 23:20:56 +0800
-Message-Id: <1529421657-14969-6-git-send-email-jingqi.liu@intel.com>
+Date: Tue, 19 Jun 2018 23:20:53 +0800
+Message-Id: <1529421657-14969-3-git-send-email-jingqi.liu@intel.com>
 In-Reply-To: <1529421657-14969-1-git-send-email-jingqi.liu@intel.com>
 References: <1529421657-14969-1-git-send-email-jingqi.liu@intel.com>
-Subject: [Qemu-devel] [PATCH V1 RESEND 5/6] numa: Extend the command-line to
- provide memory side cache information
+Subject: [Qemu-devel] [PATCH V1 RESEND 2/6] hmat acpi: Build System Locality
+ Latency and Bandwidth Information Structure(s) in ACPI HMAT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,205 +28,238 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: imammedo@redhat.com, ehabkost@redhat.com, eblake@redhat.com, pbonzini@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com, rth@twiddle.net, armbru@redhat.com
 Cc: qemu-devel@nongnu.org, Liu Jingqi <jingqi.liu@intel.com>
 
-Add -numa hmat-cache option to provide Memory Side Cache Information.
-These memory attributes help to build Memory Side Cache Information
-Structure(s) in ACPI Heterogeneous Memory Attribute Table (HMAT).
+This structure describes the memory access latency and bandwidth
+information from various memory access initiator proximity domains.
+The latency and bandwidth numbers represented in this structure
+correspond to rated latency and bandwidth for the platform.
+The software could use this information as hint for optimization.
 
 Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
 ---
- numa.c         | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- qapi/misc.json | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 142 insertions(+), 2 deletions(-)
+ hw/acpi/hmat.c | 98 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ hw/acpi/hmat.h | 76 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 174 insertions(+)
 
-diff --git a/numa.c b/numa.c
-index d475ef2..6c7b865 100644
---- a/numa.c
-+++ b/numa.c
-@@ -293,6 +293,72 @@ static void parse_numa_hmat_lb(MachineState *ms, NumaHmatLBOptions *node,
+diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+index d4e586d..214f150 100644
+--- a/hw/acpi/hmat.c
++++ b/hw/acpi/hmat.c
+@@ -34,6 +34,11 @@
+ #include "hw/nvram/fw_cfg.h"
+ #include "hw/acpi/bios-linker-loader.h"
+ 
++struct numa_hmat_lb_info *hmat_lb_info[HMAT_LB_LEVELS][HMAT_LB_TYPES] = {0};
++
++static uint32_t initiator_pxm[MAX_NODES], target_pxm[MAX_NODES];
++static uint32_t num_initiator, num_target;
++
+ /* Build Memory Subsystem Address Range Structure */
+ static void hmat_build_spa_info(GArray *table_data,
+                                 uint64_t base, uint64_t length, int node)
+@@ -115,10 +120,103 @@ static void hmat_build_spa(GArray *table_data, PCMachineState *pcms)
      }
  }
  
-+static void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
-+                            Error **errp)
++static void classify_proximity_domains(void)
 +{
-+    struct numa_hmat_cache_info *hmat_cache;
++    int node;
 +
-+    if (node->node_id >= nb_numa_nodes) {
-+        error_setg(errp, "Invalid node-id=%" PRIu32
-+                   ", it should be less than %d.",
-+                   node->node_id, nb_numa_nodes);
-+        return;
++    for (node = 0; node < nb_numa_nodes; node++) {
++        if (numa_info[node].is_initiator) {
++            initiator_pxm[num_initiator++] = node;
++        }
++        if (numa_info[node].is_target) {
++            target_pxm[num_target++] = node;
++        }
 +    }
-+    if (!numa_info[node->node_id].is_target) {
-+        error_setg(errp, "Invalid node-id=%" PRIu32
-+                   ", it isn't a target proximity domain.",
-+                   node->node_id);
-+        return;
-+    }
-+
-+    if (node->total > MAX_HMAT_CACHE_LEVEL) {
-+        error_setg(errp, "Invalid total=%" PRIu8
-+                   ", it should be less than or equal to %d.",
-+                   node->total, MAX_HMAT_CACHE_LEVEL);
-+        return;
-+    }
-+    if (node->level > node->total) {
-+        error_setg(errp, "Invalid level=%" PRIu8
-+                   ", it should be less than or equal to"
-+                   " total=%" PRIu8 ".",
-+                   node->level, node->total);
-+        return;
-+    }
-+    if (hmat_cache_info[node->node_id][node->level]) {
-+        error_setg(errp, "Duplicate configuration of the side cache for "
-+                   "node-id=%" PRIu32 " and level=%" PRIu8 ".",
-+                   node->node_id, node->level);
-+        return;
-+    }
-+
-+    if ((node->level > 1) &&
-+        hmat_cache_info[node->node_id][node->level - 1] &&
-+        (node->size >=
-+            hmat_cache_info[node->node_id][node->level - 1]->size)) {
-+        error_setg(errp, "Invalid size=0x%" PRIx64
-+                   ", the size of level=%" PRIu8
-+                   " should be less than the size(0x%" PRIx64
-+                   ") of level=%" PRIu8 ".",
-+                   node->size, node->level,
-+                   hmat_cache_info[node->node_id][node->level - 1]->size,
-+                   node->level - 1);
-+        return;
-+    }
-+
-+    hmat_cache = g_malloc0(sizeof(*hmat_cache));
-+
-+    hmat_cache->mem_proximity = node->node_id;
-+    hmat_cache->size = node->size;
-+    hmat_cache->total_levels = node->total;
-+    hmat_cache->level = node->level;
-+    hmat_cache->associativity = node->assoc;
-+    hmat_cache->write_policy = node->policy;
-+    hmat_cache->line_size = node->line;
-+    hmat_cache->num_smbios_handles = 0;
-+
-+    hmat_cache_info[node->node_id][node->level] = hmat_cache;
 +}
 +
- static
- void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
- {
-@@ -332,6 +398,12 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
-             goto end;
-         }
-         break;
-+    case NUMA_OPTIONS_TYPE_HMAT_CACHE:
-+        parse_numa_hmat_cache(ms, &object->u.hmat_cache, &err);
-+        if (err) {
-+            goto end;
++static void hmat_build_lb(GArray *table_data)
++{
++    AcpiHmatLBInfo *hmat_lb;
++    struct numa_hmat_lb_info *numa_hmat_lb;
++    int i, j, hrchy, type;
++
++    if (!num_initiator && !num_target) {
++        classify_proximity_domains();
++    }
++
++    for (hrchy = HMAT_LB_MEM_MEMORY;
++         hrchy <= HMAT_LB_MEM_CACHE_3RD_LEVEL; hrchy++) {
++        for (type = HMAT_LB_DATA_ACCESS_LATENCY;
++             type <= HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
++            numa_hmat_lb = hmat_lb_info[hrchy][type];
++
++            if (numa_hmat_lb) {
++                uint64_t start;
++                uint32_t *list_entry;
++                uint16_t *entry, *entry_start;
++                uint32_t size;
++                uint8_t m, n;
++
++                start = table_data->len;
++                hmat_lb = acpi_data_push(table_data, sizeof(*hmat_lb));
++
++                hmat_lb->type          = cpu_to_le16(ACPI_HMAT_LB_INFO);
++                hmat_lb->flags         = numa_hmat_lb->hierarchy;
++                hmat_lb->data_type     = numa_hmat_lb->data_type;
++                hmat_lb->num_initiator = cpu_to_le32(num_initiator);
++                hmat_lb->num_target    = cpu_to_le32(num_target);
++
++                if (type <= HMAT_LB_DATA_WRITE_LATENCY) {
++                    hmat_lb->base_unit = cpu_to_le32(numa_hmat_lb->base_lat);
++                } else {
++                    hmat_lb->base_unit = cpu_to_le32(numa_hmat_lb->base_bw);
++                }
++                if (!hmat_lb->base_unit) {
++                    hmat_lb->base_unit = cpu_to_le32(1);
++                }
++
++                /* the initiator proximity domain list */
++                for (i = 0; i < num_initiator; i++) {
++                    list_entry = acpi_data_push(table_data, sizeof(uint32_t));
++                    *list_entry = cpu_to_le32(initiator_pxm[i]);
++                }
++
++                /* the target proximity domain list */
++                for (i = 0; i < num_target; i++) {
++                    list_entry = acpi_data_push(table_data, sizeof(uint32_t));
++                    *list_entry = cpu_to_le32(target_pxm[i]);
++                }
++
++                /* latency or bandwidth entries */
++                size = sizeof(uint16_t) * num_initiator * num_target;
++                entry_start = acpi_data_push(table_data, size);
++
++                for (i = 0; i < num_initiator; i++) {
++                    m = initiator_pxm[i];
++                    for (j = 0; j < num_target; j++) {
++                        n = target_pxm[j];
++                        entry = entry_start + i * num_target + j;
++                        if (type <= HMAT_LB_DATA_WRITE_LATENCY) {
++                            *entry = cpu_to_le16(numa_hmat_lb->latency[m][n]);
++                        } else {
++                            *entry = cpu_to_le16(numa_hmat_lb->bandwidth[m][n]);
++                        }
++                    }
++                }
++                hmat_lb = (AcpiHmatLBInfo *)(table_data->data + start);
++                hmat_lb->length = cpu_to_le16(table_data->len - start);
++            }
 +        }
-+        break;
-     default:
-         abort();
-     }
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 51bf005..36bbda2 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -2738,10 +2738,12 @@
- #
- # @hmat-lb: memory latency and bandwidth information (Since: 2.13)
- #
-+# @hmat-cache: memory side cache information (Since: 2.13)
-+#
- # Since: 2.1
- ##
- { 'enum': 'NumaOptionsType',
--  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
-+  'data': [ 'node', 'dist', 'cpu', 'hmat-lb', 'hmat-cache' ] }
++    }
++}
++
+ static void hmat_build_hma(GArray *hma, PCMachineState *pcms)
+ {
+     /* Build HMAT Memory Subsystem Address Range. */
+     hmat_build_spa(hma, pcms);
++
++    /* Build HMAT System Locality Latency and Bandwidth Information. */
++    hmat_build_lb(hma);
+ }
  
- ##
- # @NumaOptions:
-@@ -2757,7 +2759,8 @@
-     'node': 'NumaNodeOptions',
-     'dist': 'NumaDistOptions',
-     'cpu': 'NumaCpuOptions',
--    'hmat-lb': 'NumaHmatLBOptions' }}
-+    'hmat-lb': 'NumaHmatLBOptions',
-+    'hmat-cache': 'NumaHmatCacheOptions' }}
+ void hmat_build_acpi(GArray *table_data, BIOSLinker *linker,
+diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
+index 096415d..fddd05e 100644
+--- a/hw/acpi/hmat.h
++++ b/hw/acpi/hmat.h
+@@ -32,6 +32,7 @@
+ #include "hw/acpi/aml-build.h"
  
- ##
- # @NumaNodeOptions:
-@@ -2906,6 +2909,71 @@
-    '*bandwidth': 'uint16' }}
+ #define ACPI_HMAT_SPA               0
++#define ACPI_HMAT_LB_INFO           1
  
- ##
-+# @HmatCacheAssociativity:
-+#
-+# Cache associativity in the Memory Side Cache
-+# Information Structure of HMAT
-+#
-+# @none: None
-+#
-+# @direct: Direct Mapped
-+#
-+# @complex: Complex Cache Indexing (implementation specific)
-+#
-+# Since: 2.13
-+##
-+{ 'enum': 'HmatCacheAssociativity',
-+  'data': [ 'none', 'direct', 'complex' ] }
+ /* ACPI HMAT sub-structure header */
+ #define ACPI_HMAT_SUB_HEADER_DEF    \
+@@ -46,6 +47,28 @@ enum {
+     HMAT_SPA_RESERVATION_HINT = 0x4,
+ };
+ 
++/* the value of AcpiHmatLBInfo flags */
++enum {
++    HMAT_LB_MEM_MEMORY           = 0,
++    HMAT_LB_MEM_CACHE_LAST_LEVEL = 1,
++    HMAT_LB_MEM_CACHE_1ST_LEVEL  = 2,
++    HMAT_LB_MEM_CACHE_2ND_LEVEL  = 3,
++    HMAT_LB_MEM_CACHE_3RD_LEVEL  = 4,
++};
 +
-+##
-+# @HmatCacheWritePolicy:
-+#
-+# Cache write policy in the Memory Side Cache
-+# Information Structure of HMAT
-+#
-+# @none: None
-+#
-+# @write-back: Write Back (WB)
-+#
-+# @write-through: Write Through (WT)
-+#
-+# Since: 2.13
-+##
-+{ 'enum': 'HmatCacheWritePolicy',
-+  'data': [ 'none', 'write-back', 'write-through' ] }
++/* the value of AcpiHmatLBInfo data type */
++enum {
++    HMAT_LB_DATA_ACCESS_LATENCY = 0,
++    HMAT_LB_DATA_READ_LATENCY = 1,
++    HMAT_LB_DATA_WRITE_LATENCY = 2,
++    HMAT_LB_DATA_ACCESS_BANDWIDTH = 3,
++    HMAT_LB_DATA_READ_BANDWIDTH = 4,
++    HMAT_LB_DATA_WRITE_BANDWIDTH = 5,
++};
 +
-+##
-+# @NumaHmatCacheOptions:
-+#
-+# Set the memory side cache information for a given memory domain.
-+#
-+# @node-id: the memory proximity domain to which the memory belongs.
-+#
-+# @size: the size of memory side cache in bytes.
-+#
-+# @total: the total cache levels for this memory proximity domain.
-+#
-+# @level: the cache level described in this structure.
-+#
-+# @assoc: the cache associativity, none/direct-mapped/complex(complex cache indexing).
++#define HMAT_LB_LEVELS    (HMAT_LB_MEM_CACHE_3RD_LEVEL + 1)
++#define HMAT_LB_TYPES     (HMAT_LB_DATA_WRITE_BANDWIDTH + 1)
 +
-+# @policy: the write policy, none/write-back/write-through.
-+#
-+# @line: the cache Line size in bytes.
-+#
-+# Since: 2.13
-+##
-+{ 'struct': 'NumaHmatCacheOptions',
-+  'data': {
-+   'node-id': 'uint32',
-+   'size': 'size',
-+   'total': 'uint8',
-+   'level': 'uint8',
-+   'assoc': 'HmatCacheAssociativity',
-+   'policy': 'HmatCacheWritePolicy',
-+   'line': 'uint16' }}
+ /*
+  * HMAT (Heterogeneous Memory Attributes Table)
+  */
+@@ -67,6 +90,59 @@ struct AcpiHmatSpaRange {
+ } QEMU_PACKED;
+ typedef struct AcpiHmatSpaRange AcpiHmatSpaRange;
+ 
++struct AcpiHmatLBInfo {
++    ACPI_HMAT_SUB_HEADER_DEF
++    uint8_t     flags;
++    uint8_t     data_type;
++    uint16_t    reserved1;
++    uint32_t    num_initiator;
++    uint32_t    num_target;
++    uint32_t    reserved2;
++    uint64_t    base_unit;
++} QEMU_PACKED;
++typedef struct AcpiHmatLBInfo AcpiHmatLBInfo;
 +
-+##
- # @HostMemPolicy:
- #
- # Host memory policy types
++struct numa_hmat_lb_info {
++    /*
++     * Indicates total number of Proximity Domains
++     * that can initiate memory access requests.
++     */
++    uint32_t    num_initiator;
++    /*
++     * Indicates total number of Proximity Domains
++     * that can act as target.
++     */
++    uint32_t    num_target;
++    /*
++     * Indicates it's memory or
++     * the specified level memory side cache.
++     */
++    uint8_t     hierarchy;
++    /*
++     * Present the type of data,
++     * access/read/write latency or bandwidth.
++     */
++    uint8_t     data_type;
++    /* The base unit for latency in nanoseconds. */
++    uint64_t    base_lat;
++    /* The base unit for bandwidth in megabytes per second(MB/s). */
++    uint64_t    base_bw;
++    /*
++     * latency[i][j]:
++     * Indicates the latency based on base_lat
++     * from Initiator Proximity Domain i to Target Proximity Domain j.
++     */
++    uint16_t    latency[MAX_NODES][MAX_NODES];
++    /*
++     * bandwidth[i][j]:
++     * Indicates the bandwidth based on base_bw
++     * from Initiator Proximity Domain i to Target Proximity Domain j.
++     */
++    uint16_t    bandwidth[MAX_NODES][MAX_NODES];
++};
++
++extern struct numa_hmat_lb_info *hmat_lb_info[HMAT_LB_LEVELS][HMAT_LB_TYPES];
++
+ void hmat_build_acpi(GArray *table_data, BIOSLinker *linker,
+                      MachineState *machine);
+ 
 -- 
 2.7.4
