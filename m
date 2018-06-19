@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVDfj-0003yU-Es
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:15:36 -0400
+	(envelope-from <david@redhat.com>) id 1fVDi6-0004fz-GF
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:18:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVDfi-0003oz-JR
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:15:35 -0400
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:38184)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fVDfi-0003om-3Z
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:15:34 -0400
-Received: by mail-oi0-x230.google.com with SMTP id d5-v6so17637684oib.5
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 03:15:33 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fVDi3-0004lP-D2
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:18:02 -0400
+References: <20180618142536.23995-1-david@redhat.com>
+	<20180618142536.23995-12-david@redhat.com>
+	<20180619001203.GG25461@umbus.fritz.box>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <4b768fa0-2be0-8ded-8ea4-df9d804e9720@redhat.com>
+Date: Tue, 19 Jun 2018 12:17:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180615191327.11480-1-ehabkost@redhat.com>
-References: <20180615191327.11480-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Jun 2018 11:15:12 +0100
-Message-ID: <CAFEAcA_CjitrfZYR7L3LB283HFiE0Fi5uY2SeTBTfLk5-d0_eA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/7] Python queue, 2018-06-15
+In-Reply-To: <20180619001203.GG25461@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 11/12] nvdimm: make get_memory_region()
+ perform checks and initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +26,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Alexander Graf <agraf@suse.de>
 
-On 15 June 2018 at 20:13, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> The following changes since commit 2ef2f16781af9dee6ba6517755e9073ba5799fa2:
->
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20180615a' into staging (2018-06-15 18:13:35 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to 1b145d59b74a5880d82954ee940a219e73851f9e:
->
->   configure: Enable out-of-tree acceptance tests (2018-06-15 16:10:11 -0300)
->
-> ----------------------------------------------------------------
-> Python queue, 2018-06-15
->
-> * Add avocado_qemu: functional/acceptance test infrastructure
->
-> ----------------------------------------------------------------
+On 19.06.2018 02:12, David Gibson wrote:
+> On Mon, Jun 18, 2018 at 04:25:35PM +0200, David Hildenbrand wrote:
+>> We might get a call to get_memory_region() before the device has been
+>> realized. We should return a consistent value, as the return value
+>> will e.g. later on be used in the pre_plug handler.
+>>
+>> To avoid duplicating too much code, factor the initialization and checks
+>> out into a helper function.
+>>
+>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/mem/nvdimm.c | 46 +++++++++++++++++++++++++++++++++++++---------
+>>  1 file changed, 37 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+>> index db7d8c3050..bba98e57e1 100644
+>> --- a/hw/mem/nvdimm.c
+>> +++ b/hw/mem/nvdimm.c
+>> @@ -71,20 +71,24 @@ static void nvdimm_init(Object *obj)
+>>                          NULL, NULL);
+>>  }
+>>  
+>> -static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+>> +static void nvdimm_prepare_memory_region(NVDIMMDevice *nvdimm, Error **errp)
+>>  {
+>> -    NVDIMMDevice *nvdimm = NVDIMM(dimm);
+>> +    PCDIMMDevice *dimm = PC_DIMM(nvdimm);
+>> +    uint64_t align, pmem_size, size;
+>> +    MemoryRegion *mr;
+>>  
+>> -    return nvdimm->nvdimm_mr;
+>> -}
+>> +    if (nvdimm->nvdimm_mr) {
+>> +        return;
+>> +    }
+>>  
+>> -static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+>> -{
+>> -    MemoryRegion *mr = host_memory_backend_get_memory(dimm->hostmem);
+>> -    NVDIMMDevice *nvdimm = NVDIMM(dimm);
+>> -    uint64_t align, pmem_size, size = memory_region_size(mr);
+>> +    if (!dimm->hostmem) {
+>> +        error_setg(errp, "'" PC_DIMM_MEMDEV_PROP "' property must be set");
+>> +        return;
+>> +    }
+>>  
+>> +    mr = host_memory_backend_get_memory(dimm->hostmem);
+>>      align = memory_region_get_alignment(mr);
+>> +    size = memory_region_size(mr);
+>>  
+>>      pmem_size = size - nvdimm->label_size;
+>>      nvdimm->label_data = memory_region_get_ram_ptr(mr) + pmem_size;
+>> @@ -108,6 +112,30 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+>>      nvdimm->nvdimm_mr->align = align;
+>>  }
+>>  
+>> +static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+>> +{
+>> +    NVDIMMDevice *nvdimm = NVDIMM(dimm);
+>> +    Error *local_err = NULL;
+>> +
+>> +    if (!nvdimm->nvdimm_mr) {
+> 
+> nvdimm_prepare..() already checks this internally, so you could just
+> call it internally.  Nonetheless
+> 
 
-Applied, thanks.
+I'll just turn this into an assert as I'll resend. Thanks!
 
--- PMM
+-- 
+
+Thanks,
+
+David / dhildenb
