@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jh-0003B9-OY
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:10 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5jk-0003DB-0J
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jg-0000tP-Aw
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:09 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5ji-0000uA-F3
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:12 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:41:33 -0500
-Message-Id: <20180619014319.28272-8-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:42:47 -0500
+Message-Id: <20180619014319.28272-82-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 007/113] spapr: Adjust default VSMT value for
- better migration compatibility
+Subject: [Qemu-devel] [PATCH 081/113] s390x/virtio: Convert virtio-ccw from
+ *_exit to *_unrealize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,104 +22,193 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+Cc: qemu-stable@nongnu.org, Nia Alarie <nia.alarie@gmail.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: David Gibson <david@gibson.dropbear.id.au>
+From: Nia Alarie <nia.alarie@gmail.com>
 
-fa98fbfc "PC: KVM: Support machine option to set VSMT mode" introduced the
-"vsmt" parameter for the pseries machine type, which controls the spacing
-of the vcpu ids of thread 0 for each virtual core.  This was done to bring
-some consistency and stability to how that was done, while still allowing
-backwards compatibility for migration and otherwise.
-
-The default value we used for vsmt was set to the max of the host's
-advertised default number of threads and the number of vthreads per vcore
-in the guest.  This was done to continue running without extra parameters
-on older KVM versions which don't allow the VSMT value to be changed.
-
-Unfortunately, even that smaller than before leakage of host configuration
-into guest visible configuration still breaks things.  Specifically a guest
-with 4 (or less) vthread/vcore will get a different vsmt value when
-running on a POWER8 (vsmt==8) and POWER9 (vsmt==4) host.  That means the
-vcpu ids don't line up so you can't migrate between them, though you should
-be able to.
-
-Long term we really want to make vsmt == smp_threads for sufficiently
-new machine types.  However, that means that qemu will then require a
-sufficiently recent KVM (one which supports changing VSMT) - that's still
-not widely enough deployed to be really comfortable to do.
-
-In the meantime we need some default that will work as often as
-possible.  This patch changes that default to 8 in all circumstances.
-This does change guest visible behaviour (including for existing
-machine versions) for many cases - just not the most common/important
-case.
-
-Following is case by case justification for why this is still the least
-worst option.  Note that any of the old behaviours can still be duplicated
-after this patch, it's just that it requires manual intervention by
-setting the vsmt property on the command line.
-
-KVM HV on POWER8 host:
-   This is the overwhelmingly common case in production setups, and is
-   unchanged by design.  POWER8 hosts will advertise a default VSMT mode
-   of 8, and > 8 vthreads/vcore isn't permitted
-
-KVM HV on POWER7 host:
-   Will break, but POWER7s allowing KVM were never released to the public.
-
-KVM HV on POWER9 host:
-   Not yet released to the public, breaking this now will reduce other
-   breakage later.
-
-KVM HV on PowerPC 970:
-   Will theoretically break it, but it was barely supported to begin with
-   and already required various user visible hacks to work.  Also so old
-   that I just don't care.
-
-TCG:
-   This is the nastiest one; it means migration of TCG guests (without
-   manual vsmt setting) will break.  Since TCG is rarely used in production
-   I think this is worth it for the other benefits.  It does also remove
-   one more barrier to TCG<->KVM migration which could be interesting for
-   debugging applications.
-
-KVM PR:
-   As with TCG, this will break migration of existing configurations,
-   without adding extra manual vsmt options.  As with TCG, it is rare in
-   production so I think the benefits outweigh breakages.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Reviewed-by: Jose Ricardo Ziviani <joserz@linux.vnet.ibm.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-(cherry picked from commit 8904e5a75005fe579c28806003892d8ae4a27dfa)
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Nia Alarie <nia.alarie@gmail.com>
+Message-Id: <20180307162958.11232-1-nia.alarie@gmail.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+(cherry picked from commit 24118af846868bb22e573be206c63e684ba9846a)
+*prereq for 0c53057adb
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ hw/s390x/virtio-ccw.c | 34 +++++++++++++++++-----------------
+ hw/s390x/virtio-ccw.h |  2 +-
+ 2 files changed, 18 insertions(+), 18 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 37388f1416..0c6547faef 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2282,9 +2282,14 @@ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
-         }
-         /* In this case, spapr->vsmt has been set by the command line */
-     } else {
--        /* Choose a VSMT mode that may be higher than necessary but is
--         * likely to be compatible with hosts that don't have VSMT. */
--        spapr->vsmt = MAX(kvm_smt, smp_threads);
-+        /*
-+         * Default VSMT value is tricky, because we need it to be as
-+         * consistent as possible (for migration), but this requires
-+         * changing it for at least some existing cases.  We pick 8 as
-+         * the value that we'd get with KVM on POWER8, the
-+         * overwhelmingly common case in production systems.
-+         */
-+        spapr->vsmt = 8;
-     }
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 184515ce94..8f2998e8ac 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -751,7 +751,7 @@ out_err:
+     g_free(sch);
+ }
  
-     /* KVM: If necessary, set the SMT mode: */
+-static int virtio_ccw_exit(VirtioCcwDevice *dev)
++static void virtio_ccw_unrealize(VirtioCcwDevice *dev, Error **errp)
+ {
+     CcwDevice *ccw_dev = CCW_DEVICE(dev);
+     SubchDev *sch = ccw_dev->sch;
+@@ -759,12 +759,12 @@ static int virtio_ccw_exit(VirtioCcwDevice *dev)
+     if (sch) {
+         css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
+         g_free(sch);
++        ccw_dev->sch = NULL;
+     }
+     if (dev->indicators) {
+         release_indicator(&dev->routes.adapter, dev->indicators);
+         dev->indicators = NULL;
+     }
+-    return 0;
+ }
+ 
+ static void virtio_ccw_net_realize(VirtioCcwDevice *ccw_dev, Error **errp)
+@@ -1343,7 +1343,7 @@ static void virtio_ccw_net_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_net_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_net_properties;
+     set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
+@@ -1371,7 +1371,7 @@ static void virtio_ccw_blk_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_blk_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_blk_properties;
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+@@ -1399,7 +1399,7 @@ static void virtio_ccw_serial_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_serial_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_serial_properties;
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+@@ -1427,7 +1427,7 @@ static void virtio_ccw_balloon_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_balloon_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_balloon_properties;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+@@ -1455,7 +1455,7 @@ static void virtio_ccw_scsi_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_scsi_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_scsi_properties;
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+@@ -1482,7 +1482,7 @@ static void vhost_ccw_scsi_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = vhost_ccw_scsi_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = vhost_ccw_scsi_properties;
+     set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
+@@ -1519,7 +1519,7 @@ static void virtio_ccw_rng_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_rng_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_rng_properties;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+@@ -1557,7 +1557,7 @@ static void virtio_ccw_crypto_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_crypto_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_crypto_properties;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+@@ -1595,7 +1595,7 @@ static void virtio_ccw_gpu_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_gpu_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_gpu_properties;
+     dc->hotpluggable = false;
+@@ -1624,7 +1624,7 @@ static void virtio_ccw_input_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = virtio_ccw_input_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_input_properties;
+     set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+@@ -1704,12 +1704,12 @@ static void virtio_ccw_busdev_realize(DeviceState *dev, Error **errp)
+     virtio_ccw_device_realize(_dev, errp);
+ }
+ 
+-static int virtio_ccw_busdev_exit(DeviceState *dev)
++static void virtio_ccw_busdev_unrealize(DeviceState *dev, Error **errp)
+ {
+     VirtioCcwDevice *_dev = (VirtioCcwDevice *)dev;
+     VirtIOCCWDeviceClass *_info = VIRTIO_CCW_DEVICE_GET_CLASS(dev);
+ 
+-    return _info->exit(_dev);
++    _info->unrealize(_dev, errp);
+ }
+ 
+ static void virtio_ccw_busdev_unplug(HotplugHandler *hotplug_dev,
+@@ -1727,7 +1727,7 @@ static void virtio_ccw_device_class_init(ObjectClass *klass, void *data)
+ 
+     k->unplug = virtio_ccw_busdev_unplug;
+     dc->realize = virtio_ccw_busdev_realize;
+-    dc->exit = virtio_ccw_busdev_exit;
++    dc->unrealize = virtio_ccw_busdev_unrealize;
+     dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
+ }
+ 
+@@ -1803,7 +1803,7 @@ static void virtio_ccw_9p_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     k->realize = virtio_ccw_9p_realize;
+     dc->reset = virtio_ccw_reset;
+     dc->props = virtio_ccw_9p_properties;
+@@ -1852,7 +1852,7 @@ static void vhost_vsock_ccw_class_init(ObjectClass *klass, void *data)
+     VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
+ 
+     k->realize = vhost_vsock_ccw_realize;
+-    k->exit = virtio_ccw_exit;
++    k->unrealize = virtio_ccw_unrealize;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     dc->props = vhost_vsock_ccw_properties;
+     dc->reset = virtio_ccw_reset;
+diff --git a/hw/s390x/virtio-ccw.h b/hw/s390x/virtio-ccw.h
+index 3905f3a3d6..2fc513001e 100644
+--- a/hw/s390x/virtio-ccw.h
++++ b/hw/s390x/virtio-ccw.h
+@@ -76,7 +76,7 @@ typedef struct VirtioCcwDevice VirtioCcwDevice;
+ typedef struct VirtIOCCWDeviceClass {
+     CCWDeviceClass parent_class;
+     void (*realize)(VirtioCcwDevice *dev, Error **errp);
+-    int (*exit)(VirtioCcwDevice *dev);
++    void (*unrealize)(VirtioCcwDevice *dev, Error **errp);
+ } VirtIOCCWDeviceClass;
+ 
+ /* Performance improves when virtqueue kick processing is decoupled from the
 -- 
 2.11.0
