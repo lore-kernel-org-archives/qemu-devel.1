@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fVGKq-0004CC-FM
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:06:18 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fVGPc-0005oU-74
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:11:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fVGKn-0006MM-B9
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:06:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13536)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fVGKn-0006MH-4i
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:06:09 -0400
-Date: Tue, 19 Jun 2018 10:06:06 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180619130606.GB25787@localhost.localdomain>
-References: <20180618175958.29073-1-armbru@redhat.com>
-	<20180618175958.29073-2-armbru@redhat.com>
-	<20180618213526.GJ24764@localhost.localdomain>
-	<87tvpzz3wn.fsf@dusky.pond.sub.org>
-	<20180619105032.GO7451@localhost.localdomain>
-	<20180619120510.GS20929@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1fVGPY-0007wM-A4
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:11:08 -0400
+Date: Tue, 19 Jun 2018 21:17:16 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180619111716.GA3546@umbus.fritz.box>
+References: <20180619085631.2859-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="bp/iNruPH9dso1Pn"
 Content-Disposition: inline
-In-Reply-To: <20180619120510.GS20929@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] qapi: Open files with
- encoding='utf-8'
+In-Reply-To: <20180619085631.2859-1-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu] xics-kvm: Fix compile warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +23,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, tamiko@43-1.org, qemu-devel@nongnu.org, arfrever.fta@gmail.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Tue, Jun 19, 2018 at 01:05:10PM +0100, Daniel P. Berrang=E9 wrote:
-[...]
-> > > > The python-future package would help us write code for a single
-> > > > file/string API instead of two different APIs, but it's not a
-> > > > QEMU build dependency (yet?), so this patch is good enough for
-> > > > now.
-> > >=20
-> > > Please do not invest more than absolutely necessary in Python 2 sup=
-port.
-> > > All such investment will turn into technical debt in less than two
-> > > years.  If you must invest, pick a solution that will result in les=
-s
-> > > technical debt.  We can accept local ugliness for that.
-> > >=20
-> > > In my personal opinion, dumb ideas like supporting Python 2 this cl=
-ose
-> > > to its EOL ought to look ugly.
-> >=20
-> > That's the whole point: python-future allows us to not worry
-> > about Python 2 support in the code anymore because it exposes the
-> > Python 3 string API (and others) even if we're running Python 2.
-> >=20
-> > After we stop supporting Python 2, we can simply delete the "from
-> > __future__ import .*" and "from builtins import .*" lines.
-> >=20
-> > Anyway, I will send a RFC series demonstrating that, and then we
-> > can discuss if it's worth it.  My main worry is not the extra
-> > imports in Python code, but the introduction of a new build
-> > dependency only for a few (one?) releases.
+
+--bp/iNruPH9dso1Pn
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Jun 19, 2018 at 06:56:31PM +1000, Alexey Kardashevskiy wrote:
+> This fixes uninitialized variable warning:
 >=20
-> Using __future__ doesn't add an build dependancy AFAIK. __future__ is
-> bundled with core python library rather than being an addon module.
+> /home/aik/p/qemu/hw/intc/xics_kvm.c: In function =E2=80=98ics_set_kvm_sta=
+te=E2=80=99:
+> /home/aik/p/qemu/hw/intc/xics_kvm.c:281:20: warning: =E2=80=98ret=E2=80=
+=99 may be used uninitialized in this function [-Wmaybe-uninitialized]
+>              return ret;
+>                     ^~~
+>=20
+> Discovered with gcc (Ubuntu 7.3.0-16ubuntu3) 7.3.0 from Ubuntu 18.04.
+>=20
+> Fixes: bf358b541b8 "xics_kvm: use KVM helpers"
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-The extra dependency is because of the "builtins" module,
-provided by python-future in Python 2.7.
+This no longer applies on ppc-for-3.0.
+
+> ---
+>  hw/intc/xics_kvm.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 8bdf6af..48efbce 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -273,8 +273,8 @@ static int ics_set_kvm_state(ICSState *ics, int versi=
+on_id)
+>                  state |=3D KVM_XICS_QUEUED;
+>          }
+> =20
+> -        kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+> -                          i + ics->offset, &state, true, &local_err);
+> +        ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURC=
+ES,
+> +                                i + ics->offset, &state, true, &local_er=
+r);
+>          if (local_err) {
+>              error_report("Unable to restore KVM interrupt controller sta=
+te"
+>                      " for IRQs %d: %s", i + ics->offset, strerror(errno)=
+);
 
 --=20
-Eduardo
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--bp/iNruPH9dso1Pn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlso5joACgkQbDjKyiDZ
+s5K+qRAAjhN534Vxd35eEPcmKn2IwqIEa1+26gkPhYFeQRErAL2zOcRc8u9zS8cd
+nZ7iD0Kg4hzugrF/vJO6QAAnmfGSZQ8fd35ZUHClXgTmF1huU9RO1hauAluKPkQP
+7r7TOYaLeYbxi4cNvbggZ1iJjvpfdSoYvEI3wYvZ7VjMudEiyt8lDnf7FMtBOLlK
+3iO4jTmSQ5SFzxKqW9NoRru1lRYH19qtsXzF5lrNFIS5oYxuBPALCHvauHvwXLQp
+KfwphejSZRWeILJ9IBU0L42YFTZEBkgVMfWQEN6DY3ML0+2Znw577NIplqFOYgOk
+OKlCkzhl/yeN1prgez+g0R0Q2wRZVpsQJvF2i48WzzaNdKVndnyxhuEr8ZlN1YCj
+D21cSxVQZtGajds228xcD5VoE336yWtNQAnpUW6zyn6cXhcLuV51Ar0n9gcyFBB3
+UruRGEw1wYDvfEKlQkgRyF6Wc1JTSZFflrKGw8jnDeJnaIIgZ9yhoyFblIh+AC+4
+2S8Red3EmgcoCcniXva14vyry2wYSD5KFNAmmYABsTld4QK43yvaSiFUNpvOkviG
+ru+CYfjFWphhcivrY5qlrA4aZa1oTd940gU/iOszthIQwovHBwxN0GkK/lKYlAH9
+w1CQZ6EpzttyM37WZN+wvUBX9A9+gWwtoQou5aHMJoknhTFI0/Q=
+=WE6w
+-----END PGP SIGNATURE-----
+
+--bp/iNruPH9dso1Pn--
