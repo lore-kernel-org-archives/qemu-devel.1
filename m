@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fVJJ8-0008Gx-4S
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:16:41 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fVJO8-0003nc-AW
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:21:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fVJJ7-0000pL-8W
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:16:38 -0400
-References: <1528866321-23886-1-git-send-email-thuth@redhat.com>
-	<1528866321-23886-5-git-send-email-thuth@redhat.com>
-	<20180613133840.GK24528@stefanha-x1.localdomain>
-	<20180613134452.GU19901@redhat.com>
-	<b0ebd968-797f-48e0-32c1-869c452feca9@redhat.com>
-	<20180613151942.GC19901@redhat.com> <87k1r24quk.fsf@dusky.pond.sub.org>
-	<20180619171539.0adc90d6.cohuck@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d4e02083-c372-3ce5-d4a2-4809579fc8f2@redhat.com>
-Date: Tue, 19 Jun 2018 18:16:33 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1fVJO7-0007Dy-FC
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:21:48 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36991)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fVJO7-0007D8-8e
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:21:47 -0400
+Received: by mail-wr0-x243.google.com with SMTP id d8-v6so279027wro.4
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 09:21:47 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Tue, 19 Jun 2018 16:44:04 +0100
+Message-Id: <20180619154435.18898-26-alex.bennee@linaro.org>
+In-Reply-To: <20180619154435.18898-1-alex.bennee@linaro.org>
+References: <20180619154435.18898-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180619171539.0adc90d6.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 4/4] qemu-options: Do not show
- -enable-kvm and -enable-hax in the docs anymore
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 25/56] tests/tcg: enable building for AArch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,18 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On 19/06/2018 17:15, Cornelia Huck wrote:
->> Why does a user have to know how to enable KVM?  Oh, because our default
->> is "run this guest much slower than necessary".  Great!
-> Should we try again to default to a better accelerator, if possible? I
-> don't quite recall why we didn't do so the last time that came up...
-> was it tests?
+We only have compilers for the (default) little endian variants.
 
-My plan was to create qemu-{kvm,hax,hvf,whpx} binaries that default to a
-better accelerator, and leave qemu-system-* as defaulting to TCG.  This
-matches what distributions already do.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+v4
+  - update MAINTAINERS
 
-Paolo
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 75a163f557..c4fc6fa357 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -136,6 +136,7 @@ L: qemu-arm@nongnu.org
+ S: Maintained
+ F: target/arm/
+ F: tests/tcg/arm/
++F: tests/tcg/aarch64/
+ F: hw/arm/
+ F: hw/cpu/a*mpcore.c
+ F: include/hw/cpu/a*mpcore.h
+diff --git a/tests/tcg/aarch64/Makefile.include b/tests/tcg/aarch64/Makefile.include
+new file mode 100644
+index 0000000000..de32c91235
+--- /dev/null
++++ b/tests/tcg/aarch64/Makefile.include
+@@ -0,0 +1,8 @@
++# Makefile.include for AArch64 targets
++#
++# We don't have any bigendian build tools so we only use this for AArch64
++
++ifeq ($(TARGET_NAME),aarch64)
++DOCKER_IMAGE=debian-arm64-cross
++DOCKER_CROSS_COMPILER=aarch64-linux-gnu-gcc
++endif
+-- 
+2.17.1
