@@ -1,33 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVFKX-00062o-VR
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:02:01 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fVFNM-000728-Bd
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:04:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVFKJ-0000OS-ND
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:01:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35850 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVFKJ-0000N7-Fp
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:01:35 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 584EC40201BE
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 12:01:34 +0000 (UTC)
-Date: Tue, 19 Jun 2018 13:01:26 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180619120126.GQ20929@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180618161729.334-1-marcandre.lureau@redhat.com>
-	<20180618161729.334-2-marcandre.lureau@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180618161729.334-2-marcandre.lureau@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 01/26] chardev: avoid crash if no
- associated address
+	(envelope-from <cohuck@redhat.com>) id 1fVFNL-0001lO-F7
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:04:44 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Tue, 19 Jun 2018 14:04:23 +0200
+Message-Id: <20180619120434.25062-2-cohuck@redhat.com>
+In-Reply-To: <20180619120434.25062-1-cohuck@redhat.com>
+References: <20180619120434.25062-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PULL 01/12] virtio-ccw: clean up notify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +19,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 
-On Mon, Jun 18, 2018 at 06:17:04PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> A socket chardev may not have associated address (when adding client
-> fd manually for example). But on disconnect, updating socket filename
-> expects an address and may lead to this crash:
->=20
->   Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation faul=
-t.
->   0x0000555555d8c70c in SocketAddress_to_str (prefix=3D0x555556043062 "=
-disconnected:", addr=3D0x0, is_listen=3Dfalse, is_telnet=3Dfalse) at /hom=
-e/elmarco/src/qq/chardev/char-socket.c:388
->   388	    switch (addr->type) {
->   (gdb) bt
->   #0  0x0000555555d8c70c in SocketAddress_to_str (prefix=3D0x5555560430=
-62 "disconnected:", addr=3D0x0, is_listen=3Dfalse, is_telnet=3Dfalse) at =
-/home/elmarco/src/qq/chardev/char-socket.c:388
->   #1  0x0000555555d8c8aa in update_disconnected_filename (s=3D0x555556b=
-1ed00) at /home/elmarco/src/qq/chardev/char-socket.c:419
->   #2  0x0000555555d8c959 in tcp_chr_disconnect (chr=3D0x555556b1ed00) a=
-t /home/elmarco/src/qq/chardev/char-socket.c:438
->   #3  0x0000555555d8cba1 in tcp_chr_hup (channel=3D0x555556b75690, cond=
-=3DG_IO_HUP, opaque=3D0x555556b1ed00) at /home/elmarco/src/qq/chardev/cha=
-r-socket.c:482
->   #4  0x0000555555da596e in qio_channel_fd_source_dispatch (source=3D0x=
-555556bb68b0, callback=3D0x555555d8cb58 <tcp_chr_hup>, user_data=3D0x5555=
-56b1ed00) at /home/elmarco/src/qq/io/channel-watch.c:84
->=20
-> Replace filename with a generic "disconnected:socket" in this case.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  chardev/char-socket.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+From: Halil Pasic <pasic@linux.ibm.com>
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Coverity recently started complaining about virtio_ccw_notify().  Turns
+out, there is a couple of things that can be cleaned up.  Let's clean!
 
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Fixes: CID 1390619
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+Message-Id: <20180516132757.68558-1-pasic@linux.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/s390x/virtio-ccw.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 0a9bec484b..b92a85d0b0 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -1001,10 +1001,15 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
+     SubchDev *sch = ccw_dev->sch;
+     uint64_t indicators;
+ 
+-    /* queue indicators + secondary indicators */
+-    if (vector >= VIRTIO_QUEUE_MAX + 64) {
++    if (vector == VIRTIO_NO_VECTOR) {
+         return;
+     }
++    /*
++     * vector < VIRTIO_QUEUE_MAX: notification for a virtqueue
++     * vector == VIRTIO_QUEUE_MAX: configuration change notification
++     * bits beyond that are unused and should never be notified for
++     */
++    assert(vector <= VIRTIO_QUEUE_MAX);
+ 
+     if (vector < VIRTIO_QUEUE_MAX) {
+         if (!dev->indicators) {
+@@ -1027,6 +1032,7 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
+                 css_adapter_interrupt(CSS_IO_ADAPTER_VIRTIO, dev->thinint_isc);
+             }
+         } else {
++            assert(vector < NR_CLASSIC_INDICATOR_BITS);
+             indicators = address_space_ldq(&address_space_memory,
+                                            dev->indicators->addr,
+                                            MEMTXATTRS_UNSPECIFIED,
+@@ -1040,12 +1046,11 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
+         if (!dev->indicators2) {
+             return;
+         }
+-        vector = 0;
+         indicators = address_space_ldq(&address_space_memory,
+                                        dev->indicators2->addr,
+                                        MEMTXATTRS_UNSPECIFIED,
+                                        NULL);
+-        indicators |= 1ULL << vector;
++        indicators |= 1ULL;
+         address_space_stq(&address_space_memory, dev->indicators2->addr,
+                           indicators, MEMTXATTRS_UNSPECIFIED, NULL);
+         css_conditional_io_interrupt(sch);
+-- 
+2.14.4
