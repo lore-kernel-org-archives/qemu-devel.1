@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fV8Nn-0000Ou-A0
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:36:44 -0400
+	(envelope-from <peterx@redhat.com>) id 1fV8SX-0001vF-B4
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:41:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fV8Nm-0007NB-8w
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:36:43 -0400
-Date: Tue, 19 Jun 2018 14:36:31 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180619043631.GC11674@umbus.fritz.box>
-References: <20180618215601.8974-1-mail@sebastianbauer.info>
-	<20180618235557.GB25461@umbus.fritz.box>
-	<73dd5b26b622e6c59776976aa2c7a3a0@sebastianbauer.info>
+	(envelope-from <peterx@redhat.com>) id 1fV8SU-0000g3-7P
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:41:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48372 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fV8SU-0000fX-2b
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:41:34 -0400
+Date: Tue, 19 Jun 2018 12:41:16 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180619044116.GG16790@xz-mi>
+References: <20180615014249.22730-1-peterx@redhat.com>
+	<20180615014249.22730-4-peterx@redhat.com>
+	<87tvq4bh7w.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="DIOMP1UsTsWJauNi"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <73dd5b26b622e6c59776976aa2c7a3a0@sebastianbauer.info>
-Subject: Re: [Qemu-devel] [PATCH] ppc: Include vga cirrus card into the
- compiling process
+In-Reply-To: <87tvq4bh7w.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3 3/6] tests: iotests: drop some stderr
+ line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sebastian Bauer <mail@sebastianbauer.info>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com, balaton@eik.bme.hu, qemu-ppc@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
+On Fri, Jun 15, 2018 at 10:13:07AM +0200, Markus Armbruster wrote:
+> Peter Xu <peterx@redhat.com> writes:
+> 
+> > In my Out-Of-Band test, "check -qcow2 060" fail with this:
+> >
+> > 060 5s ... - output mismatch (see 060.out.bad)
+> > --- /home/peterx/git/qemu/tests/qemu-iotests/060.out    2018-06-15 08:31:14.607411950 +0800
+> > +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/060.out.bad    2018-06-15 08:33:09.679880113 +0800
+> > @@ -427,8 +427,8 @@
+> >  QMP_VERSION
+> >  {"return": {}}
+> >  qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1 index: 0); further non-fatal corruption events will be suppressed
+> > -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a0
+> > 0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
+> >  read failed: Input/output error
+> > +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a0
+> > 0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
+> >  {"return": ""}
+> >  {"return": {}}
+> >  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+> > Failures: 060
+> > Failed 1 of 1 tests
+> 
+> Please indent this diff; git-am chokes on it for me.
 
---DIOMP1UsTsWJauNi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Will do.
 
-On Tue, Jun 19, 2018 at 06:32:55AM +0200, Sebastian Bauer wrote:
-> Am 2018-06-19 01:55, schrieb David Gibson:
-> > Have you checked the Cirrus VGA actually works on a ppc machine?
->=20
-> Yes, it works for AmigaOS guests. Better than the sm501 for
-> instance.
+> 
+> > The order of the event and the in/out error line is swapped.  I didn't
+> > dig up the reason, but AFAIU what we want to verify is the event rather
+> > than stderr.  Let's drop the stderr line directly for this test.
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> >
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> 
+> Lose one S-o-b, please :)
 
-Ok.  However, your patch doesn't apply against the ppc-for-3.0 tree.
-It looks like you've made it against a tree including some of BALATON
-Zoltan's proposed but not yet merged patches.
+Yeah. :)
 
-Please make sure your patches are against the current ppc-for-3.0 tree
-before posting.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---DIOMP1UsTsWJauNi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsoiE0ACgkQbDjKyiDZ
-s5JaARAAy7BRlKs/ByynHu7zGLFdCCaJUlNHnzl8ov7G0UdnIRdwONDE8SqSeUUK
-LVYCqsLBpP1svri064l4AcrEMtnv4G+t60+XkG0WcINNdQBMvZQU3D3N20emxh8p
-D7jEZa/bOZrAJEnYuuP2dwjKg9/sIkuU+RAb4PEnr8oMOMD7mb93RJa7lGHXWNof
-/2XaHfgbVVqC/+CZMdOmd3z+5ggO/6oSwQDFpUsBLxOthFUCp5MNrL6OCulQCKeb
-DlmFsb6F5I5GayfxqOXJfVAXjQhgPhsRNB9/X3Ilzs/QK2TppqkVozAaF7TZ1CRq
-w2dE6yRuUDC6rdFI7R50pqXowqzidpCsXGXqshC0zabsGXxIoPR3hk3wnWHXHRyn
-0sVbbFsEpxaDEpIqotLaWZUIs3yqnXYJHX2xHe7aE3YjdfA6Ds8vkLtjfLB5EXbM
-5VTrrvS4iVkVU0ZjyKBaoNxvqKTRAWMXM3+zbJ8z4pkH7V5gq713qUjQNL2zeT1U
-zOQd7SYPBmcuFHMjHIguDlka228fxhrxNfT7wcu+IreH8VB7jbHc5FExT0nDwHfa
-7XYHgI79abafjhfRPGe8m5D52sYTVk5W7Ri417RrVTCGxH4orojlInE6AHpaCju0
-kifl0Kkzg/rBHxcwF0a1NkbqX1PvQHpGmJ17kT22oOpb0XkWzz8=
-=AFcg
------END PGP SIGNATURE-----
-
---DIOMP1UsTsWJauNi--
+-- 
+Peter Xu
