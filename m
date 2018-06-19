@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45100)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fVHom-0001qN-FS
+	(envelope-from <bounces@canonical.com>) id 1fVHom-0001qH-AP
 	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 10:41:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fVHoi-0007FP-TY
+	(envelope-from <bounces@canonical.com>) id 1fVHoi-0007Ex-MB
 	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 10:41:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36134)
+Received: from indium.canonical.com ([91.189.90.7]:36108)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fVHoi-0007Dc-BQ
+	id 1fVHoi-0007D6-3Q
 	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 10:41:08 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fVHog-0002sd-QK
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 14:41:06 +0000
+	id 1fVHof-0002mg-AQ
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 14:41:05 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 64D502E80CD
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 14:41:06 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 40BF02E80CD
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 14:41:05 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Jun 2018 14:32:06 -0000
-From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Tue, 19 Jun 2018 14:25:55 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Reply-To: Bug 1775555 <1775555@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152836238216.25020.6334059622433678386.malonedeb@gac.canonical.com>
-Message-Id: <152941872610.7216.8399793108564489411.malone@wampee.canonical.com>
+Message-Id: <152941835566.2583.5729750141147320191.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1775555] Re: guest migration 100% cpu freeze bug
 List-Id: <qemu-devel.nongnu.org>
@@ -38,16 +38,15 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-This looks suspicious:
- $GUEST.log source:  -cpu Westmere =
+ok, it's always a pain when you can't reproduce it on demand, but  it does =
+happen.
+I suggest you start by figuring out which guest OS versions are hitting it;=
+ and then just create a couple of VMs with identical configs and set them c=
+onstantly bouncing between a pair of boxes -  a bit of scripting and you ca=
+n get yourself a few hundred migrations an hour like that in a test.
 
- $GUEST.log destination: -cpu Westmere,vme=3Don,pclmuldq=3Don,x2apic=3Don,h=
-ypervisor=3Don,arat=3Don
-
-libvirt is supposed to use the same device configuration on the source
-and destination.  In the best case, the additional options are useless
-because QEMU already ensures CPUID compatibility.  In the worst case,
-this will make CPUID change during migration.
+As soon as you can nail it on one of your own VMs then you can get a
+full RAM dump and back trace and registers and see wth is going on.
 
 -- =
 
