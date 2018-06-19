@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52897)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fV8SX-0001vF-B4
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:41:38 -0400
+	(envelope-from <sjitindarsingh@gmail.com>) id 1fV8Zi-00035N-2E
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:49:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fV8SU-0000g3-7P
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:41:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48372 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fV8SU-0000fX-2b
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:41:34 -0400
-Date: Tue, 19 Jun 2018 12:41:16 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180619044116.GG16790@xz-mi>
-References: <20180615014249.22730-1-peterx@redhat.com>
-	<20180615014249.22730-4-peterx@redhat.com>
-	<87tvq4bh7w.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87tvq4bh7w.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3 3/6] tests: iotests: drop some stderr
- line
+	(envelope-from <sjitindarsingh@gmail.com>) id 1fV8Ze-0004a7-Vl
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:49:02 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:34320)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
+	id 1fV8Ze-0004ZY-PH
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:48:58 -0400
+Received: by mail-pg0-x244.google.com with SMTP id q4-v6so8573642pgr.1
+	for <qemu-devel@nongnu.org>; Mon, 18 Jun 2018 21:48:58 -0700 (PDT)
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Date: Tue, 19 Jun 2018 14:48:35 +1000
+Message-Id: <20180619044835.18795-1-sjitindarsingh@gmail.com>
+Subject: [Qemu-devel] [PATCH] hmp-commands: use long for begin and length in
+ dump-guest-memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Suraj Jitindar Singh <sjtindarsingh@gmail.com>
 
-On Fri, Jun 15, 2018 at 10:13:07AM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
-> 
-> > In my Out-Of-Band test, "check -qcow2 060" fail with this:
-> >
-> > 060 5s ... - output mismatch (see 060.out.bad)
-> > --- /home/peterx/git/qemu/tests/qemu-iotests/060.out    2018-06-15 08:31:14.607411950 +0800
-> > +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/060.out.bad    2018-06-15 08:33:09.679880113 +0800
-> > @@ -427,8 +427,8 @@
-> >  QMP_VERSION
-> >  {"return": {}}
-> >  qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1 index: 0); further non-fatal corruption events will be suppressed
-> > -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a0
-> > 0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
-> >  read failed: Input/output error
-> > +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a0
-> > 0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
-> >  {"return": ""}
-> >  {"return": {}}
-> >  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> > Failures: 060
-> > Failed 1 of 1 tests
-> 
-> Please indent this diff; git-am chokes on it for me.
+The dump-guest-memory command is used to dump an area of guest memory
+to a file, the piece of memory is specified by a begin address and
+a length. These parameters are specified as ints and thus have a maximum
+value of 4GB. This means you can't dump the guest memory past the first
+4GB and instead get:
+(qemu) dump-guest-memory tmp 0x100000000 0x100000000
+'dump-guest-memory' has failed: integer is for 32-bit values
+Try "help dump-guest-memory" for more information
 
-Will do.
+This limitation is imposed in monitor_parse_arguments() since they are
+both ints. hmp_dump_guest_memory() uses 64 bit quantities to store both
+the begin and length values. Thus specify begin and length as long so
+that the entire guest memory space can be dumped.
 
-> 
-> > The order of the event and the in/out error line is swapped.  I didn't
-> > dig up the reason, but AFAIU what we want to verify is the event rather
-> > than stderr.  Let's drop the stderr line directly for this test.
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> 
-> Lose one S-o-b, please :)
+Signed-off-by: Suraj Jitindar Singh <sjtindarsingh@gmail.com>
+---
+ hmp-commands.hx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yeah. :)
-
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 0734fea931..3b5c1f65db 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1116,7 +1116,7 @@ ETEXI
+ 
+     {
+         .name       = "dump-guest-memory",
+-        .args_type  = "paging:-p,detach:-d,zlib:-z,lzo:-l,snappy:-s,filename:F,begin:i?,length:i?",
++        .args_type  = "paging:-p,detach:-d,zlib:-z,lzo:-l,snappy:-s,filename:F,begin:l?,length:l?",
+         .params     = "[-p] [-d] [-z|-l|-s] filename [begin length]",
+         .help       = "dump guest memory into file 'filename'.\n\t\t\t"
+                       "-p: do paging to get guest's memory mapping.\n\t\t\t"
 -- 
-Peter Xu
+2.13.6
