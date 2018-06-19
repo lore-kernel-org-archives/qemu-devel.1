@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fV98X-0002N2-F5
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 01:25:02 -0400
+	(envelope-from <thuth@redhat.com>) id 1fV98e-0002SA-TP
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 01:25:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fV98U-0007SU-CC
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 01:25:01 -0400
-Received: from 15.mo3.mail-out.ovh.net ([87.98.150.177]:44954)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fV98U-0007Ry-4s
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 01:24:58 -0400
-Received: from player793.ha.ovh.net (unknown [10.109.120.111])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 0DF0D1BDD46
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 07:24:55 +0200 (CEST)
-References: <20180615152536.30093-1-clg@kaod.org>
-	<20180615152536.30093-4-clg@kaod.org>
-	<20180618103844.GX25461@umbus.fritz.box>
-	<9d1ce421-9caa-08eb-2417-15307dd271ed@kaod.org>
-	<20180618121328.GY25461@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <048d2369-389f-1118-03b0-b81e6bd565a0@kaod.org>
-Date: Tue, 19 Jun 2018 07:24:44 +0200
+	(envelope-from <thuth@redhat.com>) id 1fV98b-0007Ur-OL
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 01:25:08 -0400
+References: <20180618215601.8974-1-mail@sebastianbauer.info>
+	<20180618235557.GB25461@umbus.fritz.box>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ec75487b-ea7c-32c2-4b9e-654d4bc1018e@redhat.com>
+Date: Tue, 19 Jun 2018 07:24:51 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180618121328.GY25461@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] ppc/pnv: introduce Pnv8Chip and
- Pnv9Chip models
+In-Reply-To: <20180618235557.GB25461@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="C93Lxq1ztHMhDhZ4bA7wxNDsdbAcFCOSL"
+Subject: Re: [Qemu-devel] [PATCH] ppc: Include vga cirrus card into the
+ compiling process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,33 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, Sebastian Bauer <mail@sebastianbauer.info>
+Cc: qemu-devel@nongnu.org, balaton@eik.bme.hu, qemu-ppc@nongnu.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--C93Lxq1ztHMhDhZ4bA7wxNDsdbAcFCOSL
+From: Thomas Huth <thuth@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>,
+ Sebastian Bauer <mail@sebastianbauer.info>
+Cc: qemu-devel@nongnu.org, balaton@eik.bme.hu, qemu-ppc@nongnu.org
+Message-ID: <ec75487b-ea7c-32c2-4b9e-654d4bc1018e@redhat.com>
+Subject: Re: [PATCH] ppc: Include vga cirrus card into the compiling process
+References: <20180618215601.8974-1-mail@sebastianbauer.info>
+ <20180618235557.GB25461@umbus.fritz.box>
+In-Reply-To: <20180618235557.GB25461@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
->>>  typedef struct PnvChipClass {
->>>      /*< private >*/
->>> @@ -75,6 +95,7 @@ typedef struct PnvChipClass {
->>>  
->>>      hwaddr       xscom_base;
->>>  
->>> +    void (*realize)(PnvChip *chip, Error **errp);
+On 19.06.2018 01:55, David Gibson wrote:
+> On Mon, Jun 18, 2018 at 11:56:01PM +0200, Sebastian Bauer wrote:
+>> Drivers for this card exists on PPC-based AmigaOS guests so it is usef=
+ul to
+>> allow users to emulate the graphics card for PPC machines.
 >>
->> This looks the wrong way round from how things are usually done.
->> Rather than having the base class realize() call the subclass specific
->> realize hook, it's more usual for the subclass to set the
->> dc->realize() and have it call a k->parent_realize() to call up the
->> chain.  grep for device_class_set_parent_realize() for some more
->> examples.
->
-> Ah. That is more to my liking. There are a couple of models following
-> the wrong object pattern, xics, vio. I will check them.
+>> Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+>=20
+> Have you checked the Cirrus VGA actually works on a ppc machine?
 
-So XICS is causing some head-aches because the ics-kvm model inherits
-from ics-simple which inherits from ics-base. so we have a grand-parent
-class to handle.
+FWIW: It actually even works with SLOF on the pseries machine:
 
-if we could affiliate ics-kvm directly to ics-base it would make the 
-family affair easier. we need to check migration though.  
+https://github.com/aik/SLOF/blob/master/board-qemu/slof/pci-device_1013_0=
+0b8.fs#L252
 
-C.
+ Thomas
+
+
+--C93Lxq1ztHMhDhZ4bA7wxNDsdbAcFCOSL
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJbKJOsAAoJEC7Z13T+cC21b6QP/2OmxIU6KgN64lvEibKo9398
+JoxN7FnT+P7ObTAMBtN6/neqON7AklKmqpO4MdWYcvODMIaIMdg7vjO1cYyJejDR
+qhiMr6lg+ZdA52yCN/EMPFv/AcqUZSSjVYHyTCJ4eAy/dL0FZlwmP8kFTl/ViORf
+258O0L31uDbWu4R4rRsBD/oWCuWIjPuxOa6y5n8G5HMouG1sm3qhO1PXr4TynvjM
+TsCTj49JJnLtNF+bcyhpQc/G8pG75fO1psMNbYshiu0WF+qkcl1JULjIdrskqMSs
+pWdWvB558ZjR1y1+Q+5q2cN2AqEEz//D0LkOqjaSYE7voJxfjNSzC2eYVRx/f7FZ
+Q+Bjei7NOypNBAm35YOP40NTtlFXRm2+pL355WqRzAAZOlR25i0Db87DE67g0Zdl
+OgAXePgJWldV3o57CKi+TuoMYJBw3jhJcvOi1fcGMsC3WqQTelOMnJuDgBDrMR12
+oNe+zAKwCeZn9eDvq53OVMZIi2wAX8a4QW8rx1XipJ9OmYUR7ZIoIjRxKsEZgN3i
+ohl72XJzkA1FGQoMytr3NQnZQ0Xo/RAw7vWEx7mctwZB4cpBXqkn9vPPp6pnJqor
+Qzx3zqH8gC/ROEv6aNKPrFvlt0ZiFJTXXbeFZXmAxQDfFoa1PV7yt/wCAApXW4QG
+bd8gnL8ICxkuQLEK52dN
+=VXtv
+-----END PGP SIGNATURE-----
+
+--C93Lxq1ztHMhDhZ4bA7wxNDsdbAcFCOSL--
