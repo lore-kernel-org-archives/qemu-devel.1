@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fVEtZ-0000vd-Vt
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:33:59 -0400
+	(envelope-from <armbru@redhat.com>) id 1fVEvd-0002D4-4R
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:36:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fVEtW-0005UA-SO
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:33:57 -0400
-Received: from 1.mo1.mail-out.ovh.net ([178.32.127.22]:40016)
+	(envelope-from <armbru@redhat.com>) id 1fVEvZ-0006Kz-Sl
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:36:05 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35048 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fVEtW-0005Tl-Ku
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:33:54 -0400
-Received: from player763.ha.ovh.net (unknown [10.109.105.21])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id D0D8B1094F4
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 13:33:52 +0200 (CEST)
-Date: Tue, 19 Jun 2018 13:33:45 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180619133345.2fc58378@bahia.lan>
-In-Reply-To: <20180619085631.2859-1-aik@ozlabs.ru>
-References: <20180619085631.2859-1-aik@ozlabs.ru>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVEvZ-0006Kj-Lq
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:36:01 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
+	<20180321115211.17937-4-marcandre.lureau@redhat.com>
+	<87po0nyzrg.fsf@dusky.pond.sub.org>
+	<CAJ+F1C+aqkJau41jYMse_1ypq=prUjENjEXeymbKq8G4rv3u-A@mail.gmail.com>
+Date: Tue, 19 Jun 2018 13:35:59 +0200
+In-Reply-To: <CAJ+F1C+aqkJau41jYMse_1ypq=prUjENjEXeymbKq8G4rv3u-A@mail.gmail.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 19 Jun 2018
+	10:41:12 +0200")
+Message-ID: <87wouvvwio.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH qemu] xics-kvm: Fix compile
- warning
+Subject: Re: [Qemu-devel] [PATCH v3 03/49] qapi: add 'if' to top-level
+ expressions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +32,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Markus Armbruster <armbru@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-On Tue, 19 Jun 2018 18:56:31 +1000
-Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
 
-> This fixes uninitialized variable warning:
->=20
-> /home/aik/p/qemu/hw/intc/xics_kvm.c: In function =E2=80=98ics_set_kvm_sta=
-te=E2=80=99:
-> /home/aik/p/qemu/hw/intc/xics_kvm.c:281:20: warning: =E2=80=98ret=E2=80=
-=99 may be used uninitialized in this function [-Wmaybe-uninitialized]
->              return ret;
->                     ^~~
->=20
-> Discovered with gcc (Ubuntu 7.3.0-16ubuntu3) 7.3.0 from Ubuntu 18.04.
->=20
-> Fixes: bf358b541b8 "xics_kvm: use KVM helpers"
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
+> On Tue, Jun 19, 2018 at 9:57 AM, Markus Armbruster <armbru@redhat.com> wr=
+ote:
+>> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>>
+>>> Accept 'if' key in top-level elements, accepted as string or list of
+>>> string type. The following patches will modify the test visitor to
+>>> check the value is correctly saved, and generate #if/#endif code (as a
+>>> single #if/endif line or a series for a list).
+>>>
+>>> Example of 'if' key:
+>>> { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+>>>   'if': 'defined(TEST_IF_STRUCT)' }
+>>>
+>>> The generated code is for now *unconditional*. Later patches generate
+>>> the conditionals.
+>>>
+>>> A following patch for qapi-code-gen.txt will provide more complete
+>>> documentation for 'if' usage.
+>>>
+>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> [...]
+>>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>>> index 0b277036df..f77ad2ba3b 100644
+>>> --- a/tests/Makefile.include
+>>> +++ b/tests/Makefile.include
+>>> @@ -436,6 +436,10 @@ qapi-schema +=3D args-unknown.json
+>>>  qapi-schema +=3D bad-base.json
+>>>  qapi-schema +=3D bad-data.json
+>>>  qapi-schema +=3D bad-ident.json
+>>> +qapi-schema +=3D bad-if.json
+>>> +qapi-schema +=3D bad-if-empty.json
+>>> +qapi-schema +=3D bad-if-empty-list.json
+>>> +qapi-schema +=3D bad-if-list.json
+>>>  qapi-schema +=3D bad-type-bool.json
+>>>  qapi-schema +=3D bad-type-dict.json
+>>>  qapi-schema +=3D bad-type-int.json
+>>> @@ -933,6 +937,8 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): che=
+ck-%.json: $(SRC_PATH)/%.json
+>>>               "TEST","$*.out")
+>>>       @# Sanitize error messages (make them independent of build direct=
+ory)
+>>>       @perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff -u $(SRC_P=
+ATH)/$*.err -
+>>> +     @if test "$(QAPI_REGENERATE)" =3D=3D 1 ; then cp $*.test.out $(SR=
+C_PATH)/$*.out ; fi
+>>> +     @if test "$(QAPI_REGENERATE)" =3D=3D 1 ; then cp $*.test.err $(SR=
+C_PATH)/$*.err ; fi
+>>>       @diff -u $(SRC_PATH)/$*.out $*.test.out
+>>>       @diff -u $(SRC_PATH)/$*.exit $*.test.exit
+>>>
+>>
+>> Huh?
+>
+> Oops, leftover. Do you have an alternative? I could propose it as a
+> seperate patch if it's generally useful.
 
-Already fixed and present in David's last pull req:
+I guess what you're trying to do here is updating expected test output.
+So far, everybody does that by hand.
 
-https://lists.nongnu.org/archive/html/qemu-ppc/2018-06/msg00682.html
+A make target to do that (check-accept?) would be nice.  Trivial to do
+if we had a single test harness, but of course we have many.
 
->  hw/intc/xics_kvm.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index 8bdf6af..48efbce 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -273,8 +273,8 @@ static int ics_set_kvm_state(ICSState *ics, int versi=
-on_id)
->                  state |=3D KVM_XICS_QUEUED;
->          }
-> =20
-> -        kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
-> -                          i + ics->offset, &state, true, &local_err);
-> +        ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURC=
-ES,
-> +                                i + ics->offset, &state, true, &local_er=
-r);
->          if (local_err) {
->              error_report("Unable to restore KVM interrupt controller sta=
-te"
->                      " for IRQs %d: %s", i + ics->offset, strerror(errno)=
-);
+My R-by stands with this hunk dropped.
