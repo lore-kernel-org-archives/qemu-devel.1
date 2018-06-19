@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5ge-0008WS-1E
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:00 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5gf-00007K-W2
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5gc-0007eO-S5
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:00 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5ge-0007f3-Oy
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:02 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:43:09 -0500
-Message-Id: <20180619014319.28272-104-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:43:10 -0500
+Message-Id: <20180619014319.28272-105-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 103/113] iotests: Add case for a corrupted
- inactive image
+Subject: [Qemu-devel] [PATCH 104/113] throttle: Fix crash on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,86 +21,155 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: qemu-stable@nongnu.org, Alberto Garcia <berto@igalia.com>, Max Reitz <mreitz@redhat.com>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Alberto Garcia <berto@igalia.com>
 
-Reviewed-by: John Snow <jsnow@redhat.com>
-Tested-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+The throttle block filter can be reopened, and with this it is
+possible to change the throttle group that the filter belongs to.
+
+The way the code does that is the following:
+
+  - On throttle_reopen_prepare(): create a new ThrottleGroupMember
+    and attach it to the new throttle group.
+
+  - On throttle_reopen_commit(): detach the old ThrottleGroupMember,
+    delete it and replace it with the new one.
+
+The problem with this is that by replacing the ThrottleGroupMember the
+previous value of io_limits_disabled is lost, causing an assertion
+failure in throttle_co_drain_end().
+
+This problem can be reproduced by reopening a throttle node:
+
+   $QEMU -monitor stdio
+   -object throttle-group,id=tg0,x-iops-total=1000 \
+   -blockdev node-name=hd0,driver=qcow2,file.driver=file,file.filename=hd.qcow2 \
+   -blockdev node-name=root,driver=throttle,throttle-group=tg0,file=hd0,read-only=on
+
+   (qemu) block_stream root
+   block/throttle.c:214: throttle_co_drain_end: Assertion `tgm->io_limits_disabled' failed.
+
+Since we only want to change the throttle group on reopen there's no
+need to create a ThrottleGroupMember and discard the old one. It's
+easier if we simply detach it from its current group and attach it to
+the new one.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Message-id: 20180608151536.7378-1-berto@igalia.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20180606193702.7113-4-mreitz@redhat.com
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit c50abd175a88cd41c2c08339de91f6f6e4a7b162)
+(cherry picked from commit bc33c047d1ec0b35c9cd8be62bcefae2da28654f)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qemu-iotests/060     | 30 ++++++++++++++++++++++++++++++
- tests/qemu-iotests/060.out | 14 ++++++++++++++
- 2 files changed, 44 insertions(+)
+ block/throttle.c | 54 +++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 33 insertions(+), 21 deletions(-)
 
-diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index 14797dd3b0..d6f4e6eb3c 100755
---- a/tests/qemu-iotests/060
-+++ b/tests/qemu-iotests/060
-@@ -439,6 +439,36 @@ echo "{'execute': 'qmp_capabilities'}
-             -drive if=none,node-name=drive,file="$TEST_IMG",driver=qcow2 \
-     | _filter_qmp | _filter_qemu_io
+diff --git a/block/throttle.c b/block/throttle.c
+index 833175ac77..d5903784c0 100644
+--- a/block/throttle.c
++++ b/block/throttle.c
+@@ -35,9 +35,12 @@ static QemuOptsList throttle_opts = {
+     },
+ };
  
-+echo
-+echo "=== Testing incoming inactive corrupted image ==="
-+echo
+-static int throttle_configure_tgm(BlockDriverState *bs,
+-                                  ThrottleGroupMember *tgm,
+-                                  QDict *options, Error **errp)
++/*
++ * If this function succeeds then the throttle group name is stored in
++ * @group and must be freed by the caller.
++ * If there's an error then @group remains unmodified.
++ */
++static int throttle_parse_options(QDict *options, char **group, Error **errp)
+ {
+     int ret;
+     const char *group_name;
+@@ -62,8 +65,7 @@ static int throttle_configure_tgm(BlockDriverState *bs,
+         goto fin;
+     }
+ 
+-    /* Register membership to group with name group_name */
+-    throttle_group_register_tgm(tgm, group_name, bdrv_get_aio_context(bs));
++    *group = g_strdup(group_name);
+     ret = 0;
+ fin:
+     qemu_opts_del(opts);
+@@ -74,6 +76,8 @@ static int throttle_open(BlockDriverState *bs, QDict *options,
+                          int flags, Error **errp)
+ {
+     ThrottleGroupMember *tgm = bs->opaque;
++    char *group;
++    int ret;
+ 
+     bs->file = bdrv_open_child(NULL, options, "file", bs,
+                                &child_file, false, errp);
+@@ -83,7 +87,14 @@ static int throttle_open(BlockDriverState *bs, QDict *options,
+     bs->supported_write_flags = bs->file->bs->supported_write_flags;
+     bs->supported_zero_flags = bs->file->bs->supported_zero_flags;
+ 
+-    return throttle_configure_tgm(bs, tgm, options, errp);
++    ret = throttle_parse_options(options, &group, errp);
++    if (ret == 0) {
++        /* Register membership to group with name group_name */
++        throttle_group_register_tgm(tgm, group, bdrv_get_aio_context(bs));
++        g_free(group);
++    }
 +
-+_make_test_img 64M
-+# Create an unaligned L1 entry, so qemu will signal a corruption when
-+# reading from the covered area
-+poke_file "$TEST_IMG" "$l1_offset" "\x00\x00\x00\x00\x2a\x2a\x2a\x2a"
++    return ret;
+ }
+ 
+ static void throttle_close(BlockDriverState *bs)
+@@ -159,35 +170,36 @@ static void throttle_attach_aio_context(BlockDriverState *bs,
+ static int throttle_reopen_prepare(BDRVReopenState *reopen_state,
+                                    BlockReopenQueue *queue, Error **errp)
+ {
+-    ThrottleGroupMember *tgm;
++    int ret;
++    char *group = NULL;
+ 
+     assert(reopen_state != NULL);
+     assert(reopen_state->bs != NULL);
+ 
+-    reopen_state->opaque = g_new0(ThrottleGroupMember, 1);
+-    tgm = reopen_state->opaque;
+-
+-    return throttle_configure_tgm(reopen_state->bs, tgm, reopen_state->options,
+-            errp);
++    ret = throttle_parse_options(reopen_state->options, &group, errp);
++    reopen_state->opaque = group;
++    return ret;
+ }
+ 
+ static void throttle_reopen_commit(BDRVReopenState *reopen_state)
+ {
+-    ThrottleGroupMember *old_tgm = reopen_state->bs->opaque;
+-    ThrottleGroupMember *new_tgm = reopen_state->opaque;
++    BlockDriverState *bs = reopen_state->bs;
++    ThrottleGroupMember *tgm = bs->opaque;
++    char *group = reopen_state->opaque;
 +
-+# Inactive images are effectively read-only images, so this should be a
-+# non-fatal corruption (which does not modify the image)
-+echo "{'execute': 'qmp_capabilities'}
-+      {'execute': 'human-monitor-command',
-+       'arguments': {'command-line': 'qemu-io drive \"read 0 512\"'}}
-+      {'execute': 'quit'}" \
-+    | $QEMU -qmp stdio -nographic -nodefaults \
-+            -blockdev "{'node-name': 'drive',
-+                        'driver': 'qcow2',
-+                        'file': {
-+                            'driver': 'file',
-+                            'filename': '$TEST_IMG'
-+                        }}" \
-+            -incoming exec:'cat /dev/null' \
-+            2>&1 \
-+    | _filter_qmp | _filter_qemu_io
-+
-+echo
-+# Image should not have been marked corrupt
-+_img_info --format-specific | grep 'corrupt:'
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index c4cb7c665e..36714ff414 100644
---- a/tests/qemu-iotests/060.out
-+++ b/tests/qemu-iotests/060.out
-@@ -411,4 +411,18 @@ write failed: Input/output error
- {"return": ""}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+=== Testing incoming inactive corrupted image ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+QMP_VERSION
-+{"return": {}}
-+qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1 index: 0); further non-fatal corruption events will be suppressed
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a00 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
-+read failed: Input/output error
-+{"return": ""}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+    corrupt: false
- *** done
++    assert(group);
+ 
+-    throttle_group_unregister_tgm(old_tgm);
+-    g_free(old_tgm);
+-    reopen_state->bs->opaque = new_tgm;
++    if (strcmp(group, throttle_group_get_name(tgm))) {
++        throttle_group_unregister_tgm(tgm);
++        throttle_group_register_tgm(tgm, group, bdrv_get_aio_context(bs));
++    }
++    g_free(reopen_state->opaque);
+     reopen_state->opaque = NULL;
+ }
+ 
+ static void throttle_reopen_abort(BDRVReopenState *reopen_state)
+ {
+-    ThrottleGroupMember *tgm = reopen_state->opaque;
+-
+-    throttle_group_unregister_tgm(tgm);
+-    g_free(tgm);
++    g_free(reopen_state->opaque);
+     reopen_state->opaque = NULL;
+ }
+ 
 -- 
 2.11.0
