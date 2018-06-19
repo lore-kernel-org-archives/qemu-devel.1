@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54577)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fVEKR-00083a-D5
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:57:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1fVEOu-0001A8-My
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:02:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fVEKO-00017Z-4t
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:57:39 -0400
-References: <20180618215601.8974-1-mail@sebastianbauer.info>
-	<20180618235557.GB25461@umbus.fritz.box>
-	<73dd5b26b622e6c59776976aa2c7a3a0@sebastianbauer.info>
-	<20180619043631.GC11674@umbus.fritz.box>
-	<alpine.BSF.2.21.1806191218120.6476@zero.eik.bme.hu>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d66a1914-1fbd-93d0-7e9f-879240c6fe94@redhat.com>
-Date: Tue, 19 Jun 2018 12:57:33 +0200
+	(envelope-from <eblake@redhat.com>) id 1fVEOq-0002gO-7D
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:02:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42208 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fVEOq-0002gC-2R
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:02:12 -0400
+References: <20180618175958.29073-1-armbru@redhat.com>
+	<20180618175958.29073-2-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ac17cafd-6133-c6c9-c25e-08145c5a3be4@redhat.com>
+Date: Tue, 19 Jun 2018 06:02:10 -0500
 MIME-Version: 1.0
-In-Reply-To: <alpine.BSF.2.21.1806191218120.6476@zero.eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180618175958.29073-2-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] ppc: Include vga cirrus card
- into the compiling process
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] qapi: Open files with
+ encoding='utf-8'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,17 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
-Cc: Sebastian Bauer <mail@sebastianbauer.info>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: tamiko@43-1.org, arfrever.fta@gmail.com
 
-On 19.06.2018 12:23, BALATON Zoltan wrote:
-[...]
-> Also what about ppcemb-softmmu? It's deprecated but do we still want to
-> update it until it's removed or deprecated means no new features are
-> added to it? I've also updated ppcemb config in my other patches to keep
-> sam460ex working there the same as with ppc-softmmu.
+On 06/18/2018 12:59 PM, Markus Armbruster wrote:
+> Python 2 happily reads UTF-8 files in text mode, but Python 3 requires
+> either UTF-8 locale or an explicit encoding passed to open().  Commit
+> d4e5ec877ca fixed this by setting the en_US.UTF-8 locale.  Falls apart
+> when the locale isn't be available.
+> 
+> Matthias Maier and Arfrever Frehtes Taifersar Arahesis proposed to use
+> binary mode instead, with manual conversion from bytes to str.  Works,
+> but opening with an explicit encoding is simpler, so do that.
+> 
+> Since Python 2's open() doesn't support the encoding parameter, we
+> need to suppress it with a version check.
+> 
+> Reported-by: Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
+> Reported-by: Matthias Maier <tamiko@43-1.org>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   scripts/qapi/common.py | 17 ++++++++++++++---
+>   1 file changed, 14 insertions(+), 3 deletions(-)
+> 
 
-IMHO it's not worth the effort anymore to update the ppcemb-softmmu
-configs. It's going to be removed soon anyway.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
- Thomas
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
