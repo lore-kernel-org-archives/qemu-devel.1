@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37734)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVF7p-0008Gs-17
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:48:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1fVFC3-00021W-2m
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:53:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVF7n-0003ea-At
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:48:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59604 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fVFBz-00057i-5M
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:53:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57388 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fVF7n-0003eL-68
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:48:39 -0400
-References: <20180619053426.13065-1-peterx@redhat.com>
-	<20180619053426.13065-3-peterx@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <216e8a49-f5d9-102a-bb8c-a98d76b11553@redhat.com>
-Date: Tue, 19 Jun 2018 06:48:35 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVFBy-00057O-WD
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:52:59 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180618175958.29073-1-armbru@redhat.com>
+	<20180618175958.29073-2-armbru@redhat.com>
+	<20180618213526.GJ24764@localhost.localdomain>
+	<87tvpzz3wn.fsf@dusky.pond.sub.org>
+	<20180619105032.GO7451@localhost.localdomain>
+Date: Tue, 19 Jun 2018 13:52:56 +0200
+In-Reply-To: <20180619105032.GO7451@localhost.localdomain> (Eduardo Habkost's
+	message of "Tue, 19 Jun 2018 07:50:32 -0300")
+Message-ID: <87bmc7vvqf.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180619053426.13065-3-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/7] monitor: rename *_pop_one to
- *_pop_any
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] qapi: Open files with
+ encoding='utf-8'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +31,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, tamiko@43-1.org, qemu-devel@nongnu.org, arfrever.fta@gmail.com
 
-On 06/19/2018 12:34 AM, Peter Xu wrote:
-> The old names are confusing since both of the old functions are poping
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-s/poping/popping/
+> On Tue, Jun 19, 2018 at 08:28:08AM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>> 
+>> > On Mon, Jun 18, 2018 at 07:59:57PM +0200, Markus Armbruster wrote:
+>> >> Python 2 happily reads UTF-8 files in text mode, but Python 3 requires
+>> >> either UTF-8 locale or an explicit encoding passed to open().  Commit
+>> >> d4e5ec877ca fixed this by setting the en_US.UTF-8 locale.  Falls apart
+>> >> when the locale isn't be available.
+>> >> 
+>> >> Matthias Maier and Arfrever Frehtes Taifersar Arahesis proposed to use
+>> >> binary mode instead, with manual conversion from bytes to str.  Works,
+>> >> but opening with an explicit encoding is simpler, so do that.
+>> >> 
+>> >> Since Python 2's open() doesn't support the encoding parameter, we
+>> >> need to suppress it with a version check.
+>> >> 
+>> >> Reported-by: Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
+>> >> Reported-by: Matthias Maier <tamiko@43-1.org>
+>> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> >> ---
+>> >>  scripts/qapi/common.py | 17 ++++++++++++++---
+>> >>  1 file changed, 14 insertions(+), 3 deletions(-)
+>> >> 
+>> >> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+>> >> index 2462fc0291..832f11438a 100644
+>> >> --- a/scripts/qapi/common.py
+>> >> +++ b/scripts/qapi/common.py
+>> >> @@ -16,6 +16,7 @@ import errno
+>> >>  import os
+>> >>  import re
+>> >>  import string
+>> >> +import sys
+>> >>  from collections import OrderedDict
+>> >>  
+>> >>  builtin_types = {
+>> >> @@ -340,7 +341,10 @@ class QAPISchemaParser(object):
+>> >>              return None
+>> >>  
+>> >>          try:
+>> >> -            fobj = open(incl_fname, 'r')
+>> >> +            if sys.version_info[0] >= 3:
+>> >> +                fobj = open(incl_fname, 'r', encoding='utf-8')
+>> >> +            else:
+>> >> +                fobj = open(incl_fname, 'r')
+>> >
+>> > I dislike the Python version check, but getting rid of it would
+>> > require rewriting the QAPI modules to not use the Python 2 str
+>> > type (that has different semantics from Python 3 str type).
+>> 
+>> The version check is ugly, but it has a property I rather like: when we
+>> drop support for Python 2, the conditional becomes True, and partial
+>> evaluation results in the Python 3 code we actually want.
+>> 
+>> > The python-future package would help us write code for a single
+>> > file/string API instead of two different APIs, but it's not a
+>> > QEMU build dependency (yet?), so this patch is good enough for
+>> > now.
+>> 
+>> Please do not invest more than absolutely necessary in Python 2 support.
+>> All such investment will turn into technical debt in less than two
+>> years.  If you must invest, pick a solution that will result in less
+>> technical debt.  We can accept local ugliness for that.
+>> 
+>> In my personal opinion, dumb ideas like supporting Python 2 this close
+>> to its EOL ought to look ugly.
+>
+> That's the whole point: python-future allows us to not worry
+> about Python 2 support in the code anymore because it exposes the
+> Python 3 string API (and others) even if we're running Python 2.
+>
+> After we stop supporting Python 2, we can simply delete the "from
+> __future__ import .*" and "from builtins import .*" lines.
 
-> an item from multiple queues rather than a single queue.  In that
-> sense, *_pop_any() suites better than *_pop_one().
-> 
-> Since at it, touch up the function monitor_qmp_response_pop_any() a bit
-> to let the callers pass in a QMPResponse struct instead of returning a
-> struct.  Change the return value to boolean to mark whether we have
-> poped a valid response instead.
+You're right, __future__ is one of the least annoying ways to keep
+Python 2 working.  But is the improvement over my stupid, ugly solution
+worth your while?  You decide.
 
-s/poped/popped/
+> Anyway, I will send a RFC series demonstrating that, and then we
+> can discuss if it's worth it.  My main worry is not the extra
+> imports in Python code, but the introduction of a new build
+> dependency only for a few (one?) releases.
 
-> 
-> Suggested-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->   monitor.c | 20 +++++++++-----------
->   1 file changed, 9 insertions(+), 11 deletions(-)
-> 
+The sane extra dependency to add would be Python 3.  Not worth arguing
+again; time's on my side ;)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>> > Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+>> 
+>> Uh, what does "Acked-by" add over "Reviewed-by"?
+>
+> It was supposed to indicate that I agree it can be merged through
+> other maintainers.  But it looks like this is not part of the
+> original definition of "Acked-by"?
+
+I'll drop the Acked-by then.
