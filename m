@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVLhX-0000vm-W4
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:50:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1fVLhw-0001F4-MJ
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:50:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVLhX-00027s-3K
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:50:00 -0400
-References: <20180426025129.621969-1-eblake@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fVLhv-0002SO-So
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:50:24 -0400
+References: <20180619183457.371081-1-vsementsov@virtuozzo.com>
+	<20180619183457.371081-4-vsementsov@virtuozzo.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <5e00e94d-bd70-0c53-d0ed-33aa066e6cf3@redhat.com>
-Date: Tue, 19 Jun 2018 13:49:54 -0500
+Message-ID: <22f38c8e-8fbb-352e-ab15-b5e5f20ac03e@redhat.com>
+Date: Tue, 19 Jun 2018 13:50:17 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180426025129.621969-1-eblake@redhat.com>
+In-Reply-To: <20180619183457.371081-4-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 0/6] minor qcow2 compression improvements
+Subject: Re: [Qemu-devel] [PATCH 3/7] block/qcow2-refcount:
+ check_refcounts_l2: refactor compressed case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,51 +25,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, berto@igalia.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
-ping
+On 06/19/2018 01:34 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Separate offset and size of compressed cluster.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   block/qcow2-refcount.c | 15 ++++++++++-----
+>   1 file changed, 10 insertions(+), 5 deletions(-)
 
-On 04/25/2018 09:51 PM, Eric Blake wrote:
-> Even though v5 was posted earlier today, it was worth a respin:
-> - 2/6: add R-b [Berto]
-> - 4/6, 6/6: improve commit messages [Max]
-> - 5/6: new patch, with an iotests proving that 4/6 is a bug fix [Max]
-> 
-> The new test is rather slow (nearly 90 seconds for me using
-> tmpfs) unless it skips entirely (such as testing on ext4); ideas
-> for speeding it up are welcome (translation: maybe qemu should
-> optimize the search for the next available cluster to allocate,
-> and/or qemu-img check should be faster at reporting leaked
-> clusters)
-> 
-> 001/6:[----] [--] 'qcow2: Prefer byte-based calls into bs->file'
-> 002/6:[----] [--] 'qcow2: Document some maximum size constraints'
-> 003/6:[----] [--] 'qcow2: Reduce REFT_OFFSET_MASK'
-> 004/6:[----] [--] 'qcow2: Don't allow overflow during cluster allocation'
-> 005/6:[down] 'iotests: Add new test 214 for max compressed cluster offset'
-> 006/6:[----] [--] 'qcow2: Avoid memory over-allocation on compressed images'
-> 
-> Eric Blake (6):
->    qcow2: Prefer byte-based calls into bs->file
->    qcow2: Document some maximum size constraints
->    qcow2: Reduce REFT_OFFSET_MASK
->    qcow2: Don't allow overflow during cluster allocation
->    iotests: Add new test 214 for max compressed cluster offset
->    qcow2: Avoid memory over-allocation on compressed images
-> 
->   docs/interop/qcow2.txt     | 40 +++++++++++++++++--
->   block/qcow2.h              |  8 +++-
->   block/qcow2-cluster.c      | 32 +++++++++------
->   block/qcow2-refcount.c     | 27 ++++++++-----
->   block/qcow2.c              |  2 +-
->   tests/qemu-iotests/214     | 97 ++++++++++++++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/214.out | 54 ++++++++++++++++++++++++++
->   tests/qemu-iotests/group   |  1 +
->   8 files changed, 234 insertions(+), 27 deletions(-)
->   create mode 100755 tests/qemu-iotests/214
->   create mode 100644 tests/qemu-iotests/214.out
-> 
+Hmm, I wonder if this duplicates my pending patch:
+
+https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg04542.html
 
 -- 
 Eric Blake, Principal Software Engineer
