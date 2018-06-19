@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVIoi-000739-6e
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:45:13 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fVIs6-00019N-DR
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:48:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVIof-0006bJ-3F
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:45:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37888 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVIoe-0006b4-Tc
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:45:09 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 62C6D7DAC3
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 15:45:08 +0000 (UTC)
-Date: Tue, 19 Jun 2018 16:45:05 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180619154504.GI2368@work-vm>
-References: <20180619151719.17002-1-berrange@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1fVIs3-000877-Al
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:48:42 -0400
+Date: Tue, 19 Jun 2018 17:48:30 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180619174830.33d2c3d2@redhat.com>
+In-Reply-To: <20180618144800.555-2-david@redhat.com>
+References: <20180618144800.555-1-david@redhat.com>
+	<20180618144800.555-2-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180619151719.17002-1-berrange@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: fix crash in when incoming
- client channel setup fails
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/4] pc-dimm: assign and verify the
+ "slot" property during pre_plug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,83 +24,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> The way we determine if we can start the incoming migration was
-> changed to use migration_has_all_channels() in:
->=20
->   commit 428d89084c709e568f9cd301c2f6416a54c53d6d
->   Author: Juan Quintela <quintela@redhat.com>
->   Date:   Mon Jul 24 13:06:25 2017 +0200
->=20
->     migration: Create migration_has_all_channels
->=20
-> This method in turn calls multifd_recv_all_channels_created()
-> which is hardcoded to always return 'true' when multifd is
-> not in use.
->=20
-> This means that if channel initialization fails with normal
-> migration, it'll never notice and attempt to start the
-> incoming migration regardless.
+On Mon, 18 Jun 2018 16:47:57 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-I'm not sure if that was actually the cause, because older versions
-had no check at all in socket_accept_incoming_migration.
+> We can assign and verify the slot before realizing and trying to plug.
+> reading/writing the slot property should never fail, so let's reduce
+> error handling a bit by using &error_abort.
+> 
+> To do this during pre_plug, add and use (x86, ppc) pc_dimm_pre_plug().
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-> This can be seen, for example, if a client connects to a server
-> requiring TLS, but has an invalid x509 certificate:
->=20
-> qemu-system-x86_64: The certificate hasn't got a known issuer
-> qemu-system-x86_64: migration/migration.c:386: process_incoming_migrati=
-on_co: Assertion `mis->from_src_file' failed.
->=20
->  #0  0x00007fffebd24f2b in raise () at /lib64/libc.so.6
->  #1  0x00007fffebd0f561 in abort () at /lib64/libc.so.6
->  #2  0x00007fffebd0f431 in _nl_load_domain.cold.0 () at /lib64/libc.so.=
-6
->  #3  0x00007fffebd1d692 in  () at /lib64/libc.so.6
->  #4  0x0000555555ad027e in process_incoming_migration_co (opaque=3D<opt=
-imized out>) at migration/migration.c:386
->  #5  0x0000555555c45e8b in coroutine_trampoline (i0=3D<optimized out>, =
-i1=3D<optimized out>) at util/coroutine-ucontext.c:116
->  #6  0x00007fffebd3a6a0 in __start_context () at /lib64/libc.so.6
->  #7  0x0000000000000000 in  ()
->=20
-> To handle the non-multifd case, we check whether mis->from_src_file
-> is non-NULL.
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-So, what happens with this fix, does the destination exit cleanly, or
-stay to accept another connection or what?
-
-Dave
-
-> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
 > ---
->  migration/migration.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/migration/migration.c b/migration/migration.c
-> index e1eaa97df4..38ad818b23 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -518,11 +518,12 @@ void migration_ioc_process_incoming(QIOChannel *i=
-oc)
->   */
->  bool migration_has_all_channels(void)
->  {
-> +    MigrationIncomingState *mis =3D migration_incoming_get_current();
->      bool all_channels;
-> =20
->      all_channels =3D multifd_recv_all_channels_created();
-> =20
-> -    return all_channels;
-> +    return all_channels && mis->from_src_file !=3D NULL;
+>  hw/i386/pc.c             |  2 ++
+>  hw/mem/pc-dimm.c         | 35 ++++++++++++++++++-----------------
+>  hw/ppc/spapr.c           |  1 +
+>  include/hw/mem/pc-dimm.h |  1 +
+>  4 files changed, 22 insertions(+), 17 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index f310040351..bf986baf91 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -1695,6 +1695,8 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>          error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
+>          return;
+>      }
+> +
+> +    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
 >  }
-> =20
->  /*
-> --=20
-> 2.17.0
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>  
+>  static void pc_memory_plug(HotplugHandler *hotplug_dev,
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index 65843bc52a..e56c4daef2 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -29,10 +29,27 @@
+>  
+>  static int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
+>  
+> +void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp)
+> +{
+> +    Error *local_err = NULL;
+> +    int slot;
+> +
+> +    slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP,
+> +                                   &error_abort);
+> +    slot = pc_dimm_get_free_slot(slot == PC_DIMM_UNASSIGNED_SLOT ? NULL : &slot,
+> +                                 machine->ram_slots, &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +    object_property_set_int(OBJECT(dev), slot, PC_DIMM_SLOT_PROP, &error_abort);
+> +    trace_mhp_pc_dimm_assigned_slot(slot);
+> +out:
+> +    error_propagate(errp, local_err);
+> +}
+> +
+>  void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+>                    Error **errp)
+>  {
+> -    int slot;
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+>      MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
+> @@ -59,22 +76,6 @@ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+>      }
+>      trace_mhp_pc_dimm_assigned_address(addr);
+>  
+> -    slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP, &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+> -
+> -    slot = pc_dimm_get_free_slot(slot == PC_DIMM_UNASSIGNED_SLOT ? NULL : &slot,
+> -                                 machine->ram_slots, &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+> -    object_property_set_int(OBJECT(dev), slot, PC_DIMM_SLOT_PROP, &local_err);
+> -    if (local_err) {
+> -        goto out;
+> -    }
+> -    trace_mhp_pc_dimm_assigned_slot(slot);
+> -
+>      memory_device_plug_region(machine, mr, addr);
+>      vmstate_register_ram(vmstate_mr, dev);
+>  
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 6934abc21e..9da233588b 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3211,6 +3211,7 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>          goto out;
+>      }
+>  
+> +    pc_dimm_pre_plug(dev, MACHINE(hotplug_dev), errp);
+>  out:
+>      g_free(mem_dev);
+>  }
+> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+> index 26ebb7d5e9..7b120416d1 100644
+> --- a/include/hw/mem/pc-dimm.h
+> +++ b/include/hw/mem/pc-dimm.h
+> @@ -79,6 +79,7 @@ typedef struct PCDIMMDeviceClass {
+>                                                 Error **errp);
+>  } PCDIMMDeviceClass;
+>  
+> +void pc_dimm_pre_plug(DeviceState *dev, MachineState *machine, Error **errp);
+>  void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+>                    Error **errp);
+>  void pc_dimm_unplug(DeviceState *dev, MachineState *machine);
