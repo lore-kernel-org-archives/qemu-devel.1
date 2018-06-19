@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fVLTB-0007il-WB
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:35:11 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fVLTA-0005Zk-Hh
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fVLTB-0007iO-NF
 	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:35:10 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fVLTA-0005Yj-9D
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 14:35:09 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Tue, 19 Jun 2018 21:34:54 +0300
-Message-Id: <20180619183457.371081-5-vsementsov@virtuozzo.com>
+Date: Tue, 19 Jun 2018 21:34:53 +0300
+Message-Id: <20180619183457.371081-4-vsementsov@virtuozzo.com>
 In-Reply-To: <20180619183457.371081-1-vsementsov@virtuozzo.com>
 References: <20180619183457.371081-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH 4/7] block/qcow2-refcount: check_refcounts_l2:
- reduce ignored overlaps
+Subject: [Qemu-devel] [PATCH 3/7] block/qcow2-refcount: check_refcounts_l2:
+ refactor compressed case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +23,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Reduce number of structures ignored in overlap check: when checking
-active table ignore active tables, when checking inactive table ignore
-inactive ones.
+Separate offset and size of compressed cluster.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/qcow2-refcount.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ block/qcow2-refcount.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 42167b7040..02583f260b 100644
+index 28d21bedc3..42167b7040 100644
 --- a/block/qcow2-refcount.c
 +++ b/block/qcow2-refcount.c
-@@ -1559,7 +1559,7 @@ enum {
- static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-                               void **refcount_table,
-                               int64_t *refcount_table_size, int64_t l2_offset,
--                              int flags, BdrvCheckMode fix)
-+                              int flags, BdrvCheckMode fix, bool active)
- {
+@@ -1564,7 +1564,7 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
      BDRVQcow2State *s = bs->opaque;
      uint64_t *l2_table, l2_entry;
-@@ -1648,11 +1648,12 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
-                     if (fix & BDRV_FIX_ERRORS) {
-                         uint64_t l2e_offset =
-                             l2_offset + (uint64_t)i * sizeof(uint64_t);
-+                        int ign = active ? QCOW2_OL_ACTIVE_L2 :
-+                                           QCOW2_OL_INACTIVE_L2;
+     uint64_t next_contiguous_offset = 0;
+-    int i, l2_size, nb_csectors, ret;
++    int i, l2_size, ret;
  
-                         l2_entry = QCOW_OFLAG_ZERO;
-                         l2_table[i] = cpu_to_be64(l2_entry);
--                        ret = qcow2_pre_write_overlap_check(bs,
--                                QCOW2_OL_ACTIVE_L2 | QCOW2_OL_INACTIVE_L2,
-+                        ret = qcow2_pre_write_overlap_check(bs, ign,
-                                 l2e_offset, sizeof(uint64_t));
-                         if (ret < 0) {
-                             fprintf(stderr, "ERROR: Overlap check failed\n");
-@@ -1726,7 +1727,7 @@ static int check_refcounts_l1(BlockDriverState *bs,
-                               void **refcount_table,
-                               int64_t *refcount_table_size,
-                               int64_t l1_table_offset, int l1_size,
--                              int flags, BdrvCheckMode fix)
-+                              int flags, BdrvCheckMode fix, bool active)
- {
-     BDRVQcow2State *s = bs->opaque;
-     uint64_t *l1_table = NULL, l2_offset, l1_size2;
-@@ -1782,7 +1783,7 @@ static int check_refcounts_l1(BlockDriverState *bs,
-             /* Process and check L2 entries */
-             ret = check_refcounts_l2(bs, res, refcount_table,
-                                      refcount_table_size, l2_offset, flags,
--                                     fix);
-+                                     fix, active);
+     /* Read L2 table from disk */
+     l2_size = s->l2_size * sizeof(uint64_t);
+@@ -1583,6 +1583,9 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
+ 
+         switch (qcow2_get_cluster_type(l2_entry)) {
+         case QCOW2_CLUSTER_COMPRESSED:
++        {
++            int64_t csize, coffset;
++
+             /* Compressed clusters don't have QCOW_OFLAG_COPIED */
+             if (l2_entry & QCOW_OFLAG_COPIED) {
+                 fprintf(stderr, "ERROR: coffset=0x%" PRIx64 ": "
+@@ -1593,12 +1596,13 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
+             }
+ 
+             /* Mark cluster as used */
+-            nb_csectors = ((l2_entry >> s->csize_shift) &
+-                           s->csize_mask) + 1;
+-            l2_entry &= s->cluster_offset_mask;
++            csize = (((l2_entry >> s->csize_shift) & s->csize_mask) + 1) *
++                    BDRV_SECTOR_SIZE;
++            coffset = l2_entry & s->cluster_offset_mask &
++                      ~(BDRV_SECTOR_SIZE - 1);
+             ret = qcow2_inc_refcounts_imrt(bs, res,
+                                            refcount_table, refcount_table_size,
+-                                           l2_entry & ~511, nb_csectors * 512);
++                                           coffset, csize);
              if (ret < 0) {
                  goto fail;
              }
-@@ -2068,7 +2069,7 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-     /* current L1 table */
-     ret = check_refcounts_l1(bs, res, refcount_table, nb_clusters,
-                              s->l1_table_offset, s->l1_size, CHECK_FRAG_INFO,
--                             fix);
-+                             fix, true);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -2091,7 +2092,8 @@ static int calculate_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
-             continue;
-         }
-         ret = check_refcounts_l1(bs, res, refcount_table, nb_clusters,
--                                 sn->l1_table_offset, sn->l1_size, 0, fix);
-+                                 sn->l1_table_offset, sn->l1_size, 0, fix,
-+                                 false);
-         if (ret < 0) {
-             return ret;
-         }
+@@ -1615,6 +1619,7 @@ static int check_refcounts_l2(BlockDriverState *bs, BdrvCheckResult *res,
+                 res->bfi.fragmented_clusters++;
+             }
+             break;
++        }
+ 
+         case QCOW2_CLUSTER_ZERO_ALLOC:
+         case QCOW2_CLUSTER_NORMAL:
 -- 
 2.11.1
