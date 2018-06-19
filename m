@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51296)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVMJm-00071p-0h
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:29:30 -0400
+	(envelope-from <eblake@redhat.com>) id 1fVMPm-0000lw-KW
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:35:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVMJl-00058m-7K
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:29:30 -0400
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-9-kwolf@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fVMPl-00018T-85
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:35:42 -0400
+References: <20180614232119.31669-1-naravamudan@digitalocean.com>
+	<20180615174729.20544-1-naravamudan@digitalocean.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <c770ff9b-7b3e-af61-2216-7132eec63c58@redhat.com>
-Date: Tue, 19 Jun 2018 14:29:21 -0500
+Message-ID: <1dbfeae9-6cae-179b-214b-61e3f96ac94c@redhat.com>
+Date: Tue, 19 Jun 2018 14:35:33 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180615142108.27814-9-kwolf@redhat.com>
+In-Reply-To: <20180615174729.20544-1-naravamudan@digitalocean.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 08/26] qobject: Move block-specific qdict
- code to block-qdict.c
+Subject: Re: [Qemu-devel] [PATCH] [RFC v2] aio: properly bubble up errors
+ from initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +25,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Nishanth Aravamudan <naravamudan@digitalocean.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-On 06/15/2018 09:20 AM, Kevin Wolf wrote:
-> From: Markus Armbruster <armbru@redhat.com>
+On 06/15/2018 12:47 PM, Nishanth Aravamudan via Qemu-devel wrote:
+> laio_init() can fail for a couple of reasons, which will lead to a NULL
+> pointer dereference in laio_attach_aio_context().
 > 
-> Pure code motion, except for two brace placements and a comment
-> tweaked to appease checkpatch.
+> To solve this, add a aio_setup_linux_aio() function which is called
+> before aio_get_linux_aio() where it is called currently, and which
+> propogates setup errors up. The signature of aio_get_linux_aio() was not
+
+s/propogates/propagates/
+
+> modified, because it seems preferable to return the actual errno from
+> the possible failing initialization calls.
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> With respect to the error-handling in the file-posix.c, we properly
+> bubble any errors up in raw_co_prw and in the case s of
+> raw_aio_{,un}plug, the result is the same as if s->use_linux_aio was not
+> set (but there is no bubbling up). In all three cases, if the setup
+> function fails, we fallback to the thread pool and an error message is
+> emitted.
+> 
+> It is trivial to make qemu segfault in my testing. Set
+> /proc/sys/fs/aio-max-nr to 0 and start a guest with
+> aio=native,cache=directsync. With this patch, the guest successfully
+> starts (but obviously isn't using native AIO). Setting aio-max-nr back
+> up to a reasonable value, AIO contexts are consumed normally.
+> 
+> Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
+> 
 > ---
->   qobject/block-qdict.c     | 640 ++++++++++++++++++++++++++++++++++++++++++++
->   qobject/qdict.c           | 629 --------------------------------------------
->   tests/check-block-qdict.c | 655 ++++++++++++++++++++++++++++++++++++++++++++++
->   tests/check-qdict.c       | 642 ---------------------------------------------
->   MAINTAINERS               |   2 +
->   qobject/Makefile.objs     |   1 +
->   tests/Makefile.include    |   4 +
->   7 files changed, 1302 insertions(+), 1271 deletions(-)
->   create mode 100644 qobject/block-qdict.c
->   create mode 100644 tests/check-block-qdict.c
+> 
+> Changes from v1 -> v2:
 
-and missing a change to tests/.gitignore, so that 
-tests/check-block-qdict now shows up as an untracked file on an in-tree 
-build.
+When posting a v2, it's best to post as a new thread, rather than 
+in-reply-to the v1 thread, so that automated tooling knows to check the 
+new patch.  More patch submission tips at 
+https://wiki.qemu.org/Contribute/SubmitAPatch
 
-(We really should follow through with our threat of renaming all the 
-tests to use a consistent suffix-based pattern, as it's much easier to 
-gitignore a suffix than a prefix)
+> 
+> Rather than affect virtio-scsi/blk at all, make all the changes internal
+> to file-posix.c. Thanks to Kevin Wolf for the suggested change.
+> ---
+>   block/file-posix.c      | 24 ++++++++++++++++++++++++
+>   block/linux-aio.c       | 15 ++++++++++-----
+>   include/block/aio.h     |  3 +++
+>   include/block/raw-aio.h |  2 +-
+>   stubs/linux-aio.c       |  2 +-
+>   util/async.c            | 15 ++++++++++++---
+>   6 files changed, 51 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 07bb061fe4..2415d09bf1 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -1665,6 +1665,14 @@ static int coroutine_fn raw_co_prw(BlockDriverState *bs, uint64_t offset,
+>               type |= QEMU_AIO_MISALIGNED;
+>   #ifdef CONFIG_LINUX_AIO
+>           } else if (s->use_linux_aio) {
+> +            int rc;
+> +            rc = aio_setup_linux_aio(bdrv_get_aio_context(bs));
+> +            if (rc != 0) {
+> +                error_report("Unable to use native AIO, falling back to "
+> +                             "thread pool.");
+
+In general, error_report() should not output a trailing '.'.
+
+> +                s->use_linux_aio = 0;
+> +                return rc;
+
+Wait - the message claims we are falling back, but the non-zero return 
+code sounds like we are returning an error instead of falling back.  (My 
+preference - if the user requested something and we can't do it, it's 
+better to error than to fall back to something that does not match the 
+user's request).
+
+> +            }
+>               LinuxAioState *aio = aio_get_linux_aio(bdrv_get_aio_context(bs));
+>               assert(qiov->size == bytes);
+>               return laio_co_submit(bs, aio, s->fd, offset, qiov, type);
+> @@ -1695,6 +1703,14 @@ static void raw_aio_plug(BlockDriverState *bs)
+>   #ifdef CONFIG_LINUX_AIO
+>       BDRVRawState *s = bs->opaque;
+>       if (s->use_linux_aio) {
+> +        int rc;
+> +        rc = aio_setup_linux_aio(bdrv_get_aio_context(bs));
+> +        if (rc != 0) {
+> +            error_report("Unable to use native AIO, falling back to "
+> +                         "thread pool.");
+> +            s->use_linux_aio = 0;
+
+Should s->use_linux_aio be a bool instead of an int?
 
 -- 
 Eric Blake, Principal Software Engineer
