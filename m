@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVCQ0-0004WK-RN
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:55:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1fVCQb-0004xc-KT
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:55:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVCPx-0003Fg-2Y
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:55:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54742 helo=mx1.redhat.com)
+	(envelope-from <berrange@redhat.com>) id 1fVCQX-0003Sq-Ro
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:55:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54754 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVCPw-0003Fb-U1
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:55:12 -0400
-Date: Tue, 19 Jun 2018 09:55:02 +0100
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVCQX-0003Se-Nn
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:55:49 -0400
+Date: Tue, 19 Jun 2018 09:55:43 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180619085502.GH20929@redhat.com>
+Message-ID: <20180619085543.GI20929@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20180618225131.13113-1-ehabkost@redhat.com>
-	<20180618225131.13113-3-ehabkost@redhat.com>
+	<20180618225131.13113-4-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180618225131.13113-3-ehabkost@redhat.com>
+In-Reply-To: <20180618225131.13113-4-ehabkost@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] Revert "docker.py: Python 2.6 argparse
- compatibility"
+Subject: Re: [Qemu-devel] [PATCH 3/3] Revert "tests: migration/guestperf
+ Python 2.6 argparse compatibility"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,16 +33,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Eduardo Habkost <ehabkost@redhat.com>
 Cc: qemu-devel@nongnu.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Mon, Jun 18, 2018 at 07:51:30PM -0300, Eduardo Habkost wrote:
-> This reverts commit c2d3189667409561772e8c1e5615c5166cd8aa2c.
+On Mon, Jun 18, 2018 at 07:51:31PM -0300, Eduardo Habkost wrote:
+> This reverts commit 0ea47d0f36112f0f38661e2e430edf32737c7f43.
 >=20
-> scripts/argparse.py was removed from the tree, so we don't need
-> this hack anymore.
+> scripts/argparse.py was removed from the tree, so we don't
+> need this hack anymore.
 >=20
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
->  tests/docker/docker.py | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+>  tests/migration/guestperf/shell.py | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
 
 Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
