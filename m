@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fVCCS-0001Ye-2R
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:41:17 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fVCOR-0003PA-PD
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:53:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fVCCR-0005vl-7q
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:41:16 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35086)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fVCCR-0005vU-0u
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:41:15 -0400
-Received: by mail-wm0-x241.google.com with SMTP id j15-v6so20504292wme.0
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 01:41:14 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1fVCOQ-0002rb-E8
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:53:39 -0400
+Date: Tue, 19 Jun 2018 10:53:29 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180619085329.GA4292@dhcp-200-186.str.redhat.com>
+References: <20180617183515.3982-1-suratiamol@gmail.com>
+	<20180617183515.3982-2-suratiamol@gmail.com>
+	<20180618180254.GA2441@arch>
+	<d02a8fcd-3a5f-7c90-bef0-abf9ee076dd8@redhat.com>
+	<20180619040153.GA8868@arch>
 MIME-Version: 1.0
-In-Reply-To: <87po0nyzrg.fsf@dusky.pond.sub.org>
-References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
-	<20180321115211.17937-4-marcandre.lureau@redhat.com>
-	<87po0nyzrg.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 19 Jun 2018 10:41:12 +0200
-Message-ID: <CAJ+F1C+aqkJau41jYMse_1ypq=prUjENjEXeymbKq8G4rv3u-A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 03/49] qapi: add 'if' to top-level
- expressions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180619040153.GA8868@arch>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC 1/1] ide: bug #1777315:
+ io_buffer_size and sg.size can represent partial sector sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,65 +27,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>
+To: Amol Surati <suratiamol@gmail.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>
 
-On Tue, Jun 19, 2018 at 9:57 AM, Markus Armbruster <armbru@redhat.com> wrot=
-e:
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->
->> Accept 'if' key in top-level elements, accepted as string or list of
->> string type. The following patches will modify the test visitor to
->> check the value is correctly saved, and generate #if/#endif code (as a
->> single #if/endif line or a series for a list).
->>
->> Example of 'if' key:
->> { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
->>   'if': 'defined(TEST_IF_STRUCT)' }
->>
->> The generated code is for now *unconditional*. Later patches generate
->> the conditionals.
->>
->> A following patch for qapi-code-gen.txt will provide more complete
->> documentation for 'if' usage.
->>
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
-> [...]
->> diff --git a/tests/Makefile.include b/tests/Makefile.include
->> index 0b277036df..f77ad2ba3b 100644
->> --- a/tests/Makefile.include
->> +++ b/tests/Makefile.include
->> @@ -436,6 +436,10 @@ qapi-schema +=3D args-unknown.json
->>  qapi-schema +=3D bad-base.json
->>  qapi-schema +=3D bad-data.json
->>  qapi-schema +=3D bad-ident.json
->> +qapi-schema +=3D bad-if.json
->> +qapi-schema +=3D bad-if-empty.json
->> +qapi-schema +=3D bad-if-empty-list.json
->> +qapi-schema +=3D bad-if-list.json
->>  qapi-schema +=3D bad-type-bool.json
->>  qapi-schema +=3D bad-type-dict.json
->>  qapi-schema +=3D bad-type-int.json
->> @@ -933,6 +937,8 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): chec=
-k-%.json: $(SRC_PATH)/%.json
->>               "TEST","$*.out")
->>       @# Sanitize error messages (make them independent of build directo=
-ry)
->>       @perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff -u $(SRC_PA=
-TH)/$*.err -
->> +     @if test "$(QAPI_REGENERATE)" =3D=3D 1 ; then cp $*.test.out $(SRC=
-_PATH)/$*.out ; fi
->> +     @if test "$(QAPI_REGENERATE)" =3D=3D 1 ; then cp $*.test.err $(SRC=
-_PATH)/$*.err ; fi
->>       @diff -u $(SRC_PATH)/$*.out $*.test.out
->>       @diff -u $(SRC_PATH)/$*.exit $*.test.exit
->>
->
-> Huh?
+Am 19.06.2018 um 06:01 hat Amol Surati geschrieben:
+> On Mon, Jun 18, 2018 at 08:14:10PM -0400, John Snow wrote:
+> > 
+> > 
+> > On 06/18/2018 02:02 PM, Amol Surati wrote:
+> > > On Mon, Jun 18, 2018 at 12:05:15AM +0530, Amol Surati wrote:
+> > >> This patch fixes the assumption that io_buffer_size is always a perfect
+> > >> multiple of the sector size. The assumption is the cause of the firing
+> > >> of 'assert(n * 512 == s->sg.size);'.
+> > >>
+> > >> Signed-off-by: Amol Surati <suratiamol@gmail.com>
+> > >> ---
+> > > 
+> > > The repository https://github.com/asurati/1777315 contains a module for
+> > > QEMU's 8086:7010 ATA controller, which exercises the code path
+> > > described in [RFC 0/1] of this series.
+> > > 
+> > 
+> > Thanks, this made it easier to see what was happening. I was able to
+> > write an ide-test test case using this source as a guide, and reproduce
+> > the error.
+> > 
+> > static void test_bmdma_partial_sector_short_prdt(void)
+> > {
+> >     QPCIDevice *dev;
+> >     QPCIBar bmdma_bar, ide_bar;
+> >     uint8_t status;
+> > 
+> >     /* Read 2 sectors but only give 1 sector in PRDT */
+> >     PrdtEntry prdt[] = {
+> >         {
+> >             .addr = 0,
+> >             .size = cpu_to_le32(0x200),
+> >         },
+> >         {
+> >             .addr = 512,
+> >             .size = cpu_to_le32(0x44 | PRDT_EOT),
+> >         }
+> >     };
+> > 
+> >     dev = get_pci_device(&bmdma_bar, &ide_bar);
+> >     status = send_dma_request(CMD_READ_DMA, 0, 2,
+> >                               prdt, ARRAY_SIZE(prdt), NULL);
+> >     g_assert_cmphex(status, ==, 0);
+> >     assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR);
+> >     free_pci_device(dev);
+> > }
+> > 
+> > > Loading the module reproduces the bug. Tested on the latest master
+> > > branch.
+> > > 
+> > > Steps:
+> > > - Install a Linux distribution as a guest, ensuring that the boot disk
+> > >   resides on non-IDE controllers (such as virtio)
+> > > - Attach another disk as a master device on the primary
+> > >   IDE controller (i.e. attach at -hda.)
+> > > - Blacklist ata_piix, pata_acpi and ata_generic modules, and reboot.
+> > > - Copy the source files into the guest and build the module.
+> > > - Load the module. QEMU process should die with the message:
+> > >   qemu-system-x86_64: hw/ide/core.c:871: ide_dma_cb:
+> > >   Assertion `n * 512 == s->sg.size' failed.
+> > > 
+> > > 
+> > > -Amol
+> > > 
+> > 
+> > I'm less sure of the fix -- certainly the assert is wrong, but just
+> > incrementing 'n' is wrong too -- we didn't copy (n+1) sectors, we copied
+> > (n) and a few extra bytes.
+> 
+> That is true.
+> 
+> There are (at least) two fields that represent the total size of a DMA
+> transfer -
+> (1) The size, as requested through the NSECTOR field.
+> (2) The size, as calculated through the length fields of the PRD entries.
+> 
+> It makes sense to consider the most restrictive of the sizes, as the factor
+> which determines both the end of a successful DMA transfer and the
+> condition to assert.
+> 
+> > 
+> > The sector-based math here would need to be adjusted to be able to cope
+> > with partial sector reads... or we ought to avoid doing any partial
+> > sector transfers.
+> > 
+> > 
+> > I'm not sure which is more correct tonight, it depends:
+> > 
+> > - If it's OK to transfer partial sectors before reporting overflow,
+> > adjusting the command loop to work with partial sectors is OK.
+> > 
+> > - If it's NOT OK to do partial sector transfer, the sglist preparation
+> > phase needs to produce a truncated SGList that's some multiple of 512
+> > bytes that leaves the excess bytes in a second sglist that we don't
+> > throw away and can use as a basis for building the next sglist. (Or the
+> > DMA helpers need to take a max_bytes parameter and return an sglist
+> > representing unused buffer space if the command underflowed.)
+> 
+> Support for partial sector transfers is built into the DMA interface's PRD
+> mechanism itself, because an entry is allowed to transfer in the units of
+> even number of bytes.
+> 
+> I think the controller's IO process runs in two parts (probably loops over
+> for a single transfer):
+> 
+> (1) The controller's disk interface transfers between its internal buffer
+>     and the disk storage. The transfers are likely to be in the
+>     multiples of a sector.
+> (2) The controller's DMA interface transfers between its internal buffer
+>     and the system memory. The transfers can be sub-sector in size(, and
+>     are preserving of the areas, of the internal buffer, not subject to a
+>     write.)
 
-Oops, leftover. Do you have an alternative? I could propose it as a
-seperate patch if it's generally useful.
+The spec isn't clear about this (or at least I can't find anything where
+the exact behaviour is specified), but I agree that that's my mental
+model as well. So I would make IDE send a byte-granularity request with
+the final partial sector to the block layer, so that the data is
+actually transferred up to that point.
 
---=20
-Marc-Andr=C3=A9 Lureau
+In practice it probably doesn't matter much because a too short PRDT
+means that the request doesn't complete successfully (the condition is
+indicated by clear Interrupt, Active and Error flags in the BMDMA
+controller) and I suppose the guest won't actually look at the data
+then.
+
+Providing the data anyway (consistent with our assumption how real
+hardware works) is erring on the safe side because it doesn't hurt a
+reasonable guest that did not expect the data to be transferred in this
+condition.
+
+Kevin
