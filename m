@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58364)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVJgO-0001k6-EK
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:40:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fVJiW-0003cV-SE
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:42:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVJgK-00009T-FS
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:40:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47776 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVJgK-000091-2C
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:40:36 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 77EE28780F
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 16:40:35 +0000 (UTC)
-Date: Tue, 19 Jun 2018 17:40:32 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180619164032.GL2368@work-vm>
-References: <20180619163552.18206-1-berrange@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fVJiV-00027V-Jf
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:42:52 -0400
+Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:37187)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fVJiV-00026t-Ex
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:42:51 -0400
+Received: by mail-oi0-x234.google.com with SMTP id l22-v6so327387oib.4
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 09:42:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180619163552.18206-1-berrange@redhat.com>
+In-Reply-To: <20180618164955.6923-1-richard.henderson@linaro.org>
+References: <20180618164955.6923-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 19 Jun 2018 17:42:30 +0100
+Message-ID: <CAFEAcA9kArDaoj_VMdAawhoXGawRPrSQfYO2qH7Gx_buUbqtWA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] migration: fix crash in when incoming
- client channel setup fails
+Subject: Re: [Qemu-devel] [PULL 0/1] alpha-softmmu queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,96 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> The way we determine if we can start the incoming migration was
-> changed to use migration_has_all_channels() in:
->=20
->   commit 428d89084c709e568f9cd301c2f6416a54c53d6d
->   Author: Juan Quintela <quintela@redhat.com>
->   Date:   Mon Jul 24 13:06:25 2017 +0200
->=20
->     migration: Create migration_has_all_channels
->=20
-> This method in turn calls multifd_recv_all_channels_created()
-> which is hardcoded to always return 'true' when multifd is
-> not in use. This is a latent bug...
->=20
-> ...activated in in a following commit where that return result
-> ends up acting as the flag to indicate whether it is possible
-> to start processing the migration:
->=20
->   commit 36c2f8be2c4eb0003ac77a14910842b7ddd7337e
->   Author: Juan Quintela <quintela@redhat.com>
->   Date:   Wed Mar 7 08:40:52 2018 +0100
->=20
->     migration: Delay start of migration main routines
->=20
-> This means that if channel initialization fails with normal
-> migration, it'll never notice and attempt to start the
-> incoming migration regardless and crash on a NULL pointer.
->=20
-> This can be seen, for example, if a client connects to a server
-> requiring TLS, but has an invalid x509 certificate:
->=20
-> qemu-system-x86_64: The certificate hasn't got a known issuer
-> qemu-system-x86_64: migration/migration.c:386: process_incoming_migrati=
-on_co: Assertion `mis->from_src_file' failed.
->=20
->  #0  0x00007fffebd24f2b in raise () at /lib64/libc.so.6
->  #1  0x00007fffebd0f561 in abort () at /lib64/libc.so.6
->  #2  0x00007fffebd0f431 in _nl_load_domain.cold.0 () at /lib64/libc.so.=
-6
->  #3  0x00007fffebd1d692 in  () at /lib64/libc.so.6
->  #4  0x0000555555ad027e in process_incoming_migration_co (opaque=3D<opt=
-imized out>) at migration/migration.c:386
->  #5  0x0000555555c45e8b in coroutine_trampoline (i0=3D<optimized out>, =
-i1=3D<optimized out>) at util/coroutine-ucontext.c:116
->  #6  0x00007fffebd3a6a0 in __start_context () at /lib64/libc.so.6
->  #7  0x0000000000000000 in  ()
->=20
-> To handle the non-multifd case, we check whether mis->from_src_file
-> is non-NULL. With this in place, the migration server drops the
-> rejected client and stays around waiting for another, hopefully
-> valid, client to arrive.
->=20
-> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
+On 18 June 2018 at 17:49, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> The following changes since commit 2ef2f16781af9dee6ba6517755e9073ba5799f=
+a2:
+>
+>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-2018=
+0615a' into staging (2018-06-15 18:13:35 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-axp-20180618
+>
+> for you to fetch changes up to 75cacb128b2d39863a72f60cbefc0987cbcaf641:
+>
+>   hw/isa/smc37c669: Change the parallel I/O base to 378H (2018-06-16 19:4=
+6:54 -1000)
+>
+> ----------------------------------------------------------------
+> Place parallel device properly, fixing vga
+>
+> ----------------------------------------------------------------
+> Philippe Mathieu-Daud=C3=A9 (1):
+>       hw/isa/smc37c669: Change the parallel I/O base to 378H
+>
+>  hw/isa/smc37c669-superio.c | 2 +-
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Applied, thanks.
 
-> ---
->=20
-> Changed in v2:
->=20
->  - Clarify exactly when it broke
->  - Clarify that we expect the server to stay active
->=20
->  migration/migration.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/migration/migration.c b/migration/migration.c
-> index e1eaa97df4..38ad818b23 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -518,11 +518,12 @@ void migration_ioc_process_incoming(QIOChannel *i=
-oc)
->   */
->  bool migration_has_all_channels(void)
->  {
-> +    MigrationIncomingState *mis =3D migration_incoming_get_current();
->      bool all_channels;
-> =20
->      all_channels =3D multifd_recv_all_channels_created();
-> =20
-> -    return all_channels;
-> +    return all_channels && mis->from_src_file !=3D NULL;
->  }
-> =20
->  /*
-> --=20
-> 2.17.0
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
