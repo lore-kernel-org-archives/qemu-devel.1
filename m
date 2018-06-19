@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44486)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5gb-0008UR-Oj
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:43:58 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5ge-0008WS-1E
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5ga-0007dh-RN
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:43:57 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5gc-0007eO-S5
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:00 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:43:08 -0500
-Message-Id: <20180619014319.28272-103-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:43:09 -0500
+Message-Id: <20180619014319.28272-104-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 102/113] qcow2: Do not mark inactive images
- corrupt
+Subject: [Qemu-devel] [PATCH 103/113] iotests: Add case for a corrupted
+ inactive image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,44 +26,82 @@ Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 From: Max Reitz <mreitz@redhat.com>
 
-When signaling a corruption on a read-only image, qcow2 already makes
-fatal events non-fatal (i.e., they will not result in the image being
-closed, and the image header's corrupt flag will not be set).  This is
-necessary because we cannot set the corrupt flag on read-only images,
-and it is possible because further corruption of read-only images is
-impossible.
-
-Inactive images are effectively read-only, too, so we should do the same
-for them.  bdrv_is_writable() can tell us whether an image can actually
-be written to, so use its result instead of !bs->read_only.
-
-(Otherwise, the assert(!(bs->open_flags & BDRV_O_INACTIVE)) in
-bdrv_co_pwritev() will fail, crashing qemu.)
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20180606193702.7113-3-mreitz@redhat.com
 Reviewed-by: John Snow <jsnow@redhat.com>
+Tested-by: Jeff Cody <jcody@redhat.com>
 Reviewed-by: Jeff Cody <jcody@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit ddf3b47ef4b5ed0bf6558d4c2c8ae130b8d8a580)
+Message-id: 20180606193702.7113-4-mreitz@redhat.com
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+(cherry picked from commit c50abd175a88cd41c2c08339de91f6f6e4a7b162)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/qcow2.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qemu-iotests/060     | 30 ++++++++++++++++++++++++++++++
+ tests/qemu-iotests/060.out | 14 ++++++++++++++
+ 2 files changed, 44 insertions(+)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 1914a940e5..28f2d91797 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4235,7 +4235,7 @@ void qcow2_signal_corruption(BlockDriverState *bs, bool fatal, int64_t offset,
-     char *message;
-     va_list ap;
+diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
+index 14797dd3b0..d6f4e6eb3c 100755
+--- a/tests/qemu-iotests/060
++++ b/tests/qemu-iotests/060
+@@ -439,6 +439,36 @@ echo "{'execute': 'qmp_capabilities'}
+             -drive if=none,node-name=drive,file="$TEST_IMG",driver=qcow2 \
+     | _filter_qmp | _filter_qemu_io
  
--    fatal = fatal && !bs->read_only;
-+    fatal = fatal && bdrv_is_writable(bs);
- 
-     if (s->signaled_corruption &&
-         (!fatal || (s->incompatible_features & QCOW2_INCOMPAT_CORRUPT)))
++echo
++echo "=== Testing incoming inactive corrupted image ==="
++echo
++
++_make_test_img 64M
++# Create an unaligned L1 entry, so qemu will signal a corruption when
++# reading from the covered area
++poke_file "$TEST_IMG" "$l1_offset" "\x00\x00\x00\x00\x2a\x2a\x2a\x2a"
++
++# Inactive images are effectively read-only images, so this should be a
++# non-fatal corruption (which does not modify the image)
++echo "{'execute': 'qmp_capabilities'}
++      {'execute': 'human-monitor-command',
++       'arguments': {'command-line': 'qemu-io drive \"read 0 512\"'}}
++      {'execute': 'quit'}" \
++    | $QEMU -qmp stdio -nographic -nodefaults \
++            -blockdev "{'node-name': 'drive',
++                        'driver': 'qcow2',
++                        'file': {
++                            'driver': 'file',
++                            'filename': '$TEST_IMG'
++                        }}" \
++            -incoming exec:'cat /dev/null' \
++            2>&1 \
++    | _filter_qmp | _filter_qemu_io
++
++echo
++# Image should not have been marked corrupt
++_img_info --format-specific | grep 'corrupt:'
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
+index c4cb7c665e..36714ff414 100644
+--- a/tests/qemu-iotests/060.out
++++ b/tests/qemu-iotests/060.out
+@@ -411,4 +411,18 @@ write failed: Input/output error
+ {"return": ""}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++=== Testing incoming inactive corrupted image ===
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
++QMP_VERSION
++{"return": {}}
++qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1 index: 0); further non-fatal corruption events will be suppressed
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a00 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
++read failed: Input/output error
++{"return": ""}
++{"return": {}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++
++    corrupt: false
+ *** done
 -- 
 2.11.0
