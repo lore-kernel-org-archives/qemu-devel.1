@@ -1,34 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVCcQ-0001Tt-F5
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 05:08:10 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fVCgM-0002vR-8s
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 05:12:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVCcL-0007KL-8q
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 05:08:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58976 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVCcL-0007KB-2m
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 05:08:01 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F392640201BE
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 09:07:57 +0000 (UTC)
-Date: Tue, 19 Jun 2018 10:07:53 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180619090753.GJ20929@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180618161729.334-1-marcandre.lureau@redhat.com>
-	<20180618161729.334-10-marcandre.lureau@redhat.com>
-	<20180619061903.pmiy36kznlkpmanq@sirius.home.kraxel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180619061903.pmiy36kznlkpmanq@sirius.home.kraxel.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 09/26] HACK: vhost-user-backend: allow
- to specify binary to execute
+	(envelope-from <balaton@eik.bme.hu>) id 1fVCgH-0007w6-EB
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 05:12:10 -0400
+Message-Id: <453290537c0f31507ea5e44ac824f45427b9ac1e.1529398335.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1529398335.git.balaton@eik.bme.hu>
+References: <cover.1529398335.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Tue, 19 Jun 2018 10:52:15 +0200
+Subject: [Qemu-devel] [PATCH v4 06/11] target/ppc: Add missing opcode for
+ icbt on PPC440
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,39 +20,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 
-On Tue, Jun 19, 2018 at 08:19:03AM +0200, Gerd Hoffmann wrote:
-> On Mon, Jun 18, 2018 at 06:17:12PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> > An executable with its arguments may be given as 'cmd' property, ex:
-> > -object vhost-user-backend,id=3Dvui,cmd=3D"./vhost-user-input
-> > /dev/input..". The executable is then spawn and, by convention, the
-> > vhost-user socket is passed as fd=3D3. It may be considered a securit=
-y
-> > breach to allow creating processes that may execute arbitrary
-> > executables, so this may be restricted to some known executables (via
-> > signature etc) or directory.
->=20
-> Hmm, maybe let the device which uses vhost-user-backend handle this?
->=20
-> So you use "-device vhost-user-input-pci,device=3D/dev/input/$dev" and
-> vhost-user-input-pci translates that into ...
-> =20
->   argv =3D { "$dir/vhost-user-input", "-device", "/dev/input/$dev", NUL=
-L }
->=20
-> ... for vhost-user-backend ?
+According to PPC440 User Manual PPC440 has multiple opcodes for icbt
+instruction: one for compatibility with older cores and two 440
+specific opcodes one of which is defined in BookE. QEMU only
+implements two of these, add the missing one.
 
-Or just accept the binary name, but mandate a pre-determined set of
-argv, in the same way we do for  TAP device ifup scripts.
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+v4: Updated commit message, for reference see bottom of:
+http://manualzilla.com/doc/6915682/ppc440-processor-user-s-manual?page=451
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+ target/ppc/translate.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 5fe1ba6..3a215a1 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -6707,6 +6707,8 @@ GEN_HANDLER_E(mbar, 0x1F, 0x16, 0x1a, 0x001FF801,
+ GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x03FFF801, PPC_BOOKE),
+ GEN_HANDLER2_E(icbt_440, "icbt", 0x1F, 0x16, 0x00, 0x03E00001,
+                PPC_BOOKE, PPC2_BOOKE206),
++GEN_HANDLER2(icbt_440, "icbt", 0x1F, 0x06, 0x08, 0x03E00001,
++               PPC_440_SPEC),
+ GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
+ GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
+ GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
+-- 
+2.7.6
