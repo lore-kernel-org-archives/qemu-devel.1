@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5gY-0008SJ-SV
+	(envelope-from <flukshun@gmail.com>) id 1fV5gZ-0008So-IS
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:43:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5gU-0007bg-An
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:43:54 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5gY-0007d1-M4
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:43:55 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:41:35 -0500
-Message-Id: <20180619014319.28272-10-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:43:07 -0500
+Message-Id: <20180619014319.28272-102-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 009/113] spapr: use spapr->vsmt to compute VCPU
- ids
+Subject: [Qemu-devel] [PATCH 101/113] block: Make bdrv_is_writable() public
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,255 +21,88 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-From: Greg Kurz <groug@kaod.org>
+From: Max Reitz <mreitz@redhat.com>
 
-Since the introduction of VSMT in 2.11, the spacing of VCPU ids
-between cores is controllable through a machine property instead
-of being only dictated by the SMT mode of the host:
+This is a useful function for the whole block layer, so make it public.
+At the same time, users outside of block.c probably do not need to make
+use of the reopen functionality, so rename the current function to
+bdrv_is_writable_after_reopen() create a new bdrv_is_writable() function
+that just passes NULL to it for the reopen queue.
 
-    cpu->vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i
-
-Until recently, the machine code would try to change the SMT mode
-of the host to be equal to VSMT or exit. This allowed the rest of
-the code to assume that kvmppc_smt_threads() == spapr->vsmt is
-always true.
-
-Recent commit "8904e5a75005 spapr: Adjust default VSMT value for
-better migration compatibility" relaxed the rule. If the VSMT
-mode cannot be set in KVM for some reasons, but the requested
-CPU topology is compatible with the current SMT mode, then we
-let the guest run with  kvmppc_smt_threads() != spapr->vsmt.
-
-This breaks quite a few places in the code, in particular when
-calculating DRC indexes.
-
-This is what happens on a POWER host with subcores-per-core=2 (ie,
-supports up to SMT4) when passing the following topology:
-
-    -smp threads=4,maxcpus=16 \
-    -device host-spapr-cpu-core,core-id=4,id=core1 \
-    -device host-spapr-cpu-core,core-id=8,id=core2
-
-qemu-system-ppc64: warning: Failed to set KVM's VSMT mode to 8 (errno -22)
-
-This is expected since KVM is limited to SMT4, but the guest is started
-anyway because this topology can run on SMT4 even with a VSMT8 spacing.
-
-But when we look at the DT, things get nastier:
-
-cpus {
-        ...
-        ibm,drc-indexes = <0x4 0x10000000 0x10000004 0x10000008 0x1000000c>;
-
-This means that we have the following association:
-
- CPU core device |     DRC    | VCPU id
------------------+------------+---------
-   boot core     | 0x10000000 | 0
-   core1         | 0x10000004 | 4
-   core2         | 0x10000008 | 8
-   core3         | 0x1000000c | 12
-
-But since the spacing of VCPU ids is 8, the DRC for core1 points to a
-VCPU that doesn't exist, the DRC for core2 points to the first VCPU of
-core1 and and so on...
-
-        ...
-
-        PowerPC,POWER8@0 {
-                ...
-                ibm,my-drc-index = <0x10000000>;
-                ...
-        };
-
-        PowerPC,POWER8@8 {
-                ...
-                ibm,my-drc-index = <0x10000008>;
-                ...
-        };
-
-        PowerPC,POWER8@10 {
-                ...
-
-No ibm,my-drc-index property for this core since 0x10000010 doesn't
-exist in ibm,drc-indexes above.
-
-                ...
-        };
-};
-
-...
-
-interrupt-controller {
-        ...
-        ibm,interrupt-server-ranges = <0x0 0x10>;
-
-With a spacing of 8, the highest VCPU id for the given topology should be:
-        16 * 8 / 4 = 32 and not 16
-
-        ...
-        linux,phandle = <0x7e7323b8>;
-        interrupt-controller;
-};
-
-And CPU hot-plug/unplug is broken:
-
-(qemu) device_del core1
-pseries-hotplug-cpu: Cannot find CPU (drc index 10000004) to remove
-
-(qemu) device_del core2
-cpu 4 (hwid 8) Ready to die...
-cpu 5 (hwid 9) Ready to die...
-cpu 6 (hwid 10) Ready to die...
-cpu 7 (hwid 11) Ready to die...
-
-These are the VCPU ids of core1 actually
-
-(qemu) device_add host-spapr-cpu-core,core-id=12,id=core3
-(qemu) device_del core3
-pseries-hotplug-cpu: Cannot find CPU (drc index 1000000c) to remove
-
-This patches all the code in hw/ppc/spapr.c to assume the VSMT
-spacing when manipulating VCPU ids.
-
-Fixes: 8904e5a75005
-Signed-off-by: Greg Kurz <groug@kaod.org>
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-
-(cherry picked from commit 72194664c8a16b67865eb95054f984dd169cfa86)
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-id: 20180606193702.7113-2-mreitz@redhat.com
+Reviewed-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+(cherry picked from commit cc022140972f8b6ac3973c12ccf9dd6b1d2fd200)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr.c | 24 ++++++++++--------------
- 1 file changed, 10 insertions(+), 14 deletions(-)
+ block.c               | 17 ++++++++++++++---
+ include/block/block.h |  1 +
+ 2 files changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 6f78c1cf7a..094e75f97d 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -161,9 +161,9 @@ static void pre_2_10_vmstate_unregister_dummy_icp(int i)
-                        (void *)(uintptr_t) i);
+diff --git a/block.c b/block.c
+index f236431da1..24dd28d51d 100644
+--- a/block.c
++++ b/block.c
+@@ -1596,13 +1596,24 @@ static int bdrv_reopen_get_flags(BlockReopenQueue *q, BlockDriverState *bs)
+ 
+ /* Returns whether the image file can be written to after the reopen queue @q
+  * has been successfully applied, or right now if @q is NULL. */
+-static bool bdrv_is_writable(BlockDriverState *bs, BlockReopenQueue *q)
++static bool bdrv_is_writable_after_reopen(BlockDriverState *bs,
++                                          BlockReopenQueue *q)
+ {
+     int flags = bdrv_reopen_get_flags(q, bs);
+ 
+     return (flags & (BDRV_O_RDWR | BDRV_O_INACTIVE)) == BDRV_O_RDWR;
  }
  
--static inline int xics_max_server_number(void)
-+static int xics_max_server_number(sPAPRMachineState *spapr)
- {
--    return DIV_ROUND_UP(max_cpus * kvmppc_smt_threads(), smp_threads);
-+    return DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads);
- }
++/*
++ * Return whether the BDS can be written to.  This is not necessarily
++ * the same as !bdrv_is_read_only(bs), as inactivated images may not
++ * be written to but do not count as read-only images.
++ */
++bool bdrv_is_writable(BlockDriverState *bs)
++{
++    return bdrv_is_writable_after_reopen(bs, NULL);
++}
++
+ static void bdrv_child_perm(BlockDriverState *bs, BlockDriverState *child_bs,
+                             BdrvChild *c, const BdrvChildRole *role,
+                             BlockReopenQueue *reopen_queue,
+@@ -1640,7 +1651,7 @@ static int bdrv_check_perm(BlockDriverState *bs, BlockReopenQueue *q,
  
- static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
-@@ -195,7 +195,7 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
-     if (smc->pre_2_10_has_unused_icps) {
-         int i;
+     /* Write permissions never work with read-only images */
+     if ((cumulative_perms & (BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED)) &&
+-        !bdrv_is_writable(bs, q))
++        !bdrv_is_writable_after_reopen(bs, q))
+     {
+         error_setg(errp, "Block node is read-only");
+         return -EPERM;
+@@ -1930,7 +1941,7 @@ void bdrv_format_default_perms(BlockDriverState *bs, BdrvChild *c,
+                                   &perm, &shared);
  
--        for (i = 0; i < xics_max_server_number(); i++) {
-+        for (i = 0; i < xics_max_server_number(spapr); i++) {
-             /* Dummy entries get deregistered when real ICPState objects
-              * are registered during CPU core hotplug.
-              */
-@@ -338,7 +338,6 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
-     int ret = 0, offset, cpus_offset;
-     CPUState *cs;
-     char cpu_model[32];
--    int smt = kvmppc_smt_threads();
-     uint32_t pft_size_prop[] = {0, cpu_to_be32(spapr->htab_shift)};
- 
-     CPU_FOREACH(cs) {
-@@ -347,7 +346,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
-         int index = spapr_vcpu_id(cpu);
-         int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
- 
--        if ((index % smt) != 0) {
-+        if (index % spapr->vsmt != 0) {
-             continue;
+         /* Format drivers may touch metadata even if the guest doesn't write */
+-        if (bdrv_is_writable(bs, reopen_queue)) {
++        if (bdrv_is_writable_after_reopen(bs, reopen_queue)) {
+             perm |= BLK_PERM_WRITE | BLK_PERM_RESIZE;
          }
  
-@@ -614,7 +613,6 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
-     CPUState *cs;
-     int cpus_offset;
-     char *nodename;
--    int smt = kvmppc_smt_threads();
- 
-     cpus_offset = fdt_add_subnode(fdt, 0, "cpus");
-     _FDT(cpus_offset);
-@@ -632,7 +630,7 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
-         DeviceClass *dc = DEVICE_GET_CLASS(cs);
-         int offset;
- 
--        if ((index % smt) != 0) {
-+        if (index % spapr->vsmt != 0) {
-             continue;
-         }
- 
-@@ -1105,7 +1103,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
-     _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
- 
-     /* /interrupt controller */
--    spapr_dt_xics(xics_max_server_number(), fdt, PHANDLE_XICP);
-+    spapr_dt_xics(xics_max_server_number(spapr), fdt, PHANDLE_XICP);
- 
-     ret = spapr_populate_memory(spapr, fdt);
-     if (ret < 0) {
-@@ -2198,7 +2196,6 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
-     MachineState *machine = MACHINE(spapr);
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     const char *type = spapr_get_cpu_core_type(machine->cpu_type);
--    int smt = kvmppc_smt_threads();
-     const CPUArchIdList *possible_cpus;
-     int boot_cores_nr = smp_cpus / smp_threads;
-     int i;
-@@ -2233,7 +2230,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
- 
-         if (mc->has_hotpluggable_cpus) {
-             spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
--                                   (core_id / smp_threads) * smt);
-+                                   (core_id / smp_threads) * spapr->vsmt);
-         }
- 
-         if (i < boot_cores_nr) {
-@@ -3262,10 +3259,10 @@ static
- void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                Error **errp)
- {
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(OBJECT(hotplug_dev));
-     int index;
-     sPAPRDRConnector *drc;
-     CPUCore *cc = CPU_CORE(dev);
--    int smt = kvmppc_smt_threads();
- 
-     if (!spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id, &index)) {
-         error_setg(errp, "Unable to find CPU core with core-id: %d",
-@@ -3277,7 +3274,7 @@ void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
-     }
- 
--    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * smt);
-+    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * spapr->vsmt);
-     g_assert(drc);
- 
-     spapr_drc_detach(drc);
-@@ -3296,7 +3293,6 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     CPUState *cs = CPU(core->threads);
-     sPAPRDRConnector *drc;
-     Error *local_err = NULL;
--    int smt = kvmppc_smt_threads();
-     CPUArchId *core_slot;
-     int index;
-     bool hotplugged = spapr_drc_hotplugged(dev);
-@@ -3307,7 +3303,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                    cc->core_id);
-         return;
-     }
--    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * smt);
-+    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * spapr->vsmt);
- 
-     g_assert(drc || !mc->has_hotpluggable_cpus);
- 
+diff --git a/include/block/block.h b/include/block/block.h
+index c05cac57e5..f9e90beb21 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -437,6 +437,7 @@ bool bdrv_is_read_only(BlockDriverState *bs);
+ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
+                            bool ignore_allow_rdw, Error **errp);
+ int bdrv_set_read_only(BlockDriverState *bs, bool read_only, Error **errp);
++bool bdrv_is_writable(BlockDriverState *bs);
+ bool bdrv_is_sg(BlockDriverState *bs);
+ bool bdrv_is_inserted(BlockDriverState *bs);
+ void bdrv_lock_medium(BlockDriverState *bs, bool locked);
 -- 
 2.11.0
