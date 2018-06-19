@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fVHRX-0006Ti-Tz
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 10:17:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fVHTX-0007hg-6D
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 10:19:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fVHRS-0003ZW-Ly
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 10:17:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52272 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVHRS-0003Yo-Ga
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 10:17:06 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180619053426.13065-1-peterx@redhat.com>
-	<20180619053426.13065-7-peterx@redhat.com>
-Date: Tue, 19 Jun 2018 16:16:49 +0200
-In-Reply-To: <20180619053426.13065-7-peterx@redhat.com> (Peter Xu's message of
-	"Tue, 19 Jun 2018 13:34:25 +0800")
-Message-ID: <8736xioo8e.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fVHTW-0005hj-8u
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 10:19:15 -0400
+Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:45399)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fVHTW-0005hJ-3W
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 10:19:14 -0400
+Received: by mail-oi0-x233.google.com with SMTP id 188-v6so18251273oid.12
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 07:19:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v4 6/7] monitor: remove "x-oob",
- turn oob on by default
+In-Reply-To: <20180618101841.21609-1-kraxel@redhat.com>
+References: <20180618101841.21609-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 19 Jun 2018 15:18:52 +0100
+Message-ID: <CAFEAcA9V+=8vF08=mf0bGFNxFUW4M3poc5pVH1+Nq1T72Khmxg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] Input 20180618 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,148 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Peter Xu <peterx@redhat.com> writes:
-
-> There was a regression reported by Eric Auger before with OOB:
+On 18 June 2018 at 11:18, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit 2ef2f16781af9dee6ba6517755e9073ba5799fa2:
 >
->   http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06231.html
+>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20180615a' into staging (2018-06-15 18:13:35 +0100)
 >
-> It is fixed in 951702f39c ("monitor: bind dispatch bh to iohandler
-> context", 2018-04-10).
+> are available in the git repository at:
 >
-> For the bug, we turned Out-Of-Band feature of monitors off for 2.12
-> release.  Now we turn that on again after the 2.12 release.
-
-Relating what happened in the order it happened could be easier to
-understand.  Perhaps:
-
-  OOB commands were introduced in commit cf869d53172.  Unfortunately, we
-  ran into a regression, and had to disable them by default for 2.12
-  (commit be933ffc23).
-
-  The regression has since been fixed (commit 951702f39c7 "monitor: bind
-  dispatch bh to iohandler context").  Time to re-enable OOB.
-
-> This patch partly reverts be933ffc23 (monitor: new parameter "x-oob"),
-> meanwhile turn it on again by default for non-MUX QMPs.  Note that we
-
-"by default"?
-
-> can't enable Out-Of-Band for monitors with MUX-typed chardev backends,
-> because not all the chardev frontends can run without main thread, or
-> can run in multiple threads.
+>   git://git.kraxel.org/qemu tags/input-20180618-pull-request
 >
-> Some trivial touch-up in the test code is required to make sure qmp-test
-> won't broke.
-
-"won't break"
-
+> for you to fetch changes up to b55a06df4f03f21e8a32e9d067a8a5782ac3ce0d:
 >
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  include/monitor/monitor.h |  1 -
->  monitor.c                 | 17 +----------------
->  tests/libqtest.c          |  2 +-
->  tests/qmp-test.c          |  2 +-
->  vl.c                      |  5 -----
->  5 files changed, 3 insertions(+), 24 deletions(-)
+>   ps2: check PS2Queue wptr pointer in post_load routine (2018-06-18 12:06:45 +0200)
 >
-> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
-> index d6ab70cae2..0cb0538a31 100644
-> --- a/include/monitor/monitor.h
-> +++ b/include/monitor/monitor.h
-> @@ -13,7 +13,6 @@ extern Monitor *cur_mon;
->  #define MONITOR_USE_READLINE  0x02
->  #define MONITOR_USE_CONTROL   0x04
->  #define MONITOR_USE_PRETTY    0x08
-> -#define MONITOR_USE_OOB       0x10
->  
->  bool monitor_cur_is_qmp(void);
->  
-> diff --git a/monitor.c b/monitor.c
-> index c9a02ee40c..7fbcf84b02 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -4587,19 +4587,7 @@ void monitor_init(Chardev *chr, int flags)
->  {
->      Monitor *mon = g_malloc(sizeof(*mon));
->      bool use_readline = flags & MONITOR_USE_READLINE;
-> -    bool use_oob = flags & MONITOR_USE_OOB;
-> -
-> -    if (use_oob) {
-> -        if (CHARDEV_IS_MUX(chr)) {
-> -            error_report("Monitor Out-Of-Band is not supported with "
-> -                         "MUX typed chardev backend");
-> -            exit(1);
-> -        }
-> -        if (use_readline) {
-> -            error_report("Monitor Out-Of-band is only supported by QMP");
-> -            exit(1);
-> -        }
-> -    }
-> +    bool use_oob = (flags & MONITOR_USE_CONTROL) && !CHARDEV_IS_MUX(chr);
+> ----------------------------------------------------------------
+> input: ps2 post_load fix.
+>
+> ----------------------------------------------------------------
+>
+> liujunjie (1):
+>   ps2: check PS2Queue wptr pointer in post_load routine
+>
 
-A comment explaining (briefly!) why MUX prevents oob would be useful
-here.  Fortunately, you can simply steal from your commit message.
+Applied, thanks.
 
->  
->      monitor_data_init(mon, false, use_oob);
->  
-> @@ -4701,9 +4689,6 @@ QemuOptsList qemu_mon_opts = {
->          },{
->              .name = "pretty",
->              .type = QEMU_OPT_BOOL,
-> -        },{
-> -            .name = "x-oob",
-> -            .type = QEMU_OPT_BOOL,
->          },
->          { /* end of list */ }
->      },
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index 098af6aec4..c5cb3f925c 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -213,7 +213,7 @@ QTestState *qtest_init_without_qmp_handshake(bool use_oob,
->                                    "-display none "
->                                    "%s", qemu_binary, socket_path,
->                                    getenv("QTEST_LOG") ? "/dev/fd/2" : "/dev/null",
-> -                                  qmp_socket_path, use_oob ? ",x-oob=on" : "",
-> +                                  qmp_socket_path, "",
->                                    extra_args ?: "");
->          execlp("/bin/sh", "sh", "-c", command, NULL);
->          exit(1);
-> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-> index a49cbc6fde..3747bf7fbb 100644
-> --- a/tests/qmp-test.c
-> +++ b/tests/qmp-test.c
-> @@ -89,7 +89,7 @@ static void test_qmp_protocol(void)
->      g_assert(q);
->      test_version(qdict_get(q, "version"));
->      capabilities = qdict_get_qlist(q, "capabilities");
-> -    g_assert(capabilities && qlist_empty(capabilities));
-> +    g_assert(capabilities);
->      qobject_unref(resp);
->  
->      /* Test valid command before handshake */
-> diff --git a/vl.c b/vl.c
-> index 6e34fb348d..26a0bb3f0f 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2307,11 +2307,6 @@ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
->      if (qemu_opt_get_bool(opts, "pretty", 0))
->          flags |= MONITOR_USE_PRETTY;
->  
-> -    /* OOB is off by default */
-> -    if (qemu_opt_get_bool(opts, "x-oob", 0)) {
-> -        flags |= MONITOR_USE_OOB;
-> -    }
-> -
->      chardev = qemu_opt_get(opts, "chardev");
->      chr = qemu_chr_find(chardev);
->      if (chr == NULL) {
-
-Preferrably with the commit message touched up, and a common on MUX:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+-- PMM
