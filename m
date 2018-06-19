@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1fVBcB-0000nw-4G
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:03:48 -0400
+	(envelope-from <david@redhat.com>) id 1fVBes-0001ll-CE
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <atar4qemu@gmail.com>) id 1fVBc6-0001Sr-54
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:03:47 -0400
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:37252)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1fVBc5-0001Ro-VZ
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:03:42 -0400
-Received: by mail-it0-x242.google.com with SMTP id l6-v6so15889208iti.2
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 01:03:41 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fVBen-0002Bd-BR
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:06:34 -0400
+References: <20180618142536.23995-1-david@redhat.com>
+	<20180618142536.23995-11-david@redhat.com>
+	<20180619085448.65e009a1@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <cd3dbdae-0d00-e2ac-7394-4c85ed8524e4@redhat.com>
+Date: Tue, 19 Jun 2018 10:06:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <da05f804-31f4-e820-12ed-22a240bf2d07@ilande.co.uk>
-References: <40d9df00-f80d-02a4-58ec-b407e7dd8cdb@redhat.com>
-	<da05f804-31f4-e820-12ed-22a240bf2d07@ilande.co.uk>
-From: Artyom Tarasenko <atar4qemu@gmail.com>
-Date: Tue, 19 Jun 2018 10:03:20 +0200
-Message-ID: <CACXAS8CE9OZ+bxOUQCjDVedqGNUXMRvDWfCWmhf4jqeVzLVGZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] valgrind problem in sun4u_load_kernel()
+In-Reply-To: <20180619085448.65e009a1@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 10/12] nvdimm: convert nvdimm_mr into a
+ pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,67 +26,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
 
-On Sun, Jun 17, 2018 at 12:22 PM, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> On 15/06/18 11:37, Thomas Huth wrote:
->
->>   Hi Mark, hi Artyom,
+On 19.06.2018 08:54, Igor Mammedov wrote:
+> On Mon, 18 Jun 2018 16:25:34 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> This way we can easily check if the region has already been inititalized
+>> without having to rely on the size of an uninitialized region being 0.
 >>
->> while using valgrind to fix some issues with the rom_ptr() function
->> today, I noticed that there is one more problem in sun4u_load_kernel():
->> The kernel_top variable can be used uninitialized in some cases:
->> If load_elf() fails and the kernel is loaded via load_aout() or
->> load_image_targphys(), the kernel_top variable is never set to a valid
->> value. This could cause some trouble when loading the initrd later. When
->> you've got some spare time, could you please have a look?
->
->
-> Hmmm that's an interesting one - I'm not immediately aware of any 64-bit
-> kernels that are a.out rather than ELF, so I wonder if this has been used to
-> run a.out executables on startup? Any thoughts, Artyom?
+>> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/mem/nvdimm.c         | 9 +++++----
+>>  include/hw/mem/nvdimm.h | 2 +-
+>>  2 files changed, 6 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+>> index 7260c9c6b1..db7d8c3050 100644
+>> --- a/hw/mem/nvdimm.c
+>> +++ b/hw/mem/nvdimm.c
+>> @@ -43,7 +43,7 @@ static void nvdimm_set_label_size(Object *obj, Visitor *v, const char *name,
+>>      Error *local_err = NULL;
+>>      uint64_t value;
+>>  
+>> -    if (memory_region_size(&nvdimm->nvdimm_mr)) {
+>> +    if (nvdimm->nvdimm_mr) {
+>>          error_setg(&local_err, "cannot change property value");
+>>          goto out;
+>>      }
+>> @@ -75,7 +75,7 @@ static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+>>  {
+>>      NVDIMMDevice *nvdimm = NVDIMM(dimm);
+>>  
+>> -    return &nvdimm->nvdimm_mr;
+>> +    return nvdimm->nvdimm_mr;
+>>  }
+>>  
+>>  static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+>> @@ -102,9 +102,10 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+>>          return;
+>>      }
+>>  
+>> -    memory_region_init_alias(&nvdimm->nvdimm_mr, OBJECT(dimm),
+>> +    nvdimm->nvdimm_mr = g_new(MemoryRegion, 1);
+> missed leak,
+> you need to free this manually in unrealize() in this patch but
+> considering that the next patches would move this allocation before
+> realize, it has to be move to finalize(). So make a note in commit
+> message explaining why finalize() is used prematurely.
 
-I think there are no Linux/SPARC64 kernels in the a.out format.
-NetBSD should not be a problem either
+Very right, thanks. finalize() seems to be the right spot.
 
-> If this is the case then we can only have a valid kernel_top with an ELF
-> kernel then maybe the following is a good enough solution:
->
->
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index 3975a7b65a..35acf8c96e 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -139,7 +139,7 @@ static uint64_t sun4u_load_kernel(const char
-> *kernel_filename,
->      unsigned int i;
->      long kernel_size;
->      uint8_t *ptr;
-> -    uint64_t kernel_top;
-> +    uint64_t kernel_top = 0;
->
->      linux_boot = (kernel_filename != NULL);
->
-> @@ -172,7 +172,7 @@ static uint64_t sun4u_load_kernel(const char
-> *kernel_filename,
->          }
->          /* load initrd above kernel */
->          *initrd_size = 0;
-> -        if (initrd_filename) {
-> +        if (initrd_filename && kernel_top) {
->              *initrd_addr = TARGET_PAGE_ALIGN(kernel_top);
->
->              *initrd_size = load_image_targphys(initrd_filename,
->
->
-Looks good to me.
-Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
+> 
+> probably no need to respin whole series, just send v5 of this patch
+> as reply here if change doesn't break series.
+> 
+>> +    memory_region_init_alias(nvdimm->nvdimm_mr, OBJECT(dimm),
+>>                               "nvdimm-memory", mr, 0, pmem_size);
+>> -    nvdimm->nvdimm_mr.align = align;
+>> +    nvdimm->nvdimm_mr->align = align;
+>>  }
+>>  
+>>  /*
+>> diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+>> index 9340631cfc..c5c9b3c7f8 100644
+>> --- a/include/hw/mem/nvdimm.h
+>> +++ b/include/hw/mem/nvdimm.h
+>> @@ -74,7 +74,7 @@ struct NVDIMMDevice {
+>>       * it's the PMEM region in NVDIMM device, which is presented to
+>>       * guest via ACPI NFIT and _FIT method if NVDIMM hotplug is supported.
+>>       */
+>> -    MemoryRegion nvdimm_mr;
+>> +    MemoryRegion *nvdimm_mr;
+>>  
+>>      /*
+>>       * The 'on' value results in the unarmed flag set in ACPI NFIT,
+> 
 
 
 -- 
-Regards,
-Artyom Tarasenko
 
-SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
+Thanks,
+
+David / dhildenb
