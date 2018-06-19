@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1fVBGg-0002n6-1I
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:41:35 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fVBIN-0003gX-NH
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:43:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1fVBGc-0001gi-UQ
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:41:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36830 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1fVBGc-0001ga-PU
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:41:30 -0400
-Date: Tue, 19 Jun 2018 15:41:21 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20180619074121.GC22275@wei-ubt>
-References: <1528225683-11413-1-git-send-email-wexu@redhat.com>
-	<43058759-28c7-9144-27f3-a16475281973@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1fVBIK-0002FI-Jt
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:43:19 -0400
+Date: Tue, 19 Jun 2018 09:42:48 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180619094248.08d5fed5.cohuck@redhat.com>
+In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
+References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <43058759-28c7-9144-27f3-a16475281973@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 0/8] packed ring virtio-net userspace
- backend support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 00/113] Patch Round-up for stable 2.11.2,
+ freeze on 2018-06-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +23,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, tiwei.bie@intel.com, mst@redhat.com, jfreimann@redhat.com
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On Wed, Jun 06, 2018 at 11:49:22AM +0800, Jason Wang wrote:
->=20
->=20
-> On 2018=E5=B9=B406=E6=9C=8806=E6=97=A5 03:07, wexu@redhat.com wrote:
-> >From: Wei Xu<wexu@redhat.com>
-> >
-> >Todo:
-> >- address Rx slow performance
-> >- event index interrupt suppression test
->=20
-> And there's something more need to test:
->=20
-> - vIOMMU support
-> - migration
+On Mon, 18 Jun 2018 20:41:26 -0500
+Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
 
-OK, I will test it and put it to next version.
+> Hi everyone,
+> 
+> The following new patches are queued for QEMU stable v2.11.2:
+> 
+>   https://github.com/mdroth/qemu/commits/stable-2.11-staging
+> 
+> The release is planned for 2018-06-22:
+> 
+>   https://wiki.qemu.org/Planning/2.11
+> 
+> Please respond here or CC qemu-stable@nongnu.org on any patches you
+> think should be included in the release.
+> 
+> Thanks!
+> 
+> ----------------------------------------------------------------
+> 
+> The following changes since commit 7c1beb52ed86191d9e965444d934adaa2531710f:
+> 
+>   Update version for 2.11.1 release (2018-02-14 14:41:05 -0600)
+> 
+> are available in the git repository at:
+> 
+>   git://github.com/mdroth/qemu.git 
+> 
+> for you to fetch changes up to acb3571f90885a2e206044b3bdc8d1dd2a0389c0:
+> 
+>   arm_gicv3_kvm: kvm_dist_get/put_priority: skip the registers banked by GICR_IPRIORITYR (2018-06-16 07:47:00 -0500)
+> 
+> ----------------------------------------------------------------
 
->=20
-> Thanks
+Hi Michael,
+
+as this series includes some s390-ccw bios patches, it needs a rebuild
+of the s390-ccw bios as well, probably on top of your stable branch.
+(IIRC we have extra patches on master, so you probably don't want to
+cherry-pick the latest rebuild from there.). Let me know if one of us
+should provide a rebuild.
