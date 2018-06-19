@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5hf-0001Ey-1d
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:06 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5hu-0001VD-0O
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5he-0008AC-7n
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:03 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5ht-0008N1-01
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:18 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:41:53 -0500
-Message-Id: <20180619014319.28272-28-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:41:59 -0500
+Message-Id: <20180619014319.28272-34-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 027/113] openpic_kvm: drop
- address_space_to_flatview call
+Subject: [Qemu-devel] [PATCH 033/113] address_space_rw:
+ address_space_to_flatview needs RCU lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +26,63 @@ Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
 From: Paolo Bonzini <pbonzini@redhat.com>
 
-The MemoryListener is registered on address_space_memory, there is
-not much to assert.  This currently works because the callback
-is invoked only once when the listener is registered, but section->fv
-is the _new_ FlatView, not the old one on later calls and that
-would break.
+address_space_rw is calling address_space_to_flatview but it can
+be called outside the RCU lock.  To fix it, transform flatview_rw
+into address_space_rw, since flatview_rw is otherwise unused.
 
-This confines address_space_to_flatview to exec.c and memory.c.
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 80d2b933f9fe3e53d4f76a45a1bc1a0175669468)
+(cherry picked from commit db84fd973eba3f1e121416dcab73a4e8a60f2526)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/intc/openpic_kvm.c | 4 ----
- 1 file changed, 4 deletions(-)
+ exec.c | 28 ++++++++++------------------
+ 1 file changed, 10 insertions(+), 18 deletions(-)
 
-diff --git a/hw/intc/openpic_kvm.c b/hw/intc/openpic_kvm.c
-index fa83420254..39a6f369c5 100644
---- a/hw/intc/openpic_kvm.c
-+++ b/hw/intc/openpic_kvm.c
-@@ -124,10 +124,6 @@ static void kvm_openpic_region_add(MemoryListener *listener,
-     uint64_t reg_base;
-     int ret;
+diff --git a/exec.c b/exec.c
+index e30155c113..d589283bdd 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3108,24 +3108,6 @@ static MemTxResult flatview_read(FlatView *fv, hwaddr addr,
+                                   addr1, l, mr);
+ }
  
--    if (section->fv != address_space_to_flatview(&address_space_memory)) {
--        abort();
+-static MemTxResult flatview_rw(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
+-                               uint8_t *buf, int len, bool is_write)
+-{
+-    if (is_write) {
+-        return flatview_write(fv, addr, attrs, (uint8_t *)buf, len);
+-    } else {
+-        return flatview_read(fv, addr, attrs, (uint8_t *)buf, len);
 -    }
+-}
 -
-     /* Ignore events on regions that are not us */
-     if (section->mr != &opp->mem) {
-         return;
+-MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
+-                             MemTxAttrs attrs, uint8_t *buf,
+-                             int len, bool is_write)
+-{
+-    return flatview_rw(address_space_to_flatview(as),
+-                       addr, attrs, buf, len, is_write);
+-}
+-
+ MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
+                                     MemTxAttrs attrs, uint8_t *buf, int len)
+ {
+@@ -3159,6 +3141,16 @@ MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
+     return result;
+ }
+ 
++MemTxResult address_space_rw(AddressSpace *as, hwaddr addr, MemTxAttrs attrs,
++                             uint8_t *buf, int len, bool is_write)
++{
++    if (is_write) {
++        return address_space_write(as, addr, attrs, buf, len);
++    } else {
++        return address_space_read_full(as, addr, attrs, buf, len);
++    }
++}
++
+ void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
+                             int len, int is_write)
+ {
 -- 
 2.11.0
