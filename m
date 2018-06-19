@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47334)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVDpo-0008JS-FR
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:26:01 -0400
+	(envelope-from <mail@sebastianbauer.info>) id 1fVE9P-00042R-Pj
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:46:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVDpj-0007kl-Bx
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:26:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54316 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVDpj-0007k8-7m
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:25:55 -0400
-Date: Tue, 19 Jun 2018 11:25:51 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180619102550.GA2368@work-vm>
-References: <20180619044835.18795-1-sjitindarsingh@gmail.com>
+	(envelope-from <mail@sebastianbauer.info>) id 1fVE9P-0005KG-2F
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:46:15 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180619044835.18795-1-sjitindarsingh@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] hmp-commands: use long for begin and
- length in dump-guest-memory
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Tue, 19 Jun 2018 12:46:01 +0200
+From: Sebastian Bauer <mail@sebastianbauer.info>
+In-Reply-To: <alpine.BSF.2.21.1806191218120.6476@zero.eik.bme.hu>
+References: <20180618215601.8974-1-mail@sebastianbauer.info>
+	<20180618235557.GB25461@umbus.fritz.box>
+	<73dd5b26b622e6c59776976aa2c7a3a0@sebastianbauer.info>
+	<20180619043631.GC11674@umbus.fritz.box>
+	<alpine.BSF.2.21.1806191218120.6476@zero.eik.bme.hu>
+Message-ID: <a4d4ed6dd28280922d3444364da28de0@sebastianbauer.info>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] ppc: Include vga cirrus card
+ into the compiling process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +28,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Cc: qemu-devel@nongnu.org, Suraj Jitindar Singh <sjtindarsingh@gmail.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: David Gibson <david@gibson.dropbear.id.au>, thuth@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-* Suraj Jitindar Singh (sjitindarsingh@gmail.com) wrote:
-> The dump-guest-memory command is used to dump an area of guest memory
-> to a file, the piece of memory is specified by a begin address and
-> a length. These parameters are specified as ints and thus have a maximum
-> value of 4GB. This means you can't dump the guest memory past the first
-> 4GB and instead get:
-> (qemu) dump-guest-memory tmp 0x100000000 0x100000000
-> 'dump-guest-memory' has failed: integer is for 32-bit values
-> Try "help dump-guest-memory" for more information
-> 
-> This limitation is imposed in monitor_parse_arguments() since they are
-> both ints. hmp_dump_guest_memory() uses 64 bit quantities to store both
-> the begin and length values. Thus specify begin and length as long so
-> that the entire guest memory space can be dumped.
-> 
-> Signed-off-by: Suraj Jitindar Singh <sjtindarsingh@gmail.com>
-> ---
->  hmp-commands.hx | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 0734fea931..3b5c1f65db 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1116,7 +1116,7 @@ ETEXI
->  
->      {
->          .name       = "dump-guest-memory",
-> -        .args_type  = "paging:-p,detach:-d,zlib:-z,lzo:-l,snappy:-s,filename:F,begin:i?,length:i?",
-> +        .args_type  = "paging:-p,detach:-d,zlib:-z,lzo:-l,snappy:-s,filename:F,begin:l?,length:l?",
->          .params     = "[-p] [-d] [-z|-l|-s] filename [begin length]",
->          .help       = "dump guest memory into file 'filename'.\n\t\t\t"
->                        "-p: do paging to get guest's memory mapping.\n\t\t\t"
+Am 2018-06-19 12:23, schrieb BALATON Zoltan:
+> On Tue, 19 Jun 2018, David Gibson wrote:
+>> Ok.  However, your patch doesn't apply against the ppc-for-3.0 tree.
+>> It looks like you've made it against a tree including some of BALATON
+>> Zoltan's proposed but not yet merged patches.
+> I've sent those patches as well. But if this also works with pseries
+> maybe it does not have to be in the For sam460ex part of the config
+> but could be on it's own with a comment saying that multiple machines
+> can use it.
 
-OK, so hmp_dump_guest_memory in hmp.c already uses int64_t for both,
-as does the qmp_dump_guest_memory it calls; so this looks OK.
+In my opinion, it should be added to pci.mak (and removed from all 
+present configs that include pci.mak). There is also CONFIG_VGA_PCI 
+there, a bunch of network cards and other stuff. The Cirrus VGA is just 
+another PCI card that one could plug into any systems that has a PCI(e) 
+bus, also on physical hardware (whether it is supported by which guests 
+is a different question).
 
-Can you repost this please with the correct sign off that I see you
-tried to fix in the following mail; best if we get it in the one mail.
+However, I wanted to be conservative with my change so I added it only 
+to the 32 bit PPC branch, because this is the platform that I can easily 
+test. Does anybody know why CONFIG_VGA_CIRRUS is selectively enabled for 
+PCI-based systems? What would speak against adding it to pci.mak?
 
-Dave
-
-> -- 
-> 2.13.6
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Bye
+Sebastian
