@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5is-0002Tm-Jv
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:19 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5iv-0002XT-Oj
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5ir-0000JS-Ma
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:18 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5iu-0000LM-Qn
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:21 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:26 -0500
-Message-Id: <20180619014319.28272-61-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:41:31 -0500
+Message-Id: <20180619014319.28272-6-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 060/113] ccid: Fix dwProtocols advertisement of
- T=0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 005/113] sdl: workaround bug in sdl 2.0.8
+ headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,53 +25,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Jason Andryuk <jandryuk@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-stable@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Greg Kurz <groug@kaod.org>
 
-From: Jason Andryuk <jandryuk@gmail.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-Commit d7d218ef02d87c637d20d64da8f575d434ff6f78 attempted to change
-dwProtocols to only advertise support for T=0 and not T=1.  The change
-was incorrect as it changed 0x00000003 to 0x00010000.
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=892087
 
-lsusb -v in a linux guest shows:
-"dwProtocols         65536  (Invalid values detected)", though the
-smart card could still be accessed.  Windows 7 does not detect inserted
-smart cards and logs the the following Error in the Event Logs:
-
-    Source: Smart Card Service
-    Event ID: 610
-    Smart Card Reader 'QEMU QEMU USB CCID 0' rejected IOCTL SET_PROTOCOL:
-    Incorrect function. If this error persists, your smart card or reader
-    may not be functioning correctly
-
-    Command Header: 03 00 00 00
-
-Setting to 0x00000001 fixes the Windows issue.
-
-Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
-Message-id: 20180420183219.20722-1-jandryuk@gmail.com
-Cc: qemu-stable@nongnu.org
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-(cherry picked from commit 0ee86bb6c5beb6498488850104f7557c376d0bef)
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-id: 20180307154258.9313-1-kraxel@redhat.com
+(cherry picked from commit 2ca5c43091324a68772dc348cdf157c63888c168)
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/usb/dev-smartcard-reader.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
-index e334d3be11..4be60a8310 100644
---- a/hw/usb/dev-smartcard-reader.c
-+++ b/hw/usb/dev-smartcard-reader.c
-@@ -329,8 +329,8 @@ static const uint8_t qemu_ccid_descriptor[] = {
-                      */
-         0x07,       /* u8  bVoltageSupport; 01h - 5.0v, 02h - 3.0, 03 - 1.8 */
- 
--        0x00, 0x00, /* u32 dwProtocols; RRRR PPPP. RRRR = 0000h.*/
--        0x01, 0x00, /* PPPP: 0001h = Protocol T=0, 0002h = Protocol T=1 */
-+        0x01, 0x00, /* u32 dwProtocols; RRRR PPPP. RRRR = 0000h.*/
-+        0x00, 0x00, /* PPPP: 0001h = Protocol T=0, 0002h = Protocol T=1 */
-                     /* u32 dwDefaultClock; in kHZ (0x0fa0 is 4 MHz) */
-         0xa0, 0x0f, 0x00, 0x00,
-                     /* u32 dwMaximumClock; */
+diff --git a/configure b/configure
+index 087a82ac50..3c8e66c750 100755
+--- a/configure
++++ b/configure
+@@ -2788,6 +2788,7 @@ if test "$sdl" != "no" ; then
+ int main( void ) { return SDL_Init (SDL_INIT_VIDEO); }
+ EOF
+   sdl_cflags=$($sdlconfig --cflags 2>/dev/null)
++  sdl_cflags="$sdl_cflags -Wno-undef"  # workaround 2.0.8 bug
+   if test "$static" = "yes" ; then
+     if $pkg_config $sdlname --exists; then
+       sdl_libs=$($pkg_config $sdlname --static --libs 2>/dev/null)
 -- 
 2.11.0
