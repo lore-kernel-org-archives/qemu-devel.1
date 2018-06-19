@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jM-0002wR-Sk
+	(envelope-from <flukshun@gmail.com>) id 1fV5jK-0002rv-8D
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jL-0000gw-Ju
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:48 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5jJ-0000bD-5E
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:46 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:37 -0500
-Message-Id: <20180619014319.28272-72-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:41:32 -0500
+Message-Id: <20180619014319.28272-7-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 071/113] iotests: Add test for rebasing with
- relative paths
+Subject: [Qemu-devel] [PATCH 006/113] spapr: Allow some cases where we can't
+ set VSMT mode in the kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,159 +22,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: qemu-stable@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
 
-From: Max Reitz <mreitz@redhat.com>
+From: David Gibson <david@gibson.dropbear.id.au>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20180509182002.8044-3-mreitz@redhat.com
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit 28036a7f7044fddb79819e3c8fcb4ae5605c60e0)
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+At present if we require a vsmt mode that's not equal to the kernel's
+default, and the kernel doesn't let us change it (e.g. because it's an old
+kernel without support) then we always fail.
+
+But in fact we can cope with the kernel having a different vsmt as long as
+  a) it's >= the actual number of vthreads/vcore (so that guest threads
+     that are supposed to be on the same core act like it)
+  b) it's a submultiple of the requested vsmt mode (so that guest threads
+     spaced by the vsmt value will act like they're on different cores)
+
+Allowing this case gives us a bit more freedom to adjust the vsmt behaviour
+without breaking existing cases.
+
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+Tested-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+(cherry picked from commit 1f20f2e0ee61d91abff4e86ed1cda1b5244647d3)
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- tests/qemu-iotests/024     | 82 ++++++++++++++++++++++++++++++++++++++++++++--
- tests/qemu-iotests/024.out | 30 +++++++++++++++++
- 2 files changed, 109 insertions(+), 3 deletions(-)
+ hw/ppc/spapr.c | 26 +++++++++++++++++++-------
+ 1 file changed, 19 insertions(+), 7 deletions(-)
 
-diff --git a/tests/qemu-iotests/024 b/tests/qemu-iotests/024
-index e0d77ce2f5..4071ed6093 100755
---- a/tests/qemu-iotests/024
-+++ b/tests/qemu-iotests/024
-@@ -29,9 +29,14 @@ status=1	# failure is the default!
- 
- _cleanup()
- {
--	_cleanup_test_img
--	rm -f "$TEST_DIR/t.$IMGFMT.base_old"
--	rm -f "$TEST_DIR/t.$IMGFMT.base_new"
-+    _cleanup_test_img
-+    rm -f "$TEST_DIR/t.$IMGFMT.base_old"
-+    rm -f "$TEST_DIR/t.$IMGFMT.base_new"
-+
-+    rm -f "$TEST_DIR/subdir/t.$IMGFMT"
-+    rm -f "$TEST_DIR/subdir/t.$IMGFMT.base_old"
-+    rm -f "$TEST_DIR/subdir/t.$IMGFMT.base_new"
-+    rmdir "$TEST_DIR/subdir" 2> /dev/null
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
- 
-@@ -123,6 +128,77 @@ io_pattern readv $((13 * CLUSTER_SIZE)) $CLUSTER_SIZE 0 1 0x00
- io_pattern readv $((14 * CLUSTER_SIZE)) $CLUSTER_SIZE 0 1 0x11
- io_pattern readv $((15 * CLUSTER_SIZE)) $CLUSTER_SIZE 0 1 0x00
- 
-+echo
-+echo "=== Test rebase in a subdirectory of the working directory ==="
-+echo
-+
-+# Clean up the old images beforehand so they do not interfere with
-+# this test
-+_cleanup
-+
-+mkdir "$TEST_DIR/subdir"
-+
-+# Relative to the overlay
-+BASE_OLD_OREL="t.$IMGFMT.base_old"
-+BASE_NEW_OREL="t.$IMGFMT.base_new"
-+
-+# Relative to $TEST_DIR (which is going to be our working directory)
-+OVERLAY_WREL="subdir/t.$IMGFMT"
-+
-+BASE_OLD="$TEST_DIR/subdir/$BASE_OLD_OREL"
-+BASE_NEW="$TEST_DIR/subdir/$BASE_NEW_OREL"
-+OVERLAY="$TEST_DIR/$OVERLAY_WREL"
-+
-+# Test done here:
-+#
-+# Backing (old): 11 11 -- 11
-+# Backing (new): -- 22 22 11
-+# Overlay:       -- -- -- --
-+#
-+# Rebasing works, we have verified that above.  Here, we just want to
-+# see that rebasing is done for the correct target backing file.
-+
-+TEST_IMG=$BASE_OLD _make_test_img 1M
-+TEST_IMG=$BASE_NEW _make_test_img 1M
-+TEST_IMG=$OVERLAY _make_test_img -b "$BASE_OLD_OREL" 1M
-+
-+echo
-+
-+$QEMU_IO "$BASE_OLD" \
-+    -c "write -P 0x11 $((0 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
-+    -c "write -P 0x11 $((3 * CLUSTER_SIZE)) $((1 * CLUSTER_SIZE))" \
-+    | _filter_qemu_io
-+
-+$QEMU_IO "$BASE_NEW" \
-+    -c "write -P 0x22 $((1 * CLUSTER_SIZE)) $((2 * CLUSTER_SIZE))" \
-+    -c "write -P 0x11 $((3 * CLUSTER_SIZE)) $((1 * CLUSTER_SIZE))" \
-+    | _filter_qemu_io
-+
-+echo
-+
-+pushd "$TEST_DIR" >/dev/null
-+$QEMU_IMG rebase -f "$IMGFMT" -b "$BASE_NEW_OREL" "$OVERLAY_WREL"
-+popd >/dev/null
-+
-+# Verify the backing path is correct
-+TEST_IMG=$OVERLAY _img_info | grep '^backing file'
-+
-+echo
-+
-+# Verify the data is correct
-+$QEMU_IO "$OVERLAY" \
-+    -c "read -P 0x11 $((0 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
-+    -c "read -P 0x11 $((1 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
-+    -c "read -P 0x00 $((2 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
-+    -c "read -P 0x11 $((3 * CLUSTER_SIZE)) $CLUSTER_SIZE" \
-+    | _filter_qemu_io
-+
-+echo
-+
-+# Verify that cluster #3 is not allocated (because it is the same in
-+# $BASE_OLD and $BASE_NEW)
-+$QEMU_IMG map "$OVERLAY" | _filter_qemu_img_map
-+
- 
- # success, all done
- echo "*** done"
-diff --git a/tests/qemu-iotests/024.out b/tests/qemu-iotests/024.out
-index 33cfaf5cfc..024dc786b3 100644
---- a/tests/qemu-iotests/024.out
-+++ b/tests/qemu-iotests/024.out
-@@ -141,4 +141,34 @@ read 65536/65536 bytes at offset 917504
- === IO: pattern 0x00
- read 65536/65536 bytes at offset 983040
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+=== Test rebase in a subdirectory of the working directory ===
-+
-+Formatting 'TEST_DIR/subdir/t.IMGFMT.base_old', fmt=IMGFMT size=1048576
-+Formatting 'TEST_DIR/subdir/t.IMGFMT.base_new', fmt=IMGFMT size=1048576
-+Formatting 'TEST_DIR/subdir/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=t.IMGFMT.base_old
-+
-+wrote 131072/131072 bytes at offset 0
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 196608
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 131072/131072 bytes at offset 65536
-+128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+wrote 65536/65536 bytes at offset 196608
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+backing file: t.IMGFMT.base_new (actual path: TEST_DIR/subdir/t.IMGFMT.base_new)
-+
-+read 65536/65536 bytes at offset 0
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 65536
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 131072
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+read 65536/65536 bytes at offset 196608
-+64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+Offset          Length          File
-+0               0x30000         TEST_DIR/subdir/t.IMGFMT
-+0x30000         0x10000         TEST_DIR/subdir/t.IMGFMT.base_new
- *** done
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index b57528baf4..37388f1416 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2291,17 +2291,29 @@ static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
+     if (kvm_enabled() && (spapr->vsmt != kvm_smt)) {
+         ret = kvmppc_set_smt_threads(spapr->vsmt);
+         if (ret) {
++            /* Looks like KVM isn't able to change VSMT mode */
+             error_setg(&local_err,
+                        "Failed to set KVM's VSMT mode to %d (errno %d)",
+                        spapr->vsmt, ret);
+-            if (!vsmt_user) {
+-                error_append_hint(&local_err, "On PPC, a VM with %d threads/"
+-                             "core on a host with %d threads/core requires "
+-                             " the use of VSMT mode %d.\n",
+-                             smp_threads, kvm_smt, spapr->vsmt);
++            /* We can live with that if the default one is big enough
++             * for the number of threads, and a submultiple of the one
++             * we want.  In this case we'll waste some vcpu ids, but
++             * behaviour will be correct */
++            if ((kvm_smt >= smp_threads) && ((spapr->vsmt % kvm_smt) == 0)) {
++                warn_report_err(local_err);
++                local_err = NULL;
++                goto out;
++            } else {
++                if (!vsmt_user) {
++                    error_append_hint(&local_err,
++                                      "On PPC, a VM with %d threads/core"
++                                      " on a host with %d threads/core"
++                                      " requires the use of VSMT mode %d.\n",
++                                      smp_threads, kvm_smt, spapr->vsmt);
++                }
++                kvmppc_hint_smt_possible(&local_err);
++                goto out;
+             }
+-            kvmppc_hint_smt_possible(&local_err);
+-            goto out;
+         }
+     }
+     /* else TCG: nothing to do currently */
 -- 
 2.11.0
