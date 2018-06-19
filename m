@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45108)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5hE-0000kK-1t
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:37 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5hG-0000ni-UM
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5hD-0007yU-0R
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:36 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5hF-0007zO-SS
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:38 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:41:41 -0500
-Message-Id: <20180619014319.28272-16-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:41:42 -0500
+Message-Id: <20180619014319.28272-17-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 015/113] spapr: register dummy ICPs later
+Subject: [Qemu-devel] [PATCH 016/113] spapr: make pseries-2.11 the default
+ machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,100 +22,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>
 
 From: Greg Kurz <groug@kaod.org>
 
-Some older machine types create more ICPs than needed. We hence
-need to register up to xics_max_server_number() dummy ICPs to
-accomodate the migration of these machine types.
+The spapr capability framework was introduced in QEMU 2.12. It allows
+to have an explicit control on how host features are exposed to the
+guest. This is especially needed to handle migration between hetero-
+geneous hosts (eg, POWER8 to POWER9). It is also used to expose fixes/
+workarounds against speculative execution vulnerabilities to guests.
+The framework was hence backported to QEMU 2.11.1, especially these
+commits:
 
-Recent VSMT rework changed xics_max_server_number() to return
+0fac4aa93074 spapr: Add pseries-2.12 machine type
+9070f408f491 spapr: Treat Hardware Transactional Memory (HTM) as an
+ optional capability
 
-    DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads)
+0fac4aa93074 has the confusing effect of making pseries-2.12 the default
+machine type for QEMU 2.11.1, instead of the expected pseries-2.11. This
+patch changes the default machine back to pseries-2.11.
 
-instead of
+Unfortunately, 9070f408f491 enforces the HTM capability for pseries-2.11.
+This isn't supported by TCG and breaks 'make check'. So this patch also
+adds a hack to turn HTM off when using TCG.
 
-    DIV_ROUND_UP(max_cpus * kvmppc_smt_threads(), smp_threads);
-
-The change is okay but it requires spapr->vsmt to be set, which
-isn't the case with the current code. This causes the formula to
-return zero and we don't create dummy ICPs. This breaks migration
-of older guests as reported here:
-
-    https://bugzilla.redhat.com/show_bug.cgi?id=1549087
-
-The dummy ICP workaround doesn't really have a dependency on XICS
-itself. But it does depend on proper VCPU id numbering and it must
-be applied before creating vCPUs (ie, creating real ICPs). So this
-patch moves the workaround to spapr_init_cpus(), which already
-assumes VSMT to be set.
-
-Fixes: 72194664c8a1 ("spapr: use spapr->vsmt to compute VCPU ids")
-Reported-by: Lukas Doktor <ldoktor@redhat.com>
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-(cherry picked from commit 72fdd4de8e5fdc1a6078e000835fb54592a3fe97)
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ hw/ppc/spapr.c      | 4 ++--
+ hw/ppc/spapr_caps.c | 5 +++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d53123c127..1a2dd1f597 100644
+index 1a2dd1f597..6499a86752 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -184,7 +184,6 @@ static int xics_max_server_number(sPAPRMachineState *spapr)
- static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
- {
-     sPAPRMachineState *spapr = SPAPR_MACHINE(machine);
--    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
- 
-     if (kvm_enabled()) {
-         if (machine_kernel_irqchip_allowed(machine) &&
-@@ -206,17 +205,6 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
-             return;
-         }
-     }
--
--    if (smc->pre_2_10_has_unused_icps) {
--        int i;
--
--        for (i = 0; i < xics_max_server_number(spapr); i++) {
--            /* Dummy entries get deregistered when real ICPState objects
--             * are registered during CPU core hotplug.
--             */
--            pre_2_10_vmstate_register_dummy_icp(i);
--        }
--    }
+@@ -3820,7 +3820,7 @@ static void spapr_machine_2_12_class_options(MachineClass *mc)
+     /* Defaults for the latest behaviour inherited from the base class */
  }
  
- static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
-@@ -2210,6 +2198,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
- {
-     MachineState *machine = MACHINE(spapr);
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
-     const char *type = spapr_get_cpu_core_type(machine->cpu_type);
-     const CPUArchIdList *possible_cpus;
-     int boot_cores_nr = smp_cpus / smp_threads;
-@@ -2240,6 +2229,17 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
-         boot_cores_nr = possible_cpus->len;
-     }
+-DEFINE_SPAPR_MACHINE(2_12, "2.12", true);
++DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
  
-+    if (smc->pre_2_10_has_unused_icps) {
-+        int i;
-+
-+        for (i = 0; i < xics_max_server_number(spapr); i++) {
-+            /* Dummy entries get deregistered when real ICPState objects
-+             * are registered during CPU core hotplug.
-+             */
-+            pre_2_10_vmstate_register_dummy_icp(i);
-+        }
+ /*
+  * pseries-2.11
+@@ -3842,7 +3842,7 @@ static void spapr_machine_2_11_class_options(MachineClass *mc)
+     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
+ }
+ 
+-DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
++DEFINE_SPAPR_MACHINE(2_11, "2.11", true);
+ 
+ /*
+  * pseries-2.10
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 7b229517be..82043e60e7 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -285,6 +285,11 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
+ 
+     caps = smc->default_caps;
+ 
++    /* HACK for 2.11.2: fix make check */
++    if (tcg_enabled()) {
++        caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
 +    }
 +
-     for (i = 0; i < possible_cpus->len; i++) {
-         int core_id = i * smp_threads;
- 
+     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
+                           0, spapr->max_compat_pvr)) {
+         caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
 -- 
 2.11.0
