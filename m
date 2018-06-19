@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fVFlz-00059O-Ds
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:30:12 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fVFnc-00060C-Ds
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:31:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fVFlt-0004hg-Qy
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:30:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48738 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fVFlt-0004hC-KG
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:30:05 -0400
-References: <20180605221500.21674-1-juterry@microsoft.com>
-	<20180605221500.21674-2-juterry@microsoft.com>
-	<dfb2eddc-b582-4175-0109-c752d97ccf34@redhat.com>
-	<MW2PR2101MB09217AB059213F2EAE1C7B72B6710@MW2PR2101MB0921.namprd21.prod.outlook.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2413663f-b3c7-04cb-afb4-5d1b18147559@redhat.com>
-Date: Tue, 19 Jun 2018 14:30:02 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fVFnb-0005dK-EE
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:31:52 -0400
+Date: Tue, 19 Jun 2018 13:31:40 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180619123138.GD2368@work-vm>
+References: <20180615155103.11924-1-berrange@redhat.com>
+	<20180615155103.11924-7-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <MW2PR2101MB09217AB059213F2EAE1C7B72B6710@MW2PR2101MB0921.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] WHPX: register for unrecognized MSR
- exits
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180615155103.11924-7-berrange@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 6/6] monitor: deprecate acl_show, acl_reset,
+ acl_policy, acl_add, acl_remove
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +25,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Justin Terry (VM)" <juterry@microsoft.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 19/06/2018 00:01, Justin Terry (VM) wrote:
-> The issue is that the Windows Hypervisor Platform will return #GP for
-> any rdmsr/wrmsr that is not a virtualized MSR in the hypervisor by
-> default. A virt stack (QEMU) can override this default behavior by
-> registering for MSR exits. In this configuration the virt stack will
-> receive any non-virtualized MSR exit and from the hypervisors
-> perspective this is now effectively handled. I could certainly list
-> each MSR individually but it seems overly prone to test-matrix
-> errors. For example, each kernel that I try might succeed but a
-> single option difference in another kernel might fail (which was the
-> case here because the 4.4 kernel is different from the 4.14+ it
-> seems). But, I will make any change you see fit to handle this in the
-> way QEMU prefers.
-> 
-> As FYI, this is the same logic that Hyper-V uses in its virt stack
-> for any hypervisor exits that are not handled in the hypervisor
-> itself.
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> The various ACL related commands are obsolete now that the QAuthZ
+> framework for authorization is fully integrated throughout QEMU network
+> services. Mark it as deprecated with no replacement to be provided.
+>=20
+> Signed-off-by: Daniel P. Berrang=E9 <berrange@redhat.com>
 
-If by "the same logic" you mean that Hyper-V does
-read-as-zero/write-to-nowhere, then the patch is okay with a comment
-that says so.
+OK, so I can do all these by using object_add/object_del with the right
+type and parameters?
 
-Thanks,
+but looks OK:
 
-Paolo
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+
+> ---
+>  monitor.c     | 23 +++++++++++++++++++++++
+>  qemu-doc.texi |  8 ++++++++
+>  2 files changed, 31 insertions(+)
+>=20
+> diff --git a/monitor.c b/monitor.c
+> index 67c63013bd..c4a9ae5c85 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -2089,6 +2089,19 @@ static QAuthZList *find_auth(Monitor *mon, const=
+ char *name)
+>      return QAUTHZ_LIST(obj);
+>  }
+> =20
+> +static bool warn_acl;
+> +static void hmp_warn_acl(void)
+> +{
+> +    if (warn_acl) {
+> +        return;
+> +    }
+> +    error_report("The acl_show, acl_reset, acl_policy, acl_add, acl_re=
+move "
+> +                 "commands are deprecated with no replacement. Authori=
+zation "
+> +                 "for VNC should be performed using the pluggable QAut=
+hZ "
+> +                 "objects");
+> +    warn_acl =3D true;
+> +}
+> +
+>  static void hmp_acl_show(Monitor *mon, const QDict *qdict)
+>  {
+>      const char *aclname =3D qdict_get_str(qdict, "aclname");
+> @@ -2096,6 +2109,8 @@ static void hmp_acl_show(Monitor *mon, const QDic=
+t *qdict)
+>      QAuthZListRuleList *rules;
+>      size_t i =3D 0;
+> =20
+> +    hmp_warn_acl();
+> +
+>      if (!auth) {
+>          return;
+>      }
+> @@ -2119,6 +2134,8 @@ static void hmp_acl_reset(Monitor *mon, const QDi=
+ct *qdict)
+>      const char *aclname =3D qdict_get_str(qdict, "aclname");
+>      QAuthZList *auth =3D find_auth(mon, aclname);
+> =20
+> +    hmp_warn_acl();
+> +
+>      if (!auth) {
+>          return;
+>      }
+> @@ -2137,6 +2154,8 @@ static void hmp_acl_policy(Monitor *mon, const QD=
+ict *qdict)
+>      int val;
+>      Error *err =3D NULL;
+> =20
+> +    hmp_warn_acl();
+> +
+>      if (!auth) {
+>          return;
+>      }
+> @@ -2172,6 +2191,8 @@ static void hmp_acl_add(Monitor *mon, const QDict=
+ *qdict)
+>      QAuthZListFormat format;
+>      size_t i =3D 0;
+> =20
+> +    hmp_warn_acl();
+> +
+>      if (!auth) {
+>          return;
+>      }
+> @@ -2227,6 +2248,8 @@ static void hmp_acl_remove(Monitor *mon, const QD=
+ict *qdict)
+>      QAuthZList *auth =3D find_auth(mon, aclname);
+>      ssize_t i =3D 0;
+> =20
+> +    hmp_warn_acl();
+> +
+>      if (!auth) {
+>          return;
+>      }
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 5b7e3faab2..c6aad94015 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2938,6 +2938,14 @@ The ``query-cpus'' command is replaced by the ``=
+query-cpus-fast'' command.
+>  The ``arch'' output member of the ``query-cpus-fast'' command is
+>  replaced by the ``target'' output member.
+> =20
+> +@section Human Monitor Protocol (HMP) commands
+> +
+> +@subsection acl_show, acl_reset, acl_policy, acl_add, acl_remove (sinc=
+e 3.0.0)
+> +
+> +The ``acl_show'', ``acl_reset'', ``acl_policy'', ``acl_add'', and
+> +``acl_remove'' commands are deprecated with no replacement. Authorizat=
+ion
+> +for VNC should be performed using the pluggable QAuthZ objects.
+> +
+>  @section System emulator devices
+> =20
+>  @subsection ivshmem (since 2.6.0)
+> --=20
+> 2.17.0
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
