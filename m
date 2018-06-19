@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fVOEe-00075B-BL
+	(envelope-from <Babu.Moger@amd.com>) id 1fVOEe-000759-Ar
 	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:32:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fVOEc-00034x-5j
+	(envelope-from <Babu.Moger@amd.com>) id 1fVOEb-00034X-P3
 	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:32:20 -0400
 Received: from mail-sn1nam02on0082.outbound.protection.outlook.com
 	([104.47.36.82]:38970
 	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fVOEb-00032O-S6
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:32:18 -0400
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fVOEb-00032O-HA
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:32:17 -0400
 From: Babu Moger <babu.moger@amd.com>
-Date: Tue, 19 Jun 2018 17:31:59 -0400
-Message-Id: <1529443919-67509-4-git-send-email-babu.moger@amd.com>
+Date: Tue, 19 Jun 2018 17:31:58 -0400
+Message-Id: <1529443919-67509-3-git-send-email-babu.moger@amd.com>
 In-Reply-To: <1529443919-67509-1-git-send-email-babu.moger@amd.com>
 References: <1529443919-67509-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v16 3/3] i386: Remove generic SMT thread check
+Subject: [Qemu-devel] [PATCH v16 2/3] i386: Enable TOPOEXT feature on AMD
+ EPYC CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +31,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 Cc: qemu-devel@nongnu.org, mtosatti@redhat.com, kvm@vger.kernel.org, kash@tripleback.net, geoff@hostfission.com, babu.moger@amd.com
 
-Remove generic non-intel check while validating hyperthreading support.
-Certain AMD CPUs can support hyperthreading now.
+Enable TOPOEXT feature on EPYC CPU. This is required to support
+hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
 
-CPU family with TOPOEXT feature can support hyperthreading now.
+Disable topoext on PC_COMPAT_2_12 and keep xlevel 0x8000000a.
 
 Signed-off-by: Babu Moger <babu.moger@amd.com>
-Tested-by: Geoffrey McRae <geoff@hostfission.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/i386/cpu.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ include/hw/i386/pc.h |  8 ++++++++
+ target/i386/cpu.c    | 10 ++++++----
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index fc8dedc..d0ebeb9 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -303,6 +303,14 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+         .driver   = TYPE_X86_CPU,\
+         .property = "legacy-cache",\
+         .value    = "on",\
++    },{\
++        .driver   = TYPE_X86_CPU,\
++        .property = "topoext",\
++        .value    = "off",\
++    },{\
++        .driver   = "EPYC-" TYPE_X86_CPU,\
++        .property = "xlevel",\
++        .value    = stringify(0x8000000a),\
+     },
+ 
+ #define PC_COMPAT_2_11 \
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d6ed29b..e6c2f8a 100644
+index 130391c..d6ed29b 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -4985,17 +4985,22 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
- 
-     qemu_init_vcpu(cs);
- 
--    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
--     * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
--     * based on inputs (sockets,cores,threads), it is still better to gives
-+    /*
-+     * Most Intel and certain AMD CPUs support hyperthreading. Even though QEMU
-+     * fixes this issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
-+     * based on inputs (sockets,cores,threads), it is still better to give
-      * users a warning.
-      *
-      * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
-      * cs->nr_threads hasn't be populated yet and the checking is incorrect.
-      */
--    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
--        error_report("AMD CPU doesn't support hyperthreading. Please configure"
--                     " -smp options properly.");
-+     if (IS_AMD_CPU(env) &&
-+         !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
-+         cs->nr_threads > 1 && !ht_warned) {
-+            error_report("This family of AMD CPU doesn't support "
-+                         "hyperthreading(%d). Please configure -smp "
-+                         "options properly or try enabling topoext feature.",
-+                         cs->nr_threads);
-         ht_warned = true;
-     }
- 
+@@ -2579,7 +2579,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .features[FEAT_8000_0001_ECX] =
+             CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
+             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
+-            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
++            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
++            CPUID_EXT3_TOPOEXT,
+         .features[FEAT_7_0_EBX] =
+             CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
+             CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
+@@ -2594,7 +2595,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_XSAVE_XGETBV1,
+         .features[FEAT_6_EAX] =
+             CPUID_6_EAX_ARAT,
+-        .xlevel = 0x8000000A,
++        .xlevel = 0x8000001E,
+         .model_id = "AMD EPYC Processor",
+         .cache_info = &epyc_cache_info,
+     },
+@@ -2624,7 +2625,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .features[FEAT_8000_0001_ECX] =
+             CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
+             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
+-            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
++            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
++            CPUID_EXT3_TOPOEXT,
+         .features[FEAT_8000_0008_EBX] =
+             CPUID_8000_0008_EBX_IBPB,
+         .features[FEAT_7_0_EBX] =
+@@ -2641,7 +2643,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
+             CPUID_XSAVE_XGETBV1,
+         .features[FEAT_6_EAX] =
+             CPUID_6_EAX_ARAT,
+-        .xlevel = 0x8000000A,
++        .xlevel = 0x8000001E,
+         .model_id = "AMD EPYC Processor (with IBPB)",
+         .cache_info = &epyc_cache_info,
+     },
 -- 
 1.8.3.1
