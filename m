@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5k3-0003Tx-CA
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:32 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5kA-0003Xa-6N
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5k1-00014c-QQ
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:31 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5k8-000184-64
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:38 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:56 -0500
-Message-Id: <20180619014319.28272-91-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:42:58 -0500
+Message-Id: <20180619014319.28272-93-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 090/113] intel-iommu: add iommu lock
+Subject: [Qemu-devel] [PATCH 092/113] intel-iommu: introduce
+ vtd_page_walk_info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,239 +26,193 @@ Cc: qemu-stable@nongnu.org, Peter Xu <peterx@redhat.com>, "Michael S . Tsirkin" 
 
 From: Peter Xu <peterx@redhat.com>
 
-SECURITY IMPLICATION: this patch fixes a potential race when multiple
-threads access the IOMMU IOTLB cache.
-
-Add a per-iommu big lock to protect IOMMU status.  Currently the only
-thing to be protected is the IOTLB/context cache, since that can be
-accessed even without BQL, e.g., in IO dataplane.
-
-Note that we don't need to protect device page tables since that's fully
-controlled by the guest kernel.  However there is still possibility that
-malicious drivers will program the device to not obey the rule.  In that
-case QEMU can't really do anything useful, instead the guest itself will
-be responsible for all uncertainties.
+During the recursive page walking of IOVA page tables, some stack
+variables are constant variables and never changed during the whole page
+walking procedure.  Isolate them into a struct so that we don't need to
+pass those contants down the stack every time and multiple times.
 
 CC: QEMU Stable <qemu-stable@nongnu.org>
-Reported-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit 1d9efa73e12ddf361ea997c2d532cc4afa6674d1)
+(cherry picked from commit fe215b0cbb8c1f4b4af0a64aa5c02042080dd537)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/i386/intel_iommu.c         | 56 ++++++++++++++++++++++++++++++++++++-------
- include/hw/i386/intel_iommu.h |  6 +++++
- 2 files changed, 53 insertions(+), 9 deletions(-)
+ hw/i386/intel_iommu.c | 84 +++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 52 insertions(+), 32 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index be2f445758..cfcd1046e7 100644
+index 3715fa327b..e059bfd577 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -128,6 +128,16 @@ static uint64_t vtd_set_clear_mask_quad(IntelIOMMUState *s, hwaddr addr,
-     return new_val;
- }
+@@ -748,9 +748,27 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
  
-+static inline void vtd_iommu_lock(IntelIOMMUState *s)
-+{
-+    qemu_mutex_lock(&s->iommu_lock);
-+}
+ typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
+ 
++/**
++ * Constant information used during page walking
++ *
++ * @hook_fn: hook func to be called when detected page
++ * @private: private data to be passed into hook func
++ * @notify_unmap: whether we should notify invalid entries
++ * @aw: maximum address width
++ */
++typedef struct {
++    vtd_page_walk_hook hook_fn;
++    void *private;
++    bool notify_unmap;
++    uint8_t aw;
++} vtd_page_walk_info;
 +
-+static inline void vtd_iommu_unlock(IntelIOMMUState *s)
-+{
-+    qemu_mutex_unlock(&s->iommu_lock);
-+}
-+
- /* GHashTable functions */
- static gboolean vtd_uint64_equal(gconstpointer v1, gconstpointer v2)
+ static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
+-                             vtd_page_walk_hook hook_fn, void *private)
++                             vtd_page_walk_info *info)
  {
-@@ -172,9 +182,9 @@ static gboolean vtd_hash_remove_by_page(gpointer key, gpointer value,
- }
- 
- /* Reset all the gen of VTDAddressSpace to zero and set the gen of
-- * IntelIOMMUState to 1.
-+ * IntelIOMMUState to 1.  Must be called with IOMMU lock held.
++    vtd_page_walk_hook hook_fn = info->hook_fn;
++    void *private = info->private;
++
+     assert(hook_fn);
+     trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
+                             entry->addr_mask, entry->perm);
+@@ -763,17 +781,13 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
+  * @addr: base GPA addr to start the walk
+  * @start: IOVA range start address
+  * @end: IOVA range end address (start <= addr < end)
+- * @hook_fn: hook func to be called when detected page
+- * @private: private data to be passed into hook func
+  * @read: whether parent level has read permission
+  * @write: whether parent level has write permission
+- * @notify_unmap: whether we should notify invalid entries
+- * @aw: maximum address width
++ * @info: constant information for the page walk
   */
--static void vtd_reset_context_cache(IntelIOMMUState *s)
-+static void vtd_reset_context_cache_locked(IntelIOMMUState *s)
+ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+-                               uint64_t end, vtd_page_walk_hook hook_fn,
+-                               void *private, uint32_t level, bool read,
+-                               bool write, bool notify_unmap, uint8_t aw)
++                               uint64_t end, uint32_t level, bool read,
++                               bool write, vtd_page_walk_info *info)
  {
-     VTDAddressSpace *vtd_as;
-     VTDBus *vtd_bus;
-@@ -197,12 +207,20 @@ static void vtd_reset_context_cache(IntelIOMMUState *s)
-     s->context_cache_gen = 1;
- }
+     bool read_cur, write_cur, entry_valid;
+     uint32_t offset;
+@@ -823,24 +837,24 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
  
--static void vtd_reset_iotlb(IntelIOMMUState *s)
-+/* Must be called with IOMMU lock held. */
-+static void vtd_reset_iotlb_locked(IntelIOMMUState *s)
+         if (vtd_is_last_slpte(slpte, level)) {
+             /* NOTE: this is only meaningful if entry_valid == true */
+-            entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
+-            if (!entry_valid && !notify_unmap) {
++            entry.translated_addr = vtd_get_slpte_addr(slpte, info->aw);
++            if (!entry_valid && !info->notify_unmap) {
+                 trace_vtd_page_walk_skip_perm(iova, iova_next);
+                 goto next;
+             }
+-            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
++            ret = vtd_page_walk_one(&entry, level, info);
+             if (ret < 0) {
+                 return ret;
+             }
+         } else {
+             if (!entry_valid) {
+-                if (notify_unmap) {
++                if (info->notify_unmap) {
+                     /*
+                      * The whole entry is invalid; unmap it all.
+                      * Translated address is meaningless, zero it.
+                      */
+                     entry.translated_addr = 0x0;
+-                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
++                    ret = vtd_page_walk_one(&entry, level, info);
+                     if (ret < 0) {
+                         return ret;
+                     }
+@@ -849,10 +863,9 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+                 }
+                 goto next;
+             }
+-            ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
+-                                      MIN(iova_next, end), hook_fn, private,
+-                                      level - 1, read_cur, write_cur,
+-                                      notify_unmap, aw);
++            ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, info->aw),
++                                      iova, MIN(iova_next, end), level - 1,
++                                      read_cur, write_cur, info);
+             if (ret < 0) {
+                 return ret;
+             }
+@@ -871,28 +884,24 @@ next:
+  * @ce: context entry to walk upon
+  * @start: IOVA address to start the walk
+  * @end: IOVA range end address (start <= addr < end)
+- * @hook_fn: the hook that to be called for each detected area
+- * @private: private data for the hook function
+- * @aw: maximum address width
++ * @info: page walking information struct
+  */
+ static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_t end,
+-                         vtd_page_walk_hook hook_fn, void *private,
+-                         bool notify_unmap, uint8_t aw)
++                         vtd_page_walk_info *info)
  {
-     assert(s->iotlb);
-     g_hash_table_remove_all(s->iotlb);
- }
+     dma_addr_t addr = vtd_ce_get_slpt_base(ce);
+     uint32_t level = vtd_ce_get_level(ce);
  
-+static void vtd_reset_iotlb(IntelIOMMUState *s)
-+{
-+    vtd_iommu_lock(s);
-+    vtd_reset_iotlb_locked(s);
-+    vtd_iommu_unlock(s);
-+}
-+
- static uint64_t vtd_get_iotlb_key(uint64_t gfn, uint16_t source_id,
-                                   uint32_t level)
- {
-@@ -215,6 +233,7 @@ static uint64_t vtd_get_iotlb_gfn(hwaddr addr, uint32_t level)
-     return (addr & vtd_slpt_level_page_mask(level)) >> VTD_PAGE_SHIFT_4K;
- }
- 
-+/* Must be called with IOMMU lock held */
- static VTDIOTLBEntry *vtd_lookup_iotlb(IntelIOMMUState *s, uint16_t source_id,
-                                        hwaddr addr)
- {
-@@ -235,6 +254,7 @@ out:
-     return entry;
- }
- 
-+/* Must be with IOMMU lock held */
- static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
-                              uint16_t domain_id, hwaddr addr, uint64_t slpte,
-                              uint8_t access_flags, uint32_t level)
-@@ -246,7 +266,7 @@ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
-     trace_vtd_iotlb_page_update(source_id, addr, slpte, domain_id);
-     if (g_hash_table_size(s->iotlb) >= VTD_IOTLB_MAX_SIZE) {
-         trace_vtd_iotlb_reset("iotlb exceeds size limit");
--        vtd_reset_iotlb(s);
-+        vtd_reset_iotlb_locked(s);
+-    if (!vtd_iova_range_check(start, ce, aw)) {
++    if (!vtd_iova_range_check(start, ce, info->aw)) {
+         return -VTD_FR_ADDR_BEYOND_MGAW;
      }
  
-     entry->gfn = gfn;
-@@ -1106,7 +1126,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
-     IntelIOMMUState *s = vtd_as->iommu_state;
-     VTDContextEntry ce;
-     uint8_t bus_num = pci_bus_num(bus);
--    VTDContextCacheEntry *cc_entry = &vtd_as->context_cache_entry;
-+    VTDContextCacheEntry *cc_entry;
-     uint64_t slpte, page_mask;
-     uint32_t level;
-     uint16_t source_id = vtd_make_source_id(bus_num, devfn);
-@@ -1123,6 +1143,10 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
-      */
-     assert(!vtd_is_interrupt_addr(addr));
- 
-+    vtd_iommu_lock(s);
-+
-+    cc_entry = &vtd_as->context_cache_entry;
-+
-     /* Try to fetch slpte form IOTLB */
-     iotlb_entry = vtd_lookup_iotlb(s, source_id, addr);
-     if (iotlb_entry) {
-@@ -1182,7 +1206,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
-          * IOMMU region can be swapped back.
-          */
-         vtd_pt_enable_fast_path(s, source_id);
--
-+        vtd_iommu_unlock(s);
-         return true;
+-    if (!vtd_iova_range_check(end, ce, aw)) {
++    if (!vtd_iova_range_check(end, ce, info->aw)) {
+         /* Fix end so that it reaches the maximum */
+-        end = vtd_iova_limit(ce, aw);
++        end = vtd_iova_limit(ce, info->aw);
      }
  
-@@ -1203,6 +1227,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
-     vtd_update_iotlb(s, source_id, VTD_CONTEXT_ENTRY_DID(ce.hi), addr, slpte,
-                      access_flags, level);
- out:
-+    vtd_iommu_unlock(s);
-     entry->iova = addr & page_mask;
-     entry->translated_addr = vtd_get_slpte_addr(slpte, s->aw_bits) & page_mask;
-     entry->addr_mask = ~page_mask;
-@@ -1210,6 +1235,7 @@ out:
-     return true;
+-    return vtd_page_walk_level(addr, start, end, hook_fn, private,
+-                               level, true, true, notify_unmap, aw);
++    return vtd_page_walk_level(addr, start, end, level, true, true, info);
+ }
  
- error:
-+    vtd_iommu_unlock(s);
-     entry->iova = 0;
-     entry->translated_addr = 0;
-     entry->addr_mask = 0;
-@@ -1258,10 +1284,13 @@ static void vtd_iommu_replay_all(IntelIOMMUState *s)
- static void vtd_context_global_invalidate(IntelIOMMUState *s)
- {
-     trace_vtd_inv_desc_cc_global();
-+    /* Protects context cache */
-+    vtd_iommu_lock(s);
-     s->context_cache_gen++;
-     if (s->context_cache_gen == VTD_CONTEXT_CACHE_GEN_MAX) {
--        vtd_reset_context_cache(s);
-+        vtd_reset_context_cache_locked(s);
-     }
-+    vtd_iommu_unlock(s);
-     vtd_switch_address_space_all(s);
-     /*
-      * From VT-d spec 6.5.2.1, a global context entry invalidation
-@@ -1313,7 +1342,9 @@ static void vtd_context_device_invalidate(IntelIOMMUState *s,
-             if (vtd_as && ((devfn_it & mask) == (devfn & mask))) {
-                 trace_vtd_inv_desc_cc_device(bus_n, VTD_PCI_SLOT(devfn_it),
-                                              VTD_PCI_FUNC(devfn_it));
-+                vtd_iommu_lock(s);
-                 vtd_as->context_cache_entry.context_cache_gen = 0;
-+                vtd_iommu_unlock(s);
+ /* Map a device to its corresponding domain (context-entry) */
+@@ -1449,14 +1458,19 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
+                                        vtd_as->devfn, &ce);
+         if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
+             if (vtd_as_has_map_notifier(vtd_as)) {
++                vtd_page_walk_info info = {
++                    .hook_fn = vtd_page_invalidate_notify_hook,
++                    .private = (void *)&vtd_as->iommu,
++                    .notify_unmap = true,
++                    .aw = s->aw_bits,
++                };
++
                  /*
-                  * Do switch address space when needed, in case if the
-                  * device passthrough bit is switched.
-@@ -1377,8 +1408,10 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
- 
-     trace_vtd_inv_desc_iotlb_domain(domain_id);
- 
-+    vtd_iommu_lock(s);
-     g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_domain,
-                                 &domain_id);
-+    vtd_iommu_unlock(s);
- 
-     QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
-         if (!vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
-@@ -1426,7 +1459,9 @@ static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
-     info.domain_id = domain_id;
-     info.addr = addr;
-     info.mask = ~((1 << am) - 1);
-+    vtd_iommu_lock(s);
-     g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_page, &info);
-+    vtd_iommu_unlock(s);
-     vtd_iotlb_page_invalidate_notify(s, domain_id, addr, am);
- }
- 
-@@ -2922,8 +2957,10 @@ static void vtd_init(IntelIOMMUState *s)
-         s->cap |= VTD_CAP_CM;
-     }
- 
--    vtd_reset_context_cache(s);
--    vtd_reset_iotlb(s);
-+    vtd_iommu_lock(s);
-+    vtd_reset_context_cache_locked(s);
-+    vtd_reset_iotlb_locked(s);
-+    vtd_iommu_unlock(s);
- 
-     /* Define registers with default values and bit semantics */
-     vtd_define_long(s, DMAR_VER_REG, 0x10UL, 0, 0);
-@@ -3072,6 +3109,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
-     }
- 
-     QLIST_INIT(&s->vtd_as_with_notifiers);
-+    qemu_mutex_init(&s->iommu_lock);
-     memset(s->vtd_as_by_bus_num, 0, sizeof(s->vtd_as_by_bus_num));
-     memory_region_init_io(&s->csrmem, OBJECT(s), &vtd_mem_ops, s,
-                           "intel_iommu", DMAR_REG_SIZE);
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 032e33bcb2..016e74bedb 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -300,6 +300,12 @@ struct IntelIOMMUState {
-     OnOffAuto intr_eim;             /* Toggle for EIM cabability */
-     bool buggy_eim;                 /* Force buggy EIM unless eim=off */
-     uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
+                  * As long as we have MAP notifications registered in
+                  * any of our IOMMU notifiers, we need to sync the
+                  * shadow page table.
+                  */
+-                vtd_page_walk(&ce, addr, addr + size,
+-                              vtd_page_invalidate_notify_hook,
+-                              (void *)&vtd_as->iommu, true, s->aw_bits);
++                vtd_page_walk(&ce, addr, addr + size, &info);
+             } else {
+                 /*
+                  * For UNMAP-only notifiers, we don't need to walk the
+@@ -2917,8 +2931,14 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
+                                   ce.hi, ce.lo);
+         if (vtd_as_has_map_notifier(vtd_as)) {
+             /* This is required only for MAP typed notifiers */
+-            vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, false,
+-                          s->aw_bits);
++            vtd_page_walk_info info = {
++                .hook_fn = vtd_replay_hook,
++                .private = (void *)n,
++                .notify_unmap = false,
++                .aw = s->aw_bits,
++            };
 +
-+    /*
-+     * Protects IOMMU states in general.  Currently it protects the
-+     * per-IOMMU IOTLB cache, and context entry cache in VTDAddressSpace.
-+     */
-+    QemuMutex iommu_lock;
- };
- 
- /* Find the VTD Address space associated with the given bus pointer,
++            vtd_page_walk(&ce, 0, ~0ULL, &info);
+         }
+     } else {
+         trace_vtd_replay_ce_invalid(bus_n, PCI_SLOT(vtd_as->devfn),
 -- 
 2.11.0
