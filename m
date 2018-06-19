@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVGlz-0006bc-9y
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:34:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1fVGn7-0007Ry-O3
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:35:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVGly-0001id-Gh
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:34:15 -0400
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:45116)
+	(envelope-from <bounces@canonical.com>) id 1fVGn3-0001zj-PT
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:35:25 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48568)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fVGly-0001iU-CC
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:34:14 -0400
-Received: by mail-oi0-x234.google.com with SMTP id 188-v6so18105156oid.12
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 06:34:14 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fVGn3-0001zP-GX
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:35:21 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fVGn2-0002kI-8x
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 13:35:20 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2F8D52E80C9
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 13:35:20 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180618095758.5006-1-kraxel@redhat.com>
-References: <20180618095758.5006-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Jun 2018 14:33:53 +0100
-Message-ID: <CAFEAcA_9vgP8S0t26fRKhmMw3tL5ea3i4KfURncQeHE4VUVnCQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/4] Vga 20180618 patches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 19 Jun 2018 13:18:51 -0000
+From: Thomas Huth <1470481@bugs.launchpad.net>
+Reply-To: Bug 1470481 <1470481@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150701120650.14797.87262.malonedeb@wampee.canonical.com>
+Message-Id: <152941433184.27033.8565204544422294417.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1470481] Re: qemu-img converts large vhd files
+ into only approx. 127GB raw file causing the VM to crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
 
-On 18 June 2018 at 10:57, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> The following changes since commit 2ef2f16781af9dee6ba6517755e9073ba5799fa2:
->
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20180615a' into staging (2018-06-15 18:13:35 +0100)
->
-> are available in the git repository at:
->
->   git://git.kraxel.org/qemu tags/vga-20180618-pull-request
->
-> for you to fetch changes up to 58d632c7ce66c272868b057491cec7ee5a6a1050:
->
->   Add ramfb MAINTAINERS entry (2018-06-18 11:24:25 +0200)
->
-> ----------------------------------------------------------------
-> vga: add ramfb, print virglrenderer version
->
-> ----------------------------------------------------------------
->
+Which version of QEMU (or rather qemu-img) have you been using here? Can
+you still reproduce it with the latest version (currently v2.12)?
 
-Applied, thanks.
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1470481
+
+Title:
+  qemu-img converts large vhd files into only approx. 127GB raw file
+  causing the VM to crash
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  I have a VHD file for Windows 2014 server OS. I use the following
+  command to convert VHD file (20GB) to a RAW file for KVM.
+
+  qemu-img convert -f vpc -O raw WIN-SNRGCQV6O3O.VHD disk.img
+
+  The output file is about 127GB. When install the VM and boot it up,
+  the OS crashes with STOP error after the intial screen. I found on the
+  internet that the file limit of 127GB is an existing bug. Kindly fix
+  the problem. The workaround to use a Hyper-V to convert to fixed disk
+  is not a feasible solution.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1470481/+subscriptions
