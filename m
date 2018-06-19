@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5iU-00026l-Ay
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:55 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5iW-00028u-Hi
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5iT-0000AH-Br
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:54 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5iR-00009l-Ly
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:56 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:15 -0500
-Message-Id: <20180619014319.28272-50-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:42:14 -0500
+Message-Id: <20180619014319.28272-49-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 049/113] iotests: Test preallocated truncate of
- 2G image
+Subject: [Qemu-devel] [PATCH 048/113] block/file-posix: Fix fully
+ preallocated truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +26,48 @@ Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 From: Max Reitz <mreitz@redhat.com>
 
+Storing the lseek() result in an int results in it overflowing when the
+file is at least 2 GB big.  Then, we have a 50 % chance of the result
+being "negative" and thus thinking an error occurred when actually
+everything went just fine.
+
+So we should use the correct type for storing the result: off_t.
+
+Reported-by: Daniel P. Berrange <berrange@redhat.com>
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1549231
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20180228131315.30194-3-mreitz@redhat.com
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-id: 20180228131315.30194-2-mreitz@redhat.com
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit 733d1dce0f3c8ab7b79a173f6482781d3718f844)
+(cherry picked from commit 82b45e0a0b824787bd79ce3f6453eaa2afddd138)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qemu-iotests/106     | 24 ++++++++++++++++++++++++
- tests/qemu-iotests/106.out | 10 ++++++++++
- 2 files changed, 34 insertions(+)
+ block/file-posix.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/106 b/tests/qemu-iotests/106
-index bfe71f4e60..5e51f88a78 100755
---- a/tests/qemu-iotests/106
-+++ b/tests/qemu-iotests/106
-@@ -86,6 +86,30 @@ for growth_mode in falloc full off; do
-     $QEMU_IMG resize -f "$IMGFMT" --shrink --preallocation=$growth_mode "$TEST_IMG" -${GROWTH_SIZE}K
- done
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 36ee89e940..275953fdc6 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1694,6 +1694,7 @@ static int raw_regular_truncate(int fd, int64_t offset, PreallocMode prealloc,
+     case PREALLOC_MODE_FULL:
+     {
+         int64_t num = 0, left = offset - current_length;
++        off_t seek_result;
  
-+echo
-+echo '=== Testing image growth on 2G empty image ==='
-+
-+for growth_mode in falloc full; do
-+    echo
-+    echo "--- growth_mode=$growth_mode ---"
-+
-+    # Maybe we want to do an lseek() to the end of the file before the
-+    # preallocation; if the file has a length of 2 GB, that would
-+    # return an integer that overflows to negative when put into a
-+    # plain int.  We should use the correct type for the result, and
-+    # this tests we do.
-+
-+    _make_test_img 2G
-+    $QEMU_IMG resize -f "$IMGFMT" --preallocation=$growth_mode "$TEST_IMG" +${GROWTH_SIZE}K
-+
-+    actual_size=$($QEMU_IMG info -f "$IMGFMT" "$TEST_IMG" | grep 'disk size')
-+    actual_size=$(echo "$actual_size" | sed -e 's/^[^0-9]*\([0-9]\+\).*$/\1/')
-+
-+    if [ $actual_size -lt $GROWTH_SIZE ]; then
-+        echo "ERROR: Image should have at least ${GROWTH_SIZE}K, but has ${actual_size}K"
-+    fi
-+done
-+
- # success, all done
- echo '*** done'
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/106.out b/tests/qemu-iotests/106.out
-index 0a42312301..c459957660 100644
---- a/tests/qemu-iotests/106.out
-+++ b/tests/qemu-iotests/106.out
-@@ -47,4 +47,14 @@ qemu-img: Preallocation can only be used for growing images
+         /*
+          * Knowing the final size from the beginning could allow the file
+@@ -1708,8 +1709,8 @@ static int raw_regular_truncate(int fd, int64_t offset, PreallocMode prealloc,
  
- --- growth_mode=off ---
- Image resized.
-+
-+=== Testing image growth on 2G empty image ===
-+
-+--- growth_mode=falloc ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2147483648
-+Image resized.
-+
-+--- growth_mode=full ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2147483648
-+Image resized.
- *** done
+         buf = g_malloc0(65536);
+ 
+-        result = lseek(fd, current_length, SEEK_SET);
+-        if (result < 0) {
++        seek_result = lseek(fd, current_length, SEEK_SET);
++        if (seek_result < 0) {
+             result = -errno;
+             error_setg_errno(errp, -result,
+                              "Failed to seek to the old end of file");
 -- 
 2.11.0
