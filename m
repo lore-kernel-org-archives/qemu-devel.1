@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVLs8-0007Ck-GG
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:00:58 -0400
+	(envelope-from <venu.busireddy@oracle.com>) id 1fVLtU-0007ru-If
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:02:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVLs5-0001Ow-AR
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:00:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52092 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVLs4-0001Nk-RF
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:00:53 -0400
-Date: Tue, 19 Jun 2018 20:00:47 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180619190047.GO2368@work-vm>
-References: <20180514165424.12884-1-zhangckid@gmail.com>
-	<20180514165424.12884-13-zhangckid@gmail.com>
-	<20180515185603.GF2749@work-vm>
-	<CAK3tnv+ir0fcjLr5Af-tn7LHpyrXsCWC_wu4-K277_GbUOPscQ@mail.gmail.com>
+	(envelope-from <venu.busireddy@oracle.com>) id 1fVLtR-0002hY-4O
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:02:20 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:46030)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <venu.busireddy@oracle.com>)
+	id 1fVLtQ-0002h8-Qn
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:02:17 -0400
+Date: Tue, 19 Jun 2018 14:02:10 -0500
+From: Venu Busireddy <venu.busireddy@oracle.com>
+Message-ID: <20180619190209.GA15541@lt>
+References: <20180619163228.13790-1-venu.busireddy@oracle.com>
+	<20180619163228.13790-3-venu.busireddy@oracle.com>
+	<20180619202118-mutt-send-email-mst@kernel.org>
+	<20180619181406.GA14456@lt>
+	<20180619211709-mutt-send-email-mst@kernel.org>
+	<20180619183617.GA14746@lt>
+	<20180619215130-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK3tnv+ir0fcjLr5Af-tn7LHpyrXsCWC_wu4-K277_GbUOPscQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH V7 RESEND 12/17] savevm: split the process
- of different stages for loadvm/savevm
+In-Reply-To: <20180619215130-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH 2/3] Add "Group
+ Identifier" support to PCIe bridges.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,296 +34,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-* Zhang Chen (zhangckid@gmail.com) wrote:
-> On Wed, May 16, 2018 at 2:56 AM, Dr. David Alan Gilbert <dgilbert@redhat.com
-> > wrote:
+On 2018-06-19 21:53:01 +0300, Michael S. Tsirkin wrote:
+> On Tue, Jun 19, 2018 at 01:36:17PM -0500, Venu Busireddy wrote:
+> > On 2018-06-19 21:21:23 +0300, Michael S. Tsirkin wrote:
+> > > On Tue, Jun 19, 2018 at 01:14:06PM -0500, Venu Busireddy wrote:
+> > > > On 2018-06-19 20:24:12 +0300, Michael S. Tsirkin wrote:
+> > > > > On Tue, Jun 19, 2018 at 11:32:26AM -0500, Venu Busireddy wrote:
+> > > > > > Add a "Vendor-Specific" capability to the PCIe bridge, to contain the
+> > > > > > "Group Identifier" (UUID) that will be used to pair a virtio device with
+> > > > > > the passthrough device attached to that bridge.
+> > > > > > 
+> > > > > > This capability is added to the bridge iff the "uuid" option is specified
+> > > > > > for the bridge device, via the qemu command line. Also, the bridge's
+> > > > > > Device ID is changed to PCI_VENDOR_ID_REDHAT, and Vendor ID is changed
+> > > > > > to PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE (from the default values), when the
+> > > > > > "uuid" option is present.
+> > > > > > 
+> > > > > > Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+> > > > > 
+> > > > > I don't see why we should add it to all bridges.
+> > > > > Let's just add it to ones that already have the RH vendor ID?
+> > > > 
+> > > > No. I am not adding the capability to all bridges.
+> > > > 
+> > > > In the earlier discussions, we agreed that the bridge be left as
+> > > > Intel bridge if we do not intend to use it for storing the pairing
+> > > > information. If we do intend to store the pairing information in the
+> > > > bridge, we wanted to change the bridge's Vendor ID to RH Vendor ID to
+> > > > avoid confusion. In other words, bridge's with RH Vendor ID come into
+> > > > existence only when there is an intent to store the pairing information
+> > > > in the bridge.
+> > > > 
+> > > > Accordingly, if the "uuid" option is specified for the bridge, it
+> > > > is assumed that the user intends to use the bridge for storing the
+> > > > pairing information, and hence, the capability is added to the bridge,
+> > > > and the Vendor ID is changed to RH Vendor ID. If the "uuid" option
+> > > > is not specified, the bridge remains as Intel bridge, and without the
+> > > > vendor-specific capability.
+> > > > 
+> > > > Venu
+> > > 
+> > > Yes but the way to do it is not to tweak the vendor and device ID,
+> > > instead, just add the UUID property to bridges that already have the
+> > > correct vendor and device id.
+> > 
+> > I was using ioh3420 as the bridge device, because that is what is
+> > recommended here:
+> > 
+> >   https://git.qemu.org/?p=qemu.git;a=blob_plain;f=docs/pcie.txt;hb=HEAD
+> > 
+> > ioh3420 defaults to the Intel Vendor ID. Hence the tweak to change the
+> > Vendor ID to RH Vendor ID.
+> > 
+> > Is there another bridge device other than ioh3420 that I should use?
+> > what device do you suggest? 
+> > 
+> > Thanks,
+> > 
+> > Venu
 > 
-> > * Zhang Chen (zhangckid@gmail.com) wrote:
-> > > From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > >
-> > > There are several stages during loadvm/savevm process. In different
-> > stage,
-> > > migration incoming processes different types of sections.
-> > > We want to control these stages more accuracy, it will benefit COLO
-> > > performance, we don't have to save type of QEMU_VM_SECTION_START
-> > > sections everytime while do checkpoint, besides, we want to separate
-> > > the process of saving/loading memory and devices state.
-> > >
-> > > So we add three new helper functions: qemu_load_device_state() and
-> > > qemu_savevm_live_state() to achieve different process during migration.
-> > >
-> > > Besides, we make qemu_loadvm_state_main() and qemu_save_device_state()
-> > > public, and simplify the codes of qemu_save_device_state() by calling the
-> > > wrapper qemu_savevm_state_header().
-> > >
-> > > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> > > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > ---
-> > >  migration/colo.c   | 36 ++++++++++++++++++++++++++++--------
-> > >  migration/savevm.c | 35 ++++++++++++++++++++++++++++-------
-> > >  migration/savevm.h |  4 ++++
-> > >  3 files changed, 60 insertions(+), 15 deletions(-)
-> > >
-> > > diff --git a/migration/colo.c b/migration/colo.c
-> > > index cdff0a2490..5b055f79f1 100644
-> > > --- a/migration/colo.c
-> > > +++ b/migration/colo.c
-> > > @@ -30,6 +30,7 @@
-> > >  #include "block/block.h"
-> > >  #include "qapi/qapi-events-migration.h"
-> > >  #include "qapi/qmp/qerror.h"
-> > > +#include "sysemu/cpus.h"
-> > >
-> > >  static bool vmstate_loading;
-> > >  static Notifier packets_compare_notifier;
-> > > @@ -414,23 +415,30 @@ static int colo_do_checkpoint_transaction(MigrationState
-> > *s,
-> > >
-> > >      /* Disable block migration */
-> > >      migrate_set_block_enabled(false, &local_err);
-> > > -    qemu_savevm_state_header(fb);
-> > > -    qemu_savevm_state_setup(fb);
-> > >      qemu_mutex_lock_iothread();
-> > >      replication_do_checkpoint_all(&local_err);
-> > >      if (local_err) {
-> > >          qemu_mutex_unlock_iothread();
-> > >          goto out;
-> > >      }
-> > > -    qemu_savevm_state_complete_precopy(fb, false, false);
-> > > -    qemu_mutex_unlock_iothread();
-> > > -
-> > > -    qemu_fflush(fb);
-> > >
-> > >      colo_send_message(s->to_dst_file, COLO_MESSAGE_VMSTATE_SEND,
-> > &local_err);
-> > >      if (local_err) {
-> > >          goto out;
-> > >      }
-> > > +    /*
-> > > +     * Only save VM's live state, which not including device state.
-> > > +     * TODO: We may need a timeout mechanism to prevent COLO process
-> > > +     * to be blocked here.
-> > > +     */
-> >
-> > I guess that's the downside to transmitting it directly than into the
-> > buffer;
-> > Peter Xu's OOB command system would let you kill the connection - and
-> > that's something I think COLO should use.
-> > Still the change saves you having that huge outgoing buffer on the
-> > source side and lets you start sending the checkpoint sooner, which
-> > means the pause time should be smaller.
-> >
+> For pci, use hw/pci-bridge/pci_bridge_dev.c
+> Maybe allocate a special ID for grouping bridges.
 > 
-> Yes, you are right.
-> But I think this is a performance optimization, this series focus on
-> enabling.
-> I will do this job in the future.
-> 
-> 
-> >
-> > > +    qemu_savevm_live_state(s->to_dst_file);
-> >
-> > Does this actually need to be inside of the qemu_mutex_lock_iothread?
-> > I'm pretty sure the device_state needs to be, but I'm not sure the
-> > live_state needs to.
-> >
-> 
-> I have checked the codes, qemu_savevm_live_state needn't inside of the
-> qemu_mutex_lock_iothread,
-> I will move the it out the lock area in next version.
-> 
-> 
-> 
-> >
-> > > +    /* Note: device state is saved into buffer */
-> > > +    ret = qemu_save_device_state(fb);
-> > > +
-> > > +    qemu_mutex_unlock_iothread();
-> > > +
-> > > +    qemu_fflush(fb);
-> > > +
-> > >      /*
-> > >       * We need the size of the VMstate data in Secondary side,
-> > >       * With which we can decide how much data should be read.
-> > > @@ -643,6 +651,7 @@ void *colo_process_incoming_thread(void *opaque)
-> > >      uint64_t total_size;
-> > >      uint64_t value;
-> > >      Error *local_err = NULL;
-> > > +    int ret;
-> > >
-> > >      qemu_sem_init(&mis->colo_incoming_sem, 0);
-> > >
-> > > @@ -715,6 +724,16 @@ void *colo_process_incoming_thread(void *opaque)
-> > >              goto out;
-> > >          }
-> > >
-> > > +        qemu_mutex_lock_iothread();
-> > > +        cpu_synchronize_all_pre_loadvm();
-> > > +        ret = qemu_loadvm_state_main(mis->from_src_file, mis);
-> > > +        qemu_mutex_unlock_iothread();
-> > > +
-> > > +        if (ret < 0) {
-> > > +            error_report("Load VM's live state (ram) error");
-> > > +            goto out;
-> > > +        }
-> > > +
-> > >          value = colo_receive_message_value(mis->from_src_file,
-> > >                                   COLO_MESSAGE_VMSTATE_SIZE, &local_err);
-> > >          if (local_err) {
-> > > @@ -748,8 +767,9 @@ void *colo_process_incoming_thread(void *opaque)
-> > >          qemu_mutex_lock_iothread();
-> > >          qemu_system_reset(SHUTDOWN_CAUSE_NONE);
-> >
-> > Is the reset safe? Are you sure it doesn't change the ram you've just
-> > loaded?
-> >
-> 
-> Yes, It is safe. In my test the secondary node running well.
+> For express, add your own downstream port.
 
-The fact it's working doesn't mean it's safe; it just means you've
-not hit a problem!  A qemu_system_reset calls a 'reset' on all of the
-devices, nd calls cpu_synchronize_all_states() - I'd worry that any of
-those might touch RAM.
+Specifically, on the command line, what device does the user specify?
+For example:
 
-> >
-> > >          vmstate_loading = true;
-> > > -        if (qemu_loadvm_state(fb) < 0) {
-> > > -            error_report("COLO: loadvm failed");
-> > > +        ret = qemu_load_device_state(fb);
-> > > +        if (ret < 0) {
-> > > +            error_report("COLO: load device state failed");
-> > >              qemu_mutex_unlock_iothread();
-> > >              goto out;
-> > >          }
-> > > diff --git a/migration/savevm.c b/migration/savevm.c
-> > > index ec0bff09ce..0f61239429 100644
-> > > --- a/migration/savevm.c
-> > > +++ b/migration/savevm.c
-> > > @@ -1332,13 +1332,20 @@ done:
-> > >      return ret;
-> > >  }
-> > >
-> > > -static int qemu_save_device_state(QEMUFile *f)
-> > > +void qemu_savevm_live_state(QEMUFile *f)
-> > >  {
-> > > -    SaveStateEntry *se;
-> > > +    /* save QEMU_VM_SECTION_END section */
-> > > +    qemu_savevm_state_complete_precopy(f, true, false);
-> > > +    qemu_put_byte(f, QEMU_VM_EOF);
-> > > +}
-> > >
-> > > -    qemu_put_be32(f, QEMU_VM_FILE_MAGIC);
-> > > -    qemu_put_be32(f, QEMU_VM_FILE_VERSION);
-> > > +int qemu_save_device_state(QEMUFile *f)
-> > > +{
-> > > +    SaveStateEntry *se;
-> > >
-> > > +    if (!migration_in_colo_state()) {
-> > > +        qemu_savevm_state_header(f);
-> > > +    }
-> > >      cpu_synchronize_all_states();
-> >
-> > So this changes qemu_save_device_state to use savevm_state_header
-> > which feels reasonable, but that includes the 'configuration'
-> > section;  do we want that?  Is that OK for Xen's use in
-> > qmp_xen_save_devices_state?
-> >
-> 
-> If I understand correctly, COLO Xen don't use qemu migration codes do this
-> job currently,
-> COLO Xen have an independent COLO frame do same job(use Xen migration
-> codes),
-> So I think it is OK for Xen.
+ qemu-system-x86_64 --device ${Bridge_Device},uuid="uuid string",<blah blah>
 
-It's important not to break non-COLO Xen though; so you need to check
-with the Xen people that a change that impacts
-qmp_xen_save_devices_state is OK.
+What does the user specify for ${Bridge_Device} from the following:
 
-Dave
+"i82801b11-bridge", bus PCI
+"ioh3420", bus PCI, desc "Intel IOH device id 3420 PCIE Root Port"
+"pci-bridge", bus PCI, desc "Standard PCI Bridge"
+"pci-bridge-seat", bus PCI, desc "Standard PCI Bridge (multiseat)"
+"pcie-pci-bridge", bus PCI
+"pcie-root-port", bus PCI, desc "PCI Express Root Port"
+"pxb", bus PCI, desc "PCI Expander Bridge"
+"pxb-pcie", bus PCI, desc "PCI Express Expander Bridge"
+"usb-host", bus usb-bus
+"usb-hub", bus usb-bus
+"vfio-pci-igd-lpc-bridge", bus PCI, desc "VFIO dummy ISA/LPC bridge for IGD assignment"
+"x3130-upstream", bus PCI, desc "TI X3130 Upstream Port of PCI Express Switch"
+"xio3130-downstream", bus PCI, desc "TI X3130 Downstream Port of PCI Express Switch"
+
+Or, are you suggesting that I add a new type of device? If latter, what
+should it be called?
+
+Thanks,
+
+
 
 > 
 > 
-> Thanks your review and continued support.
-> Zhang Chen
+> > > 
+> > > 
+> > > > > 
+> > > > > 
+> > > > > > ---
+> > > > > >  hw/pci-bridge/ioh3420.c        |  2 ++
+> > > > > >  hw/pci-bridge/pcie_root_port.c |  7 +++++++
+> > > > > >  hw/pci/pci_bridge.c            | 32 ++++++++++++++++++++++++++++++++
+> > > > > >  include/hw/pci/pci.h           |  2 ++
+> > > > > >  include/hw/pci/pcie.h          |  1 +
+> > > > > >  include/hw/pci/pcie_port.h     |  1 +
+> > > > > >  6 files changed, 45 insertions(+)
+> > > > > > 
+> > > > > > diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
+> > > > > > index a451d74ee6..b6b9ebc726 100644
+> > > > > > --- a/hw/pci-bridge/ioh3420.c
+> > > > > > +++ b/hw/pci-bridge/ioh3420.c
+> > > > > > @@ -35,6 +35,7 @@
+> > > > > >  #define IOH_EP_MSI_SUPPORTED_FLAGS      PCI_MSI_FLAGS_MASKBIT
+> > > > > >  #define IOH_EP_MSI_NR_VECTOR            2
+> > > > > >  #define IOH_EP_EXP_OFFSET               0x90
+> > > > > > +#define IOH_EP_VENDOR_OFFSET            0xCC
+> > > > > >  #define IOH_EP_AER_OFFSET               0x100
+> > > > > >  
+> > > > > >  /*
+> > > > > > @@ -111,6 +112,7 @@ static void ioh3420_class_init(ObjectClass *klass, void *data)
+> > > > > >      rpc->exp_offset = IOH_EP_EXP_OFFSET;
+> > > > > >      rpc->aer_offset = IOH_EP_AER_OFFSET;
+> > > > > >      rpc->ssvid_offset = IOH_EP_SSVID_OFFSET;
+> > > > > > +    rpc->vendor_offset = IOH_EP_VENDOR_OFFSET;
+> > > > > >      rpc->ssid = IOH_EP_SSVID_SSID;
+> > > > > >  }
+> > > > > >  
+> > > > > > diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> > > > > > index 45f9e8cd4a..ba470c7fda 100644
+> > > > > > --- a/hw/pci-bridge/pcie_root_port.c
+> > > > > > +++ b/hw/pci-bridge/pcie_root_port.c
+> > > > > > @@ -71,6 +71,12 @@ static void rp_realize(PCIDevice *d, Error **errp)
+> > > > > >          goto err_bridge;
+> > > > > >      }
+> > > > > >  
+> > > > > > +    rc = pci_bridge_vendor_init(d, rpc->vendor_offset, errp);
+> > > > > > +    if (rc < 0) {
+> > > > > > +        error_append_hint(errp, "Can't init group ID, error %d\n", rc);
+> > > > > > +        goto err_bridge;
+> > > > > > +    }
+> > > > > > +
+> > > > > >      if (rpc->interrupts_init) {
+> > > > > >          rc = rpc->interrupts_init(d, errp);
+> > > > > >          if (rc < 0) {
+> > > > > > @@ -137,6 +143,7 @@ static void rp_exit(PCIDevice *d)
+> > > > > >  static Property rp_props[] = {
+> > > > > >      DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+> > > > > >                      QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+> > > > > > +    DEFINE_PROP_UUID(COMPAT_PROP_UUID, PCIDevice, uuid, false),
+> > > > > >      DEFINE_PROP_END_OF_LIST()
+> > > > > >  };
+> > > > > >  
+> > > > > > diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+> > > > > > index 40a39f57cb..c63bc439f7 100644
+> > > > > > --- a/hw/pci/pci_bridge.c
+> > > > > > +++ b/hw/pci/pci_bridge.c
+> > > > > > @@ -34,12 +34,17 @@
+> > > > > >  #include "hw/pci/pci_bus.h"
+> > > > > >  #include "qemu/range.h"
+> > > > > >  #include "qapi/error.h"
+> > > > > > +#include "qemu/uuid.h"
+> > > > > >  
+> > > > > >  /* PCI bridge subsystem vendor ID helper functions */
+> > > > > >  #define PCI_SSVID_SIZEOF        8
+> > > > > >  #define PCI_SSVID_SVID          4
+> > > > > >  #define PCI_SSVID_SSID          6
+> > > > > >  
+> > > > > > +#define PCI_VENDOR_SIZEOF             20
+> > > > > > +#define PCI_VENDOR_CAP_LEN_OFFSET      2
+> > > > > > +#define PCI_VENDOR_GROUP_ID_OFFSET     4
+> > > > > > +
+> > > > > >  int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+> > > > > >                            uint16_t svid, uint16_t ssid,
+> > > > > >                            Error **errp)
+> > > > > > @@ -57,6 +62,33 @@ int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+> > > > > >      return pos;
+> > > > > >  }
+> > > > > >  
+> > > > > > +int pci_bridge_vendor_init(PCIDevice *d, uint8_t offset, Error **errp)
+> > > > > > +{
+> > > > > > +    int pos;
+> > > > > > +    PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
+> > > > > > +
+> > > > > > +    if (qemu_uuid_is_null(&d->uuid)) {
+> > > > > > +        return 0;
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    pos = pci_add_capability(d, PCI_CAP_ID_VNDR, offset, PCI_VENDOR_SIZEOF,
+> > > > > > +            errp);
+> > > > > > +    if (pos < 0) {
+> > > > > > +        return pos;
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    dc->vendor_id = PCI_VENDOR_ID_REDHAT;
+> > > > > > +    dc->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
+> > > > > > +    pci_set_word(d->config + PCI_VENDOR_ID, PCI_VENDOR_ID_REDHAT);
+> > > > > > +    pci_set_word(d->config + PCI_DEVICE_ID, PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE);
+> > > > > > +
+> > > > > > +    pci_set_word(d->config + pos + PCI_VENDOR_CAP_LEN_OFFSET,
+> > > > > > +            PCI_VENDOR_SIZEOF);
+> > > > > > +    memcpy(d->config + offset + PCI_VENDOR_GROUP_ID_OFFSET, &d->uuid,
+> > > > > > +            sizeof(QemuUUID));
+> > > > > > +    return pos;
+> > > > > > +}
+> > > > > > +
+> > > > > >  /* Accessor function to get parent bridge device from pci bus. */
+> > > > > >  PCIDevice *pci_bridge_get_device(PCIBus *bus)
+> > > > > >  {
+> > > > > > diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> > > > > > index 990d6fcbde..ee234c5a6f 100644
+> > > > > > --- a/include/hw/pci/pci.h
+> > > > > > +++ b/include/hw/pci/pci.h
+> > > > > > @@ -4,6 +4,7 @@
+> > > > > >  #include "hw/qdev.h"
+> > > > > >  #include "exec/memory.h"
+> > > > > >  #include "sysemu/dma.h"
+> > > > > > +#include "qemu/uuid.h"
+> > > > > >  
+> > > > > >  /* PCI includes legacy ISA access.  */
+> > > > > >  #include "hw/isa/isa.h"
+> > > > > > @@ -343,6 +344,7 @@ struct PCIDevice {
+> > > > > >      bool has_rom;
+> > > > > >      MemoryRegion rom;
+> > > > > >      uint32_t rom_bar;
+> > > > > > +    QemuUUID uuid;
+> > > > > >  
+> > > > > >      /* INTx routing notifier */
+> > > > > >      PCIINTxRoutingNotifier intx_routing_notifier;
+> > > > > > diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> > > > > > index b71e369703..b4189d0ce3 100644
+> > > > > > --- a/include/hw/pci/pcie.h
+> > > > > > +++ b/include/hw/pci/pcie.h
+> > > > > > @@ -82,6 +82,7 @@ struct PCIExpressDevice {
+> > > > > >  };
+> > > > > >  
+> > > > > >  #define COMPAT_PROP_PCP "power_controller_present"
+> > > > > > +#define COMPAT_PROP_UUID "uuid"
+> > > > > >  
+> > > > > >  /* PCI express capability helper functions */
+> > > > > >  int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type,
+> > > > > > diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+> > > > > > index 0736014bfd..40db6dbbe7 100644
+> > > > > > --- a/include/hw/pci/pcie_port.h
+> > > > > > +++ b/include/hw/pci/pcie_port.h
+> > > > > > @@ -74,6 +74,7 @@ typedef struct PCIERootPortClass {
+> > > > > >      int exp_offset;
+> > > > > >      int aer_offset;
+> > > > > >      int ssvid_offset;
+> > > > > > +    int vendor_offset;
+> > > > > >      int ssid;
+> > > > > >  } PCIERootPortClass;
+> > > > > >  
+> > > > > 
+> > > > > ---------------------------------------------------------------------
+> > > > > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> > > > > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> > > > > 
 > 
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
 > 
-> >
-> > >      QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-> > > @@ -1394,8 +1401,6 @@ enum LoadVMExitCodes {
-> > >      LOADVM_QUIT     =  1,
-> > >  };
-> > >
-> > > -static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState
-> > *mis);
-> > > -
-> > >  /* ------ incoming postcopy messages ------ */
-> > >  /* 'advise' arrives before any transfers just to tell us that a postcopy
-> > >   * *might* happen - it might be skipped if precopy transferred
-> > everything
-> > > @@ -2075,7 +2080,7 @@ void qemu_loadvm_state_cleanup(void)
-> > >      }
-> > >  }
-> > >
-> > > -static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState
-> > *mis)
-> > > +int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
-> > >  {
-> > >      uint8_t section_type;
-> > >      int ret = 0;
-> > > @@ -2229,6 +2234,22 @@ int qemu_loadvm_state(QEMUFile *f)
-> > >      return ret;
-> > >  }
-> > >
-> > > +int qemu_load_device_state(QEMUFile *f)
-> > > +{
-> > > +    MigrationIncomingState *mis = migration_incoming_get_current();
-> > > +    int ret;
-> > > +
-> > > +    /* Load QEMU_VM_SECTION_FULL section */
-> > > +    ret = qemu_loadvm_state_main(f, mis);
-> > > +    if (ret < 0) {
-> > > +        error_report("Failed to load device state: %d", ret);
-> > > +        return ret;
-> > > +    }
-> > > +
-> > > +    cpu_synchronize_all_post_init();
-> > > +    return 0;
-> > > +}
-> > > +
-> > >  int save_snapshot(const char *name, Error **errp)
-> > >  {
-> > >      BlockDriverState *bs, *bs1;
-> > > diff --git a/migration/savevm.h b/migration/savevm.h
-> > > index c6d46b37a2..cf7935dd68 100644
-> > > --- a/migration/savevm.h
-> > > +++ b/migration/savevm.h
-> > > @@ -53,8 +53,12 @@ void qemu_savevm_send_postcopy_ram_discard(QEMUFile
-> > *f, const char *name,
-> > >                                             uint64_t *start_list,
-> > >                                             uint64_t *length_list);
-> > >  void qemu_savevm_send_colo_enable(QEMUFile *f);
-> > > +void qemu_savevm_live_state(QEMUFile *f);
-> > > +int qemu_save_device_state(QEMUFile *f);
-> > >
-> > >  int qemu_loadvm_state(QEMUFile *f);
-> > >  void qemu_loadvm_state_cleanup(void);
-> > > +int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis);
-> > > +int qemu_load_device_state(QEMUFile *f);
-> > >
-> > >  #endif
-> > > --
-> > > 2.17.0
-> >
-> > Dave
-> >
-> > >
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
