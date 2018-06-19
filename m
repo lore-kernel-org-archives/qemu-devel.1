@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46975)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jU-00031x-Vz
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:01 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5jb-00036M-8b
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jU-0000p8-47
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:57 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5ja-0000r3-DK
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:03 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:41 -0500
-Message-Id: <20180619014319.28272-76-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:42:44 -0500
+Message-Id: <20180619014319.28272-79-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 075/113] lm32: take BQL before writing IP/IM
- register
+Subject: [Qemu-devel] [PATCH 078/113] pc-bios/s390-ccw: struct tpi_info must
+ be declared as aligned(4)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +22,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Michael Walle <michael@walle.cc>
+Cc: qemu-stable@nongnu.org, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: Michael Walle <michael@walle.cc>
+From: Thomas Huth <thuth@redhat.com>
 
-Writing to these registers may raise an interrupt request. Actually,
-this prevents the milkymist board from starting.
+I've run into a compilation error today with the current version of GCC 8:
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Michael Walle <michael@walle.cc>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-(cherry picked from commit 81e9cbd0ca1131012b058df6804b1f626a6b730c)
+In file included from s390-ccw.h:49,
+                 from main.c:12:
+cio.h:128:1: error: alignment 1 of 'struct tpi_info' is less than 4 [-Werror=packed-not-aligned]
+ } __attribute__ ((packed));
+ ^
+cc1: all warnings being treated as errors
+
+Since the struct tpi_info contains an element ("struct subchannel_id schid")
+which is marked as aligned(4), we've got to mark the struct tpi_info as
+aligned(4), too.
+
+CC: qemu-stable@nongnu.org
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1525774672-11913-1-git-send-email-thuth@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+(cherry picked from commit a6e4385dea94850d7b06b0542e7960c1063fdabd)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/lm32/op_helper.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ pc-bios/s390-ccw/cio.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/lm32/op_helper.c b/target/lm32/op_helper.c
-index 2177c8ad12..93b8d09794 100644
---- a/target/lm32/op_helper.c
-+++ b/target/lm32/op_helper.c
-@@ -102,12 +102,16 @@ void HELPER(wcsr_dc)(CPULM32State *env, uint32_t dc)
+diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+index 55eaeee4b6..1a0795f645 100644
+--- a/pc-bios/s390-ccw/cio.h
++++ b/pc-bios/s390-ccw/cio.h
+@@ -125,7 +125,7 @@ struct tpi_info {
+     __u32 reserved3  : 12;
+     __u32 int_type   : 3;
+     __u32 reserved4  : 12;
+-} __attribute__ ((packed));
++} __attribute__ ((packed, aligned(4)));
  
- void HELPER(wcsr_im)(CPULM32State *env, uint32_t im)
- {
-+    qemu_mutex_lock_iothread();
-     lm32_pic_set_im(env->pic_state, im);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void HELPER(wcsr_ip)(CPULM32State *env, uint32_t im)
- {
-+    qemu_mutex_lock_iothread();
-     lm32_pic_set_ip(env->pic_state, im);
-+    qemu_mutex_unlock_iothread();
- }
- 
- void HELPER(wcsr_jtx)(CPULM32State *env, uint32_t jtx)
+ /* channel command word (type 1) */
+ struct ccw1 {
 -- 
 2.11.0
