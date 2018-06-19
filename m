@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <junyan.he@intel.com>) id 1fV7Ko-0000U4-5B
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 23:29:36 -0400
+	(envelope-from <suratiamol@gmail.com>) id 1fV7oP-0002VX-Ph
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:00:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <junyan.he@intel.com>) id 1fV7Kk-0002iC-Qr
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 23:29:34 -0400
-Received: from mga03.intel.com ([134.134.136.65]:22131)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <junyan.he@intel.com>) id 1fV7Kk-0002hr-D0
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 23:29:30 -0400
-From: "He, Junyan" <junyan.he@intel.com>
-Date: Tue, 19 Jun 2018 03:29:26 +0000
-Message-ID: <EC8A4E314CF1574AB62C80421BD983393409D461@SHSMSX104.ccr.corp.intel.com>
-References: <1528784900-7310-1-git-send-email-junyan.he@gmx.com>
-	<1528784900-7310-4-git-send-email-junyan.he@gmx.com>
-	<20180615110352.4e65fe69@redhat.com>
-In-Reply-To: <20180615110352.4e65fe69@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <suratiamol@gmail.com>) id 1fV7oM-0001Pu-Ma
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 00:00:09 -0400
+Date: Tue, 19 Jun 2018 09:31:55 +0530
+From: Amol Surati <suratiamol@gmail.com>
+Message-ID: <20180619040153.GA8868@arch>
+References: <20180617183515.3982-1-suratiamol@gmail.com>
+	<20180617183515.3982-2-suratiamol@gmail.com>
+	<20180618180254.GA2441@arch>
+	<d02a8fcd-3a5f-7c90-bef0-abf9ee076dd8@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 3/7 V7] hostmem-file: add the 'pmem' option
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d02a8fcd-3a5f-7c90-bef0-abf9ee076dd8@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 1/1] ide: bug #1777315: io_buffer_size and
+ sg.size can represent partial sector sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,241 +26,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, "junyan.he@gmx.com" <junyan.he@gmx.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Haozhong Zhang <haozhong.zhang@intel.com>, "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: John Snow <jsnow@redhat.com>
+Cc: Amol Surati <suratiamol@gmail.com>, qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>
 
-Have already resent this, make qemu exit when meet this, please help to che=
-ck,
-thanks
+On Mon, Jun 18, 2018 at 08:14:10PM -0400, John Snow wrote:
+> 
+> 
+> On 06/18/2018 02:02 PM, Amol Surati wrote:
+> > On Mon, Jun 18, 2018 at 12:05:15AM +0530, Amol Surati wrote:
+> >> This patch fixes the assumption that io_buffer_size is always a perfect
+> >> multiple of the sector size. The assumption is the cause of the firing
+> >> of 'assert(n * 512 == s->sg.size);'.
+> >>
+> >> Signed-off-by: Amol Surati <suratiamol@gmail.com>
+> >> ---
+> > 
+> > The repository https://github.com/asurati/1777315 contains a module for
+> > QEMU's 8086:7010 ATA controller, which exercises the code path
+> > described in [RFC 0/1] of this series.
+> > 
+> 
+> Thanks, this made it easier to see what was happening. I was able to
+> write an ide-test test case using this source as a guide, and reproduce
+> the error.
+> 
+> static void test_bmdma_partial_sector_short_prdt(void)
+> {
+>     QPCIDevice *dev;
+>     QPCIBar bmdma_bar, ide_bar;
+>     uint8_t status;
+> 
+>     /* Read 2 sectors but only give 1 sector in PRDT */
+>     PrdtEntry prdt[] = {
+>         {
+>             .addr = 0,
+>             .size = cpu_to_le32(0x200),
+>         },
+>         {
+>             .addr = 512,
+>             .size = cpu_to_le32(0x44 | PRDT_EOT),
+>         }
+>     };
+> 
+>     dev = get_pci_device(&bmdma_bar, &ide_bar);
+>     status = send_dma_request(CMD_READ_DMA, 0, 2,
+>                               prdt, ARRAY_SIZE(prdt), NULL);
+>     g_assert_cmphex(status, ==, 0);
+>     assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR);
+>     free_pci_device(dev);
+> }
+> 
+> > Loading the module reproduces the bug. Tested on the latest master
+> > branch.
+> > 
+> > Steps:
+> > - Install a Linux distribution as a guest, ensuring that the boot disk
+> >   resides on non-IDE controllers (such as virtio)
+> > - Attach another disk as a master device on the primary
+> >   IDE controller (i.e. attach at -hda.)
+> > - Blacklist ata_piix, pata_acpi and ata_generic modules, and reboot.
+> > - Copy the source files into the guest and build the module.
+> > - Load the module. QEMU process should die with the message:
+> >   qemu-system-x86_64: hw/ide/core.c:871: ide_dma_cb:
+> >   Assertion `n * 512 == s->sg.size' failed.
+> > 
+> > 
+> > -Amol
+> > 
+> 
+> I'm less sure of the fix -- certainly the assert is wrong, but just
+> incrementing 'n' is wrong too -- we didn't copy (n+1) sectors, we copied
+> (n) and a few extra bytes.
 
------Original Message-----
-From: Igor Mammedov [mailto:imammedo@redhat.com]=20
-Sent: Friday, June 15, 2018 5:04 PM
-To: junyan.he@gmx.com
-Cc: qemu-devel@nongnu.org; Haozhong Zhang <haozhong.zhang@intel.com>; xiaog=
-uangrong.eric@gmail.com; crosthwaite.peter@gmail.com; mst@redhat.com; dgilb=
-ert@redhat.com; ehabkost@redhat.com; quintela@redhat.com; He, Junyan <junya=
-n.he@intel.com>; stefanha@redhat.com; pbonzini@redhat.com; rth@twiddle.net
-Subject: Re: [Qemu-devel] [PATCH 3/7 V7] hostmem-file: add the 'pmem' optio=
-n
+That is true.
 
-On Tue, 12 Jun 2018 14:28:16 +0800
-junyan.he@gmx.com wrote:
+There are (at least) two fields that represent the total size of a DMA
+transfer -
+(1) The size, as requested through the NSECTOR field.
+(2) The size, as calculated through the length fields of the PRD entries.
 
-> From: Junyan He <junyan.he@intel.com>
->=20
-> When QEMU emulates vNVDIMM labels and migrates vNVDIMM devices, it=20
-> needs to know whether the backend storage is a real persistent memory,=20
-> in order to decide whether special operations should be performed to=20
-> ensure the data persistence.
->=20
-> This boolean option 'pmem' allows users to specify whether the backend=20
-> storage of memory-backend-file is a real persistent memory. If=20
-> 'pmem=3Don', QEMU will set the flag RAM_PMEM in the RAM block of the=20
-> corresponding memory region.
->=20
-As were noted in v6 by Eduardo and me, we would prefer that pmem=3Don would=
- fail if qemu is built without libpmem support.
+It makes sense to consider the most restrictive of the sizes, as the factor
+which determines both the end of a successful DMA transfer and the
+condition to assert.
+
+> 
+> The sector-based math here would need to be adjusted to be able to cope
+> with partial sector reads... or we ought to avoid doing any partial
+> sector transfers.
+> 
+> 
+> I'm not sure which is more correct tonight, it depends:
+> 
+> - If it's OK to transfer partial sectors before reporting overflow,
+> adjusting the command loop to work with partial sectors is OK.
+> 
+> - If it's NOT OK to do partial sector transfer, the sglist preparation
+> phase needs to produce a truncated SGList that's some multiple of 512
+> bytes that leaves the excess bytes in a second sglist that we don't
+> throw away and can use as a basis for building the next sglist. (Or the
+> DMA helpers need to take a max_bytes parameter and return an sglist
+> representing unused buffer space if the command underflowed.)
+
+Support for partial sector transfers is built into the DMA interface's PRD
+mechanism itself, because an entry is allowed to transfer in the units of
+even number of bytes.
+
+I think the controller's IO process runs in two parts (probably loops over
+for a single transfer):
+
+(1) The controller's disk interface transfers between its internal buffer
+    and the disk storage. The transfers are likely to be in the
+    multiples of a sector.
+(2) The controller's DMA interface transfers between its internal buffer
+    and the system memory. The transfers can be sub-sector in size(, and
+    are preserving of the areas, of the internal buffer, not subject to a
+    write.)
+
+> 
+> 
+> 
+> (As an aside to myself here, I'm not sure if there are any cases in
+> which multiple calls to prepare_buf will ever be productive: I think
+> both for PCI BMDMA and AHCI we have the entire PRDT if we've made it
+> this far and won't "find more" space to DMA to. Maybe I can simplify
+> this loop and make decisions on underflow/overflow after a single call
+> to prepare_buf.)
+> 
+> 
+> I'll try to prepare a patch soon.
+
+Thank you.
+
+> 
+> --js
 
 
-> Signed-off-by: Junyan He <junyan.he@intel.com>
-> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  backends/hostmem-file.c | 27 ++++++++++++++++++++++++++-
->  docs/nvdimm.txt         | 18 ++++++++++++++++++
->  exec.c                  |  9 +++++++++
->  include/exec/memory.h   |  4 ++++
->  include/exec/ram_addr.h |  3 +++
->  qemu-options.hx         |  7 +++++++
->  6 files changed, 67 insertions(+), 1 deletion(-)
->=20
-> diff --git a/backends/hostmem-file.c b/backends/hostmem-file.c index=20
-> 34c68bb..6a861f0 100644
-> --- a/backends/hostmem-file.c
-> +++ b/backends/hostmem-file.c
-> @@ -34,6 +34,7 @@ struct HostMemoryBackendFile {
->      bool discard_data;
->      char *mem_path;
->      uint64_t align;
-> +    bool is_pmem;
->  };
-> =20
->  static void
-> @@ -59,7 +60,8 @@ file_backend_memory_alloc(HostMemoryBackend *backend, E=
-rror **errp)
->          memory_region_init_ram_from_file(&backend->mr, OBJECT(backend),
->                                   path,
->                                   backend->size, fb->align,
-> -                                 backend->share ? RAM_SHARED : 0,
-> +                                 (backend->share ? RAM_SHARED : 0) |
-> +                                 (fb->is_pmem ? RAM_PMEM : 0),
->                                   fb->mem_path, errp);
->          g_free(path);
->      }
-> @@ -131,6 +133,26 @@ static void file_memory_backend_set_align(Object *o,=
- Visitor *v,
->      error_propagate(errp, local_err);  }
-> =20
-> +static bool file_memory_backend_get_pmem(Object *o, Error **errp) {
-> +    return MEMORY_BACKEND_FILE(o)->is_pmem; }
-> +
-> +static void file_memory_backend_set_pmem(Object *o, bool value, Error=20
-> +**errp) {
-> +    HostMemoryBackend *backend =3D MEMORY_BACKEND(o);
-> +    HostMemoryBackendFile *fb =3D MEMORY_BACKEND_FILE(o);
-> +
-> +    if (host_memory_backend_mr_inited(backend)) {
-> +        error_setg(errp, "cannot change property 'pmem' of %s '%s'",
-> +                   object_get_typename(o),
-> +                   object_get_canonical_path_component(o));
-> +        return;
-> +    }
-> +
-> +    fb->is_pmem =3D value;
-> +}
-> +
->  static void file_backend_unparent(Object *obj)  {
->      HostMemoryBackend *backend =3D MEMORY_BACKEND(obj); @@ -162,6=20
-> +184,9 @@ file_backend_class_init(ObjectClass *oc, void *data)
->          file_memory_backend_get_align,
->          file_memory_backend_set_align,
->          NULL, NULL, &error_abort);
-> +    object_class_property_add_bool(oc, "pmem",
-> +        file_memory_backend_get_pmem, file_memory_backend_set_pmem,
-> +        &error_abort);
->  }
-> =20
->  static void file_backend_instance_finalize(Object *o) diff --git=20
-> a/docs/nvdimm.txt b/docs/nvdimm.txt index 8b48fb4..2f7d348 100644
-> --- a/docs/nvdimm.txt
-> +++ b/docs/nvdimm.txt
-> @@ -180,3 +180,21 @@ supports CPU Cache Flush and Memory Controller Flush=
- on Power Loss, etc.
-> =20
->  For a complete list of the flags available and for more detailed=20
-> descriptions,  please consult the ACPI spec.
-> +
-> +guest software that this vNVDIMM device contains a region that cannot=20
-> +accept persistent writes. In result, for example, the guest Linux=20
-> +NVDIMM driver, marks such vNVDIMM device as read-only.
-> +
-> +If the vNVDIMM backend is on the host persistent memory that can be=20
-> +accessed in SNIA NVM Programming Model [1] (e.g., Intel NVDIMM), it's=20
-> +suggested to set the 'pmem' option of memory-backend-file to 'on'.=20
-> +When 'pmem=3Don' and QEMU is built with libpmem [2] support (configured=
-=20
-> +with --enable-libpmem), QEMU will take necessary operations to=20
-> +guarantee the persistence of its own writes to the vNVDIMM backend=20
-> +(e.g., in vNVDIMM label emulation and live migration).
-> +
-> +References
-> +----------
-> +
-> +[1] SNIA NVM Programming Model:=20
-> +https://www.snia.org/sites/default/files/technical_work/final/NVMProg
-> +rammingModel_v1.2.pdf
-> +[2] PMDK: http://pmem.io/pmdk/
-> diff --git a/exec.c b/exec.c
-> index 8e079df..c42483e 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2077,6 +2077,9 @@ RAMBlock *qemu_ram_alloc_from_fd(ram_addr_t size, M=
-emoryRegion *mr,
->      Error *local_err =3D NULL;
->      int64_t file_size;
-> =20
-> +    /* Just support these ram flags by now. */
-> +    assert(ram_flags =3D=3D 0 || (ram_flags & (RAM_SHARED | RAM_PMEM)));
-> +
->      if (xen_enabled()) {
->          error_setg(errp, "-mem-path not supported with Xen");
->          return NULL;
-> @@ -4007,6 +4010,11 @@ err:
->      return ret;
->  }
-> =20
-> +bool ramblock_is_pmem(RAMBlock *rb)
-> +{
-> +    return rb->flags & RAM_PMEM;
-> +}
-> +
->  #endif
-> =20
->  void page_size_init(void)
-> @@ -4105,3 +4113,4 @@ void mtree_print_dispatch(fprintf_function mon,=20
-> void *f,  }
-> =20
->  #endif
-> +
-> diff --git a/include/exec/memory.h b/include/exec/memory.h index=20
-> 3769c06..7dd43b0 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -122,6 +122,9 @@ typedef struct IOMMUNotifier IOMMUNotifier;
->  /* RAM can be migrated */
->  #define RAM_MIGRATABLE (1 << 4)
-> =20
-> +/* RAM is a persistent kind memory */ #define RAM_PMEM (1 << 5)
-> +
->  static inline void iommu_notifier_init(IOMMUNotifier *n, IOMMUNotify fn,
->                                         IOMMUNotifierFlag flags,
->                                         hwaddr start, hwaddr end) @@=20
-> -613,6 +616,7 @@ void memory_region_init_resizeable_ram(MemoryRegion *mr,
->   *         (getpagesize()) will be used.
->   * @ram_flags: Memory region features:
->   *             - RAM_SHARED: memory must be mmaped with the MAP_SHARED f=
-lag
-> + *             - RAM_PMEM: the memory is persistent memory
->   *             Other bits are ignored now.
->   * @path: the path in which to allocate the RAM.
->   * @errp: pointer to Error*, to store an error if it happens.
-> diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h index=20
-> 5545cf3..3c65643 100644
-> --- a/include/exec/ram_addr.h
-> +++ b/include/exec/ram_addr.h
-> @@ -70,6 +70,8 @@ static inline unsigned long int ramblock_recv_bitmap_of=
-fset(void *host_addr,
->      return host_addr_offset >> TARGET_PAGE_BITS;  }
-> =20
-> +bool ramblock_is_pmem(RAMBlock *rb);
-> +
->  long qemu_getrampagesize(void);
->  unsigned long last_ram_page(void);
-> =20
-> @@ -84,6 +86,7 @@ unsigned long last_ram_page(void);
->   *  @ram_flags: specify the properties of the ram block, which can be on=
-e
->   *              or bit-or of following values
->   *              - RAM_SHARED: mmap the backing file or device with MAP_S=
-HARED
-> + *              - RAM_PMEM: the backend @mem_path or @fd is persistent m=
-emory
->   *              Other bits are ignored.
->   *  @mem_path or @fd: specify the backing file or device
->   *  @errp: pointer to Error*, to store an error if it happens diff=20
-> --git a/qemu-options.hx b/qemu-options.hx index c0d3951..006ca44=20
-> 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -4045,6 +4045,13 @@ requires an alignment different than the=20
-> default one used by QEMU, eg  the device DAX /dev/dax0.0 requires 2M=20
-> alignment rather than 4K. In  such cases, users can specify the required =
-alignment via this option.
-> =20
-> +The @option{pmem} option specifies whether the backing file specified=20
-> +by @option{mem-path} is on the persistent memory that can be accessed=20
-> +using the SNIA NVM programming model (e.g. Intel NVDIMM).
-> +If @option{pmem}, QEMU will take necessary operations to guarantee=20
-> +the persistence of its own writes to @option{mem-path} (e.g. in=20
-> +vNVDIMM label emulation and live migration).
-> +
->  @item -object=20
-> memory-backend-ram,id=3D@var{id},merge=3D@var{on|off},dump=3D@var{on|off}=
-,sh
-> are=3D@var{on|off},prealloc=3D@var{on|off},size=3D@var{size},host-nodes=
-=3D@var
-> {host-nodes},policy=3D@var{default|preferred|bind|interleave}
-> =20
->  Creates a memory backend object, which can be used to back the guest RAM=
-.
+
+-amol
