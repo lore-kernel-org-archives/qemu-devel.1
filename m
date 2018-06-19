@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fVCRp-0005bC-0Q
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:57:10 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fVCTb-0006iU-UI
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:59:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fVCRl-0003tz-3M
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:57:09 -0400
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Tue, 19 Jun 2018 18:56:31 +1000
-Message-Id: <20180619085631.2859-1-aik@ozlabs.ru>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fVCTb-0004wt-9z
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:59:00 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:44537)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fVCTb-0004wL-2a
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:58:59 -0400
+Received: by mail-wr0-x242.google.com with SMTP id x4-v6so19656258wro.11
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 01:58:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180619065448.kf3sguslhbqnczvv@sirius.home.kraxel.org>
+References: <20180618161729.334-1-marcandre.lureau@redhat.com>
+	<20180618161729.334-27-marcandre.lureau@redhat.com>
+	<20180619065448.kf3sguslhbqnczvv@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 19 Jun 2018 10:58:57 +0200
+Message-ID: <CAJ+F1CJNuOhWQTibD=iQna=cnCZ71FmZxNDRuBpXsYkfq6HLbA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH qemu] xics-kvm: Fix compile warning
+Subject: Re: [Qemu-devel] [PATCH v3 26/26] hw/display: add vhost-user-vga &
+ gpu-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-This fixes uninitialized variable warning:
+Hi
 
-/home/aik/p/qemu/hw/intc/xics_kvm.c: In function =E2=80=98ics_set_kvm_sta=
-te=E2=80=99:
-/home/aik/p/qemu/hw/intc/xics_kvm.c:281:20: warning: =E2=80=98ret=E2=80=99=
- may be used uninitialized in this function [-Wmaybe-uninitialized]
-             return ret;
-                    ^~~
+On Tue, Jun 19, 2018 at 8:54 AM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>   Hi,
+>
+>> +    VHOST_USER_GPU_SCANOUT,
+>> +    VHOST_USER_GPU_UPDATE,
+>> +    VHOST_USER_GPU_DMABUF_SCANOUT,
+>> +    VHOST_USER_GPU_DMABUF_UPDATE,
+>
+> Hmm, still two command versions.
+>
+> I still think there should be no separate 2d code path.  Just
+> put the 2d display updates into a texture, or into a drm buffer,
+> then use VHOST_USER_GPU_DMABUF_* for both 2d and 3d updates (see
+> also ui/console-gl.c, which does basically the same).
 
-Discovered with gcc (Ubuntu 7.3.0-16ubuntu3) 7.3.0 from Ubuntu 18.04.
+It will use DMABUF for both 2d and 3d, unless it's not capable of
+doing it (currently only intel gpu). So the regular scanout/update are
+fallback. They share a lot of similarities.
 
-Fixes: bf358b541b8 "xics_kvm: use KVM helpers"
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- hw/intc/xics_kvm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 8bdf6af..48efbce 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -273,8 +273,8 @@ static int ics_set_kvm_state(ICSState *ics, int versi=
-on_id)
-                 state |=3D KVM_XICS_QUEUED;
-         }
-=20
--        kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
--                          i + ics->offset, &state, true, &local_err);
-+        ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURC=
-ES,
-+                                i + ics->offset, &state, true, &local_er=
-r);
-         if (local_err) {
-             error_report("Unable to restore KVM interrupt controller sta=
-te"
-                     " for IRQs %d: %s", i + ics->offset, strerror(errno)=
-);
 --=20
-2.11.0
+Marc-Andr=C3=A9 Lureau
