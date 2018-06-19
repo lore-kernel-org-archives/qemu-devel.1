@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5hf-0001FD-6U
+	(envelope-from <flukshun@gmail.com>) id 1fV5hf-0001Ey-1d
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5hc-00089K-31
+	(envelope-from <flukshun@gmail.com>) id 1fV5he-0008AC-7n
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:03 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:41:52 -0500
-Message-Id: <20180619014319.28272-27-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:41:53 -0500
+Message-Id: <20180619014319.28272-28-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 026/113] sparc: fix leon3 casa instruction when
- MMU is disabled
+Subject: [Qemu-devel] [PATCH 027/113] openpic_kvm: drop
+ address_space_to_flatview call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,41 +22,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, KONRAD Frederic <frederic.konrad@adacore.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-From: KONRAD Frederic <frederic.konrad@adacore.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Since the commit af7a06bac7d3abb2da48ef3277d2a415772d2ae8:
-`casa [..](10), .., ..` (and probably others alternate space instructions)
-triggers a data access exception when the MMU is disabled.
+The MemoryListener is registered on address_space_memory, there is
+not much to assert.  This currently works because the callback
+is invoked only once when the listener is registered, but section->fv
+is the _new_ FlatView, not the old one on later calls and that
+would break.
 
-When we enter get_asi(...) dc->mem_idx is set to MMU_PHYS_IDX when the MMU
-is disabled. Just keep mem_idx unchanged in this case so we passthrough the
-MMU when it is disabled.
+This confines address_space_to_flatview to exec.c and memory.c.
 
-Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-(cherry picked from commit 6e10f37c86068e35151f982c976a85f1bec07ef2)
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(cherry picked from commit 80d2b933f9fe3e53d4f76a45a1bc1a0175669468)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/sparc/translate.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/intc/openpic_kvm.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/target/sparc/translate.c b/target/sparc/translate.c
-index 849a02aebd..63693f72e3 100644
---- a/target/sparc/translate.c
-+++ b/target/sparc/translate.c
-@@ -2093,6 +2093,11 @@ static DisasASI get_asi(DisasContext *dc, int insn, TCGMemOp memop)
-             type = GET_ASI_BFILL;
-             break;
-         }
-+
-+        /* MMU_PHYS_IDX is used when the MMU is disabled to passthrough the
-+         * permissions check in get_physical_address(..).
-+         */
-+        mem_idx = (dc->mem_idx == MMU_PHYS_IDX) ? MMU_PHYS_IDX : mem_idx;
-     } else {
-         gen_exception(dc, TT_PRIV_INSN);
-         type = GET_ASI_EXCP;
+diff --git a/hw/intc/openpic_kvm.c b/hw/intc/openpic_kvm.c
+index fa83420254..39a6f369c5 100644
+--- a/hw/intc/openpic_kvm.c
++++ b/hw/intc/openpic_kvm.c
+@@ -124,10 +124,6 @@ static void kvm_openpic_region_add(MemoryListener *listener,
+     uint64_t reg_base;
+     int ret;
+ 
+-    if (section->fv != address_space_to_flatview(&address_space_memory)) {
+-        abort();
+-    }
+-
+     /* Ignore events on regions that are not us */
+     if (section->mr != &opp->mem) {
+         return;
 -- 
 2.11.0
