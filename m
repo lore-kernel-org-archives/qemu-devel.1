@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fVOPx-0002s1-Pb
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:44:03 -0400
+	(envelope-from <brogers@suse.com>) id 1fVOcg-0006Ks-Nh
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:57:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fVOPw-0003Hf-0U
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:44:01 -0400
-References: <20180617183515.3982-1-suratiamol@gmail.com>
-	<20180617183515.3982-2-suratiamol@gmail.com>
-	<20180618180254.GA2441@arch>
-	<d02a8fcd-3a5f-7c90-bef0-abf9ee076dd8@redhat.com>
-	<20180619040153.GA8868@arch>
-	<20180619085329.GA4292@dhcp-200-186.str.redhat.com>
-	<834a13be-0b5c-1249-ad0a-1a1accb3e058@redhat.com>
-	<20180619143401.GA27130@arch> <20180619212558.GA29939@arch>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <d51751ed-3fec-f86b-fba1-737fac0997d4@redhat.com>
-Date: Tue, 19 Jun 2018 17:43:52 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180619212558.GA29939@arch>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC 1/1] ide: bug #1777315:
- io_buffer_size and sg.size can represent partial sector sizes
+	(envelope-from <brogers@suse.com>) id 1fVOcc-0002ze-Qv
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:57:10 -0400
+Message-Id: <5B297C2C020000480007E124@prv-mh.provo.novell.com>
+Date: Tue, 19 Jun 2018 15:57:00 -0600
+From: "Bruce Rogers" <brogers@suse.com>
+References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Subject: Re: [Qemu-devel] [PATCH 00/113] Patch Round-up for stable 2.11.2,
+ freeze on 2018-06-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,233 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amol Surati <suratiamol@gmail.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org
 
+>>> On 6/18/2018 at 7:41 PM, Michael Roth <mdroth@linux.vnet.ibm.com> =
+wrote:
+> Hi everyone,
+>=20
+> The following new patches are queued for QEMU stable v2.11.2:
+>=20
+>   https://github.com/mdroth/qemu/commits/stable-2.11-staging=20
+>=20
+> The release is planned for 2018-06-22:
+>=20
+>   https://wiki.qemu.org/Planning/2.11=20
+>=20
+> Please respond here or CC qemu-stable@nongnu.org on any patches you
+> think should be included in the release.
+>=20
 
+For openSUSE Leap 15's qemu package, based on v2.11.1, we
+also add these patches:=20
 
-On 06/19/2018 05:26 PM, Amol Surati wrote:
-> On Tue, Jun 19, 2018 at 08:04:03PM +0530, Amol Surati wrote:
->> On Tue, Jun 19, 2018 at 09:45:15AM -0400, John Snow wrote:
->>>
->>>
->>> On 06/19/2018 04:53 AM, Kevin Wolf wrote:
->>>> Am 19.06.2018 um 06:01 hat Amol Surati geschrieben:
->>>>> On Mon, Jun 18, 2018 at 08:14:10PM -0400, John Snow wrote:
->>>>>>
->>>>>>
->>>>>> On 06/18/2018 02:02 PM, Amol Surati wrote:
->>>>>>> On Mon, Jun 18, 2018 at 12:05:15AM +0530, Amol Surati wrote:
->>>>>>>> This patch fixes the assumption that io_buffer_size is always a perfect
->>>>>>>> multiple of the sector size. The assumption is the cause of the firing
->>>>>>>> of 'assert(n * 512 == s->sg.size);'.
->>>>>>>>
->>>>>>>> Signed-off-by: Amol Surati <suratiamol@gmail.com>
->>>>>>>> ---
->>>>>>>
->>>>>>> The repository https://github.com/asurati/1777315 contains a module for
->>>>>>> QEMU's 8086:7010 ATA controller, which exercises the code path
->>>>>>> described in [RFC 0/1] of this series.
->>>>>>>
->>>>>>
->>>>>> Thanks, this made it easier to see what was happening. I was able to
->>>>>> write an ide-test test case using this source as a guide, and reproduce
->>>>>> the error.
->>>>>>
->>>>>> static void test_bmdma_partial_sector_short_prdt(void)
->>>>>> {
->>>>>>     QPCIDevice *dev;
->>>>>>     QPCIBar bmdma_bar, ide_bar;
->>>>>>     uint8_t status;
->>>>>>
->>>>>>     /* Read 2 sectors but only give 1 sector in PRDT */
->>>>>>     PrdtEntry prdt[] = {
->>>>>>         {
->>>>>>             .addr = 0,
->>>>>>             .size = cpu_to_le32(0x200),
->>>>>>         },
->>>>>>         {
->>>>>>             .addr = 512,
->>>>>>             .size = cpu_to_le32(0x44 | PRDT_EOT),
->>>>>>         }
->>>>>>     };
->>>>>>
->>>>>>     dev = get_pci_device(&bmdma_bar, &ide_bar);
->>>>>>     status = send_dma_request(CMD_READ_DMA, 0, 2,
->>>>>>                               prdt, ARRAY_SIZE(prdt), NULL);
->>>>>>     g_assert_cmphex(status, ==, 0);
->>>>>>     assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR);
->>>>>>     free_pci_device(dev);
->>>>>> }
->>>>>>
->>>>>>> Loading the module reproduces the bug. Tested on the latest master
->>>>>>> branch.
->>>>>>>
->>>>>>> Steps:
->>>>>>> - Install a Linux distribution as a guest, ensuring that the boot disk
->>>>>>>   resides on non-IDE controllers (such as virtio)
->>>>>>> - Attach another disk as a master device on the primary
->>>>>>>   IDE controller (i.e. attach at -hda.)
->>>>>>> - Blacklist ata_piix, pata_acpi and ata_generic modules, and reboot.
->>>>>>> - Copy the source files into the guest and build the module.
->>>>>>> - Load the module. QEMU process should die with the message:
->>>>>>>   qemu-system-x86_64: hw/ide/core.c:871: ide_dma_cb:
->>>>>>>   Assertion `n * 512 == s->sg.size' failed.
->>>>>>>
->>>>>>>
->>>>>>> -Amol
->>>>>>>
->>>>>>
->>>>>> I'm less sure of the fix -- certainly the assert is wrong, but just
->>>>>> incrementing 'n' is wrong too -- we didn't copy (n+1) sectors, we copied
->>>>>> (n) and a few extra bytes.
->>>>>
->>>>> That is true.
->>>>>
->>>>> There are (at least) two fields that represent the total size of a DMA
->>>>> transfer -
->>>>> (1) The size, as requested through the NSECTOR field.
->>>>> (2) The size, as calculated through the length fields of the PRD entries.
->>>>>
->>>>> It makes sense to consider the most restrictive of the sizes, as the factor
->>>>> which determines both the end of a successful DMA transfer and the
->>>>> condition to assert.
->>>>>
->>>>>>
->>>>>> The sector-based math here would need to be adjusted to be able to cope
->>>>>> with partial sector reads... or we ought to avoid doing any partial
->>>>>> sector transfers.
->>>>>>
->>>>>>
->>>>>> I'm not sure which is more correct tonight, it depends:
->>>>>>
->>>>>> - If it's OK to transfer partial sectors before reporting overflow,
->>>>>> adjusting the command loop to work with partial sectors is OK.
->>>>>>
->>>>>> - If it's NOT OK to do partial sector transfer, the sglist preparation
->>>>>> phase needs to produce a truncated SGList that's some multiple of 512
->>>>>> bytes that leaves the excess bytes in a second sglist that we don't
->>>>>> throw away and can use as a basis for building the next sglist. (Or the
->>>>>> DMA helpers need to take a max_bytes parameter and return an sglist
->>>>>> representing unused buffer space if the command underflowed.)
->>>>>
->>>>> Support for partial sector transfers is built into the DMA interface's PRD
->>>>> mechanism itself, because an entry is allowed to transfer in the units of
->>>>> even number of bytes.
->>>>>
->>>>> I think the controller's IO process runs in two parts (probably loops over
->>>>> for a single transfer):
->>>>>
->>>>> (1) The controller's disk interface transfers between its internal buffer
->>>>>     and the disk storage. The transfers are likely to be in the
->>>>>     multiples of a sector.
->>>>> (2) The controller's DMA interface transfers between its internal buffer
->>>>>     and the system memory. The transfers can be sub-sector in size(, and
->>>>>     are preserving of the areas, of the internal buffer, not subject to a
->>>>>     write.)
->>>>
->>>> The spec isn't clear about this (or at least I can't find anything where
->>>> the exact behaviour is specified), but I agree that that's my mental
->>>> model as well. So I would make IDE send a byte-granularity request with
->>>> the final partial sector to the block layer, so that the data is
->>>> actually transferred up to that point.
->>>>
->>>> In practice it probably doesn't matter much because a too short PRDT
->>>> means that the request doesn't complete successfully (the condition is
->>>> indicated by clear Interrupt, Active and Error flags in the BMDMA
->>>> controller) and I suppose the guest won't actually look at the data
->>>> then.
->>>>
->>>> Providing the data anyway (consistent with our assumption how real
->>>> hardware works) is erring on the safe side because it doesn't hurt a
->>>> reasonable guest that did not expect the data to be transferred in this
->>>> condition.
->>>>
->>>> Kevin
->>>>
->>>
->>> Partial transfers it is, since I didn't see anything in AHCI or BMDMA
->>> that suggested we shouldn't and it seems like the actual easiest fix
->>> because it avoids having to modify the sglists or the sglist preparation
->>> functions.
->>>
->>> Amol, would you like to author a fix, or would you prefer that I do it?
->>
->> Yes, I would like to author it. I assume that the simplification of the
->> calls to prepare_buf is better kept as a change that is separate from
->> this fix.
->>
->>>
->>> If you do, please copy my ide-test case above and check it in as patch
->>> 2/2 to your series as a regression test (tests/ide-test.c). It may need
->>> some further editing after the command submission to pass; I only made
->>> sure it crashes QEMU.
->>
->> Will do.
->>
->> Thanks,
->> -amol
->>
->>>
->>> Thanks,
->>> --js
-> 
-> After ide_dma_cb checks the return value from prepare_buf, it comments
-> thus:
-> 
-> "The PRDs were too short. Reset the Active bit, but don't raise an
-> interrupt."
-> 
-> So, QEMU already has a policy in place for short PRDs. I apologize,
-> that I did not notice it earlier.
-> 
+commit bb223055b9b327ec66e1f6d2fbaebaee0b8f3dbe
+Author: Christian Borntraeger <borntraeger@de.ibm.com>
+Date:   Mon Dec 11 13:21:46 2017 +0100
 
-Any sane human would be forgiven for not being able to read this function.
+    s390-ccw-virtio: allow for systems larger that 7.999TB
 
-> It is enforced by the condition:
-> "(s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size) < 512)".
-> 
-> The definition of short PRDs it uses is: those which result in a
-> "< 512" bytes transfer.
-> 
-> Is there a reason to not define them, as those which result in a
-> "< n * 512" bytes transfer, to begin with (or now)?
-> > (n = s->nsector).
+commit 05b71fb207ab7f016e067bd2a40fc0804362eb74
+Author: Marc-Andr=C3=83=C2=A9 Lureau <marcandre.lureau@redhat.com>
+Date:   Mon Jan 29 19:33:04 2018 +0100
 
-ide_dma_cb is written to possibly execute more than once per command. It
-tries to gather up what it can from prepare_buf, but as long as it gets
-ENOUGH sglist to transfer "at least one sector" it goes ahead with the
-read, under the idea that maybe when we return to ide_dma_cb, the next
-call to prepare_buf will give it more space to transfer the rest of the
-data to.
+    tpm: lookup cancel path under tpm device class
 
-This is why it checks for < 512 instead of < (s->nsectors * 512).
-"As long as I can transfer a sector's worth, I can make progress on the
-command."
-
-As we now know, this mechanism is faulty because we don't always build
-sglists that are multiples of 512. A way to fix this would be to use
-s->sg.size as an offset when building the next transfer instead of (n *
-512).
-
-However, I am pretty sure that for both pci bmdma and ahci, we are
-guaranteed to have the entire sglist from the guest before reaching
-ide_dma_cb, so we might be able to adjust this loop to understand that
-prepare_buf will never yield further results.
-
-(...I think. I'm actually not confident, since I never wrote the
-original DMA loop. It looks right, though.)
-
-In this case, you could just change the overflow condition to check for
-the entire transfer size and declare the overflow sooner instead of later.
-
-> 
-> If the prepare_buf interface implementation and use, that comment, and the
-> behaviour (drop and goto eot) which that comment points towards, are all
-> consistent with one another, then, the condition "< 512" looks like a bug
-> in itself, solving of which also solves this crash (hopefully, without
-> making any other change.)
-> 
-> Thanks,
-> -amol
-> 
+Bruce
