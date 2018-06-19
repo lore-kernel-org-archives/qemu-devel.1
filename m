@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVGtW-0002w4-Hy
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:42:03 -0400
+	(envelope-from <david@redhat.com>) id 1fVGtZ-0002zO-7u
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:42:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVGtV-0004Ha-Ja
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:42:02 -0400
+	(envelope-from <david@redhat.com>) id 1fVGtY-0004IQ-CG
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:42:05 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 19 Jun 2018 15:41:34 +0200
-Message-Id: <20180619134141.29478-6-david@redhat.com>
+Date: Tue, 19 Jun 2018 15:41:35 +0200
+Message-Id: <20180619134141.29478-7-david@redhat.com>
 In-Reply-To: <20180619134141.29478-1-david@redhat.com>
 References: <20180619134141.29478-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 05/12] pc: factor out pc specific dimm
- checks into pc_memory_pre_plug()
+Subject: [Qemu-devel] [PATCH v5 06/12] nvdimm: no need to overwrite
+ get_vmstate_memory_region()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,83 +23,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-We can perform these checks before the device is actually realized.
+Our parent class (PC_DIMM) provides exactly the same function.
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/i386/pc.c | 44 ++++++++++++++++++++++++++------------------
- 1 file changed, 26 insertions(+), 18 deletions(-)
+ hw/mem/nvdimm.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index f23133facc..2db032a6df 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1674,6 +1674,29 @@ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name)
-     }
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index 4087aca25e..f974accbdd 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -166,11 +166,6 @@ static void nvdimm_write_label_data(NVDIMMDevice *nvdimm, const void *buf,
+     memory_region_set_dirty(mr, backend_offset, size);
  }
  
-+static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-+                               Error **errp)
-+{
-+    const PCMachineState *pcms = PC_MACHINE(hotplug_dev);
-+    const bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
-+
-+    /*
-+     * When -no-acpi is used with Q35 machine type, no ACPI is built,
-+     * but pcms->acpi_dev is still created. Check !acpi_enabled in
-+     * addition to cover this case.
-+     */
-+    if (!pcms->acpi_dev || !acpi_enabled) {
-+        error_setg(errp,
-+                   "memory hotplug is not enabled: missing acpi device or acpi disabled");
-+        return;
-+    }
-+
-+    if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
-+        error_setg(errp, "nvdimm is not enabled: missing 'nvdimm' in '-M'");
-+        return;
-+    }
-+}
-+
- static void pc_memory_plug(HotplugHandler *hotplug_dev,
-                            DeviceState *dev, Error **errp)
+-static MemoryRegion *nvdimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
+-{
+-    return host_memory_backend_get_memory(dimm->hostmem, &error_abort);
+-}
+-
+ static void nvdimm_class_init(ObjectClass *oc, void *data)
  {
-@@ -1696,23 +1719,6 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
-         align = memory_region_get_alignment(mr);
-     }
+     PCDIMMDeviceClass *ddc = PC_DIMM_CLASS(oc);
+@@ -178,7 +173,6 @@ static void nvdimm_class_init(ObjectClass *oc, void *data)
  
--    /*
--     * When -no-acpi is used with Q35 machine type, no ACPI is built,
--     * but pcms->acpi_dev is still created. Check !acpi_enabled in
--     * addition to cover this case.
--     */
--    if (!pcms->acpi_dev || !acpi_enabled) {
--        error_setg(&local_err,
--                   "memory hotplug is not enabled: missing acpi device or acpi disabled");
--        goto out;
--    }
--
--    if (is_nvdimm && !pcms->acpi_nvdimm_state.is_enabled) {
--        error_setg(&local_err,
--                   "nvdimm is not enabled: missing 'nvdimm' in '-M'");
--        goto out;
--    }
--
-     pc_dimm_plug(dev, MACHINE(pcms), align, &local_err);
-     if (local_err) {
-         goto out;
-@@ -2006,7 +2012,9 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
- static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-                                           DeviceState *dev, Error **errp)
- {
--    if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        pc_memory_pre_plug(hotplug_dev, dev, errp);
-+    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         pc_cpu_pre_plug(hotplug_dev, dev, errp);
-     }
- }
+     ddc->realize = nvdimm_realize;
+     ddc->get_memory_region = nvdimm_get_memory_region;
+-    ddc->get_vmstate_memory_region = nvdimm_get_vmstate_memory_region;
+ 
+     nvc->read_label_data = nvdimm_read_label_data;
+     nvc->write_label_data = nvdimm_write_label_data;
 -- 
 2.17.1
