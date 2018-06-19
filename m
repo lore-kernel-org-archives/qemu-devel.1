@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fVKSJ-0002bR-DM
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:30:12 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fVKTO-0003IL-RP
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:31:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fVKSF-0002WU-CO
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:30:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33510 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fVKTK-00030P-PF
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:31:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50472 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fVKSF-0002WM-5l
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:30:07 -0400
-Date: Tue, 19 Jun 2018 20:30:06 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180619202529-mutt-send-email-mst@kernel.org>
-References: <20180619163228.13790-1-venu.busireddy@oracle.com>
-	<20180619163228.13790-5-venu.busireddy@oracle.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVKTK-000309-I7
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:31:14 -0400
+Date: Tue, 19 Jun 2018 18:31:09 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180619173109.GM2368@work-vm>
+References: <1528445443-43406-1-git-send-email-wei.w.wang@intel.com>
+	<1528445443-43406-5-git-send-email-wei.w.wang@intel.com>
+	<20180612075016.GD15344@xz-mi> <5B1FAAAF.4030705@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180619163228.13790-5-venu.busireddy@oracle.com>
-Subject: Re: [Qemu-devel] [PATCH virtio 1/1] Add "Group Identifier" support
- to virtio PCI capabilities.
+In-Reply-To: <5B1FAAAF.4030705@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v8 4/6] migration/ram.c: add ram save state
+ notifiers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +29,213 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Venu Busireddy <venu.busireddy@oracle.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com
 
-On Tue, Jun 19, 2018 at 11:32:28AM -0500, Venu Busireddy wrote:
-> Add VIRTIO_PCI_CAP_GROUP_ID_CFG (Group Identifier) capability to the
-> virtio PCI capabilities to allow for the grouping of devices.
+* Wei Wang (wei.w.wang@intel.com) wrote:
+> On 06/12/2018 03:50 PM, Peter Xu wrote:
+> > On Fri, Jun 08, 2018 at 04:10:41PM +0800, Wei Wang wrote:
+> > > This patch adds a ram save state notifier list, and expose RAMState for
+> > > the notifer callbacks to use.
+> > > 
+> > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > CC: Juan Quintela <quintela@redhat.com>
+> > > CC: Michael S. Tsirkin <mst@redhat.com>
+> > > CC: Peter Xu <peterx@redhat.com>
+> > > ---
+> > >   include/migration/misc.h | 52 +++++++++++++++++++++++++++++++++++++++
+> > >   migration/ram.c          | 64 +++++++++++++++++-------------------------------
+> > >   2 files changed, 75 insertions(+), 41 deletions(-)
+> > > 
+> > > diff --git a/include/migration/misc.h b/include/migration/misc.h
+> > > index 113320e..b970d7d 100644
+> > > --- a/include/migration/misc.h
+> > > +++ b/include/migration/misc.h
+> > > @@ -16,9 +16,61 @@
+> > >   #include "exec/cpu-common.h"
+> > >   #include "qemu/notify.h"
+> > > +#include "qemu/thread.h"
+> > >   /* migration/ram.c */
+> > > +typedef enum RamSaveState {
+> > > +    RAM_SAVE_ERR = 0,
+> > > +    RAM_SAVE_RESET = 1,
+> > > +    RAM_SAVE_BEFORE_SYNC_BITMAP = 2,
+> > > +    RAM_SAVE_AFTER_SYNC_BITMAP = 3,
+> > > +    RAM_SAVE_MAX = 4,
+> > > +} RamSaveState;
+> > > +
+> > > +/* State of RAM for migration */
+> > > +typedef struct RAMState {
+> > > +    /* QEMUFile used for this migration */
+> > > +    QEMUFile *f;
+> > > +    /* Last block that we have visited searching for dirty pages */
+> > > +    RAMBlock *last_seen_block;
+> > > +    /* Last block from where we have sent data */
+> > > +    RAMBlock *last_sent_block;
+> > > +    /* Last dirty target page we have sent */
+> > > +    ram_addr_t last_page;
+> > > +    /* last ram version we have seen */
+> > > +    uint32_t last_version;
+> > > +    /* We are in the first round */
+> > > +    bool ram_bulk_stage;
+> > > +    /* How many times we have dirty too many pages */
+> > > +    int dirty_rate_high_cnt;
+> > > +    /* ram save states used for notifiers */
+> > > +    int ram_save_state;
+> > > +    /* these variables are used for bitmap sync */
+> > > +    /* last time we did a full bitmap_sync */
+> > > +    int64_t time_last_bitmap_sync;
+> > > +    /* bytes transferred at start_time */
+> > > +    uint64_t bytes_xfer_prev;
+> > > +    /* number of dirty pages since start_time */
+> > > +    uint64_t num_dirty_pages_period;
+> > > +    /* xbzrle misses since the beginning of the period */
+> > > +    uint64_t xbzrle_cache_miss_prev;
+> > > +    /* number of iterations at the beginning of period */
+> > > +    uint64_t iterations_prev;
+> > > +    /* Iterations since start */
+> > > +    uint64_t iterations;
+> > > +    /* number of dirty bits in the bitmap */
+> > > +    uint64_t migration_dirty_pages;
+> > > +    /* protects modification of the bitmap */
+> > > +    QemuMutex bitmap_mutex;
+> > > +    /* The RAMBlock used in the last src_page_requests */
+> > > +    RAMBlock *last_req_rb;
+> > > +    /* Queue of outstanding page requests from the destination */
+> > > +    QemuMutex src_page_req_mutex;
+> > > +    QSIMPLEQ_HEAD(src_page_requests, RAMSrcPageRequest) src_page_requests;
+> > > +} RAMState;
+> > Why move these chunk?  Can it be avoided?
+> > 
+> > > +
+> > > +void add_ram_save_state_change_notifier(Notifier *notify);
+> > >   void ram_mig_init(void);
+> > >   void qemu_guest_free_page_hint(void *addr, size_t len);
+> > > diff --git a/migration/ram.c b/migration/ram.c
+> > > index 237f11e..d45b5a4 100644
+> > > --- a/migration/ram.c
+> > > +++ b/migration/ram.c
+> > > @@ -56,6 +56,9 @@
+> > >   #include "qemu/uuid.h"
+> > >   #include "savevm.h"
+> > > +static NotifierList ram_save_state_notifiers =
+> > > +    NOTIFIER_LIST_INITIALIZER(ram_save_state_notifiers);
+> > > +
+> > >   /***********************************************************/
+> > >   /* ram save/restore */
+> > > @@ -267,49 +270,18 @@ struct RAMSrcPageRequest {
+> > >       QSIMPLEQ_ENTRY(RAMSrcPageRequest) next_req;
+> > >   };
+> > > -/* State of RAM for migration */
+> > > -struct RAMState {
+> > > -    /* QEMUFile used for this migration */
+> > > -    QEMUFile *f;
+> > > -    /* Last block that we have visited searching for dirty pages */
+> > > -    RAMBlock *last_seen_block;
+> > > -    /* Last block from where we have sent data */
+> > > -    RAMBlock *last_sent_block;
+> > > -    /* Last dirty target page we have sent */
+> > > -    ram_addr_t last_page;
+> > > -    /* last ram version we have seen */
+> > > -    uint32_t last_version;
+> > > -    /* We are in the first round */
+> > > -    bool ram_bulk_stage;
+> > > -    /* How many times we have dirty too many pages */
+> > > -    int dirty_rate_high_cnt;
+> > > -    /* these variables are used for bitmap sync */
+> > > -    /* last time we did a full bitmap_sync */
+> > > -    int64_t time_last_bitmap_sync;
+> > > -    /* bytes transferred at start_time */
+> > > -    uint64_t bytes_xfer_prev;
+> > > -    /* number of dirty pages since start_time */
+> > > -    uint64_t num_dirty_pages_period;
+> > > -    /* xbzrle misses since the beginning of the period */
+> > > -    uint64_t xbzrle_cache_miss_prev;
+> > > -    /* number of iterations at the beginning of period */
+> > > -    uint64_t iterations_prev;
+> > > -    /* Iterations since start */
+> > > -    uint64_t iterations;
+> > > -    /* number of dirty bits in the bitmap */
+> > > -    uint64_t migration_dirty_pages;
+> > > -    /* protects modification of the bitmap */
+> > > -    QemuMutex bitmap_mutex;
+> > > -    /* The RAMBlock used in the last src_page_requests */
+> > > -    RAMBlock *last_req_rb;
+> > > -    /* Queue of outstanding page requests from the destination */
+> > > -    QemuMutex src_page_req_mutex;
+> > > -    QSIMPLEQ_HEAD(src_page_requests, RAMSrcPageRequest) src_page_requests;
+> > > -};
+> > > -typedef struct RAMState RAMState;
+> > > -
+> > >   static RAMState *ram_state;
+> > > +void add_ram_save_state_change_notifier(Notifier *notify)
+> > > +{
+> > > +    notifier_list_add(&ram_save_state_notifiers, notify);
+> > > +}
+> > > +
+> > > +static void notify_ram_save_state_change_notifier(void)
+> > > +{
+> > > +    notifier_list_notify(&ram_save_state_notifiers, ram_state);
+> > > +}
+> > > +
+> > >   uint64_t ram_bytes_remaining(void)
+> > >   {
+> > >       return ram_state ? (ram_state->migration_dirty_pages * TARGET_PAGE_SIZE) :
+> > > @@ -1139,6 +1111,9 @@ static void migration_bitmap_sync(RAMState *rs)
+> > >       int64_t end_time;
+> > >       uint64_t bytes_xfer_now;
+> > > +    rs->ram_save_state = RAM_SAVE_BEFORE_SYNC_BITMAP;
+> > What's the point to keep this state after all?...
+> > 
+> > > +    notify_ram_save_state_change_notifier();
+> > > +
+> > >       ram_counters.dirty_sync_count++;
+> > >       if (!rs->time_last_bitmap_sync) {
+> > > @@ -1205,6 +1180,9 @@ static void migration_bitmap_sync(RAMState *rs)
+> > >       if (migrate_use_events()) {
+> > >           qapi_event_send_migration_pass(ram_counters.dirty_sync_count, NULL);
+> > >       }
+> > > +
+> > > +    rs->ram_save_state = RAM_SAVE_AFTER_SYNC_BITMAP;
+> > > +    notify_ram_save_state_change_notifier();
+> > >   }
+> > >   /**
+> > > @@ -1961,6 +1939,8 @@ static void ram_state_reset(RAMState *rs)
+> > >       rs->last_page = 0;
+> > >       rs->last_version = ram_list.version;
+> > >       rs->ram_bulk_stage = true;
+> > > +    rs->ram_save_state = RAM_SAVE_RESET;
+> > ... and this state is much more meaningless afaict ...
+> > 
+> > > +    notify_ram_save_state_change_notifier();
+> > >   }
+> > >   #define MAX_WAIT 50 /* ms, half buffered_file limit */
+> > > @@ -2709,6 +2689,8 @@ out:
+> > >       ret = qemu_file_get_error(f);
+> > >       if (ret < 0) {
+> > > +        rs->ram_save_state = RAM_SAVE_ERR;
+> > > +        notify_ram_save_state_change_notifier();
+> > >           return ret;
+> > >       }
+> > Also, I would prefer to add a general event framework for migration
+> > rather than "ram save" specific.  Then we add SYNC_START/SYNC_END
+> > events.  These notifiers aren't a lot, it'll be a bit awkward to
+> > introduce the framework multiple times for similar purpuse (after we
+> > have a common notifier we can merge the postcopy notifiers AFAIU).
 > 
-> Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
-> ---
->  content.tex | 43 +++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 43 insertions(+)
+> Hi Peter,
 > 
-> diff --git a/content.tex b/content.tex
-> index 7a92cb1..7ea6267 100644
-> --- a/content.tex
-> +++ b/content.tex
-> @@ -599,6 +599,8 @@ The fields are interpreted as follows:
->  #define VIRTIO_PCI_CAP_DEVICE_CFG        4
->  /* PCI configuration access */
->  #define VIRTIO_PCI_CAP_PCI_CFG           5
-> +/* Group Identifier */
-> +#define VIRTIO_PCI_CAP_GROUP_ID_CFG      6
->  \end{lstlisting}
->  
->          Any other value is reserved for future use.
-> @@ -997,6 +999,47 @@ address \field{cap.length} bytes within a BAR range
->  specified by some other Virtio Structure PCI Capability
->  of type other than \field{VIRTIO_PCI_CAP_PCI_CFG}.
->  
-> +\subsubsection{Group Identifier capability}\label{sec:Virtio Transport Options / Virtio Over PCI Bus / PCI Device Layout / Group Identifier capability}
-> +
-> +The VIRTIO_PCI_CAP_GROUP_ID_CFG capability provides means for grouping devices together.
-> +
-> +The capability is immediately followed by an identifier of arbitrary size as below:
-> +
-> +\begin{lstlisting}
-> +struct virtio_pci_group_id_cap {
-> +        struct virtio_pci_cap cap;
-> +        u8 group_id[]; /* Group Identifier */
-> +};
-> +\end{lstlisting}
-> +
-> +The fields \field{cap.bar}, \field{cap.length}, \field{cap.offset}
-> +and \field{group_id} are read-only for the driver.
-> +
-> +The specification does not impose any restrictions on the size or
-> +structure of group_id[].
+> Thanks for the review. We just got a little accident in the kernel part,
+> which may cause some modifications to the QEMU side interfaces. So I will
+> implement a new version and let you review in v9 patches.
 
-I think it must be a multiple of 4 in size, as is
-standard for all capabilities.
+Yes, but please do try and keep RAMState private to ram.c.
 
+Dave
 
-> Vendors are free to declare this array as
-> +large as needed, as long as the combined size of all capabilities can
-> +be accommodated within the PCI configuration space.
-> +
-> +If there is enough room in the PCI configuration space to accommodate
-> +the group identifier, the fields \field{cap.bar}, \field{cap.offset}
-> +and \field{cap.length} should be set to 0.
-> +
-> +If there isn't enough room, some or all of the group identifier can be
-> +presented in the BAR region, in which case the fields \field{cap.bar},
-> +\field{cap.offset} and \field{cap.length} should be set appropriately.
-
-And then how do you glue the two pieces?
-
-> +
-> +In either case, the field \field{cap.cap_len} indicates the length of
-> +the group identifier information present in the configuration space
-> +itself.
-
-It seems like an overkill to me. Isn't it enough to have it in config
-space? This would make comparisons easier.
-
-> +
-> +\devicenormative{\paragraph}{Group Identifier capability}{Virtio Transport Options / Virtio Over PCI Bus / PCI Device Layout / Group Identifier capability}
-> +
-> +The device MAY present the VIRTIO_PCI_CAP_GROUP_ID_CFG capability.
-> +
-> +\drivernormative{\paragraph}{Group Identifier capability}{Virtio Transport Options / Virtio Over PCI Bus / PCI Device Layout / Group Identifier capability}
-> +
-> +The driver MUST NOT write to group_id[] area or the BAR region.
-> +
->  \subsubsection{Legacy Interfaces: A Note on PCI Device Layout}\label{sec:Virtio Transport Options / Virtio Over PCI Bus / PCI Device Layout / Legacy Interfaces: A Note on PCI Device Layout}
->  
->  Transitional devices MUST present part of configuration
+> Best,
+> Wei
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
