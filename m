@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVOnG-00016Q-Qv
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 18:08:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1fVP9Z-0006dh-By
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 18:31:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVOnD-00019R-R6
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 18:08:06 -0400
-Date: Tue, 19 Jun 2018 23:07:52 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180619220752.GB19712@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180615155103.11924-1-berrange@redhat.com>
-	<20180615155103.11924-3-berrange@redhat.com>
-	<d10a7833-5e37-52cb-cb5d-25018313469a@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fVP9W-0000Jj-6A
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 18:31:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48878)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fVP9V-0000J0-Vq
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 18:31:06 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fVP9U-0004My-5N
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 22:31:04 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F174E2E80CC
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 22:31:02 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d10a7833-5e37-52cb-cb5d-25018313469a@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/6] nbd: allow authorization with
- nbd-server-start QMP command
+Date: Tue, 19 Jun 2018 22:23:53 -0000
+From: Waldemar Kozaczuk <1776920@bugs.launchpad.net>
+Reply-To: Bug 1776920 <1776920@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152898515528.25954.5483198787570860596.malonedeb@soybean.canonical.com>
+Message-Id: <152944703330.27152.651646040488607048.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1776920] Re: qemu-img convert on Mac OSX creates
+ corrupt images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +37,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Tue, Jun 19, 2018 at 03:10:12PM -0500, Eric Blake wrote:
-> On 06/15/2018 10:50 AM, Daniel P. Berrang=C3=A9 wrote:
-> > From: "Daniel P. Berrange" <berrange@redhat.com>
-> >=20
-> > As with the previous patch to qemu-nbd, the nbd-server-start QMP comm=
-and
-> > also needs to be able to specify authorization when enabling TLS encr=
-yption.
-> >=20
-> > First the client must create a QAuthZ object instance using the
-> > 'object-add' command:
-> >=20
-> >     {
-> >       'execute': 'object-add',
-> >       'arguments': {
-> >         'qom-type': 'authz-simple',
-> >         'id': 'authz0',
-> >         'parameters': {
-> >           'policy': 'deny',
-> >           'rules': [
-> >             {
-> >               'match': '*CN=3Dfred',
-> >               'policy': 'allow'
-> >             }
-> >           ]
-> >         }
-> >       }
-> >     }
-> >=20
-> > They can then reference this in the new 'tls-authz' parameter when
-> > executing the 'nbd-server-start' command:
-> >=20
-> >     {
-> >       'execute': 'nbd-server-start',
-> >       'arguments': {
-> >         'addr': {
-> >             'type': 'inet',
-> >             'host': '127.0.0.1',
-> >             'port': '9000'
-> >         },
-> >         'tls-creds': 'tls0',
-> >         'tls-authz': 'authz0'
-> >       }
-> >     }
->=20
-> Is it worth using a discriminated union (string vs. QAuthZ) so that one
-> could specify the authz policy inline rather than as a separate object,=
- for
-> convenience?  But that would be fine as a followup patch, if we even wa=
-nt
-> it.
+Have I provided all necessary data and other details?
 
-QAuthZ isn't a QAPI type - its a QOM object interface, so you'd have to
-allow the entire object_add arg set inline, and then validate the QOM typ=
-e
-you received after the fact actually implemented the interface.  Also for
-migration at least it is likely the single authz impl will be shared for
-both migration + nbd services. So I think its cleaner just to keep it
-separate to avoid having 2 distinct codepaths for handling the same thing
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1776920
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Title:
+  qemu-img convert on Mac OSX creates corrupt images
+
+Status in QEMU:
+  New
+
+Bug description:
+  An image created by qemu-img create, then modified by another program
+  is converted to bad/corrupt image when using convert sub command on
+  Mac OSX. The same convert works on Linux. The version of qemu-img is
+  2.12.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1776920/+subscriptions
