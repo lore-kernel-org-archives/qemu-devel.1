@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVNtE-00015W-61
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:10:13 -0400
+	(envelope-from <suratiamol@gmail.com>) id 1fVO6V-0004Ej-Nz
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:23:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVNtA-0007Im-3Y
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:10:12 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35879)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVNt9-0007Ia-UT
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:10:08 -0400
-Received: by mail-qt0-x244.google.com with SMTP id o9-v6so1156226qtp.3
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 14:10:07 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180619203918.65450-1-eblake@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9c14e207-829c-f43d-5a97-ac83d4f4c5c4@amsat.org>
-Date: Tue, 19 Jun 2018 18:10:00 -0300
+	(envelope-from <suratiamol@gmail.com>) id 1fVO6S-0006gy-Gb
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:23:55 -0400
+Date: Wed, 20 Jun 2018 02:56:00 +0530
+From: Amol Surati <suratiamol@gmail.com>
+Message-ID: <20180619212558.GA29939@arch>
+References: <20180617183515.3982-1-suratiamol@gmail.com>
+	<20180617183515.3982-2-suratiamol@gmail.com>
+	<20180618180254.GA2441@arch>
+	<d02a8fcd-3a5f-7c90-bef0-abf9ee076dd8@redhat.com>
+	<20180619040153.GA8868@arch>
+	<20180619085329.GA4292@dhcp-200-186.str.redhat.com>
+	<834a13be-0b5c-1249-ad0a-1a1accb3e058@redhat.com>
+	<20180619143401.GA27130@arch>
 MIME-Version: 1.0
-In-Reply-To: <20180619203918.65450-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tests: Simplify .gitignore
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180619143401.GA27130@arch>
+Subject: Re: [Qemu-devel] [Qemu-block] [RFC 1/1] ide: bug #1777315:
+ io_buffer_size and sg.size can represent partial sector sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,141 +30,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com
+To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: Amol Surati <suratiamol@gmail.com>, qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>
 
-On 06/19/2018 05:39 PM, Eric Blake wrote:
-> Commit 0bcc8e5b was yet another instance of 'git status' reporting
-> dirty files after an in-tree build, thanks to the new binary
-> tests/check-block-qdict.
+On Tue, Jun 19, 2018 at 08:04:03PM +0530, Amol Surati wrote:
+> On Tue, Jun 19, 2018 at 09:45:15AM -0400, John Snow wrote:
+> > 
+> > 
+> > On 06/19/2018 04:53 AM, Kevin Wolf wrote:
+> > > Am 19.06.2018 um 06:01 hat Amol Surati geschrieben:
+> > >> On Mon, Jun 18, 2018 at 08:14:10PM -0400, John Snow wrote:
+> > >>>
+> > >>>
+> > >>> On 06/18/2018 02:02 PM, Amol Surati wrote:
+> > >>>> On Mon, Jun 18, 2018 at 12:05:15AM +0530, Amol Surati wrote:
+> > >>>>> This patch fixes the assumption that io_buffer_size is always a perfect
+> > >>>>> multiple of the sector size. The assumption is the cause of the firing
+> > >>>>> of 'assert(n * 512 == s->sg.size);'.
+> > >>>>>
+> > >>>>> Signed-off-by: Amol Surati <suratiamol@gmail.com>
+> > >>>>> ---
+> > >>>>
+> > >>>> The repository https://github.com/asurati/1777315 contains a module for
+> > >>>> QEMU's 8086:7010 ATA controller, which exercises the code path
+> > >>>> described in [RFC 0/1] of this series.
+> > >>>>
+> > >>>
+> > >>> Thanks, this made it easier to see what was happening. I was able to
+> > >>> write an ide-test test case using this source as a guide, and reproduce
+> > >>> the error.
+> > >>>
+> > >>> static void test_bmdma_partial_sector_short_prdt(void)
+> > >>> {
+> > >>>     QPCIDevice *dev;
+> > >>>     QPCIBar bmdma_bar, ide_bar;
+> > >>>     uint8_t status;
+> > >>>
+> > >>>     /* Read 2 sectors but only give 1 sector in PRDT */
+> > >>>     PrdtEntry prdt[] = {
+> > >>>         {
+> > >>>             .addr = 0,
+> > >>>             .size = cpu_to_le32(0x200),
+> > >>>         },
+> > >>>         {
+> > >>>             .addr = 512,
+> > >>>             .size = cpu_to_le32(0x44 | PRDT_EOT),
+> > >>>         }
+> > >>>     };
+> > >>>
+> > >>>     dev = get_pci_device(&bmdma_bar, &ide_bar);
+> > >>>     status = send_dma_request(CMD_READ_DMA, 0, 2,
+> > >>>                               prdt, ARRAY_SIZE(prdt), NULL);
+> > >>>     g_assert_cmphex(status, ==, 0);
+> > >>>     assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR);
+> > >>>     free_pci_device(dev);
+> > >>> }
+> > >>>
+> > >>>> Loading the module reproduces the bug. Tested on the latest master
+> > >>>> branch.
+> > >>>>
+> > >>>> Steps:
+> > >>>> - Install a Linux distribution as a guest, ensuring that the boot disk
+> > >>>>   resides on non-IDE controllers (such as virtio)
+> > >>>> - Attach another disk as a master device on the primary
+> > >>>>   IDE controller (i.e. attach at -hda.)
+> > >>>> - Blacklist ata_piix, pata_acpi and ata_generic modules, and reboot.
+> > >>>> - Copy the source files into the guest and build the module.
+> > >>>> - Load the module. QEMU process should die with the message:
+> > >>>>   qemu-system-x86_64: hw/ide/core.c:871: ide_dma_cb:
+> > >>>>   Assertion `n * 512 == s->sg.size' failed.
+> > >>>>
+> > >>>>
+> > >>>> -Amol
+> > >>>>
+> > >>>
+> > >>> I'm less sure of the fix -- certainly the assert is wrong, but just
+> > >>> incrementing 'n' is wrong too -- we didn't copy (n+1) sectors, we copied
+> > >>> (n) and a few extra bytes.
+> > >>
+> > >> That is true.
+> > >>
+> > >> There are (at least) two fields that represent the total size of a DMA
+> > >> transfer -
+> > >> (1) The size, as requested through the NSECTOR field.
+> > >> (2) The size, as calculated through the length fields of the PRD entries.
+> > >>
+> > >> It makes sense to consider the most restrictive of the sizes, as the factor
+> > >> which determines both the end of a successful DMA transfer and the
+> > >> condition to assert.
+> > >>
+> > >>>
+> > >>> The sector-based math here would need to be adjusted to be able to cope
+> > >>> with partial sector reads... or we ought to avoid doing any partial
+> > >>> sector transfers.
+> > >>>
+> > >>>
+> > >>> I'm not sure which is more correct tonight, it depends:
+> > >>>
+> > >>> - If it's OK to transfer partial sectors before reporting overflow,
+> > >>> adjusting the command loop to work with partial sectors is OK.
+> > >>>
+> > >>> - If it's NOT OK to do partial sector transfer, the sglist preparation
+> > >>> phase needs to produce a truncated SGList that's some multiple of 512
+> > >>> bytes that leaves the excess bytes in a second sglist that we don't
+> > >>> throw away and can use as a basis for building the next sglist. (Or the
+> > >>> DMA helpers need to take a max_bytes parameter and return an sglist
+> > >>> representing unused buffer space if the command underflowed.)
+> > >>
+> > >> Support for partial sector transfers is built into the DMA interface's PRD
+> > >> mechanism itself, because an entry is allowed to transfer in the units of
+> > >> even number of bytes.
+> > >>
+> > >> I think the controller's IO process runs in two parts (probably loops over
+> > >> for a single transfer):
+> > >>
+> > >> (1) The controller's disk interface transfers between its internal buffer
+> > >>     and the disk storage. The transfers are likely to be in the
+> > >>     multiples of a sector.
+> > >> (2) The controller's DMA interface transfers between its internal buffer
+> > >>     and the system memory. The transfers can be sub-sector in size(, and
+> > >>     are preserving of the areas, of the internal buffer, not subject to a
+> > >>     write.)
+> > > 
+> > > The spec isn't clear about this (or at least I can't find anything where
+> > > the exact behaviour is specified), but I agree that that's my mental
+> > > model as well. So I would make IDE send a byte-granularity request with
+> > > the final partial sector to the block layer, so that the data is
+> > > actually transferred up to that point.
+> > > 
+> > > In practice it probably doesn't matter much because a too short PRDT
+> > > means that the request doesn't complete successfully (the condition is
+> > > indicated by clear Interrupt, Active and Error flags in the BMDMA
+> > > controller) and I suppose the guest won't actually look at the data
+> > > then.
+> > > 
+> > > Providing the data anyway (consistent with our assumption how real
+> > > hardware works) is erring on the safe side because it doesn't hurt a
+> > > reasonable guest that did not expect the data to be transferred in this
+> > > condition.
+> > > 
+> > > Kevin
+> > > 
+> > 
+> > Partial transfers it is, since I didn't see anything in AHCI or BMDMA
+> > that suggested we shouldn't and it seems like the actual easiest fix
+> > because it avoids having to modify the sglists or the sglist preparation
+> > functions.
+> > 
+> > Amol, would you like to author a fix, or would you prefer that I do it?
 > 
-> Instead of piecemeal exemptions of each new binary as they are
-> added, let's use git's negative globbing feature to exempt ALL
-> files that have a 'test-' or 'check-' prefix, except for the ones
-> ending in '.c' or '.sh'.  We still have a couple of generated
-> files that then need (re-)exclusion, but the overall list is a
-> LOT shorter, and less prone to needing future edits.
-
-Finally :)
-
+> Yes, I would like to author it. I assume that the simplification of the
+> calls to prepare_buf is better kept as a change that is separate from
+> this fix.
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  tests/.gitignore | 93 +++-----------------------------------------------------
->  1 file changed, 5 insertions(+), 88 deletions(-)
+> > 
+> > If you do, please copy my ide-test case above and check it in as patch
+> > 2/2 to your series as a regression test (tests/ide-test.c). It may need
+> > some further editing after the command submission to pass; I only made
+> > sure it crashes QEMU.
 > 
-> diff --git a/tests/.gitignore b/tests/.gitignore
-> index 2bc61a9a58d..08e2df1ce1f 100644
-> --- a/tests/.gitignore
-> +++ b/tests/.gitignore
-> @@ -2,101 +2,18 @@ atomic_add-bench
->  benchmark-crypto-cipher
->  benchmark-crypto-hash
->  benchmark-crypto-hmac
-> -check-qdict
-> -check-qnum
-> -check-qjson
-> -check-qlist
-> -check-qlit
-> -check-qnull
-> -check-qobject
-> -check-qstring
-> -check-qom-interface
-> -check-qom-proplist
-> +check-*
-> +!check-*.c
-> +!check-*.sh
->  qht-bench
->  rcutorture
-> -test-aio
-> -test-aio-multithread
-> -test-arm-mptimer
-> -test-base64
-> -test-bdrv-drain
-> -test-bitops
-> -test-bitcnt
-> -test-block-backend
-> -test-blockjob
-> -test-blockjob-txn
-> -test-bufferiszero
-> -test-char
-> -test-clone-visitor
-> -test-coroutine
-> -test-crypto-afsplit
-> -test-crypto-block
-> -test-crypto-cipher
-> -test-crypto-hash
-> -test-crypto-hmac
-> -test-crypto-ivgen
-> -test-crypto-pbkdf
-> -test-crypto-secret
-> -test-crypto-tlscredsx509
-> -test-crypto-tlscredsx509-work/
-> -test-crypto-tlscredsx509-certs/
-> -test-crypto-tlssession
-> -test-crypto-tlssession-work/
-> -test-crypto-tlssession-client/
-> -test-crypto-tlssession-server/
-> -test-crypto-xts
-> -test-cutils
-> -test-hbitmap
-> -test-hmp
-> -test-int128
-> -test-iov
-> -test-io-channel-buffer
-> -test-io-channel-command
-> -test-io-channel-command.fifo
-> -test-io-channel-file
-> -test-io-channel-file.txt
-> -test-io-channel-socket
-> -test-io-channel-tls
-> -test-io-task
-> -test-keyval
-> -test-logging
-> -test-mul64
-> -test-opts-visitor
-> +test-*
-> +!test-*.c
->  test-qapi-commands.[ch]
->  test-qapi-events.[ch]
->  test-qapi-types.[ch]
-> -test-qapi-util
->  test-qapi-visit.[ch]
-> -test-qdev-global-props
-> -test-qemu-opts
-> -test-qdist
-> -test-qga
-> -test-qht
-> -test-qht-par
-> -test-qmp-cmds
-> -test-qmp-event
-> -test-qobject-input-strict
-> -test-qobject-input-visitor
->  test-qapi-introspect.[ch]
-> -test-qobject-output-visitor
-> -test-rcu-list
-> -test-replication
-> -test-shift128
-> -test-string-input-visitor
-> -test-string-output-visitor
-> -test-thread-pool
-> -test-throttle
-> -test-timed-average
-> -test-uuid
-> -test-util-sockets
-> -test-visitor-serialization
-> -test-vmstate
-> -test-write-threshold
-> -test-x86-cpuid
-> -test-x86-cpuid-compat
-> -test-xbzrle
-> -test-netfilter
-> -test-filter-mirror
-> -test-filter-redirector
->  *-test
->  qapi-schema/*.test.*
->  vm/*.img
+> Will do.
 > 
+> Thanks,
+> -amol
+> 
+> > 
+> > Thanks,
+> > --js
+
+After ide_dma_cb checks the return value from prepare_buf, it comments
+thus:
+
+"The PRDs were too short. Reset the Active bit, but don't raise an
+interrupt."
+
+So, QEMU already has a policy in place for short PRDs. I apologize,
+that I did not notice it earlier.
+
+It is enforced by the condition:
+"(s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size) < 512)".
+
+The definition of short PRDs it uses is: those which result in a
+"< 512" bytes transfer.
+
+Is there a reason to not define them, as those which result in a
+"< n * 512" bytes transfer, to begin with (or now)?
+
+(n = s->nsector).
+
+If the prepare_buf interface implementation and use, that comment, and the
+behaviour (drop and goto eot) which that comment points towards, are all
+consistent with one another, then, the condition "< 512" looks like a bug
+in itself, solving of which also solves this crash (hopefully, without
+making any other change.)
+
+Thanks,
+-amol
