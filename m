@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fVAXV-0003Ds-VM
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 02:54:54 -0400
+	(envelope-from <peterx@redhat.com>) id 1fVB6G-0000Ag-Lo
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:30:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fVAXS-0002ny-VG
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 02:54:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44914 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fVB6D-0005VX-Hq
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:30:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36524 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fVAXS-0002ns-Pq
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 02:54:50 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DA7C07DAC3
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 06:54:49 +0000 (UTC)
-Date: Tue, 19 Jun 2018 08:54:48 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180619065448.kf3sguslhbqnczvv@sirius.home.kraxel.org>
-References: <20180618161729.334-1-marcandre.lureau@redhat.com>
-	<20180618161729.334-27-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fVB6D-0005VI-CJ
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:30:45 -0400
+Date: Tue, 19 Jun 2018 15:30:34 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180619073034.GA14814@xz-mi>
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180604095520.8563-7-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180618161729.334-27-marcandre.lureau@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 26/26] hw/display: add vhost-user-vga &
- gpu-pci
+In-Reply-To: <20180604095520.8563-7-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH 06/12] migration: do not detect zero page
+ for compression
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,22 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-  Hi,
+On Mon, Jun 04, 2018 at 05:55:14PM +0800, guangrong.xiao@gmail.com wrote:
+> From: Xiao Guangrong <xiaoguangrong@tencent.com>
+> 
+> Detecting zero page is not a light work, we can disable it
+> for compression that can handle all zero data very well
 
-> +    VHOST_USER_GPU_SCANOUT,
-> +    VHOST_USER_GPU_UPDATE,
-> +    VHOST_USER_GPU_DMABUF_SCANOUT,
-> +    VHOST_USER_GPU_DMABUF_UPDATE,
+Is there any number shows how the compression algo performs better
+than the zero-detect algo?  Asked since AFAIU buffer_is_zero() might
+be fast, depending on how init_accel() is done in util/bufferiszero.c.
 
-Hmm, still two command versions.
+>From compression rate POV of course zero page algo wins since it
+contains no data (but only a flag).
 
-I still think there should be no separate 2d code path.  Just
-put the 2d display updates into a texture, or into a drm buffer,
-then use VHOST_USER_GPU_DMABUF_* for both 2d and 3d updates (see
-also ui/console-gl.c, which does basically the same).
+Regards,
 
-cheers,
-  Gerd
+-- 
+Peter Xu
