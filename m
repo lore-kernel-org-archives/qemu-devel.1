@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39166)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVIvW-0004Ix-Bd
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:52:38 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fVIva-0004Mm-Ie
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:52:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVIvI-0001sV-Ef
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:52:14 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:53355)
+	(envelope-from <alex.bennee@linaro.org>) id 1fVIvJ-0001uH-RL
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:52:18 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:34715)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fVIvH-0001qj-Qc
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:52:00 -0400
-Received: by mail-wm0-x241.google.com with SMTP id x6-v6so1202017wmc.3
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 08:51:59 -0700 (PDT)
+	id 1fVIvJ-0001sq-GD
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:52:01 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id l15-v6so19348696wmc.1
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 08:52:01 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 19 Jun 2018 16:44:28 +0100
-Message-Id: <20180619154435.18898-50-alex.bennee@linaro.org>
+Date: Tue, 19 Jun 2018 16:44:33 +0100
+Message-Id: <20180619154435.18898-55-alex.bennee@linaro.org>
 In-Reply-To: <20180619154435.18898-1-alex.bennee@linaro.org>
 References: <20180619154435.18898-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 49/56] tests: add top-level make dependency for
- docker builds
+Subject: [Qemu-devel] [PULL 54/56] docker: docker.py adding age check command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,93 +32,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-One problem with satisfying your docker dependencies in a sub-make it
-you might end up trying to satisfy the dependency multiple times. This
-is especially a problem with debian-sid based cross compilers and CI
-setups. We solve this by doing a docker build pass at the top level
-before any sub-makes are called.
-
-We still need to satisfy dependencies in the Makefile.target call so
-people can run tests from individual target directories. We introduce
-a new Makefile.probe which gets called for each PROBE_TARGET and
-allows us to build up the list. It does require multiply including
-config-target.mak which shouldn't cause any issues as it shouldn't
-define anything that clashes with config-host.mak. However we undefine
-a few key variables each time around.
+This is useful for querying if an image is too old.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
 v7
-  - remove $(info) spam
-  - just add the explicit docker dependency to each build target
-  - include build-tcg-prereqs for CI tasks
+  - use cached info
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index c8faa01a33..2dd0700a88 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -938,6 +938,14 @@ BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(LINUX_USER_TARGETS))
- CLEAN_TCG_TARGET_RULES=$(patsubst %,clean-tcg-tests-%, $(LINUX_USER_TARGETS))
- RUN_TCG_TARGET_RULES=$(patsubst %,run-tcg-tests-%, $(LINUX_USER_TARGETS))
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 770b22424b..c748c457b9 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -29,6 +29,7 @@ from tarfile import TarFile, TarInfo
+ from StringIO import StringIO
+ from shutil import copy, rmtree
+ from pwd import getpwuid
++from datetime import datetime,timedelta
  
-+# Probe for the Docker Builds needed for each build
-+DOCKER_BUILD_TARGETS:=
-+$(foreach PROBE_TARGET,$(TARGET_LIST), 				\
-+	$(eval -include $(SRC_PATH)/tests/tcg/Makefile.probe) 	\
-+	$(if $(DOCKER_PREREQ), 					\
-+		$(eval DOCKER_BUILD_TARGETS+=$(DOCKER_PREREQ))  \
-+		$(eval build-tcg-tests-$(PROBE_TARGET): $(DOCKER_PREREQ))))
-+
- build-tcg-tests-%:
- 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" guest-tests,)
  
-@@ -947,6 +955,9 @@ run-tcg-tests-%: build-tcg-tests-%
- clean-tcg-tests-%:
- 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" clean-guest-tests,)
+ FILTERED_ENV_NAMES = ['ftp_proxy', 'http_proxy', 'https_proxy']
+@@ -187,6 +188,9 @@ class Docker(object):
+         except subprocess.CalledProcessError:
+             return None
  
-+.PHONY: build-tcg-prereqs
-+build-tcg-prereqs: $(DOCKER_BUILD_TARGETS)
++    def get_image_creation_time(self, info):
++        return json.loads(info)[0]["Created"]
 +
- .PHONY: build-tcg
- build-tcg: $(BUILD_TCG_TARGET_RULES)
+     def get_image_dockerfile_checksum(self, tag):
+         resp = self.inspect_tag(tag)
+         labels = json.loads(resp)[0]["Config"].get("Labels", {})
+@@ -458,11 +462,14 @@ class CheckCommand(SubCommand):
+     def args(self, parser):
+         parser.add_argument("tag",
+                             help="Image Tag")
+-        parser.add_argument("dockerfile",
+-                            help="Dockerfile name")
++        parser.add_argument("dockerfile", default=None,
++                            help="Dockerfile name", nargs='?')
++        parser.add_argument("--checktype", choices=["checksum", "age"],
++                            default="checksum", help="check type")
++        parser.add_argument("--olderthan", default=60, type=int,
++                            help="number of minutes")
  
-diff --git a/tests/tcg/Makefile.probe b/tests/tcg/Makefile.probe
-new file mode 100644
-index 0000000000..15c0412657
---- /dev/null
-+++ b/tests/tcg/Makefile.probe
-@@ -0,0 +1,31 @@
-+# -*- Mode: makefile -*-
-+#
-+# TCG Compiler Probe
-+#
-+# This Makefile fragement is included multiple times in the main make
-+# script to probe for available compilers. This is used to build up a
-+# selection of required docker targets before we invoke a sub-make for
-+# each target.
+     def run(self, args, argv):
+-        dockerfile = open(args.dockerfile, "rb").read()
+         tag = args.tag
+ 
+         dkr = Docker()
+@@ -471,13 +478,32 @@ class CheckCommand(SubCommand):
+             print("Image does not exist")
+             return 1
+ 
+-        if dkr.image_matches_dockerfile(tag, dockerfile):
+-            if not args.quiet:
+-                print("Image is up to date")
+-            return 0
+-        else:
+-            print("Image needs updating")
+-            return 1
++        if args.checktype == "checksum":
++            if not args.dockerfile:
++                print("Need a dockerfile for tag:%s" % (tag))
++                return 1
 +
-+# First we need the target makefile which tells us the target architecture
-+-include $(BUILD_DIR)/$(PROBE_TARGET)/config-target.mak
++            dockerfile = open(args.dockerfile, "rb").read()
 +
-+# Then we load up the target architecture makefiles which tell us
-+# about the compilers
-+CROSS_CC_GUEST:=
-+DOCKER_IMAGE:=
-+DOCKER_PREREQ:=
-+
-+-include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.include
-+-include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
-+
-+ifndef CROSS_CC_GUEST
-+ifneq ($(DOCKER_IMAGE),)
-+DOCKER_PREREQ:=docker-image-$(DOCKER_IMAGE)
-+endif
-+endif
-+
-+# Clean-up
-+# undefine TARGET_NAME
-+# undefine TARGET_BASE_ARCH
-+# undefine TARGET_ABI_DIR
++            if dkr.image_matches_dockerfile(tag, dockerfile):
++                if not args.quiet:
++                    print("Image is up to date")
++                return 0
++            else:
++                print("Image needs updating")
++                return 1
++        elif args.checktype == "age":
++            timestr = dkr.get_image_creation_time(info).split(".")[0]
++            created = datetime.strptime(timestr, "%Y-%m-%dT%H:%M:%S")
++            past = datetime.now() - timedelta(minutes=args.olderthan)
++            if created < past:
++                print ("Image created @ %s more than %d minutes old" %
++                       (timestr, args.olderthan))
++                return 1
++            else:
++                if not args.quiet:
++                    print ("Image less than %d minutes old" % (args.olderthan))
++                return 0
+ 
+ 
+ def main():
 -- 
 2.17.1
