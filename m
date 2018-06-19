@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jd-00036P-6B
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:06 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jc-0000rb-GE
+	(envelope-from <flukshun@gmail.com>) id 1fV5ja-00034Q-0Z
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:05 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <flukshun@gmail.com>) id 1fV5jY-0000qB-CC
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:02 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:45 -0500
-Message-Id: <20180619014319.28272-80-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:42:43 -0500
+Message-Id: <20180619014319.28272-78-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 079/113] qdev: rename typedef qdev_resetfn() ->
- DeviceReset()
+Subject: [Qemu-devel] [PATCH 077/113] s390x/css: disabled subchannels cannot
+ be status pending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +22,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-stable@nongnu.org, Cornelia Huck <cohuck@redhat.com>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Cornelia Huck <cohuck@redhat.com>
 
-following the DeviceRealize and DeviceUnrealize typedefs,
-this unify a bit the new QOM API.
+The 3270 code will try to post an attention interrupt when the
+3270 emulator (e.g. x3270) attaches. If the guest has not yet
+enabled the subchannel for the 3270 device, we will present a spurious
+cc 1 (status pending) when it uses msch on it later on, e.g. when
+trying to enable the subchannel.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20180114020412.26160-2-f4bug@amsat.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit b850f664a1dbbc1ea27bef12cd251ee5da0bfe05)
-*prereq for 0c53057adb
+To fix this, just don't do anything in css_conditional_io_interrupt()
+if the subchannel is not enabled. The 3270 code will work fine with
+that, and the other user of this function (virtio-ccw) never
+attempts to post an interrupt for a disabled device to begin with.
+
+CC: qemu-stable@nongnu.org
+Reported-by: Thomas Huth <thuth@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+(cherry picked from commit 6e9c893ecd00afd5344c35d0d0ded50eaa0938f6)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- include/hw/qdev-core.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/s390x/css.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 0a71bf83f0..83db53b3f5 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -32,9 +32,9 @@ typedef enum DeviceCategory {
- 
- typedef int (*qdev_initfn)(DeviceState *dev);
- typedef int (*qdev_event)(DeviceState *dev);
--typedef void (*qdev_resetfn)(DeviceState *dev);
- typedef void (*DeviceRealize)(DeviceState *dev, Error **errp);
- typedef void (*DeviceUnrealize)(DeviceState *dev, Error **errp);
-+typedef void (*DeviceReset)(DeviceState *dev);
- typedef void (*BusRealize)(BusState *bus, Error **errp);
- typedef void (*BusUnrealize)(BusState *bus, Error **errp);
- 
-@@ -117,7 +117,7 @@ typedef struct DeviceClass {
-     bool hotpluggable;
- 
-     /* callbacks */
--    void (*reset)(DeviceState *dev);
-+    DeviceReset reset;
-     DeviceRealize realize;
-     DeviceUnrealize unrealize;
- 
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index f6b5c807cd..f530080243 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -618,6 +618,14 @@ void css_inject_io_interrupt(SubchDev *sch)
+ void css_conditional_io_interrupt(SubchDev *sch)
+ {
+     /*
++     * If the subchannel is not enabled, it is not made status pending
++     * (see PoP p. 16-17, "Status Control").
++     */
++    if (!(sch->curr_status.pmcw.flags & PMCW_FLAGS_MASK_ENA)) {
++        return;
++    }
++
++    /*
+      * If the subchannel is not currently status pending, make it pending
+      * with alert status.
+      */
 -- 
 2.11.0
