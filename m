@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVGte-00034T-27
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:42:13 -0400
+	(envelope-from <david@redhat.com>) id 1fVGtd-000340-ID
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:42:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVGtc-0004Jk-T5
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:42:10 -0400
+	(envelope-from <david@redhat.com>) id 1fVGta-0004JG-Ju
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:42:09 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 19 Jun 2018 15:41:37 +0200
-Message-Id: <20180619134141.29478-9-david@redhat.com>
+Date: Tue, 19 Jun 2018 15:41:36 +0200
+Message-Id: <20180619134141.29478-8-david@redhat.com>
 In-Reply-To: <20180619134141.29478-1-david@redhat.com>
 References: <20180619134141.29478-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 08/12] pc-dimm: merge
- get_(vmstate_)memory_region()
+Subject: [Qemu-devel] [PATCH v5 07/12] hostmem: drop error variable from
+ host_memory_backend_get_memory()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +23,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-Importantly, get_vmstate_memory_region() should also fail with a proper
-error if called before the device is realized. For a PCDIMM, both functions
-are to return the same thing, so share the implementation.
-
-All current users are called after the device has been realized, so we
-can expect the calls to succeed.
+Unused, so let's remove it.
 
 Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/mem/pc-dimm.c         | 13 +++++--------
- include/hw/mem/pc-dimm.h |  3 ++-
- 2 files changed, 7 insertions(+), 9 deletions(-)
+ backends/hostmem.c       | 3 +--
+ hw/mem/nvdimm.c          | 4 ++--
+ hw/mem/pc-dimm.c         | 4 ++--
+ hw/misc/ivshmem.c        | 3 +--
+ include/sysemu/hostmem.h | 3 +--
+ numa.c                   | 3 +--
+ 6 files changed, 8 insertions(+), 12 deletions(-)
 
-diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-index 73f0eee4c7..4ff39b59ef 100644
---- a/hw/mem/pc-dimm.c
-+++ b/hw/mem/pc-dimm.c
-@@ -35,7 +35,8 @@ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
-     int slot;
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
-+    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
-+                                                              &error_abort);
-     Error *local_err = NULL;
-     MemoryRegion *mr;
-     uint64_t addr;
-@@ -90,7 +91,8 @@ void pc_dimm_unplug(DeviceState *dev, MachineState *machine)
- {
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
--    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
-+    MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
-+                                                              &error_abort);
-     MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
- 
-     memory_device_unplug_region(machine, mr);
-@@ -229,11 +231,6 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
-     return host_memory_backend_get_memory(dimm->hostmem);
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index 3627e61584..4908946cd3 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -247,8 +247,7 @@ bool host_memory_backend_mr_inited(HostMemoryBackend *backend)
+     return memory_region_size(&backend->mr) != 0;
  }
  
--static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
--{
--    return host_memory_backend_get_memory(dimm->hostmem);
--}
--
- static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+-MemoryRegion *
+-host_memory_backend_get_memory(HostMemoryBackend *backend, Error **errp)
++MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend)
  {
-     const PCDIMMDevice *dimm = PC_DIMM(md);
-@@ -298,7 +295,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
-     dc->desc = "DIMM memory module";
+     return host_memory_backend_mr_inited(backend) ? &backend->mr : NULL;
+ }
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index f974accbdd..df9716231f 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -105,7 +105,7 @@ static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
  
-     ddc->get_memory_region = pc_dimm_get_memory_region;
--    ddc->get_vmstate_memory_region = pc_dimm_get_vmstate_memory_region;
-+    ddc->get_vmstate_memory_region = pc_dimm_get_memory_region;
+ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
+ {
+-    MemoryRegion *mr = host_memory_backend_get_memory(dimm->hostmem, errp);
++    MemoryRegion *mr = host_memory_backend_get_memory(dimm->hostmem);
+     NVDIMMDevice *nvdimm = NVDIMM(dimm);
+     uint64_t align, pmem_size, size = memory_region_size(mr);
  
-     mdc->get_addr = pc_dimm_md_get_addr;
-     /* for a dimm plugged_size == region_size */
-diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-index cf71247630..5679a80465 100644
---- a/include/hw/mem/pc-dimm.h
-+++ b/include/hw/mem/pc-dimm.h
-@@ -73,7 +73,8 @@ typedef struct PCDIMMDeviceClass {
-     /* public */
-     void (*realize)(PCDIMMDevice *dimm, Error **errp);
-     MemoryRegion *(*get_memory_region)(PCDIMMDevice *dimm, Error **errp);
--    MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm);
-+    MemoryRegion *(*get_vmstate_memory_region)(PCDIMMDevice *dimm,
-+                                               Error **errp);
- } PCDIMMDeviceClass;
+@@ -161,7 +161,7 @@ static void nvdimm_write_label_data(NVDIMMDevice *nvdimm, const void *buf,
  
- void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+     memcpy(nvdimm->label_data + offset, buf, size);
+ 
+-    mr = host_memory_backend_get_memory(dimm->hostmem, &error_abort);
++    mr = host_memory_backend_get_memory(dimm->hostmem);
+     backend_offset = memory_region_size(mr) - nvdimm->label_size + offset;
+     memory_region_set_dirty(mr, backend_offset, size);
+ }
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 7387963cf1..73f0eee4c7 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -226,12 +226,12 @@ static MemoryRegion *pc_dimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
+         return NULL;
+     }
+ 
+-    return host_memory_backend_get_memory(dimm->hostmem, errp);
++    return host_memory_backend_get_memory(dimm->hostmem);
+ }
+ 
+ static MemoryRegion *pc_dimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
+ {
+-    return host_memory_backend_get_memory(dimm->hostmem, &error_abort);
++    return host_memory_backend_get_memory(dimm->hostmem);
+ }
+ 
+ static uint64_t pc_dimm_md_get_addr(const MemoryDeviceState *md)
+diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
+index 16f03701b7..ee01c5e66b 100644
+--- a/hw/misc/ivshmem.c
++++ b/hw/misc/ivshmem.c
+@@ -909,8 +909,7 @@ static void ivshmem_common_realize(PCIDevice *dev, Error **errp)
+     if (s->hostmem != NULL) {
+         IVSHMEM_DPRINTF("using hostmem\n");
+ 
+-        s->ivshmem_bar2 = host_memory_backend_get_memory(s->hostmem,
+-                                                         &error_abort);
++        s->ivshmem_bar2 = host_memory_backend_get_memory(s->hostmem);
+     } else {
+         Chardev *chr = qemu_chr_fe_get_driver(&s->server_chr);
+         assert(chr);
+diff --git a/include/sysemu/hostmem.h b/include/sysemu/hostmem.h
+index 5beb0ef8ab..6e6bd2c1cb 100644
+--- a/include/sysemu/hostmem.h
++++ b/include/sysemu/hostmem.h
+@@ -62,8 +62,7 @@ struct HostMemoryBackend {
+ };
+ 
+ bool host_memory_backend_mr_inited(HostMemoryBackend *backend);
+-MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend,
+-                                             Error **errp);
++MemoryRegion *host_memory_backend_get_memory(HostMemoryBackend *backend);
+ 
+ void host_memory_backend_set_mapped(HostMemoryBackend *backend, bool mapped);
+ bool host_memory_backend_is_mapped(HostMemoryBackend *backend);
+diff --git a/numa.c b/numa.c
+index 33572bfa74..94f758c757 100644
+--- a/numa.c
++++ b/numa.c
+@@ -523,8 +523,7 @@ void memory_region_allocate_system_memory(MemoryRegion *mr, Object *owner,
+         if (!backend) {
+             continue;
+         }
+-        MemoryRegion *seg = host_memory_backend_get_memory(backend,
+-                                                           &error_fatal);
++        MemoryRegion *seg = host_memory_backend_get_memory(backend);
+ 
+         if (memory_region_is_mapped(seg)) {
+             char *path = object_get_canonical_path_component(OBJECT(backend));
 -- 
 2.17.1
