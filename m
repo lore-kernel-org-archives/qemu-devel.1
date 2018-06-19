@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVK5e-0008Et-Tq
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:06:48 -0400
+	(envelope-from <mst@redhat.com>) id 1fVKMe-0007Uf-Ox
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:24:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVK5b-0000dJ-IP
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:06:46 -0400
-References: <20180618144800.555-1-david@redhat.com>
-	<20180618144800.555-3-david@redhat.com>
-	<20180619175940.00ae5e70@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <1c0de15c-0bbd-1714-782a-00928f3064fe@redhat.com>
-Date: Tue, 19 Jun 2018 19:06:38 +0200
+	(envelope-from <mst@redhat.com>) id 1fVKMa-0008Fe-Mp
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:24:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48840 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fVKMa-0008Es-G5
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:24:16 -0400
+Date: Tue, 19 Jun 2018 20:24:12 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180619202118-mutt-send-email-mst@kernel.org>
+References: <20180619163228.13790-1-venu.busireddy@oracle.com>
+	<20180619163228.13790-3-venu.busireddy@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20180619175940.00ae5e70@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 2/4] machine: factor out
- enforce_aligned_dimm into memory_device_align
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180619163228.13790-3-venu.busireddy@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] Add "Group Identifier" support to PCIe
+ bridges.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,236 +28,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Venu Busireddy <venu.busireddy@oracle.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On 19.06.2018 17:59, Igor Mammedov wrote:
-> On Mon, 18 Jun 2018 16:47:58 +0200
-> David Hildenbrand <david@redhat.com> wrote:
->=20
->> We want to handle memory device address assignment without passing
->> compatibility parameters ("*align").
->>
->> As x86 and Power use different strategies to determine an alignment an=
-d
->> we need clean support for compat handling, let's introduce an enum on
->> the machine class level. This is the machine configuration on how to
->> align memory devices in guest physical memory.
->>
->> The three introduced types represent what is being done on x86 and Pow=
-er
->> right now.
->=20
-> commit message doesn't deliver purpose of the path,
+On Tue, Jun 19, 2018 at 11:32:26AM -0500, Venu Busireddy wrote:
+> Add a "Vendor-Specific" capability to the PCIe bridge, to contain the
+> "Group Identifier" (UUID) that will be used to pair a virtio device with
+> the passthrough device attached to that bridge.
+> 
+> This capability is added to the bridge iff the "uuid" option is specified
+> for the bridge device, via the qemu command line. Also, the bridge's
+> Device ID is changed to PCI_VENDOR_ID_REDHAT, and Vendor ID is changed
+> to PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE (from the default values), when the
+> "uuid" option is present.
+> 
+> Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
 
-"We want to handle memory device address assignment without passing
-compatibility parameters ("*align")."
-
-So in order to do patch nr 4 without this, I would basically have to
-move the align parameter to pc_dimm_pre_plug, along with the code for
-"detecting" the alignment in e.g. pc_memory_plug. And I want to avoid
-this because ...
-
-> So I'm no conviced it's necessary.
-> we probably discussed it in previous revisions but could you reiterate
-> it here WHY do you need this and 3/4
->=20
-
-.. I want to get rid of the align parameter in the long run. Alignment
-is some memory device specific property that can be easily detected
-using a detection configuration (this patch). This approach looks much
-cleaner to me. This way we can use the same alignment strategy for all
-memory devices.
-
-In follow up series I want to factor out address assignment completely
-into memory_device_pre_plug(). And I also don't want to have an align
-parameter at that function. I want to avoid moving the same code around
-two times (pc.c).
-
-> =20
->=20
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/core/machine.c    |  3 +++
->>  hw/i386/pc.c         | 13 +++++++------
->>  hw/i386/pc_piix.c    |  2 +-
->>  include/hw/boards.h  | 13 +++++++++++++
->>  include/hw/i386/pc.h |  3 ---
->>  5 files changed, 24 insertions(+), 10 deletions(-)
->>
->> diff --git a/hw/core/machine.c b/hw/core/machine.c
->> index 617e5f8d75..d34b205125 100644
->> --- a/hw/core/machine.c
->> +++ b/hw/core/machine.c
->> @@ -531,6 +531,9 @@ static void machine_class_init(ObjectClass *oc, vo=
-id *data)
->>      mc->numa_mem_align_shift =3D 23;
->>      mc->numa_auto_assign_ram =3D numa_default_auto_assign_ram;
->> =20
->> +    /* Default: use memory region alignment as memory devices alignme=
-nt */
->> +    mc->memory_device_align =3D MEMORY_DEVICE_ALIGN_REGION;
->> +
->>      object_class_property_add_str(oc, "accel",
->>          machine_get_accel, machine_set_accel, &error_abort);
->>      object_class_property_set_description(oc, "accel",
->> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index bf986baf91..04a97e89e7 100644
->> --- a/hw/i386/pc.c
->> +++ b/hw/i386/pc.c
->> @@ -1331,6 +1331,7 @@ void pc_memory_init(PCMachineState *pcms,
->>      FWCfgState *fw_cfg;
->>      MachineState *machine =3D MACHINE(pcms);
->>      PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
->> +    MachineClass *mc =3D MACHINE_GET_CLASS(machine);
->> =20
->>      assert(machine->ram_size =3D=3D pcms->below_4g_mem_size +
->>                                  pcms->above_4g_mem_size);
->> @@ -1363,8 +1364,6 @@ void pc_memory_init(PCMachineState *pcms,
->>      if (!pcmc->has_reserved_memory &&
->>          (machine->ram_slots ||
->>           (machine->maxram_size > machine->ram_size))) {
->> -        MachineClass *mc =3D MACHINE_GET_CLASS(machine);
->> -
->>          error_report("\"-memory 'slots|maxmem'\" is not supported by:=
- %s",
->>                       mc->name);
->>          exit(EXIT_FAILURE);
->> @@ -1394,7 +1393,7 @@ void pc_memory_init(PCMachineState *pcms,
->>          machine->device_memory->base =3D
->>              ROUND_UP(0x100000000ULL + pcms->above_4g_mem_size, 1ULL <=
-< 30);
->> =20
->> -        if (pcmc->enforce_aligned_dimm) {
->> +        if (mc->memory_device_align !=3D MEMORY_DEVICE_ALIGN_PAGE) {
->>              /* size device region assuming 1G page max alignment per =
-slot */
->>              device_mem_size +=3D (1ULL << 30) * machine->ram_slots;
->>          }
->> @@ -1705,14 +1704,16 @@ static void pc_memory_plug(HotplugHandler *hot=
-plug_dev,
->>      HotplugHandlerClass *hhc;
->>      Error *local_err =3D NULL;
->>      PCMachineState *pcms =3D PC_MACHINE(hotplug_dev);
->> -    PCMachineClass *pcmc =3D PC_MACHINE_GET_CLASS(pcms);
->> +    MachineClass *mc =3D MACHINE_GET_CLASS(hotplug_dev);
->>      PCDIMMDevice *dimm =3D PC_DIMM(dev);
->>      PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
->>      MemoryRegion *mr =3D ddc->get_memory_region(dimm, &error_abort);
->>      uint64_t align =3D TARGET_PAGE_SIZE;
->>      bool is_nvdimm =3D object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->> =20
->> -    if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm=
-) {
->> +
->> +    if (memory_region_get_alignment(mr) &&
->> +        mc->memory_device_align !=3D MEMORY_DEVICE_ALIGN_PAGE) {
->>          align =3D memory_region_get_alignment(mr);
->>      }
->> =20
->> @@ -2374,7 +2375,6 @@ static void pc_machine_class_init(ObjectClass *o=
-c, void *data)
->>      pcmc->gigabyte_align =3D true;
->>      pcmc->has_reserved_memory =3D true;
->>      pcmc->kvmclock_enabled =3D true;
->> -    pcmc->enforce_aligned_dimm =3D true;
->>      /* BIOS ACPI tables: 128K. Other BIOS datastructures: less than 4=
-K reported
->>       * to be used at the moment, 32K should be enough for a while.  *=
-/
->>      pcmc->acpi_data_size =3D 0x20000 + 0x8000;
->> @@ -2398,6 +2398,7 @@ static void pc_machine_class_init(ObjectClass *o=
-c, void *data)
->>      hc->unplug =3D pc_machine_device_unplug_cb;
->>      nc->nmi_monitor_handler =3D x86_nmi;
->>      mc->default_cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
->> +    mc->memory_device_align =3D MEMORY_DEVICE_ALIGN_REGION_OR_PAGE;
->> =20
->>      object_class_property_add(oc, PC_MACHINE_DEVMEM_REGION_SIZE, "int=
-",
->>          pc_machine_get_device_memory_region_size, NULL,
->> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
->> index 3b87f3cedb..cc11856c24 100644
->> --- a/hw/i386/pc_piix.c
->> +++ b/hw/i386/pc_piix.c
->> @@ -566,7 +566,7 @@ static void pc_i440fx_2_1_machine_options(MachineC=
-lass *m)
->>      m->default_display =3D NULL;
->>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_1);
->>      pcmc->smbios_uuid_encoded =3D false;
->> -    pcmc->enforce_aligned_dimm =3D false;
->> +    m->memory_device_align =3D MEMORY_DEVICE_ALIGN_PAGE;
->>  }
->> =20
->>  DEFINE_I440FX_MACHINE(v2_1, "pc-i440fx-2.1", pc_compat_2_1,
->> diff --git a/include/hw/boards.h b/include/hw/boards.h
->> index ef7457f5dd..3f151207c1 100644
->> --- a/include/hw/boards.h
->> +++ b/include/hw/boards.h
->> @@ -105,6 +105,15 @@ typedef struct {
->>      CPUArchId cpus[0];
->>  } CPUArchIdList;
->> =20
->> +typedef enum MemoryDeviceAlign {
->> +    /* use specified memory region alignment */
->> +    MEMORY_DEVICE_ALIGN_REGION =3D 0,
->> +    /* use target page size as alignment */
->> +    MEMORY_DEVICE_ALIGN_PAGE,
->> +    /* use target page size if no memory region alignment has been sp=
-ecified */
->> +    MEMORY_DEVICE_ALIGN_REGION_OR_PAGE,
->> +} MemoryDeviceAlign;
->> +
->>  /**
->>   * MachineClass:
->>   * @max_cpus: maximum number of CPUs supported. Default: 1
->> @@ -156,6 +165,9 @@ typedef struct {
->>   *    should instead use "unimplemented-device" for all memory ranges=
- where
->>   *    the guest will attempt to probe for a device that QEMU doesn't
->>   *    implement and a stub device is required.
->> + * @memory_device_align: The alignment that will be used as default w=
-hen
->> + *    searching for a guest physical memory address while plugging a
->> + *    memory device. This is relevant for compatibility handling.
->>   */
->>  struct MachineClass {
->>      /*< private >*/
->> @@ -202,6 +214,7 @@ struct MachineClass {
->>      const char **valid_cpu_types;
->>      strList *allowed_dynamic_sysbus_devices;
->>      bool auto_enable_numa_with_memhp;
->> +    MemoryDeviceAlign memory_device_align;
->>      void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
->>                                   int nb_nodes, ram_addr_t size);
->> =20
->> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
->> index fc8dedca12..ffb4654fc8 100644
->> --- a/include/hw/i386/pc.h
->> +++ b/include/hw/i386/pc.h
->> @@ -86,8 +86,6 @@ struct PCMachineState {
->>   *
->>   * Compat fields:
->>   *
->> - * @enforce_aligned_dimm: check that DIMM's address/size is aligned b=
-y
->> - *                        backend's alignment value if provided
->>   * @acpi_data_size: Size of the chunk of memory at the top of RAM
->>   *                  for the BIOS ACPI tables and other BIOS
->>   *                  datastructures.
->> @@ -124,7 +122,6 @@ struct PCMachineClass {
->>      /* RAM / address space compat: */
->>      bool gigabyte_align;
->>      bool has_reserved_memory;
->> -    bool enforce_aligned_dimm;
->>      bool broken_reserved_end;
->> =20
->>      /* TSC rate migration: */
->=20
+I don't see why we should add it to all bridges.
+Let's just add it to ones that already have the RH vendor ID?
 
 
---=20
-
-Thanks,
-
-David / dhildenb
+> ---
+>  hw/pci-bridge/ioh3420.c        |  2 ++
+>  hw/pci-bridge/pcie_root_port.c |  7 +++++++
+>  hw/pci/pci_bridge.c            | 32 ++++++++++++++++++++++++++++++++
+>  include/hw/pci/pci.h           |  2 ++
+>  include/hw/pci/pcie.h          |  1 +
+>  include/hw/pci/pcie_port.h     |  1 +
+>  6 files changed, 45 insertions(+)
+> 
+> diff --git a/hw/pci-bridge/ioh3420.c b/hw/pci-bridge/ioh3420.c
+> index a451d74ee6..b6b9ebc726 100644
+> --- a/hw/pci-bridge/ioh3420.c
+> +++ b/hw/pci-bridge/ioh3420.c
+> @@ -35,6 +35,7 @@
+>  #define IOH_EP_MSI_SUPPORTED_FLAGS      PCI_MSI_FLAGS_MASKBIT
+>  #define IOH_EP_MSI_NR_VECTOR            2
+>  #define IOH_EP_EXP_OFFSET               0x90
+> +#define IOH_EP_VENDOR_OFFSET            0xCC
+>  #define IOH_EP_AER_OFFSET               0x100
+>  
+>  /*
+> @@ -111,6 +112,7 @@ static void ioh3420_class_init(ObjectClass *klass, void *data)
+>      rpc->exp_offset = IOH_EP_EXP_OFFSET;
+>      rpc->aer_offset = IOH_EP_AER_OFFSET;
+>      rpc->ssvid_offset = IOH_EP_SSVID_OFFSET;
+> +    rpc->vendor_offset = IOH_EP_VENDOR_OFFSET;
+>      rpc->ssid = IOH_EP_SSVID_SSID;
+>  }
+>  
+> diff --git a/hw/pci-bridge/pcie_root_port.c b/hw/pci-bridge/pcie_root_port.c
+> index 45f9e8cd4a..ba470c7fda 100644
+> --- a/hw/pci-bridge/pcie_root_port.c
+> +++ b/hw/pci-bridge/pcie_root_port.c
+> @@ -71,6 +71,12 @@ static void rp_realize(PCIDevice *d, Error **errp)
+>          goto err_bridge;
+>      }
+>  
+> +    rc = pci_bridge_vendor_init(d, rpc->vendor_offset, errp);
+> +    if (rc < 0) {
+> +        error_append_hint(errp, "Can't init group ID, error %d\n", rc);
+> +        goto err_bridge;
+> +    }
+> +
+>      if (rpc->interrupts_init) {
+>          rc = rpc->interrupts_init(d, errp);
+>          if (rc < 0) {
+> @@ -137,6 +143,7 @@ static void rp_exit(PCIDevice *d)
+>  static Property rp_props[] = {
+>      DEFINE_PROP_BIT(COMPAT_PROP_PCP, PCIDevice, cap_present,
+>                      QEMU_PCIE_SLTCAP_PCP_BITNR, true),
+> +    DEFINE_PROP_UUID(COMPAT_PROP_UUID, PCIDevice, uuid, false),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>  
+> diff --git a/hw/pci/pci_bridge.c b/hw/pci/pci_bridge.c
+> index 40a39f57cb..c63bc439f7 100644
+> --- a/hw/pci/pci_bridge.c
+> +++ b/hw/pci/pci_bridge.c
+> @@ -34,12 +34,17 @@
+>  #include "hw/pci/pci_bus.h"
+>  #include "qemu/range.h"
+>  #include "qapi/error.h"
+> +#include "qemu/uuid.h"
+>  
+>  /* PCI bridge subsystem vendor ID helper functions */
+>  #define PCI_SSVID_SIZEOF        8
+>  #define PCI_SSVID_SVID          4
+>  #define PCI_SSVID_SSID          6
+>  
+> +#define PCI_VENDOR_SIZEOF             20
+> +#define PCI_VENDOR_CAP_LEN_OFFSET      2
+> +#define PCI_VENDOR_GROUP_ID_OFFSET     4
+> +
+>  int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+>                            uint16_t svid, uint16_t ssid,
+>                            Error **errp)
+> @@ -57,6 +62,33 @@ int pci_bridge_ssvid_init(PCIDevice *dev, uint8_t offset,
+>      return pos;
+>  }
+>  
+> +int pci_bridge_vendor_init(PCIDevice *d, uint8_t offset, Error **errp)
+> +{
+> +    int pos;
+> +    PCIDeviceClass *dc = PCI_DEVICE_GET_CLASS(d);
+> +
+> +    if (qemu_uuid_is_null(&d->uuid)) {
+> +        return 0;
+> +    }
+> +
+> +    pos = pci_add_capability(d, PCI_CAP_ID_VNDR, offset, PCI_VENDOR_SIZEOF,
+> +            errp);
+> +    if (pos < 0) {
+> +        return pos;
+> +    }
+> +
+> +    dc->vendor_id = PCI_VENDOR_ID_REDHAT;
+> +    dc->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
+> +    pci_set_word(d->config + PCI_VENDOR_ID, PCI_VENDOR_ID_REDHAT);
+> +    pci_set_word(d->config + PCI_DEVICE_ID, PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE);
+> +
+> +    pci_set_word(d->config + pos + PCI_VENDOR_CAP_LEN_OFFSET,
+> +            PCI_VENDOR_SIZEOF);
+> +    memcpy(d->config + offset + PCI_VENDOR_GROUP_ID_OFFSET, &d->uuid,
+> +            sizeof(QemuUUID));
+> +    return pos;
+> +}
+> +
+>  /* Accessor function to get parent bridge device from pci bus. */
+>  PCIDevice *pci_bridge_get_device(PCIBus *bus)
+>  {
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index 990d6fcbde..ee234c5a6f 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -4,6 +4,7 @@
+>  #include "hw/qdev.h"
+>  #include "exec/memory.h"
+>  #include "sysemu/dma.h"
+> +#include "qemu/uuid.h"
+>  
+>  /* PCI includes legacy ISA access.  */
+>  #include "hw/isa/isa.h"
+> @@ -343,6 +344,7 @@ struct PCIDevice {
+>      bool has_rom;
+>      MemoryRegion rom;
+>      uint32_t rom_bar;
+> +    QemuUUID uuid;
+>  
+>      /* INTx routing notifier */
+>      PCIINTxRoutingNotifier intx_routing_notifier;
+> diff --git a/include/hw/pci/pcie.h b/include/hw/pci/pcie.h
+> index b71e369703..b4189d0ce3 100644
+> --- a/include/hw/pci/pcie.h
+> +++ b/include/hw/pci/pcie.h
+> @@ -82,6 +82,7 @@ struct PCIExpressDevice {
+>  };
+>  
+>  #define COMPAT_PROP_PCP "power_controller_present"
+> +#define COMPAT_PROP_UUID "uuid"
+>  
+>  /* PCI express capability helper functions */
+>  int pcie_cap_init(PCIDevice *dev, uint8_t offset, uint8_t type,
+> diff --git a/include/hw/pci/pcie_port.h b/include/hw/pci/pcie_port.h
+> index 0736014bfd..40db6dbbe7 100644
+> --- a/include/hw/pci/pcie_port.h
+> +++ b/include/hw/pci/pcie_port.h
+> @@ -74,6 +74,7 @@ typedef struct PCIERootPortClass {
+>      int exp_offset;
+>      int aer_offset;
+>      int ssvid_offset;
+> +    int vendor_offset;
+>      int ssid;
+>  } PCIERootPortClass;
+>  
