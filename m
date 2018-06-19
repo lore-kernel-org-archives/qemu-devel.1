@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1fVEvv-0002NI-OO
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:36:24 -0400
+	(envelope-from <armbru@redhat.com>) id 1fVF4J-0006Lf-VK
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:45:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1fVEvs-0006RT-LP
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:36:23 -0400
-Received: from 9pmail.ess.barracuda.com ([64.235.154.211]:60704)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Yongbok.Kim@mips.com>)
-	id 1fVEvs-00068X-C9
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:36:20 -0400
-References: <1529346580-25537-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Yongbok Kim <yongbok.kim@mips.com>
-Message-ID: <33eb9ed9-fab0-faec-ef3d-57e4efa564b6@mips.com>
-Date: Tue, 19 Jun 2018 12:35:24 +0100
+	(envelope-from <armbru@redhat.com>) id 1fVF4F-0001ko-Lx
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 07:45:04 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180619085631.2859-1-aik@ozlabs.ru>
+Date: Tue, 19 Jun 2018 13:44:56 +0200
+In-Reply-To: <20180619085631.2859-1-aik@ozlabs.ru> (Alexey Kardashevskiy's
+	message of "Tue, 19 Jun 2018 18:56:31 +1000")
+Message-ID: <87sh5jvw3r.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1529346580-25537-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-GB
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: update target-mips maintainers
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH qemu] xics-kvm: Fix compile warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,55 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, aurelien@aurel32.net, rich.fuhler@mips.com, petar.jovanovic@mips.com, aleksandar.markovic@mips.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On 18/06/2018 19:29, Aleksandar Markovic wrote:
-> From: Aleksandar Markovic <aleksandar.markovic@mips.com>
+Alexey Kardashevskiy <aik@ozlabs.ru> writes:
+
+> This fixes uninitialized variable warning:
 >
-> Yongbok Kim transfers duties of QEMU for target MIPS maintainer to
-> myself as he leaves MIPS. Many thanks to Yongbok for his substantial
-> contributing to QEMU for MIPS over many years and taking care of its
-> maintainance for almost two years.
+> /home/aik/p/qemu/hw/intc/xics_kvm.c: In function =E2=80=98ics_set_kvm_sta=
+te=E2=80=99:
+> /home/aik/p/qemu/hw/intc/xics_kvm.c:281:20: warning: =E2=80=98ret=E2=80=
+=99 may be used uninitialized in this function [-Wmaybe-uninitialized]
+>              return ret;
+>                     ^~~
 >
-> Signed-off-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
+> Discovered with gcc (Ubuntu 7.3.0-16ubuntu3) 7.3.0 from Ubuntu 18.04.
+>
+> Fixes: bf358b541b8 "xics_kvm: use KVM helpers"
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 > ---
->   MAINTAINERS | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+>  hw/intc/xics_kvm.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0fb5f38..b81a93b 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -185,7 +185,7 @@ F: disas/microblaze.c
->   
->   MIPS
->   M: Aurelien Jarno <aurelien@aurel32.net>
-> -M: Yongbok Kim <yongbok.kim@mips.com>
-> +M: Aleksandar Markovic <aleksandar.markovic@mips.com>
->   S: Maintained
->   F: target/mips/
->   F: hw/mips/
-> @@ -696,7 +696,7 @@ S: Maintained
->   F: hw/mips/mips_malta.c
->   
->   Mipssim
-> -M: Yongbok Kim <yongbok.kim@mips.com>
-> +M: Aleksandar Markovic <aleksandar.markovic@mips.com>
->   S: Odd Fixes
->   F: hw/mips/mips_mipssim.c
->   F: hw/net/mipsnet.c
-> @@ -707,7 +707,7 @@ S: Maintained
->   F: hw/mips/mips_r4k.c
->   
->   Fulong 2E
-> -M: Yongbok Kim <yongbok.kim@mips.com>
-> +M: Aleksandar Markovic <aleksandar.markovic@mips.com>
->   S: Odd Fixes
->   F: hw/mips/mips_fulong2e.c
->   F: hw/isa/vt82c686.c
+> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
+> index 8bdf6af..48efbce 100644
+> --- a/hw/intc/xics_kvm.c
+> +++ b/hw/intc/xics_kvm.c
+> @@ -273,8 +273,8 @@ static int ics_set_kvm_state(ICSState *ics, int versi=
+on_id)
+>                  state |=3D KVM_XICS_QUEUED;
+>          }
+>=20=20
+> -        kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURCES,
+> -                          i + ics->offset, &state, true, &local_err);
+> +        ret =3D kvm_device_access(kernel_xics_fd, KVM_DEV_XICS_GRP_SOURC=
+ES,
+> +                                i + ics->offset, &state, true, &local_er=
+r);
+>          if (local_err) {
+>              error_report("Unable to restore KVM interrupt controller sta=
+te"
+>                      " for IRQs %d: %s", i + ics->offset, strerror(errno)=
+);
+               return ret;
+           }
 
-Thanks Aleksandar.
-Can you send this patch with your mips.com account again?
-Otherwise,
-Acked-by: Yongbok Kim <yongbok.kim@mips.com>
+Unless all callers effectively ignore the return value, this fixes a
+bug, not just a compiler warning.  Recommend to check callers to find
+the bug's impact, and document it in your commit message.
+
+Messed up in commit bf358b541b8.  Would be nice to mention that in your
+commit message.
+
+Also messed up there: leaks local_err.  Please fix that, too.
