@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVBes-0001ll-CE
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:06:36 -0400
+	(envelope-from <armbru@redhat.com>) id 1fVBhN-0002il-QI
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:09:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVBen-0002Bd-BR
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:06:34 -0400
-References: <20180618142536.23995-1-david@redhat.com>
-	<20180618142536.23995-11-david@redhat.com>
-	<20180619085448.65e009a1@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <cd3dbdae-0d00-e2ac-7394-4c85ed8524e4@redhat.com>
-Date: Tue, 19 Jun 2018 10:06:19 +0200
+	(envelope-from <armbru@redhat.com>) id 1fVBhI-0002uG-D4
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:09:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49540 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVBhI-0002u5-8T
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:09:04 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D6A1387A7C
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 08:09:03 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
+	<20180321115211.17937-5-marcandre.lureau@redhat.com>
+Date: Tue, 19 Jun 2018 10:09:02 +0200
+In-Reply-To: <20180321115211.17937-5-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 21 Mar 2018 12:51:26 +0100")
+Message-ID: <87lgbbyz8h.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180619085448.65e009a1@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 10/12] nvdimm: convert nvdimm_mr into a
- pointer
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 04/49] qapi: pass 'if' condition into
+ QAPISchemaEntity objects
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +36,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com
 
-On 19.06.2018 08:54, Igor Mammedov wrote:
-> On Mon, 18 Jun 2018 16:25:34 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> This way we can easily check if the region has already been inititalized
->> without having to rely on the size of an uninitialized region being 0.
->>
->> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/mem/nvdimm.c         | 9 +++++----
->>  include/hw/mem/nvdimm.h | 2 +-
->>  2 files changed, 6 insertions(+), 5 deletions(-)
->>
->> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
->> index 7260c9c6b1..db7d8c3050 100644
->> --- a/hw/mem/nvdimm.c
->> +++ b/hw/mem/nvdimm.c
->> @@ -43,7 +43,7 @@ static void nvdimm_set_label_size(Object *obj, Visitor *v, const char *name,
->>      Error *local_err = NULL;
->>      uint64_t value;
->>  
->> -    if (memory_region_size(&nvdimm->nvdimm_mr)) {
->> +    if (nvdimm->nvdimm_mr) {
->>          error_setg(&local_err, "cannot change property value");
->>          goto out;
->>      }
->> @@ -75,7 +75,7 @@ static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
->>  {
->>      NVDIMMDevice *nvdimm = NVDIMM(dimm);
->>  
->> -    return &nvdimm->nvdimm_mr;
->> +    return nvdimm->nvdimm_mr;
->>  }
->>  
->>  static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
->> @@ -102,9 +102,10 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
->>          return;
->>      }
->>  
->> -    memory_region_init_alias(&nvdimm->nvdimm_mr, OBJECT(dimm),
->> +    nvdimm->nvdimm_mr = g_new(MemoryRegion, 1);
-> missed leak,
-> you need to free this manually in unrealize() in this patch but
-> considering that the next patches would move this allocation before
-> realize, it has to be move to finalize(). So make a note in commit
-> message explaining why finalize() is used prematurely.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Very right, thanks. finalize() seems to be the right spot.
+> Built-in objects remain unconditional.  Explicitly defined objects
+> use the condition specified in the schema.  Implicitly defined
+> objects inherit their condition from their users.  For most of them,
+> there is exactly one user, so the condition to use is obvious.  The
+> exception is the wrapped type's generated for simple union variants,
 
-> 
-> probably no need to respin whole series, just send v5 of this patch
-> as reply here if change doesn't break series.
-> 
->> +    memory_region_init_alias(nvdimm->nvdimm_mr, OBJECT(dimm),
->>                               "nvdimm-memory", mr, 0, pmem_size);
->> -    nvdimm->nvdimm_mr.align = align;
->> +    nvdimm->nvdimm_mr->align = align;
->>  }
->>  
->>  /*
->> diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
->> index 9340631cfc..c5c9b3c7f8 100644
->> --- a/include/hw/mem/nvdimm.h
->> +++ b/include/hw/mem/nvdimm.h
->> @@ -74,7 +74,7 @@ struct NVDIMMDevice {
->>       * it's the PMEM region in NVDIMM device, which is presented to
->>       * guest via ACPI NFIT and _FIT method if NVDIMM hotplug is supported.
->>       */
->> -    MemoryRegion nvdimm_mr;
->> +    MemoryRegion *nvdimm_mr;
->>  
->>      /*
->>       * The 'on' value results in the unarmed flag set in ACPI NFIT,
-> 
+Editing accident in v4: you changed "is the wrapper types" to "is the
+wrapped type's" here instead of...
 
+> which can be shared by any number of simple unions.  The tight
+> condition would be the disjunction of the conditions of these simple
+> unions.  For now, use wrapped type's condition instead.  Much
 
--- 
+... changing "use wrapped type's" to "use the wrapped type's" here.  Can
+touch up on commit.
 
-Thanks,
+> simpler and good enough for now.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-David / dhildenb
+R-by stands.
