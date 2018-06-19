@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5gy-0000Rl-VZ
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:22 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5h0-0000UN-Tv
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5gx-0007ph-PF
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:21 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5gz-0007qd-Vj
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:22 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:43:18 -0500
-Message-Id: <20180619014319.28272-113-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:43:19 -0500
+Message-Id: <20180619014319.28272-114-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 112/113] iotests: Add test 221 to catch
- qemu-img map regression
+Subject: [Qemu-devel] [PATCH 113/113] arm_gicv3_kvm:
+ kvm_dist_get/put_priority: skip the registers banked by GICR_IPRIORITYR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,131 +22,61 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-stable@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Eric Blake <eblake@redhat.com>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
 
-Although qemu-img creates aligned files (by rounding up), it
-must also gracefully handle files that are not sector-aligned.
-Test that the bug fixed in the previous patch does not recur.
+While for_each_dist_irq_reg loop starts from GIC_INTERNAL, it forgot to
+offset the date array and index. This will overlap the GICR registers
+value and leave the last GIC_INTERNAL irq's registers out of update.
 
-It's a bit annoying that we can see the (implicit) hole past
-the end of the file on to the next sector boundary, so if we
-ever reach the point where we report a byte-accurate size rather
-than our current behavior of always rounding up, this test will
-probably need a slight modification.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-(cherry picked from commit c6a9d2f6f9bc0c163b3a3073126464a2446bad5f)
- Conflicts:
-	tests/qemu-iotests/group
-* drop context dep on tests not present in 2.11
+Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+(cherry picked from commit 1dcf3675196a1cec616ce71b067d9498590a60a6)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qemu-iotests/221     | 60 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/221.out | 16 +++++++++++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 77 insertions(+)
- create mode 100755 tests/qemu-iotests/221
- create mode 100644 tests/qemu-iotests/221.out
+ hw/intc/arm_gicv3_kvm.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/221 b/tests/qemu-iotests/221
-new file mode 100755
-index 0000000000..41c4e4bdf8
---- /dev/null
-+++ b/tests/qemu-iotests/221
-@@ -0,0 +1,60 @@
-+#!/bin/bash
-+#
-+# Test qemu-img vs. unaligned images
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+seq="$(basename $0)"
-+echo "QA output created by $seq"
-+
-+here="$PWD"
-+status=1 # failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt raw
-+_supported_proto file
-+_supported_os Linux
-+
-+echo
-+echo "=== Check mapping of unaligned raw image ==="
-+echo
-+
-+_make_test_img 43009 # qemu-img create rounds size up
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+truncate --size=43009 "$TEST_IMG" # so we resize it and check again
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+$QEMU_IO -c 'w 43008 1' "$TEST_IMG" | _filter_qemu_io # writing also rounds up
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+truncate --size=43009 "$TEST_IMG" # so we resize it and check again
-+$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
-+
-+# success, all done
-+echo '*** done'
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/221.out b/tests/qemu-iotests/221.out
-new file mode 100644
-index 0000000000..a9c0190aad
---- /dev/null
-+++ b/tests/qemu-iotests/221.out
-@@ -0,0 +1,16 @@
-+QA output created by 221
-+
-+=== Check mapping of unaligned raw image ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=43009
-+[{ "start": 0, "length": 43520, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
-+[{ "start": 0, "length": 43520, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
-+wrote 1/1 bytes at offset 43008
-+1 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+[{ "start": 0, "length": 40960, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+{ "start": 40960, "length": 2049, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 43009, "length": 511, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
-+[{ "start": 0, "length": 40960, "depth": 0, "zero": true, "data": false, "offset": OFFSET},
-+{ "start": 40960, "length": 2049, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
-+{ "start": 43009, "length": 511, "depth": 0, "zero": true, "data": false, "offset": OFFSET}]
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 3e688678dd..e6e793c951 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -197,3 +197,4 @@
- 197 rw auto quick
- 198 rw auto
- 200 rw auto
-+221 rw auto quick
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index 550fd13525..3fff4687ee 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -135,7 +135,14 @@ static void kvm_dist_get_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
+     uint32_t reg, *field;
+     int irq;
+ 
+-    field = (uint32_t *)bmp;
++    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
++     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
++     * functionality is replaced by GICR_IPRIORITYR<n>. It doesn't need to
++     * sync them. So it needs to skip the field of GIC_INTERNAL irqs in bmp and
++     * offset.
++     */
++    field = (uint32_t *)(bmp + GIC_INTERNAL);
++    offset += (GIC_INTERNAL * 8) / 8;
+     for_each_dist_irq_reg(irq, s->num_irq, 8) {
+         kvm_gicd_access(s, offset, &reg, false);
+         *field = reg;
+@@ -149,7 +156,14 @@ static void kvm_dist_put_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
+     uint32_t reg, *field;
+     int irq;
+ 
+-    field = (uint32_t *)bmp;
++    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
++     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
++     * functionality is replaced by GICR_IPRIORITYR<n>. It doesn't need to
++     * sync them. So it needs to skip the field of GIC_INTERNAL irqs in bmp and
++     * offset.
++     */
++    field = (uint32_t *)(bmp + GIC_INTERNAL);
++    offset += (GIC_INTERNAL * 8) / 8;
+     for_each_dist_irq_reg(irq, s->num_irq, 8) {
+         reg = *field;
+         kvm_gicd_access(s, offset, &reg, true);
 -- 
 2.11.0
