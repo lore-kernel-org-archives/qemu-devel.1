@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1fVOcg-0006Ks-Nh
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:57:11 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fVOdD-0006ZR-Dx
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:57:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brogers@suse.com>) id 1fVOcc-0002ze-Qv
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:57:10 -0400
-Message-Id: <5B297C2C020000480007E124@prv-mh.provo.novell.com>
-Date: Tue, 19 Jun 2018 15:57:00 -0600
-From: "Bruce Rogers" <brogers@suse.com>
-References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-Subject: Re: [Qemu-devel] [PATCH 00/113] Patch Round-up for stable 2.11.2,
- freeze on 2018-06-22
+	(envelope-from <no-reply@patchew.org>) id 1fVOd8-0003RC-KC
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:57:43 -0400
+Resent-Message-Id: <E1fVOd8-0003RC-KC@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21134)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fVOd8-0003MN-Bz
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:57:38 -0400
+In-Reply-To: <20180619193806.17419-1-danielhb413@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152944541677.795.974637064165086849@d39dc562802a>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 19 Jun 2018 14:56:57 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v1 0/6] QGA: systemd
+ hibernate/suspend/hybrid-sleep
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+To: danielhb413@gmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, mdroth@linux.vnet.ibm.com
 
->>> On 6/18/2018 at 7:41 PM, Michael Roth <mdroth@linux.vnet.ibm.com> =
-wrote:
-> Hi everyone,
->=20
-> The following new patches are queued for QEMU stable v2.11.2:
->=20
->   https://github.com/mdroth/qemu/commits/stable-2.11-staging=20
->=20
-> The release is planned for 2018-06-22:
->=20
->   https://wiki.qemu.org/Planning/2.11=20
->=20
-> Please respond here or CC qemu-stable@nongnu.org on any patches you
-> think should be included in the release.
->=20
-
-For openSUSE Leap 15's qemu package, based on v2.11.1, we
-also add these patches:=20
-
-commit bb223055b9b327ec66e1f6d2fbaebaee0b8f3dbe
-Author: Christian Borntraeger <borntraeger@de.ibm.com>
-Date:   Mon Dec 11 13:21:46 2017 +0100
-
-    s390-ccw-virtio: allow for systems larger that 7.999TB
-
-commit 05b71fb207ab7f016e067bd2a40fc0804362eb74
-Author: Marc-Andr=C3=83=C2=A9 Lureau <marcandre.lureau@redhat.com>
-Date:   Mon Jan 29 19:33:04 2018 +0100
-
-    tpm: lookup cancel path under tpm device class
-
-Bruce
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjE5MTkzODA2LjE3NDE5LTEtZGFuaWVsaGI0MTNAZ21haWwuY29tClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjEgMC82XSBRR0E6IHN5c3RlbWQgaGliZXJuYXRl
+L3N1c3BlbmQvaHlicmlkLXNsZWVwCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
+IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+YWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
+ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
+QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
+ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
+LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
+ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
+VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hl
+ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmNjNjk2ZjEwMDkgcWdhOiByZW1vdmluZyBiaW9zX3N1
+cHBvcnRzX21vZGUKZGM3MTJiYmVjMiBxZ2E6IGFkZGluZyBzeXN0ZW1kIGhpYmVybmF0ZS9zdXNw
+ZW5kL2h5YnJpZC1zbGVlcCBzdXBwb3J0CjNiZTQ1NmI3ZjEgcWdhOiByZW1vdmluZyBzd2l0Y2gg
+c3RhdGVtZW50cywgYWRkaW5nIHJ1bl9wcm9jZXNzX2NoaWxkCjMxY2YwZTZiMTUgcWdhOiBndWVz
+dF9zdXNwZW5kOiBkZWNvdXBsaW5nIHBtLXV0aWxzIGFuZCBzeXMgbG9naWMKMzE0ZDNhMDVjYSBx
+Z2E6IGJpb3Nfc3VwcG9ydHNfbW9kZTogZGVjb3VwbGluZyBwbS11dGlscyBhbmQgc3lzIGxvZ2lj
+CmRhMTM1YTdjOWYgcWdhOiByZWZhY3RvcmluZyBxbXBfZ3Vlc3Rfc3VzcGVuZF8qIGZ1bmN0aW9u
+cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS82OiBxZ2E6IHJlZmFjdG9y
+aW5nIHFtcF9ndWVzdF9zdXNwZW5kXyogZnVuY3Rpb25zLi4uCkNoZWNraW5nIFBBVENIIDIvNjog
+cWdhOiBiaW9zX3N1cHBvcnRzX21vZGU6IGRlY291cGxpbmcgcG0tdXRpbHMgYW5kIHN5cyBsb2dp
+Yy4uLgpDaGVja2luZyBQQVRDSCAzLzY6IHFnYTogZ3Vlc3Rfc3VzcGVuZDogZGVjb3VwbGluZyBw
+bS11dGlscyBhbmQgc3lzIGxvZ2ljLi4uCkNoZWNraW5nIFBBVENIIDQvNjogcWdhOiByZW1vdmlu
+ZyBzd2l0Y2ggc3RhdGVtZW50cywgYWRkaW5nIHJ1bl9wcm9jZXNzX2NoaWxkLi4uCkVSUk9SOiAi
+KGZvbyogY29uc3QqKSIgc2hvdWxkIGJlICIoZm9vICogY29uc3QqKSIKIzkxOiBGSUxFOiBxZ2Ev
+Y29tbWFuZHMtcG9zaXguYzoxNDY3OgorICAgICAgICBleGVjdmUoY21kX3BhdGgsIChjaGFyKiBj
+b25zdCopY29tbWFuZCwgZW52aXJvbik7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRo
+YXQgJyonIChjdHg6VnhCKQojOTE6IEZJTEU6IHFnYS9jb21tYW5kcy1wb3NpeC5jOjE0Njc6Cisg
+ICAgICAgIGV4ZWN2ZShjbWRfcGF0aCwgKGNoYXIqIGNvbnN0Kiljb21tYW5kLCBlbnZpcm9uKTsK
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMs
+IDAgd2FybmluZ3MsIDI5NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzY6IHFnYTogYWRkaW5nIHN5c3RlbWQgaGli
+ZXJuYXRlL3N1c3BlbmQvaHlicmlkLXNsZWVwIHN1cHBvcnQuLi4KQ2hlY2tpbmcgUEFUQ0ggNi82
+OiBxZ2E6IHJlbW92aW5nIGJpb3Nfc3VwcG9ydHNfbW9kZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0K
+ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBh
+dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
+ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
