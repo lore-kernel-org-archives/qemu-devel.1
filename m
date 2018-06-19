@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jD-0002lX-T7
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:40 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jD-0000S6-0r
+	(envelope-from <flukshun@gmail.com>) id 1fV5jB-0002kH-I2
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:39 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <flukshun@gmail.com>) id 1fV5jA-0000RW-GM
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:37 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:34 -0500
-Message-Id: <20180619014319.28272-69-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:42:33 -0500
+Message-Id: <20180619014319.28272-68-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 068/113] qxl: fix local renderer crash
+Subject: [Qemu-devel] [PATCH 067/113] spapr: don't advertise radix GTSE if
+ max-compat-cpu < power9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,41 +22,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+From: Greg Kurz <groug@kaod.org>
 
-Make sure we only ask the spice local renderer for display updates in
-case we have a valid primary surface.  Without that spice is confused
-and throws errors in case a display update request (triggered by
-screendump for example) happens in parallel to a mode switch and hits
-the race window where the old primary surface is gone and the new isn't
-establisted yet.
+On a POWER9 host, if a guest runs in pre POWER9 compat mode, it necessarily
+uses the hash MMU mode. In this case, we shouldn't advertise radix GTSE in
+the ibm,arch-vec-5-platform-support DT property as the current code does.
+The first reason is that it doesn't make sense, and the second one is that
+causes the CAS-negotiated options subsection to be migrated. This breaks
+backward migration to QEMU 2.7 and older versions on POWER8 hosts:
 
-Cc: qemu-stable@nongnu.org
-Fixes: https://bugzilla.redhat.com//show_bug.cgi?id=1567733
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-id: 20180427115528.345-1-kraxel@redhat.com
-(cherry picked from commit 5bd5c27c7d284d01477c5cc022ce22438c46bf9f)
+qemu-system-ppc64: error while loading state for instance 0x0 of device
+ 'spapr'
+qemu-system-ppc64: load of migration failed: No such file or directory
+
+This patch hence initialize CPUs a bit earlier so that we can check the
+requested compat mode, and don't set OV5_MMU_RADIX_GTSE for power8 and
+older.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+(cherry picked from commit 0550b1206a91d66051a21441a02c4ff126b531fe)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/display/qxl-render.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/ppc/spapr.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/hw/display/qxl-render.c b/hw/display/qxl-render.c
-index 90e0865618..9c1c44481f 100644
---- a/hw/display/qxl-render.c
-+++ b/hw/display/qxl-render.c
-@@ -169,7 +169,8 @@ void qxl_render_update(PCIQXLDevice *qxl)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 6499a86752..a74eb2dc68 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -2356,6 +2356,7 @@ static void ppc_spapr_init(MachineState *machine)
+     long load_limit, fw_size;
+     char *filename;
+     Error *resize_hpt_err = NULL;
++    PowerPCCPU *first_ppc_cpu;
  
-     qemu_mutex_lock(&qxl->ssd.lock);
+     msi_nonbroken = true;
  
--    if (!runstate_is_running() || !qxl->guest_primary.commands) {
-+    if (!runstate_is_running() || !qxl->guest_primary.commands ||
-+        qxl->mode == QXL_MODE_UNDEFINED) {
-         qxl_render_update_area_unlocked(qxl);
-         qemu_mutex_unlock(&qxl->ssd.lock);
-         return;
+@@ -2448,11 +2449,6 @@ static void ppc_spapr_init(MachineState *machine)
+     }
+ 
+     spapr_ovec_set(spapr->ov5, OV5_FORM1_AFFINITY);
+-    if (!kvm_enabled() || kvmppc_has_cap_mmu_radix()) {
+-        /* KVM and TCG always allow GTSE with radix... */
+-        spapr_ovec_set(spapr->ov5, OV5_MMU_RADIX_GTSE);
+-    }
+-    /* ... but not with hash (currently). */
+ 
+     /* advertise support for dedicated HP event source to guests */
+     if (spapr->use_hotplug_event_source) {
+@@ -2469,6 +2465,15 @@ static void ppc_spapr_init(MachineState *machine)
+ 
+     spapr_init_cpus(spapr);
+ 
++    first_ppc_cpu = POWERPC_CPU(first_cpu);
++    if ((!kvm_enabled() || kvmppc_has_cap_mmu_radix()) &&
++        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
++                         spapr->max_compat_pvr)) {
++        /* KVM and TCG always allow GTSE with radix... */
++        spapr_ovec_set(spapr->ov5, OV5_MMU_RADIX_GTSE);
++    }
++    /* ... but not with hash (currently). */
++
+     if (kvm_enabled()) {
+         /* Enable H_LOGICAL_CI_* so SLOF can talk to in-kernel devices */
+         kvmppc_enable_logical_ci_hcalls();
 -- 
 2.11.0
