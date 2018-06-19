@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fVGIL-0002g9-9h
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:03:42 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fVGK3-0003oI-V8
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:05:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fVGIG-0005JP-Ow
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:03:37 -0400
-Resent-Message-Id: <E1fVGIG-0005JP-Ow@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21025)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fVGIG-0005Ia-Gh
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:03:32 -0400
-In-Reply-To: <20180619105451.29163-1-contrib@steffen-goertz.de>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152941336584.786.9919770934448972191@d39dc562802a>
+	(envelope-from <kwolf@redhat.com>) id 1fVGJx-00061m-Aw
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:05:23 -0400
+Date: Tue, 19 Jun 2018 15:05:09 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180619130509.GA21115@dhcp-200-186.str.redhat.com>
+References: <cover.1528991017.git.berto@igalia.com>
+	<6782db91216488e4fc1509a267a362a3f15a1aaa.1528991017.git.berto@igalia.com>
+	<20180618143801.GC4667@localhost.localdomain>
+	<w51in6gp213.fsf@maestria.local.igalia.com>
+	<20180618161229.GD4667@localhost.localdomain>
+	<w51vaaf0xnj.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 19 Jun 2018 06:02:46 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC] Add NRF51 RNG peripheral
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <w51vaaf0xnj.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 06/10] block: Allow changing the
+ backing file on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,89 +28,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: contrib@steffen-goertz.de
-Cc: famz@redhat.com, qemu-devel@nongnu.org, stefanha@gmail.com, jim@groklearning.com, jusual@mail.ru, joel@jms.id.au
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjE5MTA1NDUxLjI5MTYzLTEtY29udHJpYkBzdGVmZmVuLWdvZXJ0ei5k
-ZQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQ10gQWRkIE5SRjUxIFJORyBwZXJpcGhlcmFsCgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFs
-PSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29t
-bWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4g
-JGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxv
-ZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9
-ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAg
-ICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQg
-JGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
-ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3
-LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzE1MjkzNDY1
-ODAtMjU1MzctMS1naXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1hcmtvdmljQHJ0LXJrLmNvbSAt
-PiBwYXRjaGV3LzE1MjkzNDY1ODAtMjU1MzctMS1naXQtc2VuZC1lbWFpbC1hbGVrc2FuZGFyLm1h
-cmtvdmljQHJ0LXJrLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgw
-NjE4MTc1OTU4LjI5MDczLTEtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDYxODE3
-NTk1OC4yOTA3My0xLWFybWJydUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAg
-IHBhdGNoZXcvMjAxODA2MTkxMDU0NTEuMjkxNjMtMS1jb250cmliQHN0ZWZmZW4tZ29lcnR6LmRl
-IC0+IHBhdGNoZXcvMjAxODA2MTkxMDU0NTEuMjkxNjMtMS1jb250cmliQHN0ZWZmZW4tZ29lcnR6
-LmRlClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmE0NjkwM2UxZSBBZGQgTlJGNTEg
-Uk5HIHBlcmlwaGVyYWwKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTog
-QWRkIE5SRjUxIFJORyBwZXJpcGhlcmFsLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxl
-dGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI0OiAKbmV3IGZp
-bGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBvcGVuIGJyYWNlICd7JyBmb2xsb3dpbmcgZnVuY3Rpb24g
-ZGVjbGFyYXRpb25zIGdvIG9uIHRoZSBuZXh0IGxpbmUKIzk3OiBGSUxFOiBody9taXNjL25yZjUx
-X3JuZy5jOjY5Ogorc3RhdGljIGludDY0X3QgY2FsY19uZXh0X3RpbWVvdXQoTnJmNTFSTkdTdGF0
-ZSAqcykgewoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNp
-cyAnKCcKIzk5OiBGSUxFOiBody9taXNjL25yZjUxX3JuZy5jOjcxOgorICAgIGlmKHMtPnN0YXRl
-LmZpbHRlcl9lbmFibGVkKSB7CgpFUlJPUjogb3BlbiBicmFjZSAneycgZm9sbG93aW5nIGZ1bmN0
-aW9uIGRlY2xhcmF0aW9ucyBnbyBvbiB0aGUgbmV4dCBsaW5lCiMxMDk6IEZJTEU6IGh3L21pc2Mv
-bnJmNTFfcm5nLmM6ODE6CitzdGF0aWMgdm9pZCBybmdfdXBkYXRlX3RpbWVyKE5yZjUxUk5HU3Rh
-dGUgKnMpIHsKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVz
-aXMgJygnCiMxMjc6IEZJTEU6IGh3L21pc2MvbnJmNTFfcm5nLmM6OTk6CisgICAgICAgIGlmKHZh
-bHVlID09IE5SRjUxX1RSSUdHRVJfVEFTSykgIHsKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZv
-cmUgdGhlIG9wZW4gcGFyZW50aGVzaXMgJygnCiMxMzM6IEZJTEU6IGh3L21pc2MvbnJmNTFfcm5n
-LmM6MTA1OgorICAgICAgICBpZih2YWx1ZSA9PSBOUkY1MV9UUklHR0VSX1RBU0spICB7CgpFUlJP
-Ujogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMTM5OiBG
-SUxFOiBody9taXNjL25yZjUxX3JuZy5jOjExMToKKyAgICAgICAgaWYodmFsdWUgPT0gTlJGNTFf
-RVZFTlRfQ0xFQVIpICB7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBh
-cmVudGhlc2lzICcoJwojMTUzOiBGSUxFOiBody9taXNjL25yZjUxX3JuZy5jOjEyNToKKyAgICAg
-ICAgaWYodmFsdWUgJiBCSVRfTUFTSyhOUkY1MV9STkdfUkVHX0lOVEVOX1ZBTFJEWSkpIHsKCkVS
-Uk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVzaXMgJygnCiMxNTg6
-IEZJTEU6IGh3L21pc2MvbnJmNTFfcm5nLmM6MTMwOgorICAgICAgICBpZih2YWx1ZSAmIEJJVF9N
-QVNLKE5SRjUxX1JOR19SRUdfSU5URU5fVkFMUkRZKSkgewoKRVJST1I6IG9wZW4gYnJhY2UgJ3sn
-IGZvbGxvd2luZyBmdW5jdGlvbiBkZWNsYXJhdGlvbnMgZ28gb24gdGhlIG5leHQgbGluZQojMTgw
-OiBGSUxFOiBody9taXNjL25yZjUxX3JuZy5jOjE1MjoKK3N0YXRpYyB2b2lkIG5yZjUxX3JuZ190
-aW1lcl9leHBpcmUodm9pZCAqb3BhcXVlKSB7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3Jl
-IHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMTg4OiBGSUxFOiBody9taXNjL25yZjUxX3JuZy5j
-OjE2MDoKKyAgICBpZihzLT5zdGF0ZS5pbnRlcnJ1cHRfZW5hYmxlZCkgewoKRVJST1I6IHNwYWNl
-IHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzE5MjogRklMRTogaHcv
-bWlzYy9ucmY1MV9ybmcuYzoxNjQ6CisgICAgaWYocy0+c3RhdGUuc2hvcnRjdXRfc3RvcF9vbl92
-YWxyZHkpIHsKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVz
-aXMgJygnCiMyMDM6IEZJTEU6IGh3L21pc2MvbnJmNTFfcm5nLmM6MTc1OgorICAgIGlmKGxldmVs
-KSB7CgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50
-cyAoNCwgNykKIzIxMzogRklMRTogaHcvbWlzYy9ucmY1MV9ybmcuYzoxODU6CisgICAgaWYobGV2
-ZWwpIHsKKyAgICAgICBzLT5zdGF0ZS5hY3RpdmUgPSAwOwoKRVJST1I6IHNwYWNlIHJlcXVpcmVk
-IGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzIxMzogRklMRTogaHcvbWlzYy9ucmY1
-MV9ybmcuYzoxODU6CisgICAgaWYobGV2ZWwpIHsKCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBh
-cm91bmQgdGhhdCAnOicgKGN0eDpWeFcpCiMzMjY6IEZJTEU6IGluY2x1ZGUvaHcvbWlzYy9ucmY1
-MV9ybmcuaDo1MToKKyAgICAgICAgdWludDMyX3QgYWN0aXZlOiAxOwogICAgICAgICAgICAgICAg
-ICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6
-VnhXKQojMzI3OiBGSUxFOiBpbmNsdWRlL2h3L21pc2MvbnJmNTFfcm5nLmg6NTI6CisgICAgICAg
-IHVpbnQzMl90IGV2ZW50X3ZhbHJkeTogMTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XgoKRVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4VykKIzMy
-ODogRklMRTogaW5jbHVkZS9ody9taXNjL25yZjUxX3JuZy5oOjUzOgorICAgICAgICB1aW50MzJf
-dCBzaG9ydGN1dF9zdG9wX29uX3ZhbHJkeTogMTsKICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJvdW5kIHRoYXQgJzon
-IChjdHg6VnhXKQojMzI5OiBGSUxFOiBpbmNsdWRlL2h3L21pc2MvbnJmNTFfcm5nLmg6NTQ6Cisg
-ICAgICAgIHVpbnQzMl90IGludGVycnVwdF9lbmFibGVkOiAxOwogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAn
-OicgKGN0eDpWeFcpCiMzMzA6IEZJTEU6IGluY2x1ZGUvaHcvbWlzYy9ucmY1MV9ybmcuaDo1NToK
-KyAgICAgICAgdWludDMyX3QgZmlsdGVyX2VuYWJsZWQ6IDE7CiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXgoKdG90YWw6IDE5IGVycm9ycywgMSB3YXJuaW5ncywgMzA2IGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Am 19.06.2018 um 14:27 hat Alberto Garcia geschrieben:
+> On Mon 18 Jun 2018 06:12:29 PM CEST, Kevin Wolf wrote:
+> >> >> This patch allows the user to change the backing file of an image
+> >> >> that is being reopened. Here's what it does:
+> >> >> 
+> >> >>  - In bdrv_reopen_queue_child(): if the 'backing' option points to an
+> >> >>    image different from the current backing file then it means that
+> >> >>    the latter is going be detached so it must not be put in the reopen
+> >> >>    queue.
+> >> >> 
+> >> >>  - In bdrv_reopen_prepare(): check that the value of 'backing' points
+> >> >>    to an existing node or is null. If it points to an existing node it
+> >> >>    also needs to make sure that replacing the backing file will not
+> >> >>    create a cycle in the node graph (i.e. you cannot reach the parent
+> >> >>    from the new backing file).
+> >> >> 
+> >> >>  - In bdrv_reopen_commit(): perform the actual node replacement by
+> >> >>    calling bdrv_set_backing_hd(). It may happen that there are
+> >> >>    temporary implicit nodes between the BDS that we are reopening and
+> >> >>    the backing file that we want to replace (e.g. a commit fiter node),
+> >> >>    so we must skip them.
+> >> >
+> >> > I think we shouldn't do this. blockdev-reopen is an advanced command
+> >> > that requires knowledge of the graph at the node level. Therefore we can
+> >> > expect the management tool to consider filter nodes when it reconfigures
+> >> > the graph. This is important because it makes a difference whether a
+> >> > new node is inserted above or below the filter node.
+> >> 
+> >> But those nodes that the management tool knows about would not be
+> >> implicit, or would they?
+> >
+> > Hm, you're right, they are only implicit if no node name was given. So
+> > it's not as bad as I thought.
+> >
+> > I still think of bs->implicit as a hack to maintain compatibility for
+> > legacy commands rather than something to use in new commands.
+> 
+> Yes, and I'm still not 100% convinced that skipping the implicit nodes
+> as I'm doing here is the proper solution, so maybe I'll need to come up
+> with something else.
+> 
+> >> The reason why I did this is because there's several places in the
+> >> QEMU codebase where bdrv_reopen() is called while there's a temporary
+> >> implicit node. For example, on exit bdrv_commit() needs to call
+> >> bdrv_set_backing_hd() to remove intermediate nodes from the
+> >> chain. This happens while bdrv_mirror_top is still there, so if we
+> >> don't skip it then QEMU crashes.
+> >
+> > But isn't that bdrv_set_backing_hd() a separate operation? I would
+> > understand that it matters if you changed the code so that it would
+> > use bdrv_reopen() in order to change the backing file, but that's not
+> > what it does, is it?
+> 
+> Wait, I think the description I gave is inaccurate:
+> 
+> commit_complete() calls bdrv_drop_intermediate(), and that updates the
+> backing image name (c->role->update_filename()). If we're doing this in
+> an intermediate node then it needs to be reopened in read-write mode,
+> while keeping the rest of the options.
+> 
+> But then bdrv_reopen_commit() realizes that the backing file (from
+> reopen_state->options) is not the current one (because there's a
+> bdrv_mirror_top implicit filter) and attempts to remove it. And that's
+> the root cause of the crash.
+
+How did the other (the real?) backing file get into
+reopen_state->options? I don't think bdrv_drop_intermediate() wants to
+change anything except the read-only flag, so we should surely have the
+node name of bdrv_mirror_top there?
+
+> So my first impression is that we should not try to change backing files
+> if a reopen was not requested by the user (blockdev-reopen) and perhaps
+> we should forbid it when there are implicit nodes involved.
+
+Changing the behaviour depending on who the caller is sounds like a hack
+that relies on coincidence and may break sooner or later.
+
+> >> >> 2) If the 'backing' option is omitted altogether then the existing
+> >> >> backing file (if any) is kept. Unlike blockdev-add this will _not_
+> >> >> open the default backing file specified in the image header.
+> >> >
+> >> > Hm... This is certainly an inconsistency. Is it unavoidable?
+> >> 
+> >> I don't think we want to open new nodes on reopen(), but one easy way
+> >> to avoid this behavior is simply to return an error if the user omits
+> >> the 'backing' option.
+> >
+> > Hm, yes, not opening new nodes is a good point.
+> >
+> > As long as find a good solution that can be consistently applied to
+> > all BlockdevRef, it should be okay. So I don't necessarily object to
+> > the special casing and just leaving them as they are by default.
+> >
+> >> But this raises a few questions. Let's say you have an image with a
+> >> backing file and you open it with blockdev-add omitting the 'backing'
+> >> option. That means the default backing file is opened.
+> >> 
+> >>   - Do you still have to specify 'backing' on reopen? I suppose you
+> >>     don't have to.
+> >
+> > You would have to. I agree it's ugly (not the least because you probably
+> > didn't assign an explicit node name, though -drive allows specifying
+> > only the node name, but still using the filename from the image file).
+> 
+> Yes it's a bit ugly, but we wouldn't be having a special case with the
+> 'backing' option.
+
+I think files I'm meanwhile tending towards your current solution (i.e.
+default is leaving the reference as it is and you must use null to get
+rid of a backing file).
+
+> >>   - If you don't have to, can QEMU tell if bs->backing is the original
+> >>     backing file or a new one? I suppose it can, by checking for
+> >>     'backing / backing.*' in bs->options.
+> >> 
+> >>   - If you omit 'backing', does the backing file still get reopened? And
+> >>     more importantly, does it keep its current options or are they
+> >>     supposed to be reset to their default values?
+> >
+> > If you make omitting it an error, then that's not really a question?
+> 
+> No, if you are forced to specify 'backing' then this is not a problem.
+> 
+> >> >> +        /* If the 'backing' option is set and it points to a different
+> >> >> +         * node then it means that we want to replace the current one,
+> >> >> +         * so we shouldn't put it in the reopen queue */
+> >> >> +        if (child->role == &child_backing && qdict_haskey(options, "backing")) {
+> >> >
+> >> > I think checking child->name for "backing" makes more sense when we
+> >> > also look for the "backing" key in the options QDict. This would make
+> >> > generalising it for other children easier (which we probably should
+> >> > do, whether in this patch or a follow-up).
+> >> 
+> >> Sounds reasonable.
+> >> 
+> >> > Do we need some way for e.g. block jobs to forbid changing the backing
+> >> > file of the subchain they are operating on?
+> >> 
+> >> Are you thinking of any particular scenario?
+> >
+> > Not specifically, but I think e.g. the commit job might get confused
+> > if you break its backing chain because it assumes that base is
+> > somewhere in the backing chain of top, and also that it called
+> > block_job_add_bdrv() on everything in the subchain it is working on.
+> >
+> > It just feels like we'd allow to break any such assumptions if we
+> > don't block graph changes there.
+> 
+> Ah, ok, I think that's related to the crash that I mentioned earlier
+> with block-commit. Yes, it makes sense that we forbid that. I suppose
+> that we can do this already with BLK_PERM_GRAPH_MOD ?
+
+Possibly. The thing with BLK_PERM_GRAPH_MOD is that nobody knows what
+its meaning has to be so that it's actually useful, so we're not using
+it in any meaningful way yet.
+
+I suspect BLK_PERM_GRAPH_MOD is the wrong tool because what we actually
+want to protect against modification is not a BDS, but a BdrvChild. But
+I may be wrong there.
+
+Kevin
