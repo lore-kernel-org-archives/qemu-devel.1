@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jP-0002yd-8x
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:52 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5jU-00031x-Vz
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jN-0000lG-Tp
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:51 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5jU-0000p8-47
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:57 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:38 -0500
-Message-Id: <20180619014319.28272-73-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:42:41 -0500
+Message-Id: <20180619014319.28272-76-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 072/113] qemu-io: Use purely string blockdev
- options
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 075/113] lm32: take BQL before writing IP/IM
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,56 +25,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: qemu-stable@nongnu.org, Michael Walle <michael@walle.cc>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Michael Walle <michael@walle.cc>
 
-Currently, qemu-io only uses string-valued blockdev options (as all are
-converted directly from QemuOpts) -- with one exception: -U adds the
-force-share option as a boolean.  This in itself is already a bit
-questionable, but a real issue is that it also assumes the value already
-existing in the options QDict would be a boolean, which is wrong.
-
-That has the following effect:
-
-$ ./qemu-io -r -U --image-opts \
-    driver=file,filename=/dev/null,force-share=off
-[1]    15200 segmentation fault (core dumped)  ./qemu-io -r -U
---image-opts driver=file,filename=/dev/null,force-share=off
-
-Since @opts is converted from QemuOpts, the value must be a string, and
-we have to compare it as such.  Consequently, it makes sense to also set
-it as a string instead of a boolean.
+Writing to these registers may raise an interrupt request. Actually,
+this prevents the milkymist board from starting.
 
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20180502202051.15493-2-mreitz@redhat.com
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit 2a01c01f9ecb43af4c0a85fe6adc429ffc9c31b5)
+Signed-off-by: Michael Walle <michael@walle.cc>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+(cherry picked from commit 81e9cbd0ca1131012b058df6804b1f626a6b730c)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qemu-io.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/lm32/op_helper.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/qemu-io.c b/qemu-io.c
-index c70bde3eb1..e6b608a564 100644
---- a/qemu-io.c
-+++ b/qemu-io.c
-@@ -71,12 +71,12 @@ static int openfile(char *name, int flags, bool writethrough, bool force_share,
-             opts = qdict_new();
-         }
-         if (qdict_haskey(opts, BDRV_OPT_FORCE_SHARE)
--            && !qdict_get_bool(opts, BDRV_OPT_FORCE_SHARE)) {
-+            && strcmp(qdict_get_str(opts, BDRV_OPT_FORCE_SHARE), "on")) {
-             error_report("-U conflicts with image options");
-             QDECREF(opts);
-             return 1;
-         }
--        qdict_put_bool(opts, BDRV_OPT_FORCE_SHARE, true);
-+        qdict_put_str(opts, BDRV_OPT_FORCE_SHARE, "on");
-     }
-     qemuio_blk = blk_new_open(name, NULL, opts, flags, &local_err);
-     if (!qemuio_blk) {
+diff --git a/target/lm32/op_helper.c b/target/lm32/op_helper.c
+index 2177c8ad12..93b8d09794 100644
+--- a/target/lm32/op_helper.c
++++ b/target/lm32/op_helper.c
+@@ -102,12 +102,16 @@ void HELPER(wcsr_dc)(CPULM32State *env, uint32_t dc)
+ 
+ void HELPER(wcsr_im)(CPULM32State *env, uint32_t im)
+ {
++    qemu_mutex_lock_iothread();
+     lm32_pic_set_im(env->pic_state, im);
++    qemu_mutex_unlock_iothread();
+ }
+ 
+ void HELPER(wcsr_ip)(CPULM32State *env, uint32_t im)
+ {
++    qemu_mutex_lock_iothread();
+     lm32_pic_set_ip(env->pic_state, im);
++    qemu_mutex_unlock_iothread();
+ }
+ 
+ void HELPER(wcsr_jtx)(CPULM32State *env, uint32_t jtx)
 -- 
 2.11.0
