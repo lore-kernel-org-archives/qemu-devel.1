@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59817)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suratiamol@gmail.com>) id 1fVO6V-0004Ej-Nz
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:23:57 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fVOEe-00075B-BL
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:32:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suratiamol@gmail.com>) id 1fVO6S-0006gy-Gb
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:23:55 -0400
-Date: Wed, 20 Jun 2018 02:56:00 +0530
-From: Amol Surati <suratiamol@gmail.com>
-Message-ID: <20180619212558.GA29939@arch>
-References: <20180617183515.3982-1-suratiamol@gmail.com>
-	<20180617183515.3982-2-suratiamol@gmail.com>
-	<20180618180254.GA2441@arch>
-	<d02a8fcd-3a5f-7c90-bef0-abf9ee076dd8@redhat.com>
-	<20180619040153.GA8868@arch>
-	<20180619085329.GA4292@dhcp-200-186.str.redhat.com>
-	<834a13be-0b5c-1249-ad0a-1a1accb3e058@redhat.com>
-	<20180619143401.GA27130@arch>
+	(envelope-from <Babu.Moger@amd.com>) id 1fVOEc-00034x-5j
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:32:20 -0400
+Received: from mail-sn1nam02on0082.outbound.protection.outlook.com
+	([104.47.36.82]:38970
+	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fVOEb-00032O-S6
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:32:18 -0400
+From: Babu Moger <babu.moger@amd.com>
+Date: Tue, 19 Jun 2018 17:31:59 -0400
+Message-Id: <1529443919-67509-4-git-send-email-babu.moger@amd.com>
+In-Reply-To: <1529443919-67509-1-git-send-email-babu.moger@amd.com>
+References: <1529443919-67509-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180619143401.GA27130@arch>
-Subject: Re: [Qemu-devel] [Qemu-block] [RFC 1/1] ide: bug #1777315:
- io_buffer_size and sg.size can represent partial sector sizes
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v16 3/3] i386: Remove generic SMT thread check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,199 +27,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: Amol Surati <suratiamol@gmail.com>, qemu-devel@nongnu.org, "open list:IDE" <qemu-block@nongnu.org>
+To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+Cc: qemu-devel@nongnu.org, mtosatti@redhat.com, kvm@vger.kernel.org, kash@tripleback.net, geoff@hostfission.com, babu.moger@amd.com
 
-On Tue, Jun 19, 2018 at 08:04:03PM +0530, Amol Surati wrote:
-> On Tue, Jun 19, 2018 at 09:45:15AM -0400, John Snow wrote:
-> > 
-> > 
-> > On 06/19/2018 04:53 AM, Kevin Wolf wrote:
-> > > Am 19.06.2018 um 06:01 hat Amol Surati geschrieben:
-> > >> On Mon, Jun 18, 2018 at 08:14:10PM -0400, John Snow wrote:
-> > >>>
-> > >>>
-> > >>> On 06/18/2018 02:02 PM, Amol Surati wrote:
-> > >>>> On Mon, Jun 18, 2018 at 12:05:15AM +0530, Amol Surati wrote:
-> > >>>>> This patch fixes the assumption that io_buffer_size is always a perfect
-> > >>>>> multiple of the sector size. The assumption is the cause of the firing
-> > >>>>> of 'assert(n * 512 == s->sg.size);'.
-> > >>>>>
-> > >>>>> Signed-off-by: Amol Surati <suratiamol@gmail.com>
-> > >>>>> ---
-> > >>>>
-> > >>>> The repository https://github.com/asurati/1777315 contains a module for
-> > >>>> QEMU's 8086:7010 ATA controller, which exercises the code path
-> > >>>> described in [RFC 0/1] of this series.
-> > >>>>
-> > >>>
-> > >>> Thanks, this made it easier to see what was happening. I was able to
-> > >>> write an ide-test test case using this source as a guide, and reproduce
-> > >>> the error.
-> > >>>
-> > >>> static void test_bmdma_partial_sector_short_prdt(void)
-> > >>> {
-> > >>>     QPCIDevice *dev;
-> > >>>     QPCIBar bmdma_bar, ide_bar;
-> > >>>     uint8_t status;
-> > >>>
-> > >>>     /* Read 2 sectors but only give 1 sector in PRDT */
-> > >>>     PrdtEntry prdt[] = {
-> > >>>         {
-> > >>>             .addr = 0,
-> > >>>             .size = cpu_to_le32(0x200),
-> > >>>         },
-> > >>>         {
-> > >>>             .addr = 512,
-> > >>>             .size = cpu_to_le32(0x44 | PRDT_EOT),
-> > >>>         }
-> > >>>     };
-> > >>>
-> > >>>     dev = get_pci_device(&bmdma_bar, &ide_bar);
-> > >>>     status = send_dma_request(CMD_READ_DMA, 0, 2,
-> > >>>                               prdt, ARRAY_SIZE(prdt), NULL);
-> > >>>     g_assert_cmphex(status, ==, 0);
-> > >>>     assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), DF | ERR);
-> > >>>     free_pci_device(dev);
-> > >>> }
-> > >>>
-> > >>>> Loading the module reproduces the bug. Tested on the latest master
-> > >>>> branch.
-> > >>>>
-> > >>>> Steps:
-> > >>>> - Install a Linux distribution as a guest, ensuring that the boot disk
-> > >>>>   resides on non-IDE controllers (such as virtio)
-> > >>>> - Attach another disk as a master device on the primary
-> > >>>>   IDE controller (i.e. attach at -hda.)
-> > >>>> - Blacklist ata_piix, pata_acpi and ata_generic modules, and reboot.
-> > >>>> - Copy the source files into the guest and build the module.
-> > >>>> - Load the module. QEMU process should die with the message:
-> > >>>>   qemu-system-x86_64: hw/ide/core.c:871: ide_dma_cb:
-> > >>>>   Assertion `n * 512 == s->sg.size' failed.
-> > >>>>
-> > >>>>
-> > >>>> -Amol
-> > >>>>
-> > >>>
-> > >>> I'm less sure of the fix -- certainly the assert is wrong, but just
-> > >>> incrementing 'n' is wrong too -- we didn't copy (n+1) sectors, we copied
-> > >>> (n) and a few extra bytes.
-> > >>
-> > >> That is true.
-> > >>
-> > >> There are (at least) two fields that represent the total size of a DMA
-> > >> transfer -
-> > >> (1) The size, as requested through the NSECTOR field.
-> > >> (2) The size, as calculated through the length fields of the PRD entries.
-> > >>
-> > >> It makes sense to consider the most restrictive of the sizes, as the factor
-> > >> which determines both the end of a successful DMA transfer and the
-> > >> condition to assert.
-> > >>
-> > >>>
-> > >>> The sector-based math here would need to be adjusted to be able to cope
-> > >>> with partial sector reads... or we ought to avoid doing any partial
-> > >>> sector transfers.
-> > >>>
-> > >>>
-> > >>> I'm not sure which is more correct tonight, it depends:
-> > >>>
-> > >>> - If it's OK to transfer partial sectors before reporting overflow,
-> > >>> adjusting the command loop to work with partial sectors is OK.
-> > >>>
-> > >>> - If it's NOT OK to do partial sector transfer, the sglist preparation
-> > >>> phase needs to produce a truncated SGList that's some multiple of 512
-> > >>> bytes that leaves the excess bytes in a second sglist that we don't
-> > >>> throw away and can use as a basis for building the next sglist. (Or the
-> > >>> DMA helpers need to take a max_bytes parameter and return an sglist
-> > >>> representing unused buffer space if the command underflowed.)
-> > >>
-> > >> Support for partial sector transfers is built into the DMA interface's PRD
-> > >> mechanism itself, because an entry is allowed to transfer in the units of
-> > >> even number of bytes.
-> > >>
-> > >> I think the controller's IO process runs in two parts (probably loops over
-> > >> for a single transfer):
-> > >>
-> > >> (1) The controller's disk interface transfers between its internal buffer
-> > >>     and the disk storage. The transfers are likely to be in the
-> > >>     multiples of a sector.
-> > >> (2) The controller's DMA interface transfers between its internal buffer
-> > >>     and the system memory. The transfers can be sub-sector in size(, and
-> > >>     are preserving of the areas, of the internal buffer, not subject to a
-> > >>     write.)
-> > > 
-> > > The spec isn't clear about this (or at least I can't find anything where
-> > > the exact behaviour is specified), but I agree that that's my mental
-> > > model as well. So I would make IDE send a byte-granularity request with
-> > > the final partial sector to the block layer, so that the data is
-> > > actually transferred up to that point.
-> > > 
-> > > In practice it probably doesn't matter much because a too short PRDT
-> > > means that the request doesn't complete successfully (the condition is
-> > > indicated by clear Interrupt, Active and Error flags in the BMDMA
-> > > controller) and I suppose the guest won't actually look at the data
-> > > then.
-> > > 
-> > > Providing the data anyway (consistent with our assumption how real
-> > > hardware works) is erring on the safe side because it doesn't hurt a
-> > > reasonable guest that did not expect the data to be transferred in this
-> > > condition.
-> > > 
-> > > Kevin
-> > > 
-> > 
-> > Partial transfers it is, since I didn't see anything in AHCI or BMDMA
-> > that suggested we shouldn't and it seems like the actual easiest fix
-> > because it avoids having to modify the sglists or the sglist preparation
-> > functions.
-> > 
-> > Amol, would you like to author a fix, or would you prefer that I do it?
-> 
-> Yes, I would like to author it. I assume that the simplification of the
-> calls to prepare_buf is better kept as a change that is separate from
-> this fix.
-> 
-> > 
-> > If you do, please copy my ide-test case above and check it in as patch
-> > 2/2 to your series as a regression test (tests/ide-test.c). It may need
-> > some further editing after the command submission to pass; I only made
-> > sure it crashes QEMU.
-> 
-> Will do.
-> 
-> Thanks,
-> -amol
-> 
-> > 
-> > Thanks,
-> > --js
+Remove generic non-intel check while validating hyperthreading support.
+Certain AMD CPUs can support hyperthreading now.
 
-After ide_dma_cb checks the return value from prepare_buf, it comments
-thus:
+CPU family with TOPOEXT feature can support hyperthreading now.
 
-"The PRDs were too short. Reset the Active bit, but don't raise an
-interrupt."
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+Tested-by: Geoffrey McRae <geoff@hostfission.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-So, QEMU already has a policy in place for short PRDs. I apologize,
-that I did not notice it earlier.
-
-It is enforced by the condition:
-"(s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size) < 512)".
-
-The definition of short PRDs it uses is: those which result in a
-"< 512" bytes transfer.
-
-Is there a reason to not define them, as those which result in a
-"< n * 512" bytes transfer, to begin with (or now)?
-
-(n = s->nsector).
-
-If the prepare_buf interface implementation and use, that comment, and the
-behaviour (drop and goto eot) which that comment points towards, are all
-consistent with one another, then, the condition "< 512" looks like a bug
-in itself, solving of which also solves this crash (hopefully, without
-making any other change.)
-
-Thanks,
--amol
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index d6ed29b..e6c2f8a 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4985,17 +4985,22 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+ 
+     qemu_init_vcpu(cs);
+ 
+-    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
+-     * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
+-     * based on inputs (sockets,cores,threads), it is still better to gives
++    /*
++     * Most Intel and certain AMD CPUs support hyperthreading. Even though QEMU
++     * fixes this issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
++     * based on inputs (sockets,cores,threads), it is still better to give
+      * users a warning.
+      *
+      * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
+      * cs->nr_threads hasn't be populated yet and the checking is incorrect.
+      */
+-    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
+-        error_report("AMD CPU doesn't support hyperthreading. Please configure"
+-                     " -smp options properly.");
++     if (IS_AMD_CPU(env) &&
++         !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
++         cs->nr_threads > 1 && !ht_warned) {
++            error_report("This family of AMD CPU doesn't support "
++                         "hyperthreading(%d). Please configure -smp "
++                         "options properly or try enabling topoext feature.",
++                         cs->nr_threads);
+         ht_warned = true;
+     }
+ 
+-- 
+1.8.3.1
