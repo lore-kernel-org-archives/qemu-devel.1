@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fVFOg-0008A7-0x
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:06:07 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fVFQC-0000ua-LR
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:07:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fVFOc-0002NA-2b
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:06:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42360)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fVFOb-0002Mp-Rh
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:06:01 -0400
-Date: Tue, 19 Jun 2018 09:05:54 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180619120554.GP7451@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA-ZEH+SxhPOoPj+FkgSykikQq0cGUZdXnhvN5C2PE=i6w@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/13] Python queue, 2018-06-11
+	(envelope-from <pm215@archaic.org.uk>) id 1fVFQB-0003Cl-TY
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:07:40 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42828)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fVFQB-0003A9-Ll
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 08:07:39 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 19 Jun 2018 13:07:30 +0100
+Message-Id: <20180619120730.32586-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] hw/pci-host/xilinx-pcie: don't make "io"
+ region be RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,69 +23,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paul Burton <paul.burton@mips.com>, Aleksandar Markovic <aleksandar.markovic@mips.com>
 
-On Tue, Jun 19, 2018 at 12:13:41PM +0100, Peter Maydell wrote:
-> On 11 June 2018 at 18:42, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > The following changes since commit 0d2fa03dae4fbe185a082f361342b1e30a=
-ed4582:
-> >
-> >   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm=
--20180608' into staging (2018-06-08 16:26:51 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
-> >
-> > for you to fetch changes up to c7883412440905b41dde7e70f4af782932e80e=
-90:
-> >
-> >   python: Remove scripts/ordereddict.py (2018-06-08 16:40:54 -0300)
-> >
-> > ----------------------------------------------------------------
-> > Python queue, 2018-06-11
-> >
-> > * Make code compatible with Python 3 using 'futurize --stage1'
-> > * Require Python >=3D 2.7 and remove Python 2.6 compatibility
-> >   modules
-> >
-> > ----------------------------------------------------------------
->=20
-> Hi; I noticed that running configure on my machine can now produce a
-> python traceback from docker.py:
->=20
-> make: Entering directory '/home/petmay01/linaro/qemu-for-merges/build/a=
-lldbg'
-> config-host.mak is out-of-date, running configure
-> Traceback (most recent call last):
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 29, in <module>
->     from StringIO import StringIO
-> ImportError: No module named 'StringIO'
-> Install prefix    /usr/local
-> [etc]
->=20
-> I don't know if this is because of this change, but this is the
-> most recent change involving python...
+Currently we use memory_region_init_rom_nomigrate() to create
+the "io" memory region to pass to pci_register_root_bus().
+This is a dummy region, because this PCI controller doesn't
+support accesses to PCI IO space.
 
-This seems to be introduced by:
+There is no reason for the dummy region to be a RAM region;
+it is only used as a place where PCI BARs can be mapped,
+and if you could get a PCI card to do a bus master access
+to the IO space it should not get acts-like-RAM behaviour.
+Use a simple container memory region instead. (We do have
+one PCI card model which can do bus master accesses to IO
+space -- the LSI53C895A SCSI adaptor.)
 
-commit 51a12b51fd3693a16eb73362713a98d467e15af7
-Author: Alex Benn=E9e <alex.bennee@linaro.org>
-Date:   Wed Apr 4 14:24:39 2018 +0100
+This avoids the oddity of having a memory region which is
+RAM but where the RAM is not migrated.
 
-    configure: add test for docker availability
+Note that the size of the region we use here has no
+effect on behaviour.
 
-    This tests for a working docker installation without sudo and sets up
-    config-host.mak accordingly. This will be useful from cross compiling
-    things in the future.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/pci-host/xilinx-pcie.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-    Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-    Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-tests/docker/docker.py is still python2-only but ./configure is
-trying to run it using $python (which can be Python 3).
-
---=20
-Eduardo
+diff --git a/hw/pci-host/xilinx-pcie.c b/hw/pci-host/xilinx-pcie.c
+index 044e312dc18..b0a31b917d8 100644
+--- a/hw/pci-host/xilinx-pcie.c
++++ b/hw/pci-host/xilinx-pcie.c
+@@ -120,9 +120,8 @@ static void xilinx_pcie_host_realize(DeviceState *dev, Error **errp)
+     memory_region_init(&s->mmio, OBJECT(s), "mmio", UINT64_MAX);
+     memory_region_set_enabled(&s->mmio, false);
+ 
+-    /* dummy I/O region */
+-    memory_region_init_ram_nomigrate(&s->io, OBJECT(s), "io", 16, NULL);
+-    memory_region_set_enabled(&s->io, false);
++    /* dummy PCI I/O region (not visible to the CPU) */
++    memory_region_init(&s->io, OBJECT(s), "io", 16);
+ 
+     /* interrupt out */
+     qdev_init_gpio_out_named(dev, &s->irq, "interrupt_out", 1);
+-- 
+2.17.1
