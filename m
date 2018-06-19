@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fVGK3-0003oI-V8
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:05:27 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fVGKq-0004CC-FM
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:06:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fVGJx-00061m-Aw
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:05:23 -0400
-Date: Tue, 19 Jun 2018 15:05:09 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180619130509.GA21115@dhcp-200-186.str.redhat.com>
-References: <cover.1528991017.git.berto@igalia.com>
-	<6782db91216488e4fc1509a267a362a3f15a1aaa.1528991017.git.berto@igalia.com>
-	<20180618143801.GC4667@localhost.localdomain>
-	<w51in6gp213.fsf@maestria.local.igalia.com>
-	<20180618161229.GD4667@localhost.localdomain>
-	<w51vaaf0xnj.fsf@maestria.local.igalia.com>
+	(envelope-from <ehabkost@redhat.com>) id 1fVGKn-0006MM-B9
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:06:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:13536)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fVGKn-0006MH-4i
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:06:09 -0400
+Date: Tue, 19 Jun 2018 10:06:06 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180619130606.GB25787@localhost.localdomain>
+References: <20180618175958.29073-1-armbru@redhat.com>
+	<20180618175958.29073-2-armbru@redhat.com>
+	<20180618213526.GJ24764@localhost.localdomain>
+	<87tvpzz3wn.fsf@dusky.pond.sub.org>
+	<20180619105032.GO7451@localhost.localdomain>
+	<20180619120510.GS20929@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <w51vaaf0xnj.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 06/10] block: Allow changing the
- backing file on reopen
+In-Reply-To: <20180619120510.GS20929@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] qapi: Open files with
+ encoding='utf-8'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,167 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, tamiko@43-1.org, qemu-devel@nongnu.org, arfrever.fta@gmail.com
 
-Am 19.06.2018 um 14:27 hat Alberto Garcia geschrieben:
-> On Mon 18 Jun 2018 06:12:29 PM CEST, Kevin Wolf wrote:
-> >> >> This patch allows the user to change the backing file of an image
-> >> >> that is being reopened. Here's what it does:
-> >> >> 
-> >> >>  - In bdrv_reopen_queue_child(): if the 'backing' option points to an
-> >> >>    image different from the current backing file then it means that
-> >> >>    the latter is going be detached so it must not be put in the reopen
-> >> >>    queue.
-> >> >> 
-> >> >>  - In bdrv_reopen_prepare(): check that the value of 'backing' points
-> >> >>    to an existing node or is null. If it points to an existing node it
-> >> >>    also needs to make sure that replacing the backing file will not
-> >> >>    create a cycle in the node graph (i.e. you cannot reach the parent
-> >> >>    from the new backing file).
-> >> >> 
-> >> >>  - In bdrv_reopen_commit(): perform the actual node replacement by
-> >> >>    calling bdrv_set_backing_hd(). It may happen that there are
-> >> >>    temporary implicit nodes between the BDS that we are reopening and
-> >> >>    the backing file that we want to replace (e.g. a commit fiter node),
-> >> >>    so we must skip them.
-> >> >
-> >> > I think we shouldn't do this. blockdev-reopen is an advanced command
-> >> > that requires knowledge of the graph at the node level. Therefore we can
-> >> > expect the management tool to consider filter nodes when it reconfigures
-> >> > the graph. This is important because it makes a difference whether a
-> >> > new node is inserted above or below the filter node.
-> >> 
-> >> But those nodes that the management tool knows about would not be
-> >> implicit, or would they?
-> >
-> > Hm, you're right, they are only implicit if no node name was given. So
-> > it's not as bad as I thought.
-> >
-> > I still think of bs->implicit as a hack to maintain compatibility for
-> > legacy commands rather than something to use in new commands.
-> 
-> Yes, and I'm still not 100% convinced that skipping the implicit nodes
-> as I'm doing here is the proper solution, so maybe I'll need to come up
-> with something else.
-> 
-> >> The reason why I did this is because there's several places in the
-> >> QEMU codebase where bdrv_reopen() is called while there's a temporary
-> >> implicit node. For example, on exit bdrv_commit() needs to call
-> >> bdrv_set_backing_hd() to remove intermediate nodes from the
-> >> chain. This happens while bdrv_mirror_top is still there, so if we
-> >> don't skip it then QEMU crashes.
-> >
-> > But isn't that bdrv_set_backing_hd() a separate operation? I would
-> > understand that it matters if you changed the code so that it would
-> > use bdrv_reopen() in order to change the backing file, but that's not
-> > what it does, is it?
-> 
-> Wait, I think the description I gave is inaccurate:
-> 
-> commit_complete() calls bdrv_drop_intermediate(), and that updates the
-> backing image name (c->role->update_filename()). If we're doing this in
-> an intermediate node then it needs to be reopened in read-write mode,
-> while keeping the rest of the options.
-> 
-> But then bdrv_reopen_commit() realizes that the backing file (from
-> reopen_state->options) is not the current one (because there's a
-> bdrv_mirror_top implicit filter) and attempts to remove it. And that's
-> the root cause of the crash.
+On Tue, Jun 19, 2018 at 01:05:10PM +0100, Daniel P. Berrang=E9 wrote:
+[...]
+> > > > The python-future package would help us write code for a single
+> > > > file/string API instead of two different APIs, but it's not a
+> > > > QEMU build dependency (yet?), so this patch is good enough for
+> > > > now.
+> > >=20
+> > > Please do not invest more than absolutely necessary in Python 2 sup=
+port.
+> > > All such investment will turn into technical debt in less than two
+> > > years.  If you must invest, pick a solution that will result in les=
+s
+> > > technical debt.  We can accept local ugliness for that.
+> > >=20
+> > > In my personal opinion, dumb ideas like supporting Python 2 this cl=
+ose
+> > > to its EOL ought to look ugly.
+> >=20
+> > That's the whole point: python-future allows us to not worry
+> > about Python 2 support in the code anymore because it exposes the
+> > Python 3 string API (and others) even if we're running Python 2.
+> >=20
+> > After we stop supporting Python 2, we can simply delete the "from
+> > __future__ import .*" and "from builtins import .*" lines.
+> >=20
+> > Anyway, I will send a RFC series demonstrating that, and then we
+> > can discuss if it's worth it.  My main worry is not the extra
+> > imports in Python code, but the introduction of a new build
+> > dependency only for a few (one?) releases.
+>=20
+> Using __future__ doesn't add an build dependancy AFAIK. __future__ is
+> bundled with core python library rather than being an addon module.
 
-How did the other (the real?) backing file get into
-reopen_state->options? I don't think bdrv_drop_intermediate() wants to
-change anything except the read-only flag, so we should surely have the
-node name of bdrv_mirror_top there?
+The extra dependency is because of the "builtins" module,
+provided by python-future in Python 2.7.
 
-> So my first impression is that we should not try to change backing files
-> if a reopen was not requested by the user (blockdev-reopen) and perhaps
-> we should forbid it when there are implicit nodes involved.
-
-Changing the behaviour depending on who the caller is sounds like a hack
-that relies on coincidence and may break sooner or later.
-
-> >> >> 2) If the 'backing' option is omitted altogether then the existing
-> >> >> backing file (if any) is kept. Unlike blockdev-add this will _not_
-> >> >> open the default backing file specified in the image header.
-> >> >
-> >> > Hm... This is certainly an inconsistency. Is it unavoidable?
-> >> 
-> >> I don't think we want to open new nodes on reopen(), but one easy way
-> >> to avoid this behavior is simply to return an error if the user omits
-> >> the 'backing' option.
-> >
-> > Hm, yes, not opening new nodes is a good point.
-> >
-> > As long as find a good solution that can be consistently applied to
-> > all BlockdevRef, it should be okay. So I don't necessarily object to
-> > the special casing and just leaving them as they are by default.
-> >
-> >> But this raises a few questions. Let's say you have an image with a
-> >> backing file and you open it with blockdev-add omitting the 'backing'
-> >> option. That means the default backing file is opened.
-> >> 
-> >>   - Do you still have to specify 'backing' on reopen? I suppose you
-> >>     don't have to.
-> >
-> > You would have to. I agree it's ugly (not the least because you probably
-> > didn't assign an explicit node name, though -drive allows specifying
-> > only the node name, but still using the filename from the image file).
-> 
-> Yes it's a bit ugly, but we wouldn't be having a special case with the
-> 'backing' option.
-
-I think files I'm meanwhile tending towards your current solution (i.e.
-default is leaving the reference as it is and you must use null to get
-rid of a backing file).
-
-> >>   - If you don't have to, can QEMU tell if bs->backing is the original
-> >>     backing file or a new one? I suppose it can, by checking for
-> >>     'backing / backing.*' in bs->options.
-> >> 
-> >>   - If you omit 'backing', does the backing file still get reopened? And
-> >>     more importantly, does it keep its current options or are they
-> >>     supposed to be reset to their default values?
-> >
-> > If you make omitting it an error, then that's not really a question?
-> 
-> No, if you are forced to specify 'backing' then this is not a problem.
-> 
-> >> >> +        /* If the 'backing' option is set and it points to a different
-> >> >> +         * node then it means that we want to replace the current one,
-> >> >> +         * so we shouldn't put it in the reopen queue */
-> >> >> +        if (child->role == &child_backing && qdict_haskey(options, "backing")) {
-> >> >
-> >> > I think checking child->name for "backing" makes more sense when we
-> >> > also look for the "backing" key in the options QDict. This would make
-> >> > generalising it for other children easier (which we probably should
-> >> > do, whether in this patch or a follow-up).
-> >> 
-> >> Sounds reasonable.
-> >> 
-> >> > Do we need some way for e.g. block jobs to forbid changing the backing
-> >> > file of the subchain they are operating on?
-> >> 
-> >> Are you thinking of any particular scenario?
-> >
-> > Not specifically, but I think e.g. the commit job might get confused
-> > if you break its backing chain because it assumes that base is
-> > somewhere in the backing chain of top, and also that it called
-> > block_job_add_bdrv() on everything in the subchain it is working on.
-> >
-> > It just feels like we'd allow to break any such assumptions if we
-> > don't block graph changes there.
-> 
-> Ah, ok, I think that's related to the crash that I mentioned earlier
-> with block-commit. Yes, it makes sense that we forbid that. I suppose
-> that we can do this already with BLK_PERM_GRAPH_MOD ?
-
-Possibly. The thing with BLK_PERM_GRAPH_MOD is that nobody knows what
-its meaning has to be so that it's actually useful, so we're not using
-it in any meaningful way yet.
-
-I suspect BLK_PERM_GRAPH_MOD is the wrong tool because what we actually
-want to protect against modification is not a BDS, but a BdrvChild. But
-I may be wrong there.
-
-Kevin
+--=20
+Eduardo
