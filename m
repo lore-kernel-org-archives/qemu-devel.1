@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5kJ-0003h3-6t
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:48 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5kL-0003lW-VY
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5kI-0001DR-GO
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:47 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5kL-0001Fb-0J
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:50 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:43:03 -0500
-Message-Id: <20180619014319.28272-98-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:43:04 -0500
+Message-Id: <20180619014319.28272-99-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 097/113] arm_gicv3_kvm: increase clroffset
- accordingly
+Subject: [Qemu-devel] [PATCH 098/113] Fix libusb-1.0.22 deprecated
+ libusb_set_debug with libusb_set_option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,37 +22,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, John Thomson <git@johnthomson.fastmail.com.au>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Shannon Zhao <zhaoshenglong@huawei.com>
+From: John Thomson <git@johnthomson.fastmail.com.au>
 
-It forgot to increase clroffset during the loop. So it only clear the
-first 4 bytes.
+libusb-1.0.22 marked libusb_set_debug deprecated
+it is replaced with
+libusb_set_option(libusb_context, LIBUSB_OPTION_LOG_LEVEL, libusb_log_level);
 
-Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Message-id: 1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit 34ffacae085914fce54590ea84bae9c6ad95e2a4)
+details here: https://github.com/libusb/libusb/commit/539f22e2fd916558d11ab9a66f10f461c5593168
+
+Warning here:
+
+  CC      hw/usb/host-libusb.o
+/builds/xen/src/qemu-xen/hw/usb/host-libusb.c: In function 'usb_host_init':
+/builds/xen/src/qemu-xen/hw/usb/host-libusb.c:250:5: error: 'libusb_set_debug' is deprecated: Use libusb_set_option instead [-Werror=deprecated-declarations]
+     libusb_set_debug(ctx, loglevel);
+     ^~~~~~~~~~~~~~~~
+In file included from /builds/xen/src/qemu-xen/hw/usb/host-libusb.c:40:0:
+/usr/include/libusb-1.0/libusb.h:1300:18: note: declared here
+ void LIBUSB_CALL libusb_set_debug(libusb_context *ctx, int level);
+                  ^~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [/builds/xen/src/qemu-xen/rules.mak:66: hw/usb/host-libusb.o] Error 1
+make: Leaving directory '/builds/xen/src/xen/tools/qemu-xen-build'
+
+Signed-off-by: John Thomson <git@johnthomson.fastmail.com.au>
+Message-id: 20180405132046.4968-1-git@johnthomson.fastmail.com.au
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit 9d8fa0df49af16a208fa961c2968fba4daffcc07)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/intc/arm_gicv3_kvm.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/usb/host-libusb.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 481fe5405a..d01deba632 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -243,6 +243,7 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
-         if (clroffset != 0) {
-             reg = 0;
-             kvm_gicd_access(s, clroffset, &reg, true);
-+            clroffset += 4;
-         }
-         reg = *gic_bmp_ptr32(bmp, irq);
-         kvm_gicd_access(s, offset, &reg, true);
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+index 1b0be071cc..dc0a8fe295 100644
+--- a/hw/usb/host-libusb.c
++++ b/hw/usb/host-libusb.c
+@@ -247,7 +247,11 @@ static int usb_host_init(void)
+     if (rc != 0) {
+         return -1;
+     }
++#if LIBUSB_API_VERSION >= 0x01000106
++    libusb_set_option(ctx, LIBUSB_OPTION_LOG_LEVEL, loglevel);
++#else
+     libusb_set_debug(ctx, loglevel);
++#endif
+ #ifdef CONFIG_WIN32
+     /* FIXME: add support for Windows. */
+ #else
 -- 
 2.11.0
