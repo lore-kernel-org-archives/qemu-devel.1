@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVNPT-0001gs-Oz
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 16:39:28 -0400
+	(envelope-from <jusual@mail.ru>) id 1fVNSv-0002nP-8S
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 16:43:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVNPR-0007ya-6M
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 16:39:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54810 helo=mx1.redhat.com)
+	(envelope-from <jusual@mail.ru>) id 1fVNSs-0003Su-2c
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 16:43:01 -0400
+Received: from smtp62.i.mail.ru ([217.69.128.42]:33524)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fVNPR-0007xe-0g
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 16:39:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 475C54021CC4
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 20:39:24 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 19 Jun 2018 15:39:18 -0500
-Message-Id: <20180619203918.65450-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests: Simplify .gitignore
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fVNSr-0003RB-Ma
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 16:42:57 -0400
+From: Julia Suvorova <jusual@mail.ru>
+Date: Tue, 19 Jun 2018 23:42:37 +0300
+Message-Id: <20180619204237.9931-1-jusual@mail.ru>
+Subject: [Qemu-devel] [PATCH] target/arm: Set strict alignment for ARMv6-M
+ load/store
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,135 +22,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, kwolf@redhat.com
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
 
-Commit 0bcc8e5b was yet another instance of 'git status' reporting
-dirty files after an in-tree build, thanks to the new binary
-tests/check-block-qdict.
+Unlike ARMv7-M, ARMv6-M only supports naturally aligned memory accesses
+for 16-bit halfword and 32-bit word accesses using the LDR, LDRH,
+LDRSH, STR and STRH instructions.
 
-Instead of piecemeal exemptions of each new binary as they are
-added, let's use git's negative globbing feature to exempt ALL
-files that have a 'test-' or 'check-' prefix, except for the ones
-ending in '.c' or '.sh'.  We still have a couple of generated
-files that then need (re-)exclusion, but the overall list is a
-LOT shorter, and less prone to needing future edits.
-
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Julia Suvorova <jusual@mail.ru>
 ---
- tests/.gitignore | 93 +++-----------------------------------------------------
- 1 file changed, 5 insertions(+), 88 deletions(-)
+ target/arm/translate.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/tests/.gitignore b/tests/.gitignore
-index 2bc61a9a58d..08e2df1ce1f 100644
---- a/tests/.gitignore
-+++ b/tests/.gitignore
-@@ -2,101 +2,18 @@ atomic_add-bench
- benchmark-crypto-cipher
- benchmark-crypto-hash
- benchmark-crypto-hmac
--check-qdict
--check-qnum
--check-qjson
--check-qlist
--check-qlit
--check-qnull
--check-qobject
--check-qstring
--check-qom-interface
--check-qom-proplist
-+check-*
-+!check-*.c
-+!check-*.sh
- qht-bench
- rcutorture
--test-aio
--test-aio-multithread
--test-arm-mptimer
--test-base64
--test-bdrv-drain
--test-bitops
--test-bitcnt
--test-block-backend
--test-blockjob
--test-blockjob-txn
--test-bufferiszero
--test-char
--test-clone-visitor
--test-coroutine
--test-crypto-afsplit
--test-crypto-block
--test-crypto-cipher
--test-crypto-hash
--test-crypto-hmac
--test-crypto-ivgen
--test-crypto-pbkdf
--test-crypto-secret
--test-crypto-tlscredsx509
--test-crypto-tlscredsx509-work/
--test-crypto-tlscredsx509-certs/
--test-crypto-tlssession
--test-crypto-tlssession-work/
--test-crypto-tlssession-client/
--test-crypto-tlssession-server/
--test-crypto-xts
--test-cutils
--test-hbitmap
--test-hmp
--test-int128
--test-iov
--test-io-channel-buffer
--test-io-channel-command
--test-io-channel-command.fifo
--test-io-channel-file
--test-io-channel-file.txt
--test-io-channel-socket
--test-io-channel-tls
--test-io-task
--test-keyval
--test-logging
--test-mul64
--test-opts-visitor
-+test-*
-+!test-*.c
- test-qapi-commands.[ch]
- test-qapi-events.[ch]
- test-qapi-types.[ch]
--test-qapi-util
- test-qapi-visit.[ch]
--test-qdev-global-props
--test-qemu-opts
--test-qdist
--test-qga
--test-qht
--test-qht-par
--test-qmp-cmds
--test-qmp-event
--test-qobject-input-strict
--test-qobject-input-visitor
- test-qapi-introspect.[ch]
--test-qobject-output-visitor
--test-rcu-list
--test-replication
--test-shift128
--test-string-input-visitor
--test-string-output-visitor
--test-thread-pool
--test-throttle
--test-timed-average
--test-uuid
--test-util-sockets
--test-visitor-serialization
--test-vmstate
--test-write-threshold
--test-x86-cpuid
--test-x86-cpuid-compat
--test-xbzrle
--test-netfilter
--test-filter-mirror
--test-filter-redirector
- *-test
- qapi-schema/*.test.*
- vm/*.img
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index b988d379e7..d923cbe98e 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -1100,7 +1100,14 @@ static inline TCGv gen_aa32_addr(DisasContext *s, TCGv_i32 a32, TCGMemOp op)
+ static void gen_aa32_ld_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
+                             int index, TCGMemOp opc)
+ {
+-    TCGv addr = gen_aa32_addr(s, a32, opc);
++    TCGv addr;
++
++    if (arm_dc_feature(s, ARM_FEATURE_M) &&
++        !arm_dc_feature(s, ARM_FEATURE_V7)) {
++        opc |= MO_ALIGN;
++    }
++
++    addr = gen_aa32_addr(s, a32, opc);
+     tcg_gen_qemu_ld_i32(val, addr, index, opc);
+     tcg_temp_free(addr);
+ }
+@@ -1108,7 +1115,14 @@ static void gen_aa32_ld_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
+ static void gen_aa32_st_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
+                             int index, TCGMemOp opc)
+ {
+-    TCGv addr = gen_aa32_addr(s, a32, opc);
++    TCGv addr;
++
++    if (arm_dc_feature(s, ARM_FEATURE_M) &&
++        !arm_dc_feature(s, ARM_FEATURE_V7)) {
++        opc |= MO_ALIGN;
++    }
++
++    addr = gen_aa32_addr(s, a32, opc);
+     tcg_gen_qemu_st_i32(val, addr, index, opc);
+     tcg_temp_free(addr);
+ }
 -- 
-2.14.4
+2.17.0
