@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fV4gE-000400-O7
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 20:39:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fV4gE-000401-UL
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 20:39:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fV4gD-0003GS-KU
+	(envelope-from <dgibson@ozlabs.org>) id 1fV4gD-0003GY-L7
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 20:39:30 -0400
-Date: Tue, 19 Jun 2018 10:39:17 +1000
+Date: Tue, 19 Jun 2018 10:38:42 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180619003917.GM25461@umbus.fritz.box>
+Message-ID: <20180619003842.GL25461@umbus.fritz.box>
 References: <20180618173402.23405-1-clg@kaod.org>
-	<20180618173402.23405-3-clg@kaod.org>
+	<20180618173402.23405-2-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="KHHg66sM3ACL179N"
+	protocol="application/pgp-signature"; boundary="pW9qtIr+3H2OZPIR"
 Content-Disposition: inline
-In-Reply-To: <20180618173402.23405-3-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] spapr: remove unused spapr_irq
- routines
+In-Reply-To: <20180618173402.23405-2-clg@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] spapr: split the IRQ allocation
+ sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,145 +29,249 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---KHHg66sM3ACL179N
+--pW9qtIr+3H2OZPIR
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 18, 2018 at 07:34:01PM +0200, C=E9dric Le Goater wrote:
-> spapr_irq_alloc_block and spapr_irq_alloc() are now deprecated.
+On Mon, Jun 18, 2018 at 07:34:00PM +0200, C=E9dric Le Goater wrote:
+> Today, when a device requests for IRQ number in a sPAPR machine, the
+> spapr_irq_alloc() routine first scans the ICSState status array to
+> find an empty slot and then performs the assignement of the selected
+> numbers. Split this sequence in two distinct routines : spapr_irq_find()
+> for lookups and spapr_irq_claim() for claiming the IRQ numbers.
+>=20
+> This will ease the introduction of a static layout of IRQ numbers.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
 Applied to ppc-for-3.0, thanks.
 
 > ---
->  include/hw/ppc/spapr.h |  4 ---
->  hw/ppc/spapr.c         | 80 +-------------------------------------------=
-------
->  2 files changed, 1 insertion(+), 83 deletions(-)
+>  include/hw/ppc/spapr.h |  4 ++++
+>  hw/ppc/spapr.c         | 50 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  hw/ppc/spapr_events.c  | 18 ++++++++++++++----
+>  hw/ppc/spapr_pci.c     | 23 ++++++++++++++++++++---
+>  hw/ppc/spapr_vio.c     | 10 +++++++++-
+>  5 files changed, 97 insertions(+), 8 deletions(-)
 >=20
 > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 15f771acc892..9decc66a1915 100644
+> index 3388750fc795..15f771acc892 100644
 > --- a/include/hw/ppc/spapr.h
 > +++ b/include/hw/ppc/spapr.h
-> @@ -772,10 +772,6 @@ int spapr_get_vcpu_id(PowerPCCPU *cpu);
->  void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp);
->  PowerPCCPU *spapr_find_cpu(int vcpu_id);
-> =20
-> -int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
-> -                    Error **errp);
-> -int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
-> -                          bool align, Error **errp);
->  int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align,
->                     Error **errp);
->  #define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false, e=
+> @@ -776,6 +776,10 @@ int spapr_irq_alloc(sPAPRMachineState *spapr, int ir=
+q_hint, bool lsi,
+>                      Error **errp);
+>  int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
+>                            bool align, Error **errp);
+> +int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align,
+> +                   Error **errp);
+> +#define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false, e=
 rrp)
+> +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp);
+>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+>  qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+> =20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 1fa398111111..2b6d17056012 100644
+> index db0fb385d4e0..1fa398111111 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -3846,84 +3846,6 @@ int spapr_irq_find(sPAPRMachineState *spapr, int n=
-um, bool align, Error **errp)
->      return first + ics->offset;
+> @@ -3816,6 +3816,36 @@ static int ics_find_free_block(ICSState *ics, int =
+num, int alignnum)
+>      return -1;
 >  }
 > =20
-> -/*
-> - * Allocate the IRQ number and set the IRQ type, LSI or MSI
-> - */
-> -static void spapr_irq_set_lsi(sPAPRMachineState *spapr, int irq, bool ls=
-i)
-> -{
-> -    ics_set_irq_type(spapr->ics, irq - spapr->ics->offset, lsi);
-> -}
-> -
-> -int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
-> -                    Error **errp)
-> -{
-> -    ICSState *ics =3D spapr->ics;
-> -    int irq;
-> -
-> -    assert(ics);
-> -
-> -    if (irq_hint) {
-> -        if (!ICS_IRQ_FREE(ics, irq_hint - ics->offset)) {
-> -            error_setg(errp, "can't allocate IRQ %d: already in use", ir=
-q_hint);
-> -            return -1;
-> -        }
-> -        irq =3D irq_hint;
-> -    } else {
-> -        irq =3D ics_find_free_block(ics, 1, 1);
-> -        if (irq < 0) {
-> -            error_setg(errp, "can't allocate IRQ: no IRQ left");
-> -            return -1;
-> -        }
-> -        irq +=3D ics->offset;
-> -    }
-> -
-> -    spapr_irq_set_lsi(spapr, irq, lsi);
-> -    trace_spapr_irq_alloc(irq);
-> -
-> -    return irq;
-> -}
-> -
-> -/*
-> - * Allocate block of consecutive IRQs, and return the number of the firs=
-t IRQ in
-> - * the block. If align=3D=3Dtrue, aligns the first IRQ number to num.
-> - */
-> -int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
-> -                          bool align, Error **errp)
-> -{
-> -    ICSState *ics =3D spapr->ics;
-> -    int i, first =3D -1;
-> -
-> -    assert(ics);
-> -
-> -    /*
-> -     * MSIMesage::data is used for storing VIRQ so
-> -     * it has to be aligned to num to support multiple
-> -     * MSI vectors. MSI-X is not affected by this.
-> -     * The hint is used for the first IRQ, the rest should
-> -     * be allocated continuously.
-> -     */
-> -    if (align) {
-> -        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
-> -               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
-> -        first =3D ics_find_free_block(ics, num, num);
-> -    } else {
-> -        first =3D ics_find_free_block(ics, num, 1);
-> -    }
-> -    if (first < 0) {
-> -        error_setg(errp, "can't find a free %d-IRQ block", num);
-> -        return -1;
-> -    }
-> -
-> -    first +=3D ics->offset;
-> -    for (i =3D first; i < first + num; ++i) {
-> -        spapr_irq_set_lsi(spapr, i, lsi);
-> -    }
-> -
-> -    trace_spapr_irq_alloc_block(first, num, lsi, align);
-> -
-> -    return first;
-> -}
-> -
->  int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+> +int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Error =
+**errp)
+> +{
+> +    ICSState *ics =3D spapr->ics;
+> +    int first =3D -1;
+> +
+> +    assert(ics);
+> +
+> +    /*
+> +     * MSIMesage::data is used for storing VIRQ so
+> +     * it has to be aligned to num to support multiple
+> +     * MSI vectors. MSI-X is not affected by this.
+> +     * The hint is used for the first IRQ, the rest should
+> +     * be allocated continuously.
+> +     */
+> +    if (align) {
+> +        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
+> +               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
+> +        first =3D ics_find_free_block(ics, num, num);
+> +    } else {
+> +        first =3D ics_find_free_block(ics, num, 1);
+> +    }
+> +
+> +    if (first < 0) {
+> +        error_setg(errp, "can't find a free %d-IRQ block", num);
+> +        return -1;
+> +    }
+> +
+> +    return first + ics->offset;
+> +}
+> +
+>  /*
+>   * Allocate the IRQ number and set the IRQ type, LSI or MSI
+>   */
+> @@ -3894,6 +3924,26 @@ int spapr_irq_alloc_block(sPAPRMachineState *spapr=
+, int num, bool lsi,
+>      return first;
+>  }
+> =20
+> +int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
 *errp)
+> +{
+> +    ICSState *ics =3D spapr->ics;
+> +
+> +    assert(ics);
+> +
+> +    if (!ics_valid_irq(ics, irq)) {
+> +        error_setg(errp, "IRQ %d is invalid", irq);
+> +        return -1;
+> +    }
+> +
+> +    if (!ICS_IRQ_FREE(ics, irq - ics->offset)) {
+> +        error_setg(errp, "IRQ %d is not free", irq);
+> +        return -1;
+> +    }
+> +
+> +    spapr_irq_set_lsi(spapr, irq, lsi);
+> +    return 0;
+> +}
+> +
+>  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
 >  {
 >      ICSState *ics =3D spapr->ics;
-> @@ -3940,7 +3862,7 @@ int spapr_irq_claim(sPAPRMachineState *spapr, int i=
-rq, bool lsi, Error **errp)
->          return -1;
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index 86836f0626dc..e4f5946a2188 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -707,13 +707,18 @@ void spapr_clear_pending_events(sPAPRMachineState *=
+spapr)
+> =20
+>  void spapr_events_init(sPAPRMachineState *spapr)
+>  {
+> +    int epow_irq;
+> +
+> +    epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
+> +
+> +    spapr_irq_claim(spapr, epow_irq, false, &error_fatal);
+> +
+>      QTAILQ_INIT(&spapr->pending_events);
+> =20
+>      spapr->event_sources =3D spapr_event_sources_new();
+> =20
+>      spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_EPOW,
+> -                                 spapr_irq_alloc(spapr, 0, false,
+> -                                                  &error_fatal));
+> +                                 epow_irq);
+> =20
+>      /* NOTE: if machine supports modern/dedicated hotplug event source,
+>       * we add it to the device-tree unconditionally. This means we may
+> @@ -724,9 +729,14 @@ void spapr_events_init(sPAPRMachineState *spapr)
+>       * checking that it's enabled.
+>       */
+>      if (spapr->use_hotplug_event_source) {
+> +        int hp_irq;
+> +
+> +        hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
+> +
+> +        spapr_irq_claim(spapr, hp_irq, false, &error_fatal);
+> +
+>          spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_H=
+OT_PLUG,
+> -                                     spapr_irq_alloc(spapr, 0, false,
+> -                                                      &error_fatal));
+> +                                     hp_irq);
 >      }
 > =20
-> -    spapr_irq_set_lsi(spapr, irq, lsi);
-> +    ics_set_irq_type(ics, irq - ics->offset, lsi);
->      return 0;
->  }
+>      spapr->epow_notifier.notify =3D spapr_powerdown_req;
+> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> index f936ce63effa..497b896c7d24 100644
+> --- a/hw/ppc/spapr_pci.c
+> +++ b/hw/ppc/spapr_pci.c
+> @@ -279,6 +279,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+>      spapr_pci_msi *msi;
+>      int *config_addr_key;
+>      Error *err =3D NULL;
+> +    int i;
 > =20
+>      /* Fins sPAPRPHBState */
+>      phb =3D spapr_pci_find_phb(spapr, buid);
+> @@ -371,8 +372,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+>      }
+> =20
+>      /* Allocate MSIs */
+> -    irq =3D spapr_irq_alloc_block(spapr, req_num, false,
+> -                           ret_intr_type =3D=3D RTAS_TYPE_MSI, &err);
+> +    irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS_TYP=
+E_MSI, &err);
+>      if (err) {
+>          error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+>                            config_addr);
+> @@ -380,6 +380,16 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPA=
+PRMachineState *spapr,
+>          return;
+>      }
+> =20
+> +    for (i =3D 0; i < req_num; i++) {
+> +        spapr_irq_claim(spapr, irq + i, false, &err);
+> +        if (err) {
+> +            error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+> +                              config_addr);
+> +            rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
+> +            return;
+> +        }
+> +    }
+> +
+>      /* Release previous MSIs */
+>      if (msi) {
+>          spapr_irq_free(spapr, msi->first_irq, msi->num);
+> @@ -1698,7 +1708,14 @@ static void spapr_phb_realize(DeviceState *dev, Er=
+ror **errp)
+>          uint32_t irq;
+>          Error *local_err =3D NULL;
+> =20
+> -        irq =3D spapr_irq_alloc_block(spapr, 1, true, false, &local_err);
+> +        irq =3D spapr_irq_findone(spapr, &local_err);
+> +        if (local_err) {
+> +            error_propagate(errp, local_err);
+> +            error_prepend(errp, "can't allocate LSIs: ");
+> +            return;
+> +        }
+> +
+> +        spapr_irq_claim(spapr, irq, true, &local_err);
+>          if (local_err) {
+>              error_propagate(errp, local_err);
+>              error_prepend(errp, "can't allocate LSIs: ");
+> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+> index 4555c648a8e2..daf85130b5ef 100644
+> --- a/hw/ppc/spapr_vio.c
+> +++ b/hw/ppc/spapr_vio.c
+> @@ -475,7 +475,15 @@ static void spapr_vio_busdev_realize(DeviceState *qd=
+ev, Error **errp)
+>          dev->qdev.id =3D id;
+>      }
+> =20
+> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err);
+> +    if (!dev->irq) {
+> +        dev->irq =3D spapr_irq_findone(spapr, &local_err);
+> +        if (local_err) {
+> +            error_propagate(errp, local_err);
+> +            return;
+> +        }
+> +    }
+> +
+> +    spapr_irq_claim(spapr, dev->irq, false, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+>          return;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -175,24 +279,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---KHHg66sM3ACL179N
+--pW9qtIr+3H2OZPIR
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsoULUACgkQbDjKyiDZ
-s5JMAhAAmQHzRzk89mgOhQckiCTP030Viys3NPoNAE7Dtmd/8XlIA6asSSIpZtty
-JstmHGljbAueUbRwTFb8X1Xo6r1ZH5bmk1wsDRvP5DVqZm/JqDxDisAhAvBarbCs
-YzJMraLg7AhYAI3CeQY6Td/qT65Reax8NPtH3d8CghzaeRzmH6zcmjKiZpHYyqqm
-MkV9V21hVHPYQzX6b2K9OnDhxtddqAsxYT6oIKbNX6FuCKP3u2krRZSB9wRSxzCc
-6ICGS78352tcbxjXPqzZZW1AIp0iqXpImg9kJ3b2V4daZr70sK1O0nz/B69BbGWF
-0KNw4pd0q+hf32tIUSVU2WpOR+Qmku19eLmflbkd1sdfswD/ptevsAhhvoJnRvv9
-KI4YJVthbk5m5pli5M5s7uUyPkrpv66jlF+OhwXu+1RP3pSaukurGzLu4wfpo86U
-73oy7/n/njzDPiZusF2DvhADvk6csCTRRxF6b1j0d4QTuhG3uVRGySXcagM99l2B
-bsUSxsQslMJb9bgPwVy0q4PKohE6EoPJEVnnccLCrw0Y+d+ADrD0G9KoSyr/ie7e
-K7pIcnA2uqAupJ3OxQkZZsCMGoht4OIOKLGuKsY/apV8ZMtQSzN9b/+MRWIAiWTa
-JRuVsRcj1eVQlo61YNaNk/PK2Y9le7XyCo/6Z2OLHhk/zIB2tI4=
-=qpGR
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsoUJIACgkQbDjKyiDZ
+s5JXsBAA26Mw/YOWgnylbKSuxEbIJpJrSaEdv2cJXSBAFhNFsrl1nHO40xKjKmVL
+eKqgSE1BVQ+fl8yX8E7IKPySfpYRgOsAo81dLPCW8NQVndGOdHsfP2kHmXtptyEp
+/QpUkVMkTg+S/z9L+tCNQR7wcNNqs9DOLFXbTA9kLJMhcTav9KytR0U/b04cme8P
+P4/lBj2PoQJcedECcxiS2GC4kJ+7DXngyJ8XWvSo6MGAGwJGqmcxxIbh16se90fC
+3WKJPbW8savmpxMhZQzx3FGmuyC5PyEkMF0/t+gy0U9M4IK4bjtY0FWT7n3CsBdZ
+A6b3Qi+PBPckejQjtV8qyrP1XCHlhmEdxr4Q9YRsHUpEaIn8zQQDA7YePlEUBfYG
+6QYakIYYLS7G2nnfzkfpqRM+9/1Z/sByHW5GbAKy4FxMV8V7x2hshY+IY8bMMZcv
+W8JK4kVnfI/tqB6wBNiu9pfnKsAqmILRei4FlQCW6CLaG9RgZvh0Kcq4h2zU0lBD
+XrHPRVGa2FqkmOxdRSP29CLGXlq7XAar+n8bzHEGV5JIVW3gz4tvHLUkXRPFHDIv
+DWHr6qKg05k/g+E4eWmsBKsxODHn+qAa3RVxbKXyRGYTHRd2T0XhiRuDtmxgo0Tc
+gH8XbcWUVOnMcK72Xi+rBc82MuskqEdf/cbdW24/bPjknYzIYGI=
+=AMoe
 -----END PGP SIGNATURE-----
 
---KHHg66sM3ACL179N--
+--pW9qtIr+3H2OZPIR--
