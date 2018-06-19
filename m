@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@sebastianbauer.info>) id 1fVE9P-00042R-Pj
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:46:16 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fVEDg-0005Nb-F3
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:50:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@sebastianbauer.info>) id 1fVE9P-0005KG-2F
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:46:15 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fVEDc-0006ho-Dj
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:50:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61387)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fVEDc-0006hf-2z
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 06:50:36 -0400
+Date: Tue, 19 Jun 2018 07:50:32 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180619105032.GO7451@localhost.localdomain>
+References: <20180618175958.29073-1-armbru@redhat.com>
+	<20180618175958.29073-2-armbru@redhat.com>
+	<20180618213526.GJ24764@localhost.localdomain>
+	<87tvpzz3wn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Tue, 19 Jun 2018 12:46:01 +0200
-From: Sebastian Bauer <mail@sebastianbauer.info>
-In-Reply-To: <alpine.BSF.2.21.1806191218120.6476@zero.eik.bme.hu>
-References: <20180618215601.8974-1-mail@sebastianbauer.info>
-	<20180618235557.GB25461@umbus.fritz.box>
-	<73dd5b26b622e6c59776976aa2c7a3a0@sebastianbauer.info>
-	<20180619043631.GC11674@umbus.fritz.box>
-	<alpine.BSF.2.21.1806191218120.6476@zero.eik.bme.hu>
-Message-ID: <a4d4ed6dd28280922d3444364da28de0@sebastianbauer.info>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] ppc: Include vga cirrus card
- into the compiling process
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87tvpzz3wn.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] qapi: Open files with
+ encoding='utf-8'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +30,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: David Gibson <david@gibson.dropbear.id.au>, thuth@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: tamiko@43-1.org, qemu-devel@nongnu.org, arfrever.fta@gmail.com
 
-Am 2018-06-19 12:23, schrieb BALATON Zoltan:
-> On Tue, 19 Jun 2018, David Gibson wrote:
->> Ok.  However, your patch doesn't apply against the ppc-for-3.0 tree.
->> It looks like you've made it against a tree including some of BALATON
->> Zoltan's proposed but not yet merged patches.
-> I've sent those patches as well. But if this also works with pseries
-> maybe it does not have to be in the For sam460ex part of the config
-> but could be on it's own with a comment saying that multiple machines
-> can use it.
+On Tue, Jun 19, 2018 at 08:28:08AM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+> > On Mon, Jun 18, 2018 at 07:59:57PM +0200, Markus Armbruster wrote:
+> >> Python 2 happily reads UTF-8 files in text mode, but Python 3 requires
+> >> either UTF-8 locale or an explicit encoding passed to open().  Commit
+> >> d4e5ec877ca fixed this by setting the en_US.UTF-8 locale.  Falls apart
+> >> when the locale isn't be available.
+> >> 
+> >> Matthias Maier and Arfrever Frehtes Taifersar Arahesis proposed to use
+> >> binary mode instead, with manual conversion from bytes to str.  Works,
+> >> but opening with an explicit encoding is simpler, so do that.
+> >> 
+> >> Since Python 2's open() doesn't support the encoding parameter, we
+> >> need to suppress it with a version check.
+> >> 
+> >> Reported-by: Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
+> >> Reported-by: Matthias Maier <tamiko@43-1.org>
+> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> >> ---
+> >>  scripts/qapi/common.py | 17 ++++++++++++++---
+> >>  1 file changed, 14 insertions(+), 3 deletions(-)
+> >> 
+> >> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> >> index 2462fc0291..832f11438a 100644
+> >> --- a/scripts/qapi/common.py
+> >> +++ b/scripts/qapi/common.py
+> >> @@ -16,6 +16,7 @@ import errno
+> >>  import os
+> >>  import re
+> >>  import string
+> >> +import sys
+> >>  from collections import OrderedDict
+> >>  
+> >>  builtin_types = {
+> >> @@ -340,7 +341,10 @@ class QAPISchemaParser(object):
+> >>              return None
+> >>  
+> >>          try:
+> >> -            fobj = open(incl_fname, 'r')
+> >> +            if sys.version_info[0] >= 3:
+> >> +                fobj = open(incl_fname, 'r', encoding='utf-8')
+> >> +            else:
+> >> +                fobj = open(incl_fname, 'r')
+> >
+> > I dislike the Python version check, but getting rid of it would
+> > require rewriting the QAPI modules to not use the Python 2 str
+> > type (that has different semantics from Python 3 str type).
+> 
+> The version check is ugly, but it has a property I rather like: when we
+> drop support for Python 2, the conditional becomes True, and partial
+> evaluation results in the Python 3 code we actually want.
+> 
+> > The python-future package would help us write code for a single
+> > file/string API instead of two different APIs, but it's not a
+> > QEMU build dependency (yet?), so this patch is good enough for
+> > now.
+> 
+> Please do not invest more than absolutely necessary in Python 2 support.
+> All such investment will turn into technical debt in less than two
+> years.  If you must invest, pick a solution that will result in less
+> technical debt.  We can accept local ugliness for that.
+> 
+> In my personal opinion, dumb ideas like supporting Python 2 this close
+> to its EOL ought to look ugly.
 
-In my opinion, it should be added to pci.mak (and removed from all 
-present configs that include pci.mak). There is also CONFIG_VGA_PCI 
-there, a bunch of network cards and other stuff. The Cirrus VGA is just 
-another PCI card that one could plug into any systems that has a PCI(e) 
-bus, also on physical hardware (whether it is supported by which guests 
-is a different question).
+That's the whole point: python-future allows us to not worry
+about Python 2 support in the code anymore because it exposes the
+Python 3 string API (and others) even if we're running Python 2.
 
-However, I wanted to be conservative with my change so I added it only 
-to the 32 bit PPC branch, because this is the platform that I can easily 
-test. Does anybody know why CONFIG_VGA_CIRRUS is selectively enabled for 
-PCI-based systems? What would speak against adding it to pci.mak?
+After we stop supporting Python 2, we can simply delete the "from
+__future__ import .*" and "from builtins import .*" lines.
 
-Bye
-Sebastian
+Anyway, I will send a RFC series demonstrating that, and then we
+can discuss if it's worth it.  My main worry is not the extra
+imports in Python code, but the introduction of a new build
+dependency only for a few (one?) releases.
+
+
+> 
+> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> > Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+> 
+> Uh, what does "Acked-by" add over "Reviewed-by"?
+
+It was supposed to indicate that I agree it can be merged through
+other maintainers.  But it looks like this is not part of the
+original definition of "Acked-by"?
+
+-- 
+Eduardo
