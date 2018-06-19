@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44358)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVJ0x-0000vw-Tv
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:57:52 -0400
+	(envelope-from <berrange@redhat.com>) id 1fVJ2B-0001yN-9O
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:59:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVJ0x-0005lZ-3X
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:57:52 -0400
-Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:46426)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fVJ0w-0005l9-Ta
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:57:51 -0400
-Received: by mail-oi0-x232.google.com with SMTP id h79-v6so152875oig.13
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 08:57:50 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1fVJ27-0006FR-D8
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:59:07 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41020 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVJ27-0006Eu-5o
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 11:59:03 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 80E917DAC3
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 15:59:02 +0000 (UTC)
+Date: Tue, 19 Jun 2018 16:58:59 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180619155859.GE26829@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180619151719.17002-1-berrange@redhat.com>
+	<20180619154504.GI2368@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20180618164504.24488-1-kwolf@redhat.com>
-References: <20180618164504.24488-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Jun 2018 16:57:29 +0100
-Message-ID: <CAFEAcA-LZyARdFAgxCOQQNGro=ydU62fP8b9LXXLO+=ws=46dQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/35] Block layer patches
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180619154504.GI2368@work-vm>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: fix crash in when incoming
+ client channel setup fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +36,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 
-On 18 June 2018 at 17:44, Kevin Wolf <kwolf@redhat.com> wrote:
-> The following changes since commit 2ef2f16781af9dee6ba6517755e9073ba5799fa2:
->
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20180615a' into staging (2018-06-15 18:13:35 +0100)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to 4c790afe2503eab12874508acab5b388d7babfd2:
->
->   Merge remote-tracking branch 'mreitz/tags/pull-block-2018-06-18' into queue-block (2018-06-18 17:20:42 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - Active mirror (blockdev-mirror copy-mode=write-blocking)
-> - bdrv_drain_*() fixes and test cases
-> - Fix crash with scsi-hd and drive_del
->
+On Tue, Jun 19, 2018 at 04:45:05PM +0100, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+> > The way we determine if we can start the incoming migration was
+> > changed to use migration_has_all_channels() in:
+> >=20
+> >   commit 428d89084c709e568f9cd301c2f6416a54c53d6d
+> >   Author: Juan Quintela <quintela@redhat.com>
+> >   Date:   Mon Jul 24 13:06:25 2017 +0200
+> >=20
+> >     migration: Create migration_has_all_channels
+> >=20
+> > This method in turn calls multifd_recv_all_channels_created()
+> > which is hardcoded to always return 'true' when multifd is
+> > not in use.
+> >=20
+> > This means that if channel initialization fails with normal
+> > migration, it'll never notice and attempt to start the
+> > incoming migration regardless.
+>=20
+> I'm not sure if that was actually the cause, because older versions
+> had no check at all in socket_accept_incoming_migration.
 
-Applied, thanks.
+Hmm, actually your write - it was a complicated series of refactorings
+for multifd, and I think I mis-identified. I'll do a proper bisect so
+we can have an accurate record.
 
--- PMM
+>=20
+> > This can be seen, for example, if a client connects to a server
+> > requiring TLS, but has an invalid x509 certificate:
+> >=20
+> > qemu-system-x86_64: The certificate hasn't got a known issuer
+> > qemu-system-x86_64: migration/migration.c:386: process_incoming_migra=
+tion_co: Assertion `mis->from_src_file' failed.
+> >=20
+> >  #0  0x00007fffebd24f2b in raise () at /lib64/libc.so.6
+> >  #1  0x00007fffebd0f561 in abort () at /lib64/libc.so.6
+> >  #2  0x00007fffebd0f431 in _nl_load_domain.cold.0 () at /lib64/libc.s=
+o.6
+> >  #3  0x00007fffebd1d692 in  () at /lib64/libc.so.6
+> >  #4  0x0000555555ad027e in process_incoming_migration_co (opaque=3D<o=
+ptimized out>) at migration/migration.c:386
+> >  #5  0x0000555555c45e8b in coroutine_trampoline (i0=3D<optimized out>=
+, i1=3D<optimized out>) at util/coroutine-ucontext.c:116
+> >  #6  0x00007fffebd3a6a0 in __start_context () at /lib64/libc.so.6
+> >  #7  0x0000000000000000 in  ()
+> >=20
+> > To handle the non-multifd case, we check whether mis->from_src_file
+> > is non-NULL.
+>=20
+> So, what happens with this fix, does the destination exit cleanly, or
+> stay to accept another connection or what?
+
+It stays around and can accept another connection, which is actually
+quite desirable, as it limits impact of a malicious client from DOS'ing
+the genuine client by racing to connect first.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
