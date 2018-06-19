@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVGtj-00039k-6K
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:42:18 -0400
+	(envelope-from <david@redhat.com>) id 1fVGtp-0003Gc-Rg
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:42:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVGti-0004ME-7U
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:42:15 -0400
+	(envelope-from <david@redhat.com>) id 1fVGto-0004OE-Ol
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:42:21 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Tue, 19 Jun 2018 15:41:39 +0200
-Message-Id: <20180619134141.29478-11-david@redhat.com>
+Date: Tue, 19 Jun 2018 15:41:41 +0200
+Message-Id: <20180619134141.29478-13-david@redhat.com>
 In-Reply-To: <20180619134141.29478-1-david@redhat.com>
 References: <20180619134141.29478-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 10/12] nvdimm: convert nvdimm_mr into a
- pointer
+Subject: [Qemu-devel] [PATCH v5 12/12] pc-dimm: get_memory_region() will not
+ fail after realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,86 +23,120 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
 
-This way we can easily check if the region has already been inititalized
-without having to rely on the size of an uninitialized region being 0.
+Let's try to reduce error handling a bit. In the plug/unplug case, the
+device was realized and therefore we can assume that getting access to
+the memory region will not fail.
 
-Free the region in nvdimm_finalize() and not in unrealize() as we will
-allow to create the region before realization in following patches.
+For get_vmstate_memory_region() this is already handled that way.
+Document both cases.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/mem/nvdimm.c         | 17 +++++++++++++----
- include/hw/mem/nvdimm.h |  2 +-
- 2 files changed, 14 insertions(+), 5 deletions(-)
+ hw/i386/pc.c             |  7 +------
+ hw/mem/pc-dimm.c         |  7 +------
+ hw/ppc/spapr.c           | 12 ++----------
+ include/hw/mem/pc-dimm.h |  6 ++++--
+ 4 files changed, 8 insertions(+), 24 deletions(-)
 
-diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-index 7260c9c6b1..afd3912d6b 100644
---- a/hw/mem/nvdimm.c
-+++ b/hw/mem/nvdimm.c
-@@ -43,7 +43,7 @@ static void nvdimm_set_label_size(Object *obj, Visitor *v, const char *name,
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 2db032a6df..f310040351 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1706,15 +1706,10 @@ static void pc_memory_plug(HotplugHandler *hotplug_dev,
+     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryRegion *mr;
++    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+     uint64_t align = TARGET_PAGE_SIZE;
+     bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+ 
+-    mr = ddc->get_memory_region(dimm, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+-
+     if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
+         align = memory_region_get_alignment(mr);
+     }
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index 4ff39b59ef..65843bc52a 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -37,15 +37,10 @@ void pc_dimm_plug(DeviceState *dev, MachineState *machine, uint64_t align,
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+     MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
+                                                               &error_abort);
++    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
      Error *local_err = NULL;
-     uint64_t value;
+-    MemoryRegion *mr;
+     uint64_t addr;
  
--    if (memory_region_size(&nvdimm->nvdimm_mr)) {
-+    if (nvdimm->nvdimm_mr) {
-         error_setg(&local_err, "cannot change property value");
-         goto out;
-     }
-@@ -71,11 +71,18 @@ static void nvdimm_init(Object *obj)
-                         NULL, NULL);
- }
+-    mr = ddc->get_memory_region(dimm, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+-
+     addr = object_property_get_uint(OBJECT(dimm),
+                                     PC_DIMM_ADDR_PROP, &local_err);
+     if (local_err) {
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 4250a3c9b8..74d1d23506 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3148,14 +3148,10 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     sPAPRMachineState *ms = SPAPR_MACHINE(hotplug_dev);
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryRegion *mr;
++    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+     uint64_t align, size, addr;
+     uint32_t node;
  
-+static void nvdimm_finalize(Object *obj)
-+{
-+    NVDIMMDevice *nvdimm = NVDIMM(obj);
-+
-+    g_free(nvdimm->nvdimm_mr);
-+}
-+
- static MemoryRegion *nvdimm_get_memory_region(PCDIMMDevice *dimm, Error **errp)
- {
-     NVDIMMDevice *nvdimm = NVDIMM(dimm);
+-    mr = ddc->get_memory_region(dimm, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+     align = memory_region_get_alignment(mr);
+     size = memory_region_size(mr);
  
--    return &nvdimm->nvdimm_mr;
-+    return nvdimm->nvdimm_mr;
- }
+@@ -3346,16 +3342,12 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
+     Error *local_err = NULL;
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+-    MemoryRegion *mr;
++    MemoryRegion *mr = ddc->get_memory_region(dimm, &error_abort);
+     uint32_t nr_lmbs;
+     uint64_t size, addr_start, addr;
+     int i;
+     sPAPRDRConnector *drc;
  
- static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
-@@ -102,9 +109,10 @@ static void nvdimm_realize(PCDIMMDevice *dimm, Error **errp)
-         return;
-     }
+-    mr = ddc->get_memory_region(dimm, &local_err);
+-    if (local_err) {
+-        goto out;
+-    }
+     size = memory_region_size(mr);
+     nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
  
--    memory_region_init_alias(&nvdimm->nvdimm_mr, OBJECT(dimm),
-+    nvdimm->nvdimm_mr = g_new(MemoryRegion, 1);
-+    memory_region_init_alias(nvdimm->nvdimm_mr, OBJECT(dimm),
-                              "nvdimm-memory", mr, 0, pmem_size);
--    nvdimm->nvdimm_mr.align = align;
-+    nvdimm->nvdimm_mr->align = align;
- }
- 
- /*
-@@ -167,6 +175,7 @@ static TypeInfo nvdimm_info = {
-     .class_init    = nvdimm_class_init,
-     .instance_size = sizeof(NVDIMMDevice),
-     .instance_init = nvdimm_init,
-+    .instance_finalize = nvdimm_finalize,
- };
- 
- static void nvdimm_register_types(void)
-diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-index 9340631cfc..c5c9b3c7f8 100644
---- a/include/hw/mem/nvdimm.h
-+++ b/include/hw/mem/nvdimm.h
-@@ -74,7 +74,7 @@ struct NVDIMMDevice {
-      * it's the PMEM region in NVDIMM device, which is presented to
-      * guest via ACPI NFIT and _FIT method if NVDIMM hotplug is supported.
-      */
--    MemoryRegion nvdimm_mr;
-+    MemoryRegion *nvdimm_mr;
- 
-     /*
-      * The 'on' value results in the unarmed flag set in ACPI NFIT,
+diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+index 5679a80465..26ebb7d5e9 100644
+--- a/include/hw/mem/pc-dimm.h
++++ b/include/hw/mem/pc-dimm.h
+@@ -62,9 +62,11 @@ typedef struct PCDIMMDevice {
+  * @realize: called after common dimm is realized so that the dimm based
+  * devices get the chance to do specified operations.
+  * @get_memory_region: returns #MemoryRegion associated with @dimm which
+- * is directly mapped into the physical address space of guest.
++ * is directly mapped into the physical address space of guest. Will not
++ * fail after the device was realized.
+  * @get_vmstate_memory_region: returns #MemoryRegion which indicates the
+- * memory of @dimm should be kept during live migration.
++ * memory of @dimm should be kept during live migration. Will not fail
++ * after the device was realized.
+  */
+ typedef struct PCDIMMDeviceClass {
+     /* private */
 -- 
 2.17.1
