@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhengxiang9@huawei.com>) id 1fVBY3-00086q-GJ
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:59:32 -0400
+	(envelope-from <atar4qemu@gmail.com>) id 1fVBcB-0000nw-4G
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:03:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhengxiang9@huawei.com>) id 1fVBY2-0008Jv-QG
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:59:31 -0400
-From: Zheng Xiang <zhengxiang9@huawei.com>
-Date: Tue, 19 Jun 2018 15:58:21 +0800
-Message-ID: <20180619075821.9884-1-zhengxiang9@huawei.com>
+	(envelope-from <atar4qemu@gmail.com>) id 1fVBc6-0001Sr-54
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:03:47 -0400
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:37252)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <atar4qemu@gmail.com>) id 1fVBc5-0001Ro-VZ
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:03:42 -0400
+Received: by mail-it0-x242.google.com with SMTP id l6-v6so15889208iti.2
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 01:03:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] target-arm: fix a segmentation fault due to
- illegal memory access
+In-Reply-To: <da05f804-31f4-e820-12ed-22a240bf2d07@ilande.co.uk>
+References: <40d9df00-f80d-02a4-58ec-b407e7dd8cdb@redhat.com>
+	<da05f804-31f4-e820-12ed-22a240bf2d07@ilande.co.uk>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Tue, 19 Jun 2018 10:03:20 +0200
+Message-ID: <CACXAS8CE9OZ+bxOUQCjDVedqGNUXMRvDWfCWmhf4jqeVzLVGZA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] valgrind problem in sun4u_load_kernel()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,32 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: zhaoshenglong@huawei.com, peter.maydell@linaro.org, Zheng Xiang <xiang.zheng@linaro.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: Zheng Xiang <xiang.zheng@linaro.org>
+On Sun, Jun 17, 2018 at 12:22 PM, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> On 15/06/18 11:37, Thomas Huth wrote:
+>
+>>   Hi Mark, hi Artyom,
+>>
+>> while using valgrind to fix some issues with the rom_ptr() function
+>> today, I noticed that there is one more problem in sun4u_load_kernel():
+>> The kernel_top variable can be used uninitialized in some cases:
+>> If load_elf() fails and the kernel is loaded via load_aout() or
+>> load_image_targphys(), the kernel_top variable is never set to a valid
+>> value. This could cause some trouble when loading the initrd later. When
+>> you've got some spare time, could you please have a look?
+>
+>
+> Hmmm that's an interesting one - I'm not immediately aware of any 64-bit
+> kernels that are a.out rather than ELF, so I wonder if this has been used to
+> run a.out executables on startup? Any thoughts, Artyom?
 
-The elements of kvm_devices_head list are freed in kvm_arm_machine_init_done(),
-but we still access these illegal memory in kvm_arm_devlistener_del().
+I think there are no Linux/SPARC64 kernels in the a.out format.
+NetBSD should not be a problem either
 
-This will cause segment fault when booting guest with MALLOC_PERTURB_=1.
+> If this is the case then we can only have a valid kernel_top with an ELF
+> kernel then maybe the following is a good enough solution:
+>
+>
+> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+> index 3975a7b65a..35acf8c96e 100644
+> --- a/hw/sparc64/sun4u.c
+> +++ b/hw/sparc64/sun4u.c
+> @@ -139,7 +139,7 @@ static uint64_t sun4u_load_kernel(const char
+> *kernel_filename,
+>      unsigned int i;
+>      long kernel_size;
+>      uint8_t *ptr;
+> -    uint64_t kernel_top;
+> +    uint64_t kernel_top = 0;
+>
+>      linux_boot = (kernel_filename != NULL);
+>
+> @@ -172,7 +172,7 @@ static uint64_t sun4u_load_kernel(const char
+> *kernel_filename,
+>          }
+>          /* load initrd above kernel */
+>          *initrd_size = 0;
+> -        if (initrd_filename) {
+> +        if (initrd_filename && kernel_top) {
+>              *initrd_addr = TARGET_PAGE_ALIGN(kernel_top);
+>
+>              *initrd_size = load_image_targphys(initrd_filename,
+>
+>
+Looks good to me.
+Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
 
-Signed-off-by: Zheng Xiang <xiang.zheng@linaro.org>
----
- target/arm/kvm.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 98f5006..5bf41e1 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -256,6 +256,7 @@ static void kvm_arm_machine_init_done(Notifier *notifier, void *data)
-             kvm_arm_set_device_addr(kd);
-         }
-         memory_region_unref(kd->mr);
-+        QSLIST_REMOVE_HEAD(&kvm_devices_head, entries);
-         g_free(kd);
-     }
-     memory_listener_unregister(&devlistener);
 -- 
-1.8.3.1
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
