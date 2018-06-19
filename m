@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5j4-0002eI-Gz
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:31 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5j6-0002fP-R2
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5j3-0000Ot-La
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:30 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5j5-0000Pa-Oi
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:32 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:30 -0500
-Message-Id: <20180619014319.28272-65-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:42:31 -0500
+Message-Id: <20180619014319.28272-66-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 064/113] tcg/arm: Fix memory barrier encoding
+Subject: [Qemu-devel] [PATCH 065/113] target/arm: Implement v8M VLLDM and
+ VLSTM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,52 +22,55 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Henry Wertz <hwertz10@gmail.com>, Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-stable@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 
-From: Henry Wertz <hwertz10@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-I found with qemu 2.11.x or newer that I would get an illegal instruction
-error running some Intel binaries on my ARM chromebook.  On investigation,
-I found it was quitting on memory barriers.
+For v8M the instructions VLLDM and VLSTM support lazy saving
+and restoring of the secure floating-point registers. Even
+if the floating point extension is not implemented, these
+instructions must act as NOPs in Secure state, so they can
+be used as part of the secure-to-nonsecure call sequence.
 
-qemu instruction:
-mb $0x31
-was translating as:
-0x604050cc:  5bf07ff5  blpl     #0x600250a8
-
-After patch it gives:
-0x604050cc:  f57ff05b  dmb      ish
-
-In short, I found INSN_DMB_ISH (memory barrier for ARMv7) appeared to be
-correct based on online docs, but due to some endian-related shenanigans it
-had to be byte-swapped to suit qemu; it appears INSN_DMB_MCR (memory
-barrier for ARMv6) also should be byte swapped  (and this patch does so).
-I have not checked for correctness of aarch64's barrier instruction.
-
+Fixes: https://bugs.launchpad.net/qemu/+bug/1768295
 Cc: qemu-stable@nongnu.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Henry Wertz <hwertz10@gmail.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-(cherry picked from commit 3f814b803797c007abfe5c4041de754e01723031)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20180503105730.5958-1-peter.maydell@linaro.org
+(cherry picked from commit b1e5336a9899016c53d59eba53ebf6abcc21995c)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tcg/arm/tcg-target.inc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/arm/translate.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
-index 98a12535a5..ccbd324262 100644
---- a/tcg/arm/tcg-target.inc.c
-+++ b/tcg/arm/tcg-target.inc.c
-@@ -159,8 +159,8 @@ typedef enum {
-     INSN_STRD_IMM  = 0x004000f0,
-     INSN_STRD_REG  = 0x000000f0,
- 
--    INSN_DMB_ISH   = 0x5bf07ff5,
--    INSN_DMB_MCR   = 0xba0f07ee,
-+    INSN_DMB_ISH   = 0xf57ff05b,
-+    INSN_DMB_MCR   = 0xee070fba,
- 
-     /* Architected nop introduced in v6k.  */
-     /* ??? This is an MSR (imm) 0,0,0 insn.  Anyone know if this
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index f120932f44..a8e8168a06 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -10511,8 +10511,23 @@ static int disas_thumb2_insn(DisasContext *s, uint32_t insn)
+         /* Coprocessor.  */
+         if (arm_dc_feature(s, ARM_FEATURE_M)) {
+             /* We don't currently implement M profile FP support,
+-             * so this entire space should give a NOCP fault.
++             * so this entire space should give a NOCP fault, with
++             * the exception of the v8M VLLDM and VLSTM insns, which
++             * must be NOPs in Secure state and UNDEF in Nonsecure state.
+              */
++            if (arm_dc_feature(s, ARM_FEATURE_V8) &&
++                (insn & 0xffa00f00) == 0xec200a00) {
++                /* 0b1110_1100_0x1x_xxxx_xxxx_1010_xxxx_xxxx
++                 *  - VLLDM, VLSTM
++                 * We choose to UNDEF if the RAZ bits are non-zero.
++                 */
++                if (!s->v8m_secure || (insn & 0x0040f0ff)) {
++                    goto illegal_op;
++                }
++                /* Just NOP since FP support is not implemented */
++                break;
++            }
++            /* All other insns: NOCP */
+             gen_exception_insn(s, 4, EXCP_NOCP, syn_uncategorized(),
+                                default_exception_el(s));
+             break;
 -- 
 2.11.0
