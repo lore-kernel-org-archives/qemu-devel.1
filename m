@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46152)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5iO-0001zW-Ok
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:49 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5iN-00008M-Fk
+	(envelope-from <flukshun@gmail.com>) id 1fV5iM-0001xr-Tc
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:48 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <flukshun@gmail.com>) id 1fV5iL-00007c-Kr
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:46 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:12 -0500
-Message-Id: <20180619014319.28272-47-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:42:11 -0500
+Message-Id: <20180619014319.28272-46-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 046/113] virtio_net: flush uncompleted TX on
- reset
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 045/113] arm/translate-a64: treat DISAS_UPDATE
+ as variant of DISAS_EXIT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,98 +25,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, Jason Wang <jasowang@redhat.com>
+Cc: qemu-stable@nongnu.org, Victor Kamensky <kamensky@cisco.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Greg Kurz <groug@kaod.org>
+From: Victor Kamensky <kamensky@cisco.com>
 
-If the backend could not transmit a packet right away for some reason,
-the packet is queued for asynchronous sending. The corresponding vq
-element is tracked in the async_tx.elem field of the VirtIONetQueue,
-for later freeing when the transmission is complete.
+In OE project 4.15 linux kernel boot hang was observed under
+single cpu aarch64 qemu. Kernel code was in a loop waiting for
+vtimer arrival, spinning in TC generated blocks, while interrupt
+was pending unprocessed. This happened because when qemu tried to
+handle vtimer interrupt target had interrupts disabled, as
+result flag indicating TCG exit, cpu->icount_decr.u16.high,
+was cleared but arm_cpu_exec_interrupt function did not call
+arm_cpu_do_interrupt to process interrupt. Later when target
+reenabled interrupts, it happened without exit into main loop, so
+following code that waited for result of interrupt execution
+run in infinite loop.
 
-If a reset happens before completion, virtio_net_tx_complete() will push
-async_tx.elem back to the guest anyway, and we end up with the inuse flag
-of the vq being equal to -1. The next call to virtqueue_pop() is then
-likely to fail with "Virtqueue size exceeded".
+To solve the problem instructions that operate on CPU sys state
+(i.e enable/disable interrupt), and marked as DISAS_UPDATE,
+should be considered as DISAS_EXIT variant, and should be
+forced to exit back to main loop so qemu will have a chance
+processing pending CPU state updates, including pending
+interrupts.
 
-This can be reproduced easily by starting a guest with an hubport backend
-that is not connected to a functional network, eg,
+This change brings consistency with how DISAS_UPDATE is treated
+in aarch32 case.
 
- -device virtio-net-pci,netdev=hub0 -netdev hubport,id=hub0,hubid=0
-
-and no other -netdev hubport,hubid=0 on the command line.
-
-The appropriate fix is to ensure that such an asynchronous transmission
-cannot survive a device reset. So for all queues, we first try to send
-the packet again, and eventually we purge it if the backend still could
-not deliver it.
-
+CC: Peter Maydell <peter.maydell@linaro.org>
+CC: Alex Bennée <alex.bennee@linaro.org>
 CC: qemu-stable@nongnu.org
-Reported-by: R. Nageswara Sastry <nasastry@in.ibm.com>
-Buglink: https://github.com/open-power-host-os/qemu/issues/37
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Tested-by: R. Nageswara Sastry <nasastry@in.ibm.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-(cherry picked from commit 94b52958b77a2a040564cf7ed716d3a9545d94e5)
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Victor Kamensky <kamensky@cisco.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 1521526368-1996-1-git-send-email-kamensky@cisco.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+(cherry picked from commit a75a52d62418dafe462be4fe30485501d1010bb9)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/net/virtio-net.c | 11 +++++++++++
- include/net/net.h   |  1 +
- net/net.c           |  1 -
- 3 files changed, 12 insertions(+), 1 deletion(-)
+ target/arm/translate-a64.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 38674b08aa..6bdef38ceb 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -422,6 +422,7 @@ static RxFilterInfo *virtio_net_query_rxfilter(NetClientState *nc)
- static void virtio_net_reset(VirtIODevice *vdev)
- {
-     VirtIONet *n = VIRTIO_NET(vdev);
-+    int i;
- 
-     /* Reset back to compatibility mode */
-     n->promisc = 1;
-@@ -445,6 +446,16 @@ static void virtio_net_reset(VirtIODevice *vdev)
-     memcpy(&n->mac[0], &n->nic->conf->macaddr, sizeof(n->mac));
-     qemu_format_nic_info_str(qemu_get_queue(n->nic), n->mac);
-     memset(n->vlans, 0, MAX_VLAN >> 3);
-+
-+    /* Flush any async TX */
-+    for (i = 0;  i < n->max_queues; i++) {
-+        NetClientState *nc = qemu_get_subqueue(n->nic, i);
-+
-+        if (nc->peer) {
-+            qemu_flush_or_purge_queued_packets(nc->peer, true);
-+            assert(!virtio_net_get_subqueue(nc)->async_tx.elem);
-+        }
-+    }
- }
- 
- static void peer_test_vnet_hdr(VirtIONet *n)
-diff --git a/include/net/net.h b/include/net/net.h
-index 1c55a93588..ab87d426e1 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -156,6 +156,7 @@ ssize_t qemu_send_packet_async(NetClientState *nc, const uint8_t *buf,
-                                int size, NetPacketSent *sent_cb);
- void qemu_purge_queued_packets(NetClientState *nc);
- void qemu_flush_queued_packets(NetClientState *nc);
-+void qemu_flush_or_purge_queued_packets(NetClientState *nc, bool purge);
- void qemu_format_nic_info_str(NetClientState *nc, uint8_t macaddr[6]);
- bool qemu_has_ufo(NetClientState *nc);
- bool qemu_has_vnet_hdr(NetClientState *nc);
-diff --git a/net/net.c b/net/net.c
-index 39ef546708..0719358d03 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -612,7 +612,6 @@ void qemu_purge_queued_packets(NetClientState *nc)
-     qemu_net_queue_purge(nc->peer->incoming_queue, nc);
- }
- 
--static
- void qemu_flush_or_purge_queued_packets(NetClientState *nc, bool purge)
- {
-     nc->receive_disabled = 0;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 625ef2dfd2..c38109146f 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11384,12 +11384,12 @@ static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+         case DISAS_UPDATE:
+             gen_a64_set_pc_im(dc->pc);
+             /* fall through */
+-        case DISAS_JUMP:
+-            tcg_gen_lookup_and_goto_ptr();
+-            break;
+         case DISAS_EXIT:
+             tcg_gen_exit_tb(0);
+             break;
++        case DISAS_JUMP:
++            tcg_gen_lookup_and_goto_ptr();
++            break;
+         case DISAS_NORETURN:
+         case DISAS_SWI:
+             break;
 -- 
 2.11.0
