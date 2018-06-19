@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVH0v-0001GI-4L
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:49:42 -0400
+	(envelope-from <armbru@redhat.com>) id 1fVH4N-0003ld-M3
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:53:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVH0s-0008Dw-28
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:49:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51348 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fVH4L-0001nw-LC
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:53:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51458 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVH0r-0008Dr-Tf
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:49:37 -0400
-Date: Tue, 19 Jun 2018 14:49:33 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180619134933.GY20929@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180619132200.12320-1-sameeh@daynix.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVH4L-0001na-FR
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 09:53:13 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180619053426.13065-1-peterx@redhat.com>
+	<20180619053426.13065-4-peterx@redhat.com>
+Date: Tue, 19 Jun 2018 15:53:11 +0200
+In-Reply-To: <20180619053426.13065-4-peterx@redhat.com> (Peter Xu's message of
+	"Tue, 19 Jun 2018 13:34:22 +0800")
+Message-ID: <87a7rqvq60.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180619132200.12320-1-sameeh@daynix.com>
-Subject: Re: [Qemu-devel] [RFC 0/1] Add BPF suuport to Qemu
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 3/7] monitor: flush qmp responses when
+ CLOSED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +28,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sameeh@daynix.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Yan Vugenfirer <yan@daynix.com>, Amnon Ilan <ailan@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Tue, Jun 19, 2018 at 04:21:59PM +0300, Sameeh Jubran wrote:
-> From: Sameeh Jubran <sjubran@redhat.com>
-> 
-> The Berkeley Packet Filter has been in the kernel for a while now and I
-> think it is time that it is introduced to Qemu. This patch is an
-> infrastructure for any future usage of the BPF in Qemu.
-> 
-> It is important to note that the tun driver had started supporting using
-> BPF programs through ioctls (TUNSETSTEERINGEBPF and TUNSETFILTEREBPF).
-> 
-> At first, instead of adding the syscall wrappers, I wanted to integrate libbpf
-> library which resides in the Linux source tree under tools/lib/bpf. It appears
-> to be that by default it compiles to x64 on x64 arch - which can't be
-> integrated into Qemu  - and my attempts to compile the 32 bit versions have
-> failed. What's more interesting is that the vendors don't provide this library
-> in any package, which makes this library a nasty dependency.
-> 
-> Please share your thoughts :)
+Peter Xu <peterx@redhat.com> writes:
 
-IMHO there should be example usage illustrated for some part of QEMU
-before we add any general infrastructure, as you can't really do a
-useful design evaluation without understanding its usage.
+> Previously we clean up the queues when we got CLOSED event.  It was used
+> to make sure we won't send leftover replies/events of a old client to a
+> new client which makes perfect sense. However this will also drop the
+> replies/events even if the output port of the previous chardev backend
+> is still open, which can lead to missing of the last replies/events.
+> Now this patch does an extra operation to flush the response queue
+> before cleaning up.
+>
+> In most cases, a QMP session will be based on a bidirectional channel (a
+> TCP port, for example, we read/write to the same socket handle), so in
+> port and out port of the backend chardev are fundamentally the same
+> port. In these cases, it does not really matter much on whether we'll
+> flush the response queue since flushing will fail anyway.  However there
+> can be cases where in & out ports of the QMP monitor's backend chardev
+> are separated.  Here is an example:
+>
+>   cat $QMP_COMMANDS | qemu -qmp stdio ... | filter_commands
+>
+> In this case, the backend is fd-typed, and it is connected to stdio
+> where in port is stdin and out port is stdout.  Now if we drop all the
+> events on the response queue then filter_command process might miss some
+> events that it might expect.  The thing is that, when stdin closes,
+> stdout might still be there alive!
+>
+> In practice, I encountered SHUTDOWN event missing when running test with
+> iotest 087 with Out-Of-Band enabled.  Here is one of the ways that this
+> can happen (after "quit" command is executed and QEMU quits the main
+> loop):
+>
+> 1. [main thread] QEMU queues a SHUTDOWN event into response queue.
+>
+> 2. "cat" terminates (to distinguish it from the animal, I quote it).
+>
+> 3. [monitor iothread] QEMU's monitor iothread reads EOF from stdin.
+>
+> 4. [monitor iothread] QEMU's monitor iothread calls the CLOSED event
+>    hook for the monitor, which will destroy the response queue of the
+>    monitor, then the SHUTDOWN event is dropped.
+>
+> 5. [main thread] QEMU's main thread cleans up the monitors in
+>    monitor_cleanup().  When trying to flush pending responses, it sees
+>    nothing.  SHUTDOWN is lost forever.
+>
+> Note that before the monitor iothread was introduced, step [4]/[5] could
+> never happen since the main loop was the only place to detect the EOF
+> event of stdin and run the CLOSED event hooks.  Now things can happen in
+> parallel in the iothread.
+>
+> Without this patch, iotest 087 will have ~10% chance to miss the
+> SHUTDOWN event and fail when with Out-Of-Band enabled (the output is
+> manually touched up to suite line width requirement):
 
-It isn't clear that QEMU is neccessarily the best place to even do it, if
-the intended usage is to provide network traffic firewalling for guest
-NICs. eg libvirt already provides a firewalling system based on iptables,
-that could have an BPFilter implementation added to it.
+I wouldn't wrap lines when quoting a diff.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>
+> --- /home/peterx/git/qemu/tests/qemu-iotests/087.out
+> +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/087.out.bad
+> @@ -8,7 +8,6 @@
+>  {"return": {}}
+>  {"error": {"class": "GenericError", "desc": "'node-name' must be
+>   specified for the root node"}}
+>  {"return": {}}
+> -{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP},
+> - "event": "SHUTDOWN", "data": {"guest": false}}
+>
+>  === Duplicate ID ===
+> @@ -53,7 +52,6 @@
+>  {"return": {}}
+>  {"return": {}}
+>  {"return": {}}
+>
+> -{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP},
+> - "event": "SHUTDOWN", "data": {"guest": false}}
+
+Please indent the quoted diff a bit, so make it more obviously not part
+of the patch.  In fact, git-am chokes on it for me.
+
+>
+> This patch fixes the problem.
+>
+> Fixes: 6d2d563f8c ("qmp: cleanup qmp queues properly", 2018-03-27)
+> Suggested-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  monitor.c | 33 ++++++++++++++++++++++++++++++---
+>  1 file changed, 30 insertions(+), 3 deletions(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index d4a463f707..c9a02ee40c 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -512,6 +512,27 @@ struct QMPResponse {
+>  };
+>  typedef struct QMPResponse QMPResponse;
+>  
+> +static QObject *monitor_qmp_response_pop_one(Monitor *mon)
+> +{
+> +    QObject *data;
+> +
+> +    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+> +    data = g_queue_pop_head(mon->qmp.qmp_responses);
+> +    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+> +
+> +    return data;
+> +}
+> +
+> +static void monitor_qmp_response_flush(Monitor *mon)
+> +{
+> +    QObject *data;
+> +
+> +    while ((data = monitor_qmp_response_pop_one(mon))) {
+> +        monitor_json_emitter_raw(mon, data);
+> +        qobject_unref(data);
+> +    }
+> +}
+> +
+>  /*
+>   * Pop a QMPResponse from any monitor's response queue into @response.
+>   * Return false if all the queues are empty; else true.
+> @@ -523,9 +544,7 @@ static bool monitor_qmp_response_pop_any(QMPResponse *response)
+>  
+>      qemu_mutex_lock(&monitor_lock);
+>      QTAILQ_FOREACH(mon, &mon_list, entry) {
+> -        qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+> -        data = g_queue_pop_head(mon->qmp.qmp_responses);
+> -        qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+> +        data = monitor_qmp_response_pop_one(mon);
+>          if (data) {
+>              response->mon = mon;
+>              response->data = data;
+> @@ -4364,6 +4383,14 @@ static void monitor_qmp_event(void *opaque, int event)
+>          mon_refcount++;
+>          break;
+>      case CHR_EVENT_CLOSED:
+> +        /*
+> +         * Note: this is only useful when the output of the chardev
+> +         * backend is still open.  For example, when the backend is
+> +         * stdio, it's possible that stdout is still open when stdin
+> +         * is closed.  After all, CHR_EVENT_CLOSED event is currently
+> +         * only bound to stdin.
+> +         */
+
+I'm not sure I get the last sentence.  What do you mean by "bound to
+stdin"?
+
+> +        monitor_qmp_response_flush(mon);
+>          monitor_qmp_cleanup_queues(mon);
+>          json_message_parser_destroy(&mon->qmp.parser);
+>          json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
