@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fVBhN-0002il-QI
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:09:10 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fVCCS-0001Ye-2R
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:41:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fVBhI-0002uG-D4
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:09:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49540 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVBhI-0002u5-8T
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:09:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D6A1387A7C
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 08:09:03 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
-	<20180321115211.17937-5-marcandre.lureau@redhat.com>
-Date: Tue, 19 Jun 2018 10:09:02 +0200
-In-Reply-To: <20180321115211.17937-5-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 21 Mar 2018 12:51:26 +0100")
-Message-ID: <87lgbbyz8h.fsf@dusky.pond.sub.org>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fVCCR-0005vl-7q
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:41:16 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35086)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fVCCR-0005vU-0u
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 04:41:15 -0400
+Received: by mail-wm0-x241.google.com with SMTP id j15-v6so20504292wme.0
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 01:41:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <87po0nyzrg.fsf@dusky.pond.sub.org>
+References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
+	<20180321115211.17937-4-marcandre.lureau@redhat.com>
+	<87po0nyzrg.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 19 Jun 2018 10:41:12 +0200
+Message-ID: <CAJ+F1C+aqkJau41jYMse_1ypq=prUjENjEXeymbKq8G4rv3u-A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 04/49] qapi: pass 'if' condition into
- QAPISchemaEntity objects
+Subject: Re: [Qemu-devel] [PATCH v3 03/49] qapi: add 'if' to top-level
+ expressions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,30 +32,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Built-in objects remain unconditional.  Explicitly defined objects
-> use the condition specified in the schema.  Implicitly defined
-> objects inherit their condition from their users.  For most of them,
-> there is exactly one user, so the condition to use is obvious.  The
-> exception is the wrapped type's generated for simple union variants,
-
-Editing accident in v4: you changed "is the wrapper types" to "is the
-wrapped type's" here instead of...
-
-> which can be shared by any number of simple unions.  The tight
-> condition would be the disjunction of the conditions of these simple
-> unions.  For now, use wrapped type's condition instead.  Much
-
-... changing "use wrapped type's" to "use the wrapped type's" here.  Can
-touch up on commit.
-
-> simpler and good enough for now.
+On Tue, Jun 19, 2018 at 9:57 AM, Markus Armbruster <armbru@redhat.com> wrot=
+e:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 >
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> Accept 'if' key in top-level elements, accepted as string or list of
+>> string type. The following patches will modify the test visitor to
+>> check the value is correctly saved, and generate #if/#endif code (as a
+>> single #if/endif line or a series for a list).
+>>
+>> Example of 'if' key:
+>> { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+>>   'if': 'defined(TEST_IF_STRUCT)' }
+>>
+>> The generated code is for now *unconditional*. Later patches generate
+>> the conditionals.
+>>
+>> A following patch for qapi-code-gen.txt will provide more complete
+>> documentation for 'if' usage.
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> [...]
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 0b277036df..f77ad2ba3b 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -436,6 +436,10 @@ qapi-schema +=3D args-unknown.json
+>>  qapi-schema +=3D bad-base.json
+>>  qapi-schema +=3D bad-data.json
+>>  qapi-schema +=3D bad-ident.json
+>> +qapi-schema +=3D bad-if.json
+>> +qapi-schema +=3D bad-if-empty.json
+>> +qapi-schema +=3D bad-if-empty-list.json
+>> +qapi-schema +=3D bad-if-list.json
+>>  qapi-schema +=3D bad-type-bool.json
+>>  qapi-schema +=3D bad-type-dict.json
+>>  qapi-schema +=3D bad-type-int.json
+>> @@ -933,6 +937,8 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): chec=
+k-%.json: $(SRC_PATH)/%.json
+>>               "TEST","$*.out")
+>>       @# Sanitize error messages (make them independent of build directo=
+ry)
+>>       @perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff -u $(SRC_PA=
+TH)/$*.err -
+>> +     @if test "$(QAPI_REGENERATE)" =3D=3D 1 ; then cp $*.test.out $(SRC=
+_PATH)/$*.out ; fi
+>> +     @if test "$(QAPI_REGENERATE)" =3D=3D 1 ; then cp $*.test.err $(SRC=
+_PATH)/$*.err ; fi
+>>       @diff -u $(SRC_PATH)/$*.out $*.test.out
+>>       @diff -u $(SRC_PATH)/$*.exit $*.test.exit
+>>
+>
+> Huh?
 
-R-by stands.
+Oops, leftover. Do you have an alternative? I could propose it as a
+seperate patch if it's generally useful.
+
+--=20
+Marc-Andr=C3=A9 Lureau
