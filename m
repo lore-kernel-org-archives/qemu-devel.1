@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5h9-0000i3-Fq
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:34 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5hB-0000iS-Hq
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5h8-0007ux-F4
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:31 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5hA-0007xg-J8
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:33 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:41:39 -0500
-Message-Id: <20180619014319.28272-14-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:41:40 -0500
+Message-Id: <20180619014319.28272-15-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 013/113] spapr: consolidate the VCPU id
- numbering logic in a single place
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 014/113] spapr: fix missing CPU core nodes in
+ DT when running with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,116 +29,81 @@ Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibs
 
 From: Greg Kurz <groug@kaod.org>
 
-Several places in the code need to calculate a VCPU id:
+Commit 5d0fb1508e2d "spapr: consolidate the VCPU id numbering logic
+in a single place" introduced a helper to detect thread0 of a virtual
+core based on its VCPU id. This is used to create CPU core nodes in
+the DT, but it is broken in TCG.
 
-    (cpu_index / smp_threads) * spapr->vsmt + cpu_index % smp_threads
-    (core_id / smp_threads) * spapr->vsmt (1 user)
-    index * spapr->vsmt (2 users)
+$ qemu-system-ppc64 -nographic -accel tcg -machine dumpdtb=dtb.bin \
+                    -smp cores=16,maxcpus=16,threads=1
+$ dtc -f -O dts dtb.bin | grep POWER8
+                PowerPC,POWER8@0 {
+                PowerPC,POWER8@8 {
 
-or guess that the VCPU id of a given VCPU is the first thread of a virtual
-core:
+instead of the expected 16 cores that we get with KVM:
 
-    index % spapr->vsmt != 0
+$ dtc -f -O dts dtb.bin | grep POWER8
+                PowerPC,POWER8@0 {
+                PowerPC,POWER8@8 {
+                PowerPC,POWER8@10 {
+                PowerPC,POWER8@18 {
+                PowerPC,POWER8@20 {
+                PowerPC,POWER8@28 {
+                PowerPC,POWER8@30 {
+                PowerPC,POWER8@38 {
+                PowerPC,POWER8@40 {
+                PowerPC,POWER8@48 {
+                PowerPC,POWER8@50 {
+                PowerPC,POWER8@58 {
+                PowerPC,POWER8@60 {
+                PowerPC,POWER8@68 {
+                PowerPC,POWER8@70 {
+                PowerPC,POWER8@78 {
 
-Even if the numbering logic isn't that complex, it is rather fragile to
-have these assumptions open-coded in several places. FWIW this was
-proved with recent issues related to VSMT.
+This happens because spapr_get_vcpu_id() maps VCPU ids to
+cs->cpu_index in TCG mode. This confuses the code in
+spapr_is_thread0_in_vcore(), since it assumes thread0 VCPU
+ids to have a spapr->vsmt spacing.
 
-This patch moves the VCPU id formula to a single function to be called
-everywhere the code needs to compute one. It also adds an helper to
-guess if a VCPU is the first thread of a VCORE.
+    spapr_get_vcpu_id(cpu) % spapr->vsmt == 0
 
+Actually, there's no real reason to expose cs->cpu_index instead
+of the VCPU id, since we also generate it with TCG. Also we already
+set it explicitly in spapr_set_vcpu_id(), so there's no real reason
+either to call kvm_arch_vcpu_id() with KVM.
+
+This patch unifies spapr_get_vcpu_id() to always return the computed
+VCPU id both in TCG and KVM. This is one step forward towards KVM<->TCG
+migration.
+
+Fixes: 5d0fb1508e2d
+Reported-by: Cédric Le Goater <clg@kaod.org>
 Signed-off-by: Greg Kurz <groug@kaod.org>
-[dwg: Rename spapr_is_vcore() to spapr_is_thread0_in_vcore() for clarity]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-(cherry picked from commit 5d0fb1508e2d279da74ef4a103e8def9b52c6304)
+(cherry picked from commit b1a568c1c2192f090536b8ac76d135ce1f46a0ee)
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c | 30 +++++++++++++++++++++++-------
- 1 file changed, 23 insertions(+), 7 deletions(-)
+ hw/ppc/spapr.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 0be60fb044..a36494b87b 100644
+index a36494b87b..d53123c127 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -100,6 +100,21 @@
+@@ -3655,13 +3655,7 @@ static void spapr_pic_print_info(InterruptStatsProvider *obj,
  
- #define PHANDLE_XICP            0x00001111
+ int spapr_get_vcpu_id(PowerPCCPU *cpu)
+ {
+-    CPUState *cs = CPU(cpu);
+-
+-    if (kvm_enabled()) {
+-        return kvm_arch_vcpu_id(cs);
+-    } else {
+-        return cs->cpu_index;
+-    }
++    return cpu->vcpu_id;
+ }
  
-+/* These two functions implement the VCPU id numbering: one to compute them
-+ * all and one to identify thread 0 of a VCORE. Any change to the first one
-+ * is likely to have an impact on the second one, so let's keep them close.
-+ */
-+static int spapr_vcpu_id(sPAPRMachineState *spapr, int cpu_index)
-+{
-+    return
-+        (cpu_index / smp_threads) * spapr->vsmt + cpu_index % smp_threads;
-+}
-+static bool spapr_is_thread0_in_vcore(sPAPRMachineState *spapr,
-+                                      PowerPCCPU *cpu)
-+{
-+    return spapr_get_vcpu_id(cpu) % spapr->vsmt == 0;
-+}
-+
- static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
-                                   const char *type_ics,
-                                   int nr_irqs, Error **errp)
-@@ -346,7 +361,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
-         int index = spapr_get_vcpu_id(cpu);
-         int compat_smt = MIN(smp_threads, ppc_compat_max_vthreads(cpu));
- 
--        if (index % spapr->vsmt != 0) {
-+        if (!spapr_is_thread0_in_vcore(spapr, cpu)) {
-             continue;
-         }
- 
-@@ -630,7 +645,7 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
-         DeviceClass *dc = DEVICE_GET_CLASS(cs);
-         int offset;
- 
--        if (index % spapr->vsmt != 0) {
-+        if (!spapr_is_thread0_in_vcore(spapr, cpu)) {
-             continue;
-         }
- 
-@@ -2230,7 +2245,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
- 
-         if (mc->has_hotpluggable_cpus) {
-             spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
--                                   (core_id / smp_threads) * spapr->vsmt);
-+                                   spapr_vcpu_id(spapr, core_id));
-         }
- 
-         if (i < boot_cores_nr) {
-@@ -3274,7 +3289,8 @@ void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
-     }
- 
--    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * spapr->vsmt);
-+    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU,
-+                          spapr_vcpu_id(spapr, cc->core_id));
-     g_assert(drc);
- 
-     spapr_drc_detach(drc);
-@@ -3303,7 +3319,8 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                    cc->core_id);
-         return;
-     }
--    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * spapr->vsmt);
-+    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU,
-+                          spapr_vcpu_id(spapr, cc->core_id));
- 
-     g_assert(drc || !mc->has_hotpluggable_cpus);
- 
-@@ -3652,8 +3669,7 @@ void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp)
-     sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     int vcpu_id;
- 
--    vcpu_id =
--        (cpu_index / smp_threads) * spapr->vsmt + cpu_index % smp_threads;
-+    vcpu_id = spapr_vcpu_id(spapr, cpu_index);
- 
-     if (kvm_enabled() && !kvm_vcpu_id_is_valid(vcpu_id)) {
-         error_setg(errp, "Can't create CPU with id %d in KVM", vcpu_id);
+ void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp)
 -- 
 2.11.0
