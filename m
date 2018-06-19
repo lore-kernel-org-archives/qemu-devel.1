@@ -1,18 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47556)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5kA-0003Xc-6e
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:39 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5kF-0003dp-UY
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5k6-00017e-0q
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:38 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5kE-0001Bd-Gl
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:43 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:57 -0500
-Message-Id: <20180619014319.28272-92-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:43:01 -0500
+Message-Id: <20180619014319.28272-96-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 091/113] intel-iommu: only do page walk for MAP
- notifiers
+Subject: [Qemu-devel] [PATCH 095/113] util: implement simple iova tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,114 +25,311 @@ Cc: qemu-stable@nongnu.org, Peter Xu <peterx@redhat.com>, "Michael S . Tsirkin" 
 
 From: Peter Xu <peterx@redhat.com>
 
-For UNMAP-only IOMMU notifiers, we don't need to walk the page tables.
-Fasten that procedure by skipping the page table walk.  That should
-boost performance for UNMAP-only notifiers like vhost.
+Introduce a simplest iova tree implementation based on GTree.
 
 CC: QEMU Stable <qemu-stable@nongnu.org>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit 4f8a62a933a79094e44bc1b16b63bb23e62d67b4)
+(cherry picked from commit eecf5eedbdc0fc04f39abcf3afeedfbf21b25ca4)
+ Conflicts:
+	util/Makefile.objs
+* drop context dep
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/i386/intel_iommu.c         | 44 ++++++++++++++++++++++++++++++++++++++-----
- include/hw/i386/intel_iommu.h |  2 ++
- 2 files changed, 41 insertions(+), 5 deletions(-)
+ MAINTAINERS              |   6 +++
+ include/qemu/iova-tree.h | 134 +++++++++++++++++++++++++++++++++++++++++++++++
+ util/Makefile.objs       |   1 +
+ util/iova-tree.c         | 114 ++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 255 insertions(+)
+ create mode 100644 include/qemu/iova-tree.h
+ create mode 100644 util/iova-tree.c
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index cfcd1046e7..3715fa327b 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -138,6 +138,12 @@ static inline void vtd_iommu_unlock(IntelIOMMUState *s)
-     qemu_mutex_unlock(&s->iommu_lock);
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0255113470..a8e01de523 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1680,6 +1680,12 @@ F: include/sysemu/replay.h
+ F: docs/replay.txt
+ F: stubs/replay.c
  
-+/* Whether the address space needs to notify new mappings */
-+static inline gboolean vtd_as_has_map_notifier(VTDAddressSpace *as)
++IOVA Tree
++M: Peter Xu <peterx@redhat.com>
++S: Maintained
++F: include/qemu/iova-tree.h
++F: util/iova-tree.c
++
+ Usermode Emulation
+ ------------------
+ Overall
+diff --git a/include/qemu/iova-tree.h b/include/qemu/iova-tree.h
+new file mode 100644
+index 0000000000..b061932097
+--- /dev/null
++++ b/include/qemu/iova-tree.h
+@@ -0,0 +1,134 @@
++/*
++ * An very simplified iova tree implementation based on GTree.
++ *
++ * Copyright 2018 Red Hat, Inc.
++ *
++ * Authors:
++ *  Peter Xu <peterx@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ */
++#ifndef IOVA_TREE_H
++#define IOVA_TREE_H
++
++/*
++ * Currently the iova tree will only allow to keep ranges
++ * information, and no extra user data is allowed for each element.  A
++ * benefit is that we can merge adjacent ranges internally within the
++ * tree.  It can save a lot of memory when the ranges are splitted but
++ * mostly continuous.
++ *
++ * Note that current implementation does not provide any thread
++ * protections.  Callers of the iova tree should be responsible
++ * for the thread safety issue.
++ */
++
++#include "qemu/osdep.h"
++#include "exec/memory.h"
++#include "exec/hwaddr.h"
++
++#define  IOVA_OK           (0)
++#define  IOVA_ERR_INVALID  (-1) /* Invalid parameters */
++#define  IOVA_ERR_OVERLAP  (-2) /* IOVA range overlapped */
++
++typedef struct IOVATree IOVATree;
++typedef struct DMAMap {
++    hwaddr iova;
++    hwaddr translated_addr;
++    hwaddr size;                /* Inclusive */
++    IOMMUAccessFlags perm;
++} QEMU_PACKED DMAMap;
++typedef gboolean (*iova_tree_iterator)(DMAMap *map);
++
++/**
++ * iova_tree_new:
++ *
++ * Create a new iova tree.
++ *
++ * Returns: the tree pointer when succeeded, or NULL if error.
++ */
++IOVATree *iova_tree_new(void);
++
++/**
++ * iova_tree_insert:
++ *
++ * @tree: the iova tree to insert
++ * @map: the mapping to insert
++ *
++ * Insert an iova range to the tree.  If there is overlapped
++ * ranges, IOVA_ERR_OVERLAP will be returned.
++ *
++ * Return: 0 if succeeded, or <0 if error.
++ */
++int iova_tree_insert(IOVATree *tree, DMAMap *map);
++
++/**
++ * iova_tree_remove:
++ *
++ * @tree: the iova tree to remove range from
++ * @map: the map range to remove
++ *
++ * Remove mappings from the tree that are covered by the map range
++ * provided.  The range does not need to be exactly what has inserted,
++ * all the mappings that are included in the provided range will be
++ * removed from the tree.  Here map->translated_addr is meaningless.
++ *
++ * Return: 0 if succeeded, or <0 if error.
++ */
++int iova_tree_remove(IOVATree *tree, DMAMap *map);
++
++/**
++ * iova_tree_find:
++ *
++ * @tree: the iova tree to search from
++ * @map: the mapping to search
++ *
++ * Search for a mapping in the iova tree that overlaps with the
++ * mapping range specified.  Only the first found mapping will be
++ * returned.
++ *
++ * Return: DMAMap pointer if found, or NULL if not found.  Note that
++ * the returned DMAMap pointer is maintained internally.  User should
++ * only read the content but never modify or free the content.  Also,
++ * user is responsible to make sure the pointer is valid (say, no
++ * concurrent deletion in progress).
++ */
++DMAMap *iova_tree_find(IOVATree *tree, DMAMap *map);
++
++/**
++ * iova_tree_find_address:
++ *
++ * @tree: the iova tree to search from
++ * @iova: the iova address to find
++ *
++ * Similar to iova_tree_find(), but it tries to find mapping with
++ * range iova=iova & size=0.
++ *
++ * Return: same as iova_tree_find().
++ */
++DMAMap *iova_tree_find_address(IOVATree *tree, hwaddr iova);
++
++/**
++ * iova_tree_foreach:
++ *
++ * @tree: the iova tree to iterate on
++ * @iterator: the interator for the mappings, return true to stop
++ *
++ * Iterate over the iova tree.
++ *
++ * Return: 1 if found any overlap, 0 if not, <0 if error.
++ */
++void iova_tree_foreach(IOVATree *tree, iova_tree_iterator iterator);
++
++/**
++ * iova_tree_destroy:
++ *
++ * @tree: the iova tree to destroy
++ *
++ * Destroy an existing iova tree.
++ *
++ * Return: None.
++ */
++void iova_tree_destroy(IOVATree *tree);
++
++#endif
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index 2973b0a323..5ece5db8ce 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -46,3 +46,4 @@ util-obj-y += qht.o
+ util-obj-y += range.o
+ util-obj-y += stats64.o
+ util-obj-y += systemd.o
++util-obj-y += iova-tree.o
+diff --git a/util/iova-tree.c b/util/iova-tree.c
+new file mode 100644
+index 0000000000..2d9cebfc89
+--- /dev/null
++++ b/util/iova-tree.c
+@@ -0,0 +1,114 @@
++/*
++ * IOVA tree implementation based on GTree.
++ *
++ * Copyright 2018 Red Hat, Inc.
++ *
++ * Authors:
++ *  Peter Xu <peterx@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ */
++
++#include <glib.h>
++#include "qemu/iova-tree.h"
++
++struct IOVATree {
++    GTree *tree;
++};
++
++static int iova_tree_compare(gconstpointer a, gconstpointer b, gpointer data)
 +{
-+    return as->notifier_flags & IOMMU_NOTIFIER_MAP;
++    const DMAMap *m1 = a, *m2 = b;
++
++    if (m1->iova > m2->iova + m2->size) {
++        return 1;
++    }
++
++    if (m1->iova + m1->size < m2->iova) {
++        return -1;
++    }
++
++    /* Overlapped */
++    return 0;
 +}
 +
- /* GHashTable functions */
- static gboolean vtd_uint64_equal(gconstpointer v1, gconstpointer v2)
- {
-@@ -1436,14 +1442,36 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
-     VTDAddressSpace *vtd_as;
-     VTDContextEntry ce;
-     int ret;
-+    hwaddr size = (1 << am) * VTD_PAGE_SIZE;
- 
-     QLIST_FOREACH(vtd_as, &(s->vtd_as_with_notifiers), next) {
-         ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
-                                        vtd_as->devfn, &ce);
-         if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
--            vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PAGE_SIZE,
--                          vtd_page_invalidate_notify_hook,
--                          (void *)&vtd_as->iommu, true, s->aw_bits);
-+            if (vtd_as_has_map_notifier(vtd_as)) {
-+                /*
-+                 * As long as we have MAP notifications registered in
-+                 * any of our IOMMU notifiers, we need to sync the
-+                 * shadow page table.
-+                 */
-+                vtd_page_walk(&ce, addr, addr + size,
-+                              vtd_page_invalidate_notify_hook,
-+                              (void *)&vtd_as->iommu, true, s->aw_bits);
-+            } else {
-+                /*
-+                 * For UNMAP-only notifiers, we don't need to walk the
-+                 * page tables.  We just deliver the PSI down to
-+                 * invalidate caches.
-+                 */
-+                IOMMUTLBEntry entry = {
-+                    .target_as = &address_space_memory,
-+                    .iova = addr,
-+                    .translated_addr = 0,
-+                    .addr_mask = size - 1,
-+                    .perm = IOMMU_NONE,
-+                };
-+                memory_region_notify_iommu(&vtd_as->iommu, entry);
-+            }
-         }
-     }
- }
-@@ -2376,6 +2404,9 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
-         exit(1);
-     }
- 
-+    /* Update per-address-space notifier flags */
-+    vtd_as->notifier_flags = new;
++IOVATree *iova_tree_new(void)
++{
++    IOVATree *iova_tree = g_new0(IOVATree, 1);
 +
-     if (old == IOMMU_NOTIFIER_NONE) {
-         QLIST_INSERT_HEAD(&s->vtd_as_with_notifiers, vtd_as, next);
-     } else if (new == IOMMU_NOTIFIER_NONE) {
-@@ -2884,8 +2915,11 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
-                                   PCI_FUNC(vtd_as->devfn),
-                                   VTD_CONTEXT_ENTRY_DID(ce.hi),
-                                   ce.hi, ce.lo);
--        vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, false,
--                      s->aw_bits);
-+        if (vtd_as_has_map_notifier(vtd_as)) {
-+            /* This is required only for MAP typed notifiers */
-+            vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, false,
-+                          s->aw_bits);
-+        }
-     } else {
-         trace_vtd_replay_ce_invalid(bus_n, PCI_SLOT(vtd_as->devfn),
-                                     PCI_FUNC(vtd_as->devfn));
-diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 016e74bedb..156f35e919 100644
---- a/include/hw/i386/intel_iommu.h
-+++ b/include/hw/i386/intel_iommu.h
-@@ -93,6 +93,8 @@ struct VTDAddressSpace {
-     IntelIOMMUState *iommu_state;
-     VTDContextCacheEntry context_cache_entry;
-     QLIST_ENTRY(VTDAddressSpace) next;
-+    /* Superset of notifier flags that this address space has */
-+    IOMMUNotifierFlag notifier_flags;
- };
- 
- struct VTDBus {
++    /* We don't have values actually, no need to free */
++    iova_tree->tree = g_tree_new_full(iova_tree_compare, NULL, g_free, NULL);
++
++    return iova_tree;
++}
++
++DMAMap *iova_tree_find(IOVATree *tree, DMAMap *map)
++{
++    return g_tree_lookup(tree->tree, map);
++}
++
++DMAMap *iova_tree_find_address(IOVATree *tree, hwaddr iova)
++{
++    DMAMap map = { .iova = iova, .size = 0 };
++
++    return iova_tree_find(tree, &map);
++}
++
++static inline void iova_tree_insert_internal(GTree *gtree, DMAMap *range)
++{
++    /* Key and value are sharing the same range data */
++    g_tree_insert(gtree, range, range);
++}
++
++int iova_tree_insert(IOVATree *tree, DMAMap *map)
++{
++    DMAMap *new;
++
++    if (map->iova + map->size < map->iova || map->perm == IOMMU_NONE) {
++        return IOVA_ERR_INVALID;
++    }
++
++    /* We don't allow to insert range that overlaps with existings */
++    if (iova_tree_find(tree, map)) {
++        return IOVA_ERR_OVERLAP;
++    }
++
++    new = g_new0(DMAMap, 1);
++    memcpy(new, map, sizeof(*new));
++    iova_tree_insert_internal(tree->tree, new);
++
++    return IOVA_OK;
++}
++
++static gboolean iova_tree_traverse(gpointer key, gpointer value,
++                                gpointer data)
++{
++    iova_tree_iterator iterator = data;
++    DMAMap *map = key;
++
++    g_assert(key == value);
++
++    return iterator(map);
++}
++
++void iova_tree_foreach(IOVATree *tree, iova_tree_iterator iterator)
++{
++    g_tree_foreach(tree->tree, iova_tree_traverse, iterator);
++}
++
++int iova_tree_remove(IOVATree *tree, DMAMap *map)
++{
++    DMAMap *overlap;
++
++    while ((overlap = iova_tree_find(tree, map))) {
++        g_tree_remove(tree->tree, overlap);
++    }
++
++    return IOVA_OK;
++}
++
++void iova_tree_destroy(IOVATree *tree)
++{
++    g_tree_destroy(tree->tree);
++    g_free(tree);
++}
 -- 
 2.11.0
