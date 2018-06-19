@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5hY-00018O-UT
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:57 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5he-0001EY-I4
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5hY-00087W-1f
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:57 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5ha-00088Z-9c
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:45:02 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:41:50 -0500
-Message-Id: <20180619014319.28272-25-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:41:51 -0500
+Message-Id: <20180619014319.28272-26-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 024/113] linux-user: fix assertion in shmdt
+Subject: [Qemu-devel] [PATCH 025/113] linux-user: fix
+ target_mprotect/target_munmap error return values
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +26,53 @@ Cc: qemu-stable@nongnu.org, Max Filippov <jcmvbkbc@gmail.com>, Riku Voipio <riku
 
 From: Max Filippov <jcmvbkbc@gmail.com>
 
-shmdt fails to call mmap_lock/mmap_unlock around page_set_flags,
-resulting in the following assertion:
-  page_set_flags: Assertion `have_mmap_lock()' failed.
-
-Wrap shmdt internals into mmap_lock/mmap_unlock.
+target_mprotect/target_munmap return value goes through get_errno at the
+call site, thus the functions must either set errno to host error code
+and return -1 or return negative guest error code. Do the latter.
 
 Cc: qemu-stable@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>
 Cc: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180228221609.11265-7-jcmvbkbc@gmail.com>
+Message-Id: <20180228221609.11265-8-jcmvbkbc@gmail.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-(cherry picked from commit 3c5f6a5f888729f9fbc64211298f7c3e2fb42b64)
+(cherry picked from commit 78cf339039c325b336442f1d7f3ccc531b22c4a0)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- linux-user/syscall.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ linux-user/mmap.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9872de7221..74d56e2ee6 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -4918,6 +4918,9 @@ static inline abi_ulong do_shmat(CPUArchState *cpu_env,
- static inline abi_long do_shmdt(abi_ulong shmaddr)
- {
-     int i;
-+    abi_long rv;
-+
-+    mmap_lock();
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index 33a73cd29c..e0c946eae6 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -77,11 +77,11 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
+ #endif
  
-     for (i = 0; i < N_SHM_REGIONS; ++i) {
-         if (shm_regions[i].in_use && shm_regions[i].start == shmaddr) {
-@@ -4926,8 +4929,11 @@ static inline abi_long do_shmdt(abi_ulong shmaddr)
-             break;
-         }
+     if ((start & ~TARGET_PAGE_MASK) != 0)
+-        return -EINVAL;
++        return -TARGET_EINVAL;
+     len = TARGET_PAGE_ALIGN(len);
+     end = start + len;
+     if (!guest_range_valid(start, len)) {
+-        return -ENOMEM;
++        return -TARGET_ENOMEM;
      }
-+    rv = get_errno(shmdt(g2h(shmaddr)));
-+
-+    mmap_unlock();
+     prot &= PROT_READ | PROT_WRITE | PROT_EXEC;
+     if (len == 0)
+@@ -621,10 +621,10 @@ int target_munmap(abi_ulong start, abi_ulong len)
+            start, len);
+ #endif
+     if (start & ~TARGET_PAGE_MASK)
+-        return -EINVAL;
++        return -TARGET_EINVAL;
+     len = TARGET_PAGE_ALIGN(len);
+     if (len == 0 || !guest_range_valid(start, len)) {
+-        return -EINVAL;
++        return -TARGET_EINVAL;
+     }
  
--    return get_errno(shmdt(g2h(shmaddr)));
-+    return rv;
- }
- 
- #ifdef TARGET_NR_ipc
+     mmap_lock();
 -- 
 2.11.0
