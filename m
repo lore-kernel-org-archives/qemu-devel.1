@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5gk-0000CC-5V
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:07 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5gj-0000Bv-Ud
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5gg-0007fe-Qc
+	(envelope-from <flukshun@gmail.com>) id 1fV5gj-0007g9-2n
 	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:06 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:43:11 -0500
-Message-Id: <20180619014319.28272-106-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:43:12 -0500
+Message-Id: <20180619014319.28272-107-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 105/113] vga: fix region calculation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 106/113] i386: define the 'ssbd' CPUID feature
+ bit (CVE-2018-3639)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,39 +25,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-stable@nongnu.org, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-Typically the scanline length and the line offset are identical.  But
-in case they are not our calculation for region_end is incorrect.  Using
-line_offset is fine for all scanlines, except the last one where we have
-to use the actual scanline length.
+New microcode introduces the "Speculative Store Bypass Disable"
+CPUID feature bit. This needs to be exposed to guest OS to allow
+them to protect against CVE-2018-3639.
 
-Fixes: CVE-2018-7550
-Reported-by: Ross Lagerwall <ross.lagerwall@citrix.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Prasad J Pandit <pjp@fedoraproject.org>
-Tested-by: Ross Lagerwall <ross.lagerwall@citrix.com>
-Message-id: 20180309143704.13420-1-kraxel@redhat.com
-(cherry picked from commit 7cdc61becd095b64a786b2625f321624e7111f3d)
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Message-Id: <20180521215424.13520-2-berrange@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+(cherry picked from commit d19d1f965904a533998739698020ff4ee8a103da)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/display/vga.c | 2 ++
- 1 file changed, 2 insertions(+)
+ target/i386/cpu.c | 2 +-
+ target/i386/cpu.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index d150a3a3eb..1fa66d597d 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -1489,6 +1489,8 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 70c8ae82d5..bc087e95c3 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -459,7 +459,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, "spec-ctrl", NULL,
+-            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, "ssbd",
+         },
+         .cpuid_eax = 7,
+         .cpuid_needs_ecx = true, .cpuid_ecx = 0,
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index f3d0ebb673..422d99d80c 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -644,6 +644,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
+ #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
+ #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
++#define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
  
-     region_start = (s->start_addr * 4);
-     region_end = region_start + (ram_addr_t)s->line_offset * height;
-+    region_end += width * s->get_bpp(s) / 8; /* scanline length */
-+    region_end -= s->line_offset;
-     if (region_end > s->vbe_size) {
-         /* wraps around (can happen with cirrus vbe modes) */
-         region_start = 0;
+ #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
+ 
 -- 
 2.11.0
