@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5gT-0008Qz-RA
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:43:51 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5gY-0008SJ-SV
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:43:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5gS-0007ZL-07
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:43:49 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5gU-0007bg-An
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:43:54 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:43:06 -0500
-Message-Id: <20180619014319.28272-101-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:41:35 -0500
+Message-Id: <20180619014319.28272-10-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 100/113] arm_gicv3_kvm: kvm_dist_get/put: skip
- the registers banked by GICR
+Subject: [Qemu-devel] [PATCH 009/113] spapr: use spapr->vsmt to compute VCPU
+ ids
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,227 +22,255 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Shannon Zhao <zhaoshenglong@huawei.com>
+From: Greg Kurz <groug@kaod.org>
 
-While we skip the GIC_INTERNAL irqs, we don't change the register offset
-accordingly. This will overlap the GICR registers value and leave the
-last GIC_INTERNAL irq's registers out of update.
+Since the introduction of VSMT in 2.11, the spacing of VCPU ids
+between cores is controllable through a machine property instead
+of being only dictated by the SMT mode of the host:
 
-Fix this by skipping the registers banked by GICR.
+    cpu->vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i
 
-Also for migration compatibility if the migration source (old version
-qemu) doesn't send gicd_no_migration_shift_bug = 1 to destination, then
-we shift the data of PPI to get the right data for SPI.
+Until recently, the machine code would try to change the SMT mode
+of the host to be equal to VSMT or exit. This allowed the rest of
+the code to assume that kvmppc_smt_threads() == spapr->vsmt is
+always true.
 
-Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
-Cc: qemu-stable@nongnu.org
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
-Message-id: 1527816987-16108-1-git-send-email-zhaoshenglong@huawei.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit 910e204841954b95c051b2ee49ab0f5c735ff93c)
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Recent commit "8904e5a75005 spapr: Adjust default VSMT value for
+better migration compatibility" relaxed the rule. If the VSMT
+mode cannot be set in KVM for some reasons, but the requested
+CPU topology is compatible with the current SMT mode, then we
+let the guest run with  kvmppc_smt_threads() != spapr->vsmt.
+
+This breaks quite a few places in the code, in particular when
+calculating DRC indexes.
+
+This is what happens on a POWER host with subcores-per-core=2 (ie,
+supports up to SMT4) when passing the following topology:
+
+    -smp threads=4,maxcpus=16 \
+    -device host-spapr-cpu-core,core-id=4,id=core1 \
+    -device host-spapr-cpu-core,core-id=8,id=core2
+
+qemu-system-ppc64: warning: Failed to set KVM's VSMT mode to 8 (errno -22)
+
+This is expected since KVM is limited to SMT4, but the guest is started
+anyway because this topology can run on SMT4 even with a VSMT8 spacing.
+
+But when we look at the DT, things get nastier:
+
+cpus {
+        ...
+        ibm,drc-indexes = <0x4 0x10000000 0x10000004 0x10000008 0x1000000c>;
+
+This means that we have the following association:
+
+ CPU core device |     DRC    | VCPU id
+-----------------+------------+---------
+   boot core     | 0x10000000 | 0
+   core1         | 0x10000004 | 4
+   core2         | 0x10000008 | 8
+   core3         | 0x1000000c | 12
+
+But since the spacing of VCPU ids is 8, the DRC for core1 points to a
+VCPU that doesn't exist, the DRC for core2 points to the first VCPU of
+core1 and and so on...
+
+        ...
+
+        PowerPC,POWER8@0 {
+                ...
+                ibm,my-drc-index = <0x10000000>;
+                ...
+        };
+
+        PowerPC,POWER8@8 {
+                ...
+                ibm,my-drc-index = <0x10000008>;
+                ...
+        };
+
+        PowerPC,POWER8@10 {
+                ...
+
+No ibm,my-drc-index property for this core since 0x10000010 doesn't
+exist in ibm,drc-indexes above.
+
+                ...
+        };
+};
+
+...
+
+interrupt-controller {
+        ...
+        ibm,interrupt-server-ranges = <0x0 0x10>;
+
+With a spacing of 8, the highest VCPU id for the given topology should be:
+        16 * 8 / 4 = 32 and not 16
+
+        ...
+        linux,phandle = <0x7e7323b8>;
+        interrupt-controller;
+};
+
+And CPU hot-plug/unplug is broken:
+
+(qemu) device_del core1
+pseries-hotplug-cpu: Cannot find CPU (drc index 10000004) to remove
+
+(qemu) device_del core2
+cpu 4 (hwid 8) Ready to die...
+cpu 5 (hwid 9) Ready to die...
+cpu 6 (hwid 10) Ready to die...
+cpu 7 (hwid 11) Ready to die...
+
+These are the VCPU ids of core1 actually
+
+(qemu) device_add host-spapr-cpu-core,core-id=12,id=core3
+(qemu) device_del core3
+pseries-hotplug-cpu: Cannot find CPU (drc index 1000000c) to remove
+
+This patches all the code in hw/ppc/spapr.c to assume the VSMT
+spacing when manipulating VCPU ids.
+
+Fixes: 8904e5a75005
+Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+
+(cherry picked from commit 72194664c8a16b67865eb95054f984dd169cfa86)
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/intc/arm_gicv3_common.c         | 79 ++++++++++++++++++++++++++++++++++++++
- hw/intc/arm_gicv3_kvm.c            | 38 ++++++++++++++++++
- include/hw/intc/arm_gicv3_common.h |  1 +
- 3 files changed, 118 insertions(+)
+ hw/ppc/spapr.c | 24 ++++++++++--------------
+ 1 file changed, 10 insertions(+), 14 deletions(-)
 
-diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-index 7b54d52376..864b7c6515 100644
---- a/hw/intc/arm_gicv3_common.c
-+++ b/hw/intc/arm_gicv3_common.c
-@@ -27,6 +27,7 @@
- #include "hw/intc/arm_gicv3_common.h"
- #include "gicv3_internal.h"
- #include "hw/arm/linux-boot-if.h"
-+#include "sysemu/kvm.h"
- 
- static int gicv3_pre_save(void *opaque)
- {
-@@ -141,6 +142,79 @@ static const VMStateDescription vmstate_gicv3_cpu = {
-     }
- };
- 
-+static int gicv3_gicd_no_migration_shift_bug_pre_load(void *opaque)
-+{
-+    GICv3State *cs = opaque;
-+
-+   /*
-+    * The gicd_no_migration_shift_bug flag is used for migration compatibility
-+    * for old version QEMU which may have the GICD bmp shift bug under KVM mode.
-+    * Strictly, what we want to know is whether the migration source is using
-+    * KVM. Since we don't have any way to determine that, we look at whether the
-+    * destination is using KVM; this is close enough because for the older QEMU
-+    * versions with this bug KVM -> TCG migration didn't work anyway. If the
-+    * source is a newer QEMU without this bug it will transmit the migration
-+    * subsection which sets the flag to true; otherwise it will remain set to
-+    * the value we select here.
-+    */
-+    if (kvm_enabled()) {
-+        cs->gicd_no_migration_shift_bug = false;
-+    }
-+
-+    return 0;
-+}
-+
-+static int gicv3_gicd_no_migration_shift_bug_post_load(void *opaque,
-+                                                       int version_id)
-+{
-+    GICv3State *cs = opaque;
-+
-+    if (cs->gicd_no_migration_shift_bug) {
-+        return 0;
-+    }
-+
-+    /* Older versions of QEMU had a bug in the handling of state save/restore
-+     * to the KVM GICv3: they got the offset in the bitmap arrays wrong,
-+     * so that instead of the data for external interrupts 32 and up
-+     * starting at bit position 32 in the bitmap, it started at bit
-+     * position 64. If we're receiving data from a QEMU with that bug,
-+     * we must move the data down into the right place.
-+     */
-+    memmove(cs->group, (uint8_t *)cs->group + GIC_INTERNAL / 8,
-+            sizeof(cs->group) - GIC_INTERNAL / 8);
-+    memmove(cs->grpmod, (uint8_t *)cs->grpmod + GIC_INTERNAL / 8,
-+            sizeof(cs->grpmod) - GIC_INTERNAL / 8);
-+    memmove(cs->enabled, (uint8_t *)cs->enabled + GIC_INTERNAL / 8,
-+            sizeof(cs->enabled) - GIC_INTERNAL / 8);
-+    memmove(cs->pending, (uint8_t *)cs->pending + GIC_INTERNAL / 8,
-+            sizeof(cs->pending) - GIC_INTERNAL / 8);
-+    memmove(cs->active, (uint8_t *)cs->active + GIC_INTERNAL / 8,
-+            sizeof(cs->active) - GIC_INTERNAL / 8);
-+    memmove(cs->edge_trigger, (uint8_t *)cs->edge_trigger + GIC_INTERNAL / 8,
-+            sizeof(cs->edge_trigger) - GIC_INTERNAL / 8);
-+
-+    /*
-+     * While this new version QEMU doesn't have this kind of bug as we fix it,
-+     * so it needs to set the flag to true to indicate that and it's necessary
-+     * for next migration to work from this new version QEMU.
-+     */
-+    cs->gicd_no_migration_shift_bug = true;
-+
-+    return 0;
-+}
-+
-+const VMStateDescription vmstate_gicv3_gicd_no_migration_shift_bug = {
-+    .name = "arm_gicv3/gicd_no_migration_shift_bug",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .pre_load = gicv3_gicd_no_migration_shift_bug_pre_load,
-+    .post_load = gicv3_gicd_no_migration_shift_bug_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_BOOL(gicd_no_migration_shift_bug, GICv3State),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_gicv3 = {
-     .name = "arm_gicv3",
-     .version_id = 1,
-@@ -165,6 +239,10 @@ static const VMStateDescription vmstate_gicv3 = {
-         VMSTATE_STRUCT_VARRAY_POINTER_UINT32(cpu, GICv3State, num_cpu,
-                                              vmstate_gicv3_cpu, GICv3CPUState),
-         VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_gicv3_gicd_no_migration_shift_bug,
-+        NULL
-     }
- };
- 
-@@ -364,6 +442,7 @@ static void arm_gicv3_common_reset(DeviceState *dev)
-             gicv3_gicd_group_set(s, i);
-         }
-     }
-+    s->gicd_no_migration_shift_bug = true;
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 6f78c1cf7a..094e75f97d 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -161,9 +161,9 @@ static void pre_2_10_vmstate_unregister_dummy_icp(int i)
+                        (void *)(uintptr_t) i);
  }
  
- static void arm_gic_common_linux_init(ARMLinuxBootIf *obj,
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index d01deba632..550fd13525 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -164,6 +164,14 @@ static void kvm_dist_get_edge_trigger(GICv3State *s, uint32_t offset,
-     uint32_t reg;
-     int irq;
+-static inline int xics_max_server_number(void)
++static int xics_max_server_number(sPAPRMachineState *spapr)
+ {
+-    return DIV_ROUND_UP(max_cpus * kvmppc_smt_threads(), smp_threads);
++    return DIV_ROUND_UP(max_cpus * spapr->vsmt, smp_threads);
+ }
  
-+    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
-+     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by GICR_ICFGR<n>. It doesn't need to sync
-+     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
-+     * This matches the for_each_dist_irq_reg() macro which also skips the
-+     * first GIC_INTERNAL irqs.
-+     */
-+    offset += (GIC_INTERNAL * 2) / 8;
-     for_each_dist_irq_reg(irq, s->num_irq, 2) {
-         kvm_gicd_access(s, offset, &reg, false);
-         reg = half_unshuffle32(reg >> 1);
-@@ -181,6 +189,14 @@ static void kvm_dist_put_edge_trigger(GICv3State *s, uint32_t offset,
-     uint32_t reg;
-     int irq;
+ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
+@@ -195,7 +195,7 @@ static void xics_system_init(MachineState *machine, int nr_irqs, Error **errp)
+     if (smc->pre_2_10_has_unused_icps) {
+         int i;
  
-+    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
-+     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by GICR_ICFGR<n>. It doesn't need to sync
-+     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
-+     * This matches the for_each_dist_irq_reg() macro which also skips the
-+     * first GIC_INTERNAL irqs.
-+     */
-+    offset += (GIC_INTERNAL * 2) / 8;
-     for_each_dist_irq_reg(irq, s->num_irq, 2) {
-         reg = *gic_bmp_ptr32(bmp, irq);
-         if (irq % 32 != 0) {
-@@ -222,6 +238,15 @@ static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
-     uint32_t reg;
-     int irq;
+-        for (i = 0; i < xics_max_server_number(); i++) {
++        for (i = 0; i < xics_max_server_number(spapr); i++) {
+             /* Dummy entries get deregistered when real ICPState objects
+              * are registered during CPU core hotplug.
+              */
+@@ -338,7 +338,6 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
+     int ret = 0, offset, cpus_offset;
+     CPUState *cs;
+     char cpu_model[32];
+-    int smt = kvmppc_smt_threads();
+     uint32_t pft_size_prop[] = {0, cpu_to_be32(spapr->htab_shift)};
  
-+    /* For the KVM GICv3, affinity routing is always enabled, and the
-+     * GICD_IGROUPR0/GICD_IGRPMODR0/GICD_ISENABLER0/GICD_ISPENDR0/
-+     * GICD_ISACTIVER0 registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by the GICR registers. It doesn't need to sync
-+     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
-+     * This matches the for_each_dist_irq_reg() macro which also skips the
-+     * first GIC_INTERNAL irqs.
-+     */
-+    offset += (GIC_INTERNAL * 1) / 8;
-     for_each_dist_irq_reg(irq, s->num_irq, 1) {
-         kvm_gicd_access(s, offset, &reg, false);
-         *gic_bmp_ptr32(bmp, irq) = reg;
-@@ -235,6 +260,19 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
-     uint32_t reg;
-     int irq;
+     CPU_FOREACH(cs) {
+@@ -347,7 +346,7 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
+         int index = spapr_vcpu_id(cpu);
+         int compat_smt = MIN(smp_threads, ppc_compat_max_threads(cpu));
  
-+    /* For the KVM GICv3, affinity routing is always enabled, and the
-+     * GICD_IGROUPR0/GICD_IGRPMODR0/GICD_ISENABLER0/GICD_ISPENDR0/
-+     * GICD_ISACTIVER0 registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by the GICR registers. It doesn't need to sync
-+     * them. So it should increase the offset and clroffset to skip GIC_INTERNAL
-+     * irqs. This matches the for_each_dist_irq_reg() macro which also skips the
-+     * first GIC_INTERNAL irqs.
-+     */
-+    offset += (GIC_INTERNAL * 1) / 8;
-+    if (clroffset != 0) {
-+        clroffset += (GIC_INTERNAL * 1) / 8;
-+    }
-+
-     for_each_dist_irq_reg(irq, s->num_irq, 1) {
-         /* If this bitmap is a set/clear register pair, first write to the
-          * clear-reg to clear all bits before using the set-reg to write
-diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
-index bccdfe17c6..d75b49d558 100644
---- a/include/hw/intc/arm_gicv3_common.h
-+++ b/include/hw/intc/arm_gicv3_common.h
-@@ -217,6 +217,7 @@ struct GICv3State {
-     uint32_t revision;
-     bool security_extn;
-     bool irq_reset_nonsecure;
-+    bool gicd_no_migration_shift_bug;
+-        if ((index % smt) != 0) {
++        if (index % spapr->vsmt != 0) {
+             continue;
+         }
  
-     int dev_fd; /* kvm device fd if backed by kvm vgic support */
-     Error *migration_blocker;
+@@ -614,7 +613,6 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
+     CPUState *cs;
+     int cpus_offset;
+     char *nodename;
+-    int smt = kvmppc_smt_threads();
+ 
+     cpus_offset = fdt_add_subnode(fdt, 0, "cpus");
+     _FDT(cpus_offset);
+@@ -632,7 +630,7 @@ static void spapr_populate_cpus_dt_node(void *fdt, sPAPRMachineState *spapr)
+         DeviceClass *dc = DEVICE_GET_CLASS(cs);
+         int offset;
+ 
+-        if ((index % smt) != 0) {
++        if (index % spapr->vsmt != 0) {
+             continue;
+         }
+ 
+@@ -1105,7 +1103,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
+     _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
+ 
+     /* /interrupt controller */
+-    spapr_dt_xics(xics_max_server_number(), fdt, PHANDLE_XICP);
++    spapr_dt_xics(xics_max_server_number(spapr), fdt, PHANDLE_XICP);
+ 
+     ret = spapr_populate_memory(spapr, fdt);
+     if (ret < 0) {
+@@ -2198,7 +2196,6 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+     MachineState *machine = MACHINE(spapr);
+     MachineClass *mc = MACHINE_GET_CLASS(machine);
+     const char *type = spapr_get_cpu_core_type(machine->cpu_type);
+-    int smt = kvmppc_smt_threads();
+     const CPUArchIdList *possible_cpus;
+     int boot_cores_nr = smp_cpus / smp_threads;
+     int i;
+@@ -2233,7 +2230,7 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+ 
+         if (mc->has_hotpluggable_cpus) {
+             spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_CPU,
+-                                   (core_id / smp_threads) * smt);
++                                   (core_id / smp_threads) * spapr->vsmt);
+         }
+ 
+         if (i < boot_cores_nr) {
+@@ -3262,10 +3259,10 @@ static
+ void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
+                                Error **errp)
+ {
++    sPAPRMachineState *spapr = SPAPR_MACHINE(OBJECT(hotplug_dev));
+     int index;
+     sPAPRDRConnector *drc;
+     CPUCore *cc = CPU_CORE(dev);
+-    int smt = kvmppc_smt_threads();
+ 
+     if (!spapr_find_cpu_slot(MACHINE(hotplug_dev), cc->core_id, &index)) {
+         error_setg(errp, "Unable to find CPU core with core-id: %d",
+@@ -3277,7 +3274,7 @@ void spapr_core_unplug_request(HotplugHandler *hotplug_dev, DeviceState *dev,
+         return;
+     }
+ 
+-    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * smt);
++    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * spapr->vsmt);
+     g_assert(drc);
+ 
+     spapr_drc_detach(drc);
+@@ -3296,7 +3293,6 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+     CPUState *cs = CPU(core->threads);
+     sPAPRDRConnector *drc;
+     Error *local_err = NULL;
+-    int smt = kvmppc_smt_threads();
+     CPUArchId *core_slot;
+     int index;
+     bool hotplugged = spapr_drc_hotplugged(dev);
+@@ -3307,7 +3303,7 @@ static void spapr_core_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+                    cc->core_id);
+         return;
+     }
+-    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * smt);
++    drc = spapr_drc_by_id(TYPE_SPAPR_DRC_CPU, index * spapr->vsmt);
+ 
+     g_assert(drc || !mc->has_hotpluggable_cpus);
+ 
 -- 
 2.11.0
