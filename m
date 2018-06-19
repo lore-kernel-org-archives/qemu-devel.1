@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fVOdD-0006ZR-Dx
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:57:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1fVOn3-0000zQ-E7
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 18:07:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fVOd8-0003RC-KC
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:57:43 -0400
-Resent-Message-Id: <E1fVOd8-0003RC-KC@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21134)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fVOd8-0003MN-Bz
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 17:57:38 -0400
-In-Reply-To: <20180619193806.17419-1-danielhb413@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152944541677.795.974637064165086849@d39dc562802a>
+	(envelope-from <eblake@redhat.com>) id 1fVOmy-0000y8-Qf
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 18:07:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57852 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fVOmy-0000wc-LZ
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 18:07:48 -0400
+References: <20180615222855.44421-1-mst@redhat.com>
+	<20180615222855.44421-2-mst@redhat.com>
+	<b59883c6-1dc0-4e81-439c-587c8f2d3e83@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f87772ab-7d59-4ab2-59e3-c1ac77eaf725@redhat.com>
+Date: Tue, 19 Jun 2018 17:07:46 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 19 Jun 2018 14:56:57 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v1 0/6] QGA: systemd
- hibernate/suspend/hybrid-sleep
+In-Reply-To: <b59883c6-1dc0-4e81-439c-587c8f2d3e83@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] kvm: support -dedicated
+ cpu-pm=on|off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: danielhb413@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, mdroth@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjE5MTkzODA2LjE3NDE5LTEtZGFuaWVsaGI0MTNAZ21haWwuY29tClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjEgMC82XSBRR0E6IHN5c3RlbWQgaGliZXJuYXRl
-L3N1c3BlbmQvaHlicmlkLXNsZWVwCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
-IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-YWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
-ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
-QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
-ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
-LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
-ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmNjNjk2ZjEwMDkgcWdhOiByZW1vdmluZyBiaW9zX3N1
-cHBvcnRzX21vZGUKZGM3MTJiYmVjMiBxZ2E6IGFkZGluZyBzeXN0ZW1kIGhpYmVybmF0ZS9zdXNw
-ZW5kL2h5YnJpZC1zbGVlcCBzdXBwb3J0CjNiZTQ1NmI3ZjEgcWdhOiByZW1vdmluZyBzd2l0Y2gg
-c3RhdGVtZW50cywgYWRkaW5nIHJ1bl9wcm9jZXNzX2NoaWxkCjMxY2YwZTZiMTUgcWdhOiBndWVz
-dF9zdXNwZW5kOiBkZWNvdXBsaW5nIHBtLXV0aWxzIGFuZCBzeXMgbG9naWMKMzE0ZDNhMDVjYSBx
-Z2E6IGJpb3Nfc3VwcG9ydHNfbW9kZTogZGVjb3VwbGluZyBwbS11dGlscyBhbmQgc3lzIGxvZ2lj
-CmRhMTM1YTdjOWYgcWdhOiByZWZhY3RvcmluZyBxbXBfZ3Vlc3Rfc3VzcGVuZF8qIGZ1bmN0aW9u
-cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS82OiBxZ2E6IHJlZmFjdG9y
-aW5nIHFtcF9ndWVzdF9zdXNwZW5kXyogZnVuY3Rpb25zLi4uCkNoZWNraW5nIFBBVENIIDIvNjog
-cWdhOiBiaW9zX3N1cHBvcnRzX21vZGU6IGRlY291cGxpbmcgcG0tdXRpbHMgYW5kIHN5cyBsb2dp
-Yy4uLgpDaGVja2luZyBQQVRDSCAzLzY6IHFnYTogZ3Vlc3Rfc3VzcGVuZDogZGVjb3VwbGluZyBw
-bS11dGlscyBhbmQgc3lzIGxvZ2ljLi4uCkNoZWNraW5nIFBBVENIIDQvNjogcWdhOiByZW1vdmlu
-ZyBzd2l0Y2ggc3RhdGVtZW50cywgYWRkaW5nIHJ1bl9wcm9jZXNzX2NoaWxkLi4uCkVSUk9SOiAi
-KGZvbyogY29uc3QqKSIgc2hvdWxkIGJlICIoZm9vICogY29uc3QqKSIKIzkxOiBGSUxFOiBxZ2Ev
-Y29tbWFuZHMtcG9zaXguYzoxNDY3OgorICAgICAgICBleGVjdmUoY21kX3BhdGgsIChjaGFyKiBj
-b25zdCopY29tbWFuZCwgZW52aXJvbik7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYmVmb3JlIHRo
-YXQgJyonIChjdHg6VnhCKQojOTE6IEZJTEU6IHFnYS9jb21tYW5kcy1wb3NpeC5jOjE0Njc6Cisg
-ICAgICAgIGV4ZWN2ZShjbWRfcGF0aCwgKGNoYXIqIGNvbnN0Kiljb21tYW5kLCBlbnZpcm9uKTsK
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMs
-IDAgd2FybmluZ3MsIDI5NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzY6IHFnYTogYWRkaW5nIHN5c3RlbWQgaGli
-ZXJuYXRlL3N1c3BlbmQvaHlicmlkLXNsZWVwIHN1cHBvcnQuLi4KQ2hlY2tpbmcgUEFUQ0ggNi82
-OiBxZ2E6IHJlbW92aW5nIGJpb3Nfc3VwcG9ydHNfbW9kZS4uLgo9PT0gT1VUUFVUIEVORCA9PT0K
-ClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On 06/19/2018 10:17 AM, Paolo Bonzini wrote:
+> On 16/06/2018 00:29, Michael S. Tsirkin wrote:
+>>   
+>> +static QemuOptsList qemu_dedicated_opts = {
+>> +    .name = "dedicated",
+>> +    .head = QTAILQ_HEAD_INITIALIZER(qemu_dedicated_opts.head),
+>> +    .desc = {
+>> +        {
+>> +            .name = "mem-lock",
+>> +            .type = QEMU_OPT_BOOL,
+>> +        },
+>> +        {
+>> +            .name = "cpu-pm",
+>> +            .type = QEMU_OPT_BOOL,
+>> +        },
+>> +        { /* end of list */ }
+>> +    },
+>> +};
+>> +
+> 
+> Let the bikeshedding begin!
+> 
+> 1) Should we deprecate -realtime?
+> 
+> 2) Maybe -hostresource?
+
+What further things might we add in the future?
+
+-dedicated sounds wrong (it is an adjective, while most of our options 
+are nouns - thing -machine, -drive, -object, ...)
+
+-hostresource at least sounds like a noun, but is long to type.  But at 
+least '-hostresource cpu-pm=on' reads reasonably well.
+
+About the only other noun I could think of would be '-feature cpu-pm=on'.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
