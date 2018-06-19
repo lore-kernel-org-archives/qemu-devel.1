@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5hG-0000ni-UM
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:39 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5hI-0000py-Sz
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5hF-0007zO-SS
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:38 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5hH-00080F-RF
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:44:40 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:41:42 -0500
-Message-Id: <20180619014319.28272-17-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:41:43 -0500
+Message-Id: <20180619014319.28272-18-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 016/113] spapr: make pseries-2.11 the default
- machine type
+Subject: [Qemu-devel] [PATCH 017/113] nbd: Honor server's advertised minimum
+ block size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,73 +22,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: qemu-stable@nongnu.org, Eric Blake <eblake@redhat.com>
 
-From: Greg Kurz <groug@kaod.org>
+From: Eric Blake <eblake@redhat.com>
 
-The spapr capability framework was introduced in QEMU 2.12. It allows
-to have an explicit control on how host features are exposed to the
-guest. This is especially needed to handle migration between hetero-
-geneous hosts (eg, POWER8 to POWER9). It is also used to expose fixes/
-workarounds against speculative execution vulnerabilities to guests.
-The framework was hence backported to QEMU 2.11.1, especially these
-commits:
+Commit 79ba8c98 (v2.7) changed the setting of request_alignment
+to occur only during bdrv_refresh_limits(), rather than at at
+bdrv_open() time; but at the time, NBD was unaffected, because
+it still used sector-based callbacks, so the block layer
+defaulted NBD to use 512 request_alignment.
 
-0fac4aa93074 spapr: Add pseries-2.12 machine type
-9070f408f491 spapr: Treat Hardware Transactional Memory (HTM) as an
- optional capability
+Later, commit 70c4fb26 (also v2.7) changed NBD to use byte-based
+callbacks, without setting request_alignment.  This resulted in
+NBD using request_alignment of 1, which works great when the
+server supports it (as is the case for qemu-nbd), but falls apart
+miserably if the server requires alignment (but only if qemu
+actually sends a sub-sector request; qemu-io can do it, but
+most qemu operations still perform on sectors or larger).
 
-0fac4aa93074 has the confusing effect of making pseries-2.12 the default
-machine type for QEMU 2.11.1, instead of the expected pseries-2.11. This
-patch changes the default machine back to pseries-2.11.
+Even later, the NBD protocol was updated to document that clients
+should learn the server's minimum alignment during NBD_OPT_GO;
+and recommended that clients should assume a minimum size of 512
+unless the server understands NBD_OPT_GO and replied with a smaller
+size.  Commit 081dd1fe (v2.10) attempted to do that, by assigning
+request_alignment to whatever was learned from the server; but
+it has two flaws: the assignment is done during bdrv_open() so
+it gets unconditionally wiped out back to 1 during any later
+bdrv_refresh_limits(); and the code is not using a default of 512
+when the server did not report a minimum size.
 
-Unfortunately, 9070f408f491 enforces the HTM capability for pseries-2.11.
-This isn't supported by TCG and breaks 'make check'. So this patch also
-adds a hack to turn HTM off when using TCG.
+Fix these issues by moving the assignment to request_alignment
+to the right function, and by using a sane default when the
+server does not advertise a minimum size.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
+CC: qemu-stable@nongnu.org
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20180215032905.27146-1-eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy<vsementsov@virtuozzo.com>
+(cherry picked from commit fd8d372dd36e839568a718684914d9960d8b1ebd)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/ppc/spapr.c      | 4 ++--
- hw/ppc/spapr_caps.c | 5 +++++
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ block/nbd-client.c | 3 ---
+ block/nbd.c        | 2 ++
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 1a2dd1f597..6499a86752 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3820,7 +3820,7 @@ static void spapr_machine_2_12_class_options(MachineClass *mc)
-     /* Defaults for the latest behaviour inherited from the base class */
- }
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 9206652e45..7b68499b76 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -846,9 +846,6 @@ int nbd_client_init(BlockDriverState *bs,
+     if (client->info.flags & NBD_FLAG_SEND_WRITE_ZEROES) {
+         bs->supported_zero_flags |= BDRV_REQ_MAY_UNMAP;
+     }
+-    if (client->info.min_block > bs->bl.request_alignment) {
+-        bs->bl.request_alignment = client->info.min_block;
+-    }
  
--DEFINE_SPAPR_MACHINE(2_12, "2.12", true);
-+DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
+     qemu_co_mutex_init(&client->send_mutex);
+     qemu_co_queue_init(&client->free_sema);
+diff --git a/block/nbd.c b/block/nbd.c
+index 8b8ba56cdd..c32ea9fd73 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -474,8 +474,10 @@ static int nbd_co_flush(BlockDriverState *bs)
+ static void nbd_refresh_limits(BlockDriverState *bs, Error **errp)
+ {
+     NBDClientSession *s = nbd_get_client_session(bs);
++    uint32_t min = s->info.min_block;
+     uint32_t max = MIN_NON_ZERO(NBD_MAX_BUFFER_SIZE, s->info.max_block);
  
- /*
-  * pseries-2.11
-@@ -3842,7 +3842,7 @@ static void spapr_machine_2_11_class_options(MachineClass *mc)
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
- }
- 
--DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
-+DEFINE_SPAPR_MACHINE(2_11, "2.11", true);
- 
- /*
-  * pseries-2.10
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 7b229517be..82043e60e7 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -285,6 +285,11 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
- 
-     caps = smc->default_caps;
- 
-+    /* HACK for 2.11.2: fix make check */
-+    if (tcg_enabled()) {
-+        caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
-+    }
-+
-     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
-                           0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
++    bs->bl.request_alignment = min ? min : BDRV_SECTOR_SIZE;
+     bs->bl.max_pdiscard = max;
+     bs->bl.max_pwrite_zeroes = max;
+     bs->bl.max_transfer = max;
 -- 
 2.11.0
