@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50168)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1fVBWt-0007ES-54
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:58:19 -0400
+	(envelope-from <zhengxiang9@huawei.com>) id 1fVBY3-00086q-GJ
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:59:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1fVBWo-00082O-8p
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:58:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49144 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1fVBWo-00082I-3R
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:58:14 -0400
-Date: Tue, 19 Jun 2018 15:58:08 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20180619075808.GB23983@wei-ubt>
-References: <1528225683-11413-1-git-send-email-wexu@redhat.com>
-	<1528225683-11413-6-git-send-email-wexu@redhat.com>
-	<f94057e1-5d6f-c90d-5b21-d1cd561d6d53@redhat.com>
-	<20180606033815.GA3749@wei-ubt>
-	<04a61e4a-f0ae-0e7d-03aa-c488e89fd1ca@redhat.com>
+	(envelope-from <zhengxiang9@huawei.com>) id 1fVBY2-0008Jv-QG
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:59:31 -0400
+From: Zheng Xiang <zhengxiang9@huawei.com>
+Date: Tue, 19 Jun 2018 15:58:21 +0800
+Message-ID: <20180619075821.9884-1-zhengxiang9@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <04a61e4a-f0ae-0e7d-03aa-c488e89fd1ca@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 5/8] virtio: queue pop for packed ring
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] target-arm: fix a segmentation fault due to
+ illegal memory access
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +20,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: jfreimann@redhat.com, qemu-devel@nongnu.org, tiwei.bie@intel.com, mst@redhat.com
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: zhaoshenglong@huawei.com, peter.maydell@linaro.org, Zheng Xiang <xiang.zheng@linaro.org>
 
-On Wed, Jun 06, 2018 at 11:41:18AM +0800, Jason Wang wrote:
->=20
->=20
-> On 2018=E5=B9=B406=E6=9C=8806=E6=97=A5 11:38, Wei Xu wrote:
-> >>>+
-> >>>+    head =3D vq->last_avail_idx;
-> >>>+    i =3D head;
-> >>>+
-> >>>+    caches =3D vring_get_region_caches(vq);
-> >>>+    cache =3D &caches->desc;
-> >>>+    vring_packed_desc_read(vdev, &desc, cache, i);
-> >>I think we'd better find a way to avoid reading descriptor twice.
-> >Do you mean here and the read for empty check?
-> >
-> >Wei
-> >
->=20
-> Yes.
+From: Zheng Xiang <xiang.zheng@linaro.org>
 
-OK, will figure it out.
+The elements of kvm_devices_head list are freed in kvm_arm_machine_init_done(),
+but we still access these illegal memory in kvm_arm_devlistener_del().
 
->=20
-> Thanks
->=20
->=20
+This will cause segment fault when booting guest with MALLOC_PERTURB_=1.
+
+Signed-off-by: Zheng Xiang <xiang.zheng@linaro.org>
+---
+ target/arm/kvm.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 98f5006..5bf41e1 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -256,6 +256,7 @@ static void kvm_arm_machine_init_done(Notifier *notifier, void *data)
+             kvm_arm_set_device_addr(kd);
+         }
+         memory_region_unref(kd->mr);
++        QSLIST_REMOVE_HEAD(&kvm_devices_head, entries);
+         g_free(kd);
+     }
+     memory_listener_unregister(&devlistener);
+-- 
+1.8.3.1
