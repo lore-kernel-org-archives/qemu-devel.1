@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVJ4z-0004dr-8n
+	(envelope-from <alex.bennee@linaro.org>) id 1fVJ51-0004gr-Uk
 	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:02:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVJ4v-0007dm-3u
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:02:01 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:53463)
+	(envelope-from <alex.bennee@linaro.org>) id 1fVJ4v-0007e2-U0
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:02:04 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:54423)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fVJ4u-0007dO-Pf
+	id 1fVJ4v-0007de-KS
 	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 12:01:57 -0400
-Received: by mail-wm0-x242.google.com with SMTP id x6-v6so1257002wmc.3
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 09:01:56 -0700 (PDT)
+Received: by mail-wm0-x230.google.com with SMTP id o13-v6so1241853wmf.4
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 09:01:57 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue, 19 Jun 2018 16:43:51 +0100
-Message-Id: <20180619154435.18898-13-alex.bennee@linaro.org>
+Date: Tue, 19 Jun 2018 16:44:12 +0100
+Message-Id: <20180619154435.18898-34-alex.bennee@linaro.org>
 In-Reply-To: <20180619154435.18898-1-alex.bennee@linaro.org>
 References: <20180619154435.18898-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 12/56] tests/tcg/multiarch: don't hard code
- paths/ports for linux-test
+Subject: [Qemu-devel] [PULL 33/56] tests/tcg: enable building for Alpha
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,145 +30,119 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-The fixed path and ports get in the way of running our tests and
-builds in parallel. Instead of using TESTPATH we use mkdtemp() and
-instead of a fixed port we allow the kernel to assign one and query it
-afterwards.
-
-Ideally test directory creation should be common functionally across
-all TCG tests but this could complicate an already huge patch series
-so we mark it as a TODO for next time.
+We can't use our normal Debian based compilers as Alpha isn't an
+officially supported architecture. However it is available as a port
+and fortunately cross compilers for all these targets are included in
+Debian Sid, the perpetual rolling/unstable/testing version of Debian.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v7
-  - chk_error(strlen(tmpdir)) -> assert(tmpdir)
-  - mark common tempdir as a TODO
+v5
+  - drop the unused debian-cross-build docker image
+  - add note to debian-sid docker image
+  - echo reference to notes on build failure
+  - include EXTRA_RUNS for mmap tests
+v6
+  - use NOCACHE=1 for docker-image-debian-sid to force re-builds
+  - this seems a little hacky
 
-diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
-index 6f2c531474..e80eccc0ce 100644
---- a/tests/tcg/multiarch/linux-test.c
-+++ b/tests/tcg/multiarch/linux-test.c
-@@ -40,9 +40,8 @@
- #include <dirent.h>
- #include <setjmp.h>
- #include <sys/shm.h>
-+#include <assert.h>
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 4a2b028a3b..8c24f8807e 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -64,6 +64,13 @@ docker-image-debian-ppc64el-cross: docker-image-debian9
+ docker-image-debian-s390x-cross: docker-image-debian9
+ docker-image-debian-win32-cross: docker-image-debian8-mxe
+ docker-image-debian-win64-cross: docker-image-debian8-mxe
++
++# Debian SID images - we are tracking a rolling distro so we want to
++# force a re-build of the base image if we ever need to build one of
++# its children.
++docker-image-debian-sid: NOCACHE=1
++
++docker-image-debian-alpha-cross: docker-image-debian-sid
+ docker-image-travis: NOUSER=1
  
--#define TESTPATH "/tmp/linux-test.tmp"
--#define TESTPORT 7654
- #define STACK_SIZE 16384
- 
- static void error1(const char *filename, int line, const char *fmt, ...)
-@@ -85,19 +84,16 @@ static void test_file(void)
-     struct iovec vecs[2];
-     DIR *dir;
-     struct dirent *de;
-+    /* TODO: make common tempdir creation for tcg tests */
-+    char template[] = "/tmp/linux-test-XXXXXX";
-+    char *tmpdir = mkdtemp(template);
- 
--    /* clean up, just in case */
--    unlink(TESTPATH "/file1");
--    unlink(TESTPATH "/file2");
--    unlink(TESTPATH "/file3");
--    rmdir(TESTPATH);
-+    assert(tmpdir);
- 
-     if (getcwd(cur_dir, sizeof(cur_dir)) == NULL)
-         error("getcwd");
- 
--    chk_error(mkdir(TESTPATH, 0755));
--
--    chk_error(chdir(TESTPATH));
-+    chk_error(chdir(tmpdir));
- 
-     /* open/read/write/close/readv/writev/lseek */
- 
-@@ -163,7 +159,7 @@ static void test_file(void)
-         st.st_mtime != 1000)
-         error("stat time");
- 
--    chk_error(stat(TESTPATH, &st));
-+    chk_error(stat(tmpdir, &st));
-     if (!S_ISDIR(st.st_mode))
-         error("stat mode");
- 
-@@ -185,7 +181,7 @@ static void test_file(void)
-         error("stat mode");
- 
-     /* getdents */
--    dir = opendir(TESTPATH);
-+    dir = opendir(tmpdir);
-     if (!dir)
-         error("opendir");
-     len = 0;
-@@ -207,7 +203,7 @@ static void test_file(void)
-     chk_error(unlink("file3"));
-     chk_error(unlink("file2"));
-     chk_error(chdir(cur_dir));
--    chk_error(rmdir(TESTPATH));
-+    chk_error(rmdir(tmpdir));
- }
- 
- static void test_fork(void)
-@@ -264,7 +260,7 @@ static int server_socket(void)
-     chk_error(setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)));
- 
-     sockaddr.sin_family = AF_INET;
--    sockaddr.sin_port = htons(TESTPORT);
-+    sockaddr.sin_port = htons(0); /* choose random ephemeral port) */
-     sockaddr.sin_addr.s_addr = 0;
-     chk_error(bind(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)));
-     chk_error(listen(fd, 0));
-@@ -272,7 +268,7 @@ static int server_socket(void)
- 
- }
- 
--static int client_socket(void)
-+static int client_socket(uint16_t port)
- {
-     int fd;
-     struct sockaddr_in sockaddr;
-@@ -280,7 +276,7 @@ static int client_socket(void)
-     /* server socket */
-     fd = chk_error(socket(PF_INET, SOCK_STREAM, 0));
-     sockaddr.sin_family = AF_INET;
--    sockaddr.sin_port = htons(TESTPORT);
-+    sockaddr.sin_port = htons(port);
-     inet_aton("127.0.0.1", &sockaddr.sin_addr);
-     chk_error(connect(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)));
-     return fd;
-@@ -292,10 +288,17 @@ static void test_socket(void)
- {
-     int server_fd, client_fd, fd, pid, ret, val;
-     struct sockaddr_in sockaddr;
--    socklen_t len;
-+    struct sockaddr_in server_addr;
-+    socklen_t len, socklen;
-+    uint16_t server_port;
-     char buf[512];
- 
-     server_fd = server_socket();
-+    /* find out what port we got */
-+    socklen = sizeof(server_addr);
-+    ret = getsockname(server_fd, &server_addr, &socklen);
-+    chk_error(ret);
-+    server_port = ntohs(server_addr.sin_port);
- 
-     /* test a few socket options */
-     len = sizeof(val);
-@@ -305,7 +308,7 @@ static void test_socket(void)
- 
-     pid = chk_error(fork());
-     if (pid == 0) {
--        client_fd = client_socket();
-+        client_fd = client_socket(server_port);
-         send(client_fd, socket_msg, sizeof(socket_msg), 0);
-         close(client_fd);
-         exit(0);
+ # Specialist build images, sometimes very limited tools
+diff --git a/tests/docker/dockerfiles/debian-alpha-cross.docker b/tests/docker/dockerfiles/debian-alpha-cross.docker
+new file mode 100644
+index 0000000000..29a25d0dfd
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-alpha-cross.docker
+@@ -0,0 +1,12 @@
++#
++# Docker cross-compiler target
++#
++# This docker target builds on the debian sid base image which
++# contains cross compilers for Debian "ports" targets.
++#
++FROM qemu:debian-sid
++
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        gcc-alpha-linux-gnu \
++        libc6.1-dev-alpha-cross || { echo "Failed to build - see debian-sid.docker notes"; exit 1; }
+diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
+new file mode 100644
+index 0000000000..9a3d168705
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-sid.docker
+@@ -0,0 +1,32 @@
++#
++# Debian Sid Base
++#
++# A number of our guests exist as ports only. We can either use the
++# ports repo or get everything from Sid. However Sid is a rolling
++# distro which may be broken at any particular time. If you are
++# unlucky and try and build your images while gcc is in the process of
++# being uploaded this can fail. Your only recourse is to try again in
++# a few hours when the repos have re-synced. Once built however you
++# won't be affected by repo changes unless the docker recipies are
++# updated and trigger a re-build.
++#
++
++FROM debian:sid-slim
++
++# Duplicate deb line as deb-src
++RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
++
++# Install common build utilities
++RUN apt update
++RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt install -y --no-install-recommends \
++        bison \
++        build-essential \
++        ca-certificates \
++        flex \
++        git \
++        pkg-config \
++        psmisc \
++        python \
++        texinfo || { echo "Failed to build - see debian-sid.docker notes"; exit 1; }
+diff --git a/tests/tcg/alpha/Makefile.include b/tests/tcg/alpha/Makefile.include
+new file mode 100644
+index 0000000000..c7dc48eadb
+--- /dev/null
++++ b/tests/tcg/alpha/Makefile.include
+@@ -0,0 +1,2 @@
++DOCKER_IMAGE=debian-alpha-cross
++DOCKER_CROSS_COMPILER=alpha-linux-gnu-gcc
+diff --git a/tests/tcg/alpha/Makefile.target b/tests/tcg/alpha/Makefile.target
+new file mode 100644
+index 0000000000..bedf1b6444
+--- /dev/null
++++ b/tests/tcg/alpha/Makefile.target
+@@ -0,0 +1,6 @@
++# -*- Mode: makefile -*-
++#
++# Alpha specific tweaks
++
++# On Alpha Linux only supports 8k pages
++EXTRA_RUNS+=run-test-mmap-8192
 -- 
 2.17.1
