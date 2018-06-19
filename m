@@ -1,17 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jp-0003H3-IC
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:18 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5jr-0003JU-VC
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5jo-0000wo-Sc
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:17 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5jr-0000y0-0B
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:47:20 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:50 -0500
-Message-Id: <20180619014319.28272-85-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:42:51 -0500
+Message-Id: <20180619014319.28272-86-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 084/113] console: Avoid segfault in screendump
+Subject: [Qemu-devel] [PATCH 085/113] hw/intc/arm_gicv3: Fix APxR<n>
+ register dispatching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,56 +22,82 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Michal Privoznik <mprivozn@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-stable@nongnu.org, Jan Kiszka <jan.kiszka@siemens.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Michal Privoznik <mprivozn@redhat.com>
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-After f771c5440e04626f1 it is possible to select device and
-head which to take screendump from. And even though we check if
-provided head number falls within range, it may still happen that
-the console has no surface yet leading to SIGSEGV:
+There was a nasty flip in identifying which register group an access is
+targeting. The issue caused spuriously raised priorities of the guest
+when handing CPUs over in the Jailhouse hypervisor.
 
-  qemu.git $ ./x86_64-softmmu/qemu-system-x86_64 \
-    -qmp stdio \
-    -device virtio-vga,id=video0,max_outputs=4
-
-  {"execute":"qmp_capabilities"}
-  {"execute":"screendump", "arguments":{"filename":"/tmp/screen.ppm", "device":"video0", "head":1}}
-  Segmentation fault
-
- #0  0x00005628249dda88 in ppm_save (filename=0x56282826cbc0 "/tmp/screen.ppm", ds=0x0, errp=0x7fff52a6fae0) at ui/console.c:304
- #1  0x00005628249ddd9b in qmp_screendump (filename=0x56282826cbc0 "/tmp/screen.ppm", has_device=true, device=0x5628276902d0 "video0", has_head=true, head=1, errp=0x7fff52a6fae0) at ui/console.c:375
- #2  0x00005628247740df in qmp_marshal_screendump (args=0x562828265e00, ret=0x7fff52a6fb68, errp=0x7fff52a6fb60) at qapi/qapi-commands-ui.c:110
-
-Here, @ds from frame #0 (or @surface from frame #1) is
-dereferenced at the very beginning of ppm_save(). And because
-it's NULL crash happens.
-
-Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-id: cb05bb1909daa6ba62145c0194aafa05a14ed3d1.1526569138.git.mprivozn@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-(cherry picked from commit 08d9864fa4e0c616e076ca8b225d39a7ecb189af)
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+Message-id: 28b927d3-da58-bce4-cc13-bfec7f9b1cb9@siemens.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+(cherry picked from commit 887aae10f6150dfdc71c45d7588e8efe6c144019)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- ui/console.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ hw/intc/arm_gicv3_cpuif.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/ui/console.c b/ui/console.c
-index c4c95abed7..96272b5c45 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -354,6 +354,11 @@ void qmp_screendump(const char *filename, Error **errp)
+diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+index 5cbafaf497..519d581bb6 100644
+--- a/hw/intc/arm_gicv3_cpuif.c
++++ b/hw/intc/arm_gicv3_cpuif.c
+@@ -431,7 +431,7 @@ static uint64_t icv_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+     GICv3CPUState *cs = icc_cs_from_env(env);
+     int regno = ri->opc2 & 3;
+-    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
++    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
+     uint64_t value = cs->ich_apr[grp][regno];
  
-     graphic_hw_update(con);
-     surface = qemu_console_surface(con);
-+    if (!surface) {
-+        error_setg(errp, "no surface");
-+        return;
-+    }
-+
-     ppm_save(filename, surface, errp);
- }
+     trace_gicv3_icv_ap_read(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
+@@ -443,7 +443,7 @@ static void icv_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ {
+     GICv3CPUState *cs = icc_cs_from_env(env);
+     int regno = ri->opc2 & 3;
+-    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
++    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
+ 
+     trace_gicv3_icv_ap_write(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
+ 
+@@ -1465,7 +1465,7 @@ static uint64_t icc_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
+     uint64_t value;
+ 
+     int regno = ri->opc2 & 3;
+-    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1;
++    int grp = (ri->crm & 1) ? GICV3_G1 : GICV3_G0;
+ 
+     if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
+         return icv_ap_read(env, ri);
+@@ -1487,7 +1487,7 @@ static void icc_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     GICv3CPUState *cs = icc_cs_from_env(env);
+ 
+     int regno = ri->opc2 & 3;
+-    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1;
++    int grp = (ri->crm & 1) ? GICV3_G1 : GICV3_G0;
+ 
+     if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
+         icv_ap_write(env, ri, value);
+@@ -2296,7 +2296,7 @@ static uint64_t ich_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+     GICv3CPUState *cs = icc_cs_from_env(env);
+     int regno = ri->opc2 & 3;
+-    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
++    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
+     uint64_t value;
+ 
+     value = cs->ich_apr[grp][regno];
+@@ -2309,7 +2309,7 @@ static void ich_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ {
+     GICv3CPUState *cs = icc_cs_from_env(env);
+     int regno = ri->opc2 & 3;
+-    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
++    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
+ 
+     trace_gicv3_ich_ap_write(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
  
 -- 
 2.11.0
