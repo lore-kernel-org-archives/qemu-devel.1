@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5ir-0002Sk-Jg
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:18 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5ii-0002KY-56
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1fV5in-0000IG-KM
-	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:17 -0400
+	(envelope-from <flukshun@gmail.com>) id 1fV5ih-0000Fb-7s
+	for qemu-devel@nongnu.org; Mon, 18 Jun 2018 21:46:08 -0400
 Sender: fluxion <flukshun@gmail.com>
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Mon, 18 Jun 2018 20:42:24 -0500
-Message-Id: <20180619014319.28272-59-mdroth@linux.vnet.ibm.com>
+Date: Mon, 18 Jun 2018 20:42:21 -0500
+Message-Id: <20180619014319.28272-56-mdroth@linux.vnet.ibm.com>
 In-Reply-To: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
 References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 058/113] hw/char/cmsdk-apb-uart.c: Correctly
- clear INTSTATUS bits on writes
+Subject: [Qemu-devel] [PATCH 055/113] vfio-ccw: fix memory leaks in
+ vfio_ccw_realize()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,40 +22,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>, Cornelia Huck <cohuck@redhat.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Greg Kurz <groug@kaod.org>
 
-The CMSDK APB UART INTSTATUS register bits are all write-one-to-clear.
-We were getting this correct for the TXO and RXO bits (which need
-special casing because their state lives in the STATE register),
-but had forgotten to handle the normal bits for RX and TX which
-we do store in our s->intstatus field.
+If the subchannel is already attached or if vfio_get_device() fails, the
+code jumps to the 'out_device_err' label and doesn't free the string it
+has just allocated.
 
-Perform the W1C operation on the bits in s->intstatus too.
+The code should be reworked so that vcdev->vdev.name only gets set when
+the device has been attached, and freed when it is about to be detached.
+This could be achieved  with the addition of a vfio_ccw_get_device()
+function that would be the counterpart of vfio_put_device(). But this is
+a more elaborate cleanup that should be done in a follow-up. For now,
+let's just add calls to g_free() on the buggy error paths.
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1760262
-Cc: qemu-stable@nongnu.org
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20180410134203.17552-1-peter.maydell@linaro.org
-(cherry picked from commit 6670b494fdb23f74ecd9be3d952c007f64e268f1)
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <152311222681.203086.8874800175539040298.stgit@bahia>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+(cherry picked from commit be4d026f645eb31078e08d431c93a898b895024e)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/char/cmsdk-apb-uart.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/vfio/ccw.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/char/cmsdk-apb-uart.c b/hw/char/cmsdk-apb-uart.c
-index 1ad1e14295..9c0929d8a2 100644
---- a/hw/char/cmsdk-apb-uart.c
-+++ b/hw/char/cmsdk-apb-uart.c
-@@ -274,6 +274,7 @@ static void uart_write(void *opaque, hwaddr offset, uint64_t value,
-          * is then reflected into the intstatus value by the update function).
-          */
-         s->state &= ~(value & (R_INTSTATUS_TXO_MASK | R_INTSTATUS_RXO_MASK));
-+        s->intstatus &= ~value;
-         cmsdk_apb_uart_update(s);
-         break;
-     case A_BAUDDIV:
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index 636729c03d..c74e107a04 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -357,11 +357,13 @@ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+         if (strcmp(vbasedev->name, vcdev->vdev.name) == 0) {
+             error_setg(&err, "vfio: subchannel %s has already been attached",
+                        vcdev->vdev.name);
++            g_free(vcdev->vdev.name);
+             goto out_device_err;
+         }
+     }
+ 
+     if (vfio_get_device(group, cdev->mdevid, &vcdev->vdev, &err)) {
++        g_free(vcdev->vdev.name);
+         goto out_device_err;
+     }
+ 
 -- 
 2.11.0
