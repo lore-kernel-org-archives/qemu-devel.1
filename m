@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVMPm-0000lw-KW
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:35:44 -0400
+	(envelope-from <danielhb413@gmail.com>) id 1fVMSV-0001hd-Co
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:38:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVMPl-00018T-85
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:35:42 -0400
-References: <20180614232119.31669-1-naravamudan@digitalocean.com>
-	<20180615174729.20544-1-naravamudan@digitalocean.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <1dbfeae9-6cae-179b-214b-61e3f96ac94c@redhat.com>
-Date: Tue, 19 Jun 2018 14:35:33 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180615174729.20544-1-naravamudan@digitalocean.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] [RFC v2] aio: properly bubble up errors
- from initialization
+	(envelope-from <danielhb413@gmail.com>) id 1fVMSU-0002sz-IE
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:38:31 -0400
+Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:43395)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
+	id 1fVMSU-0002s6-B3
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 15:38:30 -0400
+Received: by mail-qt0-x229.google.com with SMTP id y89-v6so858493qtd.10
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 12:38:29 -0700 (PDT)
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Date: Tue, 19 Jun 2018 16:38:00 -0300
+Message-Id: <20180619193806.17419-1-danielhb413@gmail.com>
+Subject: [Qemu-devel] [PATCH v1 0/6] QGA: systemd
+ hibernate/suspend/hybrid-sleep
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,101 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nishanth Aravamudan <naravamudan@digitalocean.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, mdroth@linux.vnet.ibm.com, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-On 06/15/2018 12:47 PM, Nishanth Aravamudan via Qemu-devel wrote:
-> laio_init() can fail for a couple of reasons, which will lead to a NULL
-> pointer dereference in laio_attach_aio_context().
-> 
-> To solve this, add a aio_setup_linux_aio() function which is called
-> before aio_get_linux_aio() where it is called currently, and which
-> propogates setup errors up. The signature of aio_get_linux_aio() was not
+This series adds systemd suspend support for QGA. Some newer
+guests don't have pmutils anymore, leaving us with just the
+Linux state file mechanism to suspend the guest OS, which does
+not support hybrid-sleep. With this implementation, QGA is
+now able to hybrid suspend newer guests again.
 
-s/propogates/propagates/
+Most of the patches are cleanups in the existing suspend code,
+aiming at both simplifying it and making it easier to extend
+it with systemd.
 
-> modified, because it seems preferable to return the actual errno from
-> the possible failing initialization calls.
-> 
-> With respect to the error-handling in the file-posix.c, we properly
-> bubble any errors up in raw_co_prw and in the case s of
-> raw_aio_{,un}plug, the result is the same as if s->use_linux_aio was not
-> set (but there is no bubbling up). In all three cases, if the setup
-> function fails, we fallback to the thread pool and an error message is
-> emitted.
-> 
-> It is trivial to make qemu segfault in my testing. Set
-> /proc/sys/fs/aio-max-nr to 0 and start a guest with
-> aio=native,cache=directsync. With this patch, the guest successfully
-> starts (but obviously isn't using native AIO). Setting aio-max-nr back
-> up to a reasonable value, AIO contexts are consumed normally.
-> 
-> Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
-> 
-> ---
-> 
-> Changes from v1 -> v2:
 
-When posting a v2, it's best to post as a new thread, rather than 
-in-reply-to the v1 thread, so that automated tooling knows to check the 
-new patch.  More patch submission tips at 
-https://wiki.qemu.org/Contribute/SubmitAPatch
+Note: checkpatch.pl complains about patch 3:
 
-> 
-> Rather than affect virtio-scsi/blk at all, make all the changes internal
-> to file-posix.c. Thanks to Kevin Wolf for the suggested change.
-> ---
->   block/file-posix.c      | 24 ++++++++++++++++++++++++
->   block/linux-aio.c       | 15 ++++++++++-----
->   include/block/aio.h     |  3 +++
->   include/block/raw-aio.h |  2 +-
->   stubs/linux-aio.c       |  2 +-
->   util/async.c            | 15 ++++++++++++---
->   6 files changed, 51 insertions(+), 10 deletions(-)
-> 
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 07bb061fe4..2415d09bf1 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -1665,6 +1665,14 @@ static int coroutine_fn raw_co_prw(BlockDriverState *bs, uint64_t offset,
->               type |= QEMU_AIO_MISALIGNED;
->   #ifdef CONFIG_LINUX_AIO
->           } else if (s->use_linux_aio) {
-> +            int rc;
-> +            rc = aio_setup_linux_aio(bdrv_get_aio_context(bs));
-> +            if (rc != 0) {
-> +                error_report("Unable to use native AIO, falling back to "
-> +                             "thread pool.");
+ERROR: "(foo* const*)" should be "(foo * const*)"
+#94: FILE: qga/commands-posix.c:1467:
++        execve(cmd_path, (char* const*)command, environ);
 
-In general, error_report() should not output a trailing '.'.
+ERROR: space required before that '*' (ctx:VxB)
+#94: FILE: qga/commands-posix.c:1467:
++        execve(cmd_path, (char* const*)command, environ);
 
-> +                s->use_linux_aio = 0;
-> +                return rc;
 
-Wait - the message claims we are falling back, but the non-zero return 
-code sounds like we are returning an error instead of falling back.  (My 
-preference - if the user requested something and we can't do it, it's 
-better to error than to fall back to something that does not match the 
-user's request).
+Not sure how to make it know that this is a cast instead
+of a math operation. Suggestions welcome
 
-> +            }
->               LinuxAioState *aio = aio_get_linux_aio(bdrv_get_aio_context(bs));
->               assert(qiov->size == bytes);
->               return laio_co_submit(bs, aio, s->fd, offset, qiov, type);
-> @@ -1695,6 +1703,14 @@ static void raw_aio_plug(BlockDriverState *bs)
->   #ifdef CONFIG_LINUX_AIO
->       BDRVRawState *s = bs->opaque;
->       if (s->use_linux_aio) {
-> +        int rc;
-> +        rc = aio_setup_linux_aio(bdrv_get_aio_context(bs));
-> +        if (rc != 0) {
-> +            error_report("Unable to use native AIO, falling back to "
-> +                         "thread pool.");
-> +            s->use_linux_aio = 0;
+Daniel Henrique Barboza (6):
+  qga: refactoring qmp_guest_suspend_* functions
+  qga: bios_supports_mode: decoupling pm-utils and sys logic
+  qga: guest_suspend: decoupling pm-utils and sys logic
+  qga: removing switch statements, adding run_process_child
+  qga: adding systemd hibernate/suspend/hybrid-sleep support
+  qga: removing bios_supports_mode
 
-Should s->use_linux_aio be a bool instead of an int?
+ qga/commands-posix.c | 315 ++++++++++++++++++++++++++++---------------
+ 1 file changed, 210 insertions(+), 105 deletions(-)
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.1
