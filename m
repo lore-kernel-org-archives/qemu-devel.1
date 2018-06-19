@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVKRG-0001iV-Ef
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:29:07 -0400
+	(envelope-from <mst@redhat.com>) id 1fVKSJ-0002bR-DM
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:30:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVKRF-00024v-IC
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:29:06 -0400
-Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:41127)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fVKRF-00024G-9y
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:29:05 -0400
-Received: by mail-ot0-x236.google.com with SMTP id d19-v6so554580oti.8
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 10:29:05 -0700 (PDT)
+	(envelope-from <mst@redhat.com>) id 1fVKSF-0002WU-CO
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:30:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33510 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fVKSF-0002WM-5l
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 13:30:07 -0400
+Date: Tue, 19 Jun 2018 20:30:06 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180619202529-mutt-send-email-mst@kernel.org>
+References: <20180619163228.13790-1-venu.busireddy@oracle.com>
+	<20180619163228.13790-5-venu.busireddy@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20180618174538.30092-1-mark.cave-ayland@ilande.co.uk>
-References: <20180618174538.30092-1-mark.cave-ayland@ilande.co.uk>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Jun 2018 18:28:43 +0100
-Message-ID: <CAFEAcA-9OV_n9Br0CwG8qzyY5O6oGUjuE7yJMRW9B7gDt+EWEA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/3] qemu-sparc queue 20180618
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180619163228.13790-5-venu.busireddy@oracle.com>
+Subject: Re: [Qemu-devel] [PATCH virtio 1/1] Add "Group Identifier" support
+ to virtio PCI capabilities.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +28,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Venu Busireddy <venu.busireddy@oracle.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
 
-On 18 June 2018 at 18:45, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> The following changes since commit 2ef2f16781af9dee6ba6517755e9073ba5799fa2:
->
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20180615a' into staging (2018-06-15 18:13:35 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/mcayland/qemu.git tags/qemu-sparc-20180618
->
-> for you to fetch changes up to 46bb0137b8266ab8dedc3b9712f3d246bbd686ba:
->
->   SPARC64: add icount support (2018-06-17 11:13:06 +0100)
->
-> ----------------------------------------------------------------
-> qemu-sparc queue
->
-> ----------------------------------------------------------------
-> Mark Cave-Ayland (1):
->       SPARC64: add icount support
->
-> Thomas Huth (2):
->       hw/sparc64/sun4u: Fix introspection by converting prom instance_init to realize
->       hw/sparc/sun4m: Fix problems with device introspection
->
+On Tue, Jun 19, 2018 at 11:32:28AM -0500, Venu Busireddy wrote:
+> Add VIRTIO_PCI_CAP_GROUP_ID_CFG (Group Identifier) capability to the
+> virtio PCI capabilities to allow for the grouping of devices.
+> 
+> Signed-off-by: Venu Busireddy <venu.busireddy@oracle.com>
+> ---
+>  content.tex | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 43 insertions(+)
+> 
+> diff --git a/content.tex b/content.tex
+> index 7a92cb1..7ea6267 100644
+> --- a/content.tex
+> +++ b/content.tex
+> @@ -599,6 +599,8 @@ The fields are interpreted as follows:
+>  #define VIRTIO_PCI_CAP_DEVICE_CFG        4
+>  /* PCI configuration access */
+>  #define VIRTIO_PCI_CAP_PCI_CFG           5
+> +/* Group Identifier */
+> +#define VIRTIO_PCI_CAP_GROUP_ID_CFG      6
+>  \end{lstlisting}
+>  
+>          Any other value is reserved for future use.
+> @@ -997,6 +999,47 @@ address \field{cap.length} bytes within a BAR range
+>  specified by some other Virtio Structure PCI Capability
+>  of type other than \field{VIRTIO_PCI_CAP_PCI_CFG}.
+>  
+> +\subsubsection{Group Identifier capability}\label{sec:Virtio Transport Options / Virtio Over PCI Bus / PCI Device Layout / Group Identifier capability}
+> +
+> +The VIRTIO_PCI_CAP_GROUP_ID_CFG capability provides means for grouping devices together.
+> +
+> +The capability is immediately followed by an identifier of arbitrary size as below:
+> +
+> +\begin{lstlisting}
+> +struct virtio_pci_group_id_cap {
+> +        struct virtio_pci_cap cap;
+> +        u8 group_id[]; /* Group Identifier */
+> +};
+> +\end{lstlisting}
+> +
+> +The fields \field{cap.bar}, \field{cap.length}, \field{cap.offset}
+> +and \field{group_id} are read-only for the driver.
+> +
+> +The specification does not impose any restrictions on the size or
+> +structure of group_id[].
 
-Applied, thanks.
+I think it must be a multiple of 4 in size, as is
+standard for all capabilities.
 
--- PMM
+
+> Vendors are free to declare this array as
+> +large as needed, as long as the combined size of all capabilities can
+> +be accommodated within the PCI configuration space.
+> +
+> +If there is enough room in the PCI configuration space to accommodate
+> +the group identifier, the fields \field{cap.bar}, \field{cap.offset}
+> +and \field{cap.length} should be set to 0.
+> +
+> +If there isn't enough room, some or all of the group identifier can be
+> +presented in the BAR region, in which case the fields \field{cap.bar},
+> +\field{cap.offset} and \field{cap.length} should be set appropriately.
+
+And then how do you glue the two pieces?
+
+> +
+> +In either case, the field \field{cap.cap_len} indicates the length of
+> +the group identifier information present in the configuration space
+> +itself.
+
+It seems like an overkill to me. Isn't it enough to have it in config
+space? This would make comparisons easier.
+
+> +
+> +\devicenormative{\paragraph}{Group Identifier capability}{Virtio Transport Options / Virtio Over PCI Bus / PCI Device Layout / Group Identifier capability}
+> +
+> +The device MAY present the VIRTIO_PCI_CAP_GROUP_ID_CFG capability.
+> +
+> +\drivernormative{\paragraph}{Group Identifier capability}{Virtio Transport Options / Virtio Over PCI Bus / PCI Device Layout / Group Identifier capability}
+> +
+> +The driver MUST NOT write to group_id[] area or the BAR region.
+> +
+>  \subsubsection{Legacy Interfaces: A Note on PCI Device Layout}\label{sec:Virtio Transport Options / Virtio Over PCI Bus / PCI Device Layout / Legacy Interfaces: A Note on PCI Device Layout}
+>  
+>  Transitional devices MUST present part of configuration
