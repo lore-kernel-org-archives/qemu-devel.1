@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1fVBSo-000662-Es
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:54:07 -0400
+	(envelope-from <armbru@redhat.com>) id 1fVBWV-00073o-U7
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:57:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1fVBSj-0006H2-HW
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:54:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40554 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fVBWR-0007y1-2b
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:57:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53218 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1fVBSj-0006Ft-BM
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:54:01 -0400
-Date: Tue, 19 Jun 2018 15:53:55 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20180619075355.GA23983@wei-ubt>
-References: <1528225683-11413-1-git-send-email-wexu@redhat.com>
-	<1528225683-11413-9-git-send-email-wexu@redhat.com>
-	<6972a450-117a-2f3c-fb44-fb985c35b8e6@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVBWQ-0007xn-TT
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 03:57:50 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 54EBF400E9A3
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 07:57:50 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
+	<20180321115211.17937-4-marcandre.lureau@redhat.com>
+Date: Tue, 19 Jun 2018 09:57:39 +0200
+In-Reply-To: <20180321115211.17937-4-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
+	Lureau"'s message of "Wed, 21 Mar 2018 12:51:25 +0100")
+Message-ID: <87po0nyzrg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6972a450-117a-2f3c-fb44-fb985c35b8e6@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 8/8] virtio: guest driver reload for
- vhost-net
+Subject: Re: [Qemu-devel] [PATCH v3 03/49] qapi: add 'if' to top-level
+ expressions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +36,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, tiwei.bie@intel.com, mst@redhat.com, jfreimann@redhat.com
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On Wed, Jun 06, 2018 at 11:48:19AM +0800, Jason Wang wrote:
->=20
->=20
-> On 2018=E5=B9=B406=E6=9C=8806=E6=97=A5 03:08, wexu@redhat.com wrote:
-> >From: Wei Xu <wexu@redhat.com>
-> >
-> >last_avail, avail_wrap_count, used_idx and used_wrap_count are
-> >needed to support vhost-net backend, all these are either 16 or
-> >bool variables, since state.num is 64bit wide, so here it is
-> >possible to put them to the 'num' without introducing a new case
-> >while handling ioctl.
-> >
-> >Unload/Reload test has been done successfully with a patch in vhost ke=
-rnel.
->=20
-> You need a patch to enable vhost.
->=20
-> And I think you can only do it for vhost-kenrel now since vhost-user
-> protocol needs some extension I believe.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-OK.
+> Accept 'if' key in top-level elements, accepted as string or list of
+> string type. The following patches will modify the test visitor to
+> check the value is correctly saved, and generate #if/#endif code (as a
+> single #if/endif line or a series for a list).
+>
+> Example of 'if' key:
+> { 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
+>   'if': 'defined(TEST_IF_STRUCT)' }
+>
+> The generated code is for now *unconditional*. Later patches generate
+> the conditionals.
+>
+> A following patch for qapi-code-gen.txt will provide more complete
+> documentation for 'if' usage.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+[...]
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 0b277036df..f77ad2ba3b 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -436,6 +436,10 @@ qapi-schema +=3D args-unknown.json
+>  qapi-schema +=3D bad-base.json
+>  qapi-schema +=3D bad-data.json
+>  qapi-schema +=3D bad-ident.json
+> +qapi-schema +=3D bad-if.json
+> +qapi-schema +=3D bad-if-empty.json
+> +qapi-schema +=3D bad-if-empty-list.json
+> +qapi-schema +=3D bad-if-list.json
+>  qapi-schema +=3D bad-type-bool.json
+>  qapi-schema +=3D bad-type-dict.json
+>  qapi-schema +=3D bad-type-int.json
+> @@ -933,6 +937,8 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): check=
+-%.json: $(SRC_PATH)/%.json
+>  		"TEST","$*.out")
+>  	@# Sanitize error messages (make them independent of build directory)
+>  	@perl -p -e 's|\Q$(SRC_PATH)\E/||g' $*.test.err | diff -u $(SRC_PATH)/$=
+*.err -
+> +	@if test "$(QAPI_REGENERATE)" =3D=3D 1 ; then cp $*.test.out $(SRC_PATH=
+)/$*.out ; fi
+> +	@if test "$(QAPI_REGENERATE)" =3D=3D 1 ; then cp $*.test.err $(SRC_PATH=
+)/$*.err ; fi
+>  	@diff -u $(SRC_PATH)/$*.out $*.test.out
+>  	@diff -u $(SRC_PATH)/$*.exit $*.test.exit
+>=20=20
 
->=20
-> >
-> >Signed-off-by: Wei Xu <wexu@redhat.com>
-> >---
-> >  hw/virtio/virtio.c | 42 ++++++++++++++++++++++++++++++++++--------
-> >  1 file changed, 34 insertions(+), 8 deletions(-)
-> >
-> >diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> >index 4543974..153f6d7 100644
-> >--- a/hw/virtio/virtio.c
-> >+++ b/hw/virtio/virtio.c
-> >@@ -2862,33 +2862,59 @@ hwaddr virtio_queue_get_used_size(VirtIODevice=
- *vdev, int n)
-> >      }
-> >  }
-> >-uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
-> >+uint64_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
-> >  {
-> >-    return vdev->vq[n].last_avail_idx;
-> >+    uint64_t num;
-> >+
-> >+    num =3D vdev->vq[n].last_avail_idx;
-> >+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> >+        num |=3D ((uint64_t)vdev->vq[n].avail_wrap_counter) << 16;
-> >+        num |=3D ((uint64_t)vdev->vq[n].used_idx) << 32;
-> >+        num |=3D ((uint64_t)vdev->vq[n].used_wrap_counter) << 48;
->=20
-> So s.num is 32bit, I don't think this can even work.
+Huh?
 
-I mistakenly checked out s.num is 64bit, will add a new case in next vers=
-ion.
-
-Wei
-
->=20
-> Thanks
->=20
-> >+    }
-> >+
-> >+    return num;
-> >  }
-> >-void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint1=
-6_t idx)
-> >+void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint6=
-4_t num)
-> >  {
-> >-    vdev->vq[n].last_avail_idx =3D idx;
-> >-    vdev->vq[n].shadow_avail_idx =3D idx;
-> >+    vdev->vq[n].shadow_avail_idx =3D vdev->vq[n].last_avail_idx =3D (=
-uint16_t)(num);
-> >+
-> >+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> >+        vdev->vq[n].avail_wrap_counter =3D (uint16_t)(num >> 16);
-> >+        vdev->vq[n].used_idx =3D (uint16_t)(num >> 32);
-> >+        vdev->vq[n].used_wrap_counter =3D (uint16_t)(num >> 48);
-> >+    }
-> >  }
-> >  void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
-> >  {
-> >      rcu_read_lock();
-> >-    if (vdev->vq[n].vring.desc) {
-> >+    if (!vdev->vq[n].vring.desc) {
-> >+        goto out;
-> >+    }
-> >+
-> >+    if (!virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> >          vdev->vq[n].last_avail_idx =3D vring_used_idx(&vdev->vq[n]);
-> >-        vdev->vq[n].shadow_avail_idx =3D vdev->vq[n].last_avail_idx;
-> >      }
-> >+    vdev->vq[n].shadow_avail_idx =3D vdev->vq[n].last_avail_idx;
-> >+
-> >+out:
-> >      rcu_read_unlock();
-> >  }
-> >  void virtio_queue_update_used_idx(VirtIODevice *vdev, int n)
-> >  {
-> >      rcu_read_lock();
-> >-    if (vdev->vq[n].vring.desc) {
-> >+    if (!vdev->vq[n].vring.desc) {
-> >+        goto out;
-> >+    }
-> >+
-> >+    if (!virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-> >          vdev->vq[n].used_idx =3D vring_used_idx(&vdev->vq[n]);
-> >      }
-> >+
-> >+out:
-> >      rcu_read_unlock();
-> >  }
->=20
+[...]
