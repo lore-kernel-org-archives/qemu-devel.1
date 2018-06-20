@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVbNz-0000eZ-Oz
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 07:34:55 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fVbRp-0002AC-Ln
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 07:38:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVbNw-0005EX-Lr
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 07:34:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51118 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fVbRm-0007aP-Ec
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 07:38:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59588 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVbNw-0005EQ-Fo
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 07:34:48 -0400
-Date: Wed, 20 Jun 2018 12:34:42 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180620113442.GK3441@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVbRm-0007aG-8e
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 07:38:46 -0400
+Date: Wed, 20 Jun 2018 12:38:42 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180620113842.GL2549@work-vm>
 References: <20180620103555.1342-1-berrange@redhat.com>
 	<20180620103555.1342-10-berrange@redhat.com>
 	<20180620105800.GI2549@work-vm> <20180620111107.GJ3441@redhat.com>
-	<20180620112938.GK2549@work-vm>
+	<20180620112938.GK2549@work-vm> <20180620113442.GK3441@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180620112938.GK2549@work-vm>
+In-Reply-To: <20180620113442.GK3441@redhat.com>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH v3 09/11] authz: add QAuthZListFile object
  type for a file access control list
@@ -32,67 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
 
-On Wed, Jun 20, 2018 at 12:29:38PM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > On Wed, Jun 20, 2018 at 11:58:01AM +0100, Dr. David Alan Gilbert wrot=
-e:
-> > > * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
-> > > > Add a QAuthZListFile object type that implements the QAuthZ inter=
-face. This
-> > > > built-in implementation is a proxy around the QAtuhZList object t=
-ype,
-> > > > initializing it from an external file, and optionally, automatica=
-lly
-> > > > reloading it whenever it changes.
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> On Wed, Jun 20, 2018 at 12:29:38PM +0100, Dr. David Alan Gilbert wrote:
+> > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> > > On Wed, Jun 20, 2018 at 11:58:01AM +0100, Dr. David Alan Gilbert wr=
+ote:
+> > > > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> > > > > Add a QAuthZListFile object type that implements the QAuthZ int=
+erface. This
+> > > > > built-in implementation is a proxy around the QAtuhZList object=
+ type,
+> > > > > initializing it from an external file, and optionally, automati=
+cally
+> > > > > reloading it whenever it changes.
+> > > > >=20
+> > > > > To create an instance of this object via the QMP monitor, the s=
+yntax
+> > > > > used would be:
+> > > > >=20
+> > > > >       {
+> > > > >         "execute": "object-add",
+> > > > >         "arguments": {
+> > > > >           "qom-type": "authz-list-file",
+> > > > >           "id": "authz0",
+> > > > >           "parameters": {
+> > > > >             "filename": "/etc/qemu/vnc.acl",
+> > > > > 	    "refresh": "yes"
+> > > > >           }
+> > > > >         }
+> > > > >       }
+> > > > >=20
+> > > > > If "refresh" is "yes", inotify is used to monitor the file,
+> > > > > automatically reloading changes. If an error occurs during relo=
+ading,
+> > > > > all authorizations will fail until the file is next successfull=
+y
+> > > > > loaded.
 > > > >=20
-> > > > To create an instance of this object via the QMP monitor, the syn=
-tax
-> > > > used would be:
-> > > >=20
-> > > >       {
-> > > >         "execute": "object-add",
-> > > >         "arguments": {
-> > > >           "qom-type": "authz-list-file",
-> > > >           "id": "authz0",
-> > > >           "parameters": {
-> > > >             "filename": "/etc/qemu/vnc.acl",
-> > > > 	    "refresh": "yes"
-> > > >           }
-> > > >         }
-> > > >       }
-> > > >=20
-> > > > If "refresh" is "yes", inotify is used to monitor the file,
-> > > > automatically reloading changes. If an error occurs during reload=
-ing,
-> > > > all authorizations will fail until the file is next successfully
-> > > > loaded.
+> > > > I'm curious about the 'refresh' stuff:
+> > > >   a) If refresh=3Dno is there a way to explicitly ask for a refre=
+sh
+> > > >      when some tool knows it's finished with fiddling with the fi=
+le.
 > > >=20
-> > > I'm curious about the 'refresh' stuff:
-> > >   a) If refresh=3Dno is there a way to explicitly ask for a refresh
-> > >      when some tool knows it's finished with fiddling with the file=
-.
+> > > If refresh=3Dno, then you can still use  object_del + object_add to
+> > > recreate the ACL object which will cause new content to be picked
+> > > up.
 > >=20
-> > If refresh=3Dno, then you can still use  object_del + object_add to
-> > recreate the ACL object which will cause new content to be picked
-> > up.
+> > But if I have a VNC/NBD/etc listening, won't it be bound to the old
+> > object, so I can't delete the old object?
 >=20
-> But if I have a VNC/NBD/etc listening, won't it be bound to the old
-> object, so I can't delete the old object?
+> That's ok actually - the network servers merely record the ID of the
+> authz object. They resolve that to an actual object instance at the
+> time they do the authorization check, and failsafe to DENY if it is
+> missing. So you can safely delete & recreate on the fly.
 
-That's ok actually - the network servers merely record the ID of the
-authz object. They resolve that to an actual object instance at the
-time they do the authorization check, and failsafe to DENY if it is
-missing. So you can safely delete & recreate on the fly.
+OK, that needs documenting; binding it at the time of parsing wouldn't
+be surprising to anyone except for that use.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Dave
+
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
