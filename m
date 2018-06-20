@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fVkBT-00056f-7h
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:58:32 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fVkDR-0006Kz-5M
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 17:00:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fVkBR-0007Rb-Vq
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:58:31 -0400
-References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
-	<20180609151758.17343-7-vsementsov@virtuozzo.com>
-	<be6cae77-ed51-320f-8a86-fda7865c84b0@redhat.com>
-	<4f1dd453-77a4-f45f-f2c9-15d42e95d429@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <5b4d2ffa-3489-6a93-0352-dbce9221519d@redhat.com>
-Date: Wed, 20 Jun 2018 16:58:22 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fVkDN-0008F0-BG
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 17:00:33 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180620100825.22476-1-david@redhat.com>
+	<20180620100825.22476-4-david@redhat.com>
+	<9b002cf5-a752-9b4d-1ef5-3bb0fbd62b7d@twiddle.net>
+	<892b57f3-7418-8dd2-ec4b-6c24c11e5585@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <1d391a76-e927-f590-c664-a10b0c7051eb@twiddle.net>
+Date: Wed, 20 Jun 2018 11:00:19 -1000
 MIME-Version: 1.0
-In-Reply-To: <4f1dd453-77a4-f45f-f2c9-15d42e95d429@virtuozzo.com>
+In-Reply-To: <892b57f3-7418-8dd2-ec4b-6c24c11e5585@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 6/6] docs/interop: add
- nbd.txt
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] s390x/tcg: properly implement the
+ TOD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,135 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, armbru@redhat.com, mreitz@redhat.com
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
+
+On 06/20/2018 10:33 AM, David Hildenbrand wrote:
+> On 20.06.2018 21:33, Richard Henderson wrote:
+>> On 06/20/2018 12:08 AM, David Hildenbrand wrote:
+>>> +/* Converts ns to s390's clock format */
+>>> +static inline uint64_t time2tod(uint64_t ns)
+>>> +{
+>>> +    return (ns << 9) / 125;
+>>> +}
+>>> +
+>>> +/* Converts s390's clock format to ns */
+>>> +static inline uint64_t tod2time(uint64_t t)
+>>> +{
+>>> +    return (t * 125) >> 9;
+>>> +}
+>>
+> 
+> In this patch I'm only moving the code. If we find this is a problem,
+> this should go into a separate patch.
+
+Ah, right.
 
 
+>> How many significant bits on input here?
+> 
+> Basically all are significant, and as it is a clock, we will reach these
+> bits at one point.
+> 
+>> Do you in fact want to be using muldiv64?
+> 
+> Looking at linux:
+> 
+> arch/s390/include/asm/timex.h
+> 
+> They have a lengthy documentation, resulting in (a spli to avoid overflows)
+> 
+> return ((todval >> 9) * 125) + (((todval & 0x1ff) * 125) >> 9);
+> 
+> Maybe we should do the same?
 
-On 06/20/2018 10:16 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 20.06.2018 14:33, Eric Blake wrote:
->> On 06/09/2018 10:17 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Describe new metadata namespace: "qemu".
->>>
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
->
->>> ---
->>> =C2=A0 docs/interop/nbd.txt | 37 ++++++++++++++++++++++++++++++++++++=
-+
->>> =C2=A0 MAINTAINERS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0 1 +
->>> =C2=A0 2 files changed, 38 insertions(+)
->>> =C2=A0 create mode 100644 docs/interop/nbd.txt
->>>
->>> diff --git a/docs/interop/nbd.txt b/docs/interop/nbd.txt
->>> new file mode 100644
->>> index 0000000000..7366269fc0
->>> --- /dev/null
->>> +++ b/docs/interop/nbd.txt
->>> @@ -0,0 +1,37 @@
->>> +Qemu supports NBD protocol, and has internal NBD client (look at
->>
->> s/supports/supports the/
->>
->>> +block/nbd.c), internal NBD server (look at blockdev-nbd.c) as well a=
-s
->>
->> s/internal/an internal/2
->>
->>> +external NBD server tool - qemu-nbd.c. The common code is placed in
->>
->> s/external/an external/
->>
->>> +nbd/*.
->>> +
->>> +NBD protocol is specified here:
->>
->> s/NBD/The NBD/
->>
->>> +https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md
->>> +
->>> +This following paragraphs describe some specific properties of NBD
->>> +protocol realization in Qemu.
->>> +
->>> +
->>> +=3D Metadata namespaces =3D
->>> +
->>> +Qemu supports "base:allocation" metadata context as defined in the N=
-BD
->>
->> s/supports/supports the/
->>
->>> +protocol specification and defines own metadata namespace: "qemu".
->>
->> s/own/an additional/
->>
->>> +
->>> +
->>> +=3D=3D "qemu" namespace =3D=3D
->>> +
->>> +For now, the only type of metadata context in the namespace is dirty
->>> +bitmap. All available metadata contexts have the following form:
->>
->> maybe:
->>
->> The "qemu" namespace currently contains only one type of context,
->> related to exposing the contents of a dirty bitmap alongside the
->> associated disk contents.=C2=A0 The available metadata context has the
->> following form:
->=20
-> Ok
->=20
->>
->>> +
->>> +=C2=A0=C2=A0 qemu:dirty-bitmap:<dirty-bitmap-export-name>
->>> +
->>> +Each dirty-bitmap metadata context defines the only one flag for
->>> +extents in reply for NBD_CMD_BLOCK_STATUS:
->>> +
->>> +=C2=A0=C2=A0=C2=A0 bit 0: NBD_STATE_DIRTY, means that the extent is =
-"dirty"
->>> +
->>> +For NBD_OPT_LIST_META_CONTEXT the following queries are supported
->>> +additionally to "qemu:dirty-bitmap:<dirty-bitmap-export-name>":
->>
->> s/additionally/in addition/
->>
->>> +
->>> +* "qemu:" : returns list of all available metadata contexts in the
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 n=
-amespace.
->>> +* "qemu:dirty-bitmap:" : returns list of all available dirty-bitmap
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- metadata contexts.
->>> diff --git a/MAINTAINERS b/MAINTAINERS
->>> index e187b1f18f..887b479440 100644
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -1923,6 +1923,7 @@ F: nbd/
->>> =C2=A0 F: include/block/nbd*
->>> =C2=A0 F: qemu-nbd.*
->>> =C2=A0 F: blockdev-nbd.c
->>> +F: docs/interop/nbd.txt
->>> =C2=A0 T: git git://repo.or.cz/qemu/ericb.git nbd
->>> =C2=A0 =C2=A0 NFS
->>>
->>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->>
->> At this point, I think I'll touch up the issues I've spotted and
->> submit a pull request, in order to make it easier for me to test my
->> libvirt code.
->>
->=20
-> Ok, thank you!
->=20
+That would work too.
 
-ACK; the x- prefixes will help us get everything rolling together much
-faster and gives us some leeway to change things later as needed.
 
-Vladimir, can you jog our memories and let us know which series still
-need to hit QEMU for 3.0 for safe persistence/migration et al?
-
-(Not including any of my own qemu-img patches which I'll get to by freeze=
-.)
+r~
