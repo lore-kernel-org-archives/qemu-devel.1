@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39140)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVlfc-0004x5-7N
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 18:33:45 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fVlpe-0000MU-Je
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 18:44:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVlfZ-0001vw-2t
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 18:33:44 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:34549)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVlfY-0001va-U9
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 18:33:41 -0400
-Received: by mail-qt0-x244.google.com with SMTP id d3-v6so1185296qto.1
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 15:33:40 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180620132032.12952-1-alex.bennee@linaro.org>
-	<20180620132032.12952-5-alex.bennee@linaro.org>
-	<ffe5d74e-9cc0-e257-213a-56a44002bbfa@amsat.org>
-	<87muvpuq13.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c65d5cc9-9632-e8a7-4797-2eb5a4682b84@amsat.org>
-Date: Wed, 20 Jun 2018 19:33:34 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fVlpb-0007to-GK
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 18:44:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33630)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fVlpb-0007sJ-AA
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 18:44:03 -0400
+Received: from smtp.corp.redhat.com (int-mx12.intmail.prod.int.phx2.redhat.com
+	[10.5.11.27])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 85245307D859
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 22:44:01 +0000 (UTC)
+Date: Wed, 20 Jun 2018 19:43:56 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180620224356.GT7451@localhost.localdomain>
+References: <1528688464-17289-1-git-send-email-thuth@redhat.com>
+	<20180611221859.GE7451@localhost.localdomain>
+	<5231573e-f53d-dba2-e39c-5f3755505cca@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87muvpuq13.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 4/5] build-system: add clean-coverage
- target
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5231573e-f53d-dba2-e39c-5f3755505cca@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machine types
+ pc-0.10 and pc-0.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,100 +35,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, libvir-list@redhat.com
 
-On 06/20/2018 06:06 PM, Alex Bennée wrote:
-> 
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-> 
->> Hi Alex,
->>
->> On 06/20/2018 10:20 AM, Alex Bennée wrote:
->>> This can be used to remove any stale coverage data before any
->>> particular test run. This is useful for analysing individual tests.
->>>
->>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>> ---
->>>  Makefile               | 11 +++++++++++
->>>  docs/devel/testing.rst | 11 ++++++++---
->>>  2 files changed, 19 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/Makefile b/Makefile
->>> index e46f2b625a..cb4af8bf80 100644
->>> --- a/Makefile
->>> +++ b/Makefile
->>> @@ -725,6 +725,14 @@ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
->>>  	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
->>>  	"GEN","$@")
->>>
->>> +ifdef CONFIG_GCOV
->>> +.PHONY: clean-coverage
->>> +clean-coverage:
->>> +	$(call quiet-command, \
->>> +		find . \( -name '*.gcda' -o -name '*.gcov' \) -type f -exec rm {} +, \
->>> +		"CLEAN", "coverage files")
->>
->> I also see ".gcno" files.
->> From GCC man page:
->>
->>       -ftest-coverage
->>            Produce a notes file that the gcov code-coverage
->>            utility can use to show program coverage.  Each
->>            source file's note file is called auxname.gcno.
-> 
-> I explicitly left that out - the gcno file is regenerated by the build.
-> There is no reason to wipe it between coverage runs. A full clean should
-> remove them however.
+(CCing Markus and libvir-list)
 
-Oh OK, fine then.
+On Wed, Jun 20, 2018 at 08:40:38PM +0200, Thomas Huth wrote:
+> On 12.06.2018 00:18, Eduardo Habkost wrote:
+> > On Mon, Jun 11, 2018 at 05:41:04AM +0200, Thomas Huth wrote:
+> >> The oldest machine type which is still used in a maintained distribution
+> >> is a pc-0.12 based machine type in RHEL6, so everything that is older
+> >> than pc-0.12 should not be used anymore. Thus let's deprecate pc-0.10
+> >> and pc-0.11 so that we can finally remove them in a future release.
+> [...]
+> >> @@ -3952,6 +3953,10 @@ int main(int argc, char **argv, char **envp)
+> >>      }
+> >>  
+> >>      machine_class = select_machine();
+> >> +    if (machine_class->deprecation_msg) {
+> >> +        error_report("Machine type '%s' is deprecated: %s",
+> >> +                     machine_class->name, machine_class->deprecation_msg);
+> >> +    }
+> > 
+> > Do you plan to add this info to 'query-machines' QMP command?
+> 
+> No, I'm not planning to add this. We'd need a request from upper layers
+> (i.e. libvirt) for this first, otherwise it's just a dead interface that
+> nobody is using.
 
-> 
->>
->> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> Adding gcno:
->> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>
->>> +endif
->>> +
->>>  clean:
->>>  # avoid old build problems by removing potentially incorrect old files
->>>  	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
->>> @@ -1075,6 +1083,9 @@ endif
->>>  		echo '')
->>>  	@echo  'Cleaning targets:'
->>>  	@echo  '  clean           - Remove most generated files but keep the config'
->>> +ifdef CONFIG_GCOV
->>> +	@echo  '  clean-coverage  - Remove coverage files'
->>> +endif
->>>  	@echo  '  distclean       - Remove all generated files'
->>>  	@echo  '  dist            - Build a distributable tarball'
->>>  	@echo  ''
->>> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
->>> index 66ef219f69..a3652aea14 100644
->>> --- a/docs/devel/testing.rst
->>> +++ b/docs/devel/testing.rst
->>> @@ -161,9 +161,14 @@ GCC gcov support
->>>  ``gcov`` is a GCC tool to analyze the testing coverage by
->>>  instrumenting the tested code. To use it, configure QEMU with
->>>  ``--enable-gcov`` option and build. Then run ``make check`` as usual.
->>> -Reports can be obtained by running ``gcov`` command on the output
->>> -files under ``$build_dir/tests/``, please read the ``gcov``
->>> -documentation for more information.
->>> +
->>> +If you want to gather coverage information on a single test the ``make
->>> +clean-coverage`` target can be used to any existing coverage
->>> +information before running a single test.
->>> +
->>> +Reports can be obtained by running ``gcov`` command
->>> +on the output files under ``$build_dir/tests/``, please read the
->>> +``gcov`` documentation for more information.
->>>
->>>  QEMU iotests
->>>  ============
->>>
-> 
-> 
-> --
-> Alex Bennée
-> 
+I believe that useful information being available only through
+stderr is at least as bad as being available only through HMP.
+Should we extend QMP more proactively in cases like this, too?
+
+(In either case, I don't think this should block your series)
+
+-- 
+Eduardo
