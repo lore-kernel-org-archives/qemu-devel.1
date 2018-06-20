@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33569)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVfDB-0006zg-EW
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:39:58 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fVfDJ-00078W-W2
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:40:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVfDA-0003o3-FI
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:39:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41926 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fVfDG-0003v5-0e
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:40:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41944 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVfDA-0003nE-9e
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:39:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D9FD777154
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 15:39:55 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 20 Jun 2018 16:39:45 +0100
-Message-Id: <20180620153947.30834-6-dgilbert@redhat.com>
-In-Reply-To: <20180620153947.30834-1-dgilbert@redhat.com>
-References: <20180620153947.30834-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 5/7] hmp: Add commands for preconfig
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fVfDF-0003uq-R1
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:40:01 -0400
+Date: Wed, 20 Jun 2018 16:39:58 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180620153958.GB4714@stefanha-x1.localdomain>
+References: <20180618225131.13113-1-ehabkost@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="IiVenqGWf+H9Y6IX"
+Content-Disposition: inline
+In-Reply-To: <20180618225131.13113-1-ehabkost@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/3] python: Revert sys.path hacks used for
+ compat modules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,151 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, armbru@redhat.com, imammedo@redhat.com, peterx@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Allow a bunch of the info commands to be used in preconfig.
+--IiVenqGWf+H9Y6IX
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-version, chardev, name, uuid,memdev, iothreads
-  Were enabled in QMP in the previous patch from Igor
+On Mon, Jun 18, 2018 at 07:51:28PM -0300, Eduardo Habkost wrote:
+> Now that the 'argparse' and 'ordereddict' compat modules were
+> removed, we can remove some sys.path hacks added because of them.
+>=20
+> Eduardo Habkost (3):
+>   device-crash-test: No need for sys.path hack
+>   Revert "docker.py: Python 2.6 argparse compatibility"
+>   Revert "tests: migration/guestperf Python 2.6 argparse compatibility"
+>=20
+>  scripts/device-crash-test          | 1 -
+>  tests/docker/docker.py             | 4 +---
+>  tests/migration/guestperf/shell.py | 8 +++-----
+>  3 files changed, 4 insertions(+), 9 deletions(-)
+>=20
+>=20
+> base-commit: 2ef2f16781af9dee6ba6517755e9073ba5799fa2
+> prerequisite-patch-id: 4d0af8c27a87cf124ad37fd18e3adf47fd45a93a
+> prerequisite-patch-id: 4376551471959cc464ac8f061e84780710dd9121
+> prerequisite-patch-id: 0e23e8822f87d5d0e77d897ff9ff2a952297b1ef
+> prerequisite-patch-id: b8acae4f74302b01f4d6805b39d27ce2cdaceafa
+> prerequisite-patch-id: f11e7b483ff5f356f52d16b3ae252688002518a0
+> prerequisite-patch-id: 4db77f7dd9ff0bc89641e3cce8a4634eb661b476
+> prerequisite-patch-id: afd96367ba6e592a33fef5003a01a6560596c204
+> --=20
+> 2.18.0.rc1.1.g3f1ff2140
+>=20
 
-status, hotpluggable_cpus
-  Was enabled in the original allow-preconfig series
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-history
-  is HMP specific
+--IiVenqGWf+H9Y6IX
+Content-Type: application/pgp-signature; name="signature.asc"
 
-qom-tree, numa
-  Don't have a QMP equivalent
+-----BEGIN PGP SIGNATURE-----
 
-Also enable the qom commands qom-list and qom-set.
+iQEcBAEBAgAGBQJbKnVOAAoJEJykq7OBq3PIoWwIAKZmtiZVaVx4ji711QC2jxlD
+oqU1Amomq0r/O/LuBVXv9yxl0rInpkmwH0GuHZIbRgiOoaKBvz3d0I8fDSG9rzDd
+KXp4J53f+LEhHCwv9pqFKSt1klQbgoqIBh8w1fC7k2WCavSL7yVv7IWGQPQQ79WD
+ch5dhSHb2KArxqeHLx9Ow8iXwZYjFk2cxsARpHac5R1TIINwWmSq7aI36iYd7iWK
+SKZK5PR6Xe0le2IswpjUssnQNPH1s1V6Bs1Jxt/Ru3AhriZEiuHb/ozsMvLgSazr
+y7sBLlyUgoDf2c+VS/OHZXvUAkukWBFYm6d6Mn2gnNKIOsjLMDo9FB5b//R7Rqk=
+=gYR/
+-----END PGP SIGNATURE-----
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hmp-commands-info.hx | 11 +++++++++++
- hmp-commands.hx      |  3 +++
- 2 files changed, 14 insertions(+)
-
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index ddfcd5adcc..874ff07583 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -19,6 +19,7 @@ ETEXI
-         .params     = "",
-         .help       = "show the version of QEMU",
-         .cmd        = hmp_info_version,
-+        .flags      = "p",
-     },
- 
- STEXI
-@@ -47,6 +48,7 @@ ETEXI
-         .params     = "",
-         .help       = "show the character devices",
-         .cmd        = hmp_info_chardev,
-+        .flags      = "p",
-     },
- 
- STEXI
-@@ -165,6 +167,7 @@ ETEXI
-         .params     = "",
-         .help       = "show the command line history",
-         .cmd        = hmp_info_history,
-+        .flags      = "p",
-     },
- 
- STEXI
-@@ -315,6 +318,7 @@ ETEXI
-         .params     = "",
-         .help       = "show NUMA information",
-         .cmd        = hmp_info_numa,
-+        .flags      = "p",
-     },
- 
- STEXI
-@@ -399,6 +403,7 @@ ETEXI
-         .params     = "",
-         .help       = "show the current VM status (running|paused)",
-         .cmd        = hmp_info_status,
-+        .flags      = "p",
-     },
- 
- STEXI
-@@ -457,6 +462,7 @@ ETEXI
-         .params     = "",
-         .help       = "show the current VM name",
-         .cmd        = hmp_info_name,
-+        .flags      = "p",
-     },
- 
- STEXI
-@@ -471,6 +477,7 @@ ETEXI
-         .params     = "",
-         .help       = "show the current VM UUID",
-         .cmd        = hmp_info_uuid,
-+        .flags      = "p",
-     },
- 
- STEXI
-@@ -613,6 +620,7 @@ ETEXI
-         .params     = "[path]",
-         .help       = "show QOM composition tree",
-         .cmd        = hmp_info_qom_tree,
-+        .flags      = "p",
-     },
- 
- STEXI
-@@ -671,6 +679,7 @@ ETEXI
-         .params     = "",
-         .help       = "show memory backends",
-         .cmd        = hmp_info_memdev,
-+        .flags      = "p",
-     },
- 
- STEXI
-@@ -699,6 +708,7 @@ ETEXI
-         .params     = "",
-         .help       = "show iothreads",
-         .cmd        = hmp_info_iothreads,
-+        .flags      = "p",
-     },
- 
- STEXI
-@@ -829,6 +839,7 @@ ETEXI
-         .params     = "",
-         .help       = "Show information about hotpluggable CPUs",
-         .cmd        = hmp_hotpluggable_cpus,
-+        .flags      = "p",
-     },
- 
- STEXI
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 3094294e5b..4bdf8e2090 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1828,6 +1828,7 @@ ETEXI
-         .params     = "path",
-         .help       = "list QOM properties",
-         .cmd        = hmp_qom_list,
-+        .flags      = "p",
-     },
- 
- STEXI
-@@ -1841,6 +1842,7 @@ ETEXI
-         .params     = "path property value",
-         .help       = "set QOM property",
-         .cmd        = hmp_qom_set,
-+        .flags      = "p",
-     },
- 
- STEXI
-@@ -1855,6 +1857,7 @@ ETEXI
-         .help       = "show various information about the system state",
-         .cmd        = hmp_info_help,
-         .sub_table  = info_cmds,
-+        .flags      = "p",
-     },
- 
- STEXI
--- 
-2.17.1
+--IiVenqGWf+H9Y6IX--
