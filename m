@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37814)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1fVc2W-0002KJ-MI
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:16:45 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fVc4M-0003np-OM
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:18:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1fVc2T-000152-FG
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:16:44 -0400
-Received: from 9pmail.ess.barracuda.com ([64.235.150.224]:48424)
+	(envelope-from <pbonzini@redhat.com>) id 1fVc4J-0002Jl-Hz
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:18:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49522 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Yongbok.Kim@mips.com>)
-	id 1fVc2T-00012I-9v
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:16:41 -0400
-From: Yongbok Kim <yongbok.kim@mips.com>
-Date: Wed, 20 Jun 2018 13:06:20 +0100
-Message-ID: <20180620120620.12806-36-yongbok.kim@mips.com>
-In-Reply-To: <20180620120620.12806-1-yongbok.kim@mips.com>
-References: <20180620120620.12806-1-yongbok.kim@mips.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fVc4J-0002JZ-C4
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:18:35 -0400
+References: <20180620110741.gdywesuqbyhjs4hd@sirius.home.kraxel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <776e542e-b6e1-ccbb-fb9a-ea7d521cd955@redhat.com>
+Date: Wed, 20 Jun 2018 14:18:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 35/35] target/mips: Add I7200 CPU
+In-Reply-To: <20180620110741.gdywesuqbyhjs4hd@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] regression: sata cdrom boot broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +27,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, Aleksandar.Markovic@mips.com, James.Hogan@mips.com, Paul.Burton@mips.com, Matthew.Fortune@mips.com, Stefan.Markovic@mips.com
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, f4bug@amsat.org
 
-From: Stefan Markovic <stefan.markovic@mips.com>
+On 20/06/2018 13:07, Gerd Hoffmann wrote:
+>   Hi,
+>=20
+> $subject says all.  Noticed while testing the upcoming seabios update.
+> Reproducer:
+>=20
+>   qemu-system-x86_64 -M q35 -m 4G -cdrom Fedora-Workstation-Live-x86_64=
+-28-1.1.iso
+>=20
+> bisected to:
+>=20
+>   commit 956556e131e35f387ac482ad7b41151576fef057
+>   Author: John Snow <jsnow@redhat.com>
+>   Date:   Wed Jun 6 15:09:50 2018 -0400
+>=20
+>     ahci: move PIO Setup FIS before transfer, fix it for ATAPI commands
+>=20
+> cheers,
+>   Gerd
+>=20
 
-Add I7200 CPU
+If you know where to look at, the spec is actually pretty clear with
+respect to when the interrupt is generated: "A PIO Setup FIS has been
+received with the =E2=80=98I=E2=80=99 bit set, it has been copied into sy=
+stem memory,
+and the data related to that FIS has been transferred".
 
-Reference:
-https://www.mips.com/products/warrior/i-class-i7200-multiprocessor-core/
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
----
- target/mips/translate_init.inc.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+However, after reading the SATA specification I believe that the PIO
+Setup FIS should never generate an interrupt in SeaBIOS, because:
 
-diff --git a/target/mips/translate_init.inc.c b/target/mips/translate_init.inc.c
-index c7ba6ee..262ff29 100644
---- a/target/mips/translate_init.inc.c
-+++ b/target/mips/translate_init.inc.c
-@@ -449,6 +449,43 @@ const mips_def_t mips_defs[] =
-         .insn_flags = CPU_MIPS32R6 | ASE_MICROMIPS,
-         .mmu_type = MMU_TYPE_R4000,
-     },
-+    {
-+        .name = "I7200",
-+        .CP0_PRid = 0x00010000,
-+        .CP0_Config0 = MIPS_CONFIG0 | (1 << CP0C0_MM) | (0x2 << CP0C0_AR) |
-+                        (MMU_TYPE_R4000 << CP0C0_MT),
-+        .CP0_Config1 = MIPS_CONFIG1 | (15 << CP0C1_MMU) | (2 << CP0C1_IS) |
-+                       (4 << CP0C1_IL) | (3 << CP0C1_IA) | (2 << CP0C1_DS) |
-+                       (4 << CP0C1_DL) | (3 << CP0C1_DA) | (1 << CP0C1_PC) |
-+                       (1 << CP0C1_WR) | (1 << CP0C1_EP),
-+        .CP0_Config2 = MIPS_CONFIG2,
-+        .CP0_Config3 = MIPS_CONFIG3 | (1 << CP0C3_CMGCR) | (1 << CP0C3_BI) |
-+                       (3 << CP0C3_MMAR) | (1 << CP0C3_ISA_ON_EXC) |
-+                       (1 << CP0C3_ISA) | (1 << CP0C3_ULRI) |
-+                       (1 << CP0C3_RXI) |
-+                       (1 << CP0C3_VInt) | (1U << CP0C3_M) | (1 << CP0C3_MT),
-+        .CP0_Config4 = MIPS_CONFIG4 | (0xfc << CP0C4_KScrExist) |
-+                       (2 << CP0C4_IE) | (1U << CP0C4_M),
-+        .CP0_Config5 = MIPS_CONFIG5 | (1 << CP0C5_MVH) | (1 << CP0C5_LLB),
-+        .CP0_Config5_rw_bitmask = (1 << CP0C5_SBRI) | (1 << CP0C5_FRE) |
-+                                  (1 << CP0C5_UFE),
-+        .CP0_LLAddr_rw_bitmask = 0,
-+        .CP0_LLAddr_shift = 0,
-+        .SYNCI_Step = 32,
-+        .CCRes = 2,
-+        .CP0_Status_rw_bitmask = 0x3058FF1F,
-+        .CP0_PageGrain = (1 << CP0PG_IEC) | (1 << CP0PG_XIE) |
-+                         (1U << CP0PG_RIE),
-+        .CP0_PageGrain_rw_bitmask = 0,
-+        .CP1_fcr0 = (1 << FCR0_FREP) | (1 << FCR0_HAS2008) | (1 << FCR0_F64) |
-+                    (1 << FCR0_L) | (1 << FCR0_W) | (1 << FCR0_D) |
-+                    (1 << FCR0_S) | (0x02 << FCR0_PRID) | (0x0 << FCR0_REV),
-+        .CP1_fcr31 = (1 << FCR31_ABS2008) | (1 << FCR31_NAN2008),
-+        .SEGBITS = 32,
-+        .PABITS = 32,
-+        .insn_flags = CPU_NANOMIPS32 | ASE_MICROMIPS,
-+        .mmu_type = MMU_TYPE_R4000,
-+    },
- #if defined(TARGET_MIPS64)
-     {
-         .name = "R4000",
--- 
-1.9.1
+  If this is the first DRQ data block for this command, the Interrupt
+  bit shall be cleared to zero. If this is not the first DRQ data block
+  for this command, the Interrupt bit shall be set to one
+
+Putting things together, there are two bugs in QEMU;
+
+- the PIO Setup interrupt must be generated at the end of data transfer
+
+- the PIO Setup interrupt must not be generated for the ATAPI command
+transfer
+
+*But* because SeaBIOS always uses DMA for ATAPI commands, there should
+never be more than one DRQ data block for each command, and it should be
+possible to remove the fishy PIO Setup FIS handling in SeaBIOS.
+
+Paolo
