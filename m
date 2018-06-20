@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1fVbx8-00060f-JO
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:11:11 -0400
+	(envelope-from <Yongbok.Kim@mips.com>) id 1fVbxH-00069A-Cw
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:11:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1fVbx2-0005am-Kr
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:11:10 -0400
-Received: from 9pmail.ess.barracuda.com ([64.235.154.210]:54268)
+	(envelope-from <Yongbok.Kim@mips.com>) id 1fVbxD-0005jP-Bs
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:11:19 -0400
+Received: from 9pmail.ess.barracuda.com ([64.235.154.210]:57340)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Yongbok.Kim@mips.com>)
-	id 1fVbx2-0005X5-AU
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:11:04 -0400
+	id 1fVbxD-0005bt-1O
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:11:15 -0400
 From: Yongbok Kim <yongbok.kim@mips.com>
-Date: Wed, 20 Jun 2018 13:06:01 +0100
-Message-ID: <20180620120620.12806-17-yongbok.kim@mips.com>
+Date: Wed, 20 Jun 2018 13:06:02 +0100
+Message-ID: <20180620120620.12806-18-yongbok.kim@mips.com>
 In-Reply-To: <20180620120620.12806-1-yongbok.kim@mips.com>
 References: <20180620120620.12806-1-yongbok.kim@mips.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 16/35] target/mips: Add has_isa_mode
+Subject: [Qemu-devel] [PATCH 17/35] target/mips: Add nanoMIPS load store
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +30,298 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, Aleksandar.Markovic@mips.com, James.Hogan@mips.com, Paul.Burton@mips.com, Matthew.Fortune@mips.com, Stefan.Markovic@mips.com
 
-From: Matthew Fortune <matthew.fortune@imgtec.com>
-
-ISA mode bit (LSB of address) is no longer required but is also
-masked to allow for tools transition.
+Add nanoMIPS load and store instructions
 
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 ---
- target/mips/translate.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ target/mips/translate.c | 271 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 271 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index bd50281..2e794da 100644
+index 2e794da..08765a7 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -1458,6 +1458,7 @@ typedef struct DisasContext {
-     bool mrp;
-     bool nan2008;
-     bool abs2008;
-+    bool has_isa_mode;
- } DisasContext;
- 
- #define DISAS_STOP       DISAS_TARGET_0
-@@ -4538,7 +4539,7 @@ static void gen_compute_branch (DisasContext *ctx, uint32_t opc,
- 
-     if (blink > 0) {
-         int post_delay = insn_bytes + delayslot_size;
--        int lowbit = !!(ctx->hflags & MIPS_HFLAG_M16);
-+        int lowbit = ctx->has_isa_mode && !!(ctx->hflags & MIPS_HFLAG_M16);
- 
-         tcg_gen_movi_tl(cpu_gpr[blink],
-                         ctx->base.pc_next + post_delay + lowbit);
-@@ -10876,7 +10877,8 @@ static void gen_branch(DisasContext *ctx, int insn_bytes)
-             break;
-         case MIPS_HFLAG_BR:
-             /* unconditional branch to register */
--            if (ctx->insn_flags & (ASE_MIPS16 | ASE_MICROMIPS)) {
-+            if (ctx->has_isa_mode &&
-+                    (ctx->insn_flags & (ASE_MIPS16 | ASE_MICROMIPS))) {
-                 TCGv t0 = tcg_temp_new();
-                 TCGv_i32 t1 = tcg_temp_new_i32();
- 
-@@ -10912,7 +10914,7 @@ static void gen_compute_compact_branch(DisasContext *ctx, uint32_t opc,
-     int bcond_compute = 0;
-     TCGv t0 = tcg_temp_new();
-     TCGv t1 = tcg_temp_new();
--    int m16_lowbit = (ctx->hflags & MIPS_HFLAG_M16) != 0;
-+    int m16_lowbit = ctx->has_isa_mode && ((ctx->hflags & MIPS_HFLAG_M16) != 0);
- 
-     if (ctx->hflags & MIPS_HFLAG_BMASK) {
- #ifdef MIPS_DEBUG_DISAS
-@@ -22476,6 +22478,7 @@ static void mips_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     ctx->mrp = (env->CP0_Config5 >> CP0C5_MRP) & 1;
-     ctx->nan2008 = (env->active_fpu.fcr31 >> FCR31_NAN2008) & 1;
-     ctx->abs2008 = (env->active_fpu.fcr31 >> FCR31_ABS2008) & 1;
-+    ctx->has_isa_mode = ((env->CP0_Config3 >> CP0C3_MMAR) & 0x7) != 3;
-     restore_cpu_state(env, ctx);
- #ifdef CONFIG_USER_ONLY
-         ctx->mem_idx = MIPS_HFLAG_UM;
+@@ -17379,10 +17379,281 @@ static int decode_nanomips_32_48_opc(CPUMIPSState *env, DisasContext *ctx)
+         }
+         break;
+     case NM_P_GP_BH:
++    {
++        uint32_t u = extract32(ctx->opcode, 0, 18);
++        switch ((ctx->opcode >> 18) & 0x7) {
++        case NM_LBGP:
++            gen_ld(ctx, OPC_LB, rt, 28, u);
++            break;
++        case NM_SBGP:
++            gen_st(ctx, OPC_SB, rt, 28, u);
++            break;
++        case NM_LBUGP:
++            gen_ld(ctx, OPC_LBU, rt, 28, u);
++            break;
++        case NM_ADDIUGP_B:
++            gen_arith_imm(ctx, OPC_ADDIU, rt, 28, u);
++            break;
++        case NM_P_GP_LH:
++            u &= ~1;
++            switch (ctx->opcode & 1) {
++            case NM_LHGP:
++                gen_ld(ctx, OPC_LH, rt, 28, u);
++                break;
++            case NM_LHUGP:
++                gen_ld(ctx, OPC_LHU, rt, 28, u);
++                break;
++            }
++            break;
++        case NM_P_GP_SH:
++            u &= ~1;
++            switch (ctx->opcode & 1) {
++            case NM_SHGP:
++                gen_st(ctx, OPC_SH, rt, 28, u);
++                break;
++            default:
++                generate_exception_end(ctx, EXCP_RI);
++                break;
++            }
++            break;
++        case NM_P_GP_CP1:
++            u &= ~0x3;
++            switch ((ctx->opcode & 0x3)) {
++            case NM_LWC1GP:
++                gen_cop1_ldst(ctx, OPC_LWC1, rt, 28, u);
++                break;
++            case NM_LDC1GP:
++                gen_cop1_ldst(ctx, OPC_LDC1, rt, 28, u);
++                break;
++            case NM_SWC1GP:
++                gen_cop1_ldst(ctx, OPC_SWC1, rt, 28, u);
++                break;
++            case NM_SDC1GP:
++                gen_cop1_ldst(ctx, OPC_SDC1, rt, 28, u);
++                break;
++            }
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++    }
+         break;
+     case NM_P_LS_U12:
++    {
++        uint32_t u = extract32(ctx->opcode, 0, 12);
++        switch ((ctx->opcode >> 12) & 0x0f) {
++        case NM_P_PREFU12:
++            if (rt == 31) {
++                /* SYNCI */
++                /* Break the TB to be able to sync copied instructions
++                   immediately */
++                ctx->base.is_jmp = DISAS_STOP;
++            } else {
++                /* PREF */
++                /* Treat as NOP. */
++            }
++            break;
++        case NM_LB:
++            gen_ld(ctx, OPC_LB, rt, rs, u);
++            break;
++        case NM_LH:
++            gen_ld(ctx, OPC_LH, rt, rs, u);
++            break;
++        case NM_LW:
++            gen_ld(ctx, OPC_LW, rt, rs, u);
++            break;
++        case NM_LBU:
++            gen_ld(ctx, OPC_LBU, rt, rs, u);
++            break;
++        case NM_LHU:
++            gen_ld(ctx, OPC_LHU, rt, rs, u);
++            break;
++        case NM_SB:
++            gen_st(ctx, OPC_SB, rt, rs, u);
++            break;
++        case NM_SH:
++            gen_st(ctx, OPC_SH, rt, rs, u);
++            break;
++        case NM_SW:
++            gen_st(ctx, OPC_SW, rt, rs, u);
++            break;
++        case NM_LWC1:
++            gen_cop1_ldst(ctx, OPC_LWC1, rt, rs, u);
++            break;
++        case NM_LDC1:
++            gen_cop1_ldst(ctx, OPC_LDC1, rt, rs, u);
++            break;
++        case NM_SWC1:
++            gen_cop1_ldst(ctx, OPC_SWC1, rt, rs, u);
++            break;
++        case NM_SDC1:
++            gen_cop1_ldst(ctx, OPC_SDC1, rt, rs, u);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++    }
+         break;
+     case NM_P_LS_S9:
++    {
++        int32_t s = (sextract32(ctx->opcode, 15, 1) << 8) |
++                    extract32(ctx->opcode, 0, 8);
++        switch ((ctx->opcode >> 8) & 0x07) {
++        case NM_P_LS_S0:
++            switch ((ctx->opcode >> 11) & 0x0f) {
++            case NM_LBS9:
++                gen_ld(ctx, OPC_LB, rt, rs, s);
++                break;
++            case NM_LHS9:
++                gen_ld(ctx, OPC_LH, rt, rs, s);
++                break;
++            case NM_LWS9:
++                gen_ld(ctx, OPC_LW, rt, rs, s);
++                break;
++            case NM_LBUS9:
++                gen_ld(ctx, OPC_LBU, rt, rs, s);
++                break;
++            case NM_LHUS9:
++                gen_ld(ctx, OPC_LHU, rt, rs, s);
++                break;
++            case NM_SBS9:
++                gen_st(ctx, OPC_SB, rt, rs, s);
++                break;
++            case NM_SHS9:
++                gen_st(ctx, OPC_SH, rt, rs, s);
++                break;
++            case NM_SWS9:
++                gen_st(ctx, OPC_SW, rt, rs, s);
++                break;
++            case NM_LWC1S9:
++                gen_cop1_ldst(ctx, OPC_LWC1, rt, rs, s);
++                break;
++            case NM_LDC1S9:
++                gen_cop1_ldst(ctx, OPC_LDC1, rt, rs, s);
++                break;
++            case NM_SWC1S9:
++                gen_cop1_ldst(ctx, OPC_SWC1, rt, rs, s);
++                break;
++            case NM_SDC1S9:
++                gen_cop1_ldst(ctx, OPC_SDC1, rt, rs, s);
++                break;
++            case NM_P_PREFS9:
++                if (rt == 31) {
++                    /* SYNCI */
++                    /* Break the TB to be able to sync copied instructions
++                       immediately */
++                    ctx->base.is_jmp = DISAS_STOP;
++                } else {
++                    /* PREF */
++                    /* Treat as NOP. */
++                }
++                break;
++            default:
++                generate_exception_end(ctx, EXCP_RI);
++                break;
++            }
++            break;
++        case NM_P_LS_S1:
++            switch ((ctx->opcode >> 11) & 0x0f) {
++            case NM_UALH:
++            case NM_UASH:
++            {
++                TCGv t0 = tcg_temp_new();
++                TCGv t1 = tcg_temp_new();
++
++                gen_base_offset_addr(ctx, t0, rs, s);
++
++                switch ((ctx->opcode >> 11) & 0x0f) {
++                case NM_UALH:
++                    tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TESW |
++                                       MO_UNALN);
++                    gen_store_gpr(t0, rt);
++                    break;
++                case NM_UASH:
++                    gen_load_gpr(t1, rt);
++                    tcg_gen_qemu_st_tl(t1, t0, ctx->mem_idx, MO_TEUW |
++                                       MO_UNALN);
++                    break;
++                }
++                tcg_temp_free(t0);
++                tcg_temp_free(t1);
++            }
++                break;
++            case NM_P_LL:
++                switch (ctx->opcode & 0x03) {
++                case NM_LL:
++                    gen_ld(ctx, OPC_LL, rt, rs, s);
++                    break;
++                case NM_LLWP:
++                    break;
++                }
++                break;
++            case NM_P_SC:
++                switch (ctx->opcode & 0x03) {
++                case NM_SC:
++                    gen_st_cond(ctx, OPC_SC, rt, rs, s);
++                    break;
++                case NM_SCWP:
++                    break;
++                }
++                break;
++            case NM_CACHE:
++                check_cp0_enabled(ctx);
++                if (ctx->hflags & MIPS_HFLAG_ITC_CACHE) {
++                    gen_cache_operation(ctx, rt, rs, s);
++                }
++                break;
++            }
++            break;
++        case NM_P_LS_WM:
++        case NM_P_LS_UAWM:
++        {
++            int32_t offset = sextract32(ctx->opcode, 15, 1) << 8 |
++                            extract32(ctx->opcode, 0, 8);
++            int count = extract32(ctx->opcode, 12, 3);
++            int counter = 0;
++            TCGv va = tcg_temp_new();
++            TCGv t1 = tcg_temp_new();
++            TCGMemOp memop = ((ctx->opcode >> 8) & 0x07) == NM_P_LS_UAWM ?
++                            MO_UNALN : 0;
++
++            count = (count == 0) ? 8 : count;
++            while (counter != count) {
++                int this_rt = ((rt + counter) & 0x1f) | (rt & 0x10);
++                int32_t this_offset = offset + (counter << 2);
++
++                gen_base_offset_addr(ctx, va, rs, this_offset);
++
++                switch (extract32(ctx->opcode, 11, 1)) {
++                case NM_LWM:
++                    tcg_gen_qemu_ld_tl(t1, va, ctx->mem_idx,
++                                       memop | MO_TESL);
++                    gen_store_gpr(t1, this_rt);
++                    if ((this_rt == rs) &&
++                        (counter != (count - 1))) {
++                        /* UNPREDICTABLE */
++                    }
++                    break;
++                case NM_SWM:
++                    this_rt = (rt == 0) ? 0 : this_rt;
++                    gen_load_gpr(t1, this_rt);
++                    tcg_gen_qemu_st_tl(t1, va, ctx->mem_idx,
++                                       memop | MO_TEUL);
++                    break;
++                }
++                counter++;
++            }
++            tcg_temp_free(va);
++            tcg_temp_free(t1);
++        }
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++    }
+         break;
+     case NM_MOVE_BALC:
+         break;
 -- 
 1.9.1
