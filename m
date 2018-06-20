@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fVeoV-0004C3-Ly
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:14:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fVesO-0005Lc-JO
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:18:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fVeoQ-0008Mx-Oh
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:14:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39014 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVeoQ-0008Ml-Jz
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:14:22 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 35EB28163C40
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 15:14:22 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
-	<20180321115211.17937-8-marcandre.lureau@redhat.com>
-Date: Wed, 20 Jun 2018 17:14:19 +0200
-In-Reply-To: <20180321115211.17937-8-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?=
-	Lureau"'s message of "Wed, 21 Mar 2018 12:51:29 +0100")
-Message-ID: <878t79trqs.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fVesN-0001Pd-KJ
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:18:28 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41365)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fVesN-0001PV-Ee
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:18:27 -0400
+Received: by mail-oi0-x241.google.com with SMTP id a141-v6so3344870oii.8
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 08:18:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 07/49] qapi: mcgen() shouldn't indent #
- lines
+In-Reply-To: <20180619204237.9931-1-jusual@mail.ru>
+References: <20180619204237.9931-1-jusual@mail.ru>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 Jun 2018 16:18:06 +0100
+Message-ID: <CAFEAcA9+GMnqBqKv0Edb3WJQy7882Qez9VpsHgGxTo6ZnELWaQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Set strict alignment for
+ ARMv6-M load/store
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: Julia Suvorova <jusual@mail.ru>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Skip preprocessor lines when adding indentation, since that would
-> likely result in invalid code.
+On 19 June 2018 at 21:42, Julia Suvorova <jusual@mail.ru> wrote:
+> Unlike ARMv7-M, ARMv6-M only supports naturally aligned memory accesses
+> for 16-bit halfword and 32-bit word accesses using the LDR, LDRH,
+> LDRSH, STR and STRH instructions.
 >
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Julia Suvorova <jusual@mail.ru>
 > ---
->  scripts/qapi/common.py | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  target/arm/translate.c | 18 ++++++++++++++++--
+>  1 file changed, 16 insertions(+), 2 deletions(-)
 >
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index bc4ecd6c76..47efe79758 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -1931,8 +1931,8 @@ def cgen(code, **kwds):
->      if indent_level:
->          indent =3D genindent(indent_level)
->          # re.subn() lacks flags support before Python 2.7, use re.compil=
-e()
-> -        raw =3D re.subn(re.compile(r'^.', re.MULTILINE),
-> -                      indent + r'\g<0>', raw)
-> +        raw =3D re.subn(re.compile(r'^(?!(#|$))', re.MULTILINE),
-> +                      indent, raw)
->          raw =3D raw[0]
->      return re.sub(re.escape(eatspace) + r' *', '', raw)
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index b988d379e7..d923cbe98e 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -1100,7 +1100,14 @@ static inline TCGv gen_aa32_addr(DisasContext *s, TCGv_i32 a32, TCGMemOp op)
+>  static void gen_aa32_ld_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
+>                              int index, TCGMemOp opc)
+>  {
+> -    TCGv addr = gen_aa32_addr(s, a32, opc);
+> +    TCGv addr;
+> +
+> +    if (arm_dc_feature(s, ARM_FEATURE_M) &&
+> +        !arm_dc_feature(s, ARM_FEATURE_V7)) {
+> +        opc |= MO_ALIGN;
+> +    }
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Hi; I think this is a good point to introduce a
+ARM_FEATURE_M_MAIN feature bit, because this is one
+of those places where v8M baseline and v6M are the same.
+Basically:
+ * add a line to the enum arm_features:
+    ARM_FEATURE_M_MAIN, /* M profile Main Extension */
+ * add set_feature() calls to cortex_m3/m4/m33_initfn()
+   which set that feature
+ * don't set the feature for the cortex-m0
+ * in these checks, use
+      if (arm_dc_feature(s, ARM_FEATURE_M) &&
+          !arm_dc_feature(s, ARM_FEATURE_M_MAIN)) {
+
+A lot of the v6M checks are going to also apply for v8M
+baseline, so it'll be time saved later to use the feature
+bit.
+
+(Alignment checks are a bit more complicated as strictly
+v7M has a config register bit to allow turning them on,
+but let's not worry about that. We can refactor the code
+later if we ever care about implementing that.)
+
+thanks
+-- PMM
