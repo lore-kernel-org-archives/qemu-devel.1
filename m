@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVYa3-0000eB-9Z
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:35:12 -0400
+	(envelope-from <armbru@redhat.com>) id 1fVYaf-0000zj-N8
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:35:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVYa0-00012C-0v
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:35:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59498 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fVYac-0001J0-JB
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:35:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59522 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVYZz-000124-T0
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:35:03 -0400
-Date: Wed, 20 Jun 2018 09:34:59 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180620083459.GB3441@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180619132200.12320-1-sameeh@daynix.com>
-	<20180619134933.GY20929@redhat.com>
-	<CAKPgXcHrZY1=65jOg3Y3bDdwNnik7x-Ti-3PAryYsRuvRWk=iA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVYac-0001In-EU
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:35:42 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180620073223.31964-1-peterx@redhat.com>
+	<20180620073223.31964-5-peterx@redhat.com>
+Date: Wed, 20 Jun 2018 10:35:40 +0200
+In-Reply-To: <20180620073223.31964-5-peterx@redhat.com> (Peter Xu's message of
+	"Wed, 20 Jun 2018 15:32:20 +0800")
+Message-ID: <87bmc5zwgz.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAKPgXcHrZY1=65jOg3Y3bDdwNnik7x-Ti-3PAryYsRuvRWk=iA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC 0/1] Add BPF suuport to Qemu
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 4/7] tests: iotests: drop some stderr
+ line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,28 +28,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sameeh@daynix.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Yan Vugenfirer <yan@daynix.com>, Amnon Ilan <ailan@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On Tue, Jun 19, 2018 at 05:37:10PM +0300, Sameeh Jubran wrote:
-> This patch is actually a preparation for an upcoming patch set that I want
-> to integrate into virtio-net which implements the RSS feature. (
-> https://lists.oasis-open.org/archives/virtio-dev/201805/msg00024.html)
-> So there is a use case. The rationale behind this is to distinguish the
-> infrastructure preparation needed for the BPF from the actual RSS feature
-> implementation.
+Peter Xu <peterx@redhat.com> writes:
 
-Ah, so IIUC, that is not actually doing network filtering, rather it is
-some performance related feature than happens to make of use of BPF.
+> In my Out-Of-Band test, "check -qcow2 060" fail with this (the output is
+> manually changed due to line width requirement):
 
-I think it is be important to submit code changes for the virtio driver
-at the same time, so we can properly understand the interface and usage
-model exposed to the user CLI (if any).
+I think the output is no longer wrapped.  Can drop the parenthesis when
+I apply.
 
+>   --- /home/peterx/git/qemu/tests/qemu-iotests/060.out
+>   +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/060.out.bad
+>   @@ -427,8 +427,8 @@
+>   QMP_VERSION
+>   {"return": {}}
+>   qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1
+>   index: 0); further non-fatal corruption events will be suppressed
+>   -{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a0
+>   0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
+>   read failed: Input/output error
+>   +{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a0
+>   0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
+>   {"return": ""}
+>   {"return": {}}
+>   {"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP},
+>   "event": "SHUTDOWN", "data": {"guest": false}}
+>
+> The order of the event and the in/out error line is swapped.  I didn't
+> dig up the reason, but AFAIU what we want to verify is the event rather
+> than stderr.  Let's drop the stderr line directly for this test.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Max, may I have your R-by?
+
+> ---
+>  tests/qemu-iotests/060     | 10 +++++++++-
+>  tests/qemu-iotests/060.out |  1 -
+>  2 files changed, 9 insertions(+), 2 deletions(-)
+>
+> diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
+> index 7bdf609f3f..74ad371885 100755
+> --- a/tests/qemu-iotests/060
+> +++ b/tests/qemu-iotests/060
+> @@ -33,6 +33,14 @@ _cleanup()
+>  }
+>  trap "_cleanup; exit \$status" 0 1 2 3 15
+>  
+> +# Sometimes the error line might be dumped before/after an event
+> +# randomly.  Mask it out for specific test that may trigger this
+> +# uncertainty for current test for now.
+> +_filter_io_error()
+> +{
+> +    sed '/Input\/output error/d'
+> +}
+> +
+>  # get standard environment, filters and checks
+>  . ./common.rc
+>  . ./common.filter
+> @@ -464,7 +472,7 @@ echo "{'execute': 'qmp_capabilities'}
+>                          }}" \
+>              -incoming exec:'cat /dev/null' \
+>              2>&1 \
+> -    | _filter_qmp | _filter_qemu_io
+> +    | _filter_qmp | _filter_qemu_io | _filter_io_error
+>  
+>  echo
+>  # Image should not have been marked corrupt
+> diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
+> index bff023d889..d67c6234a4 100644
+> --- a/tests/qemu-iotests/060.out
+> +++ b/tests/qemu-iotests/060.out
+> @@ -428,7 +428,6 @@ QMP_VERSION
+>  {"return": {}}
+>  qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1 index: 0); further non-fatal corruption events will be suppressed
+>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a00 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
+> -read failed: Input/output error
+>  {"return": ""}
+>  {"return": {}}
+>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
