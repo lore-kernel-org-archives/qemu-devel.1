@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fVRIJ-0000d7-D2
+	(envelope-from <dgibson@ozlabs.org>) id 1fVRIJ-0000d6-CT
 	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 20:48:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fVRII-0007X5-2k
+	(envelope-from <dgibson@ozlabs.org>) id 1fVRII-0007X2-2t
 	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 20:48:19 -0400
-Date: Wed, 20 Jun 2018 10:14:00 +1000
+Date: Wed, 20 Jun 2018 10:17:13 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180620001400.GC3546@umbus.fritz.box>
-References: <cover.1529398335.git.balaton@eik.bme.hu>
-	<b28d3ac4d357b86a1b4c9c868e148396857c36da.1529398335.git.balaton@eik.bme.hu>
+Message-ID: <20180620001713.GD3546@umbus.fritz.box>
+References: <20180618173402.23405-1-clg@kaod.org>
+	<20180618173402.23405-4-clg@kaod.org>
+	<20180619010244.GN25461@umbus.fritz.box>
+	<2f26dfab-5aca-8a61-ed83-fc56145d5bc3@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="oJ71EGRlYNjSvfq7"
+	protocol="application/pgp-signature"; boundary="IMjqdzrDRly81ofr"
 Content-Disposition: inline
-In-Reply-To: <b28d3ac4d357b86a1b4c9c868e148396857c36da.1529398335.git.balaton@eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v4 01/11] ppc4xx_i2c: Remove unimplemented
- sdata and intr registers
+In-Reply-To: <2f26dfab-5aca-8a61-ed83-fc56145d5bc3@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] spapr: introduce a fixed IRQ number
+ space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,142 +27,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---oJ71EGRlYNjSvfq7
+--IMjqdzrDRly81ofr
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 19, 2018 at 10:52:15AM +0200, BALATON Zoltan wrote:
-> We don't emulate slave mode so related registers are not needed.
-> [lh]sadr are only retained to avoid too many warnings and simplify
-> debugging but sdata is not even correct because device has a 4 byte
-> FIFO instead so just remove this unimplemented register for now.
+On Tue, Jun 19, 2018 at 07:00:18AM +0200, C=E9dric Le Goater wrote:
+> On 06/19/2018 03:02 AM, David Gibson wrote:
+> > On Mon, Jun 18, 2018 at 07:34:02PM +0200, C=E9dric Le Goater wrote:
+> >> This proposal introduces a new IRQ number space layout using static
+> >> numbers for all devices and a bitmap allocator for the MSI numbers
+> >> which are negotiated by the guest at runtime.
+> >>
+> >> The previous layout is kept in machines raising the 'xics_legacy'
+> >> flag.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>  include/hw/ppc/spapr.h     |  4 ++++
+> >>  include/hw/ppc/spapr_irq.h | 30 +++++++++++++++++++++++++
+> >>  hw/ppc/spapr.c             | 31 +++++++++++++++++++++++++
+> >>  hw/ppc/spapr_events.c      | 12 ++++++++--
+> >>  hw/ppc/spapr_irq.c         | 56 +++++++++++++++++++++++++++++++++++++=
++++++++++
+> >>  hw/ppc/spapr_pci.c         | 28 ++++++++++++++++++-----
+> >>  hw/ppc/spapr_vio.c         | 19 ++++++++++++----
+> >>  hw/ppc/Makefile.objs       |  2 +-
+> >>  8 files changed, 169 insertions(+), 13 deletions(-)
+> >>  create mode 100644 include/hw/ppc/spapr_irq.h
+> >>  create mode 100644 hw/ppc/spapr_irq.c
+> >>
+> >> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> >> index 9decc66a1915..4c63b1fac13b 100644
+> >> --- a/include/hw/ppc/spapr.h
+> >> +++ b/include/hw/ppc/spapr.h
+> >> @@ -7,6 +7,7 @@
+> >>  #include "hw/ppc/spapr_drc.h"
+> >>  #include "hw/mem/pc-dimm.h"
+> >>  #include "hw/ppc/spapr_ovec.h"
+> >> +#include "hw/ppc/spapr_irq.h"
+> >> =20
+> >>  struct VIOsPAPRBus;
+> >>  struct sPAPRPHBState;
+> >> @@ -164,6 +165,9 @@ struct sPAPRMachineState {
+> >>      char *kvm_type;
+> >> =20
+> >>      const char *icp_type;
+> >> +    bool xics_legacy;
+> >=20
+> > This flag can go in the class, rather than the instance.
+> >=20
+> > And maybe call it 'legacy_irq_allocation'.  It assumes XICS, but
+> > otherwise isn't strongly tied to it.
 >=20
-> The intr register is also not implemented correctly, it is for
-> diagnostics and normally not even visible on device without explicitly
-> enabling it. As no guests are known to need this remove it as well.
+> OK.
 >=20
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
-> v4: Updated commit message
-
-Applied to ppc-for-3.0, thanks.
-
+> >> +    int32_t irq_map_nr;
+> >> +    unsigned long *irq_map;
+> >=20
+> > So, I don't love the fact that the new bitmap duplicates information
+> > that's also in the intc backend (e.g. via ICS_IRQ_FREE()). =20
 >=20
->  hw/i2c/ppc4xx_i2c.c         | 16 +---------------
->  include/hw/i2c/ppc4xx_i2c.h |  4 +---
->  2 files changed, 2 insertions(+), 18 deletions(-)
+> Yes. I agree. new devices using MSI like interrupts will follow the
+> same pattern for allocation.=20
 >=20
-> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-> index d1936db..4e0aaae 100644
-> --- a/hw/i2c/ppc4xx_i2c.c
-> +++ b/hw/i2c/ppc4xx_i2c.c
-> @@ -3,7 +3,7 @@
->   *
->   * Copyright (c) 2007 Jocelyn Mayer
->   * Copyright (c) 2012 Fran=E7ois Revol
-> - * Copyright (c) 2016 BALATON Zoltan
-> + * Copyright (c) 2016-2018 BALATON Zoltan
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
->   * of this software and associated documentation files (the "Software"),=
- to deal
-> @@ -63,7 +63,6 @@ static void ppc4xx_i2c_reset(DeviceState *s)
->      i2c->mdcntl =3D 0;
->      i2c->sts =3D 0;
->      i2c->extsts =3D 0x8f;
-> -    i2c->sdata =3D 0;
->      i2c->lsadr =3D 0;
->      i2c->hsadr =3D 0;
->      i2c->clkdiv =3D 0;
-> @@ -71,7 +70,6 @@ static void ppc4xx_i2c_reset(DeviceState *s)
->      i2c->xfrcnt =3D 0;
->      i2c->xtcntlss =3D 0;
->      i2c->directcntl =3D 0xf;
-> -    i2c->intr =3D 0;
->  }
+> we have two layers of IRQ routines, one for the IRQ numbers and one=20
+> for the controller backend. May be we could call the backend handling=20
+> routing from the msi one ?=20
+>=20
+> > However
+> > leaving the authoritative info in the backend also causes problems
+> > when we have dynamic switching.  Not entirely sure what to do about
+> > that.
+>=20
+> yes, if we put it in the IRQ backend (the current IRQ controller model
+> in use) we will have to synchronize the number spaces when the machine=20
+> switches interrupt mode.=20
 > =20
->  static inline bool ppc4xx_i2c_is_master(PPC4xxI2CState *i2c)
-> @@ -139,9 +137,6 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr=
- addr, unsigned int size)
->                            TYPE_PPC4xx_I2C, __func__);
->          }
->          break;
-> -    case 2:
-> -        ret =3D i2c->sdata;
-> -        break;
->      case 4:
->          ret =3D i2c->lmadr;
->          break;
-> @@ -181,9 +176,6 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr=
- addr, unsigned int size)
->      case 16:
->          ret =3D i2c->directcntl;
->          break;
-> -    case 17:
-> -        ret =3D i2c->intr;
-> -        break;
->      default:
->          if (addr < PPC4xx_I2C_MEM_SIZE) {
->              qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
-> @@ -229,9 +221,6 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr ad=
-dr, uint64_t value,
->              }
->          }
->          break;
-> -    case 2:
-> -        i2c->sdata =3D value;
-> -        break;
->      case 4:
->          i2c->lmadr =3D value;
->          if (i2c_bus_busy(i2c->bus)) {
-> @@ -302,9 +291,6 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr ad=
-dr, uint64_t value,
->      case 16:
->          i2c->directcntl =3D value & 0x7;
->          break;
-> -    case 17:
-> -        i2c->intr =3D value;
-> -        break;
->      default:
->          if (addr < PPC4xx_I2C_MEM_SIZE) {
->              qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
-> diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
-> index 3c60307..e4b6ded 100644
-> --- a/include/hw/i2c/ppc4xx_i2c.h
-> +++ b/include/hw/i2c/ppc4xx_i2c.h
-> @@ -3,7 +3,7 @@
->   *
->   * Copyright (c) 2007 Jocelyn Mayer
->   * Copyright (c) 2012 Fran=E7ois Revol
-> - * Copyright (c) 2016 BALATON Zoltan
-> + * Copyright (c) 2016-2018 BALATON Zoltan
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
->   * of this software and associated documentation files (the "Software"),=
- to deal
-> @@ -49,7 +49,6 @@ typedef struct PPC4xxI2CState {
->      uint8_t mdcntl;
->      uint8_t sts;
->      uint8_t extsts;
-> -    uint8_t sdata;
->      uint8_t lsadr;
->      uint8_t hsadr;
->      uint8_t clkdiv;
-> @@ -57,7 +56,6 @@ typedef struct PPC4xxI2CState {
->      uint8_t xfrcnt;
->      uint8_t xtcntlss;
->      uint8_t directcntl;
-> -    uint8_t intr;
->  } PPC4xxI2CState;
-> =20
->  #endif /* PPC4XX_I2C_H */
+> >>      bool cmd_line_caps[SPAPR_CAP_NUM];
+> >>      sPAPRCapabilities def, eff, mig;
+> >> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
+> >> new file mode 100644
+> >> index 000000000000..345a42efd366
+> >> --- /dev/null
+> >> +++ b/include/hw/ppc/spapr_irq.h
+> >> @@ -0,0 +1,30 @@
+> >> +/*
+> >> + * QEMU PowerPC sPAPR IRQ backend definitions
+> >> + *
+> >> + * Copyright (c) 2018, IBM Corporation.
+> >> + *
+> >> + * This code is licensed under the GPL version 2 or later. See the
+> >> + * COPYING file in the top-level directory.
+> >> + */
+> >> +
+> >> +#ifndef HW_SPAPR_IRQ_H
+> >> +#define HW_SPAPR_IRQ_H
+> >> +
+> >> +/*
+> >> + * IRQ range offsets per device type
+> >> + */
+> >> +#define SPAPR_IRQ_EPOW       0x1000  /* XICS_IRQ_BASE offset */
+> >> +#define SPAPR_IRQ_HOTPLUG    0x1001
+> >> +#define SPAPR_IRQ_VIO        0x1100  /* 256 VIO devices */
+> >> +#define SPAPR_IRQ_PCI_LSI    0x1200  /* 32+ PHBs devices */
+> >> +
+> >> +#define SPAPR_IRQ_MSI        0x1300  /* Offset of the dynamic range c=
+overed
+> >> +                                      * by the bitmap allocator */
+> >=20
+> > I'm a little confused by the MSI stuff.  It looks like you're going
+> > for the option of one big pool for all dynamic irqs.  Except that I
+> > thought in our discussion the other day you said each PHB advertised
+> > its own separate MSI range, so we'd actually need to split this up
+> > into ranges for each PHB.
+>=20
+> Yes we can also, but we don't really need to and it might be too much
+> constrained in fact.
+
+Ok.
+
+> As the IRQs are allocated dynamically, there is not a strong relation=20
+> between the device doing so and the IRQ numbers. The need for a well
+> defined IRQ number range is weak. We should provision a certain number=20
+> of IRQs of course to size our IRQ number space but even that could be=20
+> done dynamically. We can resize the bitmap and allocate new source=20
+> blocks under the KVM XICS/XIVE device if needed. The resulting code=20
+> is quite simple and the IRQ number space is also less fragmented.=20
+>=20
+> I think we have all the requirements in hand, the current ones and the=20
+> new ones for hotplug PHBs, XIVE interrupt model, CAPI (which should be
+> like the PHBs), XIVE user IRQs (like MSIs). The new ones are all=20
+> dynamic IRQ models.
+>=20
+>=20
+> So I am more in favor of a single big bunch of dynamic IRQs.
+
+Ok, sounds reasonable.
+
+[snip]
+> >> @@ -4093,7 +4121,10 @@ DEFINE_SPAPR_MACHINE(3_0, "3.0", true);
+> >> =20
+> >>  static void spapr_machine_2_12_instance_options(MachineState *machine)
+> >>  {
+> >> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(machine);
+> >> +
+> >>      spapr_machine_3_0_instance_options(machine);
+> >> +    spapr->xics_legacy =3D true;
+> >>  }
+> >> =20
+> >>  static void spapr_machine_2_12_class_options(MachineClass *mc)
+> >> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> >> index e4f5946a2188..c82dc40be0d5 100644
+> >> --- a/hw/ppc/spapr_events.c
+> >> +++ b/hw/ppc/spapr_events.c
+> >> @@ -709,7 +709,11 @@ void spapr_events_init(sPAPRMachineState *spapr)
+> >>  {
+> >>      int epow_irq;
+> >> =20
+> >> -    epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
+> >> +    if (spapr->xics_legacy) {
+> >> +        epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
+> >> +    } else {
+> >> +        epow_irq =3D SPAPR_IRQ_EPOW;
+> >=20
+> > Can slightly improve brevity by just initializing epow_irq to this,
+> > then overwriting it in the legacy case.
+>=20
+> yes. I will do that. It will ease removal because we want to deprecate
+> the legacy mode one day.=20
+>=20
+> That might in a long time though. We have to wait for the QEMU machine=20
+> number to no longer be in a maintained distro. correct?
+
+Pretty much, yes.  And, yes, that will be a long ways off.
+
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -168,24 +213,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---oJ71EGRlYNjSvfq7
+--IMjqdzrDRly81ofr
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlspnEQACgkQbDjKyiDZ
-s5LzsxAAz0C/LTmpxucg7Oho4csV6FinCVgk1m+1b9JBOcX5kteSJsYMBtXQr+17
-jV/EtWfPs8OUCRlLWyrIRhKIrsHNL3SqWXULQhR4C8X6HRstn4OZlYftNvJX1cd2
-u/nZGN9mCsOa5MaJGPh/AuAYTzj8RFZ5ehlc+IXKd98GcA9B6IPbG2p5Ng0Sokw8
-wooDkjSeEJe+FSAnbbER6YHhKgmvI3sAwJEi4hRp5HmF7wX89XACA04rYARnZ5EW
-dUUzX+JH8x17BIIYGvVeLXF6Kh8c6eiGSw+wDJ4hQlcmZPkfZaAEK3q6PcKNEr4W
-1xfXvqFNIYvCP2qbTSypAULEgEUIBWq3THPFoTMaTOj2wm2QVIu9dDlO9RQpDGch
-zOP1WAaTiw0QWYDnkJbxsb9w3LeSH+lpmj2DpRA01huYxAovOLKoumIgFZRr1lEh
-aweTEJ1pgm0ygt3+RsPakJ2k7WUWIIQxHNMfMBuf6Zvsp2UAXf9U+IfbXQ6FS08g
-H0O3UbADaeCiEKZDAylR/1SfCQ9yG2yq1mPIV10IHV2SO/O62F+rKP2S0NgA/Mu4
-P8cE4cog72/jmZ/uWo32Y9jI6EefcpUQDu3fIIqwCEU/YrbItDvzvIhY/7SKRrB7
-5ykUUhxmhi3wq0Qsof/D0Ptgc8lx+3jQhEuzRcsp0UgASxQ0G2w=
-=2V9z
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlspnQkACgkQbDjKyiDZ
+s5JY2w/+O0SXXUEkBQVMC9v+IlCxi9A/PCiwgvQVdB6TMpRwabV4Fj7gCLTqH3PN
+1TlYxS6WsuiAy1zSWLGR3h0djy1EEK28F/l3sx4bbuTW9djiQzl4qlEYfUv+ZxVX
+WuY0dEUR/oIKe12tx54SwCvrhisYleMBy0EqvHIaLqHFWHXYhE25bNzU8iVxbMHr
+Yq6gPihohA0gXCA35RUWL8e73y7oTcW9DUj2BEoYb02yWoSkAe9AA5IEBuI0zqN1
+cro5ZSsJ5z9Rxdqg3ju7VIFaFnVOWOngt4TUv7wRVFkKuOaVLvLoPDlIqATt0xDu
+3pd4aEXEIak1zfuzmGVN5bJPnTHcX2qqwguVUDGBq4oqpLILgAaC70/A5uEOzFx2
+LsJ6gkp4bYZiu0a1QBsuDWSPEF/3HlFfL/HhvQxbs+U1O7TP9qK2rDk2GFLSBT6c
+4JRykYL5rKNmtuAG1GJdGnS3+emVYmf817z214ptPlExfgUijtSW+BnTYcxtvqZe
+hdCPMLvFBXp+wNdLsY5UfFl1KHbftDfotTM7BWtac22HOk23DAIm8u1/ue5Mqdbf
+8dDwT9c5wGJe7P/9bNxsrNnKRhaSRvVcMl38D/KV2ky1LkZJc2r8B0BSrQN6hQ6g
+dfYEApQzDFzS99J8Helyn4QMOT8mWLSNvwYyi38YyGuBabNwRfY=
+=kP3A
 -----END PGP SIGNATURE-----
 
---oJ71EGRlYNjSvfq7--
+--IMjqdzrDRly81ofr--
