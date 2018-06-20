@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fVcq2-0004SL-IN
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:07:56 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fVcqA-0004ZZ-MD
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:08:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fVcq1-0005hV-D4
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:07:54 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 20 Jun 2018 15:07:29 +0200
-Message-Id: <1529500053-21704-3-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1529500053-21704-1-git-send-email-eric.auger@redhat.com>
-References: <1529500053-21704-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC 2/6] hw/boards: Add a MachineState parameter to
- kvm_type callback
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fVcq9-0005l9-RB
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:08:02 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:38033)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fVcq9-0005kk-KY
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:08:01 -0400
+Received: by mail-wr0-x241.google.com with SMTP id e18-v6so3246277wrs.5
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 06:08:01 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180620124742.16979-1-armbru@redhat.com>
+References: <20180620124742.16979-1-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 20 Jun 2018 15:07:59 +0200
+Message-ID: <CAJ+F1CJguzAVgKeyeGR1EpXX2F8CjWR1sVkJajUrNgHQEsuucA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] qapi/introspect: Eliminate pointless
+ variable in .visit_end()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,87 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com, suzuki.poulose@arm.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On ARM, the kvm_type will be resolved by querying the KVMState.
-Let's add the MachineState handle to the callback so that we
-can retrieve the  KVMState handle. in kvm_init, when the callback
-is called, the kvm_state variable is not yet set.
+On Wed, Jun 20, 2018 at 2:47 PM, Markus Armbruster <armbru@redhat.com> wrot=
+e:
+> Commit 1a9a507b2e3 "qapi-introspect: Hide type names" added local
+> variable @jsons to improve sorting, but also removed the sorting.  It
+> was part of a big series that went to v8, and it made sense until v2
+> or so...
+>
+> Commit 7d0f982bfbb replaced @jsons by @qlits, preserving the
+> uselessness.
+>
+> Get rid of it.
+>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- accel/kvm/kvm-all.c   | 2 +-
- hw/ppc/mac_newworld.c | 2 +-
- hw/ppc/mac_oldworld.c | 2 +-
- hw/ppc/spapr.c        | 2 +-
- include/hw/boards.h   | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index ffee68e..0590986 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1550,7 +1550,7 @@ static int kvm_init(MachineState *ms)
- 
-     kvm_type = qemu_opt_get(qemu_get_machine_opts(), "kvm-type");
-     if (mc->kvm_type) {
--        type = mc->kvm_type(kvm_type);
-+        type = mc->kvm_type(ms, kvm_type);
-     } else if (kvm_type) {
-         ret = -EINVAL;
-         fprintf(stderr, "Invalid argument kvm-type=%s\n", kvm_type);
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 744acdf..1409d9e 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -492,7 +492,7 @@ static void ppc_core99_init(MachineState *machine)
-     qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
- }
- 
--static int core99_kvm_type(const char *arg)
-+static int core99_kvm_type(MachineState *ms, const char *arg)
- {
-     /* Always force PR KVM */
-     return 2;
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 4608bab..1211fcd 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -363,7 +363,7 @@ static void ppc_heathrow_init(MachineState *machine)
-     qemu_register_boot_set(fw_cfg_boot_set, fw_cfg);
- }
- 
--static int heathrow_kvm_type(const char *arg)
-+static int heathrow_kvm_type(MachineState *ms, const char *arg)
- {
-     /* Always force PR KVM */
-     return 2;
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f59999d..faf078e 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2834,7 +2834,7 @@ static void spapr_machine_init(MachineState *machine)
-     }
- }
- 
--static int spapr_kvm_type(const char *vm_type)
-+static int spapr_kvm_type(MachineState *ms, const char *vm_type)
- {
-     if (!vm_type) {
-         return 0;
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index ef7457f..78f90a1 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -170,7 +170,7 @@ struct MachineClass {
-     void (*init)(MachineState *state);
-     void (*reset)(void);
-     void (*hot_add_cpu)(const int64_t id, Error **errp);
--    int (*kvm_type)(const char *arg);
-+    int (*kvm_type)(MachineState *ms, const char *arg);
- 
-     BlockInterfaceType block_default_type;
-     int units_per_default_bus;
--- 
-2.5.5
+> ---
+>  scripts/qapi/introspect.py | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+>
+> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+> index 5b6c72c7b2..6ad198ae5b 100644
+> --- a/scripts/qapi/introspect.py
+> +++ b/scripts/qapi/introspect.py
+> @@ -75,13 +75,10 @@ class QAPISchemaGenIntrospectVisitor(QAPISchemaMonoli=
+thicCVisitor):
+>
+>      def visit_end(self):
+>          # visit the types that are actually used
+> -        qlits =3D self._qlits
+> -        self._qlits =3D []
+>          for typ in self._used_types:
+>              typ.visit(self)
+>          # generate C
+>          # TODO can generate awfully long lines
+> -        qlits.extend(self._qlits)
+>          name =3D c_name(self._prefix, protect=3DFalse) + 'qmp_schema_qli=
+t'
+>          self._genh.add(mcgen('''
+>  #include "qapi/qmp/qlit.h"
+> @@ -93,7 +90,7 @@ extern const QLitObject %(c_name)s;
+>  const QLitObject %(c_name)s =3D %(c_string)s;
+>  ''',
+>                               c_name=3Dc_name(name),
+> -                             c_string=3Dto_qlit(qlits)))
+> +                             c_string=3Dto_qlit(self._qlits)))
+>          self._schema =3D None
+>          self._qlits =3D []
+>          self._used_types =3D []
+> --
+> 2.17.1
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
