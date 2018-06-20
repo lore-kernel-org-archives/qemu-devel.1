@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVZn6-0000GL-N3
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:52:41 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fVZoa-0001EU-4Z
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:54:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVZn5-0001U7-VR
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:52:40 -0400
-Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:35825)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fVZn5-0001Tx-FO
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:52:39 -0400
-Received: by mail-ot0-x22d.google.com with SMTP id q17-v6so3044990otg.2
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 02:52:39 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1fVZoV-0001tO-6A
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:54:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48308 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fVZoV-0001tE-0h
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:54:07 -0400
+Date: Wed, 20 Jun 2018 11:53:59 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180620115359.1a3bf6fb.cohuck@redhat.com>
+In-Reply-To: <20180619233001-mutt-send-email-mst@kernel.org>
+References: <20180612051432-mutt-send-email-mst@kernel.org>
+	<23fc4aa4-ec41-d6e2-3354-10cbfc13b7ec@intel.com>
+	<20180612142557-mutt-send-email-mst@kernel.org>
+	<b9c88515-cf41-2a9a-078e-9c9e5adbbf14@intel.com>
+	<CADGSJ213f8tJpNXuOhv8qRew-Y5VZAwA+srNMrLZYnKdVGLdAA@mail.gmail.com>
+	<20180614120231.0a72bd5f.cohuck@redhat.com>
+	<CADGSJ23WnTmVKHezm3t0V6M2sWeHaOUoTjdXkmrvbO0EF83hMg@mail.gmail.com>
+	<20180615134815.6613620e.cohuck@redhat.com>
+	<CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
+	<20180619125453.2d2dfb2d.cohuck@redhat.com>
+	<20180619233001-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180619120434.25062-1-cohuck@redhat.com>
-References: <20180619120434.25062-1-cohuck@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Jun 2018 10:52:18 +0100
-Message-ID: <CAFEAcA8NS6t6GeGN-F9_o5Tynig-EAR8ECgmu=MHOVuo-ZyjcQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/12] next round of s390x patches
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +37,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-On 19 June 2018 at 13:04, Cornelia Huck <cohuck@redhat.com> wrote:
-> The following changes since commit 2ef2f16781af9dee6ba6517755e9073ba5799fa2:
->
->   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20180615a' into staging (2018-06-15 18:13:35 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/cohuck/qemu tags/s390x-20180619
->
-> for you to fetch changes up to 49b67e9440892179c016a7afd33725a50d995ba6:
->
->   Merge tag 'tags/s390x-2018-06-18' into staging (2018-06-18 17:05:39 +0200)
->
-> ----------------------------------------------------------------
-> - cleanup in virtio-ccw
-> - accommodate guests using vfio-ccw without specifying unlimited
->   prefetch, but actually working fine
-> - add cpu model for the z14 Model ZR1
-> - add support for pxelinux.cfg-style network booting to the s390x
->   firmware
->
-> ----------------------------------------------------------------
+On Tue, 19 Jun 2018 23:32:06 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Applied, thanks.
+> On Tue, Jun 19, 2018 at 12:54:53PM +0200, Cornelia Huck wrote:
+> > Sorry about dragging mainframes into this, but this will only work for
+> > homogenous device coupling, not for heterogenous. Consider my vfio-pci
+> > + virtio-net-ccw example again: The guest cannot find out that the two
+> > belong together by checking some group ID, it has to either use the MAC
+> > or some needs-to-be-architectured property.
+> > 
+> > Alternatively, we could propose that mechanism as pci-only, which means
+> > we can rely on mechanisms that won't necessarily work on non-pci
+> > transports. (FWIW, I don't see a use case for using vfio-ccw to pass
+> > through a network card anytime in the near future, due to the nature of
+> > network cards currently in use on s390.)  
+> 
+> That's what it boils down to, yes.  If there's need to have this for
+> non-pci devices, then we should put it in config space.
+> Cornelia, what do you think?
+> 
 
--- PMM
+I think the only really useful config on s390 is the vfio-pci network
+card coupled with a virtio-net-ccw device: Using an s390 network card
+via vfio-ccw is out due to the nature of the s390 network cards, and
+virtio-ccw is the default transport (virtio-pci is not supported on any
+enterprise distro AFAIK).
+
+For this, having a uuid in the config space could work (vfio-pci
+devices have a config space by virtue of being pci devices, and
+virtio-net-ccw devices have a config space by virtue of being virtio
+devices -- ccw devices usually don't have that concept).
