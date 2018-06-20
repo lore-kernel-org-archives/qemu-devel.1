@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fVdmG-0006PT-NR
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:08:10 -0400
+	(envelope-from <berrange@redhat.com>) id 1fVdmK-0006SU-9F
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:08:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fVdmF-0004pF-Do
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:08:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56098 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fVdmF-0004om-8H
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:08:03 -0400
-Date: Wed, 20 Jun 2018 17:08:00 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180620170330-mutt-send-email-mst@kernel.org>
-References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
-	<20180515121433.6112-4-marcandre.lureau@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1fVdmI-0004rc-UH
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:08:08 -0400
+Date: Wed, 20 Jun 2018 15:07:54 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180620140754.GP3441@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180620121423.16979-1-berrange@redhat.com>
+	<20180620121423.16979-3-berrange@redhat.com>
+	<205e17cb-30f6-ace2-d8eb-e6a60d84731d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180515121433.6112-4-marcandre.lureau@redhat.com>
+In-Reply-To: <205e17cb-30f6-ace2-d8eb-e6a60d84731d@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] acpi: build TPM Physical Presence
- interface
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] nbd: allow authorization with
+ nbd-server-start QMP command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,112 +27,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On Tue, May 15, 2018 at 02:14:32PM +0200, Marc-Andr=E9 Lureau wrote:
-> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+On Wed, Jun 20, 2018 at 09:05:32AM -0500, Eric Blake wrote:
+> On 06/20/2018 07:14 AM, Daniel P. Berrang=C3=A9 wrote:
+> > From: "Daniel P. Berrange" <berrange@redhat.com>
 >=20
-> The TPM Physical Presence interface consists of an ACPI part, a shared
-> memory part, and code in the firmware. Users can send messages to the
-> firmware by writing a code into the shared memory through invoking the
-> ACPI code. When a reboot happens, the firmware looks for the code and
-> acts on it by sending sequences of commands to the TPM.
->=20
-> This patch adds the ACPI code. It is similar to the one in EDK2 but doe=
-sn't
-> assume that SMIs are necessary to use. It uses a similar datastructure =
-for
-> the shared memory as EDK2 does so that EDK2 and SeaBIOS could both make=
- use
-> of it. I extended the shared memory data structure with an array of 256
-> bytes, one for each code that could be implemented. The array contains
-> flags describing the individual codes. This decouples the ACPI implemen=
-tation
-> from the firmware implementation.
->=20
-> The underlying TCG specification is accessible from the following page.
->=20
-> https://trustedcomputinggroup.org/tcg-physical-presence-interface-speci=
-fication/
->=20
-> This patch implements version 1.30.
->=20
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->=20
-> ---
->=20
-> v4 (Marc-Andr=E9):
->  - replace 'DerefOf (FUNC [N])' with a function, to fix Windows ACPI
->     handling.
->  - replace 'return Package (..) {} ' with scoped variables, to fix
->    Windows ACPI handling.
->=20
-> v3:
->  - add support for PPI to CRB
->  - split up OperationRegion TPPI into two parts, one containing
->    the registers (TPP1) and the other one the flags (TPP2); switched
->    the order of the flags versus registers in the code
->  - adapted ACPI code to small changes to the array of flags where
->    previous flag 0 was removed and now shifting right wasn't always
->    necessary anymore
->=20
-> v2:
->  - get rid of FAIL variable; function 5 was using it and always
->    returns 0; the value is related to the ACPI function call not
->    a possible failure of the TPM function call.
->  - extend shared memory data structure with per-opcode entries
->    holding flags and use those flags to determine what to return
->    to caller
->  - implement interface version 1.3
-> ---
->  include/hw/acpi/tpm.h |  21 +++
->  hw/i386/acpi-build.c  | 294 +++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 314 insertions(+), 1 deletion(-)
->=20
-> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-> index f79d68a77a..fc53f08827 100644
-> --- a/include/hw/acpi/tpm.h
-> +++ b/include/hw/acpi/tpm.h
-> @@ -196,4 +196,25 @@ REG32(CRB_DATA_BUFFER, 0x80)
->  #define TPM_PPI_VERSION_NONE        0
->  #define TPM_PPI_VERSION_1_30        1
-> =20
-> +struct tpm_ppi {
+> I thought you preferred the UTF-8 accent in your Author lines these day=
+s?
+> Or is this because this patch has been sitting around in your local rep=
+o
+> prior to the point where you switched your git config author spelling? =
+(Also
+> applies to S-o-b in the series)
 
-The name violate the coding style.
+Yeah its "only" been sitting in my tree since late 2016 :-)
 
+>=20
+> >=20
+> > As with the previous patch to qemu-nbd, the nbd-server-start QMP comm=
+and
+> > also needs to be able to specify authorization when enabling TLS encr=
+yption.
+> >=20
+> > First the client must create a QAuthZ object instance using the
+> > 'object-add' command:
+> >=20
+>=20
+> > They can then reference this in the new 'tls-authz' parameter when
+> > executing the 'nbd-server-start' command:
+> >=20
+>=20
+> > @@ -132,11 +137,12 @@ void nbd_server_start(SocketAddress *addr, cons=
+t char *tls_creds,
+> >   void qmp_nbd_server_start(SocketAddressLegacy *addr,
+> >                             bool has_tls_creds, const char *tls_creds=
+,
+> > +                          bool has_tls_authz, const char *tls_authz,
+> >                             Error **errp)
+> >   {
+> >       SocketAddress *addr_flat =3D socket_address_flatten(addr);
+> > -    nbd_server_start(addr_flat, tls_creds, errp);
+> > +    nbd_server_start(addr_flat, tls_creds, tls_authz, errp);
+>=20
+> Relies on QMP generated code setting tls_authz =3D NULL if has_tls_auth=
+z is
+> false (but no different than the fact that we already relied on it for
+> tls_creds).  Someday it would be nice to get rid of the has_FOO for opt=
+ional
+> strings, but that's not your problem.
+>=20
+> > +++ b/qapi/block.json
+> > @@ -197,6 +197,11 @@
+> >   #
+> >   # @addr: Address on which to listen.
+> >   # @tls-creds: (optional) ID of the TLS credentials object. Since 2.=
+6
+> > +# @tls-authz: ID of the QAuthZ authorization object used to validate
+> > +#             the client's x509 distinguished name. This object is
+> > +#             is only resolved at time of use, so can be deleted and
+> > +#             recreated on the fly while the NBD server is active.
+> > +#             If missing, it will default to denying access. Since 3=
+.0
+> >   #
+> >   # Returns: error if the server is already running.
+> >   #
+> > @@ -204,7 +209,8 @@
+> >   ##
+> >   { 'command': 'nbd-server-start',
+> >     'data': { 'addr': 'SocketAddressLegacy',
+> > -            '*tls-creds': 'str'} }
+> > +            '*tls-creds': 'str',
+> > +            '*tls-authz': 'str'} }
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+>=20
+> Although patch 1 and 2 touch NBD, I'm happy for Dan to be the one that
+> merges it as part of the larger series.
+>=20
+> --=20
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
 
-> +    uint8_t  func[256];      /* 0x000: per TPM function implementation=
- flags;
-> +                                       set by BIOS */
-> +/* whether function is blocked by BIOS settings; bits 0, 1, 2 */
-> +#define TPM_PPI_FUNC_NOT_IMPLEMENTED     (0 << 0)
-> +#define TPM_PPI_FUNC_BIOS_ONLY           (1 << 0)
-> +#define TPM_PPI_FUNC_BLOCKED             (2 << 0)
-> +#define TPM_PPI_FUNC_ALLOWED_USR_REQ     (3 << 0)
-> +#define TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ (4 << 0)
-> +#define TPM_PPI_FUNC_MASK                (7 << 0)
-> +    uint8_t ppin;            /* 0x100 : set by BIOS */
-
-Are you sure it's right? Below ints will all end up misaligned ...
-
-> +    uint32_t ppip;           /* 0x101 : set by ACPI; not used */
-> +    uint32_t pprp;           /* 0x105 : response from TPM; set by BIOS=
- */
-> +    uint32_t pprq;           /* 0x109 : opcode; set by ACPI */
-> +    uint32_t pprm;           /* 0x10d : parameter for opcode; set by A=
-CPI */
-> +    uint32_t lppr;           /* 0x111 : last opcode; set by BIOS */
-> +    uint32_t fret;           /* 0x115 : set by ACPI; not used */
-> +    uint8_t res1[0x40];      /* 0x119 : reserved for future use */
-> +    uint8_t next_step;       /* 0x159 : next step after reboot; set by=
- BIOS */
-> +} QEMU_PACKED;
-> +
->  #endif /* HW_ACPI_TPM_H */
-
-Igor could you pls take a quick look at the rest?
-
+Regards,
+Daniel
 --=20
-MST
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
