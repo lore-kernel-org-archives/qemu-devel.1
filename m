@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fVmX8-0001a2-Nt
+	(envelope-from <quintela@redhat.com>) id 1fVmX9-0001a4-KT
 	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 19:29:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fVmX7-0007Bs-95
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 19:29:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53754 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fVmX8-0007Cb-Kv
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 19:29:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59388 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fVmX7-0007BZ-3B
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 19:29:01 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fVmX8-0007CL-G5
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 19:29:02 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B3C38859C5
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:29:00 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0C2B1401EF03
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:29:02 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Thu, 21 Jun 2018 01:28:41 +0200
-Message-Id: <20180620232851.7152-3-quintela@redhat.com>
+Date: Thu, 21 Jun 2018 01:28:42 +0200
+Message-Id: <20180620232851.7152-4-quintela@redhat.com>
 In-Reply-To: <20180620232851.7152-1-quintela@redhat.com>
 References: <20180620232851.7152-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v15 02/12] migration: Create multifd packet
+Subject: [Qemu-devel] [PATCH v15 03/12] migration: Add multifd traces for
+ start/end thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,240 +33,110 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We still don't put anything there.
+We want to know how many pages/packets each channel has sent.  Add
+counters for those.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-
 --
-fix magic (dave)
-check offset/ramblock  (dave)
-s/seq/packet_num/ and make it 64bit
+sort trace-events (dave)
 ---
- migration/ram.c | 145 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 144 insertions(+), 1 deletion(-)
+ migration/ram.c        | 22 ++++++++++++++++++++++
+ migration/trace-events |  4 ++++
+ 2 files changed, 26 insertions(+)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index ed4401ee46..6504b492da 100644
+index 6504b492da..d146689d3a 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -517,6 +517,17 @@ typedef struct {
-     uint8_t id;
- } __attribute__((packed)) MultiFDInit_t;
- 
-+typedef struct {
-+    uint32_t magic;
-+    uint32_t version;
-+    uint32_t flags;
-+    uint32_t size;
-+    uint32_t used;
-+    uint64_t packet_num;
-+    char ramblock[256];
-+    uint64_t offset[];
-+} __attribute__((packed)) MultiFDPacket_t;
-+
- typedef struct {
-     /* number of used pages */
-     uint32_t used;
-@@ -551,6 +562,14 @@ typedef struct {
-     bool quit;
-     /* array of pages to sent */
-     MultiFDPages_t *pages;
-+    /* packet allocated len */
-+    uint32_t packet_len;
-+    /* pointer to the packet */
-+    MultiFDPacket_t *packet;
-+    /* multifd flags for each packet */
-+    uint32_t flags;
-+    /* global number of generated multifd packets */
-+    uint64_t packet_num;
+@@ -570,6 +570,11 @@ typedef struct {
+     uint32_t flags;
+     /* global number of generated multifd packets */
+     uint64_t packet_num;
++    /* thread local variables */
++    /* packets sent through this channel */
++    uint32_t num_packets;
++    /* pages sent through this channel */
++    uint32_t num_pages;
  }  MultiFDSendParams;
  
  typedef struct {
-@@ -573,6 +592,14 @@ typedef struct {
-     bool quit;
-     /* array of pages to receive */
-     MultiFDPages_t *pages;
-+    /* packet allocated len */
-+    uint32_t packet_len;
-+    /* pointer to the packet */
-+    MultiFDPacket_t *packet;
-+    /* multifd flags for each packet */
-+    uint32_t flags;
-+    /* global number of generated multifd packets */
-+    uint64_t packet_num;
+@@ -600,6 +605,11 @@ typedef struct {
+     uint32_t flags;
+     /* global number of generated multifd packets */
+     uint64_t packet_num;
++    /* thread local variables */
++    /* packets sent through this channel */
++    uint32_t num_packets;
++    /* pages sent through this channel */
++    uint32_t num_pages;
  } MultiFDRecvParams;
  
  static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
-@@ -661,6 +688,99 @@ static void multifd_pages_clear(MultiFDPages_t *pages)
-     g_free(pages);
+@@ -856,9 +866,13 @@ static void *multifd_send_thread(void *opaque)
+     MultiFDSendParams *p = opaque;
+     Error *local_err = NULL;
+ 
++    trace_multifd_send_thread_start(p->id);
++
+     if (multifd_send_initial_packet(p, &local_err) < 0) {
+         goto out;
+     }
++    /* initial packet */
++    p->num_packets = 1;
+ 
+     while (true) {
+         qemu_mutex_lock(&p->mutex);
+@@ -880,6 +894,8 @@ out:
+     p->running = false;
+     qemu_mutex_unlock(&p->mutex);
+ 
++    trace_multifd_send_thread_end(p->id, p->num_packets, p->num_pages);
++
+     return NULL;
  }
  
-+static void multifd_send_fill_packet(MultiFDSendParams *p)
-+{
-+    MultiFDPacket_t *packet = p->packet;
-+    int i;
-+
-+    packet->magic = cpu_to_be32(MULTIFD_MAGIC);
-+    packet->version = cpu_to_be32(MULTIFD_VERSION);
-+    packet->flags = cpu_to_be32(p->flags);
-+    packet->size = cpu_to_be32(migrate_multifd_page_count());
-+    packet->used = cpu_to_be32(p->pages->used);
-+    packet->packet_num = cpu_to_be64(p->packet_num);
-+
-+    if (p->pages->block) {
-+        strncpy(packet->ramblock, p->pages->block->idstr, 256);
-+    }
-+
-+    for (i = 0; i < p->pages->used; i++) {
-+        packet->offset[i] = cpu_to_be64(p->pages->offset[i]);
-+    }
-+}
-+
-+static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
-+{
-+    MultiFDPacket_t *packet = p->packet;
-+    RAMBlock *block;
-+    int i;
-+
-+    /* ToDo: We can't use it until we haven't received a message */
-+    return 0;
-+
-+    be32_to_cpus(&packet->magic);
-+    if (packet->magic != MULTIFD_MAGIC) {
-+        error_setg(errp, "multifd: received packet "
-+                   "magic %x and expected magic %x",
-+                   packet->magic, MULTIFD_MAGIC);
-+        return -1;
-+    }
-+
-+    be32_to_cpus(&packet->version);
-+    if (packet->version != MULTIFD_VERSION) {
-+        error_setg(errp, "multifd: received packet "
-+                   "version %d and expected version %d",
-+                   packet->version, MULTIFD_VERSION);
-+        return -1;
-+    }
-+
-+    p->flags = be32_to_cpu(packet->flags);
-+
-+    be32_to_cpus(&packet->size);
-+    if (packet->size > migrate_multifd_page_count()) {
-+        error_setg(errp, "multifd: received packet "
-+                   "with size %d and expected maximum size %d",
-+                   packet->size, migrate_multifd_page_count()) ;
-+        return -1;
-+    }
-+
-+    p->pages->used = be32_to_cpu(packet->used);
-+    if (p->pages->used > packet->size) {
-+        error_setg(errp, "multifd: received packet "
-+                   "with size %d and expected maximum size %d",
-+                   p->pages->used, packet->size) ;
-+        return -1;
-+    }
-+
-+    p->packet_num = be64_to_cpu(packet->packet_num);
-+
-+    if (p->pages->used) {
-+        /* make sure that ramblock is 0 terminated */
-+        packet->ramblock[255] = 0;
-+        block = qemu_ram_block_by_name(packet->ramblock);
-+        if (!block) {
-+            error_setg(errp, "multifd: unknown ram block %s",
-+                       packet->ramblock);
-+            return -1;
-+        }
-+    }
-+
-+    for (i = 0; i < p->pages->used; i++) {
-+        ram_addr_t offset = be64_to_cpu(packet->offset[i]);
-+
-+        if (offset > (block->used_length - TARGET_PAGE_SIZE)) {
-+            error_setg(errp, "multifd: offset too long %" PRId64
-+                       " (max %" PRId64 ")",
-+                       offset, block->max_length);
-+            return -1;
-+        }
-+        p->pages->iov[i].iov_base = block->host + offset;
-+        p->pages->iov[i].iov_len = TARGET_PAGE_SIZE;
-+    }
-+
-+    return 0;
-+}
-+
- struct {
-     MultiFDSendParams *params;
-     /* number of created threads */
-@@ -718,6 +838,9 @@ int multifd_save_cleanup(Error **errp)
-         p->name = NULL;
-         multifd_pages_clear(p->pages);
-         p->pages = NULL;
-+        p->packet_len = 0;
-+        g_free(p->packet);
-+        p->packet = NULL;
-     }
-     g_free(multifd_send_state->params);
-     multifd_send_state->params = NULL;
-@@ -739,6 +862,7 @@ static void *multifd_send_thread(void *opaque)
+@@ -1007,6 +1023,8 @@ static void *multifd_recv_thread(void *opaque)
+     Error *local_err = NULL;
+     int ret;
  
++    trace_multifd_recv_thread_start(p->id);
++
      while (true) {
          qemu_mutex_lock(&p->mutex);
-+        multifd_send_fill_packet(p);
-         if (p->quit) {
-             qemu_mutex_unlock(&p->mutex);
-             break;
-@@ -803,6 +927,9 @@ int multifd_save_setup(void)
-         p->quit = false;
-         p->id = i;
-         p->pages = multifd_pages_init(page_count);
-+        p->packet_len = sizeof(MultiFDPacket_t)
-+                      + sizeof(ram_addr_t) * page_count;
-+        p->packet = g_malloc0(p->packet_len);
-         p->name = g_strdup_printf("multifdsend_%d", i);
-         socket_send_channel_create(multifd_new_send_channel_async, p);
-     }
-@@ -862,6 +989,9 @@ int multifd_load_cleanup(Error **errp)
-         p->name = NULL;
-         multifd_pages_clear(p->pages);
-         p->pages = NULL;
-+        p->packet_len = 0;
-+        g_free(p->packet);
-+        p->packet = NULL;
-     }
-     g_free(multifd_recv_state->params);
-     multifd_recv_state->params = NULL;
-@@ -874,10 +1004,20 @@ int multifd_load_cleanup(Error **errp)
- static void *multifd_recv_thread(void *opaque)
- {
-     MultiFDRecvParams *p = opaque;
-+    Error *local_err = NULL;
-+    int ret;
+         if (false)  {
+@@ -1029,6 +1047,8 @@ static void *multifd_recv_thread(void *opaque)
+     p->running = false;
+     qemu_mutex_unlock(&p->mutex);
  
-     while (true) {
-         qemu_mutex_lock(&p->mutex);
--        if (p->quit) {
-+        if (false)  {
-+            /* ToDo: Packet reception goes here */
++    trace_multifd_recv_thread_end(p->id, p->num_packets, p->num_pages);
 +
-+            ret = multifd_recv_unfill_packet(p, &local_err);
-+            qemu_mutex_unlock(&p->mutex);
-+            if (ret) {
-+                break;
-+            }
-+        } else if (p->quit) {
-             qemu_mutex_unlock(&p->mutex);
-             break;
-         }
-@@ -914,6 +1054,9 @@ int multifd_load_setup(void)
-         p->quit = false;
-         p->id = i;
-         p->pages = multifd_pages_init(page_count);
-+        p->packet_len = sizeof(MultiFDPacket_t)
-+                      + sizeof(ram_addr_t) * page_count;
-+        p->packet = g_malloc0(p->packet_len);
-         p->name = g_strdup_printf("multifdrecv_%d", i);
+     return NULL;
+ }
+ 
+@@ -1094,6 +1114,8 @@ void multifd_recv_new_channel(QIOChannel *ioc)
      }
-     return 0;
+     p->c = ioc;
+     object_ref(OBJECT(ioc));
++    /* initial packet */
++    p->num_packets = 1;
+ 
+     p->running = true;
+     qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+diff --git a/migration/trace-events b/migration/trace-events
+index 3f67758893..6d499448b3 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -76,6 +76,10 @@ get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned
+ migration_bitmap_sync_start(void) ""
+ migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
+ migration_throttle(void) ""
++multifd_recv_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
++multifd_recv_thread_start(uint8_t id) "%d"
++multifd_send_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
++multifd_send_thread_start(uint8_t id) "%d"
+ ram_discard_range(const char *rbname, uint64_t start, size_t len) "%s: start: %" PRIx64 " %zx"
+ ram_load_loop(const char *rbname, uint64_t addr, int flags, void *host) "%s: addr: 0x%" PRIx64 " flags: 0x%x host: %p"
+ ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
 -- 
 2.17.1
