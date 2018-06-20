@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVbGM-0005Hn-Rs
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 07:26:59 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fVbJ5-0006or-GF
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 07:29:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVbGL-0001Fz-Pb
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 07:26:58 -0400
-References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
-	<20180609151758.17343-6-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <45f6544a-d384-f3cc-5fd4-c3d5f0268f25@redhat.com>
-Date: Wed, 20 Jun 2018 06:26:52 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1fVbJ2-0002cB-Cd
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 07:29:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54374 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVbJ2-0002bg-7B
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 07:29:44 -0400
+Date: Wed, 20 Jun 2018 12:29:38 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180620112938.GK2549@work-vm>
+References: <20180620103555.1342-1-berrange@redhat.com>
+	<20180620103555.1342-10-berrange@redhat.com>
+	<20180620105800.GI2549@work-vm> <20180620111107.GJ3441@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180609151758.17343-6-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 5/6] qapi: new qmp command
- nbd-server-add-bitmap
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180620111107.GJ3441@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 09/11] authz: add QAuthZListFile object
+ type for a file access control list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +30,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>
 
-On 06/09/2018 10:17 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   qapi/block.json | 23 +++++++++++++++++++++++
->   blockdev-nbd.c  | 23 +++++++++++++++++++++++
->   2 files changed, 46 insertions(+)
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> On Wed, Jun 20, 2018 at 11:58:01AM +0100, Dr. David Alan Gilbert wrote:
+> > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> > > Add a QAuthZListFile object type that implements the QAuthZ interfa=
+ce. This
+> > > built-in implementation is a proxy around the QAtuhZList object typ=
+e,
+> > > initializing it from an external file, and optionally, automaticall=
+y
+> > > reloading it whenever it changes.
+> > >=20
+> > > To create an instance of this object via the QMP monitor, the synta=
+x
+> > > used would be:
+> > >=20
+> > >       {
+> > >         "execute": "object-add",
+> > >         "arguments": {
+> > >           "qom-type": "authz-list-file",
+> > >           "id": "authz0",
+> > >           "parameters": {
+> > >             "filename": "/etc/qemu/vnc.acl",
+> > > 	    "refresh": "yes"
+> > >           }
+> > >         }
+> > >       }
+> > >=20
+> > > If "refresh" is "yes", inotify is used to monitor the file,
+> > > automatically reloading changes. If an error occurs during reloadin=
+g,
+> > > all authorizations will fail until the file is next successfully
+> > > loaded.
+> >=20
+> > I'm curious about the 'refresh' stuff:
+> >   a) If refresh=3Dno is there a way to explicitly ask for a refresh
+> >      when some tool knows it's finished with fiddling with the file.
+>=20
+> If refresh=3Dno, then you can still use  object_del + object_add to
+> recreate the ACL object which will cause new content to be picked
+> up.
 
-I'm tempted to temporarily name this x-nbd-server-add-bitmap, until I 
-have the counterpart Libvirt patches tested, just in case testing turns 
-up any tweaks we need to the interface.
+But if I have a VNC/NBD/etc listening, won't it be bound to the old
+object, so I can't delete the old object?
 
-> 
-> diff --git a/qapi/block.json b/qapi/block.json
-> index c694524002..ddbca2e286 100644
-> --- a/qapi/block.json
-> +++ b/qapi/block.json
-> @@ -269,6 +269,29 @@
->     'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
->   
->   ##
-> +# @nbd-server-add-bitmap:
-> +#
-> +# Expose a dirty bitmap associated with the selected export. The bitmap search
-> +# starts at the device attached to the export, and includes all backing files.
-> +# The exported bitmap is then locked until the NBD export is removed.
+> >   b) am I right in thinking you're actually monitoring the directory
+> >      for changes and retriggering on directory changes?  So it'll
+> >      trigger on the normal trick of renaming the modified file over t=
+he
+> >      original?
+>=20
+> I originally made the mistake of trying to monitor the file
+> and discovered the awfulness of inotify :-(
+>=20
+> So, yeah, now we monitor the directory so we can trigger
+> reloads even when the file is editted by doing a tmpfile+rename
+> dance.
+>=20
+> The inotify support in the early patch in this series is intelligent
+> so that if multiple objects all monitor the same directory we only
+> use a single inotify watch.
+>=20
+> >   c) I'm a little concerned about making it automatic; if all the qem=
+us
+> >      on a  system all wake up and reparse the file at the same time.
+>=20
+> I don't think its a big deal in this case because the files in
+> question are very small. Once one QEMU reads it, the kernel will
+> have content in I/O cache, and the CPU overhead of parsing the JSON
+> will be lost in the noise given likely file sizes IMHO.
 
-The fact that you search the backing chain is at least consistent with 
-your code.
+OK.
 
-> +#
-> +# @name: Export name.
-> +#
-> +# @bitmap: Bitmap name to search for.
-> +#
-> +# @bitmap-export-name: How the bitmap will be seen by nbd clients
-> +#                      (default @bitmap)
+Dave
 
-Do we really need the flexibility of naming the bitmap differently to 
-the NBD client than we do in qemu?
-
-> +#
-> +# Note: the client must use NBD_OPT_SET_META_CONTEXT with a query of
-> +# "qemu:dirty-bitmap:NAME" (where NAME matches @bitmap-export-name) to access
-> +# the exposed bitmap.
-> +#
-> +# Since: 3.0
-> +##
-> +  { 'command': 'nbd-server-add-bitmap',
-> +    'data': {'name': 'str', 'bitmap': 'str', '*bitmap-export-name': 'str'} }
-> +
-> +##
->   # @nbd-server-stop:
->   #
->   # Stop QEMU's embedded NBD server, and unregister all devices previously
-> diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-> index 65a84739ed..6b0c50732c 100644
-> --- a/blockdev-nbd.c
-> +++ b/blockdev-nbd.c
-> @@ -220,3 +220,26 @@ void qmp_nbd_server_stop(Error **errp)
->       nbd_server_free(nbd_server);
->       nbd_server = NULL;
->   }
-> +
-> +void qmp_nbd_server_add_bitmap(const char *name, const char *bitmap,
-> +                               bool has_bitmap_export_name,
-> +                               const char *bitmap_export_name,
-> +                               Error **errp)
-> +{
-> +    NBDExport *exp;
-> +
-> +    if (!nbd_server) {
-> +        error_setg(errp, "NBD server not running");
-> +        return;
-> +    }
-> +
-> +    exp = nbd_export_find(name);
-> +    if (exp == NULL) {
-> +        error_setg(errp, "Export '%s' is not found", name);
-> +        return;
-> +    }
-> +
-> +    nbd_export_bitmap(exp, bitmap,
-> +                      has_bitmap_export_name ? bitmap_export_name : bitmap,
-> +                      errp);
-> +}
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
