@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVYzi-0002Nz-1R
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:01:44 -0400
+	(envelope-from <bounces@canonical.com>) id 1fVZ8a-000552-Hf
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:10:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVYzd-0007si-66
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:01:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47030 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVYzd-0007sR-0P
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:01:33 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0F97440200A7
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 09:01:32 +0000 (UTC)
-Date: Wed, 20 Jun 2018 10:01:28 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180620090127.GB2549@work-vm>
-References: <20180523111817.1463-1-quintela@redhat.com>
-	<20180523111817.1463-12-quintela@redhat.com>
-	<20180611164516.GI2661@work-vm> <87d0wlyle1.fsf@secure.mitica>
+	(envelope-from <bounces@canonical.com>) id 1fVZ8V-0002fu-Qv
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:10:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33680)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fVZ8V-0002fb-Jz
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:10:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fVZ8U-0008NF-3P
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 09:10:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 12C372E802D
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 09:10:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87d0wlyle1.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH v13 11/12] migration: Remove not needed
- semaphore and quit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 20 Jun 2018 09:03:50 -0000
+From: Thomas Huth <1777786@bugs.launchpad.net>
+Reply-To: Bug 1777786 <1777786@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152947832268.7374.8550233006013647387.malonedeb@wampee.canonical.com>
+Message-Id: <152948543047.1873.6003822053837891174.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1777786] Re: virtio-gpu-3d.c: change
+ virtio_gpu_fence_poll timer scale
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,78 +37,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> > * Juan Quintela (quintela@redhat.com) wrote:
-> >> We know quit closing the QIO.
-> >
-> > This patch does two different things; one of which I think I understand.
-> >
-> > The 'quit' has been removed - I think that makes sense because the
-> > multifd threads terminate when either they come to the end of a stream
-> > or hit an error; there's no case of asking them to quit explicitly.
-> > The 'sem' was basically for kicking the recv-thread to quit; which again
-> > isn't needed.
-> >
-> > Now, what about the object_unref on p->c ?
-> > If I've got this right multifd_recv_terminate_threads is only called in
-> > the error case; but doesn't multifd_load_cleanup also get called in that
-> > case - it does the unref and p->c = NULL as well.
-> 
-> Adding another comment O:-)
-> 
-> In normal exit case: we don't care.
-> 
-> In error case, we do a close of the p->c.  Doing a close, means that the
-> channel threads that are waiting on qio_channel_read_all_eof() will stop
-> the waiting and return an error, so we are safe.
-> 
->         ret = qio_channel_read_all_eof(p->c, (void *)p->packet,
->                                        p->packet_len, &local_err);
->         if (ret == 0) {   /* EOF */
->             break;
->         }
->         if (ret == -1) {   /* Error */
->             break;
->         }
-> 
-> We have to wait for three things:
-> - we receive a synchronization packet
-> - we receive EOF and finish
-> - we got somehow an error and have to quit.
-> 
-> Old versions have a semaphore, and we have three places where we set
-> that semaphore "we are ready", when we receive one error, when we have
-> data waiting to be read (it had a qio whatcher) or we just got a normal
-> exit.
-> 
-> Waiting on two things make code more complex that it used to be (and
-> whatchers are really lame, because we know there are data ready, but not
-> how much, dealing with non-whole packets/pages is a real mess).  So we
-> moved to:
-> -  quit is gone: we just close the channel, that makes the *_read_eof()
->    to end.  Notice that we don't care if the close is due to one error
->    or because we have finished.  It is just done.
-> - Now reception channel only have to wait on _read_eof(), the three
->   cases that we talked before are handled correctly.
-> 
-> I understand the confusion, this only makes sense when you came from the
-> previous version of the patchset.
+Please don't use the bug tracker for providing patches, and send it to
+the mailing list instead, see:
+https://wiki.qemu.org/Contribute/SubmitAPatch
 
-Two questions from that then:
-  a) Are you sure it's safe to close the qio_channel while another
-thread is in qio_channel_read_all_eof?  Is it really defined that it
-causes the other thread to exit with an error;  close() in some stuff
-frees data structures that the other thread is still reading; that's
-why I've used shutdown(2) in the past rather than close on fd's
+-- =
 
-  b) I don't think your answer explains why it's an object_unref?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1777786
 
-Dave
+Title:
+  virtio-gpu-3d.c: change virtio_gpu_fence_poll timer scale
 
-> Later, Juan.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Status in QEMU:
+  New
+
+Bug description:
+  We use virtio-gpu to accelerate Unigine Heaven Benchmark in VM. But we ge=
+t only 5 FPS when we use AMD RX460 in our host.
+  We found that guest os spent a lot of time in waiting for the return of g=
+lMapBufferRange/glUnmapBuffer commad. We suspected the host GPU was waiting=
+ for fence. So we finally change the timer of fence_poll. Afer change timer=
+ from
+   ms to us=EF=BC=8C Benchmark result raise up to 22 FPS.
+
+  From a4003af5c4fe92d55353f42767d0c45de95bb78f Mon Sep 17 00:00:00 2001
+  From: chen wei <chenwei1@ruijie.com.cn>
+  Date: Fri, 8 Jun 2018 17:34:45 +0800
+  Subject: [PATCH] virtio-gpu:improve 3d performance greatly
+
+    opengl function need fence support.when CPU execute opengl function, it=
+ need wait fence for synchronize GPU.
+  so qemu must deal with fence timely as possible. but now the expire time =
+of the timer to deal with fence is 10 ms.
+  I think it is too long for opengl. So i will change it to 20 ns.
+    Before change, when i play Unigine_Heaven 3d game with virglrenderer, t=
+he fps is 3.  atfer change the fps up to 23.
+
+  Signed-off-by: chen wei   <chenwei1@ruijie.com.cn>
+  Signed-off-by: wang qiang <qiang_w@ruijie.com.cn>
+  ---
+   hw/display/virtio-gpu-3d.c | 4 ++--
+   1 file changed, 2 insertions(+), 2 deletions(-)
+
+  diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
+  index 3558f38..c0a5d21 100644
+  --- a/hw/display/virtio-gpu-3d.c
+  +++ b/hw/display/virtio-gpu-3d.c
+  @@ -582,7 +582,7 @@ static void virtio_gpu_fence_poll(void *opaque)
+       virgl_renderer_poll();
+       virtio_gpu_process_cmdq(g);
+       if (!QTAILQ_EMPTY(&g->cmdq) || !QTAILQ_EMPTY(&g->fenceq)) {
+  -        timer_mod(g->fence_poll, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +=
+ 10);
+  +        timer_mod(g->fence_poll, qemu_clock_get_us(QEMU_CLOCK_VIRTUAL) +=
+ 20);
+       }
+   }
+   =
+
+  @@ -629,7 +629,7 @@ int virtio_gpu_virgl_init(VirtIOGPU *g)
+           return ret;
+       }
+   =
+
+  -    g->fence_poll =3D timer_new_ms(QEMU_CLOCK_VIRTUAL,
+  +    g->fence_poll =3D timer_new_us(QEMU_CLOCK_VIRTUAL,
+                                    virtio_gpu_fence_poll, g);
+   =
+
+       if (virtio_gpu_stats_enabled(g->conf)) {
+  -- =
+
+  2.7.4
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1777786/+subscriptions
