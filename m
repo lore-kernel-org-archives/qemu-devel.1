@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVZm6-0007vb-6T
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:51:39 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fVZn6-0000GL-N3
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:52:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVZm4-0000yd-Um
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:51:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55358 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVZm4-0000yQ-P1
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:51:36 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2A8F38780F
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 09:51:36 +0000 (UTC)
-Date: Wed, 20 Jun 2018 10:51:33 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180620095132.GE2549@work-vm>
-References: <20180620081524.5751-1-quintela@redhat.com>
-	<20180620081524.5751-4-quintela@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fVZn5-0001U7-VR
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:52:40 -0400
+Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:35825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fVZn5-0001Tx-FO
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:52:39 -0400
+Received: by mail-ot0-x22d.google.com with SMTP id q17-v6so3044990otg.2
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 02:52:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180620081524.5751-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v14 03/12] migration: Add multifd traces
- for start/end thread
+In-Reply-To: <20180619120434.25062-1-cohuck@redhat.com>
+References: <20180619120434.25062-1-cohuck@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 Jun 2018 10:52:18 +0100
+Message-ID: <CAFEAcA8NS6t6GeGN-F9_o5Tynig-EAR8ECgmu=MHOVuo-ZyjcQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/12] next round of s390x patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,122 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We want to know how many pages/packets each channel has sent.  Add
-> counters for those.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
+On 19 June 2018 at 13:04, Cornelia Huck <cohuck@redhat.com> wrote:
+> The following changes since commit 2ef2f16781af9dee6ba6517755e9073ba5799fa2:
+>
+>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-20180615a' into staging (2018-06-15 18:13:35 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/cohuck/qemu tags/s390x-20180619
+>
+> for you to fetch changes up to 49b67e9440892179c016a7afd33725a50d995ba6:
+>
+>   Merge tag 'tags/s390x-2018-06-18' into staging (2018-06-18 17:05:39 +0200)
+>
+> ----------------------------------------------------------------
+> - cleanup in virtio-ccw
+> - accommodate guests using vfio-ccw without specifying unlimited
+>   prefetch, but actually working fine
+> - add cpu model for the z14 Model ZR1
+> - add support for pxelinux.cfg-style network booting to the s390x
+>   firmware
+>
+> ----------------------------------------------------------------
 
-You mean
+Applied, thanks.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> --
-> sort trace-events (dave)
-> ---
->  migration/ram.c        | 22 ++++++++++++++++++++++
->  migration/trace-events |  4 ++++
->  2 files changed, 26 insertions(+)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 6504b492da..d146689d3a 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -570,6 +570,11 @@ typedef struct {
->      uint32_t flags;
->      /* global number of generated multifd packets */
->      uint64_t packet_num;
-> +    /* thread local variables */
-> +    /* packets sent through this channel */
-> +    uint32_t num_packets;
-> +    /* pages sent through this channel */
-> +    uint32_t num_pages;
->  }  MultiFDSendParams;
->  
->  typedef struct {
-> @@ -600,6 +605,11 @@ typedef struct {
->      uint32_t flags;
->      /* global number of generated multifd packets */
->      uint64_t packet_num;
-> +    /* thread local variables */
-> +    /* packets sent through this channel */
-> +    uint32_t num_packets;
-> +    /* pages sent through this channel */
-> +    uint32_t num_pages;
->  } MultiFDRecvParams;
->  
->  static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
-> @@ -856,9 +866,13 @@ static void *multifd_send_thread(void *opaque)
->      MultiFDSendParams *p = opaque;
->      Error *local_err = NULL;
->  
-> +    trace_multifd_send_thread_start(p->id);
-> +
->      if (multifd_send_initial_packet(p, &local_err) < 0) {
->          goto out;
->      }
-> +    /* initial packet */
-> +    p->num_packets = 1;
->  
->      while (true) {
->          qemu_mutex_lock(&p->mutex);
-> @@ -880,6 +894,8 @@ out:
->      p->running = false;
->      qemu_mutex_unlock(&p->mutex);
->  
-> +    trace_multifd_send_thread_end(p->id, p->num_packets, p->num_pages);
-> +
->      return NULL;
->  }
->  
-> @@ -1007,6 +1023,8 @@ static void *multifd_recv_thread(void *opaque)
->      Error *local_err = NULL;
->      int ret;
->  
-> +    trace_multifd_recv_thread_start(p->id);
-> +
->      while (true) {
->          qemu_mutex_lock(&p->mutex);
->          if (false)  {
-> @@ -1029,6 +1047,8 @@ static void *multifd_recv_thread(void *opaque)
->      p->running = false;
->      qemu_mutex_unlock(&p->mutex);
->  
-> +    trace_multifd_recv_thread_end(p->id, p->num_packets, p->num_pages);
-> +
->      return NULL;
->  }
->  
-> @@ -1094,6 +1114,8 @@ void multifd_recv_new_channel(QIOChannel *ioc)
->      }
->      p->c = ioc;
->      object_ref(OBJECT(ioc));
-> +    /* initial packet */
-> +    p->num_packets = 1;
->  
->      p->running = true;
->      qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 3f67758893..6d499448b3 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -76,6 +76,10 @@ get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned
->  migration_bitmap_sync_start(void) ""
->  migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
->  migration_throttle(void) ""
-> +multifd_recv_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
-> +multifd_recv_thread_start(uint8_t id) "%d"
-> +multifd_send_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
-> +multifd_send_thread_start(uint8_t id) "%d"
->  ram_discard_range(const char *rbname, uint64_t start, size_t len) "%s: start: %" PRIx64 " %zx"
->  ram_load_loop(const char *rbname, uint64_t addr, int flags, void *host) "%s: addr: 0x%" PRIx64 " flags: 0x%x host: %p"
->  ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
-> -- 
-> 2.17.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- PMM
