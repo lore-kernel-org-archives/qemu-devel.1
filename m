@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVeL0-00060F-18
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:43:58 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fVeMB-00073a-KT
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:45:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVeKw-0002e9-UJ
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:43:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54324 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fVeKw-0002e1-Py
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:43:54 -0400
-References: <20180620124827.17106-1-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <95f6d8c0-7b38-e9da-7944-bc188930a56d@redhat.com>
-Date: Wed, 20 Jun 2018 09:43:53 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1fVeMA-00036w-Md
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:45:11 -0400
+Date: Wed, 20 Jun 2018 15:45:01 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180620144500.GN2549@work-vm>
+References: <20180620121423.16979-1-berrange@redhat.com>
+	<20180620121423.16979-2-berrange@redhat.com>
+	<20180620142252.GM2549@work-vm> <20180620142644.GR3441@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180620124827.17106-1-armbru@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Update QAPI stanza for commit
- fb0bc835e56
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180620142644.GR3441@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] qemu-nbd: add support for
+ authorization of TLS clients
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +26,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-Cc: mdroth@linux.vnet.ibm.com
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On 06/20/2018 07:48 AM, Markus Armbruster wrote:
-> Commit fb0bc835e56 moved code from scripts/qapi-*.py to
-> scripts/qapi/*.py.  It neglected to update MAINTAINERS: scripts/qapi*
-> matches only the former, not the latter.  Do that now.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   MAINTAINERS | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> On Wed, Jun 20, 2018 at 03:22:53PM +0100, Dr. David Alan Gilbert wrote:
+> > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> > > From: "Daniel P. Berrange" <berrange@redhat.com>
+> > >=20
+> > > Currently any client which can complete the TLS handshake is able t=
+o use
+> > > the NBD server. The server admin can turn on the 'verify-peer' opti=
+on
+> > > for the x509 creds to require the client to provide a x509 certific=
+ate.
+> > > This means the client will have to acquire a certificate from the C=
+A
+> > > before they are permitted to use the NBD server. This is still a fa=
+irly
+> > > low bar to cross.
+> > >=20
+> > > This adds a '--tls-authz OBJECT-ID' option to the qemu-nbd command =
+which
+> > > takes the ID of a previously added 'QAuthZ' object instance. This w=
+ill
+> > > be used to validate the client's x509 distinguished name. Clients
+> > > failing the authorization check will not be permitted to use the NB=
+D
+> > > server.
+> > >=20
+> > > For example to setup authorization that only allows connection from=
+ a client
+> > > whose x509 certificate distinguished name is
+> > >=20
+> > >    CN=3Dlaptop.example.com,O=3DExample Org,L=3DLondon,ST=3DLondon,C=
+=3DGB
+> > >=20
+> > > use:
+> > >=20
+> > >   qemu-nbd --object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/q=
+emutls,\
+> > >                     endpoint=3Dserver,verify-peer=3Dyes \
+> > >            --object authz-simple,id=3Dauth0,identity=3DCN=3Dlaptop.=
+example.com,,\
+> > >                     O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DG=
+B \
+> >=20
+> > I'm confused about how that gets parsed, what differentiates the ,s
+> > that separate the arguments (e.g. ,id=3D  ,identity=3D) and the ,s th=
+at
+> > separate the options within the identity string (e.g. the ,ST=3DLondo=
+n)
+>=20
+> That's why I've doubled up - eg ',,' must be used when you need to
+> include a literal ',' in a value without it being interpreted as
+> starting a new option
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+OK, yeh I forgot about the obscure double-comma rule.
 
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index da91501c7a..7fa5c51a98 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1615,7 +1615,8 @@ F: tests/test-*-visitor.c
->   F: tests/test-qapi-*.c
->   F: tests/test-qmp-*.c
->   F: tests/test-visitor-serialization.c
-> -F: scripts/qapi*
-> +F: scripts/qapi-gen.py
-> +F: scripts/qapi/*
->   F: docs/devel/qapi*
->   T: git git://repo.or.cz/qemu/armbru.git qapi-next
->   
-> 
+> > Would:
+> >   --object authz-simple,identity=3DCN=3Dlaptop.example.com,,O=3DExamp=
+le Org,,L=3DLondon,,ST=3DLondon,,C=3DGB,id=3Dauth0
+> >=20
+> > be equivalent?
+>=20
+> Yes
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+OK.
+
+Dave
+
+>=20
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
