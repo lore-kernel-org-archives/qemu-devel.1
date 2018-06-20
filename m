@@ -1,26 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55116)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVd2N-0007yD-Ds
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:20:41 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fVd2R-000821-3Y
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:20:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVd2M-0002lJ-88
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:20:39 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40168)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fVd2M-0002kq-22
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:20:38 -0400
-Received: by mail-wm0-x244.google.com with SMTP id n5-v6so6850999wmc.5
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 06:20:37 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 20 Jun 2018 14:20:31 +0100
-Message-Id: <20180620132032.12952-5-alex.bennee@linaro.org>
-In-Reply-To: <20180620132032.12952-1-alex.bennee@linaro.org>
-References: <20180620132032.12952-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 4/5] build-system: add clean-coverage target
+	(envelope-from <pm215@archaic.org.uk>) id 1fVd2P-0002oV-JR
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:20:43 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 Jun 2018 14:20:26 +0100
+Message-Id: <20180620132032.28865-3-peter.maydell@linaro.org>
+In-Reply-To: <20180620132032.28865-1-peter.maydell@linaro.org>
+References: <20180620132032.28865-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH v3 2/8] hw/misc/tz-mpc.c: Implement registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +19,268 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Eric Auger <eric.auger@redhat.com>
 
-This can be used to remove any stale coverage data before any
-particular test run. This is useful for analysing individual tests.
+Implement the missing registers for the TZ MPC.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- Makefile               | 11 +++++++++++
- docs/devel/testing.rst | 11 ++++++++---
- 2 files changed, 19 insertions(+), 3 deletions(-)
+ include/hw/misc/tz-mpc.h |  10 +++
+ hw/misc/tz-mpc.c         | 142 +++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 148 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index e46f2b625a..cb4af8bf80 100644
---- a/Makefile
-+++ b/Makefile
-@@ -725,6 +725,14 @@ module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.mak
- 	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
- 	"GEN","$@")
+diff --git a/include/hw/misc/tz-mpc.h b/include/hw/misc/tz-mpc.h
+index d1a65fd9a38..6f15945410d 100644
+--- a/include/hw/misc/tz-mpc.h
++++ b/include/hw/misc/tz-mpc.h
+@@ -48,6 +48,16 @@ struct TZMPC {
  
-+ifdef CONFIG_GCOV
-+.PHONY: clean-coverage
-+clean-coverage:
-+	$(call quiet-command, \
-+		find . \( -name '*.gcda' -o -name '*.gcov' \) -type f -exec rm {} +, \
-+		"CLEAN", "coverage files")
-+endif
-+
- clean:
- # avoid old build problems by removing potentially incorrect old files
- 	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
-@@ -1075,6 +1083,9 @@ endif
- 		echo '')
- 	@echo  'Cleaning targets:'
- 	@echo  '  clean           - Remove most generated files but keep the config'
-+ifdef CONFIG_GCOV
-+	@echo  '  clean-coverage  - Remove coverage files'
-+endif
- 	@echo  '  distclean       - Remove all generated files'
- 	@echo  '  dist            - Build a distributable tarball'
- 	@echo  ''
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index 66ef219f69..a3652aea14 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -161,9 +161,14 @@ GCC gcov support
- ``gcov`` is a GCC tool to analyze the testing coverage by
- instrumenting the tested code. To use it, configure QEMU with
- ``--enable-gcov`` option and build. Then run ``make check`` as usual.
--Reports can be obtained by running ``gcov`` command on the output
--files under ``$build_dir/tests/``, please read the ``gcov``
--documentation for more information.
-+
-+If you want to gather coverage information on a single test the ``make
-+clean-coverage`` target can be used to any existing coverage
-+information before running a single test.
-+
-+Reports can be obtained by running ``gcov`` command
-+on the output files under ``$build_dir/tests/``, please read the
-+``gcov`` documentation for more information.
+     /*< public >*/
  
- QEMU iotests
- ============
++    /* State */
++    uint32_t ctrl;
++    uint32_t blk_idx;
++    uint32_t int_stat;
++    uint32_t int_en;
++    uint32_t int_info1;
++    uint32_t int_info2;
++
++    uint32_t *blk_lut;
++
+     qemu_irq irq;
+ 
+     /* Properties */
+diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
+index 569bccfda7a..e5b91bf81a3 100644
+--- a/hw/misc/tz-mpc.c
++++ b/hw/misc/tz-mpc.c
+@@ -28,16 +28,23 @@ enum {
+ 
+ /* Config registers */
+ REG32(CTRL, 0x00)
++    FIELD(CTRL, SEC_RESP, 4, 1)
++    FIELD(CTRL, AUTOINC, 8, 1)
++    FIELD(CTRL, LOCKDOWN, 31, 1)
+ REG32(BLK_MAX, 0x10)
+ REG32(BLK_CFG, 0x14)
+ REG32(BLK_IDX, 0x18)
+ REG32(BLK_LUT, 0x1c)
+ REG32(INT_STAT, 0x20)
++    FIELD(INT_STAT, IRQ, 0, 1)
+ REG32(INT_CLEAR, 0x24)
++    FIELD(INT_CLEAR, IRQ, 0, 1)
+ REG32(INT_EN, 0x28)
++    FIELD(INT_EN, IRQ, 0, 1)
+ REG32(INT_INFO1, 0x2c)
+ REG32(INT_INFO2, 0x30)
+ REG32(INT_SET, 0x34)
++    FIELD(INT_SET, IRQ, 0, 1)
+ REG32(PIDR4, 0xfd0)
+ REG32(PIDR5, 0xfd4)
+ REG32(PIDR6, 0xfd8)
+@@ -57,10 +64,25 @@ static const uint8_t tz_mpc_idregs[] = {
+     0x0d, 0xf0, 0x05, 0xb1,
+ };
+ 
++static void tz_mpc_irq_update(TZMPC *s)
++{
++    qemu_set_irq(s->irq, s->int_stat && s->int_en);
++}
++
++static void tz_mpc_autoinc_idx(TZMPC *s, unsigned access_size)
++{
++    /* Auto-increment BLK_IDX if necessary */
++    if (access_size == 4 && (s->ctrl & R_CTRL_AUTOINC_MASK)) {
++        s->blk_idx++;
++        s->blk_idx %= s->blk_max;
++    }
++}
++
+ static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
+                                    uint64_t *pdata,
+                                    unsigned size, MemTxAttrs attrs)
+ {
++    TZMPC *s = TZ_MPC(opaque);
+     uint64_t r;
+     uint32_t offset = addr & ~0x3;
+ 
+@@ -74,6 +96,38 @@ static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
+     }
+ 
+     switch (offset) {
++    case A_CTRL:
++        r = s->ctrl;
++        break;
++    case A_BLK_MAX:
++        r = s->blk_max;
++        break;
++    case A_BLK_CFG:
++        /* We are never in "init in progress state", so this just indicates
++         * the block size. s->blocksize == (1 << BLK_CFG + 5), so
++         * BLK_CFG == ctz32(s->blocksize) - 5
++         */
++        r = ctz32(s->blocksize) - 5;
++        break;
++    case A_BLK_IDX:
++        r = s->blk_idx;
++        break;
++    case A_BLK_LUT:
++        r = s->blk_lut[s->blk_idx];
++        tz_mpc_autoinc_idx(s, size);
++        break;
++    case A_INT_STAT:
++        r = s->int_stat;
++        break;
++    case A_INT_EN:
++        r = s->int_en;
++        break;
++    case A_INT_INFO1:
++        r = s->int_info1;
++        break;
++    case A_INT_INFO2:
++        r = s->int_info2;
++        break;
+     case A_PIDR4:
+     case A_PIDR5:
+     case A_PIDR6:
+@@ -120,6 +174,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+                                     uint64_t value,
+                                     unsigned size, MemTxAttrs attrs)
+ {
++    TZMPC *s = TZ_MPC(opaque);
+     uint32_t offset = addr & ~0x3;
+ 
+     trace_tz_mpc_reg_write(addr, value, size);
+@@ -127,7 +182,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+     if (!attrs.secure && offset < A_PIDR4) {
+         /* NS accesses can only see the ID registers */
+         qemu_log_mask(LOG_GUEST_ERROR,
+-                      "TZ MPC register read: NS access to offset 0x%x\n",
++                      "TZ MPC register write: NS access to offset 0x%x\n",
+                       offset);
+         return MEMTX_OK;
+     }
+@@ -140,9 +195,15 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+         uint32_t oldval;
+ 
+         switch (offset) {
+-            /* As we add support for registers which need expansions
+-             * other than zeroes we'll fill in cases here.
+-             */
++        case A_CTRL:
++            oldval = s->ctrl;
++            break;
++        case A_BLK_IDX:
++            oldval = s->blk_idx;
++            break;
++        case A_BLK_LUT:
++            oldval = s->blk_lut[s->blk_idx];
++            break;
+         default:
+             oldval = 0;
+             break;
+@@ -150,7 +211,48 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+         value = deposit32(oldval, (addr & 3) * 8, size * 8, value);
+     }
+ 
++    if ((s->ctrl & R_CTRL_LOCKDOWN_MASK) &&
++        (offset == A_CTRL || offset == A_BLK_LUT || offset == A_INT_EN)) {
++        /* Lockdown mode makes these three registers read-only, and
++         * the only way out of it is to reset the device.
++         */
++        qemu_log_mask(LOG_GUEST_ERROR, "TZ MPC register write to offset 0x%x "
++                      "while MPC is in lockdown mode\n", offset);
++        return MEMTX_OK;
++    }
++
+     switch (offset) {
++    case A_CTRL:
++        /* We don't implement the 'data gating' feature so all other bits
++         * are reserved and we make them RAZ/WI.
++         */
++        s->ctrl = value & (R_CTRL_SEC_RESP_MASK |
++                           R_CTRL_AUTOINC_MASK |
++                           R_CTRL_LOCKDOWN_MASK);
++        break;
++    case A_BLK_IDX:
++        s->blk_idx = value % s->blk_max;
++        break;
++    case A_BLK_LUT:
++        s->blk_lut[s->blk_idx] = value;
++        tz_mpc_autoinc_idx(s, size);
++        break;
++    case A_INT_CLEAR:
++        if (value & R_INT_CLEAR_IRQ_MASK) {
++            s->int_stat = 0;
++            tz_mpc_irq_update(s);
++        }
++        break;
++    case A_INT_EN:
++        s->int_en = value & R_INT_EN_IRQ_MASK;
++        tz_mpc_irq_update(s);
++        break;
++    case A_INT_SET:
++        if (value & R_INT_SET_IRQ_MASK) {
++            s->int_stat = R_INT_STAT_IRQ_MASK;
++            tz_mpc_irq_update(s);
++        }
++        break;
+     case A_PIDR4:
+     case A_PIDR5:
+     case A_PIDR6:
+@@ -266,6 +368,16 @@ static int tz_mpc_num_indexes(IOMMUMemoryRegion *iommu)
+ 
+ static void tz_mpc_reset(DeviceState *dev)
+ {
++    TZMPC *s = TZ_MPC(dev);
++
++    s->ctrl = 0x00000100;
++    s->blk_idx = 0;
++    s->int_stat = 0;
++    s->int_en = 1;
++    s->int_info1 = 0;
++    s->int_info2 = 0;
++
++    memset(s->blk_lut, 0, s->blk_max * sizeof(uint32_t));
+ }
+ 
+ static void tz_mpc_init(Object *obj)
+@@ -339,13 +451,35 @@ static void tz_mpc_realize(DeviceState *dev, Error **errp)
+                        "tz-mpc-downstream");
+     address_space_init(&s->blocked_io_as, &s->blocked_io,
+                        "tz-mpc-blocked-io");
++
++    s->blk_lut = g_new(uint32_t, s->blk_max);
++}
++
++static int tz_mpc_post_load(void *opaque, int version_id)
++{
++    TZMPC *s = TZ_MPC(opaque);
++
++    /* Check the incoming data doesn't point blk_idx off the end of blk_lut. */
++    if (s->blk_idx >= s->blk_max) {
++        return -1;
++    }
++    return 0;
+ }
+ 
+ static const VMStateDescription tz_mpc_vmstate = {
+     .name = "tz-mpc",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .post_load = tz_mpc_post_load,
+     .fields = (VMStateField[]) {
++        VMSTATE_UINT32(ctrl, TZMPC),
++        VMSTATE_UINT32(blk_idx, TZMPC),
++        VMSTATE_UINT32(int_stat, TZMPC),
++        VMSTATE_UINT32(int_en, TZMPC),
++        VMSTATE_UINT32(int_info1, TZMPC),
++        VMSTATE_UINT32(int_info2, TZMPC),
++        VMSTATE_VARRAY_UINT32(blk_lut, TZMPC, blk_max,
++                              0, vmstate_info_uint32, uint32_t),
+         VMSTATE_END_OF_LIST()
+     }
+ };
 -- 
 2.17.1
