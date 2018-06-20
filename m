@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47843)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1fVeKj-0005qn-Eb
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:43:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1fVeL0-00060F-18
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:43:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1fVeKg-0002Xf-B2
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:43:41 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:50208)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1fVeKg-0002XK-17
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:43:38 -0400
-Received: by mail-wm0-x242.google.com with SMTP id e16-v6so201096wmd.0
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 07:43:37 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fVeKw-0002e9-UJ
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:43:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54324 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fVeKw-0002e1-Py
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:43:54 -0400
+References: <20180620124827.17106-1-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <95f6d8c0-7b38-e9da-7944-bc188930a56d@redhat.com>
+Date: Wed, 20 Jun 2018 09:43:53 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180620083459.GB3441@redhat.com>
-References: <20180619132200.12320-1-sameeh@daynix.com>
-	<20180619134933.GY20929@redhat.com>
-	<CAKPgXcHrZY1=65jOg3Y3bDdwNnik7x-Ti-3PAryYsRuvRWk=iA@mail.gmail.com>
-	<20180620083459.GB3441@redhat.com>
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Wed, 20 Jun 2018 17:43:36 +0300
-Message-ID: <CAKPgXcHJCTKphNhp8gca46BTY-YJMkkXfVP59HjKDLjBxaAP4w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 0/1] Add BPF suuport to Qemu
+In-Reply-To: <20180620124827.17106-1-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Update QAPI stanza for commit
+ fb0bc835e56
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>, Yan Vugenfirer <yan@daynix.com>, Amnon Ilan <ailan@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-On Wed, Jun 20, 2018 at 11:34 AM, Daniel P. Berrang=C3=A9 <berrange@redhat.=
-com>
-wrote:
+On 06/20/2018 07:48 AM, Markus Armbruster wrote:
+> Commit fb0bc835e56 moved code from scripts/qapi-*.py to
+> scripts/qapi/*.py.  It neglected to update MAINTAINERS: scripts/qapi*
+> matches only the former, not the latter.  Do that now.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   MAINTAINERS | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 
-> On Tue, Jun 19, 2018 at 05:37:10PM +0300, Sameeh Jubran wrote:
-> > This patch is actually a preparation for an upcoming patch set that I
-> want
-> > to integrate into virtio-net which implements the RSS feature. (
-> > https://lists.oasis-open.org/archives/virtio-dev/201805/msg00024.html)
-> > So there is a use case. The rationale behind this is to distinguish the
-> > infrastructure preparation needed for the BPF from the actual RSS featu=
-re
-> > implementation.
->
-> Ah, so IIUC, that is not actually doing network filtering, rather it is
-> some performance related feature than happens to make of use of BPF.
->
-> I think it is be important to submit code changes for the virtio driver
-> at the same time, so we can properly understand the interface and usage
-> model exposed to the user CLI (if any).
->
-I understand, but I thought about adding the bpf support in an elegant way
-that might serve others in the future.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
->
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/
-> dberrange :|
-> |: https://libvirt.org         -o-
-> https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/
-> dberrange :|
->
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index da91501c7a..7fa5c51a98 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1615,7 +1615,8 @@ F: tests/test-*-visitor.c
+>   F: tests/test-qapi-*.c
+>   F: tests/test-qmp-*.c
+>   F: tests/test-visitor-serialization.c
+> -F: scripts/qapi*
+> +F: scripts/qapi-gen.py
+> +F: scripts/qapi/*
+>   F: docs/devel/qapi*
+>   T: git git://repo.or.cz/qemu/armbru.git qapi-next
+>   
+> 
 
-
-
---=20
-Respectfully,
-*Sameeh Jubran*
-*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
-*Software Engineer @ Daynix <http://www.daynix.com>.*
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
