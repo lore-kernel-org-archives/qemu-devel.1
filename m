@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57305)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVewb-0006K2-7I
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:22:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fVewv-0006V6-BP
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:23:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVewW-0003JH-8m
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:22:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58614 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1fVewW-0003J4-39
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:22:44 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 781FE40201C0
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 15:22:43 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 20 Jun 2018 17:22:41 +0200
-Message-Id: <20180620152241.15772-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1] postcopy: drop ram_pages parameter from
- postcopy_ram_incoming_init()
+	(envelope-from <peter.maydell@linaro.org>) id 1fVewu-0003Sb-Ek
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:23:09 -0400
+Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:36999)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fVewu-0003SP-9I
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:23:08 -0400
+Received: by mail-ot0-x233.google.com with SMTP id 101-v6so4126576oth.4
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 08:23:08 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180619154435.18898-2-alex.bennee@linaro.org>
+References: <20180619154435.18898-1-alex.bennee@linaro.org>
+	<20180619154435.18898-2-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 Jun 2018 16:22:47 +0100
+Message-ID: <CAFEAcA94=9Dn=XgHr_qbszCe-5Yi8AJK48NRovtpULkESu5mGA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 01/56] configure: add support for
+ --cross-cc-FOO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +31,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, David Hildenbrand <david@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
 
-Not needed. Don't expose last_ram_page().
+On 19 June 2018 at 16:43, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> This allows us to specify cross compilers for our guests. This is
+> useful for building test images/programs. Currently we re-run the
+> compile test for each target. I couldn't think of a way to cache the
+> value for a given arch without getting messier configure code.
+>
+> The cross compiler for the guest is visible to each target as
+> CROSS_CC_GUEST in config-target.mak.
+>
+> +# Do we have a cross compiler for this target?
+> +if has $target_compiler; then
+> +
+> +    write_c_skeleton
+> +
+> +    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- include/exec/ram_addr.h  | 1 -
- migration/postcopy-ram.c | 4 ++--
- migration/postcopy-ram.h | 2 +-
- migration/ram.c          | 4 +---
- 4 files changed, 4 insertions(+), 7 deletions(-)
+Need quotes around "$target_compiler"
 
-diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-index 9295c01a89..d6687690fb 100644
---- a/include/exec/ram_addr.h
-+++ b/include/exec/ram_addr.h
-@@ -71,7 +71,6 @@ static inline unsigned long int ramblock_recv_bitmap_offset(void *host_addr,
- }
- 
- long qemu_getrampagesize(void);
--unsigned long last_ram_page(void);
- RAMBlock *qemu_ram_alloc_from_file(ram_addr_t size, MemoryRegion *mr,
-                                    bool share, const char *mem_path,
-                                    Error **errp);
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index 48e51556a7..932f188949 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -500,7 +500,7 @@ static int cleanup_range(const char *block_name, void *host_addr,
-  * postcopy later; must be called prior to any precopy.
-  * called from arch_init's similarly named ram_postcopy_incoming_init
-  */
--int postcopy_ram_incoming_init(MigrationIncomingState *mis, size_t ram_pages)
-+int postcopy_ram_incoming_init(MigrationIncomingState *mis)
- {
-     if (qemu_ram_foreach_migratable_block(init_range, NULL)) {
-         return -1;
-@@ -1265,7 +1265,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
-     return false;
- }
- 
--int postcopy_ram_incoming_init(MigrationIncomingState *mis, size_t ram_pages)
-+int postcopy_ram_incoming_init(MigrationIncomingState *mis)
- {
-     error_report("postcopy_ram_incoming_init: No OS support");
-     return -1;
-diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-index d900d9c34f..9d55536fd1 100644
---- a/migration/postcopy-ram.h
-+++ b/migration/postcopy-ram.h
-@@ -27,7 +27,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis);
-  * postcopy later; must be called prior to any precopy.
-  * called from ram.c's similarly named ram_postcopy_incoming_init
-  */
--int postcopy_ram_incoming_init(MigrationIncomingState *mis, size_t ram_pages);
-+int postcopy_ram_incoming_init(MigrationIncomingState *mis);
- 
- /*
-  * At the end of a migration where postcopy_ram_incoming_init was called.
-diff --git a/migration/ram.c b/migration/ram.c
-index cd5f55117d..8de7ab683e 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3107,9 +3107,7 @@ static int ram_load_cleanup(void *opaque)
-  */
- int ram_postcopy_incoming_init(MigrationIncomingState *mis)
- {
--    unsigned long ram_pages = last_ram_page();
--
--    return postcopy_ram_incoming_init(mis, ram_pages);
-+    return postcopy_ram_incoming_init(mis);
- }
- 
- /**
--- 
-2.17.1
+
+> +        # For host systems we might get away with building without -stat=
+ic
+> +        if ! do_compiler $target_compiler -o $TMPE $TMPC ; then
+
+Ditto
+
+> +            target_compiler=3D""
+> +        else
+> +            enabled_cross_compilers=3D"${enabled_cross_compilers} ${targ=
+et_compiler}"
+> +            target_compiler_static=3D"n"
+> +        fi
+> +    else
+> +        enabled_cross_compilers=3D"${enabled_cross_compilers} ${target_c=
+ompiler}"
+> +        target_compiler_static=3D"y"
+> +    fi
+> +else
+> +    target_compiler=3D""
+> +fi
+>
+
+> +if test -n "$enabled_cross_compilers"; then
+> +    echo
+> +    echo "NOTE: cross-compilers enabled:"
+> +    printf '%s\n' $enabled_cross_compilers | sort -u
+> +fi
+
+This is going to do weird things in the case where one of the
+target compilers is something like 'ccache gcc'.
+
+thanks
+-- PMM
