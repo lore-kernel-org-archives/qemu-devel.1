@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVeMB-00073a-KT
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:45:13 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fVeMi-0007Ru-RT
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:45:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVeMA-00036w-Md
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:45:11 -0400
-Date: Wed, 20 Jun 2018 15:45:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180620144500.GN2549@work-vm>
-References: <20180620121423.16979-1-berrange@redhat.com>
-	<20180620121423.16979-2-berrange@redhat.com>
-	<20180620142252.GM2549@work-vm> <20180620142644.GR3441@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fVeMf-0003PL-Q7
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:45:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54388 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fVeMf-0003OD-KQ
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:45:41 -0400
+References: <20180615222855.44421-1-mst@redhat.com>
+	<20180615222855.44421-2-mst@redhat.com>
+	<b59883c6-1dc0-4e81-439c-587c8f2d3e83@redhat.com>
+	<20180619233509-mutt-send-email-mst@kernel.org>
+	<75758aed-81ab-d320-595d-3c7832faa8d8@redhat.com>
+	<20180620172212-mutt-send-email-mst@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <31e37743-6a12-c271-1218-c2f1745851fb@redhat.com>
+Date: Wed, 20 Jun 2018 16:45:38 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180620142644.GR3441@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] qemu-nbd: add support for
- authorization of TLS clients
+In-Reply-To: <20180620172212-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] kvm: support -dedicated
+ cpu-pm=on|off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,86 +33,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Wed, Jun 20, 2018 at 03:22:53PM +0100, Dr. David Alan Gilbert wrote:
-> > * Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> > > From: "Daniel P. Berrange" <berrange@redhat.com>
-> > >=20
-> > > Currently any client which can complete the TLS handshake is able t=
-o use
-> > > the NBD server. The server admin can turn on the 'verify-peer' opti=
-on
-> > > for the x509 creds to require the client to provide a x509 certific=
-ate.
-> > > This means the client will have to acquire a certificate from the C=
-A
-> > > before they are permitted to use the NBD server. This is still a fa=
-irly
-> > > low bar to cross.
-> > >=20
-> > > This adds a '--tls-authz OBJECT-ID' option to the qemu-nbd command =
-which
-> > > takes the ID of a previously added 'QAuthZ' object instance. This w=
-ill
-> > > be used to validate the client's x509 distinguished name. Clients
-> > > failing the authorization check will not be permitted to use the NB=
-D
-> > > server.
-> > >=20
-> > > For example to setup authorization that only allows connection from=
- a client
-> > > whose x509 certificate distinguished name is
-> > >=20
-> > >    CN=3Dlaptop.example.com,O=3DExample Org,L=3DLondon,ST=3DLondon,C=
-=3DGB
-> > >=20
-> > > use:
-> > >=20
-> > >   qemu-nbd --object tls-creds-x509,id=3Dtls0,dir=3D/home/berrange/q=
-emutls,\
-> > >                     endpoint=3Dserver,verify-peer=3Dyes \
-> > >            --object authz-simple,id=3Dauth0,identity=3DCN=3Dlaptop.=
-example.com,,\
-> > >                     O=3DExample Org,,L=3DLondon,,ST=3DLondon,,C=3DG=
-B \
-> >=20
-> > I'm confused about how that gets parsed, what differentiates the ,s
-> > that separate the arguments (e.g. ,id=3D  ,identity=3D) and the ,s th=
-at
-> > separate the options within the identity string (e.g. the ,ST=3DLondo=
-n)
->=20
-> That's why I've doubled up - eg ',,' must be used when you need to
-> include a literal ',' in a value without it being interpreted as
-> starting a new option
+On 20/06/2018 16:29, Michael S. Tsirkin wrote:
+> On Wed, Jun 20, 2018 at 04:20:40PM +0200, Paolo Bonzini wrote:
+>> On 19/06/2018 22:43, Michael S. Tsirkin wrote:
+>>>
+>>>> 2) Maybe -hostresource?
+>>>
+>>> Is ability to cause high latency for other threads really a resource?
+>>
+>> The "resource" here is host CPU time.
+> 
+> Right but then everything we do is a host resource in that sense.
+> Host network, host disk ...
 
-OK, yeh I forgot about the obscure double-comma rule.
+Yes of course.  These options control how (and how much) QEMU uses those
+resources.
 
-> > Would:
-> >   --object authz-simple,identity=3DCN=3Dlaptop.example.com,,O=3DExamp=
-le Org,,L=3DLondon,,ST=3DLondon,,C=3DGB,id=3Dauth0
-> >=20
-> > be equivalent?
->=20
-> Yes
+>> In general, a vCPU with
+>> KVM_CPU_X86_DISABLE_EXITS will use more host CPU time and block
+>> overcommitting, just like mlock does for memory.
+> 
+> What bothers me is that it does not block overcommit as such.
+> It has a side effect that if something does end up
+> running on the same CPU, that something will get bad
+> latency jitter. 
+>
+> I agree there's similarity here around overcommit.
+> 
+> That's why I suggested -dedicated as an antonym to -overcommit.
+> 
+> But I'm fine with -disable-overcommit or -dedicated-host-resource too.
 
-OK.
+Both of those are quite a mouthful.  I somewhat prefer "-overcommit" to
+"-dedicated", though "-hostresource" it's still my favorite mostly
+because it's the most future-proof.
 
-Dave
-
->=20
->=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Paolo
