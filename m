@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37364)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44094)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fVfKO-0004kn-Es
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:47:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fVfTf-0004dK-SK
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:57:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fVfKL-0000EM-9D
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:47:24 -0400
-References: <20180620130619.11362-1-peter.maydell@linaro.org>
-	<20180620130619.11362-2-peter.maydell@linaro.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <dabacef8-081c-8808-d42e-ebb6fd0e6012@ilande.co.uk>
-Date: Wed, 20 Jun 2018 16:46:55 +0100
+	(envelope-from <peter.maydell@linaro.org>) id 1fVfTe-0000a1-4g
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:56:59 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:39927)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fVfTd-0000Yi-Sx
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:56:58 -0400
+Received: by mail-ot0-x244.google.com with SMTP id l15-v6so61899oth.6
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 08:56:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180620130619.11362-2-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/3] tcg: Support MMU protection regions
- smaller than TARGET_PAGE_SIZE
+In-Reply-To: <1528790908-23441-3-git-send-email-eric.auger@redhat.com>
+References: <1528790908-23441-1-git-send-email-eric.auger@redhat.com>
+	<1528790908-23441-3-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 Jun 2018 16:56:36 +0100
+Message-ID: <CAFEAcA_rgm7KX+Tm+TkgoKEfAV0f-vAeoQ5dv_jBzfA47kAWNw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] hw/arm/smmuv3: Cache/invalidate
+ config data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,358 +30,348 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, patches@linaro.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, jia.he@hxt-semitech.com, Jia He <hejianet@gmail.com>
 
-On 20/06/18 14:06, Peter Maydell wrote:
-
-> Add support for MMU protection regions that are smaller than
-> TARGET_PAGE_SIZE. We do this by marking the TLB entry for those
-> pages with a flag TLB_RECHECK. This flag causes us to always
-> take the slow-path for accesses. In the slow path we can then
-> special case them to always call tlb_fill() again, so we have
-> the correct information for the exact address being accessed.
-> 
-> This change allows us to handle reading and writing from small
-> regions; we cannot deal with execution from the small region.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 12 June 2018 at 09:08, Eric Auger <eric.auger@redhat.com> wrote:
+> Let's cache config data to avoid fetching and parsing STE/CD
+> structures on each translation. We invalidate them on data structure
+> invalidation commands.
+>
+> We put in place a per-smmu mutex to protect the config cache. This
+> will be useful too to protect the IOTLB cache. The caches can be
+> accessed without BQL, ie. in IO dataplane. The same kind of mutex was
+> put in place in the intel viommu.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
 > ---
->   accel/tcg/softmmu_template.h |  24 ++++---
->   include/exec/cpu-all.h       |   5 +-
->   accel/tcg/cputlb.c           | 131 +++++++++++++++++++++++++++++------
->   3 files changed, 130 insertions(+), 30 deletions(-)
-> 
-> diff --git a/accel/tcg/softmmu_template.h b/accel/tcg/softmmu_template.h
-> index 239ea6692b4..c47591c9709 100644
-> --- a/accel/tcg/softmmu_template.h
-> +++ b/accel/tcg/softmmu_template.h
-> @@ -98,10 +98,12 @@
->   static inline DATA_TYPE glue(io_read, SUFFIX)(CPUArchState *env,
->                                                 size_t mmu_idx, size_t index,
->                                                 target_ulong addr,
-> -                                              uintptr_t retaddr)
-> +                                              uintptr_t retaddr,
-> +                                              bool recheck)
->   {
->       CPUIOTLBEntry *iotlbentry = &env->iotlb[mmu_idx][index];
-> -    return io_readx(env, iotlbentry, mmu_idx, addr, retaddr, DATA_SIZE);
-> +    return io_readx(env, iotlbentry, mmu_idx, addr, retaddr, recheck,
-> +                    DATA_SIZE);
->   }
->   #endif
->   
-> @@ -138,7 +140,8 @@ WORD_TYPE helper_le_ld_name(CPUArchState *env, target_ulong addr,
->   
->           /* ??? Note that the io helpers always read data in the target
->              byte ordering.  We should push the LE/BE request down into io.  */
-> -        res = glue(io_read, SUFFIX)(env, mmu_idx, index, addr, retaddr);
-> +        res = glue(io_read, SUFFIX)(env, mmu_idx, index, addr, retaddr,
-> +                                    tlb_addr & TLB_RECHECK);
->           res = TGT_LE(res);
->           return res;
->       }
-> @@ -205,7 +208,8 @@ WORD_TYPE helper_be_ld_name(CPUArchState *env, target_ulong addr,
->   
->           /* ??? Note that the io helpers always read data in the target
->              byte ordering.  We should push the LE/BE request down into io.  */
-> -        res = glue(io_read, SUFFIX)(env, mmu_idx, index, addr, retaddr);
-> +        res = glue(io_read, SUFFIX)(env, mmu_idx, index, addr, retaddr,
-> +                                    tlb_addr & TLB_RECHECK);
->           res = TGT_BE(res);
->           return res;
->       }
-> @@ -259,10 +263,12 @@ static inline void glue(io_write, SUFFIX)(CPUArchState *env,
->                                             size_t mmu_idx, size_t index,
->                                             DATA_TYPE val,
->                                             target_ulong addr,
-> -                                          uintptr_t retaddr)
-> +                                          uintptr_t retaddr,
-> +                                          bool recheck)
->   {
->       CPUIOTLBEntry *iotlbentry = &env->iotlb[mmu_idx][index];
-> -    return io_writex(env, iotlbentry, mmu_idx, val, addr, retaddr, DATA_SIZE);
-> +    return io_writex(env, iotlbentry, mmu_idx, val, addr, retaddr,
-> +                     recheck, DATA_SIZE);
->   }
->   
->   void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
-> @@ -298,7 +304,8 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
->           /* ??? Note that the io helpers always read data in the target
->              byte ordering.  We should push the LE/BE request down into io.  */
->           val = TGT_LE(val);
-> -        glue(io_write, SUFFIX)(env, mmu_idx, index, val, addr, retaddr);
-> +        glue(io_write, SUFFIX)(env, mmu_idx, index, val, addr,
-> +                               retaddr, tlb_addr & TLB_RECHECK);
->           return;
->       }
->   
-> @@ -375,7 +382,8 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
->           /* ??? Note that the io helpers always read data in the target
->              byte ordering.  We should push the LE/BE request down into io.  */
->           val = TGT_BE(val);
-> -        glue(io_write, SUFFIX)(env, mmu_idx, index, val, addr, retaddr);
-> +        glue(io_write, SUFFIX)(env, mmu_idx, index, val, addr, retaddr,
-> +                               tlb_addr & TLB_RECHECK);
->           return;
->       }
->   
-> diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-> index 7fa726b8e36..7338f57062f 100644
-> --- a/include/exec/cpu-all.h
-> +++ b/include/exec/cpu-all.h
-> @@ -330,11 +330,14 @@ CPUArchState *cpu_copy(CPUArchState *env);
->   #define TLB_NOTDIRTY        (1 << (TARGET_PAGE_BITS - 2))
->   /* Set if TLB entry is an IO callback.  */
->   #define TLB_MMIO            (1 << (TARGET_PAGE_BITS - 3))
-> +/* Set if TLB entry must have MMU lookup repeated for every access */
-> +#define TLB_RECHECK         (1 << (TARGET_PAGE_BITS - 4))
->   
->   /* Use this mask to check interception with an alignment mask
->    * in a TCG backend.
->    */
-> -#define TLB_FLAGS_MASK  (TLB_INVALID_MASK | TLB_NOTDIRTY | TLB_MMIO)
-> +#define TLB_FLAGS_MASK  (TLB_INVALID_MASK | TLB_NOTDIRTY | TLB_MMIO \
-> +                         | TLB_RECHECK)
->   
->   void dump_exec_info(FILE *f, fprintf_function cpu_fprintf);
->   void dump_opcount_info(FILE *f, fprintf_function cpu_fprintf);
-> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
-> index 0a721bb9c40..d893452295f 100644
-> --- a/accel/tcg/cputlb.c
-> +++ b/accel/tcg/cputlb.c
-> @@ -621,27 +621,42 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
->       target_ulong code_address;
->       uintptr_t addend;
->       CPUTLBEntry *te, *tv, tn;
-> -    hwaddr iotlb, xlat, sz;
-> +    hwaddr iotlb, xlat, sz, paddr_page;
-> +    target_ulong vaddr_page;
->       unsigned vidx = env->vtlb_index++ % CPU_VTLB_SIZE;
->       int asidx = cpu_asidx_from_attrs(cpu, attrs);
->   
->       assert_cpu_is_self(cpu);
-> -    assert(size >= TARGET_PAGE_SIZE);
-> -    if (size != TARGET_PAGE_SIZE) {
-> -        tlb_add_large_page(env, vaddr, size);
-> -    }
->   
-> -    sz = size;
-> -    section = address_space_translate_for_iotlb(cpu, asidx, paddr, &xlat, &sz,
-> -                                                attrs, &prot);
-> +    if (size < TARGET_PAGE_SIZE) {
-> +        sz = TARGET_PAGE_SIZE;
+>
+> v1 -> v2:
+> - restore mutex
+>
+> v1:
+> - only insert the new config if decode_cfg succeeds
+> - use smmu_get_sid for trace_* and store hits/misses in the SMMUDevice
+> - s/smmuv3_put_config/smmuv3_flush_config
+> - document smmuv3_get_config
+> - removing the mutex as BQL does the job
+> ---
+>  hw/arm/smmu-common.c         |  24 +++++++-
+>  hw/arm/smmuv3.c              | 135 +++++++++++++++++++++++++++++++++++++++++--
+>  hw/arm/trace-events          |   6 ++
+>  include/hw/arm/smmu-common.h |   5 ++
+>  include/hw/arm/smmuv3.h      |   1 +
+>  5 files changed, 164 insertions(+), 7 deletions(-)
+>
+> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+> index 01c7be8..264e096 100644
+> --- a/hw/arm/smmu-common.c
+> +++ b/hw/arm/smmu-common.c
+> @@ -310,6 +310,24 @@ static AddressSpace *smmu_find_add_as(PCIBus *bus, void *opaque, int devfn)
+>      return &sdev->as;
+>  }
+>
+> +IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
+> +{
+> +    uint8_t bus_n, devfn;
+> +    SMMUPciBus *smmu_bus;
+> +    SMMUDevice *smmu;
+> +
+> +    bus_n = PCI_BUS_NUM(sid);
+> +    smmu_bus = smmu_find_smmu_pcibus(s, bus_n);
+> +    if (smmu_bus) {
+> +        devfn = sid & 0x7;
+> +        smmu = smmu_bus->pbdev[devfn];
+> +        if (smmu) {
+> +            return &smmu->iommu;
+> +        }
+> +    }
+> +    return NULL;
+> +}
+> +
+>  static void smmu_base_realize(DeviceState *dev, Error **errp)
+>  {
+>      SMMUState *s = ARM_SMMU(dev);
+> @@ -321,7 +339,7 @@ static void smmu_base_realize(DeviceState *dev, Error **errp)
+>          error_propagate(errp, local_err);
+>          return;
+>      }
+> -
+> +    s->configs = g_hash_table_new_full(NULL, NULL, NULL, g_free);
+>      s->smmu_pcibus_by_busptr = g_hash_table_new(NULL, NULL);
+>
+>      if (s->primary_bus) {
+> @@ -333,7 +351,9 @@ static void smmu_base_realize(DeviceState *dev, Error **errp)
+>
+>  static void smmu_base_reset(DeviceState *dev)
+>  {
+> -    /* will be filled later on */
+> +    SMMUState *s = ARM_SMMU(dev);
+> +
+> +    g_hash_table_remove_all(s->configs);
+>  }
+>
+>  static Property smmu_dev_properties[] = {
+> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+> index 4e7833b..4c41f51 100644
+> --- a/hw/arm/smmuv3.c
+> +++ b/hw/arm/smmuv3.c
+> @@ -544,6 +544,58 @@ static int smmuv3_decode_config(IOMMUMemoryRegion *mr, SMMUTransCfg *cfg,
+>      return decode_cd(cfg, &cd, event);
+>  }
+>
+> +/**
+> + * smmuv3_get_config - Look up for a cached copy of configuration data for
+> + * @sdev and on cache miss performs a configuration structure decoding from
+> + * guest RAM.
+> + *
+> + * @sdev: SMMUDevice handle
+> + * @event: output event info
+> + *
+> + * The configuration cache contains data resulting from both STE and CD
+> + * decoding under the form of an SMMUTransCfg struct. The hash table is indexed
+> + * by the SMMUDevice handle.
+> + */
+> +static SMMUTransCfg *smmuv3_get_config(SMMUDevice *sdev, SMMUEventInfo *event)
+> +{
+> +    SMMUv3State *s = sdev->smmu;
+> +    SMMUState *bc = &s->smmu_state;
+> +    SMMUTransCfg *cfg;
+> +
+> +    cfg = g_hash_table_lookup(bc->configs, sdev);
+> +    if (cfg) {
+> +        sdev->cfg_cache_hits += 1;
+
+Increments are more usually written "++".
+
+> +        trace_smmuv3_config_cache_hit(smmu_get_sid(sdev),
+> +                            sdev->cfg_cache_hits, sdev->cfg_cache_misses,
+> +                            100 * sdev->cfg_cache_hits /
+> +                            (sdev->cfg_cache_hits + sdev->cfg_cache_misses));
 > +    } else {
-> +        if (size > TARGET_PAGE_SIZE) {
-> +            tlb_add_large_page(env, vaddr, size);
+> +        sdev->cfg_cache_misses += 1;
+
+Ditto.
+
+> +        trace_smmuv3_config_cache_miss(smmu_get_sid(sdev),
+> +                            sdev->cfg_cache_hits, sdev->cfg_cache_misses,
+> +                            100 * sdev->cfg_cache_hits /
+> +                            (sdev->cfg_cache_hits + sdev->cfg_cache_misses));
+> +        cfg = g_new0(SMMUTransCfg, 1);
+> +
+> +        if (!smmuv3_decode_config(&sdev->iommu, cfg, event)) {
+> +            g_hash_table_insert(bc->configs, sdev, cfg);
+> +        } else {
+> +            g_free(cfg);
+> +            cfg = NULL;
 > +        }
-> +        sz = size;
 > +    }
-> +    vaddr_page = vaddr & TARGET_PAGE_MASK;
-> +    paddr_page = paddr & TARGET_PAGE_MASK;
+> +    return cfg;
+> +}
 > +
-> +    section = address_space_translate_for_iotlb(cpu, asidx, paddr_page,
-> +                                                &xlat, &sz, attrs, &prot);
->       assert(sz >= TARGET_PAGE_SIZE);
->   
->       tlb_debug("vaddr=" TARGET_FMT_lx " paddr=0x" TARGET_FMT_plx
->                 " prot=%x idx=%d\n",
->                 vaddr, paddr, prot, mmu_idx);
->   
-> -    address = vaddr;
-> -    if (!memory_region_is_ram(section->mr) && !memory_region_is_romd(section->mr)) {
-> +    address = vaddr_page;
-> +    if (size < TARGET_PAGE_SIZE) {
-> +        /*
-> +         * Slow-path the TLB entries; we will repeat the MMU check and TLB
-> +         * fill on every access.
-> +         */
-> +        address |= TLB_RECHECK;
-> +    }
-> +    if (!memory_region_is_ram(section->mr) &&
-> +        !memory_region_is_romd(section->mr)) {
->           /* IO memory case */
->           address |= TLB_MMIO;
->           addend = 0;
-> @@ -651,10 +666,10 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
->       }
->   
->       code_address = address;
-> -    iotlb = memory_region_section_get_iotlb(cpu, section, vaddr, paddr, xlat,
-> -                                            prot, &address);
-> +    iotlb = memory_region_section_get_iotlb(cpu, section, vaddr_page,
-> +                                            paddr_page, xlat, prot, &address);
->   
-> -    index = (vaddr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-> +    index = (vaddr_page >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
->       te = &env->tlb_table[mmu_idx][index];
->       /* do not discard the translation in te, evict it into a victim tlb */
->       tv = &env->tlb_v_table[mmu_idx][vidx];
-> @@ -670,18 +685,18 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
->        * TARGET_PAGE_BITS, and either
->        *  + the ram_addr_t of the page base of the target RAM (if NOTDIRTY or ROM)
->        *  + the offset within section->mr of the page base (otherwise)
-> -     * We subtract the vaddr (which is page aligned and thus won't
-> +     * We subtract the vaddr_page (which is page aligned and thus won't
->        * disturb the low bits) to give an offset which can be added to the
->        * (non-page-aligned) vaddr of the eventual memory access to get
->        * the MemoryRegion offset for the access. Note that the vaddr we
->        * subtract here is that of the page base, and not the same as the
->        * vaddr we add back in io_readx()/io_writex()/get_page_addr_code().
->        */
-> -    env->iotlb[mmu_idx][index].addr = iotlb - vaddr;
-> +    env->iotlb[mmu_idx][index].addr = iotlb - vaddr_page;
->       env->iotlb[mmu_idx][index].attrs = attrs;
->   
->       /* Now calculate the new entry */
-> -    tn.addend = addend - vaddr;
-> +    tn.addend = addend - vaddr_page;
->       if (prot & PAGE_READ) {
->           tn.addr_read = address;
->       } else {
-> @@ -702,7 +717,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
->               tn.addr_write = address | TLB_MMIO;
->           } else if (memory_region_is_ram(section->mr)
->                      && cpu_physical_memory_is_clean(
-> -                        memory_region_get_ram_addr(section->mr) + xlat)) {
-> +                       memory_region_get_ram_addr(section->mr) + xlat)) {
->               tn.addr_write = address | TLB_NOTDIRTY;
->           } else {
->               tn.addr_write = address;
-> @@ -775,7 +790,8 @@ static inline ram_addr_t qemu_ram_addr_from_host_nofail(void *ptr)
->   
->   static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->                            int mmu_idx,
-> -                         target_ulong addr, uintptr_t retaddr, int size)
-> +                         target_ulong addr, uintptr_t retaddr,
-> +                         bool recheck, int size)
->   {
->       CPUState *cpu = ENV_GET_CPU(env);
->       hwaddr mr_offset;
-> @@ -785,6 +801,29 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->       bool locked = false;
->       MemTxResult r;
->   
-> +    if (recheck) {
-> +        /*
-> +         * This is a TLB_RECHECK access, where the MMU protection
-> +         * covers a smaller range than a target page, and we must
-> +         * repeat the MMU check here. This tlb_fill() call might
-> +         * longjump out if this access should cause a guest exception.
-> +         */
-> +        int index;
-> +        target_ulong tlb_addr;
+> +static void smmuv3_flush_config(SMMUDevice *sdev)
+> +{
+> +    SMMUv3State *s = sdev->smmu;
+> +    SMMUState *bc = &s->smmu_state;
 > +
-> +        tlb_fill(cpu, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
+> +    trace_smmuv3_config_cache_inv(smmu_get_sid(sdev));
+> +    g_hash_table_remove(bc->configs, sdev);
+> +}
 > +
-> +        index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-> +        tlb_addr = env->tlb_table[mmu_idx][index].addr_read;
-> +        if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
-> +            /* RAM access */
-> +            uintptr_t haddr = addr + env->tlb_table[mmu_idx][index].addend;
+>  static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+>                                        IOMMUAccessFlags flag)
+>  {
+> @@ -553,7 +605,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+>      SMMUEventInfo event = {.type = SMMU_EVT_NONE, .sid = sid};
+>      SMMUPTWEventInfo ptw_info = {};
+>      SMMUTranslationStatus status;
+> -    SMMUTransCfg cfg = {};
+> +    SMMUTransCfg *cfg = NULL;
+>      IOMMUTLBEntry entry = {
+>          .target_as = &address_space_memory,
+>          .iova = addr,
+> @@ -562,27 +614,30 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+>          .perm = IOMMU_NONE,
+>      };
+>
+> +    qemu_mutex_lock(&s->mutex);
 > +
-> +            return ldn_p((void *)haddr, size);
+>      if (!smmu_enabled(s)) {
+>          status = SMMU_TRANS_DISABLE;
+>          goto epilogue;
+>      }
+>
+> -    if (smmuv3_decode_config(mr, &cfg, &event)) {
+> +    cfg = smmuv3_get_config(sdev, &event);
+> +    if (!cfg) {
+>          status = SMMU_TRANS_ERROR;
+>          goto epilogue;
+>      }
+>
+> -    if (cfg.aborted) {
+> +    if (cfg->aborted) {
+>          status = SMMU_TRANS_ABORT;
+>          goto epilogue;
+>      }
+>
+> -    if (cfg.bypassed) {
+> +    if (cfg->bypassed) {
+>          status = SMMU_TRANS_BYPASS;
+>          goto epilogue;
+>      }
+>
+> -    if (smmu_ptw(&cfg, addr, flag, &entry, &ptw_info)) {
+> +    if (smmu_ptw(cfg, addr, flag, &entry, &ptw_info)) {
+>          switch (ptw_info.type) {
+>          case SMMU_PTW_ERR_WALK_EABT:
+>              event.type = SMMU_EVT_F_WALK_EABT;
+> @@ -628,6 +683,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+>      }
+>
+>  epilogue:
+> +    qemu_mutex_unlock(&s->mutex);
+>      switch (status) {
+>      case SMMU_TRANS_SUCCESS:
+>          entry.perm = flag;
+> @@ -664,6 +720,7 @@ epilogue:
+>
+>  static int smmuv3_cmdq_consume(SMMUv3State *s)
+>  {
+> +    SMMUState *bs = ARM_SMMU(s);
+>      SMMUCmdError cmd_error = SMMU_CERROR_NONE;
+>      SMMUQueue *q = &s->cmdq;
+>      SMMUCommandType type = 0;
+> @@ -698,6 +755,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
+>
+>          trace_smmuv3_cmdq_opcode(smmu_cmd_string(type));
+>
+> +        qemu_mutex_lock(&s->mutex);
+>          switch (type) {
+>          case SMMU_CMD_SYNC:
+>              if (CMD_SYNC_CS(&cmd) & CMD_SYNC_SIG_IRQ) {
+> @@ -706,10 +764,74 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
+>              break;
+>          case SMMU_CMD_PREFETCH_CONFIG:
+>          case SMMU_CMD_PREFETCH_ADDR:
+> +            break;
+>          case SMMU_CMD_CFGI_STE:
+> +        {
+> +            uint32_t sid = CMD_SID(&cmd);
+> +            IOMMUMemoryRegion *mr = smmu_iommu_mr(bs, sid);
+> +            SMMUDevice *sdev;
+> +
+> +            if (CMD_SSEC(&cmd)) {
+> +                cmd_error = SMMU_CERROR_ILL;
+> +                break;
+> +            }
+> +
+> +            if (!mr) {
+> +                break;
+> +            }
+> +
+> +            trace_smmuv3_cmdq_cfgi_ste(sid);
+> +            sdev = container_of(mr, SMMUDevice, iommu);
+> +            smmuv3_flush_config(sdev);
+> +
+> +            break;
 > +        }
-> +        /* Fall through for handling IO accesses */
-> +    }
+>          case SMMU_CMD_CFGI_STE_RANGE: /* same as SMMU_CMD_CFGI_ALL */
+
+Comment says these two commands are the same, but their implementation
+is different?
+
+> +        {
+> +            uint32_t start = CMD_SID(&cmd), end, i;
+> +            uint8_t range = CMD_STE_RANGE(&cmd);
 > +
->       section = iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attrs);
->       mr = section->mr;
->       mr_offset = (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
-> @@ -819,7 +858,7 @@ static uint64_t io_readx(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->   static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->                         int mmu_idx,
->                         uint64_t val, target_ulong addr,
-> -                      uintptr_t retaddr, int size)
-> +                      uintptr_t retaddr, bool recheck, int size)
->   {
->       CPUState *cpu = ENV_GET_CPU(env);
->       hwaddr mr_offset;
-> @@ -828,6 +867,30 @@ static void io_writex(CPUArchState *env, CPUIOTLBEntry *iotlbentry,
->       bool locked = false;
->       MemTxResult r;
->   
-> +    if (recheck) {
-> +        /*
-> +         * This is a TLB_RECHECK access, where the MMU protection
-> +         * covers a smaller range than a target page, and we must
-> +         * repeat the MMU check here. This tlb_fill() call might
-> +         * longjump out if this access should cause a guest exception.
-> +         */
-> +        int index;
-> +        target_ulong tlb_addr;
+> +            if (CMD_SSEC(&cmd)) {
+> +                cmd_error = SMMU_CERROR_ILL;
+> +                break;
+> +            }
 > +
-> +        tlb_fill(cpu, addr, size, MMU_DATA_STORE, mmu_idx, retaddr);
+> +            end = start + (1 << (range + 1)) - 1;
+> +            trace_smmuv3_cmdq_cfgi_ste_range(start, end);
 > +
-> +        index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-> +        tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
-> +        if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
-> +            /* RAM access */
-> +            uintptr_t haddr = addr + env->tlb_table[mmu_idx][index].addend;
+> +            for (i = start; i <= end; i++) {
+> +                IOMMUMemoryRegion *mr = smmu_iommu_mr(bs, i);
+> +                SMMUDevice *sdev;
 > +
-> +            stn_p((void *)haddr, size, val);
-> +            return;
+> +                if (!mr) {
+> +                    continue;
+> +                }
+> +                sdev = container_of(mr, SMMUDevice, iommu);
+> +                smmuv3_flush_config(sdev);
+> +            }
+> +            break;
 > +        }
-> +        /* Fall through for handling IO accesses */
-> +    }
+>          case SMMU_CMD_CFGI_CD:
+>          case SMMU_CMD_CFGI_CD_ALL:
+> +        {
+> +            uint32_t sid = CMD_SID(&cmd);
+> +            IOMMUMemoryRegion *mr = smmu_iommu_mr(bs, sid);
+> +            SMMUDevice *sdev;
 > +
->       section = iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attrs);
->       mr = section->mr;
->       mr_offset = (iotlbentry->addr & TARGET_PAGE_MASK) + addr;
-> @@ -911,6 +974,32 @@ tb_page_addr_t get_page_addr_code(CPUArchState *env, target_ulong addr)
->               tlb_fill(ENV_GET_CPU(env), addr, 0, MMU_INST_FETCH, mmu_idx, 0);
->           }
->       }
+> +            if (CMD_SSEC(&cmd)) {
+> +                cmd_error = SMMU_CERROR_ILL;
+> +                break;
+> +            }
 > +
-> +    if (unlikely(env->tlb_table[mmu_idx][index].addr_code & TLB_RECHECK)) {
-> +        /*
-> +         * This is a TLB_RECHECK access, where the MMU protection
-> +         * covers a smaller range than a target page, and we must
-> +         * repeat the MMU check here. This tlb_fill() call might
-> +         * longjump out if this access should cause a guest exception.
-> +         */
-> +        int index;
-> +        target_ulong tlb_addr;
+> +            if (!mr) {
+> +                break;
+> +            }
 > +
-> +        tlb_fill(cpu, addr, 0, MMU_INST_FETCH, mmu_idx, 0);
-> +
-> +        index = (addr >> TARGET_PAGE_BITS) & (CPU_TLB_SIZE - 1);
-> +        tlb_addr = env->tlb_table[mmu_idx][index].addr_code;
-> +        if (!(tlb_addr & ~(TARGET_PAGE_MASK | TLB_RECHECK))) {
-> +            /* RAM access. We can't handle this, so for now just stop */
-> +            cpu_abort(cpu, "Unable to handle guest executing from RAM within "
-> +                      "a small MPU region at 0x" TARGET_FMT_lx, addr);
+> +            trace_smmuv3_cmdq_cfgi_cd(sid);
+> +            sdev = container_of(mr, SMMUDevice, iommu);
+> +            smmuv3_flush_config(sdev);
+> +            break;
 > +        }
-> +        /*
-> +         * Fall through to handle IO accesses (which will almost certainly
-> +         * also result in failure)
-> +         */
-> +    }
+>          case SMMU_CMD_TLBI_NH_ALL:
+>          case SMMU_CMD_TLBI_NH_ASID:
+>          case SMMU_CMD_TLBI_NH_VA:
+> @@ -735,6 +857,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
+>                            "Illegal command type: %d\n", CMD_TYPE(&cmd));
+>              break;
+>          }
+> +        qemu_mutex_unlock(&s->mutex);
+>          if (cmd_error) {
+>              break;
+>          }
+> @@ -1114,6 +1237,8 @@ static void smmu_realize(DeviceState *d, Error **errp)
+>          return;
+>      }
+>
+> +    qemu_mutex_init(&s->mutex);
 > +
->       iotlbentry = &env->iotlb[mmu_idx][index];
->       section = iotlb_to_section(cpu, iotlbentry->addr, iotlbentry->attrs);
->       mr = section->mr;
-> @@ -1019,8 +1108,8 @@ static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
->           tlb_addr = tlbe->addr_write & ~TLB_INVALID_MASK;
->       }
->   
-> -    /* Notice an IO access  */
-> -    if (unlikely(tlb_addr & TLB_MMIO)) {
-> +    /* Notice an IO access or a needs-MMU-lookup access */
-> +    if (unlikely(tlb_addr & (TLB_MMIO | TLB_RECHECK))) {
->           /* There's really nothing that can be done to
->              support this apart from stop-the-world.  */
->           goto stop_the_world;
+>      memory_region_init_io(&sys->iomem, OBJECT(s),
+>                            &smmu_mem_ops, sys, TYPE_ARM_SMMUV3, 0x20000);
+>
+> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+> index 0ab66bb..5bddfeb 100644
+> --- a/hw/arm/trace-events
+> +++ b/hw/arm/trace-events
+> @@ -40,3 +40,9 @@ smmuv3_translate_success(const char *n, uint16_t sid, uint64_t iova, uint64_t tr
+>  smmuv3_get_cd(uint64_t addr) "CD addr: 0x%"PRIx64
+>  smmuv3_decode_cd(uint32_t oas) "oas=%d"
+>  smmuv3_decode_cd_tt(int i, uint32_t tsz, uint64_t ttb, uint32_t granule_sz) "TT[%d]:tsz:%d ttb:0x%"PRIx64" granule_sz:%d"
+> +smmuv3_cmdq_cfgi_ste(int streamid) "     |_ streamid =%d"
+> +smmuv3_cmdq_cfgi_ste_range(int start, int end) "     |_ start=0x%d - end=0x%d"
+> +smmuv3_cmdq_cfgi_cd(uint32_t sid) "     |_ streamid = %d"
 
-This patch is very interesting as forcing the slow path is something 
-required to implement the sun4u MMU IE (invert endian) bit - for some 
-background see Richard's email at 
-https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg02835.html.
+What are the underscores in the trace strings for ?
 
-Presumably there is nothing here that would prevent the slow path being 
-used outside of TLB_RECHECK?
+> +smmuv3_config_cache_hit(uint32_t sid, uint32_t hits, uint32_t misses, float perc) "Config cache HIT for sid %d (hits=%d, misses=%d, hit rate=%.1f)"
+> +smmuv3_config_cache_miss(uint32_t sid, uint32_t hits, uint32_t misses, float perc) "Config cache MISS for sid %d (hits=%d, misses=%d, hit rate=%.1f)"
 
+Does our tracing infrastructure really support floats? There
+is no other use of it in the tree. There is one instance of
+'double', though, so maybe we do.
 
-ATB,
+In general I think we should prefer 'double' over 'float' anyway,
+though.
 
-Mark.
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
