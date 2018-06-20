@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fVigX-0005P5-3x
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 15:22:30 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fVirX-0007vV-AG
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 15:33:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fVigT-0000RT-VF
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 15:22:29 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fVirS-00065E-7D
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 15:33:51 -0400
 Sender: Richard Henderson <rth7680@gmail.com>
-References: <20180620130619.11362-1-peter.maydell@linaro.org>
+References: <20180620100825.22476-1-david@redhat.com>
+	<20180620100825.22476-4-david@redhat.com>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <a5c5975a-0860-01d4-8ff9-b69fcc91dac8@twiddle.net>
-Date: Wed, 20 Jun 2018 09:22:20 -1000
+Message-ID: <9b002cf5-a752-9b4d-1ef5-3bb0fbd62b7d@twiddle.net>
+Date: Wed, 20 Jun 2018 09:33:40 -1000
 MIME-Version: 1.0
-In-Reply-To: <20180620130619.11362-1-peter.maydell@linaro.org>
+In-Reply-To: <20180620100825.22476-4-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/3] Support M-profile MPU regions smaller
- than 1K
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] s390x/tcg: properly implement the
+ TOD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +26,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On 06/20/2018 03:06 AM, Peter Maydell wrote:
-> The Arm M-profile MPU allows the guest to specify access
-> permissions at a very fine granularity (down to a 32-byte
-> alignment for region start and and addresses). Currently
-> we insist that regions are page-aligned because the core
-> TCG code can't handle anything else.
-> 
-> This patchset relaxes that restriction, so that we can handle
-> small MPU regions for reading and writing (but not yet for
-> execution). It does that by  marking the TLB entry for any
-> page which includes a small region with a flag TLB_RECHECK.
-> This flag causes us to always take the slow-path for accesses.
-> In the slow path we can then special case them to always call
-> tlb_fill() again, so we have the correct information for the
-> exact address being accessed.
-> 
-> Patch 1 adds support to the accel/tcg code. Patch 2 then
-> enables using it for the PMSAv7 (v7M) MPU, and patch 3
-> does the same for the PMSAv8 (v8M) MPU and SAU.
-> Because we don't yet support execution from small regions,
-> the PMSA code has some corner cases where it retains the
-> previous behaviour so we don't break previously-working
-> guests:
->  * if the MPU region is small, we don't mark it PROT_EXEC
->    even if the guest asked for it (so execution will cause
->    an MPU exception)
->  * we ignore the fact that the SAU region might be smaller
->    than a page
-> 
-> (Unfortunately the old code *intended* to make small-region
-> accesses non-executable but due to bugs didn't actually
-> succeed in doing that, so this might possibly cause some
-> previously working-by-accident code to break.)
->  
-> I would ideally in future like to add execution support, but
-> this is somewhat tricky. My rough sketch for it looks like:
->  * get_page_addr_code() should return -1 for "not actually
->    a full page of RAM" (deleting all the current tricky code
->    for trying to handle it being a memory region or unmapped)
->  * its callsites in the TB hashtable lookup code should handle
->    -1 by returning "no TB found"
->  * the weird call to get_page_addr_code() in the xtensa itlb_hit_test
->    helper should be replaced by a call to tlb_fill() or some
->    xtensa-internal function (I think all it is trying to do is
->    cause the exceptions for MMU faults)
->  * tb_gen_code() should in this case generate a one-instruction
->    TB and tell its caller not to cache it
->  * the translate.c code for targets that need this probably needs
->    fixing up to make sure it can handle the case of "the load
->    code byte/word/etc functions might return failure or cause
->    an exception"
-> 
-> This would also have the advantage that it naturally allows
-> you to execute (slowly) from any MMIO region, and we could drop
-> the broken request-mmio-pointer machinery.
-> 
-> In any case that is too much for 3.0, I think; I'd like to get this
-> R/W small-region code into 3.0, though.
-> 
-> thanks
-> -- PMM
-> 
-> Peter Maydell (3):
->   tcg: Support MMU protection regions smaller than TARGET_PAGE_SIZE
->   target/arm: Set page (region) size in get_phys_addr_pmsav7()
->   target/arm: Handle small regions in get_phys_addr_pmsav8()
+On 06/20/2018 12:08 AM, David Hildenbrand wrote:
+> +/* Converts ns to s390's clock format */
+> +static inline uint64_t time2tod(uint64_t ns)
+> +{
+> +    return (ns << 9) / 125;
+> +}
+> +
+> +/* Converts s390's clock format to ns */
+> +static inline uint64_t tod2time(uint64_t t)
+> +{
+> +    return (t * 125) >> 9;
+> +}
 
-Whole series:
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-I assume you'll take this all via target-arm.next?
+How many significant bits on input here?
+Do you in fact want to be using muldiv64?
 
 
 r~
