@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVjk8-00031a-7Q
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:30:20 -0400
+	(envelope-from <david@redhat.com>) id 1fVjmz-00040T-AF
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:33:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVjk5-0005Pv-2t
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:30:16 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:44820)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVjk4-0005Pn-UM
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:30:13 -0400
-Received: by mail-qt0-x241.google.com with SMTP id x5-v6so155399qte.11
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 13:30:12 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180620132032.12952-1-alex.bennee@linaro.org>
-	<20180620132032.12952-4-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6fc68471-a891-e2bf-7573-ac41a7a1862c@amsat.org>
-Date: Wed, 20 Jun 2018 17:30:08 -0300
+	(envelope-from <david@redhat.com>) id 1fVjmw-00072A-0z
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:33:13 -0400
+References: <20180620100825.22476-1-david@redhat.com>
+	<20180620100825.22476-4-david@redhat.com>
+	<9b002cf5-a752-9b4d-1ef5-3bb0fbd62b7d@twiddle.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <892b57f3-7418-8dd2-ec4b-6c24c11e5585@redhat.com>
+Date: Wed, 20 Jun 2018 22:33:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180620132032.12952-4-alex.bennee@linaro.org>
+In-Reply-To: <9b002cf5-a752-9b4d-1ef5-3bb0fbd62b7d@twiddle.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH 3/5] .travis.yml: add gcovr summary for
- GCOV build
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] s390x/tcg: properly implement the
+ TOD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org
+To: Richard Henderson <rth@twiddle.net>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On 06/20/2018 10:20 AM, Alex Bennée wrote:
-> This gives a more useful summary, sorted by descending % coverage,
-> after the tests have run. The final numbers will give an idea if our
-> coverage is getting better or worse.
-> 
-> As quite a lot of lines don't get covered at all we filter out all the
-> 0% lines. If the file doesn't appear it is not being exercised.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  .travis.yml | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/.travis.yml b/.travis.yml
-> index fabfe9ec34..83e0577464 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -38,6 +38,7 @@ addons:
->        - libvte-2.90-dev
->        - sparse
->        - uuid-dev
-> +      - gcovr
->  
->  # The channel name "irc.oftc.net#qemu" is encrypted against qemu/qemu
->  # to prevent IRC notifications from forks. This was created using:
-> @@ -81,6 +82,8 @@ matrix:
->        compiler: clang
->      # gprof/gcov are GCC features
->      - env: CONFIG="--enable-gprof --enable-gcov --disable-pie --target-list=aarch64-softmmu,arm-softmmu,i386-softmmu,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-softmmu,x86_64-softmmu"
-> +      after_success:
-> +        - gcovr -p  | grep -v "0%" | sed s/[0-9]\*[,-]//g
+On 20.06.2018 21:33, Richard Henderson wrote:
+> On 06/20/2018 12:08 AM, David Hildenbrand wrote:
+>> +/* Converts ns to s390's clock format */
+>> +static inline uint64_t time2tod(uint64_t ns)
+>> +{
+>> +    return (ns << 9) / 125;
+>> +}
+>> +
+>> +/* Converts s390's clock format to ns */
+>> +static inline uint64_t tod2time(uint64_t t)
+>> +{
+>> +    return (t * 125) >> 9;
+>> +}
+>=20
 
-Can we use 'fgrep -B 1 -v "0%"' (--before-context=1) to also remove the
-filepath line?
+In this patch I'm only moving the code. If we find this is a problem,
+this should go into a separate patch.
 
-Any idea why I get this? "(WARNING) Unrecognized GCOV output: '====='"
+> How many significant bits on input here?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Basically all are significant, and as it is a clock, we will reach these
+bits at one point.
 
->        compiler: gcc
->      # We manually include builds which we disable "make check" for
->      - env: CONFIG="--enable-debug --enable-tcg-interpreter"
-> 
+> Do you in fact want to be using muldiv64?
+
+Looking at linux:
+
+arch/s390/include/asm/timex.h
+
+They have a lengthy documentation, resulting in (a spli to avoid overflow=
+s)
+
+return ((todval >> 9) * 125) + (((todval & 0x1ff) * 125) >> 9);
+
+Maybe we should do the same?
+
+>=20
+>=20
+> r~
+>=20
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
