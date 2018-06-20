@@ -1,15 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fVcol-0003Mp-2H
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:06:40 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fVcq0-0004Qt-T0
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:07:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fVcok-00052r-1r
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:06:35 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Jun 2018 14:06:16 +0100
-Message-Id: <20180620130619.11362-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/3] Support M-profile MPU regions smaller than
- 1K
+	(envelope-from <eric.auger@redhat.com>) id 1fVcpz-0005gM-Qe
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:07:52 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Wed, 20 Jun 2018 15:07:27 +0200
+Message-Id: <1529500053-21704-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC 0/6] KVM/ARM: Dynamic and larger GPA size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,80 +17,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
+Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com, suzuki.poulose@arm.com
 
-The Arm M-profile MPU allows the guest to specify access
-permissions at a very fine granularity (down to a 32-byte
-alignment for region start and and addresses). Currently
-we insist that regions are page-aligned because the core
-TCG code can't handle anything else.
+At the moment the guest physical address space is limited to 40b
+due to KVM limitations. [1] bumps this limitation and allows to
+create a VM with up to 52b GPA address space.
 
-This patchset relaxes that restriction, so that we can handle
-small MPU regions for reading and writing (but not yet for
-execution). It does that by  marking the TLB entry for any
-page which includes a small region with a flag TLB_RECHECK.
-This flag causes us to always take the slow-path for accesses.
-In the slow path we can then special case them to always call
-tlb_fill() again, so we have the correct information for the
-exact address being accessed.
+With this series, QEMU creates a virt VM with the max IPA range
+reported by the host kernel or 40b by default.
 
-Patch 1 adds support to the accel/tcg code. Patch 2 then
-enables using it for the PMSAv7 (v7M) MPU, and patch 3
-does the same for the PMSAv8 (v8M) MPU and SAU.
-Because we don't yet support execution from small regions,
-the PMSA code has some corner cases where it retains the
-previous behaviour so we don't break previously-working
-guests:
- * if the MPU region is small, we don't mark it PROT_EXEC
-   even if the guest asked for it (so execution will cause
-   an MPU exception)
- * we ignore the fact that the SAU region might be smaller
-   than a page
+This choice can be overriden by using the -machine kvm-type=<bits>
+option with bits within [40, 52]. If <bits> are not supported by
+the host, the legacy 40b value is used.
 
-(Unfortunately the old code *intended* to make small-region
-accesses non-executable but due to bugs didn't actually
-succeed in doing that, so this might possibly cause some
-previously working-by-accident code to break.)
- 
-I would ideally in future like to add execution support, but
-this is somewhat tricky. My rough sketch for it looks like:
- * get_page_addr_code() should return -1 for "not actually
-   a full page of RAM" (deleting all the current tricky code
-   for trying to handle it being a memory region or unmapped)
- * its callsites in the TB hashtable lookup code should handle
-   -1 by returning "no TB found"
- * the weird call to get_page_addr_code() in the xtensa itlb_hit_test
-   helper should be replaced by a call to tlb_fill() or some
-   xtensa-internal function (I think all it is trying to do is
-   cause the exceptions for MMU faults)
- * tb_gen_code() should in this case generate a one-instruction
-   TB and tell its caller not to cache it
- * the translate.c code for targets that need this probably needs
-   fixing up to make sure it can handle the case of "the load
-   code byte/word/etc functions might return failure or cause
-   an exception"
+It is an RFC as [1] is not upstream. This is not material for
+QEMU 3.0 due to the kernel dependency. Also the EDK2 FW has a
+fixed limit at 40b PA. Note at the moment there is no device or
+RAM laid out after 1TB (40b) in virt machine model address space.
+This will be addressed in a separate series.
 
-This would also have the advantage that it naturally allows
-you to execute (slowly) from any MMIO region, and we could drop
-the broken request-mmio-pointer machinery.
+Best Regards
 
-In any case that is too much for 3.0, I think; I'd like to get this
-R/W small-region code into 3.0, though.
+Eric
 
-thanks
--- PMM
+kernel dependency:
+[1] [PATCH v2 00/17] kvm: arm64: Dynamic & 52bit IPA support
+https://lkml.org/lkml/2018/3/27/437
+For testing, use my kernel branch:
+https://github.com/eauger/linux/tree/4.16.0-rc3-Suzuki-52b-IPA-v2
 
-Peter Maydell (3):
-  tcg: Support MMU protection regions smaller than TARGET_PAGE_SIZE
-  target/arm: Set page (region) size in get_phys_addr_pmsav7()
-  target/arm: Handle small regions in get_phys_addr_pmsav8()
+This QEMU series can be found at:
+https://github.com/eauger/qemu/tree/v2.12.0-ipa-rfc
 
- accel/tcg/softmmu_template.h |  24 ++++---
- include/exec/cpu-all.h       |   5 +-
- accel/tcg/cputlb.c           | 131 +++++++++++++++++++++++++++++------
- target/arm/helper.c          | 115 +++++++++++++++++++++---------
- 4 files changed, 211 insertions(+), 64 deletions(-)
+Tests:
+- On Cavium Gigabyte, a 48b VM was created.
+- Migration tests were performed between kernel supporting the
+  feature and destination kernel not suporting it
+
+Eric Auger (6):
+  linux-headers: Partial update for KVM/ARM
+    KVM_ARM_GET_MAX_VM_PHYS_SHIFT
+  hw/boards: Add a MachineState parameter to kvm_type callback
+  kvm: add kvm_get_max_vm_phys_shift
+  hw/arm/virt: Add virt-3.0 machine type
+  hw/arm/virt: support kvm_type property
+  hw/arm/virt: handle max_vm_phys_shift conflicts on migration
+
+ accel/kvm/kvm-all.c           |   9 +++-
+ accel/stubs/kvm-stub.c        |   5 +++
+ hw/arm/virt.c                 | 102 +++++++++++++++++++++++++++++++++++++++---
+ hw/ppc/mac_newworld.c         |   2 +-
+ hw/ppc/mac_oldworld.c         |   2 +-
+ hw/ppc/spapr.c                |   2 +-
+ include/hw/arm/virt.h         |   3 ++
+ include/hw/boards.h           |   2 +-
+ include/sysemu/kvm.h          |   1 +
+ linux-headers/asm-arm/kvm.h   |  15 -------
+ linux-headers/asm-arm64/kvm.h |   6 ---
+ linux-headers/linux/kvm.h     |   6 +++
+ 12 files changed, 124 insertions(+), 31 deletions(-)
 
 -- 
-2.17.1
+2.5.5
