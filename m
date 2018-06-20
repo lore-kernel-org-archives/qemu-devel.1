@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fVfdw-0003LA-Nk
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 12:07:37 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fVfeO-0003ie-2Z
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 12:08:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fVfdv-0000cM-NH
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 12:07:36 -0400
-References: <20180620152713.27309-1-vsementsov@virtuozzo.com>
-	<f3fd65c1-fd8b-1a68-3437-9eb12d0ae25f@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <48cfe0a2-734b-0b4c-a309-77354690475e@redhat.com>
-Date: Wed, 20 Jun 2018 12:07:29 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fVfeM-0000lg-Tk
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 12:08:04 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:34484)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fVfeM-0000lJ-ML
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 12:08:02 -0400
+Received: by mail-ot0-x241.google.com with SMTP id r18-v6so130584otk.1
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 09:08:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <f3fd65c1-fd8b-1a68-3437-9eb12d0ae25f@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] qapi: drop x- from
- x-block-latency-histogram-set
+In-Reply-To: <1528790908-23441-4-git-send-email-eric.auger@redhat.com>
+References: <1528790908-23441-1-git-send-email-eric.auger@redhat.com>
+	<1528790908-23441-4-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 Jun 2018 17:07:41 +0100
+Message-ID: <CAFEAcA-EpZ6uzLmjr_1w9nno6C5-tyvqU9MfWR8XZwup4hKKDA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] hw/arm/smmuv3: IOTLB emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,71 +29,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com, nshirokovskiy@virtuozzo.com, den@openvz.org
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, jia.he@hxt-semitech.com, Jia He <hejianet@gmail.com>
+
+On 12 June 2018 at 09:08, Eric Auger <eric.auger@redhat.com> wrote:
+> We emulate a TLB cache of size SMMU_IOTLB_MAX_SIZE=256.
+> It is implemented as a hash table whose key is a combination
+> of the 16b asid and 48b IOVA (Jenkins hash).
+>
+> Entries are invalidated on TLB invalidation commands, either
+> globally, or per asid, or per asid/iova.
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>
+> ---
+>
+> v1 -> v2:
+> - add comment about Jenkins Hash
+> - remove init of iotlb_hits, misses
+>
+> v1:
+> - Add new trace point when smmu is bypassed
+> - s/iotlb_miss/iotlb_misses, s/iotlb_hit/iotlb_hits
+> - use SMMUIOTLBKey as a key
+>
+> Credit to Tomasz Nowicki who did the first implementation of
+> this IOTLB implementation, inspired of intel_iommu implementation.
+> ---
+>  hw/arm/smmu-common.c         | 60 +++++++++++++++++++++++++++
+>  hw/arm/smmuv3.c              | 98 ++++++++++++++++++++++++++++++++++++++++++--
+>  hw/arm/trace-events          |  9 ++++
+>  include/hw/arm/smmu-common.h | 13 ++++++
+>  4 files changed, 176 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+> index 264e096..16cd33a 100644
+> --- a/hw/arm/smmu-common.c
+> +++ b/hw/arm/smmu-common.c
+> @@ -24,11 +24,43 @@
+>  #include "qom/cpu.h"
+>  #include "hw/qdev-properties.h"
+>  #include "qapi/error.h"
+> +#include "qemu/jhash.h"
+>
+>  #include "qemu/error-report.h"
+>  #include "hw/arm/smmu-common.h"
+>  #include "smmu-internal.h"
+>
+> +/* IOTLB Management */
+> +
+> +inline void smmu_iotlb_inv_all(SMMUState *s)
+> +{
+> +    trace_smmu_iotlb_inv_all();
+> +    g_hash_table_remove_all(s->iotlb);
+> +}
+> +
+> +static gboolean smmu_hash_remove_by_asid(gpointer key, gpointer value,
+> +                                         gpointer user_data)
+> +{
+> +    uint16_t asid = *(uint16_t *)user_data;
+> +    SMMUIOTLBKey *iotlb_key = (SMMUIOTLBKey *)key;
+> +
+> +    return iotlb_key->asid == asid;
+> +}
+> +
+> +inline void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova)
+> +{
+> +    SMMUIOTLBKey key = {.asid = asid, .iova = iova};
+> +
+> +    trace_smmu_iotlb_inv_iova(asid, iova);
+> +    g_hash_table_remove(s->iotlb, &key);
+> +}
+> +
+> +inline void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid)
+> +{
+> +    trace_smmu_iotlb_inv_asid(asid);
+> +    g_hash_table_foreach_remove(s->iotlb, smmu_hash_remove_by_asid, &asid);
+> +}
+> +
+>  /* VMSAv8-64 Translation */
+>
+>  /**
+> @@ -328,6 +360,31 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
+>      return NULL;
+>  }
+>
+> +static guint smmu_iotlb_key_hash(gconstpointer v)
+> +{
+> +    SMMUIOTLBKey *key = (SMMUIOTLBKey *)v;
+> +    uint32_t a, b, c;
+> +
+> +    /* Henkins hash */
+
+"Jenkins"
+
+> +    a = b = c = JHASH_INITVAL + sizeof(*key);
+
+Why do we add the sizeof(SMMUIOTLBKey) here ?
+
+> +    a += key->asid;
+> +    b += extract64(key->iova, 0, 32);
+> +    c += extract64(key->iova, 32, 32);
+> +
+> +    __jhash_mix(a, b, c);
+> +    __jhash_final(a, b, c);
+> +
+> +    return c;
+> +}
 
 
+> +static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
+> +{
+> +    SMMUIOTLBKey *k1 = (SMMUIOTLBKey *)v1;
+> +    SMMUIOTLBKey *k2 = (SMMUIOTLBKey *)v2;
 
-On 06/20/2018 11:28 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 20.06.2018 18:27, Vladimir Sementsov-Ogievskiy wrote:
->> Libvirt part is ready, let's drop x- prefix.
->=20
-> libvirt patches will be sent soon I hope.
->=20
+These should have a 'const', at which point I think you'll
+find that you don't need the explicit casts.
 
-OK, can you ping this patch with a link to the series when it is posted?
+Otherwise looks OK I think.
 
-Thank you,
---js
-
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->> =C2=A0 qapi/block-core.json | 4 ++--
->> =C2=A0 blockdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 2 +-
->> =C2=A0 2 files changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index cc3ede0630..dfaa050651 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -483,7 +483,7 @@
->> =C2=A0=C2=A0=C2=A0 'data': {'boundaries': ['uint64'], 'bins': ['uint64=
-'] } }
->> =C2=A0 =C2=A0 ##
->> -# @x-block-latency-histogram-set:
->> +# @block-latency-histogram-set:
->> =C2=A0 #
->> =C2=A0 # Manage read, write and flush latency histograms for the devic=
-e.
->> =C2=A0 #
->> @@ -547,7 +547,7 @@
->> =C2=A0 #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "arguments": { "device": "drive=
-0" } }
->> =C2=A0 # <- { "return": {} }
->> =C2=A0 ##
->> -{ 'command': 'x-block-latency-histogram-set',
->> +{ 'command': 'block-latency-histogram-set',
->> =C2=A0=C2=A0=C2=A0 'data': {'device': 'str',
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- '*boundaries': ['uint64'],
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- '*boundaries-read': ['uint64'],
->> diff --git a/blockdev.c b/blockdev.c
->> index 58d7570932..6d4ae77041 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -4299,7 +4299,7 @@ void qmp_x_blockdev_set_iothread(const char
->> *node_name, StrOrNull *iothread,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 aio_context_release(old_context);
->> =C2=A0 }
->> =C2=A0 -void qmp_x_block_latency_histogram_set(
->> +void qmp_block_latency_histogram_set(
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char *device,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool has_boundaries, uint64List *bounda=
-ries,
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool has_boundaries_read, uint64List *b=
-oundaries_read,
->=20
->=20
+thanks
+-- PMM
