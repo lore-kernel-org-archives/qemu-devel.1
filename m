@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fVVgg-00085y-Hu
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 01:29:47 -0400
+	(envelope-from <peterx@redhat.com>) id 1fVW5w-0006AF-0h
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 01:55:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fVVgd-0005QP-5o
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 01:29:46 -0400
-Received: from 7.mo3.mail-out.ovh.net ([46.105.57.200]:52963)
+	(envelope-from <peterx@redhat.com>) id 1fVW5r-0004Py-4m
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 01:55:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43530 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fVVgc-0005PZ-VX
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 01:29:43 -0400
-Received: from player793.ha.ovh.net (unknown [10.109.108.117])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 441021BC5D1
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 07:29:41 +0200 (CEST)
-References: <20180615152536.30093-1-clg@kaod.org>
-	<20180615152536.30093-4-clg@kaod.org>
-	<20180618103844.GX25461@umbus.fritz.box>
-	<9d1ce421-9caa-08eb-2417-15307dd271ed@kaod.org>
-	<20180618121328.GY25461@umbus.fritz.box>
-	<048d2369-389f-1118-03b0-b81e6bd565a0@kaod.org>
-	<20180620005622.GG3546@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <36801260-2573-ce87-7f10-a6c76072ad23@kaod.org>
-Date: Wed, 20 Jun 2018 07:29:37 +0200
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fVW5q-0004Pq-UE
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 01:55:47 -0400
+Date: Wed, 20 Jun 2018 13:55:35 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180620055535.GF18985@xz-mi>
+References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
+	<20180604095520.8563-10-xiaoguangrong@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <20180620005622.GG3546@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] ppc/pnv: introduce Pnv8Chip and
- Pnv9Chip models
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180604095520.8563-10-xiaoguangrong@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH 09/12] ring: introduce lockless ring buffer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,71 +27,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: guangrong.xiao@gmail.com
+Cc: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
 
-On 06/20/2018 02:56 AM, David Gibson wrote:
-> On Tue, Jun 19, 2018 at 07:24:44AM +0200, C=E9dric Le Goater wrote:
->>
->>>>>  typedef struct PnvChipClass {
->>>>>      /*< private >*/
->>>>> @@ -75,6 +95,7 @@ typedef struct PnvChipClass {
->>>>> =20
->>>>>      hwaddr       xscom_base;
->>>>> =20
->>>>> +    void (*realize)(PnvChip *chip, Error **errp);
->>>>
->>>> This looks the wrong way round from how things are usually done.
->>>> Rather than having the base class realize() call the subclass specif=
-ic
->>>> realize hook, it's more usual for the subclass to set the
->>>> dc->realize() and have it call a k->parent_realize() to call up the
->>>> chain.  grep for device_class_set_parent_realize() for some more
->>>> examples.
->>>
->>> Ah. That is more to my liking. There are a couple of models following
->>> the wrong object pattern, xics, vio. I will check them.
->>
->> So XICS is causing some head-aches because the ics-kvm model inherits
->> from ics-simple which inherits from ics-base. so we have a grand-paren=
-t
->> class to handle.
->=20
-> Ok.  I mean, we should probably switch ics around to use the
-> parent_realize model, rather than the backwards one it does now.  But
-> it's not immediately obvious to me why having a grandparent class
-> breaks things.
+On Mon, Jun 04, 2018 at 05:55:17PM +0800, guangrong.xiao@gmail.com wrote:
 
-If you follow the common realize pattern, you end up with a recursive=20
-loop with one of the realize routine. I didn't dig much the issue.
+[...]
 
->> if we could affiliate ics-kvm directly to ics-base it would make the=20
->> family affair easier. we need to check migration though.
->=20
-> But that said, I've been thinking for a while that it might make sense
-> to fold ics-kvm into ics-base.  It seems very risky to have two
-> different object classes that are supposed to have guest-identical
-> behaviour.  Certainly adding any migratable state to one not the other
-> would be horribly wrong.
+(Some more comments/questions for the MP implementation...)
 
-yes. clearly. something like bellow would be better:
+> +static inline int ring_mp_put(Ring *ring, void *data)
+> +{
+> +    unsigned int index, in, in_next, out;
+> +
+> +    do {
+> +        in = atomic_read(&ring->in);
+> +        out = atomic_read(&ring->out);
 
-                   +---------------+
-                   |     ICS       |
-         +---------+  common/base  +--------+
-         |         +---------------+        |
-         |                                  |
-         | spapr                    spapr   |
-         |  pnv                             |
-  +------v--------+                +--------v--------+
-  |     ICS       |                |       ICS       |
-  |  simple/QEMU  |                |       KVM       |
-  +---------------+                +-----------------+
+[0]
 
-with only some reset and realize handling in the subclasses. The only
-extra field we could add under the KVM class is the KVM XICS device fd. =20
+Do we need to fetch "out" with load_acquire()?  Otherwise what's the
+pairing of below store_release() at [1]?
 
+This barrier exists in SP-SC case which makes sense to me, I assume
+that's also needed for MP-SC case, am I right?
+
+> +
+> +        if (__ring_is_full(ring, in, out)) {
+> +            if (atomic_read(&ring->in) == in &&
+> +                atomic_read(&ring->out) == out) {
+
+Why read again?  After all the ring API seems to be designed as
+non-blocking.  E.g., I see the poll at [2] below makes more sense
+since when reaches [2] it means that there must be a producer that is
+_doing_ the queuing, so polling is very possible to complete fast.
+However here it seems to be a pure busy poll without any hint.  Then
+not sure whether we should just let the caller decide whether it wants
+to call ring_put() again.
+
+> +                return -ENOBUFS;
+> +            }
+> +
+> +            /* a entry has been fetched out, retry. */
+> +            continue;
+> +        }
+> +
+> +        in_next = in + 1;
+> +    } while (atomic_cmpxchg(&ring->in, in, in_next) != in);
+> +
+> +    index = ring_index(ring, in);
+> +
+> +    /*
+> +     * smp_rmb() paired with the memory barrier of (A) in ring_mp_get()
+> +     * is implied in atomic_cmpxchg() as we should read ring->out first
+> +     * before fetching the entry, otherwise this assert will fail.
+
+Thanks for all these comments!  These are really helpful for
+reviewers.
+
+However I'm not sure whether I understand it correctly here on MB of
+(A) for ring_mp_get() - AFAIU that should corresponds to a smp_rmb()
+at [0] above when reading the "out" variable rather than this
+assertion, and that's why I thought at [0] we should have something
+like a load_acquire() there (which contains a rmb()).
+
+>From content-wise, I think the code here is correct, since
+atomic_cmpxchg() should have one implicit smp_mb() after all so we
+don't need anything further barriers here.
+
+> +     */
+> +    assert(!atomic_read(&ring->data[index]));
+> +
+> +    /*
+> +     * smp_mb() paired with the memory barrier of (B) in ring_mp_get() is
+> +     * implied in atomic_cmpxchg(), that is needed here as  we should read
+> +     * ring->out before updating the entry, it is the same as we did in
+> +     * __ring_put().
+> +     *
+> +     * smp_wmb() paired with the memory barrier of (C) in ring_mp_get()
+> +     * is implied in atomic_cmpxchg(), that is needed as we should increase
+> +     * ring->in before updating the entry.
+> +     */
+> +    atomic_set(&ring->data[index], data);
+> +
+> +    return 0;
+> +}
+> +
+> +static inline void *ring_mp_get(Ring *ring)
+> +{
+> +    unsigned int index, in;
+> +    void *data;
+> +
+> +    do {
+> +        in = atomic_read(&ring->in);
+> +
+> +        /*
+> +         * (C) should read ring->in first to make sure the entry pointed by this
+> +         * index is available
+> +         */
+> +        smp_rmb();
+> +
+> +        if (!__ring_is_empty(in, ring->out)) {
+> +            break;
+> +        }
+> +
+> +        if (atomic_read(&ring->in) == in) {
+> +            return NULL;
+> +        }
+> +        /* new entry has been added in, retry. */
+> +    } while (1);
+> +
+> +    index = ring_index(ring, ring->out);
+> +
+> +    do {
+> +        data = atomic_read(&ring->data[index]);
+> +        if (data) {
+> +            break;
+> +        }
+> +        /* the producer is updating the entry, retry */
+> +        cpu_relax();
+
+[2]
+
+> +    } while (1);
+> +
+> +    atomic_set(&ring->data[index], NULL);
+> +
+> +    /*
+> +     * (B) smp_mb() is needed as we should read the entry out before
+> +     * updating ring->out as we did in __ring_get().
+> +     *
+> +     * (A) smp_wmb() is needed as we should make the entry be NULL before
+> +     * updating ring->out (which will make the entry be visible and usable).
+> +     */
+> +    atomic_store_release(&ring->out, ring->out + 1);
+
+[1]
+
+> +
+> +    return data;
+> +}
+> +
+> +static inline int ring_put(Ring *ring, void *data)
+> +{
+> +    if (ring->flags & RING_MULTI_PRODUCER) {
+> +        return ring_mp_put(ring, data);
+> +    }
+> +    return __ring_put(ring, data);
+> +}
+> +
+> +static inline void *ring_get(Ring *ring)
+> +{
+> +    if (ring->flags & RING_MULTI_PRODUCER) {
+> +        return ring_mp_get(ring);
+> +    }
+> +    return __ring_get(ring);
+> +}
+> +#endif
+> -- 
+> 2.14.4
+> 
 
 Thanks,
 
-C.
+-- 
+Peter Xu
