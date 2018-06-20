@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34919)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1fVbtS-0002cN-Cb
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:07:26 -0400
+	(envelope-from <Yongbok.Kim@mips.com>) id 1fVbtb-0002iZ-Pz
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:07:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1fVbtQ-0003SA-38
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:07:22 -0400
-Received: from 9pmail.ess.barracuda.com ([64.235.150.224]:32784)
+	(envelope-from <Yongbok.Kim@mips.com>) id 1fVbta-0003XR-9p
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:07:31 -0400
+Received: from 9pmail.ess.barracuda.com ([64.235.150.224]:59798)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Yongbok.Kim@mips.com>)
-	id 1fVbtP-0003Q3-RT
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:07:20 -0400
+	id 1fVbta-0003Tk-2j
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:07:30 -0400
 From: Yongbok Kim <yongbok.kim@mips.com>
-Date: Wed, 20 Jun 2018 13:05:48 +0100
-Message-ID: <20180620120620.12806-4-yongbok.kim@mips.com>
+Date: Wed, 20 Jun 2018 13:05:49 +0100
+Message-ID: <20180620120620.12806-5-yongbok.kim@mips.com>
 In-Reply-To: <20180620120620.12806-1-yongbok.kim@mips.com>
 References: <20180620120620.12806-1-yongbok.kim@mips.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 03/35] target/mips: Add nanoMIPS OPCODE table
+Subject: [Qemu-devel] [PATCH 04/35] target/mips: Add decode_nanomips_opc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,721 +29,324 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, Aleksandar.Markovic@mips.com, James.Hogan@mips.com, Paul.Burton@mips.com, Matthew.Fortune@mips.com, Stefan.Markovic@mips.com
 
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-
-Add nanoMIPS OPCODE table
-
-Reference:
-nanoMIPS Base ISA Technical Reference Manual
+Add nanoMIPS decoder.
+It covers P16 pool arithmetic and branch instructions.
 
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 ---
- target/mips/mips-defs.h |   4 +
- target/mips/translate.c | 670 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 674 insertions(+)
+ target/mips/translate.c | 293 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 292 insertions(+), 1 deletion(-)
 
-diff --git a/target/mips/mips-defs.h b/target/mips/mips-defs.h
-index d239069..eadc1d8 100644
---- a/target/mips/mips-defs.h
-+++ b/target/mips/mips-defs.h
-@@ -39,6 +39,7 @@
- #define   ISA_MIPS64R5  0x00001000
- #define   ISA_MIPS32R6  0x00002000
- #define   ISA_MIPS64R6  0x00004000
-+#define   ISA_NANOMIPS32  0x00008000
- 
- /* MIPS ASEs. */
- #define   ASE_MIPS16    0x00010000
-@@ -87,6 +88,9 @@
- #define CPU_MIPS32R6 (CPU_MIPS32R5 | ISA_MIPS32R6)
- #define CPU_MIPS64R6 (CPU_MIPS64R5 | CPU_MIPS32R6 | ISA_MIPS64R6)
- 
-+/* MIPS Technologies "nanoMIPS" */
-+#define CPU_NANOMIPS32 (CPU_MIPS32R6 | ISA_NANOMIPS32)
-+
- /* Strictly follow the architecture standard:
-    - Disallow "special" instruction handling for PMON/SPIM.
-    Note that we still maintain Count/Compare to match the host clock. */
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index bfbc300..27d5fb2 100644
+index 27d5fb2..633d0b4 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -15530,6 +15530,676 @@ static int decode_micromips_opc (CPUMIPSState *env, DisasContext *ctx)
-     return 2;
- }
+@@ -16200,6 +16200,293 @@ enum {
+     NM_EVP      = 0x01
+ };
  
-+/* nanoMIPS */
-+
-+/* Major opcode */
-+enum {
-+    NM_P_ADDIU      = 0x00,
-+    NM_ADDIUPC      = 0x01,
-+    NM_MOVE_BALC    = 0x02,
-+    NM_P16_MV       = 0x04,
-+    NM_LW16         = 0x05,
-+    NM_BC16         = 0x06,
-+    NM_P16_SR       = 0x07,
-+
-+    NM_POOL32A      = 0x08,
-+    NM_P_BAL        = 0x0a,
-+    NM_P16_SHIFT    = 0x0c,
-+    NM_LWSP16       = 0x0d,
-+    NM_BALC16       = 0x0e,
-+    NM_P16_4X4      = 0x0f,
-+
-+    NM_P_GP_W       = 0x10,
-+    NM_P_GP_BH      = 0x11,
-+    NM_P_J          = 0x12,
-+    NM_P16C         = 0x14,
-+    NM_LWGP16       = 0x15,
-+    NM_P16_LB       = 0x17,
-+
-+    NM_P48I         = 0x18,
-+    NM_P16_A1       = 0x1c,
-+    NM_LW4X4        = 0x1d,
-+    NM_P16_LH       = 0x1f,
-+
-+    NM_P_U12        = 0x20,
-+    NM_P_LS_U12     = 0x21,
-+    NM_P_BR1        = 0x22,
-+    NM_P16_A2       = 0x24,
-+    NM_SW16         = 0x25,
-+    NM_BEQZC16      = 0x26,
-+
-+    NM_POOL32F      = 0x28,
-+    NM_P_LS_S9      = 0x29,
-+    NM_P_BR2        = 0x2a,
-+
-+    NM_P16_ADDU     = 0x2c,
-+    NM_SWSP16       = 0x2d,
-+    NM_BNEZC16      = 0x2e,
-+    NM_MOVEP        = 0x2f,
-+
-+    NM_POOL32S      = 0x30,
-+    NM_P_BRI        = 0x32,
-+    NM_LI16         = 0x34,
-+    NM_SWGP16       = 0x35,
-+    NM_P16_BR       = 0x36,
-+
-+    NM_P_LUI        = 0x38,
-+    NM_ANDI16       = 0x3c,
-+    NM_SW4X4        = 0x3d,
-+    NM_MOVEPREV     = 0x3f
-+};
-+
-+/* POOL32A instruction pool */
-+enum {
-+    NM_POOL32A0    = 0x00,
-+    NM_SPECIAL2    = 0x01,
-+    NM_COP2_1      = 0x02,
-+    NM_UDI         = 0x03,
-+    NM_POOL32A5    = 0x05,
-+    NM_POOL32A7    = 0x07
-+};
-+
-+/* P.GP.W instruction pool */
-+enum {
-+    NM_ADDIUGP_W = 0x00,
-+    NM_LWGP      = 0x02,
-+    NM_SWGP      = 0x03
-+};
-+
-+/* P48I instruction pool */
-+enum {
-+    NM_LI48        = 0x00,
-+    NM_ADDIU48     = 0x01,
-+    NM_ADDIUGP48   = 0x02,
-+    NM_ADDIUPC48   = 0x03,
-+    NM_LWPC48      = 0x0b,
-+    NM_SWPC48      = 0x0f,
-+};
-+
-+/* P.U12 instruction pool */
-+enum {
-+    NM_ORI      = 0x00,
-+    NM_XORI     = 0x01,
-+    NM_ANDI     = 0x02,
-+    NM_P_SR     = 0x03,
-+    NM_SLTI     = 0x04,
-+    NM_SLTIU    = 0x05,
-+    NM_SEQI     = 0x06,
-+    NM_ADDIUNEG = 0x08,
-+    NM_P_SHIFT  = 0x0c,
-+    NM_P_ROTX   = 0x0d,
-+    NM_P_INS    = 0x0e,
-+    NM_P_EXT    = 0x0f
-+};
-+
-+/* POOL32F instruction pool */
-+enum {
-+    NM_POOL32F_0   = 0x00,
-+    NM_POOL32F_3   = 0x03,
-+    NM_POOL32F_5   = 0x05
-+};
-+
-+/* POOL32S instruction pool */
-+enum {
-+    NM_POOL32S_0   = 0x00,
-+    NM_POOL32S_4   = 0x04
-+};
-+
-+/* P.LUI instruction pool */
-+enum {
-+    NM_LUI      = 0x00,
-+    NM_ALUIPC   = 0x01
-+};
-+
-+/* P.GP.BH instruction pool */
-+enum {
-+    NM_LBGP      = 0x00,
-+    NM_SBGP      = 0x01,
-+    NM_LBUGP     = 0x02,
-+    NM_ADDIUGP_B = 0x03,
-+    NM_P_GP_LH   = 0x04,
-+    NM_P_GP_SH   = 0x05,
-+    NM_P_GP_CP1  = 0x06,
-+};
-+
-+/* P.LS.U12 instruction pool */
-+enum {
-+    NM_LB        = 0x00,
-+    NM_SB        = 0x01,
-+    NM_LBU       = 0x02,
-+    NM_P_PREFU12 = 0x03,
-+    NM_LH        = 0x04,
-+    NM_SH        = 0x05,
-+    NM_LHU       = 0x06,
-+    NM_LWU       = 0x07,
-+    NM_LW        = 0x08,
-+    NM_SW        = 0x09,
-+    NM_LWC1      = 0x0a,
-+    NM_SWC1      = 0x0b,
-+    NM_LDC1      = 0x0e,
-+    NM_SDC1      = 0x0f
-+};
-+
-+/* P.LS.S9 instruction pool */
-+enum {
-+    NM_P_LS_S0         = 0x00,
-+    NM_P_LS_S1         = 0x01,
-+    NM_P_LS_E0         = 0x02,
-+    NM_P_LS_WM         = 0x04,
-+    NM_P_LS_UAWM       = 0x05
-+};
-+
-+/* P.BAL instruction pool */
-+enum {
-+    NM_BC       = 0x00,
-+    NM_BALC     = 0x01
-+};
-+
-+/* P.J instruction pool */
-+enum {
-+    NM_JALRC    = 0x00,
-+    NM_JALRC_HB = 0x01,
-+    NM_P_BALRSC = 0x08
-+};
-+
-+/* P.BR1 instruction pool */
-+enum {
-+    NM_BEQC     = 0x00,
-+    NM_P_BR3A   = 0x01,
-+    NM_BGEC     = 0x02,
-+    NM_BGEUC    = 0x03
-+};
-+
-+/* P.BR2 instruction pool */
-+enum {
-+    NM_BNEC     = 0x00,
-+    NM_BLTC     = 0x02,
-+    NM_BLTUC    = 0x03
-+};
-+
-+/* P.BRI instruction pool */
-+enum {
-+    NM_BEQIC    = 0x00,
-+    NM_BBEQZC   = 0x01,
-+    NM_BGEIC    = 0x02,
-+    NM_BGEIUC   = 0x03,
-+    NM_BNEIC    = 0x04,
-+    NM_BBNEZC   = 0x05,
-+    NM_BLTIC    = 0x06,
-+    NM_BLTIUC   = 0x07
-+};
-+
-+/* P16.SHIFT instruction pool */
-+enum {
-+    NM_SLL16    = 0x00,
-+    NM_SRL16    = 0x01
-+};
-+
-+/* POOL16C instruction pool */
-+enum {
-+    NM_POOL16C_0  = 0x00,
-+    NM_LWXS16     = 0x01
-+};
-+
-+/* P16.A1 instruction pool */
-+enum {
-+    NM_ADDIUR1SP = 0x01
-+};
-+
-+/* P16.A2 instruction pool */
-+enum {
-+    NM_ADDIUR2  = 0x00,
-+    NM_P_ADDIURS5  = 0x01
-+};
-+
-+/* P16.ADDU instruction pool */
-+enum {
-+    NM_ADDU16     = 0x00,
-+    NM_SUBU16     = 0x01
-+};
-+
-+/* P16.SR instruction pool */
-+enum {
-+    NM_SAVE16        = 0x00,
-+    NM_RESTORE_JRC16 = 0x01
-+};
-+
-+/* P16.4X4 instruction pool */
-+enum {
-+    NM_ADDU4X4      = 0x00,
-+    NM_MUL4X4       = 0x01
-+};
-+
-+/* P16.LB instruction pool */
-+enum {
-+    NM_LB16       = 0x00,
-+    NM_SB16       = 0x01,
-+    NM_LBU16      = 0x02
-+};
-+
-+/* P16.LH  instruction pool */
-+enum {
-+    NM_LH16     = 0x00,
-+    NM_SH16     = 0x01,
-+    NM_LHU16    = 0x02
-+};
-+
-+/* P.RI instruction pool */
-+enum {
-+    NM_SIGRIE       = 0x00,
-+    NM_P_SYSCALL    = 0x01,
-+    NM_BREAK        = 0x02,
-+    NM_SDBBP        = 0x03
-+};
-+
-+/* POOL32A0 instruction pool */
-+enum {
-+    NM_P_TRAP   = 0x00,
-+    NM_SEB      = 0x01,
-+    NM_SLLV     = 0x02,
-+    NM_MUL      = 0x03,
-+    NM_MFC0     = 0x06,
-+    NM_MFHC0    = 0x07,
-+    NM_SEH      = 0x09,
-+    NM_SRLV     = 0x0a,
-+    NM_MUH      = 0x0b,
-+    NM_MTC0     = 0x0e,
-+    NM_MTHC0    = 0x0f,
-+    NM_SRAV     = 0x12,
-+    NM_MULU     = 0x13,
-+    NM_MFGC0    = 0x16,
-+    NM_MFHGC0   = 0x17,
-+    NM_ROTRV    = 0x1a,
-+    NM_MUHU     = 0x1b,
-+    NM_MTGC0    = 0x1e,
-+    NM_MTHGC0   = 0x1f,
-+    NM_ADD      = 0x22,
-+    NM_DIV      = 0x23,
-+    NM_ADDU     = 0x2a,
-+    NM_MOD      = 0x2b,
-+    NM_SUB      = 0x32,
-+    NM_DIVU     = 0x33,
-+    NM_RDHWR    = 0x38,
-+    NM_SUBU     = 0x3a,
-+    NM_MODU     = 0x3b,
-+    NM_P_CMOVE  = 0x42,
-+    NM_FORK     = 0x45,
-+    NM_MFTR     = 0x46,
-+    NM_MFHTR    = 0x47,
-+    NM_AND      = 0x4a,
-+    NM_YIELD    = 0x4d,
-+    NM_MTTR     = 0x4e,
-+    NM_MTHTR    = 0x4f,
-+    NM_OR       = 0x52,
-+    NM_D_E_MT_VPE = 0x56,
-+    NM_NOR      = 0x5a,
-+    NM_XOR      = 0x62,
-+    NM_SLT      = 0x6a,
-+    NM_P_SLTU   = 0x72,
-+    NM_SOV      = 0x7a,
-+};
-+
-+/* POOL32A7 instruction pool */
-+enum {
-+    NM_P_LSX        = 0x00,
-+    NM_LSA          = 0x01,
-+    NM_EXTW         = 0x03,
-+    NM_POOL32AXF    = 0x07
-+};
-+
-+/* P.SR instruction pool */
-+enum {
-+    NM_PP_SR           = 0x00,
-+    NM_P_SR_F          = 0x01
-+};
-+
-+/* P.SHIFT instruction pool */
-+enum {
-+    NM_P_SLL        = 0x00,
-+    NM_SRL          = 0x02,
-+    NM_SRA          = 0x04,
-+    NM_ROTR         = 0x06,
-+};
-+
-+/* P.ROTX instruction pool */
-+enum {
-+    NM_ROTX         = 0x00
-+};
-+
-+/* P.INS instruction pool */
-+enum {
-+    NM_INS          = 0x00
-+};
-+
-+/* P.EXT instruction pool */
-+enum {
-+    NM_EXT          = 0x00
-+};
-+
-+/* POOL32F_0 (fmt) instruction pool */
-+enum {
-+    NM_RINT_S              = 0x04,
-+    NM_RINT_D              = 0x44,
-+    NM_ADD_S               = 0x06,
-+    NM_SELEQZ_S            = 0x07,
-+    NM_SELEQZ_D            = 0x47,
-+    NM_CLASS_S             = 0x0c,
-+    NM_CLASS_D             = 0x4c,
-+    NM_SUB_S               = 0x0e,
-+    NM_SELNEZ_S            = 0x0f,
-+    NM_SELNEZ_D            = 0x4f,
-+    NM_MUL_S               = 0x16,
-+    NM_SEL_S               = 0x17,
-+    NM_SEL_D               = 0x57,
-+    NM_DIV_S               = 0x1e,
-+    NM_ADD_D               = 0x26,
-+    NM_SUB_D               = 0x2e,
-+    NM_MUL_D               = 0x36,
-+    NM_MADDF_S             = 0x37,
-+    NM_MADDF_D             = 0x77,
-+    NM_DIV_D               = 0x3e,
-+    NM_MSUBF_S             = 0x3f,
-+    NM_MSUBF_D             = 0x7f
-+};
-+
-+/* POOL32F_3  instruction pool */
-+enum {
-+    NM_MIN_FMT         = 0x00,
-+    NM_MAX_FMT         = 0x01,
-+    NM_MINA_FMT        = 0x04,
-+    NM_MAXA_FMT        = 0x05,
-+    NM_POOL32FXF       = 0x07
-+};
-+
-+/* POOL32F_5  instruction pool */
-+enum {
-+    NM_CMP_CONDN_S     = 0x00,
-+    NM_CMP_CONDN_D     = 0x02
-+};
-+
-+/* P.GP.LH instruction pool */
-+enum {
-+    NM_LHGP    = 0x00,
-+    NM_LHUGP   = 0x01
-+};
-+
-+/* P.GP.SH instruction pool */
-+enum {
-+    NM_SHGP    = 0x00
-+};
-+
-+/* P.GP.CP1 instruction pool */
-+enum {
-+    NM_LWC1GP       = 0x00,
-+    NM_SWC1GP       = 0x01,
-+    NM_LDC1GP       = 0x02,
-+    NM_SDC1GP       = 0x03
-+};
-+
-+/* P.LS.S0 instruction pool */
-+enum {
-+    NM_LBS9     = 0x00,
-+    NM_LHS9     = 0x04,
-+    NM_LWS9     = 0x08,
-+    NM_LDS9     = 0x0c,
-+
-+    NM_SBS9     = 0x01,
-+    NM_SHS9     = 0x05,
-+    NM_SWS9     = 0x09,
-+    NM_SDS9     = 0x0d,
-+
-+    NM_LBUS9    = 0x02,
-+    NM_LHUS9    = 0x06,
-+    NM_LWC1S9   = 0x0a,
-+    NM_LDC1S9   = 0x0e,
-+
-+    NM_P_PREFS9 = 0x03,
-+    NM_LWUS9    = 0x07,
-+    NM_SWC1S9   = 0x0b,
-+    NM_SDC1S9   = 0x0f
-+};
-+
-+/* P.LS.S1 instruction pool */
-+enum {
-+    NM_ASET_ACLR = 0x02,
-+    NM_UALH      = 0x04,
-+    NM_UASH      = 0x05,
-+    NM_CACHE     = 0x07,
-+    NM_P_LL      = 0x0a,
-+    NM_P_SC      = 0x0b,
-+};
-+
-+/* P.LS.WM instruction pool */
-+enum {
-+    NM_LWM       = 0x00,
-+    NM_SWM       = 0x01
-+};
-+
-+/* P.LS.UAWM instruction pool */
-+enum {
-+    NM_UALWM       = 0x00,
-+    NM_UASWM       = 0x01
-+};
-+
-+/* P.BR3A instruction pool */
-+enum {
-+    NM_BC1EQZC          = 0x00,
-+    NM_BC1NEZC          = 0x01,
-+    NM_BC2EQZC          = 0x02,
-+    NM_BC2NEZC          = 0x03,
-+    NM_BPOSGE32C        = 0x04
-+};
-+
-+/* P16.RI instruction pool */
-+enum {
-+    NM_P16_SYSCALL  = 0x01,
-+    NM_BREAK16      = 0x02,
-+    NM_SDBBP16      = 0x03
-+};
-+
-+/* POOL16C_0 instruction pool */
-+enum {
-+    NM_POOL16C_00      = 0x00
-+};
-+
-+/* P16.JRC instruction pool */
-+enum {
-+    NM_JRC          = 0x00,
-+    NM_JALRC16      = 0x01
-+};
-+
-+/* P.SYSCALL instruction pool */
-+enum {
-+    NM_SYSCALL      = 0x00,
-+    NM_HYPCALL      = 0x01
-+};
-+
-+/* P.TRAP instruction pool */
-+enum {
-+    NM_TEQ          = 0x00,
-+    NM_TNE          = 0x01
-+};
-+
-+/* P.CMOVE instruction pool */
-+enum {
-+    NM_MOVZ            = 0x00,
-+    NM_MOVN            = 0x01
-+};
-+
-+/* POOL32Axf instruction pool */
-+enum {
-+    NM_POOL32AXF_4 = 0x04,
-+    NM_POOL32AXF_5 = 0x05
-+};
-+
-+/* POOL32Axf_{4, 5} instruction pool */
-+enum {
-+    NM_CLO      = 0x25,
-+    NM_CLZ      = 0x2d,
-+
-+    NM_TLBP     = 0x01,
-+    NM_TLBR     = 0x09,
-+    NM_TLBWI    = 0x11,
-+    NM_TLBWR    = 0x19,
-+    NM_TLBINV   = 0x03,
-+    NM_TLBINVF  = 0x0b,
-+    NM_DI       = 0x23,
-+    NM_EI       = 0x2b,
-+    NM_RDPGPR   = 0x70,
-+    NM_WRPGPR   = 0x78,
-+    NM_WAIT     = 0x61,
-+    NM_DERET    = 0x71,
-+    NM_ERETX    = 0x79
-+};
-+
-+/* PP.SR instruction pool */
-+enum {
-+    NM_SAVE         = 0x00,
-+    NM_RESTORE      = 0x02,
-+    NM_RESTORE_JRC  = 0x03
-+};
-+
-+/* P.SR.F instruction pool */
-+enum {
-+    NM_SAVEF        = 0x00,
-+    NM_RESTOREF     = 0x01,
-+};
-+
-+/* P16.SYSCALL  instruction pool */
-+enum {
-+    NM_SYSCALL16     = 0x00,
-+    NM_HYPCALL16     = 0x01
-+};
-+
-+/* POOL16C_00 instruction pool */
-+enum {
-+    NM_NOT16           = 0x00,
-+    NM_XOR16           = 0x01,
-+    NM_AND16           = 0x02,
-+    NM_OR16            = 0x03
-+};
-+
-+/* PP.LSX and PP.LSXS instruction pool */
-+enum {
-+    NM_LBX      = 0x00,
-+    NM_LHX      = 0x04,
-+    NM_LWX      = 0x08,
-+    NM_LDX      = 0x0c,
-+
-+    NM_SBX      = 0x01,
-+    NM_SHX      = 0x05,
-+    NM_SWX      = 0x09,
-+    NM_SDX      = 0x0d,
-+
-+    NM_LBUX     = 0x02,
-+    NM_LHUX     = 0x06,
-+    NM_LWC1X    = 0x0a,
-+    NM_LDC1X    = 0x0e,
-+
-+    NM_LWUX     = 0x07,
-+    NM_SWC1X    = 0x0b,
-+    NM_SDC1X    = 0x0f,
-+
-+    NM_LHXS     = 0x04,
-+    NM_LWXS     = 0x08,
-+    NM_LDXS     = 0x0c,
-+
-+    NM_SHXS     = 0x05,
-+    NM_SWXS     = 0x09,
-+    NM_SDXS     = 0x0d,
-+
-+    NM_LHUXS    = 0x06,
-+    NM_LWC1XS   = 0x0a,
-+    NM_LDC1XS   = 0x0e,
-+
-+    NM_LWUXS    = 0x07,
-+    NM_SWC1XS   = 0x0b,
-+    NM_SDC1XS   = 0x0f
-+};
-+
-+/* ERETx instruction pool */
-+enum {
-+    NM_ERET     = 0x00,
-+    NM_ERETNC   = 0x01
-+};
-+
-+/* POOL32FxF_{0, 1} insturction pool */
-+enum {
-+    NM_CFC1     = 0x40,
-+    NM_CTC1     = 0x60,
-+    NM_MFC1     = 0x80,
-+    NM_MTC1     = 0xa0,
-+    NM_MFHC1    = 0xc0,
-+    NM_MTHC1    = 0xe0,
-+
-+    NM_CVT_S_PL = 0x84,
-+    NM_CVT_S_PU = 0xa4,
-+
-+    NM_CVT_L_S     = 0x004,
-+    NM_CVT_L_D     = 0x104,
-+    NM_CVT_W_S     = 0x024,
-+    NM_CVT_W_D     = 0x124,
-+
-+    NM_RSQRT_S     = 0x008,
-+    NM_RSQRT_D     = 0x108,
-+
-+    NM_SQRT_S      = 0x028,
-+    NM_SQRT_D      = 0x128,
-+
-+    NM_RECIP_S     = 0x048,
-+    NM_RECIP_D     = 0x148,
-+
-+    NM_FLOOR_L_S   = 0x00c,
-+    NM_FLOOR_L_D   = 0x10c,
-+
-+    NM_FLOOR_W_S   = 0x02c,
-+    NM_FLOOR_W_D   = 0x12c,
-+
-+    NM_CEIL_L_S    = 0x04c,
-+    NM_CEIL_L_D    = 0x14c,
-+    NM_CEIL_W_S    = 0x06c,
-+    NM_CEIL_W_D    = 0x16c,
-+    NM_TRUNC_L_S   = 0x08c,
-+    NM_TRUNC_L_D   = 0x18c,
-+    NM_TRUNC_W_S   = 0x0ac,
-+    NM_TRUNC_W_D   = 0x1ac,
-+    NM_ROUND_L_S   = 0x0cc,
-+    NM_ROUND_L_D   = 0x1cc,
-+    NM_ROUND_W_S   = 0x0ec,
-+    NM_ROUND_W_D   = 0x1ec,
-+
-+    NM_MOV_S       = 0x01,
-+    NM_MOV_D       = 0x81,
-+    NM_ABS_S       = 0x0d,
-+    NM_ABS_D       = 0x8d,
-+    NM_NEG_S       = 0x2d,
-+    NM_NEG_D       = 0xad,
-+    NM_CVT_D_S     = 0x04d,
-+    NM_CVT_D_W     = 0x0cd,
-+    NM_CVT_D_L     = 0x14d,
-+    NM_CVT_S_D     = 0x06d,
-+    NM_CVT_S_W     = 0x0ed,
-+    NM_CVT_S_L     = 0x16d
-+};
-+
-+/* P.LL instruction pool */
-+enum {
-+    NM_LL       = 0x00,
-+    NM_LLWP     = 0x01
-+};
-+
-+/* P.SC instruction pool */
-+enum {
-+    NM_SC       = 0x00,
-+    NM_SCWP     = 0x01
-+};
-+
-+/* P.DVP instruction pool */
-+enum {
-+    NM_DVP      = 0x00,
-+    NM_EVP      = 0x01
-+};
++static int mmreg_nanomips(int r)
++{
++    static const int map[] = { 16, 17, 18, 19, 4, 5, 6, 7 };
++
++    return map[r & 0x7];
++}
++
++static int mmreg4_nanomips(int r)
++{
++    static const int map[] = { 8, 9, 10, 11, 4, 5, 6, 7,
++                            16, 17, 18, 19, 20, 21, 22, 23 };
++
++    return map[r & 0xf];
++}
++
++/* Used for 16-bit store instructions.  */
++static int mmreg4z_nanomips(int r)
++{
++    static const int map[] = { 8, 9, 10, 0, 4, 5, 6, 7,
++                            16, 17, 18, 19, 20, 21, 22, 23 };
++
++    return map[r & 0xf];
++}
++
++static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
++{
++    uint32_t op;
++    int rt = mmreg_nanomips(uMIPS_RD(ctx->opcode));
++    int rs = mmreg_nanomips(uMIPS_RS(ctx->opcode));
++    int rd = mmreg_nanomips(uMIPS_RS1(ctx->opcode));
++
++    /* make sure instructions are on a halfword boundary */
++    if (ctx->base.pc_next & 0x1) {
++        env->CP0_BadVAddr = ctx->base.pc_next;
++        generate_exception_end(ctx, EXCP_AdEL);
++        return 2;
++    }
++
++    op = (ctx->opcode >> 10) & 0x3f;
++    switch (op) {
++    case NM_P16_MV:
++    {
++        int rt = uMIPS_RD5(ctx->opcode);
++        if (rt != 0) {
++            /* MOVE */
++            int rs = uMIPS_RS5(ctx->opcode);
++            gen_arith(ctx, OPC_ADDU, rt, rs, 0);
++        } else {
++            /* P16.RI */
++            switch ((ctx->opcode >> 3) & 0x3) {
++            case NM_P16_SYSCALL:
++                generate_exception_end(ctx, EXCP_SYSCALL);
++                break;
++            case NM_BREAK16:
++                generate_exception_end(ctx, EXCP_BREAK);
++                break;
++            case NM_SDBBP16:
++                if (is_uhi(extract32(ctx->opcode, 0, 3))) {
++                    gen_helper_do_semihosting(cpu_env);
++                } else {
++                    if (ctx->hflags & MIPS_HFLAG_SBRI) {
++                        generate_exception_end(ctx, EXCP_RI);
++                    } else {
++                        generate_exception_end(ctx, EXCP_DBp);
++                    }
++                }
++                break;
++            default:
++                generate_exception_end(ctx, EXCP_RI);
++                break;
++            }
++        }
++    }
++        break;
++    case NM_P16_SHIFT:
++    {
++        int shift = (ctx->opcode) & 0x7;
++        uint32_t opc = 0;
++        shift = (shift == 0) ? 8 : shift;
++
++        switch ((ctx->opcode >> 3) & 1) {
++        case NM_SLL16:
++            opc = OPC_SLL;
++            break;
++        case NM_SRL16:
++            opc = OPC_SRL;
++            break;
++        }
++        gen_shift_imm(ctx, opc, rt, rs, shift);
++    }
++        break;
++    case NM_P16C:
++        break;
++    case NM_P16_A1:
++        switch ((ctx->opcode >> 6) & 1) {
++        case NM_ADDIUR1SP:
++            gen_arith_imm(ctx, OPC_ADDIU, rt, 29,
++                          extract32(ctx->opcode, 0, 6) << 2);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++        break;
++    case NM_P16_A2:
++        switch ((ctx->opcode >> 3) & 1) {
++        case NM_ADDIUR2:
++        {
++            uint8_t u = (uint8_t) extract32(ctx->opcode, 0, 3) << 2;
++            gen_arith_imm(ctx, OPC_ADDIU, rt, rs, u);
++        }
++            break;
++        case NM_P_ADDIURS5:
++        {
++            int rt  = extract32(ctx->opcode, 5, 5);
++            if (rt != 0) {
++                int s = (sextract32(ctx->opcode, 4, 1) << 3) |
++                        extract32(ctx->opcode, 0, 3);
++                /* s = sign_extend( s[3] . s[2:0] , from_nbits = 4)*/
++                gen_arith_imm(ctx, OPC_ADDIU, rt, rt, s);
++            }
++        }
++            break;
++        }
++        break;
++    case NM_P16_ADDU:
++        switch (ctx->opcode & 0x1) {
++        case NM_ADDU16:
++            gen_arith(ctx, OPC_ADDU, rd, rs, rt);
++            break;
++        case NM_SUBU16:
++            gen_arith(ctx, OPC_SUBU, rd, rs, rt);
++            break;
++        }
++        break;
++    case NM_P16_4X4:
++    {
++        int rt = (extract32(ctx->opcode, 9, 1) << 3) |
++                  extract32(ctx->opcode, 5, 3);
++        int rs = (extract32(ctx->opcode, 4, 1) << 3) |
++                  extract32(ctx->opcode, 0, 3);
++        rt = mmreg4_nanomips(rt);
++        rs = mmreg4_nanomips(rs);
++
++        switch (((ctx->opcode >> 7) & 0x2) | ((ctx->opcode >> 3) & 0x1)) {
++        case NM_ADDU4X4:
++            gen_arith(ctx, OPC_ADDU, rt, rs, rt);
++            break;
++        case NM_MUL4X4:
++            gen_r6_muldiv(ctx, R6_OPC_MUL, rt, rs, rt);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++    }
++        break;
++    case NM_LI16:
++    {
++        int imm = extract32(ctx->opcode, 0, 7);
++        imm = (imm == 0x7f ? -1 : imm);
++        if (rt != 0) {
++            tcg_gen_movi_tl(cpu_gpr[rt], imm);
++        }
++    }
++        break;
++    case NM_ANDI16:
++    {
++        uint32_t u = extract32(ctx->opcode, 0, 4);
++        u = (u == 12) ? 0xff :
++            (u == 13) ? 0xffff : u;
++        gen_logic_imm(ctx, OPC_ANDI, rt, rs, u);
++    }
++        break;
++    case NM_P16_LB:
++        break;
++    case NM_P16_LH:
++        break;
++    case NM_LW16:
++        break;
++    case NM_LWSP16:
++        break;
++    case NM_LW4X4:
++        break;
++    case NM_SW4X4:
++        break;
++    case NM_LWGP16:
++        break;
++    case NM_SWSP16:
++        break;
++    case NM_SW16:
++        break;
++    case NM_SWGP16:
++        break;
++    case NM_BC16:
++        gen_compute_branch(ctx, OPC_BEQ, 2, 0, 0,
++                           (sextract32(ctx->opcode, 0, 1) << 10) |
++                               (extract32(ctx->opcode, 1, 9) << 1),
++                           0);
++        break;
++    case NM_BALC16:
++        gen_compute_branch(ctx, OPC_BGEZAL, 2, 0, 0,
++                           (sextract32(ctx->opcode, 0, 1) << 10) |
++                               (extract32(ctx->opcode, 1, 9) << 1),
++                           0);
++        break;
++    case NM_BEQZC16:
++    case NM_BNEZC16:
++        gen_compute_branch(ctx, op == NM_BNEZC16 ? OPC_BNE : OPC_BEQ, 2,
++                           rt, 0,
++                           (sextract32(ctx->opcode, 0, 1) << 7) |
++                               (extract32(ctx->opcode, 1, 6) << 1),
++                           0);
++        break;
++    case NM_P16_BR:
++        switch (ctx->opcode & 0xf) {
++        case 0:
++            /* P16.JRC */
++            switch ((ctx->opcode >> 4) & 1) {
++            case NM_JRC:
++                gen_compute_branch(ctx, OPC_JR, 2,
++                                   extract32(ctx->opcode, 5, 5), 0, 0, 0);
++                break;
++            case NM_JALRC16:
++                gen_compute_branch(ctx, OPC_JALR, 2,
++                                   extract32(ctx->opcode, 5, 5), 31, 0, 0);
++                break;
++            }
++            break;
++        default:
++            /* P16.BRI */
++            if (extract32(ctx->opcode, 4, 3) < extract32(ctx->opcode, 7, 3)) {
++                /* BEQC16 */
++                gen_compute_branch(ctx, OPC_BEQ, 2, rs, rt,
++                                   extract32(ctx->opcode, 0, 4) << 1, 0);
++            } else {
++                /* BNEC16 */
++                gen_compute_branch(ctx, OPC_BNE, 2, rs, rt,
++                                   extract32(ctx->opcode, 0, 4) << 1, 0);
++            }
++            break;
++        }
++        break;
++    case NM_P16_SR:
++        break;
++    case NM_MOVEP:
++    case NM_MOVEPREV:
++    {
++        static const int gpr2reg1[] = {4, 5, 6, 7};
++        static const int gpr2reg2[] = {5, 6, 7, 8};
++        int re;
++        int rd2 = extract32(ctx->opcode, 3, 1) << 1 |
++                  extract32(ctx->opcode, 8, 1);
++        int r1 = gpr2reg1[rd2];
++        int r2 = gpr2reg2[rd2];
++        int r3 = extract32(ctx->opcode, 4, 1) << 3 |
++                 extract32(ctx->opcode, 0, 3);
++        int r4 = extract32(ctx->opcode, 9, 1) << 3 |
++                 extract32(ctx->opcode, 5, 3);
++        TCGv t0 = tcg_temp_new();
++        TCGv t1 = tcg_temp_new();
++        if (op == NM_MOVEP) {
++            rd = r1;
++            re = r2;
++            rs = mmreg4z_nanomips(r3);
++            rt = mmreg4z_nanomips(r4);
++        } else {
++            rd = mmreg4_nanomips(r3);
++            re = mmreg4_nanomips(r4);
++            rs = r1;
++            rt = r2;
++        }
++        gen_load_gpr(t0, rs);
++        gen_load_gpr(t1, rt);
++        tcg_gen_mov_tl(cpu_gpr[rd], t0);
++        tcg_gen_mov_tl(cpu_gpr[re], t1);
++        tcg_temp_free(t0);
++        tcg_temp_free(t1);
++    }
++        break;
++    default:
++        break;
++    }
++
++    return 2;
++}
 +
  /* SmartMIPS extension to MIPS32 */
  
  #if defined(TARGET_MIPS64)
+@@ -20950,7 +21237,11 @@ static void mips_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+         decode_opc(env, ctx);
+     } else if (ctx->insn_flags & ASE_MICROMIPS) {
+         ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
+-        insn_bytes = decode_micromips_opc(env, ctx);
++        if (env->insn_flags & ISA_NANOMIPS32) {
++            insn_bytes = decode_nanomips_opc(env, ctx);
++        } else {
++            insn_bytes = decode_micromips_opc(env, ctx);
++        }
+     } else if (ctx->insn_flags & ASE_MIPS16) {
+         ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
+         insn_bytes = decode_mips16_opc(env, ctx);
 -- 
 1.9.1
