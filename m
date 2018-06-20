@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51025)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fVcqA-0004ZZ-MD
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:08:03 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fVcq9-0005l9-RB
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:08:02 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:38033)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fVcq9-0005kk-KY
+	(envelope-from <eric.auger@redhat.com>) id 1fVcq9-0004Xs-2C
 	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:08:01 -0400
-Received: by mail-wr0-x241.google.com with SMTP id e18-v6so3246277wrs.5
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 06:08:01 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180620124742.16979-1-armbru@redhat.com>
-References: <20180620124742.16979-1-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 20 Jun 2018 15:07:59 +0200
-Message-ID: <CAJ+F1CJguzAVgKeyeGR1EpXX2F8CjWR1sVkJajUrNgHQEsuucA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qapi/introspect: Eliminate pointless
- variable in .visit_end()
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <eric.auger@redhat.com>) id 1fVcq4-0005jO-SY
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:08:01 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Wed, 20 Jun 2018 15:07:31 +0200
+Message-Id: <1529500053-21704-5-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1529500053-21704-1-git-send-email-eric.auger@redhat.com>
+References: <1529500053-21704-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC 4/6] hw/arm/virt: Add virt-3.0 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +19,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
+Cc: dgilbert@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au, drjones@redhat.com, wei@redhat.com, suzuki.poulose@arm.com
 
-On Wed, Jun 20, 2018 at 2:47 PM, Markus Armbruster <armbru@redhat.com> wrot=
-e:
-> Commit 1a9a507b2e3 "qapi-introspect: Hide type names" added local
-> variable @jsons to improve sorting, but also removed the sorting.  It
-> was part of a big series that went to v8, and it made sense until v2
-> or so...
->
-> Commit 7d0f982bfbb replaced @jsons by @qlits, preserving the
-> uselessness.
->
-> Get rid of it.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Add virt-3.0 machine type.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-> ---
->  scripts/qapi/introspect.py | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
->
-> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-> index 5b6c72c7b2..6ad198ae5b 100644
-> --- a/scripts/qapi/introspect.py
-> +++ b/scripts/qapi/introspect.py
-> @@ -75,13 +75,10 @@ class QAPISchemaGenIntrospectVisitor(QAPISchemaMonoli=
-thicCVisitor):
->
->      def visit_end(self):
->          # visit the types that are actually used
-> -        qlits =3D self._qlits
-> -        self._qlits =3D []
->          for typ in self._used_types:
->              typ.visit(self)
->          # generate C
->          # TODO can generate awfully long lines
-> -        qlits.extend(self._qlits)
->          name =3D c_name(self._prefix, protect=3DFalse) + 'qmp_schema_qli=
-t'
->          self._genh.add(mcgen('''
->  #include "qapi/qmp/qlit.h"
-> @@ -93,7 +90,7 @@ extern const QLitObject %(c_name)s;
->  const QLitObject %(c_name)s =3D %(c_string)s;
->  ''',
->                               c_name=3Dc_name(name),
-> -                             c_string=3Dto_qlit(qlits)))
-> +                             c_string=3Dto_qlit(self._qlits)))
->          self._schema =3D None
->          self._qlits =3D []
->          self._used_types =3D []
-> --
-> 2.17.1
->
->
+---
 
+Due to the kernel dependency, virt 3.1 will be targetted instead.
+---
+ hw/arm/virt.c | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index f0a4fa0..dd92ab9 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1692,10 +1692,7 @@ static void machvirt_machine_init(void)
+ }
+ type_init(machvirt_machine_init);
+ 
+-#define VIRT_COMPAT_2_12 \
+-    HW_COMPAT_2_12
+-
+-static void virt_2_12_instance_init(Object *obj)
++static void virt_3_0_instance_init(Object *obj)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+     VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+@@ -1763,11 +1760,25 @@ static void virt_2_12_instance_init(Object *obj)
+     vms->irqmap = a15irqmap;
+ }
+ 
++static void virt_machine_3_0_options(MachineClass *mc)
++{
++}
++DEFINE_VIRT_MACHINE_AS_LATEST(3, 0)
++
++#define VIRT_COMPAT_2_12 \
++    HW_COMPAT_2_12
++
++static void virt_2_12_instance_init(Object *obj)
++{
++    virt_3_0_instance_init(obj);
++}
++
+ static void virt_machine_2_12_options(MachineClass *mc)
+ {
++    virt_machine_3_0_options(mc);
+     SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_12);
+ }
+-DEFINE_VIRT_MACHINE_AS_LATEST(2, 12)
++DEFINE_VIRT_MACHINE(2, 12)
+ 
+ #define VIRT_COMPAT_2_11 \
+     HW_COMPAT_2_11
+-- 
+2.5.5
