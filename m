@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fVY9T-0000kj-Si
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:07:41 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fVYF1-0002ZL-Fp
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:13:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fVY9O-0005mr-Oe
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:07:39 -0400
-Received: from mail-eopbgr680075.outbound.protection.outlook.com
-	([40.107.68.75]:10597
-	helo=NAM04-BN3-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <edgari@xilinx.com>) id 1fVY9O-0005mc-HA
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:07:34 -0400
-Date: Wed, 20 Jun 2018 10:07:18 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20180620080718.5dak7rys37yluigo@toto>
-References: <1529440203-29407-1-git-send-email-saipava@xilinx.com>
+	(envelope-from <jasowang@redhat.com>) id 1fVYEx-0000cf-Bn
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:13:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54504 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fVYEx-0000cP-74
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:13:19 -0400
+References: <20180619132200.12320-1-sameeh@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <4f16bb8b-2061-847e-9e17-0a8f80b18197@redhat.com>
+Date: Wed, 20 Jun 2018 16:13:10 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1529440203-29407-1-git-send-email-saipava@xilinx.com>
-Subject: Re: [Qemu-devel] [PATCH v2] xilinx_spips: Make dma transactions as
- per dma_burst_size
+In-Reply-To: <20180619132200.12320-1-sameeh@daynix.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 0/1] Add BPF suuport to Qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +27,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Cc: qemu-devel@nongnu.org, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Peter A. G. Crosthwaite" <peter.crosthwaite@petalogix.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-
-On Wed, Jun 20, 2018 at 02:00:00AM +0530, Sai Pavan Boddu wrote:
-> Qspi dma has a burst length of 64 bytes, So limit transaction length to
-> 64 max.
-> 
-> Signed-off-by: Sai Pavan Boddu <saipava@xilinx.com>
-> ---
->  hw/ssi/xilinx_spips.c         | 20 +++++++++++++++++---
->  include/hw/ssi/xilinx_spips.h |  5 ++++-
->  2 files changed, 21 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
-> index 03f5fae..0ea57d1 100644
-> --- a/hw/ssi/xilinx_spips.c
-> +++ b/hw/ssi/xilinx_spips.c
-> @@ -851,12 +851,17 @@ static void xlnx_zynqmp_qspips_notify(void *opaque)
->      {
->          size_t ret;
->          uint32_t num;
-> -        const void *rxd = pop_buf(recv_fifo, 4, &num);
-> +        const void *rxd;
-> +        int len;
-> +
-> +        len = recv_fifo->num >= rq->dma_burst_size ? rq->dma_burst_size :
-> +                                                   recv_fifo->num;
-> +        rxd = pop_buf(recv_fifo, len, &num);
->  
->          memcpy(rq->dma_buf, rxd, num);
->  
-> -        ret = stream_push(rq->dma, rq->dma_buf, 4);
-> -        assert(ret == 4);
-> +        ret = stream_push(rq->dma, rq->dma_buf, num);
-> +        assert(ret == num);
->          xlnx_zynqmp_qspips_check_flush(rq);
->      }
->  }
-> @@ -1337,6 +1342,9 @@ static void xlnx_zynqmp_qspips_realize(DeviceState *dev, Error **errp)
->      fifo8_create(&s->rx_fifo_g, xsc->rx_fifo_size);
->      fifo8_create(&s->tx_fifo_g, xsc->tx_fifo_size);
->      fifo32_create(&s->fifo_g, 32);
-> +    if (s->dma_burst_size > QSPI_DMA_MAX_BURST_SIZE) {
-> +        s->dma_burst_size = QSPI_DMA_MAX_BURST_SIZE;
-> +    }
-
-
-I think it's better to let the user know that the chosen value was out of
-range, look at how num-busses is handled at the begining of this function.
+To: Sameeh Jubran <sameeh@daynix.com>, qemu-devel@nongnu.org
+Cc: Amnon Ilan <ailan@redhat.com>, Yan Vugenfirer <yan@daynix.com>
 
 
 
+On 2018=E5=B9=B406=E6=9C=8819=E6=97=A5 21:21, Sameeh Jubran wrote:
+> From: Sameeh Jubran <sjubran@redhat.com>
+>
+> The Berkeley Packet Filter has been in the kernel for a while now and I
+> think it is time that it is introduced to Qemu. This patch is an
+> infrastructure for any future usage of the BPF in Qemu.
+>
+> It is important to note that the tun driver had started supporting usin=
+g
+> BPF programs through ioctls (TUNSETSTEERINGEBPF and TUNSETFILTEREBPF).
+>
+> At first, instead of adding the syscall wrappers, I wanted to integrate=
+ libbpf
+> library which resides in the Linux source tree under tools/lib/bpf. It =
+appears
+> to be that by default it compiles to x64 on x64 arch - which can't be
+> integrated into Qemu  - and my attempts to compile the 32 bit versions =
+have
+> failed. What's more interesting is that the vendors don't provide this =
+library
+> in any package, which makes this library a nasty dependency.
+>
+> Please share your thoughts :)
 
->  }
->  
->  static void xlnx_zynqmp_qspips_init(Object *obj)
-> @@ -1411,6 +1419,11 @@ static const VMStateDescription vmstate_xlnx_zynqmp_qspips = {
->      }
->  };
->  
-> +static Property xilinx_zynqmp_qspips_properties[] = {
-> +    DEFINE_PROP_UINT32("dma-burst-size", XlnxZynqMPQSPIPS, dma_burst_size, 64),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
->  static Property xilinx_qspips_properties[] = {
->      /* We had to turn this off for 2.10 as it is not compatible with migration.
->       * It can be enabled but will prevent the device to be migrated.
-> @@ -1463,6 +1476,7 @@ static void xlnx_zynqmp_qspips_class_init(ObjectClass *klass, void * data)
->      dc->realize = xlnx_zynqmp_qspips_realize;
->      dc->reset = xlnx_zynqmp_qspips_reset;
->      dc->vmsd = &vmstate_xlnx_zynqmp_qspips;
-> +    dc->props = xilinx_zynqmp_qspips_properties;
->      xsc->reg_ops = &xlnx_zynqmp_qspips_ops;
->      xsc->rx_fifo_size = RXFF_A_Q;
->      xsc->tx_fifo_size = TXFF_A_Q;
-> diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
-> index d398a4e..bc5596a 100644
-> --- a/include/hw/ssi/xilinx_spips.h
-> +++ b/include/hw/ssi/xilinx_spips.h
-> @@ -37,6 +37,8 @@ typedef struct XilinxSPIPS XilinxSPIPS;
->  /* Bite off 4k chunks at a time */
->  #define LQSPI_CACHE_SIZE 1024
->  
-> +#define QSPI_DMA_MAX_BURST_SIZE 2048
-> +
->  typedef enum {
->      READ = 0x3,         READ_4 = 0x13,
->      FAST_READ = 0xb,    FAST_READ_4 = 0x0c,
-> @@ -95,7 +97,8 @@ typedef struct {
->      XilinxQSPIPS parent_obj;
->  
->      StreamSlave *dma;
-> -    uint8_t dma_buf[4];
-> +    uint8_t dma_buf[QSPI_DMA_MAX_BURST_SIZE];
-> +    uint32_t dma_burst_size;
->      int gqspi_irqline;
->  
->      uint32_t regs[XLNX_ZYNQMP_SPIPS_R_MAX];
-> -- 
-> 2.7.4
-> 
+I wonder, instead of a generic eBPF support, can we have a limited but=20
+sufficient eBPF suppor for TAP only (see dpdk tap driver)? E.g if we=20
+only do bytecode loading, there's no need for e.g map update helpers.
+
+Thanks
+
+>
+> Sameeh Jubran (1):
+>    Add BPF support to qemu
+>
+>   MAINTAINERS                     |   7 +
+>   bpf/Makefile.objs               |   1 +
+>   bpf/bpf_syscall.c               |  98 ++++++
+>   include/bpf/bpf_syscall.h       |  35 +++
+>   linux-headers/linux/bpf.h       | 673 +++++++++++++++++++++++++++++++=
++++++++++
+>   scripts/update-linux-headers.sh |   3 +-
+>   6 files changed, 816 insertions(+), 1 deletion(-)
+>   create mode 100644 bpf/Makefile.objs
+>   create mode 100644 bpf/bpf_syscall.c
+>   create mode 100644 include/bpf/bpf_syscall.h
+>   create mode 100644 linux-headers/linux/bpf.h
+>
