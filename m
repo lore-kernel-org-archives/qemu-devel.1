@@ -1,35 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fVZjP-0005gG-Ol
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:48:52 -0400
+	(envelope-from <armbru@redhat.com>) id 1fVZkm-0006zs-Nz
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:50:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fVZjO-0007sY-Ov
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:48:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48184 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fVZkh-00008g-MT
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:50:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33316 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fVZjO-0007rj-I4
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:48:50 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 12E904022909
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 09:48:50 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180620094626.GD2549@work-vm> (David Alan Gilbert's message of
-	"Wed, 20 Jun 2018 10:46:27 +0100")
-References: <20180523111817.1463-1-quintela@redhat.com>
-	<20180523111817.1463-12-quintela@redhat.com>
-	<20180611164516.GI2661@work-vm> <87d0wlyle1.fsf@secure.mitica>
-	<20180620090127.GB2549@work-vm> <87r2l1lrp0.fsf@secure.mitica>
-	<20180620094626.GD2549@work-vm>
-Reply-To: quintela@redhat.com
-Date: Wed, 20 Jun 2018 11:48:45 +0200
-Message-ID: <87in6dlreq.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVZkh-00008S-Gm
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:50:11 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180620073223.31964-1-peterx@redhat.com>
+	<20180620073223.31964-4-peterx@redhat.com>
+	<87fu1hzwke.fsf@dusky.pond.sub.org> <20180620083827.GK18985@xz-mi>
+Date: Wed, 20 Jun 2018 11:50:09 +0200
+In-Reply-To: <20180620083827.GK18985@xz-mi> (Peter Xu's message of "Wed, 20
+	Jun 2018 16:38:27 +0800")
+Message-ID: <87in6dyege.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v13 11/12] migration: Remove not needed
- semaphore and quit
+Subject: Re: [Qemu-devel] [PATCH v5 3/7] monitor: flush qmp responses when
+ CLOSED
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,117 +29,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, John Snow <jsnow@redhat.com>, "Dr . David
+	Alan Gilbert" <dgilbert@redhat.com>
 
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> * Juan Quintela (quintela@redhat.com) wrote:
->> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
->> > * Juan Quintela (quintela@redhat.com) wrote:
->> >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
->> >> > * Juan Quintela (quintela@redhat.com) wrote:
->> >> >> We know quit closing the QIO.
+Peter Xu <peterx@redhat.com> writes:
 
-...
->> > Two questions from that then:
->> >   a) Are you sure it's safe to close the qio_channel while another
->> > thread is in qio_channel_read_all_eof?  Is it really defined that it
->> > causes the other thread to exit with an error;  close() in some stuff
->> > frees data structures that the other thread is still reading; that's
->> > why I've used shutdown(2) in the past rather than close on fd's
+> On Wed, Jun 20, 2018 at 10:33:37AM +0200, Markus Armbruster wrote:
+>> Peter Xu <peterx@redhat.com> writes:
 >> 
->> Dunno if it is safe (I think it is), but I agree that shutdown will also
->> get what I need.
->> 
->> >   b) I don't think your answer explains why it's an object_unref?
->> 
->> That is the standard way to closing qios to not have to take into
->> account who have it oppened.  See previous paragraph, it is better to
->> use shutdown, done.
->
-> OK, great;  I suspect it's unsafe because as soon as you do the unref
-> it could free the object; actually you should have a ref from each of
-> the threads to sotp it being freed while they use it.
->
-> Dave
->
->> Thanks, Juan.
->> 
->> > Dave
+>> > Previously we clean up the queues when we got CLOSED event.  It was used
+>> > to make sure we won't send leftover replies/events of a old client to a
+>> > new client which makes perfect sense. However this will also drop the
+>> > replies/events even if the output port of the previous chardev backend
+>> > is still open, which can lead to missing of the last replies/events.
+>> > Now this patch does an extra operation to flush the response queue
+>> > before cleaning up.
 >> >
->> >> Later, Juan.
->> > --
->> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> > In most cases, a QMP session will be based on a bidirectional channel (a
+>> > TCP port, for example, we read/write to the same socket handle), so in
+>> > port and out port of the backend chardev are fundamentally the same
+>> > port. In these cases, it does not really matter much on whether we'll
+>> > flush the response queue since flushing will fail anyway.  However there
+>> > can be cases where in & out ports of the QMP monitor's backend chardev
+>> > are separated.  Here is an example:
+>> >
+>> >   cat $QMP_COMMANDS | qemu -qmp stdio ... | filter_commands
+>> >
+>> > In this case, the backend is fd-typed, and it is connected to stdio
+>> > where in port is stdin and out port is stdout.  Now if we drop all the
+>> > events on the response queue then filter_command process might miss some
+>> > events that it might expect.  The thing is that, when stdin closes,
+>> > stdout might still be there alive!
+>> >
+>> > In practice, I encountered SHUTDOWN event missing when running test with
+>> > iotest 087 with Out-Of-Band enabled.  Here is one of the ways that this
+>> > can happen (after "quit" command is executed and QEMU quits the main
+>> > loop):
+>> >
+>> > 1. [main thread] QEMU queues a SHUTDOWN event into response queue.
+>> >
+>> > 2. "cat" terminates (to distinguish it from the animal, I quote it).
+>> >
+>> > 3. [monitor iothread] QEMU's monitor iothread reads EOF from stdin.
+>> >
+>> > 4. [monitor iothread] QEMU's monitor iothread calls the CLOSED event
+>> >    hook for the monitor, which will destroy the response queue of the
+>> >    monitor, then the SHUTDOWN event is dropped.
+>> >
+>> > 5. [main thread] QEMU's main thread cleans up the monitors in
+>> >    monitor_cleanup().  When trying to flush pending responses, it sees
+>> >    nothing.  SHUTDOWN is lost forever.
+>> >
+>> > Note that before the monitor iothread was introduced, step [4]/[5] could
+>> > never happen since the main loop was the only place to detect the EOF
+>> > event of stdin and run the CLOSED event hooks.  Now things can happen in
+>> > parallel in the iothread.
+>> >
+>> > Without this patch, iotest 087 will have ~10% chance to miss the
+>> > SHUTDOWN event and fail when with Out-Of-Band enabled (the output is
+>> > manually touched up to suite line width requirement):
+>> 
+>> I think the output is no longer wrapped.  Can drop the parenthesis when
+>> I apply.
+>
+> Indeed.
+>
+>> 
+>> >
+>> >   --- /home/peterx/git/qemu/tests/qemu-iotests/087.out
+>> >   +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/087.out.bad
+>> >   @@ -8,7 +8,6 @@
+>> >   {"return": {}}
+>> >   {"error": {"class": "GenericError", "desc": "'node-name' must be
+>> >   specified for the root node"}}
+>> >   {"return": {}}
+>> >   -{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+>> >
+>> >   === Duplicate ID ===
+>> >   @@ -53,7 +52,6 @@
+>> >   {"return": {}}
+>> >   {"return": {}}
+>> >   {"return": {}}
+>> >
+>> >   -{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+>> >
+>> > This patch fixes the problem.
+>> >
+>> > Fixes: 6d2d563f8c ("qmp: cleanup qmp queues properly", 2018-03-27)
+>> > Suggested-by: Markus Armbruster <armbru@redhat.com>
+>> > Signed-off-by: Peter Xu <peterx@redhat.com>
+>> > ---
+>> >  monitor.c | 33 ++++++++++++++++++++++++++++++---
+>> >  1 file changed, 30 insertions(+), 3 deletions(-)
+>> >
+>> > diff --git a/monitor.c b/monitor.c
+>> > index 9c89c8695c..ea93db4857 100644
+>> > --- a/monitor.c
+>> > +++ b/monitor.c
+>> > @@ -540,6 +540,27 @@ struct QMPResponse {
+>> >  };
+>> >  typedef struct QMPResponse QMPResponse;
+>> >  
+>> > +static QObject *monitor_qmp_response_pop_one(Monitor *mon)
+>> > +{
+>> > +    QObject *data;
+>> > +
+>> > +    qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+>> > +    data = g_queue_pop_head(mon->qmp.qmp_responses);
+>> > +    qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+>> > +
+>> > +    return data;
+>> > +}
+>> > +
+>> > +static void monitor_qmp_response_flush(Monitor *mon)
+>> > +{
+>> > +    QObject *data;
+>> > +
+>> > +    while ((data = monitor_qmp_response_pop_one(mon))) {
+>> > +        monitor_json_emitter_raw(mon, data);
+>> > +        qobject_unref(data);
+>> > +    }
+>> > +}
+>> > +
+>> >  /*
+>> >   * Pop a QMPResponse from any monitor's response queue into @response.
+>> >   * Return false if all the queues are empty; else true.
+>> > @@ -551,9 +572,7 @@ static bool monitor_qmp_response_pop_any(QMPResponse *response)
+>> >  
+>> >      qemu_mutex_lock(&monitor_lock);
+>> >      QTAILQ_FOREACH(mon, &mon_list, entry) {
+>> > -        qemu_mutex_lock(&mon->qmp.qmp_queue_lock);
+>> > -        data = g_queue_pop_head(mon->qmp.qmp_responses);
+>> > -        qemu_mutex_unlock(&mon->qmp.qmp_queue_lock);
+>> > +        data = monitor_qmp_response_pop_one(mon);
+>> >          if (data) {
+>> >              response->mon = mon;
+>> >              response->data = data;
+>> > @@ -4429,6 +4448,14 @@ static void monitor_qmp_event(void *opaque, int event)
+>> >          mon_refcount++;
+>> >          break;
+>> >      case CHR_EVENT_CLOSED:
+>> > +        /*
+>> > +         * Note: this is only useful when the output of the chardev
+>> > +         * backend is still open.  For example, when the backend is
+>> > +         * stdio, it's possible that stdout is still open when stdin
+>> > +         * is closed.  After all, CHR_EVENT_CLOSED event is currently
+>> > +         * only bound to stdin.
+>> 
+>> Did you forget to delete the last sentence, or decide to keep it?
+>> 
+>> I could drop it when I apply.
+>
+> I'm sorry; this one I forgot.
+>
+> Please feel free to drop it.
 
-What do you think about this, to avoid me resend the whole series?
+Will do.
 
->From e03d77de1ca179fa0168cead7c23cfeae57f1787 Mon Sep 17 00:00:00 2001
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 18 Apr 2018 00:49:19 +0200
-Subject: [PATCH 17/18] migration: Remove not needed semaphore and quit
-
-We know quit with shutdwon in the QIO.
-
-Signed-off-by: Juan Quintela <quintela@redhat.com>
---
-Add comment
-Use shutdown() instead of unref()
----
- migration/ram.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
-
-diff --git a/migration/ram.c b/migration/ram.c
-index 2c3a452a7d..be5d26f4cb 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -594,14 +594,10 @@ typedef struct {
-     QemuThread thread;
-     /* communication channel */
-     QIOChannel *c;
--    /* sem where to wait for more work */
--    QemuSemaphore sem;
-     /* this mutex protects the following parameters */
-     QemuMutex mutex;
-     /* is this channel thread running */
-     bool running;
--    /* should this thread finish */
--    bool quit;
-     /* array of pages to receive */
-     MultiFDPages_t *pages;
-     /* packet allocated len */
-@@ -1152,8 +1148,11 @@ static void multifd_recv_terminate_threads(Error *err)
-         MultiFDRecvParams *p = &multifd_recv_state->params[i];
- 
-         qemu_mutex_lock(&p->mutex);
--        p->quit = true;
--        qemu_sem_post(&p->sem);
-+        /* We could arrive here for two reasons:
-+           - normal quit, i.e. everything went fine, just finished
-+           - error quit: We close the channels so the channel threads
-+             finish the qio_channel_read_all_eof() */
-+        qio_channel_shutdown(p->c, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
-         qemu_mutex_unlock(&p->mutex);
-     }
- }
-@@ -1176,7 +1175,6 @@ int multifd_load_cleanup(Error **errp)
-         object_unref(OBJECT(p->c));
-         p->c = NULL;
-         qemu_mutex_destroy(&p->mutex);
--        qemu_sem_destroy(&p->sem);
-         qemu_sem_destroy(&p->sem_sync);
-         g_free(p->name);
-         p->name = NULL;
-@@ -1299,9 +1297,7 @@ int multifd_load_setup(void)
-         MultiFDRecvParams *p = &multifd_recv_state->params[i];
- 
-         qemu_mutex_init(&p->mutex);
--        qemu_sem_init(&p->sem, 0);
-         qemu_sem_init(&p->sem_sync, 0);
--        p->quit = false;
-         p->id = i;
-         p->pages = multifd_pages_init(page_count);
-         p->packet_len = sizeof(MultiFDPacket_t)
--- 
-2.17.1
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
