@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1fVR3u-00055o-7e
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 20:33:27 -0400
+	(envelope-from <kernellwp@gmail.com>) id 1fVRGM-0008QD-01
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 20:46:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sjitindarsingh@gmail.com>) id 1fVR3r-0000s1-2W
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 20:33:26 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:45104)
+	(envelope-from <kernellwp@gmail.com>) id 1fVRGL-0003VH-62
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 20:46:18 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:34445)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sjitindarsingh@gmail.com>)
-	id 1fVR3q-0000re-SS
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 20:33:23 -0400
-Received: by mail-pl0-x241.google.com with SMTP id c23-v6so727091plz.12
-	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 17:33:22 -0700 (PDT)
-Message-ID: <1529454797.2246.2.camel@gmail.com>
-From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
-Date: Wed, 20 Jun 2018 10:33:17 +1000
-In-Reply-To: <20180619102550.GA2368@work-vm>
-References: <20180619044835.18795-1-sjitindarsingh@gmail.com>
-	<20180619102550.GA2368@work-vm>
+	(Exim 4.71) (envelope-from <kernellwp@gmail.com>) id 1fVRGK-0003Us-VW
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 20:46:17 -0400
+Received: by mail-oi0-x241.google.com with SMTP id i205-v6so1502023oib.1
+	for <qemu-devel@nongnu.org>; Tue, 19 Jun 2018 17:46:16 -0700 (PDT)
+MIME-Version: 1.0
+References: <20180615222855.44421-1-mst@redhat.com>
+	<20180615222855.44421-2-mst@redhat.com>
+	<b59883c6-1dc0-4e81-439c-587c8f2d3e83@redhat.com>
+	<f87772ab-7d59-4ab2-59e3-c1ac77eaf725@redhat.com>
+	<20180620030236-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180620030236-mutt-send-email-mst@kernel.org>
+From: Wanpeng Li <kernellwp@gmail.com>
+Date: Wed, 20 Jun 2018 08:46:10 +0800
+Message-ID: <CANRm+CyZyo49ga=-dM-VES8fTEYiv+FM0WZdsf5F+jhnLbcLtw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hmp-commands: use long for begin and
- length in dump-guest-memory
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] kvm: support -dedicated
+ cpu-pm=on|off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Suraj Jitindar Singh <sjtindarsingh@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: eblake@redhat.com, Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm <kvm@vger.kernel.org>, Richard Henderson <rth@twiddle.net>
 
-On Tue, 2018-06-19 at 11:25 +0100, Dr. David Alan Gilbert wrote:
-> * Suraj Jitindar Singh (sjitindarsingh@gmail.com) wrote:
-> > The dump-guest-memory command is used to dump an area of guest
-> > memory
-> > to a file, the piece of memory is specified by a begin address and
-> > a length. These parameters are specified as ints and thus have a
-> > maximum
-> > value of 4GB. This means you can't dump the guest memory past the
-> > first
-> > 4GB and instead get:
-> > (qemu) dump-guest-memory tmp 0x100000000 0x100000000
-> > 'dump-guest-memory' has failed: integer is for 32-bit values
-> > Try "help dump-guest-memory" for more information
-> > 
-> > This limitation is imposed in monitor_parse_arguments() since they
-> > are
-> > both ints. hmp_dump_guest_memory() uses 64 bit quantities to store
-> > both
-> > the begin and length values. Thus specify begin and length as long
-> > so
-> > that the entire guest memory space can be dumped.
-> > 
-> > Signed-off-by: Suraj Jitindar Singh <sjtindarsingh@gmail.com>
-> > ---
-> >  hmp-commands.hx | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/hmp-commands.hx b/hmp-commands.hx
-> > index 0734fea931..3b5c1f65db 100644
-> > --- a/hmp-commands.hx
-> > +++ b/hmp-commands.hx
-> > @@ -1116,7 +1116,7 @@ ETEXI
-> >  
-> >      {
-> >          .name       = "dump-guest-memory",
-> > -        .args_type  = "paging:-p,detach:-d,zlib:-z,lzo:-l,snappy:-
-> > s,filename:F,begin:i?,length:i?",
-> > +        .args_type  = "paging:-p,detach:-d,zlib:-z,lzo:-l,snappy:-
-> > s,filename:F,begin:l?,length:l?",
-> >          .params     = "[-p] [-d] [-z|-l|-s] filename [begin
-> > length]",
-> >          .help       = "dump guest memory into file
-> > 'filename'.\n\t\t\t"
-> >                        "-p: do paging to get guest's memory
-> > mapping.\n\t\t\t"
-> 
-> OK, so hmp_dump_guest_memory in hmp.c already uses int64_t for both,
-> as does the qmp_dump_guest_memory it calls; so this looks OK.
-> 
-> Can you repost this please with the correct sign off that I see you
-> tried to fix in the following mail; best if we get it in the one
-> mail.
+On Wed, 20 Jun 2018 at 08:07, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Tue, Jun 19, 2018 at 05:07:46PM -0500, Eric Blake wrote:
+> > On 06/19/2018 10:17 AM, Paolo Bonzini wrote:
+> > > On 16/06/2018 00:29, Michael S. Tsirkin wrote:
+> > > > +static QemuOptsList qemu_dedicated_opts = {
+> > > > +    .name = "dedicated",
+> > > > +    .head = QTAILQ_HEAD_INITIALIZER(qemu_dedicated_opts.head),
+> > > > +    .desc = {
+> > > > +        {
+> > > > +            .name = "mem-lock",
+> > > > +            .type = QEMU_OPT_BOOL,
+> > > > +        },
+> > > > +        {
+> > > > +            .name = "cpu-pm",
+> > > > +            .type = QEMU_OPT_BOOL,
+> > > > +        },
+> > > > +        { /* end of list */ }
+> > > > +    },
+> > > > +};
+> > > > +
+> > >
+> > > Let the bikeshedding begin!
+> > >
+> > > 1) Should we deprecate -realtime?
+> > >
+> > > 2) Maybe -hostresource?
+> >
+> > What further things might we add in the future?
+> >
+> > -dedicated sounds wrong (it is an adjective, while most of our options are
+> > nouns - thing -machine, -drive, -object, ...)
+> >
+> > -hostresource at least sounds like a noun, but is long to type.  But at
+> > least '-hostresource cpu-pm=on' reads reasonably well.
+>
+> Yes but host resource what? I feel it says nothing at all about what
+> one can expect to find in this flag.
+>
+> > About the only other noun I could think of would be '-feature cpu-pm=on'.
+>
+> If we have nothing at all to say about what is grouping these things,
+> we don't need a new flag. We can make it a machine property.
+>
+> It's user's hint that some host resource is dedicated to a VM.
 
-Of course. Done :)
+The commit 633711e82 (kvm: rename KVM_HINTS_DEDICATED to
+KVM_HINTS_REALTIME) should be reverted according to several threads
+discussion I think.
 
-> 
-> Dave
-> 
-> > -- 
-> > 2.13.6
-> > 
-> 
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Regards,
+Wanpeng Li
