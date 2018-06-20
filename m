@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1fVbtb-0002iZ-Pz
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:07:37 -0400
+	(envelope-from <Yongbok.Kim@mips.com>) id 1fVbuM-0003Ec-L6
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:08:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1fVbta-0003XR-9p
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:07:31 -0400
-Received: from 9pmail.ess.barracuda.com ([64.235.150.224]:59798)
+	(envelope-from <Yongbok.Kim@mips.com>) id 1fVbuI-0003xL-Lg
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:08:18 -0400
+Received: from 9pmail.ess.barracuda.com ([64.235.150.224]:35087)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <Yongbok.Kim@mips.com>)
-	id 1fVbta-0003Tk-2j
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:07:30 -0400
+	id 1fVbuI-0003sq-FF
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:08:14 -0400
 From: Yongbok Kim <yongbok.kim@mips.com>
-Date: Wed, 20 Jun 2018 13:05:49 +0100
-Message-ID: <20180620120620.12806-5-yongbok.kim@mips.com>
+Date: Wed, 20 Jun 2018 13:05:50 +0100
+Message-ID: <20180620120620.12806-6-yongbok.kim@mips.com>
 In-Reply-To: <20180620120620.12806-1-yongbok.kim@mips.com>
 References: <20180620120620.12806-1-yongbok.kim@mips.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 04/35] target/mips: Add decode_nanomips_opc()
+Subject: [Qemu-devel] [PATCH 05/35] target/mips: Add nanoMIPS 16bit ld/st
+ instructions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,324 +30,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aurelien@aurel32.net, Aleksandar.Markovic@mips.com, James.Hogan@mips.com, Paul.Burton@mips.com, Matthew.Fortune@mips.com, Stefan.Markovic@mips.com
 
-Add nanoMIPS decoder.
-It covers P16 pool arithmetic and branch instructions.
+Add nanoMIPS 16bit load and store instructions
 
 Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 ---
- target/mips/translate.c | 293 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 292 insertions(+), 1 deletion(-)
+ target/mips/translate.c | 110 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 110 insertions(+)
 
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 27d5fb2..633d0b4 100644
+index 633d0b4..f5b7e14 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -16200,6 +16200,293 @@ enum {
-     NM_EVP      = 0x01
- };
+@@ -16207,6 +16207,14 @@ static int mmreg_nanomips(int r)
+     return map[r & 0x7];
+ }
  
-+static int mmreg_nanomips(int r)
++/* Used for 16-bit store instructions.  */
++static int mmreg2_nanomips(int r)
 +{
-+    static const int map[] = { 16, 17, 18, 19, 4, 5, 6, 7 };
++    static const int map[] = { 0, 17, 18, 19, 4, 5, 6, 7 };
 +
 +    return map[r & 0x7];
 +}
 +
-+static int mmreg4_nanomips(int r)
-+{
-+    static const int map[] = { 8, 9, 10, 11, 4, 5, 6, 7,
-+                            16, 17, 18, 19, 20, 21, 22, 23 };
-+
-+    return map[r & 0xf];
-+}
-+
-+/* Used for 16-bit store instructions.  */
-+static int mmreg4z_nanomips(int r)
-+{
-+    static const int map[] = { 8, 9, 10, 0, 4, 5, 6, 7,
-+                            16, 17, 18, 19, 20, 21, 22, 23 };
-+
-+    return map[r & 0xf];
-+}
-+
-+static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
-+{
-+    uint32_t op;
-+    int rt = mmreg_nanomips(uMIPS_RD(ctx->opcode));
-+    int rs = mmreg_nanomips(uMIPS_RS(ctx->opcode));
-+    int rd = mmreg_nanomips(uMIPS_RS1(ctx->opcode));
-+
-+    /* make sure instructions are on a halfword boundary */
-+    if (ctx->base.pc_next & 0x1) {
-+        env->CP0_BadVAddr = ctx->base.pc_next;
-+        generate_exception_end(ctx, EXCP_AdEL);
-+        return 2;
+ static int mmreg4_nanomips(int r)
+ {
+     static const int map[] = { 8, 9, 10, 11, 4, 5, 6, 7,
+@@ -16292,6 +16300,13 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+     }
+         break;
+     case NM_P16C:
++        switch (ctx->opcode & 1) {
++        case NM_POOL16C_0:
++            break;
++        case NM_LWXS16:
++            gen_ldxs(ctx, rt, rs, rd);
++            break;
++        }
+         break;
+     case NM_P16_A1:
+         switch ((ctx->opcode >> 6) & 1) {
+@@ -16375,24 +16390,119 @@ static int decode_nanomips_opc(CPUMIPSState *env, DisasContext *ctx)
+     }
+         break;
+     case NM_P16_LB:
++    {
++        uint32_t u = extract32(ctx->opcode, 0, 2);
++        switch (((ctx->opcode) >> 2) & 0x03) {
++        case NM_LB16:
++            gen_ld(ctx, OPC_LB, rt, rs, u);
++            break;
++        case NM_SB16:
++            {
++                int rt = mmreg2_nanomips(uMIPS_RD(ctx->opcode));
++                gen_st(ctx, OPC_SB, rt, rs, u);
++            }
++            break;
++        case NM_LBU16:
++            gen_ld(ctx, OPC_LBU, rt, rs, u);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
 +    }
-+
-+    op = (ctx->opcode >> 10) & 0x3f;
-+    switch (op) {
-+    case NM_P16_MV:
+         break;
+     case NM_P16_LH:
++    {
++        uint32_t u = extract32(ctx->opcode, 1, 2) << 1;
++        switch ((((ctx->opcode >> 3) & 1) << 1) | (ctx->opcode & 1)) {
++        case NM_LH16:
++            gen_ld(ctx, OPC_LH, rt, rs, u);
++            break;
++        case NM_SH16:
++            {
++                int rt = mmreg2_nanomips(uMIPS_RD(ctx->opcode));
++                gen_st(ctx, OPC_SH, rt, rs, u);
++            }
++            break;
++        case NM_LHU16:
++            gen_ld(ctx, OPC_LHU, rt, rs, u);
++            break;
++        default:
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++    }
+         break;
+     case NM_LW16:
++    {
++        int u = extract32(ctx->opcode, 0, 4) << 2;
++        gen_ld(ctx, OPC_LW, rt, rs, u);
++    }
+         break;
+     case NM_LWSP16:
 +    {
 +        int rt = uMIPS_RD5(ctx->opcode);
-+        if (rt != 0) {
-+            /* MOVE */
-+            int rs = uMIPS_RS5(ctx->opcode);
-+            gen_arith(ctx, OPC_ADDU, rt, rs, 0);
-+        } else {
-+            /* P16.RI */
-+            switch ((ctx->opcode >> 3) & 0x3) {
-+            case NM_P16_SYSCALL:
-+                generate_exception_end(ctx, EXCP_SYSCALL);
-+                break;
-+            case NM_BREAK16:
-+                generate_exception_end(ctx, EXCP_BREAK);
-+                break;
-+            case NM_SDBBP16:
-+                if (is_uhi(extract32(ctx->opcode, 0, 3))) {
-+                    gen_helper_do_semihosting(cpu_env);
-+                } else {
-+                    if (ctx->hflags & MIPS_HFLAG_SBRI) {
-+                        generate_exception_end(ctx, EXCP_RI);
-+                    } else {
-+                        generate_exception_end(ctx, EXCP_DBp);
-+                    }
-+                }
-+                break;
-+            default:
-+                generate_exception_end(ctx, EXCP_RI);
-+                break;
-+            }
-+        }
-+    }
-+        break;
-+    case NM_P16_SHIFT:
-+    {
-+        int shift = (ctx->opcode) & 0x7;
-+        uint32_t opc = 0;
-+        shift = (shift == 0) ? 8 : shift;
++        int u = extract32(ctx->opcode, 0, 5) << 2;
 +
-+        switch ((ctx->opcode >> 3) & 1) {
-+        case NM_SLL16:
-+            opc = OPC_SLL;
-+            break;
-+        case NM_SRL16:
-+            opc = OPC_SRL;
-+            break;
-+        }
-+        gen_shift_imm(ctx, opc, rt, rs, shift);
++        gen_ld(ctx, OPC_LW, rt, 29, u);
 +    }
-+        break;
-+    case NM_P16C:
-+        break;
-+    case NM_P16_A1:
-+        switch ((ctx->opcode >> 6) & 1) {
-+        case NM_ADDIUR1SP:
-+            gen_arith_imm(ctx, OPC_ADDIU, rt, 29,
-+                          extract32(ctx->opcode, 0, 6) << 2);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
-+        break;
-+    case NM_P16_A2:
-+        switch ((ctx->opcode >> 3) & 1) {
-+        case NM_ADDIUR2:
-+        {
-+            uint8_t u = (uint8_t) extract32(ctx->opcode, 0, 3) << 2;
-+            gen_arith_imm(ctx, OPC_ADDIU, rt, rs, u);
-+        }
-+            break;
-+        case NM_P_ADDIURS5:
-+        {
-+            int rt  = extract32(ctx->opcode, 5, 5);
-+            if (rt != 0) {
-+                int s = (sextract32(ctx->opcode, 4, 1) << 3) |
-+                        extract32(ctx->opcode, 0, 3);
-+                /* s = sign_extend( s[3] . s[2:0] , from_nbits = 4)*/
-+                gen_arith_imm(ctx, OPC_ADDIU, rt, rt, s);
-+            }
-+        }
-+            break;
-+        }
-+        break;
-+    case NM_P16_ADDU:
-+        switch (ctx->opcode & 0x1) {
-+        case NM_ADDU16:
-+            gen_arith(ctx, OPC_ADDU, rd, rs, rt);
-+            break;
-+        case NM_SUBU16:
-+            gen_arith(ctx, OPC_SUBU, rd, rs, rt);
-+            break;
-+        }
-+        break;
-+    case NM_P16_4X4:
+         break;
+     case NM_LW4X4:
 +    {
 +        int rt = (extract32(ctx->opcode, 9, 1) << 3) |
-+                  extract32(ctx->opcode, 5, 3);
++                 extract32(ctx->opcode, 5, 3);
 +        int rs = (extract32(ctx->opcode, 4, 1) << 3) |
-+                  extract32(ctx->opcode, 0, 3);
++                 extract32(ctx->opcode, 0, 3);
++        int u = (extract32(ctx->opcode, 3, 1) << 3) |
++                (extract32(ctx->opcode, 8, 1) << 2);
 +        rt = mmreg4_nanomips(rt);
 +        rs = mmreg4_nanomips(rs);
-+
-+        switch (((ctx->opcode >> 7) & 0x2) | ((ctx->opcode >> 3) & 0x1)) {
-+        case NM_ADDU4X4:
-+            gen_arith(ctx, OPC_ADDU, rt, rs, rt);
-+            break;
-+        case NM_MUL4X4:
-+            gen_r6_muldiv(ctx, R6_OPC_MUL, rt, rs, rt);
-+            break;
-+        default:
-+            generate_exception_end(ctx, EXCP_RI);
-+            break;
-+        }
++        gen_ld(ctx, OPC_LW, rt, rs, u);
 +    }
-+        break;
-+    case NM_LI16:
+         break;
+     case NM_SW4X4:
 +    {
-+        int imm = extract32(ctx->opcode, 0, 7);
-+        imm = (imm == 0x7f ? -1 : imm);
-+        if (rt != 0) {
-+            tcg_gen_movi_tl(cpu_gpr[rt], imm);
-+        }
-+    }
-+        break;
-+    case NM_ANDI16:
-+    {
-+        uint32_t u = extract32(ctx->opcode, 0, 4);
-+        u = (u == 12) ? 0xff :
-+            (u == 13) ? 0xffff : u;
-+        gen_logic_imm(ctx, OPC_ANDI, rt, rs, u);
-+    }
-+        break;
-+    case NM_P16_LB:
-+        break;
-+    case NM_P16_LH:
-+        break;
-+    case NM_LW16:
-+        break;
-+    case NM_LWSP16:
-+        break;
-+    case NM_LW4X4:
-+        break;
-+    case NM_SW4X4:
-+        break;
-+    case NM_LWGP16:
-+        break;
-+    case NM_SWSP16:
-+        break;
-+    case NM_SW16:
-+        break;
-+    case NM_SWGP16:
-+        break;
-+    case NM_BC16:
-+        gen_compute_branch(ctx, OPC_BEQ, 2, 0, 0,
-+                           (sextract32(ctx->opcode, 0, 1) << 10) |
-+                               (extract32(ctx->opcode, 1, 9) << 1),
-+                           0);
-+        break;
-+    case NM_BALC16:
-+        gen_compute_branch(ctx, OPC_BGEZAL, 2, 0, 0,
-+                           (sextract32(ctx->opcode, 0, 1) << 10) |
-+                               (extract32(ctx->opcode, 1, 9) << 1),
-+                           0);
-+        break;
-+    case NM_BEQZC16:
-+    case NM_BNEZC16:
-+        gen_compute_branch(ctx, op == NM_BNEZC16 ? OPC_BNE : OPC_BEQ, 2,
-+                           rt, 0,
-+                           (sextract32(ctx->opcode, 0, 1) << 7) |
-+                               (extract32(ctx->opcode, 1, 6) << 1),
-+                           0);
-+        break;
-+    case NM_P16_BR:
-+        switch (ctx->opcode & 0xf) {
-+        case 0:
-+            /* P16.JRC */
-+            switch ((ctx->opcode >> 4) & 1) {
-+            case NM_JRC:
-+                gen_compute_branch(ctx, OPC_JR, 2,
-+                                   extract32(ctx->opcode, 5, 5), 0, 0, 0);
-+                break;
-+            case NM_JALRC16:
-+                gen_compute_branch(ctx, OPC_JALR, 2,
-+                                   extract32(ctx->opcode, 5, 5), 31, 0, 0);
-+                break;
-+            }
-+            break;
-+        default:
-+            /* P16.BRI */
-+            if (extract32(ctx->opcode, 4, 3) < extract32(ctx->opcode, 7, 3)) {
-+                /* BEQC16 */
-+                gen_compute_branch(ctx, OPC_BEQ, 2, rs, rt,
-+                                   extract32(ctx->opcode, 0, 4) << 1, 0);
-+            } else {
-+                /* BNEC16 */
-+                gen_compute_branch(ctx, OPC_BNE, 2, rs, rt,
-+                                   extract32(ctx->opcode, 0, 4) << 1, 0);
-+            }
-+            break;
-+        }
-+        break;
-+    case NM_P16_SR:
-+        break;
-+    case NM_MOVEP:
-+    case NM_MOVEPREV:
-+    {
-+        static const int gpr2reg1[] = {4, 5, 6, 7};
-+        static const int gpr2reg2[] = {5, 6, 7, 8};
-+        int re;
-+        int rd2 = extract32(ctx->opcode, 3, 1) << 1 |
-+                  extract32(ctx->opcode, 8, 1);
-+        int r1 = gpr2reg1[rd2];
-+        int r2 = gpr2reg2[rd2];
-+        int r3 = extract32(ctx->opcode, 4, 1) << 3 |
-+                 extract32(ctx->opcode, 0, 3);
-+        int r4 = extract32(ctx->opcode, 9, 1) << 3 |
++        int rt = (extract32(ctx->opcode, 9, 1) << 3) |
 +                 extract32(ctx->opcode, 5, 3);
-+        TCGv t0 = tcg_temp_new();
-+        TCGv t1 = tcg_temp_new();
-+        if (op == NM_MOVEP) {
-+            rd = r1;
-+            re = r2;
-+            rs = mmreg4z_nanomips(r3);
-+            rt = mmreg4z_nanomips(r4);
-+        } else {
-+            rd = mmreg4_nanomips(r3);
-+            re = mmreg4_nanomips(r4);
-+            rs = r1;
-+            rt = r2;
-+        }
-+        gen_load_gpr(t0, rs);
-+        gen_load_gpr(t1, rt);
-+        tcg_gen_mov_tl(cpu_gpr[rd], t0);
-+        tcg_gen_mov_tl(cpu_gpr[re], t1);
-+        tcg_temp_free(t0);
-+        tcg_temp_free(t1);
++        int rs = (extract32(ctx->opcode, 4, 1) << 3) |
++                 extract32(ctx->opcode, 0, 3);
++        int u = (extract32(ctx->opcode, 3, 1) << 3) |
++                (extract32(ctx->opcode, 8, 1) << 2);
++        rt = mmreg4z_nanomips(rt);
++        rs = mmreg4_nanomips(rs);
++        gen_st(ctx, OPC_SW, rt, rs, u);
 +    }
-+        break;
-+    default:
-+        break;
+         break;
+     case NM_LWGP16:
++    {
++        int u = extract32(ctx->opcode, 0, 7) << 2;
++        gen_ld(ctx, OPC_LW, rt, 28, u);
 +    }
+         break;
+     case NM_SWSP16:
++    {
++        int rt = uMIPS_RD5(ctx->opcode);
++        int u = extract32(ctx->opcode, 0, 5) << 2;
 +
-+    return 2;
-+}
++        gen_st(ctx, OPC_SW, rt, 29, u);
++    }
+         break;
+     case NM_SW16:
++    {
++        int rt = mmreg2_nanomips(uMIPS_RD(ctx->opcode));
++        int rs = mmreg_nanomips(uMIPS_RS(ctx->opcode));
++        int u = extract32(ctx->opcode, 0, 4) << 2;
 +
- /* SmartMIPS extension to MIPS32 */
- 
- #if defined(TARGET_MIPS64)
-@@ -20950,7 +21237,11 @@ static void mips_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
-         decode_opc(env, ctx);
-     } else if (ctx->insn_flags & ASE_MICROMIPS) {
-         ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
--        insn_bytes = decode_micromips_opc(env, ctx);
-+        if (env->insn_flags & ISA_NANOMIPS32) {
-+            insn_bytes = decode_nanomips_opc(env, ctx);
-+        } else {
-+            insn_bytes = decode_micromips_opc(env, ctx);
-+        }
-     } else if (ctx->insn_flags & ASE_MIPS16) {
-         ctx->opcode = cpu_lduw_code(env, ctx->base.pc_next);
-         insn_bytes = decode_mips16_opc(env, ctx);
++        gen_st(ctx, OPC_SW, rt, rs, u);
++    }
+         break;
+     case NM_SWGP16:
++    {
++        int rt = mmreg2_nanomips(uMIPS_RD(ctx->opcode));
++        int u = extract32(ctx->opcode, 0, 7) << 2;
++
++        gen_st(ctx, OPC_SW, rt, 28, u);
++    }
+         break;
+     case NM_BC16:
+         gen_compute_branch(ctx, OPC_BEQ, 2, 0, 0,
 -- 
 1.9.1
