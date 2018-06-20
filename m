@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fVZky-0007AY-IB
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:50:29 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fVZm6-0007vb-6T
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:51:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fVZkx-0000K4-On
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:50:28 -0400
-Date: Wed, 20 Jun 2018 11:50:00 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20180620095000.mbhnrfmlnupzeig5@toto>
-References: <20180529124707.3025-1-edgar.iglesias@gmail.com>
+	(envelope-from <dgilbert@redhat.com>) id 1fVZm4-0000yd-Um
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:51:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55358 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVZm4-0000yQ-P1
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:51:36 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2A8F38780F
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 09:51:36 +0000 (UTC)
+Date: Wed, 20 Jun 2018 10:51:33 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180620095132.GE2549@work-vm>
+References: <20180620081524.5751-1-quintela@redhat.com>
+	<20180620081524.5751-4-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180529124707.3025-1-edgar.iglesias@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] xlnx-zynqmp: Change the Cortex-R5
- for Cortex-R5F
+In-Reply-To: <20180620081524.5751-4-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v14 03/12] migration: Add multifd traces
+ for start/end thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +34,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, frederic.konrad@adacore.com, sai.pavan.boddu@xilinx.com, alistair@alistair23.me, frasse.iglesias@gmail.com, luc.michel@greensocs.com, sstabellini@kernel.org, f4bug@amsat.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On Tue, May 29, 2018 at 02:47:05PM +0200, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+* Juan Quintela (quintela@redhat.com) wrote:
+> We want to know how many pages/packets each channel has sent.  Add
+> counters for those.
 > 
-> The ZynqMP actually has Cortex-R5Fs with the optional FPU enabled.
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
 
-Hi Peter,
+You mean
 
-Any comments on this series?
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Cheers,
-Edgar
-
-
+> --
+> sort trace-events (dave)
+> ---
+>  migration/ram.c        | 22 ++++++++++++++++++++++
+>  migration/trace-events |  4 ++++
+>  2 files changed, 26 insertions(+)
 > 
-> Cheers,
-> Edgar
-> 
-> ChangeLog:
-> 
-> v1 -> v2:
-> * Update ZCU102 description to mention R5Fs
-> 
-> Edgar E. Iglesias (2):
->   target-arm: Add the Cortex-R5F
->   xlnx-zynqmp: Swap Cortex-R5 for Cortex-R5F
-> 
->  hw/arm/xlnx-zcu102.c | 2 +-
->  hw/arm/xlnx-zynqmp.c | 2 +-
->  target/arm/cpu.c     | 9 +++++++++
->  3 files changed, 11 insertions(+), 2 deletions(-)
-> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 6504b492da..d146689d3a 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -570,6 +570,11 @@ typedef struct {
+>      uint32_t flags;
+>      /* global number of generated multifd packets */
+>      uint64_t packet_num;
+> +    /* thread local variables */
+> +    /* packets sent through this channel */
+> +    uint32_t num_packets;
+> +    /* pages sent through this channel */
+> +    uint32_t num_pages;
+>  }  MultiFDSendParams;
+>  
+>  typedef struct {
+> @@ -600,6 +605,11 @@ typedef struct {
+>      uint32_t flags;
+>      /* global number of generated multifd packets */
+>      uint64_t packet_num;
+> +    /* thread local variables */
+> +    /* packets sent through this channel */
+> +    uint32_t num_packets;
+> +    /* pages sent through this channel */
+> +    uint32_t num_pages;
+>  } MultiFDRecvParams;
+>  
+>  static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
+> @@ -856,9 +866,13 @@ static void *multifd_send_thread(void *opaque)
+>      MultiFDSendParams *p = opaque;
+>      Error *local_err = NULL;
+>  
+> +    trace_multifd_send_thread_start(p->id);
+> +
+>      if (multifd_send_initial_packet(p, &local_err) < 0) {
+>          goto out;
+>      }
+> +    /* initial packet */
+> +    p->num_packets = 1;
+>  
+>      while (true) {
+>          qemu_mutex_lock(&p->mutex);
+> @@ -880,6 +894,8 @@ out:
+>      p->running = false;
+>      qemu_mutex_unlock(&p->mutex);
+>  
+> +    trace_multifd_send_thread_end(p->id, p->num_packets, p->num_pages);
+> +
+>      return NULL;
+>  }
+>  
+> @@ -1007,6 +1023,8 @@ static void *multifd_recv_thread(void *opaque)
+>      Error *local_err = NULL;
+>      int ret;
+>  
+> +    trace_multifd_recv_thread_start(p->id);
+> +
+>      while (true) {
+>          qemu_mutex_lock(&p->mutex);
+>          if (false)  {
+> @@ -1029,6 +1047,8 @@ static void *multifd_recv_thread(void *opaque)
+>      p->running = false;
+>      qemu_mutex_unlock(&p->mutex);
+>  
+> +    trace_multifd_recv_thread_end(p->id, p->num_packets, p->num_pages);
+> +
+>      return NULL;
+>  }
+>  
+> @@ -1094,6 +1114,8 @@ void multifd_recv_new_channel(QIOChannel *ioc)
+>      }
+>      p->c = ioc;
+>      object_ref(OBJECT(ioc));
+> +    /* initial packet */
+> +    p->num_packets = 1;
+>  
+>      p->running = true;
+>      qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 3f67758893..6d499448b3 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -76,6 +76,10 @@ get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned
+>  migration_bitmap_sync_start(void) ""
+>  migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
+>  migration_throttle(void) ""
+> +multifd_recv_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
+> +multifd_recv_thread_start(uint8_t id) "%d"
+> +multifd_send_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
+> +multifd_send_thread_start(uint8_t id) "%d"
+>  ram_discard_range(const char *rbname, uint64_t start, size_t len) "%s: start: %" PRIx64 " %zx"
+>  ram_load_loop(const char *rbname, uint64_t addr, int flags, void *host) "%s: addr: 0x%" PRIx64 " flags: 0x%x host: %p"
+>  ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
 > -- 
-> 2.14.1
+> 2.17.1
 > 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
