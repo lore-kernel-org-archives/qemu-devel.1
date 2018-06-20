@@ -1,29 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVkIm-0008D5-9l
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 17:06:05 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fVkyU-0001YP-3Y
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 17:49:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVkIl-0002BY-9M
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 17:06:04 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:41666)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fVkIl-0002B6-2p
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 17:06:03 -0400
-Received: by mail-wr0-x242.google.com with SMTP id h10-v6so879162wrq.8
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 14:06:02 -0700 (PDT)
-References: <20180620132032.12952-1-alex.bennee@linaro.org>
-	<20180620132032.12952-5-alex.bennee@linaro.org>
-	<ffe5d74e-9cc0-e257-213a-56a44002bbfa@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <ffe5d74e-9cc0-e257-213a-56a44002bbfa@amsat.org>
-Date: Wed, 20 Jun 2018 22:06:00 +0100
-Message-ID: <87muvpuq13.fsf@linaro.org>
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1fVkyQ-0003UH-7s
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 17:49:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58044)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1fVkyQ-0003TM-0V
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 17:49:06 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5KLdQBE006897
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 17:49:05 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jqx1xt95m-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 17:49:04 -0400
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Wed, 20 Jun 2018 17:49:03 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 4/5] build-system: add clean-coverage
- target
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20180619094248.08d5fed5.cohuck@redhat.com>
+References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
+	<20180619094248.08d5fed5.cohuck@redhat.com>
+Date: Wed, 20 Jun 2018 15:41:24 -0500
+Message-Id: <152952728499.8870.3711510048351515296@sif>
+Subject: Re: [Qemu-devel] [PATCH 00/113] Patch Round-up for stable 2.11.2,
+ freeze on 2018-06-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,98 +42,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
+
+Quoting Cornelia Huck (2018-06-19 02:42:48)
+> On Mon, 18 Jun 2018 20:41:26 -0500
+> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+> =
+
+> > Hi everyone,
+> > =
+
+> > The following new patches are queued for QEMU stable v2.11.2:
+> > =
+
+> >   https://github.com/mdroth/qemu/commits/stable-2.11-staging
+> > =
+
+> > The release is planned for 2018-06-22:
+> > =
+
+> >   https://wiki.qemu.org/Planning/2.11
+> > =
+
+> > Please respond here or CC qemu-stable@nongnu.org on any patches you
+> > think should be included in the release.
+> > =
+
+> > Thanks!
+> > =
+
+> > ----------------------------------------------------------------
+> > =
+
+> > The following changes since commit 7c1beb52ed86191d9e965444d934adaa2531=
+710f:
+> > =
+
+> >   Update version for 2.11.1 release (2018-02-14 14:41:05 -0600)
+> > =
+
+> > are available in the git repository at:
+> > =
+
+> >   git://github.com/mdroth/qemu.git =
+
+> > =
+
+> > for you to fetch changes up to acb3571f90885a2e206044b3bdc8d1dd2a0389c0:
+> > =
+
+> >   arm_gicv3_kvm: kvm_dist_get/put_priority: skip the registers banked b=
+y GICR_IPRIORITYR (2018-06-16 07:47:00 -0500)
+> > =
+
+> > ----------------------------------------------------------------
+> =
+
+> Hi Michael,
+> =
+
+> as this series includes some s390-ccw bios patches, it needs a rebuild
+> of the s390-ccw bios as well, probably on top of your stable branch.
+> (IIRC we have extra patches on master, so you probably don't want to
+> cherry-pick the latest rebuild from there.). Let me know if one of us
+> should provide a rebuild.
+> =
 
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
-
-> Hi Alex,
->
-> On 06/20/2018 10:20 AM, Alex Benn=C3=A9e wrote:
->> This can be used to remove any stale coverage data before any
->> particular test run. This is useful for analysing individual tests.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  Makefile               | 11 +++++++++++
->>  docs/devel/testing.rst | 11 ++++++++---
->>  2 files changed, 19 insertions(+), 3 deletions(-)
->>
->> diff --git a/Makefile b/Makefile
->> index e46f2b625a..cb4af8bf80 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -725,6 +725,14 @@ module_block.h: $(SRC_PATH)/scripts/modules/module_=
-block.py config-host.mak
->>  	$(addprefix $(SRC_PATH)/,$(patsubst %.mo,%.c,$(block-obj-m))), \
->>  	"GEN","$@")
->>
->> +ifdef CONFIG_GCOV
->> +.PHONY: clean-coverage
->> +clean-coverage:
->> +	$(call quiet-command, \
->> +		find . \( -name '*.gcda' -o -name '*.gcov' \) -type f -exec rm {} +, \
->> +		"CLEAN", "coverage files")
->
-> I also see ".gcno" files.
-> From GCC man page:
->
->       -ftest-coverage
->            Produce a notes file that the gcov code-coverage
->            utility can use to show program coverage.  Each
->            source file's note file is called auxname.gcno.
-
-I explicitly left that out - the gcno file is regenerated by the build.
-There is no reason to wipe it between coverage runs. A full clean should
-remove them however.
-
->
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Adding gcno:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
->> +endif
->> +
->>  clean:
->>  # avoid old build problems by removing potentially incorrect old files
->>  	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h=
- gen-op-arm.h
->> @@ -1075,6 +1083,9 @@ endif
->>  		echo '')
->>  	@echo  'Cleaning targets:'
->>  	@echo  '  clean           - Remove most generated files but keep the c=
-onfig'
->> +ifdef CONFIG_GCOV
->> +	@echo  '  clean-coverage  - Remove coverage files'
->> +endif
->>  	@echo  '  distclean       - Remove all generated files'
->>  	@echo  '  dist            - Build a distributable tarball'
->>  	@echo  ''
->> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
->> index 66ef219f69..a3652aea14 100644
->> --- a/docs/devel/testing.rst
->> +++ b/docs/devel/testing.rst
->> @@ -161,9 +161,14 @@ GCC gcov support
->>  ``gcov`` is a GCC tool to analyze the testing coverage by
->>  instrumenting the tested code. To use it, configure QEMU with
->>  ``--enable-gcov`` option and build. Then run ``make check`` as usual.
->> -Reports can be obtained by running ``gcov`` command on the output
->> -files under ``$build_dir/tests/``, please read the ``gcov``
->> -documentation for more information.
->> +
->> +If you want to gather coverage information on a single test the ``make
->> +clean-coverage`` target can be used to any existing coverage
->> +information before running a single test.
->> +
->> +Reports can be obtained by running ``gcov`` command
->> +on the output files under ``$build_dir/tests/``, please read the
->> +``gcov`` documentation for more information.
->>
->>  QEMU iotests
->>  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>
-
-
---
-Alex Benn=C3=A9e
+Thanks Cornelia, I hadn't realized that. I think rebuild from one of the
+maintainers would definitely be preferable. We'd also want the corresponding
+patches for pc-bios/s390-ccw reflected in the 2.11.x tree. If you or
+another maintainer could put together a branch with those I can merge
+those in directly.
