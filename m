@@ -1,27 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44516)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fVe8d-0006TQ-9D
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:31:13 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fVeBg-0008S2-93
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:34:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fVe8Y-0006qw-OR
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:31:11 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:36210)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fVe8Y-0006pk-C4
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:31:06 -0400
-Received: by mail-wm0-x243.google.com with SMTP id v131-v6so124569wma.1
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 07:31:06 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1fVeBa-0007rd-9b
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:34:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38828 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fVeBa-0007rU-4V
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:34:14 -0400
+Date: Wed, 20 Jun 2018 16:34:08 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180620163408.737af8c2.cohuck@redhat.com>
+In-Reply-To: <CADGSJ20wrF418-WVev6OjaeShZWE488uxRwgaZmsjOHZr8jyOw@mail.gmail.com>
+References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
+	<20180611202207-mutt-send-email-mst@kernel.org>
+	<dc8b1669-b8b6-fb59-94e2-6e4de6b96572@redhat.com>
+	<20180612051432-mutt-send-email-mst@kernel.org>
+	<23fc4aa4-ec41-d6e2-3354-10cbfc13b7ec@intel.com>
+	<20180612142557-mutt-send-email-mst@kernel.org>
+	<b9c88515-cf41-2a9a-078e-9c9e5adbbf14@intel.com>
+	<CADGSJ213f8tJpNXuOhv8qRew-Y5VZAwA+srNMrLZYnKdVGLdAA@mail.gmail.com>
+	<20180614120231.0a72bd5f.cohuck@redhat.com>
+	<CADGSJ23WnTmVKHezm3t0V6M2sWeHaOUoTjdXkmrvbO0EF83hMg@mail.gmail.com>
+	<20180615134815.6613620e.cohuck@redhat.com>
+	<CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
+	<20180619125453.2d2dfb2d.cohuck@redhat.com>
+	<CADGSJ20wrF418-WVev6OjaeShZWE488uxRwgaZmsjOHZr8jyOw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180618161729.334-9-marcandre.lureau@redhat.com>
-References: <20180618161729.334-1-marcandre.lureau@redhat.com>
-	<20180618161729.334-9-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 20 Jun 2018 16:31:03 +0200
-Message-ID: <CAJ+F1CKndBUnSrbsxWUc0CByRrE6mskGj-KH+pU3veP8FnikeA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 08/26] Add vhost-user-backend
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,409 +40,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU <qemu-devel@nongnu.org>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Siwei Liu <loseweigh@gmail.com>
+Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, "Michael S.
+	Tsirkin" <mst@redhat.com>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-Hi
+On Tue, 19 Jun 2018 13:09:14 -0700
+Siwei Liu <loseweigh@gmail.com> wrote:
 
-On Mon, Jun 18, 2018 at 6:17 PM, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
-> Create a vhost-user-backend object that holds a connection to a
-> vhost-user backend and can be referenced from virtio devices that
-> support it. See later patches for input & gpu usage.
->
-> A chardev can be specified to communicate with the vhost-user backend,
-> ex: -chardev socket,id=3Dchar0,path=3D/tmp/foo.sock -object
-> vhost-user-backend,id=3Dvuid,chardev=3Dchar0.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  include/sysemu/vhost-user-backend.h |  60 +++++++
->  backends/vhost-user.c               | 257 ++++++++++++++++++++++++++++
->  vl.c                                |   3 +-
->  backends/Makefile.objs              |   3 +-
->  4 files changed, 321 insertions(+), 2 deletions(-)
->  create mode 100644 include/sysemu/vhost-user-backend.h
->  create mode 100644 backends/vhost-user.c
->
-> diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost-u=
-ser-backend.h
-> new file mode 100644
-> index 0000000000..60f811cae7
-> --- /dev/null
-> +++ b/include/sysemu/vhost-user-backend.h
-> @@ -0,0 +1,60 @@
-> +/*
-> + * QEMU vhost-user backend
-> + *
-> + * Copyright (C) 2018 Red Hat Inc
-> + *
-> + * Authors:
-> + *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +#ifndef QEMU_VHOST_USER_BACKEND_H
-> +#define QEMU_VHOST_USER_BACKEND_H
-> +
-> +#include "qom/object.h"
-> +#include "exec/memory.h"
-> +#include "qemu/option.h"
-> +#include "qemu/bitmap.h"
-> +#include "hw/virtio/vhost.h"
-> +#include "hw/virtio/vhost-user.h"
-> +#include "chardev/char-fe.h"
-> +#include "io/channel.h"
-> +
-> +#define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
-> +#define VHOST_USER_BACKEND(obj) \
-> +    OBJECT_CHECK(VhostUserBackend, (obj), TYPE_VHOST_USER_BACKEND)
-> +#define VHOST_USER_BACKEND_GET_CLASS(obj) \
-> +    OBJECT_GET_CLASS(VhostUserBackendClass, (obj), TYPE_VHOST_USER_BACKE=
-ND)
-> +#define VHOST_USER_BACKEND_CLASS(klass) \
-> +    OBJECT_CLASS_CHECK(VhostUserBackendClass, (klass), TYPE_VHOST_USER_B=
-ACKEND)
-> +
-> +typedef struct VhostUserBackend VhostUserBackend;
-> +typedef struct VhostUserBackendClass VhostUserBackendClass;
-> +
-> +struct VhostUserBackendClass {
-> +    ObjectClass parent_class;
-> +};
-> +
-> +struct VhostUserBackend {
-> +    /* private */
-> +    Object parent;
-> +
-> +    char *cmd;
-> +    char *chr_name;
-> +
-> +    CharBackend chr;
-> +    VhostUserState vhost_user;
-> +    struct vhost_dev dev;
-> +    QIOChannel *child;
-> +    VirtIODevice *vdev;
-> +    bool started;
-> +    bool completed;
-> +};
-> +
-> +int vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vdev,
-> +                                unsigned nvqs, Error **errp);
-> +void vhost_user_backend_start(VhostUserBackend *b);
-> +void vhost_user_backend_stop(VhostUserBackend *b);
-> +
-> +#endif
-> diff --git a/backends/vhost-user.c b/backends/vhost-user.c
-> new file mode 100644
-> index 0000000000..db97037306
-> --- /dev/null
-> +++ b/backends/vhost-user.c
-> @@ -0,0 +1,257 @@
-> +/*
-> + * QEMU vhost-user backend
-> + *
-> + * Copyright (C) 2018 Red Hat Inc
-> + *
-> + * Authors:
-> + *  Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/qdev.h"
-> +#include "qapi/error.h"
-> +#include "qapi/qmp/qerror.h"
-> +#include "qemu/error-report.h"
-> +#include "qom/object_interfaces.h"
-> +#include "sysemu/vhost-user-backend.h"
-> +#include "sysemu/kvm.h"
-> +#include "io/channel-command.h"
-> +#include "hw/virtio/virtio-bus.h"
-> +
-> +static bool
-> +ioeventfd_enabled(void)
-> +{
-> +    return kvm_enabled() && kvm_eventfds_enabled();
-> +}
-> +
-> +int
-> +vhost_user_backend_dev_init(VhostUserBackend *b, VirtIODevice *vdev,
-> +                            unsigned nvqs, Error **errp)
-> +{
-> +    int ret;
-> +
-> +    assert(!b->vdev && vdev);
-> +
-> +    if (!ioeventfd_enabled()) {
-> +        error_setg(errp, "vhost initialization failed: requires kvm");
-> +        return -1;
-> +    }
-> +
-> +    if (!vhost_user_init(&b->vhost_user, &b->chr, errp)) {
-> +        return -1;
-> +    }
-> +
-> +    b->vdev =3D vdev;
-> +    b->dev.nvqs =3D nvqs;
-> +    b->dev.vqs =3D g_new(struct vhost_virtqueue, nvqs);
-> +
-> +    ret =3D vhost_dev_init(&b->dev, &b->vhost_user, VHOST_BACKEND_TYPE_U=
-SER, 0);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, -ret, "vhost initialization failed");
-> +        return -1;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +void
-> +vhost_user_backend_start(VhostUserBackend *b)
-> +{
-> +    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
-> +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
-> +    int ret, i ;
-> +
-> +    if (b->started) {
-> +        return;
-> +    }
-> +
-> +    if (!k->set_guest_notifiers) {
-> +        error_report("binding does not support guest notifiers");
-> +        return;
-> +    }
-> +
-> +    ret =3D vhost_dev_enable_notifiers(&b->dev, b->vdev);
-> +    if (ret < 0) {
-> +        return;
-> +    }
-> +
-> +    ret =3D k->set_guest_notifiers(qbus->parent, b->dev.nvqs, true);
-> +    if (ret < 0) {
-> +        error_report("Error binding guest notifier");
-> +        goto err_host_notifiers;
-> +    }
-> +
-> +    b->dev.acked_features =3D b->vdev->guest_features;
-> +    ret =3D vhost_dev_start(&b->dev, b->vdev);
-> +    if (ret < 0) {
-> +        error_report("Error start vhost dev");
-> +        goto err_guest_notifiers;
-> +    }
-> +
-> +    /* guest_notifier_mask/pending not used yet, so just unmask
-> +     * everything here.  virtio-pci will do the right thing by
-> +     * enabling/disabling irqfd.
-> +     */
-> +    for (i =3D 0; i < b->dev.nvqs; i++) {
-> +        vhost_virtqueue_mask(&b->dev, b->vdev,
-> +                             b->dev.vq_index + i, false);
-> +    }
-> +
-> +    b->started =3D true;
-> +    return;
-> +
-> +err_guest_notifiers:
-> +    k->set_guest_notifiers(qbus->parent, b->dev.nvqs, false);
-> +err_host_notifiers:
-> +    vhost_dev_disable_notifiers(&b->dev, b->vdev);
-> +}
-> +
-> +void
-> +vhost_user_backend_stop(VhostUserBackend *b)
-> +{
-> +    BusState *qbus =3D BUS(qdev_get_parent_bus(DEVICE(b->vdev)));
-> +    VirtioBusClass *k =3D VIRTIO_BUS_GET_CLASS(qbus);
-> +    int ret =3D 0;
-> +
-> +    if (!b->started) {
-> +        return;
-> +    }
-> +
-> +    vhost_dev_stop(&b->dev, b->vdev);
-> +
-> +    if (k->set_guest_notifiers) {
-> +        ret =3D k->set_guest_notifiers(qbus->parent,
-> +                                     b->dev.nvqs, false);
-> +        if (ret < 0) {
-> +            error_report("vhost guest notifier cleanup failed: %d", ret)=
-;
-> +        }
-> +    }
-> +    assert(ret >=3D 0);
-> +
-> +    vhost_dev_disable_notifiers(&b->dev, b->vdev);
-> +    b->started =3D false;
-> +}
-> +
-> +static void
-> +pre_exec_cb(void *data)
-> +{
-> +    int *sv =3D data;
-> +    int maxfd =3D sysconf(_SC_OPEN_MAX);
-> +    int fd;
-> +
-> +    dup2(sv[1], 3);
-> +    for (fd =3D 4; fd < maxfd; fd++) {
-> +        close(fd);
-> +    }
-> +}
+> On Tue, Jun 19, 2018 at 3:54 AM, Cornelia Huck <cohuck@redhat.com> wrote:
+> > On Fri, 15 Jun 2018 10:06:07 -0700
+> > Siwei Liu <loseweigh@gmail.com> wrote:
+> >  
+> >> On Fri, Jun 15, 2018 at 4:48 AM, Cornelia Huck <cohuck@redhat.com> wrote:  
+> >> > On Thu, 14 Jun 2018 18:57:11 -0700
+> >> > Siwei Liu <loseweigh@gmail.com> wrote:
 
-I moved that function to the next patch.
+> >> > I'm a bit confused here. What, exactly, ties the two devices together?  
+> >>
+> >> The group UUID. Since QEMU VFIO dvice does not have insight of MAC
+> >> address (which it doesn't have to), the association between VFIO
+> >> passthrough and standby must be specificed for QEMU to understand the
+> >> relationship with this model. Note, standby feature is no longer
+> >> required to be exposed under this model.  
+> >
+> > Isn't that a bit limiting, though?
+> >
+> > With this model, you can probably tie a vfio-pci device and a
+> > virtio-net-pci device together. But this will fail if you have
+> > different transports: Consider tying together a vfio-pci device and a
+> > virtio-net-ccw device on s390, for example. The standby feature bit is
+> > on the virtio-net level and should not have any dependency on the
+> > transport used.  
+> 
+> Probably we'd limit the support for grouping to virtio-net-pci device
+> and vfio-pci device only. For virtio-net-pci, as you might see with
+> Venu's patch, we store the group UUID on the config space of
+> virtio-pci, which is only applicable to PCI transport.
+> 
+> If virtio-net-ccw needs to support the same, I think similar grouping
+> interface should be defined on the VirtIO CCW transport. I think the
+> current implementation of the Linux failover driver assumes that it's
+> SR-IOV VF with same MAC address which the virtio-net-pci needs to pair
+> with, and that the PV path is on same PF without needing to update
+> network of the port-MAC association change. If we need to extend the
+> grouping mechanism to virtio-net-ccw, it has to pass such failover
+> mode to virtio driver specifically through some other option I guess.
 
-Added files to MAINTAINERS
+Hm, I've just spent some time reading the Linux failover code and I did
+not really find much pci-related magic in there (other than checking
+for a pci device in net_failover_slave_pre_register). We also seem to
+look for a matching device by MAC only. What magic am I missing?
 
-Added help to qemu-options.hx
+Is the look-for-uuid handling supposed to happen in the host only?
 
-> +
-> +static void
-> +vhost_user_backend_complete(UserCreatable *uc, Error **errp)
-> +{
-> +    VhostUserBackend *b =3D VHOST_USER_BACKEND(uc);
-> +    Chardev *chr;
-> +
-> +    if (!b->chr_name) {
-> +        error_setg(errp, "You must specificy 'chardev'.");
-> +        return;
-> +    }
-> +
-> +    chr =3D qemu_chr_find(b->chr_name);
-> +    if (chr =3D=3D NULL) {
-> +        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-> +                  "Chardev '%s' not found", b->chr_name);
-> +        return;
-> +    }
-> +
-> +    if (!qemu_chr_fe_init(&b->chr, chr, errp)) {
-> +        return;
-> +    }
-> +
-> +    b->completed =3D true;
-> +    /* could vhost_dev_init() happen here, so early vhost-user message
-> +     * can be exchanged */
-> +}
-> +
-> +static void set_chardev(Object *obj, const char *value, Error **errp)
-> +{
-> +    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
-> +
-> +    if (b->completed) {
-> +        error_setg(errp, QERR_PERMISSION_DENIED);
-> +    } else {
-> +        g_free(b->chr_name);
-> +        b->chr_name =3D g_strdup(value);
-> +    }
-> +}
-> +
-> +static char *get_chardev(Object *obj, Error **errp)
-> +{
-> +    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
-> +    Chardev *chr =3D qemu_chr_fe_get_driver(&b->chr);
-> +
-> +    if (chr && chr->label) {
-> +        return g_strdup(chr->label);
-> +    }
-> +
-> +    return NULL;
-> +}
-> +
-> +static void vhost_user_backend_init(Object *obj)
-> +{
-> +    object_property_add_str(obj, "chardev", get_chardev, set_chardev, NU=
-LL);
-> +}
-> +
-> +static void vhost_user_backend_finalize(Object *obj)
-> +{
-> +    VhostUserBackend *b =3D VHOST_USER_BACKEND(obj);
-> +
-> +    g_free(b->dev.vqs);
-> +    g_free(b->chr_name);
-> +
-> +    vhost_user_cleanup(&b->vhost_user);
-> +    qemu_chr_fe_deinit(&b->chr, true);
-> +
-> +    if (b->child) {
-> +        object_unref(OBJECT(b->child));
-> +    }
-> +}
-> +
-> +static bool
-> +vhost_user_backend_can_be_deleted(UserCreatable *uc)
-> +{
-> +    return true;
-> +}
-> +
-> +static void
-> +vhost_user_backend_class_init(ObjectClass *oc, void *data)
-> +{
-> +    UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
-> +
-> +    ucc->complete =3D vhost_user_backend_complete;
-> +    ucc->can_be_deleted =3D vhost_user_backend_can_be_deleted;
-> +}
-> +
-> +static const TypeInfo vhost_user_backend_info =3D {
-> +    .name =3D TYPE_VHOST_USER_BACKEND,
-> +    .parent =3D TYPE_OBJECT,
-> +    .instance_size =3D sizeof(VhostUserBackend),
-> +    .instance_init =3D vhost_user_backend_init,
-> +    .instance_finalize =3D vhost_user_backend_finalize,
-> +    .class_size =3D sizeof(VhostUserBackendClass),
-> +    .class_init =3D vhost_user_backend_class_init,
-> +    .interfaces =3D (InterfaceInfo[]) {
-> +        { TYPE_USER_CREATABLE },
-> +        { }
-> +    }
-> +};
-> +
-> +static void register_types(void)
-> +{
-> +    type_register_static(&vhost_user_backend_info);
-> +}
-> +
-> +type_init(register_types);
-> diff --git a/vl.c b/vl.c
-> index 6e34fb348d..1c21339ba7 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2718,7 +2718,8 @@ static bool object_create_initial(const char *type)
->      }
->
->  #if defined(CONFIG_VHOST_USER) && defined(CONFIG_LINUX)
-> -    if (g_str_equal(type, "cryptodev-vhost-user")) {
-> +    if (g_str_equal(type, "cryptodev-vhost-user") ||
-> +        g_str_equal(type, "vhost-user-backend")) {
->          return false;
->      }
->  #endif
-> diff --git a/backends/Makefile.objs b/backends/Makefile.objs
-> index ad7c0325ed..1ffcf76bb1 100644
-> --- a/backends/Makefile.objs
-> +++ b/backends/Makefile.objs
-> @@ -12,7 +12,8 @@ common-obj-y +=3D cryptodev-builtin.o
->  ifeq ($(CONFIG_VIRTIO),y)
->  common-obj-y +=3D cryptodev-vhost.o
->  common-obj-$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX)) +=3D \
-> -    cryptodev-vhost-user.o
-> +    cryptodev-vhost-user.o \
-> +    vhost-user.o
->  endif
->
->  common-obj-$(CONFIG_LINUX) +=3D hostmem-memfd.o
-> --
-> 2.18.0.rc1
->
->
+> >> > If libvirt already has the knowledge that it should manage the two as a
+> >> > couple, why do we need the group id (or something else for other
+> >> > architectures)? (Maybe I'm simply missing something because I'm not
+> >> > that familiar with pci.)  
+> >>
+> >> The idea is to have QEMU control the visibility and enumeration order
+> >> of the passthrough VFIO for the failover scenario. Hotplug can be one
+> >> way to achieve it, and perhaps there's other way around also. The
+> >> group ID is not just for QEMU to couple devices, it's also helpful to
+> >> guest too as grouping using MAC address is just not safe.  
+> >
+> > Sorry about dragging mainframes into this, but this will only work for
+> > homogenous device coupling, not for heterogenous. Consider my vfio-pci
+> > + virtio-net-ccw example again: The guest cannot find out that the two
+> > belong together by checking some group ID, it has to either use the MAC
+> > or some needs-to-be-architectured property.
+> >
+> > Alternatively, we could propose that mechanism as pci-only, which means
+> > we can rely on mechanisms that won't necessarily work on non-pci
+> > transports. (FWIW, I don't see a use case for using vfio-ccw to pass
+> > through a network card anytime in the near future, due to the nature of
+> > network cards currently in use on s390.)  
+> 
+> Yes, let's do this just for PCI transport (homogenous) for now.
 
+But why? Using pci for passthrough to make things easier (and because
+there's not really a use case), sure. But I really don't want to
+restrict this to virtio-pci only.
 
+> >> In the model of (b), I think it essentially turns hotplug to one of
+> >> mechanisms for QEMU to control the visibility. The libvirt can still
+> >> manage the hotplug of individual devices during live migration or in
+> >> normal situation to hot add/remove devices. Though the visibility of
+> >> the VFIO is under the controll of QEMU, and it's possible that the hot
+> >> add/remove request does not involve actual hot plug activity in guest
+> >> at all.  
+> >
+> > That depends on how you model visibility, I guess. You'll probably want
+> > to stop traffic flowing through one or the other of the cards; would
+> > link down or similar be enough for the virtio device?  
+> 
+> I'm not sure if it is a good idea. The guest user will see two devices
+> with same MAC but one of them is down. Do you expect user to use it or
+> not? And since the guest is going to be migrated, we need to unplug a
+> broken VF from guest before migrating, why do we bother plugging in
+> this useless VF at the first place?
 
---=20
-Marc-Andr=C3=A9 Lureau
+I was thinking about using hotunplugging only over migration and doing
+the link up only after feature negotiation has finished, but that is
+probably too complicated. Let's stick to hotplug for simplicity's sake.
