@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fVdPF-0003g8-Mm
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:44:18 -0400
+	(envelope-from <berrange@redhat.com>) id 1fVdXh-0006ts-Jp
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:53:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fVdPC-0003XW-LL
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:44:17 -0400
-Received: from 20.mo5.mail-out.ovh.net ([91.121.55.239]:55142)
+	(envelope-from <berrange@redhat.com>) id 1fVdXe-0007u0-GF
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:53:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60634 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fVdPC-0003Wu-Es
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:44:14 -0400
-Received: from player693.ha.ovh.net (unknown [10.109.108.4])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 8A0411C363B
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 15:44:12 +0200 (CEST)
-References: <20180612065716.10587-1-clg@kaod.org>
-	<CAFEAcA9KJVw0fuuXY_Ya_F6ELrp-MmgTit4oHU_e0xM+VTdnWA@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <63e6fc9d-3c14-b5b6-4434-bf226a241ab4@kaod.org>
-Date: Wed, 20 Jun 2018 15:43:59 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVdXe-0007tI-Aa
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:52:58 -0400
+Date: Wed, 20 Jun 2018 14:52:54 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180620135254.GA19979@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180521161733.GA16751@rnd>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9KJVw0fuuXY_Ya_F6ELrp-MmgTit4oHU_e0xM+VTdnWA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <20180521161733.GA16751@rnd>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/3] aspeed/smc: small fixes
+Subject: Re: [Qemu-devel] [PATCH v2] Delete AF_UNIX socket after close
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +28,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>
+To: Pavel Balaev <mail@void.so>
+Cc: qemu-devel@nongnu.org
 
-On 06/20/2018 03:40 PM, Peter Maydell wrote:
-> On 12 June 2018 at 07:57, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->> Hello,
->>
->> Here is a short series of cleanups and fixes for issues in the Aspeed
->> SMC controller model discovered when experimenting with the MMIO exec
->> feature and also from tests under a QEMU PowerNV machine.
->>
->> Indeed, the OPAL/skiboot firmware accesses the Aspeed SoC address
->> space using the iLPC->AHB bridge of the SuperIO controller and drives
->> the SPI controller to access the PNOR.
+On Mon, May 21, 2018 at 07:17:35PM +0300, Pavel Balaev wrote:
+> This is a second attempt at sending this patch:
 >=20
-> Is there anybody familiar with the aspeed SoC who'd like to
-> review? The patches don't look particularly wrong, but I'm
-> not really in a position to be able to review...
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg04697.html
+>=20
+> Signed-off-by: Pavel Balaev <mail@void.so>
+> ---
+>  io/channel-socket.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/io/channel-socket.c b/io/channel-socket.c
+> index 57cfb4d3a6..b50e63a053 100644
+> --- a/io/channel-socket.c
+> +++ b/io/channel-socket.c
+> @@ -685,8 +685,10 @@ qio_channel_socket_close(QIOChannel *ioc,
+>                           Error **errp)
+>  {
+>      QIOChannelSocket *sioc =3D QIO_CHANNEL_SOCKET(ioc);
+> +    int rc =3D 0;
+> =20
+>      if (sioc->fd !=3D -1) {
+> +        SocketAddress *addr =3D socket_local_address(sioc->fd, errp);
+>  #ifdef WIN32
+>          WSAEventSelect(sioc->fd, NULL, 0);
+>  #endif
+> @@ -697,8 +699,22 @@ qio_channel_socket_close(QIOChannel *ioc,
+>              return -1;
+>          }
+>          sioc->fd =3D -1;
+> +
+> +        if (addr && addr->type =3D=3D SOCKET_ADDRESS_TYPE_UNIX
+> +            && addr->u.q_unix.path) {
+> +            if (unlink(addr->u.q_unix.path) < 0 && errno !=3D ENOENT) =
+{
+> +                error_setg_errno(errp, errno,
+> +                                 "Failed to unlink socket %s",
+> +                                 addr->u.q_unix.path);
+> +                rc =3D -1;
+> +            }
+> +        }
+> +
+> +        if (addr) {
+> +            qapi_free_SocketAddress(addr);
+> +        }
+>      }
+> -    return 0;
+> +    return rc;
+>  }
+> =20
+>  static int
 
-Adding Andrew and Joel as I should have.
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Thanks,
+I've queued this now, thanks.
 
-C.
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
