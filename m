@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fVXRX-0008Og-Nw
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 03:22:16 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fVXUX-0001YU-1H
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 03:25:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fVXRS-0007Fw-PC
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 03:22:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53388 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fVXRS-0007Fi-JD
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 03:22:10 -0400
-Date: Wed, 20 Jun 2018 15:21:52 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180620072152.GH18985@xz-mi>
-References: <20180619053426.13065-1-peterx@redhat.com>
-	<20180619053426.13065-5-peterx@redhat.com>
-	<871sd2vpzg.fsf@dusky.pond.sub.org> <20180620030620.GC18985@xz-mi>
-	<87y3faj5hi.fsf@dusky.pond.sub.org>
+	(envelope-from <dgibson@ozlabs.org>) id 1fVXUV-0008E4-SM
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 03:25:21 -0400
+Date: Wed, 20 Jun 2018 17:25:06 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180620072506.GE24636@umbus.fritz.box>
+References: <cover.1529398335.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="imjhCm/Pyz7Rq5F2"
 Content-Disposition: inline
-In-Reply-To: <87y3faj5hi.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v4 4/7] tests: iotests: drop some stderr
- line
+In-Reply-To: <cover.1529398335.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v4 00/11] Misc sam460ex improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,79 +23,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, John Snow <jsnow@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Sebastian Bauer <mail@sebastianbauer.info>
 
-On Wed, Jun 20, 2018 at 09:12:57AM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
-> 
-> > On Tue, Jun 19, 2018 at 03:57:07PM +0200, Markus Armbruster wrote:
-> >> Peter Xu <peterx@redhat.com> writes:
-> >> 
-> >> > In my Out-Of-Band test, "check -qcow2 060" fail with this (the output is
-> >> > manually changed due to line width requirement):
-> >> >
-> >> > 060 5s ... - output mismatch (see 060.out.bad)
-> >> > --- /home/peterx/git/qemu/tests/qemu-iotests/060.out
-> >> > +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/060.out.bad
-> >> > @@ -427,8 +427,8 @@
-> >> >  QMP_VERSION
-> >> >  {"return": {}}
-> >> >  qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1
-> >> >   index: 0); further non-fatal corruption events will be suppressed
-> >> > -{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP},
-> >> > - "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2
-> >> > - table offset 0x2a2a2a0
-> >> > 0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
-> >> >  read failed: Input/output error
-> >> > +{"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP},
-> >> > + "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2
-> >> > + table offset 0x2a2a2a0
-> >> > 0 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
-> >> >  {"return": ""}
-> >> >  {"return": {}}
-> >> >  {"timestamp": {"seconds": TIMESTAMP, "microseconds": TIMESTAMP},
-> >> >   "event": "SHUTDOWN", "data": {"guest": false}}
-> >> 
-> >> Please indent this diff; I'd expect git-am to choke on it.
-> >
-> > Do you mean something like pretty-JSON?
-> 
-> Instead of
-> 
->     In my Out-Of-Band test, "check -qcow2 060" fail with this (the output is
->     manually changed due to line width requirement):
->     
->     060 5s ... - output mismatch (see 060.out.bad)
->     --- /home/peterx/git/qemu/tests/qemu-iotests/060.out
->     +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/060.out.bad
->     @@ -427,8 +427,8 @@
->      QMP_VERSION
->      {"return": {}}
-> 
-> write
-> 
->     In my Out-Of-Band test, "check -qcow2 060" fail with this (the output is
->     manually changed due to line width requirement):
->     
->         060 5s ... - output mismatch (see 060.out.bad)
->         --- /home/peterx/git/qemu/tests/qemu-iotests/060.out
->         +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/060.out.bad
->         @@ -427,8 +427,8 @@
->          QMP_VERSION
->          {"return": {}}
-> 
-> The former confuses git-am.
-> 
-> In other words, quote diff output verbatim, but indent your quote.
->     
-> > How about I remove this chunk too?  What do you prefer?
-> 
-> I rather like having the test failure details in the commit message.
 
-Ah I see.  I'll keep them then.
+--imjhCm/Pyz7Rq5F2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On Tue, Jun 19, 2018 at 10:52:15AM +0200, BALATON Zoltan wrote:
+>=20
+> Next spin of sam460ex pathces with changes according to review and
+> some new patches.
 
--- 
-Peter Xu
+So, the sm501 patches I don't really have the technical knowledge to
+review, and I'm a little uncomfortable taking them through my tree,
+since they aren't strictly related to ppc.
+
+It looks like you're the only person that's made substantive changes
+to sm501 lately, though.  So, given I haven't heard screaming, I think
+it's fair to assume that either you know what you're doing, or you're
+the only person that cares about sm501 anyway.
+
+So, I think we should make you sm501 maintainer.
+
+Specifically I think you should:
+  * Fix the compile breakage I pointed out elsewhere
+  * Split out your sm501 patches
+  * Prepend a patch adding it to MAINTAINERS with yourself as
+    maintainer (whether you call it "Maintained" or "Odd Fixes" is up
+    to your level of dedication)
+  * Send this new series direct to Peter Maydell, CC me, Gerd Hoffman
+    <kraxel@redhat.com> and the SH maintainer(s) (as well as the lists
+    and whoever else you think's appropriate)
+  * I'll reply, making the case above to Peter for your
+    maintainership.
+
+With any luck, from there on you'll be able to send sm501 pull
+requests directly.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--imjhCm/Pyz7Rq5F2
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsqAVIACgkQbDjKyiDZ
+s5IMwhAAgg+Z+/qAGSFJCyuiYBJioq3zwZ2iF8gbKQD4AIa7kL0oDEabbP+xqg4v
+tUXwFx8BXywe4iZk5J+6LUbfLa8elVawxVqI+22vOhv2+ffx7ZEdxLb1B+5ZJtaN
+3wy0P3up8oRW4CQWr/slck4m0Wf5fs3bYe7ErPwBJtBJnlnfhz2FjeFVLKhM2HvS
+BWdgiOWdcGOScof2c/91AG6otajYW3kbrfX4GlyVPa1WEOWTW+OMvUJnal1iA4uu
+H9uluN8Dr9TPBrVLJS+JsxNUQXMJs6NSf4C5UYowX4U1g482lsB2092KfEK/bAwb
+aOaqoge5LboZ+AYT1esMsSIL0ydhtriPKs92nl1St3a8QtDpZIBMCAECtPCLqisF
+E5nxkUOXDG1m7M5kDw4l/WHeghbqZ16okgW92RXzB2u3UPe8S0Ta5dmD1WSFztKL
+Z0TT1dCHMs2uZDke0FWtPCMiLArA07dBezR2xWh+tfzc1R4cfcTM7F5aDY8slGCp
+VB/crQ0Is2OX21ZxaUzzrCPI3sChmU4Kyz3qzaa5Yoi21MNZBssfBmmmMpXogXYe
+NAD4hpp/9p7mW2tTCYPmlJkZAR7Ti5Al1f+mAxPvGbbS+rQ0EWz+L/jxGlwhJBSq
+4zk2DvEaf70FbSw8B6ZO7kOWGuYqpKTq8vrm2IReAgyT1/8si20=
+=wh3j
+-----END PGP SIGNATURE-----
+
+--imjhCm/Pyz7Rq5F2--
