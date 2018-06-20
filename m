@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40473)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fVZ8a-000552-Hf
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:10:53 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1fVZ8i-0005Ar-Lt
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:10:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fVZ8V-0002fu-Qv
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:10:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33680)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fVZ8V-0002fb-Jz
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:10:43 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fVZ8U-0008NF-3P
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 09:10:42 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 12C372E802D
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 09:10:42 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Jun 2018 09:03:50 -0000
-From: Thomas Huth <1777786@bugs.launchpad.net>
-Reply-To: Bug 1777786 <1777786@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152947832268.7374.8550233006013647387.malonedeb@wampee.canonical.com>
-Message-Id: <152948543047.1873.6003822053837891174.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1777786] Re: virtio-gpu-3d.c: change
- virtio_gpu_fence_poll timer scale
+	(envelope-from <aik@ozlabs.ru>) id 1fVZ8e-0002jl-Al
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 05:10:56 -0400
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Wed, 20 Jun 2018 19:10:12 +1000
+Message-Id: <20180620091013.2224-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v2] vfio/spapr: Allow backing bigger guest
+ IOMMU pages with smaller physical pages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,81 +19,122 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
 
-Please don't use the bug tracker for providing patches, and send it to
-the mailing list instead, see:
-https://wiki.qemu.org/Contribute/SubmitAPatch
+At the moment the PPC64/pseries guest only supports 4K/64K/16M IOMMU
+pages and POWER8 CPU supports the exact same set of page size so
+so far things worked fine.
 
--- =
+However POWER9 supports different set of sizes - 4K/64K/2M/1G and
+the last two - 2M and 1G - are not even allowed in the paravirt interface
+(RTAS DDW) so we always end up using 64K IOMMU pages, although we could
+back guest's 16MB IOMMU pages with 2MB pages on the host.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1777786
+This stores the supported host IOMMU page sizes in VFIOContainer and uses
+this later when creating a new DMA window. This uses the system page size
+(64k normally, 2M/16M/1G if hugepages used) as the upper limit of
+the IOMMU pagesize.
 
-Title:
-  virtio-gpu-3d.c: change virtio_gpu_fence_poll timer scale
+This changes the type of @pagesize to uint64_t as this is what
+memory_region_iommu_get_min_page_size() returns and clz64() takes.
 
-Status in QEMU:
-  New
+There should be no behavioral changes on platforms other than pseries.
+The guest will keep using the IOMMU page size selected by the PHB pagesize
+property as this only changes the underlying hardware TCE table
+granularity.
 
-Bug description:
-  We use virtio-gpu to accelerate Unigine Heaven Benchmark in VM. But we ge=
-t only 5 FPS when we use AMD RX460 in our host.
-  We found that guest os spent a lot of time in waiting for the return of g=
-lMapBufferRange/glUnmapBuffer commad. We suspected the host GPU was waiting=
- for fence. So we finally change the timer of fence_poll. Afer change timer=
- from
-   ms to us=EF=BC=8C Benchmark result raise up to 22 FPS.
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+Changes:
+v2:
+* fixed biggest but smaller page size calculation
+* limit IOMMU pagesize to the system pagesize
+---
+ include/hw/vfio/vfio-common.h |  1 +
+ hw/vfio/common.c              |  3 +++
+ hw/vfio/spapr.c               | 21 ++++++++++++++++++++-
+ 3 files changed, 24 insertions(+), 1 deletion(-)
 
-  From a4003af5c4fe92d55353f42767d0c45de95bb78f Mon Sep 17 00:00:00 2001
-  From: chen wei <chenwei1@ruijie.com.cn>
-  Date: Fri, 8 Jun 2018 17:34:45 +0800
-  Subject: [PATCH] virtio-gpu:improve 3d performance greatly
-
-    opengl function need fence support.when CPU execute opengl function, it=
- need wait fence for synchronize GPU.
-  so qemu must deal with fence timely as possible. but now the expire time =
-of the timer to deal with fence is 10 ms.
-  I think it is too long for opengl. So i will change it to 20 ns.
-    Before change, when i play Unigine_Heaven 3d game with virglrenderer, t=
-he fps is 3.  atfer change the fps up to 23.
-
-  Signed-off-by: chen wei   <chenwei1@ruijie.com.cn>
-  Signed-off-by: wang qiang <qiang_w@ruijie.com.cn>
-  ---
-   hw/display/virtio-gpu-3d.c | 4 ++--
-   1 file changed, 2 insertions(+), 2 deletions(-)
-
-  diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
-  index 3558f38..c0a5d21 100644
-  --- a/hw/display/virtio-gpu-3d.c
-  +++ b/hw/display/virtio-gpu-3d.c
-  @@ -582,7 +582,7 @@ static void virtio_gpu_fence_poll(void *opaque)
-       virgl_renderer_poll();
-       virtio_gpu_process_cmdq(g);
-       if (!QTAILQ_EMPTY(&g->cmdq) || !QTAILQ_EMPTY(&g->fenceq)) {
-  -        timer_mod(g->fence_poll, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +=
- 10);
-  +        timer_mod(g->fence_poll, qemu_clock_get_us(QEMU_CLOCK_VIRTUAL) +=
- 20);
-       }
-   }
-   =
-
-  @@ -629,7 +629,7 @@ int virtio_gpu_virgl_init(VirtIOGPU *g)
-           return ret;
-       }
-   =
-
-  -    g->fence_poll =3D timer_new_ms(QEMU_CLOCK_VIRTUAL,
-  +    g->fence_poll =3D timer_new_us(QEMU_CLOCK_VIRTUAL,
-                                    virtio_gpu_fence_poll, g);
-   =
-
-       if (virtio_gpu_stats_enabled(g->conf)) {
-  -- =
-
-  2.7.4
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1777786/+subscriptions
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index a903692..c20524d 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -73,6 +73,7 @@ typedef struct VFIOContainer {
+     unsigned iommu_type;
+     int error;
+     bool initialized;
++    unsigned long pgsizes;
+     /*
+      * This assumes the host IOMMU can support only a single
+      * contiguous IOVA window.  We may need to generalize that in
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index fb396cf..40f0356 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1108,6 +1108,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+             info.iova_pgsizes = 4096;
+         }
+         vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
++        container->pgsizes = info.iova_pgsizes;
+     } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) ||
+                ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU)) {
+         struct vfio_iommu_spapr_tce_info info;
+@@ -1172,6 +1173,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+         }
+ 
+         if (v2) {
++            container->pgsizes = info.ddw.pgsizes;
+             /*
+              * There is a default window in just created container.
+              * To make region_add/del simpler, we better remove this
+@@ -1186,6 +1188,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+             }
+         } else {
+             /* The default table uses 4K pages */
++            container->pgsizes = 0x1000;
+             vfio_host_win_add(container, info.dma32_window_start,
+                               info.dma32_window_start +
+                               info.dma32_window_size - 1,
+diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+index 259397c..becf71a 100644
+--- a/hw/vfio/spapr.c
++++ b/hw/vfio/spapr.c
+@@ -15,6 +15,7 @@
+ 
+ #include "hw/vfio/vfio-common.h"
+ #include "hw/hw.h"
++#include "exec/ram_addr.h"
+ #include "qemu/error-report.h"
+ #include "trace.h"
+ 
+@@ -144,9 +145,27 @@ int vfio_spapr_create_window(VFIOContainer *container,
+ {
+     int ret;
+     IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
+-    unsigned pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
++    uint64_t pagesize = memory_region_iommu_get_min_page_size(iommu_mr);
+     unsigned entries, pages;
+     struct vfio_iommu_spapr_tce_create create = { .argsz = sizeof(create) };
++    long systempagesize = qemu_getrampagesize();
++
++    /*
++     * The host might not support the guest supported IOMMU page size,
++     * so we will use smaller physical IOMMU pages to back them.
++     */
++    if (pagesize > systempagesize) {
++        pagesize = systempagesize;
++    }
++    pagesize = 1ULL << (63 - clz64(container->pgsizes &
++                                   (pagesize | (pagesize - 1))));
++    if (!pagesize) {
++        error_report("Host doesn't support page size 0x%"PRIx64
++                     ", the supported mask is 0x%lx",
++                     memory_region_iommu_get_min_page_size(iommu_mr),
++                     container->pgsizes);
++        return -EINVAL;
++    }
+ 
+     /*
+      * FIXME: For VFIO iommu types which have KVM acceleration to
+-- 
+2.11.0
