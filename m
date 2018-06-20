@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVa2c-0001rt-85
+	(envelope-from <david@redhat.com>) id 1fVa2c-0001rx-8t
 	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:08:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVa2Z-0001y1-FZ
+	(envelope-from <david@redhat.com>) id 1fVa2Y-0001wo-0k
 	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:08:42 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 20 Jun 2018 12:08:25 +0200
-Message-Id: <20180620100825.22476-8-david@redhat.com>
+Date: Wed, 20 Jun 2018 12:08:24 +0200
+Message-Id: <20180620100825.22476-7-david@redhat.com>
 In-Reply-To: <20180620100825.22476-1-david@redhat.com>
 References: <20180620100825.22476-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 7/7] s390x/tcg: fix CPU hotplug with
- single-threaded TCG
+Subject: [Qemu-devel] [PATCH v2 6/7] s390x/tcg: rearm the CKC timer during
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +23,80 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org
 Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
 
-run_on_cpu() doesn't seem to work reliably until the CPU has been fully
-created if the single-threaded TCG main loop is already running.
+If the CPU data is migrated after the TOD clock, the CKC timer of a CPU
+is not rearmed. Let's rearm it when loading the CPU state.
 
-Therefore, let's use run_on_cpu() for KVM only - KVM requires it due to
-the initial CPU reset ioctl.
+Introduce tcg-stub.c just like kvm-stub.c for tcg specific stubs.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ target/s390x/Makefile.objs |  1 +
+ target/s390x/machine.c     |  6 ++++++
+ target/s390x/tcg-stub.c    | 20 ++++++++++++++++++++
+ 3 files changed, 27 insertions(+)
+ create mode 100644 target/s390x/tcg-stub.c
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 40d6980229..7536dd0f03 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -218,11 +218,12 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
- #endif
-     s390_cpu_gdb_init(cs);
-     qemu_init_vcpu(cs);
--#if !defined(CONFIG_USER_ONLY)
--    run_on_cpu(cs, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
--#else
--    cpu_reset(cs);
--#endif
-+
-+    if (kvm_enabled()) {
-+        run_on_cpu(cs, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
-+    } else {
-+        cpu_reset(cs);
-+    }
+diff --git a/target/s390x/Makefile.objs b/target/s390x/Makefile.objs
+index 31932de9cf..22a9a9927a 100644
+--- a/target/s390x/Makefile.objs
++++ b/target/s390x/Makefile.objs
+@@ -5,6 +5,7 @@ obj-$(CONFIG_SOFTMMU) += machine.o ioinst.o arch_dump.o mmu_helper.o diag.o
+ obj-$(CONFIG_SOFTMMU) += sigp.o
+ obj-$(CONFIG_KVM) += kvm.o
+ obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
++obj-$(call lnot,$(CONFIG_TCG)) += tcg-stub.o
  
-     scc->parent_realize(dev, &err);
- out:
+ # build and run feature list generator
+ feat-src = $(SRC_PATH)/target/$(TARGET_BASE_ARCH)/
+diff --git a/target/s390x/machine.c b/target/s390x/machine.c
+index 84b4928755..bd3230d027 100644
+--- a/target/s390x/machine.c
++++ b/target/s390x/machine.c
+@@ -19,6 +19,7 @@
+ #include "cpu.h"
+ #include "internal.h"
+ #include "kvm_s390x.h"
++#include "tcg_s390x.h"
+ #include "sysemu/kvm.h"
+ 
+ static int cpu_post_load(void *opaque, int version_id)
+@@ -34,6 +35,11 @@ static int cpu_post_load(void *opaque, int version_id)
+         return kvm_s390_vcpu_interrupt_post_load(cpu);
+     }
+ 
++    if (tcg_enabled()) {
++        /* Rearm the CKC timer if necessary */
++        tcg_s390_tod_updated(CPU(cpu), RUN_ON_CPU_NULL);
++    }
++
+     return 0;
+ }
+ 
+diff --git a/target/s390x/tcg-stub.c b/target/s390x/tcg-stub.c
+new file mode 100644
+index 0000000000..c93501db0b
+--- /dev/null
++++ b/target/s390x/tcg-stub.c
+@@ -0,0 +1,20 @@
++/*
++ * QEMU TCG support -- s390x specific function stubs.
++ *
++ * Copyright (C) 2018 Red Hat Inc
++ *
++ * Authors:
++ *   David Hildenbrand <david@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "tcg_s390x.h"
++
++void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
++{
++}
 -- 
 2.17.1
