@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fVXXR-0003I7-Gy
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 03:28:22 -0400
+	(envelope-from <peterx@redhat.com>) id 1fVXbh-0005H0-8d
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 03:32:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fVXXN-0000oV-IH
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 03:28:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46094 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fVXbd-00029Z-BO
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 03:32:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57846 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fVXXN-0000oK-C3
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 03:28:17 -0400
-Date: Wed, 20 Jun 2018 15:28:08 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fVXbd-00029I-6Q
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 03:32:41 -0400
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180620072808.GI18985@xz-mi>
-References: <20180619053426.13065-1-peterx@redhat.com>
-	<20180619053426.13065-7-peterx@redhat.com>
-	<8736xioo8e.fsf@dusky.pond.sub.org> <20180620031529.GD18985@xz-mi>
-	<87in6dkjpd.fsf@dusky.pond.sub.org>
+Date: Wed, 20 Jun 2018 15:32:16 +0800
+Message-Id: <20180620073223.31964-1-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87in6dkjpd.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v4 6/7] monitor: remove "x-oob",
- turn oob on by default
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 0/7] monitor: enable OOB by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,58 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Fam Zheng <famz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, John Snow <jsnow@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, peterx@redhat.com, Eric Auger <eric.auger@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On Wed, Jun 20, 2018 at 09:20:30AM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
-> 
-> > On Tue, Jun 19, 2018 at 04:16:49PM +0200, Markus Armbruster wrote:
-> >> Peter Xu <peterx@redhat.com> writes:
-> >> 
-> >> > There was a regression reported by Eric Auger before with OOB:
-> >> >
-> >> >   http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06231.html
-> >> >
-> >> > It is fixed in 951702f39c ("monitor: bind dispatch bh to iohandler
-> >> > context", 2018-04-10).
-> >> >
-> >> > For the bug, we turned Out-Of-Band feature of monitors off for 2.12
-> >> > release.  Now we turn that on again after the 2.12 release.
-> >> 
-> >> Relating what happened in the order it happened could be easier to
-> >> understand.  Perhaps:
-> >> 
-> >>   OOB commands were introduced in commit cf869d53172.  Unfortunately, we
-> >>   ran into a regression, and had to disable them by default for 2.12
-> >>   (commit be933ffc23).
-> >> 
-> >>   The regression has since been fixed (commit 951702f39c7 "monitor: bind
-> >>   dispatch bh to iohandler context").  Time to re-enable OOB.
-> >
-> > This indeed looks much nicer.
-> >
-> >> 
-> >> > This patch partly reverts be933ffc23 (monitor: new parameter "x-oob"),
-> >> > meanwhile turn it on again by default for non-MUX QMPs.  Note that we
-> >> 
-> >> "by default"?
-> >
-> > Did I mis-spell somewhere?
-> 
-> I was too terse, sorry.  Let me try again.
-> 
-> "By default" suggests there's a way for the user to switch it off.
-> That's not the case.  I guess you mean something like
-> 
->     This patch partly reverts be933ffc23 (monitor: new parameter "x-oob"),
->     and turns OOB on again for non-MUX QMPs.
+v5:
+- more r-bs are collected
+- make sure no patch contains extra s-o-bs by doing proper indents for
+  diff quotes [Markus]
+- misc commit message or comment changes [Markus]
 
-I see!  Fixed, with your r-b kept.
+v4:
+- collect some r-bs
+- remove one extra s-o-b of mine in one patch [Thomas, Markus]
+- split the qmp response flush patch into two; apply changes to commit
+  message [Markus]
+- fix up the doc update patch [Markus]
 
-Hmm.  A new version is coming.
+v3:
+- drop patch "tests: iotests: don't compare SHUTDOWN event", replace
+  it with "monitor: flush qmp responses when CLOSED" to fix up the
+  race. [Eric, Markus]
+- tweak the oob revert patch to not break qmp-test [Eric]
+- quite a few comment and commit message fix-ups [Eric]
+- add more comment in commit message, mention about why MUX can't be
+  used for Out-Of-Band [Markus]
+- one new patch to comment on chardev CLOSED event [Stefan]
+- one new patch to fix iotest breakage on 060 specifically
 
-Thanks,
+Tests: make check, iotests
 
--- 
-Peter Xu
+Please review.  Thanks,
+
+Peter Xu (7):
+  chardev: comment details for CLOSED event
+  monitor: rename *_pop_one to *_pop_any
+  monitor: flush qmp responses when CLOSED
+  tests: iotests: drop some stderr line
+  docs: mention shared state protect for OOB
+  monitor: remove "x-oob", turn oob on by default
+  Revert "tests: Add parameter to qtest_init_without_qmp_handshake"
+
+ docs/devel/qapi-code-gen.txt | 17 +++++---
+ include/chardev/char.h       | 11 +++++-
+ include/monitor/monitor.h    |  1 -
+ tests/libqtest.h             |  4 +-
+ monitor.c                    | 75 +++++++++++++++++++++---------------
+ tests/libqtest.c             | 10 ++---
+ tests/qmp-test.c             |  6 +--
+ vl.c                         |  5 ---
+ tests/qemu-iotests/060       | 10 ++++-
+ tests/qemu-iotests/060.out   |  1 -
+ 10 files changed, 83 insertions(+), 57 deletions(-)
+
+--=20
+2.17.1
