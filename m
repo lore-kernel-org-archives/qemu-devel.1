@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVewv-0006V6-BP
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:23:10 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fVezv-0008KX-E3
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVewu-0003Sb-Ek
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:23:09 -0400
-Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:36999)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fVewu-0003SP-9I
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:23:08 -0400
-Received: by mail-ot0-x233.google.com with SMTP id 101-v6so4126576oth.4
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 08:23:08 -0700 (PDT)
+	(envelope-from <eric.auger@redhat.com>) id 1fVezt-0005fL-VD
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:26:15 -0400
+References: <20180620132032.28865-1-peter.maydell@linaro.org>
+	<20180620132032.28865-3-peter.maydell@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8ba4603d-8b79-ccef-907b-98254ccd7e71@redhat.com>
+Date: Wed, 20 Jun 2018 17:26:05 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180619154435.18898-2-alex.bennee@linaro.org>
-References: <20180619154435.18898-1-alex.bennee@linaro.org>
-	<20180619154435.18898-2-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Jun 2018 16:22:47 +0100
-Message-ID: <CAFEAcA94=9Dn=XgHr_qbszCe-5Yi8AJK48NRovtpULkESu5mGA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 01/56] configure: add support for
- --cross-cc-FOO
+In-Reply-To: <20180620132032.28865-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/8] hw/misc/tz-mpc.c: Implement
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +24,282 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 19 June 2018 at 16:43, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> This allows us to specify cross compilers for our guests. This is
-> useful for building test images/programs. Currently we re-run the
-> compile test for each target. I couldn't think of a way to cache the
-> value for a given arch without getting messier configure code.
->
-> The cross compiler for the guest is visible to each target as
-> CROSS_CC_GUEST in config-target.mak.
->
-> +# Do we have a cross compiler for this target?
-> +if has $target_compiler; then
+Hi Peter,
+
+On 06/20/2018 03:20 PM, Peter Maydell wrote:
+> Implement the missing registers for the TZ MPC.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/hw/misc/tz-mpc.h |  10 +++
+>  hw/misc/tz-mpc.c         | 142 +++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 148 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/hw/misc/tz-mpc.h b/include/hw/misc/tz-mpc.h
+> index d1a65fd9a38..6f15945410d 100644
+> --- a/include/hw/misc/tz-mpc.h
+> +++ b/include/hw/misc/tz-mpc.h
+> @@ -48,6 +48,16 @@ struct TZMPC {
+>  
+>      /*< public >*/
+>  
+> +    /* State */
+> +    uint32_t ctrl;
+> +    uint32_t blk_idx;
+> +    uint32_t int_stat;
+> +    uint32_t int_en;
+> +    uint32_t int_info1;
+> +    uint32_t int_info2;
 > +
-> +    write_c_skeleton
+> +    uint32_t *blk_lut;
 > +
-> +    if ! do_compiler $target_compiler -o $TMPE $TMPC -static ; then
+>      qemu_irq irq;
+>  
+>      /* Properties */
+> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
+> index 569bccfda7a..e5b91bf81a3 100644
+> --- a/hw/misc/tz-mpc.c
+> +++ b/hw/misc/tz-mpc.c
+> @@ -28,16 +28,23 @@ enum {
+>  
+>  /* Config registers */
+>  REG32(CTRL, 0x00)
+> +    FIELD(CTRL, SEC_RESP, 4, 1)
+> +    FIELD(CTRL, AUTOINC, 8, 1)
+> +    FIELD(CTRL, LOCKDOWN, 31, 1)
+>  REG32(BLK_MAX, 0x10)
+>  REG32(BLK_CFG, 0x14)
+>  REG32(BLK_IDX, 0x18)
+>  REG32(BLK_LUT, 0x1c)
+>  REG32(INT_STAT, 0x20)
+> +    FIELD(INT_STAT, IRQ, 0, 1)
+>  REG32(INT_CLEAR, 0x24)
+> +    FIELD(INT_CLEAR, IRQ, 0, 1)
+>  REG32(INT_EN, 0x28)
+> +    FIELD(INT_EN, IRQ, 0, 1)
+>  REG32(INT_INFO1, 0x2c)
+>  REG32(INT_INFO2, 0x30)
+>  REG32(INT_SET, 0x34)
+> +    FIELD(INT_SET, IRQ, 0, 1)
+>  REG32(PIDR4, 0xfd0)
+>  REG32(PIDR5, 0xfd4)
+>  REG32(PIDR6, 0xfd8)
+> @@ -57,10 +64,25 @@ static const uint8_t tz_mpc_idregs[] = {
+>      0x0d, 0xf0, 0x05, 0xb1,
+>  };
+>  
+> +static void tz_mpc_irq_update(TZMPC *s)
+> +{
+> +    qemu_set_irq(s->irq, s->int_stat && s->int_en);
+> +}
+> +
+> +static void tz_mpc_autoinc_idx(TZMPC *s, unsigned access_size)
+> +{
+> +    /* Auto-increment BLK_IDX if necessary */
+> +    if (access_size == 4 && (s->ctrl & R_CTRL_AUTOINC_MASK)) {
+> +        s->blk_idx++;
+> +        s->blk_idx %= s->blk_max;
+> +    }
+> +}
+> +
+>  static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
+>                                     uint64_t *pdata,
+>                                     unsigned size, MemTxAttrs attrs)
+>  {
+> +    TZMPC *s = TZ_MPC(opaque);
+>      uint64_t r;
+>      uint32_t offset = addr & ~0x3;
+>  
+> @@ -74,6 +96,38 @@ static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
+>      }
+>  
+>      switch (offset) {
+> +    case A_CTRL:
+> +        r = s->ctrl;
+> +        break;
+> +    case A_BLK_MAX:
+> +        r = s->blk_max;
+> +        break;
+> +    case A_BLK_CFG:
+> +        /* We are never in "init in progress state", so this just indicates
+> +         * the block size. s->blocksize == (1 << BLK_CFG + 5), so
+> +         * BLK_CFG == ctz32(s->blocksize) - 5
+> +         */
+> +        r = ctz32(s->blocksize) - 5;
+> +        break;
+> +    case A_BLK_IDX:
+> +        r = s->blk_idx;
+> +        break;
+> +    case A_BLK_LUT:
+> +        r = s->blk_lut[s->blk_idx];
+> +        tz_mpc_autoinc_idx(s, size);
+> +        break;
+> +    case A_INT_STAT:
+> +        r = s->int_stat;
+> +        break;
+> +    case A_INT_EN:
+> +        r = s->int_en;
+> +        break;
+> +    case A_INT_INFO1:
+> +        r = s->int_info1;
+> +        break;
+> +    case A_INT_INFO2:
+> +        r = s->int_info2;
+> +        break;
+>      case A_PIDR4:
+>      case A_PIDR5:
+>      case A_PIDR6:
+> @@ -120,6 +174,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+>                                      uint64_t value,
+>                                      unsigned size, MemTxAttrs attrs)
+>  {
+> +    TZMPC *s = TZ_MPC(opaque);
+>      uint32_t offset = addr & ~0x3;
+>  
+>      trace_tz_mpc_reg_write(addr, value, size);
+> @@ -127,7 +182,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+>      if (!attrs.secure && offset < A_PIDR4) {
+>          /* NS accesses can only see the ID registers */
+When reading
+"Identification registers can be read by any type of access." I
+understand all others can only be read by secure accesses. So I would
+have expected the same check on read side.
 
-Need quotes around "$target_compiler"
+Besides
 
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-> +        # For host systems we might get away with building without -stat=
-ic
-> +        if ! do_compiler $target_compiler -o $TMPE $TMPC ; then
+Thanks
 
-Ditto
-
-> +            target_compiler=3D""
-> +        else
-> +            enabled_cross_compilers=3D"${enabled_cross_compilers} ${targ=
-et_compiler}"
-> +            target_compiler_static=3D"n"
-> +        fi
-> +    else
-> +        enabled_cross_compilers=3D"${enabled_cross_compilers} ${target_c=
-ompiler}"
-> +        target_compiler_static=3D"y"
-> +    fi
-> +else
-> +    target_compiler=3D""
-> +fi
->
-
-> +if test -n "$enabled_cross_compilers"; then
-> +    echo
-> +    echo "NOTE: cross-compilers enabled:"
-> +    printf '%s\n' $enabled_cross_compilers | sort -u
-> +fi
-
-This is going to do weird things in the case where one of the
-target compilers is something like 'ccache gcc'.
-
-thanks
--- PMM
+Eric
+>          qemu_log_mask(LOG_GUEST_ERROR,
+> -                      "TZ MPC register read: NS access to offset 0x%x\n",
+> +                      "TZ MPC register write: NS access to offset 0x%x\n",
+>                        offset);
+>          return MEMTX_OK;
+>      }
+> @@ -140,9 +195,15 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+>          uint32_t oldval;
+>  
+>          switch (offset) {
+> -            /* As we add support for registers which need expansions
+> -             * other than zeroes we'll fill in cases here.
+> -             */
+> +        case A_CTRL:
+> +            oldval = s->ctrl;
+> +            break;
+> +        case A_BLK_IDX:
+> +            oldval = s->blk_idx;
+> +            break;
+> +        case A_BLK_LUT:
+> +            oldval = s->blk_lut[s->blk_idx];
+> +            break;
+>          default:
+>              oldval = 0;
+>              break;
+> @@ -150,7 +211,48 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+>          value = deposit32(oldval, (addr & 3) * 8, size * 8, value);
+>      }
+>  
+> +    if ((s->ctrl & R_CTRL_LOCKDOWN_MASK) &&
+> +        (offset == A_CTRL || offset == A_BLK_LUT || offset == A_INT_EN)) {
+> +        /* Lockdown mode makes these three registers read-only, and
+> +         * the only way out of it is to reset the device.
+> +         */
+> +        qemu_log_mask(LOG_GUEST_ERROR, "TZ MPC register write to offset 0x%x "
+> +                      "while MPC is in lockdown mode\n", offset);
+> +        return MEMTX_OK;
+> +    }
+> +
+>      switch (offset) {
+> +    case A_CTRL:
+> +        /* We don't implement the 'data gating' feature so all other bits
+> +         * are reserved and we make them RAZ/WI.
+> +         */
+> +        s->ctrl = value & (R_CTRL_SEC_RESP_MASK |
+> +                           R_CTRL_AUTOINC_MASK |
+> +                           R_CTRL_LOCKDOWN_MASK);
+> +        break;
+> +    case A_BLK_IDX:
+> +        s->blk_idx = value % s->blk_max;
+> +        break;
+> +    case A_BLK_LUT:
+> +        s->blk_lut[s->blk_idx] = value;
+> +        tz_mpc_autoinc_idx(s, size);
+> +        break;
+> +    case A_INT_CLEAR:
+> +        if (value & R_INT_CLEAR_IRQ_MASK) {
+> +            s->int_stat = 0;
+> +            tz_mpc_irq_update(s);
+> +        }
+> +        break;
+> +    case A_INT_EN:
+> +        s->int_en = value & R_INT_EN_IRQ_MASK;
+> +        tz_mpc_irq_update(s);
+> +        break;
+> +    case A_INT_SET:
+> +        if (value & R_INT_SET_IRQ_MASK) {
+> +            s->int_stat = R_INT_STAT_IRQ_MASK;
+> +            tz_mpc_irq_update(s);
+> +        }
+> +        break;
+>      case A_PIDR4:
+>      case A_PIDR5:
+>      case A_PIDR6:
+> @@ -266,6 +368,16 @@ static int tz_mpc_num_indexes(IOMMUMemoryRegion *iommu)
+>  
+>  static void tz_mpc_reset(DeviceState *dev)
+>  {
+> +    TZMPC *s = TZ_MPC(dev);
+> +
+> +    s->ctrl = 0x00000100;
+> +    s->blk_idx = 0;
+> +    s->int_stat = 0;
+> +    s->int_en = 1;
+> +    s->int_info1 = 0;
+> +    s->int_info2 = 0;
+> +
+> +    memset(s->blk_lut, 0, s->blk_max * sizeof(uint32_t));
+>  }
+>  
+>  static void tz_mpc_init(Object *obj)
+> @@ -339,13 +451,35 @@ static void tz_mpc_realize(DeviceState *dev, Error **errp)
+>                         "tz-mpc-downstream");
+>      address_space_init(&s->blocked_io_as, &s->blocked_io,
+>                         "tz-mpc-blocked-io");
+> +
+> +    s->blk_lut = g_new(uint32_t, s->blk_max);
+> +}
+> +
+> +static int tz_mpc_post_load(void *opaque, int version_id)
+> +{
+> +    TZMPC *s = TZ_MPC(opaque);
+> +
+> +    /* Check the incoming data doesn't point blk_idx off the end of blk_lut. */
+> +    if (s->blk_idx >= s->blk_max) {
+> +        return -1;
+> +    }
+> +    return 0;
+>  }
+>  
+>  static const VMStateDescription tz_mpc_vmstate = {
+>      .name = "tz-mpc",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+> +    .post_load = tz_mpc_post_load,
+>      .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32(ctrl, TZMPC),
+> +        VMSTATE_UINT32(blk_idx, TZMPC),
+> +        VMSTATE_UINT32(int_stat, TZMPC),
+> +        VMSTATE_UINT32(int_en, TZMPC),
+> +        VMSTATE_UINT32(int_info1, TZMPC),
+> +        VMSTATE_UINT32(int_info2, TZMPC),
+> +        VMSTATE_VARRAY_UINT32(blk_lut, TZMPC, blk_max,
+> +                              0, vmstate_info_uint32, uint32_t),
+>          VMSTATE_END_OF_LIST()
+>      }
+>  };
+> 
