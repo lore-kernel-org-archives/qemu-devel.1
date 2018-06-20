@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fVf2O-0001OZ-4S
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:28:49 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fVf2x-0001qM-MW
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:29:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fVf2M-000716-Mq
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:28:48 -0400
-References: <20180620132032.28865-1-peter.maydell@linaro.org>
-	<20180620132032.28865-5-peter.maydell@linaro.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <365ecc27-d270-cfe4-9b9e-d1adb0718621@redhat.com>
-Date: Wed, 20 Jun 2018 17:28:38 +0200
+	(envelope-from <no-reply@patchew.org>) id 1fVf2t-0007Oo-Oe
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:29:23 -0400
+Resent-Message-Id: <E1fVf2t-0007Oo-Oe@eggs.gnu.org>
+In-Reply-To: <20180620132032.28865-1-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152950854265.807.2921422904366195000@d39dc562802a>
 MIME-Version: 1.0
-In-Reply-To: <20180620132032.28865-5-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/8] hw/misc/tz_mpc.c: Honour the
- BLK_LUT settings in translate
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 20 Jun 2018 08:29:03 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/8] arm: implement TZ MPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,122 +23,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: peter.maydell@linaro.org
+Cc: famz@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, eric.auger@redhat.com, alex.bennee@linaro.org, patches@linaro.org
 
-Hi Peter,
-
-On 06/20/2018 03:20 PM, Peter Maydell wrote:
-> The final part of the Memory Protection Controller we need to
-> implement is actually using the BLK_LUT data programmed by the
-> guest to determine whether to block the transaction or not.
-> 
-> Since this means we now change transaction mappings when
-> the guest writes to BLK_LUT, we must also call the IOMMU
-> notifiers at that point.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
-
-> ---
->  hw/misc/tz-mpc.c     | 53 ++++++++++++++++++++++++++++++++++++++++++--
->  hw/misc/trace-events |  1 +
->  2 files changed, 52 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
-> index fded5922a21..8316079b4bf 100644
-> --- a/hw/misc/tz-mpc.c
-> +++ b/hw/misc/tz-mpc.c
-> @@ -72,6 +72,53 @@ static void tz_mpc_irq_update(TZMPC *s)
->      qemu_set_irq(s->irq, s->int_stat && s->int_en);
->  }
->  
-> +static void tz_mpc_iommu_notify(TZMPC *s, uint32_t lutidx,
-> +                                uint32_t oldlut, uint32_t newlut)
-> +{
-> +    /* Called when the LUT word at lutidx has changed from oldlut to newlut;
-> +     * must call the IOMMU notifiers for the changed blocks.
-> +     */
-> +    IOMMUTLBEntry entry = {
-> +        .addr_mask = s->blocksize - 1,
-> +    };
-> +    hwaddr addr = lutidx * s->blocksize * 32;
-> +    int i;
-> +
-> +    for (i = 0; i < 32; i++, addr += s->blocksize) {
-> +        bool block_is_ns;
-> +
-> +        if (!((oldlut ^ newlut) & (1 << i))) {
-> +            continue;
-> +        }
-> +        /* This changes the mappings for both the S and the NS space,
-> +         * so we need to do four notifies: an UNMAP then a MAP for each.
-> +         */
-> +        block_is_ns = newlut & (1 << i);
-> +
-> +        trace_tz_mpc_iommu_notify(addr);
-> +        entry.iova = addr;
-> +        entry.translated_addr = addr;
-> +
-> +        entry.perm = IOMMU_NONE;
-> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
-> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
-> +
-> +        entry.perm = IOMMU_RW;
-> +        if (block_is_ns) {
-> +            entry.target_as = &s->blocked_io_as;
-> +        } else {
-> +            entry.target_as = &s->downstream_as;
-> +        }
-> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
-> +        if (block_is_ns) {
-> +            entry.target_as = &s->downstream_as;
-> +        } else {
-> +            entry.target_as = &s->blocked_io_as;
-> +        }
-> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
-> +    }
-> +}
-> +
->  static void tz_mpc_autoinc_idx(TZMPC *s, unsigned access_size)
->  {
->      /* Auto-increment BLK_IDX if necessary */
-> @@ -237,6 +284,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
->          s->blk_idx = value % s->blk_max;
->          break;
->      case A_BLK_LUT:
-> +        tz_mpc_iommu_notify(s, s->blk_idx, s->blk_lut[s->blk_idx], value);
->          s->blk_lut[s->blk_idx] = value;
->          tz_mpc_autoinc_idx(s, size);
->          break;
-> @@ -383,9 +431,10 @@ static IOMMUTLBEntry tz_mpc_translate(IOMMUMemoryRegion *iommu,
->      /* Look at the per-block configuration for this address, and
->       * return a TLB entry directing the transaction at either
->       * downstream_as or blocked_io_as, as appropriate.
-> -     * For the moment, always permit accesses.
-> +     * If the LUT cfg_ns bit is 1, only non-secure transactions
-> +     * may pass. If the bit is 0, only secure transactions may pass.
->       */
-> -    ok = true;
-> +    ok = tz_mpc_cfg_ns(s, addr) == (iommu_idx == IOMMU_IDX_NS);
->  
->      trace_tz_mpc_translate(addr, flags,
->                             iommu_idx == IOMMU_IDX_S ? "S" : "NS",
-> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-> index 72bf9d57000..c956e1419b7 100644
-> --- a/hw/misc/trace-events
-> +++ b/hw/misc/trace-events
-> @@ -90,6 +90,7 @@ tz_mpc_reg_write(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs wri
->  tz_mpc_mem_blocked_read(uint64_t addr, unsigned size, bool secure) "TZ MPC blocked read: offset 0x%" PRIx64 " size %u secure %d"
->  tz_mpc_mem_blocked_write(uint64_t addr, uint64_t data, unsigned size, bool secure) "TZ MPC blocked write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u secure %d"
->  tz_mpc_translate(uint64_t addr, int flags, const char *idx, const char *res) "TZ MPC translate: addr 0x%" PRIx64 " flags 0x%x iommu_idx %s: %s"
-> +tz_mpc_iommu_notify(uint64_t addr) "TZ MPC iommu: notifying UNMAP/MAP for 0x%" PRIx64
->  
->  # hw/misc/tz-ppc.c
->  tz_ppc_reset(void) "TZ PPC: reset"
-> 
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjIwMTMyMDMyLjI4ODY1LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
+ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC84XSBhcm06IGltcGxlbWVudCBUWiBN
+UEMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEK
+dG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFt
+Cgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3Ig
+YyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChn
+aXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZv
+cm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgog
+ICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoK
+ZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
+MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
+dGVzdCcKZmYxZDNkZTJiZCBody9hcm0vbXBzMi10ei5jOiBJbnN0YW50aWF0ZSBNUENzCjVlOGVm
+N2U3MGUgaHcvYXJtL2lvdGtpdDogV2lyZSB1cCBNUEMgaW50ZXJydXB0IGxpbmVzCmU2MjhkNmEy
+ZmQgaHcvYXJtL2lvdGtpdDogSW5zdGFudGlhdGUgTVBDCjk3ZmQ4ODI0MTMgaHcvbWlzYy9pb3Rr
+aXQtc2VjY3RsLmM6IEltcGxlbWVudCBTRUNNUENJTlRTVEFUVVMKYjg5MDQ5OWU2NyBody9taXNj
+L3R6X21wYy5jOiBIb25vdXIgdGhlIEJMS19MVVQgc2V0dGluZ3MgaW4gdHJhbnNsYXRlCjRhOTAw
+NjY0YmUgaHcvbWlzYy90ei1tcGMuYzogSW1wbGVtZW50IGNvcnJlY3QgYmxvY2tlZC1hY2Nlc3Mg
+YmVoYXZpb3VyCmRiNzFlZWUxYjAgaHcvbWlzYy90ei1tcGMuYzogSW1wbGVtZW50IHJlZ2lzdGVy
+cwpmNzAyZWY2ZjhlIGh3L21pc2MvdHotbXBjLmM6IEltcGxlbWVudCB0aGUgQXJtIFRydXN0Wm9u
+ZSBNZW1vcnkgUHJvdGVjdGlvbiBDb250cm9sbGVyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVj
+a2luZyBQQVRDSCAxLzg6IGh3L21pc2MvdHotbXBjLmM6IEltcGxlbWVudCB0aGUgQXJtIFRydXN0
+Wm9uZSBNZW1vcnkgUHJvdGVjdGlvbiBDb250cm9sbGVyLi4uCldBUk5JTkc6IGFkZGVkLCBtb3Zl
+ZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzg1
+OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTA0
+IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
+aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
+aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hl
+Y2tpbmcgUEFUQ0ggMi84OiBody9taXNjL3R6LW1wYy5jOiBJbXBsZW1lbnQgcmVnaXN0ZXJzLi4u
+CkNoZWNraW5nIFBBVENIIDMvODogaHcvbWlzYy90ei1tcGMuYzogSW1wbGVtZW50IGNvcnJlY3Qg
+YmxvY2tlZC1hY2Nlc3MgYmVoYXZpb3VyLi4uCkNoZWNraW5nIFBBVENIIDQvODogaHcvbWlzYy90
+el9tcGMuYzogSG9ub3VyIHRoZSBCTEtfTFVUIHNldHRpbmdzIGluIHRyYW5zbGF0ZS4uLgpDaGVj
+a2luZyBQQVRDSCA1Lzg6IGh3L21pc2MvaW90a2l0LXNlY2N0bC5jOiBJbXBsZW1lbnQgU0VDTVBD
+SU5UU1RBVFVTLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6
+VnhWKQojOTE6IEZJTEU6IGh3L21pc2MvaW90a2l0LXNlY2N0bC5jOjcxMToKKyAgICAuc3Vic2Vj
+dGlvbnMgPSAoY29uc3QgVk1TdGF0ZURlc2NyaXB0aW9uKltdKSB7CiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5n
+cywgMTAwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCkNoZWNraW5nIFBBVENIIDYvODogaHcvYXJtL2lvdGtpdDogSW5zdGFudGlhdGUgTVBDLi4u
+CkNoZWNraW5nIFBBVENIIDcvODogaHcvYXJtL2lvdGtpdDogV2lyZSB1cCBNUEMgaW50ZXJydXB0
+IGxpbmVzLi4uCkNoZWNraW5nIFBBVENIIDgvODogaHcvYXJtL21wczItdHouYzogSW5zdGFudGlh
+dGUgTVBDcy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
+b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAcmVkaGF0LmNvbQ==
