@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fVf25-0001C2-Qf
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:28:32 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fVf2O-0001OZ-4S
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:28:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fVf24-0006tL-S5
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:28:29 -0400
-References: <20180620152713.27309-1-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f3fd65c1-fd8b-1a68-3437-9eb12d0ae25f@virtuozzo.com>
-Date: Wed, 20 Jun 2018 18:28:16 +0300
+	(envelope-from <eric.auger@redhat.com>) id 1fVf2M-000716-Mq
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:28:48 -0400
+References: <20180620132032.28865-1-peter.maydell@linaro.org>
+	<20180620132032.28865-5-peter.maydell@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <365ecc27-d270-cfe4-9b9e-d1adb0718621@redhat.com>
+Date: Wed, 20 Jun 2018 17:28:38 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180620152713.27309-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180620132032.28865-5-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] qapi: drop x- from
- x-block-latency-histogram-set
+Subject: Re: [Qemu-devel] [PATCH v3 4/8] hw/misc/tz_mpc.c: Honour the
+ BLK_LUT settings in translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +24,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: eblake@redhat.com, mreitz@redhat.com, armbru@redhat.com, kwolf@redhat.com, den@openvz.org, nshirokovskiy@virtuozzo.com
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-20.06.2018 18:27, Vladimir Sementsov-Ogievskiy wrote:
-> Libvirt part is ready, let's drop x- prefix.
+Hi Peter,
 
-libvirt patches will be sent soon I hope.
+On 06/20/2018 03:20 PM, Peter Maydell wrote:
+> The final part of the Memory Protection Controller we need to
+> implement is actually using the BLK_LUT data programmed by the
+> guest to determine whether to block the transaction or not.
+> 
+> Since this means we now change transaction mappings when
+> the guest writes to BLK_LUT, we must also call the IOMMU
+> notifiers at that point.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
+
 > ---
->   qapi/block-core.json | 4 ++--
->   blockdev.c           | 2 +-
->   2 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index cc3ede0630..dfaa050651 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -483,7 +483,7 @@
->     'data': {'boundaries': ['uint64'], 'bins': ['uint64'] } }
->   
->   ##
-> -# @x-block-latency-histogram-set:
-> +# @block-latency-histogram-set:
->   #
->   # Manage read, write and flush latency histograms for the device.
->   #
-> @@ -547,7 +547,7 @@
->   #      "arguments": { "device": "drive0" } }
->   # <- { "return": {} }
->   ##
-> -{ 'command': 'x-block-latency-histogram-set',
-> +{ 'command': 'block-latency-histogram-set',
->     'data': {'device': 'str',
->              '*boundaries': ['uint64'],
->              '*boundaries-read': ['uint64'],
-> diff --git a/blockdev.c b/blockdev.c
-> index 58d7570932..6d4ae77041 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -4299,7 +4299,7 @@ void qmp_x_blockdev_set_iothread(const char *node_name, StrOrNull *iothread,
->       aio_context_release(old_context);
->   }
->   
-> -void qmp_x_block_latency_histogram_set(
-> +void qmp_block_latency_histogram_set(
->       const char *device,
->       bool has_boundaries, uint64List *boundaries,
->       bool has_boundaries_read, uint64List *boundaries_read,
-
-
--- 
-Best regards,
-Vladimir
+>  hw/misc/tz-mpc.c     | 53 ++++++++++++++++++++++++++++++++++++++++++--
+>  hw/misc/trace-events |  1 +
+>  2 files changed, 52 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
+> index fded5922a21..8316079b4bf 100644
+> --- a/hw/misc/tz-mpc.c
+> +++ b/hw/misc/tz-mpc.c
+> @@ -72,6 +72,53 @@ static void tz_mpc_irq_update(TZMPC *s)
+>      qemu_set_irq(s->irq, s->int_stat && s->int_en);
+>  }
+>  
+> +static void tz_mpc_iommu_notify(TZMPC *s, uint32_t lutidx,
+> +                                uint32_t oldlut, uint32_t newlut)
+> +{
+> +    /* Called when the LUT word at lutidx has changed from oldlut to newlut;
+> +     * must call the IOMMU notifiers for the changed blocks.
+> +     */
+> +    IOMMUTLBEntry entry = {
+> +        .addr_mask = s->blocksize - 1,
+> +    };
+> +    hwaddr addr = lutidx * s->blocksize * 32;
+> +    int i;
+> +
+> +    for (i = 0; i < 32; i++, addr += s->blocksize) {
+> +        bool block_is_ns;
+> +
+> +        if (!((oldlut ^ newlut) & (1 << i))) {
+> +            continue;
+> +        }
+> +        /* This changes the mappings for both the S and the NS space,
+> +         * so we need to do four notifies: an UNMAP then a MAP for each.
+> +         */
+> +        block_is_ns = newlut & (1 << i);
+> +
+> +        trace_tz_mpc_iommu_notify(addr);
+> +        entry.iova = addr;
+> +        entry.translated_addr = addr;
+> +
+> +        entry.perm = IOMMU_NONE;
+> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
+> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
+> +
+> +        entry.perm = IOMMU_RW;
+> +        if (block_is_ns) {
+> +            entry.target_as = &s->blocked_io_as;
+> +        } else {
+> +            entry.target_as = &s->downstream_as;
+> +        }
+> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
+> +        if (block_is_ns) {
+> +            entry.target_as = &s->downstream_as;
+> +        } else {
+> +            entry.target_as = &s->blocked_io_as;
+> +        }
+> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
+> +    }
+> +}
+> +
+>  static void tz_mpc_autoinc_idx(TZMPC *s, unsigned access_size)
+>  {
+>      /* Auto-increment BLK_IDX if necessary */
+> @@ -237,6 +284,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+>          s->blk_idx = value % s->blk_max;
+>          break;
+>      case A_BLK_LUT:
+> +        tz_mpc_iommu_notify(s, s->blk_idx, s->blk_lut[s->blk_idx], value);
+>          s->blk_lut[s->blk_idx] = value;
+>          tz_mpc_autoinc_idx(s, size);
+>          break;
+> @@ -383,9 +431,10 @@ static IOMMUTLBEntry tz_mpc_translate(IOMMUMemoryRegion *iommu,
+>      /* Look at the per-block configuration for this address, and
+>       * return a TLB entry directing the transaction at either
+>       * downstream_as or blocked_io_as, as appropriate.
+> -     * For the moment, always permit accesses.
+> +     * If the LUT cfg_ns bit is 1, only non-secure transactions
+> +     * may pass. If the bit is 0, only secure transactions may pass.
+>       */
+> -    ok = true;
+> +    ok = tz_mpc_cfg_ns(s, addr) == (iommu_idx == IOMMU_IDX_NS);
+>  
+>      trace_tz_mpc_translate(addr, flags,
+>                             iommu_idx == IOMMU_IDX_S ? "S" : "NS",
+> diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+> index 72bf9d57000..c956e1419b7 100644
+> --- a/hw/misc/trace-events
+> +++ b/hw/misc/trace-events
+> @@ -90,6 +90,7 @@ tz_mpc_reg_write(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs wri
+>  tz_mpc_mem_blocked_read(uint64_t addr, unsigned size, bool secure) "TZ MPC blocked read: offset 0x%" PRIx64 " size %u secure %d"
+>  tz_mpc_mem_blocked_write(uint64_t addr, uint64_t data, unsigned size, bool secure) "TZ MPC blocked write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u secure %d"
+>  tz_mpc_translate(uint64_t addr, int flags, const char *idx, const char *res) "TZ MPC translate: addr 0x%" PRIx64 " flags 0x%x iommu_idx %s: %s"
+> +tz_mpc_iommu_notify(uint64_t addr) "TZ MPC iommu: notifying UNMAP/MAP for 0x%" PRIx64
+>  
+>  # hw/misc/tz-ppc.c
+>  tz_ppc_reset(void) "TZ PPC: reset"
+> 
