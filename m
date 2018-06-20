@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVa2c-0001rx-8t
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:08:43 -0400
+	(envelope-from <quintela@redhat.com>) id 1fVa5Q-0004uz-UU
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:11:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fVa2Y-0001wo-0k
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:08:42 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 20 Jun 2018 12:08:24 +0200
-Message-Id: <20180620100825.22476-7-david@redhat.com>
-In-Reply-To: <20180620100825.22476-1-david@redhat.com>
-References: <20180620100825.22476-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 6/7] s390x/tcg: rearm the CKC timer during
- migration
+	(envelope-from <quintela@redhat.com>) id 1fVa5P-0003mK-Rr
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:11:36 -0400
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180620100755.GH3441@redhat.com> ("Daniel P. =?utf-8?Q?Berr?=
+	=?utf-8?Q?ang=C3=A9=22's?=
+	message of "Wed, 20 Jun 2018 11:07:55 +0100")
+References: <20180615155103.11924-1-berrange@redhat.com>
+	<20180615155103.11924-4-berrange@redhat.com>
+	<87efh1lqpq.fsf@secure.mitica> <20180620100755.GH3441@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 20 Jun 2018 12:11:27 +0200
+Message-ID: <87a7rplqcw.fsf@secure.mitica>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/6] migration: add support for a
+ "tls-authz" migration parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,83 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?utf-8?Q?Marc-?= =?utf-8?Q?Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-If the CPU data is migrated after the TOD clock, the CKC timer of a CPU
-is not rearmed. Let's rearm it when loading the CPU state.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+> On Wed, Jun 20, 2018 at 12:03:45PM +0200, Juan Quintela wrote:
+>> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+>> > From: "Daniel P. Berrange" <berrange@redhat.com>
+>>=20
+>> .....
+>>=20
+>>=20
+>> It is not just the fault of this patch, but as you are the one doing the
+>> tls bits on migration...
+>>=20
+>>=20
+>> > @@ -1106,6 +1108,12 @@ static void migrate_params_apply(MigrateSetPara=
+meters *params, Error **errp)
+>> >          s->parameters.tls_hostname =3D g_strdup(params->tls_hostname-=
+>u.s);
+>> >      }
+>> >=20=20
+>> > +    if (params->has_tls_authz) {
+>> > +        g_free(s->parameters.tls_authz);
+>> > +        assert(params->tls_authz->type =3D=3D QTYPE_QSTRING);
+>>=20
+>> We really try  hard not to use assert() on migration code (yes, it is an
+>> ongoing effort).  The code around this is something like:
+>>=20
+>> static void migrate_params_test_apply(MigrateSetParameters *params,
+>>                                       MigrationParameters *dest)
+>> {
+>>     [...]
+>>=20
+>>     if (params->has_compress_level) {
+>>         dest->compress_level =3D params->compress_level;
+>>     }
+>>=20
+>>     [...]
+>>=20
+>>     if (params->has_tls_creds) {
+>>         assert(params->tls_creds->type =3D=3D QTYPE_QSTRING);
+>>         dest->tls_creds =3D g_strdup(params->tls_creds->u.s);
+>>     }
+>>     [...]
+>> }
+>>=20
+>> Ok, tls code is the one with strings, but still.
+>
+> My understanding is that because we declared this parameter to
+> have "str" type in the QAPI schema, the QAPI code should already
+> guarantee that  "params->tls_creds->type =3D=3D QTYPE_QSTRING" is
+> true.
+>
+> IOW, the assert should never fail, and if it does, that would
+> be a good thing as if QAPI wasn't validating input correctly
+> something very bad has gone wrong.
+>
+>
+>> static bool migrate_params_check(MigrationParameters *params, Error **er=
+rp)
+>> {
+>>     if (params->has_compress_level &&
+>>         (params->compress_level > 9)) {
+>>         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "compress_level",
+>>                    "is invalid, it should be in the range of 0 to 9");
+>>         return false;
+>
+> This is different because QAPI schema merely declares it to be an
+> int, so nothing in the QAPI input validation will do range checking.
+> So this codepath is definitely reachable by users feeding bad input.
 
-Introduce tcg-stub.c just like kvm-stub.c for tcg specific stubs.
+ok then.  Thanks for the explanation.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/Makefile.objs |  1 +
- target/s390x/machine.c     |  6 ++++++
- target/s390x/tcg-stub.c    | 20 ++++++++++++++++++++
- 3 files changed, 27 insertions(+)
- create mode 100644 target/s390x/tcg-stub.c
-
-diff --git a/target/s390x/Makefile.objs b/target/s390x/Makefile.objs
-index 31932de9cf..22a9a9927a 100644
---- a/target/s390x/Makefile.objs
-+++ b/target/s390x/Makefile.objs
-@@ -5,6 +5,7 @@ obj-$(CONFIG_SOFTMMU) += machine.o ioinst.o arch_dump.o mmu_helper.o diag.o
- obj-$(CONFIG_SOFTMMU) += sigp.o
- obj-$(CONFIG_KVM) += kvm.o
- obj-$(call lnot,$(CONFIG_KVM)) += kvm-stub.o
-+obj-$(call lnot,$(CONFIG_TCG)) += tcg-stub.o
- 
- # build and run feature list generator
- feat-src = $(SRC_PATH)/target/$(TARGET_BASE_ARCH)/
-diff --git a/target/s390x/machine.c b/target/s390x/machine.c
-index 84b4928755..bd3230d027 100644
---- a/target/s390x/machine.c
-+++ b/target/s390x/machine.c
-@@ -19,6 +19,7 @@
- #include "cpu.h"
- #include "internal.h"
- #include "kvm_s390x.h"
-+#include "tcg_s390x.h"
- #include "sysemu/kvm.h"
- 
- static int cpu_post_load(void *opaque, int version_id)
-@@ -34,6 +35,11 @@ static int cpu_post_load(void *opaque, int version_id)
-         return kvm_s390_vcpu_interrupt_post_load(cpu);
-     }
- 
-+    if (tcg_enabled()) {
-+        /* Rearm the CKC timer if necessary */
-+        tcg_s390_tod_updated(CPU(cpu), RUN_ON_CPU_NULL);
-+    }
-+
-     return 0;
- }
- 
-diff --git a/target/s390x/tcg-stub.c b/target/s390x/tcg-stub.c
-new file mode 100644
-index 0000000000..c93501db0b
---- /dev/null
-+++ b/target/s390x/tcg-stub.c
-@@ -0,0 +1,20 @@
-+/*
-+ * QEMU TCG support -- s390x specific function stubs.
-+ *
-+ * Copyright (C) 2018 Red Hat Inc
-+ *
-+ * Authors:
-+ *   David Hildenbrand <david@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "cpu.h"
-+#include "tcg_s390x.h"
-+
-+void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
-+{
-+}
--- 
-2.17.1
+Later, Juan.
