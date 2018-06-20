@@ -1,24 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1fVc0K-0000NB-3X
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:14:29 -0400
+	(envelope-from <berrange@redhat.com>) id 1fVc0P-0000Tc-Sl
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:14:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@mips.com>) id 1fVc0G-00089H-T1
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:14:28 -0400
-Received: from 9pmail.ess.barracuda.com ([64.235.154.210]:37198)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Yongbok.Kim@mips.com>)
-	id 1fVc0G-000863-JQ
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:14:24 -0400
-From: Yongbok Kim <yongbok.kim@mips.com>
-Date: Wed, 20 Jun 2018 13:06:14 +0100
-Message-ID: <20180620120620.12806-30-yongbok.kim@mips.com>
-In-Reply-To: <20180620120620.12806-1-yongbok.kim@mips.com>
-References: <20180620120620.12806-1-yongbok.kim@mips.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 29/35] target/mips: Fix ERET/ERETNC can cause
- ADEL exception
+	(envelope-from <berrange@redhat.com>) id 1fVc0O-0008F3-Bp
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:14:33 -0400
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Date: Wed, 20 Jun 2018 13:14:18 +0100
+Message-Id: <20180620121423.16979-2-berrange@redhat.com>
+In-Reply-To: <20180620121423.16979-1-berrange@redhat.com>
+References: <20180620121423.16979-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 1/6] qemu-nbd: add support for authorization
+ of TLS clients
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +21,181 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: aurelien@aurel32.net, Aleksandar.Markovic@mips.com, James.Hogan@mips.com, Paul.Burton@mips.com, Matthew.Fortune@mips.com, Stefan.Markovic@mips.com
+Cc: Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>, Eric Blake <eblake@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-From: Yongbok Kim <yongbok.kim@imgtec.com>
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Fix ERET/ERETNC can cause ADEL exception
+Currently any client which can complete the TLS handshake is able to use
+the NBD server. The server admin can turn on the 'verify-peer' option
+for the x509 creds to require the client to provide a x509 certificate.
+This means the client will have to acquire a certificate from the CA
+before they are permitted to use the NBD server. This is still a fairly
+low bar to cross.
 
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+This adds a '--tls-authz OBJECT-ID' option to the qemu-nbd command which
+takes the ID of a previously added 'QAuthZ' object instance. This will
+be used to validate the client's x509 distinguished name. Clients
+failing the authorization check will not be permitted to use the NBD
+server.
+
+For example to setup authorization that only allows connection from a client
+whose x509 certificate distinguished name is
+
+   CN=laptop.example.com,O=Example Org,L=London,ST=London,C=GB
+
+use:
+
+  qemu-nbd --object tls-creds-x509,id=tls0,dir=/home/berrange/qemutls,\
+                    endpoint=server,verify-peer=yes \
+           --object authz-simple,id=auth0,identity=CN=laptop.example.com,,\
+                    O=Example Org,,L=London,,ST=London,,C=GB \
+           --tls-creds tls0 \
+           --tls-authz authz0
+	   ....other qemu-nbd args...
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- target/mips/op_helper.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ include/block/nbd.h |  2 +-
+ nbd/server.c        | 10 +++++-----
+ qemu-nbd.c          | 13 ++++++++++++-
+ qemu-nbd.texi       |  4 ++++
+ 4 files changed, 22 insertions(+), 7 deletions(-)
 
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 6f5e5a3..09ec20a 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -2434,6 +2434,13 @@ static void set_pc(CPUMIPSState *env, target_ulong error_pc)
-     env->active_tc.PC = error_pc & ~(target_ulong)1;
-     if (env->insn_flags & ISA_NANOMIPS32) {
-         /* Don't clear MIPS_HFLAG_M16 */
-+        if (error_pc & 1) {
-+            if (!(env->hflags & MIPS_HFLAG_DM)) {
-+                env->CP0_BadVAddr = error_pc;
-+            }
-+            env->active_tc.PC = error_pc;
-+            do_raise_exception(env, EXCP_AdEL, 0);
-+        }
-         return;
-     }
-     if (error_pc & 1) {
-@@ -2471,10 +2478,12 @@ void helper_eretnc(CPUMIPSState *env)
- void helper_deret(CPUMIPSState *env)
- {
-     debug_pre_eret(env);
--    set_pc(env, env->CP0_DEPC);
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index fcdcd54502..80ea9d240c 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -307,7 +307,7 @@ void nbd_export_close_all(void);
+ void nbd_client_new(NBDExport *exp,
+                     QIOChannelSocket *sioc,
+                     QCryptoTLSCreds *tlscreds,
+-                    const char *tlsaclname,
++                    const char *tlsauthz,
+                     void (*close_fn)(NBDClient *, bool));
+ void nbd_client_get(NBDClient *client);
+ void nbd_client_put(NBDClient *client);
+diff --git a/nbd/server.c b/nbd/server.c
+index 9e1f227178..4f10f08dc0 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -100,7 +100,7 @@ struct NBDClient {
  
-     env->hflags &= ~MIPS_HFLAG_DM;
-     compute_hflags(env);
-+
-+    set_pc(env, env->CP0_DEPC);
-+
-     debug_post_eret(env);
+     NBDExport *exp;
+     QCryptoTLSCreds *tlscreds;
+-    char *tlsaclname;
++    char *tlsauthz;
+     QIOChannelSocket *sioc; /* The underlying data channel */
+     QIOChannel *ioc; /* The current I/O channel which may differ (eg TLS) */
+ 
+@@ -677,7 +677,7 @@ static QIOChannel *nbd_negotiate_handle_starttls(NBDClient *client,
+ 
+     tioc = qio_channel_tls_new_server(ioc,
+                                       client->tlscreds,
+-                                      client->tlsaclname,
++                                      client->tlsauthz,
+                                       errp);
+     if (!tioc) {
+         return NULL;
+@@ -1250,7 +1250,7 @@ void nbd_client_put(NBDClient *client)
+         if (client->tlscreds) {
+             object_unref(OBJECT(client->tlscreds));
+         }
+-        g_free(client->tlsaclname);
++        g_free(client->tlsauthz);
+         if (client->exp) {
+             QTAILQ_REMOVE(&client->exp->clients, client, next);
+             nbd_export_put(client->exp);
+@@ -2140,7 +2140,7 @@ static coroutine_fn void nbd_co_client_start(void *opaque)
+ void nbd_client_new(NBDExport *exp,
+                     QIOChannelSocket *sioc,
+                     QCryptoTLSCreds *tlscreds,
+-                    const char *tlsaclname,
++                    const char *tlsauthz,
+                     void (*close_fn)(NBDClient *, bool))
+ {
+     NBDClient *client;
+@@ -2153,7 +2153,7 @@ void nbd_client_new(NBDExport *exp,
+     if (tlscreds) {
+         object_ref(OBJECT(client->tlscreds));
+     }
+-    client->tlsaclname = g_strdup(tlsaclname);
++    client->tlsauthz = g_strdup(tlsauthz);
+     client->sioc = sioc;
+     object_ref(OBJECT(client->sioc));
+     client->ioc = QIO_CHANNEL(sioc);
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 51b9d38c72..c0c9c805c0 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -52,6 +52,7 @@
+ #define QEMU_NBD_OPT_TLSCREDS      261
+ #define QEMU_NBD_OPT_IMAGE_OPTS    262
+ #define QEMU_NBD_OPT_FORK          263
++#define QEMU_NBD_OPT_TLSAUTHZ      264
+ 
+ #define MBR_SIZE 512
+ 
+@@ -66,6 +67,7 @@ static int shared = 1;
+ static int nb_fds;
+ static QIONetListener *server;
+ static QCryptoTLSCreds *tlscreds;
++static const char *tlsauthz;
+ 
+ static void usage(const char *name)
+ {
+@@ -355,7 +357,7 @@ static void nbd_accept(QIONetListener *listener, QIOChannelSocket *cioc,
+     nb_fds++;
+     nbd_update_server_watch();
+     nbd_client_new(newproto ? NULL : exp, cioc,
+-                   tlscreds, NULL, nbd_client_closed);
++                   tlscreds, tlsauthz, nbd_client_closed);
  }
- #endif /* !CONFIG_USER_ONLY */
+ 
+ static void nbd_update_server_watch(void)
+@@ -533,6 +535,7 @@ int main(int argc, char **argv)
+         { "image-opts", no_argument, NULL, QEMU_NBD_OPT_IMAGE_OPTS },
+         { "trace", required_argument, NULL, 'T' },
+         { "fork", no_argument, NULL, QEMU_NBD_OPT_FORK },
++        { "tls-authz", no_argument, NULL, QEMU_NBD_OPT_TLSAUTHZ },
+         { NULL, 0, NULL, 0 }
+     };
+     int ch;
+@@ -755,6 +758,9 @@ int main(int argc, char **argv)
+             g_free(trace_file);
+             trace_file = trace_opt_parse(optarg);
+             break;
++        case QEMU_NBD_OPT_TLSAUTHZ:
++            tlsauthz = optarg;
++            break;
+         case QEMU_NBD_OPT_FORK:
+             fork_process = true;
+             break;
+@@ -819,6 +825,11 @@ int main(int argc, char **argv)
+                          error_get_pretty(local_err));
+             exit(EXIT_FAILURE);
+         }
++    } else {
++        if (tlsauthz) {
++            error_report("--tls-authz is not permitted without --tls-creds");
++            exit(EXIT_FAILURE);
++        }
+     }
+ 
+     if (disconnect) {
+diff --git a/qemu-nbd.texi b/qemu-nbd.texi
+index 9a84e81eed..7f9503cf05 100644
+--- a/qemu-nbd.texi
++++ b/qemu-nbd.texi
+@@ -91,6 +91,10 @@ of the TLS credentials object previously created with the --object
+ option.
+ @item --fork
+ Fork off the server process and exit the parent once the server is running.
++@item --tls-authz=ID
++Specify the ID of a qauthz object previously created with the
++--object option. This will be used to authorize connecting users
++against their x509 distinguished name.
+ @item -v, --verbose
+ Display extra debugging information
+ @item -h, --help
 -- 
-1.9.1
+2.17.0
