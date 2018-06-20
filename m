@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fVjir-00021p-Ij
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:29:00 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fVjk8-00031a-7Q
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:30:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fVjiq-0005Cj-Hk
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:28:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53882 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1fVjiq-0005CX-Br
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:28:56 -0400
-References: <20180620110741.gdywesuqbyhjs4hd@sirius.home.kraxel.org>
-	<776e542e-b6e1-ccbb-fb9a-ea7d521cd955@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <d1756dd7-a838-6977-0847-3a4bd5c93689@redhat.com>
-Date: Wed, 20 Jun 2018 16:28:55 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fVjk5-0005Pv-2t
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:30:16 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:44820)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fVjk4-0005Pn-UM
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 16:30:13 -0400
+Received: by mail-qt0-x241.google.com with SMTP id x5-v6so155399qte.11
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 13:30:12 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180620132032.12952-1-alex.bennee@linaro.org>
+	<20180620132032.12952-4-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6fc68471-a891-e2bf-7573-ac41a7a1862c@amsat.org>
+Date: Wed, 20 Jun 2018 17:30:08 -0300
 MIME-Version: 1.0
-In-Reply-To: <776e542e-b6e1-ccbb-fb9a-ea7d521cd955@redhat.com>
+In-Reply-To: <20180620132032.12952-4-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] regression: sata cdrom boot broken
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH 3/5] .travis.yml: add gcovr summary for
+ GCOV build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +36,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: f4bug@amsat.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org
 
+On 06/20/2018 10:20 AM, Alex Bennée wrote:
+> This gives a more useful summary, sorted by descending % coverage,
+> after the tests have run. The final numbers will give an idea if our
+> coverage is getting better or worse.
+> 
+> As quite a lot of lines don't get covered at all we filter out all the
+> 0% lines. If the file doesn't appear it is not being exercised.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  .travis.yml | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/.travis.yml b/.travis.yml
+> index fabfe9ec34..83e0577464 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -38,6 +38,7 @@ addons:
+>        - libvte-2.90-dev
+>        - sparse
+>        - uuid-dev
+> +      - gcovr
+>  
+>  # The channel name "irc.oftc.net#qemu" is encrypted against qemu/qemu
+>  # to prevent IRC notifications from forks. This was created using:
+> @@ -81,6 +82,8 @@ matrix:
+>        compiler: clang
+>      # gprof/gcov are GCC features
+>      - env: CONFIG="--enable-gprof --enable-gcov --disable-pie --target-list=aarch64-softmmu,arm-softmmu,i386-softmmu,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-softmmu,x86_64-softmmu"
+> +      after_success:
+> +        - gcovr -p  | grep -v "0%" | sed s/[0-9]\*[,-]//g
 
+Can we use 'fgrep -B 1 -v "0%"' (--before-context=1) to also remove the
+filepath line?
 
-On 06/20/2018 08:18 AM, Paolo Bonzini wrote:
-> On 20/06/2018 13:07, Gerd Hoffmann wrote:
->>   Hi,
->>
->> $subject says all.  Noticed while testing the upcoming seabios update.
->> Reproducer:
->>
->>   qemu-system-x86_64 -M q35 -m 4G -cdrom Fedora-Workstation-Live-x86_6=
-4-28-1.1.iso
->>
->> bisected to:
->>
->>   commit 956556e131e35f387ac482ad7b41151576fef057
->>   Author: John Snow <jsnow@redhat.com>
->>   Date:   Wed Jun 6 15:09:50 2018 -0400
->>
->>     ahci: move PIO Setup FIS before transfer, fix it for ATAPI command=
-s
->>
->> cheers,
->>   Gerd
->>
->=20
-> If you know where to look at, the spec is actually pretty clear with
-> respect to when the interrupt is generated: "A PIO Setup FIS has been
-> received with the =E2=80=98I=E2=80=99 bit set, it has been copied into =
-system memory,
-> and the data related to that FIS has been transferred".
->=20
+Any idea why I get this? "(WARNING) Unrecognized GCOV output: '====='"
 
-You're quoting AHCI 1.3.1 section 3.3.5 here, the documentation for the
-PxIS register.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-...Oh. So the PIO Setup FIS ... gets generated before the data is sent,
-but we don't copy it to the HBA memory buffers and notify the client
-until afterwards, but this is per-DRQ, I think, and not per-IDE command.
-
-> However, after reading the SATA specification I believe that the PIO
-> Setup FIS should never generate an interrupt in SeaBIOS, because:
->=20
->   If this is the first DRQ data block for this command, the Interrupt
->   bit shall be cleared to zero. If this is not the first DRQ data block
->   for this command, the Interrupt bit shall be set to one
->=20
-
-...and this gem is from SATA 3.2 section 11.9, "PIO data-out command
-protocol." I have long wondered what controlled that 'I' bit...
-
-> Putting things together, there are two bugs in QEMU;
->=20
-> - the PIO Setup interrupt must be generated at the end of data transfer
->
-
-Oops.
-
-> - the PIO Setup interrupt must not be generated for the ATAPI command
-> transfer
->=20
-
-Oops again. I ought to have stopped you but I was long aware that the
-PIO Setup FIS ought to be generated "before" the transfer. I suppose
-what we were doing was more correct, though.
-
-> *But* because SeaBIOS always uses DMA for ATAPI commands, there should
-> never be more than one DRQ data block for each command, and it should b=
-e
-> possible to remove the fishy PIO Setup FIS handling in SeaBIOS.
->=20
-> Paolo
->=20
+>        compiler: gcc
+>      # We manually include builds which we disable "make check" for
+>      - env: CONFIG="--enable-debug --enable-tcg-interpreter"
+> 
