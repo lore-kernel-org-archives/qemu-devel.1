@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fVi2Z-00063k-Bc
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 14:41:12 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fVigX-0005P5-3x
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 15:22:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fVi2U-0003GO-EA
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 14:41:11 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42416)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fVi2U-0003Eu-8p
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 14:41:06 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fVi2T-0001Qx-4n
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 18:41:05 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 199E12E80C8
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 18:41:05 +0000 (UTC)
+	(envelope-from <rth7680@gmail.com>) id 1fVigT-0000RT-VF
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 15:22:29 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180620130619.11362-1-peter.maydell@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <a5c5975a-0860-01d4-8ff9-b69fcc91dac8@twiddle.net>
+Date: Wed, 20 Jun 2018 09:22:20 -1000
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Jun 2018 18:33:17 -0000
-From: Waldemar Kozaczuk <1776920@bugs.launchpad.net>
-Reply-To: Bug 1776920 <1776920@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152898515528.25954.5483198787570860596.malonedeb@soybean.canonical.com>
-	<152951004729.26601.9045973197027267230.malone@gac.canonical.com>
-Message-Id: <16213D80-B75F-4B84-BFC5-0743A325FFC9@gmail.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1776920] Re: qemu-img convert on Mac OSX
- creates corrupt images
+In-Reply-To: <20180620130619.11362-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/3] Support M-profile MPU regions smaller
+ than 1K
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,94 +25,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
 
-I have done more tests based on your suggestion and I think it is the
-opposite. The problem happens is the source is APFS.
+On 06/20/2018 03:06 AM, Peter Maydell wrote:
+> The Arm M-profile MPU allows the guest to specify access
+> permissions at a very fine granularity (down to a 32-byte
+> alignment for region start and and addresses). Currently
+> we insist that regions are page-aligned because the core
+> TCG code can't handle anything else.
+> 
+> This patchset relaxes that restriction, so that we can handle
+> small MPU regions for reading and writing (but not yet for
+> execution). It does that by  marking the TLB entry for any
+> page which includes a small region with a flag TLB_RECHECK.
+> This flag causes us to always take the slow-path for accesses.
+> In the slow path we can then special case them to always call
+> tlb_fill() again, so we have the correct information for the
+> exact address being accessed.
+> 
+> Patch 1 adds support to the accel/tcg code. Patch 2 then
+> enables using it for the PMSAv7 (v7M) MPU, and patch 3
+> does the same for the PMSAv8 (v8M) MPU and SAU.
+> Because we don't yet support execution from small regions,
+> the PMSA code has some corner cases where it retains the
+> previous behaviour so we don't break previously-working
+> guests:
+>  * if the MPU region is small, we don't mark it PROT_EXEC
+>    even if the guest asked for it (so execution will cause
+>    an MPU exception)
+>  * we ignore the fact that the SAU region might be smaller
+>    than a page
+> 
+> (Unfortunately the old code *intended* to make small-region
+> accesses non-executable but due to bugs didn't actually
+> succeed in doing that, so this might possibly cause some
+> previously working-by-accident code to break.)
+>  
+> I would ideally in future like to add execution support, but
+> this is somewhat tricky. My rough sketch for it looks like:
+>  * get_page_addr_code() should return -1 for "not actually
+>    a full page of RAM" (deleting all the current tricky code
+>    for trying to handle it being a memory region or unmapped)
+>  * its callsites in the TB hashtable lookup code should handle
+>    -1 by returning "no TB found"
+>  * the weird call to get_page_addr_code() in the xtensa itlb_hit_test
+>    helper should be replaced by a call to tlb_fill() or some
+>    xtensa-internal function (I think all it is trying to do is
+>    cause the exceptions for MMU faults)
+>  * tb_gen_code() should in this case generate a one-instruction
+>    TB and tell its caller not to cache it
+>  * the translate.c code for targets that need this probably needs
+>    fixing up to make sure it can handle the case of "the load
+>    code byte/word/etc functions might return failure or cause
+>    an exception"
+> 
+> This would also have the advantage that it naturally allows
+> you to execute (slowly) from any MMIO region, and we could drop
+> the broken request-mmio-pointer machinery.
+> 
+> In any case that is too much for 3.0, I think; I'd like to get this
+> R/W small-region code into 3.0, though.
+> 
+> thanks
+> -- PMM
+> 
+> Peter Maydell (3):
+>   tcg: Support MMU protection regions smaller than TARGET_PAGE_SIZE
+>   target/arm: Set page (region) size in get_phys_addr_pmsav7()
+>   target/arm: Handle small regions in get_phys_addr_pmsav8()
 
-Following failed:
-APFS -> ExFAT
-APFS -> Fat32
+Whole series:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Following worked:
-ExFAT -> APFS
-FAT32 -> APFS
+I assume you'll take this all via target-arm.next?
 
-So for now my workaround is to use USB stick formatted with FAT32 or
-ExFAT, copy the source images there and then convert to somewhere or my
-main drive with APFS.
 
-My regards,
-Waldek
-
-Sent from my iPhone
-
-> On Jun 20, 2018, at 11:54, John Snow <1776920@bugs.launchpad.net> wrote:
-> =
-
-> I haven't had the time to look just yet.
-> =
-
-> If there's a developer out there with a Mac has the bandwidth to take a
-> look at this I'd be grateful. (I don't have access to one presently.)
-> =
-
-> I see that the target filesystem is APFS however -- I think we might
-> have a bug in our APFS support. Do you have the ability to try it on
-> your Mac but on a non-APFS destination?
-> =
-
-> It looks like the image is pretty small (~6MB?) so maybe you can try
-> with a non-APFS formatted thumb drive?
-> =
-
-> My hunch is that:
-> - APFS source to FAT32 destination might work correctly.
-> - FAT32 source to FAT32 destination will definitely work correctly.
-> =
-
-> -- =
-
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1776920
-> =
-
-> Title:
->  qemu-img convert on Mac OSX creates corrupt images
-> =
-
-> Status in QEMU:
->  New
-> =
-
-> Bug description:
->  An image created by qemu-img create, then modified by another program
->  is converted to bad/corrupt image when using convert sub command on
->  Mac OSX. The same convert works on Linux. The version of qemu-img is
->  2.12.
-> =
-
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1776920/+subscriptions
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1776920
-
-Title:
-  qemu-img convert on Mac OSX creates corrupt images
-
-Status in QEMU:
-  New
-
-Bug description:
-  An image created by qemu-img create, then modified by another program
-  is converted to bad/corrupt image when using convert sub command on
-  Mac OSX. The same convert works on Linux. The version of qemu-img is
-  2.12.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1776920/+subscriptions
+r~
