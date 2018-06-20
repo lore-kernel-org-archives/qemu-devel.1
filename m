@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVaTJ-0001uS-0i
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:36:18 -0400
+	(envelope-from <berrange@redhat.com>) id 1fVaTJ-0001uR-0P
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:36:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVaTH-0007uN-Ct
+	(envelope-from <berrange@redhat.com>) id 1fVaTE-0007tL-Ar
 	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:36:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57566 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57562 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVaTH-0007uH-7n
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:36:15 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVaTE-0007sq-3w
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:36:12 -0400
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Wed, 20 Jun 2018 11:35:51 +0100
-Message-Id: <20180620103555.1342-8-berrange@redhat.com>
+Date: Wed, 20 Jun 2018 11:35:50 +0100
+Message-Id: <20180620103555.1342-7-berrange@redhat.com>
 In-Reply-To: <20180620103555.1342-1-berrange@redhat.com>
 References: <20180620103555.1342-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 07/11] authz: add QAuthZSimple object type
- for easy whitelist auth checks
+Subject: [Qemu-devel] [PATCH v3 06/11] authz: add QAuthZ object as an
+ authorization base class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +27,157 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-In many cases a single VM will just need to whilelist a single identity
-as the allowed user of network services. This is especially the case for
-TLS live migration (optionally with NBD storage) where we just need to
-whitelist the x509 certificate distinguished name of the source QEMU
-host.
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-Via QMP this can be configured with:
+The current qemu_acl module provides a simple access control list
+facility inside QEMU, which is used via a set of monitor commands
+acl_show, acl_policy, acl_add, acl_remove & acl_reset.
 
-  {
-    "execute": "object-add",
-    "arguments": {
-      "qom-type": "authz-simple",
-      "id": "authz0",
-      "parameters": {
-        "identity": "fred"
-      }
-    }
-  }
+Note there is no ability to create ACLs - the network services (eg VNC
+server) were expected to create ACLs that they want to check.
 
-Or via the command line
+There is also no way to define ACLs on the command line, nor potentially
+integrate with external authorization systems like polkit, pam, ldap
+lookup, etc.
 
-  -object authz-simple,id=authz0,identity=fred
+The QAuthZ object defines a minimal abstract QOM class that can be
+subclassed for creating different authorization providers.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- authz/Makefile.objs    |   1 +
- authz/simple.c         | 122 +++++++++++++++++++++++++++++++++++++++++
- authz/trace-events     |   3 +
- include/authz/simple.h |  84 ++++++++++++++++++++++++++++
- qemu-options.hx        |  21 +++++++
- 5 files changed, 231 insertions(+)
- create mode 100644 authz/simple.c
- create mode 100644 include/authz/simple.h
+ MAINTAINERS          |   7 +++
+ Makefile             |  10 ++--
+ Makefile.objs        |   6 +++
+ Makefile.target      |   2 +
+ authz/Makefile.objs  |   1 +
+ authz/base.c         |  82 +++++++++++++++++++++++++++++++
+ authz/trace-events   |   4 ++
+ include/authz/base.h | 112 +++++++++++++++++++++++++++++++++++++++++++
+ 8 files changed, 220 insertions(+), 4 deletions(-)
+ create mode 100644 authz/Makefile.objs
+ create mode 100644 authz/base.c
+ create mode 100644 authz/trace-events
+ create mode 100644 include/authz/base.h
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6e04f10f12..4bff621bf0 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1770,6 +1770,13 @@ F: io/
+ F: include/io/
+ F: tests/test-io-*
+ 
++User authorization
++M: Daniel P. Berrange <berrange@redhat.com>
++S: Maintained
++F: authz/
++F: include/authz/
++F: tests/test-authz-*
++
+ Sockets
+ M: Daniel P. Berrange <berrange@redhat.com>
+ M: Gerd Hoffmann <kraxel@redhat.com>
+diff --git a/Makefile b/Makefile
+index e46f2b625a..ea51b10311 100644
+--- a/Makefile
++++ b/Makefile
+@@ -413,6 +413,7 @@ endif
+ 
+ dummy := $(call unnest-vars,, \
+                 stub-obj-y \
++                authz-obj-y \
+                 chardev-obj-y \
+                 util-obj-y \
+                 qga-obj-y \
+@@ -474,6 +475,7 @@ qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
+ SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_LIST))
+ SOFTMMU_SUBDIR_RULES=$(filter %-softmmu,$(SUBDIR_RULES))
+ 
++$(SOFTMMU_SUBDIR_RULES): $(authz-obj-y)
+ $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
+ $(SOFTMMU_SUBDIR_RULES): $(crypto-obj-y)
+ $(SOFTMMU_SUBDIR_RULES): $(io-obj-y)
+@@ -536,9 +538,9 @@ COMMON_LDADDS = libqemuutil.a
+ 
+ qemu-img.o: qemu-img-cmds.h
+ 
+-qemu-img$(EXESUF): qemu-img.o $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+-qemu-nbd$(EXESUF): qemu-nbd.o $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+-qemu-io$(EXESUF): qemu-io.o $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
++qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
++qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
++qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ 
+ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
+ 
+@@ -547,7 +549,7 @@ qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
+ fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
+ fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
+ 
+-scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
++scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ ifdef CONFIG_MPATH
+ scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
+ endif
+diff --git a/Makefile.objs b/Makefile.objs
+index 7a9828da28..42cdb1c1c3 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -62,6 +62,11 @@ util-obj-y += qapi/qapi-introspect.o
+ 
+ chardev-obj-y = chardev/
+ 
++#######################################################################
++# authz-obj-y is code used by both qemu system emulation and qemu-img
++
++authz-obj-y = authz/
++
+ #######################################################################
+ # block-obj-y is code used by both qemu system emulation and qemu-img
+ 
+@@ -199,6 +204,7 @@ trace-events-subdirs =
+ trace-events-subdirs += accel/kvm
+ trace-events-subdirs += accel/tcg
+ trace-events-subdirs += audio
++trace-events-subdirs += authz
+ trace-events-subdirs += block
+ trace-events-subdirs += chardev
+ trace-events-subdirs += crypto
+diff --git a/Makefile.target b/Makefile.target
+index dad2cf8778..0499ef4014 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -166,6 +166,7 @@ include $(SRC_PATH)/Makefile.objs
+ dummy := $(call unnest-vars,,target-obj-y)
+ target-obj-y-save := $(target-obj-y)
+ dummy := $(call unnest-vars,.., \
++               authz-obj-y \
+                block-obj-y \
+                block-obj-m \
+                chardev-obj-y \
+@@ -179,6 +180,7 @@ target-obj-y := $(target-obj-y-save)
+ all-obj-y += $(common-obj-y)
+ all-obj-y += $(target-obj-y)
+ all-obj-y += $(qom-obj-y)
++all-obj-$(CONFIG_SOFTMMU) += $(authz-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) += $(block-obj-y) $(chardev-obj-y)
+ all-obj-$(CONFIG_USER_ONLY) += $(crypto-aes-obj-y)
+ all-obj-$(CONFIG_SOFTMMU) += $(crypto-obj-y)
 diff --git a/authz/Makefile.objs b/authz/Makefile.objs
-index 12597c9528..2a75d53840 100644
---- a/authz/Makefile.objs
-+++ b/authz/Makefile.objs
-@@ -1 +1,2 @@
- authz-obj-y += base.o
-+authz-obj-y += simple.o
-diff --git a/authz/simple.c b/authz/simple.c
 new file mode 100644
-index 0000000000..1ed1605b14
+index 0000000000..12597c9528
 --- /dev/null
-+++ b/authz/simple.c
-@@ -0,0 +1,122 @@
++++ b/authz/Makefile.objs
+@@ -0,0 +1 @@
++authz-obj-y += base.o
+diff --git a/authz/base.c b/authz/base.c
+new file mode 100644
+index 0000000000..5b15811384
+--- /dev/null
++++ b/authz/base.c
+@@ -0,0 +1,82 @@
 +/*
-+ * QEMU simple authorization driver
++ * QEMU authorization framework base class
 + *
 + * Copyright (c) 2018 Red Hat, Inc.
 + *
@@ -95,126 +197,85 @@ index 0000000000..1ed1605b14
 + */
 +
 +#include "qemu/osdep.h"
-+#include "authz/simple.h"
++#include "authz/base.h"
 +#include "authz/trace.h"
-+#include "qom/object_interfaces.h"
 +
-+static bool qauthz_simple_is_allowed(QAuthZ *authz,
-+                                     const char *identity,
-+                                     Error **errp)
++bool qauthz_is_allowed(QAuthZ *authz,
++                       const char *identity,
++                       Error **errp)
 +{
-+    QAuthZSimple *sauthz = QAUTHZ_SIMPLE(authz);
++    QAuthZClass *cls = QAUTHZ_GET_CLASS(authz);
++    bool allowed;
 +
-+    trace_qauthz_simple_is_allowed(authz, sauthz->identity, identity);
-+    return g_str_equal(identity, sauthz->identity);
-+}
++    allowed = cls->is_allowed(authz, identity, errp);
++    trace_qauthz_is_allowed(authz, identity, allowed);
 +
-+static void
-+qauthz_simple_prop_set_identity(Object *obj,
-+                                const char *value,
-+                                Error **errp G_GNUC_UNUSED)
-+{
-+    QAuthZSimple *authz = QAUTHZ_SIMPLE(obj);
-+
-+    authz->identity = g_strdup(value);
++    return allowed;
 +}
 +
 +
-+static char *
-+qauthz_simple_prop_get_identity(Object *obj,
-+                                Error **errp G_GNUC_UNUSED)
++bool qauthz_is_allowed_by_id(const char *authzid,
++                             const char *identity,
++                             Error **errp)
 +{
-+    QAuthZSimple *authz = QAUTHZ_SIMPLE(obj);
++    QAuthZ *authz;
++    Object *obj;
++    Object *container;
 +
-+    return g_strdup(authz->identity);
-+}
-+
-+
-+static void
-+qauthz_simple_complete(UserCreatable *uc, Error **errp)
-+{
-+}
-+
-+
-+static void
-+qauthz_simple_finalize(Object *obj)
-+{
-+    QAuthZSimple *sauthz = QAUTHZ_SIMPLE(obj);
-+
-+    g_free(sauthz->identity);
-+}
-+
-+
-+static void
-+qauthz_simple_class_init(ObjectClass *oc, void *data)
-+{
-+    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
-+    QAuthZClass *authz = QAUTHZ_CLASS(oc);
-+
-+    ucc->complete = qauthz_simple_complete;
-+    authz->is_allowed = qauthz_simple_is_allowed;
-+
-+    object_class_property_add_str(oc, "identity",
-+                                  qauthz_simple_prop_get_identity,
-+                                  qauthz_simple_prop_set_identity,
-+                                  NULL);
-+}
-+
-+
-+QAuthZSimple *qauthz_simple_new(const char *id,
-+                                const char *identity,
-+                                Error **errp)
-+{
-+    return QAUTHZ_SIMPLE(
-+        object_new_with_props(TYPE_QAUTHZ_SIMPLE,
-+                              object_get_objects_root(),
-+                              id, errp,
-+                              "identity", identity,
-+                              NULL));
-+}
-+
-+
-+static const TypeInfo qauthz_simple_info = {
-+    .parent = TYPE_QAUTHZ,
-+    .name = TYPE_QAUTHZ_SIMPLE,
-+    .instance_size = sizeof(QAuthZSimple),
-+    .instance_finalize = qauthz_simple_finalize,
-+    .class_size = sizeof(QAuthZSimpleClass),
-+    .class_init = qauthz_simple_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
++    container = object_get_objects_root();
++    obj = object_resolve_path_component(container,
++                                        authzid);
++    if (!obj) {
++        error_setg(errp, "Cannot find QAuthZ object ID %s",
++                   authzid);
++        return 0;
 +    }
++
++    if (!object_dynamic_cast(obj, TYPE_QAUTHZ)) {
++        error_setg(errp, "Object '%s' is not a QAuthZ subclass",
++                   authzid);
++        return 0;
++    }
++
++    authz = QAUTHZ(obj);
++
++    return qauthz_is_allowed(authz, identity, errp);
++}
++
++
++static const TypeInfo authz_info = {
++    .parent = TYPE_OBJECT,
++    .name = TYPE_QAUTHZ,
++    .instance_size = sizeof(QAuthZ),
++    .class_size = sizeof(QAuthZClass),
++    .abstract = true,
 +};
 +
-+
-+static void
-+qauthz_simple_register_types(void)
++static void qauthz_register_types(void)
 +{
-+    type_register_static(&qauthz_simple_info);
++    type_register_static(&authz_info);
 +}
 +
++type_init(qauthz_register_types)
 +
-+type_init(qauthz_simple_register_types);
 diff --git a/authz/trace-events b/authz/trace-events
-index 481c90f511..1ef796c1e1 100644
---- a/authz/trace-events
-+++ b/authz/trace-events
-@@ -2,3 +2,6 @@
- 
- # authz/base.c
- qauthz_is_allowed(void *authz, const char *identity, bool allowed) "AuthZ %p check identity=%s allowed=%d"
-+
-+# auth/simple.c
-+qauthz_simple_is_allowed(void *authz, const char *wantidentity, const char *gotidentity) "AuthZ simple %p check want identity=%s got identity=%s"
-diff --git a/include/authz/simple.h b/include/authz/simple.h
 new file mode 100644
-index 0000000000..4686e7676d
+index 0000000000..481c90f511
 --- /dev/null
-+++ b/include/authz/simple.h
-@@ -0,0 +1,84 @@
++++ b/authz/trace-events
+@@ -0,0 +1,4 @@
++# See docs/devel/tracing.txt for syntax documentation.
++
++# authz/base.c
++qauthz_is_allowed(void *authz, const char *identity, bool allowed) "AuthZ %p check identity=%s allowed=%d"
+diff --git a/include/authz/base.h b/include/authz/base.h
+new file mode 100644
+index 0000000000..77dcd54c4c
+--- /dev/null
++++ b/include/authz/base.h
+@@ -0,0 +1,112 @@
 +/*
-+ * QEMU simple authorization driver
++ * QEMU authorization framework base class
 + *
 + * Copyright (c) 2018 Red Hat, Inc.
 + *
@@ -233,101 +294,97 @@ index 0000000000..4686e7676d
 + *
 + */
 +
-+#ifndef QAUTHZ_SIMPLE_H__
-+#define QAUTHZ_SIMPLE_H__
++#ifndef QAUTHZ_BASE_H__
++#define QAUTHZ_BASE_H__
 +
-+#include "authz/base.h"
++#include "qemu-common.h"
++#include "qapi/error.h"
++#include "qom/object.h"
 +
-+#define TYPE_QAUTHZ_SIMPLE "authz-simple"
 +
-+#define QAUTHZ_SIMPLE_CLASS(klass)                        \
-+    OBJECT_CLASS_CHECK(QAuthZSimpleClass, (klass),        \
-+                       TYPE_QAUTHZ_SIMPLE)
-+#define QAUTHZ_SIMPLE_GET_CLASS(obj)              \
-+    OBJECT_GET_CLASS(QAuthZSimpleClass, (obj),    \
-+                      TYPE_QAUTHZ_SIMPLE)
-+#define QAUTHZ_SIMPLE(obj) \
-+    INTERFACE_CHECK(QAuthZSimple, (obj),          \
-+                    TYPE_QAUTHZ_SIMPLE)
++#define TYPE_QAUTHZ "authz"
 +
-+typedef struct QAuthZSimple QAuthZSimple;
-+typedef struct QAuthZSimpleClass QAuthZSimpleClass;
++#define QAUTHZ_CLASS(klass) \
++     OBJECT_CLASS_CHECK(QAuthZClass, (klass), \
++                        TYPE_QAUTHZ)
++#define QAUTHZ_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(QAuthZClass, (obj), \
++                      TYPE_QAUTHZ)
++#define QAUTHZ(obj) \
++     INTERFACE_CHECK(QAuthZ, (obj), \
++                     TYPE_QAUTHZ)
++
++typedef struct QAuthZ QAuthZ;
++typedef struct QAuthZClass QAuthZClass;
++
++/**
++ * QAuthZ:
++ *
++ * The QAuthZ class defines an API contract to be used
++ * for providing an authorization driver for services
++ * with user identities.
++ */
++
++struct QAuthZ {
++    Object parent_obj;
++};
++
++
++struct QAuthZClass {
++    ObjectClass parent_class;
++
++    bool (*is_allowed)(QAuthZ *authz,
++                       const char *identity,
++                       Error **errp);
++};
 +
 +
 +/**
-+ * QAuthZSimple:
++ * qauthz_is_allowed:
++ * @authz: the authorization object
++ * @identity: the user identity to authorize
++ * @errp: pointer to a NULL initialized error object
 + *
-+ * This authorization driver provides a simple mechanism
-+ * for granting access based on an exact matched username.
++ * Check if a user @identity is authorized. If an error
++ * occurs this method will return false to indicate
++ * denial, as well as setting @errp to contain the details.
++ * Callers are recommended to treat the denial and error
++ * scenarios identically. Specifically the error info in
++ * @errp should never be fed back to the user being
++ * authorized, it is merely for benefit of administrator
++ * debugging.
 + *
-+ * To create an instance of this class via QMP:
-+ *
-+ *  {
-+ *    "execute": "object-add",
-+ *    "arguments": {
-+ *      "qom-type": "authz-simple",
-+ *      "id": "authz0",
-+ *      "parameters": {
-+ *        "identity": "fred"
-+ *      }
-+ *    }
-+ *  }
-+ *
-+ * Or via the command line
-+ *
-+ *   -object authz-simple,id=authz0,identity=fred
-+ *
++ * Returns: true if @identity is authorized, false if denied or if
++ * an error occurred.
 + */
-+struct QAuthZSimple {
-+    QAuthZ parent_obj;
-+
-+    char *identity;
-+};
++bool qauthz_is_allowed(QAuthZ *authz,
++                       const char *identity,
++                       Error **errp);
 +
 +
-+struct QAuthZSimpleClass {
-+    QAuthZClass parent_class;
-+};
++/**
++ * qauthz_is_allowed_by_id:
++ * @authzid: ID of the authorization object
++ * @identity: the user identity to authorize
++ * @errp: pointer to a NULL initialized error object
++ *
++ * Check if a user @identity is authorized. If an error
++ * occurs this method will return false to indicate
++ * denial, as well as setting @errp to contain the details.
++ * Callers are recommended to treat the denial and error
++ * scenarios identically. Specifically the error info in
++ * @errp should never be fed back to the user being
++ * authorized, it is merely for benefit of administrator
++ * debugging.
++ *
++ * Returns: true if @identity is authorized, false if denied or if
++ * an error occurred.
++ */
++bool qauthz_is_allowed_by_id(const char *authzid,
++                             const char *identity,
++                             Error **errp);
 +
++#endif /* QAUTHZ_BASE_H__ */
 +
-+QAuthZSimple *qauthz_simple_new(const char *id,
-+                                const char *identity,
-+                                Error **errp);
-+
-+
-+#endif /* QAUTHZ_SIMPLE_H__ */
-+
-diff --git a/qemu-options.hx b/qemu-options.hx
-index d5b0c26e8e..da7af30bbf 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4392,6 +4392,27 @@ e.g to launch a SEV guest
-      .....
- 
- @end example
-+
-+
-+@item -object authz-simple,id=@var{id},identity=@var{string}
-+
-+Create an authorization object that will control access to network services.
-+
-+The @option{identity} parameter is identifies the user and its format
-+depends on the network service that authorization object is associated
-+with. For authorizing based on TLS x509 certificates, the identity must
-+be the x509 distinguished name. Note that care must be taken to escape
-+any commas in the distinguished name.
-+
-+An example authorization object to validate a x509 distinguished name
-+would look like:
-+@example
-+ # $QEMU \
-+     ...
-+     -object authz-simple,id=auth0,identity=CN=laptop.example.com,,O=Example Org,,L=London,,ST=London,,C=GB \
-+     ...
-+@end example
-+
- @end table
- 
- ETEXI
 -- 
 2.17.0
