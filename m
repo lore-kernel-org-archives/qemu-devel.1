@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fVaVP-00031y-V3
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:38:29 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fVaVk-0003Iu-RB
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:38:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fVaVL-000062-1y
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:38:28 -0400
-References: <1529072910-16156-1-git-send-email-eric.auger@redhat.com>
-	<1529072910-16156-6-git-send-email-eric.auger@redhat.com>
-	<a4204e03-735d-28b9-7cc5-d51fd727b91f@redhat.com>
-	<CAKv+Gu9wYtzo86-hqVDX=79cKix_BfVGCh5Wn08ApRZ5Km_Vjg@mail.gmail.com>
-	<51b9c330-ed48-e75c-0c8a-ffa8e1794e95@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <2433d509-d833-7cbf-8e74-c3bfdab0c13b@redhat.com>
-Date: Wed, 20 Jun 2018 12:38:13 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fVaVh-0000CS-G8
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:38:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57656 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVaVh-0000CD-Aj
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:38:45 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D29C27721C
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 10:38:44 +0000 (UTC)
+Date: Wed, 20 Jun 2018 11:38:41 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180620103841.GH2549@work-vm>
+References: <20180523111817.1463-1-quintela@redhat.com>
+	<20180523111817.1463-12-quintela@redhat.com>
+	<20180611164516.GI2661@work-vm> <87d0wlyle1.fsf@secure.mitica>
+	<20180620090127.GB2549@work-vm> <87r2l1lrp0.fsf@secure.mitica>
+	<20180620094626.GD2549@work-vm> <87in6dlreq.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <51b9c330-ed48-e75c-0c8a-ffa8e1794e95@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/11] hw/arm/virt: GICv3 DT node with
- one or two redistributor regions
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87in6dlreq.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH v13 11/12] migration: Remove not needed
+ semaphore and quit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,168 +37,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, Shannon Zhao <zhaoshenglong@huawei.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 06/20/18 09:10, Auger Eric wrote:
-> Hi Laszlo,
+* Juan Quintela (quintela@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > * Juan Quintela (quintela@redhat.com) wrote:
+> >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >> > * Juan Quintela (quintela@redhat.com) wrote:
+> >> >> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >> >> > * Juan Quintela (quintela@redhat.com) wrote:
+> >> >> >> We know quit closing the QIO.
 > 
-> On 06/19/2018 09:02 PM, Ard Biesheuvel wrote:
->> On 19 June 2018 at 20:53, Laszlo Ersek <lersek@redhat.com> wrote:
->>> Hi Eric,
->>>
->>> sorry about the late followup. I have one question (mainly for Ard):
->>>
->>> On 06/15/18 16:28, Eric Auger wrote:
->>>> This patch allows the creation of a GICv3 node with 1 or 2
->>>> redistributor regions depending on the number of smu_cpus.
->>>> The second redistributor region is located just after the
->>>> existing RAM region, at 256GB and contains up to up to 512 vcpus.
->>>>
->>>> Please refer to kernel documentation for further node details:
->>>> Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>> Reviewed-by: Andrew Jones <drjones@redhat.com>
->>>>
->>>> ---
->>>> v1 (virt3.0) -> v2
->>>> - Added Drew's R-b
->>>>
->>>> v2 -> v3:
->>>> - VIRT_GIC_REDIST2 is now 64MB large, ie. 512 redistributor capacity
->>>> - virt_gicv3_redist_region_count does not test kvm_irqchip_in_kernel
->>>>   anymore
->>>> ---
->>>>  hw/arm/virt.c         | 29 ++++++++++++++++++++++++-----
->>>>  include/hw/arm/virt.h | 14 ++++++++++++++
->>>>  2 files changed, 38 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->>>> index 2885d18..d9f72eb 100644
->>>> --- a/hw/arm/virt.c
->>>> +++ b/hw/arm/virt.c
->>>> @@ -148,6 +148,8 @@ static const MemMapEntry a15memmap[] = {
->>>>      [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
->>>>      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
->>>>      [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
->>>> +    /* Additional 64 MB redist region (can contain up to 512 redistributors) */
->>>> +    [VIRT_GIC_REDIST2] =        { 0x4000000000ULL, 0x4000000 },
->>>>      /* Second PCIe window, 512GB wide at the 512GB boundary */
->>>>      [VIRT_PCIE_MMIO_HIGH] =   { 0x8000000000ULL, 0x8000000000ULL },
->>>>  };
->>>> @@ -401,13 +403,30 @@ static void fdt_add_gic_node(VirtMachineState *vms)
->>>>      qemu_fdt_setprop_cell(vms->fdt, "/intc", "#size-cells", 0x2);
->>>>      qemu_fdt_setprop(vms->fdt, "/intc", "ranges", NULL, 0);
->>>>      if (vms->gic_version == 3) {
->>>> +        int nb_redist_regions = virt_gicv3_redist_region_count(vms);
->>>> +
->>>>          qemu_fdt_setprop_string(vms->fdt, "/intc", "compatible",
->>>>                                  "arm,gic-v3");
->>>> -        qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
->>>> -                                     2, vms->memmap[VIRT_GIC_DIST].base,
->>>> -                                     2, vms->memmap[VIRT_GIC_DIST].size,
->>>> -                                     2, vms->memmap[VIRT_GIC_REDIST].base,
->>>> -                                     2, vms->memmap[VIRT_GIC_REDIST].size);
->>>> +
->>>> +        qemu_fdt_setprop_cell(vms->fdt, "/intc",
->>>> +                              "#redistributor-regions", nb_redist_regions);
->>>> +
->>>> +        if (nb_redist_regions == 1) {
->>>> +            qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
->>>> +                                         2, vms->memmap[VIRT_GIC_DIST].base,
->>>> +                                         2, vms->memmap[VIRT_GIC_DIST].size,
->>>> +                                         2, vms->memmap[VIRT_GIC_REDIST].base,
->>>> +                                         2, vms->memmap[VIRT_GIC_REDIST].size);
->>>> +        } else {
->>>> +            qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
->>>> +                                         2, vms->memmap[VIRT_GIC_DIST].base,
->>>> +                                         2, vms->memmap[VIRT_GIC_DIST].size,
->>>> +                                         2, vms->memmap[VIRT_GIC_REDIST].base,
->>>> +                                         2, vms->memmap[VIRT_GIC_REDIST].size,
->>>> +                                         2, vms->memmap[VIRT_GIC_REDIST2].base,
->>>> +                                         2, vms->memmap[VIRT_GIC_REDIST2].size);
->>>> +        }
->>>> +
->>>>          if (vms->virt) {
->>>>              qemu_fdt_setprop_cells(vms->fdt, "/intc", "interrupts",
->>>>                                     GIC_FDT_IRQ_TYPE_PPI, ARCH_GICV3_MAINT_IRQ,
->>>
->>> In edk2, we have the following code in
->>> "ArmVirtPkg/Library/ArmVirtGicArchLib/ArmVirtGicArchLib.c":
->>>
->>>   switch (GicRevision) {
->>>
->>>   case 3:
->>>     //
->>>     // The GIC v3 DT binding describes a series of at least 3 physical (base
->>>     // addresses, size) pairs: the distributor interface (GICD), at least one
->>>     // redistributor region (GICR) containing dedicated redistributor
->>>     // interfaces for all individual CPUs, and the CPU interface (GICC).
->>>     // Under virtualization, we assume that the first redistributor region
->>>     // listed covers the boot CPU. Also, our GICv3 driver only supports the
->>>     // system register CPU interface, so we can safely ignore the MMIO version
->>>     // which is listed after the sequence of redistributor interfaces.
->>>     // This means we are only interested in the first two memory regions
->>>     // supplied, and ignore everything else.
->>>     //
->>>     ASSERT (RegSize >= 32);
->>>
->>>     // RegProp[0..1] == { GICD base, GICD size }
->>>     DistBase = SwapBytes64 (Reg[0]);
->>>     ASSERT (DistBase < MAX_UINTN);
->>>
->>>     // RegProp[2..3] == { GICR base, GICR size }
->>>     RedistBase = SwapBytes64 (Reg[2]);
->>>     ASSERT (RedistBase < MAX_UINTN);
->>>
->>>     PcdStatus = PcdSet64S (PcdGicDistributorBase, DistBase);
->>>     ASSERT_RETURN_ERROR (PcdStatus);
->>>     PcdStatus = PcdSet64S (PcdGicRedistributorsBase, RedistBase);
->>>     ASSERT_RETURN_ERROR (PcdStatus);
->>>
->>>     DEBUG ((EFI_D_INFO, "Found GIC v3 (re)distributor @ 0x%Lx (0x%Lx)\n",
->>>       DistBase, RedistBase));
->>>
->>> (I vaguely recall that I may have quoted this already, but I'm not
->>> sure.)
-> I don't remember you did ;-)
->>>
->>> My understanding is that this will continue working -- as long as we
->>> don't want to boot up multiple CPUs in UEFI, anyway.
->>>
->>> I think we have no plans for adding (well, for implementing)
->>> EFI_PEI_MP_SERVICES_PPI or EFI_MP_SERVICES_PROTOCOL for ARM -- do you
->>> agree, Ard?
->>>
->>
->> Yes I agree. Only the boot cpu should enter UEFI, and although there
->> are some remnants of multi core ARM stuff in the EDK2 tree, I would
->> prefer to get rid of that as soon as we can.
->>
->>> (That PPI and PROTOCOL are totally unnecessary unless it is
->>> architecturally required to configure various CPU features on each
->>> (V)CPU *individually*, before leaving the firmware. Unfortunately, x86
->>> has some CPU warts like that, and said PPI and PROTOCOL implementations
->>> for x86 have given us a good dose of grief over time. I very much hope
->>> the PPI and the PROTOCOL will never be needed on ARM!)
->>>
->>
->> That kind of configuration typically occurs in the secure firmware on
->> an ARM system, and not at all on a virtual machine.
->>
->>>
->>> Eric, I reckon you tested this patch with the ArmVirtQemu firmware too,
->>> covering both branches of the code, and with multiple VCPUs in both
->>> cases. Can you please confirm?
-> I tested the high ECAM part with both 32b and 64b FW. However the
-> multiple redistributor region part only was tested with 64b FW. The
-> reason is Moonshot which I used to test accelerated aarch32 guest has a
-> GICv2 so I can't test the GICv3 redist part on it.
+> ...
+> >> > Two questions from that then:
+> >> >   a) Are you sure it's safe to close the qio_channel while another
+> >> > thread is in qio_channel_read_all_eof?  Is it really defined that it
+> >> > causes the other thread to exit with an error;  close() in some stuff
+> >> > frees data structures that the other thread is still reading; that's
+> >> > why I've used shutdown(2) in the past rather than close on fd's
+> >> 
+> >> Dunno if it is safe (I think it is), but I agree that shutdown will also
+> >> get what I need.
+> >> 
+> >> >   b) I don't think your answer explains why it's an object_unref?
+> >> 
+> >> That is the standard way to closing qios to not have to take into
+> >> account who have it oppened.  See previous paragraph, it is better to
+> >> use shutdown, done.
+> >
+> > OK, great;  I suspect it's unsafe because as soon as you do the unref
+> > it could free the object; actually you should have a ref from each of
+> > the threads to sotp it being freed while they use it.
+> >
+> > Dave
+> >
+> >> Thanks, Juan.
+> >> 
+> >> > Dave
+> >> >
+> >> >> Later, Juan.
+> >> > --
+> >> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 > 
-> However if my understanding is correct as the above check only is done
-> on the 1st redist, which is located in the low redist region, this
-> series shouldn't introduce any regression.
+> What do you think about this, to avoid me resend the whole series?
+> 
+> From e03d77de1ca179fa0168cead7c23cfeae57f1787 Mon Sep 17 00:00:00 2001
+> From: Juan Quintela <quintela@redhat.com>
+> Date: Wed, 18 Apr 2018 00:49:19 +0200
+> Subject: [PATCH 17/18] migration: Remove not needed semaphore and quit
+> 
+> We know quit with shutdwon in the QIO.
+> 
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> --
+> Add comment
+> Use shutdown() instead of unref()
+> ---
+>  migration/ram.c | 14 +++++---------
+>  1 file changed, 5 insertions(+), 9 deletions(-)
+> 
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 2c3a452a7d..be5d26f4cb 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -594,14 +594,10 @@ typedef struct {
+>      QemuThread thread;
+>      /* communication channel */
+>      QIOChannel *c;
+> -    /* sem where to wait for more work */
+> -    QemuSemaphore sem;
+>      /* this mutex protects the following parameters */
+>      QemuMutex mutex;
+>      /* is this channel thread running */
+>      bool running;
+> -    /* should this thread finish */
+> -    bool quit;
+>      /* array of pages to receive */
+>      MultiFDPages_t *pages;
+>      /* packet allocated len */
+> @@ -1152,8 +1148,11 @@ static void multifd_recv_terminate_threads(Error *err)
+>          MultiFDRecvParams *p = &multifd_recv_state->params[i];
+>  
+>          qemu_mutex_lock(&p->mutex);
+> -        p->quit = true;
+> -        qemu_sem_post(&p->sem);
+> +        /* We could arrive here for two reasons:
+> +           - normal quit, i.e. everything went fine, just finished
+> +           - error quit: We close the channels so the channel threads
+> +             finish the qio_channel_read_all_eof() */
+> +        qio_channel_shutdown(p->c, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
 
-I agree. Thank you!
-Laszlo
+OK, so with any luck all the threads now exit;  do we still have a
+close/unref once we're sure they have all exited?
+
+Dave
+
+>          qemu_mutex_unlock(&p->mutex);
+>      }
+>  }
+> @@ -1176,7 +1175,6 @@ int multifd_load_cleanup(Error **errp)
+>          object_unref(OBJECT(p->c));
+>          p->c = NULL;
+>          qemu_mutex_destroy(&p->mutex);
+> -        qemu_sem_destroy(&p->sem);
+>          qemu_sem_destroy(&p->sem_sync);
+>          g_free(p->name);
+>          p->name = NULL;
+> @@ -1299,9 +1297,7 @@ int multifd_load_setup(void)
+>          MultiFDRecvParams *p = &multifd_recv_state->params[i];
+>  
+>          qemu_mutex_init(&p->mutex);
+> -        qemu_sem_init(&p->sem, 0);
+>          qemu_sem_init(&p->sem_sync, 0);
+> -        p->quit = false;
+>          p->id = i;
+>          p->pages = multifd_pages_init(page_count);
+>          p->packet_len = sizeof(MultiFDPacket_t)
+> -- 
+> 2.17.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
