@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fVcWG-0003Vs-8l
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:47:29 -0400
+	(envelope-from <armbru@redhat.com>) id 1fVcWX-0003jm-PC
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:47:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fVcWF-0006Bb-F4
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:47:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38390 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fVcWW-0006Hq-TR
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:47:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53226 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fVcWF-0006BP-9g
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:47:27 -0400
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 20 Jun 2018 14:47:18 +0200
-Message-Id: <20180620124719.16450-7-kraxel@redhat.com>
-In-Reply-To: <20180620124719.16450-1-kraxel@redhat.com>
-References: <20180620124719.16450-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/7] bochs-display: enable vgabios
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVcWW-0006Hk-Oi
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 08:47:44 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Wed, 20 Jun 2018 14:47:42 +0200
+Message-Id: <20180620124742.16979-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH] qapi/introspect: Eliminate pointless variable
+ in .visit_end()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +22,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: seabios@seabios.org, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-Add vgabios binary to pci rom bar.
+Commit 1a9a507b2e3 "qapi-introspect: Hide type names" added local
+variable @jsons to improve sorting, but also removed the sorting.  It
+was part of a big series that went to v8, and it made sense until v2
+or so...
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Commit 7d0f982bfbb replaced @jsons by @qlits, preserving the
+uselessness.
+
+Get rid of it.
+
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/display/bochs-display.c | 1 +
- 1 file changed, 1 insertion(+)
+ scripts/qapi/introspect.py | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/hw/display/bochs-display.c b/hw/display/bochs-display.c
-index 1187d77576..12d8a66c6c 100644
---- a/hw/display/bochs-display.c
-+++ b/hw/display/bochs-display.c
-@@ -337,6 +337,7 @@ static void bochs_display_class_init(ObjectClass *klass, void *data)
-     k->device_id = PCI_DEVICE_ID_QEMU_VGA;
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index 5b6c72c7b2..6ad198ae5b 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -75,13 +75,10 @@ class QAPISchemaGenIntrospectVisitor(QAPISchemaMonolithicCVisitor):
  
-     k->realize   = bochs_display_realize;
-+    k->romfile   = "vgabios-bochs-display.bin";
-     k->exit      = bochs_display_exit;
-     dc->vmsd     = &vmstate_bochs_display;
-     dc->props    = bochs_display_properties;
+     def visit_end(self):
+         # visit the types that are actually used
+-        qlits = self._qlits
+-        self._qlits = []
+         for typ in self._used_types:
+             typ.visit(self)
+         # generate C
+         # TODO can generate awfully long lines
+-        qlits.extend(self._qlits)
+         name = c_name(self._prefix, protect=False) + 'qmp_schema_qlit'
+         self._genh.add(mcgen('''
+ #include "qapi/qmp/qlit.h"
+@@ -93,7 +90,7 @@ extern const QLitObject %(c_name)s;
+ const QLitObject %(c_name)s = %(c_string)s;
+ ''',
+                              c_name=c_name(name),
+-                             c_string=to_qlit(qlits)))
++                             c_string=to_qlit(self._qlits)))
+         self._schema = None
+         self._qlits = []
+         self._used_types = []
 -- 
-2.9.3
+2.17.1
