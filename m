@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41931)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fVRu6-0004RB-3c
+	(envelope-from <dgibson@ozlabs.org>) id 1fVRu5-0004RA-Tv
 	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 21:27:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fVRu1-0003ZS-PM
-	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 21:27:22 -0400
-Date: Wed, 20 Jun 2018 11:27:09 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fVRu1-0003ZZ-Q1
+	for qemu-devel@nongnu.org; Tue, 19 Jun 2018 21:27:21 -0400
+Date: Wed, 20 Jun 2018 11:22:40 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180620012709.GI3546@umbus.fritz.box>
-References: <cover.1528291908.git.balaton@eik.bme.hu>
-	<d13ea58b288f386a12a76c41a617c500c4454341.1528291908.git.balaton@eik.bme.hu>
-	<20180613012236.GQ30690@umbus.fritz.box>
-	<alpine.BSF.2.21.1806131051410.620@zero.eik.bme.hu>
-	<20180613100302.GJ30690@umbus.fritz.box>
-	<alpine.BSF.2.21.1806131544190.90524@zero.eik.bme.hu>
-	<20180618024619.GP25461@umbus.fritz.box>
-	<alpine.BSF.2.21.1806191118540.87485@zero.eik.bme.hu>
+Message-ID: <20180620012240.GH3546@umbus.fritz.box>
+References: <152700944859.346734.1389264286134807488.stgit@bahia.lan>
+	<152937387811.15330.6346338944477555198@sif>
+	<20180619131128.17a22f15@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="nO3oAMapP4dBpMZi"
+	protocol="application/pgp-signature"; boundary="82evfD9Ogz2JrdWZ"
 Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1806191118540.87485@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v2 3/8] ppc4xx_i2c: Implement directcntl
- register
+In-Reply-To: <20180619131128.17a22f15@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH for-2.11.2] spapr: make pseries-2.11 the
+ default machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,157 +26,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Greg Kurz <groug@kaod.org>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-stable@nongnu.org, qemu-devel@nongnu.org
 
 
---nO3oAMapP4dBpMZi
+--82evfD9Ogz2JrdWZ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 19, 2018 at 11:29:09AM +0200, BALATON Zoltan wrote:
-> On Mon, 18 Jun 2018, David Gibson wrote:
-> > On Wed, Jun 13, 2018 at 04:03:18PM +0200, BALATON Zoltan wrote:
-> > > On Wed, 13 Jun 2018, David Gibson wrote:
-> > > > On Wed, Jun 13, 2018 at 10:54:22AM +0200, BALATON Zoltan wrote:
-> > > > > On Wed, 13 Jun 2018, David Gibson wrote:
-> > > > > > On Wed, Jun 06, 2018 at 03:31:48PM +0200, BALATON Zoltan wrote:
-> > > > > > > diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-> > > > > > > index a68b5f7..5806209 100644
-> > > > > > > --- a/hw/i2c/ppc4xx_i2c.c
-> > > > > > > +++ b/hw/i2c/ppc4xx_i2c.c
-> > > > > > > @@ -30,6 +30,7 @@
-> > > > > > >  #include "cpu.h"
-> > > > > > >  #include "hw/hw.h"
-> > > > > > >  #include "hw/i2c/ppc4xx_i2c.h"
-> > > > > > > +#include "bitbang_i2c.h"
-> > > > > > >=20
-> > > > > > >  #define PPC4xx_I2C_MEM_SIZE 18
-> > > > > > >=20
-> > > > > > > @@ -46,7 +47,13 @@
-> > > > > > >=20
-> > > > > > >  #define IIC_XTCNTLSS_SRST   (1 << 0)
-> > > > > > >=20
-> > > > > > > +#define IIC_DIRECTCNTL_SDAC (1 << 3)
-> > > > > > > +#define IIC_DIRECTCNTL_SCLC (1 << 2)
-> > > > > > > +#define IIC_DIRECTCNTL_MSDA (1 << 1)
-> > > > > > > +#define IIC_DIRECTCNTL_MSCL (1 << 0)
-> > > > > > > +
-> > > > > > >  typedef struct {
-> > > > > > > +    bitbang_i2c_interface *bitbang;
-> > > > > > >      uint8_t mdata;
-> > > > > > >      uint8_t lmadr;
-> > > > > > >      uint8_t hmadr;
-> > > > > > > @@ -308,7 +315,11 @@ static void ppc4xx_i2c_writeb(void *opaq=
-ue, hwaddr addr, uint64_t value,
-> > > > > > >          i2c->xtcntlss =3D value;
-> > > > > > >          break;
-> > > > > > >      case 16:
-> > > > > > > -        i2c->directcntl =3D value & 0x7;
-> > > > > > > +        i2c->directcntl =3D value & (IIC_DIRECTCNTL_SDAC & I=
-IC_DIRECTCNTL_SCLC);
-> > > > > > > +        i2c->directcntl |=3D (value & IIC_DIRECTCNTL_SCLC ? =
-1 : 0);
-> > > > > > > +        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL, i2c->=
-directcntl & 1);
-> > > > > >=20
-> > > > > > Shouldn't that use i2c->directcntl & IIC_DIRECTCNTL_MSCL ?
-> > > > > >=20
-> > > > > > > +        i2c->directcntl |=3D bitbang_i2c_set(i2c->bitbang, B=
-ITBANG_I2C_SDA,
-> > > > > > > +                               (value & IIC_DIRECTCNTL_SDAC)=
- !=3D 0) << 1;
-> > > > > >=20
-> > > > > > Last expression might be clearer as:
-> > > > > > 	value & IIC_DIRECTCNTL_SDAC ? IIC_DIRECTCNTL_MSDA : 0
-> > > > >=20
-> > > > > I guess this is a matter of taste but to me IIC_DIRECTCNTL_MSDA i=
-s a bit
-> > > > > position in the register so I use that when accessing that bit bu=
-t when I
-> > > > > check for the values of a bit being 0 or 1 I don't use the define=
- which is
-> > > > > for something else, just happens to have value 1 as well.
-> > > >=20
-> > > > Hmm.. but the bit is being store in i2c->directcntl, which means it
-> > > > can be read back from the register in that position, no?
+On Tue, Jun 19, 2018 at 01:11:28PM +0200, Greg Kurz wrote:
+> On Mon, 18 Jun 2018 21:04:38 -0500
+> Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+>=20
+> > Quoting Greg Kurz (2018-05-22 12:17:28)
+> > > The spapr capability framework was introduced in QEMU 2.12. It allows
+> > > to have an explicit control on how host features are exposed to the
+> > > guest. This is especially needed to handle migration between hetero-
+> > > geneous hosts (eg, POWER8 to POWER9). It is also used to expose fixes/
+> > > workarounds against speculative execution vulnerabilities to guests.
+> > > The framework was hence backported to QEMU 2.11.1, especially these
+> > > commits:
 > > >=20
-> > > Which of the above two do you mean?
+> > > 0fac4aa93074 spapr: Add pseries-2.12 machine type
+> > > 9070f408f491 spapr: Treat Hardware Transactional Memory (HTM) as an
+> > >  optional capability
 > > >=20
-> > > In the first one I test for the 1/0 value set by the previous line be=
-fore
-> > > the bitbang_i2c_set call. This could be accessed as MSCL later but us=
-ing
-> > > that here would just make it longer and less obvious. If I want to be
-> > > absolutely precise maybe it should be (value & IIC_DIRECTCNTL_SCL ? 1=
- : 0)
-> > > in this line too but that was just stored in the register one line be=
-fore so
-> > > I can reuse that here as well. Otherwise I could add another variable=
- just
-> > > for this bit value and use that in both lines but why make it more
-> > > complicated for a simple 1 or 0 value?
+> > > 0fac4aa93074 has the confusing effect of making pseries-2.12 the defa=
+ult
+> > > machine type for QEMU 2.11.1, instead of the expected pseries-2.11. T=
+his
+> > > patch changes the default machine back to pseries-2.11.
+> > >=20
+> > > Unfortunately, 9070f408f491 enforces the HTM capability for pseries-2=
+=2E11.
+> > > This isn't supported by TCG and breaks 'make check'. So this patch al=
+so
+> > > adds a hack to turn HTM off when using TCG. =20
 > >=20
-> > Longer maybe, but I don't know about less obvious.  Actually I think
-> > you should use IIC_DIRECTCNTL_MSCL instead of a bare '1' in both the
-> > line setting i2c->directcntl, then the next line checking that bit to
-> > pass it into bitbang_i2c_set.  The point is you're modifying the
-> > effective register contents, so it makes sense to make it clearer
-> > which bit of the register you're setting.
->=20
-> When setting the bit it's the value 1 so that's not the bit
-> position,
-
-Huh??  The constants aren't bit positions either, they're masks.  How
-is IIC_DIRECTCNTL_MSCL wrong here?
-
-> I
-> think 1 : 0 is correct there.
-
-Correct, sure, but less clear than it could be.
-
-> I've changed the next line in v4 I've just
-> sent to the constant when checking the value of the MSCL bit.
->=20
-> > > In the second case using MSDA is really not correct because the level=
- to set
-> > > is defined by SDAC bit. The SDAC, SCLC bits are what the program sets=
- to
-> > > tell which states the two i2c lines should be and the MSDA, MSCL are =
-read
-> > > only bits that show what states the lines really are.
+> > I noticed this ends up breaking TCG migration for 2.11.2 -> 2.12, I
+> > get this on the target side even when specifying -machine
+> > pseries-2.11,cap-htm=3Doff for both ends:
 > >=20
-> > Ok...
+> >   qemu-system-ppc64: cap-htm higher level (1) in incoming stream than o=
+n destination (0)
+> >   qemu-system-ppc64: error while loading state for instance 0x0 of devi=
+ce 'spapr'
+> >   qemu-system-ppc64: load of migration failed: Invalid argument
 > >=20
-> > > IIC_DIRECTCNTL_MSDA has value of 1 but it means the second bit in the
-> > > directcntl reg (which could have 0 or 1 value) not 1 value of a bit o=
-r i2c
-> > > line.
+> > I'm not sure we care all that much about it but it's a regression from =
+2.11.1
+> > at least. The main issue seems to be the default caps for 2.11.2 for TC=
+G are
+> > now different from 2.11 and 2.12+, but spapr_cap_##cap##_needed still a=
+ssumes
+> > everything is the same across all these versions and as such opts not to
+> > migrate cap-htm=3Doff, since that's the default for 2.11.2. This result=
+s in the
+> > target assuming the source was using the default, which is cap-htm=3Don,
+> > and since that disagrees with the spapr->eff we get a failure.
 > >=20
-> > Uh.. what?  AFAICT, based on the result of bitbang_i2c_set() you're
-> > updating the value of the MSDA (=3D=3D 0x2) bit in i2c->directcntl
-> > register state.  Why doesn't the symbolic name make sense here?
+> > It seems spapr_cap_##cap##_needed needs to be fixed up to address that,
+> > but I'm not sure how best to deal with backward compatibility in that c=
+ase.
+> > Any ideas? If it ends up being a trade-off I think forward compatibilit=
+y is
+> > more important.
+> >=20
 >=20
-> Sorry, I may not have been able to clearly say what I mean. I meant that
-> IIC_DIRECTCNTL_MSDA means the bit in position 1 (numbering from LSB being
-> bit number 0) which may have value 1 or 0. In cases I mean the value I us=
-e 1
-> or 0. In case I refer to the bit position I use constants. In the line
+> Yeah, we shouldn't change the default since it affects the migration logi=
+c :-\
 >=20
-> bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL, i2c->directcntl & 1);
+> The motivation behind this hack is to fix TCG based 'make check', because
+> it doesn't pass cap-htm=3Doff, and thus can't run with pseries-2.11.
 >=20
-> it should be the constant, just used 1 there for brevity because it's
-> obvious from the previous line what's meant.
+> Another possibility is to let the default as is, and to disable HTM after=
+ the
+> default caps have been applied.
+>=20
+> Something like that squashed into this patch:
+>=20
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 82043e60e78b..26e6be043b18 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -285,11 +285,6 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPR=
+MachineState *spapr,
+> =20
+>      caps =3D smc->default_caps;
+> =20
+> -    /* HACK for 2.11.2: fix make check */
+> -    if (tcg_enabled()) {
+> -        caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+> -    }
+> -
+>      if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
+>                            0, spapr->max_compat_pvr)) {
+>          caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+> @@ -405,6 +400,11 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
+>          }
+>      }
+> =20
+> +    /* HACK for 2.11.2: fix make check */
+> +    if (tcg_enabled()) {
+> +        spapr->eff.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+> +    }
+> +
+>      /* .. then apply those caps to the virtual hardware */
+> =20
+>      for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
+> ---------------------
 
-Maybe, but using the constant is still clearer, and friendly to people
-grepping the source.
+Nooooo!  The whole point of the caps stuff is to stop changing guest
+visible behaviours based on host side configuration like the
+accelerator.  So, really, let's not put it back in.
 
-> I've changed this now. At other
-> places the values of the bits are written as 1 or 0 so I think for those
-> constants should not be needed.
+The correct fix is to add cap-htm=3Doff to the testcases.  Gross, but
+necessary.
 
-I have no idea what you mean by this.
+
+>=20
+> This allows:
+> - TCG 'make check' to be happy with pseries-2.11
+> - 2.11.2 --> 2.12 migration and backward
+>=20
+> > >=20
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > ---
+> > >  hw/ppc/spapr.c      |    4 ++--
+> > >  hw/ppc/spapr_caps.c |    5 +++++
+> > >  2 files changed, 7 insertions(+), 2 deletions(-)
+> > >=20
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index 1a2dd1f597d9..6499a867520f 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -3820,7 +3820,7 @@ static void spapr_machine_2_12_class_options(Ma=
+chineClass *mc)
+> > >      /* Defaults for the latest behaviour inherited from the base cla=
+ss */
+> > >  }
+> > >=20
+> > > -DEFINE_SPAPR_MACHINE(2_12, "2.12", true);
+> > > +DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
+> > >=20
+> > >  /*
+> > >   * pseries-2.11
+> > > @@ -3842,7 +3842,7 @@ static void spapr_machine_2_11_class_options(Ma=
+chineClass *mc)
+> > >      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
+> > >  }
+> > >=20
+> > > -DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
+> > > +DEFINE_SPAPR_MACHINE(2_11, "2.11", true);
+> > >=20
+> > >  /*
+> > >   * pseries-2.10
+> > > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> > > index 7b229517be38..82043e60e78b 100644
+> > > --- a/hw/ppc/spapr_caps.c
+> > > +++ b/hw/ppc/spapr_caps.c
+> > > @@ -285,6 +285,11 @@ static sPAPRCapabilities default_caps_with_cpu(s=
+PAPRMachineState *spapr,
+> > >=20
+> > >      caps =3D smc->default_caps;
+> > >=20
+> > > +    /* HACK for 2.11.2: fix make check */
+> > > +    if (tcg_enabled()) {
+> > > +        caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+> > > +    }
+> > > +
+> > >      if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
+> > >                            0, spapr->max_compat_pvr)) {
+> > >          caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+> > >  =20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -189,24 +208,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---nO3oAMapP4dBpMZi
+--82evfD9Ogz2JrdWZ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsprWwACgkQbDjKyiDZ
-s5KQ2BAA5XKFhGkHMGAJFHAo9vgBYMY1GPxEzwe5b4mf/jWEDH/MEvBz8/tVYGjt
-voUHSyLoEdU9S+uYqP4Oywlzr604Qh7JLRJfb5cA+0k3y2kzB86C2QMeMLiCs4N4
-brIxQog53Q0fnQKF1hEqI64kd9JXK6Ws0lnnrfBEdTa27bUksK15kXPsYl26ZbvW
-MEyLgj+tZPFZfk/BMpbG7N3qcjEDIiKztKPA9hDH1B1FrqYCWBX4HRZQPVfhIO9M
-UkQ8Xsm1uuSoaHlySdXrTE4VV6bWPbvkAh7Yu2Mj+e6yGKul6nh9pnKHnK9HZaG4
-a/SG7hip4a9ibKNeQXo9edKYGZjFno+7jdGbsGVncaoStLwtW/EBSrXRxgLKSwU3
-C0KLZTLnDdMd5VNIqyAd8l6pKIdTFHJg4JMpDofXxCcTfLvI3gp3aOPH/6hczhtE
-JaWT3GbzcXNxFsmuQCSDRBWv89qvdjKEZ8yWgAOwuAogiO7Dzo+bvdte5BsFEk9L
-A9AmGxqnoOrKELSk3g0Bwz5u0sBipIfowjxSWk10bC9Ai0nja3EaTPdNPt1BcZcf
-5gi2ielk6CS4b6CyRg6uMXTvshp0FZ3AfReUz+TSlXq2Qkc2aMhwj+OQPtceNXmK
-XcEDDz0XeTYLEzM2wy+MWCxOqXsNkI8BGj9Nmx3TBQXMUx0/k9E=
-=7yW6
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsprF4ACgkQbDjKyiDZ
+s5K6Tw/+IEcS1U5fRPuVHntqPI+KXLCkGYMpJF4IVqI0P/gwH+7pXQg+VrBKW7s9
+m/SH2MUcCYYGefwMsJ64WiRp66l3/OjV1rzgJKF2BYI8uCvVOz7zVyceAzyNE5Tf
+7BiDAh8OHM7ATAU4SC4Xh9OCjFxPGnRbIo7+2hLwkKxieLaj8Nxc0D5jG5m4+Mj3
+CwtvhTXc8Oiu233eIhP/zJoXRQn7RJQivu2EUJWbZRdc4bjNSEwCXctl6Eo/j2Er
+t6cb1p5P0/7aL5wXXf5PRb3zFDmF/IrkZichlc1ZIe9cMBm0S3Xr33ow8EdIkve0
+OIXvmDiU25HwWNLJ97igytUMD3HHLYUuHuXlGTbgXgWtHhTLQpc+9skO3I6mNG/E
+AB/O5ivPde6bSiM12WsGIcfFvMHkMf8hazhwjpYIGCo8Co0ZwCS8OA94GN3QvzWv
+H3hHMa6AszGm/7JrvH1sPuVJZrjC/yoz3VPIf2mciWdP55EWXhJh9ZGwPinXeU0F
+YsCb+0Ip7krRVLh13gLNRCs0JMYuU2KPNFPtyLMKaBRty2IJtoTbD1nmnEuaSUud
+GmEpHylpfUmfQT9mnENAAJlEYozgLPvmeF/OF9cAbrQMgzayM2gcWhJgOZ31AxPW
+prw5Qdu9mkQLkTzsNHowhIhjnMe4qeIstelynvul3hcgWuwdYZ0=
+=rfDY
 -----END PGP SIGNATURE-----
 
---nO3oAMapP4dBpMZi--
+--82evfD9Ogz2JrdWZ--
