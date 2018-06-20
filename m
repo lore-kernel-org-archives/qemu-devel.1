@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33531)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVfAd-0005U1-SY
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:37:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fVfD9-0006y2-FO
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:39:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVfAc-0002i8-Tu
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:37:19 -0400
-Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:33976)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fVfAc-0002hu-Mn
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:37:18 -0400
-Received: by mail-ot0-x22d.google.com with SMTP id r18-v6so9618otk.1
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 08:37:18 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1528790908-23441-2-git-send-email-eric.auger@redhat.com>
-References: <1528790908-23441-1-git-send-email-eric.auger@redhat.com>
-	<1528790908-23441-2-git-send-email-eric.auger@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Jun 2018 16:36:57 +0100
-Message-ID: <CAFEAcA_YbwG=1OUxAutMwyYjQSV=QvcN2Us1EUUvVkCmRJn1ug@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] hw/arm/smmuv3: Fix translate error
- handling
+	(envelope-from <dgilbert@redhat.com>) id 1fVfD7-0003k6-9I
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:39:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56190 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVfD7-0003jf-4H
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:39:53 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AAB7D407A6E4
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 15:39:52 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Wed, 20 Jun 2018 16:39:42 +0100
+Message-Id: <20180620153947.30834-3-dgilbert@redhat.com>
+In-Reply-To: <20180620153947.30834-1-dgilbert@redhat.com>
+References: <20180620153947.30834-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 2/7] hmp: Allow help on preconfig commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, jia.he@hxt-semitech.com, Jia He <hejianet@gmail.com>
+To: qemu-devel@nongnu.org, armbru@redhat.com, imammedo@redhat.com, peterx@redhat.com
 
-On 12 June 2018 at 09:08, Eric Auger <eric.auger@redhat.com> wrote:
-> From: Jia He <hejianet@gmail.com>
->
-> In case the STE's config is "Bypass" we currently don't set the
-> IOMMUTLBEntry perm flags and the access does not succeed. Also
-> if the config is 0b0xx (Aborted/Reserved), decode_ste and
-> smmuv3_decode_config currently returns -EINVAL and we don't enter
-> the expected code path: we record an event whereas we should not.
->
-> This patch fixes those bugs and simplifies the error handling.
-> decode_ste and smmuv3_decode_config now return 0 if aborted or
-> bypassed config was found. Only bad config info produces negative
-> error values. In smmuv3_translate we more clearly differentiate
-> errors, bypass/smmu disabled, aborted and success cases. Also
-> trace points are differentiated.
->
-> Fixes: 9bde7f0674fe ("hw/arm/smmuv3: Implement translate callback")
-> Reported-by: jia.he@hxt-semitech.com
-> Signed-off-by: jia.he@hxt-semitech.com
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Allow the 'help' command in preconfig state but
+make it only list the preconfig commands.
 
-thanks
--- PMM
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+---
+ hmp-commands.hx | 1 +
+ monitor.c       | 8 +++++++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 0de7c4c29e..3094294e5b 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -15,6 +15,7 @@ ETEXI
+         .params     = "[cmd]",
+         .help       = "show the help",
+         .cmd        = do_help_cmd,
++        .flags      = "p",
+     },
+ 
+ STEXI
+diff --git a/monitor.c b/monitor.c
+index 8dc86c0c3c..6fc20c4889 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -979,6 +979,10 @@ static void help_cmd_dump_one(Monitor *mon,
+ {
+     int i;
+ 
++    if (runstate_check(RUN_STATE_PRECONFIG) && !cmd_can_preconfig(cmd)) {
++        return;
++    }
++
+     for (i = 0; i < prefix_args_nb; i++) {
+         monitor_printf(mon, "%s ", prefix_args[i]);
+     }
+@@ -1001,7 +1005,9 @@ static void help_cmd_dump(Monitor *mon, const mon_cmd_t *cmds,
+ 
+     /* Find one entry to dump */
+     for (cmd = cmds; cmd->name != NULL; cmd++) {
+-        if (compare_cmd(args[arg_index], cmd->name)) {
++        if (compare_cmd(args[arg_index], cmd->name) &&
++            ((!runstate_check(RUN_STATE_PRECONFIG) ||
++                cmd_can_preconfig(cmd)))) {
+             if (cmd->sub_table) {
+                 /* continue with next arg */
+                 help_cmd_dump(mon, cmd->sub_table,
+-- 
+2.17.1
