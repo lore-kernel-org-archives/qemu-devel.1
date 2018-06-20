@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57765)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fVa5Q-0004uz-UU
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:11:37 -0400
+	(envelope-from <clg@kaod.org>) id 1fVaI1-0004aB-Al
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:24:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fVa5P-0003mK-Rr
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:11:36 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180620100755.GH3441@redhat.com> ("Daniel P. =?utf-8?Q?Berr?=
-	=?utf-8?Q?ang=C3=A9=22's?=
-	message of "Wed, 20 Jun 2018 11:07:55 +0100")
-References: <20180615155103.11924-1-berrange@redhat.com>
-	<20180615155103.11924-4-berrange@redhat.com>
-	<87efh1lqpq.fsf@secure.mitica> <20180620100755.GH3441@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 20 Jun 2018 12:11:27 +0200
-Message-ID: <87a7rplqcw.fsf@secure.mitica>
+	(envelope-from <clg@kaod.org>) id 1fVaHx-0000Mw-ME
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:24:37 -0400
+Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:50597)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fVaHx-0000LQ-5O
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 06:24:33 -0400
+Received: from player778.ha.ovh.net (unknown [10.109.120.117])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id D0B661A317
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 12:24:29 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Wed, 20 Jun 2018 12:24:11 +0200
+Message-Id: <20180620102413.5400-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/6] migration: add support for a
- "tls-authz" migration parameter
+Subject: [Qemu-devel] [PATCH 0/2] ppc/xics: rework the ICS classes
+ inheritance tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, =?utf-8?Q?Marc-?= =?utf-8?Q?Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-block@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> On Wed, Jun 20, 2018 at 12:03:45PM +0200, Juan Quintela wrote:
->> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
->> > From: "Daniel P. Berrange" <berrange@redhat.com>
->>=20
->> .....
->>=20
->>=20
->> It is not just the fault of this patch, but as you are the one doing the
->> tls bits on migration...
->>=20
->>=20
->> > @@ -1106,6 +1108,12 @@ static void migrate_params_apply(MigrateSetPara=
-meters *params, Error **errp)
->> >          s->parameters.tls_hostname =3D g_strdup(params->tls_hostname-=
->u.s);
->> >      }
->> >=20=20
->> > +    if (params->has_tls_authz) {
->> > +        g_free(s->parameters.tls_authz);
->> > +        assert(params->tls_authz->type =3D=3D QTYPE_QSTRING);
->>=20
->> We really try  hard not to use assert() on migration code (yes, it is an
->> ongoing effort).  The code around this is something like:
->>=20
->> static void migrate_params_test_apply(MigrateSetParameters *params,
->>                                       MigrationParameters *dest)
->> {
->>     [...]
->>=20
->>     if (params->has_compress_level) {
->>         dest->compress_level =3D params->compress_level;
->>     }
->>=20
->>     [...]
->>=20
->>     if (params->has_tls_creds) {
->>         assert(params->tls_creds->type =3D=3D QTYPE_QSTRING);
->>         dest->tls_creds =3D g_strdup(params->tls_creds->u.s);
->>     }
->>     [...]
->> }
->>=20
->> Ok, tls code is the one with strings, but still.
->
-> My understanding is that because we declared this parameter to
-> have "str" type in the QAPI schema, the QAPI code should already
-> guarantee that  "params->tls_creds->type =3D=3D QTYPE_QSTRING" is
-> true.
->
-> IOW, the assert should never fail, and if it does, that would
-> be a good thing as if QAPI wasn't validating input correctly
-> something very bad has gone wrong.
->
->
->> static bool migrate_params_check(MigrationParameters *params, Error **er=
-rp)
->> {
->>     if (params->has_compress_level &&
->>         (params->compress_level > 9)) {
->>         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "compress_level",
->>                    "is invalid, it should be in the range of 0 to 9");
->>         return false;
->
-> This is different because QAPI schema merely declares it to be an
-> int, so nothing in the QAPI input validation will do range checking.
-> So this codepath is definitely reachable by users feeding bad input.
+Hello,
 
-ok then.  Thanks for the explanation.
+First patch moves the common ICS code the ICS_BASE class. It makes the
+class hierarchy much cleaner and removes duplicated code. Second patch
+simply introduces ICP DeviceRealize and DeviceReset handler.
 
-Later, Juan.
+As we are touching the location of the objects states, migration
+compatibilty needs to be checked. The following tests were performed
+under KVM :
+
+  qemu-3.0 (pseries-3.0)   -> qemu-3.0  (pseries-3.0)   OK
+  qemu-3.0 (pseries-2.12)  -> qemu-2.12 (pseries-2.12)  OK
+  qemu-3.0 (pseries-2.11)  -> qemu-2.11 (pseries-2.11)  OK
+  qemu-3.0 (pseries-2.10)  -> qemu-2.10 (pseries-2.10)  OK
+  qemu-3.0 (pseries-2.9)   -> qemu-2.9  (pseries-2.9)   OK
+  qemu-3.0 (pseries-2.8)   -> qemu-2.8  (pseries-2.8)   OK
+  qemu-3.0 (pseries-2.7)   -> qemu-2.7  (pseries-2.7)   FAIL
+
+and back :
+
+  qemu-3.0 (pseries-3.0)  <-  qemu-3.0  (pseries-3.0)   OK
+  qemu-3.0 (pseries-2.12) <-  qemu-2.12 (pseries-2.12)  OK
+  qemu-3.0 (pseries-2.11) <-  qemu-2.11 (pseries-2.11)  OK
+  qemu-3.0 (pseries-2.10) <-  qemu-2.10 (pseries-2.10)  OK
+  qemu-3.0 (pseries-2.9)  <-  qemu-2.9  (pseries-2.9)   OK
+  qemu-3.0 (pseries-2.8)  <-  qemu-2.8  (pseries-2.8)   OK
+  qemu-3.0 (pseries-2.7)  <-  qemu-2.7  (pseries-2.7)   OK
+
+under TCG, same scenarios were run but up to 2.10 only, in which
+case the migration fails for other reasons.
+
+I wouldn't mind some extra cross checking from someone else.
+
+Thanks,
+
+C.
+
+
+C=C3=A9dric Le Goater (2):
+  ppc/xics: rework the ICS classes inheritance tree
+  ppc/xics: introduce ICP DeviceRealize and DeviceReset handlers
+
+ include/hw/ppc/xics.h |   9 ++-
+ hw/intc/xics.c        | 176 +++++++++++++++++++++++++++-----------------=
+------
+ hw/intc/xics_kvm.c    |  81 ++++++++++++++---------
+ hw/intc/xics_pnv.c    |  15 ++++-
+ hw/ppc/spapr.c        |   2 +-
+ 5 files changed, 166 insertions(+), 117 deletions(-)
+
+--=20
+2.13.6
