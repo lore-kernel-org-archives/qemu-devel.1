@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVdo0-0007uj-T7
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:09:54 -0400
+	(envelope-from <mst@redhat.com>) id 1fVdqE-0001BY-CA
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:12:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVdnw-0005j0-5Q
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:09:52 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:40595)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fVdnv-0005ip-Sb
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:09:48 -0400
-Received: by mail-wm0-x234.google.com with SMTP id n5-v6so7168639wmc.5
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 07:09:47 -0700 (PDT)
-References: <20180619154435.18898-1-alex.bennee@linaro.org>
-	<CAFEAcA-4=X-ag+v56_C4PoYe17DHVgawKAdw7D5v1k=rmFwL3A@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA-4=X-ag+v56_C4PoYe17DHVgawKAdw7D5v1k=rmFwL3A@mail.gmail.com>
-Date: Wed, 20 Jun 2018 15:09:45 +0100
-Message-ID: <87sh5hv9au.fsf@linaro.org>
+	(envelope-from <mst@redhat.com>) id 1fVdq8-0006wH-1G
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:12:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41088 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fVdq7-0006wB-Rq
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:12:03 -0400
+Date: Wed, 20 Jun 2018 17:11:59 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180620170904-mutt-send-email-mst@kernel.org>
+References: <20180612142557-mutt-send-email-mst@kernel.org>
+	<b9c88515-cf41-2a9a-078e-9c9e5adbbf14@intel.com>
+	<CADGSJ213f8tJpNXuOhv8qRew-Y5VZAwA+srNMrLZYnKdVGLdAA@mail.gmail.com>
+	<20180614120231.0a72bd5f.cohuck@redhat.com>
+	<CADGSJ23WnTmVKHezm3t0V6M2sWeHaOUoTjdXkmrvbO0EF83hMg@mail.gmail.com>
+	<20180615134815.6613620e.cohuck@redhat.com>
+	<CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
+	<20180619125453.2d2dfb2d.cohuck@redhat.com>
+	<20180619233001-mutt-send-email-mst@kernel.org>
+	<20180620115359.1a3bf6fb.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/56] add check-tcg and associated machinery
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180620115359.1a3bf6fb.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,183 +36,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
+
+On Wed, Jun 20, 2018 at 11:53:59AM +0200, Cornelia Huck wrote:
+> On Tue, 19 Jun 2018 23:32:06 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Tue, Jun 19, 2018 at 12:54:53PM +0200, Cornelia Huck wrote:
+> > > Sorry about dragging mainframes into this, but this will only work for
+> > > homogenous device coupling, not for heterogenous. Consider my vfio-pci
+> > > + virtio-net-ccw example again: The guest cannot find out that the two
+> > > belong together by checking some group ID, it has to either use the MAC
+> > > or some needs-to-be-architectured property.
+> > > 
+> > > Alternatively, we could propose that mechanism as pci-only, which means
+> > > we can rely on mechanisms that won't necessarily work on non-pci
+> > > transports. (FWIW, I don't see a use case for using vfio-ccw to pass
+> > > through a network card anytime in the near future, due to the nature of
+> > > network cards currently in use on s390.)  
+> > 
+> > That's what it boils down to, yes.  If there's need to have this for
+> > non-pci devices, then we should put it in config space.
+> > Cornelia, what do you think?
+> > 
+> 
+> I think the only really useful config on s390 is the vfio-pci network
+> card coupled with a virtio-net-ccw device: Using an s390 network card
+> via vfio-ccw is out due to the nature of the s390 network cards, and
+> virtio-ccw is the default transport (virtio-pci is not supported on any
+> enterprise distro AFAIK).
+> 
+> For this, having a uuid in the config space could work (vfio-pci
+> devices have a config space by virtue of being pci devices, and
+> virtio-net-ccw devices have a config space by virtue of being virtio
+> devices -- ccw devices usually don't have that concept).
+
+OK so this calls for adding such a field generally (it's
+device agnostic right now).
+
+How would you suggest doing that?
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On 19 June 2018 at 16:43, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->> The following changes since commit 2ef2f16781af9dee6ba6517755e9073ba5799=
-fa2:
->>
->>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-migration-201=
-80615a' into staging (2018-06-15 18:13:35 +0100)
->>
->> are available in the Git repository at:
->>
->>   https://github.com/stsquad/qemu.git tags/pull-tcg-testing-revivial-190=
-618-1
->>
->> for you to fetch changes up to 03c79cb5825f2e930a39839e8375dc0feef6d57d:
->>
->>   .travis.yml: add check-tcg test (2018-06-19 16:38:54 +0100)
->>
->> ----------------------------------------------------------------
->> Add check-tcg machinary
->>
->> This restores the ability to run TCG smoke tests by using our docker
->> infrastructure to support cross building simple tests. It represents
->> the first step to making better cross-architecture testing available
->> straight from the source tree ;-)
->>
->> ----------------------------------------------------------------
->
-> On x86-64/Linux I get:
->
-> Doing build and test cycle...
-> make: Entering directory '/home/petmay01/linaro/qemu-for-merges/build/all=
-dbg'
-> Traceback (most recent call last):
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 523, in <module>
->     sys.exit(main())
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 520, in main
->     return args.cmdobj.run(args, argv)
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 475, in run
->     dkr =3D Docker()
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 137, in __init__
->     self._command =3D _guess_docker_command()
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 62, in _guess_docker_command
->     commands_txt)
-> Exception: Cannot find working docker command. Tried:
->   docker
->   sudo -n docker
-> make: Leaving directory '/home/petmay01/linaro/qemu-for-merges/build/alld=
-bg'
-> make: *** Deleting file 'config-host.mak'
-> make: Entering directory '/home/petmay01/linaro/qemu-for-merges/build/all=
-dbg'
-> config-host.mak is out-of-date, running configure
-> Traceback (most recent call last):
->   File "/home/petmay01/linaro/qemu-for-merges/tests/docker/docker.py",
-> line 29, in <module>
->     from StringIO import StringIO
-> ImportError: No module named 'StringIO'
-> Install prefix    /usr/local
-> BIOS directory    /usr/local/share/qemu
-> firmware path     /usr/local/share/qemu-firmware
-> [other configure output trimmed]
-> VxHS block device no
-> capstone          git
-> docker
-
-Hmm I'm sure I tested this. I'll go and find a box without docker to
-double check.
-
->
-> ERROR: configure test passed without -Werror but failed with -Werror.
->        This is probably a bug in the configure script. The failing command
->        will be at the bottom of config.log.
->        You can run configure with --disable-werror to bypass this check.
->
-> Makefile:73: recipe for target 'config-host.mak' failed
-> make: *** [config-host.mak] Error 1
->
-> and the last part of config.log is
->
-> =3D=3D=3D=3D=3D=3D
-> ccache gcc -Werror -pthread -I/usr/include/glib-2.0
-> -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -fPIE -DPIE -m64 -mcx16
-> -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE
-> -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings
-> -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv
-> -Wendif-labels -Wno-missing-include-dirs -Wempty-body -Wnested-externs
-> -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
-> -Wold-style-declaration -Wold-style-definition -Wtype-limits
-> -fstack-protector-strong -I/usr/include/p11-kit-1
-> -I/usr/include/libpng12 -I/usr/include/spice-server
-> -I/usr/include/spice-1 -I$(SRC_PATH)/capstone/include -c -o
-> config-temp/qemu-conf.o config-temp/qemu-conf.c
-> c++ -D__STDC_LIMIT_MACROS -Werror -pthread -I/usr/include/glib-2.0
-> -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -fPIE -DPIE -m64 -mcx16
-> -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE -Wall -Wundef
-> -Wwrite-strings -fno-strict-aliasing -fno-common -fwrapv
-> -Wendif-labels -Wno-missing-include-dirs -Wempty-body
-> -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
-> -Wtype-limits -fstack-protector-strong -I/usr/include/p11-kit-1
-> -I/usr/include/libpng12 -I/usr/include/spice-server
-> -I/usr/include/spice-1 -I$(SRC_PATH)/capstone/include -o
-> config-temp/qemu-conf.exe config-temp/qemu-conf.cxx
-> config-temp/qemu-conf.o -Wl,--warn-common -Wl,-z,relro -Wl,-z,now -pie
-> -m64 -g
-> aarch64-linux-gnu-gcc -o config-temp/qemu-conf.exe
-> config-temp/qemu-conf.c -static
-> aarch64-linux-gnu-gcc -Werror -o config-temp/qemu-conf.exe
-> config-temp/qemu-conf.c -static
-> arm-linux-gnueabihf-gcc -o config-temp/qemu-conf.exe
-> config-temp/qemu-conf.c -static
-> arm-linux-gnueabihf-gcc -Werror -o config-temp/qemu-conf.exe
-> config-temp/qemu-conf.c -static
-> powerpc-linux-gnu-gcc -o config-temp/qemu-conf.exe
-> config-temp/qemu-conf.c -static
-> powerpc-linux-gnu-gcc -Werror -o config-temp/qemu-conf.exe
-> config-temp/qemu-conf.c -static
-> ccache gcc -o config-temp/qemu-conf.exe config-temp/qemu-conf.c -static
-> ccache -Werror gcc -o config-temp/qemu-conf.exe config-temp/qemu-conf.c -=
-static
-> ccache: invalid option -- 'W'
-> Usage:
->     ccache [options]
->     ccache compiler [compiler options]
->     compiler [compiler options]          (via symbolic link)
->
-> Options:
->     -c, --cleanup         delete old files and recalculate size counters
->                           (normally not needed as this is done automatica=
-lly)
->     -C, --clear           clear the cache completely (except configuratio=
-n)
->     -F, --max-files=3DN     set maximum number of files in cache to N (us=
-e 0 for
->                           no limit)
->     -M, --max-size=3DSIZE   set maximum size of cache to SIZE (use 0 for =
-no
->                           limit); available suffixes: k, M, G, T (decimal=
-) and
->                           Ki, Mi, Gi, Ti (binary); default suffix: G
->     -o, --set-config=3DK=3DV  set configuration key K to value V
->     -p, --print-config    print current configuration options
->     -s, --show-stats      show statistics summary
->     -z, --zero-stats      zero statistics counters
->
->     -h, --help            print this help text
->     -V, --version         print version and copyright information
->
-> See also <http://ccache.samba.org>.
-> =3D=3D=3D=3D=3D=3D
->
-> The configure options for this build are
-> '--cc=3Dccache gcc' '--enable-debug' '--python=3Dpython3'
->
-> Looks like something is mishandling CC.
->
-> On FreeBSD I get an odd linker error:
->
->   LINK    qemu-ga
-> /usr/bin/ld: cannot open linker script file ../config-host.ld: No such
-> file or directory
-> c++: error: linker command failed with exit code 1 (use -v to see invocat=
-ion)
-> gmake: *** [Makefile:688: qemu-ga] Error 1
->
-> thanks
-> -- PMM
-
-
---
-Alex Benn=C3=A9e
+-- 
+MST
