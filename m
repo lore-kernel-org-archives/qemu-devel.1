@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fVd2N-0007yH-Fd
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:20:40 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fVd2N-0007yA-Dy
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fVd2M-0002lQ-9i
+	(envelope-from <alex.bennee@linaro.org>) id 1fVd2K-0002kD-1s
 	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:20:39 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Jun 2018 14:20:24 +0100
-Message-Id: <20180620132032.28865-1-peter.maydell@linaro.org>
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:50499)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fVd2J-0002jy-Pz
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 09:20:35 -0400
+Received: by mail-wm0-x244.google.com with SMTP id e16-v6so5981715wmd.0
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 06:20:35 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed, 20 Jun 2018 14:20:28 +0100
+Message-Id: <20180620132032.12952-2-alex.bennee@linaro.org>
+In-Reply-To: <20180620132032.12952-1-alex.bennee@linaro.org>
+References: <20180620132032.12952-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 0/8] arm: implement TZ MPC
+Subject: [Qemu-devel] [RFC PATCH 1/5] build-system: remove per-test GCOV
+ reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,52 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Eric Auger <eric.auger@redhat.com>
+To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Hi; this is v3 of my iommu patchset. All the IOMMU stuff is now
-in master, so the remaining part is just implementing and using
-the Trustzone Memory Protection Controller in the mps2-an505.
+I'm not entirely sure who's using this information and certainly in a
+CI environment it just washes over as additional noise. Later patches
+will provide new reporting options so a user who wants to analyse
+individual tests will be able to use that to get the information.
 
-Changes from v2 to v3 (all fairly minor):
- * add new variable to clarify sense of LUT bits
- * only autoinc the IDX register if CTRL.AUTOINC is set
- * NS accesses should see IDregs only
-   (The datasheet is unclear on the exact behaviour on an
-   NS access to a non-ID register, so I've made a best guess
-   and had them RAZ/WI. This behaviour is not reachable for
-   the mps2-an505 anyway, so it doesn't really matter.)
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ docs/devel/testing.rst | 11 +++++------
+ tests/Makefile.include | 10 ----------
+ 2 files changed, 5 insertions(+), 16 deletions(-)
 
-Patches still needing review: 2, 4, 5
-
-thanks
--- PMM
-
-Peter Maydell (8):
-  hw/misc/tz-mpc.c: Implement the Arm TrustZone Memory Protection
-    Controller
-  hw/misc/tz-mpc.c: Implement registers
-  hw/misc/tz-mpc.c: Implement correct blocked-access behaviour
-  hw/misc/tz_mpc.c: Honour the BLK_LUT settings in translate
-  hw/misc/iotkit-secctl.c: Implement SECMPCINTSTATUS
-  hw/arm/iotkit: Instantiate MPC
-  hw/arm/iotkit: Wire up MPC interrupt lines
-  hw/arm/mps2-tz.c: Instantiate MPCs
-
- hw/misc/Makefile.objs           |   1 +
- include/hw/arm/iotkit.h         |   8 +
- include/hw/misc/iotkit-secctl.h |   8 +
- include/hw/misc/tz-mpc.h        |  80 ++++
- hw/arm/iotkit.c                 | 112 +++++-
- hw/arm/mps2-tz.c                |  71 ++--
- hw/misc/iotkit-secctl.c         |  38 +-
- hw/misc/tz-mpc.c                | 628 ++++++++++++++++++++++++++++++++
- MAINTAINERS                     |   2 +
- default-configs/arm-softmmu.mak |   1 +
- hw/misc/trace-events            |   8 +
- 11 files changed, 917 insertions(+), 40 deletions(-)
- create mode 100644 include/hw/misc/tz-mpc.h
- create mode 100644 hw/misc/tz-mpc.c
-
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+index f33e5a8423..66ef219f69 100644
+--- a/docs/devel/testing.rst
++++ b/docs/devel/testing.rst
+@@ -158,12 +158,11 @@ rarely used. See "QEMU iotests" section below for more information.
+ GCC gcov support
+ ----------------
+ 
+-``gcov`` is a GCC tool to analyze the testing coverage by instrumenting the
+-tested code. To use it, configure QEMU with ``--enable-gcov`` option and build.
+-Then run ``make check`` as usual. There will be additional ``gcov`` output as
+-the testing goes on, showing the test coverage percentage numbers per analyzed
+-source file. More detailed reports can be obtained by running ``gcov`` command
+-on the output files under ``$build_dir/tests/``, please read the ``gcov``
++``gcov`` is a GCC tool to analyze the testing coverage by
++instrumenting the tested code. To use it, configure QEMU with
++``--enable-gcov`` option and build. Then run ``make check`` as usual.
++Reports can be obtained by running ``gcov`` command on the output
++files under ``$build_dir/tests/``, please read the ``gcov``
+ documentation for more information.
+ 
+ QEMU iotests
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index ca91da26cb..55d54bd180 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -891,26 +891,16 @@ GCOV_OPTIONS = -n $(if $(V),-f,)
+ 
+ .PHONY: $(patsubst %, check-qtest-%, $(QTEST_TARGETS))
+ $(patsubst %, check-qtest-%, $(QTEST_TARGETS)): check-qtest-%: subdir-%-softmmu $(check-qtest-y)
+-	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
+ 	$(call quiet-command,QTEST_QEMU_BINARY=$*-softmmu/qemu-system-$* \
+ 		QTEST_QEMU_IMG=qemu-img$(EXESUF) \
+ 		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
+ 		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $(check-qtest-$*-y) $(check-qtest-generic-y),"GTESTER","$@")
+-	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$*-y) $(gcov-files-generic-y); do \
+-	  echo Gcov report for $$f:;\
+-	  $(GCOV) $(GCOV_OPTIONS) $$f -o `dirname $$f`; \
+-	done,)
+ 
+ .PHONY: $(patsubst %, check-%, $(check-unit-y) $(check-speed-y))
+ $(patsubst %, check-%, $(check-unit-y) $(check-speed-y)): check-%: %
+-	$(if $(CONFIG_GCOV),@rm -f *.gcda */*.gcda */*/*.gcda */*/*/*.gcda,)
+ 	$(call quiet-command, \
+ 		MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} \
+ 		gtester $(GTESTER_OPTIONS) -m=$(SPEED) $*,"GTESTER","$*")
+-	$(if $(CONFIG_GCOV),@for f in $(gcov-files-$(subst tests/,,$*)-y) $(gcov-files-generic-y); do \
+-	  echo Gcov report for $$f:;\
+-	  $(GCOV) $(GCOV_OPTIONS) $$f -o `dirname $$f`; \
+-	done,)
+ 
+ # gtester tests with XML output
+ 
 -- 
 2.17.1
