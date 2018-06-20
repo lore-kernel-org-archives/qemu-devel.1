@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fVYHC-0003vA-1k
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:15:39 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fVYHB-0001HU-5C
+	(envelope-from <quintela@redhat.com>) id 1fVYHB-0003uG-34
 	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:15:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42456 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fVYHB-0001HG-0e
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <quintela@redhat.com>) id 1fVYH9-0001Gz-UX
 	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:15:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54760 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fVYH9-0001Gb-Jx
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 04:15:35 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9E892407048B
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 08:15:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4BF778163AD2
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 08:15:35 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 20 Jun 2018 10:15:17 +0200
-Message-Id: <20180620081524.5751-6-quintela@redhat.com>
+Date: Wed, 20 Jun 2018 10:15:16 +0200
+Message-Id: <20180620081524.5751-5-quintela@redhat.com>
 In-Reply-To: <20180620081524.5751-1-quintela@redhat.com>
 References: <20180620081524.5751-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v14 05/12] migration: Multifd channels always
- wait on the sem
+Subject: [Qemu-devel] [PATCH v14 04/12] migration: Calculate transferred ram
+ correctly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +33,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Either for quit, sync or packet, we first wake them.
+On multifd we send data from more places that main channel.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+--
+Add placeholder for packets size
 ---
- migration/ram.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ migration/migration.c | 12 ++++++++++--
+ migration/ram.c       |  7 +++++++
+ migration/ram.h       |  1 +
+ 3 files changed, 18 insertions(+), 2 deletions(-)
 
+diff --git a/migration/migration.c b/migration/migration.c
+index e1eaa97df4..224629533b 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2728,12 +2728,20 @@ static void migration_update_counters(MigrationState *s,
+ {
+     uint64_t transferred, time_spent;
+     double bandwidth;
++    uint64_t now;
+ 
+     if (current_time < s->iteration_start_time + BUFFER_DELAY) {
+         return;
+     }
+ 
+-    transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
++    if (migrate_use_multifd()) {
++        now = ram_counters.normal * qemu_target_page_size()
++            + multifd_packets_size()
++            + qemu_ftell(s->to_dst_file);
++    } else {
++        now = qemu_ftell(s->to_dst_file);
++    }
++    transferred = now - s->iteration_initial_bytes;
+     time_spent = current_time - s->iteration_start_time;
+     bandwidth = (double)transferred / time_spent;
+     s->threshold_size = bandwidth * s->parameters.downtime_limit;
+@@ -2752,7 +2760,7 @@ static void migration_update_counters(MigrationState *s,
+     qemu_file_reset_rate_limit(s->to_dst_file);
+ 
+     s->iteration_start_time = current_time;
+-    s->iteration_initial_bytes = qemu_ftell(s->to_dst_file);
++    s->iteration_initial_bytes = now;
+ 
+     trace_migrate_transferred(transferred, time_spent,
+                               bandwidth, s->threshold_size);
 diff --git a/migration/ram.c b/migration/ram.c
-index d7f8b0d989..617da76a2e 100644
+index d146689d3a..d7f8b0d989 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -875,6 +875,7 @@ static void *multifd_send_thread(void *opaque)
-     p->num_packets = 1;
+@@ -952,6 +952,13 @@ int multifd_save_setup(void)
+     return 0;
+ }
  
-     while (true) {
-+        qemu_sem_wait(&p->sem);
-         qemu_mutex_lock(&p->mutex);
-         multifd_send_fill_packet(p);
-         if (p->quit) {
-@@ -882,7 +883,9 @@ static void *multifd_send_thread(void *opaque)
-             break;
-         }
-         qemu_mutex_unlock(&p->mutex);
--        qemu_sem_wait(&p->sem);
-+        /* this is impossible */
-+        error_setg(&local_err, "multifd_send_thread: Unknown command");
-+        break;
-     }
++/* Size in bytes of the page headers */
++int multifd_packets_size(void)
++{
++    /* We are not yet sending any data through channels */
++    return 0;
++}
++
+ struct {
+     MultiFDRecvParams *params;
+     /* number of created threads */
+diff --git a/migration/ram.h b/migration/ram.h
+index d386f4d641..e1decb7418 100644
+--- a/migration/ram.h
++++ b/migration/ram.h
+@@ -47,6 +47,7 @@ int multifd_load_setup(void);
+ int multifd_load_cleanup(Error **errp);
+ bool multifd_recv_all_channels_created(void);
+ void multifd_recv_new_channel(QIOChannel *ioc);
++int multifd_packets_size(void);
  
- out:
-@@ -1033,6 +1036,7 @@ static void *multifd_recv_thread(void *opaque)
-     trace_multifd_recv_thread_start(p->id);
- 
-     while (true) {
-+        qemu_sem_wait(&p->sem);
-         qemu_mutex_lock(&p->mutex);
-         if (false)  {
-             /* ToDo: Packet reception goes here */
-@@ -1047,9 +1051,14 @@ static void *multifd_recv_thread(void *opaque)
-             break;
-         }
-         qemu_mutex_unlock(&p->mutex);
--        qemu_sem_wait(&p->sem);
-+        /* this is impossible */
-+        error_setg(&local_err, "multifd_recv_thread: Unknown command");
-+        break;
-     }
- 
-+    if (local_err) {
-+        multifd_recv_terminate_threads(local_err);
-+    }
-     qemu_mutex_lock(&p->mutex);
-     p->running = false;
-     qemu_mutex_unlock(&p->mutex);
+ uint64_t ram_pagesize_summary(void);
+ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len);
 -- 
 2.17.1
