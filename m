@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fVfDJ-00078W-W2
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:40:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fVfF5-0000Fz-LP
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fVfDG-0003v5-0e
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:40:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41944 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fVfDF-0003uq-R1
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:40:01 -0400
-Date: Wed, 20 Jun 2018 16:39:58 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180620153958.GB4714@stefanha-x1.localdomain>
-References: <20180618225131.13113-1-ehabkost@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fVfF4-0004eq-QB
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:41:55 -0400
+Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:37928)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fVfF4-0004eO-Ce
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:41:54 -0400
+Received: by mail-oi0-x229.google.com with SMTP id d5-v6so7274oib.5
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 08:41:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="IiVenqGWf+H9Y6IX"
-Content-Disposition: inline
-In-Reply-To: <20180618225131.13113-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/3] python: Revert sys.path hacks used for
- compat modules
+In-Reply-To: <8ba4603d-8b79-ccef-907b-98254ccd7e71@redhat.com>
+References: <20180620132032.28865-1-peter.maydell@linaro.org>
+	<20180620132032.28865-3-peter.maydell@linaro.org>
+	<8ba4603d-8b79-ccef-907b-98254ccd7e71@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 Jun 2018 16:41:33 +0100
+Message-ID: <CAFEAcA-Lx0-MQYAQJ53fTP90LC1uzdnsMC1eO2VMR_2B3mUZJQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 2/8] hw/misc/tz-mpc.c: Implement
+ registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, "Daniel P. Berrange" <berrange@redhat.com>, Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
+On 20 June 2018 at 16:26, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi Peter,
+>
+> On 06/20/2018 03:20 PM, Peter Maydell wrote:
+>> Implement the missing registers for the TZ MPC.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
---IiVenqGWf+H9Y6IX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>> @@ -127,7 +182,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+>>      if (!attrs.secure && offset < A_PIDR4) {
+>>          /* NS accesses can only see the ID registers */
+> When reading
+> "Identification registers can be read by any type of access." I
+> understand all others can only be read by secure accesses. So I would
+> have expected the same check on read side.
 
-On Mon, Jun 18, 2018 at 07:51:28PM -0300, Eduardo Habkost wrote:
-> Now that the 'argparse' and 'ordereddict' compat modules were
-> removed, we can remove some sys.path hacks added because of them.
->=20
-> Eduardo Habkost (3):
->   device-crash-test: No need for sys.path hack
->   Revert "docker.py: Python 2.6 argparse compatibility"
->   Revert "tests: migration/guestperf Python 2.6 argparse compatibility"
->=20
->  scripts/device-crash-test          | 1 -
->  tests/docker/docker.py             | 4 +---
->  tests/migration/guestperf/shell.py | 8 +++-----
->  3 files changed, 4 insertions(+), 9 deletions(-)
->=20
->=20
-> base-commit: 2ef2f16781af9dee6ba6517755e9073ba5799fa2
-> prerequisite-patch-id: 4d0af8c27a87cf124ad37fd18e3adf47fd45a93a
-> prerequisite-patch-id: 4376551471959cc464ac8f061e84780710dd9121
-> prerequisite-patch-id: 0e23e8822f87d5d0e77d897ff9ff2a952297b1ef
-> prerequisite-patch-id: b8acae4f74302b01f4d6805b39d27ce2cdaceafa
-> prerequisite-patch-id: f11e7b483ff5f356f52d16b3ae252688002518a0
-> prerequisite-patch-id: 4db77f7dd9ff0bc89641e3cce8a4634eb661b476
-> prerequisite-patch-id: afd96367ba6e592a33fef5003a01a6560596c204
-> --=20
-> 2.18.0.rc1.1.g3f1ff2140
->=20
+The check is there for reads too, it's in patch 1.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Eric
+>>          qemu_log_mask(LOG_GUEST_ERROR,
+>> -                      "TZ MPC register read: NS access to offset 0x%x\n",
+>> +                      "TZ MPC register write: NS access to offset 0x%x\n",
+>>                        offset);
 
---IiVenqGWf+H9Y6IX
-Content-Type: application/pgp-signature; name="signature.asc"
+...this change should have been squashed into patch 2 (I cut-n-pasted
+the check from the read function to the write function, forgot
+to update the string, noticed that later but put the string fix into
+the wrong patch).
 
------BEGIN PGP SIGNATURE-----
+Sorry about the confusion.
 
-iQEcBAEBAgAGBQJbKnVOAAoJEJykq7OBq3PIoWwIAKZmtiZVaVx4ji711QC2jxlD
-oqU1Amomq0r/O/LuBVXv9yxl0rInpkmwH0GuHZIbRgiOoaKBvz3d0I8fDSG9rzDd
-KXp4J53f+LEhHCwv9pqFKSt1klQbgoqIBh8w1fC7k2WCavSL7yVv7IWGQPQQ79WD
-ch5dhSHb2KArxqeHLx9Ow8iXwZYjFk2cxsARpHac5R1TIINwWmSq7aI36iYd7iWK
-SKZK5PR6Xe0le2IswpjUssnQNPH1s1V6Bs1Jxt/Ru3AhriZEiuHb/ozsMvLgSazr
-y7sBLlyUgoDf2c+VS/OHZXvUAkukWBFYm6d6Mn2gnNKIOsjLMDo9FB5b//R7Rqk=
-=gYR/
------END PGP SIGNATURE-----
-
---IiVenqGWf+H9Y6IX--
+thanks
+-- PMM
