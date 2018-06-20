@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fVj6I-0004Dh-3M
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 15:49:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1fVj8K-0005Kq-Dq
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 15:51:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fVj6E-0006Y1-7h
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 15:49:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52616 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fVj6E-0006Wq-2c
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 15:49:02 -0400
-Date: Wed, 20 Jun 2018 22:48:58 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180620224535-mutt-send-email-mst@kernel.org>
-References: <CADGSJ213f8tJpNXuOhv8qRew-Y5VZAwA+srNMrLZYnKdVGLdAA@mail.gmail.com>
-	<20180614120231.0a72bd5f.cohuck@redhat.com>
-	<CADGSJ23WnTmVKHezm3t0V6M2sWeHaOUoTjdXkmrvbO0EF83hMg@mail.gmail.com>
-	<20180615134815.6613620e.cohuck@redhat.com>
-	<CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
-	<20180619125453.2d2dfb2d.cohuck@redhat.com>
-	<20180619233001-mutt-send-email-mst@kernel.org>
-	<20180620115359.1a3bf6fb.cohuck@redhat.com>
-	<20180620170904-mutt-send-email-mst@kernel.org>
-	<20180620180619.6b4ee52d.cohuck@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1fVj8G-0007YP-I7
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 15:51:12 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33124)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fVj8G-0007XF-B9
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 15:51:08 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fVj8C-0001yY-Os
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 19:51:04 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 45A882E80C3
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 19:51:02 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180620180619.6b4ee52d.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 20 Jun 2018 19:44:05 -0000
+From: John Snow <1776920@bugs.launchpad.net>
+Reply-To: Bug 1776920 <1776920@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152898515528.25954.5483198787570860596.malonedeb@soybean.canonical.com>
+Message-Id: <152952384591.2222.4203595123034432540.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1776920] Re: qemu-img convert on Mac OSX creates
+ corrupt images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,18 +37,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
+To: qemu-devel@nongnu.org
 
-On Wed, Jun 20, 2018 at 06:06:19PM +0200, Cornelia Huck wrote:
-> In any case, I'm not sure anymore why we'd want the extra uuid.
+Great, thanks for the additional info!
 
-It's mostly so we can have e.g. multiple devices with same MAC
-(which some people seem to want in order to then use
-then with different containers).
+It sounds like maybe something to do with our sparse detection on APFS
+is broken. Maybe lseek calls are failing? This is a bad problem because
+it means that any read from an APFS source could break similarly.
 
-But it is also handy for when you assign a PF, since then you
-can't set the MAC.
+I'm still a bit tied down with other work at the moment, but I will try
+to address this prior to the 3.0 release if nobody else gets to it
+first.
 
--- 
-MST
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1776920
+
+Title:
+  qemu-img convert on Mac OSX creates corrupt images
+
+Status in QEMU:
+  New
+
+Bug description:
+  An image created by qemu-img create, then modified by another program
+  is converted to bad/corrupt image when using convert sub command on
+  Mac OSX. The same convert works on Linux. The version of qemu-img is
+  2.12.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1776920/+subscriptions
