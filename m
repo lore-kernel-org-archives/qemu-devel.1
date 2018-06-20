@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38811)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVdmK-0006SU-9F
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:08:11 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fVdmd-0006hV-4Z
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:08:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVdmI-0004rc-UH
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:08:08 -0400
-Date: Wed, 20 Jun 2018 15:07:54 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180620140754.GP3441@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180620121423.16979-1-berrange@redhat.com>
-	<20180620121423.16979-3-berrange@redhat.com>
-	<205e17cb-30f6-ace2-d8eb-e6a60d84731d@redhat.com>
+	(envelope-from <eric.auger@redhat.com>) id 1fVdmc-00050r-9r
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 10:08:27 -0400
+References: <1529072910-16156-1-git-send-email-eric.auger@redhat.com>
+	<1529072910-16156-2-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA-wS9oy1JSgpwrCZie9GQaKLOf2wQxZOUtaLfw+HGP_GA@mail.gmail.com>
+	<7fc96a3d-f1e2-7ab4-a46d-3d3482cc5e71@redhat.com>
+	<CAFEAcA_s+LY-WS20HEi5xSkMRoA313To55kqeiX+GWW2qXq+XQ@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <85ba1b73-869c-01fb-09f3-d629ef1e5efc@redhat.com>
+Date: Wed, 20 Jun 2018 16:08:16 +0200
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_s+LY-WS20HEi5xSkMRoA313To55kqeiX+GWW2qXq+XQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <205e17cb-30f6-ace2-d8eb-e6a60d84731d@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/6] nbd: allow authorization with
- nbd-server-start QMP command
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 01/11] linux-headers: Update to 4.18-rc0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,96 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Christoffer Dall <christoffer.dall@arm.com>, qemu-arm <qemu-arm@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Laszlo Ersek <lersek@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>
 
-On Wed, Jun 20, 2018 at 09:05:32AM -0500, Eric Blake wrote:
-> On 06/20/2018 07:14 AM, Daniel P. Berrang=C3=A9 wrote:
-> > From: "Daniel P. Berrange" <berrange@redhat.com>
->=20
-> I thought you preferred the UTF-8 accent in your Author lines these day=
-s?
-> Or is this because this patch has been sitting around in your local rep=
-o
-> prior to the point where you switched your git config author spelling? =
-(Also
-> applies to S-o-b in the series)
+Hi Peter,
 
-Yeah its "only" been sitting in my tree since late 2016 :-)
+On 06/20/2018 04:06 PM, Peter Maydell wrote:
+> On 20 June 2018 at 15:03, Auger Eric <eric.auger@redhat.com> wrote:
+>> Hi Peter,
+>> On 06/20/2018 03:57 PM, Peter Maydell wrote:
+>>> On 15 June 2018 at 15:28, Eric Auger <eric.auger@redhat.com> wrote:
+>>>> commit b357bf6023a948cf6a9472f07a1b0caac0e4f8e8
+>>>> Merge tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>
+>>> What's 4.18-rc0? The upstream kernel doesn't have a tag by that
+>>> name and looking at the Makefile the last thing before 4.18-rc1
+>>> was 4.17.
+>>>
+>>> Still, since it is a commit on mainline I guess we're fine?
+>> Yes it is post 4.17 and before 4.18-rc1. I didn't know how to call that.
+> 
+> I've tweaked the commit message to read:
+>> linux-headers: Update to kernel mainline commit b357bf602
+thank you!
 
->=20
-> >=20
-> > As with the previous patch to qemu-nbd, the nbd-server-start QMP comm=
-and
-> > also needs to be able to specify authorization when enabling TLS encr=
-yption.
-> >=20
-> > First the client must create a QAuthZ object instance using the
-> > 'object-add' command:
-> >=20
->=20
-> > They can then reference this in the new 'tls-authz' parameter when
-> > executing the 'nbd-server-start' command:
-> >=20
->=20
-> > @@ -132,11 +137,12 @@ void nbd_server_start(SocketAddress *addr, cons=
-t char *tls_creds,
-> >   void qmp_nbd_server_start(SocketAddressLegacy *addr,
-> >                             bool has_tls_creds, const char *tls_creds=
-,
-> > +                          bool has_tls_authz, const char *tls_authz,
-> >                             Error **errp)
-> >   {
-> >       SocketAddress *addr_flat =3D socket_address_flatten(addr);
-> > -    nbd_server_start(addr_flat, tls_creds, errp);
-> > +    nbd_server_start(addr_flat, tls_creds, tls_authz, errp);
->=20
-> Relies on QMP generated code setting tls_authz =3D NULL if has_tls_auth=
-z is
-> false (but no different than the fact that we already relied on it for
-> tls_creds).  Someday it would be nice to get rid of the has_FOO for opt=
-ional
-> strings, but that's not your problem.
->=20
-> > +++ b/qapi/block.json
-> > @@ -197,6 +197,11 @@
-> >   #
-> >   # @addr: Address on which to listen.
-> >   # @tls-creds: (optional) ID of the TLS credentials object. Since 2.=
-6
-> > +# @tls-authz: ID of the QAuthZ authorization object used to validate
-> > +#             the client's x509 distinguished name. This object is
-> > +#             is only resolved at time of use, so can be deleted and
-> > +#             recreated on the fly while the NBD server is active.
-> > +#             If missing, it will default to denying access. Since 3=
-.0
-> >   #
-> >   # Returns: error if the server is already running.
-> >   #
-> > @@ -204,7 +209,8 @@
-> >   ##
-> >   { 'command': 'nbd-server-start',
-> >     'data': { 'addr': 'SocketAddressLegacy',
-> > -            '*tls-creds': 'str'} }
-> > +            '*tls-creds': 'str',
-> > +            '*tls-authz': 'str'} }
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-> Although patch 1 and 2 touch NBD, I'm happy for Dan to be the one that
-> merges it as part of the larger series.
->=20
-> --=20
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Eric
+>>
+>> Update our kernel headers to mainline commit
+>> b357bf6023a948cf6a9472f07a1b0caac0e4f8e8
+>> ("Merge tag 'for-linus' of git://git.kernel.org/pub/scm/virt/kvm/kvm")
+> 
+> thanks
+> -- PMM
+> 
