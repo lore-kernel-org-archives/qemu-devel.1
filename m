@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVfD9-0006xz-EM
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:39:56 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fVfDA-0006yw-IC
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:39:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVfD5-0003j4-Hl
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:39:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41916 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fVfD9-0003lp-EW
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:39:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41924 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVfD5-0003is-Cr
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:39:51 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVfD9-0003l5-8G
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 11:39:55 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8E6F17721D
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 15:39:50 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C96A877154
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 15:39:54 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Wed, 20 Jun 2018 16:39:40 +0100
-Message-Id: <20180620153947.30834-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 0/7] Reenable hmp for preconfig mode
+Date: Wed, 20 Jun 2018 16:39:44 +0100
+Message-Id: <20180620153947.30834-5-dgilbert@redhat.com>
+In-Reply-To: <20180620153947.30834-1-dgilbert@redhat.com>
+References: <20180620153947.30834-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 4/7] qmp: Enable a few commands in preconfig
+ state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +32,137 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, armbru@redhat.com, imammedo@redhat.com, peterx@redhat.com
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Igor Mammedov <imammedo@redhat.com>
 
-Reenable HMP in preconfig mode; it's pretty
-easy and anyway I want to do a similar thing for OOB eventually.
-We'll want to enable more commands in preconfig mode to make it
-useful at some point.
+Commands query-chardev, query-version, query-name, query-uuid,
+query-iothreads, query-memdev are informational and do not depend on
+the machine being initialized.  Make them available in preconfig
+runstate to make the latter a little bit more useful.
+The generic qom commands don't depend on the machine being initialized
+either; so enabled qom-list, qom-get, qom-set, qom-list-types,
+qom-list-properties.
 
-Dave
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ qapi/char.json |  3 ++-
+ qapi/misc.json | 27 +++++++++++++++++----------
+ 2 files changed, 19 insertions(+), 11 deletions(-)
+
+diff --git a/qapi/char.json b/qapi/char.json
+index ae19dcd1ed..60f31d83fc 100644
+--- a/qapi/char.json
++++ b/qapi/char.json
+@@ -62,7 +62,8 @@
+ #    }
+ #
+ ##
+-{ 'command': 'query-chardev', 'returns': ['ChardevInfo'] }
++{ 'command': 'query-chardev', 'returns': ['ChardevInfo'],
++  'allow-preconfig': true }
  
-v5
-  Drop info usbhost as per Gerd's comments
-
-Dr. David Alan Gilbert (6):
-  hmp: Add flag for preconfig commands
-  hmp: Allow help on preconfig commands
-  hmp: Restrict auto-complete in preconfig
-  hmp: Add commands for preconfig
-  hmp: add exit_preconfig
-  hmp: Allow HMP in preconfig state again
-
-Igor Mammedov (1):
-  qmp: Enable a few commands in preconfig state
-
- hmp-commands-info.hx | 11 +++++++++++
- hmp-commands.hx      | 23 +++++++++++++++++++++++
- hmp.c                |  8 ++++++++
- hmp.h                |  1 +
- monitor.c            | 43 ++++++++++++++++++++++++++++++++++---------
- qapi/char.json       |  3 ++-
- qapi/misc.json       | 27 +++++++++++++++++----------
- 7 files changed, 96 insertions(+), 20 deletions(-)
-
+ ##
+ # @ChardevBackendInfo:
+diff --git a/qapi/misc.json b/qapi/misc.json
+index f83a63a0ab..fa86831ec3 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -117,7 +117,8 @@
+ #    }
+ #
+ ##
+-{ 'command': 'query-version', 'returns': 'VersionInfo' }
++{ 'command': 'query-version', 'returns': 'VersionInfo',
++  'allow-preconfig': true }
+ 
+ ##
+ # @CommandInfo:
+@@ -241,7 +242,7 @@
+ # <- { "return": { "name": "qemu-name" } }
+ #
+ ##
+-{ 'command': 'query-name', 'returns': 'NameInfo' }
++{ 'command': 'query-name', 'returns': 'NameInfo', 'allow-preconfig': true }
+ 
+ ##
+ # @KvmInfo:
+@@ -301,7 +302,7 @@
+ # <- { "return": { "UUID": "550e8400-e29b-41d4-a716-446655440000" } }
+ #
+ ##
+-{ 'command': 'query-uuid', 'returns': 'UuidInfo' }
++{ 'command': 'query-uuid', 'returns': 'UuidInfo', 'allow-preconfig': true }
+ 
+ ##
+ # @EventInfo:
+@@ -710,7 +711,8 @@
+ #    }
+ #
+ ##
+-{ 'command': 'query-iothreads', 'returns': ['IOThreadInfo'] }
++{ 'command': 'query-iothreads', 'returns': ['IOThreadInfo'],
++  'allow-preconfig': true }
+ 
+ ##
+ # @BalloonInfo:
+@@ -1408,7 +1410,8 @@
+ ##
+ { 'command': 'qom-list',
+   'data': { 'path': 'str' },
+-  'returns': [ 'ObjectPropertyInfo' ] }
++  'returns': [ 'ObjectPropertyInfo' ],
++  'allow-preconfig': true }
+ 
+ ##
+ # @qom-get:
+@@ -1444,7 +1447,8 @@
+ ##
+ { 'command': 'qom-get',
+   'data': { 'path': 'str', 'property': 'str' },
+-  'returns': 'any' }
++  'returns': 'any',
++  'allow-preconfig': true }
+ 
+ ##
+ # @qom-set:
+@@ -1461,7 +1465,8 @@
+ # Since: 1.2
+ ##
+ { 'command': 'qom-set',
+-  'data': { 'path': 'str', 'property': 'str', 'value': 'any' } }
++  'data': { 'path': 'str', 'property': 'str', 'value': 'any' },
++  'allow-preconfig': true }
+ 
+ ##
+ # @change:
+@@ -1543,7 +1548,8 @@
+ ##
+ { 'command': 'qom-list-types',
+   'data': { '*implements': 'str', '*abstract': 'bool' },
+-  'returns': [ 'ObjectTypeInfo' ] }
++  'returns': [ 'ObjectTypeInfo' ],
++  'allow-preconfig': true }
+ 
+ ##
+ # @device-list-properties:
+@@ -1581,7 +1587,8 @@
+ ##
+ { 'command': 'qom-list-properties',
+   'data': { 'typename': 'str'},
+-  'returns': [ 'ObjectPropertyInfo' ] }
++  'returns': [ 'ObjectPropertyInfo' ],
++  'allow-preconfig': true }
+ 
+ ##
+ # @xen-set-global-dirty-log:
+@@ -2902,7 +2909,7 @@
+ #    }
+ #
+ ##
+-{ 'command': 'query-memdev', 'returns': ['Memdev'] }
++{ 'command': 'query-memdev', 'returns': ['Memdev'], 'allow-preconfig': true }
+ 
+ ##
+ # @PCDIMMDeviceInfo:
 -- 
 2.17.1
