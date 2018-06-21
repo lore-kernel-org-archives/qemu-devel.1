@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fW4WM-00011t-TF
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:41:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1fW53a-0007Wz-Q3
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 15:15:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fW4WJ-0004bB-0e
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:41:26 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:39501)
+	(envelope-from <bounces@canonical.com>) id 1fW53X-00009n-K5
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 15:15:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fW4WI-0004b7-DU
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:41:22 -0400
-Received: by mail-wr0-x241.google.com with SMTP id w7-v6so4207748wrn.6
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 11:41:22 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 21 Jun 2018 19:41:16 +0100
-Message-Id: <20180621184116.910-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fW53X-00008X-Bs
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 15:15:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fW53W-0005wv-4N
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 19:15:42 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0DF682E80C9
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 19:15:42 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] blogposts: add post about the new check-tcg
- infrastructure
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 21 Jun 2018 19:03:32 -0000
+From: John Snow <1777969@bugs.launchpad.net>
+Reply-To: Bug 1777969 <1777969@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152954819319.7254.2594756503297361665.malonedeb@wampee.canonical.com>
+Message-Id: <152960781259.1873.12468861751819992514.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1777969] Re: Crash with UEFI, q35, AHCI,
+ and <= SystemRescueCD 4.3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,148 +38,167 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- _posts/2018-06-21-tcg-testing.md | 129 +++++++++++++++++++++++++++++++
- 1 file changed, 129 insertions(+)
- create mode 100644 _posts/2018-06-21-tcg-testing.md
+Hmm... Is this a stack size protection fault due to the hardening?
 
-diff --git a/_posts/2018-06-21-tcg-testing.md b/_posts/2018-06-21-tcg-testing.md
-new file mode 100644
-index 0000000..85abb7a
---- /dev/null
-+++ b/_posts/2018-06-21-tcg-testing.md
-@@ -0,0 +1,129 @@
-+---
-+layout: post
-+title:  "QEMU TCG Tests"
-+date:   2018-06-21 10:30:00:00 +0000
-+last_modified_at: 2018-06-21 10:30:00:00 +0000
-+author: Alex Bennée
-+categories: [testing, docker, compilation, tcg]
-+---
-+
-+Ever since I started working on QEMU there was a small directory
-+called tests/tcg that was in a perpetually broken state. It contains
-+tests that exercise QEMU's ability to work across architectures using
-+the power of the Tiny Code Generator. However as these tests needed to
-+be compiled for the *guest* architectures and not the *host*
-+architecture - known as cross-compiling - most developers never ran
-+them. As the tests were hardly ever built inevitably a certain amount
-+of bit-rot set in.
-+
-+# Cross Compilers
-+
-+In the old days cross-compilation setups were almost all hand-crafted
-+affairs which involved building versions of binutils, gcc and a basic
-+libc. If you couldn't get someone to give you a pre-built tarball it
-+was something you laboured through once and hopefully never had to
-+touch again. There were even dedicated scripts like crosstool-ng which
-+attempted to make the process of patching and configuring your
-+toolchain easier.
-+
-+While the distributions have improved their support for cross
-+compilers over the years there are still plenty of variations in how
-+they are deployed. It is hard for a project like QEMU which has to
-+build on a wide range of operating systems and architectures to
-+seamlessly use any given distributions compiler setup. However for
-+those with cross compilers to hand `configure` now accepts two
-+additional flags:
-+
-+    --cross-cc-$(ARCH)
-+    --cross-cc-flags-$(ARCH)
-+
-+With a compiler specified for each guest architecture you want to test
-+the build system can now build and run the tests. However for
-+developers that don't have cross compilers around they can now take
-+advantage of QEMU's docker images.
-+
-+# Enter Docker Containers
-+
-+If you work in IT you would be hard pressed not to have noticed the
-+hype around Docker and the concept of containerisation over the last
-+few years. Put simply containers allow you to define a known working
-+set of software that gets run in an isolated environment for a given
-+task. While this has many uses for QEMU it allows us to define build
-+environments that any developer can run without having to mess around
-+with their preferred host setup.
-+
-+Over the last few years QEMU's build system has been expanding the
-+number of docker images it supports. Most of this has been in service
-+of our CI testing such as [Patchew](https://patchew.org/QEMU/) and
-+[Shippable](https://app.shippable.com/github/qemu/qemu/dashboard) but
-+any developer with a docker setup can run the exact same images. For
-+example if you want to check your patches won't break when compiled on
-+a 32 bit ARM system you can run:
-+
-+    make docker-test-build@debian-armhf-cross J=n
-+
-+instead of tracking down a piece of ARM hardware to actually build on.
-+Run `make docker` in your source tree to see the range of builds and
-+tests it can support.
-+
-+# make check-tcg
-+
-+With the latest work [merged into
-+master](https://git.qemu.org/?p=qemu.git;a=commit;h=TODO) we can now
-+take advantage of both hand configured and docker based cross
-+compilers to build test cases for TCG again. To run the TCG tests
-+after you have built QEMU:
-+
-+    make check-tcg
-+
-+and the build system will build and run all the tests it can for your
-+configured targets.
-+
-+# Rules for tests/tcg
-+
-+So now we have the infrastructure in place to add new tests what rules
-+need to be followed to add new tests? 
-+
-+Well the first thing to note is currently all the tests are for
-+linux-user versions of QEMU. This means the tests are all currently
-+user-space tests that have access to the Linux syscall ABI.
-+
-+Another thing to note is the tests are standalone from the rest of the
-+QEMU test infrastructure. To keep things simple they are compiled as
-+standalone "static" binaries. As the cross-compilation setup can be
-+quite rudimentary for some of the rarer architectures we only compile
-+against a standard libc. There is no support for linking to other
-+libraries like for example glib. Thread and maths support is part of
-+glibc so shouldn't be a problem.
-+
-+Finally when writing new tests consider if it really is architecture
-+specific or can be added to `tests/tcg/multiarch`. The multiarch tests
-+are re-built for every supported architecture and should be the
-+default place for anything explicitly testing syscalls and other
-+common parts of the code base.
-+
-+# What's Next
-+
-+My hope with this work is we can start adding more tests to
-+systematically defend functionality in linux-user. In fact I hope the
-+first port of call to reproducing a crash would be writing a test case
-+that can be added to our growing library of tests.
-+
-+Another thing that needs sorting out is getting toolchains for all of
-+the less common architectures. The current work relies heavily on the
-+excellent work of the Debian toolchain team in making multiarch
-+aware cross compilers available in their distribution. However QEMU
-+supports a lot more architectures than QEMU, some only as system
-+emulations. In principle supporting them is as easy as adding another
-+docker recipe but it might be these recipes end up having to compile
-+the compilers from source.
-+
-+The `tests/tcg` directory still contains a number of source files we
-+don't build. Notably the cris, lm32, mips, openrisc and xtensa targets have
-+a set of tests that need a system emulator. Now we have the
-+infrastructure for compiling I hope we can get support for system
-+tests added fairly quickly. There will need to be some work to figure
-+out a nice common way to pass results back to the build-system. For
-+linux-user this is simple as all programs can simply return their exit
-+code however for system emulation this is a little more involved.
-+
--- 
-2.17.1
+We tried to fix the ATAPI recursion depth issue recently, but caused a
+regression that stops us from booting with SeaBIOS (maybe UEFI too?) and
+patches are pending to fix this, so sit tight and I'll have a git commit
+for you to try soon.
+
+--js
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1777969
+
+Title:
+  Crash with UEFI, q35, AHCI, and <=3D SystemRescueCD 4.3.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  I am getting a crash when booting <=3D SystemRescueCD 4.3.0 in UEFI mode
+  with q35 machine and from a AHCI device with qemu 2.11.1 and 2.12.0.
+  The crash doesn't occur if I compile with --enable-trace-
+  backends=3Dsimple or if I use virtio-scsi.  The original crash was
+  noticed on Gentoo with hardened gcc 6.4.0 and an Intel CPU, the test
+  system to reproduce the crash is on Gentoo with non-hardened gcc 5.4.0
+  and an Intel CPU.
+
+  OVMF version is from Gentoo: edk2-ovmf-2017_p20180211-bin.tar.xz
+
+  Here is the commands I have run on qemu 2.12.0 to reproduce the issue alt=
+hough it also crashes with accel=3Dkvm removed:
+  ./configure --target-list=3D"x86_64-softmmu"
+  make
+  qemu-system-x86_64 -nodefaults -machine q35,accel=3Dkvm -cpu qemu64 -driv=
+e if=3Dpflash,format=3Draw,unit=3D0,file=3D/usr/share/edk2-ovmf/OVMF_CODE.f=
+d,readonly=3Don -drive if=3Dpflash,format=3Draw,unit=3D1,file=3DOVMF_VARS.f=
+d -m 512 -drive file=3Dsystemrescuecd-x86-4.3.0.iso,if=3Dnone,id=3Dcdrom-sy=
+sresc,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Dcdrom-sysre=
+sc,bootindex=3D5 -device VGA -display gtk
+
+  Valgrind says "Bad permissions for mapped region at address
+  0x4C022FE0" for the crash.
+
+  Here is a backtrace from gdb:
+  Program received signal SIGSEGV, Segmentation fault.
+  0x00007f42dcbc5833 in malloc () from /lib64/libc.so.6
+  (gdb) bt
+  #0  0x00007f42dcbc5833 in malloc () from /lib64/libc.so.6
+  #1  0x00007f42e10117d9 in g_malloc () from /usr/lib64/libglib-2.0.so.0
+  #2  0x000055a3ff9def8f in qemu_aio_get (aiocb_info=3Daiocb_info@entry=3D0=
+x55a4001b39a0 <thread_pool_aiocb_info>, bs=3Dbs@entry=3D0x0, cb=3Dcb@entry=
+=3D0x55a3ff9dfe20 <thread_pool_co_cb>, opaque=3Dopaque@entry=3D0x7f42961e30=
+b0) at util/aiocb.c:33
+  #3  0x000055a3ff9e0249 in thread_pool_submit_aio (pool=3Dpool@entry=3D0x5=
+5a400c038d0, func=3Dfunc@entry=3D0x55a3ff956620 <aio_worker>, arg=3Darg@ent=
+ry=3D0x55a400bd30b0, cb=3Dcb@entry=3D0x55a3ff9dfe20 <thread_pool_co_cb>, =
+
+      opaque=3Dopaque@entry=3D0x7f42961e30b0) at util/thread-pool.c:251
+  #4  0x000055a3ff9e0423 in thread_pool_submit_co (pool=3D0x55a400c038d0, f=
+unc=3Dfunc@entry=3D0x55a3ff956620 <aio_worker>, arg=3Darg@entry=3D0x55a400b=
+d30b0) at util/thread-pool.c:289
+  #5  0x000055a3ff956b50 in paio_submit_co (bs=3D0x55a400bff180, fd=3D<opti=
+mized out>, offset=3D362702848, qiov=3D<optimized out>, bytes=3D2048, type=
+=3D1) at block/file-posix.c:1536
+  #6  0x000055a3ff95c82a in bdrv_driver_preadv (bs=3Dbs@entry=3D0x55a400bff=
+180, offset=3Doffset@entry=3D362702848, bytes=3Dbytes@entry=3D2048, qiov=3D=
+qiov@entry=3D0x7f42961e3650, flags=3D0) at block/io.c:924
+  #7  0x000055a3ff960154 in bdrv_aligned_preadv (child=3Dchild@entry=3D0x55=
+a400c03a20, req=3Dreq@entry=3D0x7f42961e32e0, offset=3Doffset@entry=3D36270=
+2848, bytes=3Dbytes@entry=3D2048, align=3Dalign@entry=3D1, qiov=3Dqiov@entr=
+y=3D0x7f42961e3650, flags=3D0)
+      at block/io.c:1228
+  #8  0x000055a3ff960434 in bdrv_co_preadv (child=3D0x55a400c03a20, offset=
+=3D362702848, bytes=3D2048, qiov=3D0x7f42961e3650, flags=3D0) at block/io.c=
+:1324
+  #9  0x000055a3ff95c82a in bdrv_driver_preadv (bs=3Dbs@entry=3D0x55a400bf8=
+e50, offset=3Doffset@entry=3D362702848, bytes=3Dbytes@entry=3D2048, qiov=3D=
+qiov@entry=3D0x7f42961e3650, flags=3D0) at block/io.c:924
+  #10 0x000055a3ff960154 in bdrv_aligned_preadv (child=3Dchild@entry=3D0x55=
+a400be92c0, req=3Dreq@entry=3D0x7f42961e3510, offset=3Doffset@entry=3D36270=
+2848, bytes=3Dbytes@entry=3D2048, align=3Dalign@entry=3D512, qiov=3Dqiov@en=
+try=3D0x7f42961e3650, flags=3D0)
+      at block/io.c:1228
+  #11 0x000055a3ff960434 in bdrv_co_preadv (child=3D0x55a400be92c0, offset=
+=3Doffset@entry=3D362702848, bytes=3Dbytes@entry=3D2048, qiov=3Dqiov@entry=
+=3D0x7f42961e3650, flags=3Dflags@entry=3D0) at block/io.c:1324
+  #12 0x000055a3ff94f4ce in blk_co_preadv (blk=3D0x55a400bf8ba0, offset=3D3=
+62702848, bytes=3D2048, qiov=3D0x7f42961e3650, flags=3D0) at block/block-ba=
+ckend.c:1158
+  #13 0x000055a3ff94f5ac in blk_read_entry (opaque=3D0x7f42961e3670) at blo=
+ck/block-backend.c:1206
+  #14 0x000055a3ff94e000 in blk_prw (blk=3D0x55a400bf8ba0, offset=3D3627028=
+48, buf=3D<optimized out>, bytes=3Dbytes@entry=3D2048, co_entry=3Dco_entry@=
+entry=3D0x55a3ff94f590 <blk_read_entry>, flags=3Dflags@entry=3D0) at block/=
+block-backend.c:1243
+  #15 0x000055a3ff94f076 in blk_pread (blk=3D<optimized out>, offset=3D<opt=
+imized out>, buf=3D<optimized out>, count=3Dcount@entry=3D2048) at block/bl=
+ock-backend.c:1409
+  #16 0x000055a3ff7d8b93 in cd_read_sector_sync (s=3D0x55a401a0faa0) at hw/=
+ide/atapi.c:124
+  #17 ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at hw/ide/atapi.c:269
+  #18 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #19 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #20 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #21 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #22 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #23 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #24 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #25 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #26 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #27 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #28 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #29 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #30 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #31 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #32 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #33 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #34 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #35 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #36 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #37 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #38 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #39 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #40 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #41 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #42 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #43 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #44 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #45 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1777969/+subscriptions
