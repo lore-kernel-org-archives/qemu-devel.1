@@ -1,21 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fW24c-0007rz-PT
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fW24c-0007s1-QE
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:04:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fW24X-0002C7-Mc
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fW24Y-0002CN-Qw
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:04:38 -0400
-References: <20180424101859.10239-1-david@redhat.com>
-	<7c046e3c-8752-87c5-f4ff-06ef56ef0128@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <c4c55b6f-8ac0-5001-776e-86c28b33142a@redhat.com>
-Date: Thu, 21 Jun 2018 18:04:29 +0200
+Received: from mail-qk0-x230.google.com ([2607:f8b0:400d:c09::230]:34744)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fW24Y-0002CE-KQ
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:04:34 -0400
+Received: by mail-qk0-x230.google.com with SMTP id q70-v6so2050681qke.1
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 09:04:34 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180621062605.941-1-alex.bennee@linaro.org>
+	<CAFEAcA8dug5h=NeMKt+8bz_X_r=FaeXz9oKr4QWxttpc5VmdsA@mail.gmail.com>
+	<87in6curdy.fsf@linaro.org>
+	<ccd49bcc-1a67-064e-7508-5c8bb723fd59@amsat.org>
+	<87h8lwuqb5.fsf@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <255aad62-c8b3-01e4-9c5f-e815ad6305df@amsat.org>
+Date: Thu, 21 Jun 2018 13:04:28 -0300
 MIME-Version: 1.0
-In-Reply-To: <7c046e3c-8752-87c5-f4ff-06ef56ef0128@de.ibm.com>
+In-Reply-To: <87h8lwuqb5.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] s390x: refactor reset/reipl handling
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL v2 00/57] add check-tcg and associated
+ machinery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,115 +39,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
 
-On 21.06.2018 17:49, Christian Borntraeger wrote:
->=20
->=20
-> On 04/24/2018 12:18 PM, David Hildenbrand wrote:
->> Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
->> not be the best idea. As pause_all_vcpus() temporarily drops the qemu
->> mutex, two parallel calls to pause_all_vcpus() can be active at a time=
-,
->> resulting in a deadlock. (either by two VCPUs or by the main thread an=
-d a
->> VCPU)
+On 06/21/2018 12:12 PM, Alex Bennée wrote:
+> 
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
+> 
+>> Hi Alex,
 >>
->> Let's handle it via the main loop instead, as suggested by Paolo. If w=
-e
->> would have two parallel reset requests by two different VCPUs at the
->> same time, the last one would win.
+>> On 06/21/2018 11:48 AM, Alex Bennée wrote:
+>>>
+>>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>>
+>>>> On 21 June 2018 at 07:25, Alex Bennée <alex.bennee@linaro.org> wrote:
+>>>>> The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a93b:
+>>>>>
+>>>>>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into staging (2018-06-20 09:51:30 +0100)
+>>>>>
+>>>>> are available in the Git repository at:
+>>>>>
+>>>>>   https://github.com/stsquad/qemu.git tags/pull-tcg-testing-revivial-210618-2
+>>>>>
+>>>>> for you to fetch changes up to 65b26da485540ffcc1c46c9a0898f01912ee6b7a:
+>>>>>
+>>>>>   .travis.yml: add check-tcg test (2018-06-20 22:13:39 +0100)
+>>>>>
+>>>>> ----------------------------------------------------------------
+>>>>> Add check-tcg machinary
+>>>>>
+>>>>> This restores the ability to run TCG smoke tests by using our docker
+>>>>> infrastructure to support cross building simple tests. It represents
+>>>>> the first step to making better cross-architecture testing available
+>>>>> straight from the source tree ;-)
+>>>>>
+>>>>> v2
+>>>>>   - fix quoting of target_compiler
+>>>>>   - make docker.py Py3 safe
+>>>>>   - tweak .travis.yml recipe
+>>>>>   - don't probe docker when HAVE_USER_DOCKER not set
+>>>>
+>>>> Weird build failure for linux/x86:
+>>>>
+>>>> make: Entering directory '/home/petmay01/linaro/qemu-for-merges/build/alldbg'
+
+This looks like an out-of-tree build.
+I suppose SRC_PATH=.../qemu-for-merges/
+
+>>>> Makefile:90: rules.mak: No such file or directory
+>>>> Makefile:439: tests/Makefile.include: No such file or directory
+>>>> cat: VERSION: No such file or directory
+>>>> Makefile:1056: tests/docker/Makefile.include: No such file or directory
+>>>> Makefile:1057: tests/vm/Makefile.include: No such file or directory
+>>>> make: Leaving directory '/home/petmay01/linaro/qemu-for-merges/build/alldbg'
+>>>> make: *** No rule to make target 'tests/vm/Makefile.include'. Stop.
+>>>>
+>>>> like it's failed to figure out the source directory.
+>>>>
+>>>> This is my '--cc=ccache gcc' '--enable-debug' '--python=python3'
+>>>> build, and it's also the one I do a 'make clean' on -- perhaps
+>>>> build from clean has broken?
+>>>
+>>> Hmm I can't reproduce this. I've built a fresh 16.04 server image with
+>>> and with:
+>>>
+>>>   # Configured with: './configure' '--cc=ccache gcc' '--enable-debug' '--python=python3'
+>>>
+>>> both:
+>>>   make
+>>>
+>>> and:
+>>>   make check-tcg
+>>>
+>>> Work for me :-/
 >>
->> We use the existing ipl device to handle it. The nice side effect is
->> that we can get rid of reipl_requested.
->>
->> This change implies that all reset handling now goes via the common
->> path, so "no-reboot" handling is now active for all kinds of reboots.
->=20
-> Ok, this breaks the s390 IPL process when -no-reboot  is specified.
-> The bios does a diagnose 308 subcode 1 to jump to the final image while
-> at the same time resetting all devices. This is now blocked with -no-re=
-boot
-> (although it is actually the boot)
+>> Did you try rebuilding after a 'make clean'?
+> 
+> Yep, both make clean, configure, make and make clean, make
 
-Indeed, one corner case I missed, thanks for looking into it.
+I can not reproduce neither using out-of-tree build with
+../../configure '--cc=ccache gcc' '--enable-debug' '--python=python3'
 
-I wonder if we could turn that into a allow "one
-S390_RESET_MODIFIED_CLEAR ignoring -no-reboot" if booting from bios
-using a simple flag.
+I'll now test:
 
-Then s/SHUTDOWN_CAUSE_GUEST_RESET/SHUTDOWN_CAUSE_BIOS_RESET/
-
->=20
->=20
-> I have noticed that with virt-install on iso images since virt-install
-> specifies -no-reboot.
->=20
-> Something like this seems to help but it is not a nice solution.
->=20
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 0d67349004..7b32698eaa 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -534,8 +534,14 @@ void s390_ipl_reset_request(CPUState *cs, enum s39=
-0_reset reset_type)
->               */
->              ipl->iplb_valid =3D s390_gen_initial_iplb(ipl);
->          }
-> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-> +    } else  if (reset_type =3D=3D S390_RESET_MODIFIED_CLEAR ||
-> +                reset_type =3D=3D S390_RESET_LOAD_NORMAL) {
-> +	/* ignore -no-reboot */
-> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET_FORCE);
-> +    } else {
-> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->      }
-> -    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->      /* as this is triggered by a CPU, make sure to exit the loop */
->      if (tcg_enabled()) {
->          cpu_loop_exit(cs);
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index e893f72f3b..e9b11fd6cb 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -44,6 +44,9 @@ typedef enum ShutdownCause {
->                                       turns that into a shutdown */
->      SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line =
-turns
->                                       that into a shutdown */
-> +    SHUTDOWN_CAUSE_GUEST_RESET_FORCE,/* Guest reset that should ignore=
- --no-reboot
-> +                                     useful for the subsystem resets o=
-n s390 done
-> +                                     for kdump and kexec */
-
-I don't think it is that ugly.
-
->      SHUTDOWN_CAUSE__MAX,
->  } ShutdownCause;
-> =20
-> diff --git a/vl.c b/vl.c
-> index b3426e03d0..18f379e833 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1674,7 +1674,9 @@ void qemu_system_guest_panicked(GuestPanicInforma=
-tion *info)
-> =20
->  void qemu_system_reset_request(ShutdownCause reason)
->  {
-> -    if (no_reboot) {
-> +    if (reason =3D=3D SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
-> +	    reset_requested =3D SHUTDOWN_CAUSE_GUEST_RESET;
-> +    } else if (no_reboot) {
->          shutdown_requested =3D reason;
->      } else {
->          reset_requested =3D reason;
->=20
-
-
---=20
-
-Thanks,
-
-David / dhildenb
+$ git checkout master
+$ make clean
+$ git checkout pull-tcg-testing-revivial-210618-2
+$ make check-tcg
