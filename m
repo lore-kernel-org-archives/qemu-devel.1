@@ -1,29 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fVz0V-0005kR-5U
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:48:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1fVz28-0006Ul-2S
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:49:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fVz0U-0003d1-D5
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:48:11 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:43066)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fVz0U-0003c2-6A
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:48:10 -0400
-Received: by mail-wr0-x234.google.com with SMTP id d2-v6so3050578wrm.10
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 05:48:10 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180621123320.GA19274@debian>
-References: <20180618161729.334-1-marcandre.lureau@redhat.com>
-	<20180618161729.334-5-marcandre.lureau@redhat.com>
-	<20180621123320.GA19274@debian>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 21 Jun 2018 14:48:08 +0200
-Message-ID: <CAJ+F1CKPbdXx5sAA1ershQ_YeSOupocjfZsFWqha8-7ObkvUTg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 04/26] vhost-user: simplify
- vhost_user_init/vhost_user_cleanup
+	(envelope-from <eblake@redhat.com>) id 1fVz27-0004LO-8R
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:49:52 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Thu, 21 Jun 2018 07:49:37 -0500
+Message-Id: <20180621124937.166549-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH] nbd/server: Reject 0-length block status
+ request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +18,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Jun 21, 2018 at 2:33 PM, Tiwei Bie <tiwei.bie@intel.com> wrote:
-> On Mon, Jun 18, 2018 at 06:17:07PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> [...]
->> diff --git a/hw/virtio/vhost-stub.c b/hw/virtio/vhost-stub.c
->> index 049089b5e2..323dfcc46a 100644
->> --- a/hw/virtio/vhost-stub.c
->> +++ b/hw/virtio/vhost-stub.c
->> @@ -7,7 +7,7 @@ bool vhost_has_free_slot(void)
->>      return true;
->>  }
->>
->> -VhostUserState *vhost_user_init(void)
->> +bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **er=
-rp)
->>  {
->>      return NULL;
->
-> It would be better to return false.
->
+The NBD spec says that behavior is unspecified if the client
+requests 0 length for block status; but since the structured
+reply is documenting as returning a non-zero length, it's
+easier to just diagnose this with an EINVAL error than to
+figure out what to return.
 
-Good catch, fixed.
+CC: qemu-stable@nongnu.org
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
+ nbd/server.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Except that, would you give a reviewed-by?
+diff --git a/nbd/server.c b/nbd/server.c
+index 9e1f2271784..493a926e063 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -2007,6 +2007,10 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+                                       "discard failed", errp);
 
-> Best regards,
-> Tiwei Bie
->
->>  }
-> [...]
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+     case NBD_CMD_BLOCK_STATUS:
++        if (!request->len) {
++            return nbd_send_generic_reply(client, request->handle, -EINVAL,
++                                          "need non-zero length", errp);
++        }
+         if (client->export_meta.valid && client->export_meta.base_allocation) {
+             return nbd_co_send_block_status(client, request->handle,
+                                             blk_bs(exp->blk), request->from,
+-- 
+2.14.4
