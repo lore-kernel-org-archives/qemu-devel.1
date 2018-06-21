@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fW4C4-0003pJ-0g
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:20:29 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fW4I7-00051e-57
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:26:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fW4C0-00044K-SS
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:20:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60962 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fW4C0-00043S-OH
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:20:24 -0400
-Date: Thu, 21 Jun 2018 21:20:13 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180621211712-mutt-send-email-mst@kernel.org>
-References: <CADGSJ23WnTmVKHezm3t0V6M2sWeHaOUoTjdXkmrvbO0EF83hMg@mail.gmail.com>
-	<20180615134815.6613620e.cohuck@redhat.com>
-	<CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
-	<20180619125453.2d2dfb2d.cohuck@redhat.com>
-	<20180619233001-mutt-send-email-mst@kernel.org>
-	<20180620115359.1a3bf6fb.cohuck@redhat.com>
-	<20180620170904-mutt-send-email-mst@kernel.org>
-	<20180620180619.6b4ee52d.cohuck@redhat.com>
-	<20180620224535-mutt-send-email-mst@kernel.org>
-	<20180621165913.7e3f4faa.cohuck@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fW4I6-00073G-4I
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:26:43 -0400
+References: <20180612172614.60107-1-vsementsov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <b19ef4df-7280-27ca-cd82-c4de9297a335@virtuozzo.com>
+Date: Thu, 21 Jun 2018 21:26:29 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180621165913.7e3f4faa.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+In-Reply-To: <20180612172614.60107-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: [Qemu-devel] drop Re: [PATCH] block/qcow2: fix logic around
+ dirty_bitmaps_loaded
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,44 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
 
-On Thu, Jun 21, 2018 at 04:59:13PM +0200, Cornelia Huck wrote:
-> On Wed, 20 Jun 2018 22:48:58 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> 
-> > On Wed, Jun 20, 2018 at 06:06:19PM +0200, Cornelia Huck wrote:
-> > > In any case, I'm not sure anymore why we'd want the extra uuid.  
-> > 
-> > It's mostly so we can have e.g. multiple devices with same MAC
-> > (which some people seem to want in order to then use
-> > then with different containers).
-> > 
-> > But it is also handy for when you assign a PF, since then you
-> > can't set the MAC.
-> > 
-> 
-> OK, so what about the following:
-> 
-> - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
->   that we have a new uuid field in the virtio-net config space
-> - in QEMU, add a property for virtio-net that allows to specify a uuid,
->   offer VIRTIO_NET_F_STANDBY_UUID if set
-> - when configuring, set the property to the group UUID of the vfio-pci
->   device
-> - in the guest, use the uuid from the virtio-net device's config space
->   if applicable; else, fall back to matching by MAC as done today
-> 
-> That should work for all virtio transports.
+12.06.2018 20:26, Vladimir Sementsov-Ogievskiy wrote:
+> First: this variable was introduced to handle reopens. We need it on
+> following qcow2_do_open, to don't try loading bitmaps again. So, we are
+> fixing qcow2_invalidate_cache().
+>
+> However, if we fix only qcow2_invalidate_cache, iotest 169 fails on
+> case test__persistent__not_migbitmap__online_shared, because on first
+> target open, source is not yet closed, and is not yet stored bitmaps,
+> so, we are load nothing. And on second open, dirty_bitmaps_loaded is
+> already true, but we have no bitmaps to reopen with
+> qcow2_reopen_bitmaps_rw_hint(). So, we are fixing qcow2_do_open() too.
+>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>   block/qcow2.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 6fa5e1d71a..b4216a5830 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1499,7 +1499,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
+>           {
+>               qcow2_reopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
+>           }
+> -    } else {
+> +    } else if (s->nb_bitmaps > 0) {
+>           header_updated = qcow2_load_dirty_bitmaps(bs, &local_err);
+>           s->dirty_bitmaps_loaded = true;
+>       }
+> @@ -2178,6 +2178,7 @@ static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
+>       QDict *options;
+>       Error *local_err = NULL;
+>       int ret;
+> +    bool dirty_bitmaps_loaded = s->dirty_bitmaps_loaded;
+>   
+>       /*
+>        * Backing files are read-only which makes all of their metadata immutable,
+> @@ -2190,6 +2191,7 @@ static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
+>       qcow2_close(bs);
+>   
+>       memset(s, 0, sizeof(BDRVQcow2State));
+> +    s->dirty_bitmaps_loaded = dirty_bitmaps_loaded;
+>       options = qdict_clone_shallow(bs->options);
+>   
+>       flags &= ~BDRV_O_INACTIVE;
 
-True. I'm a bit unhappy that it's virtio net specific though
-since down the road I expect we'll have a very similar feature
-for scsi (and maybe others).
-
-But we do not have a way to have fields that are portable
-both across devices and transports, and I think it would
-be a useful addition. How would this work though? Any idea?
+Drop this, I'll resend better patch.
 
 -- 
-MST
+Best regards,
+Vladimir
