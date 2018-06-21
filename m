@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fVoo5-0004YX-G9
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fVoo9-0004bI-21
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fVoo4-0003DL-9U
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:41 -0400
-Received: from mail-pg0-x22e.google.com ([2607:f8b0:400e:c05::22e]:34589)
+	(envelope-from <richard.henderson@linaro.org>) id 1fVoo8-0003I8-18
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:45 -0400
+Received: from mail-pl0-x22f.google.com ([2607:f8b0:400e:c01::22f]:38072)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fVoo4-0003Cz-0x
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:40 -0400
-Received: by mail-pg0-x22e.google.com with SMTP id q4-v6so650289pgr.1
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 18:54:39 -0700 (PDT)
+	id 1fVoo7-0003Hl-PM
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:43 -0400
+Received: by mail-pl0-x22f.google.com with SMTP id d10-v6so757627plo.5
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 18:54:43 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 20 Jun 2018 15:53:42 -1000
-Message-Id: <20180621015359.12018-19-richard.henderson@linaro.org>
+Date: Wed, 20 Jun 2018 15:53:44 -1000
+Message-Id: <20180621015359.12018-21-richard.henderson@linaro.org>
 In-Reply-To: <20180621015359.12018-1-richard.henderson@linaro.org>
 References: <20180621015359.12018-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v5 18/35] target/arm: Implement SVE Floating
- Point Multiply Indexed Group
+Subject: [Qemu-devel] [PATCH v5 20/35] target/arm: Implement SVE Floating
+ Point Unary Operations - Unpredicated Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +32,82 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper.h        | 14 +++++++++++
- target/arm/translate-sve.c | 50 ++++++++++++++++++++++++++++++++++++++
- target/arm/vec_helper.c    | 48 ++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      | 19 +++++++++++++++
- 4 files changed, 131 insertions(+)
+ target/arm/helper.h        |  8 +++++++
+ target/arm/translate-sve.c | 47 ++++++++++++++++++++++++++++++++++++++
+ target/arm/vec_helper.c    | 20 ++++++++++++++++
+ target/arm/sve.decode      |  5 ++++
+ 4 files changed, 80 insertions(+)
 
 diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 879a7229e9..56439ac1e4 100644
+index 56439ac1e4..ad9cb6c7d5 100644
 --- a/target/arm/helper.h
 +++ b/target/arm/helper.h
-@@ -620,6 +620,20 @@ DEF_HELPER_FLAGS_5(gvec_ftsmul_s, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(gvec_ftsmul_d, TCG_CALL_NO_RWG,
+@@ -601,6 +601,14 @@ DEF_HELPER_FLAGS_5(gvec_fcmlas_idx, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(gvec_fcmlad, TCG_CALL_NO_RWG,
                     void, ptr, ptr, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_5(gvec_fmul_idx_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fmul_idx_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fmul_idx_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_frecpe_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_frecpe_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_frecpe_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_6(gvec_fmla_idx_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(gvec_fmla_idx_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_6(gvec_fmla_idx_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_frsqrte_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_frsqrte_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(gvec_frsqrte_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 +
- #ifdef TARGET_AARCH64
- #include "helper-a64.h"
- #include "helper-sve.h"
+ DEF_HELPER_FLAGS_5(gvec_fadd_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(gvec_fadd_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_5(gvec_fadd_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 12cfadf4e9..e4ba84cadd 100644
+index 47d64f2fc7..d7957cddbd 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -3400,6 +3400,56 @@ DO_ZZI(UMIN, umin)
- 
- #undef DO_ZZI
+@@ -3507,6 +3507,53 @@ DO_VPZ(FMAXNMV, fmaxnmv)
+ DO_VPZ(FMINV, fminv)
+ DO_VPZ(FMAXV, fmaxv)
  
 +/*
-+ *** SVE Floating Point Multiply-Add Indexed Group
++ *** SVE Floating Point Unary Operations - Unpredicated Group
 + */
 +
-+static bool trans_FMLA_zzxz(DisasContext *s, arg_FMLA_zzxz *a, uint32_t insn)
++static void do_zz_fp(DisasContext *s, arg_rr_esz *a, gen_helper_gvec_2_ptr *fn)
 +{
-+    static gen_helper_gvec_4_ptr * const fns[3] = {
-+        gen_helper_gvec_fmla_idx_h,
-+        gen_helper_gvec_fmla_idx_s,
-+        gen_helper_gvec_fmla_idx_d,
-+    };
++    unsigned vsz = vec_full_reg_size(s);
++    TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
 +
++    tcg_gen_gvec_2_ptr(vec_full_reg_offset(s, a->rd),
++                       vec_full_reg_offset(s, a->rn),
++                       status, vsz, vsz, 0, fn);
++    tcg_temp_free_ptr(status);
++}
++
++static bool trans_FRECPE(DisasContext *s, arg_rr_esz *a, uint32_t insn)
++{
++    static gen_helper_gvec_2_ptr * const fns[3] = {
++        gen_helper_gvec_frecpe_h,
++        gen_helper_gvec_frecpe_s,
++        gen_helper_gvec_frecpe_d,
++    };
++    if (a->esz == 0) {
++        return false;
++    }
 +    if (sve_access_check(s)) {
-+        unsigned vsz = vec_full_reg_size(s);
-+        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
-+        tcg_gen_gvec_4_ptr(vec_full_reg_offset(s, a->rd),
-+                           vec_full_reg_offset(s, a->rn),
-+                           vec_full_reg_offset(s, a->rm),
-+                           vec_full_reg_offset(s, a->ra),
-+                           status, vsz, vsz, a->index * 2 + a->sub,
-+                           fns[a->esz - 1]);
-+        tcg_temp_free_ptr(status);
++        do_zz_fp(s, a, fns[a->esz - 1]);
 +    }
 +    return true;
 +}
 +
-+/*
-+ *** SVE Floating Point Multiply Indexed Group
-+ */
-+
-+static bool trans_FMUL_zzx(DisasContext *s, arg_FMUL_zzx *a, uint32_t insn)
++static bool trans_FRSQRTE(DisasContext *s, arg_rr_esz *a, uint32_t insn)
 +{
-+    static gen_helper_gvec_3_ptr * const fns[3] = {
-+        gen_helper_gvec_fmul_idx_h,
-+        gen_helper_gvec_fmul_idx_s,
-+        gen_helper_gvec_fmul_idx_d,
++    static gen_helper_gvec_2_ptr * const fns[3] = {
++        gen_helper_gvec_frsqrte_h,
++        gen_helper_gvec_frsqrte_s,
++        gen_helper_gvec_frsqrte_d,
 +    };
-+
++    if (a->esz == 0) {
++        return false;
++    }
 +    if (sve_access_check(s)) {
-+        unsigned vsz = vec_full_reg_size(s);
-+        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
-+        tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, a->rd),
-+                           vec_full_reg_offset(s, a->rn),
-+                           vec_full_reg_offset(s, a->rm),
-+                           status, vsz, vsz, a->index, fns[a->esz - 1]);
-+        tcg_temp_free_ptr(status);
++        do_zz_fp(s, a, fns[a->esz - 1]);
 +    }
 +    return true;
 +}
@@ -125,94 +116,48 @@ index 12cfadf4e9..e4ba84cadd 100644
   *** SVE Floating Point Accumulating Reduction Group
   */
 diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-index f504dd53c8..97af75a61b 100644
+index 97af75a61b..073e5c58e7 100644
 --- a/target/arm/vec_helper.c
 +++ b/target/arm/vec_helper.c
-@@ -495,3 +495,51 @@ DO_3OP(gvec_rsqrts_d, helper_rsqrtsf_f64, float64)
+@@ -427,6 +427,26 @@ void HELPER(gvec_fcmlad)(void *vd, void *vn, void *vm,
+     clear_tail(d, opr_sz, simd_maxsz(desc));
+ }
  
- #endif
- #undef DO_3OP
-+
-+/* For the indexed ops, SVE applies the index per 128-bit vector segment.
-+ * For AdvSIMD, there is of course only one such vector segment.
-+ */
-+
-+#define DO_MUL_IDX(NAME, TYPE, H) \
-+void HELPER(NAME)(void *vd, void *vn, void *vm, void *stat, uint32_t desc) \
-+{                                                                          \
-+    intptr_t i, j, oprsz = simd_oprsz(desc), segment = 16 / sizeof(TYPE);  \
-+    intptr_t idx = simd_data(desc);                                        \
-+    TYPE *d = vd, *n = vn, *m = vm;                                        \
-+    for (i = 0; i < oprsz / sizeof(TYPE); i += segment) {                  \
-+        TYPE mm = m[H(i + idx)];                                           \
-+        for (j = 0; j < segment; j++) {                                    \
-+            d[i + j] = TYPE##_mul(n[i + j], mm, stat);                     \
-+        }                                                                  \
-+    }                                                                      \
++#define DO_2OP(NAME, FUNC, TYPE) \
++void HELPER(NAME)(void *vd, void *vn, void *stat, uint32_t desc)  \
++{                                                                 \
++    intptr_t i, oprsz = simd_oprsz(desc);                         \
++    TYPE *d = vd, *n = vn;                                        \
++    for (i = 0; i < oprsz / sizeof(TYPE); i++) {                  \
++        d[i] = FUNC(n[i], stat);                                  \
++    }                                                             \
 +}
 +
-+DO_MUL_IDX(gvec_fmul_idx_h, float16, H2)
-+DO_MUL_IDX(gvec_fmul_idx_s, float32, H4)
-+DO_MUL_IDX(gvec_fmul_idx_d, float64, )
++DO_2OP(gvec_frecpe_h, helper_recpe_f16, float16)
++DO_2OP(gvec_frecpe_s, helper_recpe_f32, float32)
++DO_2OP(gvec_frecpe_d, helper_recpe_f64, float64)
 +
-+#undef DO_MUL_IDX
++DO_2OP(gvec_frsqrte_h, helper_rsqrte_f16, float16)
++DO_2OP(gvec_frsqrte_s, helper_rsqrte_f32, float32)
++DO_2OP(gvec_frsqrte_d, helper_rsqrte_f64, float64)
 +
-+#define DO_FMLA_IDX(NAME, TYPE, H)                                         \
-+void HELPER(NAME)(void *vd, void *vn, void *vm, void *va,                  \
-+                  void *stat, uint32_t desc)                               \
-+{                                                                          \
-+    intptr_t i, j, oprsz = simd_oprsz(desc), segment = 16 / sizeof(TYPE);  \
-+    TYPE op1_neg = extract32(desc, SIMD_DATA_SHIFT, 1);                    \
-+    intptr_t idx = desc >> (SIMD_DATA_SHIFT + 1);                          \
-+    TYPE *d = vd, *n = vn, *m = vm, *a = va;                               \
-+    op1_neg <<= (8 * sizeof(TYPE) - 1);                                    \
-+    for (i = 0; i < oprsz / sizeof(TYPE); i += segment) {                  \
-+        TYPE mm = m[H(i + idx)];                                           \
-+        for (j = 0; j < segment; j++) {                                    \
-+            d[i + j] = TYPE##_muladd(n[i + j] ^ op1_neg,                   \
-+                                     mm, a[i + j], 0, stat);               \
-+        }                                                                  \
-+    }                                                                      \
-+}
++#undef DO_2OP
 +
-+DO_FMLA_IDX(gvec_fmla_idx_h, float16, H2)
-+DO_FMLA_IDX(gvec_fmla_idx_s, float32, H4)
-+DO_FMLA_IDX(gvec_fmla_idx_d, float64, )
-+
-+#undef DO_FMLA_IDX
+ /* Floating-point trigonometric starting value.
+  * See the ARM ARM pseudocode function FPTrigSMul.
+  */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 0068e415ac..f64e74fa9d 100644
+index 39a803621f..191be9463d 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -29,6 +29,7 @@
- %imm9_16_10     16:s6 10:3
- %size_23        23:2
- %dtype_23_13    23:2 13:2
-+%index3_22_19   22:1 19:2
+@@ -739,6 +739,11 @@ FMINNMV         01100101 .. 000 101 001 ... ..... .....         @rd_pg_rn
+ FMAXV           01100101 .. 000 110 001 ... ..... .....         @rd_pg_rn
+ FMINV           01100101 .. 000 111 001 ... ..... .....         @rd_pg_rn
  
- # A combination of tsz:imm3 -- extract esize.
- %tszimm_esz     22:2 5:5 !function=tszimm_esz
-@@ -712,6 +713,24 @@ UMIN_zzi        00100101 .. 101 011 110 ........ .....          @rdn_i8u
- # SVE integer multiply immediate (unpredicated)
- MUL_zzi         00100101 .. 110 000 110 ........ .....          @rdn_i8s
- 
-+### SVE FP Multiply-Add Indexed Group
++## SVE Floating Point Unary Operations - Unpredicated Group
 +
-+# SVE floating-point multiply-add (indexed)
-+FMLA_zzxz       01100100 0.1 .. rm:3 00000 sub:1 rn:5 rd:5 \
-+                ra=%reg_movprfx index=%index3_22_19 esz=1
-+FMLA_zzxz       01100100 101 index:2 rm:3 00000 sub:1 rn:5 rd:5 \
-+                ra=%reg_movprfx esz=2
-+FMLA_zzxz       01100100 111 index:1 rm:4 00000 sub:1 rn:5 rd:5 \
-+                ra=%reg_movprfx esz=3
-+
-+### SVE FP Multiply Indexed Group
-+
-+# SVE floating-point multiply (indexed)
-+FMUL_zzx        01100100 0.1 .. rm:3 001000 rn:5 rd:5 \
-+                index=%index3_22_19 esz=1
-+FMUL_zzx        01100100 101 index:2 rm:3 001000 rn:5 rd:5      esz=2
-+FMUL_zzx        01100100 111 index:1 rm:4 001000 rn:5 rd:5      esz=3
++FRECPE          01100101 .. 001 110 001100 ..... .....          @rd_rn
++FRSQRTE         01100101 .. 001 111 001100 ..... .....          @rd_rn
 +
  ### SVE FP Accumulating Reduction Group
  
