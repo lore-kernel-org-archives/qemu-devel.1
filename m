@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVt8R-0005hQ-U6
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:00 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fVt8X-0005lh-En
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVt8R-0003lo-2R
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:31:59 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:34393)
+	(envelope-from <alex.bennee@linaro.org>) id 1fVt8V-0003sW-AX
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:05 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:40837)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fVt8Q-0003l3-Rd
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:31:58 -0400
-Received: by mail-wr0-x242.google.com with SMTP id a12-v6so1855564wro.1
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:31:58 -0700 (PDT)
+	id 1fVt8V-0003rF-42
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:03 -0400
+Received: by mail-wr0-x241.google.com with SMTP id g18-v6so1831950wro.7
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:32:02 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 21 Jun 2018 07:25:59 +0100
-Message-Id: <20180621062605.941-52-alex.bennee@linaro.org>
+Date: Thu, 21 Jun 2018 07:25:33 +0100
+Message-Id: <20180621062605.941-26-alex.bennee@linaro.org>
 In-Reply-To: <20180621062605.941-1-alex.bennee@linaro.org>
 References: <20180621062605.941-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 51/57] docker: docker.py use "version" to
- probe usage
+Subject: [Qemu-devel] [PULL v2 25/57] tests/tcg/arm: fix up test-arm-iwmmxt
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,28 +31,41 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-The "images" command is a fairly heavyweight command to run as it
-involves searching the whole docker file-system inventory. On a
-machine with a lot of images this makes start-up fairly expensive.
+We need to rename the source file to a .S so we can do a single-line
+assemble and link invocation. We also specify the additional CFLAGS
+for the compile as it's a non-standard ARM binary.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+[rth: force fpu configuration]
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index b28ad87034..e6437d64a7 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -52,7 +52,9 @@ def _guess_docker_command():
-     commands = [["docker"], ["sudo", "-n", "docker"]]
-     for cmd in commands:
-         try:
--            if subprocess.call(cmd + ["images"],
-+            # docker version will return the client details in stdout
-+            # but still report a status of 1 if it can't contact the daemon
-+            if subprocess.call(cmd + ["version"],
-                                stdout=DEVNULL, stderr=DEVNULL) == 0:
-                 return cmd
-         except OSError:
+diff --git a/tests/tcg/arm/Makefile.target b/tests/tcg/arm/Makefile.target
+index 0312293dca..cadb385890 100644
+--- a/tests/tcg/arm/Makefile.target
++++ b/tests/tcg/arm/Makefile.target
+@@ -8,9 +8,14 @@ ARM_SRC=$(SRC_PATH)/tests/tcg/arm
+ # Set search path for all sources
+ VPATH 		+= $(ARM_SRC)
+ 
++TESTS += hello-arm test-arm-iwmmxt
+ 
+ hello-arm: CFLAGS+=-marm -ffreestanding
+ hello-arm: LDFLAGS+=-nostdlib
+ 
++test-arm-iwmmxt: CFLAGS+=-marm -march=iwmmxt -mabi=aapcs -mfpu=fpv4-sp-d16
++test-arm-iwmmxt: test-arm-iwmmxt.S
++	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
++
+ # On ARM Linux only supports 4k pages
+ EXTRA_RUNS+=run-test-mmap-4096
+diff --git a/tests/tcg/arm/test-arm-iwmmxt.s b/tests/tcg/arm/test-arm-iwmmxt.S
+similarity index 100%
+rename from tests/tcg/arm/test-arm-iwmmxt.s
+rename to tests/tcg/arm/test-arm-iwmmxt.S
 -- 
 2.17.1
