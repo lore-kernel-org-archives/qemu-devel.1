@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fVxm0-0002or-N2
+	(envelope-from <dgibson@ozlabs.org>) id 1fVxm0-0002os-O6
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:29:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fVxlz-0008Fd-2U
+	(envelope-from <dgibson@ozlabs.org>) id 1fVxlz-0008Fr-5e
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:29:08 -0400
-Date: Thu, 21 Jun 2018 21:00:47 +1000
+Date: Thu, 21 Jun 2018 21:01:55 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180621110047.GG32328@umbus.fritz.box>
+Message-ID: <20180621110155.GH32328@umbus.fritz.box>
 References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
 	<20180618063606.2513-6-david@gibson.dropbear.id.au>
-	<4dd7753b-f0a4-1f79-2acc-9fa037b40860@kaod.org>
+	<20180621111941.5a3f68cc@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rV8arf8D5Dod9UkK"
+	protocol="application/pgp-signature"; boundary="tT3UgwmDxwvOMqfu"
 Content-Disposition: inline
-In-Reply-To: <4dd7753b-f0a4-1f79-2acc-9fa037b40860@kaod.org>
+In-Reply-To: <20180621111941.5a3f68cc@bahia.lan>
 Subject: Re: [Qemu-devel] [PATCH 5/9] spapr: Maximum (HPT) pagesize property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,17 +25,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: groug@kaod.org, abologna@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
+To: Greg Kurz <groug@kaod.org>
+Cc: abologna@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
 
---rV8arf8D5Dod9UkK
-Content-Type: text/plain; charset=iso-8859-1
+--tT3UgwmDxwvOMqfu
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 21, 2018 at 08:22:15AM +0200, C=E9dric Le Goater wrote:
-> On 06/18/2018 08:36 AM, David Gibson wrote:
+On Thu, Jun 21, 2018 at 11:19:41AM +0200, Greg Kurz wrote:
+> On Mon, 18 Jun 2018 16:36:02 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
 > > The way the POWER Hash Page Table (HPT) MMU is virtualized by KVM HV me=
 ans
 > > that every page that the guest puts in the pagetables must be truly
@@ -57,8 +59,16 @@ tion
 ries
 > > machine type which gives the maximum allowed pagesizes for an HPT guest=
  (as
-> > a shift).  For now we just create and validate the parameter without ma=
-king
+> > a shift).
+>=20
+> Maybe you can mention that it is exposed to the user as a genuine pagesiz=
+e,
+> not a shift, because it is a friendlier interface.
+
+Oops, I fixed most of the shift references in the commit messages, but
+missed this one.  I removed the "as a shift" text.
+
+> > For now we just create and validate the parameter without making
 > > it do anything.
 > >=20
 > > For backwards compatibility, on older machine types we set it to the max
@@ -67,27 +77,12 @@ to
 > > 16, the intention being to only allow HPT pagesizes up to 64kiB by defa=
 ult
 > > in future.
->=20
-> Why not do it now ?
-
-Uh.. do what now.  Essentially this *is* doing it now, except that we
-don't have the mechanism to actually enforce it until a couple of
-patches further in.
-
-> I don't think the pseries machine supports 4k pages
-> anyway. so you could change the warn_report() below in an error I think.
-
-Uh.. I think pseries does technically still support 4k pages.
-Although it might not have been much tested recently, since none of
-the distros configure it that way.
-
+> >=20
 > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->=20
-> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> C.
->=20
 > > ---
+>=20
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>=20
 > >  hw/ppc/spapr.c         | 12 +++++++++
 > >  hw/ppc/spapr_caps.c    | 56 ++++++++++++++++++++++++++++++++++++++++++
 > >  include/hw/ppc/spapr.h |  4 ++-
@@ -247,7 +242,6 @@ r,
 > > =20
 > >  /*
 > >   * Capability Values
-> >=20
 >=20
 
 --=20
@@ -256,24 +250,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---rV8arf8D5Dod9UkK
+--tT3UgwmDxwvOMqfu
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsrhV0ACgkQbDjKyiDZ
-s5JcMQ/+Kmk7CDYWhF4FBDoJAdSKH42UoFu0n8OLPsXF/LC6uavndWO5VHmWLpKs
-Wno2Vxl6x+8KKDDaC+d5Y1u1bIQUImaQQaDvBGj0SV4Rkvtv7SxLlQEPtH/c6Xlt
-3TrtVkLjDAjSshPT1AWKajRQhBHosd5690KsH6a9dcvG9ZHjCxYxvOI2goJsaQPK
-n6RDfpCzB+TTp6hyitm4CYvbFu+8hkc8/p/jaUYRzdbQn3No3lR15gQnj2Pqj5u4
-9reuYOU9VYJZCNHZcrGRdfFtAx95hmZNq07C6Rdy0QqbMMUlSMkMzkPnFdxjMDvw
-cqiXodfpMmqysMWLPlxAPY1vuOmOL45LchLTPKKmjguRSV0e8XsaDOWzjCeEB/Aj
-ClmG0GyWHSAIZC7bvzOe0pi5IsFK6Ep4ZcPSbmHSb6kC5eSkv7JyIyuWt69Pk4Mu
-ot+q6ounNXAYCKV6Muz5AcXxBWDvb6KQdvZ6VO6ME3/svrwwX7wGAskuOajr2CVX
-OpuSeVvTTyohvvlFeDB3zEFiJiilFOYLQCGN4Xu48bXiwX5dIiAy+COkkci85sSC
-IYK12Jq6w6s/X3g6Mvpz9w8ZQnxEdZmFjDIaPm0vrZbDKPXpzwkvRTB8vunEvO7j
-S/gwPnchfNZaf6LTVECnr3RNWJqNyvMHbr/FcWZrnhGjUK1LvJY=
-=n4Mf
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsrhaMACgkQbDjKyiDZ
+s5Jj5RAAtAK+fWNOmyQwRZD555HTSacDcYzAVhJ0tW58PB4mv/Wc6xMU50n4i9Ud
+L3XucYpeEeFGFBe0p47Nc/W+pl0D8iYmElnBVLfCe25IRC6CApLIg8XsRj1bIU9X
+Qj1PbasFQpcQzOuQPtnznUdjv3ggrJfITzg+AjlyoXvNstKZ9cEJabUbrddm3zWt
+sgY0KHu5FtYp2AazsQ1bYYYAhCjNNTTfypKkqnjOlhyaVmvLjbN5Zoq8WjsL/gtm
+y+/OJhO1lLYSiXEPx6eG4bFUvo7ot+z2B7zldPgSWdBSE0ii6jdI5SLLqOv4hokJ
+HnHvmsLDn8WovMR6ZhZJPiYd1ngYqSmbEVJFC8ITWLkAv1SSUxN8MP8ClNtEX1T3
+3SPrW6f+X/EQgfywkdCESBqwP6dBJZCWOQ3ERu+KH4VWJm77qfxo8DSB+nPM/Qpv
+4hZ6YZ2p7dPZZPH7f0jgPRaDTbL44/BWOXXj8NeLToBwYoaJaGNMVD2JzcPxtNio
+kHWKZy+OUBSDz9b53L8yc6r231/Kfi9Vt9uA+izMI7SjNfvsjydhOEjhhFwxW9G1
+X7BB2JoY3QjuDbDfls/1roWMgspc/cQPm5JD2mWKV7tQiu4/ETu0A87cqyJt0qAc
+U953QqKdoHbVbk6JqHdHf+KWuPUqQsjXu2iXgeEG1pMeEZkNxao=
+=Q0XD
 -----END PGP SIGNATURE-----
 
---rV8arf8D5Dod9UkK--
+--tT3UgwmDxwvOMqfu--
