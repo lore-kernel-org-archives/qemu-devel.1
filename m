@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fVooE-0004gg-0s
+	(envelope-from <richard.henderson@linaro.org>) id 1fVooE-0004gh-19
 	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fVooC-0003KT-35
+	(envelope-from <richard.henderson@linaro.org>) id 1fVooA-0003JL-0M
 	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:50 -0400
-Received: from mail-pl0-x22b.google.com ([2607:f8b0:400e:c01::22b]:39902)
+Received: from mail-pl0-x234.google.com ([2607:f8b0:400e:c01::234]:45168)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fVooB-0003K2-QY
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:47 -0400
-Received: by mail-pl0-x22b.google.com with SMTP id s24-v6so752994plq.6
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 18:54:47 -0700 (PDT)
+	id 1fVoo9-0003Ij-OZ
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:45 -0400
+Received: by mail-pl0-x234.google.com with SMTP id o18-v6so58914pll.12
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 18:54:45 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 20 Jun 2018 15:53:46 -1000
-Message-Id: <20180621015359.12018-23-richard.henderson@linaro.org>
+Date: Wed, 20 Jun 2018 15:53:45 -1000
+Message-Id: <20180621015359.12018-22-richard.henderson@linaro.org>
 In-Reply-To: <20180621015359.12018-1-richard.henderson@linaro.org>
 References: <20180621015359.12018-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v5 22/35] target/arm: Implement SVE
- floating-point trig multiply-add coefficient
+Subject: [Qemu-devel] [PATCH v5 21/35] target/arm: Implement SVE FP Compare
+ with Zero Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,159 +32,207 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    |  4 +++
- target/arm/sve_helper.c    | 70 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 27 +++++++++++++++
- target/arm/sve.decode      |  3 ++
- 4 files changed, 104 insertions(+)
+ target/arm/helper-sve.h    | 42 +++++++++++++++++++++++++++++++++++++
+ target/arm/sve_helper.c    | 43 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 43 ++++++++++++++++++++++++++++++++++++++
+ target/arm/sve.decode      | 10 +++++++++
+ 4 files changed, 138 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 44a98440c9..aca137fc37 100644
+index ff69d143a0..44a98440c9 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -1037,6 +1037,10 @@ DEF_HELPER_FLAGS_3(sve_fnmls_zpzzz_h, TCG_CALL_NO_RWG, void, env, ptr, i32)
- DEF_HELPER_FLAGS_3(sve_fnmls_zpzzz_s, TCG_CALL_NO_RWG, void, env, ptr, i32)
- DEF_HELPER_FLAGS_3(sve_fnmls_zpzzz_d, TCG_CALL_NO_RWG, void, env, ptr, i32)
+@@ -767,6 +767,48 @@ DEF_HELPER_FLAGS_5(sve_fadda_s, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(sve_fadda_d, TCG_CALL_NO_RWG,
+                    i64, i64, ptr, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_5(sve_ftmad_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ftmad_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_ftmad_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmge0_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmge0_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmge0_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
 +
- DEF_HELPER_FLAGS_4(sve_ld1bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ld2bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
- DEF_HELPER_FLAGS_4(sve_ld3bb_r, TCG_CALL_NO_WG, void, env, ptr, tl, i32)
++DEF_HELPER_FLAGS_5(sve_fcmgt0_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmgt0_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmgt0_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_5(sve_fcmlt0_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmlt0_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmlt0_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_5(sve_fcmle0_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmle0_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmle0_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_5(sve_fcmeq0_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmeq0_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmeq0_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_5(sve_fcmne0_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmne0_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_fcmne0_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++
+ DEF_HELPER_FLAGS_6(sve_fadd_h, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_6(sve_fadd_s, TCG_CALL_NO_RWG,
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 06e963e9c2..3dc35d8b12 100644
+index befea9ba54..06e963e9c2 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -3428,6 +3428,76 @@ DO_FPCMP_PPZ0_ALL(sve_fcmlt0, DO_FCMLT)
- DO_FPCMP_PPZ0_ALL(sve_fcmeq0, DO_FCMEQ)
- DO_FPCMP_PPZ0_ALL(sve_fcmne0, DO_FCMNE)
+@@ -3362,6 +3362,8 @@ void HELPER(NAME)(void *vd, void *vn, void *vm, void *vg,               \
  
-+/* FP Trig Multiply-Add. */
-+
-+void HELPER(sve_ftmad_h)(void *vd, void *vn, void *vm, void *vs, uint32_t desc)
-+{
-+    static const float16 coeff[16] = {
-+        0x3c00, 0xb155, 0x2030, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-+        0x3c00, 0xb800, 0x293a, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-+    };
-+    intptr_t i, opr_sz = simd_oprsz(desc) / sizeof(float16);
-+    intptr_t x = simd_data(desc);
-+    float16 *d = vd, *n = vn, *m = vm;
-+    for (i = 0; i < opr_sz; i++) {
-+        float16 mm = m[i];
-+        intptr_t xx = x;
-+        if (float16_is_neg(mm)) {
-+            mm = float16_abs(mm);
-+            xx += 8;
-+        }
-+        d[i] = float16_muladd(n[i], mm, coeff[xx], 0, vs);
-+    }
+ #define DO_FCMGE(TYPE, X, Y, ST)  TYPE##_compare(Y, X, ST) <= 0
+ #define DO_FCMGT(TYPE, X, Y, ST)  TYPE##_compare(Y, X, ST) < 0
++#define DO_FCMLE(TYPE, X, Y, ST)  TYPE##_compare(X, Y, ST) <= 0
++#define DO_FCMLT(TYPE, X, Y, ST)  TYPE##_compare(X, Y, ST) < 0
+ #define DO_FCMEQ(TYPE, X, Y, ST)  TYPE##_compare_quiet(X, Y, ST) == 0
+ #define DO_FCMNE(TYPE, X, Y, ST)  TYPE##_compare_quiet(X, Y, ST) != 0
+ #define DO_FCMUO(TYPE, X, Y, ST)  \
+@@ -3385,6 +3387,47 @@ DO_FPCMP_PPZZ_ALL(sve_facgt, DO_FACGT)
+ #undef DO_FPCMP_PPZZ_H
+ #undef DO_FPCMP_PPZZ
+ 
++/* One operand floating-point comparison against zero, controlled
++ * by a predicate.
++ */
++#define DO_FPCMP_PPZ0(NAME, TYPE, H, OP)                   \
++void HELPER(NAME)(void *vd, void *vn, void *vg,            \
++                  void *status, uint32_t desc)             \
++{                                                          \
++    intptr_t i = simd_oprsz(desc), j = (i - 1) >> 6;       \
++    uint64_t *d = vd, *g = vg;                             \
++    do {                                                   \
++        uint64_t out = 0, pg = g[j];                       \
++        do {                                               \
++            i -= sizeof(TYPE), out <<= sizeof(TYPE);       \
++            if ((pg >> (i & 63)) & 1) {                    \
++                TYPE nn = *(TYPE *)(vn + H(i));            \
++                out |= OP(TYPE, nn, 0, status);            \
++            }                                              \
++        } while (i & 63);                                  \
++        d[j--] = out;                                      \
++    } while (i > 0);                                       \
 +}
 +
-+void HELPER(sve_ftmad_s)(void *vd, void *vn, void *vm, void *vs, uint32_t desc)
-+{
-+    static const float32 coeff[16] = {
-+        0x3f800000, 0xbe2aaaab, 0x3c088886, 0xb95008b9,
-+        0x36369d6d, 0x00000000, 0x00000000, 0x00000000,
-+        0x3f800000, 0xbf000000, 0x3d2aaaa6, 0xbab60705,
-+        0x37cd37cc, 0x00000000, 0x00000000, 0x00000000,
-+    };
-+    intptr_t i, opr_sz = simd_oprsz(desc) / sizeof(float32);
-+    intptr_t x = simd_data(desc);
-+    float32 *d = vd, *n = vn, *m = vm;
-+    for (i = 0; i < opr_sz; i++) {
-+        float32 mm = m[i];
-+        intptr_t xx = x;
-+        if (float32_is_neg(mm)) {
-+            mm = float32_abs(mm);
-+            xx += 8;
-+        }
-+        d[i] = float32_muladd(n[i], mm, coeff[xx], 0, vs);
-+    }
-+}
++#define DO_FPCMP_PPZ0_H(NAME, OP) \
++    DO_FPCMP_PPZ0(NAME##_h, float16, H1_2, OP)
++#define DO_FPCMP_PPZ0_S(NAME, OP) \
++    DO_FPCMP_PPZ0(NAME##_s, float32, H1_4, OP)
++#define DO_FPCMP_PPZ0_D(NAME, OP) \
++    DO_FPCMP_PPZ0(NAME##_d, float64,     , OP)
 +
-+void HELPER(sve_ftmad_d)(void *vd, void *vn, void *vm, void *vs, uint32_t desc)
-+{
-+    static const float64 coeff[16] = {
-+        0x3ff0000000000000ull, 0xbfc5555555555543ull,
-+        0x3f8111111110f30cull, 0xbf2a01a019b92fc6ull,
-+        0x3ec71de351f3d22bull, 0xbe5ae5e2b60f7b91ull,
-+        0x3de5d8408868552full, 0x0000000000000000ull,
-+        0x3ff0000000000000ull, 0xbfe0000000000000ull,
-+        0x3fa5555555555536ull, 0xbf56c16c16c13a0bull,
-+        0x3efa01a019b1e8d8ull, 0xbe927e4f7282f468ull,
-+        0x3e21ee96d2641b13ull, 0xbda8f76380fbb401ull,
-+    };
-+    intptr_t i, opr_sz = simd_oprsz(desc) / sizeof(float64);
-+    intptr_t x = simd_data(desc);
-+    float64 *d = vd, *n = vn, *m = vm;
-+    for (i = 0; i < opr_sz; i++) {
-+        float64 mm = m[i];
-+        intptr_t xx = x;
-+        if (float64_is_neg(mm)) {
-+            mm = float64_abs(mm);
-+            xx += 8;
-+        }
-+        d[i] = float64_muladd(n[i], mm, coeff[xx], 0, vs);
-+    }
-+}
++#define DO_FPCMP_PPZ0_ALL(NAME, OP) \
++    DO_FPCMP_PPZ0_H(NAME, OP)   \
++    DO_FPCMP_PPZ0_S(NAME, OP)   \
++    DO_FPCMP_PPZ0_D(NAME, OP)
++
++DO_FPCMP_PPZ0_ALL(sve_fcmge0, DO_FCMGE)
++DO_FPCMP_PPZ0_ALL(sve_fcmgt0, DO_FCMGT)
++DO_FPCMP_PPZ0_ALL(sve_fcmle0, DO_FCMLE)
++DO_FPCMP_PPZ0_ALL(sve_fcmlt0, DO_FCMLT)
++DO_FPCMP_PPZ0_ALL(sve_fcmeq0, DO_FCMEQ)
++DO_FPCMP_PPZ0_ALL(sve_fcmne0, DO_FCMNE)
 +
  /*
   * Load contiguous data, protected by a governing predicate.
   */
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 0c55501935..fb225d56a1 100644
+index d7957cddbd..0c55501935 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -3597,6 +3597,33 @@ DO_PPZ(FCMNE_ppz0, fcmne0)
- 
- #undef DO_PPZ
+@@ -3554,6 +3554,49 @@ static bool trans_FRSQRTE(DisasContext *s, arg_rr_esz *a, uint32_t insn)
+     return true;
+ }
  
 +/*
-+ *** SVE floating-point trig multiply-add coefficient
++ *** SVE Floating Point Compare with Zero Group
 + */
 +
-+static bool trans_FTMAD(DisasContext *s, arg_FTMAD *a, uint32_t insn)
++static void do_ppz_fp(DisasContext *s, arg_rpr_esz *a,
++                      gen_helper_gvec_3_ptr *fn)
 +{
-+    static gen_helper_gvec_3_ptr * const fns[3] = {
-+        gen_helper_sve_ftmad_h,
-+        gen_helper_sve_ftmad_s,
-+        gen_helper_sve_ftmad_d,
-+    };
++    unsigned vsz = vec_full_reg_size(s);
++    TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
 +
-+    if (a->esz == 0) {
-+        return false;
-+    }
-+    if (sve_access_check(s)) {
-+        unsigned vsz = vec_full_reg_size(s);
-+        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
-+        tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, a->rd),
-+                           vec_full_reg_offset(s, a->rn),
-+                           vec_full_reg_offset(s, a->rm),
-+                           status, vsz, vsz, a->imm, fns[a->esz - 1]);
-+        tcg_temp_free_ptr(status);
-+    }
-+    return true;
++    tcg_gen_gvec_3_ptr(pred_full_reg_offset(s, a->rd),
++                       vec_full_reg_offset(s, a->rn),
++                       pred_full_reg_offset(s, a->pg),
++                       status, vsz, vsz, 0, fn);
++    tcg_temp_free_ptr(status);
 +}
++
++#define DO_PPZ(NAME, name) \
++static bool trans_##NAME(DisasContext *s, arg_rpr_esz *a, uint32_t insn) \
++{                                                                 \
++    static gen_helper_gvec_3_ptr * const fns[3] = {               \
++        gen_helper_sve_##name##_h,                                \
++        gen_helper_sve_##name##_s,                                \
++        gen_helper_sve_##name##_d,                                \
++    };                                                            \
++    if (a->esz == 0) {                                            \
++        return false;                                             \
++    }                                                             \
++    if (sve_access_check(s)) {                                    \
++        do_ppz_fp(s, a, fns[a->esz - 1]);                         \
++    }                                                             \
++    return true;                                                  \
++}
++
++DO_PPZ(FCMGE_ppz0, fcmge0)
++DO_PPZ(FCMGT_ppz0, fcmgt0)
++DO_PPZ(FCMLE_ppz0, fcmle0)
++DO_PPZ(FCMLT_ppz0, fcmlt0)
++DO_PPZ(FCMEQ_ppz0, fcmeq0)
++DO_PPZ(FCMNE_ppz0, fcmne0)
++
++#undef DO_PPZ
 +
  /*
   *** SVE Floating Point Accumulating Reduction Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 5dea2e5e88..e29c598783 100644
+index 191be9463d..5dea2e5e88 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -796,6 +796,9 @@ FMINNM_zpzi     01100101 .. 011 101 100 ... 0000 . .....        @rdn_i1
- FMAX_zpzi       01100101 .. 011 110 100 ... 0000 . .....        @rdn_i1
- FMIN_zpzi       01100101 .. 011 111 100 ... 0000 . .....        @rdn_i1
+@@ -140,6 +140,7 @@
+ # One register operand, with governing predicate, vector element size
+ @rd_pg_rn       ........ esz:2 ... ... ... pg:3 rn:5 rd:5       &rpr_esz
+ @rd_pg4_pn      ........ esz:2 ... ... .. pg:4 . rn:4 rd:5      &rpr_esz
++@pd_pg_rn       ........ esz:2 ... ... ... pg:3 rn:5 . rd:4     &rpr_esz
  
-+# SVE floating-point trig multiply-add coefficient
-+FTMAD           01100101 esz:2 010 imm:3 100000 rm:5 rd:5       rn=%reg_movprfx
+ # One register operand, with governing predicate, no vector element size
+ @rd_pg_rn_e0    ........ .. ... ... ... pg:3 rn:5 rd:5          &rpr_esz esz=0
+@@ -744,6 +745,15 @@ FMINV           01100101 .. 000 111 001 ... ..... .....         @rd_pg_rn
+ FRECPE          01100101 .. 001 110 001100 ..... .....          @rd_rn
+ FRSQRTE         01100101 .. 001 111 001100 ..... .....          @rd_rn
+ 
++### SVE FP Compare with Zero Group
 +
- ### SVE FP Multiply-Add Group
++FCMGE_ppz0      01100101 .. 0100 00 001 ... ..... 0 ....        @pd_pg_rn
++FCMGT_ppz0      01100101 .. 0100 00 001 ... ..... 1 ....        @pd_pg_rn
++FCMLT_ppz0      01100101 .. 0100 01 001 ... ..... 0 ....        @pd_pg_rn
++FCMLE_ppz0      01100101 .. 0100 01 001 ... ..... 1 ....        @pd_pg_rn
++FCMEQ_ppz0      01100101 .. 0100 10 001 ... ..... 0 ....        @pd_pg_rn
++FCMNE_ppz0      01100101 .. 0100 11 001 ... ..... 0 ....        @pd_pg_rn
++
+ ### SVE FP Accumulating Reduction Group
  
- # SVE floating-point multiply-accumulate writing addend
+ # SVE floating-point serial reduction (predicated)
 -- 
 2.17.1
