@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fW0qO-00045Z-Ew
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:45:54 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fW0tU-00052w-BJ
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:49:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fW0qL-0000DS-98
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:45:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47576)
+	(envelope-from <alex.bennee@linaro.org>) id 1fW0tQ-0001jb-8s
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:49:04 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:46334)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fW0qL-0000C6-2i
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:45:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fW0qJ-00060t-UJ
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 14:45:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DF1322E80CC
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 14:45:47 +0000 (UTC)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fW0tP-0001jK-W8
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:49:00 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id v13-v6so3484179wrp.13
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 07:48:59 -0700 (PDT)
+References: <20180621062605.941-1-alex.bennee@linaro.org>
+	<CAFEAcA8dug5h=NeMKt+8bz_X_r=FaeXz9oKr4QWxttpc5VmdsA@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAFEAcA8dug5h=NeMKt+8bz_X_r=FaeXz9oKr4QWxttpc5VmdsA@mail.gmail.com>
+Date: Thu, 21 Jun 2018 15:48:57 +0100
+Message-ID: <87in6curdy.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 21 Jun 2018 14:31:18 -0000
-From: Thomas Huth <1472083@bugs.launchpad.net>
-Reply-To: Bug 1472083 <1472083@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150707053638.9337.88545.malonedeb@gac.canonical.com>
-Message-Id: <152959147894.25990.17892354490430358786.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1472083] Re: Qemu 2.1.2 hang when stop command
+Subject: Re: [Qemu-devel] [PULL v2 00/57] add check-tcg and associated
+ machinery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,63 +31,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
 
--- =
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1472083
+> On 21 June 2018 at 07:25, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+>> The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a=
+93b:
+>>
+>>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into=
+ staging (2018-06-20 09:51:30 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://github.com/stsquad/qemu.git tags/pull-tcg-testing-revivial-210=
+618-2
+>>
+>> for you to fetch changes up to 65b26da485540ffcc1c46c9a0898f01912ee6b7a:
+>>
+>>   .travis.yml: add check-tcg test (2018-06-20 22:13:39 +0100)
+>>
+>> ----------------------------------------------------------------
+>> Add check-tcg machinary
+>>
+>> This restores the ability to run TCG smoke tests by using our docker
+>> infrastructure to support cross building simple tests. It represents
+>> the first step to making better cross-architecture testing available
+>> straight from the source tree ;-)
+>>
+>> v2
+>>   - fix quoting of target_compiler
+>>   - make docker.py Py3 safe
+>>   - tweak .travis.yml recipe
+>>   - don't probe docker when HAVE_USER_DOCKER not set
+>
+> Weird build failure for linux/x86:
+>
+> make: Entering directory '/home/petmay01/linaro/qemu-for-merges/build/all=
+dbg'
+> Makefile:90: rules.mak: No such file or directory
+> Makefile:439: tests/Makefile.include: No such file or directory
+> cat: VERSION: No such file or directory
+> Makefile:1056: tests/docker/Makefile.include: No such file or directory
+> Makefile:1057: tests/vm/Makefile.include: No such file or directory
+> make: Leaving directory '/home/petmay01/linaro/qemu-for-merges/build/alld=
+bg'
+> make: *** No rule to make target 'tests/vm/Makefile.include'. Stop.
+>
+> like it's failed to figure out the source directory.
+>
+> This is my '--cc=3Dccache gcc' '--enable-debug' '--python=3Dpython3'
+> build, and it's also the one I do a 'make clean' on -- perhaps
+> build from clean has broken?
 
-Title:
-  Qemu 2.1.2 hang when stop command
+Hmm I can't reproduce this. I've built a fresh 16.04 server image with
+and with:
 
-Status in QEMU:
-  Incomplete
+  # Configured with: './configure' '--cc=3Dccache gcc' '--enable-debug' '--=
+python=3Dpython3'
 
-Bug description:
-  Qemu 2.1.2, Linux kernel 3.13.6, this is the stack.
+both:
+  make
 
-  #0  in ppoll () from /lib/x86_64-linux-gnu/libc.so.6
-  #1  in qemu_poll_ns (fds=3D0x7fa82a8de380, nfds=3D1, timeout=3D-1) at qem=
-u-timer.c:314
-  #2  in aio_poll (ctx=3D0x7fa82a8b5000, blocking=3Dtrue) at aio-posix.c:250
-  #3  in bdrv_drain_all () at block.c:1924
-  #4  in do_vm_stop (state=3DRUN_STATE_PAUSED) at /qemu-2.1.2/cpus.c:544
-  #5  in vm_stop (state=3DRUN_STATE_PAUSED) at /qemu-2.1.2/cpus.c:1227
-  #6  in qmp_stop (errp=3D0x7ffffb6dcaf8) at qmp.c:98
-  #7  in qmp_marshal_input_stop (mon=3D0x7fa82a8e0970, qdict=3D0x7fa8302950=
-20, ret=3D0x7ffffb6dcb48) at qmp-marshal.c:2806
-  #8  in qmp_call_cmd (mon=3D0x7fa82a8e0970, cmd=3D0x7fa8290558a0, params=
-=3D0x7fa830295020)  at /qemu-2.1.2/monitor.c:5038
-  #9  in handle_qmp_command (parser=3D0x7fa82a8e0a28, tokens=3D0x7fa82a8d9b=
-50) at /qemu-2.1.2/monitor.c:5104
-  #10 in json_message_process_token (lexer=3D0x7fa82a8e0a30, token=3D0x7fa8=
-30122b60, type=3DJSON_OPERATOR, x=3D39, y=3D17865) at qobject/json-streamer=
-.c:87
-  #11 in json_lexer_feed_char (lexer=3D0x7fa82a8e0a30, ch=3D125 '}', flush=
-=3Dfalse) at qobject/json-lexer.c:303
-  #12 in json_lexer_feed (lexer=3D0x7fa82a8e0a30, buffer=3D0x7ffffb6dcdb0 "=
-}\315m\373\377\177", size=3D1) at qobject/json-lexer.c:356
-  #13 in json_message_parser_feed (parser=3D0x7fa82a8e0a28, buffer=3D0x7fff=
-fb6dcdb0 "}\315m\373\377\177", size=3D1) at qobject/json-streamer.c:111
-  #14 in monitor_control_read (opaque=3D0x7fa82a8e0970, buf=3D0x7ffffb6dcdb=
-0 "}\315m\373\377\177", size=3D1) at /qemu-2.1.2/monitor.c:5125
-  #15 in qemu_chr_be_write (s=3D0x7fa82a8c2020, buf=3D0x7ffffb6dcdb0 "}\315=
-m\373\377\177", len=3D1) at qemu-char.c:213
-  #16 in tcp_chr_read (chan=3D0x7fa82a8c4ba0, cond=3DG_IO_IN, opaque=3D0x7f=
-a82a8c2020) at qemu-char.c:2729
-  #17 in g_main_context_dispatch () from /lib/x86_64-linux-gnu/libglib-2.0.=
-so.0
-  #18 in glib_pollfds_poll () at main-loop.c:190
-  #19 in os_host_main_loop_wait (timeout=3D24000000) at main-loop.c:235
-  #20 in main_loop_wait (nonblocking=3D0) at main-loop.c:484
-  #21 in main_loop () at vl.c:2034
-  #22 in main (argc=3D55, argv=3D0x7ffffb6de338, envp=3D0x7ffffb6de4f8) at =
-vl.c:4583
+and:
+  make check-tcg
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1472083/+subscriptions
+Work for me :-/
+
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Benn=C3=A9e
