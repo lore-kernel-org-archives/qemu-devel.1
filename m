@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVyVK-0004Mw-IE
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:16:00 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fVyYw-0005M3-QL
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:19:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVyVJ-000549-KE
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:15:58 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-	<152953133362.8870.5068527344743214691@sif>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5ea4363f-6711-c6a9-1641-6031eef7cee8@amsat.org>
-Date: Thu, 21 Jun 2018 09:15:43 -0300
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fVyYt-0005x1-Kt
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:19:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54258)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1fVyYt-0005wp-CQ
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:19:39 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5LCJ6uq100710
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 08:19:38 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jrb5rj2j5-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 08:19:38 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 21 Jun 2018 08:19:36 -0400
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+References: <20180621115530.11069-1-marcandre.lureau@redhat.com>
+	<20180621115530.11069-2-marcandre.lureau@redhat.com>
+	<f500f7df-3eff-c9d6-2630-0c00f2360d6e@linux.vnet.ibm.com>
+Date: Thu, 21 Jun 2018 08:19:31 -0400
 MIME-Version: 1.0
-In-Reply-To: <152953133362.8870.5068527344743214691@sif>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="CSEjHnktLcwr9jjB2R8VRxIb9oCIMZa0X"
-Subject: Re: [Qemu-devel] [PATCH 00/113] Patch Round-up for stable 2.11.2,
- freeze on 2018-06-22
+In-Reply-To: <f500f7df-3eff-c9d6-2630-0c00f2360d6e@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-MW
+Message-Id: <3b040c61-f5a4-91e8-10f0-2f9ff403351b@linux.vnet.ibm.com>
+Content-Transfer-Encoding: base64
+Subject: Re: [Qemu-devel] [PATCH v4 1/5] tpm: add a "ppi" boolean property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +43,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CSEjHnktLcwr9jjB2R8VRxIb9oCIMZa0X
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
-Message-ID: <5ea4363f-6711-c6a9-1641-6031eef7cee8@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH 00/113] Patch Round-up for stable 2.11.2,
- freeze on 2018-06-22
-References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
- <152953133362.8870.5068527344743214691@sif>
-In-Reply-To: <152953133362.8870.5068527344743214691@sif>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-Hi Michael,
-
-On 06/20/2018 06:48 PM, Michael Roth wrote:
-> Quoting Michael Roth (2018-06-18 20:41:26)
->> Hi everyone,
->>
->> The following new patches are queued for QEMU stable v2.11.2:
->>
->>   https://github.com/mdroth/qemu/commits/stable-2.11-staging
->>
->> The release is planned for 2018-06-22:
->>
->>   https://wiki.qemu.org/Planning/2.11
->>
->> Please respond here or CC qemu-stable@nongnu.org on any patches you
->> think should be included in the release.
->=20
-> The following additional patches have been queued for 2.11.2:
->=20
->   tpm: lookup cancel path under tpm device class (Marc-Andr=C3=A9 Lurea=
-u)
->   tpm-passthrough: don't save guessed cancel_path in options (Marc-Andr=
-=C3=A9 Lureau)
->   s390-ccw-virtio: allow for systems larger that 7.999TB (Christian Bor=
-ntraeger)
->   crypto: ensure we use a predictable TLS priority setting (Daniel P. B=
-errang=C3=A9)
->   qapi: ensure stable sort ordering when checking QAPI entities (Daniel=
- P. Berrange)
->=20
->   https://github.com/mdroth/qemu/commits/stable-2.11-staging
-
-I also noticed these:
-
-9005774b27 gdbstub: fix off-by-one in gdb_handle_packet()
-bf78fb1c1b usb: correctly handle Zero Length Packets
-62713a2e50 usb/dev-mtp: Fix use of uninitialized values
-
-Regards,
-
-Phil.
-
-
---CSEjHnktLcwr9jjB2R8VRxIb9oCIMZa0X
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlsrlvMACgkQ4+MsLN6t
-wN5N9RAAsegTg/akEO5skIr0KWgtfCRWKcTLc47A/hkzxBfTC80cd5ay6x1/Lrwr
-7/N8Th61CX192NMk3kjOmH80EeFNCLo0Vrd9tiTA9s3nGwHJOZqPnb+yqqYW2a+H
-vRz7L0t0TRdOkbAQivr4IBREcUF3P5gxJyxDVMaL9Gid5boDQSpRM+k/b2w64YHv
-s1xFMcyrmhHVRCnL05Mjzi/gr+1erg2J5PvCuOAJ1MHCDcpqje9WefDlznPgM7Iu
-u3LdXJ6AREEFwcBULqoeGDc2d6gsGUk6FNNEbU/SJtgX4ljryyN4XpOgK1/APysS
-12PY/46qDZhQ3w/hcxEPoHGAVKiUwL6jHNJscgtLuQ1wSjgUuIsCINZbF7HFtt00
-B59ghfaDgIej4mYn1fwxMQaHCObwDzqDTy8WyU9xPbPMvPsNoYsFsfltfrVTcrvg
-htTiCzGD84DCLD/QRmU04kAXhe/4NE1g2tdAq8n9Gao5SZ06eY1Sx45mmxhVxvly
-ezCEKmUj0UNEtx2tJd+mrd7IlRgCYjtBczRUtyHVxyud0d/UxPdhUNISVLrXuK2S
-NERffKLN9XxjxzxAlJBckSZz9XWO4+I7WkmmXuVSNK8hG/jliHtRE1LSpkPsKpI+
-c6y2v4KuwLLBM5I671y5hGm+F3MlbmfSTEnmdqwmKqbqPzAmKnM=
-=XeEL
------END PGP SIGNATURE-----
-
---CSEjHnktLcwr9jjB2R8VRxIb9oCIMZa0X--
+T24gMDYvMjEvMjAxOCAwODoxMSBBTSwgU3RlZmFuIEJlcmdlciB3cm90ZToNCj4gT24gMDYv
+MjEvMjAxOCAwNzo1NSBBTSwgTWFyYy1BbmRyw6kgTHVyZWF1IHdyb3RlOg0KPj4gVGhlIGZv
+bGxvd2luZyBwYXRjaGVzIGltcGxlbWVudCB0aGUgVFBNIFBoeXNpY2FsIFByZXNlbmNlIElu
+dGVyZmFjZSwNCj4+IGFuZCBtYWtlcyB1c2Ugb2YgbmV3IG1lbW9yeSByZWdpb24gYW5kIGZ3
+X2NmZyBlbnRyaWVzLiBFbmFibGUgaXQgYnkNCj4+IGRlZmF1bHQgb24gPjIuMTIgbWFjaGlu
+ZSB0eXBlLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IE1hcmMtQW5kcsOpIEx1cmVhdSA8bWFy
+Y2FuZHJlLmx1cmVhdUByZWRoYXQuY29tPg0KPj4gLS0tDQo+PiDCoCBpbmNsdWRlL2h3L2Nv
+bXBhdC5oIHwgMTAgKysrKysrKysrKw0KPj4gwqAgaHcvdHBtL3RwbV9jcmIuY8KgwqDCoCB8
+wqAgMyArKysNCj4+IMKgIGh3L3RwbS90cG1fdGlzLmPCoMKgwqAgfMKgIDMgKysrDQo+PiDC
+oCAzIGZpbGVzIGNoYW5nZWQsIDE2IGluc2VydGlvbnMoKykNCj4+DQo+PiBkaWZmIC0tZ2l0
+IGEvaW5jbHVkZS9ody9jb21wYXQuaCBiL2luY2x1ZGUvaHcvY29tcGF0LmgNCj4+IGluZGV4
+IDU2MzkwOGI4NzQuLmRhYzg0NzU0OGIgMTAwNjQ0DQo+PiAtLS0gYS9pbmNsdWRlL2h3L2Nv
+bXBhdC5oDQo+PiArKysgYi9pbmNsdWRlL2h3L2NvbXBhdC5oDQo+PiBAQCAtMiw2ICsyLDE2
+IEBADQo+PiDCoCAjZGVmaW5lIEhXX0NPTVBBVF9IDQo+PiDCoCDCoCAjZGVmaW5lIEhXX0NP
+TVBBVF8yXzEyIFwNCj4+ICvCoMKgwqAge1wNCj4+ICvCoMKgwqDCoMKgwqDCoCAuZHJpdmVy
+wqDCoCA9ICJ0cG0tY3JiIixcDQo+PiArwqDCoMKgwqDCoMKgwqAgLnByb3BlcnR5ID0gInBw
+aSIsXA0KPj4gK8KgwqDCoMKgwqDCoMKgIC52YWx1ZcKgwqDCoCA9ICJmYWxzZSIsXA0KPj4g
+K8KgwqDCoCB9LFwNCj4+ICvCoMKgwqAge1wNCj4+ICvCoMKgwqDCoMKgwqDCoCAuZHJpdmVy
+wqDCoCA9ICJ0cG0tdGlzIixcDQo+PiArwqDCoMKgwqDCoMKgwqAgLnByb3BlcnR5ID0gInBw
+aSIsXA0KPj4gK8KgwqDCoMKgwqDCoMKgIC52YWx1ZcKgwqDCoCA9ICJmYWxzZSIsXA0KPj4g
+K8KgwqDCoCB9LFwNCj4+IMKgwqDCoMKgwqAge1wNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCAu
+ZHJpdmVywqDCoCA9ICJtaWdyYXRpb24iLFwNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoCAucHJv
+cGVydHkgPSAiZGVjb21wcmVzcy1lcnJvci1jaGVjayIsXA0KPj4gZGlmZiAtLWdpdCBhL2h3
+L3RwbS90cG1fY3JiLmMgYi9ody90cG0vdHBtX2NyYi5jDQo+PiBpbmRleCBhOTJkZDUwNDM3
+Li5kNWIwYWM1OTIwIDEwMDY0NA0KPj4gLS0tIGEvaHcvdHBtL3RwbV9jcmIuYw0KPj4gKysr
+IGIvaHcvdHBtL3RwbV9jcmIuYw0KPj4gQEAgLTQxLDYgKzQxLDggQEAgdHlwZWRlZiBzdHJ1
+Y3QgQ1JCU3RhdGUgew0KPj4gwqDCoMKgwqDCoCBNZW1vcnlSZWdpb24gY21kbWVtOw0KPj4g
+wqAgwqDCoMKgwqDCoCBzaXplX3QgYmVfYnVmZmVyX3NpemU7DQo+PiArDQo+PiArwqDCoMKg
+IGJvb2wgcHBpX2VuYWJsZWQ7DQo+PiDCoCB9IENSQlN0YXRlOw0KPj4gwqAgwqAgI2RlZmlu
+ZSBDUkIob2JqKSBPQkpFQ1RfQ0hFQ0soQ1JCU3RhdGUsIChvYmopLCBUWVBFX1RQTV9DUkIp
+DQo+PiBAQCAtMjIxLDYgKzIyMyw3IEBAIHN0YXRpYyBjb25zdCBWTVN0YXRlRGVzY3JpcHRp
+b24gdm1zdGF0ZV90cG1fY3JiID0gew0KPj4gwqAgwqAgc3RhdGljIFByb3BlcnR5IHRwbV9j
+cmJfcHJvcGVydGllc1tdID0gew0KPj4gwqDCoMKgwqDCoCBERUZJTkVfUFJPUF9UUE1CRSgi
+dHBtZGV2IiwgQ1JCU3RhdGUsIHRwbWJlKSwNCj4+ICvCoMKgwqAgREVGSU5FX1BST1BfQk9P
+TCgicHBpIiwgQ1JCU3RhdGUsIHBwaV9lbmFibGVkLCB0cnVlKSwNCj4+IMKgwqDCoMKgwqAg
+REVGSU5FX1BST1BfRU5EX09GX0xJU1QoKSwNCj4+IMKgIH07DQo+DQo+IFdvdWxkbid0IHdl
+IGhhdmUgdG8gYnVtcCB1cCB0aGUgdmVyc2lvbiBvZiB0ZWggVk1TdGF0ZURlc2NyaXB0aW9u
+Pw0KDQpBaCwgY29tbWFuZCBsaW5lIG9wdGlvbi4uLg0KDQogwqDCoCBTdGVmYW4NCg0K
