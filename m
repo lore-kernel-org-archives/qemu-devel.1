@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40325)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVxx2-0008Jl-PF
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:40:35 -0400
+	id 1fVxxS-0000F7-S1
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:40:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVxx1-0004Ia-M1
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:40:32 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:42574)
+	id 1fVxxP-0004Qs-Nw
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:40:58 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35425)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVxx1-0004IQ-Gb
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:40:31 -0400
-Received: by mail-qk0-x241.google.com with SMTP id j80-v6so1513842qke.9
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 04:40:31 -0700 (PDT)
+	id 1fVxxP-0004Qh-Jh
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:40:55 -0400
+Received: by mail-qt0-x241.google.com with SMTP id z6-v6so2491261qti.2
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 04:40:55 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 21 Jun 2018 08:40:15 -0300
-Message-Id: <20180621114015.9207-4-f4bug@amsat.org>
-In-Reply-To: <20180621114015.9207-1-f4bug@amsat.org>
-References: <20180621114015.9207-1-f4bug@amsat.org>
+References: <20180621083551.775-1-armbru@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6b365905-7883-5f9c-cc7d-d9777abbcc63@amsat.org>
+Date: Thu, 21 Jun 2018 08:40:52 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180621083551.775-1-armbru@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 3/3] device_tree: Replace
- error_setg(&error_fatal) by error_report() + exit()
+Subject: Re: [Qemu-devel] [PATCH] qapi: Fix some pycodestyle-3 complaints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,82 +34,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-Use error_report() + exit() instead of error_setg(&error_fatal),
-as suggested by the "qapi/error.h" documentation:
+On 06/21/2018 05:35 AM, Markus Armbruster wrote:
+> Fix the following issues:
+> 
+>     common.py:873:13: E129 visually indented line with same indent as next logical line
+>     common.py:1766:5: E741 ambiguous variable name 'l'
+>     common.py:1784:1: E305 expected 2 blank lines after class or function definition, found 1
+>     common.py:1833:1: E305 expected 2 blank lines after class or function definition, found 1
+>     common.py:1843:1: E305 expected 2 blank lines after class or function definition, found 1
+>     visit.py:181:18: E127 continuation line over-indented for visual indent
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-   Please don't error_setg(&error_fatal, ...), use error_report() and
-   exit(), because that's more obvious.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
- device_tree.c | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
-
-diff --git a/device_tree.c b/device_tree.c
-index 52c3358a55..3553819257 100644
---- a/device_tree.c
-+++ b/device_tree.c
-@@ -140,15 +140,16 @@ static void read_fstree(void *fdt, const char *dirname)
-     const char *parent_node;
- 
-     if (strstr(dirname, root_dir) != dirname) {
--        error_setg(&error_fatal, "%s: %s must be searched within %s",
--                   __func__, dirname, root_dir);
-+        error_report("%s: %s must be searched within %s",
-+                     __func__, dirname, root_dir);
-+        exit(1);
-     }
-     parent_node = &dirname[strlen(SYSFS_DT_BASEDIR)];
- 
-     d = opendir(dirname);
-     if (!d) {
--        error_setg(&error_fatal, "%s cannot open %s", __func__, dirname);
--        return;
-+        error_report("%s cannot open %s", __func__, dirname);
-+        exit(1);
-     }
- 
-     while ((de = readdir(d)) != NULL) {
-@@ -162,7 +163,8 @@ static void read_fstree(void *fdt, const char *dirname)
-         tmpnam = g_strdup_printf("%s/%s", dirname, de->d_name);
- 
-         if (lstat(tmpnam, &st) < 0) {
--            error_setg(&error_fatal, "%s cannot lstat %s", __func__, tmpnam);
-+            error_report("%s cannot lstat %s", __func__, tmpnam);
-+            exit(1);
-         }
- 
-         if (S_ISREG(st.st_mode)) {
-@@ -170,8 +172,9 @@ static void read_fstree(void *fdt, const char *dirname)
-             gsize len;
- 
-             if (!g_file_get_contents(tmpnam, &val, &len, NULL)) {
--                error_setg(&error_fatal, "%s not able to extract info from %s",
--                           __func__, tmpnam);
-+                error_report("%s not able to extract info from %s",
-+                             __func__, tmpnam);
-+                exit(1);
-             }
- 
-             if (strlen(parent_node) > 0) {
-@@ -206,9 +209,9 @@ void *load_device_tree_from_sysfs(void)
-     host_fdt = create_device_tree(&host_fdt_size);
-     read_fstree(host_fdt, SYSFS_DT_BASEDIR);
-     if (fdt_check_header(host_fdt)) {
--        error_setg(&error_fatal,
--                   "%s host device tree extracted into memory is invalid",
--                   __func__);
-+        error_report("%s host device tree extracted into memory is invalid",
-+                     __func__);
-+        exit(1);
-     }
-     return host_fdt;
- }
--- 
-2.18.0.rc2
+> ---
+>  scripts/qapi/common.py | 15 +++++++++------
+>  scripts/qapi/visit.py  |  2 +-
+>  2 files changed, 10 insertions(+), 7 deletions(-)
+> 
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 2462fc0291..e51767d44d 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -865,12 +865,12 @@ def check_keys(expr_elem, meta, required, optional=[]):
+>          if key not in required and key not in optional:
+>              raise QAPISemError(info, "Unknown key '%s' in %s '%s'"
+>                                 % (key, meta, name))
+> -        if (key == 'gen' or key == 'success-response') and value is not False:
+> +        if key in ['gen', 'success-response'] and value is not False:
+>              raise QAPISemError(info,
+>                                 "'%s' of %s '%s' should only use false value"
+>                                 % (key, meta, name))
+> -        if (key == 'boxed' or key == 'allow-oob' or
+> -            key == 'allow-preconfig') and value is not True:
+> +        if (key in ['boxed', 'allow-oob', 'allow-preconfig']
+> +                and value is not True):
+>              raise QAPISemError(info,
+>                                 "'%s' of %s '%s' should only use true value"
+>                                 % (key, meta, name))
+> @@ -1763,12 +1763,12 @@ def camel_to_upper(value):
+>          return c_fun_str
+>  
+>      new_name = ''
+> -    l = len(c_fun_str)
+> -    for i in range(l):
+> +    length = len(c_fun_str)
+> +    for i in range(length):
+>          c = c_fun_str[i]
+>          # When c is upper and no '_' appears before, do more checks
+>          if c.isupper() and (i > 0) and c_fun_str[i - 1] != '_':
+> -            if i < l - 1 and c_fun_str[i + 1].islower():
+> +            if i < length - 1 and c_fun_str[i + 1].islower():
+>                  new_name += '_'
+>              elif c_fun_str[i - 1].isdigit():
+>                  new_name += '_'
+> @@ -1781,6 +1781,7 @@ def c_enum_const(type_name, const_name, prefix=None):
+>          type_name = prefix
+>      return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
+>  
+> +
+>  if hasattr(str, 'maketrans'):
+>      c_name_trans = str.maketrans('.-', '__')
+>  else:
+> @@ -1830,6 +1831,7 @@ def c_name(name, protect=True):
+>          return 'q_' + name
+>      return name
+>  
+> +
+>  eatspace = '\033EATSPACE.'
+>  pointer_suffix = ' *' + eatspace
+>  
+> @@ -1840,6 +1842,7 @@ def genindent(count):
+>          ret += ' '
+>      return ret
+>  
+> +
+>  indent_level = 0
+>  
+>  
+> diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+> index 5d72d8936c..1827c2a094 100644
+> --- a/scripts/qapi/visit.py
+> +++ b/scripts/qapi/visit.py
+> @@ -178,7 +178,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
+>      }
+>      switch ((*obj)->type) {
+>  ''',
+> -                 c_name=c_name(name))
+> +                c_name=c_name(name))
+>  
+>      for var in variants.variants:
+>          ret += mcgen('''
+> 
