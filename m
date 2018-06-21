@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVt8R-0005go-8L
+	(envelope-from <alex.bennee@linaro.org>) id 1fVt8R-0005hQ-U6
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVt8Q-0003lJ-DH
+	(envelope-from <alex.bennee@linaro.org>) id 1fVt8R-0003lo-2R
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:31:59 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:40759)
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:34393)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fVt8Q-0003kL-6c
+	id 1fVt8Q-0003l3-Rd
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:31:58 -0400
-Received: by mail-wr0-x231.google.com with SMTP id g18-v6so1831711wro.7
+Received: by mail-wr0-x242.google.com with SMTP id a12-v6so1855564wro.1
 	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:31:58 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 21 Jun 2018 07:25:25 +0100
-Message-Id: <20180621062605.941-18-alex.bennee@linaro.org>
+Date: Thu, 21 Jun 2018 07:25:59 +0100
+Message-Id: <20180621062605.941-52-alex.bennee@linaro.org>
 In-Reply-To: <20180621062605.941-1-alex.bennee@linaro.org>
 References: <20180621062605.941-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 17/57] tests/tcg/i386: Build fix for
- hello-i386
+Subject: [Qemu-devel] [PULL v2 51/57] docker: docker.py use "version" to
+ probe usage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +31,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Fam Zheng <famz@redhat.com>
+The "images" command is a fairly heavyweight command to run as it
+involves searching the whole docker file-system inventory. On a
+machine with a lot of images this makes start-up fairly expensive.
 
-We have -Werror=missing-prototype, add a dummy prototype to avoid that
-warning.
-
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/tests/tcg/i386/hello-i386.c b/tests/tcg/i386/hello-i386.c
-index fa00380de2..cfeb24b2f5 100644
---- a/tests/tcg/i386/hello-i386.c
-+++ b/tests/tcg/i386/hello-i386.c
-@@ -20,6 +20,7 @@ static inline int write(int fd, const char * buf, int len)
-   return status;
- }
- 
-+void _start(void);
- void _start(void)
- {
-     write(1, "Hello World\n", 12);
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index b28ad87034..e6437d64a7 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -52,7 +52,9 @@ def _guess_docker_command():
+     commands = [["docker"], ["sudo", "-n", "docker"]]
+     for cmd in commands:
+         try:
+-            if subprocess.call(cmd + ["images"],
++            # docker version will return the client details in stdout
++            # but still report a status of 1 if it can't contact the daemon
++            if subprocess.call(cmd + ["version"],
+                                stdout=DEVNULL, stderr=DEVNULL) == 0:
+                 return cmd
+         except OSError:
 -- 
 2.17.1
