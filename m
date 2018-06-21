@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fW0Yz-0003oS-DS
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:27:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1fW0Z2-0003pr-2B
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:27:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fW0Yv-0007xN-Di
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:27:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36962 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fW0Yv-0007xE-8m
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:27:49 -0400
-Date: Thu, 21 Jun 2018 16:27:46 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180621162746.16de966a@redhat.com>
-In-Reply-To: <CAJ+F1CKwFY7zM2mqYU3QtOdpx9jOXNFTtgfEvNJZionByas6Qg@mail.gmail.com>
-References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
-	<20180515121433.6112-4-marcandre.lureau@redhat.com>
-	<20180621145405.197d5106@redhat.com>
-	<CAJ+F1CKFq5=Afoqg8YZGw-TO8vJqTPwjpW_UAMh6G8LPp4ZztA@mail.gmail.com>
-	<CAJ+F1CJ+g4wUCi4ao8z7K6CvuO4Zt9VqOi46o4voo3e8Vceeyg@mail.gmail.com>
-	<CAJ+F1CKwFY7zM2mqYU3QtOdpx9jOXNFTtgfEvNJZionByas6Qg@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1fW0Z1-0007yr-7L
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:27:56 -0400
+References: <20180621124937.166549-1-eblake@redhat.com>
+	<f1365a2f-d63a-bbd2-32b5-d1e6e4fc1888@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <aaf9f5e4-8c52-5409-fe81-c86054dd9ba0@redhat.com>
+Date: Thu, 21 Jun 2018 09:27:50 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 3/4] acpi: build TPM Physical Presence
- interface
+In-Reply-To: <f1365a2f-d63a-bbd2-32b5-d1e6e4fc1888@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] nbd/server: Reject 0-length block status
+ request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +25,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: jsnow@redhat.com, qemu-block@nongnu.org, qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, 21 Jun 2018 16:13:32 +0200
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+On 06/21/2018 07:52 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 21.06.2018 15:49, Eric Blake wrote:
+>> The NBD spec says that behavior is unspecified if the client
+>> requests 0 length for block status; but since the structured
+>> reply is documenting as returning a non-zero length, it's
+>> easier to just diagnose this with an EINVAL error than to
+>> figure out what to return.
+>>
+>> CC: qemu-stable@nongnu.org
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-> Hi
->=20
-> On Thu, Jun 21, 2018 at 3:22 PM, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@gmail.com> wrote:
-> > Hi
-> >
-> > On Thu, Jun 21, 2018 at 3:21 PM, Marc-Andr=C3=A9 Lureau
-> > <marcandre.lureau@gmail.com> wrote:
-> > =20
-> >>>> +    method =3D aml_method("TPFN", 1, AML_SERIALIZED); =20
-> >>> not quite sure how this method (supposed to ) work(s),
-> >>> it could use nice comment explaining mechanics.
-> >>> =20
-> >>
-> >> Windows doesn't like DerefOf (FUNC [N]), it returned wrong values. It
-> >> took me a while to figure this out. My laptop TPM ACPI table uses the
-> >> same trick, so I assume this is a Windows acpi bug/limitation. Instead
-> >> we use a function that returns the corresponding field. =20
-> >
-> > Sorry, I am wrong, my laptop doesn't use such table. I don't know
-> > where I saw someone using the same trick though.. =20
->=20
-> fwiw, I also asked on OSR list for help but got no answer:
-> http://www.osronline.com/showThread.CFM?link=3D288617
-it is/might be fine if there is a workaround to make Windows work,
-we should mention it in comment though (including windows versions
-where it doesn't work) so in future someone else (including me and you)
-won't break it by accident.
+Thanks; added to my NBD queue.  Doing this makes it easier to add the 
+assertion necessary to shut up gcc warning about an uninitialized 
+variable in the other patches ready to pull.
 
->=20
->=20
->=20
->=20
->=20
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
