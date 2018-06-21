@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42126)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fW0tU-00052w-BJ
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:49:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1fW10k-0000Hj-Fn
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fW0tQ-0001jb-8s
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:49:04 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:46334)
+	(envelope-from <bounces@canonical.com>) id 1fW10f-0005HI-Gv
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:56:34 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53862)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fW0tP-0001jK-W8
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:49:00 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id v13-v6so3484179wrp.13
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 07:48:59 -0700 (PDT)
-References: <20180621062605.941-1-alex.bennee@linaro.org>
-	<CAFEAcA8dug5h=NeMKt+8bz_X_r=FaeXz9oKr4QWxttpc5VmdsA@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAFEAcA8dug5h=NeMKt+8bz_X_r=FaeXz9oKr4QWxttpc5VmdsA@mail.gmail.com>
-Date: Thu, 21 Jun 2018 15:48:57 +0100
-Message-ID: <87in6curdy.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fW10f-0005F6-9P
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:56:29 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fW10e-0000Z2-1G
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 14:56:28 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EA8002E80CB
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 14:56:27 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/57] add check-tcg and associated
- machinery
+Date: Thu, 21 Jun 2018 14:37:20 -0000
+From: Thomas Huth <1471904@bugs.launchpad.net>
+Reply-To: Bug 1471904 <1471904@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150706172738.3886.69660.malonedeb@wampee.canonical.com>
+Message-Id: <152959184007.27230.621946142209363986.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1471904] Re: qemu fails under NeXTStep 3.3 when
+ accessing ROM in SCSI-Adapter am53c974
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +37,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
+
+Looking through old bug tickets... can you still reproduce this issue
+with the latest version of QEMU? Or could we close this ticket nowadays?
 
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-> On 21 June 2018 at 07:25, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->> The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a=
-93b:
->>
->>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into=
- staging (2018-06-20 09:51:30 +0100)
->>
->> are available in the Git repository at:
->>
->>   https://github.com/stsquad/qemu.git tags/pull-tcg-testing-revivial-210=
-618-2
->>
->> for you to fetch changes up to 65b26da485540ffcc1c46c9a0898f01912ee6b7a:
->>
->>   .travis.yml: add check-tcg test (2018-06-20 22:13:39 +0100)
->>
->> ----------------------------------------------------------------
->> Add check-tcg machinary
->>
->> This restores the ability to run TCG smoke tests by using our docker
->> infrastructure to support cross building simple tests. It represents
->> the first step to making better cross-architecture testing available
->> straight from the source tree ;-)
->>
->> v2
->>   - fix quoting of target_compiler
->>   - make docker.py Py3 safe
->>   - tweak .travis.yml recipe
->>   - don't probe docker when HAVE_USER_DOCKER not set
->
-> Weird build failure for linux/x86:
->
-> make: Entering directory '/home/petmay01/linaro/qemu-for-merges/build/all=
-dbg'
-> Makefile:90: rules.mak: No such file or directory
-> Makefile:439: tests/Makefile.include: No such file or directory
-> cat: VERSION: No such file or directory
-> Makefile:1056: tests/docker/Makefile.include: No such file or directory
-> Makefile:1057: tests/vm/Makefile.include: No such file or directory
-> make: Leaving directory '/home/petmay01/linaro/qemu-for-merges/build/alld=
-bg'
-> make: *** No rule to make target 'tests/vm/Makefile.include'. Stop.
->
-> like it's failed to figure out the source directory.
->
-> This is my '--cc=3Dccache gcc' '--enable-debug' '--python=3Dpython3'
-> build, and it's also the one I do a 'make clean' on -- perhaps
-> build from clean has broken?
+-- =
 
-Hmm I can't reproduce this. I've built a fresh 16.04 server image with
-and with:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1471904
 
-  # Configured with: './configure' '--cc=3Dccache gcc' '--enable-debug' '--=
-python=3Dpython3'
+Title:
+  qemu fails under NeXTStep 3.3 when accessing ROM in SCSI-Adapter
+  am53c974
 
-both:
-  make
+Status in QEMU:
+  Incomplete
 
-and:
-  make check-tcg
+Bug description:
+  I try to do a fresh install of NeXTStep 3.3 on qemu. After all install
+  floppies are successfully read in, the installation shall start, but
+  aborts right away. During installation process the SCSI host adapter
+  is correctly detected. I don't know, if these adapter where equipped
+  with some special ROM. I thought of installing NeXTStep on a SCSI
+  system due to the IDE problems already known under #1276879. If
+  necessary I would use gdb to track more into this.
 
-Work for me :-/
+  System info:
+  Linux prerow 3.11.10-29-desktop #1 SMP PREEMPT Thu Mar 5 16:24:00 UTC 201=
+5 (338c513) x86_64 x86_64 x86_64 GNU/Linux
+  NAME=3DopenSUSE
+  VERSION=3D"13.1 (Bottle)"
+  VERSION_ID=3D"13.1"
+  PRETTY_NAME=3D"openSUSE 13.1 (Bottle) (x86_64)"
 
->
-> thanks
-> -- PMM
+  qemu commandline parameter:
+  /usr/bin/qemu-system-i386 \
+      -cpu pentium \
+      -monitor stdio \
+      -k de \
+      -vga cirrus \
+      -m 128 \
+      -localtime \
+      -drive \
+           file=3D.qemu/floppy/3.3_Boot_Disk.floppyimage,format=3Draw,if=3D=
+floppy,index=3D0 \
+       -drive \
+           file=3D.qemu/disk/scsihd-2G.qcow2,format=3Dqcow2,id=3Dscsihd0,if=
+=3Dnone \
+       -drive \
+           file=3D.qemu/cdrom/3.3_InstallCD-NeXTIntel.cdromimage,format=3Dr=
+aw,id=3Dscsicd0,if=3Dnone \
+       -net \
+           none \
+       -device \
+           am53c974,id=3DAMD0 \
+       -device \
+           scsi-cd,drive=3Dscsicd0,bus=3DAMD0.0,lun=3D0,scsi-id=3D1,physica=
+l_block_size=3D512,logical_block_size=3D512 \
+       -device \
+           scsi-hd,drive=3Dscsihd0,bus=3DAMD0.0,lun=3D0,scsi-id=3D0,removab=
+le=3Doff,secs=3D125,heads=3D8,cyls=3D4176,product=3D"ST32151N        ",vend=
+or=3D"Seagate ",serial=3D"89683587",ver=3D"2356",physical_block_size=3D512,=
+logical_block_size=3D512,dpofua=3Doff
 
+  qemu error message:
+  qemu: fatal: Trying to execute code outside RAM or ROM at 0xc01754a8
 
---
-Alex Benn=C3=A9e
+  EAX=3D000000ff EBX=3D0000fffb ECX=3D000000ff EDX=3D000000a1
+  ESI=3D00000009 EDI=3D00011010 EBP=3D0000ff84 ESP=3D0000ff6c
+  EIP=3D001754a8 EFL=3D00000007 [-----PC] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
+T=3D0
+  ES =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
+  CS =3D0008 c0000000 3fffffff 00c39a00 DPL=3D0 CS32 [-R-]
+  SS =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
+  DS =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
+  FS =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
+  GS =3D0050 00000000 bfffffff 00cb9300 DPL=3D0 DS   [-WA]
+  LDT=3D0000 00000000 0000ffff 00008200 DPL=3D0 LDT
+  TR =3D0000 00000000 0000ffff 00008b00 DPL=3D0 TSS32-busy
+  GDT=3D     001c9a58 000000ff
+  IDT=3D     001c9bac 000007ff
+  CR0=3D00000033 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000              =
+                                                                       =
+
+  DR0=3D00000000 DR1=3D00000000 DR2=3D00000000 DR3=3D00000000              =
+                                                                       =
+
+  DR6=3Dffff0ff0 DR7=3D00000400                                            =
+                                                                   =
+
+  CCS=3D00000001 CCD=3D0000000c CCO=3DINCL    =
+
+  EFER=3D0000000000000000
+  FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
+  FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
+  FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
+  FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
+  FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
+  XMM00=3D00000000000000000000000000000000 XMM01=3D000000000000000000000000=
+00000000
+  XMM02=3D00000000000000000000000000000000 XMM03=3D000000000000000000000000=
+00000000
+  XMM04=3D00000000000000000000000000000000 XMM05=3D000000000000000000000000=
+00000000
+  XMM06=3D00000000000000000000000000000000 XMM07=3D000000000000000000000000=
+00000000
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1471904/+subscriptions
