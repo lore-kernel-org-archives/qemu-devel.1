@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53286)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1fVwjM-0002pe-GK
+	(envelope-from <danielhb413@gmail.com>) id 1fVwjN-0002qK-Aj
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:22:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb413@gmail.com>) id 1fVwjK-0001fp-TH
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:22:20 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:40104)
+	(envelope-from <danielhb413@gmail.com>) id 1fVwjM-0001g6-Bq
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:22:21 -0400
+Received: from mail-qt0-x234.google.com ([2607:f8b0:400d:c0d::234]:36198)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <danielhb413@gmail.com>)
-	id 1fVwjK-0001fc-Mz
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:22:18 -0400
-Received: by mail-qt0-x241.google.com with SMTP id q6-v6so2308372qtn.7
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 03:22:18 -0700 (PDT)
+	id 1fVwjM-0001g1-73
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:22:20 -0400
+Received: by mail-qt0-x234.google.com with SMTP id o9-v6so2320716qtp.3
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 03:22:20 -0700 (PDT)
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Date: Thu, 21 Jun 2018 07:21:51 -0300
-Message-Id: <20180621102153.28443-5-danielhb413@gmail.com>
+Date: Thu, 21 Jun 2018 07:21:52 -0300
+Message-Id: <20180621102153.28443-6-danielhb413@gmail.com>
 In-Reply-To: <20180621102153.28443-1-danielhb413@gmail.com>
 References: <20180621102153.28443-1-danielhb413@gmail.com>
-Subject: [Qemu-devel] [PATCH v2 4/6] qga: removing switch statements,
- adding run_process_child
+Subject: [Qemu-devel] [PATCH v2 5/6] qga: systemd
+ hibernate/suspend/hybrid-sleep support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,338 +30,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: mdroth@linux.vnet.ibm.com, armbru@redhat.com, marcandre.lureau@gmail.com, Daniel Henrique Barboza <danielhb413@gmail.com>
 
-This is a cleanup of the resulting code after detaching
-pmutils and Linux sys state file logic:
+pmutils isn't being supported by newer OSes like Fedora 27
+or Mint. This means that the only suspend option QGA offers
+for these guests are writing directly into the Linux sys state
+file. This also means that QGA also loses the ability to do
+hybrid suspend in those guests - this suspend mode is only
+available when using pmutils.
 
-- remove the SUSPEND_MODE_* macros and use an enumeration
-instead. At the same time, drop the switch statements
-at the start of each function and use the enumeration
-index to get the right binary/argument;
+Newer guests can use systemd facilities to do all the suspend
+types QGA supports. The mapping in comparison with pmutils is:
 
-- create a new function called run_process_child(). This
-function uses g_spawn_sync() to execute a shell command,
-returning the exit code. This is a common operation in the
-pmutils functions and will be used in the systemd implementation
-as well, so this function will avoid code repetition.
+- pm-hibernate -> systemctl hibernate
+- pm-suspend -> systemctl suspend
+- pm-suspend-hybrid -> systemctl hybrid-sleep
 
-There are more places inside commands-posix.c where this new
-run_process_child function can also be used, but one step
-at a time.
+To discover whether systemd supports these functions, we inspect
+the status of the services that implements them.
+
+With this patch, we can offer hybrid suspend again for newer
+guests that do not have pmutils support anymore.
 
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- qga/commands-posix.c | 211 +++++++++++++++++--------------------------
- 1 file changed, 84 insertions(+), 127 deletions(-)
+ qga/commands-posix.c | 72 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
 
 diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 4b6fbd9b80..925544ae6d 100644
+index 925544ae6d..3546b74fed 100644
 --- a/qga/commands-posix.c
 +++ b/qga/commands-posix.c
-@@ -1438,152 +1438,117 @@ qmp_guest_fstrim(bool has_minimum, int64_t minimum, Error **errp)
- #define LINUX_SYS_STATE_FILE "/sys/power/state"
- #define SUSPEND_SUPPORTED 0
- #define SUSPEND_NOT_SUPPORTED 1
--#define SUSPEND_MODE_DISK 1
--#define SUSPEND_MODE_RAM 2
--#define SUSPEND_MODE_HYBRID 3
+@@ -1481,6 +1481,63 @@ static int run_process_child(const char *command[], Error **errp)
+     return -1;
+ }
  
--static bool pmutils_supports_mode(int suspend_mode, Error **errp)
-+typedef enum {
-+    SUSPEND_MODE_DISK = 0,
-+    SUSPEND_MODE_RAM = 1,
-+    SUSPEND_MODE_HYBRID = 2,
-+} SuspendMode;
-+
-+/*
-+ * Executes a command in a child process using g_spawn_sync,
-+ * returning an int >= 0 representing the exit status of the
-+ * process.
-+ *
-+ * If the program wasn't found in path, returns -1.
-+ *
-+ * If a problem happened when creating the child process,
-+ * returns -1 and errp is set.
-+ */
-+static int run_process_child(const char *command[], Error **errp)
- {
--    Error *local_err = NULL;
--    const char *pmutils_arg;
--    const char *pmutils_bin = "pm-is-supported";
--    char *pmutils_path;
--    pid_t pid;
--    int status;
--    bool ret = false;
-+    int exit_status, spawn_flag;
-+    GError *g_err = NULL;
-+    bool success;
- 
--    switch (suspend_mode) {
-+    spawn_flag = G_SPAWN_SEARCH_PATH | G_SPAWN_STDOUT_TO_DEV_NULL |
-+                 G_SPAWN_STDERR_TO_DEV_NULL;
- 
--    case SUSPEND_MODE_DISK:
--        pmutils_arg = "--hibernate";
--        break;
--    case SUSPEND_MODE_RAM:
--        pmutils_arg = "--suspend";
--        break;
--    case SUSPEND_MODE_HYBRID:
--        pmutils_arg = "--suspend-hybrid";
--        break;
--    default:
--        return ret;
-+    success =  g_spawn_sync(NULL, (char **)command, environ, spawn_flag,
-+                            NULL, NULL, NULL, NULL,
-+                            &exit_status, &g_err);
-+
-+    if (success) {
-+        return WEXITSTATUS(exit_status);
-     }
- 
--    pmutils_path = g_find_program_in_path(pmutils_bin);
--    if (!pmutils_path) {
--        return ret;
-+    if (g_err && (g_err->code != G_SPAWN_ERROR_NOENT)) {
-+        error_setg(errp, "failed to create child process, error '%s'",
-+                   g_err->message);
-     }
- 
--    pid = fork();
--    if (!pid) {
--        setsid();
--        execle(pmutils_path, pmutils_bin, pmutils_arg, NULL, environ);
--        /*
--         * If we get here execle() has failed.
--         */
--        _exit(SUSPEND_NOT_SUPPORTED);
--    } else if (pid < 0) {
--        error_setg_errno(errp, errno, "failed to create child process");
--        goto out;
-+    g_error_free(g_err);
-+    return -1;
-+}
-+
-+static bool pmutils_supports_mode(SuspendMode mode, Error **errp)
++static bool systemd_supports_mode(SuspendMode mode, Error **errp)
 +{
 +    Error *local_err = NULL;
-+    const char *pmutils_args[3] = {"--hibernate", "--suspend",
-+                                   "--suspend-hybrid"};
-+    const char *cmd[3] = {"pm-is-supported", pmutils_args[mode], NULL};
++    const char *systemctl_args[3] = {"systemd-hibernate", "systemd-suspend",
++                                     "systemd-hybrid-sleep"};
++    const char *cmd[4] = {"systemctl", "status", systemctl_args[mode], NULL};
 +    int status;
 +
 +    status = run_process_child(cmd, &local_err);
 +
-+    if (status == SUSPEND_SUPPORTED) {
++    /*
++     * systemctl status uses LSB return codes so we can expect
++     * status > 0 and be ok. To assert if the guest has support
++     * for the selected suspend mode, status should be < 4. 4 is
++     * the code for unknown service status, the return value when
++     * the service does not exist. A common value is status = 3
++     * (program is not running).
++     */
++    if (status > 0 && status < 4) {
 +        return true;
-     }
- 
--    ga_wait_child(pid, &status, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        goto out;
++    }
++
++    if (local_err) {
++        error_propagate(errp, local_err);
++    }
++
++    return false;
++}
++
++static void systemd_suspend(SuspendMode mode, Error **errp)
++{
++    Error *local_err = NULL;
++    const char *systemctl_args[3] = {"hibernate", "suspend", "hybrid-sleep"};
++    const char *cmd[3] = {"systemctl", systemctl_args[mode], NULL};
++    int status;
++
++    status = run_process_child(cmd, &local_err);
++
++    if (status == 0) {
++        return;
++    }
++
 +    if ((status == -1) && !local_err) {
-+        return false;
-     }
- 
--    switch (WEXITSTATUS(status)) {
--    case SUSPEND_SUPPORTED:
--        ret = true;
--        goto out;
--    case SUSPEND_NOT_SUPPORTED:
--        goto out;
--    default:
++        error_setg(errp, "the helper program 'systemctl %s' was not found",
++                   systemctl_args[mode]);
++        return;
++    }
++
 +    if (local_err) {
 +        error_propagate(errp, local_err);
 +    } else {
-         error_setg(errp,
--                   "the helper program '%s' returned an unexpected exit status"
--                   " code (%d)", pmutils_path, WEXITSTATUS(status));
--        goto out;
-+                   "the helper program '%s' returned an unexpected exit"
-+                   " status code (%d)", "pm-is-supported", status);
-     }
- 
--out:
--    g_free(pmutils_path);
--    return ret;
-+    return false;
- }
- 
--static void pmutils_suspend(int suspend_mode, Error **errp)
-+static void pmutils_suspend(SuspendMode mode, Error **errp)
++        error_setg(errp, "the helper program 'systemctl %s' returned an "
++                   "unexpected exit status code (%d)",
++                   systemctl_args[mode], status);
++    }
++}
++
+ static bool pmutils_supports_mode(SuspendMode mode, Error **errp)
  {
      Error *local_err = NULL;
--    const char *pmutils_bin;
--    char *pmutils_path;
--    pid_t pid;
-+    const char *pmutils_binaries[3] = {"pm-hibernate", "pm-suspend",
-+                                       "pm-suspend-hybrid"};
-+    const char *cmd[2] = {pmutils_binaries[mode], NULL};
-     int status;
- 
--    switch (suspend_mode) {
--
--    case SUSPEND_MODE_DISK:
--        pmutils_bin = "pm-hibernate";
--        break;
--    case SUSPEND_MODE_RAM:
--        pmutils_bin = "pm-suspend";
--        break;
--    case SUSPEND_MODE_HYBRID:
--        pmutils_bin = "pm-suspend-hybrid";
--        break;
--    default:
--        error_setg(errp, "unknown guest suspend mode");
--        return;
--    }
-+    status = run_process_child(cmd, &local_err);
- 
--    pmutils_path = g_find_program_in_path(pmutils_bin);
--    if (!pmutils_path) {
--        error_setg(errp, "the helper program '%s' was not found", pmutils_bin);
-+    if (status == 0) {
-         return;
-     }
- 
--    pid = fork();
--    if (!pid) {
--        setsid();
--        execle(pmutils_path, pmutils_bin, NULL, environ);
--        /*
--         * If we get here execle() has failed.
--         */
--        _exit(EXIT_FAILURE);
--    } else if (pid < 0) {
--        error_setg_errno(errp, errno, "failed to create child process");
--        goto out;
-+    if ((status == -1) && !local_err) {
-+        error_setg(errp, "the helper program '%s' was not found",
-+                   pmutils_binaries[mode]);
-+        return;
-     }
- 
--    ga_wait_child(pid, &status, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
--        goto out;
--    }
--
--    if (WEXITSTATUS(status)) {
-+    } else {
-         error_setg(errp,
--                   "the helper program '%s' returned an unexpected exit status"
--                   " code (%d)", pmutils_path, WEXITSTATUS(status));
-+                   "the helper program '%s' returned an unexpected exit"
-+                   " status code (%d)", pmutils_binaries[mode], status);
-     }
--
--out:
--    g_free(pmutils_path);
- }
- 
--static bool linux_sys_state_supports_mode(int suspend_mode, Error **errp)
-+static bool linux_sys_state_supports_mode(SuspendMode mode, Error **errp)
- {
--    const char *sysfile_str;
-+    const char *sysfile_strs[3] = {"disk", "mem", NULL};
-+    const char *sysfile_str = sysfile_strs[mode];
-     char buf[32]; /* hopefully big enough */
-     int fd;
-     ssize_t ret;
- 
--    switch (suspend_mode) {
--
--    case SUSPEND_MODE_DISK:
--        sysfile_str = "disk";
--        break;
--    case SUSPEND_MODE_RAM:
--        sysfile_str = "mem";
--        break;
--    default:
-+    if (!sysfile_str) {
-+        error_setg(errp, "unknown guest suspend mode");
-         return false;
-     }
- 
-@@ -1604,22 +1569,15 @@ static bool linux_sys_state_supports_mode(int suspend_mode, Error **errp)
-     return false;
- }
- 
--static void linux_sys_state_suspend(int suspend_mode, Error **errp)
-+static void linux_sys_state_suspend(SuspendMode mode, Error **errp)
- {
-     Error *local_err = NULL;
--    const char *sysfile_str;
-+    const char *sysfile_strs[3] = {"disk", "mem", NULL};
-+    const char *sysfile_str = sysfile_strs[mode];
-     pid_t pid;
-     int status;
- 
--    switch (suspend_mode) {
--
--    case SUSPEND_MODE_DISK:
--        sysfile_str = "disk";
--        break;
--    case SUSPEND_MODE_RAM:
--        sysfile_str = "mem";
--        break;
--    default:
-+    if (!sysfile_str) {
-         error_setg(errp, "unknown guest suspend mode");
-         return;
-     }
-@@ -1661,12 +1619,12 @@ static void linux_sys_state_suspend(int suspend_mode, Error **errp)
- 
- }
- 
--static void bios_supports_mode(int suspend_mode, Error **errp)
-+static void bios_supports_mode(SuspendMode mode, Error **errp)
- {
+@@ -1624,6 +1681,14 @@ static void bios_supports_mode(SuspendMode mode, Error **errp)
      Error *local_err = NULL;
      bool ret;
  
--    ret = pmutils_supports_mode(suspend_mode, &local_err);
-+    ret = pmutils_supports_mode(mode, &local_err);
++    ret = systemd_supports_mode(mode, &local_err);
++    if (ret) {
++        return;
++    }
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
+     ret = pmutils_supports_mode(mode, &local_err);
      if (ret) {
          return;
-     }
-@@ -1674,32 +1632,31 @@ static void bios_supports_mode(int suspend_mode, Error **errp)
-         error_propagate(errp, local_err);
-         return;
-     }
--    ret = linux_sys_state_supports_mode(suspend_mode, errp);
-+    ret = linux_sys_state_supports_mode(mode, &local_err);
-     if (!ret) {
-         error_setg(errp,
-                    "the requested suspend mode is not supported by the guest");
--        return;
-     }
- }
- 
--static void guest_suspend(int suspend_mode, Error **errp)
-+static void guest_suspend(SuspendMode mode, Error **errp)
- {
-     Error *local_err = NULL;
- 
--    bios_supports_mode(suspend_mode, &local_err);
-+    bios_supports_mode(mode, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
+@@ -1649,6 +1714,13 @@ static void guest_suspend(SuspendMode mode, Error **errp)
          return;
      }
  
--    pmutils_suspend(suspend_mode, &local_err);
-+    pmutils_suspend(mode, &local_err);
++    systemd_suspend(mode, &local_err);
++    if (!local_err) {
++        return;
++    }
++
++    error_free(local_err);
++
+     pmutils_suspend(mode, &local_err);
      if (!local_err) {
          return;
-     }
- 
-     error_free(local_err);
- 
--    linux_sys_state_suspend(suspend_mode, &local_err);
-+    linux_sys_state_suspend(mode, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-     }
 -- 
 2.17.1
