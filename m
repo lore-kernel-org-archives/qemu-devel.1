@@ -1,15 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fW1pR-0006b1-Ox
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:48:59 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fW1qb-0007LZ-RZ
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:50:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fW1pO-0003Ai-L9
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:48:57 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu, 21 Jun 2018 18:48:50 +0300
-Message-Id: <20180621154850.23354-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] block/fleecing-filter: new filter driver for
- fleecing
+	(envelope-from <borntraeger@de.ibm.com>) id 1fW1qZ-0003Zq-AV
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:50:09 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:23989
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fW1qZ-0003ZP-4U
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:50:07 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5LFniIZ023358
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 11:50:05 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2jrdf2mpyf-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 11:50:03 -0400
+Received: from localhost
+	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 21 Jun 2018 16:50:01 +0100
+References: <20180424101859.10239-1-david@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 21 Jun 2018 17:49:56 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180424101859.10239-1-david@redhat.com>
+Content-Language: en-US
+Message-Id: <7c046e3c-8752-87c5-f4ff-06ef56ef0128@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x: refactor reset/reipl handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,184 +42,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: armbru@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, den@openvz.com
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-We need to synchronize backup job with reading from fleecing image
-like it was done in block/replication.c.
 
-Otherwise, the following situation is theoretically possible:
 
-1. client start reading
-2. client understand, that there is no corresponding cluster in
-   fleecing image
-3. client is going to read from backing file (i.e. active image)
-4. guest writes to active image
-5. this write is stopped by backup(sync=none) and cluster is copied to
-   fleecing image
-6. guest write continues...
-7. and client reads _new_ (or partly new) date from active image
+On 04/24/2018 12:18 PM, David Hildenbrand wrote:
+> Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
+> not be the best idea. As pause_all_vcpus() temporarily drops the qemu
+> mutex, two parallel calls to pause_all_vcpus() can be active at a time,
+> resulting in a deadlock. (either by two VCPUs or by the main thread and a
+> VCPU)
+> 
+> Let's handle it via the main loop instead, as suggested by Paolo. If we
+> would have two parallel reset requests by two different VCPUs at the
+> same time, the last one would win.
+> 
+> We use the existing ipl device to handle it. The nice side effect is
+> that we can get rid of reipl_requested.
+> 
+> This change implies that all reset handling now goes via the common
+> path, so "no-reboot" handling is now active for all kinds of reboots.
 
-So, this fleecing-filter should be above fleecing image, the whole
-picture of fleecing looks like this:
+Ok, this breaks the s390 IPL process when -no-reboot  is specified.
+The bios does a diagnose 308 subcode 1 to jump to the final image while
+at the same time resetting all devices. This is now blocked with -no-reboot
+(although it is actually the boot)
 
-    +-------+           +------------+
-    |       |           |            |
-    | guest |           | NBD client +<------+
-    |       |           |            |       |
-    ++-----++           +------------+       |only read
-     |     ^                                 |
-     | IO  |                                 |
-     v     |                           +-----+------+
-    ++-----+---------+                 |            |
-    |                |                 |  internal  |
-    |  active image  +----+            | NBD server |
-    |                |    |            |            |
-    +-+--------------+    |backup      +-+----------+
-      ^                   |sync=none     ^
-      |backing            |              |only read
-      |                   |              |
-    +-+--------------+    |       +------+----------+
-    |                |    |       |                 |
-    | fleecing image +<---+       | fleecing filter |
-    |                |            |                 |
-    +--------+-------+            +-----+-----------+
-             ^                          |
-             |                          |
-             +--------------------------+
-                       file
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- qapi/block-core.json    |  9 ++++---
- block/fleecing-filter.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++
- block/Makefile.objs     |  1 +
- 3 files changed, 79 insertions(+), 3 deletions(-)
- create mode 100644 block/fleecing-filter.c
+I have noticed that with virt-install on iso images since virt-install
+specifies -no-reboot.
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index dfaa050651..b21bc3b693 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2543,7 +2543,8 @@
-             'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
-             'null-aio', 'null-co', 'nvme', 'parallels', 'qcow', 'qcow2', 'qed',
-             'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
--            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
-+            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs',
-+            'fleecing-filter' ] }
+Something like this seems to help but it is not a nice solution.
+
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 0d67349004..7b32698eaa 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -534,8 +534,14 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
+              */
+             ipl->iplb_valid = s390_gen_initial_iplb(ipl);
+         }
++        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++    } else  if (reset_type == S390_RESET_MODIFIED_CLEAR ||
++                reset_type == S390_RESET_LOAD_NORMAL) {
++	/* ignore -no-reboot */
++        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET_FORCE);
++    } else {
++        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+     }
+-    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+     /* as this is triggered by a CPU, make sure to exit the loop */
+     if (tcg_enabled()) {
+         cpu_loop_exit(cs);
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index e893f72f3b..e9b11fd6cb 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -44,6 +44,9 @@ typedef enum ShutdownCause {
+                                      turns that into a shutdown */
+     SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
+                                      that into a shutdown */
++    SHUTDOWN_CAUSE_GUEST_RESET_FORCE,/* Guest reset that should ignore --no-reboot
++                                     useful for the subsystem resets on s390 done
++                                     for kdump and kexec */
+     SHUTDOWN_CAUSE__MAX,
+ } ShutdownCause;
  
- ##
- # @BlockdevOptionsFile:
-@@ -3607,7 +3608,8 @@
-       'vmdk':       'BlockdevOptionsGenericCOWFormat',
-       'vpc':        'BlockdevOptionsGenericFormat',
-       'vvfat':      'BlockdevOptionsVVFAT',
--      'vxhs':       'BlockdevOptionsVxHS'
-+      'vxhs':       'BlockdevOptionsVxHS',
-+      'fleecing-filter': 'BlockdevOptionsGenericFormat'
-   } }
+diff --git a/vl.c b/vl.c
+index b3426e03d0..18f379e833 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1674,7 +1674,9 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
  
- ##
-@@ -4135,7 +4137,8 @@
-       'vmdk':           'BlockdevCreateNotSupported',
-       'vpc':            'BlockdevCreateOptionsVpc',
-       'vvfat':          'BlockdevCreateNotSupported',
--      'vxhs':           'BlockdevCreateNotSupported'
-+      'vxhs':           'BlockdevCreateNotSupported',
-+      'fleecing-filter': 'BlockdevCreateNotSupported'
-   } }
- 
- ##
-diff --git a/block/fleecing-filter.c b/block/fleecing-filter.c
-new file mode 100644
-index 0000000000..60bac9c0b4
---- /dev/null
-+++ b/block/fleecing-filter.c
-@@ -0,0 +1,72 @@
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "block/blockjob.h"
-+#include "block/block_int.h"
-+#include "block/block_backup.h"
-+
-+static int64_t fleecing_getlength(BlockDriverState *bs)
-+{
-+    return bdrv_getlength(bs->file->bs);
-+}
-+
-+static coroutine_fn int fleecing_co_preadv(BlockDriverState *bs,
-+                                           uint64_t offset, uint64_t bytes,
-+                                           QEMUIOVector *qiov, int flags)
-+{
-+    int ret;
-+    BlockJob *job = bs->file->bs->backing->bs->job;
-+    CowRequest req;
-+
-+    backup_wait_for_overlapping_requests(job, offset, bytes);
-+    backup_cow_request_begin(&req, job, offset, bytes);
-+
-+    ret = bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
-+
-+    backup_cow_request_end(&req);
-+
-+    return ret;
-+}
-+
-+static coroutine_fn int fleecing_co_pwritev(BlockDriverState *bs,
-+                                            uint64_t offset, uint64_t bytes,
-+                                            QEMUIOVector *qiov, int flags)
-+{
-+    return -EINVAL;
-+}
-+
-+static bool fleecing_recurse_is_first_non_filter(BlockDriverState *bs,
-+                                                 BlockDriverState *candidate)
-+{
-+    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
-+}
-+
-+static int fleecing_open(BlockDriverState *bs, QDict *options,
-+                         int flags, Error **errp)
-+{
-+    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
-+                               errp);
-+
-+    return bs->file ? 0 : -EINVAL;
-+}
-+
-+BlockDriver bdrv_fleecing_filter = {
-+    .format_name = "fleecing-filter",
-+    .protocol_name = "fleecing-filter",
-+    .instance_size = 0,
-+
-+    .bdrv_open = fleecing_open,
-+
-+    .bdrv_getlength = fleecing_getlength,
-+    .bdrv_co_preadv = fleecing_co_preadv,
-+    .bdrv_co_pwritev = fleecing_co_pwritev,
-+
-+    .is_filter = true,
-+    .bdrv_recurse_is_first_non_filter = fleecing_recurse_is_first_non_filter,
-+};
-+
-+static void bdrv_fleecing_init(void)
-+{
-+    bdrv_register(&bdrv_fleecing_filter);
-+}
-+
-+block_init(bdrv_fleecing_init);
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index 899bfb5e2c..aa0a6dd971 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -27,6 +27,7 @@ block-obj-y += write-threshold.o
- block-obj-y += backup.o
- block-obj-$(CONFIG_REPLICATION) += replication.o
- block-obj-y += throttle.o copy-on-read.o
-+block-obj-y += fleecing-filter.o
- 
- block-obj-y += crypto.o
- 
+ void qemu_system_reset_request(ShutdownCause reason)
+ {
+-    if (no_reboot) {
++    if (reason == SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
++	    reset_requested = SHUTDOWN_CAUSE_GUEST_RESET;
++    } else if (no_reboot) {
+         shutdown_requested = reason;
+     } else {
+         reset_requested = reason;
 -- 
-2.11.1
+2.17.0
