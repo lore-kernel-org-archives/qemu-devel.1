@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50453)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fW39L-0004xQ-Af
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:13:36 -0400
+	id 1fW39N-0004zp-Fl
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:13:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fW39J-0002DP-8g
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:13:35 -0400
+	id 1fW39M-0002FH-JE
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:13:37 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 21 Jun 2018 14:12:55 -0300
-Message-Id: <20180621171257.14897-10-f4bug@amsat.org>
+Date: Thu, 21 Jun 2018 14:12:56 -0300
+Message-Id: <20180621171257.14897-11-f4bug@amsat.org>
 In-Reply-To: <20180621171257.14897-1-f4bug@amsat.org>
 References: <20180621171257.14897-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 09/11] hw/net/etraxfs_eth: Convert printf()
- calls to trace events
+Subject: [Qemu-devel] [PATCH 10/11] hw/block/fdc: Convert from
+ FLOPPY_DPRINTF() macro to trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair@alistair23.me>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Jason Wang <jasowang@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>
 
-Suggested-by: Alistair Francis <alistair@alistair23.me>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/net/etraxfs_eth.c | 8 ++++----
- hw/net/trace-events  | 5 +++++
- 2 files changed, 9 insertions(+), 4 deletions(-)
+ hw/block/fdc.c        | 6 +++---
+ hw/block/trace-events | 4 ++++
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/hw/net/etraxfs_eth.c b/hw/net/etraxfs_eth.c
-index 013c8d0a41..a6932432b1 100644
---- a/hw/net/etraxfs_eth.c
-+++ b/hw/net/etraxfs_eth.c
-@@ -27,6 +27,7 @@
- #include "net/net.h"
- #include "hw/cris/etraxfs.h"
- #include "qemu/error-report.h"
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index cd29e27d8f..c7b4fe9b3e 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -40,6 +40,7 @@
+ #include "sysemu/blockdev.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/log.h"
 +#include "trace.h"
  
- #define D(x)
- 
-@@ -106,7 +107,7 @@ static unsigned int tdk_read(struct qemu_phy *phy, unsigned int req)
-         r = phy->regs[regnum];
+ /********************************************************/
+ /* debug Floppy devices */
+@@ -934,7 +935,7 @@ static uint32_t fdctrl_read (void *opaque, uint32_t reg)
+         retval = (uint32_t)(-1);
          break;
      }
--    D(printf("\n%s %x = reg[%d]\n", __func__, r, regnum));
-+    trace_mdio_phy_read(regnum, r);
-     return r;
+-    FLOPPY_DPRINTF("read reg%d: 0x%02x\n", reg & 7, retval);
++    trace_fdc_ioport_read(reg, retval);
+ 
+     return retval;
  }
- 
-@@ -116,7 +117,7 @@ tdk_write(struct qemu_phy *phy, unsigned int req, unsigned int data)
-     int regnum;
- 
-     regnum = req & 0x1f;
--    D(printf("%s reg[%d] = %x\n", __func__, regnum, data));
-+    trace_mdio_phy_write(regnum, data);
-     switch (regnum) {
-     default:
-         phy->regs[regnum] = data;
-@@ -206,8 +207,7 @@ static void mdio_cycle(struct qemu_mdio *bus)
+@@ -943,9 +944,8 @@ static void fdctrl_write (void *opaque, uint32_t reg, uint32_t value)
  {
-     bus->cnt++;
+     FDCtrl *fdctrl = opaque;
  
--    D(printf("mdc=%d mdio=%d state=%d cnt=%d drv=%d\n",
--        bus->mdc, bus->mdio, bus->state, bus->cnt, bus->drive));
-+    trace_mdio_bitbang(bus->mdc, bus->mdio, bus->state, bus->cnt, bus->drive);
- #if 0
-     if (bus->mdc) {
-         printf("%d", bus->mdio);
-diff --git a/hw/net/trace-events b/hw/net/trace-events
-index f57010df37..663bea1b74 100644
---- a/hw/net/trace-events
-+++ b/hw/net/trace-events
-@@ -1,5 +1,10 @@
+-    FLOPPY_DPRINTF("write reg%d: 0x%02x\n", reg & 7, value);
+-
+     reg &= 7;
++    trace_fdc_ioport_write(reg, value);
+     switch (reg) {
+     case FD_REG_DOR:
+         fdctrl_write_dor(fdctrl, value);
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 6b9e733412..d842c45409 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -1,5 +1,9 @@
  # See docs/devel/tracing.txt for syntax documentation.
  
-+# hw/net/etraxfs_eth.c
-+mdio_phy_read(int regnum, uint16_t value) "read phy_reg:%d value:0x%04x"
-+mdio_phy_write(int regnum, uint16_t value) "write phy_reg:%d value:0x%04x"
-+mdio_bitbang(bool mdc, bool mdio, int state, uint16_t cnt, unsigned int drive) "bitbang mdc=%u mdio=%u state=%d cnt=%u drv=%d"
++# hw/block/fdc.c
++fdc_ioport_read(uint8_t reg, uint8_t value) "read reg 0x%02x val 0x%02x"
++fdc_ioport_write(uint8_t reg, uint8_t value) "write reg 0x%02x val 0x%02x"
 +
- # hw/net/lance.c
- lance_mem_readw(uint64_t addr, uint32_t ret) "addr=0x%"PRIx64"val=0x%04x"
- lance_mem_writew(uint64_t addr, uint32_t val) "addr=0x%"PRIx64"val=0x%04x"
+ # hw/block/virtio-blk.c
+ virtio_blk_req_complete(void *vdev, void *req, int status) "vdev %p req %p status %d"
+ virtio_blk_rw_complete(void *vdev, void *req, int ret) "vdev %p req %p ret %d"
 -- 
 2.18.0.rc2
