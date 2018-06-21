@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fVzOp-0000iV-Rv
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:13:21 -0400
+	(envelope-from <thuth@redhat.com>) id 1fVzQB-0001Sc-U9
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:14:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fVzOo-00050P-IH
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:13:19 -0400
-References: <20180413143156.11409-1-vsementsov@virtuozzo.com>
-	<8003bc90-1b11-3d1b-07a3-dca4d49fb79b@virtuozzo.com>
-	<dcffbc2b-e0b0-3c90-0c29-aa0c0be64af8@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <0b3bc235-e1a5-f076-2903-15a12041eed9@virtuozzo.com>
-Date: Thu, 21 Jun 2018 16:13:07 +0300
+	(envelope-from <thuth@redhat.com>) id 1fVzQ8-0005q2-MF
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:14:43 -0400
+References: <20180620100825.22476-1-david@redhat.com>
+	<20180620100825.22476-6-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0544e011-e909-6bca-e4ca-5a1caa141f4b@redhat.com>
+Date: Thu, 21 Jun 2018 15:14:32 +0200
 MIME-Version: 1.0
-In-Reply-To: <dcffbc2b-e0b0-3c90-0c29-aa0c0be64af8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20180620100825.22476-6-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] nbd/server: introduce NBD_CMD_CACHE
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 5/7] s390x/tcg: implement SET CLOCK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +24,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, pbonzini@redhat.com
+To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-17.05.2018 16:34, Eric Blake wrote:
-> On 05/17/2018 04:52 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Finally, what about this?
->>
->> 13.04.2018 17:31, Vladimir Sementsov-Ogievskiy wrote:
->>> Handle nbd CACHE command. Just do read, without sending read data back.
->>> Cache mechanism should be done by exported node driver chain.
->
-> Still waiting on the NBD spec review, which I've pinged on the NBD=20
-> list. But as mentioned there, I'll probably go ahead and accept this=20
-> (possibly with slight tweaks) on Monday, after giving one more weekend=20
-> for any last-minute review comments.
+On 20.06.2018 12:08, David Hildenbrand wrote:
+> This allows a guest to change its TOD. We already take care of updating
+> all CKC timers from within S390TODClass.
+> 
+> Use MO_ALIGN to load the operand manually - this will properly trigger a
+> SPECIFICATION exception.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/helper.h      |  1 +
+>  target/s390x/insn-data.def |  3 +--
+>  target/s390x/misc_helper.c | 19 +++++++++++++++++++
+>  target/s390x/translate.c   |  9 +++++++++
+>  4 files changed, 30 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+> index 59cba86a27..97c60ca7bc 100644
+> --- a/target/s390x/helper.h
+> +++ b/target/s390x/helper.h
+> @@ -127,6 +127,7 @@ DEF_HELPER_4(diag, void, env, i32, i32, i32)
+>  DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
+>  DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
+>  DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
+> +DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
+>  DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
+>  DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
+>  DEF_HELPER_FLAGS_1(stckc, TCG_CALL_NO_RWG, i64, env)
+> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+> index 157619403d..5c6f33ed9c 100644
+> --- a/target/s390x/insn-data.def
+> +++ b/target/s390x/insn-data.def
+> @@ -997,8 +997,7 @@
+>  /* SET ADDRESS SPACE CONTROL FAST */
+>      C(0xb279, SACF,    S,     Z,   0, a2, 0, 0, sacf, 0)
+>  /* SET CLOCK */
+> -    /* ??? Not implemented - is it necessary? */
+> -    C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
+> +    C(0xb204, SCK,     S,     Z,   la2, 0, 0, 0, sck, 0)
+>  /* SET CLOCK COMPARATOR */
+>      C(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0)
+>  /* SET CLOCK PROGRAMMABLE FIELD */
+> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+> index d5f9f5e1d3..c9712b9476 100644
+> --- a/target/s390x/misc_helper.c
+> +++ b/target/s390x/misc_helper.c
+> @@ -191,6 +191,25 @@ void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
+>      helper_sckc(env, env->ckc);
+>  }
+>  
+> +/* Set Clock */
+> +uint32_t HELPER(sck)(CPUS390XState *env, uint64_t tod_low)
+> +{
+> +    S390TODState *td = s390_get_tod();
+> +    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
+> +    S390TOD tod = {
+> +        .high = 0,
+> +        .low = tod_low,
+> +    };
+> +    Error *err = NULL;
+> +
+> +    qemu_mutex_lock_iothread();
+> +    tdc->set(td, &tod, &err);
+> +    qemu_mutex_unlock_iothread();
+> +    g_assert(!err);
 
-Hmm, Eric?
+I know it currently can't happen, but still, I think it would be nicer
+to use CC3 to tell the guest that something went wrong with the clock,
+instead of abort QEMU here.
 
->
->>> @@ -1826,7 +1826,9 @@ static int=20
->>> nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EIO;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> -=C2=A0=C2=A0=C2=A0 if (request->type =3D=3D NBD_CMD_READ || request->t=
-ype =3D=3D=20
->>> NBD_CMD_WRITE) {
->>> +=C2=A0=C2=A0=C2=A0 if (request->type =3D=3D NBD_CMD_READ || request->t=
-ype =3D=3D=20
->>> NBD_CMD_WRITE ||
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 request->type =3D=3D NBD_CM=
-D_CACHE)
->>> +=C2=A0=C2=A0=C2=A0 {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (request->len=
- > NBD_MAX_BUFFER_SIZE) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 error_setg(errp, "len (%" PRIu32" ) is larger than max=20
->>> len (%u)",
->
-> I'm not sure I agree with this one. Since we aren't passing the cached=20
-> data over the wire, we can reject the command with EINVAL instead of=20
-> killing the connection entirely.
->
-> (As it is, I wonder if we can be nicer about rejecting a read request=20
-> > 32M. For a write request, we have to disconnect; but for a read=20
-> request, we can keep the connection alive by just returning EINVAL for=20
-> a too-large read, instead of our current behavior of disconnecting)
->
->>> request->len, NBD_MAX_BUFFER_SIZE);
->>> @@ -1911,7 +1913,7 @@ static coroutine_fn int=20
->>> nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NBDExport *exp =3D client->exp;
->>> -=C2=A0=C2=A0=C2=A0 assert(request->type =3D=3D NBD_CMD_READ);
->>> +=C2=A0=C2=A0=C2=A0 assert(request->type =3D=3D NBD_CMD_READ || request=
-->type =3D=3D=20
->>> NBD_CMD_CACHE);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* XXX: NBD Protocol only documents use =
-of FUA with WRITE */
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (request->flags & NBD_CMD_FLAG_FUA) {
->>> @@ -1930,7 +1932,7 @@ static coroutine_fn int=20
->>> nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D blk_pread(exp->blk, request->fro=
-m + exp->dev_offset, data,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 request->len);
->>> -=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>> +=C2=A0=C2=A0=C2=A0 if (ret < 0 || request->type =3D=3D NBD_CMD_CACHE) =
-{
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return nbd_send_=
-generic_reply(client, request->handle, ret,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 "reading from file failed",=20
->>> errp);
->
-> As for the implementation on the server side, yes, this looks=20
-> reasonable, given the proposed spec wording being considered on the=20
-> NBD list.
->
-
-
---=20
-Best regards,
-Vladimir
+ Thomas
