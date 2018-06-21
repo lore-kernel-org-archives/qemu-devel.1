@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fW34Q-0001gH-7j
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:08:31 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fW36a-0003Fx-Ns
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:10:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fW34L-00072M-8X
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:08:30 -0400
-References: <20180621170143.113370-1-borntraeger@de.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d27919d1-6017-3b57-815d-0bdeb96dea6e@redhat.com>
-Date: Thu, 21 Jun 2018 19:08:20 +0200
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fW36X-0008SN-NO
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:10:44 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:36278)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fW36X-0008Rj-Bl
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:10:41 -0400
+Received: by mail-wr0-x241.google.com with SMTP id f16-v6so3989208wrm.3
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 10:10:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180621170143.113370-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] s390/ipl: fix ipl with -no-reboot
+In-Reply-To: <20180621162333.293f1a2c@redhat.com>
+References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
+	<20180515121433.6112-4-marcandre.lureau@redhat.com>
+	<20180621145405.197d5106@redhat.com>
+	<CAJ+F1CKFq5=Afoqg8YZGw-TO8vJqTPwjpW_UAMh6G8LPp4ZztA@mail.gmail.com>
+	<20180621162333.293f1a2c@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 21 Jun 2018 19:10:38 +0200
+Message-ID: <CAJ+F1CLHtrx0hC9AUQ_JvvGGMx5D-X6=hy3A1c+MC0P-5Q3QAg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] acpi: build TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,85 +34,657 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 21/06/2018 19:01, Christian Borntraeger wrote:
-> kexec/kdump as well as the bootloader use a subcode of diagnose 308
-> that is supposed to reset the subsystem but not comprise a full
-> "reboot". With the latest refactoring this is now broken when
-> -no-reboot is used. This for example breaks virt-install from
-> iso images.
-> 
-> We need to mark these "soft" reboots as ok for rebooting.
-> 
-> Fixes: a30fb811cbe9 (s390x: refactor reset/reipl handling)
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+Hi
 
-Ok, then my suggestion made even more sense. :)  No other objections
-apart from the name of the constant.
+On Thu, Jun 21, 2018 at 4:23 PM, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Thu, 21 Jun 2018 15:21:02 +0200
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+>
+>> Hi
+>>
+>> On Thu, Jun 21, 2018 at 2:54 PM, Igor Mammedov <imammedo@redhat.com> wro=
+te:
+>> > On Tue, 15 May 2018 14:14:32 +0200
+>> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
+>> >
+>> >> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> >>
+>> >> The TPM Physical Presence interface consists of an ACPI part, a share=
+d
+>> >> memory part, and code in the firmware. Users can send messages to the
+>> >> firmware by writing a code into the shared memory through invoking th=
+e
+>> >> ACPI code. When a reboot happens, the firmware looks for the code and
+>> >> acts on it by sending sequences of commands to the TPM.
+>> >>
+>> >> This patch adds the ACPI code. It is similar to the one in EDK2 but d=
+oesn't
+>> >> assume that SMIs are necessary to use. It uses a similar datastructur=
+e for
+>> >> the shared memory as EDK2 does so that EDK2 and SeaBIOS could both ma=
+ke use
+>> >> of it. I extended the shared memory data structure with an array of 2=
+56
+>> >> bytes, one for each code that could be implemented. The array contain=
+s
+>> >> flags describing the individual codes. This decouples the ACPI implem=
+entation
+>> >> from the firmware implementation.
+>> >>
+>> >> The underlying TCG specification is accessible from the following pag=
+e.
+>> >>
+>> >> https://trustedcomputinggroup.org/tcg-physical-presence-interface-spe=
+cification/
+>> >>
+>> >> This patch implements version 1.30.
+>> >>
+>> >> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> >>
+>> >> ---
+>> >>
+>> >> v4 (Marc-Andr=C3=A9):
+>> >>  - replace 'DerefOf (FUNC [N])' with a function, to fix Windows ACPI
+>> >>     handling.
+>> >>  - replace 'return Package (..) {} ' with scoped variables, to fix
+>> >>    Windows ACPI handling.
+>> >>
+>> >> v3:
+>> >>  - add support for PPI to CRB
+>> >>  - split up OperationRegion TPPI into two parts, one containing
+>> >>    the registers (TPP1) and the other one the flags (TPP2); switched
+>> >>    the order of the flags versus registers in the code
+>> >>  - adapted ACPI code to small changes to the array of flags where
+>> >>    previous flag 0 was removed and now shifting right wasn't always
+>> >>    necessary anymore
+>> >>
+>> >> v2:
+>> >>  - get rid of FAIL variable; function 5 was using it and always
+>> >>    returns 0; the value is related to the ACPI function call not
+>> >>    a possible failure of the TPM function call.
+>> >>  - extend shared memory data structure with per-opcode entries
+>> >>    holding flags and use those flags to determine what to return
+>> >>    to caller
+>> >>  - implement interface version 1.3
+>> >> ---
+>> >>  include/hw/acpi/tpm.h |  21 +++
+>> >>  hw/i386/acpi-build.c  | 294 ++++++++++++++++++++++++++++++++++++++++=
++-
+>> >>  2 files changed, 314 insertions(+), 1 deletion(-)
+>> >>
+>> >> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+>> >> index f79d68a77a..fc53f08827 100644
+>> >> --- a/include/hw/acpi/tpm.h
+>> >> +++ b/include/hw/acpi/tpm.h
+>> >> @@ -196,4 +196,25 @@ REG32(CRB_DATA_BUFFER, 0x80)
+>> >>  #define TPM_PPI_VERSION_NONE        0
+>> >>  #define TPM_PPI_VERSION_1_30        1
+>> >>
+>> >> +struct tpm_ppi {
+>> >> +    uint8_t  func[256];      /* 0x000: per TPM function implementati=
+on flags;
+>> >> +                                       set by BIOS */
+>> >> +/* whether function is blocked by BIOS settings; bits 0, 1, 2 */
+>> >> +#define TPM_PPI_FUNC_NOT_IMPLEMENTED     (0 << 0)
+>> >> +#define TPM_PPI_FUNC_BIOS_ONLY           (1 << 0)
+>> >> +#define TPM_PPI_FUNC_BLOCKED             (2 << 0)
+>> >> +#define TPM_PPI_FUNC_ALLOWED_USR_REQ     (3 << 0)
+>> >> +#define TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ (4 << 0)
+>> >> +#define TPM_PPI_FUNC_MASK                (7 << 0)
+>> >> +    uint8_t ppin;            /* 0x100 : set by BIOS */
+>> >> +    uint32_t ppip;           /* 0x101 : set by ACPI; not used */
+>> >> +    uint32_t pprp;           /* 0x105 : response from TPM; set by BI=
+OS */
+>> >> +    uint32_t pprq;           /* 0x109 : opcode; set by ACPI */
+>> >> +    uint32_t pprm;           /* 0x10d : parameter for opcode; set by=
+ ACPI */
+>> >> +    uint32_t lppr;           /* 0x111 : last opcode; set by BIOS */
+>> >> +    uint32_t fret;           /* 0x115 : set by ACPI; not used */
+>> >> +    uint8_t res1[0x40];      /* 0x119 : reserved for future use */
+>> >> +    uint8_t next_step;       /* 0x159 : next step after reboot; set =
+by BIOS */
+>> >> +} QEMU_PACKED;
+>> > is this structure plant to be used for accessing data from within QEMU
+>> > or it is just used for convenience of calculating offsets/sizes for AM=
+L?
+>> >
+>> >
+>>
+>> For convenience (and it can be useful for debugging).
+> we are gradually getting rid of usage "struct foo" in ACPI code
+> (i.e. when I have time to convert old struct based approach
+> to build_append_int() table based format).
+> and for new code I usually require ACPI parts be struct less
+> (if there is no previous struct baggage to back it up).
+>
 
-Paolo
+The tpm_ppi struct is not an ACPI table, it's a fixed memory region /
+layout to exchange between guest/os and firmware.
 
-> ---
->  hw/s390x/ipl.c          | 8 +++++++-
->  include/sysemu/sysemu.h | 3 +++
->  vl.c                    | 4 ++--
->  3 files changed, 12 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index 0d67349004..ade6896af6 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -535,7 +535,13 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
->              ipl->iplb_valid = s390_gen_initial_iplb(ipl);
->          }
->      }
-> -    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-> +    if (reset_type == S390_RESET_MODIFIED_CLEAR ||
-> +        reset_type == S390_RESET_LOAD_NORMAL) {
-> +        /* ignore -no-reboot */
-> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET_FORCE);
-> +    } else {
-> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-> +    }
->      /* as this is triggered by a CPU, make sure to exit the loop */
->      if (tcg_enabled()) {
->          cpu_loop_exit(cs);
-> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> index e893f72f3b..345369d924 100644
-> --- a/include/sysemu/sysemu.h
-> +++ b/include/sysemu/sysemu.h
-> @@ -44,6 +44,9 @@ typedef enum ShutdownCause {
->                                       turns that into a shutdown */
->      SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
->                                       that into a shutdown */
-> +    SHUTDOWN_CAUSE_GUEST_RESET_FORCE,/* Guest reset that should ignore
-> +                                        --no-reboot. This is useful for reset
-> +                                        like actions as s390 kexec/kdump */
->      SHUTDOWN_CAUSE__MAX,
->  } ShutdownCause;
->  
-> diff --git a/vl.c b/vl.c
-> index b3426e03d0..44e65071bc 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1628,7 +1628,7 @@ void qemu_system_reset(ShutdownCause reason)
->      } else {
->          qemu_devices_reset();
->      }
-> -    if (reason) {
-> +    if (reason != SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
->          qapi_event_send_reset(shutdown_caused_by_guest(reason),
->                                &error_abort);
->      }
-> @@ -1674,7 +1674,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
->  
->  void qemu_system_reset_request(ShutdownCause reason)
->  {
-> -    if (no_reboot) {
-> +    if (no_reboot && reason != SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
->          shutdown_requested = reason;
->      } else {
->          reset_requested = reason;
-> 
+> Hence my request to drop dummy struct and document layout
+> properly in related spec doc (that's where FW should look for
+> documentation and not into struct definition somewhere in
+> the header). So I'd strongly prefer it be done this way.
+
+There is not much more than the field description for me ;). Stefan,
+would you like to develop the structure usage?
+
+>
+>> >> +
+>> >>  #endif /* HW_ACPI_TPM_H */
+>> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> >> index f6d447f03a..95be4f0710 100644
+>> >> --- a/hw/i386/acpi-build.c
+>> >> +++ b/hw/i386/acpi-build.c
+>> >> @@ -43,6 +43,7 @@
+>> >>  #include "hw/acpi/memory_hotplug.h"
+>> >>  #include "sysemu/tpm.h"
+>> >>  #include "hw/acpi/tpm.h"
+>> >> +#include "hw/tpm/tpm_ppi.h"
+>> >>  #include "hw/acpi/vmgenid.h"
+>> >>  #include "sysemu/tpm_backend.h"
+>> >>  #include "hw/timer/mc146818rtc_regs.h"
+>> >> @@ -1789,6 +1790,292 @@ static Aml *build_q35_osc_method(void)
+>> >>      return method;
+>> >>  }
+>> >>
+>> >> +static void
+>> >> +build_tpm_ppi(Aml *dev)
+>> >> +{
+>> >> +    Aml *method, *name, *field, *ifctx, *ifctx2, *ifctx3, *pak;
+>> >> +    struct tpm_ppi *tpm_ppi =3D NULL;
+>> >> +    int i;
+>> > plain AML variables throughout the function make code rather unreadabl=
+e
+>> > (well, like any other AML code would be).
+>> > Pls take a look at how build_legacy_cpu_hotplug_aml() uses intermediat=
+e
+>> > more or less sanely named variables to make it more understandable.
+>> > that also should allow to reduce LOC this function takes.
+>>
+>> Sorry, I don't understand what I should take from
+>> build_legacy_cpu_hotplug_aml() approach. Could you describe a little
+>> bit?
+> I was talking about something like this:
+>
+>     Aml *apic_id =3D aml_arg(0);
+>     Aml *cpu_on =3D aml_local(0);
+>     ...
+>     Aml *cpus_map =3D aml_name(CPU_ON_BITMAP);
+>     ...
+>     aml_append(method,
+>         aml_store(aml_derefof(aml_index(cpus_map, apic_id)), cpu_on))
+>
+>     ^^^ this part becomes much more read-able for reviewer/maintainer ver=
+sus pure ASL
+>
+>         aml_store(aml_derefof(aml_index(aml_name("CPON"), aml_arg(0))), a=
+ml_local(0)))
+
+Ok
+
+>
+>> >
+>> >> +    /*
+>> >> +     * TPP1 is for the CPONflags that indicate which PPI operations
+>> >> +     * are supported by the firmware. The firmware is expected to
+>> >> +     * write these flags.
+>> >> +     */
+>> >> +    aml_append(dev,
+>> >> +               aml_operation_region("TPP1", AML_SYSTEM_MEMORY,
+>> >> +                                    aml_int(TPM_PPI_ADDR_BASE),
+>> >> +                                    sizeof(tpm_ppi->func)));
+>> >> +    field =3D aml_field("TPP1", AML_ANY_ACC, AML_NOLOCK, AML_PRESERV=
+E);
+>> >> +    for (i =3D 0; i < sizeof(tpm_ppi->func); i++) {
+>> >> +        char *tmp =3D g_strdup_printf("FN%02X", i);
+>> >> +        aml_append(field, aml_named_field(tmp, BITS_PER_BYTE));
+>> >> +        g_free(tmp);
+>> >> +    }
+>> >> +    aml_append(dev, field);
+>> >> +
+>> >> +    /*
+>> >> +     * TPP2 is for the registers that ACPI code used to pass
+>> >> +     * the PPI code and parameter (PPRQ, PPRM) to the firmware.
+>> >> +     */
+>> >> +    aml_append(dev,
+>> >> +               aml_operation_region("TPP2", AML_SYSTEM_MEMORY,
+>> >> +                                    aml_int(TPM_PPI_ADDR_BASE +
+>> >> +                                            offsetof(struct tpm_ppi,=
+ ppin)),
+>> >> +                                    sizeof(struct tpm_ppi) -
+>> >> +                                        sizeof(tpm_ppi->func)));
+>> >> +    field =3D aml_field("TPP2", AML_ANY_ACC, AML_NOLOCK, AML_PRESERV=
+E);
+>> >> +    aml_append(field, aml_named_field("PPIN",
+>> >> +               sizeof(uint8_t) * BITS_PER_BYTE));
+>> > here you already don't use tpm_ppi for sizing, so it creates a confusi=
+ng mix
+>> > of both approaches.
+>>
+>> True, sizeof_field() will become handy here. I can leave a TODO?
+>
+> I'd just use a constant /8/ here like the rest of the code that uses aml_=
+named_field()
+> (no need to over-complicate or create another precedent to copy from)
+
+ok
+
+>
+> Why TODO, changes I suggested for this patch would change it quite heavil=
+y
+> so why merge patch that would be changed by follow up patch almost immedi=
+ately.
+> I'd prefer cleaner code being merged unless there are very good reasons
+> to merge something that should be rewritten afterwards.
+
+I thought we should use the upcoming sizeof_field() here. In this
+case, TODO would make sense to avoid waiting for the other series.
+
+>
+>>
+>>
+>> >
+>> > From ACPI pov I'd prefer PPI table documented somewhere in spec docs
+>> > (similar docs/specs/acpi_mem_hotplug.txt) and would look like in
+>> > other use-cases:
+>> >
+>> >    aml_append(field, aml_named_field("PPIN", 8)
+>> >
+>> > and drop "struct tpm_ppi" altogether replacing places it was used by
+>> > explicit constants.
+>>
+>> I have a slight preference for the tpm_ppi structure. But ok with
+>> replacing it with constant. Stefan, do you agree?
+>>
+>> >> +    aml_append(field, aml_named_field("PPIP",
+>> >> +               sizeof(uint32_t) * BITS_PER_BYTE));
+>> >> +    aml_append(field, aml_named_field("PPRP",
+>> >> +               sizeof(uint32_t) * BITS_PER_BYTE));
+>> >> +    aml_append(field, aml_named_field("PPRQ",
+>> >> +               sizeof(uint32_t) * BITS_PER_BYTE));
+>> >> +    aml_append(field, aml_named_field("PPRM",
+>> >> +               sizeof(uint32_t) * BITS_PER_BYTE));
+>> >> +    aml_append(field, aml_named_field("LPPR",
+>> >> +               sizeof(uint32_t) * BITS_PER_BYTE));
+>> >> +    aml_append(dev, field);
+>> >> +
+>> >> +    method =3D aml_method("TPFN", 1, AML_SERIALIZED);
+>> > not quite sure how this method (supposed to ) work(s),
+>> > it could use nice comment explaining mechanics.
+>> >
+>>
+>> Windows doesn't like DerefOf (FUNC [N]), it returned wrong values. It
+>> took me a while to figure this out. My laptop TPM ACPI table uses the
+>> same trick, so I assume this is a Windows acpi bug/limitation. Instead
+>> we use a function that returns the corresponding field.
+>>
+>> So we declare each field / array entry:
+>>             OperationRegion (TPP1, SystemMemory, 0xFED45000, 0x0100)
+>>             Field (TPP1, AnyAcc, NoLock, Preserve)
+>>             {
+>>                 FN00,   8,
+>>                 FN01,   8,....
+>>
+>> And the method to access it:
+>>
+>>            Method (TPFN, 1, Serialized)
+>>             {
+>>                 If ((Zero =3D=3D Arg0))
+>>                 {
+>>                     Return (FN00) /* \_SB_.TPM_.FN00 */
+>>                 }
+>> .....
+>>
+>>
+>>
+>> >> +    {
+>> >> +        for (i =3D 0; i < sizeof(tpm_ppi->func); i++) {
+>> >> +            ifctx =3D aml_if(aml_equal(aml_int(i), aml_arg(0)));
+>> >> +            {
+>> >> +                aml_append(ifctx, aml_return(aml_name("FN%02X", i)))=
+;
+>> >> +            }
+>> >> +            aml_append(method, ifctx);
+>> >> +        }
+>> >> +        aml_append(method, aml_return(aml_int(0)));
+>> >> +    }
+>> >> +    aml_append(dev, method);
+>> >> +
+>> >> +    pak =3D aml_package(2);
+>> >> +    aml_append(pak, aml_int(0));
+>> >> +    aml_append(pak, aml_int(0));
+>> >> +    name =3D aml_name_decl("TPM2", pak);
+>> >> +    aml_append(dev, name);
+>> >> +
+>> >> +    pak =3D aml_package(3);
+>> >> +    aml_append(pak, aml_int(0));
+>> >> +    aml_append(pak, aml_int(0));
+>> >> +    aml_append(pak, aml_int(0));
+>> >> +    name =3D aml_name_decl("TPM3", pak);
+>> >> +    aml_append(dev, name);
+>> >> +
+>> >> +    method =3D aml_method("_DSM", 4, AML_SERIALIZED);
+>> >> +    {
+>> >> +        uint8_t zerobyte[1] =3D { 0 };
+>> >> +
+>> >> +        ifctx =3D aml_if(
+>> >> +            aml_equal(aml_arg(0),
+>> >> +                      aml_touuid("3DDDFAA6-361B-4EB4-A424-8D10089D16=
+53")));
+>> > a comment pointing to a specific part/version of spec that documents t=
+his _DSM
+>> > for every uuid/function used here would help to review it.
+>>
+>> ok, fixing that.
+>>
+>> The spec PDF is fairly easy to read imho:
+>>
+>> https://trustedcomputinggroup.org/wp-content/uploads/Physical-Presence-I=
+nterface_1-30_0-52.pdf
+>> >
+>> >> +        {
+>> >> +            aml_append(ifctx,
+>> >> +                       aml_store(aml_to_integer(aml_arg(2)), aml_loc=
+al(0)));
+>> >> +
+>> >> +            /* standard DSM query function */
+>> >> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(0)));
+>> >> +            {
+>> >> +                uint8_t byte_list[2] =3D { 0xff, 0x01 };
+>> >> +                aml_append(ifctx2, aml_return(aml_buffer(2, byte_lis=
+t)));
+>> >> +            }
+>> >> +            aml_append(ifctx, ifctx2);
+>> >> +
+>> >> +            /* interface version: 1.3 */
+>> >> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(1)));
+>> >> +            {
+>> >> +                aml_append(ifctx2, aml_return(aml_string("1.3")));
+>> >> +            }
+>> >> +            aml_append(ifctx, ifctx2);
+>> >> +
+>> >> +            /* submit TPM operation */
+>> >> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(2)));
+>> >> +            {
+>> >> +                /* get opcode */
+>> >> +                aml_append(ifctx2,
+>> >> +                           aml_store(aml_derefof(aml_index(aml_arg(3=
+),
+>> >> +                                                           aml_int(0=
+))),
+>> >> +                                     aml_local(0)));
+>> >> +                /* get opcode flags */
+>> >> +                aml_append(ifctx2,
+>> >> +                           aml_store(aml_call1("TPFN", aml_local(0))=
+,
+>> >> +                                     aml_local(1)));
+>> >> +                ifctx3 =3D aml_if(
+>> >> +                    aml_equal(
+>> >> +                        aml_and(aml_local(1), aml_int(TPM_PPI_FUNC_M=
+ASK), NULL),
+>> >> +                        aml_int(TPM_PPI_FUNC_NOT_IMPLEMENTED)));
+>> >> +                {
+>> >> +                    /* 1: not implemented */
+>> >> +                    aml_append(ifctx3, aml_return(aml_int(1)));
+>> >> +                }
+>> >> +                aml_append(ifctx2, ifctx3);
+>> >> +                aml_append(ifctx2, aml_store(aml_local(0), aml_name(=
+"PPRQ")));
+>> >> +                aml_append(ifctx2, aml_store(aml_int(0), aml_name("P=
+PRM")));
+>> >> +                /* 0: success */
+>> >> +                aml_append(ifctx2, aml_return(aml_int(0)));
+>> >> +            }
+>> >> +            aml_append(ifctx, ifctx2);
+>> >> +
+>> >> +            /* get pending TPM operation */
+>> >> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(3)));
+>> >> +            {
+>> >> +                /* revision to integer */
+>> >> +                aml_append(ifctx2,
+>> >> +                           aml_store(
+>> >> +                               aml_to_integer(aml_arg(1)),
+>> >> +                               aml_local(1)));
+>> >> +                ifctx3 =3D aml_if(aml_equal(aml_local(1), aml_int(1)=
+));
+>> >> +                {
+>> >> +                    aml_append(ifctx3,
+>> >> +                               aml_store(
+>> >> +                                   aml_name("PPRQ"),
+>> >> +                                   aml_index(aml_name("TPM2"), aml_i=
+nt(1))));
+>> >> +                    aml_append(ifctx3, aml_return(aml_name("TPM2")))=
+;
+>> >> +                }
+>> >> +                aml_append(ifctx2, ifctx3);
+>> >> +
+>> >> +                ifctx3 =3D aml_if(aml_equal(aml_local(1), aml_int(2)=
+));
+>> >> +                {
+>> >> +                    aml_append(ifctx3,
+>> >> +                               aml_store(
+>> >> +                                   aml_name("PPRQ"),
+>> >> +                                   aml_index(aml_name("TPM3"), aml_i=
+nt(1))));
+>> >> +                    aml_append(ifctx3,
+>> >> +                               aml_store(
+>> >> +                                   aml_name("PPRM"),
+>> >> +                                   aml_index(aml_name("TPM3"), aml_i=
+nt(2))));
+>> >> +                    aml_append(ifctx3, aml_return(aml_name("TPM3")))=
+;
+>> >> +                }
+>> >> +                aml_append(ifctx2, ifctx3);
+>> >> +            }
+>> >> +            aml_append(ifctx, ifctx2);
+>> >> +
+>> >> +            /* get platform-specific action to transition to pre-OS =
+env. */
+>> >> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(4)));
+>> >> +            {
+>> >> +                /* reboot */
+>> >> +                aml_append(ifctx2, aml_return(aml_int(2)));
+>> >> +            }
+>> >> +            aml_append(ifctx, ifctx2);
+>> >> +
+>> >> +            /* get TPM operation response */
+>> >> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(5)));
+>> >> +            {
+>> >> +                aml_append(ifctx2,
+>> >> +                           aml_store(
+>> >> +                               aml_name("LPPR"),
+>> >> +                               aml_index(aml_name("TPM3"), aml_int(1=
+))));
+>> >> +                aml_append(ifctx2,
+>> >> +                           aml_store(
+>> >> +                               aml_name("PPRP"),
+>> >> +                               aml_index(aml_name("TPM3"), aml_int(2=
+))));
+>> >> +                aml_append(ifctx2, aml_return(aml_name("TPM3")));
+>> >> +            }
+>> >> +            aml_append(ifctx, ifctx2);
+>> >> +
+>> >> +            /* submit preferred user language */
+>> >> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(6)));
+>> >> +            {
+>> >> +                /* 3 =3D not implemented */
+>> >> +                aml_append(ifctx2, aml_return(aml_int(3)));
+>> >> +            }
+>> >> +            aml_append(ifctx, ifctx2);
+>> >> +
+>> >> +            /* submit TPM operation v2 */
+>> >> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(7)));
+>> >> +            {
+>> >> +                /* get opcode */
+>> >> +                aml_append(ifctx2,
+>> >> +                           aml_store(aml_derefof(aml_index(aml_arg(3=
+),
+>> >> +                                                           aml_int(0=
+))),
+>> >> +                                     aml_local(0)));
+>> >> +                /* get opcode flags */
+>> >> +                aml_append(ifctx2,
+>> >> +                           aml_store(aml_call1("TPFN", aml_local(0))=
+,
+>> >> +                                     aml_local(1)));
+>> >> +                ifctx3 =3D aml_if(
+>> >> +                    aml_equal(
+>> >> +                        aml_and(aml_local(1), aml_int(TPM_PPI_FUNC_M=
+ASK), NULL),
+>> >> +                        aml_int(TPM_PPI_FUNC_NOT_IMPLEMENTED)));
+>> >> +                {
+>> >> +                    /* 1: not implemented */
+>> >> +                    aml_append(ifctx3, aml_return(aml_int(1)));
+>> >> +                }
+>> >> +                aml_append(ifctx2, ifctx3);
+>> >> +
+>> >> +                ifctx3 =3D aml_if(
+>> >> +                    aml_equal(
+>> >> +                        aml_and(aml_local(1), aml_int(TPM_PPI_FUNC_M=
+ASK), NULL),
+>> >> +                        aml_int(TPM_PPI_FUNC_BLOCKED)));
+>> >> +                {
+>> >> +                    /* 3: blocked by firmware */
+>> >> +                    aml_append(ifctx3, aml_return(aml_int(3)));
+>> >> +                }
+>> >> +                aml_append(ifctx2, ifctx3);
+>> >> +
+>> >> +                /* revision to integer */
+>> >> +                aml_append(ifctx2,
+>> >> +                           aml_store(
+>> >> +                               aml_to_integer(aml_arg(1)),
+>> >> +                               aml_local(1)));
+>> >> +
+>> >> +                ifctx3 =3D aml_if(aml_equal(aml_local(1), aml_int(1)=
+));
+>> >> +                {
+>> >> +                    /* revision 1 */
+>> >> +                    aml_append(ifctx3, aml_store(aml_local(0),
+>> >> +                                                 aml_name("PPRQ")));
+>> >> +                    aml_append(ifctx3, aml_store(aml_int(0),
+>> >> +                                                 aml_name("PPRM")));
+>> >> +                }
+>> >> +                aml_append(ifctx2, ifctx3);
+>> >> +
+>> >> +                ifctx3 =3D aml_if(aml_equal(aml_local(1), aml_int(2)=
+));
+>> >> +                {
+>> >> +                    /* revision 2 */
+>> >> +                    aml_append(ifctx3,
+>> >> +                               aml_store(aml_local(0), aml_name("PPR=
+Q")));
+>> >> +                    aml_append(ifctx3,
+>> >> +                               aml_store(
+>> >> +                                   aml_derefof(aml_index(aml_arg(3),
+>> >> +                                                         aml_int(1))=
+),
+>> >> +                                   aml_name("PPRM")));
+>> >> +                }
+>> >> +                aml_append(ifctx2, ifctx3);
+>> >> +                /* 0: success */
+>> >> +                aml_append(ifctx2, aml_return(aml_int(0)));
+>> >> +            }
+>> >> +            aml_append(ifctx, ifctx2);
+>> >> +
+>> >> +            /* get user confirmation status for operation */
+>> >> +            ifctx2 =3D aml_if(aml_equal(aml_local(0), aml_int(8)));
+>> >> +            {
+>> >> +                /* get opcode */
+>> >> +                aml_append(ifctx2,
+>> >> +                           aml_store(aml_derefof(aml_index(aml_arg(3=
+),
+>> >> +                                                           aml_int(0=
+))),
+>> >> +                                     aml_local(0)));
+>> >> +                /* get opcode flags */
+>> >> +                aml_append(ifctx2,
+>> >> +                           aml_store(aml_call1("TPFN", aml_local(0))=
+,
+>> >> +                                     aml_local(1)));
+>> >> +                /* return confirmation status code */
+>> >> +                aml_append(ifctx2,
+>> >> +                           aml_return(
+>> >> +                               aml_and(aml_local(1),
+>> >> +                                       aml_int(TPM_PPI_FUNC_MASK), N=
+ULL)));
+>> >> +            }
+>> >> +            aml_append(ifctx, ifctx2);
+>> >> +
+>> >> +            aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
+>> >> +        }
+>> >> +        aml_append(method, ifctx);
+>> >> +    }
+>> >> +    aml_append(dev, method);
+>> >> +}
+>> >> +
+>> >>  static void
+>> >>  build_dsdt(GArray *table_data, BIOSLinker *linker,
+>> >>             AcpiPmInfo *pm, AcpiMiscInfo *misc,
+>> >> @@ -2153,6 +2440,9 @@ build_dsdt(GArray *table_data, BIOSLinker *link=
+er,
+>> >>                   */
+>> >>                  /* aml_append(crs, aml_irq_no_flags(TPM_TIS_IRQ)); *=
+/
+>> >>                  aml_append(dev, aml_name_decl("_CRS", crs));
+>> >> +
+>> >> +                build_tpm_ppi(dev);
+>> >> +
+>> >>                  aml_append(scope, dev);
+>> >>              }
+>> >>
+>> >> @@ -2172,6 +2462,8 @@ build_dsdt(GArray *table_data, BIOSLinker *link=
+er,
+>> >>          aml_append(method, aml_return(aml_int(0x0f)));
+>> >>          aml_append(dev, method);
+>> >>
+>> >> +        build_tpm_ppi(dev);
+>> >> +
+>> >>          aml_append(sb_scope, dev);
+>> >>      }
+>> >>
+>> >> @@ -2918,7 +3210,7 @@ void acpi_setup(void)
+>> >>          tpm_config =3D (FWCfgTPMConfig) {
+>> >>              .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
+>> >>              .tpm_version =3D cpu_to_le32(tpm_get_version(tpm_find())=
+),
+>> >> -            .tpmppi_version =3D cpu_to_le32(TPM_PPI_VERSION_NONE)
+>> > what was the point of introducing TPM_PPI_VERSION_NONE if it would not=
+ be used?
+>> > maybe patch ordering is problem? what if we put fwcfg patch after this=
+ one?
+>>
+>> edk2 already knows that NONE (0) is no PPI. So we at least have to
+>> keep the same indexing.
+>>
+>> I don't see much point in reordering. If you look at v4, you may want
+>> to squash things together too, but that makes reviewing more
+>> complicated. As the long as the split is natural, and no regression
+>> are introduced, I would rather keep it the way it is.
+>>
+>> >
+>> >> +            .tpmppi_version =3D cpu_to_le32(TPM_PPI_VERSION_1_30)
+>> >>          };
+>> >>          fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
+>> >>                          &tpm_config, sizeof tpm_config);
+>> >
+>> > hopefully patch would be more review-able with comments and nicely nam=
+ed
+>> > variables, so I could actually review it functionality wise without re=
+ading
+>> > whole TPM spec(s)
+>>
+>> Let see what I can do.
+>>
+>> Thanks!
+>>
+>>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
