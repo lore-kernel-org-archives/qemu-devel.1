@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fW336-0000pE-TF
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:07:09 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fW338-0000pa-Oz
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:07:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fW331-00064I-Vi
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:07:08 -0400
-References: <20180621162506.94416-1-borntraeger@de.ibm.com>
-	<57057de1-b1dd-bc22-eb98-1325c499f591@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <159d794c-58b3-ceba-e286-2e585d9a661a@redhat.com>
-Date: Thu, 21 Jun 2018 19:06:59 +0200
-MIME-Version: 1.0
-In-Reply-To: <57057de1-b1dd-bc22-eb98-1325c499f591@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390/ipl: fix ipl with -no-reboot
+	(envelope-from <kwolf@redhat.com>) id 1fW337-000678-TE
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:07:10 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Thu, 21 Jun 2018 19:06:55 +0200
+Message-Id: <20180621170657.27542-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] file-posix: Make truncate/preallocate
+ asynchronous
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,37 +18,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-On 21/06/2018 18:31, David Hildenbrand wrote:
-> +    SHUTDOWN_CAUSE_GUEST_RESET_FORCE,/* Guest reset that should ignore
-> +                                        --no-reboot. This is useful for reset
-> +                                        like actions as s390 kexec/kdump */
->      SHUTDOWN_CAUSE__MAX,
->  } ShutdownCause;
->  
-> diff --git a/vl.c b/vl.c
-> index b3426e03d0..722c3b9963 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1674,7 +1674,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
->  
->  void qemu_system_reset_request(ShutdownCause reason)
->  {
-> -    if (no_reboot) {
-> +    if (no_reboot && reason != SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
->          shutdown_requested = reason;
->      } else {
->          reset_requested = reason;
+This fixes the problem that blockdev-create on a local file blocks the
+main loop despite being a background job. This was caused by file-posix
+preallocating the image with blocking syscalls rather than moving this
+to the thread pool and yielding the coroutine meanwhile.
 
-The only comment is that I'd drop the event too.  It's not possible to
-use SHUTDOWN_CAUSE_NONE directly of course, but you can special case it
-in qemu_system_reset.
+Kevin Wolf (2):
+  block: Convert .bdrv_truncate callback to coroutine_fn
+  file-posix: Make .bdrv_co_truncate asynchronous
 
-Also I wouldn't be worried of picking an s390-specific name like
-SHUTDOWN_CAUSE_GUEST_(RE)?IPL.  At least it explains exactly what it is
-for and it makes sense that it doesn't obey -no-reboot and generate the
-event.
+ include/block/block.h     |   4 +
+ include/block/block_int.h |   4 +-
+ include/block/raw-aio.h   |   4 +-
+ block.c                   |  49 +++++++-
+ block/copy-on-read.c      |   8 +-
+ block/crypto.c            |   9 +-
+ block/file-posix.c        | 277 ++++++++++++++++++++++++++--------------------
+ block/file-win32.c        |   6 +-
+ block/gluster.c           |  14 ++-
+ block/iscsi.c             |   8 +-
+ block/nfs.c               |   7 +-
+ block/qcow2.c             |  14 +--
+ block/qed.c               |   8 +-
+ block/raw-format.c        |   8 +-
+ block/rbd.c               |   8 +-
+ block/sheepdog.c          |  12 +-
+ block/ssh.c               |   6 +-
+ 17 files changed, 267 insertions(+), 179 deletions(-)
 
-Paolo
+-- 
+2.13.6
