@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fVv3Z-0006AT-Rp
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:35:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1fVv4Q-0006m2-2g
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:35:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fVv3V-0001JG-Sl
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:35:05 -0400
-Date: Thu, 21 Jun 2018 10:34:57 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180621103457.395ed157.cohuck@redhat.com>
-In-Reply-To: <152953170557.8870.15609104033222049328@sif>
-References: <20180619014319.28272-1-mdroth@linux.vnet.ibm.com>
-	<20180619094248.08d5fed5.cohuck@redhat.com>
-	<152952728499.8870.3711510048351515296@sif>
-	<152953170557.8870.15609104033222049328@sif>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 00/113] Patch Round-up for stable 2.11.2,
- freeze on 2018-06-22
+	(envelope-from <armbru@redhat.com>) id 1fVv4L-0002Li-2B
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:35:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40558 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVv4K-0002L1-TF
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:35:53 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Thu, 21 Jun 2018 10:35:51 +0200
+Message-Id: <20180621083551.775-1-armbru@redhat.com>
+Subject: [Qemu-devel] [PATCH] qapi: Fix some pycodestyle-3 complaints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,93 +21,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: mdroth@linux.vnet.ibm.com
 
-On Wed, 20 Jun 2018 16:55:05 -0500
-Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+Fix the following issues:
 
-> Quoting Michael Roth (2018-06-20 15:41:24)
-> > Quoting Cornelia Huck (2018-06-19 02:42:48)  
-> > > On Mon, 18 Jun 2018 20:41:26 -0500
-> > > Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-> > >   
-> > > > Hi everyone,
-> > > > 
-> > > > The following new patches are queued for QEMU stable v2.11.2:
-> > > > 
-> > > >   https://github.com/mdroth/qemu/commits/stable-2.11-staging
-> > > > 
-> > > > The release is planned for 2018-06-22:
-> > > > 
-> > > >   https://wiki.qemu.org/Planning/2.11
-> > > > 
-> > > > Please respond here or CC qemu-stable@nongnu.org on any patches you
-> > > > think should be included in the release.
-> > > > 
-> > > > Thanks!
-> > > > 
-> > > > ----------------------------------------------------------------
-> > > > 
-> > > > The following changes since commit 7c1beb52ed86191d9e965444d934adaa2531710f:
-> > > > 
-> > > >   Update version for 2.11.1 release (2018-02-14 14:41:05 -0600)
-> > > > 
-> > > > are available in the git repository at:
-> > > > 
-> > > >   git://github.com/mdroth/qemu.git 
-> > > > 
-> > > > for you to fetch changes up to acb3571f90885a2e206044b3bdc8d1dd2a0389c0:
-> > > > 
-> > > >   arm_gicv3_kvm: kvm_dist_get/put_priority: skip the registers banked by GICR_IPRIORITYR (2018-06-16 07:47:00 -0500)
-> > > > 
-> > > > ----------------------------------------------------------------  
-> > > 
-> > > Hi Michael,
-> > > 
-> > > as this series includes some s390-ccw bios patches, it needs a rebuild
-> > > of the s390-ccw bios as well, probably on top of your stable branch.
-> > > (IIRC we have extra patches on master, so you probably don't want to
-> > > cherry-pick the latest rebuild from there.). Let me know if one of us
-> > > should provide a rebuild.
-> > >   
-> > 
-> > Thanks Cornelia, I hadn't realized that. I think rebuild from one of the
-> > maintainers would definitely be preferable. We'd also want the corresponding
-> > patches for pc-bios/s390-ccw reflected in the 2.11.x tree.  
-> 
-> Er, sorry was a bit confused. I suppose that part is covered already if
-> there's no additional patches needed in the rebuild other than what's in
-> 2.11.x already.
+    common.py:873:13: E129 visually indented line with same indent as next logical line
+    common.py:1766:5: E741 ambiguous variable name 'l'
+    common.py:1784:1: E305 expected 2 blank lines after class or function definition, found 1
+    common.py:1833:1: E305 expected 2 blank lines after class or function definition, found 1
+    common.py:1843:1: E305 expected 2 blank lines after class or function definition, found 1
+    visit.py:181:18: E127 continuation line over-indented for visual indent
 
-Yes, this should be all AFAICS.
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ scripts/qapi/common.py | 15 +++++++++------
+ scripts/qapi/visit.py  |  2 +-
+ 2 files changed, 10 insertions(+), 7 deletions(-)
 
-> 
-> 
-> > another maintainer could put together a branch with those I can merge
-> > those in directly.  
-> 
-
-The following changes since commit 1e13e7d93b93885d8a27fd18ec8a4b865a70e2ea:
-
-  tpm: lookup cancel path under tpm device class (2018-06-20 20:45:08 -0500)
-
-are available in the Git repository at:
-
-  git://github.com/cohuck/qemu tags/s390x-20180621-211-stable
-
-for you to fetch changes up to 728d6c602ea9fc9cfc4a2fcafb2553a1f4f400b6:
-
-  pc-bios/s390-ccw.img: update image for stable (2018-06-21 04:22:15 -0400)
-
-----------------------------------------------------------------
-update s390-ccw.img for stable
-
-----------------------------------------------------------------
-Cornelia Huck (1):
-      pc-bios/s390-ccw.img: update image for stable
-
- pc-bios/s390-ccw.img | Bin 26416 -> 26416 bytes
- 1 file changed, 0 insertions(+), 0 deletions(-)
-
-(or just cherry-pick from git://github.com/cohuck/qemu for-2.11-stable)
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 2462fc0291..e51767d44d 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -865,12 +865,12 @@ def check_keys(expr_elem, meta, required, optional=[]):
+         if key not in required and key not in optional:
+             raise QAPISemError(info, "Unknown key '%s' in %s '%s'"
+                                % (key, meta, name))
+-        if (key == 'gen' or key == 'success-response') and value is not False:
++        if key in ['gen', 'success-response'] and value is not False:
+             raise QAPISemError(info,
+                                "'%s' of %s '%s' should only use false value"
+                                % (key, meta, name))
+-        if (key == 'boxed' or key == 'allow-oob' or
+-            key == 'allow-preconfig') and value is not True:
++        if (key in ['boxed', 'allow-oob', 'allow-preconfig']
++                and value is not True):
+             raise QAPISemError(info,
+                                "'%s' of %s '%s' should only use true value"
+                                % (key, meta, name))
+@@ -1763,12 +1763,12 @@ def camel_to_upper(value):
+         return c_fun_str
+ 
+     new_name = ''
+-    l = len(c_fun_str)
+-    for i in range(l):
++    length = len(c_fun_str)
++    for i in range(length):
+         c = c_fun_str[i]
+         # When c is upper and no '_' appears before, do more checks
+         if c.isupper() and (i > 0) and c_fun_str[i - 1] != '_':
+-            if i < l - 1 and c_fun_str[i + 1].islower():
++            if i < length - 1 and c_fun_str[i + 1].islower():
+                 new_name += '_'
+             elif c_fun_str[i - 1].isdigit():
+                 new_name += '_'
+@@ -1781,6 +1781,7 @@ def c_enum_const(type_name, const_name, prefix=None):
+         type_name = prefix
+     return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
+ 
++
+ if hasattr(str, 'maketrans'):
+     c_name_trans = str.maketrans('.-', '__')
+ else:
+@@ -1830,6 +1831,7 @@ def c_name(name, protect=True):
+         return 'q_' + name
+     return name
+ 
++
+ eatspace = '\033EATSPACE.'
+ pointer_suffix = ' *' + eatspace
+ 
+@@ -1840,6 +1842,7 @@ def genindent(count):
+         ret += ' '
+     return ret
+ 
++
+ indent_level = 0
+ 
+ 
+diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+index 5d72d8936c..1827c2a094 100644
+--- a/scripts/qapi/visit.py
++++ b/scripts/qapi/visit.py
+@@ -178,7 +178,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *name, %(c_name)s **obj, Error
+     }
+     switch ((*obj)->type) {
+ ''',
+-                 c_name=c_name(name))
++                c_name=c_name(name))
+ 
+     for var in variants.variants:
+         ret += mcgen('''
+-- 
+2.17.1
