@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fVonz-0004S9-8x
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fVoo4-0004XC-5i
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fVonw-000391-Nx
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:34 -0400
-Received: from mail-pf0-x232.google.com ([2607:f8b0:400e:c00::232]:35928)
+	(envelope-from <richard.henderson@linaro.org>) id 1fVoo0-0003B3-9a
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:40 -0400
+Received: from mail-pl0-x233.google.com ([2607:f8b0:400e:c01::233]:44757)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fVonw-00038g-FD
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:32 -0400
-Received: by mail-pf0-x232.google.com with SMTP id a12-v6so689301pfi.3
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 18:54:32 -0700 (PDT)
+	id 1fVoo0-0003Ah-0s
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:36 -0400
+Received: by mail-pl0-x233.google.com with SMTP id z9-v6so746293plk.11
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 18:54:35 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 20 Jun 2018 15:53:38 -1000
-Message-Id: <20180621015359.12018-15-richard.henderson@linaro.org>
+Date: Wed, 20 Jun 2018 15:53:40 -1000
+Message-Id: <20180621015359.12018-17-richard.henderson@linaro.org>
 In-Reply-To: <20180621015359.12018-1-richard.henderson@linaro.org>
 References: <20180621015359.12018-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v5 14/35] target/arm: Implement SVE first-fault
- gather loads
+Subject: [Qemu-devel] [PATCH v5 16/35] target/arm: Implement SVE
+ floating-point compare vectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,348 +32,217 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    |  67 ++++++++++++++++++++
- target/arm/sve_helper.c    |  88 ++++++++++++++++++++++++++
- target/arm/translate-sve.c | 126 ++++++++++++++++++++++++-------------
- 3 files changed, 236 insertions(+), 45 deletions(-)
+ target/arm/helper-sve.h    | 49 ++++++++++++++++++++++++++++++
+ target/arm/sve_helper.c    | 62 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 40 ++++++++++++++++++++++++
+ target/arm/sve.decode      | 11 +++++++
+ 4 files changed, 162 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index aeb62afc34..55e8a908d4 100644
+index 55e8a908d4..6089b3a53f 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -1026,6 +1026,73 @@ DEF_HELPER_FLAGS_6(sve_ldhds_zd, TCG_CALL_NO_WG,
- DEF_HELPER_FLAGS_6(sve_ldsds_zd, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
+@@ -839,6 +839,55 @@ DEF_HELPER_FLAGS_5(sve_ucvt_ds, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(sve_ucvt_dd, TCG_CALL_NO_RWG,
+                    void, ptr, ptr, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_6(sve_ldffbsu_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffhsu_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffssu_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffbss_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffhss_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_fcmge_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_fcmge_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_fcmge_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_6(sve_ldffbsu_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffhsu_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffssu_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffbss_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffhss_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_fcmgt_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_fcmgt_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_fcmgt_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_6(sve_ldffbdu_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffhdu_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffsdu_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffddu_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffbds_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffhds_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffsds_zsu, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_fcmeq_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_fcmeq_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_fcmeq_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_6(sve_ldffbdu_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffhdu_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffsdu_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffddu_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffbds_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffhds_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffsds_zss, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_fcmne_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_fcmne_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_fcmne_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_6(sve_ldffbdu_zd, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffhdu_zd, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffsdu_zd, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffddu_zd, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffbds_zd, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffhds_zd, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
-+DEF_HELPER_FLAGS_6(sve_ldffsds_zd, TCG_CALL_NO_WG,
-+                   void, env, ptr, ptr, ptr, tl, i32)
++DEF_HELPER_FLAGS_6(sve_fcmuo_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_fcmuo_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_fcmuo_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
 +
- DEF_HELPER_FLAGS_6(sve_stbs_zsu, TCG_CALL_NO_WG,
-                    void, env, ptr, ptr, ptr, tl, i32)
- DEF_HELPER_FLAGS_6(sve_sths_zsu, TCG_CALL_NO_WG,
++DEF_HELPER_FLAGS_6(sve_facge_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_facge_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_facge_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++
++DEF_HELPER_FLAGS_6(sve_facgt_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_facgt_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(sve_facgt_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++
+ DEF_HELPER_FLAGS_3(sve_fmla_zpzzz_h, TCG_CALL_NO_RWG, void, env, ptr, i32)
+ DEF_HELPER_FLAGS_3(sve_fmla_zpzzz_s, TCG_CALL_NO_RWG, void, env, ptr, i32)
+ DEF_HELPER_FLAGS_3(sve_fmla_zpzzz_d, TCG_CALL_NO_RWG, void, env, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 9b99718156..38f7cc2274 100644
+index 38f7cc2274..2fd34d722b 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -3790,6 +3790,94 @@ DO_LD1_ZPZ_D(sve_ldbds_zd, uint64_t, int8_t,   cpu_ldub_data_ra)
- DO_LD1_ZPZ_D(sve_ldhds_zd, uint64_t, int16_t,  cpu_lduw_data_ra)
- DO_LD1_ZPZ_D(sve_ldsds_zd, uint64_t, int32_t,  cpu_ldl_data_ra)
- 
-+/* First fault loads with a vector index.  */
-+
-+#ifdef CONFIG_USER_ONLY
-+
-+#define DO_LDFF1_ZPZ(NAME, TYPEE, TYPEI, TYPEM, FN, H)                  \
-+void HELPER(NAME)(CPUARMState *env, void *vd, void *vg, void *vm,       \
-+                  target_ulong base, uint32_t desc)                     \
-+{                                                                       \
-+    intptr_t i, oprsz = simd_oprsz(desc);                               \
-+    unsigned scale = simd_data(desc);                                   \
-+    uintptr_t ra = GETPC();                                             \
-+    bool first = true;                                                  \
-+    mmap_lock();                                                        \
-+    for (i = 0; i < oprsz; i++) {                                       \
-+        uint16_t pg = *(uint16_t *)(vg + H1_2(i >> 3));                 \
-+        do {                                                            \
-+            TYPEM m = 0;                                                \
-+            if (pg & 1) {                                               \
-+                target_ulong off = *(TYPEI *)(vm + H(i));               \
-+                target_ulong addr = base + (off << scale);              \
-+                if (!first &&                                           \
-+                    page_check_range(addr, sizeof(TYPEM), PAGE_READ)) { \
-+                    record_fault(env, i, oprsz);                        \
-+                    goto exit;                                          \
-+                }                                                       \
-+                m = FN(env, addr, ra);                                  \
-+                first = false;                                          \
-+            }                                                           \
-+            *(TYPEE *)(vd + H(i)) = m;                                  \
-+            i += sizeof(TYPEE), pg >>= sizeof(TYPEE);                   \
-+        } while (i & 15);                                               \
-+    }                                                                   \
-+ exit:                                                                  \
-+    mmap_unlock();                                                      \
-+}
-+
-+#else
-+
-+#define DO_LDFF1_ZPZ(NAME, TYPEE, TYPEI, TYPEM, FN, H)                  \
-+void HELPER(NAME)(CPUARMState *env, void *vd, void *vg, void *vm,       \
-+                  target_ulong base, uint32_t desc)                     \
-+{                                                                       \
-+    g_assert_not_reached();                                             \
-+}
-+
-+#endif
-+
-+#define DO_LDFF1_ZPZ_S(NAME, TYPEI, TYPEM, FN) \
-+    DO_LDFF1_ZPZ(NAME, uint32_t, TYPEI, TYPEM, FN, H1_4)
-+#define DO_LDFF1_ZPZ_D(NAME, TYPEI, TYPEM, FN) \
-+    DO_LDFF1_ZPZ(NAME, uint64_t, TYPEI, TYPEM, FN, )
-+
-+DO_LDFF1_ZPZ_S(sve_ldffbsu_zsu, uint32_t, uint8_t,  cpu_ldub_data_ra)
-+DO_LDFF1_ZPZ_S(sve_ldffhsu_zsu, uint32_t, uint16_t, cpu_lduw_data_ra)
-+DO_LDFF1_ZPZ_S(sve_ldffssu_zsu, uint32_t, uint32_t, cpu_ldl_data_ra)
-+DO_LDFF1_ZPZ_S(sve_ldffbss_zsu, uint32_t, int8_t,   cpu_ldub_data_ra)
-+DO_LDFF1_ZPZ_S(sve_ldffhss_zsu, uint32_t, int16_t,  cpu_lduw_data_ra)
-+
-+DO_LDFF1_ZPZ_S(sve_ldffbsu_zss, int32_t, uint8_t,  cpu_ldub_data_ra)
-+DO_LDFF1_ZPZ_S(sve_ldffhsu_zss, int32_t, uint16_t, cpu_lduw_data_ra)
-+DO_LDFF1_ZPZ_S(sve_ldffssu_zss, int32_t, uint32_t, cpu_ldl_data_ra)
-+DO_LDFF1_ZPZ_S(sve_ldffbss_zss, int32_t, int8_t,   cpu_ldub_data_ra)
-+DO_LDFF1_ZPZ_S(sve_ldffhss_zss, int32_t, int16_t,  cpu_lduw_data_ra)
-+
-+DO_LDFF1_ZPZ_D(sve_ldffbdu_zsu, uint32_t, uint8_t,  cpu_ldub_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffhdu_zsu, uint32_t, uint16_t, cpu_lduw_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffsdu_zsu, uint32_t, uint32_t, cpu_ldl_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffddu_zsu, uint32_t, uint64_t, cpu_ldq_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffbds_zsu, uint32_t, int8_t,   cpu_ldub_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffhds_zsu, uint32_t, int16_t,  cpu_lduw_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffsds_zsu, uint32_t, int32_t,  cpu_ldl_data_ra)
-+
-+DO_LDFF1_ZPZ_D(sve_ldffbdu_zss, int32_t, uint8_t,  cpu_ldub_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffhdu_zss, int32_t, uint16_t, cpu_lduw_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffsdu_zss, int32_t, uint32_t, cpu_ldl_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffddu_zss, int32_t, uint64_t, cpu_ldq_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffbds_zss, int32_t, int8_t,   cpu_ldub_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffhds_zss, int32_t, int16_t,  cpu_lduw_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffsds_zss, int32_t, int32_t,  cpu_ldl_data_ra)
-+
-+DO_LDFF1_ZPZ_D(sve_ldffbdu_zd, uint64_t, uint8_t,  cpu_ldub_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffhdu_zd, uint64_t, uint16_t, cpu_lduw_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffsdu_zd, uint64_t, uint32_t, cpu_ldl_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffddu_zd, uint64_t, uint64_t, cpu_ldq_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffbds_zd, uint64_t, int8_t,   cpu_ldub_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffhds_zd, uint64_t, int16_t,  cpu_lduw_data_ra)
-+DO_LDFF1_ZPZ_D(sve_ldffsds_zd, uint64_t, int32_t,  cpu_ldl_data_ra)
-+
- /* Stores with a vector index.  */
- 
- #define DO_ST1_ZPZ_S(NAME, TYPEI, FN)                                   \
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index a53554f8d5..11c1bf112c 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -4255,47 +4255,85 @@ static void do_mem_zpz(DisasContext *s, int zt, int pg, int zm, int scale,
-     tcg_temp_free_i32(desc);
+@@ -3193,6 +3193,68 @@ void HELPER(sve_fnmls_zpzzz_d)(CPUARMState *env, void *vg, uint32_t desc)
+     do_fmla_zpzzz_d(env, vg, desc, 0, INT64_MIN);
  }
  
--/* Indexed by [xs][u][msz].  */
--static gen_helper_gvec_mem_scatter * const gather_load_fn32[2][2][3] = {
--    { { gen_helper_sve_ldbss_zsu,
--        gen_helper_sve_ldhss_zsu,
--        NULL, },
--      { gen_helper_sve_ldbsu_zsu,
--        gen_helper_sve_ldhsu_zsu,
--        gen_helper_sve_ldssu_zsu, } },
--    { { gen_helper_sve_ldbss_zss,
--        gen_helper_sve_ldhss_zss,
--        NULL, },
--      { gen_helper_sve_ldbsu_zss,
--        gen_helper_sve_ldhsu_zss,
--        gen_helper_sve_ldssu_zss, } },
-+/* Indexed by [ff][xs][u][msz].  */
-+static gen_helper_gvec_mem_scatter * const gather_load_fn32[2][2][2][3] = {
-+    { { { gen_helper_sve_ldbss_zsu,
-+          gen_helper_sve_ldhss_zsu,
-+          NULL, },
-+        { gen_helper_sve_ldbsu_zsu,
-+          gen_helper_sve_ldhsu_zsu,
-+          gen_helper_sve_ldssu_zsu, } },
-+      { { gen_helper_sve_ldbss_zss,
-+          gen_helper_sve_ldhss_zss,
-+          NULL, },
-+        { gen_helper_sve_ldbsu_zss,
-+          gen_helper_sve_ldhsu_zss,
-+          gen_helper_sve_ldssu_zss, } }, },
++/* Two operand floating-point comparison controlled by a predicate.
++ * Unlike the integer version, we are not allowed to optimistically
++ * compare operands, since the comparison may have side effects wrt
++ * the FPSR.
++ */
++#define DO_FPCMP_PPZZ(NAME, TYPE, H, OP)                                \
++void HELPER(NAME)(void *vd, void *vn, void *vm, void *vg,               \
++                  void *status, uint32_t desc)                          \
++{                                                                       \
++    intptr_t i = simd_oprsz(desc), j = (i - 1) >> 6;                    \
++    uint64_t *d = vd, *g = vg;                                          \
++    do {                                                                \
++        uint64_t out = 0, pg = g[j];                                    \
++        do {                                                            \
++            i -= sizeof(TYPE), out <<= sizeof(TYPE);                    \
++            if (likely((pg >> (i & 63)) & 1)) {                         \
++                TYPE nn = *(TYPE *)(vn + H(i));                         \
++                TYPE mm = *(TYPE *)(vm + H(i));                         \
++                out |= OP(TYPE, nn, mm, status);                        \
++            }                                                           \
++        } while (i & 63);                                               \
++        d[j--] = out;                                                   \
++    } while (i > 0);                                                    \
++}
 +
-+    { { { gen_helper_sve_ldffbss_zsu,
-+          gen_helper_sve_ldffhss_zsu,
-+          NULL, },
-+        { gen_helper_sve_ldffbsu_zsu,
-+          gen_helper_sve_ldffhsu_zsu,
-+          gen_helper_sve_ldffssu_zsu, } },
-+      { { gen_helper_sve_ldffbss_zss,
-+          gen_helper_sve_ldffhss_zss,
-+          NULL, },
-+        { gen_helper_sve_ldffbsu_zss,
-+          gen_helper_sve_ldffhsu_zss,
-+          gen_helper_sve_ldffssu_zss, } } }
- };
- 
--static gen_helper_gvec_mem_scatter * const gather_load_fn64[3][2][4] = {
--    { { gen_helper_sve_ldbds_zsu,
--        gen_helper_sve_ldhds_zsu,
--        gen_helper_sve_ldsds_zsu,
--        NULL, },
--      { gen_helper_sve_ldbdu_zsu,
--        gen_helper_sve_ldhdu_zsu,
--        gen_helper_sve_ldsdu_zsu,
--        gen_helper_sve_ldddu_zsu, } },
--    { { gen_helper_sve_ldbds_zss,
--        gen_helper_sve_ldhds_zss,
--        gen_helper_sve_ldsds_zss,
--        NULL, },
--      { gen_helper_sve_ldbdu_zss,
--        gen_helper_sve_ldhdu_zss,
--        gen_helper_sve_ldsdu_zss,
--        gen_helper_sve_ldddu_zss, } },
--    { { gen_helper_sve_ldbds_zd,
--        gen_helper_sve_ldhds_zd,
--        gen_helper_sve_ldsds_zd,
--        NULL, },
--      { gen_helper_sve_ldbdu_zd,
--        gen_helper_sve_ldhdu_zd,
--        gen_helper_sve_ldsdu_zd,
--        gen_helper_sve_ldddu_zd, } },
-+static gen_helper_gvec_mem_scatter * const gather_load_fn64[2][3][2][4] = {
-+    { { { gen_helper_sve_ldbds_zsu,
-+          gen_helper_sve_ldhds_zsu,
-+          gen_helper_sve_ldsds_zsu,
-+          NULL, },
-+        { gen_helper_sve_ldbdu_zsu,
-+          gen_helper_sve_ldhdu_zsu,
-+          gen_helper_sve_ldsdu_zsu,
-+          gen_helper_sve_ldddu_zsu, } },
-+      { { gen_helper_sve_ldbds_zss,
-+          gen_helper_sve_ldhds_zss,
-+          gen_helper_sve_ldsds_zss,
-+          NULL, },
-+        { gen_helper_sve_ldbdu_zss,
-+          gen_helper_sve_ldhdu_zss,
-+          gen_helper_sve_ldsdu_zss,
-+          gen_helper_sve_ldddu_zss, } },
-+      { { gen_helper_sve_ldbds_zd,
-+          gen_helper_sve_ldhds_zd,
-+          gen_helper_sve_ldsds_zd,
-+          NULL, },
-+        { gen_helper_sve_ldbdu_zd,
-+          gen_helper_sve_ldhdu_zd,
-+          gen_helper_sve_ldsdu_zd,
-+          gen_helper_sve_ldddu_zd, } } },
++#define DO_FPCMP_PPZZ_H(NAME, OP) \
++    DO_FPCMP_PPZZ(NAME##_h, float16, H1_2, OP)
++#define DO_FPCMP_PPZZ_S(NAME, OP) \
++    DO_FPCMP_PPZZ(NAME##_s, float32, H1_4, OP)
++#define DO_FPCMP_PPZZ_D(NAME, OP) \
++    DO_FPCMP_PPZZ(NAME##_d, float64,     , OP)
 +
-+    { { { gen_helper_sve_ldffbds_zsu,
-+          gen_helper_sve_ldffhds_zsu,
-+          gen_helper_sve_ldffsds_zsu,
-+          NULL, },
-+        { gen_helper_sve_ldffbdu_zsu,
-+          gen_helper_sve_ldffhdu_zsu,
-+          gen_helper_sve_ldffsdu_zsu,
-+          gen_helper_sve_ldffddu_zsu, } },
-+      { { gen_helper_sve_ldffbds_zss,
-+          gen_helper_sve_ldffhds_zss,
-+          gen_helper_sve_ldffsds_zss,
-+          NULL, },
-+        { gen_helper_sve_ldffbdu_zss,
-+          gen_helper_sve_ldffhdu_zss,
-+          gen_helper_sve_ldffsdu_zss,
-+          gen_helper_sve_ldffddu_zss, } },
-+      { { gen_helper_sve_ldffbds_zd,
-+          gen_helper_sve_ldffhds_zd,
-+          gen_helper_sve_ldffsds_zd,
-+          NULL, },
-+        { gen_helper_sve_ldffbdu_zd,
-+          gen_helper_sve_ldffhdu_zd,
-+          gen_helper_sve_ldffsdu_zd,
-+          gen_helper_sve_ldffddu_zd, } } }
- };
++#define DO_FPCMP_PPZZ_ALL(NAME, OP) \
++    DO_FPCMP_PPZZ_H(NAME, OP)   \
++    DO_FPCMP_PPZZ_S(NAME, OP)   \
++    DO_FPCMP_PPZZ_D(NAME, OP)
++
++#define DO_FCMGE(TYPE, X, Y, ST)  TYPE##_compare(Y, X, ST) <= 0
++#define DO_FCMGT(TYPE, X, Y, ST)  TYPE##_compare(Y, X, ST) < 0
++#define DO_FCMEQ(TYPE, X, Y, ST)  TYPE##_compare_quiet(X, Y, ST) == 0
++#define DO_FCMNE(TYPE, X, Y, ST)  TYPE##_compare_quiet(X, Y, ST) != 0
++#define DO_FCMUO(TYPE, X, Y, ST)  \
++    TYPE##_compare_quiet(X, Y, ST) == float_relation_unordered
++#define DO_FACGE(TYPE, X, Y, ST)  \
++    TYPE##_compare(TYPE##_abs(Y), TYPE##_abs(X), ST) <= 0
++#define DO_FACGT(TYPE, X, Y, ST)  \
++    TYPE##_compare(TYPE##_abs(Y), TYPE##_abs(X), ST) < 0
++
++DO_FPCMP_PPZZ_ALL(sve_fcmge, DO_FCMGE)
++DO_FPCMP_PPZZ_ALL(sve_fcmgt, DO_FCMGT)
++DO_FPCMP_PPZZ_ALL(sve_fcmeq, DO_FCMEQ)
++DO_FPCMP_PPZZ_ALL(sve_fcmne, DO_FCMNE)
++DO_FPCMP_PPZZ_ALL(sve_fcmuo, DO_FCMUO)
++DO_FPCMP_PPZZ_ALL(sve_facge, DO_FACGE)
++DO_FPCMP_PPZZ_ALL(sve_facgt, DO_FACGT)
++
++#undef DO_FPCMP_PPZZ_ALL
++#undef DO_FPCMP_PPZZ_D
++#undef DO_FPCMP_PPZZ_S
++#undef DO_FPCMP_PPZZ_H
++#undef DO_FPCMP_PPZZ
++
+ /*
+  * Load contiguous data, protected by a governing predicate.
+  */
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index fdc3231e63..a68126b369 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -3533,6 +3533,46 @@ DO_FP3(FMULX, fmulx)
  
- static bool trans_LD1_zprz(DisasContext *s, arg_LD1_zprz *a, uint32_t insn)
-@@ -4311,13 +4349,12 @@ static bool trans_LD1_zprz(DisasContext *s, arg_LD1_zprz *a, uint32_t insn)
-         return true;
-     }
+ #undef DO_FP3
  
--    /* TODO: handle LDFF1.  */
-     switch (a->esz) {
-     case MO_32:
--        fn = gather_load_fn32[a->xs][a->u][a->msz];
-+        fn = gather_load_fn32[a->ff][a->xs][a->u][a->msz];
-         break;
-     case MO_64:
--        fn = gather_load_fn64[a->xs][a->u][a->msz];
-+        fn = gather_load_fn64[a->ff][a->xs][a->u][a->msz];
-         break;
-     }
-     assert(fn != NULL);
-@@ -4339,13 +4376,12 @@ static bool trans_LD1_zpiz(DisasContext *s, arg_LD1_zpiz *a, uint32_t insn)
-         return true;
-     }
++static bool do_fp_cmp(DisasContext *s, arg_rprr_esz *a,
++                      gen_helper_gvec_4_ptr *fn)
++{
++    if (fn == NULL) {
++        return false;
++    }
++    if (sve_access_check(s)) {
++        unsigned vsz = vec_full_reg_size(s);
++        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
++        tcg_gen_gvec_4_ptr(pred_full_reg_offset(s, a->rd),
++                           vec_full_reg_offset(s, a->rn),
++                           vec_full_reg_offset(s, a->rm),
++                           pred_full_reg_offset(s, a->pg),
++                           status, vsz, vsz, 0, fn);
++        tcg_temp_free_ptr(status);
++    }
++    return true;
++}
++
++#define DO_FPCMP(NAME, name) \
++static bool trans_##NAME##_ppzz(DisasContext *s, arg_rprr_esz *a,     \
++                                uint32_t insn)                        \
++{                                                                     \
++    static gen_helper_gvec_4_ptr * const fns[4] = {                   \
++        NULL, gen_helper_sve_##name##_h,                              \
++        gen_helper_sve_##name##_s, gen_helper_sve_##name##_d          \
++    };                                                                \
++    return do_fp_cmp(s, a, fns[a->esz]);                              \
++}
++
++DO_FPCMP(FCMGE, fcmge)
++DO_FPCMP(FCMGT, fcmgt)
++DO_FPCMP(FCMEQ, fcmeq)
++DO_FPCMP(FCMNE, fcmne)
++DO_FPCMP(FCMUO, fcmuo)
++DO_FPCMP(FACGE, facge)
++DO_FPCMP(FACGT, facgt)
++
++#undef DO_FPCMP
++
+ typedef void gen_helper_sve_fmla(TCGv_env, TCGv_ptr, TCGv_i32);
  
--    /* TODO: handle LDFF1.  */
-     switch (a->esz) {
-     case MO_32:
--        fn = gather_load_fn32[0][a->u][a->msz];
-+        fn = gather_load_fn32[a->ff][0][a->u][a->msz];
-         break;
-     case MO_64:
--        fn = gather_load_fn64[2][a->u][a->msz];
-+        fn = gather_load_fn64[a->ff][2][a->u][a->msz];
-         break;
-     }
-     assert(fn != NULL);
+ static bool do_fmla(DisasContext *s, arg_rprrr_esz *a, gen_helper_sve_fmla *fn)
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index 311ae6dbdf..6f4a36422d 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -320,6 +320,17 @@ UXTH            00000100 .. 010 011 101 ... ..... .....         @rd_pg_rn
+ SXTW            00000100 .. 010 100 101 ... ..... .....         @rd_pg_rn
+ UXTW            00000100 .. 010 101 101 ... ..... .....         @rd_pg_rn
+ 
++### SVE Floating Point Compare - Vectors Group
++
++# SVE floating-point compare vectors
++FCMGE_ppzz      01100101 .. 0 ..... 010 ... ..... 0 ....        @pd_pg_rn_rm
++FCMGT_ppzz      01100101 .. 0 ..... 010 ... ..... 1 ....        @pd_pg_rn_rm
++FCMEQ_ppzz      01100101 .. 0 ..... 011 ... ..... 0 ....        @pd_pg_rn_rm
++FCMNE_ppzz      01100101 .. 0 ..... 011 ... ..... 1 ....        @pd_pg_rn_rm
++FCMUO_ppzz      01100101 .. 0 ..... 110 ... ..... 0 ....        @pd_pg_rn_rm
++FACGE_ppzz      01100101 .. 0 ..... 110 ... ..... 1 ....        @pd_pg_rn_rm
++FACGT_ppzz      01100101 .. 0 ..... 111 ... ..... 1 ....        @pd_pg_rn_rm
++
+ ### SVE Integer Multiply-Add Group
+ 
+ # SVE integer multiply-add writing addend (predicated)
 -- 
 2.17.1
