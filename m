@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50236)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50277)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fW393-0004id-Cr
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:13:18 -0400
+	id 1fW39A-0004mo-Dm
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:13:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fW392-00024J-De
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:13:17 -0400
+	id 1fW395-000265-GZ
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:13:24 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 21 Jun 2018 14:12:49 -0300
-Message-Id: <20180621171257.14897-4-f4bug@amsat.org>
+Date: Thu, 21 Jun 2018 14:12:50 -0300
+Message-Id: <20180621171257.14897-5-f4bug@amsat.org>
 In-Reply-To: <20180621171257.14897-1-f4bug@amsat.org>
 References: <20180621171257.14897-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 03/11] hw/char/serial: Convert from DPRINTF
+Subject: [Qemu-devel] [PATCH 04/11] hw/char/parallel: Convert from pdebug()
  macro to trace events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,53 +32,119 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/char/serial.c     | 5 +++--
- hw/char/trace-events | 4 ++++
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ hw/char/parallel.c   | 16 +++++++++++++---
+ hw/char/trace-events |  4 ++++
+ 2 files changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 605b0d02f9..26f53ba02f 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -29,6 +29,7 @@
- #include "qapi/error.h"
- #include "qemu/timer.h"
- #include "qemu/error-report.h"
+diff --git a/hw/char/parallel.c b/hw/char/parallel.c
+index 35748e6c1b..a80da47ecf 100644
+--- a/hw/char/parallel.c
++++ b/hw/char/parallel.c
+@@ -30,6 +30,7 @@
+ #include "hw/isa/isa.h"
+ #include "hw/char/parallel.h"
+ #include "sysemu/sysemu.h"
 +#include "trace.h"
  
- //#define DEBUG_SERIAL
+ //#define DEBUG_PARALLEL
  
-@@ -335,7 +336,7 @@ static void serial_ioport_write(void *opaque, hwaddr addr, uint64_t val,
-     SerialState *s = opaque;
+@@ -110,9 +111,8 @@ parallel_ioport_write_sw(void *opaque, uint32_t addr, uint32_t val)
+ {
+     ParallelState *s = opaque;
+ 
+-    pdebug("write addr=0x%02x val=0x%02x\n", addr, val);
+-
+     addr &= 7;
++    trace_parallel_ioport_write("SW", addr, val);
+     switch(addr) {
+     case PARA_REG_DATA:
+         s->dataw = val;
+@@ -157,6 +157,7 @@ static void parallel_ioport_write_hw(void *opaque, uint32_t addr, uint32_t val)
+     s->last_read_offset = ~0U;
  
      addr &= 7;
--    DPRINTF("write addr=0x%" HWADDR_PRIx " val=0x%" PRIx64 "\n", addr, val);
-+    trace_serial_ioport_write(addr, val);
++    trace_parallel_ioport_write("HW", addr, val);
      switch(addr) {
-     default:
-     case 0:
-@@ -548,7 +549,7 @@ static uint64_t serial_ioport_read(void *opaque, hwaddr addr, unsigned size)
-         ret = s->scr;
+     case PARA_REG_DATA:
+         if (s->dataw == val)
+@@ -230,6 +231,8 @@ parallel_ioport_eppdata_write_hw2(void *opaque, uint32_t addr, uint32_t val)
+     struct ParallelIOArg ioarg = {
+         .buffer = &eppdata, .count = sizeof(eppdata)
+     };
++
++    trace_parallel_ioport_write("EPP", addr, val);
+     if ((s->control & (PARA_CTR_DIR|PARA_CTR_SIGNAL)) != PARA_CTR_INIT) {
+         /* Controls not correct for EPP data cycle, so do nothing */
+         pdebug("we%04x s\n", val);
+@@ -253,6 +256,8 @@ parallel_ioport_eppdata_write_hw4(void *opaque, uint32_t addr, uint32_t val)
+     struct ParallelIOArg ioarg = {
+         .buffer = &eppdata, .count = sizeof(eppdata)
+     };
++
++    trace_parallel_ioport_write("EPP", addr, val);
+     if ((s->control & (PARA_CTR_DIR|PARA_CTR_SIGNAL)) != PARA_CTR_INIT) {
+         /* Controls not correct for EPP data cycle, so do nothing */
+         pdebug("we%08x s\n", val);
+@@ -299,7 +304,7 @@ static uint32_t parallel_ioport_read_sw(void *opaque, uint32_t addr)
+         ret = s->control;
          break;
      }
--    DPRINTF("read addr=0x%" HWADDR_PRIx " val=0x%02x\n", addr, ret);
-+    trace_serial_ioport_read(addr, ret);
+-    pdebug("read addr=0x%02x val=0x%02x\n", addr, ret);
++    trace_parallel_ioport_read("SW", addr, ret);
      return ret;
  }
  
+@@ -371,6 +376,7 @@ static uint32_t parallel_ioport_read_hw(void *opaque, uint32_t addr)
+         }
+         break;
+     }
++    trace_parallel_ioport_read("HW", addr, ret);
+     s->last_read_offset = addr;
+     return ret;
+ }
+@@ -399,6 +405,7 @@ parallel_ioport_eppdata_read_hw2(void *opaque, uint32_t addr)
+     }
+     else
+         pdebug("re%04x\n", ret);
++    trace_parallel_ioport_read("EPP", addr, ret);
+     return ret;
+ }
+ 
+@@ -426,11 +433,13 @@ parallel_ioport_eppdata_read_hw4(void *opaque, uint32_t addr)
+     }
+     else
+         pdebug("re%08x\n", ret);
++    trace_parallel_ioport_read("EPP", addr, ret);
+     return ret;
+ }
+ 
+ static void parallel_ioport_ecp_write(void *opaque, uint32_t addr, uint32_t val)
+ {
++    trace_parallel_ioport_write("ECP", addr & 7, val);
+     pdebug("wecp%d=%02x\n", addr & 7, val);
+ }
+ 
+@@ -438,6 +447,7 @@ static uint32_t parallel_ioport_ecp_read(void *opaque, uint32_t addr)
+ {
+     uint8_t ret = 0xff;
+ 
++    trace_parallel_ioport_read("ECP", addr & 7, ret);
+     pdebug("recp%d:%02x\n", addr & 7, ret);
+     return ret;
+ }
 diff --git a/hw/char/trace-events b/hw/char/trace-events
-index ebd8a92450..158957627e 100644
+index 158957627e..b64213d4dd 100644
 --- a/hw/char/trace-events
 +++ b/hw/char/trace-events
 @@ -1,5 +1,9 @@
  # See docs/devel/tracing.txt for syntax documentation.
  
-+# hw/char/serial.c
-+serial_ioport_read(uint16_t addr, uint8_t value) "read addr 0x%02x val 0x%02x"
-+serial_ioport_write(uint16_t addr, uint8_t value) "write addr 0x%02x val 0x%02x"
++# hw/char/parallel.c
++parallel_ioport_read(const char *desc, uint16_t addr, uint8_t value) "read [%s] addr 0x%02x val 0x%02x"
++parallel_ioport_write(const char *desc, uint16_t addr, uint8_t value) "write [%s] addr 0x%02x val 0x%02x"
 +
- # hw/char/virtio-serial-bus.c
- virtio_serial_send_control_event(unsigned int port, uint16_t event, uint16_t value) "port %u, event %u, value %u"
- virtio_serial_throttle_port(unsigned int port, bool throttle) "port %u, throttle %d"
+ # hw/char/serial.c
+ serial_ioport_read(uint16_t addr, uint8_t value) "read addr 0x%02x val 0x%02x"
+ serial_ioport_write(uint16_t addr, uint8_t value) "write addr 0x%02x val 0x%02x"
 -- 
 2.18.0.rc2
