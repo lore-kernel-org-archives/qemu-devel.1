@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fVs1q-0002kf-Nj
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:21:08 -0400
+	(envelope-from <clg@kaod.org>) id 1fVsDI-0004cs-3f
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:32:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fVs1n-0003Ge-GR
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:21:06 -0400
-Received: from 2.mo178.mail-out.ovh.net ([46.105.39.61]:51343)
+	(envelope-from <clg@kaod.org>) id 1fVsDD-0000CM-TV
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:32:56 -0400
+Received: from 12.mo3.mail-out.ovh.net ([188.165.41.191]:44118)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fVs1n-0003GF-61
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:21:03 -0400
-Received: from player693.ha.ovh.net (unknown [10.109.122.117])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 84DCA1B85D
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 07:21:01 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fVsDD-0000Bw-Nm
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:32:51 -0400
+Received: from player692.ha.ovh.net (unknown [10.109.120.111])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 8EC901BE610
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 07:32:48 +0200 (CEST)
 References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
-	<20180618063606.2513-2-david@gibson.dropbear.id.au>
+	<20180618063606.2513-3-david@gibson.dropbear.id.au>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <ecc5a50f-18b3-249f-ec0b-09b0de8a50cf@kaod.org>
-Date: Thu, 21 Jun 2018 07:20:51 +0200
+Message-ID: <89c037a0-22ee-10ff-6e86-fe4295860a4a@kaod.org>
+Date: Thu, 21 Jun 2018 07:32:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180618063606.2513-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20180618063606.2513-3-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/9] target/ppc: Allow cpu compatiblity
- checks based on type, not instance
+Subject: Re: [Qemu-devel] [PATCH 2/9] spapr: Compute effective capability
+ values earlier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,230 +33,107 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, abologna@redhat.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
 On 06/18/2018 08:35 AM, David Gibson wrote:
-> ppc_check_compat() is used in a number of places to check if a cpu obje=
-ct
-> supports a certain compatiblity mode, subject to various constraints.
+> Previously, the effective values of the various spapr capability flags
+> were only determined at machine reset time.  That was a lazy way of mak=
+ing
+> sure it was after cpu initialization so it could use the cpu object to
+> inform the defaults.
 >=20
-> It takes a PowerPCCPU *, however it really only depends on the cpu's cl=
-ass.
-> We have upcoming cases where it would be useful to make compatibility
-> checks before we fully instantiate the cpu objects.
->=20
-> ppc_type_check_compat() will now make an equivalent check, but based on=
- a
-> CPU's QOM typename instead of an instantiated CPU object.
->=20
-> We make use of the new interface in several places in spapr, where we'r=
+> But we've now improved the compat checking code so that we don't need t=
+o
+> instantiate the cpus to use it.  That lets us move the resolution of th=
 e
-> essentially making a global check, rather than one specific to a partic=
-ular
-> cpu.  This avoids some ugly uses of first_cpu to grab a "representative=
-"
-> instance.
+> capability defaults much earlier.
+>=20
+> This is going to be necessary for some future capabilities.
 >=20
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Looks good to me,
-
 Thanks,
 
 C.
-
-
 > ---
->  hw/ppc/spapr.c      | 10 ++++------
->  hw/ppc/spapr_caps.c | 19 +++++++++----------
->  target/ppc/compat.c | 27 +++++++++++++++++++++------
->  target/ppc/cpu.h    |  4 ++++
->  4 files changed, 38 insertions(+), 22 deletions(-)
+>  hw/ppc/spapr.c         | 6 ++++--
+>  hw/ppc/spapr_caps.c    | 9 ++++++---
+>  include/hw/ppc/spapr.h | 3 ++-
+>  3 files changed, 12 insertions(+), 6 deletions(-)
 >=20
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index db0fb385d4..b0b94fc1f0 100644
+> index b0b94fc1f0..40858d047c 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -1616,8 +1616,8 @@ static void spapr_machine_reset(void)
+> @@ -1612,7 +1612,7 @@ static void spapr_machine_reset(void)
+>      void *fdt;
+>      int rc;
+> =20
+> -    spapr_caps_reset(spapr);
+> +    spapr_caps_apply(spapr);
 > =20
 >      first_ppc_cpu =3D POWERPC_CPU(first_cpu);
 >      if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
-> -        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-> -                         spapr->max_compat_pvr)) {
-> +        ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3=
-_00, 0,
-> +                              spapr->max_compat_pvr)) {
->          /* If using KVM with radix mode available, VCPUs can be starte=
-d
->           * without a HPT because KVM will start them in radix mode.
->           * Set the GR bit in PATB so that we know there is no HPT. */
-> @@ -2520,7 +2520,6 @@ static void spapr_machine_init(MachineState *mach=
+> @@ -2526,7 +2526,9 @@ static void spapr_machine_init(MachineState *mach=
 ine)
->      long load_limit, fw_size;
->      char *filename;
->      Error *resize_hpt_err =3D NULL;
-> -    PowerPCCPU *first_ppc_cpu;
+>      QLIST_INIT(&spapr->phbs);
+>      QTAILQ_INIT(&spapr->pending_dimm_unplugs);
 > =20
->      msi_nonbroken =3D true;
-> =20
-> @@ -2618,10 +2617,9 @@ static void spapr_machine_init(MachineState *mac=
-hine)
->      /* init CPUs */
->      spapr_init_cpus(spapr);
-> =20
-> -    first_ppc_cpu =3D POWERPC_CPU(first_cpu);
->      if ((!kvm_enabled() || kvmppc_has_cap_mmu_radix()) &&
-> -        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
-> -                         spapr->max_compat_pvr)) {
-> +        ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3=
-_00, 0,
-> +                              spapr->max_compat_pvr)) {
->          /* KVM and TCG always allow GTSE with radix... */
->          spapr_ovec_set(spapr->ov5, OV5_MMU_RADIX_GTSE);
->      }
+> -    /* Check HPT resizing availability */
+> +    /* Determine capabilities to run with */
+> +    spapr_caps_init(spapr);
+> +
+>      kvmppc_check_papr_resize_hpt(&resize_hpt_err);
+>      if (spapr->resize_hpt =3D=3D SPAPR_RESIZE_HPT_DEFAULT) {
+>          /*
 > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 00e43a9ba7..469f38f0ef 100644
+> index 469f38f0ef..dabed817d1 100644
 > --- a/hw/ppc/spapr_caps.c
 > +++ b/hw/ppc/spapr_caps.c
-> @@ -327,27 +327,26 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NU=
-M] =3D {
->  };
+> @@ -439,12 +439,12 @@ SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
+>  SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
+>  SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
 > =20
->  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spap=
-r,
-> -                                               CPUState *cs)
-> +                                               const char *cputype)
+> -void spapr_caps_reset(sPAPRMachineState *spapr)
+> +void spapr_caps_init(sPAPRMachineState *spapr)
 >  {
->      sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> -    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->      sPAPRCapabilities caps;
-> =20
->      caps =3D smc->default_caps;
-> =20
-> -    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
-> -                          0, spapr->max_compat_pvr)) {
-> +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_07,
-> +                               0, spapr->max_compat_pvr)) {
->          caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
->          caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
->      }
-> =20
-> -    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06_PLUS,
-> -                          0, spapr->max_compat_pvr)) {
-> +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_06_PLUS,
-> +                               0, spapr->max_compat_pvr)) {
->          caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
->      }
-> =20
-> -    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
-> -                          0, spapr->max_compat_pvr)) {
-> +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_06,
-> +                               0, spapr->max_compat_pvr)) {
->          caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_OFF;
->          caps.caps[SPAPR_CAP_DFP] =3D SPAPR_CAP_OFF;
->          caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
-> @@ -384,7 +383,7 @@ int spapr_caps_post_migration(sPAPRMachineState *sp=
-apr)
->      sPAPRCapabilities dstcaps =3D spapr->eff;
->      sPAPRCapabilities srccaps;
-> =20
-> -    srccaps =3D default_caps_with_cpu(spapr, first_cpu);
-> +    srccaps =3D default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type)=
-;
->      for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
->          /* If not default value then assume came in with the migration=
- */
->          if (spapr->mig.caps[i] !=3D spapr->def.caps[i]) {
-> @@ -446,7 +445,7 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
+>      sPAPRCapabilities default_caps;
 >      int i;
 > =20
->      /* First compute the actual set of caps we're running with.. */
-> -    default_caps =3D default_caps_with_cpu(spapr, first_cpu);
-> +    default_caps =3D default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_=
+> -    /* First compute the actual set of caps we're running with.. */
+> +    /* Compute the actual set of caps we should run with */
+>      default_caps =3D default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_=
 type);
 > =20
 >      for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
->          /* Store the defaults */
-> diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-> index 807c906f68..7de4bf3122 100644
-> --- a/target/ppc/compat.c
-> +++ b/target/ppc/compat.c
-> @@ -105,17 +105,13 @@ static const CompatInfo *compat_by_pvr(uint32_t p=
-vr)
->      return NULL;
+> @@ -455,8 +455,11 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
+>              spapr->eff.caps[i] =3D default_caps.caps[i];
+>          }
+>      }
+> +}
+> =20
+> -    /* .. then apply those caps to the virtual hardware */
+> +void spapr_caps_apply(sPAPRMachineState *spapr)
+> +{
+> +    int i;
+> =20
+>      for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
+>          sPAPRCapabilityInfo *info =3D &capability_table[i];
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 3388750fc7..9dbd6010f5 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -798,7 +798,8 @@ static inline uint8_t spapr_get_cap(sPAPRMachineSta=
+te *spapr, int cap)
+>      return spapr->eff.caps[cap];
 >  }
 > =20
-> -bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
-> -                      uint32_t min_compat_pvr, uint32_t max_compat_pvr=
-)
-> +static bool pcc_compat(PowerPCCPUClass *pcc, uint32_t compat_pvr,
-> +                       uint32_t min_compat_pvr, uint32_t max_compat_pv=
-r)
->  {
-> -    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
->      const CompatInfo *compat =3D compat_by_pvr(compat_pvr);
->      const CompatInfo *min =3D compat_by_pvr(min_compat_pvr);
->      const CompatInfo *max =3D compat_by_pvr(max_compat_pvr);
+> -void spapr_caps_reset(sPAPRMachineState *spapr);
+> +void spapr_caps_init(sPAPRMachineState *spapr);
+> +void spapr_caps_apply(sPAPRMachineState *spapr);
+>  void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
+>  int spapr_caps_post_migration(sPAPRMachineState *spapr);
 > =20
-> -#if !defined(CONFIG_USER_ONLY)
-> -    g_assert(cpu->vhyp);
-> -#endif
->      g_assert(!min_compat_pvr || min);
->      g_assert(!max_compat_pvr || max);
-> =20
-> @@ -134,6 +130,25 @@ bool ppc_check_compat(PowerPCCPU *cpu, uint32_t co=
-mpat_pvr,
->      return true;
->  }
-> =20
-> +bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
-> +                      uint32_t min_compat_pvr, uint32_t max_compat_pvr=
-)
-> +{
-> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-> +
-> +#if !defined(CONFIG_USER_ONLY)
-> +    g_assert(cpu->vhyp);
-> +#endif
-> +
-> +    return pcc_compat(pcc, compat_pvr, min_compat_pvr, max_compat_pvr)=
-;
-> +}
-> +
-> +bool ppc_type_check_compat(const char *cputype, uint32_t compat_pvr,
-> +                           uint32_t min_compat_pvr, uint32_t max_compa=
-t_pvr)
-> +{
-> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(object_class_by_name(cp=
-utype));
-> +    return pcc_compat(pcc, compat_pvr, min_compat_pvr, max_compat_pvr)=
-;
-> +}
-> +
->  void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp=
-)
->  {
->      const CompatInfo *compat =3D compat_by_pvr(compat_pvr);
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 874da6efbc..c7f3fb6b73 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1369,7 +1369,11 @@ static inline int cpu_mmu_index (CPUPPCState *en=
-v, bool ifetch)
->  #if defined(TARGET_PPC64)
->  bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
->                        uint32_t min_compat_pvr, uint32_t max_compat_pvr=
-);
-> +bool ppc_type_check_compat(const char *cputype, uint32_t compat_pvr,
-> +                           uint32_t min_compat_pvr, uint32_t max_compa=
-t_pvr);
-> +
->  void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp=
-);
-> +
->  #if !defined(CONFIG_USER_ONLY)
->  void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
->  #endif
 >=20
