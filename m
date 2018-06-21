@@ -1,17 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fVxZs-0003Nr-3G
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:16:39 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fVxcG-0004uo-DU
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:19:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fVxZq-0003FM-D1
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:16:36 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Thu, 21 Jun 2018 13:16:14 +0200
-Message-Id: <1529579774-27795-5-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1529579774-27795-1-git-send-email-eric.auger@redhat.com>
-References: <1529579774-27795-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/4] hw/arm/smmuv3: Add notifications on
- invalidation
+	(envelope-from <dgilbert@redhat.com>) id 1fVxcF-0004Rb-IW
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:19:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60798 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVxcF-0004RT-E8
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:19:03 -0400
+Date: Thu, 21 Jun 2018 12:19:00 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180621111859.GA10744@work-vm>
+References: <1525445354-16233-1-git-send-email-walling@linux.ibm.com>
+	<7e9e9dfd-795b-47f2-453a-59bf65f28229@redhat.com>
+	<7274b001-02f2-6584-ea0a-c3d0f96d46b8@linux.ibm.com>
+	<89dc884d-97af-4922-bd69-1cb7308399d8@redhat.com>
+	<724592be-f5ac-7a40-8c26-5d2dd200ef82@linux.ibm.com>
+	<ee680f5e-ac9a-479d-f65e-9f8ae9cfe5d4@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ee680f5e-ac9a-479d-f65e-9f8ae9cfe5d4@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] monitor: report entirety of hmp command
+ on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,252 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, jia.he@hxt-semitech.com, hejianet@gmail.com
+To: Collin Walling <walling@linux.ibm.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-On TLB invalidation commands, let's call registered
-IOMMU notifiers. Those can only be UNMAP notifiers.
-SMMUv3 does not support notification on MAP (VFIO).
+* Collin Walling (walling@linux.ibm.com) wrote:
+> When a user incorrectly provides an hmp command, an error response will be
+> printed that prompts the user to try "help <command name>". However, when
+> the command contains multiple parts e.g. "info uuid xyz", only the last
+> whitespace delimited string will be reported (in this example "info" will
+> be dropped and the message will read "Try "help uuid" for more information",
+> which is incorrect).
+> 
+> Let's correct this by capturing the entirety of the command from the command
+> line -- excluding any extraneous characters.
+> 
+> Reported-by: Mikhail Fokin <fokin@de.ibm.com>
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
 
-This patch allows vhost use case where IOTLB API is notified
-on each guest IOTLB invalidation.
+Queued
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
----
-v2 -> v3:
-- added Peter's R-b
----
- hw/arm/smmu-common.c         | 34 +++++++++++++++
- hw/arm/smmuv3.c              | 99 +++++++++++++++++++++++++++++++++++++++++++-
- hw/arm/trace-events          |  5 +++
- include/hw/arm/smmu-common.h |  6 +++
- 4 files changed, 142 insertions(+), 2 deletions(-)
-
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index f66e444..3098915 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -385,6 +385,40 @@ static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
-     return (k1->asid == k2->asid) && (k1->iova == k2->iova);
- }
- 
-+/* Unmap the whole notifier's range */
-+static void smmu_unmap_notifier_range(IOMMUNotifier *n)
-+{
-+    IOMMUTLBEntry entry;
-+
-+    entry.target_as = &address_space_memory;
-+    entry.iova = n->start;
-+    entry.perm = IOMMU_NONE;
-+    entry.addr_mask = n->end - n->start;
-+
-+    memory_region_notify_one(n, &entry);
-+}
-+
-+/* Unmap all notifiers attached to @mr */
-+inline void smmu_inv_notifiers_mr(IOMMUMemoryRegion *mr)
-+{
-+    IOMMUNotifier *n;
-+
-+    trace_smmu_inv_notifiers_mr(mr->parent_obj.name);
-+    IOMMU_NOTIFIER_FOREACH(n, mr) {
-+        smmu_unmap_notifier_range(n);
-+    }
-+}
-+
-+/* Unmap all notifiers of all mr's */
-+void smmu_inv_notifiers_all(SMMUState *s)
-+{
-+    SMMUNotifierNode *node;
-+
-+    QLIST_FOREACH(node, &s->notifiers_list, next) {
-+        smmu_inv_notifiers_mr(&node->sdev->iommu);
-+    }
-+}
-+
- static void smmu_base_realize(DeviceState *dev, Error **errp)
- {
-     SMMUState *s = ARM_SMMU(dev);
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 853975a..c58e596 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -780,6 +780,68 @@ epilogue:
-     return entry;
- }
- 
-+/**
-+ * smmuv3_notify_iova - call the notifier @n for a given
-+ * @asid and @iova tuple.
-+ *
-+ * @mr: IOMMU mr region handle
-+ * @n: notifier to be called
-+ * @asid: address space ID or negative value if we don't care
-+ * @iova: iova
-+ */
-+static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
-+                               IOMMUNotifier *n,
-+                               int asid,
-+                               dma_addr_t iova)
-+{
-+    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
-+    SMMUEventInfo event = {};
-+    SMMUTransTableInfo *tt;
-+    SMMUTransCfg *cfg;
-+    IOMMUTLBEntry entry;
-+
-+    cfg = smmuv3_get_config(sdev, &event);
-+    if (!cfg) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s error decoding the configuration for iommu mr=%s\n",
-+                      __func__, mr->parent_obj.name);
-+        return;
-+    }
-+
-+    if (asid >= 0 && cfg->asid != asid) {
-+        return;
-+    }
-+
-+    tt = select_tt(cfg, iova);
-+    if (!tt) {
-+        return;
-+    }
-+
-+    entry.target_as = &address_space_memory;
-+    entry.iova = iova;
-+    entry.addr_mask = (1 << tt->granule_sz) - 1;
-+    entry.perm = IOMMU_NONE;
-+
-+    memory_region_notify_one(n, &entry);
-+}
-+
-+/* invalidate an asid/iova tuple in all mr's */
-+static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova)
-+{
-+    SMMUNotifierNode *node;
-+
-+    QLIST_FOREACH(node, &s->notifiers_list, next) {
-+        IOMMUMemoryRegion *mr = &node->sdev->iommu;
-+        IOMMUNotifier *n;
-+
-+        trace_smmuv3_inv_notifiers_iova(mr->parent_obj.name, asid, iova);
-+
-+        IOMMU_NOTIFIER_FOREACH(n, mr) {
-+            smmuv3_notify_iova(mr, n, asid, iova);
-+        }
-+    }
-+}
-+
- static int smmuv3_cmdq_consume(SMMUv3State *s)
- {
-     SMMUState *bs = ARM_SMMU(s);
-@@ -899,12 +961,14 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             uint16_t asid = CMD_ASID(&cmd);
- 
-             trace_smmuv3_cmdq_tlbi_nh_asid(asid);
-+            smmu_inv_notifiers_all(&s->smmu_state);
-             smmu_iotlb_inv_asid(bs, asid);
-             break;
-         }
-         case SMMU_CMD_TLBI_NH_ALL:
-         case SMMU_CMD_TLBI_NSNH_ALL:
-             trace_smmuv3_cmdq_tlbi_nh();
-+            smmu_inv_notifiers_all(&s->smmu_state);
-             smmu_iotlb_inv_all(bs);
-             break;
-         case SMMU_CMD_TLBI_NH_VAA:
-@@ -913,6 +977,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             uint16_t vmid = CMD_VMID(&cmd);
- 
-             trace_smmuv3_cmdq_tlbi_nh_vaa(vmid, addr);
-+            smmuv3_inv_notifiers_iova(bs, -1, addr);
-             smmu_iotlb_inv_all(bs);
-             break;
-         }
-@@ -924,6 +989,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             bool leaf = CMD_LEAF(&cmd);
- 
-             trace_smmuv3_cmdq_tlbi_nh_va(vmid, asid, addr, leaf);
-+            smmuv3_inv_notifiers_iova(bs, asid, addr);
-             smmu_iotlb_inv_iova(bs, asid, addr);
-             break;
-         }
-@@ -1402,9 +1468,38 @@ static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
-                                        IOMMUNotifierFlag old,
-                                        IOMMUNotifierFlag new)
- {
-+    SMMUDevice *sdev = container_of(iommu, SMMUDevice, iommu);
-+    SMMUv3State *s3 = sdev->smmu;
-+    SMMUState *s = &(s3->smmu_state);
-+    SMMUNotifierNode *node = NULL;
-+    SMMUNotifierNode *next_node = NULL;
-+
-+    if (new == IOMMU_NOTIFIER_MAP) {
-+        int bus_num = pci_bus_num(sdev->bus);
-+        PCIDevice *pcidev = pci_find_device(sdev->bus, bus_num, sdev->devfn);
-+
-+        warn_report("SMMUv3 does not support notification on MAP: "
-+                     "device %s will not function properly", pcidev->name);
-+    }
-+
-     if (old == IOMMU_NOTIFIER_NONE) {
--        warn_report("SMMUV3 does not support vhost/vfio integration yet: "
--                    "devices of those types will not function properly");
-+        trace_smmuv3_notify_flag_add(iommu->parent_obj.name);
-+        node = g_malloc0(sizeof(*node));
-+        node->sdev = sdev;
-+        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
-+        return;
-+    }
-+
-+    /* update notifier node with new flags */
-+    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
-+        if (node->sdev == sdev) {
-+            if (new == IOMMU_NOTIFIER_NONE) {
-+                trace_smmuv3_notify_flag_del(iommu->parent_obj.name);
-+                QLIST_REMOVE(node, next);
-+                g_free(node);
-+            }
-+            return;
-+        }
-     }
- }
- 
-diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index be69c5d..27b11d6 100644
---- a/hw/arm/trace-events
-+++ b/hw/arm/trace-events
-@@ -17,6 +17,7 @@ smmu_iotlb_cache_miss(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss,
- smmu_iotlb_inv_all(void) "IOTLB invalidate all"
- smmu_iotlb_inv_asid(uint16_t asid) "IOTLB invalidate asid=%d"
- smmu_iotlb_inv_iova(uint16_t asid, uint64_t addr) "IOTLB invalidate asid=%d addr=0x%"PRIx64
-+smmu_inv_notifiers_mr(const char *name) "iommu mr=%s"
- 
- #hw/arm/smmuv3.c
- smmuv3_read_mmio(uint64_t addr, uint64_t val, unsigned size, uint32_t r) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x(%d)"
-@@ -55,3 +56,7 @@ smmuv3_cmdq_tlbi_nh_vaa(int vmid, uint64_t addr) "vmid =%d addr=0x%"PRIx64
- smmuv3_cmdq_tlbi_nh(void) ""
- smmuv3_cmdq_tlbi_nh_asid(uint16_t asid) "asid=%d"
- smmuv3_config_cache_inv(uint32_t sid) "Config cache INV for sid %d"
-+smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
-+smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
-+smmuv3_inv_notifiers_iova(const char *name, uint16_t asid, uint64_t iova) "iommu mr=%s asid=%d iova=0x%"PRIx64
-+
-diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-index d173806..50e2912 100644
---- a/include/hw/arm/smmu-common.h
-+++ b/include/hw/arm/smmu-common.h
-@@ -160,4 +160,10 @@ void smmu_iotlb_inv_all(SMMUState *s);
- void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
- void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova);
- 
-+/* Unmap the range of all the notifiers registered to any IOMMU mr */
-+void smmu_inv_notifiers_all(SMMUState *s);
-+
-+/* Unmap the range of all the notifiers registered to @mr */
-+void smmu_inv_notifiers_mr(IOMMUMemoryRegion *mr);
-+
- #endif  /* HW_ARM_SMMU_COMMON */
--- 
-2.5.5
+> ---
+>  monitor.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/monitor.c b/monitor.c
+> index 39f8ee1..38736b3 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -3371,6 +3371,7 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
+>  {
+>      QDict *qdict;
+>      const mon_cmd_t *cmd;
+> +    const char *cmd_start = cmdline;
+>  
+>      trace_handle_hmp_command(mon, cmdline);
+>  
+> @@ -3381,8 +3382,11 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
+>  
+>      qdict = monitor_parse_arguments(mon, &cmdline, cmd);
+>      if (!qdict) {
+> -        monitor_printf(mon, "Try \"help %s\" for more information\n",
+> -                       cmd->name);
+> +        while (cmdline > cmd_start && qemu_isspace(cmdline[-1])) {
+> +            cmdline--;
+> +        }
+> +        monitor_printf(mon, "Try \"help %.*s\" for more information\n",
+> +                       (int)(cmdline - cmd_start), cmd_start);
+>          return;
+>      }
+>  
+> -- 
+> 2.7.4
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
