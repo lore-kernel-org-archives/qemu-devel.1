@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fW39R-00054E-JO
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:13:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fW3DH-0008Gg-Ly
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:17:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fW39P-0002Go-Ok
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:13:41 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 21 Jun 2018 14:12:57 -0300
-Message-Id: <20180621171257.14897-12-f4bug@amsat.org>
-In-Reply-To: <20180621171257.14897-1-f4bug@amsat.org>
-References: <20180621171257.14897-1-f4bug@amsat.org>
+	(envelope-from <kwolf@redhat.com>) id 1fW3DG-0004K3-8d
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:17:39 -0400
+Date: Thu, 21 Jun 2018 19:17:29 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180621171729.GK5024@localhost.localdomain>
+References: <f9a9b5bb-4941-a6b3-ff6b-02ab2cb046df@virtuozzo.com>
+	<20180614104656.GD8564@localhost.localdomain>
+	<8114a2a4-8bd1-809e-44c2-f3c8fb52b773@virtuozzo.com>
+	<20180621142500.GJ5024@localhost.localdomain>
+	<14e2ebb9-8d4f-3079-83f0-a4b6bd60e9d6@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 11/11] hw/block/pflash_cfi: Convert from
- DPRINTF() macro to trace events
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <14e2ebb9-8d4f-3079-83f0-a4b6bd60e9d6@virtuozzo.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] bug in reopen arch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,259 +27,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Block layer core" <qemu-block@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/block/pflash_cfi01.c | 42 +++++++++++++++--------------------------
- hw/block/pflash_cfi02.c | 18 +++++++++---------
- hw/block/trace-events   | 13 +++++++++++++
- 3 files changed, 37 insertions(+), 36 deletions(-)
+Am 21.06.2018 um 17:55 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> 21.06.2018 17:25, Kevin Wolf wrote:
+> > Am 15.06.2018 um 20:42 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> > > 14.06.2018 13:46, Kevin Wolf wrote:
+> > > > Am 12.06.2018 um 20:57 hat Vladimir Sementsov-Ogievskiy geschrieb=
+en:
+> > > > > Hi all!
+> > > > >=20
+> > > > > I've faced the following problem:
+> > > > >=20
+> > > > >   =A0=A0=A0 1. create image with dirty bitmap, a.qcow2 (start q=
+emu and run qmp
+> > > > >   =A0=A0=A0 command block-dirty-bitmap-add)
+> > > > >=20
+> > > > >   =A0=A0=A0 2. run the following commands:
+> > > > >=20
+> > > > >   =A0=A0=A0=A0=A0=A0=A0 qemu-img create -f qcow2 -b a.qcow2 b.q=
+cow2 10M
+> > > > >   =A0=A0=A0=A0=A0=A0=A0 qemu-io -c 'write 0 512' b.qcow2
+> > > > >   =A0=A0=A0=A0=A0=A0=A0 qemu-img commit b.qcow2
+> > > > >=20
+> > > > >   =A0=A0=A0 3. last command fails with the following output:
+> > > > >=20
+> > > > > Formatting 'b.qcow2', fmt=3Dqcow2 size=3D68719476736 backing_fi=
+le=3Da.qcow2
+> > > > > cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+> > > > > wrote 512/512 bytes at offset 0
+> > > > > 512 bytes, 1 ops; 0.0953 sec (5.243 KiB/sec and 10.4867 ops/sec=
+)
+> > > > > qemu-img: #block397: Failed to make dirty bitmaps writable: Can=
+'t update
+> > > > > bitmap directory: Operation not permitted
+> > > > > qemu-img: Block job failed: Operation not permitted
+> > > > >=20
+> > > > > And problem is that children are reopened _after_ parent. But q=
+cow2 reopen
+> > > > > needs write access to its file, to write IN_USE flag to dirty-b=
+itmaps
+> > > > > extension.
+> > > > I was aware of a different instance of this problem: Assume a qco=
+w2
+> > > > image with an unknown autoclear flag (so it will be cleared on r/=
+w
+> > > > open), which is first opened r/o and then reopened r/w. This will=
+ fail
+> > > > because .bdrv_reopen_prepare doesn't have the permissions yet.
+> > > Hm.. If I understand correctly qcow2_reopen_prepare doesn't deal wi=
+th
+> > > autoclear flags, as it doesn't call qcow2_do_open.
+> > Hm, right, not sure what I really meant back then when I added it to =
+my
+> > to-do list... Maybe I confused reopen and invalidate_cache.
+> >=20
+> > > > Simply changing the order won't fix this because in the r/w -> r/=
+o, the
+> > > > driver will legitimately flush its caches in .bdrv_reopen_prepare=
+, and
+> > > > for this it still needs to be able to write.
+> > > >=20
+> > > > We may need to have a way for nodes to access both the old and th=
+e new
+> > > > state of their children. I'm not completely sure how to achieve t=
+his
+> > > > best, though.
+> > > >=20
+> > > > When I thought only of permissions, the obvious and simple thing =
+to do
+> > > > was to just get combined permissions for the old and new state, i=
+.e.
+> > > > 'old_perm | new_perm' and 'old_shared & new_shared'. But I don't =
+think
+> > > > this is actually enough when the child node switches between a r/=
+w and
+> > > > a r/o file descriptor because even though QEMU's permission syste=
+m would
+> > > > allow the write, you still can't successfully write to a r/o file
+> > > > descriptor.
+> > > >=20
+> > > > Kevin
+> > > Maybe we want two .bdrv_reopen_prepare: .bdrv_reopen_prepare_before=
+_children
+> > > and .bdrv_reopen_prepare_after_children. But to write something in
+> > > reopen_prepare, we need to move bdrv_set_perm from reopen_commit to
+> > > .. Is it possible?
+> > Getting the permission problems out of the way can be solved by chang=
+ing
+> > permissions twice, like I said above: First to the combined permissio=
+ns
+> > of old and new, and finally to only the new permissions.
+> >=20
+> > The problem I see with .bdrv_reopen_prepare_after_children is that I
+> > don't see how it actually buys you anything: Even if the children
+> > already prepared the reopen, any access of the child node still refer=
+s
+> > to the old file descriptor because the new one only becomes valid wit=
+h
+> > .bdrv_reopen_commit.
+> >=20
+> > > Now, I've found the following workaround, what do you think about s=
+omething
+> > > like this as a temporary fix:
+> > I honestly don't understand why this workaround makes any difference.
+>=20
+> with this patch, commit for children will be called earlier than for pa=
+rent,
+> so, when reopening bitmaps rw (which is done in commit) bs->file will b=
+e
+> already completely reopened rw, and all works.
 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index e4b5b3c273..bffb4c40e7 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -47,6 +47,7 @@
- #include "qemu/log.h"
- #include "hw/sysbus.h"
- #include "sysemu/sysemu.h"
-+#include "trace.h"
- 
- #define PFLASH_BUG(fmt, ...) \
- do { \
-@@ -120,7 +121,7 @@ static void pflash_timer (void *opaque)
- {
-     pflash_t *pfl = opaque;
- 
--    DPRINTF("%s: command %02x done\n", __func__, pfl->cmd);
-+    trace_pflash_timer_expired(pfl->cmd);
-     /* Reset flash */
-     pfl->status ^= 0x80;
-     memory_region_rom_device_set_romd(&pfl->mem, true);
-@@ -218,15 +219,14 @@ static uint32_t pflash_devid_query(pflash_t *pfl, hwaddr offset)
-     switch (boff & 0xFF) {
-     case 0:
-         resp = pfl->ident0;
--        DPRINTF("%s: Manufacturer Code %04x\n", __func__, resp);
-+        trace_pflash_manufacturer_id(resp);
-         break;
-     case 1:
-         resp = pfl->ident1;
--        DPRINTF("%s: Device ID Code %04x\n", __func__, resp);
-+        trace_pflash_device_id(resp);
-         break;
-     default:
--        DPRINTF("%s: Read Device Information offset=%x\n", __func__,
--                (unsigned)offset);
-+        trace_pflash_device_info(offset);
-         return 0;
-         break;
-     }
-@@ -251,8 +251,7 @@ static uint32_t pflash_data_read(pflash_t *pfl, hwaddr offset,
-     switch (width) {
-     case 1:
-         ret = p[offset];
--        DPRINTF("%s: data offset " TARGET_FMT_plx " %02x\n",
--                __func__, offset, ret);
-+        trace_pflash_data_read8(offset, ret);
-         break;
-     case 2:
-         if (be) {
-@@ -262,8 +261,7 @@ static uint32_t pflash_data_read(pflash_t *pfl, hwaddr offset,
-             ret = p[offset];
-             ret |= p[offset + 1] << 8;
-         }
--        DPRINTF("%s: data offset " TARGET_FMT_plx " %04x\n",
--                __func__, offset, ret);
-+        trace_pflash_data_read16(offset, ret);
-         break;
-     case 4:
-         if (be) {
-@@ -277,8 +275,7 @@ static uint32_t pflash_data_read(pflash_t *pfl, hwaddr offset,
-             ret |= p[offset + 2] << 16;
-             ret |= p[offset + 3] << 24;
-         }
--        DPRINTF("%s: data offset " TARGET_FMT_plx " %08x\n",
--                __func__, offset, ret);
-+        trace_pflash_data_read32(offset, ret);
-         break;
-     default:
-         DPRINTF("BUG in %s\n", __func__);
-@@ -294,11 +291,7 @@ static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
-     uint32_t ret;
- 
-     ret = -1;
--
--#if 0
--    DPRINTF("%s: reading offset " TARGET_FMT_plx " under cmd %02x width %d\n",
--            __func__, offset, pfl->cmd, width);
--#endif
-+    trace_pflash_read(offset, pfl->cmd, width, pfl->wcycle);
-     switch (pfl->cmd) {
-     default:
-         /* This should never happen : reset state & treat it as a read */
-@@ -349,15 +342,14 @@ static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
-             switch (boff) {
-             case 0:
-                 ret = pfl->ident0 << 8 | pfl->ident1;
--                DPRINTF("%s: Manufacturer Code %04x\n", __func__, ret);
-+                trace_pflash_manufacturer_id(ret);
-                 break;
-             case 1:
-                 ret = pfl->ident2 << 8 | pfl->ident3;
--                DPRINTF("%s: Device ID Code %04x\n", __func__, ret);
-+                trace_pflash_device_id(ret);
-                 break;
-             default:
--                DPRINTF("%s: Read Device Information boff=%x\n", __func__,
--                        (unsigned)boff);
-+                trace_pflash_device_info(boff);
-                 ret = 0;
-                 break;
-             }
-@@ -425,9 +417,7 @@ static inline void pflash_data_write(pflash_t *pfl, hwaddr offset,
- {
-     uint8_t *p = pfl->storage;
- 
--    DPRINTF("%s: block write offset " TARGET_FMT_plx
--            " value %x counter %016" PRIx64 "\n",
--            __func__, offset, value, pfl->counter);
-+    trace_pflash_data_write(offset, value, width, pfl->counter);
-     switch (width) {
-     case 1:
-         p[offset] = value;
-@@ -466,9 +456,7 @@ static void pflash_write(pflash_t *pfl, hwaddr offset,
- 
-     cmd = value;
- 
--    DPRINTF("%s: writing offset " TARGET_FMT_plx " value %08x width %d wcycle 0x%x\n",
--            __func__, offset, value, width, pfl->wcycle);
--
-+    trace_pflash_write(offset, value, width, pfl->wcycle);
-     if (!pfl->wcycle) {
-         /* Set the device in I/O access mode */
-         memory_region_rom_device_set_romd(&pfl->mem, false);
-@@ -656,8 +644,8 @@ static void pflash_write(pflash_t *pfl, hwaddr offset,
-                   "\n", __func__, offset, pfl->wcycle, pfl->cmd, value);
- 
-  reset_flash:
-+    trace_pflash_reset();
-     memory_region_rom_device_set_romd(&pfl->mem, true);
--
-     pfl->wcycle = 0;
-     pfl->cmd = 0;
- }
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 6c18e5e578..0f8b7b8c7b 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -43,6 +43,7 @@
- #include "sysemu/block-backend.h"
- #include "qemu/host-utils.h"
- #include "hw/sysbus.h"
-+#include "trace.h"
- 
- //#define PFLASH_DEBUG
- #ifdef PFLASH_DEBUG
-@@ -124,7 +125,7 @@ static void pflash_timer (void *opaque)
- {
-     pflash_t *pfl = opaque;
- 
--    DPRINTF("%s: command %02x done\n", __func__, pfl->cmd);
-+    trace_pflash_timer_expired(pfl->cmd);
-     /* Reset flash */
-     pfl->status ^= 0x80;
-     if (pfl->bypass) {
-@@ -143,8 +144,8 @@ static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
-     uint32_t ret;
-     uint8_t *p;
- 
--    DPRINTF("%s: offset " TARGET_FMT_plx "\n", __func__, offset);
-     ret = -1;
-+    trace_pflash_read(offset, pfl->cmd, width, pfl->wcycle);
-     /* Lazy reset to ROMD mode after a certain amount of read accesses */
-     if (!pfl->rom_mode && pfl->wcycle == 0 &&
-         ++pfl->read_counter > PFLASH_LAZY_ROMD_THRESHOLD) {
-@@ -172,7 +173,7 @@ static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
-         switch (width) {
-         case 1:
-             ret = p[offset];
--//            DPRINTF("%s: data offset %08x %02x\n", __func__, offset, ret);
-+            trace_pflash_data_read8(offset, ret);
-             break;
-         case 2:
-             if (be) {
-@@ -182,7 +183,7 @@ static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
-                 ret = p[offset];
-                 ret |= p[offset + 1] << 8;
-             }
--//            DPRINTF("%s: data offset %08x %04x\n", __func__, offset, ret);
-+            trace_pflash_data_read16(offset, ret);
-             break;
-         case 4:
-             if (be) {
-@@ -196,7 +197,7 @@ static uint32_t pflash_read (pflash_t *pfl, hwaddr offset,
-                 ret |= p[offset + 2] << 16;
-                 ret |= p[offset + 3] << 24;
-             }
--//            DPRINTF("%s: data offset %08x %08x\n", __func__, offset, ret);
-+            trace_pflash_data_read32(offset, ret);
-             break;
-         }
-         break;
-@@ -274,8 +275,7 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
- #endif
-         goto reset_flash;
-     }
--    DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d %d\n", __func__,
--            offset, value, width, pfl->wcycle);
-+    trace_pflash_write(offset, value, width, pfl->wcycle);
-     offset &= pfl->chip_len - 1;
- 
-     DPRINTF("%s: offset " TARGET_FMT_plx " %08x %d\n", __func__,
-@@ -345,8 +345,7 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
-             /* We need another unlock sequence */
-             goto check_unlock0;
-         case 0xA0:
--            DPRINTF("%s: write data offset " TARGET_FMT_plx " %08x %d\n",
--                    __func__, offset, value, width);
-+            trace_pflash_data_write(offset, value, width, 0);
-             p = pfl->storage;
-             if (!pfl->ro) {
-                 switch (width) {
-@@ -483,6 +482,7 @@ static void pflash_write (pflash_t *pfl, hwaddr offset,
- 
-     /* Reset flash */
-  reset_flash:
-+    trace_pflash_reset();
-     pfl->bypass = 0;
-     pfl->wcycle = 0;
-     pfl->cmd = 0;
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index d842c45409..f1017fac39 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -4,6 +4,19 @@
- fdc_ioport_read(uint8_t reg, uint8_t value) "read reg 0x%02x val 0x%02x"
- fdc_ioport_write(uint8_t reg, uint8_t value) "write reg 0x%02x val 0x%02x"
- 
-+# hw/block/pflash_cfi0?.c
-+pflash_reset(void) "reset"
-+pflash_read(uint64_t offset, uint8_t cmd, int width, uint8_t wcycle) "offset:0x%04"PRIx64" cmd:0x%02x width:%d wcycle:%u"
-+pflash_write(uint64_t offset, uint32_t value, int width, uint8_t wcycle) "offset:0x%04"PRIx64" value:0x%03x width:%d wcycle:%u"
-+pflash_timer_expired(uint8_t cmd) "command 0x%02x done"
-+pflash_data_read8(uint64_t offset, uint32_t value) "data offset:0x%04"PRIx64" value:0x%02x"
-+pflash_data_read16(uint64_t offset, uint32_t value) "data offset:0x%04"PRIx64" value:0x%04x"
-+pflash_data_read32(uint64_t offset, uint32_t value) "data offset:0x%04"PRIx64" value:0x%08x"
-+pflash_data_write(uint64_t offset, uint32_t value, int width, uint64_t counter) "data offset:0x%04"PRIx64" value:0x%08x width:%d counter:0x%016"PRIx64
-+pflash_manufacturer_id(uint16_t id) "Read Manufacturer ID: 0x%04x"
-+pflash_device_id(uint16_t id) "Read Device ID: 0x%04x"
-+pflash_device_info(uint64_t offset) "Read Device Information offset:0x%04lx"
-+
- # hw/block/virtio-blk.c
- virtio_blk_req_complete(void *vdev, void *req, int status) "vdev %p req %p status %d"
- virtio_blk_rw_complete(void *vdev, void *req, int ret) "vdev %p req %p ret %d"
--- 
-2.18.0.rc2
+.bdrv_reopen_commit() can't do any I/O because it must not fail.
+Therefore the order in which nodes are committed should not matter.
+
+Any I/O that needs to be done has to be in .bdrv_reopen_prepare() (and
+possibly be kept in a temporary buffer) and .bdrv_reopen_commit() can
+only apply what is already in memory.
+
+I don't see the code for reopening bitmaps in master. Is this a pending
+patch?
+
+Kevin
