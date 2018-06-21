@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVy4C-0005bJ-9c
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:47:57 -0400
+	(envelope-from <groug@kaod.org>) id 1fVy4j-0005zr-8y
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:48:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fVy4A-0008Db-P3
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:47:56 -0400
-References: <20180621031957.134718-1-eblake@redhat.com>
-	<20180621031957.134718-6-eblake@redhat.com>
-	<d07e7a19-3d8e-6049-04f6-e26f9e9c328b@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <273ec772-cbd2-a882-1029-7e31139b5e8d@redhat.com>
-Date: Thu, 21 Jun 2018 06:47:47 -0500
+	(envelope-from <groug@kaod.org>) id 1fVy4g-0008TC-6K
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:48:29 -0400
+Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:36401)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fVy4f-0008SR-W0
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:48:26 -0400
+Received: from player793.ha.ovh.net (unknown [10.109.105.16])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 0BFD7D3AF2
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 13:48:23 +0200 (CEST)
+Date: Thu, 21 Jun 2018 13:48:12 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180621134812.51a02a72@bahia.lan>
+In-Reply-To: <20180618063606.2513-8-david@gibson.dropbear.id.au>
+References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
+	<20180618063606.2513-8-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <d07e7a19-3d8e-6049-04f6-e26f9e9c328b@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 5/7] nbd/server: implement dirty bitmap
- export
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 7/9] target/ppc: Add
+ ppc_hash64_filter_pagesizes()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +31,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: abologna@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
-On 06/21/2018 05:17 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 21.06.2018 06:19, Eric Blake wrote:
->> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> Handle a new NBD meta namespace: "qemu", and corresponding queries:
->> "qemu:dirty-bitmap:<export bitmap name>".
->>
->> With the new metadata context negotiated, BLOCK_STATUS query will repl=
-y
->> with dirty-bitmap data, converted to extents. The new public function
->> nbd_export_bitmap selects which bitmap to export. For now, only one=20
->> bitmap
->> may be exported.
->>
+On Mon, 18 Jun 2018 16:36:04 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
->> +/*
->> + * Populate @extents from a dirty bitmap. Unless @dont_fragment, the
->> + * final extent may exceed the original @length. Store in @length the
->> + * byte length encoded (which may be smaller or larger than the
->> + * original), and return the number of extents used.
->> + */
->> +static unsigned int bitmap_to_extents(BdrvDirtyBitmap *bitmap,=20
->> uint64_t offset,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 uint64_t *length, NBDExtent=20
->> *extents,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 unsigned int nb_extents,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 bool dont_fragment)
->> +{
->> +=C2=A0=C2=A0=C2=A0 uint64_t begin =3D offset, end;
->> +=C2=A0=C2=A0=C2=A0 uint64_t overall_end =3D offset + *length;
->> +=C2=A0=C2=A0=C2=A0 unsigned int i =3D 0;
->> +=C2=A0=C2=A0=C2=A0 BdrvDirtyBitmapIter *it;
->> +=C2=A0=C2=A0=C2=A0 bool dirty;
->> +
->> +=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_lock(bitmap);
->> +
->> +=C2=A0=C2=A0=C2=A0 it =3D bdrv_dirty_iter_new(bitmap);
->> +=C2=A0=C2=A0=C2=A0 dirty =3D bdrv_get_dirty_locked(NULL, bitmap, offs=
-et);
->> +
->> +=C2=A0=C2=A0=C2=A0 while (begin < overall_end && i < nb_extents) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dirty) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 en=
-d =3D bdrv_dirty_bitmap_next_zero(bitmap, begin);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bd=
-rv_set_dirty_iter(it, begin);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 en=
-d =3D bdrv_dirty_iter_next(it);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->=20
-> after tjos begin may be zero, and end near to the bitmap end,
-> so end !=3D -1 and end-begin > 4G (and dont_fragment may be false)
+> The paravirtualized PAPR platform sometimes needs to restrict the guest to
+> using only some of the page sizes actually supported by the host's MMU.
+> At the moment this is handled in KVM specific code, but for consistency we
+> want to apply the same limitations to all accelerators.
+> 
+> This makes a start on this by providing a helper function in the cpu code
+> to allow platform code to remove some of the cpu's page size definitions
+> via a caller supplied callback.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
 
-Oh, good catch. Such a situation will still need to be clamped to under=20
-4G (it's only possible on the last extent reported to the user, since in=20
-that case, end > overall_end given that overall_end is at most a 32-bit=20
-request beyond the original begin), so...
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
->=20
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (end =3D=3D -1) {
-
-...we just need to tweak this to 'if (end =3D=3D -1 || end - begin > UINT=
-32_MAX)
-
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
- Cap to an aligned value < 4G beyond begin. */
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 en=
-d =3D MIN(bdrv_dirty_bitmap_size(bitmap),
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 begin + 0x10000=
-0000ULL -
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitm=
-ap_granularity(bitmap));
-
-Also, it might be more legible if I spell this as UINT32_MAX + 1 instead=20
-of open-coding the 33-bit constant.
-
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (dont_fragment && end >=
- overall_end) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 en=
-d =3D overall_end;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+>  target/ppc/mmu-hash64.c | 59 +++++++++++++++++++++++++++++++++++++++++
+>  target/ppc/mmu-hash64.h |  3 +++
+>  2 files changed, 62 insertions(+)
+> 
+> diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+> index aa200cba4c..276d9015e7 100644
+> --- a/target/ppc/mmu-hash64.c
+> +++ b/target/ppc/mmu-hash64.c
+> @@ -1166,3 +1166,62 @@ const PPCHash64Options ppc_hash64_opts_POWER7 = {
+>          },
+>      }
+>  };
+> +
+> +void ppc_hash64_filter_pagesizes(PowerPCCPU *cpu,
+> +                                 bool (*cb)(void *, uint32_t, uint32_t),
+> +                                 void *opaque)
+> +{
+> +    PPCHash64Options *opts = cpu->hash64_opts;
+> +    int i;
+> +    int n = 0;
+> +    bool ci_largepage = false;
+> +
+> +    assert(opts);
+> +
+> +    n = 0;
+> +    for (i = 0; i < ARRAY_SIZE(opts->sps); i++) {
+> +        PPCHash64SegmentPageSizes *sps = &opts->sps[i];
+> +        int j;
+> +        int m = 0;
+> +
+> +        assert(n <= i);
+> +
+> +        if (!sps->page_shift) {
+> +            break;
+> +        }
+> +
+> +        for (j = 0; j < ARRAY_SIZE(sps->enc); j++) {
+> +            PPCHash64PageSize *ps = &sps->enc[j];
+> +
+> +            assert(m <= j);
+> +            if (!ps->page_shift) {
+> +                break;
+> +            }
+> +
+> +            if (cb(opaque, sps->page_shift, ps->page_shift)) {
+> +                if (ps->page_shift >= 16) {
+> +                    ci_largepage = true;
+> +                }
+> +                sps->enc[m++] = *ps;
+> +            }
+> +        }
+> +
+> +        /* Clear rest of the row */
+> +        for (j = m; j < ARRAY_SIZE(sps->enc); j++) {
+> +            memset(&sps->enc[j], 0, sizeof(sps->enc[j]));
+> +        }
+> +
+> +        if (m) {
+> +            n++;
+> +        }
+> +    }
+> +
+> +    /* Clear the rest of the table */
+> +    for (i = n; i < ARRAY_SIZE(opts->sps); i++) {
+> +        memset(&opts->sps[i], 0, sizeof(opts->sps[i]));
+> +    }
+> +
+> +    if (!ci_largepage) {
+> +        opts->flags &= ~PPC_HASH64_CI_LARGEPAGE;
+> +    }
+> +}
+> diff --git a/target/ppc/mmu-hash64.h b/target/ppc/mmu-hash64.h
+> index 53dcec5b93..f11efc9cbc 100644
+> --- a/target/ppc/mmu-hash64.h
+> +++ b/target/ppc/mmu-hash64.h
+> @@ -20,6 +20,9 @@ unsigned ppc_hash64_hpte_page_shift_noslb(PowerPCCPU *cpu,
+>  void ppc_store_lpcr(PowerPCCPU *cpu, target_ulong val);
+>  void ppc_hash64_init(PowerPCCPU *cpu);
+>  void ppc_hash64_finalize(PowerPCCPU *cpu);
+> +void ppc_hash64_filter_pagesizes(PowerPCCPU *cpu,
+> +                                 bool (*cb)(void *, uint32_t, uint32_t),
+> +                                 void *opaque);
+>  #endif
+>  
+>  /*
