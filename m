@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVtI8-0004vw-Ng
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:42:02 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fVtI8-0004vZ-FW
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:42:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVtI7-0003M9-IE
+	(envelope-from <alex.bennee@linaro.org>) id 1fVtI6-0003Lj-Sk
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:42:00 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:52459)
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35953)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fVtI7-0003La-A4
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:41:59 -0400
-Received: by mail-wm0-x233.google.com with SMTP id p126-v6so3181792wmb.2
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:41:59 -0700 (PDT)
+	id 1fVtI6-0003L8-Kn
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:41:58 -0400
+Received: by mail-wm0-x241.google.com with SMTP id v131-v6so3696949wma.1
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:41:58 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 21 Jun 2018 07:25:42 +0100
-Message-Id: <20180621062605.941-35-alex.bennee@linaro.org>
+Date: Thu, 21 Jun 2018 07:25:43 +0100
+Message-Id: <20180621062605.941-36-alex.bennee@linaro.org>
 In-Reply-To: <20180621062605.941-1-alex.bennee@linaro.org>
 References: <20180621062605.941-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 34/57] tests/tcg: enable building for Alpha
+Subject: [Qemu-devel] [PULL v2 35/57] tests/tcg/alpha: add Alpha specific
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,108 +33,138 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-We can't use our normal Debian based compilers as Alpha isn't an
-officially supported architecture. However it is available as a port
-and fortunately cross compilers for all these targets are included in
-Debian Sid, the perpetual rolling/unstable/testing version of Debian.
+These tests did use their own crt.o stub however that is a little
+stone age so we drop crt.S and just statically link to the cross
+compilers libraries.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 4a2b028a3b..8c24f8807e 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -64,6 +64,13 @@ docker-image-debian-ppc64el-cross: docker-image-debian9
- docker-image-debian-s390x-cross: docker-image-debian9
- docker-image-debian-win32-cross: docker-image-debian8-mxe
- docker-image-debian-win64-cross: docker-image-debian8-mxe
-+
-+# Debian SID images - we are tracking a rolling distro so we want to
-+# force a re-build of the base image if we ever need to build one of
-+# its children.
-+docker-image-debian-sid: NOCACHE=1
-+
-+docker-image-debian-alpha-cross: docker-image-debian-sid
- docker-image-travis: NOUSER=1
- 
- # Specialist build images, sometimes very limited tools
-diff --git a/tests/docker/dockerfiles/debian-alpha-cross.docker b/tests/docker/dockerfiles/debian-alpha-cross.docker
-new file mode 100644
-index 0000000000..29a25d0dfd
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-alpha-cross.docker
-@@ -0,0 +1,12 @@
-+#
-+# Docker cross-compiler target
-+#
-+# This docker target builds on the debian sid base image which
-+# contains cross compilers for Debian "ports" targets.
-+#
-+FROM qemu:debian-sid
-+
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt-get install -y --no-install-recommends \
-+        gcc-alpha-linux-gnu \
-+        libc6.1-dev-alpha-cross || { echo "Failed to build - see debian-sid.docker notes"; exit 1; }
-diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
-new file mode 100644
-index 0000000000..9a3d168705
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-sid.docker
-@@ -0,0 +1,32 @@
-+#
-+# Debian Sid Base
-+#
-+# A number of our guests exist as ports only. We can either use the
-+# ports repo or get everything from Sid. However Sid is a rolling
-+# distro which may be broken at any particular time. If you are
-+# unlucky and try and build your images while gcc is in the process of
-+# being uploaded this can fail. Your only recourse is to try again in
-+# a few hours when the repos have re-synced. Once built however you
-+# won't be affected by repo changes unless the docker recipies are
-+# updated and trigger a re-build.
-+#
-+
-+FROM debian:sid-slim
-+
-+# Duplicate deb line as deb-src
-+RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
-+
-+# Install common build utilities
-+RUN apt update
-+RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt install -y --no-install-recommends \
-+        bison \
-+        build-essential \
-+        ca-certificates \
-+        flex \
-+        git \
-+        pkg-config \
-+        psmisc \
-+        python \
-+        texinfo || { echo "Failed to build - see debian-sid.docker notes"; exit 1; }
-diff --git a/tests/tcg/alpha/Makefile.include b/tests/tcg/alpha/Makefile.include
-new file mode 100644
-index 0000000000..c7dc48eadb
---- /dev/null
-+++ b/tests/tcg/alpha/Makefile.include
-@@ -0,0 +1,2 @@
-+DOCKER_IMAGE=debian-alpha-cross
-+DOCKER_CROSS_COMPILER=alpha-linux-gnu-gcc
+diff --git a/tests/tcg/alpha/Makefile b/tests/tcg/alpha/Makefile
+deleted file mode 100644
+index 2b1f03d048..0000000000
+--- a/tests/tcg/alpha/Makefile
++++ /dev/null
+@@ -1,35 +0,0 @@
+-CROSS=alpha-linux-gnu-
+-CC=$(CROSS)gcc
+-AS=$(CROSS)as
+-
+-SIM=../../alpha-linux-user/qemu-alpha
+-
+-CFLAGS=-O
+-LINK=$(CC) -o $@ crt.o $< -nostdlib
+-
+-TESTS=test-cond test-cmov
+-
+-all: hello-alpha $(TESTS)
+-
+-hello-alpha: hello-alpha.o crt.o
+-	$(LINK)
+-
+-test-cond: test-cond.o crt.o
+-	$(LINK)
+-
+-test-cmov.o: test-cond.c
+-	$(CC) -c $(CFLAGS) -DTEST_CMOV -o $@ $<
+-
+-test-cmov: test-cmov.o crt.o
+-	$(LINK)
+-
+-test-ovf: test-ovf.o crt.o
+-	$(LINK)
+-
+-check: $(TESTS)
+-	for f in $(TESTS); do $(SIM) $$f || exit 1; done
+-
+-clean:
+-	$(RM) *.o *~ hello-alpha $(TESTS)
+-
+-.PHONY: clean all check
 diff --git a/tests/tcg/alpha/Makefile.target b/tests/tcg/alpha/Makefile.target
-new file mode 100644
-index 0000000000..bedf1b6444
---- /dev/null
+index bedf1b6444..a585080328 100644
+--- a/tests/tcg/alpha/Makefile.target
 +++ b/tests/tcg/alpha/Makefile.target
-@@ -0,0 +1,6 @@
-+# -*- Mode: makefile -*-
-+#
-+# Alpha specific tweaks
+@@ -2,5 +2,17 @@
+ #
+ # Alpha specific tweaks
+ 
++ALPHA_SRC=$(SRC_PATH)/tests/tcg/alpha
++VPATH+=$(ALPHA_SRC)
 +
-+# On Alpha Linux only supports 8k pages
-+EXTRA_RUNS+=run-test-mmap-8192
++ALPHA_TESTS=hello-alpha test-cond test-cmov test-ovf
++TESTS+=$(ALPHA_TESTS)
++
++test-cmov: EXTRA_CFLAGS=-DTEST_CMOV
++test-cmov: test-cond.c
++	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
++
++run-test-cmov: test-cmov
++
+ # On Alpha Linux only supports 8k pages
+ EXTRA_RUNS+=run-test-mmap-8192
+diff --git a/tests/tcg/alpha/crt.s b/tests/tcg/alpha/crt.s
+deleted file mode 100644
+index 31af8825bc..0000000000
+--- a/tests/tcg/alpha/crt.s
++++ /dev/null
+@@ -1,26 +0,0 @@
+-	.text
+-
+-	.globl _start
+-	.ent _start,0
+-_start:
+-	.frame $15,0,$15
+-	br $29,1f
+-1:	ldgp $29, 0($29)
+-	.prologue 0
+-	ldq $27,main($29) !literal!1
+-	jsr $26,($27)
+-	or $0,$0,$16
+-	.end _start
+-
+-	.globl _exit
+-_exit:
+-	lda $0,1
+-	callsys
+-
+-	call_pal 0
+-
+-	.globl write
+-write:
+-	lda $0,4
+-	callsys
+-	ret
+diff --git a/tests/tcg/alpha/hello-alpha.c b/tests/tcg/alpha/hello-alpha.c
+index 79892e6522..84e43b2fc4 100644
+--- a/tests/tcg/alpha/hello-alpha.c
++++ b/tests/tcg/alpha/hello-alpha.c
+@@ -1,3 +1,5 @@
++#include <unistd.h>
++
+ int main (void)
+ {
+   write (1, "hello\n", 6);
+diff --git a/tests/tcg/alpha/test-cond.c b/tests/tcg/alpha/test-cond.c
+index 74adffaa69..e625313b3e 100644
+--- a/tests/tcg/alpha/test-cond.c
++++ b/tests/tcg/alpha/test-cond.c
+@@ -1,3 +1,4 @@
++#include <unistd.h>
+ 
+ #ifdef TEST_CMOV
+ 
+diff --git a/tests/tcg/alpha/test-ovf.c b/tests/tcg/alpha/test-ovf.c
+index 01c80e7525..17892f1e89 100644
+--- a/tests/tcg/alpha/test-ovf.c
++++ b/tests/tcg/alpha/test-ovf.c
+@@ -1,3 +1,5 @@
++#include <unistd.h>
++
+ static long test_subqv (long a, long b)
+ {
+   long res;
 -- 
 2.17.1
