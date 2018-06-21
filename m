@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fVwmB-00057G-Va
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:25:17 -0400
+	(envelope-from <groug@kaod.org>) id 1fVwqM-0008T5-QH
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:29:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fVwmA-0002TS-It
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:25:15 -0400
-References: <20180613020613.1343-1-jsnow@redhat.com>
-	<20180613020613.1343-4-jsnow@redhat.com>
-	<f3332ec8-5370-fecc-b0ae-4834d0eb28b7@virtuozzo.com>
-	<8df85931-08ab-d89d-5e26-10f5054a9357@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <81a2a867-4dc7-3843-88cd-fb1809f8d23b@virtuozzo.com>
-Date: Thu, 21 Jun 2018 13:25:01 +0300
+	(envelope-from <groug@kaod.org>) id 1fVwqJ-00047m-HO
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:29:34 -0400
+Received: from 2.mo7.mail-out.ovh.net ([87.98.143.68]:54120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fVwqJ-00047L-7e
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:29:31 -0400
+Received: from player795.ha.ovh.net (unknown [10.109.105.67])
+	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 642F0B538A
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 12:29:29 +0200 (CEST)
+Date: Thu, 21 Jun 2018 12:29:14 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180621122914.6d918b54@bahia.lan>
+In-Reply-To: <20180618063606.2513-7-david@gibson.dropbear.id.au>
+References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
+	<20180618063606.2513-7-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <8df85931-08ab-d89d-5e26-10f5054a9357@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 03/10] qcow2/bitmap: cache bm_list
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 6/9] spapr: Use maximum page size
+ capability to simplify memory backend checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,163 +31,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: abologna@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
-21.06.2018 02:29, John Snow wrote:
->
-> On 06/20/2018 09:04 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 13.06.2018 05:06, John Snow wrote:
->>> We don't need to re-read this list every time, exactly. We can keep it
->>> cached
->>> and delete our copy when we flush to disk.
->>>
->>> Because we don't try to flush bitmaps on close if there's nothing to
->>> flush,
->>> add a new conditional to delete the state anyway for a clean exit.
->>>
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
->>>  =C2=A0 block/qcow2-bitmap.c | 74
->>> ++++++++++++++++++++++++++++++++++------------------
->>>  =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 2 ++
->>>  =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 2 ++
->>>  =C2=A0 3 files changed, 52 insertions(+), 26 deletions(-)
->>>
->>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
->>> index 85c1b5afe3..5ae9b17928 100644
->>> --- a/block/qcow2-bitmap.c
->>> +++ b/block/qcow2-bitmap.c
->>> @@ -636,6 +636,34 @@ fail:
->>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->>>  =C2=A0 }
->>>  =C2=A0 +static Qcow2BitmapList *get_bitmap_list(BlockDriverState *bs, =
-Error
->>> **errp)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 BDRVQcow2State *s =3D bs->opaque;
->>> +=C2=A0=C2=A0=C2=A0 Qcow2BitmapList *bm_list;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (s->bitmap_list) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return (Qcow2BitmapList *)s=
-->bitmap_list;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (s->nb_bitmaps) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bm_list =3D bitmap_list_loa=
-d(bs, errp);
->>> +=C2=A0=C2=A0=C2=A0 } else {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bm_list =3D bitmap_list_new=
-();
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 s->bitmap_list =3D bm_list;
->> may be, we shouldn't cache it in inactive mode. However, I think we'll
->> finally will not load bitmaps in inactive mode and drop the on
->> inactivate, so it would not matter..
->>
-> Do we not load bitmaps when BDRV_O_INACTIVE is set? it looks like we do?
->
-> (From your subsequent email):
->> really, now it would be a problem: we can start in inactive mode, load
->> nothing, and then we can't reload bitmaps; my fix in
->> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg03254.html
->> will not work after this patch.
->>
-> So we load nothing because when we opened up the image RO, saw IN_USE
-> bitmaps (or saw none at all) and decided not to load them. qcow2_do_open
-> however marks that it has "loaded the bitmaps."
->
-> Later, when we reopen RW, we have a cached bm_list that doesn't include
-> this bitmap, so we don't mark it as IN_USE again or update the header.
->
-> (Wait, if you are worried about the bitmap's data having been changed,
-> why do we not reload the bitmap data here too?)
->
->
-> Now, patch 06 changes the cache so that we load all bitmaps and not just
-> ones not IN_USE. On RW reload, I reject any such IN_USE bitmaps as a
-> reason to prohibit the RW reload. However, this is broken too, because I
-> will miss any new flags that exist on-disk, so this function should
-> never use the cached data.
->
-> I'm confused, though, the comment that calls reopen_bitmaps_rw_hint says:
->
-> "It's some kind of reopen. There are no known cases where we need to
-> reload bitmaps in such a situation, so it's safer to skip them.
-> Moreover, if we have some readonly bitmaps and we are reopening for rw
-> we should reopen bitmaps correspondingly."
->
-> Why do we assume that bitmap data cannot change while BDRV_O_INACTIVATE
-> is set? Is that not wrong?
+On Mon, 18 Jun 2018 16:36:03 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-agree. and this is one more reason to not load bitmaps in inactive mode=20
-at all. and drop them (after storing) on inactivating.
-I'll make a patch.
+> The way we used to handle KVM allowable guest pagesizes for PAPR guests
+> required some convoluted checking of memory attached to the guest.
+> 
+> The allowable pagesizes advertised to the guest cpus depended on the memory
+> which was attached at boot, but then we needed to ensure that any memory
+> later hotplugged didn't change which pagesizes were allowed.
+> 
+> Now that we have an explicit machine option to control the allowable
+> maximum pagesize we can simplify this.  We just check all memory backends
+> against that declared pagesize.  We check base and cold-plugged memory at
+> reset time, and hotplugged memory at pre_plug() time.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr.c         | 17 +++++++----------
+>  hw/ppc/spapr_caps.c    | 20 ++++++++++++++++++++
+>  include/hw/ppc/spapr.h |  3 +++
+>  target/ppc/kvm.c       | 14 --------------
+>  target/ppc/kvm_ppc.h   |  6 ------
+>  5 files changed, 30 insertions(+), 30 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 74a76e7e09..efd36e92e2 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3192,11 +3192,13 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                                    Error **errp)
+>  {
+>      const sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(hotplug_dev);
+> +    sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+>      MemoryRegion *mr;
+>      uint64_t size;
+> -    char *mem_dev;
+> +    Object *memdev;
+> +    hwaddr pagesize;
+>  
+>      if (!smc->dr_lmb_enabled) {
+>          error_setg(errp, "Memory hotplug not supported for this machine");
+> @@ -3215,15 +3217,10 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>          return;
+>      }
+>  
+> -    mem_dev = object_property_get_str(OBJECT(dimm), PC_DIMM_MEMDEV_PROP, NULL);
+> -    if (mem_dev && !kvmppc_is_mem_backend_page_size_ok(mem_dev)) {
+> -        error_setg(errp, "Memory backend has bad page size. "
+> -                   "Use 'memory-backend-file' with correct mem-path.");
+> -        goto out;
+> -    }
+> -
+> -out:
+> -    g_free(mem_dev);
+> +    memdev = object_property_get_link(OBJECT(dimm), PC_DIMM_MEMDEV_PROP,
+> +                                      &error_abort);
+> +    pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(memdev));
+> +    spapr_check_pagesize(spapr, pagesize, errp);
+>  }
+>  
+>  struct sPAPRDIMMState {
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 6cdc0c94e7..9fc739b3f5 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -26,6 +26,7 @@
+>  #include "qapi/error.h"
+>  #include "qapi/visitor.h"
+>  #include "sysemu/hw_accel.h"
+> +#include "exec/ram_addr.h"
+>  #include "target/ppc/cpu.h"
+>  #include "target/ppc/mmu-hash64.h"
+>  #include "cpu-models.h"
+> @@ -304,6 +305,23 @@ static void cap_safe_indirect_branch_apply(sPAPRMachineState *spapr,
+>  
+>  #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
+>  
+> +void spapr_check_pagesize(sPAPRMachineState *spapr, hwaddr pagesize,
+> +                          Error **errp)
+> +{
+> +    hwaddr maxpagesize = (1ULL << spapr->eff.caps[SPAPR_CAP_HPT_MPS]);
 
->
->> Hm, I've understood the following problem: cache becomes incorrect after
->> failed update_ext_header_and_dir or update_ext_header_and_dir_in_place
->> operations. (after failed qcow2_remove_persistent_dirty_bitmap or
->> qcow2_reopen_bitmaps_rw_hint)
->>
->> And this comes from incomplete architecture after the patch:
->> On the one hand, we work with one singleton bitmap_list, and loading
->> part is refactored to do it safely. On the other hand, storing functions
->> still have old behavior, they work with bitmap list like with their own
->> local variable.
-> Yeah, I see it. Dropping the cache on such errors is fine.
->
->> So, we have safe mechanism to read list through the cache. We need also
->> safe mechanism to update list both in cache and in file.
->>
->> There are two possible variants:
->>
->> 1. drop cache after failed store
->> 2. rollback cache after failed store
->>
->> 1 looks simpler..
->>
->> Also, we should drop cache on inactivate (we do this) and should not
->> create cache in inactive mode, because the other process may change the
->> image.
->>
->> Hm. may be, it is better to work with s->bitmap_list directly? In this
->> case it will be more obvious that it is the cache, not local variable.
->> And we will work with it like with other "parts of extension cache"
->> s->nb_bitmaps, s->bitmap_directory_offset ...
->>
->> After the patch, functions update_ext_header_and_dir* becomes strange:
->>
->> 1. before the patch, they take external parameter - bm_list, and by this
->> parameter they updated the file and cached s->nb_bitmaps, s->bitmap_*, .=
-.
->> 2. after the patch, they take parameter (actually s->bitmap_list) of
->> same nature like s->nb_bitmap, and update s->nb_bitmap from it.
->>
-> Yeah, if we do decide that keeping a cache is the right thing, some of
-> the helper functions could be refactored or simplified a little to take
-> advantage of the new paradigm.
->
->> Sorry for being late and for disordered stream of thoughts. Is this
->> patch really needed for the whole series?
->>
-> The nice part is to have bm_list with pointers that correlate directly
-> to the in-memory bitmaps.
->
-> I can load bm_list on demand later for the purposes of `qemu-img info`,
-> but I have to look up the in-memory bitmaps again too. It seemed simpler
-> to just preserve the data the first time we build it instead of
-> rebuilding it all the time.
->
-> I think that we'll eventually want a cache either way, but maybe I am
-> still underestimating how difficult it is to do correctly... I think I
-> need to understand inactivate/invalidate a little more carefully before
-> I trudge ahead here ...
+s/SPAPR_CAP_HPT_MPS/SPAPR_CAP_HPT_MAXPAGESIZE
 
+> +
+> +    if (!kvmppc_hpt_needs_host_contiguous_pages()) {
+> +        return;
+> +    }
+> +
+> +    if (maxpagesize > pagesize) {
+> +        error_setg(errp,
+> +                   "Can't support %"HWADDR_PRIu" kiB guest pages with %"
+> +                   HWADDR_PRIu" kiB host pages with this KVM implementation",
+> +                   maxpagesize >> 10, pagesize >> 10);
+> +    }
+> +}
+> +
+>  static void cap_hpt_maxpagesize_apply(sPAPRMachineState *spapr,
+>                                        uint8_t val, Error **errp)
+>  {
+> @@ -312,6 +330,8 @@ static void cap_hpt_maxpagesize_apply(sPAPRMachineState *spapr,
+>      } else if (val < 16) {
+>          warn_report("Many guests require at least 64kiB hpt-max-page-size");
+>      }
+> +
+> +    spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
 
+Even if in this precise case QEMU will always exit gracefully since
+errp == &error_fatal, passing errp several times is a fragile pattern.
+It may cause a crash if *errp was already allocated.
 
---=20
-Best regards,
-Vladimir
+Maybe use a local_err variable and error_propagate() or at least return
+in the (val < 12) block above.
+
+Rest looks good. With the two issues addressed:
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  }
+>  
+>  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index c97593d032..75e2cf2687 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -806,4 +806,7 @@ void spapr_caps_cpu_apply(sPAPRMachineState *spapr, PowerPCCPU *cpu);
+>  void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
+>  int spapr_caps_post_migration(sPAPRMachineState *spapr);
+>  
+> +void spapr_check_pagesize(sPAPRMachineState *spapr, hwaddr pagesize,
+> +                          Error **errp);
+> +
+>  #endif /* HW_SPAPR_H */
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 50b5d01432..9cfbd388ad 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -500,26 +500,12 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+>          cpu->hash64_opts->flags &= ~PPC_HASH64_1TSEG;
+>      }
+>  }
+> -
+> -bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+> -{
+> -    Object *mem_obj = object_resolve_path(obj_path, NULL);
+> -    long pagesize = host_memory_backend_pagesize(MEMORY_BACKEND(mem_obj));
+> -
+> -    return pagesize >= max_cpu_page_size;
+> -}
+> -
+>  #else /* defined (TARGET_PPC64) */
+>  
+>  static inline void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+>  {
+>  }
+>  
+> -bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+> -{
+> -    return true;
+> -}
+> -
+>  #endif /* !defined (TARGET_PPC64) */
+>  
+>  unsigned long kvm_arch_vcpu_id(CPUState *cpu)
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index a7ddb8a5d6..443fca0a4e 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -71,7 +71,6 @@ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
+>  bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
+>  
+>  bool kvmppc_hpt_needs_host_contiguous_pages(void);
+> -bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
+>  
+>  #else
+>  
+> @@ -228,11 +227,6 @@ static inline bool kvmppc_hpt_needs_host_contiguous_pages(void)
+>      return false;
+>  }
+>  
+> -static inline bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
+> -{
+> -    return true;
+> -}
+> -
+>  static inline bool kvmppc_has_cap_spapr_vfio(void)
+>  {
+>      return false;
