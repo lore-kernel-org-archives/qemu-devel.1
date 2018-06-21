@@ -1,30 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fW12B-00019O-Pn
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:58:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1fW12D-00019f-Qf
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:58:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fW126-0006eF-RY
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:58:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57474 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fW126-0006di-Lm
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:57:58 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C0EFA401EF07
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 14:57:57 +0000 (UTC)
-Received: from red.redhat.com (ovpn-120-169.rdu2.redhat.com [10.10.120.169])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8500F10FD2A4
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 14:57:57 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1fW12C-0006kx-Vm
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:58:05 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 21 Jun 2018 09:57:40 -0500
-Message-Id: <20180621145749.191944-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 0/9] bitmap export over NBD
+Date: Thu, 21 Jun 2018 09:57:42 -0500
+Message-Id: <20180621145749.191944-3-eblake@redhat.com>
+In-Reply-To: <20180621145749.191944-1-eblake@redhat.com>
+References: <20180621145749.191944-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PULL v2 2/9] nbd/server: Reject 0-length block status
+ request
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,63 +21,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
 
-The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a9=
-3b:
+The NBD spec says that behavior is unspecified if the client
+requests 0 length for block status; but since the structured
+reply is documenting as returning a non-zero length, it's
+easier to just diagnose this with an EINVAL error than to
+figure out what to return.
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into =
-staging (2018-06-20 09:51:30 +0100)
+CC: qemu-stable@nongnu.org
+Signed-off-by: Eric Blake <eblake@redhat.com>
+Message-Id: <20180621124937.166549-1-eblake@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ nbd/server.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-are available in the Git repository at:
+diff --git a/nbd/server.c b/nbd/server.c
+index 9e1f2271784..493a926e063 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -2007,6 +2007,10 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+                                       "discard failed", errp);
 
-  git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-06-20-v2
-
-for you to fetch changes up to bc37b06a5cde24fb24c2a2cc44dd86756034ba9d:
-
-  nbd/server: introduce NBD_CMD_CACHE (2018-06-21 09:41:39 -0500)
-
-Only sending the new patches (2, 9) and the changed patch (6, was 5/7
-in v1)
-
-----------------------------------------------------------------
-nbd patches for 2018-06-20
-
-Add experimental x-nbd-server-add-bitmap to expose a disabled
-bitmap over NBD, in preparation for a pull model incremental
-backup scheme. Also fix a corner case protocol issue with
-NBD_CMD_BLOCK_STATUS, and add new NBD_CMD_CACHE.
-
-- Eric Blake: tests: Simplify .gitignore
-- Eric Blake: nbd/server: Reject 0-length block status request
-- Vladimir Sementsov-Ogievskiy: 0/6 NBD export bitmaps
-- Vladimir Sementsov-Ogievskiy: nbd/server: introduce NBD_CMD_CACHE
-
-----------------------------------------------------------------
-Eric Blake (2):
-      tests: Simplify .gitignore
-      nbd/server: Reject 0-length block status request
-
-Vladimir Sementsov-Ogievskiy (7):
-      nbd/server: fix trace
-      nbd/server: refactor NBDExportMetaContexts
-      nbd/server: add nbd_meta_empty_or_pattern helper
-      nbd/server: implement dirty bitmap export
-      qapi: new qmp command nbd-server-add-bitmap
-      docs/interop: add nbd.txt
-      nbd/server: introduce NBD_CMD_CACHE
-
- docs/interop/nbd.txt |  38 +++++
- qapi/block.json      |  23 +++
- include/block/nbd.h  |  11 +-
- blockdev-nbd.c       |  23 +++
- nbd/common.c         |   2 +
- nbd/server.c         | 385 ++++++++++++++++++++++++++++++++++++++++++++-=
-------
- MAINTAINERS          |   1 +
- nbd/trace-events     |   1 +
- tests/.gitignore     |  93 +------------
- 9 files changed, 433 insertions(+), 144 deletions(-)
- create mode 100644 docs/interop/nbd.txt
-
---=20
+     case NBD_CMD_BLOCK_STATUS:
++        if (!request->len) {
++            return nbd_send_generic_reply(client, request->handle, -EINVAL,
++                                          "need non-zero length", errp);
++        }
+         if (client->export_meta.valid && client->export_meta.base_allocation) {
+             return nbd_co_send_block_status(client, request->handle,
+                                             blk_bs(exp->blk), request->from,
+-- 
 2.14.4
