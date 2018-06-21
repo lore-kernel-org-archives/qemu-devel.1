@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVt8a-0005oj-1N
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:09 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fVt8V-0005ja-CJ
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVt8Y-0003w9-CS
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:08 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:38337)
+	(envelope-from <alex.bennee@linaro.org>) id 1fVt8T-0003qX-Kj
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:03 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:55309)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fVt8Y-0003uh-32
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:06 -0400
-Received: by mail-wr0-x241.google.com with SMTP id e18-v6so1837024wrs.5
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:32:05 -0700 (PDT)
+	id 1fVt8T-0003oJ-C5
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:01 -0400
+Received: by mail-wm0-x233.google.com with SMTP id v16-v6so3107298wmh.5
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:32:01 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 21 Jun 2018 07:25:52 +0100
-Message-Id: <20180621062605.941-45-alex.bennee@linaro.org>
+Date: Thu, 21 Jun 2018 07:25:55 +0100
+Message-Id: <20180621062605.941-48-alex.bennee@linaro.org>
 In-Reply-To: <20180621062605.941-1-alex.bennee@linaro.org>
 References: <20180621062605.941-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 44/57] tests/tcg/Makefile: update to be
- called from Makefile.target
+Subject: [Qemu-devel] [PULL v2 47/57] tests/tcg: add run, diff,
+ and skip helper macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,248 +31,125 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:ARM" <qemu-arm@nongnu.org>
 
-This make is now invoked from each individual target make with the
-appropriate CC and EXTRA_CFLAGS set for each guest. It then includes
-additional Makefile.targets from:
-
-  - tests/tcg/multiarch (always)
-  - tests/tcg/$(TARGET_BASE_ARCH) (if available)
-  - tests/tcg/$(TARGET_NAME)
-
-The order is important as the later Makefile's may want to suppress
-TESTS from its base arch profile. Each included Makefile.target is
-responsible for adding TESTS as well as defining any special build
-instructions for individual tests.
+As we aren't using the default runners for all the test cases it is
+easy to miss out things like timeouts. To help with this we add some
+helpers and use them so we only need to make core changes in one
+place.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index de1ae8423e..4c955425b9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2156,6 +2156,12 @@ W: https://travis-ci.org/qemu/qemu
- W: https://app.shippable.com/github/qemu/qemu
- W: http://patchew.org/QEMU/
- 
-+Guest Test Compilation Support
-+M: Alex Bennée <alex.bennee@linaro.org>
-+R: Philippe Mathieu-Daudé <f4bug@amsat.org>
-+F: tests/tcg/Makefile
-+L: qemu-devel@nongnu.org
-+
- Documentation
- -------------
- Build system architecture
 diff --git a/tests/tcg/Makefile b/tests/tcg/Makefile
-index e12395117a..e7dbcdb5bf 100644
+index e7dbcdb5bf..bf06415390 100644
 --- a/tests/tcg/Makefile
 +++ b/tests/tcg/Makefile
-@@ -1,125 +1,94 @@
-+# -*- Mode: makefile -*-
-+#
-+# TCG tests
-+#
-+# These are complicated by the fact we want to build them for guest
-+# systems. This requires knowing what guests we are building and which
-+# ones we have cross-compilers for or docker images with
-+# cross-compilers.
-+#
-+# The tests themselves should be as minimal as possible as
-+# cross-compilers don't always have a large amount of libraries
-+# available.
-+#
-+# We only include the host build system for SRC_PATH and we don't
-+# bother with the common rules.mk. We expect the following:
-+#
-+#   CC - the C compiler command
-+#   EXTRA_CFLAGS - any extra CFLAGS
-+#   BUILD_STATIC - are we building static binaries
-+#
-+# By default all tests are statically compiled but some host systems
-+# may not package static libraries by default. If an external
-+# cross-compiler can only build dynamic libraries the user might need
-+# to make extra efforts to ensure ld.so can link at runtime when the
-+# tests are run.
-+#
-+# We also accept SPEED=slow to enable slower running tests
-+#
-+# We also expect to be in the tests build dir for the FOO-linux-user.
-+#
+@@ -34,6 +34,15 @@
+ 
+ quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
+ 
++# $1 = test name, $2 = cmd, $3 = desc
++run-test = $(call quiet-command, timeout $(TIMEOUT) $2 > $1.out,"TEST",$3)
 +
- -include ../../config-host.mak
---include $(SRC_PATH)/rules.mak
-+-include ../config-target.mak
++# $1 = test name, $2 = reference
++diff-out = $(call quiet-command, diff -u $1.out $2 | head -n 10,"DIFF","$1.out with $2")
++
++# $1 = test name, $2 = reason
++skip-test = @printf "  SKIPPED %s on $(TARGET_NAME) because %s\n" $1 $2
++
+ # Tests we are building
+ TESTS=
  
--$(call set-vpath, $(SRC_PATH)/tests/tcg)
-+quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
+@@ -84,9 +93,7 @@ RUN_TESTS=$(patsubst %,run-%, $(TESTS))
+ RUN_TESTS+=$(EXTRA_RUNS)
  
--QEMU=../../i386-linux-user/qemu-i386
--QEMU_X86_64=../../x86_64-linux-user/qemu-x86_64
--CC_X86_64=$(CC_I386) -m64
-+# Tests we are building
-+TESTS=
+ run-%: %
+-	$(call quiet-command, \
+-		timeout $(TIMEOUT) $(QEMU) $< > $<.out, \
+-		"TEST", "$< on $(TARGET_NAME)")
++	$(call run-test, $<, $(QEMU) $<, "$< on $(TARGET_NAME)")
  
--QEMU_INCLUDES += -I../..
--CFLAGS=-Wall -O2 -g -fno-strict-aliasing
--#CFLAGS+=-msse2
-+# Start with a blank slate, the build targets get to add stuff first
-+CFLAGS=
-+QEMU_CFLAGS=
- LDFLAGS=
+ .PHONY: run
+ run: $(RUN_TESTS)
+diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
+index 7dba32138d..08c45b8470 100644
+--- a/tests/tcg/aarch64/Makefile.target
++++ b/tests/tcg/aarch64/Makefile.target
+@@ -13,7 +13,5 @@ TESTS:=$(AARCH64_TESTS)
+ fcvt: LDFLAGS+=-lm
  
--# TODO: automatically detect ARM and MIPS compilers, and run those too
--
--# runcom maps page 0, so it requires root privileges
--# also, pi_10.com runs indefinitely
--
--I386_TESTS=hello-i386 \
--	   sha1-i386 \
--	   test-i386 \
--	   test-i386-fprem \
--	   # runcom
-+# The QEMU for this TARGET
-+QEMU=../qemu-$(TARGET_NAME)
+ run-fcvt: fcvt
+-	$(call quiet-command, \
+-		$(QEMU) $< > fcvt.out && \
+-		diff -u $(AARCH64_SRC)/fcvt.ref fcvt.out, \
+-		"TEST", "$< (default) on $(TARGET_NAME)")
++	$(call run-test,$<,$(QEMU) $<, "$< on $(TARGET_NAME)")
++	$(call diff-out,$<,$(AARCH64_SRC)/fcvt.ref)
+diff --git a/tests/tcg/arm/Makefile.target b/tests/tcg/arm/Makefile.target
+index 14b5435fc6..aa4e4e3782 100644
+--- a/tests/tcg/arm/Makefile.target
++++ b/tests/tcg/arm/Makefile.target
+@@ -24,10 +24,8 @@ fcvt: LDFLAGS+=-lm
+ # fcvt: CFLAGS+=-march=armv8.2-a+fp16 -mfpu=neon-fp-armv8
  
--# native i386 compilers sometimes are not biarch.  assume cross-compilers are
--ifneq ($(ARCH),i386)
--I386_TESTS+=run-test-x86_64
-+# If TCG debugging is enabled things are a lot slower
-+ifeq ($(CONFIG_DEBUG_TCG),y)
-+TIMEOUT=45
-+else
-+TIMEOUT=15
+ run-fcvt: fcvt
+-	$(call quiet-command, \
+-		$(QEMU) $< > fcvt.out && \
+-		diff -u $(ARM_SRC)/fcvt.ref fcvt.out, \
+-		"TEST", "$< (default) on $(TARGET_NAME)")
++	$(call run-test,fcvt,$(QEMU) $<,"$< on $(TARGET_NAME)")
++	$(call diff-out,fcvt,$(ARM_SRC)/fcvt.ref)
  endif
  
--TESTS = test_path
--ifneq ($(call find-in-path, $(CC_I386)),)
--TESTS += $(I386_TESTS)
-+# The order we include is important. We include multiarch, base arch
-+# and finally arch if it's not the same as base arch.
-+-include $(SRC_PATH)/tests/tcg/multiarch/Makefile.target
-+-include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.target
-+ifneq ($(TARGET_BASE_ARCH),$(TARGET_NAME))
-+-include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.target
+ # On ARM Linux only supports 4k pages
+diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
+index cd173363ee..97b7c23cf1 100644
+--- a/tests/tcg/i386/Makefile.target
++++ b/tests/tcg/i386/Makefile.target
+@@ -31,7 +31,7 @@ test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S test-i386.h test-i386
+ 
+ # Specialist test runners
+ run-runcom: runcom pi_10.com
+-	$(call quiet-command, $(QEMU) ./runcom $(I386_SRC)/pi_10.com > runcom.out, "TEST", "$< on $(TARGET_NAME)")
++	$(call run-test,$<,$(QEMU) ./runcom $(I386_SRC)/pi_10.com,"$< on $(TARGET_NAME)")
+ 
+ ifeq ($(SPEED), slow)
+ 
+@@ -40,13 +40,11 @@ test-i386-fprem.ref: test-i386-fprem
+ 
+ run-test-i386-fprem: TIMEOUT=60
+ run-test-i386-fprem: test-i386-fprem
+-	$(call quiet-command, \
+-		$(QEMU) $< > $<.out && \
+-		diff -u $(I386_SRC)/$<.ref $<.out, \
+-		"TEST", "$< (default) on $(TARGET_NAME)")
++	$(call run-test,test-i386-fprem, $(QEMU) $<,"$< on $(TARGET_NAME)")
++	$(call diff-out,test-i386-fprem, $(I386_SRC)/$<.ref)
+ else
+ run-test-i386-fprem: test-i386-fprem
+-	$(call quiet-command, /bin/true, "SLOW TEST", "$< SKIPPED on $(TARGET_NAME)")
++	$(call skip-test, $<, "SLOW")
  endif
  
--all: $(patsubst %,run-%,$(TESTS))
--test: all
--
--# rules to run tests
--
--.PHONY: $(patsubst %,run-%,$(TESTS))
--
--run-%: %
--	-$(QEMU) ./$*
--
--run-hello-i386: hello-i386
--run-sha1-i386: sha1-i386
--
--run-test-i386: test-i386
--	./test-i386 > test-i386.ref
--	-$(QEMU) test-i386 > test-i386.out
--	@if diff -u test-i386.ref test-i386.out ; then echo "Auto Test OK"; fi
--
--run-test-i386-fprem: test-i386-fprem
--	./test-i386-fprem > test-i386-fprem.ref
--	-$(QEMU) test-i386-fprem > test-i386-fprem.out
--	@if diff -u test-i386-fprem.ref test-i386-fprem.out ; then echo "Auto Test OK"; fi
--
--run-test-x86_64: test-x86_64
--	./test-x86_64 > test-x86_64.ref
--	-$(QEMU_X86_64) test-x86_64 > test-x86_64.out
--	@if diff -u test-x86_64.ref test-x86_64.out ; then echo "Auto Test OK"; fi
--
--
--run-runcom: runcom
--	-$(QEMU) ./runcom $(SRC_PATH)/tests/pi_10.com
--
--run-test_path: test_path
--	./test_path
--
--# rules to compile tests
--
--hello-i386: hello-i386.c
--	$(CC_I386) -nostdlib $(CFLAGS) -static $(LDFLAGS) -o $@ $<
--	strip $@
--
--# i386/x86_64 emulation test (test various opcodes) */
--test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S \
--           test-i386.h test-i386-shift.h test-i386-muldiv.h
--	$(CC_I386) $(QEMU_INCLUDES) $(CFLAGS) $(LDFLAGS) -o $@ \
--              $(<D)/test-i386.c $(<D)/test-i386-code16.S $(<D)/test-i386-vm86.S -lm
--
--test-i386-fprem: test-i386-fprem.c
--	$(CC_I386) $(QEMU_INCLUDES) $(CFLAGS) $(LDFLAGS) -o $@ $^
--
--test-x86_64: test-i386.c \
--           test-i386.h test-i386-shift.h test-i386-muldiv.h
--	$(CC_X86_64) $(QEMU_INCLUDES) $(CFLAGS) $(LDFLAGS) -o $@ $(<D)/test-i386.c -lm
--
--# vm86 test
--runcom: runcom.c
--	$(CC_I386) $(CFLAGS) $(LDFLAGS) -o $@ $<
--
--# speed test
--sha1-i386: sha1.c
--	$(CC_I386) $(CFLAGS) $(LDFLAGS) -o $@ $<
--
--# arm test
--hello-arm: hello-arm.o
--	arm-linux-ld -o $@ $<
-+# Add the common build options
-+CFLAGS+=-Wall -O0 -g -fno-strict-aliasing
-+ifeq ($(BUILD_STATIC),y)
-+LDFLAGS+=-static
-+endif
+ # On i386 and x86_64 Linux only supports 4k pages (large pages are a different hack)
+diff --git a/tests/tcg/multiarch/Makefile.target b/tests/tcg/multiarch/Makefile.target
+index 90e45a881e..b77084c146 100644
+--- a/tests/tcg/multiarch/Makefile.target
++++ b/tests/tcg/multiarch/Makefile.target
+@@ -27,10 +27,10 @@ testthread: LDFLAGS+=-lpthread
  
--hello-arm.o: hello-arm.c
--	arm-linux-gcc -Wall -g -O2 -c -o $@ $<
-+%: %.c
-+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
+ # default case (host page size)
+ run-test-mmap: test-mmap
+-	$(call quiet-command, $(QEMU) $< > test-mmap.out, "TEST", \
++	$(call run-test, test-mmap, $(QEMU) $<, \
+ 		"$< (default) on $(TARGET_NAME)")
  
--test-arm-iwmmxt: test-arm-iwmmxt.s
--	cpp < $< | arm-linux-gnu-gcc -Wall -static -march=iwmmxt -mabi=aapcs -x assembler - -o $@
-+all: $(TESTS)
- 
--# MIPS test
--hello-mips: hello-mips.c
--	mips-linux-gnu-gcc -nostdlib -static -mno-abicalls -fno-PIC -mabi=32 -Wall -Wextra -g -O2 -o $@ $<
-+#
-+# Test Runners
-+#
-+# By default we just run the test with the appropriate QEMU for the
-+# target. More advanced tests may want to override the runner in their
-+# specific make rules. Additional runners for the same binary should
-+# be added to EXTRA_RUNS.
-+#
- 
--hello-mipsel: hello-mips.c
--	mipsel-linux-gnu-gcc -nostdlib -static -mno-abicalls -fno-PIC -mabi=32 -Wall -Wextra -g -O2 -o $@ $<
-+RUN_TESTS=$(patsubst %,run-%, $(TESTS))
-+RUN_TESTS+=$(EXTRA_RUNS)
- 
--# testsuite for the CRIS port.
--test-cris:
--	$(MAKE) -C cris check
-+run-%: %
-+	$(call quiet-command, \
-+		timeout $(TIMEOUT) $(QEMU) $< > $<.out, \
-+		"TEST", "$< on $(TARGET_NAME)")
- 
--# testsuite for the LM32 port.
--test-lm32:
--	$(MAKE) -C lm32 check
-+.PHONY: run
-+run: $(RUN_TESTS)
- 
--clean:
--	rm -f *~ *.o test-i386.out test-i386.ref \
--           test-x86_64.log test-x86_64.ref qruncom $(TESTS)
-+# There is no clean target, the calling make just rm's the tests build dir
+ # additional page sizes (defined by each architecture adding to EXTRA_RUNS)
+ run-test-mmap-%: test-mmap
+-	$(call quiet-command, $(QEMU) -p $* $< > test-mmap-$*.out, "TEST", \
++	$(call run-test, test-mmap-$*, $(QEMU) -p $* $<,\
+ 		"$< ($* byte pages) on $(TARGET_NAME)")
 -- 
 2.17.1
