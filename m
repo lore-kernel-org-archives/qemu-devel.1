@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fW09Q-0002K5-3w
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:01:37 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fW09c-0002SH-Mi
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fW09N-0003Tz-18
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:01:28 -0400
-References: <20180620100825.22476-1-david@redhat.com>
-	<20180620100825.22476-6-david@redhat.com>
-	<0544e011-e909-6bca-e4ca-5a1caa141f4b@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <051d6c6f-13c9-589e-a8f9-cf1439f3b751@redhat.com>
-Date: Thu, 21 Jun 2018 16:01:22 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1fW09Z-0003au-Kc
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:01:40 -0400
+Date: Fri, 22 Jun 2018 00:01:13 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180621140113.GA612@umbus.fritz.box>
+References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
+	<20180618063606.2513-9-david@gibson.dropbear.id.au>
+	<20180621142419.5c6d2ce2@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <0544e011-e909-6bca-e4ca-5a1caa141f4b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 5/7] s390x/tcg: implement SET CLOCK
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
+Content-Disposition: inline
+In-Reply-To: <20180621142419.5c6d2ce2@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 8/9] spapr: Limit available pagesizes to
+ provide a consistent guest environment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,102 +26,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: abologna@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
-On 21.06.2018 15:14, Thomas Huth wrote:
-> On 20.06.2018 12:08, David Hildenbrand wrote:
->> This allows a guest to change its TOD. We already take care of updatin=
-g
->> all CKC timers from within S390TODClass.
->>
->> Use MO_ALIGN to load the operand manually - this will properly trigger=
- a
->> SPECIFICATION exception.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/helper.h      |  1 +
->>  target/s390x/insn-data.def |  3 +--
->>  target/s390x/misc_helper.c | 19 +++++++++++++++++++
->>  target/s390x/translate.c   |  9 +++++++++
->>  4 files changed, 30 insertions(+), 2 deletions(-)
->>
->> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
->> index 59cba86a27..97c60ca7bc 100644
->> --- a/target/s390x/helper.h
->> +++ b/target/s390x/helper.h
->> @@ -127,6 +127,7 @@ DEF_HELPER_4(diag, void, env, i32, i32, i32)
->>  DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
->>  DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
->>  DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
->> +DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
->>  DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
->>  DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
->>  DEF_HELPER_FLAGS_1(stckc, TCG_CALL_NO_RWG, i64, env)
->> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
->> index 157619403d..5c6f33ed9c 100644
->> --- a/target/s390x/insn-data.def
->> +++ b/target/s390x/insn-data.def
->> @@ -997,8 +997,7 @@
->>  /* SET ADDRESS SPACE CONTROL FAST */
->>      C(0xb279, SACF,    S,     Z,   0, a2, 0, 0, sacf, 0)
->>  /* SET CLOCK */
->> -    /* ??? Not implemented - is it necessary? */
->> -    C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
->> +    C(0xb204, SCK,     S,     Z,   la2, 0, 0, 0, sck, 0)
->>  /* SET CLOCK COMPARATOR */
->>      C(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0)
->>  /* SET CLOCK PROGRAMMABLE FIELD */
->> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
->> index d5f9f5e1d3..c9712b9476 100644
->> --- a/target/s390x/misc_helper.c
->> +++ b/target/s390x/misc_helper.c
->> @@ -191,6 +191,25 @@ void tcg_s390_tod_updated(CPUState *cs, run_on_cp=
-u_data opaque)
->>      helper_sckc(env, env->ckc);
->>  }
->> =20
->> +/* Set Clock */
->> +uint32_t HELPER(sck)(CPUS390XState *env, uint64_t tod_low)
->> +{
->> +    S390TODState *td =3D s390_get_tod();
->> +    S390TODClass *tdc =3D S390_TOD_GET_CLASS(td);
->> +    S390TOD tod =3D {
->> +        .high =3D 0,
->> +        .low =3D tod_low,
->> +    };
->> +    Error *err =3D NULL;
->> +
->> +    qemu_mutex_lock_iothread();
->> +    tdc->set(td, &tod, &err);
->> +    qemu_mutex_unlock_iothread();
->> +    g_assert(!err);
+
+--d6Gm4EdcadzBjdND
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Jun 21, 2018 at 02:24:19PM +0200, Greg Kurz wrote:
+> On Mon, 18 Jun 2018 16:36:05 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> I know it currently can't happen, but still, I think it would be nicer
-> to use CC3 to tell the guest that something went wrong with the clock,
-> instead of abort QEMU here.
-
-Hmm, I thing I should either use error_abort here or do what you suggest.
-
-However, CC=3D3 means "Clock in not-operational state".
-
-And this implies that also STORE CLOCK and friends will have to fail and
-that we have to present a machine check. Especially, once we would
-implement the TOD-clock steering facility, CC=3D3 would not apply anymore=
-.
-
-So instead of faking something that is not architecturally correct, I
-think we really should just quit QEMU, as we expect this to never fail.
-
-
+> > KVM HV has some limitations (deriving from the hardware) that mean not =
+all
+> > host-cpu supported pagesizes may be usable in the guest.  At present th=
+is
+> > means that KVM guests and TCG guests may see different available page s=
+izes
+> > even if they notionally have the same vcpu model.  This is confusing and
+> > also prevents migration between TCG and KVM.
+> >=20
+> > This patch makes the environment consistent by always allowing the same=
+ set
+> > of pagesizes.  Since we can't remove the KVM limitations, we do this by
+> > always applying the same limitations it has, even to TCG guests.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/ppc/spapr_caps.c | 33 +++++++++++++++++++++++++++++++++
+> >  1 file changed, 33 insertions(+)
+> >=20
+> > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> > index 9fc739b3f5..0584c7c6ab 100644
+> > --- a/hw/ppc/spapr_caps.c
+> > +++ b/hw/ppc/spapr_caps.c
+> > @@ -334,6 +334,38 @@ static void cap_hpt_maxpagesize_apply(sPAPRMachine=
+State *spapr,
+> >      spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
+> >  }
+> > =20
+> > +static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift, uint3=
+2_t pshift)
+> > +{
+> > +    unsigned maxshift =3D *((unsigned *)opaque);
+> > +
+> > +    assert(pshift >=3D seg_pshift);
+> > +
+> > +    /* Don't allow the guest to use pages bigger than the configured
+> > +     * maximum size */
+> > +    if (pshift > maxshift) {
+> > +        return false;
+> > +    }
+> > +
+> > +    /* For whatever reason, KVM doesn't allow multiple pagesizes
+> > +     * within a segment, *except* for the case of 16M pages in a 4k or
+> > +     * 64k segment.  Always exclude other cases, so that TCG and KVM
+> > +     * guests see a consistent environment */
 >=20
->  Thomas
->=20
+> Unless I'm missing something, I don't see how we could get "other cases"
+> with TCG, at least with the current content of ppc_hash64_opts_POWER7.
 
+You're missing something.  hash64_opts_POWER7 includes 64k pages in a
+segment with base page size of 4k.
 
 --=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Thanks,
+--d6Gm4EdcadzBjdND
+Content-Type: application/pgp-signature; name="signature.asc"
 
-David / dhildenb
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsrr6kACgkQbDjKyiDZ
+s5LC0g/9H0RQSOWleC3LybaOhnDiEU+rKsa/EoODqXLJT97X4ZQvVFiBmLDeLI07
+zmJJrmT1oigR6XNNGXKX+6LvB8Uxu4U/Vor5HC0wWbKKt0rBvo7Bpt4wzJezUJTr
+RZ1CZXISKhKNaR+abpcNGGZgnWH0DAryx6lTwP2tzNw4DbNAr8kCtq7F8eD0AjNj
+VxQw+HQW7scXsxuJE6DpajZidKwMtn8A/6j+bekfKotjlpkVdkeD/CbUSseX0TLp
+fUVXrNRdJ74qYwMsb2uVxFK3rHowIwLrbHch87wQlnclzJFjtGA8e0A9/3+6CbYb
+SM0g8hBHkyRjY6C2z+Z3CqKcCOrcwJzAqyxPcRQFpnkBEtyeY82iMVbtz6KTc8Tf
+vSn5SeaxMLqHMRmoXs0S1KOVN7lEKSKlFKrOAv4KQ/bj2AFW1CDOW5HKiZc51wMj
+aeCt5PY9dGfBCpwq0RQV28O/TsMycIdhdvTXsXZOzAxGFdBynWQ0XqSVUOrXCP9f
+QO3gw4xVOy6Ug/y/mJxhQ1GmQ5aRdwpgAynassdOb71ycTJxkf5LzLqTtxF6PXCt
+BpHdEAZuChrxbObNgXguWTpP3PL2FBTaSHPnWK8Vu6mFd1YcREke+tNFdx8MyMOu
+3SUAHF/a+j9z3TOZbG+KvS72S6URaGqIpjFTrGev4bGiPSWXTt8=
+=FGSb
+-----END PGP SIGNATURE-----
+
+--d6Gm4EdcadzBjdND--
