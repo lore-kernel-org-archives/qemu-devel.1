@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fVtbD-00049P-Q7
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:01:44 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fVtbS-0004MK-O2
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:02:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fVtb8-00086U-PN
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:01:43 -0400
-Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:51213)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fVtb8-00085f-Iz
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:01:38 -0400
-Received: from player732.ha.ovh.net (unknown [10.109.122.80])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id D63A1D1993
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 09:01:36 +0200 (CEST)
-References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
-	<20180618063606.2513-9-david@gibson.dropbear.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <f829daa0-c870-f835-2195-df795c0e47b9@kaod.org>
-Date: Thu, 21 Jun 2018 09:01:27 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1fVtbO-0008J3-RU
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:01:58 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:51032)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fVtbO-0008IK-GL
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:01:54 -0400
+Received: by mail-wm0-x243.google.com with SMTP id e16-v6so3268062wmd.0
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 00:01:54 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu, 21 Jun 2018 07:25:50 +0100
+Message-Id: <20180621062605.941-43-alex.bennee@linaro.org>
+In-Reply-To: <20180621062605.941-1-alex.bennee@linaro.org>
+References: <20180621062605.941-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180618063606.2513-9-david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 8/9] spapr: Limit available pagesizes to
- provide a consistent guest environment
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL v2 42/57] docker: move debian-powerpc-cross to
+ sid based build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,88 +30,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, abologna@redhat.com
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 06/18/2018 08:36 AM, David Gibson wrote:
-> KVM HV has some limitations (deriving from the hardware) that mean not all
-> host-cpu supported pagesizes may be usable in the guest.  At present this
-> means that KVM guests and TCG guests may see different available page sizes
-> even if they notionally have the same vcpu model.  This is confusing and
-> also prevents migration between TCG and KVM.
-> 
-> This patch makes the environment consistent by always allowing the same set
-> of pagesizes.  Since we can't remove the KVM limitations, we do this by
-> always applying the same limitations it has, even to TCG guests.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->
-> ---
->  hw/ppc/spapr_caps.c | 33 +++++++++++++++++++++++++++++++++
->  1 file changed, 33 insertions(+)
-> 
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 9fc739b3f5..0584c7c6ab 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -334,6 +334,38 @@ static void cap_hpt_maxpagesize_apply(sPAPRMachineState *spapr,
->      spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
->  }
->  
-> +static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift, uint32_t pshift)
-> +{
-> +    unsigned maxshift = *((unsigned *)opaque);
-> +
-> +    assert(pshift >= seg_pshift);
+The original Jessie based cross builder hasn't worked for a while. The
+state of the libraries is still perilous for cross-building QEMU but
+we can use it for building TCG tests.
 
-you could check that elsewhere.
+The debian-apt-fake.sh script can also be dropped as it is no longer
+used.
 
-> +    /* Don't allow the guest to use pages bigger than the configured
-> +     * maximum size */
-> +    if (pshift > maxshift) {
-> +        return false;
-> +    }
-> +
-> +    /* For whatever reason, KVM doesn't allow multiple pagesizes
-> +     * within a segment, *except* for the case of 16M pages in a 4k or
-> +     * 64k segment.  Always exclude other cases, so that TCG and KVM
-> +     * guests see a consistent environment */
-> +    if ((pshift != seg_pshift) && (pshift != 24)) {
-> +        return false;
-> +    }
-> +
-> +    return true;
-> +}
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-So, do we really need ppc_hash64_filter_pagesizes() to have a callback ? 
-
-It seems that we only use the routine once in the patchset and that the
-only thing we need to check is 'maxshift'.
-
-Do you envision other usage of the routine ?
-
-Thanks,
-
-C.
-
-> +static void cap_hpt_maxpagesize_cpu_apply(sPAPRMachineState *spapr,
-> +                                          PowerPCCPU *cpu,
-> +                                          uint8_t val, Error **errp)
-> +{
-> +    unsigned maxshift = val;
-> +
-> +    ppc_hash64_filter_pagesizes(cpu, spapr_pagesize_cb, &maxshift);
-> +}
-> +
->  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
->      [SPAPR_CAP_HTM] = {
->          .name = "htm",
-> @@ -401,6 +433,7 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
->          .set = spapr_cap_set_pagesize,
->          .type = "int",
->          .apply = cap_hpt_maxpagesize_apply,
-> +        .cpu_apply = cap_hpt_maxpagesize_cpu_apply,
->      },
->  };
->  
-> 
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index a680743ae8..87f449264f 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -47,8 +47,6 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
+ 		"BUILD","$*")
+ 
+-docker-image-debian-powerpc-cross: EXTRA_FILES:=$(SRC_PATH)/tests/docker/dockerfiles/debian-apt-fake.sh
+-
+ # Enforce dependencies for composite images
+ docker-image-debian: docker-image-debian9
+ docker-image-debian8-mxe: docker-image-debian8
+@@ -59,7 +57,6 @@ docker-image-debian-arm64-cross: docker-image-debian9
+ docker-image-debian-mips-cross: docker-image-debian9
+ docker-image-debian-mipsel-cross: docker-image-debian9
+ docker-image-debian-mips64el-cross: docker-image-debian9
+-docker-image-debian-powerpc-cross: docker-image-debian8
+ docker-image-debian-ppc64el-cross: docker-image-debian9
+ docker-image-debian-s390x-cross: docker-image-debian9
+ docker-image-debian-win32-cross: docker-image-debian8-mxe
+@@ -77,6 +74,7 @@ docker-image-debian-sh4-cross: docker-image-debian-sid
+ docker-image-debian-sparc64-cross: docker-image-debian-sid
+ docker-image-debian-mips64-cross: docker-image-debian-sid
+ docker-image-debian-riscv64-cross: docker-image-debian-sid
++docker-image-debian-powerpc-cross: docker-image-debian-sid
+ docker-image-travis: NOUSER=1
+ 
+ # Specialist build images, sometimes very limited tools
+diff --git a/tests/docker/dockerfiles/debian-apt-fake.sh b/tests/docker/dockerfiles/debian-apt-fake.sh
+deleted file mode 100755
+index 2ec0fdf47a..0000000000
+--- a/tests/docker/dockerfiles/debian-apt-fake.sh
++++ /dev/null
+@@ -1,46 +0,0 @@
+-#! /bin/sh
+-#
+-# Generate fake debian package to resolve unimportant unmet dependencies held
+-# by upstream multiarch broken packages.
+-#
+-# Copyright (c) 2017 Philippe Mathieu-Daudé <f4bug@amsat.org>
+-#
+-# This work is licensed under the terms of the GNU GPL, version 2
+-# or (at your option) any later version. See the COPYING file in
+-# the top-level directory.
+-
+-test $1 = "install" && shift 1
+-
+-fake_install()
+-{
+-    echo "Generating fake $2 $1 $3 ..."
+-    (cd /var/cache/apt/archives
+-        (cat << 'EOF'
+-Section: misc
+-Priority: optional
+-Standards-Version: 3.9.2
+-
+-Package: NAME
+-Version: VERSION
+-Maintainer: qemu-devel@nongnu.org
+-Architecture: any
+-Multi-Arch: same
+-Description: fake NAME
+-EOF
+-        ) | sed s/NAME/$2/g | sed s/VERSION/$3/g > $2.control
+-        equivs-build -a $1 $2.control 1>/dev/null 2>/dev/null
+-        dpkg -i --force-overwrite $2_$3_$1.deb
+-    )
+-}
+-
+-try_install()
+-{
+-    name=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\1/")
+-    arch=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\2/")
+-    vers=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\3/")
+-    apt-get install -q -yy $1 || fake_install $arch $name $vers
+-}
+-
+-for package in $*; do
+-    try_install $package
+-done
+diff --git a/tests/docker/dockerfiles/debian-powerpc-cross.docker b/tests/docker/dockerfiles/debian-powerpc-cross.docker
+index a5dd46b4ac..5e62ca0df1 100644
+--- a/tests/docker/dockerfiles/debian-powerpc-cross.docker
++++ b/tests/docker/dockerfiles/debian-powerpc-cross.docker
+@@ -1,40 +1,13 @@
+ #
+ # Docker powerpc cross-compiler target
+ #
+-# This docker target builds on the debian Jessie base image.
++# This docker target builds on the debian sid base image which
++# contains cross compilers for Debian "ports" targets. The original
++# Jessie based no longer builds.
+ #
+-FROM qemu:debian8
+-MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
++FROM qemu:debian-sid
+ 
+-# Add the foreign architecture we want and install dependencies
+-RUN dpkg --add-architecture powerpc
+-RUN apt-get update
+ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+     apt-get install -y --no-install-recommends \
+-        crossbuild-essential-powerpc
+-
+-# <kludge> to fix "following packages have unmet dependencies" ...
+-ADD debian-apt-fake.sh /usr/local/bin/apt-fake
+-RUN apt-get install -y --no-install-recommends \
+-        equivs \
+-        pkg-config
+-RUN apt-fake install \
+-        pkg-config:powerpc=0.28-1.1-fake && \
+-    ln -s pkg-config /usr/bin/powerpc-linux-gnu-pkg-config
+-ENV PKG_CONFIG_PATH /usr/lib/powerpc-linux-gnu/pkgconfig
+-# </kludge>
+-
+-# Specify the cross prefix for this image (see tests/docker/common.rc)
+-ENV QEMU_CONFIGURE_OPTS --cross-prefix=powerpc-linux-gnu-
+-
+-RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+-    apt-get build-dep -yy -a powerpc qemu
+-RUN DEBIAN_FRONTEND=noninteractive \
+-    apt-get install -y --no-install-recommends \
+-        glusterfs-common:powerpc \
+-        libbz2-dev:powerpc \
+-        liblzo2-dev:powerpc \
+-        libncursesw5-dev:powerpc \
+-        libnfs-dev:powerpc \
+-        librdmacm-dev:powerpc \
+-        libsnappy-dev:powerpc
++        gcc-powerpc-linux-gnu \
++        libc6-dev-powerpc-cross || { echo "Failed to build - see debian-sid.docker notes"; exit 1; }
+diff --git a/tests/docker/dockerfiles/debian8.docker b/tests/docker/dockerfiles/debian8.docker
+index 1bcf2e3d2f..52945631cd 100644
+--- a/tests/docker/dockerfiles/debian8.docker
++++ b/tests/docker/dockerfiles/debian8.docker
+@@ -32,6 +32,3 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+         pkg-config \
+         python-minimal
+ 
+-# Setup Emdebian [emdebian-archive-keyring]
+-RUN echo "deb http://emdebian.org/tools/debian/ jessie main" > /etc/apt/sources.list.d/emdebian.list && \
+-    curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
+-- 
+2.17.1
