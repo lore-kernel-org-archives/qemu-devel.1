@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39488)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fW4N9-0007bv-JC
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:31:56 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fW4WM-00011t-TF
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:41:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fW4N6-0001Po-Gf
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:31:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59484)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fW4N6-0001Or-AQ
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:31:52 -0400
-Date: Thu, 21 Jun 2018 15:31:48 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180621183148.GX7451@localhost.localdomain>
-References: <1529443919-67509-1-git-send-email-babu.moger@amd.com>
-	<1529443919-67509-4-git-send-email-babu.moger@amd.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fW4WJ-0004bB-0e
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:41:26 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:39501)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fW4WI-0004b7-DU
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:41:22 -0400
+Received: by mail-wr0-x241.google.com with SMTP id w7-v6so4207748wrn.6
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 11:41:22 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu, 21 Jun 2018 19:41:16 +0100
+Message-Id: <20180621184116.910-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1529443919-67509-4-git-send-email-babu.moger@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v16 3/3] i386: Remove generic SMT thread
- check
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] blogposts: add post about the new check-tcg
+ infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,20 +28,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Babu Moger <babu.moger@amd.com>
-Cc: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, mtosatti@redhat.com, kvm@vger.kernel.org, kash@tripleback.net, geoff@hostfission.com
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Tue, Jun 19, 2018 at 05:31:59PM -0400, Babu Moger wrote:
-> Remove generic non-intel check while validating hyperthreading support.
-> Certain AMD CPUs can support hyperthreading now.
-> 
-> CPU family with TOPOEXT feature can support hyperthreading now.
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> Tested-by: Geoffrey McRae <geoff@hostfission.com>
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ _posts/2018-06-21-tcg-testing.md | 129 +++++++++++++++++++++++++++++++
+ 1 file changed, 129 insertions(+)
+ create mode 100644 _posts/2018-06-21-tcg-testing.md
 
-Queued, thanks!
-
+diff --git a/_posts/2018-06-21-tcg-testing.md b/_posts/2018-06-21-tcg-testing.md
+new file mode 100644
+index 0000000..85abb7a
+--- /dev/null
++++ b/_posts/2018-06-21-tcg-testing.md
+@@ -0,0 +1,129 @@
++---
++layout: post
++title:  "QEMU TCG Tests"
++date:   2018-06-21 10:30:00:00 +0000
++last_modified_at: 2018-06-21 10:30:00:00 +0000
++author: Alex Bennée
++categories: [testing, docker, compilation, tcg]
++---
++
++Ever since I started working on QEMU there was a small directory
++called tests/tcg that was in a perpetually broken state. It contains
++tests that exercise QEMU's ability to work across architectures using
++the power of the Tiny Code Generator. However as these tests needed to
++be compiled for the *guest* architectures and not the *host*
++architecture - known as cross-compiling - most developers never ran
++them. As the tests were hardly ever built inevitably a certain amount
++of bit-rot set in.
++
++# Cross Compilers
++
++In the old days cross-compilation setups were almost all hand-crafted
++affairs which involved building versions of binutils, gcc and a basic
++libc. If you couldn't get someone to give you a pre-built tarball it
++was something you laboured through once and hopefully never had to
++touch again. There were even dedicated scripts like crosstool-ng which
++attempted to make the process of patching and configuring your
++toolchain easier.
++
++While the distributions have improved their support for cross
++compilers over the years there are still plenty of variations in how
++they are deployed. It is hard for a project like QEMU which has to
++build on a wide range of operating systems and architectures to
++seamlessly use any given distributions compiler setup. However for
++those with cross compilers to hand `configure` now accepts two
++additional flags:
++
++    --cross-cc-$(ARCH)
++    --cross-cc-flags-$(ARCH)
++
++With a compiler specified for each guest architecture you want to test
++the build system can now build and run the tests. However for
++developers that don't have cross compilers around they can now take
++advantage of QEMU's docker images.
++
++# Enter Docker Containers
++
++If you work in IT you would be hard pressed not to have noticed the
++hype around Docker and the concept of containerisation over the last
++few years. Put simply containers allow you to define a known working
++set of software that gets run in an isolated environment for a given
++task. While this has many uses for QEMU it allows us to define build
++environments that any developer can run without having to mess around
++with their preferred host setup.
++
++Over the last few years QEMU's build system has been expanding the
++number of docker images it supports. Most of this has been in service
++of our CI testing such as [Patchew](https://patchew.org/QEMU/) and
++[Shippable](https://app.shippable.com/github/qemu/qemu/dashboard) but
++any developer with a docker setup can run the exact same images. For
++example if you want to check your patches won't break when compiled on
++a 32 bit ARM system you can run:
++
++    make docker-test-build@debian-armhf-cross J=n
++
++instead of tracking down a piece of ARM hardware to actually build on.
++Run `make docker` in your source tree to see the range of builds and
++tests it can support.
++
++# make check-tcg
++
++With the latest work [merged into
++master](https://git.qemu.org/?p=qemu.git;a=commit;h=TODO) we can now
++take advantage of both hand configured and docker based cross
++compilers to build test cases for TCG again. To run the TCG tests
++after you have built QEMU:
++
++    make check-tcg
++
++and the build system will build and run all the tests it can for your
++configured targets.
++
++# Rules for tests/tcg
++
++So now we have the infrastructure in place to add new tests what rules
++need to be followed to add new tests? 
++
++Well the first thing to note is currently all the tests are for
++linux-user versions of QEMU. This means the tests are all currently
++user-space tests that have access to the Linux syscall ABI.
++
++Another thing to note is the tests are standalone from the rest of the
++QEMU test infrastructure. To keep things simple they are compiled as
++standalone "static" binaries. As the cross-compilation setup can be
++quite rudimentary for some of the rarer architectures we only compile
++against a standard libc. There is no support for linking to other
++libraries like for example glib. Thread and maths support is part of
++glibc so shouldn't be a problem.
++
++Finally when writing new tests consider if it really is architecture
++specific or can be added to `tests/tcg/multiarch`. The multiarch tests
++are re-built for every supported architecture and should be the
++default place for anything explicitly testing syscalls and other
++common parts of the code base.
++
++# What's Next
++
++My hope with this work is we can start adding more tests to
++systematically defend functionality in linux-user. In fact I hope the
++first port of call to reproducing a crash would be writing a test case
++that can be added to our growing library of tests.
++
++Another thing that needs sorting out is getting toolchains for all of
++the less common architectures. The current work relies heavily on the
++excellent work of the Debian toolchain team in making multiarch
++aware cross compilers available in their distribution. However QEMU
++supports a lot more architectures than QEMU, some only as system
++emulations. In principle supporting them is as easy as adding another
++docker recipe but it might be these recipes end up having to compile
++the compilers from source.
++
++The `tests/tcg` directory still contains a number of source files we
++don't build. Notably the cris, lm32, mips, openrisc and xtensa targets have
++a set of tests that need a system emulator. Now we have the
++infrastructure for compiling I hope we can get support for system
++tests added fairly quickly. There will need to be some work to figure
++out a nice common way to pass results back to the build-system. For
++linux-user this is simple as all programs can simply return their exit
++code however for system emulation this is a little more involved.
++
 -- 
-Eduardo
+2.17.1
