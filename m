@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVvII-0002ru-7B
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:50:19 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fVvO5-0004BD-Hs
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:56:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fVvIH-0004vU-DV
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:50:18 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:44522)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fVvIH-0004vA-1a
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:50:17 -0400
-Received: by mail-ot0-x241.google.com with SMTP id w13-v6so2674783ote.11
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 01:50:16 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1fVvO1-0007ku-IB
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:56:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57142 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fVvO1-0007ka-Ck
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:56:13 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9E9B04002248
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 08:56:12 +0000 (UTC)
+Date: Thu, 21 Jun 2018 10:56:08 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180621105608.01463ba5@redhat.com>
+In-Reply-To: <20180620153947.30834-6-dgilbert@redhat.com>
+References: <20180620153947.30834-1-dgilbert@redhat.com>
+	<20180620153947.30834-6-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180621062605.941-2-alex.bennee@linaro.org>
-References: <20180621062605.941-1-alex.bennee@linaro.org>
-	<20180621062605.941-2-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Jun 2018 09:49:55 +0100
-Message-ID: <CAFEAcA8WQD26TW+zfd-f=qeUP7QFxHixV-AENWEmWyyNU3bseg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 01/57] docker: docker.py wrap StringIO
- import for python3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 5/7] hmp: Add commands for preconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +33,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, peterx@redhat.com
 
-On 21 June 2018 at 07:25, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> Although the docker.py is nominally python2 we actually invoke it with
-> the configured python from the configure script.
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-> index 306e14cf69..e4095270eb 100755
-> --- a/tests/docker/docker.py
-> +++ b/tests/docker/docker.py
-> @@ -26,7 +26,10 @@ import tempfile
->  import re
->  import signal
->  from tarfile import TarFile, TarInfo
-> -from StringIO import StringIO
-> +try:
-> +    from StringIO import StringIO
-> +except ImportError:
-> +    from io import StringIO
->  from shutil import copy, rmtree
->  from pwd import getpwuid
+On Wed, 20 Jun 2018 16:39:45 +0100
+"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
 
-This is fairly trivial, but it is a new unreviewed patch:
-would one of the python experts like to review it ?
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Allow a bunch of the info commands to be used in preconfig.
+> 
+> version, chardev, name, uuid,memdev, iothreads
+>   Were enabled in QMP in the previous patch from Igor
+> 
+> status, hotpluggable_cpus
+>   Was enabled in the original allow-preconfig series
+> 
+> history
+>   is HMP specific
+> 
+> qom-tree, numa
+>   Don't have a QMP equivalent
+I'm not sure that 'info numa' in current state is useful/or valid
+at preconfig time wrt memory stats (depends on memory devices
+which hasn't created at that moment yet).
+Let's drop it for now from this series.
+With it dropped:
 
-thanks
--- PMM
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> Also enable the qom commands qom-list and qom-set.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hmp-commands-info.hx | 11 +++++++++++
+>  hmp-commands.hx      |  3 +++
+>  2 files changed, 14 insertions(+)
+> 
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index ddfcd5adcc..874ff07583 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -19,6 +19,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show the version of QEMU",
+>          .cmd        = hmp_info_version,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -47,6 +48,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show the character devices",
+>          .cmd        = hmp_info_chardev,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -165,6 +167,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show the command line history",
+>          .cmd        = hmp_info_history,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -315,6 +318,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show NUMA information",
+>          .cmd        = hmp_info_numa,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -399,6 +403,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show the current VM status (running|paused)",
+>          .cmd        = hmp_info_status,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -457,6 +462,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show the current VM name",
+>          .cmd        = hmp_info_name,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -471,6 +477,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show the current VM UUID",
+>          .cmd        = hmp_info_uuid,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -613,6 +620,7 @@ ETEXI
+>          .params     = "[path]",
+>          .help       = "show QOM composition tree",
+>          .cmd        = hmp_info_qom_tree,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -671,6 +679,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show memory backends",
+>          .cmd        = hmp_info_memdev,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -699,6 +708,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "show iothreads",
+>          .cmd        = hmp_info_iothreads,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -829,6 +839,7 @@ ETEXI
+>          .params     = "",
+>          .help       = "Show information about hotpluggable CPUs",
+>          .cmd        = hmp_hotpluggable_cpus,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 3094294e5b..4bdf8e2090 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1828,6 +1828,7 @@ ETEXI
+>          .params     = "path",
+>          .help       = "list QOM properties",
+>          .cmd        = hmp_qom_list,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -1841,6 +1842,7 @@ ETEXI
+>          .params     = "path property value",
+>          .help       = "set QOM property",
+>          .cmd        = hmp_qom_set,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
+> @@ -1855,6 +1857,7 @@ ETEXI
+>          .help       = "show various information about the system state",
+>          .cmd        = hmp_info_help,
+>          .sub_table  = info_cmds,
+> +        .flags      = "p",
+>      },
+>  
+>  STEXI
