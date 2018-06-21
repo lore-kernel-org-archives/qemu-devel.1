@@ -1,35 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fW2Ya-0000cU-5V
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:35:37 -0400
+	(envelope-from <armbru@redhat.com>) id 1fW2ZO-00015I-Jq
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:36:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fW2YW-0005LX-VR
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:35:36 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36130)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fW2YW-0005LO-Ml
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:35:32 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5LGYEbe143200
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 12:35:31 -0400
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jrerttmnj-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 12:35:30 -0400
-Received: from localhost
-	by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 21 Jun 2018 17:35:27 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 21 Jun 2018 18:35:22 +0200
-Message-Id: <20180621163522.100968-1-borntraeger@de.ibm.com>
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
+	(envelope-from <armbru@redhat.com>) id 1fW2ZL-0005jg-F4
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:36:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49086 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fW2ZL-0005jN-AO
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:36:23 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180615154203.11347-1-berrange@redhat.com>
+	<20180615154203.11347-9-berrange@redhat.com>
+	<48a79954-a9a7-cd76-40f2-c99e69ffb087@redhat.com>
+	<20180621153941.GO3615@redhat.com>
+Date: Thu, 21 Jun 2018 18:36:19 +0200
+In-Reply-To: <20180621153941.GO3615@redhat.com> ("Daniel P. =?utf-8?Q?Berr?=
+	=?utf-8?Q?ang=C3=A9=22's?=
+	message of "Thu, 21 Jun 2018 16:39:41 +0100")
+Message-ID: <8736xgjdvg.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH v2] s390/ipl: fix ipl with -no-reboot
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 08/11] authz: add QAuthZList object type
+ for an access control list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,70 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, "Dr. David
+	Alan Gilbert" <dgilbert@redhat.com>, Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>
 
-kexec/kdump as well as the bootloader use a subcode of diagnose 308
-that is supposed to reset the subsystem but not comprise a full
-"reboot". With the latest refactoring this is now broken when
--no-reboot is used. This for example break virt-install from
-iso images.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-We need to mark these "soft" reboots as ok for rebooting.
+> On Thu, Jun 21, 2018 at 10:28:23AM -0500, Eric Blake wrote:
+>> On 06/15/2018 10:42 AM, Daniel P. Berrang=C3=A9 wrote:
+>> > From: "Daniel P. Berrange" <berrange@redhat.com>
+>> >=20
+>> > Add a QAuthZList object type that implements the QAuthZ interface. This
+>> > built-in implementation maintains a trivial access control list with a
+>> > sequence of match rules and a final default policy. This replicates the
+>> > functionality currently provided by the qemu_acl module.
+>> >=20
+>>=20
+>> >=20
+>> > It is not currently possible to create this via -object, since there is
+>> > no syntax supported to specify non-scalar properties for objects. This
+>> > is likely to be addressed by later support for using JSON with -object,
+>> > or an equivalent approach.
+>>=20
+>> Is this statement slightly stale, since we have JSON support with --obje=
+ct
+>> already?
+>
+> That's news to me if we do. Markus did a PoC but AFAIK it was never
+> proposed for merge so far.
 
-Fixes: a30fb811cbe9 (s390x: refactor reset/reipl handling)
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- hw/s390x/ipl.c          | 8 +++++++-
- include/sysemu/sysemu.h | 3 +++
- vl.c                    | 2 +-
- 3 files changed, 11 insertions(+), 2 deletions(-)
+Correct.  Can finish the job if there's a need.
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 0d67349004..ade6896af6 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -535,7 +535,13 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
-             ipl->iplb_valid = s390_gen_initial_iplb(ipl);
-         }
-     }
--    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+    if (reset_type == S390_RESET_MODIFIED_CLEAR ||
-+        reset_type == S390_RESET_LOAD_NORMAL) {
-+        /* ignore -no-reboot */
-+        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET_FORCE);
-+    } else {
-+        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+    }
-     /* as this is triggered by a CPU, make sure to exit the loop */
-     if (tcg_enabled()) {
-         cpu_loop_exit(cs);
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index e893f72f3b..345369d924 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -44,6 +44,9 @@ typedef enum ShutdownCause {
-                                      turns that into a shutdown */
-     SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
-                                      that into a shutdown */
-+    SHUTDOWN_CAUSE_GUEST_RESET_FORCE,/* Guest reset that should ignore
-+                                        --no-reboot. This is useful for reset
-+                                        like actions as s390 kexec/kdump */
-     SHUTDOWN_CAUSE__MAX,
- } ShutdownCause;
- 
-diff --git a/vl.c b/vl.c
-index b3426e03d0..722c3b9963 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1674,7 +1674,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
- 
- void qemu_system_reset_request(ShutdownCause reason)
- {
--    if (no_reboot) {
-+    if (no_reboot && reason != SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
-         shutdown_requested = reason;
-     } else {
-         reset_requested = reason;
--- 
-2.17.0
+[...]
