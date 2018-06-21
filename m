@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51933)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fW3GM-0002Rm-B8
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:20:51 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fW3Vl-0000r4-LT
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fW3GI-0005yl-Bc
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:20:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39470)
+	(envelope-from <richard.henderson@linaro.org>) id 1fW3Vi-0004Kz-HM
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:36:45 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:39459)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fW3GI-0005yK-5c
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:20:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fW3GG-0008Vx-9N
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 17:20:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F29242E80CC
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 17:20:43 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 21 Jun 2018 17:11:27 -0000
-From: John Snow <1776920@bugs.launchpad.net>
-Reply-To: Bug 1776920 <1776920@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152898515528.25954.5483198787570860596.malonedeb@soybean.canonical.com>
-Message-Id: <152960108766.26563.15291996422240489526.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1776920] Re: qemu-img convert on Mac OSX creates
- corrupt images
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fW3Vi-0004Kb-2r
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:36:42 -0400
+Received: by mail-pl0-x241.google.com with SMTP id s24-v6so2050104plq.6
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 10:36:41 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu, 21 Jun 2018 07:36:33 -1000
+Message-Id: <20180621173635.21537-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/2] linux-user: Change mmap_lock to rwlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,53 +25,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: laurent@vivier.eu, cota@braap.org, qemu-arm@nongnu.org
 
-My hunch is that we're handling zero regions incorrectly and we might be
-skipping data regions we ought to be copying.
+The objective here is to avoid serializing the first-fault
+and no-fault aarch64 sve loads.
 
-...I'm looking at the `image2.qemu` file you've uploaded and it's empty!
-we didn't copy *anything* from your source file.
+When I first thought of this, we still had tb_lock protecting
+code generation and merely needed mmap_lock to prevent mapping
+changes while doing so.  Now (or very soon), tb_lock is gone
+and user-only code generation dual-purposes the mmap_lock for
+the code generation lock.
 
-Try converting with '-S 0` to disable sparse protection and see if that
-might help.
+There are two other legacy users of mmap_lock within linux-user,
+for ppc and mips.  I believe these are dead code from before these
+ports were converted to use tcg atomics.
 
-  '-S' indicates the consecutive number of bytes (defaults to 4k) that must
-       contain only zeros for qemu-img to create a sparse image during
-       conversion. If the number of bytes is 0, the source will not be scan=
-ned for
-       unallocated or zero sectors, and the destination image will always be
-       fully allocated
+Thoughts?
 
-If that helps, I'd take a look at img_convert in qemu-img.c ...
 
-convert_iteration_sectors looks relevant, it appears to help us know
-which sectors to copy when called by convert_co_do_copy.
+r~
 
-Tracing around "convert_co_read" in the same function might also help us
-to know which portions of the image we're even deciding to read; and we
-could probably track backwards from there to figure out which
-condition(s) are disqualifying us if we're deciding not to copy data.
 
-My current hunch is that bdrv_block_status[_above] is returning
-something wrong when backed by APFS.
+Based-on: <20180621143715.27176-1-richard.henderson@linaro.org> [tcg-next]
+Based-on: <20180621015359.12018-1-richard.henderson@linaro.org> [v5 SVE]
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1776920
+Richard Henderson (2):
+  exec: Split mmap_lock to mmap_rdlock/mmap_wrlock
+  linux-user: Use pthread_rwlock_t for mmap_rd/wrlock
 
-Title:
-  qemu-img convert on Mac OSX creates corrupt images
+ include/exec/exec-all.h    |  6 ++--
+ accel/tcg/cpu-exec.c       |  8 ++---
+ accel/tcg/translate-all.c  |  4 +--
+ bsd-user/mmap.c            | 18 +++++++++---
+ exec.c                     |  6 ++--
+ linux-user/elfload.c       |  2 +-
+ linux-user/mips/cpu_loop.c |  2 +-
+ linux-user/mmap.c          | 60 +++++++++++++++++++++++++-------------
+ linux-user/ppc/cpu_loop.c  |  2 +-
+ linux-user/syscall.c       |  4 +--
+ target/arm/sve_helper.c    | 10 ++-----
+ target/xtensa/op_helper.c  |  2 +-
+ 12 files changed, 76 insertions(+), 48 deletions(-)
 
-Status in QEMU:
-  New
-
-Bug description:
-  An image created by qemu-img create, then modified by another program
-  is converted to bad/corrupt image when using convert sub command on
-  Mac OSX. The same convert works on Linux. The version of qemu-img is
-  2.12.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1776920/+subscriptions
+-- 
+2.17.1
