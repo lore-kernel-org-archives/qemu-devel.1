@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40273)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fW2MN-0003mE-FT
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:23:00 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fW2Oe-00054P-9j
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:25:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fW2MJ-0007GO-FY
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:22:59 -0400
-References: <20180424101859.10239-1-david@redhat.com>
-	<7c046e3c-8752-87c5-f4ff-06ef56ef0128@de.ibm.com>
-	<3eb09b9c-bd1f-e84b-2cda-7e6693f8eb01@redhat.com>
-	<742beb4d-b9c1-b5cf-d15f-e1a6998fc2c7@de.ibm.com>
-	<6e288342-9a4a-7377-013c-d2962676cc90@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <75a3668e-aaa9-3b87-b723-66fdaabcc20e@redhat.com>
-Date: Thu, 21 Jun 2018 18:22:52 +0200
+	(envelope-from <borntraeger@de.ibm.com>) id 1fW2Oa-0008J3-BQ
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:25:20 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33272)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fW2Oa-0008Ic-2v
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:25:16 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5LGNggq109958
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 12:25:15 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jrdd6p66j-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 12:25:14 -0400
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 21 Jun 2018 17:25:12 +0100
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 21 Jun 2018 18:25:06 +0200
+Message-Id: <20180621162506.94416-1-borntraeger@de.ibm.com>
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 MIME-Version: 1.0
-In-Reply-To: <6e288342-9a4a-7377-013c-d2962676cc90@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1] s390x: refactor
- reset/reipl handling
+Subject: [Qemu-devel] [PATCH 1/1] s390/ipl: fix ipl with -no-reboot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +38,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-On 21.06.2018 18:21, Christian Borntraeger wrote:
-> 
-> 
-> On 06/21/2018 06:20 PM, Christian Borntraeger wrote:
->>
->>
->> On 06/21/2018 06:15 PM, David Hildenbrand wrote:
->>> On 21.06.2018 17:49, Christian Borntraeger wrote:
->>>>
->>>>
->>>> On 04/24/2018 12:18 PM, David Hildenbrand wrote:
->>>>> Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
->>>>> not be the best idea. As pause_all_vcpus() temporarily drops the qemu
->>>>> mutex, two parallel calls to pause_all_vcpus() can be active at a time,
->>>>> resulting in a deadlock. (either by two VCPUs or by the main thread and a
->>>>> VCPU)
->>>>>
->>>>> Let's handle it via the main loop instead, as suggested by Paolo. If we
->>>>> would have two parallel reset requests by two different VCPUs at the
->>>>> same time, the last one would win.
->>>>>
->>>>> We use the existing ipl device to handle it. The nice side effect is
->>>>> that we can get rid of reipl_requested.
->>>>>
->>>>> This change implies that all reset handling now goes via the common
->>>>> path, so "no-reboot" handling is now active for all kinds of reboots.
->>>>
->>>> Ok, this breaks the s390 IPL process when -no-reboot  is specified.
->>>> The bios does a diagnose 308 subcode 1 to jump to the final image while
->>>> at the same time resetting all devices. This is now blocked with -no-reboot
->>>> (although it is actually the boot)
->>>>
->>>>
->>>> I have noticed that with virt-install on iso images since virt-install
->>>> specifies -no-reboot.
->>>>
->>>> Something like this seems to help but it is not a nice solution.
->>>>
->>>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
->>>> index 0d67349004..7b32698eaa 100644
->>>> --- a/hw/s390x/ipl.c
->>>> +++ b/hw/s390x/ipl.c
->>>> @@ -534,8 +534,14 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
->>>>               */
->>>>              ipl->iplb_valid = s390_gen_initial_iplb(ipl);
->>>>          }
->>>> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->>>> +    } else  if (reset_type == S390_RESET_MODIFIED_CLEAR ||
->>>> +                reset_type == S390_RESET_LOAD_NORMAL) {
->>>> +	/* ignore -no-reboot */
->>>> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET_FORCE);
->>>> +    } else {
->>>> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->>>>      }
->>>> -    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->>>>      /* as this is triggered by a CPU, make sure to exit the loop */
->>>>      if (tcg_enabled()) {
->>>>          cpu_loop_exit(cs);
->>>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
->>>> index e893f72f3b..e9b11fd6cb 100644
->>>> --- a/include/sysemu/sysemu.h
->>>> +++ b/include/sysemu/sysemu.h
->>>> @@ -44,6 +44,9 @@ typedef enum ShutdownCause {
->>>>                                       turns that into a shutdown */
->>>>      SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
->>>>                                       that into a shutdown */
->>>> +    SHUTDOWN_CAUSE_GUEST_RESET_FORCE,/* Guest reset that should ignore --no-reboot
->>>> +                                     useful for the subsystem resets on s390 done
->>>> +                                     for kdump and kexec */
->>>>      SHUTDOWN_CAUSE__MAX,
->>>>  } ShutdownCause;
->>>>  
->>>> diff --git a/vl.c b/vl.c
->>>> index b3426e03d0..18f379e833 100644
->>>> --- a/vl.c
->>>> +++ b/vl.c
->>>> @@ -1674,7 +1674,9 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
->>>>  
->>>>  void qemu_system_reset_request(ShutdownCause reason)
->>>>  {
->>>> -    if (no_reboot) {
->>>> +    if (reason == SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
->>>> +	    reset_requested = SHUTDOWN_CAUSE_GUEST_RESET;
->>>
->>> As the value is not use anywhere, you can make this less ugly by not
->>> setting it like this maybe
->>>
->>> if (reason != SHUTDOWN_CAUSE_GUEST_RESET_FORCE && no_reboot)
->>
->> I also change the reason from SHUTDOWN_CAUSE_GUEST_RESET_FORCE back
->> to  SHUTDOWN_CAUSE_GUEST_RESET. I think I have to, so that the handler do not need
->> to be modified. No?
-> 
-> Now I see you point. You say nobody uses the value?
-> 
+kexec/kdump as well as the bootloader use a subcode of diagnose 308
+that is supposed to reset the subsystem but not comprise a full
+"reboot". With the latest refactoring this is now broken when
+-no-reboot is used. This for example break virt-install from
+iso images.
 
-Yes, the only relevant place I see is
+We need to mark these "soft" reboots as ok for rebooting.
 
-shutdown_caused_by_guest()
+Fixes: a30fb811cbe9 (s390x: refactor reset/reipl handling)
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ hw/s390x/ipl.c          | 8 +++++++-
+ include/sysemu/sysemu.h | 3 +++
+ vl.c                    | 2 +-
+ 3 files changed, 11 insertions(+), 2 deletions(-)
 
-and that seems to work just fine with that change.
-
+diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+index 0d67349004..0fab9d2f9d 100644
+--- a/hw/s390x/ipl.c
++++ b/hw/s390x/ipl.c
+@@ -534,8 +534,14 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
+              */
+             ipl->iplb_valid = s390_gen_initial_iplb(ipl);
+         }
++        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++    } else  if (reset_type == S390_RESET_MODIFIED_CLEAR ||
++                reset_type == S390_RESET_LOAD_NORMAL) {
++        /* ignore -no-reboot */
++        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET_FORCE);
++    } else {
++        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+     }
+-    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+     /* as this is triggered by a CPU, make sure to exit the loop */
+     if (tcg_enabled()) {
+         cpu_loop_exit(cs);
+diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+index e893f72f3b..345369d924 100644
+--- a/include/sysemu/sysemu.h
++++ b/include/sysemu/sysemu.h
+@@ -44,6 +44,9 @@ typedef enum ShutdownCause {
+                                      turns that into a shutdown */
+     SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
+                                      that into a shutdown */
++    SHUTDOWN_CAUSE_GUEST_RESET_FORCE,/* Guest reset that should ignore
++                                        --no-reboot. This is useful for reset
++                                        like actions as s390 kexec/kdump */
+     SHUTDOWN_CAUSE__MAX,
+ } ShutdownCause;
+ 
+diff --git a/vl.c b/vl.c
+index b3426e03d0..722c3b9963 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1674,7 +1674,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
+ 
+ void qemu_system_reset_request(ShutdownCause reason)
+ {
+-    if (no_reboot) {
++    if (no_reboot && reason != SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
+         shutdown_requested = reason;
+     } else {
+         reset_requested = reason;
 -- 
-
-Thanks,
-
-David / dhildenb
+2.17.0
