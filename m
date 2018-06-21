@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fVoo4-0004XB-5V
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:41 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fVoo5-0004YX-G9
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fVoo2-0003CZ-Eh
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:40 -0400
-Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:40125)
+	(envelope-from <richard.henderson@linaro.org>) id 1fVoo4-0003DL-9U
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:41 -0400
+Received: from mail-pg0-x22e.google.com ([2607:f8b0:400e:c05::22e]:34589)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fVoo2-0003C3-5W
-	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:38 -0400
-Received: by mail-pg0-x22b.google.com with SMTP id w8-v6so640749pgp.7
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 18:54:37 -0700 (PDT)
+	id 1fVoo4-0003Cz-0x
+	for qemu-devel@nongnu.org; Wed, 20 Jun 2018 21:54:40 -0400
+Received: by mail-pg0-x22e.google.com with SMTP id q4-v6so650289pgr.1
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 18:54:39 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 20 Jun 2018 15:53:41 -1000
-Message-Id: <20180621015359.12018-18-richard.henderson@linaro.org>
+Date: Wed, 20 Jun 2018 15:53:42 -1000
+Message-Id: <20180621015359.12018-19-richard.henderson@linaro.org>
 In-Reply-To: <20180621015359.12018-1-richard.henderson@linaro.org>
 References: <20180621015359.12018-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v5 17/35] target/arm: Implement SVE
- floating-point arithmetic with immediate
+Subject: [Qemu-devel] [PATCH v5 18/35] target/arm: Implement SVE Floating
+ Point Multiply Indexed Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,283 +32,190 @@ Cc: peter.maydell@linaro.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 56 ++++++++++++++++++++++++++++
- target/arm/sve_helper.c    | 69 +++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 75 ++++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      | 14 +++++++
- 4 files changed, 214 insertions(+)
+ target/arm/helper.h        | 14 +++++++++++
+ target/arm/translate-sve.c | 50 ++++++++++++++++++++++++++++++++++++++
+ target/arm/vec_helper.c    | 48 ++++++++++++++++++++++++++++++++++++
+ target/arm/sve.decode      | 19 +++++++++++++++
+ 4 files changed, 131 insertions(+)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 6089b3a53f..087819ec2b 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -809,6 +809,62 @@ DEF_HELPER_FLAGS_6(sve_fmulx_s, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_6(sve_fmulx_d, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_6(sve_fadds_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fadds_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fadds_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fsubs_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fsubs_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fsubs_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fmuls_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmuls_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmuls_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fsubrs_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fsubrs_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fsubrs_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fmaxnms_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmaxnms_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmaxnms_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fminnms_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fminnms_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fminnms_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fmaxs_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmaxs_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmaxs_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+
-+DEF_HELPER_FLAGS_6(sve_fmins_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmins_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+DEF_HELPER_FLAGS_6(sve_fmins_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, i64, ptr, i32)
-+
- DEF_HELPER_FLAGS_5(sve_scvt_hh, TCG_CALL_NO_RWG,
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 879a7229e9..56439ac1e4 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -620,6 +620,20 @@ DEF_HELPER_FLAGS_5(gvec_ftsmul_s, TCG_CALL_NO_RWG,
+ DEF_HELPER_FLAGS_5(gvec_ftsmul_d, TCG_CALL_NO_RWG,
                     void, ptr, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_5(sve_scvt_sh, TCG_CALL_NO_RWG,
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 2fd34d722b..a40df62414 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -2997,6 +2997,75 @@ DO_ZPZZ_FP(sve_fmulx_d, uint64_t,     , helper_vfp_mulxd)
  
- #undef DO_ZPZZ_FP
- 
-+/* Three-operand expander, with one scalar operand, controlled by
-+ * a predicate, with the extra float_status parameter.
-+ */
-+#define DO_ZPZS_FP(NAME, TYPE, H, OP) \
-+void HELPER(NAME)(void *vd, void *vn, void *vg, uint64_t scalar,  \
-+                  void *status, uint32_t desc)                    \
-+{                                                                 \
-+    intptr_t i = simd_oprsz(desc);                                \
-+    uint64_t *g = vg;                                             \
-+    TYPE mm = scalar;                                             \
-+    do {                                                          \
-+        uint64_t pg = g[(i - 1) >> 6];                            \
-+        do {                                                      \
-+            i -= sizeof(TYPE);                                    \
-+            if (likely((pg >> (i & 63)) & 1)) {                   \
-+                TYPE nn = *(TYPE *)(vn + H(i));                   \
-+                *(TYPE *)(vd + H(i)) = OP(nn, mm, status);        \
-+            }                                                     \
-+        } while (i & 63);                                         \
-+    } while (i != 0);                                             \
-+}
++DEF_HELPER_FLAGS_5(gvec_fmul_idx_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(gvec_fmul_idx_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(gvec_fmul_idx_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, i32)
 +
-+DO_ZPZS_FP(sve_fadds_h, float16, H1_2, float16_add)
-+DO_ZPZS_FP(sve_fadds_s, float32, H1_4, float32_add)
-+DO_ZPZS_FP(sve_fadds_d, float64,     , float64_add)
++DEF_HELPER_FLAGS_6(gvec_fmla_idx_h, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(gvec_fmla_idx_s, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_6(gvec_fmla_idx_d, TCG_CALL_NO_RWG,
++                   void, ptr, ptr, ptr, ptr, ptr, i32)
 +
-+DO_ZPZS_FP(sve_fsubs_h, float16, H1_2, float16_sub)
-+DO_ZPZS_FP(sve_fsubs_s, float32, H1_4, float32_sub)
-+DO_ZPZS_FP(sve_fsubs_d, float64,     , float64_sub)
-+
-+DO_ZPZS_FP(sve_fmuls_h, float16, H1_2, float16_mul)
-+DO_ZPZS_FP(sve_fmuls_s, float32, H1_4, float32_mul)
-+DO_ZPZS_FP(sve_fmuls_d, float64,     , float64_mul)
-+
-+static inline float16 subr_h(float16 a, float16 b, float_status *s)
-+{
-+    return float16_sub(b, a, s);
-+}
-+
-+static inline float32 subr_s(float32 a, float32 b, float_status *s)
-+{
-+    return float32_sub(b, a, s);
-+}
-+
-+static inline float64 subr_d(float64 a, float64 b, float_status *s)
-+{
-+    return float64_sub(b, a, s);
-+}
-+
-+DO_ZPZS_FP(sve_fsubrs_h, float16, H1_2, subr_h)
-+DO_ZPZS_FP(sve_fsubrs_s, float32, H1_4, subr_s)
-+DO_ZPZS_FP(sve_fsubrs_d, float64,     , subr_d)
-+
-+DO_ZPZS_FP(sve_fmaxnms_h, float16, H1_2, float16_maxnum)
-+DO_ZPZS_FP(sve_fmaxnms_s, float32, H1_4, float32_maxnum)
-+DO_ZPZS_FP(sve_fmaxnms_d, float64,     , float64_maxnum)
-+
-+DO_ZPZS_FP(sve_fminnms_h, float16, H1_2, float16_minnum)
-+DO_ZPZS_FP(sve_fminnms_s, float32, H1_4, float32_minnum)
-+DO_ZPZS_FP(sve_fminnms_d, float64,     , float64_minnum)
-+
-+DO_ZPZS_FP(sve_fmaxs_h, float16, H1_2, float16_max)
-+DO_ZPZS_FP(sve_fmaxs_s, float32, H1_4, float32_max)
-+DO_ZPZS_FP(sve_fmaxs_d, float64,     , float64_max)
-+
-+DO_ZPZS_FP(sve_fmins_h, float16, H1_2, float16_min)
-+DO_ZPZS_FP(sve_fmins_s, float32, H1_4, float32_min)
-+DO_ZPZS_FP(sve_fmins_d, float64,     , float64_min)
-+
- /* Fully general two-operand expander, controlled by a predicate,
-  * With the extra float_status parameter.
-  */
+ #ifdef TARGET_AARCH64
+ #include "helper-a64.h"
+ #include "helper-sve.h"
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index a68126b369..12cfadf4e9 100644
+index 12cfadf4e9..e4ba84cadd 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -32,6 +32,7 @@
- #include "exec/log.h"
- #include "trace-tcg.h"
- #include "translate-a64.h"
-+#include "fpu/softfloat.h"
+@@ -3400,6 +3400,56 @@ DO_ZZI(UMIN, umin)
  
+ #undef DO_ZZI
  
- typedef void GVecGen2sFn(unsigned, uint32_t, uint32_t,
-@@ -3533,6 +3534,80 @@ DO_FP3(FMULX, fmulx)
- 
- #undef DO_FP3
- 
-+typedef void gen_helper_sve_fp2scalar(TCGv_ptr, TCGv_ptr, TCGv_ptr,
-+                                      TCGv_i64, TCGv_ptr, TCGv_i32);
++/*
++ *** SVE Floating Point Multiply-Add Indexed Group
++ */
 +
-+static void do_fp_scalar(DisasContext *s, int zd, int zn, int pg, bool is_fp16,
-+                         TCGv_i64 scalar, gen_helper_sve_fp2scalar *fn)
++static bool trans_FMLA_zzxz(DisasContext *s, arg_FMLA_zzxz *a, uint32_t insn)
 +{
-+    unsigned vsz = vec_full_reg_size(s);
-+    TCGv_ptr t_zd, t_zn, t_pg, status;
-+    TCGv_i32 desc;
++    static gen_helper_gvec_4_ptr * const fns[3] = {
++        gen_helper_gvec_fmla_idx_h,
++        gen_helper_gvec_fmla_idx_s,
++        gen_helper_gvec_fmla_idx_d,
++    };
 +
-+    t_zd = tcg_temp_new_ptr();
-+    t_zn = tcg_temp_new_ptr();
-+    t_pg = tcg_temp_new_ptr();
-+    tcg_gen_addi_ptr(t_zd, cpu_env, vec_full_reg_offset(s, zd));
-+    tcg_gen_addi_ptr(t_zn, cpu_env, vec_full_reg_offset(s, zn));
-+    tcg_gen_addi_ptr(t_pg, cpu_env, pred_full_reg_offset(s, pg));
-+
-+    status = get_fpstatus_ptr(is_fp16);
-+    desc = tcg_const_i32(simd_desc(vsz, vsz, 0));
-+    fn(t_zd, t_zn, t_pg, scalar, status, desc);
-+
-+    tcg_temp_free_i32(desc);
-+    tcg_temp_free_ptr(status);
-+    tcg_temp_free_ptr(t_pg);
-+    tcg_temp_free_ptr(t_zn);
-+    tcg_temp_free_ptr(t_zd);
++    if (sve_access_check(s)) {
++        unsigned vsz = vec_full_reg_size(s);
++        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
++        tcg_gen_gvec_4_ptr(vec_full_reg_offset(s, a->rd),
++                           vec_full_reg_offset(s, a->rn),
++                           vec_full_reg_offset(s, a->rm),
++                           vec_full_reg_offset(s, a->ra),
++                           status, vsz, vsz, a->index * 2 + a->sub,
++                           fns[a->esz - 1]);
++        tcg_temp_free_ptr(status);
++    }
++    return true;
 +}
 +
-+static void do_fp_imm(DisasContext *s, arg_rpri_esz *a, uint64_t imm,
-+                      gen_helper_sve_fp2scalar *fn)
++/*
++ *** SVE Floating Point Multiply Indexed Group
++ */
++
++static bool trans_FMUL_zzx(DisasContext *s, arg_FMUL_zzx *a, uint32_t insn)
 +{
-+    TCGv_i64 temp = tcg_const_i64(imm);
-+    do_fp_scalar(s, a->rd, a->rn, a->pg, a->esz == MO_16, temp, fn);
-+    tcg_temp_free_i64(temp);
++    static gen_helper_gvec_3_ptr * const fns[3] = {
++        gen_helper_gvec_fmul_idx_h,
++        gen_helper_gvec_fmul_idx_s,
++        gen_helper_gvec_fmul_idx_d,
++    };
++
++    if (sve_access_check(s)) {
++        unsigned vsz = vec_full_reg_size(s);
++        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
++        tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, a->rd),
++                           vec_full_reg_offset(s, a->rn),
++                           vec_full_reg_offset(s, a->rm),
++                           status, vsz, vsz, a->index, fns[a->esz - 1]);
++        tcg_temp_free_ptr(status);
++    }
++    return true;
 +}
 +
-+#define DO_FP_IMM(NAME, name, const0, const1) \
-+static bool trans_##NAME##_zpzi(DisasContext *s, arg_rpri_esz *a,         \
-+                                uint32_t insn)                            \
-+{                                                                         \
-+    static gen_helper_sve_fp2scalar * const fns[3] = {                    \
-+        gen_helper_sve_##name##_h,                                        \
-+        gen_helper_sve_##name##_s,                                        \
-+        gen_helper_sve_##name##_d                                         \
-+    };                                                                    \
-+    static uint64_t const val[3][2] = {                                   \
-+        { float16_##const0, float16_##const1 },                           \
-+        { float32_##const0, float32_##const1 },                           \
-+        { float64_##const0, float64_##const1 },                           \
-+    };                                                                    \
-+    if (a->esz == 0) {                                                    \
-+        return false;                                                     \
-+    }                                                                     \
-+    if (sve_access_check(s)) {                                            \
-+        do_fp_imm(s, a, val[a->esz - 1][a->imm], fns[a->esz - 1]);        \
-+    }                                                                     \
-+    return true;                                                          \
+ /*
+  *** SVE Floating Point Accumulating Reduction Group
+  */
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index f504dd53c8..97af75a61b 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -495,3 +495,51 @@ DO_3OP(gvec_rsqrts_d, helper_rsqrtsf_f64, float64)
+ 
+ #endif
+ #undef DO_3OP
++
++/* For the indexed ops, SVE applies the index per 128-bit vector segment.
++ * For AdvSIMD, there is of course only one such vector segment.
++ */
++
++#define DO_MUL_IDX(NAME, TYPE, H) \
++void HELPER(NAME)(void *vd, void *vn, void *vm, void *stat, uint32_t desc) \
++{                                                                          \
++    intptr_t i, j, oprsz = simd_oprsz(desc), segment = 16 / sizeof(TYPE);  \
++    intptr_t idx = simd_data(desc);                                        \
++    TYPE *d = vd, *n = vn, *m = vm;                                        \
++    for (i = 0; i < oprsz / sizeof(TYPE); i += segment) {                  \
++        TYPE mm = m[H(i + idx)];                                           \
++        for (j = 0; j < segment; j++) {                                    \
++            d[i + j] = TYPE##_mul(n[i + j], mm, stat);                     \
++        }                                                                  \
++    }                                                                      \
 +}
 +
-+#define float16_two  make_float16(0x4000)
-+#define float32_two  make_float32(0x40000000)
-+#define float64_two  make_float64(0x4000000000000000ULL)
++DO_MUL_IDX(gvec_fmul_idx_h, float16, H2)
++DO_MUL_IDX(gvec_fmul_idx_s, float32, H4)
++DO_MUL_IDX(gvec_fmul_idx_d, float64, )
 +
-+DO_FP_IMM(FADD, fadds, half, one)
-+DO_FP_IMM(FSUB, fsubs, half, one)
-+DO_FP_IMM(FMUL, fmuls, half, two)
-+DO_FP_IMM(FSUBR, fsubrs, half, one)
-+DO_FP_IMM(FMAXNM, fmaxnms, zero, one)
-+DO_FP_IMM(FMINNM, fminnms, zero, one)
-+DO_FP_IMM(FMAX, fmaxs, zero, one)
-+DO_FP_IMM(FMIN, fmins, zero, one)
++#undef DO_MUL_IDX
 +
-+#undef DO_FP_IMM
++#define DO_FMLA_IDX(NAME, TYPE, H)                                         \
++void HELPER(NAME)(void *vd, void *vn, void *vm, void *va,                  \
++                  void *stat, uint32_t desc)                               \
++{                                                                          \
++    intptr_t i, j, oprsz = simd_oprsz(desc), segment = 16 / sizeof(TYPE);  \
++    TYPE op1_neg = extract32(desc, SIMD_DATA_SHIFT, 1);                    \
++    intptr_t idx = desc >> (SIMD_DATA_SHIFT + 1);                          \
++    TYPE *d = vd, *n = vn, *m = vm, *a = va;                               \
++    op1_neg <<= (8 * sizeof(TYPE) - 1);                                    \
++    for (i = 0; i < oprsz / sizeof(TYPE); i += segment) {                  \
++        TYPE mm = m[H(i + idx)];                                           \
++        for (j = 0; j < segment; j++) {                                    \
++            d[i + j] = TYPE##_muladd(n[i + j] ^ op1_neg,                   \
++                                     mm, a[i + j], 0, stat);               \
++        }                                                                  \
++    }                                                                      \
++}
 +
- static bool do_fp_cmp(DisasContext *s, arg_rprr_esz *a,
-                       gen_helper_gvec_4_ptr *fn)
- {
++DO_FMLA_IDX(gvec_fmla_idx_h, float16, H2)
++DO_FMLA_IDX(gvec_fmla_idx_s, float32, H4)
++DO_FMLA_IDX(gvec_fmla_idx_d, float64, )
++
++#undef DO_FMLA_IDX
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 6f4a36422d..0068e415ac 100644
+index 0068e415ac..f64e74fa9d 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -160,6 +160,10 @@
- @rdn_pg4        ........ esz:2 .. pg:4 ... ........ rd:5 \
-                 &rpri_esz rn=%reg_movprfx
+@@ -29,6 +29,7 @@
+ %imm9_16_10     16:s6 10:3
+ %size_23        23:2
+ %dtype_23_13    23:2 13:2
++%index3_22_19   22:1 19:2
  
-+# Two register operand, one one-bit floating-point operand.
-+@rdn_i1         ........ esz:2 ......... pg:3 .... imm:1 rd:5 \
-+                &rpri_esz rn=%reg_movprfx
+ # A combination of tsz:imm3 -- extract esize.
+ %tszimm_esz     22:2 5:5 !function=tszimm_esz
+@@ -712,6 +713,24 @@ UMIN_zzi        00100101 .. 101 011 110 ........ .....          @rdn_i8u
+ # SVE integer multiply immediate (unpredicated)
+ MUL_zzi         00100101 .. 110 000 110 ........ .....          @rdn_i8s
+ 
++### SVE FP Multiply-Add Indexed Group
 +
- # Two register operand, one encoded bitmask.
- @rdn_dbm        ........ .. .... dbm:13 rd:5 \
-                 &rr_dbm rn=%reg_movprfx
-@@ -740,6 +744,16 @@ FMULX           01100101 .. 00 1010 100 ... ..... .....    @rdn_pg_rm
- FDIV            01100101 .. 00 1100 100 ... ..... .....    @rdm_pg_rn # FDIVR
- FDIV            01100101 .. 00 1101 100 ... ..... .....    @rdn_pg_rm
- 
-+# SVE floating-point arithmetic with immediate (predicated)
-+FADD_zpzi       01100101 .. 011 000 100 ... 0000 . .....        @rdn_i1
-+FSUB_zpzi       01100101 .. 011 001 100 ... 0000 . .....        @rdn_i1
-+FMUL_zpzi       01100101 .. 011 010 100 ... 0000 . .....        @rdn_i1
-+FSUBR_zpzi      01100101 .. 011 011 100 ... 0000 . .....        @rdn_i1
-+FMAXNM_zpzi     01100101 .. 011 100 100 ... 0000 . .....        @rdn_i1
-+FMINNM_zpzi     01100101 .. 011 101 100 ... 0000 . .....        @rdn_i1
-+FMAX_zpzi       01100101 .. 011 110 100 ... 0000 . .....        @rdn_i1
-+FMIN_zpzi       01100101 .. 011 111 100 ... 0000 . .....        @rdn_i1
++# SVE floating-point multiply-add (indexed)
++FMLA_zzxz       01100100 0.1 .. rm:3 00000 sub:1 rn:5 rd:5 \
++                ra=%reg_movprfx index=%index3_22_19 esz=1
++FMLA_zzxz       01100100 101 index:2 rm:3 00000 sub:1 rn:5 rd:5 \
++                ra=%reg_movprfx esz=2
++FMLA_zzxz       01100100 111 index:1 rm:4 00000 sub:1 rn:5 rd:5 \
++                ra=%reg_movprfx esz=3
 +
- ### SVE FP Multiply-Add Group
++### SVE FP Multiply Indexed Group
++
++# SVE floating-point multiply (indexed)
++FMUL_zzx        01100100 0.1 .. rm:3 001000 rn:5 rd:5 \
++                index=%index3_22_19 esz=1
++FMUL_zzx        01100100 101 index:2 rm:3 001000 rn:5 rd:5      esz=2
++FMUL_zzx        01100100 111 index:1 rm:4 001000 rn:5 rd:5      esz=3
++
+ ### SVE FP Accumulating Reduction Group
  
- # SVE floating-point multiply-accumulate writing addend
+ # SVE floating-point serial reduction (predicated)
 -- 
 2.17.1
