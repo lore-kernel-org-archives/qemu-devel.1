@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fVydm-0006Oj-5G
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:24:43 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fVyfv-0007mr-Hy
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:26:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fVydj-0008Gz-0j
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:24:42 -0400
-Received: from 15.mo1.mail-out.ovh.net ([188.165.38.232]:43934)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fVydi-0008Dn-Ov
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:24:38 -0400
-Received: from player789.ha.ovh.net (unknown [10.109.108.97])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 5D9E410A1EF
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 14:24:29 +0200 (CEST)
-Date: Thu, 21 Jun 2018 14:24:19 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180621142419.5c6d2ce2@bahia.lan>
-In-Reply-To: <20180618063606.2513-9-david@gibson.dropbear.id.au>
-References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
-	<20180618063606.2513-9-david@gibson.dropbear.id.au>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fVyfp-00022w-5Q
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:26:55 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35813)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fVyfo-00022g-Vu
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:26:49 -0400
+Received: by mail-qt0-x243.google.com with SMTP id z6-v6so2612765qti.2
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 05:26:48 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Thu, 21 Jun 2018 09:26:37 -0300
+Message-Id: <20180621122638.12113-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 8/9] spapr: Limit available pagesizes to
- provide a consistent guest environment
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH] travis: Test out-of-tree builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,79 +31,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: abologna@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-On Mon, 18 Jun 2018 16:36:05 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Force one config to build 'out-of-tree' (object files and executables
+are created in a tree outside the project source code).
 
-> KVM HV has some limitations (deriving from the hardware) that mean not all
-> host-cpu supported pagesizes may be usable in the guest.  At present this
-> means that KVM guests and TCG guests may see different available page sizes
-> even if they notionally have the same vcpu model.  This is confusing and
-> also prevents migration between TCG and KVM.
-> 
-> This patch makes the environment consistent by always allowing the same set
-> of pagesizes.  Since we can't remove the KVM limitations, we do this by
-> always applying the same limitations it has, even to TCG guests.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/spapr_caps.c | 33 +++++++++++++++++++++++++++++++++
->  1 file changed, 33 insertions(+)
-> 
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 9fc739b3f5..0584c7c6ab 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -334,6 +334,38 @@ static void cap_hpt_maxpagesize_apply(sPAPRMachineState *spapr,
->      spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
->  }
->  
-> +static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift, uint32_t pshift)
-> +{
-> +    unsigned maxshift = *((unsigned *)opaque);
-> +
-> +    assert(pshift >= seg_pshift);
-> +
-> +    /* Don't allow the guest to use pages bigger than the configured
-> +     * maximum size */
-> +    if (pshift > maxshift) {
-> +        return false;
-> +    }
-> +
-> +    /* For whatever reason, KVM doesn't allow multiple pagesizes
-> +     * within a segment, *except* for the case of 16M pages in a 4k or
-> +     * 64k segment.  Always exclude other cases, so that TCG and KVM
-> +     * guests see a consistent environment */
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+I noticed various out-of-tree issue in the last 2 merge windows.
 
-Unless I'm missing something, I don't see how we could get "other cases"
-with TCG, at least with the current content of ppc_hash64_opts_POWER7.
+Pseudo-randomly picked a build from the matrix which covers system + user.
 
-> +    if ((pshift != seg_pshift) && (pshift != 24)) {
-> +        return false;
-> +    }
-> +
-> +    return true;
-> +}
-> +
-> +static void cap_hpt_maxpagesize_cpu_apply(sPAPRMachineState *spapr,
-> +                                          PowerPCCPU *cpu,
-> +                                          uint8_t val, Error **errp)
-> +{
-> +    unsigned maxshift = val;
-> +
-> +    ppc_hash64_filter_pagesizes(cpu, spapr_pagesize_cb, &maxshift);
-> +}
-> +
->  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
->      [SPAPR_CAP_HTM] = {
->          .name = "htm",
-> @@ -401,6 +433,7 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
->          .set = spapr_cap_set_pagesize,
->          .type = "int",
->          .apply = cap_hpt_maxpagesize_apply,
-> +        .cpu_apply = cap_hpt_maxpagesize_cpu_apply,
->      },
->  };
->  
+ .travis.yml | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/.travis.yml b/.travis.yml
+index fabfe9ec34..02e096f6a9 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -50,6 +50,8 @@ notifications:
+     on_failure: always
+ env:
+   global:
++    - SRC_DIR="."
++    - BUILD_DIR="."
+     - TEST_CMD="make check"
+     - MAKEFLAGS="-j3"
+   matrix:
+@@ -69,11 +71,15 @@ before_install:
+   - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
+   - git submodule update --init --recursive
+ before_script:
+-  - ./configure ${CONFIG} || { cat config.log && exit 1; }
++  - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
++  - ${SRC_DIR}/configure ${CONFIG} || { cat config.log && exit 1; }
+ script:
+   - make ${MAKEFLAGS} && ${TEST_CMD}
+ matrix:
+   include:
++    # Test out-of-tree builds
++    - env: CONFIG="--enable-debug --enable-debug-tcg"
++           BUILD_DIR="out-of-tree/build/dir" SRC_DIR="../../.."
+     # Test with Clang for compile portability (Travis uses clang-5.0)
+     - env: CONFIG="--disable-system"
+       compiler: clang
+-- 
+2.18.0.rc2
