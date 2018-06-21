@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fVwzX-0002ey-9g
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:39:04 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fVxAS-0004ol-0a
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:50:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fVwzV-0001PW-30
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:39:03 -0400
-Resent-Message-Id: <E1fVwzV-0001PW-30@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21032)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fVwzU-0001P2-St
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:39:01 -0400
-In-Reply-To: <20180618063606.2513-1-david@gibson.dropbear.id.au>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152956396753.822.1965875101953228155@d39dc562802a>
+	(envelope-from <pbonzini@redhat.com>) id 1fVxAO-00084j-Ul
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:50:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48454 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fVxAO-00082g-Py
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:50:16 -0400
+References: <20180620110741.gdywesuqbyhjs4hd@sirius.home.kraxel.org>
+	<776e542e-b6e1-ccbb-fb9a-ea7d521cd955@redhat.com>
+	<d1756dd7-a838-6977-0847-3a4bd5c93689@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <79d04e9f-df54-16ac-3c66-09424f515635@redhat.com>
+Date: Thu, 21 Jun 2018 12:50:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 20 Jun 2018 23:52:48 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/9] spapr: Clean up pagesize handling
+In-Reply-To: <d1756dd7-a838-6977-0847-3a4bd5c93689@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] regression: sata cdrom boot broken
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au
-Cc: famz@redhat.com, groug@kaod.org, abologna@redhat.com, aik@ozlabs.ru, qemu-ppc@nongnu.org, clg@kaod.org, qemu-devel@nongnu.org
+To: John Snow <jsnow@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: f4bug@amsat.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjE4MDYzNjA2LjI1MTMtMS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQu
-YXUKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwLzldIHNwYXByOiBDbGVhbiB1cCBwYWdl
-c2l6ZSBoYW5kbGluZwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
-RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
-bGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRo
-bSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJB
-U0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4v
-JHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBz
-aG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChu
-KzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
-IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dp
-dGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAg
-cGF0Y2hldy8yMDE4MDYxODA2MzYwNi4yNTEzLTEtZGF2aWRAZ2lic29uLmRyb3BiZWFyLmlkLmF1
-IC0+IHBhdGNoZXcvMjAxODA2MTgwNjM2MDYuMjUxMy0xLWRhdmlkQGdpYnNvbi5kcm9wYmVhci5p
-ZC5hdQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjBjNjYzODZmYjEgc3BhcHI6IERv
-bid0IHJld3JpdGUgbW11IGNhcGFiaWxpdGllcyBpbiBLVk0gbW9kZQo3ODdhZGRkMzU1IHNwYXBy
-OiBMaW1pdCBhdmFpbGFibGUgcGFnZXNpemVzIHRvIHByb3ZpZGUgYSBjb25zaXN0ZW50IGd1ZXN0
-IGVudmlyb25tZW50CmY2YjQzNjZlMjQgdGFyZ2V0L3BwYzogQWRkIHBwY19oYXNoNjRfZmlsdGVy
-X3BhZ2VzaXplcygpCjE0M2VlNDZlZjAgc3BhcHI6IFVzZSBtYXhpbXVtIHBhZ2Ugc2l6ZSBjYXBh
-YmlsaXR5IHRvIHNpbXBsaWZ5IG1lbW9yeSBiYWNrZW5kIGNoZWNraW5nCjdiYjZlODVlNDQgc3Bh
-cHI6IE1heGltdW0gKEhQVCkgcGFnZXNpemUgcHJvcGVydHkKN2E0M2VkNTljZSB0YXJnZXQvcHBj
-OiBBZGQga3ZtcHBjX2hwdF9uZWVkc19ob3N0X2NvbnRpZ3VvdXNfcGFnZXMoKSBoZWxwZXIKOWJm
-ZjljMTVlMCBzcGFwcjogQWRkIGNwdV9hcHBseSBob29rIHRvIGNhcGFiaWxpdGllcwo0YzljNzli
-OTY3IHNwYXByOiBDb21wdXRlIGVmZmVjdGl2ZSBjYXBhYmlsaXR5IHZhbHVlcyBlYXJsaWVyCjEz
-MjFhYjQyM2IgdGFyZ2V0L3BwYzogQWxsb3cgY3B1IGNvbXBhdGlibGl0eSBjaGVja3MgYmFzZWQg
-b24gdHlwZSwgbm90IGluc3RhbmNlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
-SCAxLzk6IHRhcmdldC9wcGM6IEFsbG93IGNwdSBjb21wYXRpYmxpdHkgY2hlY2tzIGJhc2VkIG9u
-IHR5cGUsIG5vdCBpbnN0YW5jZS4uLgpDaGVja2luZyBQQVRDSCAyLzk6IHNwYXByOiBDb21wdXRl
-IGVmZmVjdGl2ZSBjYXBhYmlsaXR5IHZhbHVlcyBlYXJsaWVyLi4uCkNoZWNraW5nIFBBVENIIDMv
-OTogc3BhcHI6IEFkZCBjcHVfYXBwbHkgaG9vayB0byBjYXBhYmlsaXRpZXMuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNC85OiB0YXJnZXQvcHBjOiBBZGQga3ZtcHBjX2hwdF9uZWVkc19ob3N0X2NvbnRpZ3Vv
-dXNfcGFnZXMoKSBoZWxwZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggNS85OiBzcGFwcjogTWF4aW11bSAo
-SFBUKSBwYWdlc2l6ZSBwcm9wZXJ0eS4uLgpDaGVja2luZyBQQVRDSCA2Lzk6IHNwYXByOiBVc2Ug
-bWF4aW11bSBwYWdlIHNpemUgY2FwYWJpbGl0eSB0byBzaW1wbGlmeSBtZW1vcnkgYmFja2VuZCBj
-aGVja2luZy4uLgpDaGVja2luZyBQQVRDSCA3Lzk6IHRhcmdldC9wcGM6IEFkZCBwcGNfaGFzaDY0
-X2ZpbHRlcl9wYWdlc2l6ZXMoKS4uLgpDaGVja2luZyBQQVRDSCA4Lzk6IHNwYXByOiBMaW1pdCBh
-dmFpbGFibGUgcGFnZXNpemVzIHRvIHByb3ZpZGUgYSBjb25zaXN0ZW50IGd1ZXN0IGVudmlyb25t
-ZW50Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyODogRklMRTogaHcvcHBj
-L3NwYXByX2NhcHMuYzozMzc6CitzdGF0aWMgYm9vbCBzcGFwcl9wYWdlc2l6ZV9jYih2b2lkICpv
-cGFxdWUsIHVpbnQzMl90IHNlZ19wc2hpZnQsIHVpbnQzMl90IHBzaGlmdCkKCnRvdGFsOiAwIGVy
-cm9ycywgMSB3YXJuaW5ncywgNDUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA5Lzk6IHNwYXByOiBEb24ndCByZXdyaXRl
-IG1tdSBjYXBhYmlsaXRpZXMgaW4gS1ZNIG1vZGUuLi4KRVJST1I6IEVycm9yIG1lc3NhZ2VzIHNo
-b3VsZCBub3QgY29udGFpbiBuZXdsaW5lcwojMjEyOiBGSUxFOiB0YXJnZXQvcHBjL2t2bS5jOjUw
-NToKKyJLVk0gY2FuJ3Qgc3VwcGx5IDY0a2lCIENJIHBhZ2VzLCB3aGljaCBndWVzdCBleHBlY3Rz
-XG4iKTsKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjAxIGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoK
-VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
-IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 20/06/2018 22:28, John Snow wrote:
+>=20
+> ...Oh. So the PIO Setup FIS ... gets generated before the data is sent,
+> but we don't copy it to the HBA memory buffers and notify the client
+> until afterwards, but this is per-DRQ, I think, and not per-IDE command=
+.
+
+No, the copy happens before: "When a PIO setup FIS arrives from the
+device, the HBA copies it to the PSFIS area of this structure".
+
+However, the interrupt happens after the data is received too (and
+whether it happens is decided per-FIS, i.e. per-DRQ).
+
+>> Putting things together, there are two bugs in QEMU;
+>>
+>> - the PIO Setup interrupt must be generated at the end of data transfe=
+r
+>>
+> Oops.
+>=20
+>> - the PIO Setup interrupt must not be generated for the ATAPI command
+>> transfer
+>>
+> Oops again. I ought to have stopped you but I was long aware that the
+> PIO Setup FIS ought to be generated "before" the transfer. I suppose
+> what we were doing was more correct, though.
+
+Not really, it's half and half and in fact the second of these two bugs
+was very much preexisting.
+
+Certainly it was wrong to generate the interrupt after the callback was
+invoked, i.e. per command rather than per-DRQ.  This was the important
+part of the original patch series because it is what made the recursion
+not a tail recursion.
+
+It's really hard to review this stuff since you have to find all the
+tidbits across the AHCI and SATA (and sometimes ATA command set) specs.
+If anything the blame goes to both of us for not testing the CD-ROM boot
+case, rather than to you for missing it during the code review!
+
+And on the bright side, it's still a win:
+
+- it's possible to fix the bug without jeopardizing the whole READ CD ser=
+ies
+
+- we've learnt more of the interactions between the AHCI and SATA specs
+
+- the bug was discovered quickly enough
+
+Paolo
