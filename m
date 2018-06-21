@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fW1vr-00035E-QY
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:55:37 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fW1zk-0004WC-4h
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:59:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fW1vo-0006Mv-MK
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:55:35 -0400
-References: <f9a9b5bb-4941-a6b3-ff6b-02ab2cb046df@virtuozzo.com>
-	<20180614104656.GD8564@localhost.localdomain>
-	<8114a2a4-8bd1-809e-44c2-f3c8fb52b773@virtuozzo.com>
-	<20180621142500.GJ5024@localhost.localdomain>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fW1zh-0000Dw-1C
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:59:36 -0400
+References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
+	<20180609151758.17343-7-vsementsov@virtuozzo.com>
+	<be6cae77-ed51-320f-8a86-fda7865c84b0@redhat.com>
+	<4f1dd453-77a4-f45f-f2c9-15d42e95d429@virtuozzo.com>
+	<5b4d2ffa-3489-6a93-0352-dbce9221519d@redhat.com>
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <14e2ebb9-8d4f-3079-83f0-a4b6bd60e9d6@virtuozzo.com>
-Date: Thu, 21 Jun 2018 18:55:25 +0300
+Message-ID: <43ed9c89-4730-d333-51ff-2befd03d5462@virtuozzo.com>
+Date: Thu, 21 Jun 2018 18:59:25 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180621142500.GJ5024@localhost.localdomain>
+In-Reply-To: <5b4d2ffa-3489-6a93-0352-dbce9221519d@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Subject: Re: [Qemu-devel] bug in reopen arch
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 6/6] docs/interop: add
+ nbd.txt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,107 +28,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, armbru@redhat.com, mreitz@redhat.com
 
-21.06.2018 17:25, Kevin Wolf wrote:
-> Am 15.06.2018 um 20:42 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> 14.06.2018 13:46, Kevin Wolf wrote:
->>> Am 12.06.2018 um 20:57 hat Vladimir Sementsov-Ogievskiy geschrieben:
->>>> Hi all!
->>>>
->>>> I've faced the following problem:
->>>>
->>>>   =C2=A0=C2=A0=C2=A0 1. create image with dirty bitmap, a.qcow2 (start=
- qemu and run qmp
->>>>   =C2=A0=C2=A0=C2=A0 command block-dirty-bitmap-add)
->>>>
->>>>   =C2=A0=C2=A0=C2=A0 2. run the following commands:
->>>>
->>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu-img create -f qcow2 =
--b a.qcow2 b.qcow2 10M
->>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu-io -c 'write 0 512' =
-b.qcow2
->>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu-img commit b.qcow2
->>>>
->>>>   =C2=A0=C2=A0=C2=A0 3. last command fails with the following output:
->>>>
->>>> Formatting 'b.qcow2', fmt=3Dqcow2 size=3D68719476736 backing_file=3Da.=
-qcow2
->>>> cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
->>>> wrote 512/512 bytes at offset 0
->>>> 512 bytes, 1 ops; 0.0953 sec (5.243 KiB/sec and 10.4867 ops/sec)
->>>> qemu-img: #block397: Failed to make dirty bitmaps writable: Can't upda=
-te
->>>> bitmap directory: Operation not permitted
->>>> qemu-img: Block job failed: Operation not permitted
->>>>
->>>> And problem is that children are reopened _after_ parent. But qcow2 re=
-open
->>>> needs write access to its file, to write IN_USE flag to dirty-bitmaps
->>>> extension.
->>> I was aware of a different instance of this problem: Assume a qcow2
->>> image with an unknown autoclear flag (so it will be cleared on r/w
->>> open), which is first opened r/o and then reopened r/w. This will fail
->>> because .bdrv_reopen_prepare doesn't have the permissions yet.
->> Hm.. If I understand correctly qcow2_reopen_prepare doesn't deal with
->> autoclear flags, as it doesn't call qcow2_do_open.
-> Hm, right, not sure what I really meant back then when I added it to my
-> to-do list... Maybe I confused reopen and invalidate_cache.
+20.06.2018 23:58, John Snow wrote:
 >
->>> Simply changing the order won't fix this because in the r/w -> r/o, the
->>> driver will legitimately flush its caches in .bdrv_reopen_prepare, and
->>> for this it still needs to be able to write.
+> On 06/20/2018 10:16 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 20.06.2018 14:33, Eric Blake wrote:
+>>> On 06/09/2018 10:17 AM, Vladimir Sementsov-Ogievskiy wrote:
+>>>> Describe new metadata namespace: "qemu".
+>>>>
+>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>> ---
+>>>>  =C2=A0 docs/interop/nbd.txt | 37 ++++++++++++++++++++++++++++++++++++=
++
+>>>>  =C2=A0 MAINTAINERS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0 1 +
+>>>>  =C2=A0 2 files changed, 38 insertions(+)
+>>>>  =C2=A0 create mode 100644 docs/interop/nbd.txt
+>>>>
+>>>> diff --git a/docs/interop/nbd.txt b/docs/interop/nbd.txt
+>>>> new file mode 100644
+>>>> index 0000000000..7366269fc0
+>>>> --- /dev/null
+>>>> +++ b/docs/interop/nbd.txt
+>>>> @@ -0,0 +1,37 @@
+>>>> +Qemu supports NBD protocol, and has internal NBD client (look at
+>>> s/supports/supports the/
 >>>
->>> We may need to have a way for nodes to access both the old and the new
->>> state of their children. I'm not completely sure how to achieve this
->>> best, though.
+>>>> +block/nbd.c), internal NBD server (look at blockdev-nbd.c) as well as
+>>> s/internal/an internal/2
 >>>
->>> When I thought only of permissions, the obvious and simple thing to do
->>> was to just get combined permissions for the old and new state, i.e.
->>> 'old_perm | new_perm' and 'old_shared & new_shared'. But I don't think
->>> this is actually enough when the child node switches between a r/w and
->>> a r/o file descriptor because even though QEMU's permission system woul=
-d
->>> allow the write, you still can't successfully write to a r/o file
->>> descriptor.
+>>>> +external NBD server tool - qemu-nbd.c. The common code is placed in
+>>> s/external/an external/
 >>>
->>> Kevin
->> Maybe we want two .bdrv_reopen_prepare: .bdrv_reopen_prepare_before_chil=
-dren
->> and .bdrv_reopen_prepare_after_children. But to write something in
->> reopen_prepare, we need to move bdrv_set_perm from reopen_commit to
->> .. Is it possible?
-> Getting the permission problems out of the way can be solved by changing
-> permissions twice, like I said above: First to the combined permissions
-> of old and new, and finally to only the new permissions.
+>>>> +nbd/*.
+>>>> +
+>>>> +NBD protocol is specified here:
+>>> s/NBD/The NBD/
+>>>
+>>>> +https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md
+>>>> +
+>>>> +This following paragraphs describe some specific properties of NBD
+>>>> +protocol realization in Qemu.
+>>>> +
+>>>> +
+>>>> +=3D Metadata namespaces =3D
+>>>> +
+>>>> +Qemu supports "base:allocation" metadata context as defined in the NB=
+D
+>>> s/supports/supports the/
+>>>
+>>>> +protocol specification and defines own metadata namespace: "qemu".
+>>> s/own/an additional/
+>>>
+>>>> +
+>>>> +
+>>>> +=3D=3D "qemu" namespace =3D=3D
+>>>> +
+>>>> +For now, the only type of metadata context in the namespace is dirty
+>>>> +bitmap. All available metadata contexts have the following form:
+>>> maybe:
+>>>
+>>> The "qemu" namespace currently contains only one type of context,
+>>> related to exposing the contents of a dirty bitmap alongside the
+>>> associated disk contents.=C2=A0 The available metadata context has the
+>>> following form:
+>> Ok
+>>
+>>>> +
+>>>> +=C2=A0=C2=A0 qemu:dirty-bitmap:<dirty-bitmap-export-name>
+>>>> +
+>>>> +Each dirty-bitmap metadata context defines the only one flag for
+>>>> +extents in reply for NBD_CMD_BLOCK_STATUS:
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 bit 0: NBD_STATE_DIRTY, means that the extent is "=
+dirty"
+>>>> +
+>>>> +For NBD_OPT_LIST_META_CONTEXT the following queries are supported
+>>>> +additionally to "qemu:dirty-bitmap:<dirty-bitmap-export-name>":
+>>> s/additionally/in addition/
+>>>
+>>>> +
+>>>> +* "qemu:" : returns list of all available metadata contexts in the
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 na=
+mespace.
+>>>> +* "qemu:dirty-bitmap:" : returns list of all available dirty-bitmap
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ metadata contexts.
+>>>> diff --git a/MAINTAINERS b/MAINTAINERS
+>>>> index e187b1f18f..887b479440 100644
+>>>> --- a/MAINTAINERS
+>>>> +++ b/MAINTAINERS
+>>>> @@ -1923,6 +1923,7 @@ F: nbd/
+>>>>  =C2=A0 F: include/block/nbd*
+>>>>  =C2=A0 F: qemu-nbd.*
+>>>>  =C2=A0 F: blockdev-nbd.c
+>>>> +F: docs/interop/nbd.txt
+>>>>  =C2=A0 T: git git://repo.or.cz/qemu/ericb.git nbd
+>>>>  =C2=A0 =C2=A0 NFS
+>>>>
+>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>>
+>>> At this point, I think I'll touch up the issues I've spotted and
+>>> submit a pull request, in order to make it easier for me to test my
+>>> libvirt code.
+>>>
+>> Ok, thank you!
+>>
+> ACK; the x- prefixes will help us get everything rolling together much
+> faster and gives us some leeway to change things later as needed.
 >
-> The problem I see with .bdrv_reopen_prepare_after_children is that I
-> don't see how it actually buys you anything: Even if the children
-> already prepared the reopen, any access of the child node still refers
-> to the old file descriptor because the new one only becomes valid with
-> .bdrv_reopen_commit.
+> Vladimir, can you jog our memories and let us know which series still
+> need to hit QEMU for 3.0 for safe persistence/migration et al?
 >
->> Now, I've found the following workaround, what do you think about someth=
-ing
->> like this as a temporary fix:
-> I honestly don't understand why this workaround makes any difference.
+> (Not including any of my own qemu-img patches which I'll get to by freeze=
+.)
 
-with this patch, commit for children will be called earlier than for=20
-parent, so, when reopening bitmaps rw (which is done in commit) bs->file=20
-will be already completely reopened rw, and all works.
+not a trivial question :)
 
-> Shouldn't all .bdrv_reopen_prepare() callbacks still work on the old
-> version of the child node?
+at least, there are the following pending patches:
 
-yes, but problem is with commit.
+migration
+ =C2=A0=C2=A0 [PATCH] migration: invalidate cache before source start
 
->
-> Even if I understood the reason, it looks a bit too hacky probably.
-> Maybe I'll change may opinion once I understand it.
->
-> Kevin
+persistance
+ =C2=A0=C2=A0 [PATCH v2] qcow2: add overlap check for bitmap directory
+ =C2=A0=C2=A0 [PATCH] block/qcow2: fix logic around dirty_bitmaps_loaded
+ =C2=A0=C2=A0 thread "bug in reopen arch", there is no final solution for n=
+ow
+ =C2=A0=C2=A0 also, I need to finally rethink and make a patch to don't hav=
+e any=20
+persistent bitmaps in inactive mode
 
+fleecing
+ =C2=A0=C2=A0 [PATCH] block/fleecing-filter: new filter driver for fleecing=
+ (new=20
+patch, but I remember, I've already started to discuss this..)
 
 --=20
 Best regards,
