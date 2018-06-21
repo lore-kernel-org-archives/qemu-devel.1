@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fVxm0-0002ot-PV
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:29:09 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fVxm0-0002or-N2
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:29:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fVxlz-0008G1-8V
+	(envelope-from <dgibson@ozlabs.org>) id 1fVxlz-0008Fd-2U
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:29:08 -0400
-Date: Thu, 21 Jun 2018 21:06:23 +1000
+Date: Thu, 21 Jun 2018 21:00:47 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180621110623.GI32328@umbus.fritz.box>
+Message-ID: <20180621110047.GG32328@umbus.fritz.box>
 References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
-	<20180618063606.2513-7-david@gibson.dropbear.id.au>
-	<e5ab358f-726a-add0-c2d2-27c157ca1925@kaod.org>
+	<20180618063606.2513-6-david@gibson.dropbear.id.au>
+	<4dd7753b-f0a4-1f79-2acc-9fa037b40860@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="YrQNB5Deg1WGKZi3"
+	protocol="application/pgp-signature"; boundary="rV8arf8D5Dod9UkK"
 Content-Disposition: inline
-In-Reply-To: <e5ab358f-726a-add0-c2d2-27c157ca1925@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH 6/9] spapr: Use maximum page size
- capability to simplify memory backend checking
+In-Reply-To: <4dd7753b-f0a4-1f79-2acc-9fa037b40860@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 5/9] spapr: Maximum (HPT) pagesize property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,156 +29,224 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: groug@kaod.org, abologna@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
 
---YrQNB5Deg1WGKZi3
+--rV8arf8D5Dod9UkK
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 21, 2018 at 08:29:36AM +0200, C=E9dric Le Goater wrote:
+On Thu, Jun 21, 2018 at 08:22:15AM +0200, C=E9dric Le Goater wrote:
 > On 06/18/2018 08:36 AM, David Gibson wrote:
-> > The way we used to handle KVM allowable guest pagesizes for PAPR guests
-> > required some convoluted checking of memory attached to the guest.
+> > The way the POWER Hash Page Table (HPT) MMU is virtualized by KVM HV me=
+ans
+> > that every page that the guest puts in the pagetables must be truly
+> > physically contiguous, not just GPA-contiguous.  In effect this means t=
+hat
+> > an HPT guest can't use any pagesizes greater than the host page size us=
+ed
+> > to back its memory.
 > >=20
-> > The allowable pagesizes advertised to the guest cpus depended on the me=
-mory
-> > which was attached at boot, but then we needed to ensure that any memory
-> > later hotplugged didn't change which pagesizes were allowed.
+> > At present we handle this by changing what we advertise to the guest ba=
+sed
+> > on the backing pagesizes.  This is pretty bad, because it means the gue=
+st
+> > sees a different environment depending on what should be host configura=
+tion
+> > details.
 > >=20
-> > Now that we have an explicit machine option to control the allowable
-> > maximum pagesize we can simplify this.  We just check all memory backen=
-ds
-> > against that declared pagesize.  We check base and cold-plugged memory =
-at
-> > reset time, and hotplugged memory at pre_plug() time.
+> > As a start on fixing this, we add a new capability parameter to the pse=
+ries
+> > machine type which gives the maximum allowed pagesizes for an HPT guest=
+ (as
+> > a shift).  For now we just create and validate the parameter without ma=
+king
+> > it do anything.
 > >=20
+> > For backwards compatibility, on older machine types we set it to the max
+> > available page size for the host.  For the 3.0 machine type, we fix it =
+to
+> > 16, the intention being to only allow HPT pagesizes up to 64kiB by defa=
+ult
+> > in future.
+>=20
+> Why not do it now ?
+
+Uh.. do what now.  Essentially this *is* doing it now, except that we
+don't have the mechanism to actually enforce it until a couple of
+patches further in.
+
+> I don't think the pseries machine supports 4k pages
+> anyway. so you could change the warn_report() below in an error I think.
+
+Uh.. I think pseries does technically still support 4k pages.
+Although it might not have been much tested recently, since none of
+the distros configure it that way.
+
 > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 >=20
-> One minor question below.
->=20
-> Nevertheless,
->=20
 > Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
-
-[snip]
-> > @@ -304,6 +305,23 @@ static void cap_safe_indirect_branch_apply(sPAPRMa=
+>=20
+> C.
+>=20
+> > ---
+> >  hw/ppc/spapr.c         | 12 +++++++++
+> >  hw/ppc/spapr_caps.c    | 56 ++++++++++++++++++++++++++++++++++++++++++
+> >  include/hw/ppc/spapr.h |  4 ++-
+> >  3 files changed, 71 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index 40858d047c..74a76e7e09 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -63,6 +63,7 @@
+> >  #include "hw/virtio/vhost-scsi-common.h"
+> > =20
+> >  #include "exec/address-spaces.h"
+> > +#include "exec/ram_addr.h"
+> >  #include "hw/usb.h"
+> >  #include "qemu/config-file.h"
+> >  #include "qemu/error-report.h"
+> > @@ -4043,6 +4044,7 @@ static void spapr_machine_class_init(ObjectClass =
+*oc, void *data)
+> >      smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
+> >      smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
+> >      smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
+> > +    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /* 64kiB=
+ */
+> >      spapr_caps_add_properties(smc, &error_abort);
+> >  }
+> > =20
+> > @@ -4126,8 +4128,18 @@ static void spapr_machine_2_12_instance_options(=
+MachineState *machine)
+> > =20
+> >  static void spapr_machine_2_12_class_options(MachineClass *mc)
+> >  {
+> > +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
+> > +    uint8_t mps;
+> > +
+> >      spapr_machine_3_0_class_options(mc);
+> >      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
+> > +
+> > +    if (kvmppc_hpt_needs_host_contiguous_pages()) {
+> > +        mps =3D ctz64(qemu_getrampagesize());
+> > +    } else {
+> > +        mps =3D 34; /* allow everything up to 16GiB, i.e. everything */
+> > +    }
+> > +    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D mps;
+> >  }
+> > =20
+> >  DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
+> > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> > index 68a4243efc..6cdc0c94e7 100644
+> > --- a/hw/ppc/spapr_caps.c
+> > +++ b/hw/ppc/spapr_caps.c
+> > @@ -27,6 +27,7 @@
+> >  #include "qapi/visitor.h"
+> >  #include "sysemu/hw_accel.h"
+> >  #include "target/ppc/cpu.h"
+> > +#include "target/ppc/mmu-hash64.h"
+> >  #include "cpu-models.h"
+> >  #include "kvm_ppc.h"
+> > =20
+> > @@ -144,6 +145,42 @@ out:
+> >      g_free(val);
+> >  }
+> > =20
+> > +static void spapr_cap_get_pagesize(Object *obj, Visitor *v, const char=
+ *name,
+> > +                                   void *opaque, Error **errp)
+> > +{
+> > +    sPAPRCapabilityInfo *cap =3D opaque;
+> > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> > +    uint8_t val =3D spapr_get_cap(spapr, cap->index);
+> > +    uint64_t pagesize =3D (1ULL << val);
+> > +
+> > +    visit_type_size(v, name, &pagesize, errp);
+> > +}
+> > +
+> > +static void spapr_cap_set_pagesize(Object *obj, Visitor *v, const char=
+ *name,
+> > +                                   void *opaque, Error **errp)
+> > +{
+> > +    sPAPRCapabilityInfo *cap =3D opaque;
+> > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
+> > +    uint64_t pagesize;
+> > +    uint8_t val;
+> > +    Error *local_err =3D NULL;
+> > +
+> > +    visit_type_size(v, name, &pagesize, &local_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        return;
+> > +    }
+> > +
+> > +    if (!is_power_of_2(pagesize)) {
+> > +        error_setg(errp, "cap-%s must be a power of 2", cap->name);
+> > +        return;
+> > +    }
+> > +
+> > +    val =3D ctz64(pagesize);
+> > +    spapr->cmd_line_caps[cap->index] =3D true;
+> > +    spapr->eff.caps[cap->index] =3D val;
+> > +}
+> > +
+> >  static void cap_htm_apply(sPAPRMachineState *spapr, uint8_t val, Error=
+ **errp)
+> >  {
+> >      if (!val) {
+> > @@ -267,6 +304,16 @@ static void cap_safe_indirect_branch_apply(sPAPRMa=
 chineState *spapr,
 > > =20
 > >  #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
 > > =20
-> > +void spapr_check_pagesize(sPAPRMachineState *spapr, hwaddr pagesize,
-> > +                          Error **errp)
+> > +static void cap_hpt_maxpagesize_apply(sPAPRMachineState *spapr,
+> > +                                      uint8_t val, Error **errp)
 > > +{
-> > +    hwaddr maxpagesize =3D (1ULL << spapr->eff.caps[SPAPR_CAP_HPT_MPS]=
-);
->=20
-> I suppose this is SPAPR_CAP_HPT_MAXPAGESIZE now ?=20
-
-Oops.  I thought I'd compile tested all the intermediate patches,
-which would have caught this, but apparently not.
-
-Fixed now.
-
-> > +
-> > +    if (!kvmppc_hpt_needs_host_contiguous_pages()) {
-> > +        return;
-> > +    }
-> > +
-> > +    if (maxpagesize > pagesize) {
-> > +        error_setg(errp,
-> > +                   "Can't support %"HWADDR_PRIu" kiB guest pages with =
-%"
-> > +                   HWADDR_PRIu" kiB host pages with this KVM implement=
-ation",
-> > +                   maxpagesize >> 10, pagesize >> 10);
+> > +    if (val < 12) {
+> > +        error_setg(errp, "Require at least 4kiB hpt-max-page-size");
+> > +    } else if (val < 16) {
+> > +        warn_report("Many guests require at least 64kiB hpt-max-page-s=
+ize");
 > > +    }
 > > +}
 > > +
-> >  static void cap_hpt_maxpagesize_apply(sPAPRMachineState *spapr,
-> >                                        uint8_t val, Error **errp)
-> >  {
-> > @@ -312,6 +330,8 @@ static void cap_hpt_maxpagesize_apply(sPAPRMachineS=
-tate *spapr,
-> >      } else if (val < 16) {
-> >          warn_report("Many guests require at least 64kiB hpt-max-page-s=
-ize");
-> >      }
-> > +
-> > +    spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
-> >  }
-> > =20
 > >  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
+> >      [SPAPR_CAP_HTM] =3D {
+> >          .name =3D "htm",
+> > @@ -326,6 +373,15 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM=
+] =3D {
+> >          .possible =3D &cap_ibs_possible,
+> >          .apply =3D cap_safe_indirect_branch_apply,
+> >      },
+> > +    [SPAPR_CAP_HPT_MAXPAGESIZE] =3D {
+> > +        .name =3D "hpt-max-page-size",
+> > +        .description =3D "Maximum page size for Hash Page Table guests=
+",
+> > +        .index =3D SPAPR_CAP_HPT_MAXPAGESIZE,
+> > +        .get =3D spapr_cap_get_pagesize,
+> > +        .set =3D spapr_cap_set_pagesize,
+> > +        .type =3D "int",
+> > +        .apply =3D cap_hpt_maxpagesize_apply,
+> > +    },
+> >  };
+> > =20
+> >  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spap=
+r,
 > > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index c97593d032..75e2cf2687 100644
+> > index 9dd46a72f6..c97593d032 100644
 > > --- a/include/hw/ppc/spapr.h
 > > +++ b/include/hw/ppc/spapr.h
-> > @@ -806,4 +806,7 @@ void spapr_caps_cpu_apply(sPAPRMachineState *spapr,=
- PowerPCCPU *cpu);
-> >  void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
-> >  int spapr_caps_post_migration(sPAPRMachineState *spapr);
+> > @@ -66,8 +66,10 @@ typedef enum {
+> >  #define SPAPR_CAP_SBBC                  0x04
+> >  /* Indirect Branch Serialisation */
+> >  #define SPAPR_CAP_IBS                   0x05
+> > +/* HPT Maximum Page Size (encoded as a shift) */
+> > +#define SPAPR_CAP_HPT_MAXPAGESIZE       0x06
+> >  /* Num Caps */
+> > -#define SPAPR_CAP_NUM                   (SPAPR_CAP_IBS + 1)
+> > +#define SPAPR_CAP_NUM                   (SPAPR_CAP_HPT_MAXPAGESIZE + 1)
 > > =20
-> > +void spapr_check_pagesize(sPAPRMachineState *spapr, hwaddr pagesize,
-> > +                          Error **errp);
-> > +
-> >  #endif /* HW_SPAPR_H */
-> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> > index 50b5d01432..9cfbd388ad 100644
-> > --- a/target/ppc/kvm.c
-> > +++ b/target/ppc/kvm.c
-> > @@ -500,26 +500,12 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
-> >          cpu->hash64_opts->flags &=3D ~PPC_HASH64_1TSEG;
-> >      }
-> >  }
-> > -
-> > -bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
-> > -{
-> > -    Object *mem_obj =3D object_resolve_path(obj_path, NULL);
-> > -    long pagesize =3D host_memory_backend_pagesize(MEMORY_BACKEND(mem_=
-obj));
-> > -
-> > -    return pagesize >=3D max_cpu_page_size;
-> > -}
-> > -
-> >  #else /* defined (TARGET_PPC64) */
-> > =20
-> >  static inline void kvm_fixup_page_sizes(PowerPCCPU *cpu)
-> >  {
-> >  }
-> > =20
-> > -bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
-> > -{
-> > -    return true;
-> > -}
-> > -
-> >  #endif /* !defined (TARGET_PPC64) */
-> > =20
-> >  unsigned long kvm_arch_vcpu_id(CPUState *cpu)
-> > diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> > index a7ddb8a5d6..443fca0a4e 100644
-> > --- a/target/ppc/kvm_ppc.h
-> > +++ b/target/ppc/kvm_ppc.h
-> > @@ -71,7 +71,6 @@ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_=
-ulong flags, int shift);
-> >  bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
-> > =20
-> >  bool kvmppc_hpt_needs_host_contiguous_pages(void);
-> > -bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
-> > =20
-> >  #else
-> > =20
-> > @@ -228,11 +227,6 @@ static inline bool kvmppc_hpt_needs_host_contiguou=
-s_pages(void)
-> >      return false;
-> >  }
-> > =20
-> > -static inline bool kvmppc_is_mem_backend_page_size_ok(const char *obj_=
-path)
-> > -{
-> > -    return true;
-> > -}
-> > -
-> >  static inline bool kvmppc_has_cap_spapr_vfio(void)
-> >  {
-> >      return false;
+> >  /*
+> >   * Capability Values
 > >=20
 >=20
 
@@ -189,24 +256,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---YrQNB5Deg1WGKZi3
+--rV8arf8D5Dod9UkK
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsrhq8ACgkQbDjKyiDZ
-s5ImpA//W1C8J9fYcxxbieluSx5kLAYxa0unaSZAr2u4J+Znqx80kRdkzSxWlX2m
-J4WaMuQCunZdUfzKkV98B9KeDCKA+2XkU2K5N+V0RRVQjBcbU1D29h7T073Ya9d9
-Z6GyR/C+YLMI2DuEcL9ESxl9hJU63vHyeI5/li7CVZEQhTXdHFllXhYqHVOILWKv
-LYxNuHOkohosyCu41Qn4AdgDqi7Jo48xyUWdf+KKqWMB6fTvr1G2iG57A7Stni9j
-UmFtFx3JIIoTVo2U/zL5Q3fMPwvN1zYbpxl8EgBH0y9SuKecULZkPTNyHrwGn7Ud
-x/cKnmtfpoTJ5s07TwzqsyymoTzXi0OZl+S97vcZeRVv5IARvJuQamZoXPl5Xiev
-kMLQ4KNomXVsMPSF3v62pOqM2gESmHc/ykHA08w7IyzQuR4GPnUl+z/cPCOvIteg
-5hPiAXJAS9eWYTQ6EAq2fLpB2Ja0iVfTudHwwDCRbZ+YL6QX+Ib2HyRVl4droNs3
-oAqfPkO//1sZL4kDk/TQ4Dfayhp1x7XBs6VM1wamLmfvbullgrrZa6bl3aF1Guuh
-fX7p5j34coni/HHrLpENmcgjEdjd3jpeQPcuVm7dsVKxLa03+aUlhEmaXDWPAwpj
-q+/JQfo4ruuNz5HQZmrIXF1kWju1vEmQ8F5Hz2cd4+H25jx8WmY=
-=LYle
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsrhV0ACgkQbDjKyiDZ
+s5JcMQ/+Kmk7CDYWhF4FBDoJAdSKH42UoFu0n8OLPsXF/LC6uavndWO5VHmWLpKs
+Wno2Vxl6x+8KKDDaC+d5Y1u1bIQUImaQQaDvBGj0SV4Rkvtv7SxLlQEPtH/c6Xlt
+3TrtVkLjDAjSshPT1AWKajRQhBHosd5690KsH6a9dcvG9ZHjCxYxvOI2goJsaQPK
+n6RDfpCzB+TTp6hyitm4CYvbFu+8hkc8/p/jaUYRzdbQn3No3lR15gQnj2Pqj5u4
+9reuYOU9VYJZCNHZcrGRdfFtAx95hmZNq07C6Rdy0QqbMMUlSMkMzkPnFdxjMDvw
+cqiXodfpMmqysMWLPlxAPY1vuOmOL45LchLTPKKmjguRSV0e8XsaDOWzjCeEB/Aj
+ClmG0GyWHSAIZC7bvzOe0pi5IsFK6Ep4ZcPSbmHSb6kC5eSkv7JyIyuWt69Pk4Mu
+ot+q6ounNXAYCKV6Muz5AcXxBWDvb6KQdvZ6VO6ME3/svrwwX7wGAskuOajr2CVX
+OpuSeVvTTyohvvlFeDB3zEFiJiilFOYLQCGN4Xu48bXiwX5dIiAy+COkkci85sSC
+IYK12Jq6w6s/X3g6Mvpz9w8ZQnxEdZmFjDIaPm0vrZbDKPXpzwkvRTB8vunEvO7j
+S/gwPnchfNZaf6LTVECnr3RNWJqNyvMHbr/FcWZrnhGjUK1LvJY=
+=n4Mf
 -----END PGP SIGNATURE-----
 
---YrQNB5Deg1WGKZi3--
+--rV8arf8D5Dod9UkK--
