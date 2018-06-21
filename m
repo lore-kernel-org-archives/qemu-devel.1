@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fVxm0-0002os-O6
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:29:10 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fVxm2-0002pC-S9
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:29:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fVxlz-0008Fr-5e
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:29:08 -0400
-Date: Thu, 21 Jun 2018 21:01:55 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fVxly-0008FS-U4
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:29:10 -0400
+Date: Thu, 21 Jun 2018 21:23:25 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180621110155.GH32328@umbus.fritz.box>
-References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
-	<20180618063606.2513-6-david@gibson.dropbear.id.au>
-	<20180621111941.5a3f68cc@bahia.lan>
+Message-ID: <20180621112325.GK32328@umbus.fritz.box>
+References: <20180621091852.1034-1-aik@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="tT3UgwmDxwvOMqfu"
+	protocol="application/pgp-signature"; boundary="ibq+fG+Ci5ONsaof"
 Content-Disposition: inline
-In-Reply-To: <20180621111941.5a3f68cc@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 5/9] spapr: Maximum (HPT) pagesize property
+In-Reply-To: <20180621091852.1034-1-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [GIT PULL for qemu-pseries] pseries: Update SLOF
+ firmware image to qemu-slof-20180621
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,223 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: abologna@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>
 
 
---tT3UgwmDxwvOMqfu
+--ibq+fG+Ci5ONsaof
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 21, 2018 at 11:19:41AM +0200, Greg Kurz wrote:
-> On Mon, 18 Jun 2018 16:36:02 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Thu, Jun 21, 2018 at 07:18:52PM +1000, Alexey Kardashevskiy wrote:
+> The following changes since commit 840d3ddc259b70a7b4e1ba367945cc31a45c93=
+c6:
 >=20
-> > The way the POWER Hash Page Table (HPT) MMU is virtualized by KVM HV me=
-ans
-> > that every page that the guest puts in the pagetables must be truly
-> > physically contiguous, not just GPA-contiguous.  In effect this means t=
-hat
-> > an HPT guest can't use any pagesizes greater than the host page size us=
-ed
-> > to back its memory.
-> >=20
-> > At present we handle this by changing what we advertise to the guest ba=
-sed
-> > on the backing pagesizes.  This is pretty bad, because it means the gue=
-st
-> > sees a different environment depending on what should be host configura=
-tion
-> > details.
-> >=20
-> > As a start on fixing this, we add a new capability parameter to the pse=
-ries
-> > machine type which gives the maximum allowed pagesizes for an HPT guest=
- (as
-> > a shift).
+>   pseries: Update SLOF firmware image to qemu-slof-20180621 (2018-06-21 1=
+9:16:26 +1000)
 >=20
-> Maybe you can mention that it is exposed to the user as a genuine pagesiz=
-e,
-> not a shift, because it is a friendlier interface.
+> are available in the git repository at:
+>=20
+>   git@github.com:aik/qemu.git tags/qemu-slof-20180621
+>=20
+> for you to fetch changes up to 840d3ddc259b70a7b4e1ba367945cc31a45c93c6:
+>=20
+>   pseries: Update SLOF firmware image to qemu-slof-20180621 (2018-06-21 1=
+9:16:26 +1000)
+>=20
+> ----------------------------------------------------------------
+>=20
+>=20
+> *** Note: this is not for master, this is for pseries
 
-Oops, I fixed most of the shift references in the commit messages, but
-missed this one.  I removed the "as a shift" text.
+Merged, thanks.
 
-> > For now we just create and validate the parameter without making
-> > it do anything.
-> >=20
-> > For backwards compatibility, on older machine types we set it to the max
-> > available page size for the host.  For the 3.0 machine type, we fix it =
-to
-> > 16, the intention being to only allow HPT pagesizes up to 64kiB by defa=
-ult
-> > in future.
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
-> >  hw/ppc/spapr.c         | 12 +++++++++
-> >  hw/ppc/spapr_caps.c    | 56 ++++++++++++++++++++++++++++++++++++++++++
-> >  include/hw/ppc/spapr.h |  4 ++-
-> >  3 files changed, 71 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 40858d047c..74a76e7e09 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -63,6 +63,7 @@
-> >  #include "hw/virtio/vhost-scsi-common.h"
-> > =20
-> >  #include "exec/address-spaces.h"
-> > +#include "exec/ram_addr.h"
-> >  #include "hw/usb.h"
-> >  #include "qemu/config-file.h"
-> >  #include "qemu/error-report.h"
-> > @@ -4043,6 +4044,7 @@ static void spapr_machine_class_init(ObjectClass =
-*oc, void *data)
-> >      smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
-> >      smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
-> >      smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
-> > +    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /* 64kiB=
- */
-> >      spapr_caps_add_properties(smc, &error_abort);
-> >  }
-> > =20
-> > @@ -4126,8 +4128,18 @@ static void spapr_machine_2_12_instance_options(=
-MachineState *machine)
-> > =20
-> >  static void spapr_machine_2_12_class_options(MachineClass *mc)
-> >  {
-> > +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-> > +    uint8_t mps;
-> > +
-> >      spapr_machine_3_0_class_options(mc);
-> >      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
-> > +
-> > +    if (kvmppc_hpt_needs_host_contiguous_pages()) {
-> > +        mps =3D ctz64(qemu_getrampagesize());
-> > +    } else {
-> > +        mps =3D 34; /* allow everything up to 16GiB, i.e. everything */
-> > +    }
-> > +    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D mps;
-> >  }
-> > =20
-> >  DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
-> > diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> > index 68a4243efc..6cdc0c94e7 100644
-> > --- a/hw/ppc/spapr_caps.c
-> > +++ b/hw/ppc/spapr_caps.c
-> > @@ -27,6 +27,7 @@
-> >  #include "qapi/visitor.h"
-> >  #include "sysemu/hw_accel.h"
-> >  #include "target/ppc/cpu.h"
-> > +#include "target/ppc/mmu-hash64.h"
-> >  #include "cpu-models.h"
-> >  #include "kvm_ppc.h"
-> > =20
-> > @@ -144,6 +145,42 @@ out:
-> >      g_free(val);
-> >  }
-> > =20
-> > +static void spapr_cap_get_pagesize(Object *obj, Visitor *v, const char=
- *name,
-> > +                                   void *opaque, Error **errp)
-> > +{
-> > +    sPAPRCapabilityInfo *cap =3D opaque;
-> > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > +    uint8_t val =3D spapr_get_cap(spapr, cap->index);
-> > +    uint64_t pagesize =3D (1ULL << val);
-> > +
-> > +    visit_type_size(v, name, &pagesize, errp);
-> > +}
-> > +
-> > +static void spapr_cap_set_pagesize(Object *obj, Visitor *v, const char=
- *name,
-> > +                                   void *opaque, Error **errp)
-> > +{
-> > +    sPAPRCapabilityInfo *cap =3D opaque;
-> > +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-> > +    uint64_t pagesize;
-> > +    uint8_t val;
-> > +    Error *local_err =3D NULL;
-> > +
-> > +    visit_type_size(v, name, &pagesize, &local_err);
-> > +    if (local_err) {
-> > +        error_propagate(errp, local_err);
-> > +        return;
-> > +    }
-> > +
-> > +    if (!is_power_of_2(pagesize)) {
-> > +        error_setg(errp, "cap-%s must be a power of 2", cap->name);
-> > +        return;
-> > +    }
-> > +
-> > +    val =3D ctz64(pagesize);
-> > +    spapr->cmd_line_caps[cap->index] =3D true;
-> > +    spapr->eff.caps[cap->index] =3D val;
-> > +}
-> > +
-> >  static void cap_htm_apply(sPAPRMachineState *spapr, uint8_t val, Error=
- **errp)
-> >  {
-> >      if (!val) {
-> > @@ -267,6 +304,16 @@ static void cap_safe_indirect_branch_apply(sPAPRMa=
-chineState *spapr,
-> > =20
-> >  #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
-> > =20
-> > +static void cap_hpt_maxpagesize_apply(sPAPRMachineState *spapr,
-> > +                                      uint8_t val, Error **errp)
-> > +{
-> > +    if (val < 12) {
-> > +        error_setg(errp, "Require at least 4kiB hpt-max-page-size");
-> > +    } else if (val < 16) {
-> > +        warn_report("Many guests require at least 64kiB hpt-max-page-s=
-ize");
-> > +    }
-> > +}
-> > +
-> >  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
-> >      [SPAPR_CAP_HTM] =3D {
-> >          .name =3D "htm",
-> > @@ -326,6 +373,15 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM=
-] =3D {
-> >          .possible =3D &cap_ibs_possible,
-> >          .apply =3D cap_safe_indirect_branch_apply,
-> >      },
-> > +    [SPAPR_CAP_HPT_MAXPAGESIZE] =3D {
-> > +        .name =3D "hpt-max-page-size",
-> > +        .description =3D "Maximum page size for Hash Page Table guests=
-",
-> > +        .index =3D SPAPR_CAP_HPT_MAXPAGESIZE,
-> > +        .get =3D spapr_cap_get_pagesize,
-> > +        .set =3D spapr_cap_set_pagesize,
-> > +        .type =3D "int",
-> > +        .apply =3D cap_hpt_maxpagesize_apply,
-> > +    },
-> >  };
-> > =20
-> >  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spap=
-r,
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index 9dd46a72f6..c97593d032 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -66,8 +66,10 @@ typedef enum {
-> >  #define SPAPR_CAP_SBBC                  0x04
-> >  /* Indirect Branch Serialisation */
-> >  #define SPAPR_CAP_IBS                   0x05
-> > +/* HPT Maximum Page Size (encoded as a shift) */
-> > +#define SPAPR_CAP_HPT_MAXPAGESIZE       0x06
-> >  /* Num Caps */
-> > -#define SPAPR_CAP_NUM                   (SPAPR_CAP_IBS + 1)
-> > +#define SPAPR_CAP_NUM                   (SPAPR_CAP_HPT_MAXPAGESIZE + 1)
-> > =20
-> >  /*
-> >   * Capability Values
 >=20
 
 --=20
@@ -250,24 +64,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---tT3UgwmDxwvOMqfu
+--ibq+fG+Ci5ONsaof
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsrhaMACgkQbDjKyiDZ
-s5Jj5RAAtAK+fWNOmyQwRZD555HTSacDcYzAVhJ0tW58PB4mv/Wc6xMU50n4i9Ud
-L3XucYpeEeFGFBe0p47Nc/W+pl0D8iYmElnBVLfCe25IRC6CApLIg8XsRj1bIU9X
-Qj1PbasFQpcQzOuQPtnznUdjv3ggrJfITzg+AjlyoXvNstKZ9cEJabUbrddm3zWt
-sgY0KHu5FtYp2AazsQ1bYYYAhCjNNTTfypKkqnjOlhyaVmvLjbN5Zoq8WjsL/gtm
-y+/OJhO1lLYSiXEPx6eG4bFUvo7ot+z2B7zldPgSWdBSE0ii6jdI5SLLqOv4hokJ
-HnHvmsLDn8WovMR6ZhZJPiYd1ngYqSmbEVJFC8ITWLkAv1SSUxN8MP8ClNtEX1T3
-3SPrW6f+X/EQgfywkdCESBqwP6dBJZCWOQ3ERu+KH4VWJm77qfxo8DSB+nPM/Qpv
-4hZ6YZ2p7dPZZPH7f0jgPRaDTbL44/BWOXXj8NeLToBwYoaJaGNMVD2JzcPxtNio
-kHWKZy+OUBSDz9b53L8yc6r231/Kfi9Vt9uA+izMI7SjNfvsjydhOEjhhFwxW9G1
-X7BB2JoY3QjuDbDfls/1roWMgspc/cQPm5JD2mWKV7tQiu4/ETu0A87cqyJt0qAc
-U953QqKdoHbVbk6JqHdHf+KWuPUqQsjXu2iXgeEG1pMeEZkNxao=
-=Q0XD
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsriqoACgkQbDjKyiDZ
+s5Ld8g//YMfBEsRZBDghTqi0PPXu3RYiWMinuQckTGPBK0rHoRPYkN8nUQ77MzrH
+Dv4rXhsLSVKbsl1dXOwNM46utmM9TaEi0Z9DJsPIDgZtZpimF1gAFy3Q7S0Rj5xv
+ciPb1huv42ZOu2wLiCqII5LxzOhpiu31WW07lqx0RdOqGuVCH+YoLYUDT+DbFfJg
+bAPjX4R1YoMrCjPdL+zPz9nULmERwLeT0lGDW77XgOUWyxxp9segblT4pD4wGHEe
+z/iQHskCBlY+oiw2ECiWrM+S2mA/SZ24SoJHzFpmVfS/at13GzVo7MkjnVcYCd9b
+d8HrZpaH0SHheJ47X5/MbkHjjuNz1y4c8x2+kRa6nBp2+WgfF6rFXAxP6owYmaUt
+5dhgrkRoJIUC0kGFshBT9DYx4QMkpGHHxZrEmHLLisWCnbXXggMKoOlPu4tEGook
+Tcrkl9SutEM3F0iiFef+tqsA3eM4U85aHQgkWqRMSYCsx363vS77Qjek2cfVo2DA
+7v6LRcx9T/LAqy8qRO07uQARvEP/zMkJLml00DQtbkGVKX88vn5pXujgk618DXro
+y09J4tsHtG3ztFOL0F6hVM1RuLZbqnjTDbgo0U7r6tz0RroXTXSMSEtscedC2+Iz
+n4k8u2SGXweTAYqRWHGm0r1hUaGzcS5nrZ2k20LE86PXm93JPJ8=
+=njOb
 -----END PGP SIGNATURE-----
 
---tT3UgwmDxwvOMqfu--
+--ibq+fG+Ci5ONsaof--
