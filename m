@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53196)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVt2y-00011D-Mr
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:26:22 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fVt31-00013q-2G
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:26:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVt2v-0000fS-GV
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:26:20 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:40730)
+	(envelope-from <alex.bennee@linaro.org>) id 1fVt30-0000iQ-1b
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:26:23 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:37071)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fVt2v-0000es-6x
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:26:17 -0400
-Received: by mail-wr0-x233.google.com with SMTP id g18-v6so1817340wro.7
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:26:17 -0700 (PDT)
+	id 1fVt2z-0000hr-RA
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:26:21 -0400
+Received: by mail-wm0-x234.google.com with SMTP id r125-v6so3615564wmg.2
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:26:21 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 21 Jun 2018 07:25:20 +0100
-Message-Id: <20180621062605.941-13-alex.bennee@linaro.org>
+Date: Thu, 21 Jun 2018 07:26:01 +0100
+Message-Id: <20180621062605.941-54-alex.bennee@linaro.org>
 In-Reply-To: <20180621062605.941-1-alex.bennee@linaro.org>
 References: <20180621062605.941-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 12/57] tests/tcg/multiarch: enable additional
- linux-test tests
+Subject: [Qemu-devel] [PULL v2 53/57] docker: docker.py add check sub-command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,158 +32,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Un-comment the remaining tests.
-
-I removed the itimer value tests because I'm fairly sure a re-arming
-timer will always have a different value in it when you grab it.
-
-I've also fixed up the clone thread flags as QEMU will only allow a
-clone to use flags which match glibc. However the test is still racey
-so it remains disabled by default - it can be run by passing any
-additional parameters on the command line.
+This command allows you to check if we need to re-build a docker
+image. If the image isn't in the repository or the checksums don't
+match then we return false and some text (for processing in
+makefiles).
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
-index 4457bd04ba..6f2c531474 100644
---- a/tests/tcg/multiarch/linux-test.c
-+++ b/tests/tcg/multiarch/linux-test.c
-@@ -16,6 +16,7 @@
-  *  You should have received a copy of the GNU General Public License
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
-+#define _GNU_SOURCE
- #include <stdarg.h>
- #include <stdlib.h>
- #include <stdio.h>
-@@ -58,8 +59,8 @@ static void error1(const char *filename, int line, const char *fmt, ...)
- static int __chk_error(const char *filename, int line, int ret)
- {
-     if (ret < 0) {
--        error1(filename, line, "%m (ret=%d, errno=%d)",
--               ret, errno);
-+        error1(filename, line, "%m (ret=%d, errno=%d/%s)",
-+               ret, errno, strerror(errno));
-     }
-     return ret;
- }
-@@ -216,6 +217,7 @@ static void test_fork(void)
-     pid = chk_error(fork());
-     if (pid == 0) {
-         /* child */
-+        sleep(2);
-         exit(2);
-     }
-     chk_error(waitpid(pid, &status, 0));
-@@ -320,7 +322,6 @@ static void test_socket(void)
-     chk_error(close(server_fd));
- }
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 6a9f2f224b..e4f37820e0 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -184,8 +184,14 @@ class Docker(object):
+                                        stderr=subprocess.STDOUT,
+                                        **kwargs)
  
--#if 0
- #define WCOUNT_MAX 512
- 
- static void test_pipe(void)
-@@ -355,7 +356,7 @@ static void test_pipe(void)
-             }
-             if (FD_ISSET(fds[1], &wfds)) {
-                 ch = 'a';
--                chk_error(write(fds[0], &ch, 1));
-+                chk_error(write(fds[1], &ch, 1));
-                 wcount++;
-             }
-         }
-@@ -387,28 +388,41 @@ static int thread2_func(void *arg)
-     return 0;
- }
- 
--void test_clone(void)
-+static void wait_for_child(pid_t pid)
-+{
-+    int status;
-+    chk_error(waitpid(pid, &status, 0));
-+}
++    def inspect_tag(self, tag):
++        try:
++            return self._output(["inspect", tag])
++        except subprocess.CalledProcessError:
++            return None
 +
-+/* For test_clone we must match the clone flags used by glibc, see
-+ * CLONE_THREAD_FLAGS in the QEMU source code.
-+ */
-+static void test_clone(void)
- {
-     uint8_t *stack1, *stack2;
--    int pid1, pid2, status1, status2;
-+    pid_t pid1, pid2;
+     def get_image_dockerfile_checksum(self, tag):
+-        resp = self._output(["inspect", tag])
++        resp = self.inspect_tag(tag)
+         labels = json.loads(resp)[0]["Config"].get("Labels", {})
+         return labels.get("com.qemu.dockerfile-checksum", "")
  
-     stack1 = malloc(STACK_SIZE);
-     pid1 = chk_error(clone(thread1_func, stack1 + STACK_SIZE,
--                           CLONE_VM | CLONE_FS | CLONE_FILES | SIGCHLD, "hello1"));
-+                           CLONE_VM | CLONE_FS | CLONE_FILES |
-+                           CLONE_SIGHAND | CLONE_THREAD | CLONE_SYSVSEM,
-+                            "hello1"));
+@@ -447,6 +453,36 @@ class CcCommand(SubCommand):
+         return Docker().command("run", cmd, args.quiet)
  
-     stack2 = malloc(STACK_SIZE);
-     pid2 = chk_error(clone(thread2_func, stack2 + STACK_SIZE,
--                           CLONE_VM | CLONE_FS | CLONE_FILES | SIGCHLD, "hello2"));
-+                           CLONE_VM | CLONE_FS | CLONE_FILES |
-+                           CLONE_SIGHAND | CLONE_THREAD | CLONE_SYSVSEM,
-+                           "hello2"));
  
--    while (waitpid(pid1, &status1, 0) != pid1);
-+    wait_for_child(pid1);
-     free(stack1);
--    while (waitpid(pid2, &status2, 0) != pid2);
-+    wait_for_child(pid2);
-     free(stack2);
++class CheckCommand(SubCommand):
++    """Check if we need to re-build a docker image out of a dockerfile.
++    Arguments: <tag> <dockerfile>"""
++    name = "check"
 +
-     if (thread1_res != 5 ||
-         thread2_res != 6)
-         error("clone");
- }
--#endif
- 
- /***********************************/
- 
-@@ -449,12 +463,10 @@ static void test_signal(void)
-     it.it_value.tv_usec = 10 * 1000;
-     chk_error(setitimer(ITIMER_REAL, &it, NULL));
-     chk_error(getitimer(ITIMER_REAL, &oit));
--    if (oit.it_value.tv_sec != it.it_value.tv_sec ||
--        oit.it_value.tv_usec != it.it_value.tv_usec)
--        error("itimer");
- 
-     while (alarm_count < 5) {
-         usleep(10 * 1000);
-+        getitimer(ITIMER_REAL, &oit);
-     }
- 
-     it.it_interval.tv_sec = 0;
-@@ -463,9 +475,6 @@ static void test_signal(void)
-     it.it_value.tv_usec = 0;
-     memset(&oit, 0xff, sizeof(oit));
-     chk_error(setitimer(ITIMER_REAL, &it, &oit));
--    if (oit.it_value.tv_sec != 0 ||
--        oit.it_value.tv_usec != 10 * 1000)
--        error("setitimer");
- 
-     /* SIGSEGV test */
-     act.sa_sigaction = sig_segv;
-@@ -503,10 +512,16 @@ static void test_shm(void)
- int main(int argc, char **argv)
- {
-     test_file();
-+    test_pipe();
-     test_fork();
-     test_time();
-     test_socket();
--    //    test_clone();
++    def args(self, parser):
++        parser.add_argument("tag",
++                            help="Image Tag")
++        parser.add_argument("dockerfile",
++                            help="Dockerfile name")
 +
-+    if (argc > 1) {
-+        printf("test_clone still considered buggy\n");
-+        test_clone();
-+    }
++    def run(self, args, argv):
++        dockerfile = open(args.dockerfile, "rb").read()
++        tag = args.tag
 +
-     test_signal();
-     test_shm();
-     return 0;
++        dkr = Docker()
++        info = dkr.inspect_tag(tag)
++        if info is None:
++            print("Image does not exist")
++            return 1
++
++        if dkr.image_matches_dockerfile(tag, dockerfile):
++            if not args.quiet:
++                print("Image is up to date")
++            return 0
++        else:
++            print("Image needs updating")
++            return 1
++
++
+ def main():
+     parser = argparse.ArgumentParser(description="A Docker helper",
+             usage="%s <subcommand> ..." % os.path.basename(sys.argv[0]))
 -- 
 2.17.1
