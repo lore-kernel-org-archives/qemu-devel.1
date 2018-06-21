@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fW402-0004gr-F3
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:08:05 -0400
+	(envelope-from <bounces@canonical.com>) id 1fW42z-0007LF-Lp
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:11:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fW401-0000Lj-FI
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:08:02 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180621171257.14897-1-f4bug@amsat.org>
-	<20180621171257.14897-11-f4bug@amsat.org>
-	<4aa9b48d-1934-bf06-0bae-9d8d2721f199@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ee2ec992-6a76-5685-06f5-0e1373909e3e@amsat.org>
-Date: Thu, 21 Jun 2018 15:07:47 -0300
+	(envelope-from <bounces@canonical.com>) id 1fW42w-0001LV-5B
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:11:05 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46200)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fW42v-0001KB-R9
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:11:02 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fW42u-0004iM-C5
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 18:11:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 5A69F2E8019
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 18:11:00 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <4aa9b48d-1934-bf06-0bae-9d8d2721f199@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 10/11] hw/block/fdc: Convert from
- FLOPPY_DPRINTF() macro to trace events
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 21 Jun 2018 17:57:33 -0000
+From: Neil Skrypuch <1732959@bugs.launchpad.net>
+Reply-To: Bug 1732959 <1732959@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <151094264088.1535.6755029665700711915.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152960385351.25494.13882750055106336846.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1732959] Re: [regression] Clock jump on source VM
+ after migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,77 +37,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
 
-On 06/21/2018 02:41 PM, John Snow wrote:
-> 
-> 
-> On 06/21/2018 01:12 PM, Philippe Mathieu-Daudé wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  hw/block/fdc.c        | 6 +++---
->>  hw/block/trace-events | 4 ++++
->>  2 files changed, 7 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
->> index cd29e27d8f..c7b4fe9b3e 100644
->> --- a/hw/block/fdc.c
->> +++ b/hw/block/fdc.c
->> @@ -40,6 +40,7 @@
->>  #include "sysemu/blockdev.h"
->>  #include "sysemu/sysemu.h"
->>  #include "qemu/log.h"
->> +#include "trace.h"
->>  
->>  /********************************************************/
->>  /* debug Floppy devices */
->> @@ -934,7 +935,7 @@ static uint32_t fdctrl_read (void *opaque, uint32_t reg)
->>          retval = (uint32_t)(-1);
->>          break;
->>      }
->> -    FLOPPY_DPRINTF("read reg%d: 0x%02x\n", reg & 7, retval);
->> +    trace_fdc_ioport_read(reg, retval);
-> 
-> Earlier in this function we've already masked the register number, which
-> is not clear from context.
+Actually, migration isn't required to reproduce this issue at all, it is
+the stop/cont involved in the migration here that triggers the bug. It
+is significantly easier to reproduce the bug with the following steps:
 
-Sorry this is an old patch, I then learned to fill commit messages as if
-you are going to send upstream, even if it will be in months...
+1) on host, adjtimex -f 100000000000
+2) start guest
+3) wait 20 minutes
+4) stop and immediately after cont guest
 
-> Reviewed-by: John Snow <jsnow@redhat.com>
+At this point you will observe a time jump in the guest proportional to
+the amount of time drift accumulated on the host since the last
+stop/cont cycle (or guest startup if none). The easiest way to notice
+the time jump in the guest is by running ntpd in the guest.
 
-Thanks.
+Step one above is optional, but if omitted, you must wait substantially
+longer in step 3 (~1 day or more, depending on the amount of natural
+clock drift on the host).
 
-> 
-> (and ACK, to whomever stages this outside of my branch. --js)
-> 
->>  
->>      return retval;
->>  }
->> @@ -943,9 +944,8 @@ static void fdctrl_write (void *opaque, uint32_t reg, uint32_t value)
->>  {
->>      FDCtrl *fdctrl = opaque;
->>  
->> -    FLOPPY_DPRINTF("write reg%d: 0x%02x\n", reg & 7, value);
->> -
->>      reg &= 7;
->> +    trace_fdc_ioport_write(reg, value);
->>      switch (reg) {
->>      case FD_REG_DOR:
->>          fdctrl_write_dor(fdctrl, value);
->> diff --git a/hw/block/trace-events b/hw/block/trace-events
->> index 6b9e733412..d842c45409 100644
->> --- a/hw/block/trace-events
->> +++ b/hw/block/trace-events
->> @@ -1,5 +1,9 @@
->>  # See docs/devel/tracing.txt for syntax documentation.
->>  
->> +# hw/block/fdc.c
->> +fdc_ioport_read(uint8_t reg, uint8_t value) "read reg 0x%02x val 0x%02x"
->> +fdc_ioport_write(uint8_t reg, uint8_t value) "write reg 0x%02x val 0x%02x"
->> +
->>  # hw/block/virtio-blk.c
->>  virtio_blk_req_complete(void *vdev, void *req, int status) "vdev %p req %p status %d"
->>  virtio_blk_rw_complete(void *vdev, void *req, int ret) "vdev %p req %p ret %d"
->>
+One upshot of this is that we now have a (very ugly and hacky)
+workaround, which is to regularly (several times a day) issue a
+stop/cont to every running VM, which smears the time jump out into
+enough smaller pieces that it's not as bad as one bigger jump. It would
+still be nice to have this bug fixed though.
+
+** Summary changed:
+
+- [regression] Clock jump on source VM after migration
++ [regression] stop/cont triggers clock jump proportional to host clock dri=
+ft
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1732959
+
+Title:
+  [regression] stop/cont triggers clock jump proportional to host clock
+  drift
+
+Status in QEMU:
+  New
+
+Bug description:
+  We (ab)use migration + block mirroring to perform transparent zero
+  downtime VM backups. Basically:
+
+  1) do a block mirror of the source VM's disk
+  2) migrate the source VM to a destination VM using the disk copy
+  3) cancel the block mirroring
+  4) resume the source VM
+  5) shut down the destination VM gracefully and move the disk to backup
+
+  Relatively recently, the source VM's clock started jumping after step
+  #4. More specifically, the clock jumps an amount of time proportional
+  to the time since it was last migrated. With a week between
+  migrations, clock jumps between ~2.5s and ~12s have been observed. For
+  a particular host, the amount of clock jump is fairly consistent, but
+  there is a large variation from one host to the next (this is likely
+  down to hardware variations and the amount of NTP adjusted clock drift
+  on the host).
+
+  This is caused by a kernel regression which I was able to bisect. The
+  result of the bisect was:
+
+  108b249c453dd7132599ab6dc7e435a7036c193f is the first bad commit
+  commit 108b249c453dd7132599ab6dc7e435a7036c193f
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Thu Sep 1 14:21:03 2016 +0200
+
+      KVM: x86: introduce get_kvmclock_ns
+      =
+
+      Introduce a function that reads the exact nanoseconds value that is
+      provided to the guest in kvmclock.  This crystallizes the notion of
+      kvmclock as a thin veneer over a stable TSC, that the guest will
+      (hopefully) convert with NTP.  In other words, kvmclock is *not* a
+      paravirtualized host-to-guest NTP.
+      =
+
+      Drop the get_kernel_ns() function, that was used both to get the base
+      value of the master clock and to get the current value of kvmclock.
+      The former use is replaced by ktime_get_boot_ns(), the latter is
+      the purpose of get_kernel_ns().
+      =
+
+      This also allows KVM to provide a Hyper-V time reference counter that
+      is synchronized with the time that is computed from the TSC page.
+      =
+
+      Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
+      Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+  I am able to reproduce the issue with much newer kernels as well,
+  including 4.12.5 and 4.9.6.
+
+  Reliably reproducing the problem in isolation is difficult, as one
+  must run a VM for many hours before the clock jump from this bug is
+  noticeable over the clock jump inherent with a pause and resume of the
+  VM. The reproducer I am including is set to run the VM for 18 hours
+  before migration and looks for >=3D 150 ms of clock jump. On different
+  hardware, you may need to let the VM run for more than 18 hours to
+  reliably reproduce the issue.
+
+  To reproduce the issue, please see the attached reproducer. The host
+  needs to have perl, screen and socat installed for the backup script
+  to work. Both the host and guest need to be running NTP (and NTP must
+  autostart at boot in the guest). The host needs to be able to SSH into
+  the guest using SSH keys (to measure the clock jump), so you will need
+  to configure the network and SSH keys appropriately, then change the
+  hardcoded IP address in checktime.sh and test.sh. I have only tested
+  with CentOS 7 guests.
+
+  The qemu command that gets run is in .kvmscreen (the destination VM's
+  command line is programmatically constructed from this command as
+  well), you may need to tweak the bridge configuration. Also, although
+  the reproducer is relatively self contained, it has several built in
+  assumptions that will break if the image file is not in the
+  /var/lib/kvm directory or if the monitor file is not in the
+  /var/lib/kvm/monitor directory, or if the /backup directory does not
+  exist. Finally, if you change the process name or socket name in
+  .kvmscreen, you'll need to adjust the cleanup section in test.sh.
+
+  With all of the above in place, run test.sh and check back in a little
+  over 18 hours, part of the output should include something along these
+  lines:
+
+  Target not found (wanted 150, at 10)
+
+  - or -
+
+  Target found (wanted 150, found 340)
+
+  If the target is reported as found, that means that we have probably
+  reproduced the described issue.
+
+  The version of QEMU in use does not appear to matter. At one point I
+  tested every major version from 2.4 to 2.9 (inclusive) and reproduced
+  the issue in all of them.
+
+  This was initially observed on two different Gentoo hosts. I have also
+  started to see this issue happening with four different RHEL 7 hosts
+  as of the upgrade to RHEL 7.4. This is not too surprising as it
+  appears that the above commit has been backported into RHEL 7. All
+  hosts and guests are 64-bit.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1732959/+subscriptions
