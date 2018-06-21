@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1fVyG7-0005Ss-EA
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:00:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fVyHC-0006Oh-6b
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1fVyG1-0005fE-28
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:00:15 -0400
-References: <1528403460-30526-1-git-send-email-gengdongjiu@huawei.com>
-	<1528403460-30526-3-git-send-email-gengdongjiu@huawei.com>
-	<CAFEAcA_k_-6LuMw_Av9sAvkBeb7OvvZnsppd=1aF6RYydOH=YQ@mail.gmail.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <0af82400-4131-d236-4929-8514d899ca9f@huawei.com>
-Date: Thu, 21 Jun 2018 19:59:01 +0800
+	(envelope-from <peter.maydell@linaro.org>) id 1fVyH2-0006nR-QC
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:01:22 -0400
+Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:37854)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fVyH2-0006m4-KI
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 08:01:12 -0400
+Received: by mail-oi0-x22d.google.com with SMTP id l22-v6so2667392oib.4
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 05:01:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_k_-6LuMw_Av9sAvkBeb7OvvZnsppd=1aF6RYydOH=YQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 RFC 2/2] target: arm: Add support for
- VCPU event states
+In-Reply-To: <20180621062605.941-1-alex.bennee@linaro.org>
+References: <20180621062605.941-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 Jun 2018 13:00:51 +0100
+Message-ID: <CAFEAcA8dug5h=NeMKt+8bz_X_r=FaeXz9oKr4QWxttpc5VmdsA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 00/57] add check-tcg and associated
+ machinery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,100 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: James Morse <james.morse@arm.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU
-	Developers <qemu-devel@nongnu.org>, Linuxarm <linuxarm@huawei.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
 
-Hi peter,
-   Thanks for the review.
+On 21 June 2018 at 07:25, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a9=
+3b:
+>
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into =
+staging (2018-06-20 09:51:30 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-tcg-testing-revivial-2106=
+18-2
+>
+> for you to fetch changes up to 65b26da485540ffcc1c46c9a0898f01912ee6b7a:
+>
+>   .travis.yml: add check-tcg test (2018-06-20 22:13:39 +0100)
+>
+> ----------------------------------------------------------------
+> Add check-tcg machinary
+>
+> This restores the ability to run TCG smoke tests by using our docker
+> infrastructure to support cross building simple tests. It represents
+> the first step to making better cross-architecture testing available
+> straight from the source tree ;-)
+>
+> v2
+>   - fix quoting of target_compiler
+>   - make docker.py Py3 safe
+>   - tweak .travis.yml recipe
+>   - don't probe docker when HAVE_USER_DOCKER not set
 
-On 2018/6/21 0:56, Peter Maydell wrote:
-> On 7 June 2018 at 21:31, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->> This patch extends the qemu-kvm state sync logic with support for
->> KVM_GET/SET_VCPU_EVENTS, giving access to yet missing SError exception.
->> And also it can support the exception state migration.
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> ---
->>  target/arm/cpu.h     |  5 ++++
->>  target/arm/kvm64.c   | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  target/arm/machine.c |  3 +++
->>  3 files changed, 72 insertions(+)
->>
->> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> index 8488273..b3d6682 100644
->> --- a/target/arm/cpu.h
->> +++ b/target/arm/cpu.h
->> @@ -645,6 +645,11 @@ typedef struct CPUARMState {
->>      const struct arm_boot_info *boot_info;
->>      /* Store GICv3CPUState to access from this struct */
->>      void *gicv3state;
->> +    struct {
->> +        uint32_t pending;
->> +        uint32_t has_esr;
->> +        uint64_t esr;
->> +    } serror;
-> 
-> What is this state? That is, what guest CPU architectural state
-> is it supposed to correspond to?
-The guest CPU architectural can be arm64 CPU with RAS extension. so before
-kvm_put_vcpu_events() sets the vcpu events, it firstly checks whether  CPU architectural support
-RAS extension through kvm_can_set_vcpu_esr().
+Weird build failure for linux/x86:
 
----------------------------------------------------------------------
-static int kvm_put_vcpu_events(ARMCPU *cpu)
-{
-    ........................................
-    if (kvm_can_set_vcpu_esr(cpu)) {
-        events.exception.serror_has_esr = env->serror.has_esr;
-        events.exception.serror_esr = env->serror.esr;
-    }
+make: Entering directory '/home/petmay01/linaro/qemu-for-merges/build/alldb=
+g'
+Makefile:90: rules.mak: No such file or directory
+Makefile:439: tests/Makefile.include: No such file or directory
+cat: VERSION: No such file or directory
+Makefile:1056: tests/docker/Makefile.include: No such file or directory
+Makefile:1057: tests/vm/Makefile.include: No such file or directory
+make: Leaving directory '/home/petmay01/linaro/qemu-for-merges/build/alldbg=
+'
+make: *** No rule to make target 'tests/vm/Makefile.include'. Stop.
 
-    ...............................................
-}
-------------------------------------------------------------------
+like it's failed to figure out the source directory.
 
-> 
->> diff --git a/target/arm/machine.c b/target/arm/machine.c
->> index 2e28d08..5a359f4 100644
->> --- a/target/arm/machine.c
->> +++ b/target/arm/machine.c
->> @@ -695,6 +695,9 @@ const VMStateDescription vmstate_arm_cpu = {
->>          VMSTATE_UINT32(env.exception.syndrome, ARMCPU),
->>          VMSTATE_UINT32(env.exception.fsr, ARMCPU),
->>          VMSTATE_UINT64(env.exception.vaddress, ARMCPU),
->> +        VMSTATE_UINT32(env.serror.pending, ARMCPU),
->> +        VMSTATE_UINT32(env.serror.has_esr, ARMCPU),
->> +        VMSTATE_UINT64(env.serror.esr, ARMCPU),
->>          VMSTATE_TIMER_PTR(gt_timer[GTIMER_PHYS], ARMCPU),
->>          VMSTATE_TIMER_PTR(gt_timer[GTIMER_VIRT], ARMCPU),
->>          {
-> 
-> You can't just add fields like this, as it breaks migration
-> compatibility. If these need to be migrated then you need a
-> new subsection with a suitable 'needed' function controlling
-> whether it is present. But we should determine first
-> whether this really is new guest CPU state...
+This is my '--cc=3Dccache gcc' '--enable-debug' '--python=3Dpython3'
+build, and it's also the one I do a 'make clean' on -- perhaps
+build from clean has broken?
 
-I know your means. I will modify it according to the patch[1], which is used to do SVE migration.
-Now I use this API kvm_can_set_vcpu_esr() to check the new guest CPU state. The kvm_can_set_vcpu_esr()
-will check whether CPU architectural supports RAS extension.
-
--------------------------------------------------------------
-static bool kvm_can_set_vcpu_esr(ARMCPU *cpu)
-{
-    CPUState *cs = CPU(cpu);
-
-    int ret = kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_INJECT_SERROR_ESR);
-    return (ret) ? true : false;
-}
------------------------------------------------------------------
-
-[1]: https://git.qemu.org/?p=qemu.git;a=commitdiff;h=ef401601d5561f9805102695d5e65d72594f7020
-
-> 
-> thanks
-> -- PMM
-> 
-> .
-> 
+thanks
+-- PMM
