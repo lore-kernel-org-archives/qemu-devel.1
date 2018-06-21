@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50169)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fW38z-0004fv-Iv
+	id 1fW38z-0004fw-Jq
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:13:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fW38u-0001zt-LX
+	id 1fW38x-00021C-0u
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:13:13 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 21 Jun 2018 14:12:46 -0300
-Message-Id: <20180621171257.14897-1-f4bug@amsat.org>
+Date: Thu, 21 Jun 2018 14:12:47 -0300
+Message-Id: <20180621171257.14897-2-f4bug@amsat.org>
+In-Reply-To: <20180621171257.14897-1-f4bug@amsat.org>
+References: <20180621171257.14897-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 00/11] hw: various conversions to trace-events
+Subject: [Qemu-devel] [PATCH 01/11] trace: Fix format string for the struct
+ timeval members casted to size_t
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, John Snow <jsnow@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-block@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-Hi,
+This fixes when using GCC with -Wformat-signedness:
 
-This series is a collection of various trivial patches from
-different stagnating branches. Time to share before loosing
-them.
+    migration/trace.h: In function ‘_nocheck__trace_dirty_bitmap_load_success’:
+    migration/trace.h:6368:24: error: format ‘%zd’ expects argument of type ‘signed size_t’, but argument 3 has type ‘long unsigned int’ [-Werror=format=]
+      qemu_log("%d@%zd.%06zd:dirty_bitmap_load_success " "" "\n",
+                   ~~^
+                   %ld
+    migration/trace.h:6370:18:
+               (size_t)_now.tv_sec, (size_t)_now.tv_usec
+               ~~~~~~~~~~~~~~~~~~~
+    migration/trace.h:6368:30: error: format ‘%zd’ expects argument of type ‘signed size_t’, but argument 4 has type ‘long unsigned int’ [-Werror=format=]
+      qemu_log("%d@%zd.%06zd:dirty_bitmap_load_success " "" "\n",
+                       ~~~~^
+                       %06ld
+    migration/trace.h:6370:39:
+               (size_t)_now.tv_sec, (size_t)_now.tv_usec
+                                    ~~~~~~~~~~~~~~~~~~~~
 
-Only the first differs and is meant for Stefan, other will
-probably go via the Trivial tree once Acked.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ scripts/tracetool/backend/log.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards,
-
-Phil.
-
-Philippe Mathieu-Daudé (11):
-  trace: Fix format string for the struct timeval members casted to size_t
-  sdcard: Reduce sdcard_set_blocklen() trace digits
-  hw/char/serial: Convert from DPRINTF macro to trace events
-  hw/char/parallel: Convert from pdebug() macro to trace events
-  hw/display/cirrus: Convert printf() calls to trace events
-  hw/input/tsc2005: Convert a fprintf() call to trace events
-  hw/net/ne2000: Add trace events
-  hw/net/ne2000: Convert printf() calls to trace events
-  hw/net/etraxfs_eth: Convert printf() calls to trace events
-  hw/block/fdc: Convert from FLOPPY_DPRINTF() macro to trace events
-  hw/block/pflash_cfi: Convert from DPRINTF() macro to trace events
-
- hw/block/fdc.c                   |  6 ++---
- hw/block/pflash_cfi01.c          | 42 ++++++++++++--------------------
- hw/block/pflash_cfi02.c          | 18 +++++++-------
- hw/char/parallel.c               | 16 +++++++++---
- hw/char/serial.c                 |  5 ++--
- hw/display/cirrus_vga.c          | 25 +++++--------------
- hw/input/tsc2005.c               |  7 +++---
- hw/net/etraxfs_eth.c             |  8 +++---
- hw/net/ne2000.c                  | 25 ++++++++++---------
- hw/block/trace-events            | 17 +++++++++++++
- hw/char/trace-events             |  8 ++++++
- hw/display/trace-events          |  2 ++
- hw/input/trace-events            |  3 +++
- hw/net/trace-events              | 11 +++++++++
- hw/sd/trace-events               |  2 +-
- scripts/tracetool/backend/log.py |  2 +-
- 16 files changed, 113 insertions(+), 84 deletions(-)
-
+diff --git a/scripts/tracetool/backend/log.py b/scripts/tracetool/backend/log.py
+index 78933d03ad..6751f41bc5 100644
+--- a/scripts/tracetool/backend/log.py
++++ b/scripts/tracetool/backend/log.py
+@@ -38,7 +38,7 @@ def generate_h(event, group):
+     out('    if (%(cond)s && qemu_loglevel_mask(LOG_TRACE)) {',
+         '        struct timeval _now;',
+         '        gettimeofday(&_now, NULL);',
+-        '        qemu_log("%%d@%%zd.%%06zd:%(name)s " %(fmt)s "\\n",',
++        '        qemu_log("%%d@%%zu.%%06zu:%(name)s " %(fmt)s "\\n",',
+         '                 getpid(),',
+         '                 (size_t)_now.tv_sec, (size_t)_now.tv_usec',
+         '                 %(argnames)s);',
 -- 
 2.18.0.rc2
