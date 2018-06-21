@@ -1,38 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1fW63K-0000tk-Ng
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 16:19:35 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fW6IK-0003l0-1M
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 16:35:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1fW63H-0001et-Fu
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 16:19:34 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46976)
+	(envelope-from <borntraeger@de.ibm.com>) id 1fW6IE-0005no-VY
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 16:35:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46094
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
-	id 1fW63H-0001e9-6e
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 16:19:31 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fW6IE-0005nU-Pc
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 16:34:58 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5LKJ3p8096412
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 16:19:29 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jrh8yc1b2-1
+	w5LKYftm135744
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 16:34:57 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jrgkfp605-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 16:19:29 -0400
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 16:34:57 -0400
 Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
-	Thu, 21 Jun 2018 16:19:27 -0400
-Date: Thu, 21 Jun 2018 17:19:23 -0300
-From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-References: <20180621102153.28443-1-danielhb413@gmail.com>
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 21 Jun 2018 21:34:55 +0100
+References: <20180621170143.113370-1-borntraeger@de.ibm.com>
+	<d27919d1-6017-3b57-815d-0bdeb96dea6e@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Thu, 21 Jun 2018 22:34:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180621102153.28443-1-danielhb413@gmail.com>
-Message-Id: <20180621201923.GA27759@kermit-br-ibm-com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] QGA: systemd
- hibernate/suspend/hybrid-sleep
+In-Reply-To: <d27919d1-6017-3b57-815d-0bdeb96dea6e@redhat.com>
+Content-Language: en-US
+Message-Id: <c4ce8f0c-ccbb-3d79-459f-bb771a68685a@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] s390/ipl: fix ipl with -no-reboot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,57 +43,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Cc: qemu-devel@nongnu.org, marcandre.lureau@gmail.com, mdroth@linux.vnet.ibm.com, armbru@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On Thu, Jun 21, 2018 at 07:21:47AM -0300, Daniel Henrique Barboza wrote:
-> changes in v2 from Marc-Andre Lureau review:
-> - use error_free() accordingly
-> - use g_spawn_sync() instead of fork() in run_process_child()
-> - previous version link:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg05499.html
+
+
+On 06/21/2018 07:08 PM, Paolo Bonzini wrote:
+> On 21/06/2018 19:01, Christian Borntraeger wrote:
+>> kexec/kdump as well as the bootloader use a subcode of diagnose 308
+>> that is supposed to reset the subsystem but not comprise a full
+>> "reboot". With the latest refactoring this is now broken when
+>> -no-reboot is used. This for example breaks virt-install from
+>> iso images.
+>>
+>> We need to mark these "soft" reboots as ok for rebooting.
+>>
+>> Fixes: a30fb811cbe9 (s390x: refactor reset/reipl handling)
+>> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
 > 
+> Ok, then my suggestion made even more sense. :)  No other objections
+> apart from the name of the constant.
 > 
-> This series adds systemd suspend support for QGA. Some newer
-> guests don't have pmutils anymore, leaving us with just the
-> Linux state file mechanism to suspend the guest OS, which does
-> not support hybrid-sleep. With this implementation, QGA is
-> now able to hybrid suspend newer guests again.
+> Paolo
+
+SHUTDOWN_CAUSE_S390_PARTIAL ?
+
+SHUTDOWN_CAUSE_S390_SUBSYS_RESET?
+
+
 > 
-> Most of the patches are cleanups in the existing suspend code,
-> aiming at both simplifying it and making it easier to extend
-> it with systemd.
+>> ---
+>>  hw/s390x/ipl.c          | 8 +++++++-
+>>  include/sysemu/sysemu.h | 3 +++
+>>  vl.c                    | 4 ++--
+>>  3 files changed, 12 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+>> index 0d67349004..ade6896af6 100644
+>> --- a/hw/s390x/ipl.c
+>> +++ b/hw/s390x/ipl.c
+>> @@ -535,7 +535,13 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
+>>              ipl->iplb_valid = s390_gen_initial_iplb(ipl);
+>>          }
+>>      }
+>> -    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+>> +    if (reset_type == S390_RESET_MODIFIED_CLEAR ||
+>> +        reset_type == S390_RESET_LOAD_NORMAL) {
+>> +        /* ignore -no-reboot */
+>> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET_FORCE);
+>> +    } else {
+>> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+>> +    }
+>>      /* as this is triggered by a CPU, make sure to exit the loop */
+>>      if (tcg_enabled()) {
+>>          cpu_loop_exit(cs);
+>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+>> index e893f72f3b..345369d924 100644
+>> --- a/include/sysemu/sysemu.h
+>> +++ b/include/sysemu/sysemu.h
+>> @@ -44,6 +44,9 @@ typedef enum ShutdownCause {
+>>                                       turns that into a shutdown */
+>>      SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
+>>                                       that into a shutdown */
+>> +    SHUTDOWN_CAUSE_GUEST_RESET_FORCE,/* Guest reset that should ignore
+>> +                                        --no-reboot. This is useful for reset
+>> +                                        like actions as s390 kexec/kdump */
+>>      SHUTDOWN_CAUSE__MAX,
+>>  } ShutdownCause;
+>>  
+>> diff --git a/vl.c b/vl.c
+>> index b3426e03d0..44e65071bc 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -1628,7 +1628,7 @@ void qemu_system_reset(ShutdownCause reason)
+>>      } else {
+>>          qemu_devices_reset();
+>>      }
+>> -    if (reason) {
+>> +    if (reason != SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
+>>          qapi_event_send_reset(shutdown_caused_by_guest(reason),
+>>                                &error_abort);
+>>      }
+>> @@ -1674,7 +1674,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
+>>  
+>>  void qemu_system_reset_request(ShutdownCause reason)
+>>  {
+>> -    if (no_reboot) {
+>> +    if (no_reboot && reason != SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
+>>          shutdown_requested = reason;
+>>      } else {
+>>          reset_requested = reason;
+>>
 > 
-> 
-> Daniel Henrique Barboza (6):
->   qga: refactoring qmp_guest_suspend_* functions
->   qga: bios_supports_mode: decoupling pm-utils and sys logic
->   qga: guest_suspend: decoupling pm-utils and sys logic
->   qga: removing switch statements, adding run_process_child
->   qga: systemd hibernate/suspend/hybrid-sleep support
->   qga: removing bios_supports_mode
-
-Hi, Daniel.
-
-Your patches look good, just some minor comments about how they're
-organized and coding style, if you allow me.
-
-I'd suggest to introduce the new API, functions, and typedef at first
-(preferably one thing per patch to easier the review) without wiring
-them up.
-
-After the new stuff is ready to use, I'd wire them up (one per patch)
-and update/remove old API they're replacing.
-
-Introducing the new API and wiring it up later makes it easier to
-review.  For example, bios_supports_mode() is changed by patch 1/6, then
-it's moved around by patch 3/6, and finally removed by patch 6/6.
-
-Do we need an empty line after opening a switch statement?  I'd drop it,
-as seen in other parts of the code.
-
-Does run_process_child() fit better under util/, or another place where
-it can be shared throughout the code, if that's the case?
-
-Cheers
-Murilo
