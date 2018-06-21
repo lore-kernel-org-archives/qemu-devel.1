@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fVtZf-0002vf-68
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:00:11 -0400
+	(envelope-from <clg@kaod.org>) id 1fVtbD-00049P-Q7
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:01:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fVtZc-0006qY-4q
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:00:07 -0400
-Date: Thu, 21 Jun 2018 09:00:02 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <20180620072506.GE24636@umbus.fritz.box>
-Message-ID: <alpine.BSF.2.21.1806210852360.16898@zero.eik.bme.hu>
-References: <cover.1529398335.git.balaton@eik.bme.hu>
-	<20180620072506.GE24636@umbus.fritz.box>
+	(envelope-from <clg@kaod.org>) id 1fVtb8-00086U-PN
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:01:43 -0400
+Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:51213)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fVtb8-00085f-Iz
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:01:38 -0400
+Received: from player732.ha.ovh.net (unknown [10.109.122.80])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id D63A1D1993
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 09:01:36 +0200 (CEST)
+References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
+	<20180618063606.2513-9-david@gibson.dropbear.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <f829daa0-c870-f835-2195-df795c0e47b9@kaod.org>
+Date: Thu, 21 Jun 2018 09:01:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v4 00/11] Misc sam460ex improvements
+In-Reply-To: <20180618063606.2513-9-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 8/9] spapr: Limit available pagesizes to
+ provide a consistent guest environment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,61 +32,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Alexander Graf <agraf@suse.de>, Sebastian Bauer <mail@sebastianbauer.info>
+To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, abologna@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
-Hello,
-
-On Wed, 20 Jun 2018, David Gibson wrote:
-> On Tue, Jun 19, 2018 at 10:52:15AM +0200, BALATON Zoltan wrote:
->> Next spin of sam460ex pathces with changes according to review and
->> some new patches.
+On 06/18/2018 08:36 AM, David Gibson wrote:
+> KVM HV has some limitations (deriving from the hardware) that mean not all
+> host-cpu supported pagesizes may be usable in the guest.  At present this
+> means that KVM guests and TCG guests may see different available page sizes
+> even if they notionally have the same vcpu model.  This is confusing and
+> also prevents migration between TCG and KVM.
+> 
+> This patch makes the environment consistent by always allowing the same set
+> of pagesizes.  Since we can't remove the KVM limitations, we do this by
+> always applying the same limitations it has, even to TCG guests.
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 >
-> So, the sm501 patches I don't really have the technical knowledge to
-> review, and I'm a little uncomfortable taking them through my tree,
-> since they aren't strictly related to ppc.
+> ---
+>  hw/ppc/spapr_caps.c | 33 +++++++++++++++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
+> 
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 9fc739b3f5..0584c7c6ab 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -334,6 +334,38 @@ static void cap_hpt_maxpagesize_apply(sPAPRMachineState *spapr,
+>      spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
+>  }
+>  
+> +static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift, uint32_t pshift)
+> +{
+> +    unsigned maxshift = *((unsigned *)opaque);
+> +
+> +    assert(pshift >= seg_pshift);
 
-OK, since the sm501 is also used on SH it's not PPC only so I think you 
-can ignore them for now and just take the other patches and I can submit 
-the sm501 related patches as a separate series (although all these changes 
-are to improve sam460ex emulation).
+you could check that elsewhere.
 
-> It looks like you're the only person that's made substantive changes
-> to sm501 lately, though.  So, given I haven't heard screaming, I think
-> it's fair to assume that either you know what you're doing, or you're
-> the only person that cares about sm501 anyway.
->
-> So, I think we should make you sm501 maintainer.
+> +    /* Don't allow the guest to use pages bigger than the configured
+> +     * maximum size */
+> +    if (pshift > maxshift) {
+> +        return false;
+> +    }
+> +
+> +    /* For whatever reason, KVM doesn't allow multiple pagesizes
+> +     * within a segment, *except* for the case of 16M pages in a 4k or
+> +     * 64k segment.  Always exclude other cases, so that TCG and KVM
+> +     * guests see a consistent environment */
+> +    if ((pshift != seg_pshift) && (pshift != 24)) {
+> +        return false;
+> +    }
+> +
+> +    return true;
+> +}
 
-I don't feel confident enough to take on maintainership of this device but 
-hope maybe Peter could help as he did before to get the patches in not 
-involving your tree.
+So, do we really need ppc_hash64_filter_pagesizes() to have a callback ? 
 
-> Specifically I think you should:
->  * Fix the compile breakage I pointed out elsewhere
+It seems that we only use the routine once in the patchset and that the
+only thing we need to check is 'maxshift'.
 
-Thanks, I'll check and fix this.
+Do you envision other usage of the routine ?
 
->  * Split out your sm501 patches
+Thanks,
 
-OK, as above I'll send these as separate series, you can ignore all sm501: 
-prefixed patches from this v4 series.
+C.
 
->  * Prepend a patch adding it to MAINTAINERS with yourself as
->    maintainer (whether you call it "Maintained" or "Odd Fixes" is up
->    to your level of dedication)
->  * Send this new series direct to Peter Maydell, CC me, Gerd Hoffman
->    <kraxel@redhat.com> and the SH maintainer(s) (as well as the lists
->    and whoever else you think's appropriate)
->  * I'll reply, making the case above to Peter for your
->    maintainership.
->
-> With any luck, from there on you'll be able to send sm501 pull
-> requests directly.
-
-But if there's an other way I'd rather cc those people for review and to 
-take care of pull requests without me becoming maintainer as I don't have 
-any experience with that.
-
-Regards,
-BALATON Zoltan
+> +static void cap_hpt_maxpagesize_cpu_apply(sPAPRMachineState *spapr,
+> +                                          PowerPCCPU *cpu,
+> +                                          uint8_t val, Error **errp)
+> +{
+> +    unsigned maxshift = val;
+> +
+> +    ppc_hash64_filter_pagesizes(cpu, spapr_pagesize_cb, &maxshift);
+> +}
+> +
+>  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>      [SPAPR_CAP_HTM] = {
+>          .name = "htm",
+> @@ -401,6 +433,7 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] = {
+>          .set = spapr_cap_set_pagesize,
+>          .type = "int",
+>          .apply = cap_hpt_maxpagesize_apply,
+> +        .cpu_apply = cap_hpt_maxpagesize_cpu_apply,
+>      },
+>  };
+>  
+> 
