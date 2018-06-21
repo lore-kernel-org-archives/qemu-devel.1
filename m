@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53892)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nshirokovskiy@virtuozzo.com>) id 1fVwkh-0003jL-Fw
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:23:44 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fVwmB-00057G-Va
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:25:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nshirokovskiy@virtuozzo.com>) id 1fVwke-0001z0-7P
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:23:43 -0400
-References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
-	<20180609151758.17343-6-vsementsov@virtuozzo.com>
-	<45f6544a-d384-f3cc-5fd4-c3d5f0268f25@redhat.com>
-	<f92c42cd-d5ed-b89d-5381-f220fdd4aa02@virtuozzo.com>
-From: Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
-Message-ID: <ca14a2d4-f268-686a-01a1-3faa28561358@virtuozzo.com>
-Date: Thu, 21 Jun 2018 13:23:31 +0300
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fVwmA-0002TS-It
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:25:15 -0400
+References: <20180613020613.1343-1-jsnow@redhat.com>
+	<20180613020613.1343-4-jsnow@redhat.com>
+	<f3332ec8-5370-fecc-b0ae-4834d0eb28b7@virtuozzo.com>
+	<8df85931-08ab-d89d-5e26-10f5054a9357@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <81a2a867-4dc7-3843-88cd-fb1809f8d23b@virtuozzo.com>
+Date: Thu, 21 Jun 2018 13:25:01 +0300
 MIME-Version: 1.0
-In-Reply-To: <f92c42cd-d5ed-b89d-5381-f220fdd4aa02@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <8df85931-08ab-d89d-5e26-10f5054a9357@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 5/6] qapi: new qmp command
- nbd-server-add-bitmap
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 03/10] qcow2/bitmap: cache bm_list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,137 +26,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-
-
-On 20.06.2018 17:13, Vladimir Sementsov-Ogievskiy wrote:
-> 20.06.2018 14:26, Eric Blake wrote:
->> On 06/09/2018 10:17 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+21.06.2018 02:29, John Snow wrote:
+>
+> On 06/20/2018 09:04 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 13.06.2018 05:06, John Snow wrote:
+>>> We don't need to re-read this list every time, exactly. We can keep it
+>>> cached
+>>> and delete our copy when we flush to disk.
+>>>
+>>> Because we don't try to flush bitmaps on close if there's nothing to
+>>> flush,
+>>> add a new conditional to delete the state anyway for a clean exit.
+>>>
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
 >>> ---
->>> =C2=A0 qapi/block.json | 23 +++++++++++++++++++++++
->>> =C2=A0 blockdev-nbd.c=C2=A0 | 23 +++++++++++++++++++++++
->>> =C2=A0 2 files changed, 46 insertions(+)
->>
->> I'm tempted to temporarily name this x-nbd-server-add-bitmap, until I ha=
-ve the counterpart Libvirt patches tested, just in case testing turns up an=
-y tweaks we need to the interface.
->>
+>>>  =C2=A0 block/qcow2-bitmap.c | 74
+>>> ++++++++++++++++++++++++++++++++++------------------
+>>>  =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+ 2 ++
+>>>  =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+ 2 ++
+>>>  =C2=A0 3 files changed, 52 insertions(+), 26 deletions(-)
 >>>
->>> diff --git a/qapi/block.json b/qapi/block.json
->>> index c694524002..ddbca2e286 100644
->>> --- a/qapi/block.json
->>> +++ b/qapi/block.json
->>> @@ -269,6 +269,29 @@
->>> =C2=A0=C2=A0=C2=A0 'data': {'name': 'str', '*mode': 'NbdServerRemoveMod=
-e'} }
->>> =C2=A0 =C2=A0 ##
->>> +# @nbd-server-add-bitmap:
->>> +#
->>> +# Expose a dirty bitmap associated with the selected export. The bitma=
-p search
->>> +# starts at the device attached to the export, and includes all backin=
-g files.
->>> +# The exported bitmap is then locked until the NBD export is removed.
->>
->> The fact that you search the backing chain is at least consistent with y=
-our code.
->>
->>> +#
->>> +# @name: Export name.
->>> +#
->>> +# @bitmap: Bitmap name to search for.
->>> +#
->>> +# @bitmap-export-name: How the bitmap will be seen by nbd clients
->>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (default @bitmap)
->>
->> Do we really need the flexibility of naming the bitmap differently to th=
-e NBD client than we do in qemu?
->=20
-> It was needed for our backup-api implementation. Nikolay?
-
-Hi.
-
-In case of checkpoints A, B, C in my implementation I created bitmaps A, B,=
- C
-respectively with A tracking changes from time A to time B for example. Lat=
-er
-if somebody needs to export CBT from A to last snapshot(checkpotin) I need =
-to
-merge A and B and create T bitmap for this purpuse. NBD client would like
-to see this CBT under name A I guess thus I used @bitmap-export-name option=
-.
-
-But I could start with naming bitmaps delta-A, delta-B, delta-C and then
-use name A for merge.
-
-Nikolay
-
->=20
->>
->>> +#
->>> +# Note: the client must use NBD_OPT_SET_META_CONTEXT with a query of
->>> +# "qemu:dirty-bitmap:NAME" (where NAME matches @bitmap-export-name) to=
- access
->>> +# the exposed bitmap.
->>> +#
->>> +# Since: 3.0
->>> +##
->>> +=C2=A0 { 'command': 'nbd-server-add-bitmap',
->>> +=C2=A0=C2=A0=C2=A0 'data': {'name': 'str', 'bitmap': 'str', '*bitmap-e=
-xport-name': 'str'} }
->>> +
->>> +##
->>> =C2=A0 # @nbd-server-stop:
->>> =C2=A0 #
->>> =C2=A0 # Stop QEMU's embedded NBD server, and unregister all devices pr=
-eviously
->>> diff --git a/blockdev-nbd.c b/blockdev-nbd.c
->>> index 65a84739ed..6b0c50732c 100644
->>> --- a/blockdev-nbd.c
->>> +++ b/blockdev-nbd.c
->>> @@ -220,3 +220,26 @@ void qmp_nbd_server_stop(Error **errp)
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nbd_server_free(nbd_server);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 nbd_server =3D NULL;
->>> =C2=A0 }
->>> +
->>> +void qmp_nbd_server_add_bitmap(const char *name, const char *bitmap,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool has_bitmap_export_name,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char *bitmap_export_name,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error **errp)
+>>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+>>> index 85c1b5afe3..5ae9b17928 100644
+>>> --- a/block/qcow2-bitmap.c
+>>> +++ b/block/qcow2-bitmap.c
+>>> @@ -636,6 +636,34 @@ fail:
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
+>>>  =C2=A0 }
+>>>  =C2=A0 +static Qcow2BitmapList *get_bitmap_list(BlockDriverState *bs, =
+Error
+>>> **errp)
 >>> +{
->>> +=C2=A0=C2=A0=C2=A0 NBDExport *exp;
+>>> +=C2=A0=C2=A0=C2=A0 BDRVQcow2State *s =3D bs->opaque;
+>>> +=C2=A0=C2=A0=C2=A0 Qcow2BitmapList *bm_list;
 >>> +
->>> +=C2=A0=C2=A0=C2=A0 if (!nbd_server) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "NBD serve=
-r not running");
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> +=C2=A0=C2=A0=C2=A0 if (s->bitmap_list) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return (Qcow2BitmapList *)s=
+->bitmap_list;
 >>> +=C2=A0=C2=A0=C2=A0 }
 >>> +
->>> +=C2=A0=C2=A0=C2=A0 exp =3D nbd_export_find(name);
->>> +=C2=A0=C2=A0=C2=A0 if (exp =3D=3D NULL) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "Export '%=
-s' is not found", name);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> +=C2=A0=C2=A0=C2=A0 if (s->nb_bitmaps) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bm_list =3D bitmap_list_loa=
+d(bs, errp);
+>>> +=C2=A0=C2=A0=C2=A0 } else {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bm_list =3D bitmap_list_new=
+();
 >>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 nbd_export_bitmap(exp, bitmap,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 has_bitmap_export=
-_name ? bitmap_export_name : bitmap,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 errp);
->>> +}
->>>
+>>> +=C2=A0=C2=A0=C2=A0 s->bitmap_list =3D bm_list;
+>> may be, we shouldn't cache it in inactive mode. However, I think we'll
+>> finally will not load bitmaps in inactive mode and drop the on
+>> inactivate, so it would not matter..
 >>
->=20
->=20
+> Do we not load bitmaps when BDRV_O_INACTIVE is set? it looks like we do?
+>
+> (From your subsequent email):
+>> really, now it would be a problem: we can start in inactive mode, load
+>> nothing, and then we can't reload bitmaps; my fix in
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg03254.html
+>> will not work after this patch.
+>>
+> So we load nothing because when we opened up the image RO, saw IN_USE
+> bitmaps (or saw none at all) and decided not to load them. qcow2_do_open
+> however marks that it has "loaded the bitmaps."
+>
+> Later, when we reopen RW, we have a cached bm_list that doesn't include
+> this bitmap, so we don't mark it as IN_USE again or update the header.
+>
+> (Wait, if you are worried about the bitmap's data having been changed,
+> why do we not reload the bitmap data here too?)
+>
+>
+> Now, patch 06 changes the cache so that we load all bitmaps and not just
+> ones not IN_USE. On RW reload, I reject any such IN_USE bitmaps as a
+> reason to prohibit the RW reload. However, this is broken too, because I
+> will miss any new flags that exist on-disk, so this function should
+> never use the cached data.
+>
+> I'm confused, though, the comment that calls reopen_bitmaps_rw_hint says:
+>
+> "It's some kind of reopen. There are no known cases where we need to
+> reload bitmaps in such a situation, so it's safer to skip them.
+> Moreover, if we have some readonly bitmaps and we are reopening for rw
+> we should reopen bitmaps correspondingly."
+>
+> Why do we assume that bitmap data cannot change while BDRV_O_INACTIVATE
+> is set? Is that not wrong?
+
+agree. and this is one more reason to not load bitmaps in inactive mode=20
+at all. and drop them (after storing) on inactivating.
+I'll make a patch.
+
+>
+>> Hm, I've understood the following problem: cache becomes incorrect after
+>> failed update_ext_header_and_dir or update_ext_header_and_dir_in_place
+>> operations. (after failed qcow2_remove_persistent_dirty_bitmap or
+>> qcow2_reopen_bitmaps_rw_hint)
+>>
+>> And this comes from incomplete architecture after the patch:
+>> On the one hand, we work with one singleton bitmap_list, and loading
+>> part is refactored to do it safely. On the other hand, storing functions
+>> still have old behavior, they work with bitmap list like with their own
+>> local variable.
+> Yeah, I see it. Dropping the cache on such errors is fine.
+>
+>> So, we have safe mechanism to read list through the cache. We need also
+>> safe mechanism to update list both in cache and in file.
+>>
+>> There are two possible variants:
+>>
+>> 1. drop cache after failed store
+>> 2. rollback cache after failed store
+>>
+>> 1 looks simpler..
+>>
+>> Also, we should drop cache on inactivate (we do this) and should not
+>> create cache in inactive mode, because the other process may change the
+>> image.
+>>
+>> Hm. may be, it is better to work with s->bitmap_list directly? In this
+>> case it will be more obvious that it is the cache, not local variable.
+>> And we will work with it like with other "parts of extension cache"
+>> s->nb_bitmaps, s->bitmap_directory_offset ...
+>>
+>> After the patch, functions update_ext_header_and_dir* becomes strange:
+>>
+>> 1. before the patch, they take external parameter - bm_list, and by this
+>> parameter they updated the file and cached s->nb_bitmaps, s->bitmap_*, .=
+.
+>> 2. after the patch, they take parameter (actually s->bitmap_list) of
+>> same nature like s->nb_bitmap, and update s->nb_bitmap from it.
+>>
+> Yeah, if we do decide that keeping a cache is the right thing, some of
+> the helper functions could be refactored or simplified a little to take
+> advantage of the new paradigm.
+>
+>> Sorry for being late and for disordered stream of thoughts. Is this
+>> patch really needed for the whole series?
+>>
+> The nice part is to have bm_list with pointers that correlate directly
+> to the in-memory bitmaps.
+>
+> I can load bm_list on demand later for the purposes of `qemu-img info`,
+> but I have to look up the in-memory bitmaps again too. It seemed simpler
+> to just preserve the data the first time we build it instead of
+> rebuilding it all the time.
+>
+> I think that we'll eventually want a cache either way, but maybe I am
+> still underestimating how difficult it is to do correctly... I think I
+> need to understand inactivate/invalidate a little more carefully before
+> I trudge ahead here ...
+
+
+
+--=20
+Best regards,
+Vladimir
