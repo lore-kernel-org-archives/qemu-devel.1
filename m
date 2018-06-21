@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fVzZv-0006mw-Qq
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:24:51 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1fVzcc-0008Lh-0Q
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fVzZu-0001tA-Q0
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:24:47 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:32861)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fVzZu-0001t0-Iq
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:24:46 -0400
-Received: by mail-wr0-x242.google.com with SMTP id k16-v6so3217072wro.0
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 06:24:46 -0700 (PDT)
+	(envelope-from <tiwei.bie@intel.com>) id 1fVzcX-0003lT-6h
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:27:34 -0400
+Received: from mga05.intel.com ([192.55.52.43]:25660)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1fVzcW-0003kT-Sg
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:27:29 -0400
+Date: Thu, 21 Jun 2018 21:27:30 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+Message-ID: <20180621132730.GA3345@debian>
+References: <20180618161729.334-1-marcandre.lureau@redhat.com>
+	<20180618161729.334-5-marcandre.lureau@redhat.com>
+	<20180621123320.GA19274@debian>
+	<CAJ+F1CKPbdXx5sAA1ershQ_YeSOupocjfZsFWqha8-7ObkvUTg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180621150203.2c985ed2@redhat.com>
-References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
-	<20180515121433.6112-5-marcandre.lureau@redhat.com>
-	<20180621150203.2c985ed2@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 21 Jun 2018 15:24:44 +0200
-Message-ID: <CAJ+F1CJHraqeM2q5G-ooVfp771r_K4g=osJG=J6PTH4aV0BprQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] tpm: add a fake ACPI memory clear
- interface
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJ+F1CKPbdXx5sAA1ershQ_YeSOupocjfZsFWqha8-7ObkvUTg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 04/26] vhost-user: simplify
+ vhost_user_init/vhost_user_cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +31,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-Hi
+On Thu, Jun 21, 2018 at 02:48:08PM +0200, Marc-André Lureau wrote:
+> On Thu, Jun 21, 2018 at 2:33 PM, Tiwei Bie <tiwei.bie@intel.com> wrote:
+> > On Mon, Jun 18, 2018 at 06:17:07PM +0200, Marc-André Lureau wrote:
+> > [...]
+> >> diff --git a/hw/virtio/vhost-stub.c b/hw/virtio/vhost-stub.c
+> >> index 049089b5e2..323dfcc46a 100644
+> >> --- a/hw/virtio/vhost-stub.c
+> >> +++ b/hw/virtio/vhost-stub.c
+> >> @@ -7,7 +7,7 @@ bool vhost_has_free_slot(void)
+> >>      return true;
+> >>  }
+> >>
+> >> -VhostUserState *vhost_user_init(void)
+> >> +bool vhost_user_init(VhostUserState *user, CharBackend *chr, Error **errp)
+> >>  {
+> >>      return NULL;
+> >
+> > It would be better to return false.
+> >
+> 
+> Good catch, fixed.
+> 
+> Except that, would you give a reviewed-by?
 
-On Thu, Jun 21, 2018 at 3:02 PM, Igor Mammedov <imammedo@redhat.com> wrote:
-> On Tue, 15 May 2018 14:14:33 +0200
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
->
->> This allows to pass the last failing test from the Windows HLK TPM 2.0
->> TCG PPI 1.3 tests.
->>
->> The interface is described in the "TCG Platform Reset Attack
->> Mitigation Specification", chapter 6 "ACPI _DSM Function". Whether or
->> not we should have a real implementation remains an open question to me.
-> might it cause security issues?
+Sorry, I missed something previously. In below diff:
 
-Good question. If the guest assumes success of this operation perhaps.
-I'll check the spec.
+diff --git a/net/vhost-user.c b/net/vhost-user.c
+index a39f9c9974..5e5b8f3fc9 100644
+--- a/net/vhost-user.c
++++ b/net/vhost-user.c
+@@ -291,14 +291,14 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+ {
+     Error *err = NULL;
+     NetClientState *nc, *nc0 = NULL;
+-    VhostUserState *user = NULL;
+     NetVhostUserState *s = NULL;
++    VhostUserState *user;
+     int i;
+ 
+     assert(name);
+     assert(queues > 0);
+ 
+-    user = vhost_user_init();
++    user = g_new0(struct VhostUserState, 1);
+     if (!user) {
+         error_report("failed to init vhost_user");
+         goto err;
 
-> What are implications of faking it and how hard it's to implement thing
-> per spec?
+It might be better to change the error message
+to something like:
 
-Laszlo answerd that in "[Qemu-devel] investigating TPM for
-OVMF-on-QEMU"  2f2b) TCG Memory Clear Interface
+"failed to allocate vhost-user state".
 
->
->
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  hw/i386/acpi-build.c | 9 +++++++++
->>  1 file changed, 9 insertions(+)
->>
->> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
->> index 95be4f0710..392a1e50bd 100644
->> --- a/hw/i386/acpi-build.c
->> +++ b/hw/i386/acpi-build.c
->> @@ -2072,6 +2072,15 @@ build_tpm_ppi(Aml *dev)
->>              aml_append(ifctx, aml_return(aml_buffer(1, zerobyte)));
->>          }
->>          aml_append(method, ifctx);
->> +
->> +       /* dummy MOR Memory Clear for the sake of WLK PPI test */
->> +        ifctx =3D aml_if(
->> +            aml_equal(aml_arg(0),
->> +                      aml_touuid("376054ED-CC13-4675-901C-4756D7F2D45D"=
-)));
->> +        {
->> +            aml_append(ifctx, aml_return(aml_int(0)));
->> +        }
->> +        aml_append(method, ifctx);
->>      }
->>      aml_append(dev, method);
->>  }
->
->
+Except that, it looks good to me and you can add
+my reviewed-by.
 
+Best regards,
+Tiwei Bie
 
-
---=20
-Marc-Andr=C3=A9 Lureau
+> 
+> > Best regards,
+> > Tiwei Bie
+> >
+> >>  }
+> > [...]
+> >
+> 
+> 
+> 
+> -- 
+> Marc-André Lureau
