@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fVvO5-0004BD-Hs
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:56:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fVvVm-0006YZ-IC
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 05:04:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fVvO1-0007ku-IB
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:56:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57142 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fVvO1-0007ka-Ck
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:56:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 9E9B04002248
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 08:56:12 +0000 (UTC)
-Date: Thu, 21 Jun 2018 10:56:08 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180621105608.01463ba5@redhat.com>
-In-Reply-To: <20180620153947.30834-6-dgilbert@redhat.com>
-References: <20180620153947.30834-1-dgilbert@redhat.com>
-	<20180620153947.30834-6-dgilbert@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fVvVl-0005pN-JW
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 05:04:14 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:33100)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fVvVl-0005oy-CX
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 05:04:13 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id c6-v6so2259388oiy.0
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 02:04:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 5/7] hmp: Add commands for preconfig
+In-Reply-To: <20180621031957.134718-1-eblake@redhat.com>
+References: <20180621031957.134718-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 Jun 2018 10:03:52 +0100
+Message-ID: <CAFEAcA8TjkgNrEGJ9Z_vmwD_Upf8sjRFms5jKZiV4fBHCsRJ2g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/7] bitmap export over NBD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,160 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, peterx@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, 20 Jun 2018 16:39:45 +0100
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+On 21 June 2018 at 04:19, Eric Blake <eblake@redhat.com> wrote:
+> The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a93b:
+>
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into staging (2018-06-20 09:51:30 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2018-06-20
+>
+> for you to fetch changes up to 5bde4bbbd1e217c323551d2785a0efff6340d840:
+>
+>   docs/interop: add nbd.txt (2018-06-20 21:20:05 -0500)
+>
+> ----------------------------------------------------------------
+> nbd patches for 2018-06-20
+>
+> Add experimental x-nbd-server-add-bitmap to expose a disabled
+> bitmap over NBD, in preparation for a pull model incremental
+> backup scheme.
+>
+> - Eric Blake: tests: Simplify .gitignore
+> - Vladimir Sementsov-Ogievskiy: 0/6 NBD export bitmaps
+>
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Allow a bunch of the info commands to be used in preconfig.
-> 
-> version, chardev, name, uuid,memdev, iothreads
->   Were enabled in QMP in the previous patch from Igor
-> 
-> status, hotpluggable_cpus
->   Was enabled in the original allow-preconfig series
-> 
-> history
->   is HMP specific
-> 
-> qom-tree, numa
->   Don't have a QMP equivalent
-I'm not sure that 'info numa' in current state is useful/or valid
-at preconfig time wrt memory stats (depends on memory devices
-which hasn't created at that moment yet).
-Let's drop it for now from this series.
-With it dropped:
+The patchew errors for this pullreq look like they're real --
+do you want to fix them up and resend?
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> Also enable the qom commands qom-list and qom-set.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  hmp-commands-info.hx | 11 +++++++++++
->  hmp-commands.hx      |  3 +++
->  2 files changed, 14 insertions(+)
-> 
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index ddfcd5adcc..874ff07583 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -19,6 +19,7 @@ ETEXI
->          .params     = "",
->          .help       = "show the version of QEMU",
->          .cmd        = hmp_info_version,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -47,6 +48,7 @@ ETEXI
->          .params     = "",
->          .help       = "show the character devices",
->          .cmd        = hmp_info_chardev,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -165,6 +167,7 @@ ETEXI
->          .params     = "",
->          .help       = "show the command line history",
->          .cmd        = hmp_info_history,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -315,6 +318,7 @@ ETEXI
->          .params     = "",
->          .help       = "show NUMA information",
->          .cmd        = hmp_info_numa,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -399,6 +403,7 @@ ETEXI
->          .params     = "",
->          .help       = "show the current VM status (running|paused)",
->          .cmd        = hmp_info_status,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -457,6 +462,7 @@ ETEXI
->          .params     = "",
->          .help       = "show the current VM name",
->          .cmd        = hmp_info_name,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -471,6 +477,7 @@ ETEXI
->          .params     = "",
->          .help       = "show the current VM UUID",
->          .cmd        = hmp_info_uuid,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -613,6 +620,7 @@ ETEXI
->          .params     = "[path]",
->          .help       = "show QOM composition tree",
->          .cmd        = hmp_info_qom_tree,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -671,6 +679,7 @@ ETEXI
->          .params     = "",
->          .help       = "show memory backends",
->          .cmd        = hmp_info_memdev,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -699,6 +708,7 @@ ETEXI
->          .params     = "",
->          .help       = "show iothreads",
->          .cmd        = hmp_info_iothreads,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -829,6 +839,7 @@ ETEXI
->          .params     = "",
->          .help       = "Show information about hotpluggable CPUs",
->          .cmd        = hmp_hotpluggable_cpus,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 3094294e5b..4bdf8e2090 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1828,6 +1828,7 @@ ETEXI
->          .params     = "path",
->          .help       = "list QOM properties",
->          .cmd        = hmp_qom_list,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -1841,6 +1842,7 @@ ETEXI
->          .params     = "path property value",
->          .help       = "set QOM property",
->          .cmd        = hmp_qom_set,
-> +        .flags      = "p",
->      },
->  
->  STEXI
-> @@ -1855,6 +1857,7 @@ ETEXI
->          .help       = "show various information about the system state",
->          .cmd        = hmp_info_help,
->          .sub_table  = info_cmds,
-> +        .flags      = "p",
->      },
->  
->  STEXI
+thanks
+-- PMM
