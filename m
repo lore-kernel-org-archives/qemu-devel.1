@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fVs0Z-00021g-UT
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:19:50 -0400
+	(envelope-from <clg@kaod.org>) id 1fVs1q-0002kf-Nj
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:21:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fVs0W-0002b5-Kt
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:19:47 -0400
-Resent-Message-Id: <E1fVs0W-0002b5-Kt@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21148)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fVs0W-0002Xp-CZ
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:19:44 -0400
-In-Reply-To: <20180621015359.12018-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152955833839.819.9013852684606869144@d39dc562802a>
+	(envelope-from <clg@kaod.org>) id 1fVs1n-0003Ge-GR
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:21:06 -0400
+Received: from 2.mo178.mail-out.ovh.net ([46.105.39.61]:51343)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fVs1n-0003GF-61
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:21:03 -0400
+Received: from player693.ha.ovh.net (unknown [10.109.122.117])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 84DCA1B85D
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 07:21:01 +0200 (CEST)
+References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
+	<20180618063606.2513-2-david@gibson.dropbear.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <ecc5a50f-18b3-249f-ec0b-09b0de8a50cf@kaod.org>
+Date: Thu, 21 Jun 2018 07:20:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 20 Jun 2018 22:18:58 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 00/35] target/arm SVE patches
+In-Reply-To: <20180618063606.2513-2-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/9] target/ppc: Allow cpu compatiblity
+ checks based on type, not instance
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,238 +32,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, abologna@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjIxMDE1MzU5LjEyMDE4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY1IDAwLzM1XSB0YXJnZXQvYXJtIFNW
-RSBwYXRjaGVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
-c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
-MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
-c3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4u
-KSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90
-YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cg
-JGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07
-IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkp
-CmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
-Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRj
-aGV3LzIwMTgwNjIxMDE1MzU5LjEyMDE4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZyAt
-PiBwYXRjaGV3LzIwMTgwNjIxMDE1MzU5LjEyMDE4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjIwZGE3OGFlM2YgdGFyZ2V0L2Fy
-bTogSW1wbGVtZW50IEFSTXY4LjItRG90UHJvZAowY2I3MDE5YjhlIHRhcmdldC9hcm06IEVuYWJs
-ZSBTVkUgZm9yIGFhcmNoNjQtbGludXgtdXNlcgozOTk0YTUzMTFmIHRhcmdldC9hcm06IEltcGxl
-bWVudCBTVkUgZG90IHByb2R1Y3QgKGluZGV4ZWQpCjY4NTQ0YzQ1N2YgdGFyZ2V0L2FybTogSW1w
-bGVtZW50IFNWRSBkb3QgcHJvZHVjdCAodmVjdG9ycykKZDRkZTQzYThkNSB0YXJnZXQvYXJtOiBJ
-bXBsZW1lbnQgU1ZFIGZwIGNvbXBsZXggbXVsdGlwbHkgYWRkIChpbmRleGVkKQoyYzJjN2QzODkx
-IHRhcmdldC9hcm06IFBhc3MgaW5kZXggdG8gQWR2U0lNRCBGQ01MQSAoaW5kZXhlZCkKYTBlNjlk
-M2Y2OSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIGZwIGNvbXBsZXggbXVsdGlwbHkgYWRkCjVm
-NjRhNjg2ZjMgdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBmbG9hdGluZy1wb2ludCBjb21wbGV4
-IGFkZApkYWQ2MzliYzNkIHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgTU9WUFJGWAo1MmIwMWMz
-Mzg4IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgZmxvYXRpbmctcG9pbnQgdW5hcnkgb3BlcmF0
-aW9ucwphMTlkM2JmOTI2IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgZmxvYXRpbmctcG9pbnQg
-cm91bmQgdG8gaW50ZWdyYWwgdmFsdWUKM2YyNGRlNTQwNyB0YXJnZXQvYXJtOiBJbXBsZW1lbnQg
-U1ZFIGZsb2F0aW5nLXBvaW50IGNvbnZlcnQgdG8gaW50ZWdlcgowNWExZmVmYTg0IHRhcmdldC9h
-cm06IEltcGxlbWVudCBTVkUgZmxvYXRpbmctcG9pbnQgY29udmVydCBwcmVjaXNpb24KNzE2MmQx
-ODU1NSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIGZsb2F0aW5nLXBvaW50IHRyaWcgbXVsdGlw
-bHktYWRkIGNvZWZmaWNpZW50CmEwZGI2YWY5NzcgdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBG
-UCBDb21wYXJlIHdpdGggWmVybyBHcm91cAo0NzMyOTViNTcwIHRhcmdldC9hcm06IEltcGxlbWVu
-dCBTVkUgRmxvYXRpbmcgUG9pbnQgVW5hcnkgT3BlcmF0aW9ucyAtIFVucHJlZGljYXRlZCBHcm91
-cAplNGM3NTQ3NzE1IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgRlAgRmFzdCBSZWR1Y3Rpb24g
-R3JvdXAKNWM4YzdiYzExMiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIEZsb2F0aW5nIFBvaW50
-IE11bHRpcGx5IEluZGV4ZWQgR3JvdXAKZTI1YzEzYjJmMiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQg
-U1ZFIGZsb2F0aW5nLXBvaW50IGFyaXRobWV0aWMgd2l0aCBpbW1lZGlhdGUKYmQ1ZjhiNWI1OCB0
-YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIGZsb2F0aW5nLXBvaW50IGNvbXBhcmUgdmVjdG9ycwow
-ZjNiNDNmZDE3IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgc2NhdHRlciBzdG9yZSB2ZWN0b3Ig
-aW1tZWRpYXRlCjMzYTAyNmM0MWQgdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBmaXJzdC1mYXVs
-dCBnYXRoZXIgbG9hZHMKOTE4MzBjZDBmZiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIGdhdGhl
-ciBsb2FkcwpiZDFiM2Y4OTI2IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgcHJlZmV0Y2hlcwpl
-NTZiYzJlNGIyIHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgc2NhdHRlciBzdG9yZXMKMGExZjYz
-MzU2YiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIHN0b3JlIHZlY3Rvci9wcmVkaWNhdGUgcmVn
-aXN0ZXIKYzg3NjhhOThkNCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIGxvYWQgYW5kIGJyb2Fk
-Y2FzdCBlbGVtZW50CjIyNDg3MzczODAgdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBGbG9hdGlu
-ZyBQb2ludCBBY2N1bXVsYXRpbmcgUmVkdWN0aW9uIEdyb3VwCmViMDliYTU2NTcgdGFyZ2V0L2Fy
-bTogSW1wbGVtZW50IFNWRSBGUCBNdWx0aXBseS1BZGQgR3JvdXAKNGFjYWM5MzUyNiB0YXJnZXQv
-YXJtOiBJbXBsZW1lbnQgU1ZFIGZsb2F0aW5nLXBvaW50IGFyaXRobWV0aWMgKHByZWRpY2F0ZWQp
-CjY5MGQwYzE1N2YgdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBpbnRlZ2VyIGNvbnZlcnQgdG8g
-ZmxvYXRpbmctcG9pbnQKY2Q5ZGRhZWRkMCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIGxvYWQg
-YW5kIGJyb2FkY2FzdCBxdWFkd29yZAo5NmY4NTYwMTUzIHRhcmdldC9hcm06IEltcGxlbWVudCBT
-VkUgTWVtb3J5IENvbnRpZ3VvdXMgU3RvcmUgR3JvdXAKNzg2Yjc5MTFkZiB0YXJnZXQvYXJtOiBJ
-bXBsZW1lbnQgU1ZFIENvbnRpZ3VvdXMgTG9hZCwgZmlyc3QtZmF1bHQgYW5kIG5vLWZhdWx0CjNh
-OGFjZjMyMTggdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBNZW1vcnkgQ29udGlndW91cyBMb2Fk
-IEdyb3VwCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzM1OiB0YXJnZXQv
-YXJtOiBJbXBsZW1lbnQgU1ZFIE1lbW9yeSBDb250aWd1b3VzIExvYWQgR3JvdXAuLi4KRVJST1I6
-IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMyNDE6
-IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjI5MzE6CitET19MRDEoc3ZlX2xkMWJkdV9y
-LCBjcHVfbGR1Yl9kYXRhX3JhLCB1aW50NjRfdCwgdWludDhfdCwgKQoKRVJST1I6IHNwYWNlIHBy
-b2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMyNDI6IEZJTEU6IHRh
-cmdldC9hcm0vc3ZlX2hlbHBlci5jOjI5MzI6CitET19MRDEoc3ZlX2xkMWJkc19yLCBjcHVfbGRz
-Yl9kYXRhX3JhLCB1aW50NjRfdCwgaW50OF90LCApCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBi
-ZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzI0NjogRklMRTogdGFyZ2V0L2FybS9z
-dmVfaGVscGVyLmM6MjkzNjoKK0RPX0xEMShzdmVfbGQxaGR1X3IsIGNwdV9sZHV3X2RhdGFfcmEs
-IHVpbnQ2NF90LCB1aW50MTZfdCwgKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRo
-YXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMyNDc6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBl
-ci5jOjI5Mzc6CitET19MRDEoc3ZlX2xkMWhkc19yLCBjcHVfbGRzd19kYXRhX3JhLCB1aW50NjRf
-dCwgaW50MTZfdCwgKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2Ug
-cGFyZW50aGVzaXMgJyknCiMyNDk6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjI5Mzk6
-CitET19MRDEoc3ZlX2xkMXNkdV9yLCBjcHVfbGRsX2RhdGFfcmEsIHVpbnQ2NF90LCB1aW50MzJf
-dCwgKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVz
-aXMgJyknCiMyNTA6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjI5NDA6CitET19MRDEo
-c3ZlX2xkMXNkc19yLCBjcHVfbGRsX2RhdGFfcmEsIHVpbnQ2NF90LCBpbnQzMl90LCApCgpFUlJP
-Ujogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzI2
-NzogRklMRTogdGFyZ2V0L2FybS9zdmVfaGVscGVyLmM6Mjk1NzoKK0RPX0xEMShzdmVfbGQxZGRf
-ciwgY3B1X2xkcV9kYXRhX3JhLCB1aW50NjRfdCwgdWludDY0X3QsICkKCkVSUk9SOiBzcGFjZSBw
-cm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojMjY4OiBGSUxFOiB0
-YXJnZXQvYXJtL3N2ZV9oZWxwZXIuYzoyOTU4OgorRE9fTEQyKHN2ZV9sZDJkZF9yLCBjcHVfbGRx
-X2RhdGFfcmEsIHVpbnQ2NF90LCB1aW50NjRfdCwgKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQg
-YmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMyNjk6IEZJTEU6IHRhcmdldC9hcm0v
-c3ZlX2hlbHBlci5jOjI5NTk6CitET19MRDMoc3ZlX2xkM2RkX3IsIGNwdV9sZHFfZGF0YV9yYSwg
-dWludDY0X3QsIHVpbnQ2NF90LCApCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhh
-dCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzI3MDogRklMRTogdGFyZ2V0L2FybS9zdmVfaGVscGVy
-LmM6Mjk2MDoKK0RPX0xENChzdmVfbGQ0ZGRfciwgY3B1X2xkcV9kYXRhX3JhLCB1aW50NjRfdCwg
-dWludDY0X3QsICkKCnRvdGFsOiAxMCBlcnJvcnMsIDAgd2FybmluZ3MsIDM4NSBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
-SCAyLzM1OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIENvbnRpZ3VvdXMgTG9hZCwgZmlyc3Qt
-ZmF1bHQgYW5kIG5vLWZhdWx0Li4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0
-IGNsb3NlIHBhcmVudGhlc2lzICcpJwojMjA0OiBGSUxFOiB0YXJnZXQvYXJtL3N2ZV9oZWxwZXIu
-YzozMDg0OgorRE9fTERGRjEoYmR1X3IsIGNwdV9sZHViX2RhdGFfcmEsIHVpbnQ2NF90LCB1aW50
-OF90LCApCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRo
-ZXNpcyAnKScKIzIwNTogRklMRTogdGFyZ2V0L2FybS9zdmVfaGVscGVyLmM6MzA4NToKK0RPX0xE
-RkYxKGJkc19yLCBjcHVfbGRzYl9kYXRhX3JhLCB1aW50NjRfdCwgaW50OF90LCApCgpFUlJPUjog
-c3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzIxMDog
-RklMRTogdGFyZ2V0L2FybS9zdmVfaGVscGVyLmM6MzA5MDoKK0RPX0xERkYxKGhkdV9yLCBjcHVf
-bGR1d19kYXRhX3JhLCB1aW50NjRfdCwgdWludDE2X3QsICkKCkVSUk9SOiBzcGFjZSBwcm9oaWJp
-dGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojMjExOiBGSUxFOiB0YXJnZXQv
-YXJtL3N2ZV9oZWxwZXIuYzozMDkxOgorRE9fTERGRjEoaGRzX3IsIGNwdV9sZHN3X2RhdGFfcmEs
-IHVpbnQ2NF90LCBpbnQxNl90LCApCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhh
-dCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzIxNDogRklMRTogdGFyZ2V0L2FybS9zdmVfaGVscGVy
-LmM6MzA5NDoKK0RPX0xERkYxKHNkdV9yLCBjcHVfbGRsX2RhdGFfcmEsIHVpbnQ2NF90LCB1aW50
-MzJfdCwgKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50
-aGVzaXMgJyknCiMyMTU6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjMwOTU6CitET19M
-REZGMShzZHNfciwgY3B1X2xkbF9kYXRhX3JhLCB1aW50NjRfdCwgaW50MzJfdCwgKQoKRVJST1I6
-IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMyMTc6
-IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjMwOTc6CitET19MREZGMShkZF9yLCAgY3B1
-X2xkcV9kYXRhX3JhLCB1aW50NjRfdCwgdWludDY0X3QsICkKCnRvdGFsOiA3IGVycm9ycywgMCB3
-YXJuaW5ncywgMjg5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDMvMzU6IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUg
-TWVtb3J5IENvbnRpZ3VvdXMgU3RvcmUgR3JvdXAuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8zNTogdGFy
-Z2V0L2FybTogSW1wbGVtZW50IFNWRSBsb2FkIGFuZCBicm9hZGNhc3QgcXVhZHdvcmQuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggNS8zNTogdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBpbnRlZ2VyIGNvbnZl
-cnQgdG8gZmxvYXRpbmctcG9pbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8zNTogdGFyZ2V0L2FybTog
-SW1wbGVtZW50IFNWRSBmbG9hdGluZy1wb2ludCBhcml0aG1ldGljIChwcmVkaWNhdGVkKS4uLgpF
-UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzE4ODogRklM
-RTogdGFyZ2V0L2FybS9zdmVfaGVscGVyLmM6Mjg2ODoKK3N0YXRpYyBpbmxpbmUgZmxvYXQxNiBh
-YmRfaChmbG9hdDE2IGEsIGZsb2F0MTYgYiwgZmxvYXRfc3RhdHVzICpzKQogICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90
-YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNTMgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNy8zNTogdGFyZ2V0L2Fy
-bTogSW1wbGVtZW50IFNWRSBGUCBNdWx0aXBseS1BZGQgR3JvdXAuLi4KQ2hlY2tpbmcgUEFUQ0gg
-OC8zNTogdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBGbG9hdGluZyBQb2ludCBBY2N1bXVsYXRp
-bmcgUmVkdWN0aW9uIEdyb3VwLi4uCkNoZWNraW5nIFBBVENIIDkvMzU6IHRhcmdldC9hcm06IElt
-cGxlbWVudCBTVkUgbG9hZCBhbmQgYnJvYWRjYXN0IGVsZW1lbnQuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTAvMzU6IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgc3RvcmUgdmVjdG9yL3ByZWRpY2F0ZSBy
-ZWdpc3Rlci4uLgpDaGVja2luZyBQQVRDSCAxMS8zNTogdGFyZ2V0L2FybTogSW1wbGVtZW50IFNW
-RSBzY2F0dGVyIHN0b3Jlcy4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcq
-JyAoY3R4Old4VikKIzEzNzogRklMRTogdGFyZ2V0L2FybS9zdmVfaGVscGVyLmM6MzcyNToKKyAg
-ICB1aW50MzJfdCAqZCA9IHZkOyBUWVBFSSAqbSA9IHZtOyB1aW50OF90ICpwZyA9IHZnOyAgICAg
-ICAgICAgICAgICAgIFwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBl
-cnJvcnMsIDAgd2FybmluZ3MsIDI0NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMi8zNTogdGFyZ2V0L2FybTogSW1w
-bGVtZW50IFNWRSBwcmVmZXRjaGVzLi4uCkNoZWNraW5nIFBBVENIIDEzLzM1OiB0YXJnZXQvYXJt
-OiBJbXBsZW1lbnQgU1ZFIGdhdGhlciBsb2Fkcy4uLgpDaGVja2luZyBQQVRDSCAxNC8zNTogdGFy
-Z2V0L2FybTogSW1wbGVtZW50IFNWRSBmaXJzdC1mYXVsdCBnYXRoZXIgbG9hZHMuLi4KRVJST1I6
-IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMxNDU6
-IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjM4NDM6CisgICAgRE9fTERGRjFfWlBaKE5B
-TUUsIHVpbnQ2NF90LCBUWVBFSSwgVFlQRU0sIEZOLCApCgp0b3RhbDogMSBlcnJvcnMsIDAgd2Fy
-bmluZ3MsIDMyMSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCgpDaGVja2luZyBQQVRDSCAxNS8zNTogdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBz
-Y2F0dGVyIHN0b3JlIHZlY3RvciBpbW1lZGlhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMzU6IHRh
-cmdldC9hcm06IEltcGxlbWVudCBTVkUgZmxvYXRpbmctcG9pbnQgY29tcGFyZSB2ZWN0b3JzLi4u
-CkNoZWNraW5nIFBBVENIIDE3LzM1OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIGZsb2F0aW5n
-LXBvaW50IGFyaXRobWV0aWMgd2l0aCBpbW1lZGlhdGUuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJl
-ZCBhcm91bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxNTE6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hl
-bHBlci5jOjMwMzQ6CitzdGF0aWMgaW5saW5lIGZsb2F0MTYgc3Vicl9oKGZsb2F0MTYgYSwgZmxv
-YXQxNiBiLCBmbG9hdF9zdGF0dXMgKnMpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdh
-cm5pbmdzLCAyNTAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMTgvMzU6IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUg
-RmxvYXRpbmcgUG9pbnQgTXVsdGlwbHkgSW5kZXhlZCBHcm91cC4uLgpFUlJPUjogc3BhY2UgcHJv
-aGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzE2MjogRklMRTogdGFy
-Z2V0L2FybS92ZWNfaGVscGVyLmM6NTE5OgorRE9fTVVMX0lEWChndmVjX2ZtdWxfaWR4X2QsIGZs
-b2F0NjQsICkKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVu
-dGhlc2lzICcpJwojMTg2OiBGSUxFOiB0YXJnZXQvYXJtL3ZlY19oZWxwZXIuYzo1NDM6CitET19G
-TUxBX0lEWChndmVjX2ZtbGFfaWR4X2QsIGZsb2F0NjQsICkKCnRvdGFsOiAyIGVycm9ycywgMCB3
-YXJuaW5ncywgMTU4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE5LzM1OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZF
-IEZQIEZhc3QgUmVkdWN0aW9uIEdyb3VwLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
-IHRoYXQgJyonIChjdHg6V3hWKQojOTE6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjI4
-NjQ6CitzdGF0aWMgVFlQRSBOQU1FIyNfcmVkdWNlKFRZUEUgKmRhdGEsIGZsb2F0X3N0YXR1cyAq
-c3RhdHVzLCB1aW50cHRyX3QgbikgXAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxODUgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tp
-bmcgUEFUQ0ggMjAvMzU6IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgRmxvYXRpbmcgUG9pbnQg
-VW5hcnkgT3BlcmF0aW9ucyAtIFVucHJlZGljYXRlZCBHcm91cC4uLgpFUlJPUjogc3BhY2VzIHJl
-cXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4Old4VikKIzU2OiBGSUxFOiB0YXJnZXQvYXJtL3Ry
-YW5zbGF0ZS1zdmUuYzozNTE0Ogorc3RhdGljIHZvaWQgZG9fenpfZnAoRGlzYXNDb250ZXh0ICpz
-LCBhcmdfcnJfZXN6ICphLCBnZW5faGVscGVyX2d2ZWNfMl9wdHIgKmZuKQogICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVx
-dWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6V3hWKQojNTY6IEZJTEU6IHRhcmdldC9hcm0vdHJh
-bnNsYXRlLXN2ZS5jOjM1MTQ6CitzdGF0aWMgdm9pZCBkb196el9mcChEaXNhc0NvbnRleHQgKnMs
-IGFyZ19ycl9lc3ogKmEsIGdlbl9oZWxwZXJfZ3ZlY18yX3B0ciAqZm4pCiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDEwNCBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyMS8z
-NTogdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBGUCBDb21wYXJlIHdpdGggWmVybyBHcm91cC4u
-LgpFUlJPUjogTWFjcm9zIHdpdGggY29tcGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGlu
-IHBhcmVudGhlc2lzCiM5ODogRklMRTogdGFyZ2V0L2FybS9zdmVfaGVscGVyLmM6MzM2NToKKyNk
-ZWZpbmUgRE9fRkNNTEUoVFlQRSwgWCwgWSwgU1QpICBUWVBFIyNfY29tcGFyZShYLCBZLCBTVCkg
-PD0gMAoKRVJST1I6IE1hY3JvcyB3aXRoIGNvbXBsZXggdmFsdWVzIHNob3VsZCBiZSBlbmNsb3Nl
-ZCBpbiBwYXJlbnRoZXNpcwojOTk6IEZJTEU6IHRhcmdldC9hcm0vc3ZlX2hlbHBlci5jOjMzNjY6
-CisjZGVmaW5lIERPX0ZDTUxUKFRZUEUsIFgsIFksIFNUKSAgVFlQRSMjX2NvbXBhcmUoWCwgWSwg
-U1QpIDwgMAoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNzQgbGluZXMgY2hlY2tlZAoK
-WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMjIv
-MzU6IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgZmxvYXRpbmctcG9pbnQgdHJpZyBtdWx0aXBs
-eS1hZGQgY29lZmZpY2llbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjMvMzU6IHRhcmdldC9hcm06IElt
-cGxlbWVudCBTVkUgZmxvYXRpbmctcG9pbnQgY29udmVydCBwcmVjaXNpb24uLi4KQ2hlY2tpbmcg
-UEFUQ0ggMjQvMzU6IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgZmxvYXRpbmctcG9pbnQgY29u
-dmVydCB0byBpbnRlZ2VyLi4uCkNoZWNraW5nIFBBVENIIDI1LzM1OiB0YXJnZXQvYXJtOiBJbXBs
-ZW1lbnQgU1ZFIGZsb2F0aW5nLXBvaW50IHJvdW5kIHRvIGludGVncmFsIHZhbHVlLi4uCkNoZWNr
-aW5nIFBBVENIIDI2LzM1OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIGZsb2F0aW5nLXBvaW50
-IHVuYXJ5IG9wZXJhdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjcvMzU6IHRhcmdldC9hcm06IElt
-cGxlbWVudCBTVkUgTU9WUFJGWC4uLgpDaGVja2luZyBQQVRDSCAyOC8zNTogdGFyZ2V0L2FybTog
-SW1wbGVtZW50IFNWRSBmbG9hdGluZy1wb2ludCBjb21wbGV4IGFkZC4uLgpDaGVja2luZyBQQVRD
-SCAyOS8zNTogdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBmcCBjb21wbGV4IG11bHRpcGx5IGFk
-ZC4uLgpDaGVja2luZyBQQVRDSCAzMC8zNTogdGFyZ2V0L2FybTogUGFzcyBpbmRleCB0byBBZHZT
-SU1EIEZDTUxBIChpbmRleGVkKS4uLgpDaGVja2luZyBQQVRDSCAzMS8zNTogdGFyZ2V0L2FybTog
-SW1wbGVtZW50IFNWRSBmcCBjb21wbGV4IG11bHRpcGx5IGFkZCAoaW5kZXhlZCkuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMzIvMzU6IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgZG90IHByb2R1Y3QgKHZl
-Y3RvcnMpLi4uCkNoZWNraW5nIFBBVENIIDMzLzM1OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZF
-IGRvdCBwcm9kdWN0IChpbmRleGVkKS4uLgpDaGVja2luZyBQQVRDSCAzNC8zNTogdGFyZ2V0L2Fy
-bTogRW5hYmxlIFNWRSBmb3IgYWFyY2g2NC1saW51eC11c2VyLi4uCkNoZWNraW5nIFBBVENIIDM1
-LzM1OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgQVJNdjguMi1Eb3RQcm9kLi4uCj09PSBPVVRQVVQg
-RU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 06/18/2018 08:35 AM, David Gibson wrote:
+> ppc_check_compat() is used in a number of places to check if a cpu obje=
+ct
+> supports a certain compatiblity mode, subject to various constraints.
+>=20
+> It takes a PowerPCCPU *, however it really only depends on the cpu's cl=
+ass.
+> We have upcoming cases where it would be useful to make compatibility
+> checks before we fully instantiate the cpu objects.
+>=20
+> ppc_type_check_compat() will now make an equivalent check, but based on=
+ a
+> CPU's QOM typename instead of an instantiated CPU object.
+>=20
+> We make use of the new interface in several places in spapr, where we'r=
+e
+> essentially making a global check, rather than one specific to a partic=
+ular
+> cpu.  This avoids some ugly uses of first_cpu to grab a "representative=
+"
+> instance.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Looks good to me,
+
+Thanks,
+
+C.
+
+
+> ---
+>  hw/ppc/spapr.c      | 10 ++++------
+>  hw/ppc/spapr_caps.c | 19 +++++++++----------
+>  target/ppc/compat.c | 27 +++++++++++++++++++++------
+>  target/ppc/cpu.h    |  4 ++++
+>  4 files changed, 38 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index db0fb385d4..b0b94fc1f0 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1616,8 +1616,8 @@ static void spapr_machine_reset(void)
+> =20
+>      first_ppc_cpu =3D POWERPC_CPU(first_cpu);
+>      if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
+> -        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
+> -                         spapr->max_compat_pvr)) {
+> +        ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3=
+_00, 0,
+> +                              spapr->max_compat_pvr)) {
+>          /* If using KVM with radix mode available, VCPUs can be starte=
+d
+>           * without a HPT because KVM will start them in radix mode.
+>           * Set the GR bit in PATB so that we know there is no HPT. */
+> @@ -2520,7 +2520,6 @@ static void spapr_machine_init(MachineState *mach=
+ine)
+>      long load_limit, fw_size;
+>      char *filename;
+>      Error *resize_hpt_err =3D NULL;
+> -    PowerPCCPU *first_ppc_cpu;
+> =20
+>      msi_nonbroken =3D true;
+> =20
+> @@ -2618,10 +2617,9 @@ static void spapr_machine_init(MachineState *mac=
+hine)
+>      /* init CPUs */
+>      spapr_init_cpus(spapr);
+> =20
+> -    first_ppc_cpu =3D POWERPC_CPU(first_cpu);
+>      if ((!kvm_enabled() || kvmppc_has_cap_mmu_radix()) &&
+> -        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
+> -                         spapr->max_compat_pvr)) {
+> +        ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3=
+_00, 0,
+> +                              spapr->max_compat_pvr)) {
+>          /* KVM and TCG always allow GTSE with radix... */
+>          spapr_ovec_set(spapr->ov5, OV5_MMU_RADIX_GTSE);
+>      }
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 00e43a9ba7..469f38f0ef 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -327,27 +327,26 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NU=
+M] =3D {
+>  };
+> =20
+>  static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spap=
+r,
+> -                                               CPUState *cs)
+> +                                               const char *cputype)
+>  {
+>      sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> -    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>      sPAPRCapabilities caps;
+> =20
+>      caps =3D smc->default_caps;
+> =20
+> -    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
+> -                          0, spapr->max_compat_pvr)) {
+> +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_07,
+> +                               0, spapr->max_compat_pvr)) {
+>          caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+>          caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
+>      }
+> =20
+> -    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06_PLUS,
+> -                          0, spapr->max_compat_pvr)) {
+> +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_06_PLUS,
+> +                               0, spapr->max_compat_pvr)) {
+>          caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
+>      }
+> =20
+> -    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
+> -                          0, spapr->max_compat_pvr)) {
+> +    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_06,
+> +                               0, spapr->max_compat_pvr)) {
+>          caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_OFF;
+>          caps.caps[SPAPR_CAP_DFP] =3D SPAPR_CAP_OFF;
+>          caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
+> @@ -384,7 +383,7 @@ int spapr_caps_post_migration(sPAPRMachineState *sp=
+apr)
+>      sPAPRCapabilities dstcaps =3D spapr->eff;
+>      sPAPRCapabilities srccaps;
+> =20
+> -    srccaps =3D default_caps_with_cpu(spapr, first_cpu);
+> +    srccaps =3D default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type)=
+;
+>      for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
+>          /* If not default value then assume came in with the migration=
+ */
+>          if (spapr->mig.caps[i] !=3D spapr->def.caps[i]) {
+> @@ -446,7 +445,7 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
+>      int i;
+> =20
+>      /* First compute the actual set of caps we're running with.. */
+> -    default_caps =3D default_caps_with_cpu(spapr, first_cpu);
+> +    default_caps =3D default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_=
+type);
+> =20
+>      for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
+>          /* Store the defaults */
+> diff --git a/target/ppc/compat.c b/target/ppc/compat.c
+> index 807c906f68..7de4bf3122 100644
+> --- a/target/ppc/compat.c
+> +++ b/target/ppc/compat.c
+> @@ -105,17 +105,13 @@ static const CompatInfo *compat_by_pvr(uint32_t p=
+vr)
+>      return NULL;
+>  }
+> =20
+> -bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
+> -                      uint32_t min_compat_pvr, uint32_t max_compat_pvr=
+)
+> +static bool pcc_compat(PowerPCCPUClass *pcc, uint32_t compat_pvr,
+> +                       uint32_t min_compat_pvr, uint32_t max_compat_pv=
+r)
+>  {
+> -    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+>      const CompatInfo *compat =3D compat_by_pvr(compat_pvr);
+>      const CompatInfo *min =3D compat_by_pvr(min_compat_pvr);
+>      const CompatInfo *max =3D compat_by_pvr(max_compat_pvr);
+> =20
+> -#if !defined(CONFIG_USER_ONLY)
+> -    g_assert(cpu->vhyp);
+> -#endif
+>      g_assert(!min_compat_pvr || min);
+>      g_assert(!max_compat_pvr || max);
+> =20
+> @@ -134,6 +130,25 @@ bool ppc_check_compat(PowerPCCPU *cpu, uint32_t co=
+mpat_pvr,
+>      return true;
+>  }
+> =20
+> +bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
+> +                      uint32_t min_compat_pvr, uint32_t max_compat_pvr=
+)
+> +{
+> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
+> +
+> +#if !defined(CONFIG_USER_ONLY)
+> +    g_assert(cpu->vhyp);
+> +#endif
+> +
+> +    return pcc_compat(pcc, compat_pvr, min_compat_pvr, max_compat_pvr)=
+;
+> +}
+> +
+> +bool ppc_type_check_compat(const char *cputype, uint32_t compat_pvr,
+> +                           uint32_t min_compat_pvr, uint32_t max_compa=
+t_pvr)
+> +{
+> +    PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(object_class_by_name(cp=
+utype));
+> +    return pcc_compat(pcc, compat_pvr, min_compat_pvr, max_compat_pvr)=
+;
+> +}
+> +
+>  void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp=
+)
+>  {
+>      const CompatInfo *compat =3D compat_by_pvr(compat_pvr);
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index 874da6efbc..c7f3fb6b73 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1369,7 +1369,11 @@ static inline int cpu_mmu_index (CPUPPCState *en=
+v, bool ifetch)
+>  #if defined(TARGET_PPC64)
+>  bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
+>                        uint32_t min_compat_pvr, uint32_t max_compat_pvr=
+);
+> +bool ppc_type_check_compat(const char *cputype, uint32_t compat_pvr,
+> +                           uint32_t min_compat_pvr, uint32_t max_compa=
+t_pvr);
+> +
+>  void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp=
+);
+> +
+>  #if !defined(CONFIG_USER_ONLY)
+>  void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
+>  #endif
+>=20
