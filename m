@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fW0lS-0001n9-QL
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:40:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1fW0mR-0002KU-AM
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:41:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fW0lP-0005Rx-N1
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:40:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44142 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fW0lP-0005Qa-In
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:40:43 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 952854023344
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 14:40:42 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
-	<20180321115211.17937-13-marcandre.lureau@redhat.com>
-Date: Thu, 21 Jun 2018 16:40:39 +0200
-In-Reply-To: <20180321115211.17937-13-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 21 Mar 2018
-	12:51:34 +0100")
-Message-ID: <87lgb8kxso.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1fW0mO-0005tz-2i
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:41:47 -0400
+References: <20180413143156.11409-1-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c7cb351c-4215-3937-37fa-ad704dcf95c8@redhat.com>
+Date: Thu, 21 Jun 2018 09:41:33 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 12/49] qapi/events: add #if conditions
- to events
+In-Reply-To: <20180413143156.11409-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] nbd/server: introduce NBD_CMD_CACHE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,36 +23,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Wrap generated code with #if/#endif using an 'ifcontext' on
-> QAPIGenCSnippet objects.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 04/13/2018 09:31 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Handle nbd CACHE command. Just do read, without sending read data back.
+> Cache mechanism should be done by exported node driver chain.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  scripts/qapi/events.py | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-> index 26ae00f6f7..dae03e3d88 100644
-> --- a/scripts/qapi/events.py
-> +++ b/scripts/qapi/events.py
-> @@ -185,8 +185,9 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVis=
-itor):
->          genc.add(gen_enum_lookup(self._enum_name, self._event_names))
->=20=20
->      def visit_event(self, name, info, ifcond, arg_type, boxed):
-> -        self._genh.add(gen_event_send_decl(name, arg_type, boxed))
-> -        self._genc.add(gen_event_send(name, arg_type, boxed, self._enum_=
-name))
-> +        with ifcontext(ifcond, self._genh, self._genc):
-> +            self._genh.add(gen_event_send_decl(name, arg_type, boxed))
-> +            self._genc.add(gen_event_send(name, arg_type, boxed, self._e=
-num_name))
+>   include/block/nbd.h |  3 ++-
+>   nbd/server.c        | 10 ++++++----
+>   2 files changed, 8 insertions(+), 5 deletions(-)
 
-events.py:190:80: E501 line too long (82 > 79 characters)
+Missing a change to nbd/common.c nbd_cmd_lookup().
 
->          self._event_names.append(name)
+> @@ -1911,7 +1913,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
+>       int ret;
+>       NBDExport *exp = client->exp;
+>   
+> -    assert(request->type == NBD_CMD_READ);
+> +    assert(request->type == NBD_CMD_READ || request->type == NBD_CMD_CACHE);
+
+Also, missing a call into this function for NBD_CMD_CACHE.
+
+Squashing the following, then adding to my NBD queue, with:
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+diff --git i/nbd/common.c w/nbd/common.c
+index 8c95c1d606e..41f5ed8d9fa 100644
+--- i/nbd/common.c
++++ w/nbd/common.c
+@@ -148,6 +148,8 @@ const char *nbd_cmd_lookup(uint16_t cmd)
+          return "flush";
+      case NBD_CMD_TRIM:
+          return "trim";
++    case NBD_CMD_CACHE:
++        return "cache";
+      case NBD_CMD_WRITE_ZEROES:
+          return "write zeroes";
+      case NBD_CMD_BLOCK_STATUS:
+diff --git i/nbd/server.c w/nbd/server.c
+index 323c6d84004..274604609f4 100644
+--- i/nbd/server.c
++++ w/nbd/server.c
+@@ -2173,6 +2173,7 @@ static coroutine_fn int 
+nbd_handle_request(NBDClient *client,
+
+      switch (request->type) {
+      case NBD_CMD_READ:
++    case NBD_CMD_CACHE:
+          return nbd_do_cmd_read(client, request, data, errp);
+
+      case NBD_CMD_WRITE:
+
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
