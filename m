@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fVvCR-0000js-4r
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:44:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fVvII-0002ru-7B
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:50:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fVvCM-0000Po-4W
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:44:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56824 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fVvCL-0000P5-VS
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:44:10 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AC61D400E9A3
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 08:44:08 +0000 (UTC)
-Date: Thu, 21 Jun 2018 10:44:05 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180621104405.12cf2e7c@redhat.com>
-In-Reply-To: <20180620153947.30834-2-dgilbert@redhat.com>
-References: <20180620153947.30834-1-dgilbert@redhat.com>
-	<20180620153947.30834-2-dgilbert@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fVvIH-0004vU-DV
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:50:18 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:44522)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fVvIH-0004vA-1a
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 04:50:17 -0400
+Received: by mail-ot0-x241.google.com with SMTP id w13-v6so2674783ote.11
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 01:50:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/7] hmp: Add flag for preconfig commands
+In-Reply-To: <20180621062605.941-2-alex.bennee@linaro.org>
+References: <20180621062605.941-1-alex.bennee@linaro.org>
+	<20180621062605.941-2-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 Jun 2018 09:49:55 +0100
+Message-ID: <CAFEAcA8WQD26TW+zfd-f=qeUP7QFxHixV-AENWEmWyyNU3bseg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 01/57] docker: docker.py wrap StringIO
+ import for python3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,70 +31,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, peterx@redhat.com
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
 
-On Wed, 20 Jun 2018 16:39:41 +0100
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+On 21 June 2018 at 07:25, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> Although the docker.py is nominally python2 we actually invoke it with
+> the configured python from the configure script.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+> index 306e14cf69..e4095270eb 100755
+> --- a/tests/docker/docker.py
+> +++ b/tests/docker/docker.py
+> @@ -26,7 +26,10 @@ import tempfile
+>  import re
+>  import signal
+>  from tarfile import TarFile, TarInfo
+> -from StringIO import StringIO
+> +try:
+> +    from StringIO import StringIO
+> +except ImportError:
+> +    from io import StringIO
+>  from shutil import copy, rmtree
+>  from pwd import getpwuid
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> Add a flag to command definitions to allow them to be used in preconfig
-> and check it.
-> If users try to use commands that aren't available, tell them to use
-> the exit_preconfig comand we're adding in a few patches.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+This is fairly trivial, but it is a new unreviewed patch:
+would one of the python experts like to review it ?
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
->  monitor.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
-> 
-> diff --git a/monitor.c b/monitor.c
-> index 885e000f9b..8dc86c0c3c 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -128,6 +128,7 @@ typedef struct mon_cmd_t {
->      const char *args_type;
->      const char *params;
->      const char *help;
-> +    const char *flags; /* p=preconfig */
->      void (*cmd)(Monitor *mon, const QDict *qdict);
->      /* @sub_table is a list of 2nd level of commands. If it does not exist,
->       * cmd should be used. If it exists, sub_table[?].cmd should be
-> @@ -958,6 +959,19 @@ static int parse_cmdline(const char *cmdline,
->      return -1;
->  }
->  
-> +/*
-> + * Returns true if the command can be executed in preconfig mode
-> + * i.e. it has the 'p' flag.
-> + */
-> +static bool cmd_can_preconfig(const mon_cmd_t *cmd)
-> +{
-> +    if (!cmd->flags) {
-> +        return false;
-> +    }
-> +
-> +    return strchr(cmd->flags, 'p');
-> +}
-> +
->  static void help_cmd_dump_one(Monitor *mon,
->                                const mon_cmd_t *cmd,
->                                char **prefix_args,
-> @@ -3041,6 +3055,12 @@ static const mon_cmd_t *monitor_parse_command(Monitor *mon,
->                         (int)(p - cmdp_start), cmdp_start);
->          return NULL;
->      }
-> +    if (runstate_check(RUN_STATE_PRECONFIG) && !cmd_can_preconfig(cmd)) {
-> +        monitor_printf(mon, "Command '%.*s' not available with -preconfig "
-> +                            "until after exit_preconfig.\n",
-> +                       (int)(p - cmdp_start), cmdp_start);
-> +        return NULL;
-> +    }
->  
->      /* filter out following useless space */
->      while (qemu_isspace(*p)) {
+thanks
+-- PMM
