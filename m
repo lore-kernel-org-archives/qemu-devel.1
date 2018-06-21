@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fVxfV-00078e-Ie
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:22:26 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fVxgi-0007wc-3G
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:23:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fVxfR-0005aj-Jo
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:22:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36704 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fVxfR-0005af-Do
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:22:21 -0400
-References: <20180620110741.gdywesuqbyhjs4hd@sirius.home.kraxel.org>
-	<ce257b1b-4d04-9e76-2ded-730b2a410f91@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ee3462a2-bad7-3b2f-e218-356529163663@redhat.com>
-Date: Thu, 21 Jun 2018 13:22:18 +0200
+	(envelope-from <eric.auger@redhat.com>) id 1fVxgh-00063E-1a
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:23:40 -0400
+References: <1529500053-21704-1-git-send-email-eric.auger@redhat.com>
+	<1529500053-21704-4-git-send-email-eric.auger@redhat.com>
+	<20180621003758.GB32328@umbus.fritz.box>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <12605529-29b8-eb41-820c-f5604d1ac771@redhat.com>
+Date: Thu, 21 Jun 2018 13:23:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <ce257b1b-4d04-9e76-2ded-730b2a410f91@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20180621003758.GB32328@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] regression: sata cdrom boot broken
+Subject: Re: [Qemu-devel] [RFC 3/6] kvm: add kvm_get_max_vm_phys_shift
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-Cc: jsnow@redhat.com, f4bug@amsat.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, dgilbert@redhat.com, agraf@suse.de, drjones@redhat.com, wei@redhat.com, suzuki.poulose@arm.com
 
-On 20/06/2018 20:15, Thomas Huth wrote:
-> On 20.06.2018 13:07, Gerd Hoffmann wrote:
->>   Hi,
+Hi David,
+
+On 06/21/2018 02:37 AM, David Gibson wrote:
+> On Wed, Jun 20, 2018 at 03:07:30PM +0200, Eric Auger wrote:
+>> Add the kvm_get_max_vm_phys_shift() helper that returns the
+>> log of the maximum IPA size supported by KVM. This capability
+>> needs to be known to create the VM with a correct IPA max size
+>> (kvm_type passed along KVM_CREATE_VM ioctl.
 >>
->> $subject says all.  Noticed while testing the upcoming seabios update.
->> Reproducer:
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  accel/kvm/kvm-all.c    | 7 +++++++
+>>  accel/stubs/kvm-stub.c | 5 +++++
+>>  include/sysemu/kvm.h   | 1 +
+>>  3 files changed, 13 insertions(+)
 >>
->>   qemu-system-x86_64 -M q35 -m 4G -cdrom Fedora-Workstation-Live-x86_64-28-1.1.iso
+>> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+>> index 0590986..137c38e 100644
+>> --- a/accel/kvm/kvm-all.c
+>> +++ b/accel/kvm/kvm-all.c
+>> @@ -280,6 +280,13 @@ static int kvm_set_user_memory_region(KVMMemoryListener *kml, KVMSlot *slot)
+>>      return ret;
+>>  }
+>>  
+>> +int kvm_get_max_vm_phys_shift(MachineState *ms)
+>> +{
+>> +    KVMState *s = KVM_STATE(ms->accelerator);
+>> +
+>> +    return kvm_ioctl(s, KVM_ARM_GET_MAX_VM_PHYS_SHIFT, 0);
 > 
-> Once this has been fixed, please add a regression test to tests/cdrom-test.c
-> for this, so that it can not happen so easily again. A line like this
-> should do the job:
+> From the ioctl() name, I'm assuming this is an ARM specific call.
 > 
->  qtest_add_data_func("cdrom/boot/q35", "-M q35 -cdrom ", test_cdboot);
+> In which case, shouldn't it be in target/arm.kvm.c, not kvm-all.c ?
+Yes definitively.
 
-Nice!  The patch I've sent fixes tests/ahci-test.c to match what the
-code now does, but cdrom-test.c is also good.
+Thanks
 
-Thanks,
-
-Paolo
+Eric
+> 
+>> +}
+>> +
+>>  int kvm_destroy_vcpu(CPUState *cpu)
+>>  {
+>>      KVMState *s = kvm_state;
+>> diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+>> index 02d5170..7575ba7 100644
+>> --- a/accel/stubs/kvm-stub.c
+>> +++ b/accel/stubs/kvm-stub.c
+>> @@ -161,6 +161,11 @@ bool kvm_has_free_slot(MachineState *ms)
+>>      return false;
+>>  }
+>>  
+>> +int kvm_get_max_vm_phys_shift(MachineState *ms)
+>> +{
+>> +    return 0;
+>> +}
+>> +
+>>  void kvm_init_cpu_signals(CPUState *cpu)
+>>  {
+>>      abort();
+>> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+>> index 0b64b8e..240e3d9 100644
+>> --- a/include/sysemu/kvm.h
+>> +++ b/include/sysemu/kvm.h
+>> @@ -206,6 +206,7 @@ extern KVMState *kvm_state;
+>>  /* external API */
+>>  
+>>  bool kvm_has_free_slot(MachineState *ms);
+>> +int kvm_get_max_vm_phys_shift(MachineState *ms);
+>>  bool kvm_has_sync_mmu(void);
+>>  int kvm_has_vcpu_events(void);
+>>  int kvm_has_robust_singlestep(void);
+> 
