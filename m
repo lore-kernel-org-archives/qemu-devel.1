@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fVzIL-0006TC-UC
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:06:41 -0400
+	(envelope-from <renyime@gmail.com>) id 1fVzKD-0007l9-M5
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:08:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fVzIF-0001XC-SL
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:06:37 -0400
-Date: Thu, 21 Jun 2018 15:06:22 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180621130622.GH5024@localhost.localdomain>
-References: <cover.1528991017.git.berto@igalia.com>
-	<6782db91216488e4fc1509a267a362a3f15a1aaa.1528991017.git.berto@igalia.com>
-	<20180618143801.GC4667@localhost.localdomain>
-	<w51in6gp213.fsf@maestria.local.igalia.com>
-	<20180618161229.GD4667@localhost.localdomain>
-	<w51vaaf0xnj.fsf@maestria.local.igalia.com>
-	<20180619130509.GA21115@dhcp-200-186.str.redhat.com>
-	<w51sh5i5047.fsf@maestria.local.igalia.com>
-	<20180620105854.GC3946@localhost.localdomain>
-	<w51vaadr5ys.fsf@maestria.local.igalia.com>
+	(envelope-from <renyime@gmail.com>) id 1fVzKB-00027V-SU
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:08:33 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w51vaadr5ys.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 06/10] block: Allow changing the
- backing file on reopen
+References: <1525506577-1946-1-git-send-email-ivanren@tencent.com>
+	<04ee2a50-c79d-fe1d-4c08-52ba9ec7fb21@redhat.com>
+In-Reply-To: <04ee2a50-c79d-fe1d-4c08-52ba9ec7fb21@redhat.com>
+From: Ivan Ren <renyime@gmail.com>
+Date: Thu, 21 Jun 2018 21:08:23 +0800
+Message-ID: <CA+6E1=kSu5ynk4fPvgfiU06dTAcJ3QZbJaDetKx=BUfB3sc5aA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] qemu-img: return allocated
+ size for block device with qcow2 format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +23,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: jsnow@redhat.com
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com
 
-Am 20.06.2018 um 14:35 hat Alberto Garcia geschrieben:
-> On Wed 20 Jun 2018 12:58:55 PM CEST, Kevin Wolf wrote:
-> > Am 19.06.2018 um 16:20 hat Alberto Garcia geschrieben:
-> >> >> Wait, I think the description I gave is inaccurate:
-> >> >> 
-> >> >> commit_complete() calls bdrv_drop_intermediate(), and that updates the
-> >> >> backing image name (c->role->update_filename()). If we're doing this in
-> >> >> an intermediate node then it needs to be reopened in read-write mode,
-> >> >> while keeping the rest of the options.
-> >> >> 
-> >> >> But then bdrv_reopen_commit() realizes that the backing file (from
-> >> >> reopen_state->options) is not the current one (because there's a
-> >> >> bdrv_mirror_top implicit filter) and attempts to remove it. And that's
-> >> >> the root cause of the crash.
-> >> >
-> >> > How did the other (the real?) backing file get into
-> >> > reopen_state->options? I don't think bdrv_drop_intermediate() wants to
-> >> > change anything except the read-only flag, so we should surely have
-> >> > the node name of bdrv_mirror_top there?
-> >> 
-> >> No, it doesn't (try to) change anything else. It cannot do it:
-> >> bdrv_reopen() only takes flags, but keeps the current options. And the
-> >> current options have 'backing' set to a thing different from the
-> >> bdrv_mirror_top node.
+>> qemu-img info with a block device which has a qcow2 format always
+>> return 0 for disk size, and this can not reflect the qcow2 size
+>> and the used space of the block device. This patch return the
+>> allocated size of qcow2 as the disk size.
+>>
+>
+>This has hit over a month old; I only skimmed the comments on V1 from
+>Max and Eric. Is this something we still want?
+
+Thanks for reply.
+
+I think it's better to return this information instead of 0.
+
+On Wed, Jun 13, 2018 at 2:42 AM John Snow <jsnow@redhat.com> wrote:
+
+>
+>
+> On 05/05/2018 03:49 AM, Ivan Ren wrote:
+> > qemu-img info with a block device which has a qcow2 format always
+> > return 0 for disk size, and this can not reflect the qcow2 size
+> > and the used space of the block device. This patch return the
+> > allocated size of qcow2 as the disk size.
 > >
-> > Okay, so in theory this is expected to just work.
+>
+> This has hit over a month old; I only skimmed the comments on V1 from
+> Max and Eric. Is this something we still want?
+>
+> --js
+>
+> > Signed-off-by: Ivan Ren <ivanren@tencent.com>
+> > ---
+> >  block/qcow2.c | 54
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 54 insertions(+)
 > >
-> > Actually, do we ever use bdrv_reopen() for flags other than read-only?
-> > Maybe we should get rid of that flags nonsense and simply make it a
-> > bdrv_reopen_set_readonly() taking a boolean.
-> 
-> I think that's a good idea. There's however one case where other flags
-> are changed: reopen_backing_file() in block/replication.c that also
-> clears BDRV_O_INACTIVE. I'd need to take a closer look to that code to
-> see what we can do about it.
-
-Uh, and that works?
-
-Clearing BDRV_O_INACTIVE with bdrv_reopen() (which means, without
-calling bdrv_invalidate_cache()) is surely suspicious. Probably this
-code is buggy.
-
-Another reason for removing flags from the interface: We didn't do any
-sanity checks for the flag changes.
-
-> And there's of course qemu-io's "reopen" command, which does take
-> options but keeps the previous values.
-
-It provides -r/-w for changing readonly and -c to change the cache mode
-flags. Both should be easy to convert to QDict options.
-
-> > I think we should already remove nested options of children from the
-> > dicts in bdrv_open_inherit(). I'm less sure about node-name
-> > references.  Maybe instead of keeing the dicts up-to-date each time we
-> > modify the graph, we should just get rid of those in the dicts as
-> > well, and instead add a function that reconstructs the full dict from
-> > bs->options and the currently attached children. This requires that
-> > the child name and the option name match, but I think that's
-> > true. (Mostly at least - what about quorum? But the child node
-> > handling of quorum is broken anyway.)
-> 
-> Yes, removing nested options sounds like a good idea. In what cases do
-> we need the full qdict, though?
-
-Not sure, maybe we don't even need them now that we decided that the
-default is leaving the reference unchanged.
-
-There's the creation of json: filenames, maybe we need it there. We'd
-also certainly need to get the full QDict if we wanted to convert the
-options to a QAPI object before we pass them to the drivers.
-
-Kevin
+> > This version differs from the previous:
+> > (1).Accumulate all non-0 refcount cluster as the allocated size instead
+> the
+> > highest offset.
+> > (2).Simplify the implementation by just check the refcount info.
+> >
+> > diff --git a/block/qcow2.c b/block/qcow2.c
+> > index ef68772..e64469a 100644
+> > --- a/block/qcow2.c
+> > +++ b/block/qcow2.c
+> > @@ -4493,6 +4493,59 @@ static QemuOptsList qcow2_create_opts = {
+> >      }
+> >  };
+> >
+> > +/* Get allocated space of qcow2, aligned to cluster_size */
+> > +static int64_t qcow2_get_allocated_size(BlockDriverState *bs)
+> > +{
+> > +    int64_t allocated_cluster_count = 0;
+> > +    uint64_t refcount;
+> > +    int64_t i, j, begin_index, end_index;
+> > +
+> > +    BDRVQcow2State *s = bs->opaque;
+> > +
+> > +    /* Traverse refcount table */
+> > +    for (i = 0; i < s->refcount_table_size; i++) {
+> > +        if (s->refcount_table[i] & REFT_OFFSET_MASK) {
+> > +            begin_index = i * s->refcount_block_size;
+> > +            end_index = begin_index + s->refcount_block_size;
+> > +            for (j = begin_index; j < end_index; j++) {
+> > +                if (qcow2_get_refcount(bs, j, &refcount) < 0) {
+> > +                    continue;
+> > +                }
+> > +                if (refcount > 0) {
+> > +                    allocated_cluster_count++;
+> > +                }
+> > +            }
+> > +        }
+> > +
+> > +    }
+> > +
+> > +    return allocated_cluster_count * s->cluster_size;
+> > +}
+> > +
+> > +static int64_t qcow2_get_allocated_file_size(BlockDriverState *bs)
+> > +{
+> > +    int64_t ret = 0;
+> > +
+> > +    /* Get through bs->file first */
+> > +    if (bs->file) {
+> > +        ret = bdrv_get_allocated_file_size(bs->file->bs);
+> > +    }
+> > +
+> > +    /*
+> > +     * If ret < 0, some error may happen to the underlying media,
+> return the
+> > +     * error directly.
+> > +     * If ret == 0, means length get from bs->file is 0, which is
+> impossible
+> > +     * for a normal file because of the qcow2 header. In this case, the
+> > +     * underlying media may be a block device or anything else that
+> can't
+> > +     * return a suitable size. So we get the allocated size of qcow2
+> instead.
+> > +     */
+> > +    if (!ret) {
+> > +        ret = qcow2_get_allocated_size(bs);
+> > +    }
+> > +
+> > +    return ret;
+> > +}
+> > +
+> >  BlockDriver bdrv_qcow2 = {
+> >      .format_name        = "qcow2",
+> >      .instance_size      = sizeof(BDRVQcow2State),
+> > @@ -4516,6 +4569,7 @@ BlockDriver bdrv_qcow2 = {
+> >      .bdrv_co_pwrite_zeroes  = qcow2_co_pwrite_zeroes,
+> >      .bdrv_co_pdiscard       = qcow2_co_pdiscard,
+> >      .bdrv_truncate          = qcow2_truncate,
+> > +    .bdrv_get_allocated_file_size = qcow2_get_allocated_file_size,
+> >      .bdrv_co_pwritev_compressed = qcow2_co_pwritev_compressed,
+> >      .bdrv_make_empty        = qcow2_make_empty,
+> >
+> >
+>
