@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fW1mo-0005DN-20
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:46:15 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fW1pR-0006b1-Ox
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:48:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fW1mj-0001yr-Tz
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:46:14 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43316)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fW1mj-0001yT-O7
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:46:09 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fW1mi-0001dV-5O
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 15:46:08 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1FAB72E80D3
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 15:46:08 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 21 Jun 2018 15:35:03 -0000
-From: =?utf-8?q?Murilo_Opsfelder_Ara=C3=BAjo?= <623852@bugs.launchpad.net>
-Reply-To: Bug 623852 <623852@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20100825083959.9657.28618.malonedeb@soybean.canonical.com>
-Message-Id: <152959530419.1873.15388228966925973868.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 623852] Re: PPC emulation loops on booting a
- FreeBSD kernel
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fW1pO-0003Ai-L9
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:48:57 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Date: Thu, 21 Jun 2018 18:48:50 +0300
+Message-Id: <20180621154850.23354-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH] block/fleecing-filter: new filter driver for
+ fleecing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,83 +18,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: armbru@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, den@openvz.com
 
-Hi, Nigel.
+We need to synchronize backup job with reading from fleecing image
+like it was done in block/replication.c.
 
-Support for powerpc64 is available since FreeBSD 9.0-RELEASE, I think.
-FreeBSD 11.2-RC2 boots fine in QEMU (at commit 46012db666990ff2eed1d3dc)
-running on an x86 host with accel=3Dtcg.  Below are the steps I have
-followed to boot it.
+Otherwise, the following situation is theoretically possible:
 
-Build QEMU:
+1. client start reading
+2. client understand, that there is no corresponding cluster in
+   fleecing image
+3. client is going to read from backing file (i.e. active image)
+4. guest writes to active image
+5. this write is stopped by backup(sync=none) and cluster is copied to
+   fleecing image
+6. guest write continues...
+7. and client reads _new_ (or partly new) date from active image
 
-$ mkdir build && cd build
-$ ../configure --target-list=3Dppc64-softmmu
-$ make -j$(nproc)
+So, this fleecing-filter should be above fleecing image, the whole
+picture of fleecing looks like this:
 
-Boot FreeBSD:
+    +-------+           +------------+
+    |       |           |            |
+    | guest |           | NBD client +<------+
+    |       |           |            |       |
+    ++-----++           +------------+       |only read
+     |     ^                                 |
+     | IO  |                                 |
+     v     |                           +-----+------+
+    ++-----+---------+                 |            |
+    |                |                 |  internal  |
+    |  active image  +----+            | NBD server |
+    |                |    |            |            |
+    +-+--------------+    |backup      +-+----------+
+      ^                   |sync=none     ^
+      |backing            |              |only read
+      |                   |              |
+    +-+--------------+    |       +------+----------+
+    |                |    |       |                 |
+    | fleecing image +<---+       | fleecing filter |
+    |                |            |                 |
+    +--------+-------+            +-----+-----------+
+             ^                          |
+             |                          |
+             +--------------------------+
+                       file
 
-$ wget http://ftp.freebsd.org/pub/FreeBSD/releases/powerpc/powerpc64/ISO-IM=
-AGES/11.2/FreeBSD-11.2-RC2-powerpc-powerpc64-disc1.iso
-$ ./qemu-img create -f qcow2 freebsd.qcow2 10G
-$ ./ppc64-softmmu/qemu-system-ppc64 -name freebsd -machine pseries,accel=3D=
-tcg,usb=3Doff -m 1024 -realtime mlock=3Doff -smp 4,sockets=3D4,cores=3D1,th=
-reads=3D1 -nographic -no-user-config -nodefaults -rtc base=3Dutc -no-shutdo=
-wn -boot strict=3Don -device pci-bridge,chassis_nr=3D1,id=3Dpci.1,bus=3Dpci=
-.0,addr=3D0x1 -device pci-ohci,id=3Dusb,bus=3Dpci.0,addr=3D0x2 -device spap=
-r-vscsi,id=3Dscsi0,reg=3D0x2000 -drive file=3Dfreebsd.qcow2,format=3Dqcow2,=
-if=3Dnone,id=3Ddrive-scsi0-0-0-0 -device scsi-hd,bus=3Dscsi0.0,channel=3D0,=
-scsi-id=3D0,lun=3D0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D=
-1 -drive file=3DFreeBSD-11.2-RC2-powerpc-powerpc64-disc1.iso,format=3Draw,i=
-f=3Dnone,id=3Ddrive-scsi0-0-1-0,readonly=3Don -device scsi-cd,bus=3Dscsi0.0=
-,channel=3D0,scsi-id=3D1,lun=3D0,drive=3Ddrive-scsi0-0-1-0,id=3Dscsi0-0-1-0=
-,bootindex=3D2 -netdev user,id=3Dhostnet0 -device spapr-vlan,netdev=3Dhostn=
-et0,id=3Dnet0,mac=3D4c:45:42:45:01:18,reg=3D0x1000 -device virtio-balloon-p=
-ci,id=3Dballoon0,bus=3Dpci.0,addr=3D0x4 -msg timestamp=3Don -serial mon:std=
-io
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ qapi/block-core.json    |  9 ++++---
+ block/fleecing-filter.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++
+ block/Makefile.objs     |  1 +
+ 3 files changed, 79 insertions(+), 3 deletions(-)
+ create mode 100644 block/fleecing-filter.c
 
-Since this bug is almost 8 years old and FreeBSD powerpc64 seems to be
-working just fine, I will close it.  Feel free to submit a new one if
-needed.
-
-Cheers
-Murilo
-
-** Changed in: qemu
-       Status: New =3D> Invalid
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/623852
-
-Title:
-  PPC emulation loops on booting a FreeBSD kernel
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Has anyone tried booting FreeBSD8.1-ppc under QEMU (Linux x86_64 host;
-  PPC guest)?  I can get Linux/PPC to run fine, and FreeBSD8.1-i386 as
-  well; but there seems to be a problem with whatever the FreeBSD8.1
-  kernel does, that QEMU's PPC emulation can't handle.
-
-  I am using the latest version of QEMU from GIT as of 25/8/10.  I don't
-  know how to get a "git commit hash", so I can't quote it.
-
-  The kernel starts OK then loops after "Kernel entry at 0x100100 ...".
-
-  The command I am running is
-
-  qemu-system-ppc -cdrom FreeBSD-8.1-RELEASE-powerpc-disc1.iso -hda
-  freebsd8.1-ppc -m 94 -boot d"
-
-  I obtained the kernel from
-  ftp://ftp.freebsd.org/pub/FreeBSD/releases/powerpc/ISO-
-  IMAGES/8.1/FreeBSD-8.1-RELEASE-powerpc-disc1.iso.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/623852/+subscriptions
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index dfaa050651..b21bc3b693 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2543,7 +2543,8 @@
+             'host_device', 'http', 'https', 'iscsi', 'luks', 'nbd', 'nfs',
+             'null-aio', 'null-co', 'nvme', 'parallels', 'qcow', 'qcow2', 'qed',
+             'quorum', 'raw', 'rbd', 'replication', 'sheepdog', 'ssh',
+-            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
++            'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs',
++            'fleecing-filter' ] }
+ 
+ ##
+ # @BlockdevOptionsFile:
+@@ -3607,7 +3608,8 @@
+       'vmdk':       'BlockdevOptionsGenericCOWFormat',
+       'vpc':        'BlockdevOptionsGenericFormat',
+       'vvfat':      'BlockdevOptionsVVFAT',
+-      'vxhs':       'BlockdevOptionsVxHS'
++      'vxhs':       'BlockdevOptionsVxHS',
++      'fleecing-filter': 'BlockdevOptionsGenericFormat'
+   } }
+ 
+ ##
+@@ -4135,7 +4137,8 @@
+       'vmdk':           'BlockdevCreateNotSupported',
+       'vpc':            'BlockdevCreateOptionsVpc',
+       'vvfat':          'BlockdevCreateNotSupported',
+-      'vxhs':           'BlockdevCreateNotSupported'
++      'vxhs':           'BlockdevCreateNotSupported',
++      'fleecing-filter': 'BlockdevCreateNotSupported'
+   } }
+ 
+ ##
+diff --git a/block/fleecing-filter.c b/block/fleecing-filter.c
+new file mode 100644
+index 0000000000..60bac9c0b4
+--- /dev/null
++++ b/block/fleecing-filter.c
+@@ -0,0 +1,72 @@
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "block/blockjob.h"
++#include "block/block_int.h"
++#include "block/block_backup.h"
++
++static int64_t fleecing_getlength(BlockDriverState *bs)
++{
++    return bdrv_getlength(bs->file->bs);
++}
++
++static coroutine_fn int fleecing_co_preadv(BlockDriverState *bs,
++                                           uint64_t offset, uint64_t bytes,
++                                           QEMUIOVector *qiov, int flags)
++{
++    int ret;
++    BlockJob *job = bs->file->bs->backing->bs->job;
++    CowRequest req;
++
++    backup_wait_for_overlapping_requests(job, offset, bytes);
++    backup_cow_request_begin(&req, job, offset, bytes);
++
++    ret = bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
++
++    backup_cow_request_end(&req);
++
++    return ret;
++}
++
++static coroutine_fn int fleecing_co_pwritev(BlockDriverState *bs,
++                                            uint64_t offset, uint64_t bytes,
++                                            QEMUIOVector *qiov, int flags)
++{
++    return -EINVAL;
++}
++
++static bool fleecing_recurse_is_first_non_filter(BlockDriverState *bs,
++                                                 BlockDriverState *candidate)
++{
++    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
++}
++
++static int fleecing_open(BlockDriverState *bs, QDict *options,
++                         int flags, Error **errp)
++{
++    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
++                               errp);
++
++    return bs->file ? 0 : -EINVAL;
++}
++
++BlockDriver bdrv_fleecing_filter = {
++    .format_name = "fleecing-filter",
++    .protocol_name = "fleecing-filter",
++    .instance_size = 0,
++
++    .bdrv_open = fleecing_open,
++
++    .bdrv_getlength = fleecing_getlength,
++    .bdrv_co_preadv = fleecing_co_preadv,
++    .bdrv_co_pwritev = fleecing_co_pwritev,
++
++    .is_filter = true,
++    .bdrv_recurse_is_first_non_filter = fleecing_recurse_is_first_non_filter,
++};
++
++static void bdrv_fleecing_init(void)
++{
++    bdrv_register(&bdrv_fleecing_filter);
++}
++
++block_init(bdrv_fleecing_init);
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index 899bfb5e2c..aa0a6dd971 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -27,6 +27,7 @@ block-obj-y += write-threshold.o
+ block-obj-y += backup.o
+ block-obj-$(CONFIG_REPLICATION) += replication.o
+ block-obj-y += throttle.o copy-on-read.o
++block-obj-y += fleecing-filter.o
+ 
+ block-obj-y += crypto.o
+ 
+-- 
+2.11.1
