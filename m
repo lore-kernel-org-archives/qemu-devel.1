@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <renyime@gmail.com>) id 1fVzKD-0007l9-M5
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:08:40 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fVzOp-0000iV-Rv
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:13:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <renyime@gmail.com>) id 1fVzKB-00027V-SU
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:08:33 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fVzOo-00050P-IH
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:13:19 -0400
+References: <20180413143156.11409-1-vsementsov@virtuozzo.com>
+	<8003bc90-1b11-3d1b-07a3-dca4d49fb79b@virtuozzo.com>
+	<dcffbc2b-e0b0-3c90-0c29-aa0c0be64af8@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <0b3bc235-e1a5-f076-2903-15a12041eed9@virtuozzo.com>
+Date: Thu, 21 Jun 2018 16:13:07 +0300
 MIME-Version: 1.0
-References: <1525506577-1946-1-git-send-email-ivanren@tencent.com>
-	<04ee2a50-c79d-fe1d-4c08-52ba9ec7fb21@redhat.com>
-In-Reply-To: <04ee2a50-c79d-fe1d-4c08-52ba9ec7fb21@redhat.com>
-From: Ivan Ren <renyime@gmail.com>
-Date: Thu, 21 Jun 2018 21:08:23 +0800
-Message-ID: <CA+6E1=kSu5ynk4fPvgfiU06dTAcJ3QZbJaDetKx=BUfB3sc5aA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2] qemu-img: return allocated
- size for block device with qcow2 format
+In-Reply-To: <dcffbc2b-e0b0-3c90-0c29-aa0c0be64af8@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH] nbd/server: introduce NBD_CMD_CACHE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,125 +25,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, eblake@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, pbonzini@redhat.com
 
->> qemu-img info with a block device which has a qcow2 format always
->> return 0 for disk size, and this can not reflect the qcow2 size
->> and the used space of the block device. This patch return the
->> allocated size of qcow2 as the disk size.
+17.05.2018 16:34, Eric Blake wrote:
+> On 05/17/2018 04:52 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Finally, what about this?
 >>
+>> 13.04.2018 17:31, Vladimir Sementsov-Ogievskiy wrote:
+>>> Handle nbd CACHE command. Just do read, without sending read data back.
+>>> Cache mechanism should be done by exported node driver chain.
 >
->This has hit over a month old; I only skimmed the comments on V1 from
->Max and Eric. Is this something we still want?
+> Still waiting on the NBD spec review, which I've pinged on the NBD=20
+> list. But as mentioned there, I'll probably go ahead and accept this=20
+> (possibly with slight tweaks) on Monday, after giving one more weekend=20
+> for any last-minute review comments.
 
-Thanks for reply.
-
-I think it's better to return this information instead of 0.
-
-On Wed, Jun 13, 2018 at 2:42 AM John Snow <jsnow@redhat.com> wrote:
+Hmm, Eric?
 
 >
+>>> @@ -1826,7 +1826,9 @@ static int=20
+>>> nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EIO;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> -=C2=A0=C2=A0=C2=A0 if (request->type =3D=3D NBD_CMD_READ || request->t=
+ype =3D=3D=20
+>>> NBD_CMD_WRITE) {
+>>> +=C2=A0=C2=A0=C2=A0 if (request->type =3D=3D NBD_CMD_READ || request->t=
+ype =3D=3D=20
+>>> NBD_CMD_WRITE ||
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 request->type =3D=3D NBD_CM=
+D_CACHE)
+>>> +=C2=A0=C2=A0=C2=A0 {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (request->len=
+ > NBD_MAX_BUFFER_SIZE) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 error_setg(errp, "len (%" PRIu32" ) is larger than max=20
+>>> len (%u)",
 >
-> On 05/05/2018 03:49 AM, Ivan Ren wrote:
-> > qemu-img info with a block device which has a qcow2 format always
-> > return 0 for disk size, and this can not reflect the qcow2 size
-> > and the used space of the block device. This patch return the
-> > allocated size of qcow2 as the disk size.
-> >
+> I'm not sure I agree with this one. Since we aren't passing the cached=20
+> data over the wire, we can reject the command with EINVAL instead of=20
+> killing the connection entirely.
 >
-> This has hit over a month old; I only skimmed the comments on V1 from
-> Max and Eric. Is this something we still want?
+> (As it is, I wonder if we can be nicer about rejecting a read request=20
+> > 32M. For a write request, we have to disconnect; but for a read=20
+> request, we can keep the connection alive by just returning EINVAL for=20
+> a too-large read, instead of our current behavior of disconnecting)
 >
-> --js
+>>> request->len, NBD_MAX_BUFFER_SIZE);
+>>> @@ -1911,7 +1913,7 @@ static coroutine_fn int=20
+>>> nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NBDExport *exp =3D client->exp;
+>>> -=C2=A0=C2=A0=C2=A0 assert(request->type =3D=3D NBD_CMD_READ);
+>>> +=C2=A0=C2=A0=C2=A0 assert(request->type =3D=3D NBD_CMD_READ || request=
+->type =3D=3D=20
+>>> NBD_CMD_CACHE);
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* XXX: NBD Protocol only documents use =
+of FUA with WRITE */
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (request->flags & NBD_CMD_FLAG_FUA) {
+>>> @@ -1930,7 +1932,7 @@ static coroutine_fn int=20
+>>> nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D blk_pread(exp->blk, request->fro=
+m + exp->dev_offset, data,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 request->len);
+>>> -=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>>> +=C2=A0=C2=A0=C2=A0 if (ret < 0 || request->type =3D=3D NBD_CMD_CACHE) =
+{
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return nbd_send_=
+generic_reply(client, request->handle, ret,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 "reading from file failed",=20
+>>> errp);
 >
-> > Signed-off-by: Ivan Ren <ivanren@tencent.com>
-> > ---
-> >  block/qcow2.c | 54
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 54 insertions(+)
-> >
-> > This version differs from the previous:
-> > (1).Accumulate all non-0 refcount cluster as the allocated size instead
-> the
-> > highest offset.
-> > (2).Simplify the implementation by just check the refcount info.
-> >
-> > diff --git a/block/qcow2.c b/block/qcow2.c
-> > index ef68772..e64469a 100644
-> > --- a/block/qcow2.c
-> > +++ b/block/qcow2.c
-> > @@ -4493,6 +4493,59 @@ static QemuOptsList qcow2_create_opts = {
-> >      }
-> >  };
-> >
-> > +/* Get allocated space of qcow2, aligned to cluster_size */
-> > +static int64_t qcow2_get_allocated_size(BlockDriverState *bs)
-> > +{
-> > +    int64_t allocated_cluster_count = 0;
-> > +    uint64_t refcount;
-> > +    int64_t i, j, begin_index, end_index;
-> > +
-> > +    BDRVQcow2State *s = bs->opaque;
-> > +
-> > +    /* Traverse refcount table */
-> > +    for (i = 0; i < s->refcount_table_size; i++) {
-> > +        if (s->refcount_table[i] & REFT_OFFSET_MASK) {
-> > +            begin_index = i * s->refcount_block_size;
-> > +            end_index = begin_index + s->refcount_block_size;
-> > +            for (j = begin_index; j < end_index; j++) {
-> > +                if (qcow2_get_refcount(bs, j, &refcount) < 0) {
-> > +                    continue;
-> > +                }
-> > +                if (refcount > 0) {
-> > +                    allocated_cluster_count++;
-> > +                }
-> > +            }
-> > +        }
-> > +
-> > +    }
-> > +
-> > +    return allocated_cluster_count * s->cluster_size;
-> > +}
-> > +
-> > +static int64_t qcow2_get_allocated_file_size(BlockDriverState *bs)
-> > +{
-> > +    int64_t ret = 0;
-> > +
-> > +    /* Get through bs->file first */
-> > +    if (bs->file) {
-> > +        ret = bdrv_get_allocated_file_size(bs->file->bs);
-> > +    }
-> > +
-> > +    /*
-> > +     * If ret < 0, some error may happen to the underlying media,
-> return the
-> > +     * error directly.
-> > +     * If ret == 0, means length get from bs->file is 0, which is
-> impossible
-> > +     * for a normal file because of the qcow2 header. In this case, the
-> > +     * underlying media may be a block device or anything else that
-> can't
-> > +     * return a suitable size. So we get the allocated size of qcow2
-> instead.
-> > +     */
-> > +    if (!ret) {
-> > +        ret = qcow2_get_allocated_size(bs);
-> > +    }
-> > +
-> > +    return ret;
-> > +}
-> > +
-> >  BlockDriver bdrv_qcow2 = {
-> >      .format_name        = "qcow2",
-> >      .instance_size      = sizeof(BDRVQcow2State),
-> > @@ -4516,6 +4569,7 @@ BlockDriver bdrv_qcow2 = {
-> >      .bdrv_co_pwrite_zeroes  = qcow2_co_pwrite_zeroes,
-> >      .bdrv_co_pdiscard       = qcow2_co_pdiscard,
-> >      .bdrv_truncate          = qcow2_truncate,
-> > +    .bdrv_get_allocated_file_size = qcow2_get_allocated_file_size,
-> >      .bdrv_co_pwritev_compressed = qcow2_co_pwritev_compressed,
-> >      .bdrv_make_empty        = qcow2_make_empty,
-> >
-> >
+> As for the implementation on the server side, yes, this looks=20
+> reasonable, given the proposed spec wording being considered on the=20
+> NBD list.
 >
+
+
+--=20
+Best regards,
+Vladimir
