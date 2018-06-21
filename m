@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35245)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fVxYU-0002Yn-79
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:15:14 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fVxZr-0003NN-JR
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:16:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fVxYP-000240-8p
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:15:10 -0400
-References: <20180620100825.22476-1-david@redhat.com>
-	<20180620100825.22476-2-david@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <574e1e82-79f7-af2a-c590-87f480f369a0@redhat.com>
-Date: Thu, 21 Jun 2018 13:15:00 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180620100825.22476-2-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/7] s390x/tod: factor out TOD into
- separate device
+	(envelope-from <eric.auger@redhat.com>) id 1fVxZq-0003Fl-F5
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:16:35 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Thu, 21 Jun 2018 13:16:10 +0200
+Message-Id: <1529579774-27795-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/4] ARM SMMUv3: IOTLB Emulation and VHOST
+ Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,91 +18,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, jia.he@hxt-semitech.com, hejianet@gmail.com
 
-On 20.06.2018 12:08, David Hildenbrand wrote:
-> Let's treat this like a separate device. TCG will have to store the
-> actual state/time later on.
->=20
-> Include cpu-qom.h in kvm_s390x.h (due to S390CPU) to compile tod-kvm.c.
->=20
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
-[...]
-> +static void s390_tod_class_init(ObjectClass *oc, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
-> +
-> +    dc->desc =3D "TOD (Time Of Day) Clock";
-> +    dc->realize =3D s390_tod_realize;
-> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-> +
-> +    /* We only have one TOD clock in the system attached to the machin=
-e */
-> +    dc->user_creatable =3D false;
-> +    dc->hotpluggable =3D false;
-> +}
+This series brings translation configuration caching and IOTLB
+emulation. The last patch implements VHOST integration and
+allows to run VSMMUv3 along with VHOST emulated end points.
 
-IIRC you don't need the hotpluggable =3D false if you already set
-user_creatable =3D false.
+The first patch fixes the passthrough mode bug reported by Jia.
+It reworks the translate function and this series needed to be
+rebased on it.
 
-> +static TypeInfo s390_tod_info =3D {
-> +    .name =3D TYPE_S390_TOD,
-> +    .parent =3D TYPE_DEVICE,
-> +    .instance_size =3D sizeof(S390TODState),
-> +    .class_init =3D s390_tod_class_init,
-> +    .class_size =3D sizeof(S390TODClass),
-> +    .abstract =3D true,
-> +};
-> +
-> +static void register_types(void)
-> +{
-> +    type_register_static(&s390_tod_info);
-> +}
-> +type_init(register_types);
-> diff --git a/include/hw/s390x/tod.h b/include/hw/s390x/tod.h
-> new file mode 100644
-> index 0000000000..43ed71600f
-> --- /dev/null
-> +++ b/include/hw/s390x/tod.h
-> @@ -0,0 +1,46 @@
-> +/*
-> + * TOD (Time Of Day) clock
-> + *
-> + * Copyright 2018 Red Hat, Inc.
-> + * Author(s): David Hildenbrand <david@redhat.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#ifndef HW_S390_TOD_H
-> +#define HW_S390_TOD_H
-> +
-> +#include "hw/qdev.h"
-> +
-> +typedef struct S390TOD {
-> +    uint8_t high;
-> +    uint64_t low;
-> +} S390TOD;
-> +
-> +#define TYPE_S390_TOD "s390-tod"
-> +#define S390_TOD(obj) OBJECT_CHECK(S390TODState, (obj), TYPE_S390_TOD)
-> +#define S390_TOD_CLASS(oc) OBJECT_CLASS_CHECK(S390TODClass, (oc), \
-> +                                              TYPE_S390_TOD)
-> +#define S390_TOD_GET_CLASS(obj) OBJECT_GET_CLASS(S390TODClass, (obj), =
-\
-> +                                                 TYPE_S390_TOD)
-> +#define TYPE_KVM_S390_TOD "kvm-" TYPE_S390_TOD
-> +#define TYPE_QEMU_S390_TOD "qemu-" TYPE_S390_TOD
+Best Regards
 
-I'd prefer if you could turn that into suffixes instead of prefixes,
-like it is done in include/hw/s390x/storage-keys.h and
-storage-attributes.h already.
+Eric
 
-Apart from that, the patch looks fine to me, so once you've changed
-that, feel free to add:
+This series can be found at:
+v1: https://github.com/eauger/qemu/tree/v2.12.0-vsmmu-optim-v3
+Previous version at:
+v1: https://github.com/eauger/qemu/tree/v2.12.0-vsmmu-optim-v2
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+History:
+v2 -> v3:
+- collected Peter's R-b
+- do not use float in trace points anymore
+
+v1 -> v2:
+- addition of the 1st patch (including addr_mask fix)
+- addition of the per device mutex as on intel iommu
+
+v1: [1] v12 last 3 patches resent in this series
+[1] [PATCH v12 00/17] ARM SMMUv3 Emulation Support
+https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg04344.html
+
+
+Eric Auger (3):
+  hw/arm/smmuv3: Cache/invalidate config data
+  hw/arm/smmuv3: IOTLB emulation
+  hw/arm/smmuv3: Add notifications on invalidation
+
+Jia He (1):
+  hw/arm/smmuv3: Fix translate error handling
+
+ hw/arm/smmu-common.c         | 118 +++++++++++-
+ hw/arm/smmuv3-internal.h     |  12 +-
+ hw/arm/smmuv3.c              | 420 +++++++++++++++++++++++++++++++++++++++----
+ hw/arm/trace-events          |  27 ++-
+ include/hw/arm/smmu-common.h |  24 +++
+ include/hw/arm/smmuv3.h      |   1 +
+ 6 files changed, 558 insertions(+), 44 deletions(-)
+
+-- 
+2.5.5
