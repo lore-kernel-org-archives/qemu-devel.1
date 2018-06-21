@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fW1zk-0004WC-4h
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:59:37 -0400
+	(envelope-from <david@redhat.com>) id 1fW24c-0007rz-PT
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:04:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fW1zh-0000Dw-1C
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:59:36 -0400
-References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
-	<20180609151758.17343-7-vsementsov@virtuozzo.com>
-	<be6cae77-ed51-320f-8a86-fda7865c84b0@redhat.com>
-	<4f1dd453-77a4-f45f-f2c9-15d42e95d429@virtuozzo.com>
-	<5b4d2ffa-3489-6a93-0352-dbce9221519d@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <43ed9c89-4730-d333-51ff-2befd03d5462@virtuozzo.com>
-Date: Thu, 21 Jun 2018 18:59:25 +0300
+	(envelope-from <david@redhat.com>) id 1fW24X-0002C7-Mc
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:04:38 -0400
+References: <20180424101859.10239-1-david@redhat.com>
+	<7c046e3c-8752-87c5-f4ff-06ef56ef0128@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <c4c55b6f-8ac0-5001-776e-86c28b33142a@redhat.com>
+Date: Thu, 21 Jun 2018 18:04:29 +0200
 MIME-Version: 1.0
-In-Reply-To: <5b4d2ffa-3489-6a93-0352-dbce9221519d@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <7c046e3c-8752-87c5-f4ff-06ef56ef0128@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v5 6/6] docs/interop: add
- nbd.txt
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v1] s390x: refactor reset/reipl handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,145 +24,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org, armbru@redhat.com, mreitz@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-20.06.2018 23:58, John Snow wrote:
->
-> On 06/20/2018 10:16 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 20.06.2018 14:33, Eric Blake wrote:
->>> On 06/09/2018 10:17 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>> Describe new metadata namespace: "qemu".
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>>  =C2=A0 docs/interop/nbd.txt | 37 ++++++++++++++++++++++++++++++++++++=
-+
->>>>  =C2=A0 MAINTAINERS=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0 1 +
->>>>  =C2=A0 2 files changed, 38 insertions(+)
->>>>  =C2=A0 create mode 100644 docs/interop/nbd.txt
->>>>
->>>> diff --git a/docs/interop/nbd.txt b/docs/interop/nbd.txt
->>>> new file mode 100644
->>>> index 0000000000..7366269fc0
->>>> --- /dev/null
->>>> +++ b/docs/interop/nbd.txt
->>>> @@ -0,0 +1,37 @@
->>>> +Qemu supports NBD protocol, and has internal NBD client (look at
->>> s/supports/supports the/
->>>
->>>> +block/nbd.c), internal NBD server (look at blockdev-nbd.c) as well as
->>> s/internal/an internal/2
->>>
->>>> +external NBD server tool - qemu-nbd.c. The common code is placed in
->>> s/external/an external/
->>>
->>>> +nbd/*.
->>>> +
->>>> +NBD protocol is specified here:
->>> s/NBD/The NBD/
->>>
->>>> +https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md
->>>> +
->>>> +This following paragraphs describe some specific properties of NBD
->>>> +protocol realization in Qemu.
->>>> +
->>>> +
->>>> +=3D Metadata namespaces =3D
->>>> +
->>>> +Qemu supports "base:allocation" metadata context as defined in the NB=
-D
->>> s/supports/supports the/
->>>
->>>> +protocol specification and defines own metadata namespace: "qemu".
->>> s/own/an additional/
->>>
->>>> +
->>>> +
->>>> +=3D=3D "qemu" namespace =3D=3D
->>>> +
->>>> +For now, the only type of metadata context in the namespace is dirty
->>>> +bitmap. All available metadata contexts have the following form:
->>> maybe:
->>>
->>> The "qemu" namespace currently contains only one type of context,
->>> related to exposing the contents of a dirty bitmap alongside the
->>> associated disk contents.=C2=A0 The available metadata context has the
->>> following form:
->> Ok
+On 21.06.2018 17:49, Christian Borntraeger wrote:
+>=20
+>=20
+> On 04/24/2018 12:18 PM, David Hildenbrand wrote:
+>> Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
+>> not be the best idea. As pause_all_vcpus() temporarily drops the qemu
+>> mutex, two parallel calls to pause_all_vcpus() can be active at a time=
+,
+>> resulting in a deadlock. (either by two VCPUs or by the main thread an=
+d a
+>> VCPU)
 >>
->>>> +
->>>> +=C2=A0=C2=A0 qemu:dirty-bitmap:<dirty-bitmap-export-name>
->>>> +
->>>> +Each dirty-bitmap metadata context defines the only one flag for
->>>> +extents in reply for NBD_CMD_BLOCK_STATUS:
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0 bit 0: NBD_STATE_DIRTY, means that the extent is "=
-dirty"
->>>> +
->>>> +For NBD_OPT_LIST_META_CONTEXT the following queries are supported
->>>> +additionally to "qemu:dirty-bitmap:<dirty-bitmap-export-name>":
->>> s/additionally/in addition/
->>>
->>>> +
->>>> +* "qemu:" : returns list of all available metadata contexts in the
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 na=
-mespace.
->>>> +* "qemu:dirty-bitmap:" : returns list of all available dirty-bitmap
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- metadata contexts.
->>>> diff --git a/MAINTAINERS b/MAINTAINERS
->>>> index e187b1f18f..887b479440 100644
->>>> --- a/MAINTAINERS
->>>> +++ b/MAINTAINERS
->>>> @@ -1923,6 +1923,7 @@ F: nbd/
->>>>  =C2=A0 F: include/block/nbd*
->>>>  =C2=A0 F: qemu-nbd.*
->>>>  =C2=A0 F: blockdev-nbd.c
->>>> +F: docs/interop/nbd.txt
->>>>  =C2=A0 T: git git://repo.or.cz/qemu/ericb.git nbd
->>>>  =C2=A0 =C2=A0 NFS
->>>>
->>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>>
->>> At this point, I think I'll touch up the issues I've spotted and
->>> submit a pull request, in order to make it easier for me to test my
->>> libvirt code.
->>>
->> Ok, thank you!
+>> Let's handle it via the main loop instead, as suggested by Paolo. If w=
+e
+>> would have two parallel reset requests by two different VCPUs at the
+>> same time, the last one would win.
 >>
-> ACK; the x- prefixes will help us get everything rolling together much
-> faster and gives us some leeway to change things later as needed.
->
-> Vladimir, can you jog our memories and let us know which series still
-> need to hit QEMU for 3.0 for safe persistence/migration et al?
->
-> (Not including any of my own qemu-img patches which I'll get to by freeze=
-.)
+>> We use the existing ipl device to handle it. The nice side effect is
+>> that we can get rid of reipl_requested.
+>>
+>> This change implies that all reset handling now goes via the common
+>> path, so "no-reboot" handling is now active for all kinds of reboots.
+>=20
+> Ok, this breaks the s390 IPL process when -no-reboot  is specified.
+> The bios does a diagnose 308 subcode 1 to jump to the final image while
+> at the same time resetting all devices. This is now blocked with -no-re=
+boot
+> (although it is actually the boot)
 
-not a trivial question :)
+Indeed, one corner case I missed, thanks for looking into it.
 
-at least, there are the following pending patches:
+I wonder if we could turn that into a allow "one
+S390_RESET_MODIFIED_CLEAR ignoring -no-reboot" if booting from bios
+using a simple flag.
 
-migration
- =C2=A0=C2=A0 [PATCH] migration: invalidate cache before source start
+Then s/SHUTDOWN_CAUSE_GUEST_RESET/SHUTDOWN_CAUSE_BIOS_RESET/
 
-persistance
- =C2=A0=C2=A0 [PATCH v2] qcow2: add overlap check for bitmap directory
- =C2=A0=C2=A0 [PATCH] block/qcow2: fix logic around dirty_bitmaps_loaded
- =C2=A0=C2=A0 thread "bug in reopen arch", there is no final solution for n=
-ow
- =C2=A0=C2=A0 also, I need to finally rethink and make a patch to don't hav=
-e any=20
-persistent bitmaps in inactive mode
+>=20
+>=20
+> I have noticed that with virt-install on iso images since virt-install
+> specifies -no-reboot.
+>=20
+> Something like this seems to help but it is not a nice solution.
+>=20
+> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> index 0d67349004..7b32698eaa 100644
+> --- a/hw/s390x/ipl.c
+> +++ b/hw/s390x/ipl.c
+> @@ -534,8 +534,14 @@ void s390_ipl_reset_request(CPUState *cs, enum s39=
+0_reset reset_type)
+>               */
+>              ipl->iplb_valid =3D s390_gen_initial_iplb(ipl);
+>          }
+> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+> +    } else  if (reset_type =3D=3D S390_RESET_MODIFIED_CLEAR ||
+> +                reset_type =3D=3D S390_RESET_LOAD_NORMAL) {
+> +	/* ignore -no-reboot */
+> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET_FORCE);
+> +    } else {
+> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+>      }
+> -    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+>      /* as this is triggered by a CPU, make sure to exit the loop */
+>      if (tcg_enabled()) {
+>          cpu_loop_exit(cs);
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index e893f72f3b..e9b11fd6cb 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -44,6 +44,9 @@ typedef enum ShutdownCause {
+>                                       turns that into a shutdown */
+>      SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line =
+turns
+>                                       that into a shutdown */
+> +    SHUTDOWN_CAUSE_GUEST_RESET_FORCE,/* Guest reset that should ignore=
+ --no-reboot
+> +                                     useful for the subsystem resets o=
+n s390 done
+> +                                     for kdump and kexec */
 
-fleecing
- =C2=A0=C2=A0 [PATCH] block/fleecing-filter: new filter driver for fleecing=
- (new=20
-patch, but I remember, I've already started to discuss this..)
+I don't think it is that ugly.
+
+>      SHUTDOWN_CAUSE__MAX,
+>  } ShutdownCause;
+> =20
+> diff --git a/vl.c b/vl.c
+> index b3426e03d0..18f379e833 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1674,7 +1674,9 @@ void qemu_system_guest_panicked(GuestPanicInforma=
+tion *info)
+> =20
+>  void qemu_system_reset_request(ShutdownCause reason)
+>  {
+> -    if (no_reboot) {
+> +    if (reason =3D=3D SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
+> +	    reset_requested =3D SHUTDOWN_CAUSE_GUEST_RESET;
+> +    } else if (no_reboot) {
+>          shutdown_requested =3D reason;
+>      } else {
+>          reset_requested =3D reason;
+>=20
+
 
 --=20
-Best regards,
-Vladimir
+
+Thanks,
+
+David / dhildenb
