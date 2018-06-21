@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fVsZx-0001th-2i
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:56:22 -0400
+	(envelope-from <clg@kaod.org>) id 1fVsan-0002Lu-CY
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:57:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fVsZt-0002Rd-6N
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:56:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36138 helo=mx1.redhat.com)
+	(envelope-from <clg@kaod.org>) id 1fVsaj-0002xm-BT
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:57:13 -0400
+Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:60258)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVsZt-0002QP-08
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:56:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2554681A4EA6
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 05:56:16 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1528688464-17289-1-git-send-email-thuth@redhat.com>
-	<20180611221859.GE7451@localhost.localdomain>
-Date: Thu, 21 Jun 2018 07:56:14 +0200
-In-Reply-To: <20180611221859.GE7451@localhost.localdomain> (Eduardo Habkost's
-	message of "Mon, 11 Jun 2018 19:18:59 -0300")
-Message-ID: <87602cr8ch.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fVsaj-0002vY-3l
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 01:57:09 -0400
+Received: from player796.ha.ovh.net (unknown [10.109.105.97])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 5DAD01082FE
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 07:57:07 +0200 (CEST)
+References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
+	<20180618063606.2513-5-david@gibson.dropbear.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <d10c36f4-9e4b-0893-25d3-0786def1b463@kaod.org>
+Date: Thu, 21 Jun 2018 07:56:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] hw/i386: Deprecate the machine types
- pc-0.10 and pc-0.11
+In-Reply-To: <20180618063606.2513-5-david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/9] target/ppc: Add
+ kvmppc_hpt_needs_host_contiguous_pages() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,102 +32,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, abologna@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+On 06/18/2018 08:36 AM, David Gibson wrote:
+> KVM HV has a restriction that for HPT mode guests, guest pages must be =
+hpa
+> contiguous as well as gpa contiguous.  We have to account for that in
+> various places.  We determine whether we're subject to this restriction
+> from the SMMU information exposed by KVM.
+>=20
+> Planned cleanups to the way we handle this will require knowing whether
+> this restriction is in play in wider parts of the code.  So, expose a
+> helper function which returns it.
+>=20
+> This does mean some redundant calls to kvm_get_smmu_info(), but they'll=
+ go
+> away again with future cleanups.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-> On Mon, Jun 11, 2018 at 05:41:04AM +0200, Thomas Huth wrote:
->> The oldest machine type which is still used in a maintained distribution
->> is a pc-0.12 based machine type in RHEL6, so everything that is older
->> than pc-0.12 should not be used anymore. Thus let's deprecate pc-0.10
->> and pc-0.11 so that we can finally remove them in a future release.
->> 
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  This is based on a patch that I already sent in 2017. But back then, we
->>  were still in progress of discussing our deprecation policies (e.g. auto-
->>  matic deprecation for old machine types), and there was no clear consensus
->>  whether we should deprecate 0.10 - 0.11, all 0.x or even up to version 1.2.
->>  After some iterations and too much discussion, I've forgotten about this
->>  patch. Anyway, I think we agreed that at least 0.10 and 0.11 can certainly
->>  be removed nowadays, so let's finally get at least those two machine types
->>  marked as deprecated! If that works fine and we will finally have removed
->>  these two types in v3.2, we can resume the discussion about newer machine
->>  types afterwards.
->
-> Thanks!
->
->
->>  
->>  hw/i386/pc_piix.c   | 2 ++
->>  include/hw/boards.h | 1 +
->>  qemu-doc.texi       | 5 +++++
->>  vl.c                | 9 +++++++--
->>  4 files changed, 15 insertions(+), 2 deletions(-)
->> 
->> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
->> index 3d81136..fa61dc3 100644
->> --- a/hw/i386/pc_piix.c
->> +++ b/hw/i386/pc_piix.c
->> @@ -955,6 +955,8 @@ static void pc_i440fx_0_11_machine_options(MachineClass *m)
->>  {
->>      pc_i440fx_0_12_machine_options(m);
->>      m->hw_version = "0.11";
->> +    m->deprecation_msg = "Old and unsupported machine version, "
->> +                         "use a newer machine type instead.";
->
-> Sounds simple enough to me, but see comment about QMP below.
->
->
->>      SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
->>  }
->>  
-[...]
->> diff --git a/vl.c b/vl.c
->> index 0603171..096814c 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -2560,8 +2560,9 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
->>              if (mc->alias) {
->>                  printf("%-20s %s (alias of %s)\n", mc->alias, mc->desc, mc->name);
->>              }
->> -            printf("%-20s %s%s\n", mc->name, mc->desc,
->> -                   mc->is_default ? " (default)" : "");
->> +            printf("%-20s %s%s%s\n", mc->name, mc->desc,
->> +                   mc->is_default ? " (default)" : "",
->> +                   mc->deprecation_msg ? " (deprecated)" : "");
->>          }
->>      }
->>  
->> @@ -3952,6 +3953,10 @@ int main(int argc, char **argv, char **envp)
->>      }
->>  
->>      machine_class = select_machine();
->> +    if (machine_class->deprecation_msg) {
->> +        error_report("Machine type '%s' is deprecated: %s",
->> +                     machine_class->name, machine_class->deprecation_msg);
->> +    }
->
-> Do you plan to add this info to 'query-machines' QMP command?
->
-> If we do that, maybe we should represent the common "this machine
-> type is too old, but there's a new version" case in a more
-> machine-friendly way?  Maybe a 'deprecation_reason' enum would be
-> better than a 'deprecation_msg' field?
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-QMP needs a generic mechanism to communicate "FOO is deprecated, use BAR
-instead".
+but this patch is already committed it seems.
 
-> (Note that I don't think any discussions about the QMP interface
-> should block this patch from being merged.  We can deprecate the
-> machines first, and decide about QMP later.)
+C.=20
 
-Yes.
+> ---
+>  target/ppc/kvm.c     | 17 +++++++++++++++--
+>  target/ppc/kvm_ppc.h |  6 ++++++
+>  2 files changed, 21 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 5c0e313ca6..50b5d01432 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -406,9 +406,22 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *c=
+pu,
+>      }
+>  }
+> =20
+> +bool kvmppc_hpt_needs_host_contiguous_pages(void)
+> +{
+> +    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
+> +    static struct kvm_ppc_smmu_info smmu_info;
+> +
+> +    if (!kvm_enabled()) {
+> +        return false;
+> +    }
+> +
+> +    kvm_get_smmu_info(cpu, &smmu_info);
+> +    return !!(smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL);
 
->>  
->>      set_memory_options(&ram_slots, &maxram_size, machine_class);
->>  
->> -- 
->> 1.8.3.1
->> 
+
+> +}
+> +
+>  static bool kvm_valid_page_size(uint32_t flags, long rampgsize, uint32=
+_t shift)
+>  {
+> -    if (!(flags & KVM_PPC_PAGE_SIZES_REAL)) {
+> +    if (!kvmppc_hpt_needs_host_contiguous_pages()) {
+>          return true;
+>      }
+> =20
+> @@ -445,7 +458,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+>      /* If we have HV KVM, we need to forbid CI large pages if our
+>       * host page size is smaller than 64K.
+>       */
+> -    if (smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL) {
+> +    if (kvmppc_hpt_needs_host_contiguous_pages()) {
+>          if (getpagesize() >=3D 0x10000) {
+>              cpu->hash64_opts->flags |=3D PPC_HASH64_CI_LARGEPAGE;
+>          } else {
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index e2840e1d33..a7ddb8a5d6 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -70,6 +70,7 @@ int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target=
+_ulong flags, int shift);
+>  int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int =
+shift);
+>  bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
+> =20
+> +bool kvmppc_hpt_needs_host_contiguous_pages(void);
+>  bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
+> =20
+>  #else
+> @@ -222,6 +223,11 @@ static inline uint64_t kvmppc_rma_size(uint64_t cu=
+rrent_size,
+>      return ram_size;
+>  }
+> =20
+> +static inline bool kvmppc_hpt_needs_host_contiguous_pages(void)
+> +{
+> +    return false;
+> +}
+> +
+>  static inline bool kvmppc_is_mem_backend_page_size_ok(const char *obj_=
+path)
+>  {
+>      return true;
+>=20
