@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVt2p-0000ss-C3
+	(envelope-from <alex.bennee@linaro.org>) id 1fVt2p-0000su-Cf
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:26:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVt2n-0000WP-FZ
+	(envelope-from <alex.bennee@linaro.org>) id 1fVt2m-0000Vc-69
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:26:11 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:35195)
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:55077)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fVt2n-0000Vl-89
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:26:09 -0400
-Received: by mail-wr0-x242.google.com with SMTP id l8-v6so1830938wrr.2
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:26:09 -0700 (PDT)
+	id 1fVt2l-0000Uq-Sk
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:26:08 -0400
+Received: by mail-wm0-x243.google.com with SMTP id o13-v6so3083689wmf.4
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:26:07 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 21 Jun 2018 07:25:11 +0100
-Message-Id: <20180621062605.941-4-alex.bennee@linaro.org>
+Date: Thu, 21 Jun 2018 07:25:09 +0100
+Message-Id: <20180621062605.941-2-alex.bennee@linaro.org>
 In-Reply-To: <20180621062605.941-1-alex.bennee@linaro.org>
 References: <20180621062605.941-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 03/57] configure: move i386_cc to
- cross_cc_i386
+Subject: [Qemu-devel] [PULL v2 01/57] docker: docker.py wrap StringIO import
+ for python3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,109 +33,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Also dont assume x86_64 compiler can build i386 binaries.
+Although the docker.py is nominally python2 we actually invoke it with
+the configured python from the configure script.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/configure b/configure
-index ab189067cb..a5676cf15f 100755
---- a/configure
-+++ b/configure
-@@ -289,7 +289,6 @@ libs_softmmu=""
- libs_tools=""
- audio_pt_int=""
- audio_win_int=""
--cc_i386=i386-pc-linux-gnu-gcc
- libs_qga=""
- debug_info="yes"
- stack_protector=""
-@@ -461,6 +460,8 @@ docker="no"
- # cross compilers defaults, can be overridden with --cross-cc-ARCH
- cross_cc_aarch64="aarch64-linux-gnu-gcc"
- cross_cc_arm="arm-linux-gnueabihf-gcc"
-+cross_cc_i386="i386-pc-linux-gnu-gcc"
-+cross_cc_cflags_i386=""
- cross_cc_powerpc="powerpc-linux-gnu-gcc"
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 306e14cf69..e4095270eb 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -26,7 +26,10 @@ import tempfile
+ import re
+ import signal
+ from tarfile import TarFile, TarInfo
+-from StringIO import StringIO
++try:
++    from StringIO import StringIO
++except ImportError:
++    from io import StringIO
+ from shutil import copy, rmtree
+ from pwd import getpwuid
  
- enabled_cross_compilers=""
-@@ -1447,7 +1448,8 @@ case "$cpu" in
-     i386)
-            CPU_CFLAGS="-m32"
-            LDFLAGS="-m32 $LDFLAGS"
--           cc_i386='$(CC) -m32'
-+           cross_cc_i386=$cc
-+           cross_cc_cflags_i386=$CPU_CFLAGS
-            ;;
-     x86_64)
-            # ??? Only extremely old AMD cpus do not have cmpxchg16b.
-@@ -1455,12 +1457,14 @@ case "$cpu" in
-            # runtime and generate the fallback to serial emulation.
-            CPU_CFLAGS="-m64 -mcx16"
-            LDFLAGS="-m64 $LDFLAGS"
--           cc_i386='$(CC) -m32'
-+           cross_cc_x86_64=$cc
-+           cross_cc_cflags_x86_64=$CPU_CFLAGS
-            ;;
-     x32)
-            CPU_CFLAGS="-mx32"
-            LDFLAGS="-mx32 $LDFLAGS"
--           cc_i386='$(CC) -m32'
-+           cross_cc_i386=$cc
-+           cross_cc_cflags_i386="-m32"
-            ;;
-     # No special flags required for other host CPUs
- esac
-@@ -6724,7 +6728,6 @@ echo "CC=$cc" >> $config_host_mak
- if $iasl -h > /dev/null 2>&1; then
-   echo "IASL=$iasl" >> $config_host_mak
- fi
--echo "CC_I386=$cc_i386" >> $config_host_mak
- echo "HOST_CC=$host_cc" >> $config_host_mak
- echo "CXX=$cxx" >> $config_host_mak
- echo "OBJCC=$objcc" >> $config_host_mak
-@@ -6845,6 +6848,7 @@ esac
- 
- target_compiler=""
- target_compiler_static=""
-+target_compiler_cflags=""
- 
- mkdir -p $target_dir
- echo "# Automatically generated by configure - do not modify" > $config_target_mak
-@@ -6862,6 +6866,7 @@ case "$target_name" in
-   i386)
-     gdb_xml_files="i386-32bit.xml i386-32bit-core.xml i386-32bit-sse.xml"
-     target_compiler=$cross_cc_i386
-+    target_compiler_cflags=$cross_cc_ccflags_i386
-   ;;
-   x86_64)
-     TARGET_BASE_ARCH=i386
-@@ -7034,9 +7039,9 @@ if has $target_compiler; then
- 
-     write_c_skeleton
- 
--    if ! do_compiler "$target_compiler" -o $TMPE $TMPC -static ; then
-+    if ! do_compiler "$target_compiler" $target_compiler_cflags -o $TMPE $TMPC -static ; then
-         # For host systems we might get away with building without -static
--        if ! do_compiler "$target_compiler" -o $TMPE $TMPC ; then
-+        if ! do_compiler "$target_compiler" $target_compiler_cflags -o $TMPE $TMPC ; then
-             target_compiler=""
-         else
-             enabled_cross_compilers="${enabled_cross_compilers} '${target_compiler}'"
-@@ -7129,8 +7134,13 @@ if test -n "$target_compiler"; then
-   if test -n "$target_compiler_static"; then
-       echo "CROSS_CC_GUEST_STATIC=$target_compiler_static" >> $config_target_mak
-   fi
-+
-+  if test -n "$target_compiler_cflags"; then
-+      echo "CROSS_CC_GUEST_CFLAGS=$target_compiler_cflags" >> $config_target_mak
-+  fi
- fi
- 
-+
- # generate QEMU_CFLAGS/LDFLAGS for targets
- 
- cflags=""
 -- 
 2.17.1
