@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fVxKp-0007MG-Gb
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:01:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1fVxKt-0007MM-4D
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:01:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shorne@gmail.com>) id 1fVxKj-0005ZZ-Sj
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:01:03 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33779)
+	(envelope-from <bounces@canonical.com>) id 1fVxKn-0005fk-GU
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:01:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42654)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <shorne@gmail.com>) id 1fVxKj-0005ZK-Lw
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:00:57 -0400
-Received: by mail-pg0-x241.google.com with SMTP id e11-v6so1275195pgq.0
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 04:00:57 -0700 (PDT)
-Date: Thu, 21 Jun 2018 20:00:53 +0900
-From: Stafford Horne <shorne@gmail.com>
-Message-ID: <20180621110053.GD24595@lianli.shorne-pla.net>
-References: <20180618184046.6270-1-richard.henderson@linaro.org>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fVxKn-0005dc-An
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:01:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fVxKl-0007Jk-5M
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 11:00:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B12112E80CF
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 11:00:58 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180618184046.6270-1-richard.henderson@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 00/22] target/openrisc improvements
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 21 Jun 2018 10:54:31 -0000
+From: guysoft <guysoft@gmail.com>
+Reply-To: Bug 1776478 <1776478@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152880770129.26761.1762643804065210181.malonedeb@gac.canonical.com>
+Message-Id: <152957847181.26951.16754505875059552219.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1776478] Re: Getting qemu: uncaught target signal
+ 6 when running lv2 plugin cross-compilation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +37,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Mon, Jun 18, 2018 at 08:40:24AM -1000, Richard Henderson wrote:
-> This is almost a grab-bag of little improvements to the port.
-> 
-> patches 1-3:
->   Fix singlestepping for gdbstub.  This has apparently never
->   worked, as the first commit has the same bug of not advancing
->   the pc when stepping.
-> 
-> patches 4:
->   Link more TBs.
-> 
-> patches 5-6:
->   Exit the TB after l.mtspr insns.  In particular, storing to
->   SR changes exception state so we want to return to the main
->   loop to recognize any pending interrupts immediately.
-> 
-> patches 8-18:
->   Reorganize TLB handling.  There is a fundamental bug that is
->   fixed in patch 13.  However the bug has been hidden by extra
->   TLB flushing elsewhere in the port.  I remove some unnecessary
->   indirection that the port inherited from somewhere -- probably
->   the MIPS port.  Finally, I present the QEMU TLB a unified view
->   of the OpenRISC split I/D TLB.
-> 
-> patch 19:
->   Split out disassembly from translation.
-> 
-> patch 20:
->   Add qemu-or1k to qemu-binfmt-conf.sh.
-> 
-> patches 21-22:
->   Implement signal handling for linux-user.
+@pmaydell Is there anything I can do to help speed this up? I can run
+tests or make reproduction easier if that helps. But I need direction
+what actually helps you.
 
-Hi Richard,
+-- =
 
-Thanks for these, I think there are a few white space issues throughout.  Do you
-mind if I take these and clean them up (indent with space) and work on the DSX
-and Interrupt issue I mentioned earlier?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1776478
 
-I can submit all during the next merge window.
+Title:
+  Getting qemu: uncaught target signal 6 when running  lv2 plugin cross-
+  compilation
 
-Let me know if you have other plans or you think they can go right away.
+Status in QEMU:
+  New
 
--Stafford
+Bug description:
+  Hey,
+  I am part of the Zynthian team and we use qemu-arm-static to cross compil=
+e lv2 audio plugins.
+
+  When running a compilation of DISTRHO-Ports we get:
+
+  lv2_ttl_generator: pthread_mutex_lock.c:81: __pthread_mutex_lock: Asserti=
+on `mutex->__data.__owner =3D=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  ./scripts/generate-ttl.sh: line 27: 16524 Aborted                 $GEN ./=
+$FILE
+  Makefile:62: recipe for target 'gen_lv2' failed
+  make[1]: *** [gen_lv2] Error 134
+  make[1]: Leaving directory '/home/pi/zynthian-sw/plugins/DISTRHO-Ports'
+  Makefile:104: recipe for target 'lv2' failed
+  make: *** [lv2] Error 2
+
+  =
+
+  lv2_ttl_generator source is here:
+  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/libs/lv2-ttl-generat=
+or
+
+  The command that is ruining is
+  lv2_ttl_generator ./TAL-Filter-2.so =
+
+
+  And ./TAL-Filter-2.so source is here:
+  https://github.com/DISTRHO/DISTRHO-Ports/tree/master/ports/tal-filter-2/s=
+ource
+
+
+  Is there a way to debug what is going on?
+  This runs fine on a Raspberrypi which is armv7
+
+  A workaround would also help.
+
+  =
+
+  Bug in Zynthian:
+  https://github.com/zynthian/zynthian-sys/issues/59
+  Bug in DISTRHO-Ports:
+  https://github.com/DISTRHO/DISTRHO-Ports/issues/29
+
+  Using qemu-arm-static version from master from two days ago:
+  qemu-arm version 2.12.50 (v2.12.0-1182-ga7a7309ca5-dirty), commit: a7a730=
+9ca52c327c6603d60db90ae4feeae719f7
+
+  Also saw this in qemu-arm version 2.12.0 (Debian 1:2.12+dfsg-3)
+
+  Thanks,
+  Guy
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1776478/+subscriptions
