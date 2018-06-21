@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59540)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fW3vC-0000gc-TH
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:03:06 -0400
+	id 1fW3vJ-0000mJ-5t
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:03:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fW3vC-0006dy-9U
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:03:02 -0400
+	id 1fW3vI-0006hF-7G
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:03:09 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 21 Jun 2018 15:02:22 -0300
-Message-Id: <20180621180224.8312-10-f4bug@amsat.org>
+Date: Thu, 21 Jun 2018 15:02:24 -0300
+Message-Id: <20180621180224.8312-12-f4bug@amsat.org>
 In-Reply-To: <20180621180224.8312-1-f4bug@amsat.org>
 References: <20180621180224.8312-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 09/11] hw/arm/stellaris: Use
- qemu_log_mask(UNIMP) instead of fprintf
+Subject: [Qemu-devel] [PATCH 11/11] hw/net/smc91c111: Use
+ qemu_log_mask(GUEST_ERROR) instead of hw_error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,25 +28,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org, Jason Wang <jasowang@redhat.com>
+
+hw_error() finally calls abort(), but there is no need to abort here.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/stellaris.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/net/smc91c111.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-index a8f1f6a912..d06e366402 100644
---- a/hw/arm/stellaris.c
-+++ b/hw/arm/stellaris.c
-@@ -560,7 +560,7 @@ static void ssys_write(void *opaque, hwaddr offset,
-     case 0x040: /* SRCR0 */
-     case 0x044: /* SRCR1 */
-     case 0x048: /* SRCR2 */
--        fprintf(stderr, "Peripheral reset not implemented\n");
-+        qemu_log_mask(LOG_UNIMP, "Peripheral reset not implemented\n");
+diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
+index c8cc5379b7..705a034cb9 100644
+--- a/hw/net/smc91c111.c
++++ b/hw/net/smc91c111.c
+@@ -11,6 +11,7 @@
+ #include "hw/sysbus.h"
+ #include "net/net.h"
+ #include "hw/devices.h"
++#include "qemu/log.h"
+ /* For crc32 */
+ #include <zlib.h>
+ 
+@@ -478,7 +479,9 @@ static void smc91c111_writeb(void *opaque, hwaddr offset,
+         }
          break;
-     case 0x054: /* IMC */
-         s->int_mask = value & 0x7f;
+     }
+-    hw_error("smc91c111_write: Bad reg %d:%x\n", s->bank, (int)offset);
++    qemu_log_mask(LOG_GUEST_ERROR,
++                  "smc91c111_write(bank:%d) 0x%" HWADDR_PRIx " = 0x%x\n",
++                  s->bank, offset, value);
+ }
+ 
+ static uint32_t smc91c111_readb(void *opaque, hwaddr offset)
+@@ -621,7 +624,9 @@ static uint32_t smc91c111_readb(void *opaque, hwaddr offset)
+         }
+         break;
+     }
+-    hw_error("smc91c111_read: Bad reg %d:%x\n", s->bank, (int)offset);
++    qemu_log_mask(LOG_GUEST_ERROR,
++                  "smc91c111_read(bank:%d) 0x%" HWADDR_PRIx "\n",
++                  s->bank, offset);
+     return 0;
+ }
+ 
 -- 
 2.18.0.rc2
