@@ -1,42 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36460)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36952)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fW2AC-0003os-6I
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:10:25 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fW2CJ-0005Gm-5e
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:12:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fW2AA-0004TS-Ue
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:10:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48334
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fW2AA-0004TL-P8
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:10:22 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5LGAKW4128766
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 12:10:22 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2jrca70vgw-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 12:10:21 -0400
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 21 Jun 2018 17:10:15 +0100
-References: <20180424101859.10239-1-david@redhat.com>
-	<7c046e3c-8752-87c5-f4ff-06ef56ef0128@de.ibm.com>
-	<20180621180443.1f0dc588.cohuck@redhat.com>
-	<9b9aaca9-5d32-73a0-049f-ee4c08b0b388@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 21 Jun 2018 18:10:11 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fW2CF-000660-34
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:12:35 -0400
+Received: from mail-qt0-x230.google.com ([2607:f8b0:400d:c0d::230]:40220)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fW2CE-00065R-Sm
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:12:31 -0400
+Received: by mail-qt0-x230.google.com with SMTP id q6-v6so3331055qtn.7
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 09:12:30 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <20180621062605.941-1-alex.bennee@linaro.org>
+	<CAFEAcA8dug5h=NeMKt+8bz_X_r=FaeXz9oKr4QWxttpc5VmdsA@mail.gmail.com>
+	<87in6curdy.fsf@linaro.org>
+	<ccd49bcc-1a67-064e-7508-5c8bb723fd59@amsat.org>
+	<87h8lwuqb5.fsf@linaro.org>
+	<255aad62-c8b3-01e4-9c5f-e815ad6305df@amsat.org>
+Message-ID: <aee66102-769e-a588-abbc-dc791073e94c@amsat.org>
+Date: Thu, 21 Jun 2018 13:12:24 -0300
 MIME-Version: 1.0
-In-Reply-To: <9b9aaca9-5d32-73a0-049f-ee4c08b0b388@redhat.com>
-Content-Language: en-US
-Message-Id: <163c23f1-2549-c76c-3399-b57d95f7c2e6@de.ibm.com>
+In-Reply-To: <255aad62-c8b3-01e4-9c5f-e815ad6305df@amsat.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x: refactor reset/reipl handling
+Subject: Re: [Qemu-devel] [PULL v2 00/57] add check-tcg and associated
+ machinery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,57 +40,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
 
-
-
-On 06/21/2018 06:07 PM, David Hildenbrand wrote:
-> On 21.06.2018 18:04, Cornelia Huck wrote:
->> On Thu, 21 Jun 2018 17:49:56 +0200
->> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+On 06/21/2018 01:04 PM, Philippe Mathieu-Daudé wrote:
+> On 06/21/2018 12:12 PM, Alex Bennée wrote:
 >>
->>> On 04/24/2018 12:18 PM, David Hildenbrand wrote:
->>>> Calling pause_all_vcpus()/resume_all_vcpus() from a VCPU thread might
->>>> not be the best idea. As pause_all_vcpus() temporarily drops the qemu
->>>> mutex, two parallel calls to pause_all_vcpus() can be active at a time,
->>>> resulting in a deadlock. (either by two VCPUs or by the main thread and a
->>>> VCPU)
->>>>
->>>> Let's handle it via the main loop instead, as suggested by Paolo. If we
->>>> would have two parallel reset requests by two different VCPUs at the
->>>> same time, the last one would win.
->>>>
->>>> We use the existing ipl device to handle it. The nice side effect is
->>>> that we can get rid of reipl_requested.
->>>>
->>>> This change implies that all reset handling now goes via the common
->>>> path, so "no-reboot" handling is now active for all kinds of reboots.  
->>>
->>> Ok, this breaks the s390 IPL process when -no-reboot  is specified.
->>> The bios does a diagnose 308 subcode 1 to jump to the final image while
->>> at the same time resetting all devices. This is now blocked with -no-reboot
->>> (although it is actually the boot)
->>>
->>>
->>> I have noticed that with virt-install on iso images since virt-install
->>> specifies -no-reboot.
->>>
->>> Something like this seems to help but it is not a nice solution.
+>> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 >>
->> It's a bit ugly, but allows us to accommodate the different semantics
->> for the different diag subcodes... the -no-reboot parameter is only
->> supposed to suppress normal guest reboot requests, right?
+>>> Hi Alex,
+>>>
+>>> On 06/21/2018 11:48 AM, Alex Bennée wrote:
+>>>>
+>>>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>>>
+>>>>> On 21 June 2018 at 07:25, Alex Bennée <alex.bennee@linaro.org> wrote:
+>>>>>> The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a93b:
+>>>>>>
+>>>>>>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into staging (2018-06-20 09:51:30 +0100)
+>>>>>>
+>>>>>> are available in the Git repository at:
+>>>>>>
+>>>>>>   https://github.com/stsquad/qemu.git tags/pull-tcg-testing-revivial-210618-2
+>>>>>>
+>>>>>> for you to fetch changes up to 65b26da485540ffcc1c46c9a0898f01912ee6b7a:
+>>>>>>
+>>>>>>   .travis.yml: add check-tcg test (2018-06-20 22:13:39 +0100)
+>>>>>>
+>>>>>> ----------------------------------------------------------------
+>>>>>> Add check-tcg machinary
+>>>>>>
+>>>>>> This restores the ability to run TCG smoke tests by using our docker
+>>>>>> infrastructure to support cross building simple tests. It represents
+>>>>>> the first step to making better cross-architecture testing available
+>>>>>> straight from the source tree ;-)
+>>>>>>
+>>>>>> v2
+>>>>>>   - fix quoting of target_compiler
+>>>>>>   - make docker.py Py3 safe
+>>>>>>   - tweak .travis.yml recipe
+>>>>>>   - don't probe docker when HAVE_USER_DOCKER not set
+>>>>>
+>>>>> Weird build failure for linux/x86:
+>>>>>
+>>>>> make: Entering directory '/home/petmay01/linaro/qemu-for-merges/build/alldbg'
 > 
-> The question is if -no-reboot should also be considered for kexec. There
-> are (at least on x86, not sure about s390x) "fast reboot techniques
-> using kexec". So it feels like -no-reboot should also apply for kexec.
+> This looks like an out-of-tree build.
+> I suppose SRC_PATH=.../qemu-for-merges/
+> 
+>>>>> Makefile:90: rules.mak: No such file or directory
+>>>>> Makefile:439: tests/Makefile.include: No such file or directory
+>>>>> cat: VERSION: No such file or directory
+>>>>> Makefile:1056: tests/docker/Makefile.include: No such file or directory
+>>>>> Makefile:1057: tests/vm/Makefile.include: No such file or directory
+>>>>> make: Leaving directory '/home/petmay01/linaro/qemu-for-merges/build/alldbg'
+>>>>> make: *** No rule to make target 'tests/vm/Makefile.include'. Stop.
+>>>>>
+>>>>> like it's failed to figure out the source directory.
+>>>>>
+>>>>> This is my '--cc=ccache gcc' '--enable-debug' '--python=python3'
+>>>>> build, and it's also the one I do a 'make clean' on -- perhaps
+>>>>> build from clean has broken?
+>>>>
+>>>> Hmm I can't reproduce this. I've built a fresh 16.04 server image with
+>>>> and with:
+>>>>
+>>>>   # Configured with: './configure' '--cc=ccache gcc' '--enable-debug' '--python=python3'
+>>>>
+>>>> both:
+>>>>   make
+>>>>
+>>>> and:
+>>>>   make check-tcg
+>>>>
+>>>> Work for me :-/
+>>>
+>>> Did you try rebuilding after a 'make clean'?
+>>
+>> Yep, both make clean, configure, make and make clean, make
+> 
+> I can not reproduce neither using out-of-tree build with
+> ../../configure '--cc=ccache gcc' '--enable-debug' '--python=python3'
+> 
+> I'll now test:
+> 
+> $ git checkout master
 
-these fast reboots via kexec also work on s390.
-But from a machine perspective kexec/kdump is not a reboot. It should not
-be blocked by -no-reboot - if it does it would be wrong from a user 
-perspective.
+$ make
 
-> But definitely not for the BIOS :)
-> 
-> 
+> $ make clean
+> $ git checkout pull-tcg-testing-revivial-210618-2
+> $ make check-tcg
+
+This worked ('clean' in previous branch).
+
+I also tested 'clean' in new branch:
+
+$ git checkout master
+$ make
+$ git checkout pull-tcg-testing-revivial-210618-2
+$ make clean
+$ make check-tcg
+
+Eventually the previous branch was not 'master' but the last pull
+request Peter tested, and the problem would be there or between this
+branch and yours.
