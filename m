@@ -1,35 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fW2Oe-00054P-9j
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:25:21 -0400
+	(envelope-from <armbru@redhat.com>) id 1fW2T8-0006R4-G8
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:30:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fW2Oa-0008J3-BQ
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:25:20 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33272)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fW2Oa-0008Ic-2v
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:25:16 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5LGNggq109958
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 12:25:15 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jrdd6p66j-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 12:25:14 -0400
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 21 Jun 2018 17:25:12 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 21 Jun 2018 18:25:06 +0200
-Message-Id: <20180621162506.94416-1-borntraeger@de.ibm.com>
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
+	(envelope-from <armbru@redhat.com>) id 1fW2T4-0001yT-FN
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:29:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45442 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fW2T4-0001yB-7a
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:29:54 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 692C44000C57
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 16:29:53 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
+	<20180321115211.17937-32-marcandre.lureau@redhat.com>
+Date: Thu, 21 Jun 2018 18:29:51 +0200
+In-Reply-To: <20180321115211.17937-32-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 21 Mar 2018
+	12:51:53 +0100")
+Message-ID: <87vaacje68.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH 1/1] s390/ipl: fix ipl with -no-reboot
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 31/49] qapi2texi: add 'If:' section to
+ generated documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,71 +36,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com
 
-kexec/kdump as well as the bootloader use a subcode of diagnose 308
-that is supposed to reset the subsystem but not comprise a full
-"reboot". With the latest refactoring this is now broken when
--no-reboot is used. This for example break virt-install from
-iso images.
+Subject needs an update for the move of qapi2texi.py to do qapi/doc.py.
+I think just qapi: would be fine.
 
-We need to mark these "soft" reboots as ok for rebooting.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Fixes: a30fb811cbe9 (s390x: refactor reset/reipl handling)
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
----
- hw/s390x/ipl.c          | 8 +++++++-
- include/sysemu/sysemu.h | 3 +++
- vl.c                    | 2 +-
- 3 files changed, 11 insertions(+), 2 deletions(-)
+> The documentation is generated only once, and doesn't know C
+> pre-conditions. Add 'If:' sections for top-level entities.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi/doc.py             | 22 ++++++++++++----------
+>  tests/qapi-schema/doc-good.json |  2 +-
+>  tests/qapi-schema/doc-good.out  |  1 +
+>  tests/qapi-schema/doc-good.texi |  2 ++
+>  4 files changed, 16 insertions(+), 11 deletions(-)
+>
+> diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+> index 6c2bf98e1d..783b13303a 100755
+> --- a/scripts/qapi/doc.py
+> +++ b/scripts/qapi/doc.py
+> @@ -174,7 +174,7 @@ def texi_members(doc, what, base, variants, member_fu=
+nc):
+>      return '\n@b{%s:}\n@table @asis\n%s@end table\n' % (what, items)
+>=20=20
+>=20=20
+> -def texi_sections(doc):
+> +def texi_sections(doc, ifcond):
+>      """Format additional sections following arguments"""
+>      body =3D ''
+>      for section in doc.sections:
+> @@ -185,14 +185,16 @@ def texi_sections(doc):
+>              body +=3D texi_example(section.text)
+>          else:
+>              body +=3D texi_format(section.text)
+> +    if ifcond:
+> +        body +=3D '\n\n@b{If:} @code{%s}' % ", ".join(ifcond)
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index 0d67349004..0fab9d2f9d 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -534,8 +534,14 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
-              */
-             ipl->iplb_valid = s390_gen_initial_iplb(ipl);
-         }
-+        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+    } else  if (reset_type == S390_RESET_MODIFIED_CLEAR ||
-+                reset_type == S390_RESET_LOAD_NORMAL) {
-+        /* ignore -no-reboot */
-+        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET_FORCE);
-+    } else {
-+        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-     }
--    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-     /* as this is triggered by a CPU, make sure to exit the loop */
-     if (tcg_enabled()) {
-         cpu_loop_exit(cs);
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index e893f72f3b..345369d924 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -44,6 +44,9 @@ typedef enum ShutdownCause {
-                                      turns that into a shutdown */
-     SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
-                                      that into a shutdown */
-+    SHUTDOWN_CAUSE_GUEST_RESET_FORCE,/* Guest reset that should ignore
-+                                        --no-reboot. This is useful for reset
-+                                        like actions as s390 kexec/kdump */
-     SHUTDOWN_CAUSE__MAX,
- } ShutdownCause;
- 
-diff --git a/vl.c b/vl.c
-index b3426e03d0..722c3b9963 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1674,7 +1674,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
- 
- void qemu_system_reset_request(ShutdownCause reason)
- {
--    if (no_reboot) {
-+    if (no_reboot && reason != SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
-         shutdown_requested = reason;
-     } else {
-         reset_requested = reason;
--- 
-2.17.0
+This is the actual change.  The other hunks for this file are about
+passing @ifcond to this spot.
+
+I figure we should explain 'If:' in the introduction, i.e. the big
+comment in qapi-schema.json.  Since we fail to explain any of the other
+tags there, this is somebody else's problem.
+
+>      return body
+>=20=20
+>=20=20
+> -def texi_entity(doc, what, base=3DNone, variants=3DNone,
+> +def texi_entity(doc, what, ifcond, base=3DNone, variants=3DNone,
+>                  member_func=3Dtexi_member):
+>      return (texi_body(doc)
+>              + texi_members(doc, what, base, variants, member_func)
+> -            + texi_sections(doc))
+> +            + texi_sections(doc, ifcond))
+>=20=20
+>=20=20
+>  class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaVisitor):
+> @@ -208,7 +210,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+>          doc =3D self.cur_doc
+>          self._gen.add(TYPE_FMT(type=3D'Enum',
+>                                 name=3Ddoc.symbol,
+> -                               body=3Dtexi_entity(doc, 'Values',
+> +                               body=3Dtexi_entity(doc, 'Values', ifcond,
+>                                                  member_func=3Dtexi_enum_=
+value)))
+>=20=20
+>      def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+> @@ -217,14 +219,14 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchem=
+aVisitor):
+>              base =3D None
+>          self._gen.add(TYPE_FMT(type=3D'Object',
+>                                 name=3Ddoc.symbol,
+> -                               body=3Dtexi_entity(doc, 'Members',
+> +                               body=3Dtexi_entity(doc, 'Members', ifcond,
+>                                                  base, variants)))
+>=20=20
+>      def visit_alternate_type(self, name, info, ifcond, variants):
+>          doc =3D self.cur_doc
+>          self._gen.add(TYPE_FMT(type=3D'Alternate',
+>                                 name=3Ddoc.symbol,
+> -                               body=3Dtexi_entity(doc, 'Members')))
+> +                               body=3Dtexi_entity(doc, 'Members', ifcond=
+)))
+>=20=20
+>      def visit_command(self, name, info, ifcond, arg_type, ret_type,
+>                        gen, success_response, boxed, allow_oob):
+> @@ -233,9 +235,9 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+>              body =3D texi_body(doc)
+>              body +=3D ('\n@b{Arguments:} the members of @code{%s}\n'
+>                       % arg_type.name)
+> -            body +=3D texi_sections(doc)
+> +            body +=3D texi_sections(doc, ifcond)
+>          else:
+> -            body =3D texi_entity(doc, 'Arguments')
+> +            body =3D texi_entity(doc, 'Arguments', ifcond)
+>          self._gen.add(MSG_FMT(type=3D'Command',
+>                                name=3Ddoc.symbol,
+>                                body=3Dbody))
+> @@ -244,7 +246,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+>          doc =3D self.cur_doc
+>          self._gen.add(MSG_FMT(type=3D'Event',
+>                                name=3Ddoc.symbol,
+> -                              body=3Dtexi_entity(doc, 'Arguments')))
+> +                              body=3Dtexi_entity(doc, 'Arguments', ifcon=
+d)))
+>=20=20
+>      def symbol(self, doc, entity):
+>          if self._gen._body:
+> @@ -257,7 +259,7 @@ class QAPISchemaGenDocVisitor(qapi.common.QAPISchemaV=
+isitor):
+>          assert not doc.args
+>          if self._gen._body:
+>              self._gen.add('\n')
+> -        self._gen.add(texi_body(doc) + texi_sections(doc))
+> +        self._gen.add(texi_body(doc) + texi_sections(doc, None))
+>=20=20
+>=20=20
+>  def gen_doc(schema, output_dir, prefix):
+> diff --git a/tests/qapi-schema/doc-good.json b/tests/qapi-schema/doc-good=
+.json
+> index 97ab4625ff..984cd8ed06 100644
+> --- a/tests/qapi-schema/doc-good.json
+> +++ b/tests/qapi-schema/doc-good.json
+> @@ -55,7 +55,7 @@
+>  #
+>  # @two is undocumented
+>  ##
+> -{ 'enum': 'Enum', 'data': [ 'one', 'two' ] }
+> +{ 'enum': 'Enum', 'data': [ 'one', 'two' ], 'if': 'defined(IFCOND)' }
+>=20=20
+>  ##
+>  # @Base:
+> diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.=
+out
+> index 3cd5c094aa..e4054e293c 100644
+> --- a/tests/qapi-schema/doc-good.out
+> +++ b/tests/qapi-schema/doc-good.out
+> @@ -12,6 +12,7 @@ module doc-good.json
+>  enum Enum
+>      member one
+>      member two
+> +    if ['defined(IFCOND)']
+>  object Base
+>      member base1: Enum optional=3DFalse
+>  object Variant1
+> diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good=
+.texi
+> index 0aed2300a5..e42eace474 100644
+> --- a/tests/qapi-schema/doc-good.texi
+> +++ b/tests/qapi-schema/doc-good.texi
+> @@ -89,6 +89,8 @@ Not documented
+>  @end table
+>  @code{two} is undocumented
+>=20=20
+> +
+> +@b{If:} @code{defined(IFCOND)}
+>  @end deftp
+
+Test coverage is a bit sparse, but it'll do for now.
