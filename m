@@ -1,30 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fW1G0-0002Io-M8
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:12:22 -0400
+	(envelope-from <walling@linux.ibm.com>) id 1fW1GR-0002dZ-95
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:12:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fW1Fw-0005lg-Mq
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:12:20 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:39144)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fW1Fw-0005lA-FD
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:12:16 -0400
-Received: by mail-wm0-x230.google.com with SMTP id p11-v6so6797418wmc.4
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 08:12:16 -0700 (PDT)
-References: <20180621062605.941-1-alex.bennee@linaro.org>
-	<CAFEAcA8dug5h=NeMKt+8bz_X_r=FaeXz9oKr4QWxttpc5VmdsA@mail.gmail.com>
-	<87in6curdy.fsf@linaro.org>
-	<ccd49bcc-1a67-064e-7508-5c8bb723fd59@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <ccd49bcc-1a67-064e-7508-5c8bb723fd59@amsat.org>
-Date: Thu, 21 Jun 2018 16:12:14 +0100
-Message-ID: <87h8lwuqb5.fsf@linaro.org>
+	(envelope-from <walling@linux.ibm.com>) id 1fW1GN-00060r-5Q
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:12:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37118
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1fW1GM-00060N-U8
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:12:43 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5LF5HpM138674
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 11:12:40 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2jrdyr9fph-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 11:12:39 -0400
+Received: from localhost
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Thu, 21 Jun 2018 09:12:39 -0600
+References: <1525445354-16233-1-git-send-email-walling@linux.ibm.com>
+	<7e9e9dfd-795b-47f2-453a-59bf65f28229@redhat.com>
+	<7274b001-02f2-6584-ea0a-c3d0f96d46b8@linux.ibm.com>
+	<89dc884d-97af-4922-bd69-1cb7308399d8@redhat.com>
+	<724592be-f5ac-7a40-8c26-5d2dd200ef82@linux.ibm.com>
+	<ee680f5e-ac9a-479d-f65e-9f8ae9cfe5d4@linux.ibm.com>
+	<20180621111859.GA10744@work-vm>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Thu, 21 Jun 2018 11:12:35 -0400
 MIME-Version: 1.0
+In-Reply-To: <20180621111859.GA10744@work-vm>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 00/57] add check-tcg and associated
- machinery
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <9f41232e-7d42-2a44-9407-202c18ad749a@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2] monitor: report entirety of hmp command
+ on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,87 +49,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org
+
+On 06/21/2018 07:19 AM, Dr. David Alan Gilbert wrote:
+> * Collin Walling (walling@linux.ibm.com) wrote:
+>> When a user incorrectly provides an hmp command, an error response will be
+>> printed that prompts the user to try "help <command name>". However, when
+>> the command contains multiple parts e.g. "info uuid xyz", only the last
+>> whitespace delimited string will be reported (in this example "info" will
+>> be dropped and the message will read "Try "help uuid" for more information",
+>> which is incorrect).
+>>
+>> Let's correct this by capturing the entirety of the command from the command
+>> line -- excluding any extraneous characters.
+>>
+>> Reported-by: Mikhail Fokin <fokin@de.ibm.com>
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> 
+> Queued
+
+Thank you!
+
+> 
+>> ---
+>>  monitor.c | 8 ++++++--
+>>  1 file changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/monitor.c b/monitor.c
+>> index 39f8ee1..38736b3 100644
+>> --- a/monitor.c
+>> +++ b/monitor.c
+>> @@ -3371,6 +3371,7 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
+>>  {
+>>      QDict *qdict;
+>>      const mon_cmd_t *cmd;
+>> +    const char *cmd_start = cmdline;
+>>  
+>>      trace_handle_hmp_command(mon, cmdline);
+>>  
+>> @@ -3381,8 +3382,11 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
+>>  
+>>      qdict = monitor_parse_arguments(mon, &cmdline, cmd);
+>>      if (!qdict) {
+>> -        monitor_printf(mon, "Try \"help %s\" for more information\n",
+>> -                       cmd->name);
+>> +        while (cmdline > cmd_start && qemu_isspace(cmdline[-1])) {
+>> +            cmdline--;
+>> +        }
+>> +        monitor_printf(mon, "Try \"help %.*s\" for more information\n",
+>> +                       (int)(cmdline - cmd_start), cmd_start);
+>>          return;
+>>      }
+>>  
+>> -- 
+>> 2.7.4
+>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
-
-> Hi Alex,
->
-> On 06/21/2018 11:48 AM, Alex Benn=C3=A9e wrote:
->>
->> Peter Maydell <peter.maydell@linaro.org> writes:
->>
->>> On 21 June 2018 at 07:25, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
-te:
->>>> The following changes since commit 46012db666990ff2eed1d3dc199ab800643=
-9a93b:
->>>>
->>>>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' in=
-to staging (2018-06-20 09:51:30 +0100)
->>>>
->>>> are available in the Git repository at:
->>>>
->>>>   https://github.com/stsquad/qemu.git tags/pull-tcg-testing-revivial-2=
-10618-2
->>>>
->>>> for you to fetch changes up to 65b26da485540ffcc1c46c9a0898f01912ee6b7=
-a:
->>>>
->>>>   .travis.yml: add check-tcg test (2018-06-20 22:13:39 +0100)
->>>>
->>>> ----------------------------------------------------------------
->>>> Add check-tcg machinary
->>>>
->>>> This restores the ability to run TCG smoke tests by using our docker
->>>> infrastructure to support cross building simple tests. It represents
->>>> the first step to making better cross-architecture testing available
->>>> straight from the source tree ;-)
->>>>
->>>> v2
->>>>   - fix quoting of target_compiler
->>>>   - make docker.py Py3 safe
->>>>   - tweak .travis.yml recipe
->>>>   - don't probe docker when HAVE_USER_DOCKER not set
->>>
->>> Weird build failure for linux/x86:
->>>
->>> make: Entering directory '/home/petmay01/linaro/qemu-for-merges/build/a=
-lldbg'
->>> Makefile:90: rules.mak: No such file or directory
->>> Makefile:439: tests/Makefile.include: No such file or directory
->>> cat: VERSION: No such file or directory
->>> Makefile:1056: tests/docker/Makefile.include: No such file or directory
->>> Makefile:1057: tests/vm/Makefile.include: No such file or directory
->>> make: Leaving directory '/home/petmay01/linaro/qemu-for-merges/build/al=
-ldbg'
->>> make: *** No rule to make target 'tests/vm/Makefile.include'. Stop.
->>>
->>> like it's failed to figure out the source directory.
->>>
->>> This is my '--cc=3Dccache gcc' '--enable-debug' '--python=3Dpython3'
->>> build, and it's also the one I do a 'make clean' on -- perhaps
->>> build from clean has broken?
->>
->> Hmm I can't reproduce this. I've built a fresh 16.04 server image with
->> and with:
->>
->>   # Configured with: './configure' '--cc=3Dccache gcc' '--enable-debug' =
-'--python=3Dpython3'
->>
->> both:
->>   make
->>
->> and:
->>   make check-tcg
->>
->> Work for me :-/
->
-> Did you try rebuilding after a 'make clean'?
-
-Yep, both make clean, configure, make and make clean, make
-
-
---
-Alex Benn=C3=A9e
+-- 
+Respectfully,
+- Collin Walling
