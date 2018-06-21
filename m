@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fW03T-0007QT-Hw
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:55:24 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fW06O-0008V4-CS
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:58:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fW03Q-0008DS-F7
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:55:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42158 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fW03Q-0008DC-9L
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:55:16 -0400
-Date: Thu, 21 Jun 2018 15:55:11 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180621155511.1fe61df5@redhat.com>
-In-Reply-To: <CAJ+F1CLYvrddKXdVfqa-Jiw-jr2LrxUbznW4Tn6kDK+O3J-M9Q@mail.gmail.com>
-References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
-	<20180515121433.6112-3-marcandre.lureau@redhat.com>
-	<20180621120056.663f7f25@redhat.com>
-	<CAJ+F1CLYvrddKXdVfqa-Jiw-jr2LrxUbznW4Tn6kDK+O3J-M9Q@mail.gmail.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1fW06M-0001TI-VJ
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:58:20 -0400
+Date: Thu, 21 Jun 2018 23:58:10 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180621135810.GC2009@umbus.fritz.box>
+References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
+	<20180618063606.2513-9-david@gibson.dropbear.id.au>
+	<f829daa0-c870-f835-2195-df795c0e47b9@kaod.org>
+	<20180621115247.GA2009@umbus.fritz.box>
+	<471b50ee-8f18-9fcc-10c7-8f5bca8c8cd3@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/4] acpi: add fw_cfg file for TPM and
- PPI virtual memory device
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="V88s5gaDVPzZ0KCq"
+Content-Disposition: inline
+In-Reply-To: <471b50ee-8f18-9fcc-10c7-8f5bca8c8cd3@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH 8/9] spapr: Limit available pagesizes to
+ provide a consistent guest environment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,145 +28,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: groug@kaod.org, abologna@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
-On Thu, 21 Jun 2018 12:10:32 +0200
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
 
-> Hi
+--V88s5gaDVPzZ0KCq
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Jun 21, 2018 at 02:50:32PM +0200, C=E9dric Le Goater wrote:
+> On 06/21/2018 01:52 PM, David Gibson wrote:
+> > On Thu, Jun 21, 2018 at 09:01:27AM +0200, C=E9dric Le Goater wrote:
+> >> On 06/18/2018 08:36 AM, David Gibson wrote:
+> >>> KVM HV has some limitations (deriving from the hardware) that mean no=
+t all
+> >>> host-cpu supported pagesizes may be usable in the guest.  At present =
+this
+> >>> means that KVM guests and TCG guests may see different available page=
+ sizes
+> >>> even if they notionally have the same vcpu model.  This is confusing =
+and
+> >>> also prevents migration between TCG and KVM.
+> >>>
+> >>> This patch makes the environment consistent by always allowing the sa=
+me set
+> >>> of pagesizes.  Since we can't remove the KVM limitations, we do this =
+by
+> >>> always applying the same limitations it has, even to TCG guests.
+> >>>
+> >>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> >>>
+> >>> ---
+> >>>  hw/ppc/spapr_caps.c | 33 +++++++++++++++++++++++++++++++++
+> >>>  1 file changed, 33 insertions(+)
+> >>>
+> >>> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> >>> index 9fc739b3f5..0584c7c6ab 100644
+> >>> --- a/hw/ppc/spapr_caps.c
+> >>> +++ b/hw/ppc/spapr_caps.c
+> >>> @@ -334,6 +334,38 @@ static void cap_hpt_maxpagesize_apply(sPAPRMachi=
+neState *spapr,
+> >>>      spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
+> >>>  }
+> >>> =20
+> >>> +static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift, uin=
+t32_t pshift)
+> >>> +{
+> >>> +    unsigned maxshift =3D *((unsigned *)opaque);
+> >>> +
+> >>> +    assert(pshift >=3D seg_pshift);
+> >>
+> >> you could check that elsewhere.
+> >=20
+> > Um.. I'm not sure what you're getting at.
 >=20
-> On Thu, Jun 21, 2018 at 12:00 PM, Igor Mammedov <imammedo@redhat.com> wro=
-te:
-> > On Tue, 15 May 2018 14:14:31 +0200
-> > Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
-> > =20
-> >> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> >>
-> >> To avoid having to hard code the base address of the PPI virtual
-> >> memory device we introduce a fw_cfg file etc/tpm/config that holds the
-> >> base address of the PPI device, the version of the PPI interface and
-> >> the version of the attached TPM. =20
-> > is it related to TPM_PPI_ADDR_BASE added in previous patch?
-> > =20
-> >>
-> >> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> >> [ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document=
- it ]
-> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >> ---
-> >>  include/hw/acpi/tpm.h |  3 +++
-> >>  hw/i386/acpi-build.c  | 17 +++++++++++++++++
-> >>  docs/specs/tpm.txt    | 20 ++++++++++++++++++++
-> >>  3 files changed, 40 insertions(+)
-> >>
-> >> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-> >> index c082df7d1d..f79d68a77a 100644
-> >> --- a/include/hw/acpi/tpm.h
-> >> +++ b/include/hw/acpi/tpm.h
-> >> @@ -193,4 +193,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
-> >>  #define TPM_PPI_ADDR_SIZE           0x400
-> >>  #define TPM_PPI_ADDR_BASE           0xFED45000
-> >>
-> >> +#define TPM_PPI_VERSION_NONE        0
-> >> +#define TPM_PPI_VERSION_1_30        1
-> >> +
-> >>  #endif /* HW_ACPI_TPM_H */
-> >> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> >> index 9bc6d97ea1..f6d447f03a 100644
-> >> --- a/hw/i386/acpi-build.c
-> >> +++ b/hw/i386/acpi-build.c
-> >> @@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
-> >>      bool pcihp_bridge_en;
-> >>  } AcpiBuildPciBusHotplugState;
-> >>
-> >> +typedef struct FWCfgTPMConfig {
-> >> +    uint32_t tpmppi_address;
-> >> +    uint8_t tpm_version;
-> >> +    uint8_t tpmppi_version;
-> >> +} QEMU_PACKED FWCfgTPMConfig;
-> >> +
-> >>  static void init_common_fadt_data(Object *o, AcpiFadtData *data)
-> >>  {
-> >>      uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BA=
-SE, NULL);
-> >> @@ -2873,6 +2879,7 @@ void acpi_setup(void)
-> >>      AcpiBuildTables tables;
-> >>      AcpiBuildState *build_state;
-> >>      Object *vmgenid_dev;
-> >> +    static FWCfgTPMConfig tpm_config;
-> >>
-> >>      if (!pcms->fw_cfg) {
-> >>          ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
-> >> @@ -2907,6 +2914,16 @@ void acpi_setup(void)
-> >>      fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
-> >>                      tables.tcpalog->data, acpi_data_len(tables.tcpalo=
-g));
-> >>
-> >> +    if (tpm_find()) {
-> >> +        tpm_config =3D (FWCfgTPMConfig) {
-> >> +            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
-> >> +            .tpm_version =3D cpu_to_le32(tpm_get_version(tpm_find())),
-> >> +            .tpmppi_version =3D cpu_to_le32(TPM_PPI_VERSION_NONE)
-> >> +        };
-> >> +        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
-> >> +                        &tpm_config, sizeof tpm_config);
-> >> +    } =20
-> > why it's in ACPI part of the code, shouldn't it be a part of device,
-> > could TPM be used without ACPI at all (-noacpi CLI option)?
-> >
-> > Wouldn't adding fwcfg entry unconditionally break migration? =20
->=20
-> Because of unstable entry IDs? that could be problematic. (especially
-> during boot time) What do you think Laszlo?
->=20
-> I guess we could have a "ppi" device property, that would imply having
-> the etc/tpm/config fw_cfg entry. We would enable it by default in
-> newer machine types (3.0?)
-yep, something like this.
-usual practice is to enable it by default and disable it for old
-machine types using hw compat props (include/hw/compat.h)
+> you could put the assert in ppc_hash64_filter_pagesizes(), that is where
+> the parameters are coming from.
+
+Yes.. but it's here that we're relying on that fact.  That's kind of
+the point with assert()s.
 
 >=20
-> > =20
-> >> +
-> >>      vmgenid_dev =3D find_vmgenid_dev();
-> >>      if (vmgenid_dev) {
-> >>          vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
-> >> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-> >> index c230c4c93e..2ddb768084 100644
-> >> --- a/docs/specs/tpm.txt
-> >> +++ b/docs/specs/tpm.txt
-> >> @@ -20,6 +20,26 @@ QEMU files related to TPM TIS interface:
-> >>   - hw/tpm/tpm_tis.h
-> >>
-> >>
-> >> +=3D fw_cfg interface =3D
-> >> +
-> >> +The bios/firmware may use the "etc/tpm/config" fw_cfg entry for
-> >> +configuring the guest appropriately.
-> >> +
-> >> +The entry of 6 bytes has the following content, in little-endian:
-> >> +
-> >> +    #define TPM_VERSION_UNSPEC          0
-> >> +    #define TPM_VERSION_1_2             1
-> >> +    #define TPM_VERSION_2_0             2
-> >> +
-> >> +    #define TPM_PPI_VERSION_NONE        0
-> >> +    #define TPM_PPI_VERSION_1_30        1
-> >> +
-> >> +    struct FWCfgTPMConfig {
-> >> +        uint32_t tpmppi_address;         /* PPI memory location */
-> >> +        uint8_t tpm_version;             /* TPM version */
-> >> +        uint8_t tpmppi_version;          /* PPI version */
-> >> +    };
-> >> +
-> >>  =3D ACPI Interface =3D
-> >>
-> >>  The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT =
-and passes =20
-> >
-> > =20
+> >>> +    /* Don't allow the guest to use pages bigger than the configured
+> >>> +     * maximum size */
+> >>> +    if (pshift > maxshift) {
+> >>> +        return false;
+> >>> +    }
+> >>> +
+> >>> +    /* For whatever reason, KVM doesn't allow multiple pagesizes
+> >>> +     * within a segment, *except* for the case of 16M pages in a 4k =
+or
+> >>> +     * 64k segment.  Always exclude other cases, so that TCG and KVM
+> >>> +     * guests see a consistent environment */
+> >>> +    if ((pshift !=3D seg_pshift) && (pshift !=3D 24)) {
+> >>> +        return false;
+> >>> +    }
+> >=20
+> > Note the stanza above, I'll refer to it below.
 >=20
+> ok.
 >=20
+> >=20
+> >>> +
+> >>> +    return true;
+> >>> +}
+> >>
+> >> So, do we really need ppc_hash64_filter_pagesizes() to have a callback=
+ ?=20
+> >=20
+> > I agree that it seems overly involved, but it was the best way I could
+> > see to logically separate the TCG / softmmu specific logic from the
+> > spapr specific logic.
 >=20
+> ok. I agree then.
+>=20
+> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+>=20
+> Thanks,
+>=20
+> C.
+>=20
+> >> It seems that we only use the routine once in the patchset and that the
+> >> only thing we need to check is 'maxshift'.
+> >=20
+> > Not quite.  An earlier draft had this routine just take a max page
+> > size and clamp accordingly.  But that failed when I wrote the code to
+> > check against the KVM capabilities, because KVM also excludes some
+> > other pagesize combinations.  That's what the stanza I point out above
+> > is about
+> >=20
+> >> Do you envision other usage of the routine ?
+> >=20
+> > Not really, no.
+> >=20
+> >>
+> >> Thanks,
+> >>
+> >> C.
+> >>
+> >>> +static void cap_hpt_maxpagesize_cpu_apply(sPAPRMachineState *spapr,
+> >>> +                                          PowerPCCPU *cpu,
+> >>> +                                          uint8_t val, Error **errp)
+> >>> +{
+> >>> +    unsigned maxshift =3D val;
+> >>> +
+> >>> +    ppc_hash64_filter_pagesizes(cpu, spapr_pagesize_cb, &maxshift);
+> >>> +}
+> >>> +
+> >>>  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
+> >>>      [SPAPR_CAP_HTM] =3D {
+> >>>          .name =3D "htm",
+> >>> @@ -401,6 +433,7 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NU=
+M] =3D {
+> >>>          .set =3D spapr_cap_set_pagesize,
+> >>>          .type =3D "int",
+> >>>          .apply =3D cap_hpt_maxpagesize_apply,
+> >>> +        .cpu_apply =3D cap_hpt_maxpagesize_cpu_apply,
+> >>>      },
+> >>>  };
+> >>> =20
+> >>>
+> >>
+> >=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--V88s5gaDVPzZ0KCq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsrrvAACgkQbDjKyiDZ
+s5JXhBAAwPcn4MGV6rjfac9MthZ9varZVMtDxJq937Pved8eEiwAn3WZv1fd8XYL
+shjeWPFWTAF/dcQaCzAlbJ1ojJtb1Y69B/Ls1Y1HqHlO6HCT8D4vx2DmR129vSrp
+RV9TYUj+2FRpaJ71IBREZK8pdDwA5uEYiDYBbFzhvl3r/0hrnajiys3ntCnPZGv+
+LuARmgLeRTJCyJYDf9k0bsrshSd6/C5nBj8bxreFKM8kXK0Ltltct7ozpoXTV8Iv
+IIMIs4COz/OK2vEsMz1nkJAPCZKz/sC/FsOFTfRlwMWWcmpvahxYDhOUaFCwEXlh
+q4sa36lit6nm8teIuXi+Key9v4/eARuxXKbxFnkxzd3hkeNR6iOCxLFHq7X/YIrZ
+oGw6ycVn+NhP9kyyZraBNNiJgObiEhbvkAZkaS4tSuNnWF9V6RC9/JmvZEvAb9/f
+ipkTJ4J0Ua0xLsdWJX6V1Zsh7dJIQsCnWEyV7DJBu3lksuyovPMSRsJOaijSoJe1
+jweAWoz/WEjBjexZS5bgEVSxkmlhUvhjuOc7P3ELKpZWX71hlYMrOKYl9z0y7zWd
+LrPi3UmOP7TPA5VFwGM09qGIaq4IsVcRrpJ7ErUb3EeToYt4iaS+9GyNLZ3dvegx
+yzjK87UAOWPjUBTc4x72iizyT11ke6glEY7g+sMmcoaUVgXmgZo=
+=QYfK
+-----END PGP SIGNATURE-----
+
+--V88s5gaDVPzZ0KCq--
