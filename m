@@ -1,15 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fW3FA-0001Lx-15
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:19:37 -0400
+	(envelope-from <bounces@canonical.com>) id 1fW3GM-0002Rm-B8
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:20:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fW3F9-0005QJ-0D
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:19:36 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Thu, 21 Jun 2018 19:19:25 +0200
-Message-Id: <20180621171925.28925-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH] file-posix: Implement co versions of
- discard/flush
+	(envelope-from <bounces@canonical.com>) id 1fW3GI-0005yl-Bc
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:20:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39470)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fW3GI-0005yK-5c
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:20:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fW3GG-0008Vx-9N
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 17:20:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F29242E80CC
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 17:20:43 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 21 Jun 2018 17:11:27 -0000
+From: John Snow <1776920@bugs.launchpad.net>
+Reply-To: Bug 1776920 <1776920@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152898515528.25954.5483198787570860596.malonedeb@soybean.canonical.com>
+Message-Id: <152960108766.26563.15291996422240489526.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1776920] Re: qemu-img convert on Mac OSX creates
+ corrupt images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,160 +37,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This simplifies file-posix by implementing the coroutine variants of
-the discard and flush BlockDriver callbacks. These were the last
-remaining users of paio_submit(), which can be removed now.
+My hunch is that we're handling zero regions incorrectly and we might be
+skipping data regions we ought to be copying.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/file-posix.c | 72 ++++++++++++++++++------------------------------------
- 1 file changed, 24 insertions(+), 48 deletions(-)
+...I'm looking at the `image2.qemu` file you've uploaded and it's empty!
+we didn't copy *anything* from your source file.
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index fa918f2bdb..7b8eecafcd 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1747,31 +1747,6 @@ static inline int paio_submit_co(BlockDriverState *bs, int fd,
-     return paio_submit_co_full(bs, fd, offset, -1, 0, qiov, bytes, type);
- }
- 
--static BlockAIOCB *paio_submit(BlockDriverState *bs, int fd,
--        int64_t offset, QEMUIOVector *qiov, int bytes,
--        BlockCompletionFunc *cb, void *opaque, int type)
--{
--    RawPosixAIOData *acb = g_new(RawPosixAIOData, 1);
--    ThreadPool *pool;
--
--    acb->bs = bs;
--    acb->aio_type = type;
--    acb->aio_fildes = fd;
--
--    acb->aio_nbytes = bytes;
--    acb->aio_offset = offset;
--
--    if (qiov) {
--        acb->aio_iov = qiov->iov;
--        acb->aio_niov = qiov->niov;
--        assert(qiov->size == acb->aio_nbytes);
--    }
--
--    trace_paio_submit(acb, opaque, offset, bytes, type);
--    pool = aio_get_thread_pool(bdrv_get_aio_context(bs));
--    return thread_pool_submit_aio(pool, aio_worker, acb, cb, opaque);
--}
--
- static int coroutine_fn raw_co_prw(BlockDriverState *bs, uint64_t offset,
-                                    uint64_t bytes, QEMUIOVector *qiov, int type)
- {
-@@ -1838,15 +1813,17 @@ static void raw_aio_unplug(BlockDriverState *bs)
- #endif
- }
- 
--static BlockAIOCB *raw_aio_flush(BlockDriverState *bs,
--        BlockCompletionFunc *cb, void *opaque)
-+static int raw_co_flush_to_disk(BlockDriverState *bs)
- {
-     BDRVRawState *s = bs->opaque;
-+    int ret;
- 
--    if (fd_open(bs) < 0)
--        return NULL;
-+    ret = fd_open(bs);
-+    if (ret < 0) {
-+        return ret;
-+    }
- 
--    return paio_submit(bs, s->fd, 0, NULL, 0, cb, opaque, QEMU_AIO_FLUSH);
-+    return paio_submit_co(bs, s->fd, 0, NULL, 0, QEMU_AIO_FLUSH);
- }
- 
- static void raw_close(BlockDriverState *bs)
-@@ -2503,14 +2480,12 @@ static void coroutine_fn raw_co_invalidate_cache(BlockDriverState *bs,
- #endif /* !__linux__ */
- }
- 
--static coroutine_fn BlockAIOCB *raw_aio_pdiscard(BlockDriverState *bs,
--    int64_t offset, int bytes,
--    BlockCompletionFunc *cb, void *opaque)
-+static coroutine_fn int
-+raw_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
- {
-     BDRVRawState *s = bs->opaque;
- 
--    return paio_submit(bs, s->fd, offset, NULL, bytes,
--                       cb, opaque, QEMU_AIO_DISCARD);
-+    return paio_submit_co(bs, s->fd, offset, NULL, bytes, QEMU_AIO_DISCARD);
- }
- 
- static int coroutine_fn raw_co_pwrite_zeroes(
-@@ -2629,8 +2604,8 @@ BlockDriver bdrv_file = {
- 
-     .bdrv_co_preadv         = raw_co_preadv,
-     .bdrv_co_pwritev        = raw_co_pwritev,
--    .bdrv_aio_flush = raw_aio_flush,
--    .bdrv_aio_pdiscard = raw_aio_pdiscard,
-+    .bdrv_co_flush_to_disk  = raw_co_flush_to_disk,
-+    .bdrv_co_pdiscard       = raw_co_pdiscard,
-     .bdrv_co_copy_range_from = raw_co_copy_range_from,
-     .bdrv_co_copy_range_to  = raw_co_copy_range_to,
-     .bdrv_refresh_limits = raw_refresh_limits,
-@@ -2995,17 +2970,18 @@ static int fd_open(BlockDriverState *bs)
-     return -EIO;
- }
- 
--static coroutine_fn BlockAIOCB *hdev_aio_pdiscard(BlockDriverState *bs,
--    int64_t offset, int bytes,
--    BlockCompletionFunc *cb, void *opaque)
-+static coroutine_fn int
-+hdev_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
- {
-     BDRVRawState *s = bs->opaque;
-+    int ret;
- 
--    if (fd_open(bs) < 0) {
--        return NULL;
-+    ret = fd_open(bs);
-+    if (ret < 0) {
-+        return ret;
-     }
--    return paio_submit(bs, s->fd, offset, NULL, bytes,
--                       cb, opaque, QEMU_AIO_DISCARD|QEMU_AIO_BLKDEV);
-+    return paio_submit_co(bs, s->fd, offset, NULL, bytes,
-+                          QEMU_AIO_DISCARD|QEMU_AIO_BLKDEV);
- }
- 
- static coroutine_fn int hdev_co_pwrite_zeroes(BlockDriverState *bs,
-@@ -3109,8 +3085,8 @@ static BlockDriver bdrv_host_device = {
- 
-     .bdrv_co_preadv         = raw_co_preadv,
-     .bdrv_co_pwritev        = raw_co_pwritev,
--    .bdrv_aio_flush	= raw_aio_flush,
--    .bdrv_aio_pdiscard   = hdev_aio_pdiscard,
-+    .bdrv_co_flush_to_disk	= raw_co_flush_to_disk,
-+    .bdrv_co_pdiscard       = hdev_co_pdiscard,
-     .bdrv_co_copy_range_from = raw_co_copy_range_from,
-     .bdrv_co_copy_range_to  = raw_co_copy_range_to,
-     .bdrv_refresh_limits = raw_refresh_limits,
-@@ -3234,7 +3210,7 @@ static BlockDriver bdrv_host_cdrom = {
- 
-     .bdrv_co_preadv         = raw_co_preadv,
-     .bdrv_co_pwritev        = raw_co_pwritev,
--    .bdrv_aio_flush	= raw_aio_flush,
-+    .bdrv_co_flush_to_disk	= raw_co_flush_to_disk,
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-@@ -3364,7 +3340,7 @@ static BlockDriver bdrv_host_cdrom = {
- 
-     .bdrv_co_preadv         = raw_co_preadv,
-     .bdrv_co_pwritev        = raw_co_pwritev,
--    .bdrv_aio_flush	= raw_aio_flush,
-+    .bdrv_co_flush_to_disk	= raw_co_flush_to_disk,
-     .bdrv_refresh_limits = raw_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
--- 
-2.13.6
+Try converting with '-S 0` to disable sparse protection and see if that
+might help.
+
+  '-S' indicates the consecutive number of bytes (defaults to 4k) that must
+       contain only zeros for qemu-img to create a sparse image during
+       conversion. If the number of bytes is 0, the source will not be scan=
+ned for
+       unallocated or zero sectors, and the destination image will always be
+       fully allocated
+
+If that helps, I'd take a look at img_convert in qemu-img.c ...
+
+convert_iteration_sectors looks relevant, it appears to help us know
+which sectors to copy when called by convert_co_do_copy.
+
+Tracing around "convert_co_read" in the same function might also help us
+to know which portions of the image we're even deciding to read; and we
+could probably track backwards from there to figure out which
+condition(s) are disqualifying us if we're deciding not to copy data.
+
+My current hunch is that bdrv_block_status[_above] is returning
+something wrong when backed by APFS.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1776920
+
+Title:
+  qemu-img convert on Mac OSX creates corrupt images
+
+Status in QEMU:
+  New
+
+Bug description:
+  An image created by qemu-img create, then modified by another program
+  is converted to bad/corrupt image when using convert sub command on
+  Mac OSX. The same convert works on Linux. The version of qemu-img is
+  2.12.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1776920/+subscriptions
