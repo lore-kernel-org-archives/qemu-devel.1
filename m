@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fVxm0-0002op-HD
+	(envelope-from <dgibson@ozlabs.org>) id 1fVxm0-0002ot-PV
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:29:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fVxlz-0008Fm-5U
+	(envelope-from <dgibson@ozlabs.org>) id 1fVxlz-0008G1-8V
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:29:08 -0400
-Date: Thu, 21 Jun 2018 21:11:17 +1000
+Date: Thu, 21 Jun 2018 21:06:23 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180621111117.GJ32328@umbus.fritz.box>
+Message-ID: <20180621110623.GI32328@umbus.fritz.box>
 References: <20180618063606.2513-1-david@gibson.dropbear.id.au>
 	<20180618063606.2513-7-david@gibson.dropbear.id.au>
-	<20180621122914.6d918b54@bahia.lan>
+	<e5ab358f-726a-add0-c2d2-27c157ca1925@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="yhze8HlyfmXt1APY"
+	protocol="application/pgp-signature"; boundary="YrQNB5Deg1WGKZi3"
 Content-Disposition: inline
-In-Reply-To: <20180621122914.6d918b54@bahia.lan>
+In-Reply-To: <e5ab358f-726a-add0-c2d2-27c157ca1925@kaod.org>
 Subject: Re: [Qemu-devel] [PATCH 6/9] spapr: Use maximum page size
  capability to simplify memory backend checking
 List-Id: <qemu-devel.nongnu.org>
@@ -26,18 +26,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: abologna@redhat.com, clg@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: groug@kaod.org, abologna@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, aik@ozlabs.ru
 
 
---yhze8HlyfmXt1APY
-Content-Type: text/plain; charset=us-ascii
+--YrQNB5Deg1WGKZi3
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 21, 2018 at 12:29:14PM +0200, Greg Kurz wrote:
-> On Mon, 18 Jun 2018 16:36:03 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
+On Thu, Jun 21, 2018 at 08:29:36AM +0200, C=E9dric Le Goater wrote:
+> On 06/18/2018 08:36 AM, David Gibson wrote:
+> > The way we used to handle KVM allowable guest pagesizes for PAPR guests
+> > required some convoluted checking of memory attached to the guest.
+> >=20
+> > The allowable pagesizes advertised to the guest cpus depended on the me=
+mory
+> > which was attached at boot, but then we needed to ensure that any memory
+> > later hotplugged didn't change which pagesizes were allowed.
+> >=20
+> > Now that we have an explicit machine option to control the allowable
+> > maximum pagesize we can simplify this.  We just check all memory backen=
+ds
+> > against that declared pagesize.  We check base and cold-plugged memory =
+at
+> > reset time, and hotplugged memory at pre_plug() time.
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+> One minor question below.
+>=20
+> Nevertheless,
+>=20
+> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
+
 [snip]
 > > @@ -304,6 +305,23 @@ static void cap_safe_indirect_branch_apply(sPAPRMa=
 chineState *spapr,
@@ -50,9 +72,12 @@ chineState *spapr,
 > > +    hwaddr maxpagesize =3D (1ULL << spapr->eff.caps[SPAPR_CAP_HPT_MPS]=
 );
 >=20
-> s/SPAPR_CAP_HPT_MPS/SPAPR_CAP_HPT_MAXPAGESIZE
+> I suppose this is SPAPR_CAP_HPT_MAXPAGESIZE now ?=20
 
-Fixed.
+Oops.  I thought I'd compile tested all the intermediate patches,
+which would have caught this, but apparently not.
+
+Fixed now.
 
 > > +
 > > +    if (!kvmppc_hpt_needs_host_contiguous_pages()) {
@@ -80,22 +105,6 @@ ize");
 > >      }
 > > +
 > > +    spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
->=20
-> Even if in this precise case QEMU will always exit gracefully since
-> errp =3D=3D &error_fatal, passing errp several times is a fragile pattern.
-> It may cause a crash if *errp was already allocated.
->=20
-> Maybe use a local_err variable and error_propagate() or at least return
-> in the (val < 12) block above.
-
-Actually, just a return; after the first error should be sufficient.
-I've put that in.
-
->=20
-> Rest looks good. With the two issues addressed:
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
 > >  }
 > > =20
 > >  sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
@@ -171,6 +180,7 @@ path)
 > >  static inline bool kvmppc_has_cap_spapr_vfio(void)
 > >  {
 > >      return false;
+> >=20
 >=20
 
 --=20
@@ -179,24 +189,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---yhze8HlyfmXt1APY
+--YrQNB5Deg1WGKZi3
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsrh9UACgkQbDjKyiDZ
-s5Je6w/+PbY8dfTR+xqf623k9psYgitDXY7cbK9FPzy16lxGY8jQ9a16H+l2iVwK
-905G6jHZEbEH5+4jQ3pQcOaBdu3r6FSFUizH0ga/qGaCeYhSBQVxrVm7vEiyoy//
-CDxX9QF7UcsIEwIK4zG7ntWRpUf0neCcgcQtq0Ui58E9zfal3Rd0l1//NCIkbvXQ
-1ynaGQhH8vBIbbQs5CrT0rdNwiOz5FDvLOKl3GJSdObCWoPIbj2oc4e+sVfHYDEH
-imaxP7raAH5XIVwUXC01GPzRlwYMZZ9/r1CbDjTVNkF56jijhNAWXEc0ZFOxFxCS
-jtKwNo6+DAQg6w6niSHXjjrPpvW1GIIh67oPStTuDr+3ww+Q0mJn1cSpOev1ArqT
-zx4mkmxO5sy34y+4RqtXr9EmJhtzVkmNfZ4QfBOYfehELvT9ZmeGofVdKWzcbEew
-+VfImCfDLf5VzeJUNzOrTOVtxQzGcVIGN40XV3wOXRC2fqHwGC1arUoA4ZIZ2yuh
-dy8Su2uBBhbJTGiVJ/GqOoa422G6Td0AdW1yRkSkLwU5T1GjUGqjBFP8CkheCTJh
-mwurKm3sN8DS0Tqf4iTcCRni0d1gqcItk8G8E1IUFuv6j45y6i314jwRZiWqq1fs
-R7f2EUM2/68fGdH6/NT8ApjfL7fiegAYaZpBL2cvr45uTp5FfFo=
-=Cw+S
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsrhq8ACgkQbDjKyiDZ
+s5ImpA//W1C8J9fYcxxbieluSx5kLAYxa0unaSZAr2u4J+Znqx80kRdkzSxWlX2m
+J4WaMuQCunZdUfzKkV98B9KeDCKA+2XkU2K5N+V0RRVQjBcbU1D29h7T073Ya9d9
+Z6GyR/C+YLMI2DuEcL9ESxl9hJU63vHyeI5/li7CVZEQhTXdHFllXhYqHVOILWKv
+LYxNuHOkohosyCu41Qn4AdgDqi7Jo48xyUWdf+KKqWMB6fTvr1G2iG57A7Stni9j
+UmFtFx3JIIoTVo2U/zL5Q3fMPwvN1zYbpxl8EgBH0y9SuKecULZkPTNyHrwGn7Ud
+x/cKnmtfpoTJ5s07TwzqsyymoTzXi0OZl+S97vcZeRVv5IARvJuQamZoXPl5Xiev
+kMLQ4KNomXVsMPSF3v62pOqM2gESmHc/ykHA08w7IyzQuR4GPnUl+z/cPCOvIteg
+5hPiAXJAS9eWYTQ6EAq2fLpB2Ja0iVfTudHwwDCRbZ+YL6QX+Ib2HyRVl4droNs3
+oAqfPkO//1sZL4kDk/TQ4Dfayhp1x7XBs6VM1wamLmfvbullgrrZa6bl3aF1Guuh
+fX7p5j34coni/HHrLpENmcgjEdjd3jpeQPcuVm7dsVKxLa03+aUlhEmaXDWPAwpj
+q+/JQfo4ruuNz5HQZmrIXF1kWju1vEmQ8F5Hz2cd4+H25jx8WmY=
+=LYle
 -----END PGP SIGNATURE-----
 
---yhze8HlyfmXt1APY--
+--YrQNB5Deg1WGKZi3--
