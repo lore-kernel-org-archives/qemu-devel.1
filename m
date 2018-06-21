@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVuBS-00075W-Pt
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:39:11 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fVuLy-0001w9-IV
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:50:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fVuBP-00034F-MY
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:39:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43414 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fVuBP-000346-Hi
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:39:07 -0400
-Date: Thu, 21 Jun 2018 08:39:02 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180621073902.GC3615@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <23040757-b561-e0bf-a41d-38d3c44555ee@gmail.com>
-	<20180605072746.v6xxabsbewiuw7ka@sirius.home.kraxel.org>
-	<20180605084300.GF32286@redhat.com>
-	<20180613180508.GD24764@localhost.localdomain>
-	<20180614080948.GF6355@redhat.com>
-	<20180615025056.GB7451@localhost.localdomain>
-	<20180615090314.GA31552@redhat.com>
-	<20180618171431.GK7451@localhost.localdomain>
-	<20180618201612-mutt-send-email-mst@kernel.org>
-	<20180620172824.GS7451@localhost.localdomain>
+	(envelope-from <eric.auger@redhat.com>) id 1fVuLx-0000c8-Az
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 03:50:02 -0400
+References: <1528790908-23441-1-git-send-email-eric.auger@redhat.com>
+	<1528790908-23441-4-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA-EpZ6uzLmjr_1w9nno6C5-tyvqU9MfWR8XZwup4hKKDA@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <240510c9-875f-d768-fb14-70835a363c5f@redhat.com>
+Date: Thu, 21 Jun 2018 09:49:50 +0200
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-EpZ6uzLmjr_1w9nno6C5-tyvqU9MfWR8XZwup4hKKDA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180620172824.GS7451@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH RFC] hw/pc: set q35 as the default x86
- machine
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] hw/arm/smmuv3: IOTLB emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,42 +24,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, libvir-list@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, jia.he@hxt-semitech.com, Jia He <hejianet@gmail.com>
 
-On Wed, Jun 20, 2018 at 02:28:24PM -0300, Eduardo Habkost wrote:
-> On Mon, Jun 18, 2018 at 08:18:16PM +0300, Michael S. Tsirkin wrote:
-> > On Mon, Jun 18, 2018 at 02:14:31PM -0300, Eduardo Habkost wrote:
-> > > > Sure if someone does that, we'll have no choice, but as long as 'pc' is
-> > > > shipped we shouldn't gratuitously break apps by changing the default.
-> > > 
-> > > Right.  I just want to make sure "omitting the machine-type may
-> > > stop working in the future" is documented somehow.
-> > 
-> > I still think we should just add links to the qemu binary and
-> > use ARGV to detect the machine type.
-> > 
-> > qemu-pc-i386
-> > qemu-q35-x86_64
+Hi Peter,
+
+On 06/20/2018 06:07 PM, Peter Maydell wrote:
+> On 12 June 2018 at 09:08, Eric Auger <eric.auger@redhat.com> wrote:
+>> We emulate a TLB cache of size SMMU_IOTLB_MAX_SIZE=256.
+>> It is implemented as a hash table whose key is a combination
+>> of the 16b asid and 48b IOVA (Jenkins hash).
+>>
+>> Entries are invalidated on TLB invalidation commands, either
+>> globally, or per asid, or per asid/iova.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>
+>> ---
+>>
+>> v1 -> v2:
+>> - add comment about Jenkins Hash
+>> - remove init of iotlb_hits, misses
+>>
+>> v1:
+>> - Add new trace point when smmu is bypassed
+>> - s/iotlb_miss/iotlb_misses, s/iotlb_hit/iotlb_hits
+>> - use SMMUIOTLBKey as a key
+>>
+>> Credit to Tomasz Nowicki who did the first implementation of
+>> this IOTLB implementation, inspired of intel_iommu implementation.
+>> ---
+>>  hw/arm/smmu-common.c         | 60 +++++++++++++++++++++++++++
+>>  hw/arm/smmuv3.c              | 98 ++++++++++++++++++++++++++++++++++++++++++--
+>>  hw/arm/trace-events          |  9 ++++
+>>  include/hw/arm/smmu-common.h | 13 ++++++
+>>  4 files changed, 176 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+>> index 264e096..16cd33a 100644
+>> --- a/hw/arm/smmu-common.c
+>> +++ b/hw/arm/smmu-common.c
+>> @@ -24,11 +24,43 @@
+>>  #include "qom/cpu.h"
+>>  #include "hw/qdev-properties.h"
+>>  #include "qapi/error.h"
+>> +#include "qemu/jhash.h"
+>>
+>>  #include "qemu/error-report.h"
+>>  #include "hw/arm/smmu-common.h"
+>>  #include "smmu-internal.h"
+>>
+>> +/* IOTLB Management */
+>> +
+>> +inline void smmu_iotlb_inv_all(SMMUState *s)
+>> +{
+>> +    trace_smmu_iotlb_inv_all();
+>> +    g_hash_table_remove_all(s->iotlb);
+>> +}
+>> +
+>> +static gboolean smmu_hash_remove_by_asid(gpointer key, gpointer value,
+>> +                                         gpointer user_data)
+>> +{
+>> +    uint16_t asid = *(uint16_t *)user_data;
+>> +    SMMUIOTLBKey *iotlb_key = (SMMUIOTLBKey *)key;
+>> +
+>> +    return iotlb_key->asid == asid;
+>> +}
+>> +
+>> +inline void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova)
+>> +{
+>> +    SMMUIOTLBKey key = {.asid = asid, .iova = iova};
+>> +
+>> +    trace_smmu_iotlb_inv_iova(asid, iova);
+>> +    g_hash_table_remove(s->iotlb, &key);
+>> +}
+>> +
+>> +inline void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid)
+>> +{
+>> +    trace_smmu_iotlb_inv_asid(asid);
+>> +    g_hash_table_foreach_remove(s->iotlb, smmu_hash_remove_by_asid, &asid);
+>> +}
+>> +
+>>  /* VMSAv8-64 Translation */
+>>
+>>  /**
+>> @@ -328,6 +360,31 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
+>>      return NULL;
+>>  }
+>>
+>> +static guint smmu_iotlb_key_hash(gconstpointer v)
+>> +{
+>> +    SMMUIOTLBKey *key = (SMMUIOTLBKey *)v;
+>> +    uint32_t a, b, c;
+>> +
+>> +    /* Henkins hash */
 > 
-> Why having separate QEMU binaries would help?  We still need to
-> define and document what will happen when both the machine-type
-> and the QEMU binary are omitted in the domain XML.
+> "Jenkins"
+> 
+>> +    a = b = c = JHASH_INITVAL + sizeof(*key);
+> 
+> Why do we add the sizeof(SMMUIOTLBKey) here ?
+To be honest I did something similar to net/colo.c, connection_key_hash().
 
-It would not help libvirt at all, and in fact it would cause extra pain
-for applications, because we don't have ability to associated separate
-QEMU binaries with machine types in our capabilities design. So not
-only would libvirt need changing, but apps using libvirt too.
+in
+https://stackoverflow.com/questions/3279615/python-implementation-of-jenkins-hash
 
-> Personally I prefer to document this as "we recommend you always
-> specify the machine-type" instead of "we recommend you always
-> specify the QEMU binary path".
+I can also find
 
-Indeed, the former is something apps already do in many cases.
+def hashlittle2(data, initval = 0, initval2 = 0):
+    length = lenpos = len(data)
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+    a = b = c = (0xdeadbeef + (length) + initval)
+../..
+
+
+> 
+>> +    a += key->asid;
+>> +    b += extract64(key->iova, 0, 32);
+>> +    c += extract64(key->iova, 32, 32);
+>> +
+>> +    __jhash_mix(a, b, c);
+>> +    __jhash_final(a, b, c);
+>> +
+>> +    return c;
+>> +}
+> 
+> 
+>> +static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
+>> +{
+>> +    SMMUIOTLBKey *k1 = (SMMUIOTLBKey *)v1;
+>> +    SMMUIOTLBKey *k2 = (SMMUIOTLBKey *)v2;
+> 
+> These should have a 'const', at which point I think you'll
+> find that you don't need the explicit casts.
+indeed
+
+Thanks
+
+Eric
+> 
+> Otherwise looks OK I think.
+> 
+> thanks
+> -- PMM
+> 
