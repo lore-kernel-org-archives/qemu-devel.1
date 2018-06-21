@@ -1,46 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1fW1GR-0002dZ-95
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:12:49 -0400
+	(envelope-from <bounces@canonical.com>) id 1fW1JK-0004gA-Ez
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:15:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <walling@linux.ibm.com>) id 1fW1GN-00060r-5Q
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:12:47 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37118
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
-	id 1fW1GM-00060N-U8
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:12:43 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5LF5HpM138674
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 11:12:40 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2jrdyr9fph-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 11:12:39 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
-	Thu, 21 Jun 2018 09:12:39 -0600
-References: <1525445354-16233-1-git-send-email-walling@linux.ibm.com>
-	<7e9e9dfd-795b-47f2-453a-59bf65f28229@redhat.com>
-	<7274b001-02f2-6584-ea0a-c3d0f96d46b8@linux.ibm.com>
-	<89dc884d-97af-4922-bd69-1cb7308399d8@redhat.com>
-	<724592be-f5ac-7a40-8c26-5d2dd200ef82@linux.ibm.com>
-	<ee680f5e-ac9a-479d-f65e-9f8ae9cfe5d4@linux.ibm.com>
-	<20180621111859.GA10744@work-vm>
-From: Collin Walling <walling@linux.ibm.com>
-Date: Thu, 21 Jun 2018 11:12:35 -0400
+	(envelope-from <bounces@canonical.com>) id 1fW1JG-0007UO-DG
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:15:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60174)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fW1JG-0007UC-6C
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 11:15:42 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fW1JF-0003z4-4e
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 15:15:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0D8E32E80CC
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 15:15:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180621111859.GA10744@work-vm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <9f41232e-7d42-2a44-9407-202c18ad749a@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2] monitor: report entirety of hmp command
- on error
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 21 Jun 2018 15:04:46 -0000
+From: Thomas Huth <1470720@bugs.launchpad.net>
+Reply-To: Bug 1470720 <1470720@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150702054858.28284.89593.malonedeb@gac.canonical.com>
+Message-Id: <152959348670.26915.7388712060560528397.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1470720] Re: high IRQ-TLB generates network
+ interruptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,68 +37,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 06/21/2018 07:19 AM, Dr. David Alan Gilbert wrote:
-> * Collin Walling (walling@linux.ibm.com) wrote:
->> When a user incorrectly provides an hmp command, an error response will be
->> printed that prompts the user to try "help <command name>". However, when
->> the command contains multiple parts e.g. "info uuid xyz", only the last
->> whitespace delimited string will be reported (in this example "info" will
->> be dropped and the message will read "Try "help uuid" for more information",
->> which is incorrect).
->>
->> Let's correct this by capturing the entirety of the command from the command
->> line -- excluding any extraneous characters.
->>
->> Reported-by: Mikhail Fokin <fokin@de.ibm.com>
->> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> 
-> Queued
+Looking through old bug tickets... can you still reproduce this issue
+with the latest version of QEMU? Or could we close this ticket nowadays?
 
-Thank you!
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-> 
->> ---
->>  monitor.c | 8 ++++++--
->>  1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/monitor.c b/monitor.c
->> index 39f8ee1..38736b3 100644
->> --- a/monitor.c
->> +++ b/monitor.c
->> @@ -3371,6 +3371,7 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
->>  {
->>      QDict *qdict;
->>      const mon_cmd_t *cmd;
->> +    const char *cmd_start = cmdline;
->>  
->>      trace_handle_hmp_command(mon, cmdline);
->>  
->> @@ -3381,8 +3382,11 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
->>  
->>      qdict = monitor_parse_arguments(mon, &cmdline, cmd);
->>      if (!qdict) {
->> -        monitor_printf(mon, "Try \"help %s\" for more information\n",
->> -                       cmd->name);
->> +        while (cmdline > cmd_start && qemu_isspace(cmdline[-1])) {
->> +            cmdline--;
->> +        }
->> +        monitor_printf(mon, "Try \"help %.*s\" for more information\n",
->> +                       (int)(cmdline - cmd_start), cmd_start);
->>          return;
->>      }
->>  
->> -- 
->> 2.7.4
->>
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> 
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1470720
 
--- 
-Respectfully,
-- Collin Walling
+Title:
+  high IRQ-TLB generates network interruptions
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+   we are having a problem in our hosts, all the vm running on them
+  suddenly, and for some seconds, lost network connectivity.
+
+  the root cause appears to be the increase of irb-tlb from low values
+  (less than 20) to more than >100k, that spike only last for some
+  seconds then everything goes back to normal
+
+  i've upload an screenshot of collectd for one hypervisor here
+  http://zumbi.com.ar/tmp/irq-tlb.png
+
+  =
+
+  we have hosts running precise (qemu 1.5, ovs 2.0.2, libvirt 1.2.2 and ker=
+nel 3.13) where the issue is frequent. also we have an small % of our fleet=
+ running trusty (qemu 2.0.0 ovs 2.0.2 libvirt 1.2.2 and kernel 3.16) where =
+the problem seemed to be nonexistent until today
+
+  issue seems to be isolated to < 10% of our hypervisors, some hypervisors =
+had this problem every few days, others only once or twice. our vm are a bl=
+ack box to us we don't know what users run on them, but mostly cpu and netw=
+ork bound workload.
+  most of our guests run centos 6.5 (kernel 2.6.32)
+
+  vm are bridged to a linuxbridge then veth wired to an ovs switch
+  (neutron openvswitch agent setup)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1470720/+subscriptions
