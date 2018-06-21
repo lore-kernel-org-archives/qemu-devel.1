@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fW0I3-0006aj-6l
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:10:28 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fW0L9-0007bo-Kx
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fW0Hy-00082e-1V
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:10:23 -0400
-Date: Thu, 21 Jun 2018 16:10:10 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180621161010.16f02132.cohuck@redhat.com>
-In-Reply-To: <a0f58d3e-7c79-f6be-782d-92cd5bbf7868@redhat.com>
-References: <20180620100825.22476-1-david@redhat.com>
-	<20180620100825.22476-5-david@redhat.com>
-	<8f537d31-91df-99cc-624b-82434dc084ee@redhat.com>
-	<a0f58d3e-7c79-f6be-782d-92cd5bbf7868@redhat.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fW0L8-00016o-7B
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:13:35 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:32822)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fW0L8-00016Q-1E
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:13:34 -0400
+Received: by mail-wm0-x242.google.com with SMTP id z6-v6so3386020wma.0
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 07:13:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/7] s390x/tcg: SET CLOCK COMPARATOR can
- clear CKC interrupts
+In-Reply-To: <CAJ+F1CJ+g4wUCi4ao8z7K6CvuO4Zt9VqOi46o4voo3e8Vceeyg@mail.gmail.com>
+References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
+	<20180515121433.6112-4-marcandre.lureau@redhat.com>
+	<20180621145405.197d5106@redhat.com>
+	<CAJ+F1CKFq5=Afoqg8YZGw-TO8vJqTPwjpW_UAMh6G8LPp4ZztA@mail.gmail.com>
+	<CAJ+F1CJ+g4wUCi4ao8z7K6CvuO4Zt9VqOi46o4voo3e8Vceeyg@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 21 Jun 2018 16:13:32 +0200
+Message-ID: <CAJ+F1CKwFY7zM2mqYU3QtOdpx9jOXNFTtgfEvNJZionByas6Qg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 3/4] acpi: build TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 21 Jun 2018 15:54:36 +0200
-David Hildenbrand <david@redhat.com> wrote:
+Hi
 
-> On 21.06.2018 14:09, Thomas Huth wrote:
-> > On 20.06.2018 12:08, David Hildenbrand wrote:  
-> >> Let's stop the timer and delete any pending CKC IRQ before doing
-> >> anything else.
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  target/s390x/misc_helper.c | 6 ++++++
-> >>  1 file changed, 6 insertions(+)
-> >>
-> >> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> >> index 6ccbe1fe9a..d5f9f5e1d3 100644
-> >> --- a/target/s390x/misc_helper.c
-> >> +++ b/target/s390x/misc_helper.c
-> >> @@ -158,6 +158,12 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
-> >>      Error *err = NULL;
-> >>      S390TOD tod_base;
-> >>  
-> >> +    /* stop the timer and remove pending CKC IRQs */
-> >> +    timer_del(env->tod_timer);
-> >> +    qemu_mutex_lock_iothread();
-> >> +    env->pending_int &= ~INTERRUPT_EXT_CLOCK_COMPARATOR;
-> >> +    qemu_mutex_unlock_iothread();  
-> > 
-> > Reviewed-by: Thomas Huth <thuth@redhat.com>
-> >   
-> >>      if (time == -1ULL) {  
-> > 
-> > I wonder whether that check is still adequate? Is there really a way to
-> > disable the clock comparator like this? At least I haven't seen it in
-> > the PoP.  
-> 
-> e.g. 4-61 (Control)
-> 
-> 4. When the clock-comparator sign control is zero,
-> (a) the program can set the clock comparator to
-> all zeros to ensure that an interruption condition
-> is immediately present, and (b) the program can
-> set the clock comparator to a value of all binary
-> ones to ensure that a clock-comparator interrup-
-> tion is never recognized. [...]
-> 
-> Rational from 4-59 (Control):
-> 
-> The clock comparator provides a means of causing
-> an interruption when the TOD-clock value exceeds a
-> value specified by the program.
-> 
-> We can never exceed all binary 1s. So it is really exceeding, not "hitting"
+On Thu, Jun 21, 2018 at 3:22 PM, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+> Hi
+>
+> On Thu, Jun 21, 2018 at 3:21 PM, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@gmail.com> wrote:
+>
+>>>> +    method =3D aml_method("TPFN", 1, AML_SERIALIZED);
+>>> not quite sure how this method (supposed to ) work(s),
+>>> it could use nice comment explaining mechanics.
+>>>
+>>
+>> Windows doesn't like DerefOf (FUNC [N]), it returned wrong values. It
+>> took me a while to figure this out. My laptop TPM ACPI table uses the
+>> same trick, so I assume this is a Windows acpi bug/limitation. Instead
+>> we use a function that returns the corresponding field.
+>
+> Sorry, I am wrong, my laptop doesn't use such table. I don't know
+> where I saw someone using the same trick though..
 
-OK, so that actually makes sense with your change on top. Before we
-just jumped out. Agree about adding a comment.
+fwiw, I also asked on OSR list for help but got no answer:
+http://www.osronline.com/showThread.CFM?link=3D288617
+
+
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
