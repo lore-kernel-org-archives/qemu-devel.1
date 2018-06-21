@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fW4I7-00051e-57
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:26:44 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fW4K9-0006AL-6Q
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:28:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fW4I6-00073G-4I
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:26:43 -0400
-References: <20180612172614.60107-1-vsementsov@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b19ef4df-7280-27ca-cd82-c4de9297a335@virtuozzo.com>
-Date: Thu, 21 Jun 2018 21:26:29 +0300
+	(envelope-from <ehabkost@redhat.com>) id 1fW4K6-0007Wt-1w
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:28:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35248)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fW4K5-0007Wk-RF
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 14:28:45 -0400
+Date: Thu, 21 Jun 2018 15:28:41 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180621182841.GV7451@localhost.localdomain>
+References: <1529443919-67509-1-git-send-email-babu.moger@amd.com>
+	<1529443919-67509-2-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <20180612172614.60107-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: [Qemu-devel] drop Re: [PATCH] block/qcow2: fix logic around
- dirty_bitmaps_loaded
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1529443919-67509-2-git-send-email-babu.moger@amd.com>
+Subject: Re: [Qemu-devel] [PATCH v16 1/3] i386: Fix up the Node id for
+ CPUID_8000_001E
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Babu Moger <babu.moger@amd.com>
+Cc: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, mtosatti@redhat.com, kvm@vger.kernel.org, kash@tripleback.net, geoff@hostfission.com
 
-12.06.2018 20:26, Vladimir Sementsov-Ogievskiy wrote:
-> First: this variable was introduced to handle reopens. We need it on
-> following qcow2_do_open, to don't try loading bitmaps again. So, we are
-> fixing qcow2_invalidate_cache().
->
-> However, if we fix only qcow2_invalidate_cache, iotest 169 fails on
-> case test__persistent__not_migbitmap__online_shared, because on first
-> target open, source is not yet closed, and is not yet stored bitmaps,
-> so, we are load nothing. And on second open, dirty_bitmaps_loaded is
-> already true, but we have no bitmaps to reopen with
-> qcow2_reopen_bitmaps_rw_hint(). So, we are fixing qcow2_do_open() too.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   block/qcow2.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 6fa5e1d71a..b4216a5830 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -1499,7 +1499,7 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
->           {
->               qcow2_reopen_bitmaps_rw_hint(bs, &header_updated, &local_err);
->           }
-> -    } else {
-> +    } else if (s->nb_bitmaps > 0) {
->           header_updated = qcow2_load_dirty_bitmaps(bs, &local_err);
->           s->dirty_bitmaps_loaded = true;
->       }
-> @@ -2178,6 +2178,7 @@ static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
->       QDict *options;
->       Error *local_err = NULL;
->       int ret;
-> +    bool dirty_bitmaps_loaded = s->dirty_bitmaps_loaded;
->   
->       /*
->        * Backing files are read-only which makes all of their metadata immutable,
-> @@ -2190,6 +2191,7 @@ static void coroutine_fn qcow2_co_invalidate_cache(BlockDriverState *bs,
->       qcow2_close(bs);
->   
->       memset(s, 0, sizeof(BDRVQcow2State));
-> +    s->dirty_bitmaps_loaded = dirty_bitmaps_loaded;
->       options = qdict_clone_shallow(bs->options);
->   
->       flags &= ~BDRV_O_INACTIVE;
+On Tue, Jun 19, 2018 at 05:31:57PM -0400, Babu Moger wrote:
+> This is part of topoext support. To keep the compatibility, it is better
+> we support all the combination of nr_cores and nr_threads currently
+> supported. By allowing more nr_cores and nr_threads, we might end up with
+> more nodes than we can actually support with the real hardware. We need to
+> fix up the node id to make this work. We can achieve this by shifting the
+> socket_id bits left to address more nodes.
+> 
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
 
-Drop this, I'll resend better patch.
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+Queued, thanks.
 
 -- 
-Best regards,
-Vladimir
+Eduardo
