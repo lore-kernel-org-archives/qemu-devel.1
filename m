@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fVwXz-0007pq-Rq
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:10:36 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fVwXz-0007pu-VT
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:10:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fVwXv-0003Vf-OK
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fVwXy-0003Wo-PO
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:10:35 -0400
-References: <20180609151758.17343-1-vsementsov@virtuozzo.com>
-	<20180609151758.17343-6-vsementsov@virtuozzo.com>
-	<45f6544a-d384-f3cc-5fd4-c3d5f0268f25@redhat.com>
-	<f92c42cd-d5ed-b89d-5381-f220fdd4aa02@virtuozzo.com>
-	<88afa2f6-39b3-092e-33c2-4436cbe8e5dd@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b0d9121b-db6a-36c9-ad29-f743a535ac71@virtuozzo.com>
-Date: Thu, 21 Jun 2018 13:10:26 +0300
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:46298)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fVwXy-0003WS-FS
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 06:10:34 -0400
+Received: by mail-wr0-x242.google.com with SMTP id v13-v6so2523858wrp.13
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 03:10:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <88afa2f6-39b3-092e-33c2-4436cbe8e5dd@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180621120056.663f7f25@redhat.com>
+References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
+	<20180515121433.6112-3-marcandre.lureau@redhat.com>
+	<20180621120056.663f7f25@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 21 Jun 2018 12:10:32 +0200
+Message-ID: <CAJ+F1CLYvrddKXdVfqa-Jiw-jr2LrxUbznW4Tn6kDK+O3J-M9Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v5 5/6] qapi: new qmp command
- nbd-server-add-bitmap
+Subject: Re: [Qemu-devel] [PATCH v3 2/4] acpi: add fw_cfg file for TPM and
+ PPI virtual memory device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,104 +32,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+To: Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-20.06.2018 21:14, Eric Blake wrote:
-> On 06/20/2018 09:13 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 20.06.2018 14:26, Eric Blake wrote:
->>> On 06/09/2018 10:17 AM, Vladimir Sementsov-Ogievskiy wrote:
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>> =C2=A0 qapi/block.json | 23 +++++++++++++++++++++++
->>>> =C2=A0 blockdev-nbd.c=C2=A0 | 23 +++++++++++++++++++++++
->>>> =C2=A0 2 files changed, 46 insertions(+)
->>>
->>> I'm tempted to temporarily name this x-nbd-server-add-bitmap, until=20
->>> I have the counterpart Libvirt patches tested, just in case testing=20
->>> turns up any tweaks we need to the interface.
->>>
+Hi
+
+On Thu, Jun 21, 2018 at 12:00 PM, Igor Mammedov <imammedo@redhat.com> wrote=
+:
+> On Tue, 15 May 2018 14:14:31 +0200
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 >
->>>> +# @bitmap-export-name: How the bitmap will be seen by nbd clients
->>>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (default @bitm=
-ap)
->>>
->>> Do we really need the flexibility of naming the bitmap differently=20
->>> to the NBD client than we do in qemu?
+>> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 >>
->> It was needed for our backup-api implementation. Nikolay?
+>> To avoid having to hard code the base address of the PPI virtual
+>> memory device we introduce a fw_cfg file etc/tpm/config that holds the
+>> base address of the PPI device, the version of the PPI interface and
+>> the version of the attached TPM.
+> is it related to TPM_PPI_ADDR_BASE added in previous patch?
 >
-> In fact, if we include the ability now, we can't remove it later=20
-> (unless we use the x- prefix); but if we omit it now, we can add it=20
-> later (regardless of using the x- prefix).=C2=A0 So I've gone ahead and=20
-> added the x- prefix; here's what I'm squashing, along with:
+>>
+>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>> [ Marc-Andr=C3=A9: renamed to etc/tpm/config, made it static, document i=
+t ]
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  include/hw/acpi/tpm.h |  3 +++
+>>  hw/i386/acpi-build.c  | 17 +++++++++++++++++
+>>  docs/specs/tpm.txt    | 20 ++++++++++++++++++++
+>>  3 files changed, 40 insertions(+)
+>>
+>> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
+>> index c082df7d1d..f79d68a77a 100644
+>> --- a/include/hw/acpi/tpm.h
+>> +++ b/include/hw/acpi/tpm.h
+>> @@ -193,4 +193,7 @@ REG32(CRB_DATA_BUFFER, 0x80)
+>>  #define TPM_PPI_ADDR_SIZE           0x400
+>>  #define TPM_PPI_ADDR_BASE           0xFED45000
+>>
+>> +#define TPM_PPI_VERSION_NONE        0
+>> +#define TPM_PPI_VERSION_1_30        1
+>> +
+>>  #endif /* HW_ACPI_TPM_H */
+>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>> index 9bc6d97ea1..f6d447f03a 100644
+>> --- a/hw/i386/acpi-build.c
+>> +++ b/hw/i386/acpi-build.c
+>> @@ -119,6 +119,12 @@ typedef struct AcpiBuildPciBusHotplugState {
+>>      bool pcihp_bridge_en;
+>>  } AcpiBuildPciBusHotplugState;
+>>
+>> +typedef struct FWCfgTPMConfig {
+>> +    uint32_t tpmppi_address;
+>> +    uint8_t tpm_version;
+>> +    uint8_t tpmppi_version;
+>> +} QEMU_PACKED FWCfgTPMConfig;
+>> +
+>>  static void init_common_fadt_data(Object *o, AcpiFadtData *data)
+>>  {
+>>      uint32_t io =3D object_property_get_uint(o, ACPI_PM_PROP_PM_IO_BASE=
+, NULL);
+>> @@ -2873,6 +2879,7 @@ void acpi_setup(void)
+>>      AcpiBuildTables tables;
+>>      AcpiBuildState *build_state;
+>>      Object *vmgenid_dev;
+>> +    static FWCfgTPMConfig tpm_config;
+>>
+>>      if (!pcms->fw_cfg) {
+>>          ACPI_BUILD_DPRINTF("No fw cfg. Bailing out.\n");
+>> @@ -2907,6 +2914,16 @@ void acpi_setup(void)
+>>      fw_cfg_add_file(pcms->fw_cfg, ACPI_BUILD_TPMLOG_FILE,
+>>                      tables.tcpalog->data, acpi_data_len(tables.tcpalog)=
+);
+>>
+>> +    if (tpm_find()) {
+>> +        tpm_config =3D (FWCfgTPMConfig) {
+>> +            .tpmppi_address =3D cpu_to_le32(TPM_PPI_ADDR_BASE),
+>> +            .tpm_version =3D cpu_to_le32(tpm_get_version(tpm_find())),
+>> +            .tpmppi_version =3D cpu_to_le32(TPM_PPI_VERSION_NONE)
+>> +        };
+>> +        fw_cfg_add_file(pcms->fw_cfg, "etc/tpm/config",
+>> +                        &tpm_config, sizeof tpm_config);
+>> +    }
+> why it's in ACPI part of the code, shouldn't it be a part of device,
+> could TPM be used without ACPI at all (-noacpi CLI option)?
 >
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Wouldn't adding fwcfg entry unconditionally break migration?
+
+Because of unstable entry IDs? that could be problematic. (especially
+during boot time) What do you think Laszlo?
+
+I guess we could have a "ppi" device property, that would imply having
+the etc/tpm/config fw_cfg entry. We would enable it by default in
+newer machine types (3.0?)
+
 >
-> diff --git i/qapi/block.json w/qapi/block.json
-> index ddbca2e286c..ca807f176ae 100644
-> --- i/qapi/block.json
-> +++ w/qapi/block.json
-> @@ -269,7 +269,7 @@
-> =C2=A0=C2=A0 'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
->
-> =C2=A0##
-> -# @nbd-server-add-bitmap:
-> +# @x-nbd-server-add-bitmap:
-> =C2=A0#
-> =C2=A0# Expose a dirty bitmap associated with the selected export. The=20
-> bitmap search
-> =C2=A0# starts at the device attached to the export, and includes all=20
-> backing files.
-> @@ -288,7 +288,7 @@
-> =C2=A0#
-> =C2=A0# Since: 3.0
-> =C2=A0##
-> -=C2=A0 { 'command': 'nbd-server-add-bitmap',
-> +=C2=A0 { 'command': 'x-nbd-server-add-bitmap',
-> =C2=A0=C2=A0=C2=A0=C2=A0 'data': {'name': 'str', 'bitmap': 'str', '*bitma=
-p-export-name':=20
-> 'str'} }
->
-> =C2=A0##
-> diff --git i/blockdev-nbd.c w/blockdev-nbd.c
-> index 6b0c50732c1..1ef11041a73 100644
-> --- i/blockdev-nbd.c
-> +++ w/blockdev-nbd.c
-> @@ -221,10 +221,10 @@ void qmp_nbd_server_stop(Error **errp)
-> =C2=A0=C2=A0=C2=A0=C2=A0 nbd_server =3D NULL;
-> =C2=A0}
->
-> -void qmp_nbd_server_add_bitmap(const char *name, const char *bitmap,
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool has_bitmap_export_name,
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char *bitmap_export_name,
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error **errp)
-> +void qmp_x_nbd_server_add_bitmap(const char *name, const char *bitmap,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool has_bitmap_export_name,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char *bitmap_export_nam=
-e,
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Error **errp)
-> =C2=A0{
-> =C2=A0=C2=A0=C2=A0=C2=A0 NBDExport *exp;
->
+>> +
+>>      vmgenid_dev =3D find_vmgenid_dev();
+>>      if (vmgenid_dev) {
+>>          vmgenid_add_fw_cfg(VMGENID(vmgenid_dev), pcms->fw_cfg,
+>> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+>> index c230c4c93e..2ddb768084 100644
+>> --- a/docs/specs/tpm.txt
+>> +++ b/docs/specs/tpm.txt
+>> @@ -20,6 +20,26 @@ QEMU files related to TPM TIS interface:
+>>   - hw/tpm/tpm_tis.h
+>>
+>>
+>> +=3D fw_cfg interface =3D
+>> +
+>> +The bios/firmware may use the "etc/tpm/config" fw_cfg entry for
+>> +configuring the guest appropriately.
+>> +
+>> +The entry of 6 bytes has the following content, in little-endian:
+>> +
+>> +    #define TPM_VERSION_UNSPEC          0
+>> +    #define TPM_VERSION_1_2             1
+>> +    #define TPM_VERSION_2_0             2
+>> +
+>> +    #define TPM_PPI_VERSION_NONE        0
+>> +    #define TPM_PPI_VERSION_1_30        1
+>> +
+>> +    struct FWCfgTPMConfig {
+>> +        uint32_t tpmppi_address;         /* PPI memory location */
+>> +        uint8_t tpm_version;             /* TPM version */
+>> +        uint8_t tpmppi_version;          /* PPI version */
+>> +    };
+>> +
+>>  =3D ACPI Interface =3D
+>>
+>>  The TPM device is defined with ACPI ID "PNP0C31". QEMU builds a SSDT an=
+d passes
 >
 >
 
-Ok, good
+
 
 --=20
-Best regards,
-Vladimir
+Marc-Andr=C3=A9 Lureau
