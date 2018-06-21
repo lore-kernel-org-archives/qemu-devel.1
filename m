@@ -1,24 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fW2w7-0005BY-Ab
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:59:56 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fW2wW-0005VI-1m
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:00:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fW2w4-0001JL-9m
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 12:59:55 -0400
-References: <20180424101859.10239-1-david@redhat.com>
-	<7c046e3c-8752-87c5-f4ff-06ef56ef0128@de.ibm.com>
-	<20180621180443.1f0dc588.cohuck@redhat.com>
-	<0c3f3ee4-f8b9-8781-6ad5-31dd7753a2c4@de.ibm.com>
-	<eda9ada5-1fdd-1652-6cc8-0a3592dbf996@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b73a7220-62a2-4e85-0268-cd6c40ca3b24@redhat.com>
-Date: Thu, 21 Jun 2018 18:59:45 +0200
+	(envelope-from <borntraeger@de.ibm.com>) id 1fW2wT-0001SX-0q
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:00:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44770
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fW2wS-0001SF-RM
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 13:00:16 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5LGxfrg062575
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 13:00:16 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2jrftugf84-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 13:00:15 -0400
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Thu, 21 Jun 2018 18:00:13 +0100
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20180621163522.100968-1-borntraeger@de.ibm.com>
+	<f21788b0-6417-dddb-fd5e-9dd9d17cfc66@de.ibm.com>
+Date: Thu, 21 Jun 2018 19:00:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <eda9ada5-1fdd-1652-6cc8-0a3592dbf996@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <f21788b0-6417-dddb-fd5e-9dd9d17cfc66@de.ibm.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1] s390x: refactor reset/reipl handling
+Message-Id: <e6f90da2-1bba-c14f-83f3-f95b348b9de9@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2] s390/ipl: fix ipl with -no-reboot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,25 +43,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 21/06/2018 18:08, David Hildenbrand wrote:
->> Without this we have no kdump/kexec/ipl
->> as soon as somebody uses -no-reboot.
->>
-> Paolo even said that consistent -no-reboot handling would be one of the
-> benefits :)
+
+
+On 06/21/2018 06:51 PM, Christian Borntraeger wrote:
 > 
+> 
+> On 06/21/2018 06:35 PM, Christian Borntraeger wrote:
+>> kexec/kdump as well as the bootloader use a subcode of diagnose 308
+>> that is supposed to reset the subsystem but not comprise a full
+>> "reboot". With the latest refactoring this is now broken when
+>> -no-reboot is used. This for example break virt-install from
+>> iso images.
+> 
+> Its even worse. With this patch I can IPL with --no-reboot, but
+> virt-install still creates an xml like
+> 
+>   <on_poweroff>destroy</on_poweroff>
+>   <on_reboot>destroy</on_reboot>
+>   <on_crash>destroy</on_crash>
+> 
+> With you patch a "soft reset" still seems to trigger an qapi event
+> so that libvirt kills the guest due to that...
 
-kdump/kexec (and of course "ipl") do not reboot on x86, so fixing the
-bug does help in making things consistent. :)
+So this on top....
 
-Do we really want a reset event for ipl?  Maybe for kexec/kdump, but
-perhaps just using SHUTDOWN_CAUSE_NONE for MODIFIED_CLEAR and
-LOAD_NORMAL (not sure about the difference) is the way to go.
 
-For example, x86 suspend is a "reboot" but it is already special cased
-to use SHUTDOWN_CAUSE_NONE.
-
-Paolo
+diff --git a/vl.c b/vl.c
+index 722c3b9963..44e65071bc 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1628,7 +1628,7 @@ void qemu_system_reset(ShutdownCause reason)
+     } else {
+         qemu_devices_reset();
+     }
+-    if (reason) {
++    if (reason != SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
+         qapi_event_send_reset(shutdown_caused_by_guest(reason),
+                               &error_abort);
+     }
