@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVxx0-0008Hn-EC
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:40:31 -0400
+	(envelope-from <eblake@redhat.com>) id 1fVxx0-0008I3-Qc
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:40:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fVxwz-0004Hl-8F
+	(envelope-from <eblake@redhat.com>) id 1fVxwx-0004HI-MT
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:40:30 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 21 Jun 2018 08:40:14 -0300
-Message-Id: <20180621114015.9207-3-f4bug@amsat.org>
-In-Reply-To: <20180621114015.9207-1-f4bug@amsat.org>
-References: <20180621114015.9207-1-f4bug@amsat.org>
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45538 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fVxwx-0004H0-Eo
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:40:27 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DBCC181A4EAB
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 11:40:26 +0000 (UTC)
+References: <152955929417.819.6336496286507533586@d39dc562802a>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7e6b7078-0717-ac19-287b-2e26bfd80bba@redhat.com>
+Date: Thu, 21 Jun 2018 06:40:25 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 2/3] hw/arm/sysbus-fdt: Replace
- error_setg(&error_fatal) by error_report() + exit()
+In-Reply-To: <152955929417.819.6336496286507533586@d39dc562802a>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 0/7] bitmap export over NBD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,138 +33,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-Use error_report() + exit() instead of error_setg(&error_fatal),
-as suggested by the "qapi/error.h" documentation:
+On 06/21/2018 12:34 AM, no-reply@patchew.org wrote:
+> Hi,
+> 
+> This series failed docker-mingw@fedora build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
+> 
 
-   Please don't error_setg(&error_fatal, ...), use error_report() and
-   exit(), because that's more obvious.
+> /tmp/qemu-test/src/nbd/server.c: In function 'nbd_trip':
+> /tmp/qemu-test/src/nbd/server.c:1979:19: error: 'end' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>       *length = end - offset;
+>                 ~~~~^~~~~~~~
+> /tmp/qemu-test/src/nbd/server.c:1940:30: note: 'end' was declared here
+>       uint64_t begin = offset, end;
+>                                ^~~
 
-This fixes CID 1352173:
-    "Passing null pointer dt_name to qemu_fdt_node_path, which dereferences it."
+This gcc is too stupid to see that end is always initialized:
 
-And this also fixes:
+> 
+> +/*
+> + * Populate @extents from a dirty bitmap. Unless @dont_fragment, the
+> + * final extent may exceed the original @length. Store in @length the
+> + * byte length encoded (which may be smaller or larger than the
+> + * original), and return the number of extents used.
+> + */
+> +static unsigned int bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
+> +                                      uint64_t *length, NBDExtent *extents,
+> +                                      unsigned int nb_extents,
+> +                                      bool dont_fragment)
+> +{
+> +    uint64_t begin = offset, end;
+> +    uint64_t overall_end = offset + *length;
 
-    hw/arm/sysbus-fdt.c:322:9: warning: Array access (from variable 'node_path') results in a null pointer dereference
-        if (node_path[1]) {
-            ^~~~~~~~~~~~
+On input, *length is a non-zero 32-bit number (gcc can't see that)...
 
-Fixes: Coverity CID 1352173 (Dereference after null check)
-Suggested-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
----
- hw/arm/sysbus-fdt.c | 45 ++++++++++++++++++++++++++-------------------
- 1 file changed, 26 insertions(+), 19 deletions(-)
+> +    unsigned int i = 0;
+> +    BdrvDirtyBitmapIter *it;
+> +    bool dirty;
+> +
+> +    bdrv_dirty_bitmap_lock(bitmap);
+> +
+> +    it = bdrv_dirty_iter_new(bitmap);
+> +    dirty = bdrv_get_dirty_locked(NULL, bitmap, offset);
+> +
+> +    while (begin < overall_end && i < nb_extents) {
 
-diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-index 277ed872e7..63b74a353e 100644
---- a/hw/arm/sysbus-fdt.c
-+++ b/hw/arm/sysbus-fdt.c
-@@ -92,7 +92,7 @@ static void copy_properties_from_host(HostProperty *props, int nb_props,
-         r = qemu_fdt_getprop(host_fdt, node_path,
-                              props[i].name,
-                              &prop_len,
--                             props[i].optional ? &err : &error_fatal);
-+                             &err);
-         if (r) {
-             qemu_fdt_setprop(guest_fdt, nodename,
-                              props[i].name, r, prop_len);
-@@ -103,6 +103,10 @@ static void copy_properties_from_host(HostProperty *props, int nb_props,
-             } else {
-                 error_free(err);
-             }
-+            if (!props[i].optional) {
-+                /* mandatory property not found: bail out */
-+                exit(1);
-+            }
-         }
-     }
- }
-@@ -138,9 +142,9 @@ static void fdt_build_clock_node(void *host_fdt, void *guest_fdt,
- 
-     node_offset = fdt_node_offset_by_phandle(host_fdt, host_phandle);
-     if (node_offset <= 0) {
--        error_setg(&error_fatal,
--                   "not able to locate clock handle %d in host device tree",
--                   host_phandle);
-+        error_report("not able to locate clock handle %d in host device tree",
-+                     host_phandle);
-+        exit(1);
-     }
-     node_path = g_malloc(path_len);
-     while ((ret = fdt_get_path(host_fdt, node_offset, node_path, path_len))
-@@ -149,16 +153,16 @@ static void fdt_build_clock_node(void *host_fdt, void *guest_fdt,
-         node_path = g_realloc(node_path, path_len);
-     }
-     if (ret < 0) {
--        error_setg(&error_fatal,
--                   "not able to retrieve node path for clock handle %d",
--                   host_phandle);
-+        error_report("not able to retrieve node path for clock handle %d",
-+                     host_phandle);
-+        exit(1);
-     }
- 
-     r = qemu_fdt_getprop(host_fdt, node_path, "compatible", &prop_len,
-                          &error_fatal);
-     if (strcmp(r, "fixed-clock")) {
--        error_setg(&error_fatal,
--                   "clock handle %d is not a fixed clock", host_phandle);
-+        error_report("clock handle %d is not a fixed clock", host_phandle);
-+        exit(1);
-     }
- 
-     nodename = strrchr(node_path, '/');
-@@ -301,34 +305,37 @@ static int add_amd_xgbe_fdt_node(SysBusDevice *sbdev, void *opaque)
- 
-     dt_name = sysfs_to_dt_name(vbasedev->name);
-     if (!dt_name) {
--        error_setg(&error_fatal, "%s incorrect sysfs device name %s",
--                    __func__, vbasedev->name);
-+        error_report("%s incorrect sysfs device name %s",
-+                     __func__, vbasedev->name);
-+        exit(1);
-     }
-     node_path = qemu_fdt_node_path(host_fdt, dt_name, vdev->compat,
-                                    &error_fatal);
-     if (!node_path || !node_path[0]) {
--        error_setg(&error_fatal, "%s unable to retrieve node path for %s/%s",
--                   __func__, dt_name, vdev->compat);
-+        error_report("%s unable to retrieve node path for %s/%s",
-+                     __func__, dt_name, vdev->compat);
-+        exit(1);
-     }
- 
-     if (node_path[1]) {
--        error_setg(&error_fatal, "%s more than one node matching %s/%s!",
--                   __func__, dt_name, vdev->compat);
-+        error_report("%s more than one node matching %s/%s!",
-+                     __func__, dt_name, vdev->compat);
-+        exit(1);
-     }
- 
-     g_free(dt_name);
- 
-     if (vbasedev->num_regions != 5) {
--        error_setg(&error_fatal, "%s Does the host dt node combine XGBE/PHY?",
--                   __func__);
-+        error_report("%s Does the host dt node combine XGBE/PHY?", __func__);
-+        exit(1);
-     }
- 
-     /* generate nodes for DMA_CLK and PTP_CLK */
-     r = qemu_fdt_getprop(host_fdt, node_path[0], "clocks",
-                          &prop_len, &error_fatal);
-     if (prop_len != 8) {
--        error_setg(&error_fatal, "%s clocks property should contain 2 handles",
--                   __func__);
-+        error_report("%s clocks property should contain 2 handles", __func__);
-+        exit(1);
-     }
-     host_clock_phandles = (uint32_t *)r;
-     guest_clock_phandles[0] = qemu_fdt_alloc_phandle(guest_fdt);
+...so this loop always iterates at least once...
+
+> +        if (dirty) {
+> +            end = bdrv_dirty_bitmap_next_zero(bitmap, begin);
+> +        } else {
+> +            bdrv_set_dirty_iter(it, begin);
+> +            end = bdrv_dirty_iter_next(it);
+> +        }
+
+...and end is always initialized...
+
+> +        if (end == -1) {
+> +            /* Cap to an aligned value < 4G beyond begin. */
+> +            end = MIN(bdrv_dirty_bitmap_size(bitmap),
+> +                      begin + 0x100000000ULL -
+> +                      bdrv_dirty_bitmap_granularity(bitmap));
+> +        }
+> +        if (dont_fragment && end > overall_end) {
+> +            end = overall_end;
+> +        }
+> +
+> +        extents[i].length = cpu_to_be32(end - begin);
+> +        extents[i].flags = cpu_to_be32(dirty ? NBD_STATE_DIRTY : 0);
+> +        i++;
+> +        begin = end;
+> +        dirty = !dirty;
+> +    }
+> +
+> +    bdrv_dirty_iter_free(it);
+> +
+> +    bdrv_dirty_bitmap_unlock(bitmap);
+> +
+> +    *length = end - offset;
+
+...but gcc didn't know that.
+
 -- 
-2.18.0.rc2
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
