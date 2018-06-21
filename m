@@ -1,16 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fW12S-0001MX-9s
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:58:22 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fW13T-0002LL-0l
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:59:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fW12Q-0006q9-40
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:58:20 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Thu, 21 Jun 2018 09:57:46 -0500
-Message-Id: <20180621145749.191944-7-eblake@redhat.com>
-In-Reply-To: <20180621145749.191944-1-eblake@redhat.com>
-References: <20180621145749.191944-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL v2 6/9] nbd/server: implement dirty bitmap export
+	(envelope-from <cohuck@redhat.com>) id 1fW13P-0007De-AT
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:59:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41580 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fW13P-0007DP-55
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 10:59:19 -0400
+Date: Thu, 21 Jun 2018 16:59:13 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180621165913.7e3f4faa.cohuck@redhat.com>
+In-Reply-To: <20180620224535-mutt-send-email-mst@kernel.org>
+References: <CADGSJ213f8tJpNXuOhv8qRew-Y5VZAwA+srNMrLZYnKdVGLdAA@mail.gmail.com>
+	<20180614120231.0a72bd5f.cohuck@redhat.com>
+	<CADGSJ23WnTmVKHezm3t0V6M2sWeHaOUoTjdXkmrvbO0EF83hMg@mail.gmail.com>
+	<20180615134815.6613620e.cohuck@redhat.com>
+	<CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
+	<20180619125453.2d2dfb2d.cohuck@redhat.com>
+	<20180619233001-mutt-send-email-mst@kernel.org>
+	<20180620115359.1a3bf6fb.cohuck@redhat.com>
+	<20180620170904-mutt-send-email-mst@kernel.org>
+	<20180620180619.6b4ee52d.cohuck@redhat.com>
+	<20180620224535-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,458 +37,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Wed, 20 Jun 2018 22:48:58 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Handle a new NBD meta namespace: "qemu", and corresponding queries:
-"qemu:dirty-bitmap:<export bitmap name>".
+> On Wed, Jun 20, 2018 at 06:06:19PM +0200, Cornelia Huck wrote:
+> > In any case, I'm not sure anymore why we'd want the extra uuid.  
+> 
+> It's mostly so we can have e.g. multiple devices with same MAC
+> (which some people seem to want in order to then use
+> then with different containers).
+> 
+> But it is also handy for when you assign a PF, since then you
+> can't set the MAC.
+> 
 
-With the new metadata context negotiated, BLOCK_STATUS query will reply
-with dirty-bitmap data, converted to extents. The new public function
-nbd_export_bitmap selects which bitmap to export. For now, only one bitmap
-may be exported.
+OK, so what about the following:
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20180609151758.17343-5-vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-[eblake: wording tweaks, minor cleanups, additional tracing]
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- include/block/nbd.h |   8 +-
- nbd/server.c        | 278 +++++++++++++++++++++++++++++++++++++++++++++++-----
- nbd/trace-events    |   1 +
- 3 files changed, 262 insertions(+), 25 deletions(-)
+- introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
+  that we have a new uuid field in the virtio-net config space
+- in QEMU, add a property for virtio-net that allows to specify a uuid,
+  offer VIRTIO_NET_F_STANDBY_UUID if set
+- when configuring, set the property to the group UUID of the vfio-pci
+  device
+- in the guest, use the uuid from the virtio-net device's config space
+  if applicable; else, fall back to matching by MAC as done today
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index fcdcd545023..8bb9606c39b 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -229,11 +229,13 @@ enum {
- #define NBD_REPLY_TYPE_ERROR         NBD_REPLY_ERR(1)
- #define NBD_REPLY_TYPE_ERROR_OFFSET  NBD_REPLY_ERR(2)
-
--/* Flags for extents (NBDExtent.flags) of NBD_REPLY_TYPE_BLOCK_STATUS,
-- * for base:allocation meta context */
-+/* Extent flags for base:allocation in NBD_REPLY_TYPE_BLOCK_STATUS */
- #define NBD_STATE_HOLE (1 << 0)
- #define NBD_STATE_ZERO (1 << 1)
-
-+/* Extent flags for qemu:dirty-bitmap in NBD_REPLY_TYPE_BLOCK_STATUS */
-+#define NBD_STATE_DIRTY (1 << 0)
-+
- static inline bool nbd_reply_type_is_error(int type)
- {
-     return type & (1 << 15);
-@@ -315,6 +317,8 @@ void nbd_client_put(NBDClient *client);
- void nbd_server_start(SocketAddress *addr, const char *tls_creds,
-                       Error **errp);
-
-+void nbd_export_bitmap(NBDExport *exp, const char *bitmap,
-+                       const char *bitmap_export_name, Error **errp);
-
- /* nbd_read
-  * Reads @size bytes from @ioc. Returns 0 on success.
-diff --git a/nbd/server.c b/nbd/server.c
-index 9171cd41680..2c2d62c6361 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -23,6 +23,13 @@
- #include "nbd-internal.h"
-
- #define NBD_META_ID_BASE_ALLOCATION 0
-+#define NBD_META_ID_DIRTY_BITMAP 1
-+
-+/* NBD_MAX_BITMAP_EXTENTS: 1 mb of extents data. An empirical
-+ * constant. If an increase is needed, note that the NBD protocol
-+ * recommends no larger than 32 mb, so that the client won't consider
-+ * the reply as a denial of service attack. */
-+#define NBD_MAX_BITMAP_EXTENTS (0x100000 / 8)
-
- static int system_errno_to_nbd_errno(int err)
- {
-@@ -80,6 +87,9 @@ struct NBDExport {
-
-     BlockBackend *eject_notifier_blk;
-     Notifier eject_notifier;
-+
-+    BdrvDirtyBitmap *export_bitmap;
-+    char *export_bitmap_context;
- };
-
- static QTAILQ_HEAD(, NBDExport) exports = QTAILQ_HEAD_INITIALIZER(exports);
-@@ -92,6 +102,7 @@ typedef struct NBDExportMetaContexts {
-     bool valid; /* means that negotiation of the option finished without
-                    errors */
-     bool base_allocation; /* export base:allocation context (block status) */
-+    bool bitmap; /* export qemu:dirty-bitmap:<export bitmap name> */
- } NBDExportMetaContexts;
-
- struct NBDClient {
-@@ -814,6 +825,56 @@ static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
-                                      &meta->base_allocation, errp);
- }
-
-+/* nbd_meta_bitmap_query
-+ *
-+ * Handle query to 'qemu:' namespace.
-+ * @len is the amount of text remaining to be read from the current name, after
-+ * the 'qemu:' portion has been stripped.
-+ *
-+ * Return -errno on I/O error, 0 if option was completely handled by
-+ * sending a reply about inconsistent lengths, or 1 on success. */
-+static int nbd_meta_qemu_query(NBDClient *client, NBDExportMetaContexts *meta,
-+                               uint32_t len, Error **errp)
-+{
-+    bool dirty_bitmap = false;
-+    size_t dirty_bitmap_len = strlen("dirty-bitmap:");
-+    int ret;
-+
-+    if (!meta->exp->export_bitmap) {
-+        trace_nbd_negotiate_meta_query_skip("no dirty-bitmap exported");
-+        return nbd_opt_skip(client, len, errp);
-+    }
-+
-+    if (len == 0) {
-+        if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
-+            meta->bitmap = true;
-+        }
-+        trace_nbd_negotiate_meta_query_parse("empty");
-+        return 1;
-+    }
-+
-+    if (len < dirty_bitmap_len) {
-+        trace_nbd_negotiate_meta_query_skip("not dirty-bitmap:");
-+        return nbd_opt_skip(client, len, errp);
-+    }
-+
-+    len -= dirty_bitmap_len;
-+    ret = nbd_meta_pattern(client, "dirty-bitmap:", &dirty_bitmap, errp);
-+    if (ret <= 0) {
-+        return ret;
-+    }
-+    if (!dirty_bitmap) {
-+        trace_nbd_negotiate_meta_query_skip("not dirty-bitmap:");
-+        return nbd_opt_skip(client, len, errp);
-+    }
-+
-+    trace_nbd_negotiate_meta_query_parse("dirty-bitmap:");
-+
-+    return nbd_meta_empty_or_pattern(
-+            client, meta->exp->export_bitmap_context +
-+            strlen("qemu:dirty_bitmap:"), len, &meta->bitmap, errp);
-+}
-+
- /* nbd_negotiate_meta_query
-  *
-  * Parse namespace name and call corresponding function to parse body of the
-@@ -829,9 +890,14 @@ static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
- static int nbd_negotiate_meta_query(NBDClient *client,
-                                     NBDExportMetaContexts *meta, Error **errp)
- {
-+    /*
-+     * Both 'qemu' and 'base' namespaces have length = 5 including a
-+     * colon. If another length namespace is later introduced, this
-+     * should certainly be refactored.
-+     */
-     int ret;
--    char query[sizeof("base:") - 1];
--    size_t baselen = strlen("base:");
-+    size_t ns_len = 5;
-+    char ns[5];
-     uint32_t len;
-
-     ret = nbd_opt_read(client, &len, sizeof(len), errp);
-@@ -840,25 +906,27 @@ static int nbd_negotiate_meta_query(NBDClient *client,
-     }
-     cpu_to_be32s(&len);
-
--    /* The only supported namespace for now is 'base'. So query should start
--     * with 'base:'. Otherwise, we can ignore it and skip the remainder. */
--    if (len < baselen) {
-+    if (len < ns_len) {
-         trace_nbd_negotiate_meta_query_skip("length too short");
-         return nbd_opt_skip(client, len, errp);
-     }
-
--    len -= baselen;
--    ret = nbd_opt_read(client, query, baselen, errp);
-+    len -= ns_len;
-+    ret = nbd_opt_read(client, ns, ns_len, errp);
-     if (ret <= 0) {
-         return ret;
-     }
--    if (strncmp(query, "base:", baselen) != 0) {
--        trace_nbd_negotiate_meta_query_skip("not for base: namespace");
--        return nbd_opt_skip(client, len, errp);
-+
-+    if (!strncmp(ns, "base:", ns_len)) {
-+        trace_nbd_negotiate_meta_query_parse("base:");
-+        return nbd_meta_base_query(client, meta, len, errp);
-+    } else if (!strncmp(ns, "qemu:", ns_len)) {
-+        trace_nbd_negotiate_meta_query_parse("qemu:");
-+        return nbd_meta_qemu_query(client, meta, len, errp);
-     }
-
--    trace_nbd_negotiate_meta_query_parse("base:");
--    return nbd_meta_base_query(client, meta, len, errp);
-+    trace_nbd_negotiate_meta_query_skip("unknown namespace");
-+    return nbd_opt_skip(client, len, errp);
- }
-
- /* nbd_negotiate_meta_queries
-@@ -928,6 +996,16 @@ static int nbd_negotiate_meta_queries(NBDClient *client,
-         }
-     }
-
-+    if (meta->bitmap) {
-+        ret = nbd_negotiate_send_meta_context(client,
-+                                              meta->exp->export_bitmap_context,
-+                                              NBD_META_ID_DIRTY_BITMAP,
-+                                              errp);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+    }
-+
-     ret = nbd_negotiate_send_rep(client, NBD_REP_ACK, errp);
-     if (ret == 0) {
-         meta->valid = true;
-@@ -1556,6 +1634,11 @@ void nbd_export_put(NBDExport *exp)
-             exp->blk = NULL;
-         }
-
-+        if (exp->export_bitmap) {
-+            bdrv_dirty_bitmap_set_qmp_locked(exp->export_bitmap, false);
-+            g_free(exp->export_bitmap_context);
-+        }
-+
-         g_free(exp);
-     }
- }
-@@ -1797,9 +1880,15 @@ static int blockstatus_to_extent_be(BlockDriverState *bs, uint64_t offset,
- }
-
- /* nbd_co_send_extents
-- * @extents should be in big-endian */
-+ *
-+ * @length is only for tracing purposes (and may be smaller or larger
-+ * than the client's original request). @last controls whether
-+ * NBD_REPLY_FLAG_DONE is sent. @extents should already be in
-+ * big-endian format.
-+ */
- static int nbd_co_send_extents(NBDClient *client, uint64_t handle,
--                               NBDExtent *extents, unsigned nb_extents,
-+                               NBDExtent *extents, unsigned int nb_extents,
-+                               uint64_t length, bool last,
-                                uint32_t context_id, Error **errp)
- {
-     NBDStructuredMeta chunk;
-@@ -1809,7 +1898,9 @@ static int nbd_co_send_extents(NBDClient *client, uint64_t handle,
-         {.iov_base = extents, .iov_len = nb_extents * sizeof(extents[0])}
-     };
-
--    set_be_chunk(&chunk.h, NBD_REPLY_FLAG_DONE, NBD_REPLY_TYPE_BLOCK_STATUS,
-+    trace_nbd_co_send_extents(handle, nb_extents, context_id, length, last);
-+    set_be_chunk(&chunk.h, last ? NBD_REPLY_FLAG_DONE : 0,
-+                 NBD_REPLY_TYPE_BLOCK_STATUS,
-                  handle, sizeof(chunk) - sizeof(chunk.h) + iov[1].iov_len);
-     stl_be_p(&chunk.context_id, context_id);
-
-@@ -1819,8 +1910,8 @@ static int nbd_co_send_extents(NBDClient *client, uint64_t handle,
- /* Get block status from the exported device and send it to the client */
- static int nbd_co_send_block_status(NBDClient *client, uint64_t handle,
-                                     BlockDriverState *bs, uint64_t offset,
--                                    uint64_t length, uint32_t context_id,
--                                    Error **errp)
-+                                    uint64_t length, bool last,
-+                                    uint32_t context_id, Error **errp)
- {
-     int ret;
-     NBDExtent extent;
-@@ -1831,7 +1922,84 @@ static int nbd_co_send_block_status(NBDClient *client, uint64_t handle,
-                 client, handle, -ret, "can't get block status", errp);
-     }
-
--    return nbd_co_send_extents(client, handle, &extent, 1, context_id, errp);
-+    return nbd_co_send_extents(client, handle, &extent, 1, length, last,
-+                               context_id, errp);
-+}
-+
-+/*
-+ * Populate @extents from a dirty bitmap. Unless @dont_fragment, the
-+ * final extent may exceed the original @length. Store in @length the
-+ * byte length encoded (which may be smaller or larger than the
-+ * original), and return the number of extents used.
-+ */
-+static unsigned int bitmap_to_extents(BdrvDirtyBitmap *bitmap, uint64_t offset,
-+                                      uint64_t *length, NBDExtent *extents,
-+                                      unsigned int nb_extents,
-+                                      bool dont_fragment)
-+{
-+    uint64_t begin = offset, end;
-+    uint64_t overall_end = offset + *length;
-+    unsigned int i = 0;
-+    BdrvDirtyBitmapIter *it;
-+    bool dirty;
-+
-+    bdrv_dirty_bitmap_lock(bitmap);
-+
-+    it = bdrv_dirty_iter_new(bitmap);
-+    dirty = bdrv_get_dirty_locked(NULL, bitmap, offset);
-+
-+    assert(begin < overall_end && nb_extents);
-+    while (begin < overall_end && i < nb_extents) {
-+        if (dirty) {
-+            end = bdrv_dirty_bitmap_next_zero(bitmap, begin);
-+        } else {
-+            bdrv_set_dirty_iter(it, begin);
-+            end = bdrv_dirty_iter_next(it);
-+        }
-+        if (end == -1 || end - begin > UINT32_MAX) {
-+            /* Cap to an aligned value < 4G beyond begin. */
-+            end = MIN(bdrv_dirty_bitmap_size(bitmap),
-+                      begin + UINT32_MAX + 1 -
-+                      bdrv_dirty_bitmap_granularity(bitmap));
-+        }
-+        if (dont_fragment && end > overall_end) {
-+            end = overall_end;
-+        }
-+
-+        extents[i].length = cpu_to_be32(end - begin);
-+        extents[i].flags = cpu_to_be32(dirty ? NBD_STATE_DIRTY : 0);
-+        i++;
-+        begin = end;
-+        dirty = !dirty;
-+    }
-+
-+    bdrv_dirty_iter_free(it);
-+
-+    bdrv_dirty_bitmap_unlock(bitmap);
-+
-+    *length = end - offset;
-+    return i;
-+}
-+
-+static int nbd_co_send_bitmap(NBDClient *client, uint64_t handle,
-+                              BdrvDirtyBitmap *bitmap, uint64_t offset,
-+                              uint32_t length, bool dont_fragment, bool last,
-+                              uint32_t context_id, Error **errp)
-+{
-+    int ret;
-+    unsigned int nb_extents = dont_fragment ? 1 : NBD_MAX_BITMAP_EXTENTS;
-+    NBDExtent *extents = g_new(NBDExtent, nb_extents);
-+    uint64_t final_length = length;
-+
-+    nb_extents = bitmap_to_extents(bitmap, offset, &final_length, extents,
-+                                   nb_extents, dont_fragment);
-+
-+    ret = nbd_co_send_extents(client, handle, extents, nb_extents,
-+                              final_length, last, context_id, errp);
-+
-+    g_free(extents);
-+
-+    return ret;
- }
-
- /* nbd_co_receive_request
-@@ -2051,11 +2219,34 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
-             return nbd_send_generic_reply(client, request->handle, -EINVAL,
-                                           "need non-zero length", errp);
-         }
--        if (client->export_meta.valid && client->export_meta.base_allocation) {
--            return nbd_co_send_block_status(client, request->handle,
--                                            blk_bs(exp->blk), request->from,
--                                            request->len,
--                                            NBD_META_ID_BASE_ALLOCATION, errp);
-+        if (client->export_meta.valid &&
-+            (client->export_meta.base_allocation ||
-+             client->export_meta.bitmap))
-+        {
-+            if (client->export_meta.base_allocation) {
-+                ret = nbd_co_send_block_status(client, request->handle,
-+                                               blk_bs(exp->blk), request->from,
-+                                               request->len,
-+                                               !client->export_meta.bitmap,
-+                                               NBD_META_ID_BASE_ALLOCATION,
-+                                               errp);
-+                if (ret < 0) {
-+                    return ret;
-+                }
-+            }
-+
-+            if (client->export_meta.bitmap) {
-+                ret = nbd_co_send_bitmap(client, request->handle,
-+                                         client->exp->export_bitmap,
-+                                         request->from, request->len,
-+                                         request->flags & NBD_CMD_FLAG_REQ_ONE,
-+                                         true, NBD_META_ID_DIRTY_BITMAP, errp);
-+                if (ret < 0) {
-+                    return ret;
-+                }
-+            }
-+
-+            return ret;
-         } else {
-             return nbd_send_generic_reply(client, request->handle, -EINVAL,
-                                           "CMD_BLOCK_STATUS not negotiated",
-@@ -2207,3 +2398,44 @@ void nbd_client_new(NBDExport *exp,
-     co = qemu_coroutine_create(nbd_co_client_start, client);
-     qemu_coroutine_enter(co);
- }
-+
-+void nbd_export_bitmap(NBDExport *exp, const char *bitmap,
-+                       const char *bitmap_export_name, Error **errp)
-+{
-+    BdrvDirtyBitmap *bm = NULL;
-+    BlockDriverState *bs = blk_bs(exp->blk);
-+
-+    if (exp->export_bitmap) {
-+        error_setg(errp, "Export bitmap is already set");
-+        return;
-+    }
-+
-+    while (true) {
-+        bm = bdrv_find_dirty_bitmap(bs, bitmap);
-+        if (bm != NULL || bs->backing == NULL) {
-+            break;
-+        }
-+
-+        bs = bs->backing->bs;
-+    }
-+
-+    if (bm == NULL) {
-+        error_setg(errp, "Bitmap '%s' is not found", bitmap);
-+        return;
-+    }
-+
-+    if (bdrv_dirty_bitmap_enabled(bm)) {
-+        error_setg(errp, "Bitmap '%s' is enabled", bitmap);
-+        return;
-+    }
-+
-+    if (bdrv_dirty_bitmap_qmp_locked(bm)) {
-+        error_setg(errp, "Bitmap '%s' is locked", bitmap);
-+        return;
-+    }
-+
-+    bdrv_dirty_bitmap_set_qmp_locked(bm, true);
-+    exp->export_bitmap = bm;
-+    exp->export_bitmap_context =
-+            g_strdup_printf("qemu:dirty-bitmap:%s", bitmap_export_name);
-+}
-diff --git a/nbd/trace-events b/nbd/trace-events
-index dee081e7758..5e1d4afe8e6 100644
---- a/nbd/trace-events
-+++ b/nbd/trace-events
-@@ -64,6 +64,7 @@ nbd_co_send_simple_reply(uint64_t handle, uint32_t error, const char *errname, i
- nbd_co_send_structured_done(uint64_t handle) "Send structured reply done: handle = %" PRIu64
- nbd_co_send_structured_read(uint64_t handle, uint64_t offset, void *data, size_t size) "Send structured read data reply: handle = %" PRIu64 ", offset = %" PRIu64 ", data = %p, len = %zu"
- nbd_co_send_structured_read_hole(uint64_t handle, uint64_t offset, size_t size) "Send structured read hole reply: handle = %" PRIu64 ", offset = %" PRIu64 ", len = %zu"
-+nbd_co_send_extents(uint64_t handle, unsigned int extents, uint32_t id, uint64_t length, int last) "Send block status reply: handle = %" PRIu64 ", extents = %u, context = %d (extents cover %" PRIu64 " bytes, last chunk = %d)"
- nbd_co_send_structured_error(uint64_t handle, int err, const char *errname, const char *msg) "Send structured error reply: handle = %" PRIu64 ", error = %d (%s), msg = '%s'"
- nbd_co_receive_request_decode_type(uint64_t handle, uint16_t type, const char *name) "Decoding type: handle = %" PRIu64 ", type = %" PRIu16 " (%s)"
- nbd_co_receive_request_payload_received(uint64_t handle, uint32_t len) "Payload received: handle = %" PRIu64 ", len = %" PRIu32
--- 
-2.14.4
+That should work for all virtio transports.
