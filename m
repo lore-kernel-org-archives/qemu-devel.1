@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54445)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVt8V-0005ja-CJ
+	(envelope-from <alex.bennee@linaro.org>) id 1fVt8V-0005jY-CF
 	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fVt8T-0003qX-Kj
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:03 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:55309)
+	(envelope-from <alex.bennee@linaro.org>) id 1fVt8S-0003ok-Tu
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:02 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:44628)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fVt8T-0003oJ-C5
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:01 -0400
-Received: by mail-wm0-x233.google.com with SMTP id v16-v6so3107298wmh.5
-	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:32:01 -0700 (PDT)
+	id 1fVt8S-0003mx-K4
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 02:32:00 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id p12-v6so212460wrn.11
+	for <qemu-devel@nongnu.org>; Wed, 20 Jun 2018 23:32:00 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 21 Jun 2018 07:25:55 +0100
-Message-Id: <20180621062605.941-48-alex.bennee@linaro.org>
+Date: Thu, 21 Jun 2018 07:25:23 +0100
+Message-Id: <20180621062605.941-16-alex.bennee@linaro.org>
 In-Reply-To: <20180621062605.941-1-alex.bennee@linaro.org>
 References: <20180621062605.941-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 47/57] tests/tcg: add run, diff,
- and skip helper macros
+Subject: [Qemu-devel] [PULL v2 15/57] tests/tcg: move i386 specific tests
+ into subdir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,125 +31,203 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:ARM" <qemu-arm@nongnu.org>
+Cc: qemu-devel@nongnu.org, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-As we aren't using the default runners for all the test cases it is
-easy to miss out things like timeouts. To help with this we add some
-helpers and use them so we only need to make core changes in one
-place.
+These only need to be built for i386 guests. This includes a stub
+tests/tcg/i386/Makfile.target which absorbs some of what was in
+tests/tcg/Makefile.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/tests/tcg/Makefile b/tests/tcg/Makefile
-index e7dbcdb5bf..bf06415390 100644
---- a/tests/tcg/Makefile
-+++ b/tests/tcg/Makefile
-@@ -34,6 +34,15 @@
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 28dc787617..590c24377c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -283,6 +283,7 @@ M: Richard Henderson <rth@twiddle.net>
+ M: Eduardo Habkost <ehabkost@redhat.com>
+ S: Maintained
+ F: target/i386/
++F: tests/tcg/i386/
+ F: hw/i386/
+ F: disas/i386.c
+ T: git git://github.com/ehabkost/qemu.git x86-next
+diff --git a/tests/tcg/README b/tests/tcg/README
+index 0890044cf0..469504c4cb 100644
+--- a/tests/tcg/README
++++ b/tests/tcg/README
+@@ -3,45 +3,6 @@ regression testing. Tests are either multi-arch, meaning they can be
+ built for all guest architectures that support linux-user executable,
+ or they are architecture specific.
  
- quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
+-i386
+-====
+-
+-test-i386
+----------
+-
+-This program executes most of the 16 bit and 32 bit x86 instructions and
+-generates a text output, for comparison with the output obtained with
+-a real CPU or another emulator.
+-
+-The Linux system call modify_ldt() is used to create x86 selectors
+-to test some 16 bit addressing and 32 bit with segmentation cases.
+-
+-The Linux system call vm86() is used to test vm86 emulation.
+-
+-Various exceptions are raised to test most of the x86 user space
+-exception reporting.
+-
+-linux-test
+-----------
+-
+-This program tests various Linux system calls. It is used to verify
+-that the system call parameters are correctly converted between target
+-and host CPUs.
+-
+-test-i386-fprem
+----------------
+-
+-runcom
+-------
+-
+-test-mmap
+----------
+-
+-sha1
+-----
+-
+-hello-i386
+-----------
  
-+# $1 = test name, $2 = cmd, $3 = desc
-+run-test = $(call quiet-command, timeout $(TIMEOUT) $2 > $1.out,"TEST",$3)
-+
-+# $1 = test name, $2 = reference
-+diff-out = $(call quiet-command, diff -u $1.out $2 | head -n 10,"DIFF","$1.out with $2")
-+
-+# $1 = test name, $2 = reason
-+skip-test = @printf "  SKIPPED %s on $(TARGET_NAME) because %s\n" $1 $2
-+
- # Tests we are building
- TESTS=
  
-@@ -84,9 +93,7 @@ RUN_TESTS=$(patsubst %,run-%, $(TESTS))
- RUN_TESTS+=$(EXTRA_RUNS)
- 
- run-%: %
--	$(call quiet-command, \
--		timeout $(TIMEOUT) $(QEMU) $< > $<.out, \
--		"TEST", "$< on $(TARGET_NAME)")
-+	$(call run-test, $<, $(QEMU) $<, "$< on $(TARGET_NAME)")
- 
- .PHONY: run
- run: $(RUN_TESTS)
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index 7dba32138d..08c45b8470 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -13,7 +13,5 @@ TESTS:=$(AARCH64_TESTS)
- fcvt: LDFLAGS+=-lm
- 
- run-fcvt: fcvt
--	$(call quiet-command, \
--		$(QEMU) $< > fcvt.out && \
--		diff -u $(AARCH64_SRC)/fcvt.ref fcvt.out, \
--		"TEST", "$< (default) on $(TARGET_NAME)")
-+	$(call run-test,$<,$(QEMU) $<, "$< on $(TARGET_NAME)")
-+	$(call diff-out,$<,$(AARCH64_SRC)/fcvt.ref)
-diff --git a/tests/tcg/arm/Makefile.target b/tests/tcg/arm/Makefile.target
-index 14b5435fc6..aa4e4e3782 100644
---- a/tests/tcg/arm/Makefile.target
-+++ b/tests/tcg/arm/Makefile.target
-@@ -24,10 +24,8 @@ fcvt: LDFLAGS+=-lm
- # fcvt: CFLAGS+=-march=armv8.2-a+fp16 -mfpu=neon-fp-armv8
- 
- run-fcvt: fcvt
--	$(call quiet-command, \
--		$(QEMU) $< > fcvt.out && \
--		diff -u $(ARM_SRC)/fcvt.ref fcvt.out, \
--		"TEST", "$< (default) on $(TARGET_NAME)")
-+	$(call run-test,fcvt,$(QEMU) $<,"$< on $(TARGET_NAME)")
-+	$(call diff-out,fcvt,$(ARM_SRC)/fcvt.ref)
- endif
- 
- # On ARM Linux only supports 4k pages
+ ARM
 diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
-index cd173363ee..97b7c23cf1 100644
---- a/tests/tcg/i386/Makefile.target
+new file mode 100644
+index 0000000000..2f27b65e2d
+--- /dev/null
 +++ b/tests/tcg/i386/Makefile.target
-@@ -31,7 +31,7 @@ test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S test-i386.h test-i386
- 
- # Specialist test runners
- run-runcom: runcom pi_10.com
--	$(call quiet-command, $(QEMU) ./runcom $(I386_SRC)/pi_10.com > runcom.out, "TEST", "$< on $(TARGET_NAME)")
-+	$(call run-test,$<,$(QEMU) ./runcom $(I386_SRC)/pi_10.com,"$< on $(TARGET_NAME)")
- 
- ifeq ($(SPEED), slow)
- 
-@@ -40,13 +40,11 @@ test-i386-fprem.ref: test-i386-fprem
- 
- run-test-i386-fprem: TIMEOUT=60
- run-test-i386-fprem: test-i386-fprem
--	$(call quiet-command, \
--		$(QEMU) $< > $<.out && \
--		diff -u $(I386_SRC)/$<.ref $<.out, \
--		"TEST", "$< (default) on $(TARGET_NAME)")
-+	$(call run-test,test-i386-fprem, $(QEMU) $<,"$< on $(TARGET_NAME)")
-+	$(call diff-out,test-i386-fprem, $(I386_SRC)/$<.ref)
- else
- run-test-i386-fprem: test-i386-fprem
--	$(call quiet-command, /bin/true, "SLOW TEST", "$< SKIPPED on $(TARGET_NAME)")
-+	$(call skip-test, $<, "SLOW")
- endif
- 
- # On i386 and x86_64 Linux only supports 4k pages (large pages are a different hack)
-diff --git a/tests/tcg/multiarch/Makefile.target b/tests/tcg/multiarch/Makefile.target
-index 90e45a881e..b77084c146 100644
---- a/tests/tcg/multiarch/Makefile.target
-+++ b/tests/tcg/multiarch/Makefile.target
-@@ -27,10 +27,10 @@ testthread: LDFLAGS+=-lpthread
- 
- # default case (host page size)
- run-test-mmap: test-mmap
--	$(call quiet-command, $(QEMU) $< > test-mmap.out, "TEST", \
-+	$(call run-test, test-mmap, $(QEMU) $<, \
- 		"$< (default) on $(TARGET_NAME)")
- 
- # additional page sizes (defined by each architecture adding to EXTRA_RUNS)
- run-test-mmap-%: test-mmap
--	$(call quiet-command, $(QEMU) -p $* $< > test-mmap-$*.out, "TEST", \
-+	$(call run-test, test-mmap-$*, $(QEMU) -p $* $<,\
- 		"$< ($* byte pages) on $(TARGET_NAME)")
+@@ -0,0 +1,30 @@
++# i386 cross compile notes
++
++I386_SRC=$(SRC_PATH)/tests/tcg/i386
++
++# Set search path for all sources
++VPATH 		+= $(I386_SRC)
++
++I386_SRCS=$(notdir $(wildcard $(I386_SRC)/*.c))
++I386_TESTS=$(I386_SRCS:.c=)
++
++# Update TESTS
++TESTS+=$(I386_TESTS)
++
++ifneq ($(TARGET_NAME),x86_64)
++CFLAGS+=-m32
++endif
++
++#
++# hello-i386 is a barebones app
++#
++hello-i386: CFLAGS+=-ffreestanding
++hello-i386: LDFLAGS+=-nostdlib
++
++#
++# test-386 includes a couple of additional objects that need to be linked together
++#
++
++test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S test-i386.h test-i386-shift.h test-i386-muldiv.h
++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ \
++	   $(<D)/test-i386.c $(<D)/test-i386-code16.S $(<D)/test-i386-vm86.S -lm
+diff --git a/tests/tcg/i386/README b/tests/tcg/i386/README
+new file mode 100644
+index 0000000000..7a0a47bf27
+--- /dev/null
++++ b/tests/tcg/i386/README
+@@ -0,0 +1,38 @@
++These are i386 specific guest programs
++
++test-i386
++---------
++
++This program executes most of the 16 bit and 32 bit x86 instructions and
++generates a text output, for comparison with the output obtained with
++a real CPU or another emulator.
++
++The Linux system call modify_ldt() is used to create x86 selectors
++to test some 16 bit addressing and 32 bit with segmentation cases.
++
++The Linux system call vm86() is used to test vm86 emulation.
++
++Various exceptions are raised to test most of the x86 user space
++exception reporting.
++
++linux-test
++----------
++
++This program tests various Linux system calls. It is used to verify
++that the system call parameters are correctly converted between target
++and host CPUs.
++
++test-i386-fprem
++---------------
++
++runcom
++------
++
++test-mmap
++---------
++
++sha1
++----
++
++hello-i386
++----------
+diff --git a/tests/tcg/hello-i386.c b/tests/tcg/i386/hello-i386.c
+similarity index 100%
+rename from tests/tcg/hello-i386.c
+rename to tests/tcg/i386/hello-i386.c
+diff --git a/tests/tcg/pi_10.com b/tests/tcg/i386/pi_10.com
+similarity index 100%
+rename from tests/tcg/pi_10.com
+rename to tests/tcg/i386/pi_10.com
+diff --git a/tests/tcg/runcom.c b/tests/tcg/i386/runcom.c
+similarity index 100%
+rename from tests/tcg/runcom.c
+rename to tests/tcg/i386/runcom.c
+diff --git a/tests/tcg/test-i386-code16.S b/tests/tcg/i386/test-i386-code16.S
+similarity index 100%
+rename from tests/tcg/test-i386-code16.S
+rename to tests/tcg/i386/test-i386-code16.S
+diff --git a/tests/tcg/test-i386-fprem.c b/tests/tcg/i386/test-i386-fprem.c
+similarity index 100%
+rename from tests/tcg/test-i386-fprem.c
+rename to tests/tcg/i386/test-i386-fprem.c
+diff --git a/tests/tcg/test-i386-muldiv.h b/tests/tcg/i386/test-i386-muldiv.h
+similarity index 100%
+rename from tests/tcg/test-i386-muldiv.h
+rename to tests/tcg/i386/test-i386-muldiv.h
+diff --git a/tests/tcg/test-i386-shift.h b/tests/tcg/i386/test-i386-shift.h
+similarity index 100%
+rename from tests/tcg/test-i386-shift.h
+rename to tests/tcg/i386/test-i386-shift.h
+diff --git a/tests/tcg/test-i386-ssse3.c b/tests/tcg/i386/test-i386-ssse3.c
+similarity index 100%
+rename from tests/tcg/test-i386-ssse3.c
+rename to tests/tcg/i386/test-i386-ssse3.c
+diff --git a/tests/tcg/test-i386-vm86.S b/tests/tcg/i386/test-i386-vm86.S
+similarity index 100%
+rename from tests/tcg/test-i386-vm86.S
+rename to tests/tcg/i386/test-i386-vm86.S
+diff --git a/tests/tcg/test-i386.c b/tests/tcg/i386/test-i386.c
+similarity index 100%
+rename from tests/tcg/test-i386.c
+rename to tests/tcg/i386/test-i386.c
+diff --git a/tests/tcg/test-i386.h b/tests/tcg/i386/test-i386.h
+similarity index 100%
+rename from tests/tcg/test-i386.h
+rename to tests/tcg/i386/test-i386.h
 -- 
 2.17.1
