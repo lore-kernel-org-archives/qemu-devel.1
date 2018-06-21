@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fVzQB-0001Sc-U9
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:14:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1fVzTY-0002Vf-UB
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fVzQ8-0005q2-MF
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:14:43 -0400
+	(envelope-from <thuth@redhat.com>) id 1fVzTT-00077T-TG
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:18:12 -0400
 References: <20180620100825.22476-1-david@redhat.com>
-	<20180620100825.22476-6-david@redhat.com>
+	<20180620100825.22476-7-david@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0544e011-e909-6bca-e4ca-5a1caa141f4b@redhat.com>
-Date: Thu, 21 Jun 2018 15:14:32 +0200
+Message-ID: <8da98f5c-8ddd-5dda-b930-7ca8fd04acf7@redhat.com>
+Date: Thu, 21 Jun 2018 15:18:02 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180620100825.22476-6-david@redhat.com>
+In-Reply-To: <20180620100825.22476-7-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 5/7] s390x/tcg: implement SET CLOCK
+Subject: Re: [Qemu-devel] [PATCH v2 6/7] s390x/tcg: rearm the CKC timer
+ during migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +29,17 @@ To: David Hildenbrand <david@redhat.com>, qemu-s390x@nongnu.org
 Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
 
 On 20.06.2018 12:08, David Hildenbrand wrote:
-> This allows a guest to change its TOD. We already take care of updating
-> all CKC timers from within S390TODClass.
+> If the CPU data is migrated after the TOD clock, the CKC timer of a CPU
+> is not rearmed. Let's rearm it when loading the CPU state.
 > 
-> Use MO_ALIGN to load the operand manually - this will properly trigger a
-> SPECIFICATION exception.
+> Introduce tcg-stub.c just like kvm-stub.c for tcg specific stubs.
 > 
 > Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/s390x/helper.h      |  1 +
->  target/s390x/insn-data.def |  3 +--
->  target/s390x/misc_helper.c | 19 +++++++++++++++++++
->  target/s390x/translate.c   |  9 +++++++++
->  4 files changed, 30 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-> index 59cba86a27..97c60ca7bc 100644
-> --- a/target/s390x/helper.h
-> +++ b/target/s390x/helper.h
-> @@ -127,6 +127,7 @@ DEF_HELPER_4(diag, void, env, i32, i32, i32)
->  DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
->  DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
->  DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
-> +DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
->  DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
->  DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
->  DEF_HELPER_FLAGS_1(stckc, TCG_CALL_NO_RWG, i64, env)
-> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-> index 157619403d..5c6f33ed9c 100644
-> --- a/target/s390x/insn-data.def
-> +++ b/target/s390x/insn-data.def
-> @@ -997,8 +997,7 @@
->  /* SET ADDRESS SPACE CONTROL FAST */
->      C(0xb279, SACF,    S,     Z,   0, a2, 0, 0, sacf, 0)
->  /* SET CLOCK */
-> -    /* ??? Not implemented - is it necessary? */
-> -    C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
-> +    C(0xb204, SCK,     S,     Z,   la2, 0, 0, 0, sck, 0)
->  /* SET CLOCK COMPARATOR */
->      C(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0)
->  /* SET CLOCK PROGRAMMABLE FIELD */
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index d5f9f5e1d3..c9712b9476 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -191,6 +191,25 @@ void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
->      helper_sckc(env, env->ckc);
->  }
->  
-> +/* Set Clock */
-> +uint32_t HELPER(sck)(CPUS390XState *env, uint64_t tod_low)
-> +{
-> +    S390TODState *td = s390_get_tod();
-> +    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
-> +    S390TOD tod = {
-> +        .high = 0,
-> +        .low = tod_low,
-> +    };
-> +    Error *err = NULL;
-> +
-> +    qemu_mutex_lock_iothread();
-> +    tdc->set(td, &tod, &err);
-> +    qemu_mutex_unlock_iothread();
-> +    g_assert(!err);
+>  target/s390x/Makefile.objs |  1 +
+>  target/s390x/machine.c     |  6 ++++++
+>  target/s390x/tcg-stub.c    | 20 ++++++++++++++++++++
+>  3 files changed, 27 insertions(+)
+>  create mode 100644 target/s390x/tcg-stub.c
 
-I know it currently can't happen, but still, I think it would be nicer
-to use CC3 to tell the guest that something went wrong with the clock,
-instead of abort QEMU here.
-
- Thomas
+Reviewed-by: Thomas Huth <thuth@redhat.com>
