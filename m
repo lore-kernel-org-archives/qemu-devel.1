@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVxPY-0000Ui-NT
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:05:57 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fVxXZ-0001rm-9F
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:14:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fVxPT-0007FH-N1
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:05:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36178 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fVxPT-0007F1-HO
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:05:51 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D66154022905
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 11:05:50 +0000 (UTC)
-Date: Thu, 21 Jun 2018 12:05:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180621110544.GD2585@work-vm>
-References: <20180620153947.30834-1-dgilbert@redhat.com>
-	<20180620153947.30834-6-dgilbert@redhat.com>
-	<20180621105608.01463ba5@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fVxXU-0001lk-96
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 07:14:13 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180607144645.10187-1-f4bug@amsat.org>
+	<20180607144645.10187-4-f4bug@amsat.org>
+	<877en9bxoc.fsf@dusky.pond.sub.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8b533a03-0adf-a15c-a6e8-6e7641a9e3ac@amsat.org>
+Date: Thu, 21 Jun 2018 08:14:03 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180621105608.01463ba5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 5/7] hmp: Add commands for preconfig
+In-Reply-To: <877en9bxoc.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] hw/arm/sysbus-fdt: Replace
+ error_setg(&error_fatal) by error_report() + exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,171 +30,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, peterx@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-* Igor Mammedov (imammedo@redhat.com) wrote:
-> On Wed, 20 Jun 2018 16:39:45 +0100
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+Hi Markus,
+
+On 06/08/2018 03:27 AM, Markus Armbruster wrote:
+> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
 > 
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Allow a bunch of the info commands to be used in preconfig.
-> > 
-> > version, chardev, name, uuid,memdev, iothreads
-> >   Were enabled in QMP in the previous patch from Igor
-> > 
-> > status, hotpluggable_cpus
-> >   Was enabled in the original allow-preconfig series
-> > 
-> > history
-> >   is HMP specific
-> > 
-> > qom-tree, numa
-> >   Don't have a QMP equivalent
-> I'm not sure that 'info numa' in current state is useful/or valid
-> at preconfig time wrt memory stats (depends on memory devices
-> which hasn't created at that moment yet).
-> Let's drop it for now from this series.
-
-OK, gone.
-
-> With it dropped:
+>> Use error_report() + exit() instead of error_setg(&error_fatal),
+>> as suggested by the "qapi/error.h" documentation:
+>>
+>>    Please don't error_setg(&error_fatal, ...), use error_report() and
+>>    exit(), because that's more obvious.
+>>
+>> This fixes CID 1352173:
+>>     "Passing null pointer dt_name to qemu_fdt_node_path, which dereferences it."
+>>
+>> And this also fixes:
+>>
+>>     hw/arm/sysbus-fdt.c:322:9: warning: Array access (from variable 'node_path') results in a null pointer dereference
+>>         if (node_path[1]) {
+>>             ^~~~~~~~~~~~
+>>
+>> Fixes: Coverity CID 1352173 (Dereference after null check)
 > 
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-Thanks.
-
-Dave
-
-> > Also enable the qom commands qom-list and qom-set.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  hmp-commands-info.hx | 11 +++++++++++
-> >  hmp-commands.hx      |  3 +++
-> >  2 files changed, 14 insertions(+)
-> > 
-> > diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> > index ddfcd5adcc..874ff07583 100644
-> > --- a/hmp-commands-info.hx
-> > +++ b/hmp-commands-info.hx
-> > @@ -19,6 +19,7 @@ ETEXI
-> >          .params     = "",
-> >          .help       = "show the version of QEMU",
-> >          .cmd        = hmp_info_version,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > @@ -47,6 +48,7 @@ ETEXI
-> >          .params     = "",
-> >          .help       = "show the character devices",
-> >          .cmd        = hmp_info_chardev,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > @@ -165,6 +167,7 @@ ETEXI
-> >          .params     = "",
-> >          .help       = "show the command line history",
-> >          .cmd        = hmp_info_history,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > @@ -315,6 +318,7 @@ ETEXI
-> >          .params     = "",
-> >          .help       = "show NUMA information",
-> >          .cmd        = hmp_info_numa,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > @@ -399,6 +403,7 @@ ETEXI
-> >          .params     = "",
-> >          .help       = "show the current VM status (running|paused)",
-> >          .cmd        = hmp_info_status,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > @@ -457,6 +462,7 @@ ETEXI
-> >          .params     = "",
-> >          .help       = "show the current VM name",
-> >          .cmd        = hmp_info_name,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > @@ -471,6 +477,7 @@ ETEXI
-> >          .params     = "",
-> >          .help       = "show the current VM UUID",
-> >          .cmd        = hmp_info_uuid,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > @@ -613,6 +620,7 @@ ETEXI
-> >          .params     = "[path]",
-> >          .help       = "show QOM composition tree",
-> >          .cmd        = hmp_info_qom_tree,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > @@ -671,6 +679,7 @@ ETEXI
-> >          .params     = "",
-> >          .help       = "show memory backends",
-> >          .cmd        = hmp_info_memdev,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > @@ -699,6 +708,7 @@ ETEXI
-> >          .params     = "",
-> >          .help       = "show iothreads",
-> >          .cmd        = hmp_info_iothreads,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > @@ -829,6 +839,7 @@ ETEXI
-> >          .params     = "",
-> >          .help       = "Show information about hotpluggable CPUs",
-> >          .cmd        = hmp_hotpluggable_cpus,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > diff --git a/hmp-commands.hx b/hmp-commands.hx
-> > index 3094294e5b..4bdf8e2090 100644
-> > --- a/hmp-commands.hx
-> > +++ b/hmp-commands.hx
-> > @@ -1828,6 +1828,7 @@ ETEXI
-> >          .params     = "path",
-> >          .help       = "list QOM properties",
-> >          .cmd        = hmp_qom_list,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > @@ -1841,6 +1842,7 @@ ETEXI
-> >          .params     = "path property value",
-> >          .help       = "set QOM property",
-> >          .cmd        = hmp_qom_set,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
-> > @@ -1855,6 +1857,7 @@ ETEXI
-> >          .help       = "show various information about the system state",
-> >          .cmd        = hmp_info_help,
-> >          .sub_table  = info_cmds,
-> > +        .flags      = "p",
-> >      },
-> >  
-> >  STEXI
+> You lost
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>   Suggested-by: Eric Blake <eblake@redhat.com>
+> 
+> Intentional?
+
+Not at all :/
+
+> 
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>  hw/arm/sysbus-fdt.c | 42 +++++++++++++++++++++++-------------------
+>>  1 file changed, 23 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
+>> index e4c492ea44..8e2784fa11 100644
+>> --- a/hw/arm/sysbus-fdt.c
+>> +++ b/hw/arm/sysbus-fdt.c
+>> @@ -91,7 +91,7 @@ static void copy_properties_from_host(HostProperty *props, int nb_props,
+>>          r = qemu_fdt_getprop(host_fdt, node_path,
+>>                               props[i].name,
+>>                               &prop_len,
+>> -                             props[i].optional ? &err : &error_fatal);
+>> +                             &err);
+>>          if (r) {
+>>              qemu_fdt_setprop(guest_fdt, nodename,
+>>                               props[i].name, r, prop_len);
+>> @@ -102,6 +102,7 @@ static void copy_properties_from_host(HostProperty *props, int nb_props,
+>>              } else {
+>>                  error_free(err);
+>>              }
+>> +            assert(props[i].optional); /* mandatory property not found */
+>>          }
+>>      }
+>>  }
+> 
+> This is not the conversion the commit message promised: it replaces
+> exit(1) by abort().  Why?
+
+I can't understand it either, I suppose I cherry-picked from an
+incorrect branch, because I also added your R-b locally.
+
+I'll resend.
+
+Thanks,
+
+Phil.
