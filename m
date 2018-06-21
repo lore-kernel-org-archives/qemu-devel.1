@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60848)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fVzHO-0005vt-Of
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:05:43 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fVzIL-0006TC-UC
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:06:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fVzHJ-0001Ly-G0
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:05:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48620 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fVzHJ-0001Ls-4M
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:05:33 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B796381663C5
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 13:05:32 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
-	<20180321115211.17937-11-marcandre.lureau@redhat.com>
-Date: Thu, 21 Jun 2018 15:05:31 +0200
-In-Reply-To: <20180321115211.17937-11-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 21 Mar 2018
-	12:51:32 +0100")
-Message-ID: <87r2l0mgro.fsf@dusky.pond.sub.org>
+	(envelope-from <kwolf@redhat.com>) id 1fVzIF-0001XC-SL
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 09:06:37 -0400
+Date: Thu, 21 Jun 2018 15:06:22 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180621130622.GH5024@localhost.localdomain>
+References: <cover.1528991017.git.berto@igalia.com>
+	<6782db91216488e4fc1509a267a362a3f15a1aaa.1528991017.git.berto@igalia.com>
+	<20180618143801.GC4667@localhost.localdomain>
+	<w51in6gp213.fsf@maestria.local.igalia.com>
+	<20180618161229.GD4667@localhost.localdomain>
+	<w51vaaf0xnj.fsf@maestria.local.igalia.com>
+	<20180619130509.GA21115@dhcp-200-186.str.redhat.com>
+	<w51sh5i5047.fsf@maestria.local.igalia.com>
+	<20180620105854.GC3946@localhost.localdomain>
+	<w51vaadr5ys.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 10/49] qapi-introspect: add preprocessor
- conditions to generated QLit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <w51vaadr5ys.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 06/10] block: Allow changing the
+ backing file on reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,176 +32,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: Alberto Garcia <berto@igalia.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+Am 20.06.2018 um 14:35 hat Alberto Garcia geschrieben:
+> On Wed 20 Jun 2018 12:58:55 PM CEST, Kevin Wolf wrote:
+> > Am 19.06.2018 um 16:20 hat Alberto Garcia geschrieben:
+> >> >> Wait, I think the description I gave is inaccurate:
+> >> >> 
+> >> >> commit_complete() calls bdrv_drop_intermediate(), and that updates the
+> >> >> backing image name (c->role->update_filename()). If we're doing this in
+> >> >> an intermediate node then it needs to be reopened in read-write mode,
+> >> >> while keeping the rest of the options.
+> >> >> 
+> >> >> But then bdrv_reopen_commit() realizes that the backing file (from
+> >> >> reopen_state->options) is not the current one (because there's a
+> >> >> bdrv_mirror_top implicit filter) and attempts to remove it. And that's
+> >> >> the root cause of the crash.
+> >> >
+> >> > How did the other (the real?) backing file get into
+> >> > reopen_state->options? I don't think bdrv_drop_intermediate() wants to
+> >> > change anything except the read-only flag, so we should surely have
+> >> > the node name of bdrv_mirror_top there?
+> >> 
+> >> No, it doesn't (try to) change anything else. It cannot do it:
+> >> bdrv_reopen() only takes flags, but keeps the current options. And the
+> >> current options have 'backing' set to a thing different from the
+> >> bdrv_mirror_top node.
+> >
+> > Okay, so in theory this is expected to just work.
+> >
+> > Actually, do we ever use bdrv_reopen() for flags other than read-only?
+> > Maybe we should get rid of that flags nonsense and simply make it a
+> > bdrv_reopen_set_readonly() taking a boolean.
+> 
+> I think that's a good idea. There's however one case where other flags
+> are changed: reopen_backing_file() in block/replication.c that also
+> clears BDRV_O_INACTIVE. I'd need to take a closer look to that code to
+> see what we can do about it.
 
-> The generator will take (obj, condition) tuples to wrap generated QLit
-> objects for 'obj' with #if/#endif conditions.
->
-> This commit adds 'ifcond' condition to top-level QLit objects.
->
-> See generated tests/test-qmp-introspect.c. Example diff after this patch:
->
->     --- before	2018-01-08 11:55:24.757083654 +0100
->     +++ tests/test-qmp-introspect.c	2018-01-08 13:08:44.477641629 +0100
->     @@ -51,6 +51,8 @@
->              { "name", QLIT_QSTR("EVENT_F"), },
->              {}
->          })),
->     +#if defined(TEST_IF_CMD)
->     +#if defined(TEST_IF_STRUCT)
->          QLIT_QDICT(((QLitDictEntry[]) {
->              { "arg-type", QLIT_QSTR("5"), },
->              { "meta-type", QLIT_QSTR("command"), },
->     @@ -58,12 +60,16 @@
->              { "ret-type", QLIT_QSTR("0"), },
->              {}
->          })),
->     +#endif /* defined(TEST_IF_STRUCT) */
->     +#endif /* defined(TEST_IF_CMD) */
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi/introspect.py | 31 +++++++++++++++++++++----------
->  1 file changed, 21 insertions(+), 10 deletions(-)
->
-> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
-> index 1a8eb9e33e..cb4825f134 100644
-> --- a/scripts/qapi/introspect.py
-> +++ b/scripts/qapi/introspect.py
-> @@ -18,6 +18,15 @@ def to_qlit(obj, level=3D0, suppress_first_indent=3DFa=
-lse):
->      def indent(level):
->          return level * 4 * ' '
->=20=20
-> +    if isinstance(obj, tuple):
-> +        ifobj, ifcond =3D obj
-> +        ret =3D gen_if(ifcond)
-> +        ret +=3D to_qlit(ifobj, level)
-> +        endif =3D gen_endif(ifcond)
-> +        if endif:
-> +            ret +=3D '\n' + endif
-> +        return ret
-> +
->      ret =3D ''
->      if not suppress_first_indent:
->          ret +=3D indent(level)
+Uh, and that works?
 
-@obj represents a JSON object.  It consists of dictionaries, lists,
-strings, booleans and None.  Numbers aren't implemented.  Your patch
-splices in tuples to represent conditionals at any level.
+Clearing BDRV_O_INACTIVE with bdrv_reopen() (which means, without
+calling bdrv_invalidate_cache()) is surely suspicious. Probably this
+code is buggy.
 
-So far, tuples occur only as elements of the outermost list (see
-._gen_qlit() below), but to_qlit() supports them anywhere.  I figure
-that will be needed later.  If yes, the whole thing is a bit of a hack,
-but at least it's a simple hack.  If no, I'd look for a solution that
-feels less hackish.
+Another reason for removing flags from the interface: We didn't do any
+sanity checks for the flag changes.
 
-By the way, this hunk makes my pylint die with "RecursionError: maximum
-recursion depth exceeded".  If I comment out the line with the
-recursion, it survives.  Latest git survives, too.  Oh well, python3
-setup.py install.
+> And there's of course qemu-io's "reopen" command, which does take
+> options but keeps the previous values.
 
-> @@ -26,7 +35,7 @@ def to_qlit(obj, level=3D0, suppress_first_indent=3DFal=
-se):
->      elif isinstance(obj, str):
->          ret +=3D 'QLIT_QSTR(' + to_c_string(obj) + ')'
->      elif isinstance(obj, list):
-> -        elts =3D [to_qlit(elt, level + 1)
-> +        elts =3D [to_qlit(elt, level + 1).strip('\n')
->                  for elt in obj]
->          elts.append(indent(level + 1) + "{}")
->          ret +=3D 'QLIT_QLIST(((QLitObject[]) {\n'
+It provides -r/-w for changing readonly and -c to change the cache mode
+flags. Both should be easy to convert to QDict options.
 
-The .strip('\n') looks odd.  Reminds me of the asymmetry I noted in
-PATCH 08: you take care to adjust vertical space around #if there, but
-not around #endif.  Let's not worry about it now.
+> > I think we should already remove nested options of children from the
+> > dicts in bdrv_open_inherit(). I'm less sure about node-name
+> > references.  Maybe instead of keeing the dicts up-to-date each time we
+> > modify the graph, we should just get rid of those in the dicts as
+> > well, and instead add a function that reconstructs the full dict from
+> > bs->options and the currently attached children. This requires that
+> > the child name and the option name match, but I think that's
+> > true. (Mostly at least - what about quorum? But the child node
+> > handling of quorum is broken anyway.)
+> 
+> Yes, removing nested options sounds like a good idea. In what cases do
+> we need the full qdict, though?
 
-> @@ -131,12 +140,12 @@ const QLitObject %(c_name)s =3D %(c_string)s;
->              return '[' + self._use_type(typ.element_type) + ']'
->          return self._name(typ.name)
->=20=20
-> -    def _gen_qlit(self, name, mtype, obj):
-> +    def _gen_qlit(self, name, mtype, obj, ifcond):
->          if mtype not in ('command', 'event', 'builtin', 'array'):
->              name =3D self._name(name)
->          obj['name'] =3D name
->          obj['meta-type'] =3D mtype
-> -        self._qlits.append(obj)
-> +        self._qlits.append((obj, ifcond))
+Not sure, maybe we don't even need them now that we decided that the
+default is leaving the reference unchanged.
 
-This is where we produce ._qlits.  It's also the only place where we
-create tuples.  Thus, all elements of ._qlits are tuples, and no tuples
-occur at deeper levels.
+There's the creation of json: filenames, maybe we need it there. We'd
+also certainly need to get the full QDict if we wanted to convert the
+options to a QAPI object before we pass them to the drivers.
 
->=20=20
->      def _gen_member(self, member):
->          ret =3D {'name': member.name, 'type': self._use_type(member.type=
-)}
-> @@ -152,26 +161,27 @@ const QLitObject %(c_name)s =3D %(c_string)s;
->          return {'case': variant.name, 'type': self._use_type(variant.typ=
-e)}
->=20=20
->      def visit_builtin_type(self, name, info, json_type):
-> -        self._gen_qlit(name, 'builtin', {'json-type': json_type})
-> +        self._gen_qlit(name, 'builtin', {'json-type': json_type}, [])
->=20=20
->      def visit_enum_type(self, name, info, ifcond, values, prefix):
-> -        self._gen_qlit(name, 'enum', {'values': values})
-> +        self._gen_qlit(name, 'enum', {'values': values}, ifcond)
->=20=20
->      def visit_array_type(self, name, info, ifcond, element_type):
->          element =3D self._use_type(element_type)
-> -        self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
-ement})
-> +        self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
-ement},
-> +                       ifcond)
->=20=20
->      def visit_object_type_flat(self, name, info, ifcond, members, varian=
-ts):
->          obj =3D {'members': [self._gen_member(m) for m in members]}
->          if variants:
->              obj.update(self._gen_variants(variants.tag_member.name,
->                                            variants.variants))
-> -        self._gen_qlit(name, 'object', obj)
-> +        self._gen_qlit(name, 'object', obj, ifcond)
->=20=20
->      def visit_alternate_type(self, name, info, ifcond, variants):
->          self._gen_qlit(name, 'alternate',
->                         {'members': [{'type': self._use_type(m.type)}
-> -                                    for m in variants.variants]})
-> +                                    for m in variants.variants]}, ifcond)
->=20=20
->      def visit_command(self, name, info, ifcond, arg_type, ret_type,
->                        gen, success_response, boxed, allow_oob):
-> @@ -180,11 +190,12 @@ const QLitObject %(c_name)s =3D %(c_string)s;
->          self._gen_qlit(name, 'command',
->                         {'arg-type': self._use_type(arg_type),
->                          'ret-type': self._use_type(ret_type),
-> -                        'allow-oob': allow_oob})
-> +                        'allow-oob': allow_oob}, ifcond)
->=20=20
->      def visit_event(self, name, info, ifcond, arg_type, boxed):
->          arg_type =3D arg_type or self._schema.the_empty_object_type
-> -        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
-pe)})
-> +        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
-pe)},
-> +                       ifcond)
->=20=20
->=20=20
->  def gen_introspect(schema, output_dir, prefix, opt_unmask):
-
-I still prefer the approach I explored in
-
-    [PATCH RFC 09/14] qapi: Pass ifcond to visitors
-    [PATCH RFC 13/14] qapi-introspect: Add #if conditions to introspection =
-value
-
-because it separates the concerns.  I'd love to complete my exploration
-so we can compare apples to apples.  However, with the soft freeze
-closing in, I'll probably have to take the solution that's already
-complete, regardless of my preference.
+Kevin
