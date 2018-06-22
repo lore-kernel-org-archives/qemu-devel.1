@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59933)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWMJP-0006H4-Um
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:41:16 -0400
+	id 1fWMJS-0006Ji-9k
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:41:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWMJO-0003b4-QD
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:41:16 -0400
+	id 1fWMJR-0003eZ-FS
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:41:18 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 22 Jun 2018 10:40:33 -0300
-Message-Id: <20180622134036.23182-12-f4bug@amsat.org>
+Date: Fri, 22 Jun 2018 10:40:34 -0300
+Message-Id: <20180622134036.23182-13-f4bug@amsat.org>
 In-Reply-To: <20180622134036.23182-1-f4bug@amsat.org>
 References: <20180622134036.23182-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 11/14] hw/net/stellaris_enet: Use
+Subject: [Qemu-devel] [PATCH v2 12/14] hw/net/smc91c111: Use
  qemu_log_mask(GUEST_ERROR) instead of hw_error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,41 +34,41 @@ hw_error() finally calls abort(), but there is no need to abort here.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/net/stellaris_enet.c | 9 +++++++--
+ hw/net/smc91c111.c | 9 +++++++--
  1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/hw/net/stellaris_enet.c b/hw/net/stellaris_enet.c
-index 04bd10ada3..f8edebdecd 100644
---- a/hw/net/stellaris_enet.c
-+++ b/hw/net/stellaris_enet.c
-@@ -9,6 +9,7 @@
- #include "qemu/osdep.h"
+diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
+index c8cc5379b7..9094c0b47c 100644
+--- a/hw/net/smc91c111.c
++++ b/hw/net/smc91c111.c
+@@ -11,6 +11,7 @@
  #include "hw/sysbus.h"
  #include "net/net.h"
+ #include "hw/devices.h"
 +#include "qemu/log.h"
+ /* For crc32 */
  #include <zlib.h>
  
- //#define DEBUG_STELLARIS_ENET 1
-@@ -343,7 +344,9 @@ static uint64_t stellaris_enet_read(void *opaque, hwaddr offset,
-     case 0x3c: /* Undocuented: Timestamp? */
-         return 0;
-     default:
--        hw_error("stellaris_enet_read: Bad offset %x\n", (int)offset);
-+        qemu_log_mask(LOG_GUEST_ERROR, "stellaris_enet_rd%d: Illegal register"
-+                                       " 0x02%" HWADDR_PRIx "\n",
-+                      size << 2, offset);
-         return 0;
-     }
- }
-@@ -442,7 +445,9 @@ static void stellaris_enet_write(void *opaque, hwaddr offset,
-         /* Ignored.  */
+@@ -478,7 +479,9 @@ static void smc91c111_writeb(void *opaque, hwaddr offset,
+         }
          break;
-     default:
--        hw_error("stellaris_enet_write: Bad offset %x\n", (int)offset);
-+        qemu_log_mask(LOG_GUEST_ERROR, "stellaris_enet_wr%d: Illegal register"
-+                                       " 0x02%" HWADDR_PRIx " = 0x%lx\n",
-+                      size << 2, offset, value);
      }
+-    hw_error("smc91c111_write: Bad reg %d:%x\n", s->bank, (int)offset);
++    qemu_log_mask(LOG_GUEST_ERROR, "smc91c111_write(bank:%d) Illegal register"
++                                   " 0x%" HWADDR_PRIx " = 0x%x\n",
++                  s->bank, offset, value);
+ }
+ 
+ static uint32_t smc91c111_readb(void *opaque, hwaddr offset)
+@@ -621,7 +624,9 @@ static uint32_t smc91c111_readb(void *opaque, hwaddr offset)
+         }
+         break;
+     }
+-    hw_error("smc91c111_read: Bad reg %d:%x\n", s->bank, (int)offset);
++    qemu_log_mask(LOG_GUEST_ERROR, "smc91c111_read(bank:%d) Illegal register"
++                                   " 0x%" HWADDR_PRIx "\n",
++                  s->bank, offset);
+     return 0;
  }
  
 -- 
