@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <naravamudan@digitalocean.com>) id 1fWPbZ-0000t8-AJ
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:12:14 -0400
+	(envelope-from <naravamudan@digitalocean.com>) id 1fWPbq-00014O-V4
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:12:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <naravamudan@digitalocean.com>) id 1fWPbV-0001LE-WA
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:12:13 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:43505)
+	(envelope-from <naravamudan@digitalocean.com>) id 1fWPbn-0001Sg-Nn
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:12:30 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:37675)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <naravamudan@digitalocean.com>)
-	id 1fWPbV-0001KV-Nv
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:12:09 -0400
-Received: by mail-pl0-x243.google.com with SMTP id c41-v6so3773950plj.10
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 10:12:09 -0700 (PDT)
-Date: Fri, 22 Jun 2018 10:12:07 -0700
+	id 1fWPbn-0001SY-HY
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:12:27 -0400
+Received: by mail-pg0-x242.google.com with SMTP id r21-v6so3242389pgv.4
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 10:12:27 -0700 (PDT)
+Date: Fri, 22 Jun 2018 10:12:24 -0700
 From: Nishanth Aravamudan <naravamudan@digitalocean.com>
-Message-ID: <20180622171207.GA20261@breakout>
+Message-ID: <20180622171224.GB20261@breakout>
 References: <20180621222143.27266-1-naravamudan@digitalocean.com>
-	<20180621222143.27266-2-naravamudan@digitalocean.com>
-	<20180622022119.GA5449@lemon.usersys.redhat.com>
+	<20180621222143.27266-3-naravamudan@digitalocean.com>
+	<20180622022512.GB5449@lemon.usersys.redhat.com>
+	<20180622090206.GD4366@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180622022119.GA5449@lemon.usersys.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] linux-aio: properly bubble up
- errors from initialization
+In-Reply-To: <20180622090206.GD4366@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] block/file-posix: reconfigure aio
+ on iothread start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,107 +33,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On 22.06.2018 [10:21:19 +0800], Fam Zheng wrote:
-> On Thu, 06/21 15:21, Nishanth Aravamudan wrote:
-> > laio_init() can fail for a couple of reasons, which will lead to a NULL
-> > pointer dereference in laio_attach_aio_context().
+On 22.06.2018 [11:02:06 +0200], Kevin Wolf wrote:
+> Am 22.06.2018 um 04:25 hat Fam Zheng geschrieben:
+> > On Thu, 06/21 15:21, Nishanth Aravamudan wrote:
+> > > When the AioContext changes, we need to associate a LinuxAioState with
+> > > the new AioContext. Use the bdrv_attach_aio_context callback and call
+> > > the new aio_setup_linux_aio(), which will allocate a new AioContext if
+> > > needed, and return errors on failures. If it fails for any reason,
+> > > fallback to threaded AIO with an error message, as the device is already
+> > > in-use by the guest.
+> > > 
+> > > Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
+> > > ---
+> > > Note this patch didn't exist in v2, but is a result of feedback to that
+> > > posting.
 > > 
-> > To solve this, add a aio_setup_linux_aio() function which is called
-> > early in raw_open_common. If this fails, propagate the error up. The
-> > signature of aio_get_linux_aio() was not modified, because it seems
-> > preferable to return the actual errno from the possible failing
-> > initialization calls.
-> > 
-> > Add an assert that aio_get_linux_aio() cannot return NULL.
-> > 
-> > Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
-> > ---
-> > Changes from v2 -> v3 (thanks to Eric Blake and Kevin Wolf for review):
-> > 
-> > Use a boolean false rather than 0 in assignment to use_linux_aio.
-> > Drop ending '.' from error_report() calls.
-> > Fix typo in commit message (propogates -> propagates).
-> > Move aio_setup_linux_aio call to raw_open_common.
-> > 
-> > Changes from v1 -> v2 (thanks to Kevin Wolf for review):
-> > 
-> > Rather than affect virtio-scsi/blk at all, make all the changes internal
-> > to file-posix.c. Thanks to Kevin Wolf for the suggested change.
-> > 
-> >  block/file-posix.c      | 17 ++++++++++++-----
-> >  block/linux-aio.c       | 15 ++++++++++-----
-> >  include/block/aio.h     |  3 +++
-> >  include/block/raw-aio.h |  2 +-
-> >  stubs/linux-aio.c       |  2 +-
-> >  util/async.c            | 16 +++++++++++++---
-> >  6 files changed, 40 insertions(+), 15 deletions(-)
-> > 
-> > diff --git a/block/file-posix.c b/block/file-posix.c
-> > index 07bb061fe4..6a1714d4a8 100644
-> > --- a/block/file-posix.c
-> > +++ b/block/file-posix.c
-> > @@ -545,11 +545,18 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-> >  
-> >  #ifdef CONFIG_LINUX_AIO
-> >       /* Currently Linux does AIO only for files opened with O_DIRECT */
-> > -    if (s->use_linux_aio && !(s->open_flags & O_DIRECT)) {
-> > -        error_setg(errp, "aio=native was specified, but it requires "
-> > -                         "cache.direct=on, which was not specified.");
-> > -        ret = -EINVAL;
-> > -        goto fail;
-> > +    if (s->use_linux_aio) {
-> > +        if (!(s->open_flags & O_DIRECT)) {
-> > +            error_setg(errp, "aio=native was specified, but it requires "
-> > +                             "cache.direct=on, which was not specified.");
-> > +            ret = -EINVAL;
-> > +            goto fail;
-> > +        }
-> > +        ret = aio_setup_linux_aio(bdrv_get_aio_context(bs));
-> > +        if (ret != 0) {
-> > +            error_setg(errp, "Unable to setup native AIO context.");
-> > +            goto fail;
-> > +        }
-> >      }
-> >  #else
-> >      if (s->use_linux_aio) {
-> > diff --git a/block/linux-aio.c b/block/linux-aio.c
-> > index 88b8d55ec7..4d799f85fe 100644
-> > --- a/block/linux-aio.c
-> > +++ b/block/linux-aio.c
-> > @@ -470,28 +470,33 @@ void laio_attach_aio_context(LinuxAioState *s, AioContext *new_context)
-> >                             qemu_laio_poll_cb);
-> >  }
-> >  
-> > -LinuxAioState *laio_init(void)
-> > +int laio_init(LinuxAioState **linux_aio)
-> >  {
-> > +    int rc;
-> >      LinuxAioState *s;
-> >  
-> >      s = g_malloc0(sizeof(*s));
-> > -    if (event_notifier_init(&s->e, false) < 0) {
-> > +    rc = event_notifier_init(&s->e, false);
-> > +    if (rc < 0) {
+> > This should be squashed into patch 1, no?
 > 
-> It would be nice if the error message could distinguish this error...
-> 
-> >          goto out_free_state;
-> >      }
-> >  
-> > -    if (io_setup(MAX_EVENTS, &s->ctx) != 0) {
-> > +    rc = io_setup(MAX_EVENTS, &s->ctx);
-> > +    if (rc != 0) {
-> 
-> ... from this one. And it also makes sense to propagate the errno back with
-> error_setg_errno.
-> 
-> To do this, add an "Error **errp" parameter to the function and you
-> can keep the return type (LinuxAioState *).
+> Yes, without it, patch 1 is incorrect. Specifically, at least the
+> assertion in aio_get_linux_aio() won't hold true without it.
 
-Thank you for this suggestion! I will send out a v4 with this and your
-other feedback integrated.
+Yes, you are right! Sorry about that. I'll send a v4 today.
 
 -Nish
