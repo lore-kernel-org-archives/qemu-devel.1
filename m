@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fWH1v-00028c-Sl
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:02:52 -0400
+	(envelope-from <thuth@redhat.com>) id 1fWH3W-0003TE-6T
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:04:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jusual@mail.ru>) id 1fWH1s-0002f0-Jc
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:02:51 -0400
-Received: from smtp58.i.mail.ru ([217.69.128.38]:40232)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fWH1s-0002eN-CU
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:02:48 -0400
-From: Julia Suvorova <jusual@mail.ru>
-Date: Fri, 22 Jun 2018 11:01:38 +0300
-Message-Id: <20180622080138.17702-3-jusual@mail.ru>
-In-Reply-To: <20180622080138.17702-1-jusual@mail.ru>
-References: <20180622080138.17702-1-jusual@mail.ru>
-Subject: [Qemu-devel] [PATCH v2 2/2] target/arm: Strict alignment for
- ARMv6-M and ARMv8-M Baseline
+	(envelope-from <thuth@redhat.com>) id 1fWH3Q-0003L4-C3
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:04:30 -0400
+References: <20180621180224.8312-1-f4bug@amsat.org>
+	<20180621180224.8312-2-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <114c5545-19e6-690a-78a7-4586aa57860d@redhat.com>
+Date: Fri, 22 Jun 2018 10:04:10 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180621180224.8312-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 01/11] hw/input/pckbd: Use
+ qemu_log_mask(GUEST_ERROR) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +25,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-Unlike ARMv7-M, ARMv6-M and ARMv8-M Baseline only supports naturally
-aligned memory accesses for load/store instructions.
+On 21.06.2018 20:02, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/input/pckbd.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
+> index f33e3fc63d..1102d2a31b 100644
+> --- a/hw/input/pckbd.c
+> +++ b/hw/input/pckbd.c
+> @@ -22,6 +22,7 @@
+>   * THE SOFTWARE.
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/log.h"
+>  #include "hw/hw.h"
+>  #include "hw/isa/isa.h"
+>  #include "hw/i386/pc.h"
+> @@ -308,7 +309,8 @@ static void kbd_write_command(void *opaque, hwaddr =
+addr,
+>          /* ignore that */
+>          break;
+>      default:
+> -        fprintf(stderr, "qemu: unsupported keyboard cmd=3D0x%02x\n", (=
+int)val);
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "qemu: unsupported keyboard cmd=3D0x%02lx\n", va=
+l);
 
-Signed-off-by: Julia Suvorova <jusual@mail.ru>
----
- target/arm/translate.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+Please remove the "qemu:" prefix while you're at it.
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index b988d379e7..2a3e4f5d4c 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -1100,7 +1100,14 @@ static inline TCGv gen_aa32_addr(DisasContext *s, TCGv_i32 a32, TCGMemOp op)
- static void gen_aa32_ld_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
-                             int index, TCGMemOp opc)
- {
--    TCGv addr = gen_aa32_addr(s, a32, opc);
-+    TCGv addr;
-+
-+    if (arm_dc_feature(s, ARM_FEATURE_M) &&
-+        !arm_dc_feature(s, ARM_FEATURE_M_MAIN)) {
-+        opc |= MO_ALIGN;
-+    }
-+
-+    addr = gen_aa32_addr(s, a32, opc);
-     tcg_gen_qemu_ld_i32(val, addr, index, opc);
-     tcg_temp_free(addr);
- }
-@@ -1108,7 +1115,14 @@ static void gen_aa32_ld_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
- static void gen_aa32_st_i32(DisasContext *s, TCGv_i32 val, TCGv_i32 a32,
-                             int index, TCGMemOp opc)
- {
--    TCGv addr = gen_aa32_addr(s, a32, opc);
-+    TCGv addr;
-+
-+    if (arm_dc_feature(s, ARM_FEATURE_M) &&
-+        !arm_dc_feature(s, ARM_FEATURE_M_MAIN)) {
-+        opc |= MO_ALIGN;
-+    }
-+
-+    addr = gen_aa32_addr(s, a32, opc);
-     tcg_gen_qemu_st_i32(val, addr, index, opc);
-     tcg_temp_free(addr);
- }
--- 
-2.17.0
+ Thomas
