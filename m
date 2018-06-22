@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJPs-0000ei-SU
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:47 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJPv-0000hG-6S
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJPq-0003Qd-KZ
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJPs-0003Sh-No
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:47 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 22 Jun 2018 20:35:09 +1000
-Message-Id: <20180622103528.28598-7-david@gibson.dropbear.id.au>
+Date: Fri, 22 Jun 2018 20:35:13 +1000
+Message-Id: <20180622103528.28598-11-david@gibson.dropbear.id.au>
 In-Reply-To: <20180622103528.28598-1-david@gibson.dropbear.id.au>
 References: <20180622103528.28598-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 06/25] ppc/pnv: consolidate the creation of the
- ISA bus device tree
+Subject: [Qemu-devel] [PULL 10/25] target/ppc: Add
+ kvmppc_hpt_needs_host_contiguous_pages() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,119 +26,94 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+KVM HV has a restriction that for HPT mode guests, guest pages must be hp=
+a
+contiguous as well as gpa contiguous.  We have to account for that in
+various places.  We determine whether we're subject to this restriction
+from the SMMU information exposed by KVM.
 
-The device tree node of the ISA bus was being partially done in
-different places. Move all the nodes creation under the same routine.
+Planned cleanups to the way we handle this will require knowing whether
+this restriction is in play in wider parts of the code.  So, expose a
+helper function which returns it.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+This does mean some redundant calls to kvm_get_smmu_info(), but they'll g=
+o
+away again with future cleanups.
+
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/pnv.c | 51 +++++++++++++++++++++++----------------------------
- 1 file changed, 23 insertions(+), 28 deletions(-)
+ target/ppc/kvm.c     | 17 +++++++++++++++--
+ target/ppc/kvm_ppc.h |  6 ++++++
+ 2 files changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index a29ea996b4..7401ffe5b0 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -265,18 +265,6 @@ static void pnv_dt_icp(PnvChip *chip, void *fdt, uin=
-t32_t pir,
-     g_free(reg);
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 5c0e313ca6..50b5d01432 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -406,9 +406,22 @@ target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu=
+,
+     }
  }
 =20
--static int pnv_chip_lpc_offset(PnvChip *chip, void *fdt)
--{
--    char *name;
--    int offset;
--
--    name =3D g_strdup_printf("/xscom@%" PRIx64 "/isa@%x",
--                           (uint64_t) PNV_XSCOM_BASE(chip), PNV_XSCOM_LP=
-C_BASE);
--    offset =3D fdt_path_offset(fdt, name);
--    g_free(name);
--    return offset;
--}
--
- static void pnv_dt_chip(PnvChip *chip, void *fdt)
- {
-     const char *typename =3D pnv_chip_core_typename(chip);
-@@ -285,16 +273,6 @@ static void pnv_dt_chip(PnvChip *chip, void *fdt)
-=20
-     pnv_dt_xscom(chip, fdt, 0);
-=20
--    /* The default LPC bus of a multichip system is on chip 0. It's
--     * recognized by the firmware (skiboot) using a "primary"
--     * property.
--     */
--    if (chip->chip_id =3D=3D 0x0) {
--        int lpc_offset =3D pnv_chip_lpc_offset(chip, fdt);
--
--        _FDT((fdt_setprop(fdt, lpc_offset, "primary", NULL, 0)));
--    }
--
-     for (i =3D 0; i < chip->nr_cores; i++) {
-         PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-=20
-@@ -418,16 +396,35 @@ static int pnv_dt_isa_device(DeviceState *dev, void=
- *opaque)
-     return 0;
- }
-=20
--static void pnv_dt_isa(ISABus *bus, void *fdt, int lpc_offset)
-+static int pnv_chip_isa_offset(PnvChip *chip, void *fdt)
++bool kvmppc_hpt_needs_host_contiguous_pages(void)
 +{
-+    char *name;
-+    int offset;
++    PowerPCCPU *cpu =3D POWERPC_CPU(first_cpu);
++    static struct kvm_ppc_smmu_info smmu_info;
 +
-+    name =3D g_strdup_printf("/xscom@%" PRIx64 "/isa@%x",
-+                           (uint64_t) PNV_XSCOM_BASE(chip), PNV_XSCOM_LP=
-C_BASE);
-+    offset =3D fdt_path_offset(fdt, name);
-+    g_free(name);
-+    return offset;
++    if (!kvm_enabled()) {
++        return false;
++    }
++
++    kvm_get_smmu_info(cpu, &smmu_info);
++    return !!(smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL);
 +}
 +
-+/* The default LPC bus of a multichip system is on chip 0. It's
-+ * recognized by the firmware (skiboot) using a "primary" property.
-+ */
-+static void pnv_dt_isa(PnvMachineState *pnv, void *fdt)
+ static bool kvm_valid_page_size(uint32_t flags, long rampgsize, uint32_t=
+ shift)
  {
-+    int isa_offset =3D pnv_chip_isa_offset(pnv->chips[0], fdt);
-     ForeachPopulateArgs args =3D {
-         .fdt =3D fdt,
--        .offset =3D lpc_offset,
-+        .offset =3D isa_offset,
-     };
-=20
-+    _FDT((fdt_setprop(fdt, isa_offset, "primary", NULL, 0)));
-+
-     /* ISA devices are not necessarily parented to the ISA bus so we
-      * can not use object_child_foreach() */
--    qbus_walk_children(BUS(bus), pnv_dt_isa_device, NULL, NULL, NULL, &a=
-rgs);
-+    qbus_walk_children(BUS(pnv->isa_bus), pnv_dt_isa_device, NULL, NULL,=
- NULL,
-+                       &args);
- }
-=20
- static void *pnv_dt_create(MachineState *machine)
-@@ -438,7 +435,6 @@ static void *pnv_dt_create(MachineState *machine)
-     char *buf;
-     int off;
-     int i;
--    int lpc_offset;
-=20
-     fdt =3D g_malloc0(FDT_MAX_SIZE);
-     _FDT((fdt_create_empty_tree(fdt, FDT_MAX_SIZE)));
-@@ -480,8 +476,7 @@ static void *pnv_dt_create(MachineState *machine)
+-    if (!(flags & KVM_PPC_PAGE_SIZES_REAL)) {
++    if (!kvmppc_hpt_needs_host_contiguous_pages()) {
+         return true;
      }
 =20
-     /* Populate ISA devices on chip 0 */
--    lpc_offset =3D pnv_chip_lpc_offset(pnv->chips[0], fdt);
--    pnv_dt_isa(pnv->isa_bus, fdt, lpc_offset);
-+    pnv_dt_isa(pnv, fdt);
+@@ -445,7 +458,7 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+     /* If we have HV KVM, we need to forbid CI large pages if our
+      * host page size is smaller than 64K.
+      */
+-    if (smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL) {
++    if (kvmppc_hpt_needs_host_contiguous_pages()) {
+         if (getpagesize() >=3D 0x10000) {
+             cpu->hash64_opts->flags |=3D PPC_HASH64_CI_LARGEPAGE;
+         } else {
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index e2840e1d33..a7ddb8a5d6 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -70,6 +70,7 @@ int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_u=
+long flags, int shift);
+ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int sh=
+ift);
+ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
 =20
-     if (pnv->bmc) {
-         pnv_dt_bmc_sensors(pnv->bmc, fdt);
++bool kvmppc_hpt_needs_host_contiguous_pages(void);
+ bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
+=20
+ #else
+@@ -222,6 +223,11 @@ static inline uint64_t kvmppc_rma_size(uint64_t curr=
+ent_size,
+     return ram_size;
+ }
+=20
++static inline bool kvmppc_hpt_needs_host_contiguous_pages(void)
++{
++    return false;
++}
++
+ static inline bool kvmppc_is_mem_backend_page_size_ok(const char *obj_pa=
+th)
+ {
+     return true;
 --=20
 2.17.1
