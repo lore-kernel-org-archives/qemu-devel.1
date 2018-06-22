@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fWJZK-0000UP-Ae
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:45:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJdI-0003Pw-8m
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:49:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fWJZJ-00082S-C5
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:45:30 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:42845)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fWJZJ-000824-5h
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:45:29 -0400
-Received: by mail-ot0-x242.google.com with SMTP id 92-v6so6994919otw.9
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 03:45:29 -0700 (PDT)
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJdD-0001K6-Uv
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:49:36 -0400
+Date: Fri, 22 Jun 2018 20:49:07 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180622104907.GK612@umbus.fritz.box>
+References: <cover.1529398335.git.balaton@eik.bme.hu>
+	<ce619ddd11a875caae4c221c18ebf7c6a6f4bd4f.1529398335.git.balaton@eik.bme.hu>
+	<20180620052044.GA24636@umbus.fritz.box>
+	<alpine.BSF.2.21.1806210900160.16898@zero.eik.bme.hu>
+	<20180622015940.GF612@umbus.fritz.box>
+	<alpine.BSF.2.21.1806220952410.66303@zero.eik.bme.hu>
 MIME-Version: 1.0
-In-Reply-To: <1529663827-28854-1-git-send-email-hongbo.zhang@linaro.org>
-References: <1529663827-28854-1-git-send-email-hongbo.zhang@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Jun 2018 11:45:07 +0100
-Message-ID: <CAFEAcA8Bx7b_0zUxbdxFgtANFycVkUiSiemAwHpr0wpyxuLKmw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: fix psci conduit in acpi when
- el3 enabled
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="zPXeIxDajdrcF2en"
+Content-Disposition: inline
+In-Reply-To: <alpine.BSF.2.21.1806220952410.66303@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] ppc4xx_i2c: Implement directcntl
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +29,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hongbo Zhang <hongbo.zhang@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
-On 22 June 2018 at 11:37, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
-> When QEMU_PSCI_CONDUIT_DISABLED is set, it doesn't mean all the PSCI
-> conduits are totally disabled, it only mean the QEMU built-in PSCI
-> support is disabled, in such a case, e.g. EL3 is enabled and external
-> firmware (it is usually Arm Trusted Firmware) is loaded, SMC should be
-> used for the guest to trigger PSCI functions.
->
-> Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
-> ---
->  hw/arm/virt-acpi-build.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 74f5744..e5b4947 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -715,7 +715,11 @@ static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
->
->      switch (vms->psci_conduit) {
->      case QEMU_PSCI_CONDUIT_DISABLED:
-> -        fadt.arm_boot_arch = 0;
-> +        /* This case means QEMU's internal EL3 implementation is disabled,
-> +         * but when firmware is loaded, the guest can still use SMC as PSCI
-> +         * conduit to call external firmware PSCI services
-> +         */
-> +        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT;
->          break;
->      case QEMU_PSCI_CONDUIT_HVC:
->          fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT |
 
-I think this means we end up reporting different things for ACPI
-and DT in this case, doesn't it?
+--zPXeIxDajdrcF2en
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I think that if QEMU isn't providing the PSCI implementation it
-shouldn't advertise it in the ACPI tables. It would seem more
-logical that the firmware itself does that (QEMU can't know if
-it really does provide PSCI, after all...)
+On Fri, Jun 22, 2018 at 10:00:34AM +0200, BALATON Zoltan wrote:
+> On Fri, 22 Jun 2018, David Gibson wrote:
+> > On Thu, Jun 21, 2018 at 09:17:11AM +0200, BALATON Zoltan wrote:
+> > > On Wed, 20 Jun 2018, David Gibson wrote:
+> > > > On Tue, Jun 19, 2018 at 10:52:15AM +0200, BALATON Zoltan wrote:
+> > > > > As well as being able to generate its own i2c transactions, the p=
+pc4xx
+> > > > > i2c controller has a DIRECTCNTL register which allows explicit co=
+ntrol
+> > > > > of the i2c lines.
+> > > > >=20
+> > > > > Using this register an OS can directly bitbang i2c operations. In
+> > > > > order to let emulated i2c devices respond to this, we need to wir=
+e up
+> > > > > the DIRECTCNTL register to qemu's bitbanged i2c handling code.
+> > > > >=20
+> > > > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> > > > > ---
+> > > > > v4: Updated commit message and use defined constant where
+> > > > > appropriate
+> > > >=20
+> > > > I'm still don't quite understand your approach to the symbolic
+> > > > constants here, but I don't care enough to hold this up any further.
+> > > > So, applied to ppc-for-3.0.
+> > >=20
+> > > Thanks, just to try to clear this up, I consider symbolic constants t=
+o be
+> > > the name of bits 0-3 in the directntl register so while MSCL equals 1=
+ it's
+> > > only appropriate to use the constant if I really mean (1 << 0) i.e. b=
+it 0 of
+> > > directcntl reg.
+> >=20
+> > Right..
+> >=20
+> > >=20
+> > > > > diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+> > > > > index 4e0aaae..fca80d6 100644
+> > > > > --- a/hw/i2c/ppc4xx_i2c.c
+> > > > > +++ b/hw/i2c/ppc4xx_i2c.c
+> > > > > @@ -30,6 +30,7 @@
+> > > > >  #include "cpu.h"
+> > > > >  #include "hw/hw.h"
+> > > > >  #include "hw/i2c/ppc4xx_i2c.h"
+> > > > > +#include "bitbang_i2c.h"
+> > > > >=20
+> > > > >  #define PPC4xx_I2C_MEM_SIZE 18
+> > > > >=20
+> > > > > @@ -46,6 +47,11 @@
+> > > > >=20
+> > > > >  #define IIC_XTCNTLSS_SRST   (1 << 0)
+> > > > >=20
+> > > > > +#define IIC_DIRECTCNTL_SDAC (1 << 3)
+> > > > > +#define IIC_DIRECTCNTL_SCLC (1 << 2)
+> > > > > +#define IIC_DIRECTCNTL_MSDA (1 << 1)
+> > > > > +#define IIC_DIRECTCNTL_MSCL (1 << 0)
+> > > > > +
+> > > > >  static void ppc4xx_i2c_reset(DeviceState *s)
+> > > > >  {
+> > > > >      PPC4xxI2CState *i2c =3D PPC4xx_I2C(s);
+> > > > > @@ -289,7 +295,12 @@ static void ppc4xx_i2c_writeb(void *opaque, =
+hwaddr addr, uint64_t value,
+> > > > >          i2c->xtcntlss =3D value;
+> > > > >          break;
+> > > > >      case 16:
+> > > > > -        i2c->directcntl =3D value & 0x7;
+> > > > > +        i2c->directcntl =3D value & (IIC_DIRECTCNTL_SDAC & IIC_D=
+IRECTCNTL_SCLC);
+> > >=20
+> > > This clears all bits but SDAC and SCLC so constants are OK here as th=
+ey
+> > > refer to bits in the register. (Guest can set the S* bits to say what=
+ state
+> > > it wants the i2c lines to become.)
+> > >=20
+> > > > > +        i2c->directcntl |=3D (value & IIC_DIRECTCNTL_SCLC ? 1 : =
+0);
+> > >=20
+> > > This is directcntl[MSCL] =3D direcntl[SCLC] that is, set MSCL bit the=
+ same as
+> > > SCLC, the 1 : 0 here are the value of the bit not the MSCL bit so con=
+stans
+> > > are not appropriate here.
+> >=20
+> > This is what I don't get.  Regardless of the method of it, you *are*
+> > setting bit 1 of the directcntl register, so why would the MSCL name
+> > not be appropriate?
+>=20
+> I'm setting bit 0 (MSCL) to either 1 or 0. I could probably use the MSCL
+> constant in place of the 1 here but would that make it clearer?
 
-thanks
--- PMM
+Yeah, it kinda would.  Instead of the line saying "it sets bit 0 based
+on this" it would say "this sets the MSCL bit based on this" which is
+probably more useful information.  In addition, if someone greps
+looking find everywhere the MSCL bit is manipulated, they'll find it.
+
+> It would
+> just be longer and less clear without looking up the constants so to me t=
+his
+> looks more comprehensible this way.
+>=20
+> > > > > +        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL,
+> > > > > +                        i2c->directcntl & IIC_DIRECTCNTL_MSCL);
+> > >=20
+> > > This lets the bitbang_i2c emulation also know that MSCL is set to 1 o=
+r 0 so
+> > > constant here is OK, previously it was just 1 for brevity which may h=
+ave
+> > > confused you.
+> > >=20
+> > > > > +        i2c->directcntl |=3D bitbang_i2c_set(i2c->bitbang, BITBA=
+NG_I2C_SDA,
+> > > > > +                               (value & IIC_DIRECTCNTL_SDAC) !=
+=3D 0) << 1;
+> > >=20
+> > > This sets MSDA bit of directcntl to the value returned by bitbang_i2c
+> > > emulation when sending it the bit in SDAC. So the
+> > > (value & IIC_DIRECTCNTL_SDAC) !=3D 0)
+> > > tests what value the SDAC bit has so 0 means the value of the bit and
+> > > constant refers to the bit in the register. (Because SDAC is not the =
+LSB and
+> > > we need 1 or 0 here hence the equality test to normalise the value, m=
+aybe
+> > > the !! construct could also be used, I'm not sure.) The << 1 at the e=
+nd
+> > > makes sure we set the MSDA bit but that constant cannot be used here =
+and
+> > > using MSCL instead is not correct because we mean the MSDA bit.
+> >=20
+> > Right, I'm not suggesting you use MSCL here, I'm suggesting you use
+> > MSDA.
+>=20
+> But how? Third arg of bitbang_i2c_set is level, either 0 or 1. How could a
+> constant with value 2 used here? (Also to set bit 1 I have to shift 1 not=
+ 2
+> so I don't see how the constant could be used there either.)
+
+Don't use the shift.
+
+i2c->directcntl |=3D bitbang_i2c_set(i2c->bitmang, BITBANG_I2C_SDA,
+				   !!(value & IIC_DIRECTCNTL_SDAC))
+			? IIC_DIRECTCNTL_MSDA : 0;
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--zPXeIxDajdrcF2en
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlss1B8ACgkQbDjKyiDZ
+s5LgmRAAnS++MRlJNHJ2BFXuGHRPKYvjCJm/Sq41xrGVfMBvkr8kw2b07XgI/8CZ
+9ozPVCJE0LLV8V9FSrUu/S8EFHHZzUanIJbsk8Ze3CPvAZlPaFK6LIdG8ZQsbFzb
+OJL4koQKmP7mU9kOYE0bM0dG2Ko3oR3eI9t7N/yH/TjC53rHBPHHHOsDtFzFa4ZU
+kFl0OkfvPqtGVU6ALLIaz5qTTilLVDRkVgzsrnZgGA7sEl3an0f0ey7ZfvC0wzT5
+CaqdFsu8REN3SYumXXmlYRy7x/K7YaBzfUCmKcu4UjGFXpVSE4ZnVAZKuQlBRceW
+XOT6WuPB7sVKd+3slAy/oMv/u/zgo6Dmb6kXEBot1/lQMcS1xL0Grw7oFcQIkUHB
+oqr/CkkvHWmVlYEoXgVQY7DdLkMESPs6uC6CwS5ZZ2B59IJjJ1tThNgKR6jv3Gax
+/Sxao9AAQVsNPKHfDQaCvqT8O8wKnDzvfAg7TZy8b9y1gdr32N7TUWmRt17iJf+W
+J2XL5cC9gYnTLU52xZXAdpeHrtHHiPp0uQ3esW+z9ruxzhygJ09Itg8WUNemQ1sJ
+CW+aGyEejHX+LYinUGRhCenUQEApNmhkih/mTY+TQyIZ1RF4gfgzetrf0Th+KTxe
+M0PVAFAZfhKjyINvSWLa5AV/7J97Dwz1Zgctq2hiSvv4uLAt9XU=
+=kzb3
+-----END PGP SIGNATURE-----
+
+--zPXeIxDajdrcF2en--
