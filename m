@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46075)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fWHAL-00006b-3r
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:11:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1fWHNF-00030M-78
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:24:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fWHAK-0000EW-0t
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:11:33 -0400
+	(envelope-from <thuth@redhat.com>) id 1fWHNE-0006WT-AM
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:24:53 -0400
 References: <20180621180224.8312-1-f4bug@amsat.org>
-	<20180621180224.8312-4-f4bug@amsat.org>
+	<20180621180224.8312-5-f4bug@amsat.org>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3b263d94-b684-3c59-1c34-62f075ea1c9f@redhat.com>
-Date: Fri, 22 Jun 2018 10:11:23 +0200
+Message-ID: <cbfadf4b-e3ef-e7bc-921b-2926c270f51f@redhat.com>
+Date: Fri, 22 Jun 2018 10:24:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180621180224.8312-4-f4bug@amsat.org>
+In-Reply-To: <20180621180224.8312-5-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/11] hw/dma/omap_dma: Use
- qemu_log_mask(UNIMP) instead of printf
+Subject: Re: [Qemu-devel] [PATCH 04/11] hw/dma/omap_dma: Use
+ qemu_log_mask(GUEST_ERROR) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +31,24 @@ Cc: qemu-trivial@nongnu.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 On 21.06.2018 20:02, Philippe Mathieu-Daud=C3=A9 wrote:
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  hw/dma/omap_dma.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/dma/omap_dma.c b/hw/dma/omap_dma.c
-> index abd18c67ea..ab3a1b0451 100644
-> --- a/hw/dma/omap_dma.c
-> +++ b/hw/dma/omap_dma.c
-> @@ -18,6 +18,7 @@
->   * with this program; if not, see <http://www.gnu.org/licenses/>.
->   */
->  #include "qemu/osdep.h"
-> +#include "qemu/log.h"
->  #include "qemu-common.h"
->  #include "qemu/timer.h"
->  #include "hw/arm/omap.h"
-> @@ -1439,8 +1440,9 @@ static int omap_dma_sys_read(struct omap_dma_s *s=
-, int offset,
->      case 0x480:	/* DMA_PCh0_SR */
->      case 0x482:	/* DMA_PCh1_SR */
->      case 0x4c0:	/* DMA_PChD_SR_0 */
-> -        printf("%s: Physical Channel Status Registers not implemented.=
-\n",
-> -               __func__);
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "%s: Physical Channel Status Registers not imple=
-mented\n",
-> +                      __func__);
->          *ret =3D 0xff;
->          break;
+>  hw/dma/omap_dma.c | 66 ++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 42 insertions(+), 24 deletions(-)
+[...]
+>      case 0x78:	/* DMA4_GCR */
+>          s->gcr =3D value & 0x00ff00ff;
+> -	if ((value & 0xff) =3D=3D 0x00)		/* MAX_CHANNEL_FIFO_DEPTH */
+> -            fprintf(stderr, "%s: wrong FIFO depth in GCR\n", __func__)=
+;
+> +        if ((value & 0xff) =3D=3D 0x00) {
+> +            /* MAX_CHANNEL_FIFO_DEPTH */
+> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: wrong FIFO depth in GC=
+R\n",
+> +                          __func__);
+> +        }
+>          return;
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Not sure, but doesn't that MAX_CHANNEL_FIFO_DEPTH comment rather belong
+to the if-statement than to the print statement? If so, could you please
+leave it at the end of the line?
+
+ Thomas
