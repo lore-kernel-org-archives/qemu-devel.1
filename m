@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fWMwz-0005xY-GF
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:22:10 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fWMx0-0005yO-0t
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:22:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fWMwv-0003Wz-2I
+	(envelope-from <alex.bennee@linaro.org>) id 1fWMwy-0003Zx-O6
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:22:09 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:54620)
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:35869)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fWMwu-0003WH-OX
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:22:04 -0400
-Received: by mail-wm0-x236.google.com with SMTP id o13-v6so2421261wmf.4
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 07:22:04 -0700 (PDT)
+	id 1fWMwy-0003ZG-DJ
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:22:08 -0400
+Received: by mail-wm0-x235.google.com with SMTP id v131-v6so2837145wma.1
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 07:22:08 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 22 Jun 2018 15:12:03 +0100
-Message-Id: <20180622141205.16306-21-alex.bennee@linaro.org>
+Date: Fri, 22 Jun 2018 15:11:56 +0100
+Message-Id: <20180622141205.16306-14-alex.bennee@linaro.org>
 In-Reply-To: <20180622141205.16306-1-alex.bennee@linaro.org>
 References: <20180622141205.16306-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH v4 20/22] risu_reginfo_aarch64: add SVE
- support to reginfo_dump_mismatch
+Subject: [Qemu-devel] [RISU PATCH v4 13/22] risu: move optional args to each
+ architecture
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,233 +33,179 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-We also tweak the justification of the rest of the registers so the :
-lines up nicely across the register dump and diff dump.
+The key variables here are: *arch_long_opts and *arch_extra_help. If
+they are not NULL then we concatenate the extra options to appropriate
+structure to enable the support. Adding architecture short options is
+not supported.
+
+This also includes moving the ARM specific test_fp_exc/test-fp-exc
+into ARM specific code.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
 v2
-  - include ffr in comparison
-  - mild re-factor of preg cmp/diff
-v3
-  - re-factoring
-v4
-  - alignment/justification tweaks
-  - merge chunks from the variable VQ patch
+  - better concatenation of default and extra opts
 ---
- risu_reginfo_aarch64.c | 140 ++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 124 insertions(+), 16 deletions(-)
+ risu.c                 | 29 +++++++++++++++++++++++++----
+ risu.h                 |  6 ++++--
+ risu_reginfo_aarch64.c |  3 +++
+ risu_reginfo_arm.c     | 11 +++++++++++
+ risu_reginfo_m68k.c    |  3 +++
+ risu_reginfo_ppc64.c   |  3 +++
+ 6 files changed, 49 insertions(+), 6 deletions(-)
 
-diff --git a/risu_reginfo_aarch64.c b/risu_reginfo_aarch64.c
-index 79db5dd..bf98ba1 100644
---- a/risu_reginfo_aarch64.c
-+++ b/risu_reginfo_aarch64.c
-@@ -17,6 +17,7 @@
- #include <stdlib.h>
- #include <stddef.h>
- #include <stdbool.h>
-+#include <inttypes.h>
+diff --git a/risu.c b/risu.c
+index c684c90..18de351 100644
+--- a/risu.c
++++ b/risu.c
+@@ -46,8 +46,7 @@ gzFile gz_trace_file;
  
- #include "risu.h"
- #include "risu_reginfo_aarch64.h"
-@@ -146,12 +147,12 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
-         }
+ sigjmp_buf jmpbuf;
  
-         /* Finally the FFR */
--        memcpy(&ri->sve.ffr,(void *)sve + SVE_SIG_FFR_OFFSET(vq),
-+        memcpy(&ri->sve.ffr, (void *)sve + SVE_SIG_FFR_OFFSET(vq),
-                SVE_SIG_FFR_SIZE(vq));
+-/* Should we test for FP exception status bits? */
+-int test_fp_exc;
++#define ARRAY_SIZE(x)	(sizeof(x) / sizeof((x)[0]))
  
-         return;
-     }
--#endif
-+#endif /* SVE_MAGIC */
+ /* Master functions */
  
-     for (i = 0; i < 32; i++) {
-         ri->simd.vregs[i] = fp->vregs[i];
-@@ -164,6 +165,52 @@ int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2)
-     return memcmp(r1, r2, reginfo_size()) == 0;
+@@ -283,6 +282,9 @@ void usage(void)
+     fprintf(stderr,
+             "  -p, --port=PORT   Specify the port to connect to/listen on "
+             "(default 9191)\n");
++    if (arch_extra_help) {
++        fprintf(stderr, "%s", arch_extra_help);
++    }
  }
  
-+#ifdef SVE_MAGIC
-+static int sve_zreg_is_eq(int vq, const void *z1, const void *z2)
-+{
-+    return memcmp(z1, z2, vq * 16) == 0;
-+}
+ struct option * setup_options(char **short_opts)
+@@ -293,12 +295,31 @@ struct option * setup_options(char **short_opts)
+         {"host", required_argument, 0, 'h'},
+         {"port", required_argument, 0, 'p'},
+         {"trace", required_argument, 0, 't'},
+-        {"test-fp-exc", no_argument, &test_fp_exc, 1},
+         {0, 0, 0, 0}
+     };
++    struct option *lopts = &default_longopts[0];
+ 
+     *short_opts = "h:p:t:";
+-    return default_longopts;
 +
-+static int sve_preg_is_eq(int vq, const void *p1, const void *p2)
-+{
-+    return memcmp(p1, p2, vq * 2) == 0;
-+}
++    if (arch_long_opts) {
++        const size_t osize = sizeof(struct option);
++        const int default_count = ARRAY_SIZE(default_longopts);
++        struct option *dptr;
++        int extra_count = 0;
 +
-+static void sve_dump_preg(FILE *f, int vq, const uint16_t *p)
-+{
-+    int q;
-+    for (q = vq - 1; q >= 0; q--) {
-+        fprintf(f, "%04x", p[q]);
++        /* count additional opts */
++        dptr = arch_long_opts;
++        do {} while (dptr[extra_count++].name);
++
++        lopts = calloc(default_count + extra_count, osize);
++
++        /* Copy default opts + extra opts */
++        memcpy(lopts, default_longopts, default_count * osize);
++        dptr = &lopts[default_count - 1];
++        memcpy(dptr, arch_long_opts, extra_count * osize);
 +    }
-+}
 +
-+static void sve_dump_preg_diff(FILE *f, int vq, const uint16_t *p1,
-+                               const uint16_t *p2)
-+{
-+    sve_dump_preg(f, vq, p1);
-+    fprintf(f, " vs ");
-+    sve_dump_preg(f, vq, p2);
-+    fprintf(f, "\n");
-+}
++    return lopts;
+ }
+ 
+ int main(int argc, char **argv)
+diff --git a/risu.h b/risu.h
+index 1c8ecee..89811f4 100644
+--- a/risu.h
++++ b/risu.h
+@@ -17,6 +17,10 @@
+ #include <ucontext.h>
+ #include <stdio.h>
+ 
++/* Extra option processing for architectures */
++extern void *arch_long_opts;
++extern char *arch_extra_help;
 +
-+static void sve_dump_zreg_diff(FILE *f, int vq, const __uint128_t *z1,
-+                               const __uint128_t *z2)
-+{
-+    const char *pad = "";
-+    int q;
+ /* GCC computed include to pull in the correct risu_reginfo_*.h for
+  * the architecture.
+  */
+@@ -36,8 +40,6 @@ void send_response_byte(int sock, int resp);
+ extern uintptr_t image_start_address;
+ extern void *memblock;
+ 
+-extern int test_fp_exc;
+-
+ /* Ops code under test can request from risu: */
+ #define OP_COMPARE 0
+ #define OP_TESTEND 1
+diff --git a/risu_reginfo_aarch64.c b/risu_reginfo_aarch64.c
+index 3bb4339..ab12270 100644
+--- a/risu_reginfo_aarch64.c
++++ b/risu_reginfo_aarch64.c
+@@ -18,6 +18,9 @@
+ #include "risu.h"
+ #include "risu_reginfo_aarch64.h"
+ 
++void *arch_long_opts;
++char *arch_extra_help;
 +
-+    for (q = 0; q < vq; ++q) {
-+        if (z1[q] != z2[q]) {
-+            fprintf(f, "%sq%-2d: %016" PRIx64 "%016" PRIx64
-+                    " vs %016" PRIx64 "%016" PRIx64"\n", pad, q,
-+                    (uint64_t)(z1[q] >> 64), (uint64_t)z1[q],
-+                    (uint64_t)(z2[q] >> 64), (uint64_t)z2[q]);
-+            pad = "      ";
-+        }
-+    }
-+}
-+#endif
-+
- /* reginfo_dump: print state to a stream, returns nonzero on success */
- int reginfo_dump(struct reginfo *ri, FILE * f)
+ /* reginfo_init: initialize with a ucontext */
+ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
  {
-@@ -171,17 +218,47 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
-     fprintf(f, "  faulting insn %08x\n", ri->faulting_insn);
+diff --git a/risu_reginfo_arm.c b/risu_reginfo_arm.c
+index 6b9ee7b..5acad02 100644
+--- a/risu_reginfo_arm.c
++++ b/risu_reginfo_arm.c
+@@ -13,12 +13,23 @@
+ #include <stdio.h>
+ #include <ucontext.h>
+ #include <string.h>
++#include <getopt.h>
  
-     for (i = 0; i < 31; i++) {
--        fprintf(f, "  X%-2d   : %016" PRIx64 "\n", i, ri->regs[i]);
-+        fprintf(f, "  X%-2d    : %016" PRIx64 "\n", i, ri->regs[i]);
-     }
+ #include "risu.h"
+ #include "risu_reginfo_arm.h"
  
--    fprintf(f, "  sp    : %016" PRIx64 "\n", ri->sp);
--    fprintf(f, "  pc    : %016" PRIx64 "\n", ri->pc);
--    fprintf(f, "  flags : %08x\n", ri->flags);
--    fprintf(f, "  fpsr  : %08x\n", ri->fpsr);
--    fprintf(f, "  fpcr  : %08x\n", ri->fpcr);
-+    fprintf(f, "  sp     : %016" PRIx64 "\n", ri->sp);
-+    fprintf(f, "  pc     : %016" PRIx64 "\n", ri->pc);
-+    fprintf(f, "  flags  : %08x\n", ri->flags);
-+    fprintf(f, "  fpsr   : %08x\n", ri->fpsr);
-+    fprintf(f, "  fpcr   : %08x\n", ri->fpcr);
-+
-+#ifdef SVE_MAGIC
-+    if (test_sve) {
-+        int q, vq = test_sve;
-+
-+        fprintf(f, "  vl     : %d\n", ri->sve.vl);
-+
-+        for (i = 0; i < 32; i++) {
-+            fprintf(f, "  Z%-2d q%-2d: %016" PRIx64 "%016" PRIx64 "\n", i, 0,
-+                    (uint64_t)(ri->sve.zregs[i][0] >> 64),
-+                    (uint64_t)ri->sve.zregs[i][0]);
-+            for (q = 1; q < vq; ++q) {
-+                fprintf(f, "      q%-2d: %016" PRIx64 "%016" PRIx64 "\n", q,
-+                        (uint64_t)(ri->sve.zregs[i][q] >> 64),
-+                        (uint64_t)ri->sve.zregs[i][q]);
-+            }
-+        }
-+
-+        for (i = 0; i < 16; i++) {
-+            fprintf(f, "  P%-2d    : ", i);
-+            sve_dump_preg(f, vq, &ri->sve.pregs[i][0]);
-+            fprintf(f, "\n");
-+        }
-+        fprintf(f, "  FFR    : ");
-+        sve_dump_preg(f, vq, &ri->sve.ffr[0]);
-+        fprintf(f, "\n");
-+
-+        return !ferror(f);
-+    }
-+#endif
+ extern int insnsize(ucontext_t *uc);
  
-     for (i = 0; i < 32; i++) {
--        fprintf(f, "  V%-2d   : %016" PRIx64 "%016" PRIx64 "\n", i,
-+        fprintf(f, "  V%-2d    : %016" PRIx64 "%016" PRIx64 "\n", i,
-                 (uint64_t) (ri->simd.vregs[i] >> 64),
-                 (uint64_t) (ri->simd.vregs[i]));
-     }
-@@ -200,36 +277,67 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
-     }
-     for (i = 0; i < 31; i++) {
-         if (m->regs[i] != a->regs[i]) {
--            fprintf(f, "  X%-2d   : %016" PRIx64 " vs %016" PRIx64 "\n",
-+            fprintf(f, "  X%-2d    : %016" PRIx64 " vs %016" PRIx64 "\n",
-                     i, m->regs[i], a->regs[i]);
-         }
-     }
- 
-     if (m->sp != a->sp) {
--        fprintf(f, "  sp    : %016" PRIx64 " vs %016" PRIx64 "\n",
-+        fprintf(f, "  sp     : %016" PRIx64 " vs %016" PRIx64 "\n",
-                 m->sp, a->sp);
-     }
- 
-     if (m->pc != a->pc) {
--        fprintf(f, "  pc    : %016" PRIx64 " vs %016" PRIx64 "\n",
-+        fprintf(f, "  pc     : %016" PRIx64 " vs %016" PRIx64 "\n",
-                 m->pc, a->pc);
-     }
- 
-     if (m->flags != a->flags) {
--        fprintf(f, "  flags : %08x vs %08x\n", m->flags, a->flags);
-+        fprintf(f, "  flags  : %08x vs %08x\n", m->flags, a->flags);
-     }
- 
-     if (m->fpsr != a->fpsr) {
--        fprintf(f, "  fpsr  : %08x vs %08x\n", m->fpsr, a->fpsr);
-+        fprintf(f, "  fpsr   : %08x vs %08x\n", m->fpsr, a->fpsr);
-     }
- 
-     if (m->fpcr != a->fpcr) {
--        fprintf(f, "  fpcr  : %08x vs %08x\n", m->fpcr, a->fpcr);
-+        fprintf(f, "  fpcr   : %08x vs %08x\n", m->fpcr, a->fpcr);
-     }
- 
-+#ifdef SVE_MAGIC
-+    if (test_sve) {
-+        int vq = sve_vq_from_vl(m->sve.vl);
++/* Should we test for FP exception status bits? */
++static int test_fp_exc;
++static struct option extra_opts[] = {
++    {"test-fp-exc", no_argument, &test_fp_exc, 1},
++    {0, 0, 0, 0}
++};
 +
-+        if (m->sve.vl != a->sve.vl) {
-+            fprintf(f, "  vl    : %d vs %d\n", m->sve.vl, a->sve.vl);
-+        }
++void *arch_long_opts = &extra_opts[0];
++char *arch_extra_help = "  --test-fp-exc     Check FP exception bits when comparing\n";
 +
-+        for (i = 0; i < SVE_NUM_ZREGS; i++) {
-+            if (!sve_zreg_is_eq(vq, &m->sve.zregs[i], &a->sve.zregs[i])) {
-+                fprintf(f, "  Z%-2d ", i);
-+                sve_dump_zreg_diff(f, vq, &m->sve.zregs[i][0],
-+                                   &a->sve.zregs[i][0]);
-+            }
-+        }
-+        for (i = 0; i < SVE_NUM_PREGS; i++) {
-+            if (!sve_preg_is_eq(vq, &m->sve.pregs[i], &a->sve.pregs[i])) {
-+                fprintf(f, "  P%-2d    : ", i);
-+                sve_dump_preg_diff(f, vq, &m->sve.pregs[i][0],
-+                                   &a->sve.pregs[i][0]);
-+            }
-+        }
-+        if (!sve_preg_is_eq(vq, &m->sve.ffr, &a->sve.ffr)) {
-+            fprintf(f, "  FFR   : ");
-+            sve_dump_preg_diff(f, vq, &m->sve.pregs[i][0], &a->sve.pregs[i][0]);
-+        }
+ static void reginfo_init_vfp(struct reginfo *ri, ucontext_t *uc)
+ {
+     /* Read VFP registers. These live in uc->uc_regspace, which is
+diff --git a/risu_reginfo_m68k.c b/risu_reginfo_m68k.c
+index 4ff0aa8..d429502 100644
+--- a/risu_reginfo_m68k.c
++++ b/risu_reginfo_m68k.c
+@@ -14,6 +14,9 @@
+ #include "risu.h"
+ #include "risu_reginfo_m68k.h"
+ 
++void *arch_long_opts;
++char *arch_extra_help;
 +
-+        return !ferror(f);
-+    }
-+#endif
+ /* reginfo_init: initialize with a ucontext */
+ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+ {
+diff --git a/risu_reginfo_ppc64.c b/risu_reginfo_ppc64.c
+index 5f33648..395111c 100644
+--- a/risu_reginfo_ppc64.c
++++ b/risu_reginfo_ppc64.c
+@@ -22,6 +22,9 @@
+ #define XER 37
+ #define CCR 38
+ 
++void *arch_long_opts;
++char *arch_extra_help;
 +
-     for (i = 0; i < 32; i++) {
-         if (m->simd.vregs[i] != a->simd.vregs[i]) {
--            fprintf(f, "  V%-2d   : "
-+            fprintf(f, "  V%-2d    : "
-                     "%016" PRIx64 "%016" PRIx64 " vs "
-                     "%016" PRIx64 "%016" PRIx64 "\n", i,
-                     (uint64_t) (m->simd.vregs[i] >> 64),
+ /* reginfo_init: initialize with a ucontext */
+ void reginfo_init(struct reginfo *ri, ucontext_t *uc)
+ {
 -- 
 2.17.1
