@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fWTu6-0005ew-Jr
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:47:39 -0400
+	(envelope-from <loseweigh@gmail.com>) id 1fWTxb-0006fi-0p
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:51:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fWTu3-0003hB-Fv
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:47:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54022 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fWTu3-0003gt-C0
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:47:35 -0400
-Date: Sat, 23 Jun 2018 00:47:33 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180623004404-mutt-send-email-mst@kernel.org>
-References: <20180605152344-mutt-send-email-mst@kernel.org>
-	<a45625c9-d2cd-f8f7-ce31-37c558e70b88@redhat.com>
-	<20180612144743-mutt-send-email-mst@kernel.org>
-	<5718de66-74c9-1362-a87b-2eba02475b48@redhat.com>
-	<c29a5ac9-cfb5-0a19-f28c-30d41bd5efcf@intel.com>
-	<ce4da2b0-88fd-c79b-0567-fe564bb34922@redhat.com>
-	<20180621211359-mutt-send-email-mst@kernel.org>
-	<CADGSJ216itm89dUuK_vOfuBsBq5bq4485GqMKjB1JXFD_PLZxA@mail.gmail.com>
-	<20180622052717-mutt-send-email-mst@kernel.org>
-	<CADGSJ210d358_uyNK9LLw9gpP5uXK6T0h=9mR9ryG7ySkVqvkA@mail.gmail.com>
+	(envelope-from <loseweigh@gmail.com>) id 1fWTxZ-0005dS-TT
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:51:15 -0400
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:56134)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <loseweigh@gmail.com>) id 1fWTxZ-0005d3-Nc
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:51:13 -0400
+Received: by mail-it0-x241.google.com with SMTP id 16-v6so4790641itl.5
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 14:51:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADGSJ210d358_uyNK9LLw9gpP5uXK6T0h=9mR9ryG7ySkVqvkA@mail.gmail.com>
+In-Reply-To: <20180623002628-mutt-send-email-mst@kernel.org>
+References: <20180619233001-mutt-send-email-mst@kernel.org>
+	<20180620115359.1a3bf6fb.cohuck@redhat.com>
+	<20180620170904-mutt-send-email-mst@kernel.org>
+	<20180620180619.6b4ee52d.cohuck@redhat.com>
+	<20180620224535-mutt-send-email-mst@kernel.org>
+	<20180621165913.7e3f4faa.cohuck@redhat.com>
+	<CADGSJ22B39JiS14L0yCYQ720-fZcwyUt1wCX1YO-6Y9FhmDKZg@mail.gmail.com>
+	<20180622053141-mutt-send-email-mst@kernel.org>
+	<CADGSJ23SBEFJCD50K-F-Gt86Q1-i_6iHTmSSjdXDzNnnpWZ_oQ@mail.gmail.com>
+	<CADGSJ22nLcz_XaJNzUUdpjQaJY8b5wZs=ohm=B7c2qf2K7_yGA@mail.gmail.com>
+	<20180623002628-mutt-send-email-mst@kernel.org>
+From: Siwei Liu <loseweigh@gmail.com>
+Date: Fri, 22 Jun 2018 14:51:11 -0700
+Message-ID: <CADGSJ20td7b6He6S1PBSJjCq=bNvgqMGbOjiho2eeQm2pgpK3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
  VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
@@ -36,48 +38,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Siwei Liu <loseweigh@gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, "Samudrala,
+	Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-On Fri, Jun 22, 2018 at 12:43:26PM -0700, Siwei Liu wrote:
-> > The semantics are that the primary is always used if present in
-> > preference to standby.
-> OK. If this is the only semantics of what "standby" refers to in
-> general, that is fine.
-> 
-> I just don't want to limit the failover/standby semantics to the
-> device model specifics, the "accelerated datapath" thing or whatever.
-> I really don't know where the requirements of the "accelerated
-> datapath" came from,
+On Fri, Jun 22, 2018 at 2:29 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Fri, Jun 22, 2018 at 01:03:04PM -0700, Siwei Liu wrote:
+>> On Fri, Jun 22, 2018 at 1:00 PM, Siwei Liu <loseweigh@gmail.com> wrote:
+>> > On Thu, Jun 21, 2018 at 7:32 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+>> >> On Thu, Jun 21, 2018 at 06:21:55PM -0700, Siwei Liu wrote:
+>> >>> On Thu, Jun 21, 2018 at 7:59 AM, Cornelia Huck <cohuck@redhat.com> wrote:
+>> >>> > On Wed, 20 Jun 2018 22:48:58 +0300
+>> >>> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>> >>> >
+>> >>> >> On Wed, Jun 20, 2018 at 06:06:19PM +0200, Cornelia Huck wrote:
+>> >>> >> > In any case, I'm not sure anymore why we'd want the extra uuid.
+>> >>> >>
+>> >>> >> It's mostly so we can have e.g. multiple devices with same MAC
+>> >>> >> (which some people seem to want in order to then use
+>> >>> >> then with different containers).
+>> >>> >>
+>> >>> >> But it is also handy for when you assign a PF, since then you
+>> >>> >> can't set the MAC.
+>> >>> >>
+>> >>> >
+>> >>> > OK, so what about the following:
+>> >>> >
+>> >>> > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
+>> >>> >   that we have a new uuid field in the virtio-net config space
+>> >>> > - in QEMU, add a property for virtio-net that allows to specify a uuid,
+>> >>> >   offer VIRTIO_NET_F_STANDBY_UUID if set
+>> >>> > - when configuring, set the property to the group UUID of the vfio-pci
+>> >>> >   device
+>> >>>
+>> >>> If feature negotiation fails on VIRTIO_NET_F_STANDBY_UUID, is it safe
+>> >>> to still expose UUID in the config space on virtio-pci?
+>> >>
+>> >>
+>> >> Yes but guest is not supposed to read it.
+>> >>
+>> >>> I'm not even sure if it's sane to expose group UUID on the PCI bridge
+>> >>> where the corresponding vfio-pci device attached to for a guest which
+>> >>> doesn't support the feature (legacy).
+>> >>>
+>> >>> -Siwei
+>> >>
+>> >> Yes but you won't add the primary behind such a bridge.
+>> >
+>> > I assume the UUID feature is a new one besides the exiting
+>> > VIRTIO_NET_F_STANDBY feature, where I think the current proposal is,
+>> > if UUID feature is present and supported by guest, we'll do pairing
+>> > based on UUID; if UUID feature present
+>>                                  ^^^^^^^  is NOT present
+>
+> Let's go back for a bit.
+>
+> What is wrong with matching by mac?
+>
+> 1. Does not allow multiple NICs with same mac
+> 2. Requires MAC to be programmed by host in the PT device
+>    (which is often possible with VFs but isn't possible with all PT
+>    devices)
 
-It's a way to put it that matches what failover actually provides.
+Might not neccessarily be something wrong, but it's very limited to
+prohibit the MAC of VF from changing when enslaved by failover. The
+same as you indicated on the PT device. I suspect the same is
+prohibited on even virtio-net and failover is because of the same
+limitation.
 
-> as the originial problem is migrating vfio
-> devices which is in match of QEMU's live migration model.
+>
+> Both issues are up to host: if host needs them it needs the UUID
+> feature, if not MAC matching is sufficient.
 
-If you put it this way then it's natural to require that we have a
-config with a working vfio device, and that we somehow add virtio for
-duration of migration.
+I know. What I'm saying is that we rely on STANDBY feature to control
+the visibility of the primary, not the UUID feature.
 
-> Hyper-V has
-> it's limitation to do 1-netdev should not impact how KVM/QEMU should
-> be doing it.
+-Siwei
 
-That's a linux thing and pretty orthogonal to host/guest interface.
-
-> > Jason said virtio net is sometimes preferable.
-> > If that's the case don't make it a standby.
-> >
-> > More advanced use-cases do exist and e.g. Alexander Duyck
-> > suggested using a switch-dev.
-> 
-> The switchdev case would need a new feature bit, right?
-> 
-> -Siwei
-
-I think it would need to be a completely new device.
-
-> > failover isn't it though.
-> >
-> > --
-> > MST
+>
+>
+>> > or not supported by guest,
+>> > we'll still plug in the VF (if guest supports the _F_STANDBY feature)
+>> > but the pairing will be fallback to using MAC address. Are you saying
+>> > you don't even want to plug in the primary when the UUID feature is
+>> > not supported by guest? Does the feature negotiation UUID have to
+>> > depend on STANDBY being set, or the other way around? I thought that
+>> > just the absence of STANDBY will prevent primary to get exposed to the
+>> > guest.
+>> >
+>> > -Siwei
+>> >
+>> >>
+>> >>>
+>> >>> > - in the guest, use the uuid from the virtio-net device's config space
+>> >>> >   if applicable; else, fall back to matching by MAC as done today
+>
