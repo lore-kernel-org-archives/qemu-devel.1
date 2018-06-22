@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Aleksandar.Markovic@mips.com>) id 1fWMPk-0003Oa-Di
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:47:49 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fWMQS-0003tI-HZ
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:48:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Aleksandar.Markovic@mips.com>) id 1fWMPg-0006m7-H7
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:47:48 -0400
-Received: from 9pmail.ess.barracuda.com ([64.235.154.210]:52317)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Aleksandar.Markovic@mips.com>)
-	id 1fWMPg-0006iv-7V
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:47:44 -0400
-From: Aleksandar Markovic <Aleksandar.Markovic@mips.com>
-Date: Fri, 22 Jun 2018 13:47:31 +0000
-Message-ID: <d35499a67a0a4c11851d1debe9987e52@mips.com>
-References: <20180620120620.12806-1-yongbok.kim@mips.com>,
-	<20180620120620.12806-34-yongbok.kim@mips.com>
-In-Reply-To: <20180620120620.12806-34-yongbok.kim@mips.com>
-Content-Language: en-US
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fWMQR-0007Re-GC
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:48:32 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180622134036.23182-1-f4bug@amsat.org>
+	<20180622134036.23182-9-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <31db6cdd-48f6-746e-3c5d-38925b43f81b@amsat.org>
+Date: Fri, 22 Jun 2018 10:48:17 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 33/35] target/mips: Fix gdbstub to
- read/write 64 bit FP registers
+In-Reply-To: <20180622134036.23182-9-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/14] hw/arm/omap1: Use
+ qemu_log_mask(GUEST_ERROR) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +29,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongbok Kim <Yongbok.Kim@mips.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, James Hogan <James.Hogan@mips.com>, Paul Burton <Paul.Burton@mips.com>, Matthew Fortune <Matthew.Fortune@mips.com>, Stefan Markovic <Stefan.Markovic@mips.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
 
-> From: Yongbok Kim <yongbok.kim@imgtec.com>
->
-> Fix gdbstub to read/write 64 bit FP registers
->
-> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+On 06/22/2018 10:40 AM, Philippe Mathieu-Daudé wrote:
+> TCMI_VERBOSE is no more used, drop the OMAP_8/16/32B_REG macros.
+> 
 
-Reviewed-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
+Oh and eventually:
 
+Suggested-by: Thomas Huth <thuth@redhat.com>
+
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  target/mips/gdbstub.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/target/mips/gdbstub.c b/target/mips/gdbstub.c
-> index 6d1fb70..18e0e6d 100644
-> --- a/target/mips/gdbstub.c
-> +++ b/target/mips/gdbstub.c
-> @@ -39,7 +39,7 @@ int mips_cpu_gdb_read_register(CPUState *cs, uint8_t *m=
-em_buf, int n)
->              return gdb_get_regl(mem_buf, (int32_t)env->active_fpu.fcr0);
->          default:
->              if (env->CP0_Status & (1 << CP0St_FR)) {
-> -                return gdb_get_regl(mem_buf,
-> +                return gdb_get_reg64(mem_buf,
->                      env->active_fpu.fpr[n - 38].d);
->              } else {
->                  return gdb_get_regl(mem_buf,
-> @@ -100,6 +100,7 @@ int mips_cpu_gdb_write_register(CPUState *cs, uint8_t=
- *mem_buf, int n)
->              break;
->          default:
->              if (env->CP0_Status & (1 << CP0St_FR)) {
-> +                uint64_t tmp =3D ldq_p(mem_buf);
->                  env->active_fpu.fpr[n - 38].d =3D tmp;
->              } else {
->                  env->active_fpu.fpr[n - 38].w[FP_ENDIAN_IDX] =3D tmp;
-> --
-> 1.9.1
+>  include/hw/arm/omap.h | 18 ------------------
+>  hw/arm/omap1.c        | 18 ++++++++++++------
+>  2 files changed, 12 insertions(+), 24 deletions(-)
+> 
+> diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
+> index b398607b06..39abba753d 100644
+> --- a/include/hw/arm/omap.h
+> +++ b/include/hw/arm/omap.h
+> @@ -993,24 +993,6 @@ enum {
+>  #define OMAP_GPIOSW_INVERTED	0x0001
+>  #define OMAP_GPIOSW_OUTPUT	0x0002
+>  
+> -# define TCMI_VERBOSE			1
+> -
+> -# ifdef TCMI_VERBOSE
+> -#  define OMAP_8B_REG(paddr)		\
+> -        fprintf(stderr, "%s: 8-bit register " OMAP_FMT_plx "\n",	\
+> -                        __func__, paddr)
+> -#  define OMAP_16B_REG(paddr)		\
+> -        fprintf(stderr, "%s: 16-bit register " OMAP_FMT_plx "\n",	\
+> -                        __func__, paddr)
+> -#  define OMAP_32B_REG(paddr)		\
+> -        fprintf(stderr, "%s: 32-bit register " OMAP_FMT_plx "\n",	\
+> -                        __func__, paddr)
+> -# else
+> -#  define OMAP_8B_REG(paddr)
+> -#  define OMAP_16B_REG(paddr)
+> -#  define OMAP_32B_REG(paddr)
+> -# endif
+> -
+>  # define OMAP_MPUI_REG_MASK		0x000007ff
+>  
+>  #endif /* hw_omap_h */
+> diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+> index 9af04728e3..539d29ef9c 100644
+> --- a/hw/arm/omap1.c
+> +++ b/hw/arm/omap1.c
+> @@ -34,12 +34,18 @@
+>  #include "qemu/cutils.h"
+>  #include "qemu/bcd.h"
+>  
+> +static inline void omap_log_badwidth(const char *funcname, hwaddr addr, int sz)
+> +{
+> +    qemu_log_mask(LOG_GUEST_ERROR, "%s: %d-bit register %#08" HWADDR_PRIx "\n",
+> +                  funcname, sz << 2, addr);
+> +}
+> +
+>  /* Should signal the TCMI/GPMC */
+>  uint32_t omap_badwidth_read8(void *opaque, hwaddr addr)
+>  {
+>      uint8_t ret;
+>  
+> -    OMAP_8B_REG(addr);
+> +    omap_log_badwidth(__func__, addr, 1);
+>      cpu_physical_memory_read(addr, &ret, 1);
+>      return ret;
+>  }
+> @@ -49,7 +55,7 @@ void omap_badwidth_write8(void *opaque, hwaddr addr,
+>  {
+>      uint8_t val8 = value;
+>  
+> -    OMAP_8B_REG(addr);
+> +    omap_log_badwidth(__func__, addr, 1);
+>      cpu_physical_memory_write(addr, &val8, 1);
+>  }
+>  
+> @@ -57,7 +63,7 @@ uint32_t omap_badwidth_read16(void *opaque, hwaddr addr)
+>  {
+>      uint16_t ret;
+>  
+> -    OMAP_16B_REG(addr);
+> +    omap_log_badwidth(__func__, addr, 2);
+>      cpu_physical_memory_read(addr, &ret, 2);
+>      return ret;
+>  }
+> @@ -67,7 +73,7 @@ void omap_badwidth_write16(void *opaque, hwaddr addr,
+>  {
+>      uint16_t val16 = value;
+>  
+> -    OMAP_16B_REG(addr);
+> +    omap_log_badwidth(__func__, addr, 2);
+>      cpu_physical_memory_write(addr, &val16, 2);
+>  }
+>  
+> @@ -75,7 +81,7 @@ uint32_t omap_badwidth_read32(void *opaque, hwaddr addr)
+>  {
+>      uint32_t ret;
+>  
+> -    OMAP_32B_REG(addr);
+> +    omap_log_badwidth(__func__, addr, 4);
+>      cpu_physical_memory_read(addr, &ret, 4);
+>      return ret;
+>  }
+> @@ -83,7 +89,7 @@ uint32_t omap_badwidth_read32(void *opaque, hwaddr addr)
+>  void omap_badwidth_write32(void *opaque, hwaddr addr,
+>                  uint32_t value)
+>  {
+> -    OMAP_32B_REG(addr);
+> +    omap_log_badwidth(__func__, addr, 4);
+>      cpu_physical_memory_write(addr, &value, 4);
+>  }
+>  
+> 
