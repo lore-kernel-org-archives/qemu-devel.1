@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDd2-0007ld-0p
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDcz-0007is-S4
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDd0-0003c5-K3
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:55 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDcx-0003a0-PS
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:53 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 22 Jun 2018 14:24:28 +1000
-Message-Id: <20180622042437.14259-14-david@gibson.dropbear.id.au>
+Date: Fri, 22 Jun 2018 14:24:31 +1000
+Message-Id: <20180622042437.14259-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20180622042437.14259-1-david@gibson.dropbear.id.au>
 References: <20180622042437.14259-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 14/23] sm501: Fix hardware cursor color
- conversion
+Subject: [Qemu-devel] [PATCH 17/23] target/ppc: Add missing opcode for icbt
+ on PPC440
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,41 +21,33 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sebastian Bauer <mail@sebastianbauer.info>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Sebastian Bauer <mail@sebastianbauer.info>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-According to the sm501 specs the hardware cursor colors are to be given in
-the rgb565 format, but the code currently interprets them as bgr565.
+According to PPC440 User Manual PPC440 has multiple opcodes for icbt
+instruction: one for compatibility with older cores and two 440
+specific opcodes one of which is defined in BookE. QEMU only
+implements two of these, add the missing one.
 
-Therefore, the colors of the hardware cursors are wrong in the QEMU
-display, e.g., the standard mouse pointer of AmigaOS appears blue instead
-of red. This change fixes this issue by replacing the existing naive
-bgr565 => rgb888 conversion with a standard rgb565 => rgb888 one that also
-scales the color component values properly.
-
-Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/display/sm501.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ target/ppc/translate.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index ca0840f6fa..8206ae81a1 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -652,9 +652,9 @@ static inline void get_hwc_palette(SM501State *state, int crt, uint8_t *palette)
-         } else {
-             rgb565 = color_reg & 0xFFFF;
-         }
--        palette[i * 3 + 0] = (rgb565 << 3) & 0xf8; /* red */
--        palette[i * 3 + 1] = (rgb565 >> 3) & 0xfc; /* green */
--        palette[i * 3 + 2] = (rgb565 >> 8) & 0xf8; /* blue */
-+        palette[i * 3 + 0] = ((rgb565 >> 11) * 527 + 23) >> 6; /* r */
-+        palette[i * 3 + 1] = (((rgb565 >> 5) & 0x3f) * 259 + 33) >> 6; /* g */
-+        palette[i * 3 + 2] = ((rgb565 & 0x1f) * 527 + 23) >> 6; /* b */
-     }
- }
- 
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 5fe1ba6555..3a215a1dc6 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -6707,6 +6707,8 @@ GEN_HANDLER_E(mbar, 0x1F, 0x16, 0x1a, 0x001FF801,
+ GEN_HANDLER(msync_4xx, 0x1F, 0x16, 0x12, 0x03FFF801, PPC_BOOKE),
+ GEN_HANDLER2_E(icbt_440, "icbt", 0x1F, 0x16, 0x00, 0x03E00001,
+                PPC_BOOKE, PPC2_BOOKE206),
++GEN_HANDLER2(icbt_440, "icbt", 0x1F, 0x06, 0x08, 0x03E00001,
++               PPC_440_SPEC),
+ GEN_HANDLER(lvsl, 0x1f, 0x06, 0x00, 0x00000001, PPC_ALTIVEC),
+ GEN_HANDLER(lvsr, 0x1f, 0x06, 0x01, 0x00000001, PPC_ALTIVEC),
+ GEN_HANDLER(mfvscr, 0x04, 0x2, 0x18, 0x001ff800, PPC_ALTIVEC),
 -- 
 2.17.1
