@@ -1,32 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWDVS-00065f-QH
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:17:07 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDcv-0007gf-Gl
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWDVP-0001HE-KY
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:17:06 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:42525)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWDVP-0001H6-DJ
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:17:03 -0400
-Received: by mail-qk0-x243.google.com with SMTP id u62-v6so507865qkf.9
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 21:17:03 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180620120620.12806-1-yongbok.kim@mips.com>
-	<20180620120620.12806-23-yongbok.kim@mips.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7eb9338c-75df-840a-c53c-5c65314a711c@amsat.org>
-Date: Fri, 22 Jun 2018 01:16:53 -0300
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDcu-0003Xq-Eu
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:49 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri, 22 Jun 2018 14:24:20 +1000
+Message-Id: <20180622042437.14259-6-david@gibson.dropbear.id.au>
+In-Reply-To: <20180622042437.14259-1-david@gibson.dropbear.id.au>
+References: <20180622042437.14259-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20180620120620.12806-23-yongbok.kim@mips.com>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="eKd2bCRWoDiPqJl8L46vgRPDbCLE2pP9R"
-Subject: Re: [Qemu-devel] [PATCH 22/35] target/mips: Fix data type for offset
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 06/23] ppc/pnv: consolidate the creation of the
+ ISA bus device tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,105 +23,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongbok Kim <yongbok.kim@mips.com>, qemu-devel@nongnu.org
-Cc: Aleksandar.Markovic@mips.com, Paul.Burton@mips.com, Stefan.Markovic@mips.com, Matthew.Fortune@mips.com, James.Hogan@mips.com, aurelien@aurel32.net, Richard Henderson <rth@twiddle.net>
+To: peter.maydell@linaro.org
+Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---eKd2bCRWoDiPqJl8L46vgRPDbCLE2pP9R
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: Yongbok Kim <yongbok.kim@mips.com>, qemu-devel@nongnu.org
-Cc: Aleksandar.Markovic@mips.com, Paul.Burton@mips.com,
- Stefan.Markovic@mips.com, Matthew.Fortune@mips.com, James.Hogan@mips.com,
- aurelien@aurel32.net, Richard Henderson <rth@twiddle.net>
-Message-ID: <7eb9338c-75df-840a-c53c-5c65314a711c@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH 22/35] target/mips: Fix data type for offset
-References: <20180620120620.12806-1-yongbok.kim@mips.com>
- <20180620120620.12806-23-yongbok.kim@mips.com>
-In-Reply-To: <20180620120620.12806-23-yongbok.kim@mips.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-On 06/20/2018 09:06 AM, Yongbok Kim wrote:
-> From: Yongbok Kim <yongbok.kim@imgtec.com>
->=20
-> Offset can be larger than 16 bit from nanoMIPS,
-> and immediate field can be larger than 16 bits as well.
->=20
-> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+The device tree node of the ISA bus was being partially done in
+different places. Move all the nodes creation under the same routine.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/pnv.c | 51 +++++++++++++++++++++++----------------------------
+ 1 file changed, 23 insertions(+), 28 deletions(-)
 
-> ---
->  target/mips/translate.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->=20
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 9e29dd7..8c20ba3 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -2114,7 +2114,7 @@ OP_ST_ATOMIC(scd,st64,ld64,0x7);
->  #undef OP_ST_ATOMIC
-> =20
->  static void gen_base_offset_addr (DisasContext *ctx, TCGv addr,
-> -                                  int base, int16_t offset)
-> +                                  int base, int offset)
->  {
->      if (base =3D=3D 0) {
->          tcg_gen_movi_tl(addr, offset);
-> @@ -2142,7 +2142,7 @@ static target_ulong pc_relative_pc (DisasContext =
-*ctx)
-> =20
->  /* Load */
->  static void gen_ld(DisasContext *ctx, uint32_t opc,
-> -                   int rt, int base, int16_t offset)
-> +                   int rt, int base, int offset)
->  {
->      TCGv t0, t1, t2;
->      int mem_idx =3D ctx->mem_idx;
-> @@ -2377,7 +2377,7 @@ static void gen_llwp(DisasContext *ctx, uint32_t =
-base, int16_t offset,
-> =20
->  /* Store */
->  static void gen_st (DisasContext *ctx, uint32_t opc, int rt,
-> -                    int base, int16_t offset)
-> +                    int base, int offset)
->  {
->      TCGv t0 =3D tcg_temp_new();
->      TCGv t1 =3D tcg_temp_new();
-> @@ -2602,7 +2602,7 @@ static void gen_cop1_ldst(DisasContext *ctx, uint=
-32_t op, int rt,
-> =20
->  /* Arithmetic with immediate operand */
->  static void gen_arith_imm(DisasContext *ctx, uint32_t opc,
-> -                          int rt, int rs, int16_t imm)
-> +                          int rt, int rs, int imm)
->  {
->      target_ulong uimm =3D (target_long)imm; /* Sign extend to 32/64 bi=
-ts */
-> =20
->=20
-
-
---eKd2bCRWoDiPqJl8L46vgRPDbCLE2pP9R
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlsseDUACgkQ4+MsLN6t
-wN4Q+A/+ITa9aAGbIX/SIz12s5zGfYkr1DX5UAHyJ9OjV/6R26yNRM7QFrlMm+hJ
-7hSLAyIZuDc99XeES+kmfgRthQ0FSe/J430BPocW4fAIlymV0/ezWZVR5CNS9Vmv
-QACy4F/6Y9EYca6JLrWZrQuVCceTK7FCAnsXoWWH1Mwc1RIsv18VVQ8N0nhApncc
-Zt3b2ufcXcfZRK6167a8GNjYl7QrGpGaW2qGnztIGZlv9Y0g61a5ezsBAr2XplHX
-9XJDz+Ej5NjILdD5ruTVV3U+hVuzXAyIxnN6GJg8Zx5izTVKwQOckWmSyGIWMv6E
-JMAXIMw4Dif9ZpkJ66shBT3Y5JbIHVrr1E+XLAK++7DQ2tQSgMERM8kRbFyfD7Vh
-zKzvWo2VfFyxP6ntPpHb7juLR+N1bTmdIjNi8h18nM3RlBNbHGF8FVtsl8PpcXqx
-EVXDXVt93xWJ2Y44lJRtZB7TH02zFwXVKXKAJ4xqkBwQCMmyneBz9CCn2Px1JRSX
-CmnAfD3UbV3thpabd5nMbg4uDRUGGn4mx17vCb9UVjKBMBf2V9q5HlGzKhWoEcXh
-KB46cMnk94Qedd8IFI+iD84anze4L2wphWFbVyNlBU0qNJm/zckaYhK2e4sdxWJF
-RFGUm2g24XoGADpPjpBTravNsWEjts+Cc5Pf5sxZ6dcDCV+Vi1M=
-=c/86
------END PGP SIGNATURE-----
-
---eKd2bCRWoDiPqJl8L46vgRPDbCLE2pP9R--
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index a29ea996b4..7401ffe5b0 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -265,18 +265,6 @@ static void pnv_dt_icp(PnvChip *chip, void *fdt, uin=
+t32_t pir,
+     g_free(reg);
+ }
+=20
+-static int pnv_chip_lpc_offset(PnvChip *chip, void *fdt)
+-{
+-    char *name;
+-    int offset;
+-
+-    name =3D g_strdup_printf("/xscom@%" PRIx64 "/isa@%x",
+-                           (uint64_t) PNV_XSCOM_BASE(chip), PNV_XSCOM_LP=
+C_BASE);
+-    offset =3D fdt_path_offset(fdt, name);
+-    g_free(name);
+-    return offset;
+-}
+-
+ static void pnv_dt_chip(PnvChip *chip, void *fdt)
+ {
+     const char *typename =3D pnv_chip_core_typename(chip);
+@@ -285,16 +273,6 @@ static void pnv_dt_chip(PnvChip *chip, void *fdt)
+=20
+     pnv_dt_xscom(chip, fdt, 0);
+=20
+-    /* The default LPC bus of a multichip system is on chip 0. It's
+-     * recognized by the firmware (skiboot) using a "primary"
+-     * property.
+-     */
+-    if (chip->chip_id =3D=3D 0x0) {
+-        int lpc_offset =3D pnv_chip_lpc_offset(chip, fdt);
+-
+-        _FDT((fdt_setprop(fdt, lpc_offset, "primary", NULL, 0)));
+-    }
+-
+     for (i =3D 0; i < chip->nr_cores; i++) {
+         PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
+=20
+@@ -418,16 +396,35 @@ static int pnv_dt_isa_device(DeviceState *dev, void=
+ *opaque)
+     return 0;
+ }
+=20
+-static void pnv_dt_isa(ISABus *bus, void *fdt, int lpc_offset)
++static int pnv_chip_isa_offset(PnvChip *chip, void *fdt)
++{
++    char *name;
++    int offset;
++
++    name =3D g_strdup_printf("/xscom@%" PRIx64 "/isa@%x",
++                           (uint64_t) PNV_XSCOM_BASE(chip), PNV_XSCOM_LP=
+C_BASE);
++    offset =3D fdt_path_offset(fdt, name);
++    g_free(name);
++    return offset;
++}
++
++/* The default LPC bus of a multichip system is on chip 0. It's
++ * recognized by the firmware (skiboot) using a "primary" property.
++ */
++static void pnv_dt_isa(PnvMachineState *pnv, void *fdt)
+ {
++    int isa_offset =3D pnv_chip_isa_offset(pnv->chips[0], fdt);
+     ForeachPopulateArgs args =3D {
+         .fdt =3D fdt,
+-        .offset =3D lpc_offset,
++        .offset =3D isa_offset,
+     };
+=20
++    _FDT((fdt_setprop(fdt, isa_offset, "primary", NULL, 0)));
++
+     /* ISA devices are not necessarily parented to the ISA bus so we
+      * can not use object_child_foreach() */
+-    qbus_walk_children(BUS(bus), pnv_dt_isa_device, NULL, NULL, NULL, &a=
+rgs);
++    qbus_walk_children(BUS(pnv->isa_bus), pnv_dt_isa_device, NULL, NULL,=
+ NULL,
++                       &args);
+ }
+=20
+ static void *pnv_dt_create(MachineState *machine)
+@@ -438,7 +435,6 @@ static void *pnv_dt_create(MachineState *machine)
+     char *buf;
+     int off;
+     int i;
+-    int lpc_offset;
+=20
+     fdt =3D g_malloc0(FDT_MAX_SIZE);
+     _FDT((fdt_create_empty_tree(fdt, FDT_MAX_SIZE)));
+@@ -480,8 +476,7 @@ static void *pnv_dt_create(MachineState *machine)
+     }
+=20
+     /* Populate ISA devices on chip 0 */
+-    lpc_offset =3D pnv_chip_lpc_offset(pnv->chips[0], fdt);
+-    pnv_dt_isa(pnv->isa_bus, fdt, lpc_offset);
++    pnv_dt_isa(pnv, fdt);
+=20
+     if (pnv->bmc) {
+         pnv_dt_bmc_sensors(pnv->bmc, fdt);
+--=20
+2.17.1
