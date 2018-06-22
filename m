@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fWMfw-0008Uh-2U
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:04:33 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fWMkC-0003KQ-G3
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:08:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fWMfs-00041V-T1
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:04:32 -0400
-Resent-Message-Id: <E1fWMfs-00041V-T1@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21070)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fWMfs-00041K-Jc
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:04:28 -0400
-In-Reply-To: <1529663827-28854-1-git-send-email-hongbo.zhang@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152967353172.876.8679943897946809404@d39dc562802a>
+	(envelope-from <peter.maydell@linaro.org>) id 1fWMkB-00052C-82
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:08:56 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:39605)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fWMkB-00051z-1Q
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:08:55 -0400
+Received: by mail-ot0-x244.google.com with SMTP id l15-v6so7614754oth.6
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 07:08:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 22 Jun 2018 06:18:52 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: fix psci conduit in acpi when
- el3 enabled
+In-Reply-To: <20180622135045.GD12424@codeaurora.org>
+References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
+	<1523997485-1905-4-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA_g1Bb=-cj+QToHDypZPiqw_U5YioRWfDSs0Ano3PqDTQ@mail.gmail.com>
+	<20180622135045.GD12424@codeaurora.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 15:08:33 +0100
+Message-ID: <CAFEAcA_EEXRQQjXDsei0Y6mQB6EVTtJB5=EFHFsT7kbZk5iv6Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v4 03/21] target/arm: Reorganize PMCCNTR
+ accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,33 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: hongbo.zhang@linaro.org
-Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Aaron Lindsay <alindsay@codeaurora.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1Mjk2NjM4MjctMjg4NTQtMS1naXQtc2VuZC1lbWFpbC1ob25nYm8uemhhbmdA
-bGluYXJvLm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBody9hcm0vdmlydDogZml4
-IHBzY2kgY29uZHVpdCBpbiBhY3BpIHdoZW4gZWwzIGVuYWJsZWQKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
-bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cg
-LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
-IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
-JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
-ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMzE3YTBjYzg0NyBody9h
-cm0vdmlydDogZml4IHBzY2kgY29uZHVpdCBpbiBhY3BpIHdoZW4gZWwzIGVuYWJsZWQKCj09PSBP
-VVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogaHcvYXJtL3ZpcnQ6IGZpeCBwc2Np
-IGNvbmR1aXQgaW4gYWNwaSB3aGVuIGVsMyBlbmFibGVkLi4uCkVSUk9SOiB0cmFpbGluZyB3aGl0
-ZXNwYWNlCiMyNzogRklMRTogaHcvYXJtL3ZpcnQtYWNwaS1idWlsZC5jOjcyMToKKyAgICAgICAg
-ICovICQKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTIgbGluZXMgY2hlY2tlZAoKWW91
-ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 22 June 2018 at 14:50, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> On Apr 20 11:17, Peter Maydell wrote:
+>> On 17 April 2018 at 21:37, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+>> > pmccntr_read and pmccntr_write contained duplicate code that was already
+>> > being handled by pmccntr_sync. Consolidate the duplicated code into two
+>> > functions: pmccntr_op_start and pmccntr_op_finish. Add a companion to
+>> > c15_ccnt in CPUARMState so that we can simultaneously save both the
+>> > architectural register value and the last underlying cycle count - this
+>> > ensure time isn't lost and will also allow us to access the 'old'
+>> > architectural register value in order to detect overflows in later
+>> > patches.
+>> >
+>> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
+
+>> > -        /* If the counter is enabled, this stores the last time the counter
+>> > -         * was reset. Otherwise it stores the counter value
+>> > +        /* Stores the architectural value of the counter *the last time it was
+>> > +         * updated* by pmccntr_op_start. Accesses should always be surrounded
+>> > +         * by pmccntr_op_start/pmccntr_op_finish to guarantee the latest
+>> > +         * architecturally-corect value is being read/set.
+>> >           */
+>> >          uint64_t c15_ccnt;
+>> > +        /* Stores the delta between the architectural value and the underlying
+>> > +         * cycle count during normal operation. It is used to update c15_ccnt
+>> > +         * to be the correct architectural value before accesses. During
+>> > +         * accesses, c15_ccnt_delta contains the underlying count being used
+>> > +         * for the access, after which it reverts to the delta value in
+>> > +         * pmccntr_op_finish.
+>> > +         */
+>> > +        uint64_t c15_ccnt_delta;
+>>
+>> So the key question here is: how does this work for VM migration?
+>
+> To be honest, I'm not sure I fully understand the things I need to be
+> looking out for with VM migration.
+>
+> My guess, though, is that this current implementation is not sufficient.
+> Perhaps there needs to be logic to ensure that c15_ccnt is the current
+> architectural value before migration and also to setup c15_ccnt_delta to
+> be the delta between that architectural value and the underlying cycle
+> count upon inbound migration. Does that sound like an approach which
+> would fit well within the rest of the migration framework?
+
+You need to deal with two different situations:
+ (1) migration from an older QEMU which doesn't have this patchset
+ (2) migration from a QEMU with this patchset to one with this patchset
+
+Either:
+ (a) all the architectural state can be expressed in our existing
+state fields in whatever the previous format was -- in this case
+you just need to ensure that cpu_pre_save() and cpu_post_load()
+put the state there and unpack it again
+ (b) we were missing some architectural state and really do need
+to transfer more over the wire than we were before -- in this case
+you need to add a new subsection to the vmstate which has the fields
+that contain that new state, and give the subsection a suitable 'needed'
+function to indicate when the subsection should be transferred plus
+pre_load and post_load functions that allow us to cope correctly with
+the case of the older QEMU that doesn't send the subsection.
+
+thanks
+-- PMM
