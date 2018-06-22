@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59733)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59802)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWMJH-00068I-QA
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:41:09 -0400
+	id 1fWMJK-0006BT-ID
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:41:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWMJG-0003Qd-Rf
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:41:07 -0400
+	id 1fWMJJ-0003Vc-NZ
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:41:10 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 22 Jun 2018 10:40:30 -0300
-Message-Id: <20180622134036.23182-9-f4bug@amsat.org>
+Date: Fri, 22 Jun 2018 10:40:31 -0300
+Message-Id: <20180622134036.23182-10-f4bug@amsat.org>
 In-Reply-To: <20180622134036.23182-1-f4bug@amsat.org>
 References: <20180622134036.23182-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 08/14] hw/arm/omap1: Use
+Subject: [Qemu-devel] [PATCH v2 09/14] hw/arm/omap: Use
  qemu_log_mask(GUEST_ERROR) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -30,111 +30,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
 
-TCMI_VERBOSE is no more used, drop the OMAP_8/16/32B_REG macros.
-
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/arm/omap.h | 18 ------------------
- hw/arm/omap1.c        | 18 ++++++++++++------
- 2 files changed, 12 insertions(+), 24 deletions(-)
+ include/hw/arm/omap.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
-index b398607b06..39abba753d 100644
+index 39abba753d..3867687b8c 100644
 --- a/include/hw/arm/omap.h
 +++ b/include/hw/arm/omap.h
-@@ -993,24 +993,6 @@ enum {
- #define OMAP_GPIOSW_INVERTED	0x0001
- #define OMAP_GPIOSW_OUTPUT	0x0002
+@@ -21,6 +21,7 @@
+ # define hw_omap_h		"omap.h"
+ #include "hw/irq.h"
+ #include "target/arm/cpu-qom.h"
++#include "qemu/log.h"
  
--# define TCMI_VERBOSE			1
--
--# ifdef TCMI_VERBOSE
--#  define OMAP_8B_REG(paddr)		\
--        fprintf(stderr, "%s: 8-bit register " OMAP_FMT_plx "\n",	\
+ # define OMAP_EMIFS_BASE	0x00000000
+ # define OMAP2_Q0_BASE		0x00000000
+@@ -962,8 +963,8 @@ void omap_mpu_wakeup(void *opaque, int irq, int req);
+         fprintf(stderr, "%s: Bad register " OMAP_FMT_plx "\n",	\
+                         __func__, paddr)
+ # define OMAP_RO_REG(paddr)		\
+-        fprintf(stderr, "%s: Read-only register " OMAP_FMT_plx "\n",	\
 -                        __func__, paddr)
--#  define OMAP_16B_REG(paddr)		\
--        fprintf(stderr, "%s: 16-bit register " OMAP_FMT_plx "\n",	\
--                        __func__, paddr)
--#  define OMAP_32B_REG(paddr)		\
--        fprintf(stderr, "%s: 32-bit register " OMAP_FMT_plx "\n",	\
--                        __func__, paddr)
--# else
--#  define OMAP_8B_REG(paddr)
--#  define OMAP_16B_REG(paddr)
--#  define OMAP_32B_REG(paddr)
--# endif
--
- # define OMAP_MPUI_REG_MASK		0x000007ff
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: Read-only register " OMAP_FMT_plx \
++                      "\n", __func__, paddr)
  
- #endif /* hw_omap_h */
-diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-index 9af04728e3..539d29ef9c 100644
---- a/hw/arm/omap1.c
-+++ b/hw/arm/omap1.c
-@@ -34,12 +34,18 @@
- #include "qemu/cutils.h"
- #include "qemu/bcd.h"
- 
-+static inline void omap_log_badwidth(const char *funcname, hwaddr addr, int sz)
-+{
-+    qemu_log_mask(LOG_GUEST_ERROR, "%s: %d-bit register %#08" HWADDR_PRIx "\n",
-+                  funcname, sz << 2, addr);
-+}
-+
- /* Should signal the TCMI/GPMC */
- uint32_t omap_badwidth_read8(void *opaque, hwaddr addr)
- {
-     uint8_t ret;
- 
--    OMAP_8B_REG(addr);
-+    omap_log_badwidth(__func__, addr, 1);
-     cpu_physical_memory_read(addr, &ret, 1);
-     return ret;
- }
-@@ -49,7 +55,7 @@ void omap_badwidth_write8(void *opaque, hwaddr addr,
- {
-     uint8_t val8 = value;
- 
--    OMAP_8B_REG(addr);
-+    omap_log_badwidth(__func__, addr, 1);
-     cpu_physical_memory_write(addr, &val8, 1);
- }
- 
-@@ -57,7 +63,7 @@ uint32_t omap_badwidth_read16(void *opaque, hwaddr addr)
- {
-     uint16_t ret;
- 
--    OMAP_16B_REG(addr);
-+    omap_log_badwidth(__func__, addr, 2);
-     cpu_physical_memory_read(addr, &ret, 2);
-     return ret;
- }
-@@ -67,7 +73,7 @@ void omap_badwidth_write16(void *opaque, hwaddr addr,
- {
-     uint16_t val16 = value;
- 
--    OMAP_16B_REG(addr);
-+    omap_log_badwidth(__func__, addr, 2);
-     cpu_physical_memory_write(addr, &val16, 2);
- }
- 
-@@ -75,7 +81,7 @@ uint32_t omap_badwidth_read32(void *opaque, hwaddr addr)
- {
-     uint32_t ret;
- 
--    OMAP_32B_REG(addr);
-+    omap_log_badwidth(__func__, addr, 4);
-     cpu_physical_memory_read(addr, &ret, 4);
-     return ret;
- }
-@@ -83,7 +89,7 @@ uint32_t omap_badwidth_read32(void *opaque, hwaddr addr)
- void omap_badwidth_write32(void *opaque, hwaddr addr,
-                 uint32_t value)
- {
--    OMAP_32B_REG(addr);
-+    omap_log_badwidth(__func__, addr, 4);
-     cpu_physical_memory_write(addr, &value, 4);
- }
- 
+ /* OMAP-specific Linux bootloader tags for the ATAG_BOARD area
+    (Board-specifc tags are not here)  */
 -- 
 2.18.0.rc2
