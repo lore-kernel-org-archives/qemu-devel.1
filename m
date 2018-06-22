@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fWR7Y-0004hc-7Y
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 14:49:21 -0400
+	(envelope-from <mst@redhat.com>) id 1fWRNg-0007gD-30
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:06:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fWR7X-0007gJ-7e
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 14:49:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43262)
+	(envelope-from <mst@redhat.com>) id 1fWRNb-0006Bc-34
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:06:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48196 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fWR7W-0007g7-Va
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 14:49:19 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 22 Jun 2018 15:49:09 -0300
-Message-Id: <20180622184909.23381-2-ehabkost@redhat.com>
-In-Reply-To: <20180622184909.23381-1-ehabkost@redhat.com>
-References: <20180622184909.23381-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 1/1] Partially revert "python: futurize -f
- libfuturize.fixes.fix_absolute_import"
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fWRNa-0006Aw-Sg
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:05:55 -0400
+Date: Fri, 22 Jun 2018 22:05:50 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180622214259-mutt-send-email-mst@kernel.org>
+References: <CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
+	<20180619125453.2d2dfb2d.cohuck@redhat.com>
+	<20180619233001-mutt-send-email-mst@kernel.org>
+	<20180620115359.1a3bf6fb.cohuck@redhat.com>
+	<20180620170904-mutt-send-email-mst@kernel.org>
+	<20180620180619.6b4ee52d.cohuck@redhat.com>
+	<20180620224535-mutt-send-email-mst@kernel.org>
+	<20180621165913.7e3f4faa.cohuck@redhat.com>
+	<20180621211712-mutt-send-email-mst@kernel.org>
+	<20180622170955.298900c1.cohuck@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180622170955.298900c1.cohuck@redhat.com>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,164 +36,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>, Cleber Rosa <crosa@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-Since commit 068cf7a44cd4d65c05aa877dbebced295be5ce44, qmp-shell
-is broken:
+On Fri, Jun 22, 2018 at 05:09:55PM +0200, Cornelia Huck wrote:
+> On Thu, 21 Jun 2018 21:20:13 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Thu, Jun 21, 2018 at 04:59:13PM +0200, Cornelia Huck wrote:
+> > > OK, so what about the following:
+> > > 
+> > > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
+> > >   that we have a new uuid field in the virtio-net config space
+> > > - in QEMU, add a property for virtio-net that allows to specify a uuid,
+> > >   offer VIRTIO_NET_F_STANDBY_UUID if set
+> > > - when configuring, set the property to the group UUID of the vfio-pci
+> > >   device
+> > > - in the guest, use the uuid from the virtio-net device's config space
+> > >   if applicable; else, fall back to matching by MAC as done today
+> > > 
+> > > That should work for all virtio transports.  
+> > 
+> > True. I'm a bit unhappy that it's virtio net specific though
+> > since down the road I expect we'll have a very similar feature
+> > for scsi (and maybe others).
+> > 
+> > But we do not have a way to have fields that are portable
+> > both across devices and transports, and I think it would
+> > be a useful addition. How would this work though? Any idea?
+> 
+> Can we introduce some kind of device-independent config space area?
+> Pushing back the device-specific config space by a certain value if the
+> appropriate feature is negotiated and use that for things like the uuid?
 
-  $ ./scripts/qmp/qmp-shell
-  Traceback (most recent call last):
-    File "./scripts/qmp/qmp-shell", line 70, in <module>
-      from . import qmp
-  ValueError: Attempted relative import in non-package
+So config moves back and forth?
+Reminds me of the msi vector mess we had with pci.
+I'd rather have every transport add a new config.
 
-Relative imports don't work on scripts that are executed
-directly, so revert the change on the scripts inside scripts/qmp.
+> But regardless of that, I'm not sure whether extending this approach to
+> other device types is the way to go. Tying together two different
+> devices is creating complicated situations at least in the hypervisor
+> (even if it's fairly straightforward in the guest). [I have not come
+> around again to look at the "how to handle visibility in QEMU"
+> questions due to lack of cycles, sorry about that.]
+> 
+> So, what's the goal of this approach? Only to allow migration with
+> vfio-pci, or also to plug in a faster device and use it instead of an
+> already attached paravirtualized device?
 
-Fixes: 068cf7a44cd4d65c05aa877dbebced295be5ce44
-Reported-by: John Snow <jsnow@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20180621175451.7948-1-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- scripts/qmp/qemu-ga-client | 3 +--
- scripts/qmp/qmp            | 3 +--
- scripts/qmp/qmp-shell      | 3 +--
- scripts/qmp/qom-fuse       | 3 +--
- scripts/qmp/qom-get        | 3 +--
- scripts/qmp/qom-list       | 3 +--
- scripts/qmp/qom-set        | 3 +--
- scripts/qmp/qom-tree       | 3 +--
- 8 files changed, 8 insertions(+), 16 deletions(-)
+These are two sides of the same coin, I think the second approach
+is closer to what we are doing here.
 
-diff --git a/scripts/qmp/qemu-ga-client b/scripts/qmp/qemu-ga-client
-index 976e69e05f..e8cb7646a0 100755
---- a/scripts/qmp/qemu-ga-client
-+++ b/scripts/qmp/qemu-ga-client
-@@ -37,11 +37,10 @@
- #
- 
- from __future__ import print_function
--from __future__ import absolute_import
- import base64
- import random
- 
--from . import qmp
-+import qmp
- 
- 
- class QemuGuestAgent(qmp.QEMUMonitorProtocol):
-diff --git a/scripts/qmp/qmp b/scripts/qmp/qmp
-index 33a0d6b73a..6cb46fdae2 100755
---- a/scripts/qmp/qmp
-+++ b/scripts/qmp/qmp
-@@ -11,9 +11,8 @@
- # See the COPYING file in the top-level directory.
- 
- from __future__ import print_function
--from __future__ import absolute_import
- import sys, os
--from .qmp import QEMUMonitorProtocol
-+from qmp import QEMUMonitorProtocol
- 
- def print_response(rsp, prefix=[]):
-     if type(rsp) == list:
-diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-index 26418dab95..a42306dd89 100755
---- a/scripts/qmp/qmp-shell
-+++ b/scripts/qmp/qmp-shell
-@@ -66,8 +66,7 @@
- # sent to QEMU, which is useful for debugging and documentation generation.
- 
- from __future__ import print_function
--from __future__ import absolute_import
--from . import qmp
-+import qmp
- import json
- import ast
- import readline
-diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
-index e524e798fc..4d85970a78 100755
---- a/scripts/qmp/qom-fuse
-+++ b/scripts/qmp/qom-fuse
-@@ -11,12 +11,11 @@
- # the COPYING file in the top-level directory.
- ##
- 
--from __future__ import absolute_import
- import fuse, stat
- from fuse import Fuse
- import os, posix
- from errno import *
--from .qmp import QEMUMonitorProtocol
-+from qmp import QEMUMonitorProtocol
- 
- fuse.fuse_python_api = (0, 2)
- 
-diff --git a/scripts/qmp/qom-get b/scripts/qmp/qom-get
-index a3f5d7660e..ec5275d53a 100755
---- a/scripts/qmp/qom-get
-+++ b/scripts/qmp/qom-get
-@@ -12,10 +12,9 @@
- ##
- 
- from __future__ import print_function
--from __future__ import absolute_import
- import sys
- import os
--from .qmp import QEMUMonitorProtocol
-+from qmp import QEMUMonitorProtocol
- 
- cmd, args = sys.argv[0], sys.argv[1:]
- socket_path = None
-diff --git a/scripts/qmp/qom-list b/scripts/qmp/qom-list
-index 2ba25e1792..0f97440973 100755
---- a/scripts/qmp/qom-list
-+++ b/scripts/qmp/qom-list
-@@ -12,10 +12,9 @@
- ##
- 
- from __future__ import print_function
--from __future__ import absolute_import
- import sys
- import os
--from .qmp import QEMUMonitorProtocol
-+from qmp import QEMUMonitorProtocol
- 
- cmd, args = sys.argv[0], sys.argv[1:]
- socket_path = None
-diff --git a/scripts/qmp/qom-set b/scripts/qmp/qom-set
-index 0352668812..26ed9e3263 100755
---- a/scripts/qmp/qom-set
-+++ b/scripts/qmp/qom-set
-@@ -12,10 +12,9 @@
- ##
- 
- from __future__ import print_function
--from __future__ import absolute_import
- import sys
- import os
--from .qmp import QEMUMonitorProtocol
-+from qmp import QEMUMonitorProtocol
- 
- cmd, args = sys.argv[0], sys.argv[1:]
- socket_path = None
-diff --git a/scripts/qmp/qom-tree b/scripts/qmp/qom-tree
-index 32e708a13e..31603c681f 100755
---- a/scripts/qmp/qom-tree
-+++ b/scripts/qmp/qom-tree
-@@ -14,10 +14,9 @@
- ##
- 
- from __future__ import print_function
--from __future__ import absolute_import
- import sys
- import os
--from .qmp import QEMUMonitorProtocol
-+from qmp import QEMUMonitorProtocol
- 
- cmd, args = sys.argv[0], sys.argv[1:]
- socket_path = None
+> What about migration of vfio devices that are not easily replaced by a
+> paravirtualized device? I'm thinking of vfio-ccw, where our main (and
+> currently only) supported device is dasd (disks) -- which can do a lot
+> of specialized things that virtio-blk does not support (and should not
+> or even cannot support).
+
+But maybe virtio-scsi can?
+
+> Would it be more helpful to focus on generic
+> migration support for vfio instead of going about it device by device?
+> 
+> This network device approach already seems far along, so it makes sense
+> to continue with it. But I'm not sure whether we want to spend time and
+> energy on that for other device types rather than working on a general
+> solution for vfio migration.
+
+I'm inclined to say finalizing this feature would be a good first step
+and will teach us how we can move forward.
+
 -- 
-2.18.0.rc1.1.g3f1ff2140
+MST
