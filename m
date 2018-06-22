@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53996)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fWBsH-0006zV-GE
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:32:34 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fWCZh-0002yY-NH
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 23:17:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fWBsE-0002L9-Af
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:32:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36940 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fWBsE-0002Ku-4x
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:32:30 -0400
-Date: Fri, 22 Jun 2018 05:32:28 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180622053141-mutt-send-email-mst@kernel.org>
-References: <20180615134815.6613620e.cohuck@redhat.com>
-	<CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
-	<20180619125453.2d2dfb2d.cohuck@redhat.com>
-	<20180619233001-mutt-send-email-mst@kernel.org>
-	<20180620115359.1a3bf6fb.cohuck@redhat.com>
-	<20180620170904-mutt-send-email-mst@kernel.org>
-	<20180620180619.6b4ee52d.cohuck@redhat.com>
-	<20180620224535-mutt-send-email-mst@kernel.org>
-	<20180621165913.7e3f4faa.cohuck@redhat.com>
-	<CADGSJ22B39JiS14L0yCYQ720-fZcwyUt1wCX1YO-6Y9FhmDKZg@mail.gmail.com>
+	(envelope-from <no-reply@patchew.org>) id 1fWCZe-0006G3-E5
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 23:17:25 -0400
+Resent-Message-Id: <E1fWCZe-0006G3-E5@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21033)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fWCZe-0006Di-4J
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 23:17:22 -0400
+In-Reply-To: <20180622003140.164613-1-mst@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152963649940.840.12519409178336343639@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADGSJ22B39JiS14L0yCYQ720-fZcwyUt1wCX1YO-6Y9FhmDKZg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 21 Jun 2018 20:01:40 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v4 0/2] kvm: limited x86 CPU power
+ management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Siwei Liu <loseweigh@gmail.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
+To: mst@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com, ehabkost@redhat.com, kvm@vger.kernel.org, rth@twiddle.net
 
-On Thu, Jun 21, 2018 at 06:21:55PM -0700, Siwei Liu wrote:
-> On Thu, Jun 21, 2018 at 7:59 AM, Cornelia Huck <cohuck@redhat.com> wrote:
-> > On Wed, 20 Jun 2018 22:48:58 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >
-> >> On Wed, Jun 20, 2018 at 06:06:19PM +0200, Cornelia Huck wrote:
-> >> > In any case, I'm not sure anymore why we'd want the extra uuid.
-> >>
-> >> It's mostly so we can have e.g. multiple devices with same MAC
-> >> (which some people seem to want in order to then use
-> >> then with different containers).
-> >>
-> >> But it is also handy for when you assign a PF, since then you
-> >> can't set the MAC.
-> >>
-> >
-> > OK, so what about the following:
-> >
-> > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
-> >   that we have a new uuid field in the virtio-net config space
-> > - in QEMU, add a property for virtio-net that allows to specify a uuid,
-> >   offer VIRTIO_NET_F_STANDBY_UUID if set
-> > - when configuring, set the property to the group UUID of the vfio-pci
-> >   device
-> 
-> If feature negotiation fails on VIRTIO_NET_F_STANDBY_UUID, is it safe
-> to still expose UUID in the config space on virtio-pci?
-
-
-Yes but guest is not supposed to read it.
-
-> I'm not even sure if it's sane to expose group UUID on the PCI bridge
-> where the corresponding vfio-pci device attached to for a guest which
-> doesn't support the feature (legacy).
-> 
-> -Siwei
-
-Yes but you won't add the primary behind such a bridge.
-
-> 
-> > - in the guest, use the uuid from the virtio-net device's config space
-> >   if applicable; else, fall back to matching by MAC as done today
-> >
-> > That should work for all virtio transports.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjIyMDAzMTQwLjE2NDYxMy0xLW1zdEByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggdjQgMC8yXSBrdm06IGxpbWl0ZWQgeDg2IENQVSBwb3dlciBt
+YW5hZ2VtZW50Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
+c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
+MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
+c3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4u
+KSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90
+YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cg
+JGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07
+IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkp
+CmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
+aGV3LzIwMTgwNjIxMjIzOTQ2LjIwNzM4LTEtY2xnQGthb2Qub3JnIC0+IHBhdGNoZXcvMjAxODA2
+MjEyMjM5NDYuMjA3MzgtMS1jbGdAa2FvZC5vcmcKICogW25ldyB0YWddICAgICAgICAgICAgICAg
+cGF0Y2hldy8yMDE4MDYyMjAwMzE0MC4xNjQ2MTMtMS1tc3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3
+LzIwMTgwNjIyMDAzMTQwLjE2NDYxMy0xLW1zdEByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAg
+ICAgICAgICAgIHBhdGNoZXcvMjAxODA2MjIwMDQ0MzUuMTAyOTEtMS1mNGJ1Z0BhbXNhdC5vcmcg
+LT4gcGF0Y2hldy8yMDE4MDYyMjAwNDQzNS4xMDI5MS0xLWY0YnVnQGFtc2F0Lm9yZwpTd2l0Y2hl
+ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmNlMWJkYzMxYWYgaTM4Ni9jcHU6IG1ha2UgLWNwdSBo
+b3N0IHN1cHBvcnQgbW9uaXRvci9td2FpdAo1NzdmMjU4YjE1IGt2bTogc3VwcG9ydCAtb3ZlcmNv
+bW1pdCBjcHUtcG09b258b2ZmCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAx
+LzI6IGt2bTogc3VwcG9ydCAtb3ZlcmNvbW1pdCBjcHUtcG09b258b2ZmLi4uCkVSUk9SOiBkbyBu
+b3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVMTAojMTAzOiBGSUxFOiB2bC5jOjE0NToK
+K2Jvb2wgZW5hYmxlX2NwdV9wbSA9IGZhbHNlOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
+LCAxMTAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+LgoKQ2hlY2tpbmcgUEFUQ0ggMi8yOiBpMzg2L2NwdTogbWFrZSAtY3B1IGhvc3Qgc3VwcG9ydCBt
+b25pdG9yL213YWl0Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEByZWRoYXQuY29t
