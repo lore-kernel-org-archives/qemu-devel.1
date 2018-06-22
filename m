@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fWP1n-00053O-Tt
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:35:17 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fWP44-0005ol-JA
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fWP1m-0004IV-3H
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:35:15 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:38052)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fWP3z-0006At-Ej
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:37:36 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:43798)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fWP1l-0004IJ-Sc
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:35:14 -0400
-Received: by mail-ot0-x241.google.com with SMTP id p95-v6so8163879ota.5
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 09:35:13 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fWP3z-00069b-2k
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:37:31 -0400
+Received: by mail-wr0-x242.google.com with SMTP id d2-v6so7271200wrm.10
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 09:37:30 -0700 (PDT)
+References: <1528794804-6289-1-git-send-email-whois.zihan.yang@gmail.com>
+	<1528794804-6289-2-git-send-email-whois.zihan.yang@gmail.com>
+	<a6014b3a-0e1c-47e6-7b10-4873358864c3@gmail.com>
+	<CAKwiv-jnGkCWqkMKB+osxBG1vfu5jERHO6D90M=dPfvbS+J5CQ@mail.gmail.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <f8fb9875-3f1d-e6f3-6cd6-d41f40cc55d8@gmail.com>
+Date: Fri, 22 Jun 2018 19:37:24 +0300
 MIME-Version: 1.0
-In-Reply-To: <152968508595.888.6631795618045211665@d39dc562802a>
-References: <20180622125814.345274-1-eblake@redhat.com>
-	<152968508595.888.6631795618045211665@d39dc562802a>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Jun 2018 17:34:52 +0100
-Message-ID: <CAFEAcA9rdG4uAVgVe16_prsZ50Wic9+BMSmeZ+E7=uJ75WE=8A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] nbd/server: Silence gcc false positive
+In-Reply-To: <CAKwiv-jnGkCWqkMKB+osxBG1vfu5jERHO6D90M=dPfvbS+J5CQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [RFC v2 2/3] acpi-build: allocate mcfg for
+ pxb-pcie host bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,116 +34,444 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Zihan Yang <whois.zihan.yang@gmail.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi Fam -- looks like patchew has got confused somehow...
 
-On 22 June 2018 at 17:31,  <no-reply@patchew.org> wrote:
-> Hi,
->
-> This series seems to have some coding style problems. See output below for
-> more information:
->
-> Type: series
-> Message-id: 20180622125814.345274-1-eblake@redhat.com
-> Subject: [Qemu-devel] [PATCH] nbd/server: Silence gcc false positive
 
-This is the report email for this nbd patch (and it's following
-up to the nbd patch email)...
+On 06/21/2018 07:49 PM, Zihan Yang wrote:
+> Thanks for your review.
+>
+> Marcel Apfelbaum <marcel.apfelbaum@gmail.com> 于2018年6月20日周三 下午3:41写道：
+>>
+>>
+>> On 06/12/2018 12:13 PM, Zihan Yang wrote:
+>>> Allocate new segment for pxb-pcie host bridges in MCFG table, and reserve
+>>> corresponding MCFG space for them. This allows user-defined pxb-pcie
+>>> host bridges to be placed in different pci domain than q35 host
+>>>
+>>> Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
+>>> ---
+>>>    hw/i386/acpi-build.c                        | 97 +++++++++++++++++++++++------
+>>>    hw/i386/pc.c                                | 14 ++++-
+>>>    hw/pci-bridge/pci_expander_bridge.c         | 52 +++++++++++-----
+>>>    hw/pci-host/q35.c                           |  2 +
+>>>    include/hw/i386/pc.h                        |  1 +
+>>>    include/hw/pci-bridge/pci_expander_bridge.h |  6 ++
+>>>    include/hw/pci-host/q35.h                   |  1 +
+>>>    7 files changed, 137 insertions(+), 36 deletions(-)
+>>>    create mode 100644 include/hw/pci-bridge/pci_expander_bridge.h
+>>>
+>>> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+>>> index 9bc6d97..104e52d 100644
+>>> --- a/hw/i386/acpi-build.c
+>>> +++ b/hw/i386/acpi-build.c
+>>> @@ -89,6 +89,8 @@
+>>>    typedef struct AcpiMcfgInfo {
+>>>        uint64_t mcfg_base;
+>>>        uint32_t mcfg_size;
+>>> +    uint32_t domain_nr;
+>>> +    struct AcpiMcfgInfo *next;
+>>>    } AcpiMcfgInfo;
+>>>
+>>>    typedef struct AcpiPmInfo {
+>>> @@ -2427,14 +2429,16 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+>>>    {
+>>>        AcpiTableMcfg *mcfg;
+>>>        const char *sig;
+>>> -    int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
+>>> +    int len, count = 0;
+>>> +    AcpiMcfgInfo *cfg = info;
+>>> +
+>>> +    while (cfg) {
+>>> +        ++count;
+>>> +        cfg = cfg->next;
+>>> +    }
+>>> +    len = sizeof(*mcfg) + count * sizeof(mcfg->allocation[0]);
+>>>
+>>>        mcfg = acpi_data_push(table_data, len);
+>>> -    mcfg->allocation[0].address = cpu_to_le64(info->mcfg_base);
+>>> -    /* Only a single allocation so no need to play with segments */
+>>> -    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+>>> -    mcfg->allocation[0].start_bus_number = 0;
+>>> -    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
+>>>
+>>>        /* MCFG is used for ECAM which can be enabled or disabled by guest.
+>>>         * To avoid table size changes (which create migration issues),
+>>> @@ -2448,6 +2452,15 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+>>>        } else {
+>>>            sig = "MCFG";
+>>>        }
+>>> +
+>>> +    while (info) {
+>>> +        mcfg[count].allocation[0].address = cpu_to_le64(info->mcfg_base);
+>>> +        mcfg[count].allocation[0].pci_segment = cpu_to_le16(info->domain_nr);
+>>> +        mcfg[count].allocation[0].start_bus_number = 0;
+>>> +        mcfg[count++].allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
+>> I think you want to use here max_bus property defined in the prev patch.
+> mcfg_size is calculated by the max_bus, but it does seems more readable
+> to use max_bus here.
 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> From https://github.com/patchew-project/qemu
->  t [tag update]            patchew/20180620120620.12806-1-yongbok.kim@mips.com -> patchew/20180620120620.12806-1-yongbok.kim@mips.com
->  * [new tag]               patchew/20180622125814.345274-1-eblake@redhat.com -> patchew/20180622125814.345274-1-eblake@redhat.com
-> Switched to a new branch 'test'
-> 6489e4b10c Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180622' into staging
-> 10e84d2504 xen: Don't use memory_region_init_ram_nomigrate() in pci_assign_dev_load_option_rom()
-> aea21afaef vl.c: Don't zero-initialize statics for serial_hds
-> fea64baeab target/arm: Strict alignment for ARMv6-M and ARMv8-M Baseline
+At the end is up to you :)
+I just thought is more readable.
 
-...but the patches it seems to actually be testing are from my
-latest target-arm pull request ?
+>>> +        info = info->next;
+>>> +    }
+>>> +
+>>>        build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
+>>>    }
+>>>
+>>> @@ -2602,26 +2615,69 @@ struct AcpiBuildState {
+>>>        MemoryRegion *linker_mr;
+>>>    } AcpiBuildState;
+>>>
+>>> -static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
+>>> +static inline void cleanup_mcfg(AcpiMcfgInfo *mcfg)
+>>> +{
+>>> +    AcpiMcfgInfo *tmp;
+>>> +    while (mcfg) {
+>>> +        tmp = mcfg->next;
+>>> +        g_free(mcfg);
+>>> +        mcfg = tmp;
+>>> +    }
+>>> +}
+>>> +
+>>> +static AcpiMcfgInfo *acpi_get_mcfg(void)
+>>>    {
+>>>        Object *pci_host;
+>>>        QObject *o;
+>>> +    uint32_t domain_nr;
+>>> +    AcpiMcfgInfo *head = NULL, *tail, *mcfg;
+>>>
+>>>        pci_host = acpi_get_i386_pci_host();
+>>>        g_assert(pci_host);
+>>>
+>>> -    o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_BASE, NULL);
+>>> -    if (!o) {
+>>> -        return false;
+>>> +    while (pci_host) {
+>>> +        o = object_property_get_qobject(pci_host, "domain_nr", NULL);
+>>> +        if (!o) {
+>> If every pci_host is supposed to have a domain_nr is better to assert here.
+> OK, I get it.
+>
+>>> +            cleanup_mcfg(head);
+>>> +            return NULL;
+>>> +        }
+>>> +        domain_nr = qnum_get_uint(qobject_to(QNum, o));
+>>> +        qobject_unref(o);
+>>> +        /* skip q35 host and bridges that reside in the same domain with it */
+>>> +        if (domain_nr == 0) {
+>>> +            pci_host = OBJECT(QLIST_NEXT(PCI_HOST_BRIDGE(pci_host), next));
+>>> +            continue;
+>> The default q35 pci host will not have a MMCFG?
+> I must have got my brain messed up.. The original purpose was to let q35host
+> reside in pci domain 0, and all the expander host bridges that have non-zero
+> domain_nr reside in their corresponding domains.
 
-> 12c583c45b target/arm: Introduce ARM_FEATURE_M_MAIN
-> 42fc936a30 hw/arm/mps2-tz.c: Instantiate MPCs
-> b03e0d28a2 hw/arm/iotkit: Wire up MPC interrupt lines
-> 985db83c4a hw/arm/iotkit: Instantiate MPC
-> 769d3448af hw/misc/iotkit-secctl.c: Implement SECMPCINTSTATUS
-> cdf0c49a6a hw/misc/tz_mpc.c: Honour the BLK_LUT settings in translate
-> 7790999ca7 hw/misc/tz-mpc.c: Implement correct blocked-access behaviour
-> fa6dd4bba5 hw/misc/tz-mpc.c: Implement registers
-> d3cb43aea7 hw/misc/tz-mpc.c: Implement the Arm TrustZone Memory Protection Controller
-> 80c3703588 xlnx-zynqmp: Swap Cortex-R5 for Cortex-R5F
-> 60e383fc83 target-arm: Add the Cortex-R5F
-> 6603ff9f6b hw/arm/virt: Increase max_cpus to 512
-> ad37e0623f hw/arm/virt: Use 256MB ECAM region by default
-> 08e38e7a7e hw/arm/virt: Add virt-3.0 machine type
-> d844e5a9a5 hw/arm/virt: Add a new 256MB ECAM region
-> 82ca568747 hw/arm/virt: Register two redistributor regions when necessary
-> f3a20d2d88 hw/arm/virt-acpi-build: Advertise one or two GICR structures
-> 0bd011094d hw/arm/virt: GICv3 DT node with one or two redistributor regions
-> b095e84e4f hw/intc/arm_gicv3_kvm: Get prepared to handle multiple redist regions
-> 77737a0dc0 hw/intc/arm_gicv3: Introduce redist-region-count array property
-> 356069f49b target/arm: Allow KVM device address overwriting
-> 0d9ee1e956 linux-headers: Update to kernel mainline commit b357bf602
-> e9eb7de541 target-arm: fix a segmentation fault due to illegal memory access
-> a2bd1a2dce target/arm: Minor cleanup for ARMv6-M 32-bit instructions
-> 787260735f hw/intc/arm_gicv3: fix an extra left-shift when reading IPRIORITYR
->
-> === OUTPUT BEGIN ===
-> Checking PATCH 1/29: hw/intc/arm_gicv3: fix an extra left-shift when reading IPRIORITYR...
-> Checking PATCH 2/29: target/arm: Minor cleanup for ARMv6-M 32-bit instructions...
-> Checking PATCH 3/29: target-arm: fix a segmentation fault due to illegal memory access...
-> Checking PATCH 4/29: linux-headers: Update to kernel mainline commit b357bf602...
-> Checking PATCH 5/29: target/arm: Allow KVM device address overwriting...
-> Checking PATCH 6/29: hw/intc/arm_gicv3: Introduce redist-region-count array property...
-> Checking PATCH 7/29: hw/intc/arm_gicv3_kvm: Get prepared to handle multiple redist regions...
-> Checking PATCH 8/29: hw/arm/virt: GICv3 DT node with one or two redistributor regions...
-> Checking PATCH 9/29: hw/arm/virt-acpi-build: Advertise one or two GICR structures...
-> Checking PATCH 10/29: hw/arm/virt: Register two redistributor regions when necessary...
-> Checking PATCH 11/29: hw/arm/virt: Add a new 256MB ECAM region...
-> Checking PATCH 12/29: hw/arm/virt: Add virt-3.0 machine type...
-> Checking PATCH 13/29: hw/arm/virt: Use 256MB ECAM region by default...
-> Checking PATCH 14/29: hw/arm/virt: Increase max_cpus to 512...
-> Checking PATCH 15/29: target-arm: Add the Cortex-R5F...
-> Checking PATCH 16/29: xlnx-zynqmp: Swap Cortex-R5 for Cortex-R5F...
-> Checking PATCH 17/29: hw/misc/tz-mpc.c: Implement the Arm TrustZone Memory Protection Controller...
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #86:
-> new file mode 100644
->
-> total: 0 errors, 1 warnings, 504 lines checked
->
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> Checking PATCH 18/29: hw/misc/tz-mpc.c: Implement registers...
-> Checking PATCH 19/29: hw/misc/tz-mpc.c: Implement correct blocked-access behaviour...
-> Checking PATCH 20/29: hw/misc/tz_mpc.c: Honour the BLK_LUT settings in translate...
-> Checking PATCH 21/29: hw/misc/iotkit-secctl.c: Implement SECMPCINTSTATUS...
-> ERROR: spaces required around that '*' (ctx:VxV)
-> #92: FILE: hw/misc/iotkit-secctl.c:711:
-> +    .subsections = (const VMStateDescription*[]) {
->                                              ^
->
-> total: 1 errors, 0 warnings, 100 lines checked
->
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->
-> Checking PATCH 22/29: hw/arm/iotkit: Instantiate MPC...
-> Checking PATCH 23/29: hw/arm/iotkit: Wire up MPC interrupt lines...
-> Checking PATCH 24/29: hw/arm/mps2-tz.c: Instantiate MPCs...
-> Checking PATCH 25/29: target/arm: Introduce ARM_FEATURE_M_MAIN...
-> Checking PATCH 26/29: target/arm: Strict alignment for ARMv6-M and ARMv8-M Baseline...
-> Checking PATCH 27/29: vl.c: Don't zero-initialize statics for serial_hds...
-> Checking PATCH 28/29: xen: Don't use memory_region_init_ram_nomigrate() in pci_assign_dev_load_option_rom()...
-> Checking PATCH 29/29: Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180622' into staging...
-> === OUTPUT END ===
->
-> Test command exited with code: 1
+Correct
 
-thanks
--- PMM
+>   Expander bridges whose
+> domain_nr equals to 0 are skipped because they don't actually specify a domain.
+
+Correct again
+
+>
+> I thought I added q35 host when I wrote the code at the beginning, there might
+> be some mistakes when I fotmat  the code later on. I will correct them in next
+> version.
+
+Please double check we keep Q35 main host bridge MMCFG :)
+
+
+>>> +        }
+>>> +
+>>> +        mcfg = g_new0(AcpiMcfgInfo, 1);
+>>> +        mcfg->next = NULL;
+>>> +        if (!head) {
+>>> +            tail = head = mcfg;
+>>> +        } else {
+>>> +            tail->next = mcfg;
+>>> +            tail = mcfg;
+>>> +        }
+>>> +        mcfg->domain_nr = domain_nr;
+>>> +
+>>> +        o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_BASE, NULL);
+>>> +        assert(o);
+>>> +        mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
+>>> +        qobject_unref(o);
+>>> +
+>>> +        /* firmware will overwrite it */
+>>> +        o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
+>>> +        assert(o);
+>>> +        mcfg->mcfg_size = qnum_get_uint(qobject_to(QNum, o));
+>>> +        qobject_unref(o);
+>>> +
+>>> +        o = object_property_get_qobject(pci_host, "domain_nr", NULL);
+>>> +        assert(o);
+>>> +        mcfg->domain_nr = qnum_get_uint(qobject_to(QNum, o));
+>> You already have the domain_nr.
+> That seems a mistake, I will recode this piece of code in next version.
+>
+>>> +
+>>> +        pci_host = OBJECT(QLIST_NEXT(PCI_HOST_BRIDGE(pci_host), next));
+>>>        }
+>>> -    mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
+>>> -    qobject_unref(o);
+>>>
+>>> -    o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
+>>> -    assert(o);
+>>> -    mcfg->mcfg_size = qnum_get_uint(qobject_to(QNum, o));
+>>> -    qobject_unref(o);
+>>> -    return true;
+>>> +    return head;
+>>>    }
+>>>
+>>>    static
+>>> @@ -2633,7 +2689,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>>>        unsigned facs, dsdt, rsdt, fadt;
+>>>        AcpiPmInfo pm;
+>>>        AcpiMiscInfo misc;
+>>> -    AcpiMcfgInfo mcfg;
+>>> +    AcpiMcfgInfo *mcfg;
+>>>        Range pci_hole, pci_hole64;
+>>>        uint8_t *u;
+>>>        size_t aml_len = 0;
+>>> @@ -2714,10 +2770,11 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+>>>                build_slit(tables_blob, tables->linker);
+>>>            }
+>>>        }
+>>> -    if (acpi_get_mcfg(&mcfg)) {
+>>> +    if ((mcfg = acpi_get_mcfg()) != NULL) {
+>>>            acpi_add_table(table_offsets, tables_blob);
+>>> -        build_mcfg_q35(tables_blob, tables->linker, &mcfg);
+>>> +        build_mcfg_q35(tables_blob, tables->linker, mcfg);
+>>>        }
+>>> +    cleanup_mcfg(mcfg);
+>>>        if (x86_iommu_get_default()) {
+>>>            IommuType IOMMUType = x86_iommu_get_type();
+>>>            if (IOMMUType == TYPE_AMD) {
+>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>>> index f3befe6..95f6c34 100644
+>>> --- a/hw/i386/pc.c
+>>> +++ b/hw/i386/pc.c
+>>> @@ -34,6 +34,7 @@
+>>>    #include "hw/ide.h"
+>>>    #include "hw/pci/pci.h"
+>>>    #include "hw/pci/pci_bus.h"
+>>> +#include "hw/pci-bridge/pci_expander_bridge.h"
+>>>    #include "hw/nvram/fw_cfg.h"
+>>>    #include "hw/timer/hpet.h"
+>>>    #include "hw/smbios/smbios.h"
+>>> @@ -1469,15 +1470,24 @@ uint64_t pc_pci_hole64_start(void)
+>>>        if (pcmc->has_reserved_memory && ms->device_memory->base) {
+>>>            hole64_start = ms->device_memory->base;
+>>>            if (!pcmc->broken_reserved_end) {
+>>> -            hole64_start += memory_region_size(&ms->device_memory->mr);
+>>> +            hole64_start += (memory_region_size(&ms->device_memory->mr) + \
+>>> +                            pxb_pcie_mcfg_hole());
+>>>            }
+>>>        } else {
+>>> -        hole64_start = 0x100000000ULL + pcms->above_4g_mem_size;
+>>> +        /* memory layout [RAM Hotplug][MCFG][..ROUND UP..][PCI HOLE] */
+>>> +        hole64_start = pc_pci_mcfg_start() + pxb_pcie_mcfg_hole();
+>>>        }
+>>>
+>>>        return ROUND_UP(hole64_start, 1ULL << 30);
+>>>    }
+>>>
+>>> +uint64_t pc_pci_mcfg_start(void)
+>>> +{
+>>> +    PCMachineState *pcms = PC_MACHINE(qdev_get_machine());
+>>> +
+>>> +    return ROUND_UP(0x100000000ULL + pcms->above_4g_mem_size, 1ULL << 12);
+>>> +}
+>>> +
+>>>    qemu_irq pc_allocate_cpu_irq(void)
+>>>    {
+>>>        return qemu_allocate_irq(pic_irq_request, NULL, 0);
+>>> diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
+>>> index 448b9fb..14f0447 100644
+>>> --- a/hw/pci-bridge/pci_expander_bridge.c
+>>> +++ b/hw/pci-bridge/pci_expander_bridge.c
+>>> @@ -12,11 +12,14 @@
+>>>
+>>>    #include "qemu/osdep.h"
+>>>    #include "qapi/error.h"
+>>> +#include "hw/i386/pc.h"
+>>>    #include "hw/pci/pci.h"
+>>>    #include "hw/pci/pci_bus.h"
+>>>    #include "hw/pci/pci_host.h"
+>>>    #include "hw/pci/pcie_host.h"
+>>>    #include "hw/pci/pci_bridge.h"
+>>> +#include "hw/pci-host/q35.h"
+>>> +#include "hw/pci-bridge/pci_expander_bridge.h"
+>>>    #include "qemu/range.h"
+>>>    #include "qemu/error-report.h"
+>>>    #include "sysemu/numa.h"
+>>> @@ -118,6 +121,25 @@ static const TypeInfo pxb_pcie_bus_info = {
+>>>        .class_init    = pxb_bus_class_init,
+>>>    };
+>>>
+>>> +static uint64_t pxb_mcfg_hole_size = 0;
+>>> +
+>> No need to initialize a static to 0.
+>>
+>>> +static void pxb_pcie_foreach(gpointer data, gpointer user_data)
+>>> +{
+>>> +    PXBDev *pxb = (PXBDev *)data;
+>>> +
+>>> +    if (pxb->sep_domain && pxb->domain_nr > 0) {
+>>> +        // only reserve what users ask for to reduce memory cost
+>>> +        pxb_mcfg_hole_size += ((pxb->max_bus + 1ULL) << 20);
+>> Why "+ 1" ?
+>> Please replace 20 with a MACRO explaining it.
+> Sorry for the confusion. This is because max_bus specify the maximum
+> bus number that will be used. For example, if max_bus is 255(0xff),
+> then the actual bus numbers are (255 + 1) = 256. But since max_bus
+> is uint8_t, I can't initialize it to 256, therefore it should +1 when
+> calculating the bus numbers in use.
+
+OK . In order to be more clear maybe you can use (max_bus - start_bus + 1)
+
+>
+> left shift 20 bits means 1MB, I will add a macro for it.
+>
+
+Thanks,
+Marcel
+
+>>> +    }
+>>> +}
+>>> +
+>>> +uint64_t pxb_pcie_mcfg_hole(void)
+>>> +{
+>>> +    /* foreach is necessary as some pxb still reside in domain 0 */
+>>> +    g_list_foreach(pxb_dev_list, pxb_pcie_foreach, NULL);
+>>> +    return pxb_mcfg_hole_size;
+>>> +}
+>>> +
+>>>    static const char *pxb_host_root_bus_path(PCIHostState *host_bridge,
+>>>                                              PCIBus *rootbus)
+>>>    {
+>>> @@ -145,14 +167,6 @@ static const char *pxb_pcie_host_root_bus_path(PCIHostState *host_bridge,
+>>>        return bus->bus_path;
+>>>    }
+>>>
+>>> -static void pxb_pcie_host_get_mmcfg_size(Object *obj, Visitor *v, const char *name,
+>>> -                                    void *opaque, Error **errp)
+>>> -{
+>>> -    PCIExpressHost *e = PCIE_HOST_BRIDGE(obj);
+>>> -
+>>> -    visit_type_uint64(v, name, &e->size, errp);
+>>> -}
+>>> -
+>>>    static char *pxb_host_ofw_unit_address(const SysBusDevice *dev)
+>>>    {
+>>>        const PCIHostState *pxb_host;
+>>> @@ -192,16 +206,12 @@ static void pxb_pcie_host_initfn(Object *obj)
+>>>                              "pci-conf-idx", 4);
+>>>        memory_region_init_io(&phb->data_mem, obj, &pci_host_data_le_ops, phb,
+>>>                              "pci-conf-data", 4);
+>>> -
+>>> -    object_property_add(obj, PCIE_HOST_MCFG_SIZE, "uint64",
+>>> -                         pxb_pcie_host_get_mmcfg_size,
+>>> -                         NULL, NULL, NULL, NULL);
+>>> -
+>>>    }
+>>>
+>>>    static Property pxb_pcie_host_props[] = {
+>>>        DEFINE_PROP_UINT64(PCIE_HOST_MCFG_BASE, PXBPCIEHost, parent_obj.base_addr,
+>>> -                        PCIE_BASE_ADDR_UNMAPPED),
+>>> +                       PCIE_BASE_ADDR_UNMAPPED),
+>>> +    DEFINE_PROP_UINT64(PCIE_HOST_MCFG_SIZE, PXBPCIEHost, parent_obj.size, 0),
+>>>        DEFINE_PROP_UINT32("domain_nr", PXBPCIEHost, domain_nr, 0),
+>>>        DEFINE_PROP_UINT8("bus_nr", PXBPCIEHost, bus_nr, 0),
+>>>        DEFINE_PROP_UINT8("max_bus", PXBPCIEHost, max_bus, 255),
+>>> @@ -301,6 +311,8 @@ static gint pxb_compare(gconstpointer a, gconstpointer b)
+>>>               0;
+>>>    }
+>>>
+>>> +static uint64_t pxb_pcie_mcfg_base = 0;
+>>> +
+>>>    static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
+>>>    {
+>>>        PXBDev *pxb = convert_to_pxb(dev);
+>>> @@ -327,6 +339,15 @@ static void pxb_dev_realize_common(PCIDevice *dev, bool pcie, Error **errp)
+>>>            qdev_prop_set_uint8(ds, "bus_nr", pxb->bus_nr); //TODO.
+>>>            qdev_prop_set_uint8(ds, "max_bus", pxb->max_bus);
+>>>            qdev_prop_set_uint8(ds, "domain_nr", pxb->domain_nr);
+>>> +
+>>> +        /* will be overwritten by firmware, but kept for readability */
+>>> +        qdev_prop_set_uint64(ds, PCIE_HOST_MCFG_BASE,
+>>> +            pxb->domain_nr ? pxb_pcie_mcfg_base : MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT);
+>>> +        qdev_prop_set_uint64(ds, PCIE_HOST_MCFG_SIZE,
+>>> +            pxb->domain_nr ? (pxb->max_bus + 1ULL) << 20 : 0);
+>>> +        if (pxb->domain_nr)
+>>> +            pxb_pcie_mcfg_base += ((pxb->max_bus + 1ULL) << 20);
+>>> +
+>>>            bus = pci_root_bus_new(ds, dev_name, NULL, NULL, 0, TYPE_PXB_PCIE_BUS);
+>>>        } else {
+>>>            ds = qdev_create(NULL, TYPE_PXB_HOST);
+>>> @@ -438,6 +459,9 @@ static void pxb_pcie_dev_realize(PCIDevice *dev, Error **errp)
+>>>            return;
+>>>        }
+>>>
+>>> +    if (0 == pxb_pcie_mcfg_base)
+>>> +        pxb_pcie_mcfg_base = pc_pci_mcfg_start();
+>>> +
+>>>        pxb_dev_realize_common(dev, true, errp);
+>>>    }
+>>>
+>>> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+>>> index 02f9576..a76029d 100644
+>>> --- a/hw/pci-host/q35.c
+>>> +++ b/hw/pci-host/q35.c
+>>> @@ -178,6 +178,8 @@ static Property q35_host_props[] = {
+>>>        DEFINE_PROP_SIZE(PCI_HOST_ABOVE_4G_MEM_SIZE, Q35PCIHost,
+>>>                         mch.above_4g_mem_size, 0),
+>>>        DEFINE_PROP_BOOL("x-pci-hole64-fix", Q35PCIHost, pci_hole64_fix, true),
+>>> +    /* q35 host bridge should always stay in pci domain 0 */
+>>> +    DEFINE_PROP_UINT32("domain_nr", Q35PCIHost, domain_nr, 0),
+>>>        DEFINE_PROP_END_OF_LIST(),
+>>>    };
+>>>
+>>> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+>>> index 04d1f8c..81ba010 100644
+>>> --- a/include/hw/i386/pc.h
+>>> +++ b/include/hw/i386/pc.h
+>>> @@ -212,6 +212,7 @@ void pc_memory_init(PCMachineState *pcms,
+>>>                        MemoryRegion *rom_memory,
+>>>                        MemoryRegion **ram_memory);
+>>>    uint64_t pc_pci_hole64_start(void);
+>>> +uint64_t pc_pci_mcfg_start(void);
+>>>    qemu_irq pc_allocate_cpu_irq(void);
+>>>    DeviceState *pc_vga_init(ISABus *isa_bus, PCIBus *pci_bus);
+>>>    void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
+>>> diff --git a/include/hw/pci-bridge/pci_expander_bridge.h b/include/hw/pci-bridge/pci_expander_bridge.h
+>>> new file mode 100644
+>>> index 0000000..bb1462c
+>>> --- /dev/null
+>>> +++ b/include/hw/pci-bridge/pci_expander_bridge.h
+>>> @@ -0,0 +1,6 @@
+>>> +#ifndef HW_PCI_EXPANDER_H
+>>> +#define HW_PCI_EXPANDER_H
+>>> +
+>>> +uint64_t pxb_pcie_mcfg_hole(void);
+>>> +
+>>> +#endif
+>>> diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
+>>> index 8f4ddde..432e569 100644
+>>> --- a/include/hw/pci-host/q35.h
+>>> +++ b/include/hw/pci-host/q35.h
+>>> @@ -69,6 +69,7 @@ typedef struct Q35PCIHost {
+>>>        /*< public >*/
+>>>
+>>>        bool pci_hole64_fix;
+>>> +    uint32_t domain_nr;
+>>>        MCHPCIState mch;
+>>>    } Q35PCIHost;
+>>>
+>> Thanks,
+>> Marcel
+>>
