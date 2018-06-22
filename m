@@ -1,45 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fWMy7-0006tN-Iq
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:23:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fWN0E-0000Iv-Ro
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:25:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fWMy3-00040X-Fq
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:23:19 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58802
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1fWMy3-00040N-9y
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:23:15 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5MEId1H108214
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 10:23:14 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2js2hq12rx-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 10:23:14 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 22 Jun 2018 08:23:10 -0600
-References: <20180621115530.11069-1-marcandre.lureau@redhat.com>
-	<20180621115530.11069-5-marcandre.lureau@redhat.com>
-	<9d02acd4-8a60-1ac3-00d9-8c99940254a2@linux.vnet.ibm.com>
-	<20180622110312.275b5d59@redhat.com>
-	<aa7b8eb8-3353-cac1-8c17-43f928cc3ff6@linux.vnet.ibm.com>
-	<20180622155642.3f05423b@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 22 Jun 2018 10:23:05 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fWN0D-0004kh-SY
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:25:30 -0400
+Date: Fri, 22 Jun 2018 16:25:13 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180622142513.GH4366@localhost.localdomain>
+References: <20180615142108.27814-1-kwolf@redhat.com>
+	<20180615142108.27814-26-kwolf@redhat.com>
+	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
+	<20180622125502.GF4366@localhost.localdomain>
+	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20180622155642.3f05423b@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Message-Id: <da031edd-af7d-d51a-616a-1b231becd4c9@linux.vnet.ibm.com>
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] acpi: build TPM Physical Presence
- interface
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
+Subject: Re: [Qemu-devel] [PULL 25/26] block: Remove deprecated -drive
+ option serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,141 +27,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Boris Fiuczynski <fiuczy@linux.ibm.com>, libvir-list@redhat.com, eblake@redhat.com, pkrempa@redhat.com, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-T24gMDYvMjIvMjAxOCAwOTo1NiBBTSwgSWdvciBNYW1tZWRvdiB3cm90ZToNCj4gT24gRnJp
-LCAyMiBKdW4gMjAxOCAwOToyNjo0NSAtMDQwMA0KPiBTdGVmYW4gQmVyZ2VyIDxzdGVmYW5i
-QGxpbnV4LnZuZXQuaWJtLmNvbT4gd3JvdGU6DQo+DQo+PiBPbiAwNi8yMi8yMDE4IDA1OjAz
-IEFNLCBJZ29yIE1hbW1lZG92IHdyb3RlOg0KPj4+IEknZCBwcmVmZXIgYSB0YWJsZSBmb3Jt
-YXQgdG8gZGVzY3JpYmUgbGF5b3V0LCBsaWtlIGluDQo+Pj4gZG9jcy9zcGVjcy9hY3BpX252
-ZGltbS50eHQgb3IgZG9jcy9zcGVjcy9hY3BpX21lbV9ob3RwbHVnLnR4dA0KPj4gZGlmZiAt
-LWdpdCBhL2RvY3Mvc3BlY3MvdHBtLnR4dCBiL2RvY3Mvc3BlY3MvdHBtLnR4dA0KPj4gaW5k
-ZXggYzIzMGM0YzkzZS4uNWJmNGU4OTJhMCAxMDA2NDQNCj4+IC0tLSBhL2RvY3Mvc3BlY3Mv
-dHBtLnR4dA0KPj4gKysrIGIvZG9jcy9zcGVjcy90cG0udHh0DQo+PiBAQCAtNDIsNiArNDIs
-NzYgQEAgVVJMOg0KPj4NCj4+ICAgwqBodHRwczovL3RydXN0ZWRjb21wdXRpbmdncm91cC5v
-cmcvdGNnLWFjcGktc3BlY2lmaWNhdGlvbi8NCj4+DQo+PiArPT0gQUNQSSBQUEkgSW50ZXJm
-YWNlID09DQo+PiArDQo+PiArUUVNVSBzdXBwb3J0cyB0aGUgUGh5c2ljYWwgUHJlc2VuY2Ug
-SW50ZXJmYWNlIChQUEkpIGZvciBUUE0gMS4yIGFuZCBUUE0NCj4+IDIuIFRoaXMNCj4+ICtp
-bnRlcmZhY2UgcmVxdWlyZXMgQUNQSSBhbmQgZmlybXdhcmUgc3VwcG9ydC4gVGhlIHNwZWNp
-ZmljYXRpb24gY2FuIGJlDQo+PiBmb3VuZCBhdA0KPj4gK3RoZSBmb2xsb3dpbmcgVVJMOg0K
-Pj4gKw0KPj4gK2h0dHBzOi8vdHJ1c3RlZGNvbXB1dGluZ2dyb3VwLm9yZy9yZXNvdXJjZS90
-Y2ctcGh5c2ljYWwtcHJlc2VuY2UtaW50ZXJmYWNlLXNwZWNpZmljYXRpb24vDQo+PiArDQo+
-PiArUFBJIGVuYWJsZXMgYSBzeXN0ZW0gYWRtaW5pc3RyYXRvciAocm9vdCkgdG8gcmVxdWVz
-dCBhIG1vZGlmaWNhdGlvbiB0byB0aGUNCj4+ICtUUE0gdXBvbiByZWJvb3QuIFRoZSBQUEkg
-c3BlY2lmaWNhdGlvbiBkZWZpbmVzIHRoZSBvcGVyYXRpb24gcmVxdWVzdHMNCj4+IGFuZCB0
-aGUNCj4+ICthY3Rpb25zIHRoZSBmaXJtd2FyZSBoYXMgdG8gdGFrZS4gVGhlIHN5c3RlbSBh
-ZG1pbmlzdHJhdG9yIHBhc3NlcyB0aGUNCj4+IG9wZXJhdGlvbg0KPj4gK3JlcXVlc3QgbnVt
-YmVyIHRvIHRoZSBmaXJtd2FyZSB0aHJvdWdoIGFuIEFDUEkgaW50ZXJmYWNlIHdoaWNoIHdy
-aXRlcyB0aGlzDQo+PiArbnVtYmVyIHRvIGEgbWVtb3J5IGxvY2F0aW9uIHRoYXQgdGhlIGZp
-cm13YXJlIGtub3dzLiBVcG9uIHJlYm9vdCwgdGhlDQo+PiBmaXJtd2FyZQ0KPj4gK2ZpbmRz
-IHRoZSBudW1iZXIgYW5kIHNlbmRzIGNvbW1hbmRzIHRvIHRoZSB0aGUgVFBNLiBUaGUgZmly
-bXdhcmUgd3JpdGVzDQo+PiB0aGUgVFBNDQo+PiArcmVzdWx0IGNvZGUgYW5kIHRoZSBvcGVy
-YXRpb24gcmVxdWVzdCBudW1iZXIgdG8gYSBtZW1vcnkgbG9jYXRpb24gdGhhdA0KPj4gQUNQ
-SSBjYW4NCj4+ICtyZWFkIGZyb20gYW5kIHBhc3MgdGhlIHJlc3VsdCBvbiB0byB0aGUgYWRt
-aW5pc3RyYXRvci4NCj4+ICsNCj4+ICtUaGUgUFBJIHNwZWNpZmljYXRpb24gZGVmaW5lcyBh
-IHNldCBvZiBtYW5kYXRvcnkgYW5kIG9wdGlvbmFsDQo+PiBvcGVyYXRpb25zIGZvcg0KPj4g
-K3RoZSBmaXJtd2FyZSB0byBpbXBsZW1lbnQuIFRoZSBBQ1BJIGludGVyZmFjZSBhbHNvIGFs
-bG93cyBhbg0KPj4gYWRtaW5pc3RyYXRvciB0bw0KPj4gK2xpc3QgdGhlIHN1cHBvcnRlZCBv
-cGVyYXRpb25zLiBJbiBRRU1VIHRoZSBBQ1BJIGNvZGUgaXMgZ2VuZXJhdGVkIGJ5DQo+PiBR
-RU1VLCB5ZXQNCj4+ICt0aGUgZmlybXdhcmUgbmVlZHMgdG8gaW1wbGVtZW50IHN1cHBvcnQg
-b24gYSBwZXItb3BlcmF0aW9ucyBiYXNpcywgYW5kDQo+PiArZGlmZmVyZW50IGZpcm13YXJl
-cyBtYXkgc3VwcG9ydCBhIGRpZmZlcmVudCBzdWJzZXQuIFRoZXJlZm9yZSwgUUVNVQ0KPj4g
-aW50cm9kdWNlcw0KPj4gK3RoZSB2aXJ0dWFsIG1lbW9yeSBkZXZpY2UgZm9yIFBQSSB3aGVy
-ZSB0aGUgZmlybXdhcmUgY2FuIGluZGljYXRlIHdoaWNoDQo+PiArb3BlcmF0aW9ucyBpdCBz
-dXBwb3J0cyBhbmQgQUNQSSBjYW4gZW5hYmxlIHRoZSBvbmVzIHRoYXQgYXJlIHN1cHBvcnRl
-ZCBhbmQNCj4+ICtkaXNhYmxlIGFsbCBvdGhlcnMuIFRoaXMgaW50ZXJmYWNlIGxpZXMgaW4g
-bWFpbiBtZW1vcnkgYW5kIGhhcyB0aGUNCj4+IGZvbGxvd2luZw0KPiB3aGF0IGFib3V0IHVz
-ZWNhc2Ugd2hlbiBpdCdzIG1hcHBlZCBpbiBpc2EgYWRkcmVzcyBzcGFjZT8NCj4gICAgdHBt
-X3Rpc19yZWFsaXplZm4oKSAtPg0KPiAgICAgICAgIHRwbV9wcGlfaW5pdF9pbygmcy0+cHBp
-LCBpc2FfYWRkcmVzc19zcGFjZShJU0FfREVWSUNFKGRldikpDQoNClRoZSB1c2UgY2FzZSBm
-b3IgUFBJIGlzICdhZG1pbmlzdHJhdG9yIHdhbnRzIHRvIHJlY29uZmlndXJlIHRoZSBUUE0g
-b24gDQpuZXh0IHJlYm9vdC4nIEkgYW0gbm90IHN1cmUgd2hhdCBlbHNlIHRvIGFkZD8hDQoN
-Cj4NCj4+ICtsYXlvdXQ6DQo+PiArDQo+PiArICstLS0tLS0tLS0tKy0tLS0tLS0tKy0tLS0t
-LS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQo+PiAr
-wqDCoCB8wqAgRmllbGTCoMKgIHwgTGVuZ3RoIHwgT2Zmc2V0IHwgRGVzY3JpcHRpb27CoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCj4+ICsgKy0tLS0tLS0tLS0rLS0tLS0tLS0r
-LS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSsN
-Cj4+ICvCoMKgIHwgZnVuY8KgwqDCoMKgIHzCoCAweDEwMCB8wqAgMHgwMDAgfCBGaXJtd2Fy
-ZSBzZXRzIHZhbHVlcyBmb3IgZWFjaA0KPj4gc3VwcG9ydGVkwqDCoCB8DQo+PiArwqDCoCB8
-wqDCoMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAgfCBv
-cGVyYXRpb24uIFNlZSBkZWZpbmVkIHZhbHVlcw0KPj4gYmVsb3cuwqDCoMKgwqDCoCB8DQo+
-PiArICstLS0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQo+PiArwqDCoCB8IHBwaW7CoMKgwqDCoCB8wqDC
-oCAweDHCoCB8wqAgMHgxMDAgfCBTTUkgaW50ZXJydXB0IHRvIHVzZS4gU2V0IGJ5DQo+PiBm
-aXJtd2FyZS7CoMKgwqAgfA0KPj4gK8KgwqAgfMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKg
-wqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgIHwgTm90DQo+PiBzdXBwb3J0ZWQuwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCj4+ICsg
-Ky0tLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLSsNCj4+ICvCoMKgIHwgcHBpcMKgwqDCoMKgIHzCoMKgIDB4
-NMKgIHzCoCAweDEwMSB8IEFDUEkgZnVuY3Rpb24gaW5kZXggdG8gcGFzcyB0byBTTU0NCj4+
-IGNvZGUuwqAgfA0KPj4gK8KgwqAgfMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKg
-wqAgfMKgwqDCoMKgwqDCoMKgIHwgU2V0IGJ5IEFDUEkuIE5vdA0KPj4gc3VwcG9ydGVkLsKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfA0KPj4gKyArLS0tLS0tLS0tLSstLS0tLS0t
-LSstLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-Kw0KPj4gK8KgwqAgfCBwcHJwwqDCoMKgwqAgfMKgwqAgMHg0wqAgfMKgIDB4MTA1IHwgUmVz
-dWx0IG9mIGxhc3QgZXhlY3V0ZWQgb3BlcmF0aW9uLg0KPj4gU2V0IGJ5IHwNCj4+ICvCoMKg
-IHzCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoCB8
-DQo+PiBmaXJtd2FyZS7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCj4+ICsgKy0tLS0tLS0tLS0rLS0tLS0tLS0r
-LS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSsN
-Cj4+ICvCoMKgIHwgcHByccKgwqDCoMKgIHzCoMKgIDB4NMKgIHzCoCAweDEwOSB8IE9wZXJh
-dGlvbiByZXF1ZXN0IG51bWJlciB0byBleGVjdXRlLg0KPj4gU2V0wqAgfA0KPj4gK8KgwqAg
-fMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgIHwg
-YnkNCj4+IEFDUEkuwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCj4+ICsgKy0tLS0tLS0tLS0rLS0tLS0tLS0r
-LS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSsN
-Cj4+ICvCoMKgIHwgcHBybcKgwqDCoMKgIHzCoMKgIDB4NMKgIHzCoCAweDEwZCB8IE9wZXJh
-dGlvbiByZXF1ZXN0IG9wdGlvbmFsIHBhcmFtZXRlci4NCj4+IFNldCB8DQo+PiArwqDCoCB8
-wqDCoMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAgfCBi
-eQ0KPj4gQUNQSS7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfA0KPj4gKyArLS0tLS0tLS0tLSstLS0tLS0tLSst
-LS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKw0K
-Pj4gK8KgwqAgfCBscHBywqDCoMKgwqAgfMKgwqAgMHg0wqAgfMKgIDB4MTExIHwgTGFzdCBl
-eGVjdXRlIHJlcXVlc3QgbnVtYmVyLiBTZXQNCj4+IGJ5wqDCoMKgwqDCoMKgIHwNCj4+ICvC
-oMKgIHzCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDC
-oCB8DQo+PiBmaXJtd2FyZS7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCj4+ICsgKy0tLS0tLS0tLS0rLS0tLS0t
-LS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LSsNCj4+ICvCoMKgIHwgZnJldMKgwqDCoMKgIHzCoMKgIDB4NMKgIHzCoCAweDExNSB8IFJl
-c3VsdCBjb2RlIGZyb20gU01NDQo+PiBmdW5jdGlvbi7CoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IHwNCj4+ICvCoMKgIHzCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgIHzCoMKg
-wqDCoMKgwqDCoCB8IE5vdA0KPj4gc3VwcG9ydGVkLsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8DQo+PiArICstLS0tLS0tLS0tKy0t
-LS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0rDQo+PiArwqDCoCB8IHJlczHCoMKgwqDCoCB8wqAgMHg0MMKgIHzCoCAweDExOSB8
-IFJlc2VydmVkIGZvciBmdXR1cmUNCj4+IHVzZcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCB8DQo+PiArICstLS0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQo+PiArwqDCoCB8IG5l
-eHRfc3RlcHzCoMKgIDB4McKgIHzCoCAweDE1OSB8IE9wZXJhdGlvbiB0byBleGVjdXRlIGFm
-dGVyIHJlYm9vdA0KPj4gYnnCoMKgwqDCoMKgIHwNCj4+ICvCoMKgIHzCoMKgwqDCoMKgwqDC
-oMKgwqAgfMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoCB8IGZpcm13YXJlLiBVc2Vk
-IGJ5DQo+PiBmaXJtd2FyZS7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCj4+ICsg
-Ky0tLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLSsNCj4gaWYgdGhlcmUgaXMgcmVsZXZhbnQgbWF0Y2gvZGVz
-Y3JpcHRpb24gaW4gUFBJIHNwZWMgZm9yIGFib3ZlIGZpZWxkcw0KPiBpdCB3b3VsZCBiZSBi
-ZXR0ZXIgdG8gcHV0IHJlZmVyZW5jZSB0byBpdCBpbiBkZXNjcmlwdGlvbiBmaWVsZHMgYW5k
-DQo+IGFzIGZpZWxkIG5hbWUgdGhhdCBjb3VsZCBiZSBlYXNpbHkgZ3JlcHBlZCBmb3IgaW4g
-UFBJIHNwZWMsDQo+IGxpa2Ugd2Ugd2UgZG8gd2l0aCBBQ1BJIHByaW1pdGl2ZXM6DQo+DQo+
-ICAgICJBQ1BJIDEuMGI6IDE2LjIuNS4xIE5hbWVzcGFjZSBNb2RpZmllciBPYmplY3RzIEVu
-Y29kaW5nOiBEZWZTY29wZSINCj4NCj4gc28gcmVhZGVyIGNvdWxkIGVhc2lseSBtYXRjaCBz
-cGVjIHdpdGggcGFydHMgaGUvc2hlIGlzIGludGVyZXN0ZWQgaW4uDQoNClRoZSBBQ1BJIHNw
-ZWMgZG9lcyBub3QgZ28gdG8gdGhlIGxldmVsIG9mIHRoZSBpbXBsZW1lbnRhdGlvbiBsZXQg
-YWxvbmUgDQp0aGUgbmVjZXNzYXJ5IGZpZWxkcy4gVGhlIG5hbWVzIG9mIHRoZSBmaWVsZHMg
-c3RlbSBmcm9tIGVkazIuDQoNCg0KPg0KPj4gKw0KPj4gK8KgwqAgVGhlIGZvbGxvd2luZyB2
-YWx1ZXMgYXJlIHN1cHBvcnRlZCBmb3IgdGhlICdmdW5jJyBmaWVsZC4gVGhleSBjb3JyZXNw
-b25kDQo+PiArwqDCoCB0byB0aGUgdmFsdWVzIHVzZWQgYnkgQUNQSSBmdW5jdGlvbiBpbmRl
-eCA4Lg0KPj4gKw0KPj4gK8KgwqDCoCAjZGVmaW5lIFRQTV9QUElfRlVOQ19OT1RfSU1QTEVN
-RU5URUTCoMKgwqDCoCAoMCA8PCAwKQ0KPj4gK8KgwqDCoCAjZGVmaW5lIFRQTV9QUElfRlVO
-Q19CSU9TX09OTFnCoMKgwqDCoMKgwqDCoMKgwqDCoCAoMSA8PCAwKQ0KPj4gK8KgwqDCoCAj
-ZGVmaW5lIFRQTV9QUElfRlVOQ19CTE9DS0VEwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICgy
-IDw8IDApDQo+PiArwqDCoMKgICNkZWZpbmUgVFBNX1BQSV9GVU5DX0FMTE9XRURfVVNSX1JF
-UcKgwqDCoMKgICgzIDw8IDApDQo+PiArwqDCoMKgICNkZWZpbmUgVFBNX1BQSV9GVU5DX0FM
-TE9XRURfVVNSX05PVF9SRVEgKDQgPDwgMCkNCj4+ICvCoMKgwqAgI2RlZmluZSBUUE1fUFBJ
-X0ZVTkNfTUFTS8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAoNyA8PCAwKQ0KPj4g
-Kw0KPiBsb29rcyBnb29kIHRvIG1lDQo+IFBTOg0KPiBtYXliZSBkcm9wICNkZWZpbmUgcGFy
-dCBhbmQgbWFrZSBhIHRhYmxlIGZyb20gaXQgdG9vIHNvIHJlYWRlcg0KPiB3b24ndCBoYXZl
-IHRvIGRvIHNoaWZ0IG9uIGhpcyBvd24sIGxpa2UNCj4NCj4gICAgMHgwICB8IGZ1bmN0aW9u
-IGlzIG5vdCBpbXBsZW1lbnRlZA0KPiAgICAweDEgIHwgLi4uDQo+ICAgIC4uLg0KPg0KPg0K
-Pj4gICDCoFFFTVUgZmlsZXMgcmVsYXRlZCB0byBUUE0gQUNQSSB0YWJsZXM6DQo+PiAgIMKg
-IC0gaHcvaTM4Ni9hY3BpLWJ1aWxkLmMNCj4+DQoNCg==
+Am 22.06.2018 um 15:36 hat Christian Borntraeger geschrieben:
+> 
+> 
+> On 06/22/2018 02:55 PM, Kevin Wolf wrote:
+> > Am 22.06.2018 um 13:38 hat Christian Borntraeger geschrieben:
+> >>
+> >> On 06/15/2018 04:21 PM, Kevin Wolf wrote:
+> >>> The -drive option serial was deprecated in QEMU 2.10. It's time to
+> >>> remove it.
+> >>>
+> >>> Tests need to be updated to set the serial number with -global instead
+> >>> of using the -drive option.
+> >>
+> >> libvirt 4.5 still creates those (at least on s390x)
+> >>
+> >>     <disk type='file' device='disk'>
+> >>       <driver name='qemu' type='qcow2' cache='none' io='native' iothread='1'/>
+> >>       <source file='/var/lib/libvirt/qemu/image.zhyp137'/>
+> >>       <target dev='hda' bus='virtio'/>
+> >>       <serial>skel</serial>
+> >>       <boot order='1'/>
+> >>       <address type='ccw' cssid='0xfe' ssid='0x0' devno='0x0000'/>
+> >>     </disk>
+> >>
+> >>
+> >> -> 
+> >> [...]
+> >> -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native -device virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0000,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on 
+> >> [...]
+> >>
+> >> 2018-06-22T11:25:20.946024Z qemu-system-s390x: -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native: Block format 'qcow2' does not support the option 'serial'
+> >> 2018-06-22 11:25:21.098+0000: shutting down, reason=failed
+> >>
+> >> So it seems that this breaks s390x.
+> 
+> To me it seems that this is also broken on x86.
+> > 
+> > Thanks for bringing this up. libvirt should fix this before QEMU 3.0 is
+> > released.
+> 
+> I think this is definitely too short notice. We should not break existing
+> setups just by insisting that users have to update libvirt when they update
+> QEMU. Yes, this might be our policy, but doing so "just because we can"
+> is certainly a very bad attitude. I see no fundamental technical reason why
+> we should not revert this change.
+
+This was in fact one release longer than our deprecation policy says.
+Are we serious about the deprecation policy or aren't we?
+
+I might consider reverting a change if it turned out that this requires
+some massive work in libvirt. But I think this one should be rather easy
+to fix in libvirt until 3.0 is released.
+
+> > Sadly, it also shows that deprecation warnings in log files go
+> > unnoticed.
+> 
+> In fact whoever added the deprication notice should have followed up
+> with the libvirt team to implement that change. no?
+
+I expect the libvirt developers to read the QEMU Changelog at least for
+incompatible changes and deprecations. We can't reasonably go and hunt
+for developers for every management tool for QEMU that exists.
+
+And anyway, if you come across a deprecation warning, that's the time
+you should act, not only when it finally breaks.
+
+Kevin
