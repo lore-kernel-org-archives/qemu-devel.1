@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1fWMSo-0005g7-ME
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:51:00 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fWMYS-0002Mx-Qg
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:56:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1fWMSn-0008BF-Qz
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:50:58 -0400
-Date: Fri, 22 Jun 2018 09:50:45 -0400
-From: Aaron Lindsay <alindsay@codeaurora.org>
-Message-ID: <20180622135045.GD12424@codeaurora.org>
-References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
-	<1523997485-1905-4-git-send-email-alindsay@codeaurora.org>
-	<CAFEAcA_g1Bb=-cj+QToHDypZPiqw_U5YioRWfDSs0Ano3PqDTQ@mail.gmail.com>
+	(envelope-from <imammedo@redhat.com>) id 1fWMYP-0001qd-Q4
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:56:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55534 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fWMYP-0001qX-JP
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:56:45 -0400
+Date: Fri, 22 Jun 2018 15:56:42 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180622155642.3f05423b@redhat.com>
+In-Reply-To: <aa7b8eb8-3353-cac1-8c17-43f928cc3ff6@linux.vnet.ibm.com>
+References: <20180621115530.11069-1-marcandre.lureau@redhat.com>
+	<20180621115530.11069-5-marcandre.lureau@redhat.com>
+	<9d02acd4-8a60-1ac3-00d9-8c99940254a2@linux.vnet.ibm.com>
+	<20180622110312.275b5d59@redhat.com>
+	<aa7b8eb8-3353-cac1-8c17-43f928cc3ff6@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_g1Bb=-cj+QToHDypZPiqw_U5YioRWfDSs0Ano3PqDTQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 03/21] target/arm: Reorganize PMCCNTR
- accesses
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 4/5] acpi: build TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +31,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Apr 20 11:17, Peter Maydell wrote:
-> On 17 April 2018 at 21:37, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> > pmccntr_read and pmccntr_write contained duplicate code that was already
-> > being handled by pmccntr_sync. Consolidate the duplicated code into two
-> > functions: pmccntr_op_start and pmccntr_op_finish. Add a companion to
-> > c15_ccnt in CPUARMState so that we can simultaneously save both the
-> > architectural register value and the last underlying cycle count - this
-> > ensure time isn't lost and will also allow us to access the 'old'
-> > architectural register value in order to detect overflows in later
-> > patches.
-> >
-> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-> > ---
-> >  target/arm/cpu.h    |  28 ++++++++++-----
-> >  target/arm/helper.c | 100 ++++++++++++++++++++++++++++------------------------
-> >  2 files changed, 73 insertions(+), 55 deletions(-)
-> >
-> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> > index 19a0c03..04041db 100644
-> > --- a/target/arm/cpu.h
-> > +++ b/target/arm/cpu.h
-> > @@ -454,10 +454,20 @@ typedef struct CPUARMState {
-> >          uint64_t oslsr_el1; /* OS Lock Status */
-> >          uint64_t mdcr_el2;
-> >          uint64_t mdcr_el3;
-> > -        /* If the counter is enabled, this stores the last time the counter
-> > -         * was reset. Otherwise it stores the counter value
-> > +        /* Stores the architectural value of the counter *the last time it was
-> > +         * updated* by pmccntr_op_start. Accesses should always be surrounded
-> > +         * by pmccntr_op_start/pmccntr_op_finish to guarantee the latest
-> > +         * architecturally-corect value is being read/set.
-> >           */
-> >          uint64_t c15_ccnt;
-> > +        /* Stores the delta between the architectural value and the underlying
-> > +         * cycle count during normal operation. It is used to update c15_ccnt
-> > +         * to be the correct architectural value before accesses. During
-> > +         * accesses, c15_ccnt_delta contains the underlying count being used
-> > +         * for the access, after which it reverts to the delta value in
-> > +         * pmccntr_op_finish.
-> > +         */
-> > +        uint64_t c15_ccnt_delta;
-> 
-> So the key question here is: how does this work for VM migration?
+On Fri, 22 Jun 2018 09:26:45 -0400
+Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
 
-To be honest, I'm not sure I fully understand the things I need to be
-looking out for with VM migration.
+> On 06/22/2018 05:03 AM, Igor Mammedov wrote:
+> > I'd prefer a table format to describe layout, like in
+> > docs/specs/acpi_nvdimm.txt or docs/specs/acpi_mem_hotplug.txt =20
+>=20
+> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+> index c230c4c93e..5bf4e892a0 100644
+> --- a/docs/specs/tpm.txt
+> +++ b/docs/specs/tpm.txt
+> @@ -42,6 +42,76 @@ URL:
+>=20
+>  =C2=A0https://trustedcomputinggroup.org/tcg-acpi-specification/
+>=20
+> +=3D=3D ACPI PPI Interface =3D=3D
+> +
+> +QEMU supports the Physical Presence Interface (PPI) for TPM 1.2 and TPM=
+=20
+> 2. This
+> +interface requires ACPI and firmware support. The specification can be=20
+> found at
+> +the following URL:
+> +
+> +https://trustedcomputinggroup.org/resource/tcg-physical-presence-interfa=
+ce-specification/
+> +
+> +PPI enables a system administrator (root) to request a modification to t=
+he
+> +TPM upon reboot. The PPI specification defines the operation requests=20
+> and the
+> +actions the firmware has to take. The system administrator passes the=20
+> operation
+> +request number to the firmware through an ACPI interface which writes th=
+is
+> +number to a memory location that the firmware knows. Upon reboot, the=20
+> firmware
+> +finds the number and sends commands to the the TPM. The firmware writes=
+=20
+> the TPM
+> +result code and the operation request number to a memory location that=20
+> ACPI can
+> +read from and pass the result on to the administrator.
+> +
+> +The PPI specification defines a set of mandatory and optional=20
+> operations for
+> +the firmware to implement. The ACPI interface also allows an=20
+> administrator to
+> +list the supported operations. In QEMU the ACPI code is generated by=20
+> QEMU, yet
+> +the firmware needs to implement support on a per-operations basis, and
+> +different firmwares may support a different subset. Therefore, QEMU=20
+> introduces
+> +the virtual memory device for PPI where the firmware can indicate which
+> +operations it supports and ACPI can enable the ones that are supported a=
+nd
+> +disable all others. This interface lies in main memory and has the=20
+> following
+what about usecase when it's mapped in isa address space?
+  tpm_tis_realizefn() ->
+       tpm_ppi_init_io(&s->ppi, isa_address_space(ISA_DEVICE(dev))
 
-My guess, though, is that this current implementation is not sufficient.
-Perhaps there needs to be logic to ensure that c15_ccnt is the current
-architectural value before migration and also to setup c15_ccnt_delta to
-be the delta between that architectural value and the underlying cycle
-count upon inbound migration. Does that sound like an approach which
-would fit well within the rest of the migration framework?
+> +layout:
+> +
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> +=C2=A0=C2=A0 |=C2=A0 Field=C2=A0=C2=A0 | Length | Offset | Description=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> +=C2=A0=C2=A0 | func=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 0x100 |=C2=A0 0x000 =
+| Firmware sets values for each=20
+> supported=C2=A0=C2=A0 |
+> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | operation. See defined values=20
+> below.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> +=C2=A0=C2=A0 | ppin=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x1=C2=A0 |=C2=
+=A0 0x100 | SMI interrupt to use. Set by=20
+> firmware.=C2=A0=C2=A0=C2=A0 |
+> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | Not=20
+> supported.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> +=C2=A0=C2=A0 | ppip=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=C2=
+=A0 0x101 | ACPI function index to pass to SMM=20
+> code.=C2=A0 |
+> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | Set by ACPI. Not=20
+> supported.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> +=C2=A0=C2=A0 | pprp=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=C2=
+=A0 0x105 | Result of last executed operation.=20
+> Set by |
+> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 |=20
+> firmware.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> +=C2=A0=C2=A0 | pprq=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=C2=
+=A0 0x109 | Operation request number to execute.=20
+> Set=C2=A0 |
+> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | by=20
+> ACPI.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> +=C2=A0=C2=A0 | pprm=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=C2=
+=A0 0x10d | Operation request optional parameter.=20
+> Set |
+> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | by=20
+> ACPI.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> +=C2=A0=C2=A0 | lppr=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=C2=
+=A0 0x111 | Last execute request number. Set=20
+> by=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 |=20
+> firmware.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> +=C2=A0=C2=A0 | fret=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=C2=
+=A0 0x115 | Result code from SMM=20
+> function.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |
+> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | Not=20
+> supported.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> +=C2=A0=C2=A0 | res1=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 0x40=C2=A0 |=C2=A0 0=
+x119 | Reserved for future=20
+> use=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+> +=C2=A0=C2=A0 | next_step|=C2=A0=C2=A0 0x1=C2=A0 |=C2=A0 0x159 | Operatio=
+n to execute after reboot=20
+> by=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
+> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | firmware. Used by=20
+> firmware.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |
+> + +----------+--------+--------+-----------------------------------------=
+--+
+if there is relevant match/description in PPI spec for above fields
+it would be better to put reference to it in description fields and
+as field name that could be easily grepped for in PPI spec,
+like we we do with ACPI primitives:
 
--Aaron
+  "ACPI 1.0b: 16.2.5.1 Namespace Modifier Objects Encoding: DefScope"
 
--- 
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+so reader could easily match spec with parts he/she is interested in.
+
+> +
+> +=C2=A0=C2=A0 The following values are supported for the 'func' field. Th=
+ey correspond
+> +=C2=A0=C2=A0 to the values used by ACPI function index 8.
+> +
+> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_NOT_IMPLEMENTED=C2=A0=C2=A0=C2=
+=A0=C2=A0 (0 << 0)
+> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_BIOS_ONLY=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1 << 0)
+> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_BLOCKED=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (2 << 0)
+> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_ALLOWED_USR_REQ=C2=A0=C2=A0=C2=
+=A0=C2=A0 (3 << 0)
+> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ (4 << 0)
+> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_MASK=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (7 << 0)
+> +
+
+looks good to me
+PS:
+maybe drop #define part and make a table from it too so reader
+won't have to do shift on his own, like
+
+  0x0  | function is not implemented
+  0x1  | ...
+  ...
+
+
+>  =C2=A0QEMU files related to TPM ACPI tables:
+>  =C2=A0 - hw/i386/acpi-build.c
+>=20
