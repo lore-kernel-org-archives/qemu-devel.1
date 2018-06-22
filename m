@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJPs-0000dy-9O
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJPt-0000fb-Rg
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJPp-0003Pn-VX
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJPq-0003QS-FM
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:45 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 22 Jun 2018 20:35:11 +1000
-Message-Id: <20180622103528.28598-9-david@gibson.dropbear.id.au>
+Date: Fri, 22 Jun 2018 20:35:06 +1000
+Message-Id: <20180622103528.28598-4-david@gibson.dropbear.id.au>
 In-Reply-To: <20180622103528.28598-1-david@gibson.dropbear.id.au>
 References: <20180622103528.28598-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 08/25] spapr: Compute effective capability
- values earlier
+Subject: [Qemu-devel] [PULL 03/25] spapr_cpu_core: migrate per-CPU data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,99 +22,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Previously, the effective values of the various spapr capability flags
-were only determined at machine reset time.  That was a lazy way of makin=
-g
-sure it was after cpu initialization so it could use the cpu object to
-inform the defaults.
+From: Greg Kurz <groug@kaod.org>
 
-But we've now improved the compat checking code so that we don't need to
-instantiate the cpus to use it.  That lets us move the resolution of the
-capability defaults much earlier.
+A per-CPU machine data pointer was recently added to PowerPCCPU. The
+motivation is to to hide platform specific details from the core CPU
+code. This per-CPU data can hold state which is relevant to the guest
+though, eg, Virtual Processor Areas, and we should migrate this state.
 
-This is going to be necessary for some future capabilities.
+This patch adds the plumbing so that we can migrate the per-CPU data
+for PAPR guests. We only do this for newer machine types for the sake
+of backward compatibility. No state is migrated for the moment: the
+vmstate_spapr_cpu_state structure will be populated by subsequent
+patches.
 
+Signed-off-by: Greg Kurz <groug@kaod.org>
+[dwg: Fix some trivial spelling and spacing errors]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/spapr.c         | 6 ++++--
- hw/ppc/spapr_caps.c    | 9 ++++++---
- include/hw/ppc/spapr.h | 3 ++-
- 3 files changed, 12 insertions(+), 6 deletions(-)
+ hw/ppc/spapr.c                  |  7 ++++++-
+ hw/ppc/spapr_cpu_core.c         | 22 ++++++++++++++++++++--
+ include/hw/ppc/spapr_cpu_core.h |  1 +
+ 3 files changed, 27 insertions(+), 3 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index bc179f6f89..4a0b679166 100644
+index db0fb385d4..3174468fc5 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1612,7 +1612,7 @@ static void spapr_machine_reset(void)
-     void *fdt;
-     int rc;
-=20
--    spapr_caps_reset(spapr);
-+    spapr_caps_apply(spapr);
-=20
-     first_ppc_cpu =3D POWERPC_CPU(first_cpu);
-     if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
-@@ -2526,7 +2526,9 @@ static void spapr_machine_init(MachineState *machin=
-e)
-     QLIST_INIT(&spapr->phbs);
-     QTAILQ_INIT(&spapr->pending_dimm_unplugs);
-=20
--    /* Check HPT resizing availability */
-+    /* Determine capabilities to run with */
-+    spapr_caps_init(spapr);
-+
-     kvmppc_check_papr_resize_hpt(&resize_hpt_err);
-     if (spapr->resize_hpt =3D=3D SPAPR_RESIZE_HPT_DEFAULT) {
-         /*
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 469f38f0ef..dabed817d1 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -439,12 +439,12 @@ SPAPR_CAP_MIG_STATE(cfpc, SPAPR_CAP_CFPC);
- SPAPR_CAP_MIG_STATE(sbbc, SPAPR_CAP_SBBC);
- SPAPR_CAP_MIG_STATE(ibs, SPAPR_CAP_IBS);
-=20
--void spapr_caps_reset(sPAPRMachineState *spapr)
-+void spapr_caps_init(sPAPRMachineState *spapr)
- {
-     sPAPRCapabilities default_caps;
-     int i;
-=20
--    /* First compute the actual set of caps we're running with.. */
-+    /* Compute the actual set of caps we should run with */
-     default_caps =3D default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_ty=
-pe);
-=20
-     for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
-@@ -455,8 +455,11 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
-             spapr->eff.caps[i] =3D default_caps.caps[i];
-         }
-     }
-+}
-=20
--    /* .. then apply those caps to the virtual hardware */
-+void spapr_caps_apply(sPAPRMachineState *spapr)
-+{
-+    int i;
-=20
-     for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
-         sPAPRCapabilityInfo *info =3D &capability_table[i];
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 3388750fc7..9dbd6010f5 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -798,7 +798,8 @@ static inline uint8_t spapr_get_cap(sPAPRMachineState=
- *spapr, int cap)
-     return spapr->eff.caps[cap];
+@@ -4115,7 +4115,12 @@ DEFINE_SPAPR_MACHINE(3_0, "3.0", true);
+     HW_COMPAT_2_12                                                     \
+     {                                                                  \
+         .driver = TYPE_POWERPC_CPU,                                    \
+-        .property = "pre-3.0-migration",                              \
++        .property = "pre-3.0-migration",                               \
++        .value    = "on",                                              \
++    },                                                                 \
++    {                                                                  \
++        .driver = TYPE_SPAPR_CPU_CORE,                                 \
++        .property = "pre-3.0-migration",                               \
+         .value    = "on",                                              \
+     },
+ 
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index aef3be33a3..f129ac884e 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -129,6 +129,15 @@ static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
+     g_free(sc->threads);
  }
-=20
--void spapr_caps_reset(sPAPRMachineState *spapr);
-+void spapr_caps_init(sPAPRMachineState *spapr);
-+void spapr_caps_apply(sPAPRMachineState *spapr);
- void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
- int spapr_caps_post_migration(sPAPRMachineState *spapr);
-=20
---=20
+ 
++static const VMStateDescription vmstate_spapr_cpu_state = {
++    .name = "spapr_cpu",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    },
++};
++
+ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                                Error **errp)
+ {
+@@ -194,6 +203,10 @@ static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore *sc, int i, Error **errp)
+     }
+ 
+     cpu->machine_data = g_new0(sPAPRCPUState, 1);
++    if (!sc->pre_3_0_migration) {
++        vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
++                         cpu->machine_data);
++    }
+ 
+     object_unref(obj);
+     return cpu;
+@@ -204,10 +217,13 @@ err:
+     return NULL;
+ }
+ 
+-static void spapr_delete_vcpu(PowerPCCPU *cpu)
++static void spapr_delete_vcpu(PowerPCCPU *cpu, sPAPRCPUCore *sc)
+ {
+     sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+ 
++    if (!sc->pre_3_0_migration) {
++        vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_data);
++    }
+     cpu->machine_data = NULL;
+     g_free(spapr_cpu);
+     object_unparent(OBJECT(cpu));
+@@ -253,7 +269,7 @@ err_unrealize:
+     }
+ err:
+     while (--i >= 0) {
+-        spapr_delete_vcpu(sc->threads[i]);
++        spapr_delete_vcpu(sc->threads[i], sc);
+     }
+     g_free(sc->threads);
+     error_propagate(errp, local_err);
+@@ -261,6 +277,8 @@ err:
+ 
+ static Property spapr_cpu_core_properties[] = {
+     DEFINE_PROP_INT32("node-id", sPAPRCPUCore, node_id, CPU_UNSET_NUMA_NODE_ID),
++    DEFINE_PROP_BOOL("pre-3.0-migration", sPAPRCPUCore, pre_3_0_migration,
++                     false),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+index 8ceea2973a..9e2821e4b3 100644
+--- a/include/hw/ppc/spapr_cpu_core.h
++++ b/include/hw/ppc/spapr_cpu_core.h
+@@ -31,6 +31,7 @@ typedef struct sPAPRCPUCore {
+     /*< public >*/
+     PowerPCCPU **threads;
+     int node_id;
++    bool pre_3_0_migration; /* older machine don't know about sPAPRCPUState */
+ } sPAPRCPUCore;
+ 
+ typedef struct sPAPRCPUCoreClass {
+-- 
 2.17.1
