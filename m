@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDcw-0007gn-1l
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDcw-0007go-2U
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDcu-0003Y3-OQ
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDcu-0003YD-RF
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:50 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 22 Jun 2018 14:24:18 +1000
-Message-Id: <20180622042437.14259-4-david@gibson.dropbear.id.au>
+Date: Fri, 22 Jun 2018 14:24:16 +1000
+Message-Id: <20180622042437.14259-2-david@gibson.dropbear.id.au>
 In-Reply-To: <20180622042437.14259-1-david@gibson.dropbear.id.au>
 References: <20180622042437.14259-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PATCH 04/23] spapr_cpu_core: migrate VPA related state
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 02/23] ppc/pnv: introduce a new isa_create()
+ operation to the chip model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,131 +26,194 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-QEMU implements the "Shared Processor LPAR" (SPLPAR) option, which allows
-the hypervisor to time-slice a physical processor into multiple virtual
-processor. The intent is to allow more guests to run, and to optimize
-processor utilization.
+This moves the details of the ISA bus creation under the LPC model but
+more important, the new PnvChip operation will let us choose the chip
+class to use when we introduce the different chip classes for Power9
+and Power8. It hides away the processor chip controllers from the
+machine.
 
-The guest OS can cede idle VCPUs, so that their processing capacity may
-be used by other VCPUs, with the H_CEDE hcall. The guest OS can also
-optimize spinlocks, by confering the time-slice of a spinning VCPU to the
-spinlock holder if it's currently notrunning, with the H_CONFER hcall.
-
-Both hcalls depend on a "Virtual Processor Area" (VPA) to be registered
-by the guest OS, generally during early boot. Other per-VCPU areas can
-be registered: the "SLB Shadow Buffer" which allows a more efficient
-dispatching of VCPUs, and the "Dispatch Trace Log Buffer" (DTL) which
-is used to compute time stolen by the hypervisor. Both DTL and SLB Shadow
-areas depend on the VPA to be registered.
-
-The VPA/SLB Shadow/DTL are state that QEMU should migrate, but this doesn't
-happen, for no apparent reason other than it was just never coded. This
-causes the features listed above to stop working after migration, and it
-breaks the logic of the H_REGISTER_VPA hcall in the destination.
-
-The VPA is set at the guest request, ie, we don't have to migrate
-it before the guest has actually set it. This patch hence adds an
-"spapr_cpu/vpa" subsection to the recently introduced per-CPU machine
-data migration stream.
-
-Since DTL and SLB Shadow are optional and both depend on VPA, they get
-their own subsections "spapr_cpu/vpa/slb_shadow" and "spapr_cpu/vpa/dtl"
-hanging from the "spapr_cpu/vpa" subsection.
-
-Note that this won't break migration to older QEMUs. Is is already handled
-by only registering the vmstate handler for per-CPU data with newer machine
-types.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_cpu_core.c | 65 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+ hw/ppc/pnv.c             | 34 +++++++++++++++++++---------------
+ hw/ppc/pnv_lpc.c         | 30 +++++++++++++++++++++++++-----
+ include/hw/ppc/pnv.h     |  1 +
+ include/hw/ppc/pnv_lpc.h |  3 +--
+ 4 files changed, 46 insertions(+), 22 deletions(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index f129ac884e..67f1596c57 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -129,6 +129,67 @@ static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
-     g_free(sc->threads);
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index c7e127ae97..ac828d1331 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -529,24 +529,24 @@ static void pnv_reset(void)
+     cpu_physical_memory_write(PNV_FDT_ADDR, fdt, fdt_totalsize(fdt));
  }
- 
-+static bool slb_shadow_needed(void *opaque)
-+{
-+    sPAPRCPUState *spapr_cpu = opaque;
-+
-+    return spapr_cpu->slb_shadow_addr != 0;
+=20
+-static ISABus *pnv_isa_create(PnvChip *chip)
++static ISABus *pnv_chip_power8_isa_create(PnvChip *chip, Error **errp)
+ {
+-    PnvLpcController *lpc =3D &chip->lpc;
+-    ISABus *isa_bus;
+-    qemu_irq *irqs;
+-    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
++    return pnv_lpc_isa_create(&chip->lpc, true, errp);
 +}
-+
-+static const VMStateDescription vmstate_spapr_cpu_slb_shadow = {
-+    .name = "spapr_cpu/vpa/slb_shadow",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = slb_shadow_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(slb_shadow_addr, sPAPRCPUState),
-+        VMSTATE_UINT64(slb_shadow_size, sPAPRCPUState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool dtl_needed(void *opaque)
+=20
+-    /* let isa_bus_new() create its own bridge on SysBus otherwise
+-     * devices speficied on the command line won't find the bus and
+-     * will fail to create.
+-     */
+-    isa_bus =3D isa_bus_new(NULL, &lpc->isa_mem, &lpc->isa_io,
+-                          &error_fatal);
++static ISABus *pnv_chip_power8nvl_isa_create(PnvChip *chip, Error **errp=
+)
 +{
-+    sPAPRCPUState *spapr_cpu = opaque;
-+
-+    return spapr_cpu->dtl_addr != 0;
++    return pnv_lpc_isa_create(&chip->lpc, false, errp);
 +}
-+
-+static const VMStateDescription vmstate_spapr_cpu_dtl = {
-+    .name = "spapr_cpu/vpa/dtl",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = dtl_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(dtl_addr, sPAPRCPUState),
-+        VMSTATE_UINT64(dtl_size, sPAPRCPUState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool vpa_needed(void *opaque)
+=20
+-    irqs =3D pnv_lpc_isa_irq_create(lpc, pcc->chip_type, ISA_NUM_IRQS);
++static ISABus *pnv_chip_power9_isa_create(PnvChip *chip, Error **errp)
 +{
-+    sPAPRCPUState *spapr_cpu = opaque;
-+
-+    return spapr_cpu->vpa_addr != 0;
++    return NULL;
 +}
+=20
+-    isa_bus_irqs(isa_bus, irqs);
+-    return isa_bus;
++static ISABus *pnv_isa_create(PnvChip *chip, Error **errp)
++{
++    return PNV_CHIP_GET_CLASS(chip)->isa_create(chip, errp);
+ }
+=20
+ static void pnv_init(MachineState *machine)
+@@ -646,7 +646,7 @@ static void pnv_init(MachineState *machine)
+     g_free(chip_typename);
+=20
+     /* Instantiate ISA bus on chip 0 */
+-    pnv->isa_bus =3D pnv_isa_create(pnv->chips[0]);
++    pnv->isa_bus =3D pnv_isa_create(pnv->chips[0], &error_fatal);
+=20
+     /* Create serial port */
+     serial_hds_isa_init(pnv->isa_bus, 0, MAX_ISA_SERIAL_PORTS);
+@@ -735,6 +735,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
+klass, void *data)
+     k->cores_mask =3D POWER8E_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
+     k->intc_create =3D pnv_chip_power8_intc_create;
++    k->isa_create =3D pnv_chip_power8_isa_create;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8E";
+ }
+@@ -749,6 +750,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
+lass, void *data)
+     k->cores_mask =3D POWER8_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
+     k->intc_create =3D pnv_chip_power8_intc_create;
++    k->isa_create =3D pnv_chip_power8_isa_create;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8";
+ }
+@@ -763,6 +765,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
+ *klass, void *data)
+     k->cores_mask =3D POWER8_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
+     k->intc_create =3D pnv_chip_power8_intc_create;
++    k->isa_create =3D pnv_chip_power8nvl_isa_create;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8NVL";
+ }
+@@ -777,6 +780,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
+lass, void *data)
+     k->cores_mask =3D POWER9_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p9;
+     k->intc_create =3D pnv_chip_power9_intc_create;
++    k->isa_create =3D pnv_chip_power9_isa_create;
+     k->xscom_base =3D 0x00603fc00000000ull;
+     dc->desc =3D "PowerNV Chip POWER9";
+ }
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index 402c4fefa8..d7721320a2 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -22,6 +22,7 @@
+ #include "target/ppc/cpu.h"
+ #include "qapi/error.h"
+ #include "qemu/log.h"
++#include "hw/isa/isa.h"
+=20
+ #include "hw/ppc/pnv.h"
+ #include "hw/ppc/pnv_lpc.h"
+@@ -535,16 +536,35 @@ static void pnv_lpc_isa_irq_handler(void *opaque, i=
+nt n, int level)
+     }
+ }
+=20
+-qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type,
+-                                 int nirqs)
++ISABus *pnv_lpc_isa_create(PnvLpcController *lpc, bool use_cpld, Error *=
+*errp)
+ {
++    Error *local_err =3D NULL;
++    ISABus *isa_bus;
++    qemu_irq *irqs;
++    qemu_irq_handler handler;
 +
-+static const VMStateDescription vmstate_spapr_cpu_vpa = {
-+    .name = "spapr_cpu/vpa",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = vpa_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(vpa_addr, sPAPRCPUState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_spapr_cpu_slb_shadow,
-+        &vmstate_spapr_cpu_dtl,
-+        NULL
++    /* let isa_bus_new() create its own bridge on SysBus otherwise
++     * devices speficied on the command line won't find the bus and
++     * will fail to create.
++     */
++    isa_bus =3D isa_bus_new(NULL, &lpc->isa_mem, &lpc->isa_io, &local_er=
+r);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return NULL;
 +    }
-+};
 +
- static const VMStateDescription vmstate_spapr_cpu_state = {
-     .name = "spapr_cpu",
-     .version_id = 1,
-@@ -136,6 +197,10 @@ static const VMStateDescription vmstate_spapr_cpu_state = {
-     .fields = (VMStateField[]) {
-         VMSTATE_END_OF_LIST()
-     },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_spapr_cpu_vpa,
-+        NULL
-+    }
- };
- 
- static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr,
--- 
+     /* Not all variants have a working serial irq decoder. If not,
+      * handling of LPC interrupts becomes a platform issue (some
+      * platforms have a CPLD to do it).
+      */
+-    if (chip_type =3D=3D PNV_CHIP_POWER8NVL) {
+-        return qemu_allocate_irqs(pnv_lpc_isa_irq_handler, lpc, nirqs);
++    if (use_cpld) {
++        handler =3D pnv_lpc_isa_irq_handler_cpld;
+     } else {
+-        return qemu_allocate_irqs(pnv_lpc_isa_irq_handler_cpld, lpc, nir=
+qs);
++        handler =3D pnv_lpc_isa_irq_handler;
+     }
++
++    irqs =3D qemu_allocate_irqs(handler, lpc, ISA_NUM_IRQS);
++
++    isa_bus_irqs(isa_bus, irqs);
++    return isa_bus;
+ }
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index e934e84f55..563279f3e0 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -77,6 +77,7 @@ typedef struct PnvChipClass {
+=20
+     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
+     Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
++    ISABus *(*isa_create)(PnvChip *chip, Error **errp);
+ } PnvChipClass;
+=20
+ #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
+diff --git a/include/hw/ppc/pnv_lpc.h b/include/hw/ppc/pnv_lpc.h
+index 53fdd5bb64..d657489b07 100644
+--- a/include/hw/ppc/pnv_lpc.h
++++ b/include/hw/ppc/pnv_lpc.h
+@@ -70,7 +70,6 @@ typedef struct PnvLpcController {
+     PnvPsi *psi;
+ } PnvLpcController;
+=20
+-qemu_irq *pnv_lpc_isa_irq_create(PnvLpcController *lpc, int chip_type,
+-                                 int nirqs);
++ISABus *pnv_lpc_isa_create(PnvLpcController *lpc, bool use_cpld, Error *=
+*errp);
+=20
+ #endif /* _PPC_PNV_LPC_H */
+--=20
 2.17.1
