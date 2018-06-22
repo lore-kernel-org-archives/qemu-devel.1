@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56709)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fWO2s-0000iY-Ky
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:32:19 -0400
+	(envelope-from <armbru@redhat.com>) id 1fWO38-0000pq-BV
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:32:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fWO2r-00006k-MI
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:32:18 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:38658)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fWO2r-000068-GD
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:32:17 -0400
-Received: by mail-ot0-x242.google.com with SMTP id p95-v6so7939461ota.5
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 08:32:17 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fWO35-0000Ht-3j
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:32:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54609 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fWO34-0000H9-Vt
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:32:31 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1C845A2C7F
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 15:32:30 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+Date: Fri, 22 Jun 2018 17:32:20 +0200
+Message-Id: <20180622153228.23594-3-armbru@redhat.com>
+In-Reply-To: <20180622153228.23594-1-armbru@redhat.com>
+References: <20180622153228.23594-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <b80b128f-916a-a114-97e3-96705321503d@amsat.org>
-References: <20180620120620.12806-1-yongbok.kim@mips.com>
-	<263756cc-6869-de24-3f9b-140d24025829@amsat.org>
-	<5d9fc1151a1045eab8c6ace71b772f94@mips.com>
-	<b80b128f-916a-a114-97e3-96705321503d@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Jun 2018 16:31:56 +0100
-Message-ID: <CAFEAcA9wYJpYTvMY4bVy4-NPputq4j-SwtqFYQFz4D_TjobANg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/35] nanoMIPS
+Subject: [Qemu-devel] [PULL 02/10] qapi/events: generate event enum in main
+ module
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +33,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Aleksandar Markovic <Aleksandar.Markovic@mips.com>, Yongbok Kim <Yongbok.Kim@mips.com>, James Hogan <James.Hogan@mips.com>, Paul Burton <Paul.Burton@mips.com>, Stefan Markovic <Stefan.Markovic@mips.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "aurelien@aurel32.net" <aurelien@aurel32.net>, Matthew Fortune <Matthew.Fortune@mips.com>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 22 June 2018 at 16:16, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> On 06/22/2018 11:39 AM, Aleksandar Markovic wrote:
->> If nobody objects, while integrating/applying, I am going to change all =
-instances of "@imgtec.com" to "@mips.com" for this series.
->>
->> Some of the patches might have been developed while the company was part=
- of Imagination Technologies - however, I think it is reasonable to use ema=
-il addresses at the moment of submitting changes to this list. This gets co=
-mplicated if, for example, a person leaves the company before his/her email=
- address changes, but I think, in this case, using "@mips.com" is appropria=
-te for all involved persons.
->
-> Well, since imgtec.com entries are in .mailmap, and get_maintainer.pl
-> parses it, maybe there is a bug in the script.
->
-> The 'From' is used for the git author, and IMO should be @mips.com.
->
-> To respect Imagination Technologies efforts, can this work?
->
-> Signed-off-by: James Hogan <james.hogan@mips.com> for Imagination
-> Technologies
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-That seems a bit weird to me. I would stick with just using
-the mips addresses.
+The event generator produces an enum, and put it in the last visited
+module. It fits better in the main module, since it's the set of all
+visited events, from all modules.
 
-thanks
--- PMM
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20180321115211.17937-3-marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ scripts/qapi/events.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
+index 4426861ff1..5657524688 100644
+--- a/scripts/qapi/events.py
++++ b/scripts/qapi/events.py
+@@ -180,8 +180,9 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVis=
+itor):
+                              types=3Dtypes))
+=20
+     def visit_end(self):
+-        self._genh.add(gen_enum(self._enum_name, self._event_names))
+-        self._genc.add(gen_enum_lookup(self._enum_name, self._event_name=
+s))
++        (genc, genh) =3D self._module[self._main_module]
++        genh.add(gen_enum(self._enum_name, self._event_names))
++        genc.add(gen_enum_lookup(self._enum_name, self._event_names))
+=20
+     def visit_event(self, name, info, arg_type, boxed):
+         self._genh.add(gen_event_send_decl(name, arg_type, boxed))
+--=20
+2.17.1
