@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42142)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWAu0-0001RZ-N3
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 21:30:17 -0400
+	id 1fWAvt-00029a-UA
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 21:32:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWAtx-0005aX-Jr
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 21:30:16 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:38247)
+	id 1fWAvq-000684-Qd
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 21:32:13 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:32791)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWAtx-0005aT-E7
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 21:30:13 -0400
-Received: by mail-qk0-x243.google.com with SMTP id y4-v6so2902756qka.5
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 18:30:13 -0700 (PDT)
+	id 1fWAvq-00067T-MN
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 21:32:10 -0400
+Received: by mail-qt0-x244.google.com with SMTP id l10-v6so4707938qtj.0
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 18:32:10 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <152961556394.840.7383908386098566787@d39dc562802a>
+References: <cover.1529568501.git.balaton@eik.bme.hu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c0d56ee0-4635-1d7d-00b4-27c09bd7cd89@amsat.org>
-Date: Thu, 21 Jun 2018 22:30:09 -0300
+Message-ID: <3cbe516a-9c99-273a-49aa-2961a315aff8@amsat.org>
+Date: Thu, 21 Jun 2018 22:32:05 -0300
 MIME-Version: 1.0
-In-Reply-To: <152961556394.840.7383908386098566787@d39dc562802a>
+In-Reply-To: <cover.1529568501.git.balaton@eik.bme.hu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] blogposts: add post about the new
- check-tcg infrastructure
+Subject: Re: [Qemu-devel] [PATCH 0/5] Misc sm501 improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,31 +34,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, alex.bennee@linaro.org, famz@redhat.com
-Cc: pbonzini@redhat.com
+To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Sebastian Bauer <mail@sebastianbauer.info>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>
 
-On 06/21/2018 06:12 PM, no-reply@patchew.org wrote:
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Type: series
-> Message-id: 20180621184116.910-1-alex.bennee@linaro.org
-> Subject: [Qemu-devel] [PATCH] blogposts: add post about the new check-tcg infrastructure
-[...]> === OUTPUT BEGIN ===
-> Checking PATCH 1/1: blogposts: add post about the new check-tcg infrastructure...
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #13: 
-> new file mode 100644
-> 
-> ERROR: trailing whitespace
-> #102: FILE: _posts/2018-06-21-tcg-testing.md:85:
-> +need to be followed to add new tests? $
+Hi Zoltan,
 
-=)
+On 06/21/2018 05:08 AM, BALATON Zoltan wrote:
+> These are fixes to sm501 emulation that were found while testing with
+> AmigaOS 4.1FE (AmigaOS 4 is known to work on real hardware but we have
+> no way to verify it against hardware). While this is mainly to improve
 
+Is it possible to fetch/use this image? (and add integration tests)
+
+> sam460ex emulation this is now a separate series with the sm501
+> specific patches because that's also used on SH emulation. I hope
+> someone can review and merge this.
 > 
-> total: 1 errors, 1 warnings, 129 lines checked
+> BALATON Zoltan (3):
+>   sm501: Implement i2c part for reading monitor EDID
+>   sm501: Set updated region dirty after 2D operation
+>   sm501: Fix support for non-zero frame buffer start address
 > 
-> Your patch has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
+> Sebastian Bauer (2):
+>   sm501: Perform a full update after palette change
+>   sm501: Use values from the pitch register for 2d operations.
+> 
+>  default-configs/ppc-softmmu.mak    |   1 +
+>  default-configs/ppcemb-softmmu.mak |   1 +
+>  default-configs/sh4-softmmu.mak    |   2 +
+>  default-configs/sh4eb-softmmu.mak  |   2 +
+>  hw/display/sm501.c                 | 166 +++++++++++++++++++++++++++++++++++--
+>  5 files changed, 163 insertions(+), 9 deletions(-)
+> 
