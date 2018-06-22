@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDd1-0007l5-15
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:58 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDcx-0003ZR-AU
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDcy-0007ha-NS
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:55 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDcu-0003Xk-9u
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:52 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 22 Jun 2018 14:24:21 +1000
-Message-Id: <20180622042437.14259-7-david@gibson.dropbear.id.au>
-In-Reply-To: <20180622042437.14259-1-david@gibson.dropbear.id.au>
-References: <20180622042437.14259-1-david@gibson.dropbear.id.au>
+Date: Fri, 22 Jun 2018 14:24:15 +1000
+Message-Id: <20180622042437.14259-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 07/23] target/ppc: Allow cpu compatiblity
- checks based on type, not instance
+Subject: [Qemu-devel] [PATCH 01/23] ppc/pnv: introduce a new intc_create()
+ operation to the chip model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,205 +24,175 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-ppc_check_compat() is used in a number of places to check if a cpu object
-supports a certain compatiblity mode, subject to various constraints.
+From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-It takes a PowerPCCPU *, however it really only depends on the cpu's clas=
-s.
-We have upcoming cases where it would be useful to make compatibility
-checks before we fully instantiate the cpu objects.
+On Power9, the thread interrupt presenter has a different type and is
+linked to the chip owning the cores.
 
-ppc_type_check_compat() will now make an equivalent check, but based on a
-CPU's QOM typename instead of an instantiated CPU object.
-
-We make use of the new interface in several places in spapr, where we're
-essentially making a global check, rather than one specific to a particul=
-ar
-cpu.  This avoids some ugly uses of first_cpu to grab a "representative"
-instance.
-
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ppc/spapr.c      | 10 ++++------
- hw/ppc/spapr_caps.c | 19 +++++++++----------
- target/ppc/compat.c | 27 +++++++++++++++++++++------
- target/ppc/cpu.h    |  4 ++++
- 4 files changed, 38 insertions(+), 22 deletions(-)
+ hw/ppc/pnv.c         | 21 +++++++++++++++++++--
+ hw/ppc/pnv_core.c    | 18 +++++++++---------
+ include/hw/ppc/pnv.h |  1 +
+ 3 files changed, 29 insertions(+), 11 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 3174468fc5..bc179f6f89 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1616,8 +1616,8 @@ static void spapr_machine_reset(void)
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 0d2b79f798..c7e127ae97 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -671,6 +671,13 @@ static uint32_t pnv_chip_core_pir_p8(PnvChip *chip, =
+uint32_t core_id)
+     return (chip->chip_id << 7) | (core_id << 3);
+ }
 =20
-     first_ppc_cpu =3D POWERPC_CPU(first_cpu);
-     if (kvm_enabled() && kvmppc_has_cap_mmu_radix() &&
--        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
--                         spapr->max_compat_pvr)) {
-+        ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_0=
-0, 0,
-+                              spapr->max_compat_pvr)) {
-         /* If using KVM with radix mode available, VCPUs can be started
-          * without a HPT because KVM will start them in radix mode.
-          * Set the GR bit in PATB so that we know there is no HPT. */
-@@ -2520,7 +2520,6 @@ static void spapr_machine_init(MachineState *machin=
-e)
-     long load_limit, fw_size;
-     char *filename;
-     Error *resize_hpt_err =3D NULL;
--    PowerPCCPU *first_ppc_cpu;
++static Object *pnv_chip_power8_intc_create(PnvChip *chip, Object *child,
++                                           Error **errp)
++{
++    return icp_create(child, TYPE_PNV_ICP, XICS_FABRIC(qdev_get_machine(=
+)),
++                      errp);
++}
++
+ /*
+  *    0:48  Reserved - Read as zeroes
+  *   49:52  Node ID
+@@ -686,6 +693,12 @@ static uint32_t pnv_chip_core_pir_p9(PnvChip *chip, =
+uint32_t core_id)
+     return (chip->chip_id << 8) | (core_id << 2);
+ }
 =20
-     msi_nonbroken =3D true;
-=20
-@@ -2618,10 +2617,9 @@ static void spapr_machine_init(MachineState *machi=
-ne)
-     /* init CPUs */
-     spapr_init_cpus(spapr);
-=20
--    first_ppc_cpu =3D POWERPC_CPU(first_cpu);
-     if ((!kvm_enabled() || kvmppc_has_cap_mmu_radix()) &&
--        ppc_check_compat(first_ppc_cpu, CPU_POWERPC_LOGICAL_3_00, 0,
--                         spapr->max_compat_pvr)) {
-+        ppc_type_check_compat(machine->cpu_type, CPU_POWERPC_LOGICAL_3_0=
-0, 0,
-+                              spapr->max_compat_pvr)) {
-         /* KVM and TCG always allow GTSE with radix... */
-         spapr_ovec_set(spapr->ov5, OV5_MMU_RADIX_GTSE);
-     }
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 00e43a9ba7..469f38f0ef 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -327,27 +327,26 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM]=
- =3D {
++static Object *pnv_chip_power9_intc_create(PnvChip *chip, Object *child,
++                                           Error **errp)
++{
++    return NULL;
++}
++
+ /* Allowed core identifiers on a POWER8 Processor Chip :
+  *
+  * <EX0 reserved>
+@@ -721,6 +734,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
+klass, void *data)
+     k->chip_cfam_id =3D 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
+     k->cores_mask =3D POWER8E_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
++    k->intc_create =3D pnv_chip_power8_intc_create;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8E";
+ }
+@@ -734,6 +748,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
+lass, void *data)
+     k->chip_cfam_id =3D 0x220ea04980000000ull; /* P8 Venice DD2.0 */
+     k->cores_mask =3D POWER8_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
++    k->intc_create =3D pnv_chip_power8_intc_create;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8";
+ }
+@@ -747,6 +762,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
+ *klass, void *data)
+     k->chip_cfam_id =3D 0x120d304980000000ull;  /* P8 Naples DD1.0 */
+     k->cores_mask =3D POWER8_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p8;
++    k->intc_create =3D pnv_chip_power8_intc_create;
+     k->xscom_base =3D 0x003fc0000000000ull;
+     dc->desc =3D "PowerNV Chip POWER8NVL";
+ }
+@@ -760,6 +776,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
+lass, void *data)
+     k->chip_cfam_id =3D 0x220d104900008000ull; /* P9 Nimbus DD2.0 */
+     k->cores_mask =3D POWER9_CORE_MASK;
+     k->core_pir =3D pnv_chip_core_pir_p9;
++    k->intc_create =3D pnv_chip_power9_intc_create;
+     k->xscom_base =3D 0x00603fc00000000ull;
+     dc->desc =3D "PowerNV Chip POWER9";
+ }
+@@ -892,8 +909,8 @@ static void pnv_chip_core_realize(PnvChip *chip, Erro=
+r **errp)
+         object_property_set_int(OBJECT(pnv_core),
+                                 pcc->core_pir(chip, core_hwid),
+                                 "pir", &error_fatal);
+-        object_property_add_const_link(OBJECT(pnv_core), "xics",
+-                                       qdev_get_machine(), &error_fatal)=
+;
++        object_property_add_const_link(OBJECT(pnv_core), "chip",
++                                       OBJECT(chip), &error_fatal);
+         object_property_set_bool(OBJECT(pnv_core), true, "realized",
+                                  &error_fatal);
+         object_unref(OBJECT(pnv_core));
+diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
+index f7cf33f547..a9f129fc2c 100644
+--- a/hw/ppc/pnv_core.c
++++ b/hw/ppc/pnv_core.c
+@@ -99,13 +99,14 @@ static const MemoryRegionOps pnv_core_xscom_ops =3D {
+     .endianness =3D DEVICE_BIG_ENDIAN,
  };
 =20
- static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
--                                               CPUState *cs)
-+                                               const char *cputype)
+-static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFabric *xi, Error **er=
+rp)
++static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip *chip, Error **err=
+p)
  {
-     sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
--    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-     sPAPRCapabilities caps;
+     CPUPPCState *env =3D &cpu->env;
+     int core_pir;
+     int thread_index =3D 0; /* TODO: TCG supports only one thread */
+     ppc_spr_t *pir =3D &env->spr_cb[SPR_PIR];
+     Error *local_err =3D NULL;
++    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
 =20
-     caps =3D smc->default_caps;
-=20
--    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
--                          0, spapr->max_compat_pvr)) {
-+    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_07,
-+                               0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
-         caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
+     object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
+     if (local_err) {
+@@ -113,7 +114,7 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFab=
+ric *xi, Error **errp)
+         return;
      }
 =20
--    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06_PLUS,
--                          0, spapr->max_compat_pvr)) {
-+    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_06_PLUS,
-+                               0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
+-    cpu->intc =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, xi, &local_err);
++    cpu->intc =3D pcc->intc_create(chip, OBJECT(cpu), &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
+@@ -143,13 +144,12 @@ static void pnv_core_realize(DeviceState *dev, Erro=
+r **errp)
+     void *obj;
+     int i, j;
+     char name[32];
+-    Object *xi;
++    Object *chip;
+=20
+-    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
+-    if (!xi) {
+-        error_setg(errp, "%s: required link 'xics' not found: %s",
+-                   __func__, error_get_pretty(local_err));
+-        return;
++    chip =3D object_property_get_link(OBJECT(dev), "chip", &local_err);
++    if (!chip) {
++        error_propagate(errp, local_err);
++        error_prepend(errp, "required link 'chip' not found: ");
      }
 =20
--    if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_06,
--                          0, spapr->max_compat_pvr)) {
-+    if (!ppc_type_check_compat(cputype, CPU_POWERPC_LOGICAL_2_06,
-+                               0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_VSX] =3D SPAPR_CAP_OFF;
-         caps.caps[SPAPR_CAP_DFP] =3D SPAPR_CAP_OFF;
-         caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
-@@ -384,7 +383,7 @@ int spapr_caps_post_migration(sPAPRMachineState *spap=
-r)
-     sPAPRCapabilities dstcaps =3D spapr->eff;
-     sPAPRCapabilities srccaps;
+     pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
+@@ -166,7 +166,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
+**errp)
+     }
 =20
--    srccaps =3D default_caps_with_cpu(spapr, first_cpu);
-+    srccaps =3D default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_type);
-     for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
-         /* If not default value then assume came in with the migration *=
-/
-         if (spapr->mig.caps[i] !=3D spapr->def.caps[i]) {
-@@ -446,7 +445,7 @@ void spapr_caps_reset(sPAPRMachineState *spapr)
-     int i;
+     for (j =3D 0; j < cc->nr_threads; j++) {
+-        pnv_realize_vcpu(pc->threads[j], XICS_FABRIC(xi), &local_err);
++        pnv_realize_vcpu(pc->threads[j], PNV_CHIP(chip), &local_err);
+         if (local_err) {
+             goto err;
+         }
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 90759240a7..e934e84f55 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -76,6 +76,7 @@ typedef struct PnvChipClass {
+     hwaddr       xscom_base;
 =20
-     /* First compute the actual set of caps we're running with.. */
--    default_caps =3D default_caps_with_cpu(spapr, first_cpu);
-+    default_caps =3D default_caps_with_cpu(spapr, MACHINE(spapr)->cpu_ty=
-pe);
+     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
++    Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
+ } PnvChipClass;
 =20
-     for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
-         /* Store the defaults */
-diff --git a/target/ppc/compat.c b/target/ppc/compat.c
-index 807c906f68..7de4bf3122 100644
---- a/target/ppc/compat.c
-+++ b/target/ppc/compat.c
-@@ -105,17 +105,13 @@ static const CompatInfo *compat_by_pvr(uint32_t pvr=
-)
-     return NULL;
- }
-=20
--bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
--                      uint32_t min_compat_pvr, uint32_t max_compat_pvr)
-+static bool pcc_compat(PowerPCCPUClass *pcc, uint32_t compat_pvr,
-+                       uint32_t min_compat_pvr, uint32_t max_compat_pvr)
- {
--    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-     const CompatInfo *compat =3D compat_by_pvr(compat_pvr);
-     const CompatInfo *min =3D compat_by_pvr(min_compat_pvr);
-     const CompatInfo *max =3D compat_by_pvr(max_compat_pvr);
-=20
--#if !defined(CONFIG_USER_ONLY)
--    g_assert(cpu->vhyp);
--#endif
-     g_assert(!min_compat_pvr || min);
-     g_assert(!max_compat_pvr || max);
-=20
-@@ -134,6 +130,25 @@ bool ppc_check_compat(PowerPCCPU *cpu, uint32_t comp=
-at_pvr,
-     return true;
- }
-=20
-+bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
-+                      uint32_t min_compat_pvr, uint32_t max_compat_pvr)
-+{
-+    PowerPCCPUClass *pcc =3D POWERPC_CPU_GET_CLASS(cpu);
-+
-+#if !defined(CONFIG_USER_ONLY)
-+    g_assert(cpu->vhyp);
-+#endif
-+
-+    return pcc_compat(pcc, compat_pvr, min_compat_pvr, max_compat_pvr);
-+}
-+
-+bool ppc_type_check_compat(const char *cputype, uint32_t compat_pvr,
-+                           uint32_t min_compat_pvr, uint32_t max_compat_=
-pvr)
-+{
-+    PowerPCCPUClass *pcc =3D POWERPC_CPU_CLASS(object_class_by_name(cput=
-ype));
-+    return pcc_compat(pcc, compat_pvr, min_compat_pvr, max_compat_pvr);
-+}
-+
- void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp)
- {
-     const CompatInfo *compat =3D compat_by_pvr(compat_pvr);
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 874da6efbc..c7f3fb6b73 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1369,7 +1369,11 @@ static inline int cpu_mmu_index (CPUPPCState *env,=
- bool ifetch)
- #if defined(TARGET_PPC64)
- bool ppc_check_compat(PowerPCCPU *cpu, uint32_t compat_pvr,
-                       uint32_t min_compat_pvr, uint32_t max_compat_pvr);
-+bool ppc_type_check_compat(const char *cputype, uint32_t compat_pvr,
-+                           uint32_t min_compat_pvr, uint32_t max_compat_=
-pvr);
-+
- void ppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr, Error **errp);
-+
- #if !defined(CONFIG_USER_ONLY)
- void ppc_set_compat_all(uint32_t compat_pvr, Error **errp);
- #endif
+ #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
 --=20
 2.17.1
