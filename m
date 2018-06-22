@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fWLd1-0003S2-IZ
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:57:29 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fWLd3-0003V8-VQ
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:57:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fWLcz-0005El-Ts
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:57:27 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42958)
+	(envelope-from <pm215@archaic.org.uk>) id 1fWLd2-0005M2-Gq
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:57:30 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42960)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fWLcz-00053n-JK
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:57:25 -0400
+	id 1fWLd2-00055S-82
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:57:28 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fWLcr-0003rF-Ba
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:57:17 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fWLd0-0003wr-UG
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:57:26 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Jun 2018 13:56:50 +0100
-Message-Id: <20180622125713.15303-6-peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 13:57:03 +0100
+Message-Id: <20180622125713.15303-19-peter.maydell@linaro.org>
 In-Reply-To: <20180622125713.15303-1-peter.maydell@linaro.org>
 References: <20180622125713.15303-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 05/28] target/arm: Allow KVM device address
- overwriting
+Subject: [Qemu-devel] [PULL 18/28] hw/misc/tz-mpc.c: Implement registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,151 +29,258 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Eric Auger <eric.auger@redhat.com>
+Implement the missing registers for the TZ MPC.
 
-for KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attribute, the attribute
-data pointed to by kvm_device_attr.addr is a OR of the
-redistributor region address and other fields such as the index
-of the redistributor region and the number of redistributors the
-region can contain.
-
-The existing machine init done notifier framework sets the address
-field to the actual address of the device and does not allow to OR
-this value with other fields.
-
-This patch extends the KVMDevice struct with a new kda_addr_ormask
-member. Its value is passed at registration time and OR'ed with the
-resolved address on kvm_arm_set_device_addr().
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 1529072910-16156-3-git-send-email-eric.auger@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Message-id: 20180620132032.28865-3-peter.maydell@linaro.org
 ---
- target/arm/kvm_arm.h        |  3 ++-
- hw/intc/arm_gic_kvm.c       |  4 ++--
- hw/intc/arm_gicv3_its_kvm.c |  2 +-
- hw/intc/arm_gicv3_kvm.c     |  4 ++--
- target/arm/kvm.c            | 10 +++++++++-
- 5 files changed, 16 insertions(+), 7 deletions(-)
+ include/hw/misc/tz-mpc.h |  10 +++
+ hw/misc/tz-mpc.c         | 140 ++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 147 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 1e2364007d3..863f205822e 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -34,6 +34,7 @@ int kvm_arm_vcpu_init(CPUState *cs);
-  * @group: device control API group for setting addresses
-  * @attr: device control API address type
-  * @dev_fd: device control device file descriptor (or -1 if not supported)
-+ * @addr_ormask: value to be OR'ed with resolved address
-  *
-  * Remember the memory region @mr, and when it is mapped by the
-  * machine model, tell the kernel that base address using the
-@@ -45,7 +46,7 @@ int kvm_arm_vcpu_init(CPUState *cs);
-  * address at the point where machine init is complete.
-  */
- void kvm_arm_register_device(MemoryRegion *mr, uint64_t devid, uint64_t group,
--                             uint64_t attr, int dev_fd);
-+                             uint64_t attr, int dev_fd, uint64_t addr_ormask);
+diff --git a/include/hw/misc/tz-mpc.h b/include/hw/misc/tz-mpc.h
+index d1a65fd9a38..6f15945410d 100644
+--- a/include/hw/misc/tz-mpc.h
++++ b/include/hw/misc/tz-mpc.h
+@@ -48,6 +48,16 @@ struct TZMPC {
  
- /**
-  * kvm_arm_init_cpreg_list:
-diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
-index 204369d0e2f..86665080bdc 100644
---- a/hw/intc/arm_gic_kvm.c
-+++ b/hw/intc/arm_gic_kvm.c
-@@ -558,7 +558,7 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
-                             | KVM_VGIC_V2_ADDR_TYPE_DIST,
-                             KVM_DEV_ARM_VGIC_GRP_ADDR,
-                             KVM_VGIC_V2_ADDR_TYPE_DIST,
--                            s->dev_fd);
-+                            s->dev_fd, 0);
-     /* CPU interface for current core. Unlike arm_gic, we don't
-      * provide the "interface for core #N" memory regions, because
-      * cores with a VGIC don't have those.
-@@ -568,7 +568,7 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
-                             | KVM_VGIC_V2_ADDR_TYPE_CPU,
-                             KVM_DEV_ARM_VGIC_GRP_ADDR,
-                             KVM_VGIC_V2_ADDR_TYPE_CPU,
--                            s->dev_fd);
-+                            s->dev_fd, 0);
+     /*< public >*/
  
-     if (kvm_has_gsi_routing()) {
-         /* set up irq routing */
-diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index eea6a73df2c..271ebe461c8 100644
---- a/hw/intc/arm_gicv3_its_kvm.c
-+++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -103,7 +103,7 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
- 
-     /* register the base address */
-     kvm_arm_register_device(&s->iomem_its_cntrl, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
--                            KVM_VGIC_ITS_ADDR_TYPE, s->dev_fd);
-+                            KVM_VGIC_ITS_ADDR_TYPE, s->dev_fd, 0);
- 
-     gicv3_its_init_mmio(s, NULL);
- 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index d8d3b254035..95491df72a0 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -807,9 +807,9 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
-                       KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true, &error_abort);
- 
-     kvm_arm_register_device(&s->iomem_dist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
--                            KVM_VGIC_V3_ADDR_TYPE_DIST, s->dev_fd);
-+                            KVM_VGIC_V3_ADDR_TYPE_DIST, s->dev_fd, 0);
-     kvm_arm_register_device(&s->iomem_redist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
--                            KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd);
-+                            KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
- 
-     if (kvm_has_gsi_routing()) {
-         /* set up irq routing */
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 5bf41e151c6..65f867d5692 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -184,10 +184,15 @@ unsigned long kvm_arch_vcpu_id(CPUState *cpu)
-  * We use a MemoryListener to track mapping and unmapping of
-  * the regions during board creation, so the board models don't
-  * need to do anything special for the KVM case.
-+ *
-+ * Sometimes the address must be OR'ed with some other fields
-+ * (for example for KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION).
-+ * @kda_addr_ormask aims at storing the value of those fields.
-  */
- typedef struct KVMDevice {
-     struct kvm_arm_device_addr kda;
-     struct kvm_device_attr kdattr;
-+    uint64_t kda_addr_ormask;
-     MemoryRegion *mr;
-     QSLIST_ENTRY(KVMDevice) entries;
-     int dev_fd;
-@@ -234,6 +239,8 @@ static void kvm_arm_set_device_addr(KVMDevice *kd)
-      */
-     if (kd->dev_fd >= 0) {
-         uint64_t addr = kd->kda.addr;
++    /* State */
++    uint32_t ctrl;
++    uint32_t blk_idx;
++    uint32_t int_stat;
++    uint32_t int_en;
++    uint32_t int_info1;
++    uint32_t int_info2;
 +
-+        addr |= kd->kda_addr_ormask;
-         attr->addr = (uintptr_t)&addr;
-         ret = kvm_device_ioctl(kd->dev_fd, KVM_SET_DEVICE_ATTR, attr);
-     } else {
-@@ -267,7 +274,7 @@ static Notifier notify = {
++    uint32_t *blk_lut;
++
+     qemu_irq irq;
+ 
+     /* Properties */
+diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
+index 8a8617bdbdf..e5b91bf81a3 100644
+--- a/hw/misc/tz-mpc.c
++++ b/hw/misc/tz-mpc.c
+@@ -28,16 +28,23 @@ enum {
+ 
+ /* Config registers */
+ REG32(CTRL, 0x00)
++    FIELD(CTRL, SEC_RESP, 4, 1)
++    FIELD(CTRL, AUTOINC, 8, 1)
++    FIELD(CTRL, LOCKDOWN, 31, 1)
+ REG32(BLK_MAX, 0x10)
+ REG32(BLK_CFG, 0x14)
+ REG32(BLK_IDX, 0x18)
+ REG32(BLK_LUT, 0x1c)
+ REG32(INT_STAT, 0x20)
++    FIELD(INT_STAT, IRQ, 0, 1)
+ REG32(INT_CLEAR, 0x24)
++    FIELD(INT_CLEAR, IRQ, 0, 1)
+ REG32(INT_EN, 0x28)
++    FIELD(INT_EN, IRQ, 0, 1)
+ REG32(INT_INFO1, 0x2c)
+ REG32(INT_INFO2, 0x30)
+ REG32(INT_SET, 0x34)
++    FIELD(INT_SET, IRQ, 0, 1)
+ REG32(PIDR4, 0xfd0)
+ REG32(PIDR5, 0xfd4)
+ REG32(PIDR6, 0xfd8)
+@@ -57,10 +64,25 @@ static const uint8_t tz_mpc_idregs[] = {
+     0x0d, 0xf0, 0x05, 0xb1,
  };
  
- void kvm_arm_register_device(MemoryRegion *mr, uint64_t devid, uint64_t group,
--                             uint64_t attr, int dev_fd)
-+                             uint64_t attr, int dev_fd, uint64_t addr_ormask)
++static void tz_mpc_irq_update(TZMPC *s)
++{
++    qemu_set_irq(s->irq, s->int_stat && s->int_en);
++}
++
++static void tz_mpc_autoinc_idx(TZMPC *s, unsigned access_size)
++{
++    /* Auto-increment BLK_IDX if necessary */
++    if (access_size == 4 && (s->ctrl & R_CTRL_AUTOINC_MASK)) {
++        s->blk_idx++;
++        s->blk_idx %= s->blk_max;
++    }
++}
++
+ static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
+                                    uint64_t *pdata,
+                                    unsigned size, MemTxAttrs attrs)
  {
-     KVMDevice *kd;
++    TZMPC *s = TZ_MPC(opaque);
+     uint64_t r;
+     uint32_t offset = addr & ~0x3;
  
-@@ -287,6 +294,7 @@ void kvm_arm_register_device(MemoryRegion *mr, uint64_t devid, uint64_t group,
-     kd->kdattr.group = group;
-     kd->kdattr.attr = attr;
-     kd->dev_fd = dev_fd;
-+    kd->kda_addr_ormask = addr_ormask;
-     QSLIST_INSERT_HEAD(&kvm_devices_head, kd, entries);
-     memory_region_ref(kd->mr);
+@@ -74,6 +96,38 @@ static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
+     }
+ 
+     switch (offset) {
++    case A_CTRL:
++        r = s->ctrl;
++        break;
++    case A_BLK_MAX:
++        r = s->blk_max;
++        break;
++    case A_BLK_CFG:
++        /* We are never in "init in progress state", so this just indicates
++         * the block size. s->blocksize == (1 << BLK_CFG + 5), so
++         * BLK_CFG == ctz32(s->blocksize) - 5
++         */
++        r = ctz32(s->blocksize) - 5;
++        break;
++    case A_BLK_IDX:
++        r = s->blk_idx;
++        break;
++    case A_BLK_LUT:
++        r = s->blk_lut[s->blk_idx];
++        tz_mpc_autoinc_idx(s, size);
++        break;
++    case A_INT_STAT:
++        r = s->int_stat;
++        break;
++    case A_INT_EN:
++        r = s->int_en;
++        break;
++    case A_INT_INFO1:
++        r = s->int_info1;
++        break;
++    case A_INT_INFO2:
++        r = s->int_info2;
++        break;
+     case A_PIDR4:
+     case A_PIDR5:
+     case A_PIDR6:
+@@ -120,6 +174,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+                                     uint64_t value,
+                                     unsigned size, MemTxAttrs attrs)
+ {
++    TZMPC *s = TZ_MPC(opaque);
+     uint32_t offset = addr & ~0x3;
+ 
+     trace_tz_mpc_reg_write(addr, value, size);
+@@ -140,9 +195,15 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+         uint32_t oldval;
+ 
+         switch (offset) {
+-            /* As we add support for registers which need expansions
+-             * other than zeroes we'll fill in cases here.
+-             */
++        case A_CTRL:
++            oldval = s->ctrl;
++            break;
++        case A_BLK_IDX:
++            oldval = s->blk_idx;
++            break;
++        case A_BLK_LUT:
++            oldval = s->blk_lut[s->blk_idx];
++            break;
+         default:
+             oldval = 0;
+             break;
+@@ -150,7 +211,48 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+         value = deposit32(oldval, (addr & 3) * 8, size * 8, value);
+     }
+ 
++    if ((s->ctrl & R_CTRL_LOCKDOWN_MASK) &&
++        (offset == A_CTRL || offset == A_BLK_LUT || offset == A_INT_EN)) {
++        /* Lockdown mode makes these three registers read-only, and
++         * the only way out of it is to reset the device.
++         */
++        qemu_log_mask(LOG_GUEST_ERROR, "TZ MPC register write to offset 0x%x "
++                      "while MPC is in lockdown mode\n", offset);
++        return MEMTX_OK;
++    }
++
+     switch (offset) {
++    case A_CTRL:
++        /* We don't implement the 'data gating' feature so all other bits
++         * are reserved and we make them RAZ/WI.
++         */
++        s->ctrl = value & (R_CTRL_SEC_RESP_MASK |
++                           R_CTRL_AUTOINC_MASK |
++                           R_CTRL_LOCKDOWN_MASK);
++        break;
++    case A_BLK_IDX:
++        s->blk_idx = value % s->blk_max;
++        break;
++    case A_BLK_LUT:
++        s->blk_lut[s->blk_idx] = value;
++        tz_mpc_autoinc_idx(s, size);
++        break;
++    case A_INT_CLEAR:
++        if (value & R_INT_CLEAR_IRQ_MASK) {
++            s->int_stat = 0;
++            tz_mpc_irq_update(s);
++        }
++        break;
++    case A_INT_EN:
++        s->int_en = value & R_INT_EN_IRQ_MASK;
++        tz_mpc_irq_update(s);
++        break;
++    case A_INT_SET:
++        if (value & R_INT_SET_IRQ_MASK) {
++            s->int_stat = R_INT_STAT_IRQ_MASK;
++            tz_mpc_irq_update(s);
++        }
++        break;
+     case A_PIDR4:
+     case A_PIDR5:
+     case A_PIDR6:
+@@ -266,6 +368,16 @@ static int tz_mpc_num_indexes(IOMMUMemoryRegion *iommu)
+ 
+ static void tz_mpc_reset(DeviceState *dev)
+ {
++    TZMPC *s = TZ_MPC(dev);
++
++    s->ctrl = 0x00000100;
++    s->blk_idx = 0;
++    s->int_stat = 0;
++    s->int_en = 1;
++    s->int_info1 = 0;
++    s->int_info2 = 0;
++
++    memset(s->blk_lut, 0, s->blk_max * sizeof(uint32_t));
  }
+ 
+ static void tz_mpc_init(Object *obj)
+@@ -339,13 +451,35 @@ static void tz_mpc_realize(DeviceState *dev, Error **errp)
+                        "tz-mpc-downstream");
+     address_space_init(&s->blocked_io_as, &s->blocked_io,
+                        "tz-mpc-blocked-io");
++
++    s->blk_lut = g_new(uint32_t, s->blk_max);
++}
++
++static int tz_mpc_post_load(void *opaque, int version_id)
++{
++    TZMPC *s = TZ_MPC(opaque);
++
++    /* Check the incoming data doesn't point blk_idx off the end of blk_lut. */
++    if (s->blk_idx >= s->blk_max) {
++        return -1;
++    }
++    return 0;
+ }
+ 
+ static const VMStateDescription tz_mpc_vmstate = {
+     .name = "tz-mpc",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .post_load = tz_mpc_post_load,
+     .fields = (VMStateField[]) {
++        VMSTATE_UINT32(ctrl, TZMPC),
++        VMSTATE_UINT32(blk_idx, TZMPC),
++        VMSTATE_UINT32(int_stat, TZMPC),
++        VMSTATE_UINT32(int_en, TZMPC),
++        VMSTATE_UINT32(int_info1, TZMPC),
++        VMSTATE_UINT32(int_info2, TZMPC),
++        VMSTATE_VARRAY_UINT32(blk_lut, TZMPC, blk_max,
++                              0, vmstate_info_uint32, uint32_t),
+         VMSTATE_END_OF_LIST()
+     }
+ };
 -- 
 2.17.1
