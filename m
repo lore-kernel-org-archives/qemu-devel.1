@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Aleksandar.Markovic@mips.com>) id 1fWMPH-00033W-TV
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:47:21 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Aleksandar.Markovic@mips.com>) id 1fWMPE-0006Vb-02
+	(envelope-from <cohuck@redhat.com>) id 1fWMPI-00033h-2P
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:47:20 -0400
-Received: from 9pmail.ess.barracuda.com ([64.235.150.224]:34961)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Aleksandar.Markovic@mips.com>)
-	id 1fWMPD-0006UM-Q3
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:47:15 -0400
-From: Aleksandar Markovic <Aleksandar.Markovic@mips.com>
-Date: Fri, 22 Jun 2018 13:47:03 +0000
-Message-ID: <96f2606a9d054aa9bd26d48be5256322@mips.com>
-References: <20180620120620.12806-1-yongbok.kim@mips.com>,
-	<20180620120620.12806-23-yongbok.kim@mips.com>
-In-Reply-To: <20180620120620.12806-23-yongbok.kim@mips.com>
-Content-Language: en-US
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <cohuck@redhat.com>) id 1fWMPE-0006WB-6x
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:47:20 -0400
+Date: Fri, 22 Jun 2018 15:47:08 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180622154708.37167025.cohuck@redhat.com>
+In-Reply-To: <5df62baa-268b-2624-e9d7-42c521546d04@de.ibm.com>
+References: <152967373830.876.17089841294743780259@d39dc562802a>
+	<5df62baa-268b-2624-e9d7-42c521546d04@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 22/35] target/mips: Fix data type for offset
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] s390/ipl: fix ipl with -no-reboot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +23,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yongbok Kim <Yongbok.Kim@mips.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, James Hogan <James.Hogan@mips.com>, Paul Burton <Paul.Burton@mips.com>, Matthew Fortune <Matthew.Fortune@mips.com>, Stefan Markovic <Stefan.Markovic@mips.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, frankja@linux.vnet.ibm.com, thuth@redhat.com, david@redhat.com, agraf@suse.de, pasic@linux.vnet.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
-> From: Yongbok Kim <yongbok.kim@imgtec.com>
->
-> Offset can be larger than 16 bit from nanoMIPS,
-> and immediate field can be larger than 16 bits as well.
->
-> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
+On Fri, 22 Jun 2018 15:29:04 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-Reviewed-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
+> On 06/22/2018 03:22 PM, no-reply@patchew.org wrote:
+> > Hi,
+> > 
+> > This series failed docker-mingw@fedora build test. Please find the testing commands and
+> > their output below. If you have Docker installed, you can probably reproduce it
+> > locally.
+> >   
+> 
+> [...]
+> 
+> >   CC      os-win32.o
+> >   CC      bt-host.o
+> >   CC      bt-vhci.o
+> >   CC      dma-helpers.o
+> >   CC      vl.o
+> >   CC      tpm.o
+> >   CC      device_tree.o
+> > /tmp/qemu-test/src/nbd/server.c: In function 'nbd_trip':
+> > /tmp/qemu-test/src/nbd/server.c:1980:19: error: 'end' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+> >      *length = end - offset;
+> >                ~~~~^~~~~~~~
+> > /tmp/qemu-test/src/nbd/server.c:1940:30: note: 'end' was declared here
+> >      uint64_t begin = offset, end;
+> >                               ^~~
+> > cc1: all warnings being treated as errors  
+> 
+> This seems unrelated to the patch?
+> 
 
-> ---
->  target/mips/translate.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/target/mips/translate.c b/target/mips/translate.c
-> index 9e29dd7..8c20ba3 100644
-> --- a/target/mips/translate.c
-> +++ b/target/mips/translate.c
-> @@ -2114,7 +2114,7 @@ OP_ST_ATOMIC(scd,st64,ld64,0x7);
->  #undef OP_ST_ATOMIC
->
->  static void gen_base_offset_addr (DisasContext *ctx, TCGv addr,
-> -                                  int base, int16_t offset)
-> +                                  int base, int offset)
->  {
->      if (base =3D=3D 0) {
->          tcg_gen_movi_tl(addr, offset);
-> @@ -2142,7 +2142,7 @@ static target_ulong pc_relative_pc (DisasContext *c=
-tx)
->
->  /* Load */
->  static void gen_ld(DisasContext *ctx, uint32_t opc,
-> -                   int rt, int base, int16_t offset)
-> +                   int rt, int base, int offset)
->  {
->      TCGv t0, t1, t2;
->      int mem_idx =3D ctx->mem_idx;
-> @@ -2377,7 +2377,7 @@ static void gen_llwp(DisasContext *ctx, uint32_t ba=
-se, int16_t offset,
->
->  /* Store */
->  static void gen_st (DisasContext *ctx, uint32_t opc, int rt,
-> -                    int base, int16_t offset)
-> +                    int base, int offset)
->  {
->      TCGv t0 =3D tcg_temp_new();
->      TCGv t1 =3D tcg_temp_new();
-> @@ -2602,7 +2602,7 @@ static void gen_cop1_ldst(DisasContext *ctx, uint32=
-_t op, int rt,
->
->  /* Arithmetic with immediate operand */
->  static void gen_arith_imm(DisasContext *ctx, uint32_t opc,
-> -                          int rt, int rs, int16_t imm)
-> +                          int rt, int rs, int imm)
->  {
->      target_ulong uimm =3D (target_long)imm; /* Sign extend to 32/64 bits=
- */
->
-> --
-> 1.9.1
+Yes, the last few patches all failed with this error.
