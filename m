@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39676)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39721)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDcy-0007ha-NS
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:55 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDd0-0007j9-1J
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDcu-0003Xk-9u
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:52 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDcx-0003Zh-Jx
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:53 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 22 Jun 2018 14:24:15 +1000
-Message-Id: <20180622042437.14259-1-david@gibson.dropbear.id.au>
+Date: Fri, 22 Jun 2018 14:24:25 +1000
+Message-Id: <20180622042437.14259-11-david@gibson.dropbear.id.au>
+In-Reply-To: <20180622042437.14259-1-david@gibson.dropbear.id.au>
+References: <20180622042437.14259-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 01/23] ppc/pnv: introduce a new intc_create()
- operation to the chip model
+Subject: [Qemu-devel] [PATCH 11/23] spapr: split the IRQ allocation sequence
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,173 +27,241 @@ Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.c
 
 From: C=C3=A9dric Le Goater <clg@kaod.org>
 
-On Power9, the thread interrupt presenter has a different type and is
-linked to the chip owning the cores.
+Today, when a device requests for IRQ number in a sPAPR machine, the
+spapr_irq_alloc() routine first scans the ICSState status array to
+find an empty slot and then performs the assignement of the selected
+numbers. Split this sequence in two distinct routines : spapr_irq_find()
+for lookups and spapr_irq_claim() for claiming the IRQ numbers.
+
+This will ease the introduction of a static layout of IRQ numbers.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv.c         | 21 +++++++++++++++++++--
- hw/ppc/pnv_core.c    | 18 +++++++++---------
- include/hw/ppc/pnv.h |  1 +
- 3 files changed, 29 insertions(+), 11 deletions(-)
+ hw/ppc/spapr.c         | 50 ++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_events.c  | 18 +++++++++++----
+ hw/ppc/spapr_pci.c     | 23 ++++++++++++++++---
+ hw/ppc/spapr_vio.c     | 10 ++++++++-
+ include/hw/ppc/spapr.h |  4 ++++
+ 5 files changed, 97 insertions(+), 8 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 0d2b79f798..c7e127ae97 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -671,6 +671,13 @@ static uint32_t pnv_chip_core_pir_p8(PnvChip *chip, =
-uint32_t core_id)
-     return (chip->chip_id << 7) | (core_id << 3);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 4a0b679166..b7705c3944 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3816,6 +3816,36 @@ static int ics_find_free_block(ICSState *ics, int =
+num, int alignnum)
+     return -1;
  }
 =20
-+static Object *pnv_chip_power8_intc_create(PnvChip *chip, Object *child,
-+                                           Error **errp)
++int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Error =
+**errp)
 +{
-+    return icp_create(child, TYPE_PNV_ICP, XICS_FABRIC(qdev_get_machine(=
-)),
-+                      errp);
++    ICSState *ics =3D spapr->ics;
++    int first =3D -1;
++
++    assert(ics);
++
++    /*
++     * MSIMesage::data is used for storing VIRQ so
++     * it has to be aligned to num to support multiple
++     * MSI vectors. MSI-X is not affected by this.
++     * The hint is used for the first IRQ, the rest should
++     * be allocated continuously.
++     */
++    if (align) {
++        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
++               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
++        first =3D ics_find_free_block(ics, num, num);
++    } else {
++        first =3D ics_find_free_block(ics, num, 1);
++    }
++
++    if (first < 0) {
++        error_setg(errp, "can't find a free %d-IRQ block", num);
++        return -1;
++    }
++
++    return first + ics->offset;
 +}
 +
  /*
-  *    0:48  Reserved - Read as zeroes
-  *   49:52  Node ID
-@@ -686,6 +693,12 @@ static uint32_t pnv_chip_core_pir_p9(PnvChip *chip, =
-uint32_t core_id)
-     return (chip->chip_id << 8) | (core_id << 2);
+  * Allocate the IRQ number and set the IRQ type, LSI or MSI
+  */
+@@ -3894,6 +3924,26 @@ int spapr_irq_alloc_block(sPAPRMachineState *spapr=
+, int num, bool lsi,
+     return first;
  }
 =20
-+static Object *pnv_chip_power9_intc_create(PnvChip *chip, Object *child,
-+                                           Error **errp)
++int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp)
 +{
-+    return NULL;
++    ICSState *ics =3D spapr->ics;
++
++    assert(ics);
++
++    if (!ics_valid_irq(ics, irq)) {
++        error_setg(errp, "IRQ %d is invalid", irq);
++        return -1;
++    }
++
++    if (!ICS_IRQ_FREE(ics, irq - ics->offset)) {
++        error_setg(errp, "IRQ %d is not free", irq);
++        return -1;
++    }
++
++    spapr_irq_set_lsi(spapr, irq, lsi);
++    return 0;
 +}
 +
- /* Allowed core identifiers on a POWER8 Processor Chip :
-  *
-  * <EX0 reserved>
-@@ -721,6 +734,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *=
-klass, void *data)
-     k->chip_cfam_id =3D 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
-     k->cores_mask =3D POWER8E_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-+    k->intc_create =3D pnv_chip_power8_intc_create;
-     k->xscom_base =3D 0x003fc0000000000ull;
-     dc->desc =3D "PowerNV Chip POWER8E";
- }
-@@ -734,6 +748,7 @@ static void pnv_chip_power8_class_init(ObjectClass *k=
-lass, void *data)
-     k->chip_cfam_id =3D 0x220ea04980000000ull; /* P8 Venice DD2.0 */
-     k->cores_mask =3D POWER8_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-+    k->intc_create =3D pnv_chip_power8_intc_create;
-     k->xscom_base =3D 0x003fc0000000000ull;
-     dc->desc =3D "PowerNV Chip POWER8";
- }
-@@ -747,6 +762,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass=
- *klass, void *data)
-     k->chip_cfam_id =3D 0x120d304980000000ull;  /* P8 Naples DD1.0 */
-     k->cores_mask =3D POWER8_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p8;
-+    k->intc_create =3D pnv_chip_power8_intc_create;
-     k->xscom_base =3D 0x003fc0000000000ull;
-     dc->desc =3D "PowerNV Chip POWER8NVL";
- }
-@@ -760,6 +776,7 @@ static void pnv_chip_power9_class_init(ObjectClass *k=
-lass, void *data)
-     k->chip_cfam_id =3D 0x220d104900008000ull; /* P9 Nimbus DD2.0 */
-     k->cores_mask =3D POWER9_CORE_MASK;
-     k->core_pir =3D pnv_chip_core_pir_p9;
-+    k->intc_create =3D pnv_chip_power9_intc_create;
-     k->xscom_base =3D 0x00603fc00000000ull;
-     dc->desc =3D "PowerNV Chip POWER9";
- }
-@@ -892,8 +909,8 @@ static void pnv_chip_core_realize(PnvChip *chip, Erro=
-r **errp)
-         object_property_set_int(OBJECT(pnv_core),
-                                 pcc->core_pir(chip, core_hwid),
-                                 "pir", &error_fatal);
--        object_property_add_const_link(OBJECT(pnv_core), "xics",
--                                       qdev_get_machine(), &error_fatal)=
-;
-+        object_property_add_const_link(OBJECT(pnv_core), "chip",
-+                                       OBJECT(chip), &error_fatal);
-         object_property_set_bool(OBJECT(pnv_core), true, "realized",
-                                  &error_fatal);
-         object_unref(OBJECT(pnv_core));
-diff --git a/hw/ppc/pnv_core.c b/hw/ppc/pnv_core.c
-index f7cf33f547..a9f129fc2c 100644
---- a/hw/ppc/pnv_core.c
-+++ b/hw/ppc/pnv_core.c
-@@ -99,13 +99,14 @@ static const MemoryRegionOps pnv_core_xscom_ops =3D {
-     .endianness =3D DEVICE_BIG_ENDIAN,
- };
-=20
--static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFabric *xi, Error **er=
-rp)
-+static void pnv_realize_vcpu(PowerPCCPU *cpu, PnvChip *chip, Error **err=
-p)
+ void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
  {
-     CPUPPCState *env =3D &cpu->env;
-     int core_pir;
-     int thread_index =3D 0; /* TODO: TCG supports only one thread */
-     ppc_spr_t *pir =3D &env->spr_cb[SPR_PIR];
-     Error *local_err =3D NULL;
-+    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+     ICSState *ics =3D spapr->ics;
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index 86836f0626..e4f5946a21 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -707,13 +707,18 @@ void spapr_clear_pending_events(sPAPRMachineState *=
+spapr)
 =20
-     object_property_set_bool(OBJECT(cpu), true, "realized", &local_err);
-     if (local_err) {
-@@ -113,7 +114,7 @@ static void pnv_realize_vcpu(PowerPCCPU *cpu, XICSFab=
-ric *xi, Error **errp)
+ void spapr_events_init(sPAPRMachineState *spapr)
+ {
++    int epow_irq;
++
++    epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
++
++    spapr_irq_claim(spapr, epow_irq, false, &error_fatal);
++
+     QTAILQ_INIT(&spapr->pending_events);
+=20
+     spapr->event_sources =3D spapr_event_sources_new();
+=20
+     spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_EPOW,
+-                                 spapr_irq_alloc(spapr, 0, false,
+-                                                  &error_fatal));
++                                 epow_irq);
+=20
+     /* NOTE: if machine supports modern/dedicated hotplug event source,
+      * we add it to the device-tree unconditionally. This means we may
+@@ -724,9 +729,14 @@ void spapr_events_init(sPAPRMachineState *spapr)
+      * checking that it's enabled.
+      */
+     if (spapr->use_hotplug_event_source) {
++        int hp_irq;
++
++        hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
++
++        spapr_irq_claim(spapr, hp_irq, false, &error_fatal);
++
+         spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_H=
+OT_PLUG,
+-                                     spapr_irq_alloc(spapr, 0, false,
+-                                                      &error_fatal));
++                                     hp_irq);
+     }
+=20
+     spapr->epow_notifier.notify =3D spapr_powerdown_req;
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index f936ce63ef..497b896c7d 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -279,6 +279,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+     spapr_pci_msi *msi;
+     int *config_addr_key;
+     Error *err =3D NULL;
++    int i;
+=20
+     /* Fins sPAPRPHBState */
+     phb =3D spapr_pci_find_phb(spapr, buid);
+@@ -371,8 +372,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
+RMachineState *spapr,
+     }
+=20
+     /* Allocate MSIs */
+-    irq =3D spapr_irq_alloc_block(spapr, req_num, false,
+-                           ret_intr_type =3D=3D RTAS_TYPE_MSI, &err);
++    irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS_TYP=
+E_MSI, &err);
+     if (err) {
+         error_reportf_err(err, "Can't allocate MSIs for device %x: ",
+                           config_addr);
+@@ -380,6 +380,16 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPA=
+PRMachineState *spapr,
          return;
      }
 =20
--    cpu->intc =3D icp_create(OBJECT(cpu), TYPE_PNV_ICP, xi, &local_err);
-+    cpu->intc =3D pcc->intc_create(chip, OBJECT(cpu), &local_err);
++    for (i =3D 0; i < req_num; i++) {
++        spapr_irq_claim(spapr, irq + i, false, &err);
++        if (err) {
++            error_reportf_err(err, "Can't allocate MSIs for device %x: "=
+,
++                              config_addr);
++            rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
++            return;
++        }
++    }
++
+     /* Release previous MSIs */
+     if (msi) {
+         spapr_irq_free(spapr, msi->first_irq, msi->num);
+@@ -1698,7 +1708,14 @@ static void spapr_phb_realize(DeviceState *dev, Er=
+ror **errp)
+         uint32_t irq;
+         Error *local_err =3D NULL;
+=20
+-        irq =3D spapr_irq_alloc_block(spapr, 1, true, false, &local_err)=
+;
++        irq =3D spapr_irq_findone(spapr, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            error_prepend(errp, "can't allocate LSIs: ");
++            return;
++        }
++
++        spapr_irq_claim(spapr, irq, true, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             error_prepend(errp, "can't allocate LSIs: ");
+diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+index 4555c648a8..daf85130b5 100644
+--- a/hw/ppc/spapr_vio.c
++++ b/hw/ppc/spapr_vio.c
+@@ -475,7 +475,15 @@ static void spapr_vio_busdev_realize(DeviceState *qd=
+ev, Error **errp)
+         dev->qdev.id =3D id;
+     }
+=20
+-    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err);
++    if (!dev->irq) {
++        dev->irq =3D spapr_irq_findone(spapr, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
++        }
++    }
++
++    spapr_irq_claim(spapr, dev->irq, false, &local_err);
      if (local_err) {
          error_propagate(errp, local_err);
          return;
-@@ -143,13 +144,12 @@ static void pnv_core_realize(DeviceState *dev, Erro=
-r **errp)
-     void *obj;
-     int i, j;
-     char name[32];
--    Object *xi;
-+    Object *chip;
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 9dd46a72f6..6bfdf5a2fb 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -776,6 +776,10 @@ int spapr_irq_alloc(sPAPRMachineState *spapr, int ir=
+q_hint, bool lsi,
+                     Error **errp);
+ int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
+                           bool align, Error **errp);
++int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align,
++                   Error **errp);
++#define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false, e=
+rrp)
++int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
+*errp);
+ void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
+ qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
 =20
--    xi =3D object_property_get_link(OBJECT(dev), "xics", &local_err);
--    if (!xi) {
--        error_setg(errp, "%s: required link 'xics' not found: %s",
--                   __func__, error_get_pretty(local_err));
--        return;
-+    chip =3D object_property_get_link(OBJECT(dev), "chip", &local_err);
-+    if (!chip) {
-+        error_propagate(errp, local_err);
-+        error_prepend(errp, "required link 'chip' not found: ");
-     }
-=20
-     pc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
-@@ -166,7 +166,7 @@ static void pnv_core_realize(DeviceState *dev, Error =
-**errp)
-     }
-=20
-     for (j =3D 0; j < cc->nr_threads; j++) {
--        pnv_realize_vcpu(pc->threads[j], XICS_FABRIC(xi), &local_err);
-+        pnv_realize_vcpu(pc->threads[j], PNV_CHIP(chip), &local_err);
-         if (local_err) {
-             goto err;
-         }
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 90759240a7..e934e84f55 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -76,6 +76,7 @@ typedef struct PnvChipClass {
-     hwaddr       xscom_base;
-=20
-     uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
-+    Object *(*intc_create)(PnvChip *chip, Object *child, Error **errp);
- } PnvChipClass;
-=20
- #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
 --=20
 2.17.1
