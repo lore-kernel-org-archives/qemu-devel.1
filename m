@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40602)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fWU1q-0007iI-QM
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:55:40 -0400
+	(envelope-from <loseweigh@gmail.com>) id 1fWU3q-0008La-Gu
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:57:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fWU1n-0007RY-My
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:55:38 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:56231)
+	(envelope-from <loseweigh@gmail.com>) id 1fWU3p-0000O1-Be
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:57:42 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:40198)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fWU1n-0007Qy-Bw
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:55:35 -0400
-Received: by mail-wm0-x243.google.com with SMTP id v16-v6so3488308wmh.5
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 14:55:35 -0700 (PDT)
-References: <20180622140223.26056-1-f4bug@amsat.org>
-	<CAMo8Bf+_bSYrz_grbvHgpFsNmA7pJDOzjLUhLq2YfmV8FdoXkQ@mail.gmail.com>
-	<878t76vlal.fsf@linaro.org>
-	<CAMo8Bf+OfMyORPN69vROMBMUDF9ucNVMCOHF7EFfXFO7Qpnr1g@mail.gmail.com>
-	<c721aacc-6ee9-28e3-a8f9-c3c836d42355@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <c721aacc-6ee9-28e3-a8f9-c3c836d42355@amsat.org>
-Date: Fri, 22 Jun 2018 22:55:32 +0100
-Message-ID: <87602av63v.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <loseweigh@gmail.com>) id 1fWU3p-0000NR-50
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:57:41 -0400
+Received: by mail-it0-x244.google.com with SMTP id 188-v6so4844043ita.5
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 14:57:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] docker: Add fedora-xtensa-cross image
+In-Reply-To: <20180623003022-mutt-send-email-mst@kernel.org>
+References: <20180619233001-mutt-send-email-mst@kernel.org>
+	<20180620115359.1a3bf6fb.cohuck@redhat.com>
+	<20180620170904-mutt-send-email-mst@kernel.org>
+	<20180620180619.6b4ee52d.cohuck@redhat.com>
+	<20180620224535-mutt-send-email-mst@kernel.org>
+	<20180621165913.7e3f4faa.cohuck@redhat.com>
+	<20180621211712-mutt-send-email-mst@kernel.org>
+	<20180622170955.298900c1.cohuck@redhat.com>
+	<20180622214259-mutt-send-email-mst@kernel.org>
+	<CADGSJ22e=Sa8S-HqM4XtOa6ngBKPL73SiQRPh8PUzQgRaie5oA@mail.gmail.com>
+	<20180623003022-mutt-send-email-mst@kernel.org>
+From: Siwei Liu <loseweigh@gmail.com>
+Date: Fri, 22 Jun 2018 14:57:39 -0700
+Message-ID: <CADGSJ22oFhP955cuTmMWeSt0UOsG5K1A--c34QUSMx5z3Up2SA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,117 +38,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Max Filippov <jcmvbkbc@gmail.com>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, "Samudrala,
+	Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
-
-> On 06/22/2018 03:45 PM, Max Filippov wrote:
->> On Fri, Jun 22, 2018 at 9:27 AM, Alex Benn=C3=A9e <alex.bennee@linaro.or=
-g> wrote:
->>> Max Filippov <jcmvbkbc@gmail.com> writes:
->>>> On Fri, Jun 22, 2018 at 7:02 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@am=
-sat.org> wrote:
->>>>> As of this commit:
->>>>>
->>>>>   $ xtensa-linux-gnu-as -v
->>>>>   GNU assembler version 2.29.1 (xtensa-linux-gnu) using BFD version v=
-ersion 2.29.1-1.fc27
->>>>>
->>>>>   $ xtensa-linux-gnu-gcc -v
->>>>>   Target: xtensa-linux-gnu
->>>>>   gcc version 7.2.1 20170915 (Red Hat Cross 7.2.1-1) (GCC)
->>>>>
->>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>>> ---
->>>>>  tests/docker/dockerfiles/fedora-xtensa-cross.docker | 7 +++++++
->>>>>  1 file changed, 7 insertions(+)
->>>>>  create mode 100644 tests/docker/dockerfiles/fedora-xtensa-cross.dock=
-er
->>>>>
->>>>> diff --git a/tests/docker/dockerfiles/fedora-xtensa-cross.docker b/te=
-sts/docker/dockerfiles/fedora-xtensa-cross.docker
->>>>> new file mode 100644
->>>>> index 0000000000..6f9521520c
->>>>> --- /dev/null
->>>>> +++ b/tests/docker/dockerfiles/fedora-xtensa-cross.docker
->>>>> @@ -0,0 +1,7 @@
->>>>> +FROM fedora:latest
->>>>> +ENV PACKAGES \
->>>>> +    binutils-xtensa-linux-gnu \
->>>>> +    gcc-xtensa-linux-gnu
->>>>
->>>> Generic binutils and gcc for xtensa only (partially) make sense for
->>>> build testing.
->>>
->>> OK
->>>
->>>> Built binaries will not work.
->>>
->>> Why?
+On Fri, Jun 22, 2018 at 2:32 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Fri, Jun 22, 2018 at 01:21:45PM -0700, Siwei Liu wrote:
+>> On Fri, Jun 22, 2018 at 12:05 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+>> > On Fri, Jun 22, 2018 at 05:09:55PM +0200, Cornelia Huck wrote:
+>> >> On Thu, 21 Jun 2018 21:20:13 +0300
+>> >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>> >>
+>> >> > On Thu, Jun 21, 2018 at 04:59:13PM +0200, Cornelia Huck wrote:
+>> >> > > OK, so what about the following:
+>> >> > >
+>> >> > > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
+>> >> > >   that we have a new uuid field in the virtio-net config space
+>> >> > > - in QEMU, add a property for virtio-net that allows to specify a uuid,
+>> >> > >   offer VIRTIO_NET_F_STANDBY_UUID if set
+>> >> > > - when configuring, set the property to the group UUID of the vfio-pci
+>> >> > >   device
+>> >> > > - in the guest, use the uuid from the virtio-net device's config space
+>> >> > >   if applicable; else, fall back to matching by MAC as done today
+>> >> > >
+>> >> > > That should work for all virtio transports.
+>> >> >
+>> >> > True. I'm a bit unhappy that it's virtio net specific though
+>> >> > since down the road I expect we'll have a very similar feature
+>> >> > for scsi (and maybe others).
+>> >> >
+>> >> > But we do not have a way to have fields that are portable
+>> >> > both across devices and transports, and I think it would
+>> >> > be a useful addition. How would this work though? Any idea?
+>> >>
+>> >> Can we introduce some kind of device-independent config space area?
+>> >> Pushing back the device-specific config space by a certain value if the
+>> >> appropriate feature is negotiated and use that for things like the uuid?
+>> >
+>> > So config moves back and forth?
+>> > Reminds me of the msi vector mess we had with pci.
+>> > I'd rather have every transport add a new config.
+>> >
+>> >> But regardless of that, I'm not sure whether extending this approach to
+>> >> other device types is the way to go. Tying together two different
+>> >> devices is creating complicated situations at least in the hypervisor
+>> >> (even if it's fairly straightforward in the guest). [I have not come
+>> >> around again to look at the "how to handle visibility in QEMU"
+>> >> questions due to lack of cycles, sorry about that.]
+>> >>
+>> >> So, what's the goal of this approach? Only to allow migration with
+>> >> vfio-pci, or also to plug in a faster device and use it instead of an
+>> >> already attached paravirtualized device?
+>> >
+>> > These are two sides of the same coin, I think the second approach
+>> > is closer to what we are doing here.
 >>
->> The default toolchain does not generate code for any real xtensa CPU
->> configuration or for any configuration supported by the QEMU.
->> The xtensa configuration overlay for a specific CPU must be applied
->> to the toolchain source in order to build a toolchain capable of
->> producing code that would work on that CPU.
->> There's FSF xtensa CPU configuration in QEMU that is compatible with
->> very old (older than 2.19 IIRC) binutils.
->
-> While the Fedora binutils supports dual endianness, the compiler only
-> works for big-endian:
->
-> $ docker run --rm -it qemu:fedora-xtensa-cross xtensa-linux-gnu-objcopy
-> xtensa-linux-gnu-objcopy: supported targets: elf32-xtensa-le
-> elf32-xtensa-be elf32-little elf32-big
->
-> $ docker run --rm -it qemu:fedora-xtensa-cross bash -c \
->   'echo -e "__XTENSA_EL__\n__XTENSA_EB__" | \
->   xtensa-linux-gnu-gcc -E - | grep -v "\#"'
-> __XTENSA_EL__
-> 1
->
->> xtensa TCG tests (at least
->> some of them) are written for the dc232b xtensa CPU. The configuration
->
-> I learned that the hard way :(
->
-> I took the only big-endian CPU available: FSF, however
->
-> - the linkscript expect the unavailable XTENSA_HAVE_BE definition,
-> - core-isa.h misses the following definitions:
->
-> #define XCHAL_KERNEL_VECOFS             0x00000200 /* XXX ??? */
-> #define XCHAL_INTLEVEL2_VECOFS          0x00000180 /* XXX ??? */
-> #define XCHAL_INTLEVEL3_VECOFS          0x00000240 /* XXX ??? */
-> #define XCHAL_INTLEVEL4_VECOFS          0x00000520 /* XXX ??? */
->
-> So this is a dead-end.
->
->> overlay for that CPU is available here:
+>> I'm leaning towards being conservative to keep the potential of doing
+>> both. It's the vfio migration itself that has to be addessed, not to
+>> make every virtio device to have an accelerated datapath, right?
 >>
->>   https://github.com/jcmvbkbc/xtensa-toolchain-build/blob/master/overlay=
-s/xtensa_dc232b.tar.gz
->>
->> The following toolchain may be used to build working tests for xtensa:
->>
->>   https://github.com/foss-xtensa/toolchain/releases/download/2018.02/x86=
-_64-2018.02-xtensa-dc232b-elf.tar.gz
+>> -Siwei
 >
-> Thanks for the links, I'll continue with DC232B next week.
+> I think that the approach we took (signal configuration
+> through standby) assumes standby always present and
+> primary appearing and disappearing.
+
+I can imagine that's still true even for 1-netdev model. As long as we
+can hide the lower devices.
+
+That's what I said "to keep the potential to support both" models. But
+we should not go further along to assume the other aspect ie. to get
+PV accelerated whenever possible, but not to get VF migrated whenever
+possible. That's essetially a big diveregence of the priority for the
+goal we'd want to pursue.
+
+-Siwei
+
 >
-> Alex: Can you dequeue this patch please?
-
-OK poor first choice for getting the system emulation patches working. I
-wonder if the other fedora compilers will be useful for us?
-
-
-> gcc-nios2-linux-gnu-7.1.1-3.fc27.i686.rpm
-> gcc-microblaze-linux-gnu-7.1.1-3.fc27.i686.rpm
-> gcc-tile-linux-gnu-7.1.1-3.fc27.i686.rpm
-> gcc-cris-linux-gnu-7.1.1-3.fc27.i686.rpm
-
-
---
-Alex Benn=C3=A9e
+> Anything else isn't well supported and I'm not sure we
+> should complicate code too much to support it.
+>
+>>
+>> >
+>> >> What about migration of vfio devices that are not easily replaced by a
+>> >> paravirtualized device? I'm thinking of vfio-ccw, where our main (and
+>> >> currently only) supported device is dasd (disks) -- which can do a lot
+>> >> of specialized things that virtio-blk does not support (and should not
+>> >> or even cannot support).
+>> >
+>> > But maybe virtio-scsi can?
+>> >
+>> >> Would it be more helpful to focus on generic
+>> >> migration support for vfio instead of going about it device by device?
+>> >>
+>> >> This network device approach already seems far along, so it makes sense
+>> >> to continue with it. But I'm not sure whether we want to spend time and
+>> >> energy on that for other device types rather than working on a general
+>> >> solution for vfio migration.
+>> >
+>> > I'm inclined to say finalizing this feature would be a good first step
+>> > and will teach us how we can move forward.
+>> >
+>> > --
+>> > MST
