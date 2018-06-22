@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDd0-0007j9-1J
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDd2-0007lg-QE
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDcx-0003Zh-Jx
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:53 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDd0-0003cQ-To
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:56 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 22 Jun 2018 14:24:25 +1000
-Message-Id: <20180622042437.14259-11-david@gibson.dropbear.id.au>
+Date: Fri, 22 Jun 2018 14:24:36 +1000
+Message-Id: <20180622042437.14259-22-david@gibson.dropbear.id.au>
 In-Reply-To: <20180622042437.14259-1-david@gibson.dropbear.id.au>
 References: <20180622042437.14259-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 11/23] spapr: split the IRQ allocation sequence
+Subject: [Qemu-devel] [PATCH 22/23] spapr: Limit available pagesizes to
+ provide a consistent guest environment
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,243 +26,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+KVM HV has some limitations (deriving from the hardware) that mean not al=
+l
+host-cpu supported pagesizes may be usable in the guest.  At present this
+means that KVM guests and TCG guests may see different available page siz=
+es
+even if they notionally have the same vcpu model.  This is confusing and
+also prevents migration between TCG and KVM.
 
-Today, when a device requests for IRQ number in a sPAPR machine, the
-spapr_irq_alloc() routine first scans the ICSState status array to
-find an empty slot and then performs the assignement of the selected
-numbers. Split this sequence in two distinct routines : spapr_irq_find()
-for lookups and spapr_irq_claim() for claiming the IRQ numbers.
+This patch makes the environment consistent by always allowing the same s=
+et
+of pagesizes.  Since we can't remove the KVM limitations, we do this by
+always applying the same limitations it has, even to TCG guests.
 
-This will ease the introduction of a static layout of IRQ numbers.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c         | 50 ++++++++++++++++++++++++++++++++++++++++++
- hw/ppc/spapr_events.c  | 18 +++++++++++----
- hw/ppc/spapr_pci.c     | 23 ++++++++++++++++---
- hw/ppc/spapr_vio.c     | 10 ++++++++-
- include/hw/ppc/spapr.h |  4 ++++
- 5 files changed, 97 insertions(+), 8 deletions(-)
+ hw/ppc/spapr_caps.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 4a0b679166..b7705c3944 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3816,6 +3816,36 @@ static int ics_find_free_block(ICSState *ics, int =
-num, int alignnum)
-     return -1;
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index 722b213d9a..62663ebdf5 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -335,6 +335,39 @@ static void cap_hpt_maxpagesize_apply(sPAPRMachineSt=
+ate *spapr,
+     spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
  }
 =20
-+int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align, Error =
-**errp)
++static bool spapr_pagesize_cb(void *opaque, uint32_t seg_pshift,
++                              uint32_t pshift)
 +{
-+    ICSState *ics =3D spapr->ics;
-+    int first =3D -1;
++    unsigned maxshift =3D *((unsigned *)opaque);
 +
-+    assert(ics);
++    assert(pshift >=3D seg_pshift);
 +
-+    /*
-+     * MSIMesage::data is used for storing VIRQ so
-+     * it has to be aligned to num to support multiple
-+     * MSI vectors. MSI-X is not affected by this.
-+     * The hint is used for the first IRQ, the rest should
-+     * be allocated continuously.
-+     */
-+    if (align) {
-+        assert((num =3D=3D 1) || (num =3D=3D 2) || (num =3D=3D 4) ||
-+               (num =3D=3D 8) || (num =3D=3D 16) || (num =3D=3D 32));
-+        first =3D ics_find_free_block(ics, num, num);
-+    } else {
-+        first =3D ics_find_free_block(ics, num, 1);
++    /* Don't allow the guest to use pages bigger than the configured
++     * maximum size */
++    if (pshift > maxshift) {
++        return false;
 +    }
 +
-+    if (first < 0) {
-+        error_setg(errp, "can't find a free %d-IRQ block", num);
-+        return -1;
++    /* For whatever reason, KVM doesn't allow multiple pagesizes
++     * within a segment, *except* for the case of 16M pages in a 4k or
++     * 64k segment.  Always exclude other cases, so that TCG and KVM
++     * guests see a consistent environment */
++    if ((pshift !=3D seg_pshift) && (pshift !=3D 24)) {
++        return false;
 +    }
 +
-+    return first + ics->offset;
++    return true;
 +}
 +
- /*
-  * Allocate the IRQ number and set the IRQ type, LSI or MSI
-  */
-@@ -3894,6 +3924,26 @@ int spapr_irq_alloc_block(sPAPRMachineState *spapr=
-, int num, bool lsi,
-     return first;
- }
-=20
-+int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
-*errp)
++static void cap_hpt_maxpagesize_cpu_apply(sPAPRMachineState *spapr,
++                                          PowerPCCPU *cpu,
++                                          uint8_t val, Error **errp)
 +{
-+    ICSState *ics =3D spapr->ics;
++    unsigned maxshift =3D val;
 +
-+    assert(ics);
-+
-+    if (!ics_valid_irq(ics, irq)) {
-+        error_setg(errp, "IRQ %d is invalid", irq);
-+        return -1;
-+    }
-+
-+    if (!ICS_IRQ_FREE(ics, irq - ics->offset)) {
-+        error_setg(errp, "IRQ %d is not free", irq);
-+        return -1;
-+    }
-+
-+    spapr_irq_set_lsi(spapr, irq, lsi);
-+    return 0;
++    ppc_hash64_filter_pagesizes(cpu, spapr_pagesize_cb, &maxshift);
 +}
 +
- void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num)
+ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
+     [SPAPR_CAP_HTM] =3D {
+         .name =3D "htm",
+@@ -402,6 +435,7 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D=
  {
-     ICSState *ics =3D spapr->ics;
-diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-index 86836f0626..e4f5946a21 100644
---- a/hw/ppc/spapr_events.c
-+++ b/hw/ppc/spapr_events.c
-@@ -707,13 +707,18 @@ void spapr_clear_pending_events(sPAPRMachineState *=
-spapr)
-=20
- void spapr_events_init(sPAPRMachineState *spapr)
- {
-+    int epow_irq;
-+
-+    epow_irq =3D spapr_irq_findone(spapr, &error_fatal);
-+
-+    spapr_irq_claim(spapr, epow_irq, false, &error_fatal);
-+
-     QTAILQ_INIT(&spapr->pending_events);
-=20
-     spapr->event_sources =3D spapr_event_sources_new();
-=20
-     spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_EPOW,
--                                 spapr_irq_alloc(spapr, 0, false,
--                                                  &error_fatal));
-+                                 epow_irq);
-=20
-     /* NOTE: if machine supports modern/dedicated hotplug event source,
-      * we add it to the device-tree unconditionally. This means we may
-@@ -724,9 +729,14 @@ void spapr_events_init(sPAPRMachineState *spapr)
-      * checking that it's enabled.
-      */
-     if (spapr->use_hotplug_event_source) {
-+        int hp_irq;
-+
-+        hp_irq =3D spapr_irq_findone(spapr, &error_fatal);
-+
-+        spapr_irq_claim(spapr, hp_irq, false, &error_fatal);
-+
-         spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_H=
-OT_PLUG,
--                                     spapr_irq_alloc(spapr, 0, false,
--                                                      &error_fatal));
-+                                     hp_irq);
-     }
-=20
-     spapr->epow_notifier.notify =3D spapr_powerdown_req;
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index f936ce63ef..497b896c7d 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -279,6 +279,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-     spapr_pci_msi *msi;
-     int *config_addr_key;
-     Error *err =3D NULL;
-+    int i;
-=20
-     /* Fins sPAPRPHBState */
-     phb =3D spapr_pci_find_phb(spapr, buid);
-@@ -371,8 +372,7 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPAP=
-RMachineState *spapr,
-     }
-=20
-     /* Allocate MSIs */
--    irq =3D spapr_irq_alloc_block(spapr, req_num, false,
--                           ret_intr_type =3D=3D RTAS_TYPE_MSI, &err);
-+    irq =3D spapr_irq_find(spapr, req_num, ret_intr_type =3D=3D RTAS_TYP=
-E_MSI, &err);
-     if (err) {
-         error_reportf_err(err, "Can't allocate MSIs for device %x: ",
-                           config_addr);
-@@ -380,6 +380,16 @@ static void rtas_ibm_change_msi(PowerPCCPU *cpu, sPA=
-PRMachineState *spapr,
-         return;
-     }
-=20
-+    for (i =3D 0; i < req_num; i++) {
-+        spapr_irq_claim(spapr, irq + i, false, &err);
-+        if (err) {
-+            error_reportf_err(err, "Can't allocate MSIs for device %x: "=
-,
-+                              config_addr);
-+            rtas_st(rets, 0, RTAS_OUT_HW_ERROR);
-+            return;
-+        }
-+    }
-+
-     /* Release previous MSIs */
-     if (msi) {
-         spapr_irq_free(spapr, msi->first_irq, msi->num);
-@@ -1698,7 +1708,14 @@ static void spapr_phb_realize(DeviceState *dev, Er=
-ror **errp)
-         uint32_t irq;
-         Error *local_err =3D NULL;
-=20
--        irq =3D spapr_irq_alloc_block(spapr, 1, true, false, &local_err)=
-;
-+        irq =3D spapr_irq_findone(spapr, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            error_prepend(errp, "can't allocate LSIs: ");
-+            return;
-+        }
-+
-+        spapr_irq_claim(spapr, irq, true, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
-             error_prepend(errp, "can't allocate LSIs: ");
-diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-index 4555c648a8..daf85130b5 100644
---- a/hw/ppc/spapr_vio.c
-+++ b/hw/ppc/spapr_vio.c
-@@ -475,7 +475,15 @@ static void spapr_vio_busdev_realize(DeviceState *qd=
-ev, Error **errp)
-         dev->qdev.id =3D id;
-     }
-=20
--    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err);
-+    if (!dev->irq) {
-+        dev->irq =3D spapr_irq_findone(spapr, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            return;
-+        }
-+    }
-+
-+    spapr_irq_claim(spapr, dev->irq, false, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 9dd46a72f6..6bfdf5a2fb 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -776,6 +776,10 @@ int spapr_irq_alloc(sPAPRMachineState *spapr, int ir=
-q_hint, bool lsi,
-                     Error **errp);
- int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
-                           bool align, Error **errp);
-+int spapr_irq_find(sPAPRMachineState *spapr, int num, bool align,
-+                   Error **errp);
-+#define spapr_irq_findone(spapr, errp) spapr_irq_find(spapr, 1, false, e=
-rrp)
-+int spapr_irq_claim(sPAPRMachineState *spapr, int irq, bool lsi, Error *=
-*errp);
- void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
- qemu_irq spapr_qirq(sPAPRMachineState *spapr, int irq);
+         .set =3D spapr_cap_set_pagesize,
+         .type =3D "int",
+         .apply =3D cap_hpt_maxpagesize_apply,
++        .cpu_apply =3D cap_hpt_maxpagesize_cpu_apply,
+     },
+ };
 =20
 --=20
 2.17.1
