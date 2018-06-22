@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJPp-0000bs-W5
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJPr-0000d6-ND
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJPl-0003Kz-SS
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:41 -0400
-Date: Fri, 22 Jun 2018 20:25:50 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJPp-0003P1-IT
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:43 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180622102550.GI612@umbus.fritz.box>
-References: <20180622080009.5707-1-mark.cave-ayland@ilande.co.uk>
-	<20180622080009.5707-3-mark.cave-ayland@ilande.co.uk>
+Date: Fri, 22 Jun 2018 20:35:12 +1000
+Message-Id: <20180622103528.28598-10-david@gibson.dropbear.id.au>
+In-Reply-To: <20180622103528.28598-1-david@gibson.dropbear.id.au>
+References: <20180622103528.28598-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="pe+tqlI1iYzVj1X/"
-Content-Disposition: inline
-In-Reply-To: <20180622080009.5707-3-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 2/2] mac_newworld: always enable
- disable_direct_reg3_writes for ADB machines
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 09/25] spapr: Add cpu_apply hook to capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,78 +22,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: peter.maydell@linaro.org
+Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+spapr capabilities have an apply hook to actually activate (or deactivate=
+)
+the feature in the system at reset time.  However, a number of capabiliti=
+es
+affect the setup of cpus, and need to be applied to each of them -
+including hotplugged cpus for extra complication.  To make this simpler,
+add an optional cpu_apply hook that is called from spapr_cpu_reset().
 
---pe+tqlI1iYzVj1X/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/ppc/spapr_caps.c     | 19 +++++++++++++++++++
+ hw/ppc/spapr_cpu_core.c |  2 ++
+ include/hw/ppc/spapr.h  |  1 +
+ 3 files changed, 22 insertions(+)
 
-On Fri, Jun 22, 2018 at 09:00:09AM +0100, Mark Cave-Ayland wrote:
-> Commit 84051eb400 "adb: add property to disable direct reg 3 writes" adde=
-d a
-> workaround for MacOS 9 incorrectly setting the mouse address during boot =
-of
-> PMU machines.
->=20
-> Further testing has shown that since fb6649f172 "adb: fix read reg 3 byte
-> ordering" this can still sometimes happen with the CUDA mac99 machine,
-> so let's enable this workaround for all New World machines using ADB for =
-now.
->=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Applied to ppc-for-3.0, thanks.
-
-> ---
->  hw/ppc/mac_newworld.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-> index ff715ffffd..2b13fcdde5 100644
-> --- a/hw/ppc/mac_newworld.c
-> +++ b/hw/ppc/mac_newworld.c
-> @@ -407,11 +407,11 @@ static void ppc_core99_init(MachineState *machine)
-> =20
->          adb_bus =3D qdev_get_child_bus(dev, "adb.0");
->          dev =3D qdev_create(adb_bus, TYPE_ADB_KEYBOARD);
-> -        qdev_prop_set_bit(dev, "disable-direct-reg3-writes", has_pmu);
-> +        qdev_prop_set_bit(dev, "disable-direct-reg3-writes", true);
->          qdev_init_nofail(dev);
-> =20
->          dev =3D qdev_create(adb_bus, TYPE_ADB_MOUSE);
-> -        qdev_prop_set_bit(dev, "disable-direct-reg3-writes", has_pmu);
-> +        qdev_prop_set_bit(dev, "disable-direct-reg3-writes", true);
->          qdev_init_nofail(dev);
->      }
-> =20
-
+diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+index dabed817d1..68a4243efc 100644
+--- a/hw/ppc/spapr_caps.c
++++ b/hw/ppc/spapr_caps.c
+@@ -59,6 +59,8 @@ typedef struct sPAPRCapabilityInfo {
+     sPAPRCapPossible *possible;
+     /* Make sure the virtual hardware can support this capability */
+     void (*apply)(sPAPRMachineState *spapr, uint8_t val, Error **errp);
++    void (*cpu_apply)(sPAPRMachineState *spapr, PowerPCCPU *cpu,
++                      uint8_t val, Error **errp);
+ } sPAPRCapabilityInfo;
+=20
+ static void spapr_cap_get_bool(Object *obj, Visitor *v, const char *name=
+,
+@@ -472,6 +474,23 @@ void spapr_caps_apply(sPAPRMachineState *spapr)
+     }
+ }
+=20
++void spapr_caps_cpu_apply(sPAPRMachineState *spapr, PowerPCCPU *cpu)
++{
++    int i;
++
++    for (i =3D 0; i < SPAPR_CAP_NUM; i++) {
++        sPAPRCapabilityInfo *info =3D &capability_table[i];
++
++        /*
++         * If the apply function can't set the desired level and thinks =
+it's
++         * fatal, it should cause that.
++         */
++        if (info->cpu_apply) {
++            info->cpu_apply(spapr, cpu, spapr->eff.caps[i], &error_fatal=
+);
++        }
++    }
++}
++
+ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp)
+ {
+     Error *local_err =3D NULL;
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 67f1596c57..bfb94f650c 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -76,6 +76,8 @@ static void spapr_cpu_reset(void *opaque)
+     spapr_cpu->slb_shadow_size =3D 0;
+     spapr_cpu->dtl_addr =3D 0;
+     spapr_cpu->dtl_size =3D 0;
++
++    spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
+ }
+=20
+ void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
+_ulong r3)
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 9dbd6010f5..9dd46a72f6 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -800,6 +800,7 @@ static inline uint8_t spapr_get_cap(sPAPRMachineState=
+ *spapr, int cap)
+=20
+ void spapr_caps_init(sPAPRMachineState *spapr);
+ void spapr_caps_apply(sPAPRMachineState *spapr);
++void spapr_caps_cpu_apply(sPAPRMachineState *spapr, PowerPCCPU *cpu);
+ void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
+ int spapr_caps_post_migration(sPAPRMachineState *spapr);
+=20
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---pe+tqlI1iYzVj1X/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsszq4ACgkQbDjKyiDZ
-s5LaRBAApXrjXONBPZsxL2zqSbLwQ643EklXU64KjBNvoiw0QAh/LG7OUK3WAGm3
-yyqxqdSRbJQ+wJhxFDqZgxMZYMuR4WQL8qopFde+1/RHMzPg7NHvmdnXrjuedAiH
-aTm8xe5zgVRB0sq05nGf+CpwXus37LThg+I8NyogJLQWFia+eSZCeQmVHRafDE8n
-lpt8d8veMaG/sspijmTCbTSgvB4wHTrqViyspK+1ctxiaaUDdVjXBCBarRgtWsCP
-L/5723TEHUqTat3B3Mmf0W5ZrZfTvVWMKIDlNtTM+186Mfh++pIH+1Bgri/ok1v2
-4DWrhXbtUKoq8G7869HAi+ns2Ja1w561Zbti/9k3Z5cL0paD4GW/uJj5FoHipaFg
-eNC5yUuh3rbSyM9eXTJjbIUVow2g1NMHXVwtueBcMToF6fbp33Fcoe3JBzc48UHr
-n8+Dkp/0XQv8gJbMVkMN1w6DQJeLNY0s/bSuHMFC2rEbJn08Sio8rhjRhvSm+8x2
-sTr5l/97OriD4yrSTn9mdPJaMR+920aiPEazAS0i0wnbx1ZBYKFWrdKXgOloH22W
-xON94k/7ZuHeqHDUC+tNB4KBXp6f/8+hk4fl0nOmjHSem+3yEbby73o0Elo5/Djr
-EyzZevKZ8j0npZCgVx5KBLPuyWUftRQmGrZTCri4yNjUCuNDgzk=
-=JLQ5
------END PGP SIGNATURE-----
-
---pe+tqlI1iYzVj1X/--
+2.17.1
