@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fWRbF-0004hE-VQ
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:20:03 -0400
+	(envelope-from <mst@redhat.com>) id 1fWRdI-0005Tx-TP
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:22:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fWRbF-0002Lk-5I
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:20:01 -0400
-References: <1528866321-23886-1-git-send-email-thuth@redhat.com>
-	<1528866321-23886-5-git-send-email-thuth@redhat.com>
-	<20180613133840.GK24528@stefanha-x1.localdomain>
-	<20180613134452.GU19901@redhat.com>
-	<b0ebd968-797f-48e0-32c1-869c452feca9@redhat.com>
-	<20180613151942.GC19901@redhat.com> <87k1r24quk.fsf@dusky.pond.sub.org>
-	<20180619171539.0adc90d6.cohuck@redhat.com>
-	<d4e02083-c372-3ce5-d4a2-4809579fc8f2@redhat.com>
-	<20180622181108.GY7451@localhost.localdomain>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c10c2ffa-7ee2-5106-07d1-528df939d6ad@redhat.com>
-Date: Fri, 22 Jun 2018 21:19:56 +0200
+	(envelope-from <mst@redhat.com>) id 1fWRdF-0002dx-Kn
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:22:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53472 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fWRdF-0002dr-Bn
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:22:05 -0400
+Date: Fri, 22 Jun 2018 22:22:01 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180622192148.178309-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180622181108.GY7451@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH 4/4] qemu-options: Do not show
- -enable-kvm and -enable-hax in the docs anymore
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH v6 0/2] kvm: limited x86 CPU power management
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,25 +24,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
 
-On 22.06.2018 20:11, Eduardo Habkost wrote:
-> On Tue, Jun 19, 2018 at 06:16:33PM +0200, Paolo Bonzini wrote:
->> On 19/06/2018 17:15, Cornelia Huck wrote:
->>>> Why does a user have to know how to enable KVM?  Oh, because our default
->>>> is "run this guest much slower than necessary".  Great!
->>> Should we try again to default to a better accelerator, if possible? I
->>> don't quite recall why we didn't do so the last time that came up...
->>> was it tests?
->>
->> My plan was to create qemu-{kvm,hax,hvf,whpx} binaries that default to a
->> better accelerator, and leave qemu-system-* as defaulting to TCG.  This
->> matches what distributions already do.
-> 
-> Why is this better than using KVM by default if it's available?
+This adds ability to expose some host CPU power management capabilities
+to guests. For intel guests, this is sufficient for guest to enable low
+power CPU states on idle. For AMD guests it isn't sufficient, deeper
+C-states are entered using System-IO.
 
-The answer is (as almost always): Compatibility with migration. Nobody
-dares to sacrifice that chicken :-(
+When enabled this puts CPU in a low power state with exit latencies that
+can go up to multiple milliseconds, and makes host scheduler as well as
+host utilities such as top and powertop think the CPU is constantly
+busy.  Thus it has the effect of dedicating a host CPU for this guest.
 
- Thomas
+mwait based power management is tied closely to specifics of CPUID,
+making migration challenging. At this point only the non-migrateable
+-cpu host is supported.
+
+With this patch applied, VM latency is within the noise of
+baremetal for some benchmarks.
+
+perf bench sched pipe results:
+Before:
+    6.452 sec
+After:
+    4.382 sec
+Baremetal:
+    4.136 sec
+
+Changes since v5:
+    Typo fix.
+
+Changes since v4:
+    See v3, now for real.
+
+Changes since v3:
+    At Paolo's suggestion, rename -dedicated to -overcommit.
+
+Changes since v2:
+    At Daniel's suggestion, don't use the -realtime flag.
+
+    At Paolo's suggestion, group this with memory lock flag
+    which has a similar effect of dedicating memory to this VM.
+
+Michael S. Tsirkin (2):
+  kvm: support -overcommit cpu-pm=on|off
+  i386/cpu: make -cpu host support monitor/mwait
+
+ include/sysemu/sysemu.h |  1 +
+ target/i386/cpu.h       |  9 +++++++++
+ target/i386/cpu.c       | 19 ++++++++++++++-----
+ target/i386/kvm.c       | 32 ++++++++++++++++++++++++++++++++
+ vl.c                    | 32 +++++++++++++++++++++++++++++++-
+ qemu-options.hx         | 27 +++++++++++++++++++++++++--
+ 6 files changed, 112 insertions(+), 8 deletions(-)
+
+-- 
+MST
