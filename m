@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fWTd3-0000YV-8L
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:30:02 -0400
+	(envelope-from <mst@redhat.com>) id 1fWTfn-0001Oa-BC
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:32:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fWTcz-0002Su-9b
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:30:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43436 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fWTfj-0003xj-C8
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:32:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40476 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fWTcz-0002Se-44
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:29:57 -0400
-Date: Sat, 23 Jun 2018 00:29:54 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fWTfj-0003xY-5x
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:32:47 -0400
+Date: Sat, 23 Jun 2018 00:32:45 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180623002628-mutt-send-email-mst@kernel.org>
+Message-ID: <20180623003022-mutt-send-email-mst@kernel.org>
 References: <20180619233001-mutt-send-email-mst@kernel.org>
 	<20180620115359.1a3bf6fb.cohuck@redhat.com>
 	<20180620170904-mutt-send-email-mst@kernel.org>
 	<20180620180619.6b4ee52d.cohuck@redhat.com>
 	<20180620224535-mutt-send-email-mst@kernel.org>
 	<20180621165913.7e3f4faa.cohuck@redhat.com>
-	<CADGSJ22B39JiS14L0yCYQ720-fZcwyUt1wCX1YO-6Y9FhmDKZg@mail.gmail.com>
-	<20180622053141-mutt-send-email-mst@kernel.org>
-	<CADGSJ23SBEFJCD50K-F-Gt86Q1-i_6iHTmSSjdXDzNnnpWZ_oQ@mail.gmail.com>
-	<CADGSJ22nLcz_XaJNzUUdpjQaJY8b5wZs=ohm=B7c2qf2K7_yGA@mail.gmail.com>
+	<20180621211712-mutt-send-email-mst@kernel.org>
+	<20180622170955.298900c1.cohuck@redhat.com>
+	<20180622214259-mutt-send-email-mst@kernel.org>
+	<CADGSJ22e=Sa8S-HqM4XtOa6ngBKPL73SiQRPh8PUzQgRaie5oA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CADGSJ22nLcz_XaJNzUUdpjQaJY8b5wZs=ohm=B7c2qf2K7_yGA@mail.gmail.com>
+In-Reply-To: <CADGSJ22e=Sa8S-HqM4XtOa6ngBKPL73SiQRPh8PUzQgRaie5oA@mail.gmail.com>
 Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
  VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
@@ -39,79 +39,89 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Siwei Liu <loseweigh@gmail.com>
 Cc: Cornelia Huck <cohuck@redhat.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-On Fri, Jun 22, 2018 at 01:03:04PM -0700, Siwei Liu wrote:
-> On Fri, Jun 22, 2018 at 1:00 PM, Siwei Liu <loseweigh@gmail.com> wrote:
-> > On Thu, Jun 21, 2018 at 7:32 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >> On Thu, Jun 21, 2018 at 06:21:55PM -0700, Siwei Liu wrote:
-> >>> On Thu, Jun 21, 2018 at 7:59 AM, Cornelia Huck <cohuck@redhat.com> wrote:
-> >>> > On Wed, 20 Jun 2018 22:48:58 +0300
-> >>> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >>> >
-> >>> >> On Wed, Jun 20, 2018 at 06:06:19PM +0200, Cornelia Huck wrote:
-> >>> >> > In any case, I'm not sure anymore why we'd want the extra uuid.
-> >>> >>
-> >>> >> It's mostly so we can have e.g. multiple devices with same MAC
-> >>> >> (which some people seem to want in order to then use
-> >>> >> then with different containers).
-> >>> >>
-> >>> >> But it is also handy for when you assign a PF, since then you
-> >>> >> can't set the MAC.
-> >>> >>
-> >>> >
-> >>> > OK, so what about the following:
-> >>> >
-> >>> > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
-> >>> >   that we have a new uuid field in the virtio-net config space
-> >>> > - in QEMU, add a property for virtio-net that allows to specify a uuid,
-> >>> >   offer VIRTIO_NET_F_STANDBY_UUID if set
-> >>> > - when configuring, set the property to the group UUID of the vfio-pci
-> >>> >   device
-> >>>
-> >>> If feature negotiation fails on VIRTIO_NET_F_STANDBY_UUID, is it safe
-> >>> to still expose UUID in the config space on virtio-pci?
+On Fri, Jun 22, 2018 at 01:21:45PM -0700, Siwei Liu wrote:
+> On Fri, Jun 22, 2018 at 12:05 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > On Fri, Jun 22, 2018 at 05:09:55PM +0200, Cornelia Huck wrote:
+> >> On Thu, 21 Jun 2018 21:20:13 +0300
+> >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > >>
+> >> > On Thu, Jun 21, 2018 at 04:59:13PM +0200, Cornelia Huck wrote:
+> >> > > OK, so what about the following:
+> >> > >
+> >> > > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
+> >> > >   that we have a new uuid field in the virtio-net config space
+> >> > > - in QEMU, add a property for virtio-net that allows to specify a uuid,
+> >> > >   offer VIRTIO_NET_F_STANDBY_UUID if set
+> >> > > - when configuring, set the property to the group UUID of the vfio-pci
+> >> > >   device
+> >> > > - in the guest, use the uuid from the virtio-net device's config space
+> >> > >   if applicable; else, fall back to matching by MAC as done today
+> >> > >
+> >> > > That should work for all virtio transports.
+> >> >
+> >> > True. I'm a bit unhappy that it's virtio net specific though
+> >> > since down the road I expect we'll have a very similar feature
+> >> > for scsi (and maybe others).
+> >> >
+> >> > But we do not have a way to have fields that are portable
+> >> > both across devices and transports, and I think it would
+> >> > be a useful addition. How would this work though? Any idea?
 > >>
-> >> Yes but guest is not supposed to read it.
-> >>
-> >>> I'm not even sure if it's sane to expose group UUID on the PCI bridge
-> >>> where the corresponding vfio-pci device attached to for a guest which
-> >>> doesn't support the feature (legacy).
-> >>>
-> >>> -Siwei
-> >>
-> >> Yes but you won't add the primary behind such a bridge.
+> >> Can we introduce some kind of device-independent config space area?
+> >> Pushing back the device-specific config space by a certain value if the
+> >> appropriate feature is negotiated and use that for things like the uuid?
 > >
-> > I assume the UUID feature is a new one besides the exiting
-> > VIRTIO_NET_F_STANDBY feature, where I think the current proposal is,
-> > if UUID feature is present and supported by guest, we'll do pairing
-> > based on UUID; if UUID feature present
->                                  ^^^^^^^  is NOT present
-
-Let's go back for a bit.
-
-What is wrong with matching by mac?
-
-1. Does not allow multiple NICs with same mac
-2. Requires MAC to be programmed by host in the PT device
-   (which is often possible with VFs but isn't possible with all PT
-   devices)
-
-Both issues are up to host: if host needs them it needs the UUID
-feature, if not MAC matching is sufficient.
-
-
-> > or not supported by guest,
-> > we'll still plug in the VF (if guest supports the _F_STANDBY feature)
-> > but the pairing will be fallback to using MAC address. Are you saying
-> > you don't even want to plug in the primary when the UUID feature is
-> > not supported by guest? Does the feature negotiation UUID have to
-> > depend on STANDBY being set, or the other way around? I thought that
-> > just the absence of STANDBY will prevent primary to get exposed to the
-> > guest.
+> > So config moves back and forth?
+> > Reminds me of the msi vector mess we had with pci.
+> > I'd rather have every transport add a new config.
 > >
-> > -Siwei
-> >
+> >> But regardless of that, I'm not sure whether extending this approach to
+> >> other device types is the way to go. Tying together two different
+> >> devices is creating complicated situations at least in the hypervisor
+> >> (even if it's fairly straightforward in the guest). [I have not come
+> >> around again to look at the "how to handle visibility in QEMU"
+> >> questions due to lack of cycles, sorry about that.]
 > >>
-> >>>
-> >>> > - in the guest, use the uuid from the virtio-net device's config space
-> >>> >   if applicable; else, fall back to matching by MAC as done today
+> >> So, what's the goal of this approach? Only to allow migration with
+> >> vfio-pci, or also to plug in a faster device and use it instead of an
+> >> already attached paravirtualized device?
+> >
+> > These are two sides of the same coin, I think the second approach
+> > is closer to what we are doing here.
+> 
+> I'm leaning towards being conservative to keep the potential of doing
+> both. It's the vfio migration itself that has to be addessed, not to
+> make every virtio device to have an accelerated datapath, right?
+> 
+> -Siwei
+
+I think that the approach we took (signal configuration
+through standby) assumes standby always present and
+primary appearing and disappearing.
+
+Anything else isn't well supported and I'm not sure we
+should complicate code too much to support it.
+
+> 
+> >
+> >> What about migration of vfio devices that are not easily replaced by a
+> >> paravirtualized device? I'm thinking of vfio-ccw, where our main (and
+> >> currently only) supported device is dasd (disks) -- which can do a lot
+> >> of specialized things that virtio-blk does not support (and should not
+> >> or even cannot support).
+> >
+> > But maybe virtio-scsi can?
+> >
+> >> Would it be more helpful to focus on generic
+> >> migration support for vfio instead of going about it device by device?
+> >>
+> >> This network device approach already seems far along, so it makes sense
+> >> to continue with it. But I'm not sure whether we want to spend time and
+> >> energy on that for other device types rather than working on a general
+> >> solution for vfio migration.
+> >
+> > I'm inclined to say finalizing this feature would be a good first step
+> > and will teach us how we can move forward.
+> >
+> > --
+> > MST
