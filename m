@@ -1,26 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWSVR-0006AM-Dw
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:18:06 -0400
+	(envelope-from <loseweigh@gmail.com>) id 1fWSZ3-0007YV-2w
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:21:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWSVO-0006gu-9k
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:18:05 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180622124716.9179-1-f4bug@amsat.org>
-	<CAKmqyKMp8-ZAaTU2nxaMCqoR0JsbXoogR6t6Nq7UwU3B3o1AKw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8ae01d79-ef5e-0036-bd4d-cb667a3e2cf4@amsat.org>
-Date: Fri, 22 Jun 2018 17:17:57 -0300
+	(envelope-from <loseweigh@gmail.com>) id 1fWSZ2-0000yV-16
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:21:49 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:51766)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <loseweigh@gmail.com>) id 1fWSZ1-0000xQ-QH
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:21:47 -0400
+Received: by mail-it0-x243.google.com with SMTP id n7-v6so4544255itn.1
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 13:21:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKMp8-ZAaTU2nxaMCqoR0JsbXoogR6t6Nq7UwU3B3o1AKw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/core/register: Log unimplemented access
- via the 'unimp' debug level
+In-Reply-To: <20180622214259-mutt-send-email-mst@kernel.org>
+References: <CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
+	<20180619125453.2d2dfb2d.cohuck@redhat.com>
+	<20180619233001-mutt-send-email-mst@kernel.org>
+	<20180620115359.1a3bf6fb.cohuck@redhat.com>
+	<20180620170904-mutt-send-email-mst@kernel.org>
+	<20180620180619.6b4ee52d.cohuck@redhat.com>
+	<20180620224535-mutt-send-email-mst@kernel.org>
+	<20180621165913.7e3f4faa.cohuck@redhat.com>
+	<20180621211712-mutt-send-email-mst@kernel.org>
+	<20180622170955.298900c1.cohuck@redhat.com>
+	<20180622214259-mutt-send-email-mst@kernel.org>
+From: Siwei Liu <loseweigh@gmail.com>
+Date: Fri, 22 Jun 2018 13:21:45 -0700
+Message-ID: <CADGSJ22e=Sa8S-HqM4XtOa6ngBKPL73SiQRPh8PUzQgRaie5oA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +38,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, QEMU Trivial <qemu-trivial@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, "Samudrala,
+	Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-On 06/22/2018 04:49 PM, Alistair Francis wrote:
-> On Fri, Jun 22, 2018 at 5:47 AM, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  hw/core/register.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
+On Fri, Jun 22, 2018 at 12:05 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Fri, Jun 22, 2018 at 05:09:55PM +0200, Cornelia Huck wrote:
+>> On Thu, 21 Jun 2018 21:20:13 +0300
+>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 >>
->> diff --git a/hw/core/register.c b/hw/core/register.c
->> index d2d1636250..8ed7c6b927 100644
->> --- a/hw/core/register.c
->> +++ b/hw/core/register.c
->> @@ -203,7 +203,7 @@ void register_write_memory(void *opaque, hwaddr addr,
->>      }
+>> > On Thu, Jun 21, 2018 at 04:59:13PM +0200, Cornelia Huck wrote:
+>> > > OK, so what about the following:
+>> > >
+>> > > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
+>> > >   that we have a new uuid field in the virtio-net config space
+>> > > - in QEMU, add a property for virtio-net that allows to specify a uuid,
+>> > >   offer VIRTIO_NET_F_STANDBY_UUID if set
+>> > > - when configuring, set the property to the group UUID of the vfio-pci
+>> > >   device
+>> > > - in the guest, use the uuid from the virtio-net device's config space
+>> > >   if applicable; else, fall back to matching by MAC as done today
+>> > >
+>> > > That should work for all virtio transports.
+>> >
+>> > True. I'm a bit unhappy that it's virtio net specific though
+>> > since down the road I expect we'll have a very similar feature
+>> > for scsi (and maybe others).
+>> >
+>> > But we do not have a way to have fields that are portable
+>> > both across devices and transports, and I think it would
+>> > be a useful addition. How would this work though? Any idea?
 >>
->>      if (!reg) {
->> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: write to unimplemented register " \
->> +        qemu_log_mask(LOG_UNIMP, "%s: write to unimplemented register " \
->>                        "at address: %#" PRIx64 "\n", reg_array->prefix, addr);
->>          return;
->>      }
->> @@ -232,7 +232,7 @@ uint64_t register_read_memory(void *opaque, hwaddr addr,
->>      }
+>> Can we introduce some kind of device-independent config space area?
+>> Pushing back the device-specific config space by a certain value if the
+>> appropriate feature is negotiated and use that for things like the uuid?
+>
+> So config moves back and forth?
+> Reminds me of the msi vector mess we had with pci.
+> I'd rather have every transport add a new config.
+>
+>> But regardless of that, I'm not sure whether extending this approach to
+>> other device types is the way to go. Tying together two different
+>> devices is creating complicated situations at least in the hypervisor
+>> (even if it's fairly straightforward in the guest). [I have not come
+>> around again to look at the "how to handle visibility in QEMU"
+>> questions due to lack of cycles, sorry about that.]
 >>
->>      if (!reg) {
->> -        qemu_log_mask(LOG_GUEST_ERROR, "%s:  read to unimplemented register " \
->> +        qemu_log_mask(LOG_UNIMP, "%s:  read to unimplemented register " \
->>                        "at address: %#" PRIx64 "\n", reg_array->prefix, addr);
-> 
-> I'm not sure this is correct. These can be unimplemented because there
-> are gaps in the register memory map, so it is a guest error.
+>> So, what's the goal of this approach? Only to allow migration with
+>> vfio-pci, or also to plug in a faster device and use it instead of an
+>> already attached paravirtualized device?
+>
+> These are two sides of the same coin, I think the second approach
+> is closer to what we are doing here.
 
-This is exactly what I was wondering, thanks for your comment, I'll
-probably add a comment about it.
+I'm leaning towards being conservative to keep the potential of doing
+both. It's the vfio migration itself that has to be addessed, not to
+make every virtio device to have an accelerated datapath, right?
 
-> 
-> Alistair
-> 
->>          return 0;
->>      }
->> --
->> 2.18.0.rc2
+-Siwei
+
+
+>
+>> What about migration of vfio devices that are not easily replaced by a
+>> paravirtualized device? I'm thinking of vfio-ccw, where our main (and
+>> currently only) supported device is dasd (disks) -- which can do a lot
+>> of specialized things that virtio-blk does not support (and should not
+>> or even cannot support).
+>
+> But maybe virtio-scsi can?
+>
+>> Would it be more helpful to focus on generic
+>> migration support for vfio instead of going about it device by device?
 >>
->>
+>> This network device approach already seems far along, so it makes sense
+>> to continue with it. But I'm not sure whether we want to spend time and
+>> energy on that for other device types rather than working on a general
+>> solution for vfio migration.
+>
+> I'm inclined to say finalizing this feature would be a good first step
+> and will teach us how we can move forward.
+>
+> --
+> MST
