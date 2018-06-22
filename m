@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56706)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fWO38-0000ph-9F
+	(envelope-from <armbru@redhat.com>) id 1fWO38-0000po-An
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:32:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fWO36-0000JZ-0N
+	(envelope-from <armbru@redhat.com>) id 1fWO35-0000ID-5u
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:32:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54614 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54608 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fWO35-0000Id-Pw
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fWO34-0000HA-VN
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:32:31 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1761FA2C73
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 15:32:30 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-Date: Fri, 22 Jun 2018 17:32:26 +0200
-Message-Id: <20180622153228.23594-9-armbru@redhat.com>
+Date: Fri, 22 Jun 2018 17:32:21 +0200
+Message-Id: <20180622153228.23594-4-armbru@redhat.com>
 In-Reply-To: <20180622153228.23594-1-armbru@redhat.com>
 References: <20180622153228.23594-1-armbru@redhat.com>
-Subject: [Qemu-devel] [PULL 08/10] Revert commit d4e5ec877ca
+Subject: [Qemu-devel] [PULL 03/10] qdict: Make qdict_flatten()
+ shallow-clone-friendly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +31,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Matthias Maier <tamiko@43-1.org>, Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
+Cc: Max Reitz <mreitz@redhat.com>
 
-From: Matthias Maier <tamiko@43-1.org>
+From: Max Reitz <mreitz@redhat.com>
 
-This commit removes the PYTHON_UTF8 workaround. The problem with setting
+In its current form, qdict_flatten() removes all entries from nested
+QDicts that are moved to the root QDict.  It is completely sufficient to
+remove all old entries from the root QDict, however.  If the nested
+dicts have a refcount of 1, this will automatically delete them, too.
+And if they have a greater refcount, we probably do not want to modify
+them in the first place.
 
-  LC_ALL= LANG=C LC_CTYPE=en_US.UTF-8
+The latter observation means that it was currently (in general)
+impossible to qdict_flatten() a shallowly cloned dict because that would
+empty nested QDicts in the original dict as well.  This patch changes
+this, so you can now use qdict_flatten(qdict_shallow_clone(dict)) to get
+a flattened copy without disturbing the original.
 
-is that the en_US.UTF-8 locale might not be available. In this case
-setting above locales results in build errors even though another UTF-8
-locale was originally set [1]. The only stable way of fixing the
-encoding problem is by specifying the encoding in Python, like the
-previous commit does.
-
-[1] https://bugs.gentoo.org/657766
-
-Signed-off-by: Arfrever Frehtes Taifersar Arahesis <arfrever.fta@gmail.com>
-Signed-off-by: Matthias Maier <tamiko@43-1.org>
-Message-Id: <20180618175958.29073-3-armbru@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-[Commit message tweaked]
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+Message-Id: <20180611205203.2624-7-mreitz@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- Makefile               | 6 ++----
- tests/Makefile.include | 6 +++---
- 2 files changed, 5 insertions(+), 7 deletions(-)
+ qobject/block-qdict.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index e46f2b625a..7ed9cc4a21 100644
---- a/Makefile
-+++ b/Makefile
-@@ -20,8 +20,6 @@ ifneq ($(wildcard config-host.mak),)
- all:
- include config-host.mak
+diff --git a/qobject/block-qdict.c b/qobject/block-qdict.c
+index df833083a7..36129e7379 100644
+--- a/qobject/block-qdict.c
++++ b/qobject/block-qdict.c
+@@ -114,19 +114,30 @@ static void qdict_flatten_qdict(QDict *qdict, QDict *target, const char *prefix)
  
--PYTHON_UTF8 = LC_ALL= LANG=C LC_CTYPE=en_US.UTF-8 $(PYTHON)
--
- git-submodule-update:
+         /*
+          * Flatten non-empty QDict and QList recursively into @target,
+-         * copy other objects to @target
++         * copy other objects to @target.
++         * On the root level (if @qdict == @target), remove flattened
++         * nested QDicts and QLists from @qdict.
++         *
++         * (Note that we do not need to remove entries from nested
++         * dicts or lists.  Their reference count is decremented on
++         * the root level, so there are no leaks.  In fact, if they
++         * have a reference count greater than one, we are probably
++         * well advised not to modify them altogether.)
+          */
+         if (dict_val && qdict_size(dict_val)) {
+             qdict_flatten_qdict(dict_val, target,
+                                 new_key ? new_key : entry->key);
+-            qdict_del(qdict, entry->key);
++            if (target == qdict) {
++                qdict_del(qdict, entry->key);
++            }
+         } else if (list_val && !qlist_empty(list_val)) {
+             qdict_flatten_qlist(list_val, target,
+                                 new_key ? new_key : entry->key);
+-            qdict_del(qdict, entry->key);
++            if (target == qdict) {
++                qdict_del(qdict, entry->key);
++            }
+         } else if (target != qdict) {
+             qdict_put_obj(target, new_key, qobject_ref(value));
+-            qdict_del(qdict, entry->key);
+         }
  
- .PHONY: git-submodule-update
-@@ -576,7 +574,7 @@ qga/qapi-generated/qga-qapi-commands.h qga/qapi-generated/qga-qapi-commands.c \
- qga/qapi-generated/qga-qapi-doc.texi: \
- qga/qapi-generated/qapi-gen-timestamp ;
- qga/qapi-generated/qapi-gen-timestamp: $(SRC_PATH)/qga/qapi-schema.json $(qapi-py)
--	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
- 		-o qga/qapi-generated -p "qga-" $<, \
- 		"GEN","$(@:%-timestamp=%)")
- 	@>$@
-@@ -676,7 +674,7 @@ qapi/qapi-introspect.h qapi/qapi-introspect.c \
- qapi/qapi-doc.texi: \
- qapi-gen-timestamp ;
- qapi-gen-timestamp: $(qapi-modules) $(qapi-py)
--	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
- 		-o "qapi" -b $<, \
- 		"GEN","$(@:%-timestamp=%)")
- 	@>$@
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 8b45f01d25..e8bb2d8f66 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -678,13 +678,13 @@ tests/test-qapi-events.c tests/test-qapi-events.h \
- tests/test-qapi-introspect.c tests/test-qapi-introspect.h: \
- tests/test-qapi-gen-timestamp ;
- tests/test-qapi-gen-timestamp: $(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json $(qapi-py)
--	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
- 		-o tests -p "test-" $<, \
- 		"GEN","$(@:%-timestamp=%)")
- 	@>$@
- 
- tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc-good.json $(qapi-py)
--	$(call quiet-command,$(PYTHON_UTF8) $(SRC_PATH)/scripts/qapi-gen.py \
-+	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
- 		-o tests/qapi-schema -p "doc-good-" $<, \
- 		"GEN","$@")
- 	@mv tests/qapi-schema/doc-good-qapi-doc.texi $@
-@@ -978,7 +978,7 @@ check-tests/qemu-iotests-quick.sh: tests/qemu-iotests-quick.sh qemu-img$(EXESUF)
- .PHONY: $(patsubst %, check-%, $(check-qapi-schema-y))
- $(patsubst %, check-%, $(check-qapi-schema-y)): check-%.json: $(SRC_PATH)/%.json
- 	$(call quiet-command, PYTHONPATH=$(SRC_PATH)/scripts \
--		$(PYTHON_UTF8) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
-+		$(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py \
- 		$^ >$*.test.out 2>$*.test.err; \
- 		echo $$? >$*.test.exit, \
- 		"TEST","$*.out")
+         g_free(new_key);
 -- 
 2.17.1
