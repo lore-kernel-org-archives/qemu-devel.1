@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDd3-0007ln-SA
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:25:00 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDd5-0007na-Ja
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:25:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDd1-0003d4-Ix
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:57 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDd3-0003eJ-GR
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:59 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 22 Jun 2018 14:24:34 +1000
-Message-Id: <20180622042437.14259-20-david@gibson.dropbear.id.au>
+Date: Fri, 22 Jun 2018 14:24:29 +1000
+Message-Id: <20180622042437.14259-15-david@gibson.dropbear.id.au>
 In-Reply-To: <20180622042437.14259-1-david@gibson.dropbear.id.au>
 References: <20180622042437.14259-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 20/23] spapr: Use maximum page size capability
- to simplify memory backend checking
+Subject: [Qemu-devel] [PATCH 15/23] ppc4xx_i2c: Remove unimplemented sdata
+ and intr registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,199 +24,131 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-The way we used to handle KVM allowable guest pagesizes for PAPR guests
-required some convoluted checking of memory attached to the guest.
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-The allowable pagesizes advertised to the guest cpus depended on the memo=
-ry
-which was attached at boot, but then we needed to ensure that any memory
-later hotplugged didn't change which pagesizes were allowed.
+We don't emulate slave mode so related registers are not needed.
+[lh]sadr are only retained to avoid too many warnings and simplify
+debugging but sdata is not even correct because device has a 4 byte
+FIFO instead so just remove this unimplemented register for now.
 
-Now that we have an explicit machine option to control the allowable
-maximum pagesize we can simplify this.  We just check all memory backends
-against that declared pagesize.  We check base and cold-plugged memory at
-reset time, and hotplugged memory at pre_plug() time.
+The intr register is also not implemented correctly, it is for
+diagnostics and normally not even visible on device without explicitly
+enabling it. As no guests are known to need this remove it as well.
 
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c         | 17 +++++++----------
- hw/ppc/spapr_caps.c    | 21 +++++++++++++++++++++
- include/hw/ppc/spapr.h |  3 +++
- target/ppc/kvm.c       | 14 --------------
- target/ppc/kvm_ppc.h   |  6 ------
- 5 files changed, 31 insertions(+), 30 deletions(-)
+ hw/i2c/ppc4xx_i2c.c         | 16 +---------------
+ include/hw/i2c/ppc4xx_i2c.h |  4 +---
+ 2 files changed, 2 insertions(+), 18 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 70b150b098..0d032a1ad0 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3192,11 +3192,13 @@ static void spapr_memory_pre_plug(HotplugHandler =
-*hotplug_dev, DeviceState *dev,
-                                   Error **errp)
- {
-     const sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(hotplug_dev=
-);
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(hotplug_dev);
-     PCDIMMDevice *dimm =3D PC_DIMM(dev);
-     PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-     MemoryRegion *mr;
-     uint64_t size;
--    char *mem_dev;
-+    Object *memdev;
-+    hwaddr pagesize;
-=20
-     if (!smc->dr_lmb_enabled) {
-         error_setg(errp, "Memory hotplug not supported for this machine"=
-);
-@@ -3215,15 +3217,10 @@ static void spapr_memory_pre_plug(HotplugHandler =
-*hotplug_dev, DeviceState *dev,
-         return;
-     }
-=20
--    mem_dev =3D object_property_get_str(OBJECT(dimm), PC_DIMM_MEMDEV_PRO=
-P, NULL);
--    if (mem_dev && !kvmppc_is_mem_backend_page_size_ok(mem_dev)) {
--        error_setg(errp, "Memory backend has bad page size. "
--                   "Use 'memory-backend-file' with correct mem-path.");
--        goto out;
--    }
--
--out:
--    g_free(mem_dev);
-+    memdev =3D object_property_get_link(OBJECT(dimm), PC_DIMM_MEMDEV_PRO=
-P,
-+                                      &error_abort);
-+    pagesize =3D host_memory_backend_pagesize(MEMORY_BACKEND(memdev));
-+    spapr_check_pagesize(spapr, pagesize, errp);
+diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+index d1936dbdca..4e0aaae1fc 100644
+--- a/hw/i2c/ppc4xx_i2c.c
++++ b/hw/i2c/ppc4xx_i2c.c
+@@ -3,7 +3,7 @@
+  *
+  * Copyright (c) 2007 Jocelyn Mayer
+  * Copyright (c) 2012 Fran=C3=A7ois Revol
+- * Copyright (c) 2016 BALATON Zoltan
++ * Copyright (c) 2016-2018 BALATON Zoltan
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+  * of this software and associated documentation files (the "Software"),=
+ to deal
+@@ -63,7 +63,6 @@ static void ppc4xx_i2c_reset(DeviceState *s)
+     i2c->mdcntl =3D 0;
+     i2c->sts =3D 0;
+     i2c->extsts =3D 0x8f;
+-    i2c->sdata =3D 0;
+     i2c->lsadr =3D 0;
+     i2c->hsadr =3D 0;
+     i2c->clkdiv =3D 0;
+@@ -71,7 +70,6 @@ static void ppc4xx_i2c_reset(DeviceState *s)
+     i2c->xfrcnt =3D 0;
+     i2c->xtcntlss =3D 0;
+     i2c->directcntl =3D 0xf;
+-    i2c->intr =3D 0;
  }
 =20
- struct sPAPRDIMMState {
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 6cdc0c94e7..722b213d9a 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -26,6 +26,7 @@
- #include "qapi/error.h"
- #include "qapi/visitor.h"
- #include "sysemu/hw_accel.h"
-+#include "exec/ram_addr.h"
- #include "target/ppc/cpu.h"
- #include "target/ppc/mmu-hash64.h"
- #include "cpu-models.h"
-@@ -304,14 +305,34 @@ static void cap_safe_indirect_branch_apply(sPAPRMac=
-hineState *spapr,
+ static inline bool ppc4xx_i2c_is_master(PPC4xxI2CState *i2c)
+@@ -139,9 +137,6 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr=
+ addr, unsigned int size)
+                           TYPE_PPC4xx_I2C, __func__);
+         }
+         break;
+-    case 2:
+-        ret =3D i2c->sdata;
+-        break;
+     case 4:
+         ret =3D i2c->lmadr;
+         break;
+@@ -181,9 +176,6 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr=
+ addr, unsigned int size)
+     case 16:
+         ret =3D i2c->directcntl;
+         break;
+-    case 17:
+-        ret =3D i2c->intr;
+-        break;
+     default:
+         if (addr < PPC4xx_I2C_MEM_SIZE) {
+             qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
+@@ -229,9 +221,6 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr ad=
+dr, uint64_t value,
+             }
+         }
+         break;
+-    case 2:
+-        i2c->sdata =3D value;
+-        break;
+     case 4:
+         i2c->lmadr =3D value;
+         if (i2c_bus_busy(i2c->bus)) {
+@@ -302,9 +291,6 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr ad=
+dr, uint64_t value,
+     case 16:
+         i2c->directcntl =3D value & 0x7;
+         break;
+-    case 17:
+-        i2c->intr =3D value;
+-        break;
+     default:
+         if (addr < PPC4xx_I2C_MEM_SIZE) {
+             qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
+diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
+index 3c603071bd..e4b6ded855 100644
+--- a/include/hw/i2c/ppc4xx_i2c.h
++++ b/include/hw/i2c/ppc4xx_i2c.h
+@@ -3,7 +3,7 @@
+  *
+  * Copyright (c) 2007 Jocelyn Mayer
+  * Copyright (c) 2012 Fran=C3=A7ois Revol
+- * Copyright (c) 2016 BALATON Zoltan
++ * Copyright (c) 2016-2018 BALATON Zoltan
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+  * of this software and associated documentation files (the "Software"),=
+ to deal
+@@ -49,7 +49,6 @@ typedef struct PPC4xxI2CState {
+     uint8_t mdcntl;
+     uint8_t sts;
+     uint8_t extsts;
+-    uint8_t sdata;
+     uint8_t lsadr;
+     uint8_t hsadr;
+     uint8_t clkdiv;
+@@ -57,7 +56,6 @@ typedef struct PPC4xxI2CState {
+     uint8_t xfrcnt;
+     uint8_t xtcntlss;
+     uint8_t directcntl;
+-    uint8_t intr;
+ } PPC4xxI2CState;
 =20
- #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
-=20
-+void spapr_check_pagesize(sPAPRMachineState *spapr, hwaddr pagesize,
-+                          Error **errp)
-+{
-+    hwaddr maxpagesize =3D (1ULL << spapr->eff.caps[SPAPR_CAP_HPT_MAXPAG=
-ESIZE]);
-+
-+    if (!kvmppc_hpt_needs_host_contiguous_pages()) {
-+        return;
-+    }
-+
-+    if (maxpagesize > pagesize) {
-+        error_setg(errp,
-+                   "Can't support %"HWADDR_PRIu" kiB guest pages with %"
-+                   HWADDR_PRIu" kiB host pages with this KVM implementat=
-ion",
-+                   maxpagesize >> 10, pagesize >> 10);
-+    }
-+}
-+
- static void cap_hpt_maxpagesize_apply(sPAPRMachineState *spapr,
-                                       uint8_t val, Error **errp)
- {
-     if (val < 12) {
-         error_setg(errp, "Require at least 4kiB hpt-max-page-size");
-+        return;
-     } else if (val < 16) {
-         warn_report("Many guests require at least 64kiB hpt-max-page-siz=
-e");
-     }
-+
-+    spapr_check_pagesize(spapr, qemu_getrampagesize(), errp);
- }
-=20
- sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 4bc9dbff96..7e028164ba 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -806,4 +806,7 @@ void spapr_caps_cpu_apply(sPAPRMachineState *spapr, P=
-owerPCCPU *cpu);
- void spapr_caps_add_properties(sPAPRMachineClass *smc, Error **errp);
- int spapr_caps_post_migration(sPAPRMachineState *spapr);
-=20
-+void spapr_check_pagesize(sPAPRMachineState *spapr, hwaddr pagesize,
-+                          Error **errp);
-+
- #endif /* HW_SPAPR_H */
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 50b5d01432..9cfbd388ad 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -500,26 +500,12 @@ static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
-         cpu->hash64_opts->flags &=3D ~PPC_HASH64_1TSEG;
-     }
- }
--
--bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
--{
--    Object *mem_obj =3D object_resolve_path(obj_path, NULL);
--    long pagesize =3D host_memory_backend_pagesize(MEMORY_BACKEND(mem_ob=
-j));
--
--    return pagesize >=3D max_cpu_page_size;
--}
--
- #else /* defined (TARGET_PPC64) */
-=20
- static inline void kvm_fixup_page_sizes(PowerPCCPU *cpu)
- {
- }
-=20
--bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path)
--{
--    return true;
--}
--
- #endif /* !defined (TARGET_PPC64) */
-=20
- unsigned long kvm_arch_vcpu_id(CPUState *cpu)
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index a7ddb8a5d6..443fca0a4e 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -71,7 +71,6 @@ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ul=
-ong flags, int shift);
- bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
-=20
- bool kvmppc_hpt_needs_host_contiguous_pages(void);
--bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
-=20
- #else
-=20
-@@ -228,11 +227,6 @@ static inline bool kvmppc_hpt_needs_host_contiguous_=
-pages(void)
-     return false;
- }
-=20
--static inline bool kvmppc_is_mem_backend_page_size_ok(const char *obj_pa=
-th)
--{
--    return true;
--}
--
- static inline bool kvmppc_has_cap_spapr_vfio(void)
- {
-     return false;
+ #endif /* PPC4XX_I2C_H */
 --=20
 2.17.1
