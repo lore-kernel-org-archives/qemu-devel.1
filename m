@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fWOyd-0004IK-51
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:32:00 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fWP1n-00053O-Tt
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fWOya-0002zD-0l
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:31:59 -0400
-Resent-Message-Id: <E1fWOya-0002zD-0l@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21136)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fWOyZ-0002yl-No
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:31:55 -0400
-In-Reply-To: <20180622125814.345274-1-eblake@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152968508595.888.6631795618045211665@d39dc562802a>
+	(envelope-from <peter.maydell@linaro.org>) id 1fWP1m-0004IV-3H
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:35:15 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:38052)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fWP1l-0004IJ-Sc
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:35:14 -0400
+Received: by mail-ot0-x241.google.com with SMTP id p95-v6so8163879ota.5
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 09:35:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 22 Jun 2018 09:31:26 -0700 (PDT)
+In-Reply-To: <152968508595.888.6631795618045211665@d39dc562802a>
+References: <20180622125814.345274-1-eblake@redhat.com>
+	<152968508595.888.6631795618045211665@d39dc562802a>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 17:34:52 +0100
+Message-ID: <CAFEAcA9rdG4uAVgVe16_prsZ50Wic9+BMSmeZ+E7=uJ75WE=8A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [PATCH] nbd/server: Silence gcc false positive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,116 +29,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eblake@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-block@nongnu.org, pbonzini@redhat.com
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjIyMTI1ODE0LjM0NTI3NC0xLWVibGFrZUByZWRoYXQuY29tClN1Ympl
-Y3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIG5iZC9zZXJ2ZXI6IFNpbGVuY2UgZ2NjIGZhbHNlIHBv
-c2l0aXZlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
-Z3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
-Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
-ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
-LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
-ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
-bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
-YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
-bS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3
-LzIwMTgwNjIwMTIwNjIwLjEyODA2LTEteW9uZ2Jvay5raW1AbWlwcy5jb20gLT4gcGF0Y2hldy8y
-MDE4MDYyMDEyMDYyMC4xMjgwNi0xLXlvbmdib2sua2ltQG1pcHMuY29tCiAqIFtuZXcgdGFnXSAg
-ICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA2MjIxMjU4MTQuMzQ1Mjc0LTEtZWJsYWtlQHJlZGhh
-dC5jb20gLT4gcGF0Y2hldy8yMDE4MDYyMjEyNTgxNC4zNDUyNzQtMS1lYmxha2VAcmVkaGF0LmNv
-bQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjY0ODllNGIxMGMgTWVyZ2UgcmVtb3Rl
-LXRyYWNraW5nIGJyYW5jaCAncmVtb3Rlcy9wbWF5ZGVsbC90YWdzL3B1bGwtdGFyZ2V0LWFybS0y
-MDE4MDYyMicgaW50byBzdGFnaW5nCjEwZTg0ZDI1MDQgeGVuOiBEb24ndCB1c2UgbWVtb3J5X3Jl
-Z2lvbl9pbml0X3JhbV9ub21pZ3JhdGUoKSBpbiBwY2lfYXNzaWduX2Rldl9sb2FkX29wdGlvbl9y
-b20oKQphZWEyMWFmYWVmIHZsLmM6IERvbid0IHplcm8taW5pdGlhbGl6ZSBzdGF0aWNzIGZvciBz
-ZXJpYWxfaGRzCmZlYTY0YmFlYWIgdGFyZ2V0L2FybTogU3RyaWN0IGFsaWdubWVudCBmb3IgQVJN
-djYtTSBhbmQgQVJNdjgtTSBCYXNlbGluZQoxMmM1ODNjNDViIHRhcmdldC9hcm06IEludHJvZHVj
-ZSBBUk1fRkVBVFVSRV9NX01BSU4KNDJmYzkzNmEzMCBody9hcm0vbXBzMi10ei5jOiBJbnN0YW50
-aWF0ZSBNUENzCmIwM2UwZDI4YTIgaHcvYXJtL2lvdGtpdDogV2lyZSB1cCBNUEMgaW50ZXJydXB0
-IGxpbmVzCjk4NWRiODNjNGEgaHcvYXJtL2lvdGtpdDogSW5zdGFudGlhdGUgTVBDCjc2OWQzNDQ4
-YWYgaHcvbWlzYy9pb3RraXQtc2VjY3RsLmM6IEltcGxlbWVudCBTRUNNUENJTlRTVEFUVVMKY2Rm
-MGM0OWE2YSBody9taXNjL3R6X21wYy5jOiBIb25vdXIgdGhlIEJMS19MVVQgc2V0dGluZ3MgaW4g
-dHJhbnNsYXRlCjc3OTA5OTljYTcgaHcvbWlzYy90ei1tcGMuYzogSW1wbGVtZW50IGNvcnJlY3Qg
-YmxvY2tlZC1hY2Nlc3MgYmVoYXZpb3VyCmZhNmRkNGJiYTUgaHcvbWlzYy90ei1tcGMuYzogSW1w
-bGVtZW50IHJlZ2lzdGVycwpkM2NiNDNhZWE3IGh3L21pc2MvdHotbXBjLmM6IEltcGxlbWVudCB0
-aGUgQXJtIFRydXN0Wm9uZSBNZW1vcnkgUHJvdGVjdGlvbiBDb250cm9sbGVyCjgwYzM3MDM1ODgg
-eGxueC16eW5xbXA6IFN3YXAgQ29ydGV4LVI1IGZvciBDb3J0ZXgtUjVGCjYwZTM4M2ZjODMgdGFy
-Z2V0LWFybTogQWRkIHRoZSBDb3J0ZXgtUjVGCjY2MDNmZjlmNmIgaHcvYXJtL3ZpcnQ6IEluY3Jl
-YXNlIG1heF9jcHVzIHRvIDUxMgphZDM3ZTA2MjNmIGh3L2FybS92aXJ0OiBVc2UgMjU2TUIgRUNB
-TSByZWdpb24gYnkgZGVmYXVsdAowOGUzOGU3YTdlIGh3L2FybS92aXJ0OiBBZGQgdmlydC0zLjAg
-bWFjaGluZSB0eXBlCmQ4NDRlNWE5YTUgaHcvYXJtL3ZpcnQ6IEFkZCBhIG5ldyAyNTZNQiBFQ0FN
-IHJlZ2lvbgo4MmNhNTY4NzQ3IGh3L2FybS92aXJ0OiBSZWdpc3RlciB0d28gcmVkaXN0cmlidXRv
-ciByZWdpb25zIHdoZW4gbmVjZXNzYXJ5CmYzYTIwZDJkODggaHcvYXJtL3ZpcnQtYWNwaS1idWls
-ZDogQWR2ZXJ0aXNlIG9uZSBvciB0d28gR0lDUiBzdHJ1Y3R1cmVzCjBiZDAxMTA5NGQgaHcvYXJt
-L3ZpcnQ6IEdJQ3YzIERUIG5vZGUgd2l0aCBvbmUgb3IgdHdvIHJlZGlzdHJpYnV0b3IgcmVnaW9u
-cwpiMDk1ZTg0ZTRmIGh3L2ludGMvYXJtX2dpY3YzX2t2bTogR2V0IHByZXBhcmVkIHRvIGhhbmRs
-ZSBtdWx0aXBsZSByZWRpc3QgcmVnaW9ucwo3NzczN2EwZGMwIGh3L2ludGMvYXJtX2dpY3YzOiBJ
-bnRyb2R1Y2UgcmVkaXN0LXJlZ2lvbi1jb3VudCBhcnJheSBwcm9wZXJ0eQozNTYwNjlmNDliIHRh
-cmdldC9hcm06IEFsbG93IEtWTSBkZXZpY2UgYWRkcmVzcyBvdmVyd3JpdGluZwowZDllZTFlOTU2
-IGxpbnV4LWhlYWRlcnM6IFVwZGF0ZSB0byBrZXJuZWwgbWFpbmxpbmUgY29tbWl0IGIzNTdiZjYw
-MgplOWViN2RlNTQxIHRhcmdldC1hcm06IGZpeCBhIHNlZ21lbnRhdGlvbiBmYXVsdCBkdWUgdG8g
-aWxsZWdhbCBtZW1vcnkgYWNjZXNzCmEyYmQxYTJkY2UgdGFyZ2V0L2FybTogTWlub3IgY2xlYW51
-cCBmb3IgQVJNdjYtTSAzMi1iaXQgaW5zdHJ1Y3Rpb25zCjc4NzI2MDczNWYgaHcvaW50Yy9hcm1f
-Z2ljdjM6IGZpeCBhbiBleHRyYSBsZWZ0LXNoaWZ0IHdoZW4gcmVhZGluZyBJUFJJT1JJVFlSCgo9
-PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzI5OiBody9pbnRjL2FybV9naWN2
-MzogZml4IGFuIGV4dHJhIGxlZnQtc2hpZnQgd2hlbiByZWFkaW5nIElQUklPUklUWVIuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMi8yOTogdGFyZ2V0L2FybTogTWlub3IgY2xlYW51cCBmb3IgQVJNdjYtTSAz
-Mi1iaXQgaW5zdHJ1Y3Rpb25zLi4uCkNoZWNraW5nIFBBVENIIDMvMjk6IHRhcmdldC1hcm06IGZp
-eCBhIHNlZ21lbnRhdGlvbiBmYXVsdCBkdWUgdG8gaWxsZWdhbCBtZW1vcnkgYWNjZXNzLi4uCkNo
-ZWNraW5nIFBBVENIIDQvMjk6IGxpbnV4LWhlYWRlcnM6IFVwZGF0ZSB0byBrZXJuZWwgbWFpbmxp
-bmUgY29tbWl0IGIzNTdiZjYwMi4uLgpDaGVja2luZyBQQVRDSCA1LzI5OiB0YXJnZXQvYXJtOiBB
-bGxvdyBLVk0gZGV2aWNlIGFkZHJlc3Mgb3ZlcndyaXRpbmcuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8y
-OTogaHcvaW50Yy9hcm1fZ2ljdjM6IEludHJvZHVjZSByZWRpc3QtcmVnaW9uLWNvdW50IGFycmF5
-IHByb3BlcnR5Li4uCkNoZWNraW5nIFBBVENIIDcvMjk6IGh3L2ludGMvYXJtX2dpY3YzX2t2bTog
-R2V0IHByZXBhcmVkIHRvIGhhbmRsZSBtdWx0aXBsZSByZWRpc3QgcmVnaW9ucy4uLgpDaGVja2lu
-ZyBQQVRDSCA4LzI5OiBody9hcm0vdmlydDogR0lDdjMgRFQgbm9kZSB3aXRoIG9uZSBvciB0d28g
-cmVkaXN0cmlidXRvciByZWdpb25zLi4uCkNoZWNraW5nIFBBVENIIDkvMjk6IGh3L2FybS92aXJ0
-LWFjcGktYnVpbGQ6IEFkdmVydGlzZSBvbmUgb3IgdHdvIEdJQ1Igc3RydWN0dXJlcy4uLgpDaGVj
-a2luZyBQQVRDSCAxMC8yOTogaHcvYXJtL3ZpcnQ6IFJlZ2lzdGVyIHR3byByZWRpc3RyaWJ1dG9y
-IHJlZ2lvbnMgd2hlbiBuZWNlc3NhcnkuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMjk6IGh3L2FybS92
-aXJ0OiBBZGQgYSBuZXcgMjU2TUIgRUNBTSByZWdpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvMjk6
-IGh3L2FybS92aXJ0OiBBZGQgdmlydC0zLjAgbWFjaGluZSB0eXBlLi4uCkNoZWNraW5nIFBBVENI
-IDEzLzI5OiBody9hcm0vdmlydDogVXNlIDI1Nk1CIEVDQU0gcmVnaW9uIGJ5IGRlZmF1bHQuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMTQvMjk6IGh3L2FybS92aXJ0OiBJbmNyZWFzZSBtYXhfY3B1cyB0byA1
-MTIuLi4KQ2hlY2tpbmcgUEFUQ0ggMTUvMjk6IHRhcmdldC1hcm06IEFkZCB0aGUgQ29ydGV4LVI1
-Ri4uLgpDaGVja2luZyBQQVRDSCAxNi8yOTogeGxueC16eW5xbXA6IFN3YXAgQ29ydGV4LVI1IGZv
-ciBDb3J0ZXgtUjVGLi4uCkNoZWNraW5nIFBBVENIIDE3LzI5OiBody9taXNjL3R6LW1wYy5jOiBJ
-bXBsZW1lbnQgdGhlIEFybSBUcnVzdFpvbmUgTWVtb3J5IFByb3RlY3Rpb24gQ29udHJvbGxlci4u
-LgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlO
-RVJTIG5lZWQgdXBkYXRpbmc/CiM4NjogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBl
-cnJvcnMsIDEgd2FybmluZ3MsIDUwNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDE4LzI5OiBody9taXNjL3R6LW1wYy5j
-OiBJbXBsZW1lbnQgcmVnaXN0ZXJzLi4uCkNoZWNraW5nIFBBVENIIDE5LzI5OiBody9taXNjL3R6
-LW1wYy5jOiBJbXBsZW1lbnQgY29ycmVjdCBibG9ja2VkLWFjY2VzcyBiZWhhdmlvdXIuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggMjAvMjk6IGh3L21pc2MvdHpfbXBjLmM6IEhvbm91ciB0aGUgQkxLX0xVVCBz
-ZXR0aW5ncyBpbiB0cmFuc2xhdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMjEvMjk6IGh3L21pc2MvaW90
-a2l0LXNlY2N0bC5jOiBJbXBsZW1lbnQgU0VDTVBDSU5UU1RBVFVTLi4uCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojOTI6IEZJTEU6IGh3L21pc2MvaW90
-a2l0LXNlY2N0bC5jOjcxMToKKyAgICAuc3Vic2VjdGlvbnMgPSAoY29uc3QgVk1TdGF0ZURlc2Ny
-aXB0aW9uKltdKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IF4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTAwIGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIyLzI5OiBo
-dy9hcm0vaW90a2l0OiBJbnN0YW50aWF0ZSBNUEMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjMvMjk6IGh3
-L2FybS9pb3RraXQ6IFdpcmUgdXAgTVBDIGludGVycnVwdCBsaW5lcy4uLgpDaGVja2luZyBQQVRD
-SCAyNC8yOTogaHcvYXJtL21wczItdHouYzogSW5zdGFudGlhdGUgTVBDcy4uLgpDaGVja2luZyBQ
-QVRDSCAyNS8yOTogdGFyZ2V0L2FybTogSW50cm9kdWNlIEFSTV9GRUFUVVJFX01fTUFJTi4uLgpD
-aGVja2luZyBQQVRDSCAyNi8yOTogdGFyZ2V0L2FybTogU3RyaWN0IGFsaWdubWVudCBmb3IgQVJN
-djYtTSBhbmQgQVJNdjgtTSBCYXNlbGluZS4uLgpDaGVja2luZyBQQVRDSCAyNy8yOTogdmwuYzog
-RG9uJ3QgemVyby1pbml0aWFsaXplIHN0YXRpY3MgZm9yIHNlcmlhbF9oZHMuLi4KQ2hlY2tpbmcg
-UEFUQ0ggMjgvMjk6IHhlbjogRG9uJ3QgdXNlIG1lbW9yeV9yZWdpb25faW5pdF9yYW1fbm9taWdy
-YXRlKCkgaW4gcGNpX2Fzc2lnbl9kZXZfbG9hZF9vcHRpb25fcm9tKCkuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMjkvMjk6IE1lcmdlIHJlbW90ZS10cmFja2luZyBicmFuY2ggJ3JlbW90ZXMvcG1heWRlbGwv
-dGFncy9wdWxsLXRhcmdldC1hcm0tMjAxODA2MjInIGludG8gc3RhZ2luZy4uLgo9PT0gT1VUUFVU
-IEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdl
-bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQ
-bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Hi Fam -- looks like patchew has got confused somehow...
+
+On 22 June 2018 at 17:31,  <no-reply@patchew.org> wrote:
+> Hi,
+>
+> This series seems to have some coding style problems. See output below for
+> more information:
+>
+> Type: series
+> Message-id: 20180622125814.345274-1-eblake@redhat.com
+> Subject: [Qemu-devel] [PATCH] nbd/server: Silence gcc false positive
+
+This is the report email for this nbd patch (and it's following
+up to the nbd patch email)...
+
+> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
+> From https://github.com/patchew-project/qemu
+>  t [tag update]            patchew/20180620120620.12806-1-yongbok.kim@mips.com -> patchew/20180620120620.12806-1-yongbok.kim@mips.com
+>  * [new tag]               patchew/20180622125814.345274-1-eblake@redhat.com -> patchew/20180622125814.345274-1-eblake@redhat.com
+> Switched to a new branch 'test'
+> 6489e4b10c Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180622' into staging
+> 10e84d2504 xen: Don't use memory_region_init_ram_nomigrate() in pci_assign_dev_load_option_rom()
+> aea21afaef vl.c: Don't zero-initialize statics for serial_hds
+> fea64baeab target/arm: Strict alignment for ARMv6-M and ARMv8-M Baseline
+
+...but the patches it seems to actually be testing are from my
+latest target-arm pull request ?
+
+> 12c583c45b target/arm: Introduce ARM_FEATURE_M_MAIN
+> 42fc936a30 hw/arm/mps2-tz.c: Instantiate MPCs
+> b03e0d28a2 hw/arm/iotkit: Wire up MPC interrupt lines
+> 985db83c4a hw/arm/iotkit: Instantiate MPC
+> 769d3448af hw/misc/iotkit-secctl.c: Implement SECMPCINTSTATUS
+> cdf0c49a6a hw/misc/tz_mpc.c: Honour the BLK_LUT settings in translate
+> 7790999ca7 hw/misc/tz-mpc.c: Implement correct blocked-access behaviour
+> fa6dd4bba5 hw/misc/tz-mpc.c: Implement registers
+> d3cb43aea7 hw/misc/tz-mpc.c: Implement the Arm TrustZone Memory Protection Controller
+> 80c3703588 xlnx-zynqmp: Swap Cortex-R5 for Cortex-R5F
+> 60e383fc83 target-arm: Add the Cortex-R5F
+> 6603ff9f6b hw/arm/virt: Increase max_cpus to 512
+> ad37e0623f hw/arm/virt: Use 256MB ECAM region by default
+> 08e38e7a7e hw/arm/virt: Add virt-3.0 machine type
+> d844e5a9a5 hw/arm/virt: Add a new 256MB ECAM region
+> 82ca568747 hw/arm/virt: Register two redistributor regions when necessary
+> f3a20d2d88 hw/arm/virt-acpi-build: Advertise one or two GICR structures
+> 0bd011094d hw/arm/virt: GICv3 DT node with one or two redistributor regions
+> b095e84e4f hw/intc/arm_gicv3_kvm: Get prepared to handle multiple redist regions
+> 77737a0dc0 hw/intc/arm_gicv3: Introduce redist-region-count array property
+> 356069f49b target/arm: Allow KVM device address overwriting
+> 0d9ee1e956 linux-headers: Update to kernel mainline commit b357bf602
+> e9eb7de541 target-arm: fix a segmentation fault due to illegal memory access
+> a2bd1a2dce target/arm: Minor cleanup for ARMv6-M 32-bit instructions
+> 787260735f hw/intc/arm_gicv3: fix an extra left-shift when reading IPRIORITYR
+>
+> === OUTPUT BEGIN ===
+> Checking PATCH 1/29: hw/intc/arm_gicv3: fix an extra left-shift when reading IPRIORITYR...
+> Checking PATCH 2/29: target/arm: Minor cleanup for ARMv6-M 32-bit instructions...
+> Checking PATCH 3/29: target-arm: fix a segmentation fault due to illegal memory access...
+> Checking PATCH 4/29: linux-headers: Update to kernel mainline commit b357bf602...
+> Checking PATCH 5/29: target/arm: Allow KVM device address overwriting...
+> Checking PATCH 6/29: hw/intc/arm_gicv3: Introduce redist-region-count array property...
+> Checking PATCH 7/29: hw/intc/arm_gicv3_kvm: Get prepared to handle multiple redist regions...
+> Checking PATCH 8/29: hw/arm/virt: GICv3 DT node with one or two redistributor regions...
+> Checking PATCH 9/29: hw/arm/virt-acpi-build: Advertise one or two GICR structures...
+> Checking PATCH 10/29: hw/arm/virt: Register two redistributor regions when necessary...
+> Checking PATCH 11/29: hw/arm/virt: Add a new 256MB ECAM region...
+> Checking PATCH 12/29: hw/arm/virt: Add virt-3.0 machine type...
+> Checking PATCH 13/29: hw/arm/virt: Use 256MB ECAM region by default...
+> Checking PATCH 14/29: hw/arm/virt: Increase max_cpus to 512...
+> Checking PATCH 15/29: target-arm: Add the Cortex-R5F...
+> Checking PATCH 16/29: xlnx-zynqmp: Swap Cortex-R5 for Cortex-R5F...
+> Checking PATCH 17/29: hw/misc/tz-mpc.c: Implement the Arm TrustZone Memory Protection Controller...
+> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #86:
+> new file mode 100644
+>
+> total: 0 errors, 1 warnings, 504 lines checked
+>
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+> Checking PATCH 18/29: hw/misc/tz-mpc.c: Implement registers...
+> Checking PATCH 19/29: hw/misc/tz-mpc.c: Implement correct blocked-access behaviour...
+> Checking PATCH 20/29: hw/misc/tz_mpc.c: Honour the BLK_LUT settings in translate...
+> Checking PATCH 21/29: hw/misc/iotkit-secctl.c: Implement SECMPCINTSTATUS...
+> ERROR: spaces required around that '*' (ctx:VxV)
+> #92: FILE: hw/misc/iotkit-secctl.c:711:
+> +    .subsections = (const VMStateDescription*[]) {
+>                                              ^
+>
+> total: 1 errors, 0 warnings, 100 lines checked
+>
+> Your patch has style problems, please review.  If any of these errors
+> are false positives report them to the maintainer, see
+> CHECKPATCH in MAINTAINERS.
+>
+> Checking PATCH 22/29: hw/arm/iotkit: Instantiate MPC...
+> Checking PATCH 23/29: hw/arm/iotkit: Wire up MPC interrupt lines...
+> Checking PATCH 24/29: hw/arm/mps2-tz.c: Instantiate MPCs...
+> Checking PATCH 25/29: target/arm: Introduce ARM_FEATURE_M_MAIN...
+> Checking PATCH 26/29: target/arm: Strict alignment for ARMv6-M and ARMv8-M Baseline...
+> Checking PATCH 27/29: vl.c: Don't zero-initialize statics for serial_hds...
+> Checking PATCH 28/29: xen: Don't use memory_region_init_ram_nomigrate() in pci_assign_dev_load_option_rom()...
+> Checking PATCH 29/29: Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180622' into staging...
+> === OUTPUT END ===
+>
+> Test command exited with code: 1
+
+thanks
+-- PMM
