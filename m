@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJPz-0000oD-KN
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:55 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJQ2-0000qO-KO
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJPw-0003WN-9u
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:51 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJPx-0003XS-Lr
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:54 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 22 Jun 2018 20:35:22 +1000
-Message-Id: <20180622103528.28598-20-david@gibson.dropbear.id.au>
+Date: Fri, 22 Jun 2018 20:35:26 +1000
+Message-Id: <20180622103528.28598-24-david@gibson.dropbear.id.au>
 In-Reply-To: <20180622103528.28598-1-david@gibson.dropbear.id.au>
 References: <20180622103528.28598-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 19/25] spapr: Maximum (HPT) pagesize property
+Subject: [Qemu-devel] [PULL 23/25] spapr: Don't rewrite mmu capabilities in
+ KVM mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,192 +26,263 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-The way the POWER Hash Page Table (HPT) MMU is virtualized by KVM HV mean=
-s
-that every page that the guest puts in the pagetables must be truly
-physically contiguous, not just GPA-contiguous.  In effect this means tha=
-t
-an HPT guest can't use any pagesizes greater than the host page size used
-to back its memory.
+Currently during KVM initialization on POWER, kvm_fixup_page_sizes()
+rewrites a bunch of information in the cpu state to reflect the
+capabilities of the host MMU and KVM.  This overwrites the information
+that's already there reflecting how the TCG implementation of the MMU wil=
+l
+operate.
 
-At present we handle this by changing what we advertise to the guest base=
-d
-on the backing pagesizes.  This is pretty bad, because it means the guest
-sees a different environment depending on what should be host configurati=
-on
-details.
+This means that we can get guest-visibly different behaviour between KVM
+and TCG (and between different KVM implementations).  That's bad.  It als=
+o
+prevents migration between KVM and TCG.
 
-As a start on fixing this, we add a new capability parameter to the
-pseries machine type which gives the maximum allowed pagesizes for an
-HPT guest.  For now we just create and validate the parameter without
-making it do anything.
+The pseries machine type now has filtering of the pagesizes it allows the
+guest to use which means it can present a consistent model of the MMU
+across all accelerators.
 
-For backwards compatibility, on older machine types we set it to the max
-available page size for the host.  For the 3.0 machine type, we fix it to
-16, the intention being to only allow HPT pagesizes up to 64kiB by defaul=
-t
-in future.
+So, we can now replace kvm_fixup_page_sizes() with kvm_check_mmu() which
+merely verifies that the expected cpu model can be faithfully handled by
+KVM, rather than updating the cpu model to match KVM.
+
+We call kvm_check_mmu() from the spapr cpu reset code.  This is a hack:
+conceptually it makes more sense where fixup_page_sizes() was - in the KV=
+M
+cpu init path.  However, doing that would require moving the platform's
+pagesize filtering much earlier, which would require a lot of work making
+further adjustments.  There wouldn't be a lot of concrete point to doing
+that, since the only KVM implementation which has the awkward MMU
+restrictions is KVM HV, which can only work with an spapr guest anyway.
 
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c         | 12 +++++++++
- hw/ppc/spapr_caps.c    | 56 ++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr.h |  4 ++-
- 3 files changed, 71 insertions(+), 1 deletion(-)
+ hw/ppc/spapr_cpu_core.c |   2 +
+ target/ppc/kvm.c        | 133 ++++++++++++++++++++--------------------
+ target/ppc/kvm_ppc.h    |   5 ++
+ 3 files changed, 72 insertions(+), 68 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 78186500e9..70b150b098 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -63,6 +63,7 @@
- #include "hw/virtio/vhost-scsi-common.h"
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index bfb94f650c..993759db47 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -78,6 +78,8 @@ static void spapr_cpu_reset(void *opaque)
+     spapr_cpu->dtl_size =3D 0;
 =20
- #include "exec/address-spaces.h"
-+#include "exec/ram_addr.h"
- #include "hw/usb.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-@@ -4015,6 +4016,7 @@ static void spapr_machine_class_init(ObjectClass *o=
-c, void *data)
-     smc->default_caps.caps[SPAPR_CAP_CFPC] =3D SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_SBBC] =3D SPAPR_CAP_BROKEN;
-     smc->default_caps.caps[SPAPR_CAP_IBS] =3D SPAPR_CAP_BROKEN;
-+    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D 16; /* 64kiB *=
-/
-     spapr_caps_add_properties(smc, &error_abort);
+     spapr_caps_cpu_apply(SPAPR_MACHINE(qdev_get_machine()), cpu);
++
++    kvm_check_mmu(cpu, &error_fatal);
  }
 =20
-@@ -4103,8 +4105,18 @@ static void spapr_machine_2_12_instance_options(Ma=
-chineState *machine)
+ void spapr_cpu_set_entry_state(PowerPCCPU *cpu, target_ulong nip, target=
+_ulong r3)
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 9cfbd388ad..4df4ff6cbf 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -419,93 +419,93 @@ bool kvmppc_hpt_needs_host_contiguous_pages(void)
+     return !!(smmu_info.flags & KVM_PPC_PAGE_SIZES_REAL);
+ }
 =20
- static void spapr_machine_2_12_class_options(MachineClass *mc)
+-static bool kvm_valid_page_size(uint32_t flags, long rampgsize, uint32_t=
+ shift)
++void kvm_check_mmu(PowerPCCPU *cpu, Error **errp)
  {
-+    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
-+    uint8_t mps;
+-    if (!kvmppc_hpt_needs_host_contiguous_pages()) {
+-        return true;
+-    }
+-
+-    return (1ul << shift) <=3D rampgsize;
+-}
+-
+-static long max_cpu_page_size;
+-
+-static void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+-{
+-    static struct kvm_ppc_smmu_info smmu_info;
+-    static bool has_smmu_info;
+-    CPUPPCState *env =3D &cpu->env;
++    struct kvm_ppc_smmu_info smmu_info;
+     int iq, ik, jq, jk;
+=20
+-    /* We only handle page sizes for 64-bit server guests for now */
+-    if (!(env->mmu_model & POWERPC_MMU_64)) {
++    /* For now, we only have anything to check on hash64 MMUs */
++    if (!cpu->hash64_opts || !kvm_enabled()) {
+         return;
+     }
+=20
+-    /* Collect MMU info from kernel if not already */
+-    if (!has_smmu_info) {
+-        kvm_get_smmu_info(cpu, &smmu_info);
+-        has_smmu_info =3D true;
+-    }
++    kvm_get_smmu_info(cpu, &smmu_info);
+=20
+-    if (!max_cpu_page_size) {
+-        max_cpu_page_size =3D qemu_getrampagesize();
++    if (ppc_hash64_has(cpu, PPC_HASH64_1TSEG)
++        && !(smmu_info.flags & KVM_PPC_1T_SEGMENTS)) {
++        error_setg(errp,
++                   "KVM does not support 1TiB segments which guest expec=
+ts");
++        return;
+     }
+=20
+-    /* Convert to QEMU form */
+-    memset(cpu->hash64_opts->sps, 0, sizeof(*cpu->hash64_opts->sps));
+-
+-    /* If we have HV KVM, we need to forbid CI large pages if our
+-     * host page size is smaller than 64K.
+-     */
+-    if (kvmppc_hpt_needs_host_contiguous_pages()) {
+-        if (getpagesize() >=3D 0x10000) {
+-            cpu->hash64_opts->flags |=3D PPC_HASH64_CI_LARGEPAGE;
+-        } else {
+-            cpu->hash64_opts->flags &=3D ~PPC_HASH64_CI_LARGEPAGE;
+-        }
++    if (smmu_info.slb_size < cpu->hash64_opts->slb_size) {
++        error_setg(errp, "KVM only supports %u SLB entries, but guest ne=
+eds %u",
++                   smmu_info.slb_size, cpu->hash64_opts->slb_size);
++        return;
+     }
+=20
+     /*
+-     * XXX This loop should be an entry wide AND of the capabilities tha=
+t
+-     *     the selected CPU has with the capabilities that KVM supports.
++     * Verify that every pagesize supported by the cpu model is
++     * supported by KVM with the same encodings
+      */
+-    for (ik =3D iq =3D 0; ik < KVM_PPC_PAGE_SIZES_MAX_SZ; ik++) {
++    for (iq =3D 0; iq < ARRAY_SIZE(cpu->hash64_opts->sps); iq++) {
+         PPCHash64SegmentPageSizes *qsps =3D &cpu->hash64_opts->sps[iq];
+-        struct kvm_ppc_one_seg_page_size *ksps =3D &smmu_info.sps[ik];
++        struct kvm_ppc_one_seg_page_size *ksps;
+=20
+-        if (!kvm_valid_page_size(smmu_info.flags, max_cpu_page_size,
+-                                 ksps->page_shift)) {
+-            continue;
+-        }
+-        qsps->page_shift =3D ksps->page_shift;
+-        qsps->slb_enc =3D ksps->slb_enc;
+-        for (jk =3D jq =3D 0; jk < KVM_PPC_PAGE_SIZES_MAX_SZ; jk++) {
+-            if (!kvm_valid_page_size(smmu_info.flags, max_cpu_page_size,
+-                                     ksps->enc[jk].page_shift)) {
+-                continue;
+-            }
+-            qsps->enc[jq].page_shift =3D ksps->enc[jk].page_shift;
+-            qsps->enc[jq].pte_enc =3D ksps->enc[jk].pte_enc;
+-            if (++jq >=3D PPC_PAGE_SIZES_MAX_SZ) {
++        for (ik =3D 0; ik < ARRAY_SIZE(smmu_info.sps); ik++) {
++            if (qsps->page_shift =3D=3D smmu_info.sps[ik].page_shift) {
+                 break;
+             }
+         }
+-        if (++iq >=3D PPC_PAGE_SIZES_MAX_SZ) {
+-            break;
++        if (ik >=3D ARRAY_SIZE(smmu_info.sps)) {
++            error_setg(errp, "KVM doesn't support for base page shift %u=
+",
++                       qsps->page_shift);
++            return;
++        }
 +
-     spapr_machine_3_0_class_options(mc);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
++        ksps =3D &smmu_info.sps[ik];
++        if (ksps->slb_enc !=3D qsps->slb_enc) {
++            error_setg(errp,
++"KVM uses SLB encoding 0x%x for page shift %u, but guest expects 0x%x",
++                       ksps->slb_enc, ksps->page_shift, qsps->slb_enc);
++            return;
++        }
 +
-+    if (kvmppc_hpt_needs_host_contiguous_pages()) {
-+        mps =3D ctz64(qemu_getrampagesize());
-+    } else {
-+        mps =3D 34; /* allow everything up to 16GiB, i.e. everything */
++        for (jq =3D 0; jq < ARRAY_SIZE(qsps->enc); jq++) {
++            for (jk =3D 0; jk < ARRAY_SIZE(ksps->enc); jk++) {
++                if (qsps->enc[jq].page_shift =3D=3D ksps->enc[jk].page_s=
+hift) {
++                    break;
++                }
++            }
++
++            if (jk >=3D ARRAY_SIZE(ksps->enc)) {
++                error_setg(errp, "KVM doesn't support page shift %u/%u",
++                           qsps->enc[jq].page_shift, qsps->page_shift);
++                return;
++            }
++            if (qsps->enc[jq].pte_enc !=3D ksps->enc[jk].pte_enc) {
++                error_setg(errp,
++"KVM uses PTE encoding 0x%x for page shift %u/%u, but guest expects 0x%x=
+",
++                           ksps->enc[jk].pte_enc, qsps->enc[jq].page_shi=
+ft,
++                           qsps->page_shift, qsps->enc[jq].pte_enc);
++                return;
++            }
+         }
+     }
+-    cpu->hash64_opts->slb_size =3D smmu_info.slb_size;
+-    if (!(smmu_info.flags & KVM_PPC_1T_SEGMENTS)) {
+-        cpu->hash64_opts->flags &=3D ~PPC_HASH64_1TSEG;
+-    }
+-}
+-#else /* defined (TARGET_PPC64) */
+=20
+-static inline void kvm_fixup_page_sizes(PowerPCCPU *cpu)
+-{
++    if (ppc_hash64_has(cpu, PPC_HASH64_CI_LARGEPAGE)) {
++        /* Mostly what guest pagesizes we can use are related to the
++         * host pages used to map guest RAM, which is handled in the
++         * platform code. Cache-Inhibited largepages (64k) however are
++         * used for I/O, so if they're mapped to the host at all it
++         * will be a normal mapping, not a special hugepage one used
++         * for RAM. */
++        if (getpagesize() < 0x10000) {
++            error_setg(errp,
++                       "KVM can't supply 64kiB CI pages, which guest exp=
+ects");
++        }
 +    }
-+    smc->default_caps.caps[SPAPR_CAP_HPT_MAXPAGESIZE] =3D mps;
+ }
+-
+ #endif /* !defined (TARGET_PPC64) */
+=20
+ unsigned long kvm_arch_vcpu_id(CPUState *cpu)
+@@ -551,9 +551,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     CPUPPCState *cenv =3D &cpu->env;
+     int ret;
+=20
+-    /* Gather server mmu info from KVM and update the CPU state */
+-    kvm_fixup_page_sizes(cpu);
+-
+     /* Synchronize sregs with kvm */
+     ret =3D kvm_arch_sync_sregs(cpu);
+     if (ret) {
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 443fca0a4e..657582bb32 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -71,6 +71,7 @@ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ul=
+ong flags, int shift);
+ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
+=20
+ bool kvmppc_hpt_needs_host_contiguous_pages(void);
++void kvm_check_mmu(PowerPCCPU *cpu, Error **errp);
+=20
+ #else
+=20
+@@ -227,6 +228,10 @@ static inline bool kvmppc_hpt_needs_host_contiguous_=
+pages(void)
+     return false;
  }
 =20
- DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 68a4243efc..6cdc0c94e7 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -27,6 +27,7 @@
- #include "qapi/visitor.h"
- #include "sysemu/hw_accel.h"
- #include "target/ppc/cpu.h"
-+#include "target/ppc/mmu-hash64.h"
- #include "cpu-models.h"
- #include "kvm_ppc.h"
-=20
-@@ -144,6 +145,42 @@ out:
-     g_free(val);
- }
-=20
-+static void spapr_cap_get_pagesize(Object *obj, Visitor *v, const char *=
-name,
-+                                   void *opaque, Error **errp)
++static inline void kvm_check_mmu(PowerPCCPU *cpu, Error **errp)
 +{
-+    sPAPRCapabilityInfo *cap =3D opaque;
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+    uint8_t val =3D spapr_get_cap(spapr, cap->index);
-+    uint64_t pagesize =3D (1ULL << val);
-+
-+    visit_type_size(v, name, &pagesize, errp);
 +}
 +
-+static void spapr_cap_set_pagesize(Object *obj, Visitor *v, const char *=
-name,
-+                                   void *opaque, Error **errp)
-+{
-+    sPAPRCapabilityInfo *cap =3D opaque;
-+    sPAPRMachineState *spapr =3D SPAPR_MACHINE(obj);
-+    uint64_t pagesize;
-+    uint8_t val;
-+    Error *local_err =3D NULL;
-+
-+    visit_type_size(v, name, &pagesize, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+
-+    if (!is_power_of_2(pagesize)) {
-+        error_setg(errp, "cap-%s must be a power of 2", cap->name);
-+        return;
-+    }
-+
-+    val =3D ctz64(pagesize);
-+    spapr->cmd_line_caps[cap->index] =3D true;
-+    spapr->eff.caps[cap->index] =3D val;
-+}
-+
- static void cap_htm_apply(sPAPRMachineState *spapr, uint8_t val, Error *=
-*errp)
+ static inline bool kvmppc_has_cap_spapr_vfio(void)
  {
-     if (!val) {
-@@ -267,6 +304,16 @@ static void cap_safe_indirect_branch_apply(sPAPRMach=
-ineState *spapr,
-=20
- #define VALUE_DESC_TRISTATE     " (broken, workaround, fixed)"
-=20
-+static void cap_hpt_maxpagesize_apply(sPAPRMachineState *spapr,
-+                                      uint8_t val, Error **errp)
-+{
-+    if (val < 12) {
-+        error_setg(errp, "Require at least 4kiB hpt-max-page-size");
-+    } else if (val < 16) {
-+        warn_report("Many guests require at least 64kiB hpt-max-page-siz=
-e");
-+    }
-+}
-+
- sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =3D {
-     [SPAPR_CAP_HTM] =3D {
-         .name =3D "htm",
-@@ -326,6 +373,15 @@ sPAPRCapabilityInfo capability_table[SPAPR_CAP_NUM] =
-=3D {
-         .possible =3D &cap_ibs_possible,
-         .apply =3D cap_safe_indirect_branch_apply,
-     },
-+    [SPAPR_CAP_HPT_MAXPAGESIZE] =3D {
-+        .name =3D "hpt-max-page-size",
-+        .description =3D "Maximum page size for Hash Page Table guests",
-+        .index =3D SPAPR_CAP_HPT_MAXPAGESIZE,
-+        .get =3D spapr_cap_get_pagesize,
-+        .set =3D spapr_cap_set_pagesize,
-+        .type =3D "int",
-+        .apply =3D cap_hpt_maxpagesize_apply,
-+    },
- };
-=20
- static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index 8a9142244f..4bc9dbff96 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -66,8 +66,10 @@ typedef enum {
- #define SPAPR_CAP_SBBC                  0x04
- /* Indirect Branch Serialisation */
- #define SPAPR_CAP_IBS                   0x05
-+/* HPT Maximum Page Size (encoded as a shift) */
-+#define SPAPR_CAP_HPT_MAXPAGESIZE       0x06
- /* Num Caps */
--#define SPAPR_CAP_NUM                   (SPAPR_CAP_IBS + 1)
-+#define SPAPR_CAP_NUM                   (SPAPR_CAP_HPT_MAXPAGESIZE + 1)
-=20
- /*
-  * Capability Values
+     return false;
 --=20
 2.17.1
