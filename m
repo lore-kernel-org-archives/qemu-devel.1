@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fWGwi-0006Zg-Pv
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:57:29 -0400
+	(envelope-from <clg@kaod.org>) id 1fWGwo-0006eo-T0
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:57:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fWGwf-0008TF-Is
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:57:28 -0400
-Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:35289)
+	(envelope-from <clg@kaod.org>) id 1fWGwl-0008W4-Qk
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:57:34 -0400
+Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:41042)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fWGwf-0008Qa-Ct
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:57:25 -0400
-Received: from player168.ha.ovh.net (unknown [10.109.105.96])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 6868DC66DE
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 09:57:23 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fWGwl-0008V3-KA
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:57:31 -0400
+Received: from player168.ha.ovh.net (unknown [10.109.122.88])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id BADB813A882
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 09:57:29 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Fri, 22 Jun 2018 09:56:59 +0200
-Message-Id: <20180622075700.5923-3-clg@kaod.org>
+Date: Fri, 22 Jun 2018 09:57:00 +0200
+Message-Id: <20180622075700.5923-4-clg@kaod.org>
 In-Reply-To: <20180622075700.5923-1-clg@kaod.org>
 References: <20180622075700.5923-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/3] aspeed: initialize the SCU controller
- first
+Subject: [Qemu-devel] [PATCH v2 3/3] aspeed/timer: use the APB frequency
+ from the SCU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,94 +33,124 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The System Control Unit should be initialized first as it drives all
-the configuration of the SoC and other device models.
+The timer controller can be driven by either an external 1MHz clock or
+by the APB clock. Today, the model makes the assumption that the APB
+frequency is always set to 24MHz but this is incorrect.
+
+The AST2400 SoC on the palmetto machines uses a 48MHz input clock
+source and the APB can be set to 48MHz. The consequence is a general
+system slowdown. The QEMU machines using the AST2500 SoC do not seem
+impacted today because the APB frequency is still set to 24MHz.
+
+We fix the timer frequency for all SoCs by linking the Timer model to
+the SCU model. The APB frequency driving the timers is now the one
+configured for the SoC.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Joel Stanley <joel@jms.id.au>
 ---
- hw/arm/aspeed_soc.c | 40 ++++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+ include/hw/timer/aspeed_timer.h |  4 ++++
+ hw/arm/aspeed_soc.c             |  2 ++
+ hw/timer/aspeed_timer.c         | 19 +++++++++++++++----
+ 3 files changed, 21 insertions(+), 4 deletions(-)
 
+diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_ti=
+mer.h
+index bd6c1a7f9609..040a08873432 100644
+--- a/include/hw/timer/aspeed_timer.h
++++ b/include/hw/timer/aspeed_timer.h
+@@ -24,6 +24,8 @@
+=20
+ #include "qemu/timer.h"
+=20
++typedef struct AspeedSCUState AspeedSCUState;
++
+ #define ASPEED_TIMER(obj) \
+     OBJECT_CHECK(AspeedTimerCtrlState, (obj), TYPE_ASPEED_TIMER);
+ #define TYPE_ASPEED_TIMER "aspeed.timer"
+@@ -55,6 +57,8 @@ typedef struct AspeedTimerCtrlState {
+     uint32_t ctrl;
+     uint32_t ctrl2;
+     AspeedTimer timers[ASPEED_TIMER_NR_TIMERS];
++
++    AspeedSCUState *scu;
+ } AspeedTimerCtrlState;
+=20
+ #endif /* ASPEED_TIMER_H */
 diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index 1955a892f4a4..7cc05ee27ea4 100644
+index 7cc05ee27ea4..e68911af0f90 100644
 --- a/hw/arm/aspeed_soc.c
 +++ b/hw/arm/aspeed_soc.c
-@@ -109,18 +109,6 @@ static void aspeed_soc_init(Object *obj)
-     object_initialize(&s->cpu, sizeof(s->cpu), sc->info->cpu_type);
-     object_property_add_child(obj, "cpu", OBJECT(&s->cpu), NULL);
+@@ -127,6 +127,8 @@ static void aspeed_soc_init(Object *obj)
 =20
--    object_initialize(&s->vic, sizeof(s->vic), TYPE_ASPEED_VIC);
--    object_property_add_child(obj, "vic", OBJECT(&s->vic), NULL);
--    qdev_set_parent_bus(DEVICE(&s->vic), sysbus_get_default());
--
--    object_initialize(&s->timerctrl, sizeof(s->timerctrl), TYPE_ASPEED_T=
+     object_initialize(&s->timerctrl, sizeof(s->timerctrl), TYPE_ASPEED_T=
 IMER);
--    object_property_add_child(obj, "timerctrl", OBJECT(&s->timerctrl), N=
+     object_property_add_child(obj, "timerctrl", OBJECT(&s->timerctrl), N=
 ULL);
--    qdev_set_parent_bus(DEVICE(&s->timerctrl), sysbus_get_default());
--
--    object_initialize(&s->i2c, sizeof(s->i2c), TYPE_ASPEED_I2C);
--    object_property_add_child(obj, "i2c", OBJECT(&s->i2c), NULL);
--    qdev_set_parent_bus(DEVICE(&s->i2c), sysbus_get_default());
--
-     object_initialize(&s->scu, sizeof(s->scu), TYPE_ASPEED_SCU);
-     object_property_add_child(obj, "scu", OBJECT(&s->scu), NULL);
-     qdev_set_parent_bus(DEVICE(&s->scu), sysbus_get_default());
-@@ -133,6 +121,18 @@ static void aspeed_soc_init(Object *obj)
-     object_property_add_alias(obj, "hw-prot-key", OBJECT(&s->scu),
-                               "hw-prot-key", &error_abort);
++    object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
++                                   OBJECT(&s->scu), &error_abort);
+     qdev_set_parent_bus(DEVICE(&s->timerctrl), sysbus_get_default());
 =20
-+    object_initialize(&s->vic, sizeof(s->vic), TYPE_ASPEED_VIC);
-+    object_property_add_child(obj, "vic", OBJECT(&s->vic), NULL);
-+    qdev_set_parent_bus(DEVICE(&s->vic), sysbus_get_default());
-+
-+    object_initialize(&s->timerctrl, sizeof(s->timerctrl), TYPE_ASPEED_T=
-IMER);
-+    object_property_add_child(obj, "timerctrl", OBJECT(&s->timerctrl), N=
-ULL);
-+    qdev_set_parent_bus(DEVICE(&s->timerctrl), sysbus_get_default());
-+
-+    object_initialize(&s->i2c, sizeof(s->i2c), TYPE_ASPEED_I2C);
-+    object_property_add_child(obj, "i2c", OBJECT(&s->i2c), NULL);
-+    qdev_set_parent_bus(DEVICE(&s->i2c), sysbus_get_default());
-+
-     object_initialize(&s->fmc, sizeof(s->fmc), sc->info->fmc_typename);
-     object_property_add_child(obj, "fmc", OBJECT(&s->fmc), NULL);
-     qdev_set_parent_bus(DEVICE(&s->fmc), sysbus_get_default());
-@@ -195,6 +195,14 @@ static void aspeed_soc_realize(DeviceState *dev, Err=
-or **errp)
-     memory_region_add_subregion(get_system_memory(), ASPEED_SOC_SRAM_BAS=
-E,
-                                 &s->sram);
+     object_initialize(&s->i2c, sizeof(s->i2c), TYPE_ASPEED_I2C);
+diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
+index 1e31e22b6f1f..5e3f51b66b43 100644
+--- a/hw/timer/aspeed_timer.c
++++ b/hw/timer/aspeed_timer.c
+@@ -10,8 +10,10 @@
+  */
 =20
-+    /* SCU */
-+    object_property_set_bool(OBJECT(&s->scu), true, "realized", &err);
-+    if (err) {
+ #include "qemu/osdep.h"
++#include "qapi/error.h"
+ #include "hw/sysbus.h"
+ #include "hw/timer/aspeed_timer.h"
++#include "hw/misc/aspeed_scu.h"
+ #include "qemu-common.h"
+ #include "qemu/bitops.h"
+ #include "qemu/timer.h"
+@@ -26,7 +28,6 @@
+ #define TIMER_CLOCK_USE_EXT true
+ #define TIMER_CLOCK_EXT_HZ 1000000
+ #define TIMER_CLOCK_USE_APB false
+-#define TIMER_CLOCK_APB_HZ 24000000
+=20
+ #define TIMER_REG_STATUS 0
+ #define TIMER_REG_RELOAD 1
+@@ -80,11 +81,11 @@ static inline bool timer_external_clock(AspeedTimer *=
+t)
+     return timer_ctrl_status(t, op_external_clock);
+ }
+=20
+-static uint32_t clock_rates[] =3D { TIMER_CLOCK_APB_HZ, TIMER_CLOCK_EXT_=
+HZ };
+-
+ static inline uint32_t calculate_rate(struct AspeedTimer *t)
+ {
+-    return clock_rates[timer_external_clock(t)];
++    AspeedTimerCtrlState *s =3D timer_to_ctrl(t);
++
++    return timer_external_clock(t) ? TIMER_CLOCK_EXT_HZ : s->scu->apb_fr=
+eq;
+ }
+=20
+ static inline uint32_t calculate_ticks(struct AspeedTimer *t, uint64_t n=
+ow_ns)
+@@ -449,6 +450,16 @@ static void aspeed_timer_realize(DeviceState *dev, E=
+rror **errp)
+     int i;
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+     AspeedTimerCtrlState *s =3D ASPEED_TIMER(dev);
++    Object *obj;
++    Error *err =3D NULL;
++
++    obj =3D object_property_get_link(OBJECT(dev), "scu", &err);
++    if (!obj) {
 +        error_propagate(errp, err);
++        error_prepend(errp, "required link 'scu' not found: ");
 +        return;
 +    }
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->scu), 0, ASPEED_SOC_SCU_BASE);
-+
-     /* VIC */
-     object_property_set_bool(OBJECT(&s->vic), true, "realized", &err);
-     if (err) {
-@@ -219,14 +227,6 @@ static void aspeed_soc_realize(DeviceState *dev, Err=
-or **errp)
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->timerctrl), i, irq);
-     }
++    s->scu =3D ASPEED_SCU(obj);
 =20
--    /* SCU */
--    object_property_set_bool(OBJECT(&s->scu), true, "realized", &err);
--    if (err) {
--        error_propagate(errp, err);
--        return;
--    }
--    sysbus_mmio_map(SYS_BUS_DEVICE(&s->scu), 0, ASPEED_SOC_SCU_BASE);
--
-     /* UART - attach an 8250 to the IO space as our UART5 */
-     if (serial_hd(0)) {
-         qemu_irq uart5 =3D qdev_get_gpio_in(DEVICE(&s->vic), uart_irqs[4=
-]);
+     for (i =3D 0; i < ASPEED_TIMER_NR_TIMERS; i++) {
+         aspeed_init_one_timer(s, i);
 --=20
 2.13.6
