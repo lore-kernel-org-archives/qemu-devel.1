@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWDFQ-0002oX-RF
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:00:34 -0400
+	(envelope-from <bounces@canonical.com>) id 1fWDPT-0004E7-B9
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:10:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWDFN-0004se-MK
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:00:32 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:35294)
+	(envelope-from <bounces@canonical.com>) id 1fWDPQ-0008Kx-36
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:10:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49296)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWDFN-0004sK-GR
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:00:29 -0400
-Received: by mail-qt0-x244.google.com with SMTP id z6-v6so4908822qti.2
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 21:00:29 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1529568501.git.balaton@eik.bme.hu>
-	<9933d3e471467712047b5e60627bad2e3a38bcae.1529568501.git.balaton@eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0240b908-ee0b-84ca-b10c-fbae34720f6d@amsat.org>
-Date: Fri, 22 Jun 2018 01:00:23 -0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fWDPP-0008Ks-Pg
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:10:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fWDPO-0001wa-Tj
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 04:10:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DFE972E8019
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 04:10:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <9933d3e471467712047b5e60627bad2e3a38bcae.1529568501.git.balaton@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] sm501: Implement i2c part for reading
- monitor EDID
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 22 Jun 2018 04:02:21 -0000
+From: Matthew Stapleton <matthew4196@gmail.com>
+Reply-To: Bug 1777969 <1777969@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152954819319.7254.2594756503297361665.malonedeb@wampee.canonical.com>
+Message-Id: <152964014137.7019.17761606205561114191.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1777969] Re: Crash with UEFI, q35, AHCI,
+ and <= SystemRescueCD 4.3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,397 +37,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Sebastian Bauer <mail@sebastianbauer.info>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-Hi Zoltan,
+Okay thanks.  I forgot to mention I am running the Gentoo version of
+kernel 4.14 series.  Here is the configure settings for gcc from my
+desktop system used to reproduce the crash that originally occurred on
+the hardened server, and even though the desktop system isn't using
+hardened profile, this gcc is using some hardened features:
 
-On 06/21/2018 05:08 AM, BALATON Zoltan wrote:
-> Emulate the i2c part of SM501 which is used to access the EDID info
-> from a monitor.
-> 
-> The vmstate structure is changed and its version is increased but
-> SM501 is only used on SH and PPC sam460ex machines that don't support
-> cross-version migration.
-> 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->  default-configs/ppc-softmmu.mak    |   1 +
->  default-configs/ppcemb-softmmu.mak |   1 +
->  default-configs/sh4-softmmu.mak    |   2 +
->  default-configs/sh4eb-softmmu.mak  |   2 +
->  hw/display/sm501.c                 | 136 +++++++++++++++++++++++++++++++++++--
->  5 files changed, 138 insertions(+), 4 deletions(-)
-> 
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-> index b8b0526..e131e24 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -24,6 +24,7 @@ CONFIG_ETSEC=y
->  # For Sam460ex
->  CONFIG_USB_EHCI_SYSBUS=y
->  CONFIG_SM501=y
-> +CONFIG_DDC=y
->  CONFIG_IDE_SII3112=y
->  CONFIG_I2C=y
->  CONFIG_BITBANG_I2C=y
-> diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
-> index 37af193..ac44f15 100644
-> --- a/default-configs/ppcemb-softmmu.mak
-> +++ b/default-configs/ppcemb-softmmu.mak
-> @@ -17,6 +17,7 @@ CONFIG_XILINX=y
->  CONFIG_XILINX_ETHLITE=y
->  CONFIG_USB_EHCI_SYSBUS=y
->  CONFIG_SM501=y
-> +CONFIG_DDC=y
->  CONFIG_IDE_SII3112=y
->  CONFIG_I2C=y
->  CONFIG_BITBANG_I2C=y
-> diff --git a/default-configs/sh4-softmmu.mak b/default-configs/sh4-softmmu.mak
-> index 546d855..caeccd5 100644
-> --- a/default-configs/sh4-softmmu.mak
-> +++ b/default-configs/sh4-softmmu.mak
-> @@ -9,6 +9,8 @@ CONFIG_PFLASH_CFI02=y
->  CONFIG_SH4=y
->  CONFIG_IDE_MMIO=y
->  CONFIG_SM501=y
-> +CONFIG_I2C=y
-> +CONFIG_DDC=y
->  CONFIG_ISA_TESTDEV=y
->  CONFIG_I82378=y
->  CONFIG_I8259=y
-> diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/sh4eb-softmmu.mak
-> index 2d3fd49..53b9cd7 100644
-> --- a/default-configs/sh4eb-softmmu.mak
-> +++ b/default-configs/sh4eb-softmmu.mak
-> @@ -9,6 +9,8 @@ CONFIG_PFLASH_CFI02=y
->  CONFIG_SH4=y
->  CONFIG_IDE_MMIO=y
->  CONFIG_SM501=y
-> +CONFIG_I2C=y
-> +CONFIG_DDC=y
->  CONFIG_ISA_TESTDEV=y
->  CONFIG_I82378=y
->  CONFIG_I8259=y
-> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> index ca0840f..0625cf5 100644
-> --- a/hw/display/sm501.c
-> +++ b/hw/display/sm501.c
-> @@ -26,6 +26,7 @@
->  #include "qemu/osdep.h"
->  #include "qemu/cutils.h"
->  #include "qapi/error.h"
-> +#include "qemu/log.h"
->  #include "qemu-common.h"
->  #include "cpu.h"
->  #include "hw/hw.h"
-> @@ -34,6 +35,8 @@
->  #include "hw/devices.h"
->  #include "hw/sysbus.h"
->  #include "hw/pci/pci.h"
-> +#include "hw/i2c/i2c.h"
-> +#include "hw/i2c/i2c-ddc.h"
->  #include "qemu/range.h"
->  #include "ui/pixel_ops.h"
->  
-> @@ -471,10 +474,12 @@ typedef struct SM501State {
->      MemoryRegion local_mem_region;
->      MemoryRegion mmio_region;
->      MemoryRegion system_config_region;
-> +    MemoryRegion i2c_region;
->      MemoryRegion disp_ctrl_region;
->      MemoryRegion twoD_engine_region;
->      uint32_t last_width;
->      uint32_t last_height;
-> +    I2CBus *i2c_bus;
->  
->      /* mmio registers */
->      uint32_t system_control;
-> @@ -487,6 +492,11 @@ typedef struct SM501State {
->      uint32_t misc_timing;
->      uint32_t power_mode_control;
->  
-> +    uint8_t i2c_byte_count;
-> +    uint8_t i2c_status;
-> +    uint8_t i2c_addr;
-> +    uint8_t i2c_data[16];
+/var/tmp/portage/sys-devel/gcc-5.4.0-r3/work/gcc-5.4.0/configure
+--host=3Dx86_64-pc-linux-gnu --build=3Dx86_64-pc-linux-gnu --prefix=3D/usr
+--bindir=3D/usr/x86_64-pc-linux-gnu/gcc-bin/5.4.0
+--includedir=3D/usr/lib/gcc/x86_64-pc-linux-gnu/5.4.0/include
+--datadir=3D/usr/share/gcc-data/x86_64-pc-linux-gnu/5.4.0
+--mandir=3D/usr/share/gcc-data/x86_64-pc-linux-gnu/5.4.0/man
+--infodir=3D/usr/share/gcc-data/x86_64-pc-linux-gnu/5.4.0/info --with-gxx-
+include-dir=3D/usr/lib/gcc/x86_64-pc-linux-gnu/5.4.0/include/g++-v5
+--with-python-dir=3D/share/gcc-data/x86_64-pc-linux-gnu/5.4.0/python
+--enable-languages=3Dc,c++,fortran --enable-obsolete --enable-secureplt
+--disable-werror --with-system-zlib --enable-nls --without-included-
+gettext --enable-checking=3Drelease --with-bugurl=3Dhttps://bugs.gentoo.org/
+--with-pkgversion=3D'Gentoo 5.4.0-r3 p1.3, pie-0.6.5' --enable-libstdcxx-
+time --enable-shared --enable-threads=3Dposix --enable-__cxa_atexit
+--enable-clocale=3Dgnu --enable-multilib --with-multilib-list=3Dm32,m64
+--disable-altivec --disable-fixed-point --enable-targets=3Dall --disable-
+libgcj --enable-libgomp --disable-libmudflap --disable-libssp --disable-
+libcilkrts --disable-libmpx --enable-vtable-verify --enable-libvtv
+--enable-lto --without-isl --enable-libsanitizer
 
-Using:
-       uint8_t i2c_regs[0x20];
+-- =
 
-Would ease vmstate management and further refactors.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1777969
 
-> +
->      uint32_t uart0_ier;
->      uint32_t uart0_lcr;
->      uint32_t uart0_mcr;
-> @@ -897,6 +907,107 @@ static const MemoryRegionOps sm501_system_config_ops = {
->      .endianness = DEVICE_LITTLE_ENDIAN,
->  };
->  
+Title:
+  Crash with UEFI, q35, AHCI, and <=3D SystemRescueCD 4.3.0
 
-To help code review you can use the "hw/registerfields.h" API:
+Status in QEMU:
+  New
 
-FIELD(CTRL, ENABLE,       0, 1)
-FIELD(CTRL, BUS_SPEED,    1, 1)
-FIELD(CTRL, START,        2, 1)
-FIELD(CTRL, INT_ENABLE,   4, 1)
-FIELD(CTRL, INT_ACK,      5, 1)
-FIELD(CTRL, REPEAT_START, 6, 1)
+Bug description:
+  I am getting a crash when booting <=3D SystemRescueCD 4.3.0 in UEFI mode
+  with q35 machine and from a AHCI device with qemu 2.11.1 and 2.12.0.
+  The crash doesn't occur if I compile with --enable-trace-
+  backends=3Dsimple or if I use virtio-scsi.  The original crash was
+  noticed on Gentoo with hardened gcc 6.4.0 and an Intel CPU, the test
+  system to reproduce the crash is on Gentoo with non-hardened gcc 5.4.0
+  and an Intel CPU.
 
-FIELD(STATUS, BUSY,       0, 1)
-FIELD(STATUS, ACK,        1, 1)
-FIELD(STATUS, ERROR,      2, 1)
-FIELD(STATUS, COMPLETE,   3, 1)
+  OVMF version is from Gentoo: edk2-ovmf-2017_p20180211-bin.tar.xz
 
-FIELD(RESET, ERROR,       2, 1)
+  Here is the commands I have run on qemu 2.12.0 to reproduce the issue alt=
+hough it also crashes with accel=3Dkvm removed:
+  ./configure --target-list=3D"x86_64-softmmu"
+  make
+  qemu-system-x86_64 -nodefaults -machine q35,accel=3Dkvm -cpu qemu64 -driv=
+e if=3Dpflash,format=3Draw,unit=3D0,file=3D/usr/share/edk2-ovmf/OVMF_CODE.f=
+d,readonly=3Don -drive if=3Dpflash,format=3Draw,unit=3D1,file=3DOVMF_VARS.f=
+d -m 512 -drive file=3Dsystemrescuecd-x86-4.3.0.iso,if=3Dnone,id=3Dcdrom-sy=
+sresc,readonly=3Don -device ide-cd,bus=3Dide.0,unit=3D0,drive=3Dcdrom-sysre=
+sc,bootindex=3D5 -device VGA -display gtk
 
-> +static uint64_t sm501_i2c_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    SM501State *s = (SM501State *)opaque;
-> +    uint8_t ret = 0;
-> +
-> +    switch (addr) {
-> +    case SM501_I2C_BYTE_COUNT:
-> +        ret = s->i2c_byte_count;
-> +        break;
-> +    case SM501_I2C_STATUS:
-> +        ret = s->i2c_status;
-> +        break;
-> +    case SM501_I2C_SLAVE_ADDRESS:
-> +        ret = s->i2c_addr;
-> +        break;
-> +    case SM501_I2C_DATA ... SM501_I2C_DATA + 15:
-> +        ret = s->i2c_data[addr - SM501_I2C_DATA];
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_UNIMP, "sm501 i2c : not implemented register read."
-> +                      " addr=0x%" HWADDR_PRIx "\n", addr);
-> +    }
-> +
-> +    SM501_DPRINTF("sm501 i2c regs : read addr=%" HWADDR_PRIx " val=%x\n",
-> +                  addr, ret);
+  Valgrind says "Bad permissions for mapped region at address
+  0x4C022FE0" for the crash.
 
-At some point we should replace the SM501_DPRINTF() macro by trace events.
+  Here is a backtrace from gdb:
+  Program received signal SIGSEGV, Segmentation fault.
+  0x00007f42dcbc5833 in malloc () from /lib64/libc.so.6
+  (gdb) bt
+  #0  0x00007f42dcbc5833 in malloc () from /lib64/libc.so.6
+  #1  0x00007f42e10117d9 in g_malloc () from /usr/lib64/libglib-2.0.so.0
+  #2  0x000055a3ff9def8f in qemu_aio_get (aiocb_info=3Daiocb_info@entry=3D0=
+x55a4001b39a0 <thread_pool_aiocb_info>, bs=3Dbs@entry=3D0x0, cb=3Dcb@entry=
+=3D0x55a3ff9dfe20 <thread_pool_co_cb>, opaque=3Dopaque@entry=3D0x7f42961e30=
+b0) at util/aiocb.c:33
+  #3  0x000055a3ff9e0249 in thread_pool_submit_aio (pool=3Dpool@entry=3D0x5=
+5a400c038d0, func=3Dfunc@entry=3D0x55a3ff956620 <aio_worker>, arg=3Darg@ent=
+ry=3D0x55a400bd30b0, cb=3Dcb@entry=3D0x55a3ff9dfe20 <thread_pool_co_cb>, =
 
-> +    return ret;
-> +}
-> +
-> +static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
-> +                            unsigned size)
-> +{
-> +    SM501State *s = (SM501State *)opaque;
-> +    SM501_DPRINTF("sm501 i2c regs : write addr=%" HWADDR_PRIx
-> +                  " val=%" PRIx64 "\n", addr, value);
-> +
-> +    switch (addr) {
-> +    case SM501_I2C_BYTE_COUNT:
-> +        s->i2c_byte_count = value & 0xf;
-> +        break;
-> +    case SM501_I2C_CONTROL:
-> +        if (value & 1) {
+      opaque=3Dopaque@entry=3D0x7f42961e30b0) at util/thread-pool.c:251
+  #4  0x000055a3ff9e0423 in thread_pool_submit_co (pool=3D0x55a400c038d0, f=
+unc=3Dfunc@entry=3D0x55a3ff956620 <aio_worker>, arg=3Darg@entry=3D0x55a400b=
+d30b0) at util/thread-pool.c:289
+  #5  0x000055a3ff956b50 in paio_submit_co (bs=3D0x55a400bff180, fd=3D<opti=
+mized out>, offset=3D362702848, qiov=3D<optimized out>, bytes=3D2048, type=
+=3D1) at block/file-posix.c:1536
+  #6  0x000055a3ff95c82a in bdrv_driver_preadv (bs=3Dbs@entry=3D0x55a400bff=
+180, offset=3Doffset@entry=3D362702848, bytes=3Dbytes@entry=3D2048, qiov=3D=
+qiov@entry=3D0x7f42961e3650, flags=3D0) at block/io.c:924
+  #7  0x000055a3ff960154 in bdrv_aligned_preadv (child=3Dchild@entry=3D0x55=
+a400c03a20, req=3Dreq@entry=3D0x7f42961e32e0, offset=3Doffset@entry=3D36270=
+2848, bytes=3Dbytes@entry=3D2048, align=3Dalign@entry=3D1, qiov=3Dqiov@entr=
+y=3D0x7f42961e3650, flags=3D0)
+      at block/io.c:1228
+  #8  0x000055a3ff960434 in bdrv_co_preadv (child=3D0x55a400c03a20, offset=
+=3D362702848, bytes=3D2048, qiov=3D0x7f42961e3650, flags=3D0) at block/io.c=
+:1324
+  #9  0x000055a3ff95c82a in bdrv_driver_preadv (bs=3Dbs@entry=3D0x55a400bf8=
+e50, offset=3Doffset@entry=3D362702848, bytes=3Dbytes@entry=3D2048, qiov=3D=
+qiov@entry=3D0x7f42961e3650, flags=3D0) at block/io.c:924
+  #10 0x000055a3ff960154 in bdrv_aligned_preadv (child=3Dchild@entry=3D0x55=
+a400be92c0, req=3Dreq@entry=3D0x7f42961e3510, offset=3Doffset@entry=3D36270=
+2848, bytes=3Dbytes@entry=3D2048, align=3Dalign@entry=3D512, qiov=3Dqiov@en=
+try=3D0x7f42961e3650, flags=3D0)
+      at block/io.c:1228
+  #11 0x000055a3ff960434 in bdrv_co_preadv (child=3D0x55a400be92c0, offset=
+=3Doffset@entry=3D362702848, bytes=3Dbytes@entry=3D2048, qiov=3Dqiov@entry=
+=3D0x7f42961e3650, flags=3Dflags@entry=3D0) at block/io.c:1324
+  #12 0x000055a3ff94f4ce in blk_co_preadv (blk=3D0x55a400bf8ba0, offset=3D3=
+62702848, bytes=3D2048, qiov=3D0x7f42961e3650, flags=3D0) at block/block-ba=
+ckend.c:1158
+  #13 0x000055a3ff94f5ac in blk_read_entry (opaque=3D0x7f42961e3670) at blo=
+ck/block-backend.c:1206
+  #14 0x000055a3ff94e000 in blk_prw (blk=3D0x55a400bf8ba0, offset=3D3627028=
+48, buf=3D<optimized out>, bytes=3Dbytes@entry=3D2048, co_entry=3Dco_entry@=
+entry=3D0x55a3ff94f590 <blk_read_entry>, flags=3Dflags@entry=3D0) at block/=
+block-backend.c:1243
+  #15 0x000055a3ff94f076 in blk_pread (blk=3D<optimized out>, offset=3D<opt=
+imized out>, buf=3D<optimized out>, count=3Dcount@entry=3D2048) at block/bl=
+ock-backend.c:1409
+  #16 0x000055a3ff7d8b93 in cd_read_sector_sync (s=3D0x55a401a0faa0) at hw/=
+ide/atapi.c:124
+  #17 ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at hw/ide/atapi.c:269
+  #18 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #19 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #20 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #21 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #22 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #23 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #24 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #25 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #26 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #27 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #28 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #29 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #30 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #31 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #32 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #33 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #34 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #35 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #36 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #37 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #38 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #39 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #40 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #41 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #42 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #43 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
+  #44 0x000055a3ff7dde0e in ahci_start_transfer (dma=3D0x55a401a0f9f0) at h=
+w/ide/ahci.c:1325
+  #45 0x000055a3ff7d870c in ide_atapi_cmd_reply_end (s=3D0x55a401a0faa0) at=
+ hw/ide/atapi.c:285
 
-               value & R_CTRL_ENABLE_MASK
-
-> +            if (value & 4) {
-
-                   value & R_CTRL_START_MASK
-
-> +                int res = i2c_start_transfer(s->i2c_bus,
-> +                                             s->i2c_addr >> 1,
-> +                                             s->i2c_addr & 1);
-> +                s->i2c_status |= (res ? 1 << 2 : 0);
-
-Hmm if you previously had the ERROR bit set, you don't clear it.
-
-                   s->i2c_status = FIELD_DP32(s->i2c_status, STATUS,
-                                              ERROR, res);
-
-> +                if (!res) {
-> +                    int i;
-> +                    SM501_DPRINTF("sm501 i2c : transferring %d bytes to 0x%x\n",
-> +                                  s->i2c_byte_count + 1, s->i2c_addr >> 1);
-> +                    for (i = 0; i <= s->i2c_byte_count; i++) {
-> +                        res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
-> +                                            !(s->i2c_addr & 1));
-> +                        if (res) {
-> +                            SM501_DPRINTF("sm501 i2c : transfer failed"
-> +                                          " i=%d, res=%d\n", i, res);
-> +                            s->i2c_status |= (res ? 1 << 2 : 0);
-
-Ditto.
-
-This could be a goto transfer_error at end of func.
-
-> +                            return;
-> +                        }
-> +                    }
-> +                    if (i) {
-> +                        SM501_DPRINTF("sm501 i2c : transferred %d bytes\n", i);
-> +                        s->i2c_status = 8;
-
-                           s->i2c_status = R_STATUS_COMPLETE_MASK;
-
-> +                    }
-> +                }
-> +            } else {
-> +                SM501_DPRINTF("sm501 i2c : end transfer\n");
-> +                i2c_end_transfer(s->i2c_bus);
-> +                s->i2c_status &= ~4;
-
-                   s->i2c_status &= ~R_STATUS_ERROR_MASK;
-
-> +            }
-> +        }
-> +        break;
-> +    case SM501_I2C_RESET:
-> +            s->i2c_status &= ~4;
-
-I understand "0 clear" as:
-
-               if (FIELD_EX32(value, RESET, ERROR) == 0) {
-                   s->i2c_status &= ~R_STATUS_ERROR_MASK;
-               }
-
-also:
-
-               value &= ~R_RESET_ERROR_MASK;
-               if (value) {
-                   qemu_log_mask(LOG_GUEST_ERROR,
-                                 "sm501_i2c_write(RESET) bad value...",
-                                 value);
-               }
-
-> +        break;
-> +    case SM501_I2C_SLAVE_ADDRESS:
-> +        s->i2c_addr = value & 0xff;
-
-Implicit mask, fine.
-
-> +        break;
-> +    case SM501_I2C_DATA ... SM501_I2C_DATA + 15:
-> +        s->i2c_data[addr - SM501_I2C_DATA] = value & 0xff;
-
-Ditto.
-
-> +        break;
-> +    default:
-> +        qemu_log_mask(LOG_UNIMP, "sm501 i2c : not implemented register write. "
-> +                      "addr=0x%" HWADDR_PRIx " val=%" PRIx64 "\n", addr, value);
-> +    }
-> +}
-> +
-> +static const MemoryRegionOps sm501_i2c_ops = {
-> +    .read = sm501_i2c_read,
-> +    .write = sm501_i2c_write,
-> +    .valid = {
-> +        .min_access_size = 1,
-> +        .max_access_size = 4,
-
-Per "Table 9-1: GPIO and I2C Register Summary" valid.max_access_size is
-1 (8-bit registers) for registers 0, 1, 2, 3;
-and 4 for registers 4 to 15.
-
-To keep things simple you could add in sm501_i2c_read/sm501_i2c_write
-prologue:
-
-       if (addr < 4 && size > 1) {
-           qemu_log_mask(LOG_GUEST_ERROR, ...
-           return ...
-       }
-
-> +    },
-> +    .impl = {
-> +        .min_access_size = 1,
-> +        .max_access_size = 1,
-> +    },
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +};
-> +
->  static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
->  {
->      SM501State *s = (SM501State *)opaque;
-> @@ -1577,6 +1688,10 @@ static void sm501_reset(SM501State *s)
->      s->irq_mask = 0;
->      s->misc_timing = 0;
->      s->power_mode_control = 0;
-> +    s->i2c_byte_count = 0;
-> +    s->i2c_status = 0;
-> +    s->i2c_addr = 0;
-> +    memset(s->i2c_data, 0, 16);
->      s->dc_panel_control = 0x00010000; /* FIFO level 3 */
->      s->dc_video_control = 0;
->      s->dc_crt_control = 0x00010000;
-> @@ -1615,6 +1730,11 @@ static void sm501_init(SM501State *s, DeviceState *dev,
->      memory_region_set_log(&s->local_mem_region, true, DIRTY_MEMORY_VGA);
->      s->local_mem = memory_region_get_ram_ptr(&s->local_mem_region);
->  
-> +    /* i2c */
-> +    s->i2c_bus = i2c_init_bus(dev, "sm501.i2c");
-
-       /* ddc */
-
-> +    I2CDDCState *ddc = I2CDDC(qdev_create(BUS(s->i2c_bus), TYPE_I2CDDC));
-> +    i2c_set_slave_address(I2C_SLAVE(ddc), 0x50);
-
-I think this is board/screen related but that's way easier this way.
-
-> +
->      /* mmio */
->      memory_region_init(&s->mmio_region, OBJECT(dev), "sm501.mmio", MMIO_SIZE);
->      memory_region_init_io(&s->system_config_region, OBJECT(dev),
-> @@ -1622,6 +1742,9 @@ static void sm501_init(SM501State *s, DeviceState *dev,
->                            "sm501-system-config", 0x6c);
->      memory_region_add_subregion(&s->mmio_region, SM501_SYS_CONFIG,
->                                  &s->system_config_region);
-> +    memory_region_init_io(&s->i2c_region, OBJECT(dev), &sm501_i2c_ops, s,
-> +                          "sm501-i2c", 0x14);
-
-Per "Figure 9-2: GPIO / I2C Master Register Space" the region size is 0x20.
-
-> +    memory_region_add_subregion(&s->mmio_region, SM501_I2C, &s->i2c_region);
->      memory_region_init_io(&s->disp_ctrl_region, OBJECT(dev),
->                            &sm501_disp_ctrl_ops, s,
->                            "sm501-disp-ctrl", 0x1000);
-> @@ -1705,6 +1828,11 @@ static const VMStateDescription vmstate_sm501_state = {
->          VMSTATE_UINT32(twoD_destination_base, SM501State),
->          VMSTATE_UINT32(twoD_alpha, SM501State),
->          VMSTATE_UINT32(twoD_wrap, SM501State),
-> +        /* Added in version 2 */
-> +        VMSTATE_UINT8(i2c_byte_count, SM501State),
-> +        VMSTATE_UINT8(i2c_status, SM501State),
-> +        VMSTATE_UINT8(i2c_addr, SM501State),
-> +        VMSTATE_UINT8_ARRAY(i2c_data, SM501State, 16),
->          VMSTATE_END_OF_LIST()
->       }
->  };
-> @@ -1770,8 +1898,8 @@ static void sm501_reset_sysbus(DeviceState *dev)
->  
->  static const VMStateDescription vmstate_sm501_sysbus = {
->      .name = TYPE_SYSBUS_SM501,
-> -    .version_id = 1,
-> -    .minimum_version_id = 1,
-> +    .version_id = 2,
-> +    .minimum_version_id = 2,
->      .fields = (VMStateField[]) {
->          VMSTATE_STRUCT(state, SM501SysBusState, 1,
->                         vmstate_sm501_state, SM501State),
-> @@ -1843,8 +1971,8 @@ static void sm501_reset_pci(DeviceState *dev)
->  
->  static const VMStateDescription vmstate_sm501_pci = {
->      .name = TYPE_PCI_SM501,
-> -    .version_id = 1,
-> -    .minimum_version_id = 1,
-> +    .version_id = 2,
-> +    .minimum_version_id = 2,
->      .fields = (VMStateField[]) {
->          VMSTATE_PCI_DEVICE(parent_obj, SM501PCIState),
->          VMSTATE_STRUCT(state, SM501PCIState, 1,
-> 
-
-Fixing "0 clear" and region size to 0x20:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Regards,
-
-Phil.
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1777969/+subscriptions
