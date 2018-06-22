@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fWMle-0004Zz-Ch
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:10:27 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1fWMlq-0004lm-P2
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:10:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fWMlZ-0005U3-Mf
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:10:26 -0400
-References: <152967373830.876.17089841294743780259@d39dc562802a>
-	<5df62baa-268b-2624-e9d7-42c521546d04@de.ibm.com>
-	<20180622154708.37167025.cohuck@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a237bbc8-deb5-643f-a81b-b5752f628863@redhat.com>
-Date: Fri, 22 Jun 2018 09:10:15 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1fWMll-0005Y2-On
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:10:38 -0400
+Received: from mail-he1eur01hn0242.outbound.protection.outlook.com
+	([104.47.0.242]:11919
+	helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+	id 1fWMlk-0005XG-Gw
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:10:33 -0400
+Date: Fri, 22 Jun 2018 17:10:15 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20180622141015.GA15836@rkaganb.sw.ru>
+References: <20180517162342.4330-1-viktor.prutyanov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20180622154708.37167025.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] s390/ipl: fix ipl with -no-reboot
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180517162342.4330-1-viktor.prutyanov@virtuozzo.com>
+Subject: Re: [Qemu-devel] [PATCH 0/4] dump: add Windows crashdump format
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: frankja@linux.vnet.ibm.com, thuth@redhat.com, famz@redhat.com, david@redhat.com, qemu-devel@nongnu.org, agraf@suse.de, qemu-s390x@nongnu.org, pasic@linux.vnet.ibm.com, pbonzini@redhat.com, rth@twiddle.net
+To: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, marcandre.lureau@redhat.com, dgilbert@redhat.com, armbru@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On 06/22/2018 08:47 AM, Cornelia Huck wrote:
-
->>> /tmp/qemu-test/src/nbd/server.c: In function 'nbd_trip':
->>> /tmp/qemu-test/src/nbd/server.c:1980:19: error: 'end' may be used uninitialized in this function [-Werror=maybe-uninitialized]
->>>       *length = end - offset;
->>>                 ~~~~^~~~~~~~
->>> /tmp/qemu-test/src/nbd/server.c:1940:30: note: 'end' was declared here
->>>       uint64_t begin = offset, end;
->>>                                ^~~
->>> cc1: all warnings being treated as errors
->>
->> This seems unrelated to the patch?
->>
+On Thu, May 17, 2018 at 07:23:38PM +0300, Viktor Prutyanov wrote:
+> Recently a Windows guest driver has been added with the ability to
+> publish the data needed to produce useful guest dumps on the
+> hypervisor side.  The data is wrapped in a standard VMCOREINFO
+> container and is exposed to the hypervisor via FwCfg (see
+> https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/fwcfg64)
 > 
-> Yes, the last few patches all failed with this error.
+> This patch series extends dump-guest-memory to make use of this data
+> and generate guest dumps in Windows crashdump format directly in QEMU
+> (as opposed to postprocessing the traditional ELF dumps).
+> 
+> The first patch in the series is identical to the one posted two weeks
+> ago with message-id: <20180501132031.13270-1-viktor.prutyanov@virtuozzo.com>.
+> The rest are various improvements on top of it, making it useful in
+> situations beyond immediately after a BSOD.
+> 
+> Viktor Prutyanov (4):
+>   dump: add Windows dump format to dump-guest-memory
+>   dump: use system context in Windows dump
+>   dump: add fallback KDBG using in Windows dump
+>   dump: add Windows live system dump
+> 
+>  Makefile.target |   1 +
+>  dump.c          |  24 +++-
+>  hmp-commands.hx |  13 +-
+>  hmp.c           |   9 +-
+>  qapi/misc.json  |   5 +-
+>  win_dump.c      | 385 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  win_dump.h      | 176 ++++++++++++++++++++++++++
+>  7 files changed, 604 insertions(+), 9 deletions(-)
+>  create mode 100644 win_dump.c
+>  create mode 100644 win_dump.h
+> 
 
-And fixed now, with commit 45eb6fb
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Ping?
