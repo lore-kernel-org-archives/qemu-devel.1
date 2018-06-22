@@ -1,35 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <loseweigh@gmail.com>) id 1fWTxb-0006fi-0p
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:51:16 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fWU1q-0007iI-QM
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:55:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <loseweigh@gmail.com>) id 1fWTxZ-0005dS-TT
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:51:15 -0400
-Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:56134)
+	(envelope-from <alex.bennee@linaro.org>) id 1fWU1n-0007RY-My
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:55:38 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:56231)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <loseweigh@gmail.com>) id 1fWTxZ-0005d3-Nc
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:51:13 -0400
-Received: by mail-it0-x241.google.com with SMTP id 16-v6so4790641itl.5
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 14:51:13 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fWU1n-0007Qy-Bw
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 17:55:35 -0400
+Received: by mail-wm0-x243.google.com with SMTP id v16-v6so3488308wmh.5
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 14:55:35 -0700 (PDT)
+References: <20180622140223.26056-1-f4bug@amsat.org>
+	<CAMo8Bf+_bSYrz_grbvHgpFsNmA7pJDOzjLUhLq2YfmV8FdoXkQ@mail.gmail.com>
+	<878t76vlal.fsf@linaro.org>
+	<CAMo8Bf+OfMyORPN69vROMBMUDF9ucNVMCOHF7EFfXFO7Qpnr1g@mail.gmail.com>
+	<c721aacc-6ee9-28e3-a8f9-c3c836d42355@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <c721aacc-6ee9-28e3-a8f9-c3c836d42355@amsat.org>
+Date: Fri, 22 Jun 2018 22:55:32 +0100
+Message-ID: <87602av63v.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180623002628-mutt-send-email-mst@kernel.org>
-References: <20180619233001-mutt-send-email-mst@kernel.org>
-	<20180620115359.1a3bf6fb.cohuck@redhat.com>
-	<20180620170904-mutt-send-email-mst@kernel.org>
-	<20180620180619.6b4ee52d.cohuck@redhat.com>
-	<20180620224535-mutt-send-email-mst@kernel.org>
-	<20180621165913.7e3f4faa.cohuck@redhat.com>
-	<CADGSJ22B39JiS14L0yCYQ720-fZcwyUt1wCX1YO-6Y9FhmDKZg@mail.gmail.com>
-	<20180622053141-mutt-send-email-mst@kernel.org>
-	<CADGSJ23SBEFJCD50K-F-Gt86Q1-i_6iHTmSSjdXDzNnnpWZ_oQ@mail.gmail.com>
-	<CADGSJ22nLcz_XaJNzUUdpjQaJY8b5wZs=ohm=B7c2qf2K7_yGA@mail.gmail.com>
-	<20180623002628-mutt-send-email-mst@kernel.org>
-From: Siwei Liu <loseweigh@gmail.com>
-Date: Fri, 22 Jun 2018 14:51:11 -0700
-Message-ID: <CADGSJ20td7b6He6S1PBSJjCq=bNvgqMGbOjiho2eeQm2pgpK3g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] docker: Add fedora-xtensa-cross image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,98 +33,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, "Samudrala,
-	Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Max Filippov <jcmvbkbc@gmail.com>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, Jun 22, 2018 at 2:29 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Fri, Jun 22, 2018 at 01:03:04PM -0700, Siwei Liu wrote:
->> On Fri, Jun 22, 2018 at 1:00 PM, Siwei Liu <loseweigh@gmail.com> wrote:
->> > On Thu, Jun 21, 2018 at 7:32 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
->> >> On Thu, Jun 21, 2018 at 06:21:55PM -0700, Siwei Liu wrote:
->> >>> On Thu, Jun 21, 2018 at 7:59 AM, Cornelia Huck <cohuck@redhat.com> wrote:
->> >>> > On Wed, 20 Jun 2018 22:48:58 +0300
->> >>> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
->> >>> >
->> >>> >> On Wed, Jun 20, 2018 at 06:06:19PM +0200, Cornelia Huck wrote:
->> >>> >> > In any case, I'm not sure anymore why we'd want the extra uuid.
->> >>> >>
->> >>> >> It's mostly so we can have e.g. multiple devices with same MAC
->> >>> >> (which some people seem to want in order to then use
->> >>> >> then with different containers).
->> >>> >>
->> >>> >> But it is also handy for when you assign a PF, since then you
->> >>> >> can't set the MAC.
->> >>> >>
->> >>> >
->> >>> > OK, so what about the following:
->> >>> >
->> >>> > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
->> >>> >   that we have a new uuid field in the virtio-net config space
->> >>> > - in QEMU, add a property for virtio-net that allows to specify a uuid,
->> >>> >   offer VIRTIO_NET_F_STANDBY_UUID if set
->> >>> > - when configuring, set the property to the group UUID of the vfio-pci
->> >>> >   device
->> >>>
->> >>> If feature negotiation fails on VIRTIO_NET_F_STANDBY_UUID, is it safe
->> >>> to still expose UUID in the config space on virtio-pci?
->> >>
->> >>
->> >> Yes but guest is not supposed to read it.
->> >>
->> >>> I'm not even sure if it's sane to expose group UUID on the PCI bridge
->> >>> where the corresponding vfio-pci device attached to for a guest which
->> >>> doesn't support the feature (legacy).
->> >>>
->> >>> -Siwei
->> >>
->> >> Yes but you won't add the primary behind such a bridge.
->> >
->> > I assume the UUID feature is a new one besides the exiting
->> > VIRTIO_NET_F_STANDBY feature, where I think the current proposal is,
->> > if UUID feature is present and supported by guest, we'll do pairing
->> > based on UUID; if UUID feature present
->>                                  ^^^^^^^  is NOT present
->
-> Let's go back for a bit.
->
-> What is wrong with matching by mac?
->
-> 1. Does not allow multiple NICs with same mac
-> 2. Requires MAC to be programmed by host in the PT device
->    (which is often possible with VFs but isn't possible with all PT
->    devices)
 
-Might not neccessarily be something wrong, but it's very limited to
-prohibit the MAC of VF from changing when enslaved by failover. The
-same as you indicated on the PT device. I suspect the same is
-prohibited on even virtio-net and failover is because of the same
-limitation.
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
+> On 06/22/2018 03:45 PM, Max Filippov wrote:
+>> On Fri, Jun 22, 2018 at 9:27 AM, Alex Benn=C3=A9e <alex.bennee@linaro.or=
+g> wrote:
+>>> Max Filippov <jcmvbkbc@gmail.com> writes:
+>>>> On Fri, Jun 22, 2018 at 7:02 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@am=
+sat.org> wrote:
+>>>>> As of this commit:
+>>>>>
+>>>>>   $ xtensa-linux-gnu-as -v
+>>>>>   GNU assembler version 2.29.1 (xtensa-linux-gnu) using BFD version v=
+ersion 2.29.1-1.fc27
+>>>>>
+>>>>>   $ xtensa-linux-gnu-gcc -v
+>>>>>   Target: xtensa-linux-gnu
+>>>>>   gcc version 7.2.1 20170915 (Red Hat Cross 7.2.1-1) (GCC)
+>>>>>
+>>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>>>> ---
+>>>>>  tests/docker/dockerfiles/fedora-xtensa-cross.docker | 7 +++++++
+>>>>>  1 file changed, 7 insertions(+)
+>>>>>  create mode 100644 tests/docker/dockerfiles/fedora-xtensa-cross.dock=
+er
+>>>>>
+>>>>> diff --git a/tests/docker/dockerfiles/fedora-xtensa-cross.docker b/te=
+sts/docker/dockerfiles/fedora-xtensa-cross.docker
+>>>>> new file mode 100644
+>>>>> index 0000000000..6f9521520c
+>>>>> --- /dev/null
+>>>>> +++ b/tests/docker/dockerfiles/fedora-xtensa-cross.docker
+>>>>> @@ -0,0 +1,7 @@
+>>>>> +FROM fedora:latest
+>>>>> +ENV PACKAGES \
+>>>>> +    binutils-xtensa-linux-gnu \
+>>>>> +    gcc-xtensa-linux-gnu
+>>>>
+>>>> Generic binutils and gcc for xtensa only (partially) make sense for
+>>>> build testing.
+>>>
+>>> OK
+>>>
+>>>> Built binaries will not work.
+>>>
+>>> Why?
+>>
+>> The default toolchain does not generate code for any real xtensa CPU
+>> configuration or for any configuration supported by the QEMU.
+>> The xtensa configuration overlay for a specific CPU must be applied
+>> to the toolchain source in order to build a toolchain capable of
+>> producing code that would work on that CPU.
+>> There's FSF xtensa CPU configuration in QEMU that is compatible with
+>> very old (older than 2.19 IIRC) binutils.
 >
-> Both issues are up to host: if host needs them it needs the UUID
-> feature, if not MAC matching is sufficient.
+> While the Fedora binutils supports dual endianness, the compiler only
+> works for big-endian:
+>
+> $ docker run --rm -it qemu:fedora-xtensa-cross xtensa-linux-gnu-objcopy
+> xtensa-linux-gnu-objcopy: supported targets: elf32-xtensa-le
+> elf32-xtensa-be elf32-little elf32-big
+>
+> $ docker run --rm -it qemu:fedora-xtensa-cross bash -c \
+>   'echo -e "__XTENSA_EL__\n__XTENSA_EB__" | \
+>   xtensa-linux-gnu-gcc -E - | grep -v "\#"'
+> __XTENSA_EL__
+> 1
+>
+>> xtensa TCG tests (at least
+>> some of them) are written for the dc232b xtensa CPU. The configuration
+>
+> I learned that the hard way :(
+>
+> I took the only big-endian CPU available: FSF, however
+>
+> - the linkscript expect the unavailable XTENSA_HAVE_BE definition,
+> - core-isa.h misses the following definitions:
+>
+> #define XCHAL_KERNEL_VECOFS             0x00000200 /* XXX ??? */
+> #define XCHAL_INTLEVEL2_VECOFS          0x00000180 /* XXX ??? */
+> #define XCHAL_INTLEVEL3_VECOFS          0x00000240 /* XXX ??? */
+> #define XCHAL_INTLEVEL4_VECOFS          0x00000520 /* XXX ??? */
+>
+> So this is a dead-end.
+>
+>> overlay for that CPU is available here:
+>>
+>>   https://github.com/jcmvbkbc/xtensa-toolchain-build/blob/master/overlay=
+s/xtensa_dc232b.tar.gz
+>>
+>> The following toolchain may be used to build working tests for xtensa:
+>>
+>>   https://github.com/foss-xtensa/toolchain/releases/download/2018.02/x86=
+_64-2018.02-xtensa-dc232b-elf.tar.gz
+>
+> Thanks for the links, I'll continue with DC232B next week.
+>
+> Alex: Can you dequeue this patch please?
 
-I know. What I'm saying is that we rely on STANDBY feature to control
-the visibility of the primary, not the UUID feature.
+OK poor first choice for getting the system emulation patches working. I
+wonder if the other fedora compilers will be useful for us?
 
--Siwei
 
->
->
->> > or not supported by guest,
->> > we'll still plug in the VF (if guest supports the _F_STANDBY feature)
->> > but the pairing will be fallback to using MAC address. Are you saying
->> > you don't even want to plug in the primary when the UUID feature is
->> > not supported by guest? Does the feature negotiation UUID have to
->> > depend on STANDBY being set, or the other way around? I thought that
->> > just the absence of STANDBY will prevent primary to get exposed to the
->> > guest.
->> >
->> > -Siwei
->> >
->> >>
->> >>>
->> >>> > - in the guest, use the uuid from the virtio-net device's config space
->> >>> >   if applicable; else, fall back to matching by MAC as done today
->
+> gcc-nios2-linux-gnu-7.1.1-3.fc27.i686.rpm
+> gcc-microblaze-linux-gnu-7.1.1-3.fc27.i686.rpm
+> gcc-tile-linux-gnu-7.1.1-3.fc27.i686.rpm
+> gcc-cris-linux-gnu-7.1.1-3.fc27.i686.rpm
+
+
+--
+Alex Benn=C3=A9e
