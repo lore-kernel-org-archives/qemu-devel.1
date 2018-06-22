@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fWMnQ-00068P-Aj
+	(envelope-from <alex.bennee@linaro.org>) id 1fWMnQ-00068q-R9
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:12:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fWMnP-0006AB-4g
+	(envelope-from <alex.bennee@linaro.org>) id 1fWMnP-0006Aj-Or
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:12:16 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:42763)
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:40645)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fWMnO-00069H-SZ
+	id 1fWMnP-00069y-II
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:12:15 -0400
-Received: by mail-wr0-x243.google.com with SMTP id w10-v6so6859436wrk.9
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 07:12:14 -0700 (PDT)
+Received: by mail-wm0-x234.google.com with SMTP id n5-v6so2762645wmc.5
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 07:12:15 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 22 Jun 2018 15:11:51 +0100
-Message-Id: <20180622141205.16306-9-alex.bennee@linaro.org>
+Date: Fri, 22 Jun 2018 15:11:52 +0100
+Message-Id: <20180622141205.16306-10-alex.bennee@linaro.org>
 In-Reply-To: <20180622141205.16306-1-alex.bennee@linaro.org>
 References: <20180622141205.16306-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RISU PATCH v4 08/22] risugen: Initialize sve
- predicates with random data
+Subject: [Qemu-devel] [RISU PATCH v4 09/22] risugen: use fewer insns for
+ aarch64 immediate load
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,93 +35,66 @@ Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, richard.henderson@linaro.org, =?
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Using ptrue makes most of the uses of predicates trivial.
-Therefore, initialize them to something interesting.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- risugen_arm.pm | 48 ++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 34 insertions(+), 14 deletions(-)
+ risugen_arm.pm | 32 +++++++++++++++++++-------------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
 
 diff --git a/risugen_arm.pm b/risugen_arm.pm
-index bb3ee90..83e521d 100644
+index 83e521d..485e94e 100644
 --- a/risugen_arm.pm
 +++ b/risugen_arm.pm
-@@ -174,6 +174,24 @@ sub write_sxt32($$)
-     insn32(0x93407c00 | $rn << 5 | $rd);
- }
+@@ -261,15 +261,13 @@ sub write_mov_rr($$)
  
-+sub write_add_rri($$$)
-+{
-+    my ($rd, $rn, $i) = @_;
-+    my $sh;
-+
-+    die "write_add_rri: invalid operation for this arch.\n" if (!$is_aarch64);
-+
-+    if ($i >= 0 && $i < 0x1000) {
-+        $sh = 0;
-+    } elsif (($i & 0xfff) || $i >= 0x1000000) {
-+        die "invalid immediate for this arch,\n";
-+    } else {
-+        $sh = 1;
-+        $i >>= 12;
-+    }
-+    insn32(0x91000000 | ($rd << 0) | ($rn << 5) | ($i << 10) | ($sh << 22));
-+}
-+
- sub write_sub_rrr($$$)
+ sub write_mov_ri16($$$)
  {
-     my ($rd, $rn, $rm) = @_;
-@@ -477,33 +495,35 @@ sub write_random_aarch64_svedata()
-     # Load SVE registers
-     my $align = 16;
-     my $vq = 16;                             # quadwords per vector
--    my $datalen = (32 * $vq * 16) + $align;
--
--    write_pc_adr(0, (3 * 4) + ($align - 1)); # insn 1
--    write_align_reg(0, $align);              # insn 2
--    write_jump_fwd($datalen);                # insn 3
-+    my $veclen = 32 * $vq * 16;
-+    my $predlen = 16 * $vq * 2;
-+    my $datalen = $veclen + $predlen;
+-    # Write 16 bits of immediate to register, using either MOVW or MOVT
++    # Write 16 bits of immediate to register.
+     my ($rd, $imm, $is_movt) = @_;
+-    die "write_mov_ri16: immediate $imm out of range\n" if (($imm & 0xffff0000) != 0);
  
--    # align safety
--    for (my $i = 0; $i < ($align / 4); $i++) {
--        # align with nops
--        insn32(0xd503201f);
--    };
-+    write_pc_adr(0, 2 * 4);     # insn 1
-+    write_jump_fwd($datalen);   # insn 2
+-    if ($is_aarch64) {
+-        # Use MOVZ 0x52800000. is_movt means MOVK of high bits */
+-        insn32(0xd2800000 | ($is_movt << 29) | ($is_movt ? 16 << 17 : 0) | ($imm << 5) | $rd);
++    die "write_mov_ri16: invalid operation for this arch.\n" if ($is_aarch64);
++    die "write_mov_ri16: immediate $imm out of range\n" if (($imm & 0xffff0000) != 0);
  
-     for (my $rt = 0; $rt <= 31; $rt++) {
-         for (my $q = 0; $q < $vq; $q++) {
-             write_random_fpreg_var(4); # quad
-         }
-     }
--
--    # Reset all the predicate registers to all true
--    for (my $p = 0; $p < 16; $p++) {
--        insn32(0x2518e3e0 | $p);
-+    for (my $rt = 0; $rt <= 15; $rt++) {
-+        for (my $q = 0; $q < $vq; $q++) {
-+            insn16(rand(0xffff));
+-    } elsif ($is_thumb) {
++    if ($is_thumb) {
+         # enc T3
+         my ($imm4, $i, $imm3, $imm8) = (($imm & 0xf000) >> 12,
+                                         ($imm & 0x0800) >> 11,
+@@ -287,16 +285,24 @@ sub write_mov_ri16($$$)
+ 
+ sub write_mov_ri($$)
+ {
+-    # We always use a MOVW/MOVT pair, for simplicity.
+-    # on aarch64, we use a MOVZ/MOVK pair.
+     my ($rd, $imm) = @_;
+-    write_mov_ri16($rd, ($imm & 0xffff), 0);
+     my $highhalf = ($imm >> 16) & 0xffff;
+-    write_mov_ri16($rd, $highhalf, 1) if $highhalf;
+ 
+-    if ($is_aarch64 && $imm < 0) {
+-        # sign extend to allow small negative imm constants
+-        write_sxt32($rd, $rd);
++    if ($is_aarch64) {
++        if ($imm < 0) {
++            # MOVN
++            insn32(0x92800000 | ((~$imm & 0xffff) << 5) | $rd);
++            # MOVK, LSL 16
++            insn32(0xf2a00000 | ($highhalf << 5) | $rd) if $highhalf != 0xffff;
++        } else {
++            # MOVZ
++            insn32(0x52800000 | (($imm & 0xffff) << 5) | $rd);
++            # MOVK, LSL 16
++            insn32(0xf2a00000 | ($highhalf << 5) | $rd) if $highhalf != 0;
 +        }
++    } else {
++        write_mov_ri16($rd, ($imm & 0xffff), 0);
++        write_mov_ri16($rd, $highhalf, 1) if $highhalf;
      }
- 
-     for (my $rt = 0; $rt <= 31; $rt++) {
-         # ldr z$rt, [x0, #$rt, mul vl]
-         insn32(0x85804000 + $rt + (($rt & 7) << 10) + (($rt & 0x18) << 13));
-     }
-+
-+    write_add_rri(0, 0, $veclen);
-+
-+    for (my $rt = 0; $rt <= 15; $rt++) {
-+        # ldr p$rt, [x0, #$pt, mul vl]
-+        insn32(0x85800000 + $rt + (($rt & 7) << 10) + (($rt & 0x18) << 13));
-+    }
  }
  
- sub write_random_aarch64_regdata($$)
 -- 
 2.17.1
