@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fWJA3-0000Jf-BO
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:19:26 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fWJA9-0000Ol-Ud
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:19:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fWJA2-0005aL-9m
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:19:23 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fWJA6-0005dT-Pf
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:19:29 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 22 Jun 2018 12:19:06 +0200
-Message-Id: <1529662749-32069-3-git-send-email-eric.auger@redhat.com>
+Date: Fri, 22 Jun 2018 12:19:08 +0200
+Message-Id: <1529662749-32069-5-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1529662749-32069-1-git-send-email-eric.auger@redhat.com>
 References: <1529662749-32069-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC 2/5] hw/arm/virt: Add pc-dimm mem hotplug
- framework
+Subject: [Qemu-devel] [RFC 4/5] hw/arm/boot: Expose the PC-DIMM nodes in the
+ DT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,116 +24,79 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu
 
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-This patch adds the the PC-DIMM hot-plug/hot-unplug infrastructure
-in machvirt.
+This patch add memory nodes corresponding to PC-DIMM
+regions.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Signed-off-by: Kwangwoo Lee <kwangwoo.lee@sk.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- default-configs/arm-softmmu.mak |  2 ++
- hw/arm/virt.c                   | 53 ++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 54 insertions(+), 1 deletion(-)
+ hw/arm/boot.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 7cf73d2..0840a56 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -151,3 +151,5 @@ CONFIG_PCI_DESIGNWARE=y
- CONFIG_STRONGARM=y
- CONFIG_HIGHBANK=y
- CONFIG_MUSICPAL=y
-+CONFIG_MEM_HOTPLUG=y
-+
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index a251054..a6e3b3d 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -60,6 +60,7 @@
- #include "standard-headers/linux/input.h"
- #include "hw/arm/smmuv3.h"
- #include "hw/acpi/acpi.h"
-+#include "hw/mem/pc-dimm.h"
- 
- #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
-     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
-@@ -1723,6 +1724,40 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
-     return ms->possible_cpus;
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index cc425ce..81668bd 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -19,6 +19,7 @@
+ #include "sysemu/numa.h"
+ #include "hw/boards.h"
+ #include "hw/loader.h"
++#include "hw/mem/memory-device.h"
+ #include "elf.h"
+ #include "sysemu/device_tree.h"
+ #include "qemu/config-file.h"
+@@ -516,6 +517,37 @@ static void fdt_add_psci_node(void *fdt)
+     qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
  }
  
-+static void virt_dimm_plug(HotplugHandler *hotplug_dev,
-+                           DeviceState *dev, Error **errp)
-+{
-+    PCDIMMDevice *dimm = PC_DIMM(dev);
-+    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-+    Error *local_err = NULL;
-+    MemoryRegion *mr;
-+    uint64_t align;
++static int fdt_add_hotpluggable_memory_nodes(void *fdt,
++                                             uint64_t base, uint64_t len,
++                                             uint32_t acells, uint32_t scells) {
++    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
++    MemoryDeviceInfoList *info;
++    uint64_t end, cur, size;
++    MemoryDeviceInfo *mi;
++    PCDIMMDeviceInfo *di;
++    bool is_nvdimm;
++    int ret;
 +
-+    mr = ddc->get_memory_region(dimm, &local_err);
-+    if (local_err) {
-+        goto out;
++    end = base + len;
++    for (cur = base, info = info_list; cur < end;
++         cur += size, info = info->next) {
++        if (!info) {
++            break;
++        }
++        mi = info->value;
++        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
++        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
++
++        ret = fdt_add_memory_node(fdt, acells, di->addr,
++                                  scells, di->size, di->node);
++        if (ret < 0) {
++            return ret;
++        }
++        size = di->size;
 +    }
-+
-+    if (memory_region_get_alignment(mr)) {
-+        align = memory_region_get_alignment(mr);
-+    } else {
-+        /* by default we align on 64KB page size */
-+        align = SZ_64K;
-+    }
-+
-+    pc_dimm_memory_plug(dev, MACHINE(hotplug_dev), align, &local_err);
-+
-+out:
-+    error_propagate(errp, local_err);
++    return 0;
 +}
 +
-+static void virt_dimm_unplug(HotplugHandler *hotplug_dev,
-+                             DeviceState *dev, Error **errp)
-+{
-+    pc_dimm_memory_unplug(dev, MACHINE(hotplug_dev));
-+    object_unparent(OBJECT(dev));
-+}
-+
- static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                         DeviceState *dev, Error **errp)
+ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+                  hwaddr addr_limit, AddressSpace *as)
  {
-@@ -1734,12 +1769,27 @@ static void virt_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-                                      SYS_BUS_DEVICE(dev));
+@@ -600,6 +632,14 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
          }
      }
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+            virt_dimm_plug(hotplug_dev, dev, errp);
+ 
++    rc = fdt_add_hotpluggable_memory_nodes(fdt, binfo->device_memory_start,
++                                           binfo->device_memory_size,
++                                           acells, scells);
++    if (rc < 0) {
++            fprintf(stderr, "couldn't add hotpluggable memory nodes\n");
++            goto fail;
 +    }
-+}
 +
-+static void virt_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
-+                                          DeviceState *dev, Error **errp)
-+{
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+        virt_dimm_unplug(hotplug_dev, dev, errp);
-+    } else {
-+        error_setg(errp, "device unplug request for unsupported device"
-+                   " type: %s", object_get_typename(OBJECT(dev)));
-+    }
- }
- 
- static HotplugHandler *virt_machine_get_hotplug_handler(MachineState *machine,
-                                                         DeviceState *dev)
- {
--    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_SYS_BUS_DEVICE) ||
-+       (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM))) {
-         return HOTPLUG_HANDLER(machine);
-     }
- 
-@@ -1800,6 +1850,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     assert(!mc->get_hotplug_handler);
-     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
-     hc->plug = virt_machine_device_plug_cb;
-+    hc->unplug = virt_machine_device_unplug_cb;
- }
- 
- static const TypeInfo virt_machine_info = {
+     rc = fdt_path_offset(fdt, "/chosen");
+     if (rc < 0) {
+         qemu_fdt_add_subnode(fdt, "/chosen");
 -- 
 2.5.5
