@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57736)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fWQGB-0004s1-5o
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:54:12 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fWQWk-0001sK-FG
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 14:11:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fWQGA-0000Z5-9T
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:54:11 -0400
-Date: Fri, 22 Jun 2018 19:54:00 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180622175359.GJ4366@localhost.localdomain>
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-26-kwolf@redhat.com>
-	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
-	<20180622125502.GF4366@localhost.localdomain>
-	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
-	<20180622142513.GH4366@localhost.localdomain>
-	<20180622154042.GS23296@redhat.com>
+	(envelope-from <ehabkost@redhat.com>) id 1fWQWg-0000hT-B1
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 14:11:18 -0400
+Date: Fri, 22 Jun 2018 15:11:09 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180622181108.GY7451@localhost.localdomain>
+References: <1528866321-23886-1-git-send-email-thuth@redhat.com>
+	<1528866321-23886-5-git-send-email-thuth@redhat.com>
+	<20180613133840.GK24528@stefanha-x1.localdomain>
+	<20180613134452.GU19901@redhat.com>
+	<b0ebd968-797f-48e0-32c1-869c452feca9@redhat.com>
+	<20180613151942.GC19901@redhat.com>
+	<87k1r24quk.fsf@dusky.pond.sub.org>
+	<20180619171539.0adc90d6.cohuck@redhat.com>
+	<d4e02083-c372-3ce5-d4a2-4809579fc8f2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180622154042.GS23296@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 25/26] block: Remove deprecated -drive
- option serial
+In-Reply-To: <d4e02083-c372-3ce5-d4a2-4809579fc8f2@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 4/4] qemu-options: Do not show
+ -enable-kvm and -enable-hax in the docs anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +31,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, pkrempa@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-Am 22.06.2018 um 17:40 hat Daniel P. Berrang=E9 geschrieben:
-> On Fri, Jun 22, 2018 at 04:25:13PM +0200, Kevin Wolf wrote:
-> > This was in fact one release longer than our deprecation policy says.
-> > Are we serious about the deprecation policy or aren't we?
-> >=20
-> > I might consider reverting a change if it turned out that this requir=
-es
-> > some massive work in libvirt. But I think this one should be rather e=
-asy
-> > to fix in libvirt until 3.0 is released.
->=20
-> I've got a patch mostly ready that converts libvirt to setting these th=
-ings
-> on the frontend device, however, I've got some queries...
->=20
->  - usb-storage  - doesn't appear to support geometry or werror/rerror
->=20
->    Will we loose functionality by stopping use of -drive for werror
->=20
->    Loosing geometry feels relevant too, unless it was already ignored
->    when set opf -drive ?
+On Tue, Jun 19, 2018 at 06:16:33PM +0200, Paolo Bonzini wrote:
+> On 19/06/2018 17:15, Cornelia Huck wrote:
+> >> Why does a user have to know how to enable KVM?  Oh, because our default
+> >> is "run this guest much slower than necessary".  Great!
+> > Should we try again to default to a better accelerator, if possible? I
+> > don't quite recall why we didn't do so the last time that came up...
+> > was it tests?
+> 
+> My plan was to create qemu-{kvm,hax,hvf,whpx} binaries that default to a
+> better accelerator, and leave qemu-system-* as defaulting to TCG.  This
+> matches what distributions already do.
 
-You're right, usb-storage doesn't allow using -device to specify these,
-and it does use the values from -drive.
+Why is this better than using KVM by default if it's available?
 
-For werror/rerror, we should clearly implement the option forwarding to
-scsi-disk so that you can make use of it.
-
-I'm not sure how sane specifying a non-standard CHS geometry for a USB
-stick actually is. As an additional difficulty, usb-storage internally
-creates a scsi-disk device (not scsi-hd), which is also considered
-legacy and doesn't support the geometry options either, so it's not just
-simple forwarding. We removed an actual feature there, but that feature
-was probably never intended nor used.
-
-If someone comes up with a compelling reason why they really need to
-configure the CHS geometry of their USB sticks, I guess we can do it. My
-real USB sticks I tested don't even support MODE_PAGE_HD_GEOMETRY
-(though they have MODE_PAGE_FLEXIBLE_DISK_GEOMETRY).
-
->  - SD card - requires -drive with if=3Dsd, no -device support AFAICT
->=20
->    Will we loose functionality be stopping use of -drive for if=3Dsd, o=
-r
->    is this stuff ignored anyway ?
-
-This was already silently ignored.
-
->  - ide-cd/scsi-id - doesn't support geometry
->=20
->    Presumably becuase its irrelevant for CDs
-
-Yes, geometry has no effect for CDs.
-
-Kevin
+-- 
+Eduardo
