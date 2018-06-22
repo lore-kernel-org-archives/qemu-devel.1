@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJPv-0000hs-TS
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJPv-0000hi-Mb
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJPt-0003UE-Vn
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJPt-0003T3-1x
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:47 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 22 Jun 2018 20:35:17 +1000
-Message-Id: <20180622103528.28598-15-david@gibson.dropbear.id.au>
+Date: Fri, 22 Jun 2018 20:35:19 +1000
+Message-Id: <20180622103528.28598-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20180622103528.28598-1-david@gibson.dropbear.id.au>
 References: <20180622103528.28598-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 14/25] sm501: Fix hardware cursor color
- conversion
+Subject: [Qemu-devel] [PULL 16/25] ppc4xx_i2c: Implement directcntl register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,41 +20,115 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sebastian Bauer <mail@sebastianbauer.info>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Sebastian Bauer <mail@sebastianbauer.info>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-According to the sm501 specs the hardware cursor colors are to be given in
-the rgb565 format, but the code currently interprets them as bgr565.
+As well as being able to generate its own i2c transactions, the ppc4xx
+i2c controller has a DIRECTCNTL register which allows explicit control
+of the i2c lines.
 
-Therefore, the colors of the hardware cursors are wrong in the QEMU
-display, e.g., the standard mouse pointer of AmigaOS appears blue instead
-of red. This change fixes this issue by replacing the existing naive
-bgr565 => rgb888 conversion with a standard rgb565 => rgb888 one that also
-scales the color component values properly.
+Using this register an OS can directly bitbang i2c operations. In
+order to let emulated i2c devices respond to this, we need to wire up
+the DIRECTCNTL register to qemu's bitbanged i2c handling code.
 
-Signed-off-by: Sebastian Bauer <mail@sebastianbauer.info>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/display/sm501.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ default-configs/ppc-softmmu.mak    |  1 +
+ default-configs/ppcemb-softmmu.mak |  1 +
+ hw/i2c/ppc4xx_i2c.c                | 14 +++++++++++++-
+ include/hw/i2c/ppc4xx_i2c.h        |  4 ++++
+ 4 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index ca0840f6fa..8206ae81a1 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -652,9 +652,9 @@ static inline void get_hwc_palette(SM501State *state, int crt, uint8_t *palette)
-         } else {
-             rgb565 = color_reg & 0xFFFF;
-         }
--        palette[i * 3 + 0] = (rgb565 << 3) & 0xf8; /* red */
--        palette[i * 3 + 1] = (rgb565 >> 3) & 0xfc; /* green */
--        palette[i * 3 + 2] = (rgb565 >> 8) & 0xf8; /* blue */
-+        palette[i * 3 + 0] = ((rgb565 >> 11) * 527 + 23) >> 6; /* r */
-+        palette[i * 3 + 1] = (((rgb565 >> 5) & 0x3f) * 259 + 33) >> 6; /* g */
-+        palette[i * 3 + 2] = ((rgb565 & 0x1f) * 527 + 23) >> 6; /* b */
-     }
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index abeeb0418a..851b4afc21 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -26,6 +26,7 @@ CONFIG_USB_EHCI_SYSBUS=y
+ CONFIG_SM501=y
+ CONFIG_IDE_SII3112=y
+ CONFIG_I2C=y
++CONFIG_BITBANG_I2C=y
+ 
+ # For Macs
+ CONFIG_MAC=y
+diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
+index 67d18b2e0e..37af1930b3 100644
+--- a/default-configs/ppcemb-softmmu.mak
++++ b/default-configs/ppcemb-softmmu.mak
+@@ -19,3 +19,4 @@ CONFIG_USB_EHCI_SYSBUS=y
+ CONFIG_SM501=y
+ CONFIG_IDE_SII3112=y
+ CONFIG_I2C=y
++CONFIG_BITBANG_I2C=y
+diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+index 4e0aaae1fc..fca80d695a 100644
+--- a/hw/i2c/ppc4xx_i2c.c
++++ b/hw/i2c/ppc4xx_i2c.c
+@@ -30,6 +30,7 @@
+ #include "cpu.h"
+ #include "hw/hw.h"
+ #include "hw/i2c/ppc4xx_i2c.h"
++#include "bitbang_i2c.h"
+ 
+ #define PPC4xx_I2C_MEM_SIZE 18
+ 
+@@ -46,6 +47,11 @@
+ 
+ #define IIC_XTCNTLSS_SRST   (1 << 0)
+ 
++#define IIC_DIRECTCNTL_SDAC (1 << 3)
++#define IIC_DIRECTCNTL_SCLC (1 << 2)
++#define IIC_DIRECTCNTL_MSDA (1 << 1)
++#define IIC_DIRECTCNTL_MSCL (1 << 0)
++
+ static void ppc4xx_i2c_reset(DeviceState *s)
+ {
+     PPC4xxI2CState *i2c = PPC4xx_I2C(s);
+@@ -289,7 +295,12 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+         i2c->xtcntlss = value;
+         break;
+     case 16:
+-        i2c->directcntl = value & 0x7;
++        i2c->directcntl = value & (IIC_DIRECTCNTL_SDAC & IIC_DIRECTCNTL_SCLC);
++        i2c->directcntl |= (value & IIC_DIRECTCNTL_SCLC ? 1 : 0);
++        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL,
++                        i2c->directcntl & IIC_DIRECTCNTL_MSCL);
++        i2c->directcntl |= bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SDA,
++                               (value & IIC_DIRECTCNTL_SDAC) != 0) << 1;
+         break;
+     default:
+         if (addr < PPC4xx_I2C_MEM_SIZE) {
+@@ -322,6 +333,7 @@ static void ppc4xx_i2c_init(Object *o)
+     sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
+     sysbus_init_irq(SYS_BUS_DEVICE(s), &s->irq);
+     s->bus = i2c_init_bus(DEVICE(s), "i2c");
++    s->bitbang = bitbang_i2c_init(s->bus);
  }
  
+ static void ppc4xx_i2c_class_init(ObjectClass *klass, void *data)
+diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
+index e4b6ded855..ea6c8e1a58 100644
+--- a/include/hw/i2c/ppc4xx_i2c.h
++++ b/include/hw/i2c/ppc4xx_i2c.h
+@@ -31,6 +31,9 @@
+ #include "hw/sysbus.h"
+ #include "hw/i2c/i2c.h"
+ 
++/* from hw/i2c/bitbang_i2c.h */
++typedef struct bitbang_i2c_interface bitbang_i2c_interface;
++
+ #define TYPE_PPC4xx_I2C "ppc4xx-i2c"
+ #define PPC4xx_I2C(obj) OBJECT_CHECK(PPC4xxI2CState, (obj), TYPE_PPC4xx_I2C)
+ 
+@@ -42,6 +45,7 @@ typedef struct PPC4xxI2CState {
+     I2CBus *bus;
+     qemu_irq irq;
+     MemoryRegion iomem;
++    bitbang_i2c_interface *bitbang;
+     uint8_t mdata;
+     uint8_t lmadr;
+     uint8_t hmadr;
 -- 
 2.17.1
