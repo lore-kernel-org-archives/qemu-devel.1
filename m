@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60298)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fWQWk-0001sK-FG
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 14:11:19 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fWQhp-0005Bu-89
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 14:22:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fWQWg-0000hT-B1
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 14:11:18 -0400
-Date: Fri, 22 Jun 2018 15:11:09 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fWQhm-0005QW-2j
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 14:22:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fWQhl-0005QA-Rv
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 14:22:41 -0400
+Date: Fri, 22 Jun 2018 15:22:36 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180622181108.GY7451@localhost.localdomain>
-References: <1528866321-23886-1-git-send-email-thuth@redhat.com>
-	<1528866321-23886-5-git-send-email-thuth@redhat.com>
-	<20180613133840.GK24528@stefanha-x1.localdomain>
-	<20180613134452.GU19901@redhat.com>
-	<b0ebd968-797f-48e0-32c1-869c452feca9@redhat.com>
-	<20180613151942.GC19901@redhat.com>
-	<87k1r24quk.fsf@dusky.pond.sub.org>
-	<20180619171539.0adc90d6.cohuck@redhat.com>
-	<d4e02083-c372-3ce5-d4a2-4809579fc8f2@redhat.com>
+Message-ID: <20180622182236.GA7451@localhost.localdomain>
+References: <20180622003140.164613-1-mst@redhat.com>
+	<20180622003140.164613-2-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d4e02083-c372-3ce5-d4a2-4809579fc8f2@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 4/4] qemu-options: Do not show
- -enable-kvm and -enable-hax in the docs anymore
+In-Reply-To: <20180622003140.164613-2-mst@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] kvm: support -overcommit
+ cpu-pm=on|off
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
 
-On Tue, Jun 19, 2018 at 06:16:33PM +0200, Paolo Bonzini wrote:
-> On 19/06/2018 17:15, Cornelia Huck wrote:
-> >> Why does a user have to know how to enable KVM?  Oh, because our default
-> >> is "run this guest much slower than necessary".  Great!
-> > Should we try again to default to a better accelerator, if possible? I
-> > don't quite recall why we didn't do so the last time that came up...
-> > was it tests?
-> 
-> My plan was to create qemu-{kvm,hax,hvf,whpx} binaries that default to a
-> better accelerator, and leave qemu-system-* as defaulting to TCG.  This
-> matches what distributions already do.
+On Fri, Jun 22, 2018 at 03:31:48AM +0300, Michael S. Tsirkin wrote:
+> With this flag, kvm allows guest to control host CPU power state.  This
+> increases latency for other processes using same host CPU in an
+> unpredictable way, but if decreases idle entry/exit times for the
+> running VCPU, so to use it QEMU needs a hint about whether host CPU is
+> overcommitted, hence the flag name.
 
-Why is this better than using KVM by default if it's available?
+The flag name in the code below is still "-dedicated".
+
+[...]
+> +static QemuOptsList qemu_dedicated_opts = {
+> +    .name = "dedicated",
+[...]
+> +            case QEMU_OPTION_dedicated:
+> +                opts = qemu_opts_parse_noisily(qemu_find_opts("dedicated"),
+> +                                               optarg, false);
+[...]
+> +DEF("dedicated", HAS_ARG, QEMU_OPTION_dedicated,
+> +    "-dedicated [mem-lock=on|off][cpu-pm=on|off]\n"
+> +    "                run qemu with realtime features\n"
+> +    "                mem-lock=on|off controls memory lock support (default: off)\n"
+> +    "                cpu-pm=on|off controls cpu power management (default: off)\n",
+> +    QEMU_ARCH_ALL)
+> +STEXI
+> +@item -dedicated mem-lock=on|off
+> +@item -dedicated cpu-pm=on|off
+> +@findex -dedicated
+> +Run qemu using dedicated host resources.
+> +Locking qemu and guest memory can be enabled via @option{mem-lock=on}
+> +(disabled by default). This is equivalent to @option{realtime}.
+> +Guest ability to manage power state of host cpus (increasing latency for other
+> +processes on the same host cpu, but decreasing latency for guest)
+> +can be enabled via @option{cpu-pm=on} (disabled by default).
+> +ETEXI
+[...]
 
 -- 
 Eduardo
