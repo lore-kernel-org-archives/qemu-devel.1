@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fWHWT-0006Be-1i
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:34:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1fWHWw-0006Rf-72
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:34:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fWHWP-0004Uu-3t
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:34:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48346 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fWHWO-0004Uo-VL
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:34:21 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7609E1133F8
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 08:34:20 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
-	<20180321115211.17937-12-marcandre.lureau@redhat.com>
-Date: Fri, 22 Jun 2018 10:34:18 +0200
-In-Reply-To: <20180321115211.17937-12-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 21 Mar 2018
-	12:51:33 +0100")
-Message-ID: <87sh5fdxth.fsf@dusky.pond.sub.org>
+	(envelope-from <thuth@redhat.com>) id 1fWHWv-0004eH-7r
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:34:54 -0400
+References: <20180621180224.8312-1-f4bug@amsat.org>
+	<20180621180224.8312-9-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e8e5e2ff-9576-402d-1502-9b584b0295f7@redhat.com>
+Date: Fri, 22 Jun 2018 10:34:42 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180621180224.8312-9-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 11/49] qapi/commands: add #if conditions
- to commands
+Subject: Re: [Qemu-devel] [PATCH 08/11] hw/arm/omap: Use
+ qemu_log_mask(GUEST_ERROR) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,100 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-trivial@nongnu.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Wrap generated code with #if/#endif using an 'ifcontext' on
-> QAPIGenCSnippet objects.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On 21.06.2018 20:02, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  scripts/qapi/commands.py | 19 ++++++++++---------
->  tests/test-qmp-cmds.c    |  4 ++--
->  2 files changed, 12 insertions(+), 11 deletions(-)
->
-> diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-> index e2366b4801..40bb680b7c 100644
-> --- a/scripts/qapi/commands.py
-> +++ b/scripts/qapi/commands.py
-> @@ -237,7 +237,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModularCV=
-isitor):
->          QAPISchemaModularCVisitor.__init__(
->              self, prefix, 'qapi-commands',
->              ' * Schema-defined QAPI/QMP commands', __doc__)
-> -        self._regy =3D ''
-> +        self._regy =3D QAPIGenCSnippet()
->          self._visited_ret_types =3D {}
->=20=20
->      def _begin_module(self, name):
-> @@ -273,19 +273,20 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModular=
-CVisitor):
->  void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
->  ''',
->                         c_prefix=3Dc_name(self._prefix, protect=3DFalse)))
-> -        genc.add(gen_registry(self._regy, self._prefix))
-> +        genc.add(gen_registry(self._regy.get_content(), self._prefix))
->=20=20
->      def visit_command(self, name, info, ifcond, arg_type, ret_type,
->                        gen, success_response, boxed, allow_oob):
->          if not gen:
->              return
-> -        self._genh.add(gen_command_decl(name, arg_type, boxed, ret_type))
-> -        if ret_type and ret_type not in self._visited_ret_types[self._ge=
-nc]:
-> -            self._visited_ret_types[self._genc].add(ret_type)
-> -            self._genc.add(gen_marshal_output(ret_type))
-> -        self._genh.add(gen_marshal_decl(name))
-> -        self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
-> -        self._regy +=3D gen_register_command(name, success_response, all=
-ow_oob)
-> +        with ifcontext(ifcond, self._genh, self._genc, self._regy):
-> +            self._genh.add(gen_command_decl(name, arg_type, boxed, ret_t=
-ype))
-> +            if ret_type and ret_type not in self._visited_ret_types[self=
-._genc]:
-> +                self._visited_ret_types[self._genc].add(ret_type)
-> +                self._genc.add(gen_marshal_output(ret_type))
+>  include/hw/arm/omap.h | 20 ++++++++++++--------
+>  1 file changed, 12 insertions(+), 8 deletions(-)
+[...]
+> @@ -997,14 +998,17 @@ enum {
+> =20
+>  # ifdef TCMI_VERBOSE
+>  #  define OMAP_8B_REG(paddr)		\
+> -        fprintf(stderr, "%s: 8-bit register " OMAP_FMT_plx "\n",	\
+> -                        __func__, paddr)
+> +        qemu_log_mask(LOG_GUEST_ERROR, \
+> +                      "%s: 8-bit register " OMAP_FMT_plx "\n", \
+> +                      __func__, paddr)
+>  #  define OMAP_16B_REG(paddr)		\
+> -        fprintf(stderr, "%s: 16-bit register " OMAP_FMT_plx "\n",	\
+> -                        __func__, paddr)
+> +        qemu_log_mask(LOG_GUEST_ERROR, \
+> +                      "%s: 16-bit register " OMAP_FMT_plx "\n", \
+> +                      __func__, paddr)
+>  #  define OMAP_32B_REG(paddr)		\
+> -        fprintf(stderr, "%s: 32-bit register " OMAP_FMT_plx "\n",	\
+> -                        __func__, paddr)
+> +        qemu_log_mask(LOG_GUEST_ERROR, \
+> +                      "%s: 32-bit register " OMAP_FMT_plx "\n", \
+> +                      __func__, paddr)
+>  # else
+>  #  define OMAP_8B_REG(paddr)
+>  #  define OMAP_16B_REG(paddr)
+>=20
 
-I'm afraid this falls apart when multiple commands with different
-conditions share a return type.
+Since the qemu_log_mask(LOG_GUEST_ERROR, ...) calls are not shown up by
+default anymore, I think it would rather be better to get rid of this
+#ifdef TCMI_VERBOSE ... #endif block now and put the qemu_log_mask()
+statements directly into the omap_badwidth_* functions instead.
 
-That case needs test coverage.
-
-Aside: the qmp_marshal_FOO() should be static.  I can see just two uses
-preventing that:
-
-    monitor.c:1146:                         qmp_marshal_qmp_capabilities, Q=
-CO_NO_OPTIONS);
-    monitor.c:4312:    qmp_marshal_query_version(NULL, &ver, NULL);
-
-Would be nice to get rid of those.  Not necessarily in this series, of
-course.
-
-> +            self._genh.add(gen_marshal_decl(name))
-> +            self._genc.add(gen_marshal(name, arg_type, boxed, ret_type))
-> +            self._regy.add(gen_register_command(name, success_response, =
-allow_oob))
->=20=20
->=20=20
->  def gen_commands(schema, output_dir, prefix):
-> diff --git a/tests/test-qmp-cmds.c b/tests/test-qmp-cmds.c
-> index c25fc2100a..e675722593 100644
-> --- a/tests/test-qmp-cmds.c
-> +++ b/tests/test-qmp-cmds.c
-> @@ -12,11 +12,11 @@
->=20=20
->  static QmpCommandList qmp_commands;
->=20=20
-> -/* #if defined(TEST_IF_STRUCT) && defined(TEST_IF_CMD) */
-> +#if defined(TEST_IF_STRUCT) && defined(TEST_IF_CMD)
->  void qmp_TestIfCmd(TestIfStruct *foo, Error **errp)
->  {
->  }
-> -/* #endif */
-> +#endif
->=20=20
->  void qmp_user_def_cmd(Error **errp)
->  {
+ Thomas
