@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fWGku-00011Y-LU
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:45:18 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fWGkw-00013m-NZ
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:45:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fWGks-0000Dl-RY
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:45:16 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fWGku-0000FG-LR
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:45:18 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 22 Jun 2018 09:44:59 +0200
-Message-Id: <1529653501-15358-3-git-send-email-eric.auger@redhat.com>
+Date: Fri, 22 Jun 2018 09:45:00 +0200
+Message-Id: <1529653501-15358-4-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1529653501-15358-1-git-send-email-eric.auger@redhat.com>
 References: <1529653501-15358-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/4] hw/arm/smmuv3: Cache/invalidate config
- data
+Subject: [Qemu-devel] [PATCH v4 3/4] hw/arm/smmuv3: IOTLB emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,359 +21,348 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, jia.he@hxt-semitech.com, hejianet@gmail.com
 
-Let's cache config data to avoid fetching and parsing STE/CD
-structures on each translation. We invalidate them on data structure
-invalidation commands.
+We emulate a TLB cache of size SMMU_IOTLB_MAX_SIZE=256.
+It is implemented as a hash table whose key is a combination
+of the 16b asid and 48b IOVA (Jenkins hash).
 
-We put in place a per-smmu mutex to protect the config cache. This
-will be useful too to protect the IOTLB cache. The caches can be
-accessed without BQL, ie. in IO dataplane. The same kind of mutex was
-put in place in the intel viommu.
+Entries are invalidated on TLB invalidation commands, either
+globally, or per asid, or per asid/iova.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 ---
 v2 -> v3:
-- use uint32_t instead of float in cache hit rate traces
-- change the format of the new traces
-- added Peter's R-b
+- use uint32_t instead of float when printing the iotlb hit rate
+- use const local variables in smmu_iotlb_key_equal
 
 v1 -> v2:
-- restore mutex
+- add comment about Jenkins Hash
+- remove init of iotlb_hits, misses
 
 v1:
-- only insert the new config if decode_cfg succeeds
-- use smmu_get_sid for trace_* and store hits/misses in the SMMUDevice
-- s/smmuv3_put_config/smmuv3_flush_config
-- document smmuv3_get_config
-- removing the mutex as BQL does the job
+- Add new trace point when smmu is bypassed
+- s/iotlb_miss/iotlb_misses, s/iotlb_hit/iotlb_hits
+- use SMMUIOTLBKey as a key
+
+Credit to Tomasz Nowicki who did the first implementation of
+this IOTLB implementation, inspired of intel_iommu implementation.
 ---
- hw/arm/smmu-common.c         |  24 +++++++-
- hw/arm/smmuv3.c              | 135 +++++++++++++++++++++++++++++++++++++++++--
- hw/arm/trace-events          |   6 ++
- include/hw/arm/smmu-common.h |   5 ++
- include/hw/arm/smmuv3.h      |   1 +
- 5 files changed, 164 insertions(+), 7 deletions(-)
+ hw/arm/smmu-common.c         | 60 +++++++++++++++++++++++++++
+ hw/arm/smmuv3.c              | 98 ++++++++++++++++++++++++++++++++++++++++++--
+ hw/arm/trace-events          |  9 ++++
+ include/hw/arm/smmu-common.h | 13 ++++++
+ 4 files changed, 176 insertions(+), 4 deletions(-)
 
 diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index 3c5f724..db242c7 100644
+index db242c7..f66e444 100644
 --- a/hw/arm/smmu-common.c
 +++ b/hw/arm/smmu-common.c
-@@ -310,6 +310,24 @@ static AddressSpace *smmu_find_add_as(PCIBus *bus, void *opaque, int devfn)
-     return &sdev->as;
+@@ -24,11 +24,43 @@
+ #include "qom/cpu.h"
+ #include "hw/qdev-properties.h"
+ #include "qapi/error.h"
++#include "qemu/jhash.h"
+ 
+ #include "qemu/error-report.h"
+ #include "hw/arm/smmu-common.h"
+ #include "smmu-internal.h"
+ 
++/* IOTLB Management */
++
++inline void smmu_iotlb_inv_all(SMMUState *s)
++{
++    trace_smmu_iotlb_inv_all();
++    g_hash_table_remove_all(s->iotlb);
++}
++
++static gboolean smmu_hash_remove_by_asid(gpointer key, gpointer value,
++                                         gpointer user_data)
++{
++    uint16_t asid = *(uint16_t *)user_data;
++    SMMUIOTLBKey *iotlb_key = (SMMUIOTLBKey *)key;
++
++    return iotlb_key->asid == asid;
++}
++
++inline void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova)
++{
++    SMMUIOTLBKey key = {.asid = asid, .iova = iova};
++
++    trace_smmu_iotlb_inv_iova(asid, iova);
++    g_hash_table_remove(s->iotlb, &key);
++}
++
++inline void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid)
++{
++    trace_smmu_iotlb_inv_asid(asid);
++    g_hash_table_foreach_remove(s->iotlb, smmu_hash_remove_by_asid, &asid);
++}
++
+ /* VMSAv8-64 Translation */
+ 
+ /**
+@@ -328,6 +360,31 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
+     return NULL;
  }
  
-+IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
++static guint smmu_iotlb_key_hash(gconstpointer v)
 +{
-+    uint8_t bus_n, devfn;
-+    SMMUPciBus *smmu_bus;
-+    SMMUDevice *smmu;
++    SMMUIOTLBKey *key = (SMMUIOTLBKey *)v;
++    uint32_t a, b, c;
 +
-+    bus_n = PCI_BUS_NUM(sid);
-+    smmu_bus = smmu_find_smmu_pcibus(s, bus_n);
-+    if (smmu_bus) {
-+        devfn = sid & 0x7;
-+        smmu = smmu_bus->pbdev[devfn];
-+        if (smmu) {
-+            return &smmu->iommu;
-+        }
-+    }
-+    return NULL;
++    /* Jenkins hash */
++    a = b = c = JHASH_INITVAL + sizeof(*key);
++    a += key->asid;
++    b += extract64(key->iova, 0, 32);
++    c += extract64(key->iova, 32, 32);
++
++    __jhash_mix(a, b, c);
++    __jhash_final(a, b, c);
++
++    return c;
++}
++
++static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
++{
++    const SMMUIOTLBKey *k1 = v1;
++    const SMMUIOTLBKey *k2 = v2;
++
++    return (k1->asid == k2->asid) && (k1->iova == k2->iova);
 +}
 +
  static void smmu_base_realize(DeviceState *dev, Error **errp)
  {
      SMMUState *s = ARM_SMMU(dev);
-@@ -321,7 +339,7 @@ static void smmu_base_realize(DeviceState *dev, Error **errp)
-         error_propagate(errp, local_err);
+@@ -340,6 +397,8 @@ static void smmu_base_realize(DeviceState *dev, Error **errp)
          return;
      }
--
-+    s->configs = g_hash_table_new_full(NULL, NULL, NULL, g_free);
+     s->configs = g_hash_table_new_full(NULL, NULL, NULL, g_free);
++    s->iotlb = g_hash_table_new_full(smmu_iotlb_key_hash, smmu_iotlb_key_equal,
++                                     g_free, g_free);
      s->smmu_pcibus_by_busptr = g_hash_table_new(NULL, NULL);
  
      if (s->primary_bus) {
-@@ -333,7 +351,9 @@ static void smmu_base_realize(DeviceState *dev, Error **errp)
+@@ -354,6 +413,7 @@ static void smmu_base_reset(DeviceState *dev)
+     SMMUState *s = ARM_SMMU(dev);
  
- static void smmu_base_reset(DeviceState *dev)
- {
--    /* will be filled later on */
-+    SMMUState *s = ARM_SMMU(dev);
-+
-+    g_hash_table_remove_all(s->configs);
+     g_hash_table_remove_all(s->configs);
++    g_hash_table_remove_all(s->iotlb);
  }
  
  static Property smmu_dev_properties[] = {
 diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 70b8f29..df704c2 100644
+index df704c2..b6dc7ed 100644
 --- a/hw/arm/smmuv3.c
 +++ b/hw/arm/smmuv3.c
-@@ -544,6 +544,58 @@ static int smmuv3_decode_config(IOMMUMemoryRegion *mr, SMMUTransCfg *cfg,
-     return decode_cd(cfg, &cd, event);
- }
- 
-+/**
-+ * smmuv3_get_config - Look up for a cached copy of configuration data for
-+ * @sdev and on cache miss performs a configuration structure decoding from
-+ * guest RAM.
-+ *
-+ * @sdev: SMMUDevice handle
-+ * @event: output event info
-+ *
-+ * The configuration cache contains data resulting from both STE and CD
-+ * decoding under the form of an SMMUTransCfg struct. The hash table is indexed
-+ * by the SMMUDevice handle.
-+ */
-+static SMMUTransCfg *smmuv3_get_config(SMMUDevice *sdev, SMMUEventInfo *event)
-+{
-+    SMMUv3State *s = sdev->smmu;
-+    SMMUState *bc = &s->smmu_state;
-+    SMMUTransCfg *cfg;
-+
-+    cfg = g_hash_table_lookup(bc->configs, sdev);
-+    if (cfg) {
-+        sdev->cfg_cache_hits++;
-+        trace_smmuv3_config_cache_hit(smmu_get_sid(sdev),
-+                            sdev->cfg_cache_hits, sdev->cfg_cache_misses,
-+                            100 * sdev->cfg_cache_hits /
-+                            (sdev->cfg_cache_hits + sdev->cfg_cache_misses));
-+    } else {
-+        sdev->cfg_cache_misses++;
-+        trace_smmuv3_config_cache_miss(smmu_get_sid(sdev),
-+                            sdev->cfg_cache_hits, sdev->cfg_cache_misses,
-+                            100 * sdev->cfg_cache_hits /
-+                            (sdev->cfg_cache_hits + sdev->cfg_cache_misses));
-+        cfg = g_new0(SMMUTransCfg, 1);
-+
-+        if (!smmuv3_decode_config(&sdev->iommu, cfg, event)) {
-+            g_hash_table_insert(bc->configs, sdev, cfg);
-+        } else {
-+            g_free(cfg);
-+            cfg = NULL;
-+        }
-+    }
-+    return cfg;
-+}
-+
-+static void smmuv3_flush_config(SMMUDevice *sdev)
-+{
-+    SMMUv3State *s = sdev->smmu;
-+    SMMUState *bc = &s->smmu_state;
-+
-+    trace_smmuv3_config_cache_inv(smmu_get_sid(sdev));
-+    g_hash_table_remove(bc->configs, sdev);
-+}
-+
- static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
-                                       IOMMUAccessFlags flag, int iommu_idx)
- {
-@@ -553,7 +605,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+@@ -605,6 +605,10 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
      SMMUEventInfo event = {.type = SMMU_EVT_NONE, .sid = sid};
      SMMUPTWEventInfo ptw_info = {};
      SMMUTranslationStatus status;
--    SMMUTransCfg cfg = {};
-+    SMMUTransCfg *cfg = NULL;
++    SMMUState *bs = ARM_SMMU(s);
++    uint64_t page_mask, aligned_addr;
++    IOMMUTLBEntry *cached_entry = NULL;
++    SMMUTransTableInfo *tt;
+     SMMUTransCfg *cfg = NULL;
      IOMMUTLBEntry entry = {
          .target_as = &address_space_memory,
-         .iova = addr,
-@@ -562,27 +614,30 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+@@ -613,6 +617,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         .addr_mask = ~(hwaddr)0,
          .perm = IOMMU_NONE,
      };
++    SMMUIOTLBKey key, *new_key;
  
-+    qemu_mutex_lock(&s->mutex);
+     qemu_mutex_lock(&s->mutex);
+ 
+@@ -637,7 +642,57 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         goto epilogue;
+     }
+ 
+-    if (smmu_ptw(cfg, addr, flag, &entry, &ptw_info)) {
++    tt = select_tt(cfg, addr);
++    if (!tt) {
++        if (event.record_trans_faults) {
++            event.type = SMMU_EVT_F_TRANSLATION;
++            event.u.f_translation.addr = addr;
++            event.u.f_translation.rnw = flag & 0x1;
++        }
++        status = SMMU_TRANS_ERROR;
++        goto epilogue;
++    }
 +
-     if (!smmu_enabled(s)) {
-         status = SMMU_TRANS_DISABLE;
-         goto epilogue;
-     }
- 
--    if (smmuv3_decode_config(mr, &cfg, &event)) {
-+    cfg = smmuv3_get_config(sdev, &event);
-+    if (!cfg) {
-         status = SMMU_TRANS_ERROR;
-         goto epilogue;
-     }
- 
--    if (cfg.aborted) {
-+    if (cfg->aborted) {
-         status = SMMU_TRANS_ABORT;
-         goto epilogue;
-     }
- 
--    if (cfg.bypassed) {
-+    if (cfg->bypassed) {
-         status = SMMU_TRANS_BYPASS;
-         goto epilogue;
-     }
- 
--    if (smmu_ptw(&cfg, addr, flag, &entry, &ptw_info)) {
-+    if (smmu_ptw(cfg, addr, flag, &entry, &ptw_info)) {
++    page_mask = (1ULL << (tt->granule_sz)) - 1;
++    aligned_addr = addr & ~page_mask;
++
++    key.asid = cfg->asid;
++    key.iova = aligned_addr;
++
++    cached_entry = g_hash_table_lookup(bs->iotlb, &key);
++    if (cached_entry) {
++        cfg->iotlb_hits++;
++        trace_smmu_iotlb_cache_hit(cfg->asid, aligned_addr,
++                                   cfg->iotlb_hits, cfg->iotlb_misses,
++                                   100 * cfg->iotlb_hits /
++                                   (cfg->iotlb_hits + cfg->iotlb_misses));
++        if ((flag & IOMMU_WO) && !(cached_entry->perm & IOMMU_WO)) {
++            status = SMMU_TRANS_ERROR;
++            if (event.record_trans_faults) {
++                event.type = SMMU_EVT_F_PERMISSION;
++                event.u.f_permission.addr = addr;
++                event.u.f_permission.rnw = flag & 0x1;
++            }
++        } else {
++            status = SMMU_TRANS_SUCCESS;
++        }
++        goto epilogue;
++    }
++
++    cfg->iotlb_misses++;
++    trace_smmu_iotlb_cache_miss(cfg->asid, addr & ~page_mask,
++                                cfg->iotlb_hits, cfg->iotlb_misses,
++                                100 * cfg->iotlb_hits /
++                                (cfg->iotlb_hits + cfg->iotlb_misses));
++
++    if (g_hash_table_size(bs->iotlb) >= SMMU_IOTLB_MAX_SIZE) {
++        smmu_iotlb_inv_all(bs);
++    }
++
++    cached_entry = g_new0(IOMMUTLBEntry, 1);
++
++    if (smmu_ptw(cfg, aligned_addr, flag, cached_entry, &ptw_info)) {
++        g_free(cached_entry);
          switch (ptw_info.type) {
          case SMMU_PTW_ERR_WALK_EABT:
              event.type = SMMU_EVT_F_WALK_EABT;
-@@ -628,6 +683,7 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+@@ -679,6 +734,10 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         }
+         status = SMMU_TRANS_ERROR;
+     } else {
++        new_key = g_new0(SMMUIOTLBKey, 1);
++        new_key->asid = cfg->asid;
++        new_key->iova = aligned_addr;
++        g_hash_table_insert(bs->iotlb, new_key, cached_entry);
+         status = SMMU_TRANS_SUCCESS;
      }
  
- epilogue:
-+    qemu_mutex_unlock(&s->mutex);
+@@ -687,6 +746,9 @@ epilogue:
      switch (status) {
      case SMMU_TRANS_SUCCESS:
          entry.perm = flag;
-@@ -664,6 +720,7 @@ epilogue:
- 
- static int smmuv3_cmdq_consume(SMMUv3State *s)
- {
-+    SMMUState *bs = ARM_SMMU(s);
-     SMMUCmdError cmd_error = SMMU_CERROR_NONE;
-     SMMUQueue *q = &s->cmdq;
-     SMMUCommandType type = 0;
-@@ -698,6 +755,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
- 
-         trace_smmuv3_cmdq_opcode(smmu_cmd_string(type));
- 
-+        qemu_mutex_lock(&s->mutex);
-         switch (type) {
-         case SMMU_CMD_SYNC:
-             if (CMD_SYNC_CS(&cmd) & CMD_SYNC_SIG_IRQ) {
-@@ -706,10 +764,74 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
++        entry.translated_addr = cached_entry->translated_addr +
++                                    (addr & page_mask);
++        entry.addr_mask = cached_entry->addr_mask;
+         trace_smmuv3_translate_success(mr->parent_obj.name, sid, addr,
+                                        entry.translated_addr, entry.perm);
+         break;
+@@ -832,10 +894,39 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
+             smmuv3_flush_config(sdev);
              break;
-         case SMMU_CMD_PREFETCH_CONFIG:
-         case SMMU_CMD_PREFETCH_ADDR:
-+            break;
-         case SMMU_CMD_CFGI_STE:
-+        {
-+            uint32_t sid = CMD_SID(&cmd);
-+            IOMMUMemoryRegion *mr = smmu_iommu_mr(bs, sid);
-+            SMMUDevice *sdev;
-+
-+            if (CMD_SSEC(&cmd)) {
-+                cmd_error = SMMU_CERROR_ILL;
-+                break;
-+            }
-+
-+            if (!mr) {
-+                break;
-+            }
-+
-+            trace_smmuv3_cmdq_cfgi_ste(sid);
-+            sdev = container_of(mr, SMMUDevice, iommu);
-+            smmuv3_flush_config(sdev);
-+
-+            break;
-+        }
-         case SMMU_CMD_CFGI_STE_RANGE: /* same as SMMU_CMD_CFGI_ALL */
-+        {
-+            uint32_t start = CMD_SID(&cmd), end, i;
-+            uint8_t range = CMD_STE_RANGE(&cmd);
-+
-+            if (CMD_SSEC(&cmd)) {
-+                cmd_error = SMMU_CERROR_ILL;
-+                break;
-+            }
-+
-+            end = start + (1 << (range + 1)) - 1;
-+            trace_smmuv3_cmdq_cfgi_ste_range(start, end);
-+
-+            for (i = start; i <= end; i++) {
-+                IOMMUMemoryRegion *mr = smmu_iommu_mr(bs, i);
-+                SMMUDevice *sdev;
-+
-+                if (!mr) {
-+                    continue;
-+                }
-+                sdev = container_of(mr, SMMUDevice, iommu);
-+                smmuv3_flush_config(sdev);
-+            }
-+            break;
-+        }
-         case SMMU_CMD_CFGI_CD:
-         case SMMU_CMD_CFGI_CD_ALL:
-+        {
-+            uint32_t sid = CMD_SID(&cmd);
-+            IOMMUMemoryRegion *mr = smmu_iommu_mr(bs, sid);
-+            SMMUDevice *sdev;
-+
-+            if (CMD_SSEC(&cmd)) {
-+                cmd_error = SMMU_CERROR_ILL;
-+                break;
-+            }
-+
-+            if (!mr) {
-+                break;
-+            }
-+
-+            trace_smmuv3_cmdq_cfgi_cd(sid);
-+            sdev = container_of(mr, SMMUDevice, iommu);
-+            smmuv3_flush_config(sdev);
-+            break;
-+        }
-         case SMMU_CMD_TLBI_NH_ALL:
+         }
+-        case SMMU_CMD_TLBI_NH_ALL:
          case SMMU_CMD_TLBI_NH_ASID:
-         case SMMU_CMD_TLBI_NH_VA:
-@@ -735,6 +857,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-                           "Illegal command type: %d\n", CMD_TYPE(&cmd));
-             break;
-         }
-+        qemu_mutex_unlock(&s->mutex);
-         if (cmd_error) {
-             break;
-         }
-@@ -1114,6 +1237,8 @@ static void smmu_realize(DeviceState *d, Error **errp)
-         return;
-     }
- 
-+    qemu_mutex_init(&s->mutex);
+-        case SMMU_CMD_TLBI_NH_VA:
++        {
++            uint16_t asid = CMD_ASID(&cmd);
 +
-     memory_region_init_io(&sys->iomem, OBJECT(s),
-                           &smmu_mem_ops, sys, TYPE_ARM_SMMUV3, 0x20000);
- 
++            trace_smmuv3_cmdq_tlbi_nh_asid(asid);
++            smmu_iotlb_inv_asid(bs, asid);
++            break;
++        }
++        case SMMU_CMD_TLBI_NH_ALL:
++        case SMMU_CMD_TLBI_NSNH_ALL:
++            trace_smmuv3_cmdq_tlbi_nh();
++            smmu_iotlb_inv_all(bs);
++            break;
+         case SMMU_CMD_TLBI_NH_VAA:
++        {
++            dma_addr_t addr = CMD_ADDR(&cmd);
++            uint16_t vmid = CMD_VMID(&cmd);
++
++            trace_smmuv3_cmdq_tlbi_nh_vaa(vmid, addr);
++            smmu_iotlb_inv_all(bs);
++            break;
++        }
++        case SMMU_CMD_TLBI_NH_VA:
++        {
++            uint16_t asid = CMD_ASID(&cmd);
++            uint16_t vmid = CMD_VMID(&cmd);
++            dma_addr_t addr = CMD_ADDR(&cmd);
++            bool leaf = CMD_LEAF(&cmd);
++
++            trace_smmuv3_cmdq_tlbi_nh_va(vmid, asid, addr, leaf);
++            smmu_iotlb_inv_iova(bs, asid, addr);
++            break;
++        }
+         case SMMU_CMD_TLBI_EL3_ALL:
+         case SMMU_CMD_TLBI_EL3_VA:
+         case SMMU_CMD_TLBI_EL2_ALL:
+@@ -844,7 +935,6 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
+         case SMMU_CMD_TLBI_EL2_VAA:
+         case SMMU_CMD_TLBI_S12_VMALL:
+         case SMMU_CMD_TLBI_S2_IPA:
+-        case SMMU_CMD_TLBI_NSNH_ALL:
+         case SMMU_CMD_ATC_INV:
+         case SMMU_CMD_PRI_RESP:
+         case SMMU_CMD_RESUME:
 diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index 0ab66bb..8ee4c21 100644
+index 8ee4c21..be69c5d 100644
 --- a/hw/arm/trace-events
 +++ b/hw/arm/trace-events
-@@ -40,3 +40,9 @@ smmuv3_translate_success(const char *n, uint16_t sid, uint64_t iova, uint64_t tr
- smmuv3_get_cd(uint64_t addr) "CD addr: 0x%"PRIx64
- smmuv3_decode_cd(uint32_t oas) "oas=%d"
- smmuv3_decode_cd_tt(int i, uint32_t tsz, uint64_t ttb, uint32_t granule_sz) "TT[%d]:tsz:%d ttb:0x%"PRIx64" granule_sz:%d"
-+smmuv3_cmdq_cfgi_ste(int streamid) "streamid =%d"
-+smmuv3_cmdq_cfgi_ste_range(int start, int end) "start=0x%d - end=0x%d"
-+smmuv3_cmdq_cfgi_cd(uint32_t sid) "streamid = %d"
-+smmuv3_config_cache_hit(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache HIT for sid %d (hits=%d, misses=%d, hit rate=%d)"
-+smmuv3_config_cache_miss(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache MISS for sid %d (hits=%d, misses=%d, hit rate=%d)"
-+smmuv3_config_cache_inv(uint32_t sid) "Config cache INV for sid %d"
+@@ -12,6 +12,11 @@ smmu_ptw_invalid_pte(int stage, int level, uint64_t baseaddr, uint64_t pteaddr,
+ smmu_ptw_page_pte(int stage, int level,  uint64_t iova, uint64_t baseaddr, uint64_t pteaddr, uint64_t pte, uint64_t address) "stage=%d level=%d iova=0x%"PRIx64" base@=0x%"PRIx64" pte@=0x%"PRIx64" pte=0x%"PRIx64" page address = 0x%"PRIx64
+ smmu_ptw_block_pte(int stage, int level, uint64_t baseaddr, uint64_t pteaddr, uint64_t pte, uint64_t iova, uint64_t gpa, int bsize_mb) "stage=%d level=%d base@=0x%"PRIx64" pte@=0x%"PRIx64" pte=0x%"PRIx64" iova=0x%"PRIx64" block address = 0x%"PRIx64" block size = %d MiB"
+ smmu_get_pte(uint64_t baseaddr, int index, uint64_t pteaddr, uint64_t pte) "baseaddr=0x%"PRIx64" index=0x%x, pteaddr=0x%"PRIx64", pte=0x%"PRIx64
++smmu_iotlb_cache_hit(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, uint32_t p) "IOTLB cache HIT asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%d"
++smmu_iotlb_cache_miss(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss, uint32_t p) "IOTLB cache MISS asid=%d addr=0x%"PRIx64" hit=%d miss=%d hit rate=%d"
++smmu_iotlb_inv_all(void) "IOTLB invalidate all"
++smmu_iotlb_inv_asid(uint16_t asid) "IOTLB invalidate asid=%d"
++smmu_iotlb_inv_iova(uint16_t asid, uint64_t addr) "IOTLB invalidate asid=%d addr=0x%"PRIx64
+ 
+ #hw/arm/smmuv3.c
+ smmuv3_read_mmio(uint64_t addr, uint64_t val, unsigned size, uint32_t r) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x(%d)"
+@@ -45,4 +50,8 @@ smmuv3_cmdq_cfgi_ste_range(int start, int end) "start=0x%d - end=0x%d"
+ smmuv3_cmdq_cfgi_cd(uint32_t sid) "streamid = %d"
+ smmuv3_config_cache_hit(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache HIT for sid %d (hits=%d, misses=%d, hit rate=%d)"
+ smmuv3_config_cache_miss(uint32_t sid, uint32_t hits, uint32_t misses, uint32_t perc) "Config cache MISS for sid %d (hits=%d, misses=%d, hit rate=%d)"
++smmuv3_cmdq_tlbi_nh_va(int vmid, int asid, uint64_t addr, bool leaf) "vmid =%d asid =%d addr=0x%"PRIx64" leaf=%d"
++smmuv3_cmdq_tlbi_nh_vaa(int vmid, uint64_t addr) "vmid =%d addr=0x%"PRIx64
++smmuv3_cmdq_tlbi_nh(void) ""
++smmuv3_cmdq_tlbi_nh_asid(uint16_t asid) "asid=%d"
+ smmuv3_config_cache_inv(uint32_t sid) "Config cache INV for sid %d"
 diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-index c41eb5c3..7ce95ca 100644
+index 7ce95ca..d173806 100644
 --- a/include/hw/arm/smmu-common.h
 +++ b/include/hw/arm/smmu-common.h
-@@ -75,6 +75,8 @@ typedef struct SMMUDevice {
-     int                devfn;
-     IOMMUMemoryRegion  iommu;
-     AddressSpace       as;
-+    uint32_t           cfg_cache_hits;
-+    uint32_t           cfg_cache_misses;
- } SMMUDevice;
+@@ -67,6 +67,8 @@ typedef struct SMMUTransCfg {
+     uint8_t tbi;               /* Top Byte Ignore */
+     uint16_t asid;
+     SMMUTransTableInfo tt[2];
++    uint32_t iotlb_hits;       /* counts IOTLB hits for this asid */
++    uint32_t iotlb_misses;     /* counts IOTLB misses for this asid */
+ } SMMUTransCfg;
  
- typedef struct SMMUNotifierNode {
-@@ -142,4 +144,7 @@ int smmu_ptw(SMMUTransCfg *cfg, dma_addr_t iova, IOMMUAccessFlags perm,
-  */
- SMMUTransTableInfo *select_tt(SMMUTransCfg *cfg, dma_addr_t iova);
+ typedef struct SMMUDevice {
+@@ -89,6 +91,11 @@ typedef struct SMMUPciBus {
+     SMMUDevice   *pbdev[0]; /* Parent array is sparse, so dynamically alloc */
+ } SMMUPciBus;
  
-+/* Return the iommu mr associated to @sid, or NULL if none */
-+IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid);
++typedef struct SMMUIOTLBKey {
++    uint64_t iova;
++    uint16_t asid;
++} SMMUIOTLBKey;
++
+ typedef struct SMMUState {
+     /* <private> */
+     SysBusDevice  dev;
+@@ -147,4 +154,10 @@ SMMUTransTableInfo *select_tt(SMMUTransCfg *cfg, dma_addr_t iova);
+ /* Return the iommu mr associated to @sid, or NULL if none */
+ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid);
+ 
++#define SMMU_IOTLB_MAX_SIZE 256
++
++void smmu_iotlb_inv_all(SMMUState *s);
++void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
++void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova);
 +
  #endif  /* HW_ARM_SMMU_COMMON */
-diff --git a/include/hw/arm/smmuv3.h b/include/hw/arm/smmuv3.h
-index 23f7036..36b2f45 100644
---- a/include/hw/arm/smmuv3.h
-+++ b/include/hw/arm/smmuv3.h
-@@ -59,6 +59,7 @@ typedef struct SMMUv3State {
-     SMMUQueue eventq, cmdq;
- 
-     qemu_irq     irq[4];
-+    QemuMutex mutex;
- } SMMUv3State;
- 
- typedef enum {
 -- 
 2.5.5
