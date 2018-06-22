@@ -1,33 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38206)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38397)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWDUS-0005hY-JN
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:16:06 -0400
+	id 1fWDVS-00065f-QH
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:17:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWDUP-00012k-DT
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:16:04 -0400
-Received: from mail-qk0-x236.google.com ([2607:f8b0:400d:c09::236]:39529)
+	id 1fWDVP-0001HE-KY
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:17:06 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:42525)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWDUP-00012d-73
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:16:01 -0400
-Received: by mail-qk0-x236.google.com with SMTP id g14-v6so3043833qkm.6
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 21:16:00 -0700 (PDT)
+	id 1fWDVP-0001H6-DJ
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:17:03 -0400
+Received: by mail-qk0-x243.google.com with SMTP id u62-v6so507865qkf.9
+	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 21:17:03 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180620120620.12806-1-yongbok.kim@mips.com>
-	<20180620120620.12806-21-yongbok.kim@mips.com>
+	<20180620120620.12806-23-yongbok.kim@mips.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <427a9783-fe26-bd1a-119b-74dfe26297ba@amsat.org>
-Date: Fri, 22 Jun 2018 01:15:55 -0300
+Message-ID: <7eb9338c-75df-840a-c53c-5c65314a711c@amsat.org>
+Date: Fri, 22 Jun 2018 01:16:53 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180620120620.12806-21-yongbok.kim@mips.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 20/35] target/mips: Fix not to update
- BadVAddr in Debug Mode
+In-Reply-To: <20180620120620.12806-23-yongbok.kim@mips.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="eKd2bCRWoDiPqJl8L46vgRPDbCLE2pP9R"
+Subject: Re: [Qemu-devel] [PATCH 22/35] target/mips: Fix data type for offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,95 +38,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Yongbok Kim <yongbok.kim@mips.com>, qemu-devel@nongnu.org
 Cc: Aleksandar.Markovic@mips.com, Paul.Burton@mips.com, Stefan.Markovic@mips.com, Matthew.Fortune@mips.com, James.Hogan@mips.com, aurelien@aurel32.net, Richard Henderson <rth@twiddle.net>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eKd2bCRWoDiPqJl8L46vgRPDbCLE2pP9R
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Yongbok Kim <yongbok.kim@mips.com>, qemu-devel@nongnu.org
+Cc: Aleksandar.Markovic@mips.com, Paul.Burton@mips.com,
+ Stefan.Markovic@mips.com, Matthew.Fortune@mips.com, James.Hogan@mips.com,
+ aurelien@aurel32.net, Richard Henderson <rth@twiddle.net>
+Message-ID: <7eb9338c-75df-840a-c53c-5c65314a711c@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH 22/35] target/mips: Fix data type for offset
+References: <20180620120620.12806-1-yongbok.kim@mips.com>
+ <20180620120620.12806-23-yongbok.kim@mips.com>
+In-Reply-To: <20180620120620.12806-23-yongbok.kim@mips.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
 On 06/20/2018 09:06 AM, Yongbok Kim wrote:
 > From: Yongbok Kim <yongbok.kim@imgtec.com>
-> 
-> BadVaddr shouldn't be updated in Debug Mode
-
-Long-standing issue!
-
-> 
+>=20
+> Offset can be larger than 16 bit from nanoMIPS,
+> and immediate field can be larger than 16 bits as well.
+>=20
 > Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 > ---
->  target/mips/helper.c    |  4 +++-
->  target/mips/op_helper.c | 20 +++++++++++++++-----
->  2 files changed, 18 insertions(+), 6 deletions(-)
-> 
-> diff --git a/target/mips/helper.c b/target/mips/helper.c
-> index 8cf91ce..e215af9 100644
-> --- a/target/mips/helper.c
-> +++ b/target/mips/helper.c
-> @@ -502,7 +502,9 @@ static void raise_mmu_exception(CPUMIPSState *env, target_ulong address,
->          break;
->      }
->      /* Raise exception */
-> -    env->CP0_BadVAddr = address;
-> +    if (!(env->hflags & MIPS_HFLAG_DM)) {
-> +        env->CP0_BadVAddr = address;
-> +    }
->      env->CP0_Context = (env->CP0_Context & ~0x007fffff) |
->                         ((address >> 9) & 0x007ffff0);
->      env->CP0_EntryHi = (env->CP0_EntryHi & env->CP0_EntryHi_ASID_mask) |
-> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-> index 71a9d66..c9a111c 100644
-> --- a/target/mips/op_helper.c
-> +++ b/target/mips/op_helper.c
-> @@ -271,7 +271,9 @@ static inline hwaddr do_translate_address(CPUMIPSState *env,
->  target_ulong helper_##name(CPUMIPSState *env, target_ulong arg, int mem_idx)  \
->  {                                                                             \
->      if (arg & almask) {                                                       \
-> -        env->CP0_BadVAddr = arg;                                              \
-> +        if (!(env->hflags & MIPS_HFLAG_DM)) {                                 \
-> +            env->CP0_BadVAddr = arg;                                          \
-> +        }                                                                     \
->          do_raise_exception(env, EXCP_AdEL, GETPC());                          \
->      }                                                                         \
->      env->lladdr = do_translate_address(env, arg, 0, GETPC());                 \
-> @@ -288,7 +290,9 @@ void helper_llwp(CPUMIPSState *env, target_ulong addr, uint32_t reg1,
->                   uint32_t reg2, uint32_t mem_idx)
+>  target/mips/translate.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/target/mips/translate.c b/target/mips/translate.c
+> index 9e29dd7..8c20ba3 100644
+> --- a/target/mips/translate.c
+> +++ b/target/mips/translate.c
+> @@ -2114,7 +2114,7 @@ OP_ST_ATOMIC(scd,st64,ld64,0x7);
+>  #undef OP_ST_ATOMIC
+> =20
+>  static void gen_base_offset_addr (DisasContext *ctx, TCGv addr,
+> -                                  int base, int16_t offset)
+> +                                  int base, int offset)
 >  {
->      if (addr & 0x7) {
-> -        env->CP0_BadVAddr = addr;
-> +        if (!(env->hflags & MIPS_HFLAG_DM)) {
-> +            env->CP0_BadVAddr = addr;
-> +        }
->          do_raise_exception(env, EXCP_AdEL, GETPC());
->      }
->      env->lladdr = do_translate_address(env, addr, 0, GETPC());
-> @@ -304,7 +308,9 @@ target_ulong helper_##name(CPUMIPSState *env, target_ulong arg1,              \
->      target_long tmp;                                                          \
->                                                                                \
->      if (arg2 & almask) {                                                      \
-> -        env->CP0_BadVAddr = arg2;                                             \
-> +        if (!(env->hflags & MIPS_HFLAG_DM)) {                                 \
-> +            env->CP0_BadVAddr = arg2;                                         \
-> +        }                                                                     \
->          do_raise_exception(env, EXCP_AdES, GETPC());                          \
->      }                                                                         \
->      if (do_translate_address(env, arg2, 1, GETPC()) == env->lladdr) {         \
-> @@ -329,7 +335,9 @@ target_ulong helper_scwp(CPUMIPSState *env, target_ulong addr,
->      uint32_t tmp2;
->  
->      if (addr & 0x7) {
-> -        env->CP0_BadVAddr = addr;
-> +        if (!(env->hflags & MIPS_HFLAG_DM)) {
-> +            env->CP0_BadVAddr = addr;
-> +        }
->          do_raise_exception(env, EXCP_AdES, GETPC());
->      }
->      if (do_translate_address(env, addr, 1, GETPC()) == env->lladdr) {
-> @@ -2472,7 +2480,9 @@ void mips_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
->      int error_code = 0;
->      int excp;
->  
-> -    env->CP0_BadVAddr = addr;
-> +    if (!(env->hflags & MIPS_HFLAG_DM)) {
-> +        env->CP0_BadVAddr = addr;
-> +    }
->  
->      if (access_type == MMU_DATA_STORE) {
->          excp = EXCP_AdES;
-> 
+>      if (base =3D=3D 0) {
+>          tcg_gen_movi_tl(addr, offset);
+> @@ -2142,7 +2142,7 @@ static target_ulong pc_relative_pc (DisasContext =
+*ctx)
+> =20
+>  /* Load */
+>  static void gen_ld(DisasContext *ctx, uint32_t opc,
+> -                   int rt, int base, int16_t offset)
+> +                   int rt, int base, int offset)
+>  {
+>      TCGv t0, t1, t2;
+>      int mem_idx =3D ctx->mem_idx;
+> @@ -2377,7 +2377,7 @@ static void gen_llwp(DisasContext *ctx, uint32_t =
+base, int16_t offset,
+> =20
+>  /* Store */
+>  static void gen_st (DisasContext *ctx, uint32_t opc, int rt,
+> -                    int base, int16_t offset)
+> +                    int base, int offset)
+>  {
+>      TCGv t0 =3D tcg_temp_new();
+>      TCGv t1 =3D tcg_temp_new();
+> @@ -2602,7 +2602,7 @@ static void gen_cop1_ldst(DisasContext *ctx, uint=
+32_t op, int rt,
+> =20
+>  /* Arithmetic with immediate operand */
+>  static void gen_arith_imm(DisasContext *ctx, uint32_t opc,
+> -                          int rt, int rs, int16_t imm)
+> +                          int rt, int rs, int imm)
+>  {
+>      target_ulong uimm =3D (target_long)imm; /* Sign extend to 32/64 bi=
+ts */
+> =20
+>=20
+
+
+--eKd2bCRWoDiPqJl8L46vgRPDbCLE2pP9R
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlsseDUACgkQ4+MsLN6t
+wN4Q+A/+ITa9aAGbIX/SIz12s5zGfYkr1DX5UAHyJ9OjV/6R26yNRM7QFrlMm+hJ
+7hSLAyIZuDc99XeES+kmfgRthQ0FSe/J430BPocW4fAIlymV0/ezWZVR5CNS9Vmv
+QACy4F/6Y9EYca6JLrWZrQuVCceTK7FCAnsXoWWH1Mwc1RIsv18VVQ8N0nhApncc
+Zt3b2ufcXcfZRK6167a8GNjYl7QrGpGaW2qGnztIGZlv9Y0g61a5ezsBAr2XplHX
+9XJDz+Ej5NjILdD5ruTVV3U+hVuzXAyIxnN6GJg8Zx5izTVKwQOckWmSyGIWMv6E
+JMAXIMw4Dif9ZpkJ66shBT3Y5JbIHVrr1E+XLAK++7DQ2tQSgMERM8kRbFyfD7Vh
+zKzvWo2VfFyxP6ntPpHb7juLR+N1bTmdIjNi8h18nM3RlBNbHGF8FVtsl8PpcXqx
+EVXDXVt93xWJ2Y44lJRtZB7TH02zFwXVKXKAJ4xqkBwQCMmyneBz9CCn2Px1JRSX
+CmnAfD3UbV3thpabd5nMbg4uDRUGGn4mx17vCb9UVjKBMBf2V9q5HlGzKhWoEcXh
+KB46cMnk94Qedd8IFI+iD84anze4L2wphWFbVyNlBU0qNJm/zckaYhK2e4sdxWJF
+RFGUm2g24XoGADpPjpBTravNsWEjts+Cc5Pf5sxZ6dcDCV+Vi1M=
+=c/86
+-----END PGP SIGNATURE-----
+
+--eKd2bCRWoDiPqJl8L46vgRPDbCLE2pP9R--
