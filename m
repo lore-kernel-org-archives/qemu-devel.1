@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fWBha-0002L6-2y
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:21:33 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWBjG-0003Ck-W0
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:23:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fWBhY-0005P3-OS
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:21:30 -0400
-Date: Fri, 22 Jun 2018 10:21:19 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180622022119.GA5449@lemon.usersys.redhat.com>
-References: <20180621222143.27266-1-naravamudan@digitalocean.com>
-	<20180621222143.27266-2-naravamudan@digitalocean.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1fWBjD-0006F2-L0
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:23:14 -0400
+Date: Fri, 22 Jun 2018 11:59:40 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180622015940.GF612@umbus.fritz.box>
+References: <cover.1529398335.git.balaton@eik.bme.hu>
+	<ce619ddd11a875caae4c221c18ebf7c6a6f4bd4f.1529398335.git.balaton@eik.bme.hu>
+	<20180620052044.GA24636@umbus.fritz.box>
+	<alpine.BSF.2.21.1806210900160.16898@zero.eik.bme.hu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="dgjlcl3Tl+kb3YDk"
 Content-Disposition: inline
-In-Reply-To: <20180621222143.27266-2-naravamudan@digitalocean.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] linux-aio: properly bubble up
- errors from initialization
+In-Reply-To: <alpine.BSF.2.21.1806210900160.16898@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] ppc4xx_i2c: Implement directcntl
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,199 +27,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nishanth Aravamudan <naravamudan@digitalocean.com>
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
-On Thu, 06/21 15:21, Nishanth Aravamudan wrote:
-> laio_init() can fail for a couple of reasons, which will lead to a NULL
-> pointer dereference in laio_attach_aio_context().
-> 
-> To solve this, add a aio_setup_linux_aio() function which is called
-> early in raw_open_common. If this fails, propagate the error up. The
-> signature of aio_get_linux_aio() was not modified, because it seems
-> preferable to return the actual errno from the possible failing
-> initialization calls.
-> 
-> Add an assert that aio_get_linux_aio() cannot return NULL.
-> 
-> Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
-> ---
-> Changes from v2 -> v3 (thanks to Eric Blake and Kevin Wolf for review):
-> 
-> Use a boolean false rather than 0 in assignment to use_linux_aio.
-> Drop ending '.' from error_report() calls.
-> Fix typo in commit message (propogates -> propagates).
-> Move aio_setup_linux_aio call to raw_open_common.
-> 
-> Changes from v1 -> v2 (thanks to Kevin Wolf for review):
-> 
-> Rather than affect virtio-scsi/blk at all, make all the changes internal
-> to file-posix.c. Thanks to Kevin Wolf for the suggested change.
-> 
->  block/file-posix.c      | 17 ++++++++++++-----
->  block/linux-aio.c       | 15 ++++++++++-----
->  include/block/aio.h     |  3 +++
->  include/block/raw-aio.h |  2 +-
->  stubs/linux-aio.c       |  2 +-
->  util/async.c            | 16 +++++++++++++---
->  6 files changed, 40 insertions(+), 15 deletions(-)
-> 
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 07bb061fe4..6a1714d4a8 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -545,11 +545,18 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
->  
->  #ifdef CONFIG_LINUX_AIO
->       /* Currently Linux does AIO only for files opened with O_DIRECT */
-> -    if (s->use_linux_aio && !(s->open_flags & O_DIRECT)) {
-> -        error_setg(errp, "aio=native was specified, but it requires "
-> -                         "cache.direct=on, which was not specified.");
-> -        ret = -EINVAL;
-> -        goto fail;
-> +    if (s->use_linux_aio) {
-> +        if (!(s->open_flags & O_DIRECT)) {
-> +            error_setg(errp, "aio=native was specified, but it requires "
-> +                             "cache.direct=on, which was not specified.");
-> +            ret = -EINVAL;
-> +            goto fail;
-> +        }
-> +        ret = aio_setup_linux_aio(bdrv_get_aio_context(bs));
-> +        if (ret != 0) {
-> +            error_setg(errp, "Unable to setup native AIO context.");
-> +            goto fail;
-> +        }
->      }
->  #else
->      if (s->use_linux_aio) {
-> diff --git a/block/linux-aio.c b/block/linux-aio.c
-> index 88b8d55ec7..4d799f85fe 100644
-> --- a/block/linux-aio.c
-> +++ b/block/linux-aio.c
-> @@ -470,28 +470,33 @@ void laio_attach_aio_context(LinuxAioState *s, AioContext *new_context)
->                             qemu_laio_poll_cb);
->  }
->  
-> -LinuxAioState *laio_init(void)
-> +int laio_init(LinuxAioState **linux_aio)
->  {
-> +    int rc;
->      LinuxAioState *s;
->  
->      s = g_malloc0(sizeof(*s));
-> -    if (event_notifier_init(&s->e, false) < 0) {
-> +    rc = event_notifier_init(&s->e, false);
-> +    if (rc < 0) {
 
-It would be nice if the error message could distinguish this error...
+--dgjlcl3Tl+kb3YDk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->          goto out_free_state;
->      }
->  
-> -    if (io_setup(MAX_EVENTS, &s->ctx) != 0) {
-> +    rc = io_setup(MAX_EVENTS, &s->ctx);
-> +    if (rc != 0) {
+On Thu, Jun 21, 2018 at 09:17:11AM +0200, BALATON Zoltan wrote:
+> On Wed, 20 Jun 2018, David Gibson wrote:
+> > On Tue, Jun 19, 2018 at 10:52:15AM +0200, BALATON Zoltan wrote:
+> > > As well as being able to generate its own i2c transactions, the ppc4xx
+> > > i2c controller has a DIRECTCNTL register which allows explicit control
+> > > of the i2c lines.
+> > >=20
+> > > Using this register an OS can directly bitbang i2c operations. In
+> > > order to let emulated i2c devices respond to this, we need to wire up
+> > > the DIRECTCNTL register to qemu's bitbanged i2c handling code.
+> > >=20
+> > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+> > > ---
+> > > v4: Updated commit message and use defined constant where
+> > > appropriate
+> >=20
+> > I'm still don't quite understand your approach to the symbolic
+> > constants here, but I don't care enough to hold this up any further.
+> > So, applied to ppc-for-3.0.
+>=20
+> Thanks, just to try to clear this up, I consider symbolic constants to be
+> the name of bits 0-3 in the directntl register so while MSCL equals 1 it's
+> only appropriate to use the constant if I really mean (1 << 0) i.e. bit 0=
+ of
+> directcntl reg.
 
-... from this one. And it also makes sense to propagate the errno back with
-error_setg_errno.
+Right..
 
-To do this, add an "Error **errp" parameter to the function and you can keep the
-return type (LinuxAioState *).
+>=20
+> > > diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+> > > index 4e0aaae..fca80d6 100644
+> > > --- a/hw/i2c/ppc4xx_i2c.c
+> > > +++ b/hw/i2c/ppc4xx_i2c.c
+> > > @@ -30,6 +30,7 @@
+> > >  #include "cpu.h"
+> > >  #include "hw/hw.h"
+> > >  #include "hw/i2c/ppc4xx_i2c.h"
+> > > +#include "bitbang_i2c.h"
+> > >=20
+> > >  #define PPC4xx_I2C_MEM_SIZE 18
+> > >=20
+> > > @@ -46,6 +47,11 @@
+> > >=20
+> > >  #define IIC_XTCNTLSS_SRST   (1 << 0)
+> > >=20
+> > > +#define IIC_DIRECTCNTL_SDAC (1 << 3)
+> > > +#define IIC_DIRECTCNTL_SCLC (1 << 2)
+> > > +#define IIC_DIRECTCNTL_MSDA (1 << 1)
+> > > +#define IIC_DIRECTCNTL_MSCL (1 << 0)
+> > > +
+> > >  static void ppc4xx_i2c_reset(DeviceState *s)
+> > >  {
+> > >      PPC4xxI2CState *i2c =3D PPC4xx_I2C(s);
+> > > @@ -289,7 +295,12 @@ static void ppc4xx_i2c_writeb(void *opaque, hwad=
+dr addr, uint64_t value,
+> > >          i2c->xtcntlss =3D value;
+> > >          break;
+> > >      case 16:
+> > > -        i2c->directcntl =3D value & 0x7;
+> > > +        i2c->directcntl =3D value & (IIC_DIRECTCNTL_SDAC & IIC_DIREC=
+TCNTL_SCLC);
+>=20
+> This clears all bits but SDAC and SCLC so constants are OK here as they
+> refer to bits in the register. (Guest can set the S* bits to say what sta=
+te
+> it wants the i2c lines to become.)
+>=20
+> > > +        i2c->directcntl |=3D (value & IIC_DIRECTCNTL_SCLC ? 1 : 0);
+>=20
+> This is directcntl[MSCL] =3D direcntl[SCLC] that is, set MSCL bit the sam=
+e as
+> SCLC, the 1 : 0 here are the value of the bit not the MSCL bit so constans
+> are not appropriate here.
 
->          goto out_close_efd;
->      }
->  
->      ioq_init(&s->io_q);
->  
-> -    return s;
-> +    *linux_aio = s;
-> +    return 0;
->  
->  out_close_efd:
->      event_notifier_cleanup(&s->e);
->  out_free_state:
->      g_free(s);
-> -    return NULL;
-> +    *linux_aio = NULL;
-> +    return rc;
->  }
->  
->  void laio_cleanup(LinuxAioState *s)
-> diff --git a/include/block/aio.h b/include/block/aio.h
-> index ae6f354e6c..8900516ac5 100644
-> --- a/include/block/aio.h
-> +++ b/include/block/aio.h
-> @@ -381,6 +381,9 @@ GSource *aio_get_g_source(AioContext *ctx);
->  /* Return the ThreadPool bound to this AioContext */
->  struct ThreadPool *aio_get_thread_pool(AioContext *ctx);
->  
-> +/* Setup the LinuxAioState bound to this AioContext */
-> +int aio_setup_linux_aio(AioContext *ctx);
+This is what I don't get.  Regardless of the method of it, you *are*
+setting bit 1 of the directcntl register, so why would the MSCL name
+not be appropriate?
 
-And this will then need "Error **errp" as well.
+>=20
+> > > +        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL,
+> > > +                        i2c->directcntl & IIC_DIRECTCNTL_MSCL);
+>=20
+> This lets the bitbang_i2c emulation also know that MSCL is set to 1 or 0 =
+so
+> constant here is OK, previously it was just 1 for brevity which may have
+> confused you.
+>=20
+> > > +        i2c->directcntl |=3D bitbang_i2c_set(i2c->bitbang, BITBANG_I=
+2C_SDA,
+> > > +                               (value & IIC_DIRECTCNTL_SDAC) !=3D 0)=
+ << 1;
+>=20
+> This sets MSDA bit of directcntl to the value returned by bitbang_i2c
+> emulation when sending it the bit in SDAC. So the
+> (value & IIC_DIRECTCNTL_SDAC) !=3D 0)
+> tests what value the SDAC bit has so 0 means the value of the bit and
+> constant refers to the bit in the register. (Because SDAC is not the LSB =
+and
+> we need 1 or 0 here hence the equality test to normalise the value, maybe
+> the !! construct could also be used, I'm not sure.) The << 1 at the end
+> makes sure we set the MSDA bit but that constant cannot be used here and
+> using MSCL instead is not correct because we mean the MSDA bit.
 
-> +
->  /* Return the LinuxAioState bound to this AioContext */
->  struct LinuxAioState *aio_get_linux_aio(AioContext *ctx);
->  
-> diff --git a/include/block/raw-aio.h b/include/block/raw-aio.h
-> index 0e717fd475..81b90e5fc6 100644
-> --- a/include/block/raw-aio.h
-> +++ b/include/block/raw-aio.h
-> @@ -43,7 +43,7 @@
->  /* linux-aio.c - Linux native implementation */
->  #ifdef CONFIG_LINUX_AIO
->  typedef struct LinuxAioState LinuxAioState;
-> -LinuxAioState *laio_init(void);
-> +int laio_init(LinuxAioState **linux_aio);
->  void laio_cleanup(LinuxAioState *s);
->  int coroutine_fn laio_co_submit(BlockDriverState *bs, LinuxAioState *s, int fd,
->                                  uint64_t offset, QEMUIOVector *qiov, int type);
-> diff --git a/stubs/linux-aio.c b/stubs/linux-aio.c
-> index ed47bd443c..88ab927e35 100644
-> --- a/stubs/linux-aio.c
-> +++ b/stubs/linux-aio.c
-> @@ -21,7 +21,7 @@ void laio_attach_aio_context(LinuxAioState *s, AioContext *new_context)
->      abort();
->  }
->  
-> -LinuxAioState *laio_init(void)
-> +int laio_init(LinuxAioState **linux_aio)
->  {
->      abort();
->  }
-> diff --git a/util/async.c b/util/async.c
-> index 03f62787f2..ae88c931d0 100644
-> --- a/util/async.c
-> +++ b/util/async.c
-> @@ -323,12 +323,22 @@ ThreadPool *aio_get_thread_pool(AioContext *ctx)
->  }
->  
->  #ifdef CONFIG_LINUX_AIO
-> -LinuxAioState *aio_get_linux_aio(AioContext *ctx)
-> +int aio_setup_linux_aio(AioContext *ctx)
->  {
-> +    int rc;
-> +    rc = 0;
->      if (!ctx->linux_aio) {
-> -        ctx->linux_aio = laio_init();
-> -        laio_attach_aio_context(ctx->linux_aio, ctx);
-> +        rc = laio_init(&ctx->linux_aio);
-> +        if (rc == 0) {
-> +            laio_attach_aio_context(ctx->linux_aio, ctx);
-> +        }
->      }
-> +    return rc;
-> +}
-> +
-> +LinuxAioState *aio_get_linux_aio(AioContext *ctx)
-> +{
-> +    assert(ctx->linux_aio);
->      return ctx->linux_aio;
->  }
->  #endif
-> -- 
-> 2.17.1
-> 
+Right, I'm not suggesting you use MSCL here, I'm suggesting you use
+MSDA.
 
-Fam
+> In summary, guest sets SDAC and SCLC as it wants the i2c lines and MSDA a=
+nd
+> MSCL are set by the device to what state the lines are actually in. (The S
+> in first two regs may stand for Set while M stands for Monitor.)
+>=20
+> Regards,
+> BALATON Zoltan
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--dgjlcl3Tl+kb3YDk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlssWAkACgkQbDjKyiDZ
+s5KMdA/9Fidk1Yp6RhWjIup0J68whvOS/H8t5QRMb8ww4dSNzUmgrAqewpT5MXef
+7ID6W/seZuwp1ZJCfZkaonz7JqYxpFUMC/CyiNCxvu6r4wdtJ/sZEVKy23OQo7oH
+Dw9Q6UeLbM1KNyW7FN/x1e7e813JI5jEvWWw+CufklkASmvOoCiYXyfBM7kDVQ5W
+BwxfYyFN1qFVh9GyOa8tYh4S2ulmfCTU8zMBwljtNN4xJAtza3wcKC08ezPSjUNY
+Bhg8orjgtV1x0AAjuGXEf1em3jbdqR3T7FBCAEmQToJb2CqmQmLvEgexmLRaQ3bh
+7ahzYlRpjd18FOQdiyl9sgRaPQt/eJWSNSj2vKqcL76t7Dmq3qYx1w2R01XiIeQZ
+Sqnt+1oaL0uJ2FWxi63TKDOYVhGp8OkC/bs1bmWlILlxho8tQiqmkvG/pZ88g+mw
+A67ljij4AXxiaA04WEuxL0Gj11cg0HIu+LwcyUbwUxSxV2n24ss+hyeNJbq5kBwH
+c4FtCIvcNUuZ0/ockR9qcH3xNHgb66Omct6dKok80rGuhNFISGpjBVqzXFs7Kj8e
+KzvSI4Bj1o/nWfXFaWsXSNqnOS48JOZhzIM/cBlZfCcSFpNdiidVw+SrC95ETeT2
+wzlo0qtYBTZzb/27twpoqU3/+DNnHgTxmNUHc5o1WY5HrjJ/vOI=
+=XDW6
+-----END PGP SIGNATURE-----
+
+--dgjlcl3Tl+kb3YDk--
