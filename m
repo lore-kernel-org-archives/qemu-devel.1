@@ -1,43 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fWMFP-00029M-Ck
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:37:08 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fWMIx-0005nZ-HM
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:40:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fWMFO-0001Nf-DT
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:37:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46894
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fWMFO-0001NY-7k
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:37:06 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5MDYENM080556
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 09:37:05 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2jrx6mtrnm-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 09:37:05 -0400
-Received: from localhost
-	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 22 Jun 2018 14:36:55 +0100
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-26-kwolf@redhat.com>
-	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
-	<20180622125502.GF4366@localhost.localdomain>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 22 Jun 2018 15:36:50 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fWMIv-0002p5-1E
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:40:47 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Fri, 22 Jun 2018 10:40:22 -0300
+Message-Id: <20180622134036.23182-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180622125502.GF4366@localhost.localdomain>
-Content-Language: en-US
-Message-Id: <ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 25/26] block: Remove deprecated -drive
- option serial
+Subject: [Qemu-devel] [PATCH v2 00/14] hw/arm: use qemu_log_mask instead of
+ fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,58 +25,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Boris Fiuczynski <fiuczy@linux.ibm.com>, libvir-list@redhat.com, eblake@redhat.com, pkrempa@redhat.com, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
 
+Hi,
 
+This series is another collection of trivial patches from
+different stagnating branches, OMAP and Stellaris. Time to
+share before loosing them.
 
-On 06/22/2018 02:55 PM, Kevin Wolf wrote:
-> Am 22.06.2018 um 13:38 hat Christian Borntraeger geschrieben:
->>
->> On 06/15/2018 04:21 PM, Kevin Wolf wrote:
->>> The -drive option serial was deprecated in QEMU 2.10. It's time to
->>> remove it.
->>>
->>> Tests need to be updated to set the serial number with -global instead
->>> of using the -drive option.
->>
->> libvirt 4.5 still creates those (at least on s390x)
->>
->>     <disk type='file' device='disk'>
->>       <driver name='qemu' type='qcow2' cache='none' io='native' iothread='1'/>
->>       <source file='/var/lib/libvirt/qemu/image.zhyp137'/>
->>       <target dev='hda' bus='virtio'/>
->>       <serial>skel</serial>
->>       <boot order='1'/>
->>       <address type='ccw' cssid='0xfe' ssid='0x0' devno='0x0000'/>
->>     </disk>
->>
->>
->> -> 
->> [...]
->> -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native -device virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0000,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on 
->> [...]
->>
->> 2018-06-22T11:25:20.946024Z qemu-system-s390x: -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native: Block format 'qcow2' does not support the option 'serial'
->> 2018-06-22 11:25:21.098+0000: shutting down, reason=failed
->>
->> So it seems that this breaks s390x.
+Regards,
 
-To me it seems that this is also broken on x86.
-> 
-> Thanks for bringing this up. libvirt should fix this before QEMU 3.0 is
-> released.
+Phil.
 
-I think this is definitely too short notice. We should not break existing
-setups just by insisting that users have to update libvirt when they update
-QEMU. Yes, this might be our policy, but doing so "just because we can"
-is certainly a very bad attitude. I see no fundamental technical reason why
-we should not revert this change.
+Since v1:
+- added Alistair R-b
+- addressed Thomas Huth comments
+- added one more change in smc91c111
+- fixed gptm_write()
 
+v1: http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg06324.html
 
-> 
-> Sadly, it also shows that deprecation warnings in log files go
-> unnoticed.
+[----] : patches are identical
+[####] : number of functional differences between upstream/downstream patch
+[down] : patch is downstream-only
+The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
 
-In fact whoever added the deprication notice should have followed up
-with the libvirt team to implement that change. no?
+001/14:[0002] [FC] 'hw/input/pckbd: Use qemu_log_mask(GUEST_ERROR) instead of fprintf'
+002/14:[0003] [FC] 'hw/input/tsc2005: Use qemu_log_mask(GUEST_ERROR) instead of fprintf'
+003/14:[----] [--] 'hw/dma/omap_dma: Use qemu_log_mask(UNIMP) instead of printf'
+004/14:[0006] [FC] 'hw/dma/omap_dma: Use qemu_log_mask(GUEST_ERROR) instead of fprintf'
+005/14:[----] [--] 'hw/ssi/omap_spi: Use qemu_log_mask(GUEST_ERROR) instead of fprintf'
+006/14:[----] [--] 'hw/sd/omap_mmc: Use qemu_log_mask(UNIMP) instead of printf'
+007/14:[0009] [FC] 'hw/i2c/omap_i2c: Use qemu_log_mask(UNIMP) instead of fprintf'
+008/14:[down] 'hw/arm/omap1: Use qemu_log_mask(GUEST_ERROR) instead of fprintf'
+009/14:[0015] [FC] 'hw/arm/omap: Use qemu_log_mask(GUEST_ERROR) instead of fprintf'
+010/14:[----] [--] 'hw/arm/stellaris: Use qemu_log_mask(UNIMP) instead of fprintf'
+011/14:[0012] [FC] 'hw/net/stellaris_enet: Use qemu_log_mask(GUEST_ERROR) instead of hw_error'
+012/14:[0008] [FC] 'hw/net/smc91c111: Use qemu_log_mask(GUEST_ERROR) instead of hw_error'
+013/14:[down] 'hw/net/smc91c111: Use qemu_log_mask(UNIMP) instead of fprintf'
+014/14:[down] 'hw/arm/stellaris: Fix gptm_write() error message'
+
+Philippe Mathieu-Daudé (14):
+  hw/input/pckbd: Use qemu_log_mask(GUEST_ERROR) instead of fprintf
+  hw/input/tsc2005: Use qemu_log_mask(GUEST_ERROR) instead of fprintf
+  hw/dma/omap_dma: Use qemu_log_mask(UNIMP) instead of printf
+  hw/dma/omap_dma: Use qemu_log_mask(GUEST_ERROR) instead of fprintf
+  hw/ssi/omap_spi: Use qemu_log_mask(GUEST_ERROR) instead of fprintf
+  hw/sd/omap_mmc: Use qemu_log_mask(UNIMP) instead of printf
+  hw/i2c/omap_i2c: Use qemu_log_mask(UNIMP) instead of fprintf
+  hw/arm/omap1: Use qemu_log_mask(GUEST_ERROR) instead of fprintf
+  hw/arm/omap: Use qemu_log_mask(GUEST_ERROR) instead of fprintf
+  hw/arm/stellaris: Use qemu_log_mask(UNIMP) instead of fprintf
+  hw/net/stellaris_enet: Use qemu_log_mask(GUEST_ERROR) instead of hw_error
+  hw/net/smc91c111: Use qemu_log_mask(GUEST_ERROR) instead of hw_error
+  hw/net/smc91c111: Use qemu_log_mask(UNIMP) instead of fprintf
+  hw/arm/stellaris: Fix gptm_write() error message
+
+ include/hw/arm/omap.h   | 23 ++------------
+ hw/arm/omap1.c          | 18 +++++++----
+ hw/arm/stellaris.c      |  4 +--
+ hw/dma/omap_dma.c       | 70 ++++++++++++++++++++++++++---------------
+ hw/i2c/omap_i2c.c       | 20 +++++++-----
+ hw/input/pckbd.c        |  4 ++-
+ hw/input/tsc2005.c      | 13 +++++---
+ hw/net/smc91c111.c      | 21 +++++++++----
+ hw/net/stellaris_enet.c |  9 ++++--
+ hw/sd/omap_mmc.c        | 13 +++++---
+ hw/ssi/omap_spi.c       | 15 ++++++---
+ 11 files changed, 125 insertions(+), 85 deletions(-)
+
+-- 
+2.18.0.rc2
