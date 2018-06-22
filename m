@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWBgu-00020t-UC
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:20:50 -0400
+	(envelope-from <famz@redhat.com>) id 1fWBha-0002L6-2y
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:21:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWBgr-00053Q-MK
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:20:48 -0400
-Received: from mail-qt0-x232.google.com ([2607:f8b0:400d:c0d::232]:34439)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWBgr-00053L-H2
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:20:45 -0400
-Received: by mail-qt0-x232.google.com with SMTP id d3-v6so4779648qto.1
-	for <qemu-devel@nongnu.org>; Thu, 21 Jun 2018 19:20:45 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Thu, 21 Jun 2018 23:20:35 -0300
-Message-Id: <20180622022035.18490-1-f4bug@amsat.org>
+	(envelope-from <famz@redhat.com>) id 1fWBhY-0005P3-OS
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:21:30 -0400
+Date: Fri, 22 Jun 2018 10:21:19 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180622022119.GA5449@lemon.usersys.redhat.com>
+References: <20180621222143.27266-1-naravamudan@digitalocean.com>
+	<20180621222143.27266-2-naravamudan@digitalocean.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH] Makefile: Enable synchronized parallel
- output when possible
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180621222143.27266-2-naravamudan@digitalocean.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] linux-aio: properly bubble up
+ errors from initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,76 +24,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Nishanth Aravamudan <naravamudan@digitalocean.com>
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-The '--output-sync' option is available since GNU make 4.0.
+On Thu, 06/21 15:21, Nishanth Aravamudan wrote:
+> laio_init() can fail for a couple of reasons, which will lead to a NULL
+> pointer dereference in laio_attach_aio_context().
+> 
+> To solve this, add a aio_setup_linux_aio() function which is called
+> early in raw_open_common. If this fails, propagate the error up. The
+> signature of aio_get_linux_aio() was not modified, because it seems
+> preferable to return the actual errno from the possible failing
+> initialization calls.
+> 
+> Add an assert that aio_get_linux_aio() cannot return NULL.
+> 
+> Signed-off-by: Nishanth Aravamudan <naravamudan@digitalocean.com>
+> ---
+> Changes from v2 -> v3 (thanks to Eric Blake and Kevin Wolf for review):
+> 
+> Use a boolean false rather than 0 in assignment to use_linux_aio.
+> Drop ending '.' from error_report() calls.
+> Fix typo in commit message (propogates -> propagates).
+> Move aio_setup_linux_aio call to raw_open_common.
+> 
+> Changes from v1 -> v2 (thanks to Kevin Wolf for review):
+> 
+> Rather than affect virtio-scsi/blk at all, make all the changes internal
+> to file-posix.c. Thanks to Kevin Wolf for the suggested change.
+> 
+>  block/file-posix.c      | 17 ++++++++++++-----
+>  block/linux-aio.c       | 15 ++++++++++-----
+>  include/block/aio.h     |  3 +++
+>  include/block/raw-aio.h |  2 +-
+>  stubs/linux-aio.c       |  2 +-
+>  util/async.c            | 16 +++++++++++++---
+>  6 files changed, 40 insertions(+), 15 deletions(-)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 07bb061fe4..6a1714d4a8 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -545,11 +545,18 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
+>  
+>  #ifdef CONFIG_LINUX_AIO
+>       /* Currently Linux does AIO only for files opened with O_DIRECT */
+> -    if (s->use_linux_aio && !(s->open_flags & O_DIRECT)) {
+> -        error_setg(errp, "aio=native was specified, but it requires "
+> -                         "cache.direct=on, which was not specified.");
+> -        ret = -EINVAL;
+> -        goto fail;
+> +    if (s->use_linux_aio) {
+> +        if (!(s->open_flags & O_DIRECT)) {
+> +            error_setg(errp, "aio=native was specified, but it requires "
+> +                             "cache.direct=on, which was not specified.");
+> +            ret = -EINVAL;
+> +            goto fail;
+> +        }
+> +        ret = aio_setup_linux_aio(bdrv_get_aio_context(bs));
+> +        if (ret != 0) {
+> +            error_setg(errp, "Unable to setup native AIO context.");
+> +            goto fail;
+> +        }
+>      }
+>  #else
+>      if (s->use_linux_aio) {
+> diff --git a/block/linux-aio.c b/block/linux-aio.c
+> index 88b8d55ec7..4d799f85fe 100644
+> --- a/block/linux-aio.c
+> +++ b/block/linux-aio.c
+> @@ -470,28 +470,33 @@ void laio_attach_aio_context(LinuxAioState *s, AioContext *new_context)
+>                             qemu_laio_poll_cb);
+>  }
+>  
+> -LinuxAioState *laio_init(void)
+> +int laio_init(LinuxAioState **linux_aio)
+>  {
+> +    int rc;
+>      LinuxAioState *s;
+>  
+>      s = g_malloc0(sizeof(*s));
+> -    if (event_notifier_init(&s->e, false) < 0) {
+> +    rc = event_notifier_init(&s->e, false);
+> +    if (rc < 0) {
 
-  5.4.1 Output During Parallel Execution
+It would be nice if the error message could distinguish this error...
 
-  When running several recipes in parallel the output from each
-  recipe appears as soon as it is generated, with the result that
-  messages from different recipes may be interspersed, sometimes
-  even appearing on the same line. This can make reading the output
-  very difficult.
+>          goto out_free_state;
+>      }
+>  
+> -    if (io_setup(MAX_EVENTS, &s->ctx) != 0) {
+> +    rc = io_setup(MAX_EVENTS, &s->ctx);
+> +    if (rc != 0) {
 
-  To avoid this you can use the ‘--output-sync’ (‘-O’) option. This
-  option instructs make to save the output from the commands it
-  invokes and print it all once the commands are completed.
-  Additionally, if there are multiple recursive make invocations
-  running in parallel, they will communicate so that only one of
-  them is generating output at a time.
+... from this one. And it also makes sense to propagate the errno back with
+error_setg_errno.
 
-  There are four levels of granularity when synchronizing output,
-  specified by giving an argument to the option (e.g., ‘-Oline’
-  or ‘--output-sync=recurse’).
+To do this, add an "Error **errp" parameter to the function and you can keep the
+return type (LinuxAioState *).
 
-    none
-      This is the default: all output is sent directly as it is
-      generated and no synchronization is performed.
+>          goto out_close_efd;
+>      }
+>  
+>      ioq_init(&s->io_q);
+>  
+> -    return s;
+> +    *linux_aio = s;
+> +    return 0;
+>  
+>  out_close_efd:
+>      event_notifier_cleanup(&s->e);
+>  out_free_state:
+>      g_free(s);
+> -    return NULL;
+> +    *linux_aio = NULL;
+> +    return rc;
+>  }
+>  
+>  void laio_cleanup(LinuxAioState *s)
+> diff --git a/include/block/aio.h b/include/block/aio.h
+> index ae6f354e6c..8900516ac5 100644
+> --- a/include/block/aio.h
+> +++ b/include/block/aio.h
+> @@ -381,6 +381,9 @@ GSource *aio_get_g_source(AioContext *ctx);
+>  /* Return the ThreadPool bound to this AioContext */
+>  struct ThreadPool *aio_get_thread_pool(AioContext *ctx);
+>  
+> +/* Setup the LinuxAioState bound to this AioContext */
+> +int aio_setup_linux_aio(AioContext *ctx);
 
-    line
-      Output from each individual line of the recipe is grouped
-      and printed as soon as that line is complete. If a recipe
-      consists of multiple lines, they may be interspersed with
-      lines from other recipes.
+And this will then need "Error **errp" as well.
 
-    target
-      Output from the entire recipe for each target is grouped and
-      printed once the target is complete. This is the default if
-      the --output-sync or -O option is given with no argument.
+> +
+>  /* Return the LinuxAioState bound to this AioContext */
+>  struct LinuxAioState *aio_get_linux_aio(AioContext *ctx);
+>  
+> diff --git a/include/block/raw-aio.h b/include/block/raw-aio.h
+> index 0e717fd475..81b90e5fc6 100644
+> --- a/include/block/raw-aio.h
+> +++ b/include/block/raw-aio.h
+> @@ -43,7 +43,7 @@
+>  /* linux-aio.c - Linux native implementation */
+>  #ifdef CONFIG_LINUX_AIO
+>  typedef struct LinuxAioState LinuxAioState;
+> -LinuxAioState *laio_init(void);
+> +int laio_init(LinuxAioState **linux_aio);
+>  void laio_cleanup(LinuxAioState *s);
+>  int coroutine_fn laio_co_submit(BlockDriverState *bs, LinuxAioState *s, int fd,
+>                                  uint64_t offset, QEMUIOVector *qiov, int type);
+> diff --git a/stubs/linux-aio.c b/stubs/linux-aio.c
+> index ed47bd443c..88ab927e35 100644
+> --- a/stubs/linux-aio.c
+> +++ b/stubs/linux-aio.c
+> @@ -21,7 +21,7 @@ void laio_attach_aio_context(LinuxAioState *s, AioContext *new_context)
+>      abort();
+>  }
+>  
+> -LinuxAioState *laio_init(void)
+> +int laio_init(LinuxAioState **linux_aio)
+>  {
+>      abort();
+>  }
+> diff --git a/util/async.c b/util/async.c
+> index 03f62787f2..ae88c931d0 100644
+> --- a/util/async.c
+> +++ b/util/async.c
+> @@ -323,12 +323,22 @@ ThreadPool *aio_get_thread_pool(AioContext *ctx)
+>  }
+>  
+>  #ifdef CONFIG_LINUX_AIO
+> -LinuxAioState *aio_get_linux_aio(AioContext *ctx)
+> +int aio_setup_linux_aio(AioContext *ctx)
+>  {
+> +    int rc;
+> +    rc = 0;
+>      if (!ctx->linux_aio) {
+> -        ctx->linux_aio = laio_init();
+> -        laio_attach_aio_context(ctx->linux_aio, ctx);
+> +        rc = laio_init(&ctx->linux_aio);
+> +        if (rc == 0) {
+> +            laio_attach_aio_context(ctx->linux_aio, ctx);
+> +        }
+>      }
+> +    return rc;
+> +}
+> +
+> +LinuxAioState *aio_get_linux_aio(AioContext *ctx)
+> +{
+> +    assert(ctx->linux_aio);
+>      return ctx->linux_aio;
+>  }
+>  #endif
+> -- 
+> 2.17.1
+> 
 
-    recurse
-      Output from each recursive invocation of make is grouped and
-      printed once the recursive invocation is complete.
-
-  Regardless of the mode chosen, the total build time will be the
-  same. The only difference is in how the output appears.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-Maybe 'line' is better for workstation and 'target/recurse' for
-unattended builds.
-
-doc: https://www.gnu.org/software/make/manual/html_node/Parallel-Output.html
----
- Makefile | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index e46f2b625a..e94c687afe 100644
---- a/Makefile
-+++ b/Makefile
-@@ -367,6 +367,10 @@ DOCS=
- endif
- 
- SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
-+ifeq ($(shell test $(firstword $(subst ., ,$(MAKE_VERSION))) -ge 4; echo $$?),0)
-+SUBDIR_MAKEFLAGS+=--output-sync=target
-+endif
-+
- SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_LIST))
- SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_LIST))
- 
--- 
-2.18.0.rc2
+Fam
