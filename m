@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fWI7e-0000HL-0y
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 05:12:50 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fWIJ3-0002qe-FK
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 05:24:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fWI7d-0005Ha-6u
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 05:12:49 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:35264)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fWI7d-0005HG-0s
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 05:12:49 -0400
-Received: by mail-ot0-x242.google.com with SMTP id q17-v6so6758199otg.2
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 02:12:49 -0700 (PDT)
+	(envelope-from <kraxel@redhat.com>) id 1fWIJ0-0003Vc-Bf
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 05:24:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47362 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fWIJ0-0003VN-6f
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 05:24:34 -0400
+Date: Fri, 22 Jun 2018 11:24:31 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180622092431.mvo3ve46cw2rp45c@sirius.home.kraxel.org>
+References: <cover.1529568501.git.balaton@eik.bme.hu>
+	<20180622005134.GC612@umbus.fritz.box>
+	<84aa3623-0b93-182e-d9bb-6acca7a7d7ea@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180622021546.18178-1-f4bug@amsat.org>
-References: <20180622021546.18178-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Jun 2018 10:12:27 +0100
-Message-ID: <CAFEAcA-pt4yUYvAoHJfGmBCyO2eCQWVRRjMXP1=WqNBNUwQLnA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <84aa3623-0b93-182e-d9bb-6acca7a7d7ea@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] travis: Do not waste time cloning
- unused submodules
+Subject: Re: [Qemu-devel] [PATCH 0/5] Misc sm501 improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +29,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, BALATON Zoltan <balaton@eik.bme.hu>, Peter Maydell <peter.maydell@linaro.org>, Sebastian Bauer <mail@sebastianbauer.info>, Magnus Damm <magnus.damm@gmail.com>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-On 22 June 2018 at 03:15, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> Builds only require:
-> - dtc
-> - keycodemapdb
-> - capstone
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> Some tests might require ROMs. Can they clone submodules only when requir=
-ed?
+On Thu, Jun 21, 2018 at 10:37:10PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> Cc'ing Gerd who maintains many hw/display/ files.
+>=20
+> On 06/21/2018 09:51 PM, David Gibson wrote:
+> > On Thu, Jun 21, 2018 at 10:08:21AM +0200, BALATON Zoltan wrote:
+> >> These are fixes to sm501 emulation that were found while testing wit=
+h
+> >> AmigaOS 4.1FE (AmigaOS 4 is known to work on real hardware but we ha=
+ve
+> >> no way to verify it against hardware). While this is mainly to impro=
+ve
+> >> sam460ex emulation this is now a separate series with the sm501
+> >> specific patches because that's also used on SH emulation. I hope
+> >> someone can review and merge this.
+> [...]
+> > hw/display/sm501.c                 | 166
+> +++++++++++++++++++++++++++++++++++--
+> >=20
+> > I'm not really familiar with the sm501 hardware, so I can't speak to
+> > these technically, beyond the fact that there's nothing obviously
+> > bogus.
+> >=20
+> > I can say that BALATON Zoltan is the only person who's made
+> > non-trivial changes to sm501 lately, and there don't seem to have bee=
+n
+> > any screams, so I'm pretty happy to assume he knows what he's doing.
 
-In general the ROM blobs should be in the main git repo; the submodules
-are only the source for recompiling the blobs, I think.
+Changes all look sane to me even without having sm501 specs at hand.
 
-thanks
--- PMM
+cheers,
+  Gerd
