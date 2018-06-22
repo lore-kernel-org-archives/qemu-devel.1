@@ -1,40 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fWKPD-0002j9-Bj
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 07:39:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fWKQz-0004B1-MF
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 07:40:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fWKPA-0005cJ-A5
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 07:39:07 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32874)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fWKPA-0005bp-2N
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 07:39:04 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5MBY2GQ032632
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 07:39:02 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jrx5yxpy3-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 07:39:02 -0400
-Received: from localhost
-	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 22 Jun 2018 12:39:00 +0100
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-26-kwolf@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 22 Jun 2018 13:38:56 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fWKQy-0006Y2-Mb
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 07:40:57 -0400
+Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:46674)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fWKQy-0006Xp-8E
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 07:40:56 -0400
+Received: by mail-ot0-x233.google.com with SMTP id v24-v6so7136744otk.13
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 04:40:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180615142108.27814-26-kwolf@redhat.com>
-Content-Language: en-US
-Message-Id: <7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 25/26] block: Remove deprecated -drive
- option serial
+In-Reply-To: <20180621062605.941-1-alex.bennee@linaro.org>
+References: <20180621062605.941-1-alex.bennee@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 12:40:35 +0100
+Message-ID: <CAFEAcA82QaEbD=kgnGTX9c171QxPF41AMED6EUd-qP9BL59Fsg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 00/57] add check-tcg and associated
+ machinery
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,35 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Boris Fiuczynski <fiuczy@linux.ibm.com>, libvir-list@redhat.com
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Fam Zheng <famz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <richard.henderson@linaro.org>, andrzej zaborowski <balrogg@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Alexander Graf <agraf@suse.de>
 
+On 21 June 2018 at 07:25, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a9=
+3b:
+>
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into =
+staging (2018-06-20 09:51:30 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/stsquad/qemu.git tags/pull-tcg-testing-revivial-2106=
+18-2
+>
+> for you to fetch changes up to 65b26da485540ffcc1c46c9a0898f01912ee6b7a:
+>
+>   .travis.yml: add check-tcg test (2018-06-20 22:13:39 +0100)
+>
+> ----------------------------------------------------------------
+> Add check-tcg machinary
+>
+> This restores the ability to run TCG smoke tests by using our docker
+> infrastructure to support cross building simple tests. It represents
+> the first step to making better cross-architecture testing available
+> straight from the source tree ;-)
+>
+> v2
+>   - fix quoting of target_compiler
+>   - make docker.py Py3 safe
+>   - tweak .travis.yml recipe
+>   - don't probe docker when HAVE_USER_DOCKER not set
+>
+Applied, thanks.
 
-On 06/15/2018 04:21 PM, Kevin Wolf wrote:
-> The -drive option serial was deprecated in QEMU 2.10. It's time to
-> remove it.
-> 
-> Tests need to be updated to set the serial number with -global instead
-> of using the -drive option.
-
-libvirt 4.5 still creates those (at least on s390x)
-
-    <disk type='file' device='disk'>
-      <driver name='qemu' type='qcow2' cache='none' io='native' iothread='1'/>
-      <source file='/var/lib/libvirt/qemu/image.zhyp137'/>
-      <target dev='hda' bus='virtio'/>
-      <serial>skel</serial>
-      <boot order='1'/>
-      <address type='ccw' cssid='0xfe' ssid='0x0' devno='0x0000'/>
-    </disk>
-
-
--> 
-[...]
--drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native -device virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0000,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on 
-[...]
-
-2018-06-22T11:25:20.946024Z qemu-system-s390x: -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native: Block format 'qcow2' does not support the option 'serial'
-2018-06-22 11:25:21.098+0000: shutting down, reason=failed
-
-So it seems that this breaks s390x.
+-- PMM
