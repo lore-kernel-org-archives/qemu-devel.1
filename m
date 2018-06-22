@@ -1,17 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43674)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fWGza-0000Nd-DE
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:00:36 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fWGzo-0000X0-Sq
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:00:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fWGzW-0001LF-IK
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:00:26 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri, 22 Jun 2018 09:00:09 +0100
-Message-Id: <20180622080009.5707-3-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180622080009.5707-1-mark.cave-ayland@ilande.co.uk>
-References: <20180622080009.5707-1-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 2/2] mac_newworld: always enable
- disable_direct_reg3_writes for ADB machines
+	(envelope-from <balaton@eik.bme.hu>) id 1fWGzk-0001U9-NW
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:00:40 -0400
+Date: Fri, 22 Jun 2018 10:00:34 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <20180622015940.GF612@umbus.fritz.box>
+Message-ID: <alpine.BSF.2.21.1806220952410.66303@zero.eik.bme.hu>
+References: <cover.1529398335.git.balaton@eik.bme.hu>
+	<ce619ddd11a875caae4c221c18ebf7c6a6f4bd4f.1529398335.git.balaton@eik.bme.hu>
+	<20180620052044.GA24636@umbus.fritz.box>
+	<alpine.BSF.2.21.1806210900160.16898@zero.eik.bme.hu>
+	<20180622015940.GF612@umbus.fritz.box>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v4 02/11] ppc4xx_i2c: Implement directcntl
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,38 +26,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
-Commit 84051eb400 "adb: add property to disable direct reg 3 writes" added a
-workaround for MacOS 9 incorrectly setting the mouse address during boot of
-PMU machines.
+On Fri, 22 Jun 2018, David Gibson wrote:
+> On Thu, Jun 21, 2018 at 09:17:11AM +0200, BALATON Zoltan wrote:
+>> On Wed, 20 Jun 2018, David Gibson wrote:
+>>> On Tue, Jun 19, 2018 at 10:52:15AM +0200, BALATON Zoltan wrote:
+>>>> As well as being able to generate its own i2c transactions, the ppc4xx
+>>>> i2c controller has a DIRECTCNTL register which allows explicit control
+>>>> of the i2c lines.
+>>>>
+>>>> Using this register an OS can directly bitbang i2c operations. In
+>>>> order to let emulated i2c devices respond to this, we need to wire up
+>>>> the DIRECTCNTL register to qemu's bitbanged i2c handling code.
+>>>>
+>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>>> ---
+>>>> v4: Updated commit message and use defined constant where
+>>>> appropriate
+>>>
+>>> I'm still don't quite understand your approach to the symbolic
+>>> constants here, but I don't care enough to hold this up any further.
+>>> So, applied to ppc-for-3.0.
+>>
+>> Thanks, just to try to clear this up, I consider symbolic constants to be
+>> the name of bits 0-3 in the directntl register so while MSCL equals 1 it's
+>> only appropriate to use the constant if I really mean (1 << 0) i.e. bit 0 of
+>> directcntl reg.
+>
+> Right..
+>
+>>
+>>>> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+>>>> index 4e0aaae..fca80d6 100644
+>>>> --- a/hw/i2c/ppc4xx_i2c.c
+>>>> +++ b/hw/i2c/ppc4xx_i2c.c
+>>>> @@ -30,6 +30,7 @@
+>>>>  #include "cpu.h"
+>>>>  #include "hw/hw.h"
+>>>>  #include "hw/i2c/ppc4xx_i2c.h"
+>>>> +#include "bitbang_i2c.h"
+>>>>
+>>>>  #define PPC4xx_I2C_MEM_SIZE 18
+>>>>
+>>>> @@ -46,6 +47,11 @@
+>>>>
+>>>>  #define IIC_XTCNTLSS_SRST   (1 << 0)
+>>>>
+>>>> +#define IIC_DIRECTCNTL_SDAC (1 << 3)
+>>>> +#define IIC_DIRECTCNTL_SCLC (1 << 2)
+>>>> +#define IIC_DIRECTCNTL_MSDA (1 << 1)
+>>>> +#define IIC_DIRECTCNTL_MSCL (1 << 0)
+>>>> +
+>>>>  static void ppc4xx_i2c_reset(DeviceState *s)
+>>>>  {
+>>>>      PPC4xxI2CState *i2c = PPC4xx_I2C(s);
+>>>> @@ -289,7 +295,12 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+>>>>          i2c->xtcntlss = value;
+>>>>          break;
+>>>>      case 16:
+>>>> -        i2c->directcntl = value & 0x7;
+>>>> +        i2c->directcntl = value & (IIC_DIRECTCNTL_SDAC & IIC_DIRECTCNTL_SCLC);
+>>
+>> This clears all bits but SDAC and SCLC so constants are OK here as they
+>> refer to bits in the register. (Guest can set the S* bits to say what state
+>> it wants the i2c lines to become.)
+>>
+>>>> +        i2c->directcntl |= (value & IIC_DIRECTCNTL_SCLC ? 1 : 0);
+>>
+>> This is directcntl[MSCL] = direcntl[SCLC] that is, set MSCL bit the same as
+>> SCLC, the 1 : 0 here are the value of the bit not the MSCL bit so constans
+>> are not appropriate here.
+>
+> This is what I don't get.  Regardless of the method of it, you *are*
+> setting bit 1 of the directcntl register, so why would the MSCL name
+> not be appropriate?
 
-Further testing has shown that since fb6649f172 "adb: fix read reg 3 byte
-ordering" this can still sometimes happen with the CUDA mac99 machine,
-so let's enable this workaround for all New World machines using ADB for now.
+I'm setting bit 0 (MSCL) to either 1 or 0. I could probably use the MSCL 
+constant in place of the 1 here but would that make it clearer? It would 
+just be longer and less clear without looking up the constants so to me 
+this looks more comprehensible this way.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/ppc/mac_newworld.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+>>>> +        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL,
+>>>> +                        i2c->directcntl & IIC_DIRECTCNTL_MSCL);
+>>
+>> This lets the bitbang_i2c emulation also know that MSCL is set to 1 or 0 so
+>> constant here is OK, previously it was just 1 for brevity which may have
+>> confused you.
+>>
+>>>> +        i2c->directcntl |= bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SDA,
+>>>> +                               (value & IIC_DIRECTCNTL_SDAC) != 0) << 1;
+>>
+>> This sets MSDA bit of directcntl to the value returned by bitbang_i2c
+>> emulation when sending it the bit in SDAC. So the
+>> (value & IIC_DIRECTCNTL_SDAC) != 0)
+>> tests what value the SDAC bit has so 0 means the value of the bit and
+>> constant refers to the bit in the register. (Because SDAC is not the LSB and
+>> we need 1 or 0 here hence the equality test to normalise the value, maybe
+>> the !! construct could also be used, I'm not sure.) The << 1 at the end
+>> makes sure we set the MSDA bit but that constant cannot be used here and
+>> using MSCL instead is not correct because we mean the MSDA bit.
+>
+> Right, I'm not suggesting you use MSCL here, I'm suggesting you use
+> MSDA.
 
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index ff715ffffd..2b13fcdde5 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -407,11 +407,11 @@ static void ppc_core99_init(MachineState *machine)
- 
-         adb_bus = qdev_get_child_bus(dev, "adb.0");
-         dev = qdev_create(adb_bus, TYPE_ADB_KEYBOARD);
--        qdev_prop_set_bit(dev, "disable-direct-reg3-writes", has_pmu);
-+        qdev_prop_set_bit(dev, "disable-direct-reg3-writes", true);
-         qdev_init_nofail(dev);
- 
-         dev = qdev_create(adb_bus, TYPE_ADB_MOUSE);
--        qdev_prop_set_bit(dev, "disable-direct-reg3-writes", has_pmu);
-+        qdev_prop_set_bit(dev, "disable-direct-reg3-writes", true);
-         qdev_init_nofail(dev);
-     }
- 
--- 
-2.11.0
+But how? Third arg of bitbang_i2c_set is level, either 0 or 1. How could a 
+constant with value 2 used here? (Also to set bit 1 I have to shift 1 not 
+2 so I don't see how the constant could be used there either.)
+
+Regards,
+BALATON Zoltan
