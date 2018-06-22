@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fWQFs-0004gO-Iq
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:53:53 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fWQGB-0004s1-5o
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:54:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fWQFo-0000Sr-8q
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:53:52 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:35663)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fWQFn-0000SY-OR
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:53:48 -0400
-Received: by mail-pl0-x243.google.com with SMTP id k1-v6so3833720plt.2
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 10:53:47 -0700 (PDT)
-References: <1529689531-4024-1-git-send-email-cota@braap.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ef642140-0ce4-edf9-261e-2eef4bdfe394@linaro.org>
-Date: Fri, 22 Jun 2018 10:53:43 -0700
+	(envelope-from <kwolf@redhat.com>) id 1fWQGA-0000Z5-9T
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:54:11 -0400
+Date: Fri, 22 Jun 2018 19:54:00 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180622175359.GJ4366@localhost.localdomain>
+References: <20180615142108.27814-1-kwolf@redhat.com>
+	<20180615142108.27814-26-kwolf@redhat.com>
+	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
+	<20180622125502.GF4366@localhost.localdomain>
+	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
+	<20180622142513.GH4366@localhost.localdomain>
+	<20180622154042.GS23296@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1529689531-4024-1-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tcg: fix --disable-tcg build breakage
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180622154042.GS23296@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 25/26] block: Remove deprecated -drive
+ option serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +30,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, pkrempa@redhat.com
 
-On 06/22/2018 10:45 AM, Emilio G. Cota wrote:
-> Fix the --disable-tcg breakage introduced by tb_lock's removal by
-> relying on the fact that tcg_enabled() is set to 0 at
-> compile-time under --disable-tcg.
-> 
-> While at it, add further asserts to fix builds that enable both
-> --disable-tcg and --enable-debug, which were broken even before
-> tb_lock's removal.
-> 
-> Tested to build x86_64-softmmu and i386-softmmu targets.
-> 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
-> ---
->  accel/stubs/tcg-stub.c | 4 ----
->  cpus.c                 | 4 ++++
->  exec.c                 | 3 +++
->  3 files changed, 7 insertions(+), 4 deletions(-)
+Am 22.06.2018 um 17:40 hat Daniel P. Berrang=E9 geschrieben:
+> On Fri, Jun 22, 2018 at 04:25:13PM +0200, Kevin Wolf wrote:
+> > This was in fact one release longer than our deprecation policy says.
+> > Are we serious about the deprecation policy or aren't we?
+> >=20
+> > I might consider reverting a change if it turned out that this requir=
+es
+> > some massive work in libvirt. But I think this one should be rather e=
+asy
+> > to fix in libvirt until 3.0 is released.
+>=20
+> I've got a patch mostly ready that converts libvirt to setting these th=
+ings
+> on the frontend device, however, I've got some queries...
+>=20
+>  - usb-storage  - doesn't appear to support geometry or werror/rerror
+>=20
+>    Will we loose functionality by stopping use of -drive for werror
+>=20
+>    Loosing geometry feels relevant too, unless it was already ignored
+>    when set opf -drive ?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+You're right, usb-storage doesn't allow using -device to specify these,
+and it does use the values from -drive.
 
-Peter, I'm assuming you'll take this directly to master as a build fix.
+For werror/rerror, we should clearly implement the option forwarding to
+scsi-disk so that you can make use of it.
 
+I'm not sure how sane specifying a non-standard CHS geometry for a USB
+stick actually is. As an additional difficulty, usb-storage internally
+creates a scsi-disk device (not scsi-hd), which is also considered
+legacy and doesn't support the geometry options either, so it's not just
+simple forwarding. We removed an actual feature there, but that feature
+was probably never intended nor used.
 
-r~
+If someone comes up with a compelling reason why they really need to
+configure the CHS geometry of their USB sticks, I guess we can do it. My
+real USB sticks I tested don't even support MODE_PAGE_HD_GEOMETRY
+(though they have MODE_PAGE_FLEXIBLE_DISK_GEOMETRY).
+
+>  - SD card - requires -drive with if=3Dsd, no -device support AFAICT
+>=20
+>    Will we loose functionality be stopping use of -drive for if=3Dsd, o=
+r
+>    is this stuff ignored anyway ?
+
+This was already silently ignored.
+
+>  - ide-cd/scsi-id - doesn't support geometry
+>=20
+>    Presumably becuase its irrelevant for CDs
+
+Yes, geometry has no effect for CDs.
+
+Kevin
