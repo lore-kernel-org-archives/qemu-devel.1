@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fWNbC-0004q8-9c
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:03:43 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fWNdw-0006ZM-D7
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:06:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fWNbB-0004eX-DR
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:03:42 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:47041)
+	(envelope-from <alex.bennee@linaro.org>) id 1fWNds-0006uH-BG
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:06:32 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:36685)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fWNbA-0004eC-UT
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:03:41 -0400
-Received: by mail-ot0-x241.google.com with SMTP id v24-v6so7800375otk.13
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 08:03:40 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fWNds-0006t3-2m
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:06:28 -0400
+Received: by mail-wm0-x244.google.com with SMTP id v131-v6so3009638wma.1
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 08:06:28 -0700 (PDT)
+References: <20180622140223.26056-1-f4bug@amsat.org>
+	<20180622142305.GM23296@redhat.com>
+	<f693508b-37d0-8eb1-4e08-a69b36088eea@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <f693508b-37d0-8eb1-4e08-a69b36088eea@amsat.org>
+Date: Fri, 22 Jun 2018 16:06:25 +0100
+Message-ID: <87a7rmvp1q.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180622103528.28598-1-david@gibson.dropbear.id.au>
-References: <20180622103528.28598-1-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Jun 2018 16:03:19 +0100
-Message-ID: <CAFEAcA8-jSMy-9R69d7zQoEL593iiR5xitaPh17JwNzo-2U=1g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/25] ppc-for-3.0 queue 2018-06-22
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] docker: Add fedora-xtensa-cross image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +31,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, Alexey Kardashevskiy <aik@ozlabs.ru>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
 
-On 22 June 2018 at 11:35, David Gibson <david@gibson.dropbear.id.au> wrote:
-> The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a93b:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into staging (2018-06-20 09:51:30 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/dgibson/qemu.git tags/ppc-for-3.0-20180622
->
-> for you to fetch changes up to e5ca28ecab5c69b7578e22391a66c97c3979ffd8:
->
->   spapr: Don't rewrite mmu capabilities in KVM mode (2018-06-22 14:19:07 +1000)
->
-> ----------------------------------------------------------------
-> ppc patch queue 2018-06-22
->
-> Another assorted patch of patches for ppc and spapr.
->     * Rework of guest pagesize handling for ppc, which avoids guest
->       visibly different behaviour between accelerators
->     * A number of Pnv cleanups, working towards more complete POWER9
->       support
->     * Migration of VPA data, a significant bugfix
 
-Applied, thanks.
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
--- PMM
+> On 06/22/2018 11:23 AM, Daniel P. Berrang=C3=A9 wrote:
+>> On Fri, Jun 22, 2018 at 11:02:23AM -0300, Philippe Mathieu-Daud=C3=A9 wr=
+ote:
+>>> As of this commit:
+>>>
+>>>   $ xtensa-linux-gnu-as -v
+>>>   GNU assembler version 2.29.1 (xtensa-linux-gnu) using BFD version ver=
+sion 2.29.1-1.fc27
+>>>
+>>>   $ xtensa-linux-gnu-gcc -v
+>>>   Target: xtensa-linux-gnu
+>>>   gcc version 7.2.1 20170915 (Red Hat Cross 7.2.1-1) (GCC)
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>> ---
+>>>  tests/docker/dockerfiles/fedora-xtensa-cross.docker | 7 +++++++
+>>>  1 file changed, 7 insertions(+)
+>>>  create mode 100644 tests/docker/dockerfiles/fedora-xtensa-cross.docker
+>>>
+>>> diff --git a/tests/docker/dockerfiles/fedora-xtensa-cross.docker b/test=
+s/docker/dockerfiles/fedora-xtensa-cross.docker
+>>> new file mode 100644
+>>> index 0000000000..6f9521520c
+>>> --- /dev/null
+>>> +++ b/tests/docker/dockerfiles/fedora-xtensa-cross.docker
+>>> @@ -0,0 +1,7 @@
+>>> +FROM fedora:latest
+>>
+>> IIRC, we decided using ':latest' is not a good idea because its meaning
+>> will change over time and lead to inconsistent results for devs. We saw
+>> this before when patchew reported failure on fedora while developers saw
+>> nothing, due to patchew having cached a ":latest" image which was differ=
+ent.
+>
+> I totally agree with you :)
+>
+> "FROM fedora:28" works.
+
+Queued with the fedora:28 fix
+
+>
+>>
+>>> +ENV PACKAGES \
+>>> +    binutils-xtensa-linux-gnu \
+>>> +    gcc-xtensa-linux-gnu
+>>> +
+>>> +RUN dnf install -y $PACKAGES
+>>> +RUN rpm -q $PACKAGES | sort > /packages.txt
+>>
+>>
+>> Regards,
+>> Daniel
+>>
+
+
+--
+Alex Benn=C3=A9e
