@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <loseweigh@gmail.com>) id 1fWSGx-0000Fl-Ib
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:03:08 -0400
+	(envelope-from <thuth@redhat.com>) id 1fWSMa-0001Oe-0Y
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:08:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <loseweigh@gmail.com>) id 1fWSGw-0000P2-O3
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:03:07 -0400
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:38588)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <loseweigh@gmail.com>) id 1fWSGw-0000Oy-Ix
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:03:06 -0400
-Received: by mail-it0-x242.google.com with SMTP id v83-v6so4516239itc.3
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 13:03:06 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1fWSMZ-0002TA-1b
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:08:55 -0400
+References: <20180615142108.27814-1-kwolf@redhat.com>
+	<20180615142108.27814-26-kwolf@redhat.com>
+	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
+	<2c62e570-7f4b-9120-0203-2122edb8b1e3@de.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <27d07ae8-c689-1949-a457-2bcfd5ae8db1@redhat.com>
+Date: Fri, 22 Jun 2018 22:08:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <CADGSJ23SBEFJCD50K-F-Gt86Q1-i_6iHTmSSjdXDzNnnpWZ_oQ@mail.gmail.com>
-References: <20180615134815.6613620e.cohuck@redhat.com>
-	<CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
-	<20180619125453.2d2dfb2d.cohuck@redhat.com>
-	<20180619233001-mutt-send-email-mst@kernel.org>
-	<20180620115359.1a3bf6fb.cohuck@redhat.com>
-	<20180620170904-mutt-send-email-mst@kernel.org>
-	<20180620180619.6b4ee52d.cohuck@redhat.com>
-	<20180620224535-mutt-send-email-mst@kernel.org>
-	<20180621165913.7e3f4faa.cohuck@redhat.com>
-	<CADGSJ22B39JiS14L0yCYQ720-fZcwyUt1wCX1YO-6Y9FhmDKZg@mail.gmail.com>
-	<20180622053141-mutt-send-email-mst@kernel.org>
-	<CADGSJ23SBEFJCD50K-F-Gt86Q1-i_6iHTmSSjdXDzNnnpWZ_oQ@mail.gmail.com>
-From: Siwei Liu <loseweigh@gmail.com>
-Date: Fri, 22 Jun 2018 13:03:04 -0700
-Message-ID: <CADGSJ22nLcz_XaJNzUUdpjQaJY8b5wZs=ohm=B7c2qf2K7_yGA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+In-Reply-To: <2c62e570-7f4b-9120-0203-2122edb8b1e3@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] request a revert for "block: Remove
+ deprecated -drive option serial" (was block: Remove deprecated -drive
+ option serial)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,71 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, "Samudrala,
-	Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: Boris Fiuczynski <fiuczy@linux.ibm.com>, libvir-list@redhat.com, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, Max Reitz <mreitz@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Fri, Jun 22, 2018 at 1:00 PM, Siwei Liu <loseweigh@gmail.com> wrote:
-> On Thu, Jun 21, 2018 at 7:32 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
->> On Thu, Jun 21, 2018 at 06:21:55PM -0700, Siwei Liu wrote:
->>> On Thu, Jun 21, 2018 at 7:59 AM, Cornelia Huck <cohuck@redhat.com> wrote:
->>> > On Wed, 20 Jun 2018 22:48:58 +0300
->>> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
->>> >
->>> >> On Wed, Jun 20, 2018 at 06:06:19PM +0200, Cornelia Huck wrote:
->>> >> > In any case, I'm not sure anymore why we'd want the extra uuid.
->>> >>
->>> >> It's mostly so we can have e.g. multiple devices with same MAC
->>> >> (which some people seem to want in order to then use
->>> >> then with different containers).
->>> >>
->>> >> But it is also handy for when you assign a PF, since then you
->>> >> can't set the MAC.
->>> >>
->>> >
->>> > OK, so what about the following:
->>> >
->>> > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
->>> >   that we have a new uuid field in the virtio-net config space
->>> > - in QEMU, add a property for virtio-net that allows to specify a uuid,
->>> >   offer VIRTIO_NET_F_STANDBY_UUID if set
->>> > - when configuring, set the property to the group UUID of the vfio-pci
->>> >   device
+On 22.06.2018 14:51, Christian Borntraeger wrote:
+> adding more CC.
+> 
+> On 06/22/2018 01:38 PM, Christian Borntraeger wrote:
+>>
+>> On 06/15/2018 04:21 PM, Kevin Wolf wrote:
+>>> The -drive option serial was deprecated in QEMU 2.10. It's time to
+>>> remove it.
 >>>
->>> If feature negotiation fails on VIRTIO_NET_F_STANDBY_UUID, is it safe
->>> to still expose UUID in the config space on virtio-pci?
+>>> Tests need to be updated to set the serial number with -global instead
+>>> of using the -drive option.
 >>
+>> libvirt 4.5 still creates those (at least on s390x)
 >>
->> Yes but guest is not supposed to read it.
+>>     <disk type='file' device='disk'>
+>>       <driver name='qemu' type='qcow2' cache='none' io='native' iothread='1'/>
+>>       <source file='/var/lib/libvirt/qemu/image.zhyp137'/>
+>>       <target dev='hda' bus='virtio'/>
+>>       <serial>skel</serial>
+>>       <boot order='1'/>
+>>       <address type='ccw' cssid='0xfe' ssid='0x0' devno='0x0000'/>
+>>     </disk>
+>> -> 
+>> [...]
+>> -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native -device virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0000,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on 
+>> [...]
 >>
->>> I'm not even sure if it's sane to expose group UUID on the PCI bridge
->>> where the corresponding vfio-pci device attached to for a guest which
->>> doesn't support the feature (legacy).
->>>
->>> -Siwei
+>> 2018-06-22T11:25:20.946024Z qemu-system-s390x: -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native: Block format 'qcow2' does not support the option 'serial'
+>> 2018-06-22 11:25:21.098+0000: shutting down, reason=failed
 >>
->> Yes but you won't add the primary behind such a bridge.
->
-> I assume the UUID feature is a new one besides the exiting
-> VIRTIO_NET_F_STANDBY feature, where I think the current proposal is,
-> if UUID feature is present and supported by guest, we'll do pairing
-> based on UUID; if UUID feature present
-                                 ^^^^^^^  is NOT present
+>> So it seems that this breaks s390x.
 
-> or not supported by guest,
-> we'll still plug in the VF (if guest supports the _F_STANDBY feature)
-> but the pairing will be fallback to using MAC address. Are you saying
-> you don't even want to plug in the primary when the UUID feature is
-> not supported by guest? Does the feature negotiation UUID have to
-> depend on STANDBY being set, or the other way around? I thought that
-> just the absence of STANDBY will prevent primary to get exposed to the
-> guest.
->
-> -Siwei
->
->>
->>>
->>> > - in the guest, use the uuid from the virtio-net device's config space
->>> >   if applicable; else, fall back to matching by MAC as done today
->>> >
->>> > That should work for all virtio transports.
+I wonder why nobody noticed the deprecation messages before?
+
+> So what about reverting commit b0083267444a5e0f28391f6c2831a539f878d424
+> "block: Remove deprecated -drive option serial" and redo the removal in
+> qemu 3.1 (or 3.2) ?
+> Even if we fix libvirt today, this is certainly a too short period of 
+> time to get things fixed in the field.
+
+Agreed, reverting that commit is likely the best thing we can do right
+now, and then kill it in a later QEMU release. Note that you also need
+to revert 6266e900b8083945cb766b45c124fb3c42932cb3 first.
+
+ Thomas
