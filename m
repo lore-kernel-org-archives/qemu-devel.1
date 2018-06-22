@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fWBqZ-0006Ki-VQ
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:30:48 -0400
+	(envelope-from <mst@redhat.com>) id 1fWBsH-0006zV-GE
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:32:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fWBqW-0001jt-PK
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:30:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45342 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fWBsE-0002L9-Af
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:32:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36940 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fWBqW-0001ix-JY
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:30:44 -0400
-Date: Fri, 22 Jun 2018 05:30:43 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fWBsE-0002Ku-4x
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 22:32:30 -0400
+Date: Fri, 22 Jun 2018 05:32:28 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180622052717-mutt-send-email-mst@kernel.org>
-References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
-	<fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
-	<20180605152344-mutt-send-email-mst@kernel.org>
-	<a45625c9-d2cd-f8f7-ce31-37c558e70b88@redhat.com>
-	<20180612144743-mutt-send-email-mst@kernel.org>
-	<5718de66-74c9-1362-a87b-2eba02475b48@redhat.com>
-	<c29a5ac9-cfb5-0a19-f28c-30d41bd5efcf@intel.com>
-	<ce4da2b0-88fd-c79b-0567-fe564bb34922@redhat.com>
-	<20180621211359-mutt-send-email-mst@kernel.org>
-	<CADGSJ216itm89dUuK_vOfuBsBq5bq4485GqMKjB1JXFD_PLZxA@mail.gmail.com>
+Message-ID: <20180622053141-mutt-send-email-mst@kernel.org>
+References: <20180615134815.6613620e.cohuck@redhat.com>
+	<CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
+	<20180619125453.2d2dfb2d.cohuck@redhat.com>
+	<20180619233001-mutt-send-email-mst@kernel.org>
+	<20180620115359.1a3bf6fb.cohuck@redhat.com>
+	<20180620170904-mutt-send-email-mst@kernel.org>
+	<20180620180619.6b4ee52d.cohuck@redhat.com>
+	<20180620224535-mutt-send-email-mst@kernel.org>
+	<20180621165913.7e3f4faa.cohuck@redhat.com>
+	<CADGSJ22B39JiS14L0yCYQ720-fZcwyUt1wCX1YO-6Y9FhmDKZg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CADGSJ216itm89dUuK_vOfuBsBq5bq4485GqMKjB1JXFD_PLZxA@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CADGSJ22B39JiS14L0yCYQ720-fZcwyUt1wCX1YO-6Y9FhmDKZg@mail.gmail.com>
 Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
  VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
@@ -38,86 +37,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Siwei Liu <loseweigh@gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, qemu-devel@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-On Thu, Jun 21, 2018 at 06:07:18PM -0700, Siwei Liu wrote:
-> On Thu, Jun 21, 2018 at 11:14 AM, Michael S. Tsirkin <mst@redhat.com> w=
-rote:
-> > On Wed, Jun 13, 2018 at 01:40:59PM +0800, Jason Wang wrote:
-> >>
-> >>
-> >> On 2018=E5=B9=B406=E6=9C=8813=E6=97=A5 12:24, Samudrala, Sridhar wro=
-te:
-> >> > On 6/12/2018 7:38 PM, Jason Wang wrote:
-> >> > >
-> >> > >
-> >> > > On 2018=E5=B9=B406=E6=9C=8812=E6=97=A5 19:54, Michael S. Tsirkin=
- wrote:
-> >> > > > On Wed, Jun 06, 2018 at 10:29:03AM +0800, Jason Wang wrote:
-> >> > > > >
-> >> > > > > On 2018=E5=B9=B406=E6=9C=8805=E6=97=A5 20:33, Michael S. Tsi=
-rkin wrote:
-> >> > > > > > I don't think this is sufficient.
-> >> > > > > >
-> >> > > > > > If both primary and standby devices are present, a
-> >> > > > > > legacy guest without
-> >> > > > > > support for the feature might see two devices with same ma=
-c and get
-> >> > > > > > confused.
-> >> > > > > >
-> >> > > > > > I think that we should only make primary visible after
-> >> > > > > > guest acked the
-> >> > > > > > backup feature bit.
-> >> > > > > I think we want exactly the reverse? E.g fail the
-> >> > > > > negotiation when guest
-> >> > > > > does not ack backup feature.
-> >> > > > >
-> >> > > > > Otherwise legacy guest won't even have the chance to see
-> >> > > > > primary device in
-> >> > > > > the guest.
-> >> > > > That's by design.
-> >> > >
-> >> > > So management needs to know the capability of guest to set the
-> >> > > backup feature. This looks a chicken or egg problem to me.
-> >> >
-> >> > I don't think so. If the tenant requests 'accelerated datapath fea=
-ture',
-> >> > the management
-> >> > will set 'standby' feature bit on virtio-net interface and if the =
-guest
-> >> > virtio-net driver
-> >> > supports this feature, then the tenant VM will get that capability=
- via a
-> >> > hot-plugged
-> >> > primary device.
-> >>
-> >> Ok, I thought exactly the reverse because of the commit title is "en=
-able
-> >> virtio_net to act as a standby for a passthru device". But re-read t=
-he
-> >> commit log content, I understand the case a little bit. Btw, VF is n=
-ot
-> >> necessarily faster than virtio-net, especially consider virtio-net m=
-ay have
-> >> a lot of queues.
+On Thu, Jun 21, 2018 at 06:21:55PM -0700, Siwei Liu wrote:
+> On Thu, Jun 21, 2018 at 7:59 AM, Cornelia Huck <cohuck@redhat.com> wrote:
+> > On Wed, 20 Jun 2018 22:48:58 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > >
-> > Don't do that then, right?
->=20
-> I don't understand. Where did the standby feature come to imply the
-> "accelerated datapath" thing?
-> Isn't failover/standby a generic high
-> availblity term, rather than marry it to the concept of device model
-> specifics? Do we expect scsi to work exactly the same way with
-> "accelerated datapath"?
+> >> On Wed, Jun 20, 2018 at 06:06:19PM +0200, Cornelia Huck wrote:
+> >> > In any case, I'm not sure anymore why we'd want the extra uuid.
+> >>
+> >> It's mostly so we can have e.g. multiple devices with same MAC
+> >> (which some people seem to want in order to then use
+> >> then with different containers).
+> >>
+> >> But it is also handy for when you assign a PF, since then you
+> >> can't set the MAC.
+> >>
+> >
+> > OK, so what about the following:
+> >
+> > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
+> >   that we have a new uuid field in the virtio-net config space
+> > - in QEMU, add a property for virtio-net that allows to specify a uuid,
+> >   offer VIRTIO_NET_F_STANDBY_UUID if set
+> > - when configuring, set the property to the group UUID of the vfio-pci
+> >   device
+> 
+> If feature negotiation fails on VIRTIO_NET_F_STANDBY_UUID, is it safe
+> to still expose UUID in the config space on virtio-pci?
 
-That's not what I said.
-The semantics are that the primary is always used if present in
-preference to standby.
-Jason said virtio net is sometimes preferable.
-If that's the case don't make it a standby.
 
-More advanced use-cases do exist and e.g. Alexander Duyck
-suggested using a switch-dev. failover isn't it though.
+Yes but guest is not supposed to read it.
 
---=20
-MST
+> I'm not even sure if it's sane to expose group UUID on the PCI bridge
+> where the corresponding vfio-pci device attached to for a guest which
+> doesn't support the feature (legacy).
+> 
+> -Siwei
+
+Yes but you won't add the primary behind such a bridge.
+
+> 
+> > - in the guest, use the uuid from the virtio-net device's config space
+> >   if applicable; else, fall back to matching by MAC as done today
+> >
+> > That should work for all virtio transports.
