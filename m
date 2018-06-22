@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fWPIA-0003Yl-96
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:52:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fWPSn-0006LV-2O
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:03:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fWPI6-0002KG-97
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:52:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58656 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fWPI6-0002K9-2r
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 12:52:06 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3ED2B4001389
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 16:52:05 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 22 Jun 2018 18:51:59 +0200
-Message-Id: <20180622165159.19863-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] ahci: fix FIS I bit and PIO Setup FIS
- interrupt
+	(envelope-from <peter.maydell@linaro.org>) id 1fWPSm-0006ZD-9v
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:03:09 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:41891)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fWPSm-0006Z9-4i
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:03:08 -0400
+Received: by mail-oi0-x242.google.com with SMTP id a141-v6so6728277oii.8
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 10:03:08 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180622153228.23594-1-armbru@redhat.com>
+References: <20180622153228.23594-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 18:02:47 +0100
+Message-ID: <CAFEAcA9jHb8C2Ueiy5CPnaRDLSjy25HTGuNPJBhc6atA+5xkxw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/10] QAPI patches for 2018-06-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,248 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com, jsnow@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-The "I" bit in PIO Setup and D2H FISes is exclusively a device concept
-and the irqstatus register in the controller does not matter.  The SATA
-spec says when it should be one; for D2H FISes in practice it is always
-set, while the PIO Setup FIS has several subcases that are documented in
-the patch.
+On 22 June 2018 at 16:32, Markus Armbruster <armbru@redhat.com> wrote:
+> The following changes since commit 45eb6fb6cea28cdc937764aac6585751047bb294:
+>
+>   nbd/server: Silence gcc false positive (2018-06-22 14:18:36 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2018-06-22
+>
+> for you to fetch changes up to be25fcc4d2faeb3ffa8db813272963bae659c4c2:
+>
+>   MAINTAINERS: Update QAPI stanza for commit fb0bc835e56 (2018-06-22 16:33:47 +0200)
+>
+> ----------------------------------------------------------------
+> QAPI patches for 2018-06-22
+>
+> ----------------------------------------------------------------
+Applied, thanks.
 
-Also, the PIO Setup FIS interrupt is actually generated _after_ data
-has been received.
-
-Someone should probably spend some time reading the SATA specification and
-figuring out the more obscure fields in the PIO Setup FIS, but this is enough
-to fix SeaBIOS booting from ATAPI CD-ROMs over an AHCI controller.
-
-Fixes: 956556e131e35f387ac482ad7b41151576fef057
-Reported-by: Gerd Hoffmann <kraxel@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/ide/ahci.c          | 36 +++++++++++++++++++++++++-----------
- hw/ide/ahci_internal.h |  2 +-
- tests/libqos/ahci.c    | 25 ++++++++++++++++---------
- tests/libqos/ahci.h    |  2 +-
- 4 files changed, 43 insertions(+), 22 deletions(-)
-
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index f7852be842..82b3f755c4 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -801,7 +801,7 @@ static void ahci_write_fis_sdb(AHCIState *s, NCQTransferState *ncq_tfs)
-     }
- }
- 
--static void ahci_write_fis_pio(AHCIDevice *ad, uint16_t len)
-+static void ahci_write_fis_pio(AHCIDevice *ad, uint16_t len, bool pio_fis_i)
- {
-     AHCIPortRegs *pr = &ad->port_regs;
-     uint8_t *pio_fis;
-@@ -814,7 +814,7 @@ static void ahci_write_fis_pio(AHCIDevice *ad, uint16_t len)
-     pio_fis = &ad->res_fis[RES_FIS_PSFIS];
- 
-     pio_fis[0] = SATA_FIS_TYPE_PIO_SETUP;
--    pio_fis[1] = (ad->hba->control_regs.irqstatus ? (1 << 6) : 0);
-+    pio_fis[1] = (pio_fis_i ? (1 << 6) : 0);
-     pio_fis[2] = s->status;
-     pio_fis[3] = s->error;
- 
-@@ -842,8 +842,6 @@ static void ahci_write_fis_pio(AHCIDevice *ad, uint16_t len)
-     if (pio_fis[2] & ERR_STAT) {
-         ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_TFES);
-     }
--
--    ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_PSS);
- }
- 
- static bool ahci_write_fis_d2h(AHCIDevice *ad)
-@@ -860,7 +858,7 @@ static bool ahci_write_fis_d2h(AHCIDevice *ad)
-     d2h_fis = &ad->res_fis[RES_FIS_RFIS];
- 
-     d2h_fis[0] = SATA_FIS_TYPE_REGISTER_D2H;
--    d2h_fis[1] = (ad->hba->control_regs.irqstatus ? (1 << 6) : 0);
-+    d2h_fis[1] = (1 << 6); /* interrupt bit */
-     d2h_fis[2] = s->status;
-     d2h_fis[3] = s->error;
- 
-@@ -1251,6 +1249,7 @@ static void handle_reg_h2d_fis(AHCIState *s, int port,
- 
-     /* Copy the ACMD field (ATAPI packet, if any) from the AHCI command
-      * table to ide_state->io_buffer */
-+    s->dev[port].done_first_drq = false;
-     if (opts & AHCI_CMD_ATAPI) {
-         memcpy(ide_state->io_buffer, &cmd_fis[AHCI_COMMAND_TABLE_ACMD], 0x10);
-         if (trace_event_get_state_backends(TRACE_HANDLE_REG_H2D_FIS_DUMP)) {
-@@ -1258,7 +1257,6 @@ static void handle_reg_h2d_fis(AHCIState *s, int port,
-             trace_handle_reg_h2d_fis_dump(s, port, pretty_fis);
-             g_free(pretty_fis);
-         }
--        s->dev[port].done_atapi_packet = false;
-     }
- 
-     ide_state->error = 0;
-@@ -1351,13 +1349,23 @@ static void ahci_pio_transfer(IDEDMA *dma)
-     int is_write = opts & AHCI_CMD_WRITE;
-     int is_atapi = opts & AHCI_CMD_ATAPI;
-     int has_sglist = 0;
-+    bool pio_fis_i;
- 
--    /* PIO FIS gets written prior to transfer */
--    ahci_write_fis_pio(ad, size);
-+    /* The PIO Setup FIS is received prior to transfer, but the interrupt
-+     * is only triggered after data is received.
-+     *
-+     * The device only sets the 'I' bit in the PIO Setup FIS for device->host
-+     * requests (see "DPIOI1" in the SATA spec), or for host->device DRQs after
-+     * the first (see "DPIOO1").  The latter is consistent with the spec's
-+     * description of the PACKET protocol, where the command part of ATAPI requests
-+     * ("DPKT0") has the 'I' bit clear, while the data part of PIO ATAPI requests
-+     * ("DPKT4a" and "DPKT7") has the 'I' bit set for both directions for all DRQs.
-+     */
-+    pio_fis_i = ad->done_first_drq || (!is_atapi && !is_write);
-+    ahci_write_fis_pio(ad, size, pio_fis_i);
- 
--    if (is_atapi && !ad->done_atapi_packet) {
-+    if (is_atapi && !ad->done_first_drq) {
-         /* already prepopulated iobuffer */
--        ad->done_atapi_packet = true;
-         goto out;
-     }
- 
-@@ -1379,9 +1387,15 @@ static void ahci_pio_transfer(IDEDMA *dma)
- 
-     /* Update number of transferred bytes, destroy sglist */
-     dma_buf_commit(s, size);
-+
- out:
-     /* declare that we processed everything */
-     s->data_ptr = s->data_end;
-+
-+    ad->done_first_drq = true;
-+    if (pio_fis_i) {
-+        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_PSS);
-+    }
- }
- 
- static void ahci_start_dma(IDEDMA *dma, IDEState *s,
-@@ -1627,7 +1641,7 @@ static const VMStateDescription vmstate_ahci_device = {
-         VMSTATE_UINT32(port_regs.scr_err, AHCIDevice),
-         VMSTATE_UINT32(port_regs.scr_act, AHCIDevice),
-         VMSTATE_UINT32(port_regs.cmd_issue, AHCIDevice),
--        VMSTATE_BOOL(done_atapi_packet, AHCIDevice),
-+        VMSTATE_BOOL(done_first_drq, AHCIDevice),
-         VMSTATE_INT32(busy_slot, AHCIDevice),
-         VMSTATE_BOOL(init_d2h_sent, AHCIDevice),
-         VMSTATE_STRUCT_ARRAY(ncq_tfs, AHCIDevice, AHCI_MAX_CMDS,
-diff --git a/hw/ide/ahci_internal.h b/hw/ide/ahci_internal.h
-index 2953243929..9b7fa8fc7d 100644
---- a/hw/ide/ahci_internal.h
-+++ b/hw/ide/ahci_internal.h
-@@ -315,7 +315,7 @@ struct AHCIDevice {
-     QEMUBH *check_bh;
-     uint8_t *lst;
-     uint8_t *res_fis;
--    bool done_atapi_packet;
-+    bool done_first_drq;
-     int32_t busy_slot;
-     bool init_d2h_sent;
-     AHCICmdHdr *cur_cmd;
-diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
-index 7264e085d0..42d3f76933 100644
---- a/tests/libqos/ahci.c
-+++ b/tests/libqos/ahci.c
-@@ -651,10 +651,7 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
-     /* Command creation */
-     if (opts->atapi) {
-         uint16_t bcl = opts->set_bcl ? opts->bcl : ATAPI_SECTOR_SIZE;
--        cmd = ahci_atapi_command_create(op, bcl);
--        if (opts->atapi_dma) {
--            ahci_command_enable_atapi_dma(cmd);
--        }
-+        cmd = ahci_atapi_command_create(op, bcl, opts->atapi_dma);
-     } else {
-         cmd = ahci_command_create(op);
-     }
-@@ -874,7 +871,6 @@ AHCICommand *ahci_command_create(uint8_t command_name)
-     /* cmd->interrupts |= props->data ? AHCI_PX_IS_DPS : 0; */
-     /* BUG: We expect the DMA Setup interrupt for DMA commands */
-     /* cmd->interrupts |= props->dma ? AHCI_PX_IS_DSS : 0; */
--    cmd->interrupts |= props->pio ? AHCI_PX_IS_PSS : 0;
-     cmd->interrupts |= props->ncq ? AHCI_PX_IS_SDBS : 0;
- 
-     command_header_init(cmd);
-@@ -883,19 +879,24 @@ AHCICommand *ahci_command_create(uint8_t command_name)
-     return cmd;
- }
- 
--AHCICommand *ahci_atapi_command_create(uint8_t scsi_cmd, uint16_t bcl)
-+AHCICommand *ahci_atapi_command_create(uint8_t scsi_cmd, uint16_t bcl, bool dma)
- {
-     AHCICommand *cmd = ahci_command_create(CMD_PACKET);
-     cmd->atapi_cmd = g_malloc0(16);
-     cmd->atapi_cmd[0] = scsi_cmd;
-     stw_le_p(&cmd->fis.lba_lo[1], bcl);
-+    if (dma) {
-+        ahci_command_enable_atapi_dma(cmd);
-+    } else {
-+        cmd->interrupts |= bcl ? AHCI_PX_IS_PSS : 0;
-+    }
-     return cmd;
- }
- 
- void ahci_atapi_test_ready(AHCIQState *ahci, uint8_t port,
-                            bool ready, uint8_t expected_sense)
- {
--    AHCICommand *cmd = ahci_atapi_command_create(CMD_ATAPI_TEST_UNIT_READY, 0);
-+    AHCICommand *cmd = ahci_atapi_command_create(CMD_ATAPI_TEST_UNIT_READY, 0, false);
-     ahci_command_set_size(cmd, 0);
-     if (!ready) {
-         cmd->interrupts |= AHCI_PX_IS_TFES;
-@@ -937,7 +938,7 @@ void ahci_atapi_get_sense(AHCIQState *ahci, uint8_t port,
- 
- void ahci_atapi_eject(AHCIQState *ahci, uint8_t port)
- {
--    AHCICommand *cmd = ahci_atapi_command_create(CMD_ATAPI_START_STOP_UNIT, 0);
-+    AHCICommand *cmd = ahci_atapi_command_create(CMD_ATAPI_START_STOP_UNIT, 0, false);
-     ahci_command_set_size(cmd, 0);
- 
-     cmd->atapi_cmd[4] = 0x02; /* loej = true */
-@@ -949,7 +950,7 @@ void ahci_atapi_eject(AHCIQState *ahci, uint8_t port)
- 
- void ahci_atapi_load(AHCIQState *ahci, uint8_t port)
- {
--    AHCICommand *cmd = ahci_atapi_command_create(CMD_ATAPI_START_STOP_UNIT, 0);
-+    AHCICommand *cmd = ahci_atapi_command_create(CMD_ATAPI_START_STOP_UNIT, 0, false);
-     ahci_command_set_size(cmd, 0);
- 
-     cmd->atapi_cmd[4] = 0x03; /* loej,start = true */
-@@ -1098,6 +1099,12 @@ void ahci_command_set_sizes(AHCICommand *cmd, uint64_t xbytes,
-     } else if (cmd->props->atapi) {
-         ahci_atapi_set_size(cmd, xbytes);
-     } else {
-+        /* For writes, the PIO Setup FIS interrupt only comes from DRQs
-+         * after the first.
-+         */
-+        if (cmd->props->pio && sect_count > (cmd->props->read ? 0 : 1)) {
-+            cmd->interrupts |= AHCI_PX_IS_PSS;
-+        }
-         cmd->fis.count = sect_count;
-     }
-     cmd->header.prdtl = size_to_prdtl(cmd->xbytes, cmd->prd_size);
-diff --git a/tests/libqos/ahci.h b/tests/libqos/ahci.h
-index 13f6d87b75..f05b3e5fce 100644
---- a/tests/libqos/ahci.h
-+++ b/tests/libqos/ahci.h
-@@ -622,7 +622,7 @@ void ahci_atapi_load(AHCIQState *ahci, uint8_t port);
- 
- /* Command: Fine-grained lifecycle */
- AHCICommand *ahci_command_create(uint8_t command_name);
--AHCICommand *ahci_atapi_command_create(uint8_t scsi_cmd, uint16_t bcl);
-+AHCICommand *ahci_atapi_command_create(uint8_t scsi_cmd, uint16_t bcl, bool dma);
- void ahci_command_commit(AHCIQState *ahci, AHCICommand *cmd, uint8_t port);
- void ahci_command_issue(AHCIQState *ahci, AHCICommand *cmd);
- void ahci_command_issue_async(AHCIQState *ahci, AHCICommand *cmd);
--- 
-2.17.0
+-- PMM
