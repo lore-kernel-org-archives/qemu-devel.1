@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1fWLmP-0002uS-4j
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:07:09 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fWLxZ-0003gr-0M
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:18:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kchamart@redhat.com>) id 1fWLmM-0001Ok-0K
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:07:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33826 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1fWLmL-0001Nu-RV
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:07:05 -0400
-Date: Fri, 22 Jun 2018 15:06:59 +0200
-From: Kashyap Chamarthy <kchamart@redhat.com>
-Message-ID: <20180622130659.GA11827@paraplu>
-References: <20180612184616.90838-1-mst@redhat.com>
-	<20180614081800.GH6355@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fWLxY-0006DH-7f
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:18:41 -0400
+Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:39440)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fWLxY-0006CF-0y
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:18:40 -0400
+Received: by mail-ot0-x22e.google.com with SMTP id l15-v6so7442259oth.6
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 06:18:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180614081800.GH6355@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] kvm: x86 CPU power management
+In-Reply-To: <20180621164727.36626-1-dgilbert@redhat.com>
+References: <20180621164727.36626-1-dgilbert@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 14:18:19 +0100
+Message-ID: <CAFEAcA8T2hsQ6zc281_irOD42L-VK5h9LqGnFfsYU=qNNWzsWg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/9] hmp queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,29 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org, Richard Henderson <rth@twiddle.net>, huth@tuxfamily.org
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Collin Walling <walling@linux.ibm.com>, Markus Armbruster <armbru@redhat.com>
 
-(Cc: Thomas Huth)
+On 21 June 2018 at 17:47, Dr. David Alan Gilbert (git)
+<dgilbert@redhat.com> wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+> The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a93b:
+>
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into staging (2018-06-20 09:51:30 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dagrh/qemu.git tags/pull-hmp-20180621
+>
+> for you to fetch changes up to 13163a93b729b9ec4b49501d03d3f50af4b05758:
+>
+>   hmp: Allow HMP in preconfig state again (2018-06-21 13:18:11 +0100)
+>
+> ----------------------------------------------------------------
+> HMP pull 2018-06-21
+>
+> Minor fixes and reenable preconfig
+>
+> ----------------------------------------------------------------
 
-On Thu, Jun 14, 2018 at 09:18:00AM +0100, Daniel P. Berrang=E9 wrote:
 
-[...]
+Applied, thanks.
 
-> IMHO this really shouldn't be under the -realtime flag. I don't think
-> the -realtime flag should ever have been introduced, and we certainly
-> shouldn't add more stuff under it.
->=20
-> "-realtime" is referring to a very specific use case, while the
-> properties listed under it are all general purpose features. Real
-> time guests just happen to be one possible use case, but it is
-> valid to use them for non-real time guests.
-
-Given what you say above, then it sounds like the "-realtime" QEMU
-option should be deprecated, and removed in a future release.
-
-[...]
-
-
---=20
-/kashyap
+-- PMM
