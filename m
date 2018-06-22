@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fWMeS-0007UZ-3y
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:03:03 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fWMfw-0008Uh-2U
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:04:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fWMeN-0003nH-Vf
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:03:00 -0400
-Date: Fri, 22 Jun 2018 15:02:44 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180622140244.GK23296@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-26-kwolf@redhat.com>
-	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
-	<20180622125502.GF4366@localhost.localdomain>
-	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
+	(envelope-from <no-reply@patchew.org>) id 1fWMfs-00041V-T1
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:04:32 -0400
+Resent-Message-Id: <E1fWMfs-00041V-T1@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21070)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fWMfs-00041K-Jc
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:04:28 -0400
+In-Reply-To: <1529663827-28854-1-git-send-email-hongbo.zhang@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152967353172.876.8679943897946809404@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 22 Jun 2018 06:18:52 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: fix psci conduit in acpi when
+ el3 enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,69 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org, pkrempa@redhat.com
+To: hongbo.zhang@linaro.org
+Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-On Fri, Jun 22, 2018 at 03:36:50PM +0200, Christian Borntraeger wrote:
-> 
-> 
-> On 06/22/2018 02:55 PM, Kevin Wolf wrote:
-> > Am 22.06.2018 um 13:38 hat Christian Borntraeger geschrieben:
-> >>
-> >> On 06/15/2018 04:21 PM, Kevin Wolf wrote:
-> >>> The -drive option serial was deprecated in QEMU 2.10. It's time to
-> >>> remove it.
-> >>>
-> >>> Tests need to be updated to set the serial number with -global instead
-> >>> of using the -drive option.
-> >>
-> >> libvirt 4.5 still creates those (at least on s390x)
-> >>
-> >>     <disk type='file' device='disk'>
-> >>       <driver name='qemu' type='qcow2' cache='none' io='native' iothread='1'/>
-> >>       <source file='/var/lib/libvirt/qemu/image.zhyp137'/>
-> >>       <target dev='hda' bus='virtio'/>
-> >>       <serial>skel</serial>
-> >>       <boot order='1'/>
-> >>       <address type='ccw' cssid='0xfe' ssid='0x0' devno='0x0000'/>
-> >>     </disk>
-> >>
-> >>
-> >> -> 
-> >> [...]
-> >> -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native -device virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0000,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on 
-> >> [...]
-> >>
-> >> 2018-06-22T11:25:20.946024Z qemu-system-s390x: -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native: Block format 'qcow2' does not support the option 'serial'
-> >> 2018-06-22 11:25:21.098+0000: shutting down, reason=failed
-> >>
-> >> So it seems that this breaks s390x.
-> 
-> To me it seems that this is also broken on x86.
-
-Correct, this is not architecture specific.
-
-> > Thanks for bringing this up. libvirt should fix this before QEMU 3.0 is
-> > released.
-> 
-> I think this is definitely too short notice. We should not break existing
-> setups just by insisting that users have to update libvirt when they update
-> QEMU. Yes, this might be our policy, but doing so "just because we can"
-> is certainly a very bad attitude. I see no fundamental technical reason why
-> we should not revert this change.
-> 
-> > Sadly, it also shows that deprecation warnings in log files go
-> > unnoticed.
-> 
-> In fact whoever added the deprication notice should have followed up
-> with the libvirt team to implement that change. no?
-
-On libvirt side I thought we had already stopped using the deprecated
-syntax, but we clearly missed it :-(
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1Mjk2NjM4MjctMjg4NTQtMS1naXQtc2VuZC1lbWFpbC1ob25nYm8uemhhbmdA
+bGluYXJvLm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBody9hcm0vdmlydDogZml4
+IHBzY2kgY29uZHVpdCBpbiBhY3BpIHdoZW4gZWwzIGVuYWJsZWQKCj09PSBURVNUIFNDUklQVCBC
+RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
+bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cg
+LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
+IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
+JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
+cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
+ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
+IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
+ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMzE3YTBjYzg0NyBody9h
+cm0vdmlydDogZml4IHBzY2kgY29uZHVpdCBpbiBhY3BpIHdoZW4gZWwzIGVuYWJsZWQKCj09PSBP
+VVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogaHcvYXJtL3ZpcnQ6IGZpeCBwc2Np
+IGNvbmR1aXQgaW4gYWNwaSB3aGVuIGVsMyBlbmFibGVkLi4uCkVSUk9SOiB0cmFpbGluZyB3aGl0
+ZXNwYWNlCiMyNzogRklMRTogaHcvYXJtL3ZpcnQtYWNwaS1idWlsZC5jOjcyMToKKyAgICAgICAg
+ICovICQKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTIgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
