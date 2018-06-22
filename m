@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fWIes-0007Kj-Aa
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 05:47:11 -0400
+	(envelope-from <saipava@xilinx.com>) id 1fWIgP-00080Y-9N
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 05:48:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fWIen-0007gc-F0
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 05:47:10 -0400
-Date: Fri, 22 Jun 2018 11:46:59 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180622114659.7858fe00.cohuck@redhat.com>
-In-Reply-To: <c4ce8f0c-ccbb-3d79-459f-bb771a68685a@de.ibm.com>
-References: <20180621170143.113370-1-borntraeger@de.ibm.com>
-	<d27919d1-6017-3b57-815d-0bdeb96dea6e@redhat.com>
-	<c4ce8f0c-ccbb-3d79-459f-bb771a68685a@de.ibm.com>
+	(envelope-from <saipava@xilinx.com>) id 1fWIgK-0008NM-Bm
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 05:48:45 -0400
+Received: from mail-co1nam03on0057.outbound.protection.outlook.com
+	([104.47.40.57]:64960
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <saipava@xilinx.com>) id 1fWIgJ-0008Mu-V6
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 05:48:40 -0400
+From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Date: Fri, 22 Jun 2018 15:17:58 +0530
+Message-ID: <1529660880-30376-1-git-send-email-sai.pavan.boddu@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] s390/ipl: fix ipl with -no-reboot
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4] xilinx_spips: Make dma transactions as per
+ dma_burst_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,106 +26,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Sai Pavan Boddu <saipava@xilinx.com>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Francisco Iglesias <frasse.iglesias@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, KONRAD Frederic <frederic.konrad@adacore.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On Thu, 21 Jun 2018 22:34:49 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+From: Sai Pavan Boddu <saipava@xilinx.com>
 
-> On 06/21/2018 07:08 PM, Paolo Bonzini wrote:
-> > On 21/06/2018 19:01, Christian Borntraeger wrote:  
-> >> kexec/kdump as well as the bootloader use a subcode of diagnose 308
-> >> that is supposed to reset the subsystem but not comprise a full
-> >> "reboot". With the latest refactoring this is now broken when
-> >> -no-reboot is used. This for example breaks virt-install from
-> >> iso images.
-> >>
-> >> We need to mark these "soft" reboots as ok for rebooting.
-> >>
-> >> Fixes: a30fb811cbe9 (s390x: refactor reset/reipl handling)
-> >> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>  
-> > 
-> > Ok, then my suggestion made even more sense. :)  No other objections
-> > apart from the name of the constant.
-> > 
-> > Paolo  
-> 
-> SHUTDOWN_CAUSE_S390_PARTIAL ?
+Qspi dma has a burst length of 64 bytes, So limit the transactions w.r.t
+dma-burst-size property.
 
-Don't like that one much.
+Signed-off-by: Sai Pavan Boddu <saipava@xilinx.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+Changes for V2:
+   Remove dynamic allocation of dma_buf and limit burst size to 2k 
+Changes for V3:
+   Instead of proceeding with max burst size, report user the error.
+Changes for V4:
+   move dma_buf to the bottom of XlnxZynqMPQSPIPS
 
-> 
-> SHUTDOWN_CAUSE_S390_SUBSYS_RESET?
+ hw/ssi/xilinx_spips.c         | 23 ++++++++++++++++++++---
+ include/hw/ssi/xilinx_spips.h |  5 ++++-
+ 2 files changed, 24 insertions(+), 4 deletions(-)
 
-Either that, or drop the 'S390' (is it conceivable that other
-architectures have something similar)?
-
-> 
-> 
-> >   
-> >> ---
-> >>  hw/s390x/ipl.c          | 8 +++++++-
-> >>  include/sysemu/sysemu.h | 3 +++
-> >>  vl.c                    | 4 ++--
-> >>  3 files changed, 12 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> >> index 0d67349004..ade6896af6 100644
-> >> --- a/hw/s390x/ipl.c
-> >> +++ b/hw/s390x/ipl.c
-> >> @@ -535,7 +535,13 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
-> >>              ipl->iplb_valid = s390_gen_initial_iplb(ipl);
-> >>          }
-> >>      }
-> >> -    qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-> >> +    if (reset_type == S390_RESET_MODIFIED_CLEAR ||
-> >> +        reset_type == S390_RESET_LOAD_NORMAL) {
-> >> +        /* ignore -no-reboot */
-> >> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET_FORCE);
-> >> +    } else {
-> >> +        qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-> >> +    }
-> >>      /* as this is triggered by a CPU, make sure to exit the loop */
-> >>      if (tcg_enabled()) {
-> >>          cpu_loop_exit(cs);
-> >> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-> >> index e893f72f3b..345369d924 100644
-> >> --- a/include/sysemu/sysemu.h
-> >> +++ b/include/sysemu/sysemu.h
-> >> @@ -44,6 +44,9 @@ typedef enum ShutdownCause {
-> >>                                       turns that into a shutdown */
-> >>      SHUTDOWN_CAUSE_GUEST_PANIC,   /* Guest panicked, and command line turns
-> >>                                       that into a shutdown */
-> >> +    SHUTDOWN_CAUSE_GUEST_RESET_FORCE,/* Guest reset that should ignore
-> >> +                                        --no-reboot. This is useful for reset
-> >> +                                        like actions as s390 kexec/kdump */
-> >>      SHUTDOWN_CAUSE__MAX,
-> >>  } ShutdownCause;
-> >>  
-> >> diff --git a/vl.c b/vl.c
-> >> index b3426e03d0..44e65071bc 100644
-> >> --- a/vl.c
-> >> +++ b/vl.c
-> >> @@ -1628,7 +1628,7 @@ void qemu_system_reset(ShutdownCause reason)
-> >>      } else {
-> >>          qemu_devices_reset();
-> >>      }
-> >> -    if (reason) {
-> >> +    if (reason != SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
-> >>          qapi_event_send_reset(shutdown_caused_by_guest(reason),
-> >>                                &error_abort);
-> >>      }
-> >> @@ -1674,7 +1674,7 @@ void qemu_system_guest_panicked(GuestPanicInformation *info)
-> >>  
-> >>  void qemu_system_reset_request(ShutdownCause reason)
-> >>  {
-> >> -    if (no_reboot) {
-> >> +    if (no_reboot && reason != SHUTDOWN_CAUSE_GUEST_RESET_FORCE) {
-> >>          shutdown_requested = reason;
-> >>      } else {
-> >>          reset_requested = reason;
-> >>  
-> >   
-> 
-
-The patch looks sane to me.
+diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+index 03f5fae..d6ca36e 100644
+--- a/hw/ssi/xilinx_spips.c
++++ b/hw/ssi/xilinx_spips.c
+@@ -851,12 +851,17 @@ static void xlnx_zynqmp_qspips_notify(void *opaque)
+     {
+         size_t ret;
+         uint32_t num;
+-        const void *rxd = pop_buf(recv_fifo, 4, &num);
++        const void *rxd;
++        int len;
++
++        len = recv_fifo->num >= rq->dma_burst_size ? rq->dma_burst_size :
++                                                   recv_fifo->num;
++        rxd = pop_buf(recv_fifo, len, &num);
+ 
+         memcpy(rq->dma_buf, rxd, num);
+ 
+-        ret = stream_push(rq->dma, rq->dma_buf, 4);
+-        assert(ret == 4);
++        ret = stream_push(rq->dma, rq->dma_buf, num);
++        assert(ret == num);
+         xlnx_zynqmp_qspips_check_flush(rq);
+     }
+ }
+@@ -1333,6 +1338,12 @@ static void xlnx_zynqmp_qspips_realize(DeviceState *dev, Error **errp)
+     XlnxZynqMPQSPIPS *s = XLNX_ZYNQMP_QSPIPS(dev);
+     XilinxSPIPSClass *xsc = XILINX_SPIPS_GET_CLASS(s);
+ 
++    if (s->dma_burst_size > QSPI_DMA_MAX_BURST_SIZE) {
++        error_setg(errp,
++                   "qspi dma burst size %u exceeds maximum limit %d",
++                   s->dma_burst_size, QSPI_DMA_MAX_BURST_SIZE);
++        return;
++    }
+     xilinx_qspips_realize(dev, errp);
+     fifo8_create(&s->rx_fifo_g, xsc->rx_fifo_size);
+     fifo8_create(&s->tx_fifo_g, xsc->tx_fifo_size);
+@@ -1411,6 +1422,11 @@ static const VMStateDescription vmstate_xlnx_zynqmp_qspips = {
+     }
+ };
+ 
++static Property xilinx_zynqmp_qspips_properties[] = {
++    DEFINE_PROP_UINT32("dma-burst-size", XlnxZynqMPQSPIPS, dma_burst_size, 64),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static Property xilinx_qspips_properties[] = {
+     /* We had to turn this off for 2.10 as it is not compatible with migration.
+      * It can be enabled but will prevent the device to be migrated.
+@@ -1463,6 +1479,7 @@ static void xlnx_zynqmp_qspips_class_init(ObjectClass *klass, void * data)
+     dc->realize = xlnx_zynqmp_qspips_realize;
+     dc->reset = xlnx_zynqmp_qspips_reset;
+     dc->vmsd = &vmstate_xlnx_zynqmp_qspips;
++    dc->props = xilinx_zynqmp_qspips_properties;
+     xsc->reg_ops = &xlnx_zynqmp_qspips_ops;
+     xsc->rx_fifo_size = RXFF_A_Q;
+     xsc->tx_fifo_size = TXFF_A_Q;
+diff --git a/include/hw/ssi/xilinx_spips.h b/include/hw/ssi/xilinx_spips.h
+index d398a4e..a0a0ae7 100644
+--- a/include/hw/ssi/xilinx_spips.h
++++ b/include/hw/ssi/xilinx_spips.h
+@@ -37,6 +37,8 @@ typedef struct XilinxSPIPS XilinxSPIPS;
+ /* Bite off 4k chunks at a time */
+ #define LQSPI_CACHE_SIZE 1024
+ 
++#define QSPI_DMA_MAX_BURST_SIZE 2048
++
+ typedef enum {
+     READ = 0x3,         READ_4 = 0x13,
+     FAST_READ = 0xb,    FAST_READ_4 = 0x0c,
+@@ -95,7 +97,6 @@ typedef struct {
+     XilinxQSPIPS parent_obj;
+ 
+     StreamSlave *dma;
+-    uint8_t dma_buf[4];
+     int gqspi_irqline;
+ 
+     uint32_t regs[XLNX_ZYNQMP_SPIPS_R_MAX];
+@@ -113,6 +114,8 @@ typedef struct {
+     uint8_t rx_fifo_g_align;
+     uint8_t tx_fifo_g_align;
+     bool man_start_com_g;
++    uint32_t dma_burst_size;
++    uint8_t dma_buf[QSPI_DMA_MAX_BURST_SIZE];
+ } XlnxZynqMPQSPIPS;
+ 
+ typedef struct XilinxSPIPSClass {
+-- 
+2.7.4
