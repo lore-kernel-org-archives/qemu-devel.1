@@ -1,42 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fWM5a-0002cQ-Fh
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:26:59 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fWM7q-0004bw-Hc
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:29:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fWM5V-0006Yz-HH
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:26:58 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48190)
+	(envelope-from <borntraeger@de.ibm.com>) id 1fWM7l-0007Ia-L8
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:29:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57318)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1fWM5V-0006Yq-8N
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:26:53 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fWM7l-0007IJ-CF
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:29:13 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5MDO8DJ081368
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 09:26:52 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2jrx44jwm7-1
+	w5MDSewO119476
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 09:29:12 -0400
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2js1r4gpac-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 09:26:51 -0400
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 09:29:11 -0400
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 22 Jun 2018 09:26:50 -0400
-References: <20180621115530.11069-1-marcandre.lureau@redhat.com>
-	<20180621115530.11069-5-marcandre.lureau@redhat.com>
-	<9d02acd4-8a60-1ac3-00d9-8c99940254a2@linux.vnet.ibm.com>
-	<20180622110312.275b5d59@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 22 Jun 2018 09:26:45 -0400
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 22 Jun 2018 14:29:09 +0100
+References: <152967373830.876.17089841294743780259@d39dc562802a>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 22 Jun 2018 15:29:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180622110312.275b5d59@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Message-Id: <aa7b8eb8-3353-cac1-8c17-43f928cc3ff6@linux.vnet.ibm.com>
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] acpi: build TPM Physical Presence
- interface
+In-Reply-To: <152967373830.876.17089841294743780259@d39dc562802a>
+Content-Language: en-US
+Message-Id: <5df62baa-268b-2624-e9d7-42c521546d04@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4] s390/ipl: fix ipl with -no-reboot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,113 +41,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, cohuck@redhat.com, frankja@linux.vnet.ibm.com, thuth@redhat.com, david@redhat.com, agraf@suse.de, pasic@linux.vnet.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
-T24gMDYvMjIvMjAxOCAwNTowMyBBTSwgSWdvciBNYW1tZWRvdiB3cm90ZToNCj4gSSdkIHBy
-ZWZlciBhIHRhYmxlIGZvcm1hdCB0byBkZXNjcmliZSBsYXlvdXQsIGxpa2UgaW4NCj4gZG9j
-cy9zcGVjcy9hY3BpX252ZGltbS50eHQgb3IgZG9jcy9zcGVjcy9hY3BpX21lbV9ob3RwbHVn
-LnR4dA0KDQpkaWZmIC0tZ2l0IGEvZG9jcy9zcGVjcy90cG0udHh0IGIvZG9jcy9zcGVjcy90
-cG0udHh0DQppbmRleCBjMjMwYzRjOTNlLi41YmY0ZTg5MmEwIDEwMDY0NA0KLS0tIGEvZG9j
-cy9zcGVjcy90cG0udHh0DQorKysgYi9kb2NzL3NwZWNzL3RwbS50eHQNCkBAIC00Miw2ICs0
-Miw3NiBAQCBVUkw6DQoNCiDCoGh0dHBzOi8vdHJ1c3RlZGNvbXB1dGluZ2dyb3VwLm9yZy90
-Y2ctYWNwaS1zcGVjaWZpY2F0aW9uLw0KDQorPT0gQUNQSSBQUEkgSW50ZXJmYWNlID09DQor
-DQorUUVNVSBzdXBwb3J0cyB0aGUgUGh5c2ljYWwgUHJlc2VuY2UgSW50ZXJmYWNlIChQUEkp
-IGZvciBUUE0gMS4yIGFuZCBUUE0gDQoyLiBUaGlzDQoraW50ZXJmYWNlIHJlcXVpcmVzIEFD
-UEkgYW5kIGZpcm13YXJlIHN1cHBvcnQuIFRoZSBzcGVjaWZpY2F0aW9uIGNhbiBiZSANCmZv
-dW5kIGF0DQordGhlIGZvbGxvd2luZyBVUkw6DQorDQoraHR0cHM6Ly90cnVzdGVkY29tcHV0
-aW5nZ3JvdXAub3JnL3Jlc291cmNlL3RjZy1waHlzaWNhbC1wcmVzZW5jZS1pbnRlcmZhY2Ut
-c3BlY2lmaWNhdGlvbi8NCisNCitQUEkgZW5hYmxlcyBhIHN5c3RlbSBhZG1pbmlzdHJhdG9y
-IChyb290KSB0byByZXF1ZXN0IGEgbW9kaWZpY2F0aW9uIHRvIHRoZQ0KK1RQTSB1cG9uIHJl
-Ym9vdC4gVGhlIFBQSSBzcGVjaWZpY2F0aW9uIGRlZmluZXMgdGhlIG9wZXJhdGlvbiByZXF1
-ZXN0cyANCmFuZCB0aGUNCithY3Rpb25zIHRoZSBmaXJtd2FyZSBoYXMgdG8gdGFrZS4gVGhl
-IHN5c3RlbSBhZG1pbmlzdHJhdG9yIHBhc3NlcyB0aGUgDQpvcGVyYXRpb24NCityZXF1ZXN0
-IG51bWJlciB0byB0aGUgZmlybXdhcmUgdGhyb3VnaCBhbiBBQ1BJIGludGVyZmFjZSB3aGlj
-aCB3cml0ZXMgdGhpcw0KK251bWJlciB0byBhIG1lbW9yeSBsb2NhdGlvbiB0aGF0IHRoZSBm
-aXJtd2FyZSBrbm93cy4gVXBvbiByZWJvb3QsIHRoZSANCmZpcm13YXJlDQorZmluZHMgdGhl
-IG51bWJlciBhbmQgc2VuZHMgY29tbWFuZHMgdG8gdGhlIHRoZSBUUE0uIFRoZSBmaXJtd2Fy
-ZSB3cml0ZXMgDQp0aGUgVFBNDQorcmVzdWx0IGNvZGUgYW5kIHRoZSBvcGVyYXRpb24gcmVx
-dWVzdCBudW1iZXIgdG8gYSBtZW1vcnkgbG9jYXRpb24gdGhhdCANCkFDUEkgY2FuDQorcmVh
-ZCBmcm9tIGFuZCBwYXNzIHRoZSByZXN1bHQgb24gdG8gdGhlIGFkbWluaXN0cmF0b3IuDQor
-DQorVGhlIFBQSSBzcGVjaWZpY2F0aW9uIGRlZmluZXMgYSBzZXQgb2YgbWFuZGF0b3J5IGFu
-ZCBvcHRpb25hbCANCm9wZXJhdGlvbnMgZm9yDQordGhlIGZpcm13YXJlIHRvIGltcGxlbWVu
-dC4gVGhlIEFDUEkgaW50ZXJmYWNlIGFsc28gYWxsb3dzIGFuIA0KYWRtaW5pc3RyYXRvciB0
-bw0KK2xpc3QgdGhlIHN1cHBvcnRlZCBvcGVyYXRpb25zLiBJbiBRRU1VIHRoZSBBQ1BJIGNv
-ZGUgaXMgZ2VuZXJhdGVkIGJ5IA0KUUVNVSwgeWV0DQordGhlIGZpcm13YXJlIG5lZWRzIHRv
-IGltcGxlbWVudCBzdXBwb3J0IG9uIGEgcGVyLW9wZXJhdGlvbnMgYmFzaXMsIGFuZA0KK2Rp
-ZmZlcmVudCBmaXJtd2FyZXMgbWF5IHN1cHBvcnQgYSBkaWZmZXJlbnQgc3Vic2V0LiBUaGVy
-ZWZvcmUsIFFFTVUgDQppbnRyb2R1Y2VzDQordGhlIHZpcnR1YWwgbWVtb3J5IGRldmljZSBm
-b3IgUFBJIHdoZXJlIHRoZSBmaXJtd2FyZSBjYW4gaW5kaWNhdGUgd2hpY2gNCitvcGVyYXRp
-b25zIGl0IHN1cHBvcnRzIGFuZCBBQ1BJIGNhbiBlbmFibGUgdGhlIG9uZXMgdGhhdCBhcmUg
-c3VwcG9ydGVkIGFuZA0KK2Rpc2FibGUgYWxsIG90aGVycy4gVGhpcyBpbnRlcmZhY2UgbGll
-cyBpbiBtYWluIG1lbW9yeSBhbmQgaGFzIHRoZSANCmZvbGxvd2luZw0KK2xheW91dDoNCisN
-CisgKy0tLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLSsNCivCoMKgIHzCoCBGaWVsZMKgwqAgfCBMZW5ndGgg
-fCBPZmZzZXQgfCBEZXNjcmlwdGlvbsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfA0K
-KyArLS0tLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tKw0KK8KgwqAgfCBmdW5jwqDCoMKgwqAgfMKgIDB4MTAw
-IHzCoCAweDAwMCB8IEZpcm13YXJlIHNldHMgdmFsdWVzIGZvciBlYWNoIA0Kc3VwcG9ydGVk
-wqDCoCB8DQorwqDCoCB8wqDCoMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoCB8wqDC
-oMKgwqDCoMKgwqAgfCBvcGVyYXRpb24uIFNlZSBkZWZpbmVkIHZhbHVlcyANCmJlbG93LsKg
-wqDCoMKgwqAgfA0KKyArLS0tLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLSstLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tKw0KK8KgwqAgfCBwcGluwqDCoMKg
-wqAgfMKgwqAgMHgxwqAgfMKgIDB4MTAwIHwgU01JIGludGVycnVwdCB0byB1c2UuIFNldCBi
-eSANCmZpcm13YXJlLsKgwqDCoCB8DQorwqDCoCB8wqDCoMKgwqDCoMKgwqDCoMKgIHzCoMKg
-wqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAgfCBOb3QgDQpzdXBwb3J0ZWQuwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCisgKy0t
-LS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLSsNCivCoMKgIHwgcHBpcMKgwqDCoMKgIHzCoMKgIDB4NMKgIHzC
-oCAweDEwMSB8IEFDUEkgZnVuY3Rpb24gaW5kZXggdG8gcGFzcyB0byBTTU0gDQpjb2RlLsKg
-IHwNCivCoMKgIHzCoMKgwqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDC
-oMKgwqDCoCB8IFNldCBieSBBQ1BJLiBOb3QgDQpzdXBwb3J0ZWQuwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCB8DQorICstLS0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQorwqDCoCB8IHBwcnDC
-oMKgwqDCoCB8wqDCoCAweDTCoCB8wqAgMHgxMDUgfCBSZXN1bHQgb2YgbGFzdCBleGVjdXRl
-ZCBvcGVyYXRpb24uIA0KU2V0IGJ5IHwNCivCoMKgIHzCoMKgwqDCoMKgwqDCoMKgwqAgfMKg
-wqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoCB8IA0KZmlybXdhcmUuwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8
-DQorICstLS0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQorwqDCoCB8IHBwcnHCoMKgwqDCoCB8wqDCoCAw
-eDTCoCB8wqAgMHgxMDkgfCBPcGVyYXRpb24gcmVxdWVzdCBudW1iZXIgdG8gZXhlY3V0ZS4g
-DQpTZXTCoCB8DQorwqDCoCB8wqDCoMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoCB8
-wqDCoMKgwqDCoMKgwqAgfCBieSANCkFDUEkuwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHwNCisgKy0tLS0tLS0t
-LS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLSsNCivCoMKgIHwgcHBybcKgwqDCoMKgIHzCoMKgIDB4NMKgIHzCoCAweDEw
-ZCB8IE9wZXJhdGlvbiByZXF1ZXN0IG9wdGlvbmFsIHBhcmFtZXRlci4gDQpTZXQgfA0KK8Kg
-wqAgfMKgwqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKg
-IHwgYnkgDQpBQ1BJLsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8DQorICstLS0tLS0tLS0tKy0tLS0tLS0tKy0t
-LS0tLS0tKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQor
-wqDCoCB8IGxwcHLCoMKgwqDCoCB8wqDCoCAweDTCoCB8wqAgMHgxMTEgfCBMYXN0IGV4ZWN1
-dGUgcmVxdWVzdCBudW1iZXIuIFNldCANCmJ5wqDCoMKgwqDCoMKgIHwNCivCoMKgIHzCoMKg
-wqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgIHzCoMKgwqDCoMKgwqDCoCB8IA0KZmly
-bXdhcmUuwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCB8DQorICstLS0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQorwqDCoCB8IGZy
-ZXTCoMKgwqDCoCB8wqDCoCAweDTCoCB8wqAgMHgxMTUgfCBSZXN1bHQgY29kZSBmcm9tIFNN
-TSANCmZ1bmN0aW9uLsKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfA0KK8KgwqAgfMKgwqDCoMKg
-wqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgIHwgTm90IA0Kc3Vw
-cG9ydGVkLsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCB8DQorICstLS0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tKy0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0rDQorwqDCoCB8IHJlczHCoMKgwqDC
-oCB8wqAgMHg0MMKgIHzCoCAweDExOSB8IFJlc2VydmVkIGZvciBmdXR1cmUgDQp1c2XCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfA0KKyArLS0tLS0tLS0tLSstLS0t
-LS0tLSstLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tKw0KK8KgwqAgfCBuZXh0X3N0ZXB8wqDCoCAweDHCoCB8wqAgMHgxNTkgfCBPcGVyYXRp
-b24gdG8gZXhlY3V0ZSBhZnRlciByZWJvb3QgDQpiecKgwqDCoMKgwqAgfA0KK8KgwqAgfMKg
-wqDCoMKgwqDCoMKgwqDCoCB8wqDCoMKgwqDCoMKgwqAgfMKgwqDCoMKgwqDCoMKgIHwgZmly
-bXdhcmUuIFVzZWQgYnkgDQpmaXJtd2FyZS7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IHwNCisgKy0tLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0rLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLSsNCisNCivCoMKgIFRoZSBmb2xsb3dpbmcgdmFs
-dWVzIGFyZSBzdXBwb3J0ZWQgZm9yIHRoZSAnZnVuYycgZmllbGQuIFRoZXkgY29ycmVzcG9u
-ZA0KK8KgwqAgdG8gdGhlIHZhbHVlcyB1c2VkIGJ5IEFDUEkgZnVuY3Rpb24gaW5kZXggOC4N
-CisNCivCoMKgwqAgI2RlZmluZSBUUE1fUFBJX0ZVTkNfTk9UX0lNUExFTUVOVEVEwqDCoMKg
-wqAgKDAgPDwgMCkNCivCoMKgwqAgI2RlZmluZSBUUE1fUFBJX0ZVTkNfQklPU19PTkxZwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgKDEgPDwgMCkNCivCoMKgwqAgI2RlZmluZSBUUE1fUFBJX0ZV
-TkNfQkxPQ0tFRMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAoMiA8PCAwKQ0KK8KgwqDCoCAj
-ZGVmaW5lIFRQTV9QUElfRlVOQ19BTExPV0VEX1VTUl9SRVHCoMKgwqDCoCAoMyA8PCAwKQ0K
-K8KgwqDCoCAjZGVmaW5lIFRQTV9QUElfRlVOQ19BTExPV0VEX1VTUl9OT1RfUkVRICg0IDw8
-IDApDQorwqDCoMKgICNkZWZpbmUgVFBNX1BQSV9GVU5DX01BU0vCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgKDcgPDwgMCkNCisNCg0KIMKgUUVNVSBmaWxlcyByZWxhdGVkIHRv
-IFRQTSBBQ1BJIHRhYmxlczoNCiDCoCAtIGh3L2kzODYvYWNwaS1idWlsZC5jDQoNCg==
+
+
+On 06/22/2018 03:22 PM, no-reply@patchew.org wrote:
+> Hi,
+> 
+> This series failed docker-mingw@fedora build test. Please find the testing commands and
+> their output below. If you have Docker installed, you can probably reproduce it
+> locally.
+> 
+
+[...]
+
+>   CC      os-win32.o
+>   CC      bt-host.o
+>   CC      bt-vhci.o
+>   CC      dma-helpers.o
+>   CC      vl.o
+>   CC      tpm.o
+>   CC      device_tree.o
+> /tmp/qemu-test/src/nbd/server.c: In function 'nbd_trip':
+> /tmp/qemu-test/src/nbd/server.c:1980:19: error: 'end' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>      *length = end - offset;
+>                ~~~~^~~~~~~~
+> /tmp/qemu-test/src/nbd/server.c:1940:30: note: 'end' was declared here
+>      uint64_t begin = offset, end;
+>                               ^~~
+> cc1: all warnings being treated as errors
+
+This seems unrelated to the patch?
