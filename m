@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWMQS-0003tI-HZ
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:48:35 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fWMSC-000583-GW
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:50:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWMQR-0007Re-GC
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:48:32 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180622134036.23182-1-f4bug@amsat.org>
-	<20180622134036.23182-9-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <31db6cdd-48f6-746e-3c5d-38925b43f81b@amsat.org>
-Date: Fri, 22 Jun 2018 10:48:17 -0300
+	(envelope-from <cohuck@redhat.com>) id 1fWMS7-0007yr-3g
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:50:19 -0400
+Date: Fri, 22 Jun 2018 15:50:09 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180622155009.19eeffaf.cohuck@redhat.com>
+In-Reply-To: <20180622102928.173420-1-borntraeger@de.ibm.com>
+References: <20180622102928.173420-1-borntraeger@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20180622134036.23182-9-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/14] hw/arm/omap1: Use
- qemu_log_mask(GUEST_ERROR) instead of fprintf
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] s390/ipl: fix ipl with -no-reboot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,119 +22,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-s390x <qemu-s390x@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Janosch Frank <frankja@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 06/22/2018 10:40 AM, Philippe Mathieu-Daudé wrote:
-> TCMI_VERBOSE is no more used, drop the OMAP_8/16/32B_REG macros.
+On Fri, 22 Jun 2018 12:29:28 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+
+> kexec/kdump as well as the bootloader use a subcode of diagnose 308
+> that is supposed to reset the I/O subsystem but not comprise a full
+> "reboot". With the latest refactoring this is now broken when
+> -no-reboot is used or when libvirt acts on a reboot QMP event, for
+> example a virt-install from iso images.
+> We need to mark these "subsystem reset" as special.
+
+s/reset/resets/
+
 > 
-
-Oh and eventually:
-
-Suggested-by: Thomas Huth <thuth@redhat.com>
-
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Fixes: a30fb811cbe9 (s390x: refactor reset/reipl handling)
+> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
 > ---
->  include/hw/arm/omap.h | 18 ------------------
->  hw/arm/omap1.c        | 18 ++++++++++++------
->  2 files changed, 12 insertions(+), 24 deletions(-)
+> v3->v4: - rename to SHUTDOWN_CAUSE_SUBSYSTEM_RESET
+>         - modify comments and patch descriptions
 > 
-> diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
-> index b398607b06..39abba753d 100644
-> --- a/include/hw/arm/omap.h
-> +++ b/include/hw/arm/omap.h
-> @@ -993,24 +993,6 @@ enum {
->  #define OMAP_GPIOSW_INVERTED	0x0001
->  #define OMAP_GPIOSW_OUTPUT	0x0002
->  
-> -# define TCMI_VERBOSE			1
-> -
-> -# ifdef TCMI_VERBOSE
-> -#  define OMAP_8B_REG(paddr)		\
-> -        fprintf(stderr, "%s: 8-bit register " OMAP_FMT_plx "\n",	\
-> -                        __func__, paddr)
-> -#  define OMAP_16B_REG(paddr)		\
-> -        fprintf(stderr, "%s: 16-bit register " OMAP_FMT_plx "\n",	\
-> -                        __func__, paddr)
-> -#  define OMAP_32B_REG(paddr)		\
-> -        fprintf(stderr, "%s: 32-bit register " OMAP_FMT_plx "\n",	\
-> -                        __func__, paddr)
-> -# else
-> -#  define OMAP_8B_REG(paddr)
-> -#  define OMAP_16B_REG(paddr)
-> -#  define OMAP_32B_REG(paddr)
-> -# endif
-> -
->  # define OMAP_MPUI_REG_MASK		0x000007ff
->  
->  #endif /* hw_omap_h */
-> diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-> index 9af04728e3..539d29ef9c 100644
-> --- a/hw/arm/omap1.c
-> +++ b/hw/arm/omap1.c
-> @@ -34,12 +34,18 @@
->  #include "qemu/cutils.h"
->  #include "qemu/bcd.h"
->  
-> +static inline void omap_log_badwidth(const char *funcname, hwaddr addr, int sz)
-> +{
-> +    qemu_log_mask(LOG_GUEST_ERROR, "%s: %d-bit register %#08" HWADDR_PRIx "\n",
-> +                  funcname, sz << 2, addr);
-> +}
-> +
->  /* Should signal the TCMI/GPMC */
->  uint32_t omap_badwidth_read8(void *opaque, hwaddr addr)
->  {
->      uint8_t ret;
->  
-> -    OMAP_8B_REG(addr);
-> +    omap_log_badwidth(__func__, addr, 1);
->      cpu_physical_memory_read(addr, &ret, 1);
->      return ret;
->  }
-> @@ -49,7 +55,7 @@ void omap_badwidth_write8(void *opaque, hwaddr addr,
->  {
->      uint8_t val8 = value;
->  
-> -    OMAP_8B_REG(addr);
-> +    omap_log_badwidth(__func__, addr, 1);
->      cpu_physical_memory_write(addr, &val8, 1);
->  }
->  
-> @@ -57,7 +63,7 @@ uint32_t omap_badwidth_read16(void *opaque, hwaddr addr)
->  {
->      uint16_t ret;
->  
-> -    OMAP_16B_REG(addr);
-> +    omap_log_badwidth(__func__, addr, 2);
->      cpu_physical_memory_read(addr, &ret, 2);
->      return ret;
->  }
-> @@ -67,7 +73,7 @@ void omap_badwidth_write16(void *opaque, hwaddr addr,
->  {
->      uint16_t val16 = value;
->  
-> -    OMAP_16B_REG(addr);
-> +    omap_log_badwidth(__func__, addr, 2);
->      cpu_physical_memory_write(addr, &val16, 2);
->  }
->  
-> @@ -75,7 +81,7 @@ uint32_t omap_badwidth_read32(void *opaque, hwaddr addr)
->  {
->      uint32_t ret;
->  
-> -    OMAP_32B_REG(addr);
-> +    omap_log_badwidth(__func__, addr, 4);
->      cpu_physical_memory_read(addr, &ret, 4);
->      return ret;
->  }
-> @@ -83,7 +89,7 @@ uint32_t omap_badwidth_read32(void *opaque, hwaddr addr)
->  void omap_badwidth_write32(void *opaque, hwaddr addr,
->                  uint32_t value)
->  {
-> -    OMAP_32B_REG(addr);
-> +    omap_log_badwidth(__func__, addr, 4);
->      cpu_physical_memory_write(addr, &value, 4);
->  }
->  
-> 
+>  hw/s390x/ipl.c          | 8 +++++++-
+>  include/sysemu/sysemu.h | 4 ++++
+>  vl.c                    | 4 ++--
+>  3 files changed, 13 insertions(+), 3 deletions(-)
+
+Thanks, applied.
