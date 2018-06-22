@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47828)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1fWJRR-00023n-Nx
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:37:23 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fWJTD-0003RD-Q0
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:39:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1fWJRN-0004Pe-Pk
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:37:21 -0400
-Received: from mail-yb0-x242.google.com ([2607:f8b0:4002:c09::242]:35415)
+	(envelope-from <peter.maydell@linaro.org>) id 1fWJTD-0005Vm-2N
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:39:11 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:45620)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1fWJRN-0004PR-L4
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:37:17 -0400
-Received: by mail-yb0-x242.google.com with SMTP id a16-v6so2372051ybm.2
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 03:37:17 -0700 (PDT)
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Fri, 22 Jun 2018 18:37:07 +0800
-Message-Id: <1529663827-28854-1-git-send-email-hongbo.zhang@linaro.org>
-Subject: [Qemu-devel] [PATCH] hw/arm/virt: fix psci conduit in acpi when el3
- enabled
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fWJTC-0005Uj-Sx
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:39:10 -0400
+Received: by mail-ot0-x241.google.com with SMTP id a5-v6so6964582otf.12
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 03:39:10 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180612005145.3375-14-richard.henderson@linaro.org>
+References: <20180612005145.3375-1-richard.henderson@linaro.org>
+	<20180612005145.3375-14-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 11:38:49 +0100
+Message-ID: <CAFEAcA9p63Fq+jjRpfwuXsubdVG-M9fjpdVx8JKRRyMgPOQfKA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 13/19] linux-user: Split out close, open,
+ openat, read, write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,36 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, Hongbo Zhang <hongbo.zhang@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 
-When QEMU_PSCI_CONDUIT_DISABLED is set, it doesn't mean all the PSCI
-conduits are totally disabled, it only mean the QEMU built-in PSCI
-support is disabled, in such a case, e.g. EL3 is enabled and external
-firmware (it is usually Arm Trusted Firmware) is loaded, SMC should be
-used for the guest to trigger PSCI functions.
+On 12 June 2018 at 01:51, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  linux-user/syscall.h           |  51 ++++
+>  linux-user/strace.c            |  35 ---
+>  linux-user/syscall.c           | 402 +------------------------------
+>  linux-user/syscall_file.c      | 423 +++++++++++++++++++++++++++++++++
+>  linux-user/Makefile.objs       |   3 +-
+>  linux-user/gen_syscall_list.py |   5 +
+>  linux-user/strace.list         |  15 --
+>  7 files changed, 484 insertions(+), 450 deletions(-)
+>  create mode 100644 linux-user/syscall_file.c
 
-Signed-off-by: Hongbo Zhang <hongbo.zhang@linaro.org>
----
- hw/arm/virt-acpi-build.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 74f5744..e5b4947 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -715,7 +715,11 @@ static void build_fadt_rev5(GArray *table_data, BIOSLinker *linker,
- 
-     switch (vms->psci_conduit) {
-     case QEMU_PSCI_CONDUIT_DISABLED:
--        fadt.arm_boot_arch = 0;
-+        /* This case means QEMU's internal EL3 implementation is disabled,
-+         * but when firmware is loaded, the guest can still use SMC as PSCI
-+         * conduit to call external firmware PSCI services
-+         */ 
-+        fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT;
-         break;
-     case QEMU_PSCI_CONDUIT_HVC:
-         fadt.arm_boot_arch = ACPI_FADT_ARM_PSCI_COMPLIANT |
--- 
-2.7.4
+> +SYSCALL_IMPL(close)
+> +{
+> +    fd_trans_unregister(arg1);
+> +    return get_errno(close(arg1));
+> +}
+> +SYSCALL_DEF(close, ARG_DEC);
+
+If in future we wanted to extend the set of information
+we had for each syscall in the SyscallDef struct, I guess
+we'd add parameters to the SYSCALL_DEF macro (or have
+more variant macros)? I can't offhand think of something I'd
+want to use that for, so it's a bit of an abstract question
+for the moment.
+
+thanks
+-- PMM
