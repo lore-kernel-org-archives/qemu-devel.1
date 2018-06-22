@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDcv-0007gf-Gl
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDcv-0007gl-Jw
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWDcu-0003Xq-Eu
+	(envelope-from <dgibson@ozlabs.org>) id 1fWDcu-0003Xw-JN
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 00:24:49 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 22 Jun 2018 14:24:20 +1000
-Message-Id: <20180622042437.14259-6-david@gibson.dropbear.id.au>
+Date: Fri, 22 Jun 2018 14:24:17 +1000
+Message-Id: <20180622042437.14259-3-david@gibson.dropbear.id.au>
 In-Reply-To: <20180622042437.14259-1-david@gibson.dropbear.id.au>
 References: <20180622042437.14259-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 06/23] ppc/pnv: consolidate the creation of the
- ISA bus device tree
+Subject: [Qemu-devel] [PATCH 03/23] spapr_cpu_core: migrate per-CPU data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,119 +22,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: C=C3=A9dric Le Goater <clg@kaod.org>
+From: Greg Kurz <groug@kaod.org>
 
-The device tree node of the ISA bus was being partially done in
-different places. Move all the nodes creation under the same routine.
+A per-CPU machine data pointer was recently added to PowerPCCPU. The
+motivation is to to hide platform specific details from the core CPU
+code. This per-CPU data can hold state which is relevant to the guest
+though, eg, Virtual Processor Areas, and we should migrate this state.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+This patch adds the plumbing so that we can migrate the per-CPU data
+for PAPR guests. We only do this for newer machine types for the sake
+of backward compatibility. No state is migrated for the moment: the
+vmstate_spapr_cpu_state structure will be populated by subsequent
+patches.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+[dwg: Fix some trivial spelling and spacing errors]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/pnv.c | 51 +++++++++++++++++++++++----------------------------
- 1 file changed, 23 insertions(+), 28 deletions(-)
+ hw/ppc/spapr.c                  |  7 ++++++-
+ hw/ppc/spapr_cpu_core.c         | 22 ++++++++++++++++++++--
+ include/hw/ppc/spapr_cpu_core.h |  1 +
+ 3 files changed, 27 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index a29ea996b4..7401ffe5b0 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -265,18 +265,6 @@ static void pnv_dt_icp(PnvChip *chip, void *fdt, uin=
-t32_t pir,
-     g_free(reg);
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index db0fb385d4..3174468fc5 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -4115,7 +4115,12 @@ DEFINE_SPAPR_MACHINE(3_0, "3.0", true);
+     HW_COMPAT_2_12                                                     \
+     {                                                                  \
+         .driver = TYPE_POWERPC_CPU,                                    \
+-        .property = "pre-3.0-migration",                              \
++        .property = "pre-3.0-migration",                               \
++        .value    = "on",                                              \
++    },                                                                 \
++    {                                                                  \
++        .driver = TYPE_SPAPR_CPU_CORE,                                 \
++        .property = "pre-3.0-migration",                               \
+         .value    = "on",                                              \
+     },
+ 
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index aef3be33a3..f129ac884e 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -129,6 +129,15 @@ static void spapr_cpu_core_unrealize(DeviceState *dev, Error **errp)
+     g_free(sc->threads);
  }
-=20
--static int pnv_chip_lpc_offset(PnvChip *chip, void *fdt)
--{
--    char *name;
--    int offset;
--
--    name =3D g_strdup_printf("/xscom@%" PRIx64 "/isa@%x",
--                           (uint64_t) PNV_XSCOM_BASE(chip), PNV_XSCOM_LP=
-C_BASE);
--    offset =3D fdt_path_offset(fdt, name);
--    g_free(name);
--    return offset;
--}
--
- static void pnv_dt_chip(PnvChip *chip, void *fdt)
+ 
++static const VMStateDescription vmstate_spapr_cpu_state = {
++    .name = "spapr_cpu",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_END_OF_LIST()
++    },
++};
++
+ static void spapr_realize_vcpu(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+                                Error **errp)
  {
-     const char *typename =3D pnv_chip_core_typename(chip);
-@@ -285,16 +273,6 @@ static void pnv_dt_chip(PnvChip *chip, void *fdt)
-=20
-     pnv_dt_xscom(chip, fdt, 0);
-=20
--    /* The default LPC bus of a multichip system is on chip 0. It's
--     * recognized by the firmware (skiboot) using a "primary"
--     * property.
--     */
--    if (chip->chip_id =3D=3D 0x0) {
--        int lpc_offset =3D pnv_chip_lpc_offset(chip, fdt);
--
--        _FDT((fdt_setprop(fdt, lpc_offset, "primary", NULL, 0)));
--    }
--
-     for (i =3D 0; i < chip->nr_cores; i++) {
-         PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-=20
-@@ -418,16 +396,35 @@ static int pnv_dt_isa_device(DeviceState *dev, void=
- *opaque)
-     return 0;
- }
-=20
--static void pnv_dt_isa(ISABus *bus, void *fdt, int lpc_offset)
-+static int pnv_chip_isa_offset(PnvChip *chip, void *fdt)
-+{
-+    char *name;
-+    int offset;
-+
-+    name =3D g_strdup_printf("/xscom@%" PRIx64 "/isa@%x",
-+                           (uint64_t) PNV_XSCOM_BASE(chip), PNV_XSCOM_LP=
-C_BASE);
-+    offset =3D fdt_path_offset(fdt, name);
-+    g_free(name);
-+    return offset;
-+}
-+
-+/* The default LPC bus of a multichip system is on chip 0. It's
-+ * recognized by the firmware (skiboot) using a "primary" property.
-+ */
-+static void pnv_dt_isa(PnvMachineState *pnv, void *fdt)
- {
-+    int isa_offset =3D pnv_chip_isa_offset(pnv->chips[0], fdt);
-     ForeachPopulateArgs args =3D {
-         .fdt =3D fdt,
--        .offset =3D lpc_offset,
-+        .offset =3D isa_offset,
-     };
-=20
-+    _FDT((fdt_setprop(fdt, isa_offset, "primary", NULL, 0)));
-+
-     /* ISA devices are not necessarily parented to the ISA bus so we
-      * can not use object_child_foreach() */
--    qbus_walk_children(BUS(bus), pnv_dt_isa_device, NULL, NULL, NULL, &a=
-rgs);
-+    qbus_walk_children(BUS(pnv->isa_bus), pnv_dt_isa_device, NULL, NULL,=
- NULL,
-+                       &args);
- }
-=20
- static void *pnv_dt_create(MachineState *machine)
-@@ -438,7 +435,6 @@ static void *pnv_dt_create(MachineState *machine)
-     char *buf;
-     int off;
-     int i;
--    int lpc_offset;
-=20
-     fdt =3D g_malloc0(FDT_MAX_SIZE);
-     _FDT((fdt_create_empty_tree(fdt, FDT_MAX_SIZE)));
-@@ -480,8 +476,7 @@ static void *pnv_dt_create(MachineState *machine)
+@@ -194,6 +203,10 @@ static PowerPCCPU *spapr_create_vcpu(sPAPRCPUCore *sc, int i, Error **errp)
      }
-=20
-     /* Populate ISA devices on chip 0 */
--    lpc_offset =3D pnv_chip_lpc_offset(pnv->chips[0], fdt);
--    pnv_dt_isa(pnv->isa_bus, fdt, lpc_offset);
-+    pnv_dt_isa(pnv, fdt);
-=20
-     if (pnv->bmc) {
-         pnv_dt_bmc_sensors(pnv->bmc, fdt);
---=20
+ 
+     cpu->machine_data = g_new0(sPAPRCPUState, 1);
++    if (!sc->pre_3_0_migration) {
++        vmstate_register(NULL, cs->cpu_index, &vmstate_spapr_cpu_state,
++                         cpu->machine_data);
++    }
+ 
+     object_unref(obj);
+     return cpu;
+@@ -204,10 +217,13 @@ err:
+     return NULL;
+ }
+ 
+-static void spapr_delete_vcpu(PowerPCCPU *cpu)
++static void spapr_delete_vcpu(PowerPCCPU *cpu, sPAPRCPUCore *sc)
+ {
+     sPAPRCPUState *spapr_cpu = spapr_cpu_state(cpu);
+ 
++    if (!sc->pre_3_0_migration) {
++        vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_data);
++    }
+     cpu->machine_data = NULL;
+     g_free(spapr_cpu);
+     object_unparent(OBJECT(cpu));
+@@ -253,7 +269,7 @@ err_unrealize:
+     }
+ err:
+     while (--i >= 0) {
+-        spapr_delete_vcpu(sc->threads[i]);
++        spapr_delete_vcpu(sc->threads[i], sc);
+     }
+     g_free(sc->threads);
+     error_propagate(errp, local_err);
+@@ -261,6 +277,8 @@ err:
+ 
+ static Property spapr_cpu_core_properties[] = {
+     DEFINE_PROP_INT32("node-id", sPAPRCPUCore, node_id, CPU_UNSET_NUMA_NODE_ID),
++    DEFINE_PROP_BOOL("pre-3.0-migration", sPAPRCPUCore, pre_3_0_migration,
++                     false),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/include/hw/ppc/spapr_cpu_core.h b/include/hw/ppc/spapr_cpu_core.h
+index 8ceea2973a..9e2821e4b3 100644
+--- a/include/hw/ppc/spapr_cpu_core.h
++++ b/include/hw/ppc/spapr_cpu_core.h
+@@ -31,6 +31,7 @@ typedef struct sPAPRCPUCore {
+     /*< public >*/
+     PowerPCCPU **threads;
+     int node_id;
++    bool pre_3_0_migration; /* older machine don't know about sPAPRCPUState */
+ } sPAPRCPUCore;
+ 
+ typedef struct sPAPRCPUCoreClass {
+-- 
 2.17.1
