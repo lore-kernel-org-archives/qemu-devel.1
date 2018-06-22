@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fWUY9-0008Gs-Hi
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 18:29:02 -0400
+	(envelope-from <mst@redhat.com>) id 1fWUcq-0000vI-89
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 18:34:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fWUY6-0004DP-Eh
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 18:29:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53494 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fWUcZ-0005oD-I2
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 18:33:52 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41886 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fWUY6-0004DA-8k
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 18:28:58 -0400
-Date: Sat, 23 Jun 2018 01:28:57 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fWUcZ-0005o7-57
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 18:33:35 -0400
+Date: Sat, 23 Jun 2018 01:33:31 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180623012606-mutt-send-email-mst@kernel.org>
-References: <20180612144743-mutt-send-email-mst@kernel.org>
-	<5718de66-74c9-1362-a87b-2eba02475b48@redhat.com>
-	<c29a5ac9-cfb5-0a19-f28c-30d41bd5efcf@intel.com>
-	<ce4da2b0-88fd-c79b-0567-fe564bb34922@redhat.com>
-	<20180621211359-mutt-send-email-mst@kernel.org>
-	<CADGSJ216itm89dUuK_vOfuBsBq5bq4485GqMKjB1JXFD_PLZxA@mail.gmail.com>
-	<20180622052717-mutt-send-email-mst@kernel.org>
-	<CADGSJ210d358_uyNK9LLw9gpP5uXK6T0h=9mR9ryG7ySkVqvkA@mail.gmail.com>
-	<20180623004404-mutt-send-email-mst@kernel.org>
-	<CADGSJ20aseLKPeEoOg20D5MC5m0JshyPCd2Q8ERfuFhpRL8-FA@mail.gmail.com>
+Message-ID: <20180623012934-mutt-send-email-mst@kernel.org>
+References: <20180620170904-mutt-send-email-mst@kernel.org>
+	<20180620180619.6b4ee52d.cohuck@redhat.com>
+	<20180620224535-mutt-send-email-mst@kernel.org>
+	<20180621165913.7e3f4faa.cohuck@redhat.com>
+	<20180621211712-mutt-send-email-mst@kernel.org>
+	<20180622170955.298900c1.cohuck@redhat.com>
+	<20180622214259-mutt-send-email-mst@kernel.org>
+	<CADGSJ22e=Sa8S-HqM4XtOa6ngBKPL73SiQRPh8PUzQgRaie5oA@mail.gmail.com>
+	<20180623003022-mutt-send-email-mst@kernel.org>
+	<CADGSJ22oFhP955cuTmMWeSt0UOsG5K1A--c34QUSMx5z3Up2SA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CADGSJ20aseLKPeEoOg20D5MC5m0JshyPCd2Q8ERfuFhpRL8-FA@mail.gmail.com>
+In-Reply-To: <CADGSJ22oFhP955cuTmMWeSt0UOsG5K1A--c34QUSMx5z3Up2SA@mail.gmail.com>
 Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
  VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
@@ -37,79 +37,114 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Siwei Liu <loseweigh@gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, qemu-devel@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-On Fri, Jun 22, 2018 at 03:25:19PM -0700, Siwei Liu wrote:
-> On Fri, Jun 22, 2018 at 2:47 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> > On Fri, Jun 22, 2018 at 12:43:26PM -0700, Siwei Liu wrote:
-> >> > The semantics are that the primary is always used if present in
-> >> > preference to standby.
-> >> OK. If this is the only semantics of what "standby" refers to in
-> >> general, that is fine.
-> >>
-> >> I just don't want to limit the failover/standby semantics to the
-> >> device model specifics, the "accelerated datapath" thing or whatever.
-> >> I really don't know where the requirements of the "accelerated
-> >> datapath" came from,
-> >
-> > It's a way to put it that matches what failover actually provides.
-> >
-> >> as the originial problem is migrating vfio
-> >> devices which is in match of QEMU's live migration model.
-> >
-> > If you put it this way then it's natural to require that we have a
-> > config with a working vfio device, and that we somehow add virtio for
-> > duration of migration.
-> 
-> OK. That's the STANDBY feature sematics as I expect.
-
-Maybe but that isn't what virtio or hyperv implement.
-If someone tells you otherwise, they are mistaken IMHO.
-
-> Not something like "we have a working virtio, but we need an
-> accelerated datapath via VFIO when the VM is not migrating". The VFIO
-> is the what needs to be concerned with, not the virtio.
-> The way I view it, the STANDBY feature, although present in the virtio
-> device, is served as a communication channel for the paired VFIO
-> device, and the main purpose of its feature negotiation process has to
-> be around for migrating the corresponding VFIO. While it's possible to
-> re-use it as a side way to achieve "accelerated datapath".
-> 
-> There could be other alternatives for vfio migration though, which do
-> not need the virtio helper, so don't need to get a STANDBY virtio for
-> that VFIO device.
-> 
-> >
-> >> Hyper-V has
-> >> it's limitation to do 1-netdev should not impact how KVM/QEMU should
-> >> be doing it.
-> >
-> > That's a linux thing and pretty orthogonal to host/guest interface.
-> 
-> I agree. So don't assume any device model specifics in the host/guest interface.
-> 
-> >
-> >> > Jason said virtio net is sometimes preferable.
-> >> > If that's the case don't make it a standby.
+On Fri, Jun 22, 2018 at 02:57:39PM -0700, Siwei Liu wrote:
+> On Fri, Jun 22, 2018 at 2:32 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > On Fri, Jun 22, 2018 at 01:21:45PM -0700, Siwei Liu wrote:
+> >> On Fri, Jun 22, 2018 at 12:05 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >> > On Fri, Jun 22, 2018 at 05:09:55PM +0200, Cornelia Huck wrote:
+> >> >> On Thu, 21 Jun 2018 21:20:13 +0300
+> >> >> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >> >>
+> >> >> > On Thu, Jun 21, 2018 at 04:59:13PM +0200, Cornelia Huck wrote:
+> >> >> > > OK, so what about the following:
+> >> >> > >
+> >> >> > > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
+> >> >> > >   that we have a new uuid field in the virtio-net config space
+> >> >> > > - in QEMU, add a property for virtio-net that allows to specify a uuid,
+> >> >> > >   offer VIRTIO_NET_F_STANDBY_UUID if set
+> >> >> > > - when configuring, set the property to the group UUID of the vfio-pci
+> >> >> > >   device
+> >> >> > > - in the guest, use the uuid from the virtio-net device's config space
+> >> >> > >   if applicable; else, fall back to matching by MAC as done today
+> >> >> > >
+> >> >> > > That should work for all virtio transports.
+> >> >> >
+> >> >> > True. I'm a bit unhappy that it's virtio net specific though
+> >> >> > since down the road I expect we'll have a very similar feature
+> >> >> > for scsi (and maybe others).
+> >> >> >
+> >> >> > But we do not have a way to have fields that are portable
+> >> >> > both across devices and transports, and I think it would
+> >> >> > be a useful addition. How would this work though? Any idea?
+> >> >>
+> >> >> Can we introduce some kind of device-independent config space area?
+> >> >> Pushing back the device-specific config space by a certain value if the
+> >> >> appropriate feature is negotiated and use that for things like the uuid?
 > >> >
-> >> > More advanced use-cases do exist and e.g. Alexander Duyck
-> >> > suggested using a switch-dev.
+> >> > So config moves back and forth?
+> >> > Reminds me of the msi vector mess we had with pci.
+> >> > I'd rather have every transport add a new config.
+> >> >
+> >> >> But regardless of that, I'm not sure whether extending this approach to
+> >> >> other device types is the way to go. Tying together two different
+> >> >> devices is creating complicated situations at least in the hypervisor
+> >> >> (even if it's fairly straightforward in the guest). [I have not come
+> >> >> around again to look at the "how to handle visibility in QEMU"
+> >> >> questions due to lack of cycles, sorry about that.]
+> >> >>
+> >> >> So, what's the goal of this approach? Only to allow migration with
+> >> >> vfio-pci, or also to plug in a faster device and use it instead of an
+> >> >> already attached paravirtualized device?
+> >> >
+> >> > These are two sides of the same coin, I think the second approach
+> >> > is closer to what we are doing here.
 > >>
-> >> The switchdev case would need a new feature bit, right?
+> >> I'm leaning towards being conservative to keep the potential of doing
+> >> both. It's the vfio migration itself that has to be addessed, not to
+> >> make every virtio device to have an accelerated datapath, right?
 > >>
 > >> -Siwei
 > >
-> > I think it would need to be a completely new device.
+> > I think that the approach we took (signal configuration
+> > through standby) assumes standby always present and
+> > primary appearing and disappearing.
 > 
-> So how it relates to virtio or failover?
+> I can imagine that's still true even for 1-netdev model. As long as we
+> can hide the lower devices.
 > 
-> Regards,
+> That's what I said "to keep the potential to support both" models. But
+> we should not go further along to assume the other aspect ie. to get
+> PV accelerated whenever possible, but not to get VF migrated whenever
+> possible. That's essetially a big diveregence of the priority for the
+> goal we'd want to pursue.
+> 
 > -Siwei
 
-It might with time offer a super-set of the features.
+I suspect the diveregence will be lost on most users though
+simply because they don't even care about vfio. They just
+want things to go fast.
+
+Rephrasing requirements in terms of acceleration actually
+made things implementable. So I'm not in a hurry to try
+and go back to asking for a migrateable vfio - very
+easy to get stuck there.
 
 > >
-> >> > failover isn't it though.
+> > Anything else isn't well supported and I'm not sure we
+> > should complicate code too much to support it.
+> >
+> >>
+> >> >
+> >> >> What about migration of vfio devices that are not easily replaced by a
+> >> >> paravirtualized device? I'm thinking of vfio-ccw, where our main (and
+> >> >> currently only) supported device is dasd (disks) -- which can do a lot
+> >> >> of specialized things that virtio-blk does not support (and should not
+> >> >> or even cannot support).
+> >> >
+> >> > But maybe virtio-scsi can?
+> >> >
+> >> >> Would it be more helpful to focus on generic
+> >> >> migration support for vfio instead of going about it device by device?
+> >> >>
+> >> >> This network device approach already seems far along, so it makes sense
+> >> >> to continue with it. But I'm not sure whether we want to spend time and
+> >> >> energy on that for other device types rather than working on a general
+> >> >> solution for vfio migration.
+> >> >
+> >> > I'm inclined to say finalizing this feature would be a good first step
+> >> > and will teach us how we can move forward.
 > >> >
 > >> > --
 > >> > MST
