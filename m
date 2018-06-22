@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJdI-0003Pw-8m
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:49:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fWJqA-0006YL-LB
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 07:02:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJdD-0001K6-Uv
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:49:36 -0400
-Date: Fri, 22 Jun 2018 20:49:07 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180622104907.GK612@umbus.fritz.box>
-References: <cover.1529398335.git.balaton@eik.bme.hu>
-	<ce619ddd11a875caae4c221c18ebf7c6a6f4bd4f.1529398335.git.balaton@eik.bme.hu>
-	<20180620052044.GA24636@umbus.fritz.box>
-	<alpine.BSF.2.21.1806210900160.16898@zero.eik.bme.hu>
-	<20180622015940.GF612@umbus.fritz.box>
-	<alpine.BSF.2.21.1806220952410.66303@zero.eik.bme.hu>
+	(envelope-from <peter.maydell@linaro.org>) id 1fWJq9-0006HP-AS
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 07:02:54 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:46240)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fWJq9-0006HJ-3F
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 07:02:53 -0400
+Received: by mail-ot0-x243.google.com with SMTP id v24-v6so7031950otk.13
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 04:02:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="zPXeIxDajdrcF2en"
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1806220952410.66303@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH v4 02/11] ppc4xx_i2c: Implement directcntl
- register
+In-Reply-To: <1529326004-32239-4-git-send-email-eric.auger@redhat.com>
+References: <1529326004-32239-1-git-send-email-eric.auger@redhat.com>
+	<1529326004-32239-4-git-send-email-eric.auger@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 12:02:31 +0100
+Message-ID: <CAFEAcA9X2ASVtcG0Nw5_Bx-rn2+M5hW7g3+QhZvhASYn9aV+SA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] hw/arm/virt: Silence dtc /memory
+ warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,182 +30,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, ">" <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>
 
+On 18 June 2018 at 13:46, Eric Auger <eric.auger@redhat.com> wrote:
+> When running dtc on the guest /proc/device-tree we get the
+> following warning: Warning (unit_address_vs_reg): Node /memory
+> has a reg or ranges property, but no unit name".
+>
+> Let's fix that by adding the unit address to the node name. We also
+> don't create the /memory node anymore in create_fdt(). We directly
+> create it in load_dtb. /chosen still needs to be created in create_fdt
+> as the uart needs it. In case the user provided his own dtb, we nop
+> all memory nodes and create new one(s).
+>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  hw/arm/boot.c | 34 ++++++++++++++++++++--------------
+>  hw/arm/virt.c |  7 +------
+>  2 files changed, 21 insertions(+), 20 deletions(-)
+>
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index 1e48166..de80d05 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
+> @@ -490,11 +490,13 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>                   hwaddr addr_limit, AddressSpace *as)
+>  {
+>      void *fdt = NULL;
+> -    int size, rc;
+> +    int size, rc, n = 0;
+>      uint32_t acells, scells;
+>      char *nodename;
+>      unsigned int i;
+>      hwaddr mem_base, mem_len;
+> +    char **node_path;
+> +    Error *err = NULL;
+>
+>      if (binfo->dtb_filename) {
+>          char *filename;
+> @@ -546,12 +548,22 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>          goto fail;
+>      }
+>
+> +    /* nop all nodes matching /memory or /memory@unit-address */
+> +    node_path = qemu_fdt_node_unit_path(fdt, "memory", &err);
+> +    if (err) {
+> +        error_report_err(err);
+> +        goto fail;
+> +    }
+> +    while (node_path[n]) {
+> +        qemu_fdt_nop_node(fdt, node_path[n++]);
+> +    }
+> +    g_strfreev(node_path);
 
---zPXeIxDajdrcF2en
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This removes all nodes named "memory" or "memory@*", rather than
+just the ones in the root, right? Is that definitely what we want to
+do? The old code only deleted /memory, and the comment implies
+that we only look in the root.
 
-On Fri, Jun 22, 2018 at 10:00:34AM +0200, BALATON Zoltan wrote:
-> On Fri, 22 Jun 2018, David Gibson wrote:
-> > On Thu, Jun 21, 2018 at 09:17:11AM +0200, BALATON Zoltan wrote:
-> > > On Wed, 20 Jun 2018, David Gibson wrote:
-> > > > On Tue, Jun 19, 2018 at 10:52:15AM +0200, BALATON Zoltan wrote:
-> > > > > As well as being able to generate its own i2c transactions, the p=
-pc4xx
-> > > > > i2c controller has a DIRECTCNTL register which allows explicit co=
-ntrol
-> > > > > of the i2c lines.
-> > > > >=20
-> > > > > Using this register an OS can directly bitbang i2c operations. In
-> > > > > order to let emulated i2c devices respond to this, we need to wir=
-e up
-> > > > > the DIRECTCNTL register to qemu's bitbanged i2c handling code.
-> > > > >=20
-> > > > > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> > > > > ---
-> > > > > v4: Updated commit message and use defined constant where
-> > > > > appropriate
-> > > >=20
-> > > > I'm still don't quite understand your approach to the symbolic
-> > > > constants here, but I don't care enough to hold this up any further.
-> > > > So, applied to ppc-for-3.0.
-> > >=20
-> > > Thanks, just to try to clear this up, I consider symbolic constants t=
-o be
-> > > the name of bits 0-3 in the directntl register so while MSCL equals 1=
- it's
-> > > only appropriate to use the constant if I really mean (1 << 0) i.e. b=
-it 0 of
-> > > directcntl reg.
-> >=20
-> > Right..
-> >=20
-> > >=20
-> > > > > diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-> > > > > index 4e0aaae..fca80d6 100644
-> > > > > --- a/hw/i2c/ppc4xx_i2c.c
-> > > > > +++ b/hw/i2c/ppc4xx_i2c.c
-> > > > > @@ -30,6 +30,7 @@
-> > > > >  #include "cpu.h"
-> > > > >  #include "hw/hw.h"
-> > > > >  #include "hw/i2c/ppc4xx_i2c.h"
-> > > > > +#include "bitbang_i2c.h"
-> > > > >=20
-> > > > >  #define PPC4xx_I2C_MEM_SIZE 18
-> > > > >=20
-> > > > > @@ -46,6 +47,11 @@
-> > > > >=20
-> > > > >  #define IIC_XTCNTLSS_SRST   (1 << 0)
-> > > > >=20
-> > > > > +#define IIC_DIRECTCNTL_SDAC (1 << 3)
-> > > > > +#define IIC_DIRECTCNTL_SCLC (1 << 2)
-> > > > > +#define IIC_DIRECTCNTL_MSDA (1 << 1)
-> > > > > +#define IIC_DIRECTCNTL_MSCL (1 << 0)
-> > > > > +
-> > > > >  static void ppc4xx_i2c_reset(DeviceState *s)
-> > > > >  {
-> > > > >      PPC4xxI2CState *i2c =3D PPC4xx_I2C(s);
-> > > > > @@ -289,7 +295,12 @@ static void ppc4xx_i2c_writeb(void *opaque, =
-hwaddr addr, uint64_t value,
-> > > > >          i2c->xtcntlss =3D value;
-> > > > >          break;
-> > > > >      case 16:
-> > > > > -        i2c->directcntl =3D value & 0x7;
-> > > > > +        i2c->directcntl =3D value & (IIC_DIRECTCNTL_SDAC & IIC_D=
-IRECTCNTL_SCLC);
-> > >=20
-> > > This clears all bits but SDAC and SCLC so constants are OK here as th=
-ey
-> > > refer to bits in the register. (Guest can set the S* bits to say what=
- state
-> > > it wants the i2c lines to become.)
-> > >=20
-> > > > > +        i2c->directcntl |=3D (value & IIC_DIRECTCNTL_SCLC ? 1 : =
-0);
-> > >=20
-> > > This is directcntl[MSCL] =3D direcntl[SCLC] that is, set MSCL bit the=
- same as
-> > > SCLC, the 1 : 0 here are the value of the bit not the MSCL bit so con=
-stans
-> > > are not appropriate here.
-> >=20
-> > This is what I don't get.  Regardless of the method of it, you *are*
-> > setting bit 1 of the directcntl register, so why would the MSCL name
-> > not be appropriate?
->=20
-> I'm setting bit 0 (MSCL) to either 1 or 0. I could probably use the MSCL
-> constant in place of the 1 here but would that make it clearer?
+(I'm wondering if there are DTs that use memory nodes for random
+odd things other than system memory...)
 
-Yeah, it kinda would.  Instead of the line saying "it sets bit 0 based
-on this" it would say "this sets the MSCL bit based on this" which is
-probably more useful information.  In addition, if someone greps
-looking find everywhere the MSCL bit is manipulated, they'll find it.
+> +
+>      if (nb_numa_nodes > 0) {
+>          /*
+>           * Turn the /memory node created before into a NOP node, then create
+>           * /memory@addr nodes for all numa nodes respectively.
+>           */
+> -        qemu_fdt_nop_node(fdt, "/memory");
 
-> It would
-> just be longer and less clear without looking up the constants so to me t=
-his
-> looks more comprehensible this way.
->=20
-> > > > > +        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL,
-> > > > > +                        i2c->directcntl & IIC_DIRECTCNTL_MSCL);
-> > >=20
-> > > This lets the bitbang_i2c emulation also know that MSCL is set to 1 o=
-r 0 so
-> > > constant here is OK, previously it was just 1 for brevity which may h=
-ave
-> > > confused you.
-> > >=20
-> > > > > +        i2c->directcntl |=3D bitbang_i2c_set(i2c->bitbang, BITBA=
-NG_I2C_SDA,
-> > > > > +                               (value & IIC_DIRECTCNTL_SDAC) !=
-=3D 0) << 1;
-> > >=20
-> > > This sets MSDA bit of directcntl to the value returned by bitbang_i2c
-> > > emulation when sending it the bit in SDAC. So the
-> > > (value & IIC_DIRECTCNTL_SDAC) !=3D 0)
-> > > tests what value the SDAC bit has so 0 means the value of the bit and
-> > > constant refers to the bit in the register. (Because SDAC is not the =
-LSB and
-> > > we need 1 or 0 here hence the equality test to normalise the value, m=
-aybe
-> > > the !! construct could also be used, I'm not sure.) The << 1 at the e=
-nd
-> > > makes sure we set the MSDA bit but that constant cannot be used here =
-and
-> > > using MSCL instead is not correct because we mean the MSDA bit.
-> >=20
-> > Right, I'm not suggesting you use MSCL here, I'm suggesting you use
-> > MSDA.
->=20
-> But how? Third arg of bitbang_i2c_set is level, either 0 or 1. How could a
-> constant with value 2 used here? (Also to set bit 1 I have to shift 1 not=
- 2
-> so I don't see how the constant could be used there either.)
+This code change means the comment needs updating too.
 
-Don't use the shift.
+>          mem_base = binfo->loader_start;
+>          for (i = 0; i < nb_numa_nodes; i++) {
+>              mem_len = numa_info[i].node_mem;
+> @@ -572,24 +584,18 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+>              g_free(nodename);
+>          }
+>      } else {
+> -        Error *err = NULL;
+> +        nodename = g_strdup_printf("/memory@%" PRIx64, binfo->loader_start);
+> +        qemu_fdt_add_subnode(fdt, nodename);
+> +        qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+>
+> -        rc = fdt_path_offset(fdt, "/memory");
+> -        if (rc < 0) {
+> -            qemu_fdt_add_subnode(fdt, "/memory");
+> -        }
+> -
+> -        if (!qemu_fdt_getprop(fdt, "/memory", "device_type", NULL, &err)) {
+> -            qemu_fdt_setprop_string(fdt, "/memory", "device_type", "memory");
+> -        }
+> -
+> -        rc = qemu_fdt_setprop_sized_cells(fdt, "/memory", "reg",
+> +        rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+>                                            acells, binfo->loader_start,
+>                                            scells, binfo->ram_size);
+>          if (rc < 0) {
+> -            fprintf(stderr, "couldn't set /memory/reg\n");
+> +            fprintf(stderr, "couldn't set %s reg\n", nodename);
+>              goto fail;
+>          }
+> +        g_free(nodename);
+>      }
+>
+>      rc = fdt_path_offset(fdt, "/chosen");
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index cd0f350..71c27f1 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -200,13 +200,8 @@ static void create_fdt(VirtMachineState *vms)
+>      qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
+>      qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
+>
+> -    /*
+> -     * /chosen and /memory nodes must exist for load_dtb
+> -     * to fill in necessary properties later
+> -     */
+> +    /* /chosen must exist for load_dtb to fill in necessary properties later */
+>      qemu_fdt_add_subnode(fdt, "/chosen");
+> -    qemu_fdt_add_subnode(fdt, "/memory");
+> -    qemu_fdt_setprop_string(fdt, "/memory", "device_type", "memory");
+>
+>      /* Clock node, for the benefit of the UART. The kernel device tree
+>       * binding documentation claims the PL011 node clock properties are
+> --
+> 2.5.5
 
-i2c->directcntl |=3D bitbang_i2c_set(i2c->bitmang, BITBANG_I2C_SDA,
-				   !!(value & IIC_DIRECTCNTL_SDAC))
-			? IIC_DIRECTCNTL_MSDA : 0;
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---zPXeIxDajdrcF2en
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlss1B8ACgkQbDjKyiDZ
-s5LgmRAAnS++MRlJNHJ2BFXuGHRPKYvjCJm/Sq41xrGVfMBvkr8kw2b07XgI/8CZ
-9ozPVCJE0LLV8V9FSrUu/S8EFHHZzUanIJbsk8Ze3CPvAZlPaFK6LIdG8ZQsbFzb
-OJL4koQKmP7mU9kOYE0bM0dG2Ko3oR3eI9t7N/yH/TjC53rHBPHHHOsDtFzFa4ZU
-kFl0OkfvPqtGVU6ALLIaz5qTTilLVDRkVgzsrnZgGA7sEl3an0f0ey7ZfvC0wzT5
-CaqdFsu8REN3SYumXXmlYRy7x/K7YaBzfUCmKcu4UjGFXpVSE4ZnVAZKuQlBRceW
-XOT6WuPB7sVKd+3slAy/oMv/u/zgo6Dmb6kXEBot1/lQMcS1xL0Grw7oFcQIkUHB
-oqr/CkkvHWmVlYEoXgVQY7DdLkMESPs6uC6CwS5ZZ2B59IJjJ1tThNgKR6jv3Gax
-/Sxao9AAQVsNPKHfDQaCvqT8O8wKnDzvfAg7TZy8b9y1gdr32N7TUWmRt17iJf+W
-J2XL5cC9gYnTLU52xZXAdpeHrtHHiPp0uQ3esW+z9ruxzhygJ09Itg8WUNemQ1sJ
-CW+aGyEejHX+LYinUGRhCenUQEApNmhkih/mTY+TQyIZ1RF4gfgzetrf0Th+KTxe
-M0PVAFAZfhKjyINvSWLa5AV/7J97Dwz1Zgctq2hiSvv4uLAt9XU=
-=kzb3
------END PGP SIGNATURE-----
-
---zPXeIxDajdrcF2en--
+thanks
+-- PMM
