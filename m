@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWSkY-0002r0-Ks
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:33:43 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fWSmH-0004Rs-Db
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:35:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWSkV-0005cx-Ft
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:33:42 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:46908)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWSkV-0005co-BG
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:33:39 -0400
-Received: by mail-qk0-x241.google.com with SMTP id o2-v6so4387803qkc.13
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 13:33:39 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180622140223.26056-1-f4bug@amsat.org>
-	<CAMo8Bf+_bSYrz_grbvHgpFsNmA7pJDOzjLUhLq2YfmV8FdoXkQ@mail.gmail.com>
-	<878t76vlal.fsf@linaro.org>
-	<CAMo8Bf+OfMyORPN69vROMBMUDF9ucNVMCOHF7EFfXFO7Qpnr1g@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c721aacc-6ee9-28e3-a8f9-c3c836d42355@amsat.org>
-Date: Fri, 22 Jun 2018 17:33:34 -0300
+	(envelope-from <jsnow@redhat.com>) id 1fWSmG-0005vj-DM
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:35:29 -0400
+References: <20180622201122.9358-1-jsnow@redhat.com>
+	<63db09f9-1f4a-15d3-cd5b-f1f5006e3eac@amsat.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <fbc39ad9-21c1-89f0-cc25-95c9223c0e2d@redhat.com>
+Date: Fri, 22 Jun 2018 16:35:18 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAMo8Bf+OfMyORPN69vROMBMUDF9ucNVMCOHF7EFfXFO7Qpnr1g@mail.gmail.com>
+In-Reply-To: <63db09f9-1f4a-15d3-cd5b-f1f5006e3eac@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] docker: Add fedora-xtensa-cross image
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: Appease coverity,
+ skip empty block trees
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,98 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: peter.maydell@linaro.org, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 06/22/2018 03:45 PM, Max Filippov wrote:
-> On Fri, Jun 22, 2018 at 9:27 AM, Alex Bennée <alex.bennee@linaro.org> wrote:
->> Max Filippov <jcmvbkbc@gmail.com> writes:
->>> On Fri, Jun 22, 2018 at 7:02 AM, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>>> As of this commit:
->>>>
->>>>   $ xtensa-linux-gnu-as -v
->>>>   GNU assembler version 2.29.1 (xtensa-linux-gnu) using BFD version version 2.29.1-1.fc27
->>>>
->>>>   $ xtensa-linux-gnu-gcc -v
->>>>   Target: xtensa-linux-gnu
->>>>   gcc version 7.2.1 20170915 (Red Hat Cross 7.2.1-1) (GCC)
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>> ---
->>>>  tests/docker/dockerfiles/fedora-xtensa-cross.docker | 7 +++++++
->>>>  1 file changed, 7 insertions(+)
->>>>  create mode 100644 tests/docker/dockerfiles/fedora-xtensa-cross.docker
->>>>
->>>> diff --git a/tests/docker/dockerfiles/fedora-xtensa-cross.docker b/tests/docker/dockerfiles/fedora-xtensa-cross.docker
->>>> new file mode 100644
->>>> index 0000000000..6f9521520c
->>>> --- /dev/null
->>>> +++ b/tests/docker/dockerfiles/fedora-xtensa-cross.docker
->>>> @@ -0,0 +1,7 @@
->>>> +FROM fedora:latest
->>>> +ENV PACKAGES \
->>>> +    binutils-xtensa-linux-gnu \
->>>> +    gcc-xtensa-linux-gnu
->>>
->>> Generic binutils and gcc for xtensa only (partially) make sense for
->>> build testing.
+
+
+On 06/22/2018 04:24 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 06/22/2018 05:11 PM, John Snow wrote:
+>> If a tree consists exclusively of implicit filter nodes, we might cras=
+h
+>> QEMU. This configuration should not exist in practice, but if it did,
+>> skipping it would be fine.
 >>
->> OK
+>> For the purposes of debug builds, throw an assert to remind us that
+>> this configuration is truly unexpected, but if it's compiled out we
+>> will cope just fine.
+>=20
+> Well... with your explanation, your patch is correct.
+> But do we really want to maintain a 'debug with assert' vs 'production
+> without assertions' codebase?
+>
+
+I might have misremembered, but I seem to recall that it is literally
+possible to disable glib assertions. We endeavor not to, but it's
+*possible*.
+
+In this case I'd prefer to have a runtime behavior that makes sense:
+skipping such trees is sensible because they won't have any bitmaps for
+us to migrate.
+
+However, this is a really bizarre block configuration that I suspect
+cannot exist in practice. If it does, I'd rather not ignore it in the
+development context.
+
+> $ git grep g_assert_not_reached | egrep -v '^tests/' | wc -l
+> 406
+>=20
+> Does Coverity require all these 406 lines to behave with a
+> "configuration [that] should not exist in practice"?
+>=20
 >>
->>> Built binaries will not work.
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  migration/block-dirty-bitmap.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
 >>
->> Why?
-> 
-> The default toolchain does not generate code for any real xtensa CPU
-> configuration or for any configuration supported by the QEMU.
-> The xtensa configuration overlay for a specific CPU must be applied
-> to the toolchain source in order to build a toolchain capable of
-> producing code that would work on that CPU.
-> There's FSF xtensa CPU configuration in QEMU that is compatible with
-> very old (older than 2.19 IIRC) binutils.
+>> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bi=
+tmap.c
+>> index 3bafbbdc4c..02725293dd 100644
+>> --- a/migration/block-dirty-bitmap.c
+>> +++ b/migration/block-dirty-bitmap.c
+>> @@ -287,6 +287,10 @@ static int init_dirty_bitmap_migration(void)
+>>          while (bs && bs->drv && bs->implicit) {
+>>              bs =3D backing_bs(bs);
+>>          }
+>> +        if (!bs) {
+>> +            g_assert_not_reached();
+>> +            continue;
+>=20
+> Can we choose one or the other?
+>=20
 
-While the Fedora binutils supports dual endianness, the compiler only
-works for big-endian:
+Ask someone more familiar with assert policy and a fondness for paint hue=
+s.
 
-$ docker run --rm -it qemu:fedora-xtensa-cross xtensa-linux-gnu-objcopy
-xtensa-linux-gnu-objcopy: supported targets: elf32-xtensa-le
-elf32-xtensa-be elf32-little elf32-big
+--js
 
-$ docker run --rm -it qemu:fedora-xtensa-cross bash -c \
-  'echo -e "__XTENSA_EL__\n__XTENSA_EB__" | \
-  xtensa-linux-gnu-gcc -E - | grep -v "\#"'
-__XTENSA_EL__
-1
-
-> xtensa TCG tests (at least
-> some of them) are written for the dc232b xtensa CPU. The configuration
-
-I learned that the hard way :(
-
-I took the only big-endian CPU available: FSF, however
-
-- the linkscript expect the unavailable XTENSA_HAVE_BE definition,
-- core-isa.h misses the following definitions:
-
-#define XCHAL_KERNEL_VECOFS             0x00000200 /* XXX ??? */
-#define XCHAL_INTLEVEL2_VECOFS          0x00000180 /* XXX ??? */
-#define XCHAL_INTLEVEL3_VECOFS          0x00000240 /* XXX ??? */
-#define XCHAL_INTLEVEL4_VECOFS          0x00000520 /* XXX ??? */
-
-So this is a dead-end.
-
-> overlay for that CPU is available here:
-> 
->   https://github.com/jcmvbkbc/xtensa-toolchain-build/blob/master/overlays/xtensa_dc232b.tar.gz
-> 
-> The following toolchain may be used to build working tests for xtensa:
-> 
->   https://github.com/foss-xtensa/toolchain/releases/download/2018.02/x86_64-2018.02-xtensa-dc232b-elf.tar.gz
-
-Thanks for the links, I'll continue with DC232B next week.
-
-Alex: Can you dequeue this patch please?
-
-Regards,
-
-Phil.
+>> +        }
+>> =20
+>>          for (bitmap =3D bdrv_dirty_bitmap_next(bs, NULL); bitmap;
+>>               bitmap =3D bdrv_dirty_bitmap_next(bs, bitmap))
+>>
