@@ -1,24 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fWOBD-0007nM-92
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:40:56 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fWOKp-0004Mo-Te
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fWOBC-0004wK-8p
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:40:55 -0400
-Date: Fri, 22 Jun 2018 16:40:42 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180622154042.GS23296@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1fWOKl-0004Qk-14
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:50:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38342
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fWOKk-0004QC-Q4
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:50:46 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5MFnLGd119184
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 11:50:45 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2js21qe0mv-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 11:50:45 -0400
+Received: from localhost
+	by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Fri, 22 Jun 2018 16:50:43 +0100
 References: <20180615142108.27814-1-kwolf@redhat.com>
 	<20180615142108.27814-26-kwolf@redhat.com>
 	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
 	<20180622125502.GF4366@localhost.localdomain>
 	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
 	<20180622142513.GH4366@localhost.localdomain>
+	<930d6481-0da2-f5cd-15bf-1f09a8769c76@de.ibm.com>
+	<20180622150141.GI4366@localhost.localdomain>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Fri, 22 Jun 2018 17:50:38 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180622150141.GI4366@localhost.localdomain>
+Content-Language: en-US
+Message-Id: <f273cf7e-39be-fe31-5bf0-8efb80cfed4d@de.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180622142513.GH4366@localhost.localdomain>
+Content-Transfer-Encoding: 8bit
 Subject: Re: [Qemu-devel] [PULL 25/26] block: Remove deprecated -drive
  option serial
 List-Id: <qemu-devel.nongnu.org>
@@ -30,85 +51,102 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, pkrempa@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Boris Fiuczynski <fiuczy@linux.ibm.com>, libvir-list@redhat.com, eblake@redhat.com, pkrempa@redhat.com, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Fri, Jun 22, 2018 at 04:25:13PM +0200, Kevin Wolf wrote:
-> Am 22.06.2018 um 15:36 hat Christian Borntraeger geschrieben:
-> > 
-> > 
-> > On 06/22/2018 02:55 PM, Kevin Wolf wrote:
-> > > Am 22.06.2018 um 13:38 hat Christian Borntraeger geschrieben:
-> > >>
-> > >> On 06/15/2018 04:21 PM, Kevin Wolf wrote:
-> > >>> The -drive option serial was deprecated in QEMU 2.10. It's time to
-> > >>> remove it.
-> > >>>
-> > >>> Tests need to be updated to set the serial number with -global instead
-> > >>> of using the -drive option.
-> > >>
-> > >> libvirt 4.5 still creates those (at least on s390x)
-> > >>
-> > >>     <disk type='file' device='disk'>
-> > >>       <driver name='qemu' type='qcow2' cache='none' io='native' iothread='1'/>
-> > >>       <source file='/var/lib/libvirt/qemu/image.zhyp137'/>
-> > >>       <target dev='hda' bus='virtio'/>
-> > >>       <serial>skel</serial>
-> > >>       <boot order='1'/>
-> > >>       <address type='ccw' cssid='0xfe' ssid='0x0' devno='0x0000'/>
-> > >>     </disk>
-> > >>
-> > >>
-> > >> -> 
-> > >> [...]
-> > >> -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native -device virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0000,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on 
-> > >> [...]
-> > >>
-> > >> 2018-06-22T11:25:20.946024Z qemu-system-s390x: -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native: Block format 'qcow2' does not support the option 'serial'
-> > >> 2018-06-22 11:25:21.098+0000: shutting down, reason=failed
-> > >>
-> > >> So it seems that this breaks s390x.
-> > 
-> > To me it seems that this is also broken on x86.
-> > > 
-> > > Thanks for bringing this up. libvirt should fix this before QEMU 3.0 is
-> > > released.
-> > 
-> > I think this is definitely too short notice. We should not break existing
-> > setups just by insisting that users have to update libvirt when they update
-> > QEMU. Yes, this might be our policy, but doing so "just because we can"
-> > is certainly a very bad attitude. I see no fundamental technical reason why
-> > we should not revert this change.
+
+
+On 06/22/2018 05:01 PM, Kevin Wolf wrote:
+> Am 22.06.2018 um 16:38 hat Christian Borntraeger geschrieben:
+>>
+>>
+>> On 06/22/2018 04:25 PM, Kevin Wolf wrote:
+>>> Am 22.06.2018 um 15:36 hat Christian Borntraeger geschrieben:
+>>>>
+>>>>
+>>>> On 06/22/2018 02:55 PM, Kevin Wolf wrote:
+>>>>> Am 22.06.2018 um 13:38 hat Christian Borntraeger geschrieben:
+>>>>>>
+>>>>>> On 06/15/2018 04:21 PM, Kevin Wolf wrote:
+>>>>>>> The -drive option serial was deprecated in QEMU 2.10. It's time to
+>>>>>>> remove it.
+>>>>>>>
+>>>>>>> Tests need to be updated to set the serial number with -global instead
+>>>>>>> of using the -drive option.
+>>>>>>
+>>>>>> libvirt 4.5 still creates those (at least on s390x)
+>>>>>>
+>>>>>>     <disk type='file' device='disk'>
+>>>>>>       <driver name='qemu' type='qcow2' cache='none' io='native' iothread='1'/>
+>>>>>>       <source file='/var/lib/libvirt/qemu/image.zhyp137'/>
+>>>>>>       <target dev='hda' bus='virtio'/>
+>>>>>>       <serial>skel</serial>
+>>>>>>       <boot order='1'/>
+>>>>>>       <address type='ccw' cssid='0xfe' ssid='0x0' devno='0x0000'/>
+>>>>>>     </disk>
+>>>>>>
+>>>>>>
+>>>>>> -> 
+>>>>>> [...]
+>>>>>> -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native -device virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0000,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on 
+>>>>>> [...]
+>>>>>>
+>>>>>> 2018-06-22T11:25:20.946024Z qemu-system-s390x: -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native: Block format 'qcow2' does not support the option 'serial'
+>>>>>> 2018-06-22 11:25:21.098+0000: shutting down, reason=failed
+>>>>>>
+>>>>>> So it seems that this breaks s390x.
+>>>>
+>>>> To me it seems that this is also broken on x86.
+>>>>>
+>>>>> Thanks for bringing this up. libvirt should fix this before QEMU 3.0 is
+>>>>> released.
+>>>>
+>>>> I think this is definitely too short notice. We should not break existing
+>>>> setups just by insisting that users have to update libvirt when they update
+>>>> QEMU. Yes, this might be our policy, but doing so "just because we can"
+>>>> is certainly a very bad attitude. I see no fundamental technical reason why
+>>>> we should not revert this change.
+>>>
+>>> This was in fact one release longer than our deprecation policy says.
+>>> Are we serious about the deprecation policy or aren't we?
+>>
+>> I think it makes more sense to have 2 releases after everything was fixed
+>> instead of 2 releases after it was announced.
 > 
-> This was in fact one release longer than our deprecation policy says.
-> Are we serious about the deprecation policy or aren't we?
+> This means effectively banning feature removal. The only time that
+> people actually starting fixing things is when it breaks. So if you
+> never remove it before everything is fixed, you just never remove it at
+> all.
+
+With the proposal that is floating around (like the --no-deprecation option
+to be used for regression test suites) this could be solved. 
+
 > 
-> I might consider reverting a change if it turned out that this requires
-> some massive work in libvirt. But I think this one should be rather easy
-> to fix in libvirt until 3.0 is released.
+> It's unfortunate, but breaking things at some point is necessary. I hope
+> the breakage will only last a few days because libvirt will fix this.
+> 
+> Maybe one thing we could look into for the future is a special
+> deprecation warning function rather than just error_report(), and we
+> would make that one fatal in non-release builds so that things break
+> early, but you can still override it with a ./configure option.
+> 
+>> So if everyone has adopted we can certainly follow our deprecation policy.
+>> Now if deprecation breaks some real world cases it makes no sense to
+>> "insist" on that deprecation policy. Really: If latest greatest libvirt
+>> does not work 2 weeks before soft freeze I consider this too late.
+>>
+>> Why: This breaks MY regression test setup before softfreeze. So I will stop
+>> testing qemu in the most critical point in time.
+>>
+>> If you would come up with your statement (taking deprecation policy more
+>> serious than users) in the Linux kernel I can pretty much guarantee that
+>> Linus would call you names.
+> 
+> Users shouldn't use random git snapshots. Developers can revert the
+> change locally until libvirt is fixed.g
+> 
+> If contrary to all expectations, libvirt doesn't manage to get this
+> fixed until 3.0-rc2, I will consider reverting the patch. But not
+> significantly earlier than that.
 
-I've got a patch mostly ready that converts libvirt to setting these things
-on the frontend device, however, I've got some queries...
 
- - usb-storage  - doesn't appear to support geometry or werror/rerror
-
-   Will we loose functionality by stopping use of -drive for werror
-
-   Loosing geometry feels relevant too, unless it was already ignored
-   when set opf -drive ?
-
- - SD card - requires -drive with if=sd, no -device support AFAICT
-
-   Will we loose functionality be stopping use of -drive for if=sd, or
-   is this stuff ignored anyway ?
-
- - ide-cd/scsi-id - doesn't support geometry
-
-   Presumably becuase its irrelevant for CDs
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+I think I made it clear that I consider this wrong on so many levels.
