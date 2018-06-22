@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37097)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fWAPd-0001jy-SI
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 20:58:55 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1fWASw-0003bQ-VN
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 21:02:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fWAPa-0006AS-PF
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 20:58:53 -0400
-Resent-Message-Id: <E1fWAPa-0006AS-PF@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21093)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fWAPa-00069x-Fr
-	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 20:58:50 -0400
-In-Reply-To: <20180621184116.910-1-alex.bennee@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152961556394.840.7383908386098566787@d39dc562802a>
+	(envelope-from <joel.stan@gmail.com>) id 1fWASv-00088E-QJ
+	for qemu-devel@nongnu.org; Thu, 21 Jun 2018 21:02:19 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 21 Jun 2018 14:12:44 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] blogposts: add post about the new
- check-tcg infrastructure
+Sender: joel.stan@gmail.com
+In-Reply-To: <20180621223946.20738-4-clg@kaod.org>
+References: <20180621223946.20738-1-clg@kaod.org>
+	<20180621223946.20738-4-clg@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Fri, 22 Jun 2018 10:31:56 +0930
+Message-ID: <CACPK8Xdpnyz=wTBuWyh_ZQTqd7r+RVZertN+a-wrX1QqtYQU0A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/3] aspeed/timer: use the APB frequency
+ from the SCU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +25,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: alex.bennee@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjIxMTg0MTE2LjkxMC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcKU3Vi
-amVjdDogW1FlbXUtZGV2ZWxdIFtQQVRDSF0gYmxvZ3Bvc3RzOiBhZGQgcG9zdCBhYm91dCB0aGUg
-bmV3IGNoZWNrLXRjZyBpbmZyYXN0cnVjdHVyZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNF
-Li4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
-SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
-Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
-CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
-Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
-ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
-RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
-RnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWdd
-ICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDYyMTE4NDExNi45MTAtMS1hbGV4LmJlbm5lZUBs
-aW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxODA2MjExODQxMTYuOTEwLTEtYWxleC5iZW5uZWVAbGlu
-YXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjBhNzY1MzI3YWQgYmxvZ3Bv
-c3RzOiBhZGQgcG9zdCBhYm91dCB0aGUgbmV3IGNoZWNrLXRjZyBpbmZyYXN0cnVjdHVyZQoKPT09
-IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBibG9ncG9zdHM6IGFkZCBwb3N0
-IGFib3V0IHRoZSBuZXcgY2hlY2stdGNnIGluZnJhc3RydWN0dXJlLi4uCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzEzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNl
-CiMxMDI6IEZJTEU6IF9wb3N0cy8yMDE4LTA2LTIxLXRjZy10ZXN0aW5nLm1kOjg1OgorbmVlZCB0
-byBiZSBmb2xsb3dlZCB0byBhZGQgbmV3IHRlc3RzPyAkCgp0b3RhbDogMSBlcnJvcnMsIDEgd2Fy
-bmluZ3MsIDEyOSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
-OiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6
-Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
-ZWxAcmVkaGF0LmNvbQ==
+On 22 June 2018 at 08:09, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> The timer controller can be driven by either an external 1MHz clock or
+> by the APB clock. Today, the model makes this assumption that the APB
+> frequency is 24MHz but this is incorrect on the AST2400 SoC. palmetto
+> machines use a 48MHz input clock source.
+
+So this fixes it to use a apb frequency from the scu for all platform,
+not just the 2400?
+
+Can you put something in the commit message about the change in guest
+behaviour - the output of Linux's clk_summary or similar - so we know
+what bug this fixed?
+
+The code looks good though.
+
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+
+> Use the SCU object to get the APB frequency and drive the timers with
+> the configured freq for the SoC.
+>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  include/hw/timer/aspeed_timer.h |  4 ++++
+>  hw/arm/aspeed_soc.c             |  2 ++
+>  hw/timer/aspeed_timer.c         | 19 +++++++++++++++----
+>  3 files changed, 21 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/hw/timer/aspeed_timer.h b/include/hw/timer/aspeed_ti=
+mer.h
+> index bd6c1a7f9609..040a08873432 100644
+> --- a/include/hw/timer/aspeed_timer.h
+> +++ b/include/hw/timer/aspeed_timer.h
+> @@ -24,6 +24,8 @@
+>
+>  #include "qemu/timer.h"
+>
+> +typedef struct AspeedSCUState AspeedSCUState;
+> +
+>  #define ASPEED_TIMER(obj) \
+>      OBJECT_CHECK(AspeedTimerCtrlState, (obj), TYPE_ASPEED_TIMER);
+>  #define TYPE_ASPEED_TIMER "aspeed.timer"
+> @@ -55,6 +57,8 @@ typedef struct AspeedTimerCtrlState {
+>      uint32_t ctrl;
+>      uint32_t ctrl2;
+>      AspeedTimer timers[ASPEED_TIMER_NR_TIMERS];
+> +
+> +    AspeedSCUState *scu;
+>  } AspeedTimerCtrlState;
+>
+>  #endif /* ASPEED_TIMER_H */
+> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> index 7cc05ee27ea4..e68911af0f90 100644
+> --- a/hw/arm/aspeed_soc.c
+> +++ b/hw/arm/aspeed_soc.c
+> @@ -127,6 +127,8 @@ static void aspeed_soc_init(Object *obj)
+>
+>      object_initialize(&s->timerctrl, sizeof(s->timerctrl), TYPE_ASPEED_T=
+IMER);
+>      object_property_add_child(obj, "timerctrl", OBJECT(&s->timerctrl), N=
+ULL);
+> +    object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
+> +                                   OBJECT(&s->scu), &error_abort);
+>      qdev_set_parent_bus(DEVICE(&s->timerctrl), sysbus_get_default());
+>
+>      object_initialize(&s->i2c, sizeof(s->i2c), TYPE_ASPEED_I2C);
+> diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
+> index 1e31e22b6f1f..5e3f51b66b43 100644
+> --- a/hw/timer/aspeed_timer.c
+> +++ b/hw/timer/aspeed_timer.c
+> @@ -10,8 +10,10 @@
+>   */
+>
+>  #include "qemu/osdep.h"
+> +#include "qapi/error.h"
+>  #include "hw/sysbus.h"
+>  #include "hw/timer/aspeed_timer.h"
+> +#include "hw/misc/aspeed_scu.h"
+>  #include "qemu-common.h"
+>  #include "qemu/bitops.h"
+>  #include "qemu/timer.h"
+> @@ -26,7 +28,6 @@
+>  #define TIMER_CLOCK_USE_EXT true
+>  #define TIMER_CLOCK_EXT_HZ 1000000
+>  #define TIMER_CLOCK_USE_APB false
+> -#define TIMER_CLOCK_APB_HZ 24000000
+>
+>  #define TIMER_REG_STATUS 0
+>  #define TIMER_REG_RELOAD 1
+> @@ -80,11 +81,11 @@ static inline bool timer_external_clock(AspeedTimer *=
+t)
+>      return timer_ctrl_status(t, op_external_clock);
+>  }
+>
+> -static uint32_t clock_rates[] =3D { TIMER_CLOCK_APB_HZ, TIMER_CLOCK_EXT_=
+HZ };
+> -
+>  static inline uint32_t calculate_rate(struct AspeedTimer *t)
+>  {
+> -    return clock_rates[timer_external_clock(t)];
+> +    AspeedTimerCtrlState *s =3D timer_to_ctrl(t);
+> +
+> +    return timer_external_clock(t) ? TIMER_CLOCK_EXT_HZ : s->scu->apb_fr=
+eq;
+>  }
+>
+>  static inline uint32_t calculate_ticks(struct AspeedTimer *t, uint64_t n=
+ow_ns)
+> @@ -449,6 +450,16 @@ static void aspeed_timer_realize(DeviceState *dev, E=
+rror **errp)
+>      int i;
+>      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+>      AspeedTimerCtrlState *s =3D ASPEED_TIMER(dev);
+> +    Object *obj;
+> +    Error *err =3D NULL;
+> +
+> +    obj =3D object_property_get_link(OBJECT(dev), "scu", &err);
+> +    if (!obj) {
+> +        error_propagate(errp, err);
+> +        error_prepend(errp, "required link 'scu' not found: ");
+> +        return;
+> +    }
+> +    s->scu =3D ASPEED_SCU(obj);
+>
+>      for (i =3D 0; i < ASPEED_TIMER_NR_TIMERS; i++) {
+>          aspeed_init_one_timer(s, i);
+> --
+> 2.13.6
+>
