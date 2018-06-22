@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fWMPI-00033h-2P
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:47:20 -0400
+	(envelope-from <Aleksandar.Markovic@mips.com>) id 1fWMPk-0003Oa-Di
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:47:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fWMPE-0006WB-6x
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:47:20 -0400
-Date: Fri, 22 Jun 2018 15:47:08 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180622154708.37167025.cohuck@redhat.com>
-In-Reply-To: <5df62baa-268b-2624-e9d7-42c521546d04@de.ibm.com>
-References: <152967373830.876.17089841294743780259@d39dc562802a>
-	<5df62baa-268b-2624-e9d7-42c521546d04@de.ibm.com>
+	(envelope-from <Aleksandar.Markovic@mips.com>) id 1fWMPg-0006m7-H7
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:47:48 -0400
+Received: from 9pmail.ess.barracuda.com ([64.235.154.210]:52317)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Aleksandar.Markovic@mips.com>)
+	id 1fWMPg-0006iv-7V
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:47:44 -0400
+From: Aleksandar Markovic <Aleksandar.Markovic@mips.com>
+Date: Fri, 22 Jun 2018 13:47:31 +0000
+Message-ID: <d35499a67a0a4c11851d1debe9987e52@mips.com>
+References: <20180620120620.12806-1-yongbok.kim@mips.com>,
+	<20180620120620.12806-34-yongbok.kim@mips.com>
+In-Reply-To: <20180620120620.12806-34-yongbok.kim@mips.com>
+Content-Language: en-US
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] s390/ipl: fix ipl with -no-reboot
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 33/35] target/mips: Fix gdbstub to
+ read/write 64 bit FP registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,39 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, frankja@linux.vnet.ibm.com, thuth@redhat.com, david@redhat.com, agraf@suse.de, pasic@linux.vnet.ibm.com, qemu-s390x@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+To: Yongbok Kim <Yongbok.Kim@mips.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "aurelien@aurel32.net" <aurelien@aurel32.net>, James Hogan <James.Hogan@mips.com>, Paul Burton <Paul.Burton@mips.com>, Matthew Fortune <Matthew.Fortune@mips.com>, Stefan Markovic <Stefan.Markovic@mips.com>
 
-On Fri, 22 Jun 2018 15:29:04 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> From: Yongbok Kim <yongbok.kim@imgtec.com>
+>
+> Fix gdbstub to read/write 64 bit FP registers
+>
+> Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
 
-> On 06/22/2018 03:22 PM, no-reply@patchew.org wrote:
-> > Hi,
-> > 
-> > This series failed docker-mingw@fedora build test. Please find the testing commands and
-> > their output below. If you have Docker installed, you can probably reproduce it
-> > locally.
-> >   
-> 
-> [...]
-> 
-> >   CC      os-win32.o
-> >   CC      bt-host.o
-> >   CC      bt-vhci.o
-> >   CC      dma-helpers.o
-> >   CC      vl.o
-> >   CC      tpm.o
-> >   CC      device_tree.o
-> > /tmp/qemu-test/src/nbd/server.c: In function 'nbd_trip':
-> > /tmp/qemu-test/src/nbd/server.c:1980:19: error: 'end' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-> >      *length = end - offset;
-> >                ~~~~^~~~~~~~
-> > /tmp/qemu-test/src/nbd/server.c:1940:30: note: 'end' was declared here
-> >      uint64_t begin = offset, end;
-> >                               ^~~
-> > cc1: all warnings being treated as errors  
-> 
-> This seems unrelated to the patch?
-> 
+Reviewed-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
 
-Yes, the last few patches all failed with this error.
+> ---
+>  target/mips/gdbstub.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/target/mips/gdbstub.c b/target/mips/gdbstub.c
+> index 6d1fb70..18e0e6d 100644
+> --- a/target/mips/gdbstub.c
+> +++ b/target/mips/gdbstub.c
+> @@ -39,7 +39,7 @@ int mips_cpu_gdb_read_register(CPUState *cs, uint8_t *m=
+em_buf, int n)
+>              return gdb_get_regl(mem_buf, (int32_t)env->active_fpu.fcr0);
+>          default:
+>              if (env->CP0_Status & (1 << CP0St_FR)) {
+> -                return gdb_get_regl(mem_buf,
+> +                return gdb_get_reg64(mem_buf,
+>                      env->active_fpu.fpr[n - 38].d);
+>              } else {
+>                  return gdb_get_regl(mem_buf,
+> @@ -100,6 +100,7 @@ int mips_cpu_gdb_write_register(CPUState *cs, uint8_t=
+ *mem_buf, int n)
+>              break;
+>          default:
+>              if (env->CP0_Status & (1 << CP0St_FR)) {
+> +                uint64_t tmp =3D ldq_p(mem_buf);
+>                  env->active_fpu.fpr[n - 38].d =3D tmp;
+>              } else {
+>                  env->active_fpu.fpr[n - 38].w[FP_ENDIAN_IDX] =3D tmp;
+> --
+> 1.9.1
