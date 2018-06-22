@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fWRz3-0001y5-VK
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:44:38 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fWS4I-0003Dl-PA
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:50:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fWRz2-0001ob-Vo
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:44:38 -0400
-References: <20180622134036.23182-1-f4bug@amsat.org>
-	<20180622134036.23182-10-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <b70145b2-5c24-d525-b23a-aaeb7ab960c5@redhat.com>
-Date: Fri, 22 Jun 2018 21:44:26 +0200
+	(envelope-from <alistair23@gmail.com>) id 1fWS4H-0003lW-SH
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:50:02 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180622134036.23182-10-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20180622124716.9179-1-f4bug@amsat.org>
+References: <20180622124716.9179-1-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 22 Jun 2018 12:49:27 -0700
+Message-ID: <CAKmqyKMp8-ZAaTU2nxaMCqoR0JsbXoogR6t6Nq7UwU3B3o1AKw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 09/14] hw/arm/omap: Use
- qemu_log_mask(GUEST_ERROR) instead of fprintf
+Subject: Re: [Qemu-devel] [PATCH] hw/core/register: Log unimplemented access
+ via the 'unimp' debug level
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, QEMU Trivial <qemu-trivial@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On 22.06.2018 15:40, Philippe Mathieu-Daud=C3=A9 wrote:
+On Fri, Jun 22, 2018 at 5:47 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  include/hw/arm/omap.h | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
-> index 39abba753d..3867687b8c 100644
-> --- a/include/hw/arm/omap.h
-> +++ b/include/hw/arm/omap.h
-> @@ -21,6 +21,7 @@
->  # define hw_omap_h		"omap.h"
->  #include "hw/irq.h"
->  #include "target/arm/cpu-qom.h"
-> +#include "qemu/log.h"
-> =20
->  # define OMAP_EMIFS_BASE	0x00000000
->  # define OMAP2_Q0_BASE		0x00000000
-> @@ -962,8 +963,8 @@ void omap_mpu_wakeup(void *opaque, int irq, int req=
-);
->          fprintf(stderr, "%s: Bad register " OMAP_FMT_plx "\n",	\
->                          __func__, paddr)
+>  hw/core/register.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/core/register.c b/hw/core/register.c
+> index d2d1636250..8ed7c6b927 100644
+> --- a/hw/core/register.c
+> +++ b/hw/core/register.c
+> @@ -203,7 +203,7 @@ void register_write_memory(void *opaque, hwaddr addr,
+>      }
+>
+>      if (!reg) {
+> -        qemu_log_mask(LOG_GUEST_ERROR, "%s: write to unimplemented regis=
+ter " \
+> +        qemu_log_mask(LOG_UNIMP, "%s: write to unimplemented register " =
+\
+>                        "at address: %#" PRIx64 "\n", reg_array->prefix, a=
+ddr);
+>          return;
+>      }
+> @@ -232,7 +232,7 @@ uint64_t register_read_memory(void *opaque, hwaddr ad=
+dr,
+>      }
+>
+>      if (!reg) {
+> -        qemu_log_mask(LOG_GUEST_ERROR, "%s:  read to unimplemented regis=
+ter " \
+> +        qemu_log_mask(LOG_UNIMP, "%s:  read to unimplemented register " =
+\
+>                        "at address: %#" PRIx64 "\n", reg_array->prefix, a=
+ddr);
 
-What about that fprintf above?
+I'm not sure this is correct. These can be unimplemented because there
+are gaps in the register memory map, so it is a guest error.
 
->  # define OMAP_RO_REG(paddr)		\
-> -        fprintf(stderr, "%s: Read-only register " OMAP_FMT_plx "\n",	\
-> -                        __func__, paddr)
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: Read-only register " OMAP_=
-FMT_plx \
-> +                      "\n", __func__, paddr)
-> =20
->  /* OMAP-specific Linux bootloader tags for the ATAG_BOARD area
->     (Board-specifc tags are not here)  */
->=20
+Alistair
 
- Thomas
+>          return 0;
+>      }
+> --
+> 2.18.0.rc2
+>
+>
