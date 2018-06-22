@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54962)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1fWSmy-00050p-Dp
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:36:13 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fWT51-0007rE-Dx
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:54:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1fWSmx-0006En-9t
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:36:12 -0400
-Date: Fri, 22 Jun 2018 16:36:04 -0400
-From: Aaron Lindsay <alindsay@codeaurora.org>
-Message-ID: <20180622203604.GE12424@codeaurora.org>
-References: <1523997485-1905-1-git-send-email-alindsay@codeaurora.org>
-	<1523997485-1905-4-git-send-email-alindsay@codeaurora.org>
-	<CAFEAcA_g1Bb=-cj+QToHDypZPiqw_U5YioRWfDSs0Ano3PqDTQ@mail.gmail.com>
-	<20180622135045.GD12424@codeaurora.org>
-	<CAFEAcA_EEXRQQjXDsei0Y6mQB6EVTtJB5=EFHFsT7kbZk5iv6Q@mail.gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1fWT4y-0004np-CI
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:54:51 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56004 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1fWT4y-0004nf-5H
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 16:54:48 -0400
+References: <20180609141457.6283-1-vsementsov@virtuozzo.com>
+	<20180615120649.GC2615@work-vm>
+	<f40607cd-a777-b033-ae37-0be50e3bc3d2@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <0cb09c1e-6ad4-7fc4-3c30-3382a0a757b0@redhat.com>
+Date: Fri, 22 Jun 2018 16:54:46 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_EEXRQQjXDsei0Y6mQB6EVTtJB5=EFHFsT7kbZk5iv6Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 03/21] target/arm: Reorganize PMCCNTR
- accesses
+In-Reply-To: <f40607cd-a777-b033-ae37-0be50e3bc3d2@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: invalidate cache before source
+ start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +30,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 
-On Jun 22 15:08, Peter Maydell wrote:
-> On 22 June 2018 at 14:50, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> > On Apr 20 11:17, Peter Maydell wrote:
-> >> On 17 April 2018 at 21:37, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> >> > pmccntr_read and pmccntr_write contained duplicate code that was already
-> >> > being handled by pmccntr_sync. Consolidate the duplicated code into two
-> >> > functions: pmccntr_op_start and pmccntr_op_finish. Add a companion to
-> >> > c15_ccnt in CPUARMState so that we can simultaneously save both the
-> >> > architectural register value and the last underlying cycle count - this
-> >> > ensure time isn't lost and will also allow us to access the 'old'
-> >> > architectural register value in order to detect overflows in later
-> >> > patches.
-> >> >
-> >> > Signed-off-by: Aaron Lindsay <alindsay@codeaurora.org>
-> 
-> >> > -        /* If the counter is enabled, this stores the last time the counter
-> >> > -         * was reset. Otherwise it stores the counter value
-> >> > +        /* Stores the architectural value of the counter *the last time it was
-> >> > +         * updated* by pmccntr_op_start. Accesses should always be surrounded
-> >> > +         * by pmccntr_op_start/pmccntr_op_finish to guarantee the latest
-> >> > +         * architecturally-corect value is being read/set.
-> >> >           */
-> >> >          uint64_t c15_ccnt;
-> >> > +        /* Stores the delta between the architectural value and the underlying
-> >> > +         * cycle count during normal operation. It is used to update c15_ccnt
-> >> > +         * to be the correct architectural value before accesses. During
-> >> > +         * accesses, c15_ccnt_delta contains the underlying count being used
-> >> > +         * for the access, after which it reverts to the delta value in
-> >> > +         * pmccntr_op_finish.
-> >> > +         */
-> >> > +        uint64_t c15_ccnt_delta;
-> >>
-> >> So the key question here is: how does this work for VM migration?
-> >
-> > To be honest, I'm not sure I fully understand the things I need to be
-> > looking out for with VM migration.
-> >
-> > My guess, though, is that this current implementation is not sufficient.
-> > Perhaps there needs to be logic to ensure that c15_ccnt is the current
-> > architectural value before migration and also to setup c15_ccnt_delta to
-> > be the delta between that architectural value and the underlying cycle
-> > count upon inbound migration. Does that sound like an approach which
-> > would fit well within the rest of the migration framework?
-> 
-> You need to deal with two different situations:
->  (1) migration from an older QEMU which doesn't have this patchset
->  (2) migration from a QEMU with this patchset to one with this patchset
-> 
-> Either:
->  (a) all the architectural state can be expressed in our existing
-> state fields in whatever the previous format was -- in this case
-> you just need to ensure that cpu_pre_save() and cpu_post_load()
-> put the state there and unpack it again
->  (b) we were missing some architectural state and really do need
-> to transfer more over the wire than we were before -- in this case
-> you need to add a new subsection to the vmstate which has the fields
-> that contain that new state, and give the subsection a suitable 'needed'
-> function to indicate when the subsection should be transferred plus
-> pre_load and post_load functions that allow us to cope correctly with
-> the case of the older QEMU that doesn't send the subsection.
 
-Okay, thanks! I didn't manage to get to this before v5, but look into it
-more for v6.
 
--Aaron
+On 06/15/2018 08:33 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 15.06.2018 15:06, Dr. David Alan Gilbert wrote:
+>> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+>>> Invalidate cache before source start in case of failed migration.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+>
+>> Why doesn't the code at the bottom of migration_completion,
+>> fail_invalidate:=C2=A0=C2=A0 and the code in migrate_fd_cancel=C2=A0=C2=
+=A0 handle this?
+>>
+>> What case did you see it in that those didn't handle?
+>> (Also I guess it probably should set s->block_inactive =3D false)
+>=20
+> on source I see:
+>=20
+> 81392@1529065750.766289:migrate_set_state new state 7
+> 81392@1529065750.766330:migration_thread_file_err
+> 81392@1529065750.766332:migration_thread_after_loop
+>=20
+> so, we are leaving loop on
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (qemu_file_get_error(s->t=
+o_dst_file)) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 migr=
+ate_set_state(&s->state, current_active_state,
+> MIGRATION_STATUS_FAILED);
+> trace_migration_thread_file_err();
+> break;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>=20
+> and skip migration_completion()
+>=20
 
--- 
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+OK, so you're saying that in migration_thread;
+
+`
+        thr_error =3D migration_detect_error(s);
+        if (thr_error =3D=3D MIG_THR_ERR_FATAL) {
+	    /* Stop migration */
+            break;
+	}
+`
+
+is triggering, so then we jump right away to
+
+`
+    trace_migration_thread_after_loop();
+    migration_iteration_finish(s);
+`
+
+and in so doing, we fail before we get a chance for
+migration_iteration_run to call migration_completion, which was
+otherwise the mechanism that invalidated the images.
+
+Seems like a legitimate concern that early failures versus late failures
+trigger different error pathways.
+
+David?
+
+--js
+
+>=20
+>>
+>> Dave
+>>
+>>> ---
+>>>
+>>> =C2=A0 migration/migration.c | 9 ++++++++-
+>>> =C2=A0 1 file changed, 8 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/migration/migration.c b/migration/migration.c
+>>> index 1e99ec9b7e..8f39e0dc02 100644
+>>> --- a/migration/migration.c
+>>> +++ b/migration/migration.c
+>>> @@ -2806,7 +2806,14 @@ static void
+>>> migration_iteration_finish(MigrationState *s)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case MIGRATION_STATUS_FAILED:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case MIGRATION_STATUS_CANCELLED:
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->vm_was_=
+running) {
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 v=
+m_start();
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 E=
+rror *local_err =3D NULL;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
+drv_invalidate_cache_all(&local_err);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
+f (local_err) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 error_reportf_err(local_err, "Can't invalidate disk=
+s
+>>> before "
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "source vm start")=
+;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }=
+ else {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 vm_start();
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 runstate_set(RUN_STATE_POSTMIGRATE);
+>>> --=C2=A0
+>>> 2.11.1
+>>>
+>> --=20
+>> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+>=20
