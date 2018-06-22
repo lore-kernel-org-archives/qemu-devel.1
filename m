@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54777)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fWPvQ-0006kn-Dn
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:32:45 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fWPva-0006rI-MO
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:32:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fWPvN-0000Kw-BE
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:32:44 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:34132)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fWPvN-0000Kl-4A
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:32:41 -0400
-Received: by mail-pf0-x242.google.com with SMTP id a63-v6so3541709pfl.1
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 10:32:40 -0700 (PDT)
-References: <20180612005145.3375-1-richard.henderson@linaro.org>
-	<20180612005145.3375-13-richard.henderson@linaro.org>
-	<CAFEAcA_TvTydOEJOmfFA8x2vgRnd+Su8osz3hRuGabWtu5ybHA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <52957842-ffa0-93ed-e9e7-667fc6248f21@linaro.org>
-Date: Fri, 22 Jun 2018 10:32:36 -0700
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_TvTydOEJOmfFA8x2vgRnd+Su8osz3hRuGabWtu5ybHA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 12/19] linux-user: Setup split syscall
- infrastructure
+	(envelope-from <pm215@archaic.org.uk>) id 1fWPvZ-0000Qj-TT
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:32:54 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42984)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fWPvZ-0000Oj-I8
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:32:53 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 18:32:49 +0100
+Message-Id: <20180622173249.29963-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] virtio-gpu-3d: Drop workaround for
+ VIRTIO_GPU_CAPSET_VIRGL2 define
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +23,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 06/22/2018 03:30 AM, Peter Maydell wrote:
->> +struct SyscallDef {
->> +    const char *name;
->> +    SyscallArgsFn *args;
->> +    SyscallImplFn *impl;
->> +    SyscallPrintFn *print;
->> +    SyscallPrintRetFn *print_ret;
-> 
-> Are all these hook functions mandatory, or can a syscall
-> implementation leave some of them NULL for a default behaviour?
+In commit a8bff79e9f27df we added a definition to hw/virtio/virtio-gpu.h
+for VIRTIO_GPU_CAPSET_VIRGL2, as a workaround for it not yet being
+in the Linux kernel headers. In commit 77d361b13c19 we updated our
+kernel headers to a version which does define the macro, so we can
+now remove our workaround.
 
-Only impl is mandatory.  You're right that there should be more doco here at
-the structure definition.  Here, the docs got split down to the macros that
-define the most common forms of the structures.  Will fix.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/hw/virtio/virtio-gpu.h | 5 -----
+ 1 file changed, 5 deletions(-)
 
-
->>  static void
->>  print_flags(const struct flags *f, abi_long flags, int last)
->>  {
->> -    const char *sep = "";
->> -    int n;
->> +    char buf[256];
->> +    add_flags(buf, sizeof(buf), f, flags, false);
->> +    gemu_log("%s%s", buf, get_comma(last));
->> +}
-> 
-> All this refactoring of the strace functions feels like it
-> should have been in a separate patch...
-
-Fair.
-
-
-r~
+diff --git a/include/hw/virtio/virtio-gpu.h b/include/hw/virtio/virtio-gpu.h
+index d6ba61f2f12..9780f755ef0 100644
+--- a/include/hw/virtio/virtio-gpu.h
++++ b/include/hw/virtio/virtio-gpu.h
+@@ -22,11 +22,6 @@
+ 
+ #include "standard-headers/linux/virtio_gpu.h"
+ 
+-/* Not yet(?) defined in standard-headers, remove when possible */
+-#ifndef VIRTIO_GPU_CAPSET_VIRGL2
+-#define VIRTIO_GPU_CAPSET_VIRGL2 2
+-#endif
+-
+ #define TYPE_VIRTIO_GPU "virtio-gpu-device"
+ #define VIRTIO_GPU(obj)                                        \
+         OBJECT_CHECK(VirtIOGPU, (obj), TYPE_VIRTIO_GPU)
+-- 
+2.17.1
