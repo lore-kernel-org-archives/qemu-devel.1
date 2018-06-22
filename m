@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fWMnC-0005wO-JY
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:12:03 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fWMnM-00064f-VN
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fWMnB-00061a-I9
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:12:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50634 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fWMnB-00061D-CT
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:12:01 -0400
-Date: Fri, 22 Jun 2018 16:11:58 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180622161158.3a88c371@redhat.com>
-In-Reply-To: <c7c8dfc5-d7b3-a22e-586c-4436214c7b9f@redhat.com>
-References: <c7c8dfc5-d7b3-a22e-586c-4436214c7b9f@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fWMnI-00064i-Hb
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:12:12 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38321)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fWMnI-000642-Ag
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:12:08 -0400
+Received: by mail-wm0-x242.google.com with SMTP id 69-v6so2783062wmf.3
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 07:12:08 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 22 Jun 2018 15:11:45 +0100
+Message-Id: <20180622141205.16306-3-alex.bennee@linaro.org>
+In-Reply-To: <20180622141205.16306-1-alex.bennee@linaro.org>
+References: <20180622141205.16306-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Question] inconsistent memory amount statistics
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RISU PATCH v4 02/22] comms: include header for writev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,107 +29,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>, Eugene Crosser <evgenii.cherkashin@profitbricks.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: peter.maydell@linaro.org
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, richard.henderson@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On Fri, 22 Jun 2018 09:41:15 +0200
-David Hildenbrand <david@redhat.com> wrote:
+The compiler complains about implicit declarations otherwise.
 
-> Starting qemu with and querying some outputs:
-> 
-> [...]
-> -m 4G,maxmem=20G,slots=2 \
-> -numa node,nodeid=0,cpus=0-1 -numa node,nodeid=1,cpus=2-3 \
-> [...]
-> -device virtio-balloon \
-> -object memory-backend-ram,id=mem0,size=8G \
-> -device pc-dimm,id=dimm0,memdev=mem0 \
-> -object memory-backend-ram,id=mem1,size=8G \
-> -device nvdimm,id=dimm1,memdev=mem1,node=1
-> 
-> (qemu) info numa
-> info numa
-> 2 nodes
-> node 0 cpus: 0 1
-> node 0 size: 10240 MB
-> node 0 plugged: 0 MB
-> node 1 cpus: 2 3
-> node 1 size: 10240 MB
-> node 1 plugged: 0 MB
-> 
-> 
-> (qemu) info memory_size_summary
-> info memory_size_summary
-> base memory: 4294967296
-> plugged memory: 17179869184
-> 
-> (qemu) info memory-devices
-> info memory-devices
-> Memory device [dimm]: "dimm0"
->   addr: 0x140000000
->   slot: 0
->   node: 0
->   size: 8589934592
->   memdev: /objects/mem0
->   hotplugged: false
->   hotpluggable: true
-> Memory device [nvdimm]: "dimm1"
->   addr: 0x340000000
->   slot: 1
->   node: 1
->   size: 8589934592
->   memdev: /objects/mem1
->   hotplugged: false
->   hotpluggable: true
-> 
-> 
-> (qemu) info balloon
-> info balloon
-> balloon: actual=12288
-> 
-> 
-> 1. "info numa"
-> - considers both, pc-dimm and nvdimm
-> - "-device ..." are considered as "!plugged" although it could be
->   theoretically "unplugged"
-I'd think that this part is broken there should be no difference
--device vs device_add here (the only difference here is cold/hot-plugged).
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ comms.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> - device_add devices are considered as "plugged"
+diff --git a/comms.c b/comms.c
+index 2900c33..6946fd9 100644
+--- a/comms.c
++++ b/comms.c
+@@ -17,6 +17,7 @@
+ #include <errno.h>
+ #include <sys/socket.h>
+ #include <sys/types.h>
++#include <sys/uio.h>
+ #include <netinet/in.h>
+ #include <netdb.h>
  
-> 
-> 2. "info memory_size_summary"
-> - considers both, pc-dimm and nvdimm
-> - "-device ..." are considered as "plugged"
-> - device_add devices are considered as "plugged"
-> 
-> 3. "info balloon"
-> - does not consider nvdimm devices to calculate "actual"
-> -- actual = get_current_ram_size() - inflated
-> -- get_current_ram_size() does not consider nvdimm
-> 
-> So we have some inconsistency in regards of
-> 1. What is considered memory and what not (pc-dimm vs nvdimm)
-> 2. What is considered plugged memory (-device vs. device_add)
-> 
-> 
-> Is this what we expect? I think we should make up our mind
-> 
-> a) what "plugged" means
-> b) which stats should consider "nvdimm" and which not.
-> 
-> I would have guessed that "nvdimms" might be memory devices but should
-> never count towards memory statistics ("not actually ram" - they might
-> be OK).
-well, it depends. 
-nvdimm might be actually battery powered RAM with nvram backend.
- 
-> Especially "info memory_size_summary" ... "plugged-memory - amount of
-> memory that was hot-plugged" - this seems to be wrong. And I wonder if
-> we should exclude nvdimm from that.
-These summary interfaces look broken to me as what is memory might be
-unclear. It would be better if we just provide primitives to query/list
-individual and let user do the math the way he/she prefers.
-
-Wrt QEMU's CLI interface /VM it emulates/ it's all RAM,
-so if we report some statistics we probably should include nvdimm as well.
+-- 
+2.17.1
