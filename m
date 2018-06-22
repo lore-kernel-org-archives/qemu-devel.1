@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35258)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fWMYS-0002Mx-Qg
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:56:50 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fWMa4-0003fR-2p
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:58:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fWMYP-0001qd-Q4
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:56:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55534 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fWMYP-0001qX-JP
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:56:45 -0400
-Date: Fri, 22 Jun 2018 15:56:42 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180622155642.3f05423b@redhat.com>
-In-Reply-To: <aa7b8eb8-3353-cac1-8c17-43f928cc3ff6@linux.vnet.ibm.com>
-References: <20180621115530.11069-1-marcandre.lureau@redhat.com>
-	<20180621115530.11069-5-marcandre.lureau@redhat.com>
-	<9d02acd4-8a60-1ac3-00d9-8c99940254a2@linux.vnet.ibm.com>
-	<20180622110312.275b5d59@redhat.com>
-	<aa7b8eb8-3353-cac1-8c17-43f928cc3ff6@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] acpi: build TPM Physical Presence
- interface
+	(envelope-from <pm215@archaic.org.uk>) id 1fWMa3-0002an-9Y
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:58:28 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42976)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fWMa2-0002ad-W8
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:58:27 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 14:58:23 +0100
+Message-Id: <20180622135823.32421-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [RFC PATCH] xtensa: Avoid calling get_page_addr_code()
+ from helper function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,219 +23,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Max Filippov <jcmvbkbc@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On Fri, 22 Jun 2018 09:26:45 -0400
-Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+The xtensa frontend calls get_page_addr_code() from its
+itlb_hit_test helper function. This function is really part
+of the TCG core's internals, and calling it from a target
+helper makes it awkward to make changes to that core code.
+It also means that we don't pass the correct retaddr to
+tlb_fill(), so we won't correctly handle the case where
+an exception is generated.
 
-> On 06/22/2018 05:03 AM, Igor Mammedov wrote:
-> > I'd prefer a table format to describe layout, like in
-> > docs/specs/acpi_nvdimm.txt or docs/specs/acpi_mem_hotplug.txt =20
->=20
-> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-> index c230c4c93e..5bf4e892a0 100644
-> --- a/docs/specs/tpm.txt
-> +++ b/docs/specs/tpm.txt
-> @@ -42,6 +42,76 @@ URL:
->=20
->  =C2=A0https://trustedcomputinggroup.org/tcg-acpi-specification/
->=20
-> +=3D=3D ACPI PPI Interface =3D=3D
-> +
-> +QEMU supports the Physical Presence Interface (PPI) for TPM 1.2 and TPM=
-=20
-> 2. This
-> +interface requires ACPI and firmware support. The specification can be=20
-> found at
-> +the following URL:
-> +
-> +https://trustedcomputinggroup.org/resource/tcg-physical-presence-interfa=
-ce-specification/
-> +
-> +PPI enables a system administrator (root) to request a modification to t=
-he
-> +TPM upon reboot. The PPI specification defines the operation requests=20
-> and the
-> +actions the firmware has to take. The system administrator passes the=20
-> operation
-> +request number to the firmware through an ACPI interface which writes th=
-is
-> +number to a memory location that the firmware knows. Upon reboot, the=20
-> firmware
-> +finds the number and sends commands to the the TPM. The firmware writes=
-=20
-> the TPM
-> +result code and the operation request number to a memory location that=20
-> ACPI can
-> +read from and pass the result on to the administrator.
-> +
-> +The PPI specification defines a set of mandatory and optional=20
-> operations for
-> +the firmware to implement. The ACPI interface also allows an=20
-> administrator to
-> +list the supported operations. In QEMU the ACPI code is generated by=20
-> QEMU, yet
-> +the firmware needs to implement support on a per-operations basis, and
-> +different firmwares may support a different subset. Therefore, QEMU=20
-> introduces
-> +the virtual memory device for PPI where the firmware can indicate which
-> +operations it supports and ACPI can enable the ones that are supported a=
-nd
-> +disable all others. This interface lies in main memory and has the=20
-> following
-what about usecase when it's mapped in isa address space?
-  tpm_tis_realizefn() ->
-       tpm_ppi_init_io(&s->ppi, isa_address_space(ISA_DEVICE(dev))
+The helper is used for the instructions IHI, IHU and IPFL.
 
-> +layout:
-> +
-> + +----------+--------+--------+-----------------------------------------=
---+
-> +=C2=A0=C2=A0 |=C2=A0 Field=C2=A0=C2=A0 | Length | Offset | Description=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 |
-> + +----------+--------+--------+-----------------------------------------=
---+
-> +=C2=A0=C2=A0 | func=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 0x100 |=C2=A0 0x000 =
-| Firmware sets values for each=20
-> supported=C2=A0=C2=A0 |
-> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | operation. See defined values=20
-> below.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> + +----------+--------+--------+-----------------------------------------=
---+
-> +=C2=A0=C2=A0 | ppin=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x1=C2=A0 |=C2=
-=A0 0x100 | SMI interrupt to use. Set by=20
-> firmware.=C2=A0=C2=A0=C2=A0 |
-> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | Not=20
-> supported.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |
-> + +----------+--------+--------+-----------------------------------------=
---+
-> +=C2=A0=C2=A0 | ppip=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=C2=
-=A0 0x101 | ACPI function index to pass to SMM=20
-> code.=C2=A0 |
-> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | Set by ACPI. Not=20
-> supported.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 |
-> + +----------+--------+--------+-----------------------------------------=
---+
-> +=C2=A0=C2=A0 | pprp=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=C2=
-=A0 0x105 | Result of last executed operation.=20
-> Set by |
-> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=20
-> firmware.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> + +----------+--------+--------+-----------------------------------------=
---+
-> +=C2=A0=C2=A0 | pprq=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=C2=
-=A0 0x109 | Operation request number to execute.=20
-> Set=C2=A0 |
-> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | by=20
-> ACPI.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> + +----------+--------+--------+-----------------------------------------=
---+
-> +=C2=A0=C2=A0 | pprm=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=C2=
-=A0 0x10d | Operation request optional parameter.=20
-> Set |
-> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | by=20
-> ACPI.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> + +----------+--------+--------+-----------------------------------------=
---+
-> +=C2=A0=C2=A0 | lppr=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=C2=
-=A0 0x111 | Last execute request number. Set=20
-> by=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=20
-> firmware.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> + +----------+--------+--------+-----------------------------------------=
---+
-> +=C2=A0=C2=A0 | fret=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=C2=
-=A0 0x115 | Result code from SMM=20
-> function.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |
-> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | Not=20
-> supported.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |
-> + +----------+--------+--------+-----------------------------------------=
---+
-> +=C2=A0=C2=A0 | res1=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 0x40=C2=A0 |=C2=A0 0=
-x119 | Reserved for future=20
-> use=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> + +----------+--------+--------+-----------------------------------------=
---+
-> +=C2=A0=C2=A0 | next_step|=C2=A0=C2=A0 0x1=C2=A0 |=C2=A0 0x159 | Operatio=
-n to execute after reboot=20
-> by=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | firmware. Used by=20
-> firmware.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 |
-> + +----------+--------+--------+-----------------------------------------=
---+
-if there is relevant match/description in PPI spec for above fields
-it would be better to put reference to it in description fields and
-as field name that could be easily grepped for in PPI spec,
-like we we do with ACPI primitives:
+Change it to call cpu_ldb_code_ra() instead.
 
-  "ACPI 1.0b: 16.2.5.1 Namespace Modifier Objects Encoding: DefScope"
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This retains the current behaviour that all these insns
+may cause exceptions both for MMU permissions checks
+failures and also for "resulting physaddr doesn't point
+at memory".
 
-so reader could easily match spec with parts he/she is interested in.
+My reading of the ISA manual is that this isn't strictly
+correct for IHI and IHU, which ought to only cause MMU
+exceptions but not actually do a memory access. If we
+wanted to fix that, the right thing would be to split
+them into their own helper function, which could then
+just do a tlb_fill().
 
-> +
-> +=C2=A0=C2=A0 The following values are supported for the 'func' field. Th=
-ey correspond
-> +=C2=A0=C2=A0 to the values used by ACPI function index 8.
-> +
-> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_NOT_IMPLEMENTED=C2=A0=C2=A0=C2=
-=A0=C2=A0 (0 << 0)
-> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_BIOS_ONLY=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1 << 0)
-> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_BLOCKED=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (2 << 0)
-> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_ALLOWED_USR_REQ=C2=A0=C2=A0=C2=
-=A0=C2=A0 (3 << 0)
-> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ (4 << 0)
-> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_MASK=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (7 << 0)
-> +
+Tagged as RFC because I don't have any xtensa test images.
 
-looks good to me
-PS:
-maybe drop #define part and make a table from it too so reader
-won't have to do shift on his own, like
+My motivation here is that at some point I'd like us to
+support execution from arbitrary MMIO/small MPU regions/etc,
+for which purpose get_page_addr_code() will change to return
+-1 to mean "this isn't RAM, load a single insn into a
+throwaway TB and execute it"...
 
-  0x0  | function is not implemented
-  0x1  | ...
-  ...
+ target/xtensa/op_helper.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-
->  =C2=A0QEMU files related to TPM ACPI tables:
->  =C2=A0 - hw/i386/acpi-build.c
->=20
+diff --git a/target/xtensa/op_helper.c b/target/xtensa/op_helper.c
+index 8a8c763c631..34dc1eb68fe 100644
+--- a/target/xtensa/op_helper.c
++++ b/target/xtensa/op_helper.c
+@@ -465,7 +465,11 @@ void HELPER(check_interrupts)(CPUXtensaState *env)
+ 
+ void HELPER(itlb_hit_test)(CPUXtensaState *env, uint32_t vaddr)
+ {
+-    get_page_addr_code(env, vaddr);
++    /*
++     * Attempt the memory load; we don't care about the result but
++     * only the side-effects (ie any MMU or other exception)
++     */
++    cpu_ldub_code_ra(env, vaddr, GETPC());
+ }
+ 
+ /*!
+-- 
+2.17.1
