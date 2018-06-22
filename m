@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fWHth-00078M-Oj
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:58:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fWHtr-0007Ez-NO
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:58:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1fWHtc-0007G1-Me
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:58:25 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:35623)
+	(envelope-from <peter.maydell@linaro.org>) id 1fWHtr-0007P6-0O
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:58:35 -0400
+Received: from mail-ot0-x232.google.com ([2607:f8b0:4003:c0f::232]:35276)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1fWHtc-0007Ed-G6
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:58:20 -0400
-Received: by mail-wr0-x243.google.com with SMTP id y12-v6so910627wrs.2
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 01:58:20 -0700 (PDT)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-References: <20180620132546.27128-1-pbonzini@redhat.com>
-	<b3034f45-18f4-eb6d-3553-82d777f30777@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7f6f37a7-538c-e7f9-5092-9ca9329153ae@redhat.com>
-Date: Fri, 22 Jun 2018 10:58:18 +0200
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fWHtq-0007Og-QZ
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 04:58:34 -0400
+Received: by mail-ot0-x232.google.com with SMTP id q17-v6so6716808otg.2
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 01:58:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <b3034f45-18f4-eb6d-3553-82d777f30777@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] ahci: fix FIS I bit and PIO Setup FIS
- interrupt
+In-Reply-To: <20180621143715.27176-1-richard.henderson@linaro.org>
+References: <20180621143715.27176-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 09:58:13 +0100
+Message-ID: <CAFEAcA9dGUOLhxHr+AYHCfTvStM+M7DLVBiHEmnDzpX38aggBw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2.5 00/19] tcg queued patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 21/06/2018 22:06, John Snow wrote:
-> 
-> On 06/20/2018 09:25 AM, Paolo Bonzini wrote:
->> +    pio_fis_i = is_atapi ? ad->done_atapi_packet : !is_write;
-> Per DPIOO1, does this go to false for the first DRQ block, or did I
-> misunderstand? Currently my understanding:
+On 21 June 2018 at 15:37, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Re-issuing the v2 pull request with the proper form.
+>
+>
+> r~
+>
+>
+> The following changes since commit 42747d6abb5035473e5585fa17620c1e8983a70b:
+>
+>   Merge remote-tracking branch 'remotes/edgar/tags/edgar/xilinx-next-2018-06-15.for-upstream' into staging (2018-06-15 17:28:37 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-tcg-20180615
+>
+> for you to fetch changes up to 9f754620651d3432114f4bb89c7f12cbea814b3e:
+>
+>   tcg: Reduce max TB opcode count (2018-06-15 09:39:53 -1000)
+>
+> ----------------------------------------------------------------
+> TCG patch queue:
+>
+> Workaround macos assembler lossage.
+> Eliminate tb_lock.
+> Fix TB code generation overflow.
+>
+Applied, thanks.
 
-DPIOO1 is the !is_atapi && is_write case, where I is currently always 0.
- When do we have more than one DRQ block, is it for multi-sector PIO
-reads?  Then perhaps we need something like ad->command->done_first_pio.
-
-Paolo
-
-> - device->host
-> 	DPIOI1
-> 	Interrupt bit shall be set.
-> - host->device:
-> 	DPIOO1:
-> 	0 for first block, 1 otherwise
-> - ATAPI:
-> 	0 for packet itself
-> 	1 for all data otherwise.
+-- PMM
