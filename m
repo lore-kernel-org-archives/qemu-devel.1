@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=704af0c1d=Alistair.Francis@wdc.com>)
-	id 1fWRmY-0001mM-KS
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:31:43 -0400
+	(envelope-from <thuth@redhat.com>) id 1fWRpf-0003OE-Np
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:34:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=704af0c1d=Alistair.Francis@wdc.com>)
-	id 1fWRmV-0005bG-Dx
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:31:42 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:50290)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=704af0c1d=Alistair.Francis@wdc.com>)
-	id 1fWRmV-0005Zt-1m
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:31:39 -0400
-From: Alistair Francis <alistair.francis@wdc.com>
-Date: Fri, 22 Jun 2018 12:31:27 -0700
-Message-Id: <8a9c4a39a990991d375476924e882fd43f49616e.1529695276.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1529695276.git.alistair.francis@wdc.com>
-References: <cover.1529695276.git.alistair.francis@wdc.com>
+	(envelope-from <thuth@redhat.com>) id 1fWRpf-0006ue-08
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 15:34:55 -0400
+References: <20180622134036.23182-1-f4bug@amsat.org>
+	<20180622134036.23182-5-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <dc7e0220-ee8a-8ab0-05de-572e34d4d78b@redhat.com>
+Date: Fri, 22 Jun 2018 21:34:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v1 5/5] riscv64-softmmu.mak: Build Virtio Block
- support
+In-Reply-To: <20180622134036.23182-5-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 04/14] hw/dma/omap_dma: Use
+ qemu_log_mask(GUEST_ERROR) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +25,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alistair.francis@wdc.com, alistair23@gmail.com, palmer@sifive.com, mjc@sifive.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
 
-Add build time support for the VirtIO block device. This allows us to
-attach a drive using the virtio-blk-device.
+On 22.06.2018 15:40, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/dma/omap_dma.c | 64 +++++++++++++++++++++++++++++------------------
+>  1 file changed, 40 insertions(+), 24 deletions(-)
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- default-configs/riscv64-softmmu.mak | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
-index 73a421d3de..0be2cce269 100644
---- a/default-configs/riscv64-softmmu.mak
-+++ b/default-configs/riscv64-softmmu.mak
-@@ -10,3 +10,5 @@ CONFIG_PCI_XILINX=y
- 
- CONFIG_VGA=y
- CONFIG_VGA_PCI=y
-+
-+CONFIG_VIRTIO_BLK=y
--- 
-2.17.1
+Reviewed-by: Thomas Huth <thuth@redhat.com>
