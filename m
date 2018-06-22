@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50486)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fWLf7-0005Y6-Eh
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:59:38 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fWLjB-0000M0-RP
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:03:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fWLf6-0006Jr-QP
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:59:37 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:41460)
+	(envelope-from <alex.bennee@linaro.org>) id 1fWLj6-0007f0-FU
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:03:49 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38951)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fWLf6-0006JZ-MS
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:59:36 -0400
-Received: by mail-ot0-x242.google.com with SMTP id d19-v6so7381823oti.8
-	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 05:59:36 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fWLj6-0007dx-7P
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:03:44 -0400
+Received: by mail-wm0-x241.google.com with SMTP id p11-v6so2504847wmc.4
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 06:03:44 -0700 (PDT)
+References: <20180622021546.18178-1-f4bug@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180622021546.18178-1-f4bug@amsat.org>
+Date: Fri, 22 Jun 2018 14:03:41 +0100
+Message-ID: <87bmc3ug5u.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180622125814.345274-1-eblake@redhat.com>
-References: <20180622125814.345274-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Jun 2018 13:59:15 +0100
-Message-ID: <CAFEAcA8SdUhXXyi4kcgQCodzxHFYyeMZVRrSB1==ddSLBDh6+A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] nbd/server: Silence gcc false positive
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] travis: Do not waste time cloning
+ unused submodules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,24 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Network Block Dev..." <qemu-block@nongnu.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-On 22 June 2018 at 13:58, Eric Blake <eblake@redhat.com> wrote:
-> The code has a while() loop that always initialized 'end', and
-> the loop always executes at least once (as evidenced by the assert()
-> just prior to the loop).  But some versions of gcc still complain
-> that 'end' is used uninitialized, so silence them.
+
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+
+> Builds only require:
+> - dtc
+> - keycodemapdb
+> - capstone
 >
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
+> Some tests might require ROMs. Can they clone submodules only when requir=
+ed?
+> ---
+>  .travis.yml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> Peter, do you want to apply this directly as a build fix, or shall
-> I submit a pull request?
+> diff --git a/.travis.yml b/.travis.yml
+> index fabfe9ec34..415d703c91 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -67,7 +67,7 @@ before_install:
+>    - if [ "$TRAVIS_OS_NAME" =3D=3D "osx" ]; then brew update ; fi
+>    - if [ "$TRAVIS_OS_NAME" =3D=3D "osx" ]; then brew install libffi gett=
+ext glib pixman ; fi
+>    - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-s=
+eed.tar.xz | tar -xvJ
+> -  - git submodule update --init --recursive
+> +  - git submodule update --init --recursive capstone dtc
+> ui/keycodemapdb
 
-I'll just apply it directly.
+Queued with drop of wget as well. Thanks.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>  before_script:
+>    - ./configure ${CONFIG} || { cat config.log && exit 1; }
+>  script:
 
-thanks
--- PMM
+
+--
+Alex Benn=C3=A9e
