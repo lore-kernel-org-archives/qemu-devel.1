@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fWGkw-00013O-Cj
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:45:23 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fWGku-0000FV-P7
+	(envelope-from <eric.auger@redhat.com>) id 1fWGku-00011P-Ic
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:45:18 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <eric.auger@redhat.com>) id 1fWGks-0000Dr-SJ
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 03:45:16 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 22 Jun 2018 09:45:01 +0200
-Message-Id: <1529653501-15358-5-git-send-email-eric.auger@redhat.com>
+Date: Fri, 22 Jun 2018 09:44:58 +0200
+Message-Id: <1529653501-15358-2-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1529653501-15358-1-git-send-email-eric.auger@redhat.com>
 References: <1529653501-15358-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 4/4] hw/arm/smmuv3: Add notifications on
- invalidation
+Subject: [Qemu-devel] [PATCH v4 1/4] hw/arm/smmuv3: Fix translate error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,254 +22,289 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, jia.he@hxt-semitech.com, hejianet@gmail.com
 
-On TLB invalidation commands, let's call registered
-IOMMU notifiers. Those can only be UNMAP notifiers.
-SMMUv3 does not support notification on MAP (VFIO).
+From: Jia He <hejianet@gmail.com>
 
-This patch allows vhost use case where IOTLB API is notified
-on each guest IOTLB invalidation.
+In case the STE's config is "Bypass" we currently don't set the
+IOMMUTLBEntry perm flags and the access does not succeed. Also
+if the config is 0b0xx (Aborted/Reserved), decode_ste and
+smmuv3_decode_config currently returns -EINVAL and we don't enter
+the expected code path: we record an event whereas we should not.
 
+This patch fixes those bugs and simplifies the error handling.
+decode_ste and smmuv3_decode_config now return 0 if aborted or
+bypassed config was found. Only bad config info produces negative
+error values. In smmuv3_translate we more clearly differentiate
+errors, bypass/smmu disabled, aborted and success cases. Also
+trace points are differentiated.
+
+Fixes: 9bde7f0674fe ("hw/arm/smmuv3: Implement translate callback")
+Reported-by: jia.he@hxt-semitech.com
+Signed-off-by: jia.he@hxt-semitech.com
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 ---
-v3 -> v4:
-- fixed smmuv3_notify_flag_changed
-  (new == IOMMU_NOTIFIER_MAP) replaced by (new & IOMMU_NOTIFIER_MAP)
 
 v2 -> v3:
 - added Peter's R-b
----
- hw/arm/smmu-common.c         | 34 +++++++++++++++
- hw/arm/smmuv3.c              | 99 +++++++++++++++++++++++++++++++++++++++++++-
- hw/arm/trace-events          |  5 +++
- include/hw/arm/smmu-common.h |  6 +++
- 4 files changed, 142 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index f66e444..3098915 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -385,6 +385,40 @@ static gboolean smmu_iotlb_key_equal(gconstpointer v1, gconstpointer v2)
-     return (k1->asid == k2->asid) && (k1->iova == k2->iova);
- }
+v1 -> v2:
+- set addr_mask in case of bypass and disabled. Mandated for
+  vhost use case since a411c84b561baa94b28165c52f21c33517ee8f59
+  "exec: extract address_space_translate_iommu, fix page_mask
+  corner case"
+---
+ hw/arm/smmuv3-internal.h | 12 +++++-
+ hw/arm/smmuv3.c          | 96 +++++++++++++++++++++++++++++++++---------------
+ hw/arm/trace-events      |  7 ++--
+ 3 files changed, 80 insertions(+), 35 deletions(-)
+
+diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
+index a9d714b..bab25d6 100644
+--- a/hw/arm/smmuv3-internal.h
++++ b/hw/arm/smmuv3-internal.h
+@@ -23,6 +23,14 @@
  
-+/* Unmap the whole notifier's range */
-+static void smmu_unmap_notifier_range(IOMMUNotifier *n)
-+{
-+    IOMMUTLBEntry entry;
+ #include "hw/arm/smmu-common.h"
+ 
++typedef enum SMMUTranslationStatus {
++    SMMU_TRANS_DISABLE,
++    SMMU_TRANS_ABORT,
++    SMMU_TRANS_BYPASS,
++    SMMU_TRANS_ERROR,
++    SMMU_TRANS_SUCCESS,
++} SMMUTranslationStatus;
 +
-+    entry.target_as = &address_space_memory;
-+    entry.iova = n->start;
-+    entry.perm = IOMMU_NONE;
-+    entry.addr_mask = n->end - n->start;
-+
-+    memory_region_notify_one(n, &entry);
-+}
-+
-+/* Unmap all notifiers attached to @mr */
-+inline void smmu_inv_notifiers_mr(IOMMUMemoryRegion *mr)
-+{
-+    IOMMUNotifier *n;
-+
-+    trace_smmu_inv_notifiers_mr(mr->parent_obj.name);
-+    IOMMU_NOTIFIER_FOREACH(n, mr) {
-+        smmu_unmap_notifier_range(n);
-+    }
-+}
-+
-+/* Unmap all notifiers of all mr's */
-+void smmu_inv_notifiers_all(SMMUState *s)
-+{
-+    SMMUNotifierNode *node;
-+
-+    QLIST_FOREACH(node, &s->notifiers_list, next) {
-+        smmu_inv_notifiers_mr(&node->sdev->iommu);
-+    }
-+}
-+
- static void smmu_base_realize(DeviceState *dev, Error **errp)
- {
-     SMMUState *s = ARM_SMMU(dev);
+ /* MMIO Registers */
+ 
+ REG32(IDR0,                0x0)
+@@ -315,7 +323,7 @@ enum { /* Command completion notification */
+ /* Events */
+ 
+ typedef enum SMMUEventType {
+-    SMMU_EVT_OK                 = 0x00,
++    SMMU_EVT_NONE               = 0x00,
+     SMMU_EVT_F_UUT                    ,
+     SMMU_EVT_C_BAD_STREAMID           ,
+     SMMU_EVT_F_STE_FETCH              ,
+@@ -337,7 +345,7 @@ typedef enum SMMUEventType {
+ } SMMUEventType;
+ 
+ static const char *event_stringify[] = {
+-    [SMMU_EVT_OK]                       = "SMMU_EVT_OK",
++    [SMMU_EVT_NONE]                     = "no recorded event",
+     [SMMU_EVT_F_UUT]                    = "SMMU_EVT_F_UUT",
+     [SMMU_EVT_C_BAD_STREAMID]           = "SMMU_EVT_C_BAD_STREAMID",
+     [SMMU_EVT_F_STE_FETCH]              = "SMMU_EVT_F_STE_FETCH",
 diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index b6dc7ed..39fbcbf 100644
+index 9783309..70b8f29 100644
 --- a/hw/arm/smmuv3.c
 +++ b/hw/arm/smmuv3.c
-@@ -780,6 +780,68 @@ epilogue:
-     return entry;
+@@ -23,6 +23,7 @@
+ #include "hw/qdev-core.h"
+ #include "hw/pci/pci.h"
+ #include "exec/address-spaces.h"
++#include "cpu.h"
+ #include "trace.h"
+ #include "qemu/log.h"
+ #include "qemu/error-report.h"
+@@ -154,7 +155,7 @@ void smmuv3_record_event(SMMUv3State *s, SMMUEventInfo *info)
+     EVT_SET_SID(&evt, info->sid);
+ 
+     switch (info->type) {
+-    case SMMU_EVT_OK:
++    case SMMU_EVT_NONE:
+         return;
+     case SMMU_EVT_F_UUT:
+         EVT_SET_SSID(&evt, info->u.f_uut.ssid);
+@@ -312,12 +313,11 @@ static int smmu_get_cd(SMMUv3State *s, STE *ste, uint32_t ssid,
+     return 0;
  }
  
-+/**
-+ * smmuv3_notify_iova - call the notifier @n for a given
-+ * @asid and @iova tuple.
-+ *
-+ * @mr: IOMMU mr region handle
-+ * @n: notifier to be called
-+ * @asid: address space ID or negative value if we don't care
-+ * @iova: iova
-+ */
-+static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
-+                               IOMMUNotifier *n,
-+                               int asid,
-+                               dma_addr_t iova)
-+{
-+    SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
-+    SMMUEventInfo event = {};
-+    SMMUTransTableInfo *tt;
-+    SMMUTransCfg *cfg;
-+    IOMMUTLBEntry entry;
-+
-+    cfg = smmuv3_get_config(sdev, &event);
-+    if (!cfg) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s error decoding the configuration for iommu mr=%s\n",
-+                      __func__, mr->parent_obj.name);
-+        return;
-+    }
-+
-+    if (asid >= 0 && cfg->asid != asid) {
-+        return;
-+    }
-+
-+    tt = select_tt(cfg, iova);
-+    if (!tt) {
-+        return;
-+    }
-+
-+    entry.target_as = &address_space_memory;
-+    entry.iova = iova;
-+    entry.addr_mask = (1 << tt->granule_sz) - 1;
-+    entry.perm = IOMMU_NONE;
-+
-+    memory_region_notify_one(n, &entry);
-+}
-+
-+/* invalidate an asid/iova tuple in all mr's */
-+static void smmuv3_inv_notifiers_iova(SMMUState *s, int asid, dma_addr_t iova)
-+{
-+    SMMUNotifierNode *node;
-+
-+    QLIST_FOREACH(node, &s->notifiers_list, next) {
-+        IOMMUMemoryRegion *mr = &node->sdev->iommu;
-+        IOMMUNotifier *n;
-+
-+        trace_smmuv3_inv_notifiers_iova(mr->parent_obj.name, asid, iova);
-+
-+        IOMMU_NOTIFIER_FOREACH(n, mr) {
-+            smmuv3_notify_iova(mr, n, asid, iova);
-+        }
-+    }
-+}
-+
- static int smmuv3_cmdq_consume(SMMUv3State *s)
+-/* Returns <0 if the caller has no need to continue the translation */
++/* Returns < 0 in case of invalid STE, 0 otherwise */
+ static int decode_ste(SMMUv3State *s, SMMUTransCfg *cfg,
+                       STE *ste, SMMUEventInfo *event)
  {
-     SMMUState *bs = ARM_SMMU(s);
-@@ -899,12 +961,14 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             uint16_t asid = CMD_ASID(&cmd);
+     uint32_t config;
+-    int ret = -EINVAL;
  
-             trace_smmuv3_cmdq_tlbi_nh_asid(asid);
-+            smmu_inv_notifiers_all(&s->smmu_state);
-             smmu_iotlb_inv_asid(bs, asid);
-             break;
-         }
-         case SMMU_CMD_TLBI_NH_ALL:
-         case SMMU_CMD_TLBI_NSNH_ALL:
-             trace_smmuv3_cmdq_tlbi_nh();
-+            smmu_inv_notifiers_all(&s->smmu_state);
-             smmu_iotlb_inv_all(bs);
-             break;
-         case SMMU_CMD_TLBI_NH_VAA:
-@@ -913,6 +977,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             uint16_t vmid = CMD_VMID(&cmd);
+     if (!STE_VALID(ste)) {
+         goto bad_ste;
+@@ -326,13 +326,13 @@ static int decode_ste(SMMUv3State *s, SMMUTransCfg *cfg,
+     config = STE_CONFIG(ste);
  
-             trace_smmuv3_cmdq_tlbi_nh_vaa(vmid, addr);
-+            smmuv3_inv_notifiers_iova(bs, -1, addr);
-             smmu_iotlb_inv_all(bs);
-             break;
-         }
-@@ -924,6 +989,7 @@ static int smmuv3_cmdq_consume(SMMUv3State *s)
-             bool leaf = CMD_LEAF(&cmd);
- 
-             trace_smmuv3_cmdq_tlbi_nh_va(vmid, asid, addr, leaf);
-+            smmuv3_inv_notifiers_iova(bs, asid, addr);
-             smmu_iotlb_inv_iova(bs, asid, addr);
-             break;
-         }
-@@ -1402,9 +1468,38 @@ static void smmuv3_notify_flag_changed(IOMMUMemoryRegion *iommu,
-                                        IOMMUNotifierFlag old,
-                                        IOMMUNotifierFlag new)
- {
-+    SMMUDevice *sdev = container_of(iommu, SMMUDevice, iommu);
-+    SMMUv3State *s3 = sdev->smmu;
-+    SMMUState *s = &(s3->smmu_state);
-+    SMMUNotifierNode *node = NULL;
-+    SMMUNotifierNode *next_node = NULL;
-+
-+    if (new & IOMMU_NOTIFIER_MAP) {
-+        int bus_num = pci_bus_num(sdev->bus);
-+        PCIDevice *pcidev = pci_find_device(sdev->bus, bus_num, sdev->devfn);
-+
-+        warn_report("SMMUv3 does not support notification on MAP: "
-+                     "device %s will not function properly", pcidev->name);
-+    }
-+
-     if (old == IOMMU_NOTIFIER_NONE) {
--        warn_report("SMMUV3 does not support vhost/vfio integration yet: "
--                    "devices of those types will not function properly");
-+        trace_smmuv3_notify_flag_add(iommu->parent_obj.name);
-+        node = g_malloc0(sizeof(*node));
-+        node->sdev = sdev;
-+        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
-+        return;
-+    }
-+
-+    /* update notifier node with new flags */
-+    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
-+        if (node->sdev == sdev) {
-+            if (new == IOMMU_NOTIFIER_NONE) {
-+                trace_smmuv3_notify_flag_del(iommu->parent_obj.name);
-+                QLIST_REMOVE(node, next);
-+                g_free(node);
-+            }
-+            return;
-+        }
+     if (STE_CFG_ABORT(config)) {
+-        cfg->aborted = true; /* abort but don't record any event */
+-        return ret;
++        cfg->aborted = true;
++        return 0;
      }
- }
  
+     if (STE_CFG_BYPASS(config)) {
+         cfg->bypassed = true;
+-        return ret;
++        return 0;
+     }
+ 
+     if (STE_CFG_S2_ENABLED(config)) {
+@@ -509,7 +509,7 @@ bad_cd:
+  *       the different configuration decoding steps
+  * @event: must be zero'ed by the caller
+  *
+- * return < 0 if the translation needs to be aborted (@event is filled
++ * return < 0 in case of config decoding error (@event is filled
+  * accordingly). Return 0 otherwise.
+  */
+ static int smmuv3_decode_config(IOMMUMemoryRegion *mr, SMMUTransCfg *cfg,
+@@ -518,19 +518,26 @@ static int smmuv3_decode_config(IOMMUMemoryRegion *mr, SMMUTransCfg *cfg,
+     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+     uint32_t sid = smmu_get_sid(sdev);
+     SMMUv3State *s = sdev->smmu;
+-    int ret = -EINVAL;
++    int ret;
+     STE ste;
+     CD cd;
+ 
+-    if (smmu_find_ste(s, sid, &ste, event)) {
++    ret = smmu_find_ste(s, sid, &ste, event);
++    if (ret) {
+         return ret;
+     }
+ 
+-    if (decode_ste(s, cfg, &ste, event)) {
++    ret = decode_ste(s, cfg, &ste, event);
++    if (ret) {
+         return ret;
+     }
+ 
+-    if (smmu_get_cd(s, &ste, 0 /* ssid */, &cd, event)) {
++    if (cfg->aborted || cfg->bypassed) {
++        return 0;
++    }
++
++    ret = smmu_get_cd(s, &ste, 0 /* ssid */, &cd, event);
++    if (ret) {
+         return ret;
+     }
+ 
+@@ -543,8 +550,9 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+     SMMUv3State *s = sdev->smmu;
+     uint32_t sid = smmu_get_sid(sdev);
+-    SMMUEventInfo event = {.type = SMMU_EVT_OK, .sid = sid};
++    SMMUEventInfo event = {.type = SMMU_EVT_NONE, .sid = sid};
+     SMMUPTWEventInfo ptw_info = {};
++    SMMUTranslationStatus status;
+     SMMUTransCfg cfg = {};
+     IOMMUTLBEntry entry = {
+         .target_as = &address_space_memory,
+@@ -553,23 +561,28 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         .addr_mask = ~(hwaddr)0,
+         .perm = IOMMU_NONE,
+     };
+-    int ret = 0;
+ 
+     if (!smmu_enabled(s)) {
+-        goto out;
++        status = SMMU_TRANS_DISABLE;
++        goto epilogue;
+     }
+ 
+-    ret = smmuv3_decode_config(mr, &cfg, &event);
+-    if (ret) {
+-        goto out;
++    if (smmuv3_decode_config(mr, &cfg, &event)) {
++        status = SMMU_TRANS_ERROR;
++        goto epilogue;
+     }
+ 
+     if (cfg.aborted) {
+-        goto out;
++        status = SMMU_TRANS_ABORT;
++        goto epilogue;
+     }
+ 
+-    ret = smmu_ptw(&cfg, addr, flag, &entry, &ptw_info);
+-    if (ret) {
++    if (cfg.bypassed) {
++        status = SMMU_TRANS_BYPASS;
++        goto epilogue;
++    }
++
++    if (smmu_ptw(&cfg, addr, flag, &entry, &ptw_info)) {
+         switch (ptw_info.type) {
+         case SMMU_PTW_ERR_WALK_EABT:
+             event.type = SMMU_EVT_F_WALK_EABT;
+@@ -609,18 +622,41 @@ static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
+         default:
+             g_assert_not_reached();
+         }
++        status = SMMU_TRANS_ERROR;
++    } else {
++        status = SMMU_TRANS_SUCCESS;
+     }
+-out:
+-    if (ret) {
+-        qemu_log_mask(LOG_GUEST_ERROR,
+-                      "%s translation failed for iova=0x%"PRIx64"(%d)\n",
+-                      mr->parent_obj.name, addr, ret);
+-        entry.perm = IOMMU_NONE;
+-        smmuv3_record_event(s, &event);
+-    } else if (!cfg.aborted) {
++
++epilogue:
++    switch (status) {
++    case SMMU_TRANS_SUCCESS:
+         entry.perm = flag;
+-        trace_smmuv3_translate(mr->parent_obj.name, sid, addr,
+-                               entry.translated_addr, entry.perm);
++        trace_smmuv3_translate_success(mr->parent_obj.name, sid, addr,
++                                       entry.translated_addr, entry.perm);
++        break;
++    case SMMU_TRANS_DISABLE:
++        entry.perm = flag;
++        entry.addr_mask = ~TARGET_PAGE_MASK;
++        trace_smmuv3_translate_disable(mr->parent_obj.name, sid, addr,
++                                      entry.perm);
++        break;
++    case SMMU_TRANS_BYPASS:
++        entry.perm = flag;
++        entry.addr_mask = ~TARGET_PAGE_MASK;
++        trace_smmuv3_translate_bypass(mr->parent_obj.name, sid, addr,
++                                      entry.perm);
++        break;
++    case SMMU_TRANS_ABORT:
++        /* no event is recorded on abort */
++        trace_smmuv3_translate_abort(mr->parent_obj.name, sid, addr,
++                                     entry.perm);
++        break;
++    case SMMU_TRANS_ERROR:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s translation failed for iova=0x%"PRIx64"(%s)\n",
++                      mr->parent_obj.name, addr, smmu_event_string(event.type));
++        smmuv3_record_event(s, &event);
++        break;
+     }
+ 
+     return entry;
 diff --git a/hw/arm/trace-events b/hw/arm/trace-events
-index be69c5d..27b11d6 100644
+index 2d92727..0ab66bb 100644
 --- a/hw/arm/trace-events
 +++ b/hw/arm/trace-events
-@@ -17,6 +17,7 @@ smmu_iotlb_cache_miss(uint16_t asid, uint64_t addr, uint32_t hit, uint32_t miss,
- smmu_iotlb_inv_all(void) "IOTLB invalidate all"
- smmu_iotlb_inv_asid(uint16_t asid) "IOTLB invalidate asid=%d"
- smmu_iotlb_inv_iova(uint16_t asid, uint64_t addr) "IOTLB invalidate asid=%d addr=0x%"PRIx64
-+smmu_inv_notifiers_mr(const char *name) "iommu mr=%s"
- 
- #hw/arm/smmuv3.c
- smmuv3_read_mmio(uint64_t addr, uint64_t val, unsigned size, uint32_t r) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x(%d)"
-@@ -55,3 +56,7 @@ smmuv3_cmdq_tlbi_nh_vaa(int vmid, uint64_t addr) "vmid =%d addr=0x%"PRIx64
- smmuv3_cmdq_tlbi_nh(void) ""
- smmuv3_cmdq_tlbi_nh_asid(uint16_t asid) "asid=%d"
- smmuv3_config_cache_inv(uint32_t sid) "Config cache INV for sid %d"
-+smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
-+smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
-+smmuv3_inv_notifiers_iova(const char *name, uint16_t asid, uint64_t iova) "iommu mr=%s asid=%d iova=0x%"PRIx64
-+
-diff --git a/include/hw/arm/smmu-common.h b/include/hw/arm/smmu-common.h
-index d173806..50e2912 100644
---- a/include/hw/arm/smmu-common.h
-+++ b/include/hw/arm/smmu-common.h
-@@ -160,4 +160,10 @@ void smmu_iotlb_inv_all(SMMUState *s);
- void smmu_iotlb_inv_asid(SMMUState *s, uint16_t asid);
- void smmu_iotlb_inv_iova(SMMUState *s, uint16_t asid, dma_addr_t iova);
- 
-+/* Unmap the range of all the notifiers registered to any IOMMU mr */
-+void smmu_inv_notifiers_all(SMMUState *s);
-+
-+/* Unmap the range of all the notifiers registered to @mr */
-+void smmu_inv_notifiers_mr(IOMMUMemoryRegion *mr);
-+
- #endif  /* HW_ARM_SMMU_COMMON */
+@@ -33,9 +33,10 @@ smmuv3_record_event(const char *type, uint32_t sid) "%s sid=%d"
+ smmuv3_find_ste(uint16_t sid, uint32_t features, uint16_t sid_split) "SID:0x%x features:0x%x, sid_split:0x%x"
+ smmuv3_find_ste_2lvl(uint64_t strtab_base, uint64_t l1ptr, int l1_ste_offset, uint64_t l2ptr, int l2_ste_offset, int max_l2_ste) "strtab_base:0x%"PRIx64" l1ptr:0x%"PRIx64" l1_off:0x%x, l2ptr:0x%"PRIx64" l2_off:0x%x max_l2_ste:%d"
+ smmuv3_get_ste(uint64_t addr) "STE addr: 0x%"PRIx64
+-smmuv3_translate_bypass(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d bypass iova:0x%"PRIx64" is_write=%d"
+-smmuv3_translate_in(uint16_t sid, int pci_bus_num, uint64_t strtab_base) "SID:0x%x bus:%d strtab_base:0x%"PRIx64
++smmuv3_translate_disable(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d bypass (smmu disabled) iova:0x%"PRIx64" is_write=%d"
++smmuv3_translate_bypass(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d STE bypass iova:0x%"PRIx64" is_write=%d"
++smmuv3_translate_abort(const char *n, uint16_t sid, uint64_t addr, bool is_write) "%s sid=%d abort on iova:0x%"PRIx64" is_write=%d"
++smmuv3_translate_success(const char *n, uint16_t sid, uint64_t iova, uint64_t translated, int perm) "%s sid=%d iova=0x%"PRIx64" translated=0x%"PRIx64" perm=0x%x"
+ smmuv3_get_cd(uint64_t addr) "CD addr: 0x%"PRIx64
+-smmuv3_translate(const char *n, uint16_t sid, uint64_t iova, uint64_t translated, int perm) "%s sid=%d iova=0x%"PRIx64" translated=0x%"PRIx64" perm=0x%x"
+ smmuv3_decode_cd(uint32_t oas) "oas=%d"
+ smmuv3_decode_cd_tt(int i, uint32_t tsz, uint64_t ttb, uint32_t granule_sz) "TT[%d]:tsz:%d ttb:0x%"PRIx64" granule_sz:%d"
 -- 
 2.5.5
