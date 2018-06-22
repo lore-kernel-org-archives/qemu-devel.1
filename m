@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50012)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fWLd5-0003WH-8U
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:57:32 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fWLd4-0003VY-Fv
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:57:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fWLd4-0005NK-Az
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:57:31 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42968)
+	(envelope-from <pm215@archaic.org.uk>) id 1fWLd1-0005KJ-Ks
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:57:30 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42964)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fWLd4-0005Ms-3Y
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:57:30 -0400
+	id 1fWLd1-0005Gr-4J
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 08:57:27 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fWLd3-0003ym-36
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:57:29 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fWLd0-0003wM-27
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 13:57:26 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Jun 2018 13:57:06 +0100
-Message-Id: <20180622125713.15303-22-peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 13:57:02 +0100
+Message-Id: <20180622125713.15303-18-peter.maydell@linaro.org>
 In-Reply-To: <20180622125713.15303-1-peter.maydell@linaro.org>
 References: <20180622125713.15303-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 21/28] hw/misc/iotkit-secctl.c: Implement
- SECMPCINTSTATUS
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 17/28] hw/misc/tz-mpc.c: Implement the Arm
+ TrustZone Memory Protection Controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,134 +33,570 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Implement the SECMPCINTSTATUS register. This is the only register
-in the security controller that deals with Memory Protection
-Controllers, and it simply provides a read-only view of the
-interrupt lines from the various MPCs in the system.
+Implement the Arm TrustZone Memory Protection Controller, which sits
+in front of RAM and allows secure software to configure it to either
+pass through or reject transactions.
+
+We implement the MPC as a QEMU IOMMU, which will direct transactions
+either through to the devices and memory behind it or to a special
+"never works" AddressSpace if they are blocked.
+
+This initial commit implements the skeleton of the device:
+ * it always permits accesses
+ * it doesn't implement most of the registers
+ * it doesn't implement the interrupt or other behaviour
+   for blocked transactions
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20180620132032.28865-6-peter.maydell@linaro.org
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Message-id: 20180620132032.28865-2-peter.maydell@linaro.org
 ---
- include/hw/misc/iotkit-secctl.h |  8 +++++++
- hw/misc/iotkit-secctl.c         | 38 +++++++++++++++++++++++++++++++--
- 2 files changed, 44 insertions(+), 2 deletions(-)
+ hw/misc/Makefile.objs           |   1 +
+ include/hw/misc/tz-mpc.h        |  70 ++++++
+ hw/misc/tz-mpc.c                | 399 ++++++++++++++++++++++++++++++++
+ MAINTAINERS                     |   2 +
+ default-configs/arm-softmmu.mak |   1 +
+ hw/misc/trace-events            |   7 +
+ 6 files changed, 480 insertions(+)
+ create mode 100644 include/hw/misc/tz-mpc.h
+ create mode 100644 hw/misc/tz-mpc.c
 
-diff --git a/include/hw/misc/iotkit-secctl.h b/include/hw/misc/iotkit-secctl.h
-index faad0c91901..082c14c925e 100644
---- a/include/hw/misc/iotkit-secctl.h
-+++ b/include/hw/misc/iotkit-secctl.h
-@@ -39,6 +39,11 @@
-  *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_enable
-  *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_clear
-  *  + named GPIO inputs ahb_ppcexp{0,1,2,3}_irq_status
-+ * Controlling the MPC in the IoTKit:
-+ *  + named GPIO input mpc_status
-+ * Controlling each of the 16 expansion MPCs which a system using the IoTKit
-+ * might provide:
-+ *  + named GPIO inputs mpcexp_status[0..15]
-  */
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index ecd8d610984..93509008451 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -62,6 +62,7 @@ obj-$(CONFIG_MIPS_ITU) += mips_itu.o
+ obj-$(CONFIG_MPS2_FPGAIO) += mps2-fpgaio.o
+ obj-$(CONFIG_MPS2_SCC) += mps2-scc.o
  
- #ifndef IOTKIT_SECCTL_H
-@@ -55,6 +60,8 @@
- #define IOTS_NUM_APB_PPC 2
- #define IOTS_NUM_APB_EXP_PPC 4
- #define IOTS_NUM_AHB_EXP_PPC 4
-+#define IOTS_NUM_EXP_MPC 16
-+#define IOTS_NUM_MPC 1
++obj-$(CONFIG_TZ_MPC) += tz-mpc.o
+ obj-$(CONFIG_TZ_PPC) += tz-ppc.o
+ obj-$(CONFIG_IOTKIT_SECCTL) += iotkit-secctl.o
  
- typedef struct IoTKitSecCtl IoTKitSecCtl;
- 
-@@ -94,6 +101,7 @@ struct IoTKitSecCtl {
-     uint32_t secrespcfg;
-     uint32_t nsccfg;
-     uint32_t brginten;
-+    uint32_t mpcintstatus;
- 
-     IoTKitSecCtlPPC apb[IOTS_NUM_APB_PPC];
-     IoTKitSecCtlPPC apbexp[IOTS_NUM_APB_EXP_PPC];
-diff --git a/hw/misc/iotkit-secctl.c b/hw/misc/iotkit-secctl.c
-index ddd1584d341..de4fd8e36d2 100644
---- a/hw/misc/iotkit-secctl.c
-+++ b/hw/misc/iotkit-secctl.c
-@@ -139,6 +139,9 @@ static MemTxResult iotkit_secctl_s_read(void *opaque, hwaddr addr,
-     case A_NSCCFG:
-         r = s->nsccfg;
-         break;
-+    case A_SECMPCINTSTATUS:
-+        r = s->mpcintstatus;
+diff --git a/include/hw/misc/tz-mpc.h b/include/hw/misc/tz-mpc.h
+new file mode 100644
+index 00000000000..d1a65fd9a38
+--- /dev/null
++++ b/include/hw/misc/tz-mpc.h
+@@ -0,0 +1,70 @@
++/*
++ * ARM AHB5 TrustZone Memory Protection Controller emulation
++ *
++ * Copyright (c) 2018 Linaro Limited
++ * Written by Peter Maydell
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 or
++ * (at your option) any later version.
++ */
++
++/* This is a model of the TrustZone memory protection controller (MPC).
++ * It is documented in the ARM CoreLink SIE-200 System IP for Embedded TRM
++ * (DDI 0571G):
++ * https://developer.arm.com/products/architecture/m-profile/docs/ddi0571/g
++ *
++ * The MPC sits in front of memory and allows secure software to
++ * configure it to either pass through or reject transactions.
++ * Rejected transactions may be configured to either be aborted, or to
++ * behave as RAZ/WI. An interrupt can be signalled for a rejected transaction.
++ *
++ * The MPC has a register interface which the guest uses to configure it.
++ *
++ * QEMU interface:
++ * + sysbus MMIO region 0: MemoryRegion for the MPC's config registers
++ * + sysbus MMIO region 1: MemoryRegion for the upstream end of the MPC
++ * + Property "downstream": MemoryRegion defining the downstream memory
++ * + Named GPIO output "irq": set for a transaction-failed interrupt
++ */
++
++#ifndef TZ_MPC_H
++#define TZ_MPC_H
++
++#include "hw/sysbus.h"
++
++#define TYPE_TZ_MPC "tz-mpc"
++#define TZ_MPC(obj) OBJECT_CHECK(TZMPC, (obj), TYPE_TZ_MPC)
++
++#define TZ_NUM_PORTS 16
++
++#define TYPE_TZ_MPC_IOMMU_MEMORY_REGION "tz-mpc-iommu-memory-region"
++
++typedef struct TZMPC TZMPC;
++
++struct TZMPC {
++    /*< private >*/
++    SysBusDevice parent_obj;
++
++    /*< public >*/
++
++    qemu_irq irq;
++
++    /* Properties */
++    MemoryRegion *downstream;
++
++    hwaddr blocksize;
++    uint32_t blk_max;
++
++    /* MemoryRegions exposed to user */
++    MemoryRegion regmr;
++    IOMMUMemoryRegion upstream;
++
++    /* MemoryRegion used internally */
++    MemoryRegion blocked_io;
++
++    AddressSpace downstream_as;
++    AddressSpace blocked_io_as;
++};
++
++#endif
+diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
+new file mode 100644
+index 00000000000..8a8617bdbdf
+--- /dev/null
++++ b/hw/misc/tz-mpc.c
+@@ -0,0 +1,399 @@
++/*
++ * ARM AHB5 TrustZone Memory Protection Controller emulation
++ *
++ * Copyright (c) 2018 Linaro Limited
++ * Written by Peter Maydell
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 or
++ * (at your option) any later version.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/log.h"
++#include "qapi/error.h"
++#include "trace.h"
++#include "hw/sysbus.h"
++#include "hw/registerfields.h"
++#include "hw/misc/tz-mpc.h"
++
++/* Our IOMMU has two IOMMU indexes, one for secure transactions and one for
++ * non-secure transactions.
++ */
++enum {
++    IOMMU_IDX_S,
++    IOMMU_IDX_NS,
++    IOMMU_NUM_INDEXES,
++};
++
++/* Config registers */
++REG32(CTRL, 0x00)
++REG32(BLK_MAX, 0x10)
++REG32(BLK_CFG, 0x14)
++REG32(BLK_IDX, 0x18)
++REG32(BLK_LUT, 0x1c)
++REG32(INT_STAT, 0x20)
++REG32(INT_CLEAR, 0x24)
++REG32(INT_EN, 0x28)
++REG32(INT_INFO1, 0x2c)
++REG32(INT_INFO2, 0x30)
++REG32(INT_SET, 0x34)
++REG32(PIDR4, 0xfd0)
++REG32(PIDR5, 0xfd4)
++REG32(PIDR6, 0xfd8)
++REG32(PIDR7, 0xfdc)
++REG32(PIDR0, 0xfe0)
++REG32(PIDR1, 0xfe4)
++REG32(PIDR2, 0xfe8)
++REG32(PIDR3, 0xfec)
++REG32(CIDR0, 0xff0)
++REG32(CIDR1, 0xff4)
++REG32(CIDR2, 0xff8)
++REG32(CIDR3, 0xffc)
++
++static const uint8_t tz_mpc_idregs[] = {
++    0x04, 0x00, 0x00, 0x00,
++    0x60, 0xb8, 0x1b, 0x00,
++    0x0d, 0xf0, 0x05, 0xb1,
++};
++
++static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
++                                   uint64_t *pdata,
++                                   unsigned size, MemTxAttrs attrs)
++{
++    uint64_t r;
++    uint32_t offset = addr & ~0x3;
++
++    if (!attrs.secure && offset < A_PIDR4) {
++        /* NS accesses can only see the ID registers */
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "TZ MPC register read: NS access to offset 0x%x\n",
++                      offset);
++        r = 0;
++        goto read_out;
++    }
++
++    switch (offset) {
++    case A_PIDR4:
++    case A_PIDR5:
++    case A_PIDR6:
++    case A_PIDR7:
++    case A_PIDR0:
++    case A_PIDR1:
++    case A_PIDR2:
++    case A_PIDR3:
++    case A_CIDR0:
++    case A_CIDR1:
++    case A_CIDR2:
++    case A_CIDR3:
++        r = tz_mpc_idregs[(offset - A_PIDR4) / 4];
 +        break;
-     case A_SECPPCINTSTAT:
-         r = s->secppcintstat;
-         break;
-@@ -186,7 +189,6 @@ static MemTxResult iotkit_secctl_s_read(void *opaque, hwaddr addr,
-     case A_APBSPPPCEXP3:
-         r = s->apbexp[offset_to_ppc_idx(offset)].sp;
-         break;
--    case A_SECMPCINTSTATUS:
-     case A_SECMSCINTSTAT:
-     case A_SECMSCINTEN:
-     case A_NSMSCEXP:
-@@ -572,6 +574,20 @@ static void iotkit_secctl_reset(DeviceState *dev)
-     foreach_ppc(s, iotkit_secctl_reset_ppc);
- }
- 
-+static void iotkit_secctl_mpc_status(void *opaque, int n, int level)
-+{
-+    IoTKitSecCtl *s = IOTKIT_SECCTL(opaque);
++    case A_INT_CLEAR:
++    case A_INT_SET:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "TZ MPC register read: write-only offset 0x%x\n",
++                      offset);
++        r = 0;
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "TZ MPC register read: bad offset 0x%x\n", offset);
++        r = 0;
++        break;
++    }
 +
-+    s->mpcintstatus = deposit32(s->mpcintstatus, 0, 1, !!level);
++    if (size != 4) {
++        /* None of our registers are read-sensitive (except BLK_LUT,
++         * which can special case the "size not 4" case), so just
++         * pull the right bytes out of the word read result.
++         */
++        r = extract32(r, (addr & 3) * 8, size * 8);
++    }
++
++read_out:
++    trace_tz_mpc_reg_read(addr, r, size);
++    *pdata = r;
++    return MEMTX_OK;
 +}
 +
-+static void iotkit_secctl_mpcexp_status(void *opaque, int n, int level)
++static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
++                                    uint64_t value,
++                                    unsigned size, MemTxAttrs attrs)
 +{
-+    IoTKitSecCtl *s = IOTKIT_SECCTL(opaque);
++    uint32_t offset = addr & ~0x3;
 +
-+    s->mpcintstatus = deposit32(s->mpcintstatus, n + 16, 1, !!level);
++    trace_tz_mpc_reg_write(addr, value, size);
++
++    if (!attrs.secure && offset < A_PIDR4) {
++        /* NS accesses can only see the ID registers */
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "TZ MPC register write: NS access to offset 0x%x\n",
++                      offset);
++        return MEMTX_OK;
++    }
++
++    if (size != 4) {
++        /* Expand the byte or halfword write to a full word size.
++         * In most cases we can do this with zeroes; the exceptions
++         * are CTRL, BLK_IDX and BLK_LUT.
++         */
++        uint32_t oldval;
++
++        switch (offset) {
++            /* As we add support for registers which need expansions
++             * other than zeroes we'll fill in cases here.
++             */
++        default:
++            oldval = 0;
++            break;
++        }
++        value = deposit32(oldval, (addr & 3) * 8, size * 8, value);
++    }
++
++    switch (offset) {
++    case A_PIDR4:
++    case A_PIDR5:
++    case A_PIDR6:
++    case A_PIDR7:
++    case A_PIDR0:
++    case A_PIDR1:
++    case A_PIDR2:
++    case A_PIDR3:
++    case A_CIDR0:
++    case A_CIDR1:
++    case A_CIDR2:
++    case A_CIDR3:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "TZ MPC register write: read-only offset 0x%x\n", offset);
++        break;
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "TZ MPC register write: bad offset 0x%x\n", offset);
++        break;
++    }
++
++    return MEMTX_OK;
 +}
 +
- static void iotkit_secctl_ppc_irqstatus(void *opaque, int n, int level)
- {
-     IoTKitSecCtlPPC *ppc = opaque;
-@@ -640,6 +656,10 @@ static void iotkit_secctl_init(Object *obj)
-     qdev_init_gpio_out_named(dev, &s->sec_resp_cfg, "sec_resp_cfg", 1);
-     qdev_init_gpio_out_named(dev, &s->nsc_cfg_irq, "nsc_cfg", 1);
- 
-+    qdev_init_gpio_in_named(dev, iotkit_secctl_mpc_status, "mpc_status", 1);
-+    qdev_init_gpio_in_named(dev, iotkit_secctl_mpcexp_status,
-+                            "mpcexp_status", IOTS_NUM_EXP_MPC);
++static const MemoryRegionOps tz_mpc_reg_ops = {
++    .read_with_attrs = tz_mpc_reg_read,
++    .write_with_attrs = tz_mpc_reg_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 4,
++    .impl.min_access_size = 1,
++    .impl.max_access_size = 4,
++};
 +
-     memory_region_init_io(&s->s_regs, obj, &iotkit_secctl_s_ops,
-                           s, "iotkit-secctl-s-regs", 0x1000);
-     memory_region_init_io(&s->ns_regs, obj, &iotkit_secctl_ns_ops,
-@@ -660,6 +680,16 @@ static const VMStateDescription iotkit_secctl_ppc_vmstate = {
-     }
- };
- 
-+static const VMStateDescription iotkit_secctl_mpcintstatus_vmstate = {
-+    .name = "iotkit-secctl-mpcintstatus",
++/* Accesses only reach these read and write functions if the MPC is
++ * blocking them; non-blocked accesses go directly to the downstream
++ * memory region without passing through this code.
++ */
++static MemTxResult tz_mpc_mem_blocked_read(void *opaque, hwaddr addr,
++                                           uint64_t *pdata,
++                                           unsigned size, MemTxAttrs attrs)
++{
++    trace_tz_mpc_mem_blocked_read(addr, size, attrs.secure);
++
++    *pdata = 0;
++    return MEMTX_OK;
++}
++
++static MemTxResult tz_mpc_mem_blocked_write(void *opaque, hwaddr addr,
++                                            uint64_t value,
++                                            unsigned size, MemTxAttrs attrs)
++{
++    trace_tz_mpc_mem_blocked_write(addr, value, size, attrs.secure);
++
++    return MEMTX_OK;
++}
++
++static const MemoryRegionOps tz_mpc_mem_blocked_ops = {
++    .read_with_attrs = tz_mpc_mem_blocked_read,
++    .write_with_attrs = tz_mpc_mem_blocked_write,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid.min_access_size = 1,
++    .valid.max_access_size = 8,
++    .impl.min_access_size = 1,
++    .impl.max_access_size = 8,
++};
++
++static IOMMUTLBEntry tz_mpc_translate(IOMMUMemoryRegion *iommu,
++                                      hwaddr addr, IOMMUAccessFlags flags,
++                                      int iommu_idx)
++{
++    TZMPC *s = TZ_MPC(container_of(iommu, TZMPC, upstream));
++    bool ok;
++
++    IOMMUTLBEntry ret = {
++        .iova = addr & ~(s->blocksize - 1),
++        .translated_addr = addr & ~(s->blocksize - 1),
++        .addr_mask = s->blocksize - 1,
++        .perm = IOMMU_RW,
++    };
++
++    /* Look at the per-block configuration for this address, and
++     * return a TLB entry directing the transaction at either
++     * downstream_as or blocked_io_as, as appropriate.
++     * For the moment, always permit accesses.
++     */
++    ok = true;
++
++    trace_tz_mpc_translate(addr, flags,
++                           iommu_idx == IOMMU_IDX_S ? "S" : "NS",
++                           ok ? "pass" : "block");
++
++    ret.target_as = ok ? &s->downstream_as : &s->blocked_io_as;
++    return ret;
++}
++
++static int tz_mpc_attrs_to_index(IOMMUMemoryRegion *iommu, MemTxAttrs attrs)
++{
++    /* We treat unspecified attributes like secure. Transactions with
++     * unspecified attributes come from places like
++     * cpu_physical_memory_write_rom() for initial image load, and we want
++     * those to pass through the from-reset "everything is secure" config.
++     * All the real during-emulation transactions from the CPU will
++     * specify attributes.
++     */
++    return (attrs.unspecified || attrs.secure) ? IOMMU_IDX_S : IOMMU_IDX_NS;
++}
++
++static int tz_mpc_num_indexes(IOMMUMemoryRegion *iommu)
++{
++    return IOMMU_NUM_INDEXES;
++}
++
++static void tz_mpc_reset(DeviceState *dev)
++{
++}
++
++static void tz_mpc_init(Object *obj)
++{
++    DeviceState *dev = DEVICE(obj);
++    TZMPC *s = TZ_MPC(obj);
++
++    qdev_init_gpio_out_named(dev, &s->irq, "irq", 1);
++}
++
++static void tz_mpc_realize(DeviceState *dev, Error **errp)
++{
++    Object *obj = OBJECT(dev);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
++    TZMPC *s = TZ_MPC(dev);
++    uint64_t size;
++
++    /* We can't create the upstream end of the port until realize,
++     * as we don't know the size of the MR used as the downstream until then.
++     * We insist on having a downstream, to avoid complicating the code
++     * with handling the "don't know how big this is" case. It's easy
++     * enough for the user to create an unimplemented_device as downstream
++     * if they have nothing else to plug into this.
++     */
++    if (!s->downstream) {
++        error_setg(errp, "MPC 'downstream' link not set");
++        return;
++    }
++
++    size = memory_region_size(s->downstream);
++
++    memory_region_init_iommu(&s->upstream, sizeof(s->upstream),
++                             TYPE_TZ_MPC_IOMMU_MEMORY_REGION,
++                             obj, "tz-mpc-upstream", size);
++
++    /* In real hardware the block size is configurable. In QEMU we could
++     * make it configurable but will need it to be at least as big as the
++     * target page size so we can execute out of the resulting MRs. Guest
++     * software is supposed to check the block size using the BLK_CFG
++     * register, so make it fixed at the page size.
++     */
++    s->blocksize = memory_region_iommu_get_min_page_size(&s->upstream);
++    if (size % s->blocksize != 0) {
++        error_setg(errp,
++                   "MPC 'downstream' size %" PRId64
++                   " is not a multiple of %" HWADDR_PRIx " bytes",
++                   size, s->blocksize);
++        object_unref(OBJECT(&s->upstream));
++        return;
++    }
++
++    /* BLK_MAX is the max value of BLK_IDX, which indexes an array of 32-bit
++     * words, each bit of which indicates one block.
++     */
++    s->blk_max = DIV_ROUND_UP(size / s->blocksize, 32);
++
++    memory_region_init_io(&s->regmr, obj, &tz_mpc_reg_ops,
++                          s, "tz-mpc-regs", 0x1000);
++    sysbus_init_mmio(sbd, &s->regmr);
++
++    sysbus_init_mmio(sbd, MEMORY_REGION(&s->upstream));
++
++    /* This memory region is not exposed to users of this device as a
++     * sysbus MMIO region, but is instead used internally as something
++     * that our IOMMU translate function might direct accesses to.
++     */
++    memory_region_init_io(&s->blocked_io, obj, &tz_mpc_mem_blocked_ops,
++                          s, "tz-mpc-blocked-io", size);
++
++    address_space_init(&s->downstream_as, s->downstream,
++                       "tz-mpc-downstream");
++    address_space_init(&s->blocked_io_as, &s->blocked_io,
++                       "tz-mpc-blocked-io");
++}
++
++static const VMStateDescription tz_mpc_vmstate = {
++    .name = "tz-mpc",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(mpcintstatus, IoTKitSecCtl),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
- static const VMStateDescription iotkit_secctl_vmstate = {
-     .name = "iotkit-secctl",
-     .version_id = 1,
-@@ -677,7 +707,11 @@ static const VMStateDescription iotkit_secctl_vmstate = {
-         VMSTATE_STRUCT_ARRAY(ahbexp, IoTKitSecCtl, IOTS_NUM_AHB_EXP_PPC, 1,
-                              iotkit_secctl_ppc_vmstate, IoTKitSecCtlPPC),
-         VMSTATE_END_OF_LIST()
--    }
-+    },
-+    .subsections = (const VMStateDescription*[]) {
-+        &iotkit_secctl_mpcintstatus_vmstate,
-+        NULL
-+    },
- };
++static Property tz_mpc_properties[] = {
++    DEFINE_PROP_LINK("downstream", TZMPC, downstream,
++                     TYPE_MEMORY_REGION, MemoryRegion *),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void tz_mpc_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = tz_mpc_realize;
++    dc->vmsd = &tz_mpc_vmstate;
++    dc->reset = tz_mpc_reset;
++    dc->props = tz_mpc_properties;
++}
++
++static const TypeInfo tz_mpc_info = {
++    .name = TYPE_TZ_MPC,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(TZMPC),
++    .instance_init = tz_mpc_init,
++    .class_init = tz_mpc_class_init,
++};
++
++static void tz_mpc_iommu_memory_region_class_init(ObjectClass *klass,
++                                                  void *data)
++{
++    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
++
++    imrc->translate = tz_mpc_translate;
++    imrc->attrs_to_index = tz_mpc_attrs_to_index;
++    imrc->num_indexes = tz_mpc_num_indexes;
++}
++
++static const TypeInfo tz_mpc_iommu_memory_region_info = {
++    .name = TYPE_TZ_MPC_IOMMU_MEMORY_REGION,
++    .parent = TYPE_IOMMU_MEMORY_REGION,
++    .class_init = tz_mpc_iommu_memory_region_class_init,
++};
++
++static void tz_mpc_register_types(void)
++{
++    type_register_static(&tz_mpc_info);
++    type_register_static(&tz_mpc_iommu_memory_region_info);
++}
++
++type_init(tz_mpc_register_types);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f222bf8b167..b8b4e60c069 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -457,6 +457,8 @@ F: hw/char/cmsdk-apb-uart.c
+ F: include/hw/char/cmsdk-apb-uart.h
+ F: hw/misc/tz-ppc.c
+ F: include/hw/misc/tz-ppc.h
++F: hw/misc/tz-mpc.c
++F: include/hw/misc/tz-mpc.h
  
- static void iotkit_secctl_class_init(ObjectClass *klass, void *data)
+ ARM cores
+ M: Peter Maydell <peter.maydell@linaro.org>
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index 7cf73d2f273..834d45cfaf9 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -108,6 +108,7 @@ CONFIG_CMSDK_APB_UART=y
+ CONFIG_MPS2_FPGAIO=y
+ CONFIG_MPS2_SCC=y
+ 
++CONFIG_TZ_MPC=y
+ CONFIG_TZ_PPC=y
+ CONFIG_IOTKIT=y
+ CONFIG_IOTKIT_SECCTL=y
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index ec5a9f0da13..72bf9d57000 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -84,6 +84,13 @@ mos6522_set_sr_int(void) "set sr_int"
+ mos6522_write(uint64_t addr, uint64_t val) "reg=0x%"PRIx64 " val=0x%"PRIx64
+ mos6522_read(uint64_t addr, unsigned val) "reg=0x%"PRIx64 " val=0x%x"
+ 
++# hw/misc/tz-mpc.c
++tz_mpc_reg_read(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs read: offset 0x%x data 0x%" PRIx64 " size %u"
++tz_mpc_reg_write(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs write: offset 0x%x data 0x%" PRIx64 " size %u"
++tz_mpc_mem_blocked_read(uint64_t addr, unsigned size, bool secure) "TZ MPC blocked read: offset 0x%" PRIx64 " size %u secure %d"
++tz_mpc_mem_blocked_write(uint64_t addr, uint64_t data, unsigned size, bool secure) "TZ MPC blocked write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u secure %d"
++tz_mpc_translate(uint64_t addr, int flags, const char *idx, const char *res) "TZ MPC translate: addr 0x%" PRIx64 " flags 0x%x iommu_idx %s: %s"
++
+ # hw/misc/tz-ppc.c
+ tz_ppc_reset(void) "TZ PPC: reset"
+ tz_ppc_cfg_nonsec(int n, int level) "TZ PPC: cfg_nonsec[%d] = %d"
 -- 
 2.17.1
