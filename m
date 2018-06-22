@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fWJA9-0000Oi-Te
+	(envelope-from <eric.auger@redhat.com>) id 1fWJA9-0000Ok-U0
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fWJA6-0005dJ-OA
+	(envelope-from <eric.auger@redhat.com>) id 1fWJA6-0005dO-O5
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:19:29 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Fri, 22 Jun 2018 12:19:09 +0200
-Message-Id: <1529662749-32069-6-git-send-email-eric.auger@redhat.com>
+Date: Fri, 22 Jun 2018 12:19:07 +0200
+Message-Id: <1529662749-32069-4-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1529662749-32069-1-git-send-email-eric.auger@redhat.com>
 References: <1529662749-32069-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC 5/5] hw/arm/virt-acpi-build: Add PC-DIMM in SRAT
+Subject: [Qemu-devel] [RFC 3/5] hw/arm/boot: introduce fdt_add_memory_node
+ helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,72 +24,128 @@ To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu
 
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-Generate Memory Affinity Structures for PC-DIMM ranges.
+We introduce an helper to create a memory node. Also we nop
+existing /memory node in numa and non numa case.
 
-Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/virt-acpi-build.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 74f5744..38a6886 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -43,6 +43,7 @@
- #include "hw/pci/pcie_host.h"
- #include "hw/pci/pci.h"
- #include "hw/arm/virt.h"
-+#include "hw/mem/memory-device.h"
- #include "sysemu/numa.h"
- #include "kvm_arm.h"
- 
-@@ -532,6 +533,35 @@ build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-                  "SPCR", table_data->len - spcr_start, 2, NULL, NULL);
+---
+
+the nop related change should disappear if the following series
+lands upstream:
+[PATCH v2 0/3] ARM virt: Silence dtc warnings
+---
+ hw/arm/boot.c | 70 +++++++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 39 insertions(+), 31 deletions(-)
+
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index 1e48166..cc425ce 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -413,6 +413,36 @@ static void set_kernel_args_old(const struct arm_boot_info *info,
+     }
  }
  
-+static void build_srat_hotpluggable_memory(GArray *table_data, uint64_t base,
-+                                          uint64_t len, int default_node)
++static int fdt_add_memory_node(void *fdt, uint32_t acells, hwaddr mem_base,
++                               uint32_t scells, hwaddr mem_len,
++                               int numa_node_id)
 +{
-+    MemoryDeviceInfoList *info_list = qmp_memory_device_list();
-+    AcpiSratMemoryAffinity *numamem;
-+    MemoryDeviceInfoList *info;
-+    MemoryDeviceInfo *mi;
-+    PCDIMMDeviceInfo *di;
-+    uint64_t end = base + len, cur, size;
++    char *nodename = NULL;
++    int ret;
 +
-+    for (cur = base, info = info_list; cur < end;
-+         cur += size, info = info->next) {
-+        bool is_nvdimm;
-+
-+        if (!info) {
-+            break;
-+        }
-+        numamem = acpi_data_push(table_data, sizeof(*numamem));
-+
-+        mi = info->value;
-+        is_nvdimm = (mi->type == MEMORY_DEVICE_INFO_KIND_NVDIMM);
-+        di = !is_nvdimm ? mi->u.dimm.data : mi->u.nvdimm.data;
-+
-+        build_srat_memory(numamem, di->addr, di->size,
-+                          0, MEM_AFFINITY_ENABLED);
-+        size = di->size;
++    nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
++    qemu_fdt_add_subnode(fdt, nodename);
++    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
++    ret = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells, mem_base,
++                                       scells, mem_len);
++    if (ret < 0) {
++        fprintf(stderr, "couldn't set %s/reg\n", nodename);
++        goto out;
 +    }
++    if (numa_node_id < 0) {
++        goto out;
++    }
++
++    ret = qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", numa_node_id);
++    if (ret < 0) {
++        fprintf(stderr, "couldn't set %s/numa-node-id\n", nodename);
++    }
++
++out:
++    g_free(nodename);
++    return ret;
 +}
 +
- static void
- build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+ static void fdt_add_psci_node(void *fdt)
  {
-@@ -564,6 +594,10 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-         mem_base += numa_info[i].node_mem;
-     }
+     uint32_t cpu_suspend_fn;
+@@ -492,7 +522,6 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+     void *fdt = NULL;
+     int size, rc;
+     uint32_t acells, scells;
+-    char *nodename;
+     unsigned int i;
+     hwaddr mem_base, mem_len;
  
-+    build_srat_hotpluggable_memory(table_data,
-+                                   vms->bootinfo.device_memory_start,
-+                                   vms->bootinfo.device_memory_size , 0);
-+
-     build_header(linker, table_data, (void *)(table_data->data + srat_start),
-                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
- }
+@@ -545,49 +574,28 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
+                 "RAM size > 4GB\n");
+         goto fail;
+     }
++    /*
++     * Turn the /memory node created before into a NOP node, then create
++     * /memory@addr nodes.
++     */
++    qemu_fdt_nop_node(fdt, "/memory");
+ 
+     if (nb_numa_nodes > 0) {
+-        /*
+-         * Turn the /memory node created before into a NOP node, then create
+-         * /memory@addr nodes for all numa nodes respectively.
+-         */
+-        qemu_fdt_nop_node(fdt, "/memory");
+         mem_base = binfo->loader_start;
+         for (i = 0; i < nb_numa_nodes; i++) {
+             mem_len = numa_info[i].node_mem;
+-            nodename = g_strdup_printf("/memory@%" PRIx64, mem_base);
+-            qemu_fdt_add_subnode(fdt, nodename);
+-            qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+-            rc = qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+-                                              acells, mem_base,
+-                                              scells, mem_len);
++            rc = fdt_add_memory_node(fdt, acells, mem_base,
++                                     scells, mem_len, i);
+             if (rc < 0) {
+-                fprintf(stderr, "couldn't set %s/reg for node %d\n", nodename,
+-                        i);
+                 goto fail;
+             }
+ 
+-            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
+             mem_base += mem_len;
+-            g_free(nodename);
+         }
+     } else {
+-        Error *err = NULL;
+-
+-        rc = fdt_path_offset(fdt, "/memory");
++        rc = fdt_add_memory_node(fdt, acells, binfo->loader_start,
++                                 scells, binfo->ram_size, -1);
+         if (rc < 0) {
+-            qemu_fdt_add_subnode(fdt, "/memory");
+-        }
+-
+-        if (!qemu_fdt_getprop(fdt, "/memory", "device_type", NULL, &err)) {
+-            qemu_fdt_setprop_string(fdt, "/memory", "device_type", "memory");
+-        }
+-
+-        rc = qemu_fdt_setprop_sized_cells(fdt, "/memory", "reg",
+-                                          acells, binfo->loader_start,
+-                                          scells, binfo->ram_size);
+-        if (rc < 0) {
+-            fprintf(stderr, "couldn't set /memory/reg\n");
+             goto fail;
+         }
+     }
 -- 
 2.5.5
