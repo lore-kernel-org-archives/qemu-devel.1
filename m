@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWF3N-0003Qw-D6
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 01:56:14 -0400
+	(envelope-from <bounces@canonical.com>) id 1fWF8J-00052L-V5
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 02:01:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWF3J-0005UC-H0
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 01:56:13 -0400
-Date: Fri, 22 Jun 2018 15:03:34 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180622050334.GG612@umbus.fritz.box>
-References: <1529642871-14214-1-git-send-email-linux@roeck-us.net>
+	(envelope-from <bounces@canonical.com>) id 1fWF8G-0007cv-1g
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 02:01:20 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37020)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fWF8F-0007cp-R1
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 02:01:15 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fWF8E-0003VN-68
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 06:01:14 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2D21E2E80CC
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 06:01:14 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9Iq5ULCa7nGtWwZS"
-Content-Disposition: inline
-In-Reply-To: <1529642871-14214-1-git-send-email-linux@roeck-us.net>
-Subject: Re: [Qemu-devel] [PATCH] ppc: Fix sam460ex devicetree when booting
- the Linux kernel
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 22 Jun 2018 05:50:50 -0000
+From: Thomas Huth <1767176@bugs.launchpad.net>
+Reply-To: Bug 1767176 <1767176@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152476695027.6122.1941123400059547378.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152964665117.26305.2564685373468531448.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1767176] Re: GTK build fails with qemu 2.12.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +36,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
---9Iq5ULCa7nGtWwZS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+-- =
 
-Balaton, can you review this please.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1767176
 
-On Thu, Jun 21, 2018 at 09:47:51PM -0700, Guenter Roeck wrote:
-> sam4660ex (or at least this emulation) does not support the "ibm,cpm" pow=
-er
-> management. As a result, Linux crashes when trying to access it. Remove
-> its devicetree node. Also, if/when we boot the Linux kernel directly,
-> u-boot will not fix up serial frequencies in the devicetree file, and
-> serial port initialization will fail. Add plausible frequency values to t=
-he
-> first serial port to be able to use it. Disable the second serial port
-> since it is not available on the board.  Also set valid values for the
-> other clock nodes otherwise set by u-boot.
->=20
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> ---
->  hw/ppc/sam460ex.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
->=20
-> diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-> index bdc53d2..045a255 100644
-> --- a/hw/ppc/sam460ex.c
-> +++ b/hw/ppc/sam460ex.c
-> @@ -308,6 +308,24 @@ static int sam460ex_load_device_tree(hwaddr addr,
->      qemu_fdt_setprop_cell(fdt, "/cpus/cpu@0", "timebase-frequency",
->                                tb_freq);
-> =20
-> +    /* Remove cpm node (not emulated) */
-> +    qemu_fdt_nop_node(fdt, "/cpm");
-> +    /* set serial port clock and speed */
-> +    qemu_fdt_setprop_cell(fdt, "/plb/opb/serial@ef600300", "clock-freque=
-ncy",
-> +                              50000000);
-> +    qemu_fdt_setprop_cell(fdt, "/plb/opb/serial@ef600300", "current-spee=
-d",
-> +                              38400);
-> +    /* disable second serial port */
-> +    qemu_fdt_setprop_string(fdt, "/plb/opb/serial@ef600400", "status",
-> +                              "disabled");
-> +    /* some more clocks */
-> +    qemu_fdt_setprop_cell(fdt, "/plb", "clock-frequency",
-> +                              50000000);
-> +    qemu_fdt_setprop_cell(fdt, "/plb/opb", "clock-frequency",
-> +                              50000000);
-> +    qemu_fdt_setprop_cell(fdt, "/plb/opb/ebc", "clock-frequency",
-> +                              50000000);
-> +
->      rom_add_blob_fixed(BINARY_DEVICE_TREE_FILE, fdt, fdt_size, addr);
->      g_free(fdt);
->      ret =3D fdt_size;
+Title:
+  GTK build fails with qemu 2.12.0
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Status in QEMU:
+  Fix Committed
 
---9Iq5ULCa7nGtWwZS
-Content-Type: application/pgp-signature; name="signature.asc"
+Bug description:
+  With the 2.12.0 release of QEMU passing `--enable-gtk` to configure
+  causes the build to fail. I'm running macOS 10.13.5 with Xcode 9.3
+  FWIW.
 
------BEGIN PGP SIGNATURE-----
+  I'm building against GTK 2.24.32, which I appreciate is no longer the
+  preferred version here, but I don't think the error is related to that
+  aspect. I'll try and find the time later to attempt a GTK3 build to
+  check that though.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlssgyMACgkQbDjKyiDZ
-s5LFog/7Bw0OJwAWRjjh0X99HbXGSOpGYHLTKuWvnTVbhZ/VkQNIDpHoiQFHzwvz
-ZyFLpEiXjnEyfcD7Rt7sZX1zrQkFDOyfKUnBFANsUp4zQZtYUvtbvoefsEKQ9cuj
-zbInyyaZfEcSKMMeCSaZe6CdykCMrYAXErRGx/SDybnjGu9usojuE5KDPNFZnw4g
-TqxALnupCM2ikjICDUKe+D7RI7h+1gFBqgpRLgEWnSmZSF9uOcwXCHaIi3Y694V/
-H3uMgWY3hnada5vwYfwC1qtVHI1sfdtKjs+9RJnih3UxWF7Jdf7QFKTqRs2ANFxU
-TkNrgi/6/TE2NHlfeGY5Cvo1w6GQLyk117s55zrDkxbPgJrifzAdItlNJcfnw2/m
-lKUFl13HO8Ea0DBLSyrOXx9IjTMwvUtov+XBJGf8p20eOf/mozX9/JTA9je/J/xe
-EJ05ebrEUMMpw2oEVDWfEqxopnXM1BjGhszzdVga74qaozdvX2tHa1GLmzL15ies
-JGtMgtsu16NqkEsVrA22Vp4nFUGine5hHfzh+jUnD24ySeYBZOliFhsNJ9Lj8509
-5pTxWrFt2qHARv4o8EG256xZkAoFt7QOCLM6dX+sas6LmjM/qb4xcPPu3X2haD05
-6cUh7LE3nJCxXAJQJKEpZbDNEHfRCsU7jWoEFGk2K0aSExWvKW8=
-=zWWa
------END PGP SIGNATURE-----
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  ui/gtk.c:1147:16: error: use of undeclared identifier 'qemu_input_map_osx=
+_to_qcode'; did you mean 'qemu_input_map_usb_to_qcode'?
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return qemu_input_map_osx=
+_to_qcode;
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0^~~~~~~~~~~~~~~~~~~~~~~~~~~
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0qemu_input_map_usb_to_qcode
+  /private/tmp/qemu-20180426-60786-1av6pq8/qemu-2.12.0/include/ui/input.h:9=
+9:22: note: 'qemu_input_map_usb_to_qcode' declared here
+  extern const guint16 qemu_input_map_usb_to_qcode[];
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0^
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
---9Iq5ULCa7nGtWwZS--
+  I tried poking around locally by applying the following diff, based
+  off of a very brief glance over the code involved, but that simply
+  causes the build to error out in a different way at a later point, so
+  I assume I'm doing something stupid.
+
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  diff --git a/Makefile b/Makefile
+  index d71dd5b..e857c3c 100644
+  --- a/Makefile
+  +++ b/Makefile
+  @@ -313,6 +313,7 @@ KEYCODEMAP_FILES =3D \
+  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-qnum-to-qcode.c \
+  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-usb-to-qcode.c \
+  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-win32-to-qcode.c \
+  +     ui/input-keymap-osx-to-qcode.c \
+  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-x11-to-qcode.c \
+  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-xorgevdev-to-qcode.c \
+  =C2=A0=C2=A0=C2=A0=C2=A0ui/input-keymap-xorgkbd-to-qcode.c \
+  diff --git a/include/ui/input.h b/include/ui/input.h
+  index 16395ab..8183840 100644
+  --- a/include/ui/input.h
+  +++ b/include/ui/input.h
+  @@ -101,6 +101,9 @@ extern const guint16 qemu_input_map_usb_to_qcode[];
+  =C2=A0extern const guint qemu_input_map_win32_to_qcode_len;
+  =C2=A0extern const guint16 qemu_input_map_win32_to_qcode[];
+
+  +extern const guint qemu_input_map_osx_to_qcode_len;
+  +extern const guint16 qemu_input_map_osx_to_qcode[];
+  +
+  =C2=A0extern const guint qemu_input_map_x11_to_qcode_len;
+  =C2=A0extern const guint16 qemu_input_map_x11_to_qcode[];
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1767176/+subscriptions
