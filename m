@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59878)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59982)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWMJP-0006H3-Ul
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:41:16 -0400
+	id 1fWMJV-0006Mf-4w
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:41:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWMJM-0003Z7-0H
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:41:16 -0400
+	id 1fWMJU-0003j2-Cu
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 09:41:21 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 22 Jun 2018 10:40:32 -0300
-Message-Id: <20180622134036.23182-11-f4bug@amsat.org>
+Date: Fri, 22 Jun 2018 10:40:35 -0300
+Message-Id: <20180622134036.23182-14-f4bug@amsat.org>
 In-Reply-To: <20180622134036.23182-1-f4bug@amsat.org>
 References: <20180622134036.23182-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 10/14] hw/arm/stellaris: Use
+Subject: [Qemu-devel] [PATCH v2 13/14] hw/net/smc91c111: Use
  qemu_log_mask(UNIMP) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,26 +28,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org, Jason Wang <jasowang@redhat.com>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/arm/stellaris.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/net/smc91c111.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-index a8f1f6a912..d06e366402 100644
---- a/hw/arm/stellaris.c
-+++ b/hw/arm/stellaris.c
-@@ -560,7 +560,7 @@ static void ssys_write(void *opaque, hwaddr offset,
-     case 0x040: /* SRCR0 */
-     case 0x044: /* SRCR1 */
-     case 0x048: /* SRCR2 */
--        fprintf(stderr, "Peripheral reset not implemented\n");
-+        qemu_log_mask(LOG_UNIMP, "Peripheral reset not implemented\n");
-         break;
-     case 0x054: /* IMC */
-         s->int_mask = value & 0x7f;
+diff --git a/hw/net/smc91c111.c b/hw/net/smc91c111.c
+index 9094c0b47c..d2fd2040e8 100644
+--- a/hw/net/smc91c111.c
++++ b/hw/net/smc91c111.c
+@@ -362,10 +362,14 @@ static void smc91c111_writeb(void *opaque, hwaddr offset,
+             SET_HIGH(gpr, value);
+             return;
+         case 12: /* Control */
+-            if (value & 1)
+-                fprintf(stderr, "smc91c111:EEPROM store not implemented\n");
+-            if (value & 2)
+-                fprintf(stderr, "smc91c111:EEPROM reload not implemented\n");
++            if (value & 1) {
++                qemu_log_mask(LOG_UNIMP,
++                              "smc91c111: EEPROM store not implemented\n");
++            }
++            if (value & 2) {
++                qemu_log_mask(LOG_UNIMP,
++                              "smc91c111: EEPROM reload not implemented\n");
++            }
+             value &= ~3;
+             SET_LOW(ctr, value);
+             return;
 -- 
 2.18.0.rc2
