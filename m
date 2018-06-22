@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44508)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fWN6U-0005hO-Lh
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:31:59 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fWN7R-0006Ui-OT
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:33:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fWN6T-00071q-HF
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:31:58 -0400
-Date: Fri, 22 Jun 2018 15:31:46 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180622143146.GQ23296@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-26-kwolf@redhat.com>
-	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
-	<20180622125502.GF4366@localhost.localdomain>
-	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
-	<20180622142513.GH4366@localhost.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1fWN7Q-0007M2-S8
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:32:57 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:34200)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fWN7Q-0007Lq-NI
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 10:32:56 -0400
+Received: by mail-ot0-x242.google.com with SMTP id r18-v6so7735865otk.1
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 07:32:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180622142513.GH4366@localhost.localdomain>
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+In-Reply-To: <20180622134610.23713-1-f4bug@amsat.org>
+References: <20180622134610.23713-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 15:32:35 +0100
+Message-ID: <CAFEAcA84t5uSTWqVoVS6dVh8YXL6SLHAv4DPAqvXUNtDb4jP3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] exec: Move hw_error() to the CPU
+ namespace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org, pkrempa@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, Jun 22, 2018 at 04:25:13PM +0200, Kevin Wolf wrote:
-> Am 22.06.2018 um 15:36 hat Christian Borntraeger geschrieben:
-> > 
-> > 
-> > On 06/22/2018 02:55 PM, Kevin Wolf wrote:
-> > > Am 22.06.2018 um 13:38 hat Christian Borntraeger geschrieben:
-> > >>
-> > >> On 06/15/2018 04:21 PM, Kevin Wolf wrote:
-> > >>> The -drive option serial was deprecated in QEMU 2.10. It's time to
-> > >>> remove it.
-> > >>>
-> > >>> Tests need to be updated to set the serial number with -global instead
-> > >>> of using the -drive option.
-> > >>
-> > >> libvirt 4.5 still creates those (at least on s390x)
-> > >>
-> > >>     <disk type='file' device='disk'>
-> > >>       <driver name='qemu' type='qcow2' cache='none' io='native' iothread='1'/>
-> > >>       <source file='/var/lib/libvirt/qemu/image.zhyp137'/>
-> > >>       <target dev='hda' bus='virtio'/>
-> > >>       <serial>skel</serial>
-> > >>       <boot order='1'/>
-> > >>       <address type='ccw' cssid='0xfe' ssid='0x0' devno='0x0000'/>
-> > >>     </disk>
-> > >>
-> > >>
-> > >> -> 
-> > >> [...]
-> > >> -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native -device virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0000,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on 
-> > >> [...]
-> > >>
-> > >> 2018-06-22T11:25:20.946024Z qemu-system-s390x: -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native: Block format 'qcow2' does not support the option 'serial'
-> > >> 2018-06-22 11:25:21.098+0000: shutting down, reason=failed
-> > >>
-> > >> So it seems that this breaks s390x.
-> > 
-> > To me it seems that this is also broken on x86.
-> > > 
-> > > Thanks for bringing this up. libvirt should fix this before QEMU 3.0 is
-> > > released.
-> > 
-> > I think this is definitely too short notice. We should not break existing
-> > setups just by insisting that users have to update libvirt when they update
-> > QEMU. Yes, this might be our policy, but doing so "just because we can"
-> > is certainly a very bad attitude. I see no fundamental technical reason why
-> > we should not revert this change.
-> 
-> This was in fact one release longer than our deprecation policy says.
-> Are we serious about the deprecation policy or aren't we?
-> 
-> I might consider reverting a change if it turned out that this requires
-> some massive work in libvirt. But I think this one should be rather easy
-> to fix in libvirt until 3.0 is released.
+On 22 June 2018 at 14:46, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
+te:
+> hw_error() is only meant for CPU errors (since it dumps the CPU state).
 
-It is probably even possible for us to fix it in our July 1st
-release
+I would disagree. hw_error() dumps the state of every CPU. The
+corresponding function for CPU errors is cpu_abort(), which
+dumps only the state of the relevant CPU. It is used pretty
+much only by device models, not by cpu models.
 
-> 
-> > > Sadly, it also shows that deprecation warnings in log files go
-> > > unnoticed.
-> > 
-> > In fact whoever added the deprication notice should have followed up
-> > with the libvirt team to implement that change. no?
-> 
-> I expect the libvirt developers to read the QEMU Changelog at least for
-> incompatible changes and deprecations. We can't reasonably go and hunt
-> for developers for every management tool for QEMU that exists.
+In any case, this is one of those functions that's a left
+over from a more innocent time when causing QEMU to bomb out
+with a screenful of hexdump was a reasonable response to the
+guest doing something weird or unsupported. In an ideal world
+we'd gradually get rid of the existing callsites...
 
-Yeah, from libvirt side we need todo a better job of checking this and
-filing bugs against libvirt if there's something we tickle.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+thanks
+-- PMM
