@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fWNZS-0003xm-6B
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:01:56 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fWNbC-0004q8-9c
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:03:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fWNZR-0003kY-1d
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:01:54 -0400
-Date: Fri, 22 Jun 2018 17:01:41 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180622150141.GI4366@localhost.localdomain>
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-26-kwolf@redhat.com>
-	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
-	<20180622125502.GF4366@localhost.localdomain>
-	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
-	<20180622142513.GH4366@localhost.localdomain>
-	<930d6481-0da2-f5cd-15bf-1f09a8769c76@de.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fWNbB-0004eX-DR
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:03:42 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:47041)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fWNbA-0004eC-UT
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 11:03:41 -0400
+Received: by mail-ot0-x241.google.com with SMTP id v24-v6so7800375otk.13
+	for <qemu-devel@nongnu.org>; Fri, 22 Jun 2018 08:03:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <930d6481-0da2-f5cd-15bf-1f09a8769c76@de.ibm.com>
-Subject: Re: [Qemu-devel] [PULL 25/26] block: Remove deprecated -drive
- option serial
+In-Reply-To: <20180622103528.28598-1-david@gibson.dropbear.id.au>
+References: <20180622103528.28598-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Jun 2018 16:03:19 +0100
+Message-ID: <CAFEAcA8-jSMy-9R69d7zQoEL593iiR5xitaPh17JwNzo-2U=1g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/25] ppc-for-3.0 queue 2018-06-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Boris Fiuczynski <fiuczy@linux.ibm.com>, libvir-list@redhat.com, eblake@redhat.com, pkrempa@redhat.com, Markus Armbruster <armbru@redhat.com>, Jeff Cody <jcody@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, Alexey Kardashevskiy <aik@ozlabs.ru>, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>
 
-Am 22.06.2018 um 16:38 hat Christian Borntraeger geschrieben:
-> 
-> 
-> On 06/22/2018 04:25 PM, Kevin Wolf wrote:
-> > Am 22.06.2018 um 15:36 hat Christian Borntraeger geschrieben:
-> >>
-> >>
-> >> On 06/22/2018 02:55 PM, Kevin Wolf wrote:
-> >>> Am 22.06.2018 um 13:38 hat Christian Borntraeger geschrieben:
-> >>>>
-> >>>> On 06/15/2018 04:21 PM, Kevin Wolf wrote:
-> >>>>> The -drive option serial was deprecated in QEMU 2.10. It's time to
-> >>>>> remove it.
-> >>>>>
-> >>>>> Tests need to be updated to set the serial number with -global instead
-> >>>>> of using the -drive option.
-> >>>>
-> >>>> libvirt 4.5 still creates those (at least on s390x)
-> >>>>
-> >>>>     <disk type='file' device='disk'>
-> >>>>       <driver name='qemu' type='qcow2' cache='none' io='native' iothread='1'/>
-> >>>>       <source file='/var/lib/libvirt/qemu/image.zhyp137'/>
-> >>>>       <target dev='hda' bus='virtio'/>
-> >>>>       <serial>skel</serial>
-> >>>>       <boot order='1'/>
-> >>>>       <address type='ccw' cssid='0xfe' ssid='0x0' devno='0x0000'/>
-> >>>>     </disk>
-> >>>>
-> >>>>
-> >>>> -> 
-> >>>> [...]
-> >>>> -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native -device virtio-blk-ccw,iothread=iothread1,scsi=off,devno=fe.0.0000,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1,write-cache=on 
-> >>>> [...]
-> >>>>
-> >>>> 2018-06-22T11:25:20.946024Z qemu-system-s390x: -drive file=/var/lib/libvirt/qemu/image.zhyp137,format=qcow2,if=none,id=drive-virtio-disk0,serial=skel,cache=none,aio=native: Block format 'qcow2' does not support the option 'serial'
-> >>>> 2018-06-22 11:25:21.098+0000: shutting down, reason=failed
-> >>>>
-> >>>> So it seems that this breaks s390x.
-> >>
-> >> To me it seems that this is also broken on x86.
-> >>>
-> >>> Thanks for bringing this up. libvirt should fix this before QEMU 3.0 is
-> >>> released.
-> >>
-> >> I think this is definitely too short notice. We should not break existing
-> >> setups just by insisting that users have to update libvirt when they update
-> >> QEMU. Yes, this might be our policy, but doing so "just because we can"
-> >> is certainly a very bad attitude. I see no fundamental technical reason why
-> >> we should not revert this change.
-> > 
-> > This was in fact one release longer than our deprecation policy says.
-> > Are we serious about the deprecation policy or aren't we?
-> 
-> I think it makes more sense to have 2 releases after everything was fixed
-> instead of 2 releases after it was announced.
+On 22 June 2018 at 11:35, David Gibson <david@gibson.dropbear.id.au> wrote:
+> The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a93b:
+>
+>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into staging (2018-06-20 09:51:30 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-3.0-20180622
+>
+> for you to fetch changes up to e5ca28ecab5c69b7578e22391a66c97c3979ffd8:
+>
+>   spapr: Don't rewrite mmu capabilities in KVM mode (2018-06-22 14:19:07 +1000)
+>
+> ----------------------------------------------------------------
+> ppc patch queue 2018-06-22
+>
+> Another assorted patch of patches for ppc and spapr.
+>     * Rework of guest pagesize handling for ppc, which avoids guest
+>       visibly different behaviour between accelerators
+>     * A number of Pnv cleanups, working towards more complete POWER9
+>       support
+>     * Migration of VPA data, a significant bugfix
 
-This means effectively banning feature removal. The only time that
-people actually starting fixing things is when it breaks. So if you
-never remove it before everything is fixed, you just never remove it at
-all.
+Applied, thanks.
 
-It's unfortunate, but breaking things at some point is necessary. I hope
-the breakage will only last a few days because libvirt will fix this.
-
-Maybe one thing we could look into for the future is a special
-deprecation warning function rather than just error_report(), and we
-would make that one fatal in non-release builds so that things break
-early, but you can still override it with a ./configure option.
-
-> So if everyone has adopted we can certainly follow our deprecation policy.
-> Now if deprecation breaks some real world cases it makes no sense to
-> "insist" on that deprecation policy. Really: If latest greatest libvirt
-> does not work 2 weeks before soft freeze I consider this too late.
-> 
-> Why: This breaks MY regression test setup before softfreeze. So I will stop
-> testing qemu in the most critical point in time.
-> 
-> If you would come up with your statement (taking deprecation policy more
-> serious than users) in the Linux kernel I can pretty much guarantee that
-> Linus would call you names.
-
-Users shouldn't use random git snapshots. Developers can revert the
-change locally until libvirt is fixed.
-
-If contrary to all expectations, libvirt doesn't manage to get this
-fixed until 3.0-rc2, I will consider reverting the patch. But not
-significantly earlier than that.
-
-Kevin
+-- PMM
