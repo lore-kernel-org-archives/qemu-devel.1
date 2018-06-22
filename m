@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45519)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJPn-0000aQ-Lo
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJPn-0000aa-S6
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fWJPm-0003Lf-A1
+	(envelope-from <dgibson@ozlabs.org>) id 1fWJPm-0003Lk-B9
 	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 06:35:39 -0400
+Date: Fri, 22 Jun 2018 20:25:12 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 22 Jun 2018 20:35:03 +1000
-Message-Id: <20180622103528.28598-1-david@gibson.dropbear.id.au>
+Message-ID: <20180622102512.GH612@umbus.fritz.box>
+References: <20180622080009.5707-1-mark.cave-ayland@ilande.co.uk>
+	<20180622080009.5707-2-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 00/25] ppc-for-3.0 queue 2018-06-22
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="fmEUq8M7S0s+Fl0V"
+Content-Disposition: inline
+In-Reply-To: <20180622080009.5707-2-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 1/2] mac_dbdma: only dump commands for
+ debug enabled channels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,103 +25,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: agraf@suse.de, aik@ozlabs.ru, groug@kaod.org, clg@kaod.org, lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a9=
-3b:
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into =
-staging (2018-06-20 09:51:30 +0100)
+--fmEUq8M7S0s+Fl0V
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-are available in the Git repository at:
+On Fri, Jun 22, 2018 at 09:00:08AM +0100, Mark Cave-Ayland wrote:
+> This enables us to apply the same filter in DEBUG_DBDMA_CHANMASK to the
+> DBDMA command execution debug output.
+>=20
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-3.0-20180622
+Applied to ppc-for-3.0, thanks.
 
-for you to fetch changes up to e5ca28ecab5c69b7578e22391a66c97c3979ffd8:
+> ---
+>  hw/misc/macio/mac_dbdma.c | 21 +++++++++++----------
+>  1 file changed, 11 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/hw/misc/macio/mac_dbdma.c b/hw/misc/macio/mac_dbdma.c
+> index 1b2a69b3ef..87ae246d37 100644
+> --- a/hw/misc/macio/mac_dbdma.c
+> +++ b/hw/misc/macio/mac_dbdma.c
+> @@ -71,18 +71,19 @@ static DBDMAState *dbdma_from_ch(DBDMA_channel *ch)
+>  }
+> =20
+>  #if DEBUG_DBDMA
+> -static void dump_dbdma_cmd(dbdma_cmd *cmd)
+> +static void dump_dbdma_cmd(DBDMA_channel *ch, dbdma_cmd *cmd)
+>  {
+> -    printf("dbdma_cmd %p\n", cmd);
+> -    printf("    req_count 0x%04x\n", le16_to_cpu(cmd->req_count));
+> -    printf("    command 0x%04x\n", le16_to_cpu(cmd->command));
+> -    printf("    phy_addr 0x%08x\n", le32_to_cpu(cmd->phy_addr));
+> -    printf("    cmd_dep 0x%08x\n", le32_to_cpu(cmd->cmd_dep));
+> -    printf("    res_count 0x%04x\n", le16_to_cpu(cmd->res_count));
+> -    printf("    xfer_status 0x%04x\n", le16_to_cpu(cmd->xfer_status));
+> +    DBDMA_DPRINTFCH(ch, "dbdma_cmd %p\n", cmd);
+> +    DBDMA_DPRINTFCH(ch, "    req_count 0x%04x\n", le16_to_cpu(cmd->req_c=
+ount));
+> +    DBDMA_DPRINTFCH(ch, "    command 0x%04x\n", le16_to_cpu(cmd->command=
+));
+> +    DBDMA_DPRINTFCH(ch, "    phy_addr 0x%08x\n", le32_to_cpu(cmd->phy_ad=
+dr));
+> +    DBDMA_DPRINTFCH(ch, "    cmd_dep 0x%08x\n", le32_to_cpu(cmd->cmd_dep=
+));
+> +    DBDMA_DPRINTFCH(ch, "    res_count 0x%04x\n", le16_to_cpu(cmd->res_c=
+ount));
+> +    DBDMA_DPRINTFCH(ch, "    xfer_status 0x%04x\n",
+> +                    le16_to_cpu(cmd->xfer_status));
+>  }
+>  #else
+> -static void dump_dbdma_cmd(dbdma_cmd *cmd)
+> +static void dump_dbdma_cmd(DBDMA_channel *ch, dbdma_cmd *cmd)
+>  {
+>  }
+>  #endif
+> @@ -448,7 +449,7 @@ static void channel_run(DBDMA_channel *ch)
+>      uint32_t phy_addr;
+> =20
+>      DBDMA_DPRINTFCH(ch, "channel_run\n");
+> -    dump_dbdma_cmd(current);
+> +    dump_dbdma_cmd(ch, current);
+> =20
+>      /* clear WAKE flag at command fetch */
+> =20
 
-  spapr: Don't rewrite mmu capabilities in KVM mode (2018-06-22 14:19:07 =
-+1000)
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-----------------------------------------------------------------
-ppc patch queue 2018-06-22
+--fmEUq8M7S0s+Fl0V
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Another assorted patch of patches for ppc and spapr.
-    * Rework of guest pagesize handling for ppc, which avoids guest
-      visibly different behaviour between accelerators
-    * A number of Pnv cleanups, working towards more complete POWER9
-      support
-    * Migration of VPA data, a significant bugfix
+-----BEGIN PGP SIGNATURE-----
 
-----------------------------------------------------------------
-Alexey Kardashevskiy (1):
-      pseries: Update SLOF firmware image to qemu-slof-20180621
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsszoYACgkQbDjKyiDZ
+s5KtLg/+JdacidVlRo3d/dDK5tpSJuLjD7JcpTzec/WBM5E8gJakzN5e2RRKwLnw
+JqgOGYfmYe8nhlP7pXgcHd0Y8VF+iktrIXUodb74HsfnQORx1fX7nb0wY+ykHPwc
+aofIpHXhHwEFDuAPsmxrRFu+QuZfhUmsHnWsMn/k8bjkcOVRVTuiCFK69SnI3jRc
+RUXod1HyVZMqubliIck2aOAizYtLXpvWnEjQf25pcSytjwyFo5xhcAA0QzR+zjQM
+TLJPON3uPRYJsxS6+Wxwb2XGhEwKGr/boqceRMwg6Hz1XYOYQRqFBes/7hJ3AQND
+4Pu9tNMnxkq+vgRQThmH9SaPrjG/VauAmwPjk55bzifOPA+pdvhS55J0QNsTWqAM
+pSgvXSOrooVgFFkCd9gtE2HLpu1LYTi2RpfZG2W/KdvSnYSVX6YpRM3IUOZGEC9P
+c/UjolhTGhRdcXAENQ6RLVpBsbMku+bm4bh1RCAWl3+CDl5GcyqLUVZaT1Q1VJf2
+bmkMxcbu59pVzDX77got3y0HowX1CLwMI+odfSPfqw+ZWf4fwhajevbCE6zRmmwV
+QCh7WTzygyrvOnmGQcE0aPIDdnBQLx5Dw19fKMFPx2U0II3e98iNucCcWmnDvwdB
+sIV15KXD94HPQ1YjRHbdsJGe0WayO1jR32BE9eXZVJplaqfOzkU=
+=+atq
+-----END PGP SIGNATURE-----
 
-BALATON Zoltan (3):
-      ppc4xx_i2c: Remove unimplemented sdata and intr registers
-      ppc4xx_i2c: Implement directcntl register
-      target/ppc: Add missing opcode for icbt on PPC440
-
-C=C3=A9dric Le Goater (6):
-      ppc/pnv: introduce a new intc_create() operation to the chip model
-      ppc/pnv: introduce a new isa_create() operation to the chip model
-      ppc/pnv: introduce Pnv8Chip and Pnv9Chip models
-      ppc/pnv: consolidate the creation of the ISA bus device tree
-      spapr: split the IRQ allocation sequence
-      spapr: remove unused spapr_irq routines
-
-David Gibson (9):
-      target/ppc: Allow cpu compatiblity checks based on type, not instan=
-ce
-      spapr: Compute effective capability values earlier
-      spapr: Add cpu_apply hook to capabilities
-      target/ppc: Add kvmppc_hpt_needs_host_contiguous_pages() helper
-      spapr: Maximum (HPT) pagesize property
-      spapr: Use maximum page size capability to simplify memory backend =
-checking
-      target/ppc: Add ppc_hash64_filter_pagesizes()
-      spapr: Limit available pagesizes to provide a consistent guest envi=
-ronment
-      spapr: Don't rewrite mmu capabilities in KVM mode
-
-Greg Kurz (2):
-      spapr_cpu_core: migrate per-CPU data
-      spapr_cpu_core: migrate VPA related state
-
-John Arbuckle (1):
-      fpu_helper.c: fix helper_fpscr_clrbit() function
-
-Sebastian Bauer (1):
-      sm501: Fix hardware cursor color conversion
-
- default-configs/ppc-softmmu.mak    |   1 +
- default-configs/ppcemb-softmmu.mak |   1 +
- hw/display/sm501.c                 |   6 +-
- hw/i2c/ppc4xx_i2c.c                |  30 ++-
- hw/ppc/pnv.c                       | 383 +++++++++++++++++++++++--------=
-------
- hw/ppc/pnv_core.c                  |  18 +-
- hw/ppc/pnv_lpc.c                   |  30 ++-
- hw/ppc/spapr.c                     | 122 ++++++------
- hw/ppc/spapr_caps.c                | 158 +++++++++++++--
- hw/ppc/spapr_cpu_core.c            |  91 ++++++++-
- hw/ppc/spapr_events.c              |  18 +-
- hw/ppc/spapr_pci.c                 |  23 ++-
- hw/ppc/spapr_vio.c                 |  10 +-
- include/hw/i2c/ppc4xx_i2c.h        |   8 +-
- include/hw/ppc/pnv.h               |  26 ++-
- include/hw/ppc/pnv_lpc.h           |   3 +-
- include/hw/ppc/spapr.h             |  19 +-
- include/hw/ppc/spapr_cpu_core.h    |   1 +
- pc-bios/README                     |   2 +-
- pc-bios/slof.bin                   | Bin 913880 -> 924840 bytes
- roms/SLOF                          |   2 +-
- target/ppc/compat.c                |  27 ++-
- target/ppc/cpu.h                   |   4 +
- target/ppc/fpu_helper.c            |  28 +++
- target/ppc/kvm.c                   | 146 +++++++-------
- target/ppc/kvm_ppc.h               |  11 +-
- target/ppc/mmu-hash64.c            |  59 ++++++
- target/ppc/mmu-hash64.h            |   3 +
- target/ppc/translate.c             |   2 +
- 29 files changed, 865 insertions(+), 367 deletions(-)
+--fmEUq8M7S0s+Fl0V--
