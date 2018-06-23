@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fWaZh-00089X-Ra
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 00:55:02 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fWcGZ-0003OR-Mh
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 02:43:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fWaZg-00046e-Rm
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 00:55:01 -0400
-Resent-Message-Id: <E1fWaZg-00046e-Rm@eggs.gnu.org>
-In-Reply-To: <20180623022258.22158-1-programmingkidx@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152972967127.939.465110624362437028@d39dc562802a>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fWcGY-0000vz-Os
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 02:43:23 -0400
+References: <20180622103528.28598-1-david@gibson.dropbear.id.au>
+	<CAFEAcA8-jSMy-9R69d7zQoEL593iiR5xitaPh17JwNzo-2U=1g@mail.gmail.com>
+	<e56f27b2-63da-a8ae-4473-e75f341ef275@ilande.co.uk>
+	<20180623004105.GL612@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <16faa15d-1351-265b-2b1f-3b7f0b1d5034@ilande.co.uk>
+Date: Sat, 23 Jun 2018 07:43:04 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 22 Jun 2018 21:54:31 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] fix fdiv instruction
+In-Reply-To: <20180623004105.GL612@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 00/25] ppc-for-3.0 queue
+ 2018-06-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,42 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: programmingkidx@gmail.com
-Cc: famz@redhat.com, david@gibson.dropbear.id.au, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Laurent Vivier <lvivier@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>, qemu-ppc <qemu-ppc@nongnu.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjIzMDIyMjU4LjIyMTU4LTEtcHJvZ3JhbW1pbmdraWR4QGdtYWlsLmNv
-bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBmaXggZmRpdiBpbnN0cnVjdGlvbgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0k
-KGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
-cyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1p
-dHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRj
-b21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cg
-LW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVt
-YWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAg
-ZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRm
-YWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
-cm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTI5NzE2NzIx
-LTI4NDAwLTEtZ2l0LXNlbmQtZW1haWwtbGludXhAcm9lY2stdXMubmV0IC0+IHBhdGNoZXcvMTUy
-OTcxNjcyMS0yODQwMC0xLWdpdC1zZW5kLWVtYWlsLWxpbnV4QHJvZWNrLXVzLm5ldAogKiBbbmV3
-IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNjIzMDIyMjU4LjIyMTU4LTEtcHJvZ3Jh
-bW1pbmdraWR4QGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTgwNjIzMDIyMjU4LjIyMTU4LTEtcHJv
-Z3JhbW1pbmdraWR4QGdtYWlsLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk3
-OTVmNTZjMjQgZml4IGZkaXYgaW5zdHJ1Y3Rpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvMTogZml4IGZkaXYgaW5zdHJ1Y3Rpb24uLi4KRVJST1I6IE1hY3JvcyB3aXRo
-IG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBs
-b29wCiM5MTogRklMRTogdGFyZ2V0L3BwYy90cmFuc2xhdGUvZnAtaW1wbC5pbmMuYzoxMDg6Cisj
-ZGVmaW5lIEdFTl9GTE9BVF9ESVYobmFtZSwgb3AyLCBpbnZhbCwgc2V0X2ZwcmYsIHR5cGUpICAg
-ICAgICAgICAgICAgICAgICAgICBcCitfR0VOX0ZMT0FUX0RJVihuYW1lLCBuYW1lLCAweDNGLCBv
-cDIsIGludmFsLCAwLCBzZXRfZnByZiwgdHlwZSk7ICAgICAgICAgICAgICBcCitfR0VOX0ZMT0FU
-X0RJVihuYW1lIyNzLCBuYW1lLCAweDNCLCBvcDIsIGludmFsLCAxLCBzZXRfZnByZiwgdHlwZSk7
-Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDY4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 23/06/18 01:41, David Gibson wrote:
+
+> On Fri, Jun 22, 2018 at 04:16:10PM +0100, Mark Cave-Ayland wrote:
+> 11;rgb:ffff/ffff/ffff> On 22/06/18 16:03, Peter Maydell wrote:
+>>
+>>> On 22 June 2018 at 11:35, David Gibson <david@gibson.dropbear.id.au> wrote:
+>>>> The following changes since commit 46012db666990ff2eed1d3dc199ab8006439a93b:
+>>>>
+>>>>     Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180619' into staging (2018-06-20 09:51:30 +0100)
+>>>>
+>>>> are available in the Git repository at:
+>>>>
+>>>>     git://github.com/dgibson/qemu.git tags/ppc-for-3.0-20180622
+>>>>
+>>>> for you to fetch changes up to e5ca28ecab5c69b7578e22391a66c97c3979ffd8:
+>>>>
+>>>>     spapr: Don't rewrite mmu capabilities in KVM mode (2018-06-22 14:19:07 +1000)
+>>>>
+>>>> ----------------------------------------------------------------
+>>>> ppc patch queue 2018-06-22
+>>>>
+>>>> Another assorted patch of patches for ppc and spapr.
+>>>>       * Rework of guest pagesize handling for ppc, which avoids guest
+>>>>         visibly different behaviour between accelerators
+>>>>       * A number of Pnv cleanups, working towards more complete POWER9
+>>>>         support
+>>>>       * Migration of VPA data, a significant bugfix
+>>>
+>>> Applied, thanks.
+>>>
+>>> -- PMM
+>>
+>> Looks like this is missing the 2 Mac commits I submitted that David added to
+>> the PR this morning?
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg06540.html
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg06536.html
+>>
+>> David, did you forget to re-push the updated tag?
+> 
+> They just missed the window, sorry.  I merged them after I'd already
+> tagged and tested the pull request.
+
+Okay, as long as you didn't forget them :)
+
+My confusion came from the fact that the emails you sent for the PR 
+yesterday contained my patches as patches 24 and 25, although they 
+aren't included in the cover letter or the github tag.
+
+
+ATB,
+
+Mark.
