@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWqdF-0001PC-9V
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 18:03:46 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fWrbX-00016F-3e
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 19:06:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWqdC-0005KV-42
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 18:03:45 -0400
-Received: from mail-qk0-x22a.google.com ([2607:f8b0:400d:c09::22a]:35940)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWqdB-0005KI-UX
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 18:03:42 -0400
-Received: by mail-qk0-x22a.google.com with SMTP id a195-v6so5620937qkg.3
-	for <qemu-devel@nongnu.org>; Sat, 23 Jun 2018 15:03:41 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20180623215313.1252-1-f4bug@amsat.org>
-	<2f6b05fd-afb3-cc8d-6b3d-011e2fd87c47@amsat.org>
-Message-ID: <78984868-7d48-f1ad-af81-3c2c5ac730ce@amsat.org>
-Date: Sat, 23 Jun 2018 19:03:36 -0300
+	(envelope-from <balaton@eik.bme.hu>) id 1fWrbT-0005rB-Rw
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 19:06:03 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:55574)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1fWrbT-0005pK-B8
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 19:05:59 -0400
+Date: Sun, 24 Jun 2018 01:05:56 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <0240b908-ee0b-84ca-b10c-fbae34720f6d@amsat.org>
+Message-ID: <alpine.BSF.2.21.1806232312500.73730@zero.eik.bme.hu>
+References: <cover.1529568501.git.balaton@eik.bme.hu>
+	<9933d3e471467712047b5e60627bad2e3a38bcae.1529568501.git.balaton@eik.bme.hu>
+	<0240b908-ee0b-84ca-b10c-fbae34720f6d@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <2f6b05fd-afb3-cc8d-6b3d-011e2fd87c47@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] docker: Add debian-xtensa-cross image
+Content-ID: <alpine.BSF.2.21.1806240026300.73730@zero.eik.bme.hu>
+Content-Type: text/plain; CHARSET=ISO-8859-15; FORMAT=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/5] sm501: Implement i2c part for reading
+ monitor EDID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,149 +30,371 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Sebastian Bauer <mail@sebastianbauer.info>, Magnus Damm <magnus.damm@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, David Gibson <david@gibson.dropbear.id.au>
 
-> But this one for example never exit:
-> 
-> xtensa-softmmu/tests$ ../qemu-system-xtensa -M sim -cpu dc232b
-> -nographic -semihosting -icount 6 -kernel ./test_mmu.tst -d in_asm
-> ...
-> ----------------
-> IN:
-> 0xd0001b0a:  wdtlb	a2, a3
-> 
-> ----------------
-> IN:
-> 0xd0001b0d:  l32r	a2, 0xd0000540
-> 0xd0001b10:  l32r	a3, 0xd0000544
-> 0xd0001b13:  l32r	a4, 0xd0000534
-> 0xd0001b16:  sub	a4, a4, a3
-> 0xd0001b19:  loop	a4, 0xd0001b26
-> 
-> ----------------
-> IN:
-> 0xd0001b1c:  l8ui	a5, a3, 0
-> 0xd0001b1f:  s8i	a5, a2, 0
-> 0xd0001b22:  addi.n	a2, a2, 1
-> 0xd0001b24:  addi.n	a3, a3, 1
-> 
-> ----------------
-> IN:
-> 0xd0001b26:  l32r	a2, 0xd0000540
-> 0xd0001b29:  l32r	a3, 0xd000053c
-> 0xd0001b2c:  jx	a2
-> 
-> ----------------
-> IN:
-> 0x00007fff:  l32i	a2, a3, 0
-> 
+Hello,
 
-Also it never quit (return to shell):
+Thanks for review, see some questions below.
 
-xtensa-softmmu/tests$ ../qemu-system-xtensa -M sim -cpu dc232b
--nographic -semihosting -icount 6 -kernel ./test_mmu.tst
-QEMU 2.12.50 monitor - type 'help' for more information
-(qemu) q
-HANG
+On Fri, 22 Jun 2018, Philippe Mathieu-Daud=E9 wrote:
+> On 06/21/2018 05:08 AM, BALATON Zoltan wrote:
+>> Emulate the i2c part of SM501 which is used to access the EDID info
+>> from a monitor.
+>>
+>> The vmstate structure is changed and its version is increased but
+>> SM501 is only used on SH and PPC sam460ex machines that don't support
+>> cross-version migration.
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> ---
+>>  default-configs/ppc-softmmu.mak    |   1 +
+>>  default-configs/ppcemb-softmmu.mak |   1 +
+>>  default-configs/sh4-softmmu.mak    |   2 +
+>>  default-configs/sh4eb-softmmu.mak  |   2 +
+>>  hw/display/sm501.c                 | 136 ++++++++++++++++++++++++++++=
++++++++--
+>>  5 files changed, 138 insertions(+), 4 deletions(-)
+>>
+[...]
+>> @@ -487,6 +492,11 @@ typedef struct SM501State {
+>>      uint32_t misc_timing;
+>>      uint32_t power_mode_control;
+>>
+>> +    uint8_t i2c_byte_count;
+>> +    uint8_t i2c_status;
+>> +    uint8_t i2c_addr;
+>> +    uint8_t i2c_data[16];
+>
+> Using:
+>       uint8_t i2c_regs[0x20];
+>
+> Would ease vmstate management and further refactors.
 
-(gdb) info threads
-  Id   Target Id         Frame
-* 1    Thread 0x7fdfead6bf80 (LWP 1645) 0x00007fdfce6dc4ec in
-futex_wait_cancelable (private=<optimized out>, expected=0,
-    futex_word=0x55b9940ae288 <qemu_pause_cond+40>) at
-../sysdeps/unix/sysv/linux/futex-internal.h:88
-  2    Thread 0x7fdfbfc79700 (LWP 1646) syscall () at
-../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
-  3    Thread 0x7fdfbf478700 (LWP 1647) 0x00007fdfce4016d6 in __GI_ppoll
-(fds=0x7fdfb0000b20, nfds=1, timeout=<optimized out>,
-    timeout@entry=0x0, sigmask=sigmask@entry=0x0) at
-../sysdeps/unix/sysv/linux/ppoll.c:39
-  4    Thread 0x7fdfbcc77700 (LWP 1648) qemu_spin_lock (spin=<optimized
-out>) at /source/qemu/include/qemu/thread.h:111
+Hmm, all other regions have named variables like this and not indexed=20
+arrays so that would not fit the current way device is implemented.
 
-(gdb) thread apply all bt
+>> +
+>>      uint32_t uart0_ier;
+>>      uint32_t uart0_lcr;
+>>      uint32_t uart0_mcr;
+>> @@ -897,6 +907,107 @@ static const MemoryRegionOps sm501_system_config=
+_ops =3D {
+>>      .endianness =3D DEVICE_LITTLE_ENDIAN,
+>>  };
+>>
+>
+> To help code review you can use the "hw/registerfields.h" API:
+>
+> FIELD(CTRL, ENABLE,       0, 1)
+> FIELD(CTRL, BUS_SPEED,    1, 1)
+> FIELD(CTRL, START,        2, 1)
+> FIELD(CTRL, INT_ENABLE,   4, 1)
+> FIELD(CTRL, INT_ACK,      5, 1)
+> FIELD(CTRL, REPEAT_START, 6, 1)
+>
+> FIELD(STATUS, BUSY,       0, 1)
+> FIELD(STATUS, ACK,        1, 1)
+> FIELD(STATUS, ERROR,      2, 1)
+> FIELD(STATUS, COMPLETE,   3, 1)
+>
+> FIELD(RESET, ERROR,       2, 1)
+>
+>> +static uint64_t sm501_i2c_read(void *opaque, hwaddr addr, unsigned si=
+ze)
+>> +{
+>> +    SM501State *s =3D (SM501State *)opaque;
+>> +    uint8_t ret =3D 0;
+>> +
+>> +    switch (addr) {
+>> +    case SM501_I2C_BYTE_COUNT:
+>> +        ret =3D s->i2c_byte_count;
+>> +        break;
+>> +    case SM501_I2C_STATUS:
+>> +        ret =3D s->i2c_status;
+>> +        break;
+>> +    case SM501_I2C_SLAVE_ADDRESS:
+>> +        ret =3D s->i2c_addr;
+>> +        break;
+>> +    case SM501_I2C_DATA ... SM501_I2C_DATA + 15:
+>> +        ret =3D s->i2c_data[addr - SM501_I2C_DATA];
+>> +        break;
+>> +    default:
+>> +        qemu_log_mask(LOG_UNIMP, "sm501 i2c : not implemented registe=
+r read."
+>> +                      " addr=3D0x%" HWADDR_PRIx "\n", addr);
+>> +    }
+>> +
+>> +    SM501_DPRINTF("sm501 i2c regs : read addr=3D%" HWADDR_PRIx " val=3D=
+%x\n",
+>> +                  addr, ret);
+>
+> At some point we should replace the SM501_DPRINTF() macro by trace even=
+ts.
 
-Thread 4 (Thread 0x7fdfbcc77700 (LWP 1648)):
-#0  0x000055b993a62fe0 in qemu_spin_lock (spin=<optimized out>) at
-/source/qemu/include/qemu/thread.h:111
-#1  0x000055b993a62fe0 in page_lock (pd=<optimized out>) at
-/source/qemu/accel/tcg/translate-all.c:655
-#2  0x000055b993a62fe0 in page_lock_pair
-(ret_p1=ret_p1@entry=0x7fdfbcc74550, phys1=phys1@entry=100667391,
-ret_p2=ret_p2@entry=0x7fdfbcc74558, phys2=phys2@entry=100663296,
-alloc=alloc@entry=1) at /source/qemu/accel/tcg/translate-all.c:873
-#3  0x000055b993a63643 in tb_link_page (phys_page2=100663296,
-phys_pc=100667391, tb=<optimized out>)
-    at /source/qemu/accel/tcg/translate-all.c:1602
-#4  0x000055b993a63643 in tb_gen_code (cpu=cpu@entry=0x55b9943eb760,
-pc=pc@entry=32767, cs_base=cs_base@entry=0, flags=flags@entry=98304,
-cflags=cflags@entry=131072) at /source/qemu/accel/tcg/translate-all.c:1794
-#5  0x000055b993a61937 in tb_find (cf_mask=131072, tb_exit=0,
-last_tb=0x0, cpu=0x18000) at /source/qemu/accel/tcg/cpu-exec.c:401
-#6  0x000055b993a61937 in cpu_exec (cpu=cpu@entry=0x55b9943eb760) at
-/source/qemu/accel/tcg/cpu-exec.c:721
-#7  0x000055b993a307a1 in tcg_cpu_exec (cpu=0x55b9943eb760) at
-/source/qemu/cpus.c:1362
-#8  0x000055b993a307a1 in qemu_tcg_rr_cpu_thread_fn (arg=<optimized
-out>) at /source/qemu/cpus.c:1461
-#9  0x00007fdfce6d65aa in start_thread (arg=0x7fdfbcc77700) at
-pthread_create.c:463
-#10 0x00007fdfce40bcbf in clone () at
-../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+This and to convert to use registerfields as suggested above could be don=
+e=20
+in separate clean up, not in this patch. That's why I've followed existin=
+g=20
+usage of SM501_DPRINTF here.
 
-Thread 3 (Thread 0x7fdfbf478700 (LWP 1647)):
-#0  0x00007fdfce4016d6 in __GI_ppoll (fds=0x7fdfb0000b20, nfds=1,
-timeout=<optimized out>, timeout@entry=0x0, sigmask=sigmask@entry=0x0)
-    at ../sysdeps/unix/sysv/linux/ppoll.c:39
-#1  0x000055b993c33109 in ppoll (__ss=0x0, __timeout=0x0,
-__nfds=<optimized out>, __fds=<optimized out>)
-    at /usr/include/x86_64-linux-gnu/bits/poll2.h:77
-#2  0x000055b993c33109 in qemu_poll_ns (fds=<optimized out>,
-nfds=<optimized out>, timeout=<optimized out>)
-    at /source/qemu/util/qemu-timer.c:322
-#3  0x000055b993c34dce in aio_poll (ctx=0x55b9943b35c0,
-blocking=blocking@entry=true) at /source/qemu/util/aio-posix.c:629
-#4  0x000055b993a9897e in iothread_run (opaque=0x55b9943b3360) at
-/source/qemu/iothread.c:64
-#5  0x00007fdfce6d65aa in start_thread (arg=0x7fdfbf478700) at
-pthread_create.c:463
-#6  0x00007fdfce40bcbf in clone () at
-../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+>> +    return ret;
+>> +}
+>> +
+>> +static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value=
+,
+>> +                            unsigned size)
+>> +{
+>> +    SM501State *s =3D (SM501State *)opaque;
+>> +    SM501_DPRINTF("sm501 i2c regs : write addr=3D%" HWADDR_PRIx
+>> +                  " val=3D%" PRIx64 "\n", addr, value);
+>> +
+>> +    switch (addr) {
+>> +    case SM501_I2C_BYTE_COUNT:
+>> +        s->i2c_byte_count =3D value & 0xf;
+>> +        break;
+>> +    case SM501_I2C_CONTROL:
+>> +        if (value & 1) {
+>
+>               value & R_CTRL_ENABLE_MASK
+>
+>> +            if (value & 4) {
+>
+>                   value & R_CTRL_START_MASK
+>
+>> +                int res =3D i2c_start_transfer(s->i2c_bus,
+>> +                                             s->i2c_addr >> 1,
+>> +                                             s->i2c_addr & 1);
+>> +                s->i2c_status |=3D (res ? 1 << 2 : 0);
+>
+> Hmm if you previously had the ERROR bit set, you don't clear it.
+>
+>                   s->i2c_status =3D FIELD_DP32(s->i2c_status, STATUS,
+>                                              ERROR, res);
+>
+>> +                if (!res) {
+>> +                    int i;
+>> +                    SM501_DPRINTF("sm501 i2c : transferring %d bytes =
+to 0x%x\n",
+>> +                                  s->i2c_byte_count + 1, s->i2c_addr =
+>> 1);
+>> +                    for (i =3D 0; i <=3D s->i2c_byte_count; i++) {
+>> +                        res =3D i2c_send_recv(s->i2c_bus, &s->i2c_dat=
+a[i],
+>> +                                            !(s->i2c_addr & 1));
+>> +                        if (res) {
+>> +                            SM501_DPRINTF("sm501 i2c : transfer faile=
+d"
+>> +                                          " i=3D%d, res=3D%d\n", i, r=
+es);
+>> +                            s->i2c_status |=3D (res ? 1 << 2 : 0);
+>
+> Ditto.
+>
+> This could be a goto transfer_error at end of func.
 
-Thread 2 (Thread 0x7fdfbfc79700 (LWP 1646)):
-#0  0x00007fdfce4068f9 in syscall () at
-../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
-#1  0x000055b993c370eb in qemu_futex_wait (val=<optimized out>,
-f=<optimized out>) at /source/qemu/include/qemu/futex.h:29
-#2  0x000055b993c370eb in qemu_event_wait (ev=ev@entry=0x55b9940e49c8
-<rcu_call_ready_event>)
-    at /source/qemu/util/qemu-thread-posix.c:445
-#3  0x000055b993c476a8 in call_rcu_thread (opaque=<optimized out>) at
-/source/qemu/util/rcu.c:261
-#4  0x00007fdfce6d65aa in start_thread (arg=0x7fdfbfc79700) at
-pthread_create.c:463
-#5  0x00007fdfce40bcbf in clone () at
-../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+Where do you see in spec or elsewhere when should the error bit be=20
+cleared?
 
-Thread 1 (Thread 0x7fdfead6bf80 (LWP 1645)):
-#0  0x00007fdfce6dc4ec in futex_wait_cancelable (private=<optimized
-out>, expected=0, futex_word=0x55b9940ae288 <qemu_pause_cond+40>)
-    at ../sysdeps/unix/sysv/linux/futex-internal.h:88
-#1  0x00007fdfce6dc4ec in __pthread_cond_wait_common (abstime=0x0,
-mutex=0x55b9940ae2e0 <qemu_global_mutex>, cond=0x55b9940ae260
-<qemu_pause_cond>) at pthread_cond_wait.c:502
-#2  0x00007fdfce6dc4ec in __pthread_cond_wait
-(cond=cond@entry=0x55b9940ae260 <qemu_pause_cond>,
-mutex=mutex@entry=0x55b9940ae2e0 <qemu_global_mutex>) at
-pthread_cond_wait.c:655
-#3  0x000055b993c36c9f in qemu_cond_wait_impl
-(cond=cond@entry=0x55b9940ae260 <qemu_pause_cond>,
-mutex=mutex@entry=0x55b9940ae2e0 <qemu_global_mutex>,
-file=file@entry=0x55b993c52bdb "/source/qemu/cpus.c", line=line@entry=1809)
-    at /source/qemu/util/qemu-thread-posix.c:164
-#4  0x000055b993a30ce0 in pause_all_vcpus () at /source/qemu/cpus.c:1809
-#5  0x000055b993a30d6a in do_vm_stop (state=RUN_STATE_SHUTDOWN,
-send_stop=<optimized out>) at /source/qemu/cpus.c:1010
-#6  0x000055b9939ef579 in main (argc=<optimized out>, argv=<optimized
-out>, envp=<optimized out>) at /source/qemu/vl.c:4605
+>
+>> +                            return;
+>> +                        }
+>> +                    }
+>> +                    if (i) {
+>> +                        SM501_DPRINTF("sm501 i2c : transferred %d byt=
+es\n", i);
+>> +                        s->i2c_status =3D 8;
+>
+>                           s->i2c_status =3D R_STATUS_COMPLETE_MASK;
+>
+>> +                    }
+>> +                }
+>> +            } else {
+>> +                SM501_DPRINTF("sm501 i2c : end transfer\n");
+>> +                i2c_end_transfer(s->i2c_bus);
+>> +                s->i2c_status &=3D ~4;
+>
+>                   s->i2c_status &=3D ~R_STATUS_ERROR_MASK;
+>
+>> +            }
+>> +        }
+>> +        break;
+>> +    case SM501_I2C_RESET:
+>> +            s->i2c_status &=3D ~4;
+>
+> I understand "0 clear" as:
+>
+>               if (FIELD_EX32(value, RESET, ERROR) =3D=3D 0) {
+>                   s->i2c_status &=3D ~R_STATUS_ERROR_MASK;
+>               }
+>
+> also:
+>
+>               value &=3D ~R_RESET_ERROR_MASK;
+>               if (value) {
+>                   qemu_log_mask(LOG_GUEST_ERROR,
+>                                 "sm501_i2c_write(RESET) bad value...",
+>                                 value);
+>               }
+
+In my copy of the spec all other bits are reserved (should contain 0) and=
+=20
+error bit is write only.
+
+>> +        break;
+>> +    case SM501_I2C_SLAVE_ADDRESS:
+>> +        s->i2c_addr =3D value & 0xff;
+>
+> Implicit mask, fine.
+>
+>> +        break;
+>> +    case SM501_I2C_DATA ... SM501_I2C_DATA + 15:
+>> +        s->i2c_data[addr - SM501_I2C_DATA] =3D value & 0xff;
+>
+> Ditto.
+>
+>> +        break;
+>> +    default:
+>> +        qemu_log_mask(LOG_UNIMP, "sm501 i2c : not implemented registe=
+r write. "
+>> +                      "addr=3D0x%" HWADDR_PRIx " val=3D%" PRIx64 "\n"=
+, addr, value);
+>> +    }
+>> +}
+>> +
+>> +static const MemoryRegionOps sm501_i2c_ops =3D {
+>> +    .read =3D sm501_i2c_read,
+>> +    .write =3D sm501_i2c_write,
+>> +    .valid =3D {
+>> +        .min_access_size =3D 1,
+>> +        .max_access_size =3D 4,
+>
+> Per "Table 9-1: GPIO and I2C Register Summary" valid.max_access_size is
+> 1 (8-bit registers) for registers 0, 1, 2, 3;
+> and 4 for registers 4 to 15.
+>
+> To keep things simple you could add in sm501_i2c_read/sm501_i2c_write
+> prologue:
+>
+>       if (addr < 4 && size > 1) {
+>           qemu_log_mask(LOG_GUEST_ERROR, ...
+>           return ...
+>       }
+
+Actually the copy I have lists all i2c regs as 8 bits in table 9-1 so=20
+maybe I should have .max_access_size =3D 1 instead. Or where have you see=
+n=20
+access size 4 for regs >=3D 4 ?
+
+>> +    },
+>> +    .impl =3D {
+>> +        .min_access_size =3D 1,
+>> +        .max_access_size =3D 1,
+>> +    },
+>> +    .endianness =3D DEVICE_LITTLE_ENDIAN,
+>> +};
+>> +
+>>  static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
+>>  {
+>>      SM501State *s =3D (SM501State *)opaque;
+>> @@ -1577,6 +1688,10 @@ static void sm501_reset(SM501State *s)
+>>      s->irq_mask =3D 0;
+>>      s->misc_timing =3D 0;
+>>      s->power_mode_control =3D 0;
+>> +    s->i2c_byte_count =3D 0;
+>> +    s->i2c_status =3D 0;
+>> +    s->i2c_addr =3D 0;
+>> +    memset(s->i2c_data, 0, 16);
+>>      s->dc_panel_control =3D 0x00010000; /* FIFO level 3 */
+>>      s->dc_video_control =3D 0;
+>>      s->dc_crt_control =3D 0x00010000;
+>> @@ -1615,6 +1730,11 @@ static void sm501_init(SM501State *s, DeviceSta=
+te *dev,
+>>      memory_region_set_log(&s->local_mem_region, true, DIRTY_MEMORY_VG=
+A);
+>>      s->local_mem =3D memory_region_get_ram_ptr(&s->local_mem_region);
+>>
+>> +    /* i2c */
+>> +    s->i2c_bus =3D i2c_init_bus(dev, "sm501.i2c");
+>
+>       /* ddc */
+>
+>> +    I2CDDCState *ddc =3D I2CDDC(qdev_create(BUS(s->i2c_bus), TYPE_I2C=
+DDC));
+>> +    i2c_set_slave_address(I2C_SLAVE(ddc), 0x50);
+>
+> I think this is board/screen related but that's way easier this way.
+>
+>> +
+>>      /* mmio */
+>>      memory_region_init(&s->mmio_region, OBJECT(dev), "sm501.mmio", MM=
+IO_SIZE);
+>>      memory_region_init_io(&s->system_config_region, OBJECT(dev),
+>> @@ -1622,6 +1742,9 @@ static void sm501_init(SM501State *s, DeviceStat=
+e *dev,
+>>                            "sm501-system-config", 0x6c);
+>>      memory_region_add_subregion(&s->mmio_region, SM501_SYS_CONFIG,
+>>                                  &s->system_config_region);
+>> +    memory_region_init_io(&s->i2c_region, OBJECT(dev), &sm501_i2c_ops=
+, s,
+>> +                          "sm501-i2c", 0x14);
+>
+> Per "Figure 9-2: GPIO / I2C Master Register Space" the region size is 0=
+x20.
+
+But registers are only defined for 0x40-0x53 so what should the rest of=20
+this region contain?
+
+Regards,
+BALATON Zoltan
+
+>> +    memory_region_add_subregion(&s->mmio_region, SM501_I2C, &s->i2c_r=
+egion);
+>>      memory_region_init_io(&s->disp_ctrl_region, OBJECT(dev),
+>>                            &sm501_disp_ctrl_ops, s,
+>>                            "sm501-disp-ctrl", 0x1000);
+>> @@ -1705,6 +1828,11 @@ static const VMStateDescription vmstate_sm501_s=
+tate =3D {
+>>          VMSTATE_UINT32(twoD_destination_base, SM501State),
+>>          VMSTATE_UINT32(twoD_alpha, SM501State),
+>>          VMSTATE_UINT32(twoD_wrap, SM501State),
+>> +        /* Added in version 2 */
+>> +        VMSTATE_UINT8(i2c_byte_count, SM501State),
+>> +        VMSTATE_UINT8(i2c_status, SM501State),
+>> +        VMSTATE_UINT8(i2c_addr, SM501State),
+>> +        VMSTATE_UINT8_ARRAY(i2c_data, SM501State, 16),
+>>          VMSTATE_END_OF_LIST()
+>>       }
+>>  };
+>> @@ -1770,8 +1898,8 @@ static void sm501_reset_sysbus(DeviceState *dev)
+>>
+>>  static const VMStateDescription vmstate_sm501_sysbus =3D {
+>>      .name =3D TYPE_SYSBUS_SM501,
+>> -    .version_id =3D 1,
+>> -    .minimum_version_id =3D 1,
+>> +    .version_id =3D 2,
+>> +    .minimum_version_id =3D 2,
+>>      .fields =3D (VMStateField[]) {
+>>          VMSTATE_STRUCT(state, SM501SysBusState, 1,
+>>                         vmstate_sm501_state, SM501State),
+>> @@ -1843,8 +1971,8 @@ static void sm501_reset_pci(DeviceState *dev)
+>>
+>>  static const VMStateDescription vmstate_sm501_pci =3D {
+>>      .name =3D TYPE_PCI_SM501,
+>> -    .version_id =3D 1,
+>> -    .minimum_version_id =3D 1,
+>> +    .version_id =3D 2,
+>> +    .minimum_version_id =3D 2,
+>>      .fields =3D (VMStateField[]) {
+>>          VMSTATE_PCI_DEVICE(parent_obj, SM501PCIState),
+>>          VMSTATE_STRUCT(state, SM501PCIState, 1,
+>>
+>
+> Fixing "0 clear" and region size to 0x20:
+> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>
+> Regards,
+>
+> Phil.
+>
+>
