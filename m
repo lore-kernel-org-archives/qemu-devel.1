@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43644)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fWn9V-0002l7-E2
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 14:20:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fWom7-0006Ko-SE
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 16:04:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fWn9U-00047r-2z
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 14:20:49 -0400
-Date: Sat, 23 Jun 2018 14:20:39 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180623182039.GA4920@flamenco>
-References: <20180621173635.21537-1-richard.henderson@linaro.org>
-	<20180622211244.GA11346@flamenco>
-	<1319a0f0-0009-ebfc-dab4-eec196ba8ba5@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fWom7-0007Wo-3F
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 16:04:47 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:45062)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fWom6-0007Wf-TY
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 16:04:47 -0400
+Received: by mail-ot0-x241.google.com with SMTP id a5-v6so11068527otf.12
+	for <qemu-devel@nongnu.org>; Sat, 23 Jun 2018 13:04:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1319a0f0-0009-ebfc-dab4-eec196ba8ba5@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 0/2] linux-user: Change mmap_lock to rwlock
+In-Reply-To: <1529689531-4024-1-git-send-email-cota@braap.org>
+References: <1529689531-4024-1-git-send-email-cota@braap.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 23 Jun 2018 21:04:25 +0100
+Message-ID: <CAFEAcA_7RESM8yWZsjQi7fhnJ0kx_tG7S+rPNKMOe+2PUnOV3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] tcg: fix --disable-tcg build breakage
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +28,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, laurent@vivier.eu, qemu-arm@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-On Sat, Jun 23, 2018 at 08:25:52 -0700, Richard Henderson wrote:
-> On 06/22/2018 02:12 PM, Emilio G. Cota wrote:
-> > I'm curious to see how much perf could be gained. It seems that the hold
-> > times in SVE code for readers might not be very large, which
-> > then wouldn't let us amortize the atomic inc of the read lock
-> > (IOW, we might not see much of a difference compared to a regular
-> > mutex).
-> 
-> In theory, the uncontended case for rwlocks is the same as a mutex.
+On 22 June 2018 at 18:45, Emilio G. Cota <cota@braap.org> wrote:
+> Fix the --disable-tcg breakage introduced by tb_lock's removal by
+> relying on the fact that tcg_enabled() is set to 0 at
+> compile-time under --disable-tcg.
+>
+> While at it, add further asserts to fix builds that enable both
+> --disable-tcg and --enable-debug, which were broken even before
+> tb_lock's removal.
+>
+> Tested to build x86_64-softmmu and i386-softmmu targets.
+>
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
 
-In the fast path, wr_lock/unlock have one more atomic than
-mutex_lock/unlock. The perf difference is quite large in
-microbenchmarks, e.g. changing tests/atomic_add-bench to
-use pthread_mutex or pthread_rwlock_wrlock instead of
-an atomic operation (this is enabled with the added -m flag):
+Applied to master as a fix for the travis builds; thanks.
 
-$ taskset -c 0 perf record tests/atomic_add-bench-mutex  -d 4 -m
- Throughput:         62.05 Mops/s
-
-$ taskset -c 0 perf record tests/atomic_add-bench-rwlock  -d 4 -m
- Throughput:         37.68 Mops/s
-
-That said, it's unlikely to have real user-space code
-(i.e. not from microbenchmarks) that would be sensitive to
-the additional delay and/or lower scalability. It is common to
-avoid frequent calls to mmap(2) due to potential serialization
-in the kernel -- think for instance of memory allocators, they
-do a few large mmap calls and then manage the memory themselves.
-
-To double-check I ran some multi-threaded benchmarks from
-Hoard[1] under qemu-linux-user, with and without the rwlock change,
-and couldn't measure a significant difference.
-
-[1] https://github.com/emeryberger/Hoard/tree/master/benchmarks
-
-> > Are you using any benchmark that shows any perf difference?
-> 
-> Not so far.  Glibc has some microbenchmarks for strings, which I will try next
-> week, but they are not multi-threaded.  Maybe just run 4 threads of those
-> benchmark?
-
-I'd run more threads if possible. I have access to a 64-core machine,
-so ping me once you identify benchmarks that are of interest.
-
-		Emilio
+-- PMM
