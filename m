@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40928)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fWq8t-0002EH-VN
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 17:32:25 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fWqTF-0005u0-6E
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 17:53:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fWq8q-0003Y8-RE
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 17:32:23 -0400
-Date: Sat, 23 Jun 2018 23:32:18 +0200 (CEST)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-In-Reply-To: <9e6234ca-ac7f-6605-6e3f-16a84b51a241@roeck-us.net>
-Message-ID: <alpine.BSF.2.21.1806232323100.73730@zero.eik.bme.hu>
-References: <1529642871-14214-1-git-send-email-linux@roeck-us.net>
-	<20180622050334.GG612@umbus.fritz.box>
-	<alpine.BSF.2.21.1806220930470.66303@zero.eik.bme.hu>
-	<c59b2d3e-384a-f3d9-41a7-74439cd3c78e@roeck-us.net>
-	<alpine.BSF.2.21.1806222322110.86811@zero.eik.bme.hu>
-	<20180623023420.GA28312@roeck-us.net>
-	<alpine.BSF.2.21.1806232245010.73730@zero.eik.bme.hu>
-	<9e6234ca-ac7f-6605-6e3f-16a84b51a241@roeck-us.net>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fWqTB-0000x7-3o
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 17:53:25 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:32790)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fWqTA-0000wz-Uh
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 17:53:21 -0400
+Received: by mail-qk0-x241.google.com with SMTP id c131-v6so5621429qkb.0
+	for <qemu-devel@nongnu.org>; Sat, 23 Jun 2018 14:53:20 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Sat, 23 Jun 2018 18:53:13 -0300
+Message-Id: <20180623215313.1252-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Subject: Re: [Qemu-devel] [PATCH] ppc: Fix sam460ex devicetree when booting
- the Linux kernel
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH] docker: Add debian-xtensa-cross image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,100 +31,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-On Sat, 23 Jun 2018, Guenter Roeck wrote:
-> On 06/23/2018 01:55 PM, BALATON Zoltan wrote:
->> On Fri, 22 Jun 2018, Guenter Roeck wrote:
->>> The problem is this (from the kernel diffs provided by aCube):
->>> 
->>> #if defined(CONFIG_PPC32)
->>> -#define smc501_readl(addr)???????????? ioread32be((addr))
->>> -#define smc501_writel(val, addr)?????? iowrite32be((val), (addr))
->>> +#define smc501_readl(addr)???????????? ioread32((addr))
->>> +#define smc501_writel(val, addr)?????? iowrite32((val), (addr))
->>> #else
->>> #define smc501_readl(addr)???????????? readl(addr)
->>> #define smc501_writel(val, addr)?????? writel(val, addr)
->>> 
->>> This is a bit fishy since the cpu is big endian and iowrite32be()
->>> should be identical to iowrite32(), but apparently that is not the
->>> case here. I don't think I'll have time to track this down, though.
->> 
->> Thanks for finding this, it helps even if you don't have time to track it 
->> down completely. Could this be related to using little endian PCI device on 
->> a big endian CPU? Not sure which implementation will this use but in 
->> arch/powerpc/kernel/iomap.c:
->> 
->> unsigned int ioread32(void __iomem *addr)
->> {
->>  ??????? return readl(addr);
->> }
->> unsigned int ioread32be(void __iomem *addr)
->> {
->>  ??????? return readl_be(addr);
->> }
->> 
->> so they don't look identical.
->> 
->
-> Sure, but normally I would assume that readl_be() matches readl() on a big 
-> endian system.
-> This is not the case here - it specifically maps to an assembler instruction 
-> which
-> afaics always swaps the byte order. Other architectures typically have 
-> something like
->
-> #define ioread32be(p) be32_to_cpu(ioread32(p))
->
-> or similar. FWIW, using ioread32() instead of ioread32be() does improve the 
-> situation:
->
-> sm501 0002:00:06.0: enabling device (0000 -> 0002)
-> sm501 0002:00:06.0: SM501 At (ptrval): Version 050100a0, 64 Mb, IRQ 0
-> sm501 0002:00:06.0: setting M1XCLK to 144000000
-> sm501 0002:00:06.0: setting MCLK to 72000000
-> sm501-usb[0] [mem 0xd84040000-0xd8405ffff]
-> sm501-usb[1] [mem 0xd83fc0000-0xd83ffffff]
-> sm501-usb[2] [irq 0]
-> sm501-fb[0] [mem 0xd84080000-0xd8408ffff]
-> sm501-fb[1] [mem 0xd84100000-0xd8414ffff]
-> sm501-fb[2] [mem 0xd80000000-0xd83fbffff]
-> sm501-fb[3] [irq 0]
->
-> even though irq 0 looks fishy. This may be related to:
->
-> qemu-system-ppc: ppc440_pcix_set_irq: PCI irq -1
->
-> seen when starting qemu.
+Xtensa cpu supported:
+- dc232b
+- dc233c
+- csp
 
-I think sm501 irq is not emulated currently so it's not expected to work 
-anyway.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+based on http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg06782.html
 
-> Also:
->
-> sm501-usb sm501-usb.80: cannot declare coherent memory
+Max: Do we need to use the overlay configuration?
 
-I think I've seen this in logs from real hardware too but not sure what it 
-is but may not be emulation related.
+This image allow the build of your dc232b tests (using [1]):
 
-> sm501-usb: probe of sm501-usb.80 failed with error -38
+$ make check-tcg
+...
+  CC      vl.o
+  CC      qmp.o
+  LINK    xtensa-softmmu/qemu-system-xtensa
+  BUILD   debian-xtensa-cross
+  BUILD   TCG tests for xtensa-softmmu
+  CHECK   debian-xtensa-cross
+  BUILD   xtensa guest-tests with docker qemu:debian-xtensa-cross
+  RUN     TCG tests for xtensa-softmmu
+  CHECK   debian-xtensa-cross
+  BUILD   xtensa guest-tests with docker qemu:debian-xtensa-cross
+$ file xtensa-softmmu/tests/*tst
+xtensa-softmmu/tests/test_bi.tst:        ELF 32-bit LSB executable, Tensilica Xtensa, version 1 (SYSV), statically linked, not stripped
+xtensa-softmmu/tests/test_break.tst:     ELF 32-bit LSB executable, Tensilica Xtensa, version 1 (SYSV), statically linked, not stripped
+...
+xtensa-softmmu/tests/test_timer.tst:     ELF 32-bit LSB executable, Tensilica Xtensa, version 1 (SYSV), statically linked, not stripped
+xtensa-softmmu/tests/test_windowed.tst:  ELF 32-bit LSB executable, Tensilica Xtensa, version 1 (SYSV), statically linked, not stripped
 
-USB part is only emulated on the sysbus version used on SH, the PCI 
-version does not create it because AFAIK it's unused on sam460ex so this 
-is expected too. Sam460ex has other USB ports in SoC which is emulated.
+[1]: https://github.com/philmd/qemu/tree/testing/gcov-and-other-build-tweaks-v1c
 
-> This is as far as I got. Fixing this may require a new configuration option -
-> something like CONFIG_MFD_SM501_NATIVE_ENDIAN which would be set to false
-> by default. I think this should be tested on real HW, though, not only on
-> sam460ex but also on some other PPC32 system with SM501. Unfortunately
-> I have neither the hardware nor the time to do all the testing.
+ .../dockerfiles/debian-xtensa-cross.docker    | 31 +++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/debian-xtensa-cross.docker
 
-I don't have real hardware either nor know about any other system that 
-have SM501/SM502 besides sam460ex so I only hope this conversation in the 
-list archives might help someone in the future who has a way to test it 
-and submit a patch for Linux to fix it.
-
-Regards,
-BALATON Zoltan
+diff --git a/tests/docker/dockerfiles/debian-xtensa-cross.docker b/tests/docker/dockerfiles/debian-xtensa-cross.docker
+new file mode 100644
+index 0000000000..afd2ab9163
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-xtensa-cross.docker
+@@ -0,0 +1,31 @@
++#
++# Docker cross-compiler target
++#
++# This docker target builds on the debian stretch base image,
++# using a prebuilt toolchains for Xtensa cores from:
++# https://github.com/foss-xtensa/toolchain/releases
++#
++FROM debian:stretch-slim
++
++RUN apt-get update && \
++    DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
++RUN DEBIAN_FRONTEND=noninteractive eatmydata \
++    apt-get install -y --no-install-recommends \
++        bison \
++        build-essential \
++        ca-certificates \
++        curl \
++        flex \
++        gettext \
++        git \
++        python-minimal
++
++ENV CPU_LIST csp dc232b dc233c
++ENV TOOLCHAIN_RELEASE 2018.02
++
++RUN for cpu in $CPU_LIST; do \
++        curl -#SL http://github.com/foss-xtensa/toolchain/releases/download/$TOOLCHAIN_RELEASE/x86_64-$TOOLCHAIN_RELEASE-xtensa-$cpu-elf.tar.gz \
++        | tar -xzC /opt; \
++    done
++
++ENV PATH $PATH:/opt/$TOOLCHAIN_RELEASE/xtensa-dc232b-elf/bin:/opt/$TOOLCHAIN_RELEASE/xtensa-dc233c-elf/bin:/opt/$TOOLCHAIN_RELEASE/xtensa-csp-elf/bin
+-- 
+2.18.0
