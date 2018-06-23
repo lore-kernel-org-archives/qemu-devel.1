@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fWlEe-0004Gz-7d
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 12:18:01 -0400
+	(envelope-from <cota@braap.org>) id 1fWn9V-0002l7-E2
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 14:20:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fWlEb-0000Na-3D
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 12:18:00 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:33896)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fWlEa-0000NK-RX
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 12:17:57 -0400
-Received: by mail-pl0-x244.google.com with SMTP id g20-v6so4874903plq.1
-	for <qemu-devel@nongnu.org>; Sat, 23 Jun 2018 09:17:56 -0700 (PDT)
-References: <20180623022258.22158-1-programmingkidx@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <ecf44486-09a4-9c9a-b96e-1db2d6a1bcbe@linaro.org>
-Date: Sat, 23 Jun 2018 09:17:52 -0700
+	(envelope-from <cota@braap.org>) id 1fWn9U-00047r-2z
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 14:20:49 -0400
+Date: Sat, 23 Jun 2018 14:20:39 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180623182039.GA4920@flamenco>
+References: <20180621173635.21537-1-richard.henderson@linaro.org>
+	<20180622211244.GA11346@flamenco>
+	<1319a0f0-0009-ebfc-dab4-eec196ba8ba5@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180623022258.22158-1-programmingkidx@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] fix fdiv instruction
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1319a0f0-0009-ebfc-dab4-eec196ba8ba5@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 0/2] linux-user: Change mmap_lock to rwlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,90 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>, david@gibson.dropbear.id.au, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu, qemu-arm@nongnu.org
 
-On 06/22/2018 07:22 PM, John Arbuckle wrote:
-> When the fdiv instruction divides a finite number by zero,
-> the result actually depends on the FPSCR[ZE] bit. If this
-> bit is set, the return value is zero. If it is not set
-> the result should be either positive or negative infinity.
-> The sign of this result would depend on the sign of the
-> two inputs. What currently happens is only infinity is
-> returned even if the FPSCR[ZE] bit is set. This patch
-> fixes this problem by actually checking the FPSCR[ZE] bit
-> when deciding what the answer should be.
+On Sat, Jun 23, 2018 at 08:25:52 -0700, Richard Henderson wrote:
+> On 06/22/2018 02:12 PM, Emilio G. Cota wrote:
+> > I'm curious to see how much perf could be gained. It seems that the hold
+> > times in SVE code for readers might not be very large, which
+> > then wouldn't let us amortize the atomic inc of the read lock
+> > (IOW, we might not see much of a difference compared to a regular
+> > mutex).
 > 
-> fdiv is suppose to only set the FPSCR's FPRF bits during a
-> division by zero situation when the FPSCR[ZE] is not set.
-> What currently happens is these bits are always set. This
-> patch fixes this problem by checking the FPSCR[ZE] bit to
-> decide if the FPRF bits should be set. 
+> In theory, the uncontended case for rwlocks is the same as a mutex.
+
+In the fast path, wr_lock/unlock have one more atomic than
+mutex_lock/unlock. The perf difference is quite large in
+microbenchmarks, e.g. changing tests/atomic_add-bench to
+use pthread_mutex or pthread_rwlock_wrlock instead of
+an atomic operation (this is enabled with the added -m flag):
+
+$ taskset -c 0 perf record tests/atomic_add-bench-mutex  -d 4 -m
+ Throughput:         62.05 Mops/s
+
+$ taskset -c 0 perf record tests/atomic_add-bench-rwlock  -d 4 -m
+ Throughput:         37.68 Mops/s
+
+That said, it's unlikely to have real user-space code
+(i.e. not from microbenchmarks) that would be sensitive to
+the additional delay and/or lower scalability. It is common to
+avoid frequent calls to mmap(2) due to potential serialization
+in the kernel -- think for instance of memory allocators, they
+do a few large mmap calls and then manage the memory themselves.
+
+To double-check I ran some multi-threaded benchmarks from
+Hoard[1] under qemu-linux-user, with and without the rwlock change,
+and couldn't measure a significant difference.
+
+[1] https://github.com/emeryberger/Hoard/tree/master/benchmarks
+
+> > Are you using any benchmark that shows any perf difference?
 > 
-> https://www.pdfdrive.net/powerpc-microprocessor-family-the-programming-environments-for-32-e3087633.html
-> This document has the information on the fdiv. Page 133 has the information on what action is executed when a division by zero situation takes place. 
-> 
-> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
-> ---
->  target/ppc/fpu_helper.c            | 16 ++++++++++++++++
->  target/ppc/translate/fp-impl.inc.c | 28 +++++++++++++++++++++++++++-
->  2 files changed, 43 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-> index 7714bfe0f9..de694604fb 100644
-> --- a/target/ppc/fpu_helper.c
-> +++ b/target/ppc/fpu_helper.c
-> @@ -658,6 +658,20 @@ uint64_t helper_fdiv(CPUPPCState *env, uint64_t arg1, uint64_t arg2)
->      } else if (unlikely(float64_is_zero(farg1.d) && float64_is_zero(farg2.d))) {
->          /* Division of zero by zero */
->          farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXZDZ, 1);
-> +    } else if (arg2 == 0) {
-> +        /* Division by zero */
-> +        float_zero_divide_excp(env, GETPC());
-> +        if (fpscr_ze) { /* if zero divide exception is enabled */
-> +            farg1.ll = 0;
-> +        } else {
-> +            uint64_t sign = (farg1.ll ^ farg2.ll) >> 63;
-> +            if (sign) { /* Negative sign bit */
-> +                farg1.ll = 0xfff0000000000000; /* Negative Infinity */
-> +            } else { /* Positive sign bit */
-> +                farg1.ll = 0x7ff0000000000000; /* Positive Infinity */
-> +            }
-> +            helper_compute_fprf_float64(env, farg1.d);
+> Not so far.  Glibc has some microbenchmarks for strings, which I will try next
+> week, but they are not multi-threaded.  Maybe just run 4 threads of those
+> benchmark?
 
-I don't believe you.
-(1) This is against IEEE spec,
-(2) There is nothing about this zero result in the Power manual,
-(3) I do not replicate this experimentally.
+I'd run more threads if possible. I have access to a 64-core machine,
+so ping me once you identify benchmarks that are of interest.
 
-#include <signal.h>
-#include <stdio.h>
-#include <fenv.h>
-#include <stdlib.h>
-
-void handle(int sig, siginfo_t *info, void *x)
-{
-    ucontext_t *u = x;
-    printf("%f\n", u->uc_mcontext.fp_regs[0]);
-    exit(0);
-}
-
-int main()
-{
-  struct sigaction a = { .sa_sigaction = handle, .sa_flags = SA_SIGINFO };
-  sigaction(SIGFPE, &a, NULL);
-  feenableexcept(FE_ALL_EXCEPT);
-
-  {
-    register double f0 __asm__("32") = 2;
-    register double f1 __asm__("33") = 1;
-    register double f2 __asm__("34") = 0;
-    __asm__ volatile ("fdiv %0,%1,%2" : "+f"(f0) : "f"(f1), "f"(f2));
-  }
-  return 1;
-}
-
-Produces the expected 2.0, i.e. the destination register is unmodified.
-Without feenableexcept, of course, the normal infinity is produced.
-
-
-r~
+		Emilio
