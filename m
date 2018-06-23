@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fWoyR-0001lM-71
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 16:17:32 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fWp03-0002gj-Pg
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 16:19:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fWoyO-0004im-2M
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 16:17:31 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34464)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fWp00-0005JH-L1
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 16:19:11 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:35009)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fWoyN-0004iU-R4
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 16:17:27 -0400
-Received: by mail-pf0-x241.google.com with SMTP id a63-v6so4705884pfl.1
-	for <qemu-devel@nongnu.org>; Sat, 23 Jun 2018 13:17:27 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-From: Michael Clark <mjc@sifive.com>
-In-Reply-To: <CAFEAcA_mvKsVAbSt0kw_zJ3G1f8CaRi2UHHy=7kMGhfPNa72hg@mail.gmail.com>
-Date: Sat, 23 Jun 2018 13:17:24 -0700
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F32434A3-C850-4F03-ACE6-B3F01265D363@sifive.com>
-References: <cover.1529695276.git.alistair.francis@wdc.com>
-	<8eaf7bd5e178b897765f99abac553a664663193c.1529695276.git.alistair.francis@wdc.com>
-	<CAFEAcA_mvKsVAbSt0kw_zJ3G1f8CaRi2UHHy=7kMGhfPNa72hg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v1 3/5] hw/riscv/virt: Connect the Xilinx
- PCIe
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fWp00-0005J7-Fg
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 16:19:08 -0400
+Received: by mail-qt0-x243.google.com with SMTP id z6-v6so8908149qti.2
+	for <qemu-devel@nongnu.org>; Sat, 23 Jun 2018 13:19:08 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180623085028.29553-1-mark.cave-ayland@ilande.co.uk>
+	<20180623085028.29553-3-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f6e618ca-3b19-5d3b-5007-5aea3ff6c878@amsat.org>
+Date: Sat, 23 Jun 2018 17:19:03 -0300
+MIME-Version: 1.0
+In-Reply-To: <20180623085028.29553-3-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] pci: allow DeviceClass fw_name to
+ override pci_dev_fw_name() if set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +36,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair.francis@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Palmer Dabbelt <palmer@sifive.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, lersek@redhat.com, marcel@redhat.com, armbru@redhat.com, mst@redhat.com
 
+On 06/23/2018 05:50 AM, Mark Cave-Ayland wrote:
+> The current implementation of pci_dev_fw_name() scans through a fixed
+> set of PCI class descriptions to determine the firmware device name
+> but in some cases this isn't always appropriate, for example with
+> the macio device which uses a class code of 0xff (unassigned).
+> 
+> Rather than add a new entry for the macio device and risk a potential
+> clash with another unassigned device later, add a check to
+> pcibus_get_fw_dev_path() that will use DeviceClass fw_name if set in
+> preference to pci_dev_fw_name().
+> 
+> This enables PCI devices such as macio to set dc->fw_name as required
+> to match the name specified in the firmware.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> On 23/06/2018, at 1:07 PM, Peter Maydell <peter.maydell@linaro.org> =
-wrote:
->=20
-> On 22 June 2018 at 20:30, Alistair Francis <alistair.francis@wdc.com> =
-wrote:
->> Connect the Xilinx PCIe device based on the device tree included in =
-the
->> HiFive Unleashed ROM.
->=20
-> Did you consider using the 'gpex' generic PCIe controller here?
-
-Yes. Alastair and I talked about this yesterday and we agreed in =
-principle to using =E2=80=98gpex=E2=80=99 on the virt machine and the =
-Xilinx PCIe on the SiFive U (=E2=80=99sifive_u=E2=80=99) machine, as =
-this reflects one of the IP configurations of SiFive=E2=80=99s Coreplex =
-U series when run on FPGA.
-
-By changing this patch to add Xilinx PCIe to =E2=80=98sifive_u=E2=80=99, =
-we can plug IO devices into the U series machine, and instead add gpex =
-to RISC-V virt. i.e. vendor agnostic generic PCIe controller for virt. =
-We would like =E2=80=98virt=E2=80=99 to be a potential vendor agnostic =
-hardware target when we have kvm, so using gpex fits with this strategy =
-(speaking from a RISC-V perspective not a SiFive perspective).
+> ---
+>  hw/pci/pci.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 80bc45930d..126dd683dc 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -2411,12 +2411,14 @@ static char *pci_dev_fw_name(DeviceState *dev, char *buf, int len)
+>  
+>  static char *pcibus_get_fw_dev_path(DeviceState *dev)
+>  {
+> +    DeviceClass *dc = DEVICE_GET_CLASS(dev);
+>      PCIDevice *d = (PCIDevice *)dev;
+>      char path[50], name[33];
+>      int off;
+>  
+>      off = snprintf(path, sizeof(path), "%s@%x",
+> -                   pci_dev_fw_name(dev, name, sizeof name),
+> +                   dc->fw_name ? dc->fw_name :
+> +                       pci_dev_fw_name(dev, name, sizeof name),
+>                     PCI_SLOT(d->devfn));
+>      if (PCI_FUNC(d->devfn))
+>          snprintf(path + off, sizeof(path) + off, ",%x", PCI_FUNC(d->devfn));
+> 
