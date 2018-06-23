@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46475)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fWgOD-0005yp-Ts
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 07:07:35 -0400
+	(envelope-from <linux@roeck-us.net>) id 1fWjeQ-0000qx-5w
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 10:36:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fWgOA-0002MM-Nz
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 07:07:33 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:33637)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fWgOA-0002M5-F6
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 07:07:30 -0400
-Received: by mail-wm0-x230.google.com with SMTP id z6-v6so8313084wma.0
-	for <qemu-devel@nongnu.org>; Sat, 23 Jun 2018 04:07:30 -0700 (PDT)
-References: <20180621184116.910-1-alex.bennee@linaro.org>
-	<CAMo8BfJ+Y9didgKKvrWJiuYOd+qUyxpjy75mBaOzspCt5eHZDA@mail.gmail.com>
-	<87efgzur9n.fsf@linaro.org>
-	<CAMo8BfJ0sCaGt2Bj8H9aGWBUpCK3qMCDKD8BTtVQp2Y6+eXnPQ@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAMo8BfJ0sCaGt2Bj8H9aGWBUpCK3qMCDKD8BTtVQp2Y6+eXnPQ@mail.gmail.com>
-Date: Sat, 23 Jun 2018 12:07:27 +0100
-Message-ID: <87in692234.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] blogposts: add post about the new
- check-tcg infrastructure
+	(envelope-from <linux@roeck-us.net>) id 1fWjeP-0003J1-7a
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 10:36:30 -0400
+From: Guenter Roeck <linux@roeck-us.net>
+Date: Sat, 23 Jun 2018 07:36:09 -0700
+Message-Id: <1529764569-12848-1-git-send-email-linux@roeck-us.net>
+Subject: [Qemu-devel] [PATCH v3] sam460ex: Fix sam460ex device tree when
+ booting the Linux kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,96 +18,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Filippov <jcmvbkbc@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, Guenter Roeck <linux@roeck-us.net>
 
+sam460ex (or at least this emulation) does not support the "ibm,cpm" power
+management. As a result, Linux crashes when trying to access it. Remove
+its device tree node. Also, if/when we boot the Linux kernel directly,
+serial port clock frequencies in the device tree file will be unset, and
+serial port initialization will fail. Add valid frequency values to
+the serial ports to be able to use it. Also set valid values for the other
+clock nodes otherwise set by u-boot.
 
-Max Filippov <jcmvbkbc@gmail.com> writes:
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+v3: Fix style problems (ERROR: braces {} are necessary for all arms ...)
+    Use defines flor clock frequencies.
+    Use clock frequencies as reported by u-boot in real system.
+    Use more specific prefix in subject
+    Fi typos in description
+v2: Initialize all serial nodes to match u-boot behavior more closely.
+    Use direct fdt API functions and ignore errors when clearing out
+    /cpm and for setting the serial port clocks.
 
-> On Fri, Jun 22, 2018 at 2:03 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org=
-> wrote:
->>
->> Max Filippov <jcmvbkbc@gmail.com> writes:
->>
->>> On Thu, Jun 21, 2018 at 11:41 AM, Alex Benn=C3=A9e <alex.bennee@linaro.=
-org> wrote:
->>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>>> ---
->>>>  _posts/2018-06-21-tcg-testing.md | 129 +++++++++++++++++++++++++++++++
->>>>  1 file changed, 129 insertions(+)
->>>>  create mode 100644 _posts/2018-06-21-tcg-testing.md
->>>>
->>>> diff --git a/_posts/2018-06-21-tcg-testing.md b/_posts/2018-06-21-tcg-=
-testing.md
->>>
->>> [...]
->>>
->>>> +The `tests/tcg` directory still contains a number of source files we
->>>> +don't build. Notably the cris, lm32, mips, openrisc and xtensa target=
-s have
->>>> +a set of tests that need a system emulator. Now we have the
->>>> +infrastructure for compiling I hope we can get support for system
->>>> +tests added fairly quickly. There will need to be some work to figure
->>>> +out a nice common way to pass results back to the build-system. For
->>>> +linux-user this is simple as all programs can simply return their exit
->>>> +code however for system emulation this is a little more involved.
->>>
->>> xtensa tests pass exit codes to the build system through semihosting ca=
-lls.
->>> If any of them fails make check fails as well.
->>
->> I've re-written that section as:
->>
->>   The `tests/tcg` directory still contains a number of source files we
->>   don't build.
->>
->>   The cris and openrisc directories contain user-space tests which just
->>   need the support of a toolchain and the relevant Makefile plumbing to
->>   be added.
->>
->>   The lm32, mips and xtensa targets have a set of tests that need a
->>   system emulator. Aside from adding the compilers as docker images some
->>   additional work is needed to handle the differences between plain
->>   linux-user tests which can simply return an exit code to getting the
->>   results from a qemu-system emulation. Some architectures have
->>   semi-hosting support already for this while others report their test
->>   status over a simple serial link which will need to be parsed and
->>   handled in the `run-%:` test rule.
->>
->> How is that?
->
-> 'run-%' goal is only present in xtensa Makefile, other test suites have
-> explicit loop in the 'check' goal. Otherwise LGTM.
+ hw/ppc/sam460ex.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-The TCG tests added a generic run-% rule:
-
-  run-%: %
-          $(call run-test, $<, $(QEMU) $<, "$< on $(TARGET_NAME)")
-
-Although individual tests can override it.
-
->
->> Any chance you could look into what it would take to package up the
->> xtensa toolchain in a docker container?
->
-> Can you point me to an example?
-
-Well this was the base attempt:
-
-https://github.com/stsquad/qemu/commit/daee9dc013b13b13e81f720176c5e379c05e=
-d0e0
-
-So I guess we need to add the overlay to the image?
-
->
->> Are they simply tarballs of binaries?
->
-> Yes, we have that option:
->
->   https://github.com/foss-xtensa/toolchain/releases
->
-> Or they may be built from source.
-
-
---
-Alex Benn=C3=A9e
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index bdc53d2..3b90196 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -37,6 +37,8 @@
+ #include "hw/i2c/smbus.h"
+ #include "hw/usb/hcd-ehci.h"
+ 
++#include <libfdt.h>
++
+ #define BINARY_DEVICE_TREE_FILE "canyonlands.dtb"
+ #define UBOOT_FILENAME "u-boot-sam460-20100605.bin"
+ /* to extract the official U-Boot bin from the updater: */
+@@ -67,6 +69,9 @@
+ */
+ 
+ #define CPU_FREQ 1150000000
++#define PLB_FREQ 230000000
++#define OPB_FREQ 115000000
++#define EBC_FREQ 115000000
+ #define SDRAM_NR_BANKS 4
+ 
+ /* FIXME: See u-boot.git 8ac41e, also fix in ppc440_uc.c */
+@@ -255,6 +260,7 @@ static int sam460ex_load_device_tree(hwaddr addr,
+     void *fdt;
+     uint32_t tb_freq = CPU_FREQ;
+     uint32_t clock_freq = CPU_FREQ;
++    int offset;
+ 
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, BINARY_DEVICE_TREE_FILE);
+     if (!filename) {
+@@ -308,6 +314,27 @@ static int sam460ex_load_device_tree(hwaddr addr,
+     qemu_fdt_setprop_cell(fdt, "/cpus/cpu@0", "timebase-frequency",
+                               tb_freq);
+ 
++    /* Remove cpm node if it exists (it is not emulated) */
++    offset = fdt_path_offset(fdt, "/cpm");
++    if (offset >= 0) {
++        fdt_nop_node(fdt, offset);
++    }
++
++    /* set serial port clocks */
++    offset = fdt_node_offset_by_compatible(fdt, -1, "ns16550");
++    while (offset >= 0) {
++        fdt_setprop_cell(fdt, offset, "clock-frequency", PLB_FREQ);
++        offset = fdt_node_offset_by_compatible(fdt, offset, "ns16550");
++    }
++
++    /* some more clocks */
++    qemu_fdt_setprop_cell(fdt, "/plb", "clock-frequency",
++                              PLB_FREQ);
++    qemu_fdt_setprop_cell(fdt, "/plb/opb", "clock-frequency",
++                              OPB_FREQ);
++    qemu_fdt_setprop_cell(fdt, "/plb/opb/ebc", "clock-frequency",
++                              EBC_FREQ);
++
+     rom_add_blob_fixed(BINARY_DEVICE_TREE_FILE, fdt, fdt_size, addr);
+     g_free(fdt);
+     ret = fdt_size;
+-- 
+2.7.4
