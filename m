@@ -1,15 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fWjeQ-0000qx-5w
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 10:36:31 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fWkQK-0008AX-3W
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 11:26:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fWjeP-0003J1-7a
-	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 10:36:30 -0400
-From: Guenter Roeck <linux@roeck-us.net>
-Date: Sat, 23 Jun 2018 07:36:09 -0700
-Message-Id: <1529764569-12848-1-git-send-email-linux@roeck-us.net>
-Subject: [Qemu-devel] [PATCH v3] sam460ex: Fix sam460ex device tree when
- booting the Linux kernel
+	(envelope-from <richard.henderson@linaro.org>) id 1fWkQH-0002KQ-0J
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 11:26:00 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:38959)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fWkQG-0002K6-PP
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 11:25:56 -0400
+Received: by mail-pg0-x242.google.com with SMTP id n2-v6so794607pgq.6
+	for <qemu-devel@nongnu.org>; Sat, 23 Jun 2018 08:25:56 -0700 (PDT)
+References: <20180621173635.21537-1-richard.henderson@linaro.org>
+	<20180622211244.GA11346@flamenco>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1319a0f0-0009-ebfc-dab4-eec196ba8ba5@linaro.org>
+Date: Sat, 23 Jun 2018 08:25:52 -0700
+MIME-Version: 1.0
+In-Reply-To: <20180622211244.GA11346@flamenco>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/2] linux-user: Change mmap_lock to rwlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,89 +31,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, Guenter Roeck <linux@roeck-us.net>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu, qemu-arm@nongnu.org
 
-sam460ex (or at least this emulation) does not support the "ibm,cpm" power
-management. As a result, Linux crashes when trying to access it. Remove
-its device tree node. Also, if/when we boot the Linux kernel directly,
-serial port clock frequencies in the device tree file will be unset, and
-serial port initialization will fail. Add valid frequency values to
-the serial ports to be able to use it. Also set valid values for the other
-clock nodes otherwise set by u-boot.
+On 06/22/2018 02:12 PM, Emilio G. Cota wrote:
+> I'm curious to see how much perf could be gained. It seems that the hold
+> times in SVE code for readers might not be very large, which
+> then wouldn't let us amortize the atomic inc of the read lock
+> (IOW, we might not see much of a difference compared to a regular
+> mutex).
 
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
-v3: Fix style problems (ERROR: braces {} are necessary for all arms ...)
-    Use defines flor clock frequencies.
-    Use clock frequencies as reported by u-boot in real system.
-    Use more specific prefix in subject
-    Fi typos in description
-v2: Initialize all serial nodes to match u-boot behavior more closely.
-    Use direct fdt API functions and ignore errors when clearing out
-    /cpm and for setting the serial port clocks.
+In theory, the uncontended case for rwlocks is the same as a mutex.
 
- hw/ppc/sam460ex.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+> Are you using any benchmark that shows any perf difference?
 
-diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
-index bdc53d2..3b90196 100644
---- a/hw/ppc/sam460ex.c
-+++ b/hw/ppc/sam460ex.c
-@@ -37,6 +37,8 @@
- #include "hw/i2c/smbus.h"
- #include "hw/usb/hcd-ehci.h"
- 
-+#include <libfdt.h>
-+
- #define BINARY_DEVICE_TREE_FILE "canyonlands.dtb"
- #define UBOOT_FILENAME "u-boot-sam460-20100605.bin"
- /* to extract the official U-Boot bin from the updater: */
-@@ -67,6 +69,9 @@
- */
- 
- #define CPU_FREQ 1150000000
-+#define PLB_FREQ 230000000
-+#define OPB_FREQ 115000000
-+#define EBC_FREQ 115000000
- #define SDRAM_NR_BANKS 4
- 
- /* FIXME: See u-boot.git 8ac41e, also fix in ppc440_uc.c */
-@@ -255,6 +260,7 @@ static int sam460ex_load_device_tree(hwaddr addr,
-     void *fdt;
-     uint32_t tb_freq = CPU_FREQ;
-     uint32_t clock_freq = CPU_FREQ;
-+    int offset;
- 
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, BINARY_DEVICE_TREE_FILE);
-     if (!filename) {
-@@ -308,6 +314,27 @@ static int sam460ex_load_device_tree(hwaddr addr,
-     qemu_fdt_setprop_cell(fdt, "/cpus/cpu@0", "timebase-frequency",
-                               tb_freq);
- 
-+    /* Remove cpm node if it exists (it is not emulated) */
-+    offset = fdt_path_offset(fdt, "/cpm");
-+    if (offset >= 0) {
-+        fdt_nop_node(fdt, offset);
-+    }
-+
-+    /* set serial port clocks */
-+    offset = fdt_node_offset_by_compatible(fdt, -1, "ns16550");
-+    while (offset >= 0) {
-+        fdt_setprop_cell(fdt, offset, "clock-frequency", PLB_FREQ);
-+        offset = fdt_node_offset_by_compatible(fdt, offset, "ns16550");
-+    }
-+
-+    /* some more clocks */
-+    qemu_fdt_setprop_cell(fdt, "/plb", "clock-frequency",
-+                              PLB_FREQ);
-+    qemu_fdt_setprop_cell(fdt, "/plb/opb", "clock-frequency",
-+                              OPB_FREQ);
-+    qemu_fdt_setprop_cell(fdt, "/plb/opb/ebc", "clock-frequency",
-+                              EBC_FREQ);
-+
-     rom_add_blob_fixed(BINARY_DEVICE_TREE_FILE, fdt, fdt_size, addr);
-     g_free(fdt);
-     ret = fdt_size;
--- 
-2.7.4
+Not so far.  Glibc has some microbenchmarks for strings, which I will try next
+week, but they are not multi-threaded.  Maybe just run 4 threads of those
+benchmark?
+
+
+r~
