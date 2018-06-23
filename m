@@ -1,14 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fWYCs-0006P9-1E
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 22:23:19 -0400
+	(envelope-from <linux@roeck-us.net>) id 1fWYNg-000050-Qp
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 22:34:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fWYCo-0000mq-1p
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 22:23:18 -0400
-From: John Arbuckle <programmingkidx@gmail.com>
-Date: Fri, 22 Jun 2018 22:22:58 -0400
-Message-Id: <20180623022258.22158-1-programmingkidx@gmail.com>
-Subject: [Qemu-devel] [PATCH] fix fdiv instruction
+	(envelope-from <linux@roeck-us.net>) id 1fWYNf-0005We-PD
+	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 22:34:28 -0400
+Date: Fri, 22 Jun 2018 19:34:20 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <20180623023420.GA28312@roeck-us.net>
+References: <1529642871-14214-1-git-send-email-linux@roeck-us.net>
+	<20180622050334.GG612@umbus.fritz.box>
+	<alpine.BSF.2.21.1806220930470.66303@zero.eik.bme.hu>
+	<c59b2d3e-384a-f3d9-41a7-74439cd3c78e@roeck-us.net>
+	<alpine.BSF.2.21.1806222322110.86811@zero.eik.bme.hu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.BSF.2.21.1806222322110.86811@zero.eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH] ppc: Fix sam460ex devicetree when booting
+ the Linux kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,113 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: david@gibson.dropbear.id.au, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: John Arbuckle <programmingkidx@gmail.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-When the fdiv instruction divides a finite number by zero,
-the result actually depends on the FPSCR[ZE] bit. If this
-bit is set, the return value is zero. If it is not set
-the result should be either positive or negative infinity.
-The sign of this result would depend on the sign of the
-two inputs. What currently happens is only infinity is
-returned even if the FPSCR[ZE] bit is set. This patch
-fixes this problem by actually checking the FPSCR[ZE] bit
-when deciding what the answer should be.
+On Fri, Jun 22, 2018 at 11:37:30PM +0200, BALATON Zoltan wrote:
+> 
+> >>The version of the Linux kernel I've tried (which is from the Linux CD
+> >>on ACube's site) did not try to access the power management register,
+> >>neither any guest OSes I've tested with. Looks like it may be specific
+> >>to the kernel config you're using.
+> >>
+> >Interesting. This is with the standard upstream kernel, using
+> >canyonlands_defconfig.
+> >The code seems to have been in the upstream kernel forever.
+> 
+> Maybe the Sam460ex specific image has some patches not in upstream kernel.
+> 
 
-fdiv is suppose to only set the FPSCR's FPRF bits during a
-division by zero situation when the FPSCR[ZE] is not set.
-What currently happens is these bits are always set. This
-patch fixes this problem by checking the FPSCR[ZE] bit to
-decide if the FPRF bits should be set. 
+Yes, it does. To start with, the DesignWare sata driver is different.
 
-https://www.pdfdrive.net/powerpc-microprocessor-family-the-programming-environments-for-32-e3087633.html
-This document has the information on the fdiv. Page 133 has the information on what action is executed when a division by zero situation takes place. 
+This is not the reason for the problem, though. canyonlands_defconfig
+in the upstream kernel has CONFIG_SUSPEND enabled, but the configuration
+used by aCube doesn't. The kernel code accessing the power management
+registers is only enabled with CONFIG_SUSPEND.
 
-Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
----
- target/ppc/fpu_helper.c            | 16 ++++++++++++++++
- target/ppc/translate/fp-impl.inc.c | 28 +++++++++++++++++++++++++++-
- 2 files changed, 43 insertions(+), 1 deletion(-)
+> >>By the way, when I've tried with a more recent Linux kernel (4.15.10)
+> >>I've noticed that the sm501 driver seemed like having endianness
+> >>problems and thus did not find the chip, while it works with other older
+> >>kernels made for sam460ex. I did not try to debug or bisect this yet. Do
+> >>you know anything about that?
+> >>
+> >
+> >No, I had not noticed. SM501 is disabled in the latest canyonlands_defconfig,
+> >and I only use the serial console for my testing. It fails as far back as
+> >3.18.y,
+> >so I am not sure if this is a Linux or a qemu problem, or if it is a
+> >problem that
+> >was never fixed in the upstream kernel. What kernels did you try ?
+> 
 
-diff --git a/target/ppc/fpu_helper.c b/target/ppc/fpu_helper.c
-index 7714bfe0f9..de694604fb 100644
---- a/target/ppc/fpu_helper.c
-+++ b/target/ppc/fpu_helper.c
-@@ -658,6 +658,20 @@ uint64_t helper_fdiv(CPUPPCState *env, uint64_t arg1, uint64_t arg2)
-     } else if (unlikely(float64_is_zero(farg1.d) && float64_is_zero(farg2.d))) {
-         /* Division of zero by zero */
-         farg1.ll = float_invalid_op_excp(env, POWERPC_EXCP_FP_VXZDZ, 1);
-+    } else if (arg2 == 0) {
-+        /* Division by zero */
-+        float_zero_divide_excp(env, GETPC());
-+        if (fpscr_ze) { /* if zero divide exception is enabled */
-+            farg1.ll = 0;
-+        } else {
-+            uint64_t sign = (farg1.ll ^ farg2.ll) >> 63;
-+            if (sign) { /* Negative sign bit */
-+                farg1.ll = 0xfff0000000000000; /* Negative Infinity */
-+            } else { /* Positive sign bit */
-+                farg1.ll = 0x7ff0000000000000; /* Positive Infinity */
-+            }
-+            helper_compute_fprf_float64(env, farg1.d);
-+        }
-     } else {
-         if (unlikely(float64_is_signaling_nan(farg1.d, &env->fp_status) ||
-                      float64_is_signaling_nan(farg2.d, &env->fp_status))) {
-@@ -665,6 +679,8 @@ uint64_t helper_fdiv(CPUPPCState *env, uint64_t arg1, uint64_t arg2)
-             float_invalid_op_excp(env, POWERPC_EXCP_FP_VXSNAN, 1);
-         }
-         farg1.d = float64_div(farg1.d, farg2.d, &env->fp_status);
-+        helper_compute_fprf_float64(env, farg1.d);
-+        helper_float_check_status(env);
-     }
- 
-     return farg1.ll;
-diff --git a/target/ppc/translate/fp-impl.inc.c b/target/ppc/translate/fp-impl.inc.c
-index 2fbd4d4f38..4e20bcceb4 100644
---- a/target/ppc/translate/fp-impl.inc.c
-+++ b/target/ppc/translate/fp-impl.inc.c
-@@ -84,6 +84,32 @@ static void gen_f##name(DisasContext *ctx)                                    \
- _GEN_FLOAT_AB(name, name, 0x3F, op2, inval, 0, set_fprf, type);               \
- _GEN_FLOAT_AB(name##s, name, 0x3B, op2, inval, 1, set_fprf, type);
- 
-+
-+#define _GEN_FLOAT_DIV(name, op, op1, op2, inval, isfloat, set_fprf, type)    \
-+static void gen_f##name(DisasContext *ctx)                                    \
-+{                                                                             \
-+    if (unlikely(!ctx->fpu_enabled)) {                                        \
-+        gen_exception(ctx, POWERPC_EXCP_FPU);                                 \
-+        return;                                                               \
-+    }                                                                         \
-+    gen_reset_fpstatus();                                                     \
-+    gen_helper_f##op(cpu_fpr[rD(ctx->opcode)], cpu_env,                       \
-+                     cpu_fpr[rA(ctx->opcode)],                                \
-+                     cpu_fpr[rB(ctx->opcode)]);                               \
-+    if (isfloat) {                                                            \
-+        gen_helper_frsp(cpu_fpr[rD(ctx->opcode)], cpu_env,                    \
-+                        cpu_fpr[rD(ctx->opcode)]);                            \
-+    }                                                                         \
-+    if (unlikely(Rc(ctx->opcode) != 0)) {                                     \
-+        gen_set_cr1_from_fpscr(ctx);                                          \
-+    }                                                                         \
-+}
-+
-+#define GEN_FLOAT_DIV(name, op2, inval, set_fprf, type)                       \
-+_GEN_FLOAT_DIV(name, name, 0x3F, op2, inval, 0, set_fprf, type);              \
-+_GEN_FLOAT_DIV(name##s, name, 0x3B, op2, inval, 1, set_fprf, type);
-+
-+
- #define _GEN_FLOAT_AC(name, op, op1, op2, inval, isfloat, set_fprf, type)     \
- static void gen_f##name(DisasContext *ctx)                                    \
- {                                                                             \
-@@ -149,7 +175,7 @@ static void gen_f##name(DisasContext *ctx)                                    \
- /* fadd - fadds */
- GEN_FLOAT_AB(add, 0x15, 0x000007C0, 1, PPC_FLOAT);
- /* fdiv - fdivs */
--GEN_FLOAT_AB(div, 0x12, 0x000007C0, 1, PPC_FLOAT);
-+GEN_FLOAT_DIV(div, 0x12, 0x000007C0, 1, PPC_FLOAT);
- /* fmul - fmuls */
- GEN_FLOAT_AC(mul, 0x19, 0x0000F800, 1, PPC_FLOAT);
- 
--- 
-2.14.3 (Apple Git-98)
+The problem is this (from the kernel diffs provided by aCube):
+
+ #if defined(CONFIG_PPC32)
+-#define smc501_readl(addr)             ioread32be((addr))
+-#define smc501_writel(val, addr)       iowrite32be((val), (addr))
++#define smc501_readl(addr)             ioread32((addr))
++#define smc501_writel(val, addr)       iowrite32((val), (addr))
+ #else
+ #define smc501_readl(addr)             readl(addr)
+ #define smc501_writel(val, addr)       writel(val, addr)
+
+This is a bit fishy since the cpu is big endian and iowrite32be()
+should be identical to iowrite32(), but apparently that is not the
+case here. I don't think I'll have time to track this down, though.
+
+Guenter
