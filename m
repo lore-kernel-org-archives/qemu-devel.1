@@ -1,15 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37430)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <root@didideMacBook-Pro-334.local>)
-	id 1fWmIK-0005Z1-TU
+	id 1fWmIK-0005Z0-Dz
 	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 13:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <root@didideMacBook-Pro-334.local>)
-	id 1fWmIJ-0003zf-NX
+	id 1fWmIJ-0003zS-FC
 	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 13:25:52 -0400
-From: 13466399134@163.com
-Date: Sun, 24 Jun 2018 00:41:16 +0800
-Message-Id: <20180623164116.29482-1-13466399134@163.com>
+From: yaoxu@didichuxing.com
+Date: Sun, 24 Jun 2018 00:46:24 +0800
+Message-Id: <20180623164624.30022-1-yaoxu@didichuxing.com>
 Subject: [Qemu-devel] block/dirty-bitmap: Useless bitmap in image can be
  removed
 List-Id: <qemu-devel.nongnu.org>
@@ -21,13 +21,13 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, Yaoxu19870920 <13466399134@163.com>
+Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, yaoxu <yaoxu@didichuxing.com>
 
 If qemu-kvm quit without save bitmaps in image(coredump or panic on host),
 bitmaps in image can not be used safely anymore, and can not be removed 
 also. Useless bitmaps should be removed.
 
-Signed-off-by: Yaoxu19870920 <13466399134@163.com>
+Signed-off-by: yaoxu <yaoxu@didichuxing.com>
 ---
 diff --git a/blockdev.c b/blockdev.c
 index c85056a74b..58d7570932 100644
