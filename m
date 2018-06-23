@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fWYNg-000050-Qp
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 22:34:29 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fWaZh-00089X-Ra
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 00:55:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fWYNf-0005We-PD
-	for qemu-devel@nongnu.org; Fri, 22 Jun 2018 22:34:28 -0400
-Date: Fri, 22 Jun 2018 19:34:20 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <20180623023420.GA28312@roeck-us.net>
-References: <1529642871-14214-1-git-send-email-linux@roeck-us.net>
-	<20180622050334.GG612@umbus.fritz.box>
-	<alpine.BSF.2.21.1806220930470.66303@zero.eik.bme.hu>
-	<c59b2d3e-384a-f3d9-41a7-74439cd3c78e@roeck-us.net>
-	<alpine.BSF.2.21.1806222322110.86811@zero.eik.bme.hu>
+	(envelope-from <no-reply@patchew.org>) id 1fWaZg-00046e-Rm
+	for qemu-devel@nongnu.org; Sat, 23 Jun 2018 00:55:01 -0400
+Resent-Message-Id: <E1fWaZg-00046e-Rm@eggs.gnu.org>
+In-Reply-To: <20180623022258.22158-1-programmingkidx@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152972967127.939.465110624362437028@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.BSF.2.21.1806222322110.86811@zero.eik.bme.hu>
-Subject: Re: [Qemu-devel] [PATCH] ppc: Fix sam460ex devicetree when booting
- the Linux kernel
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 22 Jun 2018 21:54:31 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] fix fdiv instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +23,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: programmingkidx@gmail.com
+Cc: famz@redhat.com, david@gibson.dropbear.id.au, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Fri, Jun 22, 2018 at 11:37:30PM +0200, BALATON Zoltan wrote:
-> 
-> >>The version of the Linux kernel I've tried (which is from the Linux CD
-> >>on ACube's site) did not try to access the power management register,
-> >>neither any guest OSes I've tested with. Looks like it may be specific
-> >>to the kernel config you're using.
-> >>
-> >Interesting. This is with the standard upstream kernel, using
-> >canyonlands_defconfig.
-> >The code seems to have been in the upstream kernel forever.
-> 
-> Maybe the Sam460ex specific image has some patches not in upstream kernel.
-> 
-
-Yes, it does. To start with, the DesignWare sata driver is different.
-
-This is not the reason for the problem, though. canyonlands_defconfig
-in the upstream kernel has CONFIG_SUSPEND enabled, but the configuration
-used by aCube doesn't. The kernel code accessing the power management
-registers is only enabled with CONFIG_SUSPEND.
-
-> >>By the way, when I've tried with a more recent Linux kernel (4.15.10)
-> >>I've noticed that the sm501 driver seemed like having endianness
-> >>problems and thus did not find the chip, while it works with other older
-> >>kernels made for sam460ex. I did not try to debug or bisect this yet. Do
-> >>you know anything about that?
-> >>
-> >
-> >No, I had not noticed. SM501 is disabled in the latest canyonlands_defconfig,
-> >and I only use the serial console for my testing. It fails as far back as
-> >3.18.y,
-> >so I am not sure if this is a Linux or a qemu problem, or if it is a
-> >problem that
-> >was never fixed in the upstream kernel. What kernels did you try ?
-> 
-
-The problem is this (from the kernel diffs provided by aCube):
-
- #if defined(CONFIG_PPC32)
--#define smc501_readl(addr)             ioread32be((addr))
--#define smc501_writel(val, addr)       iowrite32be((val), (addr))
-+#define smc501_readl(addr)             ioread32((addr))
-+#define smc501_writel(val, addr)       iowrite32((val), (addr))
- #else
- #define smc501_readl(addr)             readl(addr)
- #define smc501_writel(val, addr)       writel(val, addr)
-
-This is a bit fishy since the cpu is big endian and iowrite32be()
-should be identical to iowrite32(), but apparently that is not the
-case here. I don't think I'll have time to track this down, though.
-
-Guenter
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjIzMDIyMjU4LjIyMTU4LTEtcHJvZ3JhbW1pbmdraWR4QGdtYWlsLmNv
+bQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSBmaXggZmRpdiBpbnN0cnVjdGlvbgoKPT09
+IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0k
+KGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
+cyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1p
+dHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRj
+b21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cg
+LW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVt
+YWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAg
+ZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRm
+YWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
+MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
+cm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTI5NzE2NzIx
+LTI4NDAwLTEtZ2l0LXNlbmQtZW1haWwtbGludXhAcm9lY2stdXMubmV0IC0+IHBhdGNoZXcvMTUy
+OTcxNjcyMS0yODQwMC0xLWdpdC1zZW5kLWVtYWlsLWxpbnV4QHJvZWNrLXVzLm5ldAogKiBbbmV3
+IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNjIzMDIyMjU4LjIyMTU4LTEtcHJvZ3Jh
+bW1pbmdraWR4QGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTgwNjIzMDIyMjU4LjIyMTU4LTEtcHJv
+Z3JhbW1pbmdraWR4QGdtYWlsLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk3
+OTVmNTZjMjQgZml4IGZkaXYgaW5zdHJ1Y3Rpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
+aW5nIFBBVENIIDEvMTogZml4IGZkaXYgaW5zdHJ1Y3Rpb24uLi4KRVJST1I6IE1hY3JvcyB3aXRo
+IG11bHRpcGxlIHN0YXRlbWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBs
+b29wCiM5MTogRklMRTogdGFyZ2V0L3BwYy90cmFuc2xhdGUvZnAtaW1wbC5pbmMuYzoxMDg6Cisj
+ZGVmaW5lIEdFTl9GTE9BVF9ESVYobmFtZSwgb3AyLCBpbnZhbCwgc2V0X2ZwcmYsIHR5cGUpICAg
+ICAgICAgICAgICAgICAgICAgICBcCitfR0VOX0ZMT0FUX0RJVihuYW1lLCBuYW1lLCAweDNGLCBv
+cDIsIGludmFsLCAwLCBzZXRfZnByZiwgdHlwZSk7ICAgICAgICAgICAgICBcCitfR0VOX0ZMT0FU
+X0RJVihuYW1lIyNzLCBuYW1lLCAweDNCLCBvcDIsIGludmFsLCAxLCBzZXRfZnByZiwgdHlwZSk7
+Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDY4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
+Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
+b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
+Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
+ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
