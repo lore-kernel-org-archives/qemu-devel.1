@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1fWwUq-0005YD-II
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 00:19:29 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fX1UE-0001EO-OH
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 05:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1fWwUp-0001mN-QO
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 00:19:28 -0400
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:33244)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1fWwUp-0001m8-Kq
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 00:19:27 -0400
-Received: by mail-yw0-x242.google.com with SMTP id u124-v6so3720150ywg.0
-	for <qemu-devel@nongnu.org>; Sat, 23 Jun 2018 21:19:27 -0700 (PDT)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fX1UB-0004Kl-Ky
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 05:39:10 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:46464
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1fX1UB-0004H3-E4
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 05:39:07 -0400
+References: <20180623085028.29553-1-mark.cave-ayland@ilande.co.uk>
+	<20180623085028.29553-3-mark.cave-ayland@ilande.co.uk>
+	<20180624065424-mutt-send-email-mst@kernel.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <1c525625-ac87-8f89-a933-7b512fd3674f@ilande.co.uk>
+Date: Sun, 24 Jun 2018 10:38:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <f0f6c235-f66c-bd81-0a53-34a9268fdcc0@amsat.org>
-References: <20180623215313.1252-1-f4bug@amsat.org>
-	<CAMo8BfK3+g-c2C9K9RxiZOAPunGoCHXrdWdz03woAxZ+aM1GUA@mail.gmail.com>
-	<f0f6c235-f66c-bd81-0a53-34a9268fdcc0@amsat.org>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Sat, 23 Jun 2018 21:19:26 -0700
-Message-ID: <CAMo8BfKyOGqnnauq6PVv8BjypMTxzYR+QmyE999VNPjaYXuCzw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] docker: Add debian-xtensa-cross image
+In-Reply-To: <20180624065424-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] pci: allow DeviceClass fw_name to
+ override pci_dev_fw_name() if set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,18 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: marcel@redhat.com, lersek@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 
-On Sat, Jun 23, 2018 at 9:04 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> I appreciate including the csp cpu because it is big-endian.
+On 24/06/18 04:55, Michael S. Tsirkin wrote:
 
-csp is little endian. FSF was big endian, but the name no longer refers
-to a specific processor, so it is also not very useful. Perhaps I just
-need to add a well-defined big endian xtensa configuration to QEMU
-and publish the overlay and prebuilt toolchain for it.
+> On Sat, Jun 23, 2018 at 09:50:28AM +0100, Mark Cave-Ayland wrote:
+>> The current implementation of pci_dev_fw_name() scans through a fixed
+>> set of PCI class descriptions to determine the firmware device name
+>> but in some cases this isn't always appropriate, for example with
+>> the macio device which uses a class code of 0xff (unassigned).
+>>
+>> Rather than add a new entry for the macio device and risk a potential
+>> clash with another unassigned device later, add a check to
+>> pcibus_get_fw_dev_path() that will use DeviceClass fw_name if set in
+>> preference to pci_dev_fw_name().
+>>
+>> This enables PCI devices such as macio to set dc->fw_name as required
+>> to match the name specified in the firmware.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> 
+> 
+> Do we know no existing pci device sets this?
 
---=20
-Thanks.
--- Max
+Here was my basic check:
+
+# Find all files containing PCIDevice
+find . -type f -exec grep -l "PCIDevice" {} \; > /tmp/pcidevices.txt
+# Of these return files containing 'dc->fw_name'
+for FILE in `cat /tmp/pcidevices.txt`; do grep -H 'dc->fw_name' $FILE; done;
+
+./hw/ppc/spapr.c:        snprintf(cpu_model, 32, "%s@%x", dc->fw_name, 
+index);
+./hw/ppc/spapr.c:        nodename = g_strdup_printf("%s@%x", 
+dc->fw_name, index);
+./hw/ppc/spapr.c:    nodename = g_strdup_printf("%s@%x", dc->fw_name, id);
+./hw/pci-bridge/pci_expander_bridge.c:    dc->fw_name = "pci";
+./hw/pci-host/designware.c:    dc->fw_name = "pci";
+./hw/pci-host/piix.c:    dc->fw_name = "pci";
+./hw/pci-host/gpex.c:    dc->fw_name = "pci";
+./hw/pci-host/xilinx-pcie.c:    dc->fw_name = "pci";
+./hw/pci-host/q35.c:    dc->fw_name = "pci";
+./hw/pci-host/prep.c:    dc->fw_name = "pci";
+
+ From what I can see the usage in spapr.c is for setting the DT CPU name 
+whilst all of the others are derived from 
+PCIE_HOST_BRIDGE/PCI_HOST_BRIDGE which are ultimately sysbus devices.
+
+
+ATB,
+
+Mark.
