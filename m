@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1fX4Ov-0004cv-AN
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 08:45:54 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fX5H8-0003Dy-2r
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 09:41:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1fX4Oq-0003JU-FB
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 08:45:53 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:46630)
+	(envelope-from <peter.maydell@linaro.org>) id 1fX5H7-0004jy-5u
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 09:41:54 -0400
+Received: from mail-ot0-x22f.google.com ([2607:f8b0:4003:c0f::22f]:40970)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1fX4Oq-0003JL-77
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 08:45:48 -0400
-Received: by mail-wr0-x241.google.com with SMTP id l14-v6so5820286wrq.13
-	for <qemu-devel@nongnu.org>; Sun, 24 Jun 2018 05:45:47 -0700 (PDT)
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Sun, 24 Jun 2018 15:45:40 +0300
-Message-Id: <20180624124540.6659-1-sameeh@daynix.com>
-Subject: [Qemu-devel] [PATCH] qga-win: Handle fstrim for OSes lower than Win8
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fX5H6-0004hX-Pj
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 09:41:53 -0400
+Received: by mail-ot0-x22f.google.com with SMTP id d19-v6so12315081oti.8
+	for <qemu-devel@nongnu.org>; Sun, 24 Jun 2018 06:41:52 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180622184909.23381-1-ehabkost@redhat.com>
+References: <20180622184909.23381-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sun, 24 Jun 2018 14:41:31 +0100
+Message-ID: <CAFEAcA8abFHM03ExFYkdRwb2Y_fKJrP9PevA36VQh0L4P-Zw=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/1] Python queue, 2018-06-22
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Yan Vugenfirer <yan@daynix.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>, Cleber Rosa <crosa@redhat.com>
 
-From: Sameeh Jubran <sjubran@redhat.com>
+On 22 June 2018 at 19:49, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> The following changes since commit 7ed14cbf3cf083f125c079bd02b3215941853830:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2018-06-22' into staging (2018-06-22 17:08:58 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
+>
+> for you to fetch changes up to bf20b675cc5a2568f1105c3577663978c5a13108:
+>
+>   Partially revert "python: futurize -f libfuturize.fixes.fix_absolute_import" (2018-06-22 15:45:42 -0300)
+>
+> ----------------------------------------------------------------
+> Python queue, 2018-06-22
+>
+> * Partially revert commit that broke qmp-shell and other scripts
+>   inside ./scripts/qmp
+>
 
-The defrag.exe tool which is used for executing the fstrim command
-on Windows doesn't support retrim for OSes lower than Win8. This
-commit handles this case and returns a suitable error.
+Applied, thanks.
 
-Output of fstrim before this commit:
-{"execute":"guest-fstrim"}
-{"return": {"paths": [{"path": "C:\\", "error": "An invalid command line option
-was specified. (0x89000008)"}, {"path": "F:\\", "error": "An invalid command
-line option was specified. (0x89000008)"}, {"path": "S:\\", "error": "An
-invalid command line option was specified. (0x89000008)"}]}}
-
-Reported on:
-https://bugzilla.redhat.com/show_bug.cgi?id=1594113
-
-Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
----
- qga/commands-win32.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index d79974f212..0bdcd9dd38 100644
---- a/qga/commands-win32.c
-+++ b/qga/commands-win32.c
-@@ -30,6 +30,7 @@
- #include <lm.h>
- #include <wtsapi32.h>
- #include <wininet.h>
-+#include <versionhelpers.h>
- 
- #include "qga/guest-agent-core.h"
- #include "qga/vss-win32.h"
-@@ -852,6 +853,11 @@ qmp_guest_fstrim(bool has_minimum, int64_t minimum, Error **errp)
-     HANDLE handle;
-     WCHAR guid[MAX_PATH] = L"";
- 
-+   if (!IsWindows8OrGreater()) {
-+        error_setg(errp, "fstrim is only supported for Win8+");
-+        return NULL;
-+   }
-+
-     handle = FindFirstVolumeW(guid, ARRAYSIZE(guid));
-     if (handle == INVALID_HANDLE_VALUE) {
-         error_setg_win32(errp, GetLastError(), "failed to find any volume");
--- 
-2.13.6
+-- PMM
