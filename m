@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42355)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWwIV-0003u7-9x
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 00:06:44 -0400
+	id 1fWwIX-0003w4-TS
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 00:06:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fWwIU-0003rH-9N
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 00:06:43 -0400
+	id 1fWwIW-0003uK-T3
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 00:06:45 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 24 Jun 2018 01:05:59 -0300
-Message-Id: <20180624040609.17572-7-f4bug@amsat.org>
+Date: Sun, 24 Jun 2018 01:06:00 -0300
+Message-Id: <20180624040609.17572-8-f4bug@amsat.org>
 In-Reply-To: <20180624040609.17572-1-f4bug@amsat.org>
 References: <20180624040609.17572-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 06/16] hw/sd/omap_mmc: Use
- qemu_log_mask(UNIMP) instead of printf
+Subject: [Qemu-devel] [PATCH v3 07/16] hw/i2c/omap_i2c: Use
+ qemu_log_mask(UNIMP) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +33,57 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/sd/omap_mmc.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+Thomas: I used 4 <spaces> for 1 <tab> to keep checkpatch happy.
 
-diff --git a/hw/sd/omap_mmc.c b/hw/sd/omap_mmc.c
-index 5b47cadf11..aa2a816f76 100644
---- a/hw/sd/omap_mmc.c
-+++ b/hw/sd/omap_mmc.c
+ hw/i2c/omap_i2c.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/hw/i2c/omap_i2c.c b/hw/i2c/omap_i2c.c
+index 26e3e5ebf6..cabd348b45 100644
+--- a/hw/i2c/omap_i2c.c
++++ b/hw/i2c/omap_i2c.c
 @@ -17,6 +17,7 @@
   * with this program; if not, see <http://www.gnu.org/licenses/>.
   */
  #include "qemu/osdep.h"
 +#include "qemu/log.h"
  #include "hw/hw.h"
+ #include "hw/i2c/i2c.h"
  #include "hw/arm/omap.h"
- #include "hw/sd/sd.h"
-@@ -449,10 +450,14 @@ static void omap_mmc_write(void *opaque, hwaddr offset,
-         s->enable = (value >> 11) & 1;
-         s->be = (value >> 10) & 1;
-         s->clkdiv = (value >> 0) & (s->rev >= 2 ? 0x3ff : 0xff);
--        if (s->mode != 0)
--            printf("SD mode %i unimplemented!\n", s->mode);
--        if (s->be != 0)
--            printf("SD FIFO byte sex unimplemented!\n");
-+        if (s->mode != 0) {
+@@ -339,14 +340,15 @@ static void omap_i2c_write(void *opaque, hwaddr addr,
+             }
+             break;
+         }
+-        if ((value & (1 << 15)) && !(value & (1 << 10))) {	/* MST */
+-            fprintf(stderr, "%s: I^2C slave mode not supported\n",
+-                            __func__);
++        if ((value & (1 << 15)) && !(value & (1 << 10))) {    /* MST */
++            qemu_log_mask(LOG_UNIMP, "%s: I^2C slave mode not supported\n",
++                          __func__);
+             break;
+         }
+-        if ((value & (1 << 15)) && value & (1 << 8)) {		/* XA */
+-            fprintf(stderr, "%s: 10-bit addressing mode not supported\n",
+-                            __func__);
++        if ((value & (1 << 15)) && value & (1 << 8)) {        /* XA */
 +            qemu_log_mask(LOG_UNIMP,
-+                          "omap_mmc_wr: mode #%i unimplemented\n", s->mode);
-+        }
-+        if (s->be != 0) {
++                          "%s: 10-bit addressing mode not supported\n",
++                          __func__);
+             break;
+         }
+         if ((value & (1 << 15)) && value & (1 << 0)) {		/* STT */
+@@ -392,8 +394,10 @@ static void omap_i2c_write(void *opaque, hwaddr addr,
+                 s->stat |= 0x3f;
+                 omap_i2c_interrupts_update(s);
+             }
+-        if (value & (1 << 15))					/* ST_EN */
+-            fprintf(stderr, "%s: System Test not supported\n", __func__);
++        if (value & (1 << 15)) {                    /* ST_EN */
 +            qemu_log_mask(LOG_UNIMP,
-+                          "omap_mmc_wr: Big Endian not implemented\n");
++                          "%s: System Test not supported\n", __func__);
 +        }
-         if (s->dw != 0 && s->lines < 4)
-             printf("4-bit SD bus enabled\n");
-         if (!s->enable)
+         break;
+ 
+     default:
 -- 
 2.18.0
