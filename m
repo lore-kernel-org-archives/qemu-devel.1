@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXL62-0005kU-5e
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:35:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fXLAW-0006zN-7x
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:40:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXL60-0003ku-Vx
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:35:30 -0400
-References: <20180606144706.29732-1-f4bug@amsat.org>
-	<1160f838-5625-b9bf-6c34-3071ed185074@redhat.com>
-	<0c5018d5-7e87-bba1-7522-c8020277bde0@amsat.org>
-	<c7077a71-6f01-b3f2-cc0b-4d845b967ef3@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3289c3d6-91e4-1d29-2d10-da4e0fe7ef6e@redhat.com>
-Date: Mon, 25 Jun 2018 08:35:19 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1fXLAU-0006Ig-UH
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:40:08 -0400
+Date: Mon, 25 Jun 2018 16:36:51 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180625063651.GE22971@umbus.fritz.box>
+References: <20180615152536.30093-1-clg@kaod.org>
+	<20180615152536.30093-4-clg@kaod.org>
+	<20180618103844.GX25461@umbus.fritz.box>
+	<9d1ce421-9caa-08eb-2417-15307dd271ed@kaod.org>
+	<20180618121328.GY25461@umbus.fritz.box>
+	<048d2369-389f-1118-03b0-b81e6bd565a0@kaod.org>
+	<20180620005622.GG3546@umbus.fritz.box>
+	<36801260-2573-ce87-7f10-a6c76072ad23@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <c7077a71-6f01-b3f2-cc0b-4d845b967ef3@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Adopt the Gumstix
- computers-on-module machines
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="jTMWTj4UTAEmbWeb"
+Content-Disposition: inline
+In-Reply-To: <36801260-2573-ce87-7f10-a6c76072ad23@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] ppc/pnv: introduce Pnv8Chip and
+ Pnv9Chip models
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,76 +31,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 22.06.2018 15:30, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Peter,
+
+--jTMWTj4UTAEmbWeb
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jun 20, 2018 at 07:29:37AM +0200, C=E9dric Le Goater wrote:
+> On 06/20/2018 02:56 AM, David Gibson wrote:
+> > On Tue, Jun 19, 2018 at 07:24:44AM +0200, C=E9dric Le Goater wrote:
+> >>
+> >>>>>  typedef struct PnvChipClass {
+> >>>>>      /*< private >*/
+> >>>>> @@ -75,6 +95,7 @@ typedef struct PnvChipClass {
+> >>>>> =20
+> >>>>>      hwaddr       xscom_base;
+> >>>>> =20
+> >>>>> +    void (*realize)(PnvChip *chip, Error **errp);
+> >>>>
+> >>>> This looks the wrong way round from how things are usually done.
+> >>>> Rather than having the base class realize() call the subclass specif=
+ic
+> >>>> realize hook, it's more usual for the subclass to set the
+> >>>> dc->realize() and have it call a k->parent_realize() to call up the
+> >>>> chain.  grep for device_class_set_parent_realize() for some more
+> >>>> examples.
+> >>>
+> >>> Ah. That is more to my liking. There are a couple of models following
+> >>> the wrong object pattern, xics, vio. I will check them.
+> >>
+> >> So XICS is causing some head-aches because the ics-kvm model inherits
+> >> from ics-simple which inherits from ics-base. so we have a grand-parent
+> >> class to handle.
+> >=20
+> > Ok.  I mean, we should probably switch ics around to use the
+> > parent_realize model, rather than the backwards one it does now.  But
+> > it's not immediately obvious to me why having a grandparent class
+> > breaks things.
 >=20
-> On 06/06/2018 12:02 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 06/06/2018 11:53 AM, Thomas Huth wrote:
->>> On 06.06.2018 16:47, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> These COMs are hard to find, and the companie dropped the support
->>
->> "company" :/
->>
->>>> few years ago.
->>>>
->>>> Per the "Gumstix Product Changes, Known Issues, and EOL" pdf:
->>>>
->>>> - Phasing out: PXA270-based Verdex product line
->>>>   September 2012
->>>>
->>>> - Phasing out: PXA255-based Basix & Connex
->>>>   September 2009
->>>>
->>>> However there are still booting SD card image availables, very
->>>> convenient to stress test the QEMU SD card implementation.
->>>> Therefore I volunteer to keep an eye on this file, while it
->>>> is useful for testing.
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>> ---
->>>>  MAINTAINERS | 3 ++-
->>>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/MAINTAINERS b/MAINTAINERS
->>>> index 41cd3736a9..1825deb762 100644
->>>> --- a/MAINTAINERS
->>>> +++ b/MAINTAINERS
->>>> @@ -491,9 +491,10 @@ F: include/hw/arm/digic.h
->>>>  F: hw/*/digic*
->>>> =20
->>>>  Gumstix
->>>> +M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>>  L: qemu-devel@nongnu.org
->>>>  L: qemu-arm@nongnu.org
->>>> -S: Orphan
->>>> +S: Odd Fixes
->>>>  F: hw/arm/gumstix.c
->>>
->>> Great! So we can also remove the Gumstix entries from
->>> https://wiki.qemu.org/Features/LegacyRemoval ?
->>
->> I'll remove these now, eventually adding a new Gumstix COMs
->> wiki entry when Avocados tests are merged, although reading
->> the tests should be enough.
+> If you follow the common realize pattern, you end up with a recursive=20
+> loop with one of the realize routine. I didn't dig much the issue.
+
+Hmm.
+
+> >> if we could affiliate ics-kvm directly to ics-base it would make the=
+=20
+> >> family affair easier. we need to check migration though.
+> >=20
+> > But that said, I've been thinking for a while that it might make sense
+> > to fold ics-kvm into ics-base.  It seems very risky to have two
+> > different object classes that are supposed to have guest-identical
+> > behaviour.  Certainly adding any migratable state to one not the other
+> > would be horribly wrong.
 >=20
-> Do you agree with this patch?
+> yes. clearly. something like bellow would be better:
+>=20
+>                    +---------------+
+>                    |     ICS       |
+>          +---------+  common/base  +--------+
+>          |         +---------------+        |
+>          |                                  |
+>          | spapr                    spapr   |
+>          |  pnv                             |
+>   +------v--------+                +--------v--------+
+>   |     ICS       |                |       ICS       |
+>   |  simple/QEMU  |                |       KVM       |
+>   +---------------+                +-----------------+
+>=20
+> with only some reset and realize handling in the subclasses. The only
+> extra field we could add under the KVM class is the KVM XICS device fd. =
+=20
 
-FWIW:
+I think that would be an improvement over what we have, yes.  However,
+it's not what I actually had in mind.  In fact I was planning on
+getting rid of the KVM specific subclass entirely and merging it into
+the base/simple classes with explicit if (kvm) logic.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+The reason is that having different object classes for devices based
+on accelerator is unusual and kind of dangerous.  We get away with it
+because we don't have any migration information that gets tied to the
+object class name - but that's a pretty non-obvious restriction that
+would be easy to break in future.
 
-> This is mostly to avoid removing these 2 boards in 2 releases from now.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-As long as they are not listed in the "deprecation" chapter of
-qemu-doc.texi, they are *not* officially marked as deprecated and thus
-won't get removed in two releases.
+--jTMWTj4UTAEmbWeb
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> I already removed them from the "Future deprecated candidates" entry in
-> the Wiki.
+-----BEGIN PGP SIGNATURE-----
 
-Ok, thanks!
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlswjYIACgkQbDjKyiDZ
+s5JRVhAA1nRSQO6528Q0Cxl6+RYpLSu3QQQZ6IfhQYrLcKC5NxfLeNLUlyrFAXe+
+21zOdHbij/P/+eXLLvGyhjA04/XvF3VaWu/V7LrSnBjHlY5jP27cmWOHLMCz/gQz
+fB9sBBI7aTkV/xUY9K9igjELy0yH1Fxh1uQlxTRFwhXuuYt+NrwuDMCofBZC00se
+WWtsjjHfjeQf68mXkh9/z5CeRd8WbWA6p/Xl/IBnRgr7Q6v/3JSIYagrKkIdWdxZ
+fwDSqPuwd4mWK/r14cJwoyl1IkVEfl/6R2i8r6tnMchftSljecrRLz6xkzrAL6TQ
+6cqS0C1R1qMfetLGa6pO2WHlt9KbZ+akp1TrL8g85oAIGB3AYJPY2pCt2jvuosnx
+2HgQ+zM4xIWtWgMhRoOBMfD4C+/CT6E2vfUBjN7aM1Gi/B/3N2DR4GSF9lIaAHv5
+c2c2QbmJDdAkrH2Xtji3090PUrP9uUHbqsapHOXEqkm75tAtu4BCSVlv/ats8N90
+KPNWEfmcUJjnXrQkLMv7VmlbHGpDzaT1ra6Kus8UQeINHAK6KcjQyJ14JkGXR2ou
+SUtZw7V/sTNd91pq1auLjU1LHlKrbCvhLrkOePCY2bLTZDUqyEYrF+NY4BgqCFd3
+jB4zI3+bq4TnprMMi8aQfS6Jtdl4AYNMrs2oqPVGYcMLypqN2Pw=
+=w4Vs
+-----END PGP SIGNATURE-----
 
- Thomas
+--jTMWTj4UTAEmbWeb--
