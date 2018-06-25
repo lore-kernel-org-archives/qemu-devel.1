@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fXPXA-00052V-Us
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:19:52 -0400
+	(envelope-from <sameeh@daynix.com>) id 1fXPYv-0006RG-7g
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fXPX9-0008Ff-Ol
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:19:48 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:40445)
+	(envelope-from <sameeh@daynix.com>) id 1fXPYr-0000xB-EE
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:21:37 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:46268)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fXPX9-0008FN-IB
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:19:47 -0400
-Received: by mail-wr0-x244.google.com with SMTP id g18-v6so13254800wro.7
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 04:19:47 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon, 25 Jun 2018 12:19:34 +0100
-Message-Id: <20180625111935.26108-10-alex.bennee@linaro.org>
-In-Reply-To: <20180625111935.26108-1-alex.bennee@linaro.org>
-References: <20180625111935.26108-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1fXPYr-0000ww-1V
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:21:33 -0400
+Received: by mail-ed1-x541.google.com with SMTP id r17-v6so5173480edo.13
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 04:21:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 09/10] linux-user: introduce preexit_cleanup
+In-Reply-To: <CAFEAcA_52bxjEvpZcDhMVJ=dQaLaLM8unq01kb-8y=jYAiggSw@mail.gmail.com>
+References: <20180625110706.23332-1-sameeh@daynix.com>
+	<CAFEAcA_52bxjEvpZcDhMVJ=dQaLaLM8unq01kb-8y=jYAiggSw@mail.gmail.com>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Mon, 25 Jun 2018 14:21:31 +0300
+Message-ID: <CAKPgXcGLuY62tnHzo+12OLBaqJWo-_n=D=FLx2oSR9+owHb1zQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC v2 0/2] Add BPF suuport to Qemu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,115 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>, Amnon Ilan <ailan@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-To avoid repeating ourselves move our preexit clean-up code into a
-helper function. I figured the continuing effort to split of the
-syscalls made it worthwhile creating a new file for it now.
+On Mon, Jun 25, 2018 at 2:16 PM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- linux-user/Makefile.objs |  2 +-
- linux-user/exit.c        | 28 ++++++++++++++++++++++++++++
- linux-user/qemu.h        |  8 ++++++++
- linux-user/syscall.c     | 10 ++--------
- 4 files changed, 39 insertions(+), 9 deletions(-)
- create mode 100644 linux-user/exit.c
+> On 25 June 2018 at 12:07, Sameeh Jubran <sameeh@daynix.com> wrote:
+> > From: Sameeh Jubran <sjubran@redhat.com>
+> >
+> > The Berkeley Packet Filter has been in the kernel for a while now and I
+> > think it is time that it is introduced to Qemu. This patch is an
+> > infrastructure for any future usage of the BPF in Qemu.
+> >
+> > It is important to note that the tun driver had started supporting using
+> > BPF programs through ioctls (TUNSETSTEERINGEBPF and TUNSETFILTEREBPF).
+> > My plan is to use the bpf support from within virtio-net in order to set
+> > a bpf steering program to the tun device which would allow virtio-net to
+> > support RSS feature https://lists.oasis-open.org/
+> archives/virtio-dev/201805/msg00024.html
+> >
+> > Difference from v1:
+> > * Used libbpf library provided by linux
+> > * Added a configure option
+> > * Added a sample patch with demonstrates how to use the libbpf library
+> >   from within virtio-net. This patch should not be applied! It is for
+> >   demonstration purposes only
+> >
+> > The libbpf can be manually installed from the Linux source tree by
+> running make
+> > tools/bpf and make tools/bpf_install from the top level directory.
+>
+> I'm afraid this series still doesn't have a real use case for the
+> library, which is what we would need to be able to review whether
+> using BPF is a sensible design for whatever the underlying
+> feature to be implemented is. That is, what you should be sending
+> is "here is a patchset to implement RSS in virtio-net (and it
+> happens to be implemented using BPF)", not "here is a patchset
+> which links QEMU with libbpf and does nothing else".
+>
+I don't think the infrastructure should be coupled with the implementation.
+These are two separate patch sets, however I can combine them to one.
 
-diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
-index 59a5c17354..b5dfb71f25 100644
---- a/linux-user/Makefile.objs
-+++ b/linux-user/Makefile.objs
-@@ -1,7 +1,7 @@
- obj-y = main.o syscall.o strace.o mmap.o signal.o \
- 	elfload.o linuxload.o uaccess.o uname.o \
- 	safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
--        $(TARGET_ABI_DIR)/cpu_loop.o
-+        $(TARGET_ABI_DIR)/cpu_loop.o exit.o
- 
- obj-$(TARGET_HAS_BFLT) += flatload.o
- obj-$(TARGET_I386) += vm86.o
-diff --git a/linux-user/exit.c b/linux-user/exit.c
-new file mode 100644
-index 0000000000..aed8713fae
---- /dev/null
-+++ b/linux-user/exit.c
-@@ -0,0 +1,28 @@
-+/*
-+ *  exit support for qemu
-+ *
-+ *  Copyright (c) 2018 Alex Bennée <alex.bennee@linaro.org>
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+#include "qemu/osdep.h"
-+#include "qemu.h"
-+
-+void preexit_cleanup(CPUArchState *env, int code)
-+{
-+#ifdef TARGET_GPROF
-+        _mcleanup();
-+#endif
-+        gdb_exit(env, code);
-+}
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index 793cd4df04..bb85c81aa4 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -623,6 +623,14 @@ static inline int is_error(abi_long ret)
-     return (abi_ulong)ret >= (abi_ulong)(-4096);
- }
- 
-+/**
-+ * preexit_cleanup: housekeeping before the guest exits
-+ *
-+ * env: the CPU state
-+ * code: the exit code
-+ */
-+void preexit_cleanup(CPUArchState *env, int code);
-+
- /* Include target-specific struct and function definitions;
-  * they may need access to the target-independent structures
-  * above, so include them last.
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 2117fb13b4..7c66442357 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -8018,10 +8018,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
-         }
- 
-         cpu_list_unlock();
--#ifdef TARGET_GPROF
--        _mcleanup();
--#endif
--        gdb_exit(cpu_env, arg1);
-+        preexit_cleanup(cpu_env, arg1);
-         _exit(arg1);
-         ret = 0; /* avoid warning */
-         break;
-@@ -10127,10 +10124,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
- #ifdef __NR_exit_group
-         /* new thread calls */
-     case TARGET_NR_exit_group:
--#ifdef TARGET_GPROF
--        _mcleanup();
--#endif
--        gdb_exit(cpu_env, arg1);
-+        preexit_cleanup(cpu_env, arg1);
-         ret = get_errno(exit_group(arg1));
-         break;
- #endif
+>
+> thanks
+> -- PMM
+>
+
+
+
 -- 
-2.17.1
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
