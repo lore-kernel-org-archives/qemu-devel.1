@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fXQ4Q-0007dQ-E7
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:54:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1fXQ5g-0000Wn-3W
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:55:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fXQ4P-0001yz-Nl
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:54:10 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Mon, 25 Jun 2018 13:53:52 +0200
-Message-Id: <20180625115352.6889-10-david@redhat.com>
-In-Reply-To: <20180625115352.6889-1-david@redhat.com>
-References: <20180625115352.6889-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 9/9] s390x/tcg: fix CPU hotplug with
- single-threaded TCG
+	(envelope-from <thuth@redhat.com>) id 1fXQ5f-0002d3-8R
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:55:28 -0400
+References: <20180624040609.17572-1-f4bug@amsat.org>
+	<20180624040609.17572-2-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <75bd1815-88af-8411-da1d-62991a8c7287@redhat.com>
+Date: Mon, 25 Jun 2018 13:55:21 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180624040609.17572-2-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 01/16] hw/input/pckbd: Use
+ qemu_log_mask(GUEST_ERROR) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,51 +25,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-run_on_cpu() doesn't seem to work reliably until the CPU has been fully
-created if the single-threaded TCG main loop is already running.
+On 24.06.2018 06:05, Philippe Mathieu-Daud=C3=A9 wrote:
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  hw/input/pckbd.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
+> index f33e3fc63d..07c8801387 100644
+> --- a/hw/input/pckbd.c
+> +++ b/hw/input/pckbd.c
+> @@ -22,6 +22,7 @@
+>   * THE SOFTWARE.
+>   */
+>  #include "qemu/osdep.h"
+> +#include "qemu/log.h"
+>  #include "hw/hw.h"
+>  #include "hw/isa/isa.h"
+>  #include "hw/i386/pc.h"
+> @@ -308,7 +309,8 @@ static void kbd_write_command(void *opaque, hwaddr =
+addr,
+>          /* ignore that */
+>          break;
+>      default:
+> -        fprintf(stderr, "qemu: unsupported keyboard cmd=3D0x%02x\n", (=
+int)val);
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "unsupported keyboard cmd=3D0x%02" PRIx64 "\n", =
+val);
+>          break;
+>      }
+>  }
 
-Therefore, hotplugging a CPU under single-threaded TCG does currently
-not work. We should use the direct call instead of going via
-run_on_cpu().
-
-So let's use run_on_cpu() for KVM only - KVM requires it due to the initial
-CPU reset ioctl. As a nice side effect, we get rif of the ifdef.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cpu.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 40d6980229..271c5ce652 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -218,11 +218,18 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
- #endif
-     s390_cpu_gdb_init(cs);
-     qemu_init_vcpu(cs);
--#if !defined(CONFIG_USER_ONLY)
--    run_on_cpu(cs, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
--#else
--    cpu_reset(cs);
--#endif
-+
-+    /*
-+     * KVM requires the initial CPU reset ioctl to be executed on the target
-+     * CPU thread. CPU hotplug under single-threaded TCG will not work with
-+     * run_on_cpu(), as run_on_cpu() will not work properly if called while
-+     * the main thread is already running but the CPU hasn't been realized.
-+     */
-+    if (kvm_enabled()) {
-+        run_on_cpu(cs, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
-+    } else {
-+        cpu_reset(cs);
-+    }
- 
-     scc->parent_realize(dev, &err);
- out:
--- 
-2.17.1
+Reviewed-by: Thomas Huth <thuth@redhat.com>
