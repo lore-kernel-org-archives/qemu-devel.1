@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33750)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fXLJ3-0000sa-Qo
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:48:59 -0400
+	(envelope-from <armbru@redhat.com>) id 1fXLKF-0001ek-6U
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:50:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fXLJ0-00026N-HG
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:48:57 -0400
-Received: from 11.mo3.mail-out.ovh.net ([87.98.184.158]:52158)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fXLJ0-00025t-6A
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:48:54 -0400
-Received: from player746.ha.ovh.net (unknown [10.109.120.111])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 6921D1BC41B
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 08:48:52 +0200 (CEST)
-References: <20180620102413.5400-1-clg@kaod.org>
-	<20180620102413.5400-2-clg@kaod.org>
-	<20180625062728.GD22971@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <473e8188-df94-a6ae-98b9-533b05a08681@kaod.org>
-Date: Mon, 25 Jun 2018 08:48:46 +0200
+	(envelope-from <armbru@redhat.com>) id 1fXLKB-0002YH-WB
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:50:11 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1528866321-23886-5-git-send-email-thuth@redhat.com>
+	<20180613133840.GK24528@stefanha-x1.localdomain>
+	<20180613134452.GU19901@redhat.com>
+	<b0ebd968-797f-48e0-32c1-869c452feca9@redhat.com>
+	<20180613151942.GC19901@redhat.com>
+	<87k1r24quk.fsf@dusky.pond.sub.org>
+	<20180619171539.0adc90d6.cohuck@redhat.com>
+	<d4e02083-c372-3ce5-d4a2-4809579fc8f2@redhat.com>
+	<20180622181108.GY7451@localhost.localdomain>
+	<c10c2ffa-7ee2-5106-07d1-528df939d6ad@redhat.com>
+	<20180622193522.GI7451@localhost.localdomain>
+	<743d495e-51cd-8c8e-293e-026b8dece74a@redhat.com>
+Date: Mon, 25 Jun 2018 08:50:03 +0200
+In-Reply-To: <743d495e-51cd-8c8e-293e-026b8dece74a@redhat.com> (Paolo
+	Bonzini's message of "Fri, 22 Jun 2018 23:22:43 +0200")
+Message-ID: <87lgb3xsv8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180625062728.GD22971@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] ppc/xics: rework the ICS classes
- inheritance tree
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC PATCH 4/4] qemu-options: Do not show
+ -enable-kvm and -enable-hax in the docs anymore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,416 +34,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 06/25/2018 08:27 AM, David Gibson wrote:
-> On Wed, Jun 20, 2018 at 12:24:12PM +0200, C=E9dric Le Goater wrote:
->> This moves the common ICS code of the realize and reset handlers of
->> the ICS_SIMPLE class under the ICS_BASE class. The vmstate is also
->> moved down one class.
->>
->> The benefits are that the ICS_KVM class can directly inherit from
->> ICS_BASE class and not from the intermediate ICS_SIMPLE. It makes the
->> class hierarchy much cleaner and removes duplicated code. DeviceRealiz=
-e
->> and DeviceReset handlers are introduce so that parent handlers are
->> called from the inheriting classes.
->>
->> What is left in the top classes is the low level interface to access
->> the KVM XICS device in ICS_KVM and the XICS emulating handlers in
->> ICS_SIMPLE.
->>
->> This should not break migration compatibility.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->=20
-> I like the idea here, but I'm finding it pretty hard to follow the
-> patch and convince myself its really safe.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-I understand. The diff brings a lot of fuzziness. I tried to convince=20
-you with the migration tests.
+> On 22/06/2018 21:35, Eduardo Habkost wrote:
+>>>> Why is this better than using KVM by default if it's available?
+>>> The answer is (as almost always): Compatibility with migration. Nobody
+>>> dares to sacrifice that chicken :-(
+>> We can now kill it if we announce the feature as deprecated a
+>> couple of releases in advance.
+>> 
+>> If we declare that compatibility when the accelerator is omitted
+>> is deprecated in 3.0, in QEMU 3.3 we will be free to choose a
+>> different default accelerator.
+>
+> We can, we don't necessarily want it.
+>
+> The status quo is that people using KVM are invoking qemu as qemu-kvm,
+> people using TCG are invoking qemu as qemu-system-*.  All distros are
+> shipping a qemu-kvm or more rarely kvm binary, which is invariably a
+> wrapper script except for RHEL because RHEL doesn't have a qemu-system-*
+> binary at all.
+>
+> By the way, changing qemu-system-*'s default to e.g. RHEL's "kvm or tcg"
+> would not help distros that have "-accel kvm" in their /usr/bin/qemu-kvm
+> script.
 
-> How difficult would it be
-> to rework to separate out the change from base calls derived
-> ->realize (and reset), to the more normal device_set_parent whatnot
-> from the actual consolidate of the classes?
+It wouldn't hurt them, either.
 
-I will try that.
+Attentive distros could even replace the wrapper script by a link.
 
-Thanks,
-
-C. =20
-
->> ---
->>  include/hw/ppc/xics.h |   4 +-
->>  hw/intc/xics.c        | 166 ++++++++++++++++++++++++++++-------------=
----------
->>  hw/intc/xics_kvm.c    |  47 +++++++-------
->>  hw/ppc/spapr.c        |   2 +-
->>  4 files changed, 123 insertions(+), 96 deletions(-)
->>
->> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
->> index 6cebff47a7d4..adc5f437b118 100644
->> --- a/include/hw/ppc/xics.h
->> +++ b/include/hw/ppc/xics.h
->> @@ -114,7 +114,9 @@ struct PnvICPState {
->>  struct ICSStateClass {
->>      DeviceClass parent_class;
->> =20
->> -    void (*realize)(ICSState *s, Error **errp);
->> +    DeviceRealize parent_realize;
->> +    DeviceReset parent_reset;
->> +
->>      void (*pre_save)(ICSState *s);
->>      int (*post_load)(ICSState *s, int version_id);
->>      void (*reject)(ICSState *s, uint32_t irq);
->> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
->> index e73e623e3b53..b351262d1db9 100644
->> --- a/hw/intc/xics.c
->> +++ b/hw/intc/xics.c
->> @@ -547,9 +547,61 @@ static void ics_simple_eoi(ICSState *ics, uint32_=
-t nr)
->>      }
->>  }
->> =20
->> -static void ics_simple_reset(void *dev)
->> +static void ics_simple_reset(DeviceState *dev)
->>  {
->> -    ICSState *ics =3D ICS_SIMPLE(dev);
->> +    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(dev);
->> +
->> +    icsc->parent_reset(dev);
->> +}
->> +
->> +static void ics_simple_reset_handler(void *dev)
->> +{
->> +    ics_simple_reset(dev);
->> +}
->> +
->> +static void ics_simple_realize(DeviceState *dev, Error **errp)
->> +{
->> +    ICSState *ics =3D ICS_BASE(dev);
->> +    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(ics);
->> +    Error *local_err =3D NULL;
->> +
->> +    icsc->parent_realize(dev, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +
->> +    ics->qirqs =3D qemu_allocate_irqs(ics_simple_set_irq, ics, ics->n=
-r_irqs);
->> +
->> +    qemu_register_reset(ics_simple_reset_handler, ics);
->> +}
->> +
->> +static void ics_simple_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +    ICSStateClass *isc =3D ICS_BASE_CLASS(klass);
->> +
->> +    device_class_set_parent_realize(dc, ics_simple_realize,
->> +                                    &isc->parent_realize);
->> +    device_class_set_parent_reset(dc, ics_simple_reset,
->> +                                  &isc->parent_reset);
->> +
->> +    isc->reject =3D ics_simple_reject;
->> +    isc->resend =3D ics_simple_resend;
->> +    isc->eoi =3D ics_simple_eoi;
->> +}
->> +
->> +static const TypeInfo ics_simple_info =3D {
->> +    .name =3D TYPE_ICS_SIMPLE,
->> +    .parent =3D TYPE_ICS_BASE,
->> +    .instance_size =3D sizeof(ICSState),
->> +    .class_init =3D ics_simple_class_init,
->> +    .class_size =3D sizeof(ICSStateClass),
->> +};
->> +
->> +static void ics_base_reset(DeviceState *dev)
->> +{
->> +    ICSState *ics =3D ICS_BASE(dev);
->>      int i;
->>      uint8_t flags[ics->nr_irqs];
->> =20
->> @@ -566,7 +618,35 @@ static void ics_simple_reset(void *dev)
->>      }
->>  }
->> =20
->> -static int ics_simple_dispatch_pre_save(void *opaque)
->> +static void ics_base_realize(DeviceState *dev, Error **errp)
->> +{
->> +    ICSState *ics =3D ICS_BASE(dev);
->> +    Object *obj;
->> +    Error *err =3D NULL;
->> +
->> +    obj =3D object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &err=
-);
->> +    if (!obj) {
->> +        error_propagate(errp, err);
->> +        error_prepend(errp, "required link '" ICS_PROP_XICS "' not fo=
-und: ");
->> +        return;
->> +    }
->> +    ics->xics =3D XICS_FABRIC(obj);
->> +
->> +    if (!ics->nr_irqs) {
->> +        error_setg(errp, "Number of interrupts needs to be greater 0"=
-);
->> +        return;
->> +    }
->> +    ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
->> +}
->> +
->> +static void ics_base_instance_init(Object *obj)
->> +{
->> +    ICSState *ics =3D ICS_BASE(obj);
->> +
->> +    ics->offset =3D XICS_IRQ_BASE;
->> +}
->> +
->> +static int ics_base_dispatch_pre_save(void *opaque)
->>  {
->>      ICSState *ics =3D opaque;
->>      ICSStateClass *info =3D ICS_BASE_GET_CLASS(ics);
->> @@ -578,7 +658,7 @@ static int ics_simple_dispatch_pre_save(void *opaq=
-ue)
->>      return 0;
->>  }
->> =20
->> -static int ics_simple_dispatch_post_load(void *opaque, int version_id=
-)
->> +static int ics_base_dispatch_post_load(void *opaque, int version_id)
->>  {
->>      ICSState *ics =3D opaque;
->>      ICSStateClass *info =3D ICS_BASE_GET_CLASS(ics);
->> @@ -590,7 +670,7 @@ static int ics_simple_dispatch_post_load(void *opa=
-que, int version_id)
->>      return 0;
->>  }
->> =20
->> -static const VMStateDescription vmstate_ics_simple_irq =3D {
->> +static const VMStateDescription vmstate_ics_base_irq =3D {
->>      .name =3D "ics/irq",
->>      .version_id =3D 2,
->>      .minimum_version_id =3D 1,
->> @@ -604,95 +684,36 @@ static const VMStateDescription vmstate_ics_simp=
-le_irq =3D {
->>      },
->>  };
->> =20
->> -static const VMStateDescription vmstate_ics_simple =3D {
->> +static const VMStateDescription vmstate_ics_base =3D {
->>      .name =3D "ics",
->>      .version_id =3D 1,
->>      .minimum_version_id =3D 1,
->> -    .pre_save =3D ics_simple_dispatch_pre_save,
->> -    .post_load =3D ics_simple_dispatch_post_load,
->> +    .pre_save =3D ics_base_dispatch_pre_save,
->> +    .post_load =3D ics_base_dispatch_post_load,
->>      .fields =3D (VMStateField[]) {
->>          /* Sanity check */
->>          VMSTATE_UINT32_EQUAL(nr_irqs, ICSState, NULL),
->> =20
->>          VMSTATE_STRUCT_VARRAY_POINTER_UINT32(irqs, ICSState, nr_irqs,
->> -                                             vmstate_ics_simple_irq,
->> +                                             vmstate_ics_base_irq,
->>                                               ICSIRQState),
->>          VMSTATE_END_OF_LIST()
->>      },
->>  };
->> =20
->> -static void ics_simple_initfn(Object *obj)
->> -{
->> -    ICSState *ics =3D ICS_SIMPLE(obj);
->> -
->> -    ics->offset =3D XICS_IRQ_BASE;
->> -}
->> -
->> -static void ics_simple_realize(ICSState *ics, Error **errp)
->> -{
->> -    if (!ics->nr_irqs) {
->> -        error_setg(errp, "Number of interrupts needs to be greater 0"=
-);
->> -        return;
->> -    }
->> -    ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
->> -    ics->qirqs =3D qemu_allocate_irqs(ics_simple_set_irq, ics, ics->n=
-r_irqs);
->> -
->> -    qemu_register_reset(ics_simple_reset, ics);
->> -}
->> -
->> -static Property ics_simple_properties[] =3D {
->> +static Property ics_base_properties[] =3D {
->>      DEFINE_PROP_UINT32("nr-irqs", ICSState, nr_irqs, 0),
->>      DEFINE_PROP_END_OF_LIST(),
->>  };
->> =20
->> -static void ics_simple_class_init(ObjectClass *klass, void *data)
->> -{
->> -    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> -    ICSStateClass *isc =3D ICS_BASE_CLASS(klass);
->> -
->> -    isc->realize =3D ics_simple_realize;
->> -    dc->props =3D ics_simple_properties;
->> -    dc->vmsd =3D &vmstate_ics_simple;
->> -    isc->reject =3D ics_simple_reject;
->> -    isc->resend =3D ics_simple_resend;
->> -    isc->eoi =3D ics_simple_eoi;
->> -}
->> -
->> -static const TypeInfo ics_simple_info =3D {
->> -    .name =3D TYPE_ICS_SIMPLE,
->> -    .parent =3D TYPE_ICS_BASE,
->> -    .instance_size =3D sizeof(ICSState),
->> -    .class_init =3D ics_simple_class_init,
->> -    .class_size =3D sizeof(ICSStateClass),
->> -    .instance_init =3D ics_simple_initfn,
->> -};
->> -
->> -static void ics_base_realize(DeviceState *dev, Error **errp)
->> -{
->> -    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(dev);
->> -    ICSState *ics =3D ICS_BASE(dev);
->> -    Object *obj;
->> -    Error *err =3D NULL;
->> -
->> -    obj =3D object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &err=
-);
->> -    if (!obj) {
->> -        error_propagate(errp, err);
->> -        error_prepend(errp, "required link '" ICS_PROP_XICS "' not fo=
-und: ");
->> -        return;
->> -    }
->> -    ics->xics =3D XICS_FABRIC(obj);
->> -
->> -
->> -    if (icsc->realize) {
->> -        icsc->realize(ics, errp);
->> -    }
->> -}
->> -
->>  static void ics_base_class_init(ObjectClass *klass, void *data)
->>  {
->>      DeviceClass *dc =3D DEVICE_CLASS(klass);
->> =20
->>      dc->realize =3D ics_base_realize;
->> +    dc->reset =3D ics_base_reset;
->> +    dc->props =3D ics_base_properties;
->> +    dc->vmsd =3D &vmstate_ics_base;
->>  }
->> =20
->>  static const TypeInfo ics_base_info =3D {
->> @@ -700,6 +721,7 @@ static const TypeInfo ics_base_info =3D {
->>      .parent =3D TYPE_DEVICE,
->>      .abstract =3D true,
->>      .instance_size =3D sizeof(ICSState),
->> +    .instance_init =3D ics_base_instance_init,
->>      .class_init =3D ics_base_class_init,
->>      .class_size =3D sizeof(ICSStateClass),
->>  };
->> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
->> index 8dba2f84e71e..57d0ebbfaa8a 100644
->> --- a/hw/intc/xics_kvm.c
->> +++ b/hw/intc/xics_kvm.c
->> @@ -304,44 +304,47 @@ static void ics_kvm_set_irq(void *opaque, int sr=
-cno, int val)
->>      }
->>  }
->> =20
->> -static void ics_kvm_reset(void *dev)
->> +static void ics_kvm_reset(DeviceState *dev)
->>  {
->> -    ICSState *ics =3D ICS_SIMPLE(dev);
->> -    int i;
->> -    uint8_t flags[ics->nr_irqs];
->> -
->> -    for (i =3D 0; i < ics->nr_irqs; i++) {
->> -        flags[i] =3D ics->irqs[i].flags;
->> -    }
->> +    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(dev);
->> =20
->> -    memset(ics->irqs, 0, sizeof(ICSIRQState) * ics->nr_irqs);
->> +    icsc->parent_reset(dev);
->> =20
->> -    for (i =3D 0; i < ics->nr_irqs; i++) {
->> -        ics->irqs[i].priority =3D 0xff;
->> -        ics->irqs[i].saved_priority =3D 0xff;
->> -        ics->irqs[i].flags =3D flags[i];
->> -    }
->> +    ics_set_kvm_state(ICS_KVM(dev), 1);
->> +}
->> =20
->> -    ics_set_kvm_state(ics, 1);
->> +static void ics_kvm_reset_handler(void *dev)
->> +{
->> +    ics_kvm_reset(dev);
->>  }
->> =20
->> -static void ics_kvm_realize(ICSState *ics, Error **errp)
->> +static void ics_kvm_realize(DeviceState *dev, Error **errp)
->>  {
->> -    if (!ics->nr_irqs) {
->> -        error_setg(errp, "Number of interrupts needs to be greater 0"=
-);
->> +    ICSState *ics =3D ICS_BASE(dev);
->> +    ICSStateClass *icsc =3D ICS_BASE_GET_CLASS(ics);
->> +    Error *local_err =3D NULL;
->> +
->> +    icsc->parent_realize(dev, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->>          return;
->>      }
->> -    ics->irqs =3D g_malloc0(ics->nr_irqs * sizeof(ICSIRQState));
->> +
->>      ics->qirqs =3D qemu_allocate_irqs(ics_kvm_set_irq, ics, ics->nr_i=
-rqs);
->> =20
->> -    qemu_register_reset(ics_kvm_reset, ics);
->> +    qemu_register_reset(ics_kvm_reset_handler, ics);
->>  }
->> =20
->>  static void ics_kvm_class_init(ObjectClass *klass, void *data)
->>  {
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->>      ICSStateClass *icsc =3D ICS_BASE_CLASS(klass);
->> =20
->> -    icsc->realize =3D ics_kvm_realize;
->> +    device_class_set_parent_realize(dc, ics_kvm_realize,
->> +                                    &icsc->parent_realize);
->> +    device_class_set_parent_reset(dc, ics_kvm_reset,
->> +                                  &icsc->parent_reset);
->> +
->>      icsc->pre_save =3D ics_get_kvm_state;
->>      icsc->post_load =3D ics_set_kvm_state;
->>      icsc->synchronize_state =3D ics_synchronize_state;
->> @@ -349,7 +352,7 @@ static void ics_kvm_class_init(ObjectClass *klass,=
- void *data)
->> =20
->>  static const TypeInfo ics_kvm_info =3D {
->>      .name =3D TYPE_ICS_KVM,
->> -    .parent =3D TYPE_ICS_SIMPLE,
->> +    .parent =3D TYPE_ICS_BASE,
->>      .instance_size =3D sizeof(ICSState),
->>      .class_init =3D ics_kvm_class_init,
->>  };
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 78186500e917..468539100327 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -136,7 +136,7 @@ static ICSState *spapr_ics_create(sPAPRMachineStat=
-e *spapr,
->>          goto error;
->>      }
->> =20
->> -    return ICS_SIMPLE(obj);
->> +    return ICS_BASE(obj);
->> =20
->>  error:
->>      error_propagate(errp, local_err);
->=20
+> All in all, it seems simpler for me to take the status quo, which is
+> what non-RHEL distros do, and make it part of upstream.
+>
+> Paolo
