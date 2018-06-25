@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <root@localhost.localdomain>) id 1fXHhS-00004q-PJ
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 22:57:56 -0400
+	(envelope-from <root@localhost.localdomain>) id 1fXHhS-0008WS-M2
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 22:57:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <root@localhost.localdomain>) id 1fXHhS-0007FZ-4A
+	(envelope-from <root@localhost.localdomain>) id 1fXHhR-0007FM-V1
 	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 22:57:54 -0400
-From: 13466399134@163.com
-Date: Mon, 25 Jun 2018 10:36:52 +0800
-Message-Id: <20180625023652.3079-1-13466399134@163.com>
+From: yaoxu@didichuxing.com
+Date: Mon, 25 Jun 2018 10:47:21 +0800
+Message-Id: <20180625024721.5082-1-yaoxu@didichuxing.com>
 Subject: [Qemu-devel] block/dirty-bitmap: Useless bitmaps in image can be
  removed
 List-Id: <qemu-devel.nongnu.org>
