@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fXLKF-0001ek-6U
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:50:12 -0400
+	(envelope-from <armbru@redhat.com>) id 1fXLQr-00034J-M3
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:57:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fXLKB-0002YH-WB
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:50:11 -0400
+	(envelope-from <armbru@redhat.com>) id 1fXLQo-0006Dv-Hk
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:57:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57418 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fXLQo-0006Di-Cr
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:56:58 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D2A1D4000B8A
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 06:56:57 +0000 (UTC)
 From: Markus Armbruster <armbru@redhat.com>
-References: <1528866321-23886-5-git-send-email-thuth@redhat.com>
-	<20180613133840.GK24528@stefanha-x1.localdomain>
-	<20180613134452.GU19901@redhat.com>
-	<b0ebd968-797f-48e0-32c1-869c452feca9@redhat.com>
-	<20180613151942.GC19901@redhat.com>
-	<87k1r24quk.fsf@dusky.pond.sub.org>
-	<20180619171539.0adc90d6.cohuck@redhat.com>
-	<d4e02083-c372-3ce5-d4a2-4809579fc8f2@redhat.com>
-	<20180622181108.GY7451@localhost.localdomain>
-	<c10c2ffa-7ee2-5106-07d1-528df939d6ad@redhat.com>
-	<20180622193522.GI7451@localhost.localdomain>
-	<743d495e-51cd-8c8e-293e-026b8dece74a@redhat.com>
-Date: Mon, 25 Jun 2018 08:50:03 +0200
-In-Reply-To: <743d495e-51cd-8c8e-293e-026b8dece74a@redhat.com> (Paolo
-	Bonzini's message of "Fri, 22 Jun 2018 23:22:43 +0200")
-Message-ID: <87lgb3xsv8.fsf@dusky.pond.sub.org>
+References: <1529550907-26824-1-git-send-email-thuth@redhat.com>
+Date: Mon, 25 Jun 2018 08:56:56 +0200
+In-Reply-To: <1529550907-26824-1-git-send-email-thuth@redhat.com> (Thomas
+	Huth's message of "Thu, 21 Jun 2018 05:15:07 +0200")
+Message-ID: <87efgvxsjr.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC PATCH 4/4] qemu-options: Do not show
- -enable-kvm and -enable-hax in the docs anymore
+Subject: Re: [Qemu-devel] [PATCH v3] hw/i386: Deprecate the machine types
+ pc-0.10 and pc-0.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,39 +33,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Thomas Huth <thuth@redhat.com>, zhang.zhanghailiang@huawei.com, Ben Warren <ben@skyportsystems.com>, qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+Thomas Huth <thuth@redhat.com> writes:
 
-> On 22/06/2018 21:35, Eduardo Habkost wrote:
->>>> Why is this better than using KVM by default if it's available?
->>> The answer is (as almost always): Compatibility with migration. Nobody
->>> dares to sacrifice that chicken :-(
->> We can now kill it if we announce the feature as deprecated a
->> couple of releases in advance.
->> 
->> If we declare that compatibility when the accelerator is omitted
->> is deprecated in 3.0, in QEMU 3.3 we will be free to choose a
->> different default accelerator.
+> The oldest machine type which is still used in a still maintained distro
+> is a pc-0.12 based machine type in RHEL6, so everything that is older
+> than pc-0.12 should not be used anymore. Thus let's deprecate pc-0.10
+> and pc-0.11 so that we can finally remove them in a future release.
 >
-> We can, we don't necessarily want it.
->
-> The status quo is that people using KVM are invoking qemu as qemu-kvm,
-> people using TCG are invoking qemu as qemu-system-*.  All distros are
-> shipping a qemu-kvm or more rarely kvm binary, which is invariably a
-> wrapper script except for RHEL because RHEL doesn't have a qemu-system-*
-> binary at all.
->
-> By the way, changing qemu-system-*'s default to e.g. RHEL's "kvm or tcg"
-> would not help distros that have "-accel kvm" in their /usr/bin/qemu-kvm
-> script.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-It wouldn't hurt them, either.
+    $ qemu-system-x86_64 -M pc-0.10
+    qemu-system-x86_64: Machine type 'pc-0.10' is deprecated: Old and unsupported machine version, use a newer machine type instead.
 
-Attentive distros could even replace the wrapper script by a link.
+Please drop the period.
 
-> All in all, it seems simpler for me to take the status quo, which is
-> what non-RHEL distros do, and make it part of upstream.
->
-> Paolo
+"Old and unsupported" feels redundant after "is deprecated".  What about
+
+    qemu-system-x86_64: Machine type 'pc-0.10' is deprecated, use a newer version of the machine type instead
+
+or even
+
+    qemu-system-x86_64: Machine type 'pc-0.10' is deprecated, use a newer machine type instead
+
+?
