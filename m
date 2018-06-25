@@ -1,28 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fXVdW-0005Aj-LH
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:50:47 -0400
+	(envelope-from <sridhar.samudrala@intel.com>) id 1fXVgt-000688-E3
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:54:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fXVdT-0006Du-T4
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:50:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40892 helo=mx1.redhat.com)
+	(envelope-from <sridhar.samudrala@intel.com>) id 1fXVgq-00088w-QT
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:54:15 -0400
+Received: from mga14.intel.com ([192.55.52.115]:27934)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fXVdT-0006De-MG
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:50:43 -0400
-Date: Mon, 25 Jun 2018 18:50:39 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180625175039.GK2390@work-vm>
-References: <20180609141457.6283-1-vsementsov@virtuozzo.com>
-	<20180615120649.GC2615@work-vm>
-	<f40607cd-a777-b033-ae37-0be50e3bc3d2@virtuozzo.com>
-	<20180625171447.GJ2390@work-vm>
+	(Exim 4.71) (envelope-from <sridhar.samudrala@intel.com>)
+	id 1fXVgq-00088J-Hx
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:54:12 -0400
+References: <20180620170904-mutt-send-email-mst@kernel.org>
+	<20180620180619.6b4ee52d.cohuck@redhat.com>
+	<20180620224535-mutt-send-email-mst@kernel.org>
+	<20180621165913.7e3f4faa.cohuck@redhat.com>
+	<CADGSJ22B39JiS14L0yCYQ720-fZcwyUt1wCX1YO-6Y9FhmDKZg@mail.gmail.com>
+	<20180622053141-mutt-send-email-mst@kernel.org>
+	<CADGSJ23SBEFJCD50K-F-Gt86Q1-i_6iHTmSSjdXDzNnnpWZ_oQ@mail.gmail.com>
+	<CADGSJ22nLcz_XaJNzUUdpjQaJY8b5wZs=ohm=B7c2qf2K7_yGA@mail.gmail.com>
+	<20180623002628-mutt-send-email-mst@kernel.org>
+	<CADGSJ20td7b6He6S1PBSJjCq=bNvgqMGbOjiho2eeQm2pgpK3g@mail.gmail.com>
+	<20180623012406-mutt-send-email-mst@kernel.org>
+	<CADGSJ211pWKYnuuzcgUqJZiHU+=7H3oQSpp1TnE=+EBjkdmCSQ@mail.gmail.com>
+	<CADGSJ22DX8=rNPY+gNS_q=LCYLR5ieoE7oD8p4+8AnpzQsWSCg@mail.gmail.com>
+From: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
+Message-ID: <da144f8f-65cd-45d9-3c81-6c8ca1fb25fe@intel.com>
+Date: Mon, 25 Jun 2018 10:54:09 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180625171447.GJ2390@work-vm>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: invalidate cache before source
- start
+In-Reply-To: <CADGSJ22DX8=rNPY+gNS_q=LCYLR5ieoE7oD8p4+8AnpzQsWSCg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,109 +41,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, jsnow@redhat.com
+To: Siwei Liu <loseweigh@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
-> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> > 15.06.2018 15:06, Dr. David Alan Gilbert wrote:
-> > > * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> > > > Invalidate cache before source start in case of failed migration.
-> > > >=20
-> > > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo=
-.com>
-> > > Why doesn't the code at the bottom of migration_completion,
-> > > fail_invalidate:   and the code in migrate_fd_cancel   handle this?
-> > >=20
-> > > What case did you see it in that those didn't handle?
-> > > (Also I guess it probably should set s->block_inactive =3D false)
-> >=20
-> > on source I see:
-> >=20
-> > 81392@1529065750.766289:migrate_set_state new state 7
-> > 81392@1529065750.766330:migration_thread_file_err
-> > 81392@1529065750.766332:migration_thread_after_loop
-> >=20
-> > so, we are leaving loop on
-> > =A0=A0=A0=A0=A0=A0=A0 if (qemu_file_get_error(s->to_dst_file)) {
-> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 migrate_set_state(&s->state, curren=
-t_active_state,
-> > MIGRATION_STATUS_FAILED);
-> > trace_migration_thread_file_err();
-> > break;
-> > =A0=A0=A0=A0=A0=A0=A0 }
-> >=20
-> > and skip migration_completion()
->=20
-> Yeh, OK; I'd seen soemthing else a few days ago, where a cancellation
-> test that had previously ended with a 'cancelled' state has now ended u=
-p
-> in 'failed' (which is the state 7 you have above).
-> I suspect there's something else going on as well; I think what is
-> supposed to happen in the case of 'cancel' is that it spins in 'cancell=
-ing' for
-> a while in migrate_fd_cancel and then at the bottom of migrate_fd_cance=
-l
-> it does the recovery, but because it's going to failed instead, then
-> it's jumping over that recovery.
+On 6/22/2018 5:17 PM, Siwei Liu wrote:
+> On Fri, Jun 22, 2018 at 4:40 PM, Siwei Liu <loseweigh@gmail.com> wrote:
+>> On Fri, Jun 22, 2018 at 3:25 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+>>> On Fri, Jun 22, 2018 at 02:51:11PM -0700, Siwei Liu wrote:
+>>>> On Fri, Jun 22, 2018 at 2:29 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+>>>>> On Fri, Jun 22, 2018 at 01:03:04PM -0700, Siwei Liu wrote:
+>>>>>> On Fri, Jun 22, 2018 at 1:00 PM, Siwei Liu <loseweigh@gmail.com> wrote:
+>>>>>>> On Thu, Jun 21, 2018 at 7:32 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
+>>>>>>>> On Thu, Jun 21, 2018 at 06:21:55PM -0700, Siwei Liu wrote:
+>>>>>>>>> On Thu, Jun 21, 2018 at 7:59 AM, Cornelia Huck <cohuck@redhat.com> wrote:
+>>>>>>>>>> On Wed, 20 Jun 2018 22:48:58 +0300
+>>>>>>>>>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>>>>>>>>>
+>>>>>>>>>>> On Wed, Jun 20, 2018 at 06:06:19PM +0200, Cornelia Huck wrote:
+>>>>>>>>>>>> In any case, I'm not sure anymore why we'd want the extra uuid.
+>>>>>>>>>>> It's mostly so we can have e.g. multiple devices with same MAC
+>>>>>>>>>>> (which some people seem to want in order to then use
+>>>>>>>>>>> then with different containers).
+>>>>>>>>>>>
+>>>>>>>>>>> But it is also handy for when you assign a PF, since then you
+>>>>>>>>>>> can't set the MAC.
+>>>>>>>>>>>
+>>>>>>>>>> OK, so what about the following:
+>>>>>>>>>>
+>>>>>>>>>> - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
+>>>>>>>>>>    that we have a new uuid field in the virtio-net config space
+>>>>>>>>>> - in QEMU, add a property for virtio-net that allows to specify a uuid,
+>>>>>>>>>>    offer VIRTIO_NET_F_STANDBY_UUID if set
+>>>>>>>>>> - when configuring, set the property to the group UUID of the vfio-pci
+>>>>>>>>>>    device
+>>>>>>>>> If feature negotiation fails on VIRTIO_NET_F_STANDBY_UUID, is it safe
+>>>>>>>>> to still expose UUID in the config space on virtio-pci?
+>>>>>>>>
+>>>>>>>> Yes but guest is not supposed to read it.
+>>>>>>>>
+>>>>>>>>> I'm not even sure if it's sane to expose group UUID on the PCI bridge
+>>>>>>>>> where the corresponding vfio-pci device attached to for a guest which
+>>>>>>>>> doesn't support the feature (legacy).
+>>>>>>>>>
+>>>>>>>>> -Siwei
+>>>>>>>> Yes but you won't add the primary behind such a bridge.
+>>>>>>> I assume the UUID feature is a new one besides the exiting
+>>>>>>> VIRTIO_NET_F_STANDBY feature, where I think the current proposal is,
+>>>>>>> if UUID feature is present and supported by guest, we'll do pairing
+>>>>>>> based on UUID; if UUID feature present
+>>>>>>                                   ^^^^^^^  is NOT present
+>>>>> Let's go back for a bit.
+>>>>>
+>>>>> What is wrong with matching by mac?
+>>>>>
+>>>>> 1. Does not allow multiple NICs with same mac
+>>>>> 2. Requires MAC to be programmed by host in the PT device
+>>>>>     (which is often possible with VFs but isn't possible with all PT
+>>>>>     devices)
+>>>> Might not neccessarily be something wrong, but it's very limited to
+>>>> prohibit the MAC of VF from changing when enslaved by failover.
+>>> You mean guest changing MAC? I'm not sure why we prohibit that.
+>> I think Sridhar and Jiri might be better person to answer it. My
+>> impression was that sync'ing the MAC address change between all 3
+>> devices is challenging, as the failover driver uses MAC address to
+>> match net_device internally.
 
-Going back and actually looking at the patch again;
-can I ask for 1 small change;
-   Can you set s->block_inactive =3D false   in the case where you
-don't get the local_err (Like we do at the bottom of migrate_fd_cancel)
-
-
-Does that make sense?
-
-Thanks,
-
-Dave
-
-> Dave
->=20
-> >=20
-> > >=20
-> > > Dave
-> > >=20
-> > > > ---
-> > > >=20
-> > > >   migration/migration.c | 9 ++++++++-
-> > > >   1 file changed, 8 insertions(+), 1 deletion(-)
-> > > >=20
-> > > > diff --git a/migration/migration.c b/migration/migration.c
-> > > > index 1e99ec9b7e..8f39e0dc02 100644
-> > > > --- a/migration/migration.c
-> > > > +++ b/migration/migration.c
-> > > > @@ -2806,7 +2806,14 @@ static void migration_iteration_finish(Mig=
-rationState *s)
-> > > >       case MIGRATION_STATUS_FAILED:
-> > > >       case MIGRATION_STATUS_CANCELLED:
-> > > >           if (s->vm_was_running) {
-> > > > -            vm_start();
-> > > > +            Error *local_err =3D NULL;
-> > > > +            bdrv_invalidate_cache_all(&local_err);
-> > > > +            if (local_err) {
-> > > > +                error_reportf_err(local_err, "Can't invalidate d=
-isks before "
-> > > > +                                  "source vm start");
-> > > > +            } else {
-> > > > +                vm_start();
-> > > > +            }
-> > > >           } else {
-> > > >               if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
-> > > >                   runstate_set(RUN_STATE_POSTMIGRATE);
-> > > > --=20
-> > > > 2.11.1
-> > > >=20
-> > > --
-> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
-> >=20
-> > --=20
-> > Best regards,
-> > Vladimir
-> >=20
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Yes. The MAC address is assigned by the hypervisor and it needs to manage the movement
+of the MAC between the PF and VF.  Allowing the guest to change the MAC will require
+synchronization between the hypervisor and the PF/VF drivers. Most of the VF drivers
+don't allow changing guest MAC unless it is a trusted VF.
