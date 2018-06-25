@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54462)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXQqp-0001nt-CT
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:44:12 -0400
+	id 1fXQqr-0001qe-N6
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:44:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXQqo-0007wj-50
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:44:11 -0400
+	id 1fXQqq-0007yF-HW
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:44:13 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 25 Jun 2018 09:42:13 -0300
-Message-Id: <20180625124238.25339-22-f4bug@amsat.org>
+Date: Mon, 25 Jun 2018 09:42:14 -0300
+Message-Id: <20180625124238.25339-23-f4bug@amsat.org>
 In-Reply-To: <20180625124238.25339-1-f4bug@amsat.org>
 References: <20180625124238.25339-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 21/46] hw/xtensa: Use the IEC binary prefix
+Subject: [Qemu-devel] [PATCH v5 22/46] hw/alpha: Use the IEC binary prefix
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,96 +28,93 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Max Filippov <jcmvbkbc@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>
 
 It eases code review, unit is explicit.
 
 Patch generated using:
 
   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ include/hw/
-  $ git grep -n '[<>][<>]= ?[1-5]0'
 
 and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Acked-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- hw/xtensa/xtfpga.c     | 9 +++++----
- target/xtensa/helper.c | 5 +++--
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ hw/alpha/typhoon.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index 5dc13034f9..b3161de320 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -26,6 +26,7 @@
+diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
+index d3ed7cdbe8..d74b5b55e1 100644
+--- a/hw/alpha/typhoon.c
++++ b/hw/alpha/typhoon.c
+@@ -7,6 +7,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
  #include "qapi/error.h"
  #include "cpu.h"
- #include "sysemu/sysemu.h"
-@@ -152,7 +153,7 @@ static void xtfpga_net_init(MemoryRegion *address_space,
-             sysbus_mmio_get_region(s, 1));
+ #include "hw/hw.h"
+@@ -813,8 +814,6 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
+                      qemu_irq *p_rtc_irq,
+                      AlphaCPU *cpus[4], pci_map_irq_fn sys_map_irq)
+ {
+-    const uint64_t MB = 1024 * 1024;
+-    const uint64_t GB = 1024 * MB;
+     MemoryRegion *addr_space = get_system_memory();
+     DeviceState *dev;
+     TyphoonState *s;
+@@ -855,30 +854,30 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
  
-     ram = g_malloc(sizeof(*ram));
--    memory_region_init_ram_nomigrate(ram, OBJECT(s), "open_eth.ram", 16384,
-+    memory_region_init_ram_nomigrate(ram, OBJECT(s), "open_eth.ram", 16 * KiB,
-                            &error_fatal);
-     vmstate_register_ram_global(ram);
-     memory_region_add_subregion(address_space, buffers, ram);
-@@ -229,7 +230,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
-     const char *kernel_cmdline = qemu_opt_get(machine_opts, "append");
-     const char *dtb_filename = qemu_opt_get(machine_opts, "dtb");
-     const char *initrd_filename = qemu_opt_get(machine_opts, "initrd");
--    const unsigned system_io_size = 224 * 1024 * 1024;
-+    const unsigned system_io_size = 224 * MiB;
-     int n;
+     /* Pchip0 CSRs, 0x801.8000.0000, 256MB.  */
+     memory_region_init_io(&s->pchip.region, OBJECT(s), &pchip_ops, s, "pchip0",
+-                          256*MB);
++                          256 * MiB);
+     memory_region_add_subregion(addr_space, 0x80180000000ULL,
+                                 &s->pchip.region);
  
-     for (n = 0; n < smp_cpus; n++) {
-@@ -342,7 +343,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
-             cpu_physical_memory_write(cur_lowmem, fdt, fdt_size);
-             cur_tagptr = put_tag(cur_tagptr, BP_TAG_FDT,
-                                  sizeof(dtb_addr), &dtb_addr);
--            cur_lowmem = QEMU_ALIGN_UP(cur_lowmem + fdt_size, 4096);
-+            cur_lowmem = QEMU_ALIGN_UP(cur_lowmem + fdt_size, 4 * KiB);
-         }
- #else
-         if (dtb_filename) {
-@@ -370,7 +371,7 @@ static void xtfpga_init(const XtfpgaBoardDesc *board, MachineState *machine)
-             initrd_location.end = tswap32(cur_lowmem + initrd_size);
-             cur_tagptr = put_tag(cur_tagptr, BP_TAG_INITRD,
-                                  sizeof(initrd_location), &initrd_location);
--            cur_lowmem = QEMU_ALIGN_UP(cur_lowmem + initrd_size, 4096);
-+            cur_lowmem = QEMU_ALIGN_UP(cur_lowmem + initrd_size, 4 * KiB);
-         }
-         cur_tagptr = put_tag(cur_tagptr, BP_TAG_LAST, 0, NULL);
-         env->regs[2] = tagptr;
-diff --git a/target/xtensa/helper.c b/target/xtensa/helper.c
-index 34844eead3..c9a6132700 100644
---- a/target/xtensa/helper.c
-+++ b/target/xtensa/helper.c
-@@ -26,6 +26,7 @@
-  */
+     /* Cchip CSRs, 0x801.A000.0000, 256MB.  */
+     memory_region_init_io(&s->cchip.region, OBJECT(s), &cchip_ops, s, "cchip0",
+-                          256*MB);
++                          256 * MiB);
+     memory_region_add_subregion(addr_space, 0x801a0000000ULL,
+                                 &s->cchip.region);
  
- #include "qemu/osdep.h"
-+#include "qemu/units.h"
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "exec/gdbstub.h"
-@@ -726,10 +727,10 @@ static void dump_tlb(FILE *f, fprintf_function cpu_fprintf,
-         bool print_header = true;
+     /* Dchip CSRs, 0x801.B000.0000, 256MB.  */
+     memory_region_init_io(&s->dchip_region, OBJECT(s), &dchip_ops, s, "dchip0",
+-                          256*MB);
++                          256 * MiB);
+     memory_region_add_subregion(addr_space, 0x801b0000000ULL,
+                                 &s->dchip_region);
  
-         if (sz >= 0x100000) {
--            sz >>= 20;
-+            sz /= MiB;
-             sz_text = "MB";
-         } else {
--            sz >>= 10;
-+            sz /= KiB;
-             sz_text = "KB";
-         }
+     /* Pchip0 PCI memory, 0x800.0000.0000, 4GB.  */
+-    memory_region_init(&s->pchip.reg_mem, OBJECT(s), "pci0-mem", 4*GB);
++    memory_region_init(&s->pchip.reg_mem, OBJECT(s), "pci0-mem", 4 * GiB);
+     memory_region_add_subregion(addr_space, 0x80000000000ULL,
+                                 &s->pchip.reg_mem);
+ 
+     /* Pchip0 PCI I/O, 0x801.FC00.0000, 32MB.  */
+     memory_region_init_io(&s->pchip.reg_io, OBJECT(s), &alpha_pci_ignore_ops,
+-                          NULL, "pci0-io", 32*MB);
++                          NULL, "pci0-io", 32 * MiB);
+     memory_region_add_subregion(addr_space, 0x801fc000000ULL,
+                                 &s->pchip.reg_io);
+ 
+@@ -899,13 +898,13 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
+ 
+     /* Pchip0 PCI special/interrupt acknowledge, 0x801.F800.0000, 64MB.  */
+     memory_region_init_io(&s->pchip.reg_iack, OBJECT(s), &alpha_pci_iack_ops,
+-                          b, "pci0-iack", 64*MB);
++                          b, "pci0-iack", 64 * MiB);
+     memory_region_add_subregion(addr_space, 0x801f8000000ULL,
+                                 &s->pchip.reg_iack);
+ 
+     /* Pchip0 PCI configuration, 0x801.FE00.0000, 16MB.  */
+     memory_region_init_io(&s->pchip.reg_conf, OBJECT(s), &alpha_pci_conf1_ops,
+-                          b, "pci0-conf", 16*MB);
++                          b, "pci0-conf", 16 * MiB);
+     memory_region_add_subregion(addr_space, 0x801fe000000ULL,
+                                 &s->pchip.reg_conf);
  
 -- 
 2.18.0
