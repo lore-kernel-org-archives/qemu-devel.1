@@ -1,36 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37713)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fXT4C-0008G0-UX
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:06:09 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fXT6F-0000uJ-LD
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:08:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fXT46-0000Oz-Tr
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:06:08 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36844)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1fXT46-0000Md-KP
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:06:02 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5PExib6097639
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 11:06:01 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ju08hg0rj-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 11:06:00 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 25 Jun 2018 09:05:59 -0600
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 25 Jun 2018 11:05:55 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fXT6E-00017a-DG
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:08:15 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180622134036.23182-1-f4bug@amsat.org>
+	<20180622134036.23182-8-f4bug@amsat.org>
+	<e98bac2c-ce0b-e226-3d96-004e46478f2f@redhat.com>
+	<8256c2d4-722c-299f-e8e3-42c1a7f68e1d@amsat.org>
+	<0bf443e6-fd49-9aaf-43fb-f171edf5fd38@redhat.com>
+	<57e04a05-442c-bd4a-2daa-1b690540c061@amsat.org>
+	<2eab61ba-1220-095d-721b-53357104fb45@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9ad2df7b-afa2-8470-6353-facdde6b0587@amsat.org>
+Date: Mon, 25 Jun 2018 12:07:52 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Message-Id: <aa9ce054-f58c-097d-aee3-8fae769d0840@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Choosing PCR banks for swtpm's TPM 2
+In-Reply-To: <2eab61ba-1220-095d-721b-53357104fb45@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 07/14] hw/i2c/omap_i2c: Use
+ qemu_log_mask(UNIMP) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,43 +34,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: tpm2@lists.01.org, Kenneth Goldman <kgoldman@us.ibm.com>
-Cc: Chris Friesen <chris.friesen@windriver.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "Qi, Yadong" <yadong.qi@intel.com>, "Xu, Quan" <quan.xu@intel.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
 
-Hi!
+On 06/25/2018 11:30 AM, Thomas Huth wrote:
+> On 25.06.2018 14:52, Philippe Mathieu-Daudé wrote:
+>> On 06/25/2018 03:08 AM, Thomas Huth wrote:
+>>> On 22.06.2018 22:10, Philippe Mathieu-Daudé wrote:
+>>>> On 06/22/2018 04:38 PM, Thomas Huth wrote:
+>>>>> On 22.06.2018 15:40, Philippe Mathieu-Daudé wrote:
+>>>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>>>> ---
+>>>>>>  hw/i2c/omap_i2c.c | 20 ++++++++++++--------
+>>>>>>  1 file changed, 12 insertions(+), 8 deletions(-)
+>>>>>>
+>>>>>> diff --git a/hw/i2c/omap_i2c.c b/hw/i2c/omap_i2c.c
+>>>>>> index 26e3e5ebf6..690876e43e 100644
+>>>>>> --- a/hw/i2c/omap_i2c.c
+>>>>>> +++ b/hw/i2c/omap_i2c.c
+>>>>>> @@ -17,6 +17,7 @@
+>>>>>>   * with this program; if not, see <http://www.gnu.org/licenses/>.
+>>>>>>   */
+>>>>>>  #include "qemu/osdep.h"
+>>>>>> +#include "qemu/log.h"
+>>>>>>  #include "hw/hw.h"
+>>>>>>  #include "hw/i2c/i2c.h"
+>>>>>>  #include "hw/arm/omap.h"
+>>>>>> @@ -339,14 +340,15 @@ static void omap_i2c_write(void *opaque, hwaddr addr,
+>>>>>>              }
+>>>>>>              break;
+>>>>>>          }
+>>>>>> -        if ((value & (1 << 15)) && !(value & (1 << 10))) {	/* MST */
+>>>>>> -            fprintf(stderr, "%s: I^2C slave mode not supported\n",
+>>>>>> -                            __func__);
+>>>>>> +        if ((value & (1 << 15)) && !(value & (1 << 10))) { /* MST */
+>>>>>
+>>>>> Please keep the white spaces before the comment if you don't change
+>>>>> anything else.
+>>>>
+>>>> This is a <tab> and checkpatch complains...
+>>>>
+>>>> I can use 4 spaces for this tab. I tried to align with other tab-aligned
+>>>> comments I didn't modify, but the result is messier. Thus a simple space.
+>>>
+>>> Oh, sorry, I didn't notice that you've replaced a TAB here. I guess it's
+>>> ok then. But why does checkpatch complain if it is just in the context
+>>> of your modification? That's weird.
+>>
+>> The first 2 contexts (MST and XA) are fine, however checkpatch complains
+>> with the last one (ST_EN):
+>>
+>> ERROR: code indent should never use tabs
+>> #38: FILE: hw/i2c/omap_i2c.c:397:
+>> +        if (value & (1 << 15)) {^I^I^I^I^I/* ST_EN */$
+>>
+>> Since I replaced this one, I also did with the 2 previous.
+>>
+>> Now I realize I can _not_ add the brackets so I don't have to update the
+>> <tabs>:
+>>
+>>          if (value & (1 << 15))^I^I^I^I^I/* ST_EN */
+>> -            fprintf(stderr, "%s: System Test not supported\n", __func__);
+>> +            qemu_log_mask(LOG_UNIMP,
+>> +                          "%s: System Test not supported\n", __func__);
+>>          break;
+>>
+>> I think if it better to unify the code style when possible, but it is up
+>> to you, if you prefer I can resend with tabs and no brackets.
+> 
+> I think it's OK to fix up the coding style here, too. Maybe just mention
+> it in the patch description ("While we're at it, change TABs to spaces
+> and add missing curly braces to the surounding if-statements" or so).
 
- =C2=A0I am sending this email to solicit input on the choice of the PCR=20
-banks to enable for swtpm's TPM 2. I have currently enabled 4 PCR banks=20
-for SHA{1,256,384,512}. The downside of this is that running the TPM 2=20
-with so many PCR banks has a performance impact when the Linux integrity=20
-measurement architecture is used and has to extend measurements into all=20
-PCR banks, which Linux does already.
+OK. If that's fine with you I won't respin the whole series for this
+comment, but if I have to respin for another reason I'll improve the
+comment. I kindly learned the lesson for the next time although.
 
-TPM 2 has the PCR_Allocate() command for a user to select the PCR banks=20
-to use. This command allows to make some PCR banks invisible. The change=20
-has to be done through the firmware and has the downside that the TPM2=20
-does not support TPM2_Shutdown(SU_STATE) after this command was used.=20
-This prevents suspend/resume from working properly. So, it seems that=20
-one shouldn't have to use this command, which in turn means the number=20
-of PCR banks should be small.
+Thanks for the series review,
 
-Another complication with the swtpm is the upgrade path. Suspended VMs=20
-will expect that the PCR banks that were available before the suspend=20
-will be available after the resume and a possible swtpm upgrade. This in=20
-turn means that the PCR banks should be chosen now and we'll have to=20
-stick with them.
-
-That said, my suggestion would be to enable only PCR banks for SHA256=20
-for 'now' and SHA512 for the future. Having two PCR banks should enable=20
-decent performance. If someone wants to have better performance he will=20
-have to go through the firmware to select the PCR banks at the expense=20
-of loosing suspend/resume support.
-
-The change of PCR banks for the current 4 PCR banks will break the state=20
-of all swtpms.
-
-If you have suggestions, please let me know.
-
-Regards,
-
- =C2=A0=C2=A0 Stefan
+Phil.
