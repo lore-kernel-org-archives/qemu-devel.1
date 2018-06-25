@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXTTh-0007KH-Nd
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:32:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXTUK-0007gN-I1
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:33:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXTTg-0001we-HN
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:32:29 -0400
-References: <20180622134036.23182-1-f4bug@amsat.org>
-	<20180622134036.23182-8-f4bug@amsat.org>
-	<e98bac2c-ce0b-e226-3d96-004e46478f2f@redhat.com>
-	<8256c2d4-722c-299f-e8e3-42c1a7f68e1d@amsat.org>
-	<0bf443e6-fd49-9aaf-43fb-f171edf5fd38@redhat.com>
-	<57e04a05-442c-bd4a-2daa-1b690540c061@amsat.org>
-	<2eab61ba-1220-095d-721b-53357104fb45@redhat.com>
-	<9ad2df7b-afa2-8470-6353-facdde6b0587@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d3a4745c-9bf9-db13-33b2-5542ef7f74b4@redhat.com>
-Date: Mon, 25 Jun 2018 17:32:18 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fXTUJ-00027c-I2
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:33:08 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:43278)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fXTUJ-00027E-2d
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:33:07 -0400
+Received: by mail-ot0-x242.google.com with SMTP id i19-v6so15508338otk.10
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 08:33:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <9ad2df7b-afa2-8470-6353-facdde6b0587@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 07/14] hw/i2c/omap_i2c: Use
- qemu_log_mask(UNIMP) instead of fprintf
+In-Reply-To: <20180621015359.12018-8-richard.henderson@linaro.org>
+References: <20180621015359.12018-1-richard.henderson@linaro.org>
+	<20180621015359.12018-8-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 25 Jun 2018 16:32:45 +0100
+Message-ID: <CAFEAcA-n1fcCk9LfgZPnphHpft+iYXH3t1+2-7RtdmjH2jRksw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 07/35] target/arm: Implement SVE FP
+ Multiply-Add Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,99 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 25.06.2018 17:07, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 06/25/2018 11:30 AM, Thomas Huth wrote:
->> On 25.06.2018 14:52, Philippe Mathieu-Daud=C3=A9 wrote:
->>> On 06/25/2018 03:08 AM, Thomas Huth wrote:
->>>> On 22.06.2018 22:10, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>> On 06/22/2018 04:38 PM, Thomas Huth wrote:
->>>>>> On 22.06.2018 15:40, Philippe Mathieu-Daud=C3=A9 wrote:
->>>>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>>>>> ---
->>>>>>>  hw/i2c/omap_i2c.c | 20 ++++++++++++--------
->>>>>>>  1 file changed, 12 insertions(+), 8 deletions(-)
->>>>>>>
->>>>>>> diff --git a/hw/i2c/omap_i2c.c b/hw/i2c/omap_i2c.c
->>>>>>> index 26e3e5ebf6..690876e43e 100644
->>>>>>> --- a/hw/i2c/omap_i2c.c
->>>>>>> +++ b/hw/i2c/omap_i2c.c
->>>>>>> @@ -17,6 +17,7 @@
->>>>>>>   * with this program; if not, see <http://www.gnu.org/licenses/>=
-.
->>>>>>>   */
->>>>>>>  #include "qemu/osdep.h"
->>>>>>> +#include "qemu/log.h"
->>>>>>>  #include "hw/hw.h"
->>>>>>>  #include "hw/i2c/i2c.h"
->>>>>>>  #include "hw/arm/omap.h"
->>>>>>> @@ -339,14 +340,15 @@ static void omap_i2c_write(void *opaque, hw=
-addr addr,
->>>>>>>              }
->>>>>>>              break;
->>>>>>>          }
->>>>>>> -        if ((value & (1 << 15)) && !(value & (1 << 10))) {	/* MS=
-T */
->>>>>>> -            fprintf(stderr, "%s: I^2C slave mode not supported\n=
-",
->>>>>>> -                            __func__);
->>>>>>> +        if ((value & (1 << 15)) && !(value & (1 << 10))) { /* MS=
-T */
->>>>>>
->>>>>> Please keep the white spaces before the comment if you don't chang=
-e
->>>>>> anything else.
->>>>>
->>>>> This is a <tab> and checkpatch complains...
->>>>>
->>>>> I can use 4 spaces for this tab. I tried to align with other tab-al=
-igned
->>>>> comments I didn't modify, but the result is messier. Thus a simple =
-space.
->>>>
->>>> Oh, sorry, I didn't notice that you've replaced a TAB here. I guess =
-it's
->>>> ok then. But why does checkpatch complain if it is just in the conte=
-xt
->>>> of your modification? That's weird.
->>>
->>> The first 2 contexts (MST and XA) are fine, however checkpatch compla=
-ins
->>> with the last one (ST_EN):
->>>
->>> ERROR: code indent should never use tabs
->>> #38: FILE: hw/i2c/omap_i2c.c:397:
->>> +        if (value & (1 << 15)) {^I^I^I^I^I/* ST_EN */$
->>>
->>> Since I replaced this one, I also did with the 2 previous.
->>>
->>> Now I realize I can _not_ add the brackets so I don't have to update =
-the
->>> <tabs>:
->>>
->>>          if (value & (1 << 15))^I^I^I^I^I/* ST_EN */
->>> -            fprintf(stderr, "%s: System Test not supported\n", __fun=
-c__);
->>> +            qemu_log_mask(LOG_UNIMP,
->>> +                          "%s: System Test not supported\n", __func_=
-_);
->>>          break;
->>>
->>> I think if it better to unify the code style when possible, but it is=
- up
->>> to you, if you prefer I can resend with tabs and no brackets.
->>
->> I think it's OK to fix up the coding style here, too. Maybe just menti=
-on
->> it in the patch description ("While we're at it, change TABs to spaces
->> and add missing curly braces to the surounding if-statements" or so).
->=20
-> OK. If that's fine with you I won't respin the whole series for this
-> comment, but if I have to respin for another reason I'll improve the
-> comment.
+On 21 June 2018 at 02:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper-sve.h    |  16 ++++
+>  target/arm/sve_helper.c    | 158 +++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-sve.c |  49 ++++++++++++
+>  target/arm/sve.decode      |  17 ++++
+>  4 files changed, 240 insertions(+)
 
-Fine for me!
+> diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+> index 636212a638..70e5a3aeb5 100644
+> --- a/target/arm/sve.decode
+> +++ b/target/arm/sve.decode
+> @@ -128,6 +128,8 @@
+>                  &rprrr_esz ra=%reg_movprfx
+>  @rdn_pg_ra_rm   ........ esz:2 . rm:5  ... pg:3 ra:5 rd:5 \
+>                  &rprrr_esz rn=%reg_movprfx
+> +@rdn_pg_rm_ra   ........ esz:2 . ra:5  ... pg:3 rm:5 rd:5 \
+> +                &rprrr_esz rn=%reg_movprfx
 
- Thomas
+>  # One register operand, with governing predicate, vector element size
+>  @rd_pg_rn       ........ esz:2 ... ... ... pg:3 rn:5 rd:5       &rpr_esz
+> @@ -701,6 +703,21 @@ FMULX           01100101 .. 00 1010 100 ... ..... .....    @rdn_pg_rm
+>  FDIV            01100101 .. 00 1100 100 ... ..... .....    @rdm_pg_rn # FDIVR
+>  FDIV            01100101 .. 00 1101 100 ... ..... .....    @rdn_pg_rm
+>
+> +### SVE FP Multiply-Add Group
+> +
+> +# SVE floating-point multiply-accumulate writing addend
+> +FMLA_zpzzz      01100101 .. 1 ..... 000 ... ..... .....         @rda_pg_rn_rm
+> +FMLS_zpzzz      01100101 .. 1 ..... 001 ... ..... .....         @rda_pg_rn_rm
+> +FNMLA_zpzzz     01100101 .. 1 ..... 010 ... ..... .....         @rda_pg_rn_rm
+> +FNMLS_zpzzz     01100101 .. 1 ..... 011 ... ..... .....         @rda_pg_rn_rm
+> +
+> +# SVE floating-point multiply-accumulate writing multiplicand
+> +# FMAD, FMSB, FNMAD, FNMS
+> +FMLA_zpzzz      01100101 .. 1 ..... 100 ... ..... .....         @rdn_pg_rm_ra
+> +FMLS_zpzzz      01100101 .. 1 ..... 101 ... ..... .....         @rdn_pg_rm_ra
+> +FNMLA_zpzzz     01100101 .. 1 ..... 110 ... ..... .....         @rdn_pg_rm_ra
+> +FNMLS_zpzzz     01100101 .. 1 ..... 111 ... ..... .....         @rdn_pg_rm_ra
+
+It's not clear to me how we can implement both of these groups
+with the same functions. Some commentary might help.
+
+thanks
+-- PMM
