@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fXNQU-0003AW-RY
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:04:47 -0400
+	(envelope-from <thuth@redhat.com>) id 1fXNR0-0003Qu-4j
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:05:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fXNQT-0002SF-Sp
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:04:46 -0400
-Date: Mon, 25 Jun 2018 10:04:33 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180625090433.GA18580@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-26-kwolf@redhat.com>
-	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
-	<20180622125502.GF4366@localhost.localdomain>
-	<20180625071610.GH16514@angien.pipo.sk>
-	<f34a06e6-2487-e7dd-1393-cb8d82e0bfb5@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f34a06e6-2487-e7dd-1393-cb8d82e0bfb5@redhat.com>
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+	(envelope-from <thuth@redhat.com>) id 1fXNQw-0002bh-Uw
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:05:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44268 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fXNQw-0002bW-OL
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:05:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 52E7781663EC
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 09:05:14 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+Date: Mon, 25 Jun 2018 11:05:12 +0200
+Message-Id: <1529917512-10528-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH v4] hw/i386: Deprecate the machine types
+ pc-0.10 and pc-0.11
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +28,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Krempa <pkrempa@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Mon, Jun 25, 2018 at 10:23:03AM +0200, Thomas Huth wrote:
-> On 25.06.2018 09:16, Peter Krempa wrote:
-> > On Fri, Jun 22, 2018 at 14:55:02 +0200, Kevin Wolf wrote:
-> >> Am 22.06.2018 um 13:38 hat Christian Borntraeger geschrieben:
-> >>>
-> >>> On 06/15/2018 04:21 PM, Kevin Wolf wrote:
-> >>>> The -drive option serial was deprecated in QEMU 2.10. It's time to
-> >>>> remove it.
-> >>>>
-> >>>> Tests need to be updated to set the serial number with -global instead
-> >>>> of using the -drive option.
-> [...]
-> >>> So it seems that this breaks s390x.
-> >>
-> >> Thanks for bringing this up. libvirt should fix this before QEMU 3.0 is
-> >> released.
-> > 
-> > So, I already extracted the code that formats the attributes which
-> > should be actually done for the frontend few months ago, but did not
-> > swithc to it since I did not want to check when everything was added.
-> > 
-> > The fix will be rather simple if we are certain that the disk serial,
-> > geometry and error policies were supported in qemu 1.5. In that case we
-> > can switch unconditionally to the new format.
-> 
-> The CHS device properties are available since QEMU v1.2:
-> - IDE: https://git.qemu.org/?p=qemu.git;a=commitdiff;h=ba801960
-> - SCSI: https://git.qemu.org/?p=qemu.git;a=commitdiff;h=d252df48
-> - virtio-blk: https://git.qemu.org/?p=qemu.git;a=commitdiff;h=e63e7fde2
-> 
-> The "serial" property and the PCI "addr" property are also available
-> since 2012 at least, I didn't fully track their origins, but QEMU v1.2
-> already supported them.
-> 
-> So yes, all these properties should be available in QEMU 1.5 already.
+The oldest machine type which is still used in a still maintained distro
+is a pc-0.12 based machine type in RHEL6, so everything that is older
+than pc-0.12 should not be used anymore. Thus let's deprecate pc-0.10
+and pc-0.11 so that we can finally remove them in a future release.
 
-The werror/rerror attributes were not added until 2.7.0, so we still
-need a capabilities check for them
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ This is based on a patch that I already sent in 2017. But back then, we
+ were still in progress of discussing our deprecation policies (e.g. auto-
+ matic deprecation for old machine types), and there was no clear consensus
+ whether we should deprecate 0.10 - 0.11, all 0.x or even up to version 1.2.
+ After some iterations and too much discussion, I've forgotten about this
+ patch. Anyway, I think we agreed that at least 0.10 and 0.11 can certainly
+ be removed nowadays, so let's finally get at least those two machine types
+ marked as deprecated! If there is not too much bikeshed-painting discussions
+ anymore and the patch gets finally accepted and we will finally have removed
+ these two types in v3.2, we can resume the discussion about newer machine
+ types afterwards.
 
-Regards,
-Daniel
+ Note: I don't want to add a QMP interface for this in this patch here,
+ let's keep this small and simple! If we decide that we need a QMP interface,
+ we can do that with a separate patch later.
+
+ v4:
+ - Shorten the deprecation message as requested by Markus
+ - Added Eduardo's Reviewed-by
+
+ v3:
+ - Do not print the deprecation messages if qtest_enabled()
+
+ v2:
+ - Renamed deprecation_msg to deprecation_reason
+ - Added information about that field to the MachineClass comment
+
+ hw/i386/pc_piix.c   |  1 +
+ include/hw/boards.h |  3 +++
+ qemu-doc.texi       |  5 +++++
+ vl.c                | 10 ++++++++--
+ 4 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index e9b6f06..d357907 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -956,6 +956,7 @@ static void pc_i440fx_0_11_machine_options(MachineClass *m)
+ {
+     pc_i440fx_0_12_machine_options(m);
+     m->hw_version = "0.11";
++    m->deprecation_reason = "use a newer machine type instead";
+     SET_MACHINE_COMPAT(m, PC_COMPAT_0_11);
+ }
+ 
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index ef7457f..79069dd 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -107,6 +107,8 @@ typedef struct {
+ 
+ /**
+  * MachineClass:
++ * @deprecation_reason: If set, the machine is marked as deprecated. The
++ *    string should provide some clear information about what to use instead.
+  * @max_cpus: maximum number of CPUs supported. Default: 1
+  * @min_cpus: minimum number of CPUs supported. Default: 1
+  * @default_cpus: number of CPUs instantiated if none are specified. Default: 1
+@@ -166,6 +168,7 @@ struct MachineClass {
+     char *name;
+     const char *alias;
+     const char *desc;
++    const char *deprecation_reason;
+ 
+     void (*init)(MachineState *state);
+     void (*reset)(void);
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 282bc3d..16fcb47 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2943,6 +2943,11 @@ support page sizes < 4096 any longer.
+ 
+ @section System emulator machines
+ 
++@subsection pc-0.10 and pc-0.11 (since 3.0)
++
++These machine types are very old and likely can not be used for live migration
++from old QEMU versions anymore. A newer machine type should be used instead.
++
+ @section Device options
+ 
+ @subsection Block device options
+diff --git a/vl.c b/vl.c
+index d451f45..5d8a9df 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2560,8 +2560,9 @@ static gint machine_class_cmp(gconstpointer a, gconstpointer b)
+             if (mc->alias) {
+                 printf("%-20s %s (alias of %s)\n", mc->alias, mc->desc, mc->name);
+             }
+-            printf("%-20s %s%s\n", mc->name, mc->desc,
+-                   mc->is_default ? " (default)" : "");
++            printf("%-20s %s%s%s\n", mc->name, mc->desc,
++                   mc->is_default ? " (default)" : "",
++                   mc->deprecation_reason ? " (deprecated)" : "");
+         }
+     }
+ 
+@@ -4257,6 +4258,11 @@ int main(int argc, char **argv, char **envp)
+ 
+     configure_accelerator(current_machine);
+ 
++    if (!qtest_enabled() && machine_class->deprecation_reason) {
++        error_report("Machine type '%s' is deprecated: %s",
++                     machine_class->name, machine_class->deprecation_reason);
++    }
++
+     /*
+      * Register all the global properties, including accel properties,
+      * machine properties, and user-specified ones.
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+1.8.3.1
