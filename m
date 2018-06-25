@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fXODW-0003iy-27
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:55:27 -0400
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fXOEM-00049A-Hb
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:56:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fXODQ-0001ux-VA
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:55:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33758 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fXODQ-0001ul-JW
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:55:20 -0400
-Date: Mon, 25 Jun 2018 11:55:12 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180625115512.2f29844e.cohuck@redhat.com>
-In-Reply-To: <20180622214259-mutt-send-email-mst@kernel.org>
-References: <CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
-	<20180619125453.2d2dfb2d.cohuck@redhat.com>
-	<20180619233001-mutt-send-email-mst@kernel.org>
-	<20180620115359.1a3bf6fb.cohuck@redhat.com>
-	<20180620170904-mutt-send-email-mst@kernel.org>
-	<20180620180619.6b4ee52d.cohuck@redhat.com>
-	<20180620224535-mutt-send-email-mst@kernel.org>
-	<20180621165913.7e3f4faa.cohuck@redhat.com>
-	<20180621211712-mutt-send-email-mst@kernel.org>
-	<20180622170955.298900c1.cohuck@redhat.com>
-	<20180622214259-mutt-send-email-mst@kernel.org>
+	(envelope-from <hongbo.zhang@linaro.org>) id 1fXOEL-0002Iw-LU
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:56:18 -0400
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:44066)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
+	id 1fXOEL-0002Ib-F2
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:56:17 -0400
+Received: by mail-io0-x242.google.com with SMTP id g7-v6so11928994ioh.11
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 02:56:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+In-Reply-To: <CAFEAcA90hDS17L64YZ5H_B-kYkMaMV+ofBtdD=TEKgsnT+wUqA@mail.gmail.com>
+References: <1529663827-28854-1-git-send-email-hongbo.zhang@linaro.org>
+	<CAFEAcA8Bx7b_0zUxbdxFgtANFycVkUiSiemAwHpr0wpyxuLKmw@mail.gmail.com>
+	<CAHmQWvCczwh0Yto=9s2j7d00ULokZ0=VrxykAyXBvvHzQaUEMA@mail.gmail.com>
+	<CAFEAcA90hDS17L64YZ5H_B-kYkMaMV+ofBtdD=TEKgsnT+wUqA@mail.gmail.com>
+From: Hongbo Zhang <hongbo.zhang@linaro.org>
+Date: Mon, 25 Jun 2018 17:56:16 +0800
+Message-ID: <CAHmQWvBxTaX9f+xH3zue5w5s-eiLo00jmHq2OZ4gXTAJg0XLjA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: fix psci conduit in acpi when
+ el3 enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,99 +32,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Fri, 22 Jun 2018 22:05:50 +0300
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 25 June 2018 at 17:06, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 25 June 2018 at 05:06, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
+>> Hi Peter,
+>> Yes, your considerations reasonable.
+>> But in practice of hardware platforms, programmer checks that Arm TF
+>> is using SMC for PSCI call conduit, then fix it manually in the ACPI
+>> table, reason may be that Arm TF is lack of ACPI support, if device
+>> tree used, there should be no such thing because Arm TF can support
+>> it.
+>> On QEMU, I just mimic the situation, if a complete reasonable
+>> solution, further efforts are needed to figure it out.
+>
+> I'm afraid I don't really understand what you're saying
+> here. Could you try rephrasing it?
+>
+Sorry, I say in the real hardware platforms, in practice programmer
+has to write a fixed PSCI conduit value in ACPI. then on the qemu
+platform, I did the similar thing -- write a fixed value too.
+I know it is not a perfect solution for it, I have no better one for now.
 
-> On Fri, Jun 22, 2018 at 05:09:55PM +0200, Cornelia Huck wrote:
-> > On Thu, 21 Jun 2018 21:20:13 +0300
-> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >   
-> > > On Thu, Jun 21, 2018 at 04:59:13PM +0200, Cornelia Huck wrote:  
-> > > > OK, so what about the following:
-> > > > 
-> > > > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
-> > > >   that we have a new uuid field in the virtio-net config space
-> > > > - in QEMU, add a property for virtio-net that allows to specify a uuid,
-> > > >   offer VIRTIO_NET_F_STANDBY_UUID if set
-> > > > - when configuring, set the property to the group UUID of the vfio-pci
-> > > >   device
-> > > > - in the guest, use the uuid from the virtio-net device's config space
-> > > >   if applicable; else, fall back to matching by MAC as done today
-> > > > 
-> > > > That should work for all virtio transports.    
-> > > 
-> > > True. I'm a bit unhappy that it's virtio net specific though
-> > > since down the road I expect we'll have a very similar feature
-> > > for scsi (and maybe others).
-> > > 
-> > > But we do not have a way to have fields that are portable
-> > > both across devices and transports, and I think it would
-> > > be a useful addition. How would this work though? Any idea?  
-> > 
-> > Can we introduce some kind of device-independent config space area?
-> > Pushing back the device-specific config space by a certain value if the
-> > appropriate feature is negotiated and use that for things like the uuid?  
-> 
-> So config moves back and forth?
-> Reminds me of the msi vector mess we had with pci.
+> If we're running at EL3 and booting firmware, then QEMU doesn't
+> provide PSCI. The firmware we're booting is the only thing that
+> can know if that firmware has implemented PSCI. So only it can
+> decide whether the ACPI tables and DTB should say that PSCI is
+> present.
 
-Yes, that would be a bit unfortunate.
+Agree with your comments, I hope ACPI's psci conduit node can reflect
+firmware's implementation, even when firmware PSCI conduit changes,
+ACPI node changes accordingly.
+But for ACPI and DTB, there are different situations now.
 
-> I'd rather have every transport add a new config.
+If DTB is used, firmware(with psci implementation) can generate DTB
+nodes, saying which PSCI conduit is used - smc or hvc, then uboot or
+uefi can get this DTB add more DTB nodes before transfer it to kernel.
+That is, using DTB, we can achieve the goal.
 
-You mean via different mechanisms?
+But when ACPI used, there is no codes in firmware to generate ACPI
+node to show which PSCI conduit is used, then uefi or later stage
+cannot get this info dynamically from any codes as far as I know.
+(this is why programmer manually check that firmware is using smc,
+then write a fixed value in ACPI FADT).
+So, if we want to fix this neatly, adding ACPI support in Arm trusted
+firmware may be the solution, but it should be a big feature for
+firmware, not QEMU.
 
-> 
-> > But regardless of that, I'm not sure whether extending this approach to
-> > other device types is the way to go. Tying together two different
-> > devices is creating complicated situations at least in the hypervisor
-> > (even if it's fairly straightforward in the guest). [I have not come
-> > around again to look at the "how to handle visibility in QEMU"
-> > questions due to lack of cycles, sorry about that.]
-> > 
-> > So, what's the goal of this approach? Only to allow migration with
-> > vfio-pci, or also to plug in a faster device and use it instead of an
-> > already attached paravirtualized device?  
-> 
-> These are two sides of the same coin, I think the second approach
-> is closer to what we are doing here.
-
-Thinking about it, do we need any knob to keep the vfio device
-invisible if the virtio device is not present? IOW, how does the
-hypervisor know that the vfio device is supposed to be paired with a
-virtio device? It seems we need an explicit tie-in.
-
-> 
-> > What about migration of vfio devices that are not easily replaced by a
-> > paravirtualized device? I'm thinking of vfio-ccw, where our main (and
-> > currently only) supported device is dasd (disks) -- which can do a lot
-> > of specialized things that virtio-blk does not support (and should not
-> > or even cannot support).  
-> 
-> But maybe virtio-scsi can?
-
-I don't think so. Dasds have some channel commands that don't map
-easily to scsi commands.
-
-> 
-> > Would it be more helpful to focus on generic
-> > migration support for vfio instead of going about it device by device?
-> > 
-> > This network device approach already seems far along, so it makes sense
-> > to continue with it. But I'm not sure whether we want to spend time and
-> > energy on that for other device types rather than working on a general
-> > solution for vfio migration.  
-> 
-> I'm inclined to say finalizing this feature would be a good first step
-> and will teach us how we can move forward.
-
-I'm not opposed to figuring out this one, but I'm not sure whether we
-want to extend it to more device types.
-
-Are people looking into generic migration support? I have it on my
-things-to-look-at list (figuring out what needs to be device specific
-and what can be generic, figuring out how we can support vfio-ccw,
-etc.).
+(since many components involved, hope my understanding correct)
+>
+> thanks
+> -- PMM
