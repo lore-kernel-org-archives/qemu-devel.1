@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXVb9-0003yv-5e
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:48:20 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fXVdW-0005Aj-LH
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:50:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXVb8-0005Mv-AO
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:48:19 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:35183)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXVb8-0005Ml-3f
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:48:18 -0400
-Received: by mail-oi0-x242.google.com with SMTP id e8-v6so13337929oii.2
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 10:48:17 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1fXVdT-0006Du-T4
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:50:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40892 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fXVdT-0006De-MG
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:50:43 -0400
+Date: Mon, 25 Jun 2018 18:50:39 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180625175039.GK2390@work-vm>
+References: <20180609141457.6283-1-vsementsov@virtuozzo.com>
+	<20180615120649.GC2615@work-vm>
+	<f40607cd-a777-b033-ae37-0be50e3bc3d2@virtuozzo.com>
+	<20180625171447.GJ2390@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20180621015359.12018-19-richard.henderson@linaro.org>
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-19-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 18:47:56 +0100
-Message-ID: <CAFEAcA-9uU1GNZoq2N5-Mn3zSccL59ygaQq_RWQjqpaX0imeiQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 18/35] target/arm: Implement SVE
- Floating Point Multiply Indexed Group
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180625171447.GJ2390@work-vm>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] migration: invalidate cache before source
+ start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +31,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, jsnow@redhat.com
 
-On 21 June 2018 at 02:53, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper.h        | 14 +++++++++++
->  target/arm/translate-sve.c | 50 ++++++++++++++++++++++++++++++++++++++
->  target/arm/vec_helper.c    | 48 ++++++++++++++++++++++++++++++++++++
->  target/arm/sve.decode      | 19 +++++++++++++++
->  4 files changed, 131 insertions(+)
+* Dr. David Alan Gilbert (dgilbert@redhat.com) wrote:
+> * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> > 15.06.2018 15:06, Dr. David Alan Gilbert wrote:
+> > > * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
+> > > > Invalidate cache before source start in case of failed migration.
+> > > >=20
+> > > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo=
+.com>
+> > > Why doesn't the code at the bottom of migration_completion,
+> > > fail_invalidate:   and the code in migrate_fd_cancel   handle this?
+> > >=20
+> > > What case did you see it in that those didn't handle?
+> > > (Also I guess it probably should set s->block_inactive =3D false)
+> >=20
+> > on source I see:
+> >=20
+> > 81392@1529065750.766289:migrate_set_state new state 7
+> > 81392@1529065750.766330:migration_thread_file_err
+> > 81392@1529065750.766332:migration_thread_after_loop
+> >=20
+> > so, we are leaving loop on
+> > =A0=A0=A0=A0=A0=A0=A0 if (qemu_file_get_error(s->to_dst_file)) {
+> > =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 migrate_set_state(&s->state, curren=
+t_active_state,
+> > MIGRATION_STATUS_FAILED);
+> > trace_migration_thread_file_err();
+> > break;
+> > =A0=A0=A0=A0=A0=A0=A0 }
+> >=20
+> > and skip migration_completion()
+>=20
+> Yeh, OK; I'd seen soemthing else a few days ago, where a cancellation
+> test that had previously ended with a 'cancelled' state has now ended u=
+p
+> in 'failed' (which is the state 7 you have above).
+> I suspect there's something else going on as well; I think what is
+> supposed to happen in the case of 'cancel' is that it spins in 'cancell=
+ing' for
+> a while in migrate_fd_cancel and then at the bottom of migrate_fd_cance=
+l
+> it does the recovery, but because it's going to failed instead, then
+> it's jumping over that recovery.
 
-> +static bool trans_FMLA_zzxz(DisasContext *s, arg_FMLA_zzxz *a, uint32_t insn)
-> +{
-> +    static gen_helper_gvec_4_ptr * const fns[3] = {
-> +        gen_helper_gvec_fmla_idx_h,
-> +        gen_helper_gvec_fmla_idx_s,
-> +        gen_helper_gvec_fmla_idx_d,
-> +    };
-> +
-> +    if (sve_access_check(s)) {
-> +        unsigned vsz = vec_full_reg_size(s);
-> +        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
-> +        tcg_gen_gvec_4_ptr(vec_full_reg_offset(s, a->rd),
-> +                           vec_full_reg_offset(s, a->rn),
-> +                           vec_full_reg_offset(s, a->rm),
-> +                           vec_full_reg_offset(s, a->ra),
-> +                           status, vsz, vsz, a->index * 2 + a->sub,
+Going back and actually looking at the patch again;
+can I ask for 1 small change;
+   Can you set s->block_inactive =3D false   in the case where you
+don't get the local_err (Like we do at the bottom of migrate_fd_cancel)
 
-Why are we multiplying the index by 2 here? Are we just encoding
-(index, sub) into a constant to pull out again the other side?
-If so, comment might help. (Also I find shifts and ors make it
-clearer that we're just shifting values around; multiplication
-and addition to me implies that we're really doing arithmetic.)
 
-> +                           fns[a->esz - 1]);
-> +        tcg_temp_free_ptr(status);
-> +    }
-> +    return true;
-> +}
+Does that make sense?
 
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Thanks,
 
-thanks
--- PMM
+Dave
+
+> Dave
+>=20
+> >=20
+> > >=20
+> > > Dave
+> > >=20
+> > > > ---
+> > > >=20
+> > > >   migration/migration.c | 9 ++++++++-
+> > > >   1 file changed, 8 insertions(+), 1 deletion(-)
+> > > >=20
+> > > > diff --git a/migration/migration.c b/migration/migration.c
+> > > > index 1e99ec9b7e..8f39e0dc02 100644
+> > > > --- a/migration/migration.c
+> > > > +++ b/migration/migration.c
+> > > > @@ -2806,7 +2806,14 @@ static void migration_iteration_finish(Mig=
+rationState *s)
+> > > >       case MIGRATION_STATUS_FAILED:
+> > > >       case MIGRATION_STATUS_CANCELLED:
+> > > >           if (s->vm_was_running) {
+> > > > -            vm_start();
+> > > > +            Error *local_err =3D NULL;
+> > > > +            bdrv_invalidate_cache_all(&local_err);
+> > > > +            if (local_err) {
+> > > > +                error_reportf_err(local_err, "Can't invalidate d=
+isks before "
+> > > > +                                  "source vm start");
+> > > > +            } else {
+> > > > +                vm_start();
+> > > > +            }
+> > > >           } else {
+> > > >               if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
+> > > >                   runstate_set(RUN_STATE_POSTMIGRATE);
+> > > > --=20
+> > > > 2.11.1
+> > > >=20
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >=20
+> >=20
+> > --=20
+> > Best regards,
+> > Vladimir
+> >=20
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
