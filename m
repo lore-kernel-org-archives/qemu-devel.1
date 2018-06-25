@@ -1,26 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50118)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fXQGG-0000py-Mx
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:06:26 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1fXQaA-0005na-Gf
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:26:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fXQGB-0007ke-R1
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:06:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57864 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fXQGB-0007kO-LZ
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:06:19 -0400
-References: <1529897961-134132-1-git-send-email-robert.hu@linux.intel.com>
-	<1529897961-134132-3-git-send-email-robert.hu@linux.intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <58ec011e-0f19-f882-abca-dd73bda95fe5@redhat.com>
-Date: Mon, 25 Jun 2018 14:06:15 +0200
+	(envelope-from <borntraeger@de.ibm.com>) id 1fXQa6-0000J9-HV
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:26:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37386)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1fXQa6-0000IG-8R
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:26:54 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5PCOO0Z142800
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 08:26:52 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jtw0n9c0c-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 08:26:52 -0400
+Received: from localhost
+	by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Mon, 25 Jun 2018 13:26:49 +0100
+References: <20180622194736.GA5794@roeck-us.net>
+	<126ac556-0602-b927-58f5-cb5f65a5e0ec@de.ibm.com>
+	<88d9afed-f91d-c320-13c8-9a93fc52b700@de.ibm.com>
+	<20180625100548.64222dad.cohuck@redhat.com>
+	<your-ad-here.call-01529915788-ext-6027@work.hours>
+	<20180625104928.6c4cb239.cohuck@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Mon, 25 Jun 2018 14:26:45 +0200
 MIME-Version: 1.0
-In-Reply-To: <1529897961-134132-3-git-send-email-robert.hu@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180625104928.6c4cb239.cohuck@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/5] i386: Add CPUID bit and feature words
- for IA32_ARCH_CAPABILITIES MSR
+Message-Id: <76740f8f-ef4c-9d11-dae1-192beebff4d8@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] s390 qemu boot failure in -next
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +46,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Robert Hoo <robert.hu@linux.intel.com>, qemu-devel@nongnu.org, rth@twiddle.net, ehabkost@redhat.com
-Cc: robert.hu@intel.com
+To: Cornelia Huck <cohuck@redhat.com>, Vasily Gorbik <gor@linux.ibm.com>
+Cc: Guenter Roeck <linux@roeck-us.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
 
-On 25/06/2018 05:39, Robert Hoo wrote:
-> Support of IA32_PRED_CMD MSR already be enumerated by same CPUID bit as
-> SPEC_CTRL.
->=20
-> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
-> ---
->  target/i386/cpu.c | 2 +-
->  target/i386/cpu.h | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 1e69e68..3134af4 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -896,7 +896,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WO=
-RDS] =3D {
->              NULL, NULL, NULL, NULL,
->              NULL, NULL, NULL, NULL,
->              NULL, NULL, "spec-ctrl", NULL,
-> -            NULL, NULL, NULL, "ssbd",
-> +            NULL, "arch-capabilities", NULL, "ssbd",
->          },
->          .cpuid_eax =3D 7,
->          .cpuid_needs_ecx =3D true, .cpuid_ecx =3D 0,
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 734a73e..1ef2040 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -688,6 +688,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->  #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network=
- Instructions */
->  #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accum=
-ulation Single Precision */
->  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control =
-*/
-> +#define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilitie=
-s of RDCL_NO and IBRS_ALL*/
->  #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store =
-Bypass Disable */
-> =20
->  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Pred=
-iction Barrier */
->=20
 
-For migration to work, you need to add new "features" corresponding to
-the bits in the MSR, and include them in the Icelake-Server and
-Icelake-Client models.  Unfortunately there is no code for this in QEMU
-yet, though the API is there in KVM.
 
-I have just sent the KVM patch to pass the MSR value down to QEMU ("KVM:
-VMX: support MSR_IA32_ARCH_CAPABILITIES as a feature MSR").
+On 06/25/2018 10:49 AM, Cornelia Huck wrote:
+> On Mon, 25 Jun 2018 10:36:33 +0200
+> Vasily Gorbik <gor@linux.ibm.com> wrote:
+> 
+>> This change has been done on purpose. Uncompressed image is not going
+>> to be bootable any more. In future the decompressor phase would get
+>> more function (early memory detection as an example) and there is no
+>> chance to duplicate that code in uncompressed image as well (to keep it
+>> bootable on its own). The patch series commit messages contain more
+>> technical details.
+>>
+>> For qemu either bzImage or arch/s390/boot/compressed/vmlinux should be
+>> used, which are bootable images.
+>>
+>> But that's really confusing that uncompressed vmlinux is still kind
+>> of booting. May be we should discuss how to avoid this confusion
+>> (may be change uncompressed image enty point to a function doing
+>> disabled wait with badb007 or smth) and how to encourage people to use
+>> arch/s390/boot/compressed/vmlinux instead.
+> 
+> So, the intention is that you can't boot the uncompressed image
+> anywhere? (Was it possible before, e.g. when punching the image under
+> z/VM?)
 
-Paolo
+The uncompressed image (the vmlinux file) was never bootable in LPAR or z/VM.
+It was just a "nice hack" that QEMU was able to do so. (even qemu on x86 can not
+boot the pure vmlinux file as far as I know).
+
+I talked to Vasily and the vmlinux file in the linux source path is just an 
+intermediate file. Future changes will happen that will make that ELF file
+unsuitable for direct boot anyway (e.g. think about potential ASLR or Kasan
+changes).
+
+ If yes, it would make sense to explicitly fence it. But I'm
+> worried that it would break previously working setups (did we document
+> the purpose of the images anywhere?)
+> 
+
+
+I think by referring to arch/s390/boot/compressed/vmlinux things are probably
+good enough. That will still load from 0x10000.
+
+We might still "change" the way that we add the parameters (e.g.
+make that not depend on the load address), but looking forward this might
+become less important for the "intermediate vmlnux file".
