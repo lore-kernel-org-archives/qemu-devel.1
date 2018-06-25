@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53381)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fXSCC-0003ib-CS
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:10:23 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fXSHb-0005Lt-Tr
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:15:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fXSC9-0005LF-5F
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:10:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59702 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fXSC8-0005L0-V1
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:10:17 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5DEB2F68B2
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 14:10:16 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180321115211.17937-1-marcandre.lureau@redhat.com>
-	<20180321115211.17937-20-marcandre.lureau@redhat.com>
-Date: Mon, 25 Jun 2018 16:10:13 +0200
-In-Reply-To: <20180321115211.17937-20-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Wed, 21 Mar 2018
-	12:51:41 +0100")
-Message-ID: <87sh5bq7ne.fsf@dusky.pond.sub.org>
+	(envelope-from <mreitz@redhat.com>) id 1fXSHa-0006z5-Ra
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:15:55 -0400
+References: <20180621170657.27542-1-kwolf@redhat.com>
+	<20180621170657.27542-2-kwolf@redhat.com>
+	<20180625090213.GB29002@stefanha-x1.localdomain>
+	<20180625095105.GD5024@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <3b55e145-4000-dfc6-6303-c670c47bdd93@redhat.com>
+Date: Mon, 25 Jun 2018 16:15:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 19/49] qapi: factor out
- check_known_keys()
+In-Reply-To: <20180625095105.GD5024@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Y4DgjiB05X4K5dQktJBJEpVpKsfynitpu"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] block: Convert
+ .bdrv_truncate callback to coroutine_fn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,153 +27,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Y4DgjiB05X4K5dQktJBJEpVpKsfynitpu
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Message-ID: <3b55e145-4000-dfc6-6303-c670c47bdd93@redhat.com>
+Subject: Re: [Qemu-block] [PATCH 1/2] block: Convert .bdrv_truncate callback
+ to coroutine_fn
+References: <20180621170657.27542-1-kwolf@redhat.com>
+ <20180621170657.27542-2-kwolf@redhat.com>
+ <20180625090213.GB29002@stefanha-x1.localdomain>
+ <20180625095105.GD5024@localhost.localdomain>
+In-Reply-To: <20180625095105.GD5024@localhost.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-> The following patches are going to need similar checks from various
-> code path. This refactoring will report all conflicting keys (instead
-> of the first one encountered).
->
-> Modify unknown-expr-key to check plural form.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi/common.py                  | 27 ++++++++++++++++++-------
->  tests/qapi-schema/alternate-base.err    |  2 +-
->  tests/qapi-schema/double-type.err       |  2 +-
->  tests/qapi-schema/enum-missing-data.err |  2 +-
->  tests/qapi-schema/unknown-expr-key.err  |  2 +-
->  tests/qapi-schema/unknown-expr-key.json |  2 +-
->  6 files changed, 25 insertions(+), 12 deletions(-)
->
-> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-> index 4d19146064..fdbb5f1823 100644
-> --- a/scripts/qapi/common.py
-> +++ b/scripts/qapi/common.py
-> @@ -879,6 +879,24 @@ def check_struct(expr, info):
->                 allow_metas=3D['struct'])
->=20=20
->=20=20
-> +def check_known_keys(info, source, keys, required, optional):
-> +
-> +    def pprint(elems):
-> +        return ', '.join("'" + e + "'" for e in sorted(elems))
-> +
-> +    missing =3D set(required) - set(keys)
-> +    if missing:
-> +        raise QAPISemError(info, "%s must have %s key%s"
-> +                           % (source, pprint(missing),
-> +                              's' if len(missing) > 1 else ''))
-> +    allowed =3D set(required + optional)
-> +    unknown =3D set(keys) - allowed
-> +    if unknown:
-> +        raise QAPISemError(info, "%s has unknown key%s %s (allowed: %s)"
-> +                           % (source, 's' if len(unknown) > 1 else '',
-> +                              pprint(unknown), pprint(allowed)))
-> +
-> +
->  def check_keys(expr_elem, meta, required, optional=3D[]):
->      expr =3D expr_elem['expr']
->      info =3D expr_elem['info']
-> @@ -886,10 +904,9 @@ def check_keys(expr_elem, meta, required, optional=
-=3D[]):
->      if not isinstance(name, str):
->          raise QAPISemError(info, "'%s' key must have a string value" % m=
-eta)
->      required =3D required + [meta]
-> +    source =3D "%s '%s'" % (meta, name)
-> +    check_known_keys(info, source, expr, required, optional)
->      for (key, value) in expr.items():
-> -        if key not in required and key not in optional:
-> -            raise QAPISemError(info, "Unknown key '%s' in %s '%s'"
-> -                               % (key, meta, name))
->          if (key =3D=3D 'gen' or key =3D=3D 'success-response') and value=
- is not False:
->              raise QAPISemError(info,
->                                 "'%s' of %s '%s' should only use false va=
-lue"
-> @@ -900,10 +917,6 @@ def check_keys(expr_elem, meta, required, optional=
-=3D[]):
->                                 % (key, meta, name))
->          if key =3D=3D 'if':
->              check_if(expr, info)
-> -    for key in required:
-> -        if key not in expr:
-> -            raise QAPISemError(info, "Key '%s' is missing from %s '%s'"
-> -                               % (key, meta, name))
->=20=20
->=20=20
->  def check_exprs(exprs):
-> diff --git a/tests/qapi-schema/alternate-base.err b/tests/qapi-schema/alt=
-ernate-base.err
-> index 30d8a34373..2b09c4c7a3 100644
-> --- a/tests/qapi-schema/alternate-base.err
-> +++ b/tests/qapi-schema/alternate-base.err
-> @@ -1 +1 @@
-> -tests/qapi-schema/alternate-base.json:4: Unknown key 'base' in alternate=
- 'Alt'
-> +tests/qapi-schema/alternate-base.json:4: alternate 'Alt' has unknown key=
- 'base' (allowed: 'alternate', 'data', 'if')
+On 2018-06-25 11:51, Kevin Wolf wrote:
+> Am 25.06.2018 um 11:02 hat Stefan Hajnoczi geschrieben:
+>> On Thu, Jun 21, 2018 at 07:06:56PM +0200, Kevin Wolf wrote:
+>>> bdrv_truncate() is an operation that can block (even for a quite long=
 
-The change in the error message proper, i.e. up to the parenthesis,
-doesn't feel like an improvment to me.  The old message starts with
-what's wrong.  The new one starts with where's something wrong.
+>>> time, depending on the PreallocMode) in I/O paths that shouldn't bloc=
+k.
+>>> Convert it to a coroutine_fn so that we have the infrastructure for
+>>> drivers to make their .bdrv_co_truncate implementation asynchronous.
 
-I'd do the parenthesis with error_append_hint(), and say something like
-"Valid keys are ...".  See below for a more complete example.
+parallels_co_check() is a remaining coroutine_fn that calls
+bdrv_truncate(), maybe it should call bdrv_co_truncate() now.
 
-> diff --git a/tests/qapi-schema/double-type.err b/tests/qapi-schema/double=
--type.err
-> index f9613c6d6b..a8c5637659 100644
-> --- a/tests/qapi-schema/double-type.err
-> +++ b/tests/qapi-schema/double-type.err
-> @@ -1 +1 @@
-> -tests/qapi-schema/double-type.json:2: Unknown key 'command' in struct 'b=
-ar'
-> +tests/qapi-schema/double-type.json:2: struct 'bar' has unknown key 'comm=
-and' (allowed: 'base', 'data', 'if', 'struct')
-> diff --git a/tests/qapi-schema/enum-missing-data.err b/tests/qapi-schema/=
-enum-missing-data.err
-> index ba4873ae69..68e286badc 100644
-> --- a/tests/qapi-schema/enum-missing-data.err
-> +++ b/tests/qapi-schema/enum-missing-data.err
-> @@ -1 +1 @@
-> -tests/qapi-schema/enum-missing-data.json:2: Key 'data' is missing from e=
-num 'MyEnum'
-> +tests/qapi-schema/enum-missing-data.json:2: enum 'MyEnum' must have 'dat=
-a' key
+(And vhdx_allocate_block() probably should be a coroutine_fn, but that's
+something for another time, I suppose.)
 
-Again, the error message change doesn't feel like an improvement to me.
+>> block/commit.c:commit_run() invokes blk_truncate() outside of a draine=
+d
+>> region.  I haven't looked for other instances, but this patch opens th=
+e
+>> door for races with other I/O requests.  Are you sure it's safe to mak=
+e
+>> this asynchronous without request serialization?
+>=20
+> After trying to explain why it's correct, I start to think that you're
+> right at least in one case. The new thing after this patch is that the
+> truncate operation isn't atomic any more. What this means depends on th=
+e
+> block driver:
+>=20
+> * file-posix/win32: I think this one is okay. The truncate
+>   implementation doesn't depend in any way on the content of the image.=
 
-> diff --git a/tests/qapi-schema/unknown-expr-key.err b/tests/qapi-schema/u=
-nknown-expr-key.err
-> index 12f5ed5b43..d9f4e41cac 100644
-> --- a/tests/qapi-schema/unknown-expr-key.err
-> +++ b/tests/qapi-schema/unknown-expr-key.err
-> @@ -1 +1 @@
-> -tests/qapi-schema/unknown-expr-key.json:2: Unknown key 'bogus' in struct=
- 'bar'
-> +tests/qapi-schema/unknown-expr-key.json:2: struct 'bar' has unknown keys=
- 'bogus', 'foo' (allowed: 'base', 'data', 'if', 'struct')
-> diff --git a/tests/qapi-schema/unknown-expr-key.json b/tests/qapi-schema/=
-unknown-expr-key.json
+>   Preallocation could be critical (in that it could overwrite
+>   concurrently issued write requests), but the BDS size is only adjuste=
+d
+>   after the driver callback has returned, so there can't be a concurren=
+t
+>   write request.
 
-Suggest something like
+Except when the BDS is growable (which every BDS is).  qcow2 generally
+writes beyond the EOF, so I suppose a concurrent preallocating
+truncation may result in a race.
 
-    tests/qapi-schema/unknown-expr-key.json:2: Unknown keys 'bogus', 'foo' =
-in struct 'bar'
-    Valid keys are 'base', 'data', 'if', 'struct'.
+We don't have preallocating truncation over QMP yet, so technically this
+is not an issue, but with your jobs series and this series, we may well
+have it soon.
 
-> index 3b2be00cc4..5bcb8efd1d 100644
-> --- a/tests/qapi-schema/unknown-expr-key.json
-> +++ b/tests/qapi-schema/unknown-expr-key.json
-> @@ -1,2 +1,2 @@
->  # we reject an expression with unknown top-level keys
-> -{ 'struct': 'bar', 'data': { 'string': 'str'}, 'bogus': { } }
-> +{ 'struct': 'bar', 'data': { 'string': 'str'}, 'bogus': { }, 'foo': { } }
+> * copy-on-read, crypto, raw-format: Essentially just filter drivers tha=
+t
+>   pass the request to a child node, no problem.
+>=20
+> * gluster, iscsi, nfs, rbd, ssh: Won't yield even after this series, so=
 
-The patch does two things: 1. factor out a helper for later use in other
-places, 2. report all offending keys instead of just the first one.
-Split it up, please.
+>   trivially okay.
+>=20
+> * qcow2: This one is where you're right, it needs to hold s->lock so
+>   that the metadata modifications become safe.
+>=20
+> * qed: Does a single header update, should be fine without locking.
+>=20
+> * sheepdog: Doesn't yield until it starts preallocation. For
+>   preallocation, the same reasoning as for file-posix applies.
+>=20
+> So, if I got this right, the only thing to change is holding s->lock in=
+
+> qcow2_co_truncate().
+
+By holding the lock, we would probably solve the race for qcow2, but
+probably not for raw-format.
+
+(And I think qcow2 and raw are the only formats that support
+preallocation on truncation.  (Well, raw doesn't really support it, but
+it does allow it.))
+
+Max
+
+
+--Y4DgjiB05X4K5dQktJBJEpVpKsfynitpu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsw+REACgkQ9AfbAGHV
+z0BVRwf/ZKijrj/V1Sx0HLrZbeJhfLGu2JwsWaHWQuK/Et2krl3Oz5gVcHoeHd2b
+SSlyygjQ1DyAgwQ43CH+yxktjWx+t/XlPtfz0iWIScl4tJyBMmuwgf/3A0hoRaZy
+jiTujRsdnCijjfZj9MgbNUpZpTPoAyEIFuqUiTeceNdCYbkIlPz/OKG4yldAoSaD
+dhcBs6+Bc+8IM2SLcJCAgcdUD59YPZ2LH53k05EYwwqu7vZT7J6LsQG9HVjvdoAZ
+QTL1iCzwiHIOdWTNkU4fYM+N7IeeW7vis56JFOzNwjuFZcBdNRGkLwBI4wSNDWOm
+UzO+J5hRsD1DyVVVc5SPnLbq7fJFpA==
+=T9B4
+-----END PGP SIGNATURE-----
+
+--Y4DgjiB05X4K5dQktJBJEpVpKsfynitpu--
