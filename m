@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42240)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fXWUi-00040J-Up
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 14:45:45 -0400
+	(envelope-from <sw@weilnetz.de>) id 1fXWZg-0005Kn-TP
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 14:50:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fXWUf-0007TG-Kk
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 14:45:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39238)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fXWUf-0007Sc-Bj
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 14:45:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fXWUe-00081p-A5
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 18:45:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 435222E80C7
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 18:45:40 +0000 (UTC)
+	(envelope-from <sw@weilnetz.de>) id 1fXWZd-0001XI-PC
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 14:50:52 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:36000
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1fXWZd-0001WN-I7
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 14:50:49 -0400
+References: <1529950933-28347-1-git-send-email-thuth@redhat.com>
+	<a46cbc1c-197d-1460-0f55-a918c7ff3497@redhat.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <1de1692e-ca78-d828-a81d-5c1a73a400c2@weilnetz.de>
+Date: Mon, 25 Jun 2018 20:50:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 Jun 2018 18:29:03 -0000
-From: Thomas Huth <1331859@bugs.launchpad.net>
-Reply-To: Bug 1331859 <1331859@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140618233942.6989.4044.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152995134305.1637.12338334090972490113.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1331859] Re: QEMU kernel panic on Windows with
- arithmetic syntax error
+In-Reply-To: <a46cbc1c-197d-1460-0f55-a918c7ff3497@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] Deprecate the -enable-hax option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>
 
-Looking through old bug tickets... can you still reproduce this issue
-with the latest version of QEMU? Or could we close this ticket nowadays?
+Am 25.06.2018 um 20:28 schrieb Paolo Bonzini:
+> On 25/06/2018 20:22, Thomas Huth wrote:
+>> We currently have got three ways of turning on the HAX accelerator:
+>> "-machine accel=hax", "-accel hax" and "-enable-hax". That's really
+>> confusing and overloaded. Since "-accel" is our preferred way to enable
+>> an accelerator nowadays, and "-accel hax" is even less to type than
+>> "-enable-hax", let's deprecate the "-enable-hax" option now.
+>>
+>> Note: While "-enable-kvm" is available since a long time and can hardly be
+>> removed since it is used in a lot of upper layer tools and scripts, the
+>> "-enable-hax" option is still rather new and not very widespread yet, so
+>> I think that it should be OK if we remove this in a couple of releases again
+>> (we'll see whether someone complains after seeing the deprecation message -
+>> then we could still reconsider to keep it if there a well-founded reasons).
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  Let's give this a try at least :-)
+> 
+> Sounds good, queued.
+> 
+> Paolo
+> 
 
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+I would not mind if --enable-hax were removed soon, as I don't think it
+was widely used.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1331859
-
-Title:
-  QEMU kernel panic on Windows with arithmetic syntax error
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  During attempts to bring-up QEMU 64-bit ARM support I discovered a
-  kernel panics that only occur on Windows but work properly on Linux.
-
-  The issue can be reproduced by running the following command line:
-
-  $ ./arm-softmmu/qemu-system-arm -M versatilepb -kernel
-  $IMAGES/vmlinuz-3.2.0-4-versatile -initrd
-  $IMAGES/initrd.img-3.2.0-4-versatile -hda
-  $IMAGES/debian_wheezy_armel_standard.qcow2 -append "root=3D/dev/sda1"
-
-  where $IMAGES is the location where the images are downloaded from
-  http://people.debian.org/~aurel32/qemu/armel/.
-
-  This was reproduced with both a custom built QEMU as well as the QEMU
-  image installed by
-  http://qemu.weilnetz.de/w32/qemu_w32-setup-20140617.exe.
-
-  The same command line runs properly on Linux using a custom built
-  QEMU.
-
-  The Windows versions of QEMU do appear to work properly using the arm-
-  test images available on qemu.org.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1331859/+subscriptions
+Stefan
