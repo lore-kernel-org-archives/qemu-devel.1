@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38876)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXUoX-000067-U0
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:58:08 -0400
+	id 1fXUob-00009Z-AN
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXUoW-00070r-S8
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:58:06 -0400
+	id 1fXUoa-000723-AG
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:58:09 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34688)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fXUoa-00071m-3v
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:58:08 -0400
+Received: by mail-qt0-x241.google.com with SMTP id b20-v6so3341498qtp.1
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 09:58:07 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 25 Jun 2018 13:57:48 -0300
-Message-Id: <20180625165749.3910-3-f4bug@amsat.org>
+Date: Mon, 25 Jun 2018 13:57:49 -0300
+Message-Id: <20180625165749.3910-4-f4bug@amsat.org>
 In-Reply-To: <20180625165749.3910-1-f4bug@amsat.org>
 References: <20180625165749.3910-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 2/3] hw/arm/sysbus-fdt: Replace
+Subject: [Qemu-devel] [PATCH v4 3/3] device_tree: Replace
  error_setg(&error_fatal) by error_report() + exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -27,8 +34,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, "open list:ARM" <qemu-arm@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>
 
 Use error_report() + exit() instead of error_setg(&error_fatal),
 as suggested by the "qapi/error.h" documentation:
@@ -36,136 +43,73 @@ as suggested by the "qapi/error.h" documentation:
    Please don't error_setg(&error_fatal, ...), use error_report() and
    exit(), because that's more obvious.
 
-This fixes CID 1352173:
-    "Passing null pointer dt_name to qemu_fdt_node_path, which dereferences it."
-
-And this also fixes:
-
-    hw/arm/sysbus-fdt.c:322:9: warning: Array access (from variable 'node_path') results in a null pointer dereference
-        if (node_path[1]) {
-            ^~~~~~~~~~~~
-
-Fixes: Coverity CID 1352173 (Dereference after null check)
-Suggested-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 ---
-v3:  display error if property required and returned -FDT_ERR_NOTFOUND
+ device_tree.c | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
- hw/arm/sysbus-fdt.c | 53 +++++++++++++++++++++++++--------------------
- 1 file changed, 30 insertions(+), 23 deletions(-)
-
-diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-index 277ed872e7..0d4c75702c 100644
---- a/hw/arm/sysbus-fdt.c
-+++ b/hw/arm/sysbus-fdt.c
-@@ -92,16 +92,20 @@ static void copy_properties_from_host(HostProperty *props, int nb_props,
-         r = qemu_fdt_getprop(host_fdt, node_path,
-                              props[i].name,
-                              &prop_len,
--                             props[i].optional ? &err : &error_fatal);
-+                             &err);
-         if (r) {
-             qemu_fdt_setprop(guest_fdt, nodename,
-                              props[i].name, r, prop_len);
-         } else {
--            if (prop_len != -FDT_ERR_NOTFOUND) {
--                /* optional property not returned although property exists */
--                error_report_err(err);
--            } else {
-+            if (props[i].optional && prop_len == -FDT_ERR_NOTFOUND) {
-+                /* optional property does not exist */
-                 error_free(err);
-+            } else {
-+                error_report_err(err);
-+            }
-+            if (!props[i].optional) {
-+                /* mandatory property not found: bail out */
+diff --git a/device_tree.c b/device_tree.c
+index 52c3358a55..3553819257 100644
+--- a/device_tree.c
++++ b/device_tree.c
+@@ -140,15 +140,16 @@ static void read_fstree(void *fdt, const char *dirname)
+     const char *parent_node;
+ 
+     if (strstr(dirname, root_dir) != dirname) {
+-        error_setg(&error_fatal, "%s: %s must be searched within %s",
+-                   __func__, dirname, root_dir);
++        error_report("%s: %s must be searched within %s",
++                     __func__, dirname, root_dir);
++        exit(1);
+     }
+     parent_node = &dirname[strlen(SYSFS_DT_BASEDIR)];
+ 
+     d = opendir(dirname);
+     if (!d) {
+-        error_setg(&error_fatal, "%s cannot open %s", __func__, dirname);
+-        return;
++        error_report("%s cannot open %s", __func__, dirname);
++        exit(1);
+     }
+ 
+     while ((de = readdir(d)) != NULL) {
+@@ -162,7 +163,8 @@ static void read_fstree(void *fdt, const char *dirname)
+         tmpnam = g_strdup_printf("%s/%s", dirname, de->d_name);
+ 
+         if (lstat(tmpnam, &st) < 0) {
+-            error_setg(&error_fatal, "%s cannot lstat %s", __func__, tmpnam);
++            error_report("%s cannot lstat %s", __func__, tmpnam);
++            exit(1);
+         }
+ 
+         if (S_ISREG(st.st_mode)) {
+@@ -170,8 +172,9 @@ static void read_fstree(void *fdt, const char *dirname)
+             gsize len;
+ 
+             if (!g_file_get_contents(tmpnam, &val, &len, NULL)) {
+-                error_setg(&error_fatal, "%s not able to extract info from %s",
+-                           __func__, tmpnam);
++                error_report("%s not able to extract info from %s",
++                             __func__, tmpnam);
 +                exit(1);
              }
-         }
-     }
-@@ -138,9 +142,9 @@ static void fdt_build_clock_node(void *host_fdt, void *guest_fdt,
  
-     node_offset = fdt_node_offset_by_phandle(host_fdt, host_phandle);
-     if (node_offset <= 0) {
+             if (strlen(parent_node) > 0) {
+@@ -206,9 +209,9 @@ void *load_device_tree_from_sysfs(void)
+     host_fdt = create_device_tree(&host_fdt_size);
+     read_fstree(host_fdt, SYSFS_DT_BASEDIR);
+     if (fdt_check_header(host_fdt)) {
 -        error_setg(&error_fatal,
--                   "not able to locate clock handle %d in host device tree",
--                   host_phandle);
-+        error_report("not able to locate clock handle %d in host device tree",
-+                     host_phandle);
-+        exit(1);
-     }
-     node_path = g_malloc(path_len);
-     while ((ret = fdt_get_path(host_fdt, node_offset, node_path, path_len))
-@@ -149,16 +153,16 @@ static void fdt_build_clock_node(void *host_fdt, void *guest_fdt,
-         node_path = g_realloc(node_path, path_len);
-     }
-     if (ret < 0) {
--        error_setg(&error_fatal,
--                   "not able to retrieve node path for clock handle %d",
--                   host_phandle);
-+        error_report("not able to retrieve node path for clock handle %d",
-+                     host_phandle);
-+        exit(1);
-     }
- 
-     r = qemu_fdt_getprop(host_fdt, node_path, "compatible", &prop_len,
-                          &error_fatal);
-     if (strcmp(r, "fixed-clock")) {
--        error_setg(&error_fatal,
--                   "clock handle %d is not a fixed clock", host_phandle);
-+        error_report("clock handle %d is not a fixed clock", host_phandle);
-+        exit(1);
-     }
- 
-     nodename = strrchr(node_path, '/');
-@@ -301,34 +305,37 @@ static int add_amd_xgbe_fdt_node(SysBusDevice *sbdev, void *opaque)
- 
-     dt_name = sysfs_to_dt_name(vbasedev->name);
-     if (!dt_name) {
--        error_setg(&error_fatal, "%s incorrect sysfs device name %s",
--                    __func__, vbasedev->name);
-+        error_report("%s incorrect sysfs device name %s",
-+                     __func__, vbasedev->name);
-+        exit(1);
-     }
-     node_path = qemu_fdt_node_path(host_fdt, dt_name, vdev->compat,
-                                    &error_fatal);
-     if (!node_path || !node_path[0]) {
--        error_setg(&error_fatal, "%s unable to retrieve node path for %s/%s",
--                   __func__, dt_name, vdev->compat);
-+        error_report("%s unable to retrieve node path for %s/%s",
-+                     __func__, dt_name, vdev->compat);
-+        exit(1);
-     }
- 
-     if (node_path[1]) {
--        error_setg(&error_fatal, "%s more than one node matching %s/%s!",
--                   __func__, dt_name, vdev->compat);
-+        error_report("%s more than one node matching %s/%s!",
-+                     __func__, dt_name, vdev->compat);
-+        exit(1);
-     }
- 
-     g_free(dt_name);
- 
-     if (vbasedev->num_regions != 5) {
--        error_setg(&error_fatal, "%s Does the host dt node combine XGBE/PHY?",
+-                   "%s host device tree extracted into memory is invalid",
 -                   __func__);
-+        error_report("%s Does the host dt node combine XGBE/PHY?", __func__);
++        error_report("%s host device tree extracted into memory is invalid",
++                     __func__);
 +        exit(1);
      }
- 
-     /* generate nodes for DMA_CLK and PTP_CLK */
-     r = qemu_fdt_getprop(host_fdt, node_path[0], "clocks",
-                          &prop_len, &error_fatal);
-     if (prop_len != 8) {
--        error_setg(&error_fatal, "%s clocks property should contain 2 handles",
--                   __func__);
-+        error_report("%s clocks property should contain 2 handles", __func__);
-+        exit(1);
-     }
-     host_clock_phandles = (uint32_t *)r;
-     guest_clock_phandles[0] = qemu_fdt_alloc_phandle(guest_fdt);
+     return host_fdt;
+ }
 -- 
 2.18.0
