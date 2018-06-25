@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fXNBl-0008Gc-Dy
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:49:34 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fXNIf-00017M-7O
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:56:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fXNBk-00061Y-NB
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:49:33 -0400
-Date: Mon, 25 Jun 2018 10:49:28 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180625104928.6c4cb239.cohuck@redhat.com>
-In-Reply-To: <your-ad-here.call-01529915788-ext-6027@work.hours>
-References: <20180622194736.GA5794@roeck-us.net>
-	<126ac556-0602-b927-58f5-cb5f65a5e0ec@de.ibm.com>
-	<88d9afed-f91d-c320-13c8-9a93fc52b700@de.ibm.com>
-	<20180625100548.64222dad.cohuck@redhat.com>
-	<your-ad-here.call-01529915788-ext-6027@work.hours>
+	(envelope-from <stefanha@gmail.com>) id 1fXNIe-0000Gh-FN
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:56:41 -0400
+Date: Mon, 25 Jun 2018 09:56:31 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180625085631.GA29002@stefanha-x1.localdomain>
+References: <20180621170657.27542-1-kwolf@redhat.com>
+	<20180621170657.27542-3-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] s390 qemu boot failure in -next
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="sdtB3X0nJg68CQEu"
+Content-Disposition: inline
+In-Reply-To: <20180621170657.27542-3-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] file-posix: Make
+ .bdrv_co_truncate asynchronous
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,30 +25,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vasily Gorbik <gor@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Guenter Roeck <linux@roeck-us.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-On Mon, 25 Jun 2018 10:36:33 +0200
-Vasily Gorbik <gor@linux.ibm.com> wrote:
 
-> This change has been done on purpose. Uncompressed image is not going
-> to be bootable any more. In future the decompressor phase would get
-> more function (early memory detection as an example) and there is no
-> chance to duplicate that code in uncompressed image as well (to keep it
-> bootable on its own). The patch series commit messages contain more
-> technical details.
-> 
-> For qemu either bzImage or arch/s390/boot/compressed/vmlinux should be
-> used, which are bootable images.
-> 
-> But that's really confusing that uncompressed vmlinux is still kind
-> of booting. May be we should discuss how to avoid this confusion
-> (may be change uncompressed image enty point to a function doing
-> disabled wait with badb007 or smth) and how to encourage people to use
-> arch/s390/boot/compressed/vmlinux instead.
+--sdtB3X0nJg68CQEu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-So, the intention is that you can't boot the uncompressed image
-anywhere? (Was it possible before, e.g. when punching the image under
-z/VM?) If yes, it would make sense to explicitly fence it. But I'm
-worried that it would break previously working setups (did we document
-the purpose of the images anywhere?)
+On Thu, Jun 21, 2018 at 07:06:57PM +0200, Kevin Wolf wrote:
+> +    RawPosixAIOData *acb =3D g_new(RawPosixAIOData, 1);
+> +    ThreadPool *pool;
+> =20
+> -out:
+> -    if (result < 0) {
+> -        if (ftruncate(fd, current_length) < 0) {
+> -            error_report("Failed to restore old file length: %s",
+> -                         strerror(errno));
+> -        }
+> -    }
+> +    *acb =3D (RawPosixAIOData) {
+> +        .bs             =3D bs,
+> +        .aio_fildes     =3D fd,
+> +        .aio_type       =3D QEMU_AIO_TRUNCATE,
+> +        .aio_offset     =3D offset,
+> +        .prealloc       =3D prealloc,
+> +        .errp           =3D errp,
+> +    };
+> =20
+> -    g_free(buf);
+> -    return result;
+> +    /* @bs can be NULL, bdrv_get_aio_context() returns the main context =
+then */
+> +    pool =3D aio_get_thread_pool(bdrv_get_aio_context(bs));
+> +    return thread_pool_submit_co(pool, aio_worker, acb);
+
+Where is acb freed?
+
+--sdtB3X0nJg68CQEu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbMK4/AAoJEJykq7OBq3PI9HIH/1L4LsB1n+GCky5KDdhL3E++
+JyXtzObZsWSnUzZAP0M5Q0l0/+2HR2HtpfI2TiJcdeVLrRQClSBKtTBiUHXCQ1Xr
++5K2596AajlwGlXFTNrADjXLHqsGN8XDU0bpbmgwmtiSt0h+jpFnz0eoUj5Jsw2g
+p6VSfS8TP0y9I24JlYHhE3bmO61WJt/vaceLOolWzj98piyaHFEoO9M6BNLFO2x2
+DbdWYYIEW0MY4UtYGN/+PiJGPR0YgOtqAoizx4w2KKHWTagX7NJezGl1DFUXgRGy
+kBn96BccGPO4Fka7YbF077Ic6ZbiDk6aiMg58g19PA5iU6FU5WlpyEHjXrNFcxA=
+=k8+2
+-----END PGP SIGNATURE-----
+
+--sdtB3X0nJg68CQEu--
