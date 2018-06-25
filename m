@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXSYT-0005Kf-GM
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:33:22 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fXSrn-0002qG-8u
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:53:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXSYS-0004J4-QF
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:33:21 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:46837)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXSYS-0004Iy-Kl
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:33:20 -0400
-Received: by mail-ot0-x244.google.com with SMTP id v24-v6so15256822otk.13
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 07:33:20 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1fXSri-0003CL-ER
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:53:19 -0400
+Date: Mon, 25 Jun 2018 16:52:57 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180625165257.5d8a9773.cohuck@redhat.com>
+In-Reply-To: <93f1dae5-e071-41f2-a1b7-1fbfdbe7917a@redhat.com>
+References: <1529056145-6404-1-git-send-email-thuth@redhat.com>
+	<93f1dae5-e071-41f2-a1b7-1fbfdbe7917a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180625140055.32223-1-joel@jms.id.au>
-References: <20180625140055.32223-1-joel@jms.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 15:32:59 +0100
-Message-ID: <CAFEAcA8yOj6bDE0Lb6F_jmTfk_JaCZojCHTdHD8HqLAGZkh2Qw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] MAINTAINERS: Add ASPEED BMCs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] loader: Check access size when calling
+ rom_ptr() to avoid crashes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,24 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-s390x@nongnu.org, qemu-arm@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>, Paolo Bonzini <pbonzini@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-On 25 June 2018 at 15:00, Joel Stanley <joel@jms.id.au> wrote:
-> This adds Cedric as the maintainer, with Andrew and I as reviewers, for
-> the ASPEED boards and the peripherals we have developed.
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
-> Acked-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> --
-> v2: fix includes path
+On Mon, 25 Jun 2018 10:31:52 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Applied to target-arm.next, thanks.
+> On 15.06.2018 11:49, Thomas Huth wrote:
+> > The rom_ptr() function allows direct access to the ROM blobs that we
+> > load during startup. However, there are currently no checks for the
+> > size of the accesses, so it's currently possible to crash QEMU for
+> > example with:
+> > 
+> > $ echo "Insane in the mainframe" > /tmp/test.txt
+> > $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -append xyz
+> > Segmentation fault (core dumped)
+> > $ s390x-softmmu/qemu-system-s390x -kernel /tmp/test.txt -initrd /tmp/test.txt
+> > Segmentation fault (core dumped)
+> > $ echo -n HdrS > /tmp/hdr.txt
+> > $ sparc64-softmmu/qemu-system-sparc64 -kernel /tmp/hdr.txt -initrd /tmp/hdr.txt
+> > Segmentation fault (core dumped)
+> > 
+> > We need a possibility to check the size of the ROM area that we want
+> > to access, thus let's add a size parameter to the rom_ptr() function
+> > to avoid these problems.
+> > 
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>  
+> 
+> Ping!
+> 
+> Could anybody please pick this patch up? Qemu-trivial seems to be pretty
+> dormant these days (?), so maybe Paolo via misc? Or either the s390x or
+> Sparc tree, since it fixes a crash on these machines?
 
-PS: that should be '---' above, to avoid the notes below
-it going into the commit message.
-
-thanks
--- PMM
+If nobody else wants it, I can take it through the s390x tree. Would
+not mind some more acks, though.
