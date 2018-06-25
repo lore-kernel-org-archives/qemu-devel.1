@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXPAm-0003o4-3O
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:56:40 -0400
+	(envelope-from <bounces@canonical.com>) id 1fXPEy-000538-Eu
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:01:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXPAl-0007qN-9r
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:56:40 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:37419)
+	(envelope-from <bounces@canonical.com>) id 1fXPEu-0000q2-0s
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:01:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60548)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXPAl-0007pf-2m
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:56:39 -0400
-Received: by mail-oi0-x243.google.com with SMTP id l22-v6so12040088oib.4
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 03:56:38 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fXPEt-0000pm-QK
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:00:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fXPEs-0008PZ-95
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 11:00:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 434D42E80CC
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 11:00:54 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1529660880-30376-1-git-send-email-sai.pavan.boddu@xilinx.com>
-References: <1529660880-30376-1-git-send-email-sai.pavan.boddu@xilinx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 11:56:18 +0100
-Message-ID: <CAFEAcA-Wt4wVcriayGw-xCaWJskM01X=2z5GBoSTiFiRPtHvcQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4] xilinx_spips: Make dma transactions as
- per dma_burst_size
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 25 Jun 2018 10:53:31 -0000
+From: navicrej <1778350@bugs.launchpad.net>
+Reply-To: Bug 1778350 <1778350@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152976906812.26719.4060539263907295716.malonedeb@gac.canonical.com>
+Message-Id: <152992401182.25608.13015767721800507585.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1778350] Re: Android-x86 4.4-r5 won't boot on
+ QEMU since v2.11.0-rc2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +37,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, KONRAD Frederic <frederic.konrad@adacore.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-On 22 June 2018 at 10:47, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com> wrote:
-> From: Sai Pavan Boddu <saipava@xilinx.com>
->
-> Qspi dma has a burst length of 64 bytes, So limit the transactions w.r.t
-> dma-burst-size property.
->
-> Signed-off-by: Sai Pavan Boddu <saipava@xilinx.com>
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
-> Changes for V2:
->    Remove dynamic allocation of dma_buf and limit burst size to 2k
-> Changes for V3:
->    Instead of proceeding with max burst size, report user the error.
-> Changes for V4:
->    move dma_buf to the bottom of XlnxZynqMPQSPIPS
->
->  hw/ssi/xilinx_spips.c         | 23 ++++++++++++++++++++---
->  include/hw/ssi/xilinx_spips.h |  5 ++++-
->  2 files changed, 24 insertions(+), 4 deletions(-)
+After 'git bisect' -ing it I found the commit that is responsible for
+this:
 
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D9fa99d2519cbf71f871e4=
+6871df12cb446dc1c3e
 
+-- =
 
-Applied to target-arm.next, thanks.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1778350
 
--- PMM
+Title:
+  Android-x86 4.4-r5 won't boot on QEMU since v2.11.0-rc2
+
+Status in QEMU:
+  New
+
+Bug description:
+  Try to boot from the Android-x86 4.4-r5 ISO won't boot in QEMU after 2.11=
+.0-rc2. The last known version it works is 2.11.0-rc1.
+  It also works on the 2.10.x-line, even the 2.10.2 which was released afte=
+r 2.11.0-rc2!
+
+  How to reproduce:
+  Download the ISO from
+  http://www.android-x86.org/releases/releasenote-4-4-r5 or directly https:=
+//www.fosshub.com/Android-x86.html/android-x86-4.4-r5.iso
+
+  Start QEMU with this command-line: qemu-system-x86_64 -cdrom
+  android-x86-4.4-r5.iso -m 1024
+
+  On 2.11.0-rc1 and 2.10.2 after selecting to boot from CD it shows the And=
+roid splash after a short while ...
+  On 2.11.0-rc2 through the latest 2.12 line it goes to black screen shortl=
+y right after selecting to boot from CD
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1778350/+subscriptions
