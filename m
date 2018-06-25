@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fXYjY-0005On-ED
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:09:13 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fXYkq-0006L4-7T
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:10:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fXYjX-0000wM-Dh
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:09:12 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:33147)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fXYjX-0000sd-7F
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:09:11 -0400
-Received: by mail-wm0-x229.google.com with SMTP id z6-v6so13578586wma.0
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 14:09:10 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1fXYkp-0001oe-0G
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:10:32 -0400
+References: <20180620042930.24208-1-suratiamol@gmail.com>
+	<20180620042930.24208-2-suratiamol@gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <4049a376-e991-91ab-a1ea-037ee7c0a5b5@redhat.com>
+Date: Mon, 25 Jun 2018 17:10:23 -0400
 MIME-Version: 1.0
-References: <20180623022258.22158-1-programmingkidx@gmail.com>
-	<ecf44486-09a4-9c9a-b96e-1db2d6a1bcbe@linaro.org>
-	<1E63C3B2-7668-4D05-BC43-02E478FB493B@gmail.com>
-	<bc3cd25b-bdd1-3bc7-8d2d-5c351f2c30d5@linaro.org>
-	<4CC477CD-237F-480D-B9B5-B35FF507BD3C@gmail.com>
-	<c6d132e2-b2e0-5bbb-7b71-9bd13253aa22@linaro.org>
-	<2CAC99CF-A717-4A94-A68C-EEB76C727F87@gmail.com>
-	<dbbebf00-9b32-4639-1e26-a888c48f6203@linaro.org>
-	<CDA6AAA3-1452-4CBA-93A9-94CD83705E1A@gmail.com>
-In-Reply-To: <CDA6AAA3-1452-4CBA-93A9-94CD83705E1A@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Mon, 25 Jun 2018 14:08:59 -0700
-Message-ID: <CAFXwXrk+X_heyWnwAzLQ6E9+j5=AxJ-Dh+nM5e7zuQcJCEAsyg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] fix fdiv instruction
+In-Reply-To: <20180620042930.24208-2-suratiamol@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] ide/hw/core: fix crash on processing a
+ partial-sector-size DMA xfer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,49 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Arbuckle <programmingkidx@gmail.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>
+To: Amol Surati <suratiamol@gmail.com>, qemu-devel@nongnu.org
+Cc: "open list:IDE" <qemu-block@nongnu.org>
 
-On Mon, Jun 25, 2018, 08:23 G 3 <programmingkidx@gmail.com> wrote:
 
-> >
-> > Try
-> >
-> >     uint64_t expected_answer = 0xffff0000deadbeef;
-> >     ...
-> >     c.i = expected_answer;
-> >     asm volatile("fdiv %0, %1, %2" : "+f"(c.d) : "f"(1.0), "f"(0.0));
-> >
-> > to avoid depending on uninitialized data.  (This expected value is
-> > an SNaN with a deadbeef marker Just to be Sure.)
-> >
-> >
-> > r~
->
->
-> Ok I made this program and tried it on my iMac G5 (PowerPC 970).
->
-> #include <stdio.h>
-> #include <stdint.h>
-> #include <inttypes.h>
->
-> // Used to convert unsigned integer <--> double
-> union Converter
-> {
->      double d;
->      uint64_t i;
-> };
-> typedef union Converter Converter;
->
-> int main (int argc, const char * argv[]) {
->      Converter answer;
->      answer.i = 0xffff0000deadbeef;
->      //asm volatile("mtfsb1 27"); /* Set ZE bit */
->      asm volatile("fdiv %0, %1, %2" : "=f"(answer.d) : "f"(1.0),
-> "f"(0.0));
->
 
-Need +f for inout operand.
-This didn't test what you expected.
+On 06/20/2018 12:29 AM, Amol Surati wrote:
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1777315
+>=20
+> QEMU's short PRD policy applies to a DMA transfer of size < 512 bytes.
+> But it fails to consider transfers which are >=3D 512 bytes, but are
+> not a multiple of 512 bytes.
+>=20
+> Such transfers are not subject to the short PRD policy. They end up
+> violating the assumptions about the granularity of the IO sizes,
+> upon which depend the verification of the completion of the previous
+> transfer, and the advancement of the offset in preparation of the next.
+>=20
+> Those violations result in the crash.
+>=20
+> By forcing each transfer to be a multiple of sector size, such
+> transfers are subjected to the policy, and therefore culled before they
+> cause the crash.
+>=20
 
-r~
+So now even if the PRDT we get is greater than a sector is not an even
+multiple of 512, we reject it as too short.
+
+That doesn't seem correct to me.
+
+> Signed-off-by: Amol Surati <suratiamol@gmail.com>
+> ---
+>  hw/ide/core.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ide/core.c b/hw/ide/core.c
+> index 2c62efc536..14d135224b 100644
+> --- a/hw/ide/core.c
+> +++ b/hw/ide/core.c
+> @@ -836,6 +836,7 @@ static void ide_dma_cb(void *opaque, int ret)
+>  {
+>      IDEState *s =3D opaque;
+>      int n;
+> +    int32_t size_prepared;
+>      int64_t sector_num;
+>      uint64_t offset;
+>      bool stay_active =3D false;
+> @@ -886,7 +887,9 @@ static void ide_dma_cb(void *opaque, int ret)
+>      n =3D s->nsector;
+>      s->io_buffer_index =3D 0;
+>      s->io_buffer_size =3D n * 512;
+> -    if (s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size) =
+< 512) {
+> +    size_prepared =3D s->bus->dma->ops->prepare_buf(s->bus->dma,
+> +                                                  s->io_buffer_size);
+> +    if (size_prepared <=3D 0 || size_prepared % 512) {
+>          /* The PRDs were too short. Reset the Active bit, but don't ra=
+ise an
+>           * interrupt. */
+>          s->status =3D READY_STAT | SEEK_STAT;
+>=20
+
+--=20
+=E2=80=94js
