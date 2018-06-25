@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fXNqV-0006DB-Ob
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:31:41 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fXNri-0006io-N2
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:32:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fXNqS-0007sT-Iv
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:31:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34398 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fXNrf-0008WV-Kn
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:32:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48794 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fXNqS-0007rp-CU
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:31:36 -0400
-Date: Mon, 25 Jun 2018 11:31:28 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180625113128.3a8a546b@redhat.com>
-In-Reply-To: <da031edd-af7d-d51a-616a-1b231becd4c9@linux.vnet.ibm.com>
-References: <20180621115530.11069-1-marcandre.lureau@redhat.com>
-	<20180621115530.11069-5-marcandre.lureau@redhat.com>
-	<9d02acd4-8a60-1ac3-00d9-8c99940254a2@linux.vnet.ibm.com>
-	<20180622110312.275b5d59@redhat.com>
-	<aa7b8eb8-3353-cac1-8c17-43f928cc3ff6@linux.vnet.ibm.com>
-	<20180622155642.3f05423b@redhat.com>
-	<da031edd-af7d-d51a-616a-1b231becd4c9@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fXNrf-0008W2-G6
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:32:51 -0400
+Date: Mon, 25 Jun 2018 10:32:46 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180625093246.GC2390@work-vm>
+References: <bfc0c8da-0563-0115-955a-80f463389fa6@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 4/5] acpi: build TPM Physical Presence
- interface
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bfc0c8da-0563-0115-955a-80f463389fa6@oracle.com>
+Subject: Re: [Qemu-devel] Why qom-get is not available in qemu monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,242 +26,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: qemu-devel@nongnu.org, ricardo.perez_blanco@nokia.com, afaerber@suse.de
 
-On Fri, 22 Jun 2018 10:23:05 -0400
-Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
+* Dongli Zhang (dongli.zhang@oracle.com) wrote:
+> Hi,
+> 
+> Would you mind help confirm why qom-get command is not supported by qemu
+> monitor, but only qapi?
+> 
+> Is this a feature (qom-get in monitor) totally useless for some reason, or it is
+> still not implemented yet?
 
-> On 06/22/2018 09:56 AM, Igor Mammedov wrote:
-> > On Fri, 22 Jun 2018 09:26:45 -0400
-> > Stefan Berger <stefanb@linux.vnet.ibm.com> wrote:
-> > =20
-> >> On 06/22/2018 05:03 AM, Igor Mammedov wrote: =20
-> >>> I'd prefer a table format to describe layout, like in
-> >>> docs/specs/acpi_nvdimm.txt or docs/specs/acpi_mem_hotplug.txt =20
-> >> diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-> >> index c230c4c93e..5bf4e892a0 100644
-> >> --- a/docs/specs/tpm.txt
-> >> +++ b/docs/specs/tpm.txt
-> >> @@ -42,6 +42,76 @@ URL:
-> >>
-> >>   =C2=A0https://trustedcomputinggroup.org/tcg-acpi-specification/
-> >>
-> >> +=3D=3D ACPI PPI Interface =3D=3D
-> >> +
-> >> +QEMU supports the Physical Presence Interface (PPI) for TPM 1.2 and T=
-PM
-> >> 2. This
-> >> +interface requires ACPI and firmware support. The specification can be
-> >> found at
-> >> +the following URL:
-> >> +
-> >> +https://trustedcomputinggroup.org/resource/tcg-physical-presence-inte=
-rface-specification/
-> >> +
-> >> +PPI enables a system administrator (root) to request a modification t=
-o the
-> >> +TPM upon reboot. The PPI specification defines the operation requests
-> >> and the
-> >> +actions the firmware has to take. The system administrator passes the
-> >> operation
-> >> +request number to the firmware through an ACPI interface which writes=
- this
-> >> +number to a memory location that the firmware knows. Upon reboot, the
-> >> firmware
-> >> +finds the number and sends commands to the the TPM. The firmware writ=
-es
-> >> the TPM
-> >> +result code and the operation request number to a memory location that
-> >> ACPI can
-> >> +read from and pass the result on to the administrator.
-> >> +
-> >> +The PPI specification defines a set of mandatory and optional
-> >> operations for
-> >> +the firmware to implement. The ACPI interface also allows an
-> >> administrator to
-> >> +list the supported operations. In QEMU the ACPI code is generated by
-> >> QEMU, yet
-> >> +the firmware needs to implement support on a per-operations basis, and
-> >> +different firmwares may support a different subset. Therefore, QEMU
-> >> introduces
-> >> +the virtual memory device for PPI where the firmware can indicate whi=
-ch
-> >> +operations it supports and ACPI can enable the ones that are supporte=
-d and
-> >> +disable all others. This interface lies in main memory and has the
-> >> following =20
-> > what about usecase when it's mapped in isa address space?
-> >    tpm_tis_realizefn() ->
-> >         tpm_ppi_init_io(&s->ppi, isa_address_space(ISA_DEVICE(dev)) =20
->=20
-> The use case for PPI is 'administrator wants to reconfigure the TPM on=20
-> next reboot.' I am not sure what else to add?!
->=20
-> > =20
-> >> +layout:
-> >> +
-> >> + +----------+--------+--------+--------------------------------------=
------+
-> >> +=C2=A0=C2=A0 |=C2=A0 Field=C2=A0=C2=A0 | Length | Offset | Descriptio=
-n=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |
-> >> + +----------+--------+--------+--------------------------------------=
------+
-> >> +=C2=A0=C2=A0 | func=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 0x100 |=C2=A0 0x0=
-00 | Firmware sets values for each
-> >> supported=C2=A0=C2=A0 |
-> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | operation. See defined values
-> >> below.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> >> + +----------+--------+--------+--------------------------------------=
------+
-> >> +=C2=A0=C2=A0 | ppin=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x1=C2=A0 |=
-=C2=A0 0x100 | SMI interrupt to use. Set by
-> >> firmware.=C2=A0=C2=A0=C2=A0 |
-> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | Not
-> >> supported.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> >> + +----------+--------+--------+--------------------------------------=
------+
-> >> +=C2=A0=C2=A0 | ppip=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=
-=C2=A0 0x101 | ACPI function index to pass to SMM
-> >> code.=C2=A0 |
-> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | Set by ACPI. Not
-> >> supported.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |
-> >> + +----------+--------+--------+--------------------------------------=
------+
-> >> +=C2=A0=C2=A0 | pprp=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=
-=C2=A0 0x105 | Result of last executed operation.
-> >> Set by |
-> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |
-> >> firmware.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> >> + +----------+--------+--------+--------------------------------------=
------+
-> >> +=C2=A0=C2=A0 | pprq=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=
-=C2=A0 0x109 | Operation request number to execute.
-> >> Set=C2=A0 |
-> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | by
-> >> ACPI.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> >> + +----------+--------+--------+--------------------------------------=
------+
-> >> +=C2=A0=C2=A0 | pprm=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=
-=C2=A0 0x10d | Operation request optional parameter.
-> >> Set |
-> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | by
-> >> ACPI.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> >> + +----------+--------+--------+--------------------------------------=
------+
-> >> +=C2=A0=C2=A0 | lppr=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=
-=C2=A0 0x111 | Last execute request number. Set
-> >> by=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |
-> >> firmware.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> >> + +----------+--------+--------+--------------------------------------=
------+
-> >> +=C2=A0=C2=A0 | fret=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 0x4=C2=A0 |=
-=C2=A0 0x115 | Result code from SMM
-> >> function.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |
-> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | Not
-> >> supported.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> >> + +----------+--------+--------+--------------------------------------=
------+
-> >> +=C2=A0=C2=A0 | res1=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 0x40=C2=A0 |=C2=
-=A0 0x119 | Reserved for future
-> >> use=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> >> + +----------+--------+--------+--------------------------------------=
------+
-> >> +=C2=A0=C2=A0 | next_step|=C2=A0=C2=A0 0x1=C2=A0 |=C2=A0 0x159 | Opera=
-tion to execute after reboot
-> >> by=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |
-> >> +=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | firmware. Used by
-> >> firmware.=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |
-> >> + +----------+--------+--------+--------------------------------------=
------+ =20
-> > if there is relevant match/description in PPI spec for above fields
-> > it would be better to put reference to it in description fields and
-> > as field name that could be easily grepped for in PPI spec,
-> > like we we do with ACPI primitives:
-> >
-> >    "ACPI 1.0b: 16.2.5.1 Namespace Modifier Objects Encoding: DefScope"
-> >
-> > so reader could easily match spec with parts he/she is interested in. =
-=20
->=20
-> The ACPI spec does not go to the level of the implementation let alone=20
-> the necessary fields. The names of the fields stem from edk2.
+Just because it's not implemented; a few people have tried to implement
+it (including me in 2016); but it tends to get stuck because some QOM objects
+are more compelex than simple integer/strings and there didn't used
+to be any way to print other objects out easily.
 
-my understanding was that values returned in above fields (or some of them)
-are standardized in spec since they are an interface defined by functions
-implemented in _DSM method.
+The most recent thing in this was Ricardo's 'Show values and description
+when using "qom-list"' series.
 
-It would be excessive to describe them here, but sending reader to
-a relevant part/term of TPM spec would be helpful.
-(that's what we do with ACPI code, so it would be nice to it in this case
-as well if possible)
-=20
->=20
-> > =20
-> >> +
-> >> +=C2=A0=C2=A0 The following values are supported for the 'func' field.=
- They correspond
-> >> +=C2=A0=C2=A0 to the values used by ACPI function index 8.
-> >> +
-> >> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_NOT_IMPLEMENTED=C2=A0=C2=A0=
-=C2=A0=C2=A0 (0 << 0)
-> >> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_BIOS_ONLY=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (1 << 0)
-> >> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_BLOCKED=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (2 << 0)
-> >> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_ALLOWED_USR_REQ=C2=A0=C2=A0=
-=C2=A0=C2=A0 (3 << 0)
-> >> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ (4 << 0)
-> >> +=C2=A0=C2=A0=C2=A0 #define TPM_PPI_FUNC_MASK=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (7 << 0)
-> >> + =20
-> > looks good to me
-> > PS:
-> > maybe drop #define part and make a table from it too so reader
-> > won't have to do shift on his own, like
-> >
-> >    0x0  | function is not implemented
-> >    0x1  | ...
-> >    ...
-> >
-> > =20
-> >>   =C2=A0QEMU files related to TPM ACPI tables:
-> >>   =C2=A0 - hw/i386/acpi-build.c
-> >> =20
->=20
+Dave
+
+> Thank you very much!
+> 
+> Dongli Zhang
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
