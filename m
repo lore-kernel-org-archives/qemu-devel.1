@@ -1,32 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42684)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXV1F-0001H5-MY
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:11:16 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fXV2n-0002Sz-74
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:12:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXV1E-0003wV-KV
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:11:13 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:44269)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXV1E-0003w8-Fz
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:11:12 -0400
-Received: by mail-qt0-x244.google.com with SMTP id 92-v6so8152806qta.11
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 10:11:12 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1529944302-14186-1-git-send-email-cota@braap.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6c728743-f2e6-7640-923a-005361c6b6c1@amsat.org>
-Date: Mon, 25 Jun 2018 14:11:07 -0300
+	(envelope-from <jsnow@redhat.com>) id 1fXV2l-0004am-I0
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:12:49 -0400
+References: <20180621032539.134944-1-eblake@redhat.com>
+	<7570accb-ecb1-1481-4737-5a5004a2106a@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <c4ce0abf-7c24-bc7e-de70-08bda5378165@redhat.com>
+Date: Mon, 25 Jun 2018 13:12:33 -0400
 MIME-Version: 1.0
-In-Reply-To: <1529944302-14186-1-git-send-email-cota@braap.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] translate-all: fix locking of TBs whose
- two pages share the same physical page
+In-Reply-To: <7570accb-ecb1-1481-4737-5a5004a2106a@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="kJ7l8Ns20VgE2bfAyO2RXvuu43ae3jneK"
+Subject: Re: [Qemu-devel] [PATCH] nbd/client: add x-block-status hack for
+ testing server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,106 +25,196 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>, Max Filippov <jcmvbkbc@gmail.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 06/25/2018 01:31 PM, Emilio G. Cota wrote:
-> Commit 0b5c91f ("translate-all: use per-page locking in !user-mode",
-> 2018-06-15) introduced per-page locking. It assumed that the physical
-> pages corresponding to a TB (at most two pages) are always distinct,
-> which is wrong. For instance, an xtensa test provided by Max Filippov
-> is broken by the commit, since the test maps two virtual pages
-> to the same physical page:
-> 
-> 	virt1: 7fff, virt2: 8000
-> 	phys1 6000fff, phys2 6000000
-> 
-> Fix it by removing the assumption from page_lock_pair.
-> If the two physical page addresses are equal, we only lock
-> the PageDesc once. Note that the two callers of page_lock_pair,
-> namely page_unlock_tb and tb_link_page, are also updated so that
-> we do not try to unlock the same PageDesc twice.
-> 
-> Fixes: 0b5c91f74f3c83a36f37740969df8c775c997e69
-> Reported-by: Max Filippov <jcmvbkbc@gmail.com>
-> Signed-off-by: Emilio G. Cota <cota@braap.org>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--kJ7l8Ns20VgE2bfAyO2RXvuu43ae3jneK
+From: John Snow <jsnow@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, vsementsov@virtuozzo.com,
+ Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <c4ce0abf-7c24-bc7e-de70-08bda5378165@redhat.com>
+Subject: Re: [PATCH] nbd/client: add x-block-status hack for testing server
+References: <20180621032539.134944-1-eblake@redhat.com>
+ <7570accb-ecb1-1481-4737-5a5004a2106a@redhat.com>
+In-Reply-To: <7570accb-ecb1-1481-4737-5a5004a2106a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-$ make check-tcg (qemu:debian-xtensa-cross)
 
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->  accel/tcg/translate-all.c | 32 +++++++++++++++++++++++++-------
->  1 file changed, 25 insertions(+), 7 deletions(-)
-> 
-> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-> index f0c3fd4..8e0203e 100644
-> --- a/accel/tcg/translate-all.c
-> +++ b/accel/tcg/translate-all.c
-> @@ -669,9 +669,15 @@ static inline void page_lock_tb(const TranslationBlock *tb)
->  
->  static inline void page_unlock_tb(const TranslationBlock *tb)
->  {
-> -    page_unlock(page_find(tb->page_addr[0] >> TARGET_PAGE_BITS));
-> +    PageDesc *p1 = page_find(tb->page_addr[0] >> TARGET_PAGE_BITS);
-> +
-> +    page_unlock(p1);
->      if (unlikely(tb->page_addr[1] != -1)) {
-> -        page_unlock(page_find(tb->page_addr[1] >> TARGET_PAGE_BITS));
-> +        PageDesc *p2 = page_find(tb->page_addr[1] >> TARGET_PAGE_BITS);
-> +
-> +        if (p2 != p1) {
-> +            page_unlock(p2);
-> +        }
->      }
->  }
->  
-> @@ -850,22 +856,34 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_addr_t phys1,
->                             PageDesc **ret_p2, tb_page_addr_t phys2, int alloc)
->  {
->      PageDesc *p1, *p2;
-> +    tb_page_addr_t page1;
-> +    tb_page_addr_t page2;
->  
->      assert_memory_lock();
-> -    g_assert(phys1 != -1 && phys1 != phys2);
-> -    p1 = page_find_alloc(phys1 >> TARGET_PAGE_BITS, alloc);
-> +    g_assert(phys1 != -1);
-> +
-> +    page1 = phys1 >> TARGET_PAGE_BITS;
-> +    page2 = phys2 >> TARGET_PAGE_BITS;
-> +
-> +    p1 = page_find_alloc(page1, alloc);
->      if (ret_p1) {
->          *ret_p1 = p1;
->      }
->      if (likely(phys2 == -1)) {
->          page_lock(p1);
->          return;
-> +    } else if (page1 == page2) {
-> +        page_lock(p1);
-> +        if (ret_p2) {
-> +            *ret_p2 = p1;
-> +        }
-> +        return;
->      }
-> -    p2 = page_find_alloc(phys2 >> TARGET_PAGE_BITS, alloc);
-> +    p2 = page_find_alloc(page2, alloc);
->      if (ret_p2) {
->          *ret_p2 = p2;
->      }
-> -    if (phys1 < phys2) {
-> +    if (page1 < page2) {
->          page_lock(p1);
->          page_lock(p2);
->      } else {
-> @@ -1623,7 +1641,7 @@ tb_link_page(TranslationBlock *tb, tb_page_addr_t phys_pc,
->          tb = existing_tb;
->      }
->  
-> -    if (p2) {
-> +    if (p2 && p2 != p) {
->          page_unlock(p2);
->      }
->      page_unlock(p);
-> 
+On 06/25/2018 09:50 AM, Max Reitz wrote:
+> On 2018-06-21 05:25, Eric Blake wrote:
+>> In order to test that the NBD server is properly advertising
+>> dirty bitmaps, we need a bare minimum client that can request
+>> and read the context.  This patch is a hack (hence the use of
+>> the x- prefix) that serves two purposes: first, it lets the
+>> client pass a request of more than one context at a time to
+>> the server, to test the reaction of the server to various
+>> contexts (via the list command).  Second, whatever the first
+>> context in the user's list becomes the context wired up to the
+>> results visible in bdrv_block_status(); this has the result
+>> that if you pass in 'qemu:dirty-bitmap:b' instead of the usual
+>> 'base:allocation', and the server is currently serving a named
+>> bitmap 'b', then commands like 'qemu-img map' now output status
+>> corresponding to the dirty bitmap (dirty sections look like
+>> holes, while clean sections look like data, based on how the
+>> status bits are mapped over the NBD protocol).
+>>
+>> Since the hack corrupts the meaning of bdrv_block_status(), I
+>> would NOT try to run 'qemu-img convert' or any other program
+>> that might misbehave based on thinking clusters have a different
+>> status than what the normal 'base:allocation' would provide.
+>>
+>> The hack uses a semicolon-separated list embedded in a single
+>> string, as that was easier to wire into the nbd block driver than
+>> figuring out the right incantation of flattened QDict to represent
+>> an array via the command line.  Oh well, just one more reason that
+>> this hack deserves the 'x-' prefix.
+>=20
+> Without having looked at the patch, would an "x-debug-" prefix work
+> better?  We have that for x-debug-block-dirty-bitmap-sha256.  The reaso=
+n
+> is that just "x-" means "experimental", which at least to me implies
+> "once we have done all of our experiments, it will no longer be
+> experimental and the prefix is dropped".  "x-debug-" means that it is
+> actually not experimental, but just a debugging interface that will
+> never be stable.
+>=20
+> (Yes, I know we haven't documented the meaning of x-debug- anywhere...)=
+
+>=20
+> Max
+>=20
+
+I'm not sure we actually want to check this in even temporarily, but we
+do need to make use of it as a debugging facility in the meantime.
+
+As such, x-debug- works perfectly well, but it may not matter.
+
+--js
+
+>> As a demo, I was able to prove things work with the following sequence=
+:
+>>
+>> $ qemu-img info file
+>> image: file
+>> file format: qcow2
+>> virtual size: 2.0M (2097152 bytes)
+>> disk size: 2.0M
+>> cluster_size: 65536
+>> Format specific information:
+>>     compat: 1.1
+>>     lazy refcounts: false
+>>     refcount bits: 16
+>>     corrupt: false
+>>
+>> $ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdi=
+o
+>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2}, "=
+package": "v2.12.0-1531-g3ab98aa673d"}, "capabilities": []}}
+>> {'execute':'qmp_capabilities'}
+>> {"return": {}}
+>> {'execute':'blockdev-add','arguments':{'driver':'qcow2','node-name':'n=
+','file':{'driver':'file','filename':'file'}}}
+>> {"return": {}}
+>> {'execute':'block-dirty-bitmap-add','arguments':{'node':'n','name':'b'=
+,'persistent':true}}
+>> {"return": {}}
+>> {'execute':'quit'}
+>> {"return": {}}
+>> {"timestamp": {"seconds": 1529548814, "microseconds": 472828}, "event"=
+: "SHUTDOWN", "data": {"guest": false}}
+>>
+>> $ ./qemu-io -f qcow2 file
+>> qemu-io> r -v 0 1
+>> 00000000:  01  .
+>> read 1/1 bytes at offset 0
+>> 1 bytes, 1 ops; 0.0001 sec (4.957 KiB/sec and 5076.1421 ops/sec)
+>> qemu-io> w -P 1 0 1
+>> wrote 1/1 bytes at offset 0
+>> 1 bytes, 1 ops; 0.0078 sec (127.502231 bytes/sec and 127.5022 ops/sec)=
+
+>> qemu-io> q
+>>
+>> $ ./x86_64-softmmu/qemu-system-x86_64 -nodefaults -nographic -qmp stdi=
+o
+>> {"QMP": {"version": {"qemu": {"micro": 50, "minor": 12, "major": 2}, "=
+package": "v2.12.0-1531-g3ab98aa673d"}, "capabilities": []}}
+>> {'execute':'qmp_capabilities'}
+>> {"return": {}}
+>> {'execute':'nbd-server-start','arguments':{'addr':{'type':'inet','data=
+':{'host':'localhost','port':'10809'}}}}
+>> {"return": {}}
+>> {'execute':'blockdev-add','arguments':{'driver':'qcow2','node-name':'n=
+','file':{'driver':'file','filename':'file'}}}
+>> {"return": {}}
+>> {'execute':'nbd-server-add','arguments':{'device':'n'}}
+>> {"return": {}}
+>> {'execute':'x-nbd-server-add-bitmap','arguments':{'name':'n','bitmap':=
+'b'}}
+>> {"error": {"class": "GenericError", "desc": "Bitmap 'b' is enabled"}}
+>> {'execute':'x-block-dirty-bitmap-disable','arguments':{'node':'n','nam=
+e':'b'}}
+>> {"return": {}}
+>> {'execute':'x-nbd-server-add-bitmap','arguments':{'name':'n','bitmap':=
+'b'}}
+>> {"return": {}}
+>> ... leave running
+>>
+>> $ ./qemu-img map --output=3Djson --image-opts driver=3Dnbd,export=3Dn,=
+server.type=3Dinet,server.host=3Dlocalhost,server.port=3D10809
+>> [{ "start": 0, "length": 1114112, "depth": 0, "zero": false, "data": t=
+rue},
+>> { "start": 1114112, "length": 458752, "depth": 0, "zero": true, "data"=
+: false},
+>> { "start": 1572864, "length": 524288, "depth": 0, "zero": false, "data=
+": true}]
+>>
+>> $ ./qemu-img map --output=3Djson --image-opts driver=3Dnbd,export=3Dn,=
+server.type=3Dinet,server.host=3Dlocalhost,server.port=3D10809,x-block-st=
+atus=3Dqemu:dirty-bitmap:b
+>> [{ "start": 0, "length": 65536, "depth": 0, "zero": false, "data": fal=
+se},
+>> { "start": 65536, "length": 2031616, "depth": 0, "zero": false, "data"=
+: true}]
+>>
+>> The difference between the two runs shows that base:allocation status
+>> is thus different from the contents of dirty bitmap 'b'; and that the
+>> dirty bitmap 'b' indeed tracked the first 64k of the file as being
+>> dirty due to the qemu-io write at offset 0 performed between the creat=
+ion
+>> of bitmap b in the first qemu, and the disabling it prior to exporting=
+ it
+>> in the second qemu.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
+>=20
+
+
+--kJ7l8Ns20VgE2bfAyO2RXvuu43ae3jneK
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE+ber27ys35W+dsvQfe+BBqr8OQ4FAlsxIocACgkQfe+BBqr8
+OQ7yiA/8CY4w25UMjd5HwkgLC91tTSfZrMsYwIDBfOS3TBVHQFX8FSQ0JgGdSVzU
+1Jpd+KwTRPBMkHw0gWCYPS+sOQ6EOFUrdJL9Q4pSKjv4l48XPYCyj/WxQK6t2BqA
+zLlrhsaspS2FbkI4TjrB4wJ7jYEWuLMWPgFOBguKZjGzqE9/5aKDvbm0YqwlqBRx
+CBwB0nzGNwWVUFrkklj1hIbC29Gda3X6/u/uQGd2kx7CZhlrf33CRXf21WZwI54A
+5ImVJHFiQfsk9uuiXzT1MMDKAL6zonNwpsatvXR/9X//q8oMGgPGLr0Poz/nZfmb
+C3VSaINON35ZPwlvpCpAGEblRJSQR8/PnZ55frcHeSdv/undm3Wb9mTnZ7yMptgb
+IFio4uK5Mkpth0kQTzUckflQ2IWYiM/cD8iLQ2XUdpu2JYbiCPo6I/zWM7d3RhO4
+pMAcvB8ji3TJsZIgAAHRZuL52ZJqgSCFDZTfzftkhTUt7QQWLYRmcAM2IN7dSJ27
+PVGzEhKLz2WZDADUuMnJccEos3v8tvEwmGY0nogGjYv6OMa+XiH36NF3v1KG3O3w
+XhGtrDs2D5AdHGKmwuG1a5FKqwN0RQmxDXXSzU6J2bXs8sJN5mubG92Qts0UMY5b
+O3/3QWhVKIouRnwUK+uFt4yq5IwUTE1aXpJnI6GEijJg+Bbk0Sk=
+=Xqy0
+-----END PGP SIGNATURE-----
+
+--kJ7l8Ns20VgE2bfAyO2RXvuu43ae3jneK--
