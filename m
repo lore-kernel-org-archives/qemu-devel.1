@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51185)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXP9b-00035T-Qn
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:55:28 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXPAm-0003o4-3O
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:56:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXP9a-0007GB-NS
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:55:27 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:45325)
+	(envelope-from <peter.maydell@linaro.org>) id 1fXPAl-0007qN-9r
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:56:40 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:37419)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXP9a-0007Fr-Hi
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:55:26 -0400
-Received: by mail-ot0-x241.google.com with SMTP id k3-v6so970638otl.12
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 03:55:26 -0700 (PDT)
+	id 1fXPAl-0007pf-2m
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:56:39 -0400
+Received: by mail-oi0-x243.google.com with SMTP id l22-v6so12040088oib.4
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 03:56:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <c7077a71-6f01-b3f2-cc0b-4d845b967ef3@amsat.org>
-References: <20180606144706.29732-1-f4bug@amsat.org>
-	<1160f838-5625-b9bf-6c34-3071ed185074@redhat.com>
-	<0c5018d5-7e87-bba1-7522-c8020277bde0@amsat.org>
-	<c7077a71-6f01-b3f2-cc0b-4d845b967ef3@amsat.org>
+In-Reply-To: <1529660880-30376-1-git-send-email-sai.pavan.boddu@xilinx.com>
+References: <1529660880-30376-1-git-send-email-sai.pavan.boddu@xilinx.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 11:55:05 +0100
-Message-ID: <CAFEAcA8TP5hzgFVP7z-y81vxYDdPhg1csLLrqKH4+xqy+eV5CQ@mail.gmail.com>
+Date: Mon, 25 Jun 2018 11:56:18 +0100
+Message-ID: <CAFEAcA-Wt4wVcriayGw-xCaWJskM01X=2z5GBoSTiFiRPtHvcQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Adopt the Gumstix
- computers-on-module machines
+Subject: Re: [Qemu-devel] [PATCH v4] xilinx_spips: Make dma transactions as
+ per dma_burst_size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, KONRAD Frederic <frederic.konrad@adacore.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On 22 June 2018 at 14:30, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> Hi Peter,
+On 22 June 2018 at 10:47, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com> wrote:
+> From: Sai Pavan Boddu <saipava@xilinx.com>
 >
-> On 06/06/2018 12:02 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 06/06/2018 11:53 AM, Thomas Huth wrote:
->>> On 06.06.2018 16:47, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> These COMs are hard to find, and the companie dropped the support
->>
->> "company" :/
->>
->>>> few years ago.
->>>>
->>>> Per the "Gumstix Product Changes, Known Issues, and EOL" pdf:
->>>>
->>>> - Phasing out: PXA270-based Verdex product line
->>>>   September 2012
->>>>
->>>> - Phasing out: PXA255-based Basix & Connex
->>>>   September 2009
->>>>
->>>> However there are still booting SD card image availables, very
->>>> convenient to stress test the QEMU SD card implementation.
->>>> Therefore I volunteer to keep an eye on this file, while it
->>>> is useful for testing.
->>>>
->>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>> ---
->>>>  MAINTAINERS | 3 ++-
->>>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/MAINTAINERS b/MAINTAINERS
->>>> index 41cd3736a9..1825deb762 100644
->>>> --- a/MAINTAINERS
->>>> +++ b/MAINTAINERS
->>>> @@ -491,9 +491,10 @@ F: include/hw/arm/digic.h
->>>>  F: hw/*/digic*
->>>>
->>>>  Gumstix
->>>> +M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>>  L: qemu-devel@nongnu.org
->>>>  L: qemu-arm@nongnu.org
->>>> -S: Orphan
->>>> +S: Odd Fixes
->>>>  F: hw/arm/gumstix.c
+> Qspi dma has a burst length of 64 bytes, So limit the transactions w.r.t
+> dma-burst-size property.
+>
+> Signed-off-by: Sai Pavan Boddu <saipava@xilinx.com>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+> Changes for V2:
+>    Remove dynamic allocation of dma_buf and limit burst size to 2k
+> Changes for V3:
+>    Instead of proceeding with max burst size, report user the error.
+> Changes for V4:
+>    move dma_buf to the bottom of XlnxZynqMPQSPIPS
+>
+>  hw/ssi/xilinx_spips.c         | 23 ++++++++++++++++++++---
+>  include/hw/ssi/xilinx_spips.h |  5 ++++-
+>  2 files changed, 24 insertions(+), 4 deletions(-)
 
-> Do you agree with this patch? This is mostly to avoid removing these 2
-> boards in 2 releases from now. The datasheets are public so I can keep
-> an eye on them.
-> I already removed them from the "Future deprecated candidates" entry in
-> the Wiki.
 
-As Thomas says, whether anybody's listed in MAINTAINERS is
-orthogonal to whether we choose to deprecate and remove boards.
-If you want to look after these, that's cool.
 
-I've applied this patch to target-arm.next.
+Applied to target-arm.next, thanks.
 
-thanks
 -- PMM
