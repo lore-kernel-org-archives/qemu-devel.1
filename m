@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXQ5g-0000Wn-3W
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:55:31 -0400
+	(envelope-from <andrew@aj.id.au>) id 1fXQ9d-0004Bp-8Q
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:59:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fXQ5f-0002d3-8R
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:55:28 -0400
-References: <20180624040609.17572-1-f4bug@amsat.org>
-	<20180624040609.17572-2-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <75bd1815-88af-8411-da1d-62991a8c7287@redhat.com>
-Date: Mon, 25 Jun 2018 13:55:21 +0200
+	(envelope-from <andrew@aj.id.au>) id 1fXQ9c-00046Q-D6
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:59:33 -0400
+Message-Id: <1529927965.3221404.1419429536.7B0D907A@webmail.messagingengine.com>
+From: Andrew Jeffery <andrew@aj.id.au>
 MIME-Version: 1.0
-In-Reply-To: <20180624040609.17572-2-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 01/16] hw/input/pckbd: Use
- qemu_log_mask(GUEST_ERROR) instead of fprintf
+Content-Type: text/plain; charset="utf-8"
+References: <20180625110721.22485-1-joel@jms.id.au>
+	<0627e87c-6d3c-a64a-6d6d-2a632c73ebf7@amsat.org>
+Date: Mon, 25 Jun 2018 21:29:25 +0930
+In-Reply-To: <0627e87c-6d3c-a64a-6d6d-2a632c73ebf7@amsat.org>
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add ASPEED BMCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,39 +23,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?utf-8?Q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Joel Stanley <joel@jms.id.au>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: =?utf-8?Q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
 
-On 24.06.2018 06:05, Philippe Mathieu-Daud=C3=A9 wrote:
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/input/pckbd.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+On Mon, 25 Jun 2018, at 20:43, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Joel,
 >=20
-> diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
-> index f33e3fc63d..07c8801387 100644
-> --- a/hw/input/pckbd.c
-> +++ b/hw/input/pckbd.c
-> @@ -22,6 +22,7 @@
->   * THE SOFTWARE.
->   */
->  #include "qemu/osdep.h"
-> +#include "qemu/log.h"
->  #include "hw/hw.h"
->  #include "hw/isa/isa.h"
->  #include "hw/i386/pc.h"
-> @@ -308,7 +309,8 @@ static void kbd_write_command(void *opaque, hwaddr =
-addr,
->          /* ignore that */
->          break;
->      default:
-> -        fprintf(stderr, "qemu: unsupported keyboard cmd=3D0x%02x\n", (=
-int)val);
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "unsupported keyboard cmd=3D0x%02" PRIx64 "\n", =
-val);
->          break;
->      }
->  }
+> On 06/25/2018 08:07 AM, Joel Stanley wrote:
+> > This adds Cedric as the maintainer, with Andrew and I as reviewers, for
+> > the ASPEED boards and the peripherals we use.
+>=20
+> Good idea, this should speed up ASPEED reviews.
+>=20
+> >=20
+> > Signed-off-by: Joel Stanley <joel@jms.id.au>
+> > ---
+> >  MAINTAINERS | 11 +++++++++++
+> >  1 file changed, 11 insertions(+)
+> >=20
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 2874ddce6097..14bcf2ed3e3d 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -644,6 +644,17 @@ M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> >  S: Maintained
+> >  F: hw/arm/msf2-som.c
+> >=20=20
+> > +ASPEED BMCs
+> > +M: C=C3=A9dric Le Goater <clg@kaod.org>
+> > +R: Andrew Jeffery <andrew@aj.id.au>
+> > +R: Joel Stanley <joel@jms.id.au>
+> > +L: qemu-arm@nongnu.org
+> > +S: Maintained
+> > +F: hw/*/*aspeed*
+> > +F: include/*/*aspeed*
+>=20
+> This line does not match, however include/hw/*/*aspeed* does.
+>=20
+> With that fixed:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Similarly:
+
+Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+
+>=20
+> > +F: hw/net/ftgmac100.c
+> > +F: include/hw/net/ftgmac100.h
+> > +
+> >  CRIS Machines
+> >  -------------
+> >  Axis Dev88
+> >=20
