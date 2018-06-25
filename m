@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fXIMJ-0001mF-Dp
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 23:40:09 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fXKKG-0004LU-U0
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 01:46:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <robert.hu@linux.intel.com>) id 1fXIME-0007sQ-Ik
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 23:40:07 -0400
-Received: from mga17.intel.com ([192.55.52.151]:25151)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
-	id 1fXIME-0007qo-9x
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 23:40:02 -0400
-From: Robert Hoo <robert.hu@linux.intel.com>
-Date: Mon, 25 Jun 2018 11:39:17 +0800
-Message-Id: <1529897961-134132-2-git-send-email-robert.hu@linux.intel.com>
-In-Reply-To: <1529897961-134132-1-git-send-email-robert.hu@linux.intel.com>
-References: <1529897961-134132-1-git-send-email-robert.hu@linux.intel.com>
-Subject: [Qemu-devel] [PATCH 1/5] i386: Add support for IA32_PRED_CMD and
- IA32_ARCH_CAPABILITIES MSRs
+	(envelope-from <dovgaluk@ispras.ru>) id 1fXKKC-0007qU-W7
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 01:46:08 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:37504)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1fXKKC-0007o0-Jk
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 01:46:04 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
+	<CAFEAcA-3UPDD3muShM=yYgiwQcN-U+f_TyEiu-Z=EWb7_hFaCw@mail.gmail.com>
+	<001d01d3fcc4$3dfd33f0$b9f79bd0$@ru>
+In-Reply-To: <001d01d3fcc4$3dfd33f0$b9f79bd0$@ru>
+Date: Mon, 25 Jun 2018 08:46:00 +0300
+Message-ID: <007e01d40c47$cc465640$64d302c0$@ru>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Language: ru
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
+ prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,168 +31,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
-Cc: robert.hu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
+To: 'Pavel Dovgalyuk' <dovgaluk@ispras.ru>, 'Peter Maydell' <peter.maydell@linaro.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
+Cc: 'QEMU Developers' <qemu-devel@nongnu.org>, maria.klimushenkova@ispras.ru, 'Paolo Bonzini' <pbonzini@redhat.com>, =?utf-8?Q?'Llu=C3=ADs_Vilanova'?= <vilanova@ac.upc.edu>
 
-IA32_PRED_CMD MSR gives software a way to issue commands that affect the state
-of indirect branch predictors. Enumerated by CPUID.(EAX=7H,ECX=0):EDX[26].
-IA32_ARCH_CAPABILITIES MSR enumerates architectural features of RDCL_NO and
-IBRS_ALL. Enumerated by CPUID.(EAX=07H, ECX=0):EDX[29].
+Peter, what about this one?
 
-https://software.intel.com/sites/default/files/managed/c5/63/336996-Speculative-Execution-Side-Channel-Mitigations.pdf
+Pavel Dovgalyuk
 
-Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
----
- target/i386/cpu.h     |  4 ++++
- target/i386/kvm.c     | 27 ++++++++++++++++++++++++++-
- target/i386/machine.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 70 insertions(+), 1 deletion(-)
-
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 89c82be..734a73e 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -352,6 +352,8 @@ typedef enum X86Seg {
- #define MSR_TSC_ADJUST                  0x0000003b
- #define MSR_IA32_SPEC_CTRL              0x48
- #define MSR_VIRT_SSBD                   0xc001011f
-+#define MSR_IA32_PRED_CMD               0x49
-+#define MSR_IA32_ARCH_CAPABILITIES      0x10a
- #define MSR_IA32_TSCDEADLINE            0x6e0
- 
- #define FEATURE_CONTROL_LOCKED                    (1<<0)
-@@ -1210,6 +1212,8 @@ typedef struct CPUX86State {
- 
-     uint64_t spec_ctrl;
-     uint64_t virt_ssbd;
-+    uint64_t pred_cmd;
-+    uint64_t arch_capabilities;
- 
-     /* End of state preserved by INIT (dummy marker).  */
-     struct {} end_init_save;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 445e0e0..5232446 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -93,6 +93,8 @@ static bool has_msr_hv_reenlightenment;
- static bool has_msr_xss;
- static bool has_msr_spec_ctrl;
- static bool has_msr_virt_ssbd;
-+static bool has_msr_pred_cmd;
-+static bool has_msr_arch_capabilities;
- static bool has_msr_smi_count;
- 
- static uint32_t has_architectural_pmu_version;
-@@ -1258,6 +1260,11 @@ static int kvm_get_supported_msrs(KVMState *s)
-                     break;
-                 case MSR_VIRT_SSBD:
-                     has_msr_virt_ssbd = true;
-+                case MSR_IA32_PRED_CMD:
-+                    has_msr_pred_cmd = true;
-+                    break;
-+                case MSR_IA32_ARCH_CAPABILITIES:
-+                    has_msr_arch_capabilities = true;
-                     break;
-                 }
-             }
-@@ -1750,7 +1757,13 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-     if (has_msr_virt_ssbd) {
-         kvm_msr_entry_add(cpu, MSR_VIRT_SSBD, env->virt_ssbd);
-     }
--
-+    if (has_msr_pred_cmd) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_PRED_CMD, env->pred_cmd);
-+    }
-+    if (has_msr_arch_capabilities) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES,
-+            env->arch_capabilities);
-+    }
- #ifdef TARGET_X86_64
-     if (lm_capable_kernel) {
-         kvm_msr_entry_add(cpu, MSR_CSTAR, env->cstar);
-@@ -2133,6 +2146,13 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (has_msr_virt_ssbd) {
-         kvm_msr_entry_add(cpu, MSR_VIRT_SSBD, 0);
-     }
-+    if (has_msr_pred_cmd) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_PRED_CMD, 0);
-+    }
-+    if (has_msr_arch_capabilities) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_ARCH_CAPABILITIES, 0);
-+    }
-+
-     if (!env->tsc_valid) {
-         kvm_msr_entry_add(cpu, MSR_IA32_TSC, 0);
-         env->tsc_valid = !runstate_is_running();
-@@ -2514,6 +2534,11 @@ static int kvm_get_msrs(X86CPU *cpu)
-             break;
-         case MSR_VIRT_SSBD:
-             env->virt_ssbd = msrs[i].data;
-+        case MSR_IA32_PRED_CMD:
-+            env->pred_cmd = msrs[i].data;
-+            break;
-+        case MSR_IA32_ARCH_CAPABILITIES:
-+            env->arch_capabilities = msrs[i].data;
-             break;
-         case MSR_IA32_RTIT_CTL:
-             env->msr_rtit_ctrl = msrs[i].data;
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 4d98d36..089aba0 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -879,6 +879,44 @@ static const VMStateDescription vmstate_spec_ctrl = {
-     }
- };
- 
-+static bool pred_cmd_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->pred_cmd != 0;
-+}
-+
-+static const VMStateDescription vmstate_pred_cmd = {
-+    .name = "cpu/pred_cmd",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = pred_cmd_needed,
-+    .fields = (VMStateField[]){
-+        VMSTATE_UINT64(env.arch_capabilities, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool arch_capabilities_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->arch_capabilities != 0;
-+}
-+
-+static const VMStateDescription vmstate_arch_capabilities = {
-+    .name = "cpu/arch_capabilities",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = arch_capabilities_needed,
-+    .fields = (VMStateField[]){
-+        VMSTATE_UINT64(env.arch_capabilities, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static bool intel_pt_enable_needed(void *opaque)
- {
-     X86CPU *cpu = opaque;
-@@ -1056,6 +1094,8 @@ VMStateDescription vmstate_x86_cpu = {
-         &vmstate_pkru,
- #endif
-         &vmstate_spec_ctrl,
-+        &vmstate_pred_cmd,
-+        &vmstate_arch_capabilities,
-         &vmstate_mcg_ext_ctl,
-         &vmstate_msr_intel_pt,
-         &vmstate_msr_virt_ssbd,
--- 
-1.8.3.1
+> -----Original Message-----
+> From: Pavel Dovgalyuk [mailto:dovgaluk@ispras.ru]
+> Sent: Tuesday, June 05, 2018 2:56 PM
+> To: 'Peter Maydell'; 'Pavel Dovgalyuk'
+> Cc: 'QEMU Developers'; maria.klimushenkova@ispras.ru; 'Paolo Bonzini'; =
+'Llu=C3=ADs Vilanova'
+> Subject: RE: [RFC PATCH v2 0/7] QEMU binary instrumentation prototype
+>=20
+> > From: Peter Maydell [mailto:peter.maydell@linaro.org]
+> >
+> > This series doesn't seem to add anything to Documentation/ that
+> > describes the API we make available to plugins. I'm a lot more
+> > interested in reviewing the API that will be used by plugins
+> > than I am in the implementation at this stage. Can you provide
+> > a description/documentation of the API for review, please?
+>=20
+>=20
+> Here is the draft:
+>=20
+> Introduction
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> This document describes an API for creating the QEMU
+> instrumentation plugins.
+>=20
+> It is based on the following prior sources:
+>  - KVM Forum 2017 talk "Instrumenting, Introspection, and Debugging =
+with QEMU"
+>    https://www.linux-kvm.org/images/3/3d/Introspect.pdf
+>  - Discussion on Lluis Vilanova instrumentation patch series
+>    https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03357.html
+>=20
+> The aim of the instrumentation is implementing different runtime
+> tracers that can track the executed instructions, memory and
+> hardware operations.
+>=20
+> Instrumenting the code
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> Instrumentation subsystem exploits TCG helper mechanism to embed
+> callbacks into the translation blocks. These callbacks may be inserted
+> before the specific instructions, when the plugins require such =
+filtering.
+>=20
+> Translator uses two functions for embedding the callbacks:
+>  - first function checks whether the current instruction should be
+>    instrumented
+>  - second function embeds the callback for executing the =
+plugin-specific
+>    code before that instruction
+>=20
+> The similar method may be used for memory access instrumentation.
+>=20
+> QEMU->Plugin API
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> Instrumentation layer passes the requests from the translator
+> to the dynamically loaded plugins. Every plugin may provide
+> the following functions to perform the instrumentation:
+>=20
+>  1. bool plugin_init(const char *args);
+>     Initialization function. May return false if the plugin
+>     can't work in the current environment.
+>=20
+>  2. bool plugin_needs_before_insn(uint64_t pc, void *cpu);
+>     Returns true if the plugin needs to instrument the current =
+instruction.
+>     It may use the address (pc) for making the decision or the guest
+>     CPU state (cpu), which can be passed back to QEMU core API
+>     (e.g., for reading the guest memory).
+>     This function is called at both translation and execution phases.
+>=20
+>  3. void plugin_before_insn(uint64_t pc, void *cpu);
+>     If the previous function returned true for some instruction,
+>     then this function will be called. This process is repeated before
+>     every execution of the instruction, if it was instrumented.
+>=20
+> The similar pair of functions will also be added for the memory
+> operations.
+>=20
+> Plugin->QEMU API
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> QEMU core exports some functions to let the plugins introspect the =
+guest
+> or perform some interaction with other QEMU services (e.g., logging).
+> API doesn't contain any data structures, because their memory layout =
+depend
+> on the compilation settings.
+>=20
+> QEMU exports the following functions that may be called from the =
+plugins:
+>=20
+>  1. void qemulib_log(const char *fmt, ...);
+>     Wrapper for qemu_log.
+>=20
+>  2. int qemulib_read_memory(void *cpu, uint64_t addr, uint8_t *buf, =
+int len);
+>     Reads guest memory into the buffer. Wrapper for =
+cpu_memory_rw_debug.
+>=20
+>  3. int qemulib_read_register(void *cpu, uint8_t *mem_buf, int reg);
+>     Uses target gdb interface for accessing the guest registers.
+>     'reg' is the id of the desired register as it is coded by gdb.
+>=20
+> There also should be a function for flushing the translated blocks to
+> ensure that the instrumentation will occur in the case of changing
+> the internal plugin state.
+>=20
