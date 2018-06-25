@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1fXV8I-0006aA-3H
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:18:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXVAL-00084W-E1
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:20:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1fXV8G-0000PV-UN
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:18:30 -0400
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:34831)
+	(envelope-from <peter.maydell@linaro.org>) id 1fXVAK-0001rZ-Ep
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:20:37 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34317)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1fXV8G-0000Or-Ow
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:18:28 -0400
-Received: by mail-yw0-x242.google.com with SMTP id t18-v6so962708ywg.2
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 10:18:28 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fXVAK-0001qs-9B
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:20:36 -0400
+Received: by mail-oi0-x244.google.com with SMTP id c2-v6so1571801oic.1
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 10:20:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <44235a41-902c-5e6d-302c-9ca880b2f444@amsat.org>
-References: <20180623215313.1252-1-f4bug@amsat.org>
-	<2f6b05fd-afb3-cc8d-6b3d-011e2fd87c47@amsat.org>
-	<CAMo8BfJWemPTt3fTO5RwGub+1wzyBs3xfh_zY+LBVOhocZ-d3w@mail.gmail.com>
-	<20180625165931.GA16777@flamenco>
-	<44235a41-902c-5e6d-302c-9ca880b2f444@amsat.org>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 25 Jun 2018 10:18:27 -0700
-Message-ID: <CAMo8BfL75KKw8U-dJ-FqEGTWeN853J=hWUUNZRt9U93_viyCXQ@mail.gmail.com>
+In-Reply-To: <20180621015359.12018-17-richard.henderson@linaro.org>
+References: <20180621015359.12018-1-richard.henderson@linaro.org>
+	<20180621015359.12018-17-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 25 Jun 2018 18:20:15 +0100
+Message-ID: <CAFEAcA_-cZ6gqRf+dz1EXQthXo7bgKHzYxvVGh1HxmUVEaCRhg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] docker: Add debian-xtensa-cross image
+Subject: Re: [Qemu-devel] [PATCH v5 16/35] target/arm: Implement SVE
+ floating-point compare vectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Jun 25, 2018 at 10:10 AM, Philippe Mathieu-Daud=C3=A9
-<f4bug@amsat.org> wrote:
-> On 06/25/2018 01:59 PM, Emilio G. Cota wrote:
->> On Sat, Jun 23, 2018 at 20:24:09 -0700, Max Filippov wrote:
->>> # first bad commit: [0b5c91f74f3c83a36f37740969df8c775c997e69]
->>> translate-all: use per-page locking in !user-mode
->>>
->>> Emilio, could you please take a look? The following test locks up QEMU:
->>>
->>> qemu-system-xtensa -M sim -cpu dc232b -nographic -semihosting -icount
->>> 6  -kernel ./test_mmu.tst
->>>
->>> test_mmu.tst binary may be found here:
->>> http://jcmvbkbc.spb.ru/~dumb/tmp/201806232022/test_mmu.tst
->>
->> Thanks for the test case.
->>
->> I submitted a patch that fixes this for me--see this thread:
->>   https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg07236.html
->
-> Thanks, this works :)
->
-> Alex nicer test output using:
->
-> tests/tcg/xtensa/Makefile.system
->  run-%.tst: %.tst
-> -       $(SIM) $(SIMFLAGS) ./$<
-> +       $(SIM) -monitor null $(SIMFLAGS) ./$<
+On 21 June 2018 at 02:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper-sve.h    | 49 ++++++++++++++++++++++++++++++
+>  target/arm/sve_helper.c    | 62 ++++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-sve.c | 40 ++++++++++++++++++++++++
+>  target/arm/sve.decode      | 11 +++++++
+>  4 files changed, 162 insertions(+)
 
-This makefile is also usable with another simulator (xtensa ISS) which woul=
-d
-not understand this option. Could it be added to the proper SIMFLAGS instea=
-d?
 
---=20
-Thanks.
--- Max
+> +#define DO_FCMGE(TYPE, X, Y, ST)  TYPE##_compare(Y, X, ST) <= 0
+
+I was expecting the RHS of this to be TYPE##_le(Y, X, ST).
+This prompted me to notice that softfloat has as well as
+the generic 'compare' routines also specialized _le/lt/unordered
+etc functions for float64 and float32 but not float16, which is
+a bit inconsistent...
+
+> +#define DO_FCMGT(TYPE, X, Y, ST)  TYPE##_compare(Y, X, ST) < 0
+> +#define DO_FCMEQ(TYPE, X, Y, ST)  TYPE##_compare_quiet(X, Y, ST) == 0
+> +#define DO_FCMNE(TYPE, X, Y, ST)  TYPE##_compare_quiet(X, Y, ST) != 0
+> +#define DO_FCMUO(TYPE, X, Y, ST)  \
+> +    TYPE##_compare_quiet(X, Y, ST) == float_relation_unordered
+> +#define DO_FACGE(TYPE, X, Y, ST)  \
+> +    TYPE##_compare(TYPE##_abs(Y), TYPE##_abs(X), ST) <= 0
+> +#define DO_FACGT(TYPE, X, Y, ST)  \
+> +    TYPE##_compare(TYPE##_abs(Y), TYPE##_abs(X), ST) < 0
+
+Anyway,
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
