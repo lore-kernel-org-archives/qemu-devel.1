@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50606)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXThp-0006rd-H0
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:47:06 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fXTlF-0008Hr-H1
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:50:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXTho-0007ZK-MO
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:47:05 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:42234)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXTho-0007Z9-GB
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:47:04 -0400
-Received: by mail-ot0-x244.google.com with SMTP id 92-v6so15567811otw.9
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 08:47:04 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1fXTlB-0000lK-JO
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:50:37 -0400
+Date: Mon, 25 Jun 2018 17:50:29 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180625175029.69643252.cohuck@redhat.com>
+In-Reply-To: <20180625115352.6889-3-david@redhat.com>
+References: <20180625115352.6889-1-david@redhat.com>
+	<20180625115352.6889-3-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180621015359.12018-10-richard.henderson@linaro.org>
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-10-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 16:46:43 +0100
-Message-ID: <CAFEAcA-gGuY5JG+DmU3vrfiky0wsz2YBtUe2uYnFxL+ZrRiiSg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 09/35] target/arm: Implement SVE load
- and broadcast element
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/9] s390x/kvm: pass values instead of
+ pointers to kvm_s390_set_clock_*()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-On 21 June 2018 at 02:53, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On Mon, 25 Jun 2018 13:53:45 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> We are going to factor out the TOD into a separate device and use const
+> pointers for device class functions where possible. We are passing right
+> now ordinary pointers that should never be touched when setting the TOD.
+> Let's just pass the values directly.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  target/arm/helper-sve.h    |  5 +++
->  target/arm/sve_helper.c    | 41 +++++++++++++++++++++++++
->  target/arm/translate-sve.c | 62 ++++++++++++++++++++++++++++++++++++++
->  target/arm/sve.decode      |  5 +++
->  4 files changed, 113 insertions(+)
+>  target/s390x/cpu.c       |  4 ++--
+>  target/s390x/kvm-stub.c  |  4 ++--
+>  target/s390x/kvm.c       | 12 ++++++------
+>  target/s390x/kvm_s390x.h |  4 ++--
+>  4 files changed, 12 insertions(+), 12 deletions(-)
+> 
+> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> index c268065887..68512e3e54 100644
+> --- a/target/s390x/cpu.c
+> +++ b/target/s390x/cpu.c
+> @@ -413,9 +413,9 @@ int s390_set_clock(uint8_t *tod_high, uint64_t *tod_low)
 
+Any reason why you keep the pointers here?
 
-> +/* Copy Zn into Zn, and store zero into inactive elements.  */
-> +void HELPER(sve_movz_b)(void *vd, void *vn, void *vg, uint32_t desc)
+>      int r = 0;
+>  
+>      if (kvm_enabled()) {
+> -        r = kvm_s390_set_clock_ext(tod_high, tod_low);
+> +        r = kvm_s390_set_clock_ext(*tod_high, *tod_low);
+>          if (r == -ENXIO) {
+> -            return kvm_s390_set_clock(tod_high, tod_low);
+> +            return kvm_s390_set_clock(*tod_high, *tod_low);
 
-Given the prototype, presumably "into Zd" ?
+Especially as it would be more clean to check for !NULL before
+dereferencing...
 
-> +{
-> +    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
-> +    uint64_t *d = vd, *n = vn;
-> +    uint8_t *pg = vg;
-> +    for (i = 0; i < opr_sz; i += 1) {
-> +        d[i] = n[i] & expand_pred_b(pg[H1(i)]);
-> +    }
-> +}
-
-otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+>          }
+>      }
+>      /* Fixme TCG */
