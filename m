@@ -1,22 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fXYkq-0006L4-7T
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:10:33 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fXYlx-0006z9-VU
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:11:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fXYkp-0001oe-0G
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:10:32 -0400
-References: <20180620042930.24208-1-suratiamol@gmail.com>
-	<20180620042930.24208-2-suratiamol@gmail.com>
+	(envelope-from <jsnow@redhat.com>) id 1fXYlu-0002OE-RL
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:11:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43452 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1fXYlu-0002O5-Me
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:11:38 -0400
 From: John Snow <jsnow@redhat.com>
-Message-ID: <4049a376-e991-91ab-a1ea-037ee7c0a5b5@redhat.com>
-Date: Mon, 25 Jun 2018 17:10:23 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180620042930.24208-2-suratiamol@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/2] ide/hw/core: fix crash on processing a
- partial-sector-size DMA xfer
+Date: Mon, 25 Jun 2018 17:11:35 -0400
+Message-Id: <20180625211136.21295-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PULL 0/1] Ide patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +21,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amol Surati <suratiamol@gmail.com>, qemu-devel@nongnu.org
-Cc: "open list:IDE" <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, jsnow@redhat.com
 
+The following changes since commit 35e238c9330669882487f9929e0aa97900431853:
 
+  Merge remote-tracking branch 'remotes/kraxel/tags/audio-20180625-pull-request' into staging (2018-06-25 15:25:26 +0100)
 
-On 06/20/2018 12:29 AM, Amol Surati wrote:
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1777315
->=20
-> QEMU's short PRD policy applies to a DMA transfer of size < 512 bytes.
-> But it fails to consider transfers which are >=3D 512 bytes, but are
-> not a multiple of 512 bytes.
->=20
-> Such transfers are not subject to the short PRD policy. They end up
-> violating the assumptions about the granularity of the IO sizes,
-> upon which depend the verification of the completion of the previous
-> transfer, and the advancement of the offset in preparation of the next.
->=20
-> Those violations result in the crash.
->=20
-> By forcing each transfer to be a multiple of sector size, such
-> transfers are subjected to the policy, and therefore culled before they
-> cause the crash.
->=20
+are available in the Git repository at:
 
-So now even if the PRDT we get is greater than a sector is not an even
-multiple of 512, we reject it as too short.
+  https://github.com/jnsnow/qemu.git tags/ide-pull-request
 
-That doesn't seem correct to me.
+for you to fetch changes up to ae79c2db150e17757ee1be080481be675a15ccea:
 
-> Signed-off-by: Amol Surati <suratiamol@gmail.com>
-> ---
->  hw/ide/core.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index 2c62efc536..14d135224b 100644
-> --- a/hw/ide/core.c
-> +++ b/hw/ide/core.c
-> @@ -836,6 +836,7 @@ static void ide_dma_cb(void *opaque, int ret)
->  {
->      IDEState *s =3D opaque;
->      int n;
-> +    int32_t size_prepared;
->      int64_t sector_num;
->      uint64_t offset;
->      bool stay_active =3D false;
-> @@ -886,7 +887,9 @@ static void ide_dma_cb(void *opaque, int ret)
->      n =3D s->nsector;
->      s->io_buffer_index =3D 0;
->      s->io_buffer_size =3D n * 512;
-> -    if (s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size) =
-< 512) {
-> +    size_prepared =3D s->bus->dma->ops->prepare_buf(s->bus->dma,
-> +                                                  s->io_buffer_size);
-> +    if (size_prepared <=3D 0 || size_prepared % 512) {
->          /* The PRDs were too short. Reset the Active bit, but don't ra=
-ise an
->           * interrupt. */
->          s->status =3D READY_STAT | SEEK_STAT;
->=20
+  ahci: fix FIS I bit and PIO Setup FIS interrupt (2018-06-25 16:50:48 -0400)
 
---=20
-=E2=80=94js
+----------------------------------------------------------------
+Pull request
+
+----------------------------------------------------------------
+
+Paolo Bonzini (1):
+  ahci: fix FIS I bit and PIO Setup FIS interrupt
+
+ hw/ide/ahci.c          | 37 +++++++++++++++++++++++++------------
+ hw/ide/ahci_internal.h |  2 +-
+ tests/libqos/ahci.c    | 25 ++++++++++++++++---------
+ tests/libqos/ahci.h    |  2 +-
+ 4 files changed, 43 insertions(+), 23 deletions(-)
+
+-- 
+2.14.4
