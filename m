@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54014)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXQqM-0001K6-8N
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:43:44 -0400
+	id 1fXQqR-0001Ni-0h
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:43:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXQqJ-0007en-67
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:43:42 -0400
+	id 1fXQqQ-0007jH-07
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:43:47 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 25 Jun 2018 09:42:03 -0300
-Message-Id: <20180625124238.25339-12-f4bug@amsat.org>
+Date: Mon, 25 Jun 2018 09:42:05 -0300
+Message-Id: <20180625124238.25339-14-f4bug@amsat.org>
 In-Reply-To: <20180625124238.25339-1-f4bug@amsat.org>
 References: <20180625124238.25339-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 11/46] hw/xen: Use the IEC binary prefix
+Subject: [Qemu-devel] [PATCH v5 13/46] hw/block: Use the IEC binary prefix
  definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:X86" <xen-devel@lists.xenproject.org>, "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Keith Busch <keith.busch@intel.com>, "open list:Block layer core" <qemu-block@nongnu.org>
 
 It eases code review, unit is explicit.
 
@@ -39,104 +39,78 @@ Patch generated using:
 and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alan Robinson <Alan.Robinson@ts.fujitsu.com>
 ---
- hw/block/xen_disk.c        |  3 ++-
- hw/i386/xen/xen-mapcache.c |  3 ++-
- hw/xenpv/xen_domainbuild.c | 13 +++++++------
- 3 files changed, 11 insertions(+), 8 deletions(-)
+ hw/block/m25p80.c  | 5 +++--
+ hw/block/nvme.c    | 3 ++-
+ hw/block/tc58128.c | 3 ++-
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-index 9fbc0cdb87..36eff94f84 100644
---- a/hw/block/xen_disk.c
-+++ b/hw/block/xen_disk.c
-@@ -20,6 +20,7 @@
+diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
+index b0ed8fa418..e8dfa14b33 100644
+--- a/hw/block/m25p80.c
++++ b/hw/block/m25p80.c
+@@ -22,6 +22,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
- #include <sys/ioctl.h>
- #include <sys/uio.h>
- 
-@@ -814,7 +815,7 @@ static int blk_connect(struct XenDevice *xendev)
-     xen_pv_printf(xendev, 1, "type \"%s\", fileproto \"%s\", filename \"%s\","
-                   " size %" PRId64 " (%" PRId64 " MB)\n",
-                   blkdev->type, blkdev->fileproto, blkdev->filename,
--                  blkdev->file_size, blkdev->file_size >> 20);
-+                  blkdev->file_size, blkdev->file_size / MiB);
- 
-     /* Fill in number of sector size and number of sectors */
-     xenstore_write_be_int(xendev, "sector-size", blkdev->file_blk);
-diff --git a/hw/i386/xen/xen-mapcache.c b/hw/i386/xen/xen-mapcache.c
-index 628b813a11..4e4f069a24 100644
---- a/hw/i386/xen/xen-mapcache.c
-+++ b/hw/i386/xen/xen-mapcache.c
-@@ -9,6 +9,7 @@
+ #include "hw/hw.h"
+ #include "sysemu/block-backend.h"
+ #include "hw/ssi/ssi.h"
+@@ -541,12 +542,12 @@ static void flash_erase(Flash *s, int offset, FlashCMD cmd)
+     switch (cmd) {
+     case ERASE_4K:
+     case ERASE4_4K:
+-        len = 4 << 10;
++        len = 4 * KiB;
+         capa_to_assert = ER_4K;
+         break;
+     case ERASE_32K:
+     case ERASE4_32K:
+-        len = 32 << 10;
++        len = 32 * KiB;
+         capa_to_assert = ER_32K;
+         break;
+     case ERASE_SECTOR:
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index d5bf95b79b..65c84e7de3 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -25,6 +25,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
- #include "qemu/error-report.h"
+ #include "hw/block/block.h"
+ #include "hw/hw.h"
+ #include "hw/pci/msix.h"
+@@ -648,7 +649,7 @@ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeIdentify *c)
  
- #include <sys/resource.h>
-@@ -46,7 +47,7 @@
-  * From empirical tests I observed that qemu use 75MB more than the
-  * max_mcache_size.
-  */
--#define NON_MCACHE_MEMORY_SIZE (80 * 1024 * 1024)
-+#define NON_MCACHE_MEMORY_SIZE (80 * MiB)
- 
- typedef struct MapCacheEntry {
-     hwaddr paddr_index;
-diff --git a/hw/xenpv/xen_domainbuild.c b/hw/xenpv/xen_domainbuild.c
-index 027f76fad1..188acaca16 100644
---- a/hw/xenpv/xen_domainbuild.c
-+++ b/hw/xenpv/xen_domainbuild.c
+ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeIdentify *c)
+ {
+-    static const int data_len = 4096;
++    static const int data_len = 4 * KiB;
+     uint32_t min_nsid = le32_to_cpu(c->nsid);
+     uint64_t prp1 = le64_to_cpu(c->prp1);
+     uint64_t prp2 = le64_to_cpu(c->prp2);
+diff --git a/hw/block/tc58128.c b/hw/block/tc58128.c
+index 1d9f7ee000..808ad76ba6 100644
+--- a/hw/block/tc58128.c
++++ b/hw/block/tc58128.c
 @@ -1,4 +1,5 @@
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
- #include "hw/xen/xen_backend.h"
- #include "xen_domainbuild.h"
- #include "qemu/timer.h"
-@@ -75,9 +76,9 @@ int xenstore_domain_init1(const char *kernel, const char *ramdisk,
-     xenstore_write_str(dom, "vm",     vm);
+ #include "hw/hw.h"
+ #include "hw/sh4/sh.h"
+ #include "hw/loader.h"
+@@ -26,7 +27,7 @@ typedef struct {
  
-     /* memory */
--    xenstore_write_int(dom, "memory/target", ram_size >> 10);  // kB
--    xenstore_write_int(vm, "memory",         ram_size >> 20);  // MB
--    xenstore_write_int(vm, "maxmem",         ram_size >> 20);  // MB
-+    xenstore_write_int(dom, "memory/target", ram_size / KiB);
-+    xenstore_write_int(vm, "memory",         ram_size / MiB);
-+    xenstore_write_int(vm, "maxmem",         ram_size / MiB);
+ static tc58128_dev tc58128_devs[2];
  
-     /* cpus */
-     for (i = 0; i < smp_cpus; i++) {
-@@ -113,7 +114,7 @@ int xenstore_domain_init2(int xenstore_port, int xenstore_mfn,
+-#define FLASH_SIZE (16*1024*1024)
++#define FLASH_SIZE (16 * MiB)
  
-     /* console */
-     xenstore_write_str(dom, "console/type",     "ioemu");
--    xenstore_write_int(dom, "console/limit",    128 * 1024);
-+    xenstore_write_int(dom, "console/limit",    128 * KiB);
-     xenstore_write_int(dom, "console/ring-ref", console_mfn);
-     xenstore_write_int(dom, "console/port",     console_port);
-     xen_config_dev_console(0);
-@@ -260,7 +261,7 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
-     }
- #endif
- 
--    rc = xc_domain_setmaxmem(xen_xc, xen_domid, ram_size >> 10);
-+    rc = xc_domain_setmaxmem(xen_xc, xen_domid, ram_size / KiB);
-     if (rc < 0) {
-         fprintf(stderr, "xen: xc_domain_setmaxmem() failed\n");
-         goto err;
-@@ -269,7 +270,7 @@ int xen_domain_build_pv(const char *kernel, const char *ramdisk,
-     xenstore_port = xc_evtchn_alloc_unbound(xen_xc, xen_domid, 0);
-     console_port = xc_evtchn_alloc_unbound(xen_xc, xen_domid, 0);
- 
--    rc = xc_linux_build(xen_xc, xen_domid, ram_size >> 20,
-+    rc = xc_linux_build(xen_xc, xen_domid, ram_size / MiB,
-                         kernel, ramdisk, cmdline,
-                         0, flags,
-                         xenstore_port, &xenstore_mfn,
+ static void init_dev(tc58128_dev * dev, const char *filename)
+ {
 -- 
 2.18.0
