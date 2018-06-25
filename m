@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1fXJXc-0003RS-50
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 00:55:53 -0400
+	(envelope-from <robert.hu@linux.intel.com>) id 1fXIMJ-0001mH-Hd
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 23:40:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@web.de>) id 1fXJXb-0000lF-Db
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 00:55:52 -0400
-References: <20180619093124.24011-1-luc.michel@greensocs.com>
-From: Jan Kiszka <jan.kiszka@web.de>
-Message-ID: <d3c05355-4eda-f501-8f04-d808f416393a@web.de>
-Date: Mon, 25 Jun 2018 06:55:34 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180619093124.24011-1-luc.michel@greensocs.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] arm_gic: add virtualization
- extensions support
+	(envelope-from <robert.hu@linux.intel.com>) id 1fXIMF-0007sl-KR
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 23:40:07 -0400
+Received: from mga17.intel.com ([192.55.52.151]:25151)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <robert.hu@linux.intel.com>)
+	id 1fXIMF-0007qo-5u
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 23:40:03 -0400
+From: Robert Hoo <robert.hu@linux.intel.com>
+Date: Mon, 25 Jun 2018 11:39:18 +0800
+Message-Id: <1529897961-134132-3-git-send-email-robert.hu@linux.intel.com>
+In-Reply-To: <1529897961-134132-1-git-send-email-robert.hu@linux.intel.com>
+References: <1529897961-134132-1-git-send-email-robert.hu@linux.intel.com>
+Subject: [Qemu-devel] [PATCH 2/5] i386: Add CPUID bit and feature words for
+ IA32_ARCH_CAPABILITIES MSR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,24 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: luc.michel@greensocs.com, qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com
+To: qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
+Cc: robert.hu@intel.com, Robert Hoo <robert.hu@linux.intel.com>
 
-On 2018-06-19 11:31, luc.michel@greensocs.com wrote:
-> From: Luc MICHEL <luc.michel@greensocs.com>
-> 
-> This patch series add support for the virtualization extensions in the
-> ARM GICv2 interrupt controller.
-> 
-> The first two commits do some refactoring to prepare for the
-> implementation. Commits 3 and 4 are the actual implementation. The last
-> commit updates the ZynqMP implementation to support virtualization.
+Support of IA32_PRED_CMD MSR already be enumerated by same CPUID bit as
+SPEC_CTRL.
 
-Is it enabled for the virt machine as well? Seems we are missing some
-mapping of GICV and GICH there.
+Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+---
+ target/i386/cpu.c | 2 +-
+ target/i386/cpu.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-And what is the recommended way to get the ZynqMP model running? I've a
-kernel that works on a ZCU102, but just passing it via -kernel to the
-QEMU model seems insufficient.
-
-Jan
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 1e69e68..3134af4 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -896,7 +896,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, "spec-ctrl", NULL,
+-            NULL, NULL, NULL, "ssbd",
++            NULL, "arch-capabilities", NULL, "ssbd",
+         },
+         .cpuid_eax = 7,
+         .cpuid_needs_ecx = true, .cpuid_ecx = 0,
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 734a73e..1ef2040 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -688,6 +688,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network Instructions */
+ #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumulation Single Precision */
+ #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
++#define CPUID_7_0_EDX_ARCH_CAPABILITIES (1U << 29)  /*Arch Capabilities of RDCL_NO and IBRS_ALL*/
+ #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
+ 
+ #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
+-- 
+1.8.3.1
