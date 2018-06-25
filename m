@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fXLzU-0001Uk-2F
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:32:49 -0400
+	(envelope-from <thuth@redhat.com>) id 1fXMBR-0003B6-ME
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:45:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fXLzQ-0005nR-VS
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:32:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45682 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fXLzQ-0005lj-Ov
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:32:44 -0400
-References: <20180623085028.29553-1-mark.cave-ayland@ilande.co.uk>
-	<20180623085028.29553-2-mark.cave-ayland@ilande.co.uk>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <7ac656b2-374a-8591-08a6-8303aae1eba1@redhat.com>
-Date: Mon, 25 Jun 2018 09:32:41 +0200
+	(envelope-from <thuth@redhat.com>) id 1fXMBQ-0001mI-Fm
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:45:09 -0400
+References: <20180615142108.27814-1-kwolf@redhat.com>
+	<20180615142108.27814-26-kwolf@redhat.com>
+	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
+	<20180622125502.GF4366@localhost.localdomain>
+	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
+	<20180622142513.GH4366@localhost.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <badca223-5398-58ac-af48-04c34dc98729@redhat.com>
+Date: Mon, 25 Jun 2018 09:44:52 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180623085028.29553-2-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180622142513.GH4366@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] sysbus: always allow
- explicit_ofw_unit_address() to override address generation
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 25/26] block: Remove deprecated -drive
+ option serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +29,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, marcel@redhat.com, armbru@redhat.com, mst@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, pkrempa@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>
 
-Hi Mark,
+On 22.06.2018 16:25, Kevin Wolf wrote:
+> Am 22.06.2018 um 15:36 hat Christian Borntraeger geschrieben:
+>>
+>>
+>> On 06/22/2018 02:55 PM, Kevin Wolf wrote:
+>>> Am 22.06.2018 um 13:38 hat Christian Borntraeger geschrieben:
+>>>>
+>>>> On 06/15/2018 04:21 PM, Kevin Wolf wrote:
+>>>>> The -drive option serial was deprecated in QEMU 2.10. It's time to
+>>>>> remove it.
+>>>>>
+>>>>> Tests need to be updated to set the serial number with -global inst=
+ead
+>>>>> of using the -drive option.
+>>>>
+>>>> libvirt 4.5 still creates those (at least on s390x)
+>>>>
+>>>>     <disk type=3D'file' device=3D'disk'>
+>>>>       <driver name=3D'qemu' type=3D'qcow2' cache=3D'none' io=3D'nati=
+ve' iothread=3D'1'/>
+>>>>       <source file=3D'/var/lib/libvirt/qemu/image.zhyp137'/>
+>>>>       <target dev=3D'hda' bus=3D'virtio'/>
+>>>>       <serial>skel</serial>
+>>>>       <boot order=3D'1'/>
+>>>>       <address type=3D'ccw' cssid=3D'0xfe' ssid=3D'0x0' devno=3D'0x0=
+000'/>
+>>>>     </disk>
+>>>>
+>>>>
+>>>> ->=20
+>>>> [...]
+>>>> -drive file=3D/var/lib/libvirt/qemu/image.zhyp137,format=3Dqcow2,if=3D=
+none,id=3Ddrive-virtio-disk0,serial=3Dskel,cache=3Dnone,aio=3Dnative -dev=
+ice virtio-blk-ccw,iothread=3Diothread1,scsi=3Doff,devno=3Dfe.0.0000,driv=
+e=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3Don=20
+>>>> [...]
+>>>>
+>>>> 2018-06-22T11:25:20.946024Z qemu-system-s390x: -drive file=3D/var/li=
+b/libvirt/qemu/image.zhyp137,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-d=
+isk0,serial=3Dskel,cache=3Dnone,aio=3Dnative: Block format 'qcow2' does n=
+ot support the option 'serial'
+>>>> 2018-06-22 11:25:21.098+0000: shutting down, reason=3Dfailed
+>>>>
+>>>> So it seems that this breaks s390x.
+>>
+>> To me it seems that this is also broken on x86.
+>>>
+>>> Thanks for bringing this up. libvirt should fix this before QEMU 3.0 =
+is
+>>> released.
+>>
+>> I think this is definitely too short notice. We should not break exist=
+ing
+>> setups just by insisting that users have to update libvirt when they u=
+pdate
+>> QEMU. Yes, this might be our policy, but doing so "just because we can=
+"
+>> is certainly a very bad attitude. I see no fundamental technical reaso=
+n why
+>> we should not revert this change.
+>=20
+> This was in fact one release longer than our deprecation policy says.
 
-On 06/23/18 10:50, Mark Cave-Ayland wrote:
-> Some SysBusDevices either use sysbus_init_mmio() without sysbus_mmio_map() or
-> the first MMIO memory region doesn't represent the bus address, causing an invalid
-> firmware device path to be generated.
-> 
-> SysBusDeviceClass does provide a virtual explicit_ofw_unit_address() method that
-> can be used to override this process, but it is only considered as a fallback
-> option meaning that any existing MMIO memory regions still take priority whilst
-> determining the firmware device address.
-> 
-> As any class defining explicit_ofw_unit_address() has explicitly requested a
-> specialised behaviour then it should be used in preference to the default
-> implementation rather than being used as a fallback.
+Actually, if we assume that the chapter in qemu-doc.texi is the
+"official" way to deprecate things, these options are only officially
+deprecated since QEMU v2.12, since we missed to add them to the
+deprecation chapter earlier:
 
-I disagree about the last paragraph, when put like this. I don't
-disagree with the *goal* of the patch, however the original
-justification for explicit_ofw_unit_address() was different.
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3Dc08d46a9
 
-It was meant as a fallback for distinguishing sysbus devices when those
-sysbus devices had neither MMIO nor PIO resources. The issue wasn't that
-MMIO/PIO-based identification was not "right", the issue was that unique
-identification was impossible in the absence of such resources. Please
-see commit 0b336b3b98d8 ("hw/core: explicit OFW unit address callback
-for SysBusDeviceClass", 2015-06-23).
+(We've mentioned them in
+https://wiki.qemu.org/ChangeLog/2.10#Deprecated_options already, though)
 
-I don't have anything against repurposing explicit_ofw_unit_address()
-like this -- as long as you check that it doesn't change behavior for
-existing devices -- it's just that we shouldn't justify the new purpose
-with the original intent. The original intent was different.
-
-I suggest stating, "we can have explicit_ofw_unit_address() take
-priority in a backwards-compatible manner, because no sysbus device
-currently has both explicit_ofw_unit_address() and MMIO/PIO resources".
-
-(Obviously checking the validity of this statement is up to you; I'm
-just suggesting what I'd see as one more precise explanation.)
-
-Thanks,
-Laszlo
-
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->  hw/core/sysbus.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-> index ecfb0cfc0e..1ee0c162f4 100644
-> --- a/hw/core/sysbus.c
-> +++ b/hw/core/sysbus.c
-> @@ -293,16 +293,8 @@ static char *sysbus_get_fw_dev_path(DeviceState *dev)
->  {
->      SysBusDevice *s = SYS_BUS_DEVICE(dev);
->      SysBusDeviceClass *sbc = SYS_BUS_DEVICE_GET_CLASS(s);
-> -    /* for the explicit unit address fallback case: */
->      char *addr, *fw_dev_path;
->  
-> -    if (s->num_mmio) {
-> -        return g_strdup_printf("%s@" TARGET_FMT_plx, qdev_fw_name(dev),
-> -                               s->mmio[0].addr);
-> -    }
-> -    if (s->num_pio) {
-> -        return g_strdup_printf("%s@i%04x", qdev_fw_name(dev), s->pio[0]);
-> -    }
->      if (sbc->explicit_ofw_unit_address) {
->          addr = sbc->explicit_ofw_unit_address(s);
->          if (addr) {
-> @@ -311,6 +303,13 @@ static char *sysbus_get_fw_dev_path(DeviceState *dev)
->              return fw_dev_path;
->          }
->      }
-> +    if (s->num_mmio) {
-> +        return g_strdup_printf("%s@" TARGET_FMT_plx, qdev_fw_name(dev),
-> +                               s->mmio[0].addr);
-> +    }
-> +    if (s->num_pio) {
-> +        return g_strdup_printf("%s@i%04x", qdev_fw_name(dev), s->pio[0]);
-> +    }
->      return g_strdup(qdev_fw_name(dev));
->  }
->  
-> 
+ Thomas
