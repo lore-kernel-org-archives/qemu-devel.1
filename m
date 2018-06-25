@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fXHD2-0001CE-5t
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 22:26:29 -0400
+	(envelope-from <root@localhost.localdomain>) id 1fXHhS-00004t-Qt
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 22:57:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fXHCz-0002CY-1p
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 22:26:28 -0400
-Resent-Message-Id: <E1fXHCz-0002CY-1p@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21080)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fXHCy-0002CJ-QE
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 22:26:24 -0400
-In-Reply-To: <20180623172538.1590-1-yaoxu@didichuxing.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152979354762.951.4144013033931339408@d39dc562802a>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sat, 23 Jun 2018 15:39:08 -0700 (PDT)
-Subject: Re: [Qemu-devel] block/dirty-bitmap: Useless bitmap in image should
- be removed
+	(envelope-from <root@localhost.localdomain>) id 1fXHhS-0007FT-2y
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 22:57:54 -0400
+From: 13466399134@163.com
+Date: Mon, 25 Jun 2018 10:35:47 +0800
+Message-Id: <20180625023547.2817-1-13466399134@163.com>
+Subject: [Qemu-devel] block/dirty-bitmap: Useless bitmaps in image can be
+ removed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +18,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: yaoxu@didichuxing.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, Yao Xu <13466399134@163.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjIzMTcyNTM4LjE1OTAtMS15YW94dUBkaWRpY2h1eGluZy5jb20KU3Vi
-amVjdDogW1FlbXUtZGV2ZWxdIGJsb2NrL2RpcnR5LWJpdG1hcDogVXNlbGVzcyBiaXRtYXAgaW4g
-aW1hZ2Ugc2hvdWxkIGJlIHJlbW92ZWQKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1y
-ZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5n
-IFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAg
-aWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkK
-ICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09
-CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20g
-aHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAgIDdlZDE0Y2JmM2MuLmYy
-OGQwZGZkY2UgIG1hc3RlciAgICAgLT4gbWFzdGVyCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAg
-IHBhdGNoZXcvMTUyOTc2NDU2OS0xMjg0OC0xLWdpdC1zZW5kLWVtYWlsLWxpbnV4QHJvZWNrLXVz
-Lm5ldCAtPiBwYXRjaGV3LzE1Mjk3NjQ1NjktMTI4NDgtMS1naXQtc2VuZC1lbWFpbC1saW51eEBy
-b2Vjay11cy5uZXQKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDYyMzA4
-NTAyOC4yOTU1My0xLW1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrIC0+IHBhdGNoZXcvMjAx
-ODA2MjMwODUwMjguMjk1NTMtMS1tYXJrLmNhdmUtYXlsYW5kQGlsYW5kZS5jby51awogKiBbbmV3
-IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNjIzMTcyNTM4LjE1OTAtMS15YW94dUBk
-aWRpY2h1eGluZy5jb20gLT4gcGF0Y2hldy8yMDE4MDYyMzE3MjUzOC4xNTkwLTEteWFveHVAZGlk
-aWNodXhpbmcuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYTRhMjU4N2Y4NiBi
-bG9jay9kaXJ0eS1iaXRtYXA6IFVzZWxlc3MgYml0bWFwIGluIGltYWdlIHNob3VsZCBiZSByZW1v
-dmVkCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6IGJsb2NrL2RpcnR5
-LWJpdG1hcDogVXNlbGVzcyBiaXRtYXAgaW4gaW1hZ2Ugc2hvdWxkIGJlIHJlbW92ZWQuLi4KRVJS
-T1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBicmFjZSAneycKIzQyOiBGSUxFOiBi
-bG9ja2Rldi5jOjI4NDQ6CisgICAgaWYgKGJpdG1hcCl7CgpFUlJPUjogc3BhY2UgcmVxdWlyZWQg
-YmVmb3JlIHRoZSBvcGVuIGJyYWNlICd7JwojNjM6IEZJTEU6IGJsb2NrZGV2LmM6Mjg2NDoKKyAg
-ICBpZiAoYml0bWFwKXsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgNTMgbGluZXMgY2hl
-Y2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBh
-bnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBF
-TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxl
-YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+If qemu-kvm quit without saving bitmaps to image(coredump, host kernel panic,
+or host pooweroff), bitmaps in image can not be safely used anymore, and also
+can not be removed. Useless bitmaps should be removed.
+
+Signed-off-by: Yao Xu <13466399134@163.com>
+---
+diff --git a/blockdev.c b/blockdev.c
+index 58d7570932..c85056a74b 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -2837,31 +2837,35 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
+     Error *local_err = NULL;
+ 
+     bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
+-    if (!bitmap || !bs) {
++    if (!bs) {
+         return;
+     }
+ 
+-    if (bdrv_dirty_bitmap_frozen(bitmap)) {
+-        error_setg(errp,
+-                   "Bitmap '%s' is currently frozen and cannot be removed",
+-                   name);
+-        return;
+-    } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
+-        error_setg(errp,
+-                   "Bitmap '%s' is currently locked and cannot be removed",
+-                   name);
++    if (bitmap) {
++        if (bdrv_dirty_bitmap_frozen(bitmap)) {
++            error_setg(errp,
++                       "Bitmap '%s' is currently frozen and cannot be removed",
++                       name);
++            return;
++        } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
++            error_setg(errp,
++                       "Bitmap '%s' is currently locked and cannot be removed",
++                       name);
++            return;
++        }
++    }
++
++    bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
++    if (local_err != NULL) {
++        error_propagate(errp, local_err);
+         return;
+     }
+ 
+-    if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
+-        bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
+-        if (local_err != NULL) {
+-            error_propagate(errp, local_err);
+-            return;
+-        }
++    if (bitmap) {
++        bdrv_release_dirty_bitmap(bs, bitmap);
+     }
+ 
+-    bdrv_release_dirty_bitmap(bs, bitmap);
++    if (*errp) {
++        error_free(*errp);
++        *errp = NULL;
++    }
+ }
+ 
+ /**
