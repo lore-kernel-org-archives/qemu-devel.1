@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXNSy-0004fq-U0
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:07:21 -0400
+	(envelope-from <clg@kaod.org>) id 1fXNct-0006cJ-2c
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:17:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXNSx-0003fi-Tk
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:07:20 -0400
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:35244)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXNSx-0003fZ-PC
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:07:19 -0400
-Received: by mail-oi0-x233.google.com with SMTP id e8-v6so11783934oii.2
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 02:07:19 -0700 (PDT)
+	(envelope-from <clg@kaod.org>) id 1fXNco-0001PB-3W
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:17:35 -0400
+Received: from 9.mo178.mail-out.ovh.net ([46.105.75.45]:47532)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fXNcn-0001KW-TN
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:17:30 -0400
+Received: from player789.ha.ovh.net (unknown [10.109.120.95])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 53B431C550
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 11:17:28 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Mon, 25 Jun 2018 11:17:13 +0200
+Message-Id: <20180625091718.18544-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <007e01d40c47$cc465640$64d302c0$@ru>
-References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-	<CAFEAcA-3UPDD3muShM=yYgiwQcN-U+f_TyEiu-Z=EWb7_hFaCw@mail.gmail.com>
-	<001d01d3fcc4$3dfd33f0$b9f79bd0$@ru>
-	<007e01d40c47$cc465640$64d302c0$@ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 10:06:58 +0100
-Message-ID: <CAFEAcA-x+Op0LzPS9phiFudqKW-5af9ztj4kKAvvXb8w+vF6bA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
- prototype
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2 0/5] rework the ICS classes inheritance tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,14 +27,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
-Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>, maria.klimushenkova@ispras.ru, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On 25 June 2018 at 06:46, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
-> Peter, what about this one?
+Hello,
 
-Yeah, sorry about this. It's on my queue of things to look at,
-but more immediate work and review has taken precedence :-(
+It makes the class hierarchy much cleaner and removes duplicated
+code. As we are touching the location of the objects states, migration
+compatibility was checked and the following tests were performed under
+KVM :
 
-thanks
--- PMM
+  qemu-3.0 (pseries-3.0)   -> qemu-3.0  (pseries-3.0)   OK
+  qemu-3.0 (pseries-2.12)  -> qemu-2.12 (pseries-2.12)  OK
+  qemu-3.0 (pseries-2.11)  -> qemu-2.11 (pseries-2.11)  OK
+  qemu-3.0 (pseries-2.10)  -> qemu-2.10 (pseries-2.10)  OK
+  qemu-3.0 (pseries-2.9)   -> qemu-2.9  (pseries-2.9)   OK
+  qemu-3.0 (pseries-2.8)   -> qemu-2.8  (pseries-2.8)   OK
+  qemu-3.0 (pseries-2.7)   -> qemu-2.7  (pseries-2.7)   FAIL
+
+and back :
+
+  qemu-3.0 (pseries-3.0)  <-  qemu-3.0  (pseries-3.0)   OK
+  qemu-3.0 (pseries-2.12) <-  qemu-2.12 (pseries-2.12)  OK
+  qemu-3.0 (pseries-2.11) <-  qemu-2.11 (pseries-2.11)  OK
+  qemu-3.0 (pseries-2.10) <-  qemu-2.10 (pseries-2.10)  OK
+  qemu-3.0 (pseries-2.9)  <-  qemu-2.9  (pseries-2.9)   OK
+  qemu-3.0 (pseries-2.8)  <-  qemu-2.8  (pseries-2.8)   OK
+  qemu-3.0 (pseries-2.7)  <-  qemu-2.7  (pseries-2.7)   OK
+
+under TCG, same scenarios were run but up to 2.10 only, in which case
+the migration fails for other reasons.
+
+I wouldn't mind some extra cross checking from someone else.
+
+Thanks,
+
+C.
+
+Changes since v2:
+
+ - split the patch in smaller units. The migration tests were not
+   rerun because the code is very much the same. make check was run on
+   each patch.
+
+
+C=C3=A9dric Le Goater (5):
+  ppc/xics: introduce a parent_realize in ICSStateClass
+  ppc/xics: move the instance_init handler under the ics-base class
+  ppx/xics: introduce a parent_reset in ICSStateClass
+  ppc/xics: move the vmstate structures under the ics-base class
+  ppc/xics: rework the ICS classes inheritance tree
+
+ include/hw/ppc/xics.h |   4 +-
+ hw/intc/xics.c        | 164 ++++++++++++++++++++++++++++----------------=
+------
+ hw/intc/xics_kvm.c    |  46 +++++++-------
+ hw/ppc/spapr.c        |   2 +-
+ 4 files changed, 121 insertions(+), 95 deletions(-)
+
+--=20
+2.13.6
