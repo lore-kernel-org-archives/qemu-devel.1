@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54393)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fXTy2-00081q-Pw
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:03:54 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fXU1A-0001y8-Fe
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fXTxz-0007MX-Ku
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:03:50 -0400
-Date: Mon, 25 Jun 2018 18:03:41 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180625180341.5a5b9fb7.cohuck@redhat.com>
-In-Reply-To: <1dd2ef76-311a-64f0-4c2c-2f80738ff8a7@redhat.com>
-References: <20180625115352.6889-1-david@redhat.com>
-	<20180625115352.6889-3-david@redhat.com>
-	<20180625175029.69643252.cohuck@redhat.com>
-	<1dd2ef76-311a-64f0-4c2c-2f80738ff8a7@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/9] s390x/kvm: pass values instead of
- pointers to kvm_s390_set_clock_*()
+	(envelope-from <pbonzini@redhat.com>) id 1fXU17-0000Jx-A2
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:07:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36654 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fXU17-0000Je-4c
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:07:01 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 25 Jun 2018 18:06:58 +0200
+Message-Id: <20180625160658.7315-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] osdep: work around Coverity parsing errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,54 +21,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
 
-On Mon, 25 Jun 2018 17:54:42 +0200
-David Hildenbrand <david@redhat.com> wrote:
+Coverity does not like the new _Float* types that are used by
+recent glibc, and croaks on every single file that includes
+stdlib.h.  Add dummy typedefs to please it.
 
-> On 25.06.2018 17:50, Cornelia Huck wrote:
-> > On Mon, 25 Jun 2018 13:53:45 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> We are going to factor out the TOD into a separate device and use const
-> >> pointers for device class functions where possible. We are passing right
-> >> now ordinary pointers that should never be touched when setting the TOD.
-> >> Let's just pass the values directly.
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  target/s390x/cpu.c       |  4 ++--
-> >>  target/s390x/kvm-stub.c  |  4 ++--
-> >>  target/s390x/kvm.c       | 12 ++++++------
-> >>  target/s390x/kvm_s390x.h |  4 ++--
-> >>  4 files changed, 12 insertions(+), 12 deletions(-)
-> >>
-> >> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> >> index c268065887..68512e3e54 100644
-> >> --- a/target/s390x/cpu.c
-> >> +++ b/target/s390x/cpu.c
-> >> @@ -413,9 +413,9 @@ int s390_set_clock(uint8_t *tod_high, uint64_t *tod_low)  
-> > 
-> > Any reason why you keep the pointers here?
-> >   
-> >>      int r = 0;
-> >>  
-> >>      if (kvm_enabled()) {
-> >> -        r = kvm_s390_set_clock_ext(tod_high, tod_low);
-> >> +        r = kvm_s390_set_clock_ext(*tod_high, *tod_low);
-> >>          if (r == -ENXIO) {
-> >> -            return kvm_s390_set_clock(tod_high, tod_low);
-> >> +            return kvm_s390_set_clock(*tod_high, *tod_low);  
-> > 
-> > Especially as it would be more clean to check for !NULL before
-> > dereferencing...  
-> 
-> See the next patch :)
-> 
-> (I assume that refactoring code in order to rip it out does not make sense)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+	I've been using this patch for a couple months, and Peter pointed
+	out that other projects are doing similar hacks.  So it's probably
+	time to send it upstream.
 
-Add a comment in the commit message?
+	Note that this is a parse error, so it cannot be fixed in the
+	model file.
 
-"Note that s390_set_clock() will be removed in a follow-on patch and
-therefore its calling convention is not changed."
+ include/qemu/osdep.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+index 9ed62423c0..0084f3fa71 100644
+--- a/include/qemu/osdep.h
++++ b/include/qemu/osdep.h
+@@ -33,6 +33,14 @@
+ #else
+ #include "exec/poison.h"
+ #endif
++#ifdef __COVERITY__
++typedef float _Float32;
++typedef double _Float32x;
++typedef double _Float64;
++typedef __float80 _Float64x;
++typedef __float128 _Float128;
++#endif
++
+ #include "qemu/compiler.h"
+ 
+ /* Older versions of C++ don't get definitions of various macros from
+-- 
+2.17.1
