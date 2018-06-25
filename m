@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50172)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52154)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXVAL-00084W-E1
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:20:41 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fXVGH-0003nV-KW
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:26:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXVAK-0001rZ-Ep
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:20:37 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34317)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fXVGD-0005Ar-Dw
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:26:45 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33485)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXVAK-0001qs-9B
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:20:36 -0400
-Received: by mail-oi0-x244.google.com with SMTP id c2-v6so1571801oic.1
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 10:20:36 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fXVGD-0005AW-8f
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:26:41 -0400
+Received: by mail-qt0-x241.google.com with SMTP id l10-v6so12676441qtj.0
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 10:26:41 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180623215313.1252-1-f4bug@amsat.org>
+	<2f6b05fd-afb3-cc8d-6b3d-011e2fd87c47@amsat.org>
+	<CAMo8BfJWemPTt3fTO5RwGub+1wzyBs3xfh_zY+LBVOhocZ-d3w@mail.gmail.com>
+	<20180625165931.GA16777@flamenco>
+	<44235a41-902c-5e6d-302c-9ca880b2f444@amsat.org>
+	<CAMo8BfL75KKw8U-dJ-FqEGTWeN853J=hWUUNZRt9U93_viyCXQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a26cea44-ea0e-252b-0f22-f6cfa5c5a4b6@amsat.org>
+Date: Mon, 25 Jun 2018 14:26:36 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180621015359.12018-17-richard.henderson@linaro.org>
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-17-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 18:20:15 +0100
-Message-ID: <CAFEAcA_-cZ6gqRf+dz1EXQthXo7bgKHzYxvVGh1HxmUVEaCRhg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 16/35] target/arm: Implement SVE
- floating-point compare vectors
+In-Reply-To: <CAMo8BfL75KKw8U-dJ-FqEGTWeN853J=hWUUNZRt9U93_viyCXQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [RFC PATCH] docker: Add debian-xtensa-cross image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +39,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-On 21 June 2018 at 02:53, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper-sve.h    | 49 ++++++++++++++++++++++++++++++
->  target/arm/sve_helper.c    | 62 ++++++++++++++++++++++++++++++++++++++
->  target/arm/translate-sve.c | 40 ++++++++++++++++++++++++
->  target/arm/sve.decode      | 11 +++++++
->  4 files changed, 162 insertions(+)
+On 06/25/2018 02:18 PM, Max Filippov wrote:
+> On Mon, Jun 25, 2018 at 10:10 AM, Philippe Mathieu-Daudé
+> <f4bug@amsat.org> wrote:
+>> On 06/25/2018 01:59 PM, Emilio G. Cota wrote:
+>>> On Sat, Jun 23, 2018 at 20:24:09 -0700, Max Filippov wrote:
+>>>> # first bad commit: [0b5c91f74f3c83a36f37740969df8c775c997e69]
+>>>> translate-all: use per-page locking in !user-mode
+>>>>
+>>>> Emilio, could you please take a look? The following test locks up QEMU:
+>>>>
+>>>> qemu-system-xtensa -M sim -cpu dc232b -nographic -semihosting -icount
+>>>> 6  -kernel ./test_mmu.tst
+>>>>
+>>>> test_mmu.tst binary may be found here:
+>>>> http://jcmvbkbc.spb.ru/~dumb/tmp/201806232022/test_mmu.tst
+>>>
+>>> Thanks for the test case.
+>>>
+>>> I submitted a patch that fixes this for me--see this thread:
+>>>   https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg07236.html
+>>
+>> Thanks, this works :)
+>>
+>> Alex nicer test output using:
+>>
+>> tests/tcg/xtensa/Makefile.system
+>>  run-%.tst: %.tst
+>> -       $(SIM) $(SIMFLAGS) ./$<
+>> +       $(SIM) -monitor null $(SIMFLAGS) ./$<
+> 
+> This makefile is also usable with another simulator (xtensa ISS) which would
+> not understand this option. Could it be added to the proper SIMFLAGS instead?
 
-
-> +#define DO_FCMGE(TYPE, X, Y, ST)  TYPE##_compare(Y, X, ST) <= 0
-
-I was expecting the RHS of this to be TYPE##_le(Y, X, ST).
-This prompted me to notice that softfloat has as well as
-the generic 'compare' routines also specialized _le/lt/unordered
-etc functions for float64 and float32 but not float16, which is
-a bit inconsistent...
-
-> +#define DO_FCMGT(TYPE, X, Y, ST)  TYPE##_compare(Y, X, ST) < 0
-> +#define DO_FCMEQ(TYPE, X, Y, ST)  TYPE##_compare_quiet(X, Y, ST) == 0
-> +#define DO_FCMNE(TYPE, X, Y, ST)  TYPE##_compare_quiet(X, Y, ST) != 0
-> +#define DO_FCMUO(TYPE, X, Y, ST)  \
-> +    TYPE##_compare_quiet(X, Y, ST) == float_relation_unordered
-> +#define DO_FACGE(TYPE, X, Y, ST)  \
-> +    TYPE##_compare(TYPE##_abs(Y), TYPE##_abs(X), ST) <= 0
-> +#define DO_FACGT(TYPE, X, Y, ST)  \
-> +    TYPE##_compare(TYPE##_abs(Y), TYPE##_abs(X), ST) < 0
-
-Anyway,
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+OK, good to know.
