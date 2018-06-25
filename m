@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48911)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fXV4q-00042u-Fs
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:14:58 -0400
+	(envelope-from <jcmvbkbc@gmail.com>) id 1fXV8I-0006aA-3H
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:18:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fXV4l-0006MA-Qt
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:14:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43180 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fXV4l-0006LQ-Fv
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:14:51 -0400
-Date: Mon, 25 Jun 2018 18:14:48 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180625171447.GJ2390@work-vm>
-References: <20180609141457.6283-1-vsementsov@virtuozzo.com>
-	<20180615120649.GC2615@work-vm>
-	<f40607cd-a777-b033-ae37-0be50e3bc3d2@virtuozzo.com>
+	(envelope-from <jcmvbkbc@gmail.com>) id 1fXV8G-0000PV-UN
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:18:30 -0400
+Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:34831)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1fXV8G-0000Or-Ow
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 13:18:28 -0400
+Received: by mail-yw0-x242.google.com with SMTP id t18-v6so962708ywg.2
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 10:18:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <f40607cd-a777-b033-ae37-0be50e3bc3d2@virtuozzo.com>
+In-Reply-To: <44235a41-902c-5e6d-302c-9ca880b2f444@amsat.org>
+References: <20180623215313.1252-1-f4bug@amsat.org>
+	<2f6b05fd-afb3-cc8d-6b3d-011e2fd87c47@amsat.org>
+	<CAMo8BfJWemPTt3fTO5RwGub+1wzyBs3xfh_zY+LBVOhocZ-d3w@mail.gmail.com>
+	<20180625165931.GA16777@flamenco>
+	<44235a41-902c-5e6d-302c-9ca880b2f444@amsat.org>
+From: Max Filippov <jcmvbkbc@gmail.com>
+Date: Mon, 25 Jun 2018 10:18:27 -0700
+Message-ID: <CAMo8BfL75KKw8U-dJ-FqEGTWeN853J=hWUUNZRt9U93_viyCXQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] migration: invalidate cache before source
- start
+Subject: Re: [Qemu-devel] [RFC PATCH] docker: Add debian-xtensa-cross image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +32,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: "Emilio G. Cota" <cota@braap.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-* Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> 15.06.2018 15:06, Dr. David Alan Gilbert wrote:
-> > * Vladimir Sementsov-Ogievskiy (vsementsov@virtuozzo.com) wrote:
-> > > Invalidate cache before source start in case of failed migration.
-> > >=20
-> > > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.c=
-om>
-> > Why doesn't the code at the bottom of migration_completion,
-> > fail_invalidate:   and the code in migrate_fd_cancel   handle this?
-> >=20
-> > What case did you see it in that those didn't handle?
-> > (Also I guess it probably should set s->block_inactive =3D false)
->=20
-> on source I see:
->=20
-> 81392@1529065750.766289:migrate_set_state new state 7
-> 81392@1529065750.766330:migration_thread_file_err
-> 81392@1529065750.766332:migration_thread_after_loop
->=20
-> so, we are leaving loop on
-> =A0=A0=A0=A0=A0=A0=A0 if (qemu_file_get_error(s->to_dst_file)) {
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 migrate_set_state(&s->state, current_=
-active_state,
-> MIGRATION_STATUS_FAILED);
-> trace_migration_thread_file_err();
-> break;
-> =A0=A0=A0=A0=A0=A0=A0 }
->=20
-> and skip migration_completion()
+On Mon, Jun 25, 2018 at 10:10 AM, Philippe Mathieu-Daud=C3=A9
+<f4bug@amsat.org> wrote:
+> On 06/25/2018 01:59 PM, Emilio G. Cota wrote:
+>> On Sat, Jun 23, 2018 at 20:24:09 -0700, Max Filippov wrote:
+>>> # first bad commit: [0b5c91f74f3c83a36f37740969df8c775c997e69]
+>>> translate-all: use per-page locking in !user-mode
+>>>
+>>> Emilio, could you please take a look? The following test locks up QEMU:
+>>>
+>>> qemu-system-xtensa -M sim -cpu dc232b -nographic -semihosting -icount
+>>> 6  -kernel ./test_mmu.tst
+>>>
+>>> test_mmu.tst binary may be found here:
+>>> http://jcmvbkbc.spb.ru/~dumb/tmp/201806232022/test_mmu.tst
+>>
+>> Thanks for the test case.
+>>
+>> I submitted a patch that fixes this for me--see this thread:
+>>   https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg07236.html
+>
+> Thanks, this works :)
+>
+> Alex nicer test output using:
+>
+> tests/tcg/xtensa/Makefile.system
+>  run-%.tst: %.tst
+> -       $(SIM) $(SIMFLAGS) ./$<
+> +       $(SIM) -monitor null $(SIMFLAGS) ./$<
 
-Yeh, OK; I'd seen soemthing else a few days ago, where a cancellation
-test that had previously ended with a 'cancelled' state has now ended up
-in 'failed' (which is the state 7 you have above).
-I suspect there's something else going on as well; I think what is
-supposed to happen in the case of 'cancel' is that it spins in 'cancellin=
-g' for
-a while in migrate_fd_cancel and then at the bottom of migrate_fd_cancel
-it does the recovery, but because it's going to failed instead, then
-it's jumping over that recovery.
+This makefile is also usable with another simulator (xtensa ISS) which woul=
+d
+not understand this option. Could it be added to the proper SIMFLAGS instea=
+d?
 
-Dave
-
->=20
-> >=20
-> > Dave
-> >=20
-> > > ---
-> > >=20
-> > >   migration/migration.c | 9 ++++++++-
-> > >   1 file changed, 8 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/migration/migration.c b/migration/migration.c
-> > > index 1e99ec9b7e..8f39e0dc02 100644
-> > > --- a/migration/migration.c
-> > > +++ b/migration/migration.c
-> > > @@ -2806,7 +2806,14 @@ static void migration_iteration_finish(Migra=
-tionState *s)
-> > >       case MIGRATION_STATUS_FAILED:
-> > >       case MIGRATION_STATUS_CANCELLED:
-> > >           if (s->vm_was_running) {
-> > > -            vm_start();
-> > > +            Error *local_err =3D NULL;
-> > > +            bdrv_invalidate_cache_all(&local_err);
-> > > +            if (local_err) {
-> > > +                error_reportf_err(local_err, "Can't invalidate dis=
-ks before "
-> > > +                                  "source vm start");
-> > > +            } else {
-> > > +                vm_start();
-> > > +            }
-> > >           } else {
-> > >               if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
-> > >                   runstate_set(RUN_STATE_POSTMIGRATE);
-> > > --=20
-> > > 2.11.1
-> > >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
->=20
-> --=20
-> Best regards,
-> Vladimir
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--=20
+Thanks.
+-- Max
