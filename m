@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fXTLV-0001CB-TO
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:24:03 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXTMG-0001oj-Sf
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:24:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <programmingkidx@gmail.com>) id 1fXTLS-0006lN-Pi
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:24:01 -0400
-In-Reply-To: <dbbebf00-9b32-4639-1e26-a888c48f6203@linaro.org>
-References: <20180623022258.22158-1-programmingkidx@gmail.com>
-	<ecf44486-09a4-9c9a-b96e-1db2d6a1bcbe@linaro.org>
-	<1E63C3B2-7668-4D05-BC43-02E478FB493B@gmail.com>
-	<bc3cd25b-bdd1-3bc7-8d2d-5c351f2c30d5@linaro.org>
-	<4CC477CD-237F-480D-B9B5-B35FF507BD3C@gmail.com>
-	<c6d132e2-b2e0-5bbb-7b71-9bd13253aa22@linaro.org>
-	<2CAC99CF-A717-4A94-A68C-EEB76C727F87@gmail.com>
-	<dbbebf00-9b32-4639-1e26-a888c48f6203@linaro.org>
-Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <CDA6AAA3-1452-4CBA-93A9-94CD83705E1A@gmail.com>
-Content-Transfer-Encoding: 7bit
-From: G 3 <programmingkidx@gmail.com>
-Date: Mon, 25 Jun 2018 11:23:54 -0400
-Subject: Re: [Qemu-devel] [PATCH] fix fdiv instruction
+	(envelope-from <peter.maydell@linaro.org>) id 1fXTMG-0007Dc-5f
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:24:48 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:34112)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fXTMG-0007DT-0Q
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:24:48 -0400
+Received: by mail-ot0-x241.google.com with SMTP id i17-v6so4615822otl.1
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 08:24:47 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180621015359.12018-7-richard.henderson@linaro.org>
+References: <20180621015359.12018-1-richard.henderson@linaro.org>
+	<20180621015359.12018-7-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 25 Jun 2018 16:24:26 +0100
+Message-ID: <CAFEAcA9qFjrPKi_QuGivw_dE-f7uWZ2Tkj6v=naE=7-_xAoKYg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 06/35] target/arm: Implement SVE
+ floating-point arithmetic (predicated)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +30,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, David Gibson <david@gibson.dropbear.id.au>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-
-On Jun 24, 2018, at 11:47 PM, Richard Henderson wrote:
-
-> On 06/24/2018 11:38 AM, Programmingkid wrote:
->> void test_division_by_zero()
->> {
->>     Converter c;
->>     uint64_t expected_answer = 0x0;
->>     uint32_t actual_fpscr, expected_fpscr = 0xc4000010;
->>     reset_fpscr();
->>     set_fpscr_bit(ZE);
->>     asm volatile("fdiv %0, %1, %2" : "=f"(c.d) : "f"(1.0), "f"(0.0));
+On 21 June 2018 at 02:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper-sve.h    | 77 +++++++++++++++++++++++++++++++++
+>  target/arm/sve_helper.c    | 89 ++++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-sve.c | 46 ++++++++++++++++++++
+>  target/arm/sve.decode      | 17 ++++++++
+>  4 files changed, 229 insertions(+)
 >
-> Try
->
->     uint64_t expected_answer = 0xffff0000deadbeef;
->     ...
->     c.i = expected_answer;
->     asm volatile("fdiv %0, %1, %2" : "+f"(c.d) : "f"(1.0), "f"(0.0));
->
-> to avoid depending on uninitialized data.  (This expected value is
-> an SNaN with a deadbeef marker Just to be Sure.)
->
->
-> r~
 
 
-Ok I made this program and tried it on my iMac G5 (PowerPC 970).
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-#include <stdio.h>
-#include <stdint.h>
-#include <inttypes.h>
-
-// Used to convert unsigned integer <--> double
-union Converter
-{
-     double d;
-     uint64_t i;
-};
-typedef union Converter Converter;
-
-int main (int argc, const char * argv[]) {
-     Converter answer;
-     answer.i = 0xffff0000deadbeef;
-     //asm volatile("mtfsb1 27"); /* Set ZE bit */
-     asm volatile("fdiv %0, %1, %2" : "=f"(answer.d) : "f"(1.0),  
-"f"(0.0));
-     printf("answer = 0x%" PRIx64 "\n", answer.i);
-     return 0;
-}
-
-The result was the same.
-
-When the FPSCR[ZE] bit is set, the answer is 0x0.
-
-When the FPSCR[ZE] bit is not set, the answer is 0x7ff0000000000000.
-
-This seems to be an undocumented feature. 
+thanks
+-- PMM
