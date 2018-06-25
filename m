@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38679)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXOK1-0005wV-5q
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:02:10 -0400
+	(envelope-from <kchamart@redhat.com>) id 1fXOTu-00080s-Q5
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:12:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXOK0-0005qH-Co
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:02:09 -0400
-Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:38677)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXOK0-0005pd-6O
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:02:08 -0400
-Received: by mail-ot0-x231.google.com with SMTP id w16-v6so5741794otk.5
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 03:02:07 -0700 (PDT)
+	(envelope-from <kchamart@redhat.com>) id 1fXOTr-0002vx-M5
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:12:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48114 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1fXOTr-0002vj-GL
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:12:19 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E50ABBB40A
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 10:12:18 +0000 (UTC)
+Date: Mon, 25 Jun 2018 12:12:16 +0200
+From: Kashyap Chamarthy <kchamart@redhat.com>
+Message-ID: <20180625101216.GE18277@paraplu>
 MIME-Version: 1.0
-In-Reply-To: <20180622154042.GS23296@redhat.com>
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-26-kwolf@redhat.com>
-	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
-	<20180622125502.GF4366@localhost.localdomain>
-	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
-	<20180622142513.GH4366@localhost.localdomain>
-	<20180622154042.GS23296@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 11:01:46 +0100
-Message-ID: <CAFEAcA9ksxY+CkGFhD=cGK=zoAvtGAdd_hG1L91js_SKK0RCxQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 25/26] block: Remove deprecated -drive
- option serial
+Subject: [Qemu-devel] RNG: Any reason QEMU doesn't default to `/dev/urandom`?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,23 +31,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, Jeff Cody <jcody@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Peter Krempa <pkrempa@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: rjones@redhat.com, dgilbert@redhat.com, berrange@redhat.com
 
-On 22 June 2018 at 16:40, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wro=
-te:
->  - SD card - requires -drive with if=3Dsd, no -device support AFAICT
+QEMU still defaults to /dev/random as entropy source.  Any reason why
+not default to /dev/urandom?
 
-Hmm? You can use -device if you want:
-  -drive if=3Dnone,id=3Dmydrive,... -device sd-card,...,drive=3Dmydrive
-(the sd-card device then plugs into the sd controller device
-via the sd-bus bus).
+The other day Dan Berrang=C3=A9 explained elsewhere that /dev/urandom is
+recommended -- as it is non-blocking; and doesn't have the same
+limitations of /dev/random, which is a legacy interface.  (And other
+applications[*] are any way overriding the QEMU default to
+/dev/urandom.)
 
-Most command lines floating around on the web use if=3Dsd, though
-(which doesn't require explicit creation of the sd-card device.)
+`random(4)` says the following about the blocking nature of /dev/random:
 
-I think one or two controllers might not yet have been converted
-to use sd-bus.
+       The /dev/random device is a legacy interface which dates back to
+       a time where the cryptographic primitives used in the
+       implementation of /dev/urandom were not widely trusted.  It will
+       return random bytes only within the estimated number of bits of
+       fresh noise in the entropy pool, blocking if necessary.
+       /dev/random is suitable for applications  that  need high quality
+       randomness, and can afford indeterminate delays.
 
-thanks
--- PMM
+And its "Usage" section says:
+
+       The  /dev/random  interface is considered a legacy interface, and
+       /dev/urandom is preferred and sufficient in all use cases, with
+       the exception of applications which require ran=E2=80=90 domness d=
+uring
+       early boot time; for these applications, getrandom(2) must be
+       used instead, because it will block until the entropy pool is
+       initialized.
+
+       If a seed file is saved across reboots as recommended below (all
+       major Linux distributions have done this since 2000 at least),
+       the output  is  cryptographically  secure  against attackers
+       without local root access as soon as it is reloaded in the boot
+       sequence, and perfectly adequate for network encryption session
+       keys.  Since reads from /dev/random may block, users will usually
+       want to open it in nonblocking mode (or perform a read with
+       timeout), and provide some sort of user notification if the
+       desired entropy is  not  immedi=E2=80=90 ately available.
+
+[*] E.g. libguestfs:
+    https://github.com/libguestfs/libguestfs/blob/master/lib/launch-direc=
+t.c#L592
+
+--=20
+/kashyap
