@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54529)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXQqr-0001qe-N6
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:44:14 -0400
+	id 1fXQqw-0001uS-Ho
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:44:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fXQqq-0007yF-HW
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:44:13 -0400
+	id 1fXQqv-00080d-N8
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 08:44:18 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 25 Jun 2018 09:42:14 -0300
-Message-Id: <20180625124238.25339-23-f4bug@amsat.org>
+Date: Mon, 25 Jun 2018 09:42:16 -0300
+Message-Id: <20180625124238.25339-25-f4bug@amsat.org>
 In-Reply-To: <20180625124238.25339-1-f4bug@amsat.org>
 References: <20180625124238.25339-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 22/46] hw/alpha: Use the IEC binary prefix
- definitions
+Subject: [Qemu-devel] [PATCH v5 24/46] hw/microblaze: Use the IEC binary
+ prefix definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,7 +28,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
 It eases code review, unit is explicit.
 
@@ -40,81 +40,73 @@ and modified manually.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/alpha/typhoon.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ hw/microblaze/petalogix_ml605_mmu.c      | 7 ++++---
+ hw/microblaze/petalogix_s3adsp1800_mmu.c | 7 ++++---
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
-index d3ed7cdbe8..d74b5b55e1 100644
---- a/hw/alpha/typhoon.c
-+++ b/hw/alpha/typhoon.c
-@@ -7,6 +7,7 @@
+diff --git a/hw/microblaze/petalogix_ml605_mmu.c b/hw/microblaze/petalogix_ml605_mmu.c
+index 6c4a544eac..c730878d25 100644
+--- a/hw/microblaze/petalogix_ml605_mmu.c
++++ b/hw/microblaze/petalogix_ml605_mmu.c
+@@ -26,6 +26,7 @@
   */
  
  #include "qemu/osdep.h"
 +#include "qemu/units.h"
  #include "qapi/error.h"
+ #include "qemu-common.h"
  #include "cpu.h"
- #include "hw/hw.h"
-@@ -813,8 +814,6 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
-                      qemu_irq *p_rtc_irq,
-                      AlphaCPU *cpus[4], pci_map_irq_fn sys_map_irq)
- {
--    const uint64_t MB = 1024 * 1024;
--    const uint64_t GB = 1024 * MB;
-     MemoryRegion *addr_space = get_system_memory();
-     DeviceState *dev;
-     TyphoonState *s;
-@@ -855,30 +854,30 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
+@@ -44,8 +45,8 @@
  
-     /* Pchip0 CSRs, 0x801.8000.0000, 256MB.  */
-     memory_region_init_io(&s->pchip.region, OBJECT(s), &pchip_ops, s, "pchip0",
--                          256*MB);
-+                          256 * MiB);
-     memory_region_add_subregion(addr_space, 0x80180000000ULL,
-                                 &s->pchip.region);
+ #include "hw/stream.h"
  
-     /* Cchip CSRs, 0x801.A000.0000, 256MB.  */
-     memory_region_init_io(&s->cchip.region, OBJECT(s), &cchip_ops, s, "cchip0",
--                          256*MB);
-+                          256 * MiB);
-     memory_region_add_subregion(addr_space, 0x801a0000000ULL,
-                                 &s->cchip.region);
+-#define LMB_BRAM_SIZE  (128 * 1024)
+-#define FLASH_SIZE     (32 * 1024 * 1024)
++#define LMB_BRAM_SIZE  (128 * KiB)
++#define FLASH_SIZE     (32 * MiB)
  
-     /* Dchip CSRs, 0x801.B000.0000, 256MB.  */
-     memory_region_init_io(&s->dchip_region, OBJECT(s), &dchip_ops, s, "dchip0",
--                          256*MB);
-+                          256 * MiB);
-     memory_region_add_subregion(addr_space, 0x801b0000000ULL,
-                                 &s->dchip_region);
+ #define BINARY_DEVICE_TREE_FILE "petalogix-ml605.dtb"
  
-     /* Pchip0 PCI memory, 0x800.0000.0000, 4GB.  */
--    memory_region_init(&s->pchip.reg_mem, OBJECT(s), "pci0-mem", 4*GB);
-+    memory_region_init(&s->pchip.reg_mem, OBJECT(s), "pci0-mem", 4 * GiB);
-     memory_region_add_subregion(addr_space, 0x80000000000ULL,
-                                 &s->pchip.reg_mem);
+@@ -109,7 +110,7 @@ petalogix_ml605_init(MachineState *machine)
+     pflash_cfi01_register(FLASH_BASEADDR,
+                           NULL, "petalogix_ml605.flash", FLASH_SIZE,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+-                          (64 * 1024), FLASH_SIZE >> 16,
++                          64 * KiB, FLASH_SIZE >> 16,
+                           2, 0x89, 0x18, 0x0000, 0x0, 0);
  
-     /* Pchip0 PCI I/O, 0x801.FC00.0000, 32MB.  */
-     memory_region_init_io(&s->pchip.reg_io, OBJECT(s), &alpha_pci_ignore_ops,
--                          NULL, "pci0-io", 32*MB);
-+                          NULL, "pci0-io", 32 * MiB);
-     memory_region_add_subregion(addr_space, 0x801fc000000ULL,
-                                 &s->pchip.reg_io);
  
-@@ -899,13 +898,13 @@ PCIBus *typhoon_init(ram_addr_t ram_size, ISABus **isa_bus,
+diff --git a/hw/microblaze/petalogix_s3adsp1800_mmu.c b/hw/microblaze/petalogix_s3adsp1800_mmu.c
+index 0da3e62102..5cf7b84c79 100644
+--- a/hw/microblaze/petalogix_s3adsp1800_mmu.c
++++ b/hw/microblaze/petalogix_s3adsp1800_mmu.c
+@@ -24,6 +24,7 @@
+  */
  
-     /* Pchip0 PCI special/interrupt acknowledge, 0x801.F800.0000, 64MB.  */
-     memory_region_init_io(&s->pchip.reg_iack, OBJECT(s), &alpha_pci_iack_ops,
--                          b, "pci0-iack", 64*MB);
-+                          b, "pci0-iack", 64 * MiB);
-     memory_region_add_subregion(addr_space, 0x801f8000000ULL,
-                                 &s->pchip.reg_iack);
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
+@@ -39,8 +40,8 @@
  
-     /* Pchip0 PCI configuration, 0x801.FE00.0000, 16MB.  */
-     memory_region_init_io(&s->pchip.reg_conf, OBJECT(s), &alpha_pci_conf1_ops,
--                          b, "pci0-conf", 16*MB);
-+                          b, "pci0-conf", 16 * MiB);
-     memory_region_add_subregion(addr_space, 0x801fe000000ULL,
-                                 &s->pchip.reg_conf);
+ #include "boot.h"
  
+-#define LMB_BRAM_SIZE  (128 * 1024)
+-#define FLASH_SIZE     (16 * 1024 * 1024)
++#define LMB_BRAM_SIZE  (128 * KiB)
++#define FLASH_SIZE     (16 * MiB)
+ 
+ #define BINARY_DEVICE_TREE_FILE "petalogix-s3adsp1800.dtb"
+ 
+@@ -87,7 +88,7 @@ petalogix_s3adsp1800_init(MachineState *machine)
+     pflash_cfi01_register(FLASH_BASEADDR,
+                           NULL, "petalogix_s3adsp1800.flash", FLASH_SIZE,
+                           dinfo ? blk_by_legacy_dinfo(dinfo) : NULL,
+-                          (64 * 1024), FLASH_SIZE >> 16,
++                          64 * KiB, FLASH_SIZE >> 16,
+                           1, 0x89, 0x18, 0x0000, 0x0, 1);
+ 
+     dev = qdev_create(NULL, "xlnx.xps-intc");
 -- 
 2.18.0
