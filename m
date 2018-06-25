@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1fXOEM-00049A-Hb
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:56:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fXOK1-0005wV-5q
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:02:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hongbo.zhang@linaro.org>) id 1fXOEL-0002Iw-LU
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:56:18 -0400
-Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:44066)
+	(envelope-from <peter.maydell@linaro.org>) id 1fXOK0-0005qH-Co
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:02:09 -0400
+Received: from mail-ot0-x231.google.com ([2607:f8b0:4003:c0f::231]:38677)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hongbo.zhang@linaro.org>)
-	id 1fXOEL-0002Ib-F2
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:56:17 -0400
-Received: by mail-io0-x242.google.com with SMTP id g7-v6so11928994ioh.11
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 02:56:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fXOK0-0005pd-6O
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 06:02:08 -0400
+Received: by mail-ot0-x231.google.com with SMTP id w16-v6so5741794otk.5
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 03:02:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA90hDS17L64YZ5H_B-kYkMaMV+ofBtdD=TEKgsnT+wUqA@mail.gmail.com>
-References: <1529663827-28854-1-git-send-email-hongbo.zhang@linaro.org>
-	<CAFEAcA8Bx7b_0zUxbdxFgtANFycVkUiSiemAwHpr0wpyxuLKmw@mail.gmail.com>
-	<CAHmQWvCczwh0Yto=9s2j7d00ULokZ0=VrxykAyXBvvHzQaUEMA@mail.gmail.com>
-	<CAFEAcA90hDS17L64YZ5H_B-kYkMaMV+ofBtdD=TEKgsnT+wUqA@mail.gmail.com>
-From: Hongbo Zhang <hongbo.zhang@linaro.org>
-Date: Mon, 25 Jun 2018 17:56:16 +0800
-Message-ID: <CAHmQWvBxTaX9f+xH3zue5w5s-eiLo00jmHq2OZ4gXTAJg0XLjA@mail.gmail.com>
+In-Reply-To: <20180622154042.GS23296@redhat.com>
+References: <20180615142108.27814-1-kwolf@redhat.com>
+	<20180615142108.27814-26-kwolf@redhat.com>
+	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
+	<20180622125502.GF4366@localhost.localdomain>
+	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
+	<20180622142513.GH4366@localhost.localdomain>
+	<20180622154042.GS23296@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 25 Jun 2018 11:01:46 +0100
+Message-ID: <CAFEAcA9ksxY+CkGFhD=cGK=zoAvtGAdd_hG1L91js_SKK0RCxQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/arm/virt: fix psci conduit in acpi when
- el3 enabled
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 25/26] block: Remove deprecated -drive
+ option serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +36,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Boris Fiuczynski <fiuczy@linux.ibm.com>, Qemu-block <qemu-block@nongnu.org>, Libvirt <libvir-list@redhat.com>, Jeff Cody <jcody@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Peter Krempa <pkrempa@redhat.com>
 
-On 25 June 2018 at 17:06, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 25 June 2018 at 05:06, Hongbo Zhang <hongbo.zhang@linaro.org> wrote:
->> Hi Peter,
->> Yes, your considerations reasonable.
->> But in practice of hardware platforms, programmer checks that Arm TF
->> is using SMC for PSCI call conduit, then fix it manually in the ACPI
->> table, reason may be that Arm TF is lack of ACPI support, if device
->> tree used, there should be no such thing because Arm TF can support
->> it.
->> On QEMU, I just mimic the situation, if a complete reasonable
->> solution, further efforts are needed to figure it out.
->
-> I'm afraid I don't really understand what you're saying
-> here. Could you try rephrasing it?
->
-Sorry, I say in the real hardware platforms, in practice programmer
-has to write a fixed PSCI conduit value in ACPI. then on the qemu
-platform, I did the similar thing -- write a fixed value too.
-I know it is not a perfect solution for it, I have no better one for now.
+On 22 June 2018 at 16:40, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wro=
+te:
+>  - SD card - requires -drive with if=3Dsd, no -device support AFAICT
 
-> If we're running at EL3 and booting firmware, then QEMU doesn't
-> provide PSCI. The firmware we're booting is the only thing that
-> can know if that firmware has implemented PSCI. So only it can
-> decide whether the ACPI tables and DTB should say that PSCI is
-> present.
+Hmm? You can use -device if you want:
+  -drive if=3Dnone,id=3Dmydrive,... -device sd-card,...,drive=3Dmydrive
+(the sd-card device then plugs into the sd controller device
+via the sd-bus bus).
 
-Agree with your comments, I hope ACPI's psci conduit node can reflect
-firmware's implementation, even when firmware PSCI conduit changes,
-ACPI node changes accordingly.
-But for ACPI and DTB, there are different situations now.
+Most command lines floating around on the web use if=3Dsd, though
+(which doesn't require explicit creation of the sd-card device.)
 
-If DTB is used, firmware(with psci implementation) can generate DTB
-nodes, saying which PSCI conduit is used - smc or hvc, then uboot or
-uefi can get this DTB add more DTB nodes before transfer it to kernel.
-That is, using DTB, we can achieve the goal.
+I think one or two controllers might not yet have been converted
+to use sd-bus.
 
-But when ACPI used, there is no codes in firmware to generate ACPI
-node to show which PSCI conduit is used, then uefi or later stage
-cannot get this info dynamically from any codes as far as I know.
-(this is why programmer manually check that firmware is using smc,
-then write a fixed value in ACPI FADT).
-So, if we want to fix this neatly, adding ACPI support in Arm trusted
-firmware may be the solution, but it should be a big feature for
-firmware, not QEMU.
-
-(since many components involved, hope my understanding correct)
->
-> thanks
-> -- PMM
+thanks
+-- PMM
