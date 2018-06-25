@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fXOBi-0002qO-LK
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:53:35 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fXODW-0003iy-27
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:55:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fXOBh-0001LL-BW
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:53:34 -0400
-Date: Mon, 25 Jun 2018 10:53:22 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180625095322.GC18580@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180615142108.27814-1-kwolf@redhat.com>
-	<20180615142108.27814-26-kwolf@redhat.com>
-	<7a310b92-f8cb-b68b-d882-9b2959794347@de.ibm.com>
-	<20180622125502.GF4366@localhost.localdomain>
-	<ea6a2d92-8f69-d02e-e62b-0e71ed5e25f2@de.ibm.com>
-	<20180622142513.GH4366@localhost.localdomain>
-	<20180622143146.GQ23296@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1fXODQ-0001ux-VA
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:55:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33758 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fXODQ-0001ul-JW
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 05:55:20 -0400
+Date: Mon, 25 Jun 2018 11:55:12 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180625115512.2f29844e.cohuck@redhat.com>
+In-Reply-To: <20180622214259-mutt-send-email-mst@kernel.org>
+References: <CADGSJ208NRp=bjhSkzF2K5Ft94TwdRs73WfSp4h-_vXvEKwgiQ@mail.gmail.com>
+	<20180619125453.2d2dfb2d.cohuck@redhat.com>
+	<20180619233001-mutt-send-email-mst@kernel.org>
+	<20180620115359.1a3bf6fb.cohuck@redhat.com>
+	<20180620170904-mutt-send-email-mst@kernel.org>
+	<20180620180619.6b4ee52d.cohuck@redhat.com>
+	<20180620224535-mutt-send-email-mst@kernel.org>
+	<20180621165913.7e3f4faa.cohuck@redhat.com>
+	<20180621211712-mutt-send-email-mst@kernel.org>
+	<20180622170955.298900c1.cohuck@redhat.com>
+	<20180622214259-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180622143146.GQ23296@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt] [PULL 25/26] block: Remove deprecated
- -drive option serial
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,96 +37,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-block@nongnu.org, libvir-list@redhat.com, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, pkrempa@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Siwei Liu <loseweigh@gmail.com>, "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, virtio-dev@lists.oasis-open.org, aaron.f.brown@intel.com, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kubakici@wp.pl>, Netdev <netdev@vger.kernel.org>, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, Joao Martins <joao.m.martins@oracle.com>, Venu Busireddy <venu.busireddy@oracle.com>, vijay.balakrishna@oracle.com
 
-On Fri, Jun 22, 2018 at 03:31:46PM +0100, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Jun 22, 2018 at 04:25:13PM +0200, Kevin Wolf wrote:
-> > Am 22.06.2018 um 15:36 hat Christian Borntraeger geschrieben:
-> > >=20
-> > >=20
-> > > On 06/22/2018 02:55 PM, Kevin Wolf wrote:
-> > > > Am 22.06.2018 um 13:38 hat Christian Borntraeger geschrieben:
-> > > >>
-> > > >> On 06/15/2018 04:21 PM, Kevin Wolf wrote:
-> > > >>> The -drive option serial was deprecated in QEMU 2.10. It's time=
- to
-> > > >>> remove it.
-> > > >>>
-> > > >>> Tests need to be updated to set the serial number with -global =
-instead
-> > > >>> of using the -drive option.
-> > > >>
-> > > >> libvirt 4.5 still creates those (at least on s390x)
-> > > >>
-> > > >>     <disk type=3D'file' device=3D'disk'>
-> > > >>       <driver name=3D'qemu' type=3D'qcow2' cache=3D'none' io=3D'=
-native' iothread=3D'1'/>
-> > > >>       <source file=3D'/var/lib/libvirt/qemu/image.zhyp137'/>
-> > > >>       <target dev=3D'hda' bus=3D'virtio'/>
-> > > >>       <serial>skel</serial>
-> > > >>       <boot order=3D'1'/>
-> > > >>       <address type=3D'ccw' cssid=3D'0xfe' ssid=3D'0x0' devno=3D=
-'0x0000'/>
-> > > >>     </disk>
-> > > >>
-> > > >>
-> > > >> ->=20
-> > > >> [...]
-> > > >> -drive file=3D/var/lib/libvirt/qemu/image.zhyp137,format=3Dqcow2=
-,if=3Dnone,id=3Ddrive-virtio-disk0,serial=3Dskel,cache=3Dnone,aio=3Dnativ=
-e -device virtio-blk-ccw,iothread=3Diothread1,scsi=3Doff,devno=3Dfe.0.000=
-0,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk0,bootindex=3D1,write-cache=3D=
-on=20
-> > > >> [...]
-> > > >>
-> > > >> 2018-06-22T11:25:20.946024Z qemu-system-s390x: -drive file=3D/va=
-r/lib/libvirt/qemu/image.zhyp137,format=3Dqcow2,if=3Dnone,id=3Ddrive-virt=
-io-disk0,serial=3Dskel,cache=3Dnone,aio=3Dnative: Block format 'qcow2' do=
-es not support the option 'serial'
-> > > >> 2018-06-22 11:25:21.098+0000: shutting down, reason=3Dfailed
-> > > >>
-> > > >> So it seems that this breaks s390x.
-> > >=20
-> > > To me it seems that this is also broken on x86.
-> > > >=20
-> > > > Thanks for bringing this up. libvirt should fix this before QEMU =
-3.0 is
-> > > > released.
-> > >=20
-> > > I think this is definitely too short notice. We should not break ex=
-isting
-> > > setups just by insisting that users have to update libvirt when the=
-y update
-> > > QEMU. Yes, this might be our policy, but doing so "just because we =
-can"
-> > > is certainly a very bad attitude. I see no fundamental technical re=
-ason why
-> > > we should not revert this change.
-> >=20
-> > This was in fact one release longer than our deprecation policy says.
-> > Are we serious about the deprecation policy or aren't we?
-> >=20
-> > I might consider reverting a change if it turned out that this requir=
-es
-> > some massive work in libvirt. But I think this one should be rather e=
-asy
-> > to fix in libvirt until 3.0 is released.
->=20
-> It is probably even possible for us to fix it in our July 1st
-> release
+On Fri, 22 Jun 2018 22:05:50 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Fix posted here:
+> On Fri, Jun 22, 2018 at 05:09:55PM +0200, Cornelia Huck wrote:
+> > On Thu, 21 Jun 2018 21:20:13 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Thu, Jun 21, 2018 at 04:59:13PM +0200, Cornelia Huck wrote:  
+> > > > OK, so what about the following:
+> > > > 
+> > > > - introduce a new feature bit, VIRTIO_NET_F_STANDBY_UUID that indicates
+> > > >   that we have a new uuid field in the virtio-net config space
+> > > > - in QEMU, add a property for virtio-net that allows to specify a uuid,
+> > > >   offer VIRTIO_NET_F_STANDBY_UUID if set
+> > > > - when configuring, set the property to the group UUID of the vfio-pci
+> > > >   device
+> > > > - in the guest, use the uuid from the virtio-net device's config space
+> > > >   if applicable; else, fall back to matching by MAC as done today
+> > > > 
+> > > > That should work for all virtio transports.    
+> > > 
+> > > True. I'm a bit unhappy that it's virtio net specific though
+> > > since down the road I expect we'll have a very similar feature
+> > > for scsi (and maybe others).
+> > > 
+> > > But we do not have a way to have fields that are portable
+> > > both across devices and transports, and I think it would
+> > > be a useful addition. How would this work though? Any idea?  
+> > 
+> > Can we introduce some kind of device-independent config space area?
+> > Pushing back the device-specific config space by a certain value if the
+> > appropriate feature is negotiated and use that for things like the uuid?  
+> 
+> So config moves back and forth?
+> Reminds me of the msi vector mess we had with pci.
 
-https://www.redhat.com/archives/libvir-list/2018-June/msg01598.html
+Yes, that would be a bit unfortunate.
 
+> I'd rather have every transport add a new config.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+You mean via different mechanisms?
+
+> 
+> > But regardless of that, I'm not sure whether extending this approach to
+> > other device types is the way to go. Tying together two different
+> > devices is creating complicated situations at least in the hypervisor
+> > (even if it's fairly straightforward in the guest). [I have not come
+> > around again to look at the "how to handle visibility in QEMU"
+> > questions due to lack of cycles, sorry about that.]
+> > 
+> > So, what's the goal of this approach? Only to allow migration with
+> > vfio-pci, or also to plug in a faster device and use it instead of an
+> > already attached paravirtualized device?  
+> 
+> These are two sides of the same coin, I think the second approach
+> is closer to what we are doing here.
+
+Thinking about it, do we need any knob to keep the vfio device
+invisible if the virtio device is not present? IOW, how does the
+hypervisor know that the vfio device is supposed to be paired with a
+virtio device? It seems we need an explicit tie-in.
+
+> 
+> > What about migration of vfio devices that are not easily replaced by a
+> > paravirtualized device? I'm thinking of vfio-ccw, where our main (and
+> > currently only) supported device is dasd (disks) -- which can do a lot
+> > of specialized things that virtio-blk does not support (and should not
+> > or even cannot support).  
+> 
+> But maybe virtio-scsi can?
+
+I don't think so. Dasds have some channel commands that don't map
+easily to scsi commands.
+
+> 
+> > Would it be more helpful to focus on generic
+> > migration support for vfio instead of going about it device by device?
+> > 
+> > This network device approach already seems far along, so it makes sense
+> > to continue with it. But I'm not sure whether we want to spend time and
+> > energy on that for other device types rather than working on a general
+> > solution for vfio migration.  
+> 
+> I'm inclined to say finalizing this feature would be a good first step
+> and will teach us how we can move forward.
+
+I'm not opposed to figuring out this one, but I'm not sure whether we
+want to extend it to more device types.
+
+Are people looking into generic migration support? I have it on my
+things-to-look-at list (figuring out what needs to be device specific
+and what can be generic, figuring out how we can support vfio-ccw,
+etc.).
