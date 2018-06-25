@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fXXl4-0002g8-Ka
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 16:06:43 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fXXl6-0002gx-J3
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 16:06:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fXXkz-0002MK-JA
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 16:06:42 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:40225 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fXXkz-0002MF-If
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 16:06:44 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:40212 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fXXkz-00023H-Az
+	id 1fXXkz-000234-B0
 	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 16:06:37 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 25 Jun 2018 22:05:56 +0200
-Message-Id: <1529957164-4744-2-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1529957164-4744-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1529957164-4744-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 1/9] MAINTAINERS: update target-mips maintainers
+Date: Mon, 25 Jun 2018 22:05:55 +0200
+Message-Id: <1529957164-4744-1-git-send-email-aleksandar.markovic@rt-rk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/9] Target MIPS queue, 2018-06-25
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +30,45 @@ Cc: peter.maydell@linaro.org
 
 From: Aleksandar Markovic <aleksandar.markovic@mips.com>
 
-Yongbok Kim transfers duties of QEMU for target MIPS maintainer to
-myself as he leaves MIPS. Many thanks to Yongbok for his substantial
-contributing to QEMU for MIPS over many years and taking care of its
-maintainance for almost two years.
+The following changes since commit 35e238c9330669882487f9929e0aa979004318=
+53:
 
-Signed-off-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
-Acked-by: Yongbok Kim <yongbok.kim@mips.com>
-Reviewed-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
----
- MAINTAINERS | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+  Merge remote-tracking branch 'remotes/kraxel/tags/audio-20180625-pull-r=
+equest' into staging (2018-06-25 15:25:26 +0100)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 2874ddc..0f62dca 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -187,7 +187,7 @@ F: disas/microblaze.c
- 
- MIPS
- M: Aurelien Jarno <aurelien@aurel32.net>
--M: Yongbok Kim <yongbok.kim@mips.com>
-+M: Aleksandar Markovic <aleksandar.markovic@mips.com>
- S: Maintained
- F: target/mips/
- F: hw/mips/
-@@ -706,7 +706,7 @@ S: Maintained
- F: hw/mips/mips_malta.c
- 
- Mipssim
--M: Yongbok Kim <yongbok.kim@mips.com>
-+M: Aleksandar Markovic <aleksandar.markovic@mips.com>
- S: Odd Fixes
- F: hw/mips/mips_mipssim.c
- F: hw/net/mipsnet.c
-@@ -717,7 +717,7 @@ S: Maintained
- F: hw/mips/mips_r4k.c
- 
- Fulong 2E
--M: Yongbok Kim <yongbok.kim@mips.com>
-+M: Aleksandar Markovic <aleksandar.markovic@mips.com>
- S: Odd Fixes
- F: hw/mips/mips_fulong2e.c
- F: hw/isa/vt82c686.c
--- 
+are available in the git repository at:
+
+  https://github.com/AMarkovic/qemu.git=20
+
+for you to fetch changes up to 2209731f338baaad3a1ef419fab1928e1e51ec17:
+
+  target/mips: Fix gdbstub to read/write 64 bit FP registers (2018-06-25 =
+21:21:24 +0200)
+
+----------------------------------------------------------------
+Aleksandar Markovic (1):
+      MAINTAINERS: update target-mips maintainers
+
+Peter Maydell (3):
+      hw/mips/boston: don't make flash region 'nomigrate'
+      hw/mips/mips_malta: don't make bios region 'nomigrate'
+      hw/pci-host/xilinx-pcie: don't make "io" region be RAM
+
+Yongbok Kim (5):
+      target/mips: Raise a RI when given fs is n/a from CTC1
+      target/mips: Fix microMIPS on reset
+      target/mips: Update gen_flt_ldst()
+      target/mips: Fix data type for offset
+      target/mips: Fix gdbstub to read/write 64 bit FP registers
+
+ MAINTAINERS               |  6 +++---
+ hw/mips/boston.c          |  3 +--
+ hw/mips/mips_malta.c      |  2 +-
+ hw/pci-host/xilinx-pcie.c |  5 ++---
+ target/mips/gdbstub.c     |  3 ++-
+ target/mips/op_helper.c   |  3 +++
+ target/mips/translate.c   | 28 ++++++++++++++++------------
+ 7 files changed, 28 insertions(+), 22 deletions(-)
+
+--=20
 2.7.4
