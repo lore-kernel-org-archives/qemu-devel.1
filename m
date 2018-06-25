@@ -1,23 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fXXLd-0005J0-9P
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 15:40:27 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fXXPn-0006Kr-VP
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 15:44:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <linux@roeck-us.net>) id 1fXXLc-0003Hm-6Z
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 15:40:25 -0400
-Date: Mon, 25 Jun 2018 12:40:05 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-Message-ID: <20180625194005.GA21023@roeck-us.net>
-References: <64bcba64-b88f-3594-da6e-7c2118482c20@roeck-us.net>
-	<cover.thread-8b0da3.your-ad-here.call-01529937119-ext-3705@work.hours>
-	<patch-1.thread-8b0da3.git-8b0da335b2d3.your-ad-here.call-01529937119-ext-3705@work.hours>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fXXPj-0005g9-0A
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 15:44:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57898)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1fXXPi-0005fe-NE
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 15:44:38 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w5PJDWoB094892
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 15:44:37 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ju60sj1a9-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 15:44:37 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Mon, 25 Jun 2018 15:44:36 -0400
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+References: <aa9ce054-f58c-097d-aee3-8fae769d0840@linux.vnet.ibm.com>
+Date: Mon, 25 Jun 2018 15:44:32 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <patch-1.thread-8b0da3.git-8b0da335b2d3.your-ad-here.call-01529937119-ext-3705@work.hours>
-Subject: Re: [Qemu-devel] [PATCH] s390/boot: block uncompressed vmlinux
- booting attempts
+In-Reply-To: <aa9ce054-f58c-097d-aee3-8fae769d0840@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-MW
+Message-Id: <01ecb9fd-dae2-269f-ba34-94530ed6ec7d@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Choosing PCR banks for swtpm's TPM 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,92 +41,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vasily Gorbik <gor@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
+To: tpm2@lists.01.org, Kenneth Goldman <kgoldman@us.ibm.com>
+Cc: Chris Friesen <chris.friesen@windriver.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, "Qi, Yadong" <yadong.qi@intel.com>, "Xu, Quan" <quan.xu@intel.com>
 
-On Mon, Jun 25, 2018 at 05:09:19PM +0200, Vasily Gorbik wrote:
-> Since uncompressed kernel image "vmlinux" elf file is not bootable under
-> qemu anymore, add a check which would report that.
-> 
-> Qemu users are encouraged to use bzImage or
-> arch/s390/boot/compressed/vmlinux instead.
-> 
-> The check relies on s390 linux entry point ABI definition, which is only
-> present in bzImage and arch/s390/boot/compressed/vmlinux.
-> 
-> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
+On 06/25/2018 11:05 AM, Stefan Berger wrote:
+> Hi!
+>
+> =C2=A0I am sending this email to solicit input on the choice of the PCR=
+=20
+> banks to enable for swtpm's TPM 2. I have currently enabled 4 PCR=20
+> banks for SHA{1,256,384,512}. The downside of this is that running the=20
+> TPM 2 with so many PCR banks has a performance impact when the Linux=20
+> integrity measurement architecture is used and has to extend=20
+> measurements into all PCR banks, which Linux does already.
+>
+> TPM 2 has the PCR_Allocate() command for a user to select the PCR=20
+> banks to use. This command allows to make some PCR banks invisible.=20
+> The change has to be done through the firmware and has the downside=20
+> that the TPM2 does not support TPM2_Shutdown(SU_STATE) after this=20
+> command was used. This prevents suspend/resume from working properly.=20
+> So, it seems that one shouldn't have to use this command, which in=20
+> turn means the number of PCR banks should be small.
 
-With qemu:
+Actually that was my interpretation of the specs and from what it looks=20
+like I was wrong assuming that once PCR_Allocate() was used that=20
+TPM2_Shutdown(SU_STATE) cannot be used anymore at all. The text is a bit=20
+ambiguous about it. This command can be sent, but the machine needs to=20
+be rebooted and with that the TPM 2 reset.
 
-Tested-by: Guenter Roeck <linux@roeck-us.net>
+The next issue is that the IBM TSS2 is hard coded for 3 PCR banks and a=20
+few commands are breaking because of that. Now the solution would be to:
 
-> ---
->  arch/s390/boot/head.S         |  4 ++--
->  arch/s390/include/asm/setup.h |  3 ++-
->  arch/s390/kernel/early.c      | 12 ++++++++++++
->  3 files changed, 16 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/s390/boot/head.S b/arch/s390/boot/head.S
-> index f09e792df495..f721913b73f1 100644
-> --- a/arch/s390/boot/head.S
-> +++ b/arch/s390/boot/head.S
-> @@ -272,14 +272,14 @@ iplstart:
->  	.org	0x10000
->  ENTRY(startup)
->  	j	.Lep_startup_normal
-> -	.org	0x10008
-> +	.org	EP_OFFSET
->  #
->  # This is a list of s390 kernel entry points. At address 0x1000f the number of
->  # valid entry points is stored.
->  #
->  # IMPORTANT: Do not change this table, it is s390 kernel ABI!
->  #
-> -	.ascii	"S390EP"
-> +	.ascii	EP_STRING
->  	.byte	0x00,0x01
->  #
->  # kdump startup-code at 0x10010, running in 64 bit absolute addressing mode
-> diff --git a/arch/s390/include/asm/setup.h b/arch/s390/include/asm/setup.h
-> index be02f0558048..1d66016f4170 100644
-> --- a/arch/s390/include/asm/setup.h
-> +++ b/arch/s390/include/asm/setup.h
-> @@ -9,7 +9,8 @@
->  #include <linux/const.h>
->  #include <uapi/asm/setup.h>
->  
-> -
-> +#define EP_OFFSET		0x10008
-> +#define EP_STRING		"S390EP"
->  #define PARMAREA		0x10400
->  #define PARMAREA_END		0x11000
->  
-> diff --git a/arch/s390/kernel/early.c b/arch/s390/kernel/early.c
-> index 827699eb48fa..45c5be3d8777 100644
-> --- a/arch/s390/kernel/early.c
-> +++ b/arch/s390/kernel/early.c
-> @@ -331,8 +331,20 @@ static void __init setup_boot_command_line(void)
->  	append_to_cmdline(append_ipl_scpdata);
->  }
->  
-> +static void __init check_image_bootable(void)
-> +{
-> +	if (!memcmp(EP_STRING, (void *)EP_OFFSET, strlen(EP_STRING)))
-> +		return;
-> +
-> +	sclp_early_printk("The linux kernel boot failure: the image is corrupted or not bootable.\n");
-> +	sclp_early_printk("Please check that you are using bootable kernel image \"bzImage\".\n");
-> +	sclp_early_printk("(or alternatively \"arch/s390/boot/compressed/vmlinux\" image for qemu)\n");
-> +	disabled_wait(0xbadb007);
-> +}
-> +
->  void __init startup_init(void)
->  {
-> +	check_image_bootable();
->  	time_early_init();
->  	init_kernel_storage_key();
->  	lockdep_off();
-> -- 
-> ⣔⢻⣟⢢ 2.18.0.rc2.13.g4da9a5d
-> ⣿⢿⡿⣿ pacman edition
-> 
+- compile-time disable the SHA512 bank; this will break existing state=20
+but for as long as it's in preview, I hope this is ok; we cannot easily=20
+enable SHA512 then in the future.
+
+- swtpm_setup gets a --pcr-banks <PCR banks> option that=20
+PCR_Allocate()'s the active PCR banks for the swtpm. The default will be=20
+SHA 1 and SHA 256, which disables the SHA 384 PCR bank; Users can choose=20
+their banks if they run this command directly. SHA1 and SHA256 seems to=20
+be a reasonable set of active PCR banks for now.
+
+ =C2=A0=C2=A0 Stefan
+
+
+
+>
+> Another complication with the swtpm is the upgrade path. Suspended VMs=20
+> will expect that the PCR banks that were available before the suspend=20
+> will be available after the resume and a possible swtpm upgrade. This=20
+> in turn means that the PCR banks should be chosen now and we'll have=20
+> to stick with them.
+>
+> That said, my suggestion would be to enable only PCR banks for SHA256=20
+> for 'now' and SHA512 for the future. Having two PCR banks should=20
+> enable decent performance. If someone wants to have better performance=20
+> he will have to go through the firmware to select the PCR banks at the=20
+> expense of loosing suspend/resume support.
+>
+> The change of PCR banks for the current 4 PCR banks will break the=20
+> state of all swtpms.
+>
+> If you have suggestions, please let me know.
+>
+> Regards,
+>
+> =C2=A0=C2=A0 Stefan
+>
+>
