@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1fXTQz-0005S7-MX
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:29:43 -0400
+	(envelope-from <thuth@redhat.com>) id 1fXTTh-0007KH-Nd
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:32:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sameeh@daynix.com>) id 1fXTQw-0000iI-0Z
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:29:41 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:35730)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1fXTQv-0000he-IB
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:29:37 -0400
-Received: by mail-ed1-x542.google.com with SMTP id c1-v6so5666271edt.2
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 08:29:37 -0700 (PDT)
+	(envelope-from <thuth@redhat.com>) id 1fXTTg-0001we-HN
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:32:29 -0400
+References: <20180622134036.23182-1-f4bug@amsat.org>
+	<20180622134036.23182-8-f4bug@amsat.org>
+	<e98bac2c-ce0b-e226-3d96-004e46478f2f@redhat.com>
+	<8256c2d4-722c-299f-e8e3-42c1a7f68e1d@amsat.org>
+	<0bf443e6-fd49-9aaf-43fb-f171edf5fd38@redhat.com>
+	<57e04a05-442c-bd4a-2daa-1b690540c061@amsat.org>
+	<2eab61ba-1220-095d-721b-53357104fb45@redhat.com>
+	<9ad2df7b-afa2-8470-6353-facdde6b0587@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d3a4745c-9bf9-db13-33b2-5542ef7f74b4@redhat.com>
+Date: Mon, 25 Jun 2018 17:32:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180625112204.GH18580@redhat.com>
-References: <20180625110706.23332-1-sameeh@daynix.com>
-	<20180625110706.23332-3-sameeh@daynix.com>
-	<20180625112204.GH18580@redhat.com>
-From: Sameeh Jubran <sameeh@daynix.com>
-Date: Mon, 25 Jun 2018 18:29:35 +0300
-Message-ID: <CAKPgXcGq=CDGOPUDh2cFTHFAUcMa6KkXHWH+gJH6aUErRMJ3QQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <9ad2df7b-afa2-8470-6353-facdde6b0587@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 2/2] virtio-net: Example Patch for using
- BPF
+Subject: Re: [Qemu-devel] [PATCH v2 07/14] hw/i2c/omap_i2c: Use
+ qemu_log_mask(UNIMP) instead of fprintf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,84 +31,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>, Amnon Ilan <ailan@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
 
-On Mon, Jun 25, 2018 at 2:22 PM, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
-om>
-wrote:
+On 25.06.2018 17:07, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 06/25/2018 11:30 AM, Thomas Huth wrote:
+>> On 25.06.2018 14:52, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> On 06/25/2018 03:08 AM, Thomas Huth wrote:
+>>>> On 22.06.2018 22:10, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>>> On 06/22/2018 04:38 PM, Thomas Huth wrote:
+>>>>>> On 22.06.2018 15:40, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>>>>>> ---
+>>>>>>>  hw/i2c/omap_i2c.c | 20 ++++++++++++--------
+>>>>>>>  1 file changed, 12 insertions(+), 8 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/hw/i2c/omap_i2c.c b/hw/i2c/omap_i2c.c
+>>>>>>> index 26e3e5ebf6..690876e43e 100644
+>>>>>>> --- a/hw/i2c/omap_i2c.c
+>>>>>>> +++ b/hw/i2c/omap_i2c.c
+>>>>>>> @@ -17,6 +17,7 @@
+>>>>>>>   * with this program; if not, see <http://www.gnu.org/licenses/>=
+.
+>>>>>>>   */
+>>>>>>>  #include "qemu/osdep.h"
+>>>>>>> +#include "qemu/log.h"
+>>>>>>>  #include "hw/hw.h"
+>>>>>>>  #include "hw/i2c/i2c.h"
+>>>>>>>  #include "hw/arm/omap.h"
+>>>>>>> @@ -339,14 +340,15 @@ static void omap_i2c_write(void *opaque, hw=
+addr addr,
+>>>>>>>              }
+>>>>>>>              break;
+>>>>>>>          }
+>>>>>>> -        if ((value & (1 << 15)) && !(value & (1 << 10))) {	/* MS=
+T */
+>>>>>>> -            fprintf(stderr, "%s: I^2C slave mode not supported\n=
+",
+>>>>>>> -                            __func__);
+>>>>>>> +        if ((value & (1 << 15)) && !(value & (1 << 10))) { /* MS=
+T */
+>>>>>>
+>>>>>> Please keep the white spaces before the comment if you don't chang=
+e
+>>>>>> anything else.
+>>>>>
+>>>>> This is a <tab> and checkpatch complains...
+>>>>>
+>>>>> I can use 4 spaces for this tab. I tried to align with other tab-al=
+igned
+>>>>> comments I didn't modify, but the result is messier. Thus a simple =
+space.
+>>>>
+>>>> Oh, sorry, I didn't notice that you've replaced a TAB here. I guess =
+it's
+>>>> ok then. But why does checkpatch complain if it is just in the conte=
+xt
+>>>> of your modification? That's weird.
+>>>
+>>> The first 2 contexts (MST and XA) are fine, however checkpatch compla=
+ins
+>>> with the last one (ST_EN):
+>>>
+>>> ERROR: code indent should never use tabs
+>>> #38: FILE: hw/i2c/omap_i2c.c:397:
+>>> +        if (value & (1 << 15)) {^I^I^I^I^I/* ST_EN */$
+>>>
+>>> Since I replaced this one, I also did with the 2 previous.
+>>>
+>>> Now I realize I can _not_ add the brackets so I don't have to update =
+the
+>>> <tabs>:
+>>>
+>>>          if (value & (1 << 15))^I^I^I^I^I/* ST_EN */
+>>> -            fprintf(stderr, "%s: System Test not supported\n", __fun=
+c__);
+>>> +            qemu_log_mask(LOG_UNIMP,
+>>> +                          "%s: System Test not supported\n", __func_=
+_);
+>>>          break;
+>>>
+>>> I think if it better to unify the code style when possible, but it is=
+ up
+>>> to you, if you prefer I can resend with tabs and no brackets.
+>>
+>> I think it's OK to fix up the coding style here, too. Maybe just menti=
+on
+>> it in the patch description ("While we're at it, change TABs to spaces
+>> and add missing curly braces to the surounding if-statements" or so).
+>=20
+> OK. If that's fine with you I won't respin the whole series for this
+> comment, but if I have to respin for another reason I'll improve the
+> comment.
 
-> On Mon, Jun 25, 2018 at 02:07:06PM +0300, Sameeh Jubran wrote:
-> > From: Sameeh Jubran <sjubran@redhat.com>
-> >
-> > This commit is a sample only for using the libbpf in the code and
-> > shouldn't be committed.
-> >
-> > Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
-> > ---
-> >  hw/net/Makefile.objs | 4 ++++
-> >  hw/net/virtio-net.c  | 4 ++++
-> >  2 files changed, 8 insertions(+)
-> >
-> > diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
-> > index fa461d4463..0fb271436d 100644
-> > --- a/hw/net/Makefile.objs
-> > +++ b/hw/net/Makefile.objs
-> > @@ -37,6 +37,10 @@ obj-$(CONFIG_PSERIES) +=3D spapr_llan.o
-> >  obj-$(CONFIG_XILINX_ETHLITE) +=3D xilinx_ethlite.o
-> >
-> >  obj-$(CONFIG_VIRTIO_NET) +=3D virtio-net.o
-> > +ifeq ($(CONFIG_BPF),y)
-> > +     virtio-net.o-cflags :=3D $(CFLAGS_BPF)
-> > +     virtio-net.o-libs :=3D $(LIBS_BPF)
-> > +endif
-> >  obj-y +=3D vhost_net.o
-> >
-> >  obj-$(CONFIG_ETSEC) +=3D fsl_etsec/etsec.o fsl_etsec/registers.o \
-> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > index 90502fca7c..b4840838c1 100644
-> > --- a/hw/net/virtio-net.c
-> > +++ b/hw/net/virtio-net.c
-> > @@ -27,6 +27,7 @@
-> >  #include "hw/virtio/virtio-access.h"
-> >  #include "migration/misc.h"
-> >  #include "standard-headers/linux/ethtool.h"
-> > +#include "standard-headers/linux/libbpf.h"
-> >
-> >  #define VIRTIO_NET_VM_VERSION    11
-> >
-> > @@ -1329,6 +1330,9 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue
-> *q)
-> >      VirtQueueElement *elem;
-> >      int32_t num_packets =3D 0;
-> >      int queue_index =3D vq2q(virtio_get_queue_index(q->tx_vq));
-> > +
-> > +    struct bpf_object *obj =3D NULL;
-> > +    bpf_object__load(obj);
->
-> This really doesn't tell us anything useful about how this will be
-> used and integrated in qemu. I'd expect this patch to actually
-> be doing a real feature complete impl of RSS for virtio-net.
->
-No problem, I'll be sending the full series ASAP,
-Thanks :)
+Fine for me!
 
->
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/
-> dberrange :|
-> |: https://libvirt.org         -o-
-> https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/
-> dberrange :|
->
-
-
-
---=20
-Respectfully,
-*Sameeh Jubran*
-*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
-*Software Engineer @ Daynix <http://www.daynix.com>.*
+ Thomas
