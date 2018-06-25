@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1fXKZs-0006hm-SR
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:02:17 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fXKfY-0007vX-53
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:08:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew@aj.id.au>) id 1fXKZs-0001NR-35
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:02:16 -0400
-Message-Id: <1529906529.2292427.1419115928.6C7BD1D2@webmail.messagingengine.com>
-From: Andrew Jeffery <andrew@aj.id.au>
+	(envelope-from <dovgaluk@ispras.ru>) id 1fXKfU-0005YD-SQ
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:08:08 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:38170)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1fXKfU-0005Xh-Fe
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 02:08:04 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <20180528071332.9424.27343.stgit@pasha-VirtualBox>
+	<b2f04223-f52d-44e6-95a6-6ed91d021dad@ispras.ru>
+	<87in6yd146.fsf@linaro.org> <001201d3fc8d$e8a06390$b9e12ab0$@ru>
+	<87fu21d3gh.fsf@linaro.org> <001c01d3fcae$f0443fb0$d0ccbf10$@ru>
+	<87bmcpcmfa.fsf@linaro.org>
+In-Reply-To: <87bmcpcmfa.fsf@linaro.org>
+Date: Mon, 25 Jun 2018 09:08:02 +0300
+Message-ID: <007f01d40c4a$e070d070$a1527150$@ru>
 MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-References: <20180612065716.10587-1-clg@kaod.org>
-	<20180612065716.10587-2-clg@kaod.org>
-In-Reply-To: <20180612065716.10587-2-clg@kaod.org>
-Date: Mon, 25 Jun 2018 15:32:09 +0930
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/3] aspeed/smc: fix dummy
- cycles count when in dual IO mode
+Content-Language: ru
+Subject: Re: [Qemu-devel] [PATCH v4 00/19] reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,52 +32,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, Alistair Francis <alistair@alistair23.me>
+To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
+Cc: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 
-On Tue, 12 Jun 2018, at 16:27, C=C3=A9dric Le Goater wrote:
-> When configured in dual I/O mode, address and data are sent in dual
-> mode, including the dummy byte cycles in between. Adapt the count to
-> the IO setting.
+> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 >=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> >> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> >> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+> >>
+> >> >> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+> >> >> Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru> writes:
+> >> >>
+> >> >> > Ping?
+> >> >>
+> >> >> I started having a look but I ran into this straight away. First =
+I
+> >> >> recorded a boot of the kernel:
+> >> >>
+> >> >>   ./aarch64-softmmu/qemu-system-aarch64 -machine =
+virt,graphics=3Don,gic-
+> >> >> version=3D3,virtualization=3Don -cpu cortex-a53 --serial =
+mon:stdio -display none -kernel
+> >> >> ../images/aarch64-current-linux-initrd-guest.img -icount
+> >> shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin
+> >> >>
+> >> >> Then played back:
+> >> >>
+> >> >>   ./aarch64-softmmu/qemu-system-aarch64 -machine =
+virt,graphics=3Don,gic-
+> >> >> version=3D3,virtualization=3Don -cpu cortex-a53 --serial =
+mon:stdio -display none -kernel
+> >> >> ../images/aarch64-current-linux-initrd-guest.img -icount
+> >> shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin -
+> >> >> s -S
+> >> >
+> >> > This looks ok, but...
+> >> >
+> >> >> And did the following on gdb:
+> >> >>
+> >> >> (gdb) i
+> >> >> 0x0000000040000004 in ?? ()
+> >> >> =3D> 0x40000004:  mov     x1, xzr
+> >> >>    0x40000008:  mov     x2, xzr
+> >> >>    0x4000000c:  mov     x3, xzr
+> >> >> (gdb)
+> >> >> 0x0000000040000008 in ?? ()
+> >> >> =3D> 0x40000008:  mov     x2, xzr
+> >> >>    0x4000000c:  mov     x3, xzr
+> >> >>    0x40000010:  ldr     x4, 0x40000020
+> >> >> (gdb)
+> >> >> 0x000000004000000c in ?? ()
+> >> >> =3D> 0x4000000c:  mov     x3, xzr
+> >> >>    0x40000010:  ldr     x4, 0x40000020
+> >> >>    0x40000014:  br      x4
+> >> >> (gdb)
+> >> >> 0x0000000040000010 in ?? ()
+> >> >> =3D> 0x40000010:  ldr     x4, 0x40000020
+> >> >>    0x40000014:  br      x4
+> >> >>    0x40000018:  .inst   0x44000000 ; undefined
+> >> >> (gdb)
+> >> >> 0x0000000040000014 in ?? ()
+> >> >> =3D> 0x40000014:  br      x4
+> >> >>    0x40000018:  .inst   0x44000000 ; undefined
+> >> >>    0x4000001c:  .inst   0x00000000 ; undefined
+> >> >> (gdb) p/x $x4
+> >> >> $1 =3D 0x40080000
+> >> >> (gdb) reverse-stepi
+> >> >> warning: Remote failure reply: E14
+> >> >>
+> >> >> Surely this is the simple case and doesn't require any snapshots =
+for
+> >> >> block devices as there are none. Am I missing something?
+> >> >
+> >> > Reverse debugging requires the snapshotting. QEMU can't revert =
+the VM state without the
+> >> snapshots.
+> >> > You can try adding an empty qcow2 image to allow snapshotting =
+there.
+> >>
+> >> I suspect a recent patch has broken locking again:
+> >>
+> >> Starting program: =
+/home/alex/lsrc/qemu/qemu.git/aarch64-softmmu/qemu-system-aarch64 -
+> machine
+> >> virt,graphics=3Don,gic-version=3D3,virtualization=3Don -cpu =
+cortex-a53 --serial mon:stdio -
+> display
+> >> none -kernel ../images/aarch64-current-linux-initrd-guest.img =
+-icount
+> >> shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin,rrsnapshot=3Ddebug -drive
+> >> file=3Drr.qcow2,if=3Dnone,snapshot,id=3Drr -s -S
+> >> [Thread debugging using libthread_db enabled]
+> >> Using host libthread_db library =
+"/lib/x86_64-linux-gnu/libthread_db.so.1".
+> >> [New Thread 0x7fffd8536700 (LWP 32452)]
+> >> [New Thread 0x7fffd5bb3700 (LWP 32453)]
+> >> [New Thread 0x7fffd4eab700 (LWP 32454)]
+> >> **
+> >> ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed: =
+(replay_file &&
+> >> replay_mutex_locked())
+> >
+> > Have you recorded it with the attached disk before replaying?
+>=20
+> Yes. I assume the -drive doesn't actually have to be visible to the
+> guest, it's just the mechanism rr needs for saving snapshots?
+>=20
+> > Are you using the latest version?
+> > If the both answers are 'yes', then can you share the kernel? My =
+i386
+> > runs work normally.
+>=20
+> I'll have a go with x86 first as aarch64 hasn't been proven yet.
 
-Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+Any news about that?
 
-> ---
->  hw/ssi/aspeed_smc.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-> index 5059396bc623..fce126e6ee92 100644
-> --- a/hw/ssi/aspeed_smc.c
-> +++ b/hw/ssi/aspeed_smc.c
-> @@ -66,6 +66,8 @@
->=20=20
->  /* CEx Control Register */
->  #define R_CTRL0           (0x10 / 4)
-> +#define   CTRL_IO_DUAL_DATA        (1 << 29)
-> +#define   CTRL_IO_DUAL_ADDR_DATA   (1 << 28) /* Includes dummies */
->  #define   CTRL_CMD_SHIFT           16
->  #define   CTRL_CMD_MASK            0xff
->  #define   CTRL_DUMMY_HIGH_SHIFT    14
-> @@ -492,8 +494,13 @@ static int aspeed_smc_flash_dummies(const=20
-> AspeedSMCFlash *fl)
->      uint32_t r_ctrl0 =3D s->regs[s->r_ctrl0 + fl->id];
->      uint32_t dummy_high =3D (r_ctrl0 >> CTRL_DUMMY_HIGH_SHIFT) & 0x1;
->      uint32_t dummy_low =3D (r_ctrl0 >> CTRL_DUMMY_LOW_SHIFT) & 0x3;
-> +    uint32_t dummies =3D ((dummy_high << 2) | dummy_low) * 8;
->=20=20
-> -    return ((dummy_high << 2) | dummy_low) * 8;
-> +    if (r_ctrl0 & CTRL_IO_DUAL_ADDR_DATA) {
-> +        dummies /=3D 2;
-> +    }
-> +
-> +    return dummies;
->  }
->=20=20
->  static void aspeed_smc_flash_send_addr(AspeedSMCFlash *fl, uint32_t addr)
-> --=20
-> 2.13.6
->=20
->=20
+
+Pavel Dovgalyuk
