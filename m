@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXPQV-00025i-Bv
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:12:56 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fXPRD-0002VQ-5W
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:13:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXPQU-0005zl-FP
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:12:55 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:44054)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXPQU-0005zb-8i
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:12:54 -0400
-Received: by mail-oi0-x241.google.com with SMTP id b5-v6so2956431oiy.11
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 04:12:54 -0700 (PDT)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fXPR7-00069Z-Gp
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:13:39 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180625110721.22485-1-joel@jms.id.au>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <0627e87c-6d3c-a64a-6d6d-2a632c73ebf7@amsat.org>
+Date: Mon, 25 Jun 2018 08:13:27 -0300
 MIME-Version: 1.0
-In-Reply-To: <d3c05355-4eda-f501-8f04-d808f416393a@web.de>
-References: <20180619093124.24011-1-luc.michel@greensocs.com>
-	<d3c05355-4eda-f501-8f04-d808f416393a@web.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 12:12:33 +0100
-Message-ID: <CAFEAcA80O-6ycsVFEkfTSYCakQQZyGy9VV-+2rx6dE3-Ffd-Ng@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] arm_gic: add virtualization
- extensions support
+In-Reply-To: <20180625110721.22485-1-joel@jms.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Add ASPEED BMCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +27,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@web.de>
-Cc: Luc Michel <luc.michel@greensocs.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>, Mark Burton <mark.burton@greensocs.com>
+To: Joel Stanley <joel@jms.id.au>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-devel@nongnu.org
 
-On 25 June 2018 at 05:55, Jan Kiszka <jan.kiszka@web.de> wrote:
-> On 2018-06-19 11:31, luc.michel@greensocs.com wrote:
->> From: Luc MICHEL <luc.michel@greensocs.com>
->>
->> This patch series add support for the virtualization extensions in the
->> ARM GICv2 interrupt controller.
->>
->> The first two commits do some refactoring to prepare for the
->> implementation. Commits 3 and 4 are the actual implementation. The last
->> commit updates the ZynqMP implementation to support virtualization.
->
-> Is it enabled for the virt machine as well? Seems we are missing some
-> mapping of GICV and GICH there.
+Hi Joel,
 
-I agree that it would be very nice to see this enabled for the
-'virt' board; it's a bit tricky for me to test otherwise. It
-should just be a matter of mapping in the GICV and GICH,
-wiring up the maintenance interrupt, and advertising it
-correctly in the DTB and ACPI data...
+On 06/25/2018 08:07 AM, Joel Stanley wrote:
+> This adds Cedric as the maintainer, with Andrew and I as reviewers, for
+> the ASPEED boards and the peripherals we use.
 
-I'm hoping to get to reviewing this series this afternoon.
+Good idea, this should speed up ASPEED reviews.
 
-thanks
--- PMM
+> 
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+> ---
+>  MAINTAINERS | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 2874ddce6097..14bcf2ed3e3d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -644,6 +644,17 @@ M: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+>  S: Maintained
+>  F: hw/arm/msf2-som.c
+>  
+> +ASPEED BMCs
+> +M: Cédric Le Goater <clg@kaod.org>
+> +R: Andrew Jeffery <andrew@aj.id.au>
+> +R: Joel Stanley <joel@jms.id.au>
+> +L: qemu-arm@nongnu.org
+> +S: Maintained
+> +F: hw/*/*aspeed*
+> +F: include/*/*aspeed*
+
+This line does not match, however include/hw/*/*aspeed* does.
+
+With that fixed:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> +F: hw/net/ftgmac100.c
+> +F: include/hw/net/ftgmac100.h
+> +
+>  CRIS Machines
+>  -------------
+>  Axis Dev88
+> 
