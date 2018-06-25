@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fXSHb-0005Lt-Tr
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:15:57 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fXSN5-0006gm-Kl
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:21:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fXSHa-0006z5-Ra
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:15:55 -0400
-References: <20180621170657.27542-1-kwolf@redhat.com>
-	<20180621170657.27542-2-kwolf@redhat.com>
-	<20180625090213.GB29002@stefanha-x1.localdomain>
-	<20180625095105.GD5024@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <3b55e145-4000-dfc6-6303-c670c47bdd93@redhat.com>
-Date: Mon, 25 Jun 2018 16:15:45 +0200
+	(envelope-from <cohuck@redhat.com>) id 1fXSMz-0008Qd-Ok
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 10:21:35 -0400
+Date: Mon, 25 Jun 2018 16:21:25 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180625162125.506483aa.cohuck@redhat.com>
+In-Reply-To: <cd40e518-ee0c-f8fe-d910-562c2c64709d@redhat.com>
+References: <20180625124238.25339-1-f4bug@amsat.org>
+	<20180625124238.25339-20-f4bug@amsat.org>
+	<20180625150719.0392da6c.cohuck@redhat.com>
+	<cd40e518-ee0c-f8fe-d910-562c2c64709d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180625095105.GD5024@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Y4DgjiB05X4K5dQktJBJEpVpKsfynitpu"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] block: Convert
- .bdrv_truncate callback to coroutine_fn
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 19/46] hw/s390x: Use the IEC binary
+ prefix definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,118 +26,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Thomas Huth <thuth@redhat.com>, Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, "open
+	list:S390" <qemu-s390x@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Y4DgjiB05X4K5dQktJBJEpVpKsfynitpu
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Message-ID: <3b55e145-4000-dfc6-6303-c670c47bdd93@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 1/2] block: Convert .bdrv_truncate callback
- to coroutine_fn
-References: <20180621170657.27542-1-kwolf@redhat.com>
- <20180621170657.27542-2-kwolf@redhat.com>
- <20180625090213.GB29002@stefanha-x1.localdomain>
- <20180625095105.GD5024@localhost.localdomain>
-In-Reply-To: <20180625095105.GD5024@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+On Mon, 25 Jun 2018 15:16:15 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-On 2018-06-25 11:51, Kevin Wolf wrote:
-> Am 25.06.2018 um 11:02 hat Stefan Hajnoczi geschrieben:
->> On Thu, Jun 21, 2018 at 07:06:56PM +0200, Kevin Wolf wrote:
->>> bdrv_truncate() is an operation that can block (even for a quite long=
-
->>> time, depending on the PreallocMode) in I/O paths that shouldn't bloc=
-k.
->>> Convert it to a coroutine_fn so that we have the infrastructure for
->>> drivers to make their .bdrv_co_truncate implementation asynchronous.
-
-parallels_co_check() is a remaining coroutine_fn that calls
-bdrv_truncate(), maybe it should call bdrv_co_truncate() now.
-
-(And vhdx_allocate_block() probably should be a coroutine_fn, but that's
-something for another time, I suppose.)
-
->> block/commit.c:commit_run() invokes blk_truncate() outside of a draine=
-d
->> region.  I haven't looked for other instances, but this patch opens th=
-e
->> door for races with other I/O requests.  Are you sure it's safe to mak=
-e
->> this asynchronous without request serialization?
+> On 25.06.2018 15:07, Cornelia Huck wrote:
+> > On Mon, 25 Jun 2018 09:42:11 -0300
+> > Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+> >  =20
+> >> It eases code review, unit is explicit.
+> >>
+> >> Patch generated using:
+> >>
+> >>   $ git grep -E '(1024|2048|4096|8192|(<<|>>).?(10|20|30))' hw/ includ=
+e/hw/
+> >>
+> >> and modified manually.
+> >>
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> >> Acked-by: Cornelia Huck <cohuck@redhat.com> =20
+> >=20
+> > Hm, I had not looked at the v2+ patches, as this already carried my
+> > ack...
+> >  =20
+> >> ---
+> >>  hw/s390x/s390-skeys.c    | 3 ++-
+> >>  hw/s390x/s390-stattrib.c | 3 ++- =20
+> >=20
+> > ...but these two were added later on.
+> >  =20
+> >>  hw/s390x/sclp.c          | 3 ++-
+> >>  3 files changed, 6 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/hw/s390x/s390-skeys.c b/hw/s390x/s390-skeys.c
+> >> index 76241c240e..15f7ab0e53 100644
+> >> --- a/hw/s390x/s390-skeys.c
+> >> +++ b/hw/s390x/s390-skeys.c
+> >> @@ -10,6 +10,7 @@
+> >>   */
+> >> =20
+> >>  #include "qemu/osdep.h"
+> >> +#include "qemu/units.h"
+> >>  #include "hw/boards.h"
+> >>  #include "hw/s390x/storage-keys.h"
+> >>  #include "qapi/error.h"
+> >> @@ -19,7 +20,7 @@
+> >>  #include "sysemu/kvm.h"
+> >>  #include "migration/register.h"
+> >> =20
+> >> -#define S390_SKEYS_BUFFER_SIZE 131072  /* Room for 128k storage keys =
+*/
+> >> +#define S390_SKEYS_BUFFER_SIZE (128 * KiB)  /* Room for 128k storage =
+keys */ =20
+> >=20
+> > This one looks confusing to me. We're not allocating 128 chunks of 1
+> > KiB size, but space enough for 128k byte values. What do others think? =
+=20
 >=20
-> After trying to explain why it's correct, I start to think that you're
-> right at least in one case. The new thing after this patch is that the
-> truncate operation isn't atomic any more. What this means depends on th=
-e
-> block driver:
+> Hm, as this define is called "_SIZE" it should be the right thing to do.
 >=20
-> * file-posix/win32: I think this one is okay. The truncate
->   implementation doesn't depend in any way on the content of the image.=
+> I would agree if it would be "_SKEY.*_COUNT"
 
->   Preallocation could be critical (in that it could overwrite
->   concurrently issued write requests), but the BDS size is only adjuste=
-d
->   after the driver callback has returned, so there can't be a concurren=
-t
->   write request.
+Yes, but I found it a bit non-intuitive, as it is not immediately clear
+that we want to support 128k byte values. It's probably clearer than
+the previous magic value, though.
 
-Except when the BDS is growable (which every BDS is).  qcow2 generally
-writes beyond the EOF, so I suppose a concurrent preallocating
-truncation may result in a race.
-
-We don't have preallocating truncation over QMP yet, so technically this
-is not an issue, but with your jobs series and this series, we may well
-have it soon.
-
-> * copy-on-read, crypto, raw-format: Essentially just filter drivers tha=
-t
->   pass the request to a child node, no problem.
->=20
-> * gluster, iscsi, nfs, rbd, ssh: Won't yield even after this series, so=
-
->   trivially okay.
->=20
-> * qcow2: This one is where you're right, it needs to hold s->lock so
->   that the metadata modifications become safe.
->=20
-> * qed: Does a single header update, should be fine without locking.
->=20
-> * sheepdog: Doesn't yield until it starts preallocation. For
->   preallocation, the same reasoning as for file-posix applies.
->=20
-> So, if I got this right, the only thing to change is holding s->lock in=
-
-> qcow2_co_truncate().
-
-By holding the lock, we would probably solve the race for qcow2, but
-probably not for raw-format.
-
-(And I think qcow2 and raw are the only formats that support
-preallocation on truncation.  (Well, raw doesn't really support it, but
-it does allow it.))
-
-Max
-
-
---Y4DgjiB05X4K5dQktJBJEpVpKsfynitpu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsw+REACgkQ9AfbAGHV
-z0BVRwf/ZKijrj/V1Sx0HLrZbeJhfLGu2JwsWaHWQuK/Et2krl3Oz5gVcHoeHd2b
-SSlyygjQ1DyAgwQ43CH+yxktjWx+t/XlPtfz0iWIScl4tJyBMmuwgf/3A0hoRaZy
-jiTujRsdnCijjfZj9MgbNUpZpTPoAyEIFuqUiTeceNdCYbkIlPz/OKG4yldAoSaD
-dhcBs6+Bc+8IM2SLcJCAgcdUD59YPZ2LH53k05EYwwqu7vZT7J6LsQG9HVjvdoAZ
-QTL1iCzwiHIOdWTNkU4fYM+N7IeeW7vis56JFOzNwjuFZcBdNRGkLwBI4wSNDWOm
-UzO+J5hRsD1DyVVVc5SPnLbq7fJFpA==
-=T9B4
------END PGP SIGNATURE-----
-
---Y4DgjiB05X4K5dQktJBJEpVpKsfynitpu--
+No real objections to this change from my side, though.
