@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fXTFB-00054H-0w
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:17:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fXTFu-0005SG-Bt
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:18:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fXTF7-0004ek-JC
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:17:29 -0400
-Received: from 2.mo177.mail-out.ovh.net ([178.33.109.80]:44758)
+	(envelope-from <dgilbert@redhat.com>) id 1fXTFr-0004tZ-7E
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:18:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34400 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fXTF7-0004eN-81
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:17:25 -0400
-Received: from player695.ha.ovh.net (unknown [10.109.108.80])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 7C569B4C32
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 17:17:23 +0200 (CEST)
-Date: Mon, 25 Jun 2018 17:17:18 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180625171718.6f51ebf4@bahia.lan>
-In-Reply-To: <2fafd9bc91e8104f302eda0bc7da5e90b868c7e3.1529196703.git.keno@juliacomputing.com>
-References: <cover.1529196703.git.keno@juliacomputing.com>
-	<2fafd9bc91e8104f302eda0bc7da5e90b868c7e3.1529196703.git.keno@juliacomputing.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fXTFr-0004tO-26
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:18:11 -0400
+Date: Mon, 25 Jun 2018 16:18:03 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180625151803.GA2393@work-vm>
+References: <aa9ce054-f58c-097d-aee3-8fae769d0840@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 02/13] 9p: Rename 9p-util ->
- 9p-util-linux
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <aa9ce054-f58c-097d-aee3-8fae769d0840@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Choosing PCR banks for swtpm's TPM 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,173 +27,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Keno Fischer <keno@juliacomputing.com>
-Cc: qemu-devel@nongnu.org
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: tpm2@lists.01.org, Kenneth Goldman <kgoldman@us.ibm.com>, Chris Friesen <chris.friesen@windriver.com>, "Qi, Yadong" <yadong.qi@intel.com>, qemu-devel <qemu-devel@nongnu.org>, "Xu, Quan" <quan.xu@intel.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
 
-On Sat, 16 Jun 2018 20:56:46 -0400
-Keno Fischer <keno@juliacomputing.com> wrote:
+* Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
+> Hi!
+>=20
+> =A0I am sending this email to solicit input on the choice of the PCR ba=
+nks to
+> enable for swtpm's TPM 2. I have currently enabled 4 PCR banks for
+> SHA{1,256,384,512}. The downside of this is that running the TPM 2 with=
+ so
+> many PCR banks has a performance impact when the Linux integrity measur=
+ement
+> architecture is used and has to extend measurements into all PCR banks,
+> which Linux does already.
+>=20
+> TPM 2 has the PCR_Allocate() command for a user to select the PCR banks=
+ to
+> use. This command allows to make some PCR banks invisible. The change h=
+as to
+> be done through the firmware and has the downside that the TPM2 does no=
+t
+> support TPM2_Shutdown(SU_STATE) after this command was used. This preve=
+nts
+> suspend/resume from working properly. So, it seems that one shouldn't h=
+ave
+> to use this command, which in turn means the number of PCR banks should=
+ be
+> small.
+>=20
+> Another complication with the swtpm is the upgrade path. Suspended VMs =
+will
+> expect that the PCR banks that were available before the suspend will b=
+e
+> available after the resume and a possible swtpm upgrade. This in turn m=
+eans
+> that the PCR banks should be chosen now and we'll have to stick with th=
+em.
+>=20
+> That said, my suggestion would be to enable only PCR banks for SHA256 f=
+or
+> 'now' and SHA512 for the future. Having two PCR banks should enable dec=
+ent
+> performance. If someone wants to have better performance he will have t=
+o go
+> through the firmware to select the PCR banks at the expense of loosing
+> suspend/resume support.
+>=20
+> The change of PCR banks for the current 4 PCR banks will break the stat=
+e of
+> all swtpms.
+>=20
+> If you have suggestions, please let me know.
 
-> The current file only has the Linux versions of these functions.
-> Rename the file accordingly and update the Makefile to only build
-> it on Linux. A Darwin version of these will follow later in the
-> series.
-> 
-> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-> ---
+Is this something that has to be set at compile time or could it be
+something chosen at run time (as options to the swtpm command line?)
 
-I reviewed this patch during v2:
-
-https://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg00110.html
-
-Please remember to add any Reviewed-by, Acked-by, Tested-by tags that were
-posted. This speeds up the reviewing process when you post a new version.
-
->  hw/9pfs/9p-util-linux.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/9pfs/9p-util.c       | 59 -------------------------------------------------
->  hw/9pfs/Makefile.objs   |  3 ++-
->  3 files changed, 61 insertions(+), 60 deletions(-)
->  create mode 100644 hw/9pfs/9p-util-linux.c
->  delete mode 100644 hw/9pfs/9p-util.c
-> 
-> diff --git a/hw/9pfs/9p-util-linux.c b/hw/9pfs/9p-util-linux.c
-> new file mode 100644
-> index 0000000..defa3a4
-> --- /dev/null
-> +++ b/hw/9pfs/9p-util-linux.c
-> @@ -0,0 +1,59 @@
-> +/*
-> + * 9p utilities (Linux Implementation)
-> + *
-> + * Copyright IBM, Corp. 2017
-> + *
-> + * Authors:
-> + *  Greg Kurz <groug@kaod.org>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/xattr.h"
-> +#include "9p-util.h"
-> +
-> +ssize_t fgetxattrat_nofollow(int dirfd, const char *filename, const char *name,
-> +                             void *value, size_t size)
-> +{
-> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
-> +    int ret;
-> +
-> +    ret = lgetxattr(proc_path, name, value, size);
-> +    g_free(proc_path);
-> +    return ret;
-> +}
-> +
-> +ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
-> +                              char *list, size_t size)
-> +{
-> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
-> +    int ret;
-> +
-> +    ret = llistxattr(proc_path, list, size);
-> +    g_free(proc_path);
-> +    return ret;
-> +}
-> +
-> +ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
-> +                                const char *name)
-> +{
-> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
-> +    int ret;
-> +
-> +    ret = lremovexattr(proc_path, name);
-> +    g_free(proc_path);
-> +    return ret;
-> +}
-> +
-> +int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
-> +                         void *value, size_t size, int flags)
-> +{
-> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
-> +    int ret;
-> +
-> +    ret = lsetxattr(proc_path, name, value, size, flags);
-> +    g_free(proc_path);
-> +    return ret;
-> +}
-> diff --git a/hw/9pfs/9p-util.c b/hw/9pfs/9p-util.c
-> deleted file mode 100644
-> index 614b7fc..0000000
-> --- a/hw/9pfs/9p-util.c
-> +++ /dev/null
-> @@ -1,59 +0,0 @@
-> -/*
-> - * 9p utilities
-> - *
-> - * Copyright IBM, Corp. 2017
-> - *
-> - * Authors:
-> - *  Greg Kurz <groug@kaod.org>
-> - *
-> - * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> - * See the COPYING file in the top-level directory.
-> - */
-> -
-> -#include "qemu/osdep.h"
-> -#include "qemu/xattr.h"
-> -#include "9p-util.h"
-> -
-> -ssize_t fgetxattrat_nofollow(int dirfd, const char *filename, const char *name,
-> -                             void *value, size_t size)
-> -{
-> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
-> -    int ret;
-> -
-> -    ret = lgetxattr(proc_path, name, value, size);
-> -    g_free(proc_path);
-> -    return ret;
-> -}
-> -
-> -ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
-> -                              char *list, size_t size)
-> -{
-> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
-> -    int ret;
-> -
-> -    ret = llistxattr(proc_path, list, size);
-> -    g_free(proc_path);
-> -    return ret;
-> -}
-> -
-> -ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
-> -                                const char *name)
-> -{
-> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
-> -    int ret;
-> -
-> -    ret = lremovexattr(proc_path, name);
-> -    g_free(proc_path);
-> -    return ret;
-> -}
-> -
-> -int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
-> -                         void *value, size_t size, int flags)
-> -{
-> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
-> -    int ret;
-> -
-> -    ret = lsetxattr(proc_path, name, value, size, flags);
-> -    g_free(proc_path);
-> -    return ret;
-> -}
-> diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
-> index e3fa673..95e3bc0 100644
-> --- a/hw/9pfs/Makefile.objs
-> +++ b/hw/9pfs/Makefile.objs
-> @@ -1,5 +1,6 @@
->  ifeq ($(call lor,$(CONFIG_VIRTIO_9P),$(CONFIG_XEN)),y)
-> -common-obj-y  = 9p.o 9p-util.o
-> +common-obj-y  = 9p.o
-> +common-obj-$(CONFIG_LINUX) += 9p-util-linux.o
->  common-obj-y += 9p-local.o 9p-xattr.o
->  common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
->  common-obj-y += coth.o cofs.o codir.o cofile.o
+Dave
+> Regards,
+>=20
+> =A0=A0 Stefan
+>=20
+>=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
