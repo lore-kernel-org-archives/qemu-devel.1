@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fXTQk-0005Bv-71
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:29:27 -0400
+	(envelope-from <sameeh@daynix.com>) id 1fXTQz-0005S7-MX
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:29:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fXTQf-0000dV-A6
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:29:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34842 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fXTQf-0000dQ-4r
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:29:21 -0400
-Date: Mon, 25 Jun 2018 16:29:17 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180625152916.GG2390@work-vm>
-References: <aa9ce054-f58c-097d-aee3-8fae769d0840@linux.vnet.ibm.com>
-	<20180625151803.GA2393@work-vm>
-	<ad36fd83-8de6-1e9e-db51-1ceaf0f0269a@linux.vnet.ibm.com>
+	(envelope-from <sameeh@daynix.com>) id 1fXTQw-0000iI-0Z
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:29:41 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:35730)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sameeh@daynix.com>) id 1fXTQv-0000he-IB
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 11:29:37 -0400
+Received: by mail-ed1-x542.google.com with SMTP id c1-v6so5666271edt.2
+	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 08:29:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <ad36fd83-8de6-1e9e-db51-1ceaf0f0269a@linux.vnet.ibm.com>
+In-Reply-To: <20180625112204.GH18580@redhat.com>
+References: <20180625110706.23332-1-sameeh@daynix.com>
+	<20180625110706.23332-3-sameeh@daynix.com>
+	<20180625112204.GH18580@redhat.com>
+From: Sameeh Jubran <sameeh@daynix.com>
+Date: Mon, 25 Jun 2018 18:29:35 +0300
+Message-ID: <CAKPgXcGq=CDGOPUDh2cFTHFAUcMa6KkXHWH+gJH6aUErRMJ3QQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Choosing PCR banks for swtpm's TPM 2
+Subject: Re: [Qemu-devel] [RFC v2 2/2] virtio-net: Example Patch for using
+ BPF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +31,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Cc: tpm2@lists.01.org, Kenneth Goldman <kgoldman@us.ibm.com>, Chris Friesen <chris.friesen@windriver.com>, "Qi, Yadong" <yadong.qi@intel.com>, qemu-devel <qemu-devel@nongnu.org>, "Xu, Quan" <quan.xu@intel.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>, Amnon Ilan <ailan@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-* Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
-> On 06/25/2018 11:18 AM, Dr. David Alan Gilbert wrote:
-> > * Stefan Berger (stefanb@linux.vnet.ibm.com) wrote:
-> > > Hi!
-> > >=20
-> > >  =A0I am sending this email to solicit input on the choice of the P=
-CR banks to
-> > > enable for swtpm's TPM 2. I have currently enabled 4 PCR banks for
-> > > SHA{1,256,384,512}. The downside of this is that running the TPM 2 =
-with so
-> > > many PCR banks has a performance impact when the Linux integrity me=
-asurement
-> > > architecture is used and has to extend measurements into all PCR ba=
-nks,
-> > > which Linux does already.
-> > >=20
-> > > TPM 2 has the PCR_Allocate() command for a user to select the PCR b=
-anks to
-> > > use. This command allows to make some PCR banks invisible. The chan=
-ge has to
-> > > be done through the firmware and has the downside that the TPM2 doe=
-s not
-> > > support TPM2_Shutdown(SU_STATE) after this command was used. This p=
-revents
-> > > suspend/resume from working properly. So, it seems that one shouldn=
-'t have
-> > > to use this command, which in turn means the number of PCR banks sh=
-ould be
-> > > small.
-> > >=20
-> > > Another complication with the swtpm is the upgrade path. Suspended =
-VMs will
-> > > expect that the PCR banks that were available before the suspend wi=
-ll be
-> > > available after the resume and a possible swtpm upgrade. This in tu=
-rn means
-> > > that the PCR banks should be chosen now and we'll have to stick wit=
-h them.
-> > >=20
-> > > That said, my suggestion would be to enable only PCR banks for SHA2=
-56 for
-> > > 'now' and SHA512 for the future. Having two PCR banks should enable=
- decent
-> > > performance. If someone wants to have better performance he will ha=
-ve to go
-> > > through the firmware to select the PCR banks at the expense of loos=
-ing
-> > > suspend/resume support.
-> > >=20
-> > > The change of PCR banks for the current 4 PCR banks will break the =
-state of
-> > > all swtpms.
-> > >=20
-> > > If you have suggestions, please let me know.
-> > Is this something that has to be set at compile time or could it be
-> > something chosen at run time (as options to the swtpm command line?)
-> It is a compile-time option...
+On Mon, Jun 25, 2018 at 2:22 PM, Daniel P. Berrang=C3=A9 <berrange@redhat.c=
+om>
+wrote:
 
-Hmm, that's a shame - I was hoping you'd be able to switch them at
-runtime (or at least hide them?) then you can solve the upgrade problem
-by running the new swtpm with a flag telling it to hide the new banks.
-I hope the ondisk formats for suspend/resume/migration are descriptive
-enough to be able to spot an error if you try and load one configured
-differently.
+> On Mon, Jun 25, 2018 at 02:07:06PM +0300, Sameeh Jubran wrote:
+> > From: Sameeh Jubran <sjubran@redhat.com>
+> >
+> > This commit is a sample only for using the libbpf in the code and
+> > shouldn't be committed.
+> >
+> > Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
+> > ---
+> >  hw/net/Makefile.objs | 4 ++++
+> >  hw/net/virtio-net.c  | 4 ++++
+> >  2 files changed, 8 insertions(+)
+> >
+> > diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+> > index fa461d4463..0fb271436d 100644
+> > --- a/hw/net/Makefile.objs
+> > +++ b/hw/net/Makefile.objs
+> > @@ -37,6 +37,10 @@ obj-$(CONFIG_PSERIES) +=3D spapr_llan.o
+> >  obj-$(CONFIG_XILINX_ETHLITE) +=3D xilinx_ethlite.o
+> >
+> >  obj-$(CONFIG_VIRTIO_NET) +=3D virtio-net.o
+> > +ifeq ($(CONFIG_BPF),y)
+> > +     virtio-net.o-cflags :=3D $(CFLAGS_BPF)
+> > +     virtio-net.o-libs :=3D $(LIBS_BPF)
+> > +endif
+> >  obj-y +=3D vhost_net.o
+> >
+> >  obj-$(CONFIG_ETSEC) +=3D fsl_etsec/etsec.o fsl_etsec/registers.o \
+> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> > index 90502fca7c..b4840838c1 100644
+> > --- a/hw/net/virtio-net.c
+> > +++ b/hw/net/virtio-net.c
+> > @@ -27,6 +27,7 @@
+> >  #include "hw/virtio/virtio-access.h"
+> >  #include "migration/misc.h"
+> >  #include "standard-headers/linux/ethtool.h"
+> > +#include "standard-headers/linux/libbpf.h"
+> >
+> >  #define VIRTIO_NET_VM_VERSION    11
+> >
+> > @@ -1329,6 +1330,9 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue
+> *q)
+> >      VirtQueueElement *elem;
+> >      int32_t num_packets =3D 0;
+> >      int queue_index =3D vq2q(virtio_get_queue_index(q->tx_vq));
+> > +
+> > +    struct bpf_object *obj =3D NULL;
+> > +    bpf_object__load(obj);
+>
+> This really doesn't tell us anything useful about how this will be
+> used and integrated in qemu. I'd expect this patch to actually
+> be doing a real feature complete impl of RSS for virtio-net.
+>
+No problem, I'll be sending the full series ASAP,
+Thanks :)
 
-Dave
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/
+> dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/
+> dberrange :|
+>
 
-> =A0=A0 Stefan
->=20
-> >=20
-> > Dave
-> > > Regards,
-> > >=20
-> > >  =A0=A0 Stefan
-> > >=20
-> > >=20
-> > >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+
+--=20
+Respectfully,
+*Sameeh Jubran*
+*Linkedin <https://il.linkedin.com/pub/sameeh-jubran/87/747/a8a>*
+*Software Engineer @ Daynix <http://www.daynix.com>.*
