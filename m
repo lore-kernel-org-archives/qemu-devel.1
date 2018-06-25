@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fXPZW-0006ud-76
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:22:15 -0400
+	(envelope-from <armbru@redhat.com>) id 1fXPjM-0005QH-K2
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:32:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fXPZS-0001An-7D
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:22:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35978 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fXPjI-0003x4-2R
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:32:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37602 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fXPZS-0001Af-2d
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:22:10 -0400
-Date: Mon, 25 Jun 2018 12:22:04 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180625112204.GH18580@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180625110706.23332-1-sameeh@daynix.com>
-	<20180625110706.23332-3-sameeh@daynix.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fXPjH-0003ui-Uj
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 07:32:20 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180601153922.11590-1-ricardo.perez_blanco@nokia.com>
+	<a51fbf8b-9839-ebc1-cde5-5ae95656f918@suse.de>
+	<20180608094101.GG2671@work-vm>
+	<0cc71e01-7015-8f8b-6988-d3b411d3b28c@suse.de>
+	<87y3fky231.fsf@dusky.pond.sub.org>
+Date: Mon, 25 Jun 2018 13:32:17 +0200
+In-Reply-To: <87y3fky231.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Tue, 12 Jun 2018 08:02:26 +0200")
+Message-ID: <87h8lrumny.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180625110706.23332-3-sameeh@daynix.com>
-Subject: Re: [Qemu-devel] [RFC v2 2/2] virtio-net: Example Patch for using
- BPF
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] Show values and description when using
+ "qom-list"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +32,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sameeh Jubran <sameeh@daynix.com>
-Cc: qemu-devel@nongnu.org, Yan Vugenfirer <yan@daynix.com>, Jason Wang <jasowang@redhat.com>, Amnon Ilan <ailan@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>, Ricardo Perez Blanco <ricardo.perez_blanco@nokia.com>, qemu-devel <qemu-devel@nongnu.org>, Dongli Zhang <dongli.zhang@oracle.com>
 
-On Mon, Jun 25, 2018 at 02:07:06PM +0300, Sameeh Jubran wrote:
-> From: Sameeh Jubran <sjubran@redhat.com>
-> 
-> This commit is a sample only for using the libbpf in the code and
-> shouldn't be committed.
-> 
-> Signed-off-by: Sameeh Jubran <sjubran@redhat.com>
-> ---
->  hw/net/Makefile.objs | 4 ++++
->  hw/net/virtio-net.c  | 4 ++++
->  2 files changed, 8 insertions(+)
-> 
-> diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
-> index fa461d4463..0fb271436d 100644
-> --- a/hw/net/Makefile.objs
-> +++ b/hw/net/Makefile.objs
-> @@ -37,6 +37,10 @@ obj-$(CONFIG_PSERIES) += spapr_llan.o
->  obj-$(CONFIG_XILINX_ETHLITE) += xilinx_ethlite.o
->  
->  obj-$(CONFIG_VIRTIO_NET) += virtio-net.o
-> +ifeq ($(CONFIG_BPF),y)
-> +	virtio-net.o-cflags := $(CFLAGS_BPF)
-> +	virtio-net.o-libs := $(LIBS_BPF)
-> +endif
->  obj-y += vhost_net.o
->  
->  obj-$(CONFIG_ETSEC) += fsl_etsec/etsec.o fsl_etsec/registers.o \
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index 90502fca7c..b4840838c1 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -27,6 +27,7 @@
->  #include "hw/virtio/virtio-access.h"
->  #include "migration/misc.h"
->  #include "standard-headers/linux/ethtool.h"
-> +#include "standard-headers/linux/libbpf.h"
->  
->  #define VIRTIO_NET_VM_VERSION    11
->  
-> @@ -1329,6 +1330,9 @@ static int32_t virtio_net_flush_tx(VirtIONetQueue *q)
->      VirtQueueElement *elem;
->      int32_t num_packets = 0;
->      int queue_index = vq2q(virtio_get_queue_index(q->tx_vq));
-> +
-> +    struct bpf_object *obj = NULL;
-> +    bpf_object__load(obj);
+Markus Armbruster <armbru@redhat.com> writes:
 
-This really doesn't tell us anything useful about how this will be
-used and integrated in qemu. I'd expect this patch to actually
-be doing a real feature complete impl of RSS for virtio-net.
+> Andreas F=C3=A4rber <afaerber@suse.de> writes:
+>
+>> Am 08.06.2018 um 11:41 schrieb Dr. David Alan Gilbert:
+>>> * Andreas F=C3=A4rber (afaerber@suse.de) wrote:
+>>>> Am 01.06.2018 um 17:39 schrieb Ricardo Perez Blanco:
+>>>>> For debugging purposes it is very useful to:
+>>>>>  - See the description of the field. This information is already fill=
+ed
+>>>>>    in but not shown in "qom-list" command.
+>>>>
+>>>> No objection on this part.
+>>>>
+>>>>>  - Display value of the field.
+>>>>
+>>>> That is by definition the qom-get operation, not qom-list. Just like t=
+he
+>>>> ls command does not show file contents, there's cat etc. for that. For
+>>>> debugging purposes we had a qom-tree (?) command that would combine
+>>>> both.
+>>>
+>>> I'm not too bothered about distinguishing between the two commands;
+>>> but it would be nice
+>
+> When an HMP and QMP both have a command with the same name, they should
+> do the same.
+>
+> HMP may add convenience features that aren't wanted in QMP, but I feel
+> extending an operation to list objects to also show their contents goes
+> beyond that.  If we want an HMP command that does both, it should be
+> named differently.  Perhaps that might even be more appropriate for HMP
+> than low-level commands qom-list and qom-get, but I leave that to the
+> HMP maintainer to decide.
+>
+>>>                      - one reason I'm not too bothered is because we've
+>>> failed to get a qom-get in multiple years of trying.
+>
+> We clearly haven't tried hard enough.
+>
+> If we can figure out how to show values in qom-list, surely we can
+> figure out how to show them in qom-get.
+>
+>>>>       There might be unmerged patches on qemu-devel related to display
+>>>> of certain data types.
+>>>=20
+>>> Which ones?
+>>
+>> My original qom-info series needed StringOutputVisitor changes for enums
+>> (test case: rtc) that did not get accepted immediately and thus some
+>> part of HMP qom-info/qom-get got stuck due to risking assertions for
+>> qom-info / otherwise; QMP was not affected IIRC.
+>
+> Here's the last try I can find:
+> [PATCH v2] qom: Implement qom-get HMP command
+> Message-Id: <1473157086-12062-1-git-send-email-dgilbert@redhat.com>
+> https://lists.gnu.org/archive/html/qemu-devel/2016-09/msg01041.html
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Stalled on output format and consistency with qom-set.  I wrote back
+then "We can take qom-get as is and improve its output later."  I'd like
+to encourage you to dust it off.  Perfect's the enemy of good.
+
+Wanted improvements include:
+
+* Prettier output format.  I'd suggest creating a keyval variant of the
+  output visitor.
+
+* Make qom-set input format consistent by switching to the matching
+  input visitor.
+
+> Its v1 tries a different approach:
+> [PATCH 0/2] qom-get [for 2.8]
+> Message-Id: <1472117833-10236-1-git-send-email-dgilbert@redhat.com>
+> Unfortunately the mailing list archive doesn't show the full thread, so
+> you get to follow three links:
+> https://lists.gnu.org/archive/html/qemu-devel/2016-08/msg03815.html
+> https://lists.gnu.org/archive/html/qemu-devel/2016-09/msg04261.html
+> https://lists.gnu.org/archive/html/qemu-devel/2016-09/msg04267.html
+
+This one stalled on string visitor limitations.  You didn't feel like
+addressing them just to get qom-get working.  Understandable.
