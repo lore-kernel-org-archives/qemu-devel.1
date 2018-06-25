@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fXN7p-0007RE-WE
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:45:30 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fXNBl-0008Gc-Dy
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:49:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fXN7l-0003Ma-To
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:45:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32942 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fXN7l-0003LI-Mj
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:45:25 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180622190936.177827-2-mst@redhat.com> (Michael S. Tsirkin's
-	message of "Fri, 22 Jun 2018 22:09:42 +0300")
-References: <20180622190936.177827-1-mst@redhat.com>
-	<20180622190936.177827-2-mst@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Mon, 25 Jun 2018 10:48:47 +0200
-Message-ID: <87wounjlow.fsf@secure.laptop>
+	(envelope-from <cohuck@redhat.com>) id 1fXNBk-00061Y-NB
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 04:49:33 -0400
+Date: Mon, 25 Jun 2018 10:49:28 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180625104928.6c4cb239.cohuck@redhat.com>
+In-Reply-To: <your-ad-here.call-01529915788-ext-6027@work.hours>
+References: <20180622194736.GA5794@roeck-us.net>
+	<126ac556-0602-b927-58f5-cb5f65a5e0ec@de.ibm.com>
+	<88d9afed-f91d-c320-13c8-9a93fc52b700@de.ibm.com>
+	<20180625100548.64222dad.cohuck@redhat.com>
+	<your-ad-here.call-01529915788-ext-6027@work.hours>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] kvm: support -overcommit
- cpu-pm=on|off
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] s390 qemu boot failure in -next
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +26,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Guenter Roeck <linux@roeck-us.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>
 
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
-> With this flag, kvm allows guest to control host CPU power state.  This
-> increases latency for other processes using same host CPU in an
-> unpredictable way, but if decreases idle entry/exit times for the
-> running VCPU, so to use it QEMU needs a hint about whether host CPU is
-> overcommitted, hence the flag name.
->
-> Follow-up patches will expose this capability to guest
-> (using mwait leaf).
->
-> Based on a patch by Wanpeng Li <kernellwp@gmail.com> .
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+On Mon, 25 Jun 2018 10:36:33 +0200
+Vasily Gorbik <gor@linux.ibm.com> wrote:
 
-[...]
+> This change has been done on purpose. Uncompressed image is not going
+> to be bootable any more. In future the decompressor phase would get
+> more function (early memory detection as an example) and there is no
+> chance to duplicate that code in uncompressed image as well (to keep it
+> bootable on its own). The patch series commit messages contain more
+> technical details.
+> 
+> For qemu either bzImage or arch/s390/boot/compressed/vmlinux should be
+> used, which are bootable images.
+> 
+> But that's really confusing that uncompressed vmlinux is still kind
+> of booting. May be we should discuss how to avoid this confusion
+> (may be change uncompressed image enty point to a function doing
+> disabled wait with badb007 or smth) and how to encourage people to use
+> arch/s390/boot/compressed/vmlinux instead.
 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 1e99ec9b7e..e468b50c4f 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -45,6 +45,7 @@
->  #include "migration/colo.h"
->  #include "hw/boards.h"
->  #include "monitor/monitor.h"
-> +#include "qemu/ptr_ring.h"
->  
->  #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
->  
-
-Why is this chuck needed?  I can't see a reason.
-
-
-Thanks, Juan.
+So, the intention is that you can't boot the uncompressed image
+anywhere? (Was it possible before, e.g. when punching the image under
+z/VM?) If yes, it would make sense to explicitly fence it. But I'm
+worried that it would break previously working setups (did we document
+the purpose of the images anywhere?)
