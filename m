@@ -1,15 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <root@localhost.localdomain>) id 1fXIJI-0000LU-Rb
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 23:37:01 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fXITK-0002QQ-VO
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 23:47:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <root@localhost.localdomain>) id 1fXIJH-0007F3-Ut
-	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 23:37:00 -0400
-From: yaoxu@didichuxing.com
-Date: Mon, 25 Jun 2018 10:31:55 +0800
-Message-Id: <20180625023155.2022-1-yaoxu@didichuxing.com>
-Subject: [Qemu-devel] block/dirty-bitmap: Useless bitmaps in image can be
- removed
+	(envelope-from <richard.henderson@linaro.org>) id 1fXITH-0001hW-T3
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 23:47:23 -0400
+Received: from mail-pl0-x234.google.com ([2607:f8b0:400e:c01::234]:34701)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fXITH-0001ge-JW
+	for qemu-devel@nongnu.org; Sun, 24 Jun 2018 23:47:19 -0400
+Received: by mail-pl0-x234.google.com with SMTP id g20-v6so6171733plq.1
+	for <qemu-devel@nongnu.org>; Sun, 24 Jun 2018 20:47:19 -0700 (PDT)
+References: <20180623022258.22158-1-programmingkidx@gmail.com>
+	<ecf44486-09a4-9c9a-b96e-1db2d6a1bcbe@linaro.org>
+	<1E63C3B2-7668-4D05-BC43-02E478FB493B@gmail.com>
+	<bc3cd25b-bdd1-3bc7-8d2d-5c351f2c30d5@linaro.org>
+	<4CC477CD-237F-480D-B9B5-B35FF507BD3C@gmail.com>
+	<c6d132e2-b2e0-5bbb-7b71-9bd13253aa22@linaro.org>
+	<2CAC99CF-A717-4A94-A68C-EEB76C727F87@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <dbbebf00-9b32-4639-1e26-a888c48f6203@linaro.org>
+Date: Sun, 24 Jun 2018 20:47:15 -0700
+MIME-Version: 1.0
+In-Reply-To: <2CAC99CF-A717-4A94-A68C-EEB76C727F87@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] fix fdiv instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,72 +36,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, kwolf@redhat.com, mreitz@redhat.com, yaoxu <yaoxu@didichuxing.com>
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>, "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>
 
-If qemu-kvm quit without saving bitmaps to image(coredump, host kernel panic,
-or host pooweroff), bitmaps in image can not be safely used anymore, and also
-can not be removed. Useless bitmaps should be removed.
+On 06/24/2018 11:38 AM, Programmingkid wrote:
+> void test_division_by_zero()
+> {
+>     Converter c;
+>     uint64_t expected_answer = 0x0;
+>     uint32_t actual_fpscr, expected_fpscr = 0xc4000010;
+>     reset_fpscr();
+>     set_fpscr_bit(ZE);
+>     asm volatile("fdiv %0, %1, %2" : "=f"(c.d) : "f"(1.0), "f"(0.0));
 
-Signed-off-by: yaoxu <yaoxu@didichuxing.com>
----
-diff --git a/blockdev.c b/blockdev.c
-index 58d7570932..c85056a74b 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2837,31 +2837,35 @@ void qmp_block_dirty_bitmap_remove(const char *node, const char *name,
-     Error *local_err = NULL;
- 
-     bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
--    if (!bitmap || !bs) {
-+    if (!bs) {
-         return;
-     }
- 
--    if (bdrv_dirty_bitmap_frozen(bitmap)) {
--        error_setg(errp,
--                   "Bitmap '%s' is currently frozen and cannot be removed",
--                   name);
--        return;
--    } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
--        error_setg(errp,
--                   "Bitmap '%s' is currently locked and cannot be removed",
--                   name);
-+    if (bitmap) {
-+        if (bdrv_dirty_bitmap_frozen(bitmap)) {
-+            error_setg(errp,
-+                       "Bitmap '%s' is currently frozen and cannot be removed",
-+                       name);
-+            return;
-+        } else if (bdrv_dirty_bitmap_qmp_locked(bitmap)) {
-+            error_setg(errp,
-+                       "Bitmap '%s' is currently locked and cannot be removed",
-+                       name);
-+            return;
-+        }
-+    }
-+
-+    bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
-+    if (local_err != NULL) {
-+        error_propagate(errp, local_err);
-         return;
-     }
- 
--    if (bdrv_dirty_bitmap_get_persistance(bitmap)) {
--        bdrv_remove_persistent_dirty_bitmap(bs, name, &local_err);
--        if (local_err != NULL) {
--            error_propagate(errp, local_err);
--            return;
--        }
-+    if (bitmap) {
-+        bdrv_release_dirty_bitmap(bs, bitmap);
-     }
- 
--    bdrv_release_dirty_bitmap(bs, bitmap);
-+    if (*errp) {
-+        error_free(*errp);
-+        *errp = NULL;
-+    }
- }
- 
- /**
+Try
+
+    uint64_t expected_answer = 0xffff0000deadbeef;
+    ...
+    c.i = expected_answer;
+    asm volatile("fdiv %0, %1, %2" : "+f"(c.d) : "f"(1.0), "f"(0.0));
+
+to avoid depending on uninitialized data.  (This expected value is
+an SNaN with a deadbeef marker Just to be Sure.)
+
+
+r~
