@@ -1,27 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXURJ-0001HS-9J
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:34:06 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fXUZq-00035p-IP
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:42:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXURI-00050D-Cy
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:34:05 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:46984)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXURI-0004zi-68
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:34:04 -0400
-Received: by mail-oi0-x243.google.com with SMTP id h79-v6so13070007oig.13
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 09:34:04 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180622022035.18490-1-f4bug@amsat.org>
-References: <20180622022035.18490-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 17:33:42 +0100
-Message-ID: <CAFEAcA_BC5b8uJemM_aVW03D7tsxnDAwB6_ibW8owP_SCSjJSw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] Makefile: Enable synchronized parallel
- output when possible
+	(envelope-from <kwolf@redhat.com>) id 1fXUZp-0000Ey-Ky
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:42:54 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Mon, 25 Jun 2018 18:42:39 +0200
+Message-Id: <20180625164239.13794-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH] usb-storage: Add rerror/werror properties
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +17,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Daniel P . Berrange" <berrange@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, berrange@redhat.com, pkrempa@redhat.com, armbru@redhat.com, pbonzini@redhat.com, kraxel@redhat.com, qemu-devel@nongnu.org
 
-On 22 June 2018 at 03:20, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wro=
-te:
-> The '--output-sync' option is available since GNU make 4.0.
+The error handling policy was traditionally set with -drive, but with
+-blockdev it is no longer possible to set frontend options. scsi-disk
+(and other block devices) have long supported qdev properties to
+configure the error handling policy, so let's add these options to
+usb-storage as well and just forward them to the internal scsi-disk
+instance.
 
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> Maybe 'line' is better for workstation and 'target/recurse' for
-> unattended builds.
->
-> doc: https://www.gnu.org/software/make/manual/html_node/Parallel-Output.h=
-tml
-> ---
->  Makefile | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/Makefile b/Makefile
-> index e46f2b625a..e94c687afe 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -367,6 +367,10 @@ DOCS=3D
->  endif
->
->  SUBDIR_MAKEFLAGS=3D$(if $(V),,--no-print-directory --quiet) BUILD_DIR=3D=
-$(BUILD_DIR)
-> +ifeq ($(shell test $(firstword $(subst ., ,$(MAKE_VERSION))) -ge 4; echo=
- $$?),0)
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ include/hw/scsi/scsi.h |  2 ++
+ hw/scsi/scsi-bus.c     | 11 ++++++++++-
+ hw/usb/dev-storage.c   |  2 ++
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
-A comment here would help in figuring out what version check
-you were intending to perform. Also surely we don't need to
-go out to the shell just to do a comparison...
-
-Make seems to advertise --output-sync support as part of its
-.FEATURES variable, so probably the most reliable way to do
-this test is to check whether .FEATURES contains "output-sync".
-
-> +SUBDIR_MAKEFLAGS+=3D--output-sync=3Dtarget
-> +endif
-> +
->  SUBDIR_DEVICES_MAK=3D$(patsubst %, %/config-devices.mak, $(TARGET_LIST))
->  SUBDIR_DEVICES_MAK_DEP=3D$(patsubst %, %-config-devices.mak.d, $(TARGET_=
-LIST))
-
-This only affects our sub-makes, though, right? So the user
-would have to specify it on the command line anyway so that
-it applies to the top level make process...
-
-thanks
--- PMM
+diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+index e35137ea78..1a7290d563 100644
+--- a/include/hw/scsi/scsi.h
++++ b/include/hw/scsi/scsi.h
+@@ -154,6 +154,8 @@ static inline SCSIBus *scsi_bus_from_device(SCSIDevice *d)
+ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+                                       int unit, bool removable, int bootindex,
+                                       bool share_rw,
++                                      BlockdevOnError rerror,
++                                      BlockdevOnError werror,
+                                       const char *serial, Error **errp);
+ void scsi_bus_legacy_handle_cmdline(SCSIBus *bus);
+ void scsi_legacy_handle_cmdline(void);
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index 9646743a7d..5905f6bf29 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -226,6 +226,8 @@ static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
+ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+                                       int unit, bool removable, int bootindex,
+                                       bool share_rw,
++                                      BlockdevOnError rerror,
++                                      BlockdevOnError werror,
+                                       const char *serial, Error **errp)
+ {
+     const char *driver;
+@@ -262,6 +264,10 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
+         object_unparent(OBJECT(dev));
+         return NULL;
+     }
++
++    qdev_prop_set_enum(dev, "rerror", rerror);
++    qdev_prop_set_enum(dev, "werror", werror);
++
+     object_property_set_bool(OBJECT(dev), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+@@ -285,7 +291,10 @@ void scsi_bus_legacy_handle_cmdline(SCSIBus *bus)
+         }
+         qemu_opts_loc_restore(dinfo->opts);
+         scsi_bus_legacy_add_drive(bus, blk_by_legacy_dinfo(dinfo),
+-                                  unit, false, -1, false, NULL, &error_fatal);
++                                  unit, false, -1, false,
++                                  BLOCKDEV_ON_ERROR_AUTO,
++                                  BLOCKDEV_ON_ERROR_AUTO,
++                                  NULL, &error_fatal);
+     }
+     loc_pop(&loc);
+ }
+diff --git a/hw/usb/dev-storage.c b/hw/usb/dev-storage.c
+index c99398b7f6..cd5551d94f 100644
+--- a/hw/usb/dev-storage.c
++++ b/hw/usb/dev-storage.c
+@@ -625,6 +625,7 @@ static void usb_msd_storage_realize(USBDevice *dev, Error **errp)
+                  &usb_msd_scsi_info_storage, NULL);
+     scsi_dev = scsi_bus_legacy_add_drive(&s->bus, blk, 0, !!s->removable,
+                                          s->conf.bootindex, s->conf.share_rw,
++                                         s->conf.rerror, s->conf.werror,
+                                          dev->serial,
+                                          errp);
+     blk_unref(blk);
+@@ -671,6 +672,7 @@ static const VMStateDescription vmstate_usb_msd = {
+ 
+ static Property msd_properties[] = {
+     DEFINE_BLOCK_PROPERTIES(MSDState, conf),
++    DEFINE_BLOCK_ERROR_PROPERTIES(MSDState, conf),
+     DEFINE_PROP_BIT("removable", MSDState, removable, 0, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+-- 
+2.13.6
