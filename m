@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fXYxX-0003J7-IB
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:23:40 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fXZJk-0001iQ-3F
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:46:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fXYxW-0000gb-I9
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:23:39 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fXZJj-0007k4-0S
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 17:46:36 -0400
 References: <20180625165745.25259-1-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <b021509d-71fe-2c16-6f66-1e6277940988@redhat.com>
-Date: Mon, 25 Jun 2018 17:23:30 -0400
+Message-ID: <17d590b3-47b1-e9d8-f8f1-0c6dd2b91833@redhat.com>
+Date: Mon, 25 Jun 2018 17:46:24 -0400
 MIME-Version: 1.0
 In-Reply-To: <20180625165745.25259-1-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
@@ -39,15 +39,9 @@ On 06/25/2018 12:57 PM, Vladimir Sementsov-Ogievskiy wrote:
 >  3 files changed, 12 insertions(+), 5 deletions(-)
 > 
 
-ACK,
+Thanks, applied to my bitmaps tree:
 
-though it looks really odd that we've got enable/disable but only one
-corresponding _locked version.
-
-I have a patch somewhere in my local files to create a combined
-_set_disabled() that would cut the number of functions we have by a
-little bit.
-
-I'll take this first though, as an iotest fix.
+https://github.com/jnsnow/qemu/commits/bitmaps
+https://github.com/jnsnow/qemu.git
 
 --js
