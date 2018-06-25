@@ -1,40 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38966)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fXLv1-0000TF-J9
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:28:12 -0400
+	(envelope-from <lersek@redhat.com>) id 1fXLzU-0001Uk-2F
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:32:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1fXLuy-00049C-Ft
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:28:11 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49710
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1fXLuy-00048t-AA
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:28:08 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w5P7Oiup068892
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 03:28:07 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2jtsvddd3x-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 03:28:07 -0400
-Received: from localhost
-	by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 25 Jun 2018 08:28:04 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-References: <20180622194736.GA5794@roeck-us.net>
-	<126ac556-0602-b927-58f5-cb5f65a5e0ec@de.ibm.com>
-Date: Mon, 25 Jun 2018 09:27:59 +0200
+	(envelope-from <lersek@redhat.com>) id 1fXLzQ-0005nR-VS
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:32:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45682 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fXLzQ-0005lj-Ov
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 03:32:44 -0400
+References: <20180623085028.29553-1-mark.cave-ayland@ilande.co.uk>
+	<20180623085028.29553-2-mark.cave-ayland@ilande.co.uk>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <7ac656b2-374a-8591-08a6-8303aae1eba1@redhat.com>
+Date: Mon, 25 Jun 2018 09:32:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <126ac556-0602-b927-58f5-cb5f65a5e0ec@de.ibm.com>
-Content-Language: en-US
-Message-Id: <88d9afed-f91d-c320-13c8-9a93fc52b700@de.ibm.com>
+In-Reply-To: <20180623085028.29553-2-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] s390 qemu boot failure in -next
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] sysbus: always allow
+ explicit_ofw_unit_address() to override address generation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,63 +29,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Guenter Roeck <linux@roeck-us.net>, Martin Schwidefsky <schwidefsky@de.ibm.com>
-Cc: Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x <qemu-s390x@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, marcel@redhat.com, armbru@redhat.com, mst@redhat.com
 
-Also adding QEMU.
+Hi Mark,
 
-On 06/25/2018 09:10 AM, Christian Borntraeger wrote:
+On 06/23/18 10:50, Mark Cave-Ayland wrote:
+> Some SysBusDevices either use sysbus_init_mmio() without sysbus_mmio_map() or
+> the first MMIO memory region doesn't represent the bus address, causing an invalid
+> firmware device path to be generated.
 > 
+> SysBusDeviceClass does provide a virtual explicit_ofw_unit_address() method that
+> can be used to override this process, but it is only considered as a fallback
+> option meaning that any existing MMIO memory regions still take priority whilst
+> determining the firmware device address.
 > 
-> On 06/22/2018 09:47 PM, Guenter Roeck wrote:
->> Hi,
->>
->> starting with commit 's390/boot: make head.S and als.c be part of the
->> decompressor only' in -next, s390 immages no longer boot in qemu.
->> As far as I can see, the reason is that the command line is no longer
->> passed from qemu to the kernel, which results in a panic because the
->> root file system can not be mounted.
->>
->> Was this change made on purpose ? If so, is there a way to get qemu
->> back to working ?
-> 
-> Certainly not on purpose.
-> 
-> Vasily, I can reproduce this with KVM and an external kernel boot of the vmlinux file (the elf file)
-> 
-> e.g.
-> 
-> qemu-system-s390 -enable-kvm -nographic -kernel vmlinux -append "this string no longer is command line"
-> 
-> The compressed image (bzImage) seems to work fine though.
-> 
-> This seems to be an unfortunate side effect of QEMUs ways to "guess" its Linux (checking for start
-> address 0x10000, which is no longer true for the vmlinux file). With the pure vmlinux elf file
-> the load address is 0x100000 as there is no unpacker.
-> 
-> Guenter, can you check if arch/s390/boot/bzImage works for you as a workaround?
+> As any class defining explicit_ofw_unit_address() has explicitly requested a
+> specialised behaviour then it should be used in preference to the default
+> implementation rather than being used as a fallback.
 
-Something like this in QEMU 
+I disagree about the last paragraph, when put like this. I don't
+disagree with the *goal* of the patch, however the original
+justification for explicit_ofw_unit_address() was different.
 
-diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index f278036fa7..14153ce880 100644
---- a/hw/s390x/ipl.c
-+++ b/hw/s390x/ipl.c
-@@ -187,11 +187,13 @@ static void s390_ipl_realize(DeviceState *dev, Error **errp)
-          */
-         if (pentry == KERN_IMAGE_START || pentry == 0x800) {
-             ipl->start_addr = KERN_IMAGE_START;
--            /* Overwrite parameters in the kernel image, which are "rom" */
--            strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
-         } else {
-             ipl->start_addr = pentry;
-         }
-+       if (ipl->cmdline) {
-+            /* If there is a command line, put it in the right place */
-+            strcpy(rom_ptr(KERN_PARM_AREA), ipl->cmdline);
-+       }
- 
-         if (ipl->initrd) {
-             ram_addr_t initrd_offset;
+It was meant as a fallback for distinguishing sysbus devices when those
+sysbus devices had neither MMIO nor PIO resources. The issue wasn't that
+MMIO/PIO-based identification was not "right", the issue was that unique
+identification was impossible in the absence of such resources. Please
+see commit 0b336b3b98d8 ("hw/core: explicit OFW unit address callback
+for SysBusDeviceClass", 2015-06-23).
 
-would put the command line in no matter what the start address is.
+I don't have anything against repurposing explicit_ofw_unit_address()
+like this -- as long as you check that it doesn't change behavior for
+existing devices -- it's just that we shouldn't justify the new purpose
+with the original intent. The original intent was different.
+
+I suggest stating, "we can have explicit_ofw_unit_address() take
+priority in a backwards-compatible manner, because no sysbus device
+currently has both explicit_ofw_unit_address() and MMIO/PIO resources".
+
+(Obviously checking the validity of this statement is up to you; I'm
+just suggesting what I'd see as one more precise explanation.)
+
+Thanks,
+Laszlo
+
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  hw/core/sysbus.c | 15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
+> index ecfb0cfc0e..1ee0c162f4 100644
+> --- a/hw/core/sysbus.c
+> +++ b/hw/core/sysbus.c
+> @@ -293,16 +293,8 @@ static char *sysbus_get_fw_dev_path(DeviceState *dev)
+>  {
+>      SysBusDevice *s = SYS_BUS_DEVICE(dev);
+>      SysBusDeviceClass *sbc = SYS_BUS_DEVICE_GET_CLASS(s);
+> -    /* for the explicit unit address fallback case: */
+>      char *addr, *fw_dev_path;
+>  
+> -    if (s->num_mmio) {
+> -        return g_strdup_printf("%s@" TARGET_FMT_plx, qdev_fw_name(dev),
+> -                               s->mmio[0].addr);
+> -    }
+> -    if (s->num_pio) {
+> -        return g_strdup_printf("%s@i%04x", qdev_fw_name(dev), s->pio[0]);
+> -    }
+>      if (sbc->explicit_ofw_unit_address) {
+>          addr = sbc->explicit_ofw_unit_address(s);
+>          if (addr) {
+> @@ -311,6 +303,13 @@ static char *sysbus_get_fw_dev_path(DeviceState *dev)
+>              return fw_dev_path;
+>          }
+>      }
+> +    if (s->num_mmio) {
+> +        return g_strdup_printf("%s@" TARGET_FMT_plx, qdev_fw_name(dev),
+> +                               s->mmio[0].addr);
+> +    }
+> +    if (s->num_pio) {
+> +        return g_strdup_printf("%s@i%04x", qdev_fw_name(dev), s->pio[0]);
+> +    }
+>      return g_strdup(qdev_fw_name(dev));
+>  }
+>  
+> 
