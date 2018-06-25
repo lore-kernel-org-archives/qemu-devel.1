@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fXXl2-0002fe-N5
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 16:06:41 -0400
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fXXl4-0002g5-G4
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 16:06:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fXXl0-0002O6-Uz
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 16:06:40 -0400
-Received: from mx2.rt-rk.com ([89.216.37.149]:40247 helo=mail.rt-rk.com)
+	(envelope-from <aleksandar.markovic@rt-rk.com>) id 1fXXkz-0002Ly-Hd
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 16:06:42 -0400
+Received: from mx2.rt-rk.com ([89.216.37.149]:40224 helo=mail.rt-rk.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
-	id 1fXXl0-0002MO-NV
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 16:06:38 -0400
+	id 1fXXkz-00023E-9p
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 16:06:37 -0400
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Date: Mon, 25 Jun 2018 22:06:00 +0200
-Message-Id: <1529957164-4744-6-git-send-email-aleksandar.markovic@rt-rk.com>
+Date: Mon, 25 Jun 2018 22:05:57 +0200
+Message-Id: <1529957164-4744-3-git-send-email-aleksandar.markovic@rt-rk.com>
 In-Reply-To: <1529957164-4744-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1529957164-4744-1-git-send-email-aleksandar.markovic@rt-rk.com>
-Subject: [Qemu-devel] [PULL 5/9] target/mips: Raise a RI when given fs is
- n/a from CTC1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/9] hw/mips/boston: don't make flash region
+ 'nomigrate'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +31,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-From: Yongbok Kim <yongbok.kim@mips.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 
-Fix to raise a Reserved Instruction exception when given fs is not
-available from CTC1.
+Currently we use memory_region_init_rom_nomigrate() to create
+the "boston.flash" memory region, and we don't manually register
+it with vmstate_register_ram(). This currently means that its
+contents are migrated but as a ram block whose name is the empty
+string; in future it may mean they are not migrated at all. Use
+memory_region_init_ram() instead.
 
-Signed-off-by: Yongbok Kim <yongbok.kim@mips.com>
-Reviewed-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
+Note that this is a a cross-version migration compatibility break
+for the "boston" machine.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Aleksandar Markovic <aleksandar.markovic@mips.com>
 ---
- target/mips/op_helper.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/mips/boston.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
-index 9025f42..41d3634 100644
---- a/target/mips/op_helper.c
-+++ b/target/mips/op_helper.c
-@@ -2627,6 +2627,9 @@ void helper_ctc1(CPUMIPSState *env, target_ulong arg1, uint32_t fs, uint32_t rt)
-                (env->active_fpu.fcr31 & ~(env->active_fpu.fcr31_rw_bitmask));
-         break;
-     default:
-+        if (env->insn_flags & ISA_MIPS32R6) {
-+            do_raise_exception(env, EXCP_RI, GETPC());
-+        }
-         return;
-     }
-     restore_fp_status(env);
--- 
+diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+index 52cce19..14e6f95 100644
+--- a/hw/mips/boston.c
++++ b/hw/mips/boston.c
+@@ -471,8 +471,7 @@ static void boston_mach_init(MachineState *machine)
+     sysbus_mmio_map_overlap(SYS_BUS_DEVICE(s->cps), 0, 0, 1);
+=20
+     flash =3D  g_new(MemoryRegion, 1);
+-    memory_region_init_rom_nomigrate(flash, NULL,
+-                                     "boston.flash", 128 * M_BYTE, &err)=
+;
++    memory_region_init_rom(flash, NULL, "boston.flash", 128 * M_BYTE, &e=
+rr);
+     memory_region_add_subregion_overlap(sys_mem, 0x18000000, flash, 0);
+=20
+     ddr =3D g_new(MemoryRegion, 1);
+--=20
 2.7.4
