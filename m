@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39348)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXUoc-0000BE-QS
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:58:13 -0400
+	(envelope-from <cota@braap.org>) id 1fXUq1-0001FC-6X
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:59:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fXUoc-00073A-5K
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:58:10 -0400
-Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:42185)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fXUoc-00072u-0D
-	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:58:10 -0400
-Received: by mail-oi0-x231.google.com with SMTP id n84-v6so5549889oib.9
-	for <qemu-devel@nongnu.org>; Mon, 25 Jun 2018 09:58:09 -0700 (PDT)
+	(envelope-from <cota@braap.org>) id 1fXUpy-0007SD-L4
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:59:37 -0400
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:34515)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fXUpy-0007S0-EL
+	for qemu-devel@nongnu.org; Mon, 25 Jun 2018 12:59:34 -0400
+Date: Mon, 25 Jun 2018 12:59:31 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20180625165931.GA16777@flamenco>
+References: <20180623215313.1252-1-f4bug@amsat.org>
+	<2f6b05fd-afb3-cc8d-6b3d-011e2fd87c47@amsat.org>
+	<CAMo8BfJWemPTt3fTO5RwGub+1wzyBs3xfh_zY+LBVOhocZ-d3w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180621015359.12018-15-richard.henderson@linaro.org>
-References: <20180621015359.12018-1-richard.henderson@linaro.org>
-	<20180621015359.12018-15-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 25 Jun 2018 17:57:48 +0100
-Message-ID: <CAFEAcA9geF6VOCGnb5D0935UP1WwbBHXWKrmY379ztPJsoBRiw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v5 14/35] target/arm: Implement SVE
- first-fault gather loads
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMo8BfJWemPTt3fTO5RwGub+1wzyBs3xfh_zY+LBVOhocZ-d3w@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH] docker: Add debian-xtensa-cross image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,22 +28,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Max Filippov <jcmvbkbc@gmail.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <richard.henderson@linaro.org>
 
-On 21 June 2018 at 02:53, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper-sve.h    |  67 ++++++++++++++++++++
->  target/arm/sve_helper.c    |  88 ++++++++++++++++++++++++++
->  target/arm/translate-sve.c | 126 ++++++++++++++++++++++++-------------
->  3 files changed, 236 insertions(+), 45 deletions(-)
+On Sat, Jun 23, 2018 at 20:24:09 -0700, Max Filippov wrote:
+> # first bad commit: [0b5c91f74f3c83a36f37740969df8c775c997e69]
+> translate-all: use per-page locking in !user-mode
+> 
+> Emilio, could you please take a look? The following test locks up QEMU:
+> 
+> qemu-system-xtensa -M sim -cpu dc232b -nographic -semihosting -icount
+> 6  -kernel ./test_mmu.tst
+> 
+> test_mmu.tst binary may be found here:
+> http://jcmvbkbc.spb.ru/~dumb/tmp/201806232022/test_mmu.tst
 
-...ah, I see the answer about FF loads is "in the next patch"...
+Thanks for the test case.
 
+I submitted a patch that fixes this for me--see this thread:
+  https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg07236.html
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+		Emilio
